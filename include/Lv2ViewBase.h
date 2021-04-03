@@ -29,43 +29,40 @@
 
 #ifdef LMMS_HAVE_LV2
 
-
 #include <QString>
 #include <QVector>
 
 #include "LinkedModelGroupViews.h"
-#include "lmms_export.h"
 #include "Lv2Basics.h"
+#include "lmms_export.h"
 
 class Lv2Proc;
 class Lv2ControlBase;
-
 
 //! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
 class Lv2ViewProc : public LinkedModelGroupView
 {
 public:
 	//! @param colNum numbers of columns for the controls
-	Lv2ViewProc(QWidget *parent, Lv2Proc *ctrlBase, int colNum);
+	Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum);
 	~Lv2ViewProc();
 
 private:
-	static AutoLilvNode uri(const char *uriStr);
+	static AutoLilvNode uri(const char* uriStr);
 };
-
 
 //! Base class for view for one Lv2 plugin
 class LMMS_EXPORT Lv2ViewBase : public LinkedModelGroupsView
 {
 protected:
 	//! @param pluginWidget A child class which inherits QWidget
-	Lv2ViewBase(class QWidget *pluginWidget, Lv2ControlBase *ctrlBase);
+	Lv2ViewBase(class QWidget* pluginWidget, Lv2ControlBase* ctrlBase);
 	~Lv2ViewBase();
 
 	// these widgets must be connected by child widgets
-	class QPushButton *m_reloadPluginButton = nullptr;
-	class QPushButton *m_toggleUIButton = nullptr;
-	class QPushButton *m_helpButton = nullptr;
+	class QPushButton* m_reloadPluginButton = nullptr;
+	class QPushButton* m_toggleUIButton = nullptr;
+	class QPushButton* m_helpButton = nullptr;
 
 	void toggleUI();
 	void toggleHelp(bool visible);
@@ -82,7 +79,7 @@ private:
 		LinkChannelsRow
 	};
 
-	static AutoLilvNode uri(const char *uriStr);
+	static AutoLilvNode uri(const char* uriStr);
 	LinkedModelGroupView* getGroupView() override { return m_procView; }
 
 	Lv2ViewProc* m_procView;
@@ -90,9 +87,8 @@ private:
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	const int m_colNum = 6;
 	class QMdiSubWindow* m_helpWindow = nullptr;
-	class LedCheckBox *m_multiChannelLink;
+	class LedCheckBox* m_multiChannelLink;
 };
-
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2VIEWBASE_H

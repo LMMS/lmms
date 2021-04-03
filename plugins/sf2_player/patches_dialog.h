@@ -22,16 +22,15 @@
  *
  */
 
-
 #ifndef _PATCHES_DIALOG_H
 #define _PATCHES_DIALOG_H
 
-#include "ui_patches_dialog.h"
-#include "LcdSpinBox.h"
-
-#include "fluidsynthshims.h"
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
+
+#include "LcdSpinBox.h"
+#include "fluidsynthshims.h"
+#include "ui_patches_dialog.h"
 
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
@@ -41,22 +40,20 @@ class patchesDialog : public QDialog, private Ui::patchesDialog
 	Q_OBJECT
 
 public:
-
 	// Constructor.
-	patchesDialog(QWidget *pParent = 0, Qt::WindowFlags wflags = QFlag(0));
+	patchesDialog(QWidget* pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 
 	// Destructor.
 	virtual ~patchesDialog();
 
-
-	void setup(fluid_synth_t *pSynth, int iChan, const QString & _chanName,
-			LcdSpinBoxModel * _bankModel, LcdSpinBoxModel * _progModel, QLabel *_patchLabel );
+	void setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName,
+		LcdSpinBoxModel* _bankModel, LcdSpinBoxModel* _progModel, QLabel* _patchLabel);
 
 public slots:
 
 	void stabilizeForm();
 	void bankChanged();
-	void progChanged( QTreeWidgetItem * _curr, QTreeWidgetItem * _prev );
+	void progChanged(QTreeWidgetItem* _curr, QTreeWidgetItem* _prev);
 
 protected slots:
 
@@ -64,18 +61,16 @@ protected slots:
 	void reject();
 
 protected:
-
 	void setBankProg(int iBank, int iProg);
 
-	QTreeWidgetItem *findBankItem(int iBank);
-	QTreeWidgetItem *findProgItem(int iProg);
+	QTreeWidgetItem* findBankItem(int iBank);
+	QTreeWidgetItem* findProgItem(int iProg);
 
 	bool validateForm();
 
 private:
-
 	// Instance variables.
-	fluid_synth_t *m_pSynth;
+	fluid_synth_t* m_pSynth;
 
 	int m_iChan;
 	int m_iBank;
@@ -85,11 +80,9 @@ private:
 	//int m_iDirtyCount;
 	int m_dirty;
 
-	LcdSpinBoxModel * m_bankModel;
-	LcdSpinBoxModel * m_progModel;
-	QLabel *m_patchLabel;
+	LcdSpinBoxModel* m_bankModel;
+	LcdSpinBoxModel* m_progModel;
+	QLabel* m_patchLabel;
 };
 
-
 #endif
-

@@ -27,44 +27,43 @@
 #include <winsock2.h>
 #endif
 
-#include <queue>
-
 #include <FL/x.H>
+#include <queue>
 #undef CursorShape // is, by mistake, not undefed in FL
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
 
+#include "LocalZynAddSubFx.h"
 #include "Note.h"
 #include "RemotePlugin.h"
 #include "RemoteZynAddSubFx.h"
-#include "LocalZynAddSubFx.h"
-
 #include "zynaddsubfx/src/Nio/Nio.h"
 #include "zynaddsubfx/src/UI/MasterUI.h"
-
 
 class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx
 {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
-	RemoteZynAddSubFx( int _shm_in, int _shm_out ) :
-		RemotePluginClient( _shm_in, _shm_out ),
+	RemoteZynAddSubFx(int _shm_in, int _shm_out)
+		: RemotePluginClient(_shm_in, _shm_out)
+		,
 #else
-	RemoteZynAddSubFx( const char * socketPath ) :
-		RemotePluginClient( socketPath ),
+	RemoteZynAddSubFx(const char* socketPath)
+		: RemotePluginClient(socketPath)
+		,
 #endif
-		LocalZynAddSubFx(),
-		m_guiSleepTime( 100 ),
-		m_guiExit( false )
+		LocalZynAddSubFx()
+		, m_guiSleepTime(100)
+		, m_guiExit(false)
 	{
 		Nio::start();
 
-		setInputCount( 0 );
-		sendMessage( IdInitDone );
-		waitForMessage( IdInitDone );
+		setInputCount(0);
+		sendMessage(IdInitDone);
+		waitForMessage(IdInitDone);
 
-		pthread_mutex_init( &m_guiMutex, NULL );
-		pthread_create( &m_messageThreadHandle, NULL, messageLoop, this );
+		pthread_mutex_init(&m_guiMutex, NULL);
+		pthread_create(&m_messageThreadHandle, NULL, messageLoop, this);
 	}
 
 	virtual ~RemoteZynAddSubFx()
@@ -74,83 +73,81 @@ public:
 
 	virtual void updateSampleRate()
 	{
-		LocalZynAddSubFx::setSampleRate( sampleRate() );
+		LocalZynAddSubFx::setSampleRate(sampleRate());
 	}
 
 	virtual void updateBufferSize()
 	{
-		LocalZynAddSubFx::setBufferSize( bufferSize() );
+		LocalZynAddSubFx::setBufferSize(bufferSize());
 	}
 
 	void messageLoop()
 	{
 		message m;
-		while( ( m = receiveMessage() ).id != IdQuit )
+		while ((m = receiveMessage()).id != IdQuit)
 		{
-			pthread_mutex_lock( &m_master->mutex );
-			processMessage( m );
-			pthread_mutex_unlock( &m_master->mutex );
+			pthread_mutex_lock(&m_master->mutex);
+			processMessage(m);
+			pthread_mutex_unlock(&m_master->mutex);
 		}
 		m_guiExit = true;
 	}
 
-	virtual bool processMessage( const message & _m )
+	virtual bool processMessage(const message& _m)
 	{
-		switch( _m.id )
+		switch (_m.id)
 		{
-			case IdQuit:
-				break;
+		case IdQuit:
+			break;
 
-			case IdShowUI:
-			case IdHideUI:
-			case IdLoadSettingsFromFile:
-			case IdLoadPresetFile:
-				pthread_mutex_lock( &m_guiMutex );
-				m_guiMessages.push( _m );
-				pthread_mutex_unlock( &m_guiMutex );
-				break;
+		case IdShowUI:
+		case IdHideUI:
+		case IdLoadSettingsFromFile:
+		case IdLoadPresetFile:
+			pthread_mutex_lock(&m_guiMutex);
+			m_guiMessages.push(_m);
+			pthread_mutex_unlock(&m_guiMutex);
+			break;
 
-			case IdSaveSettingsToFile:
-			{
-				LocalZynAddSubFx::saveXML( _m.getString() );
-				sendMessage( IdSaveSettingsToFile );
-				break;
-			}
+		case IdSaveSettingsToFile: {
+			LocalZynAddSubFx::saveXML(_m.getString());
+			sendMessage(IdSaveSettingsToFile);
+			break;
+		}
 
-			case IdZasfPresetDirectory:
-				LocalZynAddSubFx::setPresetDir( _m.getString() );
-				break;
+		case IdZasfPresetDirectory:
+			LocalZynAddSubFx::setPresetDir(_m.getString());
+			break;
 
-			case IdZasfLmmsWorkingDirectory:
-				LocalZynAddSubFx::setLmmsWorkingDir( _m.getString() );
-				break;
+		case IdZasfLmmsWorkingDirectory:
+			LocalZynAddSubFx::setLmmsWorkingDir(_m.getString());
+			break;
 
-			case IdZasfSetPitchWheelBendRange:
-				LocalZynAddSubFx::setPitchWheelBendRange( _m.getInt() );
-				break;
+		case IdZasfSetPitchWheelBendRange:
+			LocalZynAddSubFx::setPitchWheelBendRange(_m.getInt());
+			break;
 
-			default:
-				return RemotePluginClient::processMessage( _m );
+		default:
+			return RemotePluginClient::processMessage(_m);
 		}
 		return true;
 	}
 
 	// all functions are called while m_master->mutex is held
-	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t /* _offset */ )
+	virtual void processMidiEvent(const MidiEvent& event, const f_cnt_t /* _offset */)
 	{
-		LocalZynAddSubFx::processMidiEvent( event );
+		LocalZynAddSubFx::processMidiEvent(event);
 	}
 
-
-	virtual void process( const sampleFrame * _in, sampleFrame * _out )
+	virtual void process(const sampleFrame* _in, sampleFrame* _out)
 	{
-		LocalZynAddSubFx::processAudio( _out );
+		LocalZynAddSubFx::processAudio(_out);
 	}
 
-	static void * messageLoop( void * _arg )
+	static void* messageLoop(void* _arg)
 	{
-		RemoteZynAddSubFx * _this =
-					static_cast<RemoteZynAddSubFx *>( _arg );
+		RemoteZynAddSubFx* _this =
+			static_cast<RemoteZynAddSubFx*>(_arg);
 
 		_this->messageLoop();
 
@@ -166,108 +163,98 @@ private:
 	pthread_mutex_t m_guiMutex;
 	std::queue<RemotePluginClient::message> m_guiMessages;
 	bool m_guiExit;
-
-} ;
-
-
-
+};
 
 void RemoteZynAddSubFx::guiLoop()
 {
 	int exitProgram = 0;
-	MasterUI * ui = NULL;
+	MasterUI* ui = NULL;
 
-	while( !m_guiExit )
+	while (!m_guiExit)
 	{
-		if( ui )
+		if (ui)
 		{
-			Fl::wait( m_guiSleepTime / 1000.0 );
+			Fl::wait(m_guiSleepTime / 1000.0);
 		}
 		else
 		{
 #ifdef LMMS_BUILD_WIN32
-			Sleep( m_guiSleepTime );
+			Sleep(m_guiSleepTime);
 #else
-			usleep( m_guiSleepTime*1000 );
+			usleep(m_guiSleepTime * 1000);
 #endif
 		}
-		if( exitProgram == 1 )
+		if (exitProgram == 1)
 		{
-			pthread_mutex_lock( &m_master->mutex );
-			sendMessage( IdHideUI );
+			pthread_mutex_lock(&m_master->mutex);
+			sendMessage(IdHideUI);
 			exitProgram = 0;
-			pthread_mutex_unlock( &m_master->mutex );
+			pthread_mutex_unlock(&m_master->mutex);
 		}
-		pthread_mutex_lock( &m_guiMutex );
-		while( m_guiMessages.size() )
+		pthread_mutex_lock(&m_guiMutex);
+		while (m_guiMessages.size())
 		{
 			RemotePluginClient::message m = m_guiMessages.front();
 			m_guiMessages.pop();
-			switch( m.id )
+			switch (m.id)
 			{
-				case IdShowUI:
-					// we only create GUI
-					if( !ui )
-					{
-						Fl::scheme( "plastic" );
-						ui = new MasterUI( m_master, &exitProgram );
-					}
-					ui->showUI();
+			case IdShowUI:
+				// we only create GUI
+				if (!ui)
+				{
+					Fl::scheme("plastic");
+					ui = new MasterUI(m_master, &exitProgram);
+				}
+				ui->showUI();
+				ui->refresh_master_ui();
+				break;
+
+			case IdLoadSettingsFromFile: {
+				LocalZynAddSubFx::loadXML(m.getString());
+				if (ui)
+				{
 					ui->refresh_master_ui();
-					break;
-
-				case IdLoadSettingsFromFile:
-				{
-					LocalZynAddSubFx::loadXML( m.getString() );
-					if( ui )
-					{
-						ui->refresh_master_ui();
-					}
-					pthread_mutex_lock( &m_master->mutex );
-					sendMessage( IdLoadSettingsFromFile );
-					pthread_mutex_unlock( &m_master->mutex );
-					break;
 				}
+				pthread_mutex_lock(&m_master->mutex);
+				sendMessage(IdLoadSettingsFromFile);
+				pthread_mutex_unlock(&m_master->mutex);
+				break;
+			}
 
-				case IdLoadPresetFile:
+			case IdLoadPresetFile: {
+				LocalZynAddSubFx::loadPreset(m.getString(), ui ? ui->npartcounter->value() - 1 : 0);
+				if (ui)
 				{
-					LocalZynAddSubFx::loadPreset( m.getString(), ui ?
-											ui->npartcounter->value()-1 : 0 );
-					if( ui )
-					{
-						ui->npartcounter->do_callback();
-						ui->updatepanel();
-						ui->refresh_master_ui();
-					}
-					pthread_mutex_lock( &m_master->mutex );
-					sendMessage( IdLoadPresetFile );
-					pthread_mutex_unlock( &m_master->mutex );
-					break;
+					ui->npartcounter->do_callback();
+					ui->updatepanel();
+					ui->refresh_master_ui();
 				}
+				pthread_mutex_lock(&m_master->mutex);
+				sendMessage(IdLoadPresetFile);
+				pthread_mutex_unlock(&m_master->mutex);
+				break;
+			}
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
-		pthread_mutex_unlock( &m_guiMutex );
+		pthread_mutex_unlock(&m_guiMutex);
 	}
 	Fl::flush();
 
 	delete ui;
 }
 
-
-
-
-int main( int _argc, char * * _argv )
+int main(int _argc, char** _argv)
 {
 #ifdef SYNC_WITH_SHM_FIFO
-	if( _argc < 3 )
+	if (_argc < 3)
 #else
-	if( _argc < 2 )
+	if (_argc < 2)
 #endif
 	{
-		fprintf( stderr, "not enough arguments\n" );
+		fprintf(stderr, "not enough arguments\n");
 		return -1;
 	}
 
@@ -279,18 +266,16 @@ int main( int _argc, char * * _argv )
 #endif
 #endif
 
-
 #ifdef SYNC_WITH_SHM_FIFO
-	RemoteZynAddSubFx * remoteZASF =
-		new RemoteZynAddSubFx( atoi( _argv[1] ), atoi( _argv[2] ) );
+	RemoteZynAddSubFx* remoteZASF =
+		new RemoteZynAddSubFx(atoi(_argv[1]), atoi(_argv[2]));
 #else
-	RemoteZynAddSubFx * remoteZASF = new RemoteZynAddSubFx( _argv[1] );
+	RemoteZynAddSubFx* remoteZASF = new RemoteZynAddSubFx(_argv[1]);
 #endif
 
 	remoteZASF->guiLoop();
 
 	delete remoteZASF;
-
 
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
@@ -302,23 +287,21 @@ int main( int _argc, char * * _argv )
 	return 0;
 }
 
-
 #ifdef NTK_GUI
-static Fl_Tiled_Image *module_backdrop;
+static Fl_Tiled_Image* module_backdrop;
 #endif
 
-void set_module_parameters ( Fl_Widget *o )
+void set_module_parameters(Fl_Widget* o)
 {
 #ifdef NTK_GUI
-	o->box( FL_DOWN_FRAME );
-	o->align( o->align() | FL_ALIGN_IMAGE_BACKDROP );
-	o->color( FL_BLACK );
-	o->image( module_backdrop );
-	o->labeltype( FL_SHADOW_LABEL );
+	o->box(FL_DOWN_FRAME);
+	o->align(o->align() | FL_ALIGN_IMAGE_BACKDROP);
+	o->color(FL_BLACK);
+	o->image(module_backdrop);
+	o->labeltype(FL_SHADOW_LABEL);
 #else
-	o->box( FL_PLASTIC_UP_BOX );
-	o->color( FL_CYAN );
-	o->labeltype( FL_EMBOSSED_LABEL );
+	o->box(FL_PLASTIC_UP_BOX);
+	o->color(FL_CYAN);
+	o->labeltype(FL_EMBOSSED_LABEL);
 #endif
 }
-

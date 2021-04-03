@@ -24,22 +24,24 @@
  *
  */
 
-
 #ifndef SFXR_H
 #define SFXR_H
 
+#include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
-#include "Graph.h"
-#include "PixmapButton.h"
 #include "LedCheckbox.h"
 #include "MemoryManager.h"
-
+#include "PixmapButton.h"
 
 enum SfxrWaves
 {
-	SQR_WAVE, SAW_WAVE, SINE_WAVE, NOISE_WAVE, WAVES_NUM
+	SQR_WAVE,
+	SAW_WAVE,
+	SINE_WAVE,
+	NOISE_WAVE,
+	WAVES_NUM
 };
 
 const int WAVEFORM_BASE_X = 20;
@@ -61,27 +63,22 @@ const int KNOBS_BASE_Y = 50;
 const int KNOB_BLOCK_SIZE_X = 40;
 const int KNOB_BLOCK_SIZE_Y = 40;
 
-
-
-
 class sfxrInstrument;
-
-
 
 class SfxrSynth
 {
 	MM_OPERATORS
 public:
-	SfxrSynth( const sfxrInstrument * s );
+	SfxrSynth(const sfxrInstrument* s);
 	virtual ~SfxrSynth();
 
-	void resetSample( bool restart );
-	void update( sampleFrame * buffer, const int32_t frameNum );
+	void resetSample(bool restart);
+	void update(sampleFrame* buffer, const int32_t frameNum);
 
 	bool isPlaying() const;
 
 private:
-	const sfxrInstrument * s;
+	const sfxrInstrument* s;
 	bool playing_sample;
 	int phase;
 	double fperiod;
@@ -117,10 +114,7 @@ private:
 	int arp_time;
 	int arp_limit;
 	double arp_mod;
-
-} ;
-
-
+};
 
 /**
  * @brief A class that simplify the constructor of FloatModel, with value [0,1]
@@ -128,12 +122,12 @@ private:
 class SfxrZeroToOneFloatModel : public FloatModel
 {
 public:
-	SfxrZeroToOneFloatModel( float val, Model * parent, const QString& displayName ):
-		FloatModel( val, 0.0, 1.0, 0.001, parent, displayName )
+	SfxrZeroToOneFloatModel(float val, Model* parent, const QString& displayName)
+		: FloatModel(val, 0.0, 1.0, 0.001, parent, displayName)
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */
-	virtual void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) )
+	virtual void loadSettings(const QDomElement& element, const QString& name = QString("value"))
 	{
 		float oldInitValue = initValue();
 		FloatModel::loadSettings(element, name);
@@ -149,12 +143,12 @@ public:
 class SfxrNegPosOneFloatModel : public FloatModel
 {
 public:
-	SfxrNegPosOneFloatModel(float val, Model * parent, const QString& displayName ):
-		FloatModel( val, -1.0, 1.0, 0.001, parent, displayName )
+	SfxrNegPosOneFloatModel(float val, Model* parent, const QString& displayName)
+		: FloatModel(val, -1.0, 1.0, 0.001, parent, displayName)
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */
-	virtual void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) )
+	virtual void loadSettings(const QDomElement& element, const QString& name = QString("value"))
 	{
 		float oldInitValue = initValue();
 		FloatModel::loadSettings(element, name);
@@ -168,22 +162,21 @@ class sfxrInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	sfxrInstrument(InstrumentTrack * _instrument_track );
+	sfxrInstrument(InstrumentTrack* _instrument_track);
 	virtual ~sfxrInstrument();
 
-	virtual void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc,
+		QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual PluginView* instantiateView(QWidget* _parent);
 
 	void resetModels();
-
 
 private:
 	SfxrZeroToOneFloatModel m_attModel;
@@ -221,16 +214,14 @@ private:
 	friend class SfxrSynth;
 };
 
-
-
 class sfxrInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	sfxrInstrumentView( Instrument * _instrument,
-					QWidget * _parent );
+	sfxrInstrumentView(Instrument* _instrument,
+		QWidget* _parent);
 
-	virtual ~sfxrInstrumentView() {};
+	virtual ~sfxrInstrumentView(){};
 
 protected slots:
 	void genPickup();
@@ -248,57 +239,54 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-	Knob * m_attKnob; //Attack Time
-	Knob * m_holdKnob; //Sustain Time
-	Knob * m_susKnob; //Sustain Punch
-	Knob * m_decKnob; //Decay Time
+	Knob* m_attKnob;  //Attack Time
+	Knob* m_holdKnob; //Sustain Time
+	Knob* m_susKnob;  //Sustain Punch
+	Knob* m_decKnob;  //Decay Time
 
-	Knob * m_startFreqKnob; //Start Frequency
-	Knob * m_minFreqKnob; //Min Frequency
-	Knob * m_slideKnob; //Slide
-	Knob * m_dSlideKnob; //Delta Slide
-	Knob * m_vibDepthKnob; //Vibrato Depth
-	Knob * m_vibSpeedKnob; //Vibrato Speed
+	Knob* m_startFreqKnob; //Start Frequency
+	Knob* m_minFreqKnob;   //Min Frequency
+	Knob* m_slideKnob;	   //Slide
+	Knob* m_dSlideKnob;	   //Delta Slide
+	Knob* m_vibDepthKnob;  //Vibrato Depth
+	Knob* m_vibSpeedKnob;  //Vibrato Speed
 
-	Knob * m_changeAmtKnob; //Change Amount
-	Knob * m_changeSpeedKnob; //Change Speed
+	Knob* m_changeAmtKnob;	 //Change Amount
+	Knob* m_changeSpeedKnob; //Change Speed
 
-	Knob * m_sqrDutyKnob; //Square Wave Duty
-    Knob * m_sqrSweepKnob; //Square Wave Duty Sweep
+	Knob* m_sqrDutyKnob;  //Square Wave Duty
+	Knob* m_sqrSweepKnob; //Square Wave Duty Sweep
 
-	Knob * m_repeatSpeedKnob; //Repeat Speed
+	Knob* m_repeatSpeedKnob; //Repeat Speed
 
-	Knob * m_phaserOffsetKnob; //Phaser Offset
-	Knob * m_phaserSweepKnob; //Phaser Sweep
+	Knob* m_phaserOffsetKnob; //Phaser Offset
+	Knob* m_phaserSweepKnob;  //Phaser Sweep
 
-	Knob * m_lpFilCutKnob; //LP Filter Cutoff
-	Knob * m_lpFilCutSweepKnob; //LP Filter Cutoff Sweep
-	Knob * m_lpFilResoKnob; //LP Filter Resonance
-	Knob * m_hpFilCutKnob; //HP Filter Cutoff
-	Knob * m_hpFilCutSweepKnob; //HP Filter Cutoff Sweep
+	Knob* m_lpFilCutKnob;	   //LP Filter Cutoff
+	Knob* m_lpFilCutSweepKnob; //LP Filter Cutoff Sweep
+	Knob* m_lpFilResoKnob;	   //LP Filter Resonance
+	Knob* m_hpFilCutKnob;	   //HP Filter Cutoff
+	Knob* m_hpFilCutSweepKnob; //HP Filter Cutoff Sweep
 
-	automatableButtonGroup * m_waveBtnGroup;
-	PixmapButton * m_sqrWaveBtn; //NOTE: This button has Square Duty
+	automatableButtonGroup* m_waveBtnGroup;
+	PixmapButton* m_sqrWaveBtn; //NOTE: This button has Square Duty
 								//and Square Speed configurable
-	PixmapButton * m_sawWaveBtn;
-	PixmapButton * m_sinWaveBtn;
-	PixmapButton * m_noiseWaveBtn;
+	PixmapButton* m_sawWaveBtn;
+	PixmapButton* m_sinWaveBtn;
+	PixmapButton* m_noiseWaveBtn;
 
+	PixmapButton* m_pickupBtn;
+	PixmapButton* m_laserBtn;
+	PixmapButton* m_explosionBtn;
+	PixmapButton* m_powerupBtn;
+	PixmapButton* m_hitBtn;
+	PixmapButton* m_jumpBtn;
+	PixmapButton* m_blipBtn;
 
-	PixmapButton * m_pickupBtn;
-	PixmapButton * m_laserBtn;
-	PixmapButton * m_explosionBtn;
-	PixmapButton * m_powerupBtn;
-	PixmapButton * m_hitBtn;
-	PixmapButton * m_jumpBtn;
-	PixmapButton * m_blipBtn;
+	PixmapButton* m_randomizeBtn;
+	PixmapButton* m_mutateBtn;
 
-	PixmapButton * m_randomizeBtn;
-	PixmapButton * m_mutateBtn;
-
-	static QPixmap * s_artwork;
+	static QPixmap* s_artwork;
 };
-
-
 
 #endif

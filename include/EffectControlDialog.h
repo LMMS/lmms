@@ -32,26 +32,22 @@
 
 class EffectControls;
 
-
 class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EffectControlDialog( EffectControls * _controls );
+	EffectControlDialog(EffectControls* _controls);
 	virtual ~EffectControlDialog();
 
-	virtual bool isResizable() const {return false;}
-
+	virtual bool isResizable() const { return false; }
 
 signals:
 	void closed();
 
-
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
+	void closeEvent(QCloseEvent* _ce) override;
 
-	EffectControls * m_effectControls;
-
-} ;
+	EffectControls* m_effectControls;
+};
 
 #endif

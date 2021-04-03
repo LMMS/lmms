@@ -23,15 +23,13 @@
  *
  */
 
-
 #ifndef LCD_FLOATSPINBOX_H
 #define LCD_FLOATSPINBOX_H
 
 #include <QString>
 
-#include "LcdWidget.h"
 #include "AutomatableModelView.h"
-
+#include "LcdWidget.h"
 
 class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView
 {
@@ -46,22 +44,22 @@ public:
 		update();
 	}
 
-	void setLabel(const QString &label) { m_label = label; }
+	void setLabel(const QString& label) { m_label = label; }
 
 public slots:
 	virtual void update();
 
 protected:
-	void contextMenuEvent(QContextMenuEvent *me) override;
-	void mousePressEvent(QMouseEvent *me) override;
-	void mouseMoveEvent(QMouseEvent *me) override;
-	void mouseReleaseEvent(QMouseEvent *me) override;
-	void wheelEvent(QWheelEvent *we) override;
-	void mouseDoubleClickEvent(QMouseEvent *me) override;
-	void paintEvent(QPaintEvent *pe) override;
+	void contextMenuEvent(QContextMenuEvent* me) override;
+	void mousePressEvent(QMouseEvent* me) override;
+	void mouseMoveEvent(QMouseEvent* me) override;
+	void mouseReleaseEvent(QMouseEvent* me) override;
+	void wheelEvent(QWheelEvent* we) override;
+	void mouseDoubleClickEvent(QMouseEvent* me) override;
+	void paintEvent(QPaintEvent* pe) override;
 
 private:
-	void layoutSetup(const QString &style = QString("19green"));
+	void layoutSetup(const QString& style = QString("19green"));
 	void enterValue();
 	float getStep() const;
 
@@ -75,7 +73,6 @@ private:
 
 signals:
 	void manualChange();
-
 };
 
 using LcdFloatSpinBoxModel = FloatModel;

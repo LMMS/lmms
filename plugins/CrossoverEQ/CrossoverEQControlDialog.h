@@ -28,6 +28,7 @@
 #define CROSSOVEREQ_CONTROL_DIALOG_H
 
 #include <QPixmap>
+
 #include "EffectControlDialog.h"
 
 class CrossoverEQControls;
@@ -36,11 +37,11 @@ class CrossoverEQControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	CrossoverEQControlDialog( CrossoverEQControls * controls );
+	CrossoverEQControlDialog(CrossoverEQControls* controls);
 	virtual ~CrossoverEQControlDialog()
 	{
 	}
-	
+
 private:
 	QPixmap m_fader_bg;
 	QPixmap m_fader_empty;

@@ -22,15 +22,13 @@
  *
  */
 
-
 #ifndef TEXT_FLOAT_H
 #define TEXT_FLOAT_H
 
-#include <QWidget>
 #include <QPixmap>
+#include <QWidget>
 
 #include "lmms_export.h"
-
 
 class LMMS_EXPORT TextFloat : public QWidget
 {
@@ -41,34 +39,31 @@ public:
 	{
 	}
 
-	void setTitle( const QString & _title );
-	void setText( const QString & _text );
-	void setPixmap( const QPixmap & _pixmap );
+	void setTitle(const QString& _title);
+	void setText(const QString& _text);
+	void setPixmap(const QPixmap& _pixmap);
 
-	void setVisibilityTimeOut( int _msecs );
+	void setVisibilityTimeOut(int _msecs);
 
+	static TextFloat* displayMessage(const QString& _msg,
+		int _timeout = 2000,
+		QWidget* _parent = NULL,
+		int _add_y_margin = 0);
+	static TextFloat* displayMessage(const QString& _title,
+		const QString& _msg,
+		const QPixmap& _pixmap =
+			QPixmap(),
+		int _timeout = 2000,
+		QWidget* _parent = NULL);
 
-	static TextFloat * displayMessage( const QString & _msg,
-						int _timeout = 2000,
-						QWidget * _parent = NULL,
-						int _add_y_margin = 0 );
-	static TextFloat * displayMessage( const QString & _title,
-						const QString & _msg,
-						const QPixmap & _pixmap =
-								QPixmap(),
-						int _timeout = 2000,
-						QWidget * _parent = NULL );
-
-	void moveGlobal( QWidget * _w, const QPoint & _offset )
+	void moveGlobal(QWidget* _w, const QPoint& _offset)
 	{
-		move( _w->mapToGlobal( QPoint( 0, 0 ) )+_offset );
+		move(_w->mapToGlobal(QPoint(0, 0)) + _offset);
 	}
 
-
 protected:
-	void paintEvent( QPaintEvent * _me ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-
+	void paintEvent(QPaintEvent* _me) override;
+	void mousePressEvent(QMouseEvent* _me) override;
 
 private:
 	void updateSize();
@@ -76,7 +71,6 @@ private:
 	QString m_title;
 	QString m_text;
 	QPixmap m_pixmap;
-
 };
 
 #endif

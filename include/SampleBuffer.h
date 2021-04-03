@@ -22,22 +22,19 @@
  *
  */
 
-
 #ifndef SAMPLE_BUFFER_H
 #define SAMPLE_BUFFER_H
 
-#include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
-
+#include <QtCore/QReadWriteLock>
 #include <samplerate.h>
 
-#include "lmms_export.h"
+#include "MemoryManager.h"
 #include "interpolation.h"
 #include "lmms_basics.h"
+#include "lmms_export.h"
 #include "lmms_math.h"
 #include "shared_object.h"
-#include "MemoryManager.h"
-
 
 class QPainter;
 class QRect;
@@ -46,14 +43,15 @@ class QRect;
 // the array positions correspond to the converter_type parameter values in libsamplerate
 // if there appears problems with playback on some interpolation mode, then the value for that mode
 // may need to be higher - conversely, to optimize, some may work with lower values
-const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
+const f_cnt_t MARGIN[] = {64, 64, 64, 4, 4};
 
 class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
 {
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	enum LoopMode {
+	enum LoopMode
+	{
 		LoopOff = 0,
 		LoopOn,
 		LoopPingPong
@@ -90,58 +88,52 @@ public:
 			return m_interpolationMode;
 		}
 
-
 	private:
 		f_cnt_t m_frameIndex;
 		const bool m_varyingPitch;
 		bool m_isBackwards;
-		SRC_STATE * m_resamplingData;
+		SRC_STATE* m_resamplingData;
 		int m_interpolationMode;
 
 		friend class SampleBuffer;
-
-	} ;
-
+	};
 
 	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer(const QString & audioFile, bool isBase64Data = false);
-	SampleBuffer(const sampleFrame * data, const f_cnt_t frames);
+	SampleBuffer(const QString& audioFile, bool isBase64Data = false);
+	SampleBuffer(const sampleFrame* data, const f_cnt_t frames);
 	explicit SampleBuffer(const f_cnt_t frames);
-	SampleBuffer(const SampleBuffer & orig);
+	SampleBuffer(const SampleBuffer& orig);
 
-	friend void swap(SampleBuffer & first, SampleBuffer & second) noexcept;
-	SampleBuffer& operator= (const SampleBuffer that);
+	friend void swap(SampleBuffer& first, SampleBuffer& second) noexcept;
+	SampleBuffer& operator=(const SampleBuffer that);
 
 	virtual ~SampleBuffer();
 
 	bool play(
-		sampleFrame * ab,
-		handleState * state,
+		sampleFrame* ab,
+		handleState* state,
 		const fpp_t frames,
 		const float freq,
-		const LoopMode loopMode = LoopOff
-	);
+		const LoopMode loopMode = LoopOff);
 
 	void visualize(
-		QPainter & p,
-		const QRect & dr,
-		const QRect & clip,
+		QPainter& p,
+		const QRect& dr,
+		const QRect& clip,
 		f_cnt_t fromFrame = 0,
-		f_cnt_t toFrame = 0
-	);
+		f_cnt_t toFrame = 0);
 	inline void visualize(
-		QPainter & p,
-		const QRect & dr,
+		QPainter& p,
+		const QRect& dr,
 		f_cnt_t fromFrame = 0,
-		f_cnt_t toFrame = 0
-	)
+		f_cnt_t toFrame = 0)
 	{
 		visualize(p, dr, dr, fromFrame, toFrame);
 	}
 
-	inline const QString & audioFile() const
+	inline const QString& audioFile() const
 	{
 		return m_audioFile;
 	}
@@ -180,8 +172,7 @@ public:
 		f_cnt_t start,
 		f_cnt_t end,
 		f_cnt_t loopStart,
-		f_cnt_t loopEnd
-	)
+		f_cnt_t loopEnd)
 	{
 		m_startFrame = start;
 		m_endFrame = end;
@@ -229,7 +220,7 @@ public:
 		m_sampleRate = rate;
 	}
 
-	inline const sampleFrame * data() const
+	inline const sampleFrame* data() const
 	{
 		return m_data;
 	}
@@ -238,12 +229,11 @@ public:
 	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
 
-	QString & toBase64(QString & dst) const;
-
+	QString& toBase64(QString& dst) const;
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock()
-	SampleBuffer * resample(const sample_rate_t srcSR, const sample_rate_t dstSR);
+	SampleBuffer* resample(const sample_rate_t srcSR, const sample_rate_t dstSR);
 
 	void normalizeSampleRate(const sample_rate_t srcSR, bool keepSettings = false);
 
@@ -252,7 +242,7 @@ public:
 	inline sample_t userWaveSample(const float sample) const
 	{
 		f_cnt_t frames = m_frames;
-		sampleFrame * data = m_data;
+		sampleFrame* data = m_data;
 		const float frame = sample * frames;
 		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % frames;
 		if (f1 < 0)
@@ -272,10 +262,9 @@ public:
 		m_varLock.unlock();
 	}
 
-
 public slots:
-	void setAudioFile(const QString & audioFile);
-	void loadFromBase64(const QString & data);
+	void setAudioFile(const QString& audioFile);
+	void loadFromBase64(const QString& data);
 	void setStartFrame(const f_cnt_t s);
 	void setEndFrame(const f_cnt_t e);
 	void setAmplification(float a);
@@ -287,34 +276,31 @@ private:
 
 	void update(bool keepSettings = false);
 
-	void convertIntToFloat(int_sample_t * & ibuf, f_cnt_t frames, int channels);
-	void directFloatWrite(sample_t * & fbuf, f_cnt_t frames, int channels);
+	void convertIntToFloat(int_sample_t*& ibuf, f_cnt_t frames, int channels);
+	void directFloatWrite(sample_t*& fbuf, f_cnt_t frames, int channels);
 
 	f_cnt_t decodeSampleSF(
 		QString fileName,
-		sample_t * & buf,
-		ch_cnt_t & channels,
-		sample_rate_t & samplerate
-	);
+		sample_t*& buf,
+		ch_cnt_t& channels,
+		sample_rate_t& samplerate);
 #ifdef LMMS_HAVE_OGGVORBIS
 	f_cnt_t decodeSampleOGGVorbis(
 		QString fileName,
-		int_sample_t * & buf,
-		ch_cnt_t & channels,
-		sample_rate_t & samplerate
-	);
+		int_sample_t*& buf,
+		ch_cnt_t& channels,
+		sample_rate_t& samplerate);
 #endif
 	f_cnt_t decodeSampleDS(
 		QString fileName,
-		int_sample_t * & buf,
-		ch_cnt_t & channels,
-		sample_rate_t & samplerate
-	);
+		int_sample_t*& buf,
+		ch_cnt_t& channels,
+		sample_rate_t& samplerate);
 
 	QString m_audioFile;
-	sampleFrame * m_origData;
+	sampleFrame* m_origData;
 	f_cnt_t m_origFrames;
-	sampleFrame * m_data;
+	sampleFrame* m_data;
 	mutable QReadWriteLock m_varLock;
 	f_cnt_t m_frames;
 	f_cnt_t m_startFrame;
@@ -326,25 +312,21 @@ private:
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
-	sampleFrame * getSampleFragment(
+	sampleFrame* getSampleFragment(
 		f_cnt_t index,
 		f_cnt_t frames,
 		LoopMode loopMode,
-		sampleFrame * * tmp,
-		bool * backwards,
+		sampleFrame** tmp,
+		bool* backwards,
 		f_cnt_t loopStart,
 		f_cnt_t loopEnd,
-		f_cnt_t end
-	) const;
+		f_cnt_t end) const;
 
 	f_cnt_t getLoopedIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 	f_cnt_t getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 
-
 signals:
 	void sampleUpdated();
-
-} ;
-
+};
 
 #endif

@@ -29,20 +29,19 @@
 #include "AutomationPattern.h"
 #include "shared_object.h"
 
-
 class InlineAutomation : public FloatModel, public sharedObject
 {
 public:
-	InlineAutomation() :
-		FloatModel(),
-		sharedObject(),
-		m_autoPattern( NULL )
+	InlineAutomation()
+		: FloatModel()
+		, sharedObject()
+		, m_autoPattern(NULL)
 	{
 	}
 
 	virtual ~InlineAutomation()
 	{
-		if( m_autoPattern )
+		if (m_autoPattern)
 		{
 			delete m_autoPattern;
 		}
@@ -52,7 +51,7 @@ public:
 
 	bool hasAutomation() const
 	{
-		if( m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false )
+		if (m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false)
 		{
 			// Prevent saving inline automation if there's just one node at the beginning of
 			// the pattern, which has a InValue equal to the value of model (which is going
@@ -60,11 +59,7 @@ public:
 			AutomationPattern::timeMap::const_iterator firstNode =
 				m_autoPattern->getTimeMap().begin();
 
-			if (isAtInitValue()
-				&& m_autoPattern->getTimeMap().size() == 1
-				&& POS(firstNode) == 0
-				&& INVAL(firstNode) == value()
-				&& OFFSET(firstNode) == 0)
+			if (isAtInitValue() && m_autoPattern->getTimeMap().size() == 1 && POS(firstNode) == 0 && INVAL(firstNode) == value() && OFFSET(firstNode) == 0)
 			{
 				return false;
 			}
@@ -75,24 +70,21 @@ public:
 		return false;
 	}
 
-	AutomationPattern * automationPattern()
+	AutomationPattern* automationPattern()
 	{
-		if( m_autoPattern == NULL )
+		if (m_autoPattern == NULL)
 		{
-			m_autoPattern = new AutomationPattern( NULL );
-			m_autoPattern->addObject( this );
+			m_autoPattern = new AutomationPattern(NULL);
+			m_autoPattern->addObject(this);
 		}
 		return m_autoPattern;
 	}
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 
 private:
-	AutomationPattern * m_autoPattern;
-
-} ;
-
+	AutomationPattern* m_autoPattern;
+};
 
 #endif

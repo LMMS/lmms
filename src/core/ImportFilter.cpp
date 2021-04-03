@@ -22,38 +22,31 @@
  *
  */
 
-
-#include <memory>
-#include <QMessageBox>
-
 #include "ImportFilter.h"
+
+#include <QMessageBox>
+#include <memory>
+
 #include "Engine.h"
-#include "TrackContainer.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
-
+#include "TrackContainer.h"
 
 using std::unique_ptr;
 
-ImportFilter::ImportFilter( const QString & _file_name,
-							const Descriptor * _descriptor ) :
-	Plugin( _descriptor, NULL ),
-	m_file( _file_name )
+ImportFilter::ImportFilter(const QString& _file_name,
+	const Descriptor* _descriptor)
+	: Plugin(_descriptor, NULL)
+	, m_file(_file_name)
 {
 }
-
-
-
 
 ImportFilter::~ImportFilter()
 {
 }
 
-
-
-
-void ImportFilter::import( const QString & _file_to_import,
-							TrackContainer* tc )
+void ImportFilter::import(const QString& _file_to_import,
+	TrackContainer* tc)
 {
 	bool successful = false;
 
@@ -62,58 +55,53 @@ void ImportFilter::import( const QString & _file_to_import,
 
 	// do not record changes while importing files
 	const bool j = Engine::projectJournal()->isJournalling();
-	Engine::projectJournal()->setJournalling( false );
+	Engine::projectJournal()->setJournalling(false);
 
 	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::ImportFilter))
 	{
-		unique_ptr<Plugin> p(Plugin::instantiate( desc->name, NULL, s.data() ));
-		if( dynamic_cast<ImportFilter *>( p.get() ) != NULL &&
-			dynamic_cast<ImportFilter *>( p.get() )->tryImport( tc ) )
+		unique_ptr<Plugin> p(Plugin::instantiate(desc->name, NULL, s.data()));
+		if (dynamic_cast<ImportFilter*>(p.get()) != NULL &&
+			dynamic_cast<ImportFilter*>(p.get())->tryImport(tc))
 		{
 			successful = true;
 			break;
 		}
 	}
 
-	Engine::projectJournal()->setJournalling( j );
+	Engine::projectJournal()->setJournalling(j);
 
-	if( successful == false )
+	if (successful == false)
 	{
-		QMessageBox::information( NULL,
-			TrackContainer::tr( "Couldn't import file" ),
-			TrackContainer::tr( "Couldn't find a filter for "
-						"importing file %1.\n"
-						"You should convert this file "
-						"into a format supported by "
-						"LMMS using another software."
-						).arg( _file_to_import ),
-					QMessageBox::Ok,
-					QMessageBox::NoButton );
+		QMessageBox::information(NULL,
+			TrackContainer::tr("Couldn't import file"),
+			TrackContainer::tr("Couldn't find a filter for "
+							   "importing file %1.\n"
+							   "You should convert this file "
+							   "into a format supported by "
+							   "LMMS using another software.")
+				.arg(_file_to_import),
+			QMessageBox::Ok,
+			QMessageBox::NoButton);
 	}
 }
 
-
-
-
 bool ImportFilter::openFile()
 {
-	if( m_file.open( QFile::ReadOnly ) == false )
+	if (m_file.open(QFile::ReadOnly) == false)
 	{
-		QMessageBox::critical( NULL,
-			TrackContainer::tr( "Couldn't open file" ),
-			TrackContainer::tr( "Couldn't open file %1 "
-						"for reading.\nPlease make "
-						"sure you have read-"
-						"permission to the file and "
-						"the directory containing the "
-						"file and try again!" ).arg(
-							m_file.fileName() ),
-					QMessageBox::Ok,
-					QMessageBox::NoButton );
+		QMessageBox::critical(NULL,
+			TrackContainer::tr("Couldn't open file"),
+			TrackContainer::tr("Couldn't open file %1 "
+							   "for reading.\nPlease make "
+							   "sure you have read-"
+							   "permission to the file and "
+							   "the directory containing the "
+							   "file and try again!")
+				.arg(
+					m_file.fileName()),
+			QMessageBox::Ok,
+			QMessageBox::NoButton);
 		return false;
 	}
 	return true;
 }
-
-
-

@@ -23,106 +23,97 @@
  *
  */
 
+#include "LadspaControlView.h"
+
 #include <QLayout>
 
-#include "LadspaControl.h"
-#include "LadspaControlView.h"
 #include "LadspaBase.h"
+#include "LadspaControl.h"
 #include "LedCheckbox.h"
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
 
-
-LadspaControlView::LadspaControlView( QWidget * _parent,
-						LadspaControl * _ctl ) :
-	QWidget( _parent ),
-	ModelView( _ctl, this ),
-	m_ctl( _ctl )
+LadspaControlView::LadspaControlView(QWidget* _parent,
+	LadspaControl* _ctl)
+	: QWidget(_parent)
+	, ModelView(_ctl, this)
+	, m_ctl(_ctl)
 {
-	QHBoxLayout * layout = new QHBoxLayout( this );
-	layout->setMargin( 0 );
-	layout->setSpacing( 0 );
+	QHBoxLayout* layout = new QHBoxLayout(this);
+	layout->setMargin(0);
+	layout->setSpacing(0);
 
-	LedCheckBox * link = NULL;
+	LedCheckBox* link = NULL;
 
-	if( m_ctl->m_link )
+	if (m_ctl->m_link)
 	{
-		link = new LedCheckBox( "", this );
-		link->setModel( &m_ctl->m_linkEnabledModel );
-		ToolTip::add( link, tr( "Link channels" ) );
-		layout->addWidget( link );
+		link = new LedCheckBox("", this);
+		link->setModel(&m_ctl->m_linkEnabledModel);
+		ToolTip::add(link, tr("Link channels"));
+		layout->addWidget(link);
 	}
 
-	Knob * knb = NULL;
+	Knob* knb = NULL;
 
-	switch( m_ctl->port()->data_type )
+	switch (m_ctl->port()->data_type)
 	{
-		case TOGGLED:
+	case TOGGLED: {
+		LedCheckBox* toggle = new LedCheckBox(
+			m_ctl->port()->name, this, QString(), LedCheckBox::Green);
+		toggle->setModel(m_ctl->toggledModel());
+		layout->addWidget(toggle);
+		if (link != NULL)
 		{
-			LedCheckBox * toggle = new LedCheckBox(
-				m_ctl->port()->name, this, QString(), LedCheckBox::Green );
-			toggle->setModel( m_ctl->toggledModel() );
-			layout->addWidget( toggle );
-			if( link != NULL )
-			{
-				setFixedSize( link->width() + toggle->width(),
-							toggle->height() );
-			}
-			else
-			{
-				setFixedSize( toggle->width(),
-							toggle->height() );
-			}
-			break;
-		}
-
-		case INTEGER:
-		case ENUM:
-		case FLOATING:
-			knb = new Knob( knobBright_26, this, m_ctl->port()->name );
-			break;
-
-		case TIME:
-			knb = new TempoSyncKnob( knobBright_26, this, m_ctl->port()->name );
-			break;
-
-		default:
-			break;
-	}
-
-	if( knb != NULL )
-	{
-		if( m_ctl->port()->data_type != TIME )
-		{
-			knb->setModel( m_ctl->knobModel() );
+			setFixedSize(link->width() + toggle->width(),
+				toggle->height());
 		}
 		else
 		{
-			knb->setModel( m_ctl->tempoSyncKnobModel() );
+			setFixedSize(toggle->width(),
+				toggle->height());
 		}
-		knb->setLabel( m_ctl->port()->name );
-		knb->setHintText( tr( "Value:" ), "" );
-		layout->addWidget( knb );
-		if( link != NULL )
+		break;
+	}
+
+	case INTEGER:
+	case ENUM:
+	case FLOATING:
+		knb = new Knob(knobBright_26, this, m_ctl->port()->name);
+		break;
+
+	case TIME:
+		knb = new TempoSyncKnob(knobBright_26, this, m_ctl->port()->name);
+		break;
+
+	default:
+		break;
+	}
+
+	if (knb != NULL)
+	{
+		if (m_ctl->port()->data_type != TIME)
 		{
-			setFixedSize( link->width() + knb->width(),
-						knb->height() );
+			knb->setModel(m_ctl->knobModel());
 		}
 		else
 		{
-			setFixedSize( knb->width(), knb->height() );
+			knb->setModel(m_ctl->tempoSyncKnobModel());
+		}
+		knb->setLabel(m_ctl->port()->name);
+		knb->setHintText(tr("Value:"), "");
+		layout->addWidget(knb);
+		if (link != NULL)
+		{
+			setFixedSize(link->width() + knb->width(),
+				knb->height());
+		}
+		else
+		{
+			setFixedSize(knb->width(), knb->height());
 		}
 	}
 }
-
-
-
 
 LadspaControlView::~LadspaControlView()
 {
 }
-
-
-
-
-

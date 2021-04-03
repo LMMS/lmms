@@ -22,23 +22,23 @@
  *
  */
 
+#include "SideBar.h"
+
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
 #include <QToolButton>
 
-#include "SideBar.h"
 #include "SideBarWidget.h"
 #include "ToolTip.h"
-
 
 // internal helper class allowing to create QToolButtons with
 // vertical orientation
 class SideBarButton : public QToolButton
 {
 public:
-	SideBarButton( Qt::Orientation _orientation, QWidget * _parent ) :
-		QToolButton( _parent ),
-		m_orientation( _orientation )
+	SideBarButton(Qt::Orientation _orientation, QWidget* _parent)
+		: QToolButton(_parent)
+		, m_orientation(_orientation)
 	{
 	}
 
@@ -52,118 +52,100 @@ public:
 	QSize sizeHint() const override
 	{
 		QSize s = QToolButton::sizeHint();
-		s.setWidth( s.width() + 8 );
-		if( orientation() == Qt::Horizontal )
+		s.setWidth(s.width() + 8);
+		if (orientation() == Qt::Horizontal)
 		{
 			return s;
 		}
-		return QSize( s.height(), s.width() );
+		return QSize(s.height(), s.width());
 	}
-
 
 protected:
-	void paintEvent( QPaintEvent * ) override
+	void paintEvent(QPaintEvent*) override
 	{
-		QStylePainter p( this );
+		QStylePainter p(this);
 		QStyleOptionToolButton opt;
-		initStyleOption( &opt );
-		if( orientation() == Qt::Vertical )
+		initStyleOption(&opt);
+		if (orientation() == Qt::Vertical)
 		{
 			const QSize s = sizeHint();
-			p.rotate( 270 );
-			p.translate( -s.height(), 0 );
-			opt.rect = QRect( 0, 0, s.height(), s.width() );
+			p.rotate(270);
+			p.translate(-s.height(), 0);
+			opt.rect = QRect(0, 0, s.height(), s.width());
 		}
-		p.drawComplexControl( QStyle::CC_ToolButton, opt );
+		p.drawComplexControl(QStyle::CC_ToolButton, opt);
 	}
-
 
 private:
 	Qt::Orientation m_orientation;
+};
 
-} ;
-
-
-SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
-	QToolBar( _parent ),
-	m_btnGroup( this )
+SideBar::SideBar(Qt::Orientation _orientation, QWidget* _parent)
+	: QToolBar(_parent)
+	, m_btnGroup(this)
 {
-	setOrientation( _orientation );
-	setIconSize( QSize( 16, 16 ) );
+	setOrientation(_orientation);
+	setIconSize(QSize(16, 16));
 
-	m_btnGroup.setExclusive( false );
-	connect( &m_btnGroup, SIGNAL( buttonClicked( QAbstractButton * ) ),
-				this, SLOT( toggleButton( QAbstractButton * ) ) );
+	m_btnGroup.setExclusive(false);
+	connect(&m_btnGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+		this, SLOT(toggleButton(QAbstractButton*)));
 }
-
-
-
 
 SideBar::~SideBar()
 {
 }
 
-
-
-
-void SideBar::appendTab( SideBarWidget *widget )
+void SideBar::appendTab(SideBarWidget* widget)
 {
-	SideBarButton *button = new SideBarButton( orientation(), this );
-	button->setText( " " + widget->title() );
-	button->setIcon( widget->icon() );
-	button->setLayoutDirection( Qt::RightToLeft );
-	button->setCheckable( true );
+	SideBarButton* button = new SideBarButton(orientation(), this);
+	button->setText(" " + widget->title());
+	button->setIcon(widget->icon());
+	button->setLayoutDirection(Qt::RightToLeft);
+	button->setCheckable(true);
 	m_widgets[button] = widget;
-	m_btnGroup.addButton( button );
-	addWidget( button );
+	m_btnGroup.addButton(button);
+	addWidget(button);
 
 	widget->hide();
-	widget->setMinimumWidth( 200 );
+	widget->setMinimumWidth(200);
 
-	ToolTip::add( button, widget->title() );
+	ToolTip::add(button, widget->title());
 
 	connect(widget, &SideBarWidget::closeButtonClicked,
 		[=]() { button->click(); });
 }
 
-
-
-
-void SideBar::toggleButton( QAbstractButton * button )
+void SideBar::toggleButton(QAbstractButton* button)
 {
-	QToolButton *toolButton = NULL;
-	QWidget *activeWidget = NULL;
+	QToolButton* toolButton = NULL;
+	QWidget* activeWidget = NULL;
 
-	for( auto it = m_widgets.begin(); it != m_widgets.end(); ++it )
+	for (auto it = m_widgets.begin(); it != m_widgets.end(); ++it)
 	{
-		QToolButton *curBtn = it.key();
-		QWidget *curWidget = it.value();
+		QToolButton* curBtn = it.key();
+		QWidget* curWidget = it.value();
 
-		if( curBtn == button )
+		if (curBtn == button)
 		{
 			toolButton = curBtn;
 			activeWidget = curWidget;
 		}
 		else
 		{
-			curBtn->setChecked( false );
-			curBtn->setToolButtonStyle( Qt::ToolButtonIconOnly );
+			curBtn->setChecked(false);
+			curBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 		}
 
-		if( curWidget )
+		if (curWidget)
 		{
 			curWidget->hide();
 		}
 	}
 
-	if( toolButton && activeWidget )
+	if (toolButton && activeWidget)
 	{
-		activeWidget->setVisible( button->isChecked() );
-		toolButton->setToolButtonStyle( button->isChecked() ?
-				Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly );
+		activeWidget->setVisible(button->isChecked());
+		toolButton->setToolButtonStyle(button->isChecked() ? Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly);
 	}
 }
-
-
-
-

@@ -64,10 +64,10 @@ public:
 	static void supportOption(LV2_URID key);
 
 	//! Initialize an option
-	template<typename Opt, typename Arg>
+	template <typename Opt, typename Arg>
 	void initOption(Lv2UridCache::Id key, Arg&& value,
-			LV2_Options_Context context = LV2_OPTIONS_INSTANCE,
-			std::uint32_t subject = 0)
+		LV2_Options_Context context = LV2_OPTIONS_INSTANCE,
+		std::uint32_t subject = 0)
 	{
 		const Lv2UridCache& cache = Engine::getLv2Manager()->uridCache();
 		initOption(cache[key], sizeof(Opt), cache[Lv2UridCache::IdForType<Opt>::value],

@@ -14,11 +14,11 @@ class MidiCCRackView : public QWidget, public SerializingObject
 {
 	Q_OBJECT
 public:
-	MidiCCRackView(InstrumentTrack * track);
+	MidiCCRackView(InstrumentTrack* track);
 	~MidiCCRackView() override;
 
-	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
-	void loadSettings(const QDomElement &) override;
+	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
+	void loadSettings(const QDomElement&) override;
 
 	inline QString nodeName() const override
 	{
@@ -29,12 +29,11 @@ private slots:
 	void renameWindow();
 
 private:
-	InstrumentTrack *m_track;
+	InstrumentTrack* m_track;
 
-	GroupBox *m_midiCCGroupBox; // MIDI CC GroupBox (used to enable disable MIDI CC)
+	GroupBox* m_midiCCGroupBox; // MIDI CC GroupBox (used to enable disable MIDI CC)
 
-	Knob *m_controllerKnob[MidiControllerCount]; // Holds the knob widgets for each controller
-
+	Knob* m_controllerKnob[MidiControllerCount]; // Holds the knob widgets for each controller
 };
 
 #endif

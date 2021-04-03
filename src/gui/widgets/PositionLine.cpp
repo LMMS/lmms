@@ -29,11 +29,10 @@
 #include "GuiApplication.h"
 #include "Song.h"
 
-
-PositionLine::PositionLine(QWidget* parent) :
-	QWidget(parent),
-	m_hasTailGradient(false),
-	m_lineColor(0, 0, 0, 0)
+PositionLine::PositionLine(QWidget* parent)
+	: QWidget(parent)
+	, m_hasTailGradient(false)
+	, m_lineColor(0, 0, 0, 0)
 {
 	resize(8, height());
 
@@ -63,7 +62,7 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 		if (m_hasTailGradient &&
 			Engine::getSong()->isPlaying() &&
 			(Engine::getSong()->playMode() == Song::Mode_PlaySong ||
-			 Engine::getSong()->playMode() == Song::Mode_PlayPattern))
+				Engine::getSong()->playMode() == Song::Mode_PlayPattern))
 		{
 			c.setAlpha(60);
 			gradient.setColorAt(w, c);

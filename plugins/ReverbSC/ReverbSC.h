@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef REVERBSC_H
 #define REVERBSC_H
 
@@ -30,18 +29,19 @@
 #include "ReverbSCControls.h"
 #include "ValueBuffer.h"
 
-extern "C" {
-    #include "base.h"
-    #include "revsc.h"
-    #include "dcblock.h"
+extern "C"
+{
+#include "base.h"
+#include "dcblock.h"
+#include "revsc.h"
 }
 
 class ReverbSCEffect : public Effect
 {
 public:
-	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	ReverbSCEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~ReverbSCEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
 	virtual EffectControls* controls()
 	{
@@ -52,11 +52,11 @@ public:
 
 private:
 	ReverbSCControls m_reverbSCControls;
-	sp_data *sp;
-	sp_revsc *revsc;
-	sp_dcblock *dcblk[2];
+	sp_data* sp;
+	sp_revsc* revsc;
+	sp_dcblock* dcblk[2];
 	QMutex mutex;
 	friend class ReverbSCControls;
-} ;
+};
 
 #endif

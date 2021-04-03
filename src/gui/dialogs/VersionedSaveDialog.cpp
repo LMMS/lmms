@@ -22,51 +22,51 @@
  *
  */
 
+#include "VersionedSaveDialog.h"
 
 #include <QFontMetrics>
+#include <QGroupBox>
+#include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QGroupBox>
-#include <QLabel>
 
 #include "DeprecationHelper.h"
-#include "VersionedSaveDialog.h"
 #include "LedCheckbox.h"
 
-
-VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
-										  QWidget *saveOptionsWidget,
-										  const QString &caption,
-										  const QString &directory,
-										  const QString &filter ) :
-	FileDialog(parent, caption, directory, filter)
+VersionedSaveDialog::VersionedSaveDialog(QWidget* parent,
+	QWidget* saveOptionsWidget,
+	const QString& caption,
+	const QString& directory,
+	const QString& filter)
+	: FileDialog(parent, caption, directory, filter)
 {
-	setAcceptMode( QFileDialog::AcceptSave );
-	setFileMode( QFileDialog::AnyFile );
+	setAcceptMode(QFileDialog::AcceptSave);
+	setFileMode(QFileDialog::AnyFile);
 
 	// Create + and - buttons
-	QPushButton *plusButton( new QPushButton( "+", this) );
-	plusButton->setToolTip( tr( "Increment version number" ) );
-	QPushButton *minusButton( new QPushButton( "-", this ) );
-	minusButton->setToolTip( tr( "Decrement version number" ) );
+	QPushButton* plusButton(new QPushButton("+", this));
+	plusButton->setToolTip(tr("Increment version number"));
+	QPushButton* minusButton(new QPushButton("-", this));
+	minusButton->setToolTip(tr("Decrement version number"));
 	plusButton->setFixedWidth(horizontalAdvance(plusButton->fontMetrics(), "+") + 30);
 	minusButton->setFixedWidth(horizontalAdvance(minusButton->fontMetrics(), "+") + 30);
 
 	// Add buttons to grid layout. For doing this, remove the lineEdit and
 	// replace it with a HBox containing lineEdit and the buttons.
-	QGridLayout *layout = dynamic_cast<QGridLayout*>( this->layout() );
-	QWidget *lineEdit = findChild<QLineEdit*>();
-	layout->removeWidget( lineEdit );
+	QGridLayout* layout = dynamic_cast<QGridLayout*>(this->layout());
+	QWidget* lineEdit = findChild<QLineEdit*>();
+	layout->removeWidget(lineEdit);
 
-	QHBoxLayout* hLayout( new QHBoxLayout() );
-	hLayout->addWidget( lineEdit );
-	hLayout->addWidget( plusButton );
-	hLayout->addWidget( minusButton );
-	layout->addLayout( hLayout, 2, 1 );
+	QHBoxLayout* hLayout(new QHBoxLayout());
+	hLayout->addWidget(lineEdit);
+	hLayout->addWidget(plusButton);
+	hLayout->addWidget(minusButton);
+	layout->addLayout(hLayout, 2, 1);
 
-	if (saveOptionsWidget) {
+	if (saveOptionsWidget)
+	{
 		auto groupBox = new QGroupBox(tr("Save Options"));
 		auto optionsLayout = new QGridLayout;
 
@@ -78,96 +78,84 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	}
 
 	// Connect + and - buttons
-	connect( plusButton, SIGNAL( clicked() ), this, SLOT( incrementVersion() ));
-	connect( minusButton, SIGNAL( clicked() ), this, SLOT( decrementVersion() ));
+	connect(plusButton, SIGNAL(clicked()), this, SLOT(incrementVersion()));
+	connect(minusButton, SIGNAL(clicked()), this, SLOT(decrementVersion()));
 }
 
-
-
-
-bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool increment )
+bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool increment)
 {
-	static QRegExp regexp( "[- ]\\d+(\\.\\w+)?$" );
+	static QRegExp regexp("[- ]\\d+(\\.\\w+)?$");
 
-	int idx = regexp.indexIn( fileName );
+	int idx = regexp.indexIn(fileName);
 	// For file names without extension (no ".mmpz")
-	int insertIndex = fileName.lastIndexOf( '.' );
-	if ( insertIndex < idx+1 )
+	int insertIndex = fileName.lastIndexOf('.');
+	if (insertIndex < idx + 1)
 		insertIndex = fileName.size();
 
-	if ( idx == -1 )
+	if (idx == -1)
 	{
 		// Can't decrement if there is no version number
-		if ( increment == false )
+		if (increment == false)
 			return false;
 		else
-			fileName.insert( insertIndex, "-01" );
+			fileName.insert(insertIndex, "-01");
 	}
 	else
 	{
 		// Find current version number
-		QString number = fileName.mid( idx+1, insertIndex - idx - 1 );
+		QString number = fileName.mid(idx + 1, insertIndex - idx - 1);
 		bool ok;
-		ushort version = number.toUShort( &ok );
-		Q_ASSERT( ok );
+		ushort version = number.toUShort(&ok);
+		Q_ASSERT(ok);
 
 		// Can't decrement 0
-		if ( !increment && version == 0 )
+		if (!increment && version == 0)
 			return false;
 		// Replace version number
 		version = increment ? version + 1 : version - 1;
-		QString newnumber = QString( "%1" ).arg( version, 2, 10, QChar( '0' ) );
+		QString newnumber = QString("%1").arg(version, 2, 10, QChar('0'));
 
-		fileName.replace( idx+1, number.length(), newnumber );
+		fileName.replace(idx + 1, number.length(), newnumber);
 	}
 	return true;
 }
 
-
-
-
 void VersionedSaveDialog::incrementVersion()
 {
 	const QStringList& selected = selectedFiles();
-	if ( selected.size() != 1 )
+	if (selected.size() != 1)
 		return;
 	QString file = selected[0];
-	changeFileNameVersion( file, true );
+	changeFileNameVersion(file, true);
 	clearSelection();
-	selectFile( file );
+	selectFile(file);
 }
-
-
-
 
 void VersionedSaveDialog::decrementVersion()
 {
 	const QStringList& selected = selectedFiles();
-	if ( selected.size() != 1 )
+	if (selected.size() != 1)
 		return;
 	QString file = selected[0];
-	changeFileNameVersion( file, false );
+	changeFileNameVersion(file, false);
 	clearSelection();
-	selectFile( file );
+	selectFile(file);
 }
 
-
-
-
-bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle )
+bool VersionedSaveDialog::fileExistsQuery(QString FileName, QString WindowTitle)
 {
 	bool fileExists = false;
-	if( QFile( FileName ).exists() )
+	if (QFile(FileName).exists())
 	{
 		QMessageBox mb;
-		mb.setWindowTitle( WindowTitle );
-		mb.setText( FileName + tr( " already exists. "
-			"Do you want to replace it?" ) );
-		mb.setIcon( QMessageBox::Warning );
+		mb.setWindowTitle(WindowTitle);
+		mb.setText(FileName + tr(" already exists. "
+								 "Do you want to replace it?"));
+		mb.setIcon(QMessageBox::Warning);
 		mb.setStandardButtons(
-			QMessageBox::Yes | QMessageBox::No );
+			QMessageBox::Yes | QMessageBox::No);
 
-		if( mb.exec() == QMessageBox::Yes )
+		if (mb.exec() == QMessageBox::Yes)
 		{
 			fileExists = true;
 		}
@@ -175,8 +163,9 @@ bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle
 	return fileExists;
 }
 
-SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
-	auto *layout = new QVBoxLayout();
+SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions& saveOptions)
+{
+	auto* layout = new QVBoxLayout();
 
 	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);
 	m_discardMIDIConnectionsCheckbox->setText(tr("Discard MIDI connections"));

@@ -27,8 +27,8 @@
 #define _PEAK_CONTROLLER_EFFECT_CONTROLS_H
 
 #include "EffectControls.h"
-#include "peak_controller_effect_control_dialog.h"
 #include "Knob.h"
+#include "peak_controller_effect_control_dialog.h"
 
 class PeakControllerEffect;
 
@@ -36,13 +36,13 @@ class PeakControllerEffectControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	PeakControllerEffectControls( PeakControllerEffect * _eff );
+	PeakControllerEffectControls(PeakControllerEffect* _eff);
 	virtual ~PeakControllerEffectControls()
 	{
 	}
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 	inline QString nodeName() const override
 	{
 		return "peakcontrollereffectcontrols";
@@ -52,14 +52,13 @@ public:
 	{
 		return 1;
 	}
-	EffectControlDialog * createView() override
+	EffectControlDialog* createView() override
 	{
-		return new PeakControllerEffectControlDialog( this );
+		return new PeakControllerEffectControlDialog(this);
 	}
 
-
 private:
-	PeakControllerEffect * m_effect;
+	PeakControllerEffect* m_effect;
 
 	FloatModel m_baseModel;
 	FloatModel m_amountModel;
@@ -72,8 +71,6 @@ private:
 
 	friend class PeakControllerEffectControlDialog;
 	friend class PeakControllerEffect;
-
-} ;
-
+};
 
 #endif

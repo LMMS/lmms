@@ -32,6 +32,7 @@
 #include <lv2.h>
 #include <map>
 #include <vector>
+
 #include "Lv2Manager.h"
 
 /**
@@ -51,7 +52,7 @@ class Lv2Features
 {
 public:
 	//! Return if a feature is supported by LMMS
-	static bool isFeatureSupported(const char *featName);
+	static bool isFeatureSupported(const char* featName);
 
 	Lv2Features();
 

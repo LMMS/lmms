@@ -19,21 +19,21 @@
  */
 
 #include "StepRecorder.h"
-#include "StepRecorderWidget.h"
-#include "PianoRoll.h"
 
 #include <QPainter>
-
 #include <climits>
-using std::min;
+
+#include "PianoRoll.h"
+#include "StepRecorderWidget.h"
 using std::max;
+using std::min;
 
 const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70;
 
-StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
-	m_pianoRoll(pianoRoll),
-	m_stepRecorderWidget(stepRecorderWidget),
-	m_pattern(nullptr)
+StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget)
+	: m_pianoRoll(pianoRoll)
+	, m_stepRecorderWidget(stepRecorderWidget)
+	, m_pattern(nullptr)
 {
 	m_stepRecorderWidget.hide();
 }
@@ -71,10 +71,10 @@ void StepRecorder::stop()
 	m_isRecording = false;
 }
 
-void StepRecorder::notePressed(const Note & n)
+void StepRecorder::notePressed(const Note& n)
 {
 	//if this is the first pressed note in step, advance position
-	if(!m_isStepInProgress)
+	if (!m_isStepInProgress)
 	{
 		m_isStepInProgress = true;
 
@@ -83,7 +83,7 @@ void StepRecorder::notePressed(const Note & n)
 	}
 
 	StepNote* stepNote = findCurStepNote(n.key());
-	if(stepNote == nullptr)
+	if (stepNote == nullptr)
 	{
 		m_curStepNotes.append(new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
 		m_pianoRoll.update();
@@ -94,25 +94,25 @@ void StepRecorder::notePressed(const Note & n)
 	}
 }
 
-void StepRecorder::noteReleased(const Note & n)
+void StepRecorder::noteReleased(const Note& n)
 {
 	StepNote* stepNote = findCurStepNote(n.key());
 
-	if(stepNote != nullptr && stepNote->isPressed())
+	if (stepNote != nullptr && stepNote->isPressed())
 	{
 		stepNote->setReleased();
 
 		//if m_updateReleasedTimer is not already active, activate it
 		//(when activated, the timer will re-set itself as long as there are released notes)
-		if(!m_updateReleasedTimer.isActive())
+		if (!m_updateReleasedTimer.isActive())
 		{
 			m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS);
 		}
 
 		//check if all note are released, apply notes to pattern(or dimiss if length is zero) and prepare to record next step
-		if(allCurStepNotesReleased())
+		if (allCurStepNotesReleased())
 		{
-			if(m_curStepLength > 0)
+			if (m_curStepLength > 0)
 			{
 				applyStep();
 			}
@@ -128,27 +128,25 @@ bool StepRecorder::keyPressEvent(QKeyEvent* ke)
 {
 	bool event_handled = false;
 
-	switch(ke->key())
+	switch (ke->key())
 	{
-		case Qt::Key_Right:
+	case Qt::Key_Right: {
+		if (!ke->isAutoRepeat())
 		{
-			if(!ke->isAutoRepeat())
-			{
-				stepForwards();
-			}
-			event_handled = true;
-			break;
+			stepForwards();
 		}
+		event_handled = true;
+		break;
+	}
 
-		case Qt::Key_Left:
+	case Qt::Key_Left: {
+		if (!ke->isAutoRepeat())
 		{
-			if(!ke->isAutoRepeat())
-			{
-				stepBackwards();
-			}
-			event_handled = true;
-			break;
+			stepBackwards();
 		}
+		event_handled = true;
+		break;
+	}
 	}
 
 	return event_handled;
@@ -156,7 +154,7 @@ bool StepRecorder::keyPressEvent(QKeyEvent* ke)
 
 void StepRecorder::setStepsLength(const TimePos& newLength)
 {
-	if(m_isStepInProgress)
+	if (m_isStepInProgress)
 	{
 		//update current step length by the new amount : (number_of_steps * newLength)
 		m_curStepLength = (m_curStepLength / m_stepsLength) * newLength;
@@ -173,9 +171,9 @@ QVector<Note*> StepRecorder::getCurStepNotes()
 {
 	QVector<Note*> notes;
 
-	if(m_isStepInProgress)
+	if (m_isStepInProgress)
 	{
-		for(StepNote* stepNote: m_curStepNotes)
+		for (StepNote* stepNote : m_curStepNotes)
 		{
 			notes.append(&stepNote->m_note);
 		}
@@ -186,7 +184,7 @@ QVector<Note*> StepRecorder::getCurStepNotes()
 
 void StepRecorder::stepForwards()
 {
-	if(m_isStepInProgress)
+	if (m_isStepInProgress)
 	{
 		m_curStepLength += m_stepsLength;
 
@@ -202,9 +200,9 @@ void StepRecorder::stepForwards()
 
 void StepRecorder::stepBackwards()
 {
-	if(m_isStepInProgress)
+	if (m_isStepInProgress)
 	{
-		if(m_curStepLength > 0)
+		if (m_curStepLength > 0)
 		{
 			m_curStepLength = max(m_curStepLength - m_stepsLength, 0);
 		}
@@ -243,7 +241,7 @@ void StepRecorder::applyStep()
 
 void StepRecorder::dismissStep()
 {
-	if(!m_isStepInProgress)
+	if (!m_isStepInProgress)
 	{
 		return;
 	}
@@ -253,7 +251,7 @@ void StepRecorder::dismissStep()
 
 void StepRecorder::prepareNewStep()
 {
-	for(StepNote* stepNote : m_curStepNotes)
+	for (StepNote* stepNote : m_curStepNotes)
 	{
 		delete stepNote;
 	}
@@ -267,9 +265,9 @@ void StepRecorder::prepareNewStep()
 	updateWidget();
 }
 
-void StepRecorder::setCurrentPattern( Pattern* newPattern )
+void StepRecorder::setCurrentPattern(Pattern* newPattern)
 {
-	if(m_pattern != NULL && m_pattern != newPattern)
+	if (m_pattern != NULL && m_pattern != newPattern)
 	{
 		dismissStep();
 	}
@@ -287,7 +285,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	{
 		StepNote* stepNote = itr.next();
 
-		if(stepNote->isReleased())
+		if (stepNote->isReleased())
 		{
 			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
 			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
@@ -303,12 +301,12 @@ void StepRecorder::removeNotesReleasedForTooLong()
 		}
 	}
 
-	if(notesRemoved)
+	if (notesRemoved)
 	{
 		m_pianoRoll.update();
 	}
 
-	if(nextTimout != std::numeric_limits<int>::max())
+	if (nextTimout != std::numeric_limits<int>::max())
 	{
 		m_updateReleasedTimer.start(nextTimout);
 	}
@@ -344,7 +342,7 @@ bool StepRecorder::allCurStepNotesReleased()
 {
 	for (const StepNote* stepNote : m_curStepNotes)
 	{
-		if(stepNote->isPressed())
+		if (stepNote->isPressed())
 		{
 			return false;
 		}
@@ -357,7 +355,7 @@ StepRecorder::StepNote* StepRecorder::findCurStepNote(const int key)
 {
 	for (StepNote* stepNote : m_curStepNotes)
 	{
-		if(stepNote->m_note.key() == key)
+		if (stepNote->m_note.key() == key)
 		{
 			return stepNote;
 		}

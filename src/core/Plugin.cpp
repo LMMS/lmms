@@ -24,76 +24,58 @@
 
 #include "Plugin.h"
 
-#include <QtGlobal>
+#include <QMessageBox>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
-#include <QMessageBox>
+#include <QtGlobal>
 
-#include "embed.h"
+#include "AutomatableModel.h"
+#include "DummyPlugin.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "DummyPlugin.h"
-#include "AutomatableModel.h"
 #include "Song.h"
-
+#include "embed.h"
 
 static PixmapLoader dummyLoader;
 
 static Plugin::Descriptor dummyPluginDescriptor =
+	{
+		"dummy",
+		"dummy",
+		QT_TRANSLATE_NOOP("PluginBrowser", "no description"),
+		"Tobias Doerffel <tobydox/at/users.sf.net>",
+		0x0100,
+		Plugin::Undefined,
+		&dummyLoader,
+		NULL};
+
+Plugin::Plugin(const Descriptor* descriptor, Model* parent, const Descriptor::SubPluginFeatures::Key* key)
+	: Model(parent)
+	, JournallingObject()
+	, m_descriptor(descriptor)
+	, m_key(key ? *key : Descriptor::SubPluginFeatures::Key(m_descriptor))
 {
-	"dummy",
-	"dummy",
-	QT_TRANSLATE_NOOP( "PluginBrowser", "no description" ),
-	"Tobias Doerffel <tobydox/at/users.sf.net>",
-	0x0100,
-	Plugin::Undefined,
-	&dummyLoader,
-	NULL
-} ;
-
-
-
-
-Plugin::Plugin(const Descriptor * descriptor, Model * parent, const
-		Descriptor::SubPluginFeatures::Key* key) :
-	Model(parent),
-	JournallingObject(),
-	m_descriptor(descriptor),
-	m_key(key ? *key : Descriptor::SubPluginFeatures::Key(m_descriptor))
-{
-	if( m_descriptor == NULL )
+	if (m_descriptor == NULL)
 	{
 		m_descriptor = &dummyPluginDescriptor;
 	}
 }
 
-
-
-
 Plugin::~Plugin()
 {
 }
 
-
-
-
-template<class T>
+template <class T>
 T use_this_or(T this_param, T or_param)
 {
 	return this_param ? this_param : or_param;
 }
 
-
-
-
 QString use_this_or(QString this_param, QString or_param)
 {
 	return this_param.isNull() ? or_param : this_param;
 }
-
-
-
 
 QString Plugin::displayName() const
 {
@@ -106,18 +88,12 @@ QString Plugin::displayName() const
 		: Model::displayName();
 }
 
-
-
-
 const PixmapLoader* Plugin::logo() const
 {
 	return (m_descriptor->subPluginFeatures && m_key.isValid())
 		? m_key.logo()
 		: m_descriptor->logo;
 }
-
-
-
 
 QString Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() const
 {
@@ -129,22 +105,16 @@ QString Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() c
 		: QString();
 }
 
-
-
-
 QString Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
 {
 	Q_ASSERT(isValid());
 	return desc->subPluginFeatures
 		// get from sub plugin
 		? use_this_or(desc->subPluginFeatures->displayName(*this),
-			QString::fromUtf8(desc->displayName))
+			  QString::fromUtf8(desc->displayName))
 		// get from plugin
 		: desc->displayName;
 }
-
-
-
 
 const PixmapLoader* Plugin::Descriptor::SubPluginFeatures::Key::logo() const
 {
@@ -154,48 +124,37 @@ const PixmapLoader* Plugin::Descriptor::SubPluginFeatures::Key::logo() const
 		: desc->logo;
 }
 
-
-
-
 QString Plugin::Descriptor::SubPluginFeatures::Key::description() const
 {
 	Q_ASSERT(isValid());
 	return desc->subPluginFeatures
 		? use_this_or(desc->subPluginFeatures->description(*this),
-			QString::fromUtf8(desc->description))
+			  QString::fromUtf8(desc->description))
 		: desc->description;
 }
 
-
-
-
-void Plugin::loadFile( const QString & )
+void Plugin::loadFile(const QString&)
 {
 }
 
-
-
-
-AutomatableModel * Plugin::childModel( const QString & )
+AutomatableModel* Plugin::childModel(const QString&)
 {
 	static FloatModel fm;
 	return &fm;
 }
 
-
-
 #include "PluginFactory.h"
-Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
-				const Descriptor::SubPluginFeatures::Key *key,
-				bool keyFromDnd)
+Plugin* Plugin::instantiateWithKey(const QString& pluginName, Model* parent,
+	const Descriptor::SubPluginFeatures::Key* key,
+	bool keyFromDnd)
 {
-	if(keyFromDnd)
+	if (keyFromDnd)
 		Q_ASSERT(!key);
-	const Descriptor::SubPluginFeatures::Key *keyPtr = keyFromDnd
+	const Descriptor::SubPluginFeatures::Key* keyPtr = keyFromDnd
 		? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey())
 		: key;
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
-	if(keyPtr)
+	if (keyPtr)
 	{
 		// descriptor is not yet set when loading - set it now
 		Descriptor::SubPluginFeatures::Key keyCopy = *keyPtr;
@@ -205,48 +164,45 @@ Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 	else
 		return Plugin::instantiate(pluginName, parent,
 			// the keys are never touched anywhere
-			const_cast<Descriptor::SubPluginFeatures::Key *>(keyPtr));
+			const_cast<Descriptor::SubPluginFeatures::Key*>(keyPtr));
 }
 
-
-
-
-Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
-								void *data)
+Plugin* Plugin::instantiate(const QString& pluginName, Model* parent,
+	void* data)
 {
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 
 	Plugin* inst;
-	if( pi.isNull() )
+	if (pi.isNull())
 	{
-		if( gui )
+		if (gui)
 		{
-			QMessageBox::information( NULL,
-				tr( "Plugin not found" ),
-				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
-				QMessageBox::Ok | QMessageBox::Default );
+			QMessageBox::information(NULL,
+				tr("Plugin not found"),
+				tr("The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"").arg(pluginName).arg(pluginFactory->errorString(pluginName)),
+				QMessageBox::Ok | QMessageBox::Default);
 		}
 		inst = new DummyPlugin();
 	}
 	else
 	{
 		InstantiationHook instantiationHook;
-		if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
+		if ((instantiationHook = (InstantiationHook)pi.library->resolve("lmms_plugin_main")))
 		{
 			inst = instantiationHook(parent, data);
-			if(!inst) {
+			if (!inst)
+			{
 				inst = new DummyPlugin();
 			}
 		}
 		else
 		{
-			if( gui )
+			if (gui)
 			{
-				QMessageBox::information( NULL,
-					tr( "Error while loading plugin" ),
-					tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
-					QMessageBox::Ok | QMessageBox::Default );
+				QMessageBox::information(NULL,
+					tr("Error while loading plugin"),
+					tr("Failed to load plugin \"%1\"!").arg(pluginName),
+					QMessageBox::Ok | QMessageBox::Default);
 			}
 			inst = new DummyPlugin();
 		}
@@ -255,61 +211,45 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	return inst;
 }
 
-
-
-
-void Plugin::collectErrorForUI( QString errMsg )
+void Plugin::collectErrorForUI(QString errMsg)
 {
-	Engine::getSong()->collectError( errMsg );
+	Engine::getSong()->collectError(errMsg);
 }
 
-
-
-
-PluginView * Plugin::createView( QWidget * parent )
+PluginView* Plugin::createView(QWidget* parent)
 {
-	PluginView * pv = instantiateView( parent );
-	if( pv != NULL )
+	PluginView* pv = instantiateView(parent);
+	if (pv != NULL)
 	{
-		pv->setModel( this );
+		pv->setModel(this);
 	}
 	return pv;
 }
 
-
-
-
-Plugin::Descriptor::SubPluginFeatures::Key::Key( const QDomElement & key ) :
-	desc( NULL ),
-	name( key.attribute( "key" ) ),
-	attributes()
+Plugin::Descriptor::SubPluginFeatures::Key::Key(const QDomElement& key)
+	: desc(NULL)
+	, name(key.attribute("key"))
+	, attributes()
 {
-	QDomNodeList l = key.elementsByTagName( "attribute" );
-	for( int i = 0; !l.item( i ).isNull(); ++i )
+	QDomNodeList l = key.elementsByTagName("attribute");
+	for (int i = 0; !l.item(i).isNull(); ++i)
 	{
-		QDomElement e = l.item( i ).toElement();
-		attributes[e.attribute( "name" )] = e.attribute( "value" );
+		QDomElement e = l.item(i).toElement();
+		attributes[e.attribute("name")] = e.attribute("value");
 	}
-		
 }
 
-
-
-
 QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
-						QDomDocument & doc ) const
+	QDomDocument& doc) const
 {
-	QDomElement e = doc.createElement( "key" );
-	for( AttributeMap::ConstIterator it = attributes.begin(); 
-		it != attributes.end(); ++it )
+	QDomElement e = doc.createElement("key");
+	for (AttributeMap::ConstIterator it = attributes.begin();
+		 it != attributes.end(); ++it)
 	{
-		QDomElement a = doc.createElement( "attribute" );
-		a.setAttribute( "name", it.key() );
-		a.setAttribute( "value", it.value() );
-		e.appendChild( a );
+		QDomElement a = doc.createElement("attribute");
+		a.setAttribute("name", it.key());
+		a.setAttribute("value", it.value());
+		e.appendChild(a);
 	}
 	return e;
 }
-
-
-

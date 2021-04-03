@@ -22,21 +22,20 @@
  *
  */
 
-
 #ifndef COMBOBOX_H
 #define COMBOBOX_H
 
 #include <QMenu>
 #include <QWidget>
 
-#include "ComboBoxModel.h"
 #include "AutomatableModelView.h"
+#include "ComboBoxModel.h"
 
 class LMMS_EXPORT ComboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	ComboBox( QWidget* parent = NULL, const QString& name = QString() );
+	ComboBox(QWidget* parent = NULL, const QString& name = QString());
 	virtual ~ComboBox();
 
 	ComboBoxModel* model()
@@ -55,13 +54,11 @@ public slots:
 	void selectNext();
 	void selectPrevious();
 
-
 protected:
-	void contextMenuEvent( QContextMenuEvent* event ) override;
-	void mousePressEvent( QMouseEvent* event ) override;
-	void paintEvent( QPaintEvent* event ) override;
-	void wheelEvent( QWheelEvent* event ) override;
-
+	void contextMenuEvent(QContextMenuEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void paintEvent(QPaintEvent* event) override;
+	void wheelEvent(QWheelEvent* event) override;
 
 private:
 	static QPixmap* s_background;
@@ -72,10 +69,8 @@ private:
 
 	bool m_pressed;
 
-
 private slots:
-	void setItem( QAction* item );
-
-} ;
+	void setItem(QAction* item);
+};
 
 #endif

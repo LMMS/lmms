@@ -23,40 +23,30 @@
  *
  */
 
-
 #ifndef _WAVESHAPER_H
 #define _WAVESHAPER_H
 
 #include "Effect.h"
 #include "waveshaper_controls.h"
 
-
-
 class waveShaperEffect : public Effect
 {
 public:
-	waveShaperEffect( Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key );
+	waveShaperEffect(Model* _parent,
+		const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~waveShaperEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	virtual bool processAudioBuffer(sampleFrame* _buf,
+		const fpp_t _frames);
 
-	virtual EffectControls * controls()
+	virtual EffectControls* controls()
 	{
-		return( &m_wsControls );
+		return (&m_wsControls);
 	}
 
-
 private:
-
 	waveShaperControls m_wsControls;
 
 	friend class waveShaperControls;
-
-} ;
-
-
-
-
+};
 
 #endif

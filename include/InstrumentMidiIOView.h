@@ -30,57 +30,51 @@
 
 #include "ModelView.h"
 
-
 class GroupBox;
 class LcdSpinBox;
 class QToolButton;
 class LedCheckBox;
 class InstrumentTrack;
 
-
 class InstrumentMidiIOView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	InstrumentMidiIOView( QWidget* parent );
+	InstrumentMidiIOView(QWidget* parent);
 	virtual ~InstrumentMidiIOView();
-
 
 private:
 	void modelChanged() override;
 
-	GroupBox * m_midiInputGroupBox;
-	LcdSpinBox * m_inputChannelSpinBox;
-	LcdSpinBox * m_fixedInputVelocitySpinBox;
-	QToolButton * m_rpBtn;
+	GroupBox* m_midiInputGroupBox;
+	LcdSpinBox* m_inputChannelSpinBox;
+	LcdSpinBox* m_fixedInputVelocitySpinBox;
+	QToolButton* m_rpBtn;
 
-	GroupBox * m_midiOutputGroupBox;
-	LcdSpinBox * m_outputChannelSpinBox;
-	LcdSpinBox * m_fixedOutputVelocitySpinBox;
-	LcdSpinBox * m_outputProgramSpinBox;
-	LcdSpinBox * m_fixedOutputNoteSpinBox;
-	QToolButton * m_wpBtn;
+	GroupBox* m_midiOutputGroupBox;
+	LcdSpinBox* m_outputChannelSpinBox;
+	LcdSpinBox* m_fixedOutputVelocitySpinBox;
+	LcdSpinBox* m_outputProgramSpinBox;
+	LcdSpinBox* m_fixedOutputNoteSpinBox;
+	QToolButton* m_wpBtn;
 
 	LcdSpinBox* m_baseVelocitySpinBox;
-
-} ;
+};
 
 class InstrumentMiscView : public QWidget
 {
 	Q_OBJECT
 public:
-	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
+	InstrumentMiscView(InstrumentTrack* it, QWidget* parent);
 	~InstrumentMiscView();
 
-	GroupBox * pitchGroupBox()
+	GroupBox* pitchGroupBox()
 	{
 		return m_pitchGroupBox;
 	}
 
 private:
-
-	GroupBox * m_pitchGroupBox;
-
+	GroupBox* m_pitchGroupBox;
 };
 
 #endif

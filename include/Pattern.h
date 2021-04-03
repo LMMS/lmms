@@ -26,19 +26,16 @@
 #ifndef PATTERN_H
 #define PATTERN_H
 
-#include <QtCore/QVector>
-#include <QWidget>
 #include <QDialog>
 #include <QPixmap>
 #include <QStaticText>
-
+#include <QWidget>
+#include <QtCore/QVector>
 
 #include "Note.h"
 #include "TrackContentObjectView.h"
 
-
 class InstrumentTrack;
-
 
 class LMMS_EXPORT Pattern : public TrackContentObject
 {
@@ -48,10 +45,10 @@ public:
 	{
 		BeatPattern,
 		MelodyPattern
-	} ;
+	};
 
-	Pattern( InstrumentTrack* instrumentTrack );
-	Pattern( const Pattern& other );
+	Pattern(InstrumentTrack* instrumentTrack);
+	Pattern(const Pattern& other);
 	virtual ~Pattern();
 
 	void init();
@@ -59,22 +56,22 @@ public:
 	void updateLength();
 
 	// note management
-	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
+	Note* addNote(const Note& _new_note, const bool _quant_pos = true);
 
-	void removeNote( Note * _note_to_del );
+	void removeNote(Note* _note_to_del);
 
-	Note * noteAtStep( int _step );
+	Note* noteAtStep(int _step);
 
 	void rearrangeAllNotes();
 	void clearNotes();
 
-	inline const NoteVector & notes() const
+	inline const NoteVector& notes() const
 	{
 		return m_notes;
 	}
 
-	Note * addStepNote( int step );
-	void setStep( int step, bool enabled );
+	Note* addStepNote(int step);
+	void setStep(int step, bool enabled);
 
 	// Split the list of notes on the given position
 	void splitNotes(NoteVector notes, TimePos pos);
@@ -85,36 +82,31 @@ public:
 		return m_patternType;
 	}
 
-
 	// next/previous track based on position in the containing track
-	Pattern * previousPattern() const;
-	Pattern * nextPattern() const;
+	Pattern* previousPattern() const;
+	Pattern* nextPattern() const;
 
 	// settings-management
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 	inline QString nodeName() const override
 	{
 		return "pattern";
 	}
 
-	inline InstrumentTrack * instrumentTrack() const
+	inline InstrumentTrack* instrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
 
 	bool empty();
 
-
-	TrackContentObjectView * createView( TrackView * _tv ) override;
-
+	TrackContentObjectView* createView(TrackView* _tv) override;
 
 	using Model::dataChanged;
 
-
 protected:
 	void updateBBTrack();
-
 
 protected slots:
 	void addSteps();
@@ -123,16 +115,15 @@ protected slots:
 	void clear();
 	void changeTimeSignature();
 
-
 private:
 	TimePos beatPatternLength() const;
 
-	void setType( PatternTypes _new_pattern_type );
+	void setType(PatternTypes _new_pattern_type);
 	void checkType();
 
 	void resizeToFirstTrack();
 
-	InstrumentTrack * m_instrumentTrack;
+	InstrumentTrack* m_instrumentTrack;
 
 	PatternTypes m_patternType;
 
@@ -140,25 +131,21 @@ private:
 	NoteVector m_notes;
 	int m_steps;
 
-	Pattern * adjacentPatternByOffset(int offset) const;
+	Pattern* adjacentPatternByOffset(int offset) const;
 
 	friend class PatternView;
 	friend class BBTrackContainerView;
 
-
 signals:
-	void destroyedPattern( Pattern* );
-
-} ;
-
-
+	void destroyedPattern(Pattern*);
+};
 
 class PatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
 public:
-	PatternView( Pattern* pattern, TrackView* parent );
+	PatternView(Pattern* pattern, TrackView* parent);
 	virtual ~PatternView() = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
@@ -166,22 +153,21 @@ public:
 	Q_PROPERTY(QColor mutedNoteFillColor READ getMutedNoteFillColor WRITE setMutedNoteFillColor)
 	Q_PROPERTY(QColor mutedNoteBorderColor READ getMutedNoteBorderColor WRITE setMutedNoteBorderColor)
 
-	QColor const & getNoteFillColor() const { return m_noteFillColor; }
-	void setNoteFillColor(QColor const & color) { m_noteFillColor = color; }
+	QColor const& getNoteFillColor() const { return m_noteFillColor; }
+	void setNoteFillColor(QColor const& color) { m_noteFillColor = color; }
 
-	QColor const & getNoteBorderColor() const { return m_noteBorderColor; }
-	void setNoteBorderColor(QColor const & color) { m_noteBorderColor = color; }
+	QColor const& getNoteBorderColor() const { return m_noteBorderColor; }
+	void setNoteBorderColor(QColor const& color) { m_noteBorderColor = color; }
 
-	QColor const & getMutedNoteFillColor() const { return m_mutedNoteFillColor; }
-	void setMutedNoteFillColor(QColor const & color) { m_mutedNoteFillColor = color; }
+	QColor const& getMutedNoteFillColor() const { return m_mutedNoteFillColor; }
+	void setMutedNoteFillColor(QColor const& color) { m_mutedNoteFillColor = color; }
 
-	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
-	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
+	QColor const& getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
+	void setMutedNoteBorderColor(QColor const& color) { m_mutedNoteBorderColor = color; }
 
 public slots:
 	Pattern* getPattern();
 	void update() override;
-
 
 protected slots:
 	void openInPianoRoll();
@@ -190,20 +176,18 @@ protected slots:
 	void resetName();
 	void changeName();
 
-
 protected:
-	void constructContextMenu( QMenu * ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * pe ) override;
-	void wheelEvent( QWheelEvent * _we ) override;
-
+	void constructContextMenu(QMenu*) override;
+	void mousePressEvent(QMouseEvent* _me) override;
+	void mouseDoubleClickEvent(QMouseEvent* _me) override;
+	void paintEvent(QPaintEvent* pe) override;
+	void wheelEvent(QWheelEvent* _we) override;
 
 private:
-	static QPixmap * s_stepBtnOn0;
-	static QPixmap * s_stepBtnOn200;
-	static QPixmap * s_stepBtnOff;
-	static QPixmap * s_stepBtnOffLight;
+	static QPixmap* s_stepBtnOn0;
+	static QPixmap* s_stepBtnOn200;
+	static QPixmap* s_stepBtnOff;
+	static QPixmap* s_stepBtnOffLight;
 
 	Pattern* m_pat;
 	QPixmap m_paintPixmap;
@@ -214,8 +198,6 @@ private:
 	QColor m_mutedNoteBorderColor;
 
 	QStaticText m_staticTextName;
-} ;
-
-
+};
 
 #endif

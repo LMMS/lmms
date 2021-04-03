@@ -24,16 +24,14 @@
 
 #include "Editor.h"
 
-#include "Song.h"
-
-#include "MainWindow.h"
-#include "embed.h"
-
 #include <QAction>
+#include <QCloseEvent>
 #include <QMdiArea>
 #include <QShortcut>
-#include <QCloseEvent>
 
+#include "MainWindow.h"
+#include "Song.h"
+#include "embed.h"
 
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
@@ -44,19 +42,19 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playAction->setIcon(embed::getIconPixmap("play"));
 }
 
-DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
+DropToolBar* Editor::addDropToolBarToTop(QString const& windowTitle)
 {
 	return addDropToolBar(Qt::TopToolBarArea, windowTitle);
 }
 
-DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+DropToolBar* Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const& windowTitle)
 {
 	return addDropToolBar(this, whereToAdd, windowTitle);
 }
 
-DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+DropToolBar* Editor::addDropToolBar(QWidget* parent, Qt::ToolBarArea whereToAdd, QString const& windowTitle)
 {
-	DropToolBar *toolBar = new DropToolBar(parent);
+	DropToolBar* toolBar = new DropToolBar(parent);
 	addToolBar(whereToAdd, toolBar);
 	toolBar->setMovable(false);
 	toolBar->setFloatable(false);
@@ -84,13 +82,13 @@ void Editor::toggleMaximize()
 	isMaximized() ? showNormal() : showMaximized();
 }
 
-Editor::Editor(bool record, bool stepRecord) :
-	m_toolBar(new DropToolBar(this)),
-	m_playAction(nullptr),
-	m_recordAction(nullptr),
-	m_recordAccompanyAction(nullptr),
-	m_toggleStepRecordingAction(nullptr),
-	m_stopAction(nullptr)
+Editor::Editor(bool record, bool stepRecord)
+	: m_toolBar(new DropToolBar(this))
+	, m_playAction(nullptr)
+	, m_recordAction(nullptr)
+	, m_recordAccompanyAction(nullptr)
+	, m_toggleStepRecordingAction(nullptr)
+	, m_stopAction(nullptr)
 {
 	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
 
@@ -124,7 +122,7 @@ Editor::Editor(bool record, bool stepRecord) :
 		addButton(m_recordAction, "recordButton");
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
 	}
-	if(stepRecord)
+	if (stepRecord)
 	{
 		addButton(m_toggleStepRecordingAction, "stepRecordButton");
 	}
@@ -133,17 +131,16 @@ Editor::Editor(bool record, bool stepRecord) :
 
 Editor::~Editor()
 {
-
 }
 
-QAction *Editor::playAction() const
+QAction* Editor::playAction() const
 {
 	return m_playAction;
 }
 
-void Editor::closeEvent( QCloseEvent * _ce )
+void Editor::closeEvent(QCloseEvent* _ce)
 {
-	if( parentWidget() )
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 	}
@@ -152,9 +149,10 @@ void Editor::closeEvent( QCloseEvent * _ce )
 		hide();
 	}
 	_ce->ignore();
- }
+}
 
-DropToolBar::DropToolBar(QWidget* parent) : QToolBar(parent)
+DropToolBar::DropToolBar(QWidget* parent)
+	: QToolBar(parent)
 {
 	setAcceptDrops(true);
 }
@@ -168,6 +166,3 @@ void DropToolBar::dropEvent(QDropEvent* event)
 {
 	dropped(event);
 }
-
-
-

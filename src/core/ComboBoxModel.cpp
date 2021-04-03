@@ -23,45 +23,35 @@
  */
 
 #include "ComboBoxModel.h"
+
 #include "embed.h"
 
-using std::unique_ptr;
 using std::move;
+using std::unique_ptr;
 
-void ComboBoxModel::addItem( QString item, unique_ptr<PixmapLoader> loader )
+void ComboBoxModel::addItem(QString item, unique_ptr<PixmapLoader> loader)
 {
-	m_items.emplace_back( move(item), move(loader) );
-	setRange( 0, m_items.size() - 1 );
+	m_items.emplace_back(move(item), move(loader));
+	setRange(0, m_items.size() - 1);
 }
-
-
-
 
 void ComboBoxModel::clear()
 {
-	setRange( 0, 0 );
+	setRange(0, 0);
 
 	m_items.clear();
 
 	emit propertiesChanged();
 }
 
-
-
-
-int ComboBoxModel::findText( const QString& txt ) const
+int ComboBoxModel::findText(const QString& txt) const
 {
-	for( auto it = m_items.begin(); it != m_items.end(); ++it )
+	for (auto it = m_items.begin(); it != m_items.end(); ++it)
 	{
-		if( ( *it ).first == txt )
+		if ((*it).first == txt)
 		{
 			return it - m_items.begin();
 		}
 	}
-	return -1; 
+	return -1;
 }
-
-
-
-
-

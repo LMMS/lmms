@@ -23,20 +23,15 @@
  *
  */
 
-
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
-
-
 
 struct VstParameterDumpItem
 {
 	int32_t index;
 	std::string shortLabel;
 	float value;
-} ;
-
-
+};
 
 enum VstHostLanguages
 {
@@ -47,9 +42,7 @@ enum VstHostLanguages
 	LanguageSpanish,
 	LanguageJapanese,
 	LanguageKorean
-} ;
-
-
+};
 
 enum VstRemoteMessageIDs
 {
@@ -84,8 +77,6 @@ enum VstRemoteMessageIDs
 	IdVstParameterCount,
 	IdVstParameterDump
 
-} ;
-
-
+};
 
 #endif

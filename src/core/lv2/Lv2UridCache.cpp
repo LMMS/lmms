@@ -26,11 +26,11 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QtGlobal>
 #include <lv2/lv2plug.in/ns/ext/atom/atom.h>
 #include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
 #include <lv2/lv2plug.in/ns/ext/midi/midi.h>
 #include <lv2/lv2plug.in/ns/ext/parameters/parameters.h>
-#include <QtGlobal>
 
 #include "Lv2UridMap.h"
 
@@ -45,13 +45,12 @@ uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
 	return m_cache[static_cast<std::size_t>(id)];
 }
 
-Lv2UridCache::Lv2UridCache(UridMap &mapper)
+Lv2UridCache::Lv2UridCache(UridMap& mapper)
 {
 	const uint32_t noIdYet = 0;
 	std::fill_n(m_cache, static_cast<std::size_t>(Id::size), noIdYet);
 
-	auto init = [this, &mapper](Id id, const char* uridStr)
-	{
+	auto init = [this, &mapper](Id id, const char* uridStr) {
 		m_cache[static_cast<std::size_t>(id)] = mapper.map(uridStr);
 	};
 
@@ -64,9 +63,10 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 	init(Id::midi_MidiEvent, LV2_MIDI__MidiEvent);
 	init(Id::param_sampleRate, LV2_PARAMETERS__sampleRate);
 
-	for(uint32_t urid : m_cache) { Q_ASSERT(urid != noIdYet); }
+	for (uint32_t urid : m_cache)
+	{
+		Q_ASSERT(urid != noIdYet);
+	}
 }
 
 #endif // LMMS_HAVE_LV2
-
-

@@ -36,98 +36,94 @@
  * \todo write isWhite inline function and replace throughout
  */
 
-#include <cmath>
+#include "PianoView.h"
 
 #include <QCursor>
 #include <QKeyEvent>
 #include <QPainter>
 #include <QVBoxLayout>
+#include <cmath>
 
-#include "PianoView.h"
-#include "Piano.h"
 #include "CaptionMenu.h"
-#include "embed.h"
-#include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "StringPairDrag.h"
 #include "MainWindow.h"
-
+#include "Piano.h"
+#include "StringPairDrag.h"
+#include "embed.h"
+#include "gui_templates.h"
 
 /*! The scale of C Major - white keys only.
  */
 Keys WhiteKeys[] =
-{
-	Key_C, Key_D, Key_E, Key_F, Key_G, Key_A, Key_H
-} ;
+	{
+		Key_C, Key_D, Key_E, Key_F, Key_G, Key_A, Key_H};
 
+QPixmap* PianoView::s_whiteKeyPm = NULL;		/*!< A white key released */
+QPixmap* PianoView::s_blackKeyPm = NULL;		/*!< A black key released */
+QPixmap* PianoView::s_whiteKeyPressedPm = NULL; /*!< A white key pressed */
+QPixmap* PianoView::s_blackKeyPressedPm = NULL; /*!< A black key pressed */
 
-QPixmap * PianoView::s_whiteKeyPm = NULL;           /*!< A white key released */
-QPixmap * PianoView::s_blackKeyPm = NULL;           /*!< A black key released */
-QPixmap * PianoView::s_whiteKeyPressedPm = NULL;    /*!< A white key pressed */
-QPixmap * PianoView::s_blackKeyPressedPm = NULL;    /*!< A black key pressed */
-
-
-const int PIANO_BASE = 11;          /*!< The height of the root note display */
-const int PW_WHITE_KEY_WIDTH = 10;  /*!< The width of a white key */
-const int PW_BLACK_KEY_WIDTH = 8;   /*!< The width of a black key */
+const int PIANO_BASE = 11;			/*!< The height of the root note display */
+const int PW_WHITE_KEY_WIDTH = 10;	/*!< The width of a white key */
+const int PW_BLACK_KEY_WIDTH = 8;	/*!< The width of a black key */
 const int PW_WHITE_KEY_HEIGHT = 57; /*!< The height of a white key */
 const int PW_BLACK_KEY_HEIGHT = 38; /*!< The height of a black key */
-const int LABEL_TEXT_SIZE = 7;      /*!< The height of the key label text */
-
-
-
+const int LABEL_TEXT_SIZE = 7;		/*!< The height of the key label text */
 
 /*! \brief Create a new keyboard display view
  *
  *  \param _parent the parent instrument plugin window
  *  \todo are the descriptions of the m_startkey and m_lastkey properties correct?
  */
-PianoView::PianoView( QWidget * _parent ) :
-	QWidget( _parent ),             /*!< Our parent */
-	ModelView( NULL, this ),        /*!< Our view Model */
-	m_piano( NULL ),                /*!< Our piano Model */
-	m_startKey( Key_C + Octave_3*KeysPerOctave ), /*!< The first key displayed? */
-	m_lastKey( -1 )                 /*!< The last key displayed? */
+PianoView::PianoView(QWidget* _parent)
+	: QWidget(_parent)
+	, /*!< Our parent */
+	ModelView(NULL, this)
+	, /*!< Our view Model */
+	m_piano(NULL)
+	, /*!< Our piano Model */
+	m_startKey(Key_C + Octave_3 * KeysPerOctave)
+	,			  /*!< The first key displayed? */
+	m_lastKey(-1) /*!< The last key displayed? */
 {
-	if( s_whiteKeyPm == NULL )
+	if (s_whiteKeyPm == NULL)
 	{
-		s_whiteKeyPm = new QPixmap( embed::getIconPixmap( "white_key" ) );
+		s_whiteKeyPm = new QPixmap(embed::getIconPixmap("white_key"));
 	}
-	if( s_blackKeyPm == NULL )
+	if (s_blackKeyPm == NULL)
 	{
-		s_blackKeyPm = new QPixmap( embed::getIconPixmap( "black_key" ) );
+		s_blackKeyPm = new QPixmap(embed::getIconPixmap("black_key"));
 	}
-	if( s_whiteKeyPressedPm == NULL )
+	if (s_whiteKeyPressedPm == NULL)
 	{
-		s_whiteKeyPressedPm = new QPixmap( embed::getIconPixmap( "white_key_pressed" ) );
+		s_whiteKeyPressedPm = new QPixmap(embed::getIconPixmap("white_key_pressed"));
 	}
-	if ( s_blackKeyPressedPm == NULL )
+	if (s_blackKeyPressedPm == NULL)
 	{
-		s_blackKeyPressedPm = new QPixmap( embed::getIconPixmap( "black_key_pressed" ) );
+		s_blackKeyPressedPm = new QPixmap(embed::getIconPixmap("black_key_pressed"));
 	}
 
-	setAttribute( Qt::WA_OpaquePaintEvent, true );
-	setFocusPolicy( Qt::StrongFocus );
-	setMaximumWidth( WhiteKeysPerOctave * NumOctaves * PW_WHITE_KEY_WIDTH );
+	setAttribute(Qt::WA_OpaquePaintEvent, true);
+	setFocusPolicy(Qt::StrongFocus);
+	setMaximumWidth(WhiteKeysPerOctave * NumOctaves * PW_WHITE_KEY_WIDTH);
 
 	// create scrollbar at the bottom
-	m_pianoScroll = new QScrollBar( Qt::Horizontal, this );
-	m_pianoScroll->setSingleStep( 1 );
-	m_pianoScroll->setPageStep( 20 );
-	m_pianoScroll->setValue( Octave_3 * WhiteKeysPerOctave );
+	m_pianoScroll = new QScrollBar(Qt::Horizontal, this);
+	m_pianoScroll->setSingleStep(1);
+	m_pianoScroll->setPageStep(20);
+	m_pianoScroll->setValue(Octave_3 * WhiteKeysPerOctave);
 
 	// and connect it to this widget
-	connect( m_pianoScroll, SIGNAL( valueChanged( int ) ),
-			this, SLOT( pianoScrolled( int ) ) );
+	connect(m_pianoScroll, SIGNAL(valueChanged(int)),
+		this, SLOT(pianoScrolled(int)));
 
 	// create a layout for ourselves
-	QVBoxLayout * layout = new QVBoxLayout( this );
-	layout->setSpacing( 0 );
-	layout->setMargin( 0 );
-	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
-	layout->addWidget( m_pianoScroll );
-
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	layout->addSpacing(PIANO_BASE + PW_WHITE_KEY_HEIGHT);
+	layout->addWidget(m_pianoScroll);
 }
 
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
@@ -136,7 +132,7 @@ PianoView::PianoView( QWidget * _parent ) :
  *  \todo check the scan codes for ',' = c, 'L' = c#, '.' = d, ':' = d#,
  *     '/' = d, '[' = f', '=' = f'#, ']' = g' - Paul's additions
  */
-int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
+int PianoView::getKeyFromKeyEvent(QKeyEvent* _ke)
 {
 #ifdef LMMS_BUILD_APPLE
 	const int k = _ke->nativeVirtualKey();
@@ -145,135 +141,240 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 #endif
 
 #ifdef LMMS_BUILD_WIN32
-	switch( k )
+	switch (k)
 	{
-		case 44: return 0; // Z  = C
-		case 31: return 1; // S  = C#
-		case 45: return 2; // X  = D
-		case 32: return 3; // D  = D#
-		case 46: return 4; // C  = E
-		case 47: return 5; // V  = F
-		case 34: return 6; // G  = F#
-		case 48: return 7; // B  = G
-		case 35: return 8; // H  = G#
-		case 49: return 9; // N  = A
-		case 36: return 10; // J = A#
-		case 50: return 11; // M = B
-		case 51: return 12; // , = c
-		case 38: return 13; // L = c#
-		case 52: return 14; // . = d
-		case 39: return 15; // ; = d#
-		//case 86: return 16; // / = e
-		case 53: return 16; // / = e
-		case 16: return 12; // Q = c
-		case 3: return 13; // 2 = c#
-		case 17: return 14; // W = d
-		case 4: return 15; // 3 = d#
-		case 18: return 16; // E = e
-		case 19: return 17; // R = f
-		case 6: return 18; // 5 = f#
-		case 20: return 19; // T = g
-		case 7: return 20; // 6 = g#
-		case 21: return 21; // Y = a
-		case 8: return 22; // 7 = a#
-		case 22: return 23; // U = b
-		case 23: return 24; // I = c'
-		case 10: return 25; // 9 = c'#
-		case 24: return 26; // O = d'
-		case 11: return 27; // 0 = d'#
-		case 25: return 28; // P = e'
-		case 26: return 29; // [
-		case 13: return 30; // =
-		case 27: return 31; // ]
+	case 44:
+		return 0; // Z  = C
+	case 31:
+		return 1; // S  = C#
+	case 45:
+		return 2; // X  = D
+	case 32:
+		return 3; // D  = D#
+	case 46:
+		return 4; // C  = E
+	case 47:
+		return 5; // V  = F
+	case 34:
+		return 6; // G  = F#
+	case 48:
+		return 7; // B  = G
+	case 35:
+		return 8; // H  = G#
+	case 49:
+		return 9; // N  = A
+	case 36:
+		return 10; // J = A#
+	case 50:
+		return 11; // M = B
+	case 51:
+		return 12; // , = c
+	case 38:
+		return 13; // L = c#
+	case 52:
+		return 14; // . = d
+	case 39:
+		return 15; // ; = d#
+	//case 86: return 16; // / = e
+	case 53:
+		return 16; // / = e
+	case 16:
+		return 12; // Q = c
+	case 3:
+		return 13; // 2 = c#
+	case 17:
+		return 14; // W = d
+	case 4:
+		return 15; // 3 = d#
+	case 18:
+		return 16; // E = e
+	case 19:
+		return 17; // R = f
+	case 6:
+		return 18; // 5 = f#
+	case 20:
+		return 19; // T = g
+	case 7:
+		return 20; // 6 = g#
+	case 21:
+		return 21; // Y = a
+	case 8:
+		return 22; // 7 = a#
+	case 22:
+		return 23; // U = b
+	case 23:
+		return 24; // I = c'
+	case 10:
+		return 25; // 9 = c'#
+	case 24:
+		return 26; // O = d'
+	case 11:
+		return 27; // 0 = d'#
+	case 25:
+		return 28; // P = e'
+	case 26:
+		return 29; // [
+	case 13:
+		return 30; // =
+	case 27:
+		return 31; // ]
 	}
 #endif
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD) || defined(LMMS_BUILD_FREEBSD)
-	switch( k )
+	switch (k)
 	{
-		case 52: return 0; // Z  = C
-		case 39: return 1; // S  = C#
-		case 53: return 2; // X  = D
-		case 40: return 3; // D  = D#
-		case 54: return 4; // C  = E
-		case 55: return 5; // V  = F
-		case 42: return 6; // G  = F#
-		case 56: return 7; // B  = G
-		case 43: return 8; // H  = G#
-		case 57: return 9; // N  = A
-		case 44: return 10; // J = A#
-		case 58: return 11; // M = B
-		case 59: return 12; // , = c
-		case 46: return 13; // L = c#
-		case 60: return 14; // . = d
-		case 47: return 15; // ; = d#
-		case 61: return 16; // / = e
-		case 24: return 12; // Q = c
-		case 11: return 13; // 2 = c#
-		case 25: return 14; // W = d
-		case 12: return 15; // 3 = d#
-		case 26: return 16; // E = e
-		case 27: return 17; // R = f
-		case 14: return 18; // 5 = f#
-		case 28: return 19; // T = g
-		case 15: return 20; // 6 = g#
-		case 29: return 21; // Y = a
-		case 16: return 22; // 7 = a#
-		case 30: return 23; // U = b
-		case 31: return 24; // I = c'
-		case 18: return 25; // 9 = c'#
-		case 32: return 26; // O = d'
-		case 19: return 27; // 0 = d'#
-		case 33: return 28; // P = e'
-		case 34: return 29; // [
-		case 21: return 30; // =
-		case 35: return 31; // ]
+	case 52:
+		return 0; // Z  = C
+	case 39:
+		return 1; // S  = C#
+	case 53:
+		return 2; // X  = D
+	case 40:
+		return 3; // D  = D#
+	case 54:
+		return 4; // C  = E
+	case 55:
+		return 5; // V  = F
+	case 42:
+		return 6; // G  = F#
+	case 56:
+		return 7; // B  = G
+	case 43:
+		return 8; // H  = G#
+	case 57:
+		return 9; // N  = A
+	case 44:
+		return 10; // J = A#
+	case 58:
+		return 11; // M = B
+	case 59:
+		return 12; // , = c
+	case 46:
+		return 13; // L = c#
+	case 60:
+		return 14; // . = d
+	case 47:
+		return 15; // ; = d#
+	case 61:
+		return 16; // / = e
+	case 24:
+		return 12; // Q = c
+	case 11:
+		return 13; // 2 = c#
+	case 25:
+		return 14; // W = d
+	case 12:
+		return 15; // 3 = d#
+	case 26:
+		return 16; // E = e
+	case 27:
+		return 17; // R = f
+	case 14:
+		return 18; // 5 = f#
+	case 28:
+		return 19; // T = g
+	case 15:
+		return 20; // 6 = g#
+	case 29:
+		return 21; // Y = a
+	case 16:
+		return 22; // 7 = a#
+	case 30:
+		return 23; // U = b
+	case 31:
+		return 24; // I = c'
+	case 18:
+		return 25; // 9 = c'#
+	case 32:
+		return 26; // O = d'
+	case 19:
+		return 27; // 0 = d'#
+	case 33:
+		return 28; // P = e'
+	case 34:
+		return 29; // [
+	case 21:
+		return 30; // =
+	case 35:
+		return 31; // ]
 	}
 #endif
 #ifdef LMMS_BUILD_APPLE
-	switch( k )
+	switch (k)
 	{
-		case 6: return 0; // Z  = C
-		case 1: return 1; // S  = C#
-		case 7: return 2; // X  = D
-		case 2: return 3; // D  = D#
-		case 8: return 4; // C  = E
-		case 9: return 5; // V  = F
-		case 5: return 6; // G  = F#
-		case 11: return 7; // B  = G
-		case 4: return 8; // H  = G#
-		case 45: return 9; // N  = A
-		case 38: return 10; // J = A#
-		case 46: return 11; // M = B
-		case 43: return 12; // , = c
-		case 37: return 13; // L = c#
-		case 47: return 14; // . = d
-		case 41: return 15; // ; = d#
-		case 44: return 16; // / = e
-		case 12: return 12; // Q = c
-		case 19: return 13; // 2 = c#
-		case 13: return 14; // W = d
-		case 20: return 15; // 3 = d#
-		case 14: return 16; // E = e
-		case 15: return 17; // R = f
-		case 23: return 18; // 5 = f#
-		case 17: return 19; // T = g
-		case 22: return 20; // 6 = g#
-		case 16: return 21; // Y = a
-		case 26: return 22; // 7 = a#
-		case 32: return 23; // U = b
-		case 34: return 24; // I = c'
-		case 25: return 25; // 9 = c'#
-		case 31: return 26; // O = d'
-		case 29: return 27; // 0 = d'#
-		case 35: return 28; // P = e'
+	case 6:
+		return 0; // Z  = C
+	case 1:
+		return 1; // S  = C#
+	case 7:
+		return 2; // X  = D
+	case 2:
+		return 3; // D  = D#
+	case 8:
+		return 4; // C  = E
+	case 9:
+		return 5; // V  = F
+	case 5:
+		return 6; // G  = F#
+	case 11:
+		return 7; // B  = G
+	case 4:
+		return 8; // H  = G#
+	case 45:
+		return 9; // N  = A
+	case 38:
+		return 10; // J = A#
+	case 46:
+		return 11; // M = B
+	case 43:
+		return 12; // , = c
+	case 37:
+		return 13; // L = c#
+	case 47:
+		return 14; // . = d
+	case 41:
+		return 15; // ; = d#
+	case 44:
+		return 16; // / = e
+	case 12:
+		return 12; // Q = c
+	case 19:
+		return 13; // 2 = c#
+	case 13:
+		return 14; // W = d
+	case 20:
+		return 15; // 3 = d#
+	case 14:
+		return 16; // E = e
+	case 15:
+		return 17; // R = f
+	case 23:
+		return 18; // 5 = f#
+	case 17:
+		return 19; // T = g
+	case 22:
+		return 20; // 6 = g#
+	case 16:
+		return 21; // Y = a
+	case 26:
+		return 22; // 7 = a#
+	case 32:
+		return 23; // U = b
+	case 34:
+		return 24; // I = c'
+	case 25:
+		return 25; // 9 = c'#
+	case 31:
+		return 26; // O = d'
+	case 29:
+		return 27; // 0 = d'#
+	case 35:
+		return 28; // P = e'
 	}
 #endif
 
 	return -100;
 }
-
-
-
 
 /*! \brief Register a change to this piano display view
  *
@@ -281,16 +382,12 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 void PianoView::modelChanged()
 {
 	m_piano = castModel<Piano>();
-	if( m_piano != NULL )
+	if (m_piano != NULL)
 	{
-		connect( m_piano->instrumentTrack()->baseNoteModel(), SIGNAL( dataChanged() ),
-					this, SLOT( update() ) );
+		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()),
+			this, SLOT(update()));
 	}
-
 }
-
-
-
 
 // gets the key from the given mouse-position
 /*! \brief Get the key from the mouse position in the piano display
@@ -312,22 +409,23 @@ void PianoView::modelChanged()
  *
  *  \param _p The point that the mouse was pressed.
  */
-int PianoView::getKeyFromMouse( const QPoint & _p ) const
+int PianoView::getKeyFromMouse(const QPoint& _p) const
 {
 	int offset = _p.x() % PW_WHITE_KEY_WIDTH;
-	if( offset < 0 ) offset += PW_WHITE_KEY_WIDTH;
-	int key_num = ( _p.x() - offset) / PW_WHITE_KEY_WIDTH;
+	if (offset < 0)
+		offset += PW_WHITE_KEY_WIDTH;
+	int key_num = (_p.x() - offset) / PW_WHITE_KEY_WIDTH;
 
-	for( int i = 0; i <= key_num; ++i )
+	for (int i = 0; i <= key_num; ++i)
 	{
-		if ( Piano::isBlackKey( m_startKey+i ) )
+		if (Piano::isBlackKey(m_startKey + i))
 		{
 			++key_num;
 		}
 	}
-	for( int i = 0; i >= key_num; --i )
+	for (int i = 0; i >= key_num; --i)
 	{
-		if ( Piano::isBlackKey( m_startKey+i ) )
+		if (Piano::isBlackKey(m_startKey + i))
 		{
 			--key_num;
 		}
@@ -336,30 +434,27 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 	key_num += m_startKey;
 
 	// is it a black key?
-	if( _p.y() < PIANO_BASE + PW_BLACK_KEY_HEIGHT )
+	if (_p.y() < PIANO_BASE + PW_BLACK_KEY_HEIGHT)
 	{
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
-		if( key_num > 0 && Piano::isBlackKey( key_num-1 ) &&
-			offset <= ( PW_WHITE_KEY_WIDTH / 2 ) -
-					( PW_BLACK_KEY_WIDTH / 2 ) )
+		if (key_num > 0 && Piano::isBlackKey(key_num - 1) &&
+			offset <= (PW_WHITE_KEY_WIDTH / 2) -
+					(PW_BLACK_KEY_WIDTH / 2))
 		{
 			--key_num;
 		}
-		if( key_num < NumKeys - 1 && Piano::isBlackKey( key_num+1 ) &&
-			offset >= ( PW_WHITE_KEY_WIDTH -
-					PW_BLACK_KEY_WIDTH / 2 ) )
+		if (key_num < NumKeys - 1 && Piano::isBlackKey(key_num + 1) &&
+			offset >= (PW_WHITE_KEY_WIDTH -
+						  PW_BLACK_KEY_WIDTH / 2))
 		{
 			++key_num;
 		}
 	}
 
 	// some range-checking-stuff
-	return qBound( 0, key_num, NumKeys - 1 );
+	return qBound(0, key_num, NumKeys - 1);
 }
-
-
-
 
 // handler for scrolling-event
 /*! \brief Handle the scrolling on the piano display view
@@ -368,38 +463,32 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
  *
  *  \param _new_pos the new key position.
  */
-void PianoView::pianoScrolled( int _new_pos )
+void PianoView::pianoScrolled(int _new_pos)
 {
-	m_startKey = WhiteKeys[_new_pos % WhiteKeysPerOctave]+
-			( _new_pos / WhiteKeysPerOctave ) * KeysPerOctave;
+	m_startKey = WhiteKeys[_new_pos % WhiteKeysPerOctave] +
+		(_new_pos / WhiteKeysPerOctave) * KeysPerOctave;
 
 	update();
 }
-
-
-
 
 /*! \brief Handle a context menu selection on the piano display view
  *
  *  \param _me the ContextMenuEvent to handle.
  *  \todo Is this right, or does this create the context menu?
  */
-void PianoView::contextMenuEvent( QContextMenuEvent * _me )
+void PianoView::contextMenuEvent(QContextMenuEvent* _me)
 {
-	if( _me->pos().y() > PIANO_BASE || m_piano == NULL )
+	if (_me->pos().y() > PIANO_BASE || m_piano == NULL)
 	{
-		QWidget::contextMenuEvent( _me );
+		QWidget::contextMenuEvent(_me);
 		return;
 	}
 
-	CaptionMenu contextMenu( tr( "Base note" ) );
-	AutomatableModelView amv( m_piano->instrumentTrack()->baseNoteModel(), &contextMenu );
-	amv.addDefaultActions( &contextMenu );
-	contextMenu.exec( QCursor::pos() );
+	CaptionMenu contextMenu(tr("Base note"));
+	AutomatableModelView amv(m_piano->instrumentTrack()->baseNoteModel(), &contextMenu);
+	amv.addDefaultActions(&contextMenu);
+	contextMenu.exec(QCursor::pos());
 }
-
-
-
 
 // handler for mouse-click-event
 /*! \brief Handle a mouse click on this piano display view
@@ -419,48 +508,46 @@ void PianoView::contextMenuEvent( QContextMenuEvent * _me )
  *
  *  \param _me the mouse click to handle.
  */
-void PianoView::mousePressEvent( QMouseEvent * _me )
+void PianoView::mousePressEvent(QMouseEvent* _me)
 {
-	if( _me->button() == Qt::LeftButton && m_piano != NULL )
+	if (_me->button() == Qt::LeftButton && m_piano != NULL)
 	{
 		// get pressed key
-		int key_num = getKeyFromMouse( _me->pos() );
-		if( _me->pos().y() > PIANO_BASE )
+		int key_num = getKeyFromMouse(_me->pos());
+		if (_me->pos().y() > PIANO_BASE)
 		{
 			int y_diff = _me->pos().y() - PIANO_BASE;
-			int velocity = (int)( ( float ) y_diff /
-				( Piano::isWhiteKey( key_num )  ?
-				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-						(float) m_piano->instrumentTrack()->midiPort()->baseVelocity() );
-			if( y_diff < 0 )
+			int velocity = (int)((float)y_diff /
+				(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
+				(float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
+			if (y_diff < 0)
 			{
 				velocity = 0;
 			}
-			else if( y_diff >
-				( Piano::isWhiteKey( key_num ) ?
-				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
+			else if (y_diff >
+				(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT))
 			{
 				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 			}
 			// set note on
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
-			m_piano->setKeyState( key_num, true );
+			m_piano->midiEventProcessor()->processInEvent(MidiEvent(MidiNoteOn, -1, key_num, velocity));
+			m_piano->setKeyState(key_num, true);
 			m_lastKey = key_num;
 
-			emit keyPressed( key_num );
+			emit keyPressed(key_num);
 		}
 		else
 		{
-			if( _me->modifiers() & Qt::ControlModifier )
+			if (_me->modifiers() & Qt::ControlModifier)
 			{
-				new StringPairDrag( "automatable_model",
-					QString::number( m_piano->instrumentTrack()->baseNoteModel()->id() ),
-					QPixmap(), this );
+				new StringPairDrag("automatable_model",
+					QString::number(m_piano->instrumentTrack()->baseNoteModel()->id()),
+					QPixmap(), this);
 				_me->accept();
 			}
 			else
 			{
-				m_piano->instrumentTrack()->baseNoteModel()->setInitValue( (float) key_num );
+				m_piano->instrumentTrack()->baseNoteModel()->setInitValue((float)key_num);
 
 				emit baseNoteChanged();
 			}
@@ -471,9 +558,6 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 	}
 }
 
-
-
-
 // handler for mouse-release-event
 /*! \brief Handle a mouse release event on the piano display view
  *
@@ -482,14 +566,14 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
  *
  *  \param _me the mousePressEvent to handle.
  */
-void PianoView::mouseReleaseEvent( QMouseEvent * )
+void PianoView::mouseReleaseEvent(QMouseEvent*)
 {
-	if( m_lastKey != -1 )
+	if (m_lastKey != -1)
 	{
-		if( m_piano != NULL )
+		if (m_piano != NULL)
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
-			m_piano->setKeyState( m_lastKey, false );
+			m_piano->midiEventProcessor()->processInEvent(MidiEvent(MidiNoteOff, -1, m_lastKey, 0));
+			m_piano->setKeyState(m_lastKey, false);
 		}
 
 		// and let the user see that he released a key... :)
@@ -498,9 +582,6 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
 		m_lastKey = -1;
 	}
 }
-
-
-
 
 // handler for mouse-move-event
 /*! \brief Handle a mouse move event on the piano display view
@@ -516,68 +597,62 @@ void PianoView::mouseReleaseEvent( QMouseEvent * )
  *  reduce or remove the duplication between this, the mousePressEvent()
  *  and mouseReleaseEvent() methods.
  */
-void PianoView::mouseMoveEvent( QMouseEvent * _me )
+void PianoView::mouseMoveEvent(QMouseEvent* _me)
 {
-	if( m_piano == NULL )
+	if (m_piano == NULL)
 	{
 		return;
 	}
 
-	int key_num = getKeyFromMouse( _me->pos() );
+	int key_num = getKeyFromMouse(_me->pos());
 	int y_diff = _me->pos().y() - PIANO_BASE;
-	int velocity = (int)( (float) y_diff /
-		( Piano::isWhiteKey( key_num ) ?
-			PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
-						(float) m_piano->instrumentTrack()->midiPort()->baseVelocity() );
+	int velocity = (int)((float)y_diff /
+		(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
+		(float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
 	// maybe the user moved the mouse-cursor above or under the
 	// piano-widget while holding left button so check that and
 	// correct volume if necessary
-	if( y_diff < 0 )
+	if (y_diff < 0)
 	{
 		velocity = 0;
 	}
-	else if( y_diff >
-		( Piano::isWhiteKey( key_num ) ?
-				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
+	else if (y_diff >
+		(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT))
 	{
 		velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 	}
 
 	// is the calculated key different from current key? (could be the
 	// user just moved the cursor one pixel left but on the same key)
-	if( key_num != m_lastKey )
+	if (key_num != m_lastKey)
 	{
-		if( m_lastKey != -1 )
+		if (m_lastKey != -1)
 		{
-			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, m_lastKey, 0 ) );
-			m_piano->setKeyState( m_lastKey, false );
+			m_piano->midiEventProcessor()->processInEvent(MidiEvent(MidiNoteOff, -1, m_lastKey, 0));
+			m_piano->setKeyState(m_lastKey, false);
 			m_lastKey = -1;
 		}
-		if( _me->buttons() & Qt::LeftButton )
+		if (_me->buttons() & Qt::LeftButton)
 		{
-			if( _me->pos().y() > PIANO_BASE )
+			if (_me->pos().y() > PIANO_BASE)
 			{
-				m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOn, -1, key_num, velocity ) );
-				m_piano->setKeyState( key_num, true );
+				m_piano->midiEventProcessor()->processInEvent(MidiEvent(MidiNoteOn, -1, key_num, velocity));
+				m_piano->setKeyState(key_num, true);
 				m_lastKey = key_num;
 			}
 			else
 			{
-				m_piano->instrumentTrack()->baseNoteModel()->setInitValue( (float) key_num );
+				m_piano->instrumentTrack()->baseNoteModel()->setInitValue((float)key_num);
 			}
 		}
 		// and let the user see that he pressed a key... :)
 		update();
 	}
-	else if( m_piano->isKeyPressed( key_num ) )
+	else if (m_piano->isKeyPressed(key_num))
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiKeyPressure, -1, key_num, velocity ) );
+		m_piano->midiEventProcessor()->processInEvent(MidiEvent(MidiKeyPressure, -1, key_num, velocity));
 	}
-
 }
-
-
-
 
 /*! \brief Handle a key press event on the piano display view
  *
@@ -587,16 +662,16 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  *
  *  \param _ke the KeyEvent to handle.
  */
-void PianoView::keyPressEvent( QKeyEvent * _ke )
+void PianoView::keyPressEvent(QKeyEvent* _ke)
 {
-	const int key_num = getKeyFromKeyEvent( _ke ) +
-				( DefaultOctave - 1 ) * KeysPerOctave;
+	const int key_num = getKeyFromKeyEvent(_ke) +
+		(DefaultOctave - 1) * KeysPerOctave;
 
-	if( _ke->isAutoRepeat() == false && key_num > -1 )
+	if (_ke->isAutoRepeat() == false && key_num > -1)
 	{
-		if( m_piano != NULL )
+		if (m_piano != NULL)
 		{
-			m_piano->handleKeyPress( key_num );
+			m_piano->handleKeyPress(key_num);
 			_ke->accept();
 			update();
 		}
@@ -606,9 +681,6 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
 		_ke->ignore();
 	}
 }
-
-
-
 
 /*! \brief Handle a key release event on the piano display view
  *
@@ -616,15 +688,15 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
  *
  *  \param _ke the KeyEvent to handle.
  */
-void PianoView::keyReleaseEvent( QKeyEvent * _ke )
+void PianoView::keyReleaseEvent(QKeyEvent* _ke)
 {
-	const int key_num = getKeyFromKeyEvent( _ke ) +
-				( DefaultOctave - 1 ) * KeysPerOctave;
-	if( _ke->isAutoRepeat() == false && key_num > -1 )
+	const int key_num = getKeyFromKeyEvent(_ke) +
+		(DefaultOctave - 1) * KeysPerOctave;
+	if (_ke->isAutoRepeat() == false && key_num > -1)
 	{
-		if( m_piano != NULL )
+		if (m_piano != NULL)
 		{
-			m_piano->handleKeyRelease( key_num );
+			m_piano->handleKeyRelease(key_num);
 			_ke->accept();
 			update();
 		}
@@ -635,30 +707,25 @@ void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 	}
 }
 
-
-
-
 /*! \brief Handle the focus leaving the piano display view
  *
  *  Turn off all notes if we lose focus.
  *
  *  \todo Is there supposed to be a parameter given here?
  */
-void PianoView::focusOutEvent( QFocusEvent * )
+void PianoView::focusOutEvent(QFocusEvent*)
 {
-	if( m_piano == NULL )
+	if (m_piano == NULL)
 	{
 		return;
 	}
 
 	// focus just switched to another control inside the instrument track
 	// window we live in?
-	if( parentWidget()->parentWidget()->focusWidget() != this &&
+	if (parentWidget()->parentWidget()->focusWidget() != this &&
 		parentWidget()->parentWidget()->focusWidget() != NULL &&
-		!(parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QLineEdit" ) ||
-		parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QPlainTextEdit" ) ))
+		!(parentWidget()->parentWidget()->focusWidget()->inherits("QLineEdit") ||
+			parentWidget()->parentWidget()->focusWidget()->inherits("QPlainTextEdit")))
 	{
 		// then reclaim keyboard focus!
 		setFocus();
@@ -668,23 +735,19 @@ void PianoView::focusOutEvent( QFocusEvent * )
 	// if we loose focus, we HAVE to note off all running notes because
 	// we don't receive key-release-events anymore and so the notes would
 	// hang otherwise
-	for( int i = 0; i < NumKeys; ++i )
+	for (int i = 0; i < NumKeys; ++i)
 	{
-		m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
-		m_piano->setKeyState( i, false );
+		m_piano->midiEventProcessor()->processInEvent(MidiEvent(MidiNoteOff, -1, i, 0));
+		m_piano->setKeyState(i, false);
 	}
-
 
 	update();
 }
 
-
-void PianoView::focusInEvent( QFocusEvent * )
+void PianoView::focusInEvent(QFocusEvent*)
 {
 	m_piano->instrumentTrack()->autoAssignMidiDevice(true);
 }
-
-
 
 /*! \brief update scrollbar range after resize
  *
@@ -693,16 +756,11 @@ void PianoView::focusInEvent( QFocusEvent * )
  *
  *  \param _event resize-event object (unused)
  */
-void PianoView::resizeEvent( QResizeEvent * _event )
+void PianoView::resizeEvent(QResizeEvent* _event)
 {
-	QWidget::resizeEvent( _event );
-	m_pianoScroll->setRange( 0, WhiteKeysPerOctave * NumOctaves -
-					(int) ceil( (float) width() /
-							PW_WHITE_KEY_WIDTH ) );
+	QWidget::resizeEvent(_event);
+	m_pianoScroll->setRange(0, WhiteKeysPerOctave * NumOctaves - (int)ceil((float)width() / PW_WHITE_KEY_WIDTH));
 }
-
-
-
 
 /*! \brief Convert a key number to an X coordinate in the piano display view
  *
@@ -718,35 +776,35 @@ void PianoView::resizeEvent( QResizeEvent * _event )
  *  \todo is this description of what the method does correct?
  *  \todo replace the final subtract with initialising x to width/2.
  */
-int PianoView::getKeyX( int _key_num ) const
+int PianoView::getKeyX(int _key_num) const
 {
 	int k = m_startKey;
-	if( _key_num < m_startKey )
+	if (_key_num < m_startKey)
 	{
-		return ( _key_num - k ) * PW_WHITE_KEY_WIDTH / 2;
+		return (_key_num - k) * PW_WHITE_KEY_WIDTH / 2;
 	}
 
 	int x = 0;
 	int white_cnt = 0;
 
-	while( k <= _key_num )
+	while (k <= _key_num)
 	{
-		if( Piano::isWhiteKey( k ) )
+		if (Piano::isWhiteKey(k))
 		{
 			++white_cnt;
-			if( white_cnt > 1 )
+			if (white_cnt > 1)
 			{
 				x += PW_WHITE_KEY_WIDTH;
 			}
 			else
 			{
-				x += PW_WHITE_KEY_WIDTH/2;
+				x += PW_WHITE_KEY_WIDTH / 2;
 			}
 		}
 		else
 		{
 			white_cnt = 0;
-			x += PW_WHITE_KEY_WIDTH/2;
+			x += PW_WHITE_KEY_WIDTH / 2;
 		}
 		++k;
 	}
@@ -754,11 +812,7 @@ int PianoView::getKeyX( int _key_num ) const
 	x -= PW_WHITE_KEY_WIDTH / 2;
 
 	return x;
-
 }
-
-
-
 
 /*! \brief Paint the piano display view in response to an event
  *
@@ -767,108 +821,105 @@ int PianoView::getKeyX( int _key_num ) const
  *
  *  \todo Is there supposed to be a parameter given here?
  */
-void PianoView::paintEvent( QPaintEvent * )
+void PianoView::paintEvent(QPaintEvent*)
 {
-	QPainter p( this );
+	QPainter p(this);
 
 	// set smaller font for printing number of every octave
-	p.setFont( pointSize<LABEL_TEXT_SIZE>( p.font() ) );
-
+	p.setFont(pointSize<LABEL_TEXT_SIZE>(p.font()));
 
 	// draw bar above the keyboard (there will be the labels
 	// for all C's)
-	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), p.background() );
+	p.fillRect(QRect(0, 1, width(), PIANO_BASE - 2), p.background());
 
 	// draw the line above the keyboard
-	p.setPen( Qt::black );
-	p.drawLine( 0, 0, width(), 0 );
-	p.drawLine( 0, PIANO_BASE-1, width(), PIANO_BASE-1 );
+	p.setPen(Qt::black);
+	p.drawLine(0, 0, width(), 0);
+	p.drawLine(0, PIANO_BASE - 1, width(), PIANO_BASE - 1);
 
-	p.setPen( Qt::white );
+	p.setPen(Qt::white);
 
-	const int base_key = ( m_piano != NULL ) ?
-		m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
+	const int base_key = (m_piano != NULL) ? m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
 
-	QColor baseKeyColor = QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText );
-	if( Piano::isWhiteKey( base_key ) )
+	QColor baseKeyColor = QApplication::palette().color(QPalette::Active,
+		QPalette::BrightText);
+	if (Piano::isWhiteKey(base_key))
 	{
-		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,
-							PIANO_BASE-2 ), baseKeyColor );
+		p.fillRect(QRect(getKeyX(base_key), 1, PW_WHITE_KEY_WIDTH - 1,
+					   PIANO_BASE - 2),
+			baseKeyColor);
 	}
 	else
 	{
-		p.fillRect( QRect( getKeyX( base_key ) + 1, 1,
-				PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2 ), baseKeyColor);
+		p.fillRect(QRect(getKeyX(base_key) + 1, 1,
+					   PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2),
+			baseKeyColor);
 	}
-
 
 	int cur_key = m_startKey;
 
 	// draw all white keys...
-	for( int x = 0; x < width(); )
+	for (int x = 0; x < width();)
 	{
-		while( Piano::isBlackKey( cur_key ) )
+		while (Piano::isBlackKey(cur_key))
 		{
 			++cur_key;
 		}
 
 		// draw pressed or not pressed key, depending on state of
 		// current key
-		if( m_piano && m_piano->isKeyPressed( cur_key ) )
+		if (m_piano && m_piano->isKeyPressed(cur_key))
 		{
-			p.drawPixmap( x, PIANO_BASE, *s_whiteKeyPressedPm );
+			p.drawPixmap(x, PIANO_BASE, *s_whiteKeyPressedPm);
 		}
 		else
 		{
-			p.drawPixmap( x, PIANO_BASE, *s_whiteKeyPm );
+			p.drawPixmap(x, PIANO_BASE, *s_whiteKeyPm);
 		}
 
 		x += PW_WHITE_KEY_WIDTH;
 
-		if( (Keys) (cur_key%KeysPerOctave) == Key_C )
+		if ((Keys)(cur_key % KeysPerOctave) == Key_C)
 		{
 			// label key of note C with "C" and number of current
 			// octave
-			p.drawText( x - PW_WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
-					QString( "C" ) + QString::number(
-					cur_key / KeysPerOctave, 10 ) );
+			p.drawText(x - PW_WHITE_KEY_WIDTH, LABEL_TEXT_SIZE + 2,
+				QString("C") + QString::number(cur_key / KeysPerOctave, 10));
 		}
 		++cur_key;
 	}
-
 
 	// reset all values, because now we're going to draw all black keys
 	cur_key = m_startKey;
 	int white_cnt = 0;
 
 	int startKey = m_startKey;
-	if( startKey > 0 && Piano::isBlackKey( (Keys)(--startKey) ) )
+	if (startKey > 0 && Piano::isBlackKey((Keys)(--startKey)))
 	{
-		if( m_piano && m_piano->isKeyPressed( startKey ) )
+		if (m_piano && m_piano->isKeyPressed(startKey))
 		{
-			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm );
+			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm);
 		}
 		else
 		{
-			p.drawPixmap( 0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm );
+			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm);
 		}
 	}
 
 	// now draw all black keys...
-	for( int x = 0; x < width(); )
+	for (int x = 0; x < width();)
 	{
-		if( Piano::isBlackKey( cur_key ) )
+		if (Piano::isBlackKey(cur_key))
 		{
 			// draw pressed or not pressed key, depending on
 			// state of current key
-			if( m_piano && m_piano->isKeyPressed( cur_key ) )
+			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
-				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm );
+				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPressedPm);
 			}
 			else
 			{
-				p.drawPixmap( x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm );
+				p.drawPixmap(x + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyPm);
 			}
 			x += PW_WHITE_KEY_WIDTH;
 			white_cnt = 0;
@@ -878,7 +929,7 @@ void PianoView::paintEvent( QPaintEvent * )
 			// simple workaround for increasing x if there were two
 			// white keys (e.g. between E and F)
 			++white_cnt;
-			if( white_cnt > 1 )
+			if (white_cnt > 1)
 			{
 				x += PW_WHITE_KEY_WIDTH;
 			}
@@ -886,9 +937,3 @@ void PianoView::paintEvent( QPaintEvent * )
 		++cur_key;
 	}
 }
-
-
-
-
-
-

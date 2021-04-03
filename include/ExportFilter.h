@@ -28,27 +28,28 @@
 
 #include <QtCore/QFile>
 
-#include "TrackContainer.h"
 #include "Plugin.h"
-
+#include "TrackContainer.h"
 
 class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
-	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, NULL ) {}
+	ExportFilter(const Descriptor* _descriptor)
+		: Plugin(_descriptor, NULL)
+	{
+	}
 	virtual ~ExportFilter() {}
 
+	virtual bool tryExport(const TrackContainer::TrackList& tracks,
+		const TrackContainer::TrackList& tracksBB,
+		int tempo, int masterPitch, const QString& filename) = 0;
 
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracksBB,
-				int tempo, int masterPitch, const QString &filename ) = 0;
 protected:
-
-	void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings(QDomDocument&, QDomElement&) override
 	{
 	}
 
-	void loadSettings( const QDomElement & ) override
+	void loadSettings(const QDomElement&) override
 	{
 	}
 
@@ -57,10 +58,7 @@ protected:
 		return "import_filter";
 	}
 
-
 private:
-
-} ;
-
+};
 
 #endif

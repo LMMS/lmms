@@ -28,50 +28,46 @@
 
 #include <QtCore/QReadWriteLock>
 
-#include "Track.h"
 #include "JournallingObject.h"
-
+#include "Track.h"
 
 class AutomationPattern;
 class InstrumentTrack;
 class TrackContainerView;
 
-
 class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<Track *> TrackList;
+	typedef QVector<Track*> TrackList;
 	enum TrackContainerTypes
 	{
 		BBContainer,
 		SongContainer
-	} ;
+	};
 
 	TrackContainer();
 	virtual ~TrackContainer();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 
-	void loadSettings( const QDomElement & _this ) override;
+	void loadSettings(const QDomElement& _this) override;
 
-
-	virtual AutomationPattern * tempoAutomationPattern()
+	virtual AutomationPattern* tempoAutomationPattern()
 	{
 		return NULL;
 	}
 
-	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
+	int countTracks(Track::TrackTypes _tt = Track::NumTrackTypes) const;
 
-
-	void addTrack( Track * _track );
-	void removeTrack( Track * _track );
+	void addTrack(Track* _track);
+	void removeTrack(Track* _track);
 
 	virtual void updateAfterTrackAdd();
 
 	void clearAllTracks();
 
-	const TrackList & tracks() const
+	const TrackList& tracks() const
 	{
 		return m_tracks;
 	}
@@ -83,7 +79,7 @@ public:
 		return "trackcontainer";
 	}
 
-	inline void setType( TrackContainerTypes newType )
+	inline void setType(TrackContainerTypes newType)
 	{
 		m_TrackContainerType = newType;
 	}
@@ -96,10 +92,10 @@ public:
 	virtual AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const;
 
 signals:
-	void trackAdded( Track * _track );
+	void trackAdded(Track* _track);
 
 protected:
-	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int tcoNum = -1);
+	static AutomatedValueMap automatedValuesFromTracks(const TrackList& tracks, TimePos timeStart, int tcoNum = -1);
 
 	mutable QReadWriteLock m_tracksMutex;
 
@@ -108,11 +104,8 @@ private:
 
 	TrackContainerTypes m_TrackContainerType;
 
-
 	friend class TrackContainerView;
 	friend class Track;
-
-} ;
-
+};
 
 #endif

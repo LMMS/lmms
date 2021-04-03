@@ -28,17 +28,17 @@
 #include "ComboBoxModel.h"
 #include "TempoSyncKnobModel.h"
 
-void ModelVisitor::visit(BoolModel &m) { up(m); }
-void ModelVisitor::visit(IntModel &m) { up(m); }
-void ModelVisitor::visit(FloatModel &m) { up(m); }
-void ModelVisitor::visit(ComboBoxModel &m) { up<IntModel>(m); }
-void ModelVisitor::visit(TempoSyncKnobModel &m) { up<FloatModel>(m); }
+void ModelVisitor::visit(BoolModel& m) { up(m); }
+void ModelVisitor::visit(IntModel& m) { up(m); }
+void ModelVisitor::visit(FloatModel& m) { up(m); }
+void ModelVisitor::visit(ComboBoxModel& m) { up<IntModel>(m); }
+void ModelVisitor::visit(TempoSyncKnobModel& m) { up<FloatModel>(m); }
 
-void ConstModelVisitor::visit(const BoolModel &m) { up(m); }
-void ConstModelVisitor::visit(const IntModel &m) { up(m); }
-void ConstModelVisitor::visit(const FloatModel &m) { up(m); }
-void ConstModelVisitor::visit(const ComboBoxModel &m) { up<IntModel>(m); }
-void ConstModelVisitor::visit(const TempoSyncKnobModel &m) { up<FloatModel>(m); }
+void ConstModelVisitor::visit(const BoolModel& m) { up(m); }
+void ConstModelVisitor::visit(const IntModel& m) { up(m); }
+void ConstModelVisitor::visit(const FloatModel& m) { up(m); }
+void ConstModelVisitor::visit(const ComboBoxModel& m) { up<IntModel>(m); }
+void ConstModelVisitor::visit(const TempoSyncKnobModel& m) { up<FloatModel>(m); }
 
 ModelVisitor::~ModelVisitor() {}
 ConstModelVisitor::~ConstModelVisitor() {}

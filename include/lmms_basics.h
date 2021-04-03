@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef TYPES_H
 #define TYPES_H
 
@@ -31,37 +30,33 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_STDINT_H
-#include <cstdint>
 #include <array>
+#include <cstdint>
 #endif
-
 
 typedef int32_t bar_t;
 typedef int32_t tick_t;
 typedef uint8_t volume_t;
 typedef int8_t panning_t;
 
+typedef float sample_t;		  // standard sample-type
+typedef int16_t int_sample_t; // 16-bit-int-sample
 
-typedef float sample_t;			// standard sample-type
-typedef int16_t int_sample_t;		// 16-bit-int-sample
-
-
-typedef uint32_t sample_rate_t;		// sample-rate
+typedef uint32_t sample_rate_t; // sample-rate
 typedef int16_t fpp_t;			// frames per period (0-16384)
-typedef int32_t f_cnt_t;			// standard frame-count
-typedef uint8_t ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
+typedef int32_t f_cnt_t;		// standard frame-count
+typedef uint8_t ch_cnt_t;		// channel-count (0-SURROUND_CHANNELS)
 typedef uint16_t bpm_t;			// tempo (MIN_BPM to MAX_BPM)
 typedef uint16_t bitrate_t;		// bitrate in kbps
-typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
+typedef uint16_t fx_ch_t;		// FX-channel (0 to MAX_EFFECT_CHANNEL)
 
-typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
-
+typedef uint32_t jo_id_t; // (unique) ID of a journalling object
 
 // windows headers define "min" and "max" macros, breaking the methods bwloe
 #undef min
 #undef max
 
-template<typename T>
+template <typename T>
 struct typeInfo
 {
 	static inline T min()
@@ -79,46 +74,42 @@ struct typeInfo
 		return 1;
 	}
 
-	static inline bool isEqual( T x, T y )
+	static inline bool isEqual(T x, T y)
 	{
 		return x == y;
 	}
 
-	static inline T absVal( T t )
+	static inline T absVal(T t)
 	{
 		return t >= 0 ? t : -t;
 	}
-} ;
+};
 
-
-template<>
+template <>
 inline float typeInfo<float>::minEps()
 {
 	return 1.0e-10f;
 }
 
-template<>
-inline bool typeInfo<float>::isEqual( float x, float y )
+template <>
+inline bool typeInfo<float>::isEqual(float x, float y)
 {
-	if( x == y )
+	if (x == y)
 	{
 		return true;
 	}
-	return absVal( x - y ) < minEps();
+	return absVal(x - y) < minEps();
 }
-
-
 
 const ch_cnt_t DEFAULT_CHANNELS = 2;
 
 const ch_cnt_t SURROUND_CHANNELS =
 #define LMMS_DISABLE_SURROUND
 #ifndef LMMS_DISABLE_SURROUND
-				4;
+	4;
 #else
-				2;
+	2;
 #endif
-
 
 #ifdef LMMS_BUILD_WIN32
 #define LADSPA_PATH_SEPERATOR ';'
@@ -126,21 +117,18 @@ const ch_cnt_t SURROUND_CHANNELS =
 #define LADSPA_PATH_SEPERATOR ':'
 #endif
 
-
-
-using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
+using sampleFrame = std::array<sample_t, DEFAULT_CHANNELS>;
 using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
 #define ALIGN_SIZE 16
 
-
 #define STRINGIFY(s) STR(s)
-#define STR(PN)	#PN
+#define STR(PN) #PN
 
 // Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
 #ifdef LMMS_BUILD_APPLE
-# define UI_CTRL_KEY "⌘"
+#define UI_CTRL_KEY "⌘"
 #else
-# define UI_CTRL_KEY "Ctrl"
+#define UI_CTRL_KEY "Ctrl"
 #endif
 
 #endif

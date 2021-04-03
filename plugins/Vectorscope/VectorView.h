@@ -34,29 +34,28 @@
 
 //#define VEC_DEBUG
 
-
 // Widget that displays a vectorscope visualization of stereo signal.
 class VectorView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
+	explicit VectorView(VecControls* controls, LocklessRingBuffer<sampleFrame>* inputBuffer, unsigned short displaySize, QWidget* parent = 0);
 	virtual ~VectorView() {}
 
-	QSize sizeHint() const override {return QSize(300, 300);}
+	QSize sizeHint() const override { return QSize(300, 300); }
 
 protected:
-	void paintEvent(QPaintEvent *event) override;
-	void mouseDoubleClickEvent(QMouseEvent *event) override;
-	void wheelEvent(QWheelEvent *event) override;
+	void paintEvent(QPaintEvent* event) override;
+	void mouseDoubleClickEvent(QMouseEvent* event) override;
+	void wheelEvent(QWheelEvent* event) override;
 
 private slots:
 	void periodicUpdate();
 
 private:
-	VecControls *m_controls;
+	VecControls* m_controls;
 
-	LocklessRingBuffer<sampleFrame> *m_inputBuffer;
+	LocklessRingBuffer<sampleFrame>* m_inputBuffer;
 	LocklessRingBufferReader<sampleFrame> m_bufferReader;
 
 	std::vector<uchar> m_displayBuffer;

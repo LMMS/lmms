@@ -22,18 +22,17 @@
  *
  */
 
+#include "InstrumentSoundShapingView.h"
+
 #include <QLabel>
 
-#include "InstrumentSoundShapingView.h"
+#include "ComboBox.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "EnvelopeAndLfoView.h"
-#include "ComboBox.h"
 #include "GroupBox.h"
-#include "gui_templates.h"
 #include "Knob.h"
 #include "TabWidget.h"
-
-
+#include "gui_templates.h"
 
 const int TARGETS_TABWIDGET_X = 4;
 const int TARGETS_TABWIDGET_Y = 5;
@@ -41,98 +40,79 @@ const int TARGETS_TABWIDGET_WIDTH = 242;
 const int TARGETS_TABWIDGET_HEIGTH = 175;
 
 const int FILTER_GROUPBOX_X = TARGETS_TABWIDGET_X;
-const int FILTER_GROUPBOX_Y = TARGETS_TABWIDGET_Y+TARGETS_TABWIDGET_HEIGTH+5;
+const int FILTER_GROUPBOX_Y = TARGETS_TABWIDGET_Y + TARGETS_TABWIDGET_HEIGTH + 5;
 const int FILTER_GROUPBOX_WIDTH = TARGETS_TABWIDGET_WIDTH;
-const int FILTER_GROUPBOX_HEIGHT = 245-FILTER_GROUPBOX_Y;
+const int FILTER_GROUPBOX_HEIGHT = 245 - FILTER_GROUPBOX_Y;
 
-
-
-InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
-	QWidget( _parent ),
-	ModelView( NULL, this ),
-	m_ss( NULL )
+InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* _parent)
+	: QWidget(_parent)
+	, ModelView(NULL, this)
+	, m_ss(NULL)
 {
-	m_targetsTabWidget = new TabWidget( tr( "TARGET" ), this );
-	m_targetsTabWidget->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
+	m_targetsTabWidget = new TabWidget(tr("TARGET"), this);
+	m_targetsTabWidget->setGeometry(TARGETS_TABWIDGET_X,
+		TARGETS_TABWIDGET_Y,
+		TARGETS_TABWIDGET_WIDTH,
+		TARGETS_TABWIDGET_HEIGTH);
 
-	for( int i = 0; i < InstrumentSoundShaping::NumTargets; ++i )
+	for (int i = 0; i < InstrumentSoundShaping::NumTargets; ++i)
 	{
-		m_envLfoViews[i] = new EnvelopeAndLfoView( m_targetsTabWidget );
-		m_targetsTabWidget->addTab( m_envLfoViews[i],
-						tr( InstrumentSoundShaping::targetNames[i][0] ), 
-                                                NULL );
+		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
+		m_targetsTabWidget->addTab(m_envLfoViews[i],
+			tr(InstrumentSoundShaping::targetNames[i][0]),
+			NULL);
 	}
 
+	m_filterGroupBox = new GroupBox(tr("FILTER"), this);
+	m_filterGroupBox->setGeometry(FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
+		FILTER_GROUPBOX_WIDTH,
+		FILTER_GROUPBOX_HEIGHT);
 
-	m_filterGroupBox = new GroupBox( tr( "FILTER" ), this );
-	m_filterGroupBox->setGeometry( FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
-						FILTER_GROUPBOX_WIDTH,
-						FILTER_GROUPBOX_HEIGHT );
+	m_filterComboBox = new ComboBox(m_filterGroupBox);
+	m_filterComboBox->setGeometry(14, 22, 120, ComboBox::DEFAULT_HEIGHT);
+	m_filterComboBox->setFont(pointSize<8>(m_filterComboBox->font()));
 
+	m_filterCutKnob = new Knob(knobBright_26, m_filterGroupBox);
+	m_filterCutKnob->setLabel(tr("FREQ"));
+	m_filterCutKnob->move(140, 18);
+	m_filterCutKnob->setHintText(tr("Cutoff frequency:"), " " + tr("Hz"));
 
-	m_filterComboBox = new ComboBox( m_filterGroupBox );
-	m_filterComboBox->setGeometry( 14, 22, 120, ComboBox::DEFAULT_HEIGHT );
-	m_filterComboBox->setFont( pointSize<8>( m_filterComboBox->font() ) );
+	m_filterResKnob = new Knob(knobBright_26, m_filterGroupBox);
+	m_filterResKnob->setLabel(tr("Q/RESO"));
+	m_filterResKnob->move(196, 18);
+	m_filterResKnob->setHintText(tr("Q/Resonance:"), "");
 
+	m_singleStreamInfoLabel = new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
+	m_singleStreamInfoLabel->setWordWrap(true);
+	m_singleStreamInfoLabel->setFont(pointSize<8>(m_singleStreamInfoLabel->font()));
 
-	m_filterCutKnob = new Knob( knobBright_26, m_filterGroupBox );
-	m_filterCutKnob->setLabel( tr( "FREQ" ) );
-	m_filterCutKnob->move( 140, 18 );
-	m_filterCutKnob->setHintText( tr( "Cutoff frequency:" ), " " + tr( "Hz" ) );
-
-
-	m_filterResKnob = new Knob( knobBright_26, m_filterGroupBox );
-	m_filterResKnob->setLabel( tr( "Q/RESO" ) );
-	m_filterResKnob->move( 196, 18 );
-	m_filterResKnob->setHintText( tr( "Q/Resonance:" ), "" );
-
-
-	m_singleStreamInfoLabel = new QLabel( tr( "Envelopes, LFOs and filters are not supported by the current instrument." ), this );
-	m_singleStreamInfoLabel->setWordWrap( true );
-	m_singleStreamInfoLabel->setFont( pointSize<8>( m_singleStreamInfoLabel->font() ) );
-
-	m_singleStreamInfoLabel->setGeometry( TARGETS_TABWIDGET_X,
-						TARGETS_TABWIDGET_Y,
-						TARGETS_TABWIDGET_WIDTH,
-						TARGETS_TABWIDGET_HEIGTH );
+	m_singleStreamInfoLabel->setGeometry(TARGETS_TABWIDGET_X,
+		TARGETS_TABWIDGET_Y,
+		TARGETS_TABWIDGET_WIDTH,
+		TARGETS_TABWIDGET_HEIGTH);
 }
-
-
-
 
 InstrumentSoundShapingView::~InstrumentSoundShapingView()
 {
 	delete m_targetsTabWidget;
 }
 
-
-
-void InstrumentSoundShapingView::setFunctionsHidden( bool hidden )
+void InstrumentSoundShapingView::setFunctionsHidden(bool hidden)
 {
-	m_targetsTabWidget->setHidden( hidden );
-	m_filterGroupBox->setHidden( hidden );
-	m_singleStreamInfoLabel->setHidden( !hidden );
+	m_targetsTabWidget->setHidden(hidden);
+	m_filterGroupBox->setHidden(hidden);
+	m_singleStreamInfoLabel->setHidden(!hidden);
 }
-
-
 
 void InstrumentSoundShapingView::modelChanged()
 {
 	m_ss = castModel<InstrumentSoundShaping>();
-	m_filterGroupBox->setModel( &m_ss->m_filterEnabledModel );
-	m_filterComboBox->setModel( &m_ss->m_filterModel );
-	m_filterCutKnob->setModel( &m_ss->m_filterCutModel );
-	m_filterResKnob->setModel( &m_ss->m_filterResModel );
-	for( int i = 0; i < InstrumentSoundShaping::NumTargets; ++i )
+	m_filterGroupBox->setModel(&m_ss->m_filterEnabledModel);
+	m_filterComboBox->setModel(&m_ss->m_filterModel);
+	m_filterCutKnob->setModel(&m_ss->m_filterCutModel);
+	m_filterResKnob->setModel(&m_ss->m_filterResModel);
+	for (int i = 0; i < InstrumentSoundShaping::NumTargets; ++i)
 	{
-		m_envLfoViews[i]->setModel( m_ss->m_envLfoParameters[i] );
+		m_envLfoViews[i]->setModel(m_ss->m_envLfoParameters[i]);
 	}
 }
-
-
-
-
-	

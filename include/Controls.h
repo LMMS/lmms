@@ -25,18 +25,15 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
-
 #include "Model.h"
 
 // headers only required for covariance
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 
-
 class QString;
 class QWidget;
 class AutomatableModel;
-
 
 /**
 	These classes provide
@@ -58,7 +55,6 @@ public:
 	virtual ~Control();
 };
 
-
 class KnobControl : public Control
 {
 	class Knob* m_knob;
@@ -74,7 +70,6 @@ public:
 	KnobControl(QWidget* parent = nullptr);
 	~KnobControl() override;
 };
-
 
 class ComboControl : public Control
 {
@@ -94,7 +89,6 @@ public:
 	~ComboControl() override;
 };
 
-
 class LcdControl : public Control
 {
 	class LcdSpinBox* m_lcd;
@@ -111,7 +105,6 @@ public:
 	~LcdControl() override;
 };
 
-
 class CheckControl : public Control
 {
 	QWidget* m_widget;
@@ -123,12 +116,11 @@ public:
 	QWidget* topWidget() override;
 
 	void setModel(AutomatableModel* model) override;
-	BoolModel *model() override;
+	BoolModel* model() override;
 	class AutomatableModelView* modelView() override;
 
 	CheckControl(QWidget* parent = nullptr);
 	~CheckControl() override;
 };
-
 
 #endif // CONTROLS_H

@@ -26,42 +26,39 @@
 #ifndef LADSPA_2_LMMS_H
 #define LADSPA_2_LMMS_H
 
-
 #include "LadspaManager.h"
-
 
 //! Class responsible for sorting found plugins (by LadspaManager)
 //! into categories
 class LMMS_EXPORT Ladspa2LMMS : public LadspaManager
 {
 public:
-	
 	inline l_sortable_plugin_t getInstruments()
 	{
-		return( m_instruments );
+		return (m_instruments);
 	}
-	
+
 	inline l_sortable_plugin_t getValidEffects()
 	{
-		return( m_validEffects );
+		return (m_validEffects);
 	}
-	
+
 	inline l_sortable_plugin_t getInvalidEffects()
 	{
-		return( m_invalidEffects );
+		return (m_invalidEffects);
 	}
-	
+
 	inline l_sortable_plugin_t getAnalysisTools()
 	{
-		return( m_analysisTools );
+		return (m_analysisTools);
 	}
-	
+
 	inline l_sortable_plugin_t getOthers()
 	{
-		return( m_otherPlugins );
+		return (m_otherPlugins);
 	}
-	
-	QString getShortName( const ladspa_key_t & _key );
+
+	QString getShortName(const ladspa_key_t& _key);
 
 private:
 	Ladspa2LMMS();
@@ -72,9 +69,8 @@ private:
 	l_sortable_plugin_t m_invalidEffects;
 	l_sortable_plugin_t m_analysisTools;
 	l_sortable_plugin_t m_otherPlugins;
-	
-	friend class LmmsCore;
 
-} ;
+	friend class LmmsCore;
+};
 
 #endif

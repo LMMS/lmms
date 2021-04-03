@@ -32,14 +32,12 @@
 #include "SongEditor.h"
 #include "TrackContentObjectView.h"
 
-
 class AutomationPatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
-
 public:
-	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
+	AutomationPatternView(AutomationPattern* _pat, TrackView* _parent);
 	virtual ~AutomationPatternView();
 
 public slots:
@@ -47,33 +45,30 @@ public slots:
 	void openInAutomationEditor();
 	void update() override;
 
-
 protected slots:
 	void resetName();
 	void changeName();
-	void disconnectObject( QAction * _a );
+	void disconnectObject(QAction* _a);
 	void toggleRecording();
 	void flipY();
 	void flipX();
 
 protected:
-	void constructContextMenu( QMenu * ) override;
-	void mouseDoubleClickEvent(QMouseEvent * me ) override;
-	void paintEvent( QPaintEvent * pe ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-
+	void constructContextMenu(QMenu*) override;
+	void mouseDoubleClickEvent(QMouseEvent* me) override;
+	void paintEvent(QPaintEvent* pe) override;
+	void dragEnterEvent(QDragEnterEvent* _dee) override;
+	void dropEvent(QDropEvent* _de) override;
 
 private:
-	AutomationPattern * m_pat;
+	AutomationPattern* m_pat;
 	QPixmap m_paintPixmap;
-	
+
 	QStaticText m_staticTextName;
-	
-	static QPixmap * s_pat_rec;
 
-	void scaleTimemapToFit( float oldMin, float oldMax );
-} ;
+	static QPixmap* s_pat_rec;
 
+	void scaleTimemapToFit(float oldMin, float oldMax);
+};
 
 #endif

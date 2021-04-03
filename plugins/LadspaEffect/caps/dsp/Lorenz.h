@@ -28,79 +28,80 @@
 #ifndef _DSP_LORENZ_H_
 #define _DSP_LORENZ_H_
 
-namespace DSP {
+namespace DSP
+{
 
 class Lorenz
 {
-	public:
-		double x[2], y[2], z[2];	
-		double h, a, b, c;
-		int I;
+public:
+	double x[2], y[2], z[2];
+	double h, a, b, c;
+	int I;
 
-	public:
-		Lorenz()
-			{
-				h = 0.001;
-				a = 10.0;
-				b = 28.0;
-				c = 8.0 / 3.0;
-			}
+public:
+	Lorenz()
+	{
+		h = 0.001;
+		a = 10.0;
+		b = 28.0;
+		c = 8.0 / 3.0;
+	}
 
-		/* rate is normalized (0 .. 1) */
-		void set_rate (double r)
-			{
-				h = max (.0000001, r * .015);
-			}
+	/* rate is normalized (0 .. 1) */
+	void set_rate(double r)
+	{
+		h = max(.0000001, r * .015);
+	}
 
-		void init (double _h = .001, double seed = .0)
-			{
-				I = 0;
+	void init(double _h = .001, double seed = .0)
+	{
+		I = 0;
 
-				x[0] = .1 + seed - frandom() * .1;
-				y[0] = 0;
-				z[0] = 0;
+		x[0] = .1 + seed - frandom() * .1;
+		y[0] = 0;
+		z[0] = 0;
 
-				/* progress quickly to get a 'stable' system */
-				h = .001; 
-				
-				int n = 10000 + min ((int) (10000 * seed), 10000);
-				for (int i = 0; i < n; ++i)
-					step();
+		/* progress quickly to get a 'stable' system */
+		h = .001;
 
-				h = _h;
-			}
+		int n = 10000 + min((int)(10000 * seed), 10000);
+		for (int i = 0; i < n; ++i)
+			step();
 
-		sample_t get()
-			{
-				step();
-				return .5 * get_y() + get_z();
-			}
+		h = _h;
+	}
 
-		void step()
-			{
-				int J = I ^ 1;
+	sample_t get()
+	{
+		step();
+		return .5 * get_y() + get_z();
+	}
 
-				x[J] = x[I] + h * a * (y[I] - x[I]);
-				y[J] = y[I] + h * (x[I] * (b - z[I]) - y[I]);
-				z[J] = z[I] + h * (x[I] * y[I] - c * z[I]);
+	void step()
+	{
+		int J = I ^ 1;
 
-				I = J;
-			}
+		x[J] = x[I] + h * a * (y[I] - x[I]);
+		y[J] = y[I] + h * (x[I] * (b - z[I]) - y[I]);
+		z[J] = z[I] + h * (x[I] * y[I] - c * z[I]);
 
-		double get_x()
-			{
-				return .024 * (x[I] - .172);
-			}
+		I = J;
+	}
 
-		double get_y()
-			{
-				return .018 * (y[I] - .172);
-			}
+	double get_x()
+	{
+		return .024 * (x[I] - .172);
+	}
 
-		double get_z()
-			{
-				return .019 * (z[I] - 25.43);
-			}
+	double get_y()
+	{
+		return .018 * (y[I] - .172);
+	}
+
+	double get_z()
+	{
+		return .019 * (z[I] - 25.43);
+	}
 };
 
 } /* namespace DSP */

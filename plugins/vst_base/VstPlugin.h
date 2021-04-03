@@ -34,22 +34,20 @@
 
 #include "JournallingObject.h"
 #include "RemotePlugin.h"
-
 #include "vstbase_export.h"
 
 class vstSubWin;
-
 
 class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:
-	VstPlugin( const QString & _plugin );
+	VstPlugin(const QString& _plugin);
 	virtual ~VstPlugin();
 
-	void tryLoad( const QString &remoteVstPluginExecutable );
+	void tryLoad(const QString& remoteVstPluginExecutable);
 
-	bool processMessage( const message & _m ) override;
+	bool processMessage(const message& _m) override;
 
 	inline bool hasEditor() const
 	{
@@ -61,7 +59,7 @@ public:
 	/// in a QMdiSubWindow
 	virtual QWidget* editor();
 
-	inline const QString & name() const
+	inline const QString& name() const
 	{
 		return m_name;
 	}
@@ -70,13 +68,13 @@ public:
 	{
 		return m_version;
 	}
-	
-	inline const QString & vendorString() const
+
+	inline const QString& vendorString() const
 	{
 		return m_vendorString;
 	}
 
-	inline const QString & productString() const
+	inline const QString& productString() const
 	{
 		return m_productString;
 	}
@@ -103,37 +101,35 @@ public:
 
 	int currentProgram();
 
-	const QMap<QString, QString> & parameterDump();
-	void setParameterDump( const QMap<QString, QString> & _pdump );
+	const QMap<QString, QString>& parameterDump();
+	void setParameterDump(const QMap<QString, QString>& _pdump);
 
+	QWidget* pluginWidget();
 
-	QWidget * pluginWidget();
-
-	void loadSettings( const QDomElement & _this ) override;
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings(const QDomElement& _this) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 
 	virtual QString nodeName() const override
 	{
 		return "vstplugin";
 	}
 
-
-	virtual void createUI(QWidget *parent);
-	bool eventFilter(QObject *obj, QEvent *event) override;
+	virtual void createUI(QWidget* parent);
+	bool eventFilter(QObject* obj, QEvent* event) override;
 
 	QString embedMethod() const;
 
 public slots:
-	void setTempo( bpm_t _bpm );
+	void setTempo(bpm_t _bpm);
 	void updateSampleRate();
-	void openPreset( void );
-	void setProgram( int index );
-	void rotateProgram( int offset );
+	void openPreset(void);
+	void setProgram(int index);
+	void rotateProgram(int offset);
 	void loadProgramNames();
 	void loadParameterLabels();
 	void loadParameterDisplays();
-	void savePreset( void );
-	void setParam( int i, float f );
+	void savePreset(void);
+	void setParam(int i, float f);
 	void idleUpdate();
 
 	void showUI() override;
@@ -143,7 +139,7 @@ public slots:
 	void handleClientEmbed();
 
 private:
-	void loadChunk( const QByteArray & _chunk );
+	void loadChunk(const QByteArray& _chunk);
 	QByteArray saveChunk();
 
 	void toggleEditorVisibility(int visible = -1);
@@ -170,8 +166,6 @@ private:
 	int m_currentProgram;
 
 	QTimer m_idleTimer;
-
-} ;
-
+};
 
 #endif

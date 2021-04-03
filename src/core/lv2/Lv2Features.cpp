@@ -31,27 +31,20 @@
 #include "Engine.h"
 #include "Lv2Manager.h"
 
-
 bool Lv2Features::isFeatureSupported(const char* featName)
 {
 	return Engine::getLv2Manager()->isFeatureSupported(featName);
 }
 
-
-
-
 Lv2Features::Lv2Features()
 {
 	const Lv2Manager* man = Engine::getLv2Manager();
 	// create (yet empty) map feature URI -> feature
-	for(const char* uri : man->supportedFeatureURIs())
+	for (const char* uri : man->supportedFeatureURIs())
 	{
 		m_featureByUri.emplace(uri, nullptr);
 	}
 }
-
-
-
 
 void Lv2Features::initCommon()
 {
@@ -61,37 +54,29 @@ void Lv2Features::initCommon()
 	operator[](LV2_URID__unmap) = man->uridMap().unmapFeature();
 }
 
-
-
-
 void Lv2Features::createFeatureVectors()
 {
 	// create vector of features
-	for(std::pair<const char* const, void*>& pr : m_featureByUri)
+	for (std::pair<const char* const, void*>& pr : m_featureByUri)
 	{
 		Q_ASSERT(pr.second != nullptr);
-		m_features.push_back(LV2_Feature { pr.first, pr.second });
+		m_features.push_back(LV2_Feature{pr.first, pr.second});
 	}
 
 	// create pointer vector (for lilv_plugin_instantiate)
 	m_featurePointers.reserve(m_features.size() + 1);
-	for(std::size_t i = 0; i < m_features.size(); ++i)
+	for (std::size_t i = 0; i < m_features.size(); ++i)
 	{
 		m_featurePointers.push_back(&m_features[i]);
 	}
 	m_featurePointers.push_back(nullptr);
 }
 
-
-
-
-void *&Lv2Features::operator[](const char *featName)
+void*& Lv2Features::operator[](const char* featName)
 {
 	auto itr = m_featureByUri.find(featName);
 	Q_ASSERT(itr != m_featureByUri.end());
 	return itr->second;
 }
 
-
 #endif // LMMS_HAVE_LV2
-

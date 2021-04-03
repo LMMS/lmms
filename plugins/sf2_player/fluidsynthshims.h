@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef FLUIDSYNTHSHIMS_H
 #define FLUIDSYNTHSHIMS_H
 

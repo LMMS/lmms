@@ -22,15 +22,14 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #ifndef MULTITAP_ECHO_CONTROLS_H
 #define MULTITAP_ECHO_CONTROLS_H
 
 #include "EffectControls.h"
-#include "MultitapEchoControlDialog.h"
-#include "Knob.h"
 #include "Graph.h"
-
+#include "Knob.h"
+#include "MultitapEchoControlDialog.h"
 
 class MultitapEchoEffect;
 
@@ -38,14 +37,14 @@ class MultitapEchoControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	MultitapEchoControls( MultitapEchoEffect * eff );
+	MultitapEchoControls(MultitapEchoEffect* eff);
 	virtual ~MultitapEchoControls();
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & parent );
-	virtual void loadSettings( const QDomElement & elem );
+	virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
+	virtual void loadSettings(const QDomElement& elem);
 	inline virtual QString nodeName() const
 	{
-		return( "multitapechocontrols" );
+		return ("multitapechocontrols");
 	}
 
 	void setDefaultAmpShape();
@@ -53,39 +52,38 @@ public:
 
 	virtual int controlCount()
 	{
-		return( 5 );
+		return (5);
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog* createView()
 	{
-		return( new MultitapEchoControlDialog( this ) );
+		return (new MultitapEchoControlDialog(this));
 	}
 
 private slots:
-	void ampSamplesChanged( int, int );
+	void ampSamplesChanged(int, int);
 	void ampResetClicked();
-	
-	void lpSamplesChanged( int, int );
+
+	void lpSamplesChanged(int, int);
 	void lpResetClicked();
-	
+
 	void lengthChanged();
 	void sampleRateChanged();
 
 private:
-	MultitapEchoEffect * m_effect;
+	MultitapEchoEffect* m_effect;
 	IntModel m_steps;
 	TempoSyncKnobModel m_stepLength;
-	
+
 	FloatModel m_dryGain;
 	BoolModel m_swapInputs;
 	FloatModel m_stages;
-	
+
 	graphModel m_ampGraph;
 	graphModel m_lpGraph;
 
 	friend class MultitapEchoEffect;
 	friend class MultitapEchoControlDialog;
 };
-
 
 #endif

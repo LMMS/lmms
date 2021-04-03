@@ -25,10 +25,10 @@
 #ifndef AUDIO_PORT_H
 #define AUDIO_PORT_H
 
-#include <memory>
-#include <QtCore/QString>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QString>
+#include <memory>
 
 #include "MemoryManager.h"
 #include "PlayHandle.h"
@@ -41,12 +41,12 @@ class AudioPort : public ThreadableJob
 {
 	MM_OPERATORS
 public:
-	AudioPort( const QString & _name, bool _has_effect_chain = true,
-		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL,
-		BoolModel * mutedModel = NULL );
+	AudioPort(const QString& _name, bool _has_effect_chain = true,
+		FloatModel* volumeModel = NULL, FloatModel* panningModel = NULL,
+		BoolModel* mutedModel = NULL);
 	virtual ~AudioPort();
 
-	inline sampleFrame * buffer()
+	inline sampleFrame* buffer()
 	{
 		return m_portBuffer;
 	}
@@ -61,15 +61,13 @@ public:
 		m_portBufferLock.unlock();
 	}
 
-
 	// indicate whether JACK & Co should provide output-buffer at ext. port
 	inline bool extOutputEnabled() const
 	{
 		return m_extOutputEnabled;
 	}
 
-	void setExtOutputEnabled( bool _enabled );
-
+	void setExtOutputEnabled(bool _enabled);
 
 	// next effect-channel after this audio-port
 	// (-1 = none  0 = master)
@@ -78,24 +76,22 @@ public:
 		return m_nextFxChannel;
 	}
 
-	inline EffectChain * effects()
+	inline EffectChain* effects()
 	{
 		return m_effects.get();
 	}
 
-	void setNextFxChannel( const fx_ch_t _chnl )
+	void setNextFxChannel(const fx_ch_t _chnl)
 	{
 		m_nextFxChannel = _chnl;
 	}
 
-
-	const QString & name() const
+	const QString& name() const
 	{
 		return m_name;
 	}
 
-	void setName( const QString & _new_name );
-
+	void setName(const QString& _new_name);
 
 	bool processEffects();
 
@@ -106,13 +102,13 @@ public:
 		return true;
 	}
 
-	void addPlayHandle( PlayHandle * handle );
-	void removePlayHandle( PlayHandle * handle );
+	void addPlayHandle(PlayHandle* handle);
+	void removePlayHandle(PlayHandle* handle);
 
 private:
 	volatile bool m_bufferUsage;
 
-	sampleFrame * m_portBuffer;
+	sampleFrame* m_portBuffer;
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;
@@ -125,14 +121,12 @@ private:
 	PlayHandleList m_playHandles;
 	QMutex m_playHandleLock;
 
-	FloatModel * m_volumeModel;
-	FloatModel * m_panningModel;
-	BoolModel * m_mutedModel;
+	FloatModel* m_volumeModel;
+	FloatModel* m_panningModel;
+	BoolModel* m_mutedModel;
 
 	friend class Mixer;
 	friend class MixerWorkerThread;
-
-} ;
-
+};
 
 #endif

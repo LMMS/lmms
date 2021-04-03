@@ -29,23 +29,22 @@
 #include "VecControlsDialog.h"
 #include "Vectorscope.h"
 
-
-VecControls::VecControls(Vectorscope *effect) :
-	EffectControls(effect),
-	m_effect(effect),
+VecControls::VecControls(Vectorscope* effect)
+	: EffectControls(effect)
+	, m_effect(effect)
+	,
 
 	// initialize models and set default values
-	m_persistenceModel(0.5f, 0.0f, 1.0f, 0.05f, this, tr("Display persistence amount")),
-	m_logarithmicModel(false, this, tr("Logarithmic scale")),
-	m_highQualityModel(false, this, tr("High quality"))
+	m_persistenceModel(0.5f, 0.0f, 1.0f, 0.05f, this, tr("Display persistence amount"))
+	, m_logarithmicModel(false, this, tr("Logarithmic scale"))
+	, m_highQualityModel(false, this, tr("High quality"))
 {
 	// Colors (percentages include sRGB gamma correction)
-	m_colorFG = QColor(60, 255, 130, 255);		// ~LMMS green
-	m_colorGrid = QColor(76, 80, 84, 128);		// ~60 % gray (slightly cold / blue), 50 % transparent
-	m_colorLabels = QColor(76, 80, 84, 255);	// ~60 % gray (slightly cold / blue)
-	m_colorOutline = QColor(30, 34, 38, 255);	// ~40 % gray (slightly cold / blue)
+	m_colorFG = QColor(60, 255, 130, 255);	  // ~LMMS green
+	m_colorGrid = QColor(76, 80, 84, 128);	  // ~60 % gray (slightly cold / blue), 50 % transparent
+	m_colorLabels = QColor(76, 80, 84, 255);  // ~60 % gray (slightly cold / blue)
+	m_colorOutline = QColor(30, 34, 38, 255); // ~40 % gray (slightly cold / blue)
 }
-
 
 // Create the VecControlDialog widget which handles display of GUI elements.
 EffectControlDialog* VecControls::createView()
@@ -53,16 +52,14 @@ EffectControlDialog* VecControls::createView()
 	return new VecControlsDialog(this);
 }
 
-
-void VecControls::loadSettings(const QDomElement &element)
+void VecControls::loadSettings(const QDomElement& element)
 {
 	m_persistenceModel.loadSettings(element, "Persistence");
 	m_logarithmicModel.loadSettings(element, "Logarithmic");
 	m_highQualityModel.loadSettings(element, "HighQuality");
 }
 
-
-void VecControls::saveSettings(QDomDocument &document, QDomElement &element)
+void VecControls::saveSettings(QDomDocument& document, QDomElement& element)
 {
 	m_persistenceModel.saveSettings(document, element, "Persistence");
 	m_logarithmicModel.saveSettings(document, element, "Logarithmic");

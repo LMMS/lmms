@@ -2,7 +2,8 @@
 
 QList<QTestSuite*> QTestSuite::m_suites;
 
-QTestSuite::QTestSuite(QObject *parent) : QObject(parent)
+QTestSuite::QTestSuite(QObject* parent)
+	: QObject(parent)
 {
 	m_suites << this;
 }
@@ -16,4 +17,3 @@ QList<QTestSuite*> QTestSuite::suites()
 {
 	return m_suites;
 }
-

@@ -28,21 +28,20 @@
 #include "EffectControls.h"
 #include "EqSpectrumView.h"
 
-
 class EqEffect;
 
 class EqControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	explicit EqControls( EqEffect* effect );
+	explicit EqControls(EqEffect* effect);
 	virtual ~EqControls()
 	{
 	}
 
-	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
+	virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
 
-	virtual void loadSettings ( const QDomElement &_this );
+	virtual void loadSettings(const QDomElement& _this);
 
 	inline virtual QString nodeName() const
 	{
@@ -74,7 +73,7 @@ public:
 	bool visable();
 
 private:
-	EqEffect *m_effect;
+	EqEffect* m_effect;
 
 	FloatModel m_inGainModel;
 	FloatModel m_outGainModel;

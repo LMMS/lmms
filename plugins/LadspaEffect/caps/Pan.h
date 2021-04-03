@@ -34,81 +34,80 @@
 
 class PanTap
 {
-	public:
-		int t;
-		DSP::OnePoleLP damper;
+public:
+	int t;
+	DSP::OnePoleLP damper;
 
-		sample_t get (DSP::Delay & delay)
-			{
-				return damper.process (delay[t]);
-			}
+	sample_t get(DSP::Delay& delay)
+	{
+		return damper.process(delay[t]);
+	}
 
-		void reset (double c)
-			{
-				damper.set_f (c);
-				damper.reset();
-			}
+	void reset(double c)
+	{
+		damper.set_f(c);
+		damper.reset();
+	}
 };
 
 class Pan
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t pan;
+public:
+	sample_t pan;
 
-		sample_t gain_l, gain_r;
+	sample_t gain_l, gain_r;
 
-		DSP::Delay delay;
-		PanTap tap;
+	DSP::Delay delay;
+	PanTap tap;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-		inline void set_pan (sample_t);
+	inline void set_pan(sample_t);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init();
-		void activate();
+	void init();
+	void activate();
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* stereo width reduction */
 class Narrower
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t strength;
+public:
+	sample_t strength;
 
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-	public:
-		static PortInfo port_info [];
+public:
+	static PortInfo port_info[];
 
-		void init();
-		void activate();
+	void init();
+	void activate();
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
 
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _PAN_H_ */

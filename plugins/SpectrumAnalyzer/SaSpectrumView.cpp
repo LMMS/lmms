@@ -26,28 +26,27 @@
 
 #include "SaSpectrumView.h"
 
-#include <algorithm>
-#include <cmath>
 #include <QMouseEvent>
 #include <QMutexLocker>
 #include <QPainter>
 #include <QString>
+#include <algorithm>
+#include <cmath>
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "SaProcessor.h"
 
 #ifdef SA_DEBUG
-	#include <chrono>
+#include <chrono>
 #endif
 
-
-SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
-	QWidget(_parent),
-	m_controls(controls),
-	m_processor(processor),
-	m_freezeRequest(false),
-	m_frozen(false)
+SaSpectrumView::SaSpectrumView(SaControls* controls, SaProcessor* processor, QWidget* _parent)
+	: QWidget(_parent)
+	, m_controls(controls)
+	, m_processor(processor)
+	, m_freezeRequest(false)
+	, m_frozen(false)
 {
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -69,20 +68,19 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 
 	m_cursor = QPointF(0, 0);
 
-	#ifdef SA_DEBUG
-		m_execution_avg = m_path_avg = m_draw_avg = 0;
-	#endif
+#ifdef SA_DEBUG
+	m_execution_avg = m_path_avg = m_draw_avg = 0;
+#endif
 }
-
 
 // Compose and draw all the content; periodically called by Qt.
 // NOTE: Performance sensitive! If the drawing takes too long, it will drag
 // the FPS down for the entire program! Use SA_DEBUG to display timings.
-void SaSpectrumView::paintEvent(QPaintEvent *event)
+void SaSpectrumView::paintEvent(QPaintEvent* event)
 {
-	#ifdef SA_DEBUG
-		int total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	#endif
+#ifdef SA_DEBUG
+	int total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+#endif
 
 	// 0) Constants and init
 	QPainter painter(this);
@@ -91,9 +89,9 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	// drawing and path-making are split into multiple methods for clarity;
 	// display boundaries are updated here and shared as member variables
 	m_displayTop = 1;
-	m_displayBottom = height() -20;
+	m_displayBottom = height() - 20;
 	m_displayLeft = 26;
-	m_displayRight = width() -26;
+	m_displayRight = width() - 26;
 	m_displayWidth = m_displayRight - m_displayLeft;
 
 	// recompute range labels if needed
@@ -133,34 +131,33 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 	// always draw the display outline
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawRoundedRect(m_displayLeft, 1,
-							m_displayWidth, m_displayBottom,
-							2.0, 2.0);
+		m_displayWidth, m_displayBottom,
+		2.0, 2.0);
 
-	#ifdef SA_DEBUG
-		// display performance measurements if enabled
-		total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
-		m_execution_avg = 0.95 * m_execution_avg + 0.05 * total_time / 1000000.0;
-		painter.setPen(QPen(m_controls->m_colorLabels, 1,
-							Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -150, 10, 130, 16, Qt::AlignLeft,
-						 QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).c_str()).append(" ms"));
-		painter.drawText(m_displayRight -150, 30, 130, 16, Qt::AlignLeft,
-						 QString("Buff. upd. avg: ").append(std::to_string(m_refresh_avg).substr(0, 5).c_str()).append(" ms"));
-		painter.drawText(m_displayRight -150, 50, 130, 16, Qt::AlignLeft,
-						 QString("Path build avg: ").append(std::to_string(m_path_avg).substr(0, 5).c_str()).append(" ms"));
-		painter.drawText(m_displayRight -150, 70, 130, 16, Qt::AlignLeft,
-						 QString("Path draw avg: ").append(std::to_string(m_draw_avg).substr(0, 5).c_str()).append(" ms"));
+#ifdef SA_DEBUG
+	// display performance measurements if enabled
+	total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
+	m_execution_avg = 0.95 * m_execution_avg + 0.05 * total_time / 1000000.0;
+	painter.setPen(QPen(m_controls->m_colorLabels, 1,
+		Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.drawText(m_displayRight - 150, 10, 130, 16, Qt::AlignLeft,
+		QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).c_str()).append(" ms"));
+	painter.drawText(m_displayRight - 150, 30, 130, 16, Qt::AlignLeft,
+		QString("Buff. upd. avg: ").append(std::to_string(m_refresh_avg).substr(0, 5).c_str()).append(" ms"));
+	painter.drawText(m_displayRight - 150, 50, 130, 16, Qt::AlignLeft,
+		QString("Path build avg: ").append(std::to_string(m_path_avg).substr(0, 5).c_str()).append(" ms"));
+	painter.drawText(m_displayRight - 150, 70, 130, 16, Qt::AlignLeft,
+		QString("Path draw avg: ").append(std::to_string(m_draw_avg).substr(0, 5).c_str()).append(" ms"));
 
-	#endif
+#endif
 }
 
-
 // Refresh data and draw the spectrum.
-void SaSpectrumView::drawSpectrum(QPainter &painter)
+void SaSpectrumView::drawSpectrum(QPainter& painter)
 {
-	#ifdef SA_DEBUG
-		int draw_time = 0;
-	#endif
+#ifdef SA_DEBUG
+	int draw_time = 0;
+#endif
 
 	// draw the graph only if there is any input, averaging residue or peaks
 	if (m_decaySum > 0 || m_processor->spectrumNotEmpty())
@@ -168,10 +165,10 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 		// update data buffers and reconstruct paths
 		refreshPaths();
 
-		// draw stored paths
-		#ifdef SA_DEBUG
-			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-		#endif
+// draw stored paths
+#ifdef SA_DEBUG
+		draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+#endif
 		// in case stereo is disabled, mono data are stored in left channel structures
 		if (m_controls->m_stereoModel.value())
 		{
@@ -198,17 +195,16 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 				painter.drawPath(m_pathPeakL);
 			}
 		}
-		#ifdef SA_DEBUG
-			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
-		#endif
+#ifdef SA_DEBUG
+		draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
+#endif
 	}
 
-	#ifdef SA_DEBUG
-		// save performance measurement result
-		m_draw_avg = 0.95 * m_draw_avg + 0.05 * draw_time / 1000000.0;
-	#endif
+#ifdef SA_DEBUG
+	// save performance measurement result
+	m_draw_avg = 0.95 * m_draw_avg + 0.05 * draw_time / 1000000.0;
+#endif
 }
-
 
 // Read newest FFT results from SaProcessor, update local display buffers
 // and build QPainter paths.
@@ -231,16 +227,16 @@ void SaSpectrumView::refreshPaths()
 		m_peakBufferR.resize(m_processor->binCount(), 0);
 	}
 
-	// update display buffers for left and right channel
-	#ifdef SA_DEBUG
-		int refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	#endif
+// update display buffers for left and right channel
+#ifdef SA_DEBUG
+	int refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+#endif
 	m_decaySum = 0;
 	updateBuffers(m_processor->getSpectrumL(), m_displayBufferL.data(), m_peakBufferL.data());
 	updateBuffers(m_processor->getSpectrumR(), m_displayBufferR.data(), m_peakBufferR.data());
-	#ifdef SA_DEBUG
-		refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - refresh_time;
-	#endif
+#ifdef SA_DEBUG
+	refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - refresh_time;
+#endif
 
 	// if there was a freeze request, it was taken care of during the update
 	if (m_controls->m_refFreezeModel.value() && m_freezeRequest)
@@ -249,9 +245,9 @@ void SaSpectrumView::refreshPaths()
 		m_frozen = true;
 	}
 
-	#ifdef SA_DEBUG
-		int path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	#endif
+#ifdef SA_DEBUG
+	int path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+#endif
 	// Use updated display buffers to prepare new paths for QPainter.
 	// This is the second slowest action (first is the subsequent drawing); use
 	// the resolution parameter to balance display quality and performance.
@@ -268,17 +264,16 @@ void SaSpectrumView::refreshPaths()
 			m_pathPeakR = makePath(m_peakBufferR, m_controls->m_envelopeResolutionModel.value());
 		}
 	}
-	#ifdef SA_DEBUG
-		path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - path_time;
-	#endif
+#ifdef SA_DEBUG
+	path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - path_time;
+#endif
 
-	#ifdef SA_DEBUG
-		// save performance measurement results
-		m_refresh_avg = 0.95 * m_refresh_avg + 0.05 * refresh_time / 1000000.0;
-		m_path_avg = .95f * m_path_avg + .05f * path_time / 1000000.f;
-	#endif
+#ifdef SA_DEBUG
+	// save performance measurement results
+	m_refresh_avg = 0.95 * m_refresh_avg + 0.05 * refresh_time / 1000000.0;
+	m_path_avg = .95f * m_path_avg + .05f * path_time / 1000000.f;
+#endif
 }
-
 
 // Update display buffers: add new data, update average and peaks / reference.
 // Output the sum of all displayed values -- draw only if it is non-zero.
@@ -286,7 +281,7 @@ void SaSpectrumView::refreshPaths()
 // reallocation access lock! Data access lock is not needed: the final result
 // buffer is updated very quickly and the worst case is that one frame will be
 // part new, part old. At reasonable frame rate, such difference is invisible..
-void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer)
+void SaSpectrumView::updateBuffers(const float* spectrum, float* displayBuffer, float* peakBuffer)
 {
 	for (int n = 0; n < m_processor->binCount(); n++)
 	{
@@ -330,12 +325,11 @@ void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, 
 	}
 }
 
-
 // Use display buffer to build a path that can be drawn or filled by QPainter.
 // Resolution controls the performance / quality tradeoff; the value specifies
 // number of points in x axis per device pixel. Values over 1.0 still
 // contribute to quality and accuracy thanks to anti-aliasing.
-QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float resolution = 1.0)
+QPainterPath SaSpectrumView::makePath(std::vector<float>& displayBuffer, float resolution = 1.0)
 {
 	// convert resolution to number of path points per logical pixel
 	float pixel_limit = resolution * window()->devicePixelRatio();
@@ -347,7 +341,7 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// Display is flipped: y values grow towards zero, initial max is bottom.
 	// Bins falling to interval [x_start, x_next) contribute to a single point.
 	float max = m_displayBottom;
-	float x_start = -1;		// lower bound of currently constructed point
+	float x_start = -1; // lower bound of currently constructed point
 	for (unsigned int n = 0; n < m_processor->binCount(); n++)
 	{
 		float x = freqToXPixel(binToFreq(n), m_displayWidth);
@@ -384,7 +378,7 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 			// and align it to the edge to prevent a gap
 			if (n > 0 && x > 0)
 			{
-				path.lineTo(m_displayRight,	y + m_displayTop);
+				path.lineTo(m_displayRight, y + m_displayTop);
 				break;
 			}
 		}
@@ -394,12 +388,11 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	return path;
 }
 
-
 // Draw background, grid and associated frequency and amplitude labels.
-void SaSpectrumView::drawGrid(QPainter &painter)
+void SaSpectrumView::drawGrid(QPainter& painter)
 {
-	std::vector<std::pair<int, std::string>> *freqTics = NULL;
-	std::vector<std::pair<float, std::string>> *ampTics = NULL;
+	std::vector<std::pair<int, std::string>>* freqTics = NULL;
+	std::vector<std::pair<float, std::string>>* ampTics = NULL;
 	float pos = 0;
 	float label_width = 24;
 	float label_height = 15;
@@ -407,8 +400,8 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 
 	// always draw the background
 	painter.fillRect(m_displayLeft, m_displayTop,
-					 m_displayWidth, m_displayBottom,
-					 m_controls->m_colorBG);
+		m_displayWidth, m_displayBottom,
+		m_controls->m_colorBG);
 
 	// select logarithmic or linear frequency grid and draw it
 	if (m_controls->m_logXModel.value())
@@ -420,37 +413,37 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 		freqTics = &m_linearFreqTics;
 	}
 	// draw frequency grid (line.first is display position)
-	painter.setPen(QPen(m_controls->m_colorGrid, 1,	Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto &line: *freqTics)
+	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	for (auto& line : *freqTics)
 	{
 		painter.drawLine(m_displayLeft + freqToXPixel(line.first, m_displayWidth),
-						 2,
-						 m_displayLeft + freqToXPixel(line.first, m_displayWidth),
-						 m_displayBottom);
+			2,
+			m_displayLeft + freqToXPixel(line.first, m_displayWidth),
+			m_displayBottom);
 	}
 	// print frequency labels (line.second is label)
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto & line: *freqTics)
+	for (auto& line : *freqTics)
 	{
 		pos = m_displayLeft + freqToXPixel(line.first, m_displayWidth);
 		// align first and last label to the edge if needed, otherwise center them
 		if (line == freqTics->front() && pos - label_width / 2 < m_displayLeft)
 		{
 			painter.drawText(m_displayLeft, m_displayBottom + margin,
-							 label_width, label_height, Qt::AlignLeft | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignLeft | Qt::TextDontClip,
+				QString(line.second.c_str()));
 		}
 		else if (line == freqTics->back() && pos + label_width / 2 > m_displayRight)
 		{
 			painter.drawText(m_displayRight - label_width, m_displayBottom + margin,
-							 label_width, label_height, Qt::AlignRight | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignRight | Qt::TextDontClip,
+				QString(line.second.c_str()));
 		}
 		else
 		{
 			painter.drawText(pos - label_width / 2, m_displayBottom + margin,
-							 label_width, label_height, Qt::AlignHCenter | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignHCenter | Qt::TextDontClip,
+				QString(line.second.c_str()));
 		}
 	}
 
@@ -466,17 +459,17 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 	}
 	// draw amplitude grid
 	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	for (auto & line: *ampTics)
+	for (auto& line : *ampTics)
 	{
 		painter.drawLine(m_displayLeft + 1,
-						 ampToYPixel(line.first, m_displayBottom),
-						 m_displayRight - 1,
-						 ampToYPixel(line.first, m_displayBottom));
+			ampToYPixel(line.first, m_displayBottom),
+			m_displayRight - 1,
+			ampToYPixel(line.first, m_displayBottom));
 	}
 	// print amplitude labels
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	bool stereo = m_controls->m_stereoModel.value();
-	for (auto & line: *ampTics)
+	for (auto& line : *ampTics)
 	{
 		pos = ampToYPixel(line.first, m_displayBottom);
 		// align first and last labels to edge if needed, otherwise center them
@@ -487,15 +480,15 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 				painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
 			painter.drawText(m_displayLeft - label_width - margin, m_displayTop - 2,
-							 label_width, label_height, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
+				QString(line.second.c_str()));
 			if (stereo)
 			{
 				painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
 			painter.drawText(m_displayRight + margin, m_displayTop - 2,
-							 label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
+				QString(line.second.c_str()));
 		}
 		else if (line == ampTics->front() && pos > m_displayBottom - label_height)
 		{
@@ -504,15 +497,15 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 				painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
 			painter.drawText(m_displayLeft - label_width - margin, m_displayBottom - label_height + 2,
-							 label_width, label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
+				QString(line.second.c_str()));
 			if (stereo)
 			{
 				painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
 			painter.drawText(m_displayRight + margin, m_displayBottom - label_height + 2,
-							 label_width, label_height, Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip,
+				QString(line.second.c_str()));
 		}
 		else
 		{
@@ -521,27 +514,23 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 				painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
 			painter.drawText(m_displayLeft - label_width - margin, pos - label_height / 2,
-							 label_width, label_height, Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip,
+				QString(line.second.c_str()));
 			if (stereo)
 			{
 				painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
 			painter.drawText(m_displayRight + margin, pos - label_height / 2,
-							 label_width, label_height, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip,
-							 QString(line.second.c_str()));
+				label_width, label_height, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip,
+				QString(line.second.c_str()));
 		}
 	}
 }
 
-
 // Draw cursor and its coordinates if it is within display bounds.
-void SaSpectrumView::drawCursor(QPainter &painter)
+void SaSpectrumView::drawCursor(QPainter& painter)
 {
-	if (	m_cursor.x() >= m_displayLeft
-		&&	m_cursor.x() <= m_displayRight
-		&&	m_cursor.y() >= m_displayTop
-		&&	m_cursor.y() <= m_displayBottom)
+	if (m_cursor.x() >= m_displayLeft && m_cursor.x() <= m_displayRight && m_cursor.y() >= m_displayTop && m_cursor.y() <= m_displayBottom)
 	{
 		// cursor lines
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -553,11 +542,11 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		unsigned int const box_left = 5;
 		unsigned int const box_top = 5;
 		unsigned int const box_margin = 3;
-		unsigned int const box_height = 2*(fontMetrics.size(Qt::TextSingleLine, "0 HzdBFS").height() + box_margin);
-		unsigned int const box_width = fontMetrics.size(Qt::TextSingleLine, "-99.9 dBFS").width() + 2*box_margin;
+		unsigned int const box_height = 2 * (fontMetrics.size(Qt::TextSingleLine, "0 HzdBFS").height() + box_margin);
+		unsigned int const box_width = fontMetrics.size(Qt::TextSingleLine, "-99.9 dBFS").width() + 2 * box_margin;
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.fillRect(m_displayLeft + box_left, m_displayTop + box_top,
-						 box_width, box_height, QColor(0, 0, 0, 64));
+			box_width, box_height, QColor(0, 0, 0, 64));
 
 		// coordinates: text
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -567,8 +556,8 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString("%1 Hz").arg(xFreq);
 		painter.drawText(m_displayLeft + box_left + box_margin,
-						 m_displayTop + box_top + box_margin,
-						 box_width, box_height / 2, Qt::AlignLeft, tmps);
+			m_displayTop + box_top + box_margin,
+			box_width, box_height / 2, Qt::AlignLeft, tmps);
 
 		// amplitude
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
@@ -582,11 +571,10 @@ void SaSpectrumView::drawCursor(QPainter &painter)
 			tmps = QString(std::to_string(0.0005f + yAmp).substr(0, 5).c_str());
 		}
 		painter.drawText(m_displayLeft + box_left + box_margin,
-						 m_displayTop + box_top + box_height / 2,
-						 box_width, box_height / 2, Qt::AlignLeft, tmps);
+			m_displayTop + box_top + box_height / 2,
+			box_width, box_height / 2, Qt::AlignLeft, tmps);
 	}
 }
-
 
 // Wrappers for most used SaProcessor helpers (to make local code more compact).
 float SaSpectrumView::binToFreq(unsigned int bin_index)
@@ -594,18 +582,15 @@ float SaSpectrumView::binToFreq(unsigned int bin_index)
 	return m_processor->binToFreq(bin_index);
 }
 
-
 float SaSpectrumView::freqToXPixel(float frequency, unsigned int width)
 {
 	return m_processor->freqToXPixel(frequency, width);
 }
 
-
 float SaSpectrumView::ampToYPixel(float amplitude, unsigned int height)
 {
 	return m_processor->ampToYPixel(amplitude, height);
 }
-
 
 // Generate labels suitable for logarithmic frequency scale.
 // Low / high limits are in Hz. Lowest possible label is 10 Hz.
@@ -613,8 +598,8 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 {
 	std::vector<std::pair<int, std::string>> result;
 	int i, j;
-	int a[] = {10, 20, 50};		// sparse series multipliers
-	int b[] = {14, 30, 70};		// additional (denser) series
+	int a[] = {10, 20, 50}; // sparse series multipliers
+	int b[] = {14, 30, 70}; // additional (denser) series
 
 	// generate main steps (powers of 10); use the series to specify smaller steps
 	for (i = 1; i <= high; i *= 10)
@@ -650,7 +635,6 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 	return result;
 }
 
-
 // Generate labels suitable for linear frequency scale.
 // Low / high limits are in Hz.
 std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int low, int high)
@@ -659,10 +643,22 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 	int i, increment;
 
 	// select a suitable increment based on zoom level
-	if (high - low < 500) {increment = 50;}
-	else if (high - low < 1000) {increment = 100;}
-	else if (high - low < 5000) {increment = 1000;}
-	else {increment = 2000;}
+	if (high - low < 500)
+	{
+		increment = 50;
+	}
+	else if (high - low < 1000)
+	{
+		increment = 100;
+	}
+	else if (high - low < 5000)
+	{
+		increment = 1000;
+	}
+	else
+	{
+		increment = 2000;
+	}
 
 	// generate steps based on increment, starting at 0
 	for (i = 0; i <= high; i += increment)
@@ -675,13 +671,12 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 			}
 			else
 			{
-				result.emplace_back(i, std::to_string(i/1000) + "k");
+				result.emplace_back(i, std::to_string(i / 1000) + "k");
 			}
 		}
 	}
 	return result;
 }
-
 
 // Generate labels suitable for logarithmic (dB) amplitude scale.
 // Low / high limits are in dB; 0 dB amplitude = 1.0 linear.
@@ -696,15 +691,15 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 	// to the sizeHint() (denser scale for bigger window).
 	if ((high - low) < 20 * ((float)height() / sizeHint().height()))
 	{
-		increment = pow(10, 0.3);	// 3 dB steps when really zoomed in
+		increment = pow(10, 0.3); // 3 dB steps when really zoomed in
 	}
 	else if (high - low < 45 * ((float)height() / sizeHint().height()))
 	{
-		increment = pow(10, 0.6);	// 6 dB steps when sufficiently zoomed in
+		increment = pow(10, 0.6); // 6 dB steps when sufficiently zoomed in
 	}
 	else
 	{
-		increment = 10;				// 10 dB steps otherwise
+		increment = 10; // 10 dB steps otherwise
 	}
 
 	// Generate n dB increments, start checking at -90 dB. Limits are tweaked
@@ -718,7 +713,6 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 	}
 	return result;
 }
-
 
 // Generate labels suitable for linear amplitude scale.
 // Low / high limits are in dB; 0 dB amplitude = 1.0 linear.
@@ -752,7 +746,7 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLinearAmpTics(int
 				result.emplace_back(nearest, std::to_string(nearest).substr(0, 2));
 			}
 			else if (i >= 0.099)
-			{	// also covers numbers above 100
+			{ // also covers numbers above 100
 				nearest = std::round(i * 10) / 10;
 				result.emplace_back(nearest, std::to_string(nearest).substr(0, 3));
 			}
@@ -761,20 +755,19 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLinearAmpTics(int
 				nearest = std::round(i * 1000) / 1000;
 				result.emplace_back(nearest, std::to_string(nearest).substr(0, 4));
 			}
-			else if	(i >= 0.00099)
+			else if (i >= 0.00099)
 			{
 				nearest = std::round(i * 10000) / 10000;
 				result.emplace_back(nearest, std::to_string(nearest).substr(1, 4));
 			}
 			else if (i > -0.01 && i < 0.01)
 			{
-				result.emplace_back(i, "0");	// an exception, zero is short..
+				result.emplace_back(i, "0"); // an exception, zero is short..
 			}
 		}
 	}
 	return result;
 }
-
 
 // Periodic update is called by LMMS.
 void SaSpectrumView::periodicUpdate()
@@ -785,29 +778,26 @@ void SaSpectrumView::periodicUpdate()
 	update();
 }
 
-
 // Handle mouse input: set new cursor position.
 // For some reason (a bug?), localPos() only returns integers. As a workaround
 // the fractional part is taken from windowPos() (which works correctly).
-void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
+void SaSpectrumView::mouseMoveEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = QPointF(event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
+		event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
 }
 
-void SaSpectrumView::mousePressEvent(QMouseEvent *event)
+void SaSpectrumView::mousePressEvent(QMouseEvent* event)
 {
-	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
-						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
+	m_cursor = QPointF(event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
+		event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
 }
-
 
 // Handle resize event: rebuild grid and labels
-void SaSpectrumView::resizeEvent(QResizeEvent *event)
+void SaSpectrumView::resizeEvent(QResizeEvent* event)
 {
 	// frequency does not change density with size
 	// amplitude does: rebuild labels
 	m_logAmpTics = makeLogAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 }
-

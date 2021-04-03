@@ -22,48 +22,35 @@
  *
  */
 
+#include "stereoenhancer_controls.h"
 
 #include <QDomElement>
 
-#include "stereoenhancer_controls.h"
 #include "stereo_enhancer.h"
 
-
-stereoEnhancerControls::stereoEnhancerControls( stereoEnhancerEffect * _eff ) :
-		EffectControls( _eff ),
-		m_effect( _eff ),
-		m_widthModel(0.0f, 0.0f, 180.0f, 1.0f, this, tr( "Width" ) )
+stereoEnhancerControls::stereoEnhancerControls(stereoEnhancerEffect* _eff)
+	: EffectControls(_eff)
+	, m_effect(_eff)
+	, m_widthModel(0.0f, 0.0f, 180.0f, 1.0f, this, tr("Width"))
 {
-	connect( &m_widthModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeWideCoeff() ) );
+	connect(&m_widthModel, SIGNAL(dataChanged()),
+		this, SLOT(changeWideCoeff()));
 
 	changeWideCoeff();
 }
 
-
-
 void stereoEnhancerControls::changeWideCoeff()
 {
-	m_effect->m_seFX.setWideCoeff( m_widthModel.value() );
+	m_effect->m_seFX.setWideCoeff(m_widthModel.value());
 }
 
-
-
-void stereoEnhancerControls::loadSettings( const QDomElement & _this )
+void stereoEnhancerControls::loadSettings(const QDomElement& _this)
 {
-	m_widthModel.loadSettings( _this, "width" );
+	m_widthModel.loadSettings(_this, "width");
 }
 
-
-
-
-void stereoEnhancerControls::saveSettings( QDomDocument & _doc, 
-							QDomElement & _this )
+void stereoEnhancerControls::saveSettings(QDomDocument& _doc,
+	QDomElement& _this)
 {
-	m_widthModel.saveSettings( _doc, _this, "width" );
+	m_widthModel.saveSettings(_doc, _this, "width");
 }
-
-
-
-
-

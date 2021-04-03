@@ -25,17 +25,16 @@
 #ifndef PLUGINFACTORY_H
 #define PLUGINFACTORY_H
 
-#include <memory>
-#include <string>
-
 #include <QtCore/QFileInfo>
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QVector>
+#include <memory>
+#include <string>
 
-#include "lmms_export.h"
 #include "Plugin.h"
+#include "lmms_export.h"
 
 class QLibrary;
 
@@ -49,7 +48,7 @@ public:
 		std::shared_ptr<QLibrary> library = nullptr;
 		Plugin::Descriptor* descriptor = nullptr;
 
-		bool isNull() const {return ! library;}
+		bool isNull() const { return !library; }
 	};
 	typedef QList<PluginInfo> PluginInfoList;
 	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;

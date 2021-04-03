@@ -28,66 +28,67 @@
 #ifndef _DSP_SINE_H_
 #define _DSP_SINE_H_
 
-namespace DSP {
-	
+namespace DSP
+{
+
 class Sine
 {
-	protected:
-		int z;
-		double y[2];
-		double b;
+protected:
+	int z;
+	double y[2];
+	double b;
 
-	public:
-		Sine()
-			{ 
-				b = 0;
-				y[0] = y[1] = 0;
-				z = 0;
-			}
+public:
+	Sine()
+	{
+		b = 0;
+		y[0] = y[1] = 0;
+		z = 0;
+	}
 
-		Sine (double f, double fs, double phase)
-			{
-				set_f (f, fs, phase);
-			}
+	Sine(double f, double fs, double phase)
+	{
+		set_f(f, fs, phase);
+	}
 
-		Sine (double omega, double phase = 0.)
-			{
-				set_f (omega, phase);
-			}
+	Sine(double omega, double phase = 0.)
+	{
+		set_f(omega, phase);
+	}
 
-		inline void set_f (double f, double fs, double phase)
-			{
-				set_f (f * M_PI / fs, phase);
-			}
+	inline void set_f(double f, double fs, double phase)
+	{
+		set_f(f * M_PI / fs, phase);
+	}
 
-		inline void set_f (double w, double phase)
-			{
-				b = 2 * cos (w);
-				y[0] = sin (phase - w);
-				y[1] = sin (phase - w * 2);
-				z = 0;
-			}
+	inline void set_f(double w, double phase)
+	{
+		b = 2 * cos(w);
+		y[0] = sin(phase - w);
+		y[1] = sin(phase - w * 2);
+		z = 0;
+	}
 
-		/* advance and return 1 sample */
-		inline double get()
-			{
-				register double s = b * y[z]; 
-				z ^= 1;
-				s -= y[z];
-				return y[z] = s;
-			}
+	/* advance and return 1 sample */
+	inline double get()
+	{
+		register double s = b * y[z];
+		z ^= 1;
+		s -= y[z];
+		return y[z] = s;
+	}
 
-		double get_phase()
-			{
-				double x0 = y[z], x1 = b * y[z] - y[z^1];
-				double phi = asin (x0);
-				
-				/* slope is falling, we're into the 2nd half. */
-				if (x1 < x0)
-					return M_PI - phi;
+	double get_phase()
+	{
+		double x0 = y[z], x1 = b * y[z] - y[z ^ 1];
+		double phi = asin(x0);
 
-				return phi;
-			}
+		/* slope is falling, we're into the 2nd half. */
+		if (x1 < x0)
+			return M_PI - phi;
+
+		return phi;
+	}
 };
 
 } /* namespace DSP */

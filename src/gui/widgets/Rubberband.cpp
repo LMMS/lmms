@@ -23,75 +23,54 @@
  *
  */
 
-
 #include "Rubberband.h"
 
-
-RubberBand::RubberBand( QWidget * _parent ) :
-	QRubberBand( Rectangle, _parent )
+RubberBand::RubberBand(QWidget* _parent)
+	: QRubberBand(Rectangle, _parent)
 {
 }
-
-
-
 
 RubberBand::~RubberBand()
 {
 }
 
-
-
-
-QVector<selectableObject *> RubberBand::selectedObjects() const
+QVector<selectableObject*> RubberBand::selectedObjects() const
 {
-	QVector<selectableObject *> so = selectableObjects();
-	for( QVector<selectableObject *>::iterator it = so.begin();
-							it != so.end(); )
+	QVector<selectableObject*> so = selectableObjects();
+	for (QVector<selectableObject*>::iterator it = so.begin();
+		 it != so.end();)
 	{
-		if( ( *it )->isSelected() == false )
+		if ((*it)->isSelected() == false)
 		{
-			it = so.erase( it );
+			it = so.erase(it);
 		}
 		else
 		{
 			++it;
 		}
 	}
-	return( so );
+	return (so);
 }
 
-
-
-
-void RubberBand::resizeEvent( QResizeEvent * _re )
+void RubberBand::resizeEvent(QResizeEvent* _re)
 {
-	QRubberBand::resizeEvent( _re );
+	QRubberBand::resizeEvent(_re);
 }
 
-
-
-
-QVector<selectableObject *> RubberBand::selectableObjects() const
+QVector<selectableObject*> RubberBand::selectableObjects() const
 {
-	QVector<selectableObject *> so;
-	if( parentWidget() == NULL )
+	QVector<selectableObject*> so;
+	if (parentWidget() == NULL)
 	{
-		return( so );
+		return (so);
 	}
 
-	QList<selectableObject *> l =
-			parentWidget()->findChildren<selectableObject *>();
-	for( QList<selectableObject *>::iterator it = l.begin(); it != l.end();
-									++it )
+	QList<selectableObject*> l =
+		parentWidget()->findChildren<selectableObject*>();
+	for (QList<selectableObject*>::iterator it = l.begin(); it != l.end();
+		 ++it)
 	{
-		so.push_back( *it );
+		so.push_back(*it);
 	}
-	return( so );
+	return (so);
 }
-
-
-
-
-
-
-

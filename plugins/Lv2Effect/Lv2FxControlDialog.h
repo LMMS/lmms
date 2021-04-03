@@ -30,18 +30,16 @@
 
 class Lv2FxControls;
 
-
 class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
 {
 	Q_OBJECT
 
 public:
-	Lv2FxControlDialog(Lv2FxControls *controls);
+	Lv2FxControlDialog(Lv2FxControls* controls);
 
 private:
-	Lv2FxControls *lv2Controls();
+	Lv2FxControls* lv2Controls();
 	void modelChanged() override;
 };
-
 
 #endif

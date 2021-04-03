@@ -27,12 +27,11 @@
 #define DYNPROC_CONTROLS_H
 
 #include "EffectControls.h"
-#include "dynamics_processor_control_dialog.h"
-#include "Knob.h"
 #include "Graph.h"
+#include "Knob.h"
+#include "dynamics_processor_control_dialog.h"
 
 class dynProcEffect;
-
 
 class dynProcControls : public EffectControls
 {
@@ -45,33 +44,32 @@ public:
 		SM_Unlinked,
 		NumStereoModes
 	};
-	dynProcControls( dynProcEffect * _eff );
+	dynProcControls(dynProcEffect* _eff);
 	virtual ~dynProcControls()
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 	inline virtual QString nodeName() const
 	{
-		return( "dynamicsprocessor_controls" );
+		return ("dynamicsprocessor_controls");
 	}
 
 	virtual void setDefaultShape();
 
 	virtual int controlCount()
 	{
-		return( 6 );
+		return (6);
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog* createView()
 	{
-		return( new dynProcControlDialog( this ) );
+		return (new dynProcControlDialog(this));
 	}
-
 
 private slots:
-	void samplesChanged( int, int );
+	void samplesChanged(int, int);
 	void sampleRateChanged();
 
 	void resetClicked();
@@ -81,8 +79,8 @@ private slots:
 	void subOneClicked();
 
 private:
-	dynProcEffect * m_effect;
-	
+	dynProcEffect* m_effect;
+
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
 	FloatModel m_attackModel;
@@ -92,7 +90,6 @@ private:
 
 	friend class dynProcControlDialog;
 	friend class dynProcEffect;
-
-} ;
+};
 
 #endif

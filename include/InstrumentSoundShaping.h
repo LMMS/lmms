@@ -27,21 +27,19 @@
 
 #include "ComboBoxModel.h"
 
-
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
-
 
 class InstrumentSoundShaping : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
+	InstrumentSoundShaping(InstrumentTrack* _instrument_track);
 	virtual ~InstrumentSoundShaping();
 
-	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
-							NotePlayHandle * _n );
+	void processAudioBuffer(sampleFrame* _ab, const fpp_t _frames,
+		NotePlayHandle* _n);
 
 	enum Targets
 	{
@@ -49,37 +47,32 @@ public:
 		Cut,
 		Resonance,
 		NumTargets
-	} ;
+	};
 
-	f_cnt_t envFrames( const bool _only_vol = false ) const;
+	f_cnt_t envFrames(const bool _only_vol = false) const;
 	f_cnt_t releaseFrames() const;
 
-	float volumeLevel( NotePlayHandle * _n, const f_cnt_t _frame );
+	float volumeLevel(NotePlayHandle* _n, const f_cnt_t _frame);
 
-
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 	inline QString nodeName() const override
 	{
 		return "eldata";
 	}
 
-
 private:
-	EnvelopeAndLfoParameters * m_envLfoParameters[NumTargets];
-	InstrumentTrack * m_instrumentTrack;
+	EnvelopeAndLfoParameters* m_envLfoParameters[NumTargets];
+	InstrumentTrack* m_instrumentTrack;
 
 	BoolModel m_filterEnabledModel;
 	ComboBoxModel m_filterModel;
 	FloatModel m_filterCutModel;
 	FloatModel m_filterResModel;
 
-	static const char *const targetNames[InstrumentSoundShaping::NumTargets][3];
-
+	static const char* const targetNames[InstrumentSoundShaping::NumTargets][3];
 
 	friend class InstrumentSoundShapingView;
-
-} ;
-
+};
 
 #endif

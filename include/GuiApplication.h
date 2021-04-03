@@ -44,6 +44,7 @@ class SongEditorWindow;
 class LMMS_EXPORT GuiApplication : public QObject
 {
 	Q_OBJECT;
+
 public:
 	explicit GuiApplication();
 	~GuiApplication();
@@ -53,7 +54,10 @@ public:
 	static QFont getWin32SystemFont();
 #endif
 
-	MainWindow* mainWindow() { return m_mainWindow; }
+	MainWindow* mainWindow()
+	{
+		return m_mainWindow;
+	}
 	FxMixerView* fxMixerView() { return m_fxMixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
 	BBEditor* getBBEditor() { return m_bbEditor; }
@@ -63,10 +67,10 @@ public:
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
 public slots:
-	void displayInitProgress(const QString &msg);
+	void displayInitProgress(const QString& msg);
 
 private slots:
-	void childDestroyed(QObject *obj);
+	void childDestroyed(QObject* obj);
 
 private:
 	static GuiApplication* s_instance;

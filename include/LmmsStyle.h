@@ -23,13 +23,10 @@
  *
  */
 
-
 #ifndef LMMS_STYLE_H
 #define LMMS_STYLE_H
 
 #include <QProxyStyle>
-
-
 
 class LmmsStyle : public QProxyStyle
 {
@@ -67,29 +64,28 @@ public:
 	{
 	}
 
-	QPalette standardPalette( void ) const override;
+	QPalette standardPalette(void) const override;
 
 	virtual void drawComplexControl(
-				ComplexControl control,
-				const QStyleOptionComplex * option,
-					QPainter *painter,
-						const QWidget *widget ) const override;
-	virtual void drawPrimitive( PrimitiveElement element,
-					const QStyleOption *option,
-					QPainter *painter,
-					const QWidget *widget = 0 ) const override;
+		ComplexControl control,
+		const QStyleOptionComplex* option,
+		QPainter* painter,
+		const QWidget* widget) const override;
+	virtual void drawPrimitive(PrimitiveElement element,
+		const QStyleOption* option,
+		QPainter* painter,
+		const QWidget* widget = 0) const override;
 
-	virtual int pixelMetric( PixelMetric metric,
-					const QStyleOption * option = 0,
-					const QWidget * widget = 0 ) const override;
+	virtual int pixelMetric(PixelMetric metric,
+		const QStyleOption* option = 0,
+		const QWidget* widget = 0) const override;
 
-	static QPalette * s_palette;
+	static QPalette* s_palette;
 
 private:
-	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
-	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
-	QColor m_colors[ LmmsStyle::NumColorRoles ];
-
+	QImage colorizeXpm(const char* const* xpm, const QBrush& fill) const;
+	void hoverColors(bool sunken, bool hover, bool active, QColor& color, QColor& blend) const;
+	QColor m_colors[LmmsStyle::NumColorRoles];
 };
 
 #endif

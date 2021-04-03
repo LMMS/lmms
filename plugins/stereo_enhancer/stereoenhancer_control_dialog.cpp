@@ -22,28 +22,24 @@
  *
  */
 
-
+#include "stereoenhancer_control_dialog.h"
 
 #include <QLayout>
 
-#include "stereoenhancer_control_dialog.h"
 #include "stereoenhancer_controls.h"
 
-
-
 stereoEnhancerControlDialog::stereoEnhancerControlDialog(
-	stereoEnhancerControls * _controls ) :
-	EffectControlDialog( _controls )
+	stereoEnhancerControls* _controls)
+	: EffectControlDialog(_controls)
 {
-	QHBoxLayout * l = new QHBoxLayout( this );
+	QHBoxLayout* l = new QHBoxLayout(this);
 
-	Knob * widthKnob = new Knob( knobBright_26, this );
-	widthKnob->setModel( &_controls->m_widthModel );
-	widthKnob->setLabel( tr( "WIDTH" ) );
-	widthKnob->setHintText( tr( "Width:" ) , " samples" );
+	Knob* widthKnob = new Knob(knobBright_26, this);
+	widthKnob->setModel(&_controls->m_widthModel);
+	widthKnob->setLabel(tr("WIDTH"));
+	widthKnob->setHintText(tr("Width:"), " samples");
 
-	l->addWidget( widthKnob );
+	l->addWidget(widthKnob);
 
 	this->setLayout(l);
 }
-

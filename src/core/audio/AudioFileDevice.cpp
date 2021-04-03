@@ -23,67 +23,60 @@
  *
  */
 
+#include "AudioFileDevice.h"
+
 #include <QMessageBox>
 
-#include "AudioFileDevice.h"
 #include "ExportProjectDialog.h"
 #include "GuiApplication.h"
 
-
-AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
-					const ch_cnt_t _channels,
-					const QString & _file,
-					Mixer*  _mixer ) :
-	AudioDevice( _channels, _mixer ),
-	m_outputFile( _file ),
-	m_outputSettings(outputSettings)
+AudioFileDevice::AudioFileDevice(OutputSettings const& outputSettings,
+	const ch_cnt_t _channels,
+	const QString& _file,
+	Mixer* _mixer)
+	: AudioDevice(_channels, _mixer)
+	, m_outputFile(_file)
+	, m_outputSettings(outputSettings)
 {
-	setSampleRate( outputSettings.getSampleRate() );
+	setSampleRate(outputSettings.getSampleRate());
 
-	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
+	if (m_outputFile.open(QFile::WriteOnly | QFile::Truncate) == false)
 	{
 		QString title, message;
-		title = ExportProjectDialog::tr( "Could not open file" );
-		message = ExportProjectDialog::tr( "Could not open file %1 "
-						"for writing.\nPlease make "
-						"sure you have write "
-						"permission to the file and "
-						"the directory containing the "
-						"file and try again!"
-								).arg( _file );
+		title = ExportProjectDialog::tr("Could not open file");
+		message = ExportProjectDialog::tr("Could not open file %1 "
+										  "for writing.\nPlease make "
+										  "sure you have write "
+										  "permission to the file and "
+										  "the directory containing the "
+										  "file and try again!")
+					  .arg(_file);
 
-		if( gui )
+		if (gui)
 		{
-			QMessageBox::critical( NULL, title, message,
-						QMessageBox::Ok,
-						QMessageBox::NoButton );
+			QMessageBox::critical(NULL, title, message,
+				QMessageBox::Ok,
+				QMessageBox::NoButton);
 		}
 		else
 		{
-			fprintf( stderr, "%s\n", message.toUtf8().constData() );
-			exit( EXIT_FAILURE );
+			fprintf(stderr, "%s\n", message.toUtf8().constData());
+			exit(EXIT_FAILURE);
 		}
 	}
 }
-
-
-
 
 AudioFileDevice::~AudioFileDevice()
 {
 	m_outputFile.close();
 }
 
-
-
-
-int AudioFileDevice::writeData( const void* data, int len )
+int AudioFileDevice::writeData(const void* data, int len)
 {
-	if( m_outputFile.isOpen() )
+	if (m_outputFile.isOpen())
 	{
-		return m_outputFile.write( (const char *) data, len );
+		return m_outputFile.write((const char*)data, len);
 	}
 
 	return -1;
 }
-

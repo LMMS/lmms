@@ -22,27 +22,24 @@
  *
  */
 
-
 #ifndef BASS_BOOSTER_H
 #define BASS_BOOSTER_H
 
-#include "Effect.h"
-#include "DspEffectLibrary.h"
 #include "BassBoosterControls.h"
-
+#include "DspEffectLibrary.h"
+#include "Effect.h"
 
 class BassBoosterEffect : public Effect
 {
 public:
-	BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	BassBoosterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~BassBoosterEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
 	virtual EffectControls* controls()
 	{
 		return &m_bbControls;
 	}
-
 
 protected:
 	void changeFrequency();
@@ -57,7 +54,6 @@ private:
 	BassBoosterControls m_bbControls;
 
 	friend class BassBoosterControls;
-
-} ;
+};
 
 #endif

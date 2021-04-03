@@ -33,28 +33,28 @@
 
 #include <lilv/lilv.h>
 
-#include "lmms_export.h"
 #include "Plugin.h"
+#include "lmms_export.h"
 
 class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 private:
-	static const LilvPlugin *getPlugin(const Key &k);
-	static QString pluginName(const LilvPlugin *plug);
+	static const LilvPlugin* getPlugin(const Key& k);
+	static QString pluginName(const LilvPlugin* plug);
 
 public:
 	Lv2SubPluginFeatures(Plugin::PluginTypes type);
 
 	void fillDescriptionWidget(
-		QWidget *parent, const Key *k) const override;
+		QWidget* parent, const Key* k) const override;
 
-	QString additionalFileExtensions(const Key &k) const override;
-	QString displayName(const Key &k) const override;
-	QString description(const Key &k) const override;
-	const PixmapLoader *logo(const Key &k) const override;
+	QString additionalFileExtensions(const Key& k) const override;
+	QString displayName(const Key& k) const override;
+	QString description(const Key& k) const override;
+	const PixmapLoader* logo(const Key& k) const override;
 
 	void listSubPluginKeys(
-		const Plugin::Descriptor *desc, KeyList &kl) const override;
+		const Plugin::Descriptor* desc, KeyList& kl) const override;
 };
 
 #endif // LMMS_HAVE_LV2

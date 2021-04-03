@@ -30,9 +30,7 @@
 
 static const int Quantizations[] = {
 	1, 2, 4, 8, 16, 32, 64,
-	3, 6, 12, 24, 48, 96, 192
-};
-
+	3, 6, 12, 24, 48, 96, 192};
 
 class QAction;
 
@@ -46,14 +44,15 @@ class Editor : public QMainWindow
 {
 	Q_OBJECT
 public:
-	void setPauseIcon(bool displayPauseIcon=true);
-	QAction *playAction() const;
-protected:
-	DropToolBar * addDropToolBarToTop(QString const & windowTitle);
-	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);
-	DropToolBar * addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle);
+	void setPauseIcon(bool displayPauseIcon = true);
+	QAction* playAction() const;
 
-	void closeEvent( QCloseEvent * _ce ) override;
+protected:
+	DropToolBar* addDropToolBarToTop(QString const& windowTitle);
+	DropToolBar* addDropToolBar(Qt::ToolBarArea whereToAdd, QString const& windowTitle);
+	DropToolBar* addDropToolBar(QWidget* parent, Qt::ToolBarArea whereToAdd, QString const& windowTitle);
+
+	void closeEvent(QCloseEvent* _ce) override;
 protected slots:
 	virtual void play() {}
 	virtual void record() {}
@@ -64,7 +63,7 @@ protected slots:
 private slots:
 	/// Called by pressing the space key. Plays or stops.
 	void togglePlayStop();
-	
+
 	/// Called by pressing shift+space. Toggles pause state.
 	void togglePause();
 
@@ -80,7 +79,6 @@ protected:
 	Editor(bool record = false, bool record_step = false);
 	virtual ~Editor();
 
-
 	DropToolBar* m_toolBar;
 
 	QAction* m_playAction;
@@ -90,13 +88,12 @@ protected:
 	QAction* m_stopAction;
 };
 
-
 /// Small helper class: A QToolBar that accepts and exposes drop events as signals
 class DropToolBar : public QToolBar
 {
 	Q_OBJECT
 public:
-	DropToolBar(QWidget* parent=0);
+	DropToolBar(QWidget* parent = 0);
 
 signals:
 	void dragEntered(QDragEnterEvent* event);
@@ -106,6 +103,5 @@ protected:
 	void dragEnterEvent(QDragEnterEvent* event) override;
 	void dropEvent(QDropEvent* event) override;
 };
-
 
 #endif

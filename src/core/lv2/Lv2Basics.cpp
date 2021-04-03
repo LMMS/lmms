@@ -42,8 +42,7 @@ QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port)
 std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port)
 {
 	return std::string(
-			lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
+		lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
 }
 
 #endif // LMMS_HAVE_LV2
-

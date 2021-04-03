@@ -27,17 +27,16 @@
 
 #ifdef LMMS_HAVE_MP3LAME
 
-#include "Mixer.h"
-
 #include <cassert>
 
+#include "Mixer.h"
 
-AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
-				const ch_cnt_t channels,
-				bool & successful,
-				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer )
+AudioFileMP3::AudioFileMP3(OutputSettings const& outputSettings,
+	const ch_cnt_t channels,
+	bool& successful,
+	const QString& file,
+	Mixer* mixer)
+	: AudioFileDevice(outputSettings, channels, file, mixer)
 {
 	successful = true;
 	// For now only accept stereo sources
@@ -52,9 +51,9 @@ AudioFileMP3::~AudioFileMP3()
 	tearDownEncoder();
 }
 
-void AudioFileMP3::writeBuffer( const surroundSampleFrame * _buf,
-					const fpp_t _frames,
-					const float _master_gain )
+void AudioFileMP3::writeBuffer(const surroundSampleFrame* _buf,
+	const fpp_t _frames,
+	const float _master_gain)
 {
 	if (_frames < 1)
 	{
@@ -65,15 +64,15 @@ void AudioFileMP3::writeBuffer( const surroundSampleFrame * _buf,
 	std::vector<float> interleavedDataBuffer(_frames * 2);
 	for (fpp_t i = 0; i < _frames; ++i)
 	{
-		interleavedDataBuffer[2*i] = _buf[i][0] * _master_gain;
-		interleavedDataBuffer[2*i + 1] = _buf[i][1] * _master_gain;
+		interleavedDataBuffer[2 * i] = _buf[i][0] * _master_gain;
+		interleavedDataBuffer[2 * i + 1] = _buf[i][1] * _master_gain;
 	}
 
 	size_t minimumBufferSize = 1.25 * _frames + 7200;
 	std::vector<unsigned char> encodingBuffer(minimumBufferSize);
 
 	int bytesWritten = lame_encode_buffer_interleaved_ieee_float(m_lame, &interleavedDataBuffer[0], _frames, &encodingBuffer[0], static_cast<int>(encodingBuffer.size()));
-	assert (bytesWritten >= 0);
+	assert(bytesWritten >= 0);
 
 	writeData(&encodingBuffer[0], bytesWritten);
 }
@@ -84,7 +83,7 @@ void AudioFileMP3::flushRemainingBuffers()
 	std::vector<unsigned char> encodingBuffer(7200 * 4);
 
 	int bytesWritten = lame_encode_flush(m_lame, &encodingBuffer[0], static_cast<int>(encodingBuffer.size()));
-	assert (bytesWritten >= 0);
+	assert(bytesWritten >= 0);
 
 	writeData(&encodingBuffer[0], bytesWritten);
 }

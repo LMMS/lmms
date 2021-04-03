@@ -40,11 +40,11 @@ public:
 
 	void fill(float value);
 
-	float value(int offset ) const;
+	float value(int offset) const;
 
-	const float * values() const;
-	float * values();
-	
+	const float* values() const;
+	float* values();
+
 	int length() const;
 
 	void interpolate(float start, float end);

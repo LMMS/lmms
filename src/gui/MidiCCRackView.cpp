@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "MidiCCRackView.h"
 
 #include <QGridLayout>
@@ -31,23 +30,22 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "embed.h"
 #include "GroupBox.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "Track.h"
+#include "embed.h"
 
-
-MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
-	QWidget(),
-	m_track(track)
+MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
+	: QWidget()
+	, m_track(track)
 {
 	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget(this);
+	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget(this);
 
 	// Remove maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -62,21 +60,21 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	subWin->hide();
 
 	// Main window layout
-	QVBoxLayout *mainLayout = new QVBoxLayout(this);
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
 	// Knobs GroupBox - Here we have the MIDI CC controller knobs for the selected track
 	m_midiCCGroupBox = new GroupBox(tr("MIDI CC Knobs:"));
 
 	// Layout to keep scrollable area under the GroupBox header
-	QVBoxLayout *knobsGroupBoxLayout = new QVBoxLayout();
+	QVBoxLayout* knobsGroupBoxLayout = new QVBoxLayout();
 	knobsGroupBoxLayout->setContentsMargins(5, 16, 5, 5);
 
 	m_midiCCGroupBox->setLayout(knobsGroupBoxLayout);
 
 	// Scrollable area + widget + its layout that will have all the knobs
-	QScrollArea *knobsScrollArea = new QScrollArea();
-	QWidget *knobsArea = new QWidget();
-	QGridLayout *knobsAreaLayout = new QGridLayout();
+	QScrollArea* knobsScrollArea = new QScrollArea();
+	QWidget* knobsArea = new QWidget();
+	QGridLayout* knobsAreaLayout = new QGridLayout();
 
 	knobsArea->setLayout(knobsAreaLayout);
 	knobsScrollArea->setWidget(knobsArea);
@@ -89,7 +87,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	{
 		m_controllerKnob[i] = new Knob(knobBright_26);
 		m_controllerKnob[i]->setLabel(tr("CC %1").arg(i));
-		knobsAreaLayout->addWidget(m_controllerKnob[i], i/4, i%4);
+		knobsAreaLayout->addWidget(m_controllerKnob[i], i / 4, i % 4);
 	}
 
 	// Set all the models
@@ -112,7 +110,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 
 MidiCCRackView::~MidiCCRackView()
 {
-	if(parentWidget())
+	if (parentWidget())
 	{
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
@@ -124,10 +122,10 @@ void MidiCCRackView::renameWindow()
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 }
 
-void MidiCCRackView::saveSettings(QDomDocument & doc, QDomElement & parent)
+void MidiCCRackView::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 }
 
-void MidiCCRackView::loadSettings(const QDomElement &)
+void MidiCCRackView::loadSettings(const QDomElement&)
 {
 }

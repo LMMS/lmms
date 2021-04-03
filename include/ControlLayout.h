@@ -93,23 +93,23 @@ class ControlLayout : public QLayout
 	Q_OBJECT
 
 public:
-	explicit ControlLayout(QWidget *parent,
+	explicit ControlLayout(QWidget* parent,
 		int margin = -1, int hSpacing = -1, int vSpacing = -1);
 	~ControlLayout() override;
 
-	void addItem(QLayoutItem *item) override;
+	void addItem(QLayoutItem* item) override;
 	int horizontalSpacing() const;
 	int verticalSpacing() const;
 	Qt::Orientations expandingDirections() const override;
 	bool hasHeightForWidth() const override;
 	int heightForWidth(int) const override;
 	int count() const override;
-	QLayoutItem *itemAt(int index) const override;
-	QLayoutItem *itemByString(const QString& key) const;
+	QLayoutItem* itemAt(int index) const override;
+	QLayoutItem* itemByString(const QString& key) const;
 	QSize minimumSize() const override;
-	void setGeometry(const QRect &rect) override;
+	void setGeometry(const QRect& rect) override;
 	QSize sizeHint() const override;
-	QLayoutItem *takeAt(int index) override;
+	QLayoutItem* takeAt(int index) override;
 	//! remove focus from QLineEdit search bar
 	//! this may be useful if the mouse is outside the layout
 	void removeFocusFromSearchBar();
@@ -118,11 +118,11 @@ private slots:
 	void onTextChanged(const QString&);
 
 private:
-	int doLayout(const QRect &rect, bool testOnly) const;
+	int doLayout(const QRect& rect, bool testOnly) const;
 	int smartSpacing(QStyle::PixelMetric pm) const;
-	QMap<QString, QLayoutItem *>::const_iterator pairAt(int index) const;
+	QMap<QString, QLayoutItem*>::const_iterator pairAt(int index) const;
 
-	QMultiMap<QString, QLayoutItem *> m_itemMap;
+	QMultiMap<QString, QLayoutItem*> m_itemMap;
 	int m_hSpace;
 	int m_vSpace;
 	// relevant dimension is width, as later, heightForWidth() will be called

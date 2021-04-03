@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef INSTRUMENT_VIEW_H
 #define INSTRUMENT_VIEW_H
 
@@ -31,32 +30,27 @@
 
 class InstrumentTrackWindow;
 
-
 //! Instrument view with variable size
 class LMMS_EXPORT InstrumentView : public PluginView
 {
 public:
-	InstrumentView( Instrument * _instrument, QWidget * _parent );
+	InstrumentView(Instrument* _instrument, QWidget* _parent);
 	~InstrumentView() override;
 
-	Instrument * model()
+	Instrument* model()
 	{
-		return( castModel<Instrument>() );
+		return (castModel<Instrument>());
 	}
 
-	const Instrument * model() const
+	const Instrument* model() const
 	{
-		return( castModel<Instrument>() );
+		return (castModel<Instrument>());
 	}
 
-	void setModel( Model * _model, bool = false ) override;
+	void setModel(Model* _model, bool = false) override;
 
-	InstrumentTrackWindow * instrumentTrackWindow();
-
-} ;
-
-
-
+	InstrumentTrackWindow* instrumentTrackWindow();
+};
 
 //! Instrument view with fixed LMMS-default size
 class LMMS_EXPORT InstrumentViewFixedSize : public InstrumentView
@@ -67,7 +61,6 @@ class LMMS_EXPORT InstrumentViewFixedSize : public InstrumentView
 public:
 	using InstrumentView::InstrumentView;
 	~InstrumentViewFixedSize() override;
-} ;
-
+};
 
 #endif

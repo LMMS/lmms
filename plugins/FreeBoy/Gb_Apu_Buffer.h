@@ -24,10 +24,11 @@
 #define GB_APU_BUFFER_H
 
 #include "Gb_Apu.h"
-#include "Multi_Buffer.h"
 #include "MemoryManager.h"
+#include "Multi_Buffer.h"
 
-class Gb_Apu_Buffer : public Gb_Apu {
+class Gb_Apu_Buffer : public Gb_Apu
+{
 	MM_OPERATORS
 public:
 	Gb_Apu_Buffer();
@@ -40,9 +41,9 @@ public:
 	typedef blip_sample_t sample_t;
 	long read_samples(sample_t* out, long count);
 	void bass_freq(int freq);
+
 private:
 	Stereo_Buffer m_buf;
 };
 
 #endif
-

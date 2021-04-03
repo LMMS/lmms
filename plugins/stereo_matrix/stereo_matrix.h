@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef _STEREO_MATRIX_H
 #define _STEREO_MATRIX_H
 
@@ -32,24 +31,21 @@
 class stereoMatrixEffect : public Effect
 {
 public:
-	stereoMatrixEffect( Model * parent, 
-	                      const Descriptor::SubPluginFeatures::Key * _key );
+	stereoMatrixEffect(Model* parent,
+		const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~stereoMatrixEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-		                                          const fpp_t _frames );
+	virtual bool processAudioBuffer(sampleFrame* _buf,
+		const fpp_t _frames);
 
-	virtual EffectControls * controls()
+	virtual EffectControls* controls()
 	{
-		return( &m_smControls );
+		return (&m_smControls);
 	}
-
 
 private:
 	stereoMatrixControls m_smControls;
 
 	friend class stereoMatrixControls;
-} ;
-
-
+};
 
 #endif

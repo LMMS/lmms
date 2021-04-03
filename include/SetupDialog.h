@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef SETUP_DIALOG_H
 #define SETUP_DIALOG_H
 
@@ -32,10 +31,9 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 #include "LedCheckbox.h"
-#include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"
-
+#include "lmmsconfig.h"
 
 class QComboBox;
 class QLabel;
@@ -61,10 +59,8 @@ public:
 	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
 	virtual ~SetupDialog();
 
-
 protected slots:
 	void accept() override;
-
 
 private slots:
 	// General settings widget.
@@ -95,36 +91,36 @@ private slots:
 	void toggleDisableAutoQuit(bool enabled);
 
 	// Audio settings widget.
-	void audioInterfaceChanged(const QString & driver);
+	void audioInterfaceChanged(const QString& driver);
 	void toggleHQAudioDev(bool enabled);
 	void setBufferSize(int value);
 	void resetBufferSize();
 
 	// MIDI settings widget.
-	void midiInterfaceChanged(const QString & driver);
+	void midiInterfaceChanged(const QString& driver);
 
 	// Paths settings widget.
 	void openWorkingDir();
-	void setWorkingDir(const QString & workingDir);
+	void setWorkingDir(const QString& workingDir);
 	void openVSTDir();
-	void setVSTDir(const QString & vstDir);
+	void setVSTDir(const QString& vstDir);
 	void openLADSPADir();
-	void setLADSPADir(const QString & ladspaDir);
+	void setLADSPADir(const QString& ladspaDir);
 	void openSF2Dir();
-	void setSF2Dir(const QString & sf2Dir);
+	void setSF2Dir(const QString& sf2Dir);
 	void openSF2File();
-	void setSF2File(const QString & sf2File);
+	void setSF2File(const QString& sf2File);
 	void openGIGDir();
-	void setGIGDir(const QString & gigDir);
+	void setGIGDir(const QString& gigDir);
 	void openThemeDir();
-	void setThemeDir(const QString & themeDir);
+	void setThemeDir(const QString& themeDir);
 	void openBackgroundPicFile();
-	void setBackgroundPicFile(const QString & backgroundPicFile);
+	void setBackgroundPicFile(const QString& backgroundPicFile);
 
 	void showRestartWarning();
 
 private:
-	TabBar * m_tabBar;
+	TabBar* m_tabBar;
 
 	// General settings widgets.
 	bool m_displaydBFS;
@@ -146,40 +142,39 @@ private:
 	int m_saveInterval;
 	bool m_enableAutoSave;
 	bool m_enableRunningAutoSave;
-	QSlider * m_saveIntervalSlider;
-	QLabel * m_saveIntervalLbl;
-	LedCheckBox * m_autoSave;
-	LedCheckBox * m_runningAutoSave;
+	QSlider* m_saveIntervalSlider;
+	QLabel* m_saveIntervalLbl;
+	LedCheckBox* m_autoSave;
+	LedCheckBox* m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
-	QLabel * m_vstEmbedLbl;
+	QLabel* m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
-	LedCheckBox * m_vstAlwaysOnTopCheckBox;
+	LedCheckBox* m_vstAlwaysOnTopCheckBox;
 	bool m_vstAlwaysOnTop;
 	bool m_syncVSTPlugins;
 	bool m_disableAutoQuit;
 
-
-	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
-	typedef QMap<QString, MidiSetupWidget *> MswMap;
+	typedef QMap<QString, AudioDeviceSetupWidget*> AswMap;
+	typedef QMap<QString, MidiSetupWidget*> MswMap;
 	typedef QMap<QString, QString> trMap;
 
 	// Audio settings widgets.
-	QComboBox * m_audioInterfaces;
+	QComboBox* m_audioInterfaces;
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
 	bool m_NaNHandler;
 	bool m_hqAudioDev;
 	int m_bufferSize;
-	QSlider * m_bufferSizeSlider;
-	QLabel * m_bufferSizeLbl;
+	QSlider* m_bufferSizeSlider;
+	QLabel* m_bufferSizeLbl;
 
 	// MIDI settings widgets.
-	QComboBox * m_midiInterfaces;
+	QComboBox* m_midiInterfaces;
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
-	QComboBox * m_assignableMidiDevices;
+	QComboBox* m_assignableMidiDevices;
 
 	// Paths settings widgets.
 	QString m_workingDir;
@@ -193,17 +188,17 @@ private:
 	QString m_themeDir;
 	QString m_backgroundPicFile;
 
-	QLineEdit * m_workingDirLineEdit;
-	QLineEdit * m_vstDirLineEdit;
-	QLineEdit * m_themeDirLineEdit;
-	QLineEdit * m_ladspaDirLineEdit;
-	QLineEdit * m_gigDirLineEdit;
-	QLineEdit * m_sf2DirLineEdit;
+	QLineEdit* m_workingDirLineEdit;
+	QLineEdit* m_vstDirLineEdit;
+	QLineEdit* m_themeDirLineEdit;
+	QLineEdit* m_ladspaDirLineEdit;
+	QLineEdit* m_gigDirLineEdit;
+	QLineEdit* m_sf2DirLineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	QLineEdit * m_sf2FileLineEdit;
+	QLineEdit* m_sf2FileLineEdit;
 #endif
-	QLineEdit * m_backgroundPicFileLineEdit;
+	QLineEdit* m_backgroundPicFileLineEdit;
 
-	QLabel * restartWarningLbl;
+	QLabel* restartWarningLbl;
 };
 #endif

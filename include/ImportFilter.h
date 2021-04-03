@@ -30,28 +30,24 @@
 
 #include "Plugin.h"
 
-
 class TrackContainer;
-
 
 class LMMS_EXPORT ImportFilter : public Plugin
 {
 public:
-	ImportFilter( const QString & _file_name,
-					const Descriptor * _descriptor );
+	ImportFilter(const QString& _file_name,
+		const Descriptor* _descriptor);
 	virtual ~ImportFilter();
-
 
 	// tries to import given file to given track-container by having all
 	// available import-filters to try to import the file
-	static void import( const QString & _file_to_import,
-						TrackContainer* tc );
-
+	static void import(const QString& _file_to_import,
+		TrackContainer* tc);
 
 protected:
-	virtual bool tryImport( TrackContainer* tc ) = 0;
+	virtual bool tryImport(TrackContainer* tc) = 0;
 
-	const QFile & file() const
+	const QFile& file() const
 	{
 		return m_file;
 	}
@@ -66,16 +62,16 @@ protected:
 	inline int readByte()
 	{
 		unsigned char c;
-		if( m_file.getChar( (char*) &c ) )
+		if (m_file.getChar((char*)&c))
 		{
-			return static_cast<int>( c );
+			return static_cast<int>(c);
 		}
 		return -1;
 	}
 
-	inline int readBlock( char * _data, int _len )
+	inline int readBlock(char* _data, int _len)
 	{
-		return m_file.read( _data, _len );
+		return m_file.read(_data, _len);
 	}
 
 	inline QByteArray readAllData()
@@ -84,16 +80,16 @@ protected:
 		return m_file.readAll();
 	}
 
-	inline void ungetChar( char _ch )
+	inline void ungetChar(char _ch)
 	{
-		m_file.ungetChar( _ch );
+		m_file.ungetChar(_ch);
 	}
 
-	void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings(QDomDocument&, QDomElement&) override
 	{
 	}
 
-	void loadSettings( const QDomElement & ) override
+	void loadSettings(const QDomElement&) override
 	{
 	}
 
@@ -102,11 +98,8 @@ protected:
 		return "import_filter";
 	}
 
-
 private:
 	QFile m_file;
-
-} ;
-
+};
 
 #endif

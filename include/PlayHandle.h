@@ -28,12 +28,10 @@
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 
-#include "lmms_export.h"
-
 #include "MemoryManager.h"
-
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
+#include "lmms_export.h"
 
 class QThread;
 
@@ -49,17 +47,17 @@ public:
 		TypeInstrumentPlayHandle = 0x02,
 		TypeSamplePlayHandle = 0x04,
 		TypePresetPreviewHandle = 0x08
-	} ;
+	};
 	typedef Types Type;
 
 	enum
 	{
 		MaxNumber = 1024
-	} ;
+	};
 
-	PlayHandle( const Type type, f_cnt_t offset = 0 );
+	PlayHandle(const Type type, f_cnt_t offset = 0);
 
-	PlayHandle & operator = ( PlayHandle & p )
+	PlayHandle& operator=(PlayHandle& p)
 	{
 		m_type = p.m_type;
 		m_offset = p.m_offset;
@@ -106,7 +104,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	virtual void play( sampleFrame* buffer ) = 0;
+	virtual void play(sampleFrame* buffer) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
@@ -116,37 +114,36 @@ public:
 		return m_offset;
 	}
 
-	void setOffset( f_cnt_t _offset )
+	void setOffset(f_cnt_t _offset)
 	{
 		m_offset = _offset;
 	}
 
-
-	virtual bool isFromTrack( const Track * _track ) const = 0;
+	virtual bool isFromTrack(const Track* _track) const = 0;
 
 	bool usesBuffer() const
 	{
 		return m_usesBuffer;
 	}
-	
-	void setUsesBuffer( const bool b )
+
+	void setUsesBuffer(const bool b)
 	{
 		m_usesBuffer = b;
 	}
-	
-	AudioPort * audioPort()
+
+	AudioPort* audioPort()
 	{
 		return m_audioPort;
 	}
-	
-	void setAudioPort( AudioPort * port )
+
+	void setAudioPort(AudioPort* port)
 	{
 		m_audioPort = port;
 	}
-	
+
 	void releaseBuffer();
-	
-	sampleFrame * buffer();
+
+	sampleFrame* buffer();
 
 private:
 	Type m_type;
@@ -156,12 +153,10 @@ private:
 	sampleFrame* m_playHandleBuffer;
 	bool m_bufferReleased;
 	bool m_usesBuffer;
-	AudioPort * m_audioPort;
-} ;
+	AudioPort* m_audioPort;
+};
 
-
-typedef QList<PlayHandle *> PlayHandleList;
-typedef QList<const PlayHandle *> ConstPlayHandleList;
-
+typedef QList<PlayHandle*> PlayHandleList;
+typedef QList<const PlayHandle*> ConstPlayHandleList;
 
 #endif

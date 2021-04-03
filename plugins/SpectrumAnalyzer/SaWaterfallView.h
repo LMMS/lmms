@@ -23,11 +23,11 @@
 #ifndef SAWATERFALLVIEW_H
 #define SAWATERFALLVIEW_H
 
+#include <QPainter>
+#include <QWidget>
 #include <string>
 #include <utility>
 #include <vector>
-#include <QPainter>
-#include <QWidget>
 
 #include "SaControls.h"
 #include "SaProcessor.h"
@@ -39,27 +39,27 @@ class SaWaterfallView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
+	explicit SaWaterfallView(SaControls* controls, SaProcessor* processor, QWidget* _parent = 0);
 	virtual ~SaWaterfallView() {}
 
-	QSize sizeHint() const override {return QSize(400, 350);}
+	QSize sizeHint() const override { return QSize(400, 350); }
 
 	// Check if waterfall should be displayed and adjust window size if needed.
 	void updateVisibility();
 
 protected:
-	void paintEvent(QPaintEvent *event) override;
-	void mouseMoveEvent(QMouseEvent *event) override;
-	void mousePressEvent(QMouseEvent *event) override;
-	void resizeEvent(QResizeEvent *event) override;
+	void paintEvent(QPaintEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void resizeEvent(QResizeEvent* event) override;
 
 private slots:
 	void periodicUpdate();
 
 private:
-	const SaControls *m_controls;
-	SaProcessor *m_processor;
-	const EffectControlDialog *m_controlDialog;
+	const SaControls* m_controls;
+	SaProcessor* m_processor;
+	const EffectControlDialog* m_controlDialog;
 
 	// Methods and data used to make time labels
 	float m_oldSecondsPerLine;
@@ -69,11 +69,11 @@ private:
 	float timeToYPixel(float time, int height);
 	float yPixelToTime(float position, int height);
 	std::vector<std::pair<float, std::string>> makeTimeTics();
-	std::vector<std::pair<float, std::string>> m_timeTics;	// 0..n (s)
+	std::vector<std::pair<float, std::string>> m_timeTics; // 0..n (s)
 
 	// current cursor location and a method to draw it
 	QPointF m_cursor;
-	void drawCursor(QPainter &painter);
+	void drawCursor(QPainter& painter);
 
 	// current boundaries for drawing
 	unsigned int m_displayTop;
@@ -83,8 +83,8 @@ private:
 	unsigned int m_displayWidth;
 	unsigned int m_displayHeight;
 
-	#ifdef SA_DEBUG
-		float m_execution_avg;
-	#endif
+#ifdef SA_DEBUG
+	float m_execution_avg;
+#endif
 };
 #endif // SAWATERFALLVIEW_H

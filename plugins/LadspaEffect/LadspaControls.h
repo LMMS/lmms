@@ -29,17 +29,15 @@
 #include "LadspaControl.h"
 #include "LadspaControlDialog.h"
 
-
-typedef QVector<LadspaControl *> control_list_t;
+typedef QVector<LadspaControl*> control_list_t;
 
 class LadspaEffect;
-
 
 class LadspaControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	LadspaControls( LadspaEffect * _eff );
+	LadspaControls(LadspaEffect* _eff);
 	virtual ~LadspaControls();
 
 	inline int controlCount()
@@ -47,26 +45,24 @@ public:
 		return m_controlCount;
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 	inline virtual QString nodeName() const
 	{
 		return "ladspacontrols";
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog* createView()
 	{
-		return new LadspaControlDialog( this );
+		return new LadspaControlDialog(this);
 	}
-
 
 protected slots:
 	void updateLinkStatesFromGlobal();
-	void linkPort( int _port, bool _state );
-
+	void linkPort(int _port, bool _state);
 
 private:
-	LadspaEffect * m_effect;
+	LadspaEffect* m_effect;
 	ch_cnt_t m_processors;
 	ch_cnt_t m_controlCount;
 	bool m_noLink;
@@ -74,14 +70,11 @@ private:
 	//! control vector for each processor
 	QVector<control_list_t> m_controls;
 
-
 	friend class LadspaControlDialog;
 	friend class LadspaEffect;
 
-
 signals:
-	void effectModelChanged( LadspaControls * );
-
-} ;
+	void effectModelChanged(LadspaControls*);
+};
 
 #endif

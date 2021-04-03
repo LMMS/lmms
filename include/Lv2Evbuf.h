@@ -47,7 +47,8 @@ typedef struct LV2_Evbuf_Impl LV2_Evbuf;
 /**
    An iterator over an LV2_Evbuf.
 */
-typedef struct {
+typedef struct
+{
 	LV2_Evbuf* evbuf;
 	uint32_t offset;
 } LV2_Evbuf_Iterator;
@@ -62,8 +63,7 @@ lv2_evbuf_new(uint32_t capacity, uint32_t atom_Chunk, uint32_t atom_Sequence);
 /**
    Free an event buffer allocated with lv2_evbuf_new.
 */
-void
-lv2_evbuf_free(LV2_Evbuf* evbuf);
+void lv2_evbuf_free(LV2_Evbuf* evbuf);
 
 /**
    Clear and initialize an existing event buffer.
@@ -72,8 +72,7 @@ lv2_evbuf_free(LV2_Evbuf* evbuf);
    If input is false and this is an atom buffer, the buffer will be prepared
    for writing by the plugin.  This MUST be called before every run cycle.
 */
-void
-lv2_evbuf_reset(LV2_Evbuf* evbuf, bool input);
+void lv2_evbuf_reset(LV2_Evbuf* evbuf, bool input);
 
 /**
    Return the total padded size of the events stored in the buffer.
@@ -85,8 +84,7 @@ lv2_evbuf_get_size(LV2_Evbuf* evbuf);
    Return the actual buffer implementation.
    The format of the buffer returned depends on the buffer type.
 */
-void*
-lv2_evbuf_get_buffer(LV2_Evbuf* evbuf);
+void* lv2_evbuf_get_buffer(LV2_Evbuf* evbuf);
 
 /**
    Return an iterator to the start of `evbuf`.
@@ -104,8 +102,7 @@ lv2_evbuf_end(LV2_Evbuf* evbuf);
    Check if `iter` is valid.
    @return True if `iter` is valid, otherwise false (past end of buffer)
 */
-bool
-lv2_evbuf_is_valid(LV2_Evbuf_Iterator iter);
+bool lv2_evbuf_is_valid(LV2_Evbuf_Iterator iter);
 
 /**
    Advance `iter` forward one event.
@@ -123,12 +120,11 @@ lv2_evbuf_next(LV2_Evbuf_Iterator iter);
    `data` Set to the contents of the event.
    @return True on success.
 */
-bool
-lv2_evbuf_get(	LV2_Evbuf_Iterator iter,
-				uint32_t* frames,
-				uint32_t* type,
-				uint32_t* size,
-				uint8_t** data);
+bool lv2_evbuf_get(LV2_Evbuf_Iterator iter,
+	uint32_t* frames,
+	uint32_t* type,
+	uint32_t* size,
+	uint8_t** data);
 
 /**
    Write an event at `iter`.
@@ -137,12 +133,11 @@ lv2_evbuf_get(	LV2_Evbuf_Iterator iter,
    function can be done in sequence without twiddling iter in-between).
    @return True if event was written, otherwise false (buffer is full).
 */
-bool
-lv2_evbuf_write(	LV2_Evbuf_Iterator* iter,
-					uint32_t frames,
-					uint32_t type,
-					uint32_t size,
-					const uint8_t* data);
+bool lv2_evbuf_write(LV2_Evbuf_Iterator* iter,
+	uint32_t frames,
+	uint32_t type,
+	uint32_t size,
+	const uint8_t* data);
 
 #endif // LMMS_HAVE_LV2
 

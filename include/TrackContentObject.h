@@ -30,34 +30,33 @@
 #include "AutomatableModel.h"
 #include "lmms_basics.h"
 
-
 class Track;
 class TrackContentObjectView;
 class TrackContainer;
 class TrackView;
 
-
 class LMMS_EXPORT TrackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
-	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
-	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
+	mapPropertyFromModel(bool, isMuted, setMuted, m_mutedModel);
+	mapPropertyFromModel(bool, isSolo, setSolo, m_soloModel);
+
 public:
-	TrackContentObject( Track * track );
+	TrackContentObject(Track* track);
 	virtual ~TrackContentObject();
 
-	inline Track * getTrack() const
+	inline Track* getTrack() const
 	{
 		return m_track;
 	}
 
-	inline const QString & name() const
+	inline const QString& name() const
 	{
 		return m_name;
 	}
 
-	inline void setName( const QString & name )
+	inline void setName(const QString& name)
 	{
 		m_name = name;
 		emit dataChanged();
@@ -68,8 +67,7 @@ public:
 		return name();
 	}
 
-
-	inline const TimePos & startPosition() const
+	inline const TimePos& startPosition() const
 	{
 		return m_startPosition;
 	}
@@ -80,12 +78,12 @@ public:
 		return sp + m_length;
 	}
 
-	inline const TimePos & length() const
+	inline const TimePos& length() const
 	{
 		return m_length;
 	}
 
-	inline void setAutoResize( const bool r )
+	inline void setAutoResize(const bool r)
 	{
 		m_autoResize = r;
 	}
@@ -100,26 +98,26 @@ public:
 		return m_color;
 	}
 
-	void setColor( const QColor & c )
+	void setColor(const QColor& c)
 	{
 		m_color = c;
 	}
 
 	bool hasColor();
 
-	void useCustomClipColor( bool b );
+	void useCustomClipColor(bool b);
 
 	bool usesCustomClipColor()
 	{
 		return m_useCustomClipColor;
 	}
 
-	virtual void movePosition( const TimePos & pos );
-	virtual void changeLength( const TimePos & length );
+	virtual void movePosition(const TimePos& pos);
+	virtual void changeLength(const TimePos& length);
 
-	virtual TrackContentObjectView * createView( TrackView * tv ) = 0;
+	virtual TrackContentObjectView* createView(TrackView* tv) = 0;
 
-	inline void selectViewOnCreate( bool select )
+	inline void selectViewOnCreate(bool select)
 	{
 		m_selectViewOnCreate = select;
 	}
@@ -133,16 +131,15 @@ public:
 	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
 
 	TimePos startTimeOffset() const;
-	void setStartTimeOffset( const TimePos &startTimeOffset );
+	void setStartTimeOffset(const TimePos& startTimeOffset);
 
 	void updateColor();
 
 	// Will copy the state of a TCO to another TCO
-	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
+	static void copyStateTo(TrackContentObject* src, TrackContentObject* dst);
 
 public slots:
 	void toggleMute();
-
 
 signals:
 	void lengthChanged();
@@ -150,16 +147,15 @@ signals:
 	void destroyedTCO();
 	void trackColorChanged();
 
-
 private:
 	enum Actions
 	{
 		NoAction,
 		Move,
 		Resize
-	} ;
+	};
 
-	Track * m_track;
+	Track* m_track;
 	QString m_name;
 
 	TimePos m_startPosition;
@@ -176,8 +172,6 @@ private:
 	bool m_useCustomClipColor;
 
 	friend class TrackContentObjectView;
-
-} ;
-
+};
 
 #endif

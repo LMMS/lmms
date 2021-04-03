@@ -27,29 +27,22 @@
 
 #include <QTableView>
 
-
 class RowDelegate;
-
 
 class RowTableView : public QTableView
 {
 	Q_OBJECT
 public:
-	RowTableView( QWidget * parent = 0 );
+	RowTableView(QWidget* parent = 0);
 	virtual ~RowTableView();
 
-	void setModel( QAbstractItemModel * model ) override;
-
+	void setModel(QAbstractItemModel* model) override;
 
 protected:
-	void keyPressEvent( QKeyEvent * event ) override;
-
+	void keyPressEvent(QKeyEvent* event) override;
 
 private:
-	RowDelegate * m_rowDelegate;
-
-} ;
-
-
+	RowDelegate* m_rowDelegate;
+};
 
 #endif

@@ -30,8 +30,8 @@
 
 #include "AudioPort.h"
 #include "FadeButton.h"
-#include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
+#include "FxMixer.h"
 #include "Track.h"
 #include "TrackContentObjectView.h"
 #include "TrackView.h"
@@ -43,23 +43,23 @@ class SampleTrackWindow;
 class TrackLabelButton;
 class QLineEdit;
 
-
 class SampleTCO : public TrackContentObject
 {
 	Q_OBJECT
-	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
+	mapPropertyFromModel(bool, isRecord, setRecord, m_recordModel);
+
 public:
-	SampleTCO( Track * _track );
-	SampleTCO( const SampleTCO& orig );
+	SampleTCO(Track* _track);
+	SampleTCO(const SampleTCO& orig);
 	virtual ~SampleTCO();
 
-	SampleTCO& operator=( const SampleTCO& that ) = delete;
+	SampleTCO& operator=(const SampleTCO& that) = delete;
 
-	void changeLength( const TimePos & _length ) override;
-	const QString & sampleFile() const;
+	void changeLength(const TimePos& _length) override;
+	const QString& sampleFile() const;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 	inline QString nodeName() const override
 	{
 		return "sampletco";
@@ -71,22 +71,20 @@ public:
 	}
 
 	TimePos sampleLength() const;
-	void setSampleStartFrame( f_cnt_t startFrame );
-	void setSamplePlayLength( f_cnt_t length );
-	TrackContentObjectView * createView( TrackView * _tv ) override;
-
+	void setSampleStartFrame(f_cnt_t startFrame);
+	void setSamplePlayLength(f_cnt_t length);
+	TrackContentObjectView* createView(TrackView* _tv) override;
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
 public slots:
-	void setSampleBuffer( SampleBuffer* sb );
-	void setSampleFile( const QString & _sf );
+	void setSampleBuffer(SampleBuffer* sb);
+	void setSampleFile(const QString& _sf);
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackTcos();
-
 
 private:
 	SampleBuffer* m_sampleBuffer;
@@ -95,71 +93,60 @@ private:
 
 	friend class SampleTCOView;
 
-
 signals:
 	void sampleChanged();
 	void wasReversed();
-
-} ;
-
-
+};
 
 class SampleTCOView : public TrackContentObjectView
 {
 	Q_OBJECT
 
 public:
-	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
+	SampleTCOView(SampleTCO* _tco, TrackView* _tv);
 	virtual ~SampleTCOView() = default;
 
 public slots:
 	void updateSample();
 	void reverseSample();
 
-
-
 protected:
-	void contextMenuEvent( QContextMenuEvent * _cme ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void mouseDoubleClickEvent( QMouseEvent * ) override;
-	void paintEvent( QPaintEvent * ) override;
-
+	void contextMenuEvent(QContextMenuEvent* _cme) override;
+	void mousePressEvent(QMouseEvent* _me) override;
+	void mouseReleaseEvent(QMouseEvent* _me) override;
+	void dragEnterEvent(QDragEnterEvent* _dee) override;
+	void dropEvent(QDropEvent* _de) override;
+	void mouseDoubleClickEvent(QMouseEvent*) override;
+	void paintEvent(QPaintEvent*) override;
 
 private:
-	SampleTCO * m_tco;
+	SampleTCO* m_tco;
 	QPixmap m_paintPixmap;
-	bool splitTCO( const TimePos pos ) override;
-} ;
-
-
-
+	bool splitTCO(const TimePos pos) override;
+};
 
 class SampleTrack : public Track
 {
 	Q_OBJECT
 public:
-	SampleTrack( TrackContainer* tc );
+	SampleTrack(TrackContainer* tc);
 	virtual ~SampleTrack();
 
-	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
-	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	virtual bool play(const TimePos& _start, const fpp_t _frames,
+		const f_cnt_t _frame_base, int _tco_num = -1) override;
+	TrackView* createView(TrackContainerView* tcv) override;
+	TrackContentObject* createTCO(const TimePos& pos) override;
 
+	virtual void saveTrackSpecificSettings(QDomDocument& _doc,
+		QDomElement& _parent) override;
+	void loadTrackSpecificSettings(const QDomElement& _this) override;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent ) override;
-	void loadTrackSpecificSettings( const QDomElement & _this ) override;
-
-	inline IntModel * effectChannelModel()
+	inline IntModel* effectChannelModel()
 	{
 		return &m_effectChannelModel;
 	}
 
-	inline AudioPort * audioPort()
+	inline AudioPort* audioPort()
 	{
 		return &m_audioPort;
 	}
@@ -176,7 +163,10 @@ public:
 
 	void setPlaying(bool playing)
 	{
-		if (m_isPlaying != playing) { emit playingChanged(); }
+		if (m_isPlaying != playing)
+		{
+			emit playingChanged();
+		}
 		m_isPlaying = playing;
 	}
 
@@ -185,7 +175,7 @@ signals:
 
 public slots:
 	void updateTcos();
-	void setPlayingTcos( bool isPlaying );
+	void setPlayingTcos(bool isPlaying);
 	void updateEffectChannel();
 
 private:
@@ -195,45 +185,37 @@ private:
 	AudioPort m_audioPort;
 	bool m_isPlaying;
 
-
-
 	friend class SampleTrackView;
 	friend class SampleTrackWindow;
-
-} ;
-
-
+};
 
 class SampleTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
+	SampleTrackView(SampleTrack* Track, TrackContainerView* tcv);
 	virtual ~SampleTrackView();
 
-	SampleTrackWindow * getSampleTrackWindow()
+	SampleTrackWindow* getSampleTrackWindow()
 	{
 		return m_window;
 	}
 
-	SampleTrack * model()
+	SampleTrack* model()
 	{
 		return castModel<SampleTrack>();
 	}
 
-	const SampleTrack * model() const
+	const SampleTrack* model() const
 	{
 		return castModel<SampleTrack>();
 	}
 
-
-	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
-
+	QMenu* createFxMenu(QString title, QString newFxLabel) override;
 
 public slots:
 	void showEffects();
 	void updateIndicator();
-
 
 protected:
 	void modelChanged() override;
@@ -242,86 +224,78 @@ protected:
 		return "SampleTrackView";
 	}
 
-	void dragEnterEvent(QDragEnterEvent *dee) override;
-	void dropEvent(QDropEvent *de) override;
+	void dragEnterEvent(QDragEnterEvent* dee) override;
+	void dropEvent(QDropEvent* de) override;
 
 private slots:
-	void assignFxLine( int channelIndex );
+	void assignFxLine(int channelIndex);
 	void createFxLine();
 
-
 private:
-	SampleTrackWindow * m_window;
-	Knob * m_volumeKnob;
-	Knob * m_panningKnob;
-	FadeButton * m_activityIndicator;
+	SampleTrackWindow* m_window;
+	Knob* m_volumeKnob;
+	Knob* m_panningKnob;
+	FadeButton* m_activityIndicator;
 
-	TrackLabelButton * m_tlb;
+	TrackLabelButton* m_tlb;
 
-	FadeButton * getActivityIndicator() override
+	FadeButton* getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}
 
 	friend class SampleTrackWindow;
-
-} ;
-
-
+};
 
 class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
 {
 	Q_OBJECT
 public:
-	SampleTrackWindow(SampleTrackView * tv);
+	SampleTrackWindow(SampleTrackView* tv);
 	virtual ~SampleTrackWindow();
 
-	SampleTrack * model()
+	SampleTrack* model()
 	{
 		return castModel<SampleTrack>();
 	}
 
-	const SampleTrack * model() const
+	const SampleTrack* model() const
 	{
 		return castModel<SampleTrack>();
 	}
 
-	void setSampleTrackView(SampleTrackView * tv);
+	void setSampleTrackView(SampleTrackView* tv);
 
-	SampleTrackView *sampleTrackView()
+	SampleTrackView* sampleTrackView()
 	{
 		return m_stv;
 	}
 
-
 public slots:
-	void textChanged(const QString & new_name);
+	void textChanged(const QString& new_name);
 	void toggleVisibility(bool on);
 	void updateName();
 
-
 protected:
 	// capture close-events for toggling sample-track-button
-	void closeEvent(QCloseEvent * ce) override;
+	void closeEvent(QCloseEvent* ce) override;
 
-	void saveSettings(QDomDocument & doc, QDomElement & element) override;
-	void loadSettings(const QDomElement & element) override;
+	void saveSettings(QDomDocument& doc, QDomElement& element) override;
+	void loadSettings(const QDomElement& element) override;
 
 private:
 	void modelChanged() override;
 
-	SampleTrack * m_track;
-	SampleTrackView * m_stv;
+	SampleTrack* m_track;
+	SampleTrackView* m_stv;
 
 	// widgets on the top of an sample-track-window
-	QLineEdit * m_nameLineEdit;
-	Knob * m_volumeKnob;
-	Knob * m_panningKnob;
-	FxLineLcdSpinBox * m_effectChannelNumber;
+	QLineEdit* m_nameLineEdit;
+	Knob* m_volumeKnob;
+	Knob* m_panningKnob;
+	FxLineLcdSpinBox* m_effectChannelNumber;
 
-	EffectRackView * m_effectRack;
-
-} ;
-
+	EffectRackView* m_effectRack;
+};
 
 #endif

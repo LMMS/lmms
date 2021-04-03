@@ -25,14 +25,13 @@
 #ifndef _VST_EFFECT_CONTROL_DIALOG_H
 #define _VST_EFFECT_CONTROL_DIALOG_H
 
-#include "EffectControlDialog.h"
-#include "VstPlugin.h"
-
+#include <QLabel>
 #include <QObject>
 #include <QPainter>
-#include <QLabel>
 #include <QSharedPointer>
 
+#include "EffectControlDialog.h"
+#include "VstPlugin.h"
 
 class VstEffectControls;
 class PixmapButton;
@@ -40,34 +39,33 @@ class QPixmap;
 class QPushButton;
 class PixmapButton;
 
-
 class VstEffectControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	VstEffectControlDialog( VstEffectControls * _controls );
+	VstEffectControlDialog(VstEffectControls* _controls);
 	virtual ~VstEffectControlDialog();
 
 protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-	void showEvent( QShowEvent* _se ) override;
+	void paintEvent(QPaintEvent* _pe) override;
+	void showEvent(QShowEvent* _se) override;
 
 private:
-	QWidget * m_pluginWidget;
+	QWidget* m_pluginWidget;
 
-	QPushButton * m_togglePluginButton;
-	PixmapButton * m_openPresetButton;
-	PixmapButton * m_rolLPresetButton;
-	PixmapButton * m_rolRPresetButton;
-	PixmapButton * m_managePluginButton;
-	PixmapButton * m_savePresetButton;
+	QPushButton* m_togglePluginButton;
+	PixmapButton* m_openPresetButton;
+	PixmapButton* m_rolLPresetButton;
+	PixmapButton* m_rolRPresetButton;
+	PixmapButton* m_managePluginButton;
+	PixmapButton* m_savePresetButton;
 
 	QSharedPointer<VstPlugin> m_plugin;
 
-	QLabel * tbLabel;
+	QLabel* tbLabel;
 
 public slots:
-	void togglePluginUI( bool checked );
-} ;
+	void togglePluginUI(bool checked);
+};
 
 #endif

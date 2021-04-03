@@ -29,12 +29,10 @@
 
 #ifdef LMMS_HAVE_OSS
 
-#include <QtCore/QThread>
 #include <QtCore/QFile>
+#include <QtCore/QThread>
 
 #include "MidiClient.h"
-
-
 
 class MidiOss : public QThread, public MidiClientRaw
 {
@@ -45,11 +43,10 @@ public:
 
 	static QString probeDevice();
 
-
 	inline static QString name()
 	{
-		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
-			"OSS Raw-MIDI (Open Sound System)" ) );
+		return (QT_TRANSLATE_NOOP("MidiSetupWidget",
+			"OSS Raw-MIDI (Open Sound System)"));
 	}
 
 	inline static QString configSection()
@@ -58,18 +55,15 @@ public:
 	}
 
 protected:
-	void sendByte( const unsigned char c ) override;
+	void sendByte(const unsigned char c) override;
 	void run() override;
-
 
 private:
 	QFile m_midiDev;
 
 	volatile bool m_quit;
-
-} ;
+};
 
 #endif
-
 
 #endif

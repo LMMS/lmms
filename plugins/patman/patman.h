@@ -22,59 +22,53 @@
  *
  */
 
-
 #ifndef PATMAN_H_
 #define PATMAN_H_
 
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "SampleBuffer.h"
-#include "AutomatableModel.h"
 #include "MemoryManager.h"
+#include "SampleBuffer.h"
 
 class PixmapButton;
 
-
-#define MODES_16BIT	( 1 << 0 )
-#define MODES_UNSIGNED	( 1 << 1 )
-#define MODES_LOOPING	( 1 << 2 )
-#define MODES_PINGPONG	( 1 << 3 )
-#define MODES_REVERSE	( 1 << 4 )
-#define MODES_SUSTAIN	( 1 << 5 )
-#define MODES_ENVELOPE	( 1 << 6 )
-#define MODES_CLAMPED	( 1 << 7 )
-
+#define MODES_16BIT (1 << 0)
+#define MODES_UNSIGNED (1 << 1)
+#define MODES_LOOPING (1 << 2)
+#define MODES_PINGPONG (1 << 3)
+#define MODES_REVERSE (1 << 4)
+#define MODES_SUSTAIN (1 << 5)
+#define MODES_ENVELOPE (1 << 6)
+#define MODES_CLAMPED (1 << 7)
 
 class patmanInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	patmanInstrument( InstrumentTrack * _track );
+	patmanInstrument(InstrumentTrack* _track);
 	virtual ~patmanInstrument();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n,
+		sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void loadFile(const QString& _file);
 
-	virtual void loadFile( const QString & _file );
+	virtual QString nodeName(void) const;
 
-	virtual QString nodeName( void ) const;
-
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	virtual f_cnt_t desiredReleaseFrames(void) const
 	{
-		return( 128 );
+		return (128);
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
-
+	virtual PluginView* instantiateView(QWidget* _parent);
 
 public slots:
-	void setFile( const QString & _patch_file, bool _rename = true );
-
+	void setFile(const QString& _patch_file, bool _rename = true);
 
 private:
 	typedef struct
@@ -86,10 +80,9 @@ private:
 	} handle_data;
 
 	QString m_patchFile;
-	QVector<SampleBuffer *> m_patchSamples;
+	QVector<SampleBuffer*> m_patchSamples;
 	BoolModel m_loopedModel;
 	BoolModel m_tunedModel;
-
 
 	enum LoadErrors
 	{
@@ -99,54 +92,44 @@ private:
 		LoadInstruments,
 		LoadLayers,
 		LoadIO
-	} ;
+	};
 
-	LoadErrors loadPatch( const QString & _filename );
-	void unloadCurrentPatch( void );
+	LoadErrors loadPatch(const QString& _filename);
+	void unloadCurrentPatch(void);
 
-	void selectSample( NotePlayHandle * _n );
-
+	void selectSample(NotePlayHandle* _n);
 
 	friend class PatmanView;
 
 signals:
-	void fileChanged( void );
-
-} ;
-
-
+	void fileChanged(void);
+};
 
 class PatmanView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	PatmanView( Instrument * _instrument, QWidget * _parent );
+	PatmanView(Instrument* _instrument, QWidget* _parent);
 	virtual ~PatmanView();
 
-
 public slots:
-	void openFile( void );
-	void updateFilename( void );
-
+	void openFile(void);
+	void updateFilename(void);
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void paintEvent( QPaintEvent * );
-
+	virtual void dragEnterEvent(QDragEnterEvent* _dee);
+	virtual void dropEvent(QDropEvent* _de);
+	virtual void paintEvent(QPaintEvent*);
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged(void);
 
-	patmanInstrument * m_pi;
+	patmanInstrument* m_pi;
 	QString m_displayFilename;
 
-	PixmapButton * m_openFileButton;
-	PixmapButton * m_loopButton;
-	PixmapButton * m_tuneButton;
-
-} ;
-
-
+	PixmapButton* m_openFileButton;
+	PixmapButton* m_loopButton;
+	PixmapButton* m_tuneButton;
+};
 
 #endif

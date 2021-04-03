@@ -22,27 +22,25 @@
  *
  */
 
-
-#include <QTimer>
-#include <QPainter>
-
-#include "embed.h"
 #include "FadeButton.h"
 
+#include <QPainter>
+#include <QTimer>
+
+#include "embed.h"
 
 const float FadeDuration = 300;
 
-
-FadeButton::FadeButton(const QColor & _normal_color,
-		const QColor & _activated_color,
-		const QColor & holdColor,
-		QWidget * _parent) :
-	QAbstractButton( _parent ),
-	m_stateTimer(),
-	m_releaseTimer(),
-	m_normalColor( _normal_color ),
-	m_activatedColor( _activated_color ),
-	m_holdColor( holdColor )
+FadeButton::FadeButton(const QColor& _normal_color,
+	const QColor& _activated_color,
+	const QColor& holdColor,
+	QWidget* _parent)
+	: QAbstractButton(_parent)
+	, m_stateTimer()
+	, m_releaseTimer()
+	, m_normalColor(_normal_color)
+	, m_activatedColor(_activated_color)
+	, m_holdColor(holdColor)
 {
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setCursor(QCursor(embed::getIconPixmap("hand"), 3, 3));
@@ -50,20 +48,14 @@ FadeButton::FadeButton(const QColor & _normal_color,
 	activeNotes = 0;
 }
 
-
-
-
 FadeButton::~FadeButton()
 {
 }
 
-void FadeButton::setActiveColor(const QColor & activated_color)
+void FadeButton::setActiveColor(const QColor& activated_color)
 {
 	m_activatedColor = activated_color;
 }
-
-
-
 
 void FadeButton::activate()
 {
@@ -72,16 +64,13 @@ void FadeButton::activate()
 	update();
 }
 
-
-
-
 void FadeButton::activateOnce()
 {
-	if (activeNotes == 0) { activate(); }
+	if (activeNotes == 0)
+	{
+		activate();
+	}
 }
-
-
-
 
 void FadeButton::noteEnd()
 {
@@ -103,22 +92,17 @@ void FadeButton::noteEnd()
 	update();
 }
 
-
-
-
-void FadeButton::paintEvent(QPaintEvent * _pe)
+void FadeButton::paintEvent(QPaintEvent* _pe)
 {
 	QColor col = m_normalColor;
 
-	if(m_stateTimer.isValid() && m_stateTimer.elapsed() < FadeDuration)
+	if (m_stateTimer.isValid() && m_stateTimer.elapsed() < FadeDuration)
 	{
 		// The first part of the fade, when a note is triggered.
 		col = fadeToColor(m_activatedColor, m_holdColor, m_stateTimer, FadeDuration);
 		QTimer::singleShot(20, this, SLOT(update()));
 	}
-	else if (m_stateTimer.isValid()
-		&& m_stateTimer.elapsed() >= FadeDuration
-		&& activeNotes > 0)
+	else if (m_stateTimer.isValid() && m_stateTimer.elapsed() >= FadeDuration && activeNotes > 0)
 	{
 		// The fade is done, but at least one note is still held.
 		col = m_holdColor;
@@ -144,22 +128,18 @@ void FadeButton::paintEvent(QPaintEvent * _pe)
 	p.drawLine(w, 1, w, h);
 	p.drawLine(1, h, w, h);
 	p.setPen(m_normalColor.lighter(130));
-	p.drawLine(0, 0, 0, h-1);
+	p.drawLine(0, 0, 0, h - 1);
 	p.drawLine(0, 0, w, 0);
 }
-
 
 QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QElapsedTimer timer, float duration)
 {
 	QColor col;
 
 	const float state = 1 - timer.elapsed() / duration;
-	const int r = (int)(endCol.red() * (1.0f - state)
-		+ startCol.red() * state);
-	const int g = (int)(endCol.green() * (1.0f - state)
-		+ startCol.green() * state);
-	const int b = (int)(endCol.blue() * (1.0f - state)
-		+ startCol.blue() * state);
+	const int r = (int)(endCol.red() * (1.0f - state) + startCol.red() * state);
+	const int g = (int)(endCol.green() * (1.0f - state) + startCol.green() * state);
+	const int b = (int)(endCol.blue() * (1.0f - state) + startCol.blue() * state);
 	col.setRgb(r, g, b);
 
 	return col;

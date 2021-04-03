@@ -26,11 +26,10 @@
 #ifndef _TIME_DISPLAY_WIDGET
 #define _TIME_DISPLAY_WIDGET
 
-#include <QWidget>
 #include <QHBoxLayout>
+#include <QWidget>
 
 #include "LcdWidget.h"
-
 
 class TimeDisplayWidget : public QWidget
 {
@@ -39,14 +38,11 @@ public:
 	TimeDisplayWidget();
 	virtual ~TimeDisplayWidget() = default;
 
-
 protected:
-	void mousePressEvent( QMouseEvent* mouseEvent ) override;
-
+	void mousePressEvent(QMouseEvent* mouseEvent) override;
 
 private slots:
 	void updateTime();
-
 
 private:
 	enum DisplayModes
@@ -57,14 +53,13 @@ private:
 	};
 	typedef DisplayModes DisplayMode;
 
-	void setDisplayMode( DisplayMode displayMode );
+	void setDisplayMode(DisplayMode displayMode);
 
 	DisplayMode m_displayMode;
 	QHBoxLayout m_spinBoxesLayout;
 	LcdWidget m_majorLCD;
 	LcdWidget m_minorLCD;
 	LcdWidget m_milliSecondsLCD;
-
-} ;
+};
 
 #endif

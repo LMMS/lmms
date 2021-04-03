@@ -25,19 +25,16 @@
 #ifndef LINKEDMODELGROUPS_H
 #define LINKEDMODELGROUPS_H
 
-
 #include <cstddef>
 #include <memory>
 #include <vector>
 
 #include "Model.h"
 
-
 /**
 	@file LinkedModelGroups.h
 	See Lv2ControlBase.h and Lv2Proc.h for example usage
 */
-
 
 /**
 	Base class for a group of linked models
@@ -56,12 +53,15 @@ public:
 		Initialization
 	*/
 	//! @param parent model of the LinkedModelGroups class
-	LinkedModelGroup(Model* parent) : Model(parent) {}
+	LinkedModelGroup(Model* parent)
+		: Model(parent)
+	{
+	}
 
 	/*
 		Linking (initially only)
 	*/
-	void linkControls(LinkedModelGroup *other);
+	void linkControls(LinkedModelGroup* other);
 
 	/*
 		Models
@@ -70,13 +70,18 @@ public:
 	{
 		QString m_name;
 		class AutomatableModel* m_model;
-		ModelInfo() { /* hopefully no one will use this */ } // TODO: remove?
+		ModelInfo()
+		{ /* hopefully no one will use this */
+		} // TODO: remove?
 		ModelInfo(const QString& name, AutomatableModel* model)
-			: m_name(name), m_model(model) {}
+			: m_name(name)
+			, m_model(model)
+		{
+		}
 	};
 
 	// TODO: refactor those 2
-	template<class Functor>
+	template <class Functor>
 	void foreach_model(const Functor& ftor)
 	{
 		for (auto itr = m_models.begin(); itr != m_models.end(); ++itr)
@@ -85,7 +90,7 @@ public:
 		}
 	}
 
-	template<class Functor>
+	template <class Functor>
 	void foreach_model(const Functor& ftor) const
 	{
 		for (auto itr = m_models.cbegin(); itr != m_models.cend(); ++itr)
@@ -96,7 +101,7 @@ public:
 
 	std::size_t modelNum() const { return m_models.size(); }
 	bool containsModel(const QString& name) const;
-	void removeControl(AutomatableModel *);
+	void removeControl(AutomatableModel*);
 
 	/*
 		Load/Save
@@ -131,7 +136,6 @@ private:
 	//! models for the controls
 	std::map<std::string, ModelInfo> m_models;
 };
-
 
 /**
 	Container for a group of linked models
@@ -170,6 +174,5 @@ public:
 	//! @see getGroup
 	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
 };
-
 
 #endif // LINKEDMODELGROUPS_H

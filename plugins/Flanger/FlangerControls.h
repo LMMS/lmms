@@ -26,9 +26,8 @@
 #define FLANGERCONTROLS_H
 
 #include "EffectControls.h"
-#include "Knob.h"
 #include "FlangerControlsDialog.h"
-
+#include "Knob.h"
 
 class FlangerEffect;
 
@@ -36,12 +35,12 @@ class FlangerControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	FlangerControls( FlangerEffect* effect );
+	FlangerControls(FlangerEffect* effect);
 	virtual ~FlangerControls()
 	{
 	}
-	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
-	virtual void loadSettings ( const QDomElement &_this );
+	virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
+	virtual void loadSettings(const QDomElement& _this);
 	inline virtual QString nodeName() const
 	{
 		return "Flanger";
@@ -52,7 +51,7 @@ public:
 	}
 	virtual EffectControlDialog* createView()
 	{
-		return new FlangerControlsDialog( this );
+		return new FlangerControlsDialog(this);
 	}
 
 private slots:
@@ -71,7 +70,6 @@ private:
 
 	friend class FlangerControlsDialog;
 	friend class FlangerEffect;
-
 };
 
 #endif // FLANGERCONTROLS_H

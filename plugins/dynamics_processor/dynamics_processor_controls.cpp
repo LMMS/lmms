@@ -23,104 +23,90 @@
  *
  */
 
+#include "dynamics_processor_controls.h"
 
 #include <QDomElement>
 
-#include "dynamics_processor_controls.h"
-#include "dynamics_processor.h"
-#include "base64.h"
-#include "Graph.h"
 #include "Engine.h"
+#include "Graph.h"
 #include "Song.h"
-
+#include "base64.h"
+#include "dynamics_processor.h"
 
 #define onedB 1.1220184543019633f
 
-dynProcControls::dynProcControls( dynProcEffect * _eff ) :
-	EffectControls( _eff ),
-	m_effect( _eff ),
-	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
-	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
-	m_attackModel( 10.0f, 1.0f, 500.0f, 1.0f, this, tr( "Attack time" ) ),
-	m_releaseModel( 100.0f, 1.0f, 500.0f, 1.0f, this, tr( "Release time" ) ),
-	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
-	m_stereomodeModel( 0, 0, 2, this, tr( "Stereo mode" ) )
+dynProcControls::dynProcControls(dynProcEffect* _eff)
+	: EffectControls(_eff)
+	, m_effect(_eff)
+	, m_inputModel(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Input gain"))
+	, m_outputModel(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Output gain"))
+	, m_attackModel(10.0f, 1.0f, 500.0f, 1.0f, this, tr("Attack time"))
+	, m_releaseModel(100.0f, 1.0f, 500.0f, 1.0f, this, tr("Release time"))
+	, m_wavegraphModel(0.0f, 1.0f, 200, this)
+	, m_stereomodeModel(0, 0, 2, this, tr("Stereo mode"))
 {
-	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( samplesChanged( int, int ) ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect(&m_wavegraphModel, SIGNAL(samplesChanged(int, int)),
+		this, SLOT(samplesChanged(int, int)));
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 
 	setDefaultShape();
-
 }
-
 
 void dynProcControls::sampleRateChanged()
 {
 	m_effect->m_needsUpdate = true;
 }
 
-
-void dynProcControls::samplesChanged( int _begin, int _end)
+void dynProcControls::samplesChanged(int _begin, int _end)
 {
 	Engine::getSong()->setModified();
 }
 
-
-
-
-void dynProcControls::loadSettings( const QDomElement & _this )
+void dynProcControls::loadSettings(const QDomElement& _this)
 {
-//load knobs, stereomode
-	m_inputModel.loadSettings( _this, "inputGain" );
-	m_outputModel.loadSettings( _this, "outputGain" );
-	m_attackModel.loadSettings( _this, "attack" );
-	m_releaseModel.loadSettings( _this, "release" );
-	m_stereomodeModel.loadSettings( _this, "stereoMode" );
-	
-//load waveshape
+	//load knobs, stereomode
+	m_inputModel.loadSettings(_this, "inputGain");
+	m_outputModel.loadSettings(_this, "outputGain");
+	m_attackModel.loadSettings(_this, "attack");
+	m_releaseModel.loadSettings(_this, "release");
+	m_stereomodeModel.loadSettings(_this, "stereoMode");
+
+	//load waveshape
 	int size = 0;
-	char * dst = 0;
-	base64::decode( _this.attribute( "waveShape"), &dst, &size );
+	char* dst = 0;
+	base64::decode(_this.attribute("waveShape"), &dst, &size);
 
-	m_wavegraphModel.setSamples( (float*) dst );
+	m_wavegraphModel.setSamples((float*)dst);
 	delete[] dst;
-
 }
 
-
-
-
-void dynProcControls::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void dynProcControls::saveSettings(QDomDocument& _doc,
+	QDomElement& _this)
 {
-//save input, output knobs
-	m_inputModel.saveSettings( _doc, _this, "inputGain" );
-	m_outputModel.saveSettings( _doc, _this, "outputGain" );
-	m_attackModel.saveSettings( _doc, _this, "attack" );
-	m_releaseModel.saveSettings( _doc, _this, "release" );
-	m_stereomodeModel.saveSettings( _doc, _this, "stereoMode" );
-	
+	//save input, output knobs
+	m_inputModel.saveSettings(_doc, _this, "inputGain");
+	m_outputModel.saveSettings(_doc, _this, "outputGain");
+	m_attackModel.saveSettings(_doc, _this, "attack");
+	m_releaseModel.saveSettings(_doc, _this, "release");
+	m_stereomodeModel.saveSettings(_doc, _this, "stereoMode");
 
-//save waveshape
+	//save waveshape
 	QString sampleString;
-	base64::encode( (const char *)m_wavegraphModel.samples(),
-		m_wavegraphModel.length() * sizeof(float), sampleString );
-	_this.setAttribute( "waveShape", sampleString );
-
+	base64::encode((const char*)m_wavegraphModel.samples(),
+		m_wavegraphModel.length() * sizeof(float), sampleString);
+	_this.setAttribute("waveShape", sampleString);
 }
-
 
 void dynProcControls::setDefaultShape()
 {
-	float shp [200] = { };
-	for ( int i = 0; i<200; i++)
+	float shp[200] = {};
+	for (int i = 0; i < 200; i++)
 	{
 		shp[i] = ((float)i + 1.0f) / 200.0f;
 	}
 
-	m_wavegraphModel.setLength( 200 );
-	m_wavegraphModel.setSamples( (float*)&shp );
+	m_wavegraphModel.setLength(200);
+	m_wavegraphModel.setSamples((float*)&shp);
 }
 
 void dynProcControls::resetClicked()
@@ -137,22 +123,18 @@ void dynProcControls::smoothClicked()
 
 void dynProcControls::addOneClicked()
 {
-	for( int i=0; i<200; i++ )
+	for (int i = 0; i < 200; i++)
 	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
+		m_wavegraphModel.setSampleAt(i, qBound(0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f));
 	}
 	Engine::getSong()->setModified();
 }
 
 void dynProcControls::subOneClicked()
 {
-	for( int i=0; i<200; i++ )
+	for (int i = 0; i < 200; i++)
 	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
+		m_wavegraphModel.setSampleAt(i, qBound(0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f));
 	}
 	Engine::getSong()->setModified();
 }
-
-
-
-

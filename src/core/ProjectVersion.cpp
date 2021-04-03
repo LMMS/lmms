@@ -24,15 +24,11 @@
  *
  */
 
-
 #include "ProjectVersion.h"
 
-
-
-
-ProjectVersion::ProjectVersion(QString version, CompareType c) :
-	m_version(version),
-	m_compareType(c)
+ProjectVersion::ProjectVersion(QString version, CompareType c)
+	: m_version(version)
+	, m_compareType(c)
 {
 	// Version numbers may have build data, prefixed with a '+',
 	// but this mustn't affect version precedence in comparisons
@@ -45,17 +41,24 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 	// The obligatory segment consists of three identifiers: MAJOR.MINOR.PATCH
 	QStringList mainVersion = obligatorySegment.split(".");
 	// HACK: Pad invalid versions in order to prevent crashes
-	while (mainVersion.size() < 3){ mainVersion.append("0"); }
+	while (mainVersion.size() < 3)
+	{
+		mainVersion.append("0");
+	}
 	m_major = mainVersion.at(0).toInt();
 	m_minor = mainVersion.at(1).toInt();
 	m_patch = mainVersion.at(2).toInt();
 
 	// Any # of optional pre-release identifiers may follow, separated by '.'s
-	if (!prereleaseSegment.isEmpty()){ m_labels = prereleaseSegment.split("."); }
+	if (!prereleaseSegment.isEmpty())
+	{
+		m_labels = prereleaseSegment.split(".");
+	}
 
 	// HACK: Handle old (1.2.2 and earlier), non-standard versions of the form
 	// MAJOR.MINOR.PATCH.COMMITS, used for non-release builds from source.
-	if (mainVersion.size() >= 4 && m_major <= 1 && m_minor <= 2 && m_patch <= 2){
+	if (mainVersion.size() >= 4 && m_major <= 1 && m_minor <= 2 && m_patch <= 2)
+	{
 		// Drop the standard version identifiers. erase(a, b) removes [a,b)
 		mainVersion.erase(mainVersion.begin(), mainVersion.begin() + 3);
 		// Prepend the remaining identifiers as prerelease versions
@@ -65,32 +68,48 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 	}
 }
 
-
-
-
-ProjectVersion::ProjectVersion(const char* version, CompareType c) : ProjectVersion(QString(version), c)
+ProjectVersion::ProjectVersion(const char* version, CompareType c)
+	: ProjectVersion(QString(version), c)
 {
 }
 
-
-
-
 //! @param c Determines the number of identifiers to check when comparing
-int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, CompareType c)
+int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c)
 {
 	// How many identifiers to compare before we consider the versions equal
 	const int limit = static_cast<int>(c);
 
 	// Use the value of limit to zero out identifiers we don't care about
 	int aMaj = 0, bMaj = 0, aMin = 0, bMin = 0, aPat = 0, bPat = 0;
-	if (limit >= 1){ aMaj = a.getMajor(); bMaj = b.getMajor(); }
-	if (limit >= 2){ aMin = a.getMinor(); bMin = b.getMinor(); }
-	if (limit >= 3){ aPat = a.getPatch(); bPat = b.getPatch(); }
+	if (limit >= 1)
+	{
+		aMaj = a.getMajor();
+		bMaj = b.getMajor();
+	}
+	if (limit >= 2)
+	{
+		aMin = a.getMinor();
+		bMin = b.getMinor();
+	}
+	if (limit >= 3)
+	{
+		aPat = a.getPatch();
+		bPat = b.getPatch();
+	}
 
 	// Then we can compare as if we care about every identifier
-	if(aMaj != bMaj){ return aMaj - bMaj; }
-	if(aMin != bMin){ return aMin - bMin; }
-	if(aPat != bPat){ return aPat - bPat; }
+	if (aMaj != bMaj)
+	{
+		return aMaj - bMaj;
+	}
+	if (aMin != bMin)
+	{
+		return aMin - bMin;
+	}
+	if (aPat != bPat)
+	{
+		return aPat - bPat;
+	}
 
 	// Decide how many optional identifiers we care about
 	const int maxLabels = qMax(0, limit - 3);
@@ -101,14 +120,21 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	const int commonLabels = qMin(aLabels.size(), bLabels.size());
 	// If one version has optional labels and the other doesn't,
 	// the one without them is bigger
-	if (commonLabels == 0){ return bLabels.size() - aLabels.size(); }
+	if (commonLabels == 0)
+	{
+		return bLabels.size() - aLabels.size();
+	}
 
 	// Otherwise, compare as many labels as we can
-	for (int i = 0; i < commonLabels; i++){
+	for (int i = 0; i < commonLabels; i++)
+	{
 		const QString& labelA = aLabels.at(i);
 		const QString& labelB = bLabels.at(i);
 		// If both labels are the same, skip
-		if (labelA == labelB){ continue; }
+		if (labelA == labelB)
+		{
+			continue;
+		}
 		// Numeric and non-numeric identifiers compare differently
 		bool aIsNumeric = false, bIsNumeric = false;
 		const int numA = labelA.toInt(&aIsNumeric);
@@ -117,9 +143,15 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 		aIsNumeric &= !labelA.startsWith("-");
 		bIsNumeric &= !labelB.startsWith("-");
 		// If only one identifier is numeric, that one is smaller
-		if (aIsNumeric != bIsNumeric){ return aIsNumeric ? -1 : 1; }
+		if (aIsNumeric != bIsNumeric)
+		{
+			return aIsNumeric ? -1 : 1;
+		}
 		// If both are numeric, compare as numbers
-		if (aIsNumeric && bIsNumeric){ return numA - numB; }
+		if (aIsNumeric && bIsNumeric)
+		{
+			return numA - numB;
+		}
 		// Otherwise, compare lexically
 		return labelA.compare(labelB);
 	}
@@ -127,9 +159,6 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	// If everything else matches, the version with more labels is bigger
 	return aLabels.size() - bLabels.size();
 }
-
-
-
 
 int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 {

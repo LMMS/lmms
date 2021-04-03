@@ -25,33 +25,29 @@
 #ifndef SIDE_BAR_H
 #define SIDE_BAR_H
 
-#include <QtCore/QMap>
 #include <QButtonGroup>
 #include <QToolBar>
+#include <QtCore/QMap>
 
 class QToolButton;
 class SideBarWidget;
-
 
 class SideBar : public QToolBar
 {
 	Q_OBJECT
 public:
-	SideBar( Qt::Orientation _orientation, QWidget * _parent );
+	SideBar(Qt::Orientation _orientation, QWidget* _parent);
 	virtual ~SideBar();
 
-	void appendTab( SideBarWidget * _sbw );
-
+	void appendTab(SideBarWidget* _sbw);
 
 private slots:
-	void toggleButton( QAbstractButton * _btn );
-
+	void toggleButton(QAbstractButton* _btn);
 
 private:
 	QButtonGroup m_btnGroup;
-	typedef QMap<QToolButton *, QWidget *> ButtonMap;
+	typedef QMap<QToolButton*, QWidget*> ButtonMap;
 	ButtonMap m_widgets;
-
-} ;
+};
 
 #endif

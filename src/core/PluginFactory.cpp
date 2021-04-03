@@ -28,16 +28,16 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
-#include "lmmsconfig.h"
 
 #include "ConfigManager.h"
 #include "Plugin.h"
 #include "embed.h"
+#include "lmmsconfig.h"
 
 #ifdef LMMS_BUILD_WIN32
-	QStringList nameFilters("*.dll");
+QStringList nameFilters("*.dll");
 #else
-	QStringList nameFilters("lib*.so");
+QStringList nameFilters("lib*.so");
 #endif
 
 qint64 qHash(const QFileInfo& fi)
@@ -60,9 +60,10 @@ PluginFactory::~PluginFactory()
 void PluginFactory::setupSearchPaths()
 {
 	// Adds a search path relative to the main executable if the path exists.
-	auto addRelativeIfExists = [](const QString & path) {
+	auto addRelativeIfExists = [](const QString& path) {
 		QDir dir(qApp->applicationDirPath());
-		if (!path.isEmpty() && dir.cd(path)) {
+		if (!path.isEmpty() && dir.cd(path))
+		{
 			QDir::addSearchPath("plugins", dir.absolutePath());
 		}
 	};
@@ -80,7 +81,7 @@ void PluginFactory::setupSearchPaths()
 	addRelativeIfExists("../lib/lmms"); // Installed
 #endif
 	addRelativeIfExists("plugins"); // Portable
-#ifdef PLUGIN_DIR // We may also have received a relative directory via a define
+#ifdef PLUGIN_DIR					// We may also have received a relative directory via a define
 	addRelativeIfExists(PLUGIN_DIR);
 #endif
 	// Or via an environment variable:
@@ -144,7 +145,7 @@ void PluginFactory::discoverPlugins()
 	QSet<QFileInfo> files;
 	for (const QString& searchPath : QDir::searchPaths("plugins"))
 	{
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 		auto discoveredPluginList = QDir(searchPath).entryInfoList(nameFilters);
 		files.unite(QSet<QFileInfo>(discoveredPluginList.begin(), discoveredPluginList.end()));
 #else
@@ -162,7 +163,8 @@ void PluginFactory::discoverPlugins()
 	for (const QFileInfo& file : files)
 	{
 		auto library = std::make_shared<QLibrary>(file.absoluteFilePath());
-		if (! library->load()) {
+		if (!library->load())
+		{
 			m_errors[file.baseName()] = library->errorString();
 			qWarning("%s", library->errorString().toLocal8Bit().data());
 			continue;
@@ -172,21 +174,20 @@ void PluginFactory::discoverPlugins()
 		if (library->resolve("lmms_plugin_main"))
 		{
 			QString descriptorName = file.baseName() + "_plugin_descriptor";
-			if( descriptorName.left(3) == "lib" )
+			if (descriptorName.left(3) == "lib")
 			{
 				descriptorName = descriptorName.mid(3);
 			}
 
 			pluginDescriptor = reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
-			if(pluginDescriptor == nullptr)
+			if (pluginDescriptor == nullptr)
 			{
-				qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").
-							  arg(file.absoluteFilePath()).arg(descriptorName);
+				qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").arg(file.absoluteFilePath()).arg(descriptorName);
 				continue;
 			}
 		}
 
-		if(pluginDescriptor)
+		if (pluginDescriptor)
 		{
 			PluginInfo info;
 			info.file = file;
@@ -197,23 +198,22 @@ void PluginFactory::discoverPlugins()
 			auto addSupportedFileTypes =
 				[this](QString supportedFileTypes,
 					const PluginInfo& info,
-					const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr)
-			{
-				if(!supportedFileTypes.isNull())
-				{
-					for (const QString& ext : supportedFileTypes.split(','))
+					const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr) {
+					if (!supportedFileTypes.isNull())
 					{
-						//qDebug() << "Plugin " << info.name()
-						//	<< "supports" << ext;
-						PluginInfoAndKey infoAndKey;
-						infoAndKey.info = info;
-						infoAndKey.key = key
-							? *key
-							: Plugin::Descriptor::SubPluginFeatures::Key();
-						m_pluginByExt.insert(ext, infoAndKey);
+						for (const QString& ext : supportedFileTypes.split(','))
+						{
+							//qDebug() << "Plugin " << info.name()
+							//	<< "supports" << ext;
+							PluginInfoAndKey infoAndKey;
+							infoAndKey.info = info;
+							infoAndKey.key = key
+								? *key
+								: Plugin::Descriptor::SubPluginFeatures::Key();
+							m_pluginByExt.insert(ext, infoAndKey);
+						}
 					}
-				}
-			};
+				};
 
 			if (info.descriptor->supportedFileTypes)
 				addSupportedFileTypes(QString(info.descriptor->supportedFileTypes), info);
@@ -225,8 +225,7 @@ void PluginFactory::discoverPlugins()
 				info.descriptor->subPluginFeatures->listSubPluginKeys(
 					info.descriptor,
 					subPluginKeys);
-				for(const Plugin::Descriptor::SubPluginFeatures::Key& key
-					: subPluginKeys)
+				for (const Plugin::Descriptor::SubPluginFeatures::Key& key : subPluginKeys)
 				{
 					addSupportedFileTypes(key.additionalFileExtensions(), info, &key);
 				}
@@ -239,8 +238,6 @@ void PluginFactory::discoverPlugins()
 	m_pluginInfos = pluginInfos;
 	m_descriptors = descriptors;
 }
-
-
 
 const QString PluginFactory::PluginInfo::name() const
 {

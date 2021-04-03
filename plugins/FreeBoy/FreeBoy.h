@@ -27,11 +27,12 @@
 #define FREEBOY_H
 
 #include <QObject>
+
+#include "Gb_Apu.h"
+#include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
-#include "Graph.h"
-#include "Gb_Apu.h"
 
 class FreeBoyInstrumentView;
 class NotePlayHandle;
@@ -41,26 +42,23 @@ class FreeBoyInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-
-	FreeBoyInstrument( InstrumentTrack * _instrument_track );
+	FreeBoyInstrument(InstrumentTrack* _instrument_track);
 	virtual ~FreeBoyInstrument();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n,
+		sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
 	virtual f_cnt_t desiredReleaseFrames() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual PluginView* instantiateView(QWidget* _parent);
 
-
-/*public slots:
+	/*public slots:
 	void updateKnobHint();
 	void updateKnobToolTip();*/
 
@@ -101,65 +99,63 @@ private:
 	FloatModel m_trebleModel;
 	FloatModel m_bassModel;
 
-	graphModel  m_graphModel;
+	graphModel m_graphModel;
 
 	// Fake CPU timing
 	blip_time_t m_time;
 	blip_time_t fakeClock() { return m_time += 4; }
 
 	friend class FreeBoyInstrumentView;
-} ;
-
+};
 
 class FreeBoyInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	FreeBoyInstrumentView( Instrument * _instrument, QWidget * _parent );
+	FreeBoyInstrumentView(Instrument* _instrument, QWidget* _parent);
 	virtual ~FreeBoyInstrumentView();
 
 private:
 	virtual void modelChanged();
 
-	Knob * m_ch1SweepTimeKnob;
-	PixmapButton * m_ch1SweepDirButton;
-	Knob * m_ch1SweepRtShiftKnob;
-	Knob * m_ch1WavePatternDutyKnob;
-	Knob * m_ch1VolumeKnob;
-	PixmapButton * m_ch1VolSweepDirButton;
-	Knob * m_ch1SweepStepLengthKnob;
+	Knob* m_ch1SweepTimeKnob;
+	PixmapButton* m_ch1SweepDirButton;
+	Knob* m_ch1SweepRtShiftKnob;
+	Knob* m_ch1WavePatternDutyKnob;
+	Knob* m_ch1VolumeKnob;
+	PixmapButton* m_ch1VolSweepDirButton;
+	Knob* m_ch1SweepStepLengthKnob;
 
-	Knob * m_ch2WavePatternDutyKnob;
-	Knob * m_ch2VolumeKnob;
-	PixmapButton * m_ch2VolSweepDirButton;
-	Knob * m_ch2SweepStepLengthKnob;
+	Knob* m_ch2WavePatternDutyKnob;
+	Knob* m_ch2VolumeKnob;
+	PixmapButton* m_ch2VolSweepDirButton;
+	Knob* m_ch2SweepStepLengthKnob;
 
-	Knob * m_ch3VolumeKnob;
+	Knob* m_ch3VolumeKnob;
 
-	Knob * m_ch4VolumeKnob;
-	PixmapButton * m_ch4VolSweepDirButton;
-	Knob * m_ch4SweepStepLengthKnob;
-	PixmapButton * m_ch4ShiftRegWidthButton;
+	Knob* m_ch4VolumeKnob;
+	PixmapButton* m_ch4VolSweepDirButton;
+	Knob* m_ch4SweepStepLengthKnob;
+	PixmapButton* m_ch4ShiftRegWidthButton;
 
-	Knob * m_so1VolumeKnob;
-	Knob * m_so2VolumeKnob;
-	PixmapButton * m_ch1So1Button;
-	PixmapButton * m_ch2So1Button;
-	PixmapButton * m_ch3So1Button;
-	PixmapButton * m_ch4So1Button;
-	PixmapButton * m_ch1So2Button;
-	PixmapButton * m_ch2So2Button;
-	PixmapButton * m_ch3So2Button;
-	PixmapButton * m_ch4So2Button;
-	Knob * m_trebleKnob;
-	Knob * m_bassKnob;
+	Knob* m_so1VolumeKnob;
+	Knob* m_so2VolumeKnob;
+	PixmapButton* m_ch1So1Button;
+	PixmapButton* m_ch2So1Button;
+	PixmapButton* m_ch3So1Button;
+	PixmapButton* m_ch4So1Button;
+	PixmapButton* m_ch1So2Button;
+	PixmapButton* m_ch2So2Button;
+	PixmapButton* m_ch3So2Button;
+	PixmapButton* m_ch4So2Button;
+	Knob* m_trebleKnob;
+	Knob* m_bassKnob;
 
-	Graph * m_graph;
+	Graph* m_graph;
 
-/*protected slots:
+	/*protected slots:
 	void updateKnobHint();
 	void updateKnobToolTip();*/
-} ;
-
+};
 
 #endif

@@ -26,8 +26,6 @@
 
 #include "LcdFloatSpinBox.h"
 
-#include <cmath>
-
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QInputDialog>
@@ -37,51 +35,49 @@
 #include <QPixmap>
 #include <QStyleOptionFrameV2>
 #include <QVBoxLayout>
+#include <cmath>
 
 #include "CaptionMenu.h"
-#include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "MainWindow.h"
+#include "embed.h"
+#include "gui_templates.h"
 
-
-LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent) :
-	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
-	m_wholeDisplay(numWhole, parent, name, false),
-	m_fractionDisplay(numFrac, parent, name, true),
-	m_mouseMoving(false),
-	m_intStep(false),
-	m_origMousePos(),
-	m_displayOffset(0)
+LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent)
+	: FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this)
+	, m_wholeDisplay(numWhole, parent, name, false)
+	, m_fractionDisplay(numFrac, parent, name, true)
+	, m_mouseMoving(false)
+	, m_intStep(false)
+	, m_origMousePos()
+	, m_displayOffset(0)
 {
 	layoutSetup();
 }
 
-
-LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, const QString& name, QWidget* parent) :
-	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
-	m_wholeDisplay(numWhole, style, parent, name, false),
-	m_fractionDisplay(numFrac, style, parent, name, true),
-	m_mouseMoving(false),
-	m_intStep(false),
-	m_origMousePos(),
-	m_displayOffset(0)
+LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, const QString& name, QWidget* parent)
+	: FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this)
+	, m_wholeDisplay(numWhole, style, parent, name, false)
+	, m_fractionDisplay(numFrac, style, parent, name, true)
+	, m_mouseMoving(false)
+	, m_intStep(false)
+	, m_origMousePos()
+	, m_displayOffset(0)
 {
 	layoutSetup(style);
 }
 
-
-void LcdFloatSpinBox::layoutSetup(const QString &style)
+void LcdFloatSpinBox::layoutSetup(const QString& style)
 {
 	// Assemble the LCD parts
-	QHBoxLayout *lcdLayout = new QHBoxLayout();
+	QHBoxLayout* lcdLayout = new QHBoxLayout();
 
 	m_wholeDisplay.setSeamless(false, true);
 	m_fractionDisplay.setSeamless(true, false);
 
 	lcdLayout->addWidget(&m_wholeDisplay);
 
-	QLabel *dotLabel = new QLabel("", this);
+	QLabel* dotLabel = new QLabel("", this);
 	QPixmap dotPixmap(embed::getIconPixmap(QString("lcd_" + style + "_dot").toUtf8().constData()));
 	dotLabel->setPixmap(dotPixmap.copy(0, 0, dotPixmap.size().width(), dotPixmap.size().height() / 2));
 	lcdLayout->addWidget(dotLabel);
@@ -92,14 +88,13 @@ void LcdFloatSpinBox::layoutSetup(const QString &style)
 	lcdLayout->setSpacing(0);
 
 	// Add space for label
-	QVBoxLayout *outerLayout = new QVBoxLayout();
+	QVBoxLayout* outerLayout = new QVBoxLayout();
 	outerLayout->addLayout(lcdLayout);
 	outerLayout->addSpacing(9);
 	outerLayout->setContentsMargins(0, 0, 0, 0);
 	outerLayout->setSizeConstraint(QLayout::SetFixedSize);
 	this->setLayout(outerLayout);
 }
-
 
 void LcdFloatSpinBox::update()
 {
@@ -112,14 +107,12 @@ void LcdFloatSpinBox::update()
 	QWidget::update();
 }
 
-
 void LcdFloatSpinBox::contextMenuEvent(QContextMenuEvent* event)
 {
 	CaptionMenu contextMenu(model()->displayName());
 	addDefaultActions(&contextMenu);
 	contextMenu.exec(QCursor::pos());
 }
-
 
 void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 {
@@ -130,7 +123,7 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 		m_mouseMoving = true;
 		m_origMousePos = event->globalPos();
 
-		AutomatableModel *thisModel = model();
+		AutomatableModel* thisModel = model();
 		if (thisModel)
 		{
 			thisModel->addJournalCheckPoint();
@@ -143,17 +136,25 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 	}
 }
 
-
 void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
-	else { m_intStep = false; }
+	if (event->x() < m_wholeDisplay.width())
+	{
+		m_intStep = true;
+	}
+	else
+	{
+		m_intStep = false;
+	}
 
 	if (m_mouseMoving)
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if (gui->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
+		if (gui->mainWindow()->isShiftPressed())
+		{
+			dy = qBound(-4, dy / 4, 4);
+		}
 		if (dy > 1 || dy < -1)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());
@@ -162,7 +163,6 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 		}
 	}
 }
-
 
 void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 {
@@ -173,24 +173,27 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 	}
 }
 
-
-void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
+void LcdFloatSpinBox::wheelEvent(QWheelEvent* event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
-	else { m_intStep = false; }
+	if (event->x() < m_wholeDisplay.width())
+	{
+		m_intStep = true;
+	}
+	else
+	{
+		m_intStep = false;
+	}
 
 	event->accept();
 	model()->setValue(model()->value() + ((event->delta() > 0) ? 1 : -1) * getStep());
 	emit manualChange();
 }
 
-
-void LcdFloatSpinBox::mouseDoubleClickEvent(QMouseEvent *)
+void LcdFloatSpinBox::mouseDoubleClickEvent(QMouseEvent*)
 {
 	enterValue();
 }
-
 
 void LcdFloatSpinBox::enterValue()
 {
@@ -198,14 +201,12 @@ void LcdFloatSpinBox::enterValue()
 	float newVal;
 
 	newVal = QInputDialog::getDouble(
-			this, tr("Set value"),
-			tr("Please enter a new value between %1 and %2:").
-				arg(model()->minValue()).
-				arg(model()->maxValue()),
-			model()->value(),
-			model()->minValue(),
-			model()->maxValue(),
-			m_fractionDisplay.numDigits(), &ok);
+		this, tr("Set value"),
+		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
+		model()->value(),
+		model()->minValue(),
+		model()->maxValue(),
+		m_fractionDisplay.numDigits(), &ok);
 
 	if (ok)
 	{
@@ -213,13 +214,17 @@ void LcdFloatSpinBox::enterValue()
 	}
 }
 
-
 float LcdFloatSpinBox::getStep() const
 {
-	if (m_intStep) { return 1; }
-	else { return model()->step<float>(); }
+	if (m_intStep)
+	{
+		return 1;
+	}
+	else
+	{
+		return model()->step<float>();
+	}
 }
-
 
 void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 {

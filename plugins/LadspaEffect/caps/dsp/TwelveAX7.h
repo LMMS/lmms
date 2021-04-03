@@ -27,8 +27,9 @@
 #ifndef _DSP_TWELVE_AX_7_H_
 #define _DSP_TWELVE_AX_7_H_
 
-namespace DSP {
-	
+namespace DSP
+{
+
 #include "r12ax7.h"
 
 typedef sample_t tube_sample;
@@ -40,62 +41,62 @@ typedef sample_t tube_sample;
  */
 class TwelveAX7
 {
-	public:
-		tube_sample b, c, d;
-		
-		struct {
-			tube_sample threshold, value;
-		} clip[2];
+public:
+	tube_sample b, c, d;
 
-		/* amplitude at which clipping starts */
-		tube_sample scale;
+	struct
+	{
+		tube_sample threshold, value;
+	} clip[2];
 
-	public:
-		TwelveAX7()
-			{ 
-				/* transfer polynomial parameters */
-				b = -0.79618574210627535;
-				c = -0.21108555430962023;
-				d = +0.38944033523200522;
+	/* amplitude at which clipping starts */
+	tube_sample scale;
 
-				set_clips();
+public:
+	TwelveAX7()
+	{
+		/* transfer polynomial parameters */
+		b = -0.79618574210627535;
+		c = -0.21108555430962023;
+		d = +0.38944033523200522;
 
-				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
-			}
+		set_clips();
 
-		inline tube_sample transfer (tube_sample a)
-			{ 
-				return a * (b + a * (c + a * d)); 
-			}
-			
-		inline tube_sample transfer_clip (tube_sample a)
-			{
-				if (a <= clip[0].threshold)
-					return clip[0].value;
-				if (a >= clip[1].threshold)
-					return clip[1].value;
-				return transfer (a);
-			}
+		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
+	}
 
-		inline double get_root (double sign)
-			{
-				/* only once, no need to optimize */
-				return 
-					(-2*c + sign * sqrt ((2*c) * (2*c) - 4 * (3 * d * b))) / (6 * d);
-			}
+	inline tube_sample transfer(tube_sample a)
+	{
+		return a * (b + a * (c + a * d));
+	}
 
-		inline void set_clips()
-			{
-				/* find 0 crossings in the derived, this is where we'll clip */
-				double x0 = get_root (-1);
-				double x1 = get_root (+1);
+	inline tube_sample transfer_clip(tube_sample a)
+	{
+		if (a <= clip[0].threshold)
+			return clip[0].value;
+		if (a >= clip[1].threshold)
+			return clip[1].value;
+		return transfer(a);
+	}
 
-				clip[0].value = transfer (x0);
-				clip[1].value = transfer (x1);
+	inline double get_root(double sign)
+	{
+		/* only once, no need to optimize */
+		return (-2 * c + sign * sqrt((2 * c) * (2 * c) - 4 * (3 * d * b))) / (6 * d);
+	}
 
-				clip[0].threshold = x0;
-				clip[1].threshold = x1;
-			}
+	inline void set_clips()
+	{
+		/* find 0 crossings in the derived, this is where we'll clip */
+		double x0 = get_root(-1);
+		double x1 = get_root(+1);
+
+		clip[0].value = transfer(x0);
+		clip[1].value = transfer(x1);
+
+		clip[0].threshold = x0;
+		clip[1].threshold = x1;
+	}
 };
 
 /* reworked model. higher order (than 3) polynomials make little sense;
@@ -104,45 +105,46 @@ class TwelveAX7
  */
 class TwelveAX7_2
 {
-	public:
-		tube_sample b, c, d;
+public:
+	tube_sample b, c, d;
 
-		struct {
-			tube_sample threshold, value;
-		} clip[2];
+	struct
+	{
+		tube_sample threshold, value;
+	} clip[2];
 
-		tube_sample scale;
+	tube_sample scale;
 
-	public:
-		TwelveAX7_2()
-			{ 
-				/* transfer polynomial parameters, made with gnuplot::fit() */
-				b = -1.08150605597883;
-				c = -0.262760944760536;
-				d = 0.445770802765903;
-			
-				static double x[2] = {-.52, +.98};
+public:
+	TwelveAX7_2()
+	{
+		/* transfer polynomial parameters, made with gnuplot::fit() */
+		b = -1.08150605597883;
+		c = -0.262760944760536;
+		d = 0.445770802765903;
 
-				for (int i = 0; i < 2; ++i)
-					clip[i].threshold = x[i],
-					clip[i].value = transfer (x[i]);
+		static double x[2] = {-.52, +.98};
 
-				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
-			}
+		for (int i = 0; i < 2; ++i)
+			clip[i].threshold = x[i],
+			clip[i].value = transfer(x[i]);
 
-		inline tube_sample transfer (tube_sample a)
-			{ 
-				return a * (b + a * (c + a * d));
-			}
-			
-		inline tube_sample transfer_clip (tube_sample a)
-			{
-				if (a <= clip[0].threshold)
-					return clip[0].value;
-				if (a >= clip[1].threshold)
-					return clip[1].value;
-				return transfer (a);
-			}
+		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
+	}
+
+	inline tube_sample transfer(tube_sample a)
+	{
+		return a * (b + a * (c + a * d));
+	}
+
+	inline tube_sample transfer_clip(tube_sample a)
+	{
+		if (a <= clip[0].threshold)
+			return clip[0].value;
+		if (a >= clip[1].threshold)
+			return clip[1].value;
+		return transfer(a);
+	}
 };
 
 /* third model relies on linear interpolation based on the transfer function
@@ -150,89 +152,90 @@ class TwelveAX7_2
  */
 class TwelveAX7_3
 {
-	public:
-		tube_sample b, c, d;
+public:
+	tube_sample b, c, d;
 
-		struct {
-			tube_sample threshold, value;
-		} clip[2];
+	struct
+	{
+		tube_sample threshold, value;
+	} clip[2];
 
-		tube_sample scale;
+	tube_sample scale;
 
-	public:
-		TwelveAX7_3()
-			{ 
-				static double x[2] = 
-					{
-						(double) r12AX7::Zero / 
-								((double) r12AX7::Samples - (double) r12AX7::Zero),
-						1
-					};
-
-				for (int i = 0; i < 2; ++i)
-					clip[i].threshold = x[i],
-					clip[i].value = transfer (x[i]);
-
-				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
-			}
-
-		inline tube_sample transfer (tube_sample a)
-			{ 
-				a = r12AX7::Zero + a * (r12AX7::Samples - r12AX7::Zero);
-				if (a <= 0)
-					return r12AX7::v2v[0];
-				if (a >= r12AX7::Samples - 1)
-					return r12AX7::v2v [r12AX7::Samples - 1];
-
-				/* linear interpolation from sampled function */
-				register int i = lrintf (a);
-				a -= i;
-				
-				return (r12AX7::v2v [i] * (1.f - a) + r12AX7::v2v [i + 1] * a);
-			}
-			
-		inline tube_sample transfer_clip (tube_sample a)
+public:
+	TwelveAX7_3()
+	{
+		static double x[2] =
 			{
-				return transfer (a);
-			}
+				(double)r12AX7::Zero /
+					((double)r12AX7::Samples - (double)r12AX7::Zero),
+				1};
+
+		for (int i = 0; i < 2; ++i)
+			clip[i].threshold = x[i],
+			clip[i].value = transfer(x[i]);
+
+		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
+	}
+
+	inline tube_sample transfer(tube_sample a)
+	{
+		a = r12AX7::Zero + a * (r12AX7::Samples - r12AX7::Zero);
+		if (a <= 0)
+			return r12AX7::v2v[0];
+		if (a >= r12AX7::Samples - 1)
+			return r12AX7::v2v[r12AX7::Samples - 1];
+
+		/* linear interpolation from sampled function */
+		register int i = lrintf(a);
+		a -= i;
+
+		return (r12AX7::v2v[i] * (1.f - a) + r12AX7::v2v[i + 1] * a);
+	}
+
+	inline tube_sample transfer_clip(tube_sample a)
+	{
+		return transfer(a);
+	}
 };
 
 /* experimental */
 class NoTwelveAX7
 {
-	public:
-		struct {
-			tube_sample threshold, value;
-		} clip[2];
+public:
+	struct
+	{
+		tube_sample threshold, value;
+	} clip[2];
 
-		/* amplitude at which clipping starts */
-		tube_sample scale;
+	/* amplitude at which clipping starts */
+	tube_sample scale;
 
-	public:
-		NoTwelveAX7()
-			{ 
-				static double x[2] = { -1, 1 };
+public:
+	NoTwelveAX7()
+	{
+		static double x[2] = {-1, 1};
 
-				for (int i = 0; i < 2; ++i)
-					clip[i].threshold = x[i],
-					clip[i].value = transfer (x[i]);
+		for (int i = 0; i < 2; ++i)
+			clip[i].threshold = x[i],
+			clip[i].value = transfer(x[i]);
 
-				scale = min (fabs (clip[0].threshold), fabs (clip[1].threshold));
-			}
+		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
+	}
 
-		inline tube_sample transfer (tube_sample a)
-			{ 
-				return 0.5469181606780 * (pow (1 - a, 1.5) - 1);
-			}
-			
-		inline tube_sample transfer_clip (tube_sample a)
-			{
-				if (a <= clip[0].threshold)
-					return clip[0].value;
-				if (a >= clip[1].threshold)
-					return clip[1].value;
-				return transfer (a);
-			}
+	inline tube_sample transfer(tube_sample a)
+	{
+		return 0.5469181606780 * (pow(1 - a, 1.5) - 1);
+	}
+
+	inline tube_sample transfer_clip(tube_sample a)
+	{
+		if (a <= clip[0].threshold)
+			return clip[0].value;
+		if (a >= clip[1].threshold)
+			return clip[1].value;
+		return transfer(a);
+	}
 };
 
 } /* namespace DSP */

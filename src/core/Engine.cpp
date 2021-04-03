@@ -22,9 +22,10 @@
  *
  */
 
-
 #include "Engine.h"
+
 #include "BBTrackContainer.h"
+#include "BandLimitedWave.h"
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
@@ -34,26 +35,22 @@
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
-#include "BandLimitedWave.h"
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
-FxMixer * LmmsCore::s_fxMixer = NULL;
-BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
-Song * LmmsCore::s_song = NULL;
-ProjectJournal * LmmsCore::s_projectJournal = NULL;
+FxMixer* LmmsCore::s_fxMixer = NULL;
+BBTrackContainer* LmmsCore::s_bbTrackContainer = NULL;
+Song* LmmsCore::s_song = NULL;
+ProjectJournal* LmmsCore::s_projectJournal = NULL;
 #ifdef LMMS_HAVE_LV2
-Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
+Lv2Manager* LmmsCore::s_lv2Manager = nullptr;
 #endif
-Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+Ladspa2LMMS* LmmsCore::s_ladspaManager = NULL;
 void* LmmsCore::s_dndPluginKey = nullptr;
 
-
-
-
-void LmmsCore::init( bool renderOnly )
+void LmmsCore::init(bool renderOnly)
 {
-	LmmsCore *engine = inst();
+	LmmsCore* engine = inst();
 
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
@@ -61,7 +58,7 @@ void LmmsCore::init( bool renderOnly )
 
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new Mixer( renderOnly );
+	s_mixer = new Mixer(renderOnly);
 	s_song = new Song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
@@ -72,7 +69,7 @@ void LmmsCore::init( bool renderOnly )
 #endif
 	s_ladspaManager = new Ladspa2LMMS;
 
-	s_projectJournal->setJournalling( true );
+	s_projectJournal->setJournalling(true);
 
 	emit engine->initProgress(tr("Opening audio and midi devices"));
 	s_mixer->initDevices();
@@ -83,9 +80,6 @@ void LmmsCore::init( bool renderOnly )
 	s_mixer->startProcessing();
 }
 
-
-
-
 void LmmsCore::destroy()
 {
 	s_projectJournal->stopAllJournalling();
@@ -95,26 +89,23 @@ void LmmsCore::destroy()
 
 	s_song->clearProject();
 
-	deleteHelper( &s_bbTrackContainer );
+	deleteHelper(&s_bbTrackContainer);
 
-	deleteHelper( &s_fxMixer );
-	deleteHelper( &s_mixer );
+	deleteHelper(&s_fxMixer);
+	deleteHelper(&s_mixer);
 
 #ifdef LMMS_HAVE_LV2
-	deleteHelper( &s_lv2Manager );
+	deleteHelper(&s_lv2Manager);
 #endif
-	deleteHelper( &s_ladspaManager );
+	deleteHelper(&s_ladspaManager);
 
 	//delete ConfigManager::inst();
-	deleteHelper( &s_projectJournal );
+	deleteHelper(&s_projectJournal);
 
-	deleteHelper( &s_song );
+	deleteHelper(&s_song);
 
 	delete ConfigManager::inst();
 }
-
-
-
 
 bool LmmsCore::ignorePluginBlacklist()
 {
@@ -122,42 +113,27 @@ bool LmmsCore::ignorePluginBlacklist()
 	return (envVar && *envVar);
 }
 
-
-
-
 float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 {
 	return sampleRate * 60.0f * 4 /
-			DefaultTicksPerBar / s_song->getTempo();
+		DefaultTicksPerBar / s_song->getTempo();
 }
-
-
-
 
 void LmmsCore::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerBar / s_song->getTempo();
+		DefaultTicksPerBar / s_song->getTempo();
 }
 
-
-
-
-void LmmsCore::setDndPluginKey(void *newKey)
+void LmmsCore::setDndPluginKey(void* newKey)
 {
 	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
 	s_dndPluginKey = newKey;
 }
 
-
-
-
-void *LmmsCore::pickDndPluginKey()
+void* LmmsCore::pickDndPluginKey()
 {
 	return s_dndPluginKey;
 }
 
-
-
-
-LmmsCore * LmmsCore::s_instanceOfMe = NULL;
+LmmsCore* LmmsCore::s_instanceOfMe = NULL;

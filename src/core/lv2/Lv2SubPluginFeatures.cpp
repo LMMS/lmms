@@ -36,57 +36,46 @@
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
 
-
-const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k)
+const LilvPlugin* Lv2SubPluginFeatures::getPlugin(
+	const Plugin::Descriptor::SubPluginFeatures::Key& k)
 {
-	const LilvPlugin* result = Engine::getLv2Manager()->
-		getPlugin(k.attributes["uri"]);
+	const LilvPlugin* result = Engine::getLv2Manager()->getPlugin(k.attributes["uri"]);
 	Q_ASSERT(result);
 	return result;
 }
 
-
-
-
-QString Lv2SubPluginFeatures::pluginName(const LilvPlugin *plug)
+QString Lv2SubPluginFeatures::pluginName(const LilvPlugin* plug)
 {
 	return qStringFromPluginNode(plug, lilv_plugin_get_name);
 }
 
-
-
-
-Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes type) :
-	SubPluginFeatures(type)
+Lv2SubPluginFeatures::Lv2SubPluginFeatures(Plugin::PluginTypes type)
+	: SubPluginFeatures(type)
 {
 }
 
-
-
-
-void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
-													const Key *k) const
+void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget* parent,
+	const Key* k) const
 {
-	const LilvPlugin *plug = getPlugin(*k);
+	const LilvPlugin* plug = getPlugin(*k);
 
-	QLabel *label = new QLabel(parent);
+	QLabel* label = new QLabel(parent);
 	label->setText(QWidget::tr("Name: ") + pluginName(plug));
 
-	QLabel *label2 = new QLabel(parent);
+	QLabel* label2 = new QLabel(parent);
 	label2->setText(QWidget::tr("URI: ") +
 		lilv_node_as_uri(lilv_plugin_get_uri(plug)));
 
-	QWidget *maker = new QWidget(parent);
-	QHBoxLayout *l = new QHBoxLayout(maker);
+	QWidget* maker = new QWidget(parent);
+	QHBoxLayout* l = new QHBoxLayout(maker);
 	l->setMargin(0);
 	l->setSpacing(0);
 
-	QLabel *maker_label = new QLabel(maker);
+	QLabel* maker_label = new QLabel(maker);
 	maker_label->setText(QWidget::tr("Maker: "));
 	maker_label->setAlignment(Qt::AlignTop);
 
-	QLabel *maker_content = new QLabel(maker);
+	QLabel* maker_content = new QLabel(maker);
 	maker_content->setText(
 		qStringFromPluginNode(plug, lilv_plugin_get_author_name));
 	maker_content->setWordWrap(true);
@@ -94,17 +83,17 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	l->addWidget(maker_label);
 	l->addWidget(maker_content, 1);
 
-	QWidget *copyright = new QWidget(parent);
+	QWidget* copyright = new QWidget(parent);
 	l = new QHBoxLayout(copyright);
 	l->setMargin(0);
 	l->setSpacing(0);
 	copyright->setMinimumWidth(parent->minimumWidth());
 
-	QLabel *copyright_label = new QLabel(copyright);
+	QLabel* copyright_label = new QLabel(copyright);
 	copyright_label->setText(QWidget::tr("Copyright: "));
 	copyright_label->setAlignment(Qt::AlignTop);
 
-	QLabel *copyright_content = new QLabel(copyright);
+	QLabel* copyright_content = new QLabel(copyright);
 	copyright_content->setText("<unknown>");
 	copyright_content->setWordWrap(true);
 	l->addWidget(copyright_label);
@@ -115,11 +104,8 @@ void Lv2SubPluginFeatures::fillDescriptionWidget(QWidget *parent,
 	// possibly TODO: version, project, plugin type, number of channels
 }
 
-
-
-
 QString Lv2SubPluginFeatures::additionalFileExtensions(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	(void)k;
 	// lv2 only loads .lv2 files
@@ -127,43 +113,31 @@ QString Lv2SubPluginFeatures::additionalFileExtensions(
 	return QString();
 }
 
-
-
-
 QString Lv2SubPluginFeatures::displayName(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	return pluginName(getPlugin(k));
 }
 
-
-
-
 QString Lv2SubPluginFeatures::description(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	(void)k;
 	return QString::fromUtf8("description not implemented yet"); // TODO
 }
 
-
-
-
-const PixmapLoader *Lv2SubPluginFeatures::logo(
-	const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+const PixmapLoader* Lv2SubPluginFeatures::logo(
+	const Plugin::Descriptor::SubPluginFeatures::Key& k) const
 {
 	(void)k; // TODO
 	return nullptr;
 }
 
-
-
-
-void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
-												KeyList &kl) const
+void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* desc,
+	KeyList& kl) const
 {
-	Lv2Manager *lv2Mgr = Engine::getLv2Manager();
-	for (const auto &uriInfoPair : *lv2Mgr)
+	Lv2Manager* lv2Mgr = Engine::getLv2Manager();
+	for (const auto& uriInfoPair : *lv2Mgr)
 	{
 		if (uriInfoPair.second.type() == m_type && uriInfoPair.second.isValid())
 		{
@@ -181,4 +155,3 @@ void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
 }
 
 #endif // LMMS_HAVE_LV2
-

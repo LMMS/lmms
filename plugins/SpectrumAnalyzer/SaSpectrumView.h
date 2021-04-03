@@ -27,12 +27,12 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
-#include "SaControls.h"
-
-#include <string>
-#include <utility>
 #include <QPainterPath>
 #include <QWidget>
+#include <string>
+#include <utility>
+
+#include "SaControls.h"
 
 class QMouseEvent;
 class QPainter;
@@ -43,29 +43,29 @@ class SaSpectrumView : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
+	explicit SaSpectrumView(SaControls* controls, SaProcessor* processor, QWidget* _parent = 0);
 	virtual ~SaSpectrumView() {}
 
-	QSize sizeHint() const override {return QSize(400, 200);}
+	QSize sizeHint() const override { return QSize(400, 200); }
 
 protected:
-	void paintEvent(QPaintEvent *event) override;
-	void mouseMoveEvent(QMouseEvent *event) override;
-	void mousePressEvent(QMouseEvent *event) override;
-	void resizeEvent(QResizeEvent *event) override;
+	void paintEvent(QPaintEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void resizeEvent(QResizeEvent* event) override;
 
 private slots:
 	void periodicUpdate();
 
 private:
-	const SaControls *m_controls;
-	SaProcessor *m_processor;
+	const SaControls* m_controls;
+	SaProcessor* m_processor;
 
 	// grid labels (position, label) and methods to generate them
 	std::vector<std::pair<int, std::string>> m_logFreqTics;		// 10-20-50... Hz
 	std::vector<std::pair<int, std::string>> m_linearFreqTics;	// 2k-4k-6k... Hz
 	std::vector<std::pair<float, std::string>> m_logAmpTics;	// dB
-	std::vector<std::pair<float, std::string>> m_linearAmpTics;	// 0..1
+	std::vector<std::pair<float, std::string>> m_linearAmpTics; // 0..1
 
 	std::vector<std::pair<int, std::string>> makeLogFreqTics(int low, int high);
 	std::vector<std::pair<int, std::string>> makeLinearFreqTics(int low, int high);
@@ -77,7 +77,7 @@ private:
 	int m_ampRangeIndex;
 
 	// draw the grid and all labels based on selected ranges
-	void drawGrid(QPainter &painter);
+	void drawGrid(QPainter& painter);
 
 	// local buffers for frequency bin values and a method to update them
 	// (mainly needed for averaging and to keep track of peak values)
@@ -85,7 +85,7 @@ private:
 	std::vector<float> m_displayBufferR;
 	std::vector<float> m_peakBufferL;
 	std::vector<float> m_peakBufferR;
-	void updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer);
+	void updateBuffers(const float* spectrum, float* displayBuffer, float* peakBuffer);
 
 	// final paths to be drawn by QPainter and methods to build them
 	QPainterPath m_pathL;
@@ -93,19 +93,19 @@ private:
 	QPainterPath m_pathPeakL;
 	QPainterPath m_pathPeakR;
 	void refreshPaths();
-	QPainterPath makePath(std::vector<float> &displayBuffer, float resolution);
+	QPainterPath makePath(std::vector<float>& displayBuffer, float resolution);
 
 	// helper variables for path drawing
-	float m_decaySum;		// indicates if there is anything left to draw
-	bool m_freezeRequest;	// new reference should be acquired
-	bool m_frozen;			// a reference is currently stored in the peakBuffer
+	float m_decaySum;	  // indicates if there is anything left to draw
+	bool m_freezeRequest; // new reference should be acquired
+	bool m_frozen;		  // a reference is currently stored in the peakBuffer
 
 	// top level: refresh buffers, make paths and draw the spectrum
-	void drawSpectrum(QPainter &painter);
+	void drawSpectrum(QPainter& painter);
 
 	// current cursor location and a method to draw it
 	QPointF m_cursor;
-	void drawCursor(QPainter &painter);
+	void drawCursor(QPainter& painter);
 
 	// wrappers for most used SaProcessor conversion helpers
 	// (to make local code more readable)
@@ -120,12 +120,11 @@ private:
 	unsigned int m_displayRight;
 	unsigned int m_displayWidth;
 
-	#ifdef SA_DEBUG
-		float m_execution_avg;
-		float m_refresh_avg;
-		float m_path_avg;
-		float m_draw_avg;
-	#endif
+#ifdef SA_DEBUG
+	float m_execution_avg;
+	float m_refresh_avg;
+	float m_path_avg;
+	float m_draw_avg;
+#endif
 };
 #endif // SASPECTRUMVIEW_H
-

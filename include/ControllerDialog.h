@@ -32,23 +32,19 @@
 
 class Controller;
 
-
 class ControllerDialog : public QWidget, public ModelView
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-	ControllerDialog( Controller * _controller, QWidget * _parent );
+	ControllerDialog(Controller* _controller, QWidget* _parent);
 
 	virtual ~ControllerDialog();
-
 
 signals:
 	void closed();
 
-
 protected:
-	void closeEvent( QCloseEvent * _ce ) override;
-
-} ;
+	void closeEvent(QCloseEvent* _ce) override;
+};
 
 #endif

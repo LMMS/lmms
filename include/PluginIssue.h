@@ -68,7 +68,8 @@ class PluginIssue
 
 public:
 	PluginIssue(PluginIssueType it, std::string msg = std::string())
-		: m_issueType(it), m_info(msg)
+		: m_issueType(it)
+		, m_info(msg)
 	{
 	}
 	PluginIssueType type() const { return m_issueType; }

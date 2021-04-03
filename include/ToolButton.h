@@ -22,29 +22,26 @@
  *
  */
 
-
 #ifndef TOOL_BUTTON_H
 #define TOOL_BUTTON_H
 
-#include <QToolButton>
 #include <QColor>
-
+#include <QToolButton>
 
 class ToolButton : public QToolButton
 {
 	Q_OBJECT
 public:
-	ToolButton(const QPixmap & _pixmap, const QString & _tooltip,
-			QObject * _receiver=nullptr, const char * _slot=nullptr,
-			QWidget * _parent=nullptr);
+	ToolButton(const QPixmap& _pixmap, const QString& _tooltip,
+		QObject* _receiver = nullptr, const char* _slot = nullptr,
+		QWidget* _parent = nullptr);
 
-	inline ToolButton(QWidget * _parent) :
-		QToolButton(_parent)
-	{ }
+	inline ToolButton(QWidget* _parent)
+		: QToolButton(_parent)
+	{
+	}
 
 	virtual ~ToolButton() = default;
-
-} ;
+};
 
 #endif
-

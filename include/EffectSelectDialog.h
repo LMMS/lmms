@@ -29,42 +29,38 @@
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
-#include "EffectChain.h"
 #include "Effect.h"
+#include "EffectChain.h"
 
-
-namespace Ui { class EffectSelectDialog; }
-
+namespace Ui
+{
+class EffectSelectDialog;
+}
 
 class EffectSelectDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	EffectSelectDialog( QWidget * _parent );
+	EffectSelectDialog(QWidget* _parent);
 	virtual ~EffectSelectDialog();
 
-	Effect * instantiateSelectedPlugin( EffectChain * _parent );
-
+	Effect* instantiateSelectedPlugin(EffectChain* _parent);
 
 protected slots:
 	void acceptSelection();
-	void rowChanged( const QModelIndex &, const QModelIndex & );
+	void rowChanged(const QModelIndex&, const QModelIndex&);
 	void sortAgain();
 	void updateSelection();
 
-
 private:
-	Ui::EffectSelectDialog * ui;
+	Ui::EffectSelectDialog* ui;
 
 	EffectKeyList m_effectKeys;
 	EffectKey m_currentSelection;
 
 	QStandardItemModel m_sourceModel;
 	QSortFilterProxyModel m_model;
-	QWidget * m_descriptionWidget;
-
-} ;
-
-
+	QWidget* m_descriptionWidget;
+};
 
 #endif

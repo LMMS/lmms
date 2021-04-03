@@ -26,54 +26,54 @@
 #ifndef _SCAPE_H_
 #define _SCAPE_H_
 
-#include "dsp/Sine.h"
-#include "dsp/Roessler.h"
-#include "dsp/Lorenz.h"
-#include "dsp/Delay.h"
-#include "dsp/OnePole.h"
 #include "dsp/BiQuad.h"
+#include "dsp/Delay.h"
+#include "dsp/Lorenz.h"
+#include "dsp/OnePole.h"
 #include "dsp/RBJ.h"
+#include "dsp/Roessler.h"
 #include "dsp/SVF.h"
+#include "dsp/Sine.h"
 
 typedef DSP::SVF<1> SVF;
 
 class Scape
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t time, fb;
-		double period;
+public:
+	sample_t time, fb;
+	double period;
 
-		DSP::Lorenz lfo[2];
-		DSP::Delay delay;
-		SVF svf[4];
-		DSP::OnePoleHP hipass[4];
+	DSP::Lorenz lfo[2];
+	DSP::Delay delay;
+	SVF svf[4];
+	DSP::OnePoleHP hipass[4];
 
-		template <sample_func_t>
-			void one_cycle (int frames);
-	
-	public:
-		static PortInfo port_info [];
+	template <sample_func_t>
+	void one_cycle(int frames);
 
-		void init()
-			{
-				delay.init ((int) (2.01 * fs)); /* two seconds = 30 bpm + */
-				for (int i = 0; i < 2; ++i)
-					lfo[i].init(),
-					lfo[i].set_rate (.00000001 * fs);
-			}
+public:
+	static PortInfo port_info[];
 
-		void activate();
+	void init()
+	{
+		delay.init((int)(2.01 * fs)); /* two seconds = 30 bpm + */
+		for (int i = 0; i < 2; ++i)
+			lfo[i].init(),
+				lfo[i].set_rate(.00000001 * fs);
+	}
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void activate();
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _SCAPE_H_ */

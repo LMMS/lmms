@@ -22,16 +22,15 @@
  *
  */
 
-
 #ifndef PATCHES_DIALOG_H
 #define PATCHES_DIALOG_H
 
-#include "ui_PatchesDialog.h"
-#include "LcdSpinBox.h"
-#include "GigPlayer.h"
-
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
+
+#include "GigPlayer.h"
+#include "LcdSpinBox.h"
+#include "ui_PatchesDialog.h"
 
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
@@ -41,22 +40,20 @@ class PatchesDialog : public QDialog, private Ui::PatchesDialog
 	Q_OBJECT
 
 public:
-
 	// Constructor.
-	PatchesDialog(QWidget * pParent = 0, Qt::WindowFlags wflags = QFlag(0));
+	PatchesDialog(QWidget* pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 
 	// Destructor.
 	virtual ~PatchesDialog();
 
-
-	void setup( GigInstance * pSynth, int iChan, const QString & chanName,
-			LcdSpinBoxModel * bankModel, LcdSpinBoxModel * progModel, QLabel * patchLabel );
+	void setup(GigInstance* pSynth, int iChan, const QString& chanName,
+		LcdSpinBoxModel* bankModel, LcdSpinBoxModel* progModel, QLabel* patchLabel);
 
 public slots:
 
 	void stabilizeForm();
 	void bankChanged();
-	void progChanged( QTreeWidgetItem * curr, QTreeWidgetItem * prev );
+	void progChanged(QTreeWidgetItem* curr, QTreeWidgetItem* prev);
 
 protected slots:
 
@@ -64,18 +61,16 @@ protected slots:
 	void reject();
 
 protected:
+	void setBankProg(int iBank, int iProg);
 
-	void setBankProg( int iBank, int iProg );
-
-	QTreeWidgetItem * findBankItem( int iBank );
-	QTreeWidgetItem * findProgItem( int iProg );
+	QTreeWidgetItem* findBankItem(int iBank);
+	QTreeWidgetItem* findProgItem(int iProg);
 
 	bool validateForm();
 
 private:
-
 	// Instance variables.
-	GigInstance * m_pSynth;
+	GigInstance* m_pSynth;
 
 	int m_iChan;
 	int m_iBank;
@@ -83,9 +78,9 @@ private:
 
 	int m_dirty;
 
-	LcdSpinBoxModel * m_bankModel;
-	LcdSpinBoxModel * m_progModel;
-	QLabel * m_patchLabel;
+	LcdSpinBoxModel* m_bankModel;
+	LcdSpinBoxModel* m_progModel;
+	QLabel* m_patchLabel;
 };
 
 #endif

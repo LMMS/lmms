@@ -27,44 +27,42 @@
 #define WAVESHAPER_CONTROLS_H
 
 #include "EffectControls.h"
-#include "waveshaper_control_dialog.h"
-#include "Knob.h"
 #include "Graph.h"
+#include "Knob.h"
+#include "waveshaper_control_dialog.h"
 
 class waveShaperEffect;
-
 
 class waveShaperControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	waveShaperControls( waveShaperEffect * _eff );
+	waveShaperControls(waveShaperEffect* _eff);
 	virtual ~waveShaperControls()
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 	inline virtual QString nodeName() const
 	{
-		return( "waveshapercontrols" );
+		return ("waveshapercontrols");
 	}
 
 	virtual void setDefaultShape();
 
 	virtual int controlCount()
 	{
-		return( 4 );
+		return (4);
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog* createView()
 	{
-		return( new waveShaperControlDialog( this ) );
+		return (new waveShaperControlDialog(this));
 	}
-
 
 private slots:
-	void samplesChanged( int, int );
+	void samplesChanged(int, int);
 
 	void resetClicked();
 	void smoothClicked();
@@ -73,15 +71,14 @@ private slots:
 	void subOneClicked();
 
 private:
-	waveShaperEffect * m_effect;
+	waveShaperEffect* m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
 	graphModel m_wavegraphModel;
-	BoolModel  m_clipModel;
+	BoolModel m_clipModel;
 
 	friend class waveShaperControlDialog;
 	friend class waveShaperEffect;
-
-} ;
+};
 
 #endif

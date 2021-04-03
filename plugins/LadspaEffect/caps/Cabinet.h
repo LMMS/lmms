@@ -41,95 +41,97 @@
  * might become unstable due to the lower computing precision. */
 typedef double cabinet_float;
 
-typedef struct {
+typedef struct
+{
 	int n;
 	cabinet_float a[16], b[16];
 	float gain;
 } Model16;
 
-typedef struct {
+typedef struct
+{
 	int n;
 	cabinet_float a[32], b[32];
 	float gain;
 } Model32;
 
 class CabinetI
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t gain;
-		static Model16 models [];
+public:
+	sample_t gain;
+	static Model16 models[];
 
-		int model;
-		void switch_model (int m);
+	int model;
+	void switch_model(int m);
 
-		int n, h;
-		cabinet_float * a, * b;
-		cabinet_float x[16], y[16];
-		
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	int n, h;
+	cabinet_float *a, *b;
+	cabinet_float x[16], y[16];
 
-	public:
-		static PortInfo port_info [];
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-		void init();
+public:
+	static PortInfo port_info[];
 
-		void activate();
+	void init();
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void activate();
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 /* Second version with 32nd order filters precalculated for
  * 44.1 / 48 / 88.2 / 96 kHz sample rates */
 
 class CabinetII
-: public Plugin
+	: public Plugin
 {
-	public:
-		sample_t gain;
+public:
+	sample_t gain;
 
-		static Model32 models44100 [];
-		static Model32 models48000 [];
-		static Model32 models88200 [];
-		static Model32 models96000 [];
+	static Model32 models44100[];
+	static Model32 models48000[];
+	static Model32 models88200[];
+	static Model32 models96000[];
 
-		Model32 * models;
-		int model;
-		void switch_model (int m);
+	Model32* models;
+	int model;
+	void switch_model(int m);
 
-		int n, h;
-		cabinet_float * a, * b;
-		cabinet_float x[32], y[32];
-		
-		template <sample_func_t F>
-			void one_cycle (int frames);
+	int n, h;
+	cabinet_float *a, *b;
+	cabinet_float x[32], y[32];
 
-	public:
-		static PortInfo port_info [];
+	template <sample_func_t F>
+	void one_cycle(int frames);
 
-		sample_t adding_gain;
+public:
+	static PortInfo port_info[];
 
-		void init();
-		void activate();
+	sample_t adding_gain;
 
-		void run (int n)
-			{
-				one_cycle<store_func> (n);
-			}
-		
-		void run_adding (int n)
-			{
-				one_cycle<adding_func> (n);
-			}
+	void init();
+	void activate();
+
+	void run(int n)
+	{
+		one_cycle<store_func>(n);
+	}
+
+	void run_adding(int n)
+	{
+		one_cycle<adding_func>(n);
+	}
 };
 
 #endif /* _CABINET_H_ */

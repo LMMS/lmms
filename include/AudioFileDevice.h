@@ -31,13 +31,12 @@
 #include "AudioDevice.h"
 #include "OutputSettings.h"
 
-
 class AudioFileDevice : public AudioDevice
 {
 public:
-	AudioFileDevice(OutputSettings const & outputSettings,
-			const ch_cnt_t _channels, const QString & _file,
-			Mixer* mixer );
+	AudioFileDevice(OutputSettings const& outputSettings,
+		const ch_cnt_t _channels, const QString& _file,
+		Mixer* mixer);
 	virtual ~AudioFileDevice();
 
 	QString outputFile() const
@@ -45,11 +44,10 @@ public:
 		return m_outputFile.fileName();
 	}
 
-	OutputSettings const & getOutputSettings() const { return m_outputSettings; }
-
+	OutputSettings const& getOutputSettings() const { return m_outputSettings; }
 
 protected:
-	int writeData( const void* data, int len );
+	int writeData(const void* data, int len);
 
 	inline bool outputFileOpened() const
 	{
@@ -64,15 +62,12 @@ protected:
 private:
 	QFile m_outputFile;
 	OutputSettings m_outputSettings;
-} ;
+};
 
-
-typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
-					( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  Mixer* mixer,
-					  bool & successful );
-
+typedef AudioFileDevice* (*AudioFileDeviceInstantiaton)(const QString& outputFilename,
+	OutputSettings const& outputSettings,
+	const ch_cnt_t channels,
+	Mixer* mixer,
+	bool& successful);
 
 #endif

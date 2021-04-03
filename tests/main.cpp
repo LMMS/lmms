@@ -1,10 +1,8 @@
-#include "QTestSuite.h"
-
+#include <QDebug>
 #include <QtTest/QTest>
 
-#include <QDebug>
-
 #include "Engine.h"
+#include "QTestSuite.h"
 
 int main(int argc, char* argv[])
 {
@@ -18,6 +16,6 @@ int main(int argc, char* argv[])
 	{
 		failed += QTest::qExec(suite, argc, argv);
 	}
-	qDebug() << "<<" << failed << "out of"<<numsuites<<"test suites failed.";
+	qDebug() << "<<" << failed << "out of" << numsuites << "test suites failed.";
 	return failed;
 }

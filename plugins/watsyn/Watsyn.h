@@ -22,41 +22,39 @@
  *
  */
 
-
 #ifndef WATSYN_H
 #define WATSYN_H
 
+#include <samplerate.h>
+
+#include "AutomatableButton.h"
+#include "AutomatableModel.h"
+#include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Graph.h"
-#include "AutomatableModel.h"
-#include "AutomatableButton.h"
-#include "TempoSyncKnob.h"
+#include "MemoryManager.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include <samplerate.h>
-#include "MemoryManager.h"
+#include "TempoSyncKnob.h"
 
+#define makeknob(name, x, y, hint, unit, oname) \
+	name = new Knob(knobStyled, this); \
+	name->move(x, y); \
+	name->setHintText(hint, unit); \
+	name->setObjectName(oname); \
+	name->setFixedSize(19, 19);
 
-#define makeknob( name, x, y, hint, unit, oname ) 		\
-	name = new Knob( knobStyled, this ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );		\
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 19, 19 );
-
-#define maketsknob( name, x, y, hint, unit, oname ) 		\
-	name = new TempoSyncKnob( knobStyled, this ); 				\
-	name ->move( x, y );								\
-	name ->setHintText( hint, unit );		\
-	name ->setObjectName( oname );						\
-	name ->setFixedSize( 19, 19 );
+#define maketsknob(name, x, y, hint, unit, oname) \
+	name = new TempoSyncKnob(knobStyled, this); \
+	name->move(x, y); \
+	name->setHintText(hint, unit); \
+	name->setObjectName(oname); \
+	name->setFixedSize(19, 19);
 
 #define A1ROW 26
 #define A2ROW 49
 #define B1ROW 72
 #define B2ROW 95
-
 
 const int GRAPHLEN = 220; // don't change - must be same as the size of the widget
 
@@ -65,17 +63,17 @@ const int WAVERATIO = 32; // oversampling ratio
 const int WAVELEN = GRAPHLEN * WAVERATIO;
 const int PMOD_AMT = WAVELEN / 2;
 
-const int	MOD_MIX = 0;
-const int	MOD_AM = 1;
-const int	MOD_RM = 2;
-const int	MOD_PM = 3;
-const int  NUM_MODS = 4;
+const int MOD_MIX = 0;
+const int MOD_AM = 1;
+const int MOD_RM = 2;
+const int MOD_PM = 3;
+const int NUM_MODS = 4;
 
-const int	A1_OSC = 0;
-const int	A2_OSC = 1;
-const int	B1_OSC = 2;
-const int	B2_OSC = 3;
-const int	NUM_OSCS = 4;
+const int A1_OSC = 0;
+const int A2_OSC = 1;
+const int B1_OSC = 2;
+const int B2_OSC = 3;
+const int NUM_OSCS = 4;
 
 class WatsynInstrument;
 
@@ -83,19 +81,19 @@ class WatsynObject
 {
 	MM_OPERATORS
 public:
-	WatsynObject( 	float * _A1wave, float * _A2wave,
-					float * _B1wave, float * _B2wave,
-					int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle * _nph, fpp_t _frames,
-					WatsynInstrument * _w );
+	WatsynObject(float* _A1wave, float* _A2wave,
+		float* _B1wave, float* _B2wave,
+		int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle* _nph, fpp_t _frames,
+		WatsynInstrument* _w);
 	virtual ~WatsynObject();
 
-	void renderOutput( fpp_t _frames );
+	void renderOutput(fpp_t _frames);
 
-	inline sampleFrame * abuf() const
+	inline sampleFrame* abuf() const
 	{
 		return m_abuf;
 	}
-	inline sampleFrame * bbuf() const
+	inline sampleFrame* bbuf() const
 	{
 		return m_bbuf;
 	}
@@ -109,48 +107,47 @@ private:
 	int m_bmod;
 
 	const sample_rate_t m_samplerate;
-	NotePlayHandle * m_nph;
+	NotePlayHandle* m_nph;
 
 	fpp_t m_fpp;
 
-	WatsynInstrument * m_parent;
+	WatsynInstrument* m_parent;
 
-	sampleFrame * m_abuf;
-	sampleFrame * m_bbuf;
+	sampleFrame* m_abuf;
+	sampleFrame* m_bbuf;
 
-	float m_lphase [NUM_OSCS];
-	float m_rphase [NUM_OSCS];
+	float m_lphase[NUM_OSCS];
+	float m_rphase[NUM_OSCS];
 
-	float m_A1wave [WAVELEN];
-	float m_A2wave [WAVELEN];
-	float m_B1wave [WAVELEN];
-	float m_B2wave [WAVELEN];
+	float m_A1wave[WAVELEN];
+	float m_A2wave[WAVELEN];
+	float m_B1wave[WAVELEN];
+	float m_B2wave[WAVELEN];
 };
 
 class WatsynInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	WatsynInstrument( InstrumentTrack * _instrument_track );
+	WatsynInstrument(InstrumentTrack* _instrument_track);
 	virtual ~WatsynInstrument();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n,
+		sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc,
+		QDomElement& _this);
+	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
-		return( 64 );
+		return (64);
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual PluginView* instantiateView(QWidget* _parent);
 
 public slots:
 	void updateVolumes();
@@ -164,50 +161,53 @@ public slots:
 	void updateWaveB2();
 
 protected:
-	float m_lvol [NUM_OSCS];
-    float m_rvol [NUM_OSCS];
+	float m_lvol[NUM_OSCS];
+	float m_rvol[NUM_OSCS];
 
-	float m_lfreq [NUM_OSCS];
-	float m_rfreq [NUM_OSCS];
+	float m_lfreq[NUM_OSCS];
+	float m_rfreq[NUM_OSCS];
 
 private:
-	inline float leftCh( float _vol, float _pan )
+	inline float leftCh(float _vol, float _pan)
 	{
-		return ( _pan <= 0 ? 1.0 : 1.0 - ( _pan / 100.0 ) ) * _vol / 100.0;
+		return (_pan <= 0 ? 1.0 : 1.0 - (_pan / 100.0)) * _vol / 100.0;
 	}
 
-	inline float rightCh( float _vol, float _pan )
+	inline float rightCh(float _vol, float _pan)
 	{
-		return ( _pan >= 0 ? 1.0 : 1.0 + ( _pan / 100.0 ) ) * _vol / 100.0;
+		return (_pan >= 0 ? 1.0 : 1.0 + (_pan / 100.0)) * _vol / 100.0;
 	}
 
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
-	inline void srccpy( float * _dst, float * _src )
+	inline void srccpy(float* _dst, float* _src)
 	{
 		int err;
 		const int margin = 64;
-		
-		// copy to temp array
-		float tmps [ GRAPHLEN + margin ]; // temp array in stack
-		float * tmp = &tmps[0];
 
-		memcpy( tmp, _src, sizeof( float ) * GRAPHLEN );
-		memcpy( tmp + GRAPHLEN, _src, sizeof( float ) * margin );
-		SRC_STATE * src_state = src_new( SRC_SINC_FASTEST, 1, &err );
+		// copy to temp array
+		float tmps[GRAPHLEN + margin]; // temp array in stack
+		float* tmp = &tmps[0];
+
+		memcpy(tmp, _src, sizeof(float) * GRAPHLEN);
+		memcpy(tmp + GRAPHLEN, _src, sizeof(float) * margin);
+		SRC_STATE* src_state = src_new(SRC_SINC_FASTEST, 1, &err);
 		SRC_DATA src_data;
 		src_data.data_in = tmp;
 		src_data.input_frames = GRAPHLEN + margin;
 		src_data.data_out = _dst;
 		src_data.output_frames = WAVELEN;
-		src_data.src_ratio = static_cast<double>( WAVERATIO );
+		src_data.src_ratio = static_cast<double>(WAVERATIO);
 		src_data.end_of_input = 0;
-		err = src_process( src_state, &src_data ); 
-		if( err ) { qDebug( "Watsyn SRC error: %s", src_strerror( err ) ); }
-		src_delete( src_state );
+		err = src_process(src_state, &src_data);
+		if (err)
+		{
+			qDebug("Watsyn SRC error: %s", src_strerror(err));
+		}
+		src_delete(src_state);
 	}
 
 	// memcpy utilizing cubic interpolation
-/*	inline void cipcpy( float * _dst, float * _src )
+	/*	inline void cipcpy( float * _dst, float * _src )
 	{
 		// calculate cyclic tangents
 		float tang[GRAPHLEN];
@@ -236,7 +236,6 @@ private:
 				( ( x3 - x2 ) * m2 );		
 		}
 	}*/
-
 
 	FloatModel a1_vol;
 	FloatModel a2_vol;
@@ -282,23 +281,22 @@ private:
 	IntModel m_bmod;
 
 	IntModel m_selectedGraph;
-	
-	float A1_wave [WAVELEN];
-	float A2_wave [WAVELEN];
-	float B1_wave [WAVELEN];
-	float B2_wave [WAVELEN];
+
+	float A1_wave[WAVELEN];
+	float A2_wave[WAVELEN];
+	float B1_wave[WAVELEN];
+	float B2_wave[WAVELEN];
 
 	friend class WatsynObject;
 	friend class WatsynView;
 };
 
-
 class WatsynView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	WatsynView( Instrument * _instrument,
-					QWidget * _parent );
+	WatsynView(Instrument* _instrument,
+		QWidget* _parent);
 	virtual ~WatsynView();
 
 protected slots:
@@ -319,62 +317,61 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-// knobs
-	Knob * a1_volKnob;
-	Knob * a2_volKnob;
-	Knob * b1_volKnob;
-	Knob * b2_volKnob;
+	// knobs
+	Knob* a1_volKnob;
+	Knob* a2_volKnob;
+	Knob* b1_volKnob;
+	Knob* b2_volKnob;
 
-	Knob * a1_panKnob;
-	Knob * a2_panKnob;
-	Knob * b1_panKnob;
-	Knob * b2_panKnob;
+	Knob* a1_panKnob;
+	Knob* a2_panKnob;
+	Knob* b1_panKnob;
+	Knob* b2_panKnob;
 
-	Knob * a1_multKnob;
-	Knob * a2_multKnob;
-	Knob * b1_multKnob;
-	Knob * b2_multKnob;
+	Knob* a1_multKnob;
+	Knob* a2_multKnob;
+	Knob* b1_multKnob;
+	Knob* b2_multKnob;
 
-	Knob * a1_ltuneKnob;
-	Knob * a2_ltuneKnob;
-	Knob * b1_ltuneKnob;
-	Knob * b2_ltuneKnob;
+	Knob* a1_ltuneKnob;
+	Knob* a2_ltuneKnob;
+	Knob* b1_ltuneKnob;
+	Knob* b2_ltuneKnob;
 
-	Knob * a1_rtuneKnob;
-	Knob * a2_rtuneKnob;
-	Knob * b1_rtuneKnob;
-	Knob * b2_rtuneKnob;
+	Knob* a1_rtuneKnob;
+	Knob* a2_rtuneKnob;
+	Knob* b1_rtuneKnob;
+	Knob* b2_rtuneKnob;
 
-	Knob * m_abmixKnob;
+	Knob* m_abmixKnob;
 
-	Knob * m_envAmtKnob;
+	Knob* m_envAmtKnob;
 
-	TempoSyncKnob * m_envAttKnob;
-	TempoSyncKnob * m_envHoldKnob;
-	TempoSyncKnob * m_envDecKnob;
+	TempoSyncKnob* m_envAttKnob;
+	TempoSyncKnob* m_envHoldKnob;
+	TempoSyncKnob* m_envDecKnob;
 
-	Knob * m_xtalkKnob;
+	Knob* m_xtalkKnob;
 
-	automatableButtonGroup * m_selectedGraphGroup;
-	automatableButtonGroup * m_aModGroup;
-	automatableButtonGroup * m_bModGroup;
+	automatableButtonGroup* m_selectedGraphGroup;
+	automatableButtonGroup* m_aModGroup;
+	automatableButtonGroup* m_bModGroup;
 
-	Graph * a1_graph;
-	Graph * a2_graph;
-	Graph * b1_graph;
-	Graph * b2_graph;
+	Graph* a1_graph;
+	Graph* a2_graph;
+	Graph* b1_graph;
+	Graph* b2_graph;
 
-	PixmapButton * m_sinWaveButton;
-	PixmapButton * m_triWaveButton;
-	PixmapButton * m_sawWaveButton;
-	PixmapButton * m_sqrWaveButton;
-	PixmapButton * m_normalizeButton;
-	PixmapButton * m_invertButton;
-	PixmapButton * m_smoothButton;
-	PixmapButton * m_phaseLeftButton;
-	PixmapButton * m_phaseRightButton;
-	PixmapButton * m_loadButton;
-
+	PixmapButton* m_sinWaveButton;
+	PixmapButton* m_triWaveButton;
+	PixmapButton* m_sawWaveButton;
+	PixmapButton* m_sqrWaveButton;
+	PixmapButton* m_normalizeButton;
+	PixmapButton* m_invertButton;
+	PixmapButton* m_smoothButton;
+	PixmapButton* m_phaseLeftButton;
+	PixmapButton* m_phaseRightButton;
+	PixmapButton* m_loadButton;
 };
 
 #endif

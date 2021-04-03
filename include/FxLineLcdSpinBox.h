@@ -29,25 +29,25 @@
 
 class TrackView;
 
-
 class FxLineLcdSpinBox : public LcdSpinBox
 {
 	Q_OBJECT
 public:
-	FxLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = NULL) :
-		LcdSpinBox(numDigits, parent, name), m_tv(tv)
-	{}
+	FxLineLcdSpinBox(int numDigits, QWidget* parent, const QString& name, TrackView* tv = NULL)
+		: LcdSpinBox(numDigits, parent, name)
+		, m_tv(tv)
+	{
+	}
 	virtual ~FxLineLcdSpinBox() {}
 
-	void setTrackView(TrackView * tv);
+	void setTrackView(TrackView* tv);
 
 protected:
 	void mouseDoubleClickEvent(QMouseEvent* event) override;
 	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
-	TrackView * m_tv;
-
+	TrackView* m_tv;
 };
 
 #endif

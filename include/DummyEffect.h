@@ -26,26 +26,23 @@
 #define DUMMY_EFFECT_H
 
 #include "Effect.h"
-#include "EffectControls.h"
 #include "EffectControlDialog.h"
-
+#include "EffectControls.h"
 
 class DummyEffectControlDialog : public EffectControlDialog
 {
 public:
-	DummyEffectControlDialog( EffectControls * _controls ) :
-		EffectControlDialog( _controls )
+	DummyEffectControlDialog(EffectControls* _controls)
+		: EffectControlDialog(_controls)
 	{
 	}
-
-} ;
-
+};
 
 class DummyEffectControls : public EffectControls
 {
 public:
-	DummyEffectControls( Effect * _eff ) :
-		EffectControls( _eff )
+	DummyEffectControls(Effect* _eff)
+		: EffectControls(_eff)
 	{
 	}
 
@@ -58,11 +55,11 @@ public:
 		return 0;
 	}
 
-	void saveSettings( QDomDocument &, QDomElement & ) override
+	void saveSettings(QDomDocument&, QDomElement&) override
 	{
 	}
 
-	void loadSettings( const QDomElement & ) override
+	void loadSettings(const QDomElement&) override
 	{
 	}
 
@@ -71,22 +68,20 @@ public:
 		return "DummyControls";
 	}
 
-	EffectControlDialog * createView() override
+	EffectControlDialog* createView() override
 	{
-		return new DummyEffectControlDialog( this );
+		return new DummyEffectControlDialog(this);
 	}
-} ;
-
-
+};
 
 class DummyEffect : public Effect
 {
 	Q_OBJECT
 public:
-	DummyEffect( Model * _parent, const QDomElement& originalPluginData ) :
-		Effect( NULL, _parent, NULL ),
-		m_controls( this ),
-		m_originalPluginData( originalPluginData )
+	DummyEffect(Model* _parent, const QDomElement& originalPluginData)
+		: Effect(NULL, _parent, NULL)
+		, m_controls(this)
+		, m_originalPluginData(originalPluginData)
 	{
 		setName();
 	}
@@ -95,12 +90,12 @@ public:
 	{
 	}
 
-	EffectControls * controls() override
+	EffectControls* controls() override
 	{
 		return &m_controls;
 	}
 
-	bool processAudioBuffer( sampleFrame *, const fpp_t ) override
+	bool processAudioBuffer(sampleFrame*, const fpp_t) override
 	{
 		return false;
 	}
@@ -110,34 +105,29 @@ public:
 		return m_originalPluginData;
 	}
 
-
-
 private:
 	DummyEffectControls m_controls;
 	const QDomElement m_originalPluginData;
-	
+
 	// Parse the display name from the dom
 	virtual void setName()
 	{
-		QDomNodeList keys = originalPluginData().elementsByTagName( "key" );
-		for( int i = 0; !keys.item( i ).isNull(); ++i )
+		QDomNodeList keys = originalPluginData().elementsByTagName("key");
+		for (int i = 0; !keys.item(i).isNull(); ++i)
 		{
-			QDomNodeList attributes = keys.item( i ).toElement().elementsByTagName( "attribute" );
-			for( int j = 0; !attributes.item( j ).isNull(); ++j )
+			QDomNodeList attributes = keys.item(i).toElement().elementsByTagName("attribute");
+			for (int j = 0; !attributes.item(j).isNull(); ++j)
 			{
-				QDomElement attribute = attributes.item( j ).toElement();
-				if( attribute.hasAttribute( "value" ) )
+				QDomElement attribute = attributes.item(j).toElement();
+				if (attribute.hasAttribute("value"))
 				{
-					QString name = tr("NOT FOUND") + " (" + attribute.attribute( "value" ) + ")";
+					QString name = tr("NOT FOUND") + " (" + attribute.attribute("value") + ")";
 					setDisplayName(name);
 					return;
 				}
-
 			}
-
 		}
 	}
-} ;
-
+};
 
 #endif

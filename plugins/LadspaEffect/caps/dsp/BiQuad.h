@@ -28,136 +28,137 @@
 #ifndef _DSP_BI_QUAD_H_
 #define _DSP_BI_QUAD_H_
 
-namespace DSP {
+namespace DSP
+{
 
 class BiQuad
 {
-	public:
-		/* coefficients */
-		sample_t a[3], b[3];
+public:
+	/* coefficients */
+	sample_t a[3], b[3];
 
-		/* history */
-		int h;
-		sample_t x[2], y[2];
+	/* history */
+	int h;
+	sample_t x[2], y[2];
 
-		BiQuad()
-			{
-				unity();
-				reset();
-			}
-		
-		void unity()
-			{
-				a[0] = 1;
-				a[1] = a[2] = b[0] = b[1] = b[2] = 0;
-			}
+	BiQuad()
+	{
+		unity();
+		reset();
+	}
 
-		void copy (BiQuad & bq)
-			{
-				for (int i = 0; i < 3; ++i)
-					a[i] = bq.a[i],
-					b[i] = bq.b[i];
-			}
+	void unity()
+	{
+		a[0] = 1;
+		a[1] = a[2] = b[0] = b[1] = b[2] = 0;
+	}
 
-		void reset()
-			{
-				h = 0;
+	void copy(BiQuad& bq)
+	{
+		for (int i = 0; i < 3; ++i)
+			a[i] = bq.a[i],
+			b[i] = bq.b[i];
+	}
 
-				x[0] = x[1] = 
-				y[0] = y[1] = 0.;
-			}
+	void reset()
+	{
+		h = 0;
 
-		/* denormal zapping */
-		void flush_0()
-			{
-				for (int i = 0; i < 2; ++i)
-					if (is_denormal (y[i]))
-						y[i] = 0;
-			}
+		x[0] = x[1] =
+			y[0] = y[1] = 0.;
+	}
 
-		inline sample_t process (sample_t s)
-			{
-				register int z = h;
+	/* denormal zapping */
+	void flush_0()
+	{
+		for (int i = 0; i < 2; ++i)
+			if (is_denormal(y[i]))
+				y[i] = 0;
+	}
 
-				register sample_t r = s * a[0];
-				
-				r += a[1] * x[z];
-				r += b[1] * y[z];
+	inline sample_t process(sample_t s)
+	{
+		register int z = h;
 
-				z ^= 1;
-				r += a[2] * x[z];
-				r += b[2] * y[z];
+		register sample_t r = s * a[0];
 
-				y[z] = r;
-				x[z] = s;
-				
-				h = z;
+		r += a[1] * x[z];
+		r += b[1] * y[z];
 
-				return r;
-			}
+		z ^= 1;
+		r += a[2] * x[z];
+		r += b[2] * y[z];
 
-		/* Following are additional methods for using the biquad to filter an
+		y[z] = r;
+		x[z] = s;
+
+		h = z;
+
+		return r;
+	}
+
+	/* Following are additional methods for using the biquad to filter an
 		 * upsampled signal with 0 padding -- some terms reduce to 0 in this
 		 * case */
-		inline sample_t process_0_1()
-			{
-				register int z = h;
+	inline sample_t process_0_1()
+	{
+		register int z = h;
 
-				register sample_t r = 0;
-				
-				r += a[1] * x[z];
-				r += b[1] * y[z];
+		register sample_t r = 0;
 
-				z ^= 1;
-				r += a[2] * x[z];
-				r += b[2] * y[z];
+		r += a[1] * x[z];
+		r += b[1] * y[z];
 
-				y[z] = r;
-				x[z] = 0; 
-				
-				h = z;
+		z ^= 1;
+		r += a[2] * x[z];
+		r += b[2] * y[z];
 
-				return r;
-			}
+		y[z] = r;
+		x[z] = 0;
 
-		inline sample_t process_0_2()
-			{
-				register int z = h;
+		h = z;
 
-				register sample_t r = 0;
-				
-				r += b[1] * y[z];
+		return r;
+	}
 
-				z ^= 1;
-				r += a[2] * x[z];
-				r += b[2] * y[z];
+	inline sample_t process_0_2()
+	{
+		register int z = h;
 
-				y[z] = r;
-				x[z] = 0;
-				
-				h = z;
+		register sample_t r = 0;
 
-				return r;
-			}
+		r += b[1] * y[z];
 
-		inline sample_t process_0_3()
-			{
-				register int z = h;
+		z ^= 1;
+		r += a[2] * x[z];
+		r += b[2] * y[z];
 
-				register sample_t r = 0;
-				
-				r += b[1] * y[z];
+		y[z] = r;
+		x[z] = 0;
 
-				z ^= 1;
-				r += b[2] * y[z];
+		h = z;
 
-				y[z] = r;
-				x[z] = 0;
-				
-				h = z;
+		return r;
+	}
 
-				return r;
-			}
+	inline sample_t process_0_3()
+	{
+		register int z = h;
+
+		register sample_t r = 0;
+
+		r += b[1] * y[z];
+
+		z ^= 1;
+		r += b[2] * y[z];
+
+		y[z] = r;
+		x[z] = 0;
+
+		h = z;
+
+		return r;
+	}
 };
 
 } /* namespace DSP */

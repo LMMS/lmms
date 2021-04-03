@@ -32,25 +32,22 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
-{
-	STRINGIFY(PLUGIN_NAME),
-	"Compressor",
-	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
-	"Lost Robot <r94231@gmail.com>",
-	0x0100,
-	Plugin::Effect,
-	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
-} ;
-
+	Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
+		{
+			STRINGIFY(PLUGIN_NAME),
+			"Compressor",
+			QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
+			"Lost Robot <r94231@gmail.com>",
+			0x0100,
+			Plugin::Effect,
+			new PluginPixmapLoader("logo"),
+			NULL,
+			NULL};
 }
 
-
-CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key) :
-	Effect(&compressor_plugin_descriptor, parent, key),
-	m_compressorControls(this)
+CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
+	: Effect(&compressor_plugin_descriptor, parent, key)
+	, m_compressorControls(this)
 {
 	m_sampleRate = Engine::mixer()->processingSampleRate();
 
@@ -90,21 +87,15 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	changeSampleRate();
 }
 
-
-
-
 CompressorEffect::~CompressorEffect()
 {
 }
-
 
 float CompressorEffect::msToCoeff(float ms)
 {
 	// Convert time in milliseconds to applicable lowpass coefficient
 	return exp(m_coeffPrecalc / ms);
 }
-
-
 
 void CompressorEffect::calcAutoMakeup()
 {
@@ -116,7 +107,7 @@ void CompressorEffect::calcAutoMakeup()
 		const float temp = -m_thresholdVal + m_kneeVal;
 		tempGainResult = ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 	}
-	else// Above knee
+	else // Above knee
 	{
 		tempGainResult = m_compressorControls.m_limiterModel.value()
 			? m_thresholdVal
@@ -125,8 +116,6 @@ void CompressorEffect::calcAutoMakeup()
 
 	m_autoMakeupVal = 1.f / dbfsToAmp(tempGainResult);
 }
-
-
 
 void CompressorEffect::calcAttack()
 {
@@ -172,8 +161,8 @@ void CompressorEffect::calcRange()
 {
 	// Range is inactive when turned all the way down
 	m_rangeVal = (m_compressorControls.m_rangeModel.value() > m_compressorControls.m_rangeModel.minValue())
-			? dbfsToAmp(m_compressorControls.m_rangeModel.value())
-			: 0;
+		? dbfsToAmp(m_compressorControls.m_rangeModel.value())
+		: 0;
 }
 
 void CompressorEffect::resizeRMS()
@@ -236,8 +225,6 @@ void CompressorEffect::calcMix()
 	m_mixVal = m_compressorControls.m_mixModel.value() * 0.01;
 }
 
-
-
 bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
 	if (!isEnabled() || !isRunning())
@@ -277,7 +264,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float rOutPeak = 0.0;
 	float lInPeak = 0.0;
 	float rInPeak = 0.0;
-	
+
 	const bool midside = m_compressorControls.m_midsideModel.value();
 	const bool peakmode = m_compressorControls.m_peakmodeModel.value();
 	const float inBalance = m_compressorControls.m_inBalanceModel.value();
@@ -291,7 +278,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const bool feedback = m_compressorControls.m_feedbackModel.value();
 	const bool lookahead = m_compressorControls.m_lookaheadModel.value();
 
-	for(fpp_t f = 0; f < frames; ++f)
+	for (fpp_t f = 0; f < frames; ++f)
 	{
 		sample_t drySignal[2] = {buf[f][0], buf[f][1]};
 		sample_t s[2] = {drySignal[0] * m_inGainVal, drySignal[1] * m_inGainVal};
@@ -303,7 +290,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			calcTiltFilter(s[1], s[1], 1);
 		}
 
-		if (midside)// Convert left/right to mid/side
+		if (midside) // Convert left/right to mid/side
 		{
 			const float temp = s[0];
 			s[0] = (temp + s[1]) * 0.5;
@@ -345,7 +332,6 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				inputValue = m_preLookaheadBuf[i][m_preLookaheadBufLoc[i]];
 				m_preLookaheadBuf[i][m_preLookaheadBufLoc[i]] = tempInputValue;
 
-
 				// Increment ring buffer location
 				++m_lookaheadBufLoc[i];
 				if (m_lookaheadBufLoc[i] >= m_lookaheadLength)
@@ -379,7 +365,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 			float t = inputValue;
 
-			if (t > m_yL[i])// Attack phase
+			if (t > m_yL[i]) // Attack phase
 			{
 				// We want the "resting value" of our crest factor to be with a sine wave,
 				// which with this variable has a value of 2.
@@ -393,9 +379,9 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 					: m_attCoeff;
 
 				m_yL[i] = m_yL[i] * att + (1 - att) * t;
-				m_holdTimer[i] = m_holdLength;// Reset hold timer
+				m_holdTimer[i] = m_holdLength; // Reset hold timer
 			}
-			else// Release phase
+			else // Release phase
 			{
 				float crestFactorValTemp = ((m_crestFactorVal[i] - 2.f) * m_autoRelVal) + 2.f;
 
@@ -403,7 +389,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 					? msToCoeff(2.f * m_compressorControls.m_releaseModel.value() / (crestFactorValTemp))
 					: m_relCoeff;
 
-				if (m_holdTimer[i])// Don't change peak if hold is being applied
+				if (m_holdTimer[i]) // Don't change peak if hold is being applied
 				{
 					--m_holdTimer[i];
 				}
@@ -423,16 +409,16 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 			// Now find the gain change that should be applied,
 			// depending on the measured input value.
-			if (currentPeakDbfs - m_thresholdVal < -m_kneeVal)// Below knee
+			if (currentPeakDbfs - m_thresholdVal < -m_kneeVal) // Below knee
 			{
 				m_gainResult[i] = currentPeakDbfs;
 			}
-			else if (currentPeakDbfs - m_thresholdVal < m_kneeVal)// Within knee
+			else if (currentPeakDbfs - m_thresholdVal < m_kneeVal) // Within knee
 			{
 				const float temp = currentPeakDbfs - m_thresholdVal + m_kneeVal;
 				m_gainResult[i] = currentPeakDbfs + ((limiter ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 			}
-			else// Above knee
+			else // Above knee
 			{
 				m_gainResult[i] = limiter
 					? m_thresholdVal
@@ -445,52 +431,47 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 		switch (stereoLink)
 		{
-			case Unlinked:
+		case Unlinked: {
+			break;
+		}
+		case Maximum: {
+			m_gainResult[0] = m_gainResult[1] = qMin(m_gainResult[0], m_gainResult[1]);
+			break;
+		}
+		case Average: {
+			m_gainResult[0] = m_gainResult[1] = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
+			break;
+		}
+		case Minimum: {
+			m_gainResult[0] = m_gainResult[1] = qMax(m_gainResult[0], m_gainResult[1]);
+			break;
+		}
+		case Blend: {
+			if (blend > 0) // 0 is unlinked
 			{
-				break;
-			}
-			case Maximum:
-			{
-				m_gainResult[0] = m_gainResult[1] = qMin(m_gainResult[0], m_gainResult[1]);
-				break;
-			}
-			case Average:
-			{
-				m_gainResult[0] = m_gainResult[1] = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
-				break;
-			}
-			case Minimum:
-			{
-				m_gainResult[0] = m_gainResult[1] = qMax(m_gainResult[0], m_gainResult[1]);
-				break;
-			}
-			case Blend:
-			{
-				if (blend > 0)// 0 is unlinked
+				if (blend <= 1) // Blend to minimum volume
 				{
-					if (blend <= 1)// Blend to minimum volume
-					{
-						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(m_gainResult[0], temp1, blend);
-						m_gainResult[1] = linearInterpolate(m_gainResult[1], temp1, blend);
-					}
-					else if (blend <= 2)// Blend to average volume
-					{
-						const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
-						const float temp2 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
-						m_gainResult[1] = m_gainResult[0];
-					}
-					else// Blend to maximum volume
-					{
-						const float temp1 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
-						const float temp2 = qMax(m_gainResult[0], m_gainResult[1]);
-						m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
-						m_gainResult[1] = m_gainResult[0];
-					}
+					const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
+					m_gainResult[0] = linearInterpolate(m_gainResult[0], temp1, blend);
+					m_gainResult[1] = linearInterpolate(m_gainResult[1], temp1, blend);
 				}
-				break;
+				else if (blend <= 2) // Blend to average volume
+				{
+					const float temp1 = qMin(m_gainResult[0], m_gainResult[1]);
+					const float temp2 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
+					m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 1);
+					m_gainResult[1] = m_gainResult[0];
+				}
+				else // Blend to maximum volume
+				{
+					const float temp1 = (m_gainResult[0] + m_gainResult[1]) * 0.5f;
+					const float temp2 = qMax(m_gainResult[0], m_gainResult[1]);
+					m_gainResult[0] = linearInterpolate(temp1, temp2, blend - 2);
+					m_gainResult[1] = m_gainResult[0];
+				}
 			}
+			break;
+		}
 		}
 
 		// Bias compression to the left or right (or mid or side)
@@ -527,8 +508,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		float delayedDrySignal[2] = {s[0], s[1]};
-		
-		if (midside)// Convert left/right to mid/side
+
+		if (midside) // Convert left/right to mid/side
 		{
 			const float temp = s[0];
 			s[0] = (temp + s[1]) * 0.5;
@@ -541,7 +522,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		s[0] *= m_gainResult[0] * m_inGainVal * m_outGainVal * (outBalance > 0 ? 1 - outBalance : 1);
 		s[1] *= m_gainResult[1] * m_inGainVal * m_outGainVal * (outBalance < 0 ? 1 + outBalance : 1);
 
-		if (midside)// Convert mid/side back to left/right
+		if (midside) // Convert mid/side back to left/right
 		{
 			const float temp1 = s[0];
 			const float temp2 = s[1] * 0.5;
@@ -589,28 +570,23 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	return isRunning();
 }
 
-
 // Regular modulo doesn't handle negative numbers correctly.  This does.
 inline int CompressorEffect::realmod(int k, int n)
 {
-	return (k %= n) < 0 ? k+n : k;
+	return (k %= n) < 0 ? k + n : k;
 }
 
 // Regular fmod doesn't handle negative numbers correctly.  This does.
 inline float CompressorEffect::realfmod(float k, float n)
 {
-	return (k = fmod(k, n)) < 0 ? k+n : k;
+	return (k = fmod(k, n)) < 0 ? k + n : k;
 }
 
-
-
-inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &outputSample, int filtNum)
+inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t& outputSample, int filtNum)
 {
 	m_tiltOut[filtNum] = m_a0 * inputSample + m_b1 * m_tiltOut[filtNum];
 	outputSample = inputSample + m_lgain * m_tiltOut[filtNum] + m_hgain * (inputSample - m_tiltOut[filtNum]);
 }
-
-
 
 void CompressorEffect::changeSampleRate()
 {
@@ -635,7 +611,7 @@ void CompressorEffect::changeSampleRate()
 	calcThreshold();
 	calcKnee();
 	calcRatio();
-	calcAutoMakeup();// This should be after Threshold, Knee, and Ratio
+	calcAutoMakeup(); // This should be after Threshold, Knee, and Ratio
 
 	calcAttack();
 	calcRelease();
@@ -649,16 +625,12 @@ void CompressorEffect::changeSampleRate()
 	calcMix();
 }
 
-
-
 extern "C"
 {
 
-// necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
-{
-	return new CompressorEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(data));
+	// necessary for getting instance out of shared lib
+	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
+	{
+		return new CompressorEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+	}
 }
-
-}
-

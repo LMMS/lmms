@@ -23,15 +23,14 @@
  *
  */
 
-
 #ifndef _SID_H
 #define _SID_H
 
 #include <QObject>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
-
 
 class SidInstrumentView;
 class NotePlayHandle;
@@ -43,16 +42,16 @@ class voiceObject : public Model
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	enum WaveForm {
+	enum WaveForm
+	{
 		SquareWave = 0,
 		TriangleWave,
 		SawWave,
 		NoiseWave,
 		NumWaveShapes
 	};
-	voiceObject( Model * _parent, int _idx );
+	voiceObject(Model* _parent, int _idx);
 	virtual ~voiceObject();
-
 
 private:
 	FloatModel m_pulseWidthModel;
@@ -69,57 +68,56 @@ private:
 
 	friend class SidInstrument;
 	friend class SidInstrumentView;
-} ;
+};
 
 class SidInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	enum FilerType {
+	enum FilerType
+	{
 		HighPass = 0,
 		BandPass,
 		LowPass,
 		NumFilterTypes
 	};
-	
-	enum ChipModel {
+
+	enum ChipModel
+	{
 		sidMOS6581 = 0,
 		sidMOS8580,
 		NumChipModels
 	};
 
-
-	SidInstrument( InstrumentTrack * _instrument_track );
+	SidInstrument(InstrumentTrack* _instrument_track);
 	virtual ~SidInstrument();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n,
+		sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
 	virtual f_cnt_t desiredReleaseFrames() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual PluginView* instantiateView(QWidget* _parent);
 
-
-/*public slots:
+	/*public slots:
 	void updateKnobHint();
 	void updateKnobToolTip();*/
 
 private:
 	// voices
-	voiceObject * m_voice[3];
+	voiceObject* m_voice[3];
 
-	// filter	
+	// filter
 	FloatModel m_filterFCModel;
 	FloatModel m_filterResonanceModel;
 	IntModel m_filterModeModel;
-	
+
 	// misc
 	BoolModel m_voice3OffModel;
 	FloatModel m_volumeModel;
@@ -127,77 +125,73 @@ private:
 	IntModel m_chipModel;
 
 	friend class SidInstrumentView;
-
-} ;
-
-
+};
 
 class SidInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	SidInstrumentView( Instrument * _instrument, QWidget * _parent );
+	SidInstrumentView(Instrument* _instrument, QWidget* _parent);
 	virtual ~SidInstrumentView();
 
 private:
 	virtual void modelChanged();
-	
-	automatableButtonGroup * m_passBtnGrp;
-	automatableButtonGroup * m_sidTypeBtnGrp;
+
+	automatableButtonGroup* m_passBtnGrp;
+	automatableButtonGroup* m_sidTypeBtnGrp;
 
 	struct voiceKnobs
 	{
-		voiceKnobs( Knob * a,
-					Knob * d,
-					Knob * s,
-					Knob * r,
-					Knob * pw,
-					Knob * crs,
-					automatableButtonGroup * wfbg,
-					PixmapButton * syncb,
-					PixmapButton * ringb,
-					PixmapButton * filterb,
-					PixmapButton * testb ) :
-			m_attKnob( a ),
-			m_decKnob( d ),
-			m_sustKnob( s ),
-			m_relKnob( r ),
-			m_pwKnob( pw ),
-			m_crsKnob( crs ),
-			m_waveFormBtnGrp( wfbg ),
-			m_syncButton( syncb ),
-			m_ringModButton( ringb ),
-			m_filterButton( filterb ),
-			m_testButton( testb )
+		voiceKnobs(Knob* a,
+			Knob* d,
+			Knob* s,
+			Knob* r,
+			Knob* pw,
+			Knob* crs,
+			automatableButtonGroup* wfbg,
+			PixmapButton* syncb,
+			PixmapButton* ringb,
+			PixmapButton* filterb,
+			PixmapButton* testb)
+			: m_attKnob(a)
+			, m_decKnob(d)
+			, m_sustKnob(s)
+			, m_relKnob(r)
+			, m_pwKnob(pw)
+			, m_crsKnob(crs)
+			, m_waveFormBtnGrp(wfbg)
+			, m_syncButton(syncb)
+			, m_ringModButton(ringb)
+			, m_filterButton(filterb)
+			, m_testButton(testb)
 		{
 		}
 		voiceKnobs()
 		{
 		}
-		Knob * m_attKnob;
-		Knob * m_decKnob;
-		Knob * m_sustKnob;
-		Knob * m_relKnob;
-		Knob * m_pwKnob;
-		Knob * m_crsKnob;
-		automatableButtonGroup * m_waveFormBtnGrp;
-		PixmapButton * m_syncButton;
-		PixmapButton * m_ringModButton;
-		PixmapButton * m_filterButton;
-		PixmapButton * m_testButton;
-	} ;
+		Knob* m_attKnob;
+		Knob* m_decKnob;
+		Knob* m_sustKnob;
+		Knob* m_relKnob;
+		Knob* m_pwKnob;
+		Knob* m_crsKnob;
+		automatableButtonGroup* m_waveFormBtnGrp;
+		PixmapButton* m_syncButton;
+		PixmapButton* m_ringModButton;
+		PixmapButton* m_filterButton;
+		PixmapButton* m_testButton;
+	};
 
 	voiceKnobs m_voiceKnobs[3];
 
-	Knob * m_volKnob;
-	Knob * m_resKnob;
-	Knob * m_cutKnob;
-	PixmapButton * m_offButton;
+	Knob* m_volKnob;
+	Knob* m_resKnob;
+	Knob* m_cutKnob;
+	PixmapButton* m_offButton;
 
 protected slots:
 	void updateKnobHint();
 	void updateKnobToolTip();
-} ;
-
+};
 
 #endif

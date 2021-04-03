@@ -22,109 +22,85 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
+#include "PixmapButton.h"
 
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "PixmapButton.h"
 #include "MainWindow.h"
 #include "embed.h"
 
-
-
-PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
-	AutomatableButton( _parent, _name ),
-	m_activePixmap(),
-	m_inactivePixmap(),
-	m_pressed( false )
+PixmapButton::PixmapButton(QWidget* _parent, const QString& _name)
+	: AutomatableButton(_parent, _name)
+	, m_activePixmap()
+	, m_inactivePixmap()
+	, m_pressed(false)
 {
-	setActiveGraphic( embed::getIconPixmap( "led_yellow" ) );
-	setInactiveGraphic( embed::getIconPixmap( "led_off" ), false );
+	setActiveGraphic(embed::getIconPixmap("led_yellow"));
+	setInactiveGraphic(embed::getIconPixmap("led_off"), false);
 }
-
-
-
 
 PixmapButton::~PixmapButton()
 {
 }
 
-
-
-
-void PixmapButton::paintEvent( QPaintEvent * )
+void PixmapButton::paintEvent(QPaintEvent*)
 {
-	QPainter p( this );
+	QPainter p(this);
 
-	if( ( model() != NULL && model()->value() ) || m_pressed )
+	if ((model() != NULL && model()->value()) || m_pressed)
 	{
-		if( !m_activePixmap.isNull() )
+		if (!m_activePixmap.isNull())
 		{
-			p.drawPixmap( 0, 0, m_activePixmap );
+			p.drawPixmap(0, 0, m_activePixmap);
 		}
 	}
-	else if( !m_inactivePixmap.isNull() )
+	else if (!m_inactivePixmap.isNull())
 	{
-		p.drawPixmap( 0, 0, m_inactivePixmap );
+		p.drawPixmap(0, 0, m_inactivePixmap);
 	}
 }
 
-
-
-
-
-void PixmapButton::mousePressEvent( QMouseEvent * _me )
+void PixmapButton::mousePressEvent(QMouseEvent* _me)
 {
 	// Show pressing graphics if this isn't checkable
-	if( !isCheckable() )
+	if (!isCheckable())
 	{
 		m_pressed = true;
 		update();
 	}
 
-	AutomatableButton::mousePressEvent( _me );
+	AutomatableButton::mousePressEvent(_me);
 }
 
-
-
-
-void PixmapButton::mouseReleaseEvent( QMouseEvent * _me )
+void PixmapButton::mouseReleaseEvent(QMouseEvent* _me)
 {
-	AutomatableButton::mouseReleaseEvent( _me );
+	AutomatableButton::mouseReleaseEvent(_me);
 
-	if( !isCheckable() )
+	if (!isCheckable())
 	{
 		m_pressed = false;
 		update();
 	}
 }
 
-
-
-
-void PixmapButton::mouseDoubleClickEvent( QMouseEvent * _me )
+void PixmapButton::mouseDoubleClickEvent(QMouseEvent* _me)
 {
 	emit doubleClicked();
 	_me->accept();
 }
 
-
-
-
-void PixmapButton::setActiveGraphic( const QPixmap & _pm )
+void PixmapButton::setActiveGraphic(const QPixmap& _pm)
 {
 	m_activePixmap = _pm;
-	resize( m_activePixmap.width(), m_activePixmap.height() );
+	resize(m_activePixmap.width(), m_activePixmap.height());
 }
 
-
-
-
-void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
+void PixmapButton::setInactiveGraphic(const QPixmap& _pm, bool _update)
 {
 	m_inactivePixmap = _pm;
-	if( _update )
+	if (_update)
 	{
 		update();
 	}
@@ -132,17 +108,12 @@ void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 
 QSize PixmapButton::sizeHint() const
 {
-	if( ( model() != NULL && model()->value() ) || m_pressed )
+	if ((model() != NULL && model()->value()) || m_pressed)
 	{
 		return m_activePixmap.size() / devicePixelRatio();
 	}
-	else 
+	else
 	{
 		return m_inactivePixmap.size() / devicePixelRatio();
 	}
 }
-
-
-
-
-

@@ -23,53 +23,49 @@
  *
  */
 
-
 #ifndef AUDIO_FILE_PROCESSOR_H
 #define AUDIO_FILE_PROCESSOR_H
 
 #include <QPixmap>
 
-#include "Instrument.h"
-#include "InstrumentView.h"
-#include "SampleBuffer.h"
-#include "Knob.h"
-#include "PixmapButton.h"
 #include "AutomatableButton.h"
 #include "ComboBox.h"
-
+#include "Instrument.h"
+#include "InstrumentView.h"
+#include "Knob.h"
+#include "PixmapButton.h"
+#include "SampleBuffer.h"
 
 class audioFileProcessor : public Instrument
 {
 	Q_OBJECT
 public:
-	audioFileProcessor( InstrumentTrack * _instrument_track );
+	audioFileProcessor(InstrumentTrack* _instrument_track);
 	virtual ~audioFileProcessor();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n,
+		sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-	virtual void saveSettings( QDomDocument & _doc,
-						QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc,
+		QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 
-	virtual void loadFile( const QString & _file );
+	virtual void loadFile(const QString& _file);
 
 	virtual QString nodeName() const;
 
-	virtual int getBeatLen( NotePlayHandle * _n ) const;
+	virtual int getBeatLen(NotePlayHandle* _n) const;
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
 		return 128;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
-
+	virtual PluginView* instantiateView(QWidget* _parent);
 
 public slots:
-	void setAudioFile( const QString & _audio_file, bool _rename = true );
-
+	void setAudioFile(const QString& _audio_file, bool _rename = true);
 
 private slots:
 	void reverseModelChanged();
@@ -80,10 +76,8 @@ private slots:
 	void pointChanged();
 	void stutterModelChanged();
 
-
 signals:
-	void isPlaying( f_cnt_t _current_frame );
-
+	void isPlaying(f_cnt_t _current_frame);
 
 private:
 	typedef SampleBuffer::handleState handleState;
@@ -103,19 +97,15 @@ private:
 	bool m_nextPlayBackwards;
 
 	friend class AudioFileProcessorView;
-
-} ;
-
-
+};
 
 class AudioFileProcessorWaveView;
-
 
 class AudioFileProcessorView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
+	AudioFileProcessorView(Instrument* _instrument, QWidget* _parent);
 	virtual ~AudioFileProcessorView();
 
 	void newWaveView();
@@ -123,46 +113,40 @@ protected slots:
 	void sampleUpdated();
 	void openAudioFile();
 
-
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void paintEvent( QPaintEvent * );
-
+	virtual void dragEnterEvent(QDragEnterEvent* _dee);
+	virtual void dropEvent(QDropEvent* _de);
+	virtual void paintEvent(QPaintEvent*);
 
 private:
 	virtual void modelChanged();
 
-	static QPixmap * s_artwork;
+	static QPixmap* s_artwork;
 
-	AudioFileProcessorWaveView * m_waveView;
-	Knob * m_ampKnob;
-	Knob * m_startKnob;
-	Knob * m_endKnob;
-	Knob * m_loopKnob;
+	AudioFileProcessorWaveView* m_waveView;
+	Knob* m_ampKnob;
+	Knob* m_startKnob;
+	Knob* m_endKnob;
+	Knob* m_loopKnob;
 
-	PixmapButton * m_openAudioFileButton;
-	PixmapButton * m_reverseButton;
-	automatableButtonGroup * m_loopGroup;
-	PixmapButton * m_stutterButton;
-	ComboBox * m_interpBox;
-
-} ;
-
-
+	PixmapButton* m_openAudioFileButton;
+	PixmapButton* m_reverseButton;
+	automatableButtonGroup* m_loopGroup;
+	PixmapButton* m_stutterButton;
+	ComboBox* m_interpBox;
+};
 
 class AudioFileProcessorWaveView : public QWidget
 {
 	Q_OBJECT
 protected:
-	virtual void enterEvent( QEvent * _e );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void mouseMoveEvent( QMouseEvent * _me );
-	virtual void wheelEvent( QWheelEvent * _we );
-	virtual void paintEvent( QPaintEvent * _pe );
-
+	virtual void enterEvent(QEvent* _e);
+	virtual void leaveEvent(QEvent* _e);
+	virtual void mousePressEvent(QMouseEvent* _me);
+	virtual void mouseReleaseEvent(QMouseEvent* _me);
+	virtual void mouseMoveEvent(QMouseEvent* _me);
+	virtual void wheelEvent(QWheelEvent* _we);
+	virtual void paintEvent(QPaintEvent* _pe);
 
 public:
 	enum knobType
@@ -170,49 +154,45 @@ public:
 		start,
 		end,
 		loop
-	} ;
+	};
 
 	class knob : public ::Knob
 	{
-		const AudioFileProcessorWaveView * m_waveView;
-		const Knob * m_relatedKnob;
-
+		const AudioFileProcessorWaveView* m_waveView;
+		const Knob* m_relatedKnob;
 
 	public:
-		knob( QWidget * _parent ) :
-			::Knob( knobBright_26, _parent ),
-			m_waveView( 0 ),
-			m_relatedKnob( 0 )
+		knob(QWidget* _parent)
+			: ::Knob(knobBright_26, _parent)
+			, m_waveView(0)
+			, m_relatedKnob(0)
 		{
-			setFixedSize( 37, 47 );
+			setFixedSize(37, 47);
 		}
 
-		void setWaveView( const AudioFileProcessorWaveView * _wv )
+		void setWaveView(const AudioFileProcessorWaveView* _wv)
 		{
 			m_waveView = _wv;
 		}
 
-		void setRelatedKnob( const Knob * _knob )
+		void setRelatedKnob(const Knob* _knob)
 		{
 			m_relatedKnob = _knob;
 		}
 
-		void slideBy( double _v, bool _check_bound = true )
+		void slideBy(double _v, bool _check_bound = true)
 		{
-			slideTo( model()->value() + _v, _check_bound );
+			slideTo(model()->value() + _v, _check_bound);
 		}
 
-		void slideTo( double _v, bool _check_bound = true );
-
+		void slideTo(double _v, bool _check_bound = true);
 
 	protected:
-		float getValue( const QPoint & _p );
-
+		float getValue(const QPoint& _p);
 
 	private:
-		bool checkBound( double _v ) const;
-	} ;
-
+		bool checkBound(double _v) const;
+	};
 
 public slots:
 	void update()
@@ -221,8 +201,7 @@ public slots:
 		QWidget::update();
 	}
 
-	void isPlaying( f_cnt_t _current_frame );
-
+	void isPlaying(f_cnt_t _current_frame);
 
 private:
 	static const int s_padding = 2;
@@ -233,7 +212,7 @@ private:
 		sample_start,
 		sample_end,
 		sample_loop
-	} ;
+	};
 
 	SampleBuffer& m_sampleBuffer;
 	QPixmap m_graph;
@@ -242,9 +221,9 @@ private:
 	f_cnt_t m_last_from;
 	f_cnt_t m_last_to;
 	float m_last_amp;
-	knob * m_startKnob;
-	knob * m_endKnob;
-	knob * m_loopKnob;
+	knob* m_startKnob;
+	knob* m_endKnob;
+	knob* m_loopKnob;
 	f_cnt_t m_startFrameX;
 	f_cnt_t m_endFrameX;
 	f_cnt_t m_loopFrameX;
@@ -256,35 +235,31 @@ private:
 	bool m_animation;
 
 public:
-	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
-	void setKnobs(knob *_start, knob *_end, knob *_loop );
-
+	AudioFileProcessorWaveView(QWidget* _parent, int _w, int _h, SampleBuffer& buf);
+	void setKnobs(knob* _start, knob* _end, knob* _loop);
 
 	void updateSampleRange();
-private:
-	void zoom( const bool _out = false );
-	void slide( int _px );
-	void slideSamplePointByPx( knobType _point, int _px );
-	void slideSamplePointByFrames( knobType _point, f_cnt_t _frames, bool _slide_to = false );
-	void slideSampleByFrames( f_cnt_t _frames );
 
-	void slideSamplePointToFrames( knobType _point, f_cnt_t _frames )
+private:
+	void zoom(const bool _out = false);
+	void slide(int _px);
+	void slideSamplePointByPx(knobType _point, int _px);
+	void slideSamplePointByFrames(knobType _point, f_cnt_t _frames, bool _slide_to = false);
+	void slideSampleByFrames(f_cnt_t _frames);
+
+	void slideSamplePointToFrames(knobType _point, f_cnt_t _frames)
 	{
-		slideSamplePointByFrames( _point, _frames, true );
+		slideSamplePointByFrames(_point, _frames, true);
 	}
 
 	void updateGraph();
 	void reverse();
-	void updateCursor( QMouseEvent * _me = nullptr );
+	void updateCursor(QMouseEvent* _me = nullptr);
 
-	static bool isCloseTo( int _a, int _b )
+	static bool isCloseTo(int _a, int _b)
 	{
-		return qAbs( _a - _b ) < 4;
+		return qAbs(_a - _b) < 4;
 	}
-
-} ;
-
-
-
+};
 
 #endif

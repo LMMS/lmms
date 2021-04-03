@@ -27,31 +27,30 @@
 
 #include "EffectControlDialog.h"
 #include "SaControls.h"
-#include "SaSpectrumView.h"
 #include "SaProcessor.h"
+#include "SaSpectrumView.h"
 #include "SaWaterfallView.h"
-
 
 //! Top-level widget holding the configuration GUI and spectrum displays
 class SaControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	explicit SaControlsDialog(SaControls *controls, SaProcessor *processor);
+	explicit SaControlsDialog(SaControls* controls, SaProcessor* processor);
 	virtual ~SaControlsDialog() {}
 
-	bool isResizable() const override {return true;}
+	bool isResizable() const override { return true; }
 	QSize sizeHint() const override;
 
 private:
-	SaControls *m_controls;
-	SaProcessor *m_processor;
+	SaControls* m_controls;
+	SaProcessor* m_processor;
 
 	// Pointers to created widgets are needed to keep track of their sizeHint() changes.
 	// Config widget is a plain QWidget so it has just a fixed height instead.
 	const int m_configHeight = 75;
-	SaSpectrumView *m_spectrum;
-	SaWaterfallView *m_waterfall;
+	SaSpectrumView* m_spectrum;
+	SaWaterfallView* m_waterfall;
 };
 
 #endif // SACONTROLSDIALOG_H

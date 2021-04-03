@@ -14,40 +14,47 @@
 #define _DSP_FP_TRUNCATE_MODE_H_
 
 #ifdef __i386__
-	#define fstcw(i) \
-		__asm__ __volatile__ ("fstcw %0" : "=m" (i))
+#define fstcw(i) \
+	__asm__ __volatile__("fstcw %0" \
+						 : "=m"(i))
 
-	#define fldcw(i) \
-		__asm__ __volatile__ ("fldcw %0" : : "m" (i))
+#define fldcw(i) \
+	__asm__ __volatile__("fldcw %0" \
+						 : \
+						 : "m"(i))
 
-	/* gcc chokes on __volatile__ sometimes. */
-	#define fistp(f,i) \
-		__asm__ ("fistpl %0" : "=m" (i) : "t" (f) : "st")
+/* gcc chokes on __volatile__ sometimes. */
+#define fistp(f, i) \
+	__asm__("fistpl %0" \
+			: "=m"(i) \
+			: "t"(f) \
+			: "st")
 #else /* ! __i386__ */
-	#include <cstdint>
+#include <cstdint>
 
-	inline void fistp(float f, int32_t& i) { i = static_cast<int32_t>(f); }
+inline void fistp(float f, int32_t& i) { i = static_cast<int32_t>(f); }
 #endif
 
-namespace DSP {
-	
+namespace DSP
+{
+
 class FPTruncateMode
 {
-	public:
+public:
 #ifdef __i386__
-		int cw0; /* fp control word */
+	int cw0; /* fp control word */
 
-		FPTruncateMode()
-			{
-				fstcw (cw0);
-				const int cw1 = cw0 | 0xC00;
-				fldcw (cw1);
-			}
+	FPTruncateMode()
+	{
+		fstcw(cw0);
+		const int cw1 = cw0 | 0xC00;
+		fldcw(cw1);
+	}
 
-		~FPTruncateMode()
-			{
-				fldcw (cw0);
-			}
+	~FPTruncateMode()
+	{
+		fldcw(cw0);
+	}
 #else
 	// Avoid warnings about unused variables
 	FPTruncateMode() { (void)0; }

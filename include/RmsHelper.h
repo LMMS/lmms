@@ -31,24 +31,25 @@
 class RmsHelper
 {
 public:
-	RmsHelper( int size ) :
-		m_buffer( NULL )
+	RmsHelper(int size)
+		: m_buffer(NULL)
 	{
-		setSize( size );
+		setSize(size);
 	}
-	virtual ~RmsHelper() 
+	virtual ~RmsHelper()
 	{
-		if( m_buffer ) delete[] m_buffer;
+		if (m_buffer)
+			delete[] m_buffer;
 	}
 
-	inline void setSize( int size )
+	inline void setSize(int size)
 	{
-		if( m_buffer )
+		if (m_buffer)
 		{
-			if( m_size < size )
+			if (m_size < size)
 			{
 				delete m_buffer;
-				m_buffer = new float[ size ];
+				m_buffer = new float[size];
 				m_size = size;
 				reset();
 			}
@@ -60,7 +61,7 @@ public:
 		}
 		else
 		{
-			m_buffer = new float[ size ];
+			m_buffer = new float[size];
 			m_size = size;
 			reset();
 		}
@@ -68,27 +69,26 @@ public:
 
 	inline void reset()
 	{
-		m_sizef = 1.0f / (float) m_size;
+		m_sizef = 1.0f / (float)m_size;
 		m_pos = 0;
 		m_sum = 0.0f;
-		memset( m_buffer, 0, m_size * sizeof( float ) );
+		memset(m_buffer, 0, m_size * sizeof(float));
 	}
 
-	inline float update( const float in )
+	inline float update(const float in)
 	{
-		m_sum -= m_buffer[ m_pos ];
-		m_sum += m_buffer[ m_pos ] = in * in;
+		m_sum -= m_buffer[m_pos];
+		m_sum += m_buffer[m_pos] = in * in;
 		++m_pos %= m_size;
-		return sqrtf( m_sum * m_sizef );
+		return sqrtf(m_sum * m_sizef);
 	}
 
 private:
-	float * m_buffer;
+	float* m_buffer;
 	float m_sum;
 	unsigned int m_pos;
 	unsigned int m_size;
 	float m_sizef;
 };
-
 
 #endif

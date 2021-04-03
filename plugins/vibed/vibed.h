@@ -24,12 +24,12 @@
 #ifndef _VIBED_H
 #define _VIBED_H
 
+#include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Graph.h"
 #include "Knob.h"
-#include "PixmapButton.h"
 #include "LedCheckbox.h"
+#include "PixmapButton.h"
 #include "nine_button_selector.h"
 
 class vibedView;
@@ -39,16 +39,15 @@ class vibed : public Instrument
 {
 	Q_OBJECT
 public:
-	vibed( InstrumentTrack * _instrument_track );
+	vibed(InstrumentTrack* _instrument_track);
 	virtual ~vibed();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n,
+		sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
@@ -57,9 +56,7 @@ public:
 		return IsNotBendable;
 	}
 
-
-	virtual PluginView * instantiateView( QWidget * _parent );
-
+	virtual PluginView* instantiateView(QWidget* _parent);
 
 private:
 	QList<FloatModel*> m_pickKnobs;
@@ -78,21 +75,19 @@ private:
 	static const int __sampleLength = 128;
 
 	friend class vibedView;
-} ;
-
-
+};
 
 class vibedView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	vibedView( Instrument * _instrument,
-					QWidget * _parent );
-	virtual ~vibedView() {};
+	vibedView(Instrument* _instrument,
+		QWidget* _parent);
+	virtual ~vibedView(){};
 
 public slots:
-	void showString( int _string );
-	void contextMenuEvent( QContextMenuEvent * );
+	void showString(int _string);
+	void contextMenuEvent(QContextMenuEvent*);
 
 protected slots:
 	void sinWaveClicked();
@@ -107,35 +102,32 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-
 	// String-related
-	Knob * m_pickKnob;
-	Knob * m_pickupKnob;
-	Knob * m_stiffnessKnob;
-	Knob * m_volumeKnob;
-	Knob * m_panKnob;
-	Knob * m_detuneKnob;
-	Knob * m_randomKnob;
-	Knob * m_lengthKnob;
-	Graph * m_graph;
-	nineButtonSelector * m_harmonic;
-	LedCheckBox * m_impulse;
-	LedCheckBox * m_power;
+	Knob* m_pickKnob;
+	Knob* m_pickupKnob;
+	Knob* m_stiffnessKnob;
+	Knob* m_volumeKnob;
+	Knob* m_panKnob;
+	Knob* m_detuneKnob;
+	Knob* m_randomKnob;
+	Knob* m_lengthKnob;
+	Graph* m_graph;
+	nineButtonSelector* m_harmonic;
+	LedCheckBox* m_impulse;
+	LedCheckBox* m_power;
 
 	// Not in model
-	nineButtonSelector * m_stringSelector;
-	PixmapButton * m_smoothBtn;
-	PixmapButton * m_normalizeBtn;
+	nineButtonSelector* m_stringSelector;
+	PixmapButton* m_smoothBtn;
+	PixmapButton* m_normalizeBtn;
 
 	// From impulse editor
-	PixmapButton * m_sinWaveBtn;
-	PixmapButton * m_triangleWaveBtn;
-	PixmapButton * m_sqrWaveBtn;
-	PixmapButton * m_sawWaveBtn;
-	PixmapButton * m_whiteNoiseWaveBtn;
-	PixmapButton * m_usrWaveBtn;
-
-
+	PixmapButton* m_sinWaveBtn;
+	PixmapButton* m_triangleWaveBtn;
+	PixmapButton* m_sqrWaveBtn;
+	PixmapButton* m_sawWaveBtn;
+	PixmapButton* m_whiteNoiseWaveBtn;
+	PixmapButton* m_usrWaveBtn;
 };
 
 #endif

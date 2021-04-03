@@ -22,43 +22,39 @@
  *
  */
 
-
 #ifndef _STEREO_ENHANCER_H
 #define _STEREO_ENHANCER_H
 
-#include "Effect.h"
 #include "DspEffectLibrary.h"
+#include "Effect.h"
 #include "Engine.h"
 #include "stereoenhancer_controls.h"
 
 class stereoEnhancerEffect : public Effect
 {
 public:
-	stereoEnhancerEffect( Model * parent,
-	                      const Descriptor::SubPluginFeatures::Key * _key );
+	stereoEnhancerEffect(Model* parent,
+		const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~stereoEnhancerEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-		                                          const fpp_t _frames );
+	virtual bool processAudioBuffer(sampleFrame* _buf,
+		const fpp_t _frames);
 
-	virtual EffectControls * controls()
+	virtual EffectControls* controls()
 	{
-		return( &m_bbControls );
+		return (&m_bbControls);
 	}
 
 	void clearMyBuffer();
 
-
 private:
 	DspEffectLibrary::StereoEnhancer m_seFX;
-	
-	sampleFrame * m_delayBuffer;
+
+	sampleFrame* m_delayBuffer;
 	int m_currFrame;
-	
+
 	stereoEnhancerControls m_bbControls;
 
 	friend class stereoEnhancerControls;
-} ;
-
-
+};
 
 #endif

@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef CAPTION_MENU_H
 #define CAPTION_MENU_H
 
@@ -37,11 +36,8 @@ class LMMS_EXPORT CaptionMenu : public QMenu
 {
 	Q_OBJECT
 public:
-	CaptionMenu( const QString & _title, QWidget * _parent = 0 );
+	CaptionMenu(const QString& _title, QWidget* _parent = 0);
 	virtual ~CaptionMenu();
-} ;
-
-
-
+};
 
 #endif

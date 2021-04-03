@@ -26,27 +26,23 @@
 #ifndef PANNING_H
 #define PANNING_H
 
+#include "Midi.h"
 #include "lmms_basics.h"
 #include "panning_constants.h"
-#include "Midi.h"
 #include "volume.h"
 
-inline stereoVolumeVector panningToVolumeVector( panning_t _p,
-							float _scale = 1.0f )
+inline stereoVolumeVector panningToVolumeVector(panning_t _p,
+	float _scale = 1.0f)
 {
-	stereoVolumeVector v = { { _scale, _scale } };
+	stereoVolumeVector v = {{_scale, _scale}};
 	const float pf = _p / 100.0f;
-	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - qAbs<float>( pf );
+	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - qAbs<float>(pf);
 	return v;
 }
 
-
-inline int panningToMidi( panning_t _p )
+inline int panningToMidi(panning_t _p)
 {
-	return MidiMinPanning + (int) (
-			  ( (float)( _p - PanningLeft ) ) /
-			  ( (float)( PanningRight - PanningLeft ) ) *
-			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
+	return MidiMinPanning + (int)(((float)(_p - PanningLeft)) / ((float)(PanningRight - PanningLeft)) * ((float)(MidiMaxPanning - MidiMinPanning)));
 }
 
 #endif

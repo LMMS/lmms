@@ -26,51 +26,49 @@
 #define EQCURVE_H
 
 #include <QGraphicsItem>
-#include <QPainter>
 #include <QGraphicsSceneWheelEvent>
-#include "lmms_math.h"
+#include <QPainter>
+
 #include "AutomatableModelView.h"
+#include "lmms_math.h"
 
-
-enum{
-	highpass=1,
+enum
+{
+	highpass = 1,
 	lowshelf,
 	para,
 	highshelf,
 	lowpass
 };
 
-
-
-
 // implements the Eq_Handle to control a band
 class EqHandle : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	EqHandle( int num, int x, int y );
+	EqHandle(int num, int x, int y);
 
-	static float freqToXPixel( float freq, int w );
-	static float xPixelToFreq( float x , int w );
-	static float gainToYPixel( float gain, int h, float pixelPerUnitHeight );
-	static float yPixelToGain( float y, int h, float pixelPerUnitHeight );
+	static float freqToXPixel(float freq, int w);
+	static float xPixelToFreq(float x, int w);
+	static float gainToYPixel(float gain, int h, float pixelPerUnitHeight);
+	static float yPixelToGain(float y, int h, float pixelPerUnitHeight);
 
 	QRectF boundingRect() const;
 	QPainterPath getCurvePath();
-	float getPeakCurve( float x );
-	float getHighShelfCurve( float x );
-	float getLowShelfCurve( float x );
-	float getLowCutCurve( float x );
-	float getHighCutCurve( float x );
+	float getPeakCurve(float x);
+	float getHighShelfCurve(float x);
+	float getLowShelfCurve(float x);
+	float getLowCutCurve(float x);
+	float getHighCutCurve(float x);
 	float getResonance();
 	int getNum();
 	int getType();
-	void setType( int t );
-	void setResonance( float r );
+	void setType(int t);
+	void setResonance(float r);
 	bool isMouseHover();
-	void setMouseHover( bool d );
+	void setMouseHover(bool d);
 	bool isActiveHandle();
-	void setHandleActive( bool a );
+	void setHandleActive(bool a);
 	bool mousePressed() const;
 	void sethp12();
 	void sethp24();
@@ -83,16 +81,16 @@ signals:
 	void positionChanged();
 
 protected:
-	void mousePressEvent( QGraphicsSceneMouseEvent *event );
-	void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
-	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
-	void wheelEvent( QGraphicsSceneWheelEvent *wevent );
-	void hoverEnterEvent( QGraphicsSceneHoverEvent *hevent );
-	void hoverLeaveEvent( QGraphicsSceneHoverEvent *hevent );
-	QVariant itemChange( GraphicsItemChange change, const QVariant &value );
+	void mousePressEvent(QGraphicsSceneMouseEvent* event);
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+	void wheelEvent(QGraphicsSceneWheelEvent* wevent);
+	void hoverEnterEvent(QGraphicsSceneHoverEvent* hevent);
+	void hoverLeaveEvent(QGraphicsSceneHoverEvent* hevent);
+	QVariant itemChange(GraphicsItemChange change, const QVariant& value);
 
 private:
-	double calculateGain( const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 );
+	double calculateGain(const double freq, const double a1, const double a2, const double b0, const double b1, const double b2);
 	void loadPixmap();
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
@@ -112,22 +110,19 @@ private:
 	QPixmap m_circlePixmap;
 };
 
-
-
-
 class EqCurve : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	EqCurve( QList<EqHandle*> *handle, int x, int y );
+	EqCurve(QList<EqHandle*>* handle, int x, int y);
 	QRectF boundingRect() const;
 	void setModelChanged(bool mc);
 
 protected:
-	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
+	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
 private:
-	QList<EqHandle*> *m_handle;
+	QList<EqHandle*>* m_handle;
 	QPainterPath m_curve;
 	QPixmap m_curvePixmapCache;
 	int m_width, m_heigth;

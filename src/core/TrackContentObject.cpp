@@ -32,35 +32,31 @@
 #include "GuiApplication.h"
 #include "Song.h"
 
-
 /*! \brief Create a new TrackContentObject
  *
  *  Creates a new track content object for the given track.
  *
  * \param _track The track that will contain the new object
  */
-TrackContentObject::TrackContentObject( Track * track ) :
-	Model( track ),
-	m_track( track ),
-	m_startPosition(),
-	m_length(),
-	m_mutedModel( false, this, tr( "Mute" ) ),
-	m_selectViewOnCreate( false ),
-	m_color( 128, 128, 128 ),
-	m_useCustomClipColor( false )
+TrackContentObject::TrackContentObject(Track* track)
+	: Model(track)
+	, m_track(track)
+	, m_startPosition()
+	, m_length()
+	, m_mutedModel(false, this, tr("Mute"))
+	, m_selectViewOnCreate(false)
+	, m_color(128, 128, 128)
+	, m_useCustomClipColor(false)
 {
-	if( getTrack() )
+	if (getTrack())
 	{
-		getTrack()->addTCO( this );
+		getTrack()->addTCO(this);
 	}
-	setJournalling( false );
-	movePosition( 0 );
-	changeLength( 0 );
-	setJournalling( true );
+	setJournalling(false);
+	movePosition(0);
+	changeLength(0);
+	setJournalling(true);
 }
-
-
-
 
 /*! \brief Destroy a TrackContentObject
  *
@@ -71,14 +67,11 @@ TrackContentObject::~TrackContentObject()
 {
 	emit destroyedTCO();
 
-	if( getTrack() )
+	if (getTrack())
 	{
-		getTrack()->removeTCO( this );
+		getTrack()->removeTCO(this);
 	}
 }
-
-
-
 
 /*! \brief Move this TrackContentObject's position in time
  *
@@ -87,7 +80,7 @@ TrackContentObject::~TrackContentObject()
  *
  * \param _pos The new position of the track content object.
  */
-void TrackContentObject::movePosition( const TimePos & pos )
+void TrackContentObject::movePosition(const TimePos& pos)
 {
 	TimePos newPos = qMax(0, pos.getTicks());
 	if (m_startPosition != newPos)
@@ -100,9 +93,6 @@ void TrackContentObject::movePosition( const TimePos & pos )
 	}
 }
 
-
-
-
 /*! \brief Change the length of this TrackContentObject
  *
  *  If the track content object's length has changed, update it.  We
@@ -110,47 +100,39 @@ void TrackContentObject::movePosition( const TimePos & pos )
  *
  * \param _length The new length of the track content object.
  */
-void TrackContentObject::changeLength( const TimePos & length )
+void TrackContentObject::changeLength(const TimePos& length)
 {
 	m_length = length;
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }
 
-
-
-
-bool TrackContentObject::comparePosition(const TrackContentObject *a, const TrackContentObject *b)
+bool TrackContentObject::comparePosition(const TrackContentObject* a, const TrackContentObject* b)
 {
 	return a->startPosition() < b->startPosition();
 }
-
-
-
 
 /*! \brief Copies the state of a TrackContentObject to another TrackContentObject
  *
  *  This method copies the state of a TCO to another TCO
  */
-void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObject *dst )
+void TrackContentObject::copyStateTo(TrackContentObject* src, TrackContentObject* dst)
 {
 	// If the node names match we copy the state
-	if( src->nodeName() == dst->nodeName() ){
+	if (src->nodeName() == dst->nodeName())
+	{
 		QDomDocument doc;
-		QDomElement parent = doc.createElement( "StateCopy" );
-		src->saveState( doc, parent );
+		QDomElement parent = doc.createElement("StateCopy");
+		src->saveState(doc, parent);
 
 		const TimePos pos = dst->startPosition();
-		dst->restoreState( parent.firstChild().toElement() );
-		dst->movePosition( pos );
+		dst->restoreState(parent.firstChild().toElement());
+		dst->movePosition(pos);
 
 		AutomationPattern::resolveAllIDs();
 		GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
 	}
 }
-
-
-
 
 /*! \brief Mutes this TrackContentObject
  *
@@ -162,22 +144,16 @@ void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObjec
  */
 void TrackContentObject::toggleMute()
 {
-	m_mutedModel.setValue( !m_mutedModel.value() );
+	m_mutedModel.setValue(!m_mutedModel.value());
 	emit dataChanged();
 }
-
-
-
 
 TimePos TrackContentObject::startTimeOffset() const
 {
 	return m_startTimeOffset;
 }
 
-
-
-
-void TrackContentObject::setStartTimeOffset( const TimePos &startTimeOffset )
+void TrackContentObject::setStartTimeOffset(const TimePos& startTimeOffset)
 {
 	m_startTimeOffset = startTimeOffset;
 }
@@ -185,22 +161,19 @@ void TrackContentObject::setStartTimeOffset( const TimePos &startTimeOffset )
 // Update TCO color if it follows the track color
 void TrackContentObject::updateColor()
 {
-	if( ! m_useCustomClipColor )
+	if (!m_useCustomClipColor)
 	{
 		emit trackColorChanged();
 	}
 }
 
-
-void TrackContentObject::useCustomClipColor( bool b )
+void TrackContentObject::useCustomClipColor(bool b)
 {
 	m_useCustomClipColor = b;
 	updateColor();
 }
 
-
 bool TrackContentObject::hasColor()
 {
 	return usesCustomClipColor() || getTrack()->useColor();
 }
-

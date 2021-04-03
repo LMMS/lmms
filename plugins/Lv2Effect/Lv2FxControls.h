@@ -30,29 +30,28 @@
 
 class Lv2Effect;
 
-
 class Lv2FxControls : public EffectControls, public Lv2ControlBase
 {
 	Q_OBJECT
 public:
-	Lv2FxControls(Lv2Effect *effect, const QString &uri);
+	Lv2FxControls(Lv2Effect* effect, const QString& uri);
 
-	void saveSettings(QDomDocument &_doc, QDomElement &_parent) override;
-	void loadSettings(const QDomElement &that) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& that) override;
 	inline QString nodeName() const override
 	{
 		return Lv2ControlBase::nodeName();
 	}
 
 	int controlCount() override;
-	EffectControlDialog *createView() override;
+	EffectControlDialog* createView() override;
 
 private slots:
 	void changeControl();
 
 private:
 	DataFile::Types settingsType() override;
-	void setNameFromFile(const QString &name) override;
+	void setNameFromFile(const QString& name) override;
 
 	friend class Lv2FxControlDialog;
 	friend class Lv2Effect;

@@ -34,40 +34,35 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-
 class LcdSpinBox;
 class QLineEdit;
-
 
 class AudioOss : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioOss( bool & _success_ful, Mixer* mixer );
+	AudioOss(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioOss();
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "OSS (Open Sound System)" );
+		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "OSS (Open Sound System)");
 	}
 
 	static QString probeDevice();
 
-
 	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
-		setupWidget( QWidget * _parent );
+		setupWidget(QWidget* _parent);
 		virtual ~setupWidget();
 
 		void saveSettings() override;
 
 	private:
-		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
-
-	} ;
-
+		QLineEdit* m_device;
+		LcdSpinBox* m_channels;
+	};
 
 private:
 	void startProcessing() override;
@@ -78,9 +73,7 @@ private:
 	int m_audioFD;
 
 	bool m_convertEndian;
-
-} ;
-
+};
 
 #endif
 

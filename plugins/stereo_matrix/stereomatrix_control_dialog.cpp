@@ -22,48 +22,44 @@
  *
  */
 
-
-
-#include <QLayout>
-#include <QLabel>
-
 #include "stereomatrix_control_dialog.h"
-#include "stereomatrix_controls.h"
+
+#include <QLabel>
+#include <QLayout>
+
 #include "embed.h"
-
-
+#include "stereomatrix_controls.h"
 
 stereoMatrixControlDialog::stereoMatrixControlDialog(
-	stereoMatrixControls * _controls ) :
-	EffectControlDialog( _controls )
+	stereoMatrixControls* _controls)
+	: EffectControlDialog(_controls)
 {
 
-	setFixedSize( 160, 185 );
+	setFixedSize(160, 185);
 
-	setAutoFillBackground( true );
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
+	pal.setBrush(backgroundRole(),
+		PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
 
+	Knob* llKnob = new Knob(knobBright_26, this);
+	llKnob->setModel(&_controls->m_llModel);
+	llKnob->setHintText(tr("Left to Left Vol:"), "");
+	llKnob->move(10, 79);
 
-	Knob * llKnob = new Knob( knobBright_26, this );
-	llKnob->setModel( &_controls->m_llModel );
-	llKnob->setHintText( tr( "Left to Left Vol:" ) , "" );
-	llKnob->move( 10, 79 );
+	Knob* lrKnob = new Knob(knobBright_26, this);
+	lrKnob->setModel(&_controls->m_lrModel);
+	lrKnob->setHintText(tr("Left to Right Vol:"), "");
+	lrKnob->move(48, 79);
 
-	Knob * lrKnob = new Knob( knobBright_26, this );
-	lrKnob->setModel( &_controls->m_lrModel );
-	lrKnob->setHintText( tr( "Left to Right Vol:" ) , "" );
-	lrKnob->move( 48, 79 );
+	Knob* rlKnob = new Knob(knobBright_26, this);
+	rlKnob->setModel(&_controls->m_rlModel);
+	rlKnob->setHintText(tr("Right to Left Vol:"), "");
+	rlKnob->move(85, 79);
 
-	Knob * rlKnob = new Knob( knobBright_26, this );
-	rlKnob->setModel( &_controls->m_rlModel );
-	rlKnob->setHintText( tr( "Right to Left Vol:" ) , "" );
-	rlKnob->move( 85, 79 );
-
-	Knob * rrKnob = new Knob( knobBright_26, this );
-	rrKnob->setModel( &_controls->m_rrModel );
-	rrKnob->setHintText( tr( "Right to Right Vol:" ) , "" );
-	rrKnob->move( 123, 79 );
+	Knob* rrKnob = new Knob(knobBright_26, this);
+	rrKnob->setModel(&_controls->m_rrModel);
+	rrKnob->setHintText(tr("Right to Right Vol:"), "");
+	rrKnob->move(123, 79);
 }

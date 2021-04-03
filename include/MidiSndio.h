@@ -30,19 +30,17 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QtCore/QThread>
 #include <QtCore/QFile>
-
+#include <QtCore/QThread>
 #include <sndio.h>
 
 #include "MidiClient.h"
-
 
 class MidiSndio : public QThread, public MidiClientRaw
 {
 	Q_OBJECT
 public:
-	MidiSndio( void );
+	MidiSndio(void);
 	virtual ~MidiSndio();
 
 	static QString probeDevice(void);
@@ -57,16 +55,15 @@ public:
 		return "MidiSndio";
 	}
 
-
 protected:
 	void sendByte(const unsigned char c) override;
 	void run(void) override;
 
 private:
-	struct mio_hdl *m_hdl;
+	struct mio_hdl* m_hdl;
 	volatile bool m_quit;
-} ;
+};
 
-#endif	/* LMMS_HAVE_SNDIO */
+#endif /* LMMS_HAVE_SNDIO */
 
-#endif	/* _MIDI_SNDIO_H */
+#endif /* _MIDI_SNDIO_H */

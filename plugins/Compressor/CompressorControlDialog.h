@@ -38,7 +38,6 @@
 #include "MainWindow.h"
 #include "PixmapButton.h"
 
-
 constexpr int COMP_MILLI_PER_PIXEL = 6;
 constexpr int MIN_COMP_SCREEN_X = 800;
 constexpr int MIN_COMP_SCREEN_Y = 360;
@@ -51,12 +50,10 @@ constexpr int KNEE_SCREEN_Y = COMP_SCREEN_Y;
 constexpr int COMP_KNEE_LINES = 20;
 constexpr int COMP_BOX_X = 720;
 constexpr int COMP_BOX_Y = 280;
-constexpr float COMP_GRID_SPACING = 3.f;// 3 db per grid line
-constexpr float COMP_GRID_MAX = 96.f;// Can't zoom out past 96 db
+constexpr float COMP_GRID_SPACING = 3.f; // 3 db per grid line
+constexpr float COMP_GRID_MAX = 96.f;	 // Can't zoom out past 96 db
 
-constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
-
-
+constexpr float COMP_NOISE_FLOOR = 0.000001; // -120 dbFs
 
 class CompressorControls;
 
@@ -66,8 +63,8 @@ class CompressorControlDialog : public EffectControlDialog
 public:
 	CompressorControlDialog(CompressorControls* controls);
 
-	bool isResizable() const override {return true;}
-	QSize sizeHint() const override {return QSize(COMP_SCREEN_X, COMP_SCREEN_Y);}
+	bool isResizable() const override { return true; }
+	QSize sizeHint() const override { return QSize(COMP_SCREEN_X, COMP_SCREEN_Y); }
 
 	// For theming purposes
 	Q_PROPERTY(QColor inVolAreaColor MEMBER m_inVolAreaColor)
@@ -83,9 +80,9 @@ public:
 	Q_PROPERTY(QColor resetColor MEMBER m_resetColor)
 
 protected:
-	void resizeEvent(QResizeEvent *event) override;
-	void paintEvent(QPaintEvent *event) override;
-	void wheelEvent(QWheelEvent *event) override;
+	void resizeEvent(QResizeEvent* event) override;
+	void paintEvent(QPaintEvent* event) override;
+	void wheelEvent(QWheelEvent* event) override;
 
 private slots:
 	void updateDisplay();
@@ -95,8 +92,8 @@ private slots:
 	void limiterChanged();
 
 private:
-	void makeLargeKnob(Knob * knob, QString hint, QString unit);
-	void makeSmallKnob(Knob * knob, QString hint, QString unit);
+	void makeLargeKnob(Knob* knob, QString hint, QString unit);
+	void makeSmallKnob(Knob* knob, QString hint, QString unit);
 	void resetCompressorView();
 	void drawVisPixmap();
 	void redrawKnee();
@@ -108,7 +105,7 @@ private:
 
 	QBasicTimer m_updateTimer;
 
-	CompressorControls * m_controls;
+	CompressorControls* m_controls;
 
 	inline int dbfsToYPoint(float inDbfs);
 	inline int dbfsToXPoint(float inDbfs);
@@ -155,64 +152,64 @@ private:
 
 	int m_compPixelMovement;
 
-	QLabel * m_controlsBoxLabel;
-	QLabel * m_rmsEnabledLabel;
-	QLabel * m_blendEnabledLabel;
-	QLabel * m_lookaheadEnabledLabel;
-	QLabel * m_ratioEnabledLabel;
+	QLabel* m_controlsBoxLabel;
+	QLabel* m_rmsEnabledLabel;
+	QLabel* m_blendEnabledLabel;
+	QLabel* m_lookaheadEnabledLabel;
+	QLabel* m_ratioEnabledLabel;
 
-	Knob * m_thresholdKnob;
-	Knob * m_ratioKnob;
-	Knob * m_attackKnob;
-	Knob * m_releaseKnob;
-	Knob * m_kneeKnob;
-	Knob * m_rangeKnob;
-	Knob * m_lookaheadLengthKnob;
-	Knob * m_holdKnob;
+	Knob* m_thresholdKnob;
+	Knob* m_ratioKnob;
+	Knob* m_attackKnob;
+	Knob* m_releaseKnob;
+	Knob* m_kneeKnob;
+	Knob* m_rangeKnob;
+	Knob* m_lookaheadLengthKnob;
+	Knob* m_holdKnob;
 
-	Knob * m_rmsKnob;
-	Knob * m_inBalanceKnob;
-	Knob * m_outBalanceKnob;
-	Knob * m_stereoBalanceKnob;
-	Knob * m_blendKnob;
-	Knob * m_tiltKnob;
-	Knob * m_tiltFreqKnob;
-	Knob * m_mixKnob;
+	Knob* m_rmsKnob;
+	Knob* m_inBalanceKnob;
+	Knob* m_outBalanceKnob;
+	Knob* m_stereoBalanceKnob;
+	Knob* m_blendKnob;
+	Knob* m_tiltKnob;
+	Knob* m_tiltFreqKnob;
+	Knob* m_mixKnob;
 
-	Knob * m_autoAttackKnob;
-	Knob * m_autoReleaseKnob;
+	Knob* m_autoAttackKnob;
+	Knob* m_autoReleaseKnob;
 
-	EqFader * m_outFader;
-	EqFader * m_inFader;
+	EqFader* m_outFader;
+	EqFader* m_inFader;
 
-	PixmapButton * rmsButton;
-	PixmapButton * peakButton;
-	automatableButtonGroup * rmsPeakGroup;
+	PixmapButton* rmsButton;
+	PixmapButton* peakButton;
+	automatableButtonGroup* rmsPeakGroup;
 
-	PixmapButton * leftRightButton;
-	PixmapButton * midSideButton;
-	automatableButtonGroup * leftRightMidSideGroup;
+	PixmapButton* leftRightButton;
+	PixmapButton* midSideButton;
+	automatableButtonGroup* leftRightMidSideGroup;
 
-	PixmapButton * compressButton;
-	PixmapButton * limitButton;
-	automatableButtonGroup * compressLimitGroup;
+	PixmapButton* compressButton;
+	PixmapButton* limitButton;
+	automatableButtonGroup* compressLimitGroup;
 
-	PixmapButton * unlinkedButton;
-	PixmapButton * maximumButton;
-	PixmapButton * averageButton;
-	PixmapButton * minimumButton;
-	PixmapButton * blendButton;
-	automatableButtonGroup * stereoLinkGroup;
+	PixmapButton* unlinkedButton;
+	PixmapButton* maximumButton;
+	PixmapButton* averageButton;
+	PixmapButton* minimumButton;
+	PixmapButton* blendButton;
+	automatableButtonGroup* stereoLinkGroup;
 
-	PixmapButton * autoMakeupButton;
-	PixmapButton * auditionButton;
-	PixmapButton * feedbackButton;
-	PixmapButton * lookaheadButton;
+	PixmapButton* autoMakeupButton;
+	PixmapButton* auditionButton;
+	PixmapButton* feedbackButton;
+	PixmapButton* lookaheadButton;
 
 	QElapsedTimer m_timeElapsed;
 	int m_timeSinceLastUpdate = 0;
 
 	friend class CompressorControls;
-} ;
+};
 
 #endif

@@ -25,18 +25,15 @@
 #ifndef LINKEDMODELGROUPVIEWS_H
 #define LINKEDMODELGROUPVIEWS_H
 
-
+#include <QWidget>
 #include <cstddef>
 #include <memory>
 #include <vector>
-#include <QWidget>
-
 
 /**
 	@file LinkedModelGroupViews.h
 	See Lv2ViewBase.h for example usage
 */
-
 
 /**
 	View for a representative processor
@@ -56,20 +53,20 @@ public:
 		@param colNum numbers of columns for the controls
 			(link LEDs not counted)
 	*/
-	LinkedModelGroupView(QWidget *parent, class LinkedModelGroup* model,
+	LinkedModelGroupView(QWidget* parent, class LinkedModelGroup* model,
 		std::size_t colNum);
 	~LinkedModelGroupView();
 
 	//! Reconnect models if model changed
-	void modelChanged(class LinkedModelGroup *linkedModelGroup);
+	void modelChanged(class LinkedModelGroup* linkedModelGroup);
 
 protected:
 	//! Add a control to this widget
 	//! @warning This widget will own this control, do not free it
-	void addControl(class Control *ctrl, const std::string &id,
-					const std::string& display, bool removable);
+	void addControl(class Control* ctrl, const std::string& id,
+		const std::string& display, bool removable);
 
-	void removeControl(const QString &key);
+	void removeControl(const QString& key);
 
 	void removeFocusFromSearchBar();
 
@@ -81,7 +78,6 @@ private:
 	class ControlLayout* m_layout;
 	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
 };
-
 
 /**
 	Container class for one LinkedModelGroupView
@@ -102,6 +98,5 @@ private:
 	//! which has the same value as "this"
 	virtual LinkedModelGroupView* getGroupView() = 0;
 };
-
 
 #endif // LINKEDMODELGROUPVIEWS_H

@@ -29,38 +29,42 @@
 #include "Analyzer.h"
 #include "SaControlsDialog.h"
 
-
-SaControls::SaControls(Analyzer *effect) :
-	EffectControls(effect),
-	m_effect(effect),
+SaControls::SaControls(Analyzer* effect)
+	: EffectControls(effect)
+	, m_effect(effect)
+	,
 
 	// initialize bool models and set default values
-	m_pauseModel(false, this, tr("Pause")),
-	m_refFreezeModel(false, this, tr("Reference freeze")),
+	m_pauseModel(false, this, tr("Pause"))
+	, m_refFreezeModel(false, this, tr("Reference freeze"))
+	,
 
-	m_waterfallModel(false, this, tr("Waterfall")),
-	m_smoothModel(false, this, tr("Averaging")),
-	m_stereoModel(false, this, tr("Stereo")),
-	m_peakHoldModel(false, this, tr("Peak hold")),
+	m_waterfallModel(false, this, tr("Waterfall"))
+	, m_smoothModel(false, this, tr("Averaging"))
+	, m_stereoModel(false, this, tr("Stereo"))
+	, m_peakHoldModel(false, this, tr("Peak hold"))
+	,
 
-	m_logXModel(true, this, tr("Logarithmic frequency")),
-	m_logYModel(true, this, tr("Logarithmic amplitude")),
+	m_logXModel(true, this, tr("Logarithmic frequency"))
+	, m_logYModel(true, this, tr("Logarithmic amplitude"))
+	,
 
 	// default values of combo boxes are set after they are populated
-	m_freqRangeModel(this, tr("Frequency range")),
-	m_ampRangeModel(this, tr("Amplitude range")),
-	m_blockSizeModel(this, tr("FFT block size")),
-	m_windowModel(this, tr("FFT window type")),
+	m_freqRangeModel(this, tr("Frequency range"))
+	, m_ampRangeModel(this, tr("Amplitude range"))
+	, m_blockSizeModel(this, tr("FFT block size"))
+	, m_windowModel(this, tr("FFT window type"))
+	,
 
 	// Advanced settings knobs
-	m_envelopeResolutionModel(0.25f, 0.1f, 3.0f, 0.05f, this, tr("Peak envelope resolution")),
-	m_spectrumResolutionModel(1.5f, 0.1f, 3.0f, 0.05f, this, tr("Spectrum display resolution")),
-	m_peakDecayFactorModel(0.992f, 0.95f, 0.999f, 0.001f, this, tr("Peak decay multiplier")),
-	m_averagingWeightModel(0.15f, 0.01f, 0.5f, 0.01f, this, tr("Averaging weight")),
-	m_waterfallHeightModel(300.0f, 50.0f, 1000.0f, 50.0f, this, tr("Waterfall history size")),
-	m_waterfallGammaModel(0.30f, 0.10f, 1.00f, 0.05f, this, tr("Waterfall gamma correction")),
-	m_windowOverlapModel(2.0f, 1.0f, 4.0f, 1.0f, this, tr("FFT window overlap")),
-	m_zeroPaddingModel(2.0f, 0.0f, 4.0f, 1.0f, this, tr("FFT zero padding"))
+	m_envelopeResolutionModel(0.25f, 0.1f, 3.0f, 0.05f, this, tr("Peak envelope resolution"))
+	, m_spectrumResolutionModel(1.5f, 0.1f, 3.0f, 0.05f, this, tr("Spectrum display resolution"))
+	, m_peakDecayFactorModel(0.992f, 0.95f, 0.999f, 0.001f, this, tr("Peak decay multiplier"))
+	, m_averagingWeightModel(0.15f, 0.01f, 0.5f, 0.01f, this, tr("Averaging weight"))
+	, m_waterfallHeightModel(300.0f, 50.0f, 1000.0f, 50.0f, this, tr("Waterfall history size"))
+	, m_waterfallGammaModel(0.30f, 0.10f, 1.00f, 0.05f, this, tr("Waterfall gamma correction"))
+	, m_windowOverlapModel(2.0f, 1.0f, 4.0f, 1.0f, this, tr("FFT window overlap"))
+	, m_zeroPaddingModel(2.0f, 0.0f, 4.0f, 1.0f, this, tr("FFT zero padding"))
 {
 	// Frequency and amplitude ranges; order must match
 	// FREQUENCY_RANGES and AMPLITUDE_RANGES defined in SaControls.h
@@ -116,9 +120,8 @@ SaControls::SaControls(Analyzer *effect) :
 	m_colorMonoW = QColor(64, 185, 255, 255);
 	m_colorBG = QColor(7, 7, 7, 255);			// ~20 % gray (after gamma correction)
 	m_colorGrid = QColor(30, 34, 38, 255);		// ~40 % gray (slightly cold / blue)
-	m_colorLabels = QColor(192, 202, 212, 255);	// ~90 % gray (slightly cold / blue)
+	m_colorLabels = QColor(192, 202, 212, 255); // ~90 % gray (slightly cold / blue)
 }
-
 
 // Create the SaControlDialog widget which handles display of GUI elements.
 EffectControlDialog* SaControls::createView()
@@ -126,8 +129,7 @@ EffectControlDialog* SaControls::createView()
 	return new SaControlsDialog(this, m_effect->getProcessor());
 }
 
-
-void SaControls::loadSettings(const QDomElement &_this)
+void SaControls::loadSettings(const QDomElement& _this)
 {
 	m_waterfallModel.loadSettings(_this, "Waterfall");
 	m_smoothModel.loadSettings(_this, "Smooth");
@@ -150,8 +152,7 @@ void SaControls::loadSettings(const QDomElement &_this)
 	m_zeroPaddingModel.loadSettings(_this, "ZeroPadding");
 }
 
-
-void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
+void SaControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
 	m_waterfallModel.saveSettings(doc, parent, "Waterfall");
 	m_smoothModel.saveSettings(doc, parent, "Smooth");
@@ -172,5 +173,4 @@ void SaControls::saveSettings(QDomDocument &doc, QDomElement &parent)
 	m_waterfallGammaModel.saveSettings(doc, parent, "WaterfallGamma");
 	m_windowOverlapModel.saveSettings(doc, parent, "WindowOverlap");
 	m_zeroPaddingModel.saveSettings(doc, parent, "ZeroPadding");
-
 }

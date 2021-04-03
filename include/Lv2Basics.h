@@ -22,18 +22,16 @@
  *
  */
 
-
 #ifndef LV2BASICS_H
 #define LV2BASICS_H
-
 
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_LV2
 
+#include <QString>
 #include <lilv/lilv.h>
 #include <memory>
-#include <QString>
 #include <string>
 
 struct LilvNodeDeleter
@@ -55,7 +53,7 @@ using AutoLilvNodes = std::unique_ptr<LilvNodes, LilvNodesDeleter>;
 	@param getFunc The function to return the node from the plugin
 */
 QString qStringFromPluginNode(const LilvPlugin* plug,
-		LilvNode * (*getFunc)(const LilvPlugin*));
+	LilvNode* (*getFunc)(const LilvPlugin*));
 
 //! Return port name as QString, everything will be freed automatically
 QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port);

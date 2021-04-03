@@ -31,9 +31,9 @@
 #include "MainWindow.h"
 #include "Song.h"
 
-MainApplication::MainApplication(int& argc, char** argv) :
-	QApplication(argc, argv),
-	m_queuedFile()
+MainApplication::MainApplication(int& argc, char** argv)
+	: QApplication(argc, argv)
+	, m_queuedFile()
 {
 #if defined(LMMS_BUILD_WIN32)
 	installNativeEventFilter(this);
@@ -42,29 +42,28 @@ MainApplication::MainApplication(int& argc, char** argv) :
 
 bool MainApplication::event(QEvent* event)
 {
-	switch(event->type())
+	switch (event->type())
 	{
-		case QEvent::FileOpen:
+	case QEvent::FileOpen: {
+		QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event);
+		// Handle the project file
+		m_queuedFile = fileEvent->file();
+		if (Engine::getSong())
 		{
-			QFileOpenEvent * fileEvent = static_cast<QFileOpenEvent *>(event);
-			// Handle the project file
-			m_queuedFile = fileEvent->file();
-			if(Engine::getSong())
+			if (gui->mainWindow()->mayChangeProject(true))
 			{
-				if(gui->mainWindow()->mayChangeProject(true))
-				{
-					qDebug() << "Loading file " << m_queuedFile;
-					Engine::getSong()->loadProject(m_queuedFile);
-				}
+				qDebug() << "Loading file " << m_queuedFile;
+				Engine::getSong()->loadProject(m_queuedFile);
 			}
-			else
-			{
-				qDebug() << "Queuing file " << m_queuedFile;
-			}
-			return true;
 		}
-		default:
-			return QApplication::event(event);
+		else
+		{
+			qDebug() << "Queuing file " << m_queuedFile;
+		}
+		return true;
+	}
+	default:
+		return QApplication::event(event);
 	}
 }
 
@@ -72,32 +71,32 @@ bool MainApplication::event(QEvent* event)
 // This can be moved into nativeEventFilter once Qt4 support has been dropped
 bool MainApplication::winEventFilter(MSG* msg, long* result)
 {
-	switch(msg->message)
+	switch (msg->message)
 	{
-		case WM_STYLECHANGING:
-			if(msg->wParam == GWL_EXSTYLE)
+	case WM_STYLECHANGING:
+		if (msg->wParam == GWL_EXSTYLE)
+		{
+			// Prevent plugins making the main window transparent
+			STYLESTRUCT* style = reinterpret_cast<STYLESTRUCT*>(msg->lParam);
+			if (!(style->styleOld & WS_EX_LAYERED))
 			{
-				// Prevent plugins making the main window transparent
-				STYLESTRUCT * style = reinterpret_cast<STYLESTRUCT *>(msg->lParam);
-				if(!(style->styleOld & WS_EX_LAYERED))
-				{
-					style->styleNew &= ~WS_EX_LAYERED;
-				}
-				*result = 0;
-				return true;
+				style->styleNew &= ~WS_EX_LAYERED;
 			}
-			return false;
-		default:
-			return false;
+			*result = 0;
+			return true;
+		}
+		return false;
+	default:
+		return false;
 	}
 }
 
 bool MainApplication::nativeEventFilter(const QByteArray& eventType,
-					void* message, long* result)
+	void* message, long* result)
 {
-	if(eventType == "windows_generic_MSG")
+	if (eventType == "windows_generic_MSG")
 	{
-		return winEventFilter(static_cast<MSG *>(message), result);
+		return winEventFilter(static_cast<MSG*>(message), result);
 	}
 	return false;
 }

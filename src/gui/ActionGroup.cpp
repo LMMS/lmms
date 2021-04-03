@@ -24,7 +24,8 @@
 
 #include "ActionGroup.h"
 
-ActionGroup::ActionGroup(QObject* parent) : QActionGroup(parent)
+ActionGroup::ActionGroup(QObject* parent)
+	: QActionGroup(parent)
 {
 	connect(this, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered_(QAction*)));
 }

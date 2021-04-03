@@ -24,10 +24,11 @@
 
 #include "GuiApplication.h"
 
-#include "lmmsversion.h"
-
-#include "LmmsStyle.h"
-#include "LmmsPalette.h"
+#include <QApplication>
+#include <QDir>
+#include <QMessageBox>
+#include <QSplashScreen>
+#include <QtGlobal>
 
 #include "AutomationEditor.h"
 #include "BBEditor.h"
@@ -35,16 +36,13 @@
 #include "ControllerRackView.h"
 #include "FxMixerView.h"
 #include "InstrumentTrack.h"
+#include "LmmsPalette.h"
+#include "LmmsStyle.h"
 #include "MainWindow.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
-
-#include <QApplication>
-#include <QDir>
-#include <QtGlobal>
-#include <QMessageBox>
-#include <QSplashScreen>
+#include "lmmsversion.h"
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
@@ -57,17 +55,17 @@ GuiApplication* GuiApplication::instance()
 	return s_instance;
 }
 
-
 GuiApplication::GuiApplication()
 {
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
-	if ( !ConfigManager::inst()->hasWorkingDir() &&
-		QMessageBox::question( NULL,
-				tr( "Working directory" ),
-				tr( "The LMMS working directory %1 does not "
-				"exist. Create it now? You can change the directory "
-				"later via Edit -> Settings." ).arg( ConfigManager::inst()->workingDir() ),
-					QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes)
+	if (!ConfigManager::inst()->hasWorkingDir() &&
+		QMessageBox::question(NULL,
+			tr("Working directory"),
+			tr("The LMMS working directory %1 does not "
+			   "exist. Create it now? You can change the directory "
+			   "later via Edit -> Settings.")
+				.arg(ConfigManager::inst()->workingDir()),
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
 	{
 		ConfigManager::inst()->createWorkingDir();
 	}
@@ -82,7 +80,7 @@ GuiApplication::GuiApplication()
 	LmmsPalette* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
 	QPalette* lpal = new QPalette(lmmspal->palette());
 
-	QApplication::setPalette( *lpal );
+	QApplication::setPalette(*lpal);
 	LmmsStyle::s_palette = lpal;
 
 #ifdef LMMS_BUILD_APPLE
@@ -90,18 +88,18 @@ GuiApplication::GuiApplication()
 #endif
 
 	// Show splash screen
-	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
+	QSplashScreen splashScreen(embed::getIconPixmap("splash"));
 	splashScreen.show();
 
 	QHBoxLayout layout;
 	layout.setAlignment(Qt::AlignBottom);
 	splashScreen.setLayout(&layout);
 
-	// Create a left-aligned label for loading progress 
+	// Create a left-aligned label for loading progress
 	// & a right-aligned label for version info
 	QLabel loadingProgressLabel;
 	m_loadingProgressLabel = &loadingProgressLabel;
-	QLabel versionLabel(MainWindow::tr( "Version %1" ).arg( LMMS_VERSION ));
+	QLabel versionLabel(MainWindow::tr("Version %1").arg(LMMS_VERSION));
 
 	loadingProgressLabel.setAlignment(Qt::AlignLeft);
 	versionLabel.setAlignment(Qt::AlignRight);
@@ -113,7 +111,7 @@ GuiApplication::GuiApplication()
 	splashScreen.update();
 	qApp->processEvents();
 
-	connect(Engine::inst(), SIGNAL(initProgress(const QString&)), 
+	connect(Engine::inst(), SIGNAL(initProgress(const QString&)),
 		this, SLOT(displayInitProgress(const QString&)));
 
 	// Init central engine which handles all components of LMMS
@@ -125,7 +123,7 @@ GuiApplication::GuiApplication()
 
 	m_mainWindow = new MainWindow;
 	connect(m_mainWindow, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
-	connect(m_mainWindow, SIGNAL(initProgress(const QString&)), 
+	connect(m_mainWindow, SIGNAL(initProgress(const QString&)),
 		this, SLOT(displayInitProgress(const QString&)));
 
 	displayInitProgress(tr("Preparing song editor"));
@@ -167,18 +165,17 @@ GuiApplication::~GuiApplication()
 	s_instance = nullptr;
 }
 
-
-void GuiApplication::displayInitProgress(const QString &msg)
+void GuiApplication::displayInitProgress(const QString& msg)
 {
 	Q_ASSERT(m_loadingProgressLabel != nullptr);
-	
+
 	m_loadingProgressLabel->setText(msg);
 	// must force a UI update and process events, as there may be long gaps between processEvents() calls during init
 	m_loadingProgressLabel->repaint();
 	qApp->processEvents();
 }
 
-void GuiApplication::childDestroyed(QObject *obj)
+void GuiApplication::childDestroyed(QObject* obj)
 {
 	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
@@ -222,17 +219,17 @@ void GuiApplication::childDestroyed(QObject *obj)
  */
 QFont GuiApplication::getWin32SystemFont()
 {
-	NONCLIENTMETRICS metrics = { sizeof( NONCLIENTMETRICS ) };
-	SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof( NONCLIENTMETRICS ), &metrics, 0 );
+	NONCLIENTMETRICS metrics = {sizeof(NONCLIENTMETRICS)};
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &metrics, 0);
 	int pointSize = metrics.lfMessageFont.lfHeight;
-	if ( pointSize < 0 )
+	if (pointSize < 0)
 	{
 		// height is in pixels, convert to points
-		HDC hDC = GetDC( NULL );
-		pointSize = MulDiv( abs( pointSize ), 72, GetDeviceCaps( hDC, LOGPIXELSY ) );
-		ReleaseDC( NULL, hDC );
+		HDC hDC = GetDC(NULL);
+		pointSize = MulDiv(abs(pointSize), 72, GetDeviceCaps(hDC, LOGPIXELSY));
+		ReleaseDC(NULL, hDC);
 	}
 
-	return QFont( QString::fromUtf8( metrics.lfMessageFont.lfFaceName ), pointSize );
+	return QFont(QString::fromUtf8(metrics.lfMessageFont.lfFaceName), pointSize);
 }
 #endif

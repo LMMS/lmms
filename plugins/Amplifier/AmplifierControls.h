@@ -26,25 +26,23 @@
 #ifndef AMPLIFIER_CONTROLS_H
 #define AMPLIFIER_CONTROLS_H
 
-#include "EffectControls.h"
 #include "AmplifierControlDialog.h"
+#include "EffectControls.h"
 #include "Knob.h"
 
-
 class AmplifierEffect;
-
 
 class AmplifierControls : public EffectControls
 {
 	Q_OBJECT
 public:
-	AmplifierControls( AmplifierEffect* effect );
+	AmplifierControls(AmplifierEffect* effect);
 	virtual ~AmplifierControls()
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 	inline virtual QString nodeName() const
 	{
 		return "AmplifierControls";
@@ -57,9 +55,8 @@ public:
 
 	virtual EffectControlDialog* createView()
 	{
-		return new AmplifierControlDialog( this );
+		return new AmplifierControlDialog(this);
 	}
-
 
 private slots:
 	void changeControl();
@@ -73,7 +70,6 @@ private:
 
 	friend class AmplifierControlDialog;
 	friend class AmplifierEffect;
-
-} ;
+};
 
 #endif

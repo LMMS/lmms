@@ -32,54 +32,46 @@
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 
-
 class MidiPort;
-
 
 class MidiController : public Controller, public MidiEventProcessor
 {
 	Q_OBJECT
 public:
-	MidiController( Model * _parent );
+	MidiController(Model* _parent);
 	virtual ~MidiController();
 
-	virtual void processInEvent( const MidiEvent & _me,
-					const TimePos & _time, f_cnt_t offset = 0 ) override;
+	virtual void processInEvent(const MidiEvent& _me,
+		const TimePos& _time, f_cnt_t offset = 0) override;
 
-	virtual void processOutEvent( const MidiEvent& _me,
-					const TimePos & _time, f_cnt_t offset = 0 ) override
+	virtual void processOutEvent(const MidiEvent& _me,
+		const TimePos& _time, f_cnt_t offset = 0) override
 	{
 		// No output yet
 	}
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
+	void loadSettings(const QDomElement& _this) override;
 	QString nodeName() const override;
 
 	// Used by controllerConnectionDialog to copy
-	void subscribeReadablePorts( const MidiPort::Map & _map );
-
+	void subscribeReadablePorts(const MidiPort::Map& _map);
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	ControllerDialog* createDialog(QWidget* _parent) override;
 	void updateName();
-
 
 protected:
 	// The internal per-controller get-value function
 	void updateValueBuffer() override;
 
-
 	MidiPort m_midiPort;
-
 
 	float m_lastValue;
 	float m_previousValue;
 
 	friend class ControllerConnectionDialog;
 	friend class AutoDetectMidiController;
-
-} ;
-
+};
 
 #endif

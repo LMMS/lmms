@@ -22,42 +22,43 @@
  *
  */
 
+#include "ReverbSCControlDialog.h"
+
 #include <QLayout>
 
-#include "ReverbSCControlDialog.h"
 #include "ReverbSCControls.h"
 #include "embed.h"
 
-ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
-	EffectControlDialog( controls )
+ReverbSCControlDialog::ReverbSCControlDialog(ReverbSCControls* controls)
+	: EffectControlDialog(controls)
 {
-	setAutoFillBackground( true );
+	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
-	setFixedSize( 185, 55 );
-	
-	Knob * inputGainKnob = new Knob( knobBright_26, this);
-	inputGainKnob -> move( 16, 10 );
-	inputGainKnob->setModel( &controls->m_inputGainModel );
-	inputGainKnob->setLabel( tr( "Input" ) );
-	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
+	setPalette(pal);
+	setFixedSize(185, 55);
 
-	Knob * sizeKnob = new Knob( knobBright_26, this);
-	sizeKnob -> move( 57, 10 );
-	sizeKnob->setModel( &controls->m_sizeModel );
-	sizeKnob->setLabel( tr( "Size" ) );
-	sizeKnob->setHintText( tr( "Size:" ) , "" );
+	Knob* inputGainKnob = new Knob(knobBright_26, this);
+	inputGainKnob->move(16, 10);
+	inputGainKnob->setModel(&controls->m_inputGainModel);
+	inputGainKnob->setLabel(tr("Input"));
+	inputGainKnob->setHintText(tr("Input gain:"), "dB");
 
-	Knob * colorKnob = new Knob( knobBright_26, this);
-	colorKnob -> move( 98, 10 );
-	colorKnob->setModel( &controls->m_colorModel );
-	colorKnob->setLabel( tr( "Color" ) );
-	colorKnob->setHintText( tr( "Color:" ) , "" );
+	Knob* sizeKnob = new Knob(knobBright_26, this);
+	sizeKnob->move(57, 10);
+	sizeKnob->setModel(&controls->m_sizeModel);
+	sizeKnob->setLabel(tr("Size"));
+	sizeKnob->setHintText(tr("Size:"), "");
 
-	Knob * outputGainKnob = new Knob( knobBright_26, this);
-	outputGainKnob -> move( 139, 10 );
-	outputGainKnob->setModel( &controls->m_outputGainModel );
-	outputGainKnob->setLabel( tr( "Output" ) );
-	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
+	Knob* colorKnob = new Knob(knobBright_26, this);
+	colorKnob->move(98, 10);
+	colorKnob->setModel(&controls->m_colorModel);
+	colorKnob->setLabel(tr("Color"));
+	colorKnob->setHintText(tr("Color:"), "");
+
+	Knob* outputGainKnob = new Knob(knobBright_26, this);
+	outputGainKnob->move(139, 10);
+	outputGainKnob->setModel(&controls->m_outputGainModel);
+	outputGainKnob->setLabel(tr("Output"));
+	outputGainKnob->setHintText(tr("Output gain:"), "dB");
 }

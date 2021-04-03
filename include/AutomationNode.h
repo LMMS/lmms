@@ -36,7 +36,6 @@
 
 class AutomationPattern;
 
-
 // Note: We use the default copy-assignment on the AutomationPattern constructor. It's
 // fine for now as we don't have dynamic allocated members, but if any are added we should
 // have an user-defined one to perform a deep-copy.
@@ -158,6 +157,5 @@ private:
 	float m_inTangent;
 	float m_outTangent;
 };
-
 
 #endif

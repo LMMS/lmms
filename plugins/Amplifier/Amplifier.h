@@ -23,32 +23,29 @@
  *
  */
 
-
 #ifndef AMPLIFIER_H
 #define AMPLIFIER_H
 
-#include "Effect.h"
 #include "AmplifierControls.h"
+#include "Effect.h"
 #include "ValueBuffer.h"
 
 class AmplifierEffect : public Effect
 {
 public:
-	AmplifierEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~AmplifierEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
 	virtual EffectControls* controls()
 	{
 		return &m_ampControls;
 	}
 
-
 private:
 	AmplifierControls m_ampControls;
 
 	friend class AmplifierControls;
-
-} ;
+};
 
 #endif

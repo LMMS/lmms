@@ -19,7 +19,7 @@ using std::as_const;
 template <typename T>
 constexpr typename std::add_const<T>::type& as_const(T& t) noexcept
 {
-    return t;
+	return t;
 }
 
 template <typename T>
@@ -27,4 +27,3 @@ void as_const(const T&&) = delete;
 #endif
 
 #endif // include guard
-

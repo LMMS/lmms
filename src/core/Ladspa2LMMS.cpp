@@ -23,106 +23,99 @@
  *
  */
 
-
 #include "Ladspa2LMMS.h"
-
 
 Ladspa2LMMS::Ladspa2LMMS()
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
-	
-	for( l_sortable_plugin_t::iterator it = plugins.begin();
-			it != plugins.end(); ++it )
+
+	for (l_sortable_plugin_t::iterator it = plugins.begin();
+		 it != plugins.end(); ++it)
 	{
 		ladspa_key_t key = (*it).second;
-		ladspaManagerDescription * desc = getDescription( key );
-		
-		if( desc->type == SOURCE )
+		ladspaManagerDescription* desc = getDescription(key);
+
+		if (desc->type == SOURCE)
 		{
-			m_instruments.append( qMakePair( getName( key ), 
-								key ) );
+			m_instruments.append(qMakePair(getName(key),
+				key));
 		}
-		else if( desc->type == TRANSFER &&
-			( desc->inputChannels == desc->outputChannels &&
-			( desc->inputChannels == 1 ||
-			desc->inputChannels == 2 ||
-			desc->inputChannels == 4 )/* &&
-			isRealTimeCapable( key )*/ ) )
+		else if (desc->type == TRANSFER &&
+			(desc->inputChannels == desc->outputChannels &&
+				(desc->inputChannels == 1 ||
+					desc->inputChannels == 2 ||
+					desc->inputChannels == 4) /* &&
+			isRealTimeCapable( key )*/
+				))
 		{
-			m_validEffects.append( qMakePair( getName( key ),
-								key ) );
+			m_validEffects.append(qMakePair(getName(key),
+				key));
 		}
-		else if( desc->type == TRANSFER &&
-			( desc->inputChannels != desc->outputChannels ||
-			( desc->inputChannels != 1 &&
-			desc->inputChannels != 2 &&
-			desc->inputChannels != 4 ) ||
-			!isRealTimeCapable( key ) ) )
+		else if (desc->type == TRANSFER &&
+			(desc->inputChannels != desc->outputChannels ||
+				(desc->inputChannels != 1 &&
+					desc->inputChannels != 2 &&
+					desc->inputChannels != 4) ||
+				!isRealTimeCapable(key)))
 		{
-			m_invalidEffects.append( qMakePair( getName( key ), 
-								key ) );
+			m_invalidEffects.append(qMakePair(getName(key),
+				key));
 		}
-		else if( desc->type == SINK )
+		else if (desc->type == SINK)
 		{
-			m_analysisTools.append( qMakePair( getName( key ),
-								key ) );
+			m_analysisTools.append(qMakePair(getName(key),
+				key));
 		}
-		else if( desc->type == OTHER )
+		else if (desc->type == OTHER)
 		{
-			m_otherPlugins.append( qMakePair( getName( key ), 
-								key ) );
+			m_otherPlugins.append(qMakePair(getName(key),
+				key));
 		}
 	}
 }
- 
- 
- 
- 
+
 Ladspa2LMMS::~Ladspa2LMMS()
 {
 }
 
-
-
-QString Ladspa2LMMS::getShortName( const ladspa_key_t & _key )
+QString Ladspa2LMMS::getShortName(const ladspa_key_t& _key)
 {
-	QString name = getName( _key );
-	
-	if( name.indexOf( "(" ) > 0 )
+	QString name = getName(_key);
+
+	if (name.indexOf("(") > 0)
 	{
-		name = name.left( name.indexOf( "(" ) );
+		name = name.left(name.indexOf("("));
 	}
-	if( name.indexOf( " - " ) > 0 )
+	if (name.indexOf(" - ") > 0)
 	{
-		name = name.left( name.indexOf( " - " ) );
+		name = name.left(name.indexOf(" - "));
 	}
-	if( name.indexOf( "  " ) > 0 )
+	if (name.indexOf("  ") > 0)
 	{
-		name = name.left( name.indexOf( "  " ) );
+		name = name.left(name.indexOf("  "));
 	}
 	Qt::CaseSensitivity cs = Qt::CaseInsensitive;
-	if( name.indexOf( " with ", 0, cs ) > 0 )
+	if (name.indexOf(" with ", 0, cs) > 0)
 	{
-		name = name.left( name.indexOf( " with ", 0, cs ) );
+		name = name.left(name.indexOf(" with ", 0, cs));
 	}
-	if( name.indexOf( ",", 0, cs ) > 0 )
+	if (name.indexOf(",", 0, cs) > 0)
 	{
-		name = name.left( name.indexOf( ",", 0, cs ) );
+		name = name.left(name.indexOf(",", 0, cs));
 	}
-	if( name.length() > 40 )
+	if (name.length() > 40)
 	{
 		int i = 40;
-		while( name[i] != ' ' && i > 0 )
+		while (name[i] != ' ' && i > 0)
 		{
 			i--;
 		}
-		name = name.left( i );
+		name = name.left(i);
 	}
-	if( name.length() == 0 )
+	if (name.length() == 0)
 	{
 		name = "LADSPA Plugin";
 	}
-	
+
 	return name;
 }
-

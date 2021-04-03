@@ -40,7 +40,6 @@ public:
 
 private:
 	time_point begin;
-} ;
-
+};
 
 #endif

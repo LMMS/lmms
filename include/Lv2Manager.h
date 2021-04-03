@@ -29,15 +29,14 @@
 
 #ifdef LMMS_HAVE_LV2
 
+#include <lilv/lilv.h>
 #include <map>
 #include <set>
-#include <lilv/lilv.h>
 
 #include "Lv2Basics.h"
 #include "Lv2UridCache.h"
 #include "Lv2UridMap.h"
 #include "Plugin.h"
-
 
 /*
 	all Lv2 classes in relation (use our "4 spaces per tab rule" to view):
@@ -72,7 +71,6 @@
 		Lv2Instrument::Descriptor =	{Lv2SubPluginFeatures}
 */
 
-
 //! Class to keep track of all LV2 plugins
 class Lv2Manager
 {
@@ -82,7 +80,6 @@ public:
 	Lv2Manager();
 	~Lv2Manager();
 
-
 	AutoLilvNode uri(const char* uriStr);
 
 	//! Class representing info for one plugin
@@ -90,10 +87,17 @@ public:
 	{
 	public:
 		//! use only for std::map internals
-		Lv2Info() : m_plugin(nullptr) {}
+		Lv2Info()
+			: m_plugin(nullptr)
+		{
+		}
 		//! ctor used inside Lv2Manager
-		Lv2Info(const LilvPlugin* plug, Plugin::PluginTypes type, bool valid) :
-			m_plugin(plug), m_type(type), m_valid(valid) {}
+		Lv2Info(const LilvPlugin* plug, Plugin::PluginTypes type, bool valid)
+			: m_plugin(plug)
+			, m_type(type)
+			, m_valid(valid)
+		{
+		}
 		Lv2Info(Lv2Info&& other) = default;
 		Lv2Info& operator=(Lv2Info&& other) = default;
 
@@ -108,9 +112,9 @@ public:
 	};
 
 	//! Return descriptor with URI @p uri or nullptr if none exists
-	const LilvPlugin *getPlugin(const std::string &uri);
+	const LilvPlugin* getPlugin(const std::string& uri);
 	//! Return descriptor with URI @p uri or nullptr if none exists
-	const LilvPlugin *getPlugin(const QString& uri);
+	const LilvPlugin* getPlugin(const QString& uri);
 
 	using Lv2InfoMap = std::map<std::string, Lv2Info>;
 	using Iterator = Lv2InfoMap::iterator;
@@ -120,7 +124,7 @@ public:
 	//! strcmp based key comparator for std::set and std::map
 	struct CmpStr
 	{
-		bool operator()(char const *a, char const *b) const;
+		bool operator()(char const* a, char const* b) const;
 	};
 
 	UridMap& uridMap() { return m_uridMap; }
@@ -130,8 +134,8 @@ public:
 		return m_supportedFeatureURIs;
 	}
 	bool isFeatureSupported(const char* featName) const;
-	AutoLilvNodes findNodes(const LilvNode *subject,
-		const LilvNode *predicate, const LilvNode *object);
+	AutoLilvNodes findNodes(const LilvNode* subject,
+		const LilvNode* predicate, const LilvNode* object);
 
 	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
 	{
@@ -155,7 +159,7 @@ private:
 	static const std::set<const char*, Lv2Manager::CmpStr> pluginBlacklist;
 
 	// functions
-	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
+	bool isSubclassOf(const LilvPluginClass* clvss, const char* uriStr);
 };
 
 #endif // LMMS_HAVE_LV2

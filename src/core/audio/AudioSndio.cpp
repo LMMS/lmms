@@ -31,10 +31,10 @@
 #include <QLabel>
 #include <QLineEdit>
 
-#include "endian_handling.h"
+#include "Engine.h"
 #include "LcdSpinBox.h"
 #include "Mixer.h"
-#include "Engine.h"
+#include "endian_handling.h"
 #include "gui_templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
@@ -46,31 +46,30 @@
 
 #include "ConfigManager.h"
 
-
-
-AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
-	AudioDevice( qBound<ch_cnt_t>(
-		DEFAULT_CHANNELS,
-		ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
-	m_convertEndian ( false )
+AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
+	: AudioDevice(qBound<ch_cnt_t>(
+					  DEFAULT_CHANNELS,
+					  ConfigManager::inst()->value("audiosndio", "channels").toInt(),
+					  SURROUND_CHANNELS),
+		  _mixer)
+	, m_convertEndian(false)
 {
 	_success_ful = false;
 
-	QString dev = ConfigManager::inst()->value( "audiosndio", "device" );
+	QString dev = ConfigManager::inst()->value("audiosndio", "device");
 
 	if (dev == "")
 	{
-		m_hdl = sio_open( NULL, SIO_PLAY, 0 );
+		m_hdl = sio_open(NULL, SIO_PLAY, 0);
 	}
 	else
 	{
-		m_hdl = sio_open( dev.toLatin1().constData(), SIO_PLAY, 0 );
+		m_hdl = sio_open(dev.toLatin1().constData(), SIO_PLAY, 0);
 	}
 
-	if( m_hdl == NULL )
+	if (m_hdl == NULL)
 	{
-		printf( "sndio: failed opening audio-device\n" );
+		printf("sndio: failed opening audio-device\n");
 		return;
 	}
 
@@ -83,8 +82,9 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	m_par.round = mixer()->framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
-	if ( (isLittleEndian() && (m_par.le == 0)) ||
-	     (!isLittleEndian() && (m_par.le == 1))) {
+	if ((isLittleEndian() && (m_par.le == 0)) ||
+		(!isLittleEndian() && (m_par.le == 1)))
+	{
 		m_convertEndian = true;
 	}
 
@@ -92,65 +92,61 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 
 	if (!sio_setpar(m_hdl, &m_par))
 	{
-		printf( "sndio: sio_setpar failed\n" );
+		printf("sndio: sio_setpar failed\n");
 		return;
 	}
 	if (!sio_getpar(m_hdl, &m_par))
 	{
-		printf( "sndio: sio_getpar failed\n" );
+		printf("sndio: sio_getpar failed\n");
 		return;
 	}
 
 	if (reqpar.pchan != m_par.pchan ||
 		reqpar.bits != m_par.bits ||
 		reqpar.le != m_par.le ||
-		(::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100)/reqpar.rate > 2)
+		(::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100) / reqpar.rate > 2)
 	{
-		printf( "sndio: returned params not as requested\n" );
+		printf("sndio: returned params not as requested\n");
 		return;
 	}
 
 	if (!sio_start(m_hdl))
 	{
-		printf( "sndio: sio_start failed\n" );
+		printf("sndio: sio_start failed\n");
 		return;
 	}
 
 	_success_ful = true;
 }
 
-
 AudioSndio::~AudioSndio()
 {
 	stopProcessing();
 	if (m_hdl != NULL)
 	{
-		sio_close( m_hdl );
+		sio_close(m_hdl);
 		m_hdl = NULL;
 	}
 }
 
-
-void AudioSndio::startProcessing( void )
+void AudioSndio::startProcessing(void)
 {
-	if( !isRunning() )
+	if (!isRunning())
 	{
-		start( QThread::HighPriority );
+		start(QThread::HighPriority);
 	}
 }
 
-
-void AudioSndio::stopProcessing( void )
+void AudioSndio::stopProcessing(void)
 {
-	stopProcessingThread( this );
+	stopProcessingThread(this);
 }
 
-
-void AudioSndio::applyQualitySettings( void )
+void AudioSndio::applyQualitySettings(void)
 {
-	if( hqAudio() )
+	if (hqAudio())
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate(Engine::mixer()->processingSampleRate());
 
 		/* change sample rate to sampleRate() */
 	}
@@ -158,25 +154,24 @@ void AudioSndio::applyQualitySettings( void )
 	AudioDevice::applyQualitySettings();
 }
 
-
-void AudioSndio::run( void )
+void AudioSndio::run(void)
 {
-	surroundSampleFrame * temp =
-	    new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-	    new int_sample_t[mixer()->framesPerPeriod() * channels()];
+	surroundSampleFrame* temp =
+		new surroundSampleFrame[mixer()->framesPerPeriod()];
+	int_sample_t* outbuf =
+		new int_sample_t[mixer()->framesPerPeriod() * channels()];
 
-	while( true )
+	while (true)
 	{
-		const fpp_t frames = getNextBuffer( temp );
-		if( !frames )
+		const fpp_t frames = getNextBuffer(temp);
+		if (!frames)
 		{
 			break;
 		}
 
-		uint bytes = convertToS16( temp, frames,
-		    mixer()->masterGain(), outbuf, m_convertEndian );
-		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
+		uint bytes = convertToS16(temp, frames,
+			mixer()->masterGain(), outbuf, m_convertEndian);
+		if (sio_write(m_hdl, outbuf, bytes) != bytes)
 		{
 			break;
 		}
@@ -186,44 +181,39 @@ void AudioSndio::run( void )
 	delete[] outbuf;
 }
 
-
-AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDeviceSetupWidget( AudioSndio::name(), _parent )
+AudioSndio::setupWidget::setupWidget(QWidget* _parent)
+	: AudioDeviceSetupWidget(AudioSndio::name(), _parent)
 {
-	m_device = new QLineEdit( "", this );
-	m_device->setGeometry( 10, 20, 160, 20 );
+	m_device = new QLineEdit("", this);
+	m_device->setGeometry(10, 20, 160, 20);
 
-	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
-	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
+	QLabel* dev_lbl = new QLabel(tr("Device"), this);
+	dev_lbl->setFont(pointSize<6>(dev_lbl->font()));
+	dev_lbl->setGeometry(10, 40, 160, 10);
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
-	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audiosndio",
-	    "channels" ).toInt() );
+	LcdSpinBoxModel* m = new LcdSpinBoxModel(/* this */);
+	m->setRange(DEFAULT_CHANNELS, SURROUND_CHANNELS);
+	m->setStep(2);
+	m->setValue(ConfigManager::inst()->value("audiosndio",
+										 "channels")
+					.toInt());
 
-	m_channels = new LcdSpinBox( 1, this );
-	m_channels->setModel( m );
-	m_channels->setLabel( tr( "Channels" ) );
-	m_channels->move( 180, 20 );
-
+	m_channels = new LcdSpinBox(1, this);
+	m_channels->setModel(m);
+	m_channels->setLabel(tr("Channels"));
+	m_channels->move(180, 20);
 }
-
 
 AudioSndio::setupWidget::~setupWidget()
 {
-
 }
 
-
-void AudioSndio::setupWidget::saveSettings( void )
+void AudioSndio::setupWidget::saveSettings(void)
 {
-	ConfigManager::inst()->setValue( "audiosndio", "device",
-	    m_device->text() );
-	ConfigManager::inst()->setValue( "audiosndio", "channels",
-	    QString::number( m_channels->value<int>() ) );
+	ConfigManager::inst()->setValue("audiosndio", "device",
+		m_device->text());
+	ConfigManager::inst()->setValue("audiosndio", "channels",
+		QString::number(m_channels->value<int>()));
 }
 
-
-#endif	/* LMMS_HAVE_SNDIO */
+#endif /* LMMS_HAVE_SNDIO */

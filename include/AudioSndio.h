@@ -39,45 +39,43 @@
 class LcdSpinBox;
 class QLineEdit;
 
-
 class AudioSndio : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioSndio( bool & _success_ful, Mixer * _mixer );
+	AudioSndio(bool& _success_ful, Mixer* _mixer);
 	virtual ~AudioSndio();
 
-	inline static QString name( void )
+	inline static QString name(void)
 	{
-		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
+		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "sndio");
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
-		setupWidget( QWidget * _parent );
+		setupWidget(QWidget* _parent);
 		virtual ~setupWidget();
 
-		void saveSettings( void ) override;
+		void saveSettings(void) override;
 
 	private:
-		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
-	} ;
+		QLineEdit* m_device;
+		LcdSpinBox* m_channels;
+	};
 
 private:
-	void startProcessing( void ) override;
-	void stopProcessing( void ) override;
-	void applyQualitySettings( void ) override;
-	void run( void ) override;
+	void startProcessing(void) override;
+	void stopProcessing(void) override;
+	void applyQualitySettings(void) override;
+	void run(void) override;
 
-	struct sio_hdl *m_hdl;
+	struct sio_hdl* m_hdl;
 	struct sio_par m_par;
 
 	bool m_convertEndian;
-} ;
+};
 
+#endif /* LMMS_HAVE_SNDIO */
 
-#endif	/* LMMS_HAVE_SNDIO */
-
-#endif	/* _AUDIO_SNDIO_H */
+#endif /* _AUDIO_SNDIO_H */

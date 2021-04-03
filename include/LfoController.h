@@ -27,12 +27,12 @@
 
 #include <QWidget>
 
-#include "Model.h"
 #include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
-#include "TempoSyncKnobModel.h"
+#include "Model.h"
 #include "Oscillator.h"
+#include "TempoSyncKnobModel.h"
 
 class automatableButtonGroup;
 class Knob;
@@ -40,23 +40,20 @@ class LedCheckBox;
 class TempoSyncKnob;
 class PixmapButton;
 
-
-class LfoController : public Controller 
+class LfoController : public Controller
 {
 	Q_OBJECT
 public:
-	LfoController( Model * _parent );
+	LfoController(Model* _parent);
 
 	virtual ~LfoController();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
+	void loadSettings(const QDomElement& _this) override;
 	QString nodeName() const override;
 
-
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
-
+	ControllerDialog* createDialog(QWidget* _parent) override;
 
 protected:
 	// The internal per-controller value updating function
@@ -73,10 +70,10 @@ protected:
 	float m_phaseOffset;
 	float m_currentPhase;
 
-	sample_t (*m_sampleFunction)( const float );
+	sample_t (*m_sampleFunction)(const float);
 
 private:
-	SampleBuffer * m_userDefSampleBuffer;
+	SampleBuffer* m_userDefSampleBuffer;
 
 protected slots:
 	void updatePhase();
@@ -84,40 +81,34 @@ protected slots:
 	void updateDuration();
 
 	friend class LfoControllerDialog;
-
-} ;
-
-
+};
 
 class LfoControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
-	LfoControllerDialog( Controller * _controller, QWidget * _parent );
+	LfoControllerDialog(Controller* _controller, QWidget* _parent);
 	virtual ~LfoControllerDialog();
 
-
 protected:
-	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void contextMenuEvent(QContextMenuEvent* _me) override;
 	void modelChanged() override;
 
-	LfoController * m_lfo;
+	LfoController* m_lfo;
 
-	Knob * m_baseKnob;
-	TempoSyncKnob * m_speedKnob;
-	Knob * m_amountKnob;
-	Knob * m_phaseKnob;
-	PixmapButton * m_userLfoBtn;
-	automatableButtonGroup * m_waveBtnGrp;
-	automatableButtonGroup * m_multiplierBtnGrp;
-
+	Knob* m_baseKnob;
+	TempoSyncKnob* m_speedKnob;
+	Knob* m_amountKnob;
+	Knob* m_phaseKnob;
+	PixmapButton* m_userLfoBtn;
+	automatableButtonGroup* m_waveBtnGrp;
+	automatableButtonGroup* m_multiplierBtnGrp;
 
 private:
-	PixmapButton * m_userWaveBtn;
+	PixmapButton* m_userWaveBtn;
 
 private slots:
 	void askUserDefWave();
-
-} ;
+};
 
 #endif

@@ -30,18 +30,17 @@
 
 #include "embed.h"
 
-
-SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
-							QWidget * _parent ) :
-	QWidget( _parent ),
-	m_title( _title ),
-	m_icon(_icon),
-	m_buttonSize(17, 17)
+SideBarWidget::SideBarWidget(const QString& _title, const QPixmap& _icon,
+	QWidget* _parent)
+	: QWidget(_parent)
+	, m_title(_title)
+	, m_icon(_icon)
+	, m_buttonSize(17, 17)
 {
-	m_contents = new QWidget( this );
-	m_layout = new QVBoxLayout( m_contents );
-	m_layout->setSpacing( 5 );
-	m_layout->setMargin( 0 );
+	m_contents = new QWidget(this);
+	m_layout = new QVBoxLayout(m_contents);
+	m_layout->setSpacing(5);
+	m_layout->setMargin(0);
 	m_closeBtn = new QPushButton(embed::getIconPixmap("close"), QString(), this);
 	m_closeBtn->resize(m_buttonSize);
 	m_closeBtn->setToolTip(tr("Close"));
@@ -49,49 +48,36 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 		[=]() { this->closeButtonClicked(); });
 }
 
-
-
-
 SideBarWidget::~SideBarWidget()
 {
 }
 
-
-
-
-void SideBarWidget::paintEvent( QPaintEvent * )
+void SideBarWidget::paintEvent(QPaintEvent*)
 {
-	QPainter p( this );
-	p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
+	QPainter p(this);
+	p.fillRect(0, 0, width(), 27, palette().highlight().color());
 
 	QFont f = p.font();
-	f.setBold( true );
-	f.setUnderline( true );
-	f.setPointSize( f.pointSize() + 2 );
-	p.setFont( f );
+	f.setBold(true);
+	f.setUnderline(true);
+	f.setPointSize(f.pointSize() + 2);
+	p.setFont(f);
 
-	p.setPen( palette().highlightedText().color() );
+	p.setPen(palette().highlightedText().color());
 
-	const int tx = m_icon.width()+4;
+	const int tx = m_icon.width() + 4;
 
-	QFontMetrics metrics( f );
+	QFontMetrics metrics(f);
 	const int ty = metrics.ascent();
-	p.drawText( tx, ty, m_title );
+	p.drawText(tx, ty, m_title);
 
-	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
+	p.drawPixmap(2, 2, m_icon.transformed(QTransform().rotate(-90)));
 }
 
-
-
-void SideBarWidget::resizeEvent( QResizeEvent * )
+void SideBarWidget::resizeEvent(QResizeEvent*)
 {
 	const int MARGIN = 6;
-	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
-						height() - MARGIN * 2 - 40 );
+	m_contents->setGeometry(MARGIN, 40 + MARGIN, width() - MARGIN * 2,
+		height() - MARGIN * 2 - 40);
 	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
 }
-
-
-
-
-

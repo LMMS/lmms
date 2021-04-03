@@ -22,48 +22,37 @@
  *
  */
 
-
 #ifndef _LADSPA_DESCRIPTION_H
 #define _LADSPA_DESCRIPTION_H
-
 
 #include <QWidget>
 
 #include "LadspaManager.h"
 
-
 class QListWidgetItem;
 class QScrollArea;
-
 
 class ladspaDescription : public QWidget
 {
 	Q_OBJECT
 public:
-	ladspaDescription( QWidget * _parent, ladspaPluginType _type );
+	ladspaDescription(QWidget* _parent, ladspaPluginType _type);
 	virtual ~ladspaDescription();
 
-
 signals:
-	void doubleClicked( const ladspa_key_t & );
-
+	void doubleClicked(const ladspa_key_t&);
 
 private:
-	QScrollArea * m_scrollArea;
+	QScrollArea* m_scrollArea;
 
 	QList<ladspa_key_t> m_pluginKeys;
 	ladspa_key_t m_currentSelection;
 
-	void update( const ladspa_key_t & _key );
-
+	void update(const ladspa_key_t& _key);
 
 private slots:
-	void rowChanged( int _pluginIndex );
-	void onDoubleClicked( QListWidgetItem * _item );
-
-} ;
-
-
-
+	void rowChanged(int _pluginIndex);
+	void onDoubleClicked(QListWidgetItem* _item);
+};
 
 #endif

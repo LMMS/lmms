@@ -26,11 +26,10 @@
 #ifndef _TRIPLE_OSCILLATOR_H
 #define _TRIPLE_OSCILLATOR_H
 
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Oscillator.h"
-#include "AutomatableModel.h"
-
 
 class automatableButtonGroup;
 class Knob;
@@ -40,15 +39,13 @@ class SampleBuffer;
 
 const int NUM_OF_OSCILLATORS = 3;
 
-
 class OscillatorObject : public Model
 {
 	MM_OPERATORS
 	Q_OBJECT
 public:
-	OscillatorObject( Model * _parent, int _idx );
+	OscillatorObject(Model* _parent, int _idx);
 	virtual ~OscillatorObject();
-
 
 private:
 	FloatModel m_volumeModel;
@@ -75,7 +72,6 @@ private:
 	friend class TripleOscillator;
 	friend class TripleOscillatorView;
 
-
 private slots:
 	void oscUserDefWaveDblClick();
 
@@ -84,113 +80,98 @@ private slots:
 	void updateDetuningRight();
 	void updatePhaseOffsetLeft();
 	void updatePhaseOffsetRight();
-
-} ;
-
-
-
+};
 
 class TripleOscillator : public Instrument
 {
 	Q_OBJECT
 public:
-	TripleOscillator( InstrumentTrack * _track );
+	TripleOscillator(InstrumentTrack* _track);
 	virtual ~TripleOscillator();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* _n,
+		sampleFrame* _working_buffer);
+	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
+	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
-		return( 128 );
+		return (128);
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
-
+	virtual PluginView* instantiateView(QWidget* _parent);
 
 protected slots:
 	void updateAllDetuning();
 
-
 private:
-	OscillatorObject * m_osc[NUM_OF_OSCILLATORS];
+	OscillatorObject* m_osc[NUM_OF_OSCILLATORS];
 
 	struct oscPtr
 	{
 		MM_OPERATORS
-		Oscillator * oscLeft;
-		Oscillator * oscRight;
-	} ;
-
+		Oscillator* oscLeft;
+		Oscillator* oscRight;
+	};
 
 	friend class TripleOscillatorView;
-
-} ;
-
-
+};
 
 class TripleOscillatorView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	TripleOscillatorView( Instrument * _instrument, QWidget * _parent );
+	TripleOscillatorView(Instrument* _instrument, QWidget* _parent);
 	virtual ~TripleOscillatorView();
-
 
 private:
 	virtual void modelChanged();
 
-	automatableButtonGroup * m_mod1BtnGrp;
-	automatableButtonGroup * m_mod2BtnGrp;
+	automatableButtonGroup* m_mod1BtnGrp;
+	automatableButtonGroup* m_mod2BtnGrp;
 
 	struct OscillatorKnobs
 	{
 		MM_OPERATORS
-		OscillatorKnobs( Knob * v,
-					Knob * p,
-					Knob * c,
-					Knob * fl,
-					Knob * fr,
-					Knob * po,
-					Knob * spd,
-					PixmapButton * uwb,
-					automatableButtonGroup * wsbg ) :
-			m_volKnob( v ),
-			m_panKnob( p ),
-			m_coarseKnob( c ),
-			m_fineLeftKnob( fl ),
-			m_fineRightKnob( fr ),
-			m_phaseOffsetKnob( po ),
-			m_stereoPhaseDetuningKnob( spd ),
-			m_userWaveButton( uwb ),
-			m_waveShapeBtnGrp( wsbg )
+		OscillatorKnobs(Knob* v,
+			Knob* p,
+			Knob* c,
+			Knob* fl,
+			Knob* fr,
+			Knob* po,
+			Knob* spd,
+			PixmapButton* uwb,
+			automatableButtonGroup* wsbg)
+			: m_volKnob(v)
+			, m_panKnob(p)
+			, m_coarseKnob(c)
+			, m_fineLeftKnob(fl)
+			, m_fineRightKnob(fr)
+			, m_phaseOffsetKnob(po)
+			, m_stereoPhaseDetuningKnob(spd)
+			, m_userWaveButton(uwb)
+			, m_waveShapeBtnGrp(wsbg)
 		{
 		}
 		OscillatorKnobs()
 		{
 		}
-		Knob * m_volKnob;
-		Knob * m_panKnob;
-		Knob * m_coarseKnob;
-		Knob * m_fineLeftKnob;
-		Knob * m_fineRightKnob;
-		Knob * m_phaseOffsetKnob;
-		Knob * m_stereoPhaseDetuningKnob;
-		PixmapButton * m_userWaveButton;
-		automatableButtonGroup * m_waveShapeBtnGrp;
-
-	} ;
+		Knob* m_volKnob;
+		Knob* m_panKnob;
+		Knob* m_coarseKnob;
+		Knob* m_fineLeftKnob;
+		Knob* m_fineRightKnob;
+		Knob* m_phaseOffsetKnob;
+		Knob* m_stereoPhaseDetuningKnob;
+		PixmapButton* m_userWaveButton;
+		automatableButtonGroup* m_waveShapeBtnGrp;
+	};
 
 	OscillatorKnobs m_oscKnobs[NUM_OF_OSCILLATORS];
-} ;
-
-
+};
 
 #endif

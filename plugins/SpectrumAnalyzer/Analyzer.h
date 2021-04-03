@@ -35,18 +35,17 @@
 #include "SaControls.h"
 #include "SaProcessor.h"
 
-
 //! Top level class; handles LMMS interface and feeds data to the data processor.
 class Analyzer : public Effect
 {
 public:
-	Analyzer(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
+	Analyzer(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~Analyzer();
 
-	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
-	EffectControls *controls() override {return &m_controls;}
+	bool processAudioBuffer(sampleFrame* buffer, const fpp_t frame_count) override;
+	EffectControls* controls() override { return &m_controls; }
 
-	SaProcessor *getProcessor() {return &m_processor;}
+	SaProcessor* getProcessor() { return &m_processor; }
 
 private:
 	SaProcessor m_processor;
@@ -63,13 +62,12 @@ private:
 
 	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 
-	#ifdef SA_DEBUG
-		int m_last_dump_time;
-		int m_dump_count;
-		float m_sum_execution;
-		float m_max_execution;
-	#endif
+#ifdef SA_DEBUG
+	int m_last_dump_time;
+	int m_dump_count;
+	float m_sum_execution;
+	float m_max_execution;
+#endif
 };
 
 #endif // ANALYZER_H
-

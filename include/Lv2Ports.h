@@ -33,24 +33,27 @@
 #include <memory>
 #include <vector>
 
-#include "lmms_basics.h"
 #include "PluginIssue.h"
+#include "lmms_basics.h"
 
 struct ConnectPortVisitor;
 typedef struct LV2_Evbuf_Impl LV2_Evbuf;
 
-namespace Lv2Ports {
+namespace Lv2Ports
+{
 
 /*
 	port structs
 */
-enum class Flow {
+enum class Flow
+{
 	Unknown,
 	Input,
 	Output
 };
 
-enum class Type {
+enum class Type
+{
 	Unknown,
 	Control,
 	Audio,
@@ -60,11 +63,12 @@ enum class Type {
 
 //! Port visualization
 //! @note All Lv2 audio ports are float, this is only the visualisation
-enum class Vis {
-	Generic, //!< nothing specific, a generic knob or slider shall be used
-	Integer, //!< counter
+enum class Vis
+{
+	Generic,	 //!< nothing specific, a generic knob or slider shall be used
+	Integer,	 //!< counter
 	Enumeration, //!< selection from enumerated values
-	Toggled //!< boolean widget
+	Toggled		 //!< boolean widget
 };
 
 const char* toStr(Lv2Ports::Flow pf);
@@ -80,24 +84,24 @@ struct Unknown;
 
 struct ConstVisitor
 {
-	virtual void visit(const Lv2Ports::ControlPortBase& ) {}
-	virtual void visit(const Lv2Ports::Control& ) {}
-	virtual void visit(const Lv2Ports::Audio& ) {}
-	virtual void visit(const Lv2Ports::Cv& ) {}
-	virtual void visit(const Lv2Ports::AtomSeq& ) {}
-	virtual void visit(const Lv2Ports::Unknown& ) {}
+	virtual void visit(const Lv2Ports::ControlPortBase&) {}
+	virtual void visit(const Lv2Ports::Control&) {}
+	virtual void visit(const Lv2Ports::Audio&) {}
+	virtual void visit(const Lv2Ports::Cv&) {}
+	virtual void visit(const Lv2Ports::AtomSeq&) {}
+	virtual void visit(const Lv2Ports::Unknown&) {}
 
 	virtual ~ConstVisitor();
 };
 
 struct Visitor
 {
-	virtual void visit(Lv2Ports::ControlPortBase& ) {}
-	virtual void visit(Lv2Ports::Control& ) {}
-	virtual void visit(Lv2Ports::Audio& ) {}
-	virtual void visit(Lv2Ports::Cv& ) {}
-	virtual void visit(Lv2Ports::AtomSeq& ) {}
-	virtual void visit(Lv2Ports::Unknown& ) {}
+	virtual void visit(Lv2Ports::ControlPortBase&) {}
+	virtual void visit(Lv2Ports::Control&) {}
+	virtual void visit(Lv2Ports::Audio&) {}
+	virtual void visit(Lv2Ports::Cv&) {}
+	virtual void visit(Lv2Ports::AtomSeq&) {}
+	virtual void visit(Lv2Ports::Unknown&) {}
 
 	virtual ~Visitor();
 };
@@ -118,6 +122,7 @@ struct Meta
 	float def() const { return m_def; }
 	float min(sample_rate_t sr) const { return m_sampleRate ? sr * m_min : m_min; }
 	float max(sample_rate_t sr) const { return m_sampleRate ? sr * m_max : m_max; }
+
 private:
 	float m_def = .0f, m_min = .0f, m_max = .0f;
 	bool m_sampleRate = false;
@@ -137,7 +142,7 @@ struct PortBase : public Meta
 	virtual ~PortBase();
 };
 
-template<typename Derived, typename Base>
+template <typename Derived, typename Base>
 struct VisitablePort : public Base
 {
 	void accept(Visitor& v) override { v.visit(static_cast<Derived&>(*this)); }
@@ -178,15 +183,15 @@ struct Audio : public VisitablePort<Audio, PortBase>
 
 	//! Copy buffer passed by LMMS into our ports
 	//! @param channel channel index into each sample frame
-	void copyBuffersFromCore(const sampleFrame *lmmsBuf,
+	void copyBuffersFromCore(const sampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Add buffer passed by LMMS into our ports, and halve the result
 	//! @param channel channel index into each sample frame
-	void averageWithBuffersFromCore(const sampleFrame *lmmsBuf,
+	void averageWithBuffersFromCore(const sampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
 	//! @param channel channel index into each sample frame
-	void copyBuffersToCore(sampleFrame *lmmsBuf,
+	void copyBuffersToCore(sampleFrame* lmmsBuf,
 		unsigned channel, fpp_t frames) const;
 
 	bool isSideChain() const { return m_sidechain; }
@@ -227,14 +232,14 @@ struct Unknown : public VisitablePort<Unknown, PortBase>
 /*
 	port casts
 */
-template<class Target>
+template <class Target>
 struct DCastVisitor : public Visitor
 {
 	Target* m_result = nullptr;
 	void visit(Target& tar) { m_result = &tar; }
 };
 
-template<class Target>
+template <class Target>
 struct ConstDCastVisitor : public ConstVisitor
 {
 	const Target* m_result = nullptr;
@@ -242,7 +247,7 @@ struct ConstDCastVisitor : public ConstVisitor
 };
 
 //! If you don't want to use a whole visitor, you can use dcast
-template<class Target>
+template <class Target>
 Target* dcast(PortBase* base)
 {
 	DCastVisitor<Target> vis;
@@ -251,7 +256,7 @@ Target* dcast(PortBase* base)
 }
 
 //! const overload
-template<class Target>
+template <class Target>
 const Target* dcast(const PortBase* base)
 {
 	ConstDCastVisitor<Target> vis;

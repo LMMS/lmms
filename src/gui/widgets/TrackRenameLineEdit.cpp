@@ -25,20 +25,14 @@
  *
  */
 
-
 #include "TrackRenameLineEdit.h"
 
 #include <QKeyEvent>
 
-
-
-TrackRenameLineEdit::TrackRenameLineEdit( QWidget * parent ) :
-	QLineEdit( parent )
+TrackRenameLineEdit::TrackRenameLineEdit(QWidget* parent)
+	: QLineEdit(parent)
 {
 }
-
-
-
 
 void TrackRenameLineEdit::show()
 {
@@ -46,16 +40,13 @@ void TrackRenameLineEdit::show()
 	QLineEdit::show();
 }
 
-
-
-
-void TrackRenameLineEdit::keyPressEvent( QKeyEvent * ke )
+void TrackRenameLineEdit::keyPressEvent(QKeyEvent* ke)
 {
-	if( ke->key() == Qt::Key_Escape ) 
+	if (ke->key() == Qt::Key_Escape)
 	{
-		setText( m_oldName );
+		setText(m_oldName);
 		hide();
 	}
-	
-	QLineEdit::keyPressEvent( ke );
+
+	QLineEdit::keyPressEvent(ke);
 }

@@ -28,48 +28,49 @@
 #ifndef _DSP_RMS_H_
 #define _DSP_RMS_H_
 
-namespace DSP {
+namespace DSP
+{
 
 class RMS
 {
-	protected:
-		sample_t buffer[64];
-		int write;
+protected:
+	sample_t buffer[64];
+	int write;
 
-	public:
-		double sum;
+public:
+	double sum;
 
-		RMS()
-			{
-				write = 0;
-				reset();
-			}
+	RMS()
+	{
+		write = 0;
+		reset();
+	}
 
-		void reset()
-			{
-				sum = 0.;
-				memset (buffer, 0, sizeof (buffer));
-			}
+	void reset()
+	{
+		sum = 0.;
+		memset(buffer, 0, sizeof(buffer));
+	}
 
-		/* caution: pass in the *squared* sample value */
-		void store (sample_t x)
-			{
-				sum -= buffer[write];
-				sum += (buffer[write] = x);
-				write = (write + 1) & 63;
-			}
+	/* caution: pass in the *squared* sample value */
+	void store(sample_t x)
+	{
+		sum -= buffer[write];
+		sum += (buffer[write] = x);
+		write = (write + 1) & 63;
+	}
 
-		sample_t process (sample_t x)
-			{
-				store (x);
-				return rms();
-			}
+	sample_t process(sample_t x)
+	{
+		store(x);
+		return rms();
+	}
 
-		sample_t rms()
-			{
-				/* fabs it before sqrt, just in case ... */
-				return sqrt (fabs (sum) / 64);
-			}
+	sample_t rms()
+	{
+		/* fabs it before sqrt, just in case ... */
+		return sqrt(fabs(sum) / 64);
+	}
 };
 
 } /* namespace DSP */

@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef ABOUT_DIALOG_H
 #define ABOUT_DIALOG_H
 
@@ -30,14 +29,10 @@
 
 #include "ui_about_dialog.h"
 
-
 class AboutDialog : public QDialog, public Ui::AboutDialog
 {
 public:
-	AboutDialog(QWidget* parent=0);
-
-} ;
-
+	AboutDialog(QWidget* parent = 0);
+};
 
 #endif
-

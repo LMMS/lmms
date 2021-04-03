@@ -27,42 +27,41 @@
 
 #include "PixmapButton.h"
 
-
-class nineButtonSelector: public QWidget , public IntModelView
+class nineButtonSelector : public QWidget, public IntModelView
 {
 	Q_OBJECT
-			
+
 public:
-	nineButtonSelector( 	QPixmap _button0_on,
-				QPixmap _button0_off,
-				QPixmap _button1_on,
-				QPixmap _button1_off,
-				QPixmap _button2_on,
-				QPixmap _button2_off,
-				QPixmap _button3_on,
-				QPixmap _button3_off,
-				QPixmap _button4_on,
-				QPixmap _button4_off,
-				QPixmap _button5_on,
-				QPixmap _button5_off,
-				QPixmap _button6_on,
-				QPixmap _button6_off,
-				QPixmap _button7_on,
-				QPixmap _button7_off,
-				QPixmap _button8_on,
-				QPixmap _button8_off,
-				int _default,
-				int _x, int _y,
-				QWidget * _parent);
+	nineButtonSelector(QPixmap _button0_on,
+		QPixmap _button0_off,
+		QPixmap _button1_on,
+		QPixmap _button1_off,
+		QPixmap _button2_on,
+		QPixmap _button2_off,
+		QPixmap _button3_on,
+		QPixmap _button3_off,
+		QPixmap _button4_on,
+		QPixmap _button4_off,
+		QPixmap _button5_on,
+		QPixmap _button5_off,
+		QPixmap _button6_on,
+		QPixmap _button6_off,
+		QPixmap _button7_on,
+		QPixmap _button7_off,
+		QPixmap _button8_on,
+		QPixmap _button8_off,
+		int _default,
+		int _x, int _y,
+		QWidget* _parent);
 	virtual ~nineButtonSelector();
-	
-//	inline int getSelected() { 
-//		return( castModel<nineButtonSelectorModel>()->value() );
-//	};
+
+	//	inline int getSelected() {
+	//		return( castModel<nineButtonSelectorModel>()->value() );
+	//	};
 
 protected:
-	void setSelected( int _new_button );
-	
+	void setSelected(int _new_button);
+
 public slots:
 	void button0Clicked();
 	void button1Clicked();
@@ -73,20 +72,19 @@ public slots:
 	void button6Clicked();
 	void button7Clicked();
 	void button8Clicked();
-	void contextMenuEvent( QContextMenuEvent * );
-	
+	void contextMenuEvent(QContextMenuEvent*);
+
 signals:
-	void nineButtonSelection( int );
-	
+	void nineButtonSelection(int);
+
 private:
 	virtual void modelChanged();
-	void updateButton( int );
+	void updateButton(int);
 
-	QList<PixmapButton *> m_buttons;
-	PixmapButton * m_button;
-	PixmapButton * m_lastBtn;
-
-} ;
+	QList<PixmapButton*> m_buttons;
+	PixmapButton* m_button;
+	PixmapButton* m_lastBtn;
+};
 
 typedef IntModel nineButtonSelectorModel;
 

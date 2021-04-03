@@ -22,11 +22,9 @@
  *
  */
 
-
-#include "lmmsconfig.h"
-
 #include <cstdio>
 
+#include "lmmsconfig.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -35,7 +33,7 @@ std::wstring toWString(const std::string& s)
 {
 	std::wstring ret;
 	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(),
-			s.length(), nullptr, 0);
+		s.length(), nullptr, 0);
 	if (len == 0)
 	{
 		return ret;
@@ -59,7 +57,10 @@ std::wstring toWString(const std::string& s)
 int fileToDescriptor(FILE* f, bool closeFile = true)
 {
 	int fh;
-	if (f == NULL) {return -1;}
+	if (f == NULL)
+	{
+		return -1;
+	}
 
 #ifdef LMMS_BUILD_WIN32
 	fh = _dup(_fileno(f));
@@ -67,6 +68,9 @@ int fileToDescriptor(FILE* f, bool closeFile = true)
 	fh = dup(fileno(f));
 #endif
 
-	if (closeFile) {fclose(f);}
+	if (closeFile)
+	{
+		fclose(f);
+	}
 	return fh;
 }

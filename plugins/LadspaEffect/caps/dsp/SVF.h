@@ -73,116 +73,118 @@
 #ifndef _DSP_SVF_H_
 #define _DSP_SVF_H_
 
-namespace DSP {
+namespace DSP
+{
 
 template <int OVERSAMPLE>
 class SVF
 {
-	protected:
-		/* loop parameters */
-		sample_t f, q, qnorm;
-		
-		/* outputs (peak and notch left out) */
-		sample_t lo, band, hi;
-		sample_t * out;
+protected:
+	/* loop parameters */
+	sample_t f, q, qnorm;
 
-	public:
-		/* the type of filtering to do. */
-		enum {
-			Low = 0,
-			Band = 1,
-			High = 2
-		};
+	/* outputs (peak and notch left out) */
+	sample_t lo, band, hi;
+	sample_t* out;
 
-		SVF()
-			{
-				set_out (Low);
-				set_f_Q (.1, .1);
-			}
-		
-		void reset()
-			{
-				hi = band = lo = 0;
-			}
+public:
+	/* the type of filtering to do. */
+	enum
+	{
+		Low = 0,
+		Band = 1,
+		High = 2
+	};
 
-		void set_f_Q (double fc, double Q)
-			{
-				/* this is a very tight limit */
-				f = min (.25, 2 * sin (M_PI * fc / OVERSAMPLE));
+	SVF()
+	{
+		set_out(Low);
+		set_f_Q(.1, .1);
+	}
 
-				q = 2 * cos (pow (Q, .1) * M_PI * .5);
-				q = min (q, min (2., 2 / f - f * .5));
-				qnorm = sqrt (fabs (q) / 2. + .001);
-			}
+	void reset()
+	{
+		hi = band = lo = 0;
+	}
 
-		void set_out (int o)
-			{
-				if (o == Low)
-					out = &lo;
-				else if (o == Band)
-					out = &band;
-				else
-					out = &hi;
-			}
+	void set_f_Q(double fc, double Q)
+	{
+		/* this is a very tight limit */
+		f = min(.25, 2 * sin(M_PI * fc / OVERSAMPLE));
 
-		void one_cycle (sample_t * s, int frames)
-			{
-				for (int i = 0; i < frames; ++i)
-					s[i] = process (s[i]);
-			}
+		q = 2 * cos(pow(Q, .1) * M_PI * .5);
+		q = min(q, min(2., 2 / f - f * .5));
+		qnorm = sqrt(fabs(q) / 2. + .001);
+	}
 
-		sample_t process (sample_t x)
-			{
-				x = qnorm * x;
+	void set_out(int o)
+	{
+		if (o == Low)
+			out = &lo;
+		else if (o == Band)
+			out = &band;
+		else
+			out = &hi;
+	}
 
-				for (int pass = 0; pass < OVERSAMPLE; ++pass)
-				{
-					hi = x - lo - q * band;
-					band += f * hi;
-					lo += f * band;
+	void one_cycle(sample_t* s, int frames)
+	{
+		for (int i = 0; i < frames; ++i)
+			s[i] = process(s[i]);
+	}
 
-					/* zero-padding, not 0th order holding. */
-					x = 0;
-				}
+	sample_t process(sample_t x)
+	{
+		x = qnorm * x;
 
-				/* peak and notch outputs don't belong in the loop, put them
+		for (int pass = 0; pass < OVERSAMPLE; ++pass)
+		{
+			hi = x - lo - q * band;
+			band += f * hi;
+			lo += f * band;
+
+			/* zero-padding, not 0th order holding. */
+			x = 0;
+		}
+
+		/* peak and notch outputs don't belong in the loop, put them
 				 * here (best in a template) if needed. */
 
-				return *out;
-			}
+		return *out;
+	}
 };
 
 template <int STACKED, int OVERSAMPLE>
 class StackedSVF
 {
-	public:
-		SVF<OVERSAMPLE> svf [STACKED];
+public:
+	SVF<OVERSAMPLE> svf[STACKED];
 
-		void reset()
-			{
-				for (int i = 0; i < STACKED; ++i)
-					svf[i].reset();
-			}
+	void reset()
+	{
+		for (int i = 0; i < STACKED; ++i)
+			svf[i].reset();
+	}
 
-		void set_out (int out)
-			{
-				for (int i = 0; i < STACKED; ++i)
-					svf[i].set_out (out);
-			}
+	void set_out(int out)
+	{
+		for (int i = 0; i < STACKED; ++i)
+			svf[i].set_out(out);
+	}
 
-		void set_f_Q (double f, double Q)
-			{
-				for (int i = 0; i < STACKED; ++i)
-					svf[i].set_f_Q (f, Q);
-			}
+	void set_f_Q(double f, double Q)
+	{
+		for (int i = 0; i < STACKED; ++i)
+			svf[i].set_f_Q(f, Q);
+	}
 
-		sample_t process (sample_t x)
-			{
-				for (int i = 0; i < STACKED; ++i)
-					x = svf[i].process (x);
+	sample_t process(sample_t x)
+	{
+		for (int i = 0; i < STACKED; ++i)
+			x = svf[i].process(x);
 
-				return x;
-			}
+		return x;
+	}
 };
 
 } /* namespace DSP */

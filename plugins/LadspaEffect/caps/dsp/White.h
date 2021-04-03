@@ -28,53 +28,54 @@
 #ifndef _DSP_WHITE_H_
 #define _DSP_WHITE_H_
 
-namespace DSP {
+namespace DSP
+{
 
 /* after initializing, call either get() or get_31() to get a sample, don't
  * mix them. (get_31 output goes out of range if called after get()).
  */
 class White
 {
-	public:
-		uint32 b;
+public:
+	uint32 b;
 
-		White()
-			{
-				b = 0x1fff7777;
-			}
+	White()
+	{
+		b = 0x1fff7777;
+	}
 
-		void init (float f)
-			{
-				b = (uint32) (f * (float) 0x1fff7777);
-			}
-		
-		sample_t abs()
-			{
-				return fabs (get());
-			}
+	void init(float f)
+	{
+		b = (uint32)(f * (float)0x1fff7777);
+	}
 
-		/* 32-bit version */
-		sample_t get()
-			{
-#				define BIT(y) ((b << (31 - y)) & 0x80000000)
+	sample_t abs()
+	{
+		return fabs(get());
+	}
 
-				b = ((BIT (28) ^ BIT (27) ^ BIT (1) ^ BIT (0))) | (b >> 1);
-				return (4.6566128730773926e-10 * (sample_t) b) - 1;
+	/* 32-bit version */
+	sample_t get()
+	{
+#define BIT(y) ((b << (31 - y)) & 0x80000000)
 
-#				undef BIT
-			}
+		b = ((BIT(28) ^ BIT(27) ^ BIT(1) ^ BIT(0))) | (b >> 1);
+		return (4.6566128730773926e-10 * (sample_t)b) - 1;
 
-		/* 31-bit version, at least 6 instructions less / sample. probably only
+#undef BIT
+	}
+
+	/* 31-bit version, at least 6 instructions less / sample. probably only
 		 * pays off on a processor not providing a decent binary shift. */
-		sample_t get_31()
-			{
-#				define BIT(y) ((b << (30 - y)) & 0x40000000)
+	sample_t get_31()
+	{
+#define BIT(y) ((b << (30 - y)) & 0x40000000)
 
-				b = ((BIT (3) ^ BIT (0))) | (b >> 1);
-				return (9.3132257461547852e-10 * (sample_t) b) - 1;
+		b = ((BIT(3) ^ BIT(0))) | (b >> 1);
+		return (9.3132257461547852e-10 * (sample_t)b) - 1;
 
-#				undef BIT
-			}
+#undef BIT
+	}
 };
 
 } /* namespace DSP */

@@ -33,11 +33,8 @@
 #include "AutomationNode.h"
 #include "TrackContentObject.h"
 
-
 class AutomationTrack;
 class TimePos;
-
-
 
 class LMMS_EXPORT AutomationPattern : public TrackContentObject
 {
@@ -48,18 +45,18 @@ public:
 		DiscreteProgression,
 		LinearProgression,
 		CubicHermiteProgression
-	} ;
+	};
 
 	typedef QMap<int, AutomationNode> timeMap;
 	typedef QVector<QPointer<AutomatableModel>> objectVector;
 
-	AutomationPattern( AutomationTrack * _auto_track );
-	AutomationPattern( const AutomationPattern & _pat_to_copy );
+	AutomationPattern(AutomationTrack* _auto_track);
+	AutomationPattern(const AutomationPattern& _pat_to_copy);
 	virtual ~AutomationPattern() = default;
 
-	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
+	bool addObject(AutomatableModel* _obj, bool _search_dup = true);
 
-	const AutomatableModel * firstObject() const;
+	const AutomatableModel* firstObject() const;
 	const objectVector& objects() const;
 
 	// progression-type stuff
@@ -67,58 +64,55 @@ public:
 	{
 		return m_progressionType;
 	}
-	void setProgressionType( ProgressionTypes _new_progression_type );
+	void setProgressionType(ProgressionTypes _new_progression_type);
 
 	inline float getTension() const
 	{
 		return m_tension;
 	}
-	void setTension( QString _new_tension );
+	void setTension(QString _new_tension);
 
 	TimePos timeMapLength() const;
 	void updateLength();
 
 	TimePos putValue(
-		const TimePos & time,
+		const TimePos& time,
 		const float value,
 		const bool quantPos = true,
-		const bool ignoreSurroundingPoints = true
-	);
+		const bool ignoreSurroundingPoints = true);
 
 	TimePos putValues(
-		const TimePos & time,
+		const TimePos& time,
 		const float inValue,
 		const float outValue,
 		const bool quantPos = true,
-		const bool ignoreSurroundingPoints = true
-	);
+		const bool ignoreSurroundingPoints = true);
 
-	void removeNode(const TimePos & time);
+	void removeNode(const TimePos& time);
 	void removeNodes(const int tick0, const int tick1);
 
 	void resetNodes(const int tick0, const int tick1);
 
 	void recordValue(TimePos time, float value);
 
-	TimePos setDragValue( const TimePos & time,
-				const float value,
-				const bool quantPos = true,
-				const bool controlKey = false );
+	TimePos setDragValue(const TimePos& time,
+		const float value,
+		const bool quantPos = true,
+		const bool controlKey = false);
 
 	void applyDragValue();
-
 
 	bool isDragging() const
 	{
 		return m_dragging;
 	}
 
-	inline const timeMap & getTimeMap() const
+	inline const timeMap& getTimeMap() const
 	{
 		return m_timeMap;
 	}
 
-	inline timeMap & getTimeMap()
+	inline timeMap& getTimeMap()
 	{
 		return m_timeMap;
 	}
@@ -138,61 +132,60 @@ public:
 		return m_timeMap.isEmpty() == false;
 	}
 
-	float valueAt( const TimePos & _time ) const;
-	float *valuesAfter( const TimePos & _time ) const;
+	float valueAt(const TimePos& _time) const;
+	float* valuesAfter(const TimePos& _time) const;
 
 	const QString name() const;
 
 	// settings-management
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
+	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
+	void loadSettings(const QDomElement& _this) override;
 
 	static const QString classNodeName() { return "automationpattern"; }
 	QString nodeName() const override { return classNodeName(); }
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	TrackContentObjectView* createView(TrackView* _tv) override;
 
-
-	static bool isAutomated( const AutomatableModel * _m );
-	static QVector<AutomationPattern *> patternsForModel( const AutomatableModel * _m );
-	static AutomationPattern * globalAutomationPattern( AutomatableModel * _m );
+	static bool isAutomated(const AutomatableModel* _m);
+	static QVector<AutomationPattern*> patternsForModel(const AutomatableModel* _m);
+	static AutomationPattern* globalAutomationPattern(AutomatableModel* _m);
 	static void resolveAllIDs();
 
 	bool isRecording() const { return m_isRecording; }
-	void setRecording( const bool b ) { m_isRecording = b; }
+	void setRecording(const bool b) { m_isRecording = b; }
 
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
 
 public slots:
 	void clear();
-	void objectDestroyed( jo_id_t );
-	void flipY( int min, int max );
+	void objectDestroyed(jo_id_t);
+	void flipY(int min, int max);
 	void flipY();
-	void flipX( int length = -1 );
+	void flipX(int length = -1);
 
 private:
 	void cleanObjects();
 	void generateTangents();
 	void generateTangents(timeMap::iterator it, int numToGenerate);
-	float valueAt( timeMap::const_iterator v, int offset ) const;
+	float valueAt(timeMap::const_iterator v, int offset) const;
 
 	// Mutex to make methods involving automation patterns thread safe
 	// Mutable so we can lock it from const objects
 	mutable QMutex m_patternMutex;
 
-	AutomationTrack * m_autoTrack;
+	AutomationTrack* m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
-	timeMap m_timeMap;	// actual values
-	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
+	timeMap m_timeMap;	  // actual values
+	timeMap m_oldTimeMap; // old values for storing the values before setDragValue() is called.
 	float m_tension;
 	bool m_hasAutomation;
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
 	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?
-	float m_dragOutValue; // The outValue of the dragged node's
+	float m_dragOutValue;	 // The outValue of the dragged node's
 
 	bool m_isRecording;
 	float m_lastRecordedValue;
@@ -204,8 +197,6 @@ private:
 
 	friend class AutomationPatternView;
 	friend class AutomationNode;
-
-} ;
-
+};
 
 #endif

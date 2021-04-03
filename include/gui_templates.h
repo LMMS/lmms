@@ -22,47 +22,42 @@
  *
  */
 
-
 #ifndef GUI_TEMPLATES_H
 #define GUI_TEMPLATES_H
 
-#include "lmmsconfig.h"
-
 #include <QApplication>
-#include <QFont>
 #include <QDesktopWidget>
+#include <QFont>
 
-
+#include "lmmsconfig.h"
 
 // return DPI-independent font-size - font with returned font-size has always
 // the same size in pixels
-template<int SIZE>
-inline QFont pointSize( QFont _f )
+template <int SIZE>
+inline QFont pointSize(QFont _f)
 {
 	static const float DPI = 96;
 #ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( ((float) SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
+	_f.setPointSizeF(((float)SIZE + 0.5f) * DPI /
+		QApplication::desktop()->logicalDpiY());
 #else
-	_f.setPointSizeF( (float) SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
+	_f.setPointSizeF((float)SIZE * DPI /
+		QApplication::desktop()->logicalDpiY());
 #endif
-	return( _f );
+	return (_f);
 }
 
-
-inline QFont pointSizeF( QFont _f, float SIZE )
+inline QFont pointSizeF(QFont _f, float SIZE)
 {
 	static const float DPI = 96;
 #ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( (SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
+	_f.setPointSizeF((SIZE + 0.5f) * DPI /
+		QApplication::desktop()->logicalDpiY());
 #else
-	_f.setPointSizeF( SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
+	_f.setPointSizeF(SIZE * DPI /
+		QApplication::desktop()->logicalDpiY());
 #endif
-	return( _f );
+	return (_f);
 }
-
 
 #endif

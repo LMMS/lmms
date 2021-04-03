@@ -2,4 +2,4 @@
 
 #include "allegro.h"
 
-Alg_error alg_smf_read(std::istream &file, Alg_seq_ptr new_seq);
+Alg_error alg_smf_read(std::istream& file, Alg_seq_ptr new_seq);

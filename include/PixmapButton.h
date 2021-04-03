@@ -22,7 +22,6 @@
  *
  */
 
-
 #ifndef PIXMAP_BUTTON_H
 #define PIXMAP_BUTTON_H
 
@@ -30,36 +29,32 @@
 
 #include "AutomatableButton.h"
 
-
 class LMMS_EXPORT PixmapButton : public AutomatableButton
 {
 	Q_OBJECT
 public:
-	PixmapButton( QWidget * _parent,
-					const QString & _name = QString() );
+	PixmapButton(QWidget* _parent,
+		const QString& _name = QString());
 	virtual ~PixmapButton();
 
-	void setActiveGraphic( const QPixmap & _pm );
-	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );
+	void setActiveGraphic(const QPixmap& _pm);
+	void setInactiveGraphic(const QPixmap& _pm, bool _update = true);
 
 	QSize sizeHint() const override;
 
 signals:
 	void doubleClicked();
 
-
 protected:
-	void paintEvent( QPaintEvent * _pe ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
-
+	void paintEvent(QPaintEvent* _pe) override;
+	void mousePressEvent(QMouseEvent* _me) override;
+	void mouseReleaseEvent(QMouseEvent* _me) override;
+	void mouseDoubleClickEvent(QMouseEvent* _me) override;
 
 private:
 	QPixmap m_activePixmap;
 	QPixmap m_inactivePixmap;
-	bool	m_pressed;
-
-} ;
+	bool m_pressed;
+};
 
 #endif

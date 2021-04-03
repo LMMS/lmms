@@ -52,7 +52,7 @@ inline int horizontalAdvance(const QFontMetrics& metrics, const QString& text)
  * @param wheelEvent
  * @return the position of wheelEvent
  */
-inline QPoint position(QWheelEvent *wheelEvent)
+inline QPoint position(QWheelEvent* wheelEvent)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
 	return wheelEvent->position().toPoint();

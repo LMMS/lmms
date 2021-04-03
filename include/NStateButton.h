@@ -22,54 +22,47 @@
  *
  */
 
-
 #ifndef NSTATE_BUTTON_H
 #define NSTATE_BUTTON_H
 
 #include <QPixmap>
-#include <QtCore/QVector>
 #include <QtCore/QPair>
+#include <QtCore/QVector>
 
 #include "ToolButton.h"
-
 
 class NStateButton : public ToolButton
 {
 	Q_OBJECT
 public:
-	NStateButton( QWidget * _parent );
+	NStateButton(QWidget* _parent);
 	virtual ~NStateButton();
-	void addState( const QPixmap & _pixmap, const QString & _tooltip = "" );
+	void addState(const QPixmap& _pixmap, const QString& _tooltip = "");
 
-	inline void setGeneralToolTip( const QString & _tooltip )
+	inline void setGeneralToolTip(const QString& _tooltip)
 	{
 		m_generalToolTip = _tooltip;
 	}
 
 	inline int state() const
 	{
-		return( m_curState );
+		return (m_curState);
 	}
 
-
 public slots:
-	void changeState( int _n );
-
+	void changeState(int _n);
 
 signals:
-	void changedState( int _n );
-
+	void changedState(int _n);
 
 protected:
-	void mousePressEvent( QMouseEvent * _me ) override;
-
+	void mousePressEvent(QMouseEvent* _me) override;
 
 private:
-	QVector<QPair<QPixmap, QString> > m_states;
+	QVector<QPair<QPixmap, QString>> m_states;
 	QString m_generalToolTip;
 
 	int m_curState;
-
-} ;
+};
 
 #endif
