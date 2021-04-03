@@ -177,11 +177,11 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
+	if (event->position.x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else { m_intStep = false; }
 
 	event->accept();
-	model()->setValue(model()->value() + ((event->delta() > 0) ? 1 : -1) * getStep());
+	model()->setValue(model()->value() + ((event->angleDelta().y() > 0) ? 1 : -1) * getStep());
 	emit manualChange();
 }
 
