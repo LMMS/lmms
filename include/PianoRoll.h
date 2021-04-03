@@ -47,6 +47,7 @@ class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
+class QToolButton;
 
 class ComboBox;
 class NotePlayHandle;
@@ -142,6 +143,13 @@ public:
 	int quantization() const;
 
 protected:
+	enum QuantizeActions
+	{
+		QuantizeBoth,
+		QuantizePos,
+		QuantizeLength
+	};
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void leaveEvent( QEvent * e ) override;
@@ -198,7 +206,7 @@ protected slots:
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes();
+	void quantizeNotes(QuantizeActions mode = QuantizeBoth);
 
 	void updateSemiToneMarkerMenu();
 
@@ -523,6 +531,8 @@ signals:
 private slots:
 	void updateAfterPatternChange();
 	void ghostPatternSet( bool state );
+	void exportPattern();
+	void importPattern();
 
 private:
 	void patternRenamed();
@@ -532,6 +542,7 @@ private:
 
 	PianoRoll* m_editor;
 
+	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;

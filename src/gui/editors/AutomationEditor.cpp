@@ -398,6 +398,53 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 
 
+bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValue)
+{
+	if (node == m_pattern->getTimeMap().end()) { return false; }
+
+	// Display dialog to edit the value
+	bool ok;
+	double value = QInputDialog::getDouble(
+		this,
+		tr("Edit Value"),
+		editingOutValue
+			? tr("New outValue")
+			: tr("New inValue"),
+		editingOutValue
+			? OUTVAL(node)
+			: INVAL(node),
+		m_pattern->firstObject()->minValue<float>(),
+		m_pattern->firstObject()->maxValue<float>(),
+		3,
+		&ok
+	);
+
+	// If dialog failed return false
+	if (!ok) { return false; }
+
+	// Set the new inValue/outValue
+	if (editingOutValue)
+	{
+		node.value().setOutValue(value);
+	}
+	else
+	{
+		// If the outValue is equal to the inValue we
+		// set both to the given value
+		if (OFFSET(node) == 0)
+		{
+			node.value().setOutValue(value);
+		}
+		node.value().setInValue(value);
+	}
+
+	Engine::getSong()->setModified();
+	return true;
+}
+
+
+
+
 void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 {
 	if( !validPattern() )
@@ -609,6 +656,31 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 
 		update();
+	}
+}
+
+
+
+
+void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
+{
+	if (!validPattern()) { return; }
+
+	// If we double clicked outside the AutomationEditor viewport return
+	if (mouseEvent->y() <= TOP_MARGIN || mouseEvent->x() < VALUES_WIDTH) { return; }
+
+	// Are we fine tuning the inValue or outValue?
+	const bool isOutVal = (m_editMode == DRAW_OUTVALUES);
+	timeMap::iterator clickedNode = getNodeAt(mouseEvent->x(), mouseEvent->y(), isOutVal);
+
+	switch (m_editMode)
+	{
+		case DRAW:
+		case DRAW_OUTVALUES:
+			if (fineTuneValue(clickedNode, isOutVal)) { update(); }
+			break;
+		default:
+			break;
 	}
 }
 

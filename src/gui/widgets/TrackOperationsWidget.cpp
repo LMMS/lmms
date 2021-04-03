@@ -25,9 +25,11 @@
 #include "TrackOperationsWidget.h"
 
 #include <QMenu>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QCheckBox>
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
@@ -193,6 +195,41 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 }
 
 
+/*! \brief Show a message box warning the user that this track is about to be closed */
+bool TrackOperationsWidget::confirmRemoval()
+{
+	bool needConfirm = ConfigManager::inst()->value("ui", "trackdeletionwarning", "1").toInt();
+	if (!needConfirm){ return true; }
+	
+	QString messageRemoveTrack = tr("After removing a track, it can not "
+					"be recovered. Are you sure you want to remove track \"%1\"?")
+					.arg(m_trackView->getTrack()->name());
+	QString messageTitleRemoveTrack = tr("Confirm removal");
+	QString askAgainText = tr("Don't ask again");
+	QCheckBox* askAgainCheckBox = new QCheckBox(askAgainText, nullptr);
+	connect(askAgainCheckBox, &QCheckBox::stateChanged, [this](int state){
+		// Invert button state, if it's checked we *shouldn't* ask again
+		ConfigManager::inst()->setValue("ui", "trackdeletionwarning", state ? "0" : "1");
+	});
+
+	QMessageBox mb(this);
+	mb.setText(messageRemoveTrack);
+	mb.setWindowTitle(messageTitleRemoveTrack);
+	mb.setIcon(QMessageBox::Warning);
+	mb.addButton(QMessageBox::Cancel);
+	mb.addButton(QMessageBox::Ok);
+	mb.setCheckBox(askAgainCheckBox);
+	mb.setDefaultButton(QMessageBox::Cancel);
+
+	int answer = mb.exec();
+
+	if( answer == QMessageBox::Ok )
+	{
+		return true;
+	}
+	return false;
+}
+
 
 
 /*! \brief Clone this track
@@ -232,7 +269,10 @@ void TrackOperationsWidget::clearTrack()
  */
 void TrackOperationsWidget::removeTrack()
 {
-	emit trackRemovalScheduled( m_trackView );
+	if (confirmRemoval())
+	{
+		emit trackRemovalScheduled(m_trackView);
+	}
 }
 
 void TrackOperationsWidget::changeTrackColor()

@@ -31,6 +31,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
+#include <QMessageBox>
 #include <QMdiArea>
 #include <QPainter>
 #include <QPointer>
@@ -66,6 +67,7 @@
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
+#include "FileDialog.h"
 
 
 using std::move;
@@ -3362,6 +3364,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		QPolygonF editHandles;
 
+		// Return a note's Y position on the grid
+		auto noteYPos = [&](const int key)
+		{
+			return (topKey - key) * m_keyLineHeight + keyAreaTop() - 1;
+		};
+
 		// -- Begin ghost pattern
 		if( !m_ghostNotes.empty() )
 		{
@@ -3377,7 +3385,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				{
 					len_ticks = 4;
 				}
-				const int key = note->key() - m_startKey + 1;
 
 				int pos_ticks = note->pos();
 
@@ -3396,7 +3403,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 					// we've done and checked all, let's draw the note
 					drawNoteRect(
-						p, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight, note_width,
+						p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 						note, m_ghostNoteColor, m_ghostNoteTextColor, m_selectedNoteColor,
 						m_ghostNoteOpacity, m_ghostNoteBorders, drawNoteNames);
 				}
@@ -3418,8 +3425,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				len_ticks = 4;
 			}
 
-			const int key = note->key() - m_startKey + 1;
-
 			int pos_ticks = note->pos();
 
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
@@ -3434,10 +3439,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// is the note in visible area?
 			if (note->key() > bottomKey && note->key() <= topKey)
 			{
-
 				// we've done and checked all, let's draw the note
 				drawNoteRect(
-					p, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight, note_width,
+					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 					note, m_noteColor, m_noteTextColor, m_selectedNoteColor,
 					m_noteOpacity, m_noteBorders, drawNoteNames);
 			}
@@ -3486,7 +3490,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 			if( note->hasDetuningInfo() )
 			{
-				drawDetuningInfo(p, note, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight);
+				drawDetuningInfo(p, note, x + m_whiteKeyWidth, noteYPos(note->key()));
 				p.setClipRect(
 					m_whiteKeyWidth,
 					PR_TOP_MARGIN,
@@ -3540,7 +3544,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				continue;
 			}
 
-			const int key = note->key() - m_startKey + 1;
 
 			int pos_ticks = note->pos();
 
@@ -3559,7 +3562,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 				// we've done and checked all, let's draw the note
 				drawNoteRect(
-					p, x + m_whiteKeyWidth, y_base - key * m_keyLineHeight, note_width,
+					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 					note, m_stepRecorder.curStepNoteColor(), m_noteTextColor, m_selectedNoteColor,
 					m_noteOpacity, m_noteBorders, drawNoteNames);
 			}
@@ -4553,7 +4556,7 @@ int PianoRoll::quantization() const
 }
 
 
-void PianoRoll::quantizeNotes()
+void PianoRoll::quantizeNotes(QuantizeActions mode)
 {
 	if( ! hasValidPattern() )
 	{
@@ -4581,8 +4584,15 @@ void PianoRoll::quantizeNotes()
 
 		Note copy(*n);
 		m_pattern->removeNote( n );
-		copy.quantizePos( quantization() );
-		m_pattern->addNote( copy );
+		if (mode == QuantizeBoth || mode == QuantizePos)
+		{
+			copy.quantizePos(quantization());
+		}
+		if (mode == QuantizeBoth || mode == QuantizeLength)
+		{
+			copy.quantizeLength(quantization());
+		}
+		m_pattern->addNote(copy, false);
 	}
 
 	update();
@@ -4703,15 +4713,53 @@ PianoRollWindow::PianoRollWindow() :
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
-	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
+	// Quantize combo button
+	QToolButton* quantizeButton = new QToolButton(notesActionsToolBar);
+	QMenu* quantizeButtonMenu = new QMenu(quantizeButton);
+
+	QAction* quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
+	QAction* quantizePosAction = new QAction(tr("Quantize positions"), this);
+	QAction* quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
+
+	connect(quantizeAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(); });
+	connect(quantizePosAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizePos); });
+	connect(quantizeLengthAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizeLength); });
+
+	quantizeButton->setPopupMode(QToolButton::MenuButtonPopup);
+	quantizeButton->setDefaultAction(quantizeAction);
+	quantizeButton->setMenu(quantizeButtonMenu);
+	quantizeButtonMenu->addAction(quantizePosAction);
+	quantizeButtonMenu->addAction(quantizeLengthAction);
 
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
-	notesActionsToolBar->addAction( quantizeAction );
+	notesActionsToolBar->addWidget(quantizeButton);
+
+	// -- File actions
+	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
+
+	// -- File ToolButton
+	m_fileToolsButton = new QToolButton(m_toolBar);
+	m_fileToolsButton->setIcon(embed::getIconPixmap("file"));
+	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
+
+	// Import / export
+	QAction* importAction = new QAction(embed::getIconPixmap("project_import"),
+		tr("Import pattern"), m_fileToolsButton);
+
+	QAction* exportAction = new QAction(embed::getIconPixmap("project_export"),
+		tr("Export pattern"), m_fileToolsButton);
+
+	m_fileToolsButton->addAction(importAction);
+	m_fileToolsButton->addAction(exportAction);
+	fileActionsToolBar->addWidget(m_fileToolsButton);
+
+	connect(importAction, SIGNAL(triggered()), this, SLOT(importPattern()));
+	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportPattern()));
+	// -- End File actions
 
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
@@ -4964,12 +5012,14 @@ void PianoRollWindow::setCurrentPattern( Pattern* pattern )
 	if ( pattern )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
+		m_fileToolsButton->setEnabled(true);
 		connect( pattern->instrumentTrack(), SIGNAL( nameChanged() ), this, SLOT( updateAfterPatternChange()) );
 		connect( pattern, SIGNAL( dataChanged() ), this, SLOT( updateAfterPatternChange() ) );
 	}
 	else
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+		m_fileToolsButton->setEnabled(false);
 	}
 }
 
@@ -5135,10 +5185,12 @@ void PianoRollWindow::patternRenamed()
 	if ( currentPattern() )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( currentPattern()->name() ) );
+		m_fileToolsButton->setEnabled(true);
 	}
 	else
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+		m_fileToolsButton->setEnabled(false);
 	}
 }
 
@@ -5148,6 +5200,84 @@ void PianoRollWindow::patternRenamed()
 void PianoRollWindow::ghostPatternSet( bool state )
 {
 	m_clearGhostButton->setEnabled( state );
+}
+
+
+
+
+void PianoRollWindow::exportPattern()
+{
+	FileDialog exportDialog(this, tr("Export pattern"), "",
+		tr("XML pattern file (*.xpt *.xptz)"));
+
+	exportDialog.setAcceptMode(FileDialog::AcceptSave);
+
+	if (exportDialog.exec() == QDialog::Accepted &&
+		!exportDialog.selectedFiles().isEmpty() &&
+		!exportDialog.selectedFiles().first().isEmpty())
+	{
+		QString suffix =
+			ConfigManager::inst()->value("app", "nommpz").toInt() == 0
+				? "xptz"
+				: "xpt";
+		exportDialog.setDefaultSuffix(suffix);
+
+		const QString fullPath = exportDialog.selectedFiles()[0];
+		DataFile dataFile(DataFile::NotePattern);
+		m_editor->m_pattern->saveSettings(dataFile, dataFile.content());
+
+		if (dataFile.writeFile(fullPath))
+		{
+			TextFloat::displayMessage(tr("Export pattern success"),
+				tr("Pattern saved to %1").arg(fullPath),
+				embed::getIconPixmap("project_export"), 4000);
+		}
+	}
+}
+
+
+
+
+void PianoRollWindow::importPattern()
+{
+	// Overwrite confirmation.
+	if (!m_editor->m_pattern->empty() &&
+		QMessageBox::warning(
+			NULL,
+			tr("Import pattern."),
+			tr("You are about to import a pattern, this will "
+				"overwrite your current pattern. Do you want to "
+				"continue?"),
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes
+		) != QMessageBox::Yes)
+	{
+		return;
+	}
+
+	FileDialog importDialog(this, tr("Open pattern"), "",
+		tr("XML pattern file (*.xpt *.xptz)"));
+	importDialog.setFileMode(FileDialog::ExistingFile);
+
+	if (importDialog.exec() == QDialog::Accepted &&
+		!importDialog.selectedFiles().isEmpty())
+	{
+		const QString fullPath = importDialog.selectedFiles()[0];
+		DataFile dataFile(fullPath);
+
+		if (dataFile.head().isNull())
+		{
+			return;
+		}
+
+		TimePos pos = m_editor->m_pattern->startPosition(); // Backup position in timeline.
+
+		m_editor->m_pattern->loadSettings(dataFile.content());
+		m_editor->m_pattern->movePosition(pos);
+
+		TextFloat::displayMessage(tr("Import pattern success"),
+			tr("Imported pattern %1!").arg(fullPath),
+			embed::getIconPixmap("project_import"), 4000);
+	}
 }
 
 
