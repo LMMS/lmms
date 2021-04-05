@@ -1760,15 +1760,19 @@ void InstrumentTrackWindow::toggleVisibility( bool on )
 
 void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
-	event->ignore();
-
-	if( gui->mainWindow()->workspace() )
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		event->accept();
+	}
+	else if (gui->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
+		event->ignore();
 	}
 	else
 	{
 		hide();
+		event->ignore();
 	}
 
 	m_itv->m_tlb->setFocus();

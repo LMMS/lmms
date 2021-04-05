@@ -29,9 +29,11 @@
 #include "SubWindow.h"
 
 #include <QMdiArea>
+#include <QMetaMethod>
 #include <QMoveEvent>
 #include <QPainter>
 #include <QScrollBar>
+#include <QWindow>
 
 #include "embed.h"
 
@@ -76,6 +78,14 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_restoreBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_restoreBtn->setToolTip( tr( "Restore" ) );
 	connect( m_restoreBtn, SIGNAL( clicked( bool ) ), this, SLOT( showNormal() ) );
+
+	m_detachBtn = new QPushButton( embed::getIconPixmap( "window" ), QString::null, this );
+	m_detachBtn->resize( m_buttonSize );
+	m_detachBtn->setFocusPolicy( Qt::NoFocus );
+	m_detachBtn->setCursor( Qt::ArrowCursor );
+	m_detachBtn->setAttribute( Qt::WA_NoMousePropagation );
+	m_detachBtn->setToolTip( tr( "Detach" ) );
+	connect( m_detachBtn, SIGNAL( clicked( bool ) ), this, SLOT( detach() ) );
 
 	// QLabel for the window title and the shadow effect
 	m_shadow = new QGraphicsDropShadowEffect();
@@ -149,6 +159,17 @@ void SubWindow::changeEvent( QEvent *event )
 		adjustTitleBar();
 	}
 
+}
+
+void SubWindow::showEvent(QShowEvent *e)
+{
+	attach();
+	QMdiSubWindow::showEvent(e);
+}
+
+bool SubWindow::isDetached() const
+{
+	return widget()->windowFlags().testFlag(Qt::Window);
 }
 
 
@@ -234,6 +255,38 @@ void SubWindow::setBorderColor( const QColor &c )
 	m_borderColor = c;
 }
 
+void SubWindow::detach()
+{
+	if (isDetached()) {
+		return;
+	}
+
+	auto pos = mapToGlobal(widget()->pos());
+	widget()->setWindowFlags(Qt::Window);
+	widget()->show();
+	hide();
+
+	widget()->windowHandle()->setPosition(pos);
+}
+
+void SubWindow::attach()
+{
+	if (! isDetached()) {
+		return;
+	}
+	auto frame = widget()->windowHandle()->frameGeometry();
+
+	widget()->setWindowFlags(Qt::Widget);
+	widget()->show();
+	show();
+
+	// Delay moving & resizing using event queue. Ensures that this widget is
+	// visible first, so that resizing works.
+	QObject o; connect(&o, &QObject::destroyed, this, [this, frame]() {
+		move(mdiArea()->mapFromGlobal(frame.topLeft()));
+		resize(frame.size());
+	}, Qt::QueuedConnection);
+}
 
 
 /**
@@ -277,9 +330,8 @@ void SubWindow::adjustTitleBar()
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
 
-	QPoint rightButtonPos( width() - rightSpace - m_buttonSize.width(), 3 );
-	QPoint middleButtonPos( width() - rightSpace - ( 2 * m_buttonSize.width() ) - buttonGap, 3 );
-	QPoint leftButtonPos( width() - rightSpace - ( 3 * m_buttonSize.width() ) - ( 2 * buttonGap ), 3 );
+	QPoint buttonPos( width() - rightSpace - m_buttonSize.width(), 3 );
+	const QPoint buttonStep( m_buttonSize.width() + buttonGap, 0 );
 
 	// the buttonBarWidth depends on the number of buttons.
 	// we need it to calculate the width of window title label
@@ -287,25 +339,31 @@ void SubWindow::adjustTitleBar()
 
 	// set the buttons on their positions.
 	// the close button is always needed and on the rightButtonPos
-	m_closeBtn->move( rightButtonPos );
+	m_closeBtn->move( buttonPos );
+	buttonPos -= buttonStep;
 
 	// here we ask: is the Subwindow maximizable and
 	// then we set the buttons and show them if needed
 	if( windowFlags() & Qt::WindowMaximizeButtonHint )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
-		m_maximizeBtn->move( middleButtonPos );
-		m_restoreBtn->move( middleButtonPos );
-		m_maximizeBtn->setHidden( isMaximized() );
+		m_maximizeBtn->move( buttonPos );
+		m_restoreBtn->move( buttonPos );
+		if ( ! isMaximized() ) {
+			m_maximizeBtn->show();
+			buttonPos -= buttonStep;
+		}
 	}
 
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
-	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
-	if( isMinimized() )
-	{
-		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
+	if ( isMaximized() || isMinimized() ) {
+		m_restoreBtn->show();
+		buttonPos -= buttonStep;
 	}
+
+	m_detachBtn->move( buttonPos );
+	m_detachBtn->show();
 
 	if( widget() )
 	{
@@ -374,5 +432,19 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	if( !isMaximized() && !isMinimized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
+	}
+}
+
+bool SubWindow::eventFilter(QObject * obj, QEvent * event)
+{
+	if (obj != static_cast<QObject *>(widget())) {
+		return QMdiSubWindow::eventFilter(obj, event);
+	}
+	switch (event->type()) {
+	case QEvent::WindowStateChange:
+		event->accept();
+		return true;
+	default:
+		return QMdiSubWindow::eventFilter(obj, event);
 	}
 }

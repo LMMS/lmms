@@ -554,16 +554,21 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 
 
 void FxMixerView::closeEvent( QCloseEvent * _ce )
- {
-	if( parentWidget() )
+{
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		_ce->accept();
+	}
+	else if (gui->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
+		_ce->ignore();
 	}
 	else
 	{
 		hide();
+		_ce->ignore();
 	}
-	_ce->ignore();
  }
 
 
