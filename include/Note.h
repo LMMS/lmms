@@ -104,8 +104,7 @@ public:
 		m_isPlaying = isPlaying;
 	}
 
-
-	void setLength( const TimePos & length );
+	virtual void setLength( const TimePos & length );
 	void setPos( const TimePos & pos );
 	void setKey( const int key );
 	virtual void setVolume( volume_t volume );

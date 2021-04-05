@@ -46,6 +46,8 @@
 
 #include <math.h>
 #include <utility>
+#include <VocalNote.h>
+#include <VocalPattern.h>
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
@@ -1053,7 +1055,35 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 		}
 		p.restore();
 	}
+	else
+	{
+		const auto *vocalNote = dynamic_cast<const VocalNote*>(n);
+		if (vocalNote){
+			p.save();
+			int const lyricTextHeight = static_cast<int>(noteHeight * 0.8);
+			const std::string& stdlyric = vocalNote->getLyric();
+			QString lyric = QString::fromStdString(stdlyric);
+			if (lyricTextHeight > 6)
+			{
+				QFont lyricFont(p.font());
+				lyricFont.setPixelSize(lyricTextHeight);
+				QFontMetrics fontMetrics(lyricFont);
+				QSize lyricSize = fontMetrics.size(Qt::TextSingleLine,lyric);
+				int const distanceToBorder = 6;
+				int const xOffset = borderWidth + distanceToBorder;
 
+				QRect const boundingRect = fontMetrics.boundingRect(QChar::fromLatin1('H'));
+				int const yOffset = (noteHeight - boundingRect.top() - boundingRect.bottom()) / 2;
+				if (lyricSize.width() < noteWidth-xOffset){
+					p.setPen(noteTextColor);
+					p.setFont(lyricFont);
+					QPoint textStart(x + xOffset,y+yOffset);
+					p.drawText(textStart,lyric);
+				}
+			}
+			p.restore();
+		}
+	}
 	// draw the note endmark, to hint the user to resize
 	p.setBrush( col );
 	if( width > 2 )
@@ -1971,9 +2001,23 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 	{
 		return;
 	}
+	Note *noteUnder = noteUnderMouse();
+	auto *vocalNote = dynamic_cast<VocalNote*>(noteUnder);
+	if (noteUnder && vocalNote){
+		QString newLyric = QInputDialog::getText(this,tr("Input lyric"),tr("Enter the lyrics this virtual singer must sing."));
+		if (newLyric.trimmed() == "")
+		{
+			newLyric = "la";
+		}
+		VocalPattern *vocalPattern = dynamic_cast<VocalPattern*>(m_pattern);
+		if (vocalPattern){
+			vocalPattern->setLyric(vocalNote,newLyric.toStdString());
+		}
+
+	}
 
 	// if they clicked in the note edit area, enter value for the volume bar
-	if( me->x() > noteEditLeft() && me->x() < noteEditRight()
+	else if( me->x() > noteEditLeft() && me->x() < noteEditRight()
 		&& me->y() > noteEditTop() && me->y() < noteEditBottom() )
 	{
 		// get values for going through notes
@@ -4682,6 +4726,7 @@ void PianoRoll::changeSnapMode()
 
 	m_gridMode = static_cast<GridMode>(m_snapModel.value());
 }
+
 
 PianoRollWindow::PianoRollWindow() :
 	Editor(true, true),

@@ -4,7 +4,8 @@ set(LMMS_SRCS
 	tracks/BBTrack.cpp
 	tracks/InstrumentTrack.cpp
 	tracks/Pattern.cpp
+	tracks/VocalPattern.cpp
 	tracks/SampleTrack.cpp
-
+	tracks/VocalInstrumentTrack.cpp
 	PARENT_SCOPE
 )

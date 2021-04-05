@@ -31,6 +31,7 @@
 #include <QMdiArea>
 #include <QScrollBar>
 #include <QWheelEvent>
+#include <VocalInstrumentTrack.h>
 
 #include "TrackContainer.h"
 #include "BBTrack.h"
@@ -348,11 +349,11 @@ void TrackContainerView::clearAllTracks()
 void TrackContainerView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
-		QString( "presetfile,pluginpresetfile,samplefile,instrument,"
+		QString( "presetfile,pluginpresetfile,samplefile,instrument,vocalinstrument,"
 				"importedproject,soundfontfile,patchfile,vstpluginfile,projectfile,"
 				"track_%1,track_%2" ).
 						arg( Track::InstrumentTrack ).
-						arg( Track::SampleTrack ) );
+						arg( Track::SampleTrack ));
 }
 
 
@@ -371,7 +372,19 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString value = StringPairDrag::decodeValue( _de );
-	if( type == "instrument" )
+	std::string typestring = type.toStdString();
+	if (type == "vocalinstrument")
+	{
+		VocalInstrumentTrack * it = dynamic_cast<VocalInstrumentTrack *>(
+			Track::create( Track::VocalTrack,
+						   m_tc ) );
+		InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
+			this, it, value );
+		ilt->start();
+		//it->toggledInstrumentTrackButton( true );
+		_de->accept();
+	}
+	else if( type == "instrument" )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,

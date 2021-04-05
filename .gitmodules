@@ -49,3 +49,9 @@
 [submodule "plugins/LadspaEffect/cmt/cmt"]
 	path = plugins/LadspaEffect/cmt/cmt
 	url = https://github.com/lmms/cmt
+[submodule "plugins/LUMMAUS/world4lmms-git"]
+	path = plugins/LUMMAUS/world4lmms-git
+	url = git@github.com:SeleDreams/world4lmms.git
+[submodule "plugins/LUMMAUS/wavtool-yawu-lmms-git"]
+	path = plugins/LUMMAUS/wavtool-yawu-lmms-git
+	url = git@github.com:SeleDreams/wavtool-yawu-lmms.git
