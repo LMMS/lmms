@@ -486,7 +486,7 @@ QToolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton {
+QToolButton, QToolButton::menu-button {
 	padding: 1px 1px 1px 1px;
 	border-radius: 5px;
 	border: 1px solid rgba(63, 63, 63, 128);
@@ -510,6 +510,22 @@ QToolButton:checked  {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
 	padding: 2px 1px 0px 1px;
 	color: black;
+}
+
+/* buttons with combined menu */
+
+QToolButton[popupMode="1"] {
+	margin-right: 11px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+QToolButton::menu-button {
+	subcontrol-origin: margin;
+	width: 11px;
+	padding: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 /* track label buttons - the part that contains the icon and track title */
@@ -600,10 +616,10 @@ FxLine {
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
-	qproperty-strokeOuterActive: rgb( 0, 0, 0 );	
-	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );	
-	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );	
-	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );					
+	qproperty-strokeOuterActive: rgb( 0, 0, 0 );
+	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );
+	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );
+	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );
 }
 
 /* persistent peak markers for fx peak meters */
@@ -660,7 +676,8 @@ TrackContentObjectView   {
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 3px 3px;
-	
+	qproperty-mouseHotspotKnife: 0px 0px;
+
 	font-size: 11px;
 }
 

@@ -130,6 +130,16 @@ public:
 		m_outTangent = tangent;
 	}
 
+	/**
+	 * @brief Sets the pattern this node belongs to
+	 * @param AutomationPattern* pattern that m_pattern will be
+	 * set to
+	 */
+	inline void setPattern(AutomationPattern* pat)
+	{
+		m_pattern = pat;
+	}
+
 private:
 	// Pattern that this node belongs to
 	AutomationPattern* m_pattern;
