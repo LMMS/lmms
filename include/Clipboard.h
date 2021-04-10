@@ -27,6 +27,7 @@
 
 #include <QtCore/QMap>
 #include <QDomElement>
+class QMimeData;
 
 class QMimeData;
 
@@ -35,6 +36,7 @@ namespace Clipboard
 	enum class MimeType
 	{
 		StringPair,
+		Osc,
 		Default
 	};
 
@@ -57,11 +59,11 @@ namespace Clipboard
 		{
 			case MimeType::StringPair:
 				return "application/x-lmms-stringpair";
-			break;
+			case MimeType::Osc:
+				return "application/x-osc-stringpair";
 			case MimeType::Default:
 			default:
 				return "application/x-lmms-clipboard";
-				break;
 		}
 	}
 } ;

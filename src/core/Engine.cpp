@@ -23,6 +23,8 @@
  */
 
 
+#include <QUrl>
+
 #include "Engine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
@@ -34,6 +36,7 @@
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
+#include "SpaManager.h"
 #include "BandLimitedWave.h"
 
 float LmmsCore::s_framesPerTick;
@@ -46,7 +49,11 @@ ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
 #endif
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+#ifdef LMMS_HAVE_SPA
+SpaManager * LmmsCore::s_spaManager = nullptr;
+#endif
 void* LmmsCore::s_dndPluginKey = nullptr;
+QMap<unsigned, class Plugin*> LmmsCore::s_pluginsByPort;
 
 
 
@@ -71,7 +78,9 @@ void LmmsCore::init( bool renderOnly )
 	s_lv2Manager->initPlugins();
 #endif
 	s_ladspaManager = new Ladspa2LMMS;
-
+#ifdef LMMS_HAVE_SPA
+	s_spaManager = new SpaManager;
+#endif
 	s_projectJournal->setJournalling( true );
 
 	emit engine->initProgress(tr("Opening audio and midi devices"));
@@ -104,6 +113,9 @@ void LmmsCore::destroy()
 	deleteHelper( &s_lv2Manager );
 #endif
 	deleteHelper( &s_ladspaManager );
+#ifdef LMMS_HAVE_SPA
+	deleteHelper( &s_spaManager );
+#endif
 
 	//delete ConfigManager::inst();
 	deleteHelper( &s_projectJournal );
@@ -143,6 +155,60 @@ void LmmsCore::updateFramesPerTick()
 
 
 
+// url: val as url
+AutomatableModel *LmmsCore::getAutomatableModelAtPort(const QString& val,
+	const QUrl& url)
+{
+	AutomatableModel* mod = nullptr;
+
+	// qDebug() << val;
+	auto itr = s_pluginsByPort.find(static_cast<unsigned>(url.port()));
+	if(itr == s_pluginsByPort.end())
+	{
+		puts(	"DnD from a plugin which is not "
+			"in LMMS... ignoring");
+		// TODO: MessageBox?
+	}
+	else
+	{
+		mod = itr.value()->modelAtPort(val);
+	}
+
+	return mod;
+}
+
+
+
+
+AutomatableModel *LmmsCore::getAutomatableModel(const QString& val, bool hasPort)
+{
+	AutomatableModel* mod = nullptr;
+	if(hasPort)
+	{
+		QUrl url(val);
+		if(!url.isValid())
+		{
+			printf( "Could not find a port in %s => "
+				"can not make connection\n",
+				val.toUtf8().data());
+		}
+		else
+		{
+			mod = getAutomatableModelAtPort(val, url);
+		}
+	}
+	else
+	{
+		mod = dynamic_cast<AutomatableModel *>(
+			projectJournal()->
+			journallingObject( val.toInt() ) );
+	}
+	return mod;
+}
+
+
+
+
 void LmmsCore::setDndPluginKey(void *newKey)
 {
 	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
@@ -155,6 +221,14 @@ void LmmsCore::setDndPluginKey(void *newKey)
 void *LmmsCore::pickDndPluginKey()
 {
 	return s_dndPluginKey;
+}
+
+
+
+
+void LmmsCore::addPluginByPort(unsigned port, Plugin *plug)
+{
+	s_pluginsByPort.insert(port, plug);
 }
 
 

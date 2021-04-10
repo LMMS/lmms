@@ -222,6 +222,14 @@ void ConfigManager::setLADSPADir(const QString & ladspaDir)
 
 
 
+void ConfigManager::setSPADir(const QString &sd)
+{
+	m_spaDir = sd;
+}
+
+
+
+
 void ConfigManager::setSTKDir(const QString & stkDir)
 {
 #ifdef LMMS_HAVE_STK

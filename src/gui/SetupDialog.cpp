@@ -147,6 +147,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
+	m_spaDir(QDir::toNativeSeparators(ConfigManager::inst()->spaDir())),
 	m_gigDir(QDir::toNativeSeparators(ConfigManager::inst()->gigDir())),
 	m_sf2Dir(QDir::toNativeSeparators(ConfigManager::inst()->sf2Dir())),
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -785,6 +786,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		SLOT(setLADSPADir(const QString &)),
 		SLOT(openLADSPADir()),
 		m_ladspaDirLineEdit, "add_folder");
+	addPathEntry("SPA plugin directories", m_spaDir,
+		SLOT(setSPADir(const QString &)),
+		SLOT(openSPADir()),
+		m_spaLineEdit, "add_folder");
 	addPathEntry(tr("SF2 directory"), m_sf2Dir,
 		SLOT(setSF2Dir(const QString &)),
 		SLOT(openSF2Dir()),
@@ -967,6 +972,7 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
 	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
 	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladspaDir));
+	ConfigManager::inst()->setSPADir(QDir::fromNativeSeparators(m_spaDir));
 	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	ConfigManager::inst()->setSF2File(m_sf2File);
@@ -1278,9 +1284,35 @@ void SetupDialog::openLADSPADir()
 }
 
 
+void SetupDialog::openSPADir()
+{
+	QString newDir = FileDialog::getExistingDirectory( this,
+				tr( "Choose SPA plugin directory" ),
+							m_spaDir );
+	if( ! newDir.isEmpty() )
+	{
+		if( m_spaLineEdit->text() == "" )
+		{
+			m_spaLineEdit->setText( newDir );
+		}
+		else
+		{
+			m_spaLineEdit->setText( m_spaLineEdit->text() + "," +
+								newDir );
+		}
+	}
+}
+
+
 void SetupDialog::setLADSPADir(const QString & ladspaDir)
 {
 	m_ladspaDir = ladspaDir;
+}
+
+
+void SetupDialog::setSPADir(const QString &ld)
+{
+	m_spaDir = ld;
 }
 
 

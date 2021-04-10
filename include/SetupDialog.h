@@ -82,6 +82,7 @@ private slots:
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
 	void setLanguage(int lang);
+	void setSPADir(const QString& ld);
 
 	// Performance settings widget.
 	void setAutoSaveInterval(int time);
@@ -111,6 +112,7 @@ private slots:
 	void setVSTDir(const QString & vstDir);
 	void openLADSPADir();
 	void setLADSPADir(const QString & ladspaDir);
+	void openSPADir();
 	void openSF2Dir();
 	void setSF2Dir(const QString & sf2Dir);
 	void openSF2File();
@@ -187,6 +189,7 @@ private:
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_ladspaDir;
+	QString m_spaDir;
 	QString m_gigDir;
 	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -199,6 +202,7 @@ private:
 	QLineEdit * m_vstDirLineEdit;
 	QLineEdit * m_themeDirLineEdit;
 	QLineEdit * m_ladspaDirLineEdit;
+	QLineEdit * m_spaLineEdit;
 	QLineEdit * m_gigDirLineEdit;
 	QLineEdit * m_sf2DirLineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH

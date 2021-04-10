@@ -101,6 +101,15 @@ public:
 		return s_ladspaManager;
 	}
 
+#ifdef LMMS_HAVE_SPA
+	static class SpaManager * getSPAManager()
+	{
+		return s_spaManager;
+	}
+#endif
+
+	static void addPluginByPort(unsigned port, class Plugin* plug);
+
 	static float framesPerTick()
 	{
 		return s_framesPerTick;
@@ -119,6 +128,8 @@ public:
 		return s_instanceOfMe;
 	}
 
+	static class AutomatableModel*
+	getAutomatableModel(const QString &val, bool hasPort);
 	static void setDndPluginKey(void* newKey);
 	static void* pickDndPluginKey();
 
@@ -127,6 +138,9 @@ signals:
 
 
 private:
+	static class AutomatableModel*
+	getAutomatableModelAtPort(const QString& val, const QUrl& url);
+
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
 	template<class T>
@@ -150,6 +164,10 @@ private:
 	static class Lv2Manager* s_lv2Manager;
 #endif
 	static Ladspa2LMMS * s_ladspaManager;
+#ifdef LMMS_HAVE_SPA
+	static class SpaManager* s_spaManager;
+#endif
+	static QMap<unsigned, class Plugin*> s_pluginsByPort;
 	static void* s_dndPluginKey;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals

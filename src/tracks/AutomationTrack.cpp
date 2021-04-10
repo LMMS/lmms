@@ -24,6 +24,7 @@
  *
  */
 
+#include <QMap>
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
 #include "Engine.h"
@@ -91,7 +92,7 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
 	TrackView( _at, tcv )
 {
-        setFixedHeight( 32 );
+	setFixedHeight( 32 );
 	TrackLabelButton * tlb = new TrackLabelButton( this,
 						getTrackSettingsWidget() );
 	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
@@ -102,6 +103,7 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
+	puts("ATW:dragEnter");
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 
@@ -112,12 +114,15 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString val = StringPairDrag::decodeValue( _de );
+	// qDebug() << "DROP: type/val:" << type << ", " << val;
+
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
-		if( mod != NULL )
+
+		AutomatableModel * mod = Engine::getAutomatableModel(val,
+			_de->mimeData()->hasFormat( "application/x-osc-stringpair"));
+
+		if( mod )
 		{
 			TimePos pos = TimePos( trackContainerView()->
 							currentPosition() +
@@ -136,6 +141,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
 			pat->addObject( mod );
 		}
+
+		// tell the source app that the drop did succeed
+		_de->acceptProposedAction();
 	}
 
 	update();

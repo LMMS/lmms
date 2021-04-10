@@ -24,6 +24,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 #include <QMimeData>
 
 #include "Clipboard.h"
@@ -81,7 +82,8 @@ namespace Clipboard
 
 	QString decodeKey( const QMimeData * mimeData )
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 0, 0 ) );
+		bool hasMt = (mimeData->hasFormat(mimeType(MimeType::StringPair)));
+		return( QString::fromUtf8( mimeData->data( mimeType( hasMt ? MimeType::StringPair : MimeType::Osc ) ) ).section( ':', 0, 0 ) );
 	}
 
 
@@ -89,6 +91,7 @@ namespace Clipboard
 
 	QString decodeValue( const QMimeData * mimeData )
 	{
-		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
+		bool hasMt = (mimeData->hasFormat(mimeType(MimeType::StringPair)));
+		return( QString::fromUtf8( mimeData->data( mimeType( hasMt ? MimeType::StringPair : MimeType::Osc ) ) ).section( ':', 1, -1 ) );
 	}
 }

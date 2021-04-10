@@ -289,6 +289,22 @@ public:
 	//! Create a view for the model
 	PluginView * createView( QWidget * parent );
 
+	//! If the plugin offers to identify controls as strings (aka "ports",
+	//! like OSC does), this shall return the AutomatableModel for given
+	//! port or nullptr if there's none at that port
+	virtual class AutomatableModel *modelAtPort(const class QString &)
+	{
+		return nullptr;
+	}
+
+	//! If the plugin has a network port where it can be reached, this
+	//! should return that port; if not, it should return 0
+	virtual unsigned netPort(std::size_t channel) const
+	{
+		(void)channel;
+		return 0;
+	}
+
 protected:
 	//! Create a view for the model
 	virtual PluginView* instantiateView( QWidget * ) = 0;
