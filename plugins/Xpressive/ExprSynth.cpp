@@ -147,9 +147,20 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 		if (!std::isnan(x) && !std::isinf(x))
 		{
 			const int ix=(int)x;
-			if (ix>=1 && ix<=m_history_size)
+			const float xfrc = fraction(x);
+			if (xfrc == 0)
 			{
-				return m_samples[(ix + m_pivot_last) % m_history_size];
+				if (ix>=1 && ix<=m_history_size)
+				{
+					return m_samples[(ix + m_pivot_last) % m_history_size];
+				}
+			}
+			else
+			{
+				if (ix>=1 && ix<m_history_size)
+				{
+					return linearInterpolate(m_samples[(ix + m_pivot_last) % m_history_size], m_samples[(ix + 1 + m_pivot_last) % m_history_size], xfrc);
+				}
 			}
 		}
 		return 0;
@@ -159,6 +170,10 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 		if (!std::isnan(sample) && !std::isinf(sample))
 		{
 			m_samples[m_pivot_last] = sample;
+		}
+		else
+		{
+			m_samples[m_pivot_last] = 0;
 		}
 		if (m_pivot_last == 0)
 		{

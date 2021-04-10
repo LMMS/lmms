@@ -209,8 +209,10 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 
 		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
 			//add the constants and the variables to the expression.
+			#if ENABLE_CUSTOM_KEY_MAPPING //removed because changes in the microtonal tuner.
 			e->add_constant("key", nph->key());//the key that was pressed.
 			e->add_constant("bnote", nph->instrumentTrack()->baseNote()); // the base note
+			#endif
 			e->add_constant("srate", Engine::mixer()->processingSampleRate());// sample rate of the mixer
 			e->add_constant("v", nph->getVolume() / 255.0); //volume of the note.
 			e->add_constant("tempo", Engine::getSong()->getTempo());//tempo of the song.
@@ -536,17 +538,19 @@ void XpressiveView::expressionChanged() {
 		const unsigned int sample_rate=m_raw_graph->length();
 		ExprFront expr(text.constData(),sample_rate);
 		float t=0;
-		const float f=10,key=5,v=0.5;
+		const float f=10,v=0.5;
 		unsigned int i;
 		expr.add_variable("t", t);
 
 		if (m_output_expr)
 		{
 			expr.add_constant("f", f);
+			#if ENABLE_CUSTOM_KEY_MAPPING //removed because changes in the microtonal tuner.
 			expr.add_constant("key", key);
+			expr.add_constant("bnote",e->instrumentTrack()->baseNote());
+			#endif
 			expr.add_constant("rel", 0);
 			expr.add_constant("trel", 0);
-			expr.add_constant("bnote",e->instrumentTrack()->baseNote());
 			expr.add_constant("v", v);
 			expr.add_constant("tempo", Engine::getSong()->getTempo());
 			expr.add_constant("A1", e->parameterA1().value());
@@ -824,8 +828,10 @@ QString XpressiveHelpView::s_helpText=
 "<h4>Available variables:</h4><br>"
 "<b>t</b> - Time in seconds.<br>"
 "<b>f</b> - Note's pitched frequency. Available only in the output expressions.<br>"
+#if ENABLE_CUSTOM_KEY_MAPPING
 "<b>key</b> - Note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. Available only in the output expressions.<br>"
 "<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
+#endif
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 "<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
 "<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
@@ -862,11 +868,11 @@ QString XpressiveHelpView::s_helpText=
 "hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
 "avg, sgn, mod, etc. are also available.</b><br>"
 "<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>"
-"<b>Amplitude Modulation</b> - W1(t*f)*(1+W2(t*f))<br>"
-"<b>Ring Modulation</b> - W1(t * f)*W2(t * f)<br>"
-"<b>Mix Modulation</b> - 0.5*( W1(t * f) + W2(t * f) )<br>"
+"<b>Amplitude Modulation</b> - W1( integrate(f) )*( 1 + W2( integrate(f) ) )<br>"
+"<b>Ring Modulation</b> - W1( integrate(f) )*W2( integrate(f) )<br>"
+"<b>Mix Modulation</b> - 0.5*( W1( integrate(f) )+W2( integrate(f) ) )<br>"
 "<b>Frequency Modulation</b> - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )<br>"
-"<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>"
+"<b>Phase Modulation</b> - [vol1]*W1( integrate(f)+[vol2]*W2( integrate(f) ) )<br>"
 		;
 
 XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
