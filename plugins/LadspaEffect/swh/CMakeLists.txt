@@ -24,7 +24,7 @@ FOREACH(_item ${XML_SOURCES})
 	# Coerce XML source file to C
 	ADD_CUSTOM_COMMAND(
 		OUTPUT "${_out_file}"
-		COMMAND ./makestub.pl "${_item}" > "${_out_file}"
+		COMMAND perl ./makestub.pl "${_item}" > "${_out_file}"
 		DEPENDS "${_item}"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ladspa"
 		VERBATIM
