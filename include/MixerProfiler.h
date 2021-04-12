@@ -64,8 +64,13 @@ private:
 
 	static const int s_detailCount = 4;                     // set to the actual number of used probes in Mixer.cpp
 	std::array<MicroTimer, s_detailCount> m_detailTimer;    // use arrays to avoid dynamic allocations in realtime code
+#ifdef __GNUC__
+	std::array<int, s_detailCount> m_detailTime{{0}};		// Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65815
+	std::array<float, s_detailCount> m_detailLoad{{0}};		// (Remove when LMMS CI updates to GCC 6 or higher.)
+#else
 	std::array<int, s_detailCount> m_detailTime = {0};
 	std::array<float, s_detailCount> m_detailLoad = {0};
+#endif
 };
 
 #endif
