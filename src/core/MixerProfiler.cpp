@@ -40,7 +40,6 @@ MixerProfiler::MixerProfiler() :
 
 MixerProfiler::~MixerProfiler()
 {
-	m_outputFile.close();
 }
 
 
@@ -64,14 +63,18 @@ void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod
 		m_detailLoad[i] = std::min(newLoad * 0.05f + m_detailLoad[i] * 0.95f, 100.f);
 	}
 
-	if (m_outputFile) { m_outputFile << periodElapsed << "\n"; }
+	if (m_outputFile.isOpen())
+	{
+		m_outputFile.write(QString("%1\n").arg(periodElapsed).toLatin1());
+	}
 }
 
 
 
-void MixerProfiler::setOutputFile(const std::string &outputFile)
+void MixerProfiler::setOutputFile(const QString &outputFile)
 {
 	m_outputFile.close();
-	m_outputFile.open(outputFile, std::ios::trunc);
+	m_outputFile.setFileName(outputFile);
+	m_outputFile.open(QFile::WriteOnly | QFile::Truncate);
 }
 

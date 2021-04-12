@@ -26,8 +26,7 @@
 #define MIXER_PROFILER_H
 
 #include <array>
-#include <string>
-#include <fstream>
+#include <QFile>
 
 #include "lmms_basics.h"
 #include "MicroTimer.h"
@@ -50,7 +49,7 @@ public:
 		return m_cpuLoad;
 	}
 
-	void setOutputFile(const std::string& outputFile);
+	void setOutputFile(const QString& outputFile);
 
 	void startDetail(const unsigned int index) { m_detailTimer[index].reset(); }
 	void finishDetail(const unsigned int index) { m_detailTime[index] = m_detailTimer[index].elapsed(); }
@@ -60,7 +59,7 @@ public:
 private:
 	MicroTimer m_periodTimer;
 	float m_cpuLoad;
-	std::ofstream m_outputFile;
+	QFile m_outputFile;
 
 	static const int s_detailCount = 4;                     // set to the actual number of used probes in Mixer.cpp
 	std::array<MicroTimer, s_detailCount> m_detailTimer;    // use arrays to avoid dynamic allocations in realtime code
