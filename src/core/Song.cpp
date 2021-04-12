@@ -886,6 +886,9 @@ void Song::clearProject()
 	m_masterPitchModel.reset();
 	m_timeSigModel.reset();
 
+	// Clear the m_oldAutomatedValues AutomatedValueMap
+	m_oldAutomatedValues.clear();
+
 	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
 	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
 									clear();
