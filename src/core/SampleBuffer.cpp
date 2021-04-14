@@ -1031,8 +1031,8 @@ void SampleBuffer::visualize(
 	// smaller than the width (fpp = 1) and we will have nbFrames * 2
 	// points
 	const int totalPoints = nbFrames > w
-		? w * 2
-		: nbFrames * 2;
+		? w
+		: nbFrames;
 	std::vector<QPointF> fEdgeMax(totalPoints);
 	std::vector<QPointF> fEdgeMin(totalPoints);
 	std::vector<QPointF> fRmsMax(totalPoints);
