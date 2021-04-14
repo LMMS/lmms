@@ -1027,8 +1027,8 @@ void SampleBuffer::visualize(
 
 	const int fpp = std::max(1, nbFrames / w);
 	// There are 2 possibilities: Either nbFrames is bigger than
-	// the width, so we will have width * 2 points, or nbFrames is
-	// smaller than the width (fpp = 1) and we will have nbFrames * 2
+	// the width, so we will have width points, or nbFrames is
+	// smaller than the width (fpp = 1) and we will have nbFrames
 	// points
 	const int totalPoints = nbFrames > w
 		? w
