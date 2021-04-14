@@ -24,7 +24,6 @@
  *
  */
 
-#include "AutomationTrack.h"
 #include "AutomationTrackView.h"
 #include "AutomationPattern.h"
 
