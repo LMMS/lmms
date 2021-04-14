@@ -25,13 +25,8 @@
  */
 
 #include "AutomationTrack.h"
+#include "AutomationTrackView.h"
 #include "AutomationPattern.h"
-#include "Engine.h"
-#include "embed.h"
-#include "ProjectJournal.h"
-#include "StringPairDrag.h"
-#include "TrackContainerView.h"
-#include "TrackLabelButton.h"
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
@@ -83,62 +78,3 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		setMuted( false );
 	}
 }
-
-
-
-
-
-AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
-	TrackView( _at, tcv )
-{
-        setFixedHeight( 32 );
-	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
-	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
-	tlb->move( 3, 1 );
-	tlb->show();
-	setModel( _at );
-}
-
-void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
-}
-
-
-
-
-void AutomationTrackView::dropEvent( QDropEvent * _de )
-{
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
-	if( type == "automatable_model" )
-	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
-		if( mod != NULL )
-		{
-			TimePos pos = TimePos( trackContainerView()->
-							currentPosition() +
-				( _de->pos().x() -
-					getTrackContentWidget()->x() ) *
-						TimePos::ticksPerBar() /
-		static_cast<int>( trackContainerView()->pixelsPerBar() ) )
-				.toAbsoluteBar();
-
-			if( pos.getTicks() < 0 )
-			{
-				pos.setTicks( 0 );
-			}
-
-			TrackContentObject * tco = getTrack()->createTCO( pos );
-			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
-			pat->addObject( mod );
-		}
-	}
-
-	update();
-}
-
-
