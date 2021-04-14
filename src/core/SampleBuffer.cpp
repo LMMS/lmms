@@ -1033,8 +1033,10 @@ void SampleBuffer::visualize(
 	const int totalPoints = nbFrames > w
 		? w * 2
 		: nbFrames * 2;
-	std::vector<QPointF> fMax(totalPoints);
-	std::vector<QPointF> fRms(totalPoints);
+	std::vector<QPointF> fEdgeMax(totalPoints);
+	std::vector<QPointF> fEdgeMin(totalPoints);
+	std::vector<QPointF> fRmsMax(totalPoints);
+	std::vector<QPointF> fRmsMin(totalPoints);
 	int curPixel = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
@@ -1082,18 +1084,24 @@ void SampleBuffer::visualize(
 			: xb + ((static_cast<double>(curPixel) / nbFrames) * w);
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
-		fMax[curPixel * 2] = QPointF(x, (yb - (maxData * py)));
-		fMax[curPixel * 2 + 1] = QPointF(x, (yb - (minData * py)));
-		fRms[curPixel * 2] = QPointF(x, (yb - (maxRmsData * py)));
-		fRms[curPixel * 2 + 1] = QPointF(x, (yb - (minRmsData * py)));
+		fEdgeMax[curPixel] = QPointF(x, (yb - (maxData * py)));
+		fEdgeMin[curPixel] = QPointF(x, (yb - (minData * py)));
+		fRmsMax[curPixel] = QPointF(x, (yb - (maxRmsData * py)));
+		fRmsMin[curPixel] = QPointF(x, (yb - (minRmsData * py)));
 		++curPixel;
 	}
 
-	p.drawPolyline(fMax.data(), totalPoints);
+	for (int i = 0; i < totalPoints; ++i)
+	{
+		p.drawLine(fEdgeMax[i], fEdgeMin[i]);
+	}
 
 	p.setPen(p.pen().color().lighter(123));
 
-	p.drawPolyline(fRms.data(), totalPoints);
+	for (int i = 0; i < totalPoints; ++i)
+	{
+		p.drawLine(fRmsMax[i], fRmsMin[i]);
+	}
 }
 
 
