@@ -38,7 +38,6 @@ public:
 
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;
-
 } ;
 
 
