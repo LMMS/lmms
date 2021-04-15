@@ -9,6 +9,8 @@ SET(LMMS_SRCS
 	gui/AutomationTrackView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
+	gui/BBTCOView.cpp
+	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
