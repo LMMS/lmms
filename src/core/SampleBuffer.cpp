@@ -1025,7 +1025,7 @@ void SampleBuffer::visualize(
 	const float ySpace = h * 0.5f;
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const double fpp = std::max(1, nbFrames / w);
+	const double fpp = std::max(1., static_cast<double>(nbFrames) / w);
 	// There are 2 possibilities: Either nbFrames is bigger than
 	// the width, so we will have width points, or nbFrames is
 	// smaller than the width (fpp = 1) and we will have nbFrames
