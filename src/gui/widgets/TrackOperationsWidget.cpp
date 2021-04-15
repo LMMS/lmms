@@ -32,7 +32,7 @@
 #include <QCheckBox>
 
 #include "AutomationPattern.h"
-#include "AutomationTrack.h"
+#include "AutomationTrackView.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
