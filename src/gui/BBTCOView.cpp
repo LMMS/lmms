@@ -153,7 +153,6 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	p.end();
 	
 	painter.drawPixmap( 0, 0, m_paintPixmap );
-	
 }
 
 

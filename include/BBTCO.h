@@ -47,8 +47,6 @@ public:
 	TrackContentObjectView * createView( TrackView * _tv ) override;
 
 private:
-
-
 	friend class BBTCOView;
 } ;
 
