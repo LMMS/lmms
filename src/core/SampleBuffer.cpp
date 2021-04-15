@@ -1025,7 +1025,7 @@ void SampleBuffer::visualize(
 	const float ySpace = h * 0.5f;
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const int fpp = std::max(1, nbFrames / w);
+	const float fpp = std::max(1, nbFrames / w);
 	// There are 2 possibilities: Either nbFrames is bigger than
 	// the width, so we will have width points, or nbFrames is
 	// smaller than the width (fpp = 1) and we will have nbFrames
@@ -1050,7 +1050,7 @@ void SampleBuffer::visualize(
 		? fromFrame + visibleFrames - 1
 		: visibleFrames - 1;
 
-	for (int frame = first; frame <= last && frame <= lastVisibleFrame; frame += fpp)
+	for (float frame = first; frame <= last && frame <= lastVisibleFrame; frame += fpp)
 	{
 		float maxData = -1;
 		float minData = 1;
@@ -1062,7 +1062,7 @@ void SampleBuffer::visualize(
 		{
 			for (int j = 0; j < 2; ++j)
 			{
-				auto curData = m_data[frame + i][j];
+				auto curData = m_data[static_cast<int>(frame) + i][j];
 
 				if (curData > maxData) { maxData = curData; }
 				if (curData < minData) { minData = curData; }
