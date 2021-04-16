@@ -202,7 +202,6 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
 		if (sTco) { sTco->setSampleFile(value); }
 	}
-
 }
 
 
