@@ -738,8 +738,8 @@ PatternView {
 
 /* sample track pattern */
 SampleTCOView {
-	background-color: #DE7C05;
-	color: #FFE8CD;
+	background-color: rgba(42,51,59,255);
+	color: #FF8F05;
 }
 
 /* automation pattern */
