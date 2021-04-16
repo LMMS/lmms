@@ -181,9 +181,8 @@ void PatternView::constructContextMenu( QMenu * _cm )
 void PatternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-				m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerBar() >= 96 ) &&
-				_me->y() > height() - s_stepBtnOff->height() )
+		m_pat->m_patternType == Pattern::BeatPattern &&
+		fixedTCOs() && _me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in beat/bassline -mode
 
@@ -503,7 +502,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// beat pattern paint event
-	else if( beatPattern &&	( fixedTCOs() || pixelsPerBar >= 96 ) )
+	else if( beatPattern &&	fixedTCOs() )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
