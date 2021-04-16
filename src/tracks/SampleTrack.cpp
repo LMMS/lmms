@@ -571,9 +571,13 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	QPainter p( &m_paintPixmap );
 
-	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
+	bool selected = isSelected();
+
+	QLinearGradient lingrad(0, 0, 0, height());
+	QColor c = painter.background().color();
+	if (muted) { c = c.darker(150); }
+	if (selected) { c = c.darker(150); }
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -590,7 +594,24 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.fillRect( rect(), c );
 	}
 
-	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
+	auto tcoColor = m_tco->hasColor()
+			? (m_tco->usesCustomClipColor()
+				? m_tco->color()
+				: m_tco->getTrack()->color())
+			: painter.pen().brush().color();
+
+	p.setPen(tcoColor);
+
+	if (muted)
+	{
+		QColor penColor = p.pen().brush().color();
+		penColor.setHsv(penColor.hsvHue(), penColor.hsvSaturation() / 4, penColor.value());
+		p.setPen(penColor.darker(250));
+	}
+	if (selected)
+	{
+		p.setPen(p.pen().brush().color().darker(150));
+	}
 
 	const int spacing = TCO_BORDER_WIDTH + 1;
 	const float ppb = fixedTCOs() ?
