@@ -6,6 +6,7 @@ set(LMMS_SRCS
 	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
+	core/BBTCO.cpp
 	core/BBTrackContainer.cpp
 	core/BufferManager.cpp
 	core/Clipboard.cpp
