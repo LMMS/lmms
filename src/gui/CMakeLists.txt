@@ -33,6 +33,9 @@ SET(LMMS_SRCS
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
+	gui/SampleTCOView.cpp
+	gui/SampleTrackView.cpp
+	gui/SampleTrackWindow.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
