@@ -405,17 +405,15 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		}
 	}
 
-	// Checks if an automated model stopped being automated by automation patterns
-	// so we can move the control back to any connected controller again
+	// Moves the control of the models that were processed earlier to their controllers.
+	// If they get processed again, setAutomatedValue() will move the control back
+	// to the automation.
 	if (!m_oldAutomatedValues.isEmpty())
 	{
 		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 		{
 			AutomatableModel * am = it.key();
-			if (am->controllerConnection() && !values.contains(am))
-			{
-				am->setUseControllerValue(true);
-			}
+			am->setUseControllerValue(true);
 		}
 	}
 	m_oldAutomatedValues = values;
@@ -426,10 +424,6 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		if (! recordedModels.contains(it.key()))
 		{
 			it.key()->setAutomatedValue(it.value());
-		}
-		else if (!it.key()->useControllerValue())
-		{
-			it.key()->setUseControllerValue(true);
 		}
 	}
 }
@@ -686,6 +680,18 @@ void Song::stop()
 
 	// remove all note-play-handles that are active
 	Engine::mixer()->clear();
+
+	// Moves the control of the models that were processed on the last frame
+	// back to their controllers.
+	if (!m_oldAutomatedValues.isEmpty())
+	{
+		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+		{
+			AutomatableModel * am = it.key();
+			am->setUseControllerValue(true);
+		}
+	}
+	m_oldAutomatedValues.clear();
 
 	m_playMode = Mode_None;
 

@@ -36,11 +36,10 @@ ControllerConnectionVector ControllerConnection::s_connections;
 
 
 
-ControllerConnection::ControllerConnection(Controller * _controller, AutomatableModel * contmod) :
+ControllerConnection::ControllerConnection(Controller * _controller) :
 	m_controller( NULL ),
 	m_controllerId( -1 ),
-	m_ownsController(false),
-	m_controlledModel(contmod)
+	m_ownsController(false)
 {
 	if( _controller != NULL )
 	{
@@ -123,12 +122,6 @@ void ControllerConnection::setController( Controller * _controller )
 
 	m_ownsController =
 		(_controller->type() == Controller::MidiController);
-
-	connect(Engine::getSong(), SIGNAL(stopped()),
-		m_controlledModel, SLOT(setUseControllerValue()),
-			Qt::UniqueConnection);
-
-	m_controlledModel->setUseControllerValue(true);
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
