@@ -51,24 +51,31 @@ public:
 
 	void setOutputFile(const QString& outputFile);
 
-	void startDetail(const unsigned int index) { m_detailTimer[index].reset(); }
-	void finishDetail(const unsigned int index) { m_detailTime[index] = m_detailTimer[index].elapsed(); }
+	enum DetailType {
+		NoteSetup,
+		Instruments,
+		Effects,
+		Mixing,
+		DetailCount
+	};
 
-	int detailLoad(const unsigned int index) const { return m_detailLoad[index]; }
+	void startDetail(const DetailType type) { m_detailTimer[type].reset(); }
+	void finishDetail(const DetailType type) { m_detailTime[type] = m_detailTimer[type].elapsed(); }
+
+	int detailLoad(const DetailType type) const { return m_detailLoad[type]; }
 
 private:
 	MicroTimer m_periodTimer;
 	float m_cpuLoad;
 	QFile m_outputFile;
 
-	static const int s_detailCount = 4;                     // set to the actual number of used probes in Mixer.cpp
-	std::array<MicroTimer, s_detailCount> m_detailTimer;    // use arrays to avoid dynamic allocations in realtime code
+	std::array<MicroTimer, DetailCount> m_detailTimer;   // use arrays to avoid dynamic allocations in realtime code
 #ifdef __GNUC__
-	std::array<int, s_detailCount> m_detailTime{{0}};		// Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65815
-	std::array<float, s_detailCount> m_detailLoad{{0}};		// (Remove when LMMS CI updates to GCC 6 or higher.)
+	std::array<int, DetailCount> m_detailTime{{0}};      // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65815
+	std::array<float, DetailCount> m_detailLoad{{0}};    // (Remove when LMMS CI updates to GCC 6 or higher.)
 #else
-	std::array<int, s_detailCount> m_detailTime = {0};
-	std::array<float, s_detailCount> m_detailLoad = {0};
+	std::array<int, DetailCount> m_detailTime = {0};
+	std::array<float, DetailCount> m_detailLoad = {0};
 #endif
 };
 

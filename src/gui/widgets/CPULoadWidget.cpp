@@ -100,10 +100,10 @@ void CPULoadWidget::updateCpuLoad()
 	{
 		setToolTip(
 			tr("DSP total: ") + QString::number(new_load) + " %\n" +
-			tr(" - Notes and setup: ") + QString::number(Engine::mixer()->detailLoad(0)) + " %\n" +
-			tr(" - Instruments: ") + QString::number(Engine::mixer()->detailLoad(1)) + " %\n" +
-			tr(" - Effects: ") + QString::number(Engine::mixer()->detailLoad(2)) + " %\n" +
-			tr(" - Mixing: ") + QString::number(Engine::mixer()->detailLoad(3)) + " %"
+			tr(" - Notes and setup: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::NoteSetup)) + " %\n" +
+			tr(" - Instruments: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::Instruments)) + " %\n" +
+			tr(" - Effects: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::Effects)) + " %\n" +
+			tr(" - Mixing: ") + QString::number(Engine::mixer()->detailLoad(MixerProfiler::DetailType::Mixing)) + " %"
 		);
 		m_currentLoad = new_load;
 		m_changed = true;

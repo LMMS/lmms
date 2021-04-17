@@ -238,9 +238,9 @@ public:
 		return m_profiler.cpuLoad();
 	}
 
-	int detailLoad(int index) const
+	int detailLoad(const MixerProfiler::DetailType type) const
 	{
-		return m_profiler.detailLoad(index);
+		return m_profiler.detailLoad(type);
 	}
 
 	const qualitySettings & currentQualitySettings() const

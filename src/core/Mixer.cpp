@@ -333,7 +333,7 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 const surroundSampleFrame * Mixer::renderNextBuffer()
 {
 	m_profiler.startPeriod();
-	m_profiler.startDetail(0);
+	m_profiler.startDetail(MixerProfiler::DetailType::NoteSetup);
 
 	s_renderingThread = true;
 
@@ -385,10 +385,10 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		e = next;
 	}
 
-	m_profiler.finishDetail(0);
+	m_profiler.finishDetail(MixerProfiler::DetailType::NoteSetup);
 
 	// STAGE 1: run and render all play handles
-	m_profiler.startDetail(1);
+	m_profiler.startDetail(MixerProfiler::DetailType::Instruments);
 	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
 	MixerWorkerThread::startAndWaitForJobs();
 
@@ -417,17 +417,17 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			++it;
 		}
 	}
-	m_profiler.finishDetail(1);
+	m_profiler.finishDetail(MixerProfiler::DetailType::Instruments);
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	m_profiler.startDetail(2);
+	m_profiler.startDetail(MixerProfiler::DetailType::Effects);
 	MixerWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
 	MixerWorkerThread::startAndWaitForJobs();
-	m_profiler.finishDetail(2);
+	m_profiler.finishDetail(MixerProfiler::DetailType::Effects);
 
 
 	// STAGE 3: do master mix in FX mixer
-	m_profiler.startDetail(3);
+	m_profiler.startDetail(MixerProfiler::DetailType::Mixing);
 	fxMixer->masterMix(m_outputBufferWrite);
 
 
@@ -442,7 +442,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 	s_renderingThread = false;
 
-	m_profiler.finishDetail(3);
+	m_profiler.finishDetail(MixerProfiler::DetailType::Mixing);
 	m_profiler.finishPeriod(processingSampleRate(), m_framesPerPeriod);
 
 	return m_outputBufferRead;

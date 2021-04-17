@@ -57,7 +57,7 @@ void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod
 	m_cpuLoad = std::min(newCpuLoad * 0.1f + m_cpuLoad * 0.9f, 100.f);
 
 	// Compute detailed load analysis. Can use stronger weight to get more stable readout.
-	for (int i = 0; i < s_detailCount; i++)
+	for (int i = 0; i < DetailCount; i++)
 	{
 		const int newLoad = 100 * m_detailTime[i] / timeLimit;
 		m_detailLoad[i] = std::min(newLoad * 0.05f + m_detailLoad[i] * 0.95f, 100.f);
