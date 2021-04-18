@@ -639,6 +639,9 @@ void Song::stop()
 		return;
 	}
 
+	// To avoid race conditions with the processing threads
+	Engine::mixer()->requestChangeInModel();
+
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_paused = false;
 	m_recording = true;
@@ -691,17 +694,17 @@ void Song::stop()
 	// back to their controllers.
 	if (!m_oldAutomatedValues.isEmpty())
 	{
-		Engine::mixer()->requestChangeInModel();
 		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 		{
 			AutomatableModel * am = it.key();
 			am->setUseControllerValue(true);
 		}
-		Engine::mixer()->doneChangeInModel();
 	}
 	m_oldAutomatedValues.clear();
 
 	m_playMode = Mode_None;
+
+	Engine::mixer()->doneChangeInModel();
 
 	emit stopped();
 	emit playbackStateChanged();
