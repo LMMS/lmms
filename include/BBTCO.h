@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
+ * BBTCO.h
+ *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -20,25 +21,35 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+ 
+
+#ifndef BB_TCO_H
+#define BB_TCO_H
+
+#include "TrackContentObjectView.h"
 
 
-#ifndef MEMORY_HELPER_H
-#define MEMORY_HELPER_H
-
-#include <cstddef>
-
-/**
- * Helper class to alocate aligned memory and free it.
- */
-class MemoryHelper {
+class BBTCO : public TrackContentObject
+{
 public:
+	BBTCO( Track * _track );
+	virtual ~BBTCO() = default;
 
-	static void* alignedMalloc( size_t );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
+	{
+		return( "bbtco" );
+	}
 
-	static void alignedFree( void* );
+	int bbTrackIndex();
+
+	TrackContentObjectView * createView( TrackView * _tv ) override;
 
 private:
-};
+	friend class BBTCOView;
+} ;
+
+
 
 #endif
-

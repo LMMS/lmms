@@ -91,6 +91,8 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	{
 		// Copies the automation node (in/out values and in/out tangents)
 		m_timeMap[POS(it)] = it.value();
+		// Sets the node's pattern to this one
+		m_timeMap[POS(it)].setPattern(this);
 	}
 	if (!getTrack()){ return; }
 	switch( getTrack()->trackContainer()->type() )

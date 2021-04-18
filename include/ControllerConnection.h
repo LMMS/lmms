@@ -37,6 +37,7 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
+class AutomatableModel;
 class ControllerConnection;
 
 typedef QVector<ControllerConnection *> ControllerConnectionVector;
@@ -47,7 +48,7 @@ class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObjec
 	Q_OBJECT
 public:
 
-	ControllerConnection( Controller * _controller );
+	ControllerConnection(Controller * _controller, AutomatableModel * contmod);
 	ControllerConnection( int _controllerId );
 
 	virtual ~ControllerConnection();
@@ -98,7 +99,6 @@ public:
 		return classNodeName();
 	}
 
-
 public slots:
 	void deleteConnection();
 
@@ -111,6 +111,8 @@ protected:
 	bool m_ownsController;
 
 	static ControllerConnectionVector s_connections;
+
+	AutomatableModel * m_controlledModel;
 
 signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
+ * BBTrackView.h
+ *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
@@ -22,23 +23,49 @@
  */
 
 
-#ifndef MEMORY_HELPER_H
-#define MEMORY_HELPER_H
+#ifndef BB_TRACK_VIEW_H
+#define BB_TRACK_VIEW_H
 
-#include <cstddef>
+#include <QtCore/QObject>
 
-/**
- * Helper class to alocate aligned memory and free it.
- */
-class MemoryHelper {
+#include "BBTrack.h"
+#include "TrackView.h"
+
+
+class BBTrackView : public TrackView
+{
+	Q_OBJECT
 public:
+	BBTrackView( BBTrack* bbt, TrackContainerView* tcv );
+	virtual ~BBTrackView();
 
-	static void* alignedMalloc( size_t );
+	bool close() override;
 
-	static void alignedFree( void* );
+	const BBTrack* getBBTrack() const
+	{
+		return m_bbTrack;
+	}
+	BBTrack* getBBTrack()
+	{
+		return m_bbTrack;
+	}
+
+	// Create menu to assign all tracks from the BBTrack to a FX channel
+	QMenu* createFxMenu(QString title, QString newFxLabel) override;
+
+public slots:
+	void clickedTrackLabel();
+
+
+private slots:
+	void createFxLine();
+	void assignFxLine(int channelIndex);
 
 private:
-};
+	BBTrack * m_bbTrack;
+	TrackLabelButton * m_trackLabel;
+} ;
+
+
 
 #endif
-
