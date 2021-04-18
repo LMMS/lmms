@@ -69,7 +69,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
-	&DataFile::upgrade_automationNodes
+	&DataFile::upgrade_automationNodes  ,  &DataFile::upgrade_noteTypes
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1651,6 +1651,24 @@ void DataFile::upgrade_automationNodes()
 			// inValue will be equal to "value" and outValue will
 			// be set to the same
 			el.setAttribute("outValue", value);
+		}
+	}
+}
+
+// Convert the negative length notes to StepNotes
+void DataFile::upgrade_noteTypes()
+{
+	QDomNodeList notes = elementsByTagName("note");
+
+	for (int i = 0; i < notes.size(); ++i)
+	{
+		QDomElement note = notes.item(i).toElement();
+
+		int noteSize = note.attribute("len").toInt();
+		if (noteSize < 0)
+		{
+			note.setAttribute("len", DefaultTicksPerBar / 16);
+			note.setAttribute("type", static_cast<int>(Note::StepNote));
 		}
 	}
 }

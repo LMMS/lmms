@@ -171,23 +171,20 @@ TimePos Pattern::beatPatternLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it)
 	{
-		if( ( *it )->length() < 0 )
+		if ((*it)->type() == Note::StepNote)
 		{
-			max_length = qMax<tick_t>( max_length,
-				( *it )->pos() + 1 );
+			max_length = qMax<tick_t>(max_length, (*it)->pos() + 1);
 		}
 	}
 
-	if( m_steps != TimePos::stepsPerBar() )
+	if (m_steps != TimePos::stepsPerBar())
 	{
-		max_length = m_steps * TimePos::ticksPerBar() /
-						TimePos::stepsPerBar();
+		max_length = m_steps * TimePos::ticksPerBar() / TimePos::stepsPerBar();
 	}
 
-	return TimePos( max_length ).nextFullBar() * TimePos::ticksPerBar();
+	return TimePos(max_length).nextFullBar() * TimePos::ticksPerBar();
 }
 
 
@@ -239,20 +236,18 @@ void Pattern::removeNote( Note * _note_to_del )
 }
 
 
-// returns a pointer to the note at specified step, or NULL if note doesn't exist
-
-Note * Pattern::noteAtStep( int _step )
+// Returns a pointer to the note at specified step, or nullptr if note doesn't exist
+Note * Pattern::noteAtStep(int step)
 {
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
+	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it)
 	{
-		if( ( *it )->pos() == TimePos::stepPosition( _step )
-						&& ( *it )->length() < 0 )
+		if ((*it)->pos() == TimePos::stepPosition(step)
+			&& (*it)->type() == Note::StepNote)
 		{
 			return *it;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -283,10 +278,21 @@ void Pattern::clearNotes()
 
 
 
-Note * Pattern::addStepNote( int step )
+Note * Pattern::addStepNote(int step)
 {
-	return addNote( Note( TimePos( -DefaultTicksPerBar ),
-				TimePos::stepPosition( step ) ), false );
+	auto prevPatternType = m_patternType;
+	Note * n =
+		addNote(
+			Note(TimePos(DefaultTicksPerBar / 16),
+			TimePos::stepPosition(step)), false
+		);
+	n->setType(Note::StepNote);
+	// addNote will change a BeatPattern to a MelodyPattern
+	// because it calls checkType after adding a regular note.
+	// We need to revert it back to a BeatPattern if it was one
+	// before we added the note.
+	if (prevPatternType == BeatPattern) { setType(BeatPattern); }
+	return n;
 }
 
 
@@ -361,16 +367,20 @@ void Pattern::setType( PatternTypes _new_pattern_type )
 void Pattern::checkType()
 {
 	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+
+	// If all notes are StepNotes, we have a BeatPattern
+	bool beatPattern = true;
+	while (it != m_notes.end())
 	{
-		if( ( *it )->length() > 0 )
+		if ((*it)->type() != Note::StepNote)
 		{
-			setType( MelodyPattern );
-			return;
+			beatPattern = false;
+			break;
 		}
 		++it;
 	}
-	setType( BeatPattern );
+
+	setType(beatPattern ? BeatPattern : MelodyPattern);
 }
 
 
