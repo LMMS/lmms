@@ -30,35 +30,31 @@
 class QuadratureLfo
 {
 public:
-	QuadratureLfo( int sampleRate );
-	~QuadratureLfo()
+	QuadratureLfo( int sampleRate ) :
+		m_frequency(0),
+		m_phase(0),
+		m_offset(D_PI / 2)
 	{
+		setSampleRate(sampleRate);
 	}
+
+	~QuadratureLfo() = default;
 
 	inline void setFrequency( double frequency )
 	{
-		if( frequency < 0 || frequency > ( m_samplerate / 2.0 ) || frequency == m_frequency )
+		if( frequency < 0 || frequency > m_samplerate / 2.0 || frequency == m_frequency )
 		{
 			return;
 		}
 		m_frequency = frequency;
 		m_increment = m_frequency * m_twoPiOverSr;
-
-		if( m_phase >= F_2PI )
-		{
-			m_phase -= F_2PI;
-		}
 	}
-
-
 
 
 	inline void restart()
 	{
 		m_phase = 0;
 	}
-
-
 
 
 	inline void setSampleRate ( int samplerate )
@@ -68,13 +64,31 @@ public:
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 
-	void tick( float *s, float *c );
+
+	inline void setOffset( double offsetVal )
+	{
+		m_offset = offsetVal;
+	}
+
+
+	void tick( float *l, float *r )
+	{
+		*l = sinf( m_phase );
+		*r = sinf( m_phase + m_offset );
+		m_phase += m_increment;
+
+		while (m_phase >= D_2PI)
+		{
+			m_phase -= D_2PI;
+		}
+	}
 
 private:
 	double m_frequency;
 	double m_phase;
 	double m_increment;
 	double m_twoPiOverSr;
+	double m_offset;
 	int m_samplerate;
 
 };

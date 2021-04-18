@@ -89,7 +89,7 @@ _lmms()
     pars_render=(--float --bitrate --format --interpolation)
     pars_render+=(--loop --mode --output --profile)
     pars_render+=(--samplerate --oversampling)
-    actions=(dump compress render rendertracks upgrade)
+    actions=(dump compress render rendertracks upgrade makebundle)
     actions_old=(-d --dump -r --render --rendertracks -u --upgrade)
     shortargs+=(-a -b -c -f -h -i -l -m -o -p -s -v -x)
 
@@ -246,6 +246,17 @@ _lmms()
                     filemode="existing_files"
                     filetypes="$savefiletypes"
                 elif [ "$prev2" == "upgrade" ]
+                then
+                    filemode="files"
+                    filetypes="$savefiletypes"
+                fi
+            elif [ "$action_found" == "makebundle" ]
+            then
+                if [ "$prev" == "makebundle" ]
+                then
+                    filemode="existing_files"
+                    filetypes="$savefiletypes"
+                elif [ "$prev2" == "makebundle" ]
                 then
                     filemode="files"
                     filetypes="$savefiletypes"
