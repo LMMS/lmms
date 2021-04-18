@@ -69,14 +69,12 @@ private:
 	float m_cpuLoad;
 	QFile m_outputFile;
 
-	std::array<MicroTimer, DetailCount> m_detailTimer;   // use arrays to avoid dynamic allocations in realtime code
-#ifdef __GNUC__
-	std::array<int, DetailCount> m_detailTime{{0}};      // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65815
-	std::array<float, DetailCount> m_detailLoad{{0}};    // (Remove when LMMS CI updates to GCC 6 or higher.)
-#else
-	std::array<int, DetailCount> m_detailTime = {0};
-	std::array<float, DetailCount> m_detailLoad = {0};
-#endif
+	// Use arrays to avoid dynamic allocations in realtime code
+	// NOTE: The double {} is a workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65815
+	// (Can be removed when LMMS CI updates to GCC 6 or higher.)
+	std::array<MicroTimer, DetailCount> m_detailTimer;
+	std::array<int, DetailCount> m_detailTime{{0}};
+	std::array<float, DetailCount> m_detailLoad{{0}};
 };
 
 #endif
