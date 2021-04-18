@@ -72,9 +72,14 @@ public:
 		 * Should we discard MIDI ControllerConnections from project files?
 		 */
 		BoolModel discardMIDIConnections{false};
+		/**
+		 * Should we save the project as a project bundle? (with resources)
+		 */
+		BoolModel saveAsProjectBundle{false};
 
 		void setDefaultOptions() {
 			discardMIDIConnections.setValue(false);
+			saveAsProjectBundle.setValue(false);
 		}
 	};
 
@@ -282,8 +287,8 @@ public:
 	void createNewProjectFromTemplate( const QString & templ );
 	void loadProject( const QString & filename );
 	bool guiSaveProject();
-	bool guiSaveProjectAs( const QString & filename );
-	bool saveProjectFile( const QString & filename );
+	bool guiSaveProjectAs(const QString & filename);
+	bool saveProjectFile(const QString & filename, bool withResources = false);
 
 	const QString & projectFileName() const
 	{
@@ -469,6 +474,8 @@ private:
 	TimePos m_exportLoopEnd;
 	TimePos m_exportSongEnd;
 	TimePos m_exportEffectiveLength;
+
+	AutomatedValueMap m_oldAutomatedValues;
 
 	friend class LmmsCore;
 	friend class SongEditor;

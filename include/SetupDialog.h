@@ -77,6 +77,7 @@ private slots:
 	void toggleSideBarOnRight(bool enabled);
 	void toggleLetPreviewsFinish(bool enabled);
 	void toggleSoloLegacyBehavior(bool enabled);
+	void toggleTrackDeletionWarning(bool enabled);
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
@@ -136,6 +137,7 @@ private:
 	bool m_sideBarOnRight;
 	bool m_letPreviewsFinish;
 	bool m_soloLegacyBehavior;
+	bool m_trackDeletionWarning;
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;

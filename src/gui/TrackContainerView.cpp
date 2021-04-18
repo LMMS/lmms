@@ -308,6 +308,14 @@ bool TrackContainerView::allowRubberband() const
 
 
 
+bool TrackContainerView::knifeMode() const
+{
+	return false;
+}
+
+
+
+
 void TrackContainerView::setPixelsPerBar( int ppb )
 {
 	m_ppb = ppb;
@@ -374,7 +382,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile" 
+	else if( type == "samplefile" || type == "pluginpresetfile"
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
