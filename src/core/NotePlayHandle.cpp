@@ -202,11 +202,8 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	if (key() < m_instrumentTrack->m_firstKeyModel.value() ||
 		key() > m_instrumentTrack->m_lastKeyModel.value())
 	{
-		// Release the note if it started playing before going out of range
-		if (!m_released || m_hasMidiNote)
-		{
-			noteOff(0);
-		}
+		// Release the note in case it started playing before going out of range
+		noteOff(0);
 		// Exit if the note did not start playing before going out of range (i.e. there is no need to play release)
 		if (m_totalFramesPlayed == 0)
 		{
