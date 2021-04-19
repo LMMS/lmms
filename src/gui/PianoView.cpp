@@ -305,10 +305,6 @@ void PianoView::modelChanged()
 		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 		connect(m_piano->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 		connect(m_piano->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
-/*		connect(m_piano->instrumentTrack()->microtuner()->enabledModel(), SIGNAL(dataChanged()), this, SLOT(update()));
-		connect(m_piano->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
-		connect(m_piano->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
-				this, SLOT(update()));*/
 	}
 }
 
@@ -892,7 +888,6 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 
 		// draw normal, pressed or disabled key, depending on state and position of current key
-//		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
 		if (m_piano &&
 			cur_key >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
 			cur_key <= m_piano->instrumentTrack()->lastKeyModel()->value())
@@ -929,7 +924,6 @@ void PianoView::paintEvent( QPaintEvent * )
 	int startKey = m_startKey;
 	if (startKey > 0 && Piano::isBlackKey(static_cast<Keys>(--startKey)))
 	{
-//		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(startKey))
 		if (m_piano &&
 			startKey >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
 			startKey <= m_piano->instrumentTrack()->lastKeyModel()->value())
@@ -955,7 +949,6 @@ void PianoView::paintEvent( QPaintEvent * )
 		if (Piano::isBlackKey(cur_key))
 		{
 			// draw normal, pressed or disabled key, depending on state and position of current key
-//			if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(cur_key))
 			if (m_piano &&
 				cur_key >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
 				cur_key <= m_piano->instrumentTrack()->lastKeyModel()->value())

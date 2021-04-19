@@ -58,7 +58,6 @@
 #include "Instrument.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
-//#include "InstrumentMiscView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
@@ -156,19 +155,16 @@ int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 
-//	return m_microtuner.baseKey() - mp;
 	return m_baseNoteModel.value() - mp;
 }
 
 int InstrumentTrack::firstKey() const
 {
-//	return m_microtuner.firstKey();
 	return m_firstKeyModel.value();
 }
 
 int InstrumentTrack::lastKey() const
 {
-//	return m_microtuner.lastKey();
 	return m_lastKeyModel.value();
 }
 
@@ -794,7 +790,6 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_firstKeyModel.saveSettings(doc, thisElement, "firstkey");
 	m_lastKeyModel.saveSettings(doc, thisElement, "lastkey");
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
-//	m_microtuner.saveSettings(doc, thisElement);
 
 	// Save MIDI CC stuff
 	m_midiCCEnable->saveSettings(doc, thisElement, "enablecc");
@@ -861,7 +856,6 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_firstKeyModel.loadSettings(thisElement, "firstkey");
 	m_lastKeyModel.loadSettings(thisElement, "lastkey");
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
-//	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
@@ -1665,10 +1659,6 @@ void InstrumentTrackWindow::modelChanged()
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
 	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
-/*	m_miscView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
-	m_miscView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
-	m_miscView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
-	m_miscView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());*/
 	updateName();
 }
 
