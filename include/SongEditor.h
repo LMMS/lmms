@@ -82,6 +82,7 @@ public slots:
 
 	void updatePosition( const TimePos & t );
 	void updatePositionLine();
+	void updateScrollPrecision();
 	void selectAllTcos( bool select );
 
 protected:
@@ -139,10 +140,11 @@ private:
 	bool m_proportionalSnap;
 
 	static const QVector<double> m_zoomLevels;
-	static const float m_scrollPrecision;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
+
+	float m_scrollPrecision;
 
 	EditMode m_mode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl

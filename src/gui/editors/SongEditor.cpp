@@ -57,8 +57,6 @@
 const QVector<double> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
-const float SongEditor::m_scrollPrecision = 1024.f;
-
 SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
@@ -67,6 +65,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_proportionalSnap( false ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
+	m_scrollPrecision(1),
 	m_mode(DrawMode),
 	m_origin(),
 	m_scrollPos(),
@@ -79,6 +78,8 @@ SongEditor::SongEditor( Song * song ) :
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
+	updateScrollPrecision();
+
 	m_zoomingModel->setParent(this);
 	m_snappingModel->setParent(this);
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
@@ -732,6 +733,7 @@ void SongEditor::hideMasterPitchFloat( void )
 
 void SongEditor::updateScrollBar( int len )
 {
+	updateScrollPrecision();
 	m_leftRightScroll->setMaximum( len * m_scrollPrecision );
 }
 
@@ -827,6 +829,14 @@ void SongEditor::updatePositionLine()
 }
 
 
+#include <iostream>
+void SongEditor::updateScrollPrecision()
+{
+	if (m_song->length() > 0)// Might have 0 length at first
+	{
+		m_scrollPrecision = m_leftRightScroll->width() / m_song->length();
+	}
+}
 
 
 void SongEditor::zoomingChanged()
@@ -1010,6 +1020,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
+	connect(this, SIGNAL(resized()), m_editor, SLOT(updateScrollPrecision()));
 }
 
 QSize SongEditorWindow::sizeHint() const
