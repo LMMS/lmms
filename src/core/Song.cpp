@@ -407,15 +407,12 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 
 	// Checks if an automated model stopped being automated by automation patterns
 	// so we can move the control back to any connected controller again
-	if (!m_oldAutomatedValues.isEmpty())
+	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
-		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+		AutomatableModel * am = it.key();
+		if (am->controllerConnection() && !values.contains(am))
 		{
-			AutomatableModel * am = it.key();
-			if (am->controllerConnection() && !values.contains(am))
-			{
-				am->setUseControllerValue(true);
-			}
+			am->setUseControllerValue(true);
 		}
 	}
 	m_oldAutomatedValues = values;
@@ -692,13 +689,10 @@ void Song::stop()
 
 	// Moves the control of the models that were processed on the last frame
 	// back to their controllers.
-	if (!m_oldAutomatedValues.isEmpty())
+	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
-		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
-		{
-			AutomatableModel * am = it.key();
-			am->setUseControllerValue(true);
-		}
+		AutomatableModel * am = it.key();
+		am->setUseControllerValue(true);
 	}
 	m_oldAutomatedValues.clear();
 
