@@ -407,15 +407,12 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 
 	// Checks if an automated model stopped being automated by automation patterns
 	// so we can move the control back to any connected controller again
-	if (!m_oldAutomatedValues.isEmpty())
+	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
-		for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+		AutomatableModel * am = it.key();
+		if (am->controllerConnection() && !values.contains(am))
 		{
-			AutomatableModel * am = it.key();
-			if (am->controllerConnection() && !values.contains(am))
-			{
-				am->setUseControllerValue(true);
-			}
+			am->setUseControllerValue(true);
 		}
 	}
 	m_oldAutomatedValues = values;
@@ -639,6 +636,9 @@ void Song::stop()
 		return;
 	}
 
+	// To avoid race conditions with the processing threads
+	Engine::mixer()->requestChangeInModel();
+
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_paused = false;
 	m_recording = true;
@@ -687,7 +687,18 @@ void Song::stop()
 	// remove all note-play-handles that are active
 	Engine::mixer()->clear();
 
+	// Moves the control of the models that were processed on the last frame
+	// back to their controllers.
+	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+	{
+		AutomatableModel * am = it.key();
+		am->setUseControllerValue(true);
+	}
+	m_oldAutomatedValues.clear();
+
 	m_playMode = Mode_None;
+
+	Engine::mixer()->doneChangeInModel();
 
 	emit stopped();
 	emit playbackStateChanged();
@@ -885,6 +896,9 @@ void Song::clearProject()
 	m_masterVolumeModel.reset();
 	m_masterPitchModel.reset();
 	m_timeSigModel.reset();
+
+	// Clear the m_oldAutomatedValues AutomatedValueMap
+	m_oldAutomatedValues.clear();
 
 	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
 	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
