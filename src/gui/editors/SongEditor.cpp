@@ -834,7 +834,7 @@ void SongEditor::updateScrollPrecision()
 {
 	if (m_song->length() > 0)// Might have 0 length at first
 	{
-		m_scrollPrecision = m_leftRightScroll->width() / m_song->length();
+		m_scrollPrecision = (float)m_leftRightScroll->width() / m_song->length();
 	}
 }
 
