@@ -120,6 +120,7 @@ private:
 	void upgrade_1_3_0();
 	void upgrade_noHiddenClipNames();
 	void upgrade_automationNodes();
+	void upgrade_extendedNoteRange();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;

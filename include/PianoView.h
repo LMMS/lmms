@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QScrollBar>
 
+#include "AutomatableModel.h"
 #include "ModelView.h"
 
 class Piano;
@@ -63,17 +64,24 @@ protected:
 private:
 	int getKeyFromMouse( const QPoint & _p ) const;
 	int getKeyX( int _key_num ) const;
+	int getKeyWidth(int key_num) const;
+	int getKeyHeight(int key_num) const;
+	IntModel *getNearestMarker(int key, QString* title = nullptr);
 
 	static QPixmap * s_whiteKeyPm;
 	static QPixmap * s_blackKeyPm;
 	static QPixmap * s_whiteKeyPressedPm;
 	static QPixmap * s_blackKeyPressedPm;
+	static QPixmap * s_whiteKeyDisabledPm;
+	static QPixmap * s_blackKeyDisabledPm;
 
 	Piano * m_piano;
 
 	QScrollBar * m_pianoScroll;
-	int m_startKey;			// first key when drawing
-	int m_lastKey;
+	int m_startKey;					//!< first key when drawing
+	int m_lastKey;					//!< previously pressed key
+	IntModel *m_movedNoteModel;		//!< note marker which is being moved
+
 
 
 private slots:
@@ -87,4 +95,3 @@ signals:
 
 
 #endif
-

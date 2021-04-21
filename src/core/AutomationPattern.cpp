@@ -31,7 +31,6 @@
 #include "AutomationTrack.h"
 #include "BBTrackContainer.h"
 #include "LocaleHelper.h"
-#include "Note.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 
