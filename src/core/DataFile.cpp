@@ -34,6 +34,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QtGlobal>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -1229,7 +1230,9 @@ void iterate_ladspa_ports(QDomElement& effect, Ftor& ftor)
 			{
 				continue;
 			}
-			int num = parts[1].toInt();
+
+			int proc = parts[1].left(1).toInt(); // = left or right
+			int num = parts[1].mid(1).toInt();
 
 			// From Qt's docs of QDomNode:
 			// * copying a QDomNode is OK, they still have the same
@@ -1241,7 +1244,7 @@ void iterate_ladspa_ports(QDomElement& effect, Ftor& ftor)
 			//    QDomElements by value, not references
 			// => The loops below for adding and removing don't
 			//    invalidate any other QDomElements
-			ftor(port, num, addList, removeList);
+			ftor(port, proc, num, addList, removeList);
 		}
 
 		// Add ports marked for adding
@@ -1295,6 +1298,9 @@ void DataFile::upgrade_1_3_0()
 		}
 	}
 
+	/*
+	 * fix CALF and CAPS effects
+	 */
 	list = elementsByTagName( "effect" );
 	for( int i = 0; !list.item( i ).isNull(); ++i )
 	{
@@ -1308,8 +1314,9 @@ void DataFile::upgrade_1_3_0()
 				QDomNodeList attributes = key.elementsByTagName( "attribute" );
 				for( int k = 0; !attributes.item( k ).isNull(); ++k )
 				{
-					// Effect name changes
-
+					/*
+					 * CALF effect name changes
+					 */
 					QDomElement attribute = attributes.item( k ).toElement();
 					if( attribute.attribute( "name" ) == "file" &&
 							( attribute.attribute( "value" ) == "calf" ||
@@ -1343,14 +1350,15 @@ void DataFile::upgrade_1_3_0()
 						attribute.setAttribute( "value", "MultibandLimiter" );
 					}
 
-					// Handle port changes
-
+					/*
+					 * CALF port changes
+					 */
 					if( attribute.attribute( "name" ) == "plugin" &&
 							( attribute.attribute( "value" ) == "MultibandLimiter" ||
 							attribute.attribute( "value" ) == "MultibandCompressor" ||
 							attribute.attribute( "value" ) == "MultibandGate" ) )
 					{
-						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& removeList)
+						auto fn = [&](QDomElement& port, int, int num, QList<QDomElement>&, QList<QDomElement>& removeList)
 						{
 							// Mark ports for removal
 							if ( num >= 18 && num <= 23 )
@@ -1372,7 +1380,7 @@ void DataFile::upgrade_1_3_0()
 					if( attribute.attribute( "name" ) == "plugin" &&
 							( attribute.attribute( "value" ) == "Pulsator" ) )
 					{
-						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& removeList)
+						auto fn = [&](QDomElement& port, int, int num, QList<QDomElement>& addList, QList<QDomElement>& removeList)
 						{
 							switch(num)
 							{
@@ -1417,7 +1425,7 @@ void DataFile::upgrade_1_3_0()
 					if( attribute.attribute( "name" ) == "plugin" &&
 							( attribute.attribute( "value" ) == "VintageDelay" ) )
 					{
-						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& )
+						auto fn = [&](QDomElement& port, int, int num, QList<QDomElement>& addList, QList<QDomElement>& )
 						{
 							switch(num)
 							{
@@ -1460,7 +1468,7 @@ void DataFile::upgrade_1_3_0()
 						// NBand equalizers got 4 q nobs inserted. We need to shift everything else...
 						// HOWEVER: 5 band eq has only 2 q nobs inserted (no LS/HS filters)
 						bool band5 = ( attribute.attribute( "value" ) == "Equalizer5Band" );
-						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& )
+						auto fn = [&](QDomElement& port, int, int num, QList<QDomElement>& addList, QList<QDomElement>& )
 						{
 							if(num == 4)
 							{
@@ -1552,7 +1560,7 @@ void DataFile::upgrade_1_3_0()
 					if( attribute.attribute( "name" ) == "plugin" &&
 						attribute.attribute( "value" ) == "Saturator" )
 					{
-						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& )
+						auto fn = [&](QDomElement& port, int, int num, QList<QDomElement>&, QList<QDomElement>& )
 						{
 							// These ports have been shifted a bit weird...
 							if( num == 7 )
@@ -1580,7 +1588,7 @@ void DataFile::upgrade_1_3_0()
 					if( attribute.attribute( "name" ) == "plugin" &&
 						attribute.attribute( "value" ) == "StereoTools" )
 					{
-						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& )
+						auto fn = [&](QDomElement& port, int, int num, QList<QDomElement>&, QList<QDomElement>& )
 						{
 							// This effect can not be back-ported due to bugs in the old version,
 							// or due to different behaviour. We thus port all parameters we can,
@@ -1591,6 +1599,223 @@ void DataFile::upgrade_1_3_0()
 							{
 								port.setAttribute("data", 1.0f);
 							}
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					/*
+					 * CAPS port changes
+					 */
+
+					/*
+						how to write this
+						1 - open both LMMS versions, and check visually where ports moved
+						2 - compare savefiles to find out how the indexes of the movements are
+						3 - write down the port movements here (port.setTagName...)
+						4 - all port numbers that are not source or dest of a move and exist in both old and new must be bashed to the new defaults
+						5 - fine tuning on individual parameters (e.g. if their scale changed)
+					*/
+					auto new_port_name = [](int proc, int new_num) -> QString {
+						return "port" + QString::number(proc) + QString::number(new_num);
+					};
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "AmpVTS" )
+					{
+						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>&)
+						{
+							if(num == 2)
+							{
+								port.setTagName(new_port_name(proc, 1));
+							}
+							else if(num == 3 || num == 4 || num == 5)
+							{
+								port.setTagName(new_port_name(proc, 2 + num));
+							}
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+							attribute.attribute( "value" ) == "AutoWah" )
+					{
+						attribute.setAttribute( "value", "AutoFilter" );
+						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>&)
+						{
+							if(num == 1 || num == 2 || num == 3)
+							{
+								port.setTagName(new_port_name(proc, 1 + num));
+							}
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "ChorusI" )
+					{
+						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>&)
+						{
+							port.setTagName(new_port_name(proc, num - 1));
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "Clip" )
+					{
+						attribute.setAttribute( "value", "Saturate" );
+						// FIXME: Ports conveniently map, but the volume is too quiet
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "Compress" )
+					{
+						// TODO
+
+						// 1->6
+						// 2->3??? (or bash)
+						// 3 -> 4
+						// 4 -> 5
+						// 5-> 2
+						// 6 -> bash
+
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "Eq" )
+					{
+						attribute.setAttribute( "value", "Eq10" );
+						// Head back up the DOM to upgrade ports
+						QDomNodeList ladspacontrols = effect.elementsByTagName( "ladspacontrols" );
+						for( int m = 0; !ladspacontrols.item( m ).isNull(); ++m )
+						{
+							QDomElement ladspacontrol = ladspacontrols.item( m ).toElement();
+							for( QDomElement port = ladspacontrol.firstChild().toElement();
+								!port.isNull(); port = port.nextSibling().toElement() )
+							{
+								if ( port.tagName() == "port01" )
+									port.setTagName( "port00" );
+								else if( port.tagName() == "port02" )
+									port.setTagName("port01" );
+								else if( port.tagName() == "port03")
+									port.setTagName( "port02" );
+								else if( port.tagName() == "port04" )
+									port.setTagName( "port03" );
+								else if ( port.tagName() == "port05" )
+									port.setTagName( "port04" );
+								else if( port.tagName() == "port06" )
+									port.setTagName("port05" );
+								else if( port.tagName() == "port07")
+									port.setTagName( "port06" );
+								else if( port.tagName() == "port08" )
+									port.setTagName( "port07" );
+								else if( port.tagName() == "port09")
+									port.setTagName( "port08" );
+								else if( port.tagName() == "port010" )
+									port.setTagName( "port09" );
+								if ( port.tagName() == "port11" )
+									port.setTagName( "port10" );
+								else if( port.tagName() == "port12" )
+									port.setTagName("port11" );
+								else if( port.tagName() == "port13")
+									port.setTagName( "port12" );
+								else if( port.tagName() == "port14" )
+									port.setTagName( "port13" );
+								else if ( port.tagName() == "port15" )
+									port.setTagName( "port14" );
+								else if( port.tagName() == "port16" )
+									port.setTagName("port15" );
+								else if( port.tagName() == "port17")
+									port.setTagName( "port16" );
+								else if( port.tagName() == "port18" )
+									port.setTagName( "port17" );
+								else if( port.tagName() == "port19")
+									port.setTagName( "port18" );
+								else if( port.tagName() == "port110" )
+									port.setTagName( "port19" );
+							}
+						}
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+							attribute.attribute( "value" ) == "Eq2x2" )
+					{
+						attribute.setAttribute( "value", "Eq10X2" );
+						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>&)
+						{
+							port.setTagName(new_port_name(proc, num - 2));
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					if( attribute.attribute( "name" ) == "Narrower" &&
+						attribute.attribute( "value" ) == "Narrower" )
+					{
+						attribute.setAttribute( "value", "Eq10X2" );
+						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>&)
+						{
+							if(num == 2) {
+								port.setTagName(new_port_name(proc, 1));
+							}
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					if( attribute.attribute( "name" ) == "PhaserII" &&
+						attribute.attribute( "value" ) == "PhaserII" )
+					{
+						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>&)
+						{
+							if(num == 1) {
+								port.setTagName(new_port_name(proc, 0));
+							}
+							else if(num == 4) {
+								Q_ASSERT(port.hasAttribute("data"));
+								// feedback is now multiplied by 0.9f => change scale
+								port.setAttribute("data", port.attribute("data").toFloat() / 0.9f);
+							}
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "Plate2x2" )
+					{
+						attribute.setAttribute( "value", "PlateX2" );
+
+						// Head back up the DOM to upgrade ports
+						QDomNodeList ladspacontrols = effect.elementsByTagName( "ladspacontrols" );
+						for( int m = 0; !ladspacontrols.item( m ).isNull(); ++m )
+						{
+							QDomElement ladspacontrol = ladspacontrols.item( m ).toElement();
+							for( QDomElement port = ladspacontrol.firstChild().toElement();
+								!port.isNull(); port = port.nextSibling().toElement() )
+							{
+								if ( port.tagName() == "port02" )
+									port.setTagName( "port00" );
+								else if( port.tagName() == "port03" )
+								{
+									// tail 0.749 is now 1.0
+									const float value = port.attribute("data", "0.3745").toFloat();
+									port.setAttribute( "data", value / 0.749f);
+									port.setTagName( "port01" );
+								}
+								else if( port.tagName() == "port04" )
+									port.setTagName( "port02" );
+								else if( port.tagName() == "port05" )
+									port.setTagName( "port03" );
+							}
+						}
+					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+						attribute.attribute( "value" ) == "ToneStack" )
+					{
+						auto fn = [&](QDomElement& port, int proc, int num, QList<QDomElement>&, QList<QDomElement>& )
+						{
+							// all ports move down by one
+							QString new_number = QString::number(proc) + QString::number(num - 1);
+							port.setTagName( "port" + new_number );
 						};
 						iterate_ladspa_ports(effect, fn);
 					}

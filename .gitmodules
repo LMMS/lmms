@@ -49,3 +49,6 @@
 [submodule "plugins/LadspaEffect/cmt/cmt"]
 	path = plugins/LadspaEffect/cmt/cmt
 	url = https://github.com/lmms/cmt
+[submodule "plugins/LadspaEffect/caps/caps-lv2"]
+	path = plugins/LadspaEffect/caps/caps-lv2
+	url = https://github.com/JohannesLorenz/caps-lv2.git
