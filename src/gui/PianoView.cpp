@@ -123,6 +123,11 @@ PianoView::PianoView(QWidget *parent) :
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFocusPolicy(Qt::StrongFocus);
+
+	// Black keys are drawn halfway between successive white keys, so they do not
+	// contribute to the total width. Half of a black key is added in case the last
+	// octave is incomplete and ends with a black key. Drawing always starts at
+	// a white key, so no similar modification is needed at the beginning.
 	setMaximumWidth(Piano::NumWhiteKeys * PW_WHITE_KEY_WIDTH +
 		(Piano::isBlackKey(NumKeys-1) ? PW_BLACK_KEY_WIDTH / 2 : 0));
 
@@ -413,7 +418,7 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 		return;
 	}
 
-	// check which control element is closest to the mouse and open the approptiate menu
+	// check which control element is closest to the mouse and open the appropriate menu
 	QString title;
 	IntModel *noteModel = getNearestMarker(getKeyFromMouse(me->pos()), &title);
 
@@ -484,7 +489,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 			else
 			{
 				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
-				emit baseNoteChanged();	// TODO: not actually used by anything?
+				if (m_movedNoteModel == m_piano->instrumentTrack()->baseNoteModel()) { emit baseNoteChanged(); }	// TODO: not actually used by anything?
 			}
 		}
 		else
@@ -919,7 +924,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	int white_cnt = 0;
 
 	int startKey = m_startKey;
-	if (startKey > 0 && Piano::isBlackKey((Keys)(--startKey)))
+	if (startKey > 0 && Piano::isBlackKey(static_cast<Keys>(--startKey)))
 	{
 		if (m_piano && m_piano->instrumentTrack()->microtuner()->isKeyMapped(startKey))
 		{
@@ -934,7 +939,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 		else
 		{
-			p.drawPixmap(0 + PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyDisabledPm);
+			p.drawPixmap(0 - PW_WHITE_KEY_WIDTH / 2, PIANO_BASE, *s_blackKeyDisabledPm);
 		}
 	}
 
@@ -976,8 +981,6 @@ void PianoView::paintEvent( QPaintEvent * )
 		if (++cur_key == NumKeys) {break;}
 	}
 }
-
-
 
 
 

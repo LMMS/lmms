@@ -28,7 +28,6 @@
 #define AUTOMATION_TRACK_H
 
 #include "Track.h"
-#include "TrackView.h"
 
 
 class AutomationTrack : public Track
@@ -55,19 +54,6 @@ public:
 
 private:
 	friend class AutomationTrackView;
-
-} ;
-
-
-
-class AutomationTrackView : public TrackView
-{
-public:
-	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
-	virtual ~AutomationTrackView() = default;
-
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
 
 } ;
 

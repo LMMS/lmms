@@ -228,7 +228,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// New
 			else
 			{
-				ControllerConnection* cc = new ControllerConnection( d.chosenController() );
+				ControllerConnection* cc = new ControllerConnection(d.chosenController());
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}
@@ -294,7 +294,6 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 		m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor());
 	}
 }
-
 
 /// Attempt to parse a float from the clipboard
 static float floatFromClipboard(bool* ok)

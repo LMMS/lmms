@@ -641,7 +641,7 @@ void CompressorControlDialog::resizeEvent(QResizeEvent *event)
 void CompressorControlDialog::wheelEvent(QWheelEvent * event)
 {
 	const float temp = m_dbRange;
-	const float dbRangeNew = m_dbRange - copysignf(COMP_GRID_SPACING, event->delta());
+	const float dbRangeNew = m_dbRange - copysignf(COMP_GRID_SPACING, event->angleDelta().y());
 	m_dbRange = round(qBound(COMP_GRID_SPACING, dbRangeNew, COMP_GRID_MAX) / COMP_GRID_SPACING) * COMP_GRID_SPACING;
 
 	// Only reset view if the scolling had an effect

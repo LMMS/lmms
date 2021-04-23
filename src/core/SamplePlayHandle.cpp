@@ -29,7 +29,7 @@
 #include "InstrumentTrack.h"
 #include "lmms_constants.h"
 #include "Mixer.h"
-#include "SampleTrack.h"
+#include "SampleTCO.h"
 
 
 
