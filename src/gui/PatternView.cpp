@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QMenu>
 
+#include "ConfigManager.h"
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
@@ -41,7 +42,8 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	m_noteFillColor(255, 255, 255, 220),
 	m_noteBorderColor(255, 255, 255, 220),
 	m_mutedNoteFillColor(100, 100, 100, 220),
-	m_mutedNoteBorderColor(100, 100, 100, 220)
+	m_mutedNoteBorderColor(100, 100, 100, 220),
+	m_legacySEBB(ConfigManager::inst()->value("ui","legacysebb","0").toInt())
 {
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
@@ -180,9 +182,11 @@ void PatternView::constructContextMenu( QMenu * _cm )
 
 void PatternView::mousePressEvent( QMouseEvent * _me )
 {
+	bool displayBB = fixedTCOs() || (pixelsPerBar() >= 96 && m_legacySEBB);
 	if( _me->button() == Qt::LeftButton &&
 		m_pat->m_patternType == Pattern::BeatPattern &&
-		fixedTCOs() && _me->y() > height() - s_stepBtnOff->height() )
+		displayBB && _me->y() > height() - s_stepBtnOff->height() )
+		
 
 	// when mouse button is pressed in beat/bassline -mode
 
@@ -385,6 +389,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	const int x_base = TCO_BORDER_WIDTH;
 
+	bool displayBB = fixedTCOs() || (pixelsPerBar >= 96 && m_legacySEBB);
 	// melody pattern paint event
 	NoteVector const & noteCollection = m_pat->m_notes;
 	if( m_pat->m_patternType == Pattern::MelodyPattern && !noteCollection.empty() )
@@ -500,9 +505,8 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		p.restore();
 	}
-
 	// beat pattern paint event
-	else if( beatPattern &&	fixedTCOs() )
+	else if( beatPattern &&	displayBB )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
