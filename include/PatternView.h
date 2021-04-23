@@ -92,6 +92,8 @@ private:
 	QColor m_mutedNoteBorderColor;
 
 	QStaticText m_staticTextName;
+	
+	bool m_legacySEBB;
 } ;
  
  
