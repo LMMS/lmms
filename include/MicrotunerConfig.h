@@ -72,21 +72,21 @@ private:
 	bool applyScale();
 	bool applyKeymap();
 
-	ComboBoxModel m_scaleComboModel;		//!< ID of scale currently selected for editing
-	ComboBoxModel m_keymapComboModel;		//!< ID of keymap currently selected for editing
+	ComboBoxModel m_scaleComboModel;        //!< ID of scale currently selected for editing
+	ComboBoxModel m_keymapComboModel;       //!< ID of keymap currently selected for editing
 
-	QLineEdit *m_scaleNameEdit;				//!< edit field for the scale name or description
-	QLineEdit *m_keymapNameEdit;			//!< edit field for the keymap name or description
+	QLineEdit *m_scaleNameEdit;             //!< edit field for the scale name or description
+	QLineEdit *m_keymapNameEdit;            //!< edit field for the keymap name or description
 
-	QPlainTextEdit *m_scaleTextEdit;		//!< text editor field for interval definitions
-	QPlainTextEdit *m_keymapTextEdit;		//!< text editor field for key mappings
+	QPlainTextEdit *m_scaleTextEdit;        //!< text editor field for interval definitions
+	QPlainTextEdit *m_keymapTextEdit;       //!< text editor field for key mappings
 
-	IntModel m_firstKeyModel;				//!< model for spinbox of currently edited first key
-	IntModel m_lastKeyModel;				//!< model for spinbox of currently edited last key
-	IntModel m_middleKeyModel;				//!< model for spinbox of currently edited middle key
+	IntModel m_firstKeyModel;               //!< model for spinbox of currently edited first key
+	IntModel m_lastKeyModel;                //!< model for spinbox of currently edited last key
+	IntModel m_middleKeyModel;              //!< model for spinbox of currently edited middle key
 
-	IntModel m_baseKeyModel;				//!< model for spinbox of currently edited base key
-	FloatModel m_baseFreqModel;				//!< model for spinbox of currently edited base note frequency
+	IntModel m_baseKeyModel;                //!< model for spinbox of currently edited base key
+	FloatModel m_baseFreqModel;             //!< model for spinbox of currently edited base note frequency
 };
 
 #endif

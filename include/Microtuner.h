@@ -65,9 +65,9 @@ protected slots:
 	void updateKeymapList(int index);
 
 private:
-	InstrumentTrack *m_instrumentTrack;		// Required to access base note etc. when range import is disabled
+	InstrumentTrack *m_instrumentTrack;     // Required to access base note etc. when range import is disabled
 
-	BoolModel m_enabledModel;				//!< Enable microtuner (otherwise using 12-TET @440 Hz)
+	BoolModel m_enabledModel;               //!< Enable microtuner (otherwise using 12-TET @440 Hz)
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_keymapModel;
 	BoolModel m_keyRangeImportModel;

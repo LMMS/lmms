@@ -54,10 +54,10 @@ public:
 
 private:
 	// Scala specifies that numerators and denominators should go at least up to 2147483647 → use uint32_t.
-	uint32_t m_numerator;	//!< numerator of the interval fraction
-	uint32_t m_denominator;	//!< denominator of the interval fraction
-	float m_cents;			//!< interval defined in cents (used when denominator is set to zero)
-	float m_ratio;			//!< precomputed output value for better performance
+	uint32_t m_numerator;   //!< numerator of the interval fraction
+	uint32_t m_denominator; //!< denominator of the interval fraction
+	float m_cents;          //!< interval defined in cents (used when denominator is set to zero)
+	float m_ratio;          //!< precomputed output value for better performance
 };
 
 
@@ -79,8 +79,8 @@ public:
 	inline QString nodeName() const override {return "scale";}
 
 private:
-	QString m_description;					//!< name or description of the scale
-	std::vector<Interval> m_intervals;		//!< a series of ratios that define the scale
+	QString m_description;                  //!< name or description of the scale
+	std::vector<Interval> m_intervals;      //!< a series of ratios that define the scale
 
 };
 

@@ -66,14 +66,14 @@ public:
 	inline QString nodeName() const override {return "keymap";}
 
 private:
-	QString m_description;				//!< name or description of the keymap
+	QString m_description;          //!< name or description of the keymap
 
-	std::vector<int> m_map;				//!< key to scale degree mapping
-	int m_firstKey;						//!< first key that will be mapped
-	int m_lastKey;						//!< last key that will be mapped
-	int m_middleKey;					//!< first line of the map refers to this key
-	int m_baseKey;						//!< key which is assigned the reference "base note"
-	float m_baseFreq;					//!< frequency of the base note (usually A4 @440 Hz)
+	std::vector<int> m_map;         //!< key to scale degree mapping
+	int m_firstKey;                 //!< first key that will be mapped
+	int m_lastKey;                  //!< last key that will be mapped
+	int m_middleKey;                //!< first line of the map refers to this key
+	int m_baseKey;                  //!< key which is assigned the reference "base note"
+	float m_baseFreq;               //!< frequency of the base note (usually A4 @440 Hz)
 };
 
 #endif
