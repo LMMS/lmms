@@ -448,13 +448,13 @@ void TrackContentObjectView::updateCursor(QMouseEvent * me)
 	SampleTCO * sTco = dynamic_cast<SampleTCO*>(m_tco);
 
 	// If we are at the edges, use the resize cursor
-	if ((me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize())
-		|| (me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize()))
+	if ((!me->buttons() && !m_tco->getAutoResize() && !isSelected())
+		&& ((me->x() > width() - RESIZE_GRIP_WIDTH) || (me->x() < RESIZE_GRIP_WIDTH && sTco)))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
 	// If we are in the middle on knife mode, use the knife cursor
-	else if (sTco && m_trackView->trackContainerView()->knifeMode())
+	else if (sTco && m_trackView->trackContainerView()->knifeMode() && !isSelected())
 	{
 		setCursor(m_cursorKnife);
 	}
