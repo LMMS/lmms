@@ -43,7 +43,6 @@ public:
 	virtual ~FadeButton();
 	void setActiveColor( const QColor & activated_color );
 
-
 	inline void setEnabled(bool enabled)
 	{
 		m_isEnabled = enabled;

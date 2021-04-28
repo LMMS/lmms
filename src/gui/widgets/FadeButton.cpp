@@ -154,6 +154,8 @@ void FadeButton::paintEvent(QPaintEvent * _pe)
 }
 
 
+
+
 QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QElapsedTimer timer, float duration)
 {
 	QColor col;
@@ -169,8 +171,3 @@ QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QElapsedTimer tim
 
 	return col;
 }
-/*
-void FadeButton::setEnabled(bool enabled)
-{
-	m_isEnabled = enabled;
-}*/
