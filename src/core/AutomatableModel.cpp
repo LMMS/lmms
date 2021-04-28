@@ -215,7 +215,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		}
 		if( thisConnection.isElement() )
 		{
-			setControllerConnection(new ControllerConnection((Controller*)NULL, this));
+			setControllerConnection(new ControllerConnection(nullptr));
 			m_controllerConnection->loadSettings( thisConnection.toElement() );
 			//m_controllerConnection->setTargetName( displayName() );
 		}
