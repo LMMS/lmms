@@ -60,6 +60,8 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
 	FloatModelView( new FloatModel( 0, 0, 0, 1, NULL, _name, true ), this ),
 	m_label( "" ),
+	m_isHtmlLabel(false),
+	m_tdRenderer(nullptr),
 	m_volumeKnob( false ),
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ),
 	m_buttonPressed( false ),
@@ -166,12 +168,36 @@ void Knob::onKnobNumUpdated()
 void Knob::setLabel( const QString & txt )
 {
 	m_label = txt;
+	m_isHtmlLabel = false;
 	if( m_knobPixmap )
 	{
 		setFixedSize(qMax<int>( m_knobPixmap->width(),
 					horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
 						m_knobPixmap->height() + 10);
 	}
+
+	update();
+}
+
+
+void Knob::setHtmlLabel(const QString &htmltxt)
+{
+	m_label = htmltxt;
+	m_isHtmlLabel = true;
+	// Put the rendered HTML content into cache
+	if (!m_tdRenderer)
+	{
+		m_tdRenderer = new QTextDocument(this);
+	}
+
+	m_tdRenderer->setHtml(QString("<span style=\"color:%1;\">%2</span>").arg(textColor().name(), m_label));
+
+	if (m_knobPixmap)
+	{
+		setFixedSize(m_knobPixmap->width(),
+				m_knobPixmap->height() + 15);
+	}
+
 	update();
 }
 
@@ -641,15 +667,20 @@ void Knob::paintEvent( QPaintEvent * _me )
 	drawKnob( &p );
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSizeF( p.font(), 6.5 ) );
-/*		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( width() / 2 -
-			p.fontMetrics().width( m_label ) / 2 + 1,
-				height() - 1, m_label );*/
-		p.setPen( textColor() );
-		p.drawText(width() / 2 -
+		if (!m_isHtmlLabel)
+		{
+			p.setFont(pointSizeF(p.font(), 6.5));
+			p.setPen(textColor());
+			p.drawText(width() / 2 -
 				horizontalAdvance(p.fontMetrics(), m_label) / 2,
 				height() - 2, m_label);
+		}
+		else
+		{
+			m_tdRenderer->setDefaultFont(pointSizeF(p.font(), 6.5));
+			p.translate((width() - m_tdRenderer->idealWidth()) / 2, (height() - m_tdRenderer->pageSize().height()) / 2);
+			m_tdRenderer->drawContents(&p);
+		}
 	}
 }
 

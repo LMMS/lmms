@@ -28,6 +28,7 @@
 #include <QtCore/QMap>
 #include <QDomElement>
 
+class QMimeData;
 
 namespace Clipboard
 {

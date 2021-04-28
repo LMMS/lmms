@@ -47,7 +47,7 @@ class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObjec
 	Q_OBJECT
 public:
 
-	ControllerConnection( Controller * _controller );
+	ControllerConnection(Controller * _controller);
 	ControllerConnection( int _controllerId );
 
 	virtual ~ControllerConnection();
@@ -97,7 +97,6 @@ public:
 	{
 		return classNodeName();
 	}
-
 
 public slots:
 	void deleteConnection();
