@@ -31,6 +31,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 #include <QPainterPath>
 #include <QWidget>
 
@@ -119,6 +120,12 @@ private:
 	unsigned int m_displayLeft;
 	unsigned int m_displayRight;
 	unsigned int m_displayWidth;
+
+	// cached frequency bin → x position conversion for better performance
+	std::vector<float> m_cachedBinToX;
+	float m_cachedRangeMin;
+	float m_cachedRangeMax;
+	unsigned int m_cachedDisplayWidth;
 
 	#ifdef SA_DEBUG
 		float m_execution_avg;

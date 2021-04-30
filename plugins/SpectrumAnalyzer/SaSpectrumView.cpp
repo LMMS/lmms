@@ -47,7 +47,10 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_controls(controls),
 	m_processor(processor),
 	m_freezeRequest(false),
-	m_frozen(false)
+	m_frozen(false),
+	m_cachedRangeMin(-1),
+	m_cachedRangeMax(-1),
+	m_cachedDisplayWidth(-1)
 {
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -348,10 +351,28 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// Bins falling to interval [x_start, x_next) contribute to a single point.
 	float max = m_displayBottom;
 	float x_start = -1;		// lower bound of currently constructed point
+
+	// Speed up bin → x position translation by building a LUT cache.
+	// Update the cache only when range or display width are changed.
+	float rangeMin = m_processor->getFreqRangeMin(m_controls->m_logXModel.value());
+	float rangeMax = m_processor->getFreqRangeMax();
+	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax || m_displayWidth != m_cachedDisplayWidth)
+	{
+		m_cachedBinToX.resize(m_processor->binCount() + 1);
+		m_cachedBinToX.clear();
+		for (unsigned int n = 0; n < m_processor->binCount() + 1; n++)
+		{
+			m_cachedBinToX[n] = freqToXPixel(binToFreq(n), m_displayWidth);
+		}
+		m_cachedRangeMin = rangeMin;
+		m_cachedRangeMax = rangeMax;
+		m_cachedDisplayWidth = m_displayWidth;
+	}
+
 	for (unsigned int n = 0; n < m_processor->binCount(); n++)
 	{
-		float x = freqToXPixel(binToFreq(n), m_displayWidth);
-		float x_next = freqToXPixel(binToFreq(n + 1), m_displayWidth);
+		float x = m_cachedBinToX[n];
+		float x_next = m_cachedBinToX[n + 1];
 		float y = ampToYPixel(displayBuffer[n], m_displayBottom);
 
 		// consider making a point only if x falls within display bounds
