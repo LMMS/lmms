@@ -248,16 +248,6 @@ void TrackContentObjectView::setBBPatternBackground( const QColor & c )
 void TrackContentObjectView::setGradient( const bool & b )
 { m_gradient = b; }
 
-void TrackContentObjectView::setMouseHotspotHand(const QSize & s)
-{
-	m_mouseHotspotHand = s;
-}
-
-void TrackContentObjectView::setMouseHotspotKnife(const QSize & s)
-{
-	m_mouseHotspotKnife = s;
-}
-
 // access needsUpdate member variable
 bool TrackContentObjectView::needsUpdate()
 { return m_needsUpdate; }

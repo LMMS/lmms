@@ -197,9 +197,12 @@ PianoRoll {
 	qproperty-whiteKeyInactiveTextColor: #000;
 	qproperty-whiteKeyInactiveTextShadow: #fff;
 	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #d6d6d6, stop:1 #e3e3e3);
+  qproperty-whiteKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #a0a0a0, stop:1 #b0b0b0);
 	qproperty-blackKeyWidth: 48;
 	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3ac467, stop:1 #3dd671);
 	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #262626, stop:1 #313131);
+  qproperty-blackKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #606060, stop:1 #505050);
+
 	/* Grid colors */
 	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2d6b45;
@@ -490,7 +493,7 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton {
+QToolButton, QToolButton::menu-button {
 	margin: 1px;
 	padding: 2px 2px 2px 2px;
 	border-top: 1px solid #778394;
@@ -520,6 +523,22 @@ QToolButton:checked {
 	border-bottom: 1px solid #4a515e;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
 	background-image: url(resources:shadow_p.png);
+}
+
+/* buttons with combined menu */
+
+QToolButton[popupMode="1"] {
+	margin-right: 13px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+QToolButton::menu-button {
+	subcontrol-origin: margin;
+	width: 13px;
+	padding: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 /* track label buttons - the part that contains the icon and track title */
@@ -722,8 +741,8 @@ PatternView {
 
 /* sample track pattern */
 SampleTCOView {
-	background-color: #DE7C05;
-	color: #FFE8CD;
+	background-color: rgba(42,51,59,255);
+	color: #FF8F05;
 }
 
 /* automation pattern */

@@ -47,6 +47,7 @@ class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
+class QToolButton;
 
 class ComboBox;
 class NotePlayHandle;
@@ -85,10 +86,12 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor whiteKeyActiveTextColor MEMBER m_whiteKeyActiveTextColor)
 	Q_PROPERTY(QColor whiteKeyActiveTextShadow MEMBER m_whiteKeyActiveTextShadow)
 	Q_PROPERTY(QBrush whiteKeyActiveBackground MEMBER m_whiteKeyActiveBackground)
+	Q_PROPERTY(QBrush whiteKeyDisabledBackground MEMBER m_whiteKeyDisabledBackground)
 	/* black key properties */
 	Q_PROPERTY(int blackKeyWidth MEMBER m_blackKeyWidth)
 	Q_PROPERTY(QBrush blackKeyInactiveBackground MEMBER m_blackKeyInactiveBackground)
 	Q_PROPERTY(QBrush blackKeyActiveBackground MEMBER m_blackKeyActiveBackground)
+	Q_PROPERTY(QBrush blackKeyDisabledBackground MEMBER m_blackKeyDisabledBackground)
 public:
 	enum EditModes
 	{
@@ -142,6 +145,13 @@ public:
 	int quantization() const;
 
 protected:
+	enum QuantizeActions
+	{
+		QuantizeBoth,
+		QuantizePos,
+		QuantizeLength
+	};
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void leaveEvent( QEvent * e ) override;
@@ -198,7 +208,7 @@ protected slots:
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes();
+	void quantizeNotes(QuantizeActions mode = QuantizeBoth);
 
 	void updateSemiToneMarkerMenu();
 
@@ -390,7 +400,6 @@ private:
 	int m_pianoKeysVisible;
 
 	int m_keyLineHeight;
-	int m_octaveHeight;
 	int m_whiteKeySmallHeight;
 	int m_whiteKeyBigHeight;
 	int m_blackKeyHeight;
@@ -467,10 +476,12 @@ private:
 	QColor m_whiteKeyInactiveTextColor;
 	QColor m_whiteKeyInactiveTextShadow;
 	QBrush m_whiteKeyInactiveBackground;
+	QBrush m_whiteKeyDisabledBackground;
 	/* black key properties */
 	int m_blackKeyWidth;
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
+	QBrush m_blackKeyDisabledBackground;
 
 signals:
 	void positionChanged( const TimePos & );
@@ -523,6 +534,8 @@ signals:
 private slots:
 	void updateAfterPatternChange();
 	void ghostPatternSet( bool state );
+	void exportPattern();
+	void importPattern();
 
 private:
 	void patternRenamed();
@@ -532,6 +545,7 @@ private:
 
 	PianoRoll* m_editor;
 
+	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;

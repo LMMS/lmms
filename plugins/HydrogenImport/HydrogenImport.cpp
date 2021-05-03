@@ -122,7 +122,9 @@ public:
 		else if ( sKey == "B" ) {
 			m_key = NoteKey::B;
 		} 
-        return m_key + (nOctave*12)+57;
+
+        // Hydrogen records MIDI notes from C-1 to B5, and exports them as a number ranging from -3 to 3
+        return m_key + ((nOctave + 3) * 12);
 	}
 
 };
