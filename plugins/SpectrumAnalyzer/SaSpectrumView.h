@@ -126,6 +126,7 @@ private:
 	float m_cachedRangeMin;
 	float m_cachedRangeMax;
 	unsigned int m_cachedDisplayWidth;
+	unsigned int m_cachedBinCount;
 
 	#ifdef SA_DEBUG
 		float m_execution_avg;

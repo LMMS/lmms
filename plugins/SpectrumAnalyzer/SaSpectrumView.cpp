@@ -50,7 +50,8 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_frozen(false),
 	m_cachedRangeMin(-1),
 	m_cachedRangeMax(-1),
-	m_cachedDisplayWidth(-1)
+	m_cachedDisplayWidth(0),
+	m_cachedBinCount(0)
 {
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -71,6 +72,9 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 
 	m_cursor = QPointF(0, 0);
+
+	// Initialize the size of bin → pixel X position LUT to the maximum allowed number of bins + 1.
+	m_cachedBinToX.resize(FFT_BLOCK_SIZES.back() / 2 + 2);
 
 	#ifdef SA_DEBUG
 		m_execution_avg = m_path_avg = m_draw_avg = 0;
@@ -356,17 +360,17 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// Update the cache only when range or display width are changed.
 	float rangeMin = m_processor->getFreqRangeMin(m_controls->m_logXModel.value());
 	float rangeMax = m_processor->getFreqRangeMax();
-	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax || m_displayWidth != m_cachedDisplayWidth)
+	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax ||
+		m_displayWidth != m_cachedDisplayWidth || m_processor->binCount() + 1 != m_cachedBinCount)
 	{
-		m_cachedBinToX.resize(m_processor->binCount() + 1);
-		m_cachedBinToX.clear();
-		for (unsigned int n = 0; n < m_processor->binCount() + 1; n++)
-		{
-			m_cachedBinToX[n] = freqToXPixel(binToFreq(n), m_displayWidth);
-		}
 		m_cachedRangeMin = rangeMin;
 		m_cachedRangeMax = rangeMax;
 		m_cachedDisplayWidth = m_displayWidth;
+		m_cachedBinCount = m_processor->binCount() + 1;
+		for (unsigned int n = 0; n < m_cachedBinCount; n++)
+		{
+			m_cachedBinToX[n] = freqToXPixel(binToFreq(n), m_displayWidth);
+		}
 	}
 
 	for (unsigned int n = 0; n < m_processor->binCount(); n++)
