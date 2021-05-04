@@ -280,6 +280,7 @@ private:
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
 
+	bool m_isDevelopment;
 	QString m_workingDir;
 	QString m_dataDir;
 	QString m_vstDir;
