@@ -76,12 +76,6 @@ public:
 		return m_workingDir;
 	}
 
-	void initPortableWorkingDir();
-
-	void initInstalledWorkingDir();
-
-	void initDevelopmentWorkingDir();
-
 	const QString & dataDir() const
 	{
 		return m_dataDir;
@@ -276,6 +270,8 @@ private:
 	void upgrade_1_1_91();
 	void upgrade_1_2_2();
 	void upgrade();
+
+	void checkDevelopment();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
