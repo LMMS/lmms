@@ -170,12 +170,12 @@ PianoRoll {
 	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #50b8c3, stop:1 #54c4d2);
 	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #101010, stop:1 #3a3a3a);
 	qproperty-blackKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #606060, stop:1 #505050);
-	
+
 	/* Grid colors */
 	qproperty-lineColor: rgba( 128, 128, 128, 80 );
 	qproperty-beatLineColor: rgba( 128, 128, 128, 160 );
 	qproperty-barLineColor: rgb( 128, 128, 128 );
-	
+
 	/* Text on the white piano keys */
 	qproperty-textColor: rgb( 0, 0, 0 );
 	qproperty-textColorLight: rgb( 128, 128, 128);
