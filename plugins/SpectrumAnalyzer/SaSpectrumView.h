@@ -125,6 +125,7 @@ private:
 	std::vector<float> m_cachedBinToX;
 	float m_cachedRangeMin;
 	float m_cachedRangeMax;
+	bool m_cachedLogX;
 	unsigned int m_cachedDisplayWidth;
 	unsigned int m_cachedBinCount;
 

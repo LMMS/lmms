@@ -225,12 +225,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 							if (band_end - band_start > 1.0)
 							{
 								// band spans multiple pixels: draw all pixels it covers
-								for (target = (int)band_start; target < (int)band_end; target++)
+								for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
 								{
-									if (target >= 0 && target < waterfallWidth())
-									{
-										pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
-									}
+									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 								}
 								// save remaining portion of the band for the following band / pixel
 								// (in case the next band uses sub-pixel drawing)
@@ -265,12 +262,9 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 						else
 						{
 							// Linear: always draws one or more pixels per band
-							for (target = (int)band_start; target < band_end; target++)
+							for (target = std::max((int)band_start, 0); target < band_end && target < waterfallWidth(); target++)
 							{
-								if (target >= 0 && target < waterfallWidth())
-								{
-									pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
-								}
+								pixel[target] = makePixel(m_normSpectrumL[i], m_normSpectrumR[i]);
 							}
 						}
 					}

@@ -25,7 +25,7 @@
  */
 
 #include "SaSpectrumView.h"
-
+#include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <QMouseEvent>
@@ -50,6 +50,7 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_frozen(false),
 	m_cachedRangeMin(-1),
 	m_cachedRangeMax(-1),
+	m_cachedLogX(true),
 	m_cachedDisplayWidth(0),
 	m_cachedBinCount(0)
 {
@@ -360,12 +361,13 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// Update the cache only when range or display width are changed.
 	float rangeMin = m_processor->getFreqRangeMin(m_controls->m_logXModel.value());
 	float rangeMax = m_processor->getFreqRangeMax();
-	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax ||
-		m_displayWidth != m_cachedDisplayWidth || m_processor->binCount() + 1 != m_cachedBinCount)
+	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax || m_displayWidth != m_cachedDisplayWidth ||
+		m_controls->m_logXModel.value() != m_cachedLogX || m_processor->binCount() + 1 != m_cachedBinCount)
 	{
 		m_cachedRangeMin = rangeMin;
 		m_cachedRangeMax = rangeMax;
 		m_cachedDisplayWidth = m_displayWidth;
+		m_cachedLogX = m_controls->m_logXModel.value();
 		m_cachedBinCount = m_processor->binCount() + 1;
 		for (unsigned int n = 0; n < m_cachedBinCount; n++)
 		{
