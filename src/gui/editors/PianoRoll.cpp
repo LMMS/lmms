@@ -31,8 +31,9 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
-#include <QMessageBox>
+#include <QMargins>
 #include <QMdiArea>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
 #include <QScrollBar>
@@ -121,11 +122,11 @@ QPixmap* PianoRoll::s_toolKnife = nullptr;
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
-static QString s_noteStrings[12] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+static QString s_noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
-static QString getNoteString( int key )
+static QString getNoteString(int key)
 {
-	return s_noteStrings[key % 12] + QString::number( static_cast<int>( key / KeysPerOctave ) );
+	return s_noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
 }
 
 // used for drawing of piano
@@ -174,7 +175,6 @@ PianoRoll::PianoRoll() :
 	m_userSetNotesEditHeight(100),
 	m_ppb( DEFAULT_PR_PPB ),
 	m_keyLineHeight(DEFAULT_KEY_LINE_HEIGHT),
-	m_octaveHeight(m_keyLineHeight * KeysPerOctave),
 	m_whiteKeySmallHeight(qFloor(m_keyLineHeight * 1.5)),
 	m_whiteKeyBigHeight(m_keyLineHeight * 2),
 	m_blackKeyHeight(m_keyLineHeight),
@@ -646,6 +646,7 @@ void PianoRoll::loadGhostNotes( const QDomElement & de )
 		{
 			Note * n = new Note;
 			n->restoreState( node.toElement() );
+			n->setVolume(DefaultVolume);
 			m_ghostNotes.push_back( n );
 			node = node.nextSibling();
 		}
@@ -885,11 +886,10 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 		}
 	}
 
-	if( total_notes > 0 )
+	if (total_notes > 0)
 	{
-		central_key = central_key / total_notes -
-				( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
-		m_startKey = qBound( 0, central_key, NumOctaves * KeysPerOctave );
+		central_key = central_key / total_notes - (NumKeys - m_totalKeysToScroll) / 2;
+		m_startKey = qBound(0, central_key, NumKeys);
 	}
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
@@ -902,6 +902,9 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+
+	connect(m_pattern->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(m_pattern->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 
 	update();
 	emit currentPatternChanged();
@@ -3006,8 +3009,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	f.setPixelSize(m_keyLineHeight * 0.8);
 	p.setFont(f); // font size doesn't change without this for some reason
 	QFontMetrics fontMetrics(p.font());
-	 // G4 is one of the widest
-	QRect const boundingRect = fontMetrics.boundingRect(QString("G4"));
+	// G-1 is one of the widest; plus one pixel margin for the shadow
+	QRect const boundingRect = fontMetrics.boundingRect(QString("G-1")) + QMargins(0, 0, 1, 0);
 
 	// Order of drawing
 	// - vertical quantization lines
@@ -3072,7 +3075,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// otherwise we add height
 			else { m_notesEditHeight += partialKeyVisible; }
 		}
-		updatePositionLineHeight();
 		int x, q = quantization(), tick;
 
 		// draw vertical quantization lines
@@ -3160,6 +3162,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			const int key,
 			const int yb)
 		{
+			const bool mapped = m_pattern->instrumentTrack()->firstKeyModel()->value() <= key &&
+				m_pattern->instrumentTrack()->lastKeyModel()->value() >= key;
 			const bool pressed = m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key);
 			const int keyCode = key % KeysPerOctave;
 			const int yt = yb - gridCorrection(key);
@@ -3171,10 +3175,26 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 			case PR_WHITE_KEY_SMALL:
 			case PR_WHITE_KEY_BIG:
-				p.setBrush(pressed ? m_whiteKeyActiveBackground : m_whiteKeyInactiveBackground);
+				if (mapped)
+				{
+					if (pressed) { p.setBrush(m_whiteKeyActiveBackground); }
+					else { p.setBrush(m_whiteKeyInactiveBackground); }
+				}
+				else
+				{
+					p.setBrush(m_whiteKeyDisabledBackground);
+				}
 				break;
 			case PR_BLACK_KEY:
-				p.setBrush(pressed ? m_blackKeyActiveBackground : m_blackKeyInactiveBackground);
+				if (mapped)
+				{
+					if (pressed) { p.setBrush(m_blackKeyActiveBackground); }
+					else { p.setBrush(m_blackKeyInactiveBackground); }
+				}
+				else
+				{
+					p.setBrush(m_blackKeyDisabledBackground);
+				}
 			}
 			// draw key
 			p.drawRect(PIANO_X, yt, kw, kh);
@@ -3693,7 +3713,7 @@ void PianoRoll::updateScrollbars()
 }
 
 // responsible for moving/resizing scrollbars after window-resizing
-void PianoRoll::resizeEvent(QResizeEvent * re)
+void PianoRoll::resizeEvent(QResizeEvent* re)
 {
 	updatePositionLineHeight();
 	updateScrollbars();
@@ -4261,16 +4281,14 @@ void PianoRoll::updateYScroll()
 						height() - PR_TOP_MARGIN -
 						SCROLLBAR_SIZE);
 
-	int total_pixels = m_octaveHeight * NumOctaves - (height() -
-					PR_TOP_MARGIN - PR_BOTTOM_MARGIN -
-							m_notesEditHeight);
-	m_totalKeysToScroll = qMax(0, total_pixels * KeysPerOctave / m_octaveHeight);
+	const int visible_space = keyAreaBottom() - keyAreaTop();
+	m_totalKeysToScroll = qMax(0, NumKeys - 1 - visible_space / m_keyLineHeight);
 
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 
 	if(m_startKey > m_totalKeysToScroll)
 	{
-		m_startKey = qMax(0, m_totalKeysToScroll);
+		m_startKey = m_totalKeysToScroll;
 	}
 	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
 }
@@ -4444,11 +4462,16 @@ void PianoRoll::updatePosition( const TimePos & t )
 	{
 		autoScroll( t );
 	}
-	const int pos = m_timeLine->pos() * m_ppb / TimePos::ticksPerBar();
-	if (pos >= m_currentPosition && pos <= m_currentPosition + width() - m_whiteKeyWidth)
+	// ticks relative to m_currentPosition
+	// < 0 = outside viewport left
+	// > width = outside viewport right
+	const int pos = (static_cast<int>(m_timeLine->pos()) - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
+	// if pos is within visible range, show it
+	if (pos >= 0 && pos <= width() - m_whiteKeyWidth)
 	{
 		m_positionLine->show();
-		m_positionLine->move(pos - (m_positionLine->width() - 1) - m_currentPosition + m_whiteKeyWidth, keyAreaTop());
+		// adjust pos for piano keys width and self line width (align to rightmost of line)
+		m_positionLine->move(pos + m_whiteKeyWidth - (m_positionLine->width() - 1), keyAreaTop());
 	}
 	else
 	{
@@ -4512,7 +4535,6 @@ void PianoRoll::zoomingChanged()
 void PianoRoll::zoomingYChanged()
 {
 	m_keyLineHeight = m_zoomYLevels[m_zoomingYModel.value()] * DEFAULT_KEY_LINE_HEIGHT;
-	m_octaveHeight = m_keyLineHeight * KeysPerOctave;
 	m_whiteKeySmallHeight = qFloor(m_keyLineHeight * 1.5);
 	m_whiteKeyBigHeight = m_keyLineHeight * 2;
 	m_blackKeyHeight = m_keyLineHeight; //round(m_keyLineHeight * 1.3333);

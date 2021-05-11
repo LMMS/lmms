@@ -34,7 +34,6 @@
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
 
-#include "Note.h"
 #include "RemotePlugin.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"

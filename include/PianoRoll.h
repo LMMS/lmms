@@ -86,10 +86,12 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor whiteKeyActiveTextColor MEMBER m_whiteKeyActiveTextColor)
 	Q_PROPERTY(QColor whiteKeyActiveTextShadow MEMBER m_whiteKeyActiveTextShadow)
 	Q_PROPERTY(QBrush whiteKeyActiveBackground MEMBER m_whiteKeyActiveBackground)
+	Q_PROPERTY(QBrush whiteKeyDisabledBackground MEMBER m_whiteKeyDisabledBackground)
 	/* black key properties */
 	Q_PROPERTY(int blackKeyWidth MEMBER m_blackKeyWidth)
 	Q_PROPERTY(QBrush blackKeyInactiveBackground MEMBER m_blackKeyInactiveBackground)
 	Q_PROPERTY(QBrush blackKeyActiveBackground MEMBER m_blackKeyActiveBackground)
+	Q_PROPERTY(QBrush blackKeyDisabledBackground MEMBER m_blackKeyDisabledBackground)
 public:
 	enum EditModes
 	{
@@ -398,7 +400,6 @@ private:
 	int m_pianoKeysVisible;
 
 	int m_keyLineHeight;
-	int m_octaveHeight;
 	int m_whiteKeySmallHeight;
 	int m_whiteKeyBigHeight;
 	int m_blackKeyHeight;
@@ -475,10 +476,12 @@ private:
 	QColor m_whiteKeyInactiveTextColor;
 	QColor m_whiteKeyInactiveTextShadow;
 	QBrush m_whiteKeyInactiveBackground;
+	QBrush m_whiteKeyDisabledBackground;
 	/* black key properties */
 	int m_blackKeyWidth;
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
+	QBrush m_blackKeyDisabledBackground;
 
 signals:
 	void positionChanged( const TimePos & );
