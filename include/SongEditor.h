@@ -141,7 +141,7 @@ private:
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
-	static const QVector<double> m_zoomLevels;
+	static const QVector<float> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -161,7 +161,7 @@ private:
 	friend class SongEditorWindow;
 
 signals:
-	void zoomingValueChanged( double );
+	void zoomingValueChanged( float );
 } ;
 
 
