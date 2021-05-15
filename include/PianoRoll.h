@@ -346,8 +346,8 @@ private:
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
 
-	static const QVector<double> m_zoomLevels;
-	static const QVector<double> m_zoomYLevels;
+	static const QVector<float> m_zoomLevels;
+	static const QVector<float> m_zoomYLevels;
 
 	Pattern* m_pattern;
 	NoteVector m_ghostNotes;

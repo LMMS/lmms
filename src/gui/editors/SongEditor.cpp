@@ -54,7 +54,7 @@
 #include "ToolTip.h"
 #include "Track.h"
 
-const QVector<double> SongEditor::m_zoomLevels =
+const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 SongEditor::SongEditor( Song * song ) :
@@ -99,8 +99,8 @@ SongEditor::SongEditor( Song * song ) :
 	
 	connect( m_song, SIGNAL( playbackStateChanged() ),
 			 m_positionLine, SLOT( update() ) );
-	connect( this, SIGNAL( zoomingValueChanged( double ) ),
-			 m_positionLine, SLOT( zoomChange( double ) ) );
+	connect( this, SIGNAL( zoomingValueChanged( float ) ),
+			 m_positionLine, SLOT( zoomChange( float ) ) );
 
 
 	// add some essential widgets to global tool-bar
