@@ -95,8 +95,8 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if( sTco->isPlaying() == false && (_start >= (sTco->startPosition() + sTco->startTimeOffset())
-												   || sTco->isRecord ()) )
+				if(!sTco->isPlaying() && (_start >= (sTco->startPosition() + sTco->startTimeOffset())
+										  || sTco->isRecord()))
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
@@ -113,12 +113,12 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
                     //we only play within the sampleBuffer limits
                     //Ignore that in case of recoding.
-					if( sampleStart < sampleBufferLength || sTco->isRecord ())
+					if(sampleStart < sampleBufferLength || sTco->isRecord ())
 					{
-						sTco->setSampleStartFrame( sampleStart );
-						sTco->setSamplePlayLength( samplePlayLength );
-						tcos.push_back( sTco );
-						sTco->setIsPlaying( true );
+						sTco->setSampleStartFrame(sampleStart);
+						sTco->setSamplePlayLength(samplePlayLength);
+						tcos.push_back(sTco);
+						sTco->setIsPlaying(true);
 						nowPlaying = true;
 					}
 				}
@@ -138,14 +138,13 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		if( !st->isMuted() )
 		{
 			PlayHandle* handle;
-			if( st->isRecord() )
+			if(st->isRecord())
 			{
 				if( !Engine::getSong()->isRecording() )
 				{
 					return played_a_note;
 				}
-				SampleRecordHandle* smpHandle = new SampleRecordHandle( st , _start - st->startPosition ());
-				handle = smpHandle;
+				handle = new SampleRecordHandle(st, _start - st->startPosition());
 			}
 			else
 			{
