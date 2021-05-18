@@ -190,6 +190,7 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseMoveEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void contextMenuEvent( QContextMenuEvent * _cme ) override;
 
 
 private:

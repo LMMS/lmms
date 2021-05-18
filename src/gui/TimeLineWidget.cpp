@@ -30,6 +30,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolBar>
+#include <QMenu>
 
 
 #include "TimeLineWidget.h"
@@ -93,6 +94,8 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( update() ) );
+					
+	setContextMenuPolicy(Qt::PreventContextMenu);
 }
 
 
@@ -304,30 +307,43 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 
 
+void TimeLineWidget::contextMenuEvent(QContextMenuEvent*)
+{
+	QMenu contextMenu(tr("Timeline"), this);
+	QAction selectLoopPoints(tr("Select between loop points"), this);
+	connect(&selectLoopPoints, &QAction::triggered, this, [this](){
+		emit regionSelectedFromPixels(
+			m_xOffset + m_loopPos[0] * m_ppb / TimePos::ticksPerBar(),
+			m_xOffset + m_loopPos[1] * m_ppb / TimePos::ticksPerBar()
+		);
+		emit selectionFinished();
+	});
+	contextMenu.addAction(&selectLoopPoints);
+	contextMenu.exec( QCursor::pos() );
+}
+
+
+
+
 void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 {
-	if( event->x() < m_xOffset )
+	auto button = event->button();
+	auto mods = event->modifiers();
+	
+	if (event->x() < m_xOffset) { return; }
+	if (mods & Qt::ShiftModifier)
 	{
-		return;
-	}
-	if( event->button() == Qt::LeftButton  && !(event->modifiers() & Qt::ShiftModifier) )
-	{
-		m_action = MovePositionMarker;
-		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
-		{
-			m_moveXOff = event->x() - m_xOffset;
-		}
-		else
-		{
-			m_moveXOff = s_posMarkerPixmap->width() / 2;
+		if (button == Qt::LeftButton) { m_action = MoveLoopBegin; }
+		if (button == Qt::RightButton) {
+			m_action = MoveLoopEnd;
 		}
 	}
-	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) )
+	else if (button == Qt::LeftButton && mods == Qt::ControlModifier)
 	{
 		m_action = SelectSongTCO;
 		m_initalXSelect = event->x();
 	}
-	else if( event->button() == Qt::RightButton )
+	else if (button == Qt::RightButton && mods == Qt::ControlModifier)
 	{
 		m_moveXOff = s_posMarkerPixmap->width() / 2;
 		const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
@@ -349,6 +365,19 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 
 		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
+	else if (button == Qt::LeftButton)
+	{
+		m_action = MovePositionMarker;
+		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
+		{
+			m_moveXOff = event->x() - m_xOffset;
+		}
+		else
+		{
+			m_moveXOff = s_posMarkerPixmap->width() / 2;
+		}
+	}
+	else if (button == Qt::RightButton) { contextMenuEvent(nullptr); }
 
 	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
 	{
