@@ -567,6 +567,9 @@ float SaProcessor::getFreqRangeMax() const
 
 
 // Map frequency to pixel x position on a display of given width.
+// NOTE: Results of this function may be cached by SaSpectrumView. If you use
+// a new function call or variable that can affect results of this function,
+// make sure to also add it as a trigger for cache update in SaSpectrumView.
 float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
