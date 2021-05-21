@@ -52,7 +52,8 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_cachedRangeMax(-1),
 	m_cachedLogX(true),
 	m_cachedDisplayWidth(0),
-	m_cachedBinCount(0)
+	m_cachedBinCount(0),
+	m_cachedSampleRate(0)
 {
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -362,13 +363,15 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	float rangeMin = m_processor->getFreqRangeMin(m_controls->m_logXModel.value());
 	float rangeMax = m_processor->getFreqRangeMax();
 	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax || m_displayWidth != m_cachedDisplayWidth ||
-		m_controls->m_logXModel.value() != m_cachedLogX || m_processor->binCount() + 1 != m_cachedBinCount)
+		m_controls->m_logXModel.value() != m_cachedLogX || m_processor->binCount() + 1 != m_cachedBinCount ||
+		m_processor->getSampleRate() != m_cachedSampleRate)
 	{
 		m_cachedRangeMin = rangeMin;
 		m_cachedRangeMax = rangeMax;
 		m_cachedDisplayWidth = m_displayWidth;
 		m_cachedLogX = m_controls->m_logXModel.value();
 		m_cachedBinCount = m_processor->binCount() + 1;
+		m_cachedSampleRate = m_processor->getSampleRate();
 		for (unsigned int n = 0; n < m_cachedBinCount; n++)
 		{
 			m_cachedBinToX[n] = freqToXPixel(binToFreq(n), m_displayWidth);

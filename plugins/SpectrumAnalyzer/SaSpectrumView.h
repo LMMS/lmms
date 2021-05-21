@@ -128,6 +128,7 @@ private:
 	bool m_cachedLogX;
 	unsigned int m_cachedDisplayWidth;
 	unsigned int m_cachedBinCount;
+	unsigned int m_cachedSampleRate;
 
 	#ifdef SA_DEBUG
 		float m_execution_avg;
