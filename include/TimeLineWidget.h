@@ -236,6 +236,8 @@ private:
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
+		MoveLoopClosest,
+		DragLoop,
 		SelectSongTCO,
 	} m_action;
 
