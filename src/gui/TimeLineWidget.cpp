@@ -466,6 +466,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			if (unquantized) { m_loopPos[1] = t; }
 			else { m_loopPos[1] = t.quantize(1.0); }
 			update();
+			break;
 		}
 		case SelectSongTCO:
 			emit regionSelectedFromPixels(m_initalXSelect , event->x());
