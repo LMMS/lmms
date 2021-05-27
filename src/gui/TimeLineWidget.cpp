@@ -393,7 +393,6 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	if (m_action == SelectSongTCO || m_action == DragLoop)
 	{
 		m_initalXSelect = event->x();
-		if (m_action == DragLoop){  }
 	}
 
 	// Notify the user if they can disable quantization
@@ -470,7 +469,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		}
 		case SelectSongTCO:
 			emit regionSelectedFromPixels(m_initalXSelect , event->x());
-		break;
+			break;
 
 		default:
 			break;
