@@ -24,14 +24,14 @@
  */
 
 #include "NotePlayHandle.h"
+
+#include "lmms_constants.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "Mixer.h"
 #include "Song.h"
-
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
@@ -516,19 +516,30 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 
 void NotePlayHandle::updateFrequency()
 {
-	int mp = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
-	const float pitch =
-		( key() -
-				m_instrumentTrack->baseNoteModel()->value() +
-				mp +
-				m_baseDetuning->value() )
-												 / 12.0f;
-	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
-	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
+	int masterPitch = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
+	int baseNote = m_instrumentTrack->baseNoteModel()->value();
+	float detune = m_baseDetuning->value();
+	float instrumentPitch = m_instrumentTrack->pitchModel()->value();
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	if (m_instrumentTrack->m_microtuner.enabled())
 	{
-		( *it )->updateFrequency();
+		// custom key mapping and scale: get frequency from the microtuner
+		const float detuneMaster = detune + masterPitch;
+		const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key());
+		m_frequency = frequency * powf(2.f, (detuneMaster + instrumentPitch / 100) / 12.f);
+		m_unpitchedFrequency = frequency * powf(2.f, detuneMaster / 12.f);
+	}
+	else
+	{
+		// default key mapping and 12-TET frequency computation with default 440 Hz base note frequency
+		const float pitch = (key() - baseNote + masterPitch + detune) / 12.0f;
+		m_frequency = DefaultBaseFreq * powf(2.0f, pitch + instrumentPitch / (100 * 12.0f));
+		m_unpitchedFrequency = DefaultBaseFreq * powf(2.0f, pitch);
+	}
+
+	for (auto it : m_subNotes)
+	{
+		it->updateFrequency();
 	}
 }
 

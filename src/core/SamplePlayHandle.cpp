@@ -27,6 +27,7 @@
 #include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "lmms_constants.h"
 #include "Mixer.h"
 #include "SampleTCO.h"
 
@@ -110,10 +111,11 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 /*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
-		if( ! m_sampleBuffer->play( workingBuffer, &m_state, frames,
-								BaseFreq ) )
+		// SamplePlayHandle always plays the sample at its original pitch;
+		// it is used only for previews, SampleTracks and the metronome.
+		if (!m_sampleBuffer->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
-			memset( workingBuffer, 0, frames * sizeof( sampleFrame ) );
+			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
 		}
 	}
 

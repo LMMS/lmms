@@ -109,8 +109,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_soundShaping( this ),
 	m_arpeggio( this ),
 	m_noteStacking( this ),
-	m_piano(this)
-//	m_microtuner(this)
+	m_piano(this),
+	m_microtuner(this)
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -155,17 +155,17 @@ int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 
-	return m_baseNoteModel.value() - mp;
+	return m_microtuner.baseKey() - mp;
 }
 
 int InstrumentTrack::firstKey() const
 {
-	return m_firstKeyModel.value();
+	return m_microtuner.firstKey();
 }
 
 int InstrumentTrack::lastKey() const
 {
-	return m_lastKeyModel.value();
+	return m_microtuner.lastKey();
 }
 
 
@@ -790,6 +790,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_firstKeyModel.saveSettings(doc, thisElement, "firstkey");
 	m_lastKeyModel.saveSettings(doc, thisElement, "lastkey");
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
+	m_microtuner.saveSettings(doc, thisElement);
 
 	// Save MIDI CC stuff
 	m_midiCCEnable->saveSettings(doc, thisElement, "enablecc");
@@ -856,6 +857,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_firstKeyModel.loadSettings(thisElement, "firstkey");
 	m_lastKeyModel.loadSettings(thisElement, "lastkey");
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
+	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();

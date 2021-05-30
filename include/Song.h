@@ -25,6 +25,7 @@
 #ifndef SONG_H
 #define SONG_H
 
+#include <memory>
 #include <utility>
 
 #include <QtCore/QSharedMemory>
@@ -34,8 +35,11 @@
 
 #include "TrackContainer.h"
 #include "Controller.h"
+#include "Keymap.h"
+#include "lmms_constants.h"
 #include "MeterModel.h"
 #include "Mixer.h"
+#include "Scale.h"
 #include "VstSyncController.h"
 
 
@@ -350,6 +354,11 @@ public:
 
 	bool isSavingProject() const;
 
+	std::shared_ptr<const Scale> getScale(unsigned int index) const;
+	std::shared_ptr<const Keymap> getKeymap(unsigned int index) const;
+	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
+	void setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap);
+
 public slots:
 	void playSong();
 	void record();
@@ -416,6 +425,12 @@ private:
 
 	void removeAllControllers();
 
+	void saveScaleStates(QDomDocument &doc, QDomElement &element);
+	void restoreScaleStates(const QDomElement &element);
+
+	void saveKeymapStates(QDomDocument &doc, QDomElement &element);
+	void restoreKeymapStates(const QDomElement &element);
+
 	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
 
 	void setModified(bool value);
@@ -475,6 +490,9 @@ private:
 	TimePos m_exportSongEnd;
 	TimePos m_exportEffectiveLength;
 
+	std::shared_ptr<Scale> m_scales[MaxScaleCount];
+	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
+
 	AutomatedValueMap m_oldAutomatedValues;
 
 	friend class LmmsCore;
@@ -495,6 +513,8 @@ signals:
 	void stopped();
 	void modified();
 	void projectFileNameChanged();
+	void scaleListChanged(int index);
+	void keymapListChanged(int index);
 } ;
 
 
