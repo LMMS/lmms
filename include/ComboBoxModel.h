@@ -25,6 +25,7 @@
 #ifndef COMBOBOX_MODEL_H
 #define COMBOBOX_MODEL_H
 
+#include <cassert>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -51,6 +52,8 @@ public:
 	}
 
 	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
+
+	void replaceItem(std::size_t index, QString item, std::unique_ptr<PixmapLoader> loader = nullptr);
 
 	void clear();
 
