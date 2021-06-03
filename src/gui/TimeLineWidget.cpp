@@ -387,7 +387,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		const bool quant = !(mods == (Qt::ControlModifier | Qt::ShiftModifier));
 		
-		m_loopPos[0] = quant ? t.quantize(1.0) : t;
+		m_loopPos[0] = quant ? t.quantize(m_snapSize) : t;
 		m_loopPos[1] = t + (quant ? TimePos::ticksPerBar() : 1);
 	}
 	
@@ -447,7 +447,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		{
 			const int i = m_action == MoveLoopBegin ? 0 : 1;
 			if (unquantized) { m_loopPos[i] = t; }
-			else { m_loopPos[i] = t.quantize(1.0); }
+			else { m_loopPos[i] = t.quantize(m_snapSize); }
 			// Catch begin == end
 			if (m_loopPos[0] == m_loopPos[1])
 			{
@@ -468,7 +468,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case DragLoop:
 		{
 			if (unquantized) { m_loopPos[1] = t; }
-			else { m_loopPos[1] = t.quantize(1.0); }
+			else { m_loopPos[1] = t.quantize(m_snapSize); }
 			update();
 			break;
 		}
