@@ -63,6 +63,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_xOffset( xoff ),
 	m_posMarkerX( 0 ),
 	m_ppb( ppb ),
+	m_snapSize( 1.0 ),
 	m_pos( pos ),
 	m_begin( begin ),
 	m_mode( mode ),
@@ -94,7 +95,9 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( update() ) );
-					
+	
+	// Required to prevent modified right click from triggering the context menu
+	// Instead, manually trigger the context menu on unmodified right clicks
 	setContextMenuPolicy(Qt::PreventContextMenu);
 }
 
@@ -319,7 +322,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent*)
 		emit selectionFinished();
 	});
 	contextMenu.addAction(&selectLoopPoints);
-	contextMenu.exec( QCursor::pos() );
+	contextMenu.exec(QCursor::pos());
 }
 
 
@@ -343,7 +346,8 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	if (event->x() < m_xOffset) { return; }
 	
 	// Choose an action based on input event and user's bindings
-	else if (button == Qt::LeftButton) {
+	else if (button == Qt::LeftButton)
+	{
 		if (mods & Qt::ShiftModifier){ m_action = leftShiftAction; }
 		else if (mods == Qt::ControlModifier){ m_action = leftCtrlAction; }
 		// Handles moving playhead
@@ -357,7 +361,8 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 			else { m_moveXOff = s_posMarkerPixmap->width() / 2; }
 		}
 	}
-	else if (button == Qt::RightButton) {
+	else if (button == Qt::RightButton)
+	{
 		if (mods & Qt::ShiftModifier){ m_action = rightShiftAction; }
 		else if (mods == Qt::ControlModifier){ m_action = rightCtrlAction; }
 		else { contextMenuEvent(nullptr); }
@@ -396,12 +401,12 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	}
 
 	// Notify the user if they can disable quantization
-	if (mods & Qt::ShiftModifier)
+	if (m_action != MovePositionMarker && m_action != NoAction)
 	{
 		delete m_hint;
-		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-			tr( "Hold <%1> to disable quantization." ).arg(UI_CTRL_KEY),
-			embed::getIconPixmap( "hint" ), 0 );
+		m_hint = TextFloat::displayMessage(tr("Hint"),
+			tr("Hold <%1> and <Shift> to disable quantization.").arg(UI_CTRL_KEY),
+			embed::getIconPixmap("hint"), 0);
 	}
 	mouseMoveEvent(event);
 }
@@ -413,8 +418,13 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
 	const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
-	// Fine adjust when both ctrl and shift are held
+	// Fine adjust when both ctrl and shift are held, hide ctrl+shift hint
 	bool unquantized = event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
+	if (unquantized)
+	{
+		delete m_hint;
+		m_hint = NULL;
+	}
 
 	switch (m_action)
 	{
@@ -436,13 +446,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopEnd:
 		{
 			const int i = m_action == MoveLoopBegin ? 0 : 1;
-			if (unquantized)
-			{
-				// no ctrl-press-hint when having ctrl pressed
-				delete m_hint;
-				m_hint = NULL;
-				m_loopPos[i] = t;
-			}
+			if (unquantized) { m_loopPos[i] = t; }
 			else { m_loopPos[i] = t.quantize(1.0); }
 			// Catch begin == end
 			if (m_loopPos[0] == m_loopPos[1])
