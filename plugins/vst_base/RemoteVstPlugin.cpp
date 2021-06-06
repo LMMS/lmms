@@ -52,12 +52,38 @@
 #include <sched.h>
 #endif
 
+#ifndef NATIVE_LINUX_VST
 #include <wine/exception.h>
+#endif
 
 #endif
 
 #define USE_WS_PREFIX
+#ifndef NATIVE_LINUX_VST
 #include <windows.h>
+#else
+#include <dlfcn.h>
+#include <pthread.h>
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <X11/Xos.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
+#include <sstream>
+
+// https://stackoverflow.com/questions/22476110/c-compiling-error-including-x11-x-h-x11-xlib-h
+#undef Bool
+#undef CursorShape
+#undef Expose
+#undef KeyPress
+#undef KeyRelease
+#undef FocusIn
+#undef FocusOut
+#undef FontChange
+#undef None
+#undef Status
+#undef Unsorte
+#endif
 
 #ifdef USE_MINGW_THREADS_REPLACEMENT
 #	include <mingw.mutex.h>
@@ -122,10 +148,14 @@ class RemoteVstPlugin;
 
 RemoteVstPlugin * __plugin = NULL;
 
+#ifndef NATIVE_LINUX_VST
 HWND __MessageHwnd = NULL;
 DWORD __processingThreadId = 0;
+#else
+pthread_t __processingThreadId = 0;
+#endif
 
-
+#ifndef NATIVE_LINUX_VST
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
 std::string GetErrorAsString(DWORD errorMessageID)
 {
@@ -144,7 +174,7 @@ std::string GetErrorAsString(DWORD errorMessageID)
 
 	return message;
 }
-
+#endif
 
 class RemoteVstPlugin : public RemotePluginClient
 {
@@ -333,13 +363,26 @@ public:
 
 	void idle();
 	void processUIThreadMessages();
+	void sendX11Idle();
 
+#ifndef NATIVE_LINUX_VST
 	static DWORD WINAPI processingThread( LPVOID _param );
+#else
+	static void * processingThread2( void * _param );
+#endif
+	
 	static bool setupMessageWindow();
+	
+#ifndef NATIVE_LINUX_VST
 	static DWORD WINAPI guiEventLoop();
+#else
+	void guiEventLoop();
+#endif
+	
+#ifndef NATIVE_LINUX_VST
 	static LRESULT CALLBACK wndProc( HWND hwnd, UINT uMsg,
 					WPARAM wParam, LPARAM lParam );
-
+#endif
 
 private:
 	enum GuiThreadMessages
@@ -389,10 +432,23 @@ private:
 
 	std::string m_shortName;
 
+#ifndef NATIVE_LINUX_VST
 	HINSTANCE m_libInst;
+#else
+	void* m_libInst;
+#endif
 
 	AEffect * m_plugin;
+#ifndef NATIVE_LINUX_VST
 	HWND m_window;
+#else
+	Window m_window;
+	Display* m_display;
+	Atom wmDeleteMessage;
+	Atom lmmsUiEvent;
+	Atom lmmsX11GiveIdle;
+	bool m_x11WindowVisible = false;
+#endif
 	intptr_t m_windowID;
 	int m_windowWidth;
 	int m_windowHeight;
@@ -551,7 +607,11 @@ RemoteVstPlugin::~RemoteVstPlugin()
 
 	if( m_libInst != NULL )
 	{
+#ifndef NATIVE_LINUX_VST
 		FreeLibrary( m_libInst );
+#else
+		dlclose( m_libInst );
+#endif
 		m_libInst = NULL;
 	}
 
@@ -577,7 +637,12 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			return true;
 
 		case IdToggleUI:
+			debugMessage("toogle 5");
+#ifndef NATIVE_LINUX_VST
 			if( m_window && IsWindowVisible( m_window ) )
+#else
+			if (m_window && m_x11WindowVisible)
+#endif
 			{
 				hideEditor();
 			}
@@ -585,10 +650,16 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			{
 				showEditor();
 			}
+
 			return true;
 
 		case IdIsUIVisible:
+			debugMessage("is visible?");
+#ifndef NATIVE_LINUX_VST			
 			bool visible = m_window && IsWindowVisible( m_window );
+#else
+			bool visible = m_window && m_x11WindowVisible;
+#endif
 			sendMessage( message( IdIsUIVisible )
 						 .addInt( visible ? 1 : 0 ) );
 			return true;
@@ -596,8 +667,10 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 	}
 	else if (EMBED && _m.id == IdShowUI)
 	{
+#ifndef NATIVE_LINUX_VST		
 		ShowWindow( m_window, SW_SHOWNORMAL );
 		UpdateWindow( m_window );
+#endif
 		return true;
 	}
 
@@ -728,8 +801,8 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	sendMessage( message( IdVstPluginEditorGeometry ).
 						addInt( m_windowWidth ).
 						addInt( m_windowHeight ) );
-
 	sendMessage( message( IdVstPluginName ).addString( pluginName() ) );
+	debugMessage( std::string("plugin name: ") + pluginName() + "\n" );
 	sendMessage( message( IdVstPluginVersion ).addInt( pluginVersion() ) );
 	sendMessage( message( IdVstPluginVendorString ).
 					addString( pluginVendorString() ) );
@@ -740,6 +813,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 	sendMessage( IdInitDone );
 
+	debugMessage( "initialization done\n" );
 	m_initialized = true;
 }
 
@@ -765,7 +839,7 @@ void RemoteVstPlugin::initEditor()
 		return;
 	}
 
-
+#ifndef NATIVE_LINUX_VST
 	HMODULE hInst = GetModuleHandle( NULL );
 	if( hInst == NULL )
 	{
@@ -812,6 +886,46 @@ void RemoteVstPlugin::initEditor()
 	// 64-bit versions of Windows use 32-bit handles for interoperability
 	m_windowID = (intptr_t) m_window;
 #endif
+
+#else
+	XEvent e;
+	Atom prop_atom, val_atom;
+	
+	if (m_display == NULL)
+		m_display = XOpenDisplay(NULL);
+	m_window = XCreateSimpleWindow(m_display, DefaultRootWindow(m_display), 0, 0, 400, 400, 0, 0, 0);
+	
+	wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", false);
+	XSetWMProtocols(m_display, m_window, &wmDeleteMessage, 1);
+	lmmsUiEvent = XInternAtom(m_display, "_APP_EVT", false);
+	lmmsX11GiveIdle = XInternAtom(m_display, "_APP_EVT_IDLE", false);
+	
+	// make tool window
+	prop_atom = XInternAtom(m_display, "_NET_WM_WINDOW_TYPE", False);
+	val_atom = XInternAtom(m_display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+	XChangeProperty(m_display, m_window, prop_atom, XA_ATOM, 32, PropModeReplace, (unsigned char *)&val_atom, 1);
+	
+	// change name
+	XStoreName(m_display, m_window, "LVSL");
+	
+	ERect * er;
+	pluginDispatch( effEditGetRect, 0, 0, &er );
+
+	m_windowWidth = er->right - er->left;
+	m_windowHeight = er->bottom - er->top;
+	XResizeWindow(m_display, m_window, m_windowWidth, m_windowHeight);
+	
+	XMapWindow(m_display, m_window);
+	XFlush(m_display);
+	
+	pluginDispatch( effEditOpen, 0, (intptr_t) m_display, (void*) m_window );
+	
+	XSelectInput(m_display, m_window, SubstructureNotifyMask | ButtonPressMask | ButtonReleaseMask
+			| ButtonMotionMask | ExposureMask | KeyPressMask);
+	
+	pluginDispatch( effEditTop );
+	m_x11WindowVisible = true;
+#endif
 }
 
 
@@ -820,7 +934,14 @@ void RemoteVstPlugin::initEditor()
 void RemoteVstPlugin::showEditor() {
 	if( !EMBED && !HEADLESS && m_window )
 	{
+#ifndef NATIVE_LINUX_VST
 		ShowWindow( m_window, SW_SHOWNORMAL );
+#else
+		debugMessage("show editor");
+		XMapWindow(m_display, m_window);
+		XFlush(m_display);
+		m_x11WindowVisible = true;
+#endif
 	}
 }
 
@@ -830,7 +951,14 @@ void RemoteVstPlugin::showEditor() {
 void RemoteVstPlugin::hideEditor() {
 	if( !EMBED && !HEADLESS && m_window )
 	{
+#ifndef NATIVE_LINUX_VST		
 		ShowWindow( m_window, SW_HIDE );
+#else
+		debugMessage("hide editor");
+		XUnmapWindow(m_display, m_window);
+		XFlush(m_display);
+		m_x11WindowVisible = false;
+#endif
 	}
 }
 
@@ -839,6 +967,7 @@ void RemoteVstPlugin::hideEditor() {
 
 void RemoteVstPlugin::destroyEditor()
 {
+	debugMessage("destroy editor");
 	if( m_window == NULL )
 	{
 		return;
@@ -846,7 +975,11 @@ void RemoteVstPlugin::destroyEditor()
 
 	pluginDispatch( effEditClose );
 	// Destroying the window takes some time in Wine 1.8.5
+#ifndef NATIVE_LINUX_VST	
 	DestroyWindow( m_window );
+#else
+	XCloseDisplay(m_display);
+#endif
 	m_window = NULL;
 }
 
@@ -855,15 +988,24 @@ void RemoteVstPlugin::destroyEditor()
 
 bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
+#ifndef NATIVE_LINUX_VST
 	if( ( m_libInst = LoadLibraryW( toWString(_plugin_file).c_str() ) ) == NULL )
 	{
 		DWORD error = GetLastError();
 		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );
 		return false;
 	}
+#else
+	m_libInst = dlopen(_plugin_file.c_str(), RTLD_LAZY);
+	if ( m_libInst == NULL) {
+		debugMessage( std::string("LoadLibrary failed: ") + dlerror() );
+		return false;
+	}
+#endif
 
 	typedef AEffect * ( VST_CALL_CONV * mainEntryPointer )
 						( audioMasterCallback );
+#ifndef NATIVE_LINUX_VST
 	mainEntryPointer mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "VSTPluginMain" );
 	if( mainEntry == NULL )
@@ -876,12 +1018,20 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "main" );
 	}
+#else
+	mainEntryPointer mainEntry = (mainEntryPointer) dlsym(m_libInst, "VSTPluginMain");
+	if( mainEntry == NULL )
+		mainEntry = (mainEntryPointer) dlsym(m_libInst, "VstPluginMain");
+	if( mainEntry == NULL )
+		mainEntry = (mainEntryPointer) dlsym(m_libInst, "main");
+#endif
+	
 	if( mainEntry == NULL )
 	{
 		debugMessage( "could not find entry point\n" );
 		return false;
 	}
-
+	
 	m_plugin = mainEntry( hostCallback );
 	if( m_plugin == NULL )
 	{
@@ -1550,7 +1700,11 @@ int RemoteVstPlugin::updateInOutCount()
 		return 1;
 	}
 	
+#ifndef NATIVE_LINUX_VST
 	if( GetCurrentThreadId() == __processingThreadId )
+#else
+	if( pthread_equal(pthread_self(), __processingThreadId) )
+#endif
 	{
 		debugMessage( "Plugin requested I/O change from processing "
 			"thread. Request denied; stability may suffer.\n" );
@@ -1643,7 +1797,11 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			SHOW_CALLBACK ("amc: audioMasterIdle\n" );
 			// call application idle routine (this will
 			// call effEditIdle for all open editors too)
+#ifndef NATIVE_LINUX_VST
 			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+#else
+			__plugin->sendX11Idle();
+#endif
 			return 0;
 
 		case audioMasterPinConnected:
@@ -1838,6 +1996,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			{
 				return 0;
 			}
+#ifndef NATIVE_LINUX_VST
 			__plugin->m_windowWidth = _index;
 			__plugin->m_windowHeight = _value;
 			HWND window = __plugin->m_window;
@@ -1853,6 +2012,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 				message( IdVstPluginEditorGeometry ).
 					addInt( __plugin->m_windowWidth ).
 					addInt( __plugin->m_windowHeight ) );
+#endif
 			return 1;
 		}
 
@@ -1963,7 +2123,11 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 		case audioMasterUpdateDisplay:
 			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
+#ifndef NATIVE_LINUX_VST
 			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
+#else
+			__plugin->sendX11Idle();
+#endif
 			return 0;
 
 #if kVstVersion > 2
@@ -2030,22 +2194,47 @@ void RemoteVstPlugin::processUIThreadMessages()
 	setProcessing( false );
 }
 
-
-
-
-DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
+#ifdef NATIVE_LINUX_VST
+void RemoteVstPlugin::sendX11Idle()
 {
-	__processingThreadId = GetCurrentThreadId();
+	if (m_window != NULL)
+	{
+	XEvent evt;
+	evt.xclient.type = ClientMessage;
+	evt.xclient.serial = 0;
+	evt.xclient.send_event = true;
+	evt.xclient.message_type = lmmsX11GiveIdle;
+	evt.xclient.format = 32;
+	evt.xclient.window = m_window;
+	XSendEvent(m_display, m_window, true, NoEventMask, &evt);
+	XFlush(m_display);
+	}
+}
+#endif
 
+
+#ifndef NATIVE_LINUX_VST
+DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
+#else
+void * RemoteVstPlugin::processingThread2(void * _param)
+#endif
+{
+	#ifndef NATIVE_LINUX_VST
+	__processingThreadId = GetCurrentThreadId();
+	#else
+	__processingThreadId = pthread_self();
+	#endif
+	
 	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
 
 	RemotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
         {
+		
 		if( m.id == IdStartProcessing
 			|| m.id == IdMidiEvent
 			|| m.id == IdVstSetParameter
-			|| m.id == IdVstSetTempo )
+			|| m.id == IdVstSetTempo)
 		{
 			_this->processMessage( m );
 		}
@@ -2056,24 +2245,46 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 		}
 		else
 		{
+#ifndef NATIVE_LINUX_VST
 			PostMessage( __MessageHwnd,
 					WM_USER,
 					ProcessPluginMessage,
 					(LPARAM) new message( m ) );
+#else
+		//_this->processMessage( m );
+		
+		//_this->debugMessage("wysylaie");
+		if (_this->m_window != NULL)
+		{
+		XEvent evt;
+		evt.xclient.type = ClientMessage;
+		evt.xclient.serial = 0;
+		evt.xclient.send_event = true;
+		evt.xclient.message_type = _this->lmmsUiEvent;
+		evt.xclient.format = 32;
+		evt.xclient.window = _this->m_window;
+		//evt.xclient.data.l[0] = XInternAtom(_this->m_display, "_APP_EVT_PTR", false);
+		uintptr_t val = uintptr_t(new message( m ));
+		//std::stringstream ss;
+		//ss << val;
+		//_this->debugMessage("wyslane: " + ss.str());
+		//https://stackoverflow.com/questions/2810280/how-to-store-a-64-bit-integer-in-two-32-bit-integers-and-convert-back-again
+		//evt.xclient.data.l[0] = val;
+		evt.xclient.data.l[0] = (uint32_t)((val & 0xFFFFFFFF00000000LL) >> 32);
+		evt.xclient.data.l[1] = (uint32_t)(val & 0xFFFFFFFFLL);
+		//evt.xclient.data.l[0] = _this->lmmsUiEvent;
+		XSendEvent(_this->m_display, _this->m_window, true, NoEventMask, &evt);
+		XFlush(_this->m_display);
+		}
+#endif
 		}
 	}
-
-	// notify GUI thread about shutdown
-	PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
-
-	return 0;
 }
-
-
 
 
 bool RemoteVstPlugin::setupMessageWindow()
 {
+#ifndef NATIVE_LINUX_VST
 	HMODULE hInst = GetModuleHandle( NULL );
 	if( hInst == NULL )
 	{
@@ -2087,13 +2298,13 @@ bool RemoteVstPlugin::setupMessageWindow()
 								hInst, NULL );
 	// install GUI update timer
 	SetTimer( __MessageHwnd, 1000, 50, NULL );
-
+#endif
 	return true;
 }
 
 
 
-
+#ifndef NATIVE_LINUX_VST
 DWORD WINAPI RemoteVstPlugin::guiEventLoop()
 {
 	MSG msg;
@@ -2105,10 +2316,62 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop()
 
 	return 0;
 }
+#else
+void RemoteVstPlugin::guiEventLoop()
+{
+	XEvent e;
+	while(true)
+	{
+		if (XQLength(m_display) > 0) {
+		XNextEvent(m_display, &e);
+		
+		if (e.type == ClientMessage)
+		{
+			if (m_window == NULL || e.xclient.window != m_window)
+				continue;
+			if (e.xclient.message_type == lmmsX11GiveIdle)
+			{
+				//debugMessage("idle!!!");
+				if (__plugin->isInitialized())
+					__plugin->idle();
+				return;
+			}
+			if (e.xclient.message_type == lmmsUiEvent)
+			{
+				//debugMessage("zdarzenie!!!");
+				//uintptr_t mptr = ((uintptr_t)e.xclient.data.l[0]) << 32 | e.xclient.data.l[1];
+				uintptr_t mptr = ((uintptr_t)e.xclient.data.l[0] << 32);
+				mptr = mptr | e.xclient.data.l[1];
+				//std::stringstream ss;
+				//ss << mptr;
+				//debugMessage("znalezione " +ss.str());
+				message * m = (message *) mptr;
+				if(__plugin->isInitialized())
+					__plugin->queueMessage( *m );
+				delete m;
+				if(__plugin->isInitialized() && !__plugin->isProcessing() )
+				{
+					__plugin->processUIThreadMessages();
+				}
+				
+			}
+			else if (e.xclient.data.l[0] == wmDeleteMessage)
+			{
+				//m_window = NULL;
+				debugMessage("Hide editor");
+				hideEditor();
+			}
+		} 
+		}
+		/*else
+			if (__plugin->isInitialized())
+				__plugin->idle();*/
+	}
+}
+#endif
 
 
-
-
+#ifndef NATIVE_LINUX_VST
 LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 						WPARAM wParam, LPARAM lParam )
 {
@@ -2155,7 +2418,7 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 	return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
 
-
+#endif
 
 
 int main( int _argc, char * * _argv )
@@ -2169,8 +2432,11 @@ int main( int _argc, char * * _argv )
 		fprintf( stderr, "not enough arguments\n" );
 		return -1;
 	}
-
+#ifndef NATIVE_LINUX_VST
 	OleInitialize(nullptr);
+#else
+	XInitThreads();
+#endif
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
 	// try to set realtime-priority
@@ -2188,6 +2454,7 @@ int main( int _argc, char * * _argv )
 	}
 #endif
 
+#ifndef NATIVE_LINUX_VST
 	HMODULE hInst = GetModuleHandle( NULL );
 	if( hInst == NULL )
 	{
@@ -2211,6 +2478,7 @@ int main( int _argc, char * * _argv )
 		return -1;
 	}
 
+#endif
 	{
 	#ifdef SYNC_WITH_SHM_FIFO
 		int embedMethodIndex = 3;
@@ -2265,20 +2533,27 @@ int main( int _argc, char * * _argv )
 		{
 			return -1;
 		}
+#ifndef NATIVE_LINUX_VST
 		if( CreateThread( NULL, 0, RemoteVstPlugin::processingThread,
 						__plugin, 0, NULL ) == NULL )
+#else
+		int err = 0;
+		err = pthread_create(&__processingThreadId, NULL, &RemoteVstPlugin::processingThread2, __plugin);
+		if (err != 0)
+#endif
 		{
 			__plugin->debugMessage( "could not create "
 							"processingThread\n" );
 			return -1;
 		}
-		RemoteVstPlugin::guiEventLoop();
+		
+		__plugin->guiEventLoop();
 	}
-
-
+	
 	delete __plugin;
-
+#ifndef NATIVE_LINUX_VST
 	OleUninitialize();
+#endif
 	return 0;
 
 }

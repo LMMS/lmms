@@ -682,6 +682,7 @@ void VestigeInstrumentView::openPlugin()
 	QStringList types;
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
+		<< tr( "SO-files (*.so)" )
 		;
 	ofd.setNameFilters( types );
 

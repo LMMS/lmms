@@ -29,7 +29,11 @@
 #include <stdint.h>
 
 // Calling convention
+#ifndef NATIVE_LINUX_VST
 #define VST_CALL_CONV __cdecl
+#else
+#define VST_CALL_CONV 
+#endif
 
 #define CCONST(a, b, c, d)( ( ( (int32_t) a ) << 24 ) |		\
 				( ( (int32_t) b ) << 16 ) |		\
