@@ -40,7 +40,7 @@
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 #include "TrackView.h"
 
 
@@ -137,17 +137,17 @@ void TrackContentWidget::updateBackground()
  *  Adds a(nother) trackContentObjectView to our list of views.  We also
  *  check that our position is up-to-date.
  *
- * \param tcov The trackContentObjectView to add.
+ * \param clipv The trackContentObjectView to add.
  */
-void TrackContentWidget::addTCOView( TrackContentObjectView * tcov )
+void TrackContentWidget::addClipView( ClipView * clipv )
 {
-	TrackContentObject * tco = tcov->getTrackContentObject();
+	Clip * clip = clipv->getClip();
 
-	m_tcoViews.push_back( tcov );
+	m_clipViews.push_back( clipv );
 
-	tco->saveJournallingState( false );
+	clip->saveJournallingState( false );
 	changePosition();
-	tco->restoreJournallingState();
+	clip->restoreJournallingState();
 }
 
 
@@ -157,16 +157,16 @@ void TrackContentWidget::addTCOView( TrackContentObjectView * tcov )
  *
  *  Removes the given trackContentObjectView from our list of views.
  *
- * \param tcov The trackContentObjectView to add.
+ * \param clipv The trackContentObjectView to add.
  */
-void TrackContentWidget::removeTCOView( TrackContentObjectView * tcov )
+void TrackContentWidget::removeClipView( ClipView * clipv )
 {
-	tcoViewVector::iterator it = std::find( m_tcoViews.begin(),
-						m_tcoViews.end(),
-						tcov );
-	if( it != m_tcoViews.end() )
+	clipViewVector::iterator it = std::find( m_clipViews.begin(),
+						m_clipViews.end(),
+						clipv );
+	if( it != m_clipViews.end() )
 	{
-		m_tcoViews.erase( it );
+		m_clipViews.erase( it );
 		Engine::getSong()->setModified();
 	}
 }
@@ -179,8 +179,8 @@ void TrackContentWidget::removeTCOView( TrackContentObjectView * tcov )
  */
 void TrackContentWidget::update()
 {
-	for( tcoViewVector::iterator it = m_tcoViews.begin();
-				it != m_tcoViews.end(); ++it )
+	for( clipViewVector::iterator it = m_clipViews.begin();
+				it != m_clipViews.end(); ++it )
 	{
 		( *it )->setFixedHeight( height() - 1 );
 		( *it )->update();
@@ -204,11 +204,11 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		const int curBB = Engine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled( false );
 
-		// first show TCO for current BB...
-		for( tcoViewVector::iterator it = m_tcoViews.begin();
-						it != m_tcoViews.end(); ++it )
+		// first show Clip for current BB...
+		for( clipViewVector::iterator it = m_clipViews.begin();
+						it != m_clipViews.end(); ++it )
 		{
-		if( ( *it )->getTrackContentObject()->
+		if( ( *it )->getClip()->
 						startPosition().getBar() == curBB )
 			{
 				( *it )->move( 0, ( *it )->y() );
@@ -221,10 +221,10 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 			}
 		}
 		// ...then hide others to avoid flickering
-		for( tcoViewVector::iterator it = m_tcoViews.begin();
-					it != m_tcoViews.end(); ++it )
+		for( clipViewVector::iterator it = m_clipViews.begin();
+					it != m_clipViews.end(); ++it )
 		{
-			if( ( *it )->getTrackContentObject()->
+			if( ( *it )->getClip()->
 						startPosition().getBar() != curBB )
 			{
 				( *it )->hide();
@@ -245,31 +245,31 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 
 	setUpdatesEnabled( false );
-	for( tcoViewVector::iterator it = m_tcoViews.begin();
-						it != m_tcoViews.end(); ++it )
+	for( clipViewVector::iterator it = m_clipViews.begin();
+						it != m_clipViews.end(); ++it )
 	{
-		TrackContentObjectView * tcov = *it;
-		TrackContentObject * tco = tcov->getTrackContentObject();
+		ClipView * clipv = *it;
+		Clip * clip = clipv->getClip();
 
-		tco->changeLength( tco->length() );
+		clip->changeLength( clip->length() );
 
-		const int ts = tco->startPosition();
-		const int te = tco->endPosition()-3;
+		const int ts = clip->startPosition();
+		const int te = clip->endPosition()-3;
 		if( ( ts >= begin && ts <= end ) ||
 			( te >= begin && te <= end ) ||
 			( ts <= begin && te >= end ) )
 		{
-			tcov->move( static_cast<int>( ( ts - begin ) * ppb /
+			clipv->move( static_cast<int>( ( ts - begin ) * ppb /
 						TimePos::ticksPerBar() ),
-								tcov->y() );
-			if( !tcov->isVisible() )
+								clipv->y() );
+			if( !clipv->isVisible() )
 			{
-				tcov->show();
+				clipv->show();
 			}
 		}
 		else
 		{
-			tcov->move( -tcov->width()-10, tcov->y() );
+			clipv->move( -clipv->width()-10, clipv->y() );
 		}
 	}
 	setUpdatesEnabled( true );
@@ -303,14 +303,14 @@ TimePos TrackContentWidget::getPosition( int mouseX )
  */
 void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 {
-	TimePos tcoPos = getPosition( dee->pos().x() );
-	if( canPasteSelection( tcoPos, dee ) == false )
+	TimePos clipPos = getPosition( dee->pos().x() );
+	if( canPasteSelection( clipPos, dee ) == false )
 	{
 		dee->ignore();
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, "tco_" +
+		StringPairDrag::processDragEnterEvent( dee, "clip_" +
 						QString::number( getTrack()->type() ) );
 	}
 }
@@ -318,24 +318,24 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 
 
 
-/*! \brief Returns whether a selection of TCOs can be pasted into this
+/*! \brief Returns whether a selection of Clips can be pasted into this
  *
- * \param tcoPos the position of the TCO slot being pasted on
+ * \param clipPos the position of the Clip slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QDropEvent* de )
+bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QDropEvent* de )
 {
 	const QMimeData * mimeData = de->mimeData();
 
 	// If the source of the DropEvent is the current instance of LMMS we don't allow pasting in the same bar
 	// if it's another instance of LMMS we allow it
 	return de->source()
-		? canPasteSelection( tcoPos, mimeData )
-		: canPasteSelection( tcoPos, mimeData, true );
+		? canPasteSelection( clipPos, mimeData )
+		: canPasteSelection( clipPos, mimeData, true );
 }
 
 // Overloaded method to make it possible to call this method without a Drag&Drop event
-bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData* md , bool allowSameBar )
+bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md , bool allowSameBar )
 {
 	// For decodeKey() and decodeValue()
 	using namespace Clipboard;
@@ -345,20 +345,20 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData* md 
 	QString value = decodeValue( md );
 
 	// We can only paste into tracks of the same type
-	if( type != ( "tco_" + QString::number( t->type() ) ) ||
-		m_trackView->trackContainerView()->fixedTCOs() == true )
+	if( type != ( "clip_" + QString::number( t->type() ) ) ||
+		m_trackView->trackContainerView()->fixedClips() == true )
 	{
 		return false;
 	}
 
-	// value contains XML needed to reconstruct TCOs and place them
+	// value contains XML needed to reconstruct Clips and place them
 	DataFile dataFile( value.toUtf8() );
 
-	// Extract the metadata and which TCO was grabbed
+	// Extract the metadata and which Clip was grabbed
 	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
-	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
-	TimePos grabbedTCOPos = tcoPosAttr.value().toInt();
-	TimePos grabbedTCOBar = TimePos( grabbedTCOPos.getBar(), 0 );
+	QDomAttr clipPosAttr = metadata.attributeNode( "grabbedClipPos" );
+	TimePos grabbedClipPos = clipPosAttr.value().toInt();
+	TimePos grabbedClipBar = TimePos( grabbedClipPos.getBar(), 0 );
 
 	// Extract the track index that was originally clicked
 	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
@@ -371,20 +371,20 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData* md 
 	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
 	if( !allowSameBar && sourceTrackContainerId == t->trackContainer()->id() &&
-			tcoPos == grabbedTCOBar && currentTrackIndex == initialTrackIndex )
+			clipPos == grabbedClipBar && currentTrackIndex == initialTrackIndex )
 	{
 		return false;
 	}
 
-	// Extract the tco data
-	QDomElement tcoParent = dataFile.content().firstChildElement( "tcos" );
-	QDomNodeList tcoNodes = tcoParent.childNodes();
+	// Extract the clip data
+	QDomElement clipParent = dataFile.content().firstChildElement( "clips" );
+	QDomNodeList clipNodes = clipParent.childNodes();
 
-	// Determine if all the TCOs will land on a valid track
-	for( int i = 0; i < tcoNodes.length(); i++ )
+	// Determine if all the Clips will land on a valid track
+	for( int i = 0; i < clipNodes.length(); i++ )
 	{
-		QDomElement tcoElement = tcoNodes.item( i ).toElement();
-		int trackIndex = tcoElement.attributeNode( "trackIndex" ).value().toInt();
+		QDomElement clipElement = clipNodes.item( i ).toElement();
+		int trackIndex = clipElement.attributeNode( "trackIndex" ).value().toInt();
 		int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
 
 		// Track must be in TrackContainer's tracks
@@ -394,7 +394,7 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData* md 
 		}
 
 		// Track must be of the same type
-		auto startTrackType = tcoElement.attributeNode("trackType").value().toInt();
+		auto startTrackType = clipElement.attributeNode("trackType").value().toInt();
 		Track * endTrack = tracks.at( finalTrackIndex );
 		if( startTrackType != endTrack->type() )
 		{
@@ -405,32 +405,32 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData* md 
 	return true;
 }
 
-/*! \brief Pastes a selection of TCOs onto the track
+/*! \brief Pastes a selection of Clips onto the track
  *
- * \param tcoPos the position of the TCO slot being pasted on
+ * \param clipPos the position of the Clip slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::pasteSelection( TimePos tcoPos, QDropEvent * de )
+bool TrackContentWidget::pasteSelection( TimePos clipPos, QDropEvent * de )
 {
 	const QMimeData * mimeData = de->mimeData();
 
-	if( canPasteSelection( tcoPos, de ) == false )
+	if( canPasteSelection( clipPos, de ) == false )
 	{
 		return false;
 	}
 
 	// We set skipSafetyCheck to true because we already called canPasteSelection
-	return pasteSelection( tcoPos, mimeData, true );
+	return pasteSelection( clipPos, mimeData, true );
 }
 
 // Overloaded method so we can call it without a Drag&Drop event
-bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, bool skipSafetyCheck )
+bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, bool skipSafetyCheck )
 {
 	// For decodeKey() and decodeValue()
 	using namespace Clipboard;
 
 	// When canPasteSelection was already called before, skipSafetyCheck will skip this
-	if( !skipSafetyCheck && canPasteSelection( tcoPos, md ) == false )
+	if( !skipSafetyCheck && canPasteSelection( clipPos, md ) == false )
 	{
 		return false;
 	}
@@ -440,19 +440,19 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 
 	getTrack()->addJournalCheckPoint();
 
-	// value contains XML needed to reconstruct TCOs and place them
+	// value contains XML needed to reconstruct Clips and place them
 	DataFile dataFile( value.toUtf8() );
 
-	// Extract the tco data
-	QDomElement tcoParent = dataFile.content().firstChildElement( "tcos" );
-	QDomNodeList tcoNodes = tcoParent.childNodes();
+	// Extract the clip data
+	QDomElement clipParent = dataFile.content().firstChildElement( "clips" );
+	QDomNodeList clipNodes = clipParent.childNodes();
 
 	// Extract the track index that was originally clicked
 	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
 	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
 	int initialTrackIndex = tiAttr.value().toInt();
-	QDomAttr tcoPosAttr = metadata.attributeNode( "grabbedTCOPos" );
-	TimePos grabbedTCOPos = tcoPosAttr.value().toInt();
+	QDomAttr clipPosAttr = metadata.attributeNode( "grabbedClipPos" );
+	TimePos grabbedClipPos = clipPosAttr.value().toInt();
 
 	// Snap the mouse position to the beginning of the dropped bar, in ticks
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
@@ -470,52 +470,52 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 		}
 
 
-	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
+	// TODO -- Need to draw the hovericon either way, or ghost the Clips
 	// onto their final position.
 
 	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	// All patterns should be offset the same amount as the grabbed pattern
-	TimePos offset = TimePos(tcoPos - grabbedTCOPos);
+	TimePos offset = TimePos(clipPos - grabbedClipPos);
 	// Users expect clips to "fall" backwards, so bias the offset
 	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
 	offset = offset.quantize(snapSize);
 
-	// Get the leftmost TCO and fix the offset if it reaches below bar 0
-	TimePos leftmostPos = grabbedTCOPos;
-	for(int i = 0; i < tcoNodes.length(); ++i)
+	// Get the leftmost Clip and fix the offset if it reaches below bar 0
+	TimePos leftmostPos = grabbedClipPos;
+	for(int i = 0; i < clipNodes.length(); ++i)
 	{
-		QDomElement outerTCOElement = tcoNodes.item(i).toElement();
-		QDomElement tcoElement = outerTCOElement.firstChildElement();
+		QDomElement outerClipElement = clipNodes.item(i).toElement();
+		QDomElement clipElement = outerClipElement.firstChildElement();
 
-		TimePos pos = tcoElement.attributeNode("pos").value().toInt();
+		TimePos pos = clipElement.attributeNode("pos").value().toInt();
 
 		if(pos < leftmostPos) { leftmostPos = pos; }
 	}
-	// Fix offset if it sets the left most TCO to a negative position
+	// Fix offset if it sets the left most Clip to a negative position
 	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
 
-	for( int i = 0; i<tcoNodes.length(); i++ )
+	for( int i = 0; i<clipNodes.length(); i++ )
 	{
-		QDomElement outerTCOElement = tcoNodes.item( i ).toElement();
-		QDomElement tcoElement = outerTCOElement.firstChildElement();
+		QDomElement outerClipElement = clipNodes.item( i ).toElement();
+		QDomElement clipElement = outerClipElement.firstChildElement();
 
-		int trackIndex = outerTCOElement.attributeNode( "trackIndex" ).value().toInt();
+		int trackIndex = outerClipElement.attributeNode( "trackIndex" ).value().toInt();
 		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
 		Track * t = tracks.at( finalTrackIndex );
 
 		// The new position is the old position plus the offset.
-		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
+		TimePos pos = clipElement.attributeNode( "pos" ).value().toInt() + offset;
 		// If we land on ourselves, offset by one snap
 		TimePos shift = TimePos::ticksPerBar() * getGUI()->songEditor()->m_editor->getSnapSize();
 		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
 
-		TrackContentObject * tco = t->createTCO( pos );
-		tco->restoreState( tcoElement );
-		tco->movePosition(pos); // Because we restored the state, we need to move the TCO again.
+		Clip * clip = t->createClip( pos );
+		clip->restoreState( clipElement );
+		clip->movePosition(pos); // Because we restored the state, we need to move the Clip again.
 		if( wasSelection )
 		{
-			tco->selectViewOnCreate( true );
+			clip->selectViewOnCreate( true );
 		}
 	}
 
@@ -531,8 +531,8 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
  */
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
-	TimePos tcoPos = TimePos( getPosition( de->pos().x() ) );
-	if( pasteSelection( tcoPos, de ) == true )
+	TimePos clipPos = TimePos( getPosition( de->pos().x() ) );
+	if( pasteSelection( clipPos, de ) == true )
 	{
 		de->accept();
 	}
@@ -548,7 +548,7 @@ void TrackContentWidget::dropEvent( QDropEvent * de )
 void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 {
 	// Enable box select if control is held when clicking an empty space
-	// (If we had clicked a TCO it would have intercepted the mouse event)
+	// (If we had clicked a Clip it would have intercepted the mouse event)
 	if( me->modifiers() & Qt::ControlModifier ){
 		getGUI()->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
 	}
@@ -562,9 +562,9 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 	{
 		QWidget::mousePressEvent( me );
 	}
-	// For an unmodified click, create a new TCO
+	// For an unmodified click, create a new Clip
 	else if( me->button() == Qt::LeftButton &&
-			!m_trackView->trackContainerView()->fixedTCOs() )
+			!m_trackView->trackContainerView()->fixedClips() )
 	{
 		QVector<selectableObject*> so =  m_trackView->trackContainerView()->rubberBand()->selectedObjects();
 		for( int i = 0; i < so.count(); ++i )
@@ -574,7 +574,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 		getTrack()->addJournalCheckPoint();
 		const TimePos pos = getPosition( me->x() ).getBar() *
 						TimePos::ticksPerBar();
-		getTrack()->createTCO(pos);
+		getTrack()->createClip(pos);
 	}
 }
 
@@ -658,7 +658,7 @@ void TrackContentWidget::contextMenuEvent( QContextMenuEvent * cme )
 		return;
 	}
 
-	// If we don't have TCO data in the clipboard there's no need to create this menu
+	// If we don't have Clip data in the clipboard there's no need to create this menu
 	// since "paste" is the only action at the moment.
 	if( ! hasFormat( MimeType::StringPair )  )
 	{
@@ -683,9 +683,9 @@ void TrackContentWidget::contextMenuAction( QContextMenuEvent * cme, ContextMenu
 	{
 		case Paste:
 		// Paste the selection on the TimePos of the context menu event
-		TimePos tcoPos = getPosition( cme->x() );
+		TimePos clipPos = getPosition( cme->x() );
 
-		pasteSelection( tcoPos, getMimeData() );
+		pasteSelection( clipPos, getMimeData() );
 		break;
 	}
 }

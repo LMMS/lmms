@@ -163,7 +163,7 @@ private:
 
 
 private slots:
-	void createClipView( Clip * tco );
+	void createClipView( Clip * clip );
 	void muteChanged();
 
 } ;

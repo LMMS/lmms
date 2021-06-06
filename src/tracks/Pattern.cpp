@@ -41,7 +41,7 @@ QPixmap * PatternView::s_stepBtnOffLight = nullptr;
 
 
 Pattern::Pattern( InstrumentTrack * _instrument_track ) :
-	TrackContentObject( _instrument_track ),
+	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
 	m_patternType( BeatPattern ),
 	m_steps( TimePos::stepsPerBar() )
@@ -59,7 +59,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 
 
 Pattern::Pattern( const Pattern& other ) :
-	TrackContentObject( other.m_instrumentTrack ),
+	Clip( other.m_instrumentTrack ),
 	m_instrumentTrack( other.m_instrumentTrack ),
 	m_patternType( other.m_patternType ),
 	m_steps( other.m_steps )
@@ -112,10 +112,10 @@ void Pattern::resizeToFirstTrack()
 		{
 			if(tracks.at(trackID) != m_instrumentTrack)
 			{
-				unsigned int currentTCO = m_instrumentTrack->
-					getTCOs().indexOf(this);
+				unsigned int currentClip = m_instrumentTrack->
+					getClips().indexOf(this);
 				m_steps = static_cast<Pattern *>
-					(tracks.at(trackID)->getTCO(currentTCO))
+					(tracks.at(trackID)->getClip(currentClip))
 					->m_steps;
 			}
 			break;
@@ -484,9 +484,9 @@ Pattern *  Pattern::nextPattern() const
 
 Pattern * Pattern::adjacentPatternByOffset(int offset) const
 {
-	QVector<TrackContentObject *> tcos = m_instrumentTrack->getTCOs();
-	int tcoNum = m_instrumentTrack->getTCONum(this);
-	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, nullptr));
+	QVector<Clip *> clips = m_instrumentTrack->getClips();
+	int clipNum = m_instrumentTrack->getClipNum(this);
+	return dynamic_cast<Pattern*>(clips.value(clipNum + offset, nullptr));
 }
 
 
@@ -550,7 +550,7 @@ void Pattern::removeSteps()
 
 
 
-TrackContentObjectView * Pattern::createView( TrackView * _tv )
+ClipView * Pattern::createView( TrackView * _tv )
 {
 	return new PatternView( this, _tv );
 }

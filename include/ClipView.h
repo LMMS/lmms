@@ -61,14 +61,14 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QSize mouseHotspotKnife MEMBER m_mouseHotspotKnife )
 
 public:
-	ClipView( Clip * tco, TrackView * tv );
+	ClipView( Clip * clip, TrackView * tv );
 	virtual ~ClipView();
 
 	bool fixedClips();
 
 	inline Clip * getClip()
 	{
-		return m_tco;
+		return m_clip;
 	}
 
 	inline TrackView * getTrackView()
@@ -102,19 +102,19 @@ public:
 	QVector<ClipView *> getClickedClips();
 
 	// Methods to remove, copy, cut, paste and mute a QVector of Clip views
-	void copy( QVector<ClipView *> tcovs );
-	void cut( QVector<ClipView *> tcovs );
+	void copy( QVector<ClipView *> clipvs );
+	void cut( QVector<ClipView *> clipvs );
 	void paste();
 	// remove and toggleMute are static because they don't depend
 	// being called from a particular Clip view, but can be called anywhere as long
 	// as a valid Clip view list is given, while copy/cut require an instance for
 	// some metadata to be written to the clipboard.
-	static void remove( QVector<ClipView *> tcovs );
-	static void toggleMute( QVector<ClipView *> tcovs );
-	static void mergeClips(QVector<ClipView*> tcovs);
+	static void remove( QVector<ClipView *> clipvs );
+	static void toggleMute( QVector<ClipView *> clipvs );
+	static void mergeClips(QVector<ClipView*> clipvs);
 
 	// Returns true if selection can be merged and false if not
-	static bool canMergeSelection(QVector<ClipView*> tcovs);
+	static bool canMergeSelection(QVector<ClipView*> clipvs);
 
 	QColor getColorForDisplay( QColor );
 
@@ -171,7 +171,7 @@ protected:
 	float pixelsPerBar();
 
 
-	DataFile createClipDataFiles(const QVector<ClipView *> & tcos) const;
+	DataFile createClipDataFiles(const QVector<ClipView *> & clips) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
@@ -196,7 +196,7 @@ private:
 
 	static TextFloat * s_textFloat;
 
-	Clip * m_tco;
+	Clip * m_clip;
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
@@ -224,8 +224,8 @@ private:
 	{
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal( pos );
-		m_initialClipPos = m_tco->startPosition();
-		m_initialClipEnd = m_initialClipPos + m_tco->length();
+		m_initialClipPos = m_clip->startPosition();
+		m_initialClipEnd = m_initialClipPos + m_clip->length();
 	}
 	void setInitialOffsets();
 

@@ -712,7 +712,7 @@ TrackContainerView QLabel
 /* Patterns */
 
 /* common pattern colors */
-TrackContentObjectView   {
+ClipView   {
 	qproperty-mutedColor: rgba(255,255,255,100);
 	qproperty-mutedBackgroundColor: #373d48;
 	qproperty-selectedColor: #006B65;
@@ -740,7 +740,7 @@ PatternView {
 }
 
 /* sample track pattern */
-SampleTCOView {
+SampleClipView {
 	background-color: rgba(42,51,59,255);
 	color: #FF8F05;
 }
@@ -752,7 +752,7 @@ AutomationPatternView {
 }
 
 /* bb-pattern */
-BBTCOView {
+BBClipView {
 	background-color: #20BDB2; /* default colour for bb-tracks */
 }
 

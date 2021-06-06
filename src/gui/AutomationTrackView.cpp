@@ -78,8 +78,8 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			TrackContentObject * tco = getTrack()->createTCO( pos );
-			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
+			Clip * clip = getTrack()->createClip( pos );
+			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( clip );
 			pat->addObject( mod );
 		}
 	}

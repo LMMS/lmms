@@ -55,20 +55,20 @@ public:
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
 
-	void addClipView( ClipView * tcov );
-	void removeClipView( ClipView * tcov );
-	void removeClipView( int tcoNum )
+	void addClipView( ClipView * clipv );
+	void removeClipView( ClipView * clipv );
+	void removeClipView( int clipNum )
 	{
-		if( tcoNum >= 0 && tcoNum < m_tcoViews.size() )
+		if( clipNum >= 0 && clipNum < m_clipViews.size() )
 		{
-			removeClipView( m_tcoViews[tcoNum] );
+			removeClipView( m_clipViews[clipNum] );
 		}
 	}
 
-	bool canPasteSelection( TimePos tcoPos, const QDropEvent *de );
-	bool canPasteSelection( TimePos tcoPos, const QMimeData *md, bool allowSameBar = false );
-	bool pasteSelection( TimePos tcoPos, QDropEvent * de );
-	bool pasteSelection( TimePos tcoPos, const QMimeData * md, bool skipSafetyCheck = false );
+	bool canPasteSelection( TimePos clipPos, const QDropEvent *de );
+	bool canPasteSelection( TimePos clipPos, const QMimeData *md, bool allowSameBar = false );
+	bool pasteSelection( TimePos clipPos, QDropEvent * de );
+	bool pasteSelection( TimePos clipPos, const QMimeData * md, bool skipSafetyCheck = false );
 
 	TimePos endPosition( const TimePos & posStart );
 
@@ -126,8 +126,8 @@ private:
 
 	TrackView * m_trackView;
 
-	typedef QVector<ClipView *> tcoViewVector;
-	tcoViewVector m_tcoViews;
+	typedef QVector<ClipView *> clipViewVector;
+	clipViewVector m_clipViews;
 
 	QPixmap m_background;
 

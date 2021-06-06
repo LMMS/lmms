@@ -38,7 +38,7 @@ public:
 	BBTrackContainer();
 	virtual ~BBTrackContainer();
 
-	virtual bool play(TimePos start, const fpp_t frames, const f_cnt_t frameBase, int tcoNum = -1);
+	virtual bool play(TimePos start, const fpp_t frames, const f_cnt_t frameBase, int clipNum = -1);
 
 	void updateAfterTrackAdd() override;
 
@@ -57,11 +57,11 @@ public:
 
 	void swapBB(int bb1, int bb2);
 
-	void updateBBTrack(Clip * tco);
+	void updateBBTrack(Clip * clip);
 	void fixIncorrectPositions();
 	void createClipsForBB(int bb);
 
-	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum) const override;
+	AutomatedValueMap automatedValuesAt(TimePos time, int clipNum) const override;
 
 public slots:
 	void play();

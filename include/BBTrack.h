@@ -45,7 +45,7 @@ public:
 	virtual ~BBTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
 	Clip* createClip(const TimePos & pos) override;
 
