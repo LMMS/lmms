@@ -70,6 +70,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <sstream>
+#include <time.h>
 
 // https://stackoverflow.com/questions/22476110/c-compiling-error-including-x11-x-h-x11-xlib-h
 #undef Bool
@@ -348,7 +349,13 @@ public:
 	}
 
 	inline void queueMessage( const message & m ) {
+		#ifdef NATIVE_LINUX_VST
+		pthread_mutex_lock(&message_mutex);
+		#endif
 		m_messageList.push( m );
+		#ifdef NATIVE_LINUX_VST
+		pthread_mutex_unlock(&message_mutex);
+		#endif
 	}
 
 	inline bool shouldGiveIdle() const
@@ -445,8 +452,6 @@ private:
 	Window m_window;
 	Display* m_display;
 	Atom wmDeleteMessage;
-	Atom lmmsUiEvent;
-	Atom lmmsX11GiveIdle;
 	bool m_x11WindowVisible = false;
 #endif
 	intptr_t m_windowID;
@@ -458,6 +463,9 @@ private:
 
 	bool m_processing;
 
+#ifdef NATIVE_LINUX_VST
+	pthread_mutex_t message_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
 	std::queue<message> m_messageList;
 	bool m_shouldGiveIdle;
 
@@ -637,7 +645,6 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			return true;
 
 		case IdToggleUI:
-			debugMessage("toogle 5");
 #ifndef NATIVE_LINUX_VST
 			if( m_window && IsWindowVisible( m_window ) )
 #else
@@ -757,6 +764,12 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 				sendCurrentProgramName();
 			}
 
+			break;
+		}
+		
+		case IdIdle:
+		{
+			idle();
 			break;
 		}
 
@@ -897,8 +910,6 @@ void RemoteVstPlugin::initEditor()
 	
 	wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", false);
 	XSetWMProtocols(m_display, m_window, &wmDeleteMessage, 1);
-	lmmsUiEvent = XInternAtom(m_display, "_APP_EVT", false);
-	lmmsX11GiveIdle = XInternAtom(m_display, "_APP_EVT_IDLE", false);
 	
 	// make tool window
 	prop_atom = XInternAtom(m_display, "_NET_WM_WINDOW_TYPE", False);
@@ -2181,6 +2192,10 @@ void RemoteVstPlugin::idle()
 void RemoteVstPlugin::processUIThreadMessages()
 {
 	setProcessing( true );
+	#ifdef NATIVE_LINUX_VST
+		pthread_mutex_lock(&message_mutex);
+	#endif
+	
 	while( m_messageList.size() )
 	{
 		processMessage( m_messageList.front() );
@@ -2191,24 +2206,18 @@ void RemoteVstPlugin::processUIThreadMessages()
 			setShouldGiveIdle( false );
 		}
 	}
+	#ifdef NATIVE_LINUX_VST
+		pthread_mutex_unlock(&message_mutex);
+	#endif
+	
 	setProcessing( false );
+	
 }
 
 #ifdef NATIVE_LINUX_VST
 void RemoteVstPlugin::sendX11Idle()
 {
-	if (m_window != NULL)
-	{
-	XEvent evt;
-	evt.xclient.type = ClientMessage;
-	evt.xclient.serial = 0;
-	evt.xclient.send_event = true;
-	evt.xclient.message_type = lmmsX11GiveIdle;
-	evt.xclient.format = 32;
-	evt.xclient.window = m_window;
-	XSendEvent(m_display, m_window, true, NoEventMask, &evt);
-	XFlush(m_display);
-	}
+	queueMessage(message( IdIdle ));
 }
 #endif
 
@@ -2251,31 +2260,7 @@ void * RemoteVstPlugin::processingThread2(void * _param)
 					ProcessPluginMessage,
 					(LPARAM) new message( m ) );
 #else
-		//_this->processMessage( m );
-		
-		//_this->debugMessage("wysylaie");
-		if (_this->m_window != NULL)
-		{
-		XEvent evt;
-		evt.xclient.type = ClientMessage;
-		evt.xclient.serial = 0;
-		evt.xclient.send_event = true;
-		evt.xclient.message_type = _this->lmmsUiEvent;
-		evt.xclient.format = 32;
-		evt.xclient.window = _this->m_window;
-		//evt.xclient.data.l[0] = XInternAtom(_this->m_display, "_APP_EVT_PTR", false);
-		uintptr_t val = uintptr_t(new message( m ));
-		//std::stringstream ss;
-		//ss << val;
-		//_this->debugMessage("wyslane: " + ss.str());
-		//https://stackoverflow.com/questions/2810280/how-to-store-a-64-bit-integer-in-two-32-bit-integers-and-convert-back-again
-		//evt.xclient.data.l[0] = val;
-		evt.xclient.data.l[0] = (uint32_t)((val & 0xFFFFFFFF00000000LL) >> 32);
-		evt.xclient.data.l[1] = (uint32_t)(val & 0xFFFFFFFFLL);
-		//evt.xclient.data.l[0] = _this->lmmsUiEvent;
-		XSendEvent(_this->m_display, _this->m_window, true, NoEventMask, &evt);
-		XFlush(_this->m_display);
-		}
+		_this->queueMessage( m );
 #endif
 		}
 	}
@@ -2322,40 +2307,13 @@ void RemoteVstPlugin::guiEventLoop()
 	XEvent e;
 	while(true)
 	{
-		if (XQLength(m_display) > 0) {
+		//if (XQLength(m_display) > 0) {
+		if (XPending(m_display) > 0) {
 		XNextEvent(m_display, &e);
 		
 		if (e.type == ClientMessage)
 		{
-			if (m_window == NULL || e.xclient.window != m_window)
-				continue;
-			if (e.xclient.message_type == lmmsX11GiveIdle)
-			{
-				//debugMessage("idle!!!");
-				if (__plugin->isInitialized())
-					__plugin->idle();
-				return;
-			}
-			if (e.xclient.message_type == lmmsUiEvent)
-			{
-				//debugMessage("zdarzenie!!!");
-				//uintptr_t mptr = ((uintptr_t)e.xclient.data.l[0]) << 32 | e.xclient.data.l[1];
-				uintptr_t mptr = ((uintptr_t)e.xclient.data.l[0] << 32);
-				mptr = mptr | e.xclient.data.l[1];
-				//std::stringstream ss;
-				//ss << mptr;
-				//debugMessage("znalezione " +ss.str());
-				message * m = (message *) mptr;
-				if(__plugin->isInitialized())
-					__plugin->queueMessage( *m );
-				delete m;
-				if(__plugin->isInitialized() && !__plugin->isProcessing() )
-				{
-					__plugin->processUIThreadMessages();
-				}
-				
-			}
-			else if (e.xclient.data.l[0] == wmDeleteMessage)
+			if (e.xclient.data.l[0] == wmDeleteMessage)
 			{
 				//m_window = NULL;
 				debugMessage("Hide editor");
@@ -2363,9 +2321,21 @@ void RemoteVstPlugin::guiEventLoop()
 			}
 		} 
 		}
-		/*else
-			if (__plugin->isInitialized())
-				__plugin->idle();*/
+
+		// needed by zynaAddsubfx ui
+		if (__plugin->isInitialized())
+			__plugin->idle();
+		
+		if(__plugin->isInitialized() && !__plugin->isProcessing() )
+		{
+			__plugin->processUIThreadMessages();
+		}
+		
+		struct timespec tim, tim2;
+		tim.tv_sec = 0;
+		tim.tv_nsec = 500;
+		nanosleep(&tim, &tim2);
+		
 	}
 }
 #endif
