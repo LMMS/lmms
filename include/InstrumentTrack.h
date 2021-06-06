@@ -30,6 +30,8 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Midi.h"
+#include "MidiCCRackView.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -38,11 +40,11 @@
 #include "Pitch.h"
 #include "Plugin.h"
 #include "Track.h"
+#include "TrackView.h"
 
 
 
 class QLineEdit;
-template<class T> class QQueue;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class EffectRackView;
@@ -80,8 +82,8 @@ public:
 
 	MidiEvent applyMasterKey( const MidiEvent& event );
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) override;
-	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 ) override;
+	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
+	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 	// silence all running notes played by this track
 	void silenceAllNotes( bool removeIPH = false );
 
@@ -130,13 +132,13 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play( const MidiTime & _start, const fpp_t _frames,
+	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
 	// create new view for me
 	TrackView * createView( TrackContainerView* tcv ) override;
 
 	// create new track-content-object = pattern
-	TrackContentObject* createTCO(const MidiTime & pos) override;
+	TrackContentObject* createTCO(const TimePos & pos) override;
 
 
 	// called by track
@@ -172,7 +174,19 @@ public:
 		return &m_baseNoteModel;
 	}
 
+	IntModel *firstKeyModel()
+	{
+		return &m_firstKeyModel;
+	}
+
+	IntModel *lastKeyModel()
+	{
+		return &m_lastKeyModel;
+	}
+
 	int baseNote() const;
+	int firstKey() const;
+	int lastKey() const;
 
 	Piano *pianoModel()
 	{
@@ -229,7 +243,6 @@ signals:
 	void newNote();
 	void endNote();
 
-
 protected:
 	QString nodeName() const override
 	{
@@ -248,6 +261,8 @@ protected slots:
 
 
 private:
+	void processCCEvent(int controller);
+
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
@@ -262,10 +277,12 @@ private:
 
 	bool m_previewMode;
 
+	IntModel m_baseNoteModel;	//!< The "A4" or "440 Hz" key (default 69)
+	IntModel m_firstKeyModel;	//!< First key the instrument reacts to
+	IntModel m_lastKeyModel;	//!< Last key the instrument reacts to
+
 	bool m_hasAutoMidiDev;
 	static InstrumentTrack *s_autoAssignedTrack;
-
-	IntModel m_baseNoteModel;
 
 	NotePlayHandleList m_processHandles;
 
@@ -279,7 +296,6 @@ private:
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
 
-
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
 	InstrumentFunctionArpeggio m_arpeggio;
@@ -287,11 +303,14 @@ private:
 
 	Piano m_piano;
 
+	std::unique_ptr<BoolModel> m_midiCCEnable;
+	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
 	friend class InstrumentMiscView;
+	friend class MidiCCRackView;
 
 } ;
 
@@ -324,10 +343,6 @@ public:
 		return m_midiMenu;
 	}
 
-	void freeInstrumentTrackWindow();
-
-	static void cleanupWindowCache();
-
 	// Create a menu for assigning/creating channels for this track
 	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
 
@@ -339,6 +354,7 @@ protected:
 
 private slots:
 	void toggleInstrumentWindow( bool _on );
+	void toggleMidiCCRack();
 	void activityIndicatorPressed();
 	void activityIndicatorReleased();
 
@@ -349,11 +365,11 @@ private slots:
 	void assignFxLine( int channelIndex );
 	void createFxLine();
 
+	void handleConfigChange(QString cls, QString attr, QString value);
+
 
 private:
 	InstrumentTrackWindow * m_window;
-
-	static QQueue<InstrumentTrackWindow *> s_windowCache;
 
 	// widgets in track-settings-widget
 	TrackLabelButton * m_tlb;
@@ -366,9 +382,11 @@ private:
 	QAction * m_midiInputAction;
 	QAction * m_midiOutputAction;
 
+	std::unique_ptr<MidiCCRackView> m_midiCCRackView;
+
 	QPoint m_lastPos;
 
-	FadeButton * getActivityIndicator()
+	FadeButton * getActivityIndicator() override
 	{
 		return m_activityIndicator;
 	}
@@ -482,6 +500,7 @@ private:
 	PianoView * m_pianoView;
 
 	friend class InstrumentView;
+	friend class InstrumentTrackView;
 
 } ;
 

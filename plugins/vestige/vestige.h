@@ -33,7 +33,6 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Note.h"
 #include "CustomTextKnob.h"
 #include "SubWindow.h"
 #include "AutomatableModel.h"
@@ -67,7 +66,7 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 );
+	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 

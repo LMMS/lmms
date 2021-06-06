@@ -55,6 +55,7 @@ public:
 	enum EditMode
 	{
 		DrawMode,
+		KnifeMode,
 		SelectMode
 	};
 
@@ -77,10 +78,11 @@ public slots:
 
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
+	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const TimePos & t );
 	void updatePositionLine();
 	void selectAllTcos( bool select );
 
@@ -112,6 +114,7 @@ private:
 	void wheelEvent( QWheelEvent * we ) override;
 
 	bool allowRubberband() const override;
+	bool knifeMode() const override;
 
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
@@ -138,7 +141,7 @@ private:
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
-	static const QVector<double> m_zoomLevels;
+	static const QVector<float> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -150,7 +153,7 @@ private:
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
-	MidiTime m_rubberbandStartMidipos;
+	TimePos m_rubberbandStartTimePos;
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;
@@ -158,7 +161,7 @@ private:
 	friend class SongEditorWindow;
 
 signals:
-	void zoomingValueChanged( double );
+	void zoomingValueChanged( float );
 } ;
 
 
@@ -173,6 +176,7 @@ public:
 	QSize sizeHint() const override;
 
 	SongEditor* m_editor;
+	void syncEditMode();
 
 protected:
 	void resizeEvent( QResizeEvent * event ) override;
@@ -194,9 +198,6 @@ signals:
 	void resized();
 
 private:
-	void keyPressEvent( QKeyEvent * ke ) override;
-	void keyReleaseEvent( QKeyEvent * ke ) override;
-
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
@@ -204,6 +205,7 @@ private:
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
+	QAction* m_knifeModeAction;
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 

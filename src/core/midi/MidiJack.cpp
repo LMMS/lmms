@@ -118,8 +118,10 @@ MidiJack::~MidiJack()
 {
 	if(jackClient())
 	{
-		// remove ourselves first (atomically), so we will not get called again
-		m_jackAudio->removeMidiClient();
+		if (m_jackAudio) {
+			// remove ourselves first (atomically), so we will not get called again
+			m_jackAudio->removeMidiClient();
+		}
 
 		if( jack_port_unregister( jackClient(), m_input_port) != 0){
 			printf("Failed to unregister jack midi input\n");
@@ -186,7 +188,7 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 	{
 		for(i=0; i<nframes; i++)
 		{
-			if((in_event.time == i) && (event_index < event_count))
+			while((in_event.time == i) && (event_index < event_count))
 			{
 				// lmms is setup to parse bytes coming from a device
 				// parse it byte by byte as it expects

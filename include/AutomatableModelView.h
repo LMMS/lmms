@@ -50,6 +50,7 @@ public:
 	}
 
 	void setModel( Model* model, bool isOldModelValid = true ) override;
+	void unsetModel() override;
 
 	template<typename T>
 	inline T value() const

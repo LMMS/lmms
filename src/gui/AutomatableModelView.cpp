@@ -142,6 +142,31 @@ void AutomatableModelView::setModel( Model* model, bool isOldModelValid )
 
 
 
+// Unsets the current model by setting a dummy empty model. The dummy model is marked as
+// "defaultConstructed", so the next call to setModel will delete it.
+void AutomatableModelView::unsetModel()
+{
+	if (dynamic_cast<FloatModelView*>(this))
+	{
+		setModel(new FloatModel(0, 0, 0, 1, nullptr, QString(), true));
+	}
+	else if (dynamic_cast<IntModelView*>(this))
+	{
+		setModel(new IntModel(0, 0, 0, nullptr, QString(), true));
+	}
+	else if (dynamic_cast<BoolModelView*>(this))
+	{
+		setModel(new BoolModel(false, nullptr, QString(), true));
+	}
+	else
+	{
+		ModelView::unsetModel();
+	}
+}
+
+
+
+
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
@@ -203,7 +228,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// New
 			else
 			{
-				ControllerConnection* cc = new ControllerConnection( d.chosenController() );
+				ControllerConnection* cc = new ControllerConnection(d.chosenController());
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}
@@ -269,7 +294,6 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 		m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor());
 	}
 }
-
 
 /// Attempt to parse a float from the clipboard
 static float floatFromClipboard(bool* ok)

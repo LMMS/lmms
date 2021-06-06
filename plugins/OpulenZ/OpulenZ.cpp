@@ -293,15 +293,14 @@ int OpulenzInstrument::pushVoice(int v) {
 	return i;
 }
 
-bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;
 
 	switch(event.type()) {
         case MidiNoteOn:
-		// to get us in line with MIDI(?)
-		key = event.key() +12;
+		key = event.key();
 		vel = event.velocity();
 
 		voice = popVoice();
@@ -316,7 +315,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 		}
                 break;
         case MidiNoteOff:
-                key = event.key() +12;
+                key = event.key();
                 for(voice=0; voice<OPL2_VOICES; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
@@ -328,7 +327,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime&
 		velocities[key] = 0;
                 break;
         case MidiKeyPressure:
-                key = event.key() +12;
+                key = event.key();
                 vel = event.velocity();
 		if( velocities[key] != 0) {
 			velocities[key] = vel;
