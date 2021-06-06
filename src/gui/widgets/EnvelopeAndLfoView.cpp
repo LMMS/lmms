@@ -305,7 +305,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
-					QString( "samplefile,tco_%1" ).arg(
+					QString( "samplefile,clip_%1" ).arg(
 							Track::SampleTrack ) );
 }
 
@@ -325,7 +325,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		_de->accept();
 		update();
 	}
-	else if( type == QString( "tco_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		m_params->m_userWave.setAudioFile( dataFile.content().

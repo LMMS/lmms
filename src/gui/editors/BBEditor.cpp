@@ -59,12 +59,12 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-			     + 2 * TCO_BORDER_WIDTH + 384 );
+			     + 2 * CLIP_BORDER_WIDTH + 384 );
 	}
 	else
 	{
 		setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
-			     + 2 * TCO_BORDER_WIDTH + 384 );
+			     + 2 * CLIP_BORDER_WIDTH + 384 );
 	}
 
 
@@ -196,7 +196,7 @@ void BBTrackContainerView::removeSteps()
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
+			Pattern* p = static_cast<Pattern *>( ( *it )->getClip( m_bbtc->currentBB() ) );
 			p->removeSteps();
 		}
 	}
@@ -225,7 +225,7 @@ void BBTrackContainerView::removeBBView(int bb)
 {
 	for( TrackView* view : trackViews() )
 	{
-		view->getTrackContentWidget()->removeTCOView( bb );
+		view->getTrackContentWidget()->removeClipView( bb );
 	}
 }
 
@@ -254,24 +254,24 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 		DataFile dataFile( value.toUtf8() );
 		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
 
-		// Ensure BB TCOs exist
-		bool hasValidBBTCOs = false;
-		if (t->getTCOs().size() == m_bbtc->numOfBBs())
+		// Ensure BB Clips exist
+		bool hasValidBBClips = false;
+		if (t->getClips().size() == m_bbtc->numOfBBs())
 		{
-			hasValidBBTCOs = true;
-			for (int i = 0; i < t->getTCOs().size(); ++i)
+			hasValidBBClips = true;
+			for (int i = 0; i < t->getClips().size(); ++i)
 			{
-				if (t->getTCOs()[i]->startPosition() != TimePos(i, 0))
+				if (t->getClips()[i]->startPosition() != TimePos(i, 0))
 				{
-					hasValidBBTCOs = false;
+					hasValidBBClips = false;
 					break;
 				}
 			}
 		}
-		if (!hasValidBBTCOs)
+		if (!hasValidBBClips)
 		{
-			t->deleteTCOs();
-			t->createTCOsForBB(m_bbtc->numOfBBs() - 1);
+			t->deleteClips();
+			t->createClipsForBB(m_bbtc->numOfBBs() - 1);
 		}
 		m_bbtc->updateAfterTrackAdd();
 
@@ -304,7 +304,7 @@ void BBTrackContainerView::makeSteps( bool clone )
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
+			Pattern* p = static_cast<Pattern *>( ( *it )->getClip( m_bbtc->currentBB() ) );
 			if( clone )
 			{
 				p->cloneSteps();
@@ -316,7 +316,7 @@ void BBTrackContainerView::makeSteps( bool clone )
 	}
 }
 
-// Creates a clone of the current BB track with the same pattern, but no TCOs in the song editor
+// Creates a clone of the current BB track with the same pattern, but no Clips in the song editor
 // TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
 void BBTrackContainerView::clonePattern()
 {
@@ -329,8 +329,8 @@ void BBTrackContainerView::clonePattern()
 	// Clone the track
 	Track *newTrack = bbt->clone();
 
-	// Track still have the TCOs which is undesirable in this case, clear the track
+	// Track still have the Clips which is undesirable in this case, clear the track
 	newTrack->lock();
-	newTrack->deleteTCOs();
+	newTrack->deleteClips();
 	newTrack->unlock();
 }

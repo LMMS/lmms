@@ -9,7 +9,7 @@ SET(LMMS_SRCS
 	gui/AutomationTrackView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
-	gui/BBTCOView.cpp
+	gui/BBClipView.cpp
 	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectSelectDialog.cpp
@@ -33,7 +33,7 @@ SET(LMMS_SRCS
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
-	gui/SampleTCOView.cpp
+	gui/SampleClipView.cpp
 	gui/SampleTrackView.cpp
 	gui/SampleTrackWindow.cpp
 	gui/SetupDialog.cpp
@@ -42,7 +42,7 @@ SET(LMMS_SRCS
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
-	gui/TrackContentObjectView.cpp
+	gui/ClipView.cpp
 	gui/TrackView.cpp
 
 	gui/dialogs/FileDialog.cpp

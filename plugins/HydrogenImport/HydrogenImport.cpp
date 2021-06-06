@@ -280,7 +280,7 @@ bool HydrogenImport::readSong()
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + nbb;
 				pattern_id[sName] = pattern_count - 1;
-				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getTCO( i ) );
+				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getClip( i ) );
 				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
@@ -316,7 +316,7 @@ bool HydrogenImport::readSong()
 
 			int i = pattern_id[patId]+song_num_tracks;
 			Track *t = ( BBTrack * ) s->tracks().at( i );
-			t->createTCO(pos);
+			t->createClip(pos);
 
 			if ( pattern_length[patId] > best_length ) 
 			{

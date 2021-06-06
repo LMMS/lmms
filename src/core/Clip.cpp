@@ -1,5 +1,5 @@
 /*
- * TrackContentObject.cpp - implementation of TrackContentObject class
+ * Clip.cpp - implementation of Clip class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "TrackContentObject.h"
+#include "Clip.h"
 
 #include <QDomDocument>
 
@@ -33,13 +33,13 @@
 #include "Song.h"
 
 
-/*! \brief Create a new TrackContentObject
+/*! \brief Create a new Clip
  *
  *  Creates a new track content object for the given track.
  *
  * \param _track The track that will contain the new object
  */
-TrackContentObject::TrackContentObject( Track * track ) :
+Clip::Clip( Track * track ) :
 	Model( track ),
 	m_track( track ),
 	m_startPosition(),
@@ -51,7 +51,7 @@ TrackContentObject::TrackContentObject( Track * track ) :
 {
 	if( getTrack() )
 	{
-		getTrack()->addTCO( this );
+		getTrack()->addClip( this );
 	}
 	setJournalling( false );
 	movePosition( 0 );
@@ -62,32 +62,32 @@ TrackContentObject::TrackContentObject( Track * track ) :
 
 
 
-/*! \brief Destroy a TrackContentObject
+/*! \brief Destroy a Clip
  *
  *  Destroys the given track content object.
  *
  */
-TrackContentObject::~TrackContentObject()
+Clip::~Clip()
 {
-	emit destroyedTCO();
+	emit destroyedClip();
 
 	if( getTrack() )
 	{
-		getTrack()->removeTCO( this );
+		getTrack()->removeClip( this );
 	}
 }
 
 
 
 
-/*! \brief Move this TrackContentObject's position in time
+/*! \brief Move this Clip's position in time
  *
  *  If the track content object has moved, update its position.  We
  *  also add a journal entry for undo and update the display.
  *
  * \param _pos The new position of the track content object.
  */
-void TrackContentObject::movePosition( const TimePos & pos )
+void Clip::movePosition( const TimePos & pos )
 {
 	TimePos newPos = qMax(0, pos.getTicks());
 	if (m_startPosition != newPos)
@@ -103,14 +103,14 @@ void TrackContentObject::movePosition( const TimePos & pos )
 
 
 
-/*! \brief Change the length of this TrackContentObject
+/*! \brief Change the length of this Clip
  *
  *  If the track content object's length has changed, update it.  We
  *  also add a journal entry for undo and update the display.
  *
  * \param _length The new length of the track content object.
  */
-void TrackContentObject::changeLength( const TimePos & length )
+void Clip::changeLength( const TimePos & length )
 {
 	m_length = length;
 	Engine::getSong()->updateLength();
@@ -120,7 +120,7 @@ void TrackContentObject::changeLength( const TimePos & length )
 
 
 
-bool TrackContentObject::comparePosition(const TrackContentObject *a, const TrackContentObject *b)
+bool Clip::comparePosition(const Clip *a, const Clip *b)
 {
 	return a->startPosition() < b->startPosition();
 }
@@ -128,11 +128,11 @@ bool TrackContentObject::comparePosition(const TrackContentObject *a, const Trac
 
 
 
-/*! \brief Copies the state of a TrackContentObject to another TrackContentObject
+/*! \brief Copies the state of a Clip to another Clip
  *
- *  This method copies the state of a TCO to another TCO
+ *  This method copies the state of a Clip to another Clip
  */
-void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObject *dst )
+void Clip::copyStateTo( Clip *src, Clip *dst )
 {
 	// If the node names match we copy the state
 	if( src->nodeName() == dst->nodeName() ){
@@ -152,7 +152,7 @@ void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObjec
 
 
 
-/*! \brief Mutes this TrackContentObject
+/*! \brief Mutes this Clip
  *
  *  Restore the previous state of this track content object.  This will
  *  restore the position or the length of the track content object
@@ -160,7 +160,7 @@ void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObjec
  *
  * \param _je The journal entry to undo
  */
-void TrackContentObject::toggleMute()
+void Clip::toggleMute()
 {
 	m_mutedModel.setValue( !m_mutedModel.value() );
 	emit dataChanged();
@@ -169,7 +169,7 @@ void TrackContentObject::toggleMute()
 
 
 
-TimePos TrackContentObject::startTimeOffset() const
+TimePos Clip::startTimeOffset() const
 {
 	return m_startTimeOffset;
 }
@@ -177,13 +177,13 @@ TimePos TrackContentObject::startTimeOffset() const
 
 
 
-void TrackContentObject::setStartTimeOffset( const TimePos &startTimeOffset )
+void Clip::setStartTimeOffset( const TimePos &startTimeOffset )
 {
 	m_startTimeOffset = startTimeOffset;
 }
 
-// Update TCO color if it follows the track color
-void TrackContentObject::updateColor()
+// Update Clip color if it follows the track color
+void Clip::updateColor()
 {
 	if( ! m_useCustomClipColor )
 	{
@@ -192,14 +192,14 @@ void TrackContentObject::updateColor()
 }
 
 
-void TrackContentObject::useCustomClipColor( bool b )
+void Clip::useCustomClipColor( bool b )
 {
 	m_useCustomClipColor = b;
 	updateColor();
 }
 
 
-bool TrackContentObject::hasColor()
+bool Clip::hasColor()
 {
 	return usesCustomClipColor() || getTrack()->useColor();
 }

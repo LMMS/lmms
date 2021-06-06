@@ -812,27 +812,27 @@ public:
 		_freq = qBound( minFreq(), _freq, 20000.0f );
 		const float omega = F_2PI * _freq * m_sampleRatio;
 		const float tsin = sinf( omega ) * 0.5f;
-		const float tcos = cosf( omega );
+		const float clips = cosf( omega );
 
 		const float alpha = tsin / _q;
 
 		const float a0 = 1.0f / ( 1.0f + alpha );
 
-		const float a1 = -2.0f * tcos * a0;
+		const float a1 = -2.0f * clips * a0;
 		const float a2 = ( 1.0f - alpha ) * a0;
 
 		switch( m_type )
 		{
 			case LowPass:
 			{
-				const float b1 = ( 1.0f - tcos ) * a0;
+				const float b1 = ( 1.0f - clips ) * a0;
 				const float b0 = b1 * 0.5f;
 				m_biQuad.setCoeffs( a1, a2, b0, b1, b0 );
 				break;
 			}
 			case HiPass:
 			{
-				const float b1 = ( -1.0f - tcos ) * a0;
+				const float b1 = ( -1.0f - clips ) * a0;
 				const float b0 = b1 * -0.5f;
 				m_biQuad.setCoeffs( a1, a2, b0, b1, b0 );
 				break;

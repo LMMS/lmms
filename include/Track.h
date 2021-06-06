@@ -60,7 +60,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<Clip *> tcoVector;
+	typedef QVector<Clip *> clipVector;
 
 	enum TrackTypes
 	{
@@ -90,7 +90,7 @@ public:
 	}
 
 	virtual bool play( const TimePos & start, const fpp_t frames,
-						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
+						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
 	virtual TrackView * createView( TrackContainerView * view ) = 0;
@@ -110,22 +110,22 @@ public:
 	}
 
 	// -- for usage by Clip only ---------------
-	Clip * addClip( Clip * tco );
-	void removeClip( Clip * tco );
+	Clip * addClip( Clip * clip );
+	void removeClip( Clip * clip );
 	// -------------------------------------------------------
 	void deleteClips();
 
 	int numOfClips();
-	Clip * getClip( int tcoNum );
-	int getClipNum(const Clip* tco );
+	Clip * getClip( int clipNum );
+	int getClipNum(const Clip* clip );
 
-	const tcoVector & getClips() const
+	const clipVector & getClips() const
 	{
 		return m_trackContentObjects;
 	}
-	void getClipsInRange( tcoVector & tcoV, const TimePos & start,
+	void getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end );
-	void swapPositionOfClips( int tcoNum1, int tcoNum2 );
+	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
 	void createClipsForBB( int bb );
 
@@ -215,7 +215,7 @@ private:
 
 	bool m_simpleSerializingMode;
 
-	tcoVector m_trackContentObjects;
+	clipVector m_trackContentObjects;
 
 	QMutex m_processingLock;
 	

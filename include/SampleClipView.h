@@ -35,7 +35,7 @@ class SampleClipView : public ClipView
 	Q_OBJECT
 
 public:
-	SampleClipView( SampleClip * _tco, TrackView * _tv );
+	SampleClipView( SampleClip * _clip, TrackView * _tv );
 	virtual ~SampleClipView() = default;
 
 public slots:
@@ -55,7 +55,7 @@ protected:
 
 
 private:
-	SampleClip * m_tco;
+	SampleClip * m_clip;
 	QPixmap m_paintPixmap;
 	bool splitClip( const TimePos pos ) override;
 } ;

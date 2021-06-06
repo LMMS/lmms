@@ -48,7 +48,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "sampletco";
+		return "sampleclip";
 	}
 
 	SampleBuffer* sampleBuffer()
@@ -71,7 +71,7 @@ public slots:
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
-	void updateTrackTcos();
+	void updateTrackClips();
 
 
 private:

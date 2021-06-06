@@ -84,7 +84,7 @@ public slots:
 
 	void updatePosition( const TimePos & t );
 	void updatePositionLine();
-	void selectAllTcos( bool select );
+	void selectAllClips( bool select );
 
 protected:
 	void closeEvent( QCloseEvent * ce ) override;

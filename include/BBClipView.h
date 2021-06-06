@@ -35,7 +35,7 @@ class BBClipView : public ClipView
 {
 	Q_OBJECT
 public:
-	BBClipView( Clip * _tco, TrackView * _tv );
+	BBClipView( Clip * _clip, TrackView * _tv );
 	virtual ~BBClipView() = default;
 
 

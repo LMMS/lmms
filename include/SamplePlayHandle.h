@@ -41,7 +41,7 @@ class SamplePlayHandle : public PlayHandle
 public:
 	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
 	SamplePlayHandle( const QString& sampleFile );
-	SamplePlayHandle( SampleClip* tco );
+	SamplePlayHandle( SampleClip* clip );
 	virtual ~SamplePlayHandle();
 
 	inline bool affinityMatters() const override

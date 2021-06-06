@@ -252,13 +252,13 @@ void TrackOperationsWidget::cloneTrack()
 }
 
 
-/*! \brief Clear this track - clears all TCOs from the track */
+/*! \brief Clear this track - clears all Clips from the track */
 void TrackOperationsWidget::clearTrack()
 {
 	Track * t = m_trackView->getTrack();
 	t->addJournalCheckPoint();
 	t->lock();
-	t->deleteTCOs();
+	t->deleteClips();
 	t->unlock();
 }
 
@@ -317,7 +317,7 @@ void TrackOperationsWidget::useTrackColor()
  *  For all track types, we have the Clone and Remove options.
  *  For instrument-tracks we also offer the MIDI-control-menu
  *  For automation tracks, extra options: turn on/off recording
- *  on all TCOs (same should be added for sample tracks when
+ *  on all Clips (same should be added for sample tracks when
  *  sampletrack recording is implemented)
  */
 void TrackOperationsWidget::updateMenu()
@@ -331,7 +331,7 @@ void TrackOperationsWidget::updateMenu()
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
 
-	if( ! m_trackView->trackContainerView()->fixedTCOs() )
+	if( ! m_trackView->trackContainerView()->fixedClips() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
 	}
@@ -369,9 +369,9 @@ void TrackOperationsWidget::toggleRecording( bool on )
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		for( TrackContentObject * tco : atv->getTrack()->getTCOs() )
+		for( Clip * clip : atv->getTrack()->getClips() )
 		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( tco );
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( clip );
 			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();

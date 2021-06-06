@@ -228,7 +228,7 @@ void Song::processNextBuffer()
 		case Mode_PlayPattern:
 			if (m_patternToPlay)
 			{
-				clipNum = m_patternToPlay->getTrack()->getTCONum(m_patternToPlay);
+				clipNum = m_patternToPlay->getTrack()->getClipNum(m_patternToPlay);
 				trackList.push_back(m_patternToPlay->getTrack());
 			}
 			break;
@@ -360,7 +360,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	QSet<const AutomatableModel*> recordedModels;
 
 	TrackContainer* container = this;
-	int tcoNum = -1;
+	int clipNum = -1;
 
 	switch (m_playMode)
 	{
@@ -373,28 +373,28 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		auto bbTrack = dynamic_cast<BBTrack*>(tracklist.at(0));
 		auto bbContainer = Engine::getBBTrackContainer();
 		container = bbContainer;
-		tcoNum = bbTrack->index();
+		clipNum = bbTrack->index();
 	}
 		break;
 	default:
 		return;
 	}
 
-	values = container->automatedValuesAt(timeStart, tcoNum);
+	values = container->automatedValuesAt(timeStart, clipNum);
 	TrackList tracks = container->tracks();
 
-	Track::tcoVector tcos;
+	Track::clipVector clips;
 	for (Track* track : tracks)
 	{
 		if (track->type() == Track::AutomationTrack) {
-			track->getTCOsInRange(tcos, 0, timeStart);
+			track->getClipsInRange(clips, 0, timeStart);
 		}
 	}
 
 	// Process recording
-	for (TrackContentObject* tco : tcos)
+	for (Clip* clip : clips)
 	{
-		auto p = dynamic_cast<AutomationPattern *>(tco);
+		auto p = dynamic_cast<AutomationPattern *>(clip);
 		TimePos relTime = timeStart - p->startPosition();
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
@@ -839,9 +839,9 @@ AutomationPattern * Song::tempoAutomationPattern()
 }
 
 
-AutomatedValueMap Song::automatedValuesAt(TimePos time, int tcoNum) const
+AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 {
-	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, tcoNum);
+	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, clipNum);
 }
 
 
@@ -1159,7 +1159,7 @@ void Song::loadProject( const QString & fileName )
 		node = node.nextSibling();
 	}
 
-	// quirk for fixing projects with broken positions of TCOs inside
+	// quirk for fixing projects with broken positions of Clips inside
 	// BB-tracks
 	Engine::getBBTrackContainer()->fixIncorrectPositions();
 
