@@ -321,7 +321,7 @@ public:
 		return "song";
 	}
 
-	virtual bool fixedTCOs() const
+	virtual bool fixedClips() const
 	{
 		return false;
 	}

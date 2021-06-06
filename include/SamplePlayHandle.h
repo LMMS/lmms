@@ -31,7 +31,7 @@
 #include "PlayHandle.h"
 
 class BBTrack;
-class SampleTCO;
+class SampleClip;
 class Track;
 class AudioPort;
 
@@ -41,7 +41,7 @@ class SamplePlayHandle : public PlayHandle
 public:
 	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
 	SamplePlayHandle( const QString& sampleFile );
-	SamplePlayHandle( SampleTCO* tco );
+	SamplePlayHandle( SampleClip* tco );
 	virtual ~SamplePlayHandle();
 
 	inline bool affinityMatters() const override

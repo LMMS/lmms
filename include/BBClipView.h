@@ -1,5 +1,5 @@
 /*
- * BBTCOView.h
+ * BBClipView.h
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,20 +23,20 @@
  */
  
 
-#ifndef BB_TCO_VIEW_H
-#define BB_TCO_VIEW_H
+#ifndef BB_CLIP_VIEW_H
+#define BB_CLIP_VIEW_H
 
-#include "BBTCO.h"
+#include "BBClip.h"
 
 #include <QStaticText>
 
 
-class BBTCOView : public TrackContentObjectView
+class BBClipView : public ClipView
 {
 	Q_OBJECT
 public:
-	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
-	virtual ~BBTCOView() = default;
+	BBClipView( Clip * _tco, TrackView * _tv );
+	virtual ~BBClipView() = default;
 
 
 public slots:
@@ -55,7 +55,7 @@ protected:
 
 
 private:
-	BBTCO * m_bbTCO;
+	BBClip * m_bbClip;
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;

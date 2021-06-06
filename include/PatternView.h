@@ -26,12 +26,12 @@
 #define PATTERN_VIEW_H
  
 #include "Pattern.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 class Pattern;
  
  
-class PatternView : public TrackContentObjectView
+class PatternView : public ClipView
 {
 	Q_OBJECT
 
