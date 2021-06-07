@@ -48,24 +48,24 @@ void Oscillator::waveTableInit()
 
 }
 
-Oscillator::Oscillator( const IntModel * _wave_shape_model,
-				const IntModel * _mod_algo_model,
-				const float & _freq,
-				const float & _detuning,
-				const float & _phase_offset,
-				const float & _volume,
-			Oscillator * _sub_osc ) :
-	m_waveShapeModel( _wave_shape_model ),
-	m_modulationAlgoModel( _mod_algo_model ),
-	m_freq( _freq ),
-	m_detuning( _detuning ),
-	m_volume( _volume ),
-	m_ext_phaseOffset( _phase_offset ),
-	m_subOsc( _sub_osc ),
-	m_phaseOffset( _phase_offset ),
-	m_phase( _phase_offset ),
-	m_userWave( NULL ),
-	m_useWaveTable( false )
+Oscillator::Oscillator(const IntModel *wave_shape_model,
+			const IntModel *mod_algo_model,
+			const float &freq,
+			const float &detuning_div_samplerate,
+			const float &phase_offset,
+			const float &volume,
+			Oscillator *sub_osc) :
+	m_waveShapeModel(wave_shape_model),
+	m_modulationAlgoModel(mod_algo_model),
+	m_freq(freq),
+	m_detuning_div_samplerate(detuning_div_samplerate),
+	m_volume(volume),
+	m_ext_phaseOffset(phase_offset),
+	m_subOsc(sub_osc),
+	m_phaseOffset(phase_offset),
+	m_phase(phase_offset),
+	m_userWave(nullptr),
+	m_useWaveTable(false)
 {
 }
 
@@ -227,11 +227,10 @@ void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
 
 
 
-sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumWaveShapes-2][128 / OscillatorConstants::SEMITONES_PER_TABLE][OscillatorConstants::WAVETABLE_LENGTH];
+sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumBasicWaveShapes][128 / OscillatorConstants::SEMITONES_PER_TABLE][OscillatorConstants::WAVETABLE_LENGTH];
 fftwf_plan Oscillator::s_fftPlan;
 fftwf_plan Oscillator::s_ifftPlan;
 fftwf_complex * Oscillator::s_specBuf;
-float Oscillator::s_fftBuffer[OscillatorConstants::WAVETABLE_LENGTH*2];
 float Oscillator::s_sampleBuffer[OscillatorConstants::WAVETABLE_LENGTH];
 
 
@@ -591,7 +590,7 @@ float Oscillator::syncInit( sampleFrame * _ab, const fpp_t _frames,
 		m_subOsc->update( _ab, _frames, _chnl );
 	}
 	recalcPhase();
-	return( m_freq * m_detuning );
+	return m_freq * m_detuning_div_samplerate;
 }
 
 
@@ -603,7 +602,7 @@ void Oscillator::updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
 	recalcPhase();
-	const float osc_coeff = m_freq * m_detuning;
+	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
@@ -622,7 +621,7 @@ void Oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	const float osc_coeff = m_freq * m_detuning;
+	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
@@ -643,7 +642,7 @@ void Oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	const float osc_coeff = m_freq * m_detuning;
+	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
@@ -662,7 +661,7 @@ void Oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	const float osc_coeff = m_freq * m_detuning;
+	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
@@ -682,7 +681,7 @@ void Oscillator::updateSync( sampleFrame * _ab, const fpp_t _frames,
 {
 	const float sub_osc_coeff = m_subOsc->syncInit( _ab, _frames, _chnl );
 	recalcPhase();
-	const float osc_coeff = m_freq * m_detuning;
+	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
 	for( fpp_t frame = 0; frame < _frames ; ++frame )
 	{
@@ -705,7 +704,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 {
 	m_subOsc->update( _ab, _frames, _chnl );
 	recalcPhase();
-	const float osc_coeff = m_freq * m_detuning;
+	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 	const float sampleRateCorrection = 44100.0f /
 				Engine::mixer()->processingSampleRate();
 

@@ -46,7 +46,6 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	QWidget(_parent),
 	m_controls(controls),
 	m_processor(processor),
-	m_decaySum(0),
 	m_freezeRequest(false),
 	m_frozen(false)
 {

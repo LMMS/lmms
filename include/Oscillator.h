@@ -57,8 +57,9 @@ public:
 		ExponentialWave,
 		WhiteNoise,
 		UserDefinedWave,
-		NumWaveShapes
-	} ;
+		NumWaveShapes,
+		NumBasicWaveShapes = WhiteNoise
+	};
 
 	enum ModulationAlgos
 	{
@@ -71,13 +72,13 @@ public:
 	} ;
 
 
-	Oscillator( const IntModel * _wave_shape_model,
-			const IntModel * _mod_algo_model,
-			const float & _freq,
-			const float & _detuning,
-			const float & _phase_offset,
-			const float & _volume,
-			Oscillator * _m_subOsc = NULL );
+	Oscillator( const IntModel *wave_shape_model,
+			const IntModel *mod_algo_model,
+			const float &freq,
+			const float &detuning_div_samplerate,
+			const float &phase_offset,
+			const float &volume,
+			Oscillator *m_subOsc = nullptr);
 	virtual ~Oscillator()
 	{
 		delete m_subOsc;
@@ -171,7 +172,7 @@ public:
 		int band;
 	};
 
-	inline wtSampleControl getWtSampleControl(const float sample)
+	inline wtSampleControl getWtSampleControl(const float sample) const
 	{
 		wtSampleControl control;
 		control.frame = sample * OscillatorConstants::WAVETABLE_LENGTH;
@@ -183,50 +184,54 @@ public:
 		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					control.f1 + 1 :
 					0;
-		control.band = waveTableBandFromFreq(m_freq * m_detuning * Engine::mixer()->processingSampleRate());
+		control.band = waveTableBandFromFreq(m_freq * m_detuning_div_samplerate * Engine::mixer()->processingSampleRate());
 		return control;
 	}
 
-	inline sample_t wtSample(const sample_t table[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH], const float _sample)
+	inline sample_t wtSample(const sample_t table[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH], const float _sample) const
 	{
 		wtSampleControl control = getWtSampleControl(_sample);
 		return linearInterpolate(table[control.band][control.f1],
 				table[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline sample_t wtSample(const std::unique_ptr<OscillatorConstants::waveform_t>& table, const float sample)
+	inline sample_t wtSample(const std::unique_ptr<OscillatorConstants::waveform_t>& table, const float sample) const
 	{
 		wtSampleControl control = getWtSampleControl(sample);
 		return linearInterpolate((*table)[control.band][control.f1],
 				(*table)[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline sample_t wtSample( sample_t **table, const float _sample)
+	inline sample_t wtSample( sample_t **table, const float _sample) const
 	{
 		wtSampleControl control = getWtSampleControl(_sample);
 		return linearInterpolate(table[control.band][control.f1],
 				table[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline int  waveTableBandFromFreq(float freq)
+	static inline int waveTableBandFromFreq(float freq)
 	{
-		int band = (69 + static_cast<int>(ceil(12.0f * log2f(freq / 440.0f)))) / OscillatorConstants::SEMITONES_PER_TABLE;
-		//limit the returned value
-		// qBound would require QT audio side, not a preferable option
-		// c++17 std::clamp() could be used in the future
+		// Frequency bands are indexed relative to default MIDI key frequencies.
+		// I.e., 440 Hz (A4, key 69): 69 + 12 * log2(1) = 69
+		// To always avoid aliasing, ceil() is used instead of round(). It ensures that the nearest wavetable with
+		// lower than optimal number of harmonics is used when exactly matching wavetable is not available.
+		int band = (69 + static_cast<int>(std::ceil(12.0f * std::log2(freq / 440.0f)))) / OscillatorConstants::SEMITONES_PER_TABLE;
+		// Limit the returned value to a valid wavetable index range.
+		// (qBound would bring Qt into the audio code, which not a preferable option due to realtime safety.
+		// C++17 std::clamp() could be used in the future.)
 		return band <= 1 ? 1 : band >= OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT-1 ? OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT-1 : band;
 	}
 
 	static inline float freqFromWaveTableBand(int band)
 	{
-		return 440.0f * powf(2.0f, (band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
+		return 440.0f * std::pow(2.0f, (band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
 	}
 
 private:
 	const IntModel * m_waveShapeModel;
 	const IntModel * m_modulationAlgoModel;
 	const float & m_freq;
-	const float & m_detuning;
+	const float & m_detuning_div_samplerate;
 	const float & m_volume;
 	const float & m_ext_phaseOffset;
 	Oscillator * m_subOsc;
@@ -236,11 +241,10 @@ private:
 	bool m_useWaveTable;
 
 	/* Multiband WaveTable */
-	static sample_t s_waveTables[WaveShapes::NumWaveShapes-2][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
+	static sample_t s_waveTables[WaveShapes::NumBasicWaveShapes][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
 	static fftwf_plan s_fftPlan;
 	static fftwf_plan s_ifftPlan;
 	static fftwf_complex * s_specBuf;
-	static float s_fftBuffer[OscillatorConstants::WAVETABLE_LENGTH*2];
 	static float s_sampleBuffer[OscillatorConstants::WAVETABLE_LENGTH];
 
 	static void generateSineWaveTable(sample_t * table);
