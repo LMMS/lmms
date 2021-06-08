@@ -140,7 +140,7 @@ private slots:
 		InstrumentTrack* instrumentTrack =
 				dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
 
-		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createTCO(0));
+		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createClip(0));
 		notePattern->changeLength(TimePos(4, 0));
 		Note* note = notePattern->addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
@@ -164,8 +164,8 @@ private slots:
 		BBTrack bbTrack(song);
 		Track* automationTrack = Track::create(Track::AutomationTrack, bbContainer);
 
-		QVERIFY(automationTrack->numOfTCOs());
-		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack->getTCO(0));
+		QVERIFY(automationTrack->numOfClips());
+		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack->getClip(0));
 		QVERIFY(p1);
 
 		FloatModel model;
@@ -185,9 +185,9 @@ private slots:
 		QCOMPARE(bbContainer->automatedValuesAt(5, bbTrack.index())[&model], 0.5f);
 		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
 
-		BBTCO tco(&bbTrack);
-		tco.changeLength(TimePos::ticksPerBar() * 2);
-		tco.movePosition(0);
+		BBClip clip(&bbTrack);
+		clip.changeLength(TimePos::ticksPerBar() * 2);
+		clip.movePosition(0);
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
 		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
