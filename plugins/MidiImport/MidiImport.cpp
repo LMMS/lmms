@@ -39,7 +39,7 @@
 #include "AutomationTrack.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "Instrument.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -221,7 +221,7 @@ public:
 	{ }
 	
 	InstrumentTrack * it;
-	Pattern* p;
+	MidiClip* p;
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
@@ -259,7 +259,7 @@ public:
 			it->pitchRangeModel()->setInitValue( 2 );
 
 			// Create a default pattern
-			p = dynamic_cast<Pattern*>(it->createClip(0));
+			p = dynamic_cast<MidiClip*>(it->createClip(0));
 		}
 		return this;
 	}
@@ -269,30 +269,30 @@ public:
 	{
 		if (!p)
 		{
-			p = dynamic_cast<Pattern*>(it->createClip(0));
+			p = dynamic_cast<MidiClip*>(it->createClip(0));
 		}
 		p->addNote(n, false);
 		hasNotes = true;
 	}
 
-	void splitPatterns()
+	void splitMidiClips()
 	{
-		Pattern * newPattern = nullptr;
+		MidiClip * newMidiClip = nullptr;
 		TimePos lastEnd(0);
 
 		p->rearrangeAllNotes();
 		for (auto n : p->notes())
 		{
-			if (!newPattern || n->pos() > lastEnd + DefaultTicksPerBar)
+			if (!newMidiClip || n->pos() > lastEnd + DefaultTicksPerBar)
 			{
 				TimePos pPos = TimePos(n->pos().getBar(), 0);
-				newPattern = dynamic_cast<Pattern*>(it->createClip(pPos));
+				newMidiClip = dynamic_cast<MidiClip*>(it->createClip(pPos));
 			}
 			lastEnd = n->pos() + n->length();
 
 			Note newNote(*n);
-			newNote.setPos(n->pos(newPattern->startPosition()));
-			newPattern->addNote(newNote, false);
+			newNote.setPos(n->pos(newMidiClip->startPosition()));
+			newMidiClip->addNote(newNote, false);
 		}
 
 		delete p;
@@ -565,7 +565,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	{
 		if (c.second.hasNotes)
 		{
-			c.second.splitPatterns();
+			c.second.splitMidiClips();
 		}
 		else if (c.second.it)
 		{

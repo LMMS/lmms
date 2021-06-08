@@ -39,8 +39,8 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
+#include "MidiClip.h"
 #include "Note.h"
-#include "Pattern.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "SongEditor.h"
@@ -91,7 +91,7 @@ ClipView::ClipView( Clip * clip,
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
-	m_BBPatternBackground( 0, 0, 0 ),
+	m_BBClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_mouseHotspotKnife( 0, 0 ),
@@ -215,8 +215,8 @@ QColor ClipView::textBackgroundColor() const
 QColor ClipView::textShadowColor() const
 { return m_textShadowColor; }
 
-QColor ClipView::BBPatternBackground() const
-{ return m_BBPatternBackground; }
+QColor ClipView::BBClipBackground() const
+{ return m_BBClipBackground; }
 
 bool ClipView::gradient() const
 { return m_gradient; }
@@ -242,8 +242,8 @@ void ClipView::setTextBackgroundColor( const QColor & c )
 void ClipView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
 
-void ClipView::setBBPatternBackground( const QColor & c )
-{ m_BBPatternBackground = QColor( c ); }
+void ClipView::setBBClipBackground( const QColor & c )
+{ m_BBClipBackground = QColor( c ); }
 
 void ClipView::setGradient( const bool & b )
 { m_gradient = b; }
@@ -1213,35 +1213,35 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
 	// Create a pattern where all notes will be added
-	Pattern* newPattern = dynamic_cast<Pattern*>(track->createClip(earliestPos));
-	if (!newPattern)
+	MidiClip* newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
+	if (!newMidiClip)
 	{
-		qWarning("Warning: Failed to convert Clip to Pattern on mergeClips");
+		qWarning("Warning: Failed to convert Clip to MidiClip on mergeClips");
 		return;
 	}
 
-	newPattern->saveJournallingState(false);
+	newMidiClip->saveJournallingState(false);
 
 	// Add the notes and remove the Clips that are being merged
 	for (auto clipv: clipvs)
 	{
-		// Convert ClipV to PatternView
-		PatternView* pView = dynamic_cast<PatternView*>(clipv);
+		// Convert ClipV to MidiClipView
+		MidiClipView* mcView = dynamic_cast<MidiClipView*>(clipv);
 
-		if (!pView)
+		if (!mcView)
 		{
-			qWarning("Warning: Non-pattern Clip on InstrumentTrack");
+			qWarning("Warning: Non-MidiClip Clip on InstrumentTrack");
 			continue;
 		}
 
-		NoteVector currentClipNotes = pView->getPattern()->notes();
-		TimePos pViewPos = pView->getPattern()->startPosition();
+		NoteVector currentClipNotes = mcView->getMidiClip()->notes();
+		TimePos mcViewPos = mcView->getMidiClip()->startPosition();
 
 		for (Note* note: currentClipNotes)
 		{
-			Note* newNote = newPattern->addNote(*note, false);
+			Note* newNote = newMidiClip->addNote(*note, false);
 			TimePos originalNotePos = newNote->pos();
-			newNote->setPos(originalNotePos + (pViewPos - earliestPos));
+			newNote->setPos(originalNotePos + (mcViewPos - earliestPos));
 		}
 
 		// We disable the journalling system before removing, so the
@@ -1251,12 +1251,12 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 		clipv->remove();
 	}
 
-	// Update length since we might have moved notes beyond the end of the pattern length
-	newPattern->updateLength();
+	// Update length since we might have moved notes beyond the end of the MidiClip length
+	newMidiClip->updateLength();
 	// Rearrange notes because we might have moved them
-	newPattern->rearrangeAllNotes();
+	newMidiClip->rearrangeAllNotes();
 	// Restore journalling states now that the operation is finished
-	newPattern->restoreJournallingState();
+	newMidiClip->restoreJournallingState();
 	track->restoreJournallingState();
 	// Update song
 	Engine::getSong()->setModified();

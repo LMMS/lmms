@@ -40,7 +40,7 @@
 
 
 class AutomationTrack;
-class Pattern;
+class MidiClip;
 class TimeLineWidget;
 
 
@@ -355,7 +355,7 @@ public slots:
 	void record();
 	void playAndRecord();
 	void playBB();
-	void playPattern( const Pattern * patternToPlay, bool loop = true );
+	void playPattern( const MidiClip * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -458,7 +458,7 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	bar_t m_length;
 
-	const Pattern* m_patternToPlay;
+	const MidiClip* m_clipToPlay;
 	bool m_loopPattern;
 
 	double m_elapsedMilliSeconds[Mode_Count];

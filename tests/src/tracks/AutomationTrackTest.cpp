@@ -32,7 +32,7 @@
 #include "BBTrackContainer.h"
 #include "DetuningHelper.h"
 #include "InstrumentTrack.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "TrackContainer.h"
 
 #include "Engine.h"
@@ -140,9 +140,9 @@ private slots:
 		InstrumentTrack* instrumentTrack =
 				dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
 
-		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createClip(0));
-		notePattern->changeLength(TimePos(4, 0));
-		Note* note = notePattern->addNote(Note(TimePos(4, 0)), false);
+		MidiClip* noteMidiClip = dynamic_cast<MidiClip*>(instrumentTrack->createClip(0));
+		noteMidiClip->changeLength(TimePos(4, 0));
+		Note* note = noteMidiClip->addNote(Note(TimePos(4, 0)), false);
 		note->createDetuning();
 
 		DetuningHelper* dh = note->detuning();

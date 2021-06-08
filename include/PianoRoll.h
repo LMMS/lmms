@@ -51,7 +51,7 @@ class QToolButton;
 
 class ComboBox;
 class NotePlayHandle;
-class Pattern;
+class MidiClip;
 class TimeLineWidget;
 
 class PianoRoll : public QWidget
@@ -110,8 +110,8 @@ public:
 	void showVolTextFloat(volume_t vol, const QPoint &pos, int timeout=-1);
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
-	void setCurrentPattern( Pattern* newPattern );
-	void setGhostPattern( Pattern* newPattern );
+	void setCurrentMidiClip( MidiClip* newMidiClip );
+	void setGhostClip( MidiClip* newMidiClip );
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
 
@@ -130,14 +130,14 @@ public:
 		return m_stepRecorder.isRecording();
 	}
 
-	const Pattern* currentPattern() const
+	const MidiClip* currentMidiClip() const
 	{
-		return m_pattern;
+		return m_clip;
 	}
 
-	bool hasValidPattern() const
+	bool hasValidMidiClip() const
 	{
-		return m_pattern != NULL;
+		return m_clip != NULL;
 	}
 
 	Song::PlayModes desiredPlayModeForAccompany() const;
@@ -215,11 +215,11 @@ protected slots:
 	void changeNoteEditMode( int i );
 	void markSemiTone(int i, bool fromMenu = true);
 
-	void hidePattern( Pattern* pattern );
+	void hideMidiClip( MidiClip* pattern );
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
-	void clearGhostPattern();
+	void clearGhostClip();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
 	void constrainNoteLengths(bool constrainMax);
@@ -228,8 +228,8 @@ protected slots:
 
 
 signals:
-	void currentPatternChanged();
-	void ghostPatternSet(bool);
+	void currentMidiClipChanged();
+	void ghostClipSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -349,7 +349,7 @@ private:
 	static const QVector<float> m_zoomLevels;
 	static const QVector<float> m_zoomYLevels;
 
-	Pattern* m_pattern;
+	MidiClip* m_clip;
 	NoteVector m_ghostNotes;
 
 	inline const NoteVector & ghostNotes() const
@@ -496,9 +496,9 @@ class PianoRollWindow : public Editor, SerializingObject
 public:
 	PianoRollWindow();
 
-	const Pattern* currentPattern() const;
-	void setCurrentPattern( Pattern* pattern );
-	void setGhostPattern( Pattern* pattern );
+	const MidiClip* currentMidiClip() const;
+	void setCurrentMidiClip( MidiClip* pattern );
+	void setGhostClip( MidiClip* pattern );
 
 	int quantization() const;
 
@@ -528,14 +528,14 @@ public:
 	bool hasFocus() const;
 
 signals:
-	void currentPatternChanged();
+	void currentMidiClipChanged();
 
 
 private slots:
 	void updateAfterPatternChange();
-	void ghostPatternSet( bool state );
-	void exportPattern();
-	void importPattern();
+	void ghostClipSet( bool state );
+	void exportMidiClip();
+	void importMidiClip();
 
 private:
 	void patternRenamed();

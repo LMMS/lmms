@@ -1,6 +1,6 @@
 /*
- * Pattern.h - declaration of class Pattern, which contains all information
- *             about a pattern
+ * MidiClip.h - declaration of class MidiClip, which contains all information
+ *             about a clip
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -29,26 +29,26 @@
 #include <QStaticText>
 
 #include "Note.h"
-#include "PatternView.h"
+#include "MidiClipView.h"
 #include "ClipView.h"
 
 
 class InstrumentTrack;
 
 
-class LMMS_EXPORT Pattern : public Clip
+class LMMS_EXPORT MidiClip : public Clip
 {
 	Q_OBJECT
 public:
-	enum PatternTypes
+	enum MidiClipTypes
 	{
-		BeatPattern,
-		MelodyPattern
+		BeatClip,
+		MelodyClip
 	} ;
 
-	Pattern( InstrumentTrack* instrumentTrack );
-	Pattern( const Pattern& other );
-	virtual ~Pattern();
+	MidiClip( InstrumentTrack* instrumentTrack );
+	MidiClip( const MidiClip& other );
+	virtual ~MidiClip();
 
 	void init();
 
@@ -75,23 +75,23 @@ public:
 	// Split the list of notes on the given position
 	void splitNotes(NoteVector notes, TimePos pos);
 
-	// pattern-type stuff
-	inline PatternTypes type() const
+	// clip-type stuff
+	inline MidiClipTypes type() const
 	{
-		return m_patternType;
+		return m_clipType;
 	}
 
 
 	// next/previous track based on position in the containing track
-	Pattern * previousPattern() const;
-	Pattern * nextPattern() const;
+	MidiClip * previousMidiClip() const;
+	MidiClip * nextMidiClip() const;
 
 	// settings-management
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "pattern";
+		return "clip";
 	}
 
 	inline InstrumentTrack * instrumentTrack() const
@@ -121,29 +121,29 @@ protected slots:
 
 
 private:
-	TimePos beatPatternLength() const;
+	TimePos beatClipLength() const;
 
-	void setType( PatternTypes _new_pattern_type );
+	void setType( MidiClipTypes _new_clip_type );
 	void checkType();
 
 	void resizeToFirstTrack();
 
 	InstrumentTrack * m_instrumentTrack;
 
-	PatternTypes m_patternType;
+	MidiClipTypes m_clipType;
 
 	// data-stuff
 	NoteVector m_notes;
 	int m_steps;
 
-	Pattern * adjacentPatternByOffset(int offset) const;
+	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
-	friend class PatternView;
+	friend class MidiClipView;
 	friend class BBTrackContainerView;
 
 
 signals:
-	void destroyedPattern( Pattern* );
+	void destroyedMidiClip( MidiClip* );
 } ;
 
 

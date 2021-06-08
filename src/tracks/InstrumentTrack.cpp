@@ -68,7 +68,7 @@
 #include "MidiPortMenu.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
@@ -698,7 +698,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
 	{
-		Pattern* p = dynamic_cast<Pattern*>( *it );
+		MidiClip* p = dynamic_cast<MidiClip*>( *it );
 		// everything which is not a pattern won't be played
 		// A pattern playing in the Piano Roll window will always play
 		if(p == NULL ||
@@ -762,7 +762,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 Clip* InstrumentTrack::createClip(const TimePos & pos)
 {
-	Pattern* p = new Pattern(this);
+	MidiClip* p = new MidiClip(this);
 	p->movePosition(pos);
 	return p;
 }

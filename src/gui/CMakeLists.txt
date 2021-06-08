@@ -26,9 +26,9 @@ SET(LMMS_SRCS
 	gui/MainApplication.cpp
 	gui/MainWindow.cpp
 	gui/MidiCCRackView.cpp
+	gui/MidiClipView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
-	gui/PatternView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
