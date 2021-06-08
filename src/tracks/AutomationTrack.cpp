@@ -25,7 +25,7 @@
  */
 
 #include "AutomationTrackView.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
@@ -53,7 +53,7 @@ TrackView * AutomationTrack::createView( TrackContainerView* tcv )
 
 Clip* AutomationTrack::createClip(const TimePos & pos)
 {
-	AutomationPattern* p = new AutomationPattern(this);
+	AutomationClip* p = new AutomationClip(this);
 	p->movePosition(pos);
 	return p;
 }

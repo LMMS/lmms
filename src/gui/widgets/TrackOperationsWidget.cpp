@@ -31,7 +31,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrackView.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
@@ -371,7 +371,7 @@ void TrackOperationsWidget::toggleRecording( bool on )
 	{
 		for( Clip * clip : atv->getTrack()->getClips() )
 		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( clip );
+			AutomationClip * ap = dynamic_cast<AutomationClip *>( clip );
 			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();

@@ -26,7 +26,7 @@
 
 #include "QCoreApplication"
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -48,8 +48,8 @@ private slots:
 
 	void testPatternLinear()
 	{
-		AutomationPattern p(nullptr);
-		p.setProgressionType(AutomationPattern::LinearProgression);
+		AutomationClip p(nullptr);
+		p.setProgressionType(AutomationClip::LinearProgression);
 		p.putValue(0, 0.0, false);
 		p.putValue(100, 1.0, false);
 
@@ -63,8 +63,8 @@ private slots:
 
 	void testPatternDiscrete()
 	{
-		AutomationPattern p(nullptr);
-		p.setProgressionType(AutomationPattern::DiscreteProgression);
+		AutomationClip p(nullptr);
+		p.setProgressionType(AutomationClip::DiscreteProgression);
 		p.putValue(0, 0.0, false);
 		p.putValue(100, 1.0, false);
 
@@ -81,21 +81,21 @@ private slots:
 		auto song = Engine::getSong();
 		AutomationTrack track(song);
 
-		AutomationPattern p1(&track);
-		p1.setProgressionType(AutomationPattern::LinearProgression);
+		AutomationClip p1(&track);
+		p1.setProgressionType(AutomationClip::LinearProgression);
 		p1.putValue(0, 0.0, false);
 		p1.putValue(10, 1.0, false);
 		p1.movePosition(0);
 		p1.addObject(&model);
 
-		AutomationPattern p2(&track);
-		p2.setProgressionType(AutomationPattern::LinearProgression);
+		AutomationClip p2(&track);
+		p2.setProgressionType(AutomationClip::LinearProgression);
 		p2.putValue(0, 0.0, false);
 		p2.putValue(100, 1.0, false);
 		p2.movePosition(100);
 		p2.addObject(&model);
 
-		AutomationPattern p3(&track);
+		AutomationClip p3(&track);
 		p3.addObject(&model);
 		//XXX: Why is this even necessary?
 		p3.clear();
@@ -115,8 +115,8 @@ private slots:
 		auto song = Engine::getSong();
 		AutomationTrack track(song);
 
-		AutomationPattern p(&track);
-		p.setProgressionType(AutomationPattern::LinearProgression);
+		AutomationClip p(&track);
+		p.setProgressionType(AutomationClip::LinearProgression);
 		p.addObject(&model);
 
 		p.putValue(0, 0.0, false);
@@ -147,7 +147,7 @@ private slots:
 
 		DetuningHelper* dh = note->detuning();
 		auto pattern = dh->automationPattern();
-		pattern->setProgressionType( AutomationPattern::LinearProgression );
+		pattern->setProgressionType( AutomationClip::LinearProgression );
 		pattern->putValue(TimePos(0, 0), 0.0);
 		pattern->putValue(TimePos(4, 0), 1.0);
 
@@ -165,12 +165,12 @@ private slots:
 		Track* automationTrack = Track::create(Track::AutomationTrack, bbContainer);
 
 		QVERIFY(automationTrack->numOfClips());
-		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack->getClip(0));
+		AutomationClip* p1 = dynamic_cast<AutomationClip*>(automationTrack->getClip(0));
 		QVERIFY(p1);
 
 		FloatModel model;
 
-		p1->setProgressionType(AutomationPattern::LinearProgression);
+		p1->setProgressionType(AutomationClip::LinearProgression);
 		p1->putValue(0, 0.0, false);
 		p1->putValue(10, 1.0, false);
 		p1->addObject(&model);
@@ -201,14 +201,14 @@ private slots:
 		auto song = Engine::getSong();
 
 		auto globalTrack = song->globalAutomationTrack();
-		AutomationPattern globalPattern(globalTrack);
+		AutomationClip globalPattern(globalTrack);
 
 		AutomationTrack localTrack(song);
-		AutomationPattern localPattern(&localTrack);
+		AutomationClip localPattern(&localTrack);
 
 		FloatModel model;
-		globalPattern.setProgressionType(AutomationPattern::DiscreteProgression);
-		localPattern.setProgressionType(AutomationPattern::DiscreteProgression);
+		globalPattern.setProgressionType(AutomationClip::DiscreteProgression);
+		localPattern.setProgressionType(AutomationClip::DiscreteProgression);
 		globalPattern.addObject(&model);
 		localPattern.addObject(&model);
 		globalPattern.putValue(0, 100.0f, false);

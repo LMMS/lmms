@@ -73,7 +73,7 @@
 
 using std::move;
 
-typedef AutomationPattern::timeMap timeMap;
+typedef AutomationClip::timeMap timeMap;
 
 
 // some constants...
@@ -1120,12 +1120,12 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 			// node to the other
 			switch (_n->detuning()->automationPattern()->progressionType())
 			{
-				case AutomationPattern::DiscreteProgression:
+				case AutomationClip::DiscreteProgression:
 					_p.drawLine(old_x, pre_y, cur_x, pre_y);
 					_p.drawLine(cur_x, pre_y, cur_x, cur_y);
 					break;
-				case AutomationPattern::CubicHermiteProgression: /* TODO */
-				case AutomationPattern::LinearProgression:
+				case AutomationClip::CubicHermiteProgression: /* TODO */
+				case AutomationClip::LinearProgression:
 					_p.drawLine(old_x, pre_y, cur_x, cur_y);
 					break;
 			}
@@ -1618,7 +1618,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
 	{
-		static QPointer<AutomationPattern> detuningPattern = nullptr;
+		static QPointer<AutomationClip> detuningPattern = nullptr;
 		if (detuningPattern.data() != nullptr)
 		{
 			detuningPattern->disconnect(this);

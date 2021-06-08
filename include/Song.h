@@ -63,7 +63,7 @@ public:
 		Mode_PlaySong,
 		Mode_PlayBB,
 		Mode_PlayPattern,
-		Mode_PlayAutomationPattern,
+		Mode_PlayAutomationClip,
 		Mode_Count
 	} ;
 
@@ -272,7 +272,7 @@ public:
 
 
 	bpm_t getTempo();
-	AutomationPattern * tempoAutomationPattern() override;
+	AutomationClip * tempoAutomationClip() override;
 
 	AutomationTrack * globalAutomationTrack()
 	{

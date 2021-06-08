@@ -37,7 +37,7 @@
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
 #include "AutomationTrack.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ConfigManager.h"
 #include "Pattern.h"
 #include "Instrument.h"
@@ -159,7 +159,7 @@ public:
 	{ }
 	
 	AutomationTrack * at;
-	AutomationPattern * ap;
+	AutomationClip * ap;
 	TimePos lastPos;
 	
 	smfMidiCC & create( TrackContainer* tc, QString tn )
@@ -192,7 +192,7 @@ public:
 		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
 			TimePos pPos = TimePos( time.getBar(), 0 );
-			ap = dynamic_cast<AutomationPattern*>(
+			ap = dynamic_cast<AutomationClip*>(
 				at->createClip(pPos));
 			ap->addObject( objModel );
 		}
@@ -336,12 +336,12 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	AutomationTrack * dt = dynamic_cast<AutomationTrack*>(
 		Track::create(Track::AutomationTrack, Engine::getSong()));
 	dt->setName(tr("MIDI Time Signature Denominator"));
-	AutomationPattern * timeSigNumeratorPat =
-		new AutomationPattern(nt);
+	AutomationClip * timeSigNumeratorPat =
+		new AutomationClip(nt);
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
 	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
-	AutomationPattern * timeSigDenominatorPat =
-		new AutomationPattern(dt);
+	AutomationClip * timeSigDenominatorPat =
+		new AutomationClip(dt);
 	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
 	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 	
@@ -364,7 +364,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setValue( 2 );
 
 	// Tempo stuff
-	AutomationPattern * tap = tc->tempoAutomationPattern();
+	AutomationClip * tap = tc->tempoAutomationClip();
 	if( tap )
 	{
 		tap->clear();

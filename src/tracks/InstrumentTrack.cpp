@@ -37,7 +37,7 @@
 #include <QPainter>
 
 #include "FileDialog.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "BBTrack.h"
 #include "CaptionMenu.h"
 #include "ComboBox.h"
@@ -918,7 +918,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if(AutomationPattern::classNodeName() != node.nodeName() &&
+			else if(AutomationClip::classNodeName() != node.nodeName() &&
 					ControllerConnection::classNodeName() != node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ))
 			{

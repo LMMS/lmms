@@ -2,7 +2,7 @@ set(LMMS_SRCS
 	${LMMS_SRCS}
 
 	core/AutomatableModel.cpp
-	core/AutomationPattern.cpp
+	core/AutomationClip.cpp
 	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp

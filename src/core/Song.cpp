@@ -394,7 +394,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	// Process recording
 	for (Clip* clip : clips)
 	{
-		auto p = dynamic_cast<AutomationPattern *>(clip);
+		auto p = dynamic_cast<AutomationClip *>(clip);
 		TimePos relTime = timeStart - p->startPosition();
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
@@ -833,9 +833,9 @@ bpm_t Song::getTempo()
 
 
 
-AutomationPattern * Song::tempoAutomationPattern()
+AutomationClip * Song::tempoAutomationClip()
 {
-	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
+	return AutomationClip::globalAutomationClip( &m_tempoModel );
 }
 
 
@@ -884,7 +884,7 @@ void Song::clearProject()
 
 	if( gui && gui->automationEditor() )
 	{
-		gui->automationEditor()->setCurrentPattern( NULL );
+		gui->automationEditor()->setCurrentClip( NULL );
 	}
 
 	if( gui && gui->pianoRoll() )
@@ -900,10 +900,10 @@ void Song::clearProject()
 	// Clear the m_oldAutomatedValues AutomatedValueMap
 	m_oldAutomatedValues.clear();
 
-	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
-	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
+	AutomationClip::globalAutomationClip( &m_tempoModel )->clear();
+	AutomationClip::globalAutomationClip( &m_masterVolumeModel )->
 									clear();
-	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
+	AutomationClip::globalAutomationClip( &m_masterPitchModel )->
 									clear();
 
 	Engine::mixer()->doneChangeInModel();
@@ -1173,7 +1173,7 @@ void Song::loadProject( const QString & fileName )
 		m_controllers.end());
 
 	// resolve all IDs so that autoModels are automated
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 
 
 	Engine::mixer()->doneChangeInModel();

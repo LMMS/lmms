@@ -29,7 +29,7 @@
 #include <QDomElement>
 #include <QWriteLocker>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -290,7 +290,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 			continue;
 		}
 
-		if (auto* p = dynamic_cast<AutomationPattern *>(clip))
+		if (auto* p = dynamic_cast<AutomationClip *>(clip))
 		{
 			if (! p->hasAutomation()) {
 				continue;
