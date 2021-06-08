@@ -30,7 +30,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "Clipboard.h"
 #include "ColorChooser.h"
 #include "ComboBoxModel.h"
@@ -486,7 +486,7 @@ void ClipView::dropEvent( QDropEvent * de )
 	QDomElement clips = dataFile.content().firstChildElement( "clips" );
 	m_clip->restoreState( clips.firstChildElement().firstChildElement() );
 	m_clip->movePosition( pos );
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 	de->accept();
 }
 

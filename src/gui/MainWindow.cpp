@@ -1288,7 +1288,7 @@ void MainWindow::updatePlayPauseIcons()
 				getGUI()->songEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayAutomationPattern:
+			case Song::Mode_PlayAutomationClip:
 				getGUI()->automationEditor()->setPauseIcon( true );
 				break;
 

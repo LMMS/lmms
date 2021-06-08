@@ -36,7 +36,7 @@
 #include "LadspaControl.h"
 #include "LadspaSubPluginFeatures.h"
 #include "EffectChain.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ControllerConnection.h"
 #include "MemoryManager.h"
 #include "ValueBuffer.h"
@@ -122,7 +122,7 @@ void LadspaEffect::changeSampleRate()
 
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 }
 
 

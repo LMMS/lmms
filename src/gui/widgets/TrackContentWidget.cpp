@@ -29,7 +29,7 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "BBEditor.h"
 #include "BBTrackContainer.h"
 #include "Clipboard.h"
@@ -519,7 +519,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 		}
 	}
 
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 
 	return true;
 }

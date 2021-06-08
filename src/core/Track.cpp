@@ -31,7 +31,7 @@
 
 #include <QVariant>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -173,7 +173,7 @@ Track* Track::clone()
 	saveState(doc, parent);
 	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
 
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 	return t;
 }
 
