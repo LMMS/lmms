@@ -33,7 +33,7 @@ const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70;
 StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
 	m_pianoRoll(pianoRoll),
 	m_stepRecorderWidget(stepRecorderWidget),
-	m_pattern(nullptr)
+	m_clip(nullptr)
 {
 	m_stepRecorderWidget.hide();
 }
@@ -226,16 +226,16 @@ void StepRecorder::stepBackwards()
 
 void StepRecorder::applyStep()
 {
-	m_pattern->addJournalCheckPoint();
+	m_clip->addJournalCheckPoint();
 
 	for (const StepNote* stepNote : m_curStepNotes)
 	{
-		m_pattern->addNote(stepNote->m_note, false);
+		m_clip->addNote(stepNote->m_note, false);
 	}
 
-	m_pattern->rearrangeAllNotes();
-	m_pattern->updateLength();
-	m_pattern->dataChanged();
+	m_clip->rearrangeAllNotes();
+	m_clip->updateLength();
+	m_clip->dataChanged();
 	Engine::getSong()->setModified();
 
 	prepareNewStep();
@@ -267,14 +267,14 @@ void StepRecorder::prepareNewStep()
 	updateWidget();
 }
 
-void StepRecorder::setCurrentPattern( Pattern* newPattern )
+void StepRecorder::setCurrentMidiClip( MidiClip* newMidiClip )
 {
-	if(m_pattern != nullptr && m_pattern != newPattern)
+	if(m_clip != nullptr && m_clip != newMidiClip)
 	{
 		dismissStep();
 	}
 
-	m_pattern = newPattern;
+	m_clip = newMidiClip;
 }
 
 void StepRecorder::removeNotesReleasedForTooLong()

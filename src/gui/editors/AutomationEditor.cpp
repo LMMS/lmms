@@ -1529,7 +1529,7 @@ void AutomationEditor::play()
 		if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
 		{
 			Engine::getSong()->stop();
-			Engine::getSong()->playPattern( getGUI()->pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 		else if( Engine::getSong()->isStopped() == false )
 		{
@@ -1537,7 +1537,7 @@ void AutomationEditor::play()
 		}
 		else
 		{
-			Engine::getSong()->playPattern( getGUI()->pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 	}
 	else if( inBBEditor() )

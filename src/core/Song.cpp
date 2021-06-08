@@ -50,7 +50,7 @@
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
@@ -89,7 +89,7 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_patternToPlay( nullptr ),
+	m_clipToPlay( nullptr ),
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
@@ -228,10 +228,10 @@ void Song::processNextBuffer()
 			break;
 
 		case Mode_PlayPattern:
-			if (m_patternToPlay)
+			if (m_clipToPlay)
 			{
-				clipNum = m_patternToPlay->getTrack()->getClipNum(m_patternToPlay);
-				trackList.push_back(m_patternToPlay->getTrack());
+				clipNum = m_clipToPlay->getTrack()->getClipNum(m_clipToPlay);
+				trackList.push_back(m_clipToPlay->getTrack());
 			}
 			break;
 
@@ -296,7 +296,7 @@ void Song::processNextBuffer()
 			}
 			else if (m_playMode == Mode_PlayPattern && m_loopPattern && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_patternToPlay->length());
+				enforceLoop(TimePos{0}, m_clipToPlay->length());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -539,17 +539,17 @@ void Song::playBB()
 
 
 
-void Song::playPattern( const Pattern* patternToPlay, bool loop )
+void Song::playPattern( const MidiClip* patternToPlay, bool loop )
 {
 	if( isStopped() == false )
 	{
 		stop();
 	}
 
-	m_patternToPlay = patternToPlay;
+	m_clipToPlay = patternToPlay;
 	m_loopPattern = loop;
 
-	if( m_patternToPlay != nullptr )
+	if( m_clipToPlay != nullptr )
 	{
 		m_playMode = Mode_PlayPattern;
 		m_playing = true;

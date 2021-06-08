@@ -13,7 +13,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "Track.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -280,7 +280,7 @@ bool HydrogenImport::readSong()
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + nbb;
 				pattern_id[sName] = pattern_count - 1;
-				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getClip( i ) );
+				MidiClip*p = dynamic_cast<MidiClip*>( drum_track[instrId]->getClip( i ) );
 				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
@@ -301,7 +301,7 @@ bool HydrogenImport::readSong()
 		}
 		patternNode = ( QDomNode ) patternNode.nextSiblingElement( "pattern" );
 	}
-	// Pattern sequence
+	// MidiClip sequence
 	QDomNode patternSequenceNode = songNode.firstChildElement( "patternSequence" );
 	QDomNode groupNode = patternSequenceNode.firstChildElement( "group" );
 	int pos = 0;

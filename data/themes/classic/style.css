@@ -663,14 +663,14 @@ TrackContainerView QLabel
 	background: none;
 }
 
-/* Patterns */
+/* Clips */
 
 /* common pattern colors */
 ClipView   {
 	qproperty-mutedColor: rgb( 128, 128, 128 );
 	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
 	qproperty-selectedColor: rgb( 0, 125, 255 );
-	qproperty-BBPatternBackground: rgb( 80, 80, 80 );
+	qproperty-BBClipBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
@@ -683,7 +683,7 @@ ClipView   {
 }
 
 /* instrument pattern */
-PatternView {
+MidiClipView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
 
@@ -700,7 +700,7 @@ SampleClipView {
 }
 
 /* automation pattern */
-AutomationPatternView {
+AutomationClipView {
 	background-color: #99afff;
 	color: rgb( 204, 215, 255 );
 }
