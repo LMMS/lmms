@@ -2399,7 +2399,7 @@ void RemoteVstPlugin::guiEventLoop()
 		
 		struct timespec tim, tim2;
 		tim.tv_sec = 0;
-		tim.tv_nsec = 50000;
+		tim.tv_nsec = 5000000;
 		nanosleep(&tim, &tim2);
 		
 		if (m_shouldQuit) 
