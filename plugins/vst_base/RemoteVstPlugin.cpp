@@ -2026,9 +2026,9 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			{
 				return 0;
 			}
-#ifndef NATIVE_LINUX_VST
 			__plugin->m_windowWidth = _index;
 			__plugin->m_windowHeight = _value;
+#ifndef NATIVE_LINUX_VST
 			HWND window = __plugin->m_window;
 			DWORD dwStyle = GetWindowLongPtr( window, GWL_STYLE );
 			RECT windowSize = { 0, 0, (int) _index, (int) _value };
@@ -2038,11 +2038,14 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 					windowSize.bottom - windowSize.top,
 					SWP_NOACTIVATE | SWP_NOMOVE |
 					SWP_NOOWNERZORDER | SWP_NOZORDER );
+#else
+			XResizeWindow(__plugin->m_display, __plugin->m_window, (int) _index, (int) _value);
+			XFlush(__plugin->m_display);
+#endif
 			__plugin->sendMessage(
 				message( IdVstPluginEditorGeometry ).
 					addInt( __plugin->m_windowWidth ).
 					addInt( __plugin->m_windowHeight ) );
-#endif
 			return 1;
 		}
 
