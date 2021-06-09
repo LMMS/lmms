@@ -205,7 +205,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     {
         m_paramModels.push_back(new CarlaParamFloatModel(this));
         connect(m_paramModels[i], &CarlaParamFloatModel::dataChanged,
-            this, [=]() {knobModelChanged(i);}, Qt::DirectConnection);
+            this, [=]() {paramModelChanged(i);}, Qt::DirectConnection);
     }
 #endif
 
@@ -240,7 +240,7 @@ CarlaInstrument::~CarlaInstrument()
     fHandle = NULL;
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
-    clearKnobModels();
+    clearParamModels();
 #endif
 }
 
@@ -311,7 +311,7 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
         // true = mousePress
         // false = mouseRelease
         if (!value) {
-            updateKnobModel(index);
+            updateParamModel(index);
         }
         break;
     case NATIVE_HOST_OPCODE_RELOAD_ALL:
@@ -378,7 +378,7 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 
 void CarlaInstrument::refreshParams(bool init)
 {
-	m_knobGroupCount = 0;
+	m_paramGroupCount = 0;
 	if (fDescriptor->get_parameter_count != nullptr &&
 		fDescriptor->get_parameter_info  != nullptr &&
 		fDescriptor->get_parameter_value != nullptr &&
@@ -407,7 +407,7 @@ void CarlaInstrument::refreshParams(bool init)
 
 				if (m_paramModels[i]->enabled() && !groups.contains(paramInfo->groupName)) {
 					groups.push_back(paramInfo->groupName);
-					m_knobGroupCount++;
+					m_paramGroupCount++;
 				}
 				m_paramModels[i]->setGroupId(groups.indexOf(paramInfo->groupName));
 			}
@@ -432,7 +432,7 @@ void CarlaInstrument::refreshParams(bool init)
 	emit paramsUpdated();
 }
 
-void CarlaInstrument::clearKnobModels(){
+void CarlaInstrument::clearParamModels(){
 	//Delete the models, this also disconnects all connections (automation and controller connections)
 	for (uint32_t index=0; index < m_paramModels.count(); ++index)
 	{
@@ -442,10 +442,10 @@ void CarlaInstrument::clearKnobModels(){
 	//Clear the list
 	m_paramModels.clear();
 
-	m_knobGroupCount = 0;
+	m_paramGroupCount = 0;
 }
 
-void CarlaInstrument::knobModelChanged(uint32_t index)
+void CarlaInstrument::paramModelChanged(uint32_t index)
 { // Update Carla param (LMMS -> Carla)
 	if (!m_paramModels[index]->isOutput()){
 		if (fDescriptor->set_parameter_value != nullptr){
@@ -460,7 +460,7 @@ void CarlaInstrument::knobModelChanged(uint32_t index)
 	}
 }
 
-void CarlaInstrument::updateKnobModel(uint32_t index)
+void CarlaInstrument::updateParamModel(uint32_t index)
 { // Called on param changed (Carla -> LMMS)
 	if (fDescriptor->get_parameter_value != nullptr){
 		m_paramModels[index]->setValue(
@@ -873,7 +873,7 @@ CarlaParamsView::~CarlaParamsView()
 	// Clear models
 	if (m_carlaInstrument->m_paramModels.isEmpty() == false)
 	{
-		m_carlaInstrument->clearKnobModels();
+		m_carlaInstrument->clearParamModels();
 	}
 }
 
@@ -886,7 +886,7 @@ void CarlaParamsView::filterKnobs()
 {
 	clearKnobs(); // Remove all knobs from the layout.
 
-	if (!m_carlaInstrument->m_knobGroupCount) {
+	if (!m_carlaInstrument->m_paramGroupCount) {
 		return;
 	}
 
@@ -958,8 +958,8 @@ void CarlaParamsView::refreshKnobs()
 
 	// Clear max knob width per group
 	m_maxKnobWidthPerGroup.clear();
-	m_maxKnobWidthPerGroup.reserve(m_carlaInstrument->m_knobGroupCount);
-	for (uint8_t i = 0; i < m_carlaInstrument->m_knobGroupCount; i++) {
+	m_maxKnobWidthPerGroup.reserve(m_carlaInstrument->m_paramGroupCount);
+	for (uint8_t i = 0; i < m_carlaInstrument->m_paramGroupCount; i++) {
 		m_maxKnobWidthPerGroup[i] = 0;
 	}
 
@@ -969,7 +969,7 @@ void CarlaParamsView::refreshKnobs()
 	m_knobs.reserve(m_carlaInstrument->m_paramModels.count());
 
 	QStringList groupNameList;
-	groupNameList.reserve(m_carlaInstrument->m_knobGroupCount);
+	groupNameList.reserve(m_carlaInstrument->m_paramGroupCount);
 
 	for (uint32_t i=0; i < m_carlaInstrument->m_paramModels.count(); ++i)
 	{
