@@ -616,7 +616,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
     setPalette(pal);
 
-    QHBoxLayout * l = new QHBoxLayout(this);
+    QHBoxLayout* l = new QHBoxLayout(this);
     l->setContentsMargins( 20, 180, 10, 10 );
     l->setSpacing(3);
     l->setAlignment(Qt::AlignTop);
@@ -785,9 +785,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_toolBarLayout->addWidget(m_groupFilterCombo);
 
 	// -- Input params
-	QFrame * inputFrame = new QFrame(this);
+	QFrame* inputFrame = new QFrame(this);
 	QVBoxLayout* inputLayout = new QVBoxLayout(inputFrame);
-	QLabel * inputLabel = new QLabel("Input parameters", inputFrame);
+	QLabel* inputLabel = new QLabel("Input parameters", inputFrame);
 
 	m_inputScrollArea = new QScrollArea(inputFrame);
 	m_inputScrollAreaWidgetContent = new QWidget();
@@ -811,9 +811,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	inputLayout->addWidget(m_inputScrollArea);
 
 	// -- Output params
-	QFrame * outputFrame = new QFrame(this);
+	QFrame* outputFrame = new QFrame(this);
 	QVBoxLayout* outputLayout = new QVBoxLayout(outputFrame);
-	QLabel * outputLabel = new QLabel("Output parameters", outputFrame);
+	QLabel* outputLabel = new QLabel("Output parameters", outputFrame);
 
 	m_outputScrollArea = new QScrollArea(outputFrame);
 	m_outputScrollAreaWidgetContent = new QWidget();
@@ -837,7 +837,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	outputLayout->addWidget(m_outputScrollArea);
 
 	// -- QSplitter
-	QSplitter * splitter = new QSplitter(Qt::Vertical, this);
+	QSplitter* splitter = new QSplitter(Qt::Vertical, this);
 
 	// -- Add layout and widgets.
 	verticalLayout->addLayout(m_toolBarLayout);
@@ -1088,7 +1088,7 @@ void CarlaParamsView::clearKnobs()
 	}
 
 	// Remove spacers
-	QLayoutItem * item;
+	QLayoutItem* item;
 	for (int16_t i=m_inputScrollAreaLayout->count() - 1; i > 0; i--)
 	{
 		item = m_inputScrollAreaLayout->takeAt(i);
