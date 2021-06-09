@@ -892,15 +892,16 @@ void CarlaParamsView::filterKnobs()
 		return;
 	}
 
-	uint16_t maxWidth = m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()];
-	if (!maxWidth) {
+	// Calc how many knobs will fit horizontal in the params window.
+	uint16_t maxKnobWidth = m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()];
+	maxKnobWidth += m_inputScrollAreaLayout->spacing();
+	if (!maxKnobWidth) {
 		// Prevent possible division by zero.
 		return;
 	}
+	m_maxColumns = m_inputScrollArea->width() / maxKnobWidth;
 
-	m_maxColumns = (m_inputScrollArea->width() / maxWidth);
 	QString text = m_paramsFilterLineEdit->text();
-
 	for (uint32_t i=0; i < m_knobs.count(); ++i)
 	{
 		// Don't show disabled (unused) knobs.
@@ -998,7 +999,7 @@ void CarlaParamsView::refreshKnobs()
 			uint8_t groupId = m_carlaInstrument->m_paramModels[i]->groupId();
 			if (m_maxKnobWidthPerGroup[groupId] < m_knobs[i]->width())
 			{
-				m_maxKnobWidthPerGroup[groupId] = m_knobs[i]->width() + m_inputScrollAreaLayout->spacing();
+				m_maxKnobWidthPerGroup[groupId] = m_knobs[i]->width();
 			}
 		}
 	}
