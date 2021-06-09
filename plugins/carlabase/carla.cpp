@@ -240,9 +240,7 @@ CarlaInstrument::~CarlaInstrument()
     fHandle = NULL;
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
-    if (!m_paramModels.isEmpty()) {
-        m_paramModels.clear();
-    }
+    clearKnobModels();
 #endif
 }
 
