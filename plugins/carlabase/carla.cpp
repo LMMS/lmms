@@ -200,7 +200,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
     // Add static amount of CarlaParamFloatModel's.
     int paramCount = fDescriptor->get_parameter_count(fHandle);
-    m_paramModels.reserve(paramCount+1);
+    m_paramModels.reserve(paramCount);
     for (int i=0; i < paramCount; ++i)
     {
         m_paramModels.push_back(new CarlaParamFloatModel(this));
