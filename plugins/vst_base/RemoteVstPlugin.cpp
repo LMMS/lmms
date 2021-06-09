@@ -349,13 +349,13 @@ public:
 	}
 
 	inline void queueMessage( const message & m ) {
-		#ifdef NATIVE_LINUX_VST
+#ifdef NATIVE_LINUX_VST
 		pthread_mutex_lock(&message_mutex);
-		#endif
+#endif
 		m_messageList.push( m );
-		#ifdef NATIVE_LINUX_VST
+#ifdef NATIVE_LINUX_VST
 		pthread_mutex_unlock(&message_mutex);
-		#endif
+#endif
 	}
 
 	inline bool shouldGiveIdle() const
@@ -375,7 +375,7 @@ public:
 #ifndef NATIVE_LINUX_VST
 	static DWORD WINAPI processingThread( LPVOID _param );
 #else
-	static void * processingThread2( void * _param );
+	static void * processingThread( void * _param );
 #endif
 	
 	static bool setupMessageWindow();
@@ -442,16 +442,16 @@ private:
 #ifndef NATIVE_LINUX_VST
 	HINSTANCE m_libInst;
 #else
-	void* m_libInst;
+	void* m_libInst = NULL;
 #endif
 
 	AEffect * m_plugin;
 #ifndef NATIVE_LINUX_VST
 	HWND m_window;
 #else
-	Window m_window;
-	Display* m_display;
-	Atom wmDeleteMessage;
+	Window m_window = NULL;
+	Display* m_display = NULL;
+	Atom m_wmDeleteMessage;
 	bool m_x11WindowVisible = false;
 #endif
 	intptr_t m_windowID;
@@ -465,6 +465,7 @@ private:
 
 #ifdef NATIVE_LINUX_VST
 	pthread_mutex_t message_mutex = PTHREAD_MUTEX_INITIALIZER;
+	bool m_shouldQuit = false;
 #endif
 	std::queue<message> m_messageList;
 	bool m_shouldGiveIdle;
@@ -618,7 +619,7 @@ RemoteVstPlugin::~RemoteVstPlugin()
 #ifndef NATIVE_LINUX_VST
 		FreeLibrary( m_libInst );
 #else
-		dlclose( m_libInst );
+		dlclose(m_libInst);
 #endif
 		m_libInst = NULL;
 	}
@@ -766,13 +767,22 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 
 			break;
 		}
-		
+
 		case IdIdle:
 		{
+#ifdef NATIVE_LINUX_VST
 			idle();
+#endif
 			break;
 		}
-
+		
+#ifdef NATIVE_LINUX_VST
+		case IdQuit:
+		{
+			m_shouldQuit = true;
+			break;
+		}
+#endif
 		default:
 			return RemotePluginClient::processMessage( _m );
 	}
@@ -901,6 +911,8 @@ void RemoteVstPlugin::initEditor()
 #endif
 
 #else
+	// native linux support
+	// inspired by https://github.com/ekenberg/vstminihost
 	XEvent e;
 	Atom prop_atom, val_atom;
 	
@@ -908,8 +920,8 @@ void RemoteVstPlugin::initEditor()
 		m_display = XOpenDisplay(NULL);
 	m_window = XCreateSimpleWindow(m_display, DefaultRootWindow(m_display), 0, 0, 400, 400, 0, 0, 0);
 	
-	wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", false);
-	XSetWMProtocols(m_display, m_window, &wmDeleteMessage, 1);
+	m_wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", false);
+	XSetWMProtocols(m_display, m_window, &m_wmDeleteMessage, 1);
 	
 	// make tool window
 	prop_atom = XInternAtom(m_display, "_NET_WM_WINDOW_TYPE", False);
@@ -917,10 +929,10 @@ void RemoteVstPlugin::initEditor()
 	XChangeProperty(m_display, m_window, prop_atom, XA_ATOM, 32, PropModeReplace, (unsigned char *)&val_atom, 1);
 	
 	// change name
-	XStoreName(m_display, m_window, "LVSL");
+	XStoreName(m_display, m_window, pluginName());
 	
 	ERect * er;
-	pluginDispatch( effEditGetRect, 0, 0, &er );
+	pluginDispatch(effEditGetRect, 0, 0, &er);
 
 	m_windowWidth = er->right - er->left;
 	m_windowHeight = er->bottom - er->top;
@@ -929,12 +941,12 @@ void RemoteVstPlugin::initEditor()
 	XMapWindow(m_display, m_window);
 	XFlush(m_display);
 	
-	pluginDispatch( effEditOpen, 0, (intptr_t) m_display, (void*) m_window );
+	pluginDispatch(effEditOpen, 0, (intptr_t) m_display, (void*) m_window);
 	
 	XSelectInput(m_display, m_window, SubstructureNotifyMask | ButtonPressMask | ButtonReleaseMask
 			| ButtonMotionMask | ExposureMask | KeyPressMask);
 	
-	pluginDispatch( effEditTop );
+	pluginDispatch(effEditTop);
 	m_x11WindowVisible = true;
 #endif
 }
@@ -948,10 +960,13 @@ void RemoteVstPlugin::showEditor() {
 #ifndef NATIVE_LINUX_VST
 		ShowWindow( m_window, SW_SHOWNORMAL );
 #else
-		debugMessage("show editor");
-		XMapWindow(m_display, m_window);
-		XFlush(m_display);
-		m_x11WindowVisible = true;
+		if (!m_x11WindowVisible)
+		{
+			debugMessage("show editor");
+			XMapWindow(m_display, m_window);
+			XFlush(m_display);
+			m_x11WindowVisible = true;
+		}
 #endif
 	}
 }
@@ -965,10 +980,13 @@ void RemoteVstPlugin::hideEditor() {
 #ifndef NATIVE_LINUX_VST		
 		ShowWindow( m_window, SW_HIDE );
 #else
-		debugMessage("hide editor");
-		XUnmapWindow(m_display, m_window);
-		XFlush(m_display);
-		m_x11WindowVisible = false;
+		if (m_x11WindowVisible) 
+		{
+			debugMessage("hide editor");
+			XUnmapWindow(m_display, m_window);
+			XFlush(m_display);
+			m_x11WindowVisible = false;
+		}
 #endif
 	}
 }
@@ -978,7 +996,6 @@ void RemoteVstPlugin::hideEditor() {
 
 void RemoteVstPlugin::destroyEditor()
 {
-	debugMessage("destroy editor");
 	if( m_window == NULL )
 	{
 		return;
@@ -989,7 +1006,9 @@ void RemoteVstPlugin::destroyEditor()
 #ifndef NATIVE_LINUX_VST	
 	DestroyWindow( m_window );
 #else
-	XCloseDisplay(m_display);
+	if (m_display)
+		XCloseDisplay(m_display);
+	m_display = NULL;
 #endif
 	m_window = NULL;
 }
@@ -2192,23 +2211,53 @@ void RemoteVstPlugin::idle()
 void RemoteVstPlugin::processUIThreadMessages()
 {
 	setProcessing( true );
-	#ifdef NATIVE_LINUX_VST
-		pthread_mutex_lock(&message_mutex);
-	#endif
+#ifdef NATIVE_LINUX_VST
+	pthread_mutex_lock(&message_mutex);
+#endif
 	
-	while( m_messageList.size() )
+	size_t size = m_messageList.size();
+	
+#ifdef NATIVE_LINUX_VST
+	pthread_mutex_unlock(&message_mutex);
+#endif
+
+	while( size )
 	{
-		processMessage( m_messageList.front() );
+		
+#ifdef NATIVE_LINUX_VST
+		pthread_mutex_lock(&message_mutex);
+#endif
+
+		message m = m_messageList.front();
+
+#ifdef NATIVE_LINUX_VST
+		pthread_mutex_unlock(&message_mutex);
+#endif
+		
+		processMessage( m );
+		
+#ifdef NATIVE_LINUX_VST
+		pthread_mutex_lock(&message_mutex);
+#endif
+
 		m_messageList.pop();
+#ifdef NATIVE_LINUX_VST
+		pthread_mutex_unlock(&message_mutex);
+#endif
 		if( shouldGiveIdle() )
 		{
 			pluginDispatch( effEditIdle );
 			setShouldGiveIdle( false );
 		}
-	}
-	#ifdef NATIVE_LINUX_VST
+#ifdef NATIVE_LINUX_VST
+		pthread_mutex_lock(&message_mutex);
+#endif
+
+		size = m_messageList.size();
+#ifdef NATIVE_LINUX_VST
 		pthread_mutex_unlock(&message_mutex);
-	#endif
+#endif
+	}
 	
 	setProcessing( false );
 	
@@ -2225,14 +2274,14 @@ void RemoteVstPlugin::sendX11Idle()
 #ifndef NATIVE_LINUX_VST
 DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 #else
-void * RemoteVstPlugin::processingThread2(void * _param)
+void * RemoteVstPlugin::processingThread(void * _param)
 #endif
 {
-	#ifndef NATIVE_LINUX_VST
+#ifndef NATIVE_LINUX_VST
 	__processingThreadId = GetCurrentThreadId();
-	#else
+#else
 	__processingThreadId = pthread_self();
-	#endif
+#endif
 	
 	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
 
@@ -2264,6 +2313,20 @@ void * RemoteVstPlugin::processingThread2(void * _param)
 #endif
 		}
 	}
+
+#ifndef NATIVE_LINUX_VST
+	// notify GUI thread about shutdown
+		PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
+	
+		return 0;
+#else
+	if (m.id == IdQuit)
+		_this->queueMessage( m );
+	
+	int *result = (int*) malloc(sizeof(int));
+	*result = 0;
+	pthread_exit(result);
+#endif
 }
 
 
@@ -2307,19 +2370,19 @@ void RemoteVstPlugin::guiEventLoop()
 	XEvent e;
 	while(true)
 	{
-		//if (XQLength(m_display) > 0) {
-		if (XPending(m_display) > 0) {
-		XNextEvent(m_display, &e);
-		
-		if (e.type == ClientMessage)
+		//if (XQLength(m_display) > 0)
+		if (XPending(m_display) > 0)
 		{
-			if (e.xclient.data.l[0] == wmDeleteMessage)
+			XNextEvent(m_display, &e);
+		
+			if (e.type == ClientMessage)
 			{
-				//m_window = NULL;
-				debugMessage("Hide editor");
-				hideEditor();
+				if (e.xclient.data.l[0] == m_wmDeleteMessage)
+				{
+					debugMessage("Hide editor");
+					hideEditor();
+				}
 			}
-		} 
 		}
 
 		// needed by zynaAddsubfx ui
@@ -2333,9 +2396,14 @@ void RemoteVstPlugin::guiEventLoop()
 		
 		struct timespec tim, tim2;
 		tim.tv_sec = 0;
-		tim.tv_nsec = 500;
+		tim.tv_nsec = 50000;
 		nanosleep(&tim, &tim2);
 		
+		if (m_shouldQuit) 
+		{
+			__plugin->hideEditor();
+			break;
+		}
 	}
 }
 #endif
@@ -2387,7 +2455,6 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 
 	return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
-
 #endif
 
 
@@ -2489,6 +2556,13 @@ int main( int _argc, char * * _argv )
 		}
 	}
 
+#ifdef NATIVE_LINUX_VST
+	if (EMBED)
+	{
+		cerr << "Native linux VST works only without embeding." << endl;
+	}
+#endif
+	
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
 #ifdef SYNC_WITH_SHM_FIFO
@@ -2508,7 +2582,7 @@ int main( int _argc, char * * _argv )
 						__plugin, 0, NULL ) == NULL )
 #else
 		int err = 0;
-		err = pthread_create(&__processingThreadId, NULL, &RemoteVstPlugin::processingThread2, __plugin);
+		err = pthread_create(&__processingThreadId, NULL, &RemoteVstPlugin::processingThread, __plugin);
 		if (err != 0)
 #endif
 		{
@@ -2518,6 +2592,9 @@ int main( int _argc, char * * _argv )
 		}
 		
 		__plugin->guiEventLoop();
+#ifdef NATIVE_LINUX_VST
+		pthread_join(__processingThreadId, NULL);
+#endif
 	}
 	
 	delete __plugin;

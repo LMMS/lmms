@@ -682,7 +682,9 @@ void VestigeInstrumentView::openPlugin()
 	QStringList types;
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
+#ifdef LMMS_BUILD_LINUX
 		<< tr( "SO-files (*.so)" )
+#endif
 		;
 	ofd.setNameFilters( types );
 

@@ -36,7 +36,6 @@
 #include <string>
 #include <cassert>
 
-
 #if !(defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H))
 #define SYNC_WITH_SHM_FIFO
 #define USE_QT_SEMAPHORES
@@ -825,6 +824,16 @@ public:
 		sendMessage( IdToggleUI );
 		unlock();
 	}
+
+#ifndef NATIVE_LINUX_VST
+	void setQuit()
+	{
+
+		lock();
+		sendMessage( IdQuit );
+		unlock();
+	}
+#endif
 
 	int isUIVisible()
 	{
