@@ -246,9 +246,9 @@ signals:
 private slots:
     void sampleRateChanged();
     void refreshParams(bool init = false);
-    void clearKnobModels();
-    void knobModelChanged(uint32_t index);
-    void updateKnobModel(uint32_t index);
+    void clearParamModels();
+    void paramModelChanged(uint32_t index);
+    void updateParamModel(uint32_t index);
 
 private:
     const bool kIsPatchbay;
@@ -264,7 +264,7 @@ private:
     // this is only needed because note-offs are being sent during play
     QMutex fMutex;
 
-    uint8_t m_knobGroupCount;
+    uint8_t m_paramGroupCount;
     QList<CarlaParamFloatModel*> m_paramModels;
     QDomElement m_settingsElem;
 
