@@ -184,14 +184,7 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 		p.fillRect( coloredRect, m_trackView->getTrack()->color() );
 	}
 
-	if( m_trackView->isMovingTrack() == false )
-	{
-		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip"));
-	}
-	else
-	{
-		p.drawPixmap( 2, 2, embed::getIconPixmap("track_op_grip_c"));
-	}
+	p.drawPixmap(2, 2, embed::getIconPixmap(m_trackView->isMovingTrack() ? "track_op_grip_c" : "track_op_grip"));
 }
 
 
