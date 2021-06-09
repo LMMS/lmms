@@ -398,14 +398,17 @@ void CarlaInstrument::refreshParams(bool init)
 
 			// Get parameter name
 			QString name = "_NO_NAME_";
-			if (paramInfo->name != nullptr){
+			if (paramInfo->name != nullptr)
+			{
 				name = paramInfo->name;
 			}
 
-			if (paramInfo->groupName != nullptr){
+			if (paramInfo->groupName != nullptr)
+			{
 				m_paramModels[i]->setGroupName(paramInfo->groupName);
 
-				if (m_paramModels[i]->enabled() && !groups.contains(paramInfo->groupName)) {
+				if (m_paramModels[i]->enabled() && !groups.contains(paramInfo->groupName))
+				{
 					groups.push_back(paramInfo->groupName);
 					m_paramGroupCount++;
 				}
@@ -432,7 +435,8 @@ void CarlaInstrument::refreshParams(bool init)
 	emit paramsUpdated();
 }
 
-void CarlaInstrument::clearParamModels(){
+void CarlaInstrument::clearParamModels()
+{
 	//Delete the models, this also disconnects all connections (automation and controller connections)
 	for (uint32_t index=0; index < m_paramModels.count(); ++index)
 	{
@@ -447,14 +451,17 @@ void CarlaInstrument::clearParamModels(){
 
 void CarlaInstrument::paramModelChanged(uint32_t index)
 { // Update Carla param (LMMS -> Carla)
-	if (!m_paramModels[index]->isOutput()){
-		if (fDescriptor->set_parameter_value != nullptr){
+	if (!m_paramModels[index]->isOutput())
+	{
+		if (fDescriptor->set_parameter_value != nullptr)
+		{
 			fDescriptor->set_parameter_value(fHandle, index, m_paramModels[index]->value());
 
 		}
 
 		// TODO? Shouldn't Carla be doing this?
-		if (fDescriptor->ui_set_parameter_value != nullptr){
+		if (fDescriptor->ui_set_parameter_value != nullptr)
+		{
 			fDescriptor->ui_set_parameter_value(fHandle, index, m_paramModels[index]->value());
 		}
 	}
@@ -462,7 +469,8 @@ void CarlaInstrument::paramModelChanged(uint32_t index)
 
 void CarlaInstrument::updateParamModel(uint32_t index)
 { // Called on param changed (Carla -> LMMS)
-	if (fDescriptor->get_parameter_value != nullptr){
+	if (fDescriptor->get_parameter_value != nullptr)
+	{
 		m_paramModels[index]->setValue(
 			fDescriptor->get_parameter_value(fHandle, index)
 		);
@@ -648,10 +656,13 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
 CarlaInstrumentView::~CarlaInstrumentView()
 {
     if (m_toggleUIButton->isChecked())
+    {
         toggleUI(false);
+    }
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
-    if (m_paramsView) {
+    if (m_paramsView)
+    {
         delete m_paramsView;
         m_paramsView = nullptr;
     }
@@ -699,10 +710,15 @@ void CarlaInstrumentView::toggleParamsWindow()
 	{
 		m_paramsView = new CarlaParamsView(this, m_parent);
 		connect(m_paramsSubWindow, SIGNAL(uiClosed()), this, SLOT(paramsUiClosed()));
-	} else {
-		if (m_paramsSubWindow->isVisible()) {
+	}
+	else
+	{
+		if (m_paramsSubWindow->isVisible())
+		{
 			m_paramsSubWindow->hide();
-		} else {
+		}
+		else
+		{
 			m_paramsSubWindow->show();
 		}
 	}
@@ -886,14 +902,16 @@ void CarlaParamsView::filterKnobs()
 {
 	clearKnobs(); // Remove all knobs from the layout.
 
-	if (!m_carlaInstrument->m_paramGroupCount) {
+	if (!m_carlaInstrument->m_paramGroupCount)
+	{
 		return;
 	}
 
 	// Calc how many knobs will fit horizontal in the params window.
 	uint16_t maxKnobWidth = m_maxKnobWidthPerGroup[m_groupFilterCombo->currentIndex()];
 	maxKnobWidth += m_inputScrollAreaLayout->spacing();
-	if (!maxKnobWidth) {
+	if (!maxKnobWidth)
+	{
 		// Prevent possible division by zero.
 		return;
 	}
@@ -930,7 +948,9 @@ void CarlaParamsView::filterKnobs()
 			{	
 				addKnob(i);
 			}
-		} else {
+		}
+		else
+		{
 			addKnob(i);
 		}
 	}
@@ -959,7 +979,8 @@ void CarlaParamsView::refreshKnobs()
 	// Clear max knob width per group
 	m_maxKnobWidthPerGroup.clear();
 	m_maxKnobWidthPerGroup.reserve(m_carlaInstrument->m_paramGroupCount);
-	for (uint8_t i = 0; i < m_carlaInstrument->m_paramGroupCount; i++) {
+	for (uint8_t i = 0; i < m_carlaInstrument->m_paramGroupCount; i++)
+	{
 		m_maxKnobWidthPerGroup[i] = 0;
 	}
 
@@ -1012,7 +1033,8 @@ void CarlaParamsView::refreshKnobs()
 }
 
 
-void CarlaParamsView::windowResized() {
+void CarlaParamsView::windowResized()
+{
 	filterKnobs();
 }
 
@@ -1029,7 +1051,9 @@ void CarlaParamsView::addKnob(uint32_t index)
 		if (m_curOutColumn < m_maxColumns - 1)
 		{
 			m_curOutColumn++;
-		} else {
+		}
+		else
+		{
 			m_curOutColumn = 0;
 			m_curOutRow++;
 		}
@@ -1047,7 +1071,9 @@ void CarlaParamsView::addKnob(uint32_t index)
 		if (m_curColumn < m_maxColumns - 1)
 		{
 			m_curColumn++;
-		} else {
+		}
+		else
+		{
 			m_curColumn = 0;
 			m_curRow++;
 		}
