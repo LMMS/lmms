@@ -15,14 +15,9 @@ if(LMMS_HAVE_WEAKCARLA)
     ${CMAKE_CURRENT_SOURCE_DIR}/carla/source/backend
   )
 
-  IF(LMMS_BUILD_WIN32)
-      # use carla.dll
-      SET(CMAKE_SHARED_LIBRARY_PREFIX "")
-      SET(CARLA_NATIVE_LIB carla)
-  ELSE()
-      # use libcarla_native-plugin
-      SET(CARLA_NATIVE_LIB carla_native-plugin)
-  ENDIF()
+  # use libcarla_native-plugin
+  SET(CARLA_NATIVE_LIB carla_native-plugin)
+
   ADD_LIBRARY(${CARLA_NATIVE_LIB} SHARED DummyCarla.cpp)
   TARGET_INCLUDE_DIRECTORIES(${CARLA_NATIVE_LIB} PUBLIC ${CARLA_INCLUDE_DIRS})
   INSTALL(TARGETS ${CARLA_NATIVE_LIB}
