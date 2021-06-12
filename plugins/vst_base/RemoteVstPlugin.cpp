@@ -662,7 +662,6 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			return true;
 
 		case IdIsUIVisible:
-			debugMessage("is visible?");
 #ifndef NATIVE_LINUX_VST			
 			bool visible = m_window && IsWindowVisible( m_window );
 #else
@@ -962,7 +961,6 @@ void RemoteVstPlugin::showEditor() {
 #else
 		if (!m_x11WindowVisible)
 		{
-			debugMessage("show editor");
 			XMapWindow(m_display, m_window);
 			XFlush(m_display);
 			m_x11WindowVisible = true;
@@ -982,7 +980,6 @@ void RemoteVstPlugin::hideEditor() {
 #else
 		if (m_x11WindowVisible) 
 		{
-			debugMessage("hide editor");
 			XUnmapWindow(m_display, m_window);
 			XFlush(m_display);
 			m_x11WindowVisible = false;
@@ -2370,6 +2367,10 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop()
 #else
 void RemoteVstPlugin::guiEventLoop()
 {
+	struct timespec tim, tim2;
+	tim.tv_sec = 0;
+	tim.tv_nsec = 5000000;
+
 	XEvent e;
 	while(true)
 	{
@@ -2378,14 +2379,8 @@ void RemoteVstPlugin::guiEventLoop()
 		{
 			XNextEvent(m_display, &e);
 		
-			if (e.type == ClientMessage)
-			{
-				if (e.xclient.data.l[0] == m_wmDeleteMessage)
-				{
-					debugMessage("Hide editor");
-					hideEditor();
-				}
-			}
+			if (e.type == ClientMessage && e.xclient.data.l[0] == m_wmDeleteMessage)
+				hideEditor();
 		}
 
 		// needed by zynaAddsubfx ui
@@ -2393,13 +2388,8 @@ void RemoteVstPlugin::guiEventLoop()
 			__plugin->idle();
 		
 		if(__plugin->isInitialized() && !__plugin->isProcessing() )
-		{
 			__plugin->processUIThreadMessages();
-		}
 		
-		struct timespec tim, tim2;
-		tim.tv_sec = 0;
-		tim.tv_nsec = 5000000;
 		nanosleep(&tim, &tim2);
 		
 		if (m_shouldQuit) 
