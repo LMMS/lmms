@@ -134,7 +134,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	PE::MachineType machineType;
 	QFileInfo fi(m_plugin);
 #ifdef LMMS_BUILD_LINUX
-	if (fi.completeSuffix() == "so")
+	if (fi.suffix() == "so")
 		machineType =PE::MachineType::linux64;
 	else  
 #endif
