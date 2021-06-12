@@ -1009,7 +1009,6 @@ private:
 
 	sample_rate_t m_sampleRate;
 	fpp_t m_bufferSize;
-
 } ;
 
 #endif
