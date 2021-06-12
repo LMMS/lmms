@@ -234,12 +234,14 @@ bool DataFile::validate( QString extension )
 
 QString DataFile::nameWithExtension( const QString & _fn ) const
 {
+	const QString extension = _fn.section( '.', -1 );
+
 	switch( type() )
 	{
 		case SongProject:
-			if( _fn.section( '.', -1 ) != "mmp" &&
-					_fn.section( '.', -1 ) != "mpt" &&
-					_fn.section( '.', -1 ) != "mmpz" )
+			if( extension != "mmp" &&
+					extension != "mpt" &&
+					extension != "mmpz" )
 			{
 				if( ConfigManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
@@ -250,13 +252,13 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 			}
 			break;
 		case SongProjectTemplate:
-			if( _fn.section( '.',-1 ) != "mpt" )
+			if( extension != "mpt" )
 			{
 				return _fn + ".mpt";
 			}
 			break;
 		case InstrumentTrackSettings:
-			if( _fn.section( '.', -1 ) != "xpf" )
+			if( extension != "xpf" )
 			{
 				return _fn + ".xpf";
 			}
