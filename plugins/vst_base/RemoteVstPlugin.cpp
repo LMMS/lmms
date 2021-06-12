@@ -2281,12 +2281,12 @@ void * RemoteVstPlugin::processingThread(void * _param)
 #else
 	__processingThreadId = pthread_self();
 #endif
-	
+
 	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
 
 	RemotePluginClient::message m;
 	while( ( m = _this->receiveMessage() ).id != IdQuit )
-        {
+	{
 		
 		if( m.id == IdStartProcessing
 			|| m.id == IdMidiEvent
@@ -2315,13 +2315,13 @@ void * RemoteVstPlugin::processingThread(void * _param)
 
 #ifndef NATIVE_LINUX_VST
 	// notify GUI thread about shutdown
-		PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
-	
-		return 0;
+	PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
+
+	return 0;
 #else
 	if (m.id == IdQuit)
 		_this->queueMessage( m );
-	
+
 	int *result = (int*) malloc(sizeof(int));
 	*result = 0;
 	pthread_exit(result);
