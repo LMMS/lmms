@@ -2258,9 +2258,8 @@ void RemoteVstPlugin::processUIThreadMessages()
 		pthread_mutex_unlock(&message_mutex);
 #endif
 	}
-	
+
 	setProcessing( false );
-	
 }
 
 #ifdef NATIVE_LINUX_VST
@@ -2583,18 +2582,17 @@ int main( int _argc, char * * _argv )
 							"processingThread\n" );
 			return -1;
 		}
-		
+
 		__plugin->guiEventLoop();
 #ifdef NATIVE_LINUX_VST
 		pthread_join(__processingThreadId, NULL);
 #endif
 	}
-	
+
 	delete __plugin;
 #ifndef NATIVE_LINUX_VST
 	OleUninitialize();
 #endif
 	return 0;
-
 }
 
