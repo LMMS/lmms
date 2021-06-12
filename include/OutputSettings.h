@@ -74,7 +74,7 @@ public:
 		m_bitRateSettings(bitRateSettings),
 		m_bitDepth(bitDepth),
 		m_stereoMode(stereoMode),
-		m_compressionLevel(0.5)
+		m_compressionLevel(0.625) // 5/8
 	{
 	}
 

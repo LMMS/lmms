@@ -92,7 +92,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			QVariant(i/static_cast<double>(MAX_LEVEL))
 		);
 	}
-	compLevelCB->setCurrentIndex(MAX_LEVEL/2);
+	compLevelCB->setCurrentIndex(5);
 #ifndef LMMS_HAVE_SF_COMPLEVEL
 	// Disable this widget; the setting would be ignored by the renderer.
 	compressionWidget->setVisible(false);
