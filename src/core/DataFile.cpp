@@ -69,7 +69,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
-	&DataFile::upgrade_automationNodes
+	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange
 };
 
 // Vector of all versions that have upgrade routines.
@@ -234,12 +234,14 @@ bool DataFile::validate( QString extension )
 
 QString DataFile::nameWithExtension( const QString & _fn ) const
 {
+	const QString extension = _fn.section( '.', -1 );
+
 	switch( type() )
 	{
 		case SongProject:
-			if( _fn.section( '.', -1 ) != "mmp" &&
-					_fn.section( '.', -1 ) != "mpt" &&
-					_fn.section( '.', -1 ) != "mmpz" )
+			if( extension != "mmp" &&
+					extension != "mpt" &&
+					extension != "mmpz" )
 			{
 				if( ConfigManager::inst()->value( "app",
 						"nommpz" ).toInt() == 0 )
@@ -250,13 +252,13 @@ QString DataFile::nameWithExtension( const QString & _fn ) const
 			}
 			break;
 		case SongProjectTemplate:
-			if( _fn.section( '.',-1 ) != "mpt" )
+			if( extension != "mpt" )
 			{
 				return _fn + ".mpt";
 			}
 			break;
 		case InstrumentTrackSettings:
-			if( _fn.section( '.', -1 ) != "xpf" )
+			if( extension != "xpf" )
 			{
 				return _fn + ".xpf";
 			}
@@ -1651,6 +1653,84 @@ void DataFile::upgrade_automationNodes()
 			// inValue will be equal to "value" and outValue will
 			// be set to the same
 			el.setAttribute("outValue", value);
+		}
+	}
+}
+
+
+/** \brief Note range has been extended to match MIDI specification
+ *
+ * The non-standard note range previously affected all MIDI-based instruments
+ * except OpulenZ, and made them sound an octave lower than they should (#1857).
+ */
+void DataFile::upgrade_extendedNoteRange()
+{
+	auto affected = [](const QDomElement& instrument)
+	{
+		return instrument.attribute("name") == "zynaddsubfx" ||
+			instrument.attribute("name") == "vestige" ||
+			instrument.attribute("name") == "lv2instrument" ||
+			instrument.attribute("name") == "carlapatchbay" ||
+			instrument.attribute("name") == "carlarack";
+	};
+
+	if (!elementsByTagName("song").item(0).isNull())
+	{
+		// Dealing with a project file, go through all the tracks
+		QDomNodeList tracks = elementsByTagName("track");
+		for (int i = 0; !tracks.item(i).isNull(); i++)
+		{
+			// Ignore BB container tracks
+			if (tracks.item(i).toElement().attribute("type").toInt() == 1) { continue; }
+
+			QDomNodeList instruments = tracks.item(i).toElement().elementsByTagName("instrument");
+			if (instruments.isEmpty()) { continue; }
+			QDomElement instrument = instruments.item(0).toElement();
+			// Raise the base note of every instrument by 12 to compensate for the change
+			// of A4 key code from 57 to 69. This ensures that notes are labeled correctly.
+			instrument.parentNode().toElement().setAttribute(
+				"basenote",
+				instrument.parentNode().toElement().attribute("basenote").toInt() + 12);
+			// Raise the pitch of all notes in patterns assigned to instruments not affected
+			// by #1857 by an octave. This negates the base note change for normal instruments,
+			// but leaves the MIDI-based instruments sounding an octave lower, preserving their
+			// pitch in existing projects.
+			if (!affected(instrument))
+			{
+				QDomNodeList patterns = tracks.item(i).toElement().elementsByTagName("pattern");
+				for (int i = 0; !patterns.item(i).isNull(); i++)
+				{
+					QDomNodeList notes = patterns.item(i).toElement().elementsByTagName("note");
+					for (int i = 0; !notes.item(i).isNull(); i++)
+					{
+						notes.item(i).toElement().setAttribute(
+							"key",
+							notes.item(i).toElement().attribute("key").toInt() + 12
+						);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		// Dealing with a preset, not a song
+		QDomNodeList presets = elementsByTagName("instrumenttrack");
+		if (presets.item(0).isNull()) { return; }
+		QDomElement preset = presets.item(0).toElement();
+		// Common correction for all instrument presets (make base notes match the new MIDI range).
+		// NOTE: Many older presets do not have any basenote defined, assume they were "made for 57".
+		// (Specifying a default like this also happens to fix a FileBrowser bug where previews of presets
+		// with undefined basenote always play with the basenote inherited from previously played preview.)
+		int oldBase = preset.attribute("basenote", "57").toInt();
+		preset.setAttribute("basenote", oldBase + 12);
+		// Extra correction for Zyn, VeSTige, LV2 and Carla (to preserve the original buggy behavior).
+		QDomNodeList instruments = presets.item(0).toElement().elementsByTagName("instrument");
+		if (instruments.isEmpty()) { return; }
+		QDomElement instrument = instruments.item(0).toElement();
+		if (affected(instrument))
+		{
+			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 12);
 		}
 	}
 }
