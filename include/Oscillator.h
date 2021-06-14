@@ -188,7 +188,7 @@ public:
 		return control;
 	}
 
-	inline sample_t wtSample(const sample_t table[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH], const float _sample) const
+	inline sample_t wtSample(const sample_t table[][OscillatorConstants::WAVETABLE_LENGTH], const float _sample) const
 	{
 		wtSampleControl control = getWtSampleControl(_sample);
 		return linearInterpolate(table[control.band][control.f1],
@@ -251,7 +251,7 @@ private:
 	static void generateSawWaveTable(int bands, sample_t * table);
 	static void generateTriangleWaveTable(int bands, sample_t * table);
 	static void generateSquareWaveTable(int bands, sample_t * table);
-	static void generateFromFFT(int bands, float threshold, sample_t *table);
+	static void generateFromFFT(int bands, sample_t *table);
 	static void generateWaveTables();
 	static void createFFTPlans();
 

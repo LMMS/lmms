@@ -187,22 +187,14 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t * table)
 
 
 
-//expects sample in sample buffer
-void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
+// Expects waveform converted to frequency domain to be present in the spectrum buffer
+void Oscillator::generateFromFFT(int bands, sample_t * table)
 {
 	//set unrequired bands to zero
 	for (int i = bands; i < OscillatorConstants::WAVETABLE_LENGTH * 2 + 1 - bands; i++)
 	{
 		s_specBuf[i][0] = 0.0f;
 		s_specBuf[i][1] = 0.0f;
-	}
-	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH * 2 + 1; ++i)
-	{
-		if (s_specBuf[i][0] * s_specBuf[i][0] + s_specBuf[i][1] * s_specBuf[i][1] < threshold)
-		{
-			s_specBuf[i][0] = 0.0f;
-			s_specBuf[i][1] = 0.0f;
-		}
 	}
 	//ifft
 	fftwf_execute(s_ifftPlan);
@@ -221,7 +213,7 @@ void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
 			s_sampleBuffer[i] = sampleBuffer->userWaveSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
 		}
 		fftwf_execute(s_fftPlan);
-		Oscillator::generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.001f, (*(sampleBuffer->m_userAntiAliasWaveTable))[i].data());
+		Oscillator::generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), (*(sampleBuffer->m_userAntiAliasWaveTable))[i].data());
 	}
 }
 
@@ -301,7 +293,7 @@ void Oscillator::generateWaveTables()
 				Oscillator::s_sampleBuffer[i] = moogSawSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
 			}
 			fftwf_execute(s_fftPlan);
-			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::MoogSawWave][i]);
+			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::MoogSawWave][i]);
 		}
 
 		//generate Exp tables
@@ -313,7 +305,7 @@ void Oscillator::generateWaveTables()
 				s_sampleBuffer[i] = expSample((float)i / (float)OscillatorConstants::WAVETABLE_LENGTH);
 			}
 			fftwf_execute(s_fftPlan);
-			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), 0.001f, s_waveTables[WaveShapes::ExponentialWave][i]);
+			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::ExponentialWave][i]);
 		}
 	};
 

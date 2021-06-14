@@ -31,8 +31,9 @@
 class OscillatorConstants
 {
 public:
-	static const int WAVETABLE_LENGTH = 2446; //minimum size of table to have all bands for midi note 1
-	static const int MAX_FREQ = 20000; //limit to the audio spectrum
+	// Minimum size of table to have all audible bands for midi note 1 (i.e. 20 000 Hz / 8.176 Hz)
+	static const int WAVETABLE_LENGTH = 2446;
+	static const int MAX_FREQ = 20000; // Limit wavetables to the audible audio spectrum
 
 	//SEMITONES_PER_TABLE, the smaller the value the smoother the harmonics change on frequency sweeps
 	// with the trade off of increased memory requirements to store the wave tables
