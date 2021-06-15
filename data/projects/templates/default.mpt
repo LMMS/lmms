@@ -84,44 +84,44 @@
     <scales>
       <scale description="12-tone EDO (default)">
         <interval num="1" den="1"/>
-        <interval cents="100" den="0"/>
-        <interval cents="200" den="0"/>
-        <interval cents="300" den="0"/>
-        <interval cents="400" den="0"/>
-        <interval cents="500" den="0"/>
-        <interval cents="600" den="0"/>
-        <interval cents="700" den="0"/>
-        <interval cents="800" den="0"/>
-        <interval cents="900" den="0"/>
-        <interval cents="1000" den="0"/>
-        <interval cents="1100" den="0"/>
+        <interval cents="100"/>
+        <interval cents="200"/>
+        <interval cents="300"/>
+        <interval cents="400"/>
+        <interval cents="500"/>
+        <interval cents="600"/>
+        <interval cents="700"/>
+        <interval cents="800"/>
+        <interval cents="900"/>
+        <interval cents="1000"/>
+        <interval cents="1100"/>
         <interval num="2" den="1"/>
       </scale>
       <scale description="24-tone EDO">
         <interval num="1" den="1"/>
-        <interval cents="50" den="0"/>
-        <interval cents="100" den="0"/>
-        <interval cents="150" den="0"/>
-        <interval cents="200" den="0"/>
-        <interval cents="250" den="0"/>
-        <interval cents="300" den="0"/>
-        <interval cents="350" den="0"/>
-        <interval cents="400" den="0"/>
-        <interval cents="450" den="0"/>
-        <interval cents="500" den="0"/>
-        <interval cents="550" den="0"/>
-        <interval cents="600" den="0"/>
-        <interval cents="650" den="0"/>
-        <interval cents="700" den="0"/>
-        <interval cents="750" den="0"/>
-        <interval cents="800" den="0"/>
-        <interval cents="850" den="0"/>
-        <interval cents="900" den="0"/>
-        <interval cents="950" den="0"/>
-        <interval cents="1000" den="0"/>
-        <interval cents="1050" den="0"/>
-        <interval cents="1100" den="0"/>
-        <interval cents="1150" den="0"/>
+        <interval cents="50"/>
+        <interval cents="100"/>
+        <interval cents="150"/>
+        <interval cents="200"/>
+        <interval cents="250"/>
+        <interval cents="300"/>
+        <interval cents="350"/>
+        <interval cents="400"/>
+        <interval cents="450"/>
+        <interval cents="500"/>
+        <interval cents="550"/>
+        <interval cents="600"/>
+        <interval cents="650"/>
+        <interval cents="700"/>
+        <interval cents="750"/>
+        <interval cents="800"/>
+        <interval cents="850"/>
+        <interval cents="900"/>
+        <interval cents="950"/>
+        <interval cents="1000"/>
+        <interval cents="1050"/>
+        <interval cents="1100"/>
+        <interval cents="1150"/>
         <interval num="2" den="1"/>
       </scale>
       <scale description="7-tone JI C-major (Ptolemaic)">

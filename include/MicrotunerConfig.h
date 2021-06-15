@@ -49,6 +49,7 @@ public:
 	{
 		return "MicrotunerConfig";
 	}
+	QSize sizeHint() const override {return QSize(300, 400);}
 
 public slots:
 	void updateScaleList(int index);

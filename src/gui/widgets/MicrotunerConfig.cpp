@@ -91,8 +91,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit = new QPlainTextEdit();
 	m_scaleTextEdit->setPlainText("100.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0");
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
-	m_scaleTextEdit->setFixedHeight(240);	// QTextEdit refuses to expand and must therefore use fixed size :(
-	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2, Qt::AlignLeft | Qt::AlignTop);
+	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2);
 
 	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
 	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
@@ -127,7 +126,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_keymapTextEdit = new QPlainTextEdit();
 	m_keymapTextEdit->setPlainText("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11");
 	m_keymapTextEdit->setToolTip(tr("Enter key mappings on separate lines. Each line assigns a scale degree to a MIDI key,\nstarting with the middle key and continuing in sequence.\nThe pattern repeats for keys outside of the explicit keymap range.\nMultiple keys can be mapped to the same scale degree.\nEnter \'x\' if you wish to leave the key disabled / not mapped."));
-	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2, Qt::AlignRight | Qt::AlignTop);
+	microtunerLayout->addWidget(m_keymapTextEdit, 4, 2, 1, 2);
 
 	// Mapping ranges
 	QGridLayout *keymapRangeLayout = new QGridLayout();
@@ -181,8 +180,10 @@ MicrotunerConfig::MicrotunerConfig() :
 	QMdiSubWindow *subWin = gui->mainWindow()->addWindowedWidget(this);
 
 	subWin->setAttribute(Qt::WA_DeleteOnClose, false);
-	subWin->setFixedWidth(300);
-	subWin->setFixedHeight(380);
+	subWin->setMinimumWidth(300);
+	subWin->setMinimumHeight(300);
+	subWin->setMaximumWidth(500);
+	subWin->setMaximumHeight(700);
 	subWin->hide();
 
 	// No maximize button
