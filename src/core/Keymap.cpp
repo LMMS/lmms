@@ -30,7 +30,7 @@
 Keymap::Keymap() :
 	m_description(tr("empty")),
 	m_firstKey(0),
-	m_lastKey(127),
+	m_lastKey(NumKeys - 1),
 	m_middleKey(DefaultMiddleKey),
 	m_baseKey(DefaultBaseKey),
 	m_baseFreq(DefaultBaseFreq)

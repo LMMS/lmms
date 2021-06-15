@@ -49,7 +49,6 @@ public:
 
 	int firstKey() const;
 	int lastKey() const;
-	int middleKey() const;
 	int baseKey() const;
 	float baseFreq() const;
 

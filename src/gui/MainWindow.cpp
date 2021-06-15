@@ -1165,7 +1165,7 @@ void MainWindow::updateViewMenu()
 			      this, SLOT( toggleProjectNotesWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "microtuner" ),
-			      tr( "Microtuner" ) + " (F12)",
+			      tr( "Microtuner" ) + "\tCtrl+8",
 			      this, SLOT( toggleMicrotunerWin() )
 		);
 
