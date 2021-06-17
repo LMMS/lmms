@@ -1,7 +1,7 @@
 /*
- * quadraturelfo.cpp - defination of QuadratureLfo class.
+ * BBTCOView.h
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,18 +21,46 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+ 
 
-#include "QuadratureLfo.h"
+#ifndef BB_TCO_VIEW_H
+#define BB_TCO_VIEW_H
 
-QuadratureLfo::QuadratureLfo( int sampleRate )
+#include "BBTCO.h"
+
+#include <QStaticText>
+
+
+class BBTCOView : public TrackContentObjectView
 {
-	setSampleRate(sampleRate);
-}
+	Q_OBJECT
+public:
+	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
+	virtual ~BBTCOView() = default;
 
-void QuadratureLfo::tick( float *s, float *c )
-{
-	*s = sinf( m_phase );
-	*c = cosf( m_phase );
-	m_phase += m_increment;
 
-}
+public slots:
+	void update() override;
+
+protected slots:
+	void openInBBEditor();
+	void resetName();
+	void changeName();
+
+
+protected:
+	void paintEvent( QPaintEvent * pe ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void constructContextMenu( QMenu * ) override;
+
+
+private:
+	BBTCO * m_bbTCO;
+	QPixmap m_paintPixmap;
+	
+	QStaticText m_staticTextName;
+} ;
+
+
+
+#endif

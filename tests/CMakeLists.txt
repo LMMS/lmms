@@ -16,7 +16,7 @@ ENDIF()
 ADD_EXECUTABLE(tests
 	EXCLUDE_FROM_ALL
 	main.cpp
-	QTestSuite
+	QTestSuite.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
 
 	src/core/AutomatableModelTest.cpp

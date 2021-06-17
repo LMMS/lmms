@@ -49,8 +49,9 @@ extra_args="-I@WINE_INCLUDE_DIR@ -I@WINE_INCLUDE_DIR@/wine/windows"
 extra_args="$extra_args @WINE_CXX_FLAGS@"
 
 # Apply -m32 library fix if necessary
+# Additionally, apply "-z notext" to fix an inconsistency in ld.lld vs ld.bfd and ld.gold
 if [ "$win32" = true ] && [ "$no_link" != true ]; then
-	extra_args="$extra_args @WINE_32_FLAGS@"
+	extra_args="$extra_args @WINE_32_FLAGS@ -z notext"
 fi
 
 # Apply -m64 library fix if necessary
