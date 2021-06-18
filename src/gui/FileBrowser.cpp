@@ -570,29 +570,28 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
-	// QTreeWidget handles right clicks for us, so we only care about left clicks
-	if(me->button() == Qt::LeftButton) {
-
-		QTreeWidgetItem * i = itemAt(me->pos());
-		if (i)
-		{
-			// TODO: Restrict to visible selection
-	//		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
-	//			+ treeStepSize() * ( i->depth() + ( rootIsDecorated() ?
-	//						1 : 0 ) ) + itemMargin() ||
-	//				_me->x() < header()->cellPos(
-	//						header()->mapToActual( 0 ) ) )
-	//		{
-				m_pressPos = me->pos();
-				m_mousePressed = true;
-	//		}
-		}
-
-		FileItem * f = dynamic_cast<FileItem *>(i);
-		if(f != nullptr) { previewFileItem(f); }
-	}
-	// Forward the event
+	QTreeWidgetItem * i = itemAt(me->pos());
 	QTreeWidget::mousePressEvent(me);
+	// QTreeWidget handles right clicks for us, so we only care about left clicks
+	if(me->button() != Qt::LeftButton) { return; }
+
+	if (i)
+	{
+		// TODO: Restrict to visible selection
+//		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
+//			+ treeStepSize() * ( i->depth() + ( rootIsDecorated() ?
+//						1 : 0 ) ) + itemMargin() ||
+//				_me->x() < header()->cellPos(
+//						header()->mapToActual( 0 ) ) )
+//		{
+			m_pressPos = me->pos();
+			m_mousePressed = true;
+//		}
+	}
+
+	FileItem * f = dynamic_cast<FileItem *>(i);
+	if(f != nullptr) { previewFileItem(f); }
+	// Forward the event
 }
 
 
