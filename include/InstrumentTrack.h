@@ -185,9 +185,12 @@ public:
 		return &m_lastKeyModel;
 	}
 
-	int baseNote() const;
+	bool keyRangeImport() const;
+	bool isKeyMapped(int key) const;
 	int firstKey() const;
 	int lastKey() const;
+	int baseNote() const;
+	float baseFreq() const;
 
 	Piano *pianoModel()
 	{

@@ -29,15 +29,13 @@
 
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
 #include "Keymap.h"
 #include "Scale.h"
 #include "Song.h"
 
 
-Microtuner::Microtuner(InstrumentTrack *parent) :
-	Model(parent, tr("Microtuner")),
-	m_instrumentTrack(parent),
+Microtuner::Microtuner() :
+	Model(nullptr, tr("Microtuner")),
 	m_enabledModel(false, this, tr("Microtuner on / off")),
 	m_scaleModel(this, tr("Selected scale")),
 	m_keymapModel(this, tr("Selected keyboard mapping")),
@@ -57,77 +55,13 @@ Microtuner::Microtuner(InstrumentTrack *parent) :
 }
 
 
-/** \brief Return first mapped key, based on currently selected keymap or user selection.
- *  \return Number ranging from 0 to NumKeys -1
- */
-int Microtuner::firstKey() const
-{
-	if (keyRangeImport())
-	{
-		return Engine::getSong()->getKeymap(m_keymapModel.value())->getFirstKey();
-	}
-	else
-	{
-		return m_instrumentTrack->firstKeyModel()->value();
-	}
-}
-
-
-/** \brief Return last mapped key, based on currently selected keymap or user selection.
- *  \return Number ranging from 0 to NumKeys -1
- */
-int Microtuner::lastKey() const
-{
-	if (keyRangeImport())
-	{
-		return Engine::getSong()->getKeymap(m_keymapModel.value())->getLastKey();
-	}
-	else
-	{
-		return m_instrumentTrack->lastKeyModel()->value();
-	}
-}
-
-
-/** \brief Return base key number, based on currently selected keymap or user selection.
- *  \return Number ranging from 0 to NumKeys -1
- */
-int Microtuner::baseKey() const
-{
-	if (keyRangeImport())
-	{
-		return Engine::getSong()->getKeymap(m_keymapModel.value())->getBaseKey();
-	}
-	else
-	{
-		return m_instrumentTrack->baseNoteModel()->value();
-	}
-}
-
-
-/** \brief Return frequency assigned to the base key, based on currently selected keymap.
- *  \return Frequency in Hz
- */
-float Microtuner::baseFreq() const
-{
-	if (enabled())
-	{
-		return Engine::getSong()->getKeymap(m_keymapModel.value())->getBaseFreq();
-	}
-	else
-	{
-		return DefaultBaseFreq;
-	}
-}
-
-
 /** \brief Return frequency for a given MIDI key, using the active mapping and scale.
  *  \param key A MIDI key number ranging from 0 to 127.
  *  \return Frequency in Hz; 0 if key is out of range or not mapped.
  */
-float Microtuner::keyToFreq(int key) const
+float Microtuner::keyToFreq(int key, int userBaseNote) const
 {
-	if (key < firstKey() || key > lastKey()) {return 0;}
+	if (key < 0 || key >= NumKeys) {return 0;}
 	Song *song = Engine::getSong();
 	if (!song) {return 0;}
 
@@ -154,7 +88,7 @@ float Microtuner::keyToFreq(int key) const
 	const int scaleDegree = degree_rem >= 0 ? degree_rem : degree_rem + octaveDegree;	// get true modulo
 
 	// Compute base note (the "A4 reference") degree and octave
-	const int baseNote = baseKey();
+	const int baseNote = m_keyRangeImportModel.value() ? keymap->getBaseKey() : userBaseNote;
 	const int baseKeymapDegree = keymap->getDegree(baseNote);
 	if (baseKeymapDegree == -1) {return 0;}					// base key is not mapped, umm...
 	const int baseKeymapOctave = keymap->getOctave(baseNote);
@@ -169,18 +103,6 @@ float Microtuner::keyToFreq(int key) const
 								/ intervals[baseScaleDegree].getRatio();
 
 	return middleFreq * intervals[scaleDegree].getRatio() * pow(octaveRatio, keymapOctave + scaleOctave);
-}
-
-
-bool Microtuner::isKeyMapped(int key) const
-{
-	if (key < firstKey() || key > lastKey()) {return false;}
-	if (!enabled()) {return true;}
-
-	Song *song = Engine::getSong();
-	if (!song) {return false;}
-
-	return song->getKeymap(m_keymapModel.value())->getDegree(key) != -1;
 }
 
 

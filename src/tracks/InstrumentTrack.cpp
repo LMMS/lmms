@@ -111,7 +111,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_arpeggio( this ),
 	m_noteStacking( this ),
 	m_piano(this),
-	m_microtuner(this)
+	m_microtuner()
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -152,22 +152,92 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 }
 
 
+
+bool InstrumentTrack::keyRangeImport() const
+{
+	return m_microtuner.enabled() && m_microtuner.keyRangeImport();
+}
+
+
+/** \brief Check if there is a valid mapping for the given key and it is within defined of range.
+ */
+bool InstrumentTrack::isKeyMapped(int key) const
+{
+	if (key < firstKey() || key > lastKey()) {return false;}
+	if (!m_microtuner.enabled()) {return true;}
+
+	Song *song = Engine::getSong();
+	if (!song) {return false;}
+
+	return song->getKeymap(m_microtuner.currentKeymap())->getDegree(key) != -1;
+}
+
+
+/** \brief Return first mapped key, based on currently selected keymap or user selection.
+ *	\return Number ranging from 0 to NumKeys -1
+ */
+int InstrumentTrack::firstKey() const
+{
+	if (keyRangeImport())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getFirstKey();
+	}
+	else
+	{
+		return m_firstKeyModel.value();
+	}
+}
+
+
+/** \brief Return last mapped key, based on currently selected keymap or user selection.
+ *	\return Number ranging from 0 to NumKeys -1
+ */
+int InstrumentTrack::lastKey() const
+{
+	if (keyRangeImport())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getLastKey();
+	}
+	else
+	{
+		return m_lastKeyModel.value();
+	}
+}
+
+
+/** \brief Return base key number, based on currently selected keymap or user selection.
+ *	\return Number ranging from 0 to NumKeys -1
+ */
 int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 
-	return m_microtuner.baseKey() - mp;
+	if (keyRangeImport())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getBaseKey() - mp;
+	}
+	else
+	{
+		return m_baseNoteModel.value() - mp;
+	}
 }
 
-int InstrumentTrack::firstKey() const
+
+/** \brief Return frequency assigned to the base key, based on currently selected keymap.
+ *	\return Frequency in Hz
+ */
+float InstrumentTrack::baseFreq() const
 {
-	return m_microtuner.firstKey();
+	if (m_microtuner.enabled())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getBaseFreq();
+	}
+	else
+	{
+		return DefaultBaseFreq;
+	}
 }
 
-int InstrumentTrack::lastKey() const
-{
-	return m_microtuner.lastKey();
-}
 
 
 InstrumentTrack::~InstrumentTrack()

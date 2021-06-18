@@ -31,16 +31,16 @@
 #include "lmms_constants.h"
 #include "Note.h"
 
-class InstrumentTrack;
-
 class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	explicit Microtuner(InstrumentTrack *parent);
+	explicit Microtuner();
 
 	bool enabled() const {return m_enabledModel.value();}
 	bool keyRangeImport() const {return enabled() && m_keyRangeImportModel.value();}
+	int currentScale() const {return m_scaleModel.value();}
+	int currentKeymap() const {return m_keymapModel.value();}
 
 	BoolModel *enabledModel() {return &m_enabledModel;}
 	ComboBoxModel *scaleModel() {return &m_scaleModel;}
@@ -52,8 +52,7 @@ public:
 	int baseKey() const;
 	float baseFreq() const;
 
-	float keyToFreq(int key) const;
-	bool isKeyMapped(int key) const;
+	float keyToFreq(int key, int userBaseNote) const;
 
 	QString nodeName() const override {return "microtuner";}
 	void saveSettings(QDomDocument & document, QDomElement &element) override;
@@ -64,8 +63,6 @@ protected slots:
 	void updateKeymapList(int index);
 
 private:
-	InstrumentTrack *m_instrumentTrack;     // Required to access base note etc. when range import is disabled
-
 	BoolModel m_enabledModel;               //!< Enable microtuner (otherwise using 12-TET @440 Hz)
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_keymapModel;

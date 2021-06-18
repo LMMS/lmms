@@ -3168,7 +3168,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			const int key,
 			const int yb)
 		{
-			const bool mapped = m_pattern->instrumentTrack()->microtuner()->isKeyMapped(key);
+			const bool mapped = m_pattern->instrumentTrack()->isKeyMapped(key);
 			const bool pressed = m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key);
 			const int keyCode = key % KeysPerOctave;
 			const int yt = yb - gridCorrection(key);
