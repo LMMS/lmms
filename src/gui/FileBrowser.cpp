@@ -719,6 +719,10 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 					new StringPairDrag( "projectfile", f->fullName(),
 							embed::getIconPixmap( "project_file" ), this );
 					break;
+				case FileItem::PatternFile:
+					new StringPairDrag("patternfile", f->fullName(),
+							embed::getIconPixmap("midi_file"), this);
+					break;
 
 				default:
 					break;
@@ -1207,6 +1211,9 @@ void FileItem::initPixmaps( void )
 		case MidiFile:
 			setIcon( 0, *s_midiFilePixmap );
 			break;
+		case PatternFile:
+			setIcon(0, *s_midiFilePixmap);
+			break;
 		case UnknownFile:
 		default:
 			setIcon( 0, *s_unknownFilePixmap );
@@ -1259,6 +1266,10 @@ void FileItem::determineFileType( void )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
+	}
+	else if (ext == "xpt" || ext == "xptz")
+	{
+		m_type = PatternFile;
 	}
 	else
 	{

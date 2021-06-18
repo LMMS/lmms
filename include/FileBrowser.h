@@ -220,6 +220,7 @@ public:
 		PatchFile,
 		MidiFile,
 		VstPluginFile,
+		PatternFile,
 		UnknownFile,
 		NumFileTypes
 	} ;
