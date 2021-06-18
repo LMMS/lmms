@@ -570,6 +570,7 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
+	// Forward the event
 	QTreeWidgetItem * i = itemAt(me->pos());
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
@@ -591,7 +592,6 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 
 	FileItem * f = dynamic_cast<FileItem *>(i);
 	if(f != nullptr) { previewFileItem(f); }
-	// Forward the event
 }
 
 
