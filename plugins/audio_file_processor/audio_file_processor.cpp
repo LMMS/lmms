@@ -303,7 +303,7 @@ QString audioFileProcessor::nodeName( void ) const
 
 int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
-	const auto baseFreq = instrumentTrack()->microtuner()->baseFreq();
+	const auto baseFreq = instrumentTrack()->baseFreq();
 	const float freq_factor = baseFreq / _n->frequency() *
 			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
 

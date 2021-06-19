@@ -470,7 +470,7 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 		return;
 	}
 
-	const auto baseFreq = instrumentTrack()->microtuner()->baseFreq();
+	const auto baseFreq = instrumentTrack()->baseFreq();
 	int32_t pitchedFrameNum = (_n->frequency() / baseFreq) * frameNum;
 
 	pitchedFrameNum /= ( currentSampleRate / 44100 );
