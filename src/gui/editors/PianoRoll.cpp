@@ -1695,7 +1695,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 		}
 		case PianoRollArea::Notes:
 		{
-			Note* mouseNote = noteUnderMouse(); // TODO: Rename to better name
+			Note* mouseNote = noteUnderMouse();
 			// get tick in which the user clicked
 			const int posTicks = (mex - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 			// erase a note, if note != nullptr
@@ -1938,7 +1938,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 					m_selectStartKey = keyNum;
 					m_selectedKeys = 1;
 					m_action = ActionSelectNotes;
-					printf("mousePressEvent :: sst %d  ssk %d\n", m_selectStartTick, m_selectStartKey);
 					// TODO: find a way to fix this glitch without calling mouseMoveEvent
 					// call mousemove to fix glitch where selection
 					// appears in wrong spot on mousedown
@@ -2016,35 +2015,33 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 
 			// Go through notes to figure out which ones we want to change
 			NoteVector nv;
-			for (Note* i : m_pattern->notes())
+			for (Note* n : m_pattern->notes())
 			{
-				if (i->withinRange(ticksStart, ticksEnd) || (i->selected() && !altPressed))
+				if (n->withinRange(ticksStart, ticksEnd) || (n->selected() && !altPressed))
 				{
-					nv += i;
+					nv += n;
 				}
 			}
-			// Make sure vector is not empty
-			if (nv.size() > 0)
+
+			if (nv.empty()) { break; }
+			Note* closest = nullptr;
+			// closestDist will be compared with all other note's distances to find
+			// the smallest, so we can set it to the first note's distance.
+			int closestDist = std::abs(nv.first()->pos().getTicks() - ticksMiddle);
+			// If we caught multiple notes and we're not editing a
+			// selection, find the closest...
+			if (nv.size() > 1 && !isSelection())
 			{
-				Note* closest = nullptr;
-				// closestDist will be compared with all other note's distances to find
-				// the smallest, so we can set it to the first note's distance.
-				int closestDist = std::abs(nv.first()->pos().getTicks() - ticksMiddle);
-				// If we caught multiple notes and we're not editing a
-				// selection, find the closest...
-				if (nv.size() > 1 && !isSelection())
+				for (Note* n : nv)
 				{
-					for (Note* i : nv)
-					{
-						const int dist = std::abs(i->pos().getTicks() - ticksMiddle);
-						if (dist <= closestDist) { closest = i; closestDist = dist; }
-					}
-					// ... then we clear the vector and add just the closest note
-					nv.clear();
-					nv += closest;
+					const int dist = std::abs(n->pos().getTicks() - ticksMiddle);
+					if (dist <= closestDist) { closest = n; closestDist = dist; }
 				}
-				enterValue(&nv);
+				// ... then we clear the vector and add just the closest note
+				nv.clear();
+				nv += closest;
 			}
+			enterValue(&nv);
 			break;
 		}
 		default:
@@ -2059,7 +2056,6 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 
 void PianoRoll::testPlayNote( Note * n )
 {
-	// printf("testPlayNote %d\n", n->key());
 	m_lastKey = n->key();
 
 	if( ! n->isPlaying() && ! m_recording && ! m_stepRecorder.isRecording())
@@ -2432,13 +2428,12 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 			{
 				testPlayKey(yKey, v, 0);
 			}
-			// TODO: update velocity?
-			// else
-			// {
-			// 	// printf("update velocity?\n");
-			// 	// m_pattern->instrumentTrack()->pianoModel()->handleKeyPress(yKey, v);
-			// 	// playChordNotes(yKey, v);
-			// }
+			else
+			{
+				MidiEvent evt(MidiKeyPressure, -1, yKey, v);
+				m_pattern->instrumentTrack()->processInEvent(evt);
+				// TODO: update chord notes
+			}
 			break;
 		}
 		case ActionMoveNote:
@@ -2523,7 +2518,6 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 
 			m_selectedKeys = keyNum - m_selectStartKey;
 			if (keyNum <= m_selectStartKey) { --m_selectedKeys; }
-			printf("mouseMoveEvent :: sst %d  ssk %d  st %d  sk %d  pt %d  kn %d  stk %d\n", m_selectStartTick, m_selectStartKey, m_selectedTick, m_selectedKeys, posTicks, keyNum, m_startKey);
 			break;
 		}
 		case ActionChangeNoteProperty:
@@ -3554,7 +3548,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.setPen(m_selectedNoteColor);
 	p.setBrush( Qt::NoBrush );
 	p.drawRect(x + m_whiteKeyWidth, y, w, h);
-	// printf("paintEvent :: x %d  y %d  w %d  h %d  sps %d  spe %d  sks %d  ske %d\n", x, y, w, h, sel_pos_start, sel_pos_end, sel_key_start, sel_key_end);
 
 	// TODO: Get this out of paint event
 	int l = ( hasValidPattern() )? (int) m_pattern->length() : 0;
