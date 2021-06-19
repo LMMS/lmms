@@ -2185,11 +2185,13 @@ void PianoRoll::testPlayKey( int key, int velocity, int pan )
 
 void PianoRoll::handleAftertouch(int key, int velocity)
 {
+	MidiEvent evt(MidiKeyPressure, -1, key, velocity);
+	m_pattern->instrumentTrack()->processInEvent(evt);
 	if (m_lastChord && !m_lastChord->isEmpty())
 	{
-		for (int i = 0; i < m_lastChord->size(); ++i)
+		for (int i = 1; i < m_lastChord->size(); ++i)
 		{
-			MidiEvent evt(MidiKeyPressure, -1, key + (*m_lastChord)[i], velocity);
+			evt.setKey(key + (*m_lastChord)[i]);
 			m_pattern->instrumentTrack()->processInEvent(evt);
 		}
 	}
@@ -3201,6 +3203,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				--key;
 			}
 		}
+		// FIXME: visual bug, off by one, can happen when changing vertical zoom from higher to lower
 
 		// don't draw over keys
 		p.setClipRect(m_whiteKeyWidth, keyAreaTop(), width(), noteEditBottom() - keyAreaTop());
@@ -3253,13 +3256,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		for(x = 0; x < m_markedSemiTones.size(); ++x)
 		{
 			const int key_num = m_markedSemiTones.at(x);
-			const int y = keyAreaBottom() + 5 - m_keyLineHeight *
-				(key_num - m_startKey + 1);
-			if(y > keyAreaBottom()) { break; }
-			p.fillRect(m_whiteKeyWidth + 1,
-				y - m_keyLineHeight / 2,
-				width() - 10,
-				m_keyLineHeight + 1,
+			// skip if offscreen
+			if (key_num > topKey) { continue; }
+			// break after bottom visible key
+			if (key_num < m_startKey) { break; }
+			// we're within visible area, get y (top to bottom) of keys
+			const int y = keyAreaBottom() - m_keyLineHeight * (key_num - m_startKey + 1);
+			p.fillRect(m_whiteKeyWidth + 1, y,
+				width() - m_whiteKeyWidth, m_keyLineHeight,
 				m_markedSemitoneColor);
 		}
 	}
