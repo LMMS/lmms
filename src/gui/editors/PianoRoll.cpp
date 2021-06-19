@@ -2183,6 +2183,18 @@ void PianoRoll::testPlayKey( int key, int velocity, int pan )
 	playChordNotes(key, velocity);
 }
 
+void PianoRoll::handleAftertouch(int key, int velocity)
+{
+	if (m_lastChord && !m_lastChord->isEmpty())
+	{
+		for (int i = 0; i < m_lastChord->size(); ++i)
+		{
+			MidiEvent evt(MidiKeyPressure, -1, key + (*m_lastChord)[i], velocity);
+			m_pattern->instrumentTrack()->processInEvent(evt);
+		}
+	}
+}
+
 
 
 
@@ -2430,9 +2442,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent * me)
 			}
 			else
 			{
-				MidiEvent evt(MidiKeyPressure, -1, yKey, v);
-				m_pattern->instrumentTrack()->processInEvent(evt);
-				// TODO: update chord notes
+				handleAftertouch(yKey, v);
 			}
 			break;
 		}

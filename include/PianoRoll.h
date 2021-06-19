@@ -318,6 +318,7 @@ private:
 	void pauseTestNotes(bool pause = true );
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
+	void handleAftertouch(int key, int velocity);
 
 	void setKnifeAction();
 	void cancelKnifeAction();
