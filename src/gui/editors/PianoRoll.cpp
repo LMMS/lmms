@@ -1933,11 +1933,31 @@ void PianoRoll::mousePressEvent(QMouseEvent * me)
 					// we start a selection range with left click only
 					if (!leftButton) { break; }
 
-					m_selectStartTick = posTicks;
-					m_selectedTick = 0;
-					m_selectStartKey = keyNum;
-					m_selectedKeys = 1;
-					m_action = ActionSelectNotes;
+
+					// if we're over a note
+					if (mouseNote)
+					{
+						// we need to save previous values of selected notes to properly move notes
+						auto selectedNotes = getSelectedNotes();
+						for (Note* note : selectedNotes)
+						{
+							note->setOldKey(note->key());
+							note->setOldPos(note->pos());
+							note->setOldLength(note->length());
+						}
+						m_action = ActionMoveNote;
+						setCursor(Qt::SizeAllCursor);
+						testPlayNote(mouseNote);
+					}
+					else
+					{
+						m_selectStartTick = posTicks;
+						m_selectedTick = 0;
+						m_selectStartKey = keyNum;
+						m_selectedKeys = 1;
+
+						m_action = ActionSelectNotes;
+					}
 					// TODO: find a way to fix this glitch without calling mouseMoveEvent
 					// call mousemove to fix glitch where selection
 					// appears in wrong spot on mousedown
