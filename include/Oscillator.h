@@ -26,6 +26,7 @@
 #ifndef OSCILLATOR_H
 #define OSCILLATOR_H
 
+#include <cassert>
 #include <fftw3.h>
 #include <math.h>
 
@@ -188,23 +189,26 @@ public:
 		return control;
 	}
 
-	inline sample_t wtSample(const sample_t table[][OscillatorConstants::WAVETABLE_LENGTH], const float _sample) const
+	inline sample_t wtSample(const sample_t table[][OscillatorConstants::WAVETABLE_LENGTH], const float sample) const
 	{
-		wtSampleControl control = getWtSampleControl(_sample);
+		assert(table != nullptr);
+		wtSampleControl control = getWtSampleControl(sample);
 		return linearInterpolate(table[control.band][control.f1],
 				table[control.band][control.f2], fraction(control.frame));
 	}
 
 	inline sample_t wtSample(const std::unique_ptr<OscillatorConstants::waveform_t>& table, const float sample) const
 	{
+		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
 		return linearInterpolate((*table)[control.band][control.f1],
 				(*table)[control.band][control.f2], fraction(control.frame));
 	}
 
-	inline sample_t wtSample( sample_t **table, const float _sample) const
+	inline sample_t wtSample(sample_t **table, const float sample) const
 	{
-		wtSampleControl control = getWtSampleControl(_sample);
+		assert(table != nullptr);
+		wtSampleControl control = getWtSampleControl(sample);
 		return linearInterpolate(table[control.band][control.f1],
 				table[control.band][control.f2], fraction(control.frame));
 	}

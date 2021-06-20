@@ -28,19 +28,21 @@
 
 #include <array>
 
-class OscillatorConstants
+#include "lmms_basics.h"
+
+namespace OscillatorConstants
 {
-public:
+	// Limit wavetables to the audible audio spectrum
+	const int MAX_FREQ = 20000;
 	// Minimum size of table to have all audible bands for midi note 1 (i.e. 20 000 Hz / 8.176 Hz)
-	static const int WAVETABLE_LENGTH = 2446;
-	static const int MAX_FREQ = 20000; // Limit wavetables to the audible audio spectrum
+	constexpr int WAVETABLE_LENGTH = static_cast<int>(MAX_FREQ / 8.176);
 
 	//SEMITONES_PER_TABLE, the smaller the value the smoother the harmonics change on frequency sweeps
 	// with the trade off of increased memory requirements to store the wave tables
 	// require memory = NumberOfWaveShapes*WAVETABLE_LENGTH*(MidiNoteCount/SEMITONES_PER_TABLE)*BytePerSample_t
 	// 7*2446*(128/1)*4 = 8766464 bytes
-	static const int SEMITONES_PER_TABLE = 1;
-	static const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / SEMITONES_PER_TABLE;
+	const int SEMITONES_PER_TABLE = 1;
+	const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / SEMITONES_PER_TABLE;
 
 	typedef std::array<sample_t, WAVETABLE_LENGTH> wavetable_t;
 	typedef std::array<wavetable_t,	WAVE_TABLES_PER_WAVEFORM_COUNT> waveform_t;
