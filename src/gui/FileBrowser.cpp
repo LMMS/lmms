@@ -571,11 +571,11 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
 	// Forward the event
+	QTreeWidgetItem * i = itemAt(me->pos());
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
 
-	QTreeWidgetItem * i = itemAt(me->pos());
 	if (i)
 	{
 		// TODO: Restrict to visible selection
