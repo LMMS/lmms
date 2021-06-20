@@ -58,8 +58,9 @@ public:
 		ExponentialWave,
 		WhiteNoise,
 		UserDefinedWave,
-		NumWaveShapes,
-		NumBasicWaveShapes = WhiteNoise
+		NumWaveShapes,                                         // Number of all available wave shapes
+		FirstWaveShapeTable = TriangleWave,                    // First wave shape that has a pre-generated table
+		NumWaveShapeTables = WhiteNoise - FirstWaveShapeTable, // Number of band-limited wave shapes to be generated
 	};
 
 	enum ModulationAlgos
@@ -87,7 +88,7 @@ public:
 
 	static void waveTableInit();
 	static void destroyFFTPlans();
-	static void generateAntiAliasUserWaveTable( SampleBuffer * sampleBuffer);
+	static void generateAntiAliasUserWaveTable(SampleBuffer* sampleBuffer);
 
 	inline void setUseWaveTable(bool n)
 	{
@@ -189,7 +190,9 @@ public:
 		return control;
 	}
 
-	inline sample_t wtSample(const sample_t table[][OscillatorConstants::WAVETABLE_LENGTH], const float sample) const
+	inline sample_t wtSample(
+		const sample_t table[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH],
+		const float sample) const
 	{
 		assert(table != nullptr);
 		wtSampleControl control = getWtSampleControl(sample);
@@ -245,7 +248,7 @@ private:
 	bool m_useWaveTable;
 
 	/* Multiband WaveTable */
-	static sample_t s_waveTables[WaveShapes::NumBasicWaveShapes][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
+	static sample_t s_waveTables[WaveShapes::NumWaveShapeTables][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
 	static fftwf_plan s_fftPlan;
 	static fftwf_plan s_ifftPlan;
 	static fftwf_complex * s_specBuf;
