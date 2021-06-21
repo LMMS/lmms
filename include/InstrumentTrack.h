@@ -232,6 +232,8 @@ public:
 	{
 		return m_previewMode;
 	}
+	
+	void replaceInstrument(DataFile dataFile);
 
 	void autoAssignMidiDevice( bool );
 
