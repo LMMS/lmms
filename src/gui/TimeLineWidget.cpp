@@ -388,7 +388,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		const bool quant = !(mods == (Qt::ControlModifier | Qt::ShiftModifier));
 		
 		m_loopPos[0] = quant ? t.quantize(m_snapSize) : t;
-		m_loopPos[1] = t + (quant ? TimePos::ticksPerBar() : 1);
+		m_loopPos[1] = m_loopPos[0] + (quant ? m_snapSize : 1);
 	}
 	
 	// Ensure that the loops beginning and end are stored in the right place
@@ -423,7 +423,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	if (unquantized)
 	{
 		delete m_hint;
-		m_hint = NULL;
+		m_hint = nullptr;
 	}
 
 	switch (m_action)
