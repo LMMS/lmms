@@ -331,7 +331,7 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent*)
 void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 {
 	// TODO: Read these from a config
-	auto leftCtrlAction = DragLoop;
+	auto leftCtrlAction = SelectSongTCO;
 	auto rightCtrlAction = MoveLoopClosest;
 	auto leftShiftAction = MoveLoopBegin;
 	auto rightShiftAction = MoveLoopEnd;
