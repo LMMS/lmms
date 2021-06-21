@@ -940,6 +940,7 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 void InstrumentTrack::replaceInstrument(DataFile dataFile)
 {
+	// loadSettings clears the FX channel, so we save it here and set it back later
 	int effectChannel = effectChannelModel()->value();
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
