@@ -205,7 +205,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     {
         m_paramModels.push_back(new CarlaParamFloatModel(this));
         connect(m_paramModels[i], &CarlaParamFloatModel::dataChanged,
-            this, [=]() {paramModelChanged(i);}, Qt::DirectConnection);
+            this, [this, i]() {paramModelChanged(i);}, Qt::DirectConnection);
     }
 #endif
 
