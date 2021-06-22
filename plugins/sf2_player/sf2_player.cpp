@@ -97,7 +97,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_lastMidiPitch( -1 ),
 	m_lastMidiPitchRange( -1 ),
 	m_channel( 1 ),
-	m_bankNum( 0, 0, 999, this, tr("Bank") ),
+	m_bankNum( 0, 0, 16383, this, tr("Bank") ),
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
 	m_reverbOn( false, this, tr( "Reverb" ) ),
@@ -937,13 +937,13 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 	// LCDs
-	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
-	m_bankNumLcd->move(131, 62);
+	m_bankNumLcd = new LcdSpinBox( 5, "21pink", this );
+	m_bankNumLcd->move(122, 62);
 //	m_bankNumLcd->addTextForValue( -1, "---" );
 //	m_bankNumLcd->setEnabled( false );
 
 	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
-	m_patchNumLcd->move(190, 62);
+	m_patchNumLcd->move(191, 62);
 //	m_patchNumLcd->addTextForValue( -1, "---" );
 //	m_patchNumLcd->setEnabled( false );
 
@@ -969,7 +969,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	// Gain
 	m_gainKnob = new sf2Knob( this );
 	m_gainKnob->setHintText( tr("Gain:"), "" );
-	m_gainKnob->move( 86, 55 );
+	m_gainKnob->move( 78, 55 );
 //	vl->addWidget( m_gainKnob );
 
 	// Reverb
