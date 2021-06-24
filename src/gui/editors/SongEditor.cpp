@@ -54,6 +54,13 @@
 #include "ToolTip.h"
 #include "Track.h"
 
+#ifdef LMMS_HAVE_JACK
+#include "AudioJack.h"
+// This is dirty hack, but I don't want to place this function
+// to public interface ... 
+extern void exSyncStoppedHack(); // from core/audio/AudioJack.cpp
+#endif
+
 const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
@@ -84,6 +91,10 @@ SongEditor::SongEditor( Song * song ) :
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef MUST be removed
+	m_timeLine->exSyncSetShouldSend(); // Mark TimeLineWidget for ExSync 
+#endif
 	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
 				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
 			SLOT( updatePosition( const TimePos & ) ) );
@@ -213,6 +224,20 @@ SongEditor::SongEditor( Song * song ) :
 	vcw_layout->addStretch();
 
 	gui->mainWindow()->addWidgetToToolBar( vc_w );
+		
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	m_exSyncButton = new QPushButton(tr("ExSync") , tb);
+	m_exSyncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
+	m_exSyncButton->setStyleSheet("background-color:black");
+	connect(m_exSyncButton, SIGNAL(clicked()), this, SLOT(toggleExSync()));
+	int exSyncBoxCol = gui->mainWindow()->addWidgetToToolBar(m_exSyncButton, 0);
+	
+	m_exSyncModeButton = new QPushButton(m_song->exSyncGetModeString() , tb);
+	m_exSyncModeButton->setToolTip(tr("toggle [Master] , [Slave] , [Duplex]"));
+	connect(m_exSyncModeButton, SIGNAL(clicked()), this, SLOT(toggleExSyncMode()));
+	gui->mainWindow()->addWidgetToToolBar( m_exSyncModeButton, 1, exSyncBoxCol);
+#endif
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
@@ -733,6 +758,33 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 
+#ifdef LMMS_HAVE_JACK
+// ExSync context : after ExSync.h ifdef should be removed
+void SongEditor::toggleExSync()
+{
+	bool on = m_song->exSyncToggle();
+	if (on)
+	{
+		m_exSyncButton->setStyleSheet("background-color:green;");
+		m_exSyncModeButton->setText(m_song->exSyncGetModeString());
+	} else {
+		m_exSyncButton->setStyleSheet("background-color:black");
+		m_exSyncModeButton->setText("");
+	}
+}
+
+
+
+
+void SongEditor::toggleExSyncMode()
+{
+	m_exSyncModeButton->setText(m_song->exSyncToggleMode());
+}
+#endif
+
+
+
+
 void SongEditor::updateScrollBar( int len )
 {
 	m_leftRightScroll->setMaximum( len );
@@ -775,6 +827,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 void SongEditor::updatePosition( const TimePos & t )
 {
 	int widgetWidth, trackOpWidth;
+#ifdef LMMS_HAVE_JACK
+	exSyncStoppedHack();  // from core/audio/AudioJack.cpp line ~91
+#endif
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;

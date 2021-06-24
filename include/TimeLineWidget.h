@@ -168,6 +168,12 @@ public:
 					m_ppb / TimePos::ticksPerBar() );
 	}
 
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	inline bool exSyncShouldSend() { return m_parentIsSongEditor; }
+	inline void exSyncSetShouldSend() { m_parentIsSongEditor = true; }
+	
+#endif
 signals:
 
 	void regionSelectedFromPixels( int, int );
@@ -238,6 +244,11 @@ private:
 		SelectSongTCO,
 	} m_action;
 
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	bool m_parentIsSongEditor;
+	
+#endif
 	int m_moveXOff;
 
 

@@ -105,6 +105,12 @@ private slots:
 	void updateMasterPitchFloat( int new_val );
 	void hideMasterPitchFloat();
 
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	void toggleExSync();
+	void toggleExSyncMode();
+#endif
+
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
@@ -125,6 +131,12 @@ private:
 	QScrollBar * m_leftRightScroll;
 
 	LcdSpinBox * m_tempoSpinBox;
+
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	QPushButton * m_exSyncButton;
+	QPushButton * m_exSyncModeButton;
+#endif
 
 	TimeLineWidget * m_timeLine;
 

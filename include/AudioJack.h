@@ -109,7 +109,7 @@ private:
 
 	bool m_active;
 	std::atomic<bool> m_stopped;
-
+	
 	std::atomic<MidiJack *> m_midiClient;
 	QVector<jack_port_t *> m_outputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
@@ -117,6 +117,7 @@ private:
 
 	f_cnt_t m_framesDoneInCurBuf;
 	f_cnt_t m_framesToDoInCurBuf;
+
 
 
 #ifdef AUDIO_PORT_SUPPORT
@@ -133,6 +134,67 @@ signals:
 	void zombified();
 
 } ;
+
+
+
+
+/**
+After implementing more ExSync devices 
+should be placed in own header  "ExSync.h"
+*/
+// BEGIN ExSync ExSync.h context
+//! Is included here but should be included in "ExSync.h"
+// #include "lmms_basics.h"
+
+
+//! ExSync sending code provide all fields, but here used only @frame
+struct SongExtendedPos
+{
+	bar_t bar; 	//!< the bar position, 0-based "Song.h"
+	int beat; 		//!< the beat position inside the bar, 0-based "Song.h"
+	int tick; 		//!< the remainder after bar and beat are removed , 0-based "Song.h"
+	int barStartTick; //!< tick_t currentTick()  "Song.h"
+	int beatsPerBar; //!<  getTimeSigModel().numeratorModel().value(); "MeterModel.h"
+	int beatType; 	//!<  getTimeSigModel().denominatorModel().value(); "MeterModel.h"
+	tick_t ticksPerBeat; //!< ticksPerBeat(...) "TimePos.h"
+	bpm_t tempo; //!< beats per minute getTempo(); "Song.h"
+	f_cnt_t frame; //!< currentFrame(); "Song.h"
+};
+
+/**
+ Functions, provided by Song.cpp, to control LMMS position/playing
+ LMMS react only in if ExSync is on (button is green)
+*/
+struct ExSyncCallbacks
+{
+	//! @playing [true : to start; false : to pause] 
+	void (* mode)(bool playing); 
+	//! change position to @frames;
+	void (* position)(uint32_t frames);
+	//! to calculate frames from time (not used here - jack is working in frames)
+	sample_rate_t (* processingSampleRate)(); //!< provided from Mixer.cpp
+};
+
+
+//! Functions, MUST be provided by ExSync driver
+struct ExSyncHandler
+{
+	//! true if synchronisation is available (driver is on)
+	bool (* availableNow)(); 
+	//! driver MUST send start/pause message if @playing is true/false 
+	void (* sendPlay)(bool playing); 
+	//! driver MUST send new position message
+	void (* sendPosition)(const SongExtendedPos *pos);
+	//! driver MUST start/stop remote LMMS controling @cb !nullptr/nullptr
+	void (* setSlave)(struct ExSyncCallbacks *cb); 
+};
+// struct ExSyncCallbacks *getExSync();
+// END ExSync ExSync.h context
+
+
+//! provides jackd ExSync driver API using frame based synchronization
+struct ExSyncHandler * exSyncGetJackHandler();
+
 
 #endif
 

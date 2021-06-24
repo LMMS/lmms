@@ -34,6 +34,11 @@
 #include <cmath>
 #include <functional>
 
+#ifdef LMMS_HAVE_JACK
+// ExSync after ExSync.h : ExSync.h must be included with other .h ...
+#include "AudioJack.h"
+#endif
+
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
@@ -95,6 +100,13 @@ Song::Song() :
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
 	m_loopRenderRemaining(1),
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	m_exSyncSlaveOn(false),
+	m_exSyncMasterOn(true),
+	m_exSyncOn(false),
+	m_exSyncMode(0),
+#endif
 	m_oldAutomatedValues()
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
@@ -113,7 +125,12 @@ Song::Song() :
 			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
-
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	connect( this, SIGNAL( playbackStateChanged() ), 
+			this, SLOT( onPlaybackStateChanged() ) );
+#endif
+	
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
 }
@@ -127,6 +144,171 @@ Song::~Song()
 	delete m_globalAutomationTrack;
 }
 
+
+
+
+#ifdef LMMS_HAVE_JACK
+// ExSync.cpp context : after ExSync.h MUST be moved to ExSync.cpp
+// BEGIN
+static void cs_exSyncMode(bool playing)
+{
+	Song * l_song = Engine::getSong();
+	if (l_song->isPlaying() != playing) 
+	{
+		if ( l_song->isStopped() )
+		{
+			l_song->playSong();
+		} else {
+			l_song->togglePause();
+		}
+	}
+}
+
+
+
+
+static void cs_exSyncPosition(uint32_t frames)
+{
+	Song * l_song = Engine::getSong();
+	if (l_song->playMode()  == Song::Mode_PlaySong) // Shoul Check this
+	{
+		TimePos timePos = 
+			TimePos::fromFrames(frames , Engine::framesPerTick());
+		l_song->setToTime(timePos);
+	}
+}
+
+
+
+
+static sample_rate_t cs_exSyncSampleRate()
+{
+	return Engine::mixer()->processingSampleRate();
+}
+
+
+
+
+static struct ExSyncCallbacks cs_exSyncCallbacks = {
+	&cs_exSyncMode,
+	&cs_exSyncPosition,
+	&cs_exSyncSampleRate
+};
+// struct ExSyncCallbacks *getExSync() { return *cs_exSyncCallbacks; }
+// END
+
+
+
+// ExSync Other functions should be compiled allways in Song.cpp
+void Song::onPlaybackStateChanged()
+{
+	if (m_exSyncMasterOn && m_exSyncOn)
+	{
+		if (m_playMode < Mode_PlayBB) 
+		{
+			//#ifdef LMMS_HAVE_JACK
+			ExSyncHandler * sync =  exSyncGetJackHandler();
+			sync->sendPlay(m_playing);
+			//#endif 
+		}
+	}
+}
+
+
+
+
+void Song::exSyncSendPosition()
+{
+	struct SongExtendedPos pos;
+	if (m_exSyncMasterOn && m_exSyncOn)
+	{
+		pos.bar = currentBar();
+		pos.beat = getBeat();
+		pos.tick = getBeatTicks();
+		pos.barStartTick = getTicks();
+		pos.beatsPerBar = getTimeSigModel().numeratorModel().value();
+		pos.beatType = getTimeSigModel().denominatorModel().value();
+		pos.ticksPerBeat = getPlayPos().ticksPerBeat( getTimeSigModel() );
+		pos.tempo = getTempo();
+		pos.frame = currentFrame();
+		
+		//#ifdef LMMS_HAVE_JACK
+		ExSyncHandler * sync =  exSyncGetJackHandler();
+		sync->sendPosition(&pos);
+		//#endif
+	}
+}
+
+
+
+
+#define 	EXSYNC_MAX_MODES 	(3)
+static const char * cs_exSyncModeStrings[EXSYNC_MAX_MODES] = {
+	"Master", "Slave", "Duplex"
+};
+
+
+
+
+const char * Song::exSyncToggleMode()
+{
+	// ExSync : this place MUST be changed after ExSync.h
+	ExSyncHandler * sync =  exSyncGetJackHandler();
+	if ( !sync->availableNow() ) 
+	{
+		// If driver is not available nothing to do ... 
+		return cs_exSyncModeStrings[m_exSyncMode] ;
+	}
+	m_exSyncMode += 1; 
+	if (m_exSyncMode >= EXSYNC_MAX_MODES) { m_exSyncMode = 0; }
+	switch(m_exSyncMode)
+	{
+	case 0: // Master
+		m_exSyncSlaveOn = false;
+		m_exSyncMasterOn = true;
+		sync->setSlave(nullptr); // ExSync more calls after ExSync.h
+		break;
+	case 1: // Slave
+		m_exSyncSlaveOn = true;
+		m_exSyncMasterOn = false;
+		sync->setSlave(&cs_exSyncCallbacks); // ExSync more calls after ExSync.h
+		break;
+	case 2: // Duplex
+		m_exSyncMasterOn = true;
+	}
+	return cs_exSyncModeStrings[m_exSyncMode] ;
+}
+
+
+
+
+const char * Song::exSyncGetModeString()
+{
+	return cs_exSyncModeStrings[m_exSyncMode] ;
+}
+
+
+
+
+bool Song::exSyncToggle()
+{
+	// ExSync : this place MUST be changed after ExSync.h
+	ExSyncHandler * sync =  exSyncGetJackHandler();
+	if ( sync->availableNow() )
+	{
+		if  (m_exSyncOn)
+		{
+			m_exSyncOn = false;
+		} else {
+			m_exSyncOn = true;
+		}
+	} else {
+		m_exSyncOn = false;
+	}
+	return m_exSyncOn;
+}
+
+#endif
 
 
 
@@ -250,6 +432,9 @@ void Song::processNextBuffer()
 			setToTime(begin);
 			m_vstSyncController.setPlaybackJumped(true);
 			emit updateSampleTracks();
+#ifdef LMMS_HAVE_JACK
+			exSyncSendPosition();
+#endif
 			return true;
 		}
 		return false;
@@ -665,6 +850,9 @@ void Song::stop()
 			case TimeLineWidget::KeepStopPosition:
 				break;
 		}
+#ifdef LMMS_HAVE_JACK
+		if (m_playMode < Mode_PlayBB) { exSyncSendPosition(); }
+#endif
 	}
 	else
 	{

@@ -68,6 +68,10 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_savedPos( -1 ),
 	m_hint( NULL ),
 	m_action( NoAction ),
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef should be removed
+	m_parentIsSongEditor(false),
+#endif
 	m_moveXOff( 0 )
 {
 	m_loopPos[0] = 0;
@@ -382,6 +386,13 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			m_pos.setJumped( true );
 			updatePosition();
 			positionMarkerMoved();
+#ifdef LMMS_HAVE_JACK
+			// ExSync context : after ExSync.h ifdef should be removed
+			if ( exSyncShouldSend() )
+			{
+				Engine::getSong()->exSyncSendPosition();
+			}
+#endif
 			break;
 
 		case MoveLoopBegin:
