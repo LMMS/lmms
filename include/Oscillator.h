@@ -254,11 +254,10 @@ private:
 	static fftwf_complex * s_specBuf;
 	static float s_sampleBuffer[OscillatorConstants::WAVETABLE_LENGTH];
 
-	static void generateSineWaveTable(sample_t * table);
-	static void generateSawWaveTable(int bands, sample_t * table);
-	static void generateTriangleWaveTable(int bands, sample_t * table);
-	static void generateSquareWaveTable(int bands, sample_t * table);
-	static void generateFromFFT(int bands, sample_t *table);
+	static void generateSawWaveTable(int bands, sample_t* table, int firstBand = 1);
+	static void generateTriangleWaveTable(int bands, sample_t* table, int firstBand = 1);
+	static void generateSquareWaveTable(int bands, sample_t* table, int firstBand = 1);
+	static void generateFromFFT(int bands, sample_t* table);
 	static void generateWaveTables();
 	static void createFFTPlans();
 

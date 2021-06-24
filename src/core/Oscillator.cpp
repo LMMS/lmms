@@ -25,6 +25,7 @@
 
 #include "Oscillator.h"
 
+#include <algorithm>
 #if !defined(__MINGW32__) && !defined(__MINGW64__)
 	#include <thread>
 #endif
@@ -107,81 +108,64 @@ void Oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 }
 
 
-void Oscillator::generateSawWaveTable(int bands, sample_t * table)
+void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 {
 	// sawtooth wave contain both even and odd harmonics
 	// hence sinewaves are added for all bands
 	// https://en.wikipedia.org/wiki/Sawtooth_wave
-	float max = 0;
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
-		table[i] = 0.0;
-		for (float n = 1; n <= bands; n++)
+		if (firstBand == 1) { table[i] = 0.0; }
+		for (int n = firstBand; n <= bands; n++)
 		{
-			table[i] += ((int)n%2 ? 1.0f : -1.0f) / n * sinf(F_2PI * i * n / (float)OscillatorConstants::WAVETABLE_LENGTH);
+			table[i] += (n % 2 ? 1.0f : -1.0f) / n *
+				sinf(F_2PI * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / F_PI_2;
 		}
-		max = fmax(max, table[i]);
-	}
-
-	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
-	{
-		table[i] /= max;
 	}
 }
 
 
-void Oscillator::generateTriangleWaveTable(int bands, sample_t * table)
+void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int firstBand)
 {
 	// triangle waves contain only odd harmonics
 	// hence sinewaves are added for alternate bands
 	// https://en.wikipedia.org/wiki/Triangle_wave
-	float max = 0;
-	for (int i = 0 ; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
-	{
-		table[i] = 0.0;
-		for (float n = 0; n <= bands * 0.5; n++)
-		{
-			table[i] += ((int)n%2 ? -1.0f : +1.0f) / powf((float)(2 * n + 1),
-							   2.0f) *
-					sinf(F_2PI * (2.0f * n + 1) * i / (float)OscillatorConstants::WAVETABLE_LENGTH);
-		}
-		max = fmax(max, table[i]);
-	}
-
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
-		table[i] /= max;
+		if (firstBand == 1) { table[i] = 0.0; }
+		for (int n = firstBand / 2 * 2 + 1; n <= bands; n += 2)
+		{
+			table[i] += (n % 4 ? -1.0f : +1.0f) / powf(n, 2.0f) *
+				sinf(F_2PI * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (4 / F_PI);
+		}
 	}
 }
 
-void Oscillator::generateSquareWaveTable(int bands, sample_t * table)
+
+void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBand)
 {
 	// square waves only contain odd harmonics,
 	// at diffrent levels when compared to triangle waves
 	// https://en.wikipedia.org/wiki/Square_wave
-	float max = 0;
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
-		table[i] = 0.0f;
-		for (float n = 1; n <= bands; n += 2)
+		if (firstBand == 1) { table[i] = 0.0; }
+		for (int n = firstBand / 2 * 2 + 1; n <= bands; n += 2)
 		{
-			table[i] += (1.0f / n) * sinf(F_2PI * i * n / OscillatorConstants::WAVETABLE_LENGTH);
+			table[i] += (1.0f / n) * sinf(F_2PI * i * n / OscillatorConstants::WAVETABLE_LENGTH) / (F_PI / 4);
 		}
-		max = fmax(max, table[i]);
-	}
-	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
-	{
-		table[i] /= max;
 	}
 }
 
 
 
 // Expects waveform converted to frequency domain to be present in the spectrum buffer
-void Oscillator::generateFromFFT(int bands, sample_t * table)
+void Oscillator::generateFromFFT(int bands, sample_t* table)
 {
-	//set unrequired bands to zero
-	for (int i = bands; i < OscillatorConstants::WAVETABLE_LENGTH * 2 + 1 - bands; i++)
+	// Keep only specified number of bands, set the rest to zero.
+	// Add a +1 offset to the requested number of bands, since the first "useful" frequency falls into bin 1.
+	// I.e., for bands = 1, keeping just bin 0 (center 0 Hz, +- 4 Hz) makes no sense, it would not produce any tone.
+	for (int i = bands + 1; i < OscillatorConstants::WAVETABLE_LENGTH * 2 - bands; i++)
 	{
 		s_specBuf[i][0] = 0.0f;
 		s_specBuf[i][1] = 0.0f;
@@ -242,34 +226,71 @@ void Oscillator::destroyFFTPlans()
 
 void Oscillator::generateWaveTables()
 {
-	//generate saw tables
+	// Always start from the table that contains the least number of bands, and re-use each table in the following
+	// iteration, adding more bands in each step and avoiding repeated computation of earlier bands.
+
+	// Generate saw tables
 	auto sawGen = []()
 	{
-		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		int lastBands = 0;
+		for (int i = OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1; i >= 0; i--)
 		{
-			generateSawWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i]);
+			const int bands = OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i);
+			generateSawWaveTable(bands, s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i], lastBands + 1);
+			lastBands = bands;
+			if (i)
+			{
+				std::copy(
+					s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i],
+					s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
+					s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i - 1]);
+			}
 		}
 	};
-	//generate square tables
+
+	// Generate square tables
 	auto squareGen = []()
 	{
-		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		int lastBands = 0;
+		for (int i = OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1; i >= 0; i--)
 		{
-			generateSquareWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i]);
+			const int bands = OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i);
+			generateSquareWaveTable(bands, s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i], lastBands + 1);
+			lastBands = bands;
+			if (i)
+			{
+				std::copy(
+					s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i],
+					s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
+					s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i - 1]);
+			}
 		}
 	};
-	//generate triangle tables
+
+	// Generate triangle tables
 	auto triangleGen = []()
 	{
-		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+		int lastBands = 0;
+		for (int i = OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1; i >= 0; i--)
 		{
-			generateTriangleWaveTable(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i]);
+			const int bands = OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i);
+			generateTriangleWaveTable(bands, s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i], lastBands + 1);
+			lastBands = bands;
+			if (i)
+			{
+				std::copy(
+					s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i],
+					s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
+					s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i - 1]);
+			}
 		}
 	};
+
+	// FFT-based wave shapes: make standard wave table without band limit, convert to frequency domain, remove bands
+	// above maximum frequency and convert back to time domain.
 	auto fftGen = []()
 	{
-		//generate moogSaw tables
-		//generate signal buffer
+		// Generate moogSaw tables
 		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 		{
 			for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
@@ -280,8 +301,7 @@ void Oscillator::generateWaveTables()
 			generateFromFFT(OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::MoogSawWave - FirstWaveShapeTable][i]);
 		}
 
-		//generate Exp tables
-		//generate signal buffer
+		// Generate exponential tables
 		for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 		{
 			for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
