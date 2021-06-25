@@ -169,7 +169,7 @@ public:
 	}
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	inline bool exSyncShouldSend() { return m_parentIsSongEditor; }
 	inline void exSyncSetShouldSend() { m_parentIsSongEditor = true; }
 	
@@ -245,7 +245,7 @@ private:
 	} m_action;
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	bool m_parentIsSongEditor;
 	
 #endif

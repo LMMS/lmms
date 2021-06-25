@@ -140,7 +140,7 @@ signals:
 
 /**
 After implementing more ExSync devices 
-should be placed in own header  "ExSync.h"
+MUST be placed in own header  "ExSync.h"
 */
 // BEGIN ExSync ExSync.h context
 //! Is included here but should be included in "ExSync.h"

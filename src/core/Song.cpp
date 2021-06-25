@@ -35,7 +35,7 @@
 #include <functional>
 
 #ifdef LMMS_HAVE_JACK
-// ExSync after ExSync.h : ExSync.h must be included with other .h ...
+// ExSync after ExSync.h : ExSync.h MUST be included with other .h ...
 #include "AudioJack.h"
 #endif
 
@@ -101,7 +101,7 @@ Song::Song() :
 	m_loopRenderCount(1),
 	m_loopRenderRemaining(1),
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	m_exSyncSlaveOn(false),
 	m_exSyncMasterOn(true),
 	m_exSyncOn(false),
@@ -126,7 +126,7 @@ Song::Song() :
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	connect( this, SIGNAL( playbackStateChanged() ), 
 			this, SLOT( onPlaybackStateChanged() ) );
 #endif
@@ -148,7 +148,8 @@ Song::~Song()
 
 
 #ifdef LMMS_HAVE_JACK
-// ExSync.cpp context : after ExSync.h MUST be moved to ExSync.cpp
+// ExSync.cpp context : after ExSync.h may be moved to ExSync.cpp
+// But may be ExSync.cpp not needed at all
 // BEGIN
 static void cs_exSyncMode(bool playing)
 {
@@ -170,7 +171,7 @@ static void cs_exSyncMode(bool playing)
 static void cs_exSyncPosition(uint32_t frames)
 {
 	Song * l_song = Engine::getSong();
-	if (l_song->playMode()  == Song::Mode_PlaySong) // Shoul Check this
+	if (l_song->playMode()  == Song::Mode_PlaySong) 
 	{
 		TimePos timePos = 
 			TimePos::fromFrames(frames , Engine::framesPerTick());
@@ -206,6 +207,7 @@ void Song::onPlaybackStateChanged()
 	{
 		if (m_playMode < Mode_PlayBB) 
 		{
+			// Hint to future:
 			//#ifdef LMMS_HAVE_JACK
 			ExSyncHandler * sync =  exSyncGetJackHandler();
 			sync->sendPlay(m_playing);
@@ -232,6 +234,7 @@ void Song::exSyncSendPosition()
 		pos.tempo = getTempo();
 		pos.frame = currentFrame();
 		
+		// Hint to future:
 		//#ifdef LMMS_HAVE_JACK
 		ExSyncHandler * sync =  exSyncGetJackHandler();
 		sync->sendPosition(&pos);
@@ -252,6 +255,7 @@ static const char * cs_exSyncModeStrings[EXSYNC_MAX_MODES] = {
 
 const char * Song::exSyncToggleMode()
 {
+	// Hint to future:
 	// ExSync : this place MUST be changed after ExSync.h
 	ExSyncHandler * sync =  exSyncGetJackHandler();
 	if ( !sync->availableNow() ) 
@@ -292,6 +296,7 @@ const char * Song::exSyncGetModeString()
 
 bool Song::exSyncToggle()
 {
+	// Hint to future:
 	// ExSync : this place MUST be changed after ExSync.h
 	ExSyncHandler * sync =  exSyncGetJackHandler();
 	if ( sync->availableNow() )

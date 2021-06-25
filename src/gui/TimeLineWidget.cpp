@@ -69,7 +69,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_hint( NULL ),
 	m_action( NoAction ),
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	m_parentIsSongEditor(false),
 #endif
 	m_moveXOff( 0 )
@@ -387,7 +387,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			updatePosition();
 			positionMarkerMoved();
 #ifdef LMMS_HAVE_JACK
-			// ExSync context : after ExSync.h ifdef should be removed
+			// ExSync context : after ExSync.h ifdef MUST be removed
 			if ( exSyncShouldSend() )
 			{
 				Engine::getSong()->exSyncSendPosition();

@@ -351,7 +351,7 @@ public:
 	bool isSavingProject() const;
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	void exSyncSendPosition();
 	const char * exSyncToggleMode();
 	const char * exSyncGetModeString();
@@ -394,7 +394,7 @@ private slots:
 	void updateFramesPerTick();
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	void onPlaybackStateChanged();
 	
 #endif
@@ -488,7 +488,7 @@ private:
 	TimePos m_exportEffectiveLength;
 #ifdef LMMS_HAVE_JACK
 	
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	bool m_exSyncSlaveOn; //(Receave)
 	bool m_exSyncMasterOn; //(Send)
 	bool m_exSyncOn; //(React and Send)

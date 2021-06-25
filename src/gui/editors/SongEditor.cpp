@@ -226,7 +226,7 @@ SongEditor::SongEditor( Song * song ) :
 	gui->mainWindow()->addWidgetToToolBar( vc_w );
 		
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	m_exSyncButton = new QPushButton(tr("ExSync") , tb);
 	m_exSyncButton->setToolTip(tr("play/position sync. with JACK audio interface"));
 	m_exSyncButton->setStyleSheet("background-color:black");
@@ -759,7 +759,7 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 #ifdef LMMS_HAVE_JACK
-// ExSync context : after ExSync.h ifdef should be removed
+// ExSync context : after ExSync.h ifdef MUST be removed
 void SongEditor::toggleExSync()
 {
 	bool on = m_song->exSyncToggle();

@@ -106,7 +106,7 @@ private slots:
 	void hideMasterPitchFloat();
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	void toggleExSync();
 	void toggleExSyncMode();
 #endif
@@ -133,7 +133,7 @@ private:
 	LcdSpinBox * m_tempoSpinBox;
 
 #ifdef LMMS_HAVE_JACK
-	// ExSync context : after ExSync.h ifdef should be removed
+	// ExSync context : after ExSync.h ifdef MUST be removed
 	QPushButton * m_exSyncButton;
 	QPushButton * m_exSyncModeButton;
 #endif

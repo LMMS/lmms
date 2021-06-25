@@ -90,15 +90,17 @@ void exSyncStoppedHack()
 {
 	struct ExSyncCallbacks *slaveCallBacks  = cs_slaveCallBacks;
 	// Now slaveCallBacks is local copy - never be changed by other thread ...
-	jack_transport_state_t state = jack_transport_query(cs_syncJackd, nullptr);
 	if (cs_syncJackd && slaveCallBacks)
 	{ 
+		jack_transport_state_t state = jack_transport_query(cs_syncJackd, nullptr);
 		if ( ( JackTransportStopped == state) && (state != cs_lastState) )
 		{
 			slaveCallBacks->mode(false);
 		}
+		cs_lastState = state ;
+	} else {
+		cs_lastState = JackTransportStopped;
 	}
-	cs_lastState = state ;
 }
 
 
