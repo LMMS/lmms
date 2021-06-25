@@ -272,7 +272,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
-	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
@@ -333,7 +333,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	p.setPen( c.darker( 200 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
-	// draw the 'muted' pixmap only if the pattern was manualy muted
+	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_clip->isMuted() )
 	{
 		const int spacing = CLIP_BORDER_WIDTH;

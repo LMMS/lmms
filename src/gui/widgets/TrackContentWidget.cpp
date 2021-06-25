@@ -474,7 +474,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	// onto their final position.
 
 	float snapSize = gui->songEditor()->m_editor->getSnapSize();
-	// All patterns should be offset the same amount as the grabbed pattern
+	// All clips should be offset the same amount as the grabbed clip
 	TimePos offset = TimePos(clipPos - grabbedClipPos);
 	// Users expect clips to "fall" backwards, so bias the offset
 	offset -= TimePos::ticksPerBar() * snapSize / 2;

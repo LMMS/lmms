@@ -90,7 +90,7 @@ Song::Song() :
 	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_clipToPlay( NULL ),
-	m_loopPattern( false ),
+	m_loopClip( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
@@ -225,7 +225,7 @@ void Song::processNextBuffer()
 			}
 			break;
 
-		case Mode_PlayPattern:
+		case Mode_PlayClip:
 			if (m_clipToPlay)
 			{
 				clipNum = m_clipToPlay->getTrack()->getClipNum(m_clipToPlay);
@@ -292,7 +292,7 @@ void Song::processNextBuffer()
 			{
 				enforceLoop(TimePos{0}, TimePos{Engine::getBBTrackContainer()->lengthOfCurrentBB(), 0});
 			}
-			else if (m_playMode == Mode_PlayPattern && m_loopPattern && !loopEnabled)
+			else if (m_playMode == Mode_PlayClip && m_loopClip && !loopEnabled)
 			{
 				enforceLoop(TimePos{0}, m_clipToPlay->length());
 			}
@@ -537,19 +537,19 @@ void Song::playBB()
 
 
 
-void Song::playPattern( const MidiClip* patternToPlay, bool loop )
+void Song::playMidiClip( const MidiClip* clipToPlay, bool loop )
 {
 	if( isStopped() == false )
 	{
 		stop();
 	}
 
-	m_clipToPlay = patternToPlay;
-	m_loopPattern = loop;
+	m_clipToPlay = clipToPlay;
+	m_loopClip = loop;
 
 	if( m_clipToPlay != NULL )
 	{
-		m_playMode = Mode_PlayPattern;
+		m_playMode = Mode_PlayClip;
 		m_playing = true;
 		m_paused = false;
 	}

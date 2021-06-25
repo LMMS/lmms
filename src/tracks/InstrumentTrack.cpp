@@ -191,7 +191,7 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayPattern &&
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayClip &&
 				n && n->isBbTrackMuted() ) || ! m_instrument )
 	{
 		return;
@@ -699,10 +699,10 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
 	{
 		MidiClip* p = dynamic_cast<MidiClip*>( *it );
-		// everything which is not a pattern won't be played
-		// A pattern playing in the Piano Roll window will always play
+		// everything which is not a clip won't be played
+		// A clip playing in the Piano Roll window will always play
 		if(p == NULL ||
-			(Engine::getSong()->playMode() != Song::Mode_PlayPattern
+			(Engine::getSong()->playMode() != Song::Mode_PlayClip
 			&& (*it)->isMuted()))
 		{
 			continue;
@@ -713,7 +713,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			cur_start -= p->startPosition();
 		}
 
-		// get all notes from the given pattern...
+		// get all notes from the given clip...
 		const NoteVector & notes = p->notes();
 		// ...and set our index to zero
 		NoteVector::ConstIterator nit = notes.begin();
@@ -743,7 +743,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			// are we playing global song?
 			if( _clip_num < 0 )
 			{
-				// then set song-global offset of pattern in order to
+				// then set song-global offset of clip in order to
 				// properly perform the note detuning
 				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 			}

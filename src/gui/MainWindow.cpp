@@ -1275,7 +1275,7 @@ void MainWindow::updatePlayPauseIcons()
 				gui->getBBEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayPattern:
+			case Song::Mode_PlayClip:
 				gui->pianoRoll()->setPauseIcon( true );
 				break;
 

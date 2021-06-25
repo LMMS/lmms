@@ -133,7 +133,7 @@ class StepRecorder : public QObject
 		QElapsedTimer releasedTimer;
 	} ;
 
-	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)
+	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the clip)
 
 	StepNote* findCurStepNote(const int key);
 

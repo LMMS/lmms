@@ -34,7 +34,7 @@
 
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
-	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
+	m_value( detuning ? detuning->automationClip()->valueAt( 0 ) : 0 )
 {
 }
 
@@ -539,7 +539,7 @@ void NotePlayHandle::processTimePos( const TimePos& time )
 {
 	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{
-		const float v = detuning()->automationPattern()->valueAt( time - songGlobalParentOffset() - pos() );
+		const float v = detuning()->automationClip()->valueAt( time - songGlobalParentOffset() - pos() );
 		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{
 			m_baseDetuning->setValue( v );
