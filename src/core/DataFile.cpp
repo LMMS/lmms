@@ -95,7 +95,7 @@ DataFile::typeDescStruct
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NotePattern, "pattern" }
+	{ DataFile::NoteClip, "pattern" }
 } ;
 
 
@@ -200,7 +200,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NotePattern:
+	case Type::NoteClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;

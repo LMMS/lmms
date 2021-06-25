@@ -1267,7 +1267,7 @@ void ClipView::mergeClips(QVector<ClipView*> clipvs)
 
 	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
-	// Create a pattern where all notes will be added
+	// Create a clip where all notes will be added
 	MidiClip* newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
 	if (!newMidiClip)
 	{

@@ -55,7 +55,7 @@ public:
 	// specifies origin of NotePlayHandle
 	enum Origins
 	{
-		OriginPattern,		/*! playback of a note from a pattern */
+		OriginMidiClip,		/*! playback of a note from a clip */
 		OriginMidiInput,	/*! playback of a MIDI note input event */
 		OriginNoteStacking,	/*! created by note stacking instrument function */
 		OriginArpeggio,		/*! created by arpeggio instrument function */
@@ -69,7 +69,7 @@ public:
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					Origin origin = OriginPattern );
+					Origin origin = OriginMidiClip );
 	virtual ~NotePlayHandle();
 
 	void * operator new ( size_t size, void * p )
@@ -249,7 +249,7 @@ public:
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
-	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
+	/*! Set song-global offset (relative to containing clip) in order to properly perform the note detuning */
 	void setSongGlobalParentOffset( const TimePos& offset )
 	{
 		m_songGlobalParentOffset = offset;
@@ -346,7 +346,7 @@ public:
 					const Note& noteToPlay,
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
+					NotePlayHandle::Origin origin = NotePlayHandle::OriginMidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
 	static void free();

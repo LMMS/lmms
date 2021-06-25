@@ -66,7 +66,7 @@ public:
 		Mode_None,
 		Mode_PlaySong,
 		Mode_PlayBB,
-		Mode_PlayPattern,
+		Mode_PlayClip,
 		Mode_PlayAutomationClip,
 		Mode_Count
 	} ;
@@ -364,7 +364,7 @@ public slots:
 	void record();
 	void playAndRecord();
 	void playBB();
-	void playPattern( const MidiClip * patternToPlay, bool loop = true );
+	void playMidiClip( const MidiClip * clipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -474,7 +474,7 @@ private:
 	bar_t m_length;
 
 	const MidiClip* m_clipToPlay;
-	bool m_loopPattern;
+	bool m_loopClip;
 
 	double m_elapsedMilliSeconds[Mode_Count];
 	tick_t m_elapsedTicks;

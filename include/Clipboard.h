@@ -1,5 +1,5 @@
 /*
- * Clipboard.h - the clipboard for patterns, notes etc.
+ * Clipboard.h - the clipboard for clips, notes etc.
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

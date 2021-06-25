@@ -146,7 +146,7 @@ private slots:
 		note->createDetuning();
 
 		DetuningHelper* dh = note->detuning();
-		auto pattern = dh->automationPattern();
+		auto pattern = dh->automationClip();
 		pattern->setProgressionType( AutomationClip::LinearProgression );
 		pattern->putValue(TimePos(0, 0), 0.0);
 		pattern->putValue(TimePos(4, 0), 1.0);

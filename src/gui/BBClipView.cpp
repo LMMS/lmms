@@ -100,7 +100,7 @@ void BBClipView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0, c.lighter( 130 ) );
 	lingrad.setColorAt( 1, c.lighter( 70 ) );
 
-	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
@@ -129,7 +129,7 @@ void BBClipView::paintEvent( QPaintEvent * )
 		}
 	}
 
-	// pattern name
+	// clip name
 	paintTextLabel(m_bbClip->name(), p);
 
 	// inner border
@@ -141,7 +141,7 @@ void BBClipView::paintEvent( QPaintEvent * )
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
-	// draw the 'muted' pixmap only if the pattern was manualy muted
+	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_bbClip->isMuted() )
 	{
 		const int spacing = CLIP_BORDER_WIDTH;

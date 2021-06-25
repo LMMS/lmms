@@ -88,8 +88,8 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_bb_track_pattern"), tr("Clone beat/bassline pattern"),
-						 m_trackContainerView, SLOT(clonePattern()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_bb_track_clip"), tr("Clone beat/bassline clip"),
+						 m_trackContainerView, SLOT(cloneClip()));
 	trackAndStepActionsToolBar->addAction(
 				embed::getIconPixmap("add_sample_track"),
 				tr("Add sample-track"), m_trackContainerView,
@@ -316,9 +316,9 @@ void BBTrackContainerView::makeSteps( bool clone )
 	}
 }
 
-// Creates a clone of the current BB track with the same pattern, but no Clips in the song editor
+// Creates a clone of the current BB track with the same clip, but no Clips in the song editor
 // TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
-void BBTrackContainerView::clonePattern()
+void BBTrackContainerView::cloneClip()
 {
 	// Get the current BBTrack id
 	BBTrackContainer *bbtc = static_cast<BBTrackContainer*>(model());

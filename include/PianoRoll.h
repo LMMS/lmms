@@ -215,7 +215,7 @@ protected slots:
 	void changeNoteEditMode( int i );
 	void markSemiTone(int i, bool fromMenu = true);
 
-	void hideMidiClip( MidiClip* pattern );
+	void hideMidiClip( MidiClip* clip );
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
@@ -497,8 +497,8 @@ public:
 	PianoRollWindow();
 
 	const MidiClip* currentMidiClip() const;
-	void setCurrentMidiClip( MidiClip* pattern );
-	void setGhostClip( MidiClip* pattern );
+	void setCurrentMidiClip( MidiClip* clip );
+	void setGhostClip( MidiClip* clip );
 
 	int quantization() const;
 
@@ -532,13 +532,13 @@ signals:
 
 
 private slots:
-	void updateAfterPatternChange();
+	void updateAfterMidiClipChange();
 	void ghostClipSet( bool state );
 	void exportMidiClip();
 	void importMidiClip();
 
 private:
-	void patternRenamed();
+	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
 	void stopStepRecording();
 	void updateStepRecordingIcon();

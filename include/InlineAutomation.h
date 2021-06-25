@@ -36,15 +36,16 @@ public:
 	InlineAutomation() :
 		FloatModel(),
 		sharedObject(),
-		m_autoPattern( nullptr )
+		m_autoClip( nullptr )
+		m_autoClip( NULL )
 	{
 	}
 
 	virtual ~InlineAutomation()
 	{
-		if( m_autoPattern )
+		if( m_autoClip )
 		{
-			delete m_autoPattern;
+			delete m_autoClip;
 		}
 	}
 
@@ -52,16 +53,16 @@ public:
 
 	bool hasAutomation() const
 	{
-		if( m_autoPattern != nullptr && m_autoPattern->getTimeMap().isEmpty() == false )
+		if( m_autoClip != nullptr && m_autoClip->getTimeMap().isEmpty() == false )
 		{
 			// Prevent saving inline automation if there's just one node at the beginning of
-			// the pattern, which has a InValue equal to the value of model (which is going
+			// the clip, which has a InValue equal to the value of model (which is going
 			// to be saved anyways) and no offset between the InValue and OutValue
 			AutomationClip::timeMap::const_iterator firstNode =
-				m_autoPattern->getTimeMap().begin();
+				m_autoClip->getTimeMap().begin();
 
 			if (isAtInitValue()
-				&& m_autoPattern->getTimeMap().size() == 1
+				&& m_autoClip->getTimeMap().size() == 1
 				&& POS(firstNode) == 0
 				&& INVAL(firstNode) == value()
 				&& OFFSET(firstNode) == 0)
@@ -75,14 +76,14 @@ public:
 		return false;
 	}
 
-	AutomationClip * automationPattern()
+	AutomationClip * automationClip()
 	{
-		if( m_autoPattern == nullptr )
+		if( m_autoClip == nullptr )
 		{
-			m_autoPattern = new AutomationClip( nullptr );
-			m_autoPattern->addObject( this );
+			m_autoClip = new AutomationClip( nullptr );
+			m_autoClip->addObject( this );
 		}
-		return m_autoPattern;
+		return m_autoClip;
 	}
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -90,7 +91,7 @@ public:
 
 
 private:
-	AutomationClip * m_autoPattern;
+	AutomationClip * m_autoClip;
 
 } ;
 
