@@ -154,7 +154,7 @@ Song::~Song()
 static void cs_exSyncMode(bool playing)
 {
 	Song * l_song = Engine::getSong();
-	if (l_song->isPlaying() != playing) 
+	if ((l_song->exSyncReact()) && (l_song->isPlaying() != playing)) 
 	{
 		if ( l_song->isStopped() )
 		{
@@ -171,7 +171,7 @@ static void cs_exSyncMode(bool playing)
 static void cs_exSyncPosition(uint32_t frames)
 {
 	Song * l_song = Engine::getSong();
-	if (l_song->playMode()  == Song::Mode_PlaySong) 
+	if ((l_song->exSyncReact()) && (l_song->playMode()  == Song::Mode_PlaySong))
 	{
 		TimePos timePos = 
 			TimePos::fromFrames(frames , Engine::framesPerTick());
@@ -311,6 +311,17 @@ bool Song::exSyncToggle()
 		m_exSyncOn = false;
 	}
 	return m_exSyncOn;
+}
+
+
+
+
+bool Song::exSyncAvailable()
+{
+	// ExSync : this place MUST be changed after ExSync.h
+	ExSyncHandler * sync =  exSyncGetJackHandler();
+	if ( sync->availableNow() ) { return true; }
+	return false;
 }
 
 #endif

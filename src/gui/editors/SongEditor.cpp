@@ -769,8 +769,8 @@ void SongEditor::toggleExSync()
 		m_exSyncModeButton->setText(m_song->exSyncGetModeString());
 	} else {
 		m_exSyncButton->setStyleSheet("background-color:black");
-		m_exSyncModeButton->setText("");
 	}
+	if (!m_song->exSyncAvailable()) { m_exSyncModeButton->setText(""); }
 }
 
 

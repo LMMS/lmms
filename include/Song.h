@@ -356,6 +356,8 @@ public:
 	const char * exSyncToggleMode();
 	const char * exSyncGetModeString();
 	bool exSyncToggle();
+	inline bool exSyncReact() { return m_exSyncOn; }
+	bool exSyncAvailable();
 #endif
 	
 public slots:
