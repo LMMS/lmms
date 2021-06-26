@@ -44,6 +44,11 @@ namespace OscillatorConstants
 	const int SEMITONES_PER_TABLE = 1;
 	const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / SEMITONES_PER_TABLE;
 
+	// There is some ambiguity around the use of "wavetable", "wavetable synthesis" or related terms.
+	// The following meanings and definitions were selected for use in the Oscillator class:
+	//  - wave shape: abstract and precise definition of the graph associated with a given type of wave;
+	//  - waveform: digital representations the wave shape, a set of waves optimized for use at varying pitches;
+	//  - wavetable: a table containing one period of a wave, with frequency content optimized for a specific pitch.
 	typedef std::array<sample_t, WAVETABLE_LENGTH> wavetable_t;
 	typedef std::array<wavetable_t,	WAVE_TABLES_PER_WAVEFORM_COUNT> waveform_t;
 };
