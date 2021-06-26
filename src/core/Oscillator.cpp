@@ -133,7 +133,7 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
 		if (firstBand == 1) { table[i] = 0.0; }
-		for (int n = firstBand / 2 * 2 + 1; n <= bands; n += 2)
+		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
 			table[i] += (n % 4 ? -1.0f : +1.0f) / powf(n, 2.0f) *
 				sinf(F_2PI * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (4 / F_PI);
@@ -150,7 +150,7 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBa
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
 		if (firstBand == 1) { table[i] = 0.0; }
-		for (int n = firstBand / 2 * 2 + 1; n <= bands; n += 2)
+		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
 			table[i] += (1.0f / n) * sinf(F_2PI * i * n / OscillatorConstants::WAVETABLE_LENGTH) / (F_PI / 4);
 		}
