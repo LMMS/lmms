@@ -206,6 +206,8 @@ void Mixer::initDevices()
 		m_audioDev = tryAudioDevices();
 		m_midiClient = tryMidiClients();
 	}
+	// Loading audio device may have changed the sample rate
+	emit sampleRateChanged();
 }
 
 
