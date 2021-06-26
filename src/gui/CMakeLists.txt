@@ -37,6 +37,7 @@ SET(LMMS_SRCS
 	gui/SampleTrackView.cpp
 	gui/SampleTrackWindow.cpp
 	gui/SetupDialog.cpp
+	gui/SignalSender.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
