@@ -302,7 +302,11 @@ bool Mixer::criticalXRuns() const
 
 void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 {
-	requestChangeInModel();
+	bool needCapture = Engine::getSong()->isRecording();
+	if (needCapture)
+	{
+		requestChangeInModel(); // future_hint : MUST NOT be here
+	}
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
 	int size = m_inputBufferSize[ m_inputBufferWrite ];
@@ -323,8 +327,11 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
-
-	doneChangeInModel();
+	
+	if (needCapture)
+	{
+		doneChangeInModel(); // future_hint : MUST NOT be here
+	}
 }
 
 
