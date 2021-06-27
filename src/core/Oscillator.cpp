@@ -66,44 +66,48 @@ Oscillator::Oscillator(const IntModel *wave_shape_model,
 	m_phaseOffset(phase_offset),
 	m_phase(phase_offset),
 	m_userWave(nullptr),
-	m_useWaveTable(false)
+	m_useWaveTable(false),
+	m_isModulator(false)
 {
 }
 
 
 
 
-void Oscillator::update( sampleFrame * _ab, const fpp_t _frames,
-							const ch_cnt_t _chnl )
+void Oscillator::update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator)
 {
-	if( m_freq >= Engine::mixer()->processingSampleRate() / 2 )
+	if (m_freq >= Engine::mixer()->processingSampleRate() / 2)
 	{
-		BufferManager::clear( _ab, _frames );
+		BufferManager::clear(ab, frames);
 		return;
 	}
-	if( m_subOsc != NULL )
+	// If this oscillator is used to modulate another oscillator, take a note.
+	// The sampling functions will check this variable and avoid using band-limited
+	// wavetables, since they contain ringing that would lead to unexpected results.
+	m_isModulator = modulator;
+	if (m_subOsc != nullptr)
 	{
-		switch( m_modulationAlgoModel->value() )
+		switch (m_modulationAlgoModel->value())
 		{
 			case PhaseModulation:
-				updatePM( _ab, _frames, _chnl );
+				updatePM(ab, frames, chnl);
 				break;
 			case AmplitudeModulation:
-				updateAM( _ab, _frames, _chnl );
+				updateAM(ab, frames, chnl);
 				break;
 			case SignalMix:
-				updateMix( _ab, _frames, _chnl );
+				updateMix(ab, frames, chnl);
 				break;
 			case SynchronizedBySubOsc:
-				updateSync( _ab, _frames, _chnl );
+				updateSync(ab, frames, chnl);
 				break;
 			case FrequencyModulation:
-				updateFM( _ab, _frames, _chnl );
+				updateFM(ab, frames, chnl);
 		}
 	}
 	else
 	{
-		updateNoSub( _ab, _frames, _chnl );
+		updateNoSub(ab, frames, chnl);
 	}
 }
 
@@ -580,7 +584,7 @@ template<Oscillator::WaveShapes W>
 void Oscillator::updatePM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	m_subOsc->update( _ab, _frames, _chnl );
+	m_subOsc->update( _ab, _frames, _chnl, true );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
@@ -601,7 +605,7 @@ template<Oscillator::WaveShapes W>
 void Oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	m_subOsc->update( _ab, _frames, _chnl );
+	m_subOsc->update( _ab, _frames, _chnl, true );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
@@ -620,7 +624,7 @@ template<Oscillator::WaveShapes W>
 void Oscillator::updateMix( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	m_subOsc->update( _ab, _frames, _chnl );
+	m_subOsc->update( _ab, _frames, _chnl, false );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
@@ -663,7 +667,7 @@ template<Oscillator::WaveShapes W>
 void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	m_subOsc->update( _ab, _frames, _chnl );
+	m_subOsc->update( _ab, _frames, _chnl, true );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 	const float sampleRateCorrection = 44100.0f /
@@ -702,7 +706,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::TriangleWave>(
 		const float _sample )
 {
-	if (m_useWaveTable)
+	if (m_useWaveTable && !m_isModulator)
 	{
 		return wtSample(s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable],_sample);
 	}
@@ -719,7 +723,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SawWave>(
 		const float _sample )
 {
-	if (m_useWaveTable)
+	if (m_useWaveTable && !m_isModulator)
 	{
 		return wtSample(s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable], _sample);
 	}
@@ -736,7 +740,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SquareWave>(
 		const float _sample )
 {
-	if (m_useWaveTable)
+	if (m_useWaveTable && !m_isModulator)
 	{
 		return wtSample(s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable], _sample);
 	}
@@ -753,7 +757,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::MoogSawWave>(
 							const float _sample )
 {
-	if (m_useWaveTable)
+	if (m_useWaveTable && !m_isModulator)
 	{
 		return wtSample(s_waveTables[WaveShapes::MoogSawWave - FirstWaveShapeTable], _sample);
 	}
@@ -770,7 +774,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::ExponentialWave>(
 							const float _sample )
 {
-	if (m_useWaveTable)
+	if (m_useWaveTable && !m_isModulator)
 	{
 		return wtSample(s_waveTables[WaveShapes::ExponentialWave - FirstWaveShapeTable], _sample);
 	}
@@ -797,7 +801,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 							const float _sample )
 {
-	if (m_useWaveTable)
+	if (m_useWaveTable && !m_isModulator)
 	{
 		return wtSample(m_userWave->m_userAntiAliasWaveTable, _sample);
 	}

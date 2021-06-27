@@ -100,10 +100,9 @@ public:
 		m_userWave = _wave;
 	}
 
-	void update( sampleFrame * _ab, const fpp_t _frames,
-							const ch_cnt_t _chnl );
-	// now follow the wave-shape-routines...
+	void update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator = false);
 
+	// now follow the wave-shape-routines...
 	static inline sample_t sinSample( const float _sample )
 	{
 		return sinf( _sample * F_2PI );
@@ -246,6 +245,7 @@ private:
 	float m_phase;
 	const SampleBuffer * m_userWave;
 	bool m_useWaveTable;
+	bool m_isModulator;
 
 	/* Multiband WaveTable */
 	static sample_t s_waveTables[WaveShapes::NumWaveShapeTables][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
