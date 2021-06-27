@@ -224,27 +224,32 @@ void Oscillator::destroyFFTPlans()
 
 void Oscillator::generateWaveTables()
 {
-	// Clear all wave tables
-	std::fill(s_waveTables[0][0], s_waveTables[Oscillator::WaveShapes::NumWaveShapeTables][0] - 1, 0.f);
-
 	// Generate tables for simple shaped (constructed by summing sine waves).
 	// Start from the table that contains the least number of bands, and re-use each table in the following
 	// iteration, adding more bands in each step and avoiding repeated computation of earlier bands.
 	typedef void (*generator_t)(int, sample_t*, int);
 	auto simpleGen = [](WaveShapes shape, generator_t generator)
 	{
+		const int shapeID = shape - FirstWaveShapeTable;
 		int lastBands = 0;
+
+		// Clear the first wave table
+		std::fill(
+		    std::begin(s_waveTables[shapeID][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1]),
+		    std::end(s_waveTables[shapeID][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1]),
+		    0.f);
+
 		for (int i = OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1; i >= 0; i--)
 		{
 			const int bands = OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i);
-			generator(bands, s_waveTables[shape - FirstWaveShapeTable][i], lastBands + 1);
+			generator(bands, s_waveTables[shapeID][i], lastBands + 1);
 			lastBands = bands;
 			if (i)
 			{
 				std::copy(
-					s_waveTables[shape - FirstWaveShapeTable][i],
-					s_waveTables[shape - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
-					s_waveTables[shape - FirstWaveShapeTable][i - 1]);
+					s_waveTables[shapeID][i],
+					s_waveTables[shapeID][i] + OscillatorConstants::WAVETABLE_LENGTH,
+					s_waveTables[shapeID][i - 1]);
 			}
 		}
 	};
