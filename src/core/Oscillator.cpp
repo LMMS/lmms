@@ -117,7 +117,6 @@ void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 	{
 		// add offset to the position index to match phase of the non-wavetable saw wave; precompute "/ period"
 		const float imod = (i - OscillatorConstants::WAVETABLE_LENGTH / 2.f) / OscillatorConstants::WAVETABLE_LENGTH;
-		if (firstBand == 1) { table[i] = 0.0; }
 		for (int n = firstBand; n <= bands; n++)
 		{
 			table[i] += (n % 2 ? 1.0f : -1.0f) / n * sinf(F_2PI * n * imod) / F_PI_2;
@@ -133,7 +132,6 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 	// https://en.wikipedia.org/wiki/Triangle_wave
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
-		if (firstBand == 1) { table[i] = 0.0; }
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
 			table[i] += (n & 2 ? -1.0f : 1.0f) / powf(n, 2.0f) *
@@ -150,7 +148,6 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t* table, int firstBa
 	// https://en.wikipedia.org/wiki/Square_wave
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
-		if (firstBand == 1) { table[i] = 0.0; }
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
 			table[i] += (1.0f / n) * sinf(F_2PI * i * n / OscillatorConstants::WAVETABLE_LENGTH) / (F_PI / 4);
@@ -227,62 +224,27 @@ void Oscillator::destroyFFTPlans()
 
 void Oscillator::generateWaveTables()
 {
-	// Always start from the table that contains the least number of bands, and re-use each table in the following
+	// Clear all wave tables
+	std::fill(s_waveTables[0][0], s_waveTables[Oscillator::WaveShapes::NumWaveShapeTables][0] - 1, 0.f);
+
+	// Generate tables for simple shaped (constructed by summing sine waves).
+	// Start from the table that contains the least number of bands, and re-use each table in the following
 	// iteration, adding more bands in each step and avoiding repeated computation of earlier bands.
-
-	// Generate saw tables
-	auto sawGen = []()
+	typedef void (*generator_t)(int, sample_t*, int);
+	auto simpleGen = [](WaveShapes shape, generator_t generator)
 	{
 		int lastBands = 0;
 		for (int i = OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1; i >= 0; i--)
 		{
 			const int bands = OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i);
-			generateSawWaveTable(bands, s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i], lastBands + 1);
+			generator(bands, s_waveTables[shape - FirstWaveShapeTable][i], lastBands + 1);
 			lastBands = bands;
 			if (i)
 			{
 				std::copy(
-					s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i],
-					s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
-					s_waveTables[WaveShapes::SawWave - FirstWaveShapeTable][i - 1]);
-			}
-		}
-	};
-
-	// Generate square tables
-	auto squareGen = []()
-	{
-		int lastBands = 0;
-		for (int i = OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1; i >= 0; i--)
-		{
-			const int bands = OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i);
-			generateSquareWaveTable(bands, s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i], lastBands + 1);
-			lastBands = bands;
-			if (i)
-			{
-				std::copy(
-					s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i],
-					s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
-					s_waveTables[WaveShapes::SquareWave - FirstWaveShapeTable][i - 1]);
-			}
-		}
-	};
-
-	// Generate triangle tables
-	auto triangleGen = []()
-	{
-		int lastBands = 0;
-		for (int i = OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT - 1; i >= 0; i--)
-		{
-			const int bands = OscillatorConstants::MAX_FREQ / freqFromWaveTableBand(i);
-			generateTriangleWaveTable(bands, s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i], lastBands + 1);
-			lastBands = bands;
-			if (i)
-			{
-				std::copy(
-					s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i],
-					s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
-					s_waveTables[WaveShapes::TriangleWave - FirstWaveShapeTable][i - 1]);
+					s_waveTables[shape - FirstWaveShapeTable][i],
+					s_waveTables[shape - FirstWaveShapeTable][i] + OscillatorConstants::WAVETABLE_LENGTH,
+					s_waveTables[shape - FirstWaveShapeTable][i - 1]);
 			}
 		}
 	};
@@ -315,18 +277,18 @@ void Oscillator::generateWaveTables()
 	};
 
 #if !defined(__MINGW32__) && !defined(__MINGW64__)
-	std::thread sawThread(sawGen);
-	std::thread squareThread(squareGen);
-	std::thread triangleThread(triangleGen);
+	std::thread sawThread(simpleGen, WaveShapes::SawWave, generateSawWaveTable);
+	std::thread squareThread(simpleGen, WaveShapes::SquareWave, generateSquareWaveTable);
+	std::thread triangleThread(simpleGen, WaveShapes::TriangleWave, generateTriangleWaveTable);
 	std::thread fftThread(fftGen);
 	sawThread.join();
 	squareThread.join();
 	triangleThread.join();
 	fftThread.join();
 #else
-	sawGen();
-	squareGen();
-	triangleGen();
+	simpleGen(WaveShapes::SawWave, generateSawWaveTable);
+	simpleGen(WaveShapes::SquareWave, generateSquareWaveTable);
+	simpleGen(WaveShapes::TriangleWave, generateTriangleWaveTable);
 	fftGen();
 #endif
 }

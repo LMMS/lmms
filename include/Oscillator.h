@@ -58,9 +58,9 @@ public:
 		ExponentialWave,
 		WhiteNoise,
 		UserDefinedWave,
-		NumWaveShapes,                                         // Number of all available wave shapes
-		FirstWaveShapeTable = TriangleWave,                    // First wave shape that has a pre-generated table
-		NumWaveShapeTables = WhiteNoise - FirstWaveShapeTable, // Number of band-limited wave shapes to be generated
+		NumWaveShapes,                                         //!< Number of all available wave shapes
+		FirstWaveShapeTable = TriangleWave,                    //!< First wave shape that has a pre-generated table
+		NumWaveShapeTables = WhiteNoise - FirstWaveShapeTable, //!< Number of band-limited wave shapes to be generated
 	};
 
 	enum ModulationAlgos
