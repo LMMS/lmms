@@ -116,7 +116,7 @@ void Oscillator::generateSawWaveTable(int bands, sample_t* table, int firstBand)
 	for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; i++)
 	{
 		// add offset to the position index to match phase of the non-wavetable saw wave; precompute "/ period"
-		const int imod = (i - OscillatorConstants::WAVETABLE_LENGTH / 2.f) / OscillatorConstants::WAVETABLE_LENGTH;
+		const float imod = (i - OscillatorConstants::WAVETABLE_LENGTH / 2.f) / OscillatorConstants::WAVETABLE_LENGTH;
 		if (firstBand == 1) { table[i] = 0.0; }
 		for (int n = firstBand; n <= bands; n++)
 		{
@@ -136,7 +136,7 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t* table, int first
 		if (firstBand == 1) { table[i] = 0.0; }
 		for (int n = firstBand | 1; n <= bands; n += 2)
 		{
-			table[i] += ((n - 1) / 2 % 2 ? -1.0f : 1.0f) / powf(n, 2.0f) *
+			table[i] += (n & 2 ? -1.0f : 1.0f) / powf(n, 2.0f) *
 				sinf(F_2PI * n * i / (float)OscillatorConstants::WAVETABLE_LENGTH) / (F_PI_SQR / 8);
 		}
 	}
