@@ -285,6 +285,9 @@ void Oscillator::generateWaveTables()
 		}
 	};
 
+// TODO: Mingw compilers currently do not support std::thread. There are some 3rd-party workarounds available,
+// but since threading is not essential in this case, it is easier and more reliable to simply generate
+// the wavetables serially. Remove the the check and #else branch once std::thread is well supported.
 #if !defined(__MINGW32__) && !defined(__MINGW64__)
 	std::thread sawThread(simpleGen, WaveShapes::SawWave, generateSawWaveTable);
 	std::thread squareThread(simpleGen, WaveShapes::SquareWave, generateSquareWaveTable);
