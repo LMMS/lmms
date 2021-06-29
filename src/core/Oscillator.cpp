@@ -81,7 +81,7 @@ void Oscillator::update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl
 		BufferManager::clear(ab, frames);
 		return;
 	}
-	// If this oscillator is used to modulate another oscillator, take a note.
+	// If this oscillator is used to PM or PF modulate another oscillator, take a note.
 	// The sampling functions will check this variable and avoid using band-limited
 	// wavetables, since they contain ringing that would lead to unexpected results.
 	m_isModulator = modulator;
@@ -608,7 +608,7 @@ template<Oscillator::WaveShapes W>
 void Oscillator::updateAM( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	m_subOsc->update( _ab, _frames, _chnl, true );
+	m_subOsc->update( _ab, _frames, _chnl, false );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
 
