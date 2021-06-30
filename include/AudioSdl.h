@@ -79,8 +79,8 @@ private:
 	void sdlAudioCallback( Uint8 * _buf, int _len );
 
 #ifdef LMMS_HAVE_SDL2
-	virtual void startCapture() override;
-	virtual void stopCapture() override;
+	void startCapture() override;
+	void stopCapture() override;
 	
 	static void sdlInputAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlInputAudioCallback( Uint8 * _buf, int _len );

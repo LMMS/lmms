@@ -380,7 +380,6 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
 }
 
 
