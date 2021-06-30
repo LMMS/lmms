@@ -36,7 +36,9 @@
 
 AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] )
+	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
+	m_captureOn(false),
+	m_captureCbErrors(0)
 {
 	_success_ful = false;
 
@@ -125,6 +127,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 
 AudioSdl::~AudioSdl()
 {
+	if (m_captureOn) { stopCapture(); } // May be not needed
 	stopProcessing();
 
 #ifdef LMMS_HAVE_SDL2
@@ -140,6 +143,14 @@ AudioSdl::~AudioSdl()
 	SDL_Quit();
 
 	delete[] m_outBuf;
+	
+	if (m_captureCbErrors) 
+	{
+		fprintf( stderr , 
+			"SDL inputCapture callback should not, but called [%u] !",
+			 m_captureCbErrors );
+	}
+	
 }
 
 
@@ -151,7 +162,8 @@ void AudioSdl::startProcessing()
 
 #ifdef LMMS_HAVE_SDL2
 	SDL_PauseAudioDevice (m_outputDevice, 0);
-	SDL_PauseAudioDevice (m_inputDevice, 0);
+	//! If processing interrupted in capture - renew state (input monitoring)
+	if (m_captureOn) { SDL_PauseAudioDevice (m_inputDevice, 0); }
 #else
 	SDL_PauseAudio( 0 );
 #endif
@@ -169,15 +181,15 @@ void AudioSdl::stopProcessing()
 #endif
 	{
 #ifdef LMMS_HAVE_SDL2
-		SDL_LockAudioDevice (m_inputDevice);
+		if (m_captureOn) { SDL_LockAudioDevice (m_inputDevice); }
 		SDL_LockAudioDevice (m_outputDevice);
 
 		m_stopped = true;
 
-		SDL_PauseAudioDevice (m_inputDevice,	1);
+		if (m_captureOn) { SDL_PauseAudioDevice (m_inputDevice,	1); }
 		SDL_PauseAudioDevice (m_outputDevice,	1);
 
-		SDL_UnlockAudioDevice (m_inputDevice);
+		if (m_captureOn) { SDL_UnlockAudioDevice (m_inputDevice); }
 		SDL_UnlockAudioDevice (m_outputDevice);
 #else
 		SDL_LockAudio();
@@ -306,6 +318,36 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 
 #ifdef LMMS_HAVE_SDL2
 
+
+void AudioSdl::startCapture() // New
+{
+	if (m_stopped) 
+	{
+		fprintf(stderr, 
+			"AudioSdl::startCapture()  called while rendering!!!\n");
+		return;
+	}
+	
+	if (!m_captureOn)
+	{ 
+		SDL_PauseAudioDevice (m_inputDevice,	0);
+		m_captureOn = true;
+	} 
+}
+
+
+void AudioSdl::stopCapture() // New
+{
+	if (m_captureOn) 
+	{
+		SDL_LockAudioDevice (m_inputDevice);
+		m_captureOn = false;
+		SDL_PauseAudioDevice (m_inputDevice,	1);
+		SDL_UnlockAudioDevice (m_inputDevice);
+	} 
+}
+
+
 void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 	AudioSdl * _this = static_cast<AudioSdl *>( _udata );
 
@@ -313,10 +355,17 @@ void AudioSdl::sdlInputAudioCallback(void *_udata, Uint8 *_buf, int _len) {
 }
 
 void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
-	sampleFrame *samples_buffer = (sampleFrame *) _buf;
-	fpp_t frames = _len / sizeof ( sampleFrame );
+	if ( (!m_stopped) & (m_captureOn) ) //!< Guard for Bugs ... 
+	{
+		sampleFrame *samples_buffer = (sampleFrame *) _buf;
+		fpp_t frames = _len / sizeof ( sampleFrame );
 
-	mixer()->pushInputFrames (samples_buffer, frames);
+		mixer()->pushInputFrames (samples_buffer, frames);
+	} 
+	else 
+	{
+		m_captureCbErrors += 1;
+	};
 }
 
 #endif

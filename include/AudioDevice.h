@@ -88,6 +88,10 @@ public:
 
 	virtual void applyQualitySettings();
 
+	//! Starts capture callback if can, driver MUST override if enebales capture 
+	virtual void startCapture();
+	//! Stops capture callback if can, driver MUST override if enebales capture 
+	virtual void stopCapture();
 
 
 protected:

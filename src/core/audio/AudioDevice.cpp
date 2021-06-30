@@ -129,6 +129,24 @@ void AudioDevice::stopProcessing()
 
 
 
+void AudioDevice::startCapture() 
+{
+	fprintf(stderr,
+		"BUG! AudioDevice::startCapture() called!\n");
+}
+
+
+
+
+void AudioDevice::stopCapture() 
+{
+	fprintf(stderr,
+		"BUG! AudioDevice::stopCapture() called!\n");
+}
+
+
+
+
 void AudioDevice::stopProcessingThread( QThread * thread )
 {
 	if( !thread->wait( 30000 ) )

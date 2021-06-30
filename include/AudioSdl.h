@@ -79,6 +79,9 @@ private:
 	void sdlAudioCallback( Uint8 * _buf, int _len );
 
 #ifdef LMMS_HAVE_SDL2
+	virtual void startCapture() override;
+	virtual void stopCapture() override;
+	
 	static void sdlInputAudioCallback( void * _udata, Uint8 * _buf, int _len );
 	void sdlInputAudioCallback( Uint8 * _buf, int _len );
 #endif
@@ -90,6 +93,8 @@ private:
 #ifdef LMMS_HAVE_SDL2
 	size_t m_currentBufferFramePos;
 	size_t m_currentBufferFramesCount;
+	bool m_captureOn;
+	unsigned m_captureCbErrors;
 #else
 	Uint8 * m_convertedBuf;
 	int m_convertedBufPos;
