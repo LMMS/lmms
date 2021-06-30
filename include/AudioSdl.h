@@ -93,8 +93,6 @@ private:
 #ifdef LMMS_HAVE_SDL2
 	size_t m_currentBufferFramePos;
 	size_t m_currentBufferFramesCount;
-	bool m_captureOn;
-	unsigned m_captureCbErrors;
 #else
 	Uint8 * m_convertedBuf;
 	int m_convertedBufPos;
@@ -102,6 +100,8 @@ private:
 	bool m_outConvertEndian;
 #endif
 
+	bool m_captureOn;
+	unsigned m_captureCbErrors;
 
 	bool m_stopped;
 
