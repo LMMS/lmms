@@ -407,7 +407,7 @@ bool MicrotunerConfig::applyScale()
 	Song *song = Engine::getSong();
 	if (song == nullptr) {return false;}
 
-	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), newIntervals);
+	auto newScale = std::make_shared<Scale>(m_scaleNameEdit->text(), std::move(newIntervals));
 	song->setScale(m_scaleComboModel.value(), newScale);
 
 	return true;
