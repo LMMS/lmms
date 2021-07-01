@@ -100,7 +100,6 @@ private:
 	bool m_outConvertEndian;
 #endif
 
-	bool m_captureOn;
 	unsigned m_captureCbErrors;
 
 	bool m_stopped;

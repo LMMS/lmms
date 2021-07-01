@@ -66,7 +66,12 @@ public:
 	{
 		return m_supportsCapture;
 	}
-
+	
+	inline bool isCaptureOn() const
+	{
+		return m_captureOn;
+	}
+	
 	inline sample_rate_t sampleRate() const
 	{
 		return m_sampleRate;
@@ -142,6 +147,7 @@ protected:
 
 protected:
 	bool m_supportsCapture;
+	bool m_captureOn;
 
 
 private:

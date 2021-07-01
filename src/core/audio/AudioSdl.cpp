@@ -37,7 +37,6 @@
 AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
-	m_captureOn(false),
 	m_captureCbErrors(0)
 {
 	_success_ful = false;
