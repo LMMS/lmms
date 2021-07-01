@@ -37,13 +37,15 @@ class Keymap : public QObject, public SerializingObject
 	Q_OBJECT
 public:
 	Keymap();
-	Keymap(	QString description,
-			std::vector<int> newMap,
-			int newFirst,
-			int newLast,
-			int newMiddle,
-			int newBaseKey,
-			float newBaseFreq);
+	Keymap(
+		QString description,
+		std::vector<int> newMap,
+		int newFirst,
+		int newLast,
+		int newMiddle,
+		int newBaseKey,
+		float newBaseFreq
+	);
 
 	QString getDescription() const;
 	void setDescription(QString description);
