@@ -679,7 +679,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		ToolTip::add( uwb, tr( "User-defined wave" ) );
 
 		PixmapButton * uwt = new PixmapButton( this, NULL );
-		uwt->move( 100, btn_y );
+		uwt->move( 110, btn_y );
 		uwt->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"wavetable_active" ) );
 		uwt->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
