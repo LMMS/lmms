@@ -87,7 +87,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_modulationAlgoModel( Oscillator::SignalMix, 0,
 				Oscillator::NumModulationAlgos-1, this,
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
-	m_useWaveTableModel(false),
+	m_useWaveTableModel(true),
 
 	m_sampleBuffer( new SampleBuffer ),
 	m_volumeLeft( 0.0f ),
@@ -96,7 +96,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_detuningRight( 0.0f ),
 	m_phaseOffsetLeft( 0.0f ),
 	m_phaseOffsetRight( 0.0f ),
-	m_useWaveTable( false )
+	m_useWaveTable( true )
 {
 	// Connect knobs with Oscillators' inputs
 	connect( &m_volumeModel, SIGNAL( dataChanged() ),
@@ -213,7 +213,7 @@ void OscillatorObject::updatePhaseOffsetRight()
 
 void OscillatorObject::updateUseWaveTable()
 {
-	m_useWaveTable=m_useWaveTableModel.value();
+	m_useWaveTable = m_useWaveTableModel.value();
 }
 
 

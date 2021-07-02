@@ -69,7 +69,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
-	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange
+	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
+	&DataFile::upgrade_defaultTripleOscillatorHQ
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1729,6 +1730,28 @@ void DataFile::upgrade_extendedNoteRange()
 		if (affected(instrument))
 		{
 			preset.setAttribute("basenote", preset.attribute("basenote").toInt() + 12);
+		}
+	}
+}
+
+
+/** \brief TripleOscillator switched to using high-quality, alias-free oscillators by default
+ *
+ * Older projects were made without this feature and would sound differently if loaded
+ * with the new default setting. This upgrade routine preserves their old behavior.
+ */
+void DataFile::upgrade_defaultTripleOscillatorHQ()
+{
+	QDomNodeList tripleoscillators = elementsByTagName("tripleoscillator");
+	for (int i = 0; !tripleoscillators.item(i).isNull(); i++)
+	{
+		for (int j = 1; j <= 3; j++)
+		{
+			// Only set the attribute if it does not exist (default template has it but reports as 1.2.0)
+			if (tripleoscillators.item(i).toElement().attribute("useWaveTable" + QString::number(j)) == "")
+			{
+				tripleoscillators.item(i).toElement().setAttribute("useWaveTable" + QString::number(j), 0);
+			}
 		}
 	}
 }
