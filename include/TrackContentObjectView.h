@@ -57,7 +57,8 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 	// We have to use a QSize here because using QPoint isn't supported.
 	// width -> x, height -> y
-	Q_PROPERTY( QSize mouseHotspotHand WRITE setMouseHotspotHand )
+	Q_PROPERTY( QSize mouseHotspotHand MEMBER m_mouseHotspotHand )
+	Q_PROPERTY( QSize mouseHotspotKnife MEMBER m_mouseHotspotKnife )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -92,7 +93,6 @@ public:
 	void setTextShadowColor( const QColor & c );
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
-	void setMouseHotspotHand(const QSize & s);
 
 	// access needsUpdate member variable
 	bool needsUpdate();
@@ -111,8 +111,15 @@ public:
 	// some metadata to be written to the clipboard.
 	static void remove( QVector<TrackContentObjectView *> tcovs );
 	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
+	static void mergeTCOs(QVector<TrackContentObjectView*> tcovs);
+
+	// Returns true if selection can be merged and false if not
+	static bool canMergeSelection(QVector<TrackContentObjectView*> tcovs);
 
 	QColor getColorForDisplay( QColor );
+
+	void inline setMarkerPos(int x) { m_markerPos = x; }
+	void inline setMarkerEnabled(bool e) { m_marker = e; }
 
 public slots:
 	virtual bool close();
@@ -129,8 +136,16 @@ protected:
 		Cut,
 		Copy,
 		Paste,
-		Mute
+		Mute,
+		Merge
 	};
+
+	TrackView * m_trackView;
+	TimePos m_initialTCOPos;
+	TimePos m_initialTCOEnd;
+
+	bool m_marker = false;
+	int m_markerPos = 0;
 
 	virtual void constructContextMenu( QMenu * )
 	{
@@ -140,7 +155,6 @@ protected:
 	void contextMenuAction( ContextMenuAction action );
 	void dragEnterEvent( QDragEnterEvent * dee ) override;
 	void dropEvent( QDropEvent * de ) override;
-	void leaveEvent( QEvent * e ) override;
 	void mousePressEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
@@ -149,6 +163,9 @@ protected:
 		m_needsUpdate = true;
 		selectableObject::resizeEvent( re );
 	}
+
+	bool unquantizedModHeld( QMouseEvent * me );
+	TimePos quantizeSplitPos( TimePos, bool shiftMode );
 
 	float pixelsPerBar();
 
@@ -171,6 +188,7 @@ private:
 		MoveSelection,
 		Resize,
 		ResizeLeft,
+		Split,
 		CopySelection,
 		ToggleSelected
 	} ;
@@ -178,12 +196,9 @@ private:
 	static TextFloat * s_textFloat;
 
 	TrackContentObject * m_tco;
-	TrackView * m_trackView;
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
-	TimePos m_initialTCOPos;
-	TimePos m_initialTCOEnd;
 	QVector<TimePos> m_initialOffsets;
 
 	TextFloat * m_hint;
@@ -197,7 +212,10 @@ private:
 	QColor m_textShadowColor;
 	QColor m_BBPatternBackground;
 	bool m_gradient;
-	QSize m_mouseHotspotHand; // QSize must be used because QPoint isn't supported by property system
+	QSize m_mouseHotspotHand; // QSize must be used because QPoint
+	QSize m_mouseHotspotKnife; // isn't supported by property system
+	QCursor m_cursorHand;
+	QCursor m_cursorKnife;
 	bool m_cursorSetYet;
 
 	bool m_needsUpdate;
@@ -212,6 +230,10 @@ private:
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	TimePos draggedTCOPos( QMouseEvent * me );
+	int knifeMarkerPos( QMouseEvent * me );
+	//! Return true iff TCO could be split. Currently only implemented for samples
+	virtual bool splitTCO( const TimePos pos ){ return false; };
+	void updateCursor(QMouseEvent * me);
 } ;
 
 

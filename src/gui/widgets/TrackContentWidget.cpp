@@ -477,7 +477,7 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 	// All patterns should be offset the same amount as the grabbed pattern
 	TimePos offset = TimePos(tcoPos - grabbedTCOPos);
 	// Users expect clips to "fall" backwards, so bias the offset
-	offset = offset - TimePos::ticksPerBar() * snapSize / 2;
+	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
 	offset = offset.quantize(snapSize);
 
@@ -508,7 +508,7 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
 		// If we land on ourselves, offset by one snap
 		TimePos shift = TimePos::ticksPerBar() * gui->songEditor()->m_editor->getSnapSize();
-		if (offset == 0) { pos += shift; }
+		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
@@ -547,14 +547,22 @@ void TrackContentWidget::dropEvent( QDropEvent * de )
  */
 void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 {
+	// Enable box select if control is held when clicking an empty space
+	// (If we had clicked a TCO it would have intercepted the mouse event)
+	if( me->modifiers() & Qt::ControlModifier ){
+		gui->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
+	}
+	// Forward event to allow box select if the editor supports it and is in that mode
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		QWidget::mousePressEvent( me );
 	}
+	// Forward shift clicks so tracks can be resized
 	else if( me->modifiers() & Qt::ShiftModifier )
 	{
 		QWidget::mousePressEvent( me );
 	}
+	// For an unmodified click, create a new TCO
 	else if( me->button() == Qt::LeftButton &&
 			!m_trackView->trackContainerView()->fixedTCOs() )
 	{
@@ -568,6 +576,15 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 						TimePos::ticksPerBar();
 		getTrack()->createTCO(pos);
 	}
+}
+
+
+
+
+void TrackContentWidget::mouseReleaseEvent( QMouseEvent * me )
+{
+	gui->songEditor()->syncEditMode();
+	QWidget::mouseReleaseEvent(me);
 }
 
 
@@ -707,4 +724,3 @@ void TrackContentWidget::setGridColor( const QBrush & c )
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
-

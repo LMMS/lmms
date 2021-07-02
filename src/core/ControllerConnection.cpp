@@ -36,10 +36,10 @@ ControllerConnectionVector ControllerConnection::s_connections;
 
 
 
-ControllerConnection::ControllerConnection( Controller * _controller ) :
+ControllerConnection::ControllerConnection(Controller * _controller) :
 	m_controller( NULL ),
 	m_controllerId( -1 ),
-	m_ownsController( false )
+	m_ownsController(false)
 {
 	if( _controller != NULL )
 	{
@@ -121,7 +121,7 @@ void ControllerConnection::setController( Controller * _controller )
 	}
 
 	m_ownsController =
-			( _controller->type() == Controller::MidiController );
+		(_controller->type() == Controller::MidiController);
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection

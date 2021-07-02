@@ -87,7 +87,7 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 
 // NOTE: the move() implementation fixes a bug where the position line would appear
 // in an unexpected location when positioned at the start of the track
-void PositionLine::zoomChange(double zoom)
+void PositionLine::zoomChange(float zoom)
 {
 	int playHeadPos = x() + width() - 1;
 

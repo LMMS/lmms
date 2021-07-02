@@ -43,6 +43,7 @@ public:
 protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void paintEvent( QPaintEvent * pe ) override;
+	bool confirmRemoval();
 
 
 private slots:

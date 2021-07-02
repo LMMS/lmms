@@ -28,6 +28,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 
+#include "lmms_basics.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 

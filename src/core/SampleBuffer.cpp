@@ -132,6 +132,86 @@ SampleBuffer::SampleBuffer(const f_cnt_t frames)
 
 
 
+SampleBuffer::SampleBuffer(const SampleBuffer& orig)
+{
+	orig.m_varLock.lockForRead();
+
+	m_audioFile = orig.m_audioFile;
+	m_origFrames = orig.m_origFrames;
+	m_origData = (m_origFrames > 0) ? MM_ALLOC(sampleFrame, m_origFrames) : nullptr;
+	m_frames = orig.m_frames;
+	m_data = (m_frames > 0) ? MM_ALLOC(sampleFrame, m_frames) : nullptr;
+	m_startFrame = orig.m_startFrame;
+	m_endFrame = orig.m_endFrame;
+	m_loopStartFrame = orig.m_loopStartFrame;
+	m_loopEndFrame = orig.m_loopEndFrame;
+	m_amplification = orig.m_amplification;
+	m_reversed = orig.m_reversed;
+	m_frequency = orig.m_frequency;
+	m_sampleRate = orig.m_sampleRate;
+
+	//Deep copy m_origData and m_data from original
+	const auto origFrameBytes = m_origFrames * BYTES_PER_FRAME;
+	const auto frameBytes = m_frames * BYTES_PER_FRAME;
+	if (orig.m_origData != nullptr && origFrameBytes > 0)
+		{ memcpy(m_origData, orig.m_origData, origFrameBytes); }
+	if (orig.m_data != nullptr && frameBytes > 0)
+		{ memcpy(m_data, orig.m_data, frameBytes); }
+
+	orig.m_varLock.unlock();
+}
+
+
+
+
+void swap(SampleBuffer& first, SampleBuffer& second) noexcept
+{
+	using std::swap;
+
+	// Lock both buffers for writing, with address as lock ordering
+	if (&first == &second) { return; }
+	else if (&first > &second)
+	{
+		first.m_varLock.lockForWrite();
+		second.m_varLock.lockForWrite();
+	}
+	else
+	{
+		second.m_varLock.lockForWrite();
+		first.m_varLock.lockForWrite();
+	}
+
+	first.m_audioFile.swap(second.m_audioFile);
+	swap(first.m_origData, second.m_origData);
+	swap(first.m_data, second.m_data);
+	swap(first.m_origFrames, second.m_origFrames);
+	swap(first.m_frames, second.m_frames);
+	swap(first.m_startFrame, second.m_startFrame);
+	swap(first.m_endFrame, second.m_endFrame);
+	swap(first.m_loopStartFrame, second.m_loopStartFrame);
+	swap(first.m_loopEndFrame, second.m_loopEndFrame);
+	swap(first.m_amplification, second.m_amplification);
+	swap(first.m_frequency, second.m_frequency);
+	swap(first.m_reversed, second.m_reversed);
+	swap(first.m_sampleRate, second.m_sampleRate);
+
+	// Unlock again
+	first.m_varLock.unlock();
+	second.m_varLock.unlock();
+}
+
+
+
+
+SampleBuffer& SampleBuffer::operator=(SampleBuffer that)
+{
+	swap(*this, that);
+	return *this;
+}
+
+
+
+
 SampleBuffer::~SampleBuffer()
 {
 	MM_FREE(m_origData);
@@ -927,6 +1007,13 @@ f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t en
 }
 
 
+/* @brief Draws a sample buffer on the QRect given in the range [fromFrame, toFrame)
+ * @param QPainter p: Painter object for the painting operations
+ * @param QRect dr: QRect where the buffer will be drawn in
+ * @param QRect clip: QRect used for clipping
+ * @param f_cnt_t fromFrame: First frame of the range
+ * @param f_cnt_t toFrame: Last frame of the range non-inclusive
+ */
 void SampleBuffer::visualize(
 	QPainter & p,
 	const QRect & dr,
@@ -938,6 +1025,7 @@ void SampleBuffer::visualize(
 	if (m_frames == 0) { return; }
 
 	const bool focusOnRange = toFrame <= m_frames && 0 <= fromFrame && fromFrame < toFrame;
+	//TODO: If the clip QRect is not being used we should remove it
 	//p.setClipRect(clip);
 	const int w = dr.width();
 	const int h = dr.height();
@@ -946,30 +1034,83 @@ void SampleBuffer::visualize(
 	const float ySpace = h * 0.5f;
 	const int nbFrames = focusOnRange ? toFrame - fromFrame : m_frames;
 
-	const int fpp = qBound<int>(1, nbFrames / w, 20);
-	QPointF * l = new QPointF[nbFrames / fpp + 1];
-	QPointF * r = new QPointF[nbFrames / fpp + 1];
-	int n = 0;
+	const double fpp = std::max(1., static_cast<double>(nbFrames) / w);
+	// There are 2 possibilities: Either nbFrames is bigger than
+	// the width, so we will have width points, or nbFrames is
+	// smaller than the width (fpp = 1) and we will have nbFrames
+	// points
+	const int totalPoints = nbFrames > w
+		? w
+		: nbFrames;
+	std::vector<QPointF> fEdgeMax(totalPoints);
+	std::vector<QPointF> fEdgeMin(totalPoints);
+	std::vector<QPointF> fRmsMax(totalPoints);
+	std::vector<QPointF> fRmsMin(totalPoints);
+	int curPixel = 0;
 	const int xb = dr.x();
 	const int first = focusOnRange ? fromFrame : 0;
 	const int last = focusOnRange ? toFrame - 1 : m_frames - 1;
+	// When the number of frames isn't perfectly divisible by the
+	// width, the remaining frames don't fit the last pixel and are
+	// past the visible area. lastVisibleFrame is the index number of
+	// the last visible frame.
+	const int visibleFrames = (fpp * w);
+	const int lastVisibleFrame = focusOnRange
+		? fromFrame + visibleFrames - 1
+		: visibleFrames - 1;
 
-	for (int frame = first; frame <= last; frame += fpp)
+	for (double frame = first; frame <= last && frame <= lastVisibleFrame; frame += fpp)
 	{
-		auto x = xb + ((frame - first) * double(w) / nbFrames);
+		float maxData = -1;
+		float minData = 1;
+
+		float rmsData[2] = {0, 0};
+
+		// Find maximum and minimum samples within range
+		for (int i = 0; i < fpp && frame + i <= last; ++i)
+		{
+			for (int j = 0; j < 2; ++j)
+			{
+				auto curData = m_data[static_cast<int>(frame) + i][j];
+
+				if (curData > maxData) { maxData = curData; }
+				if (curData < minData) { minData = curData; }
+
+				rmsData[j] += curData * curData;
+			}
+		}
+
+		const float trueRmsData = (rmsData[0] + rmsData[1]) / 2 / fpp;
+		const float sqrtRmsData = sqrt(trueRmsData);
+		const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
+		const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
+
+		// If nbFrames >= w, we can use curPixel to calculate X
+		// but if nbFrames < w, we need to calculate it proportionally
+		// to the total number of points
+		auto x = nbFrames >= w
+			? xb + curPixel
+			: xb + ((static_cast<double>(curPixel) / nbFrames) * w);
 		// Partial Y calculation
 		auto py = ySpace * m_amplification;
-		l[n] = QPointF(x, (yb - (m_data[frame][0] * py)));
-		r[n] = QPointF(x, (yb - (m_data[frame][1] * py)));
-		++n;
+		fEdgeMax[curPixel] = QPointF(x, (yb - (maxData * py)));
+		fEdgeMin[curPixel] = QPointF(x, (yb - (minData * py)));
+		fRmsMax[curPixel] = QPointF(x, (yb - (maxRmsData * py)));
+		fRmsMin[curPixel] = QPointF(x, (yb - (minRmsData * py)));
+		++curPixel;
 	}
 
-	p.setRenderHint(QPainter::Antialiasing);
-	p.drawPolyline(l, nbFrames / fpp);
-	p.drawPolyline(r, nbFrames / fpp);
+	for (int i = 0; i < totalPoints; ++i)
+	{
+		p.drawLine(fEdgeMax[i], fEdgeMin[i]);
+	}
 
-	delete[] l;
-	delete[] r;
+	p.setPen(p.pen().color().lighter(123));
+
+	for (int i = 0; i < totalPoints; ++i)
+	{
+		p.drawLine(fRmsMax[i], fRmsMin[i]);
+	}
 }
 
 
