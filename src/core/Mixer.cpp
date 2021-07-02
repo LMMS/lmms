@@ -300,7 +300,7 @@ bool Mixer::criticalXRuns() const
 
 
 
-void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
+void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames )
 {
 	bool needCapture = Engine::getSong()->isRecording();
 	if (needCapture)
