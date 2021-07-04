@@ -1086,6 +1086,12 @@ void SongEditorWindow::play()
 
 void SongEditorWindow::record()
 {
+	AudioDevice *ad = Engine::mixer()->audioDev();
+	if (ad->supportsCapture() &&  (!ad->isCaptureOn()))
+	{
+		ad->startCapture();
+	}
+	
 	m_editor->m_song->record();
 }
 
@@ -1094,6 +1100,12 @@ void SongEditorWindow::record()
 
 void SongEditorWindow::recordAccompany()
 {
+	AudioDevice *ad = Engine::mixer()->audioDev();
+	if (ad->supportsCapture() &&  (!ad->isCaptureOn()))
+	{
+		ad->startCapture();
+	}
+	
 	m_editor->m_song->playAndRecord();
 }
 
