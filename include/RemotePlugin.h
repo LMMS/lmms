@@ -36,7 +36,6 @@
 #include <string>
 #include <cassert>
 
-
 #if !(defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H))
 #define SYNC_WITH_SHM_FIFO
 #define USE_QT_SEMAPHORES
@@ -439,6 +438,7 @@ enum RemoteMessageIDs
 	IdSavePresetFile,
 	IdLoadPresetFile,
 	IdDebugMessage,
+	IdIdle,
 	IdUserBase = 64
 } ;
 
@@ -825,6 +825,16 @@ public:
 		unlock();
 	}
 
+#ifndef NATIVE_LINUX_VST
+	void setQuit()
+	{
+
+		lock();
+		sendMessage( IdQuit );
+		unlock();
+	}
+#endif
+
 	int isUIVisible()
 	{
 		lock();
@@ -999,7 +1009,6 @@ private:
 
 	sample_rate_t m_sampleRate;
 	fpp_t m_bufferSize;
-
 } ;
 
 #endif

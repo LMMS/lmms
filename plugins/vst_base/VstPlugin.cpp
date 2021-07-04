@@ -78,6 +78,9 @@ enum class MachineType : uint16_t
 	unknown = 0x0,
 	amd64 = 0x8664,
 	i386 = 0x14c,
+#ifdef LMMS_BUILD_LINUX
+	linux64 = 0x1,
+#endif
 };
 
 class FileInfo
@@ -129,12 +132,20 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	setSplittedChannels( true );
 
 	PE::MachineType machineType;
-	try {
-		PE::FileInfo peInfo(m_plugin);
-		machineType = peInfo.machineType();
-	} catch (std::runtime_error& e) {
-		qCritical() << "Error while determining PE file's machine type: " << e.what();
-		machineType = PE::MachineType::unknown;
+	QFileInfo fi(m_plugin);
+#ifdef LMMS_BUILD_LINUX
+	if (fi.suffix() == "so")
+		machineType =PE::MachineType::linux64;
+	else  
+#endif
+	{
+		try {
+			PE::FileInfo peInfo(m_plugin);
+			machineType = peInfo.machineType();
+		} catch (std::runtime_error& e) {
+			qCritical() << "Error while determining PE file's machine type: " << e.what();
+			machineType = PE::MachineType::unknown;
+		}
 	}
 
 	switch(machineType)
@@ -145,6 +156,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	case PE::MachineType::i386:
 		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_32 ); // Default: 32/RemoteVstPlugin32
 		break;
+#ifdef LMMS_BUILD_LINUX
+	case PE::MachineType::linux64:
+		tryLoad( NATIVE_LINUX_REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: NativeLinuxRemoteVstPlugin32
+		break;
+#endif
 	default:
 		m_failed = true;
 		return;
@@ -168,6 +184,9 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 VstPlugin::~VstPlugin()
 {
+#ifdef NATIVE_LINUX_VST
+	RemotePlugin::setQuit();
+#endif
 	delete m_pluginWidget;
 }
 
