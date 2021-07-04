@@ -30,6 +30,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolBar>
+#include <QMenu>
 
 
 #include "TimeLineWidget.h"
@@ -62,6 +63,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_xOffset( xoff ),
 	m_posMarkerX( 0 ),
 	m_ppb( ppb ),
+	m_snapSize( 1.0 ),
 	m_pos( pos ),
 	m_begin( begin ),
 	m_mode( mode ),
@@ -93,6 +95,10 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( update() ) );
+	
+	// Required to prevent modified right click from triggering the context menu
+	// Instead, manually trigger the context menu on unmodified right clicks
+	setContextMenuPolicy(Qt::PreventContextMenu);
 }
 
 
@@ -304,60 +310,105 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 
 
+void TimeLineWidget::contextMenuEvent(QContextMenuEvent*)
+{
+	QMenu contextMenu(tr("Timeline"), this);
+	QAction selectLoopPoints(tr("Select between loop points"), this);
+	connect(&selectLoopPoints, &QAction::triggered, this, [this](){
+		emit regionSelectedFromPixels(
+			m_xOffset + m_loopPos[0] * m_ppb / TimePos::ticksPerBar(),
+			m_xOffset + m_loopPos[1] * m_ppb / TimePos::ticksPerBar()
+		);
+		emit selectionFinished();
+	});
+	contextMenu.addAction(&selectLoopPoints);
+	contextMenu.exec(QCursor::pos());
+}
+
+
+
+
 void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 {
-	if( event->x() < m_xOffset )
+	// TODO: Read these from a config
+	auto leftCtrlAction = SelectSongTCO;
+	auto rightCtrlAction = MoveLoopClosest;
+	auto leftShiftAction = MoveLoopBegin;
+	auto rightShiftAction = MoveLoopEnd;
+	auto button = event->button();
+	auto mods = event->modifiers();
+	
+	// Unmodified LMB is reserved for playhead, unmodified RMB for context menu
+	// Shift or Ctrl modified press behavior is bound by the user
+	// Shift + Ctrl modifier is reserved for fine adjustment of Shift actions
+	// TODO: Let MMB be bound
+	
+	if (event->x() < m_xOffset) { return; }
+	
+	// Choose an action based on input event and user's bindings
+	else if (button == Qt::LeftButton)
 	{
-		return;
-	}
-	if( event->button() == Qt::LeftButton  && !(event->modifiers() & Qt::ShiftModifier) )
-	{
-		m_action = MovePositionMarker;
-		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
-		{
-			m_moveXOff = event->x() - m_xOffset;
-		}
+		if (mods & Qt::ShiftModifier){ m_action = leftShiftAction; }
+		else if (mods == Qt::ControlModifier){ m_action = leftCtrlAction; }
+		// Handles moving playhead
 		else
 		{
-			m_moveXOff = s_posMarkerPixmap->width() / 2;
+			m_action = MovePositionMarker;
+			if (event->x() - m_xOffset < s_posMarkerPixmap->width())
+			{
+				m_moveXOff = event->x() - m_xOffset;
+			}
+			else { m_moveXOff = s_posMarkerPixmap->width() / 2; }
 		}
 	}
-	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) )
+	else if (button == Qt::RightButton)
 	{
-		m_action = SelectSongTCO;
+		if (mods & Qt::ShiftModifier){ m_action = rightShiftAction; }
+		else if (mods == Qt::ControlModifier){ m_action = rightCtrlAction; }
+		else { contextMenuEvent(nullptr); }
+	}
+	
+	// Calculate the clicked position as a TimePos, several actions need this
+	m_moveXOff = s_posMarkerPixmap->width() / 2;
+	const auto ticksPerPixel = TimePos::ticksPerBar() / m_ppb;
+	const TimePos t = m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * ticksPerPixel);
+	
+	// Translate MoveLoopClosest into left or right based on distance
+	if (m_action == MoveLoopClosest)
+	{
+		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1]) / 2;
+		if (t < loopMid) { m_action = MoveLoopBegin; }
+		else { m_action = MoveLoopEnd; }
+	}
+	// If we're moving loop markers or dragging loop markers, update them
+	if (m_action == MoveLoopBegin){ m_loopPos[0] = t; }
+	else if (m_action == MoveLoopEnd){ m_loopPos[1] = t; }
+	else if (m_action == DragLoop)
+	{
+		const bool quant = !(mods == (Qt::ControlModifier | Qt::ShiftModifier));
+		
+		m_loopPos[0] = quant ? t.quantize(m_snapSize) : t;
+		m_loopPos[1] = m_loopPos[0] + (quant ? m_snapSize : 1);
+	}
+	
+	// Ensure that the loops beginning and end are stored in the right place
+	if (m_loopPos[0] > m_loopPos[1]) { qSwap(m_loopPos[0], m_loopPos[1]); }
+	
+	// Set initial position for actions that need it
+	if (m_action == SelectSongTCO || m_action == DragLoop)
+	{
 		m_initalXSelect = event->x();
 	}
-	else if( event->button() == Qt::RightButton )
-	{
-		m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
-		const TimePos loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
 
-		if( t < loopMid )
-		{
-			m_action = MoveLoopBegin;
-		}
-		else if( t > loopMid )
-		{
-			m_action = MoveLoopEnd;
-		}
-
-		if( m_loopPos[0] > m_loopPos[1]  )
-		{
-			qSwap( m_loopPos[0], m_loopPos[1] );
-		}
-
-		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
-	}
-
-	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
+	// Notify the user if they can disable quantization
+	if (m_action != MovePositionMarker && m_action != NoAction)
 	{
 		delete m_hint;
-		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
-					embed::getIconPixmap( "hint" ), 0 );
+		m_hint = TextFloat::displayMessage(tr("Hint"),
+			tr("Hold <%1> and <Shift> to disable quantization.").arg(UI_CTRL_KEY),
+			embed::getIconPixmap("hint"), 0);
 	}
-	mouseMoveEvent( event );
+	mouseMoveEvent(event);
 }
 
 
@@ -367,13 +418,20 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
 	const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
+	// Fine adjust when both ctrl and shift are held, hide ctrl+shift hint
+	bool unquantized = event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
+	if (unquantized)
+	{
+		delete m_hint;
+		m_hint = nullptr;
+	}
 
-	switch( m_action )
+	switch (m_action)
 	{
 		case MovePositionMarker:
 			m_pos.setTicks(t.getTicks());
 			Engine::getSong()->setToTime(t, m_mode);
-			if (!( Engine::getSong()->isPlaying()))
+			if (!(Engine::getSong()->isPlaying()))
 			{
 				//Song::Mode_None is used when nothing is being played.
 				Engine::getSong()->setToTime(t, Song::Mode_None);
@@ -387,24 +445,15 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopBegin:
 		case MoveLoopEnd:
 		{
-			const int i = m_action - MoveLoopBegin; // i == 0 || i == 1
-			if( event->modifiers() & Qt::ControlModifier )
-			{
-				// no ctrl-press-hint when having ctrl pressed
-				delete m_hint;
-				m_hint = NULL;
-				m_loopPos[i] = t;
-			}
-			else
-			{
-				m_loopPos[i] = t.quantize(1.0);
-			}
+			const int i = m_action == MoveLoopBegin ? 0 : 1;
+			if (unquantized) { m_loopPos[i] = t; }
+			else { m_loopPos[i] = t.quantize(m_snapSize); }
 			// Catch begin == end
-			if( m_loopPos[0] == m_loopPos[1] )
+			if (m_loopPos[0] == m_loopPos[1])
 			{
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
+				if (m_action == MoveLoopBegin) 
 				{
 					m_loopPos[0] -= TimePos::ticksPerBar();
 				}
@@ -416,9 +465,16 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			update();
 			break;
 		}
-	case SelectSongTCO:
-			emit regionSelectedFromPixels( m_initalXSelect , event->x() );
-		break;
+		case DragLoop:
+		{
+			if (unquantized) { m_loopPos[1] = t; }
+			else { m_loopPos[1] = t.quantize(m_snapSize); }
+			update();
+			break;
+		}
+		case SelectSongTCO:
+			emit regionSelectedFromPixels(m_initalXSelect , event->x());
+			break;
 
 		default:
 			break;
@@ -432,6 +488,8 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = NULL;
-	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
+	if (m_action == SelectSongTCO) { emit selectionFinished(); }
+	// Required when m_action == DragLoop, not harmful otherwise
+	if (m_loopPos[0] > m_loopPos[1]) { qSwap(m_loopPos[0], m_loopPos[1]); }
 	m_action = NoAction;
 }

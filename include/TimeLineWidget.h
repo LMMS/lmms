@@ -190,6 +190,7 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseMoveEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void contextMenuEvent( QContextMenuEvent * _cme ) override;
 
 
 private:
@@ -217,6 +218,7 @@ private:
 	int m_xOffset;
 	int m_posMarkerX;
 	float m_ppb;
+	float m_snapSize;
 	Song::PlayPos & m_pos;
 	const TimePos & m_begin;
 	const Song::PlayModes m_mode;
@@ -235,6 +237,8 @@ private:
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
+		MoveLoopClosest,
+		DragLoop,
 		SelectSongTCO,
 	} m_action;
 
