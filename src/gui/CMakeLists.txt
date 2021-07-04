@@ -78,6 +78,7 @@ SET(LMMS_SRCS
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
+	gui/widgets/InstrumentMiscView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
@@ -89,6 +90,7 @@ SET(LMMS_SRCS
 	gui/widgets/ControlLayout.cpp
 	gui/widgets/LinkedModelGroupViews.cpp
 	gui/widgets/MeterDialog.cpp
+	gui/widgets/MicrotunerConfig.cpp
 	gui/widgets/MidiPortMenu.cpp
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp

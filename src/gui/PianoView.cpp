@@ -147,6 +147,9 @@ PianoView::PianoView(QWidget *parent) :
 	layout->setMargin( 0 );
 	layout->addSpacing( PIANO_BASE+PW_WHITE_KEY_HEIGHT );
 	layout->addWidget( m_pianoScroll );
+
+	// trigger a redraw if keymap definitions change (different keys may become disabled)
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
@@ -305,6 +308,10 @@ void PianoView::modelChanged()
 		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 		connect(m_piano->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 		connect(m_piano->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->microtuner()->enabledModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
+				this, SLOT(update()));
 	}
 }
 
@@ -405,8 +412,7 @@ void PianoView::pianoScrolled(int new_pos)
 void PianoView::contextMenuEvent(QContextMenuEvent *me)
 {
 	if (me->pos().y() > PIANO_BASE || m_piano == nullptr ||
-//		m_piano->instrumentTrack()->microtuner()->keyRangeImport())
-		false)
+		m_piano->instrumentTrack()->keyRangeImport())
 	{
 		QWidget::contextMenuEvent(me);
 		return;
@@ -470,8 +476,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 
 			emit keyPressed(key_num);
 		}
-//		else if (!m_piano->instrumentTrack()->microtuner()->keyRangeImport())
-		else if (true)
+		else if (!m_piano->instrumentTrack()->keyRangeImport())
 		{
 			// upper section, select which marker (base / first / last note) will be moved
 			m_movedNoteModel = getNearestMarker(key_num);
@@ -853,8 +858,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	p.setPen( Qt::white );
 
 	// Controls for first / last / base key models are shown only if microtuner or its key range import are disabled
-//	if (m_piano != nullptr && !m_piano->instrumentTrack()->microtuner()->keyRangeImport())
-	if (m_piano != nullptr && true)
+	if (m_piano != nullptr && !m_piano->instrumentTrack()->keyRangeImport())
 	{
 		// Draw the base note marker and first / last note boundary markers
 		const int base_key = m_piano->instrumentTrack()->baseNoteModel()->value();
@@ -888,9 +892,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		}
 
 		// draw normal, pressed or disabled key, depending on state and position of current key
-		if (m_piano &&
-			cur_key >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
-			cur_key <= m_piano->instrumentTrack()->lastKeyModel()->value())
+		if (m_piano && m_piano->instrumentTrack()->isKeyMapped(cur_key))
 		{
 			if (m_piano && m_piano->isKeyPressed(cur_key))
 			{
@@ -924,9 +926,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	int startKey = m_startKey;
 	if (startKey > 0 && Piano::isBlackKey(static_cast<Keys>(--startKey)))
 	{
-		if (m_piano &&
-			startKey >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
-			startKey <= m_piano->instrumentTrack()->lastKeyModel()->value())
+		if (m_piano && m_piano->instrumentTrack()->isKeyMapped(startKey))
 		{
 			if (m_piano && m_piano->isKeyPressed(startKey))
 			{
@@ -949,9 +949,7 @@ void PianoView::paintEvent( QPaintEvent * )
 		if (Piano::isBlackKey(cur_key))
 		{
 			// draw normal, pressed or disabled key, depending on state and position of current key
-			if (m_piano &&
-				cur_key >= m_piano->instrumentTrack()->firstKeyModel()->value() &&
-				cur_key <= m_piano->instrumentTrack()->lastKeyModel()->value())
+			if (m_piano && m_piano->instrumentTrack()->isKeyMapped(cur_key))
 			{
 				if (m_piano && m_piano->isKeyPressed(cur_key))
 				{

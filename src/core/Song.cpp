@@ -116,6 +116,9 @@ Song::Song() :
 
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
+
+	for (int i = 0; i < MaxScaleCount; i++) {m_scales[i] = std::make_shared<Scale>();}
+	for (int i = 0; i < MaxKeymapCount; i++) {m_keymaps[i] = std::make_shared<Keymap>();}
 }
 
 
@@ -1132,6 +1135,14 @@ void Song::loadProject( const QString & fileName )
 			{
 				restoreControllerStates( node.toElement() );
 			}
+			else if (node.nodeName() == "scales")
+			{
+				restoreScaleStates(node.toElement());
+			}
+			else if (node.nodeName() == "keymaps")
+			{
+				restoreKeymapStates(node.toElement());
+			}
 			else if( gui )
 			{
 				if( node.nodeName() == gui->getControllerRackView()->nodeName() )
@@ -1240,6 +1251,9 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	saveControllerStates( dataFile, dataFile.content() );
 
+	saveScaleStates(dataFile, dataFile.content());
+	saveKeymapStates(dataFile, dataFile.content());
+
 	m_savingProject = false;
 
 	return dataFile.writeFile(filename, withResources);
@@ -1327,6 +1341,56 @@ void Song::removeAllControllers()
 	m_controllers.clear();
 }
 
+
+
+void Song::saveScaleStates(QDomDocument &doc, QDomElement &element)
+{
+	QDomElement scalesNode = doc.createElement("scales");
+	element.appendChild(scalesNode);
+
+	for (int i = 0; i < MaxScaleCount; i++)
+	{
+		m_scales[i]->saveState(doc, scalesNode);
+	}
+}
+
+
+void Song::restoreScaleStates(const QDomElement &element)
+{
+	QDomNode node = element.firstChild();
+
+	for (int i = 0; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
+	{
+		m_scales[i]->restoreState(node.toElement());
+		node = node.nextSibling();
+	}
+	emit scaleListChanged(-1);
+}
+
+
+void Song::saveKeymapStates(QDomDocument &doc, QDomElement &element)
+{
+	QDomElement keymapsNode = doc.createElement("keymaps");
+	element.appendChild(keymapsNode);
+
+	for (int i = 0; i < MaxKeymapCount; i++)
+	{
+		m_keymaps[i]->saveState(doc, keymapsNode);
+	}
+}
+
+
+void Song::restoreKeymapStates(const QDomElement &element)
+{
+	QDomNode node = element.firstChild();
+
+	for (int i = 0; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
+	{
+		m_keymaps[i]->restoreState(node.toElement());
+		node = node.nextSibling();
+	}
+	emit keymapListChanged(-1);
+}
 
 
 void Song::exportProjectMidi(QString const & exportFileName) const
@@ -1451,4 +1515,42 @@ QString Song::errorSummary()
 
 bool Song::isSavingProject() const {
 	return m_savingProject;
+}
+
+
+std::shared_ptr<const Scale> Song::getScale(unsigned int index) const
+{
+	if (index >= MaxScaleCount) {index = 0;}
+
+	return std::atomic_load(&m_scales[index]);
+}
+
+
+std::shared_ptr<const Keymap> Song::getKeymap(unsigned int index) const
+{
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	return std::atomic_load(&m_keymaps[index]);
+}
+
+
+void Song::setScale(unsigned int index, std::shared_ptr<Scale> newScale)
+{
+	if (index >= MaxScaleCount) {index = 0;}
+
+	Engine::mixer()->requestChangeInModel();
+	std::atomic_store(&m_scales[index], newScale);
+	emit scaleListChanged(index);
+	Engine::mixer()->doneChangeInModel();
+}
+
+
+void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
+{
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	Engine::mixer()->requestChangeInModel();
+	std::atomic_store(&m_keymaps[index], newMap);
+	emit keymapListChanged(index);
+	Engine::mixer()->doneChangeInModel();
 }
