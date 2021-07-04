@@ -23,6 +23,7 @@
  */
 
 #include "SampleBuffer.h"
+#include "Oscillator.h"
 
 #include <algorithm>
 
@@ -62,6 +63,7 @@
 
 
 SampleBuffer::SampleBuffer() :
+	m_userAntiAliasWaveTable(nullptr),
 	m_audioFile(""),
 	m_origData(nullptr),
 	m_origFrames(0),
@@ -351,6 +353,13 @@ void SampleBuffer::update(bool keepSettings)
 	}
 
 	emit sampleUpdated();
+
+	// allocate space for anti-aliased wave table
+	if (m_userAntiAliasWaveTable == nullptr)
+	{
+		m_userAntiAliasWaveTable = std::make_unique<OscillatorConstants::waveform_t>();
+	}
+	Oscillator::generateAntiAliasUserWaveTable(this);
 
 	if (fileLoadError)
 	{

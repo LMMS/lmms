@@ -87,6 +87,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_modulationAlgoModel( Oscillator::SignalMix, 0,
 				Oscillator::NumModulationAlgos-1, this,
 				tr( "Modulation type %1" ).arg( _idx+1 ) ),
+	m_useWaveTableModel(true),
 
 	m_sampleBuffer( new SampleBuffer ),
 	m_volumeLeft( 0.0f ),
@@ -94,7 +95,8 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_detuningLeft( 0.0f ),
 	m_detuningRight( 0.0f ),
 	m_phaseOffsetLeft( 0.0f ),
-	m_phaseOffsetRight( 0.0f )
+	m_phaseOffsetRight( 0.0f ),
+	m_useWaveTable( true )
 {
 	// Connect knobs with Oscillators' inputs
 	connect( &m_volumeModel, SIGNAL( dataChanged() ),
@@ -120,6 +122,9 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 			this, SLOT( updatePhaseOffsetRight() ), Qt::DirectConnection );
 	connect( &m_stereoPhaseDetuningModel, SIGNAL( dataChanged() ),
 			this, SLOT( updatePhaseOffsetLeft() ), Qt::DirectConnection );
+	connect ( &m_useWaveTableModel, SIGNAL(dataChanged()),
+			this, SLOT( updateUseWaveTable()));
+
 	updatePhaseOffsetLeft();
 	updatePhaseOffsetRight();
 
@@ -206,6 +211,11 @@ void OscillatorObject::updatePhaseOffsetRight()
 	m_phaseOffsetRight = m_phaseOffsetModel.value() / 360.0f;
 }
 
+void OscillatorObject::updateUseWaveTable()
+{
+	m_useWaveTable = m_useWaveTableModel.value();
+}
+
 
  
 
@@ -253,6 +263,8 @@ void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 							"wavetype" + is );
 		m_osc[i]->m_modulationAlgoModel.saveSettings( _doc, _this,
 					"modalgo" + QString::number( i+1 ) );
+		m_osc[i]->m_useWaveTableModel.saveSettings( _doc, _this,
+					"useWaveTable" + QString::number (i+1 ) );
 		_this.setAttribute( "userwavefile" + is,
 					m_osc[i]->m_sampleBuffer->audioFile() );
 	}
@@ -279,6 +291,8 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 									is );
 		m_osc[i]->m_modulationAlgoModel.loadSettings( _this,
 					"modalgo" + QString::number( i+1 ) );
+		m_osc[i]->m_useWaveTableModel.loadSettings( _this,
+							"useWaveTable" + QString::number (i+1 ) );
 		m_osc[i]->m_sampleBuffer->setAudioFile( _this.attribute(
 							"userwavefile" + is ) );
 	}
@@ -316,6 +330,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
 						m_osc[i]->m_volumeLeft );
+				oscs_l[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 				oscs_r[i] = new Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
@@ -323,6 +338,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,
 						m_osc[i]->m_volumeRight );
+				oscs_r[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 			}
 			else
 			{
@@ -334,6 +350,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						m_osc[i]->m_phaseOffsetLeft,
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
+				oscs_l[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 				oscs_r[i] = new Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
@@ -342,6 +359,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						m_osc[i]->m_phaseOffsetRight,
 						m_osc[i]->m_volumeRight,
 						oscs_r[i + 1] );
+				oscs_r[i]->setUseWaveTable(m_osc[i]->m_useWaveTable);
 			}
 
 			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
@@ -660,6 +678,15 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"usr_shape_inactive" ) );
 		ToolTip::add( uwb, tr( "User-defined wave" ) );
 
+		PixmapButton * uwt = new PixmapButton( this, NULL );
+		uwt->move( 110, btn_y );
+		uwt->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"wavetable_active" ) );
+		uwt->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"wavetable_inactive" ) );
+		uwt->setCheckable(true);
+		ToolTip::add( uwt, tr( "Use alias-free wavetable oscillators." ) );
+
 		automatableButtonGroup * wsbg =
 			new automatableButtonGroup( this );
 
@@ -672,8 +699,9 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		wsbg->addButton( white_noise_btn );
 		wsbg->addButton( uwb );
 
+
 		m_oscKnobs[i] = OscillatorKnobs( vk, pk, ck, flk, frk, pok,
-							spdk, uwb, wsbg );
+							spdk, uwb, wsbg, uwt );
 	}
 }
 
@@ -711,6 +739,9 @@ void TripleOscillatorView::modelChanged()
 				&t->m_osc[i]->m_stereoPhaseDetuningModel );
 		m_oscKnobs[i].m_waveShapeBtnGrp->setModel(
 					&t->m_osc[i]->m_waveShapeModel );
+		m_oscKnobs[i].m_multiBandWaveTableButton->setModel(
+					&t->m_osc[i]->m_useWaveTableModel );
+
 		connect( m_oscKnobs[i].m_userWaveButton,
 						SIGNAL( doubleClicked() ),
 				t->m_osc[i], SLOT( oscUserDefWaveDblClick() ) );

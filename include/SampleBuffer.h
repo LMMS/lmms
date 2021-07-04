@@ -26,6 +26,7 @@
 #ifndef SAMPLE_BUFFER_H
 #define SAMPLE_BUFFER_H
 
+#include <memory>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
 
@@ -36,6 +37,7 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "shared_object.h"
+#include "OscillatorConstants.h"
 #include "MemoryManager.h"
 
 
@@ -271,6 +273,9 @@ public:
 	{
 		m_varLock.unlock();
 	}
+
+
+	std::unique_ptr<OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
 
 
 public slots:
