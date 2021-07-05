@@ -41,15 +41,25 @@ public:
 
 	bool close() override;
 
-	const BBTrack * getBBTrack() const
+	const BBTrack* getBBTrack() const
 	{
-		return( m_bbTrack );
+		return m_bbTrack;
+	}
+	BBTrack* getBBTrack()
+	{
+		return m_bbTrack;
 	}
 
+	// Create menu to assign all tracks from the BBTrack to a FX channel
+	QMenu* createFxMenu(QString title, QString newFxLabel) override;
 
 public slots:
 	void clickedTrackLabel();
 
+
+private slots:
+	void createFxLine();
+	void assignFxLine(int channelIndex);
 
 private:
 	BBTrack * m_bbTrack;

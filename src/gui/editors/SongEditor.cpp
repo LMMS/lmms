@@ -33,6 +33,7 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QTimeLine>
+#include <QToolButton>
 
 #include "AudioDevice.h"
 #include "AutomatableSlider.h"
@@ -934,8 +935,21 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
 
+	// BBTrack tool button
+	QToolButton* bbTrackButton = new QToolButton(trackActionsToolBar);
+	QMenu* bbTrackMenu = new QMenu(bbTrackButton);
+	// BBTrack tool button actions
 	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),
-									 tr("Add beat/bassline"), this);
+		tr("Add beat/bassline"), this);
+	QAction* convertToSE = new QAction(tr("Convert BBTracks to Song Editor"), this);
+
+	connect(m_addBBTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addBBTrack()));
+	connect(convertToSE, SIGNAL(triggered()), m_editor->m_song, SLOT(convertBBtoSE()));
+	// BBTrack tool button setup
+	bbTrackButton->setPopupMode(QToolButton::MenuButtonPopup);
+	bbTrackButton->setDefaultAction(m_addBBTrackAction);
+	bbTrackButton->setMenu(bbTrackMenu);
+	bbTrackMenu->addAction(convertToSE);
 
 	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
 										 tr("Add sample-track"), this);
@@ -943,11 +957,10 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
 											 tr("Add automation-track"), this);
 
-	connect(m_addBBTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addBBTrack()));
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
-	trackActionsToolBar->addAction( m_addBBTrackAction );
+	trackActionsToolBar->addWidget(bbTrackButton);
 	trackActionsToolBar->addAction( m_addSampleTrackAction );
 	trackActionsToolBar->addAction( m_addAutomationTrackAction );
 

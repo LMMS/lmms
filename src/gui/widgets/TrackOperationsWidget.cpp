@@ -33,6 +33,7 @@
 
 #include "AutomationPattern.h"
 #include "AutomationTrackView.h"
+#include "BBTrackView.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -342,6 +343,16 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
 		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
+	}
+
+	BBTrackView* bbTrackView = dynamic_cast<BBTrackView *>(m_trackView);
+	if (bbTrackView)
+	{
+		int bbIndex = bbTrackView->getBBTrack()->index();
+		toMenu->addSeparator();
+		toMenu->addAction(tr("Convert BBTrack to Song Editor"), [bbIndex](){
+			Engine::getSong()->convertBBtoSE(true, bbIndex);
+		});
 	}
 
 	toMenu->addSeparator();
