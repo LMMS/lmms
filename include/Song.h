@@ -350,6 +350,16 @@ public:
 
 	bool isSavingProject() const;
 
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef MUST be removed
+	void exSyncSendPosition();
+	const char * exSyncToggleMode();
+	const char * exSyncGetModeString();
+	bool exSyncToggle();
+	inline bool exSyncReact() { return m_exSyncOn; }
+	bool exSyncAvailable();
+#endif
+	
 public slots:
 	void playSong();
 	void record();
@@ -385,7 +395,11 @@ private slots:
 
 	void updateFramesPerTick();
 
-
+#ifdef LMMS_HAVE_JACK
+	// ExSync context : after ExSync.h ifdef MUST be removed
+	void onPlaybackStateChanged();
+	
+#endif
 
 private:
 	Song();
@@ -474,6 +488,14 @@ private:
 	TimePos m_exportLoopEnd;
 	TimePos m_exportSongEnd;
 	TimePos m_exportEffectiveLength;
+#ifdef LMMS_HAVE_JACK
+	
+	// ExSync context : after ExSync.h ifdef MUST be removed
+	bool m_exSyncSlaveOn; //(Receave)
+	bool m_exSyncMasterOn; //(Send)
+	bool m_exSyncOn; //(React and Send)
+	unsigned m_exSyncMode; //(for ModeButton state)
+#endif
 
 	AutomatedValueMap m_oldAutomatedValues;
 
