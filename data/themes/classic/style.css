@@ -12,8 +12,16 @@ QMdiArea {
 }
 
 Knob {
+	qproperty-lineActiveColor: rgb(171, 177, 189);
 	qproperty-lineInactiveColor: rgb(120, 120, 120);
-	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
+	qproperty-arcTopActiveColor: rgba(29, 226, 118);
+	qproperty-arcTopInactiveColor: rgba(120, 120, 120);
+	qproperty-arcBottomActiveColor: rgba(120, 120, 120, 70);
+	qproperty-arcBottomInactiveColor: rgba(120, 120, 120, 70);
+	qproperty-centerTopActiveColor: rgba(77, 80, 91);
+	qproperty-centerTopInactiveColor: rgba(77, 80, 91);
+	qproperty-centerBottomActiveColor: rgba(37, 38, 43);
+	qproperty-centerBottomInactiveColor: rgba(37, 38, 43);
 }
 
 AutomationEditor {
