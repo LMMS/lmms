@@ -194,10 +194,13 @@ FIND_PACKAGE(SndFile REQUIRED)
 IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
-# check if we can use SF_SET_COMPRESSION_LEVEL
-IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
-	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
-ENDIF()
+# check if we can use SFC_SET_COMPRESSION_LEVEL
+INCLUDE(CheckCXXSourceCompiles)
+CHECK_CXX_SOURCE_COMPILES(
+	"#include <sndfile.h>
+		int main() {SFC_SET_COMPRESSION_LEVEL;}"
+	LMMS_HAVE_SF_COMPLEVEL
+)
 
 IF(WANT_LV2)
 	IF(PKG_CONFIG_FOUND)
