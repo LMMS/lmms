@@ -41,6 +41,7 @@
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
 #include "PositionLine.h"
+#include "InstrumentFunctions.h"
 
 class QPainter;
 class QPixmap;
@@ -238,12 +239,14 @@ private:
 	enum Actions
 	{
 		ActionNone,
+		ActionRemoveNote,
 		ActionMoveNote,
 		ActionResizeNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
 		ActionResizeNoteEditArea,
-		ActionKnife
+		ActionKnife,
+		ActionPlayKeys
 	};
 
 	enum NoteEditMode
@@ -277,6 +280,15 @@ private:
 	//	gridFree
 	};
 
+	enum PianoRollArea
+	{
+		Keys,
+		Notes,
+		NoteProperties,
+		EditMode,
+		EditAreaResize
+	};
+
 	PositionLine * m_positionLine;
 
 	QVector<QString> m_nemStr; // gui names of each edit mode
@@ -302,9 +314,11 @@ private:
 	int selectionCount() const;
 	void testPlayNote( Note * n );
 	void testPlayKey( int _key, int _vol, int _pan );
+	void stopNotes();
 	void pauseTestNotes(bool pause = true );
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
+	void handleAftertouch(int key, int velocity);
 
 	void setKnifeAction();
 	void cancelKnifeAction();
@@ -320,6 +334,7 @@ private:
 	int keyAreaTop() const;
 	int noteEditRight() const;
 	int noteEditLeft() const;
+	int noteAreaWidth() const;
 
 	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
@@ -345,6 +360,9 @@ private:
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
+
+	static QString m_lastChordName;
+	const InstrumentFunctionNoteStacking::Chord *m_lastChord;
 
 	static const QVector<float> m_zoomLevels;
 	static const QVector<float> m_zoomYLevels;
@@ -420,8 +438,6 @@ private:
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 	EditModes m_knifeMode; // mode they where in before entering knife mode
 
-	bool m_mouseDownRight; //true if right click is being held down
-
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
@@ -434,6 +450,8 @@ private:
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
 	void clearSelectedNotes();
+
+	PianoRollArea getPianoRollAreaIn(const int x, const int y);
 
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
