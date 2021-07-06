@@ -364,25 +364,33 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 
 	if( tfp == 0 )
 	{
+		// Initialize noise channel...
 		//PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
-		char sopt=0;
-		char ropt=1;
-		float fopt = 524288.0 / ( ropt * pow( 2.0, sopt + 1.0 ) );
-		float f;
-		for ( char s=0; s<16; s++ )
-		for ( char r=0; r<8; r++ ) {
-			f = 524288.0 / ( r * pow( 2.0, s + 1.0 ) );
-			if( fabs( freq-fopt ) > fabs( freq-f ) ) {
-				fopt = f;
-				ropt = r;
-				sopt = s;
+		char clock_freq = 0;
+		char div_ratio = 1;
+		float closest_freq = 524288.0 / ( div_ratio * pow( 2.0, clock_freq + 1.0 ) );
+		// This nested for loop iterates over all possible combinations of clock frequency and dividing
+		// ratio and chooses the combination whose resulting frequency is closest to the note frequency
+		for ( char s = 0; s < 16; s++ )
+		{
+			for ( char r = 0 ; r < 8; r++ )
+			{
+				float r_val = (r == 0 ? 0.5 : r);
+				float f = 524288.0 / ( r_val * pow( 2.0, s + 1.0 ) );
+				if( fabs( freq - closest_freq ) > fabs( freq - f ) )
+				{
+					closest_freq = f;
+					div_ratio = r;
+					clock_freq = s;
+				}
 			}
 		}
-		data = sopt;
+		
+		data = clock_freq;
 		data = data << 1;
 		data += m_ch4ShiftRegWidthModel.value();
 		data = data << 3;
-		data += ropt;
+		data += div_ratio;
 		papu->write_register( fakeClock(),  0xff22, data );
 
 		//channel 4 init
