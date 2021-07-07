@@ -50,7 +50,7 @@
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
@@ -89,8 +89,8 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_patternToPlay( NULL ),
-	m_loopPattern( false ),
+	m_clipToPlay( NULL ),
+	m_loopClip( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
@@ -225,11 +225,11 @@ void Song::processNextBuffer()
 			}
 			break;
 
-		case Mode_PlayPattern:
-			if (m_patternToPlay)
+		case Mode_PlayClip:
+			if (m_clipToPlay)
 			{
-				clipNum = m_patternToPlay->getTrack()->getTCONum(m_patternToPlay);
-				trackList.push_back(m_patternToPlay->getTrack());
+				clipNum = m_clipToPlay->getTrack()->getClipNum(m_clipToPlay);
+				trackList.push_back(m_clipToPlay->getTrack());
 			}
 			break;
 
@@ -292,9 +292,9 @@ void Song::processNextBuffer()
 			{
 				enforceLoop(TimePos{0}, TimePos{Engine::getBBTrackContainer()->lengthOfCurrentBB(), 0});
 			}
-			else if (m_playMode == Mode_PlayPattern && m_loopPattern && !loopEnabled)
+			else if (m_playMode == Mode_PlayClip && m_loopClip && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_patternToPlay->length());
+				enforceLoop(TimePos{0}, m_clipToPlay->length());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -360,7 +360,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	QSet<const AutomatableModel*> recordedModels;
 
 	TrackContainer* container = this;
-	int tcoNum = -1;
+	int clipNum = -1;
 
 	switch (m_playMode)
 	{
@@ -373,28 +373,28 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		auto bbTrack = dynamic_cast<BBTrack*>(tracklist.at(0));
 		auto bbContainer = Engine::getBBTrackContainer();
 		container = bbContainer;
-		tcoNum = bbTrack->index();
+		clipNum = bbTrack->index();
 	}
 		break;
 	default:
 		return;
 	}
 
-	values = container->automatedValuesAt(timeStart, tcoNum);
+	values = container->automatedValuesAt(timeStart, clipNum);
 	TrackList tracks = container->tracks();
 
-	Track::tcoVector tcos;
+	Track::clipVector clips;
 	for (Track* track : tracks)
 	{
 		if (track->type() == Track::AutomationTrack) {
-			track->getTCOsInRange(tcos, 0, timeStart);
+			track->getClipsInRange(clips, 0, timeStart);
 		}
 	}
 
 	// Process recording
-	for (TrackContentObject* tco : tcos)
+	for (Clip* clip : clips)
 	{
-		auto p = dynamic_cast<AutomationPattern *>(tco);
+		auto p = dynamic_cast<AutomationClip *>(clip);
 		TimePos relTime = timeStart - p->startPosition();
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
@@ -537,19 +537,19 @@ void Song::playBB()
 
 
 
-void Song::playPattern( const Pattern* patternToPlay, bool loop )
+void Song::playMidiClip( const MidiClip* clipToPlay, bool loop )
 {
 	if( isStopped() == false )
 	{
 		stop();
 	}
 
-	m_patternToPlay = patternToPlay;
-	m_loopPattern = loop;
+	m_clipToPlay = clipToPlay;
+	m_loopClip = loop;
 
-	if( m_patternToPlay != NULL )
+	if( m_clipToPlay != NULL )
 	{
-		m_playMode = Mode_PlayPattern;
+		m_playMode = Mode_PlayClip;
 		m_playing = true;
 		m_paused = false;
 	}
@@ -833,15 +833,15 @@ bpm_t Song::getTempo()
 
 
 
-AutomationPattern * Song::tempoAutomationPattern()
+AutomationClip * Song::tempoAutomationClip()
 {
-	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
+	return AutomationClip::globalAutomationClip( &m_tempoModel );
 }
 
 
-AutomatedValueMap Song::automatedValuesAt(TimePos time, int tcoNum) const
+AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 {
-	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, tcoNum);
+	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, clipNum);
 }
 
 
@@ -884,7 +884,7 @@ void Song::clearProject()
 
 	if( gui && gui->automationEditor() )
 	{
-		gui->automationEditor()->setCurrentPattern( NULL );
+		gui->automationEditor()->setCurrentClip( NULL );
 	}
 
 	if( gui && gui->pianoRoll() )
@@ -900,10 +900,10 @@ void Song::clearProject()
 	// Clear the m_oldAutomatedValues AutomatedValueMap
 	m_oldAutomatedValues.clear();
 
-	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
-	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
+	AutomationClip::globalAutomationClip( &m_tempoModel )->clear();
+	AutomationClip::globalAutomationClip( &m_masterVolumeModel )->
 									clear();
-	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
+	AutomationClip::globalAutomationClip( &m_masterPitchModel )->
 									clear();
 
 	Engine::mixer()->doneChangeInModel();
@@ -1159,7 +1159,7 @@ void Song::loadProject( const QString & fileName )
 		node = node.nextSibling();
 	}
 
-	// quirk for fixing projects with broken positions of TCOs inside
+	// quirk for fixing projects with broken positions of Clips inside
 	// BB-tracks
 	Engine::getBBTrackContainer()->fixIncorrectPositions();
 
@@ -1173,7 +1173,7 @@ void Song::loadProject( const QString & fileName )
 		m_controllers.end());
 
 	// resolve all IDs so that autoModels are automated
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 
 
 	Engine::mixer()->doneChangeInModel();

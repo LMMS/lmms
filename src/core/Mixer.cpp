@@ -463,7 +463,7 @@ void Mixer::handleMetronome()
 	Song::PlayModes currentPlayMode = song->playMode();
 
 	bool metronomeSupported =
-		currentPlayMode == Song::Mode_PlayPattern
+		currentPlayMode == Song::Mode_PlayClip
 		|| currentPlayMode == Song::Mode_PlaySong
 		|| currentPlayMode == Song::Mode_PlayBB;
 

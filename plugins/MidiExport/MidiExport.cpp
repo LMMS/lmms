@@ -160,7 +160,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
 
-				if (n.nodeName() == "bbtco")
+				if (n.nodeName() == "bbclip")
 				{
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
@@ -215,7 +215,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				MidiNoteVector nv, pat;
 				writePattern(pat, n, base_pitch, base_volume, 0);
 
-				// workaround for nested BBTCOs
+				// workaround for nested BBClips
 				int pos = 0;
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
 				for (auto it = plist.begin(); it != plist.end(); ++it)

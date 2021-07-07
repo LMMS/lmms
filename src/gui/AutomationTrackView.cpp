@@ -25,7 +25,7 @@
  
  #include "AutomationTrackView.h"
  
- #include "AutomationPattern.h"
+ #include "AutomationClip.h"
  #include "embed.h"
  #include "Engine.h"
  #include "ProjectJournal.h"
@@ -78,8 +78,8 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			TrackContentObject * tco = getTrack()->createTCO( pos );
-			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
+			Clip * clip = getTrack()->createClip( pos );
+			AutomationClip * pat = dynamic_cast<AutomationClip *>( clip );
 			pat->addObject( mod );
 		}
 	}

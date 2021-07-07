@@ -37,7 +37,7 @@
 class TimePos;
 class TrackContainer;
 class TrackContainerView;
-class TrackContentObject;
+class Clip;
 class TrackView;
 
 
@@ -60,7 +60,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<TrackContentObject *> tcoVector;
+	typedef QVector<Clip *> clipVector;
 
 	enum TrackTypes
 	{
@@ -90,11 +90,11 @@ public:
 	}
 
 	virtual bool play( const TimePos & start, const fpp_t frames,
-						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
+						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
 	virtual TrackView * createView( TrackContainerView * view ) = 0;
-	virtual TrackContentObject * createTCO( const TimePos & pos ) = 0;
+	virtual Clip * createClip( const TimePos & pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
 						QDomElement & parent ) = 0;
@@ -109,25 +109,25 @@ public:
 		m_simpleSerializingMode = true;
 	}
 
-	// -- for usage by TrackContentObject only ---------------
-	TrackContentObject * addTCO( TrackContentObject * tco );
-	void removeTCO( TrackContentObject * tco );
+	// -- for usage by Clip only ---------------
+	Clip * addClip( Clip * clip );
+	void removeClip( Clip * clip );
 	// -------------------------------------------------------
-	void deleteTCOs();
+	void deleteClips();
 
-	int numOfTCOs();
-	TrackContentObject * getTCO( int tcoNum );
-	int getTCONum(const TrackContentObject* tco );
+	int numOfClips();
+	Clip * getClip( int clipNum );
+	int getClipNum(const Clip* clip );
 
-	const tcoVector & getTCOs() const
+	const clipVector & getClips() const
 	{
 		return m_trackContentObjects;
 	}
-	void getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+	void getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end );
-	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
+	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
-	void createTCOsForBB( int bb );
+	void createClipsForBB( int bb );
 
 
 	void insertBar( const TimePos & pos );
@@ -215,7 +215,7 @@ private:
 
 	bool m_simpleSerializingMode;
 
-	tcoVector m_trackContentObjects;
+	clipVector m_trackContentObjects;
 
 	QMutex m_processingLock;
 	
@@ -228,7 +228,7 @@ private:
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void trackContentObjectAdded( TrackContentObject * );
+	void trackContentObjectAdded( Clip * );
 
 } ;
 

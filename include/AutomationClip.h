@@ -1,6 +1,6 @@
 /*
- * AutomationPattern.h - declaration of class AutomationPattern, which contains
- *                       all information about an automation pattern
+ * AutomationClip.h - declaration of class AutomationClip, which contains
+ *                       all information about an automation clip
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
@@ -24,14 +24,14 @@
  *
  */
 
-#ifndef AUTOMATION_PATTERN_H
-#define AUTOMATION_PATTERN_H
+#ifndef AUTOMATION_CLIP_H
+#define AUTOMATION_CLIP_H
 
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
 
 #include "AutomationNode.h"
-#include "TrackContentObject.h"
+#include "Clip.h"
 
 
 class AutomationTrack;
@@ -39,7 +39,7 @@ class TimePos;
 
 
 
-class LMMS_EXPORT AutomationPattern : public TrackContentObject
+class LMMS_EXPORT AutomationClip : public Clip
 {
 	Q_OBJECT
 public:
@@ -53,9 +53,9 @@ public:
 	typedef QMap<int, AutomationNode> timeMap;
 	typedef QVector<QPointer<AutomatableModel>> objectVector;
 
-	AutomationPattern( AutomationTrack * _auto_track );
-	AutomationPattern( const AutomationPattern & _pat_to_copy );
-	virtual ~AutomationPattern() = default;
+	AutomationClip( AutomationTrack * _auto_track );
+	AutomationClip( const AutomationClip & _pat_to_copy );
+	virtual ~AutomationClip() = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
@@ -147,15 +147,15 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	static const QString classNodeName() { return "automationpattern"; }
+	static const QString classNodeName() { return "automationclip"; }
 	QString nodeName() const override { return classNodeName(); }
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	ClipView * createView( TrackView * _tv ) override;
 
 
 	static bool isAutomated( const AutomatableModel * _m );
-	static QVector<AutomationPattern *> patternsForModel( const AutomatableModel * _m );
-	static AutomationPattern * globalAutomationPattern( AutomatableModel * _m );
+	static QVector<AutomationClip *> clipsForModel( const AutomatableModel * _m );
+	static AutomationClip * globalAutomationClip( AutomatableModel * _m );
 	static void resolveAllIDs();
 
 	bool isRecording() const { return m_isRecording; }
@@ -177,9 +177,9 @@ private:
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
 
-	// Mutex to make methods involving automation patterns thread safe
+	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
-	mutable QMutex m_patternMutex;
+	mutable QMutex m_clipMutex;
 
 	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
@@ -202,7 +202,7 @@ private:
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
 
-	friend class AutomationPatternView;
+	friend class AutomationClipView;
 	friend class AutomationNode;
 
 } ;

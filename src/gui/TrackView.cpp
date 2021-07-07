@@ -44,7 +44,7 @@
 #include "ToolTip.h"
 #include "Track.h"
 #include "TrackContainerView.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 
 /*! \brief Create a new track View.
@@ -89,8 +89,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	connect( m_track,
-		SIGNAL( trackContentObjectAdded( TrackContentObject * ) ),
-			this, SLOT( createTCOView( TrackContentObject * ) ),
+		SIGNAL( trackContentObjectAdded( Clip * ) ),
+			this, SLOT( createClipView( Clip * ) ),
 			Qt::QueuedConnection );
 
 	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
@@ -108,12 +108,12 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
 			m_track, SLOT( trackColorReset() ) );
 
-	// create views for already existing TCOs
-	for( Track::tcoVector::iterator it =
+	// create views for already existing Clips
+	for( Track::clipVector::iterator it =
 					m_track->m_trackContentObjects.begin();
 			it != m_track->m_trackContentObjects.end(); ++it )
 	{
-		createTCOView( *it );
+		createClipView( *it );
 	}
 
 	m_trackContainerView->addTrackView( this );
@@ -161,7 +161,7 @@ void TrackView::resizeEvent( QResizeEvent * re )
 void TrackView::update()
 {
 	m_trackContentWidget.update();
-	if( !m_trackContainerView->fixedTCOs() )
+	if( !m_trackContainerView->fixedClips() )
 	{
 		m_trackContentWidget.changePosition();
 	}
@@ -424,19 +424,19 @@ void TrackView::paintEvent( QPaintEvent * pe )
 
 
 
-/*! \brief Create a TrackContentObject View in this track View.
+/*! \brief Create a Clip View in this track View.
  *
- *  \param tco the TrackContentObject to create the view for.
+ *  \param clip the Clip to create the view for.
  *  \todo is this a good description for what this method does?
  */
-void TrackView::createTCOView( TrackContentObject * tco )
+void TrackView::createClipView( Clip * clip )
 {
-	TrackContentObjectView * tv = tco->createView( this );
-	if( tco->getSelectViewOnCreate() == true )
+	ClipView * tv = clip->createView( this );
+	if( clip->getSelectViewOnCreate() == true )
 	{
 		tv->setSelected( true );
 	}
-	tco->selectViewOnCreate( false );
+	clip->selectViewOnCreate( false );
 }
 
 

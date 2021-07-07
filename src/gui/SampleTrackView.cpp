@@ -193,14 +193,14 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 				? trackHeadWidth
 				: de->pos().x();
 
-		TimePos tcoPos = trackContainerView()->fixedTCOs()
+		TimePos clipPos = trackContainerView()->fixedClips()
 				? TimePos(0)
 				: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar()
 							* TimePos::ticksPerBar()) + trackContainerView()->currentPosition()
 						).quantize(1.0);
 
-		SampleTCO * sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
-		if (sTco) { sTco->setSampleFile(value); }
+		SampleClip * sClip = static_cast<SampleClip*>(getTrack()->createClip(clipPos));
+		if (sClip) { sClip->setSampleFile(value); }
 	}
 }
 

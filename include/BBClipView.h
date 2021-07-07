@@ -1,7 +1,7 @@
 /*
- * AutomationPatternView.h - declaration of class AutomationPatternView
+ * BBClipView.h
  *
- * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,59 +21,46 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+ 
 
-#ifndef AUTOMATION_PATTERN_VIEW_H
-#define AUTOMATION_PATTERN_VIEW_H
+#ifndef BB_CLIP_VIEW_H
+#define BB_CLIP_VIEW_H
+
+#include "BBClip.h"
 
 #include <QStaticText>
 
-#include "AutomationPattern.h"
-#include "Song.h"
-#include "SongEditor.h"
-#include "TrackContentObjectView.h"
 
-
-class AutomationPatternView : public TrackContentObjectView
+class BBClipView : public ClipView
 {
 	Q_OBJECT
-
-
 public:
-	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
-	virtual ~AutomationPatternView();
+	BBClipView( Clip * _clip, TrackView * _tv );
+	virtual ~BBClipView() = default;
+
 
 public slots:
-	/// Opens this view's pattern in the global automation editor
-	void openInAutomationEditor();
 	void update() override;
 
-
 protected slots:
+	void openInBBEditor();
 	void resetName();
 	void changeName();
-	void disconnectObject( QAction * _a );
-	void toggleRecording();
-	void flipY();
-	void flipX();
+
 
 protected:
-	void constructContextMenu( QMenu * ) override;
-	void mouseDoubleClickEvent(QMouseEvent * me ) override;
 	void paintEvent( QPaintEvent * pe ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void constructContextMenu( QMenu * ) override;
 
 
 private:
-	AutomationPattern * m_pat;
+	BBClip * m_bbClip;
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
-	
-	static QPixmap * s_pat_rec;
-
-	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;
+
 
 
 #endif
