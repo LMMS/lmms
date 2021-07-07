@@ -414,6 +414,37 @@ void AutomationPattern::resetNodes(const int tick0, const int tick1)
 
 
 
+/**
+ * @brief Resets the tangents from the nodes between the given ticks
+ * @param Int first tick of the range
+ * @param Int second tick of the range
+ */
+void AutomationPattern::resetTangents(const int tick0, const int tick1)
+{
+	if (tick0 == tick1)
+	{
+		auto it = m_timeMap.find(TimePos(tick0));
+		if (it != m_timeMap.end())
+		{
+			it.value().setLockedTangents(false);
+			generateTangents(it, 1);
+		}
+		return;
+	}
+
+	TimePos start = TimePos(qMin(tick0, tick1));
+	TimePos end = TimePos(qMax(tick0, tick1));
+
+	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
+	{
+		it.value().setLockedTangents(false);
+		generateTangents(it, 1);
+	}
+}
+
+
+
+
 void AutomationPattern::recordValue(TimePos time, float value)
 {
 	QMutexLocker m(&m_patternMutex);
@@ -459,15 +490,30 @@ TimePos AutomationPattern::setDragValue(
 		// inValue
 		m_dragKeepOutValue = false;
 
+		// We will set the tangents back to what they were if the node had
+		// its tangents locked
+		m_dragLockedTan = false;
+
 		// Check if we already have a node on the position we are dragging
 		// and if we do, store the outValue so the discrete jump can be kept
+		// and information about the tangents
 		timeMap::iterator it = m_timeMap.find(newTime);
 		if (it != m_timeMap.end())
 		{
+			// If we don't have a discrete jump, the outValue will be the
+			// same as the inValue
 			if (OFFSET(it) != 0)
 			{
 				m_dragKeepOutValue = true;
 				m_dragOutValue = OUTVAL(it);
+			}
+			// For the tangents, we will only keep them if the tangents were
+			// locked
+			if (LOCKEDTAN(it))
+			{
+				m_dragLockedTan = true;
+				m_dragInTan = INTAN(it);
+				m_dragOutTan = OUTTAN(it);
 			}
 		}
 
@@ -481,12 +527,31 @@ TimePos AutomationPattern::setDragValue(
 
 	generateTangents();
 
+	TimePos returnedPos;
+
 	if (m_dragKeepOutValue)
 	{
-		return this->putValues(time, value, m_dragOutValue, quantPos, controlKey);
+		returnedPos = this->putValues(time, value, m_dragOutValue, quantPos, controlKey);
+	}
+	else
+	{
+		returnedPos = this->putValue(time, value, quantPos, controlKey);
 	}
 
-	return this->putValue(time, value, quantPos, controlKey);
+	// Set the tangents on the newly created node if they were locked
+	// before dragging
+	if (m_dragLockedTan)
+	{
+		timeMap::iterator it = m_timeMap.find(returnedPos);
+		if (it != m_timeMap.end())
+		{
+			it.value().setInTangent(m_dragInTan);
+			it.value().setOutTangent(m_dragOutTan);
+			it.value().setLockedTangents(true);
+		}
+	}
+
+	return returnedPos;
 }
 
 
@@ -775,6 +840,9 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		element.setAttribute("pos", POS(it));
 		element.setAttribute("value", INVAL(it));
 		element.setAttribute("outValue", OUTVAL(it));
+		element.setAttribute("inTan", INTAN(it));
+		element.setAttribute("outTan", OUTTAN(it));
+		element.setAttribute("lockedTan", static_cast<int>(LOCKEDTAN(it)));
 		_this.appendChild( element );
 	}
 
@@ -797,6 +865,11 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void AutomationPattern::loadSettings( const QDomElement & _this )
 {
 	QMutexLocker m(&m_patternMutex);
+
+	// Legacy compatibility: Previously tangents were not stored in
+	// the project file. So if any node doesn't have tangent information
+	// we will generate the tangents
+	bool shouldGenerateTangents = false;
 
 	clear();
 
@@ -822,6 +895,22 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 			float timeMapOutValue = LocaleHelper::toFloat(element.attribute("outValue"));
 
 			m_timeMap[timeMapPos] = AutomationNode(this, timeMapInValue, timeMapOutValue, timeMapPos);
+
+			// Load tangents if there is information about it (it's enough to check for either inTan or outTan)
+			if (element.hasAttribute("inTan"))
+			{
+				float inTan = LocaleHelper::toFloat(element.attribute("inTan"));
+				float outTan = LocaleHelper::toFloat(element.attribute("outTan"));
+				bool lockedTan = static_cast<bool>(element.attribute("lockedTan", "0").toInt());
+
+				m_timeMap[timeMapPos].setInTangent(inTan);
+				m_timeMap[timeMapPos].setOutTangent(outTan);
+				m_timeMap[timeMapPos].setLockedTangents(lockedTan);
+			}
+			else
+			{
+				shouldGenerateTangents = true;
+			}
 		}
 		else if( element.tagName() == "object" )
 		{
@@ -845,7 +934,8 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	{
 		changeLength( len );
 	}
-	generateTangents();
+
+	if (shouldGenerateTangents) { generateTangents(); }
 }
 
 
@@ -1128,13 +1218,25 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 
 	if( m_timeMap.size() < 2 && numToGenerate > 0 )
 	{
-		it.value().setInTangent(0);
-		it.value().setOutTangent(0);
+		// Set the value of the single node's tangents if they are not
+		// locked (were manually edited)
+		if (!LOCKEDTAN(it))
+		{
+			it.value().setInTangent(0);
+			it.value().setOutTangent(0);
+		}
 		return;
 	}
 
-	for( int i = 0; i < numToGenerate; i++ )
+	for( int i = 0; i < numToGenerate && it != m_timeMap.end(); i++ )
 	{
+		// Skip the node if it has locked tangents (were manually edited)
+		if (LOCKEDTAN(it))
+		{
+			++it;
+			continue;
+		}
+
 		if( it == m_timeMap.begin() )
 		{
 			// On the first node there's no curve behind it, so we will only calculate the outTangent
