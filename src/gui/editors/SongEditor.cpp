@@ -65,6 +65,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_proportionalSnap( false ),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
+	m_scrollPrecision(1),
 	m_mode(DrawMode),
 	m_origin(),
 	m_scrollPos(),
@@ -77,6 +78,8 @@ SongEditor::SongEditor( Song * song ) :
 					 : DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH),
 	m_selectRegion(false)
 {
+	updateScrollPrecision();
+
 	m_zoomingModel->setParent(this);
 	m_snappingModel->setParent(this);
 	m_timeLine = new TimeLineWidget( m_trackHeadWidth, 32,
@@ -219,8 +222,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setMinimum( 0 );
 	m_leftRightScroll->setMaximum( 0 );
-	m_leftRightScroll->setSingleStep( 1 );
-	m_leftRightScroll->setPageStep( 20 );
+	m_leftRightScroll->setSingleStep( m_scrollPrecision );
+	m_leftRightScroll->setPageStep( m_scrollPrecision * 20 );
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ),
 					this, SLOT( scrolled( int ) ) );
@@ -340,7 +343,7 @@ void SongEditor::setHighQuality( bool hq )
 void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = TimePos( new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = TimePos( new_pos / m_scrollPrecision * TimePos::ticksPerBar() ) );
 }
 
 
@@ -360,7 +363,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 
 		//we save the position of scrollbars, mouse position and zooming level
 		m_origin = QPoint(xStart, 0);
-		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
+		m_scrollPos = QPointF(m_leftRightScroll->value() / m_scrollPrecision, contentWidget()->verticalScrollBar()->value());
 		m_currentZoomingValue = zoomingModel()->value();
 
 		//calculate the song position where the mouse was clicked
@@ -400,7 +403,7 @@ void SongEditor::updateRubberband()
 		}
 
 		//take care of the scrollbar position
-		int hs = (m_leftRightScroll->value() - m_scrollPos.x()) * pixelsPerBar();
+		int hs = (m_leftRightScroll->value() / m_scrollPrecision - m_scrollPos.x()) * pixelsPerBar();
 		int vs = contentWidget()->verticalScrollBar()->value() - m_scrollPos.y();
 
 		//the adjusted origin point
@@ -551,7 +554,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// what would be the bar in the new zoom level on the very same mouse x
 		int newBar = x / DEFAULT_PIXELS_PER_BAR / m_zoomLevels[z];
 		// scroll so the bar "selected" by the mouse x doesn't move on the screen
-		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
+		m_leftRightScroll->setValue((m_leftRightScroll->value() / m_scrollPrecision + bar - newBar) * m_scrollPrecision);
 
 		// update combobox with zooming-factor
 		m_zoomingModel->setValue( z );
@@ -566,13 +569,13 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() /30);
+		m_leftRightScroll->setValue((m_leftRightScroll->value() / m_scrollPrecision -
+							we->angleDelta().x() /30) * m_scrollPrecision);
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() / 30);
+		m_leftRightScroll->setValue((m_leftRightScroll->value() / m_scrollPrecision -
+							we->angleDelta().y() / 30) * m_scrollPrecision);
 	}
 	else
 	{
@@ -605,7 +608,7 @@ void SongEditor::mousePressEvent(QMouseEvent *me)
 	if (allowRubberband())
 	{
 		//we save the position of scrollbars, mouse position and zooming level
-		m_scrollPos = QPoint(m_leftRightScroll->value(), contentWidget()->verticalScrollBar()->value());
+		m_scrollPos = QPoint(m_leftRightScroll->value() / m_scrollPrecision, contentWidget()->verticalScrollBar()->value());
 		m_origin = contentWidget()->mapFromParent(QPoint(me->pos().x(), me->pos().y()));
 		m_currentZoomingValue = zoomingModel()->value();
 
@@ -735,7 +738,8 @@ void SongEditor::hideMasterPitchFloat( void )
 
 void SongEditor::updateScrollBar( int len )
 {
-	m_leftRightScroll->setMaximum( len );
+	updateScrollPrecision();
+	m_leftRightScroll->setMaximum( len * m_scrollPrecision );
 }
 
 
@@ -830,6 +834,14 @@ void SongEditor::updatePositionLine()
 }
 
 
+#include <iostream>
+void SongEditor::updateScrollPrecision()
+{
+	if (m_song->length() > 0)// Might have 0 length at first
+	{
+		m_scrollPrecision = (float)m_leftRightScroll->width() / m_song->length();
+	}
+}
 
 
 void SongEditor::zoomingChanged()
@@ -1024,6 +1036,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
+	connect(this, SIGNAL(resized()), m_editor, SLOT(updateScrollPrecision()));
 }
 
 QSize SongEditorWindow::sizeHint() const
