@@ -25,6 +25,7 @@
 #ifndef MIXER_PROFILER_H
 #define MIXER_PROFILER_H
 
+#include <array>
 #include <QFile>
 
 #include "lmms_basics.h"
@@ -41,21 +42,39 @@ public:
 		m_periodTimer.reset();
 	}
 
-	void finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod );
+	void finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod);
 
 	int cpuLoad() const
 	{
 		return m_cpuLoad;
 	}
 
-	void setOutputFile( const QString& outputFile );
+	void setOutputFile(const QString& outputFile);
 
+	enum DetailType {
+		NoteSetup,
+		Instruments,
+		Effects,
+		Mixing,
+		DetailCount
+	};
+
+	void startDetail(const DetailType type) { m_detailTimer[type].reset(); }
+	void finishDetail(const DetailType type) { m_detailTime[type] = m_detailTimer[type].elapsed(); }
+
+	int detailLoad(const DetailType type) const { return m_detailLoad[type]; }
 
 private:
 	MicroTimer m_periodTimer;
-	int m_cpuLoad;
+	float m_cpuLoad;
 	QFile m_outputFile;
 
+	// Use arrays to avoid dynamic allocations in realtime code
+	// NOTE: The double {} is a workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=65815
+	// (Can be removed when LMMS CI updates to GCC 6 or higher.)
+	std::array<MicroTimer, DetailCount> m_detailTimer;
+	std::array<int, DetailCount> m_detailTime{{0}};
+	std::array<float, DetailCount> m_detailLoad{{0}};
 };
 
 #endif
