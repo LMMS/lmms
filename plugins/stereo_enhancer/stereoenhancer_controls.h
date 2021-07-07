@@ -49,7 +49,7 @@ public:
 
 	virtual int controlCount()
 	{
-		return( 1 );
+		return 2;
 	}
 	
 	virtual EffectControlDialog * createView()
@@ -65,9 +65,10 @@ private slots:
 private:
 	stereoEnhancerEffect * m_effect;
 	FloatModel m_widthModel;
-	
-	friend class stereoEnhancerControlDialog;
+	FloatModel m_outputGain;
 
+	friend class stereoEnhancerControlDialog;
+	friend class stereoEnhancerEffect;
 } ;
 
 

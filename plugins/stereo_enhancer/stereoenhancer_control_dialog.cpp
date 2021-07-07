@@ -42,7 +42,13 @@ stereoEnhancerControlDialog::stereoEnhancerControlDialog(
 	widthKnob->setLabel( tr( "WIDTH" ) );
 	widthKnob->setHintText( tr( "Width:" ) , " samples" );
 
+	Knob* outputKnob = new Knob(knobBright_26, this);
+	outputKnob->setModel(&_controls->m_outputGain);
+	outputKnob->setLabel(tr("GAIN"));
+	outputKnob->setHintText(tr("Gain:"), "");
+
 	l->addWidget( widthKnob );
+	l->addWidget(outputKnob);
 
 	this->setLayout(l);
 }

@@ -32,7 +32,8 @@
 stereoEnhancerControls::stereoEnhancerControls( stereoEnhancerEffect * _eff ) :
 		EffectControls( _eff ),
 		m_effect( _eff ),
-		m_widthModel(0.0f, 0.0f, 180.0f, 1.0f, this, tr( "Width" ) )
+		m_widthModel(0.0f, 0.0f, 180.0f, 1.0f, this, tr("Width")),
+		m_outputGain(1.0f, 0.1f, 7.0f, 0.01f, this, tr("Output Gain"))
 {
 	connect( &m_widthModel, SIGNAL( dataChanged() ),
 			this, SLOT( changeWideCoeff() ) );
@@ -52,6 +53,7 @@ void stereoEnhancerControls::changeWideCoeff()
 void stereoEnhancerControls::loadSettings( const QDomElement & _this )
 {
 	m_widthModel.loadSettings( _this, "width" );
+	m_outputGain.loadSettings(_this, "gain");
 }
 
 
@@ -61,6 +63,7 @@ void stereoEnhancerControls::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	m_widthModel.saveSettings( _doc, _this, "width" );
+	m_outputGain.saveSettings(_doc, _this, "gain");
 }
 
 
