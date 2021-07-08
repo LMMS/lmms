@@ -291,7 +291,7 @@ public:
 		return m_fifoWriter != NULL;
 	}
 
-	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
+	void pushInputFrames(const sampleFrame *_ab, const f_cnt_t _frames);
 
 	inline const sampleFrame * inputBuffer()
 	{
@@ -312,6 +312,9 @@ public:
 
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
+
+	void applyMasterGainToInputBuffer (sampleFrame	*frames_data,
+								  const size_t frames_count, uint channels_count, float gain);
 
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();

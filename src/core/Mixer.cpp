@@ -300,8 +300,7 @@ bool Mixer::criticalXRuns() const
 
 
 
-void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
-{
+void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames) {
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
@@ -322,6 +321,7 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	}
 
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
+
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 
 	doneChangeInModel();
@@ -352,7 +352,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 		if( it != m_playHandles.end() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if((*it)->audioPort())
+				( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -400,7 +401,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		}
 		if( ( *it )->isFinished() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if (( *it )->audioPort()) { (*it)->audioPort()->removePlayHandle((*it)); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -581,6 +582,16 @@ void Mixer::changeQuality(const struct qualitySettings & qs)
 	startProcessing();
 }
 
+void Mixer::applyMasterGainToInputBuffer(sampleFrame *frames_data, const size_t frames_count, uint channels_count,
+									float gain) {
+	for (fpp_t f = 0; f < frames_count; ++f) {
+		for (uint channel = 0; channel < channels_count; ++channel) {
+			frames_data[f][channel] /= gain;
+		}
+
+	}
+}
+
 
 
 
@@ -674,7 +685,8 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 	if( criticalXRuns() == false )
 	{
 		m_newPlayHandles.push( handle );
-		handle->audioPort()->addPlayHandle( handle );
+		if (handle->audioPort())
+			handle->audioPort()->addPlayHandle( handle );
 		return true;
 	}
 
@@ -695,7 +707,8 @@ void Mixer::removePlayHandle(PlayHandle * ph)
 	// which were created in a thread different than mixer thread
 	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
-		ph->audioPort()->removePlayHandle(ph);
+		if (ph->audioPort())
+			ph->audioPort()->removePlayHandle(ph);
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
@@ -754,7 +767,7 @@ void Mixer::removePlayHandlesOfTypes(Track * track, const quint8 types)
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if (( *it )->audioPort()) { ( *it )->audioPort()->removePlayHandle( ( *it ) ); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
