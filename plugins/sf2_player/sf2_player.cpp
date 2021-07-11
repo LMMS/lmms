@@ -91,6 +91,7 @@ QMutex sf2Instrument::s_fontsMutex;
 sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sf2player_plugin_descriptor ),
 	m_srcState( NULL ),
+	m_synth(nullptr),
 	m_font( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
@@ -126,9 +127,8 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
 
-	// This is just our starting instance of synth.  It is recreated
-	// everytime we load a new soundfont.
-	m_synth = new_fluid_synth( m_settings );
+	// This sets up m_synth and updates reverb/chorus/gain
+	updateSampleRate();
 
 #if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Get the default values from the setting
@@ -153,14 +153,10 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusDepth.setInitValue(settingVal);
 #endif
 
-	loadFile( ConfigManager::inst()->sf2File() );
-
-	updateSampleRate();
-	updateReverbOn();
-	updateReverb();
-	updateChorusOn();
-	updateChorus();
-	updateGain();
+	// When loading a project or sf2 preview, do not load the default soundfont
+	loadFile(Engine::getSong()->isLoadingProject() or instrumentTrack()->isPreviewMode()
+				? ""
+				: ConfigManager::inst()->sf2File());
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
@@ -251,8 +247,6 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
 	m_chorusDepth.loadSettings( _this, "chorusDepth" );
 
-	updatePatch();
-	updateGain();
 }
 
 
@@ -263,11 +257,6 @@ void sf2Instrument::loadFile( const QString & _file )
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
 		openFile( _file, false );
-		updatePatch();
-
-		// for some reason we've to call that, otherwise preview of a
-		// soundfont for the first time fails
-		updateSampleRate();
 	}
 
 	// setting the first bank and patch number that is found
@@ -439,6 +428,8 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	{
 		instrumentTrack()->setName( PathUtil::cleanName( _sf2File ) );
 	}
+
+	updatePatch();
 }
 
 
@@ -572,7 +563,10 @@ void sf2Instrument::updateSampleRate()
 	{
 		// Recreate synth with no soundfonts
 		m_synthMutex.lock();
-		delete_fluid_synth( m_synth );
+		if (m_synth != nullptr)
+		{
+			delete_fluid_synth(m_synth);
+		}
 		m_synth = new_fluid_synth( m_settings );
 		m_synthMutex.unlock();
 	}
