@@ -54,24 +54,16 @@ public:
 	 * @param _width Pixel width of widget
 	 * @param _height Pixel height of widget
 	 */
-	Graph(QWidget* _parent, graphStyle _style = Graph::LinearStyle,
-		int _width = 132,
-		int _height = 104);
+	Graph(QWidget* _parent, graphStyle _style = Graph::LinearStyle, int _width = 132, int _height = 104);
 	virtual ~Graph() = default;
 
 	void setForeground(const QPixmap& _pixmap);
 
 	void setGraphColor(const QColor);
 
-	inline graphModel* model()
-	{
-		return castModel<graphModel>();
-	}
+	inline graphModel* model() { return castModel<graphModel>(); }
 
-	inline graphStyle getGraphStyle()
-	{
-		return m_graphStyle;
-	}
+	inline graphStyle getGraphStyle() { return m_graphStyle; }
 
 	inline void setGraphStyle(graphStyle _s)
 	{
@@ -127,43 +119,26 @@ public:
 	 * @param _step Step size on y axis where values snap to, or 0.0f
 	 *   for "no snapping"
 	 */
-	graphModel(float _min,
-		float _max,
-		int _size,
-		::Model* _parent,
-		bool _default_constructed = false,
-		float _step = 0.0);
+	graphModel(
+		float _min, float _max, int _size, ::Model* _parent, bool _default_constructed = false, float _step = 0.0);
 
 	virtual ~graphModel() = default;
 
 	// TODO: saveSettings, loadSettings?
 
-	inline float minValue() const
-	{
-		return (m_minValue);
-	}
+	inline float minValue() const { return (m_minValue); }
 
-	inline float maxValue() const
-	{
-		return (m_maxValue);
-	}
+	inline float maxValue() const { return (m_maxValue); }
 
-	inline int length() const
-	{
-		return m_length;
-	}
+	inline int length() const { return m_length; }
 
-	inline const float* samples() const
-	{
-		return (m_samples.data());
-	}
+	inline const float* samples() const { return (m_samples.data()); }
 
 	//! Make cyclic convolution
 	//! @param convolution Samples to convolve with
 	//! @param convolutionLength Number of samples to take for each sum
 	//! @param centerOffset Offset for resulting values
-	void convolve(const float* convolution,
-		const int convolutionLength, const int centerOffset);
+	void convolve(const float* convolution, const int convolutionLength, const int centerOffset);
 
 public slots:
 	//! Set range of y values

@@ -41,7 +41,6 @@
 	@return Used size of the target buffer, or 0 if the MidiEvent could not
 		be converted.
 */
-std::size_t LMMS_EXPORT writeToByteSeq(const class MidiEvent& ev,
-	uint8_t* data, std::size_t bufsize);
+std::size_t LMMS_EXPORT writeToByteSeq(const class MidiEvent& ev, uint8_t* data, std::size_t bufsize);
 
 #endif // MIDIEVENTTOBYTESEQ_H

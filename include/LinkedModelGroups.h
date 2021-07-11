@@ -81,8 +81,7 @@ public:
 	};
 
 	// TODO: refactor those 2
-	template <class Functor>
-	void foreach_model(const Functor& ftor)
+	template <class Functor> void foreach_model(const Functor& ftor)
 	{
 		for (auto itr = m_models.begin(); itr != m_models.end(); ++itr)
 		{
@@ -90,8 +89,7 @@ public:
 		}
 	}
 
-	template <class Functor>
-	void foreach_model(const Functor& ftor) const
+	template <class Functor> void foreach_model(const Functor& ftor) const
 	{
 		for (auto itr = m_models.cbegin(); itr != m_models.cend(); ++itr)
 		{

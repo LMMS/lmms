@@ -40,10 +40,7 @@ public:
 	virtual ~MultitapEchoEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_controls;
-	}
+	virtual EffectControls* controls() { return &m_controls; }
 
 private:
 	void updateFilters(int begin, int end);

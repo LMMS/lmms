@@ -33,19 +33,13 @@ class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
-	explicit FileDialog(QWidget* parent = 0, const QString& caption = QString(),
-		const QString& directory = QString(),
+	explicit FileDialog(QWidget* parent = 0, const QString& caption = QString(), const QString& directory = QString(),
 		const QString& filter = QString());
 
-	static QString getExistingDirectory(QWidget* parent,
-		const QString& caption,
-		const QString& directory,
+	static QString getExistingDirectory(QWidget* parent, const QString& caption, const QString& directory,
 		QFileDialog::Options options = QFileDialog::ShowDirsOnly);
-	static QString getOpenFileName(QWidget* parent = 0,
-		const QString& caption = QString(),
-		const QString& directory = QString(),
-		const QString& filter = QString(),
-		QString* selectedFilter = 0);
+	static QString getOpenFileName(QWidget* parent = 0, const QString& caption = QString(),
+		const QString& directory = QString(), const QString& filter = QString(), QString* selectedFilter = 0);
 	void clearSelection();
 };
 

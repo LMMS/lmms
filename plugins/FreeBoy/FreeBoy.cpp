@@ -48,18 +48,12 @@ const long CLOCK_RATE = 4194304;
 
 extern "C"
 {
-	Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"FreeBoy",
-			QT_TRANSLATE_NOOP("PluginBrowser", "Emulation of GameBoy (TM) APU"),
+	Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "FreeBoy",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Emulation of GameBoy (TM) APU"),
 
-			"Attila Herman <attila589/at/gmail.com>"
-			"Csaba Hruska <csaba.hruska/at/gmail.com>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL};
+		"Attila Herman <attila589/at/gmail.com>"
+		"Csaba Hruska <csaba.hruska/at/gmail.com>",
+		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL};
 }
 
 FreeBoyInstrument::FreeBoyInstrument(InstrumentTrack* _instrument_track)
@@ -68,41 +62,27 @@ FreeBoyInstrument::FreeBoyInstrument(InstrumentTrack* _instrument_track)
 
 	m_ch1SweepTimeModel(4.0f, 0.0f, 7.0f, 1.0f, this, tr("Sweep time"))
 	, m_ch1SweepDirModel(false, this, tr("Sweep direction"))
-	, m_ch1SweepRtShiftModel(4.0f, 0.0f, 7.0f, 1.0f, this,
-		  tr("Sweep rate shift amount"))
-	, m_ch1WavePatternDutyModel(2.0f, 0.0f, 3.0f, 1.0f, this,
-		  tr("Wave pattern duty cycle"))
-	, m_ch1VolumeModel(15.0f, 0.0f, 15.0f, 1.0f, this,
-		  tr("Channel 1 volume"))
-	, m_ch1VolSweepDirModel(false, this,
-		  tr("Volume sweep direction"))
-	, m_ch1SweepStepLengthModel(0.0f, 0.0f, 7.0f, 1.0f, this,
-		  tr("Length of each step in sweep"))
+	, m_ch1SweepRtShiftModel(4.0f, 0.0f, 7.0f, 1.0f, this, tr("Sweep rate shift amount"))
+	, m_ch1WavePatternDutyModel(2.0f, 0.0f, 3.0f, 1.0f, this, tr("Wave pattern duty cycle"))
+	, m_ch1VolumeModel(15.0f, 0.0f, 15.0f, 1.0f, this, tr("Channel 1 volume"))
+	, m_ch1VolSweepDirModel(false, this, tr("Volume sweep direction"))
+	, m_ch1SweepStepLengthModel(0.0f, 0.0f, 7.0f, 1.0f, this, tr("Length of each step in sweep"))
 	,
 
-	m_ch2WavePatternDutyModel(2.0f, 0.0f, 3.0f, 1.0f, this,
-		tr("Wave pattern duty cycle"))
-	, m_ch2VolumeModel(15.0f, 0.0f, 15.0f, 1.0f, this,
-		  tr("Channel 2 volume"))
-	, m_ch2VolSweepDirModel(false, this,
-		  tr("Volume sweep direction"))
-	, m_ch2SweepStepLengthModel(0.0f, 0.0f, 7.0f, 1.0f, this,
-		  tr("Length of each step in sweep"))
+	m_ch2WavePatternDutyModel(2.0f, 0.0f, 3.0f, 1.0f, this, tr("Wave pattern duty cycle"))
+	, m_ch2VolumeModel(15.0f, 0.0f, 15.0f, 1.0f, this, tr("Channel 2 volume"))
+	, m_ch2VolSweepDirModel(false, this, tr("Volume sweep direction"))
+	, m_ch2SweepStepLengthModel(0.0f, 0.0f, 7.0f, 1.0f, this, tr("Length of each step in sweep"))
 	,
 
-	//m_ch3OnModel( true, this, tr( "Channel 3 Master on/off" ) ),
-	m_ch3VolumeModel(3.0f, 0.0f, 3.0f, 1.0f, this,
-		tr("Channel 3 volume"))
+	// m_ch3OnModel( true, this, tr( "Channel 3 Master on/off" ) ),
+	m_ch3VolumeModel(3.0f, 0.0f, 3.0f, 1.0f, this, tr("Channel 3 volume"))
 	,
 
-	m_ch4VolumeModel(15.0f, 0.0f, 15.0f, 1.0f, this,
-		tr("Channel 4 volume"))
-	, m_ch4VolSweepDirModel(false, this,
-		  tr("Volume sweep direction"))
-	, m_ch4SweepStepLengthModel(0.0f, 0.0f, 7.0f, 1.0f, this,
-		  tr("Length of each step in sweep"))
-	, m_ch4ShiftRegWidthModel(false, this,
-		  tr("Shift Register width"))
+	m_ch4VolumeModel(15.0f, 0.0f, 15.0f, 1.0f, this, tr("Channel 4 volume"))
+	, m_ch4VolSweepDirModel(false, this, tr("Volume sweep direction"))
+	, m_ch4SweepStepLengthModel(0.0f, 0.0f, 7.0f, 1.0f, this, tr("Length of each step in sweep"))
+	, m_ch4ShiftRegWidthModel(false, this, tr("Shift Register width"))
 	,
 
 	m_so1VolumeModel(7.0f, 0.0f, 7.0f, 1.0f, this, tr("Right output level"))
@@ -126,12 +106,9 @@ FreeBoyInstrument::FreeBoyInstrument(InstrumentTrack* _instrument_track)
 {
 }
 
-FreeBoyInstrument::~FreeBoyInstrument()
-{
-}
+FreeBoyInstrument::~FreeBoyInstrument() {}
 
-void FreeBoyInstrument::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void FreeBoyInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	m_ch1SweepTimeModel.saveSettings(_doc, _this, "st");
 	m_ch1SweepDirModel.saveSettings(_doc, _this, "sd");
@@ -146,7 +123,7 @@ void FreeBoyInstrument::saveSettings(QDomDocument& _doc,
 	m_ch2VolSweepDirModel.saveSettings(_doc, _this, "ch2vsd");
 	m_ch2SweepStepLengthModel.saveSettings(_doc, _this, "ch2ssl");
 
-	//m_ch3OnModel.saveSettings( _doc, _this, "ch3on" );
+	// m_ch3OnModel.saveSettings( _doc, _this, "ch3on" );
 	m_ch3VolumeModel.saveSettings(_doc, _this, "ch3vol");
 
 	m_ch4VolumeModel.saveSettings(_doc, _this, "ch4vol");
@@ -168,8 +145,7 @@ void FreeBoyInstrument::saveSettings(QDomDocument& _doc,
 	m_bassModel.saveSettings(_doc, _this, "Bass");
 
 	QString sampleString;
-	base64::encode((const char*)m_graphModel.samples(),
-		m_graphModel.length() * sizeof(float), sampleString);
+	base64::encode((const char*)m_graphModel.samples(), m_graphModel.length() * sizeof(float), sampleString);
 	_this.setAttribute("sampleShape", sampleString);
 }
 
@@ -188,7 +164,7 @@ void FreeBoyInstrument::loadSettings(const QDomElement& _this)
 	m_ch2VolSweepDirModel.loadSettings(_this, "ch2vsd");
 	m_ch2SweepStepLengthModel.loadSettings(_this, "ch2ssl");
 
-	//m_ch3OnModel.loadSettings( _this, "ch3on" );
+	// m_ch3OnModel.loadSettings( _this, "ch3on" );
 	m_ch3VolumeModel.loadSettings(_this, "ch3vol");
 
 	m_ch4VolumeModel.loadSettings(_this, "ch4vol");
@@ -215,10 +191,7 @@ void FreeBoyInstrument::loadSettings(const QDomElement& _this)
 	m_graphModel.setSamples((float*)dst);
 }
 
-QString FreeBoyInstrument::nodeName() const
-{
-	return (freeboy_plugin_descriptor.name);
-}
+QString FreeBoyInstrument::nodeName() const { return (freeboy_plugin_descriptor.name); }
 
 /*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 {
@@ -233,13 +206,9 @@ QString FreeBoyInstrument::nodeName() const
 	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
 }*/
 
-f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
-{
-	return f_cnt_t(1000);
-}
+f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const { return f_cnt_t(1000); }
 
-void FreeBoyInstrument::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 	const int samplerate = Engine::mixer()->processingSampleRate();
@@ -271,7 +240,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n,
 		data += m_ch2SweepStepLengthModel.value();
 		papu->write_register(fakeClock(), 0xff17, data);
 
-		//channel 4 - noise
+		// channel 4 - noise
 		data = m_ch4VolumeModel.value();
 		data = data << 1;
 		data += m_ch4VolSweepDirModel.value();
@@ -287,7 +256,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n,
 	papu->treble_eq(m_trebleModel.value());
 	papu->bass_freq(m_bassModel.value());
 
-	//channel 1 - square
+	// channel 1 - square
 	data = m_ch1SweepTimeModel.value();
 	data = data << 1;
 	data += m_ch1SweepDirModel.value();
@@ -299,13 +268,13 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n,
 	data = data << 6;
 	papu->write_register(fakeClock(), 0xff11, data);
 
-	//channel 2 - square
+	// channel 2 - square
 	data = m_ch2WavePatternDutyModel.value();
 	data = data << 6;
 	papu->write_register(fakeClock(), 0xff16, data);
 
-	//channel 3 - wave
-	//data = m_ch3OnModel.value()?128:0;
+	// channel 3 - wave
+	// data = m_ch3OnModel.value()?128:0;
 	data = 128;
 	papu->write_register(fakeClock(), 0xff1a, data);
 
@@ -314,7 +283,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n,
 	data = data << 5;
 	papu->write_register(fakeClock(), 0xff1c, data);
 
-	//controls
+	// controls
 	data = m_so1VolumeModel.value();
 	data = data << 4;
 	data += m_so2VolumeModel.value();
@@ -357,7 +326,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n,
 
 	if (tfp == 0)
 	{
-		//PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
+		// PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
 		char sopt = 0;
 		char ropt = 1;
 		float fopt = 524288.0 / (ropt * pow(2.0, sopt + 1.0));
@@ -380,7 +349,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n,
 		data += ropt;
 		papu->write_register(fakeClock(), 0xff22, data);
 
-		//channel 4 init
+		// channel 4 init
 		papu->write_register(fakeClock(), 0xff23, 128);
 	}
 
@@ -420,10 +389,7 @@ void FreeBoyInstrument::deleteNotePluginData(NotePlayHandle* _n)
 	delete static_cast<Gb_Apu_Buffer*>(_n->m_pluginData);
 }
 
-PluginView* FreeBoyInstrument::instantiateView(QWidget* _parent)
-{
-	return (new FreeBoyInstrumentView(this, _parent));
-}
+PluginView* FreeBoyInstrument::instantiateView(QWidget* _parent) { return (new FreeBoyInstrumentView(this, _parent)); }
 
 class FreeBoyKnob : public Knob
 {
@@ -442,8 +408,7 @@ public:
 	}
 };
 
-FreeBoyInstrumentView::FreeBoyInstrumentView(Instrument* _instrument,
-	QWidget* _parent)
+FreeBoyInstrumentView::FreeBoyInstrumentView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 
@@ -530,51 +495,39 @@ FreeBoyInstrumentView::FreeBoyInstrumentView(Instrument* _instrument,
 	m_ch1SweepDirButton = new PixmapButton(this, NULL);
 	m_ch1SweepDirButton->setCheckable(true);
 	m_ch1SweepDirButton->move(167, 108);
-	m_ch1SweepDirButton->setActiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_down"));
-	m_ch1SweepDirButton->setInactiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_up"));
+	m_ch1SweepDirButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("btn_down"));
+	m_ch1SweepDirButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("btn_up"));
 	ToolTip::add(m_ch1SweepDirButton, tr("Sweep direction"));
 
 	m_ch1VolSweepDirButton = new PixmapButton(this, NULL);
 	m_ch1VolSweepDirButton->setCheckable(true);
 	m_ch1VolSweepDirButton->move(207, 108);
-	m_ch1VolSweepDirButton->setActiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_up"));
-	m_ch1VolSweepDirButton->setInactiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_down"));
+	m_ch1VolSweepDirButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("btn_up"));
+	m_ch1VolSweepDirButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("btn_down"));
 	ToolTip::add(m_ch1VolSweepDirButton, tr("Volume sweep direction"));
 
-	m_ch2VolSweepDirButton = new PixmapButton(this,
-		tr("Volume sweep direction"));
+	m_ch2VolSweepDirButton = new PixmapButton(this, tr("Volume sweep direction"));
 	m_ch2VolSweepDirButton->setCheckable(true);
 	m_ch2VolSweepDirButton->move(102, 156);
-	m_ch2VolSweepDirButton->setActiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_up"));
-	m_ch2VolSweepDirButton->setInactiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_down"));
+	m_ch2VolSweepDirButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("btn_up"));
+	m_ch2VolSweepDirButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("btn_down"));
 	ToolTip::add(m_ch2VolSweepDirButton, tr("Volume sweep direction"));
 
-	//m_ch3OnButton = new PixmapButton( this, NULL );
-	//m_ch3OnButton->move( 176, 53 );
+	// m_ch3OnButton = new PixmapButton( this, NULL );
+	// m_ch3OnButton->move( 176, 53 );
 
-	m_ch4VolSweepDirButton = new PixmapButton(this,
-		tr("Volume sweep direction"));
+	m_ch4VolSweepDirButton = new PixmapButton(this, tr("Volume sweep direction"));
 	m_ch4VolSweepDirButton->setCheckable(true);
 	m_ch4VolSweepDirButton->move(207, 157);
-	m_ch4VolSweepDirButton->setActiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_up"));
-	m_ch4VolSweepDirButton->setInactiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_down"));
+	m_ch4VolSweepDirButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("btn_up"));
+	m_ch4VolSweepDirButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("btn_down"));
 	ToolTip::add(m_ch4VolSweepDirButton, tr("Volume sweep direction"));
 
 	m_ch4ShiftRegWidthButton = new PixmapButton(this, NULL);
 	m_ch4ShiftRegWidthButton->setCheckable(true);
 	m_ch4ShiftRegWidthButton->move(207, 171);
-	m_ch4ShiftRegWidthButton->setActiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_7"));
-	m_ch4ShiftRegWidthButton->setInactiveGraphic(
-		PLUGIN_NAME::getIconPixmap("btn_15"));
+	m_ch4ShiftRegWidthButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("btn_7"));
+	m_ch4ShiftRegWidthButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("btn_15"));
 	ToolTip::add(m_ch4ShiftRegWidthButton, tr("Shift register width"));
 
 	m_ch1So1Button = new PixmapButton(this, NULL);
@@ -643,9 +596,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView(Instrument* _instrument,
 	ToolTip::add(m_graph, tr("Wave pattern graph"));
 }
 
-FreeBoyInstrumentView::~FreeBoyInstrumentView()
-{
-}
+FreeBoyInstrumentView::~FreeBoyInstrumentView() {}
 
 void FreeBoyInstrumentView::modelChanged()
 {
@@ -664,7 +615,7 @@ void FreeBoyInstrumentView::modelChanged()
 	m_ch2VolSweepDirButton->setModel(&p->m_ch2VolSweepDirModel);
 	m_ch2SweepStepLengthKnob->setModel(&p->m_ch2SweepStepLengthModel);
 
-	//m_ch3OnButton->setModel( &p->m_ch3OnModel );
+	// m_ch3OnButton->setModel( &p->m_ch3OnModel );
 	m_ch3VolumeKnob->setModel(&p->m_ch3VolumeModel);
 
 	m_ch4VolumeKnob->setModel(&p->m_ch4VolumeModel);
@@ -693,7 +644,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 	{
-		return (new FreeBoyInstrument(
-			static_cast<InstrumentTrack*>(m)));
+		return (new FreeBoyInstrument(static_cast<InstrumentTrack*>(m)));
 	}
 }

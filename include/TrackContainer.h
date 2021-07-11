@@ -53,10 +53,7 @@ public:
 
 	void loadSettings(const QDomElement& _this) override;
 
-	virtual AutomationPattern* tempoAutomationPattern()
-	{
-		return NULL;
-	}
+	virtual AutomationPattern* tempoAutomationPattern() { return NULL; }
 
 	int countTracks(Track::TrackTypes _tt = Track::NumTrackTypes) const;
 
@@ -67,27 +64,15 @@ public:
 
 	void clearAllTracks();
 
-	const TrackList& tracks() const
-	{
-		return m_tracks;
-	}
+	const TrackList& tracks() const { return m_tracks; }
 
 	bool isEmpty() const;
 
-	static const QString classNodeName()
-	{
-		return "trackcontainer";
-	}
+	static const QString classNodeName() { return "trackcontainer"; }
 
-	inline void setType(TrackContainerTypes newType)
-	{
-		m_TrackContainerType = newType;
-	}
+	inline void setType(TrackContainerTypes newType) { m_TrackContainerType = newType; }
 
-	inline TrackContainerTypes type() const
-	{
-		return m_TrackContainerType;
-	}
+	inline TrackContainerTypes type() const { return m_TrackContainerType; }
 
 	virtual AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const;
 

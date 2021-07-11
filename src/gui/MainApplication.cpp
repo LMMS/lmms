@@ -91,8 +91,7 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 	}
 }
 
-bool MainApplication::nativeEventFilter(const QByteArray& eventType,
-	void* message, long* result)
+bool MainApplication::nativeEventFilter(const QByteArray& eventType, void* message, long* result)
 {
 	if (eventType == "windows_generic_MSG")
 	{

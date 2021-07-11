@@ -47,7 +47,8 @@ public:
 	Q_PROPERTY(QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor)
 	Q_PROPERTY(QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush)
 	Q_PROPERTY(QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor)
-	Q_PROPERTY(int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding)
+	Q_PROPERTY(
+		int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding)
 
 	enum AutoScrollStates
 	{
@@ -68,8 +69,8 @@ public:
 		KeepStopPosition
 	};
 
-	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos& pos,
-		const TimePos& begin, Song::PlayModes mode, QWidget* parent);
+	TimeLineWidget(
+		int xoff, int yoff, float ppb, Song::PlayPos& pos, const TimePos& begin, Song::PlayModes mode, QWidget* parent);
 	virtual ~TimeLineWidget();
 
 	inline QColor const& getBarLineColor() const { return m_barLineColor; }
@@ -85,7 +86,10 @@ public:
 	inline void setInactiveLoopBrush(QBrush const& inactiveLoopBrush) { m_inactiveLoopBrush = inactiveLoopBrush; }
 
 	inline QColor const& getInactiveLoopInnerColor() const { return m_inactiveLoopInnerColor; }
-	inline void setInactiveLoopInnerColor(QColor const& inactiveLoopInnerColor) { m_inactiveLoopInnerColor = inactiveLoopInnerColor; }
+	inline void setInactiveLoopInnerColor(QColor const& inactiveLoopInnerColor)
+	{
+		m_inactiveLoopInnerColor = inactiveLoopInnerColor;
+	}
 
 	inline QColor const& getActiveLoopColor() const { return m_activeLoopColor; }
 	inline void setActiveLoopColor(QColor const& activeLoopColor) { m_activeLoopColor = activeLoopColor; }
@@ -94,49 +98,31 @@ public:
 	inline void setActiveLoopBrush(QBrush const& activeLoopBrush) { m_activeLoopBrush = activeLoopBrush; }
 
 	inline QColor const& getActiveLoopInnerColor() const { return m_activeLoopInnerColor; }
-	inline void setActiveLoopInnerColor(QColor const& activeLoopInnerColor) { m_activeLoopInnerColor = activeLoopInnerColor; }
+	inline void setActiveLoopInnerColor(QColor const& activeLoopInnerColor)
+	{
+		m_activeLoopInnerColor = activeLoopInnerColor;
+	}
 
 	inline int const& getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
-	inline void setLoopRectangleVerticalPadding(int const& loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
-
-	inline Song::PlayPos& pos()
+	inline void setLoopRectangleVerticalPadding(int const& loopRectangleVerticalPadding)
 	{
-		return (m_pos);
+		m_loopRectangleVerticalPadding = loopRectangleVerticalPadding;
 	}
 
-	AutoScrollStates autoScroll() const
-	{
-		return m_autoScroll;
-	}
+	inline Song::PlayPos& pos() { return (m_pos); }
 
-	BehaviourAtStopStates behaviourAtStop() const
-	{
-		return m_behaviourAtStop;
-	}
+	AutoScrollStates autoScroll() const { return m_autoScroll; }
 
-	bool loopPointsEnabled() const
-	{
-		return m_loopPoints == LoopPointsEnabled;
-	}
+	BehaviourAtStopStates behaviourAtStop() const { return m_behaviourAtStop; }
 
-	inline const TimePos& loopBegin() const
-	{
-		return (m_loopPos[0] < m_loopPos[1]) ? m_loopPos[0] : m_loopPos[1];
-	}
+	bool loopPointsEnabled() const { return m_loopPoints == LoopPointsEnabled; }
 
-	inline const TimePos& loopEnd() const
-	{
-		return (m_loopPos[0] > m_loopPos[1]) ? m_loopPos[0] : m_loopPos[1];
-	}
+	inline const TimePos& loopBegin() const { return (m_loopPos[0] < m_loopPos[1]) ? m_loopPos[0] : m_loopPos[1]; }
 
-	inline void savePos(const TimePos& pos)
-	{
-		m_savedPos = pos;
-	}
-	inline const TimePos& savedPos() const
-	{
-		return m_savedPos;
-	}
+	inline const TimePos& loopEnd() const { return (m_loopPos[0] > m_loopPos[1]) ? m_loopPos[0] : m_loopPos[1]; }
+
+	inline void savePos(const TimePos& pos) { m_savedPos = pos; }
+	inline const TimePos& savedPos() const { return m_savedPos; }
 
 	inline void setPixelsPerBar(float ppb)
 	{
@@ -150,10 +136,7 @@ public:
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
-	inline QString nodeName() const override
-	{
-		return "timeline";
-	}
+	inline QString nodeName() const override { return "timeline"; }
 
 	inline int markerX(const TimePos& _t) const
 	{
@@ -167,10 +150,7 @@ signals:
 
 public slots:
 	void updatePosition(const TimePos&);
-	void updatePosition()
-	{
-		updatePosition(TimePos());
-	}
+	void updatePosition() { updatePosition(TimePos()); }
 	void toggleAutoScroll(int _n);
 	void toggleLoopPoints(int _n);
 	void toggleBehaviourAtStop(int _n);

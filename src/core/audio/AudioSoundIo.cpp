@@ -37,9 +37,7 @@
 #include "gui_templates.h"
 
 AudioSoundIo::AudioSoundIo(bool& outSuccessful, Mixer* _mixer)
-	: AudioDevice(qBound<ch_cnt_t>(
-					  DEFAULT_CHANNELS,
-					  ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
+	: AudioDevice(qBound<ch_cnt_t>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
 					  SURROUND_CHANNELS),
 		  _mixer)
 {
@@ -184,16 +182,13 @@ AudioSoundIo::AudioSoundIo(bool& outSuccessful, Mixer* _mixer)
 		return;
 	}
 
-	fprintf(stderr, "Output device: '%s' backend: '%s'\n",
-		device->name, soundio_backend_name(m_soundio->current_backend));
+	fprintf(
+		stderr, "Output device: '%s' backend: '%s'\n", device->name, soundio_backend_name(m_soundio->current_backend));
 
 	outSuccessful = true;
 }
 
-void AudioSoundIo::onBackendDisconnect(int err)
-{
-	m_disconnectErr = err;
-}
+void AudioSoundIo::onBackendDisconnect(int err) { m_disconnectErr = err; }
 
 AudioSoundIo::~AudioSoundIo()
 {
@@ -225,8 +220,7 @@ void AudioSoundIo::startProcessing()
 	{
 		if ((err = soundio_outstream_start(m_outstream)))
 		{
-			fprintf(stderr,
-				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n",
+			fprintf(stderr, "AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n",
 				soundio_strerror(err));
 		}
 		else
@@ -240,9 +234,7 @@ void AudioSoundIo::startProcessing()
 	if ((err = soundio_outstream_pause(m_outstream, false)))
 	{
 		m_stopped = true;
-		fprintf(stderr,
-			"AudioSoundIo::startProcessing() :: resuming result error: %s\n",
-			soundio_strerror(err));
+		fprintf(stderr, "AudioSoundIo::startProcessing() :: resuming result error: %s\n", soundio_strerror(err));
 	}
 }
 
@@ -255,9 +247,7 @@ void AudioSoundIo::stopProcessing()
 	{
 		if ((err = soundio_outstream_pause(m_outstream, true)))
 		{
-			fprintf(stderr,
-				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
-				soundio_strerror(err));
+			fprintf(stderr, "AudioSoundIo::stopProcessing() :: pausing result error: %s\n", soundio_strerror(err));
 		}
 	}
 
@@ -268,15 +258,9 @@ void AudioSoundIo::stopProcessing()
 	}
 }
 
-void AudioSoundIo::errorCallback(int err)
-{
-	fprintf(stderr, "soundio: error streaming: %s\n", soundio_strerror(err));
-}
+void AudioSoundIo::errorCallback(int err) { fprintf(stderr, "soundio: error streaming: %s\n", soundio_strerror(err)); }
 
-void AudioSoundIo::underflowCallback()
-{
-	fprintf(stderr, "soundio: buffer underflow reported\n");
-}
+void AudioSoundIo::underflowCallback() { fprintf(stderr, "soundio: buffer underflow reported\n"); }
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
@@ -347,19 +331,11 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	}
 }
 
-AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil()
-{
-}
+AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil() {}
 
-void AudioSoundIoSetupUtil::reconnectSoundIo()
-{
-	((AudioSoundIo::setupWidget*)m_setupWidget)->reconnectSoundIo();
-}
+void AudioSoundIoSetupUtil::reconnectSoundIo() { ((AudioSoundIo::setupWidget*)m_setupWidget)->reconnectSoundIo(); }
 
-void AudioSoundIoSetupUtil::updateDevices()
-{
-	((AudioSoundIo::setupWidget*)m_setupWidget)->updateDevices();
-}
+void AudioSoundIoSetupUtil::updateDevices() { ((AudioSoundIo::setupWidget*)m_setupWidget)->updateDevices(); }
 
 static void setupWidgetOnBackendDisconnect(SoundIo* soundio, int err)
 {
@@ -375,7 +351,8 @@ static void setup_widget_on_devices_change(SoundIo* soundio)
 
 void AudioSoundIo::setupWidget::reconnectSoundIo()
 {
-	const QString& configBackend = m_isFirst ? ConfigManager::inst()->value("audiosoundio", "backend") : m_backendModel.currentText();
+	const QString& configBackend =
+		m_isFirst ? ConfigManager::inst()->value("audiosoundio", "backend") : m_backendModel.currentText();
 	m_isFirst = false;
 
 	soundio_disconnect(m_soundio);
@@ -397,8 +374,8 @@ void AudioSoundIo::setupWidget::reconnectSoundIo()
 		SoundIoBackend backend = soundio_get_backend(m_soundio, backend_index);
 		if ((err = soundio_connect_backend(m_soundio, backend)))
 		{
-			fprintf(stderr, "soundio: unable to connect %s backend: %s\n",
-				soundio_backend_name(backend), soundio_strerror(err));
+			fprintf(stderr, "soundio: unable to connect %s backend: %s\n", soundio_backend_name(backend),
+				soundio_strerror(err));
 			if ((err = soundio_connect(m_soundio)))
 			{
 				fprintf(stderr, "soundio: unable to connect backend: %s\n", soundio_strerror(err));

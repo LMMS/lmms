@@ -2,7 +2,7 @@
  * bit_invader.cpp - instrument which uses a usereditable wavetable
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -48,22 +48,14 @@ static const float defaultNormalizationFactor = 1.0f;
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"BitInvader",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Customizable wavetable synthesizer"),
-			"Andreas Brandmaier <andreas/at/brandmaier/dot/de>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "BitInvader",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Customizable wavetable synthesizer"),
+		"Andreas Brandmaier <andreas/at/brandmaier/dot/de>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"),
+		NULL, NULL};
 }
 
-bSynth::bSynth(float* _shape, NotePlayHandle* _nph, bool _interpolation,
-	float _factor, const sample_rate_t _sample_rate)
+bSynth::bSynth(
+	float* _shape, NotePlayHandle* _nph, bool _interpolation, float _factor, const sample_rate_t _sample_rate)
 	: sample_index(0)
 	, sample_realindex(0)
 	, nph(_nph)
@@ -87,15 +79,11 @@ bSynth::bSynth(float* _shape, NotePlayHandle* _nph, bool _interpolation,
 	}
 }
 
-bSynth::~bSynth()
-{
-	delete[] sample_shape;
-}
+bSynth::~bSynth() { delete[] sample_shape; }
 
 sample_t bSynth::nextStringSample(float sample_length)
 {
-	float sample_step =
-		static_cast<float>(sample_length / (sample_rate / nph->frequency()));
+	float sample_step = static_cast<float>(sample_length / (sample_rate / nph->frequency()));
 
 	// check overflow
 	while (sample_realindex >= sample_length)
@@ -139,12 +127,12 @@ sample_t bSynth::nextStringSample(float sample_length)
 }
 
 /***********************************************************************
-*
-*	class BitInvader
-*
-*	lmms - plugin 
-*
-***********************************************************************/
+ *
+ *	class BitInvader
+ *
+ *	lmms - plugin
+ *
+ ***********************************************************************/
 
 bitInvader::bitInvader(InstrumentTrack* _instrument_track)
 	: Instrument(_instrument_track, &bitinvader_plugin_descriptor)
@@ -156,16 +144,12 @@ bitInvader::bitInvader(InstrumentTrack* _instrument_track)
 	m_graph.setWaveToSine();
 	lengthChanged();
 
-	connect(&m_sampleLength, SIGNAL(dataChanged()),
-		this, SLOT(lengthChanged()), Qt::DirectConnection);
+	connect(&m_sampleLength, SIGNAL(dataChanged()), this, SLOT(lengthChanged()), Qt::DirectConnection);
 
-	connect(&m_graph, SIGNAL(samplesChanged(int, int)),
-		this, SLOT(samplesChanged(int, int)));
+	connect(&m_graph, SIGNAL(samplesChanged(int, int)), this, SLOT(samplesChanged(int, int)));
 }
 
-bitInvader::~bitInvader()
-{
-}
+bitInvader::~bitInvader() {}
 
 void bitInvader::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
@@ -178,8 +162,7 @@ void bitInvader::saveSettings(QDomDocument& _doc, QDomElement& _this)
 
 	// Save sample shape base64-encoded
 	QString sampleString;
-	base64::encode((const char*)m_graph.samples(),
-		wavetableSize * sizeof(float), sampleString);
+	base64::encode((const char*)m_graph.samples(), wavetableSize * sizeof(float), sampleString);
 	_this.setAttribute("sampleShape", sampleString);
 
 	// save LED normalize
@@ -225,7 +208,7 @@ void bitInvader::lengthChanged()
 void bitInvader::samplesChanged(int _begin, int _end)
 {
 	normalize();
-	//engine::getSongEditor()->setModified();
+	// engine::getSongEditor()->setModified();
 }
 
 void bitInvader::normalize()
@@ -244,13 +227,9 @@ void bitInvader::normalize()
 	m_normalizeFactor = 1.0 / max;
 }
 
-QString bitInvader::nodeName() const
-{
-	return (bitinvader_plugin_descriptor.name);
-}
+QString bitInvader::nodeName() const { return (bitinvader_plugin_descriptor.name); }
 
-void bitInvader::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void bitInvader::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL)
 	{
@@ -265,10 +244,7 @@ void bitInvader::playNote(NotePlayHandle* _n,
 			factor = m_normalizeFactor;
 		}
 
-		_n->m_pluginData = new bSynth(
-			const_cast<float*>(m_graph.samples()),
-			_n,
-			m_interpolation.value(), factor,
+		_n->m_pluginData = new bSynth(const_cast<float*>(m_graph.samples()), _n, m_interpolation.value(), factor,
 			Engine::mixer()->processingSampleRate());
 	}
 
@@ -290,18 +266,11 @@ void bitInvader::playNote(NotePlayHandle* _n,
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
 }
 
-void bitInvader::deleteNotePluginData(NotePlayHandle* _n)
-{
-	delete static_cast<bSynth*>(_n->m_pluginData);
-}
+void bitInvader::deleteNotePluginData(NotePlayHandle* _n) { delete static_cast<bSynth*>(_n->m_pluginData); }
 
-PluginView* bitInvader::instantiateView(QWidget* _parent)
-{
-	return (new bitInvaderView(this, _parent));
-}
+PluginView* bitInvader::instantiateView(QWidget* _parent) { return (new bitInvaderView(this, _parent)); }
 
-bitInvaderView::bitInvaderView(Instrument* _instrument,
-	QWidget* _parent)
+bitInvaderView::bitInvaderView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 	setAutoFillBackground(true);
@@ -319,107 +288,74 @@ bitInvaderView::bitInvaderView(Instrument* _instrument,
 	m_graph->setAutoFillBackground(true);
 	m_graph->setGraphColor(QColor(255, 255, 255));
 
-	ToolTip::add(m_graph, tr("Draw your own waveform here "
-							 "by dragging your mouse on this graph."));
+	ToolTip::add(m_graph,
+		tr("Draw your own waveform here "
+		   "by dragging your mouse on this graph."));
 
 	pal = QPalette();
-	pal.setBrush(backgroundRole(),
-		PLUGIN_NAME::getIconPixmap("wavegraph"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
 	m_graph->setPalette(pal);
 
 	m_sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
 	m_sinWaveBtn->move(131, 205);
-	m_sinWaveBtn->setActiveGraphic(embed::getIconPixmap(
-		"sin_wave_active"));
-	m_sinWaveBtn->setInactiveGraphic(embed::getIconPixmap(
-		"sin_wave_inactive"));
-	ToolTip::add(m_sinWaveBtn,
-		tr("Sine wave"));
+	m_sinWaveBtn->setActiveGraphic(embed::getIconPixmap("sin_wave_active"));
+	m_sinWaveBtn->setInactiveGraphic(embed::getIconPixmap("sin_wave_inactive"));
+	ToolTip::add(m_sinWaveBtn, tr("Sine wave"));
 
 	m_triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	m_triangleWaveBtn->move(131 + 14, 205);
-	m_triangleWaveBtn->setActiveGraphic(
-		embed::getIconPixmap("triangle_wave_active"));
-	m_triangleWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap("triangle_wave_inactive"));
-	ToolTip::add(m_triangleWaveBtn,
-		tr("Triangle wave"));
+	m_triangleWaveBtn->setActiveGraphic(embed::getIconPixmap("triangle_wave_active"));
+	m_triangleWaveBtn->setInactiveGraphic(embed::getIconPixmap("triangle_wave_inactive"));
+	ToolTip::add(m_triangleWaveBtn, tr("Triangle wave"));
 
 	m_sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
 	m_sawWaveBtn->move(131 + 14 * 2, 205);
-	m_sawWaveBtn->setActiveGraphic(embed::getIconPixmap(
-		"saw_wave_active"));
-	m_sawWaveBtn->setInactiveGraphic(embed::getIconPixmap(
-		"saw_wave_inactive"));
-	ToolTip::add(m_sawWaveBtn,
-		tr("Saw wave"));
+	m_sawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
+	m_sawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
+	ToolTip::add(m_sawWaveBtn, tr("Saw wave"));
 
 	m_sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	m_sqrWaveBtn->move(131 + 14 * 3, 205);
-	m_sqrWaveBtn->setActiveGraphic(embed::getIconPixmap(
-		"square_wave_active"));
-	m_sqrWaveBtn->setInactiveGraphic(embed::getIconPixmap(
-		"square_wave_inactive"));
-	ToolTip::add(m_sqrWaveBtn,
-		tr("Square wave"));
+	m_sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
+	m_sqrWaveBtn->setInactiveGraphic(embed::getIconPixmap("square_wave_inactive"));
+	ToolTip::add(m_sqrWaveBtn, tr("Square wave"));
 
-	m_whiteNoiseWaveBtn = new PixmapButton(this,
-		tr("White noise"));
+	m_whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise"));
 	m_whiteNoiseWaveBtn->move(131 + 14 * 4, 205);
-	m_whiteNoiseWaveBtn->setActiveGraphic(
-		embed::getIconPixmap("white_noise_wave_active"));
-	m_whiteNoiseWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap("white_noise_wave_inactive"));
-	ToolTip::add(m_whiteNoiseWaveBtn,
-		tr("White noise"));
+	m_whiteNoiseWaveBtn->setActiveGraphic(embed::getIconPixmap("white_noise_wave_active"));
+	m_whiteNoiseWaveBtn->setInactiveGraphic(embed::getIconPixmap("white_noise_wave_inactive"));
+	ToolTip::add(m_whiteNoiseWaveBtn, tr("White noise"));
 
 	m_usrWaveBtn = new PixmapButton(this, tr("User-defined wave"));
 	m_usrWaveBtn->move(131 + 14 * 5, 205);
-	m_usrWaveBtn->setActiveGraphic(embed::getIconPixmap(
-		"usr_wave_active"));
-	m_usrWaveBtn->setInactiveGraphic(embed::getIconPixmap(
-		"usr_wave_inactive"));
-	ToolTip::add(m_usrWaveBtn,
-		tr("User-defined wave"));
+	m_usrWaveBtn->setActiveGraphic(embed::getIconPixmap("usr_wave_active"));
+	m_usrWaveBtn->setInactiveGraphic(embed::getIconPixmap("usr_wave_inactive"));
+	ToolTip::add(m_usrWaveBtn, tr("User-defined wave"));
 
 	m_smoothBtn = new PixmapButton(this, tr("Smooth waveform"));
 	m_smoothBtn->move(131 + 14 * 6, 205);
-	m_smoothBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap(
-		"smooth_active"));
-	m_smoothBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(
-		"smooth_inactive"));
-	ToolTip::add(m_smoothBtn,
-		tr("Smooth waveform"));
+	m_smoothBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("smooth_active"));
+	m_smoothBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("smooth_inactive"));
+	ToolTip::add(m_smoothBtn, tr("Smooth waveform"));
 
-	m_interpolationToggle = new LedCheckBox("Interpolation", this,
-		tr("Interpolation"), LedCheckBox::Yellow);
+	m_interpolationToggle = new LedCheckBox("Interpolation", this, tr("Interpolation"), LedCheckBox::Yellow);
 	m_interpolationToggle->move(131, 221);
 
-	m_normalizeToggle = new LedCheckBox("Normalize", this,
-		tr("Normalize"), LedCheckBox::Green);
+	m_normalizeToggle = new LedCheckBox("Normalize", this, tr("Normalize"), LedCheckBox::Green);
 	m_normalizeToggle->move(131, 236);
 
-	connect(m_sinWaveBtn, SIGNAL(clicked()),
-		this, SLOT(sinWaveClicked()));
-	connect(m_triangleWaveBtn, SIGNAL(clicked()),
-		this, SLOT(triangleWaveClicked()));
-	connect(m_sawWaveBtn, SIGNAL(clicked()),
-		this, SLOT(sawWaveClicked()));
-	connect(m_sqrWaveBtn, SIGNAL(clicked()),
-		this, SLOT(sqrWaveClicked()));
-	connect(m_whiteNoiseWaveBtn, SIGNAL(clicked()),
-		this, SLOT(noiseWaveClicked()));
-	connect(m_usrWaveBtn, SIGNAL(clicked()),
-		this, SLOT(usrWaveClicked()));
+	connect(m_sinWaveBtn, SIGNAL(clicked()), this, SLOT(sinWaveClicked()));
+	connect(m_triangleWaveBtn, SIGNAL(clicked()), this, SLOT(triangleWaveClicked()));
+	connect(m_sawWaveBtn, SIGNAL(clicked()), this, SLOT(sawWaveClicked()));
+	connect(m_sqrWaveBtn, SIGNAL(clicked()), this, SLOT(sqrWaveClicked()));
+	connect(m_whiteNoiseWaveBtn, SIGNAL(clicked()), this, SLOT(noiseWaveClicked()));
+	connect(m_usrWaveBtn, SIGNAL(clicked()), this, SLOT(usrWaveClicked()));
 
-	connect(m_smoothBtn, SIGNAL(clicked()),
-		this, SLOT(smoothClicked()));
+	connect(m_smoothBtn, SIGNAL(clicked()), this, SLOT(smoothClicked()));
 
-	connect(m_interpolationToggle, SIGNAL(toggled(bool)),
-		this, SLOT(interpolationToggled(bool)));
+	connect(m_interpolationToggle, SIGNAL(toggled(bool)), this, SLOT(interpolationToggled(bool)));
 
-	connect(m_normalizeToggle, SIGNAL(toggled(bool)),
-		this, SLOT(normalizeToggled(bool)));
+	connect(m_normalizeToggle, SIGNAL(toggled(bool)), this, SLOT(normalizeToggled(bool)));
 }
 
 void bitInvaderView::modelChanged()
@@ -490,10 +426,7 @@ void bitInvaderView::interpolationToggled(bool value)
 	Engine::getSong()->setModified();
 }
 
-void bitInvaderView::normalizeToggled(bool value)
-{
-	Engine::getSong()->setModified();
-}
+void bitInvaderView::normalizeToggled(bool value) { Engine::getSong()->setModified(); }
 
 extern "C"
 {

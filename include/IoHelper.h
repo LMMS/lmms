@@ -32,8 +32,7 @@
 std::wstring toWString(const std::string& s)
 {
 	std::wstring ret;
-	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(),
-		s.length(), nullptr, 0);
+	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s.length(), nullptr, 0);
 	if (len == 0)
 	{
 		return ret;

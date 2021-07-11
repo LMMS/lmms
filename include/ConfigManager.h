@@ -2,7 +2,7 @@
  * ConfigManager.h - class ConfigManager, a class for managing LMMS-configuration
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -64,10 +64,7 @@ public:
 		return s_instanceOfMe;
 	}
 
-	const QString& workingDir() const
-	{
-		return m_workingDir;
-	}
+	const QString& workingDir() const { return m_workingDir; }
 
 	void initPortableWorkingDir();
 
@@ -75,144 +72,63 @@ public:
 
 	void initDevelopmentWorkingDir();
 
-	const QString& dataDir() const
-	{
-		return m_dataDir;
-	}
+	const QString& dataDir() const { return m_dataDir; }
 
-	QString factoryProjectsDir() const
-	{
-		return dataDir() + PROJECTS_PATH;
-	}
+	QString factoryProjectsDir() const { return dataDir() + PROJECTS_PATH; }
 
-	QString factoryTemplatesDir() const
-	{
-		return factoryProjectsDir() + TEMPLATE_PATH;
-	}
+	QString factoryTemplatesDir() const { return factoryProjectsDir() + TEMPLATE_PATH; }
 
-	QString factoryPresetsDir() const
-	{
-		return dataDir() + PRESETS_PATH;
-	}
+	QString factoryPresetsDir() const { return dataDir() + PRESETS_PATH; }
 
-	QString factorySamplesDir() const
-	{
-		return dataDir() + SAMPLES_PATH;
-	}
+	QString factorySamplesDir() const { return dataDir() + SAMPLES_PATH; }
 
-	QString userProjectsDir() const
-	{
-		return workingDir() + PROJECTS_PATH;
-	}
+	QString userProjectsDir() const { return workingDir() + PROJECTS_PATH; }
 
-	QString userTemplateDir() const
-	{
-		return workingDir() + TEMPLATE_PATH;
-	}
+	QString userTemplateDir() const { return workingDir() + TEMPLATE_PATH; }
 
-	QString userPresetsDir() const
-	{
-		return workingDir() + PRESETS_PATH;
-	}
+	QString userPresetsDir() const { return workingDir() + PRESETS_PATH; }
 
-	QString userSamplesDir() const
-	{
-		return workingDir() + SAMPLES_PATH;
-	}
+	QString userSamplesDir() const { return workingDir() + SAMPLES_PATH; }
 
-	const QString& vstDir() const
-	{
-		return m_vstDir;
-	}
+	const QString& vstDir() const { return m_vstDir; }
 
-	const QString& ladspaDir() const
-	{
-		return m_ladspaDir;
-	}
+	const QString& ladspaDir() const { return m_ladspaDir; }
 
-	const QString& sf2Dir() const
-	{
-		return m_sf2Dir;
-	}
+	const QString& sf2Dir() const { return m_sf2Dir; }
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	const QString& sf2File() const
-	{
-		return m_sf2File;
-	}
+	const QString& sf2File() const { return m_sf2File; }
 #endif
 
 #ifdef LMMS_HAVE_STK
-	const QString& stkDir() const
-	{
-		return m_stkDir;
-	}
+	const QString& stkDir() const { return m_stkDir; }
 #endif
 
-	const QString& gigDir() const
-	{
-		return m_gigDir;
-	}
+	const QString& gigDir() const { return m_gigDir; }
 
-	QString userVstDir() const
-	{
-		return m_vstDir;
-	}
+	QString userVstDir() const { return m_vstDir; }
 
-	QString userLadspaDir() const
-	{
-		return workingDir() + LADSPA_PATH;
-	}
+	QString userLadspaDir() const { return workingDir() + LADSPA_PATH; }
 
-	QString userSf2Dir() const
-	{
-		return workingDir() + SF2_PATH;
-	}
+	QString userSf2Dir() const { return workingDir() + SF2_PATH; }
 
-	QString userGigDir() const
-	{
-		return workingDir() + GIG_PATH;
-	}
+	QString userGigDir() const { return workingDir() + GIG_PATH; }
 
-	QString defaultThemeDir() const
-	{
-		return m_dataDir + DEFAULT_THEME_PATH;
-	}
+	QString defaultThemeDir() const { return m_dataDir + DEFAULT_THEME_PATH; }
 
-	QString themeDir() const
-	{
-		return m_themeDir;
-	}
+	QString themeDir() const { return m_themeDir; }
 
-	const QString& backgroundPicFile() const
-	{
-		return m_backgroundPicFile;
-	}
+	const QString& backgroundPicFile() const { return m_backgroundPicFile; }
 
-	QString trackIconsDir() const
-	{
-		return m_dataDir + TRACK_ICON_PATH;
-	}
+	QString trackIconsDir() const { return m_dataDir + TRACK_ICON_PATH; }
 
-	const QString recoveryFile() const
-	{
-		return m_workingDir + "recover.mmp";
-	}
+	const QString recoveryFile() const { return m_workingDir + "recover.mmp"; }
 
-	inline const QStringList& recentlyOpenedProjects() const
-	{
-		return m_recentlyOpenedProjects;
-	}
+	inline const QStringList& recentlyOpenedProjects() const { return m_recentlyOpenedProjects; }
 
-	QString localeDir() const
-	{
-		return m_dataDir + LOCALE_PATH;
-	}
+	QString localeDir() const { return m_dataDir + LOCALE_PATH; }
 
-	const QString& version() const
-	{
-		return m_version;
-	}
+	const QString& version() const { return m_version; }
 
 	// Used when the configversion attribute is not present in a configuration file.
 	// Returns the appropriate config file version based on the LMMS version.
@@ -228,13 +144,9 @@ public:
 
 	void addRecentlyOpenedProject(const QString& _file);
 
-	const QString& value(const QString& cls,
-		const QString& attribute) const;
-	const QString& value(const QString& cls,
-		const QString& attribute,
-		const QString& defaultVal) const;
-	void setValue(const QString& cls, const QString& attribute,
-		const QString& value);
+	const QString& value(const QString& cls, const QString& attribute) const;
+	const QString& value(const QString& cls, const QString& attribute, const QString& defaultVal) const;
+	void setValue(const QString& cls, const QString& attribute, const QString& value);
 	void deleteValue(const QString& cls, const QString& attribute);
 
 	void loadConfigFile(const QString& configFile = "");

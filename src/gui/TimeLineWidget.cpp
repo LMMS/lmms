@@ -40,9 +40,8 @@
 
 QPixmap* TimeLineWidget::s_posMarkerPixmap = NULL;
 
-TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb,
-	Song::PlayPos& pos, const TimePos& begin, Song::PlayModes mode,
-	QWidget* parent)
+TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, Song::PlayPos& pos,
+	const TimePos& begin, Song::PlayModes mode, QWidget* parent)
 	: QWidget(parent)
 	, m_inactiveLoopColor(52, 63, 53, 64)
 	, m_inactiveLoopBrush(QColor(255, 255, 255, 32))
@@ -73,8 +72,7 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb,
 
 	if (s_posMarkerPixmap == NULL)
 	{
-		s_posMarkerPixmap = new QPixmap(embed::getIconPixmap(
-			"playpos_marker"));
+		s_posMarkerPixmap = new QPixmap(embed::getIconPixmap("playpos_marker"));
 	}
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -86,11 +84,9 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb,
 	m_pos.m_timeLine = this;
 
 	QTimer* updateTimer = new QTimer(this);
-	connect(updateTimer, SIGNAL(timeout()),
-		this, SLOT(updatePosition()));
+	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
 	updateTimer->start(1000 / 60); // 60 fps
-	connect(Engine::getSong(), SIGNAL(timeSignatureChanged(int, int)),
-		this, SLOT(update()));
+	connect(Engine::getSong(), SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()));
 }
 
 TimeLineWidget::~TimeLineWidget()
@@ -117,31 +113,24 @@ void TimeLineWidget::addToolButtons(QToolBar* _tool_bar)
 	autoScroll->setGeneralToolTip(tr("Auto scrolling"));
 	autoScroll->addState(embed::getIconPixmap("autoscroll_on"));
 	autoScroll->addState(embed::getIconPixmap("autoscroll_off"));
-	connect(autoScroll, SIGNAL(changedState(int)), this,
-		SLOT(toggleAutoScroll(int)));
+	connect(autoScroll, SIGNAL(changedState(int)), this, SLOT(toggleAutoScroll(int)));
 
 	NStateButton* loopPoints = new NStateButton(_tool_bar);
 	loopPoints->setGeneralToolTip(tr("Loop points"));
 	loopPoints->addState(embed::getIconPixmap("loop_points_off"));
 	loopPoints->addState(embed::getIconPixmap("loop_points_on"));
-	connect(loopPoints, SIGNAL(changedState(int)), this,
-		SLOT(toggleLoopPoints(int)));
-	connect(this, SIGNAL(loopPointStateLoaded(int)), loopPoints,
-		SLOT(changeState(int)));
+	connect(loopPoints, SIGNAL(changedState(int)), this, SLOT(toggleLoopPoints(int)));
+	connect(this, SIGNAL(loopPointStateLoaded(int)), loopPoints, SLOT(changeState(int)));
 
 	NStateButton* behaviourAtStop = new NStateButton(_tool_bar);
-	behaviourAtStop->addState(embed::getIconPixmap("back_to_zero"),
-		tr("After stopping go back to beginning"));
+	behaviourAtStop->addState(embed::getIconPixmap("back_to_zero"), tr("After stopping go back to beginning"));
 	behaviourAtStop->addState(embed::getIconPixmap("back_to_start"),
 		tr("After stopping go back to "
 		   "position at which playing was "
 		   "started"));
-	behaviourAtStop->addState(embed::getIconPixmap("keep_stop_position"),
-		tr("After stopping keep position"));
-	connect(behaviourAtStop, SIGNAL(changedState(int)), this,
-		SLOT(toggleBehaviourAtStop(int)));
-	connect(this, SIGNAL(loadBehaviourAtStop(int)), behaviourAtStop,
-		SLOT(changeState(int)));
+	behaviourAtStop->addState(embed::getIconPixmap("keep_stop_position"), tr("After stopping keep position"));
+	connect(behaviourAtStop, SIGNAL(changedState(int)), this, SLOT(toggleBehaviourAtStop(int)));
+	connect(this, SIGNAL(loadBehaviourAtStop(int)), behaviourAtStop, SLOT(changeState(int)));
 	behaviourAtStop->changeState(BackToStart);
 
 	_tool_bar->addWidget(autoScroll);
@@ -161,8 +150,7 @@ void TimeLineWidget::loadSettings(const QDomElement& _this)
 {
 	m_loopPos[0] = _this.attribute("lp0pos").toInt();
 	m_loopPos[1] = _this.attribute("lp1pos").toInt();
-	m_loopPoints = static_cast<LoopPointStates>(
-		_this.attribute("lpstate").toInt());
+	m_loopPoints = static_cast<LoopPointStates>(_this.attribute("lpstate").toInt());
 	update();
 	emit loopPointStateLoaded(m_loopPoints);
 
@@ -185,10 +173,7 @@ void TimeLineWidget::updatePosition(const TimePos&)
 	}
 }
 
-void TimeLineWidget::toggleAutoScroll(int _n)
-{
-	m_autoScroll = static_cast<AutoScrollStates>(_n);
-}
+void TimeLineWidget::toggleAutoScroll(int _n) { m_autoScroll = static_cast<AutoScrollStates>(_n); }
 
 void TimeLineWidget::toggleLoopPoints(int _n)
 {
@@ -196,10 +181,7 @@ void TimeLineWidget::toggleLoopPoints(int _n)
 	update();
 }
 
-void TimeLineWidget::toggleBehaviourAtStop(int _n)
-{
-	m_behaviourAtStop = static_cast<BehaviourAtStopStates>(_n);
-}
+void TimeLineWidget::toggleBehaviourAtStop(int _n) { m_behaviourAtStop = static_cast<BehaviourAtStopStates>(_n); }
 
 void TimeLineWidget::paintEvent(QPaintEvent*)
 {
@@ -242,9 +224,7 @@ void TimeLineWidget::paintEvent(QPaintEvent*)
 	for (int i = 0; x + i * m_ppb < width(); ++i)
 	{
 		++barNumber;
-		if ((barNumber - 1) %
-				qMax(1, qRound(1.0f / 3.0f * TimePos::ticksPerBar() / m_ppb)) ==
-			0)
+		if ((barNumber - 1) % qMax(1, qRound(1.0f / 3.0f * TimePos::ticksPerBar() / m_ppb)) == 0)
 		{
 			const int cx = x + qRound(i * m_ppb);
 			p.setPen(barLineColor);
@@ -298,7 +278,8 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 	else if (event->button() == Qt::RightButton)
 	{
 		m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const TimePos t = m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
+		const TimePos t =
+			m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
 		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1]) / 2;
 
 		if (t < loopMid)
@@ -322,8 +303,7 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage(tr("Hint"),
-			tr("Press <%1> to disable magnetic loop points.").arg(UI_CTRL_KEY),
-			embed::getIconPixmap("hint"), 0);
+			tr("Press <%1> to disable magnetic loop points.").arg(UI_CTRL_KEY), embed::getIconPixmap("hint"), 0);
 	}
 	mouseMoveEvent(event);
 }
@@ -331,7 +311,8 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 void TimeLineWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
-	const TimePos t = m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
+	const TimePos t =
+		m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
 
 	switch (m_action)
 	{
@@ -340,7 +321,7 @@ void TimeLineWidget::mouseMoveEvent(QMouseEvent* event)
 		Engine::getSong()->setToTime(t, m_mode);
 		if (!(Engine::getSong()->isPlaying()))
 		{
-			//Song::Mode_None is used when nothing is being played.
+			// Song::Mode_None is used when nothing is being played.
 			Engine::getSong()->setToTime(t, Song::Mode_None);
 		}
 		m_pos.setCurrentFrame(0);

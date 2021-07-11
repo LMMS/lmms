@@ -2,7 +2,7 @@
  * Xpressive.cpp - Instrument which uses a mathematical formula parser
  *
  * Copyright (c) 2016-2017 Orr Dvori
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -49,10 +49,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = {STRINGIFY(
-																		PLUGIN_NAME),
-		"Xpressive", QT_TRANSLATE_NOOP("PluginBrowser", "Mathematical expression parser"), "Orr Dvori", 0x0100,
-		Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
+	Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Xpressive",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Mathematical expression parser"), "Orr Dvori", 0x0100, Plugin::Instrument,
+		new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 /*
@@ -98,13 +97,12 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track)
 	, m_W3(GRAPH_LENGTH)
 	, m_exprValid(false, this)
 {
-	m_outputExpression[0] = "sinew(integrate(f*(1+0.05sinew(12t))))*(2^(-(1.1+A2)*t)*(0.4+0.1(1+A3)+0.4sinew((2.5+2A1)t))^2)";
+	m_outputExpression[0] =
+		"sinew(integrate(f*(1+0.05sinew(12t))))*(2^(-(1.1+A2)*t)*(0.4+0.1(1+A3)+0.4sinew((2.5+2A1)t))^2)";
 	m_outputExpression[1] = "expw(integrate(f*atan(500t)*2/pi))*0.5+0.12";
 }
 
-Xpressive::~Xpressive()
-{
-}
+Xpressive::~Xpressive() {}
 
 void Xpressive::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
@@ -116,17 +114,14 @@ void Xpressive::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	_this.setAttribute("W1", QString(m_wavesExpression[0]));
 	// Save sample shape base64-encoded
 	QString sampleString;
-	base64::encode((const char*)m_rawgraphW1.samples(),
-		m_rawgraphW1.length() * sizeof(float), sampleString);
+	base64::encode((const char*)m_rawgraphW1.samples(), m_rawgraphW1.length() * sizeof(float), sampleString);
 	_this.setAttribute("W1sample", sampleString);
 
 	_this.setAttribute("W2", QString(m_wavesExpression[1]));
-	base64::encode((const char*)m_rawgraphW2.samples(),
-		m_rawgraphW2.length() * sizeof(float), sampleString);
+	base64::encode((const char*)m_rawgraphW2.samples(), m_rawgraphW2.length() * sizeof(float), sampleString);
 	_this.setAttribute("W2sample", sampleString);
 	_this.setAttribute("W3", QString(m_wavesExpression[2]));
-	base64::encode((const char*)m_rawgraphW3.samples(),
-		m_rawgraphW3.length() * sizeof(float), sampleString);
+	base64::encode((const char*)m_rawgraphW3.samples(), m_rawgraphW3.length() * sizeof(float), sampleString);
 	_this.setAttribute("W3sample", sampleString);
 	m_smoothW1.saveSettings(_doc, _this, "smoothW1");
 	m_smoothW2.saveSettings(_doc, _this, "smoothW2");
@@ -187,10 +182,7 @@ void Xpressive::loadSettings(const QDomElement& _this)
 	m_W3.copyFrom(&m_graphW3);
 }
 
-QString Xpressive::nodeName() const
-{
-	return (xpressive_plugin_descriptor.name);
-}
+QString Xpressive::nodeName() const { return (xpressive_plugin_descriptor.name); }
 
 void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer)
 {
@@ -201,24 +193,25 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer)
 	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == NULL)
 	{
 
-		ExprFront* exprO1 = new ExprFront(m_outputExpression[0].constData(), Engine::mixer()->processingSampleRate()); //give the "last" function a whole second
+		ExprFront* exprO1 = new ExprFront(m_outputExpression[0].constData(),
+			Engine::mixer()->processingSampleRate()); // give the "last" function a whole second
 		ExprFront* exprO2 = new ExprFront(m_outputExpression[1].constData(), Engine::mixer()->processingSampleRate());
 
-		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
-			//add the constants and the variables to the expression.
-			e->add_constant("key", nph->key());								   //the key that was pressed.
+		auto init_expression_step1 = [this, nph](ExprFront* e) { // lambda function to init exprO1 and exprO2
+			// add the constants and the variables to the expression.
+			e->add_constant("key", nph->key());								   // the key that was pressed.
 			e->add_constant("bnote", nph->instrumentTrack()->baseNote());	   // the base note
 			e->add_constant("srate", Engine::mixer()->processingSampleRate()); // sample rate of the mixer
-			e->add_constant("v", nph->getVolume() / 255.0);					   //volume of the note.
-			e->add_constant("tempo", Engine::getSong()->getTempo());		   //tempo of the song.
-			e->add_variable("A1", m_A1);									   //A1,A2,A3: general purpose input controls.
+			e->add_constant("v", nph->getVolume() / 255.0);					   // volume of the note.
+			e->add_constant("tempo", Engine::getSong()->getTempo());		   // tempo of the song.
+			e->add_variable("A1", m_A1); // A1,A2,A3: general purpose input controls.
 			e->add_variable("A2", m_A2);
 			e->add_variable("A3", m_A3);
 		};
 		init_expression_step1(exprO1);
 		init_expression_step1(exprO2);
 
-		m_W1.setInterpolate(m_interpolateW1.value()); //set interpolation according to the user selection.
+		m_W1.setInterpolate(m_interpolateW1.value()); // set interpolation according to the user selection.
 		m_W2.setInterpolate(m_interpolateW2.value());
 		m_W3.setInterpolate(m_interpolateW3.value());
 		nph->m_pluginData = new ExprSynth(&m_W1, &m_W2, &m_W3, exprO1, exprO2, nph,
@@ -234,15 +227,9 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer)
 	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, nph);
 }
 
-void Xpressive::deleteNotePluginData(NotePlayHandle* nph)
-{
-	delete static_cast<ExprSynth*>(nph->m_pluginData);
-}
+void Xpressive::deleteNotePluginData(NotePlayHandle* nph) { delete static_cast<ExprSynth*>(nph->m_pluginData); }
 
-PluginView* Xpressive::instantiateView(QWidget* parent)
-{
-	return (new XpressiveView(this, parent));
-}
+PluginView* Xpressive::instantiateView(QWidget* parent) { return (new XpressiveView(this, parent)); }
 
 class XpressiveKnob : public Knob
 {
@@ -298,8 +285,9 @@ XpressiveView::XpressiveView(Instrument* _instrument, QWidget* _parent)
 	m_graph->setGraphColor(QColor(255, 255, 255));
 	m_graph->setEnabled(false);
 
-	ToolTip::add(m_graph, tr("Draw your own waveform here "
-							 "by dragging your mouse on this graph."));
+	ToolTip::add(m_graph,
+		tr("Draw your own waveform here "
+		   "by dragging your mouse on this graph."));
 
 	pal = QPalette();
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
@@ -366,8 +354,7 @@ XpressiveView::XpressiveView(Instrument* _instrument, QWidget* _parent)
 
 	m_moogWaveBtn = new PixmapButton(this, tr("Moog-saw wave"));
 	m_moogWaveBtn->move(4, ROW_WAVEBTN - 14);
-	m_moogWaveBtn->setActiveGraphic(
-		embed::getIconPixmap("moog_saw_wave_active"));
+	m_moogWaveBtn->setActiveGraphic(embed::getIconPixmap("moog_saw_wave_active"));
 	m_moogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));
 	ToolTip::add(m_moogWaveBtn, tr("Moog-saw wave"));
 
@@ -391,33 +378,26 @@ XpressiveView::XpressiveView(Instrument* _instrument, QWidget* _parent)
 
 	m_triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	m_triangleWaveBtn->move(4 + 14, ROW_WAVEBTN);
-	m_triangleWaveBtn->setActiveGraphic(
-		embed::getIconPixmap("triangle_wave_active"));
-	m_triangleWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap("triangle_wave_inactive"));
+	m_triangleWaveBtn->setActiveGraphic(embed::getIconPixmap("triangle_wave_active"));
+	m_triangleWaveBtn->setInactiveGraphic(embed::getIconPixmap("triangle_wave_inactive"));
 	ToolTip::add(m_triangleWaveBtn, tr("Triangle wave"));
 
 	m_sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	m_sqrWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN);
 	m_sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
-	m_sqrWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap("square_wave_inactive"));
+	m_sqrWaveBtn->setInactiveGraphic(embed::getIconPixmap("square_wave_inactive"));
 	ToolTip::add(m_sqrWaveBtn, tr("Square wave"));
 
 	m_whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise"));
 	m_whiteNoiseWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN);
-	m_whiteNoiseWaveBtn->setActiveGraphic(
-		embed::getIconPixmap("white_noise_wave_active"));
-	m_whiteNoiseWaveBtn->setInactiveGraphic(
-		embed::getIconPixmap("white_noise_wave_inactive"));
+	m_whiteNoiseWaveBtn->setActiveGraphic(embed::getIconPixmap("white_noise_wave_active"));
+	m_whiteNoiseWaveBtn->setInactiveGraphic(embed::getIconPixmap("white_noise_wave_inactive"));
 	ToolTip::add(m_whiteNoiseWaveBtn, tr("White noise"));
 
-	m_waveInterpolate = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),
-		LedCheckBox::Green);
+	m_waveInterpolate = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"), LedCheckBox::Green);
 	m_waveInterpolate->move(2, 230);
 
-	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
-		LedCheckBox::Red);
+	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"), LedCheckBox::Red);
 	m_expressionValidToggle->move(168, EXPR_TEXT_Y + EXPR_TEXT_H - 2);
 	m_expressionValidToggle->setEnabled(false);
 
@@ -460,30 +440,21 @@ XpressiveView::XpressiveView(Instrument* _instrument, QWidget* _parent)
 	m_smoothKnob->setHintText(tr("Smoothness"), "");
 	m_smoothKnob->move(66, EXPR_TEXT_Y + EXPR_TEXT_H + 4);
 
-	connect(m_generalPurposeKnob[0], SIGNAL(sliderMoved(float)), this,
-		SLOT(expressionChanged()));
-	connect(m_generalPurposeKnob[1], SIGNAL(sliderMoved(float)), this,
-		SLOT(expressionChanged()));
-	connect(m_generalPurposeKnob[2], SIGNAL(sliderMoved(float)), this,
-		SLOT(expressionChanged()));
+	connect(m_generalPurposeKnob[0], SIGNAL(sliderMoved(float)), this, SLOT(expressionChanged()));
+	connect(m_generalPurposeKnob[1], SIGNAL(sliderMoved(float)), this, SLOT(expressionChanged()));
+	connect(m_generalPurposeKnob[2], SIGNAL(sliderMoved(float)), this, SLOT(expressionChanged()));
 
-	connect(m_expressionEditor, SIGNAL(textChanged()), this,
-		SLOT(expressionChanged()));
-	connect(m_smoothKnob, SIGNAL(sliderMoved(float)), this,
-		SLOT(smoothChanged()));
-	connect(m_graph, SIGNAL(drawn()), this,
-		SLOT(graphDrawn()));
+	connect(m_expressionEditor, SIGNAL(textChanged()), this, SLOT(expressionChanged()));
+	connect(m_smoothKnob, SIGNAL(sliderMoved(float)), this, SLOT(smoothChanged()));
+	connect(m_graph, SIGNAL(drawn()), this, SLOT(graphDrawn()));
 
 	connect(m_sinWaveBtn, SIGNAL(clicked()), this, SLOT(sinWaveClicked()));
-	connect(m_triangleWaveBtn, SIGNAL(clicked()), this,
-		SLOT(triangleWaveClicked()));
+	connect(m_triangleWaveBtn, SIGNAL(clicked()), this, SLOT(triangleWaveClicked()));
 	connect(m_expWaveBtn, SIGNAL(clicked()), this, SLOT(expWaveClicked()));
-	connect(m_moogWaveBtn, SIGNAL(clicked()), this,
-		SLOT(moogSawWaveClicked()));
+	connect(m_moogWaveBtn, SIGNAL(clicked()), this, SLOT(moogSawWaveClicked()));
 	connect(m_sawWaveBtn, SIGNAL(clicked()), this, SLOT(sawWaveClicked()));
 	connect(m_sqrWaveBtn, SIGNAL(clicked()), this, SLOT(sqrWaveClicked()));
-	connect(m_whiteNoiseWaveBtn, SIGNAL(clicked()), this,
-		SLOT(noiseWaveClicked()));
+	connect(m_whiteNoiseWaveBtn, SIGNAL(clicked()), this, SLOT(noiseWaveClicked()));
 	connect(m_usrWaveBtn, SIGNAL(clicked()), this, SLOT(usrWaveClicked()));
 	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(helpClicked()));
 
@@ -496,9 +467,7 @@ XpressiveView::XpressiveView(Instrument* _instrument, QWidget* _parent)
 	updateLayout();
 }
 
-XpressiveView::~XpressiveView()
-{
-}
+XpressiveView::~XpressiveView() {}
 
 void XpressiveView::expressionChanged()
 {
@@ -831,22 +800,28 @@ QString XpressiveHelpView::s_helpText =
 	"<h4>Available variables:</h4><br>"
 	"<b>t</b> - Time in seconds.<br>"
 	"<b>f</b> - Note's pitched frequency. Available only in the output expressions.<br>"
-	"<b>key</b> - Note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. Available only in the output expressions.<br>"
+	"<b>key</b> - Note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. Available only in the output "
+	"expressions.<br>"
 	"<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
 	"<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 	"<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
-	"<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
-	"<b>rel</b> - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.<br>"
-	"<b>trel</b> - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.<br>"
+	"<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output "
+	"expressions.<br>"
+	"<b>rel</b> - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output "
+	"expressions.<br>"
+	"<b>trel</b> - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting "
+	"seconds.<br>"
 	"The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob<br>"
-	"<b>seed</b> - A random value that remains consistent in the lifetime of a single wave. Meant to be used with <b>randsv</b><br>"
+	"<b>seed</b> - A random value that remains consistent in the lifetime of a single wave. Meant to be used with "
+	"<b>randsv</b><br>"
 	"<b>A1, A2, A3</b> - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].<br>"
 	"<h4>Available functions:</h4><br>"
 	"<b>W1, W2, W3</b> - As mentioned before. You can reference them only in O1 and O2.<br>"
 	"<b>cent(x)</b> - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
 	"100 cents equals one semitone<br>"
 	"<b>semitone(x)</b> - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.<br>"
-	"<b>last(n)</b> - Gives you the last n'th evaluated sample. In O1 and O2 it keeps a whole second. Thus the argument n must be in the range [1,srate], or else, it will return 0.<br>"
+	"<b>last(n)</b> - Gives you the last n'th evaluated sample. In O1 and O2 it keeps a whole second. Thus the "
+	"argument n must be in the range [1,srate], or else, it will return 0.<br>"
 	"<b>integrate(x)</b> - Integrates x by delta t (It sums values and divides them by sample rate).<br>"
 	"If you use notes with automated frequency, you should use:<br>"
 	"sinew(integrate(f)) instead of sinew(t*f)<br>"
@@ -864,7 +839,8 @@ QString XpressiveHelpView::s_helpText =
 	"<b>trianglew(x)</b> - A triangle wave with period of 1.<br>"
 	"<b>squarew(x)</b> - A square wave with period of 1.<br>"
 	"<b>saww(x)</b> - A saw wave with period of 1.<br>"
-	"<b>clamp(min_val,x,max_val)</b> - If x is in range of (min_val,max_val) it returns x. Otherwise if it's greater than max_val it returns max_val, else returns min_val.<br>"
+	"<b>clamp(min_val,x,max_val)</b> - If x is in range of (min_val,max_val) it returns x. Otherwise if it's greater "
+	"than max_val it returns max_val, else returns min_val.<br>"
 	"<b>abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, "
 	"hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
 	"avg, sgn, mod, etc. are also available.</b><br>"
@@ -891,10 +867,7 @@ XpressiveHelpView::XpressiveHelpView()
 	parentWidget()->setWindowFlags(flags);
 }
 
-void XpressiveView::helpClicked()
-{
-	XpressiveHelpView::getInstance()->show();
-}
+void XpressiveView::helpClicked() { XpressiveHelpView::getInstance()->show(); }
 
 extern "C"
 {

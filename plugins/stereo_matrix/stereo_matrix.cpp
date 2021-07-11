@@ -2,7 +2,7 @@
  * stereo_matrix.cpp - stereo-matrix-effect-plugin
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -30,34 +30,20 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Stereo Matrix",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Plugin for freely manipulating stereo output"),
-			"Paul Giblock <drfaygo/at/gmail.com>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Stereo Matrix",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Plugin for freely manipulating stereo output"),
+		"Paul Giblock <drfaygo/at/gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
-stereoMatrixEffect::stereoMatrixEffect(
-	Model* _parent,
-	const Descriptor::SubPluginFeatures::Key* _key)
+stereoMatrixEffect::stereoMatrixEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&stereomatrix_plugin_descriptor, _parent, _key)
 	, m_smControls(this)
 {
 }
 
-stereoMatrixEffect::~stereoMatrixEffect()
-{
-}
+stereoMatrixEffect::~stereoMatrixEffect() {}
 
-bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf,
-	const fpp_t _frames)
+bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
 
 	// This appears to be used for determining whether or not to continue processing
@@ -82,13 +68,9 @@ bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf,
 		_buf[f][1] = r * d;
 
 		// Add it wet
-		_buf[f][0] += (m_smControls.m_llModel.value(f) * l +
-						  m_smControls.m_rlModel.value(f) * r) *
-			w;
+		_buf[f][0] += (m_smControls.m_llModel.value(f) * l + m_smControls.m_rlModel.value(f) * r) * w;
 
-		_buf[f][1] += (m_smControls.m_lrModel.value(f) * l +
-						  m_smControls.m_rrModel.value(f) * r) *
-			w;
+		_buf[f][1] += (m_smControls.m_lrModel.value(f) * l + m_smControls.m_rrModel.value(f) * r) * w;
 		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 	}
 
@@ -103,8 +85,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 	{
-		return (new stereoMatrixEffect(_parent,
-			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(
-				_data)));
+		return (new stereoMatrixEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data)));
 	}
 }

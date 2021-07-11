@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/yahoo/com>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -32,27 +32,11 @@ class nineButtonSelector : public QWidget, public IntModelView
 	Q_OBJECT
 
 public:
-	nineButtonSelector(QPixmap _button0_on,
-		QPixmap _button0_off,
-		QPixmap _button1_on,
-		QPixmap _button1_off,
-		QPixmap _button2_on,
-		QPixmap _button2_off,
-		QPixmap _button3_on,
-		QPixmap _button3_off,
-		QPixmap _button4_on,
-		QPixmap _button4_off,
-		QPixmap _button5_on,
-		QPixmap _button5_off,
-		QPixmap _button6_on,
-		QPixmap _button6_off,
-		QPixmap _button7_on,
-		QPixmap _button7_off,
-		QPixmap _button8_on,
-		QPixmap _button8_off,
-		int _default,
-		int _x, int _y,
-		QWidget* _parent);
+	nineButtonSelector(QPixmap _button0_on, QPixmap _button0_off, QPixmap _button1_on, QPixmap _button1_off,
+		QPixmap _button2_on, QPixmap _button2_off, QPixmap _button3_on, QPixmap _button3_off, QPixmap _button4_on,
+		QPixmap _button4_off, QPixmap _button5_on, QPixmap _button5_off, QPixmap _button6_on, QPixmap _button6_off,
+		QPixmap _button7_on, QPixmap _button7_off, QPixmap _button8_on, QPixmap _button8_off, int _default, int _x,
+		int _y, QWidget* _parent);
 	virtual ~nineButtonSelector();
 
 	//	inline int getSelected() {

@@ -1,7 +1,7 @@
 /*
  * Gb_Apu_Buffer.cpp - Gb_Apu subclass which allows direct buffer access
  * Copyright (c) 2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -40,18 +40,9 @@ blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate)
 }
 
 // Wrap Multi_Buffer::samples_avail()
-long Gb_Apu_Buffer::samples_avail() const
-{
-	return m_buf.samples_avail();
-}
+long Gb_Apu_Buffer::samples_avail() const { return m_buf.samples_avail(); }
 
 // Wrap Multi_Buffer::read_samples(...)
-long Gb_Apu_Buffer::read_samples(sample_t* out, long count)
-{
-	return m_buf.read_samples(out, count);
-}
+long Gb_Apu_Buffer::read_samples(sample_t* out, long count) { return m_buf.read_samples(out, count); }
 
-void Gb_Apu_Buffer::bass_freq(int freq)
-{
-	m_buf.bass_freq(freq);
-}
+void Gb_Apu_Buffer::bass_freq(int freq) { m_buf.bass_freq(freq); }

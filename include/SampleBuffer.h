@@ -63,30 +63,15 @@ public:
 		handleState(bool varyingPitch = false, int interpolationMode = SRC_LINEAR);
 		virtual ~handleState();
 
-		const f_cnt_t frameIndex() const
-		{
-			return m_frameIndex;
-		}
+		const f_cnt_t frameIndex() const { return m_frameIndex; }
 
-		void setFrameIndex(f_cnt_t index)
-		{
-			m_frameIndex = index;
-		}
+		void setFrameIndex(f_cnt_t index) { m_frameIndex = index; }
 
-		bool isBackwards() const
-		{
-			return m_isBackwards;
-		}
+		bool isBackwards() const { return m_isBackwards; }
 
-		void setBackwards(bool backwards)
-		{
-			m_isBackwards = backwards;
-		}
+		void setBackwards(bool backwards) { m_isBackwards = backwards; }
 
-		int interpolationMode() const
-		{
-			return m_interpolationMode;
-		}
+		int interpolationMode() const { return m_interpolationMode; }
 
 	private:
 		f_cnt_t m_frameIndex;
@@ -112,67 +97,29 @@ public:
 	virtual ~SampleBuffer();
 
 	bool play(
-		sampleFrame* ab,
-		handleState* state,
-		const fpp_t frames,
-		const float freq,
-		const LoopMode loopMode = LoopOff);
+		sampleFrame* ab, handleState* state, const fpp_t frames, const float freq, const LoopMode loopMode = LoopOff);
 
-	void visualize(
-		QPainter& p,
-		const QRect& dr,
-		const QRect& clip,
-		f_cnt_t fromFrame = 0,
-		f_cnt_t toFrame = 0);
-	inline void visualize(
-		QPainter& p,
-		const QRect& dr,
-		f_cnt_t fromFrame = 0,
-		f_cnt_t toFrame = 0)
+	void visualize(QPainter& p, const QRect& dr, const QRect& clip, f_cnt_t fromFrame = 0, f_cnt_t toFrame = 0);
+	inline void visualize(QPainter& p, const QRect& dr, f_cnt_t fromFrame = 0, f_cnt_t toFrame = 0)
 	{
 		visualize(p, dr, dr, fromFrame, toFrame);
 	}
 
-	inline const QString& audioFile() const
-	{
-		return m_audioFile;
-	}
+	inline const QString& audioFile() const { return m_audioFile; }
 
-	inline f_cnt_t startFrame() const
-	{
-		return m_startFrame;
-	}
+	inline f_cnt_t startFrame() const { return m_startFrame; }
 
-	inline f_cnt_t endFrame() const
-	{
-		return m_endFrame;
-	}
+	inline f_cnt_t endFrame() const { return m_endFrame; }
 
-	inline f_cnt_t loopStartFrame() const
-	{
-		return m_loopStartFrame;
-	}
+	inline f_cnt_t loopStartFrame() const { return m_loopStartFrame; }
 
-	inline f_cnt_t loopEndFrame() const
-	{
-		return m_loopEndFrame;
-	}
+	inline f_cnt_t loopEndFrame() const { return m_loopEndFrame; }
 
-	void setLoopStartFrame(f_cnt_t start)
-	{
-		m_loopStartFrame = start;
-	}
+	void setLoopStartFrame(f_cnt_t start) { m_loopStartFrame = start; }
 
-	void setLoopEndFrame(f_cnt_t end)
-	{
-		m_loopEndFrame = end;
-	}
+	void setLoopEndFrame(f_cnt_t end) { m_loopEndFrame = end; }
 
-	void setAllPointFrames(
-		f_cnt_t start,
-		f_cnt_t end,
-		f_cnt_t loopStart,
-		f_cnt_t loopEnd)
+	void setAllPointFrames(f_cnt_t start, f_cnt_t end, f_cnt_t loopStart, f_cnt_t loopEnd)
 	{
 		m_startFrame = start;
 		m_endFrame = end;
@@ -180,50 +127,23 @@ public:
 		m_loopEndFrame = loopEnd;
 	}
 
-	inline f_cnt_t frames() const
-	{
-		return m_frames;
-	}
+	inline f_cnt_t frames() const { return m_frames; }
 
-	inline float amplification() const
-	{
-		return m_amplification;
-	}
+	inline float amplification() const { return m_amplification; }
 
-	inline bool reversed() const
-	{
-		return m_reversed;
-	}
+	inline bool reversed() const { return m_reversed; }
 
-	inline float frequency() const
-	{
-		return m_frequency;
-	}
+	inline float frequency() const { return m_frequency; }
 
-	sample_rate_t sampleRate() const
-	{
-		return m_sampleRate;
-	}
+	sample_rate_t sampleRate() const { return m_sampleRate; }
 
-	int sampleLength() const
-	{
-		return double(m_endFrame - m_startFrame) / m_sampleRate * 1000;
-	}
+	int sampleLength() const { return double(m_endFrame - m_startFrame) / m_sampleRate * 1000; }
 
-	inline void setFrequency(float freq)
-	{
-		m_frequency = freq;
-	}
+	inline void setFrequency(float freq) { m_frequency = freq; }
 
-	inline void setSampleRate(sample_rate_t rate)
-	{
-		m_sampleRate = rate;
-	}
+	inline void setSampleRate(sample_rate_t rate) { m_sampleRate = rate; }
 
-	inline const sampleFrame* data() const
-	{
-		return m_data;
-	}
+	inline const sampleFrame* data() const { return m_data; }
 
 	QString openAudioFile() const;
 	QString openAndSetAudioFile();
@@ -252,15 +172,9 @@ public:
 		return linearInterpolate(data[f1][0], data[(f1 + 1) % frames][0], fraction(frame));
 	}
 
-	void dataReadLock()
-	{
-		m_varLock.lockForRead();
-	}
+	void dataReadLock() { m_varLock.lockForRead(); }
 
-	void dataUnlock()
-	{
-		m_varLock.unlock();
-	}
+	void dataUnlock() { m_varLock.unlock(); }
 
 public slots:
 	void setAudioFile(const QString& audioFile);
@@ -279,23 +193,11 @@ private:
 	void convertIntToFloat(int_sample_t*& ibuf, f_cnt_t frames, int channels);
 	void directFloatWrite(sample_t*& fbuf, f_cnt_t frames, int channels);
 
-	f_cnt_t decodeSampleSF(
-		QString fileName,
-		sample_t*& buf,
-		ch_cnt_t& channels,
-		sample_rate_t& samplerate);
+	f_cnt_t decodeSampleSF(QString fileName, sample_t*& buf, ch_cnt_t& channels, sample_rate_t& samplerate);
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis(
-		QString fileName,
-		int_sample_t*& buf,
-		ch_cnt_t& channels,
-		sample_rate_t& samplerate);
+	f_cnt_t decodeSampleOGGVorbis(QString fileName, int_sample_t*& buf, ch_cnt_t& channels, sample_rate_t& samplerate);
 #endif
-	f_cnt_t decodeSampleDS(
-		QString fileName,
-		int_sample_t*& buf,
-		ch_cnt_t& channels,
-		sample_rate_t& samplerate);
+	f_cnt_t decodeSampleDS(QString fileName, int_sample_t*& buf, ch_cnt_t& channels, sample_rate_t& samplerate);
 
 	QString m_audioFile;
 	sampleFrame* m_origData;
@@ -312,15 +214,8 @@ private:
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
-	sampleFrame* getSampleFragment(
-		f_cnt_t index,
-		f_cnt_t frames,
-		LoopMode loopMode,
-		sampleFrame** tmp,
-		bool* backwards,
-		f_cnt_t loopStart,
-		f_cnt_t loopEnd,
-		f_cnt_t end) const;
+	sampleFrame* getSampleFragment(f_cnt_t index, f_cnt_t frames, LoopMode loopMode, sampleFrame** tmp, bool* backwards,
+		f_cnt_t loopStart, f_cnt_t loopEnd, f_cnt_t end) const;
 
 	f_cnt_t getLoopedIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;
 	f_cnt_t getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const;

@@ -1,8 +1,8 @@
 /*
 	VCO.h
-	
+
 	Copyright 2004-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	an oversampled triangle/saw/square oscillator, and a combination of two
@@ -35,8 +35,7 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class VCOs
-	: public Plugin
+class VCOs : public Plugin
 {
 public:
 	sample_t f, gain;
@@ -53,8 +52,7 @@ public:
 	/* downsampling filter */
 	DSP::FIR down;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -72,21 +70,14 @@ public:
 		vco.reset();
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* //////////////////////////////////////////////////////////////////////// */
 
-class VCOd
-	: public Plugin
+class VCOd : public Plugin
 {
 public:
 	double fs;
@@ -104,8 +95,7 @@ public:
 	/* downsampling filter */
 	DSP::FIR down;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -123,15 +113,9 @@ public:
 		vco.reset();
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _VCO_H_ */

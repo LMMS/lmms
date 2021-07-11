@@ -27,8 +27,7 @@
 
 #include <QtCore/QSemaphore>
 
-template <typename T>
-class FifoBuffer
+template <typename T> class FifoBuffer
 {
 public:
 	FifoBuffer(int size)
@@ -71,10 +70,7 @@ public:
 		m_writeSem.release(m_size);
 	}
 
-	bool available()
-	{
-		return m_readSem.available();
-	}
+	bool available() { return m_readSem.available(); }
 
 private:
 	QSemaphore m_readSem;

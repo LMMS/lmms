@@ -1,24 +1,24 @@
 /* eqspectrumview.cpp - implementation of EqSpectrumView class.
-*
-* Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
-*
-* This file is part of LMMS - https://lmms.io
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program (see COPYING); if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA.
-*
-*/
+ *
+ * Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
 #include "EqSpectrumView.h"
 
@@ -38,8 +38,8 @@ EqAnalyser::EqAnalyser()
 	m_specBuf = (fftwf_complex*)fftwf_malloc((FFT_BUFFER_SIZE + 1) * sizeof(fftwf_complex));
 	m_fftPlan = fftwf_plan_dft_r2c_1d(FFT_BUFFER_SIZE * 2, m_buffer, m_specBuf, FFTW_MEASURE);
 
-	//initialize Blackman-Harris window, constants taken from
-	//https://en.wikipedia.org/wiki/Window_function#A_list_of_window_functions
+	// initialize Blackman-Harris window, constants taken from
+	// https://en.wikipedia.org/wiki/Window_function#A_list_of_window_functions
 	const float a0 = 0.35875;
 	const float a1 = 0.48829;
 	const float a2 = 0.14128;
@@ -47,7 +47,9 @@ EqAnalyser::EqAnalyser()
 
 	for (int i = 0; i < FFT_BUFFER_SIZE; i++)
 	{
-		m_fftWindow[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)) + a2 * cos(4 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)) - a3 * cos(6 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)));
+		m_fftWindow[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)) +
+			a2 * cos(4 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)) -
+			a3 * cos(6 * F_PI * i / ((float)FFT_BUFFER_SIZE - 1.0)));
 	}
 	clear();
 }
@@ -60,7 +62,7 @@ EqAnalyser::~EqAnalyser()
 
 void EqAnalyser::analyze(sampleFrame* buf, const fpp_t frames)
 {
-	//only analyse if the view is visible
+	// only analyse if the view is visible
 	if (m_active)
 	{
 		m_inProgress = true;
@@ -74,8 +76,7 @@ void EqAnalyser::analyze(sampleFrame* buf, const fpp_t frames)
 		// meger channels
 		for (; f < frames; ++f)
 		{
-			m_buffer[m_framesFilledUp] =
-				(buf[f][0] + buf[f][1]) * 0.5;
+			m_buffer[m_framesFilledUp] = (buf[f][0] + buf[f][1]) * 0.5;
 			++m_framesFilledUp;
 		}
 
@@ -89,7 +90,7 @@ void EqAnalyser::analyze(sampleFrame* buf, const fpp_t frames)
 		const int LOWEST_FREQ = 0;
 		const int HIGHEST_FREQ = m_sampleRate / 2;
 
-		//apply FFT window
+		// apply FFT window
 		for (int i = 0; i < FFT_BUFFER_SIZE; i++)
 		{
 			m_buffer[i] = m_buffer[i] * m_fftWindow[i];
@@ -98,8 +99,7 @@ void EqAnalyser::analyze(sampleFrame* buf, const fpp_t frames)
 		fftwf_execute(m_fftPlan);
 		absspec(m_specBuf, m_absSpecBuf, FFT_BUFFER_SIZE + 1);
 
-		compressbands(m_absSpecBuf, m_bands, FFT_BUFFER_SIZE + 1,
-			MAX_BANDS,
+		compressbands(m_absSpecBuf, m_bands, FFT_BUFFER_SIZE + 1, MAX_BANDS,
 			(int)(LOWEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)),
 			(int)(HIGHEST_FREQ * (FFT_BUFFER_SIZE + 1) / (float)(m_sampleRate / 2)));
 		m_energy = maximum(m_bands, MAX_BANDS) / maximum(m_buffer, FFT_BUFFER_SIZE);
@@ -110,30 +110,15 @@ void EqAnalyser::analyze(sampleFrame* buf, const fpp_t frames)
 	}
 }
 
-float EqAnalyser::getEnergy() const
-{
-	return m_energy;
-}
+float EqAnalyser::getEnergy() const { return m_energy; }
 
-int EqAnalyser::getSampleRate() const
-{
-	return m_sampleRate;
-}
+int EqAnalyser::getSampleRate() const { return m_sampleRate; }
 
-bool EqAnalyser::getActive() const
-{
-	return m_active;
-}
+bool EqAnalyser::getActive() const { return m_active; }
 
-void EqAnalyser::setActive(bool active)
-{
-	m_active = active;
-}
+void EqAnalyser::setActive(bool active) { m_active = active; }
 
-bool EqAnalyser::getInProgress()
-{
-	return m_inProgress;
-}
+bool EqAnalyser::getInProgress() { return m_inProgress; }
 
 void EqAnalyser::clear()
 {
@@ -167,7 +152,7 @@ void EqSpectrumView::paintEvent(QPaintEvent* event)
 	const float energy = m_analyser->getEnergy();
 	if (energy <= 0 && m_peakSum <= 0)
 	{
-		//dont draw anything
+		// dont draw anything
 		return;
 	}
 
@@ -179,13 +164,13 @@ void EqSpectrumView::paintEvent(QPaintEvent* event)
 
 	if (m_analyser->getInProgress() || m_periodicalUpdate == false)
 	{
-		//only paint the cached path
+		// only paint the cached path
 		painter.fillPath(m_path, QBrush(m_color));
 		return;
 	}
 
 	m_periodicalUpdate = false;
-	//Now we calculate the path
+	// Now we calculate the path
 	m_path = QPainterPath();
 	float* bands = m_analyser->m_bands;
 	float peak;
@@ -228,20 +213,11 @@ void EqSpectrumView::paintEvent(QPaintEvent* event)
 	painter.drawPath(m_path);
 }
 
-QColor EqSpectrumView::getColor() const
-{
-	return m_color;
-}
+QColor EqSpectrumView::getColor() const { return m_color; }
 
-void EqSpectrumView::setColor(const QColor& value)
-{
-	m_color = value;
-}
+void EqSpectrumView::setColor(const QColor& value) { m_color = value; }
 
-float EqSpectrumView::bandToFreq(int index)
-{
-	return index * m_analyser->getSampleRate() / (MAX_BANDS * 2);
-}
+float EqSpectrumView::bandToFreq(int index) { return index * m_analyser->getSampleRate() / (MAX_BANDS * 2); }
 
 void EqSpectrumView::periodicalUpdate()
 {

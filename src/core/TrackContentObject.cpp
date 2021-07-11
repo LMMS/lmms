@@ -148,15 +148,9 @@ void TrackContentObject::toggleMute()
 	emit dataChanged();
 }
 
-TimePos TrackContentObject::startTimeOffset() const
-{
-	return m_startTimeOffset;
-}
+TimePos TrackContentObject::startTimeOffset() const { return m_startTimeOffset; }
 
-void TrackContentObject::setStartTimeOffset(const TimePos& startTimeOffset)
-{
-	m_startTimeOffset = startTimeOffset;
-}
+void TrackContentObject::setStartTimeOffset(const TimePos& startTimeOffset) { m_startTimeOffset = startTimeOffset; }
 
 // Update TCO color if it follows the track color
 void TrackContentObject::updateColor()
@@ -173,7 +167,4 @@ void TrackContentObject::useCustomClipColor(bool b)
 	updateColor();
 }
 
-bool TrackContentObject::hasColor()
-{
-	return usesCustomClipColor() || getTrack()->useColor();
-}
+bool TrackContentObject::hasColor() { return usesCustomClipColor() || getTrack()->useColor(); }

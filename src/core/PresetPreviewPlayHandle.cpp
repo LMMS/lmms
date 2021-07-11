@@ -50,44 +50,24 @@ public:
 		m_previewInstrumentTrack->setPreviewMode(true);
 	}
 
-	virtual ~PreviewTrackContainer()
-	{
-	}
+	virtual ~PreviewTrackContainer() {}
 
-	QString nodeName() const override
-	{
-		return "previewtrackcontainer";
-	}
+	QString nodeName() const override { return "previewtrackcontainer"; }
 
-	InstrumentTrack* previewInstrumentTrack()
-	{
-		return m_previewInstrumentTrack;
-	}
+	InstrumentTrack* previewInstrumentTrack() { return m_previewInstrumentTrack; }
 
-	NotePlayHandle* previewNote()
-	{
-		return m_previewNote.load(std::memory_order_acquire);
-	}
+	NotePlayHandle* previewNote() { return m_previewNote.load(std::memory_order_acquire); }
 
-	void setPreviewNote(NotePlayHandle* _note)
-	{
-		m_previewNote.store(_note, std::memory_order_release);
-	}
+	void setPreviewNote(NotePlayHandle* _note) { m_previewNote.store(_note, std::memory_order_release); }
 
 	bool testAndSetPreviewNote(NotePlayHandle* expectedVal, NotePlayHandle* newVal)
 	{
 		return m_previewNote.compare_exchange_strong(expectedVal, newVal);
 	}
 
-	void lockData()
-	{
-		m_dataMutex.lock();
-	}
+	void lockData() { m_dataMutex.lock(); }
 
-	void unlockData()
-	{
-		m_dataMutex.unlock();
-	}
+	void unlockData() { m_dataMutex.unlock(); }
 
 	bool isPreviewing()
 	{
@@ -131,8 +111,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle(const QString& _preset_file, bo
 		const QString ext = QFileInfo(_preset_file).suffix().toLower();
 		if (i == NULL || !i->descriptor()->supportsFileType(ext))
 		{
-			const PluginFactory::PluginInfoAndKey& infoAndKey =
-				pluginFactory->pluginSupportingExtension(ext);
+			const PluginFactory::PluginInfoAndKey& infoAndKey = pluginFactory->pluginSupportingExtension(ext);
 			i = s_previewTC->previewInstrumentTrack()->loadInstrument(infoAndKey.info.name(), &infoAndKey.key);
 		}
 		if (i != NULL)
@@ -149,8 +128,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle(const QString& _preset_file, bo
 			dataFileCreated = true;
 		}
 
-		s_previewTC->previewInstrumentTrack()->loadTrackSpecificSettings(
-			dataFile->content().firstChild().toElement());
+		s_previewTC->previewInstrumentTrack()->loadTrackSpecificSettings(dataFile->content().firstChild().toElement());
 
 		if (dataFileCreated)
 		{
@@ -165,9 +143,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle(const QString& _preset_file, bo
 	Engine::mixer()->requestChangeInModel();
 	// create note-play-handle for it
 	m_previewNote = NotePlayHandleManager::acquire(
-		s_previewTC->previewInstrumentTrack(), 0,
-		typeInfo<f_cnt_t>::max() / 2,
-		Note(0, 0, DefaultKey, 100));
+		s_previewTC->previewInstrumentTrack(), 0, typeInfo<f_cnt_t>::max() / 2, Note(0, 0, DefaultKey, 100));
 
 	setAudioPort(s_previewTC->previewInstrumentTrack()->audioPort());
 
@@ -197,10 +173,7 @@ void PresetPreviewPlayHandle::play(sampleFrame* _working_buffer)
 	// has been added to the mixer
 }
 
-bool PresetPreviewPlayHandle::isFinished() const
-{
-	return m_previewNote->isMuted();
-}
+bool PresetPreviewPlayHandle::isFinished() const { return m_previewNote->isMuted(); }
 
 bool PresetPreviewPlayHandle::isFromTrack(const Track* _track) const
 {
@@ -221,12 +194,10 @@ void PresetPreviewPlayHandle::cleanup()
 	s_previewTC = NULL;
 }
 
-ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(
-	const InstrumentTrack* _it)
+ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(const InstrumentTrack* _it)
 {
 	ConstNotePlayHandleList cnphv;
-	if (s_previewTC->previewNote() != NULL &&
-		s_previewTC->previewNote()->instrumentTrack() == _it)
+	if (s_previewTC->previewNote() != NULL && s_previewTC->previewNote()->instrumentTrack() == _it)
 	{
 		cnphv.push_back(s_previewTC->previewNote());
 	}

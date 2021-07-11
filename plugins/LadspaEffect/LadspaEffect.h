@@ -38,24 +38,16 @@ class LadspaEffect : public Effect
 {
 	Q_OBJECT
 public:
-	LadspaEffect(Model* _parent,
-		const Descriptor::SubPluginFeatures::Key* _key);
+	LadspaEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~LadspaEffect();
 
-	virtual bool processAudioBuffer(sampleFrame* _buf,
-		const fpp_t _frames);
+	virtual bool processAudioBuffer(sampleFrame* _buf, const fpp_t _frames);
 
 	void setControl(int _control, LADSPA_Data _data);
 
-	virtual EffectControls* controls()
-	{
-		return m_controls;
-	}
+	virtual EffectControls* controls() { return m_controls; }
 
-	inline const multi_proc_t& getPortControls()
-	{
-		return m_portControls;
-	}
+	inline const multi_proc_t& getPortControls() { return m_portControls; }
 
 private slots:
 	void changeSampleRate();

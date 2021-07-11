@@ -45,33 +45,26 @@ dynProcControls::dynProcControls(dynProcEffect* _eff)
 	, m_wavegraphModel(0.0f, 1.0f, 200, this)
 	, m_stereomodeModel(0, 0, 2, this, tr("Stereo mode"))
 {
-	connect(&m_wavegraphModel, SIGNAL(samplesChanged(int, int)),
-		this, SLOT(samplesChanged(int, int)));
+	connect(&m_wavegraphModel, SIGNAL(samplesChanged(int, int)), this, SLOT(samplesChanged(int, int)));
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 
 	setDefaultShape();
 }
 
-void dynProcControls::sampleRateChanged()
-{
-	m_effect->m_needsUpdate = true;
-}
+void dynProcControls::sampleRateChanged() { m_effect->m_needsUpdate = true; }
 
-void dynProcControls::samplesChanged(int _begin, int _end)
-{
-	Engine::getSong()->setModified();
-}
+void dynProcControls::samplesChanged(int _begin, int _end) { Engine::getSong()->setModified(); }
 
 void dynProcControls::loadSettings(const QDomElement& _this)
 {
-	//load knobs, stereomode
+	// load knobs, stereomode
 	m_inputModel.loadSettings(_this, "inputGain");
 	m_outputModel.loadSettings(_this, "outputGain");
 	m_attackModel.loadSettings(_this, "attack");
 	m_releaseModel.loadSettings(_this, "release");
 	m_stereomodeModel.loadSettings(_this, "stereoMode");
 
-	//load waveshape
+	// load waveshape
 	int size = 0;
 	char* dst = 0;
 	base64::decode(_this.attribute("waveShape"), &dst, &size);
@@ -80,20 +73,18 @@ void dynProcControls::loadSettings(const QDomElement& _this)
 	delete[] dst;
 }
 
-void dynProcControls::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void dynProcControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
-	//save input, output knobs
+	// save input, output knobs
 	m_inputModel.saveSettings(_doc, _this, "inputGain");
 	m_outputModel.saveSettings(_doc, _this, "outputGain");
 	m_attackModel.saveSettings(_doc, _this, "attack");
 	m_releaseModel.saveSettings(_doc, _this, "release");
 	m_stereomodeModel.saveSettings(_doc, _this, "stereoMode");
 
-	//save waveshape
+	// save waveshape
 	QString sampleString;
-	base64::encode((const char*)m_wavegraphModel.samples(),
-		m_wavegraphModel.length() * sizeof(float), sampleString);
+	base64::encode((const char*)m_wavegraphModel.samples(), m_wavegraphModel.length() * sizeof(float), sampleString);
 	_this.setAttribute("waveShape", sampleString);
 }
 

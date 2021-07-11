@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -59,8 +59,7 @@ public:
 
 	virtual void play(sampleFrame* _working_buffer);
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -72,15 +71,9 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return 0;
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return 0; }
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed;
-	}
+	virtual Flags flags() const { return IsSingleStreamed; }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 
@@ -180,8 +173,7 @@ class sf2InstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	sf2InstrumentView(Instrument* _instrument,
-		QWidget* _parent);
+	sf2InstrumentView(Instrument* _instrument, QWidget* _parent);
 	virtual ~sf2InstrumentView();
 
 private:

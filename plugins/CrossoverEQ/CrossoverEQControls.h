@@ -1,5 +1,5 @@
 /*
- * CrossoverEQControls.h - A native 4-band Crossover Equalizer 
+ * CrossoverEQControls.h - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -41,20 +41,11 @@ public:
 
 	virtual void saveSettings(QDomDocument& doc, QDomElement& elem);
 	virtual void loadSettings(const QDomElement& elem);
-	inline virtual QString nodeName() const
-	{
-		return ("crossoevereqcontrols");
-	}
+	inline virtual QString nodeName() const { return ("crossoevereqcontrols"); }
 
-	virtual int controlCount()
-	{
-		return (11);
-	}
+	virtual int controlCount() { return (11); }
 
-	virtual EffectControlDialog* createView()
-	{
-		return (new CrossoverEQControlDialog(this));
-	}
+	virtual EffectControlDialog* createView() { return (new CrossoverEQControlDialog(this)); }
 
 private slots:
 	void xover12Changed();

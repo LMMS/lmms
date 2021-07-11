@@ -30,10 +30,8 @@
 #include "ExportProjectDialog.h"
 #include "GuiApplication.h"
 
-AudioFileDevice::AudioFileDevice(OutputSettings const& outputSettings,
-	const ch_cnt_t _channels,
-	const QString& _file,
-	Mixer* _mixer)
+AudioFileDevice::AudioFileDevice(
+	OutputSettings const& outputSettings, const ch_cnt_t _channels, const QString& _file, Mixer* _mixer)
 	: AudioDevice(_channels, _mixer)
 	, m_outputFile(_file)
 	, m_outputSettings(outputSettings)
@@ -54,9 +52,7 @@ AudioFileDevice::AudioFileDevice(OutputSettings const& outputSettings,
 
 		if (gui)
 		{
-			QMessageBox::critical(NULL, title, message,
-				QMessageBox::Ok,
-				QMessageBox::NoButton);
+			QMessageBox::critical(NULL, title, message, QMessageBox::Ok, QMessageBox::NoButton);
 		}
 		else
 		{
@@ -66,10 +62,7 @@ AudioFileDevice::AudioFileDevice(OutputSettings const& outputSettings,
 	}
 }
 
-AudioFileDevice::~AudioFileDevice()
-{
-	m_outputFile.close();
-}
+AudioFileDevice::~AudioFileDevice() { m_outputFile.close(); }
 
 int AudioFileDevice::writeData(const void* data, int len)
 {

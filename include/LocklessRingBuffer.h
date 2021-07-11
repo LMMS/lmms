@@ -32,11 +32,9 @@
 #include "lmms_basics.h"
 
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ringbuffer
-template <class T>
-class LocklessRingBuffer
+template <class T> class LocklessRingBuffer
 {
-	template <class _T>
-	friend class LocklessRingBufferReader;
+	template <class _T> friend class LocklessRingBufferReader;
 
 public:
 	LocklessRingBuffer(std::size_t sz)
@@ -66,8 +64,7 @@ protected:
 };
 
 //! Wrapper for lockless ringbuffer reader
-template <class T>
-class LocklessRingBufferReader : public ringbuffer_reader_t<T>
+template <class T> class LocklessRingBufferReader : public ringbuffer_reader_t<T>
 {
 public:
 	LocklessRingBufferReader(LocklessRingBuffer<T>& rb)
@@ -87,4 +84,4 @@ private:
 	QWaitCondition* m_notifier;
 };
 
-#endif //LOCKLESSRINGBUFFER_H
+#endif // LOCKLESSRINGBUFFER_H

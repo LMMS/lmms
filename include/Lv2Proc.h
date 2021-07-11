@@ -60,8 +60,7 @@ enum class Vis;
 class Lv2Proc : public LinkedModelGroup
 {
 public:
-	static Plugin::PluginTypes check(const LilvPlugin* plugin,
-		std::vector<PluginIssue>& issues);
+	static Plugin::PluginTypes check(const LilvPlugin* plugin, std::vector<PluginIssue>& issues);
 
 	/*
 		ctor/dtor
@@ -86,16 +85,14 @@ public:
 	const StereoPortRef& inPorts() const { return m_inPorts; }
 	StereoPortRef& outPorts() { return m_outPorts; }
 	const StereoPortRef& outPorts() const { return m_outPorts; }
-	template <class Functor>
-	void foreach_port(const Functor& ftor)
+	template <class Functor> void foreach_port(const Functor& ftor)
 	{
 		for (std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
 		{
 			ftor(port.get());
 		}
 	}
-	template <class Functor>
-	void foreach_port(const Functor& ftor) const
+	template <class Functor> void foreach_port(const Functor& ftor) const
 	{
 		for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
 		{
@@ -125,8 +122,7 @@ public:
 	 * @param num Number of channels we must read from @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersFromCore(const sampleFrame* buf,
-		unsigned firstChan, unsigned num, fpp_t frames);
+	void copyBuffersFromCore(const sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames);
 	/**
 	 * Copy our ports into buffers passed by the core
 	 * @param buf buffer of sample frames, each sample frame is something like
@@ -138,13 +134,11 @@ public:
 	 * @param num Number of channels we must write to @param buf (starting at
 	 *   @p offset)
 	 */
-	void copyBuffersToCore(sampleFrame* buf, unsigned firstChan, unsigned num,
-		fpp_t frames) const;
+	void copyBuffersToCore(sampleFrame* buf, unsigned firstChan, unsigned num, fpp_t frames) const;
 	//! Run the Lv2 plugin instance for @param frames frames
 	void run(fpp_t frames);
 
-	void handleMidiInputEvent(const class MidiEvent& event,
-		const TimePos& time, f_cnt_t offset);
+	void handleMidiInputEvent(const class MidiEvent& event, const TimePos& time, f_cnt_t offset);
 
 	/*
 		misc

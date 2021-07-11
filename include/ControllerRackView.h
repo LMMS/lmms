@@ -48,10 +48,7 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	inline QString nodeName() const override
-	{
-		return "ControllerRackView";
-	}
+	inline QString nodeName() const override { return "ControllerRackView"; }
 
 public slots:
 	void deleteController(ControllerView* _view);

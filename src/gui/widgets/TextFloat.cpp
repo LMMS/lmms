@@ -70,8 +70,7 @@ void TextFloat::setVisibilityTimeOut(int _msecs)
 	show();
 }
 
-TextFloat* TextFloat::displayMessage(const QString& _msg, int _timeout,
-	QWidget* _parent, int _add_y_margin)
+TextFloat* TextFloat::displayMessage(const QString& _msg, int _timeout, QWidget* _parent, int _add_y_margin)
 {
 	QWidget* mw = gui->mainWindow();
 	TextFloat* tf = new TextFloat;
@@ -93,10 +92,8 @@ TextFloat* TextFloat::displayMessage(const QString& _msg, int _timeout,
 	return (tf);
 }
 
-TextFloat* TextFloat::displayMessage(const QString& _title,
-	const QString& _msg,
-	const QPixmap& _pixmap,
-	int _timeout, QWidget* _parent)
+TextFloat* TextFloat::displayMessage(
+	const QString& _title, const QString& _msg, const QPixmap& _pixmap, int _timeout, QWidget* _parent)
 {
 	TextFloat* tf = displayMessage(_msg, _timeout, _parent, 16);
 	tf->setTitle(_title);
@@ -141,10 +138,7 @@ void TextFloat::paintEvent(QPaintEvent* _pe)
 	}
 }
 
-void TextFloat::mousePressEvent(QMouseEvent*)
-{
-	close();
-}
+void TextFloat::mousePressEvent(QMouseEvent*) { close(); }
 
 void TextFloat::updateSize()
 {
@@ -166,6 +160,6 @@ void TextFloat::updateSize()
 		textBound.setWidth(textBound.width() + m_pixmap.width() + 10);
 	}
 	resize(textBound.width() + 5, textBound.height() + 2);
-	//move( QPoint( parentWidget()->width() + 5, 5 ) );
+	// move( QPoint( parentWidget()->width() + 5, 5 ) );
 	update();
 }

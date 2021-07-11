@@ -1,8 +1,8 @@
 /*
 	HRTF.h
-	
+
 	Copyright 2002-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	IIR filtering based on HRTF data sets
@@ -30,8 +30,7 @@
 
 #include "dsp/util.h"
 
-class HRTF
-	: public Plugin
+class HRTF : public Plugin
 {
 public:
 	int pan;
@@ -47,27 +46,17 @@ public:
 
 	void set_pan(int p);
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
 
 	void init();
-	void activate()
-	{
-		set_pan((int)*ports[1]);
-	}
+	void activate() { set_pan((int)*ports[1]); }
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _HRTF_H_ */

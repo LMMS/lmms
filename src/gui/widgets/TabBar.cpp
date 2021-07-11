@@ -2,7 +2,7 @@
  * TabBar.cpp - implementation of tab-bar
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -39,8 +39,7 @@ TabBar::TabBar(QWidget* _parent, QBoxLayout::Direction _dir)
 	setLayout(m_layout);
 }
 
-TabButton* TabBar::addTab(QWidget* _w, const QString& _text, int _id,
-	bool _add_stretch, bool _text_is_tooltip)
+TabButton* TabBar::addTab(QWidget* _w, const QString& _text, int _id, bool _add_stretch, bool _text_is_tooltip)
 {
 	// already tab with id?
 	if (m_tabs.contains(_id))

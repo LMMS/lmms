@@ -39,34 +39,18 @@ public:
 	virtual ~AutomatableModelView() = default;
 
 	// some basic functions for convenience
-	AutomatableModel* modelUntyped()
-	{
-		return castModel<AutomatableModel>();
-	}
+	AutomatableModel* modelUntyped() { return castModel<AutomatableModel>(); }
 
-	const AutomatableModel* modelUntyped() const
-	{
-		return castModel<AutomatableModel>();
-	}
+	const AutomatableModel* modelUntyped() const { return castModel<AutomatableModel>(); }
 
 	void setModel(Model* model, bool isOldModelValid = true) override;
 	void unsetModel() override;
 
-	template <typename T>
-	inline T value() const
-	{
-		return modelUntyped() ? modelUntyped()->value<T>() : 0;
-	}
+	template <typename T> inline T value() const { return modelUntyped() ? modelUntyped()->value<T>() : 0; }
 
-	inline void setDescription(const QString& desc)
-	{
-		m_description = desc;
-	}
+	inline void setDescription(const QString& desc) { m_description = desc; }
 
-	inline void setUnit(const QString& unit)
-	{
-		m_unit = unit;
-	}
+	inline void setUnit(const QString& unit) { m_unit = unit; }
 
 	void addDefaultActions(QMenu* menu);
 
@@ -104,8 +88,7 @@ protected:
 	AutomatableModelView* m_amv;
 };
 
-template <typename ModelType>
-class LMMS_EXPORT TypedModelView : public AutomatableModelView
+template <typename ModelType> class LMMS_EXPORT TypedModelView : public AutomatableModelView
 {
 public:
 	TypedModelView(Model* model, QWidget* _this)
@@ -113,14 +96,8 @@ public:
 	{
 	}
 
-	ModelType* model()
-	{
-		return castModel<ModelType>();
-	}
-	const ModelType* model() const
-	{
-		return castModel<ModelType>();
-	}
+	ModelType* model() { return castModel<ModelType>(); }
+	const ModelType* model() const { return castModel<ModelType>(); }
 };
 
 using FloatModelView = TypedModelView<FloatModel>;

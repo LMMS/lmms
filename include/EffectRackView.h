@@ -60,15 +60,9 @@ private slots:
 private:
 	void modelChanged() override;
 
-	inline EffectChain* fxChain()
-	{
-		return castModel<EffectChain>();
-	}
+	inline EffectChain* fxChain() { return castModel<EffectChain>(); }
 
-	inline const EffectChain* fxChain() const
-	{
-		return castModel<EffectChain>();
-	}
+	inline const EffectChain* fxChain() const { return castModel<EffectChain>(); }
 
 	QVector<EffectView*> m_effectViews;
 

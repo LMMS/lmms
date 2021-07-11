@@ -32,15 +32,9 @@
 
 namespace Clipboard
 {
-const QMimeData* getMimeData()
-{
-	return QApplication::clipboard()->mimeData(QClipboard::Clipboard);
-}
+const QMimeData* getMimeData() { return QApplication::clipboard()->mimeData(QClipboard::Clipboard); }
 
-bool hasFormat(MimeType mT)
-{
-	return getMimeData()->hasFormat(mimeType(mT));
-}
+bool hasFormat(MimeType mT) { return getMimeData()->hasFormat(mimeType(mT)); }
 
 void copyString(const QString& str, MimeType mT)
 {
@@ -50,10 +44,7 @@ void copyString(const QString& str, MimeType mT)
 	QApplication::clipboard()->setMimeData(content, QClipboard::Clipboard);
 }
 
-QString getString(MimeType mT)
-{
-	return QString(getMimeData()->data(mimeType(mT)));
-}
+QString getString(MimeType mT) { return QString(getMimeData()->data(mimeType(mT))); }
 
 void copyStringPair(const QString& key, const QString& value)
 {

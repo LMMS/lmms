@@ -55,8 +55,7 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 
 	bool embed_vst = false;
 
-	if (_ctl != NULL && _ctl->m_effect != NULL &&
-		_ctl->m_effect->m_plugin != NULL)
+	if (_ctl != NULL && _ctl->m_effect != NULL && _ctl->m_effect->m_plugin != NULL)
 	{
 		m_plugin = _ctl->m_effect->m_plugin;
 		embed_vst = m_plugin->embedMethod() != "none";
@@ -81,13 +80,11 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 		{
 			btn->setCheckable(true);
 			btn->setChecked(true);
-			connect(btn, SIGNAL(toggled(bool)),
-				SLOT(togglePluginUI(bool)));
+			connect(btn, SIGNAL(toggled(bool)), SLOT(togglePluginUI(bool)));
 		}
 		else
 		{
-			connect(btn, SIGNAL(clicked()),
-				m_plugin.data(), SLOT(toggleUI()));
+			connect(btn, SIGNAL(clicked()), m_plugin.data(), SLOT(toggleUI()));
 		}
 
 		btn->setMinimumWidth(78);
@@ -99,12 +96,9 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 		m_managePluginButton = new PixmapButton(this, "");
 		m_managePluginButton->setCheckable(false);
 		m_managePluginButton->setCursor(Qt::PointingHandCursor);
-		m_managePluginButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap(
-			"controls_active"));
-		m_managePluginButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(
-			"controls"));
-		connect(m_managePluginButton, SIGNAL(clicked()), _ctl,
-			SLOT(managePlugin()));
+		m_managePluginButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("controls_active"));
+		m_managePluginButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("controls"));
+		connect(m_managePluginButton, SIGNAL(clicked()), _ctl, SLOT(managePlugin()));
 		ToolTip::add(m_managePluginButton, tr("Control VST plugin from LMMS host"));
 
 		m_managePluginButton->setMinimumWidth(26);
@@ -115,12 +109,9 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 		m_openPresetButton = new PixmapButton(this, "");
 		m_openPresetButton->setCheckable(false);
 		m_openPresetButton->setCursor(Qt::PointingHandCursor);
-		m_openPresetButton->setActiveGraphic(embed::getIconPixmap(
-			"project_open"));
-		m_openPresetButton->setInactiveGraphic(embed::getIconPixmap(
-			"project_open"));
-		connect(m_openPresetButton, SIGNAL(clicked()), _ctl,
-			SLOT(openPreset()));
+		m_openPresetButton->setActiveGraphic(embed::getIconPixmap("project_open"));
+		m_openPresetButton->setInactiveGraphic(embed::getIconPixmap("project_open"));
+		connect(m_openPresetButton, SIGNAL(clicked()), _ctl, SLOT(openPreset()));
 		ToolTip::add(m_openPresetButton, tr("Open VST plugin preset"));
 
 		m_openPresetButton->setMinimumWidth(16);
@@ -131,15 +122,11 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 		m_rolLPresetButton = new PixmapButton(this, "");
 		m_rolLPresetButton->setCheckable(false);
 		m_rolLPresetButton->setCursor(Qt::PointingHandCursor);
-		m_rolLPresetButton->setActiveGraphic(embed::getIconPixmap(
-			"stepper-left-press"));
-		m_rolLPresetButton->setInactiveGraphic(embed::getIconPixmap(
-			"stepper-left"));
-		connect(m_rolLPresetButton, SIGNAL(clicked()), _ctl,
-			SLOT(rolrPreset()));
+		m_rolLPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-left-press"));
+		m_rolLPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-left"));
+		connect(m_rolLPresetButton, SIGNAL(clicked()), _ctl, SLOT(rolrPreset()));
 
-		connect(m_rolLPresetButton, SIGNAL(clicked()), this,
-			SLOT(update()));
+		connect(m_rolLPresetButton, SIGNAL(clicked()), this, SLOT(update()));
 
 		ToolTip::add(m_rolLPresetButton, tr("Previous (-)"));
 
@@ -153,15 +140,11 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 		m_rolRPresetButton = new PixmapButton(this, "");
 		m_rolRPresetButton->setCheckable(false);
 		m_rolRPresetButton->setCursor(Qt::PointingHandCursor);
-		m_rolRPresetButton->setActiveGraphic(embed::getIconPixmap(
-			"stepper-right-press"));
-		m_rolRPresetButton->setInactiveGraphic(embed::getIconPixmap(
-			"stepper-right"));
-		connect(m_rolRPresetButton, SIGNAL(clicked()), _ctl,
-			SLOT(rollPreset()));
+		m_rolRPresetButton->setActiveGraphic(embed::getIconPixmap("stepper-right-press"));
+		m_rolRPresetButton->setInactiveGraphic(embed::getIconPixmap("stepper-right"));
+		connect(m_rolRPresetButton, SIGNAL(clicked()), _ctl, SLOT(rollPreset()));
 
-		connect(m_rolRPresetButton, SIGNAL(clicked()), this,
-			SLOT(update()));
+		connect(m_rolRPresetButton, SIGNAL(clicked()), this, SLOT(update()));
 
 		ToolTip::add(m_rolRPresetButton, tr("Next (+)"));
 
@@ -191,12 +174,9 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 		m_savePresetButton = new PixmapButton(this, "");
 		m_savePresetButton->setCheckable(false);
 		m_savePresetButton->setCursor(Qt::PointingHandCursor);
-		m_savePresetButton->setActiveGraphic(embed::getIconPixmap(
-			"project_save", 21, 21));
-		m_savePresetButton->setInactiveGraphic(embed::getIconPixmap(
-			"project_save", 21, 21));
-		connect(m_savePresetButton, SIGNAL(clicked()), _ctl,
-			SLOT(savePreset()));
+		m_savePresetButton->setActiveGraphic(embed::getIconPixmap("project_save", 21, 21));
+		m_savePresetButton->setInactiveGraphic(embed::getIconPixmap("project_save", 21, 21));
+		connect(m_savePresetButton, SIGNAL(clicked()), _ctl, SLOT(savePreset()));
 		ToolTip::add(m_savePresetButton, tr("Save preset"));
 
 		m_savePresetButton->setMinimumWidth(21);
@@ -220,9 +200,7 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 		space1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		QFont f("Arial", 10);
 
-		l->addItem(new QSpacerItem(newSize - 20, 30, QSizePolicy::Fixed,
-					   QSizePolicy::Fixed),
-			1, 0);
+		l->addItem(new QSpacerItem(newSize - 20, 30, QSizePolicy::Fixed, QSizePolicy::Fixed), 1, 0);
 		l->addWidget(resize, 2, 0, 1, 1, Qt::AlignCenter);
 		if (m_pluginWidget)
 		{
@@ -256,8 +234,7 @@ void VstEffectControlDialog::paintEvent(QPaintEvent*)
 	if (m_plugin != NULL && tbLabel != NULL)
 	{
 		tbLabel->setText(tr("Effect by: ") + m_plugin->vendorString() +
-			tr("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />") +
-			m_plugin->currentProgramName());
+			tr("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />") + m_plugin->currentProgramName());
 	}
 }
 

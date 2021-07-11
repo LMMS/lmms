@@ -50,10 +50,7 @@ public:
 	virtual QString nodeName() const;
 	virtual PluginView* instantiateView(QWidget* _parent);
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
+	virtual Flags flags() const { return IsSingleStreamed | IsMidiBased; }
 
 	virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0);
 	virtual void play(sampleFrame* _working_buffer);

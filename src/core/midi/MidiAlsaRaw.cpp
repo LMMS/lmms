@@ -36,9 +36,7 @@ MidiAlsaRaw::MidiAlsaRaw()
 	, m_quit(false)
 {
 	int err;
-	if ((err = snd_rawmidi_open(m_inputp, m_outputp,
-			 probeDevice().toLatin1().constData(),
-			 0)) < 0)
+	if ((err = snd_rawmidi_open(m_inputp, m_outputp, probeDevice().toLatin1().constData(), 0)) < 0)
 	{
 		printf("cannot open MIDI-device: %s\n", snd_strerror(err));
 		return;
@@ -82,15 +80,12 @@ QString MidiAlsaRaw::probeDevice()
 	return dev;
 }
 
-void MidiAlsaRaw::sendByte(unsigned char c)
-{
-	snd_rawmidi_write(m_output, &c, sizeof(c));
-}
+void MidiAlsaRaw::sendByte(unsigned char c) { snd_rawmidi_write(m_output, &c, sizeof(c)); }
 
 void MidiAlsaRaw::run()
 {
 	unsigned char buf[128];
-	//int cnt = 0;
+	// int cnt = 0;
 	while (m_quit == false)
 	{
 		msleep(5); // must do that, otherwise this thread takes
@@ -112,12 +107,11 @@ void MidiAlsaRaw::run()
 		}
 		if (err == 0)
 		{
-			//printf( "there seems to be no active MIDI-device %d\n", ++cnt );
+			// printf( "there seems to be no active MIDI-device %d\n", ++cnt );
 			continue;
 		}
 		unsigned short revents;
-		if ((err = snd_rawmidi_poll_descriptors_revents(
-				 m_input, m_pfds, m_npfds, &revents)) < 0)
+		if ((err = snd_rawmidi_poll_descriptors_revents(m_input, m_pfds, m_npfds, &revents)) < 0)
 		{
 			printf("cannot get poll events: %s\nWill stop polling "
 				   "MIDI-events from MIDI-port.\n",

@@ -81,10 +81,7 @@ ConfigManager::ConfigManager()
 #endif
 }
 
-ConfigManager::~ConfigManager()
-{
-	saveConfigFile();
-}
+ConfigManager::~ConfigManager() { saveConfigFile(); }
 
 void ConfigManager::upgrade_1_1_90()
 {
@@ -128,10 +125,8 @@ void ConfigManager::upgrade()
 	}
 
 	// Runs all necessary upgrade methods
-	std::for_each(UPGRADE_METHODS.begin() + m_configVersion, UPGRADE_METHODS.end(),
-		[this](UpgradeMethod um) {
-			(this->*um)();
-		});
+	std::for_each(
+		UPGRADE_METHODS.begin() + m_configVersion, UPGRADE_METHODS.end(), [this](UpgradeMethod um) { (this->*um)(); });
 
 	ProjectVersion createdWith = m_version;
 
@@ -146,10 +141,7 @@ void ConfigManager::upgrade()
 	m_configVersion = UPGRADE_METHODS.size();
 }
 
-QString ConfigManager::defaultVersion() const
-{
-	return LMMS_VERSION;
-}
+QString ConfigManager::defaultVersion() const { return LMMS_VERSION; }
 
 QStringList ConfigManager::availableVstEmbedMethods()
 {
@@ -178,25 +170,16 @@ QString ConfigManager::vstEmbedMethod() const
 	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
 }
 
-bool ConfigManager::hasWorkingDir() const
-{
-	return QDir(m_workingDir).exists();
-}
+bool ConfigManager::hasWorkingDir() const { return QDir(m_workingDir).exists(); }
 
 void ConfigManager::setWorkingDir(const QString& workingDir)
 {
 	m_workingDir = ensureTrailingSlash(QDir::cleanPath(workingDir));
 }
 
-void ConfigManager::setVSTDir(const QString& vstDir)
-{
-	m_vstDir = ensureTrailingSlash(vstDir);
-}
+void ConfigManager::setVSTDir(const QString& vstDir) { m_vstDir = ensureTrailingSlash(vstDir); }
 
-void ConfigManager::setLADSPADir(const QString& ladspaDir)
-{
-	m_ladspaDir = ladspaDir;
-}
+void ConfigManager::setLADSPADir(const QString& ladspaDir) { m_ladspaDir = ladspaDir; }
 
 void ConfigManager::setSTKDir(const QString& stkDir)
 {
@@ -205,10 +188,7 @@ void ConfigManager::setSTKDir(const QString& stkDir)
 #endif
 }
 
-void ConfigManager::setSF2Dir(const QString& sf2Dir)
-{
-	m_sf2Dir = sf2Dir;
-}
+void ConfigManager::setSF2Dir(const QString& sf2Dir) { m_sf2Dir = sf2Dir; }
 
 void ConfigManager::setSF2File(const QString& sf2File)
 {
@@ -217,20 +197,11 @@ void ConfigManager::setSF2File(const QString& sf2File)
 #endif
 }
 
-void ConfigManager::setGIGDir(const QString& gigDir)
-{
-	m_gigDir = gigDir;
-}
+void ConfigManager::setGIGDir(const QString& gigDir) { m_gigDir = gigDir; }
 
-void ConfigManager::setThemeDir(const QString& themeDir)
-{
-	m_themeDir = ensureTrailingSlash(themeDir);
-}
+void ConfigManager::setThemeDir(const QString& themeDir) { m_themeDir = ensureTrailingSlash(themeDir); }
 
-void ConfigManager::setBackgroundPicFile(const QString& backgroundPicFile)
-{
-	m_backgroundPicFile = backgroundPicFile;
-}
+void ConfigManager::setBackgroundPicFile(const QString& backgroundPicFile) { m_backgroundPicFile = backgroundPicFile; }
 
 void ConfigManager::createWorkingDir()
 {
@@ -249,8 +220,7 @@ void ConfigManager::createWorkingDir()
 void ConfigManager::addRecentlyOpenedProject(const QString& file)
 {
 	QFileInfo recentFile(file);
-	if (recentFile.suffix().toLower() == "mmp" ||
-		recentFile.suffix().toLower() == "mmpz" ||
+	if (recentFile.suffix().toLower() == "mmp" || recentFile.suffix().toLower() == "mmpz" ||
 		recentFile.suffix().toLower() == "mpt")
 	{
 		m_recentlyOpenedProjects.removeAll(file);
@@ -263,14 +233,11 @@ void ConfigManager::addRecentlyOpenedProject(const QString& file)
 	}
 }
 
-const QString& ConfigManager::value(const QString& cls,
-	const QString& attribute) const
+const QString& ConfigManager::value(const QString& cls, const QString& attribute) const
 {
 	if (m_settings.contains(cls))
 	{
-		for (stringPairVector::const_iterator it =
-				 m_settings[cls].begin();
-			 it != m_settings[cls].end(); ++it)
+		for (stringPairVector::const_iterator it = m_settings[cls].begin(); it != m_settings[cls].end(); ++it)
 		{
 			if ((*it).first == attribute)
 			{
@@ -282,17 +249,13 @@ const QString& ConfigManager::value(const QString& cls,
 	return empty;
 }
 
-const QString& ConfigManager::value(const QString& cls,
-	const QString& attribute,
-	const QString& defaultVal) const
+const QString& ConfigManager::value(const QString& cls, const QString& attribute, const QString& defaultVal) const
 {
 	const QString& val = value(cls, attribute);
 	return val.isEmpty() ? defaultVal : val;
 }
 
-void ConfigManager::setValue(const QString& cls,
-	const QString& attribute,
-	const QString& value)
+void ConfigManager::setValue(const QString& cls, const QString& attribute, const QString& value)
 {
 	if (m_settings.contains(cls))
 	{
@@ -317,8 +280,7 @@ void ConfigManager::deleteValue(const QString& cls, const QString& attribute)
 {
 	if (m_settings.contains(cls))
 	{
-		for (stringPairVector::iterator it = m_settings[cls].begin();
-			 it != m_settings[cls].end(); ++it)
+		for (stringPairVector::iterator it = m_settings[cls].begin(); it != m_settings[cls].end(); ++it)
 		{
 			if ((*it).first == attribute)
 			{
@@ -374,20 +336,16 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 			// create the settings-map out of the DOM
 			while (!node.isNull())
 			{
-				if (node.isElement() &&
-					node.toElement().hasAttributes())
+				if (node.isElement() && node.toElement().hasAttributes())
 				{
 					stringPairVector attr;
-					QDomNamedNodeMap node_attr =
-						node.toElement().attributes();
-					for (int i = 0; i < node_attr.count();
-						 ++i)
+					QDomNamedNodeMap node_attr = node.toElement().attributes();
+					for (int i = 0; i < node_attr.count(); ++i)
 					{
 						QDomNode n = node_attr.item(i);
 						if (n.isAttr())
 						{
-							attr.push_back(qMakePair(n.toAttr().name(),
-								n.toAttr().value()));
+							attr.push_back(qMakePair(n.toAttr().name(), n.toAttr().value()));
 						}
 					}
 					m_settings[node.nodeName()] = attr;
@@ -419,8 +377,7 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 				bool badPath = false;
 #endif
 
-				if (badPath || !QDir(m_themeDir).exists() ||
-					!QFile(m_themeDir + "/style.css").exists())
+				if (badPath || !QDir(m_themeDir).exists() || !QFile(m_themeDir + "/style.css").exists())
 				{
 					m_themeDir = defaultThemeDir();
 				}
@@ -443,15 +400,17 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 		else if (gui)
 		{
 			QMessageBox::warning(NULL, MainWindow::tr("Configuration file"),
-				MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").arg(errorLine).arg(errorCol).arg(errorString));
+				MainWindow::tr("Error while parsing configuration file at line %1:%2: %3")
+					.arg(errorLine)
+					.arg(errorCol)
+					.arg(errorString));
 		}
 		cfg_file.close();
 	}
 
 	// Plugins are searched recursively, blacklist problematic locations
 	if (m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
-		m_vstDir == ensureTrailingSlash(QDir::homePath()) ||
-		!QDir(m_vstDir).exists())
+		m_vstDir == ensureTrailingSlash(QDir::homePath()) || !QDir(m_vstDir).exists())
 	{
 #ifdef LMMS_BUILD_WIN32
 		QString programFiles = QString::fromLocal8Bit(getenv("ProgramFiles"));
@@ -467,8 +426,7 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 	}
 
 #ifdef LMMS_HAVE_STK
-	if (m_stkDir.isEmpty() || m_stkDir == QDir::separator() || m_stkDir == "/" ||
-		!QDir(m_stkDir).exists())
+	if (m_stkDir.isEmpty() || m_stkDir == QDir::separator() || m_stkDir == "/" || !QDir(m_stkDir).exists())
 	{
 #if defined(LMMS_BUILD_WIN32)
 		m_stkDir = m_dataDir + "stk/rawwaves/";
@@ -526,12 +484,10 @@ void ConfigManager::saveConfigFile()
 	lmms_config.setAttribute("configversion", m_configVersion);
 	doc.appendChild(lmms_config);
 
-	for (settingsMap::iterator it = m_settings.begin();
-		 it != m_settings.end(); ++it)
+	for (settingsMap::iterator it = m_settings.begin(); it != m_settings.end(); ++it)
 	{
 		QDomElement n = doc.createElement(it.key());
-		for (stringPairVector::iterator it2 = (*it).begin();
-			 it2 != (*it).end(); ++it2)
+		for (stringPairVector::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2)
 		{
 			n.setAttribute((*it2).first, (*it2).second);
 		}
@@ -540,8 +496,7 @@ void ConfigManager::saveConfigFile()
 
 	QDomElement recent_files = doc.createElement("recentfiles");
 
-	for (QStringList::iterator it = m_recentlyOpenedProjects.begin();
-		 it != m_recentlyOpenedProjects.end(); ++it)
+	for (QStringList::iterator it = m_recentlyOpenedProjects.begin(); it != m_recentlyOpenedProjects.end(); ++it)
 	{
 		QDomElement n = doc.createElement("file");
 		n.setAttribute("path", *it);
@@ -565,9 +520,7 @@ void ConfigManager::saveConfigFile()
 					  .arg(m_lmmsRcFile);
 		if (gui)
 		{
-			QMessageBox::critical(NULL, title, message,
-				QMessageBox::Ok,
-				QMessageBox::NoButton);
+			QMessageBox::critical(NULL, title, message, QMessageBox::Ok, QMessageBox::NoButton);
 		}
 		return;
 	}
@@ -623,8 +576,7 @@ void ConfigManager::initDevelopmentWorkingDir()
 			}
 			if (line.startsWith("lmms_BINARY_DIR:"))
 			{
-				m_lmmsRcFile = line.section('=', -1).trimmed() + QDir::separator() +
-					".lmmsrc.xml";
+				m_lmmsRcFile = line.section('=', -1).trimmed() + QDir::separator() + ".lmmsrc.xml";
 				done++;
 			}
 			if (done == 2)

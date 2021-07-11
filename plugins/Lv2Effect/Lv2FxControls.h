@@ -38,10 +38,7 @@ public:
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& that) override;
-	inline QString nodeName() const override
-	{
-		return Lv2ControlBase::nodeName();
-	}
+	inline QString nodeName() const override { return Lv2ControlBase::nodeName(); }
 
 	int controlCount() override;
 	EffectControlDialog* createView() override;

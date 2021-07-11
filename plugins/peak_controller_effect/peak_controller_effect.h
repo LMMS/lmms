@@ -2,7 +2,7 @@
  * peak_controller_Effect.h - PeakController effect plugin
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -33,36 +33,19 @@ class PeakController;
 class PeakControllerEffect : public Effect
 {
 public:
-	PeakControllerEffect(Model* parent,
-		const Descriptor::SubPluginFeatures::Key* _key);
+	PeakControllerEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~PeakControllerEffect();
-	virtual bool processAudioBuffer(sampleFrame* _buf,
-		const fpp_t _frames) override;
+	virtual bool processAudioBuffer(sampleFrame* _buf, const fpp_t _frames) override;
 
-	EffectControls* controls() override
-	{
-		return &m_peakControls;
-	}
+	EffectControls* controls() override { return &m_peakControls; }
 
-	float lastSample()
-	{
-		return m_lastSample;
-	}
+	float lastSample() { return m_lastSample; }
 
-	PeakController* controller()
-	{
-		return m_autoController;
-	}
+	PeakController* controller() { return m_autoController; }
 
-	FloatModel* attackModel()
-	{
-		return &(m_peakControls.m_attackModel);
-	}
+	FloatModel* attackModel() { return &(m_peakControls.m_attackModel); }
 
-	FloatModel* decayModel()
-	{
-		return &(m_peakControls.m_decayModel);
-	}
+	FloatModel* decayModel() { return &(m_peakControls.m_decayModel); }
 
 	int m_effectId;
 

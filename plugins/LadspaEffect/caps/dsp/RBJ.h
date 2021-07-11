@@ -1,11 +1,11 @@
 /*
   dsp/RBJ.h
 
-	Copyright 
+	Copyright
 		1998 Robert Bristow-Johnson
 		2004-10 Tim Goetze <tim@quitte.de>
 
-	biquad prototypes according to the eq cookbook. easy-to-use, nice, 
+	biquad prototypes according to the eq cookbook. easy-to-use, nice,
 	predictable filters. thanks rbj!
 */
 /*
@@ -56,9 +56,8 @@ public:
 	}
 
 	/* templated so we can set double and float coefficients from the same
-		 * piece of code */
-	template <class T>
-	void make_direct_I(T* ca, T* cb)
+	 * piece of code */
+	template <class T> void make_direct_I(T* ca, T* cb)
 	{
 		double a0i = 1 / a[0];
 
@@ -66,20 +65,19 @@ public:
 		ca[1] = b[1] * a0i;
 		ca[2] = b[2] * a0i;
 
-		/* our bi-quad implementation /adds/ b[i] * y[i] so we need to 
-				 * toggle the sign for the b[] coefficients. 
-				 */
+		/* our bi-quad implementation /adds/ b[i] * y[i] so we need to
+		 * toggle the sign for the b[] coefficients.
+		 */
 		cb[0] = 0;
 		cb[1] = -a[1] * a0i;
 		cb[2] = -a[2] * a0i;
 	}
 };
 
-/* now the individual prototypes. 
+/* now the individual prototypes.
  * set-up is not optimal, i.e. does a lot of operations twice for readability.
  */
-class LP
-	: public RBJ
+class LP : public RBJ
 {
 public:
 	LP(double f, double Q, BiQuad& bq)
@@ -95,8 +93,7 @@ public:
 		ab(ca, cb);
 	}
 
-	template <class T>
-	void ab(T* ca, T* cb)
+	template <class T> void ab(T* ca, T* cb)
 	{
 		b[0] = (1 - cos) * .5;
 		b[1] = (1 - cos);
@@ -110,8 +107,7 @@ public:
 	}
 };
 
-class BP
-	: public RBJ
+class BP : public RBJ
 {
 public:
 	BP(double f, double Q, BiQuad& bq)
@@ -127,8 +123,7 @@ public:
 		ab(ca, cb);
 	}
 
-	template <class T>
-	void ab(T* ca, T* cb)
+	template <class T> void ab(T* ca, T* cb)
 	{
 		b[0] = Q * alpha;
 		b[1] = 0;
@@ -142,8 +137,7 @@ public:
 	}
 };
 
-class HP
-	: public RBJ
+class HP : public RBJ
 {
 public:
 	HP(double f, double Q, BiQuad& bq)
@@ -159,8 +153,7 @@ public:
 		ab(ca, cb);
 	}
 
-	template <class T>
-	void ab(T* ca, T* cb)
+	template <class T> void ab(T* ca, T* cb)
 	{
 		b[0] = (1 + cos) * .5;
 		b[1] = -(1 + cos);
@@ -174,8 +167,7 @@ public:
 	}
 };
 
-class Notch
-	: public RBJ
+class Notch : public RBJ
 {
 public:
 	Notch(double f, double Q, BiQuad& bq)
@@ -191,8 +183,7 @@ public:
 		ab(ca, cb);
 	}
 
-	template <class T>
-	void ab(T* ca, T* cb)
+	template <class T> void ab(T* ca, T* cb)
 	{
 		b[0] = 1;
 		b[1] = -2 * cos;
@@ -208,8 +199,7 @@ public:
 
 /* shelving and peaking dept. ////////////////////////////////////////////// */
 
-class PeakShelve
-	: public RBJ
+class PeakShelve : public RBJ
 {
 public:
 	double A, beta;
@@ -224,8 +214,7 @@ public:
 	}
 };
 
-class LoShelve
-	: public PeakShelve
+class LoShelve : public PeakShelve
 {
 public:
 	LoShelve(double f, double Q, double dB, BiQuad& bq)
@@ -241,8 +230,7 @@ public:
 		ab(ca, cb);
 	}
 
-	template <class T>
-	void ab(T* ca, T* cb)
+	template <class T> void ab(T* ca, T* cb)
 	{
 		double Ap1 = A + 1, Am1 = A - 1;
 		double beta_sin = beta * sin;
@@ -259,8 +247,7 @@ public:
 	}
 };
 
-class PeakingEQ
-	: public PeakShelve
+class PeakingEQ : public PeakShelve
 {
 public:
 	PeakingEQ(double f, double Q, double dB, BiQuad& bq)
@@ -276,8 +263,7 @@ public:
 		ab(ca, cb);
 	}
 
-	template <class T>
-	void ab(T* ca, T* cb)
+	template <class T> void ab(T* ca, T* cb)
 	{
 		b[0] = 1 + alpha * A;
 		b[1] = -2 * cos;
@@ -291,8 +277,7 @@ public:
 	}
 };
 
-class HiShelve
-	: public PeakShelve
+class HiShelve : public PeakShelve
 {
 public:
 	HiShelve(double f, double Q, double dB, BiQuad& bq)
@@ -308,8 +293,7 @@ public:
 		ab(ca, cb);
 	}
 
-	template <class T>
-	void ab(T* ca, T* cb)
+	template <class T> void ab(T* ca, T* cb)
 	{
 		double Ap1 = A + 1, Am1 = A - 1;
 		double beta_sin = beta * sin;

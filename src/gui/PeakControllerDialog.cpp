@@ -3,7 +3,7 @@
  * controller's settings
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -53,9 +53,7 @@ PeakControllerDialog::PeakControllerDialog(Controller* _model, QWidget* _parent)
 	setModel(_model);
 }
 
-PeakControllerDialog::~PeakControllerDialog()
-{
-}
+PeakControllerDialog::~PeakControllerDialog() {}
 
 /*
 void effectView::closeEffects()
@@ -65,16 +63,8 @@ void effectView::closeEffects()
 }
 */
 
-void PeakControllerDialog::contextMenuEvent(QContextMenuEvent*)
-{
-}
+void PeakControllerDialog::contextMenuEvent(QContextMenuEvent*) {}
 
-void PeakControllerDialog::paintEvent(QPaintEvent*)
-{
-	QPainter p(this);
-}
+void PeakControllerDialog::paintEvent(QPaintEvent*) { QPainter p(this); }
 
-void PeakControllerDialog::modelChanged()
-{
-	m_peakController = castModel<PeakController>();
-}
+void PeakControllerDialog::modelChanged() { m_peakController = castModel<PeakController>(); }

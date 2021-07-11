@@ -50,23 +50,17 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* _parent)
 	, m_ss(NULL)
 {
 	m_targetsTabWidget = new TabWidget(tr("TARGET"), this);
-	m_targetsTabWidget->setGeometry(TARGETS_TABWIDGET_X,
-		TARGETS_TABWIDGET_Y,
-		TARGETS_TABWIDGET_WIDTH,
-		TARGETS_TABWIDGET_HEIGTH);
+	m_targetsTabWidget->setGeometry(
+		TARGETS_TABWIDGET_X, TARGETS_TABWIDGET_Y, TARGETS_TABWIDGET_WIDTH, TARGETS_TABWIDGET_HEIGTH);
 
 	for (int i = 0; i < InstrumentSoundShaping::NumTargets; ++i)
 	{
 		m_envLfoViews[i] = new EnvelopeAndLfoView(m_targetsTabWidget);
-		m_targetsTabWidget->addTab(m_envLfoViews[i],
-			tr(InstrumentSoundShaping::targetNames[i][0]),
-			NULL);
+		m_targetsTabWidget->addTab(m_envLfoViews[i], tr(InstrumentSoundShaping::targetNames[i][0]), NULL);
 	}
 
 	m_filterGroupBox = new GroupBox(tr("FILTER"), this);
-	m_filterGroupBox->setGeometry(FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y,
-		FILTER_GROUPBOX_WIDTH,
-		FILTER_GROUPBOX_HEIGHT);
+	m_filterGroupBox->setGeometry(FILTER_GROUPBOX_X, FILTER_GROUPBOX_Y, FILTER_GROUPBOX_WIDTH, FILTER_GROUPBOX_HEIGHT);
 
 	m_filterComboBox = new ComboBox(m_filterGroupBox);
 	m_filterComboBox->setGeometry(14, 22, 120, ComboBox::DEFAULT_HEIGHT);
@@ -82,20 +76,16 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* _parent)
 	m_filterResKnob->move(196, 18);
 	m_filterResKnob->setHintText(tr("Q/Resonance:"), "");
 
-	m_singleStreamInfoLabel = new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
+	m_singleStreamInfoLabel =
+		new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
 	m_singleStreamInfoLabel->setWordWrap(true);
 	m_singleStreamInfoLabel->setFont(pointSize<8>(m_singleStreamInfoLabel->font()));
 
-	m_singleStreamInfoLabel->setGeometry(TARGETS_TABWIDGET_X,
-		TARGETS_TABWIDGET_Y,
-		TARGETS_TABWIDGET_WIDTH,
-		TARGETS_TABWIDGET_HEIGTH);
+	m_singleStreamInfoLabel->setGeometry(
+		TARGETS_TABWIDGET_X, TARGETS_TABWIDGET_Y, TARGETS_TABWIDGET_WIDTH, TARGETS_TABWIDGET_HEIGTH);
 }
 
-InstrumentSoundShapingView::~InstrumentSoundShapingView()
-{
-	delete m_targetsTabWidget;
-}
+InstrumentSoundShapingView::~InstrumentSoundShapingView() { delete m_targetsTabWidget; }
 
 void InstrumentSoundShapingView::setFunctionsHidden(bool hidden)
 {

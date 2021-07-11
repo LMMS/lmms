@@ -68,10 +68,7 @@ public:
 	InstrumentMiscView(InstrumentTrack* it, QWidget* parent);
 	~InstrumentMiscView();
 
-	GroupBox* pitchGroupBox()
-	{
-		return m_pitchGroupBox;
-	}
+	GroupBox* pitchGroupBox() { return m_pitchGroupBox; }
 
 private:
 	GroupBox* m_pitchGroupBox;

@@ -52,8 +52,7 @@ using AutoLilvNodes = std::unique_ptr<LilvNodes, LilvNodesDeleter>;
 	@param plug The plugin where the node is
 	@param getFunc The function to return the node from the plugin
 */
-QString qStringFromPluginNode(const LilvPlugin* plug,
-	LilvNode* (*getFunc)(const LilvPlugin*));
+QString qStringFromPluginNode(const LilvPlugin* plug, LilvNode* (*getFunc)(const LilvPlugin*));
 
 //! Return port name as QString, everything will be freed automatically
 QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port);

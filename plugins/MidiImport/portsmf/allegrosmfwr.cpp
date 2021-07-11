@@ -20,7 +20,7 @@ public:
 	char type; //'n' for note, 'o' for off, 's' for time signature,
 			   // 'c' for tempo changes
 	double time;
-	long index; //of the event in mSeq->notes
+	long index; // of the event in mSeq->notes
 	class event_queue* next;
 	event_queue(char t, double when, long x, class event_queue* n)
 	{
@@ -103,9 +103,7 @@ Alg_smf_write::Alg_smf_write(Alg_seq_ptr a_seq)
 	previous_divs = 0; // used to compute deltas for midifile
 }
 
-Alg_smf_write::~Alg_smf_write()
-{
-}
+Alg_smf_write::~Alg_smf_write() {}
 
 // sorting is quite subtle due to rounding
 // For example, suppose times from a MIDI file are exact, but in
@@ -168,7 +166,7 @@ void Alg_smf_write::write_note(Alg_note_ptr note, bool on)
 	double event_time = (on ? note->time : note->time + note->dur);
 	write_delta(event_time);
 
-	//printf("deltaDivisions: %d, beats elapsed: %g, on? %c\n", deltaDivisions, note->time, on);
+	// printf("deltaDivisions: %d, beats elapsed: %g, on? %c\n", deltaDivisions, note->time, on);
 
 	char chan = char(note->chan & 15);
 	int pitch = int(note->pitch + 0.5);
@@ -272,10 +270,7 @@ static char hex_to_nibble(char c)
 	}
 }
 
-static char hex_to_char(const char* s)
-{
-	return (hex_to_nibble(s[0]) << 4) + hex_to_nibble(s[1]);
-}
+static char hex_to_char(const char* s) { return (hex_to_nibble(s[0]) << 4) + hex_to_nibble(s[1]); }
 
 void Alg_smf_write::write_binary(int type_byte, const char* msg)
 {
@@ -329,8 +324,7 @@ void Alg_smf_write::write_update(Alg_update_ptr update)
 		write_data(c1);
 		write_data(c2);
 	}
-	else if (!strncmp(name, "control", 7) &&
-		update->parameter.attr_type() == 'r')
+	else if (!strncmp(name, "control", 7) && update->parameter.attr_type() == 'r')
 	{
 		int ctrlnum = atoi(name + 7);
 		int val = ROUND(update->parameter.r * 127);
@@ -339,8 +333,7 @@ void Alg_smf_write::write_update(Alg_update_ptr update)
 		write_data(ctrlnum);
 		write_data(val);
 	}
-	else if (!strcmp(name, "sysexs") &&
-		update->parameter.attr_type() == 's')
+	else if (!strcmp(name, "sysexs") && update->parameter.attr_type() == 's')
 	{
 		const char* s = update->parameter.s;
 		if (s[0] && s[1] && toupper(s[0]) == 'F' && s[1] == '0')
@@ -350,8 +343,7 @@ void Alg_smf_write::write_update(Alg_update_ptr update)
 		write_delta(update->time);
 		write_binary(0xF0, s);
 	}
-	else if (!strcmp(name, "sqspecifics") &&
-		update->parameter.attr_type() == 's')
+	else if (!strcmp(name, "sqspecifics") && update->parameter.attr_type() == 's')
 	{
 		const char* s = update->parameter.s;
 		write_delta(update->time);
@@ -470,7 +462,7 @@ void Alg_smf_write::write_update(Alg_update_ptr update)
 		keysig = -99;
 		keysig_mode = false;
 	}
-	//printf("Update: %s, key: %g\n", update->parameter.attr_name(), update->key);
+	// printf("Update: %s, key: %g\n", update->parameter.attr_name(), update->key);
 }
 
 // see notes on event_queue::push, TICK_TIME converts from beat to
@@ -526,7 +518,7 @@ void Alg_smf_write::write_track(int i)
 			}
 		}
 		else if (current->type == 'o')
-		{ //note-off
+		{ // note-off
 			Alg_note_ptr n = (Alg_note_ptr)notes[current->index];
 			write_note(n, false);
 			delete current;
@@ -537,8 +529,7 @@ void Alg_smf_write::write_track(int i)
 			current->index++; // -R
 			if (current->index < seq->get_time_map()->beats.len)
 			{
-				current->time =
-					TICK_TIME(seq->get_time_map()->beats[current->index].beat, 0);
+				current->time = TICK_TIME(seq->get_time_map()->beats[current->index].beat, 0);
 				pending = push(pending, current);
 			}
 			else
@@ -552,8 +543,7 @@ void Alg_smf_write::write_track(int i)
 			current->index++;
 			if (current->index < seq->time_sig.length())
 			{
-				current->time =
-					TICK_TIME(seq->time_sig[current->index].beat, 0);
+				current->time = TICK_TIME(seq->time_sig[current->index].beat, 0);
 				pending = push(pending, current);
 			}
 			else
@@ -695,7 +685,7 @@ void Alg_smf_write::write_delta(double event_time)
 void Alg_smf_write::write_varinum(int value)
 {
 	if (value < 0)
-		value = 0; //this line should not have to be here!
+		value = 0; // this line should not have to be here!
 	int buffer;
 
 	buffer = value & 0x7f;

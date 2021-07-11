@@ -40,10 +40,7 @@ public:
 	}
 
 private:
-	void run() override
-	{
-		m_processor->analyze(*m_inputBuffer);
-	}
+	void run() override { m_processor->analyze(*m_inputBuffer); }
 
 	SaProcessor* m_processor;
 	LocklessRingBuffer<sampleFrame>* m_inputBuffer;

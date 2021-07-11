@@ -48,10 +48,7 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	inline QString nodeName() const override
-	{
-		return "projectnotes";
-	}
+	inline QString nodeName() const override { return "projectnotes"; }
 
 protected:
 	void closeEvent(QCloseEvent* _ce) override;
@@ -71,14 +68,8 @@ private slots:
 
 private:
 	QTextEdit* m_edit;
-	QAction *m_actionTextBold,
-		*m_actionTextUnderline,
-		*m_actionTextItalic,
-		*m_actionTextColor,
-		*m_actionAlignLeft,
-		*m_actionAlignCenter,
-		*m_actionAlignRight,
-		*m_actionAlignJustify;
+	QAction *m_actionTextBold, *m_actionTextUnderline, *m_actionTextItalic, *m_actionTextColor, *m_actionAlignLeft,
+		*m_actionAlignCenter, *m_actionAlignRight, *m_actionAlignJustify;
 	QComboBox* m_comboFont;
 	QComboBox* m_comboSize;
 };

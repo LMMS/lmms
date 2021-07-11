@@ -30,23 +30,13 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"StereoEnhancer Effect",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Plugin for enhancing stereo separation of a stereo input file"),
-			"Lou Herard <lherard/at/gmail.com>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor = {STRINGIFY(PLUGIN_NAME),
+		"StereoEnhancer Effect",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Plugin for enhancing stereo separation of a stereo input file"),
+		"Lou Herard <lherard/at/gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
-stereoEnhancerEffect::stereoEnhancerEffect(
-	Model* _parent,
-	const Descriptor::SubPluginFeatures::Key* _key)
+stereoEnhancerEffect::stereoEnhancerEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&stereoenhancer_plugin_descriptor, _parent, _key)
 	, m_seFX(DspEffectLibrary::StereoEnhancer(0.0f))
 	, m_delayBuffer(new sampleFrame[DEFAULT_BUFFER_SIZE])
@@ -67,8 +57,7 @@ stereoEnhancerEffect::~stereoEnhancerEffect()
 	m_currFrame = 0;
 }
 
-bool stereoEnhancerEffect::processAudioBuffer(sampleFrame* _buf,
-	const fpp_t _frames)
+bool stereoEnhancerEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
 
 	// This appears to be used for determining whether or not to continue processing
@@ -105,8 +94,8 @@ bool stereoEnhancerEffect::processAudioBuffer(sampleFrame* _buf,
 			frameIndex += DEFAULT_BUFFER_SIZE;
 		}
 
-		//sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
-		sample_t s[2] = {_buf[f][0], m_delayBuffer[frameIndex][1]}; //Chocolate
+		// sample_t s[2] = { _buf[f][0], _buf[f][1] };	//Vanilla
+		sample_t s[2] = {_buf[f][0], m_delayBuffer[frameIndex][1]}; // Chocolate
 
 		m_seFX.nextSample(s[0], s[1]);
 
@@ -146,8 +135,7 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 	{
-		return (new stereoEnhancerEffect(_parent,
-			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(
-				_data)));
+		return (
+			new stereoEnhancerEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data)));
 	}
 }

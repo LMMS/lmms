@@ -40,15 +40,9 @@ public:
 		_success_ful = true;
 	}
 
-	virtual ~AudioDummy()
-	{
-		stopProcessing();
-	}
+	virtual ~AudioDummy() { stopProcessing(); }
 
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "Dummy (no sound output)");
-	}
+	inline static QString name() { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "Dummy (no sound output)"); }
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{
@@ -58,13 +52,9 @@ public:
 		{
 		}
 
-		virtual ~setupWidget()
-		{
-		}
+		virtual ~setupWidget() {}
 
-		void saveSettings() override
-		{
-		}
+		void saveSettings() override {}
 
 		void show() override
 		{
@@ -74,15 +64,9 @@ public:
 	};
 
 private:
-	void startProcessing() override
-	{
-		start();
-	}
+	void startProcessing() override { start(); }
 
-	void stopProcessing() override
-	{
-		stopProcessingThread(this);
-	}
+	void stopProcessing() override { stopProcessingThread(this); }
 
 	void run() override
 	{
@@ -100,7 +84,8 @@ private:
 				delete[] b;
 			}
 
-			const int microseconds = static_cast<int>(mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed());
+			const int microseconds = static_cast<int>(
+				mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed());
 			if (microseconds > 0)
 			{
 				usleep(microseconds);

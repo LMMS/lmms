@@ -69,8 +69,7 @@ QPixmap* AutomationEditor::s_toolMove = nullptr;
 QPixmap* AutomationEditor::s_toolYFlip = nullptr;
 QPixmap* AutomationEditor::s_toolXFlip = nullptr;
 
-const QVector<double> AutomationEditor::m_zoomXLevels =
-	{0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f};
+const QVector<double> AutomationEditor::m_zoomXLevels = {0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f};
 
 AutomationEditor::AutomationEditor()
 	: QWidget()
@@ -105,63 +104,50 @@ AutomationEditor::AutomationEditor()
 	, m_crossColor(0, 0, 0)
 	, m_backgroundShade(0, 0, 0)
 {
-	connect(this, SIGNAL(currentPatternChanged()),
-		this, SLOT(updateAfterPatternChange()),
-		Qt::QueuedConnection);
-	connect(Engine::getSong(), SIGNAL(timeSignatureChanged(int, int)),
-		this, SLOT(update()));
+	connect(this, SIGNAL(currentPatternChanged()), this, SLOT(updateAfterPatternChange()), Qt::QueuedConnection);
+	connect(Engine::getSong(), SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()));
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 
-	//keeps the direction of the widget, undepended on the locale
+	// keeps the direction of the widget, undepended on the locale
 	setLayoutDirection(Qt::LeftToRight);
 
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
-	connect(m_tensionModel, SIGNAL(dataChanged()),
-		this, SLOT(setTension()));
+	connect(m_tensionModel, SIGNAL(dataChanged()), this, SLOT(setTension()));
 
 	for (auto q : Quantizations)
 	{
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
 
-	connect(&m_quantizeModel, SIGNAL(dataChanged()),
-		this, SLOT(setQuantization()));
+	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
 	m_quantizeModel.setValue(m_quantizeModel.findText("1/8"));
 
 	if (s_toolYFlip == nullptr)
 	{
-		s_toolYFlip = new QPixmap(embed::getIconPixmap(
-			"flip_y"));
+		s_toolYFlip = new QPixmap(embed::getIconPixmap("flip_y"));
 	}
 	if (s_toolXFlip == nullptr)
 	{
-		s_toolXFlip = new QPixmap(embed::getIconPixmap(
-			"flip_x"));
+		s_toolXFlip = new QPixmap(embed::getIconPixmap("flip_x"));
 	}
 
 	// add time-line
-	m_timeLine = new TimeLineWidget(VALUES_WIDTH, 0, m_ppb,
-		Engine::getSong()->getPlayPos(
-			Song::Mode_PlayAutomationPattern),
-		m_currentPosition,
-		Song::Mode_PlayAutomationPattern, this);
-	connect(this, SIGNAL(positionChanged(const TimePos&)),
-		m_timeLine, SLOT(updatePosition(const TimePos&)));
-	connect(m_timeLine, SIGNAL(positionChanged(const TimePos&)),
-		this, SLOT(updatePosition(const TimePos&)));
+	m_timeLine =
+		new TimeLineWidget(VALUES_WIDTH, 0, m_ppb, Engine::getSong()->getPlayPos(Song::Mode_PlayAutomationPattern),
+			m_currentPosition, Song::Mode_PlayAutomationPattern, this);
+	connect(this, SIGNAL(positionChanged(const TimePos&)), m_timeLine, SLOT(updatePosition(const TimePos&)));
+	connect(m_timeLine, SIGNAL(positionChanged(const TimePos&)), this, SLOT(updatePosition(const TimePos&)));
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar(Qt::Horizontal, this);
 	m_leftRightScroll->setSingleStep(1);
-	connect(m_leftRightScroll, SIGNAL(valueChanged(int)), this,
-		SLOT(horScrolled(int)));
+	connect(m_leftRightScroll, SIGNAL(valueChanged(int)), this, SLOT(horScrolled(int)));
 
 	m_topBottomScroll = new QScrollBar(Qt::Vertical, this);
 	m_topBottomScroll->setSingleStep(1);
 	m_topBottomScroll->setPageStep(20);
-	connect(m_topBottomScroll, SIGNAL(valueChanged(int)), this,
-		SLOT(verScrolled(int)));
+	connect(m_topBottomScroll, SIGNAL(valueChanged(int)), this, SLOT(verScrolled(int)));
 
 	// init pixmaps
 	if (s_toolDraw == nullptr)
@@ -267,14 +253,12 @@ void AutomationEditor::keyPressEvent(QKeyEvent* ke)
 	switch (ke->key())
 	{
 	case Qt::Key_Up:
-		m_topBottomScroll->setValue(
-			m_topBottomScroll->value() - 1);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - 1);
 		ke->accept();
 		break;
 
 	case Qt::Key_Down:
-		m_topBottomScroll->setValue(
-			m_topBottomScroll->value() + 1);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() + 1);
 		ke->accept();
 		break;
 
@@ -376,19 +360,9 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 
 	// Display dialog to edit the value
 	bool ok;
-	double value = QInputDialog::getDouble(
-		this,
-		tr("Edit Value"),
-		editingOutValue
-			? tr("New outValue")
-			: tr("New inValue"),
-		editingOutValue
-			? OUTVAL(node)
-			: INVAL(node),
-		m_pattern->firstObject()->minValue<float>(),
-		m_pattern->firstObject()->maxValue<float>(),
-		3,
-		&ok);
+	double value = QInputDialog::getDouble(this, tr("Edit Value"),
+		editingOutValue ? tr("New outValue") : tr("New inValue"), editingOutValue ? OUTVAL(node) : INVAL(node),
+		m_pattern->firstObject()->minValue<float>(), m_pattern->firstObject()->maxValue<float>(), 3, &ok);
 
 	// If dialog failed return false
 	if (!ok)
@@ -474,8 +448,7 @@ void AutomationEditor::mousePressEvent(QMouseEvent* mouseEvent)
 				// clicked position to this position
 				if (mouseEvent->modifiers() & Qt::ShiftModifier)
 				{
-					drawLine(m_drawLastTick, m_drawLastLevel,
-						posTicks, level);
+					drawLine(m_drawLastTick, m_drawLastLevel, posTicks, level);
 
 					// Update the last clicked position for the next time
 					m_drawLastTick = posTicks;
@@ -489,12 +462,7 @@ void AutomationEditor::mousePressEvent(QMouseEvent* mouseEvent)
 					// Starts actually moving/draging the node
 					TimePos newTime = m_pattern->setDragValue(
 						// The TimePos of either the clicked node or a new one
-						TimePos(
-							clickedNode == tm.end()
-								? posTicks
-								: POS(clickedNode)),
-						level,
-						true,
+						TimePos(clickedNode == tm.end() ? posTicks : POS(clickedNode)), level, true,
 						mouseEvent->modifiers() & Qt::ControlModifier);
 
 					// We need to update our iterator because we are either creating a new node
@@ -583,9 +551,7 @@ void AutomationEditor::mousePressEvent(QMouseEvent* mouseEvent)
 				{
 					// We check if the quantized position of the time we clicked has a
 					// node and set its outValue
-					TimePos quantizedPos = Note::quantized(
-						TimePos(posTicks),
-						m_pattern->quantization());
+					TimePos quantizedPos = Note::quantized(TimePos(posTicks), m_pattern->quantization());
 
 					clickedNode = tm.find(quantizedPos);
 
@@ -723,10 +689,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 					// Updates the drag value of the moved node
 					m_pattern->setDragValue(
-						TimePos(posTicks),
-						level,
-						true,
-						mouseEvent->modifiers() & Qt::ControlModifier);
+						TimePos(posTicks), level, true, mouseEvent->modifiers() & Qt::ControlModifier);
 
 					Engine::getSong()->setModified();
 				}
@@ -835,7 +798,9 @@ inline void AutomationEditor::drawCross(QPainter& p)
 	QPoint mouse_pos = mapFromGlobal(QCursor::pos());
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	float level = getLevel(mouse_pos.y());
-	float cross_y = m_y_auto ? grid_bottom - ((grid_bottom - TOP_MARGIN) * (level - m_minLevel) / (float)(m_maxLevel - m_minLevel)) : grid_bottom - (level - m_bottomLevel) * m_y_delta;
+	float cross_y = m_y_auto
+		? grid_bottom - ((grid_bottom - TOP_MARGIN) * (level - m_minLevel) / (float)(m_maxLevel - m_minLevel))
+		: grid_bottom - (level - m_bottomLevel) * m_y_delta;
 
 	p.setPen(m_crossColor);
 	p.drawLine(VALUES_WIDTH, (int)cross_y, width(), (int)cross_y);
@@ -848,9 +813,7 @@ inline void AutomationEditor::drawCross(QPainter& p)
 	float scaledLevel = m_pattern->firstObject()->scaledValue(level);
 
 	// Limit the scaled-level tooltip to the grid
-	if (mouse_pos.x() >= 0 &&
-		mouse_pos.x() <= width() - SCROLLBAR_SIZE &&
-		mouse_pos.y() >= 0 &&
+	if (mouse_pos.x() >= 0 && mouse_pos.x() <= width() - SCROLLBAR_SIZE && mouse_pos.y() >= 0 &&
 		mouse_pos.y() <= height() - SCROLLBAR_SIZE)
 	{
 		QToolTip::showText(tt_pos, QString::number(scaledLevel), this);
@@ -906,8 +869,7 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 
 	// print value numbers
 	int font_height = p.fontMetrics().height();
-	Qt::Alignment text_flags =
-		(Qt::Alignment)(Qt::AlignRight | Qt::AlignVCenter);
+	Qt::Alignment text_flags = (Qt::Alignment)(Qt::AlignRight | Qt::AlignVCenter);
 
 	if (validPattern())
 	{
@@ -917,17 +879,11 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 			float level[] = {m_minLevel, m_maxLevel};
 			for (int i = 0; i < 2; ++i)
 			{
-				const QString& label = m_pattern->firstObject()
-										   ->displayValue(level[i]);
-				p.setPen(QApplication::palette().color(QPalette::Active,
-					QPalette::Shadow));
-				p.drawText(1, y[i] - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label);
+				const QString& label = m_pattern->firstObject()->displayValue(level[i]);
+				p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+				p.drawText(1, y[i] - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 				p.setPen(fgColor);
-				p.drawText(0, y[i] - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label);
+				p.drawText(0, y[i] - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 			}
 		}
 		else
@@ -943,33 +899,28 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 			}
 			for (; level <= m_topLevel; level += printable)
 			{
-				const QString& label = m_pattern->firstObject()
-										   ->displayValue(level);
+				const QString& label = m_pattern->firstObject()->displayValue(level);
 				y = yCoordOfLevel(level);
-				p.setPen(QApplication::palette().color(QPalette::Active,
-					QPalette::Shadow));
-				p.drawText(1, y - font_height + 1,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label);
+				p.setPen(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
+				p.drawText(1, y - font_height + 1, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 				p.setPen(fgColor);
-				p.drawText(0, y - font_height,
-					VALUES_WIDTH - 10, 2 * font_height,
-					text_flags, label);
+				p.drawText(0, y - font_height, VALUES_WIDTH - 10, 2 * font_height, text_flags, label);
 			}
 		}
 	}
 
 	// set clipping area, because we are not allowed to paint over
 	// keyboard...
-	p.setClipRect(VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
-		grid_height);
+	p.setClipRect(VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH, grid_height);
 
 	// draw vertical raster
 
 	if (m_pattern)
 	{
 		int tick, x, q;
-		int x_line_end = (int)(m_y_auto || m_topLevel < m_maxLevel ? TOP_MARGIN : grid_bottom - (m_topLevel - m_bottomLevel) * m_y_delta);
+		int x_line_end =
+			(int)(m_y_auto || m_topLevel < m_maxLevel ? TOP_MARGIN
+													  : grid_bottom - (m_topLevel - m_bottomLevel) * m_y_delta);
 
 		if (m_zoomingXModel.value() > 3)
 		{
@@ -991,9 +942,7 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for (tick = m_currentPosition - m_currentPosition % q,
-			x = xCoordOfTick(tick);
-			 x <= width();
+		for (tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick(tick); x <= width();
 			 tick += q, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_lineColor);
@@ -1028,32 +977,27 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 		}
 
 		// alternating shades for better contrast
-		float timeSignature = static_cast<float>(Engine::getSong()->getTimeSigModel().getNumerator()) / static_cast<float>(Engine::getSong()->getTimeSigModel().getDenominator());
+		float timeSignature = static_cast<float>(Engine::getSong()->getTimeSigModel().getNumerator()) /
+			static_cast<float>(Engine::getSong()->getTimeSigModel().getDenominator());
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
-		//the bars which disappears at the left side by scrolling
+		// the bars which disappears at the left side by scrolling
 		int leftBars = m_currentPosition * zoomFactor / TimePos::ticksPerBar();
 
-		//iterates the visible bars and draw the shading on uneven bars
-		for (int x = VALUES_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppb, ++barCount)
+		// iterates the visible bars and draw the shading on uneven bars
+		for (int x = VALUES_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature;
+			 x += m_ppb, ++barCount)
 		{
 			if ((barCount + leftBars) % 2 != 0)
 			{
-				p.fillRect(
-					x - m_currentPosition * zoomFactor / timeSignature,
-					TOP_MARGIN,
-					m_ppb,
-					height() - (SCROLLBAR_SIZE + TOP_MARGIN),
-					m_backgroundShade);
+				p.fillRect(x - m_currentPosition * zoomFactor / timeSignature, TOP_MARGIN, m_ppb,
+					height() - (SCROLLBAR_SIZE + TOP_MARGIN), m_backgroundShade);
 			}
 		}
 
 		// Draw the beat grid
-		int ticksPerBeat = DefaultTicksPerBar /
-			Engine::getSong()->getTimeSigModel().getDenominator();
+		int ticksPerBeat = DefaultTicksPerBar / Engine::getSong()->getTimeSigModel().getDenominator();
 
-		for (tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-			x = xCoordOfTick(tick);
-			 x <= width();
+		for (tick = m_currentPosition - m_currentPosition % ticksPerBeat, x = xCoordOfTick(tick); x <= width();
 			 tick += ticksPerBeat, x = xCoordOfTick(tick))
 		{
 			p.setPen(m_beatLineColor);
@@ -1061,10 +1005,8 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 		}
 
 		// and finally bars
-		for (tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(),
-			x = xCoordOfTick(tick);
-			 x <= width();
-			 tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
+		for (tick = m_currentPosition - m_currentPosition % TimePos::ticksPerBar(), x = xCoordOfTick(tick);
+			 x <= width(); tick += TimePos::ticksPerBar(), x = xCoordOfTick(tick))
 		{
 			p.setPen(m_barLineColor);
 			p.drawLine(x, grid_bottom, x, x_line_end);
@@ -1075,11 +1017,11 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 
 	if (validPattern())
 	{
-		//NEEDS Change in CSS
-		//int len_ticks = 4;
+		// NEEDS Change in CSS
+		// int len_ticks = 4;
 		timeMap& time_map = m_pattern->getTimeMap();
 
-		//Don't bother doing/rendering anything if there is no automation points
+		// Don't bother doing/rendering anything if there is no automation points
 		if (time_map.size() > 0)
 		{
 			timeMap::iterator it = time_map.begin();
@@ -1138,10 +1080,7 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 				++it;
 			}
 
-			for (
-				int i = POS(it), x = xCoordOfTick(i);
-				x <= width();
-				i++, x = xCoordOfTick(i))
+			for (int i = POS(it), x = xCoordOfTick(i); x <= width(); i++, x = xCoordOfTick(i))
 			{
 				// Draws the rectangle representing the value after the last node (for
 				// that reason we use outValue).
@@ -1156,11 +1095,9 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 		QFont f = p.font();
 		f.setBold(true);
 		p.setFont(pointSize<14>(f));
-		p.setPen(QApplication::palette().color(QPalette::Active,
-			QPalette::BrightText));
-		p.drawText(VALUES_WIDTH + 20, TOP_MARGIN + 40,
-			width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
-			grid_height - 40, Qt::TextWordWrap,
+		p.setPen(QApplication::palette().color(QPalette::Active, QPalette::BrightText));
+		p.drawText(VALUES_WIDTH + 20, TOP_MARGIN + 40, width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE, grid_height - 40,
+			Qt::TextWordWrap,
 			tr("Please open an automation pattern with "
 			   "the context menu of a control!"));
 	}
@@ -1251,7 +1188,8 @@ void AutomationEditor::drawLevelTick(QPainter& p, int tick, float value)
 	int rect_width = xCoordOfTick(tick + 1) - x;
 
 	// is the level in visible area?
-	if ((value >= m_bottomLevel && value <= m_topLevel) || (value > m_topLevel && m_topLevel >= 0) || (value < m_bottomLevel && m_bottomLevel <= 0))
+	if ((value >= m_bottomLevel && value <= m_topLevel) || (value > m_topLevel && m_topLevel >= 0) ||
+		(value < m_bottomLevel && m_bottomLevel <= 0))
 	{
 		int y_start = yCoordOfLevel(value);
 		int rect_height;
@@ -1303,13 +1241,10 @@ void AutomationEditor::centerTopBottomScroll()
 // responsible for moving/resizing scrollbars after window-resizing
 void AutomationEditor::resizeEvent(QResizeEvent* re)
 {
-	m_leftRightScroll->setGeometry(VALUES_WIDTH, height() - SCROLLBAR_SIZE,
-		width() - VALUES_WIDTH,
-		SCROLLBAR_SIZE);
+	m_leftRightScroll->setGeometry(VALUES_WIDTH, height() - SCROLLBAR_SIZE, width() - VALUES_WIDTH, SCROLLBAR_SIZE);
 
 	int grid_height = height() - TOP_MARGIN - SCROLLBAR_SIZE;
-	m_topBottomScroll->setGeometry(width() - SCROLLBAR_SIZE, TOP_MARGIN,
-		SCROLLBAR_SIZE, grid_height);
+	m_topBottomScroll->setGeometry(width() - SCROLLBAR_SIZE, TOP_MARGIN, SCROLLBAR_SIZE, grid_height);
 
 	int half_grid = grid_height / 2;
 	int total_pixels = (int)((m_maxLevel - m_minLevel) * m_y_delta + 1);
@@ -1321,8 +1256,7 @@ void AutomationEditor::resizeEvent(QResizeEvent* re)
 	}
 	else
 	{
-		m_topBottomScroll->setRange((int)m_scrollLevel,
-			(int)m_scrollLevel);
+		m_topBottomScroll->setRange((int)m_scrollLevel, (int)m_scrollLevel);
 	}
 	centerTopBottomScroll();
 
@@ -1396,18 +1330,15 @@ void AutomationEditor::wheelEvent(QWheelEvent* we)
 	// FIXME: Reconsider if determining orientation is necessary in Qt6.
 	else if (abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-			we->angleDelta().x() * 2 / 15);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - we->angleDelta().x() * 2 / 15);
 	}
 	else if (we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-			we->angleDelta().y() * 2 / 15);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - we->angleDelta().y() * 2 / 15);
 	}
 	else
 	{
-		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-			(we->angleDelta().x() + we->angleDelta().y()) / 30);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - (we->angleDelta().x() + we->angleDelta().y()) / 30);
 	}
 }
 
@@ -1415,7 +1346,12 @@ float AutomationEditor::getLevel(int y)
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
-	float level = roundf((m_bottomLevel + (m_y_auto ? (m_maxLevel - m_minLevel) * (level_line_y - y) / (float)(level_line_y - (TOP_MARGIN + 2)) : (level_line_y - y) / (float)m_y_delta)) / m_step) * m_step;
+	float level =
+		roundf((m_bottomLevel +
+				   (m_y_auto ? (m_maxLevel - m_minLevel) * (level_line_y - y) / (float)(level_line_y - (TOP_MARGIN + 2))
+							 : (level_line_y - y) / (float)m_y_delta)) /
+			m_step) *
+		m_step;
 	// some range-checking-stuff
 	level = qBound(m_bottomLevel, level, m_topLevel);
 
@@ -1424,8 +1360,7 @@ float AutomationEditor::getLevel(int y)
 
 inline bool AutomationEditor::inBBEditor()
 {
-	return (validPattern() &&
-		m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer());
+	return (validPattern() && m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer());
 }
 
 void AutomationEditor::play()
@@ -1509,10 +1444,7 @@ void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
 	update();
 }
 
-void AutomationEditor::setEditMode(int mode)
-{
-	setEditMode((AutomationEditor::EditModes)mode);
-}
+void AutomationEditor::setEditMode(int mode) { setEditMode((AutomationEditor::EditModes)mode); }
 
 void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes type)
 {
@@ -1525,10 +1457,7 @@ void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes ty
 	}
 }
 
-void AutomationEditor::setProgressionType(int type)
-{
-	setProgressionType((AutomationPattern::ProgressionTypes)type);
-}
+void AutomationEditor::setProgressionType(int type) { setProgressionType((AutomationPattern::ProgressionTypes)type); }
 
 void AutomationEditor::setTension()
 {
@@ -1541,22 +1470,18 @@ void AutomationEditor::setTension()
 
 void AutomationEditor::updatePosition(const TimePos& t)
 {
-	if ((Engine::getSong()->isPlaying() &&
-			Engine::getSong()->playMode() ==
-				Song::Mode_PlayAutomationPattern) ||
+	if ((Engine::getSong()->isPlaying() && Engine::getSong()->playMode() == Song::Mode_PlayAutomationPattern) ||
 		m_scrollBack == true)
 	{
 		const int w = width() - VALUES_WIDTH;
 		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
 		{
-			m_leftRightScroll->setValue(t.getBar() *
-				TimePos::ticksPerBar());
+			m_leftRightScroll->setValue(t.getBar() * TimePos::ticksPerBar());
 		}
 		else if (t < m_currentPosition)
 		{
 			TimePos t_ = qMax(t - w * TimePos::ticksPerBar() * TimePos::ticksPerBar() / m_ppb, 0);
-			m_leftRightScroll->setValue(t_.getBar() *
-				TimePos::ticksPerBar());
+			m_leftRightScroll->setValue(t_.getBar() * TimePos::ticksPerBar());
 		}
 		m_scrollBack = false;
 	}
@@ -1645,7 +1570,8 @@ void AutomationEditor::updateTopBottomLevels()
  * @param Int R distance in pixels
  * @return timeMap::iterator with the clicked node, or timeMap.end() if none was clicked.
  */
-AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bool outValue /* = false */, int r /* = 5 */)
+AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(
+	int x, int y, bool outValue /* = false */, int r /* = 5 */)
 {
 	// Remove the VALUES_WIDTH from the x position, so we have the actual viewport x
 	x -= VALUES_WIDTH;
@@ -1672,10 +1598,7 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 		if (posTicks <= POS(it) + ticksOffset)
 		{
 			// The y position of the node
-			float valueY = yCoordOfLevel(
-				outValue
-					? OUTVAL(it)
-					: INVAL(it));
+			float valueY = yCoordOfLevel(outValue ? OUTVAL(it) : INVAL(it));
 			// If the y coordinate is within "r" pixels of the node's value
 			if (y >= (valueY - r) && y <= (valueY + r))
 			{
@@ -1710,7 +1633,8 @@ AutomationEditorWindow::AutomationEditorWindow()
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	QAction* drawOutAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
+	QAction* drawOutAction =
+		editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
 	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
@@ -1729,12 +1653,12 @@ AutomationEditorWindow::AutomationEditorWindow()
 
 	ActionGroup* progression_type_group = new ActionGroup(this);
 
-	m_discreteAction = progression_type_group->addAction(
-		embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
+	m_discreteAction =
+		progression_type_group->addAction(embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
 	m_discreteAction->setChecked(true);
 
-	m_linearAction = progression_type_group->addAction(
-		embed::getIconPixmap("progression_linear"), tr("Linear progression"));
+	m_linearAction =
+		progression_type_group->addAction(embed::getIconPixmap("progression_linear"), tr("Linear progression"));
 	m_cubicHermiteAction = progression_type_group->addAction(
 		embed::getIconPixmap("progression_cubic_hermite"), tr("Cubic Hermite progression"));
 
@@ -1775,8 +1699,7 @@ AutomationEditorWindow::AutomationEditorWindow()
 
 	m_zoomingXComboBox->setModel(&m_editor->m_zoomingXModel);
 
-	connect(&m_editor->m_zoomingXModel, SIGNAL(dataChanged()),
-		m_editor, SLOT(zoomingXChanged()));
+	connect(&m_editor->m_zoomingXModel, SIGNAL(dataChanged()), m_editor, SLOT(zoomingXChanged()));
 
 	QLabel* zoom_y_label = new QLabel(zoomToolBar);
 	zoom_y_label->setPixmap(embed::getIconPixmap("zoom_y"));
@@ -1794,8 +1717,7 @@ AutomationEditorWindow::AutomationEditorWindow()
 
 	m_zoomingYComboBox->setModel(&m_editor->m_zoomingYModel);
 
-	connect(&m_editor->m_zoomingYModel, SIGNAL(dataChanged()),
-		m_editor, SLOT(zoomingYChanged()));
+	connect(&m_editor->m_zoomingYModel, SIGNAL(dataChanged()), m_editor, SLOT(zoomingYChanged()));
 
 	zoomToolBar->addWidget(zoom_x_label);
 	zoomToolBar->addWidget(m_zoomingXComboBox);
@@ -1826,9 +1748,7 @@ AutomationEditorWindow::AutomationEditorWindow()
 	m_toolBar->setAcceptDrops(true);
 }
 
-AutomationEditorWindow::~AutomationEditorWindow()
-{
-}
+AutomationEditorWindow::~AutomationEditorWindow() {}
 
 void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 {
@@ -1881,10 +1801,7 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 	emit currentPatternChanged();
 }
 
-const AutomationPattern* AutomationEditorWindow::currentPattern()
-{
-	return m_editor->currentPattern();
-}
+const AutomationPattern* AutomationEditorWindow::currentPattern() { return m_editor->currentPattern(); }
 
 void AutomationEditorWindow::dropEvent(QDropEvent* _de)
 {
@@ -1892,8 +1809,8 @@ void AutomationEditorWindow::dropEvent(QDropEvent* _de)
 	QString val = StringPairDrag::decodeValue(_de);
 	if (type == "automatable_model")
 	{
-		AutomatableModel* mod = dynamic_cast<AutomatableModel*>(
-			Engine::projectJournal()->journallingObject(val.toInt()));
+		AutomatableModel* mod =
+			dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
 			bool added = m_editor->m_pattern->addObject(mod);
@@ -1902,8 +1819,7 @@ void AutomationEditorWindow::dropEvent(QDropEvent* _de)
 				TextFloat::displayMessage(mod->displayName(),
 					tr("Model is already connected "
 					   "to this pattern."),
-					embed::getIconPixmap("automation"),
-					2000);
+					embed::getIconPixmap("automation"), 2000);
 			}
 			setCurrentPattern(m_editor->m_pattern);
 		}
@@ -1929,10 +1845,7 @@ void AutomationEditorWindow::open(AutomationPattern* pattern)
 	setFocus();
 }
 
-QSize AutomationEditorWindow::sizeHint() const
-{
-	return {INITIAL_WIDTH, INITIAL_HEIGHT};
-}
+QSize AutomationEditorWindow::sizeHint() const { return {INITIAL_WIDTH, INITIAL_HEIGHT}; }
 
 void AutomationEditorWindow::clearCurrentPattern()
 {
@@ -1940,10 +1853,7 @@ void AutomationEditorWindow::clearCurrentPattern()
 	setCurrentPattern(nullptr);
 }
 
-void AutomationEditorWindow::focusInEvent(QFocusEvent* event)
-{
-	m_editor->setFocus(event->reason());
-}
+void AutomationEditorWindow::focusInEvent(QFocusEvent* event) { m_editor->setFocus(event->reason()); }
 
 void AutomationEditorWindow::play()
 {
@@ -1951,10 +1861,7 @@ void AutomationEditorWindow::play()
 	setPauseIcon(Engine::getSong()->isPlaying());
 }
 
-void AutomationEditorWindow::stop()
-{
-	m_editor->stop();
-}
+void AutomationEditorWindow::stop() { m_editor->stop(); }
 
 void AutomationEditorWindow::updateWindowTitle()
 {

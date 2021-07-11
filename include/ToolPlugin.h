@@ -37,8 +37,7 @@ public:
 
 	// instantiate tool-plugin with given name or return NULL
 	// on failure
-	static ToolPlugin* instantiate(const QString& _plugin_name,
-		Model* _parent);
+	static ToolPlugin* instantiate(const QString& _plugin_name, Model* _parent);
 };
 
 #endif

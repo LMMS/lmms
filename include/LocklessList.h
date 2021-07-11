@@ -29,8 +29,7 @@
 
 #include "LocklessAllocator.h"
 
-template <typename T>
-class LocklessList
+template <typename T> class LocklessList
 {
 public:
 	struct Element
@@ -45,10 +44,7 @@ public:
 	{
 	}
 
-	~LocklessList()
-	{
-		delete m_allocator;
-	}
+	~LocklessList() { delete m_allocator; }
 
 	void push(T value)
 	{
@@ -56,33 +52,19 @@ public:
 		e->value = value;
 		e->next = m_first.load(std::memory_order_relaxed);
 
-		while (!m_first.compare_exchange_weak(e->next, e,
-			std::memory_order_release,
-			std::memory_order_relaxed))
+		while (!m_first.compare_exchange_weak(e->next, e, std::memory_order_release, std::memory_order_relaxed))
 		{
 			// Empty loop (compare_exchange_weak updates e->next)
 		}
 	}
 
-	Element* popList()
-	{
-		return m_first.exchange(nullptr);
-	}
+	Element* popList() { return m_first.exchange(nullptr); }
 
-	Element* first()
-	{
-		return m_first.load(std::memory_order_acquire);
-	}
+	Element* first() { return m_first.load(std::memory_order_acquire); }
 
-	void setFirst(Element* e)
-	{
-		m_first.store(e, std::memory_order_release);
-	}
+	void setFirst(Element* e) { m_first.store(e, std::memory_order_release); }
 
-	void free(Element* e)
-	{
-		m_allocator->free(e);
-	}
+	void free(Element* e) { m_allocator->free(e); }
 
 private:
 	std::atomic<Element*> m_first;

@@ -51,9 +51,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent)
 	{
 		if (desc->subPluginFeatures)
 		{
-			desc->subPluginFeatures->listSubPluginKeys(
-				desc,
-				subPluginEffectKeys);
+			desc->subPluginFeatures->listSubPluginKeys(desc, subPluginEffectKeys);
 		}
 		else
 		{
@@ -67,8 +65,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent)
 	m_sourceModel.setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
 	m_sourceModel.setHorizontalHeaderItem(1, new QStandardItem(tr("Type")));
 	int row = 0;
-	for (EffectKeyList::ConstIterator it = m_effectKeys.begin();
-		 it != m_effectKeys.end(); ++it)
+	for (EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it)
 	{
 		QString name;
 		QString type;
@@ -91,12 +88,9 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent)
 	m_model.setSourceModel(&m_sourceModel);
 	m_model.setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)),
-		&m_model, SLOT(setFilterFixedString(const QString&)));
-	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)),
-		this, SLOT(updateSelection()));
-	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)),
-		SLOT(sortAgain()));
+	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)), &m_model, SLOT(setFilterFixedString(const QString&)));
+	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)), this, SLOT(updateSelection()));
+	connect(ui->filterEdit, SIGNAL(textChanged(const QString&)), SLOT(sortAgain()));
 
 	ui->pluginList->setModel(&m_model);
 
@@ -105,39 +99,30 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent)
 	ui->pluginList->setSelectionModel(selectionModel);
 	connect(selectionModel, SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)),
 		SLOT(rowChanged(const QModelIndex&, const QModelIndex&)));
-	connect(ui->pluginList, SIGNAL(doubleClicked(const QModelIndex&)),
-		SLOT(acceptSelection()));
+	connect(ui->pluginList, SIGNAL(doubleClicked(const QModelIndex&)), SLOT(acceptSelection()));
 
 	// try to accept current selection when pressing "OK"
-	connect(ui->buttonBox, SIGNAL(accepted()),
-		this, SLOT(acceptSelection()));
+	connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(acceptSelection()));
 
 	ui->filterEdit->setClearButtonEnabled(true);
-	ui->pluginList->verticalHeader()->setSectionResizeMode(
-		QHeaderView::ResizeToContents);
+	ui->pluginList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	ui->pluginList->verticalHeader()->hide();
-	ui->pluginList->horizontalHeader()->setSectionResizeMode(0,
-		QHeaderView::Stretch);
-	ui->pluginList->horizontalHeader()->setSectionResizeMode(1,
-		QHeaderView::ResizeToContents);
+	ui->pluginList->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+	ui->pluginList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	ui->pluginList->sortByColumn(0, Qt::AscendingOrder);
 
 	updateSelection();
 	show();
 }
 
-EffectSelectDialog::~EffectSelectDialog()
-{
-	delete ui;
-}
+EffectSelectDialog::~EffectSelectDialog() { delete ui; }
 
 Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* _parent)
 {
 	Effect* result = nullptr;
 	if (!m_currentSelection.name.isEmpty() && m_currentSelection.desc)
 	{
-		result = Effect::instantiate(m_currentSelection.desc->name,
-			_parent, &m_currentSelection);
+		result = Effect::instantiate(m_currentSelection.desc->name, _parent, &m_currentSelection);
 	}
 	if (!result)
 	{
@@ -154,8 +139,7 @@ void EffectSelectDialog::acceptSelection()
 	}
 }
 
-void EffectSelectDialog::rowChanged(const QModelIndex& _idx,
-	const QModelIndex&)
+void EffectSelectDialog::rowChanged(const QModelIndex& _idx, const QModelIndex&)
 {
 	delete m_descriptionWidget;
 	m_descriptionWidget = NULL;
@@ -217,7 +201,8 @@ void EffectSelectDialog::rowChanged(const QModelIndex& _idx,
 		{
 			QLabel* label = new QLabel(m_descriptionWidget);
 			QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
-			labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate("PluginBrowser", descriptor.description) + "</p>";
+			labelText += "<p><b>" + tr("Description") + ":</b> " +
+				qApp->translate("PluginBrowser", descriptor.description) + "</p>";
 			labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
 
 			label->setText(labelText);
@@ -229,10 +214,7 @@ void EffectSelectDialog::rowChanged(const QModelIndex& _idx,
 	}
 }
 
-void EffectSelectDialog::sortAgain()
-{
-	ui->pluginList->setSortingEnabled(ui->pluginList->isSortingEnabled());
-}
+void EffectSelectDialog::sortAgain() { ui->pluginList->setSortingEnabled(ui->pluginList->isSortingEnabled()); }
 
 void EffectSelectDialog::updateSelection()
 {
@@ -240,8 +222,8 @@ void EffectSelectDialog::updateSelection()
 	if (ui->pluginList->selectionModel()->selection().size() <= 0)
 	{
 		// then select our first item
-		ui->pluginList->selectionModel()->select(m_model.index(0, 0),
-			QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+		ui->pluginList->selectionModel()->select(
+			m_model.index(0, 0), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 		rowChanged(m_model.index(0, 0), QModelIndex());
 	}
 }

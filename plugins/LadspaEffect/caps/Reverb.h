@@ -1,30 +1,30 @@
 /*
 	Reverb.h
-	
+
 	Copyright 2002-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	two reverb units: JVRev and Plate.
-	
+
 	the former is a rewrite of STK's JVRev, a traditional design.
-	
+
 	original comment:
-	
-		This is based on some of the famous    
-		Stanford CCRMA reverbs (NRev, KipRev)  
-		all based on the Chowning/Moorer/      
-		Schroeder reverberators, which use     
-		networks of simple allpass and comb    
-		delay filters.  
+
+		This is based on some of the famous
+		Stanford CCRMA reverbs (NRev, KipRev)
+		all based on the Chowning/Moorer/
+		Schroeder reverberators, which use
+		networks of simple allpass and comb
+		delay filters.
 
 	(STK is an effort of Gary Scavone).
-	
+
 	the algorithm is mostly unchanged in this implementation; the delay
 	line lengths have been fiddled with to make the stereo field more
 	evenly weighted, and denormal protection has been added.
 
-	the Plate reverb is based on the circuit discussed in Jon Dattorro's 
+	the Plate reverb is based on the circuit discussed in Jon Dattorro's
 	september 1997 JAES paper on effect design (part 1: reverb & filters).
 */
 /*
@@ -55,12 +55,10 @@
 #include "dsp/util.h"
 
 /* both reverbs use this */
-class Lattice
-	: public DSP::Delay
+class Lattice : public DSP::Delay
 {
 public:
-	inline sample_t
-	process(sample_t x, double d)
+	inline sample_t process(sample_t x, double d)
 	{
 		sample_t y = get();
 		x -= d * y;
@@ -70,14 +68,12 @@ public:
 };
 
 /* helper for JVRev */
-class JVComb
-	: public DSP::Delay
+class JVComb : public DSP::Delay
 {
 public:
 	float c;
 
-	inline sample_t
-	process(sample_t x)
+	inline sample_t process(sample_t x)
 	{
 		x += c * get();
 		put(x);
@@ -85,8 +81,7 @@ public:
 	}
 };
 
-class JVRev
-	: public Plugin
+class JVRev : public Plugin
 {
 public:
 	static int default_length[9];
@@ -99,8 +94,7 @@ public:
 
 	double apc;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 	int length[9];
 
@@ -112,15 +106,9 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
@@ -147,8 +135,7 @@ public:
 		tap.reset();
 	}
 
-	inline sample_t
-	process(sample_t x, double d)
+	inline sample_t process(sample_t x, double d)
 	{
 		/* TODO: try all-pass interpolation */
 		sample_t y = delay.get_at(n0 + width * lfo.get());
@@ -158,8 +145,7 @@ public:
 	}
 };
 
-class PlateStub
-	: public Plugin
+class PlateStub : public Plugin
 {
 public:
 	sample_t f_lfo;
@@ -204,54 +190,37 @@ public:
 		tank.mlattice[1].lfo.set_f(1.2, fs, .5 * M_PI);
 	}
 
-	inline void process(sample_t x, sample_t decay,
-		sample_t* xl, sample_t* xr);
+	inline void process(sample_t x, sample_t decay, sample_t* xl, sample_t* xr);
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class Plate
-	: public PlateStub
+class Plate : public PlateStub
 {
 public:
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class Plate2x2
-	: public PlateStub
+class Plate2x2 : public PlateStub
 {
 public:
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _REVERB_H_ */

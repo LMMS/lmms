@@ -62,9 +62,7 @@ tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 Song::Song()
 	: TrackContainer()
-	, m_globalAutomationTrack(dynamic_cast<AutomationTrack*>(
-		  Track::create(Track::HiddenAutomationTrack,
-			  this)))
+	, m_globalAutomationTrack(dynamic_cast<AutomationTrack*>(Track::create(Track::HiddenAutomationTrack, this)))
 	, m_tempoModel(DefaultTempo, MinTempo, MaxTempo, this, tr("Tempo"))
 	, m_timeSigModel(this)
 	, m_oldTicksPerBar(DefaultTicksPerBar)
@@ -96,18 +94,13 @@ Song::Song()
 {
 	for (int i = 0; i < Mode_Count; ++i)
 		m_elapsedMilliSeconds[i] = 0;
-	connect(&m_tempoModel, SIGNAL(dataChanged()),
-		this, SLOT(setTempo()), Qt::DirectConnection);
-	connect(&m_tempoModel, SIGNAL(dataUnchanged()),
-		this, SLOT(setTempo()), Qt::DirectConnection);
-	connect(&m_timeSigModel, SIGNAL(dataChanged()),
-		this, SLOT(setTimeSignature()), Qt::DirectConnection);
+	connect(&m_tempoModel, SIGNAL(dataChanged()), this, SLOT(setTempo()), Qt::DirectConnection);
+	connect(&m_tempoModel, SIGNAL(dataUnchanged()), this, SLOT(setTempo()), Qt::DirectConnection);
+	connect(&m_timeSigModel, SIGNAL(dataChanged()), this, SLOT(setTimeSignature()), Qt::DirectConnection);
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this,
-		SLOT(updateFramesPerTick()));
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateFramesPerTick()));
 
-	connect(&m_masterVolumeModel, SIGNAL(dataChanged()),
-		this, SLOT(masterVolumeChanged()), Qt::DirectConnection);
+	connect(&m_masterVolumeModel, SIGNAL(dataChanged()), this, SLOT(masterVolumeChanged()), Qt::DirectConnection);
 	/*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
 
@@ -121,19 +114,14 @@ Song::~Song()
 	delete m_globalAutomationTrack;
 }
 
-void Song::masterVolumeChanged()
-{
-	Engine::mixer()->setMasterGain(m_masterVolumeModel.value() /
-		100.0f);
-}
+void Song::masterVolumeChanged() { Engine::mixer()->setMasterGain(m_masterVolumeModel.value() / 100.0f); }
 
 void Song::setTempo()
 {
 	Engine::mixer()->requestChangeInModel();
 	const bpm_t tempo = (bpm_t)m_tempoModel.value();
 	PlayHandleList& playHandles = Engine::mixer()->playHandles();
-	for (PlayHandleList::Iterator it = playHandles.begin();
-		 it != playHandles.end(); ++it)
+	for (PlayHandleList::Iterator it = playHandles.begin(); it != playHandles.end(); ++it)
 	{
 		NotePlayHandle* nph = dynamic_cast<NotePlayHandle*>(*it);
 		if (nph && !nph->isReleased())
@@ -159,8 +147,7 @@ void Song::setTimeSignature()
 	emit dataChanged();
 	m_oldTicksPerBar = ticksPerBar();
 
-	m_vstSyncController.setTimeSignature(
-		getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator());
+	m_vstSyncController.setTimeSignature(getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator());
 }
 
 void Song::savePos()
@@ -287,8 +274,7 @@ void Song::processNextBuffer()
 			// Handle loop points, and inform VST plugins of the loop status
 			if (loopEnabled || (m_loopRenderRemaining > 1 && getPlayPos() >= timeline->loopBegin()))
 			{
-				m_vstSyncController.startCycle(
-					timeline->loopBegin().getTicks(), timeline->loopEnd().getTicks());
+				m_vstSyncController.startCycle(timeline->loopBegin().getTicks(), timeline->loopEnd().getTicks());
 
 				// Loop if necessary, and decrement the remaining loops if we did
 				if (enforceLoop(timeline->loopBegin(), timeline->loopEnd()) && m_loopRenderRemaining > 1)
@@ -313,7 +299,8 @@ void Song::processNextBuffer()
 			// First frame of buffer: update VST sync position.
 			// This must be done after we've corrected the frame/tick count,
 			// but before actually playing any frames.
-			m_vstSyncController.setAbsolutePosition(getPlayPos().getTicks() + getPlayPos().currentFrame() / static_cast<double>(framesPerTick));
+			m_vstSyncController.setAbsolutePosition(
+				getPlayPos().getTicks() + getPlayPos().currentFrame() / static_cast<double>(framesPerTick));
 			m_vstSyncController.update();
 		}
 
@@ -427,10 +414,7 @@ void Song::setModified(bool value)
 	}
 }
 
-bool Song::isExportDone() const
-{
-	return !isExporting() || m_playPos[m_playMode] >= m_exportSongEnd;
-}
+bool Song::isExportDone() const { return !isExporting() || m_playPos[m_playMode] >= m_exportSongEnd; }
 
 int Song::getExportProgress() const
 {
@@ -446,11 +430,14 @@ int Song::getExportProgress() const
 	}
 	else if (pos >= m_exportLoopEnd)
 	{
-		pos = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount + (pos - m_exportLoopEnd);
+		pos = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount +
+			(pos - m_exportLoopEnd);
 	}
 	else if (pos >= m_exportLoopBegin)
 	{
-		pos = (m_exportLoopBegin - m_exportSongBegin) + ((m_exportLoopEnd - m_exportLoopBegin) * (m_loopRenderCount - m_loopRenderRemaining)) + (pos - m_exportLoopBegin);
+		pos = (m_exportLoopBegin - m_exportSongBegin) +
+			((m_exportLoopEnd - m_exportLoopBegin) * (m_loopRenderCount - m_loopRenderRemaining)) +
+			(pos - m_exportLoopBegin);
 	}
 	else
 	{
@@ -693,7 +680,8 @@ void Song::startExport()
 		m_playPos[Mode_PlaySong].setTicks(0);
 	}
 
-	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
+	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) +
+		(m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
 	m_loopRenderRemaining = m_loopRenderCount;
 
 	playSong();
@@ -712,8 +700,7 @@ void Song::stopExport()
 void Song::insertBar()
 {
 	m_tracksMutex.lockForRead();
-	for (TrackList::const_iterator it = tracks().begin();
-		 it != tracks().end(); ++it)
+	for (TrackList::const_iterator it = tracks().begin(); it != tracks().end(); ++it)
 	{
 		(*it)->insertBar(m_playPos[Mode_PlaySong]);
 	}
@@ -723,8 +710,7 @@ void Song::insertBar()
 void Song::removeBar()
 {
 	m_tracksMutex.lockForRead();
-	for (TrackList::const_iterator it = tracks().begin();
-		 it != tracks().end(); ++it)
+	for (TrackList::const_iterator it = tracks().begin(); it != tracks().end(); ++it)
 	{
 		(*it)->removeBar(m_playPos[Mode_PlaySong]);
 	}
@@ -737,25 +723,13 @@ void Song::addBBTrack()
 	Engine::getBBTrackContainer()->setCurrentBB(dynamic_cast<BBTrack*>(t)->index());
 }
 
-void Song::addSampleTrack()
-{
-	(void)Track::create(Track::SampleTrack, this);
-}
+void Song::addSampleTrack() { (void)Track::create(Track::SampleTrack, this); }
 
-void Song::addAutomationTrack()
-{
-	(void)Track::create(Track::AutomationTrack, this);
-}
+void Song::addAutomationTrack() { (void)Track::create(Track::AutomationTrack, this); }
 
-bpm_t Song::getTempo()
-{
-	return (bpm_t)m_tempoModel.value();
-}
+bpm_t Song::getTempo() { return (bpm_t)m_tempoModel.value(); }
 
-AutomationPattern* Song::tempoAutomationPattern()
-{
-	return AutomationPattern::globalAutomationPattern(&m_tempoModel);
-}
+AutomationPattern* Song::tempoAutomationPattern() { return AutomationPattern::globalAutomationPattern(&m_tempoModel); }
 
 AutomatedValueMap Song::automatedValuesAt(TimePos time, int tcoNum) const
 {
@@ -861,12 +835,9 @@ void Song::createNewProject()
 
 	Track* t;
 	t = Track::create(Track::InstrumentTrack, this);
-	dynamic_cast<InstrumentTrack*>(t)->loadInstrument(
-		"tripleoscillator");
-	t = Track::create(Track::InstrumentTrack,
-		Engine::getBBTrackContainer());
-	dynamic_cast<InstrumentTrack*>(t)->loadInstrument(
-		"kicker");
+	dynamic_cast<InstrumentTrack*>(t)->loadInstrument("tripleoscillator");
+	t = Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer());
+	dynamic_cast<InstrumentTrack*>(t)->loadInstrument("kicker");
 	Track::create(Track::SampleTrack, this);
 	Track::create(Track::BBTrack, this);
 	Track::create(Track::AutomationTrack, this);
@@ -980,7 +951,7 @@ void Song::loadProject(const QString& fileName)
 		m_globalAutomationTrack->restoreState(dataFile.content().firstChildElement("track"));
 	}
 
-	//Backward compatibility for LMMS <= 0.4.15
+	// Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
 
 	// Load mixer first to be able to set the correct range for FX channels
@@ -1009,7 +980,13 @@ void Song::loadProject(const QString& fileName)
 				++m_nLoadingTrack;
 				if (nd.toElement().attribute("type").toInt() == Track::BBTrack)
 				{
-					n += nd.toElement().elementsByTagName("bbtrack").at(0).toElement().firstChildElement().childNodes().count();
+					n += nd.toElement()
+							 .elementsByTagName("bbtrack")
+							 .at(0)
+							 .toElement()
+							 .firstChildElement()
+							 .childNodes()
+							 .count();
 				}
 				nd = nd.nextSibling();
 			}
@@ -1090,8 +1067,7 @@ void Song::loadProject(const QString& fileName)
 	{
 		if (gui)
 		{
-			QMessageBox::warning(NULL, tr("LMMS Error report"), errorSummary(),
-				QMessageBox::Ok);
+			QMessageBox::warning(NULL, tr("LMMS Error report"), errorSummary(), QMessageBox::Ok);
 		}
 		else
 		{
@@ -1140,10 +1116,7 @@ bool Song::saveProjectFile(const QString& filename, bool withResources)
 }
 
 // Save the current song
-bool Song::guiSaveProject()
-{
-	return guiSaveProjectAs(m_fileName);
-}
+bool Song::guiSaveProject() { return guiSaveProjectAs(m_fileName); }
 
 // Save the current song with the given filename
 bool Song::guiSaveProjectAs(const QString& filename)
@@ -1193,8 +1166,7 @@ void Song::restoreControllerStates(const QDomElement& element)
 		else
 		{
 			// Fix indices to ensure correct connections
-			m_controllers.append(Controller::create(
-				Controller::DummyController, this));
+			m_controllers.append(Controller::create(Controller::DummyController, this));
 		}
 
 		node = node.nextSibling();
@@ -1228,15 +1200,9 @@ void Song::exportProjectMidi(QString const& exportFileName) const
 	}
 }
 
-void Song::updateFramesPerTick()
-{
-	Engine::updateFramesPerTick();
-}
+void Song::updateFramesPerTick() { Engine::updateFramesPerTick(); }
 
-void Song::setModified()
-{
-	setModified(true);
-}
+void Song::setModified() { setModified(true); }
 
 void Song::setProjectFileName(QString const& projectFileName)
 {
@@ -1272,10 +1238,7 @@ void Song::removeController(Controller* controller)
 	}
 }
 
-void Song::clearErrors()
-{
-	m_errors.clear();
-}
+void Song::clearErrors() { m_errors.clear(); }
 
 void Song::collectError(const QString error)
 {
@@ -1289,10 +1252,7 @@ void Song::collectError(const QString error)
 	}
 }
 
-bool Song::hasErrors()
-{
-	return !(m_errors.isEmpty());
-}
+bool Song::hasErrors() { return !(m_errors.isEmpty()); }
 
 QString Song::errorSummary()
 {
@@ -1316,7 +1276,4 @@ QString Song::errorSummary()
 	return errors;
 }
 
-bool Song::isSavingProject() const
-{
-	return m_savingProject;
-}
+bool Song::isSavingProject() const { return m_savingProject; }

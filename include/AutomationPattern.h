@@ -60,32 +60,19 @@ public:
 	const objectVector& objects() const;
 
 	// progression-type stuff
-	inline ProgressionTypes progressionType() const
-	{
-		return m_progressionType;
-	}
+	inline ProgressionTypes progressionType() const { return m_progressionType; }
 	void setProgressionType(ProgressionTypes _new_progression_type);
 
-	inline float getTension() const
-	{
-		return m_tension;
-	}
+	inline float getTension() const { return m_tension; }
 	void setTension(QString _new_tension);
 
 	TimePos timeMapLength() const;
 	void updateLength();
 
 	TimePos putValue(
-		const TimePos& time,
-		const float value,
-		const bool quantPos = true,
-		const bool ignoreSurroundingPoints = true);
+		const TimePos& time, const float value, const bool quantPos = true, const bool ignoreSurroundingPoints = true);
 
-	TimePos putValues(
-		const TimePos& time,
-		const float inValue,
-		const float outValue,
-		const bool quantPos = true,
+	TimePos putValues(const TimePos& time, const float inValue, const float outValue, const bool quantPos = true,
 		const bool ignoreSurroundingPoints = true);
 
 	void removeNode(const TimePos& time);
@@ -95,42 +82,22 @@ public:
 
 	void recordValue(TimePos time, float value);
 
-	TimePos setDragValue(const TimePos& time,
-		const float value,
-		const bool quantPos = true,
-		const bool controlKey = false);
+	TimePos setDragValue(
+		const TimePos& time, const float value, const bool quantPos = true, const bool controlKey = false);
 
 	void applyDragValue();
 
-	bool isDragging() const
-	{
-		return m_dragging;
-	}
+	bool isDragging() const { return m_dragging; }
 
-	inline const timeMap& getTimeMap() const
-	{
-		return m_timeMap;
-	}
+	inline const timeMap& getTimeMap() const { return m_timeMap; }
 
-	inline timeMap& getTimeMap()
-	{
-		return m_timeMap;
-	}
+	inline timeMap& getTimeMap() { return m_timeMap; }
 
-	inline float getMin() const
-	{
-		return firstObject()->minValue<float>();
-	}
+	inline float getMin() const { return firstObject()->minValue<float>(); }
 
-	inline float getMax() const
-	{
-		return firstObject()->maxValue<float>();
-	}
+	inline float getMax() const { return firstObject()->maxValue<float>(); }
 
-	inline bool hasAutomation() const
-	{
-		return m_timeMap.isEmpty() == false;
-	}
+	inline bool hasAutomation() const { return m_timeMap.isEmpty() == false; }
 
 	float valueAt(const TimePos& _time) const;
 	float* valuesAfter(const TimePos& _time) const;

@@ -35,19 +35,15 @@
 MidiController::MidiController(Model* _parent)
 	: Controller(Controller::MidiController, _parent, tr("MIDI Controller"))
 	, MidiEventProcessor()
-	, m_midiPort(tr("unnamed_midi_controller"),
-		  Engine::mixer()->midiClient(), this, this, MidiPort::Input)
+	, m_midiPort(tr("unnamed_midi_controller"), Engine::mixer()->midiClient(), this, this, MidiPort::Input)
 	, m_lastValue(0.0f)
 	, m_previousValue(0.0f)
 {
 	setSampleExact(true);
-	connect(&m_midiPort, SIGNAL(modeChanged()),
-		this, SLOT(updateName()));
+	connect(&m_midiPort, SIGNAL(modeChanged()), this, SLOT(updateName()));
 }
 
-MidiController::~MidiController()
-{
-}
+MidiController::~MidiController() {}
 
 void MidiController::updateValueBuffer()
 {
@@ -77,8 +73,7 @@ void MidiController::processInEvent(const MidiEvent& event, const TimePos& time,
 		controllerNum = event.controllerNumber();
 
 		if (m_midiPort.inputController() == controllerNum + 1 &&
-			(m_midiPort.inputChannel() == event.channel() + 1 ||
-				m_midiPort.inputChannel() == 0))
+			(m_midiPort.inputChannel() == event.channel() + 1 || m_midiPort.inputChannel() == 0))
 		{
 			unsigned char val = event.controllerValue();
 			m_previousValue = m_lastValue;
@@ -95,8 +90,7 @@ void MidiController::processInEvent(const MidiEvent& event, const TimePos& time,
 
 void MidiController::subscribeReadablePorts(const MidiPort::Map& _map)
 {
-	for (MidiPort::Map::ConstIterator it = _map.constBegin();
-		 it != _map.constEnd(); ++it)
+	for (MidiPort::Map::ConstIterator it = _map.constBegin(); it != _map.constEnd(); ++it)
 	{
 		m_midiPort.subscribeReadablePort(it.key(), *it);
 	}
@@ -117,12 +111,6 @@ void MidiController::loadSettings(const QDomElement& _this)
 	updateName();
 }
 
-QString MidiController::nodeName() const
-{
-	return ("Midicontroller");
-}
+QString MidiController::nodeName() const { return ("Midicontroller"); }
 
-ControllerDialog* MidiController::createDialog(QWidget* _parent)
-{
-	return NULL;
-}
+ControllerDialog* MidiController::createDialog(QWidget* _parent) { return NULL; }

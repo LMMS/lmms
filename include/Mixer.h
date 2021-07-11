@@ -100,8 +100,7 @@ public:
 				oversampling = Oversampling_None;
 				break;
 			case Mode_HighQuality:
-				interpolation =
-					Interpolation_SincFastest;
+				interpolation = Interpolation_SincFastest;
 				oversampling = Oversampling_2x;
 				break;
 			case Mode_FinalMix:
@@ -158,27 +157,15 @@ public:
 
 	// Returns the current audio device's name. This is not necessarily
 	// the user's preferred audio device, in case you were thinking that.
-	inline const QString& audioDevName() const
-	{
-		return m_audioDevName;
-	}
-	inline bool audioDevStartFailed() const
-	{
-		return m_audioDevStartFailed;
-	}
+	inline const QString& audioDevName() const { return m_audioDevName; }
+	inline bool audioDevStartFailed() const { return m_audioDevStartFailed; }
 
 	//! Set new audio device. Old device will be deleted,
 	//! unless it's stored using storeAudioDevice
-	void setAudioDevice(AudioDevice* _dev,
-		const struct qualitySettings& _qs,
-		bool _needs_fifo,
-		bool startNow);
+	void setAudioDevice(AudioDevice* _dev, const struct qualitySettings& _qs, bool _needs_fifo, bool startNow);
 	void storeAudioDevice();
 	void restoreAudioDevice();
-	inline AudioDevice* audioDev()
-	{
-		return m_audioDev;
-	}
+	inline AudioDevice* audioDev() { return m_audioDev; }
 
 	// audio-port-stuff
 	inline void addAudioPort(AudioPort* port)
@@ -191,63 +178,36 @@ public:
 	void removeAudioPort(AudioPort* port);
 
 	// MIDI-client-stuff
-	inline const QString& midiClientName() const
-	{
-		return m_midiClientName;
-	}
+	inline const QString& midiClientName() const { return m_midiClientName; }
 
-	inline MidiClient* midiClient()
-	{
-		return m_midiClient;
-	}
+	inline MidiClient* midiClient() { return m_midiClient; }
 
 	// play-handle stuff
 	bool addPlayHandle(PlayHandle* handle);
 
 	void removePlayHandle(PlayHandle* handle);
 
-	inline PlayHandleList& playHandles()
-	{
-		return m_playHandles;
-	}
+	inline PlayHandleList& playHandles() { return m_playHandles; }
 
 	void removePlayHandlesOfTypes(Track* track, const quint8 types);
 
 	// methods providing information for other classes
-	inline fpp_t framesPerPeriod() const
-	{
-		return m_framesPerPeriod;
-	}
+	inline fpp_t framesPerPeriod() const { return m_framesPerPeriod; }
 
-	MixerProfiler& profiler()
-	{
-		return m_profiler;
-	}
+	MixerProfiler& profiler() { return m_profiler; }
 
-	int cpuLoad() const
-	{
-		return m_profiler.cpuLoad();
-	}
+	int cpuLoad() const { return m_profiler.cpuLoad(); }
 
-	const qualitySettings& currentQualitySettings() const
-	{
-		return m_qualitySettings;
-	}
+	const qualitySettings& currentQualitySettings() const { return m_qualitySettings; }
 
 	sample_rate_t baseSampleRate() const;
 	sample_rate_t outputSampleRate() const;
 	sample_rate_t inputSampleRate() const;
 	sample_rate_t processingSampleRate() const;
 
-	inline float masterGain() const
-	{
-		return m_masterGain;
-	}
+	inline float masterGain() const { return m_masterGain; }
 
-	inline void setMasterGain(const float mo)
-	{
-		m_masterGain = mo;
-	}
+	inline void setMasterGain(const float mo) { m_masterGain = mo; }
 
 	static inline sample_t clip(const sample_t s)
 	{
@@ -276,27 +236,15 @@ public:
 
 	bool criticalXRuns() const;
 
-	inline bool hasFifoWriter() const
-	{
-		return m_fifoWriter != NULL;
-	}
+	inline bool hasFifoWriter() const { return m_fifoWriter != NULL; }
 
 	void pushInputFrames(sampleFrame* _ab, const f_cnt_t _frames);
 
-	inline const sampleFrame* inputBuffer()
-	{
-		return m_inputBuffer[m_inputBufferRead];
-	}
+	inline const sampleFrame* inputBuffer() { return m_inputBuffer[m_inputBufferRead]; }
 
-	inline f_cnt_t inputBufferFrames() const
-	{
-		return m_inputBufferFrames[m_inputBufferRead];
-	}
+	inline f_cnt_t inputBufferFrames() const { return m_inputBufferFrames[m_inputBufferRead]; }
 
-	inline const surroundSampleFrame* nextBuffer()
-	{
-		return hasFifoWriter() ? m_fifo->read() : renderNextBuffer();
-	}
+	inline const surroundSampleFrame* nextBuffer() { return hasFifoWriter() ? m_fifo->read() : renderNextBuffer(); }
 
 	void changeQuality(const struct qualitySettings& qs);
 

@@ -34,10 +34,7 @@ void ColorChooser::setPalette(QVector<QColor> colors)
 }
 
 //! Set global paletter via enum
-void ColorChooser::setPalette(Palette palette)
-{
-	setPalette(getPalette(palette));
-}
+void ColorChooser::setPalette(Palette palette) { setPalette(getPalette(palette)); }
 
 //! Set palette via enum, return self pointer for chaining
 ColorChooser* ColorChooser::withPalette(Palette palette)

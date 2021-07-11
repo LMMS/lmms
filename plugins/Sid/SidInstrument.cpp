@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -47,58 +47,37 @@
 #define SIDWRITEDELAY 9 // lda $xxxx,x 4 cycles, sta $d400,x 5 cycles
 #define SIDWAVEDELAY 4	// and $xxxx,x 4 cycles extra
 
-unsigned char sidorder[] =
-	{0x15, 0x16, 0x18, 0x17,
-		0x05, 0x06, 0x02, 0x03, 0x00, 0x01, 0x04,
-		0x0c, 0x0d, 0x09, 0x0a, 0x07, 0x08, 0x0b,
-		0x13, 0x14, 0x10, 0x11, 0x0e, 0x0f, 0x12};
+unsigned char sidorder[] = {0x15, 0x16, 0x18, 0x17, 0x05, 0x06, 0x02, 0x03, 0x00, 0x01, 0x04, 0x0c, 0x0d, 0x09, 0x0a,
+	0x07, 0x08, 0x0b, 0x13, 0x14, 0x10, 0x11, 0x0e, 0x0f, 0x12};
 
-static const char* attackTime[16] = {"2 ms", "8 ms", "16 ms", "24 ms",
-	"38 ms", "56 ms", "68 ms", "80 ms",
-	"100 ms", "250 ms", "500 ms", "800 ms",
-	"1 s", "3 s", "5 s", "8 s"};
-static const char* decRelTime[16] = {"6 ms", "24 ms", "48 ms", "72 ms",
-	"114 ms", "168 ms", "204 ms", "240 ms",
-	"300 ms", "750 ms", "1.5 s", "2.4 s",
-	"3 s", "9 s", "15 s", "24 s"};
+static const char* attackTime[16] = {"2 ms", "8 ms", "16 ms", "24 ms", "38 ms", "56 ms", "68 ms", "80 ms", "100 ms",
+	"250 ms", "500 ms", "800 ms", "1 s", "3 s", "5 s", "8 s"};
+static const char* decRelTime[16] = {"6 ms", "24 ms", "48 ms", "72 ms", "114 ms", "168 ms", "204 ms", "240 ms",
+	"300 ms", "750 ms", "1.5 s", "2.4 s", "3 s", "9 s", "15 s", "24 s"};
 // release time time in ms
-static const int relTime[16] = {6, 24, 48, 72, 114, 168, 204, 240, 300, 750,
-	1500, 2400, 3000, 9000, 15000, 24000};
+static const int relTime[16] = {6, 24, 48, 72, 114, 168, 204, 240, 300, 750, 1500, 2400, 3000, 9000, 15000, 24000};
 
 extern "C"
 {
-	Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"SID",
-			QT_TRANSLATE_NOOP("PluginBrowser", "Emulation of the MOS6581 and MOS8580 "
-											   "SID.\nThis chip was used in the Commodore 64 computer."),
+	Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "SID",
+		QT_TRANSLATE_NOOP("PluginBrowser",
+			"Emulation of the MOS6581 and MOS8580 "
+			"SID.\nThis chip was used in the Commodore 64 computer."),
 
-			"Csaba Hruska <csaba.hruska/at/gmail.com>"
-			"Attila Herman <attila589/at/gmail.com>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+		"Csaba Hruska <csaba.hruska/at/gmail.com>"
+		"Attila Herman <attila589/at/gmail.com>",
+		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 voiceObject::voiceObject(Model* _parent, int _idx)
 	: Model(_parent)
-	, m_pulseWidthModel(2048.0f, 0.0f, 4095.0f, 1.0f, this,
-		  tr("Voice %1 pulse width").arg(_idx + 1))
-	, m_attackModel(8.0f, 0.0f, 15.0f, 1.0f, this,
-		  tr("Voice %1 attack").arg(_idx + 1))
-	, m_decayModel(8.0f, 0.0f, 15.0f, 1.0f, this,
-		  tr("Voice %1 decay").arg(_idx + 1))
-	, m_sustainModel(15.0f, 0.0f, 15.0f, 1.0f, this,
-		  tr("Voice %1 sustain").arg(_idx + 1))
-	, m_releaseModel(8.0f, 0.0f, 15.0f, 1.0f, this,
-		  tr("Voice %1 release").arg(_idx + 1))
-	, m_coarseModel(0.0f, -24.0, 24.0, 1.0f, this,
-		  tr("Voice %1 coarse detuning").arg(_idx + 1))
-	, m_waveFormModel(TriangleWave, 0, NumWaveShapes - 1, this,
-		  tr("Voice %1 wave shape").arg(_idx + 1))
+	, m_pulseWidthModel(2048.0f, 0.0f, 4095.0f, 1.0f, this, tr("Voice %1 pulse width").arg(_idx + 1))
+	, m_attackModel(8.0f, 0.0f, 15.0f, 1.0f, this, tr("Voice %1 attack").arg(_idx + 1))
+	, m_decayModel(8.0f, 0.0f, 15.0f, 1.0f, this, tr("Voice %1 decay").arg(_idx + 1))
+	, m_sustainModel(15.0f, 0.0f, 15.0f, 1.0f, this, tr("Voice %1 sustain").arg(_idx + 1))
+	, m_releaseModel(8.0f, 0.0f, 15.0f, 1.0f, this, tr("Voice %1 release").arg(_idx + 1))
+	, m_coarseModel(0.0f, -24.0, 24.0, 1.0f, this, tr("Voice %1 coarse detuning").arg(_idx + 1))
+	, m_waveFormModel(TriangleWave, 0, NumWaveShapes - 1, this, tr("Voice %1 wave shape").arg(_idx + 1))
 	,
 
 	m_syncModel(false, this, tr("Voice %1 sync").arg(_idx + 1))
@@ -108,9 +87,7 @@ voiceObject::voiceObject(Model* _parent, int _idx)
 {
 }
 
-voiceObject::~voiceObject()
-{
-}
+voiceObject::~voiceObject() {}
 
 SidInstrument::SidInstrument(InstrumentTrack* _instrument_track)
 	: Instrument(_instrument_track, &sid_plugin_descriptor)
@@ -132,40 +109,26 @@ SidInstrument::SidInstrument(InstrumentTrack* _instrument_track)
 	}
 }
 
-SidInstrument::~SidInstrument()
-{
-}
+SidInstrument::~SidInstrument() {}
 
-void SidInstrument::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void SidInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	// voices
 	for (int i = 0; i < 3; ++i)
 	{
 		const QString is = QString::number(i);
 
-		m_voice[i]->m_pulseWidthModel.saveSettings(
-			_doc, _this, "pulsewidth" + is);
-		m_voice[i]->m_attackModel.saveSettings(
-			_doc, _this, "attack" + is);
-		m_voice[i]->m_decayModel.saveSettings(
-			_doc, _this, "decay" + is);
-		m_voice[i]->m_sustainModel.saveSettings(
-			_doc, _this, "sustain" + is);
-		m_voice[i]->m_releaseModel.saveSettings(
-			_doc, _this, "release" + is);
-		m_voice[i]->m_coarseModel.saveSettings(
-			_doc, _this, "coarse" + is);
-		m_voice[i]->m_waveFormModel.saveSettings(
-			_doc, _this, "waveform" + is);
-		m_voice[i]->m_syncModel.saveSettings(
-			_doc, _this, "sync" + is);
-		m_voice[i]->m_ringModModel.saveSettings(
-			_doc, _this, "ringmod" + is);
-		m_voice[i]->m_filteredModel.saveSettings(
-			_doc, _this, "filtered" + is);
-		m_voice[i]->m_testModel.saveSettings(
-			_doc, _this, "test" + is);
+		m_voice[i]->m_pulseWidthModel.saveSettings(_doc, _this, "pulsewidth" + is);
+		m_voice[i]->m_attackModel.saveSettings(_doc, _this, "attack" + is);
+		m_voice[i]->m_decayModel.saveSettings(_doc, _this, "decay" + is);
+		m_voice[i]->m_sustainModel.saveSettings(_doc, _this, "sustain" + is);
+		m_voice[i]->m_releaseModel.saveSettings(_doc, _this, "release" + is);
+		m_voice[i]->m_coarseModel.saveSettings(_doc, _this, "coarse" + is);
+		m_voice[i]->m_waveFormModel.saveSettings(_doc, _this, "waveform" + is);
+		m_voice[i]->m_syncModel.saveSettings(_doc, _this, "sync" + is);
+		m_voice[i]->m_ringModModel.saveSettings(_doc, _this, "ringmod" + is);
+		m_voice[i]->m_filteredModel.saveSettings(_doc, _this, "filtered" + is);
+		m_voice[i]->m_testModel.saveSettings(_doc, _this, "test" + is);
 	}
 
 	// filter
@@ -210,10 +173,7 @@ void SidInstrument::loadSettings(const QDomElement& _this)
 	m_chipModel.loadSettings(_this, "chipModel");
 }
 
-QString SidInstrument::nodeName() const
-{
-	return (sid_plugin_descriptor.name);
-}
+QString SidInstrument::nodeName() const { return (sid_plugin_descriptor.name); }
 
 f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
@@ -280,8 +240,7 @@ static int sid_fillbuffer(unsigned char* sidreg, SID* sid, int tdelta, short* pt
 	return total;
 }
 
-void SidInstrument::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void SidInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
@@ -437,15 +396,9 @@ void SidInstrument::playNote(NotePlayHandle* _n,
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
 }
 
-void SidInstrument::deleteNotePluginData(NotePlayHandle* _n)
-{
-	delete static_cast<SID*>(_n->m_pluginData);
-}
+void SidInstrument::deleteNotePluginData(NotePlayHandle* _n) { delete static_cast<SID*>(_n->m_pluginData); }
 
-PluginView* SidInstrument::instantiateView(QWidget* _parent)
-{
-	return (new SidInstrumentView(this, _parent));
-}
+PluginView* SidInstrument::instantiateView(QWidget* _parent) { return (new SidInstrumentView(this, _parent)); }
 
 class sidKnob : public Knob
 {
@@ -463,8 +416,7 @@ public:
 	}
 };
 
-SidInstrumentView::SidInstrumentView(Instrument* _instrument,
-	QWidget* _parent)
+SidInstrumentView::SidInstrumentView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 
@@ -559,38 +511,29 @@ SidInstrumentView::SidInstrumentView(Instrument* _instrument,
 
 		PixmapButton* pulse_btn = new PixmapButton(this, NULL);
 		pulse_btn->move(187, 101 + i * 50);
-		pulse_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("pulsered"));
-		pulse_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("pulse"));
+		pulse_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("pulsered"));
+		pulse_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("pulse"));
 		ToolTip::add(pulse_btn, tr("Pulse wave"));
 
 		PixmapButton* triangle_btn = new PixmapButton(this, NULL);
 		triangle_btn->move(168, 101 + i * 50);
-		triangle_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("trianglered"));
-		triangle_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("triangle"));
+		triangle_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("trianglered"));
+		triangle_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("triangle"));
 		ToolTip::add(triangle_btn, tr("Triangle wave"));
 
 		PixmapButton* saw_btn = new PixmapButton(this, NULL);
 		saw_btn->move(207, 101 + i * 50);
-		saw_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("sawred"));
-		saw_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("saw"));
+		saw_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("sawred"));
+		saw_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("saw"));
 		ToolTip::add(saw_btn, tr("Saw wave"));
 
 		PixmapButton* noise_btn = new PixmapButton(this, NULL);
 		noise_btn->move(226, 101 + i * 50);
-		noise_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("noisered"));
-		noise_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("noise"));
+		noise_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("noisered"));
+		noise_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("noise"));
 		ToolTip::add(noise_btn, tr("Noise"));
 
-		automatableButtonGroup* wfbg =
-			new automatableButtonGroup(this);
+		automatableButtonGroup* wfbg = new automatableButtonGroup(this);
 
 		wfbg->addButton(pulse_btn);
 		wfbg->addButton(triangle_btn);
@@ -600,47 +543,36 @@ SidInstrumentView::SidInstrumentView(Instrument* _instrument,
 		PixmapButton* sync_btn = new PixmapButton(this, NULL);
 		sync_btn->setCheckable(true);
 		sync_btn->move(207, 134 + i * 50);
-		sync_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("syncred"));
-		sync_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("sync"));
+		sync_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("syncred"));
+		sync_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("sync"));
 		ToolTip::add(sync_btn, tr("Sync"));
 
 		PixmapButton* ringMod_btn = new PixmapButton(this, NULL);
 		ringMod_btn->setCheckable(true);
 		ringMod_btn->move(170, 116 + i * 50);
-		ringMod_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("ringred"));
-		ringMod_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("ring"));
+		ringMod_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("ringred"));
+		ringMod_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("ring"));
 		ToolTip::add(ringMod_btn, tr("Ring modulation"));
 
 		PixmapButton* filter_btn = new PixmapButton(this, NULL);
 		filter_btn->setCheckable(true);
 		filter_btn->move(207, 116 + i * 50);
-		filter_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("filterred"));
-		filter_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("filter"));
+		filter_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("filterred"));
+		filter_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("filter"));
 		ToolTip::add(filter_btn, tr("Filtered"));
 
 		PixmapButton* test_btn = new PixmapButton(this, NULL);
 		test_btn->setCheckable(true);
 		test_btn->move(170, 134 + i * 50);
-		test_btn->setActiveGraphic(
-			PLUGIN_NAME::getIconPixmap("testred"));
-		test_btn->setInactiveGraphic(
-			PLUGIN_NAME::getIconPixmap("test"));
+		test_btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("testred"));
+		test_btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("test"));
 		ToolTip::add(test_btn, tr("Test"));
 
-		m_voiceKnobs[i] = voiceKnobs(ak, dk, sk, rk, pwk, crsk, wfbg,
-			sync_btn, ringMod_btn, filter_btn, test_btn);
+		m_voiceKnobs[i] = voiceKnobs(ak, dk, sk, rk, pwk, crsk, wfbg, sync_btn, ringMod_btn, filter_btn, test_btn);
 	}
 }
 
-SidInstrumentView::~SidInstrumentView()
-{
-}
+SidInstrumentView::~SidInstrumentView() {}
 
 void SidInstrumentView::updateKnobHint()
 {
@@ -648,24 +580,27 @@ void SidInstrumentView::updateKnobHint()
 
 	for (int i = 0; i < 3; ++i)
 	{
-		m_voiceKnobs[i].m_attKnob->setHintText(tr("Attack:") + " ", " (" + QString::fromLatin1(attackTime[(int)k->m_voice[i]->m_attackModel.value()]) + ")");
-		ToolTip::add(m_voiceKnobs[i].m_attKnob,
-			attackTime[(int)k->m_voice[i]->m_attackModel.value()]);
+		m_voiceKnobs[i].m_attKnob->setHintText(tr("Attack:") + " ",
+			" (" + QString::fromLatin1(attackTime[(int)k->m_voice[i]->m_attackModel.value()]) + ")");
+		ToolTip::add(m_voiceKnobs[i].m_attKnob, attackTime[(int)k->m_voice[i]->m_attackModel.value()]);
 
-		m_voiceKnobs[i].m_decKnob->setHintText(tr("Decay:") + " ", " (" + QString::fromLatin1(decRelTime[(int)k->m_voice[i]->m_decayModel.value()]) + ")");
-		ToolTip::add(m_voiceKnobs[i].m_decKnob,
-			decRelTime[(int)k->m_voice[i]->m_decayModel.value()]);
+		m_voiceKnobs[i].m_decKnob->setHintText(
+			tr("Decay:") + " ", " (" + QString::fromLatin1(decRelTime[(int)k->m_voice[i]->m_decayModel.value()]) + ")");
+		ToolTip::add(m_voiceKnobs[i].m_decKnob, decRelTime[(int)k->m_voice[i]->m_decayModel.value()]);
 
-		m_voiceKnobs[i].m_relKnob->setHintText(tr("Release:") + " ", " (" + QString::fromLatin1(decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]) + ")");
-		ToolTip::add(m_voiceKnobs[i].m_relKnob,
-			decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]);
+		m_voiceKnobs[i].m_relKnob->setHintText(tr("Release:") + " ",
+			" (" + QString::fromLatin1(decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]) + ")");
+		ToolTip::add(m_voiceKnobs[i].m_relKnob, decRelTime[(int)k->m_voice[i]->m_releaseModel.value()]);
 
-		m_voiceKnobs[i].m_pwKnob->setHintText(tr("Pulse width:") + " ", " (" + QString::number((double)k->m_voice[i]->m_pulseWidthModel.value() / 40.95) + "%)");
-		ToolTip::add(m_voiceKnobs[i].m_pwKnob,
-			QString::number((double)k->m_voice[i]->m_pulseWidthModel.value() / 40.95) + "%");
+		m_voiceKnobs[i].m_pwKnob->setHintText(tr("Pulse width:") + " ",
+			" (" + QString::number((double)k->m_voice[i]->m_pulseWidthModel.value() / 40.95) + "%)");
+		ToolTip::add(
+			m_voiceKnobs[i].m_pwKnob, QString::number((double)k->m_voice[i]->m_pulseWidthModel.value() / 40.95) + "%");
 	}
-	m_cutKnob->setHintText(tr("Cutoff frequency:") + " ", " (" + QString::number((int)(9970.0 / 2047.0 * (double)k->m_filterFCModel.value() + 30.0)) + " Hz)");
-	ToolTip::add(m_cutKnob, QString::number((int)(9970.0 / 2047.0 * (double)k->m_filterFCModel.value() + 30.0)) + " Hz");
+	m_cutKnob->setHintText(tr("Cutoff frequency:") + " ",
+		" (" + QString::number((int)(9970.0 / 2047.0 * (double)k->m_filterFCModel.value() + 30.0)) + " Hz)");
+	ToolTip::add(
+		m_cutKnob, QString::number((int)(9970.0 / 2047.0 * (double)k->m_filterFCModel.value() + 30.0)) + " Hz");
 }
 
 void SidInstrumentView::updateKnobToolTip()
@@ -673,16 +608,12 @@ void SidInstrumentView::updateKnobToolTip()
 	SidInstrument* k = castModel<SidInstrument>();
 	for (int i = 0; i < 3; ++i)
 	{
-		ToolTip::add(m_voiceKnobs[i].m_sustKnob,
-			QString::number((int)k->m_voice[i]->m_sustainModel.value()));
-		ToolTip::add(m_voiceKnobs[i].m_crsKnob,
-			QString::number((int)k->m_voice[i]->m_coarseModel.value()) +
-				" semitones");
+		ToolTip::add(m_voiceKnobs[i].m_sustKnob, QString::number((int)k->m_voice[i]->m_sustainModel.value()));
+		ToolTip::add(
+			m_voiceKnobs[i].m_crsKnob, QString::number((int)k->m_voice[i]->m_coarseModel.value()) + " semitones");
 	}
-	ToolTip::add(m_volKnob,
-		QString::number((int)k->m_volumeModel.value()));
-	ToolTip::add(m_resKnob,
-		QString::number((int)k->m_filterResonanceModel.value()));
+	ToolTip::add(m_volKnob, QString::number((int)k->m_volumeModel.value()));
+	ToolTip::add(m_resKnob, QString::number((int)k->m_filterResonanceModel.value()));
 }
 
 void SidInstrumentView::modelChanged()
@@ -698,52 +629,32 @@ void SidInstrumentView::modelChanged()
 
 	for (int i = 0; i < 3; ++i)
 	{
-		m_voiceKnobs[i].m_attKnob->setModel(
-			&k->m_voice[i]->m_attackModel);
-		m_voiceKnobs[i].m_decKnob->setModel(
-			&k->m_voice[i]->m_decayModel);
-		m_voiceKnobs[i].m_sustKnob->setModel(
-			&k->m_voice[i]->m_sustainModel);
-		m_voiceKnobs[i].m_relKnob->setModel(
-			&k->m_voice[i]->m_releaseModel);
-		m_voiceKnobs[i].m_pwKnob->setModel(
-			&k->m_voice[i]->m_pulseWidthModel);
-		m_voiceKnobs[i].m_crsKnob->setModel(
-			&k->m_voice[i]->m_coarseModel);
-		m_voiceKnobs[i].m_waveFormBtnGrp->setModel(
-			&k->m_voice[i]->m_waveFormModel);
-		m_voiceKnobs[i].m_syncButton->setModel(
-			&k->m_voice[i]->m_syncModel);
-		m_voiceKnobs[i].m_ringModButton->setModel(
-			&k->m_voice[i]->m_ringModModel);
-		m_voiceKnobs[i].m_filterButton->setModel(
-			&k->m_voice[i]->m_filteredModel);
-		m_voiceKnobs[i].m_testButton->setModel(
-			&k->m_voice[i]->m_testModel);
+		m_voiceKnobs[i].m_attKnob->setModel(&k->m_voice[i]->m_attackModel);
+		m_voiceKnobs[i].m_decKnob->setModel(&k->m_voice[i]->m_decayModel);
+		m_voiceKnobs[i].m_sustKnob->setModel(&k->m_voice[i]->m_sustainModel);
+		m_voiceKnobs[i].m_relKnob->setModel(&k->m_voice[i]->m_releaseModel);
+		m_voiceKnobs[i].m_pwKnob->setModel(&k->m_voice[i]->m_pulseWidthModel);
+		m_voiceKnobs[i].m_crsKnob->setModel(&k->m_voice[i]->m_coarseModel);
+		m_voiceKnobs[i].m_waveFormBtnGrp->setModel(&k->m_voice[i]->m_waveFormModel);
+		m_voiceKnobs[i].m_syncButton->setModel(&k->m_voice[i]->m_syncModel);
+		m_voiceKnobs[i].m_ringModButton->setModel(&k->m_voice[i]->m_ringModModel);
+		m_voiceKnobs[i].m_filterButton->setModel(&k->m_voice[i]->m_filteredModel);
+		m_voiceKnobs[i].m_testButton->setModel(&k->m_voice[i]->m_testModel);
 	}
 
 	for (int i = 0; i < 3; ++i)
 	{
-		connect(&k->m_voice[i]->m_attackModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobHint()));
-		connect(&k->m_voice[i]->m_decayModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobHint()));
-		connect(&k->m_voice[i]->m_releaseModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobHint()));
-		connect(&k->m_voice[i]->m_pulseWidthModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobHint()));
-		connect(&k->m_voice[i]->m_sustainModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobToolTip()));
-		connect(&k->m_voice[i]->m_coarseModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobToolTip()));
+		connect(&k->m_voice[i]->m_attackModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&k->m_voice[i]->m_decayModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&k->m_voice[i]->m_releaseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&k->m_voice[i]->m_pulseWidthModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&k->m_voice[i]->m_sustainModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
+		connect(&k->m_voice[i]->m_coarseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
 	}
 
-	connect(&k->m_volumeModel, SIGNAL(dataChanged()),
-		this, SLOT(updateKnobToolTip()));
-	connect(&k->m_filterResonanceModel, SIGNAL(dataChanged()),
-		this, SLOT(updateKnobToolTip()));
-	connect(&k->m_filterFCModel, SIGNAL(dataChanged()),
-		this, SLOT(updateKnobHint()));
+	connect(&k->m_volumeModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
+	connect(&k->m_filterResonanceModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
+	connect(&k->m_filterFCModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
 
 	updateKnobHint();
 	updateKnobToolTip();

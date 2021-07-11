@@ -30,10 +30,7 @@
 
 #define PI 3.14159265f
 
-float frnd(float range)
-{
-	return (float)rnd(10000) / 10000 * range;
-}
+float frnd(float range) { return (float)rnd(10000) / 10000 * range; }
 
 #include <QDomElement>
 #include <cmath>
@@ -54,18 +51,9 @@ float frnd(float range)
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"sfxr",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"LMMS port of sfxr"),
-			"Wong Cho Ching",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "sfxr",
+		QT_TRANSLATE_NOOP("PluginBrowser", "LMMS port of sfxr"), "Wong Cho Ching", 0x0100, Plugin::Instrument,
+		new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 SfxrSynth::SfxrSynth(const sfxrInstrument* s)
@@ -75,9 +63,7 @@ SfxrSynth::SfxrSynth(const sfxrInstrument* s)
 	resetSample(false);
 }
 
-SfxrSynth::~SfxrSynth()
-{
-}
+SfxrSynth::~SfxrSynth() {}
 
 void SfxrSynth::resetSample(bool restart)
 {
@@ -288,9 +274,9 @@ void SfxrSynth::update(sampleFrame* buffer, const int32_t frameNum)
 			// final accumulation and envelope application
 			ssample += sample * env_vol;
 		}
-		//ssample=ssample/8*master_vol;
+		// ssample=ssample/8*master_vol;
 
-		//ssample*=2.0f*sound_vol;
+		// ssample*=2.0f*sound_vol;
 		ssample *= 0.025f;
 
 		if (buffer != NULL)
@@ -307,10 +293,7 @@ void SfxrSynth::update(sampleFrame* buffer, const int32_t frameNum)
 	}
 }
 
-bool SfxrSynth::isPlaying() const
-{
-	return playing_sample;
-}
+bool SfxrSynth::isPlaying() const { return playing_sample; }
 
 sfxrInstrument::sfxrInstrument(InstrumentTrack* _instrument_track)
 	: Instrument(_instrument_track, &sfxr_plugin_descriptor)
@@ -352,9 +335,7 @@ sfxrInstrument::sfxrInstrument(InstrumentTrack* _instrument_track)
 {
 }
 
-sfxrInstrument::~sfxrInstrument()
-{
-}
+sfxrInstrument::~sfxrInstrument() {}
 
 void sfxrInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
@@ -426,10 +407,7 @@ void sfxrInstrument::loadSettings(const QDomElement& _this)
 	m_waveFormModel.loadSettings(_this, "waveForm");
 }
 
-QString sfxrInstrument::nodeName() const
-{
-	return (sfxr_plugin_descriptor.name);
-}
+QString sfxrInstrument::nodeName() const { return (sfxr_plugin_descriptor.name); }
 
 void sfxrInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
@@ -472,15 +450,9 @@ void sfxrInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 	instrumentTrack()->processAudioBuffer(_working_buffer, frameNum + offset, _n);
 }
 
-void sfxrInstrument::deleteNotePluginData(NotePlayHandle* _n)
-{
-	delete static_cast<SfxrSynth*>(_n->m_pluginData);
-}
+void sfxrInstrument::deleteNotePluginData(NotePlayHandle* _n) { delete static_cast<SfxrSynth*>(_n->m_pluginData); }
 
-PluginView* sfxrInstrument::instantiateView(QWidget* _parent)
-{
-	return (new sfxrInstrumentView(this, _parent));
-}
+PluginView* sfxrInstrument::instantiateView(QWidget* _parent) { return (new sfxrInstrumentView(this, _parent)); }
 
 void sfxrInstrument::resetModels()
 {
@@ -551,8 +523,7 @@ public:
 	_button->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(_resName "_inactive")); \
 	ToolTip::add(_button, tr(_name));
 
-sfxrInstrumentView::sfxrInstrumentView(Instrument* _instrument,
-	QWidget* _parent)
+sfxrInstrumentView::sfxrInstrumentView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 	srand(time(NULL));
@@ -571,12 +542,16 @@ sfxrInstrumentView::sfxrInstrumentView(Instrument* _instrument,
 	m_susKnob->setObjectName("envKnob");
 	m_decKnob->setObjectName("envKnob");
 
-	createKnob(m_startFreqKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Start Frequency");
-	createKnob(m_minFreqKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 1, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Min Frequency");
+	createKnob(
+		m_startFreqKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Start Frequency");
+	createKnob(
+		m_minFreqKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 1, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Min Frequency");
 	createKnob(m_slideKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 2, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Slide");
 	createKnob(m_dSlideKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 3, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Delta Slide");
-	createKnob(m_vibDepthKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Vibrato Depth");
-	createKnob(m_vibSpeedKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 5, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Vibrato Speed");
+	createKnob(
+		m_vibDepthKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Vibrato Depth");
+	createKnob(
+		m_vibSpeedKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 5, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 1, "Vibrato Speed");
 
 	m_startFreqKnob->setObjectName("freqKnob");
 	m_minFreqKnob->setObjectName("freqKnob");
@@ -585,33 +560,45 @@ sfxrInstrumentView::sfxrInstrumentView(Instrument* _instrument,
 	m_vibDepthKnob->setObjectName("freqKnob");
 	m_vibSpeedKnob->setObjectName("freqKnob");
 
-	createKnob(m_changeAmtKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2, "Change Amount");
-	createKnob(m_changeSpeedKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 1, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2, "Change Speed");
+	createKnob(
+		m_changeAmtKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2, "Change Amount");
+	createKnob(
+		m_changeSpeedKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 1, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2, "Change Speed");
 
 	m_changeAmtKnob->setObjectName("changeKnob");
 	m_changeSpeedKnob->setObjectName("changeKnob");
 
-	createKnob(m_sqrDutyKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 3, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2, "Square Duty (Square wave only)");
-	createKnob(m_sqrSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2, "Duty Sweep (Square wave only)");
+	createKnob(m_sqrDutyKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 3, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2,
+		"Square Duty (Square wave only)");
+	createKnob(m_sqrSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 2,
+		"Duty Sweep (Square wave only)");
 
 	m_sqrDutyKnob->setObjectName("sqrKnob");
 	m_sqrSweepKnob->setObjectName("sqrKnob");
 
-	createKnob(m_repeatSpeedKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 3, "Repeat Speed");
+	createKnob(
+		m_repeatSpeedKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 3, "Repeat Speed");
 
 	m_repeatSpeedKnob->setObjectName("repeatKnob");
 
-	createKnob(m_phaserOffsetKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 3, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 3, "Phaser Offset");
-	createKnob(m_phaserSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 3, "Phaser Sweep");
+	createKnob(m_phaserOffsetKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 3, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 3,
+		"Phaser Offset");
+	createKnob(
+		m_phaserSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 3, "Phaser Sweep");
 
 	m_phaserOffsetKnob->setObjectName("phaserKnob");
 	m_phaserSweepKnob->setObjectName("phaserKnob");
 
-	createKnob(m_lpFilCutKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4, "LP Filter Cutoff");
-	createKnob(m_lpFilCutSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 1, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4, "LP Filter Cutoff Sweep");
-	createKnob(m_lpFilResoKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 2, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4, "LP Filter Resonance");
-	createKnob(m_hpFilCutKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 3, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4, "HP Filter Cutoff");
-	createKnob(m_hpFilCutSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4, "HP Filter Cutoff Sweep");
+	createKnob(
+		m_lpFilCutKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 0, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4, "LP Filter Cutoff");
+	createKnob(m_lpFilCutSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 1, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4,
+		"LP Filter Cutoff Sweep");
+	createKnob(m_lpFilResoKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 2, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4,
+		"LP Filter Resonance");
+	createKnob(
+		m_hpFilCutKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 3, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4, "HP Filter Cutoff");
+	createKnob(m_hpFilCutSweepKnob, KNOBS_BASE_X + KNOB_BLOCK_SIZE_X * 4, KNOBS_BASE_Y + KNOB_BLOCK_SIZE_Y * 4,
+		"HP Filter Cutoff Sweep");
 
 	m_lpFilCutKnob->setObjectName("filterKnob");
 	m_lpFilCutSweepKnob->setObjectName("filterKnob");
@@ -619,10 +606,14 @@ sfxrInstrumentView::sfxrInstrumentView(Instrument* _instrument,
 	m_hpFilCutKnob->setObjectName("filterKnob");
 	m_hpFilCutSweepKnob->setObjectName("filterKnob");
 
-	createButtonLocalGraphic(m_sqrWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 0, WAVEFORM_BASE_Y, "Square Wave", "sfxr_square_wave");
-	createButtonLocalGraphic(m_sawWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 1, WAVEFORM_BASE_Y, "Saw Wave", "sfxr_saw_wave");
-	createButtonLocalGraphic(m_sinWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 2, WAVEFORM_BASE_Y, "Sine Wave", "sfxr_sin_wave");
-	createButtonLocalGraphic(m_noiseWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 3, WAVEFORM_BASE_Y, "Noise", "sfxr_white_noise_wave");
+	createButtonLocalGraphic(
+		m_sqrWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 0, WAVEFORM_BASE_Y, "Square Wave", "sfxr_square_wave");
+	createButtonLocalGraphic(
+		m_sawWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 1, WAVEFORM_BASE_Y, "Saw Wave", "sfxr_saw_wave");
+	createButtonLocalGraphic(
+		m_sinWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 2, WAVEFORM_BASE_Y, "Sine Wave", "sfxr_sin_wave");
+	createButtonLocalGraphic(
+		m_noiseWaveBtn, KNOBS_BASE_X + WAVEFORM_BUTTON_WIDTH * 3, WAVEFORM_BASE_Y, "Noise", "sfxr_white_noise_wave");
 
 	m_waveBtnGroup = new automatableButtonGroup(this);
 	m_waveBtnGroup->addButton(m_sqrWaveBtn);
@@ -630,13 +621,20 @@ sfxrInstrumentView::sfxrInstrumentView(Instrument* _instrument,
 	m_waveBtnGroup->addButton(m_sinWaveBtn);
 	m_waveBtnGroup->addButton(m_noiseWaveBtn);
 
-	createButtonLocalGraphic(m_pickupBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 0, GENERATOR_BASE_Y, "Generate pick up/coin sfx", "pickup");
-	createButtonLocalGraphic(m_laserBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 1, GENERATOR_BASE_Y, "Generate laser/shoot sfx", "laser");
-	createButtonLocalGraphic(m_explosionBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 2, GENERATOR_BASE_Y, "Generate explosion sfx", "explosion");
-	createButtonLocalGraphic(m_powerupBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 3, GENERATOR_BASE_Y, "Generate power up sfx", "powerup");
-	createButtonLocalGraphic(m_hitBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 4, GENERATOR_BASE_Y, "Generate hit/hurt sfx", "hit");
-	createButtonLocalGraphic(m_jumpBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 5, GENERATOR_BASE_Y, "Generate jump sfx", "jump");
-	createButtonLocalGraphic(m_blipBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 6, GENERATOR_BASE_Y, "Generate blip/select sfx", "blip");
+	createButtonLocalGraphic(m_pickupBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 0, GENERATOR_BASE_Y,
+		"Generate pick up/coin sfx", "pickup");
+	createButtonLocalGraphic(m_laserBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 1, GENERATOR_BASE_Y,
+		"Generate laser/shoot sfx", "laser");
+	createButtonLocalGraphic(m_explosionBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 2, GENERATOR_BASE_Y,
+		"Generate explosion sfx", "explosion");
+	createButtonLocalGraphic(m_powerupBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 3, GENERATOR_BASE_Y,
+		"Generate power up sfx", "powerup");
+	createButtonLocalGraphic(
+		m_hitBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 4, GENERATOR_BASE_Y, "Generate hit/hurt sfx", "hit");
+	createButtonLocalGraphic(
+		m_jumpBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 5, GENERATOR_BASE_Y, "Generate jump sfx", "jump");
+	createButtonLocalGraphic(
+		m_blipBtn, GENERATOR_BASE_X + GENERATOR_BUTTON_WIDTH * 6, GENERATOR_BASE_Y, "Generate blip/select sfx", "blip");
 	connect(m_pickupBtn, SIGNAL(clicked()), this, SLOT(genPickup()));
 	connect(m_laserBtn, SIGNAL(clicked()), this, SLOT(genLaser()));
 	connect(m_explosionBtn, SIGNAL(clicked()), this, SLOT(genExplosion()));
@@ -650,8 +648,8 @@ sfxrInstrumentView::sfxrInstrumentView(Instrument* _instrument,
 	connect(m_randomizeBtn, SIGNAL(clicked()), this, SLOT(randomize()));
 	connect(m_mutateBtn, SIGNAL(clicked()), this, SLOT(mutate()));
 
-	//preview sound on generator/random/mutate button clicked
-	/*  // disabled for now	
+	// preview sound on generator/random/mutate button clicked
+	/*  // disabled for now
 	connect( m_pickupBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_laserBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_explosionBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
@@ -953,7 +951,7 @@ void sfxrInstrumentView::randomize()
 
 	s->m_vibDepthModel.setValue(pow(frnd(2.0f) - 1.0f, 3.0f));
 	s->m_vibSpeedModel.setValue(frnd(2.0f) - 1.0f);
-	//s->m_vibDelayModel.setValue( frnd(2.0f)-1.0f );
+	// s->m_vibDelayModel.setValue( frnd(2.0f)-1.0f );
 
 	s->m_attModel.setValue(pow(frnd(2.0f) - 1.0f, 3.0f));
 	s->m_holdModel.setValue(pow(frnd(2.0f) - 1.0f, 2.0f));

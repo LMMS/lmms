@@ -35,9 +35,7 @@ class BitcrushControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	BitcrushControlDialog(BitcrushControls* controls);
-	virtual ~BitcrushControlDialog()
-	{
-	}
+	virtual ~BitcrushControlDialog() {}
 };
 
 #endif

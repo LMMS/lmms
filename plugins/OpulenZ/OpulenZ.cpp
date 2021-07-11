@@ -61,18 +61,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"OpulenZ",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"2-operator FM Synth"),
-			"Raine M. Ekman <raine/at/iki/fi>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			"sbi",
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "OpulenZ",
+		QT_TRANSLATE_NOOP("PluginBrowser", "2-operator FM Synth"), "Raine M. Ekman <raine/at/iki/fi>", 0x0100,
+		Plugin::Instrument, new PluginPixmapLoader("logo"), "sbi", NULL};
 
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
@@ -141,7 +132,7 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* _instrument_track)
 	theEmulator->write(0x01, 0x20);
 	emulatorMutex.unlock();
 
-	//Initialize voice values
+	// Initialize voice values
 	// voiceNote[0] = 0;
 	// voiceLRU[0] = 0;
 	for (int i = 0; i < OPL2_VOICES; ++i)
@@ -165,8 +156,7 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* _instrument_track)
 
 	tuneEqual(69, 440);
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
-		this, SLOT(reloadEmulator()));
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(reloadEmulator()));
 	// Connect knobs
 	// This one's for testing...
 	connect(&m_patchModel, SIGNAL(dataChanged()), this, SLOT(loadGMPatch()));
@@ -218,8 +208,8 @@ OpulenzInstrument::OpulenzInstrument(InstrumentTrack* _instrument_track)
 OpulenzInstrument::~OpulenzInstrument()
 {
 	delete theEmulator;
-	Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(),
-		PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+	Engine::mixer()->removePlayHandlesOfTypes(
+		instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 	delete[] renderbuffer;
 }
 
@@ -254,15 +244,11 @@ void OpulenzInstrument::setVoiceVelocity(int voice, int vel)
 	{
 		vel_adjusted = 63 - op1_lvl_mdl.value();
 	}
-	theEmulator->write(0x40 + adlib_opadd[voice],
-		((int)op1_scale_mdl.value() & 0x03 << 6) +
-			(vel_adjusted & 0x3f));
+	theEmulator->write(0x40 + adlib_opadd[voice], ((int)op1_scale_mdl.value() & 0x03 << 6) + (vel_adjusted & 0x3f));
 
 	vel_adjusted = 63 - (op2_lvl_mdl.value() * vel / 127.0);
 	// vel_adjusted = 63 - op2_lvl_mdl.value();
-	theEmulator->write(0x43 + adlib_opadd[voice],
-		((int)op2_scale_mdl.value() & 0x03 << 6) +
-			(vel_adjusted & 0x3f));
+	theEmulator->write(0x43 + adlib_opadd[voice], ((int)op2_scale_mdl.value() & 0x03 << 6) + (vel_adjusted & 0x3f));
 }
 
 // Pop least recently used voice
@@ -275,8 +261,8 @@ int OpulenzInstrument::popVoice()
 	}
 	voiceLRU[OPL2_VOICES - 1] = OPL2_NO_VOICE;
 #ifdef false
-	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0], voiceLRU[1], voiceLRU[2],
-		voiceLRU[3], voiceLRU[4], voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
+	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0], voiceLRU[1], voiceLRU[2], voiceLRU[3], voiceLRU[4],
+		voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
 #endif
 	return tmp;
 }
@@ -294,8 +280,8 @@ int OpulenzInstrument::pushVoice(int v)
 	}
 	voiceLRU[i] = v;
 #ifdef false
-	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0], voiceLRU[1], voiceLRU[2],
-		voiceLRU[3], voiceLRU[4], voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
+	printf("%d %d %d %d %d %d %d %d %d <-- \n", voiceLRU[0], voiceLRU[1], voiceLRU[2], voiceLRU[3], voiceLRU[4],
+		voiceLRU[5], voiceLRU[6], voiceLRU[7], voiceLRU[8]);
 #endif
 	return i;
 }
@@ -405,15 +391,9 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 	return true;
 }
 
-QString OpulenzInstrument::nodeName() const
-{
-	return (opulenz_plugin_descriptor.name);
-}
+QString OpulenzInstrument::nodeName() const { return (opulenz_plugin_descriptor.name); }
 
-PluginView* OpulenzInstrument::instantiateView(QWidget* _parent)
-{
-	return (new OpulenzInstrumentView(this, _parent));
-}
+PluginView* OpulenzInstrument::instantiateView(QWidget* _parent) { return (new OpulenzInstrumentView(this, _parent)); }
 
 void OpulenzInstrument::play(sampleFrame* _working_buffer)
 {
@@ -510,8 +490,8 @@ void OpulenzInstrument::loadPatch(const unsigned char inst[14])
 	{
 		theEmulator->write(0x20 + adlib_opadd[v], inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
 		theEmulator->write(0x23 + adlib_opadd[v], inst[1]); // op2
-		// theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level - these are handled by noteon/aftertouch code
-		// theEmulator->write(0x43+adlib_opadd[v],inst[3]); // op2
+		// theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level - these are handled by
+		// noteon/aftertouch code theEmulator->write(0x43+adlib_opadd[v],inst[3]); // op2
 		theEmulator->write(0x60 + adlib_opadd[v], inst[4]); // op1 A/D
 		theEmulator->write(0x63 + adlib_opadd[v], inst[5]); // op2
 		theEmulator->write(0x80 + adlib_opadd[v], inst[6]); // op1 S/R
@@ -558,32 +538,21 @@ void OpulenzInstrument::loadGMPatch()
 void OpulenzInstrument::updatePatch()
 {
 	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	inst[0] = (op1_trem_mdl.value() ? 128 : 0) +
-		(op1_vib_mdl.value() ? 64 : 0) +
+	inst[0] = (op1_trem_mdl.value() ? 128 : 0) + (op1_vib_mdl.value() ? 64 : 0) +
 		(op1_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(op1_ksr_mdl.value() ? 16 : 0) +
-		((int)op1_mul_mdl.value() & 0x0f);
-	inst[1] = (op2_trem_mdl.value() ? 128 : 0) +
-		(op2_vib_mdl.value() ? 64 : 0) +
+		(op1_ksr_mdl.value() ? 16 : 0) + ((int)op1_mul_mdl.value() & 0x0f);
+	inst[1] = (op2_trem_mdl.value() ? 128 : 0) + (op2_vib_mdl.value() ? 64 : 0) +
 		(op2_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
-		(op2_ksr_mdl.value() ? 16 : 0) +
-		((int)op2_mul_mdl.value() & 0x0f);
-	inst[2] = (((int)op1_scale_mdl.value() & 0x03) << 6) +
-		(63 - ((int)op1_lvl_mdl.value() & 0x3f));
-	inst[3] = (((int)op2_scale_mdl.value() & 0x03) << 6) +
-		(63 - ((int)op2_lvl_mdl.value() & 0x3f));
-	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op1_d_mdl.value() & 0x0f));
-	inst[5] = ((15 - ((int)op2_a_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op2_d_mdl.value() & 0x0f));
-	inst[6] = ((15 - ((int)op1_s_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op1_r_mdl.value() & 0x0f));
-	inst[7] = ((15 - ((int)op2_s_mdl.value() & 0x0f)) << 4) +
-		(15 - ((int)op2_r_mdl.value() & 0x0f));
+		(op2_ksr_mdl.value() ? 16 : 0) + ((int)op2_mul_mdl.value() & 0x0f);
+	inst[2] = (((int)op1_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op1_lvl_mdl.value() & 0x3f));
+	inst[3] = (((int)op2_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op2_lvl_mdl.value() & 0x3f));
+	inst[4] = ((15 - ((int)op1_a_mdl.value() & 0x0f)) << 4) + (15 - ((int)op1_d_mdl.value() & 0x0f));
+	inst[5] = ((15 - ((int)op2_a_mdl.value() & 0x0f)) << 4) + (15 - ((int)op2_d_mdl.value() & 0x0f));
+	inst[6] = ((15 - ((int)op1_s_mdl.value() & 0x0f)) << 4) + (15 - ((int)op1_r_mdl.value() & 0x0f));
+	inst[7] = ((15 - ((int)op2_s_mdl.value() & 0x0f)) << 4) + (15 - ((int)op2_r_mdl.value() & 0x0f));
 	inst[8] = (int)op1_waveform_mdl.value() & 0x03;
 	inst[9] = (int)op2_waveform_mdl.value() & 0x03;
-	inst[10] = (fm_mdl.value() ? 0 : 1) +
-		(((int)feedback_mdl.value() & 0x07) << 1);
+	inst[10] = (fm_mdl.value() ? 0 : 1) + (((int)feedback_mdl.value() & 0x07) << 1);
 	// These are always 0 in the list I had?
 	inst[11] = 0;
 	inst[12] = 0;
@@ -601,9 +570,8 @@ void OpulenzInstrument::updatePatch()
 		}
 	}
 #ifdef false
-	printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
-		inst[0], inst[1], inst[2], inst[3], inst[4],
-		inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
+	printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n", inst[0], inst[1], inst[2], inst[3],
+		inst[4], inst[5], inst[6], inst[7], inst[8], inst[9], inst[10]);
 #endif
 
 	loadPatch(inst);
@@ -650,9 +618,11 @@ void OpulenzInstrument::loadFile(const QString& file)
 		}
 
 #ifdef false
-		printf("SBI: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n",
-			(unsigned char)sbidata[36], (unsigned char)sbidata[37], (unsigned char)sbidata[38], (unsigned char)sbidata[39], (unsigned char)sbidata[40],
-			(unsigned char)sbidata[41], (unsigned char)sbidata[42], (unsigned char)sbidata[43], (unsigned char)sbidata[44], (unsigned char)sbidata[45], (unsigned char)sbidata[46]);
+		printf("SBI: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n", (unsigned char)sbidata[36],
+			(unsigned char)sbidata[37], (unsigned char)sbidata[38], (unsigned char)sbidata[39],
+			(unsigned char)sbidata[40], (unsigned char)sbidata[41], (unsigned char)sbidata[42],
+			(unsigned char)sbidata[43], (unsigned char)sbidata[44], (unsigned char)sbidata[45],
+			(unsigned char)sbidata[46]);
 #endif
 		// Modulator Sound Characteristic (Mult, KSR, EG, VIB, AM)
 		op1_trem_mdl.setValue((sbidata[36] & 0x80) == 0x80 ? true : false);
@@ -704,8 +674,7 @@ void OpulenzInstrument::loadFile(const QString& file)
 	}
 }
 
-OpulenzInstrumentView::OpulenzInstrumentView(Instrument* _instrument,
-	QWidget* _parent)
+OpulenzInstrumentView::OpulenzInstrumentView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 
@@ -810,36 +779,25 @@ void OpulenzInstrumentView::updateKnobHints()
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
 	const float attack_times[16] = {
-		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4,
-		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
-		950.0, 1900.0, 3800.0};
+		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 15.0, 30.0, 60.0, 120.0, 240.0, 480.0, 950.0, 1900.0, 3800.0};
 
 	const float dr_times[16] = {
-		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0,
-		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0,
-		5200.0, 10000.0, 20000.0};
+		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 5200.0, 10000.0, 20000.0};
 
-	const int fmultipliers[16] = {
-		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47};
+	const int fmultipliers[16] = {-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47};
 
 	OpulenzInstrument* m = castModel<OpulenzInstrument>();
 
-	op1_a_kn->setHintText(tr("Attack"),
-		" (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
-	op2_a_kn->setHintText(tr("Attack"),
-		" (" + knobHintHelper(attack_times[(int)m->op2_a_mdl.value()]) + ")");
-	op1_d_kn->setHintText(tr("Decay"),
-		" (" + knobHintHelper(dr_times[(int)m->op1_d_mdl.value()]) + ")");
-	op2_d_kn->setHintText(tr("Decay"),
-		" (" + knobHintHelper(dr_times[(int)m->op2_d_mdl.value()]) + ")");
-	op1_r_kn->setHintText(tr("Release"),
-		" (" + knobHintHelper(dr_times[(int)m->op1_r_mdl.value()]) + ")");
-	op2_r_kn->setHintText(tr("Release"),
-		" (" + knobHintHelper(dr_times[(int)m->op2_r_mdl.value()]) + ")");
-	op1_mul_kn->setHintText(tr("Frequency multiplier"),
-		" (" + QString::number(fmultipliers[(int)m->op1_mul_mdl.value()]) + " semitones)");
-	op2_mul_kn->setHintText(tr("Frequency multiplier"),
-		" (" + QString::number(fmultipliers[(int)m->op2_mul_mdl.value()]) + " semitones)");
+	op1_a_kn->setHintText(tr("Attack"), " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
+	op2_a_kn->setHintText(tr("Attack"), " (" + knobHintHelper(attack_times[(int)m->op2_a_mdl.value()]) + ")");
+	op1_d_kn->setHintText(tr("Decay"), " (" + knobHintHelper(dr_times[(int)m->op1_d_mdl.value()]) + ")");
+	op2_d_kn->setHintText(tr("Decay"), " (" + knobHintHelper(dr_times[(int)m->op2_d_mdl.value()]) + ")");
+	op1_r_kn->setHintText(tr("Release"), " (" + knobHintHelper(dr_times[(int)m->op1_r_mdl.value()]) + ")");
+	op2_r_kn->setHintText(tr("Release"), " (" + knobHintHelper(dr_times[(int)m->op2_r_mdl.value()]) + ")");
+	op1_mul_kn->setHintText(
+		tr("Frequency multiplier"), " (" + QString::number(fmultipliers[(int)m->op1_mul_mdl.value()]) + " semitones)");
+	op2_mul_kn->setHintText(
+		tr("Frequency multiplier"), " (" + QString::number(fmultipliers[(int)m->op2_mul_mdl.value()]) + " semitones)");
 }
 
 void OpulenzInstrumentView::modelChanged()

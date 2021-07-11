@@ -50,15 +50,9 @@ public:
 
 	void addJournalCheckPoint(JournallingObject* jo);
 
-	bool isJournalling() const
-	{
-		return m_journalling;
-	}
+	bool isJournalling() const { return m_journalling; }
 
-	void setJournalling(const bool _on)
-	{
-		m_journalling = _on;
-	}
+	void setJournalling(const bool _on) { m_journalling = _on; }
 
 	// alloc new ID and register object _obj to it
 	jo_id_t allocID(JournallingObject* _obj);
@@ -71,10 +65,7 @@ public:
 	// make ID _id unused, but keep all global journalling information
 	// (order of journalling entries etc.) referring to _id - needed for
 	// restoring a journalling object later
-	void freeID(const jo_id_t _id)
-	{
-		reallocID(_id, NULL);
-	}
+	void freeID(const jo_id_t _id) { reallocID(_id, NULL); }
 
 	//! hack, not used when saving a file
 	static jo_id_t idToSave(jo_id_t id);

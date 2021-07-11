@@ -75,22 +75,13 @@ public:
 
 	virtual void quit();
 
-	static void resetJobQueue(JobQueue::OperationMode _opMode =
-								  JobQueue::Static)
-	{
-		globalJobQueue.reset(_opMode);
-	}
+	static void resetJobQueue(JobQueue::OperationMode _opMode = JobQueue::Static) { globalJobQueue.reset(_opMode); }
 
-	static void addJob(ThreadableJob* _job)
-	{
-		globalJobQueue.addJob(_job);
-	}
+	static void addJob(ThreadableJob* _job) { globalJobQueue.addJob(_job); }
 
 	// a convenient helper function allowing to pass a container with pointers
 	// to ThreadableJob objects
-	template <typename T>
-	static void fillJobQueue(const T& _vec,
-		JobQueue::OperationMode _opMode = JobQueue::Static)
+	template <typename T> static void fillJobQueue(const T& _vec, JobQueue::OperationMode _opMode = JobQueue::Static)
 	{
 		resetJobQueue(_opMode);
 		for (typename T::ConstIterator it = _vec.begin(); it != _vec.end(); ++it)

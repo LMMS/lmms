@@ -2,7 +2,7 @@
  * MidiController.h - A controller to receive MIDI control-changes
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -41,11 +41,9 @@ public:
 	MidiController(Model* _parent);
 	virtual ~MidiController();
 
-	virtual void processInEvent(const MidiEvent& _me,
-		const TimePos& _time, f_cnt_t offset = 0) override;
+	virtual void processInEvent(const MidiEvent& _me, const TimePos& _time, f_cnt_t offset = 0) override;
 
-	virtual void processOutEvent(const MidiEvent& _me,
-		const TimePos& _time, f_cnt_t offset = 0) override
+	virtual void processOutEvent(const MidiEvent& _me, const TimePos& _time, f_cnt_t offset = 0) override
 	{
 		// No output yet
 	}

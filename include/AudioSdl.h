@@ -50,8 +50,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget",
-			"SDL (Simple DirectMedia Layer)");
+		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "SDL (Simple DirectMedia Layer)");
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget

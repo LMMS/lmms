@@ -39,9 +39,7 @@ public:
 	{
 	}
 
-	virtual ~selectableObject()
-	{
-	}
+	virtual ~selectableObject() {}
 
 	inline void setSelected(bool _selected)
 	{
@@ -49,16 +47,10 @@ public:
 		update();
 	}
 
-	inline bool isSelected() const
-	{
-		return (m_selected);
-	}
+	inline bool isSelected() const { return (m_selected); }
 
 public slots:
-	virtual void update()
-	{
-		QWidget::update();
-	}
+	virtual void update() { QWidget::update(); }
 
 private:
 	bool m_selected;

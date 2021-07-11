@@ -38,8 +38,7 @@ class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	LadspaControl(Model* _parent, port_desc_t* _port,
-		bool _link = false);
+	LadspaControl(Model* _parent, port_desc_t* _port, bool _link = false);
 	~LadspaControl();
 
 	LADSPA_Data value();
@@ -50,32 +49,17 @@ public:
 	void linkControls(LadspaControl* _control);
 	void unlinkControls(LadspaControl* _control);
 
-	inline BoolModel* toggledModel()
-	{
-		return &m_toggledModel;
-	}
+	inline BoolModel* toggledModel() { return &m_toggledModel; }
 
-	inline FloatModel* knobModel()
-	{
-		return &m_knobModel;
-	}
+	inline FloatModel* knobModel() { return &m_knobModel; }
 
-	inline TempoSyncKnobModel* tempoSyncKnobModel()
-	{
-		return &m_tempoSyncKnobModel;
-	}
+	inline TempoSyncKnobModel* tempoSyncKnobModel() { return &m_tempoSyncKnobModel; }
 
-	inline port_desc_t* port()
-	{
-		return m_port;
-	}
+	inline port_desc_t* port() { return m_port; }
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent, const QString& _name);
 	virtual void loadSettings(const QDomElement& _this, const QString& _name);
-	inline QString nodeName() const override
-	{
-		return "port";
-	}
+	inline QString nodeName() const override { return "port"; }
 
 signals:
 	void changed(int _port, LADSPA_Data _value);
@@ -94,10 +78,7 @@ protected:
 		Q_UNUSED(element)
 	}
 
-	void loadSettings(const QDomElement& element) override
-	{
-		Q_UNUSED(element)
-	}
+	void loadSettings(const QDomElement& element) override { Q_UNUSED(element) }
 
 private:
 	bool m_link;

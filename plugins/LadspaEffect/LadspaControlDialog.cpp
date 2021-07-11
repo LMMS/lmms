@@ -57,24 +57,19 @@ LadspaControlDialog::LadspaControlDialog(LadspaControls* _ctl)
 	}
 }
 
-LadspaControlDialog::~LadspaControlDialog()
-{
-}
+LadspaControlDialog::~LadspaControlDialog() {}
 
 void LadspaControlDialog::updateEffectView(LadspaControls* _ctl)
 {
 	QList<QGroupBox*> list = findChildren<QGroupBox*>();
-	for (QList<QGroupBox*>::iterator it = list.begin(); it != list.end();
-		 ++it)
+	for (QList<QGroupBox*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		delete *it;
 	}
 
 	m_effectControls = _ctl;
 
-	const int cols = static_cast<int>(sqrt(
-		static_cast<double>(_ctl->m_controlCount /
-			_ctl->m_processors)));
+	const int cols = static_cast<int>(sqrt(static_cast<double>(_ctl->m_controlCount / _ctl->m_processors)));
 	for (ch_cnt_t proc = 0; proc < _ctl->m_processors; proc++)
 	{
 		control_list_t& controls = _ctl->m_controls[proc];
@@ -85,9 +80,7 @@ void LadspaControlDialog::updateEffectView(LadspaControls* _ctl)
 		QGroupBox* grouper;
 		if (_ctl->m_processors > 1)
 		{
-			grouper = new QGroupBox(tr("Channel ") +
-					QString::number(proc + 1),
-				this);
+			grouper = new QGroupBox(tr("Channel ") + QString::number(proc + 1), this);
 		}
 		else
 		{
@@ -98,14 +91,12 @@ void LadspaControlDialog::updateEffectView(LadspaControls* _ctl)
 		grouper->setLayout(gl);
 		grouper->setAlignment(Qt::Vertical);
 
-		for (control_list_t::iterator it = controls.begin();
-			 it != controls.end(); ++it)
+		for (control_list_t::iterator it = controls.begin(); it != controls.end(); ++it)
 		{
 			if ((*it)->port()->proc == proc)
 			{
 				buffer_data_t this_port = (*it)->port()->data_type;
-				if (last_port != NONE &&
-					(this_port == TOGGLED || this_port == ENUM) &&
+				if (last_port != NONE && (this_port == TOGGLED || this_port == ENUM) &&
 					(last_port != TOGGLED && last_port != ENUM))
 				{
 					++row;
@@ -129,7 +120,6 @@ void LadspaControlDialog::updateEffectView(LadspaControls* _ctl)
 		m_stereoLink->setModel(&_ctl->m_stereoLinkModel);
 	}
 
-	connect(_ctl, SIGNAL(effectModelChanged(LadspaControls*)),
-		this, SLOT(updateEffectView(LadspaControls*)),
+	connect(_ctl, SIGNAL(effectModelChanged(LadspaControls*)), this, SLOT(updateEffectView(LadspaControls*)),
 		Qt::DirectConnection);
 }

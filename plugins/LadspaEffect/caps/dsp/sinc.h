@@ -1,8 +1,8 @@
 /*
 	dsp/sinc.h
-	
+
 	Copyright 2003-4 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	computes the sinc function: sin (x * pi) / (x * pi).
@@ -35,8 +35,7 @@ namespace DSP
 
 /* sample sinc() with step size omega into s[], centered around s + n / 2 */
 
-inline void
-sinc(double omega, sample_t* s, int n)
+inline void sinc(double omega, sample_t* s, int n)
 {
 	/* initial phase */
 	double phi = (n / 2) * -omega;

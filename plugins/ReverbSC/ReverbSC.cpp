@@ -32,17 +32,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"ReverbSC",
-			QT_TRANSLATE_NOOP("PluginBrowser", "Reverb algorithm by Sean Costello"),
-			"Paul Batchelor",
-			0x0123,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "ReverbSC",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Reverb algorithm by Sean Costello"), "Paul Batchelor", 0x0123,
+		Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 ReverbSCEffect::ReverbSCEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
@@ -93,18 +85,16 @@ bool ReverbSCEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
 		sample_t s[2] = {buf[f][0], buf[f][1]};
 
-		const SPFLOAT inGain = (SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f]
-														  : m_reverbSCControls.m_inputGainModel.value()));
-		const SPFLOAT outGain = (SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->values()[f]
-															: m_reverbSCControls.m_outputGainModel.value()));
+		const SPFLOAT inGain =
+			(SPFLOAT)DB2LIN((inGainBuf ? inGainBuf->values()[f] : m_reverbSCControls.m_inputGainModel.value()));
+		const SPFLOAT outGain =
+			(SPFLOAT)DB2LIN((outGainBuf ? outGainBuf->values()[f] : m_reverbSCControls.m_outputGainModel.value()));
 
 		s[0] *= inGain;
 		s[1] *= inGain;
-		revsc->feedback = (SPFLOAT)(sizeBuf ? sizeBuf->values()[f]
-											: m_reverbSCControls.m_sizeModel.value());
+		revsc->feedback = (SPFLOAT)(sizeBuf ? sizeBuf->values()[f] : m_reverbSCControls.m_sizeModel.value());
 
-		revsc->lpfreq = (SPFLOAT)(colorBuf ? colorBuf->values()[f]
-										   : m_reverbSCControls.m_colorModel.value());
+		revsc->lpfreq = (SPFLOAT)(colorBuf ? colorBuf->values()[f] : m_reverbSCControls.m_colorModel.value());
 
 		sp_revsc_compute(sp, revsc, &s[0], &s[1], &tmpL, &tmpR);
 		sp_dcblock_compute(sp, dcblk[0], &tmpL, &dcblkL);
@@ -147,8 +137,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 	{
-		return new ReverbSCEffect(
-			parent,
-			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+		return new ReverbSCEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
 	}
 }

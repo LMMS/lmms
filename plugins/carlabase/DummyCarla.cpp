@@ -10,4 +10,8 @@ CARLA_EXPORT const NativePluginDescriptor* carla_get_native_patchbay16_plugin() 
 CARLA_EXPORT const NativePluginDescriptor* carla_get_native_patchbay32_plugin() { return nullptr; }
 CARLA_EXPORT const NativePluginDescriptor* carla_get_native_patchbay64_plugin() { return nullptr; }
 CARLA_EXPORT const NativePluginDescriptor* carla_get_native_patchbay_cv_plugin() { return nullptr; }
-CARLA_EXPORT CarlaBackend::CarlaEngine* carla_get_native_plugin_engine(const NativePluginDescriptor* desc, NativePluginHandle handle) { return nullptr; }
+CARLA_EXPORT CarlaBackend::CarlaEngine* carla_get_native_plugin_engine(
+	const NativePluginDescriptor* desc, NativePluginHandle handle)
+{
+	return nullptr;
+}

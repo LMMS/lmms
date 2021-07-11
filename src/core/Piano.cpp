@@ -42,14 +42,13 @@
 
 /*! The black / white order of keys as they appear on the keyboard.
  */
-static const Piano::KeyTypes KEY_ORDER[] =
-	{
-		//	C                CIS              D                DIS
-		Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey,
-		//	E                F                FIS              G
-		Piano::WhiteKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey,
-		//	GIS              A                AIS              B
-		Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey};
+static const Piano::KeyTypes KEY_ORDER[] = {
+	//	C                CIS              D                DIS
+	Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey,
+	//	E                F                FIS              G
+	Piano::WhiteKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey,
+	//	GIS              A                AIS              B
+	Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey};
 
 /*! \brief Create a new keyboard display
  *
@@ -119,7 +118,4 @@ bool Piano::isBlackKey(int key)
 	return KEY_ORDER[keyCode] == Piano::BlackKey;
 }
 
-bool Piano::isWhiteKey(int key)
-{
-	return !isBlackKey(key);
-}
+bool Piano::isWhiteKey(int key) { return !isBlackKey(key); }

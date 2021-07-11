@@ -39,24 +39,13 @@ public:
 	{
 	}
 
-	virtual ~DetuningHelper()
-	{
-	}
+	virtual ~DetuningHelper() {}
 
-	float defaultValue() const override
-	{
-		return 0;
-	}
+	float defaultValue() const override { return 0; }
 
-	QString displayName() const override
-	{
-		return tr("Note detuning");
-	}
+	QString displayName() const override { return tr("Note detuning"); }
 
-	inline QString nodeName() const override
-	{
-		return "detuning";
-	}
+	inline QString nodeName() const override { return "detuning"; }
 };
 
 #endif

@@ -56,10 +56,7 @@ float maximum(const float* abs_spectrum, unsigned int spec_size)
 	return maxi;
 }
 
-float maximum(const std::vector<float>& abs_spectrum)
-{
-	return maximum(abs_spectrum.data(), abs_spectrum.size());
-}
+float maximum(const std::vector<float>& abs_spectrum) { return maximum(abs_spectrum.data(), abs_spectrum.size()); }
 
 /* Normalize the array of absolute magnitudes to a 0..1 range.
  * Block size refers to FFT block size before any zero padding.
@@ -164,7 +161,8 @@ int precomputeWindow(float* window, unsigned int length, FFT_WINDOWS type, bool 
 	// common computation for cosine-sum based windows
 	for (unsigned int i = 0; i < length; i++)
 	{
-		window[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)length - 1.0)) + a2 * cos(4 * F_PI * i / ((float)length - 1.0)) - a3 * cos(6 * F_PI * i / ((float)length - 1.0)));
+		window[i] = (a0 - a1 * cos(2 * F_PI * i / ((float)length - 1.0)) +
+			a2 * cos(4 * F_PI * i / ((float)length - 1.0)) - a3 * cos(6 * F_PI * i / ((float)length - 1.0)));
 		gain += window[i];
 	}
 
@@ -197,7 +195,8 @@ int absspec(const fftwf_complex* complex_buffer, float* absspec_buffer, unsigned
 
 	for (unsigned int i = 0; i < compl_length; i++)
 	{
-		absspec_buffer[i] = (float)sqrt(complex_buffer[i][0] * complex_buffer[i][0] + complex_buffer[i][1] * complex_buffer[i][1]);
+		absspec_buffer[i] =
+			(float)sqrt(complex_buffer[i][0] * complex_buffer[i][0] + complex_buffer[i][1] * complex_buffer[i][1]);
 	}
 
 	return 0;

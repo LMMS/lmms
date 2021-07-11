@@ -1,6 +1,6 @@
 /*
 	ToneStack.h
-	
+
 	Copyright 2006-9
 		David Yeh <dtyeh@ccrma.stanford.edu> (implementation)
 		Tim Goetze <tim@quitte.de> (cosmetics)
@@ -43,8 +43,7 @@ typedef struct
 	double C1, C2, C3;
 } TSParameters;
 
-#define TS_N_PRESETS (sizeof(DSP::ToneStack::presets) / \
-	sizeof(DSP::TSParameters))
+#define TS_N_PRESETS (sizeof(DSP::ToneStack::presets) / sizeof(DSP::TSParameters))
 
 class ToneStack
 {
@@ -56,11 +55,8 @@ private:
 
 	double c; // BT coef
 
-	double b1t, b1m, b1l, b1d,
-		b2t, b2m2, b2m, b2l, b2lm, b2d,
-		b3lm, b3m2, b3m, b3t, b3tm, b3tl,
-		a0, a1d, a1m, a1l, a2m, a2lm, a2m2, a2l, a2d,
-		a3lm, a3m2, a3m, a3l, a3d; // intermediate calculations
+	double b1t, b1m, b1l, b1d, b2t, b2m2, b2m, b2l, b2lm, b2d, b3lm, b3m2, b3m, b3t, b3tm, b3tl, a0, a1d, a1m, a1l, a2m,
+		a2lm, a2m2, a2l, a2d, a3lm, a3m2, a3m, a3l, a3d; // intermediate calculations
 
 	struct
 	{
@@ -90,15 +86,9 @@ public:
 		setparams(presets[0]);
 	}
 
-	void init(double _fs)
-	{
-		c = 2 * _fs;
-	}
+	void init(double _fs) { c = 2 * _fs; }
 
-	void activate(sample_t** ports)
-	{
-		filter.reset();
-	}
+	void activate(sample_t** ports) { filter.reset(); }
 
 	/* pass in pointer to ports and relative index of first eq band control */
 	void start_cycle(sample_t** ports, int bassindex = 1)
@@ -142,7 +132,8 @@ public:
 		a2lm = C1 * C3 * R2 * R3 + C2 * C3 * R2 * R3;
 		a2m2 = -(C1 * C3 * R3 * R3 + C2 * C3 * R3 * R3);
 		a2l = C1 * C2 * R2 * R4 + C1 * C2 * R1 * R2 + C1 * C3 * R2 * R4 + C2 * C3 * R2 * R4;
-		a2d = C1 * C2 * R1 * R4 + C1 * C3 * R1 * R4 + C1 * C2 * R3 * R4 + C1 * C2 * R1 * R3 + C1 * C3 * R3 * R4 + C2 * C3 * R3 * R4;
+		a2d = C1 * C2 * R1 * R4 + C1 * C3 * R1 * R4 + C1 * C2 * R3 * R4 + C1 * C2 * R1 * R3 + C1 * C3 * R3 * R4 +
+			C2 * C3 * R3 * R4;
 		a3lm = C1 * C2 * C3 * R1 * R2 * R3 + C1 * C2 * C3 * R2 * R3 * R4;
 		a3m2 = -(C1 * C2 * C3 * R1 * R3 * R3 + C1 * C2 * C3 * R3 * R3 * R4);
 		a3m = C1 * C2 * C3 * R3 * R3 * R4 + C1 * C2 * C3 * R1 * R3 * R3 - C1 * C2 * C3 * R1 * R3 * R4;
@@ -186,15 +177,12 @@ public:
 	}
 
 	// actualy do the DFII filtering, one sample at a time
-	inline sample_t process(sample_t x)
-	{
-		return filter.process(x);
-	}
+	inline sample_t process(sample_t x) { return filter.process(x); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-/* 
+/*
 	hardcode this, known size memory blocks
 	extern double* KS;    // 25 x 25 x 3
 	extern double* VS;    // 25 x 25 x 25 x 4
@@ -217,24 +205,13 @@ private:
 	LatFilt<Order> filter;
 
 public:
-	ToneStackLT()
-	{
-		setparams(250000, 1000000, 25000, 56000, 0.25e-9, 20e-9, 20e-9);
-	}
+	ToneStackLT() { setparams(250000, 1000000, 25000, 56000, 0.25e-9, 20e-9, 20e-9); }
 
-	void init(double _fs)
-	{
-	}
+	void init(double _fs) {}
 
-	void activate(sample_t** ports)
-	{
-		filter.reset();
-	}
+	void activate(sample_t** ports) { filter.reset(); }
 
-	void setparams(double R1, double R2, double R3, double R4,
-		double C1, double C2, double C3)
-	{
-	}
+	void setparams(double R1, double R2, double R3, double R4, double C1, double C2, double C3) {}
 
 	void updatecoefs(sample_t** ports)
 	{
@@ -257,10 +234,7 @@ public:
 	}
 
 	// actualy do the DFII filtering, one sample at a time
-	inline sample_t process(sample_t x)
-	{
-		return filter.process(x);
-	}
+	inline sample_t process(sample_t x) { return filter.process(x); }
 };
 
 } /* namespace DSP */

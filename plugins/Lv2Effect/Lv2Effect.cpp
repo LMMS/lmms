@@ -34,18 +34,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"LV2",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"plugin for using arbitrary LV2-effects inside LMMS."),
-			"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			nullptr,
-			new Lv2SubPluginFeatures(Plugin::Effect)};
+	Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "LV2",
+		QT_TRANSLATE_NOOP("PluginBrowser", "plugin for using arbitrary LV2-effects inside LMMS."),
+		"Johannes Lorenz <jlsf2013$$$users.sourceforge.net, $$$=@>", 0x0100, Plugin::Effect,
+		new PluginPixmapLoader("logo"), nullptr, new Lv2SubPluginFeatures(Plugin::Effect)};
 }
 
 Lv2Effect::Lv2Effect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)

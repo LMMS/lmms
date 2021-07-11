@@ -2,7 +2,7 @@
  * stereomatrix_control_dialog.h - control dialog for stereoMatrix-effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -34,9 +34,7 @@ class stereoMatrixControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	stereoMatrixControlDialog(stereoMatrixControls* _controls);
-	virtual ~stereoMatrixControlDialog()
-	{
-	}
+	virtual ~stereoMatrixControlDialog() {}
 };
 
 #endif

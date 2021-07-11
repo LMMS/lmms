@@ -34,13 +34,9 @@ class MidiEventProcessor
 {
 	MM_OPERATORS
 public:
-	MidiEventProcessor()
-	{
-	}
+	MidiEventProcessor() {}
 
-	virtual ~MidiEventProcessor()
-	{
-	}
+	virtual ~MidiEventProcessor() {}
 
 	// to be implemented by inheriting classes
 	virtual void processInEvent(const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0) = 0;

@@ -2,7 +2,7 @@
  * CaptionMenu.cpp - context menu with a caption
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -33,6 +33,4 @@ CaptionMenu::CaptionMenu(const QString& _title, QWidget* _parent)
 	caption->setEnabled(false);
 }
 
-CaptionMenu::~CaptionMenu()
-{
-}
+CaptionMenu::~CaptionMenu() {}

@@ -2,7 +2,7 @@
  * RenameDialog.cpp - implementation of dialog for renaming something
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -38,20 +38,13 @@ RenameDialog::RenameDialog(QString& _string)
 	m_stringLE->setText(_string);
 	m_stringLE->setGeometry(10, 5, 220, 20);
 	m_stringLE->selectAll();
-	connect(m_stringLE, SIGNAL(textChanged(const QString&)), this,
-		SLOT(textChanged(const QString&)));
-	connect(m_stringLE, SIGNAL(returnPressed()), this,
-		SLOT(accept()));
+	connect(m_stringLE, SIGNAL(textChanged(const QString&)), this, SLOT(textChanged(const QString&)));
+	connect(m_stringLE, SIGNAL(returnPressed()), this, SLOT(accept()));
 }
 
-RenameDialog::~RenameDialog()
-{
-}
+RenameDialog::~RenameDialog() {}
 
-void RenameDialog::resizeEvent(QResizeEvent* event)
-{
-	m_stringLE->setGeometry(10, 5, width() - 20, 20);
-}
+void RenameDialog::resizeEvent(QResizeEvent* event) { m_stringLE->setGeometry(10, 5, width() - 20, 20); }
 
 void RenameDialog::keyPressEvent(QKeyEvent* _ke)
 {
@@ -62,7 +55,4 @@ void RenameDialog::keyPressEvent(QKeyEvent* _ke)
 	}
 }
 
-void RenameDialog::textChanged(const QString& _new_string)
-{
-	m_stringToEdit = _new_string;
-}
+void RenameDialog::textChanged(const QString& _new_string) { m_stringToEdit = _new_string; }

@@ -41,10 +41,7 @@ struct MidiNote
 	int duration;
 	uint8_t volume;
 
-	inline bool operator<(const MidiNote& b) const
-	{
-		return this->time < b.time;
-	}
+	inline bool operator<(const MidiNote& b) const { return this->time < b.time; }
 };
 
 typedef std::vector<MidiNote> MidiNoteVector;
@@ -57,21 +54,15 @@ public:
 	MidiExport();
 	~MidiExport();
 
-	virtual PluginView* instantiateView(QWidget*)
-	{
-		return nullptr;
-	}
+	virtual PluginView* instantiateView(QWidget*) { return nullptr; }
 
-	virtual bool tryExport(const TrackContainer::TrackList& tracks,
-		const TrackContainer::TrackList& tracks_BB,
+	virtual bool tryExport(const TrackContainer::TrackList& tracks, const TrackContainer::TrackList& tracks_BB,
 		int tempo, int masterPitch, const QString& filename);
 
 private:
-	void writePattern(MidiNoteVector& pat, QDomNode n,
-		int base_pitch, double base_volume, int base_time);
+	void writePattern(MidiNoteVector& pat, QDomNode n, int base_pitch, double base_volume, int base_time);
 	void writePatternToTrack(MTrack& mtrack, MidiNoteVector& nv);
-	void writeBBPattern(MidiNoteVector& src, MidiNoteVector& dst,
-		int len, int base, int start, int end);
+	void writeBBPattern(MidiNoteVector& src, MidiNoteVector& dst, int len, int base, int start, int end);
 	void ProcessBBNotes(MidiNoteVector& nv, int cutPos);
 
 	void error();

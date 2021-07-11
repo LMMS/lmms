@@ -80,13 +80,11 @@ VecControlsDialog::VecControlsDialog(VecControls* controls)
 	Knob* persistenceKnob = new Knob(knobSmall_17, this);
 	persistenceKnob->setModel(&controls->m_persistenceModel);
 	persistenceKnob->setLabel(tr("Persist."));
-	persistenceKnob->setToolTip(tr("Trace persistence: higher amount means the trace will stay bright for longer time."));
+	persistenceKnob->setToolTip(
+		tr("Trace persistence: higher amount means the trace will stay bright for longer time."));
 	persistenceKnob->setHintText(tr("Trace persistence"), "");
 	config_layout->addWidget(persistenceKnob);
 }
 
 // Suggest the best widget size.
-QSize VecControlsDialog::sizeHint() const
-{
-	return QSize(275, 300);
-}
+QSize VecControlsDialog::sizeHint() const { return QSize(275, 300); }

@@ -73,7 +73,7 @@ SamplePlayHandle::~SamplePlayHandle()
 void SamplePlayHandle::play(sampleFrame* buffer)
 {
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
-	//play( 0, _try_parallelizing );
+	// play( 0, _try_parallelizing );
 	if (framesDone() >= totalFrames())
 	{
 		memset(buffer, 0, sizeof(sampleFrame) * fpp);
@@ -96,8 +96,7 @@ void SamplePlayHandle::play(sampleFrame* buffer)
 		/*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
-		if (!m_sampleBuffer->play(workingBuffer, &m_state, frames,
-				BaseFreq))
+		if (!m_sampleBuffer->play(workingBuffer, &m_state, frames, BaseFreq))
 		{
 			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
 		}
@@ -106,17 +105,12 @@ void SamplePlayHandle::play(sampleFrame* buffer)
 	m_frame += frames;
 }
 
-bool SamplePlayHandle::isFinished() const
-{
-	return framesDone() >= totalFrames() && m_doneMayReturnTrue == true;
-}
+bool SamplePlayHandle::isFinished() const { return framesDone() >= totalFrames() && m_doneMayReturnTrue == true; }
 
-bool SamplePlayHandle::isFromTrack(const Track* _track) const
-{
-	return m_track == _track || m_bbTrack == _track;
-}
+bool SamplePlayHandle::isFromTrack(const Track* _track) const { return m_track == _track || m_bbTrack == _track; }
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return (m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame()) * (Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate());
+	return (m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame()) *
+		(Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate());
 }

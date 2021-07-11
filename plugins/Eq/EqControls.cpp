@@ -150,10 +150,7 @@ void EqControls::loadSettings(const QDomElement& _this)
 	m_analyseOutModel.loadSettings(_this, "AnalyseOut");
 }
 
-EffectControlDialog* EqControls::createView()
-{
-	return new EqControlsDialog(this);
-}
+EffectControlDialog* EqControls::createView() { return new EqControlsDialog(this); }
 
 void EqControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {

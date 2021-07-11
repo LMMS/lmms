@@ -37,10 +37,7 @@ public:
 	FlangerEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~FlangerEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
-	virtual EffectControls* controls()
-	{
-		return &m_flangerControls;
-	}
+	virtual EffectControls* controls() { return &m_flangerControls; }
 	void changeSampleRate();
 	void restartLFO();
 

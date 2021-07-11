@@ -5,7 +5,7 @@
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -42,19 +42,11 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"MIDI Export",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Filter for exporting MIDI-files from LMMS"),
-			"Mohamed Abdel Maksoud <mohamed at amaksoud.com> and "
-			"Hyunjin Song <tteu.ingog/at/gmail.com>",
-			0x0100,
-			Plugin::ExportFilter,
-			NULL,
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "MIDI Export",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Filter for exporting MIDI-files from LMMS"),
+		"Mohamed Abdel Maksoud <mohamed at amaksoud.com> and "
+		"Hyunjin Song <tteu.ingog/at/gmail.com>",
+		0x0100, Plugin::ExportFilter, NULL, NULL, NULL};
 }
 
 MidiExport::MidiExport()
@@ -62,12 +54,9 @@ MidiExport::MidiExport()
 {
 }
 
-MidiExport::~MidiExport()
-{
-}
+MidiExport::~MidiExport() {}
 
-bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
-	const TrackContainer::TrackList& tracks_BB,
+bool MidiExport::tryExport(const TrackContainer::TrackList& tracks, const TrackContainer::TrackList& tracks_BB,
 	int tempo, int masterPitch, const QString& filename)
 {
 	QFile f(filename);
@@ -106,7 +95,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 		{
 
 			mtrack.addName(track->name().toStdString(), 0);
-			//mtrack.addProgramChange(0, 0);
+			// mtrack.addProgramChange(0, 0);
 			mtrack.addTempo(tempo, 0);
 
 			instTrack = dynamic_cast<InstrumentTrack*>(track);
@@ -180,7 +169,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 			continue;
 
 		mtrack.addName(track->name().toStdString(), 0);
-		//mtrack.addProgramChange(0, 0);
+		// mtrack.addProgramChange(0, 0);
 		mtrack.addTempo(tempo, 0);
 
 		instTrack = dynamic_cast<InstrumentTrack*>(track);
@@ -255,8 +244,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList& tracks,
 	return true;
 }
 
-void MidiExport::writePattern(MidiNoteVector& pat, QDomNode n,
-	int base_pitch, double base_volume, int base_time)
+void MidiExport::writePattern(MidiNoteVector& pat, QDomNode n, int base_pitch, double base_volume, int base_time)
 {
 	// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"
 	for (QDomNode nn = n.firstChild(); !nn.isNull(); nn = nn.nextSibling())
@@ -268,7 +256,8 @@ void MidiExport::writePattern(MidiNoteVector& pat, QDomNode n,
 		MidiNote mnote;
 		mnote.pitch = qMax(0, qMin(127, note.attribute("key", "0").toInt() + base_pitch));
 		// Map from LMMS volume to MIDI velocity
-		mnote.volume = qMin(qRound(base_volume * LocaleHelper::toDouble(note.attribute("vol", "100")) * (127.0 / 200.0)), 127);
+		mnote.volume =
+			qMin(qRound(base_volume * LocaleHelper::toDouble(note.attribute("vol", "100")) * (127.0 / 200.0)), 127);
 		mnote.time = base_time + note.attribute("pos", "0").toInt();
 		mnote.duration = note.attribute("len", "0").toInt();
 		pat.push_back(mnote);
@@ -283,8 +272,7 @@ void MidiExport::writePatternToTrack(MTrack& mtrack, MidiNoteVector& nv)
 	}
 }
 
-void MidiExport::writeBBPattern(MidiNoteVector& src, MidiNoteVector& dst,
-	int len, int base, int start, int end)
+void MidiExport::writeBBPattern(MidiNoteVector& src, MidiNoteVector& dst, int len, int base, int start, int end)
 {
 	if (start >= end)
 	{
@@ -327,15 +315,12 @@ void MidiExport::ProcessBBNotes(MidiNoteVector& nv, int cutPos)
 
 void MidiExport::error()
 {
-	//qDebug() << "MidiExport error: " << m_error ;
+	// qDebug() << "MidiExport error: " << m_error ;
 }
 
 extern "C"
 {
 
 	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* _data)
-	{
-		return new MidiExport();
-	}
+	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* _data) { return new MidiExport(); }
 }

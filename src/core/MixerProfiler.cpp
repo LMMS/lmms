@@ -31,9 +31,7 @@ MixerProfiler::MixerProfiler()
 {
 }
 
-MixerProfiler::~MixerProfiler()
-{
-}
+MixerProfiler::~MixerProfiler() {}
 
 void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod)
 {

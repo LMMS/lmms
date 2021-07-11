@@ -80,10 +80,7 @@ QString MidiSndio::probeDevice(void)
 	return dev;
 }
 
-void MidiSndio::sendByte(const unsigned char c)
-{
-	mio_write(m_hdl, &c, 1);
-}
+void MidiSndio::sendByte(const unsigned char c) { mio_write(m_hdl, &c, 1); }
 
 void MidiSndio::run(void)
 {

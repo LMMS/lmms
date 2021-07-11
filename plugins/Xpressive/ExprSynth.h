@@ -74,14 +74,8 @@ public:
 		m_samples = new float[m_length];
 		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
 	}
-	inline void copyFrom(const graphModel* graph)
-	{
-		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
-	}
-	~WaveSample()
-	{
-		delete[] m_samples;
-	}
+	inline void copyFrom(const graphModel* graph) { memcpy(m_samples, graph->samples(), m_length * sizeof(float)); }
+	~WaveSample() { delete[] m_samples; }
 	inline void setInterpolate(bool _interpolate) { m_interpolate = _interpolate; }
 	float* m_samples;
 	int m_length;
@@ -92,8 +86,9 @@ class ExprSynth
 {
 	MM_OPERATORS
 public:
-	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2, NotePlayHandle* nph,
-		const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
+	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2,
+		NotePlayHandle* nph, const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2,
+		float rel_trans);
 	virtual ~ExprSynth();
 
 	void renderOutput(fpp_t frames, sampleFrame* buf);
@@ -125,8 +120,7 @@ inline float positiveFraction(float x)
 	return x - static_cast<int>(x);
 }
 
-template <typename T>
-inline void clearArray(T* arr, unsigned int size)
+template <typename T> inline void clearArray(T* arr, unsigned int size)
 {
 	const T* const arr_end = arr + size;
 	while (arr < arr_end)

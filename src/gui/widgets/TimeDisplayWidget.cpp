@@ -53,8 +53,7 @@ TimeDisplayWidget::TimeDisplayWidget()
 	// update labels of LCD spinboxes
 	setDisplayMode(m_displayMode);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()),
-		this, SLOT(updateTime()));
+	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(updateTime()));
 }
 
 void TimeDisplayWidget::setDisplayMode(DisplayMode displayMode)
@@ -98,11 +97,9 @@ void TimeDisplayWidget::updateTime()
 		int tick;
 		tick = s->getPlayPos().getTicks();
 		m_majorLCD.setValue((int)(tick / s->ticksPerBar()) + 1);
-		m_minorLCD.setValue((tick % s->ticksPerBar()) /
-				(s->ticksPerBar() / s->getTimeSigModel().getNumerator()) +
-			1);
-		m_milliSecondsLCD.setValue((tick % s->ticksPerBar()) %
-			(s->ticksPerBar() / s->getTimeSigModel().getNumerator()));
+		m_minorLCD.setValue((tick % s->ticksPerBar()) / (s->ticksPerBar() / s->getTimeSigModel().getNumerator()) + 1);
+		m_milliSecondsLCD.setValue(
+			(tick % s->ticksPerBar()) % (s->ticksPerBar() / s->getTimeSigModel().getNumerator()));
 		break;
 
 	default:

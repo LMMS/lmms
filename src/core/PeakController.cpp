@@ -38,8 +38,7 @@ int PeakController::m_getCount;
 int PeakController::m_loadCount;
 bool PeakController::m_buggedFile;
 
-PeakController::PeakController(Model* _parent,
-	PeakControllerEffect* _peak_effect)
+PeakController::PeakController(Model* _parent, PeakControllerEffect* _peak_effect)
 	: Controller(Controller::PeakController, _parent, tr("Peak Controller"))
 	, m_peakEffect(_peak_effect)
 	, m_currentSample(0.0f)
@@ -47,14 +46,11 @@ PeakController::PeakController(Model* _parent,
 	setSampleExact(true);
 	if (m_peakEffect)
 	{
-		connect(m_peakEffect, SIGNAL(destroyed()),
-			this, SLOT(handleDestroyedEffect()));
+		connect(m_peakEffect, SIGNAL(destroyed()), this, SLOT(handleDestroyedEffect()));
 	}
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateCoeffs()));
-	connect(m_peakEffect->attackModel(), SIGNAL(dataChanged()),
-		this, SLOT(updateCoeffs()), Qt::DirectConnection);
-	connect(m_peakEffect->decayModel(), SIGNAL(dataChanged()),
-		this, SLOT(updateCoeffs()), Qt::DirectConnection);
+	connect(m_peakEffect->attackModel(), SIGNAL(dataChanged()), this, SLOT(updateCoeffs()), Qt::DirectConnection);
+	connect(m_peakEffect->decayModel(), SIGNAL(dataChanged()), this, SLOT(updateCoeffs()), Qt::DirectConnection);
 	m_coeffNeedsUpdate = true;
 }
 
@@ -110,18 +106,15 @@ void PeakController::updateValueBuffer()
 	m_bufferLastUpdated = s_periods;
 }
 
-void PeakController::updateCoeffs()
-{
-	m_coeffNeedsUpdate = true;
-}
+void PeakController::updateCoeffs() { m_coeffNeedsUpdate = true; }
 
 void PeakController::handleDestroyedEffect()
 {
 	// possible race condition...
-	//printf("disconnecting effect\n");
+	// printf("disconnecting effect\n");
 	disconnect(m_peakEffect);
 	m_peakEffect = NULL;
-	//deleteLater();
+	// deleteLater();
 	delete this;
 }
 
@@ -156,7 +149,7 @@ void PeakController::loadSettings(const QDomElement& _this)
 	}
 }
 
-//Backward compatibility function for bug in <= 0.4.15
+// Backward compatibility function for bug in <= 0.4.15
 void PeakController::initGetControllerBySetting()
 {
 	m_loadCount = 0;
@@ -170,8 +163,8 @@ PeakController* PeakController::getControllerBySetting(const QDomElement& _this)
 
 	PeakControllerEffectVector::Iterator i;
 
-	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
-	//foundCount should always be 1 because m_effectId is initialized with rand()
+	// Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
+	// foundCount should always be 1 because m_effectId is initialized with rand()
 	int foundCount = 0;
 	if (m_buggedFile == false)
 	{
@@ -207,7 +200,7 @@ PeakController* PeakController::getControllerBySetting(const QDomElement& _this)
 	{
 		effectId = m_getCount;
 	}
-	m_getCount++; //NB: m_getCount should be increased even m_buggedFile is false
+	m_getCount++; // NB: m_getCount should be increased even m_buggedFile is false
 
 	for (i = s_effects.begin(); i != s_effects.end(); ++i)
 	{
@@ -220,12 +213,6 @@ PeakController* PeakController::getControllerBySetting(const QDomElement& _this)
 	return NULL;
 }
 
-QString PeakController::nodeName() const
-{
-	return ("Peakcontroller");
-}
+QString PeakController::nodeName() const { return ("Peakcontroller"); }
 
-ControllerDialog* PeakController::createDialog(QWidget* _parent)
-{
-	return new PeakControllerDialog(this, _parent);
-}
+ControllerDialog* PeakController::createDialog(QWidget* _parent) { return new PeakControllerDialog(this, _parent); }

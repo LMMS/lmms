@@ -34,37 +34,22 @@ class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:
-	Model(Model* _parent, QString _display_name = QString(),
-		bool _default_constructed = false)
+	Model(Model* _parent, QString _display_name = QString(), bool _default_constructed = false)
 		: QObject(_parent)
 		, m_displayName(_display_name)
 		, m_defaultConstructed(_default_constructed)
 	{
 	}
 
-	virtual ~Model()
-	{
-	}
+	virtual ~Model() {}
 
-	bool isDefaultConstructed()
-	{
-		return m_defaultConstructed;
-	}
+	bool isDefaultConstructed() { return m_defaultConstructed; }
 
-	Model* parentModel() const
-	{
-		return static_cast<Model*>(parent());
-	}
+	Model* parentModel() const { return static_cast<Model*>(parent()); }
 
-	virtual QString displayName() const
-	{
-		return m_displayName;
-	}
+	virtual QString displayName() const { return m_displayName; }
 
-	virtual void setDisplayName(const QString& displayName)
-	{
-		m_displayName = displayName;
-	}
+	virtual void setDisplayName(const QString& displayName) { m_displayName = displayName; }
 
 	virtual QString fullDisplayName() const;
 

@@ -74,11 +74,7 @@ AudioSdl::AudioSdl(bool& _success_ful, Mixer* _mixer)
 	SDL_AudioSpec actual;
 
 #ifdef LMMS_HAVE_SDL2
-	m_outputDevice = SDL_OpenAudioDevice(NULL,
-		0,
-		&m_audioHandle,
-		&actual,
-		0);
+	m_outputDevice = SDL_OpenAudioDevice(NULL, 0, &m_audioHandle, &actual, 0);
 	if (m_outputDevice == 0)
 	{
 		qCritical("Couldn't open SDL-audio: %s\n", SDL_GetError());
@@ -104,11 +100,7 @@ AudioSdl::AudioSdl(bool& _success_ful, Mixer* _mixer)
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
-	m_inputDevice = SDL_OpenAudioDevice(NULL,
-		1,
-		&m_inputAudioHandle,
-		&actual,
-		0);
+	m_inputDevice = SDL_OpenAudioDevice(NULL, 1, &m_inputAudioHandle, &actual, 0);
 	if (m_inputDevice != 0)
 	{
 		m_supportsCapture = true;
@@ -236,8 +228,8 @@ void AudioSdl::sdlAudioCallback(Uint8* _buf, int _len)
 			}
 			m_currentBufferFramesCount = frames;
 		}
-		const uint min_frames_count = qMin(_len / sizeof(sampleFrame),
-			m_currentBufferFramesCount - m_currentBufferFramePos);
+		const uint min_frames_count =
+			qMin(_len / sizeof(sampleFrame), m_currentBufferFramesCount - m_currentBufferFramePos);
 
 		const float gain = mixer()->masterGain();
 		for (uint f = 0; f < min_frames_count; f++)
@@ -268,10 +260,7 @@ void AudioSdl::sdlAudioCallback(Uint8* _buf, int _len)
 			}
 			m_convertedBufSize = frames * channels() * sizeof(int_sample_t);
 
-			convertToS16(m_outBuf, frames,
-				mixer()->masterGain(),
-				(int_sample_t*)m_convertedBuf,
-				m_outConvertEndian);
+			convertToS16(m_outBuf, frames, mixer()->masterGain(), (int_sample_t*)m_convertedBuf, m_outConvertEndian);
 		}
 		const int min_len = qMin(_len, m_convertedBufSize - m_convertedBufPos);
 		memcpy(_buf, m_convertedBuf + m_convertedBufPos, min_len);
@@ -314,14 +303,8 @@ AudioSdl::setupWidget::setupWidget(QWidget* _parent)
 	dev_lbl->setGeometry(10, 40, 160, 10);
 }
 
-AudioSdl::setupWidget::~setupWidget()
-{
-}
+AudioSdl::setupWidget::~setupWidget() {}
 
-void AudioSdl::setupWidget::saveSettings()
-{
-	ConfigManager::inst()->setValue("audiosdl", "device",
-		m_device->text());
-}
+void AudioSdl::setupWidget::saveSettings() { ConfigManager::inst()->setValue("audiosdl", "device", m_device->text()); }
 
 #endif

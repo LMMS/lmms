@@ -44,19 +44,19 @@ private slots:
 		QString fuzPath = absPath;
 		fuzPath.replace(relPath, "drums/.///kick01.ogg");
 
-		//Test nicely formatted paths
+		// Test nicely formatted paths
 		QCOMPARE(PathUtil::toShortestRelative(absPath), relPath);
 		QCOMPARE(PathUtil::toAbsolute(relPath), absPath);
 
-		//Test upgrading old paths
+		// Test upgrading old paths
 		QCOMPARE(PathUtil::toShortestRelative(oldRelPath), relPath);
 		QCOMPARE(PathUtil::toAbsolute(oldRelPath), absPath);
 
-		//Test weird but valid paths
+		// Test weird but valid paths
 		QCOMPARE(PathUtil::toShortestRelative(fuzPath), relPath);
 		QCOMPARE(PathUtil::toAbsolute(fuzPath), absPath);
 
-		//Empty paths should stay empty
+		// Empty paths should stay empty
 		QString empty = QString("");
 		QCOMPARE(PathUtil::stripPrefix(""), empty);
 		QCOMPARE(PathUtil::cleanName(""), empty);

@@ -31,8 +31,7 @@
 
 #include "ConfigManager.h"
 
-FileDialog::FileDialog(QWidget* parent, const QString& caption,
-	const QString& directory, const QString& filter)
+FileDialog::FileDialog(QWidget* parent, const QString& caption, const QString& directory, const QString& filter)
 	: QFileDialog(parent, caption, directory, filter)
 {
 #if QT_VERSION > 0x050200
@@ -65,10 +64,8 @@ FileDialog::FileDialog(QWidget* parent, const QString& caption,
 	setSidebarUrls(urls);
 }
 
-QString FileDialog::getExistingDirectory(QWidget* parent,
-	const QString& caption,
-	const QString& directory,
-	QFileDialog::Options options)
+QString FileDialog::getExistingDirectory(
+	QWidget* parent, const QString& caption, const QString& directory, QFileDialog::Options options)
 {
 	FileDialog dialog(parent, caption, directory, QString());
 	dialog.setFileMode(QFileDialog::Directory);
@@ -80,11 +77,8 @@ QString FileDialog::getExistingDirectory(QWidget* parent,
 	return QString();
 }
 
-QString FileDialog::getOpenFileName(QWidget* parent,
-	const QString& caption,
-	const QString& directory,
-	const QString& filter,
-	QString* selectedFilter)
+QString FileDialog::getOpenFileName(
+	QWidget* parent, const QString& caption, const QString& directory, const QString& filter, QString* selectedFilter)
 {
 	FileDialog dialog(parent, caption, directory, filter);
 	if (selectedFilter && !selectedFilter->isEmpty())

@@ -60,15 +60,9 @@ public:
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
-	inline QString nodeName() const override
-	{
-		return "sampletco";
-	}
+	inline QString nodeName() const override { return "sampletco"; }
 
-	SampleBuffer* sampleBuffer()
-	{
-		return m_sampleBuffer;
-	}
+	SampleBuffer* sampleBuffer() { return m_sampleBuffer; }
 
 	TimePos sampleLength() const;
 	void setSampleStartFrame(f_cnt_t startFrame);
@@ -132,34 +126,21 @@ public:
 	SampleTrack(TrackContainer* tc);
 	virtual ~SampleTrack();
 
-	virtual bool play(const TimePos& _start, const fpp_t _frames,
-		const f_cnt_t _frame_base, int _tco_num = -1) override;
+	virtual bool play(
+		const TimePos& _start, const fpp_t _frames, const f_cnt_t _frame_base, int _tco_num = -1) override;
 	TrackView* createView(TrackContainerView* tcv) override;
 	TrackContentObject* createTCO(const TimePos& pos) override;
 
-	virtual void saveTrackSpecificSettings(QDomDocument& _doc,
-		QDomElement& _parent) override;
+	virtual void saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadTrackSpecificSettings(const QDomElement& _this) override;
 
-	inline IntModel* effectChannelModel()
-	{
-		return &m_effectChannelModel;
-	}
+	inline IntModel* effectChannelModel() { return &m_effectChannelModel; }
 
-	inline AudioPort* audioPort()
-	{
-		return &m_audioPort;
-	}
+	inline AudioPort* audioPort() { return &m_audioPort; }
 
-	QString nodeName() const override
-	{
-		return "sampletrack";
-	}
+	QString nodeName() const override { return "sampletrack"; }
 
-	bool isPlaying()
-	{
-		return m_isPlaying;
-	}
+	bool isPlaying() { return m_isPlaying; }
 
 	void setPlaying(bool playing)
 	{
@@ -196,20 +177,11 @@ public:
 	SampleTrackView(SampleTrack* Track, TrackContainerView* tcv);
 	virtual ~SampleTrackView();
 
-	SampleTrackWindow* getSampleTrackWindow()
-	{
-		return m_window;
-	}
+	SampleTrackWindow* getSampleTrackWindow() { return m_window; }
 
-	SampleTrack* model()
-	{
-		return castModel<SampleTrack>();
-	}
+	SampleTrack* model() { return castModel<SampleTrack>(); }
 
-	const SampleTrack* model() const
-	{
-		return castModel<SampleTrack>();
-	}
+	const SampleTrack* model() const { return castModel<SampleTrack>(); }
 
 	QMenu* createFxMenu(QString title, QString newFxLabel) override;
 
@@ -219,10 +191,7 @@ public slots:
 
 protected:
 	void modelChanged() override;
-	QString nodeName() const override
-	{
-		return "SampleTrackView";
-	}
+	QString nodeName() const override { return "SampleTrackView"; }
 
 	void dragEnterEvent(QDragEnterEvent* dee) override;
 	void dropEvent(QDropEvent* de) override;
@@ -239,10 +208,7 @@ private:
 
 	TrackLabelButton* m_tlb;
 
-	FadeButton* getActivityIndicator() override
-	{
-		return m_activityIndicator;
-	}
+	FadeButton* getActivityIndicator() override { return m_activityIndicator; }
 
 	friend class SampleTrackWindow;
 };
@@ -254,22 +220,13 @@ public:
 	SampleTrackWindow(SampleTrackView* tv);
 	virtual ~SampleTrackWindow();
 
-	SampleTrack* model()
-	{
-		return castModel<SampleTrack>();
-	}
+	SampleTrack* model() { return castModel<SampleTrack>(); }
 
-	const SampleTrack* model() const
-	{
-		return castModel<SampleTrack>();
-	}
+	const SampleTrack* model() const { return castModel<SampleTrack>(); }
 
 	void setSampleTrackView(SampleTrackView* tv);
 
-	SampleTrackView* sampleTrackView()
-	{
-		return m_stv;
-	}
+	SampleTrackView* sampleTrackView() { return m_stv; }
 
 public slots:
 	void textChanged(const QString& new_name);

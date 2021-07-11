@@ -40,10 +40,7 @@ public:
 	~CompressorEffect() override;
 	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
 
-	EffectControls* controls() override
-	{
-		return &m_compressorControls;
-	}
+	EffectControls* controls() override { return &m_compressorControls; }
 
 private slots:
 	void calcAutoMakeup();

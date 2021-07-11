@@ -39,10 +39,7 @@ public:
 	virtual ~BitcrushEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_controls;
-	}
+	virtual EffectControls* controls() { return &m_controls; }
 
 private:
 	void sampleRateChanged();

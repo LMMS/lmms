@@ -66,14 +66,9 @@ public:
 	AudioPortAudio(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioPortAudio();
 
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PortAudio");
-	}
+	inline static QString name() { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PortAudio"); }
 
-	int process_callback(const float* _inputBuffer,
-		float* _outputBuffer,
-		unsigned long _framesPerBuffer);
+	int process_callback(const float* _inputBuffer, float* _outputBuffer, unsigned long _framesPerBuffer);
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{
@@ -96,11 +91,8 @@ private:
 	virtual void applyQualitySettings();
 
 #ifdef PORTAUDIO_V19
-	static int _process_callback(const void* _inputBuffer, void* _outputBuffer,
-		unsigned long _framesPerBuffer,
-		const PaStreamCallbackTimeInfo* _timeInfo,
-		PaStreamCallbackFlags _statusFlags,
-		void* arg);
+	static int _process_callback(const void* _inputBuffer, void* _outputBuffer, unsigned long _framesPerBuffer,
+		const PaStreamCallbackTimeInfo* _timeInfo, PaStreamCallbackFlags _statusFlags, void* arg);
 
 #else
 
@@ -111,8 +103,8 @@ private:
 #define Pa_GetDefaultOutputDevice Pa_GetDefaultOutputDeviceID
 #define Pa_IsStreamActive Pa_StreamActive
 
-	static int _process_callback(void* _inputBuffer, void* _outputBuffer,
-		unsigned long _framesPerBuffer, PaTimestamp _outTime, void* _arg);
+	static int _process_callback(
+		void* _inputBuffer, void* _outputBuffer, unsigned long _framesPerBuffer, PaTimestamp _outTime, void* _arg);
 
 	typedef double PaTime;
 	typedef PaDeviceID PaDeviceIndex;

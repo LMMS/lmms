@@ -46,10 +46,7 @@ public:
 	AudioPulseAudio(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioPulseAudio();
 
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PulseAudio");
-	}
+	inline static QString name() { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "PulseAudio"); }
 
 	static QString probeDevice();
 

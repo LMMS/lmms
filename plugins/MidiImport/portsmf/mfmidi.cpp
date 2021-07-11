@@ -4,11 +4,11 @@
  */
 
 /*****************************************************************************
-*       Change Log
-*       Date    | who : Change
-*-----------+-----------------------------------------------------------------
-*  2-Mar-92 | GWL : created changelog; MIDIFILE_ERROR to satisfy compiler
-*****************************************************************************/
+ *       Change Log
+ *       Date    | who : Change
+ *-----------+-----------------------------------------------------------------
+ *  2-Mar-92 | GWL : created changelog; MIDIFILE_ERROR to satisfy compiler
+ *****************************************************************************/
 
 #include "mfmidi.h"
 
@@ -359,10 +359,7 @@ void Midifile_reader::metaevent(int type)
 	}
 }
 
-void Midifile_reader::sysex()
-{
-	Mf_sysex(msgleng(), msg());
-}
+void Midifile_reader::sysex() { Mf_sysex(msgleng(), msg()); }
 
 void Midifile_reader::chanmessage(int status, int c1, int c2)
 {
@@ -432,10 +429,7 @@ long Midifile_reader::to32bit(int c1, int c2, int c3, int c4)
 	return (value);
 }
 
-int Midifile_reader::to16bit(int c1, int c2)
-{
-	return ((c1 & 0xff) << 8) + (c2 & 0xff);
-}
+int Midifile_reader::to16bit(int c1, int c2) { return ((c1 & 0xff) << 8) + (c2 & 0xff); }
 
 long Midifile_reader::read32bit()
 {
@@ -474,10 +468,7 @@ void Midifile_reader::mferror(char* s)
 	midifile_error = 1;
 }
 
-void Midifile_reader::mferror(const char* s)
-{
-	mferror(const_cast<char*>(s));
-}
+void Midifile_reader::mferror(const char* s) { mferror(const_cast<char*>(s)); }
 
 /* The code below allows collection of a system exclusive message of */
 /* arbitrary length.  The Msgbuff is expanded as necessary.  The only */
@@ -504,20 +495,11 @@ void Midifile_reader::finalize()
 	Msgbuff = NULL;
 }
 
-void Midifile_reader::msginit()
-{
-	Msgindex = 0;
-}
+void Midifile_reader::msginit() { Msgindex = 0; }
 
-unsigned char* Midifile_reader::msg()
-{
-	return (Msgbuff);
-}
+unsigned char* Midifile_reader::msg() { return (Msgbuff); }
 
-int Midifile_reader::msgleng()
-{
-	return (Msgindex);
-}
+int Midifile_reader::msgleng() { return (Msgindex); }
 
 void Midifile_reader::msgadd(int c)
 {

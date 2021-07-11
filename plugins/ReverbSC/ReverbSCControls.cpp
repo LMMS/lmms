@@ -41,9 +41,7 @@ ReverbSCControls::ReverbSCControls(ReverbSCEffect* effect)
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 }
 
-void ReverbSCControls::changeControl()
-{
-}
+void ReverbSCControls::changeControl() {}
 
 void ReverbSCControls::loadSettings(const QDomElement& _this)
 {
@@ -61,7 +59,4 @@ void ReverbSCControls::saveSettings(QDomDocument& doc, QDomElement& _this)
 	m_outputGainModel.saveSettings(doc, _this, "output_gain");
 }
 
-void ReverbSCControls::changeSampleRate()
-{
-	m_effect->changeSampleRate();
-}
+void ReverbSCControls::changeSampleRate() { m_effect->changeSampleRate(); }

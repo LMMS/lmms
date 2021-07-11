@@ -68,26 +68,17 @@ ComboBox::ComboBox(QWidget* _parent, const QString& _name)
 	setFont(pointSize<9>(font()));
 	m_menu.setFont(pointSize<8>(m_menu.font()));
 
-	connect(&m_menu, SIGNAL(triggered(QAction*)),
-		this, SLOT(setItem(QAction*)));
+	connect(&m_menu, SIGNAL(triggered(QAction*)), this, SLOT(setItem(QAction*)));
 
 	setWindowTitle(_name);
 	doConnections();
 }
 
-ComboBox::~ComboBox()
-{
-}
+ComboBox::~ComboBox() {}
 
-void ComboBox::selectNext()
-{
-	model()->setInitValue(model()->value() + 1);
-}
+void ComboBox::selectNext() { model()->setInitValue(model()->value() + 1); }
 
-void ComboBox::selectPrevious()
-{
-	model()->setInitValue(model()->value() - 1);
-}
+void ComboBox::selectPrevious() { model()->setInitValue(model()->value() - 1); }
 
 void ComboBox::contextMenuEvent(QContextMenuEvent* event)
 {
@@ -119,8 +110,8 @@ void ComboBox::mousePressEvent(QMouseEvent* event)
 			m_menu.clear();
 			for (int i = 0; i < model()->size(); ++i)
 			{
-				QAction* a = m_menu.addAction(model()->itemPixmap(i) ? model()->itemPixmap(i)->pixmap() : QPixmap(),
-					model()->itemText(i));
+				QAction* a = m_menu.addAction(
+					model()->itemPixmap(i) ? model()->itemPixmap(i)->pixmap() : QPixmap(), model()->itemText(i));
 				a->setData(i);
 			}
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -31,8 +31,7 @@
 #include "Song.h"
 #include "peak_controller_effect.h"
 
-PeakControllerEffectControls::
-	PeakControllerEffectControls(PeakControllerEffect* _eff)
+PeakControllerEffectControls::PeakControllerEffectControls(PeakControllerEffect* _eff)
 	: EffectControls(_eff)
 	, m_effect(_eff)
 	, m_baseModel(0.5, 0.0, 1.0, 0.001, this, tr("Base value"))
@@ -49,7 +48,7 @@ PeakControllerEffectControls::
 void PeakControllerEffectControls::loadSettings(const QDomElement& _this)
 {
 	m_baseModel.loadSettings(_this, "base");
-	m_effect->m_lastSample = m_baseModel.value(); //Set initial Peak Controller output to Base
+	m_effect->m_lastSample = m_baseModel.value(); // Set initial Peak Controller output to Base
 	m_amountModel.loadSettings(_this, "amount");
 	m_muteModel.loadSettings(_this, "mute");
 
@@ -79,8 +78,7 @@ void PeakControllerEffectControls::loadSettings(const QDomElement& _this)
 	}
 }
 
-void PeakControllerEffectControls::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void PeakControllerEffectControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	_this.setAttribute("effectId", m_effect->m_effectId);
 

@@ -72,15 +72,9 @@ void Editor::togglePlayStop()
 		play();
 }
 
-void Editor::togglePause()
-{
-	Engine::getSong()->togglePause();
-}
+void Editor::togglePause() { Engine::getSong()->togglePause(); }
 
-void Editor::toggleMaximize()
-{
-	isMaximized() ? showNormal() : showMaximized();
-}
+void Editor::toggleMaximize() { isMaximized() ? showNormal() : showMaximized(); }
 
 Editor::Editor(bool record, bool stepRecord)
 	: m_toolBar(new DropToolBar(this))
@@ -103,7 +97,8 @@ Editor::Editor(bool record, bool stepRecord)
 
 	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
 	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
-	m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
+	m_toggleStepRecordingAction =
+		new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
@@ -129,14 +124,9 @@ Editor::Editor(bool record, bool stepRecord)
 	addButton(m_stopAction, "stopButton");
 }
 
-Editor::~Editor()
-{
-}
+Editor::~Editor() {}
 
-QAction* Editor::playAction() const
-{
-	return m_playAction;
-}
+QAction* Editor::playAction() const { return m_playAction; }
 
 void Editor::closeEvent(QCloseEvent* _ce)
 {
@@ -157,12 +147,6 @@ DropToolBar::DropToolBar(QWidget* parent)
 	setAcceptDrops(true);
 }
 
-void DropToolBar::dragEnterEvent(QDragEnterEvent* event)
-{
-	dragEntered(event);
-}
+void DropToolBar::dragEnterEvent(QDragEnterEvent* event) { dragEntered(event); }
 
-void DropToolBar::dropEvent(QDropEvent* event)
-{
-	dropped(event);
-}
+void DropToolBar::dropEvent(QDropEvent* event) { dropped(event); }

@@ -52,10 +52,7 @@ public:
 
 	QVector<Note*> getCurStepNotes();
 
-	bool isRecording() const
-	{
-		return m_isRecording;
-	}
+	bool isRecording() const { return m_isRecording; }
 
 	QColor curStepNoteColor() const
 	{
@@ -88,8 +85,8 @@ private:
 	TimePos m_curStepEndPos = 0;
 
 	TimePos m_stepsLength;
-	TimePos m_curStepLength; // current step length refers to the step currently recorded. it may defer from m_stepsLength
-							 // since the user can make current step larger
+	TimePos m_curStepLength; // current step length refers to the step currently recorded. it may defer from
+							 // m_stepsLength since the user can make current step larger
 
 	QTimer m_updateReleasedTimer;
 
@@ -102,10 +99,7 @@ private:
 			: m_note(note)
 			, m_pressed(true){};
 
-		void setPressed()
-		{
-			m_pressed = true;
-		}
+		void setPressed() { m_pressed = true; }
 
 		void setReleased()
 		{
@@ -113,20 +107,11 @@ private:
 			releasedTimer.start();
 		}
 
-		int timeSinceReleased()
-		{
-			return releasedTimer.elapsed();
-		}
+		int timeSinceReleased() { return releasedTimer.elapsed(); }
 
-		bool isPressed() const
-		{
-			return m_pressed;
-		}
+		bool isPressed() const { return m_pressed; }
 
-		bool isReleased() const
-		{
-			return !m_pressed;
-		}
+		bool isReleased() const { return !m_pressed; }
 
 		Note m_note;
 
@@ -135,11 +120,12 @@ private:
 		QElapsedTimer releasedTimer;
 	};
 
-	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)
+	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the
+									   // notes; before they are applied to the pattern)
 
 	StepNote* findCurStepNote(const int key);
 
 	bool m_isStepInProgress = false;
 };
 
-#endif //STEP_RECORDER_H
+#endif // STEP_RECORDER_H

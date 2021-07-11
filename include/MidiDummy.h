@@ -30,18 +30,10 @@
 class MidiDummy : public MidiClientRaw
 {
 public:
-	MidiDummy()
-	{
-	}
-	virtual ~MidiDummy()
-	{
-	}
+	MidiDummy() {}
+	virtual ~MidiDummy() {}
 
-	inline static QString name()
-	{
-		return (QT_TRANSLATE_NOOP("MidiSetupWidget",
-			"Dummy (no MIDI support)"));
-	}
+	inline static QString name() { return (QT_TRANSLATE_NOOP("MidiSetupWidget", "Dummy (no MIDI support)")); }
 
 	inline static QString probeDevice()
 	{
@@ -54,9 +46,7 @@ public:
 	}
 
 protected:
-	void sendByte(const unsigned char) override
-	{
-	}
+	void sendByte(const unsigned char) override {}
 };
 
 #endif

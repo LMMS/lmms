@@ -34,7 +34,8 @@
 #include "TempoSyncKnob.h"
 #include "gui_templates.h"
 
-InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView(InstrumentFunctionNoteStacking* cc, QWidget* parent)
+InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView(
+	InstrumentFunctionNoteStacking* cc, QWidget* parent)
 	: QWidget(parent)
 	, ModelView(NULL, this)
 	, m_cc(cc)
@@ -63,10 +64,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView(Instrumen
 	mainLayout->addWidget(m_chordRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter);
 }
 
-InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
-{
-	delete m_chordsGroupBox;
-}
+InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView() { delete m_chordsGroupBox; }
 
 void InstrumentFunctionNoteStackingView::modelChanged()
 {
@@ -151,10 +149,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView(InstrumentFunctio
 	mainLayout->setRowMinimumHeight(5, 10);
 }
 
-InstrumentFunctionArpeggioView::~InstrumentFunctionArpeggioView()
-{
-	delete m_arpGroupBox;
-}
+InstrumentFunctionArpeggioView::~InstrumentFunctionArpeggioView() { delete m_arpGroupBox; }
 
 void InstrumentFunctionArpeggioView::modelChanged()
 {

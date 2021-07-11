@@ -38,10 +38,7 @@ BassBoosterControls::BassBoosterControls(BassBoosterEffect* effect)
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeFrequency()));
 }
 
-void BassBoosterControls::changeFrequency()
-{
-	m_effect->m_frequencyChangeNeeded = true;
-}
+void BassBoosterControls::changeFrequency() { m_effect->m_frequencyChangeNeeded = true; }
 
 void BassBoosterControls::loadSettings(const QDomElement& _this)
 {

@@ -55,8 +55,7 @@ public:
 		NumControllerTypes
 	};
 
-	Controller(ControllerTypes _type, Model* _parent,
-		const QString& _display_name);
+	Controller(ControllerTypes _type, Model* _parent, const QString& _display_name);
 
 	virtual ~Controller();
 
@@ -64,20 +63,11 @@ public:
 	// The per-controller get-value-in-buffers function
 	virtual ValueBuffer* valueBuffer();
 
-	inline bool isSampleExact() const
-	{
-		return m_sampleExact;
-	}
+	inline bool isSampleExact() const { return m_sampleExact; }
 
-	void setSampleExact(bool _exact)
-	{
-		m_sampleExact = _exact;
-	}
+	void setSampleExact(bool _exact) { m_sampleExact = _exact; }
 
-	inline ControllerTypes type() const
-	{
-		return (m_type);
-	}
+	inline ControllerTypes type() const { return (m_type); }
 
 	// return whether this controller updates models frequently - used for
 	// determining when to update GUI
@@ -95,35 +85,25 @@ public:
 		return (false);
 	}
 
-	virtual const QString& name() const
-	{
-		return (m_name);
-	}
+	virtual const QString& name() const { return (m_name); }
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 	void loadSettings(const QDomElement& _this) override;
 	QString nodeName() const override;
 
 	static Controller* create(ControllerTypes _tt, Model* _parent);
-	static Controller* create(const QDomElement& _this,
-		Model* _parent);
+	static Controller* create(const QDomElement& _this, Model* _parent);
 
-	inline static float fittedValue(float _val)
-	{
-		return qBound<float>(0.0f, _val, 1.0f);
-	}
+	inline static float fittedValue(float _val) { return qBound<float>(0.0f, _val, 1.0f); }
 
-	static long runningPeriods()
-	{
-		return s_periods;
-	}
+	static long runningPeriods() { return s_periods; }
 	static unsigned int runningFrames();
 	static float runningTime();
 
 	static void triggerFrameCounter();
 	static void resetFrameCounter();
 
-	//Accepts a ControllerConnection * as it may be used in the future.
+	// Accepts a ControllerConnection * as it may be used in the future.
 	void addConnection(ControllerConnection*);
 	void removeConnection(ControllerConnection*);
 	int connectionCount() const;
@@ -133,10 +113,7 @@ public:
 public slots:
 	virtual ControllerDialog* createDialog(QWidget* _parent);
 
-	virtual void setName(const QString& _new_name)
-	{
-		m_name = _new_name;
-	}
+	virtual void setName(const QString& _new_name) { m_name = _new_name; }
 
 protected:
 	// The internal per-controller get-value function

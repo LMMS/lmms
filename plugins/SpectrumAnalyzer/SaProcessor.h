@@ -35,8 +35,7 @@
 #include "SaControls.h"
 #include "fft_helpers.h"
 
-template <class T>
-class LocklessRingBuffer;
+template <class T> class LocklessRingBuffer;
 
 //! Receives audio data, runs FFT analysis and stores the result.
 class SaProcessor

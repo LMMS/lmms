@@ -45,47 +45,27 @@ public:
 	static void free(void* ptr);
 };
 
-template <typename T>
-struct MmAllocator
+template <typename T> struct MmAllocator
 {
 	typedef T value_type;
-	template <class U>
-	struct rebind
+	template <class U> struct rebind
 	{
 		typedef MmAllocator<U> other;
 	};
 
-	T* allocate(std::size_t n)
-	{
-		return reinterpret_cast<T*>(MemoryManager::alloc(sizeof(T) * n));
-	}
+	T* allocate(std::size_t n) { return reinterpret_cast<T*>(MemoryManager::alloc(sizeof(T) * n)); }
 
-	void deallocate(T* p, std::size_t)
-	{
-		MemoryManager::free(p);
-	}
+	void deallocate(T* p, std::size_t) { MemoryManager::free(p); }
 
 	typedef std::vector<T, MmAllocator<T>> vector;
 };
 
 #define MM_OPERATORS \
 public: \
-	static void* operator new(size_t size) \
-	{ \
-		return MemoryManager::alloc(size); \
-	} \
-	static void* operator new[](size_t size) \
-	{ \
-		return MemoryManager::alloc(size); \
-	} \
-	static void operator delete(void* ptr) \
-	{ \
-		MemoryManager::free(ptr); \
-	} \
-	static void operator delete[](void* ptr) \
-	{ \
-		MemoryManager::free(ptr); \
-	}
+	static void* operator new(size_t size) { return MemoryManager::alloc(size); } \
+	static void* operator new[](size_t size) { return MemoryManager::alloc(size); } \
+	static void operator delete(void* ptr) { MemoryManager::free(ptr); } \
+	static void operator delete[](void* ptr) { MemoryManager::free(ptr); }
 
 // for use in cases where overriding new/delete isn't a possibility
 #define MM_ALLOC(type, count) reinterpret_cast<type*>(MemoryManager::alloc(sizeof(type) * count))

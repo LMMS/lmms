@@ -1,8 +1,8 @@
 /*
 	Eq.h
-	
+
 	Copyright 2004-7 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Equalizer circuit using recursive filtering.
@@ -33,20 +33,16 @@ namespace DSP
 {
 
 /* A single bandpass as used by the Eq, expressed as a biquad. Like all
- * band-pass filters I know of, the filter works with a FIR coefficient of 0 
- * for x[-1], so a generic biquad isn't the optimum implementation. 
+ * band-pass filters I know of, the filter works with a FIR coefficient of 0
+ * for x[-1], so a generic biquad isn't the optimum implementation.
  *
  * This routine isn't used anywhere, just here for testing purposes.
  */
-template <class T>
-void _BP(double fc, double Q, T* ca, T* cb)
+template <class T> void _BP(double fc, double Q, T* ca, T* cb)
 {
 	double theta = 2 * fc * M_PI;
 
-	double
-		b = (Q - theta * .5) / (2 * Q + theta),
-		a = (.5 - b) / 2,
-		c = (.5 + b) * cos(theta);
+	double b = (Q - theta * .5) / (2 * Q + theta), a = (.5 - b) / 2, c = (.5 + b) * cos(theta);
 
 	ca[0] = 2 * a;
 	ca[1] = 0;
@@ -57,8 +53,7 @@ void _BP(double fc, double Q, T* ca, T* cb)
 	cb[2] = -2 * b;
 }
 
-template <int Bands, class eq_sample = float>
-class Eq
+template <int Bands, class eq_sample = float> class Eq
 {
 public:
 	/* recursion coefficients, 3 per band */
@@ -113,14 +108,11 @@ public:
 		gf[i] = 1;
 	}
 
-	void zero_band(int i)
-	{
-		a[i] = b[i] = c[i] = 0;
-	}
+	void zero_band(int i) { a[i] = b[i] = c[i] = 0; }
 
 	/* per-band recursion:
-		 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2]) 
-		 */
+	 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2])
+	 */
 	eq_sample process(eq_sample s)
 	{
 		int z1 = h, z2 = h ^ 1;

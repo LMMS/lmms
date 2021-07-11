@@ -73,10 +73,9 @@ InstrumentMidiIOView::InstrumentMidiIOView(QWidget* parent)
 	midiInputLayout->addWidget(m_fixedInputVelocitySpinBox);
 	midiInputLayout->addStretch();
 
-	connect(m_midiInputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_inputChannelSpinBox, SLOT(setEnabled(bool)));
-	connect(m_midiInputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_fixedInputVelocitySpinBox, SLOT(setEnabled(bool)));
+	connect(m_midiInputGroupBox->ledButton(), SIGNAL(toggled(bool)), m_inputChannelSpinBox, SLOT(setEnabled(bool)));
+	connect(
+		m_midiInputGroupBox->ledButton(), SIGNAL(toggled(bool)), m_fixedInputVelocitySpinBox, SLOT(setEnabled(bool)));
 
 	m_midiOutputGroupBox = new GroupBox(tr("ENABLE MIDI OUTPUT"));
 	layout->addWidget(m_midiOutputGroupBox);
@@ -118,12 +117,10 @@ InstrumentMidiIOView::InstrumentMidiIOView(QWidget* parent)
 	midiOutputLayout->addWidget(m_fixedOutputNoteSpinBox);
 	midiOutputLayout->addStretch();
 
-	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_fixedOutputVelocitySpinBox, SLOT(setEnabled(bool)));
-	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_outputProgramSpinBox, SLOT(setEnabled(bool)));
-	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_fixedOutputNoteSpinBox, SLOT(setEnabled(bool)));
+	connect(
+		m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)), m_fixedOutputVelocitySpinBox, SLOT(setEnabled(bool)));
+	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)), m_outputProgramSpinBox, SLOT(setEnabled(bool)));
+	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)), m_fixedOutputNoteSpinBox, SLOT(setEnabled(bool)));
 
 	if (!Engine::mixer()->midiClient()->isRaw())
 	{
@@ -153,7 +150,8 @@ InstrumentMidiIOView::InstrumentMidiIOView(QWidget* parent)
 	baseVelocityLayout->setContentsMargins(8, 18, 8, 8);
 	baseVelocityLayout->setSpacing(6);
 
-	QLabel* baseVelocityHelp = new QLabel(tr("Specify the velocity normalization base for MIDI-based instruments at 100% note velocity."));
+	QLabel* baseVelocityHelp =
+		new QLabel(tr("Specify the velocity normalization base for MIDI-based instruments at 100% note velocity."));
 	baseVelocityHelp->setWordWrap(true);
 	baseVelocityHelp->setFont(pointSize<8>(baseVelocityHelp->font()));
 
@@ -164,16 +162,13 @@ InstrumentMidiIOView::InstrumentMidiIOView(QWidget* parent)
 	m_baseVelocitySpinBox->setEnabled(false);
 	baseVelocityLayout->addWidget(m_baseVelocitySpinBox);
 
-	connect(baseVelocityGroupBox->ledButton(), SIGNAL(toggled(bool)),
-		m_baseVelocitySpinBox, SLOT(setEnabled(bool)));
+	connect(baseVelocityGroupBox->ledButton(), SIGNAL(toggled(bool)), m_baseVelocitySpinBox, SLOT(setEnabled(bool)));
 #endif
 
 	layout->addStretch();
 }
 
-InstrumentMidiIOView::~InstrumentMidiIOView()
-{
-}
+InstrumentMidiIOView::~InstrumentMidiIOView() {}
 
 void InstrumentMidiIOView::modelChanged()
 {
@@ -219,6 +214,4 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack* it, QWidget* parent)
 	layout->addStretch();
 }
 
-InstrumentMiscView::~InstrumentMiscView()
-{
-}
+InstrumentMiscView::~InstrumentMiscView() {}

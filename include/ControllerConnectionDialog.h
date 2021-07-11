@@ -48,14 +48,10 @@ class ControllerConnectionDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ControllerConnectionDialog(QWidget* _parent,
-		const AutomatableModel* _target_model);
+	ControllerConnectionDialog(QWidget* _parent, const AutomatableModel* _target_model);
 	virtual ~ControllerConnectionDialog();
 
-	Controller* chosenController()
-	{
-		return m_controller;
-	}
+	Controller* chosenController() { return m_controller; }
 
 public slots:
 	//	void setSelection( const effectKey & _selection );

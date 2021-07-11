@@ -39,18 +39,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Monstro",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Monstrous 3-oscillator synth with modulation matrix"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Monstro",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Monstrous 3-oscillator synth with modulation matrix"),
+		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"),
+		NULL, NULL};
 }
 
 MonstroSynth::MonstroSynth(MonstroInstrument* _i, NotePlayHandle* _nph)
@@ -99,9 +91,7 @@ MonstroSynth::MonstroSynth(MonstroInstrument* _i, NotePlayHandle* _nph)
 	m_env[1].resize(m_parent->m_fpp);
 }
 
-MonstroSynth::~MonstroSynth()
-{
-}
+MonstroSynth::~MonstroSynth() {}
 
 void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 {
@@ -299,7 +289,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 	const float o3s_l2 = (m_parent->m_sub3lfo2.value() * 0.5f);
 	const bool o3s_mod = o3s_e1 != 0.0f || o3s_e2 != 0.0f || o3s_l1 != 0.0f || o3s_l2 != 0.0f;
 
-	//o2-o3 modulation
+	// o2-o3 modulation
 
 	const int omod = m_parent->m_o23Mod.value();
 
@@ -372,15 +362,13 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		o1r_f = o1rfb;
 		if (o1f_mod)
 		{
-			modulatefreq(o1l_f, o1f)
-				modulatefreq(o1r_f, o1f)
+			modulatefreq(o1l_f, o1f) modulatefreq(o1r_f, o1f)
 		}
 		// calc and modulate pulse
 		o1_pw = pw;
 		if (o1pw_mod)
 		{
-			modulateabs(o1_pw, o1pw)
-				o1_pw = qBound(PW_MIN, o1_pw, PW_MAX);
+			modulateabs(o1_pw, o1pw) o1_pw = qBound(PW_MIN, o1_pw, PW_MAX);
 		}
 
 		// calc and modulate phase
@@ -388,8 +376,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		rightph = o1r_p;
 		if (o1p_mod)
 		{
-			modulatephs(leftph, o1p)
-				modulatephs(rightph, o1p)
+			modulatephs(leftph, o1p) modulatephs(rightph, o1p)
 		}
 
 		// pulse wave osc
@@ -532,8 +519,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		O1R *= o1rv;
 		if (o1v_mod)
 		{
-			modulatevol(O1L, o1v)
-				modulatevol(O1R, o1v)
+			modulatevol(O1L, o1v) modulatevol(O1R, o1v)
 		}
 
 		// update osc1 phase working variable
@@ -551,8 +537,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		o2r_f = o2rfb;
 		if (o2f_mod)
 		{
-			modulatefreq(o2l_f, o2f)
-				modulatefreq(o2r_f, o2f)
+			modulatefreq(o2l_f, o2f) modulatefreq(o2r_f, o2f)
 		}
 
 		// calc and modulate phase
@@ -560,8 +545,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		rightph = o2r_p;
 		if (o2p_mod)
 		{
-			modulatephs(leftph, o2p)
-				modulatephs(rightph, o2p)
+			modulatephs(leftph, o2p) modulatephs(rightph, o2p)
 		}
 		leftph = absFraction(leftph);
 		rightph = absFraction(rightph);
@@ -595,8 +579,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		O2R *= o2rv;
 		if (o2v_mod)
 		{
-			modulatevol(O2L, o2v)
-				modulatevol(O2R, o2v)
+			modulatevol(O2L, o2v) modulatevol(O2R, o2v)
 		}
 
 		// reverse sync - invert waveforms when needed
@@ -622,16 +605,14 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		o3r_f = o3fb;
 		if (o3f_mod)
 		{
-			modulatefreq(o3l_f, o3f)
-				modulatefreq(o3r_f, o3f)
+			modulatefreq(o3l_f, o3f) modulatefreq(o3r_f, o3f)
 		}
 		// calc and modulate phase
 		leftph = o3l_p;
 		rightph = o3r_p;
 		if (o3p_mod)
 		{
-			modulatephs(leftph, o3p)
-				modulatephs(rightph, o3p)
+			modulatephs(leftph, o3p) modulatephs(rightph, o3p)
 		}
 
 		// o2 modulation?
@@ -676,8 +657,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		sub = o3sub;
 		if (o3s_mod)
 		{
-			modulateabs(sub, o3s)
-				sub = qBound(0.0f, sub, 1.0f);
+			modulateabs(sub, o3s) sub = qBound(0.0f, sub, 1.0f);
 		}
 
 		sample_t O3L = linearInterpolate(O3AL, O3BL, sub);
@@ -688,8 +668,7 @@ void MonstroSynth::renderOutput(fpp_t _frames, sampleFrame* _buf)
 		O3R *= o3rv;
 		if (o3v_mod)
 		{
-			modulatevol(O3L, o3v)
-				modulatevol(O3R, o3v)
+			modulatevol(O3L, o3v) modulatevol(O3R, o3v)
 		}
 		// o2 modulation?
 		if (omod == MOD_AM)
@@ -1065,11 +1044,8 @@ MonstroInstrument::MonstroInstrument(InstrumentTrack* _instrument_track)
 {
 
 	// setup waveboxes
-	setwavemodel(m_osc2Wave)
-		setwavemodel(m_osc3Wave1)
-			setwavemodel(m_osc3Wave2)
-				setlfowavemodel(m_lfo1Wave)
-					setlfowavemodel(m_lfo2Wave)
+	setwavemodel(m_osc2Wave) setwavemodel(m_osc3Wave1) setwavemodel(m_osc3Wave2) setlfowavemodel(m_lfo1Wave)
+		setlfowavemodel(m_lfo2Wave)
 
 		// make connections:
 
@@ -1142,12 +1118,9 @@ MonstroInstrument::MonstroInstrument(InstrumentTrack* _instrument_track)
 	updateSlope2();
 }
 
-MonstroInstrument::~MonstroInstrument()
-{
-}
+MonstroInstrument::~MonstroInstrument() {}
 
-void MonstroInstrument::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void MonstroInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -1161,7 +1134,7 @@ void MonstroInstrument::playNote(NotePlayHandle* _n,
 
 	ms->renderOutput(frames, _working_buffer + offset);
 
-	//applyRelease( _working_buffer, _n ); // we have our own release
+	// applyRelease( _working_buffer, _n ); // we have our own release
 
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
 }
@@ -1171,8 +1144,7 @@ void MonstroInstrument::deleteNotePluginData(NotePlayHandle* _n)
 	delete static_cast<MonstroSynth*>(_n->m_pluginData);
 }
 
-void MonstroInstrument::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void MonstroInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	m_osc1Vol.saveSettings(_doc, _this, "o1vol");
 	m_osc1Pan.saveSettings(_doc, _this, "o1pan");
@@ -1404,20 +1376,11 @@ void MonstroInstrument::loadSettings(const QDomElement& _this)
 	m_sub3lfo2.loadSettings(_this, "s3l2");
 }
 
-QString MonstroInstrument::nodeName() const
-{
-	return monstro_plugin_descriptor.name;
-}
+QString MonstroInstrument::nodeName() const { return monstro_plugin_descriptor.name; }
 
-f_cnt_t MonstroInstrument::desiredReleaseFrames() const
-{
-	return qMax(64, qMax(m_env1_relF, m_env2_relF));
-}
+f_cnt_t MonstroInstrument::desiredReleaseFrames() const { return qMax(64, qMax(m_env1_relF, m_env2_relF)); }
 
-PluginView* MonstroInstrument::instantiateView(QWidget* _parent)
-{
-	return (new MonstroView(this, _parent));
-}
+PluginView* MonstroInstrument::instantiateView(QWidget* _parent) { return (new MonstroView(this, _parent)); }
 
 void MonstroInstrument::updateVolume1()
 {
@@ -1439,24 +1402,17 @@ void MonstroInstrument::updateVolume3()
 
 void MonstroInstrument::updateFreq1()
 {
-	m_osc1l_freq = powf(2.0f, m_osc1Crs.value() / 12.0f) *
-		powf(2.0f, m_osc1Ftl.value() / 1200.0f);
-	m_osc1r_freq = powf(2.0f, m_osc1Crs.value() / 12.0f) *
-		powf(2.0f, m_osc1Ftr.value() / 1200.0f);
+	m_osc1l_freq = powf(2.0f, m_osc1Crs.value() / 12.0f) * powf(2.0f, m_osc1Ftl.value() / 1200.0f);
+	m_osc1r_freq = powf(2.0f, m_osc1Crs.value() / 12.0f) * powf(2.0f, m_osc1Ftr.value() / 1200.0f);
 }
 
 void MonstroInstrument::updateFreq2()
 {
-	m_osc2l_freq = powf(2.0f, m_osc2Crs.value() / 12.0f) *
-		powf(2.0f, m_osc2Ftl.value() / 1200.0f);
-	m_osc2r_freq = powf(2.0f, m_osc2Crs.value() / 12.0f) *
-		powf(2.0f, m_osc2Ftr.value() / 1200.0f);
+	m_osc2l_freq = powf(2.0f, m_osc2Crs.value() / 12.0f) * powf(2.0f, m_osc2Ftl.value() / 1200.0f);
+	m_osc2r_freq = powf(2.0f, m_osc2Crs.value() / 12.0f) * powf(2.0f, m_osc2Ftr.value() / 1200.0f);
 }
 
-void MonstroInstrument::updateFreq3()
-{
-	m_osc3_freq = powf(2.0f, m_osc3Crs.value() / 12.0f);
-}
+void MonstroInstrument::updateFreq3() { m_osc3_freq = powf(2.0f, m_osc3Crs.value() / 12.0f); }
 
 void MonstroInstrument::updatePO1()
 {
@@ -1499,7 +1455,8 @@ void MonstroInstrument::updateEnvelope1()
 	else
 		m_env1_rel = 1.0f / (m_env1Rel.value() / 1000.0f) / m_samplerate;
 
-	m_env1_len = (m_env1Pre.value() + m_env1Att.value() + m_env1Hold.value() + m_env1Dec.value()) * m_samplerate / 1000.0f;
+	m_env1_len =
+		(m_env1Pre.value() + m_env1Att.value() + m_env1Hold.value() + m_env1Dec.value()) * m_samplerate / 1000.0f;
 	m_env1_relF = m_env1Rel.value() * m_samplerate / 1000.0f;
 }
 void MonstroInstrument::updateEnvelope2()
@@ -1525,7 +1482,8 @@ void MonstroInstrument::updateEnvelope2()
 	else
 		m_env2_rel = 1.0f / (m_env2Rel.value() / 1000.0f) / m_samplerate;
 
-	m_env2_len = (m_env2Pre.value() + m_env2Att.value() + m_env2Hold.value() + m_env2Dec.value()) * m_samplerate / 1000.0f;
+	m_env2_len =
+		(m_env2Pre.value() + m_env2Att.value() + m_env2Hold.value() + m_env2Dec.value()) * m_samplerate / 1000.0f;
 	m_env2_relF = m_env2Rel.value() * m_samplerate / 1000.0f;
 }
 
@@ -1560,8 +1518,7 @@ void MonstroInstrument::updateSlope2()
 	m_slope[1] = exp10(slope * -1.0f);
 }
 
-MonstroView::MonstroView(Instrument* _instrument,
-	QWidget* _parent)
+MonstroView::MonstroView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 	m_operatorsView = setupOperatorsView(this);
@@ -1596,9 +1553,7 @@ MonstroView::MonstroView(Instrument* _instrument,
 	connect(m_matViewButton, SIGNAL(clicked()), this, SLOT(updateLayout()));
 }
 
-MonstroView::~MonstroView()
-{
-}
+MonstroView::~MonstroView() {}
 
 void MonstroView::updateLayout()
 {
@@ -1738,8 +1693,7 @@ void MonstroView::setWidgetBackground(QWidget* _widget, const QString& _pic)
 {
 	_widget->setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush(_widget->backgroundRole(),
-		PLUGIN_NAME::getIconPixmap(_pic.toLatin1().constData()));
+	pal.setBrush(_widget->backgroundRole(), PLUGIN_NAME::getIconPixmap(_pic.toLatin1().constData()));
 	_widget->setPalette(pal);
 }
 
@@ -1764,13 +1718,13 @@ QWidget* MonstroView::setupOperatorsView(QWidget* _parent)
 		maketinyled(m_osc1SSFButton, 230, 44, tr("Send sync on pulse fall"))
 
 			makeknob(m_osc2VolKnob, KNOBCOL1, O2ROW, tr("Volume"), "%", "osc2Knob")
-				makeknob(m_osc2PanKnob, KNOBCOL2, O2ROW, tr("Panning"), "", "osc2Knob")
-					makeknob(m_osc2CrsKnob, KNOBCOL3, O2ROW, tr("Coarse detune"), tr(" semitones"), "osc2Knob")
-						makeknob(m_osc2FtlKnob, KNOBCOL4, O2ROW, tr("Fine tune left"), tr(" cents"), "osc2Knob")
-							makeknob(m_osc2FtrKnob, KNOBCOL5, O2ROW, tr("Fine tune right"), tr(" cents"), "osc2Knob")
-								makeknob(m_osc2SpoKnob, KNOBCOL6, O2ROW, tr("Stereo phase offset"), tr(" deg"), "osc2Knob")
+				makeknob(m_osc2PanKnob, KNOBCOL2, O2ROW, tr("Panning"), "", "osc2Knob") makeknob(
+					m_osc2CrsKnob, KNOBCOL3, O2ROW, tr("Coarse detune"), tr(" semitones"), "osc2Knob")
+					makeknob(m_osc2FtlKnob, KNOBCOL4, O2ROW, tr("Fine tune left"), tr(" cents"), "osc2Knob")
+						makeknob(m_osc2FtrKnob, KNOBCOL5, O2ROW, tr("Fine tune right"), tr(" cents"), "osc2Knob")
+							makeknob(m_osc2SpoKnob, KNOBCOL6, O2ROW, tr("Stereo phase offset"), tr(" deg"), "osc2Knob")
 
-									m_osc2VolKnob->setVolumeKnob(true);
+								m_osc2VolKnob->setVolumeKnob(true);
 
 	m_osc2WaveBox = new ComboBox(view);
 	m_osc2WaveBox->setGeometry(204, O2ROW + 7, 42, ComboBox::DEFAULT_HEIGHT);
@@ -1810,25 +1764,24 @@ QWidget* MonstroView::setupOperatorsView(QWidget* _parent)
 	m_lfo2WaveBox->setGeometry(127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT);
 	m_lfo2WaveBox->setFont(pointSize<8>(m_lfo2WaveBox->font()));
 
-	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob")
-		maketsknob(m_lfo2RateKnob, LFOCOL5, LFOROW, tr("Rate"), " ms", "lfoKnob")
-			makeknob(m_lfo2PhsKnob, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
+	maketsknob(m_lfo2AttKnob, LFOCOL4, LFOROW, tr("Attack"), " ms", "lfoKnob") maketsknob(m_lfo2RateKnob, LFOCOL5,
+		LFOROW, tr("Rate"), " ms",
+		"lfoKnob") makeknob(m_lfo2PhsKnob, LFOCOL6, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
 
-				maketsknob(m_env1PreKnob, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob")
-					maketsknob(m_env1AttKnob, KNOBCOL2, E1ROW, tr("Attack"), " ms", "envKnob")
-						maketsknob(m_env1HoldKnob, KNOBCOL3, E1ROW, tr("Hold"), " ms", "envKnob")
-							maketsknob(m_env1DecKnob, KNOBCOL4, E1ROW, tr("Decay"), " ms", "envKnob")
-								makeknob(m_env1SusKnob, KNOBCOL5, E1ROW, tr("Sustain"), "", "envKnob")
-									maketsknob(m_env1RelKnob, KNOBCOL6, E1ROW, tr("Release"), " ms", "envKnob")
-										makeknob(m_env1SlopeKnob, KNOBCOL7, E1ROW, tr("Slope"), "", "envKnob")
+		maketsknob(m_env1PreKnob, KNOBCOL1, E1ROW, tr("Pre-delay"), " ms", "envKnob") maketsknob(
+			m_env1AttKnob, KNOBCOL2, E1ROW, tr("Attack"), " ms", "envKnob") maketsknob(m_env1HoldKnob, KNOBCOL3, E1ROW,
+			tr("Hold"), " ms", "envKnob") maketsknob(m_env1DecKnob, KNOBCOL4, E1ROW, tr("Decay"), " ms", "envKnob")
+			makeknob(m_env1SusKnob, KNOBCOL5, E1ROW, tr("Sustain"), "", "envKnob")
+				maketsknob(m_env1RelKnob, KNOBCOL6, E1ROW, tr("Release"), " ms", "envKnob")
+					makeknob(m_env1SlopeKnob, KNOBCOL7, E1ROW, tr("Slope"), "", "envKnob")
 
-											maketsknob(m_env2PreKnob, KNOBCOL1, E2ROW, tr("Pre-delay"), " ms", "envKnob")
-												maketsknob(m_env2AttKnob, KNOBCOL2, E2ROW, tr("Attack"), " ms", "envKnob")
-													maketsknob(m_env2HoldKnob, KNOBCOL3, E2ROW, tr("Hold"), " ms", "envKnob")
-														maketsknob(m_env2DecKnob, KNOBCOL4, E2ROW, tr("Decay"), " ms", "envKnob")
-															makeknob(m_env2SusKnob, KNOBCOL5, E2ROW, tr("Sustain"), "", "envKnob")
-																maketsknob(m_env2RelKnob, KNOBCOL6, E2ROW, tr("Release"), " ms", "envKnob")
-																	makeknob(m_env2SlopeKnob, KNOBCOL7, E2ROW, tr("Slope"), "", "envKnob")
+						maketsknob(m_env2PreKnob, KNOBCOL1, E2ROW, tr("Pre-delay"), " ms", "envKnob")
+							maketsknob(m_env2AttKnob, KNOBCOL2, E2ROW, tr("Attack"), " ms", "envKnob")
+								maketsknob(m_env2HoldKnob, KNOBCOL3, E2ROW, tr("Hold"), " ms", "envKnob")
+									maketsknob(m_env2DecKnob, KNOBCOL4, E2ROW, tr("Decay"), " ms", "envKnob")
+										makeknob(m_env2SusKnob, KNOBCOL5, E2ROW, tr("Sustain"), "", "envKnob")
+											maketsknob(m_env2RelKnob, KNOBCOL6, E2ROW, tr("Release"), " ms", "envKnob")
+												makeknob(m_env2SlopeKnob, KNOBCOL7, E2ROW, tr("Slope"), "", "envKnob")
 
 		// mod selector
 		PixmapButton* m_mixButton = new PixmapButton(view, NULL);
@@ -1871,62 +1824,70 @@ QWidget* MonstroView::setupMatrixView(QWidget* _parent)
 	QWidget* view = new QWidget(_parent);
 	view->setFixedSize(250, 250);
 
-	makeknob(m_vol1env1Knob, MATCOL1, MATROW1, tr("Modulation amount"), "", "matrixKnob")
-		makeknob(m_vol1env2Knob, MATCOL2, MATROW1, tr("Modulation amount"), "", "matrixKnob")
-			makeknob(m_vol1lfo1Knob, MATCOL3, MATROW1, tr("Modulation amount"), "", "matrixKnob")
-				makeknob(m_vol1lfo2Knob, MATCOL4, MATROW1, tr("Modulation amount"), "", "matrixKnob")
+	makeknob(m_vol1env1Knob, MATCOL1, MATROW1, tr("Modulation amount"), "", "matrixKnob") makeknob(
+		m_vol1env2Knob, MATCOL2, MATROW1, tr("Modulation amount"), "", "matrixKnob") makeknob(m_vol1lfo1Knob, MATCOL3,
+		MATROW1, tr("Modulation amount"), "",
+		"matrixKnob") makeknob(m_vol1lfo2Knob, MATCOL4, MATROW1, tr("Modulation amount"), "", "matrixKnob")
 
-					makeknob(m_vol2env1Knob, MATCOL1, MATROW3, tr("Modulation amount"), "", "matrixKnob")
-						makeknob(m_vol2env2Knob, MATCOL2, MATROW3, tr("Modulation amount"), "", "matrixKnob")
-							makeknob(m_vol2lfo1Knob, MATCOL3, MATROW3, tr("Modulation amount"), "", "matrixKnob")
-								makeknob(m_vol2lfo2Knob, MATCOL4, MATROW3, tr("Modulation amount"), "", "matrixKnob")
+		makeknob(m_vol2env1Knob, MATCOL1, MATROW3, tr("Modulation amount"), "", "matrixKnob") makeknob(
+			m_vol2env2Knob, MATCOL2, MATROW3, tr("Modulation amount"), "", "matrixKnob") makeknob(m_vol2lfo1Knob,
+			MATCOL3, MATROW3, tr("Modulation amount"), "",
+			"matrixKnob") makeknob(m_vol2lfo2Knob, MATCOL4, MATROW3, tr("Modulation amount"), "", "matrixKnob")
 
-									makeknob(m_vol3env1Knob, MATCOL1, MATROW5, tr("Modulation amount"), "", "matrixKnob")
-										makeknob(m_vol3env2Knob, MATCOL2, MATROW5, tr("Modulation amount"), "", "matrixKnob")
-											makeknob(m_vol3lfo1Knob, MATCOL3, MATROW5, tr("Modulation amount"), "", "matrixKnob")
-												makeknob(m_vol3lfo2Knob, MATCOL4, MATROW5, tr("Modulation amount"), "", "matrixKnob")
+			makeknob(m_vol3env1Knob, MATCOL1, MATROW5, tr("Modulation amount"), "", "matrixKnob") makeknob(
+				m_vol3env2Knob, MATCOL2, MATROW5, tr("Modulation amount"), "", "matrixKnob") makeknob(m_vol3lfo1Knob,
+				MATCOL3, MATROW5, tr("Modulation amount"), "",
+				"matrixKnob") makeknob(m_vol3lfo2Knob, MATCOL4, MATROW5, tr("Modulation amount"), "", "matrixKnob")
 
-													makeknob(m_phs1env1Knob, MATCOL1, MATROW2, tr("Modulation amount"), "", "matrixKnob")
-														makeknob(m_phs1env2Knob, MATCOL2, MATROW2, tr("Modulation amount"), "", "matrixKnob")
-															makeknob(m_phs1lfo1Knob, MATCOL3, MATROW2, tr("Modulation amount"), "", "matrixKnob")
-																makeknob(m_phs1lfo2Knob, MATCOL4, MATROW2, tr("Modulation amount"), "", "matrixKnob")
+				makeknob(m_phs1env1Knob, MATCOL1, MATROW2, tr("Modulation amount"), "", "matrixKnob") makeknob(
+					m_phs1env2Knob, MATCOL2, MATROW2, tr("Modulation amount"), "",
+					"matrixKnob") makeknob(m_phs1lfo1Knob, MATCOL3, MATROW2, tr("Modulation amount"), "",
+					"matrixKnob") makeknob(m_phs1lfo2Knob, MATCOL4, MATROW2, tr("Modulation amount"), "", "matrixKnob")
 
-																	makeknob(m_phs2env1Knob, MATCOL1, MATROW4, tr("Modulation amount"), "", "matrixKnob")
-																		makeknob(m_phs2env2Knob, MATCOL2, MATROW4, tr("Modulation amount"), "", "matrixKnob")
-																			makeknob(m_phs2lfo1Knob, MATCOL3, MATROW4, tr("Modulation amount"), "", "matrixKnob")
-																				makeknob(m_phs2lfo2Knob, MATCOL4, MATROW4, tr("Modulation amount"), "", "matrixKnob")
+					makeknob(m_phs2env1Knob, MATCOL1, MATROW4, tr("Modulation amount"), "", "matrixKnob") makeknob(
+						m_phs2env2Knob, MATCOL2, MATROW4, tr("Modulation amount"), "", "matrixKnob")
+						makeknob(m_phs2lfo1Knob, MATCOL3, MATROW4, tr("Modulation amount"), "", "matrixKnob") makeknob(
+							m_phs2lfo2Knob, MATCOL4, MATROW4, tr("Modulation amount"), "", "matrixKnob")
 
-																					makeknob(m_phs3env1Knob, MATCOL1, MATROW6, tr("Modulation amount"), "", "matrixKnob")
-																						makeknob(m_phs3env2Knob, MATCOL2, MATROW6, tr("Modulation amount"), "", "matrixKnob")
-																							makeknob(m_phs3lfo1Knob, MATCOL3, MATROW6, tr("Modulation amount"), "", "matrixKnob")
-																								makeknob(m_phs3lfo2Knob, MATCOL4, MATROW6, tr("Modulation amount"), "", "matrixKnob")
+							makeknob(m_phs3env1Knob, MATCOL1, MATROW6, tr("Modulation amount"), "",
+								"matrixKnob") makeknob(m_phs3env2Knob, MATCOL2, MATROW6, tr("Modulation amount"), "",
+								"matrixKnob") makeknob(m_phs3lfo1Knob, MATCOL3, MATROW6, tr("Modulation amount"), "",
+								"matrixKnob") makeknob(m_phs3lfo2Knob, MATCOL4, MATROW6, tr("Modulation amount"), "",
+								"matrixKnob")
 
-																									makeknob(m_pit1env1Knob, MATCOL5, MATROW1, tr("Modulation amount"), "", "matrixKnob")
-																										makeknob(m_pit1env2Knob, MATCOL6, MATROW1, tr("Modulation amount"), "", "matrixKnob")
-																											makeknob(m_pit1lfo1Knob, MATCOL7, MATROW1, tr("Modulation amount"), "", "matrixKnob")
-																												makeknob(m_pit1lfo2Knob, MATCOL8, MATROW1, tr("Modulation amount"), "", "matrixKnob")
+								makeknob(m_pit1env1Knob, MATCOL5, MATROW1, tr("Modulation amount"), "",
+									"matrixKnob") makeknob(m_pit1env2Knob, MATCOL6, MATROW1, tr("Modulation amount"),
+									"", "matrixKnob") makeknob(m_pit1lfo1Knob, MATCOL7, MATROW1,
+									tr("Modulation amount"), "", "matrixKnob") makeknob(m_pit1lfo2Knob, MATCOL8,
+									MATROW1, tr("Modulation amount"), "", "matrixKnob")
 
-																													makeknob(m_pit2env1Knob, MATCOL5, MATROW3, tr("Modulation amount"), "", "matrixKnob")
-																														makeknob(m_pit2env2Knob, MATCOL6, MATROW3, tr("Modulation amount"), "", "matrixKnob")
-																															makeknob(m_pit2lfo1Knob, MATCOL7, MATROW3, tr("Modulation amount"), "", "matrixKnob")
-																																makeknob(m_pit2lfo2Knob, MATCOL8, MATROW3, tr("Modulation amount"), "", "matrixKnob")
+									makeknob(m_pit2env1Knob, MATCOL5, MATROW3, tr("Modulation amount"), "",
+										"matrixKnob") makeknob(m_pit2env2Knob, MATCOL6, MATROW3,
+										tr("Modulation amount"), "", "matrixKnob") makeknob(m_pit2lfo1Knob, MATCOL7,
+										MATROW3, tr("Modulation amount"), "", "matrixKnob") makeknob(m_pit2lfo2Knob,
+										MATCOL8, MATROW3, tr("Modulation amount"), "", "matrixKnob")
 
-																																	makeknob(m_pit3env1Knob, MATCOL5, MATROW5, tr("Modulation amount"), "", "matrixKnob")
-																																		makeknob(m_pit3env2Knob, MATCOL6, MATROW5, tr("Modulation amount"), "", "matrixKnob")
-																																			makeknob(m_pit3lfo1Knob, MATCOL7, MATROW5, tr("Modulation amount"), "", "matrixKnob")
-																																				makeknob(m_pit3lfo2Knob, MATCOL8, MATROW5, tr("Modulation amount"), "", "matrixKnob")
+										makeknob(m_pit3env1Knob, MATCOL5, MATROW5, tr("Modulation amount"), "",
+											"matrixKnob") makeknob(m_pit3env2Knob, MATCOL6, MATROW5,
+											tr("Modulation amount"), "", "matrixKnob") makeknob(m_pit3lfo1Knob, MATCOL7,
+											MATROW5, tr("Modulation amount"), "", "matrixKnob") makeknob(m_pit3lfo2Knob,
+											MATCOL8, MATROW5, tr("Modulation amount"), "", "matrixKnob")
 
-																																					makeknob(m_pw1env1Knob, MATCOL5, MATROW2, tr("Modulation amount"), "", "matrixKnob")
-																																						makeknob(m_pw1env2Knob, MATCOL6, MATROW2, tr("Modulation amount"), "", "matrixKnob")
-																																							makeknob(m_pw1lfo1Knob, MATCOL7, MATROW2, tr("Modulation amount"), "", "matrixKnob")
-																																								makeknob(m_pw1lfo2Knob, MATCOL8, MATROW2, tr("Modulation amount"), "", "matrixKnob")
+											makeknob(m_pw1env1Knob, MATCOL5, MATROW2, tr("Modulation amount"), "",
+												"matrixKnob") makeknob(m_pw1env2Knob, MATCOL6, MATROW2,
+												tr("Modulation amount"), "", "matrixKnob") makeknob(m_pw1lfo1Knob,
+												MATCOL7, MATROW2, tr("Modulation amount"), "",
+												"matrixKnob") makeknob(m_pw1lfo2Knob, MATCOL8, MATROW2,
+												tr("Modulation amount"), "", "matrixKnob")
 
-																																									makeknob(m_sub3env1Knob, MATCOL5, MATROW6, tr("Modulation amount"), "", "matrixKnob")
-																																										makeknob(m_sub3env2Knob, MATCOL6, MATROW6, tr("Modulation amount"), "", "matrixKnob")
-																																											makeknob(m_sub3lfo1Knob, MATCOL7, MATROW6, tr("Modulation amount"), "", "matrixKnob")
-																																												makeknob(m_sub3lfo2Knob, MATCOL8, MATROW6, tr("Modulation amount"), "", "matrixKnob")
+												makeknob(m_sub3env1Knob, MATCOL5, MATROW6, tr("Modulation amount"), "",
+													"matrixKnob") makeknob(m_sub3env2Knob, MATCOL6, MATROW6,
+													tr("Modulation amount"), "", "matrixKnob") makeknob(m_sub3lfo1Knob,
+													MATCOL7, MATROW6, tr("Modulation amount"), "", "matrixKnob")
+													makeknob(m_sub3lfo2Knob, MATCOL8, MATROW6, tr("Modulation amount"),
+														"", "matrixKnob")
 
-																																													return (view);
+														return (view);
 }
 
 extern "C"

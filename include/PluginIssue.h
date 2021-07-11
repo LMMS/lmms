@@ -52,7 +52,7 @@ enum PluginIssueType
 	logScaleMinMaxDifferentSigns,
 	// features
 	featureNotSupported, //!< plugin requires functionality LMMS can't offer
-	// misc
+						 // misc
 	badPortType, //!< port type not supported
 	blacklisted,
 	noIssue

@@ -34,11 +34,8 @@
 
 static MidiDummy s_dummyClient;
 
-MidiPort::MidiPort(const QString& name,
-	MidiClient* client,
-	MidiEventProcessor* eventProcessor,
-	Model* parent,
-	Mode mode)
+MidiPort::MidiPort(
+	const QString& name, MidiClient* client, MidiEventProcessor* eventProcessor, Model* parent, Mode mode)
 	: Model(parent)
 	, m_readablePortsMenu(NULL)
 	, m_writablePortsMenu(NULL)
@@ -62,12 +59,9 @@ MidiPort::MidiPort(const QString& name,
 	m_readableModel.setValue(m_mode == Input || m_mode == Duplex);
 	m_writableModel.setValue(m_mode == Output || m_mode == Duplex);
 
-	connect(&m_readableModel, SIGNAL(dataChanged()),
-		this, SLOT(updateMidiPortMode()), Qt::DirectConnection);
-	connect(&m_writableModel, SIGNAL(dataChanged()),
-		this, SLOT(updateMidiPortMode()), Qt::DirectConnection);
-	connect(&m_outputProgramModel, SIGNAL(dataChanged()),
-		this, SLOT(updateOutputProgram()), Qt::DirectConnection);
+	connect(&m_readableModel, SIGNAL(dataChanged()), this, SLOT(updateMidiPortMode()), Qt::DirectConnection);
+	connect(&m_writableModel, SIGNAL(dataChanged()), this, SLOT(updateMidiPortMode()), Qt::DirectConnection);
+	connect(&m_outputProgramModel, SIGNAL(dataChanged()), this, SLOT(updateOutputProgram()), Qt::DirectConnection);
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
@@ -109,13 +103,10 @@ void MidiPort::setMode(Mode mode)
 void MidiPort::processInEvent(const MidiEvent& event, const TimePos& time)
 {
 	// mask event
-	if (isInputEnabled() &&
-		(inputChannel() == 0 || inputChannel() - 1 == event.channel()))
+	if (isInputEnabled() && (inputChannel() == 0 || inputChannel() - 1 == event.channel()))
 	{
 		MidiEvent inEvent = event;
-		if (event.type() == MidiNoteOn ||
-			event.type() == MidiNoteOff ||
-			event.type() == MidiKeyPressure)
+		if (event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure)
 		{
 			if (inEvent.key() < 0 || inEvent.key() >= NumKeys)
 			{
@@ -279,10 +270,7 @@ void MidiPort::subscribeWritablePort(const QString& port, bool subscribe)
 void MidiPort::updateMidiPortMode()
 {
 	// this small lookup-table makes everything easier
-	static const Modes modeTable[2][2] =
-		{
-			{Disabled, Output},
-			{Input, Duplex}};
+	static const Modes modeTable[2][2] = {{Disabled, Output}, {Input, Duplex}};
 	setMode(modeTable[m_readableModel.value()][m_writableModel.value()]);
 
 	// check whether we have to dis-check items in connection-menu
@@ -371,7 +359,4 @@ void MidiPort::updateOutputProgram()
 	processOutEvent(MidiEvent(MidiProgramChange, realOutputChannel(), outputProgram() - 1));
 }
 
-void MidiPort::invalidateCilent()
-{
-	m_midiClient = &s_dummyClient;
-}
+void MidiPort::invalidateCilent() { m_midiClient = &s_dummyClient; }

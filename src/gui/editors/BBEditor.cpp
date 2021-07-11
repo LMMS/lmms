@@ -48,13 +48,12 @@ BBEditor::BBEditor(BBTrackContainer* tc)
 
 	setAcceptDrops(true);
 	m_toolBar->setAcceptDrops(true);
-	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_trackContainerView, SLOT(dragEnterEvent(QDragEnterEvent*)));
+	connect(
+		m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_trackContainerView, SLOT(dragEnterEvent(QDragEnterEvent*)));
 	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_trackContainerView, SLOT(dropEvent(QDropEvent*)));
 
 	// TODO: Use style sheet
-	if (ConfigManager::inst()->value("ui",
-								 "compacttrackbuttons")
-			.toInt())
+	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
 	{
 		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * TCO_BORDER_WIDTH + 384);
 	}
@@ -78,14 +77,12 @@ BBEditor::BBEditor(BBTrackContainer* tc)
 	// Track actions
 	DropToolBar* trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
 
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
-		Engine::getSong(), SLOT(addBBTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_bb_track_pattern"), tr("Clone beat/bassline pattern"),
-		m_trackContainerView, SLOT(clonePattern()));
 	trackAndStepActionsToolBar->addAction(
-		embed::getIconPixmap("add_sample_track"),
-		tr("Add sample-track"), m_trackContainerView,
-		SLOT(addSampleTrack()));
+		embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"), Engine::getSong(), SLOT(addBBTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_bb_track_pattern"),
+		tr("Clone beat/bassline pattern"), m_trackContainerView, SLOT(clonePattern()));
+	trackAndStepActionsToolBar->addAction(
+		embed::getIconPixmap("add_sample_track"), tr("Add sample-track"), m_trackContainerView, SLOT(addSampleTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 		m_trackContainerView, SLOT(addAutomationTrack()));
 
@@ -94,15 +91,14 @@ BBEditor::BBEditor(BBTrackContainer* tc)
 	trackAndStepActionsToolBar->addWidget(stretch);
 
 	// Step actions
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
-		m_trackContainerView, SLOT(removeSteps()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
-		m_trackContainerView, SLOT(addSteps()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_duplicate"), tr("Clone Steps"),
-		m_trackContainerView, SLOT(cloneSteps()));
+	trackAndStepActionsToolBar->addAction(
+		embed::getIconPixmap("step_btn_remove"), tr("Remove steps"), m_trackContainerView, SLOT(removeSteps()));
+	trackAndStepActionsToolBar->addAction(
+		embed::getIconPixmap("step_btn_add"), tr("Add steps"), m_trackContainerView, SLOT(addSteps()));
+	trackAndStepActionsToolBar->addAction(
+		embed::getIconPixmap("step_btn_duplicate"), tr("Clone Steps"), m_trackContainerView, SLOT(cloneSteps()));
 
-	connect(&tc->m_bbComboBoxModel, SIGNAL(dataChanged()),
-		m_trackContainerView, SLOT(updatePosition()));
+	connect(&tc->m_bbComboBoxModel, SIGNAL(dataChanged()), m_trackContainerView, SLOT(updatePosition()));
 
 	QAction* viewNext = new QAction(this);
 	connect(viewNext, SIGNAL(triggered()), m_bbComboBox, SLOT(selectNext()));
@@ -115,19 +111,11 @@ BBEditor::BBEditor(BBTrackContainer* tc)
 	addAction(viewPrevious);
 }
 
-BBEditor::~BBEditor()
-{
-}
+BBEditor::~BBEditor() {}
 
-QSize BBEditor::sizeHint() const
-{
-	return {minimumWidth() + 10, 300};
-}
+QSize BBEditor::sizeHint() const { return {minimumWidth() + 10, 300}; }
 
-void BBEditor::removeBBView(int bb)
-{
-	m_trackContainerView->removeBBView(bb);
-}
+void BBEditor::removeBBView(int bb) { m_trackContainerView->removeBBView(bb); }
 
 void BBEditor::play()
 {
@@ -141,10 +129,7 @@ void BBEditor::play()
 	}
 }
 
-void BBEditor::stop()
-{
-	Engine::getSong()->stop();
-}
+void BBEditor::stop() { Engine::getSong()->stop(); }
 
 BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc)
 	: TrackContainerView(tc)
@@ -153,22 +138,15 @@ BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc)
 	setModel(tc);
 }
 
-void BBTrackContainerView::addSteps()
-{
-	makeSteps(false);
-}
+void BBTrackContainerView::addSteps() { makeSteps(false); }
 
-void BBTrackContainerView::cloneSteps()
-{
-	makeSteps(true);
-}
+void BBTrackContainerView::cloneSteps() { makeSteps(true); }
 
 void BBTrackContainerView::removeSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
-	for (TrackContainer::TrackList::iterator it = tl.begin();
-		 it != tl.end(); ++it)
+	for (TrackContainer::TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
 	{
 		if ((*it)->type() == Track::InstrumentTrack)
 		{
@@ -178,15 +156,9 @@ void BBTrackContainerView::removeSteps()
 	}
 }
 
-void BBTrackContainerView::addSampleTrack()
-{
-	(void)Track::create(Track::SampleTrack, model());
-}
+void BBTrackContainerView::addSampleTrack() { (void)Track::create(Track::SampleTrack, model()); }
 
-void BBTrackContainerView::addAutomationTrack()
-{
-	(void)Track::create(Track::AutomationTrack, model());
-}
+void BBTrackContainerView::addAutomationTrack() { (void)Track::create(Track::AutomationTrack, model()); }
 
 void BBTrackContainerView::removeBBView(int bb)
 {
@@ -247,7 +219,7 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 
 void BBTrackContainerView::updatePosition()
 {
-	//realignTracks();
+	// realignTracks();
 	emit positionChanged(m_currentPosition);
 }
 
@@ -255,8 +227,7 @@ void BBTrackContainerView::makeSteps(bool clone)
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
-	for (TrackContainer::TrackList::iterator it = tl.begin();
-		 it != tl.end(); ++it)
+	for (TrackContainer::TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
 	{
 		if ((*it)->type() == Track::InstrumentTrack)
 		{

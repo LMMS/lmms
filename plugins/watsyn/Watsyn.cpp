@@ -40,24 +40,14 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Watsyn",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"4-oscillator modulatable wavetable synth"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Watsyn",
+		QT_TRANSLATE_NOOP("PluginBrowser", "4-oscillator modulatable wavetable synth"),
+		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"),
+		NULL, NULL};
 }
 
-WatsynObject::WatsynObject(float* _A1wave, float* _A2wave,
-	float* _B1wave, float* _B2wave,
-	int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle* _nph, fpp_t _frames,
-	WatsynInstrument* _w)
+WatsynObject::WatsynObject(float* _A1wave, float* _A2wave, float* _B1wave, float* _B2wave, int _amod, int _bmod,
+	const sample_rate_t _samplerate, NotePlayHandle* _nph, fpp_t _frames, WatsynInstrument* _w)
 	: m_amod(_amod)
 	, m_bmod(_bmod)
 	, m_samplerate(_samplerate)
@@ -111,12 +101,10 @@ void WatsynObject::renderOutput(fpp_t _frames)
 
 		// A2
 		sample_t A2_L = linearInterpolate(m_A2wave[static_cast<int>(m_lphase[A2_OSC])],
-							m_A2wave[static_cast<int>(m_lphase[A2_OSC] + 1) % WAVELEN],
-							fraction(m_lphase[A2_OSC])) *
+							m_A2wave[static_cast<int>(m_lphase[A2_OSC] + 1) % WAVELEN], fraction(m_lphase[A2_OSC])) *
 			m_parent->m_lvol[A2_OSC];
 		sample_t A2_R = linearInterpolate(m_A2wave[static_cast<int>(m_rphase[A2_OSC])],
-							m_A2wave[static_cast<int>(m_rphase[A2_OSC] + 1) % WAVELEN],
-							fraction(m_rphase[A2_OSC])) *
+							m_A2wave[static_cast<int>(m_rphase[A2_OSC] + 1) % WAVELEN], fraction(m_rphase[A2_OSC])) *
 			m_parent->m_rvol[A2_OSC];
 
 		// if phase mod, add to phases
@@ -131,24 +119,20 @@ void WatsynObject::renderOutput(fpp_t _frames)
 		}
 		// A1
 		sample_t A1_L = linearInterpolate(m_A1wave[static_cast<int>(A1_lphase)],
-							m_A1wave[static_cast<int>(A1_lphase + 1) % WAVELEN],
-							fraction(A1_lphase)) *
+							m_A1wave[static_cast<int>(A1_lphase + 1) % WAVELEN], fraction(A1_lphase)) *
 			m_parent->m_lvol[A1_OSC];
 		sample_t A1_R = linearInterpolate(m_A1wave[static_cast<int>(A1_rphase)],
-							m_A1wave[static_cast<int>(A1_rphase + 1) % WAVELEN],
-							fraction(A1_rphase)) *
+							m_A1wave[static_cast<int>(A1_rphase + 1) % WAVELEN], fraction(A1_rphase)) *
 			m_parent->m_rvol[A1_OSC];
 
 		/////////////   B-series   /////////////////
 
 		// B2
 		sample_t B2_L = linearInterpolate(m_B2wave[static_cast<int>(m_lphase[B2_OSC])],
-							m_B2wave[static_cast<int>(m_lphase[B2_OSC] + 1) % WAVELEN],
-							fraction(m_lphase[B2_OSC])) *
+							m_B2wave[static_cast<int>(m_lphase[B2_OSC] + 1) % WAVELEN], fraction(m_lphase[B2_OSC])) *
 			m_parent->m_lvol[B2_OSC];
 		sample_t B2_R = linearInterpolate(m_B2wave[static_cast<int>(m_rphase[B2_OSC])],
-							m_B2wave[static_cast<int>(m_rphase[B2_OSC] + 1) % WAVELEN],
-							fraction(m_rphase[B2_OSC])) *
+							m_B2wave[static_cast<int>(m_rphase[B2_OSC] + 1) % WAVELEN], fraction(m_rphase[B2_OSC])) *
 			m_parent->m_rvol[B2_OSC];
 
 		// if crosstalk active, add a1
@@ -171,12 +155,10 @@ void WatsynObject::renderOutput(fpp_t _frames)
 		}
 		// B1
 		sample_t B1_L = linearInterpolate(m_B1wave[static_cast<int>(B1_lphase) % WAVELEN],
-							m_B1wave[static_cast<int>(B1_lphase + 1) % WAVELEN],
-							fraction(B1_lphase)) *
+							m_B1wave[static_cast<int>(B1_lphase + 1) % WAVELEN], fraction(B1_lphase)) *
 			m_parent->m_lvol[B1_OSC];
 		sample_t B1_R = linearInterpolate(m_B1wave[static_cast<int>(B1_rphase) % WAVELEN],
-							m_B1wave[static_cast<int>(B1_rphase + 1) % WAVELEN],
-							fraction(B1_rphase)) *
+							m_B1wave[static_cast<int>(B1_rphase + 1) % WAVELEN], fraction(B1_rphase)) *
 			m_parent->m_rvol[B1_OSC];
 
 		// A-series modulation)
@@ -332,23 +314,14 @@ WatsynInstrument::WatsynInstrument(InstrumentTrack* _instrument_track)
 	updateWaveB2();
 }
 
-WatsynInstrument::~WatsynInstrument()
-{
-}
+WatsynInstrument::~WatsynInstrument() {}
 
-void WatsynInstrument::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void WatsynInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL)
 	{
-		WatsynObject* w = new WatsynObject(
-			&A1_wave[0],
-			&A2_wave[0],
-			&B1_wave[0],
-			&B2_wave[0],
-			m_amod.value(), m_bmod.value(),
-			Engine::mixer()->processingSampleRate(), _n,
-			Engine::mixer()->framesPerPeriod(), this);
+		WatsynObject* w = new WatsynObject(&A1_wave[0], &A2_wave[0], &B1_wave[0], &B2_wave[0], m_amod.value(),
+			m_bmod.value(), Engine::mixer()->processingSampleRate(), _n, Engine::mixer()->framesPerPeriod(), this);
 
 		_n->m_pluginData = w;
 	}
@@ -393,7 +366,8 @@ void WatsynInstrument::playNote(NotePlayHandle* _n,
 				}
 				else
 				{
-					mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - ( envAtt + envHold ) ) / envDec * envAmt ), 100.0f );
+					mixvalue = qBound( -100.0f, mixvalue + envAmt - ( ( tfp - ( envAtt + envHold ) ) / envDec * envAmt
+	), 100.0f );
 				}
 			}
 			// get knob values in sample-exact way
@@ -437,10 +411,8 @@ void WatsynInstrument::playNote(NotePlayHandle* _n,
 			const float amix = 1.0 - bmix;
 
 			// mix a/b streams according to mixing knob
-			buffer[f][0] = (abuf[f][0] * amix) +
-				(bbuf[f][0] * bmix);
-			buffer[f][1] = (abuf[f][1] * amix) +
-				(bbuf[f][1] * bmix);
+			buffer[f][0] = (abuf[f][0] * amix) + (bbuf[f][0] * bmix);
+			buffer[f][1] = (abuf[f][1] * amix) + (bbuf[f][1] * bmix);
 		}
 	}
 
@@ -453,10 +425,8 @@ void WatsynInstrument::playNote(NotePlayHandle* _n,
 		for (fpp_t f = 0; f < frames; f++)
 		{
 			// mix a/b streams according to mixing knob
-			buffer[f][0] = (abuf[f][0] * amix) +
-				(bbuf[f][0] * bmix);
-			buffer[f][1] = (abuf[f][1] * amix) +
-				(bbuf[f][1] * bmix);
+			buffer[f][0] = (abuf[f][0] * amix) + (bbuf[f][0] * bmix);
+			buffer[f][1] = (abuf[f][1] * amix) + (bbuf[f][1] * bmix);
 		}
 	}
 
@@ -465,13 +435,9 @@ void WatsynInstrument::playNote(NotePlayHandle* _n,
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
 }
 
-void WatsynInstrument::deleteNotePluginData(NotePlayHandle* _n)
-{
-	delete static_cast<WatsynObject*>(_n->m_pluginData);
-}
+void WatsynInstrument::deleteNotePluginData(NotePlayHandle* _n) { delete static_cast<WatsynObject*>(_n->m_pluginData); }
 
-void WatsynInstrument::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void WatsynInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	a1_vol.saveSettings(_doc, _this, "a1_vol");
 	a2_vol.saveSettings(_doc, _this, "a2_vol");
@@ -579,15 +545,9 @@ void WatsynInstrument::loadSettings(const QDomElement& _this)
 	/*	m_selectedGraph.loadSettings( _this, "selgraph" );*/
 }
 
-QString WatsynInstrument::nodeName() const
-{
-	return (watsyn_plugin_descriptor.name);
-}
+QString WatsynInstrument::nodeName() const { return (watsyn_plugin_descriptor.name); }
 
-PluginView* WatsynInstrument::instantiateView(QWidget* _parent)
-{
-	return (new WatsynView(this, _parent));
-}
+PluginView* WatsynInstrument::instantiateView(QWidget* _parent) { return (new WatsynView(this, _parent)); }
 
 void WatsynInstrument::updateVolumes()
 {
@@ -656,8 +616,7 @@ void WatsynInstrument::updateWaveB2()
 	srccpy(&B2_wave[0], const_cast<float*>(b2_graph.samples()));
 }
 
-WatsynView::WatsynView(Instrument* _instrument,
-	QWidget* _parent)
+WatsynView::WatsynView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 	setAutoFillBackground(true);
@@ -668,40 +627,38 @@ WatsynView::WatsynView(Instrument* _instrument,
 
 	// knobs... lots of em
 
-	makeknob(a1_volKnob, 130, A1ROW, tr("Volume"), "%", "aKnob")
-		makeknob(a2_volKnob, 130, A2ROW, tr("Volume"), "%", "aKnob")
-			makeknob(b1_volKnob, 130, B1ROW, tr("Volume"), "%", "bKnob")
-				makeknob(b2_volKnob, 130, B2ROW, tr("Volume"), "%", "bKnob")
+	makeknob(a1_volKnob, 130, A1ROW, tr("Volume"), "%", "aKnob") makeknob(
+		a2_volKnob, 130, A2ROW, tr("Volume"), "%", "aKnob") makeknob(b1_volKnob, 130, B1ROW, tr("Volume"), "%",
+		"bKnob") makeknob(b2_volKnob, 130, B2ROW, tr("Volume"), "%", "bKnob")
 
-					makeknob(a1_panKnob, 154, A1ROW, tr("Panning"), "", "aKnob")
-						makeknob(a2_panKnob, 154, A2ROW, tr("Panning"), "", "aKnob")
-							makeknob(b1_panKnob, 154, B1ROW, tr("Panning"), "", "bKnob")
-								makeknob(b2_panKnob, 154, B2ROW, tr("Panning"), "", "bKnob")
+		makeknob(a1_panKnob, 154, A1ROW, tr("Panning"), "", "aKnob") makeknob(
+			a2_panKnob, 154, A2ROW, tr("Panning"), "", "aKnob") makeknob(b1_panKnob, 154, B1ROW, tr("Panning"), "",
+			"bKnob") makeknob(b2_panKnob, 154, B2ROW, tr("Panning"), "", "bKnob")
 
-									makeknob(a1_multKnob, 178, A1ROW, tr("Freq. multiplier"), "/8", "aKnob")
-										makeknob(a2_multKnob, 178, A2ROW, tr("Freq. multiplier"), "/8", "aKnob")
-											makeknob(b1_multKnob, 178, B1ROW, tr("Freq. multiplier"), "/8", "bKnob")
-												makeknob(b2_multKnob, 178, B2ROW, tr("Freq. multiplier"), "/8", "bKnob")
+			makeknob(a1_multKnob, 178, A1ROW, tr("Freq. multiplier"), "/8", "aKnob") makeknob(a2_multKnob, 178, A2ROW,
+				tr("Freq. multiplier"), "/8", "aKnob") makeknob(b1_multKnob, 178, B1ROW, tr("Freq. multiplier"), "/8",
+				"bKnob") makeknob(b2_multKnob, 178, B2ROW, tr("Freq. multiplier"), "/8", "bKnob")
 
-													makeknob(a1_ltuneKnob, 202, A1ROW, tr("Left detune"), tr(" cents"), "aKnob")
-														makeknob(a2_ltuneKnob, 202, A2ROW, tr("Left detune"), tr(" cents"), "aKnob")
-															makeknob(b1_ltuneKnob, 202, B1ROW, tr("Left detune"), tr(" cents"), "bKnob")
-																makeknob(b2_ltuneKnob, 202, B2ROW, tr("Left detune"), tr(" cents"), "bKnob")
+				makeknob(a1_ltuneKnob, 202, A1ROW, tr("Left detune"), tr(" cents"), "aKnob") makeknob(a2_ltuneKnob, 202,
+					A2ROW, tr("Left detune"), tr(" cents"),
+					"aKnob") makeknob(b1_ltuneKnob, 202, B1ROW, tr("Left detune"), tr(" cents"), "bKnob")
+					makeknob(b2_ltuneKnob, 202, B2ROW, tr("Left detune"), tr(" cents"), "bKnob")
 
-																	makeknob(a1_rtuneKnob, 226, A1ROW, tr("Right detune"), tr(" cents"), "aKnob")
-																		makeknob(a2_rtuneKnob, 226, A2ROW, tr("Right detune"), tr(" cents"), "aKnob")
-																			makeknob(b1_rtuneKnob, 226, B1ROW, tr("Right detune"), tr(" cents"), "bKnob")
-																				makeknob(b2_rtuneKnob, 226, B2ROW, tr("Right detune"), tr(" cents"), "bKnob")
+						makeknob(a1_rtuneKnob, 226, A1ROW, tr("Right detune"), tr(" cents"), "aKnob")
+							makeknob(a2_rtuneKnob, 226, A2ROW, tr("Right detune"), tr(" cents"), "aKnob")
+								makeknob(b1_rtuneKnob, 226, B1ROW, tr("Right detune"), tr(" cents"), "bKnob") makeknob(
+									b2_rtuneKnob, 226, B2ROW, tr("Right detune"), tr(" cents"), "bKnob")
 
-																					makeknob(m_abmixKnob, 4, 3, tr("A-B Mix"), "", "mixKnob")
+									makeknob(m_abmixKnob, 4, 3, tr("A-B Mix"), "", "mixKnob")
 
-																						makeknob(m_envAmtKnob, 88, 3, tr("Mix envelope amount"), "", "mixenvKnob")
+										makeknob(m_envAmtKnob, 88, 3, tr("Mix envelope amount"), "", "mixenvKnob")
 
-																							maketsknob(m_envAttKnob, 88, A1ROW, tr("Mix envelope attack"), " ms", "mixenvKnob")
-																								maketsknob(m_envHoldKnob, 88, A2ROW, tr("Mix envelope hold"), " ms", "mixenvKnob")
-																									maketsknob(m_envDecKnob, 88, B1ROW, tr("Mix envelope decay"), " ms", "mixenvKnob")
+											maketsknob(m_envAttKnob, 88, A1ROW, tr("Mix envelope attack"), " ms",
+												"mixenvKnob") maketsknob(m_envHoldKnob, 88, A2ROW,
+												tr("Mix envelope hold"), " ms", "mixenvKnob") maketsknob(m_envDecKnob,
+												88, B1ROW, tr("Mix envelope decay"), " ms", "mixenvKnob")
 
-																										makeknob(m_xtalkKnob, 88, B2ROW, tr("Crosstalk"), "", "xtalkKnob")
+												makeknob(m_xtalkKnob, 88, B2ROW, tr("Crosstalk"), "", "xtalkKnob")
 
 		// let's set volume knobs
 		a1_volKnob->setVolumeKnob(true);
@@ -926,9 +883,7 @@ WatsynView::WatsynView(Instrument* _instrument,
 	updateLayout();
 }
 
-WatsynView::~WatsynView()
-{
-}
+WatsynView::~WatsynView() {}
 
 void WatsynView::updateLayout()
 {

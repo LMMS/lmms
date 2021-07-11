@@ -36,22 +36,13 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"VST",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"plugin for using arbitrary VST effects inside LMMS."),
-			"Tobias Doerffel <tobydox/at/users.sf.net>",
-			0x0200,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			new VstSubPluginFeatures(Plugin::Effect)};
+	Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "VST",
+		QT_TRANSLATE_NOOP("PluginBrowser", "plugin for using arbitrary VST effects inside LMMS."),
+		"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0200, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		new VstSubPluginFeatures(Plugin::Effect)};
 }
 
-VstEffect::VstEffect(Model* _parent,
-	const Descriptor::SubPluginFeatures::Key* _key)
+VstEffect::VstEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&vsteffect_plugin_descriptor, _parent, _key)
 	, m_pluginMutex()
 	, m_key(*_key)
@@ -66,9 +57,7 @@ VstEffect::VstEffect(Model* _parent,
 			: m_key.attributes["file"].section(".dll", 0, 0));
 }
 
-VstEffect::~VstEffect()
-{
-}
+VstEffect::~VstEffect() {}
 
 bool VstEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
@@ -117,10 +106,8 @@ void VstEffect::openPlugin(const QString& _plugin)
 	TextFloat* tf = NULL;
 	if (gui)
 	{
-		tf = TextFloat::displayMessage(
-			VstPlugin::tr("Loading plugin"),
-			VstPlugin::tr("Please wait while loading VST plugin..."),
-			PLUGIN_NAME::getIconPixmap("logo", 24, 24), 0);
+		tf = TextFloat::displayMessage(VstPlugin::tr("Loading plugin"),
+			VstPlugin::tr("Please wait while loading VST plugin..."), PLUGIN_NAME::getIconPixmap("logo", 24, 24), 0);
 	}
 
 	QMutexLocker ml(&m_pluginMutex);
@@ -145,8 +132,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 	{
-		return new VstEffect(_parent,
-			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(
-				_data));
+		return new VstEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data));
 	}
 }

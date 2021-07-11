@@ -2,7 +2,7 @@
  * stereomatrix_controls.h - controls for stereoMatrix-effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -36,26 +36,15 @@ class stereoMatrixControls : public EffectControls
 	Q_OBJECT
 public:
 	stereoMatrixControls(stereoMatrixEffect(*_eff));
-	virtual ~stereoMatrixControls()
-	{
-	}
+	virtual ~stereoMatrixControls() {}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return ("stereomatrixcontrols");
-	}
+	inline virtual QString nodeName() const { return ("stereomatrixcontrols"); }
 
-	virtual int controlCount()
-	{
-		return (1);
-	}
+	virtual int controlCount() { return (1); }
 
-	virtual EffectControlDialog* createView()
-	{
-		return new stereoMatrixControlDialog(this);
-	}
+	virtual EffectControlDialog* createView() { return new stereoMatrixControlDialog(this); }
 
 private slots:
 	void changeMatrix();

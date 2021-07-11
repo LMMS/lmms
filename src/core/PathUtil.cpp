@@ -141,15 +141,9 @@ Base baseLookup(const QString& path)
 	return Base::Absolute;
 }
 
-QString stripPrefix(const QString& path)
-{
-	return path.mid(basePrefix(baseLookup(path)).length());
-}
+QString stripPrefix(const QString& path) { return path.mid(basePrefix(baseLookup(path)).length()); }
 
-QString cleanName(const QString& path)
-{
-	return stripPrefix(QFileInfo(path).baseName());
-}
+QString cleanName(const QString& path) { return stripPrefix(QFileInfo(path).baseName()); }
 
 QString oldRelativeUpgrade(const QString& input)
 {
@@ -158,10 +152,10 @@ QString oldRelativeUpgrade(const QString& input)
 		return input;
 	}
 
-	//Start by assuming that the file is a user sample
+	// Start by assuming that the file is a user sample
 	Base assumedBase = Base::UserSample;
 
-	//Check if it's a factory sample
+	// Check if it's a factory sample
 	QString factoryPath = baseLocation(Base::FactorySample) + input;
 	QFileInfo factoryInfo(factoryPath);
 	if (factoryInfo.exists())
@@ -169,7 +163,7 @@ QString oldRelativeUpgrade(const QString& input)
 		assumedBase = Base::FactorySample;
 	}
 
-	//Check if it's a VST
+	// Check if it's a VST
 	QString vstPath = baseLocation(Base::UserVST) + input;
 	QFileInfo vstInfo(vstPath);
 	if (vstInfo.exists())
@@ -177,13 +171,13 @@ QString oldRelativeUpgrade(const QString& input)
 		assumedBase = Base::UserVST;
 	}
 
-	//Assume we've found the correct base location, return the full path
+	// Assume we've found the correct base location, return the full path
 	return basePrefix(assumedBase) + input;
 }
 
 QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 {
-	//First, do no harm to absolute paths
+	// First, do no harm to absolute paths
 	QFileInfo inputFileInfo = QFileInfo(input);
 	if (inputFileInfo.isAbsolute())
 	{
@@ -193,7 +187,7 @@ QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 		}
 		return input;
 	}
-	//Next, handle old relative paths with no prefix
+	// Next, handle old relative paths with no prefix
 	QString upgraded = input.contains(":") ? input : oldRelativeUpgrade(input);
 
 	Base base = baseLookup(upgraded);
@@ -215,9 +209,7 @@ QString relativeOrAbsolute(const QString& input, const Base base)
 	QString relativePath = baseQDir(base, &error).relativeFilePath(absolutePath);
 	// Return the relative path if it didn't result in a path starting with ..
 	// and the baseQDir was resolved properly
-	return (relativePath.startsWith("..") || error)
-		? absolutePath
-		: relativePath;
+	return (relativePath.startsWith("..") || error) ? absolutePath : relativePath;
 }
 
 QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)

@@ -37,25 +37,14 @@ class PeakControllerEffectControls : public EffectControls
 	Q_OBJECT
 public:
 	PeakControllerEffectControls(PeakControllerEffect* _eff);
-	virtual ~PeakControllerEffectControls()
-	{
-	}
+	virtual ~PeakControllerEffectControls() {}
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
-	inline QString nodeName() const override
-	{
-		return "peakcontrollereffectcontrols";
-	}
+	inline QString nodeName() const override { return "peakcontrollereffectcontrols"; }
 
-	int controlCount() override
-	{
-		return 1;
-	}
-	EffectControlDialog* createView() override
-	{
-		return new PeakControllerEffectControlDialog(this);
-	}
+	int controlCount() override { return 1; }
+	EffectControlDialog* createView() override { return new PeakControllerEffectControlDialog(this); }
 
 private:
 	PeakControllerEffect* m_effect;

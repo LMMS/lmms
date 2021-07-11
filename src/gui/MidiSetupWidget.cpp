@@ -29,8 +29,8 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 
-MidiSetupWidget::MidiSetupWidget(const QString& caption, const QString& configSection,
-	const QString& devName, QWidget* parent)
+MidiSetupWidget::MidiSetupWidget(
+	const QString& caption, const QString& configSection, const QString& devName, QWidget* parent)
 	: TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent)
 	, m_configSection(configSection)
 	, m_device(nullptr)
@@ -52,8 +52,7 @@ void MidiSetupWidget::saveSettings()
 {
 	if (!m_configSection.isEmpty() && m_device)
 	{
-		ConfigManager::inst()->setValue(m_configSection, "device",
-			m_device->text());
+		ConfigManager::inst()->setValue(m_configSection, "device", m_device->text());
 	}
 }
 

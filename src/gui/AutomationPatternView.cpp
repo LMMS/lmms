@@ -41,16 +41,13 @@
 
 QPixmap* AutomationPatternView::s_pat_rec = NULL;
 
-AutomationPatternView::AutomationPatternView(AutomationPattern* _pattern,
-	TrackView* _parent)
+AutomationPatternView::AutomationPatternView(AutomationPattern* _pattern, TrackView* _parent)
 	: TrackContentObjectView(_pattern, _parent)
 	, m_pat(_pattern)
 	, m_paintPixmap()
 {
-	connect(m_pat, SIGNAL(dataChanged()),
-		this, SLOT(update()));
-	connect(gui->automationEditor(), SIGNAL(currentPatternChanged()),
-		this, SLOT(update()));
+	connect(m_pat, SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(gui->automationEditor(), SIGNAL(currentPatternChanged()), this, SLOT(update()));
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 
@@ -59,16 +56,13 @@ AutomationPatternView::AutomationPatternView(AutomationPattern* _pattern,
 
 	if (s_pat_rec == NULL)
 	{
-		s_pat_rec = new QPixmap(embed::getIconPixmap(
-			"pat_rec"));
+		s_pat_rec = new QPixmap(embed::getIconPixmap("pat_rec"));
 	}
 
 	update();
 }
 
-AutomationPatternView::~AutomationPatternView()
-{
-}
+AutomationPatternView::~AutomationPatternView() {}
 
 void AutomationPatternView::openInAutomationEditor()
 {
@@ -83,10 +77,7 @@ void AutomationPatternView::update()
 	TrackContentObjectView::update();
 }
 
-void AutomationPatternView::resetName()
-{
-	m_pat->setName(QString());
-}
+void AutomationPatternView::resetName() { m_pat->setName(QString()); }
 
 void AutomationPatternView::changeName()
 {
@@ -105,21 +96,20 @@ void AutomationPatternView::disconnectObject(QAction* _a)
 		float oldMin = m_pat->getMin();
 		float oldMax = m_pat->getMax();
 
-		m_pat->m_objects.erase(std::find(m_pat->m_objects.begin(),
-			m_pat->m_objects.end(),
-			dynamic_cast<AutomatableModel*>(j)));
+		m_pat->m_objects.erase(
+			std::find(m_pat->m_objects.begin(), m_pat->m_objects.end(), dynamic_cast<AutomatableModel*>(j)));
 		update();
 
-		//If automation editor is opened, update its display after disconnection
+		// If automation editor is opened, update its display after disconnection
 		if (gui->automationEditor())
 		{
 			gui->automationEditor()->m_editor->updateAfterPatternChange();
 		}
 
-		//if there is no more connection connected to the AutomationPattern
+		// if there is no more connection connected to the AutomationPattern
 		if (m_pat->m_objects.size() == 0)
 		{
-			//scale the points to fit the new min. and max. value
+			// scale the points to fit the new min. and max. value
 			this->scaleTimemapToFit(oldMin, oldMax);
 		}
 	}
@@ -145,39 +135,27 @@ void AutomationPatternView::flipX()
 
 void AutomationPatternView::constructContextMenu(QMenu* _cm)
 {
-	QAction* a = new QAction(embed::getIconPixmap("automation"),
-		tr("Open in Automation editor"), _cm);
+	QAction* a = new QAction(embed::getIconPixmap("automation"), tr("Open in Automation editor"), _cm);
 	_cm->insertAction(_cm->actions()[0], a);
 	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
 	_cm->insertSeparator(_cm->actions()[1]);
 
 	_cm->addSeparator();
 
-	_cm->addAction(embed::getIconPixmap("edit_erase"),
-		tr("Clear"), m_pat, SLOT(clear()));
+	_cm->addAction(embed::getIconPixmap("edit_erase"), tr("Clear"), m_pat, SLOT(clear()));
 	_cm->addSeparator();
 
-	_cm->addAction(embed::getIconPixmap("reload"), tr("Reset name"),
-		this, SLOT(resetName()));
-	_cm->addAction(embed::getIconPixmap("edit_rename"),
-		tr("Change name"),
-		this, SLOT(changeName()));
-	_cm->addAction(embed::getIconPixmap("record"),
-		tr("Set/clear record"),
-		this, SLOT(toggleRecording()));
-	_cm->addAction(embed::getIconPixmap("flip_y"),
-		tr("Flip Vertically (Visible)"),
-		this, SLOT(flipY()));
-	_cm->addAction(embed::getIconPixmap("flip_x"),
-		tr("Flip Horizontally (Visible)"),
-		this, SLOT(flipX()));
+	_cm->addAction(embed::getIconPixmap("reload"), tr("Reset name"), this, SLOT(resetName()));
+	_cm->addAction(embed::getIconPixmap("edit_rename"), tr("Change name"), this, SLOT(changeName()));
+	_cm->addAction(embed::getIconPixmap("record"), tr("Set/clear record"), this, SLOT(toggleRecording()));
+	_cm->addAction(embed::getIconPixmap("flip_y"), tr("Flip Vertically (Visible)"), this, SLOT(flipY()));
+	_cm->addAction(embed::getIconPixmap("flip_x"), tr("Flip Horizontally (Visible)"), this, SLOT(flipX()));
 	if (!m_pat->m_objects.isEmpty())
 	{
 		_cm->addSeparator();
 		QMenu* m = new QMenu(tr("%1 Connections").arg(m_pat->m_objects.count()), _cm);
-		for (AutomationPattern::objectVector::iterator it =
-				 m_pat->m_objects.begin();
-			 it != m_pat->m_objects.end(); ++it)
+		for (AutomationPattern::objectVector::iterator it = m_pat->m_objects.begin(); it != m_pat->m_objects.end();
+			 ++it)
 		{
 			if (*it)
 			{
@@ -186,8 +164,7 @@ void AutomationPatternView::constructContextMenu(QMenu* _cm)
 				m->addAction(a);
 			}
 		}
-		connect(m, SIGNAL(triggered(QAction*)),
-			this, SLOT(disconnectObject(QAction*)));
+		connect(m, SIGNAL(triggered(QAction*)), this, SLOT(disconnectObject(QAction*)));
 		_cm->addMenu(m);
 	}
 }
@@ -241,7 +218,9 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		p.fillRect(rect(), c);
 	}
 
-	const float ppb = fixedTCOs() ? (parentWidget()->width() - 2 * TCO_BORDER_WIDTH) / (float)m_pat->timeMapLength().getBar() : pixelsPerBar();
+	const float ppb = fixedTCOs()
+		? (parentWidget()->width() - 2 * TCO_BORDER_WIDTH) / (float)m_pat->timeMapLength().getBar()
+		: pixelsPerBar();
 
 	const int x_base = TCO_BORDER_WIDTH;
 
@@ -265,9 +244,8 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	lin2grad.setColorAt(0, col.darker(150));
 
 	p.setRenderHints(QPainter::Antialiasing, true);
-	for (AutomationPattern::timeMap::const_iterator it =
-			 m_pat->getTimeMap().begin();
-		 it != m_pat->getTimeMap().end(); ++it)
+	for (AutomationPattern::timeMap::const_iterator it = m_pat->getTimeMap().begin(); it != m_pat->getTimeMap().end();
+		 ++it)
 	{
 		if (it + 1 == m_pat->getTimeMap().end())
 		{
@@ -344,15 +322,13 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	{
 		const int tx = x_base + static_cast<int>(ppb * t) - 2;
 		p.drawLine(tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize);
-		p.drawLine(tx, rect().bottom() - (lineSize + TCO_BORDER_WIDTH),
-			tx, rect().bottom() - TCO_BORDER_WIDTH);
+		p.drawLine(tx, rect().bottom() - (lineSize + TCO_BORDER_WIDTH), tx, rect().bottom() - TCO_BORDER_WIDTH);
 	}
 
 	// recording icon for when recording automation
 	if (m_pat->isRecording())
 	{
-		p.drawPixmap(1, rect().bottom() - s_pat_rec->height(),
-			*s_pat_rec);
+		p.drawPixmap(1, rect().bottom() - s_pat_rec->height(), *s_pat_rec);
 	}
 
 	// pattern name
@@ -360,8 +336,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 
 	// inner border
 	p.setPen(c.lighter(current ? 160 : 130));
-	p.drawRect(1, 1, rect().right() - TCO_BORDER_WIDTH,
-		rect().bottom() - TCO_BORDER_WIDTH);
+	p.drawRect(1, 1, rect().right() - TCO_BORDER_WIDTH, rect().bottom() - TCO_BORDER_WIDTH);
 
 	// outer border
 	p.setPen(current ? c.lighter(130) : c.darker(300));
@@ -372,8 +347,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	{
 		const int spacing = TCO_BORDER_WIDTH;
 		const int size = 14;
-		p.drawPixmap(spacing, height() - (size + spacing),
-			embed::getIconPixmap("muted", size, size));
+		p.drawPixmap(spacing, height() - (size + spacing), embed::getIconPixmap("muted", size, size));
 	}
 
 	p.end();
@@ -396,8 +370,8 @@ void AutomationPatternView::dropEvent(QDropEvent* _de)
 	QString val = StringPairDrag::decodeValue(_de);
 	if (type == "automatable_model")
 	{
-		AutomatableModel* mod = dynamic_cast<AutomatableModel*>(
-			Engine::projectJournal()->journallingObject(val.toInt()));
+		AutomatableModel* mod =
+			dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != NULL)
 		{
 			bool added = m_pat->addObject(mod);
@@ -406,14 +380,12 @@ void AutomationPatternView::dropEvent(QDropEvent* _de)
 				TextFloat::displayMessage(mod->displayName(),
 					tr("Model is already connected "
 					   "to this pattern."),
-					embed::getIconPixmap("automation"),
-					2000);
+					embed::getIconPixmap("automation"), 2000);
 			}
 		}
 		update();
 
-		if (gui->automationEditor() &&
-			gui->automationEditor()->currentPattern() == m_pat)
+		if (gui->automationEditor() && gui->automationEditor()->currentPattern() == m_pat)
 		{
 			gui->automationEditor()->setCurrentPattern(m_pat);
 		}
@@ -441,8 +413,7 @@ void AutomationPatternView::scaleTimemapToFit(float oldMin, float oldMax)
 	// only the inValue is being considered and the outValue is being reset to the inValue (so discrete jumps
 	// are discarded). Possibly later we will want discrete jumps to be maintained so we will need to upgrade
 	// the logic to account for them.
-	for (AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin();
-		 it != m_pat->m_timeMap.end(); ++it)
+	for (AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin(); it != m_pat->m_timeMap.end(); ++it)
 	{
 		// If the values are out of the previous range, fix them so they are
 		// between oldMin and oldMax.

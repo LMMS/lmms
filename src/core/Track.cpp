@@ -152,9 +152,7 @@ Track* Track::create(const QDomElement& element, TrackContainer* tc)
 {
 	Engine::mixer()->requestChangeInModel();
 
-	Track* t = create(
-		static_cast<TrackTypes>(element.attribute("type").toInt()),
-		tc);
+	Track* t = create(static_cast<TrackTypes>(element.attribute("type").toInt()), tc);
 	if (t != NULL)
 	{
 		t->restoreState(element);
@@ -226,8 +224,7 @@ void Track::saveSettings(QDomDocument& doc, QDomElement& element)
 	}
 
 	// now save settings of all TCO's
-	for (tcoVector::const_iterator it = m_trackContentObjects.begin();
-		 it != m_trackContentObjects.end(); ++it)
+	for (tcoVector::const_iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
 	{
 		(*it)->saveState(doc, element);
 	}
@@ -253,7 +250,8 @@ void Track::loadSettings(const QDomElement& element)
 				 "settings-node!\n");
 	}
 
-	setName(element.hasAttribute("name") ? element.attribute("name") : element.firstChild().toElement().attribute("name"));
+	setName(
+		element.hasAttribute("name") ? element.attribute("name") : element.firstChild().toElement().attribute("name"));
 
 	m_mutedModel.loadSettings(element, "muted");
 	m_soloModel.loadSettings(element, "solo");
@@ -298,10 +296,10 @@ void Track::loadSettings(const QDomElement& element)
 			{
 				loadTrackSpecificSettings(node.toElement());
 			}
-			else if (node.nodeName() != "muted" && node.nodeName() != "solo" && !node.toElement().attribute("metadata").toInt())
+			else if (node.nodeName() != "muted" && node.nodeName() != "solo" &&
+				!node.toElement().attribute("metadata").toInt())
 			{
-				TrackContentObject* tco = createTCO(
-					TimePos(0));
+				TrackContentObject* tco = createTCO(TimePos(0));
 				tco->restoreState(node.toElement());
 			}
 		}
@@ -334,9 +332,7 @@ TrackContentObject* Track::addTCO(TrackContentObject* tco)
  */
 void Track::removeTCO(TrackContentObject* tco)
 {
-	tcoVector::iterator it = std::find(m_trackContentObjects.begin(),
-		m_trackContentObjects.end(),
-		tco);
+	tcoVector::iterator it = std::find(m_trackContentObjects.begin(), m_trackContentObjects.end(), tco);
 	if (it != m_trackContentObjects.end())
 	{
 		m_trackContentObjects.erase(it);
@@ -361,10 +357,7 @@ void Track::deleteTCOs()
  *
  *  \return the number of trackContentObjects we currently contain.
  */
-int Track::numOfTCOs()
-{
-	return m_trackContentObjects.size();
-}
+int Track::numOfTCOs() { return m_trackContentObjects.size(); }
 
 /*! \brief Get a TrackContentObject by number
  *
@@ -398,9 +391,7 @@ TrackContentObject* Track::getTCO(int tcoNum)
 int Track::getTCONum(const TrackContentObject* tco)
 {
 	//	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
-	tcoVector::iterator it = std::find(m_trackContentObjects.begin(),
-		m_trackContentObjects.end(),
-		tco);
+	tcoVector::iterator it = std::find(m_trackContentObjects.begin(), m_trackContentObjects.end(), tco);
 	if (it != m_trackContentObjects.end())
 	{
 		/*		if( getTCO( i ) == _tco )
@@ -424,8 +415,7 @@ int Track::getTCONum(const TrackContentObject* tco)
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
-void Track::getTCOsInRange(tcoVector& tcoV, const TimePos& start,
-	const TimePos& end)
+void Track::getTCOsInRange(tcoVector& tcoV, const TimePos& start, const TimePos& end)
 {
 	for (TrackContentObject* tco : m_trackContentObjects)
 	{
@@ -435,8 +425,7 @@ void Track::getTCOsInRange(tcoVector& tcoV, const TimePos& start,
 		{
 			// TCO is within given range
 			// Insert sorted by TCO's position
-			tcoV.insert(std::upper_bound(tcoV.begin(), tcoV.end(), tco, TrackContentObject::comparePosition),
-				tco);
+			tcoV.insert(std::upper_bound(tcoV.begin(), tcoV.end(), tco, TrackContentObject::comparePosition), tco);
 		}
 	}
 }
@@ -451,13 +440,11 @@ void Track::getTCOsInRange(tcoVector& tcoV, const TimePos& start,
  */
 void Track::swapPositionOfTCOs(int tcoNum1, int tcoNum2)
 {
-	qSwap(m_trackContentObjects[tcoNum1],
-		m_trackContentObjects[tcoNum2]);
+	qSwap(m_trackContentObjects[tcoNum1], m_trackContentObjects[tcoNum2]);
 
 	const TimePos pos = m_trackContentObjects[tcoNum1]->startPosition();
 
-	m_trackContentObjects[tcoNum1]->movePosition(
-		m_trackContentObjects[tcoNum2]->startPosition());
+	m_trackContentObjects[tcoNum1]->movePosition(m_trackContentObjects[tcoNum2]->startPosition());
 	m_trackContentObjects[tcoNum2]->movePosition(pos);
 }
 
@@ -482,13 +469,11 @@ void Track::insertBar(const TimePos& pos)
 {
 	// we'll increase the position of every TCO, positioned behind pos, by
 	// one bar
-	for (tcoVector::iterator it = m_trackContentObjects.begin();
-		 it != m_trackContentObjects.end(); ++it)
+	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
 	{
 		if ((*it)->startPosition() >= pos)
 		{
-			(*it)->movePosition((*it)->startPosition() +
-				TimePos::ticksPerBar());
+			(*it)->movePosition((*it)->startPosition() + TimePos::ticksPerBar());
 		}
 	}
 }
@@ -501,8 +486,7 @@ void Track::removeBar(const TimePos& pos)
 {
 	// we'll decrease the position of every TCO, positioned behind pos, by
 	// one bar
-	for (tcoVector::iterator it = m_trackContentObjects.begin();
-		 it != m_trackContentObjects.end(); ++it)
+	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
 	{
 		if ((*it)->startPosition() >= pos)
 		{
@@ -521,11 +505,9 @@ bar_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
-	for (tcoVector::const_iterator it = m_trackContentObjects.begin();
-		 it != m_trackContentObjects.end(); ++it)
+	for (tcoVector::const_iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
 	{
-		if (Engine::getSong()->isExporting() &&
-			(*it)->isMuted())
+		if (Engine::getSong()->isExporting() && (*it)->isMuted())
 		{
 			continue;
 		}
@@ -551,8 +533,7 @@ void Track::toggleSolo()
 	const TrackContainer::TrackList& tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
-	for (TrackContainer::TrackList::const_iterator it = tl.begin();
-		 it != tl.end(); ++it)
+	for (TrackContainer::TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it)
 	{
 		if (*it != this)
 		{
@@ -568,8 +549,7 @@ void Track::toggleSolo()
 	// Should we use the new behavior of solo or the older/legacy one?
 	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
 
-	for (TrackContainer::TrackList::const_iterator it = tl.begin();
-		 it != tl.end(); ++it)
+	for (TrackContainer::TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it)
 	{
 		if (solo)
 		{
@@ -623,7 +603,4 @@ void Track::trackColorReset()
 	m_hasColor = false;
 }
 
-BoolModel* Track::getMutedModel()
-{
-	return &m_mutedModel;
-}
+BoolModel* Track::getMutedModel() { return &m_mutedModel; }

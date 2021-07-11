@@ -38,6 +38,7 @@
 
 #ifdef LMMS_BUILD_LINUX
 #include <QX11Info>
+
 #include "X11EmbedContainer.h"
 #endif
 
@@ -46,6 +47,7 @@
 
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
+
 #include <QLayout>
 #endif
 
@@ -92,10 +94,7 @@ public:
 			throw std::runtime_error("Cannot map file");
 		}
 	}
-	~FileInfo()
-	{
-		m_file.unmap(m_map);
-	}
+	~FileInfo() { m_file.unmap(m_map); }
 
 	MachineType machineType()
 	{
@@ -120,9 +119,7 @@ private:
 VstPlugin::VstPlugin(const QString& _plugin)
 	: m_plugin(PathUtil::toAbsolute(_plugin))
 	, m_pluginWindowID(0)
-	, m_embedMethod(gui
-			  ? ConfigManager::inst()->vstEmbedMethod()
-			  : "headless")
+	, m_embedMethod(gui ? ConfigManager::inst()->vstEmbedMethod() : "headless")
 	, m_version(0)
 	, m_currentProgram()
 {
@@ -155,21 +152,15 @@ VstPlugin::VstPlugin(const QString& _plugin)
 
 	setTempo(Engine::getSong()->getTempo());
 
-	connect(Engine::getSong(), SIGNAL(tempoChanged(bpm_t)),
-		this, SLOT(setTempo(bpm_t)), Qt::DirectConnection);
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
-		this, SLOT(updateSampleRate()));
+	connect(Engine::getSong(), SIGNAL(tempoChanged(bpm_t)), this, SLOT(setTempo(bpm_t)), Qt::DirectConnection);
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateSampleRate()));
 
 	// update once per second
 	m_idleTimer.start(1000);
-	connect(&m_idleTimer, SIGNAL(timeout()),
-		this, SLOT(idleUpdate()));
+	connect(&m_idleTimer, SIGNAL(timeout()), this, SLOT(idleUpdate()));
 }
 
-VstPlugin::~VstPlugin()
-{
-	delete m_pluginWidget;
-}
+VstPlugin::~VstPlugin() { delete m_pluginWidget; }
 
 void VstPlugin::tryLoad(const QString& remoteVstPluginExecutable)
 {
@@ -226,8 +217,7 @@ void VstPlugin::loadSettings(const QDomElement& _this)
 	// if it exists try to load settings chunk
 	if (_this.hasAttribute("chunk"))
 	{
-		loadChunk(QByteArray::fromBase64(
-			_this.attribute("chunk").toUtf8()));
+		loadChunk(QByteArray::fromBase64(_this.attribute("chunk").toUtf8()));
 	}
 	else if (num_params > 0)
 	{
@@ -235,8 +225,7 @@ void VstPlugin::loadSettings(const QDomElement& _this)
 		QMap<QString, QString> dump;
 		for (int i = 0; i < num_params; ++i)
 		{
-			const QString key = "param" +
-				QString::number(i);
+			const QString key = "param" + QString::number(i);
 			dump[key] = _this.attribute(key);
 		}
 		setParameterDump(dump);
@@ -273,8 +262,7 @@ void VstPlugin::saveSettings(QDomDocument& _doc, QDomElement& _this)
 		// individual parameters
 		const QMap<QString, QString>& dump = parameterDump();
 		_this.setAttribute("numparams", dump.size());
-		for (QMap<QString, QString>::const_iterator it = dump.begin();
-			 it != dump.end(); ++it)
+		for (QMap<QString, QString>::const_iterator it = dump.begin(); it != dump.end(); ++it)
 		{
 			_this.setAttribute(it.key(), it.value());
 		}
@@ -334,14 +322,10 @@ void VstPlugin::setParameterDump(const QMap<QString, QString>& _pdump)
 {
 	message m(IdVstSetParameterDump);
 	m.addInt(_pdump.size());
-	for (QMap<QString, QString>::ConstIterator it = _pdump.begin();
-		 it != _pdump.end(); ++it)
+	for (QMap<QString, QString>::ConstIterator it = _pdump.begin(); it != _pdump.end(); ++it)
 	{
-		const VstParameterDumpItem item =
-			{
-				(*it).section(':', 0, 0).toInt(),
-				"",
-				LocaleHelper::toFloat((*it).section(':', 2, -1))};
+		const VstParameterDumpItem item = {
+			(*it).section(':', 0, 0).toInt(), "", LocaleHelper::toFloat((*it).section(':', 2, -1))};
 		m.addInt(item.index);
 		m.addString(item.shortLabel);
 		m.addFloat(item.value);
@@ -351,10 +335,7 @@ void VstPlugin::setParameterDump(const QMap<QString, QString>& _pdump)
 	unlock();
 }
 
-QWidget* VstPlugin::pluginWidget()
-{
-	return m_pluginWidget;
-}
+QWidget* VstPlugin::pluginWidget() { return m_pluginWidget; }
 
 bool VstPlugin::processMessage(const message& _m)
 {
@@ -367,22 +348,17 @@ bool VstPlugin::processMessage(const message& _m)
 #ifdef LMMS_BUILD_WIN32
 			// We're changing the owner, not the parent,
 			// so this is legal despite MSDN's warning
-			SetWindowLongPtr((HWND)(intptr_t)m_pluginWindowID,
-				GWLP_HWNDPARENT,
-				(LONG_PTR)gui->mainWindow()->winId());
+			SetWindowLongPtr((HWND)(intptr_t)m_pluginWindowID, GWLP_HWNDPARENT, (LONG_PTR)gui->mainWindow()->winId());
 #endif
 
 #ifdef LMMS_BUILD_LINUX
-			XSetTransientForHint(QX11Info::display(),
-				m_pluginWindowID,
-				gui->mainWindow()->winId());
+			XSetTransientForHint(QX11Info::display(), m_pluginWindowID, gui->mainWindow()->winId());
 #endif
 		}
 		break;
 
 	case IdVstPluginEditorGeometry:
-		m_pluginGeometry = QSize(_m.getInt(0),
-			_m.getInt(1));
+		m_pluginGeometry = QSize(_m.getInt(0), _m.getInt(1));
 		break;
 
 	case IdVstPluginName:
@@ -436,8 +412,7 @@ bool VstPlugin::processMessage(const message& _m)
 			item.index = _m.getInt(++p);
 			item.shortLabel = _m.getString(++p);
 			item.value = _m.getFloat(++p);
-			m_parameterDump["param" + QString::number(item.index)] =
-				QString::number(item.index) + ":" +
+			m_parameterDump["param" + QString::number(item.index)] = QString::number(item.index) + ":" +
 				/*uncomented*/ /*QString( item.shortLabel )*/ QString::fromStdString(item.shortLabel) + ":" +
 				QString::number(item.value);
 		}
@@ -449,22 +424,18 @@ bool VstPlugin::processMessage(const message& _m)
 	return true;
 }
 
-QWidget* VstPlugin::editor()
-{
-	return m_pluginWidget;
-}
+QWidget* VstPlugin::editor() { return m_pluginWidget; }
 
 void VstPlugin::openPreset()
 {
 
-	FileDialog ofd(NULL, tr("Open Preset"), "",
-		tr("Vst Plugin Preset (*.fxp *.fxb)"));
+	FileDialog ofd(NULL, tr("Open Preset"), "", tr("Vst Plugin Preset (*.fxp *.fxb)"));
 	ofd.setFileMode(FileDialog::ExistingFiles);
-	if (ofd.exec() == QDialog::Accepted &&
-		!ofd.selectedFiles().isEmpty())
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
 	{
 		lock();
-		sendMessage(message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
+		sendMessage(
+			message(IdLoadPresetFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(ofd.selectedFiles()[0]))));
 		waitForMessage(IdLoadPresetFile, true);
 		unlock();
 	}
@@ -515,8 +486,8 @@ void VstPlugin::savePreset()
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	FileDialog sfd(NULL, tr("Save Preset"), presName.section(": ", 1, 1) + tr(".fxp"),
-		tr("Vst Plugin Preset (*.fxp *.fxb)"));
+	FileDialog sfd(
+		NULL, tr("Save Preset"), presName.section(": ", 1, 1) + tr(".fxp"), tr("Vst Plugin Preset (*.fxp *.fxb)"));
 
 	if (p_name != "") // remember last directory
 	{
@@ -525,8 +496,7 @@ void VstPlugin::savePreset()
 
 	sfd.setAcceptMode(FileDialog::AcceptSave);
 	sfd.setFileMode(FileDialog::AnyFile);
-	if (sfd.exec() == QDialog::Accepted &&
-		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "")
+	if (sfd.exec() == QDialog::Accepted && !sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "")
 	{
 		QString fns = sfd.selectedFiles()[0];
 		p_name = fns;
@@ -546,7 +516,7 @@ void VstPlugin::setParam(int i, float f)
 {
 	lock();
 	sendMessage(message(IdVstSetParameter).addInt(i).addFloat(f));
-	//waitForMessage( IdVstSetParameter, true );
+	// waitForMessage( IdVstSetParameter, true );
 	unlock();
 }
 
@@ -602,7 +572,9 @@ void VstPlugin::loadChunk(const QByteArray& _chunk)
 		tf.flush();
 
 		lock();
-		sendMessage(message(IdLoadSettingsFromFile).addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(tf.fileName()))).addInt(_chunk.size()));
+		sendMessage(message(IdLoadSettingsFromFile)
+						.addString(QSTR_TO_STDSTR(QDir::toNativeSeparators(tf.fileName())))
+						.addInt(_chunk.size()));
 		waitForMessage(IdLoadSettingsFromFile, true);
 		unlock();
 	}
@@ -736,7 +708,4 @@ bool VstPlugin::eventFilter(QObject* obj, QEvent* event)
 	return false;
 }
 
-QString VstPlugin::embedMethod() const
-{
-	return m_embedMethod;
-}
+QString VstPlugin::embedMethod() const { return m_embedMethod; }

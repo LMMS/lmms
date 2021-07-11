@@ -29,17 +29,10 @@
 
 extern "C"
 {
-	Plugin::Descriptor PLUGIN_EXPORT vectorscope_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Vectorscope",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."),
-			"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT vectorscope_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Vectorscope",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."),
+		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 }
 
 Vectorscope::Vectorscope(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)

@@ -62,7 +62,4 @@ void DelayControls::saveSettings(QDomDocument& doc, QDomElement& _this)
 	m_outGainModel.saveSettings(doc, _this, "OutGain");
 }
 
-void DelayControls::changeSampleRate()
-{
-	m_effect->changeSampleRate();
-}
+void DelayControls::changeSampleRate() { m_effect->changeSampleRate(); }

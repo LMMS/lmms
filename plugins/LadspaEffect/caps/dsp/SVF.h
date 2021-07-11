@@ -1,11 +1,11 @@
 /*
 	dsp/SVF.h
-	
+
 	Copyright 2002-4 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
-	ladder filter in Chamberlin topology. supports largely independent 
+	ladder filter in Chamberlin topology. supports largely independent
 	f and Q adjustments and sweeps.
 
 */
@@ -51,7 +51,7 @@
 	high   = high pass output
 	band   = band pass output
 	peak   = peaking output = low - high
-	-- 
+	--
 	double sampled svf loop:
 	for (i=0; i<numSamples; i++)
 	{
@@ -76,8 +76,7 @@
 namespace DSP
 {
 
-template <int OVERSAMPLE>
-class SVF
+template <int OVERSAMPLE> class SVF
 {
 protected:
 	/* loop parameters */
@@ -102,10 +101,7 @@ public:
 		set_f_Q(.1, .1);
 	}
 
-	void reset()
-	{
-		hi = band = lo = 0;
-	}
+	void reset() { hi = band = lo = 0; }
 
 	void set_f_Q(double fc, double Q)
 	{
@@ -148,14 +144,13 @@ public:
 		}
 
 		/* peak and notch outputs don't belong in the loop, put them
-				 * here (best in a template) if needed. */
+		 * here (best in a template) if needed. */
 
 		return *out;
 	}
 };
 
-template <int STACKED, int OVERSAMPLE>
-class StackedSVF
+template <int STACKED, int OVERSAMPLE> class StackedSVF
 {
 public:
 	SVF<OVERSAMPLE> svf[STACKED];

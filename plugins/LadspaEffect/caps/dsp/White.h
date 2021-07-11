@@ -3,7 +3,7 @@
 
 	Copyright 2004 Tim Goetze <tim@quitte.de>
 
-	simple white noise generator, based on Jon Dattorro's 3/2002 JAES 
+	simple white noise generator, based on Jon Dattorro's 3/2002 JAES
 	paper. quite an elegant design; consumes next to no CPU	on a processor
 	providing a decent binary shift operator. most of all, no random() calls.
 
@@ -39,20 +39,11 @@ class White
 public:
 	uint32 b;
 
-	White()
-	{
-		b = 0x1fff7777;
-	}
+	White() { b = 0x1fff7777; }
 
-	void init(float f)
-	{
-		b = (uint32)(f * (float)0x1fff7777);
-	}
+	void init(float f) { b = (uint32)(f * (float)0x1fff7777); }
 
-	sample_t abs()
-	{
-		return fabs(get());
-	}
+	sample_t abs() { return fabs(get()); }
 
 	/* 32-bit version */
 	sample_t get()
@@ -66,7 +57,7 @@ public:
 	}
 
 	/* 31-bit version, at least 6 instructions less / sample. probably only
-		 * pays off on a processor not providing a decent binary shift. */
+	 * pays off on a processor not providing a decent binary shift. */
 	sample_t get_31()
 	{
 #define BIT(y) ((b << (30 - y)) & 0x40000000)

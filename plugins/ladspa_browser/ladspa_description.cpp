@@ -35,8 +35,7 @@
 #include "Ladspa2LMMS.h"
 #include "Mixer.h"
 
-ladspaDescription::ladspaDescription(QWidget* _parent,
-	ladspaPluginType _type)
+ladspaDescription::ladspaDescription(QWidget* _parent, ladspaPluginType _type)
 	: QWidget(_parent)
 {
 	Ladspa2LMMS* manager = Engine::getLADSPAManager();
@@ -67,8 +66,7 @@ ladspaDescription::ladspaDescription(QWidget* _parent,
 	}
 
 	QList<QString> pluginNames;
-	for (l_sortable_plugin_t::iterator it = plugins.begin();
-		 it != plugins.end(); ++it)
+	for (l_sortable_plugin_t::iterator it = plugins.begin(); it != plugins.end(); ++it)
 	{
 		if (_type != VALID ||
 			manager->getDescription((*it).second)->inputChannels <= Engine::mixer()->audioDev()->channels())
@@ -81,10 +79,8 @@ ladspaDescription::ladspaDescription(QWidget* _parent,
 	QGroupBox* pluginsBox = new QGroupBox(tr("Plugins"), this);
 	QListWidget* pluginList = new QListWidget(pluginsBox);
 	pluginList->addItems(pluginNames);
-	connect(pluginList, SIGNAL(currentRowChanged(int)),
-		SLOT(rowChanged(int)));
-	connect(pluginList, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-		SLOT(onDoubleClicked(QListWidgetItem*)));
+	connect(pluginList, SIGNAL(currentRowChanged(int)), SLOT(rowChanged(int)));
+	connect(pluginList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(onDoubleClicked(QListWidgetItem*)));
 	(new QVBoxLayout(pluginsBox))->addWidget(pluginList);
 
 	QGroupBox* descriptionBox = new QGroupBox(tr("Description"), this);
@@ -107,9 +103,7 @@ ladspaDescription::ladspaDescription(QWidget* _parent,
 	}
 }
 
-ladspaDescription::~ladspaDescription()
-{
-}
+ladspaDescription::~ladspaDescription() {}
 
 void ladspaDescription::update(const ladspa_key_t& _key)
 {
@@ -167,8 +161,8 @@ void ladspaDescription::update(const ladspa_key_t& _key)
 	layout->addWidget(realTimeCapable);
 
 	QLabel* inplaceBroken = new QLabel(description);
-	inplaceBroken->setText(QWidget::tr("In Place Broken: ") +
-		(manager->isInplaceBroken(_key) ? QWidget::tr("Yes") : QWidget::tr("No")));
+	inplaceBroken->setText(
+		QWidget::tr("In Place Broken: ") + (manager->isInplaceBroken(_key) ? QWidget::tr("Yes") : QWidget::tr("No")));
 	layout->addWidget(inplaceBroken);
 
 	QLabel* channelsIn = new QLabel(description);
@@ -176,7 +170,8 @@ void ladspaDescription::update(const ladspa_key_t& _key)
 	layout->addWidget(channelsIn);
 
 	QLabel* channelsOut = new QLabel(description);
-	channelsOut->setText(QWidget::tr("Channels Out: ") + QString::number(manager->getDescription(_key)->outputChannels));
+	channelsOut->setText(
+		QWidget::tr("Channels Out: ") + QString::number(manager->getDescription(_key)->outputChannels));
 	layout->addWidget(channelsOut);
 }
 
@@ -186,7 +181,4 @@ void ladspaDescription::rowChanged(int _pluginIndex)
 	update(m_currentSelection);
 }
 
-void ladspaDescription::onDoubleClicked(QListWidgetItem* _item)
-{
-	emit(doubleClicked(m_currentSelection));
-}
+void ladspaDescription::onDoubleClicked(QListWidgetItem* _item) { emit(doubleClicked(m_currentSelection)); }

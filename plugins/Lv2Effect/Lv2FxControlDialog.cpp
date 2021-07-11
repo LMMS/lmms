@@ -37,30 +37,21 @@ Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls* controls)
 {
 	if (m_reloadPluginButton)
 	{
-		connect(m_reloadPluginButton, &QPushButton::clicked,
-			this, [this]() { lv2Controls()->reloadPlugin(); });
+		connect(m_reloadPluginButton, &QPushButton::clicked, this, [this]() { lv2Controls()->reloadPlugin(); });
 	}
 	if (m_toggleUIButton)
 	{
-		connect(m_toggleUIButton, &QPushButton::toggled,
-			this, [this]() { toggleUI(); });
+		connect(m_toggleUIButton, &QPushButton::toggled, this, [this]() { toggleUI(); });
 	}
 	if (m_helpButton)
 	{
-		connect(m_helpButton, &QPushButton::toggled,
-			this, [this](bool visible) { toggleHelp(visible); });
+		connect(m_helpButton, &QPushButton::toggled, this, [this](bool visible) { toggleHelp(visible); });
 	}
 	// for Effects, modelChanged only goes to the top EffectView
 	// we need to call it manually
 	modelChanged();
 }
 
-Lv2FxControls* Lv2FxControlDialog::lv2Controls()
-{
-	return static_cast<Lv2FxControls*>(m_effectControls);
-}
+Lv2FxControls* Lv2FxControlDialog::lv2Controls() { return static_cast<Lv2FxControls*>(m_effectControls); }
 
-void Lv2FxControlDialog::modelChanged()
-{
-	Lv2ViewBase::modelChanged(lv2Controls());
-}
+void Lv2FxControlDialog::modelChanged() { Lv2ViewBase::modelChanged(lv2Controls()); }

@@ -40,33 +40,13 @@ class PixmapButton;
 
 const int NUM_OSCILLATORS = 8;
 const int NUM_HARMONICS = 18;
-const QString HARMONIC_NAMES[NUM_HARMONICS] = {
-	"Octave below",
-	"Fifth below",
-	"Fundamental",
-	"2nd harmonic",
-	"3rd harmonic",
-	"4th harmonic",
-	"5th harmonic",
-	"6th harmonic",
-	"7th harmonic",
-	"8th harmonic",
-	"9th harmonic",
-	"10th harmonic",
-	"11th harmonic",
-	"12th harmonic",
-	"13th harmonic",
-	"14th harmonic",
-	"15th harmonic",
+const QString HARMONIC_NAMES[NUM_HARMONICS] = {"Octave below", "Fifth below", "Fundamental", "2nd harmonic",
+	"3rd harmonic", "4th harmonic", "5th harmonic", "6th harmonic", "7th harmonic", "8th harmonic", "9th harmonic",
+	"10th harmonic", "11th harmonic", "12th harmonic", "13th harmonic", "14th harmonic", "15th harmonic",
 	"16th harmonic"};
 
 const QString WAVEFORM_NAMES[6] = {
-	"Sine wave",
-	"Saw wave",
-	"Square wave",
-	"Triangle wave",
-	"Moog saw wave",
-	"Exponential wave"};
+	"Sine wave", "Saw wave", "Square wave", "Triangle wave", "Moog saw wave", "Exponential wave"};
 
 const float CENT = 1.0f / 1200.0f;
 
@@ -111,8 +91,7 @@ public:
 	organicInstrument(InstrumentTrack* _instrument_track);
 	virtual ~organicInstrument();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -131,10 +110,7 @@ private:
 	float inline waveshape(float in, float amount);
 
 	// fast atan, fast rather than accurate
-	inline float fastatan(float x)
-	{
-		return (x / (1.0 + 0.28 * (x * x)));
-	}
+	inline float fastatan(float x) { return (x / (1.0 + 0.28 * (x * x))); }
 
 	int m_numOscillators;
 
@@ -175,12 +151,7 @@ private:
 	struct OscillatorKnobs
 	{
 		MM_OPERATORS
-		OscillatorKnobs(
-			Knob* h,
-			Knob* v,
-			Knob* o,
-			Knob* p,
-			Knob* dt)
+		OscillatorKnobs(Knob* h, Knob* v, Knob* o, Knob* p, Knob* dt)
 			: m_harmKnob(h)
 			, m_volKnob(v)
 			, m_oscKnob(o)
@@ -188,9 +159,7 @@ private:
 			, m_detuneKnob(dt)
 		{
 		}
-		OscillatorKnobs()
-		{
-		}
+		OscillatorKnobs() {}
 
 		Knob* m_harmKnob;
 		Knob* m_volKnob;

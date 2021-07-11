@@ -31,20 +31,16 @@
 #include "embed.h"
 #include "gui_templates.h"
 
-static const QString names[LedCheckBox::NumColors] =
-	{
-		"led_yellow", "led_green", "led_red"};
+static const QString names[LedCheckBox::NumColors] = {"led_yellow", "led_green", "led_red"};
 
-LedCheckBox::LedCheckBox(const QString& _text, QWidget* _parent,
-	const QString& _name, LedColors _color)
+LedCheckBox::LedCheckBox(const QString& _text, QWidget* _parent, const QString& _name, LedColors _color)
 	: AutomatableButton(_parent, _name)
 	, m_text(_text)
 {
 	initUi(_color);
 }
 
-LedCheckBox::LedCheckBox(QWidget* _parent,
-	const QString& _name, LedColors _color)
+LedCheckBox::LedCheckBox(QWidget* _parent, const QString& _name, LedColors _color)
 	: LedCheckBox(QString(), _parent, _name, _color)
 {
 }
@@ -89,8 +85,7 @@ void LedCheckBox::initUi(LedColors _color)
 	{
 		_color = Yellow;
 	}
-	m_ledOnPixmap = new QPixmap(embed::getIconPixmap(
-		names[_color].toUtf8().constData()));
+	m_ledOnPixmap = new QPixmap(embed::getIconPixmap(names[_color].toUtf8().constData()));
 	m_ledOffPixmap = new QPixmap(embed::getIconPixmap("led_off"));
 
 	setFont(pointSize<7>(font()));
@@ -99,6 +94,6 @@ void LedCheckBox::initUi(LedColors _color)
 
 void LedCheckBox::onTextUpdated()
 {
-	setFixedSize(m_ledOffPixmap->width() + 5 + horizontalAdvance(QFontMetrics(font()), text()),
-		m_ledOffPixmap->height());
+	setFixedSize(
+		m_ledOffPixmap->width() + 5 + horizontalAdvance(QFontMetrics(font()), text()), m_ledOffPixmap->height());
 }

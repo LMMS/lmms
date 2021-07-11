@@ -1,8 +1,8 @@
 /*
- * ReverbSCControls.h 
+ * ReverbSCControls.h
  *
  * Copyright (c) 2017 Paul Batchelor
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -36,26 +36,15 @@ class ReverbSCControls : public EffectControls
 	Q_OBJECT
 public:
 	ReverbSCControls(ReverbSCEffect* effect);
-	virtual ~ReverbSCControls()
-	{
-	}
+	virtual ~ReverbSCControls() {}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return "ReverbSCControls";
-	}
+	inline virtual QString nodeName() const { return "ReverbSCControls"; }
 
-	virtual int controlCount()
-	{
-		return 4;
-	}
+	virtual int controlCount() { return 4; }
 
-	virtual EffectControlDialog* createView()
-	{
-		return new ReverbSCControlDialog(this);
-	}
+	virtual EffectControlDialog* createView() { return new ReverbSCControlDialog(this); }
 
 private slots:
 	void changeControl();

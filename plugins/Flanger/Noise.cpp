@@ -26,12 +26,6 @@
 
 #include "lmms_math.h"
 
-Noise::Noise()
-{
-	inv_randmax = 1.0 / FAST_RAND_MAX; /* for range of 0 - 1.0 */
-}
+Noise::Noise() { inv_randmax = 1.0 / FAST_RAND_MAX; /* for range of 0 - 1.0 */ }
 
-float Noise::tick()
-{
-	return (float)((2.0 * fast_rand() * inv_randmax) - 1.0);
-}
+float Noise::tick() { return (float)((2.0 * fast_rand() * inv_randmax) - 1.0); }

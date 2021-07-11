@@ -30,17 +30,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"BassBooster",
-			QT_TRANSLATE_NOOP("PluginBrowser", "Boost your bass the fast and simple way"),
-			"Tobias Doerffel <tobydox/at/users.sf.net>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "BassBooster",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Boost your bass the fast and simple way"),
+		"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 }
 
 BassBoosterEffect::BassBoosterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
@@ -54,9 +47,7 @@ BassBoosterEffect::BassBoosterEffect(Model* parent, const Descriptor::SubPluginF
 	changeRatio();
 }
 
-BassBoosterEffect::~BassBoosterEffect()
-{
-}
+BassBoosterEffect::~BassBoosterEffect() {}
 
 bool BassBoosterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
@@ -91,10 +82,10 @@ bool BassBoosterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		float gain = const_gain;
 		if (gainBuffer)
 		{
-			//process period using sample exact data
+			// process period using sample exact data
 			gain = gainBuffer->value(f);
 		}
-		//float gain = gainBuffer ? gainBuffer[f] : gain;
+		// float gain = gainBuffer ? gainBuffer[f] : gain;
 		m_bbFX.leftFX().setGain(gain);
 		m_bbFX.rightFX().setGain(gain);
 

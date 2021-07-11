@@ -51,8 +51,7 @@ public:
 	void createSampleBuffer(SampleBuffer** _sample_buf);
 
 private:
-	virtual void writeBuffer(const sampleFrame* _ab,
-		const f_cnt_t _frames);
+	virtual void writeBuffer(const sampleFrame* _ab, const f_cnt_t _frames);
 
 	typedef QList<QPair<sampleFrame*, f_cnt_t>> bufferList;
 	bufferList m_buffers;

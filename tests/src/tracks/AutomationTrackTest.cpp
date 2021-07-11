@@ -40,9 +40,7 @@ class AutomationTrackTest : QTestSuite
 {
 	Q_OBJECT
 private slots:
-	void initTestCase()
-	{
-	}
+	void initTestCase() {}
 
 	void testPatternLinear()
 	{
@@ -95,7 +93,7 @@ private slots:
 
 		AutomationPattern p3(&track);
 		p3.addObject(&model);
-		//XXX: Why is this even necessary?
+		// XXX: Why is this even necessary?
 		p3.clear();
 
 		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
@@ -135,8 +133,7 @@ private slots:
 	{
 		auto song = Engine::getSong();
 
-		InstrumentTrack* instrumentTrack =
-			dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
+		InstrumentTrack* instrumentTrack = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
 
 		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createTCO(0));
 		notePattern->changeLength(TimePos(4, 0));

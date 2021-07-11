@@ -30,23 +30,18 @@
 #include "CaptionMenu.h"
 #include "MainWindow.h"
 
-AutomatableSlider::AutomatableSlider(QWidget* _parent,
-	const QString& _name)
+AutomatableSlider::AutomatableSlider(QWidget* _parent, const QString& _name)
 	: QSlider(_parent)
 	, IntModelView(new IntModel(0, 0, 0, NULL, _name, true), this)
 	, m_showStatus(false)
 {
 	setWindowTitle(_name);
 
-	connect(this, SIGNAL(valueChanged(int)),
-		this, SLOT(changeValue(int)));
-	connect(this, SIGNAL(sliderMoved(int)),
-		this, SLOT(moveSlider(int)));
+	connect(this, SIGNAL(valueChanged(int)), this, SLOT(changeValue(int)));
+	connect(this, SIGNAL(sliderMoved(int)), this, SLOT(moveSlider(int)));
 }
 
-AutomatableSlider::~AutomatableSlider()
-{
-}
+AutomatableSlider::~AutomatableSlider() {}
 
 void AutomatableSlider::contextMenuEvent(QContextMenuEvent* _me)
 {
@@ -57,8 +52,7 @@ void AutomatableSlider::contextMenuEvent(QContextMenuEvent* _me)
 
 void AutomatableSlider::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() == Qt::LeftButton &&
-		!(_me->modifiers() & Qt::ControlModifier))
+	if (_me->button() == Qt::LeftButton && !(_me->modifiers() & Qt::ControlModifier))
 	{
 		m_showStatus = true;
 		QSlider::mousePressEvent(_me);
@@ -87,8 +81,7 @@ void AutomatableSlider::modelChanged()
 {
 	QSlider::setRange(model()->minValue(), model()->maxValue());
 	updateSlider();
-	connect(model(), SIGNAL(dataChanged()),
-		this, SLOT(updateSlider()));
+	connect(model(), SIGNAL(dataChanged()), this, SLOT(updateSlider()));
 }
 
 void AutomatableSlider::changeValue(int _value)
@@ -103,7 +96,4 @@ void AutomatableSlider::moveSlider(int _value)
 	emit logicSliderMoved(model()->value());
 }
 
-void AutomatableSlider::updateSlider()
-{
-	QSlider::setValue(model()->value());
-}
+void AutomatableSlider::updateSlider() { QSlider::setValue(model()->value()); }

@@ -42,9 +42,7 @@ public:
 	virtual ~MidiClient();
 
 	// to be implemented by sub-classes
-	virtual void processOutEvent(const MidiEvent& _me,
-		const TimePos& _time,
-		const MidiPort* _port) = 0;
+	virtual void processOutEvent(const MidiEvent& _me, const TimePos& _time, const MidiPort* _port) = 0;
 
 	// inheriting classes can re-implement this for being able to update
 	// their internal port-structures etc.
@@ -58,44 +56,24 @@ public:
 
 	// returns whether client works with raw-MIDI, only needs to be
 	// re-implemented by MidiClientRaw for returning true
-	virtual bool isRaw() const
-	{
-		return false;
-	}
+	virtual bool isRaw() const { return false; }
 
 	// if not raw-client, return all readable/writable ports
-	virtual QStringList readablePorts() const
-	{
-		return QStringList();
-	}
-	virtual QStringList writablePorts() const
-	{
-		return QStringList();
-	}
+	virtual QStringList readablePorts() const { return QStringList(); }
+	virtual QStringList writablePorts() const { return QStringList(); }
 
 	// return name of port which specified MIDI event came from
-	virtual QString sourcePortName(const MidiEvent&) const
-	{
-		return QString();
-	}
+	virtual QString sourcePortName(const MidiEvent&) const { return QString(); }
 
 	// (un)subscribe given MidiPort to/from destination-port
-	virtual void subscribeReadablePort(MidiPort* _port,
-		const QString& _dest,
-		bool _subscribe = true);
-	virtual void subscribeWritablePort(MidiPort* _port,
-		const QString& _dest,
-		bool _subscribe = true);
+	virtual void subscribeReadablePort(MidiPort* _port, const QString& _dest, bool _subscribe = true);
+	virtual void subscribeWritablePort(MidiPort* _port, const QString& _dest, bool _subscribe = true);
 
 	// qobject-derived classes can use this for make a slot being
 	// connected to signal of non-raw-MIDI-client if port-lists change
-	virtual void connectRPChanged(QObject*, const char*)
-	{
-	}
+	virtual void connectRPChanged(QObject*, const char*) {}
 
-	virtual void connectWPChanged(QObject*, const char*)
-	{
-	}
+	virtual void connectWPChanged(QObject*, const char*) {}
 
 	// tries to open either MIDI-driver from config-file or (if it fails)
 	// any other working
@@ -114,10 +92,7 @@ public:
 	virtual ~MidiClientRaw();
 
 	// we are raw-clients for sure!
-	bool isRaw() const override
-	{
-		return true;
-	}
+	bool isRaw() const override { return true; }
 
 protected:
 	// generic raw-MIDI-parser which generates appropriate MIDI-events

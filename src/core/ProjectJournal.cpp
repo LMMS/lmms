@@ -44,9 +44,7 @@ ProjectJournal::ProjectJournal()
 {
 }
 
-ProjectJournal::~ProjectJournal()
-{
-}
+ProjectJournal::~ProjectJournal() {}
 
 void ProjectJournal::undo()
 {
@@ -94,15 +92,9 @@ void ProjectJournal::redo()
 	}
 }
 
-bool ProjectJournal::canUndo() const
-{
-	return !m_undoCheckPoints.isEmpty();
-}
+bool ProjectJournal::canUndo() const { return !m_undoCheckPoints.isEmpty(); }
 
-bool ProjectJournal::canRedo() const
-{
-	return !m_redoCheckPoints.isEmpty();
-}
+bool ProjectJournal::canRedo() const { return !m_redoCheckPoints.isEmpty(); }
 
 void ProjectJournal::addJournalCheckPoint(JournallingObject* jo)
 {
@@ -129,28 +121,22 @@ jo_id_t ProjectJournal::allocID(JournallingObject* _obj)
 	}
 
 	m_joIDs[id] = _obj;
-	//printf("new id: %d\n", id );
+	// printf("new id: %d\n", id );
 	return id;
 }
 
 void ProjectJournal::reallocID(const jo_id_t _id, JournallingObject* _obj)
 {
-	//printf("realloc %d %d\n", _id, _obj );
+	// printf("realloc %d %d\n", _id, _obj );
 	//	if( m_joIDs.contains( _id ) )
 	{
 		m_joIDs[_id] = _obj;
 	}
 }
 
-jo_id_t ProjectJournal::idToSave(jo_id_t id)
-{
-	return id & ~EO_ID_MSB;
-}
+jo_id_t ProjectJournal::idToSave(jo_id_t id) { return id & ~EO_ID_MSB; }
 
-jo_id_t ProjectJournal::idFromSave(jo_id_t id)
-{
-	return id | EO_ID_MSB;
-}
+jo_id_t ProjectJournal::idFromSave(jo_id_t id) { return id | EO_ID_MSB; }
 
 void ProjectJournal::clearJournal()
 {

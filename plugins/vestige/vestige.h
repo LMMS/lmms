@@ -2,7 +2,7 @@
  * vestige.h - instrument VeSTige for hosting VST-plugins
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -58,10 +58,7 @@ public:
 
 	virtual void loadFile(const QString& _file);
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
+	virtual Flags flags() const { return IsSingleStreamed | IsMidiBased; }
 
 	virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0);
 

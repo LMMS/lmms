@@ -34,14 +34,12 @@
 #include "embed.h"
 #include "waveshaper_controls.h"
 
-waveShaperControlDialog::waveShaperControlDialog(
-	waveShaperControls* _controls)
+waveShaperControlDialog::waveShaperControlDialog(waveShaperControls* _controls)
 	: EffectControlDialog(_controls)
 {
 	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush(backgroundRole(),
-		PLUGIN_NAME::getIconPixmap("artwork"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 	setFixedSize(224, 274);
 
@@ -50,8 +48,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 	waveGraph->setModel(&_controls->m_wavegraphModel);
 	waveGraph->setAutoFillBackground(true);
 	pal = QPalette();
-	pal.setBrush(backgroundRole(),
-		PLUGIN_NAME::getIconPixmap("wavegraph"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
 	waveGraph->setPalette(pal);
 	waveGraph->setGraphColor(QColor(85, 204, 145));
 	waveGraph->setMaximumSize(204, 205);
@@ -100,18 +97,13 @@ waveShaperControlDialog::waveShaperControlDialog(
 	subOneButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("sub1_inactive"));
 	ToolTip::add(subOneButton, tr("Decrease wavegraph amplitude by 1 dB"));
 
-	LedCheckBox* clipInputToggle = new LedCheckBox("Clip input", this,
-		tr("Clip input"), LedCheckBox::Green);
+	LedCheckBox* clipInputToggle = new LedCheckBox("Clip input", this, tr("Clip input"), LedCheckBox::Green);
 	clipInputToggle->move(131, 252);
 	clipInputToggle->setModel(&_controls->m_clipModel);
 	ToolTip::add(clipInputToggle, tr("Clip input signal to 0 dB"));
 
-	connect(resetButton, SIGNAL(clicked()),
-		_controls, SLOT(resetClicked()));
-	connect(smoothButton, SIGNAL(clicked()),
-		_controls, SLOT(smoothClicked()));
-	connect(addOneButton, SIGNAL(clicked()),
-		_controls, SLOT(addOneClicked()));
-	connect(subOneButton, SIGNAL(clicked()),
-		_controls, SLOT(subOneClicked()));
+	connect(resetButton, SIGNAL(clicked()), _controls, SLOT(resetClicked()));
+	connect(smoothButton, SIGNAL(clicked()), _controls, SLOT(smoothClicked()));
+	connect(addOneButton, SIGNAL(clicked()), _controls, SLOT(addOneClicked()));
+	connect(subOneButton, SIGNAL(clicked()), _controls, SLOT(subOneClicked()));
 }

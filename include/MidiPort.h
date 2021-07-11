@@ -67,31 +67,19 @@ public:
 	};
 	typedef Modes Mode;
 
-	MidiPort(const QString& name,
-		MidiClient* client,
-		MidiEventProcessor* eventProcessor,
-		Model* parent = NULL,
+	MidiPort(const QString& name, MidiClient* client, MidiEventProcessor* eventProcessor, Model* parent = NULL,
 		Mode mode = Disabled);
 	virtual ~MidiPort();
 
 	void setName(const QString& name);
 
-	Mode mode() const
-	{
-		return m_mode;
-	}
+	Mode mode() const { return m_mode; }
 
 	void setMode(Mode mode);
 
-	bool isInputEnabled() const
-	{
-		return mode() == Input || mode() == Duplex;
-	}
+	bool isInputEnabled() const { return mode() == Input || mode() == Duplex; }
 
-	bool isOutputEnabled() const
-	{
-		return mode() == Output || mode() == Duplex;
-	}
+	bool isOutputEnabled() const { return mode() == Output || mode() == Duplex; }
 
 	int realOutputChannel() const
 	{
@@ -107,23 +95,14 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& thisElement) override;
 	void loadSettings(const QDomElement& thisElement) override;
 
-	QString nodeName() const override
-	{
-		return "midiport";
-	}
+	QString nodeName() const override { return "midiport"; }
 
 	void subscribeReadablePort(const QString& port, bool subscribe = true);
 	void subscribeWritablePort(const QString& port, bool subscribe = true);
 
-	const Map& readablePorts() const
-	{
-		return m_readablePorts;
-	}
+	const Map& readablePorts() const { return m_readablePorts; }
 
-	const Map& writablePorts() const
-	{
-		return m_writablePorts;
-	}
+	const Map& writablePorts() const { return m_writablePorts; }
 
 	void invalidateCilent();
 

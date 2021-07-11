@@ -62,58 +62,33 @@ public:
 	};
 	typedef Origins Origin;
 
-	NotePlayHandle(InstrumentTrack* instrumentTrack,
-		const f_cnt_t offset,
-		const f_cnt_t frames,
-		const Note& noteToPlay,
-		NotePlayHandle* parent = NULL,
-		int midiEventChannel = -1,
-		Origin origin = OriginPattern);
+	NotePlayHandle(InstrumentTrack* instrumentTrack, const f_cnt_t offset, const f_cnt_t frames, const Note& noteToPlay,
+		NotePlayHandle* parent = NULL, int midiEventChannel = -1, Origin origin = OriginPattern);
 	virtual ~NotePlayHandle();
 
-	void* operator new(size_t size, void* p)
-	{
-		return p;
-	}
+	void* operator new(size_t size, void* p) { return p; }
 
 	void setVolume(volume_t volume) override;
 	void setPanning(panning_t panning) override;
 
 	int midiKey() const;
-	int midiChannel() const
-	{
-		return m_midiChannel;
-	}
+	int midiChannel() const { return m_midiChannel; }
 
 	/*! convenience function that returns offset for the first period and zero otherwise,
 		used by instruments to handle the offset: instruments have to check this property and
 		add the correct number of empty frames in the beginning of the period */
-	f_cnt_t noteOffset() const
-	{
-		return m_totalFramesPlayed == 0
-			? offset()
-			: 0;
-	}
+	f_cnt_t noteOffset() const { return m_totalFramesPlayed == 0 ? offset() : 0; }
 
-	const float& frequency() const
-	{
-		return m_frequency;
-	}
+	const float& frequency() const { return m_frequency; }
 
 	/*! Returns frequency without pitch wheel influence */
-	float unpitchedFrequency() const
-	{
-		return m_unpitchedFrequency;
-	}
+	float unpitchedFrequency() const { return m_unpitchedFrequency; }
 
 	/*! Renders one chunk using the attached instrument into the buffer */
 	void play(sampleFrame* buffer) override;
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
-	bool isFinished() const override
-	{
-		return m_released && framesLeft() <= 0;
-	}
+	bool isFinished() const override { return m_released && framesLeft() <= 0; }
 
 	/*! Returns number of frames left for playback */
 	f_cnt_t framesLeft() const;
@@ -128,79 +103,46 @@ public:
 	void noteOff(const f_cnt_t offset = 0);
 
 	/*! Returns number of frames to be played until the note is going to be released */
-	f_cnt_t framesBeforeRelease() const
-	{
-		return m_framesBeforeRelease;
-	}
+	f_cnt_t framesBeforeRelease() const { return m_framesBeforeRelease; }
 
 	/*! Returns how many frames were played since release */
-	f_cnt_t releaseFramesDone() const
-	{
-		return m_releaseFramesDone;
-	}
+	f_cnt_t releaseFramesDone() const { return m_releaseFramesDone; }
 
 	/*! Returns the number of frames to be played after release according to
-	    the release times in the envelopes */
+		the release times in the envelopes */
 	f_cnt_t actualReleaseFramesToDo() const;
 
 	/*! Returns total numbers of frames to play (including release frames) */
-	f_cnt_t frames() const
-	{
-		return m_frames;
-	}
+	f_cnt_t frames() const { return m_frames; }
 
 	/*! Sets the total number of frames to play (including release frames) */
 	void setFrames(const f_cnt_t _frames);
 
 	/*! Returns whether note was released */
-	bool isReleased() const
-	{
-		return m_released;
-	}
+	bool isReleased() const { return m_released; }
 
-	bool isReleaseStarted() const
-	{
-		return m_releaseStarted;
-	}
+	bool isReleaseStarted() const { return m_releaseStarted; }
 
 	/*! Returns total numbers of frames played so far */
-	f_cnt_t totalFramesPlayed() const
-	{
-		return m_totalFramesPlayed;
-	}
+	f_cnt_t totalFramesPlayed() const { return m_totalFramesPlayed; }
 
 	/*! Returns volume level at given frame (envelope/LFO) */
 	float volumeLevel(const f_cnt_t frame);
 
 	/*! Returns instrument track which is being played by this handle (const version) */
-	const InstrumentTrack* instrumentTrack() const
-	{
-		return m_instrumentTrack;
-	}
+	const InstrumentTrack* instrumentTrack() const { return m_instrumentTrack; }
 
 	/*! Returns instrument track which is being played by this handle */
-	InstrumentTrack* instrumentTrack()
-	{
-		return m_instrumentTrack;
-	}
+	InstrumentTrack* instrumentTrack() { return m_instrumentTrack; }
 
 	/*! Returns whether note has a parent, e.g. is not part of an arpeggio or a chord */
-	bool hasParent() const
-	{
-		return m_hasParent;
-	}
+	bool hasParent() const { return m_hasParent; }
 
 	/*! Returns origin of note */
-	Origin origin() const
-	{
-		return m_origin;
-	}
+	Origin origin() const { return m_origin; }
 
 	/*! Returns whether note has children */
-	bool isMasterNote() const
-	{
-		return m_subNotes.size() > 0 || m_hadChildren;
-	}
+	bool isMasterNote() const { return m_subNotes.size() > 0 || m_hadChildren; }
 
 	void setMasterNote()
 	{
@@ -209,38 +151,29 @@ public:
 	}
 
 	/*! Returns whether note is muted */
-	bool isMuted() const
-	{
-		return m_muted;
-	}
+	bool isMuted() const { return m_muted; }
 
 	/*! Mutes playback of note */
 	void mute();
 
 	/*! Returns index of NotePlayHandle in vector of note-play-handles
-	    belonging to this instrument track - used by arpeggiator.
-	    Ignores child note-play-handles, returns -1 when called on one */
+		belonging to this instrument track - used by arpeggiator.
+		Ignores child note-play-handles, returns -1 when called on one */
 	int index() const;
 
 	/*! Returns list of note-play-handles belonging to given instrument track.
-	    If allPlayHandles = true, also released note-play-handles and children
-	    are returned */
+		If allPlayHandles = true, also released note-play-handles and children
+		are returned */
 	static ConstNotePlayHandleList nphsOfInstrumentTrack(const InstrumentTrack* Track, bool allPlayHandles = false);
 
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==(const NotePlayHandle& _nph) const;
 
 	/*! Returns whether NotePlayHandle belongs to BB track and BB track is muted */
-	bool isBbTrackMuted()
-	{
-		return m_bbTrack && m_bbTrack->isMuted();
-	}
+	bool isBbTrackMuted() { return m_bbTrack && m_bbTrack->isMuted(); }
 
 	/*! Sets attached BB track */
-	void setBBTrack(Track* t)
-	{
-		m_bbTrack = t;
-	}
+	void setBBTrack(Track* t) { m_bbTrack = t; }
 
 	/*! Process note detuning automation */
 	void processTimePos(const TimePos& time);
@@ -249,21 +182,12 @@ public:
 	void resize(const bpm_t newTempo);
 
 	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
-	void setSongGlobalParentOffset(const TimePos& offset)
-	{
-		m_songGlobalParentOffset = offset;
-	}
+	void setSongGlobalParentOffset(const TimePos& offset) { m_songGlobalParentOffset = offset; }
 
 	/*! Returns song-global offset */
-	const TimePos& songGlobalParentOffset() const
-	{
-		return m_songGlobalParentOffset;
-	}
+	const TimePos& songGlobalParentOffset() const { return m_songGlobalParentOffset; }
 
-	void setFrequencyUpdate()
-	{
-		m_frequencyNeedsUpdate = true;
-	}
+	void setFrequencyUpdate() { m_frequencyNeedsUpdate = true; }
 
 private:
 	class BaseDetuning
@@ -272,15 +196,9 @@ private:
 	public:
 		BaseDetuning(DetuningHelper* detuning);
 
-		void setValue(float val)
-		{
-			m_value = val;
-		}
+		void setValue(float val) { m_value = val; }
 
-		float value() const
-		{
-			return m_value;
-		}
+		float value() const { return m_value; }
 
 	private:
 		float m_value;
@@ -336,12 +254,8 @@ class NotePlayHandleManager
 	MM_OPERATORS
 public:
 	static void init();
-	static NotePlayHandle* acquire(InstrumentTrack* instrumentTrack,
-		const f_cnt_t offset,
-		const f_cnt_t frames,
-		const Note& noteToPlay,
-		NotePlayHandle* parent = NULL,
-		int midiEventChannel = -1,
+	static NotePlayHandle* acquire(InstrumentTrack* instrumentTrack, const f_cnt_t offset, const f_cnt_t frames,
+		const Note& noteToPlay, NotePlayHandle* parent = NULL, int midiEventChannel = -1,
 		NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern);
 	static void release(NotePlayHandle* nph);
 	static void extend(int i);

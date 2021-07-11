@@ -2,7 +2,7 @@
  * ladspa_port_dialog.cpp - dialog to test a LADSPA plugin
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -74,8 +74,10 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 
 		settings->item(row, col++)->setText(manager->isPortInput(_key, row) ? tr("Input") : tr("Output"));
 
-		settings->item(row, col++)->setText(manager->isPortToggled(_key, row) ? tr("Toggled") : manager->isInteger(_key, row) ? tr("Integer")
-																															  : tr("Float"));
+		settings->item(row, col++)
+			->setText(manager->isPortToggled(_key, row) ? tr("Toggled")
+					: manager->isInteger(_key, row)		? tr("Integer")
+														: tr("Float"));
 
 		float min = manager->getLowerBound(_key, row);
 		float max = manager->getUpperBound(_key, row);
@@ -100,8 +102,7 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 		}
 		else if (manager->isInteger(_key, row))
 		{
-			range += QString::number(static_cast<int>(min)) +
-				" < ";
+			range += QString::number(static_cast<int>(min)) + " < ";
 		}
 		else
 		{
@@ -114,8 +115,7 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 		}
 		else if (manager->isInteger(_key, row))
 		{
-			range += QString::number(static_cast<int>(def)) +
-				" < ";
+			range += QString::number(static_cast<int>(def)) + " < ";
 		}
 		else
 		{
@@ -135,8 +135,7 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 			range += QString::number(max);
 		}
 
-		if (manager->isPortOutput(_key, row) ||
-			manager->isPortToggled(_key, row))
+		if (manager->isPortOutput(_key, row) || manager->isPortToggled(_key, row))
 		{
 			range = "";
 		}
@@ -160,6 +159,4 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 	show();
 }
 
-ladspaPortDialog::~ladspaPortDialog()
-{
-}
+ladspaPortDialog::~ladspaPortDialog() {}

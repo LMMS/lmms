@@ -85,8 +85,7 @@ public:
 	Knob(const Knob& other) = delete;
 
 	// TODO: remove
-	inline void setHintText(const QString& _txt_before,
-		const QString& _txt_after)
+	inline void setHintText(const QString& _txt_before, const QString& _txt_after)
 	{
 		setDescription(_txt_before);
 		setUnit(_txt_after);
@@ -151,8 +150,7 @@ private:
 
 	void doConnections() override;
 
-	QLineF calculateLine(const QPointF& _mid, float _radius,
-		float _innerRadius = 1) const;
+	QLineF calculateLine(const QPointF& _mid, float _radius, float _innerRadius = 1) const;
 
 	void drawKnob(QPainter* _p);
 	void setPosition(const QPoint& _p);
@@ -163,10 +161,7 @@ private:
 		return static_cast<int>((value - 0.5 * (minValue + maxValue)) / (maxValue - minValue) * m_totalAngle) % 360;
 	}
 
-	inline float pageSize() const
-	{
-		return (model()->maxValue() - model()->minValue()) / 100.0f;
-	}
+	inline float pageSize() const { return (model()->maxValue() - model()->minValue()) / 100.0f; }
 
 	static TextFloat* s_textFloat;
 

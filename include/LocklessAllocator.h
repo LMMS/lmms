@@ -48,8 +48,7 @@ private:
 	std::atomic_int m_startIndex;
 };
 
-template <typename T>
-class LocklessAllocatorT : private LocklessAllocator
+template <typename T> class LocklessAllocatorT : private LocklessAllocator
 {
 public:
 	LocklessAllocatorT(size_t nmemb)
@@ -57,19 +56,11 @@ public:
 	{
 	}
 
-	virtual ~LocklessAllocatorT()
-	{
-	}
+	virtual ~LocklessAllocatorT() {}
 
-	T* alloc()
-	{
-		return (T*)LocklessAllocator::alloc();
-	}
+	T* alloc() { return (T*)LocklessAllocator::alloc(); }
 
-	void free(T* ptr)
-	{
-		LocklessAllocator::free(ptr);
-	}
+	void free(T* ptr) { LocklessAllocator::free(ptr); }
 };
 
 #endif

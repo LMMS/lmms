@@ -40,22 +40,13 @@ public:
 	LadspaControls(LadspaEffect* _eff);
 	virtual ~LadspaControls();
 
-	inline int controlCount()
-	{
-		return m_controlCount;
-	}
+	inline int controlCount() { return m_controlCount; }
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return "ladspacontrols";
-	}
+	inline virtual QString nodeName() const { return "ladspacontrols"; }
 
-	virtual EffectControlDialog* createView()
-	{
-		return new LadspaControlDialog(this);
-	}
+	virtual EffectControlDialog* createView() { return new LadspaControlDialog(this); }
 
 protected slots:
 	void updateLinkStatesFromGlobal();

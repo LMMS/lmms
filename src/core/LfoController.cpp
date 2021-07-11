@@ -37,8 +37,7 @@ LfoController::LfoController(Model* _parent)
 	, m_speedModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr("Oscillator speed"))
 	, m_amountModel(1.0, -1.0, 1.0, 0.005, this, tr("Oscillator amount"))
 	, m_phaseModel(0.0, 0.0, 360.0, 4.0, this, tr("Oscillator phase"))
-	, m_waveModel(Oscillator::SineWave, 0, Oscillator::NumWaveShapes,
-		  this, tr("Oscillator waveform"))
+	, m_waveModel(Oscillator::SineWave, 0, Oscillator::NumWaveShapes, this, tr("Oscillator waveform"))
 	, m_multiplierModel(0, 0, 2, this, tr("Frequency Multiplier"))
 	, m_duration(1000)
 	, m_phaseOffset(0)
@@ -47,20 +46,14 @@ LfoController::LfoController(Model* _parent)
 	, m_userDefSampleBuffer(new SampleBuffer)
 {
 	setSampleExact(true);
-	connect(&m_waveModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleFunction()), Qt::DirectConnection);
+	connect(&m_waveModel, SIGNAL(dataChanged()), this, SLOT(updateSampleFunction()), Qt::DirectConnection);
 
-	connect(&m_speedModel, SIGNAL(dataChanged()),
-		this, SLOT(updateDuration()), Qt::DirectConnection);
-	connect(&m_multiplierModel, SIGNAL(dataChanged()),
-		this, SLOT(updateDuration()), Qt::DirectConnection);
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
-		this, SLOT(updateDuration()));
+	connect(&m_speedModel, SIGNAL(dataChanged()), this, SLOT(updateDuration()), Qt::DirectConnection);
+	connect(&m_multiplierModel, SIGNAL(dataChanged()), this, SLOT(updateDuration()), Qt::DirectConnection);
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateDuration()));
 
-	connect(Engine::getSong(), SIGNAL(playbackStateChanged()),
-		this, SLOT(updatePhase()));
-	connect(Engine::getSong(), SIGNAL(playbackPositionChanged()),
-		this, SLOT(updatePhase()));
+	connect(Engine::getSong(), SIGNAL(playbackStateChanged()), this, SLOT(updatePhase()));
+	connect(Engine::getSong(), SIGNAL(playbackPositionChanged()), this, SLOT(updatePhase()));
 
 	updateDuration();
 }
@@ -97,9 +90,8 @@ void LfoController::updateValueBuffer()
 
 	for (float& f : m_valueBuffer)
 	{
-		const float currentSample = m_sampleFunction != NULL
-			? m_sampleFunction(phase)
-			: m_userDefSampleBuffer->userWaveSample(phase);
+		const float currentSample =
+			m_sampleFunction != NULL ? m_sampleFunction(phase) : m_userDefSampleBuffer->userWaveSample(phase);
 
 		f = qBound(0.0f, m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 1.0f);
 
@@ -169,7 +161,7 @@ void LfoController::updateSampleFunction()
 			 m_sampleFunction be std::function<sample_t(const float)>
 			 and use the line below:
 			*/
-		//m_sampleFunction = &(m_userDefSampleBuffer->userWaveSample)
+		// m_sampleFunction = &(m_userDefSampleBuffer->userWaveSample)
 		break;
 	}
 }
@@ -202,12 +194,6 @@ void LfoController::loadSettings(const QDomElement& _this)
 	updateSampleFunction();
 }
 
-QString LfoController::nodeName() const
-{
-	return ("lfocontroller");
-}
+QString LfoController::nodeName() const { return ("lfocontroller"); }
 
-ControllerDialog* LfoController::createDialog(QWidget* _parent)
-{
-	return new LfoControllerDialog(this, _parent);
-}
+ControllerDialog* LfoController::createDialog(QWidget* _parent) { return new LfoControllerDialog(this, _parent); }

@@ -106,30 +106,24 @@ void SaWaterfallView::paintEvent(QPaintEvent* event)
 		// align first and last label to the edge if needed, otherwise center them
 		if (line == m_timeTics.front() && pos < label_height / 2)
 		{
-			painter.drawText(m_displayLeft - label_width - margin, m_displayTop - 1,
-				label_width, label_height, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
-				QString(line.second.c_str()));
-			painter.drawText(m_displayRight + margin, m_displayTop - 1,
-				label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayLeft - label_width - margin, m_displayTop - 1, label_width, label_height,
+				Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip, QString(line.second.c_str()));
+			painter.drawText(m_displayRight + margin, m_displayTop - 1, label_width, label_height,
+				Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 		else if (line == m_timeTics.back() && pos > m_displayBottom - label_height + 2)
 		{
-			painter.drawText(m_displayLeft - label_width - margin, m_displayBottom - label_height,
-				label_width, label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
-				QString(line.second.c_str()));
-			painter.drawText(m_displayRight + margin, m_displayBottom - label_height + 2,
-				label_width, label_height, Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayLeft - label_width - margin, m_displayBottom - label_height, label_width,
+				label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip, QString(line.second.c_str()));
+			painter.drawText(m_displayRight + margin, m_displayBottom - label_height + 2, label_width, label_height,
+				Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 		else
 		{
-			painter.drawText(m_displayLeft - label_width - margin, pos - label_height / 2,
-				label_width, label_height, Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip,
-				QString(line.second.c_str()));
-			painter.drawText(m_displayRight + margin, pos - label_height / 2,
-				label_width, label_height, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayLeft - label_width - margin, pos - label_height / 2, label_width, label_height,
+				Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip, QString(line.second.c_str()));
+			painter.drawText(m_displayRight + margin, pos - label_height / 2, label_width, label_height,
+				Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 	}
 
@@ -144,10 +138,8 @@ void SaWaterfallView::paintEvent(QPaintEvent* event)
 		lock.unlock();
 		temp.setDevicePixelRatio(devicePixelRatio()); // display at native resolution
 		painter.drawImage(m_displayLeft, m_displayTop,
-			temp.scaled(m_displayWidth * devicePixelRatio(),
-				m_displayHeight * devicePixelRatio(),
-				Qt::IgnoreAspectRatio,
-				Qt::SmoothTransformation));
+			temp.scaled(m_displayWidth * devicePixelRatio(), m_displayHeight * devicePixelRatio(),
+				Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 		m_processor->flipRequest();
 	}
 	else
@@ -177,10 +169,7 @@ float SaWaterfallView::samplesPerLine()
 	return (float)m_processor->inBlockSize() / m_controls->m_windowOverlapModel.value();
 }
 
-float SaWaterfallView::secondsPerLine()
-{
-	return samplesPerLine() / m_processor->getSampleRate();
-}
+float SaWaterfallView::secondsPerLine() { return samplesPerLine() / m_processor->getSampleRate(); }
 
 // Convert time value to Y coordinate for display of given height.
 float SaWaterfallView::timeToYPixel(float time, int height)
@@ -277,7 +266,8 @@ void SaWaterfallView::updateVisibility()
 // Draw cursor and its coordinates if it is within display bounds.
 void SaWaterfallView::drawCursor(QPainter& painter)
 {
-	if (m_cursor.x() >= m_displayLeft && m_cursor.x() <= m_displayRight && m_cursor.y() >= m_displayTop && m_cursor.y() <= m_displayBottom)
+	if (m_cursor.x() >= m_displayLeft && m_cursor.x() <= m_displayRight && m_cursor.y() >= m_displayTop &&
+		m_cursor.y() <= m_displayBottom)
 	{
 		// cursor lines
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -292,8 +282,7 @@ void SaWaterfallView::drawCursor(QPainter& painter)
 		unsigned int const box_height = 2 * (fontMetrics.size(Qt::TextSingleLine, "0 Hz").height() + box_margin);
 		unsigned int const box_width = fontMetrics.size(Qt::TextSingleLine, "20000 Hz ").width() + 2 * box_margin;
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.fillRect(m_displayLeft + box_left, m_displayTop + box_top,
-			box_width, box_height, QColor(0, 0, 0, 64));
+		painter.fillRect(m_displayLeft + box_left, m_displayTop + box_top, box_width, box_height, QColor(0, 0, 0, 64));
 
 		// coordinates: text
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -302,16 +291,14 @@ void SaWaterfallView::drawCursor(QPainter& painter)
 		// frequency
 		int freq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString("%1 Hz").arg(freq);
-		painter.drawText(m_displayLeft + box_left + box_margin,
-			m_displayTop + box_top + box_margin,
-			box_width, box_height / 2, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft + box_left + box_margin, m_displayTop + box_top + box_margin, box_width,
+			box_height / 2, Qt::AlignLeft, tmps);
 
 		// time
 		float time = yPixelToTime(m_cursor.y(), m_displayBottom);
 		tmps = QString(std::to_string(time).substr(0, 5).c_str()).append(" s");
-		painter.drawText(m_displayLeft + box_left + box_margin,
-			m_displayTop + box_top + box_height / 2,
-			box_width, box_height / 2, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft + box_left + box_margin, m_displayTop + box_top + box_height / 2, box_width,
+			box_height / 2, Qt::AlignLeft, tmps);
 	}
 }
 
@@ -331,7 +318,4 @@ void SaWaterfallView::mousePressEvent(QMouseEvent* event)
 }
 
 // Handle resize event: rebuild time labels
-void SaWaterfallView::resizeEvent(QResizeEvent* event)
-{
-	m_timeTics = makeTimeTics();
-}
+void SaWaterfallView::resizeEvent(QResizeEvent* event) { m_timeTics = makeTimeTics(); }

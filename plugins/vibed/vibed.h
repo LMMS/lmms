@@ -2,7 +2,7 @@
  * vibed.h - combination of PluckedStringSynth and BitInvader
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -42,8 +42,7 @@ public:
 	vibed(InstrumentTrack* _instrument_track);
 	virtual ~vibed();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -51,10 +50,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual Flags flags() const
-	{
-		return IsNotBendable;
-	}
+	virtual Flags flags() const { return IsNotBendable; }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 
@@ -81,8 +77,7 @@ class vibedView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	vibedView(Instrument* _instrument,
-		QWidget* _parent);
+	vibedView(Instrument* _instrument, QWidget* _parent);
 	virtual ~vibedView(){};
 
 public slots:

@@ -2,7 +2,7 @@
  * Fader.h - fader-widget used in FX-mixer - partly taken from Hydrogen
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -94,13 +94,9 @@ public:
 	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
 	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
 
-	void setDisplayConversion(bool b)
-	{
-		m_conversionFactor = b ? 100.0 : 1.0;
-	}
+	void setDisplayConversion(bool b) { m_conversionFactor = b ? 100.0 : 1.0; }
 
-	inline void setHintText(const QString& _txt_before,
-		const QString& _txt_after)
+	inline void setHintText(const QString& _txt_before, const QString& _txt_after)
 	{
 		setDescription(_txt_before);
 		setUnit(_txt_after);

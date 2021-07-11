@@ -1,11 +1,11 @@
 /*
 	basics.h
-	
+
 	Copyright 2004-9 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
-	common constants, typedefs, utility functions 
+	common constants, typedefs, utility functions
 	and simplified LADSPA #defines.
 
 */
@@ -98,36 +98,19 @@ typedef unsigned long ulong;
 /* flavours for sample store functions run() and run_adding() */
 typedef void (*sample_func_t)(sample_t*, int, sample_t, sample_t);
 
-inline void
-store_func(sample_t* s, int i, sample_t x, sample_t gain)
-{
-	s[i] = x;
-}
+inline void store_func(sample_t* s, int i, sample_t x, sample_t gain) { s[i] = x; }
 
-inline void
-adding_func(sample_t* s, int i, sample_t x, sample_t gain)
-{
-	s[i] += gain * x;
-}
+inline void adding_func(sample_t* s, int i, sample_t x, sample_t gain) { s[i] += gain * x; }
 
 #ifndef max
 
-template <class X, class Y>
-X min(X x, Y y)
-{
-	return x < y ? x : (X)y;
-}
+template <class X, class Y> X min(X x, Y y) { return x < y ? x : (X)y; }
 
-template <class X, class Y>
-X max(X x, Y y)
-{
-	return x > y ? x : (X)y;
-}
+template <class X, class Y> X max(X x, Y y) { return x > y ? x : (X)y; }
 
 #endif /* ! max */
 
-template <class T>
-T clamp(T value, T lower, T upper)
+template <class T> T clamp(T value, T lower, T upper)
 {
 	if (value < lower)
 		return lower;
@@ -136,23 +119,17 @@ T clamp(T value, T lower, T upper)
 	return value;
 }
 
-static inline float
-frandom()
-{
-	return (float)rand() / (float)RAND_MAX;
-}
+static inline float frandom() { return (float)rand() / (float)RAND_MAX; }
 
 /* NB: also true if 0  */
-inline bool
-is_denormal(float& f)
+inline bool is_denormal(float& f)
 {
 	int32 i = *((int32*)&f);
 	return ((i & 0x7f800000) == 0);
 }
 
 /* todo: not sure if this double version is correct, actually ... */
-inline bool
-is_denormal(double& f)
+inline bool is_denormal(double& f)
 {
 	int64 i = *((int64*)&f);
 	return ((i & 0x7fe0000000000000ll) == 0);

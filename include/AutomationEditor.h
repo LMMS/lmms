@@ -60,22 +60,13 @@ class AutomationEditor : public QWidget, public JournallingObject
 public:
 	void setCurrentPattern(AutomationPattern* new_pattern);
 
-	inline const AutomationPattern* currentPattern() const
-	{
-		return m_pattern;
-	}
+	inline const AutomationPattern* currentPattern() const { return m_pattern; }
 
-	inline bool validPattern() const
-	{
-		return m_pattern != nullptr && m_pattern->hasAutomation();
-	}
+	inline bool validPattern() const { return m_pattern != nullptr && m_pattern->hasAutomation(); }
 
 	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
 	void loadSettings(const QDomElement& parent) override;
-	QString nodeName() const override
-	{
-		return "automationeditor";
-	}
+	QString nodeName() const override { return "automationeditor"; }
 
 	enum EditModes
 	{
@@ -206,7 +197,7 @@ private:
 	EditModes m_editMode;
 
 	bool m_mouseDownLeft;
-	bool m_mouseDownRight; //true if right click is being held down
+	bool m_mouseDownRight; // true if right click is being held down
 
 	TimeLineWidget* m_timeLine;
 	bool m_scrollBack;

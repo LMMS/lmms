@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *                    Attila Herman <attila589/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -92,8 +92,7 @@ public:
 	SidInstrument(InstrumentTrack* _instrument_track);
 	virtual ~SidInstrument();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -142,17 +141,8 @@ private:
 
 	struct voiceKnobs
 	{
-		voiceKnobs(Knob* a,
-			Knob* d,
-			Knob* s,
-			Knob* r,
-			Knob* pw,
-			Knob* crs,
-			automatableButtonGroup* wfbg,
-			PixmapButton* syncb,
-			PixmapButton* ringb,
-			PixmapButton* filterb,
-			PixmapButton* testb)
+		voiceKnobs(Knob* a, Knob* d, Knob* s, Knob* r, Knob* pw, Knob* crs, automatableButtonGroup* wfbg,
+			PixmapButton* syncb, PixmapButton* ringb, PixmapButton* filterb, PixmapButton* testb)
 			: m_attKnob(a)
 			, m_decKnob(d)
 			, m_sustKnob(s)
@@ -166,9 +156,7 @@ private:
 			, m_testButton(testb)
 		{
 		}
-		voiceKnobs()
-		{
-		}
+		voiceKnobs() {}
 		Knob* m_attKnob;
 		Knob* m_decKnob;
 		Knob* m_sustKnob;

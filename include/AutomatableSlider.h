@@ -36,10 +36,7 @@ public:
 	AutomatableSlider(QWidget* _parent, const QString& _name = QString());
 	virtual ~AutomatableSlider();
 
-	bool showStatus()
-	{
-		return (m_showStatus);
-	}
+	bool showStatus() { return (m_showStatus); }
 
 signals:
 	void logicValueChanged(int _value);

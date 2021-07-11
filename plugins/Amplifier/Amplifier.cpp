@@ -31,17 +31,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Amplifier",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A native amplifier plugin"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Amplifier",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A native amplifier plugin"),
+		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 }
 
 AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
@@ -50,9 +43,7 @@ AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatu
 {
 }
 
-AmplifierEffect::~AmplifierEffect()
-{
-}
+AmplifierEffect::~AmplifierEffect() {}
 
 bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
@@ -89,23 +80,13 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 
 		// convert pan values to left/right values
-		const float pan = panBuf
-			? panBuf->value(f)
-			: m_ampControls.m_panModel.value();
-		const float left1 = pan <= 0
-			? 1.0
-			: 1.0 - pan * 0.01f;
-		const float right1 = pan >= 0
-			? 1.0
-			: 1.0 + pan * 0.01f;
+		const float pan = panBuf ? panBuf->value(f) : m_ampControls.m_panModel.value();
+		const float left1 = pan <= 0 ? 1.0 : 1.0 - pan * 0.01f;
+		const float right1 = pan >= 0 ? 1.0 : 1.0 + pan * 0.01f;
 
 		// second stage amplification
-		const float left2 = leftBuf
-			? leftBuf->value(f)
-			: m_ampControls.m_leftModel.value();
-		const float right2 = rightBuf
-			? rightBuf->value(f)
-			: m_ampControls.m_rightModel.value();
+		const float left2 = leftBuf ? leftBuf->value(f) : m_ampControls.m_leftModel.value();
+		const float right2 = rightBuf ? rightBuf->value(f) : m_ampControls.m_rightModel.value();
 
 		s[0] *= left1 * left2 * 0.01;
 		s[1] *= right1 * right2 * 0.01;

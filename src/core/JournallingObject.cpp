@@ -54,8 +54,7 @@ void JournallingObject::addJournalCheckPoint()
 	}
 }
 
-QDomElement JournallingObject::saveState(QDomDocument& _doc,
-	QDomElement& _parent)
+QDomElement JournallingObject::saveState(QDomDocument& _doc, QDomElement& _parent)
 {
 	if (isJournalling())
 	{
@@ -106,14 +105,11 @@ void JournallingObject::changeID(jo_id_t _id)
 		if (jo != NULL)
 		{
 			QString used_by = jo->nodeName();
-			if (used_by == "automatablemodel" &&
-				dynamic_cast<AutomatableModel*>(jo))
+			if (used_by == "automatablemodel" && dynamic_cast<AutomatableModel*>(jo))
 			{
-				used_by += ":" +
-					dynamic_cast<AutomatableModel*>(jo)->displayName();
+				used_by += ":" + dynamic_cast<AutomatableModel*>(jo)->displayName();
 			}
-			fprintf(stderr, "JO-ID %d already in use by %s!\n",
-				(int)_id, used_by.toUtf8().constData());
+			fprintf(stderr, "JO-ID %d already in use by %s!\n", (int)_id, used_by.toUtf8().constData());
 			return;
 		}
 

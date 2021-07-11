@@ -85,7 +85,4 @@ void SerializingObject::saveSettings(QDomDocument& doc, QDomElement& element)
 	Q_UNUSED(element)
 }
 
-void SerializingObject::loadSettings(const QDomElement& element)
-{
-	Q_UNUSED(element)
-}
+void SerializingObject::loadSettings(const QDomElement& element) { Q_UNUSED(element) }

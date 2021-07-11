@@ -81,26 +81,15 @@ class WatsynObject
 {
 	MM_OPERATORS
 public:
-	WatsynObject(float* _A1wave, float* _A2wave,
-		float* _B1wave, float* _B2wave,
-		int _amod, int _bmod, const sample_rate_t _samplerate, NotePlayHandle* _nph, fpp_t _frames,
-		WatsynInstrument* _w);
+	WatsynObject(float* _A1wave, float* _A2wave, float* _B1wave, float* _B2wave, int _amod, int _bmod,
+		const sample_rate_t _samplerate, NotePlayHandle* _nph, fpp_t _frames, WatsynInstrument* _w);
 	virtual ~WatsynObject();
 
 	void renderOutput(fpp_t _frames);
 
-	inline sampleFrame* abuf() const
-	{
-		return m_abuf;
-	}
-	inline sampleFrame* bbuf() const
-	{
-		return m_bbuf;
-	}
-	inline sample_rate_t samplerate() const
-	{
-		return m_samplerate;
-	}
+	inline sampleFrame* abuf() const { return m_abuf; }
+	inline sampleFrame* bbuf() const { return m_bbuf; }
+	inline sample_rate_t samplerate() const { return m_samplerate; }
 
 private:
 	int m_amod;
@@ -132,20 +121,15 @@ public:
 	WatsynInstrument(InstrumentTrack* _instrument_track);
 	virtual ~WatsynInstrument();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-	virtual void saveSettings(QDomDocument& _doc,
-		QDomElement& _this);
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _this);
 	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return (64);
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return (64); }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 
@@ -168,15 +152,9 @@ protected:
 	float m_rfreq[NUM_OSCS];
 
 private:
-	inline float leftCh(float _vol, float _pan)
-	{
-		return (_pan <= 0 ? 1.0 : 1.0 - (_pan / 100.0)) * _vol / 100.0;
-	}
+	inline float leftCh(float _vol, float _pan) { return (_pan <= 0 ? 1.0 : 1.0 - (_pan / 100.0)) * _vol / 100.0; }
 
-	inline float rightCh(float _vol, float _pan)
-	{
-		return (_pan >= 0 ? 1.0 : 1.0 + (_pan / 100.0)) * _vol / 100.0;
-	}
+	inline float rightCh(float _vol, float _pan) { return (_pan >= 0 ? 1.0 : 1.0 + (_pan / 100.0)) * _vol / 100.0; }
 
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
 	inline void srccpy(float* _dst, float* _src)
@@ -217,7 +195,7 @@ private:
 		{
 			tang[i] = ( _src[i+1] - _src[i-1] ) / 2;
 		}
-		
+
 		// calculate cspline
 		for( int i=0; i < WAVELEN; i++ )
 		{
@@ -225,15 +203,15 @@ private:
 			const float s2 = _src[ ( i / WAVERATIO + 1 ) % GRAPHLEN ];
 			const float m1 = tang[ i / WAVERATIO ];
 			const float m2 = tang[ ( i / WAVERATIO + 1 ) % GRAPHLEN ];
-			
+
 			const float x = static_cast<float>( i % WAVERATIO ) / WAVERATIO;
 			const float x2 = x * x;
 			const float x3 = x * x * x;
-			
+
 			_dst[i] = ( ( x3 * 2.0 - x2 * 3.0 + 1.0 ) * s1 ) +
 				( ( x3 * -2.0 + x2 * 3.0 ) * s2 ) +
 				( ( x3 - x2 * 2 + x ) * m1 ) +
-				( ( x3 - x2 ) * m2 );		
+				( ( x3 - x2 ) * m2 );
 		}
 	}*/
 
@@ -295,8 +273,7 @@ class WatsynView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	WatsynView(Instrument* _instrument,
-		QWidget* _parent);
+	WatsynView(Instrument* _instrument, QWidget* _parent);
 	virtual ~WatsynView();
 
 protected slots:

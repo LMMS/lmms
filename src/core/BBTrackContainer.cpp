@@ -32,18 +32,14 @@ BBTrackContainer::BBTrackContainer()
 	: TrackContainer()
 	, m_bbComboBoxModel(this)
 {
-	connect(&m_bbComboBoxModel, SIGNAL(dataChanged()),
-		this, SLOT(currentBBChanged()));
+	connect(&m_bbComboBoxModel, SIGNAL(dataChanged()), this, SLOT(currentBBChanged()));
 	// we *always* want to receive updates even in case BB actually did
 	// not change upon setCurrentBB()-call
-	connect(&m_bbComboBoxModel, SIGNAL(dataUnchanged()),
-		this, SLOT(currentBBChanged()));
+	connect(&m_bbComboBoxModel, SIGNAL(dataUnchanged()), this, SLOT(currentBBChanged()));
 	setType(BBContainer);
 }
 
-BBTrackContainer::~BBTrackContainer()
-{
-}
+BBTrackContainer::~BBTrackContainer() {}
 
 bool BBTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int tcoNum)
 {
@@ -93,10 +89,7 @@ bar_t BBTrackContainer::lengthOfBB(int bb) const
 	return maxLength.nextFullBar();
 }
 
-int BBTrackContainer::numOfBBs() const
-{
-	return Engine::getSong()->countTracks(Track::BBTrack);
-}
+int BBTrackContainer::numOfBBs() const { return Engine::getSong()->countTracks(Track::BBTrack); }
 
 void BBTrackContainer::removeBB(int bb)
 {
@@ -155,10 +148,7 @@ void BBTrackContainer::play()
 	}
 }
 
-void BBTrackContainer::stop()
-{
-	Engine::getSong()->stop();
-}
+void BBTrackContainer::stop() { Engine::getSong()->stop(); }
 
 void BBTrackContainer::updateComboBox()
 {

@@ -29,16 +29,13 @@
 
 #include "Controller.h"
 
-ControllerDialog::ControllerDialog(Controller* _controller,
-	QWidget* _parent)
+ControllerDialog::ControllerDialog(Controller* _controller, QWidget* _parent)
 	: QWidget(_parent)
 	, ModelView(_controller, this)
 {
 }
 
-ControllerDialog::~ControllerDialog()
-{
-}
+ControllerDialog::~ControllerDialog() {}
 
 void ControllerDialog::closeEvent(QCloseEvent* _ce)
 {

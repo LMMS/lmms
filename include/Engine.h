@@ -59,49 +59,25 @@ public:
 	static void destroy();
 
 	// core
-	static Mixer* mixer()
-	{
-		return s_mixer;
-	}
+	static Mixer* mixer() { return s_mixer; }
 
-	static FxMixer* fxMixer()
-	{
-		return s_fxMixer;
-	}
+	static FxMixer* fxMixer() { return s_fxMixer; }
 
-	static Song* getSong()
-	{
-		return s_song;
-	}
+	static Song* getSong() { return s_song; }
 
-	static BBTrackContainer* getBBTrackContainer()
-	{
-		return s_bbTrackContainer;
-	}
+	static BBTrackContainer* getBBTrackContainer() { return s_bbTrackContainer; }
 
-	static ProjectJournal* projectJournal()
-	{
-		return s_projectJournal;
-	}
+	static ProjectJournal* projectJournal() { return s_projectJournal; }
 
 	static bool ignorePluginBlacklist();
 
 #ifdef LMMS_HAVE_LV2
-	static class Lv2Manager* getLv2Manager()
-	{
-		return s_lv2Manager;
-	}
+	static class Lv2Manager* getLv2Manager() { return s_lv2Manager; }
 #endif
 
-	static Ladspa2LMMS* getLADSPAManager()
-	{
-		return s_ladspaManager;
-	}
+	static Ladspa2LMMS* getLADSPAManager() { return s_ladspaManager; }
 
-	static float framesPerTick()
-	{
-		return s_framesPerTick;
-	}
+	static float framesPerTick() { return s_framesPerTick; }
 
 	static float framesPerTick(sample_rate_t sample_rate);
 
@@ -125,8 +101,7 @@ signals:
 private:
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
-	template <class T>
-	static inline void deleteHelper(T** ptr)
+	template <class T> static inline void deleteHelper(T** ptr)
 	{
 		T* tmp = *ptr;
 		*ptr = NULL;

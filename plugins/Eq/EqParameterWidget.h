@@ -2,7 +2,7 @@
  * eqparameterwidget.cpp - defination of EqParameterWidget class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
-* Copyright (c) 2015 Steffen Baranowsky <BaraMGB/at/freenet/dot/de>
+ * Copyright (c) 2015 Steffen Baranowsky <BaraMGB/at/freenet/dot/de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -64,10 +64,7 @@ public:
 	~EqParameterWidget();
 	QList<EqHandle*>* m_handleList;
 
-	const int bandCount()
-	{
-		return 8;
-	}
+	const int bandCount() { return 8; }
 
 	EqBand* getBandModels(int i);
 	void changeHandle(int i);

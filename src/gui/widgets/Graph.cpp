@@ -33,8 +33,7 @@
 #include "SampleBuffer.h"
 #include "StringPairDrag.h"
 
-Graph::Graph(QWidget* _parent, graphStyle _style, int _width,
-	int _height)
+Graph::Graph(QWidget* _parent, graphStyle _style, int _width, int _height)
 	: QWidget(_parent)
 	,
 	/* TODO: size, background? */
@@ -50,22 +49,14 @@ Graph::Graph(QWidget* _parent, graphStyle _style, int _width,
 
 	graphModel* gModel = castModel<graphModel>();
 
-	QObject::connect(gModel, SIGNAL(samplesChanged(int, int)),
-		this, SLOT(updateGraph(int, int)));
+	QObject::connect(gModel, SIGNAL(samplesChanged(int, int)), this, SLOT(updateGraph(int, int)));
 
-	QObject::connect(gModel, SIGNAL(lengthChanged()),
-		this, SLOT(updateGraph()));
+	QObject::connect(gModel, SIGNAL(lengthChanged()), this, SLOT(updateGraph()));
 }
 
-void Graph::setForeground(const QPixmap& _pixmap)
-{
-	m_foreground = _pixmap;
-}
+void Graph::setForeground(const QPixmap& _pixmap) { m_foreground = _pixmap; }
 
-void Graph::setGraphColor(QColor _graphcol)
-{
-	m_graphColor = _graphcol;
-}
+void Graph::setGraphColor(QColor _graphcol) { m_graphColor = _graphcol; }
 
 /*
 void graph::loadSampleFromFile( const QString & _filename )
@@ -156,8 +147,8 @@ void Graph::mousePressEvent(QMouseEvent* _me)
 		}
 		else
 		{
-			//when shift-clicking, draw a line from last position to current
-			//position
+			// when shift-clicking, draw a line from last position to current
+			// position
 			int x = _me->x();
 			int y = _me->y();
 
@@ -179,10 +170,9 @@ void Graph::drawLineAt(int _x, int _y, int _lastx)
 		return;
 	}
 
-	float xscale = static_cast<float>(model()->length()) /
-		(width() - 4);
+	float xscale = static_cast<float>(model()->length()) / (width() - 4);
 
-	//consider border
+	// consider border
 	_x -= 2;
 	_y -= 2;
 	_lastx -= 2;
@@ -219,7 +209,7 @@ void Graph::drawLineAt(int _x, int _y, int _lastx)
 	{
 		val_begin = val;
 	}
-	//int xstep = _x > _lastx ? -1 : 1;
+	// int xstep = _x > _lastx ? -1 : 1;
 	float ystep = (val_end - val_begin) / linelen;
 
 	// draw a line
@@ -243,8 +233,7 @@ void Graph::changeSampleAt(int _x, int _y)
 		return;
 	}
 
-	float xscale = static_cast<float>(model()->length()) /
-		(width() - 4);
+	float xscale = static_cast<float>(model()->length()) / (width() - 4);
 
 	// consider border of background image
 	_x -= 2;
@@ -295,18 +284,13 @@ void Graph::paintEvent(QPaintEvent*)
 		for (int i = 0; i < length; i++)
 		{
 			// Needs to be rewritten
-			p.drawLine(
-				2 + static_cast<int>(i * xscale),
-				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
-				2 + static_cast<int>((i + 1) * xscale),
-				2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
+			p.drawLine(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
+				2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
 		}
 
 		// Draw last segment wrapped around
-		p.drawLine(2 + static_cast<int>(length * xscale),
-			2 + static_cast<int>(((*samps)[length] - maxVal) * yscale),
-			width() - 3,
-			2 + static_cast<int>(((*samps)[0] - maxVal) * yscale));
+		p.drawLine(2 + static_cast<int>(length * xscale), 2 + static_cast<int>(((*samps)[length] - maxVal) * yscale),
+			width() - 3, 2 + static_cast<int>(((*samps)[0] - maxVal) * yscale));
 
 		p.setRenderHints(QPainter::Antialiasing, false);
 		break;
@@ -314,20 +298,14 @@ void Graph::paintEvent(QPaintEvent*)
 	case Graph::NearestStyle:
 		for (int i = 0; i < length; i++)
 		{
-			p.drawLine(2 + static_cast<int>(i * xscale),
-				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
-				2 + static_cast<int>((i + 1) * xscale),
-				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale));
-			p.drawLine(2 + static_cast<int>((i + 1) * xscale),
-				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
-				2 + static_cast<int>((i + 1) * xscale),
-				2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
+			p.drawLine(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
+				2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale));
+			p.drawLine(2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
+				2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
 		}
 
-		p.drawLine(2 + static_cast<int>(length * xscale),
-			2 + static_cast<int>(((*samps)[length] - maxVal) * yscale),
-			width() - 3,
-			2 + static_cast<int>(((*samps)[length] - maxVal) * yscale));
+		p.drawLine(2 + static_cast<int>(length * xscale), 2 + static_cast<int>(((*samps)[length] - maxVal) * yscale),
+			width() - 3, 2 + static_cast<int>(((*samps)[length] - maxVal) * yscale));
 		break;
 
 	case Graph::LinearNonCyclicStyle:
@@ -336,11 +314,8 @@ void Graph::paintEvent(QPaintEvent*)
 		for (int i = 0; i < length; i++)
 		{
 			// Needs to be rewritten
-			p.drawLine(
-				2 + static_cast<int>(i * xscale),
-				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
-				2 + static_cast<int>((i + 1) * xscale),
-				2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
+			p.drawLine(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
+				2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
 		}
 
 		// Do not draw last segment wrapped around - hence, "non-cyclic"
@@ -351,16 +326,15 @@ void Graph::paintEvent(QPaintEvent*)
 	case Graph::BarStyle:
 		for (int i = 0; i <= length; i++)
 		{
-			p.fillRect(2 + static_cast<int>(i * xscale),
-				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
+			p.fillRect(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
 				qMax(static_cast<int>(xscale) - 1, 1),
-				qMax(static_cast<int>((minVal - maxVal) * yscale) - static_cast<int>(((*samps)[i] - maxVal) * yscale), 1),
+				qMax(static_cast<int>((minVal - maxVal) * yscale) - static_cast<int>(((*samps)[i] - maxVal) * yscale),
+					1),
 				gcol);
 
 			p.setPen(QPen(m_graphColor, 1.0));
 
-			p.drawLine(2 + static_cast<int>(i * xscale),
-				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
+			p.drawLine(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
 				qMax(static_cast<int>(i * xscale) + static_cast<int>(xscale), 2 + static_cast<int>(i * xscale)),
 				2 + static_cast<int>(((*samps)[i] - maxVal) * yscale));
 		}
@@ -397,8 +371,7 @@ void Graph::dropEvent(QDropEvent* _de)
 
 void Graph::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	if (StringPairDrag::processDragEnterEvent(_dee,
-			QString("samplefile")) == false)
+	if (StringPairDrag::processDragEnterEvent(_dee, QString("samplefile")) == false)
 	{
 		_dee->ignore();
 	}
@@ -408,11 +381,9 @@ void Graph::modelChanged()
 {
 	graphModel* gModel = castModel<graphModel>();
 
-	QObject::connect(gModel, SIGNAL(samplesChanged(int, int)),
-		this, SLOT(updateGraph(int, int)));
+	QObject::connect(gModel, SIGNAL(samplesChanged(int, int)), this, SLOT(updateGraph(int, int)));
 
-	QObject::connect(gModel, SIGNAL(lengthChanged()),
-		this, SLOT(updateGraph()));
+	QObject::connect(gModel, SIGNAL(lengthChanged()), this, SLOT(updateGraph()));
 }
 
 void Graph::updateGraph(int _startPos, int _endPos)
@@ -421,13 +392,9 @@ void Graph::updateGraph(int _startPos, int _endPos)
 	update();
 }
 
-void Graph::updateGraph()
-{
-	updateGraph(0, model()->length() - 1);
-}
+void Graph::updateGraph() { updateGraph(0, model()->length() - 1); }
 
-graphModel::graphModel(float _min, float _max, int _length,
-	::Model* _parent, bool _default_constructed, float _step)
+graphModel::graphModel(float _min, float _max, int _length, ::Model* _parent, bool _default_constructed, float _step)
 	: Model(_parent, tr("Graph"), _default_constructed)
 	, m_samples(_length)
 	, m_length(_length)
@@ -487,8 +454,7 @@ void graphModel::setWaveToSine()
 {
 	for (int i = 0; i < length(); i++)
 	{
-		m_samples[i] = Oscillator::sinSample(
-			i / static_cast<float>(length()));
+		m_samples[i] = Oscillator::sinSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
@@ -498,8 +464,7 @@ void graphModel::setWaveToTriangle()
 {
 	for (int i = 0; i < length(); i++)
 	{
-		m_samples[i] = Oscillator::triangleSample(
-			i / static_cast<float>(length()));
+		m_samples[i] = Oscillator::triangleSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
@@ -509,8 +474,7 @@ void graphModel::setWaveToSaw()
 {
 	for (int i = 0; i < length(); i++)
 	{
-		m_samples[i] = Oscillator::sawSample(
-			i / static_cast<float>(length()));
+		m_samples[i] = Oscillator::sawSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
@@ -520,8 +484,7 @@ void graphModel::setWaveToSquare()
 {
 	for (int i = 0; i < length(); i++)
 	{
-		m_samples[i] = Oscillator::squareSample(
-			i / static_cast<float>(length()));
+		m_samples[i] = Oscillator::squareSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
@@ -531,8 +494,7 @@ void graphModel::setWaveToNoise()
 {
 	for (int i = 0; i < length(); i++)
 	{
-		m_samples[i] = Oscillator::noiseSample(
-			i / static_cast<float>(length()));
+		m_samples[i] = Oscillator::noiseSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
@@ -547,8 +509,7 @@ QString graphModel::setWaveToUser()
 		sampleBuffer->dataReadLock();
 		for (int i = 0; i < length(); i++)
 		{
-			m_samples[i] = sampleBuffer->userWaveSample(
-				i / static_cast<float>(length()));
+			m_samples[i] = sampleBuffer->userWaveSample(i / static_cast<float>(length()));
 		}
 		sampleBuffer->dataUnlock();
 	}
@@ -581,18 +542,17 @@ void graphModel::smoothNonCyclic()
 	QVector<float> temp = m_samples;
 
 	// Smoothing
-	//m_samples[0] = ( ( temp[0] * 3 ) + temp[1] ) * 0.25f;
+	// m_samples[0] = ( ( temp[0] * 3 ) + temp[1] ) * 0.25f;
 	for (int i = 1; i < (length() - 1); i++)
 	{
 		m_samples[i] = (temp[i - 1] + (temp[i] * 2) + temp[i + 1]) * 0.25f;
 	}
-	//m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 3 ) ) * 0.25f;
+	// m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 3 ) ) * 0.25f;
 
 	emit samplesChanged(0, length() - 1);
 }
 
-void graphModel::convolve(const float* convolution,
-	const int convolutionLength, const int centerOffset)
+void graphModel::convolve(const float* convolution, const int convolutionLength, const int centerOffset)
 {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
@@ -648,7 +608,7 @@ void graphModel::invert()
 void graphModel::shiftPhase(int _deg)
 {
 	// calculate offset in samples
-	const int offset = (_deg * length()) / 360; //multiply first because integers
+	const int offset = (_deg * length()) / 360; // multiply first because integers
 
 	// store values in temporary array
 	QVector<float> temp = m_samples;
@@ -685,7 +645,7 @@ void graphModel::clearInvisible()
 
 void graphModel::drawSampleAt(int x, float val)
 {
-	//snap to the grid
+	// snap to the grid
 	val -= (m_step != 0.0) ? fmod(val, m_step) * m_step : 0;
 
 	// boundary crop

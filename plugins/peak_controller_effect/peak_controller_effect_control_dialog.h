@@ -3,7 +3,7 @@
  *                                           peakControllerEffect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -36,11 +36,8 @@ class PeakControllerEffectControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	PeakControllerEffectControlDialog(
-		PeakControllerEffectControls* _controls);
-	virtual ~PeakControllerEffectControlDialog()
-	{
-	}
+	PeakControllerEffectControlDialog(PeakControllerEffectControls* _controls);
+	virtual ~PeakControllerEffectControlDialog() {}
 
 protected:
 	Knob* m_baseKnob;

@@ -16,14 +16,9 @@ using std::as_const;
 #else
 
 /// Shim for http://en.cppreference.com/w/cpp/utility/as_const
-template <typename T>
-constexpr typename std::add_const<T>::type& as_const(T& t) noexcept
-{
-	return t;
-}
+template <typename T> constexpr typename std::add_const<T>::type& as_const(T& t) noexcept { return t; }
 
-template <typename T>
-void as_const(const T&&) = delete;
+template <typename T> void as_const(const T&&) = delete;
 #endif
 
 #endif // include guard

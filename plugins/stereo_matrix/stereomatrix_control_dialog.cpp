@@ -2,7 +2,7 @@
  * stereomatrix_control_dialog.cpp - control dialog for stereoMatrix-effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -30,8 +30,7 @@
 #include "embed.h"
 #include "stereomatrix_controls.h"
 
-stereoMatrixControlDialog::stereoMatrixControlDialog(
-	stereoMatrixControls* _controls)
+stereoMatrixControlDialog::stereoMatrixControlDialog(stereoMatrixControls* _controls)
 	: EffectControlDialog(_controls)
 {
 
@@ -39,8 +38,7 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 
 	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush(backgroundRole(),
-		PLUGIN_NAME::getIconPixmap("artwork"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 
 	Knob* llKnob = new Knob(knobBright_26, this);

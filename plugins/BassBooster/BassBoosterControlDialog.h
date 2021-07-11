@@ -34,9 +34,7 @@ class BassBoosterControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	BassBoosterControlDialog(BassBoosterControls* controls);
-	virtual ~BassBoosterControlDialog()
-	{
-	}
+	virtual ~BassBoosterControlDialog() {}
 };
 
 #endif

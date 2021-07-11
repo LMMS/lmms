@@ -116,8 +116,7 @@ void LcdFloatSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::LeftButton &&
-		!(event->modifiers() & Qt::ControlModifier) &&
+	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier) &&
 		event->y() < m_wholeDisplay.cellHeight() + 2)
 	{
 		m_mouseMoving = true;
@@ -190,23 +189,16 @@ void LcdFloatSpinBox::wheelEvent(QWheelEvent* event)
 	emit manualChange();
 }
 
-void LcdFloatSpinBox::mouseDoubleClickEvent(QMouseEvent*)
-{
-	enterValue();
-}
+void LcdFloatSpinBox::mouseDoubleClickEvent(QMouseEvent*) { enterValue(); }
 
 void LcdFloatSpinBox::enterValue()
 {
 	bool ok;
 	float newVal;
 
-	newVal = QInputDialog::getDouble(
-		this, tr("Set value"),
+	newVal = QInputDialog::getDouble(this, tr("Set value"),
 		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
-		model()->value(),
-		model()->minValue(),
-		model()->maxValue(),
-		m_fractionDisplay.numDigits(), &ok);
+		model()->value(), model()->minValue(), model()->maxValue(), m_fractionDisplay.numDigits(), &ok);
 
 	if (ok)
 	{

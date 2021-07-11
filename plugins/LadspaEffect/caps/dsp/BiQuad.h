@@ -1,8 +1,8 @@
 /*
 	dsp/BiQuad.h
-	
+
 	Copyright 2003-7 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Bi-quad IIR filter.
@@ -56,16 +56,14 @@ public:
 	void copy(BiQuad& bq)
 	{
 		for (int i = 0; i < 3; ++i)
-			a[i] = bq.a[i],
-			b[i] = bq.b[i];
+			a[i] = bq.a[i], b[i] = bq.b[i];
 	}
 
 	void reset()
 	{
 		h = 0;
 
-		x[0] = x[1] =
-			y[0] = y[1] = 0.;
+		x[0] = x[1] = y[0] = y[1] = 0.;
 	}
 
 	/* denormal zapping */
@@ -98,8 +96,8 @@ public:
 	}
 
 	/* Following are additional methods for using the biquad to filter an
-		 * upsampled signal with 0 padding -- some terms reduce to 0 in this
-		 * case */
+	 * upsampled signal with 0 padding -- some terms reduce to 0 in this
+	 * case */
 	inline sample_t process_0_1()
 	{
 		register int z = h;

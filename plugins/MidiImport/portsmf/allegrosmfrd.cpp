@@ -38,9 +38,9 @@ public:
 	// chan is actual_channel + channel_offset_per_track * track_num +
 	//                          channel_offset_per_track * port
 	long channel_offset_per_track; // used to encode track number into channel
-		// default is 0, set this to 0 to merge all tracks to 16 channels
-	long channel_offset_per_port; // used to encode port number into channel
-		// default is 16, set to 0 to ignore port prefix meta events
+								   // default is 0, set this to 0 to merge all tracks to 16 channels
+	long channel_offset_per_port;  // used to encode port number into channel
+								   // default is 16, set to 0 to ignore port prefix meta events
 	// while reading, this is channel_offset_per_track * track_num
 	int channel_offset;
 
@@ -148,20 +148,11 @@ void Alg_midifile_reader::Mf_endtrack()
 	port = 0;
 }
 
-int Alg_midifile_reader::Mf_getc()
-{
-	return file->get();
-}
+int Alg_midifile_reader::Mf_getc() { return file->get(); }
 
-void Alg_midifile_reader::Mf_chanprefix(int chan)
-{
-	meta_channel = chan;
-}
+void Alg_midifile_reader::Mf_chanprefix(int chan) { meta_channel = chan; }
 
-void Alg_midifile_reader::Mf_portprefix(int p)
-{
-	port = p;
-}
+void Alg_midifile_reader::Mf_portprefix(int p) { port = p; }
 
 void Alg_midifile_reader::Mf_eot()
 {
@@ -169,15 +160,9 @@ void Alg_midifile_reader::Mf_eot()
 	port = 0;
 }
 
-void Alg_midifile_reader::Mf_error(char* msg)
-{
-	fprintf(stdout, "Midifile reader error: %s\n", msg);
-}
+void Alg_midifile_reader::Mf_error(char* msg) { fprintf(stdout, "Midifile reader error: %s\n", msg); }
 
-void Alg_midifile_reader::Mf_error(const char* msg)
-{
-	Mf_error(const_cast<char*>(msg));
-}
+void Alg_midifile_reader::Mf_error(const char* msg) { Mf_error(const_cast<char*>(msg)); }
 
 void Alg_midifile_reader::Mf_header(int format, int ntrks, int division)
 {
@@ -226,8 +211,7 @@ void Alg_midifile_reader::Mf_off(int chan, int key, int vel)
 	while (*p)
 	{
 		if ((*p)->note->get_identifier() == key &&
-			(*p)->note->chan ==
-				chan + channel_offset + port * channel_offset_per_port)
+			(*p)->note->chan == chan + channel_offset + port * channel_offset_per_port)
 		{
 			(*p)->note->dur = time - (*p)->note->time;
 			// trace("updated %d dur %g\n", (*p)->note->key, (*p)->note->dur);
@@ -310,8 +294,7 @@ void Alg_midifile_reader::Mf_chanpressure(int chan, int val)
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::binary_msg(int len, unsigned char* msg,
-	const char* attr_string)
+void Alg_midifile_reader::binary_msg(int len, unsigned char* msg, const char* attr_string)
 {
 	Alg_parameter parameter;
 	char* hexstr = new char[len * 2 + 1];
@@ -332,10 +315,7 @@ void Alg_midifile_reader::Mf_sysex(int len, unsigned char* msg)
 	binary_msg(len, msg, "sysexs");
 }
 
-void Alg_midifile_reader::Mf_arbitrary(int len, unsigned char* msg)
-{
-	Mf_error("arbitrary data ignored");
-}
+void Alg_midifile_reader::Mf_arbitrary(int len, unsigned char* msg) { Mf_error("arbitrary data ignored"); }
 
 void Alg_midifile_reader::Mf_metamisc(int type, int len, unsigned char* msg)
 {
@@ -346,15 +326,11 @@ void Alg_midifile_reader::Mf_metamisc(int type, int len, unsigned char* msg)
 	Mf_error(text);
 }
 
-void Alg_midifile_reader::Mf_seqnum(int n)
-{
-	Mf_error("seqnum data ignored");
-}
+void Alg_midifile_reader::Mf_seqnum(int n) { Mf_error("seqnum data ignored"); }
 
 static const char* fpsstr[4] = {"24", "25", "29.97", "30"};
 
-void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs,
-	int frames, int subframes)
+void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs, int frames, int subframes)
 {
 	// string will look like "24fps:01h:27m:07s:19.00f"
 	// 30fps (drop frame) is notated as "29.97fps"
@@ -362,8 +338,7 @@ void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs,
 	int fps = (hours >> 6) & 3;
 	hours &= 0x1F;
 	//#pragma warning(disable: 4996) // text is long enough
-	sprintf(text, "%sfps:%02dh:%02dm:%02ds:%02d.%02df",
-		fpsstr[fps], hours, mins, secs, frames, subframes);
+	sprintf(text, "%sfps:%02dh:%02dm:%02ds:%02d.%02df", fpsstr[fps], hours, mins, secs, frames, subframes);
 	//#pragma warning(default: 4996)
 	Alg_parameter smpteoffset;
 	smpteoffset.s = heapify(text);

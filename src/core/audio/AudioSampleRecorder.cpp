@@ -28,9 +28,7 @@
 #include "SampleBuffer.h"
 #include "debug.h"
 
-AudioSampleRecorder::AudioSampleRecorder(const ch_cnt_t _channels,
-	bool& _success_ful,
-	Mixer* _mixer)
+AudioSampleRecorder::AudioSampleRecorder(const ch_cnt_t _channels, bool& _success_ful, Mixer* _mixer)
 	: AudioDevice(_channels, _mixer)
 	, m_buffers()
 {
@@ -49,8 +47,7 @@ AudioSampleRecorder::~AudioSampleRecorder()
 f_cnt_t AudioSampleRecorder::framesRecorded() const
 {
 	f_cnt_t frames = 0;
-	for (BufferList::ConstIterator it = m_buffers.begin();
-		 it != m_buffers.end(); ++it)
+	for (BufferList::ConstIterator it = m_buffers.begin(); it != m_buffers.end(); ++it)
 	{
 		frames += (*it).second;
 	}
@@ -68,8 +65,7 @@ void AudioSampleRecorder::createSampleBuffer(SampleBuffer** sampleBuf)
 	assert(data != NULL);
 
 	// now copy all buffers into big buffer
-	for (BufferList::ConstIterator it = m_buffers.begin();
-		 it != m_buffers.end(); ++it)
+	for (BufferList::ConstIterator it = m_buffers.begin(); it != m_buffers.end(); ++it)
 	{
 		memcpy(data_ptr, (*it).first, (*it).second * sizeof(sampleFrame));
 		data_ptr += (*it).second;
@@ -80,8 +76,7 @@ void AudioSampleRecorder::createSampleBuffer(SampleBuffer** sampleBuf)
 	delete[] data;
 }
 
-void AudioSampleRecorder::writeBuffer(const surroundSampleFrame* _ab,
-	const fpp_t _frames, const float)
+void AudioSampleRecorder::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames, const float)
 {
 	sampleFrame* buf = new sampleFrame[_frames];
 	for (fpp_t frame = 0; frame < _frames; ++frame)

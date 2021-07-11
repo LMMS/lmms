@@ -36,17 +36,11 @@ public:
 	MixerProfiler();
 	~MixerProfiler();
 
-	void startPeriod()
-	{
-		m_periodTimer.reset();
-	}
+	void startPeriod() { m_periodTimer.reset(); }
 
 	void finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod);
 
-	int cpuLoad() const
-	{
-		return m_cpuLoad;
-	}
+	int cpuLoad() const { return m_cpuLoad; }
 
 	void setOutputFile(const QString& outputFile);
 

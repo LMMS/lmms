@@ -48,13 +48,10 @@ RingBuffer::RingBuffer(float size)
 	memset(m_buffer, 0, m_size * sizeof(sampleFrame));
 	m_position = 0;
 	setSamplerateAware(true);
-	//qDebug( "m_size %d, m_position %d", m_size, m_position );
+	// qDebug( "m_size %d, m_position %d", m_size, m_position );
 }
 
-RingBuffer::~RingBuffer()
-{
-	delete[] m_buffer;
-}
+RingBuffer::~RingBuffer() { delete[] m_buffer; }
 
 void RingBuffer::reset()
 {
@@ -73,10 +70,7 @@ void RingBuffer::changeSize(f_cnt_t size)
 	delete[] tmp;
 }
 
-void RingBuffer::changeSize(float size)
-{
-	changeSize(msToFrames(size));
-}
+void RingBuffer::changeSize(float size) { changeSize(msToFrames(size)); }
 
 void RingBuffer::setSamplerateAware(bool b)
 {
@@ -90,20 +84,11 @@ void RingBuffer::setSamplerateAware(bool b)
 	}
 }
 
-void RingBuffer::advance()
-{
-	m_position = (m_position + m_fpp) % m_size;
-}
+void RingBuffer::advance() { m_position = (m_position + m_fpp) % m_size; }
 
-void RingBuffer::movePosition(f_cnt_t amount)
-{
-	m_position = (m_position + amount) % m_size;
-}
+void RingBuffer::movePosition(f_cnt_t amount) { m_position = (m_position + amount) % m_size; }
 
-void RingBuffer::movePosition(float amount)
-{
-	movePosition(msToFrames(amount));
-}
+void RingBuffer::movePosition(float amount) { movePosition(msToFrames(amount)); }
 
 void RingBuffer::pop(sampleFrame* dst)
 {
@@ -150,10 +135,7 @@ void RingBuffer::read(sampleFrame* dst, f_cnt_t offset)
 	}
 }
 
-void RingBuffer::read(sampleFrame* dst, float offset)
-{
-	read(dst, msToFrames(offset));
-}
+void RingBuffer::read(sampleFrame* dst, float offset) { read(dst, msToFrames(offset)); }
 
 void RingBuffer::read(sampleFrame* dst, f_cnt_t offset, f_cnt_t length)
 {
@@ -178,10 +160,7 @@ void RingBuffer::read(sampleFrame* dst, f_cnt_t offset, f_cnt_t length)
 	}
 }
 
-void RingBuffer::read(sampleFrame* dst, float offset, f_cnt_t length)
-{
-	read(dst, msToFrames(offset), length);
-}
+void RingBuffer::read(sampleFrame* dst, float offset, f_cnt_t length) { read(dst, msToFrames(offset), length); }
 
 void RingBuffer::write(sampleFrame* src, f_cnt_t offset, f_cnt_t length)
 {
@@ -206,10 +185,7 @@ void RingBuffer::write(sampleFrame* src, f_cnt_t offset, f_cnt_t length)
 	}
 }
 
-void RingBuffer::write(sampleFrame* src, float offset, f_cnt_t length)
-{
-	write(src, msToFrames(offset), length);
-}
+void RingBuffer::write(sampleFrame* src, float offset, f_cnt_t length) { write(src, msToFrames(offset), length); }
 
 void RingBuffer::writeAdding(sampleFrame* src, f_cnt_t offset, f_cnt_t length)
 {
@@ -242,7 +218,7 @@ void RingBuffer::writeAdding(sampleFrame* src, float offset, f_cnt_t length)
 void RingBuffer::writeAddingMultiplied(sampleFrame* src, f_cnt_t offset, f_cnt_t length, float level)
 {
 	const f_cnt_t pos = (m_position + offset) % m_size;
-	//qDebug( "pos %d m_pos %d ofs %d siz %d", pos, m_position, offset, m_size );
+	// qDebug( "pos %d m_pos %d ofs %d siz %d", pos, m_position, offset, m_size );
 	if (length == 0)
 	{
 		length = m_fpp;

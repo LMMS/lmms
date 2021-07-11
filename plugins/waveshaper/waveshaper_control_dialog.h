@@ -35,9 +35,7 @@ class waveShaperControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	waveShaperControlDialog(waveShaperControls* _controls);
-	virtual ~waveShaperControlDialog()
-	{
-	}
+	virtual ~waveShaperControlDialog() {}
 
 private:
 };

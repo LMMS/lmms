@@ -44,18 +44,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Mallets",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Tuneful things to bang on"),
-			"Danny McRae <khjklujn/at/users.sf.net>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Mallets",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Tuneful things to bang on"), "Danny McRae <khjklujn/at/users.sf.net>",
+		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 malletsInstrument::malletsInstrument(InstrumentTrack* _instrument_track)
@@ -118,9 +109,7 @@ malletsInstrument::malletsInstrument(InstrumentTrack* _instrument_track)
 	m_scalers.append(7.0);
 }
 
-malletsInstrument::~malletsInstrument()
-{
-}
+malletsInstrument::~malletsInstrument() {}
 
 void malletsInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
@@ -253,13 +242,9 @@ void malletsInstrument::loadSettings(const QDomElement& _this)
 	}
 }
 
-QString malletsInstrument::nodeName() const
-{
-	return (malletsstk_plugin_descriptor.name);
-}
+QString malletsInstrument::nodeName() const { return (malletsstk_plugin_descriptor.name); }
 
-void malletsInstrument::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void malletsInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	if (m_filesMissing)
 	{
@@ -272,8 +257,7 @@ void malletsInstrument::playNote(NotePlayHandle* _n,
 	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL)
 	{
 		// If newer projects, adjust velocity to within stk's limits
-		float velocityAdjust =
-			m_isOldVersionModel.value() ? 100.0 : 200.0;
+		float velocityAdjust = m_isOldVersionModel.value() ? 100.0 : 200.0;
 		const float vel = _n->getVolume() / velocityAdjust;
 
 		// critical section as STK is not thread-safe
@@ -281,42 +265,21 @@ void malletsInstrument::playNote(NotePlayHandle* _n,
 		m.lock();
 		if (p < 9)
 		{
-			_n->m_pluginData = new malletsSynth(freq,
-				vel,
-				m_stickModel.value(),
-				m_hardnessModel.value(),
-				m_positionModel.value(),
-				m_vibratoGainModel.value(),
-				m_vibratoFreqModel.value(),
-				p,
-				(uint8_t)m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate());
+			_n->m_pluginData = new malletsSynth(freq, vel, m_stickModel.value(), m_hardnessModel.value(),
+				m_positionModel.value(), m_vibratoGainModel.value(), m_vibratoFreqModel.value(), p,
+				(uint8_t)m_spreadModel.value(), Engine::mixer()->processingSampleRate());
 		}
 		else if (p == 9)
 		{
-			_n->m_pluginData = new malletsSynth(freq,
-				vel,
-				p,
-				m_lfoDepthModel.value(),
-				m_modulatorModel.value(),
-				m_crossfadeModel.value(),
-				m_lfoSpeedModel.value(),
-				m_adsrModel.value(),
-				(uint8_t)m_spreadModel.value(),
+			_n->m_pluginData = new malletsSynth(freq, vel, p, m_lfoDepthModel.value(), m_modulatorModel.value(),
+				m_crossfadeModel.value(), m_lfoSpeedModel.value(), m_adsrModel.value(), (uint8_t)m_spreadModel.value(),
 				Engine::mixer()->processingSampleRate());
 		}
 		else
 		{
-			_n->m_pluginData = new malletsSynth(freq,
-				vel,
-				m_pressureModel.value(),
-				m_motionModel.value(),
-				m_vibratoModel.value(),
-				p - 10,
-				m_strikeModel.value() * 128.0,
-				m_velocityModel.value(),
-				(uint8_t)m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate());
+			_n->m_pluginData = new malletsSynth(freq, vel, m_pressureModel.value(), m_motionModel.value(),
+				m_vibratoModel.value(), p - 10, m_strikeModel.value() * 128.0, m_velocityModel.value(),
+				(uint8_t)m_spreadModel.value(), Engine::mixer()->processingSampleRate());
 		}
 		m.unlock();
 		static_cast<malletsSynth*>(_n->m_pluginData)->setPresetIndex(p);
@@ -337,10 +300,8 @@ void malletsInstrument::playNote(NotePlayHandle* _n,
 
 	for (fpp_t frame = offset; frame < frames + offset; ++frame)
 	{
-		_working_buffer[frame][0] = ps->nextSampleLeft() *
-			(m_scalers[p] + add_scale);
-		_working_buffer[frame][1] = ps->nextSampleRight() *
-			(m_scalers[p] + add_scale);
+		_working_buffer[frame][0] = ps->nextSampleLeft() * (m_scalers[p] + add_scale);
+		_working_buffer[frame][1] = ps->nextSampleRight() * (m_scalers[p] + add_scale);
 	}
 
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
@@ -351,13 +312,9 @@ void malletsInstrument::deleteNotePluginData(NotePlayHandle* _n)
 	delete static_cast<malletsSynth*>(_n->m_pluginData);
 }
 
-PluginView* malletsInstrument::instantiateView(QWidget* _parent)
-{
-	return (new malletsInstrumentView(this, _parent));
-}
+PluginView* malletsInstrument::instantiateView(QWidget* _parent) { return (new malletsInstrumentView(this, _parent)); }
 
-malletsInstrumentView::malletsInstrumentView(malletsInstrument* _instrument,
-	QWidget* _parent)
+malletsInstrumentView::malletsInstrumentView(malletsInstrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 	m_modalBarWidget = setupModalBarControls(this);
@@ -378,8 +335,7 @@ malletsInstrumentView::malletsInstrumentView(malletsInstrument* _instrument,
 	m_presetsCombo->setGeometry(140, 50, 99, ComboBox::DEFAULT_HEIGHT);
 	m_presetsCombo->setFont(pointSize<8>(m_presetsCombo->font()));
 
-	connect(&_instrument->m_presetsModel, SIGNAL(dataChanged()),
-		this, SLOT(changePreset()));
+	connect(&_instrument->m_presetsModel, SIGNAL(dataChanged()), this, SLOT(changePreset()));
 
 	m_spreadKnob = new Knob(knobVintage_32, this);
 	m_spreadKnob->setLabel(tr("Spread"));
@@ -397,16 +353,13 @@ malletsInstrumentView::malletsInstrumentView(malletsInstrument* _instrument,
 	}
 }
 
-malletsInstrumentView::~malletsInstrumentView()
-{
-}
+malletsInstrumentView::~malletsInstrumentView() {}
 
 void malletsInstrumentView::setWidgetBackground(QWidget* _widget, const QString& _pic)
 {
 	_widget->setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush(_widget->backgroundRole(),
-		PLUGIN_NAME::getIconPixmap(_pic.toLatin1().constData()));
+	pal.setBrush(_widget->backgroundRole(), PLUGIN_NAME::getIconPixmap(_pic.toLatin1().constData()));
 	_widget->setPalette(pal);
 }
 
@@ -556,16 +509,9 @@ void malletsInstrumentView::changePreset()
 }
 
 // ModalBar
-malletsSynth::malletsSynth(const StkFloat _pitch,
-	const StkFloat _velocity,
-	const StkFloat _control1,
-	const StkFloat _control2,
-	const StkFloat _control4,
-	const StkFloat _control8,
-	const StkFloat _control11,
-	const int _control16,
-	const uint8_t _delay,
-	const sample_rate_t _sample_rate)
+malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const StkFloat _control1,
+	const StkFloat _control2, const StkFloat _control4, const StkFloat _control8, const StkFloat _control11,
+	const int _control16, const uint8_t _delay, const sample_rate_t _sample_rate)
 	: m_presetIndex(0)
 {
 	try
@@ -603,16 +549,9 @@ malletsSynth::malletsSynth(const StkFloat _pitch,
 }
 
 // TubeBell
-malletsSynth::malletsSynth(const StkFloat _pitch,
-	const StkFloat _velocity,
-	const int _preset,
-	const StkFloat _control1,
-	const StkFloat _control2,
-	const StkFloat _control4,
-	const StkFloat _control11,
-	const StkFloat _control128,
-	const uint8_t _delay,
-	const sample_rate_t _sample_rate)
+malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const int _preset, const StkFloat _control1,
+	const StkFloat _control2, const StkFloat _control4, const StkFloat _control11, const StkFloat _control128,
+	const uint8_t _delay, const sample_rate_t _sample_rate)
 	: m_presetIndex(0)
 {
 	try
@@ -648,16 +587,9 @@ malletsSynth::malletsSynth(const StkFloat _pitch,
 }
 
 // BandedWG
-malletsSynth::malletsSynth(const StkFloat _pitch,
-	const StkFloat _velocity,
-	const StkFloat _control2,
-	const StkFloat _control4,
-	const StkFloat _control11,
-	const int _control16,
-	const StkFloat _control64,
-	const StkFloat _control128,
-	const uint8_t _delay,
-	const sample_rate_t _sample_rate)
+malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const StkFloat _control2,
+	const StkFloat _control4, const StkFloat _control11, const int _control16, const StkFloat _control64,
+	const StkFloat _control128, const uint8_t _delay, const sample_rate_t _sample_rate)
 	: m_presetIndex(0)
 {
 	try

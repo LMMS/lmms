@@ -1,8 +1,8 @@
 /*
 	Click.h
-	
+
 	Copyright 2004-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	units perpetually repeating a recorded sample.
@@ -31,8 +31,7 @@
 #include "dsp/OnePole.h"
 #include "dsp/util.h"
 
-class ClickStub
-	: public Plugin
+class ClickStub : public Plugin
 {
 public:
 	sample_t bpm;
@@ -45,8 +44,7 @@ public:
 	int period; /* frames remaining in period */
 	int played; /* frames played from sample */
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -59,26 +57,18 @@ public:
 		period = 0;
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class Click
-	: public ClickStub
+class Click : public ClickStub
 {
 public:
 	void init();
 };
 
-class CEO
-	: public ClickStub
+class CEO : public ClickStub
 {
 public:
 	void init();
@@ -86,8 +76,7 @@ public:
 	static PortInfo port_info[];
 };
 
-class Dirac
-	: public ClickStub
+class Dirac : public ClickStub
 {
 public:
 	void init();

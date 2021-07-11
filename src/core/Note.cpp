@@ -2,7 +2,7 @@
  * Note.cpp - implementation of class note
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -29,9 +29,8 @@
 
 #include "DetuningHelper.h"
 
-Note::Note(const TimePos& length, const TimePos& pos,
-	int key, volume_t volume, panning_t panning,
-	DetuningHelper* detuning)
+Note::Note(
+	const TimePos& length, const TimePos& pos, int key, volume_t volume, panning_t panning, DetuningHelper* detuning)
 	: m_selected(false)
 	, m_oldKey(qBound(0, key, NumKeys))
 	, m_oldPos(pos)
@@ -82,15 +81,9 @@ Note::~Note()
 	}
 }
 
-void Note::setLength(const TimePos& length)
-{
-	m_length = length;
-}
+void Note::setLength(const TimePos& length) { m_length = length; }
 
-void Note::setPos(const TimePos& pos)
-{
-	m_pos = pos;
-}
+void Note::setPos(const TimePos& pos) { m_pos = pos; }
 
 void Note::setKey(const int key)
 {
@@ -129,10 +122,7 @@ void Note::quantizeLength(const int qGrid)
 	}
 }
 
-void Note::quantizePos(const int qGrid)
-{
-	setPos(quantized(pos(), qGrid));
-}
+void Note::quantizePos(const int qGrid) { setPos(quantized(pos(), qGrid)); }
 
 void Note::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
@@ -175,10 +165,7 @@ void Note::createDetuning()
 	}
 }
 
-bool Note::hasDetuningInfo() const
-{
-	return m_detuning && m_detuning->hasAutomation();
-}
+bool Note::hasDetuningInfo() const { return m_detuning && m_detuning->hasAutomation(); }
 
 bool Note::withinRange(int tickStart, int tickEnd) const
 {

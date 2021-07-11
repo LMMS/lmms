@@ -2,7 +2,7 @@
  * LfoController.h - A LFO-based controller and dialog
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or

@@ -131,7 +131,7 @@ SampleBuffer::SampleBuffer(const SampleBuffer& orig)
 	m_frequency = orig.m_frequency;
 	m_sampleRate = orig.m_sampleRate;
 
-	//Deep copy m_origData and m_data from original
+	// Deep copy m_origData and m_data from original
 	const auto origFrameBytes = m_origFrames * BYTES_PER_FRAME;
 	const auto frameBytes = m_frames * BYTES_PER_FRAME;
 	if (orig.m_origData != nullptr && origFrameBytes > 0)
@@ -197,15 +197,9 @@ SampleBuffer::~SampleBuffer()
 	MM_FREE(m_data);
 }
 
-void SampleBuffer::sampleRateChanged()
-{
-	update(true);
-}
+void SampleBuffer::sampleRateChanged() { update(true); }
 
-sample_rate_t SampleBuffer::mixerSampleRate()
-{
-	return Engine::mixer()->processingSampleRate();
-}
+sample_rate_t SampleBuffer::mixerSampleRate() { return Engine::mixer()->processingSampleRate(); }
 
 void SampleBuffer::update(bool keepSettings)
 {
@@ -339,8 +333,7 @@ void SampleBuffer::update(bool keepSettings)
 							  .arg(sampleLengthMax);
 		if (gui)
 		{
-			QMessageBox::information(nullptr,
-				title, message, QMessageBox::Ok);
+			QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
 		}
 		else
 		{
@@ -349,10 +342,7 @@ void SampleBuffer::update(bool keepSettings)
 	}
 }
 
-void SampleBuffer::convertIntToFloat(
-	int_sample_t*& ibuf,
-	f_cnt_t frames,
-	int channels)
+void SampleBuffer::convertIntToFloat(int_sample_t*& ibuf, f_cnt_t frames, int channels)
 {
 	// following code transforms int-samples into float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
@@ -372,10 +362,7 @@ void SampleBuffer::convertIntToFloat(
 	delete[] ibuf;
 }
 
-void SampleBuffer::directFloatWrite(
-	sample_t*& fbuf,
-	f_cnt_t frames,
-	int channels)
+void SampleBuffer::directFloatWrite(sample_t*& fbuf, f_cnt_t frames, int channels)
 {
 
 	m_data = MM_ALLOC(sampleFrame, frames);
@@ -428,11 +415,7 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 	}
 }
 
-f_cnt_t SampleBuffer::decodeSampleSF(
-	QString fileName,
-	sample_t*& buf,
-	ch_cnt_t& channels,
-	sample_rate_t& samplerate)
+f_cnt_t SampleBuffer::decodeSampleSF(QString fileName, sample_t*& buf, ch_cnt_t& channels, sample_rate_t& samplerate)
 {
 	SNDFILE* sndFile;
 	SF_INFO sfInfo;
@@ -472,7 +455,7 @@ f_cnt_t SampleBuffer::decodeSampleSF(
 	}
 	f.close();
 
-	//write down either directly or convert i->f depending on file type
+	// write down either directly or convert i->f depending on file type
 
 	if (frames > 0 && buf != nullptr)
 	{
@@ -516,23 +499,12 @@ int qfileCloseCallback(void* udata)
 	return 0;
 }
 
-long qfileTellCallback(void* udata)
-{
-	return static_cast<QFile*>(udata)->pos();
-}
+long qfileTellCallback(void* udata) { return static_cast<QFile*>(udata)->pos(); }
 
 f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
-	QString fileName,
-	int_sample_t*& buf,
-	ch_cnt_t& channels,
-	sample_rate_t& samplerate)
+	QString fileName, int_sample_t*& buf, ch_cnt_t& channels, sample_rate_t& samplerate)
 {
-	static ov_callbacks callbacks =
-		{
-			qfileReadCallback,
-			qfileSeekCallback,
-			qfileCloseCallback,
-			qfileTellCallback};
+	static ov_callbacks callbacks = {qfileReadCallback, qfileSeekCallback, qfileCloseCallback, qfileTellCallback};
 
 	OggVorbis_File vf;
 
@@ -589,13 +561,8 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 
 	do
 	{
-		bytesRead = ov_read(&vf,
-			(char*)&buf[frames * channels],
-			(total - frames) * channels * BYTES_PER_INT_SAMPLE,
-			isLittleEndian() ? 0 : 1,
-			BYTES_PER_INT_SAMPLE,
-			1,
-			&bitstream);
+		bytesRead = ov_read(&vf, (char*)&buf[frames * channels], (total - frames) * channels * BYTES_PER_INT_SAMPLE,
+			isLittleEndian() ? 0 : 1, BYTES_PER_INT_SAMPLE, 1, &bitstream);
 
 		if (bytesRead < 0)
 		{
@@ -617,10 +584,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 #endif
 
 f_cnt_t SampleBuffer::decodeSampleDS(
-	QString fileName,
-	int_sample_t*& buf,
-	ch_cnt_t& channels,
-	sample_rate_t& samplerate)
+	QString fileName, int_sample_t*& buf, ch_cnt_t& channels, sample_rate_t& samplerate)
 {
 	DrumSynth ds;
 	f_cnt_t frames = ds.GetDSFileSamples(fileName, buf, channels, samplerate);
@@ -634,11 +598,7 @@ f_cnt_t SampleBuffer::decodeSampleDS(
 }
 
 bool SampleBuffer::play(
-	sampleFrame* ab,
-	handleState* state,
-	const fpp_t frames,
-	const float freq,
-	const LoopMode loopMode)
+	sampleFrame* ab, handleState* state, const fpp_t frames, const float freq, const LoopMode loopMode)
 {
 	f_cnt_t startFrame = m_startFrame;
 	f_cnt_t endFrame = m_endFrame;
@@ -653,12 +613,11 @@ bool SampleBuffer::play(
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool isBackwards = state->isBackwards();
 
-	const double freqFactor = (double)freq / (double)m_frequency *
-		m_sampleRate / Engine::mixer()->processingSampleRate();
+	const double freqFactor =
+		(double)freq / (double)m_frequency * m_sampleRate / Engine::mixer()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
-	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>(
-		(endFrame - startFrame) / freqFactor);
+	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>((endFrame - startFrame) / freqFactor);
 
 	if (totalFramesForCurrentPitch == 0)
 	{
@@ -694,10 +653,9 @@ bool SampleBuffer::play(
 	{
 		SRC_DATA srcData;
 		// Generate output
-		srcData.data_in =
-			getSampleFragment(playFrame, fragmentSize, loopMode, &tmp, &isBackwards,
-				loopStartFrame, loopEndFrame, endFrame)
-				->data();
+		srcData.data_in = getSampleFragment(
+			playFrame, fragmentSize, loopMode, &tmp, &isBackwards, loopStartFrame, loopEndFrame, endFrame)
+							  ->data();
 		srcData.data_out = ab->data();
 		srcData.input_frames = fragmentSize;
 		srcData.output_frames = frames;
@@ -706,13 +664,11 @@ bool SampleBuffer::play(
 		int error = src_process(state->m_resamplingData, &srcData);
 		if (error)
 		{
-			printf("SampleBuffer: error while resampling: %s\n",
-				src_strerror(error));
+			printf("SampleBuffer: error while resampling: %s\n", src_strerror(error));
 		}
 		if (srcData.output_frames_gen > frames)
 		{
-			printf("SampleBuffer: not enough frames: %ld / %d\n",
-				srcData.output_frames_gen, frames);
+			printf("SampleBuffer: not enough frames: %ld / %d\n", srcData.output_frames_gen, frames);
 		}
 		// Advance
 		switch (loopMode)
@@ -750,8 +706,7 @@ bool SampleBuffer::play(
 
 		// Generate output
 		memcpy(ab,
-			getSampleFragment(playFrame, frames, loopMode, &tmp, &isBackwards,
-				loopStartFrame, loopEndFrame, endFrame),
+			getSampleFragment(playFrame, frames, loopMode, &tmp, &isBackwards, loopStartFrame, loopEndFrame, endFrame),
 			frames * BYTES_PER_FRAME);
 		// Advance
 		switch (loopMode)
@@ -800,15 +755,8 @@ bool SampleBuffer::play(
 	return true;
 }
 
-sampleFrame* SampleBuffer::getSampleFragment(
-	f_cnt_t index,
-	f_cnt_t frames,
-	LoopMode loopMode,
-	sampleFrame** tmp,
-	bool* backwards,
-	f_cnt_t loopStart,
-	f_cnt_t loopEnd,
-	f_cnt_t end) const
+sampleFrame* SampleBuffer::getSampleFragment(f_cnt_t index, f_cnt_t frames, LoopMode loopMode, sampleFrame** tmp,
+	bool* backwards, f_cnt_t loopStart, f_cnt_t loopEnd, f_cnt_t end) const
 {
 	if (loopMode == LoopOff)
 	{
@@ -855,9 +803,7 @@ sampleFrame* SampleBuffer::getSampleFragment(
 	else
 	{
 		f_cnt_t pos = index;
-		bool currentBackwards = pos < loopStart
-			? false
-			: *backwards;
+		bool currentBackwards = pos < loopStart ? false : *backwards;
 		f_cnt_t copied = 0;
 
 		if (currentBackwards)
@@ -938,17 +884,10 @@ f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t en
 	const f_cnt_t loopLen = endf - startf;
 	const f_cnt_t loopPos = (index - endf) % (loopLen * 2);
 
-	return (loopPos < loopLen)
-		? endf - loopPos
-		: startf + (loopPos - loopLen);
+	return (loopPos < loopLen) ? endf - loopPos : startf + (loopPos - loopLen);
 }
 
-void SampleBuffer::visualize(
-	QPainter& p,
-	const QRect& dr,
-	const QRect& clip,
-	f_cnt_t fromFrame,
-	f_cnt_t toFrame)
+void SampleBuffer::visualize(QPainter& p, const QRect& dr, const QRect& clip, f_cnt_t fromFrame, f_cnt_t toFrame)
 {
 	if (m_frames == 0)
 	{
@@ -956,7 +895,7 @@ void SampleBuffer::visualize(
 	}
 
 	const bool focusOnRange = toFrame <= m_frames && 0 <= fromFrame && fromFrame < toFrame;
-	//p.setClipRect(clip);
+	// p.setClipRect(clip);
 	const int w = dr.width();
 	const int h = dr.height();
 
@@ -1003,8 +942,7 @@ QString SampleBuffer::openAudioFile() const
 			f = ConfigManager::inst()->userSamplesDir() + f;
 			if (QFileInfo(f).exists() == false)
 			{
-				f = ConfigManager::inst()->factorySamplesDir() +
-					m_audioFile;
+				f = ConfigManager::inst()->factorySamplesDir() + m_audioFile;
 			}
 		}
 		dir = QFileInfo(f).absolutePath();
@@ -1021,16 +959,12 @@ QString SampleBuffer::openAudioFile() const
 	QStringList types;
 	types << tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc "
 				"*.aif *.aiff *.au *.raw)")
-		  << tr("Wave-Files (*.wav)")
-		  << tr("OGG-Files (*.ogg)")
-		  << tr("DrumSynth-Files (*.ds)")
+		  << tr("Wave-Files (*.wav)") << tr("OGG-Files (*.ogg)") << tr("DrumSynth-Files (*.ds)")
 		  << tr("FLAC-Files (*.flac)")
 		  << tr("SPEEX-Files (*.spx)")
 		  //<< tr("MP3-Files (*.mp3)")
 		  //<< tr("MIDI-Files (*.mid)")
-		  << tr("VOC-Files (*.voc)")
-		  << tr("AIFF-Files (*.aif *.aiff)")
-		  << tr("AU-Files (*.au)")
+		  << tr("VOC-Files (*.voc)") << tr("AIFF-Files (*.aif *.aiff)") << tr("AU-Files (*.au)")
 		  << tr("RAW-Files (*.raw)")
 		//<< tr("MOD-Files (*.mod)")
 		;
@@ -1090,12 +1024,8 @@ QString SampleBuffer::openAndSetWaveformFile()
 #undef LMMS_HAVE_FLAC_STREAM_DECODER_H
 
 #ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
-FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
-	const FLAC__StreamEncoder* /*encoder*/,
-	const FLAC__byte buffer[],
-	unsigned int /*samples*/,
-	unsigned int bytes,
-	unsigned int /*currentFrame*/,
+FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(const FLAC__StreamEncoder* /*encoder*/,
+	const FLAC__byte buffer[], unsigned int /*samples*/, unsigned int bytes, unsigned int /*currentFrame*/,
 	void* clientData)
 {
 	/*	if (bytes == 0)
@@ -1108,9 +1038,7 @@ FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
 }
 
 void flacStreamEncoderMetadataCallback(
-	const FLAC__StreamEncoder*,
-	const FLAC__StreamMetadata* metadata,
-	void* clientData)
+	const FLAC__StreamEncoder*, const FLAC__StreamMetadata* metadata, void* clientData)
 {
 	QBuffer* b = static_cast<QBuffer*>(clientData);
 	b->seek(0);
@@ -1129,16 +1057,13 @@ QString& SampleBuffer::toBase64(QString& dst) const
 	FLAC__stream_encoder_set_blocksize(flacEnc, FRAMES_PER_BUF);
 	/*	FLAC__stream_encoder_set_do_exhaustive_model_search(flacEnc, true);
 	FLAC__stream_encoder_set_do_mid_side_stereo(flacEnc, true);*/
-	FLAC__stream_encoder_set_sample_rate(flacEnc,
-		Engine::mixer()->sampleRate());
+	FLAC__stream_encoder_set_sample_rate(flacEnc, Engine::mixer()->sampleRate());
 
 	QBuffer baWriter;
 	baWriter.open(QBuffer::WriteOnly);
 
-	FLAC__stream_encoder_set_write_callback(flacEnc,
-		flacStreamEncoderWriteCallback);
-	FLAC__stream_encoder_set_metadata_callback(flacEnc,
-		flacStreamEncoderMetadataCallback);
+	FLAC__stream_encoder_set_write_callback(flacEnc, flacStreamEncoderWriteCallback);
+	FLAC__stream_encoder_set_metadata_callback(flacEnc, flacStreamEncoderMetadataCallback);
 	FLAC__stream_encoder_set_client_data(flacEnc, &baWriter);
 
 	if (FLAC__stream_encoder_init(flacEnc) != FLAC__STREAM_ENCODER_OK)
@@ -1156,9 +1081,8 @@ QString& SampleBuffer::toBase64(QString& dst) const
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[f * DEFAULT_CHANNELS + ch] = (FLAC__int32)(
-					Mixer::clip(m_data[f + frameCnt][ch]) *
-					OUTPUT_SAMPLE_MULTIPLIER);
+				buf[f * DEFAULT_CHANNELS + ch] =
+					(FLAC__int32)(Mixer::clip(m_data[f + frameCnt][ch]) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 		FLAC__stream_encoder_process_interleaved(flacEnc, buf, remaining);
@@ -1173,8 +1097,7 @@ QString& SampleBuffer::toBase64(QString& dst) const
 
 #else /* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
-	base64::encode((const char*)m_data,
-		m_frames * sizeof(sampleFrame), dst);
+	base64::encode((const char*)m_data, m_frames * sizeof(sampleFrame), dst);
 
 #endif /* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
@@ -1230,14 +1153,9 @@ struct flacStreamDecoderClientData
 };
 
 FLAC__StreamDecoderReadStatus flacStreamDecoderReadCallback(
-	const FLAC__StreamDecoder* /*decoder*/,
-	FLAC__byte* buffer,
-	unsigned int* bytes,
-	void* clientData)
+	const FLAC__StreamDecoder* /*decoder*/, FLAC__byte* buffer, unsigned int* bytes, void* clientData)
 {
-	int res = static_cast<flacStreamDecoderClientData*>(
-		clientData)
-				  ->readBuffer->read((char*)buffer, *bytes);
+	int res = static_cast<flacStreamDecoderClientData*>(clientData)->readBuffer->read((char*)buffer, *bytes);
 
 	if (res > 0)
 	{
@@ -1249,11 +1167,8 @@ FLAC__StreamDecoderReadStatus flacStreamDecoderReadCallback(
 	return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
 }
 
-FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
-	const FLAC__StreamDecoder* /*decoder*/,
-	const FLAC__Frame* frame,
-	const FLAC__int32* const buffer[],
-	void* clientData)
+FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(const FLAC__StreamDecoder* /*decoder*/,
+	const FLAC__Frame* frame, const FLAC__int32* const buffer[], void* clientData)
 {
 	if (frame->header.channels != 2)
 	{
@@ -1270,20 +1185,13 @@ FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
 	const f_cnt_t numberOfFrames = frame->header.blocksize;
 	for (f_cnt_t f = 0; f < numberOfFrames; ++f)
 	{
-		sampleFrame sframe = {buffer[0][f] / OUTPUT_SAMPLE_MULTIPLIER,
-			buffer[1][f] / OUTPUT_SAMPLE_MULTIPLIER};
-		static_cast<flacStreamDecoderClientData*>(
-			clientData)
-			->writeBuffer->write(
-				(const char*)sframe, sizeof(sframe));
+		sampleFrame sframe = {buffer[0][f] / OUTPUT_SAMPLE_MULTIPLIER, buffer[1][f] / OUTPUT_SAMPLE_MULTIPLIER};
+		static_cast<flacStreamDecoderClientData*>(clientData)->writeBuffer->write((const char*)sframe, sizeof(sframe));
 	}
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
-void flacStreamDecoderMetadataCallback(
-	const FLAC__StreamDecoder*,
-	const FLAC__StreamMetadata*,
-	void* /*clientData*/
+void flacStreamDecoderMetadataCallback(const FLAC__StreamDecoder*, const FLAC__StreamMetadata*, void* /*clientData*/
 )
 {
 	printf("stream decoder metadata callback\n");
@@ -1293,9 +1201,7 @@ void flacStreamDecoderMetadataCallback(
 }
 
 void flacStreamDecoderErrorCallback(
-	const FLAC__StreamDecoder*,
-	FLAC__StreamDecoderErrorStatus status,
-	void* /*clientData*/
+	const FLAC__StreamDecoder*, FLAC__StreamDecoderErrorStatus status, void* /*clientData*/
 )
 {
 	printf("error callback! %d\n", status);
@@ -1323,14 +1229,10 @@ void SampleBuffer::loadFromBase64(const QString& data)
 
 	FLAC__StreamDecoder* flacDec = FLAC__stream_decoder_new();
 
-	FLAC__stream_decoder_set_read_callback(flacDec,
-		flacStreamDecoderReadCallback);
-	FLAC__stream_decoder_set_write_callback(flacDec,
-		flacStreamDecoderWriteCallback);
-	FLAC__stream_decoder_set_error_callback(flacDec,
-		flacStreamDecoderErrorCallback);
-	FLAC__stream_decoder_set_metadata_callback(flacDec,
-		flacStreamDecoderMetadataCallback);
+	FLAC__stream_decoder_set_read_callback(flacDec, flacStreamDecoderReadCallback);
+	FLAC__stream_decoder_set_write_callback(flacDec, flacStreamDecoderWriteCallback);
+	FLAC__stream_decoder_set_error_callback(flacDec, flacStreamDecoderErrorCallback);
+	FLAC__stream_decoder_set_metadata_callback(flacDec, flacStreamDecoderMetadataCallback);
 	FLAC__stream_decoder_set_client_data(flacDec, &cdata);
 
 	FLAC__stream_decoder_init(flacDec);
@@ -1365,15 +1267,9 @@ void SampleBuffer::loadFromBase64(const QString& data)
 	update();
 }
 
-void SampleBuffer::setStartFrame(const f_cnt_t s)
-{
-	m_startFrame = s;
-}
+void SampleBuffer::setStartFrame(const f_cnt_t s) { m_startFrame = s; }
 
-void SampleBuffer::setEndFrame(const f_cnt_t e)
-{
-	m_endFrame = e;
-}
+void SampleBuffer::setEndFrame(const f_cnt_t e) { m_endFrame = e; }
 
 void SampleBuffer::setAmplification(float a)
 {
@@ -1409,7 +1305,4 @@ SampleBuffer::handleState::handleState(bool varyingPitch, int interpolationMode)
 	}
 }
 
-SampleBuffer::handleState::~handleState()
-{
-	src_delete(m_resamplingData);
-}
+SampleBuffer::handleState::~handleState() { src_delete(m_resamplingData); }

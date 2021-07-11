@@ -101,10 +101,7 @@ protected:
 	void paintEvent(QPaintEvent* pe) override;
 	void resizeEvent(QResizeEvent* re) override;
 
-	QString nodeName() const override
-	{
-		return "trackcontentwidget";
-	}
+	QString nodeName() const override { return "trackcontentwidget"; }
 
 	void saveSettings(QDomDocument& doc, QDomElement& element) override
 	{
@@ -112,10 +109,7 @@ protected:
 		Q_UNUSED(element)
 	}
 
-	void loadSettings(const QDomElement& element) override
-	{
-		Q_UNUSED(element)
-	}
+	void loadSettings(const QDomElement& element) override { Q_UNUSED(element) }
 
 private:
 	Track* getTrack();

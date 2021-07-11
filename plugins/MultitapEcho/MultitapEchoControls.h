@@ -42,23 +42,14 @@ public:
 
 	virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
 	virtual void loadSettings(const QDomElement& elem);
-	inline virtual QString nodeName() const
-	{
-		return ("multitapechocontrols");
-	}
+	inline virtual QString nodeName() const { return ("multitapechocontrols"); }
 
 	void setDefaultAmpShape();
 	void setDefaultLpShape();
 
-	virtual int controlCount()
-	{
-		return (5);
-	}
+	virtual int controlCount() { return (5); }
 
-	virtual EffectControlDialog* createView()
-	{
-		return (new MultitapEchoControlDialog(this));
-	}
+	virtual EffectControlDialog* createView() { return (new MultitapEchoControlDialog(this)); }
 
 private slots:
 	void ampSamplesChanged(int, int);

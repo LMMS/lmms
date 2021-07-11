@@ -32,17 +32,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Dual Filter",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A Dual filter plugin"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Dual Filter",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A Dual filter plugin"), "Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
+		0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 DualFilterEffect::DualFilterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
@@ -135,11 +127,10 @@ bool DualFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		// update filter 1
 		if (enabled1)
 		{
-			//update filter 1 params here
-			// recalculate only when necessary: either cut/res is changed, or the changed-flag is set (filter type or samplerate changed)
-			if (((*cut1Ptr != m_currentCut1 ||
-					*res1Ptr != m_currentRes1)) ||
-				m_filter1changed)
+			// update filter 1 params here
+			// recalculate only when necessary: either cut/res is changed, or the changed-flag is set (filter type or
+			// samplerate changed)
+			if (((*cut1Ptr != m_currentCut1 || *res1Ptr != m_currentRes1)) || m_filter1changed)
 			{
 				m_filter1->calcFilterCoeffs(*cut1Ptr, *res1Ptr);
 				m_filter1changed = false;
@@ -161,10 +152,8 @@ bool DualFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		// update filter 2
 		if (enabled2)
 		{
-			//update filter 2 params here
-			if (((*cut2Ptr != m_currentCut2 ||
-					*res2Ptr != m_currentRes2)) ||
-				m_filter2changed)
+			// update filter 2 params here
+			if (((*cut2Ptr != m_currentCut2 || *res2Ptr != m_currentRes2)) || m_filter2changed)
 			{
 				m_filter2->calcFilterCoeffs(*cut2Ptr, *res2Ptr);
 				m_filter2changed = false;
@@ -174,7 +163,7 @@ bool DualFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			s2[0] = m_filter2->update(s2[0], 0);
 			s2[1] = m_filter2->update(s2[1], 1);
 
-			//apply gain
+			// apply gain
 			s2[0] *= gain2;
 			s2[1] *= gain2;
 
@@ -188,7 +177,7 @@ bool DualFilterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		buf[f][1] = d * buf[f][1] + w * s[1];
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 
-		//increment pointers
+		// increment pointers
 		cut1Ptr += cut1Inc;
 		res1Ptr += res1Inc;
 		gain1Ptr += gain1Inc;

@@ -48,8 +48,7 @@ QString LadspaSubPluginFeatures::displayName(const Plugin::Descriptor::SubPlugin
 	return lm->getName(lkey);
 }
 
-void LadspaSubPluginFeatures::fillDescriptionWidget(QWidget* _parent,
-	const Key* _key) const
+void LadspaSubPluginFeatures::fillDescriptionWidget(QWidget* _parent, const Key* _key) const
 {
 	const ladspa_key_t& lkey = subPluginKeyToLadspaKey(_key);
 	Ladspa2LMMS* lm = Engine::getLADSPAManager();
@@ -95,24 +94,21 @@ void LadspaSubPluginFeatures::fillDescriptionWidget(QWidget* _parent,
 		(lm->hasRealTimeDependency(lkey) ? QWidget::tr("Yes") : QWidget::tr("No")));
 
 	QLabel* realTimeCapable = new QLabel(_parent);
-	realTimeCapable->setText(QWidget::tr("Real Time Capable: ") +
-		(lm->isRealTimeCapable(lkey) ? QWidget::tr("Yes") : QWidget::tr("No")));
+	realTimeCapable->setText(
+		QWidget::tr("Real Time Capable: ") + (lm->isRealTimeCapable(lkey) ? QWidget::tr("Yes") : QWidget::tr("No")));
 
 	QLabel* inplaceBroken = new QLabel(_parent);
-	inplaceBroken->setText(QWidget::tr("In Place Broken: ") +
-		(lm->isInplaceBroken(lkey) ? QWidget::tr("Yes") : QWidget::tr("No")));
+	inplaceBroken->setText(
+		QWidget::tr("In Place Broken: ") + (lm->isInplaceBroken(lkey) ? QWidget::tr("Yes") : QWidget::tr("No")));
 
 	QLabel* channelsIn = new QLabel(_parent);
-	channelsIn->setText(QWidget::tr("Channels In: ") +
-		QString::number(lm->getDescription(lkey)->inputChannels));
+	channelsIn->setText(QWidget::tr("Channels In: ") + QString::number(lm->getDescription(lkey)->inputChannels));
 
 	QLabel* channelsOut = new QLabel(_parent);
-	channelsOut->setText(QWidget::tr("Channels Out: ") +
-		QString::number(lm->getDescription(lkey)->outputChannels));
+	channelsOut->setText(QWidget::tr("Channels Out: ") + QString::number(lm->getDescription(lkey)->outputChannels));
 }
 
-void LadspaSubPluginFeatures::listSubPluginKeys(
-	const Plugin::Descriptor* _desc, KeyList& _kl) const
+void LadspaSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* _desc, KeyList& _kl) const
 {
 	Ladspa2LMMS* lm = Engine::getLADSPAManager();
 
@@ -124,7 +120,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 		break;
 	case Plugin::Effect:
 		plugins = lm->getValidEffects();
-		//plugins += lm->getInvalidEffects();
+		// plugins += lm->getInvalidEffects();
 		break;
 	case Plugin::Tool:
 		plugins = lm->getAnalysisTools();
@@ -136,19 +132,16 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 		break;
 	}
 
-	for (l_sortable_plugin_t::const_iterator it = plugins.begin();
-		 it != plugins.end(); ++it)
+	for (l_sortable_plugin_t::const_iterator it = plugins.begin(); it != plugins.end(); ++it)
 	{
-		if (lm->getDescription((*it).second)->inputChannels <=
-			Engine::mixer()->audioDev()->channels())
+		if (lm->getDescription((*it).second)->inputChannels <= Engine::mixer()->audioDev()->channels())
 		{
 			_kl.push_back(ladspaKeyToSubPluginKey(_desc, (*it).first, (*it).second));
 		}
 	}
 }
 
-ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
-	const Key* _key)
+ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(const Key* _key)
 {
 	QString file = _key->attributes["file"];
 	return (ladspa_key_t(file.remove(QRegExp("\\.so$")).remove(QRegExp("\\.dll$")) +

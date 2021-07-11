@@ -49,55 +49,28 @@ public:
 
 	bool processMessage(const message& _m) override;
 
-	inline bool hasEditor() const
-	{
-		return m_pluginWindowID != 0;
-	}
+	inline bool hasEditor() const { return m_pluginWindowID != 0; }
 
 	/// Same as pluginWidget(), but can be overwritten in sub-classes to modify
 	/// behavior the UI. This is used in VstInstrumentPlugin to wrap the VST UI
 	/// in a QMdiSubWindow
 	virtual QWidget* editor();
 
-	inline const QString& name() const
-	{
-		return m_name;
-	}
+	inline const QString& name() const { return m_name; }
 
-	inline int version() const
-	{
-		return m_version;
-	}
+	inline int version() const { return m_version; }
 
-	inline const QString& vendorString() const
-	{
-		return m_vendorString;
-	}
+	inline const QString& vendorString() const { return m_vendorString; }
 
-	inline const QString& productString() const
-	{
-		return m_productString;
-	}
+	inline const QString& productString() const { return m_productString; }
 
-	inline const QString& currentProgramName() const
-	{
-		return m_currentProgramName;
-	}
+	inline const QString& currentProgramName() const { return m_currentProgramName; }
 
-	inline const QString& allProgramNames() const
-	{
-		return m_allProgramNames;
-	}
+	inline const QString& allProgramNames() const { return m_allProgramNames; }
 
-	inline const QString& allParameterLabels() const
-	{
-		return m_allParameterLabels;
-	}
+	inline const QString& allParameterLabels() const { return m_allParameterLabels; }
 
-	inline const QString& allParameterDisplays() const
-	{
-		return m_allParameterDisplays;
-	}
+	inline const QString& allParameterDisplays() const { return m_allParameterDisplays; }
 
 	int currentProgram();
 
@@ -109,10 +82,7 @@ public:
 	void loadSettings(const QDomElement& _this) override;
 	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 
-	virtual QString nodeName() const override
-	{
-		return "vstplugin";
-	}
+	virtual QString nodeName() const override { return "vstplugin"; }
 
 	virtual void createUI(QWidget* parent);
 	bool eventFilter(QObject* obj, QEvent* event) override;

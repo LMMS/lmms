@@ -31,8 +31,8 @@
 #endif
 
 #ifdef USE_POSIX_TIME
-#include <unistd.h>
 #include <sys/times.h>
+#include <unistd.h>
 #endif
 
 PerfTime::PerfTime()
@@ -40,25 +40,13 @@ PerfTime::PerfTime()
 {
 }
 
-clock_t PerfTime::real() const
-{
-	return m_real;
-}
+clock_t PerfTime::real() const { return m_real; }
 
-clock_t PerfTime::user() const
-{
-	return m_user;
-}
+clock_t PerfTime::user() const { return m_user; }
 
-clock_t PerfTime::system() const
-{
-	return m_system;
-}
+clock_t PerfTime::system() const { return m_system; }
 
-bool PerfTime::valid() const
-{
-	return m_real != -1;
-}
+bool PerfTime::valid() const { return m_real != -1; }
 
 PerfTime PerfTime::now()
 {
@@ -106,15 +94,9 @@ PerfLogTimer::PerfLogTimer(const QString& what)
 	begin();
 }
 
-PerfLogTimer::~PerfLogTimer()
-{
-	end();
-}
+PerfLogTimer::~PerfLogTimer() { end(); }
 
-void PerfLogTimer::begin()
-{
-	begin_time = PerfTime::now();
-}
+void PerfLogTimer::begin() { begin_time = PerfTime::now(); }
 
 void PerfLogTimer::end()
 {
@@ -126,11 +108,8 @@ void PerfLogTimer::end()
 	long clktck = PerfTime::ticksPerSecond();
 
 	PerfTime d = PerfTime::now() - begin_time;
-	qWarning("PERFLOG | %20s | %.2fuser, %.2fsystem %.2felapsed",
-		qPrintable(name),
-		d.user() / (double)clktck,
-		d.system() / (double)clktck,
-		d.real() / (double)clktck);
+	qWarning("PERFLOG | %20s | %.2fuser, %.2fsystem %.2felapsed", qPrintable(name), d.user() / (double)clktck,
+		d.system() / (double)clktck, d.real() / (double)clktck);
 
 	// Invalidate so destructor won't call print another log entry
 	begin_time = PerfTime();

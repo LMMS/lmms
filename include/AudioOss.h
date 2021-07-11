@@ -44,10 +44,7 @@ public:
 	AudioOss(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioOss();
 
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "OSS (Open Sound System)");
-	}
+	inline static QString name() { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "OSS (Open Sound System)"); }
 
 	static QString probeDevice();
 

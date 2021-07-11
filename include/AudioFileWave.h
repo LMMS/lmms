@@ -34,27 +34,18 @@
 class AudioFileWave : public AudioFileDevice
 {
 public:
-	AudioFileWave(OutputSettings const& outputSettings,
-		const ch_cnt_t channels,
-		bool& successful,
-		const QString& file,
+	AudioFileWave(OutputSettings const& outputSettings, const ch_cnt_t channels, bool& successful, const QString& file,
 		Mixer* mixer);
 	virtual ~AudioFileWave();
 
-	static AudioFileDevice* getInst(const QString& outputFilename,
-		OutputSettings const& outputSettings,
-		const ch_cnt_t channels,
-		Mixer* mixer,
-		bool& successful)
+	static AudioFileDevice* getInst(const QString& outputFilename, OutputSettings const& outputSettings,
+		const ch_cnt_t channels, Mixer* mixer, bool& successful)
 	{
-		return new AudioFileWave(outputSettings, channels, successful,
-			outputFilename, mixer);
+		return new AudioFileWave(outputSettings, channels, successful, outputFilename, mixer);
 	}
 
 private:
-	virtual void writeBuffer(const surroundSampleFrame* _ab,
-		const fpp_t _frames,
-		float _master_gain) override;
+	virtual void writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames, float _master_gain) override;
 
 	bool startEncoding();
 	void finishEncoding();

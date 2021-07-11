@@ -2,7 +2,7 @@
  * stereomatrix_controls.cpp - controls for stereoMatrix-effect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -41,21 +41,15 @@ stereoMatrixControls::stereoMatrixControls(stereoMatrixEffect* _eff)
 	m_rlModel.setCenterValue(0);
 	m_rrModel.setCenterValue(0);
 
-	connect(&m_llModel, SIGNAL(dataChanged()),
-		this, SLOT(changeMatrix()));
-	connect(&m_lrModel, SIGNAL(dataChanged()),
-		this, SLOT(changeMatrix()));
-	connect(&m_rlModel, SIGNAL(dataChanged()),
-		this, SLOT(changeMatrix()));
-	connect(&m_rrModel, SIGNAL(dataChanged()),
-		this, SLOT(changeMatrix()));
+	connect(&m_llModel, SIGNAL(dataChanged()), this, SLOT(changeMatrix()));
+	connect(&m_lrModel, SIGNAL(dataChanged()), this, SLOT(changeMatrix()));
+	connect(&m_rlModel, SIGNAL(dataChanged()), this, SLOT(changeMatrix()));
+	connect(&m_rrModel, SIGNAL(dataChanged()), this, SLOT(changeMatrix()));
 
 	changeMatrix();
 }
 
-void stereoMatrixControls::changeMatrix()
-{
-}
+void stereoMatrixControls::changeMatrix() {}
 
 void stereoMatrixControls::loadSettings(const QDomElement& _this)
 {
@@ -65,8 +59,7 @@ void stereoMatrixControls::loadSettings(const QDomElement& _this)
 	m_rrModel.loadSettings(_this, "r-r");
 }
 
-void stereoMatrixControls::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void stereoMatrixControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	m_llModel.saveSettings(_doc, _this, "l-l");
 	m_lrModel.saveSettings(_doc, _this, "l-r");

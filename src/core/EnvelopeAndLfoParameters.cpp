@@ -42,11 +42,9 @@ EnvelopeAndLfoParameters::LfoInstances* EnvelopeAndLfoParameters::s_lfoInstances
 void EnvelopeAndLfoParameters::LfoInstances::trigger()
 {
 	QMutexLocker m(&m_lfoListMutex);
-	for (LfoList::Iterator it = m_lfos.begin();
-		 it != m_lfos.end(); ++it)
+	for (LfoList::Iterator it = m_lfos.begin(); it != m_lfos.end(); ++it)
 	{
-		(*it)->m_lfoFrame +=
-			Engine::mixer()->framesPerPeriod();
+		(*it)->m_lfoFrame += Engine::mixer()->framesPerPeriod();
 		(*it)->m_bad_lfoShapeData = true;
 	}
 }
@@ -54,8 +52,7 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 void EnvelopeAndLfoParameters::LfoInstances::reset()
 {
 	QMutexLocker m(&m_lfoListMutex);
-	for (LfoList::Iterator it = m_lfos.begin();
-		 it != m_lfos.end(); ++it)
+	for (LfoList::Iterator it = m_lfos.begin(); it != m_lfos.end(); ++it)
 	{
 		(*it)->m_lfoFrame = 0;
 		(*it)->m_bad_lfoShapeData = true;
@@ -74,9 +71,7 @@ void EnvelopeAndLfoParameters::LfoInstances::remove(EnvelopeAndLfoParameters* lf
 	m_lfos.removeAll(lfo);
 }
 
-EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
-	float _value_for_zero_amount,
-	Model* _parent)
+EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(float _value_for_zero_amount, Model* _parent)
 	: Model(_parent)
 	, m_used(false)
 	, m_predelayModel(0.0, 0.0, 2.0, 0.001, this, tr("Env pre-delay"))
@@ -95,9 +90,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	, m_rBufSize(0)
 	, m_lfoPredelayModel(0.0, 0.0, 1.0, 0.001, this, tr("LFO pre-delay"))
 	, m_lfoAttackModel(0.0, 0.0, 1.0, 0.001, this, tr("LFO attack"))
-	, m_lfoSpeedModel(0.1, 0.001, 1.0, 0.0001,
-		  SECS_PER_LFO_OSCILLATION * 1000.0, this,
-		  tr("LFO frequency"))
+	, m_lfoSpeedModel(0.1, 0.001, 1.0, 0.0001, SECS_PER_LFO_OSCILLATION * 1000.0, this, tr("LFO frequency"))
 	, m_lfoAmountModel(0.0, -1.0, 1.0, 0.005, this, tr("LFO mod amount"))
 	, m_lfoWaveModel(SineWave, 0, NumLfoShapes, this, tr("LFO wave shape"))
 	, m_x100Model(false, this, tr("LFO frequency x 100"))
@@ -116,39 +109,24 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 
 	instances()->add(this);
 
-	connect(&m_predelayModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_attackModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_holdModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_decayModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_sustainModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_releaseModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_amountModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_predelayModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_attackModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_holdModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_decayModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_sustainModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_releaseModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_amountModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
 
-	connect(&m_lfoPredelayModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_lfoAttackModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_lfoSpeedModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_lfoAmountModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_lfoWaveModel, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
-	connect(&m_x100Model, SIGNAL(dataChanged()),
-		this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoPredelayModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoAttackModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoSpeedModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoAmountModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_lfoWaveModel, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
+	connect(&m_x100Model, SIGNAL(dataChanged()), this, SLOT(updateSampleVars()), Qt::DirectConnection);
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
-		this, SLOT(updateSampleVars()));
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateSampleVars()));
 
-	m_lfoShapeData =
-		new sample_t[Engine::mixer()->framesPerPeriod()];
+	m_lfoShapeData = new sample_t[Engine::mixer()->framesPerPeriod()];
 
 	updateSampleVars();
 }
@@ -226,9 +204,7 @@ void EnvelopeAndLfoParameters::updateLfoShapeData()
 	m_bad_lfoShapeData = false;
 }
 
-inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf,
-	f_cnt_t _frame,
-	const fpp_t _frames)
+inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf, f_cnt_t _frame, const fpp_t _frames)
 {
 	if (m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames)
 	{
@@ -247,8 +223,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf,
 
 	fpp_t offset = 0;
 	const float lafI = 1.0f / qMax(minimumFrames, m_lfoAttackFrames);
-	for (; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
-		 ++_frame)
+	for (; offset < _frames && _frame < m_lfoAttackFrames; ++offset, ++_frame)
 	{
 		*_buf++ = m_lfoShapeData[offset] * _frame * lafI;
 	}
@@ -258,9 +233,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf,
 	}
 }
 
-void EnvelopeAndLfoParameters::fillLevel(float* _buf, f_cnt_t _frame,
-	const f_cnt_t _release_begin,
-	const fpp_t _frames)
+void EnvelopeAndLfoParameters::fillLevel(float* _buf, f_cnt_t _frame, const f_cnt_t _release_begin, const fpp_t _frames)
 {
 	QMutexLocker m(&m_paramMutex);
 
@@ -300,8 +273,7 @@ void EnvelopeAndLfoParameters::fillLevel(float* _buf, f_cnt_t _frame,
 	}
 }
 
-void EnvelopeAndLfoParameters::saveSettings(QDomDocument& _doc,
-	QDomElement& _parent)
+void EnvelopeAndLfoParameters::saveSettings(QDomDocument& _doc, QDomElement& _parent)
 {
 	m_predelayModel.saveSettings(_doc, _parent, "pdel");
 	m_attackModel.saveSettings(_doc, _parent, "att");
@@ -355,25 +327,18 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 {
 	QMutexLocker m(&m_paramMutex);
 
-	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-		Engine::mixer()->processingSampleRate();
+	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT * Engine::mixer()->processingSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
-	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
-		frames_per_env_seg *
-		expKnobVal(m_predelayModel.value()));
+	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_predelayModel.value()));
 
-	const f_cnt_t attack_frames = qMax(minimumFrames,
-		static_cast<f_cnt_t>(frames_per_env_seg *
-			expKnobVal(m_attackModel.value())));
+	const f_cnt_t attack_frames =
+		qMax(minimumFrames, static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_attackModel.value())));
 
-	const f_cnt_t hold_frames = static_cast<f_cnt_t>(frames_per_env_seg *
-		expKnobVal(m_holdModel.value()));
+	const f_cnt_t hold_frames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_holdModel.value()));
 
 	const f_cnt_t decay_frames = qMax(minimumFrames,
-		static_cast<f_cnt_t>(frames_per_env_seg *
-			expKnobVal(m_decayModel.value() *
-				(1 - m_sustainModel.value()))));
+		static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_decayModel.value() * (1 - m_sustainModel.value()))));
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -386,10 +351,8 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 		m_amountAdd = m_valueForZeroAmount;
 	}
 
-	m_pahdFrames = predelay_frames + attack_frames + hold_frames +
-		decay_frames;
-	m_rFrames = static_cast<f_cnt_t>(frames_per_env_seg *
-		expKnobVal(m_releaseModel.value()));
+	m_pahdFrames = predelay_frames + attack_frames + hold_frames + decay_frames;
+	m_rFrames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_releaseModel.value()));
 	m_rFrames = qMax(minimumFrames, m_rFrames);
 
 	if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0)
@@ -456,15 +419,10 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	// save this calculation in real-time-part
 	m_sustainLevel = m_sustainLevel * m_amount + m_amountAdd;
 
-	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-		Engine::mixer()->processingSampleRate();
-	m_lfoPredelayFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation *
-		expKnobVal(m_lfoPredelayModel.value()));
-	m_lfoAttackFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation *
-		expKnobVal(m_lfoAttackModel.value()));
-	m_lfoOscillationFrames = static_cast<f_cnt_t>(
-		frames_per_lfo_oscillation *
-		m_lfoSpeedModel.value());
+	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION * Engine::mixer()->processingSampleRate();
+	m_lfoPredelayFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation * expKnobVal(m_lfoPredelayModel.value()));
+	m_lfoAttackFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation * expKnobVal(m_lfoAttackModel.value()));
+	m_lfoOscillationFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation * m_lfoSpeedModel.value());
 	if (m_x100Model.value())
 	{
 		m_lfoOscillationFrames /= 100;

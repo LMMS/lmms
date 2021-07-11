@@ -2,7 +2,7 @@
  * patches_dialog.cpp - display sf2 patches
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -32,8 +32,7 @@ class patchItem : public QTreeWidgetItem
 {
 public:
 	// Constructor.
-	patchItem(QTreeWidget* pListView,
-		QTreeWidgetItem* pItemAfter)
+	patchItem(QTreeWidget* pListView, QTreeWidgetItem* pItemAfter)
 		: QTreeWidgetItem(pListView, pItemAfter)
 	{
 	}
@@ -76,41 +75,28 @@ patchesDialog::patchesDialog(QWidget* pParent, Qt::WindowFlags wflags)
 	pHeader->setStretchLastSection(true);
 
 	m_progListView->resizeColumnToContents(0); // Prog.
-	//pHeader->resizeSection(1, 200);					// Name.
+	// pHeader->resizeSection(1, 200);					// Name.
 
 	// Initial sort order...
 	m_bankListView->sortItems(0, Qt::AscendingOrder);
 	m_progListView->sortItems(0, Qt::AscendingOrder);
 
 	// UI connections...
-	QObject::connect(m_bankListView,
-		SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
-		SLOT(bankChanged()));
-	QObject::connect(m_progListView,
-		SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+	QObject::connect(
+		m_bankListView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), SLOT(bankChanged()));
+	QObject::connect(m_progListView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
 		SLOT(progChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
-	QObject::connect(m_progListView,
-		SIGNAL(itemActivated(QTreeWidgetItem*, int)),
-		SLOT(accept()));
-	QObject::connect(m_okButton,
-		SIGNAL(clicked()),
-		SLOT(accept()));
-	QObject::connect(m_cancelButton,
-		SIGNAL(clicked()),
-		SLOT(reject()));
+	QObject::connect(m_progListView, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(accept()));
+	QObject::connect(m_okButton, SIGNAL(clicked()), SLOT(accept()));
+	QObject::connect(m_cancelButton, SIGNAL(clicked()), SLOT(reject()));
 }
 
 // Destructor.
-patchesDialog::~patchesDialog()
-{
-}
+patchesDialog::~patchesDialog() {}
 
 // Dialog setup loader.
-void patchesDialog::setup(fluid_synth_t* pSynth, int iChan,
-	const QString& _chanName,
-	LcdSpinBoxModel* _bankModel,
-	LcdSpinBoxModel* _progModel,
-	QLabel* _patchLabel)
+void patchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName, LcdSpinBoxModel* _bankModel,
+	LcdSpinBoxModel* _progModel, QLabel* _patchLabel)
 {
 
 	// We'll going to changes the whole thing...
@@ -192,14 +178,11 @@ void patchesDialog::setup(fluid_synth_t* pSynth, int iChan,
 	m_progListView->scrollToItem(pProgItem);
 
 	// Done with setup...
-	//m_iDirtySetup--;
+	// m_iDirtySetup--;
 }
 
 // Stabilize current state form.
-void patchesDialog::stabilizeForm()
-{
-	m_okButton->setEnabled(validateForm());
-}
+void patchesDialog::stabilizeForm() { m_okButton->setEnabled(validateForm()); }
 
 // Validate form fields.
 bool patchesDialog::validateForm()
@@ -264,8 +247,7 @@ void patchesDialog::reject(void)
 // Find the bank item of given bank number id.
 QTreeWidgetItem* patchesDialog::findBankItem(int iBank)
 {
-	QList<QTreeWidgetItem*> banks = m_bankListView->findItems(
-		QString::number(iBank), Qt::MatchExactly, 0);
+	QList<QTreeWidgetItem*> banks = m_bankListView->findItems(QString::number(iBank), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(banks);
 	if (iter.hasNext())
@@ -277,8 +259,7 @@ QTreeWidgetItem* patchesDialog::findBankItem(int iBank)
 // Find the program item of given program number id.
 QTreeWidgetItem* patchesDialog::findProgItem(int iProg)
 {
-	QList<QTreeWidgetItem*> progs = m_progListView->findItems(
-		QString::number(iProg), Qt::MatchExactly, 0);
+	QList<QTreeWidgetItem*> progs = m_progListView->findItems(QString::number(iProg), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(progs);
 	if (iter.hasNext())
@@ -334,8 +315,8 @@ void patchesDialog::bankChanged(void)
 					{
 						pProgItem->setText(0, QString::number(iProg));
 						pProgItem->setText(1, fluid_preset_get_name(pCurPreset));
-						//pProgItem->setText(2, QString::number(fluid_sfont_get_id(pSoundFont)));
-						//pProgItem->setText(3, QFileInfo(
+						// pProgItem->setText(2, QString::number(fluid_sfont_get_id(pSoundFont)));
+						// pProgItem->setText(3, QFileInfo(
 						//	fluid_sfont_get_name(pSoundFont).baseName());
 					}
 				}

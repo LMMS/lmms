@@ -45,8 +45,7 @@ ControllerConnection::ControllerConnection(Controller* _controller, AutomatableM
 	}
 	else
 	{
-		m_controller = Controller::create(Controller::DummyController,
-			NULL);
+		m_controller = Controller::create(Controller::DummyController, NULL);
 	}
 	s_connections.append(this);
 }
@@ -72,9 +71,7 @@ ControllerConnection::~ControllerConnection()
 	}
 }
 
-void ControllerConnection::setController(int /*_controllerId*/)
-{
-}
+void ControllerConnection::setController(int /*_controllerId*/) {}
 
 void ControllerConnection::setController(Controller* _controller)
 {
@@ -102,16 +99,13 @@ void ControllerConnection::setController(Controller* _controller)
 	if (_controller->type() != Controller::DummyController)
 	{
 		_controller->addConnection(this);
-		QObject::connect(_controller, SIGNAL(valueChanged()),
-			this, SIGNAL(valueChanged()), Qt::DirectConnection);
+		QObject::connect(_controller, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()), Qt::DirectConnection);
 	}
 
-	m_ownsController =
-		(_controller->type() == Controller::MidiController);
+	m_ownsController = (_controller->type() == Controller::MidiController);
 
-	connect(Engine::getSong(), SIGNAL(stopped()),
-		m_controlledModel, SLOT(setUseControllerValue()),
-		Qt::UniqueConnection);
+	connect(
+		Engine::getSong(), SIGNAL(stopped()), m_controlledModel, SLOT(setUseControllerValue()), Qt::UniqueConnection);
 
 	m_controlledModel->setUseControllerValue(true);
 
@@ -119,8 +113,7 @@ void ControllerConnection::setController(Controller* _controller)
 	// to delete the connection
 	if (!m_ownsController)
 	{
-		QObject::connect(_controller, SIGNAL(destroyed()),
-			this, SLOT(deleteConnection()));
+		QObject::connect(_controller, SIGNAL(destroyed()), this, SLOT(deleteConnection()));
 	}
 }
 
@@ -192,7 +185,8 @@ void ControllerConnection::loadSettings(const QDomElement& _this)
 			m_controllerId = -1;
 		}
 
-		if (!Engine::getSong()->isLoadingProject() && m_controllerId != -1 && m_controllerId < Engine::getSong()->controllers().size())
+		if (!Engine::getSong()->isLoadingProject() && m_controllerId != -1 &&
+			m_controllerId < Engine::getSong()->controllers().size())
 		{
 			setController(Engine::getSong()->controllers().at(m_controllerId));
 		}
@@ -203,7 +197,4 @@ void ControllerConnection::loadSettings(const QDomElement& _this)
 	}
 }
 
-void ControllerConnection::deleteConnection()
-{
-	delete this;
-}
+void ControllerConnection::deleteConnection() { delete this; }

@@ -36,10 +36,7 @@ public:
 	JournallingObject();
 	virtual ~JournallingObject();
 
-	inline jo_id_t id() const
-	{
-		return m_id;
-	}
+	inline jo_id_t id() const { return m_id; }
 
 	void saveJournallingState(const bool newState)
 	{
@@ -57,20 +54,13 @@ public:
 
 	void addJournalCheckPoint();
 
-	virtual QDomElement saveState(QDomDocument& _doc,
-		QDomElement& _parent) override;
+	virtual QDomElement saveState(QDomDocument& _doc, QDomElement& _parent) override;
 
 	void restoreState(const QDomElement& _this) override;
 
-	inline bool isJournalling() const
-	{
-		return m_journalling;
-	}
+	inline bool isJournalling() const { return m_journalling; }
 
-	inline void setJournalling(const bool _sr)
-	{
-		m_journalling = _sr;
-	}
+	inline void setJournalling(const bool _sr) { m_journalling = _sr; }
 
 	inline bool testAndSetJournalling(const bool newState)
 	{
@@ -79,10 +69,7 @@ public:
 		return oldJournalling;
 	}
 
-	bool isJournallingStateStackEmpty() const
-	{
-		return m_journallingStateStack.isEmpty();
-	}
+	bool isJournallingStateStackEmpty() const { return m_journallingStateStack.isEmpty(); }
 
 protected:
 	void changeID(jo_id_t _id);

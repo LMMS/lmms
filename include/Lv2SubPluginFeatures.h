@@ -45,16 +45,14 @@ private:
 public:
 	Lv2SubPluginFeatures(Plugin::PluginTypes type);
 
-	void fillDescriptionWidget(
-		QWidget* parent, const Key* k) const override;
+	void fillDescriptionWidget(QWidget* parent, const Key* k) const override;
 
 	QString additionalFileExtensions(const Key& k) const override;
 	QString displayName(const Key& k) const override;
 	QString description(const Key& k) const override;
 	const PixmapLoader* logo(const Key& k) const override;
 
-	void listSubPluginKeys(
-		const Plugin::Descriptor* desc, KeyList& kl) const override;
+	void listSubPluginKeys(const Plugin::Descriptor* desc, KeyList& kl) const override;
 };
 
 #endif // LMMS_HAVE_LV2

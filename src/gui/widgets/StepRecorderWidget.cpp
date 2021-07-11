@@ -25,13 +25,8 @@
 #include "TextFloat.h"
 #include "embed.h"
 
-StepRecorderWidget::StepRecorderWidget(
-	QWidget* parent,
-	const int ppb,
-	const int marginTop,
-	const int marginBottom,
-	const int marginLeft,
-	const int marginRight)
+StepRecorderWidget::StepRecorderWidget(QWidget* parent, const int ppb, const int marginTop, const int marginBottom,
+	const int marginLeft, const int marginRight)
 	: QWidget(parent)
 	, m_marginTop(marginTop)
 	, m_marginBottom(marginBottom)
@@ -49,15 +44,9 @@ StepRecorderWidget::StepRecorderWidget(
 	m_left = m_marginLeft;
 }
 
-void StepRecorderWidget::setPixelsPerBar(int ppb)
-{
-	m_ppb = ppb;
-}
+void StepRecorderWidget::setPixelsPerBar(int ppb) { m_ppb = ppb; }
 
-void StepRecorderWidget::setCurrentPosition(TimePos currentPosition)
-{
-	m_currentPosition = currentPosition;
-}
+void StepRecorderWidget::setCurrentPosition(TimePos currentPosition) { m_currentPosition = currentPosition; }
 
 void StepRecorderWidget::setMargins(const QMargins& qm)
 {
@@ -67,20 +56,11 @@ void StepRecorderWidget::setMargins(const QMargins& qm)
 	m_bottom = qm.bottom();
 }
 
-QMargins StepRecorderWidget::margins()
-{
-	return QMargins(m_left, m_top, m_right, m_bottom);
-}
+QMargins StepRecorderWidget::margins() { return QMargins(m_left, m_top, m_right, m_bottom); }
 
-void StepRecorderWidget::setBottomMargin(const int marginBottom)
-{
-	m_marginBottom = marginBottom;
-}
+void StepRecorderWidget::setBottomMargin(const int marginBottom) { m_marginBottom = marginBottom; }
 
-void StepRecorderWidget::setStartPosition(TimePos pos)
-{
-	m_curStepStartPos = pos;
-}
+void StepRecorderWidget::setStartPosition(TimePos pos) { m_curStepStartPos = pos; }
 
 void StepRecorderWidget::setEndPosition(TimePos pos)
 {
@@ -90,14 +70,11 @@ void StepRecorderWidget::setEndPosition(TimePos pos)
 
 void StepRecorderWidget::showHint()
 {
-	TextFloat::displayMessage(tr("Hint"), tr("Move recording curser using <Left/Right> arrows"),
-		embed::getIconPixmap("hint"));
+	TextFloat::displayMessage(
+		tr("Hint"), tr("Move recording curser using <Left/Right> arrows"), embed::getIconPixmap("hint"));
 }
 
-void StepRecorderWidget::setStepsLength(TimePos stepsLength)
-{
-	m_stepsLength = stepsLength;
-}
+void StepRecorderWidget::setStepsLength(TimePos stepsLength) { m_stepsLength = stepsLength; }
 
 void StepRecorderWidget::paintEvent(QPaintEvent* pe)
 {
@@ -107,7 +84,7 @@ void StepRecorderWidget::paintEvent(QPaintEvent* pe)
 
 	move(0, 0);
 
-	//draw steps ruler
+	// draw steps ruler
 	painter.setPen(m_colorLineEnd);
 
 	TimePos curPos = m_curStepEndPos;
@@ -121,7 +98,7 @@ void StepRecorderWidget::paintEvent(QPaintEvent* pe)
 		x = xCoordOfTick(curPos);
 	}
 
-	//draw current step start/end position lines
+	// draw current step start/end position lines
 	if (m_curStepStartPos != m_curStepEndPos)
 	{
 		drawVerLine(&painter, m_curStepStartPos, m_colorLineStart, m_top, m_bottom);
@@ -129,8 +106,8 @@ void StepRecorderWidget::paintEvent(QPaintEvent* pe)
 
 	drawVerLine(&painter, m_curStepEndPos, m_colorLineEnd, m_top, m_bottom);
 
-	//if the line is adjacent to the keyboard at the left - it cannot be seen.
-	//add another line to make it clearer
+	// if the line is adjacent to the keyboard at the left - it cannot be seen.
+	// add another line to make it clearer
 	if (m_curStepEndPos == 0)
 	{
 		drawVerLine(&painter, xCoordOfTick(m_curStepEndPos) + 1, m_colorLineEnd, m_top, m_bottom);

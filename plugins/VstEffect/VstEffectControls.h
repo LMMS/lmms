@@ -49,10 +49,7 @@ public:
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return "vsteffectcontrols";
-	}
+	inline virtual QString nodeName() const { return "vsteffectcontrols"; }
 
 	virtual int controlCount();
 

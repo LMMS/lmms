@@ -121,7 +121,8 @@ FxLine::FxLine(QWidget* _parent, FxMixerView* _mv, int _channelIndex)
 	proxyWidget->setPos(8, 145);
 
 	connect(m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
-	connect(&Engine::fxMixer()->effectChannel(m_channelIndex)->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(
+		&Engine::fxMixer()->effectChannel(m_channelIndex)->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
 }
 
 FxLine::~FxLine()
@@ -158,8 +159,7 @@ void FxLine::drawFxLine(QPainter* p, const FxLine* fxLine, bool isActive, bool s
 	}
 	else
 	{
-		p->fillRect(fxLine->rect(),
-			isActive ? fxLine->backgroundActive().color() : p->background().color());
+		p->fillRect(fxLine->rect(), isActive ? fxLine->backgroundActive().color() : p->background().color());
 	}
 
 	// inner border
@@ -191,23 +191,19 @@ QString FxLine::elideName(const QString& name)
 
 void FxLine::paintEvent(QPaintEvent*)
 {
-	bool sendToThis = Engine::fxMixer()->channelSendModel(m_mv->currentFxLine()->m_channelIndex, m_channelIndex) != NULL;
-	bool receiveFromThis = Engine::fxMixer()->channelSendModel(m_channelIndex, m_mv->currentFxLine()->m_channelIndex) != NULL;
+	bool sendToThis =
+		Engine::fxMixer()->channelSendModel(m_mv->currentFxLine()->m_channelIndex, m_channelIndex) != NULL;
+	bool receiveFromThis =
+		Engine::fxMixer()->channelSendModel(m_channelIndex, m_mv->currentFxLine()->m_channelIndex) != NULL;
 	QPainter painter;
 	painter.begin(this);
 	drawFxLine(&painter, this, m_mv->currentFxLine() == this, sendToThis, receiveFromThis);
 	painter.end();
 }
 
-void FxLine::mousePressEvent(QMouseEvent*)
-{
-	m_mv->setCurrentFxLine(this);
-}
+void FxLine::mousePressEvent(QMouseEvent*) { m_mv->setCurrentFxLine(this); }
 
-void FxLine::mouseDoubleClickEvent(QMouseEvent*)
-{
-	renameChannel();
-}
+void FxLine::mouseDoubleClickEvent(QMouseEvent*) { renameChannel(); }
 
 void FxLine::contextMenuEvent(QContextMenuEvent*)
 {
@@ -225,11 +221,13 @@ void FxLine::contextMenuEvent(QContextMenuEvent*)
 		contextMenu->addAction(embed::getIconPixmap("cancel"), tr("R&emove channel"), this, SLOT(removeChannel()));
 		contextMenu->addSeparator();
 	}
-	contextMenu->addAction(embed::getIconPixmap("cancel"), tr("Remove &unused channels"), this, SLOT(removeUnusedChannels()));
+	contextMenu->addAction(
+		embed::getIconPixmap("cancel"), tr("Remove &unused channels"), this, SLOT(removeUnusedChannels()));
 	contextMenu->addSeparator();
 	contextMenu->addAction(embed::getIconPixmap("colorize"), tr("Set channel color"), this, SLOT(changeColor()));
 	contextMenu->addAction(embed::getIconPixmap("colorize"), tr("Remove channel color"), this, SLOT(resetColor()));
-	contextMenu->addAction(embed::getIconPixmap("colorize"), tr("Pick random channel color"), this, SLOT(randomColor()));
+	contextMenu->addAction(
+		embed::getIconPixmap("colorize"), tr("Pick random channel color"), this, SLOT(randomColor()));
 	contextMenu->exec(QCursor::pos());
 	delete contextMenu;
 }
@@ -290,55 +288,25 @@ void FxLine::moveChannelRight()
 	mix->moveChannelRight(m_channelIndex);
 }
 
-QBrush FxLine::backgroundActive() const
-{
-	return m_backgroundActive;
-}
+QBrush FxLine::backgroundActive() const { return m_backgroundActive; }
 
-void FxLine::setBackgroundActive(const QBrush& c)
-{
-	m_backgroundActive = c;
-}
+void FxLine::setBackgroundActive(const QBrush& c) { m_backgroundActive = c; }
 
-QColor FxLine::strokeOuterActive() const
-{
-	return m_strokeOuterActive;
-}
+QColor FxLine::strokeOuterActive() const { return m_strokeOuterActive; }
 
-void FxLine::setStrokeOuterActive(const QColor& c)
-{
-	m_strokeOuterActive = c;
-}
+void FxLine::setStrokeOuterActive(const QColor& c) { m_strokeOuterActive = c; }
 
-QColor FxLine::strokeOuterInactive() const
-{
-	return m_strokeOuterInactive;
-}
+QColor FxLine::strokeOuterInactive() const { return m_strokeOuterInactive; }
 
-void FxLine::setStrokeOuterInactive(const QColor& c)
-{
-	m_strokeOuterInactive = c;
-}
+void FxLine::setStrokeOuterInactive(const QColor& c) { m_strokeOuterInactive = c; }
 
-QColor FxLine::strokeInnerActive() const
-{
-	return m_strokeInnerActive;
-}
+QColor FxLine::strokeInnerActive() const { return m_strokeInnerActive; }
 
-void FxLine::setStrokeInnerActive(const QColor& c)
-{
-	m_strokeInnerActive = c;
-}
+void FxLine::setStrokeInnerActive(const QColor& c) { m_strokeInnerActive = c; }
 
-QColor FxLine::strokeInnerInactive() const
-{
-	return m_strokeInnerInactive;
-}
+QColor FxLine::strokeInnerInactive() const { return m_strokeInnerInactive; }
 
-void FxLine::setStrokeInnerInactive(const QColor& c)
-{
-	m_strokeInnerInactive = c;
-}
+void FxLine::setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
 
 // Ask user for a color, and set it as the mixer line color
 void FxLine::changeColor()

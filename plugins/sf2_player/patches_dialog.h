@@ -2,7 +2,7 @@
  * patches_dialog.h - display sf2 patches
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -46,8 +46,8 @@ public:
 	// Destructor.
 	virtual ~patchesDialog();
 
-	void setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName,
-		LcdSpinBoxModel* _bankModel, LcdSpinBoxModel* _progModel, QLabel* _patchLabel);
+	void setup(fluid_synth_t* pSynth, int iChan, const QString& _chanName, LcdSpinBoxModel* _bankModel,
+		LcdSpinBoxModel* _progModel, QLabel* _patchLabel);
 
 public slots:
 
@@ -76,8 +76,8 @@ private:
 	int m_iBank;
 	int m_iProg;
 
-	//int m_iDirtySetup;
-	//int m_iDirtyCount;
+	// int m_iDirtySetup;
+	// int m_iDirtyCount;
 	int m_dirty;
 
 	LcdSpinBoxModel* m_bankModel;

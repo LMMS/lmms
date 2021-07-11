@@ -3,7 +3,7 @@
  *
  * original file by ???
  * modified and enhanced by Tobias Doerffel
- * 
+ *
  * Lowpass_SV code originally from Nekobee, Copyright (C) 2004 Sean Bolton and others
  * adapted & modified for use in LMMS
  *
@@ -42,11 +42,9 @@
 #include "lmms_basics.h"
 #include "lmms_constants.h"
 
-template <ch_cnt_t CHANNELS = DEFAULT_CHANNELS>
-class BasicFilters;
+template <ch_cnt_t CHANNELS = DEFAULT_CHANNELS> class BasicFilters;
 
-template <ch_cnt_t CHANNELS>
-class LinkwitzRiley
+template <ch_cnt_t CHANNELS> class LinkwitzRiley
 {
 	MM_OPERATORS
 public:
@@ -65,10 +63,7 @@ public:
 		}
 	}
 
-	inline void setSampleRate(float sampleRate)
-	{
-		m_sampleRate = sampleRate;
-	}
+	inline void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; }
 
 	inline void setCoeffs(float freq)
 	{
@@ -116,10 +111,8 @@ public:
 
 	inline float update(float in, ch_cnt_t ch)
 	{
-		const double x = in - (m_z1[ch] * m_b1) - (m_z2[ch] * m_b2) -
-			(m_z3[ch] * m_b3) - (m_z4[ch] * m_b4);
-		const double y = (m_a0 * x) + (m_z1[ch] * m_a1) + (m_z2[ch] * m_a2) +
-			(m_z3[ch] * m_a1) + (m_z4[ch] * m_a0);
+		const double x = in - (m_z1[ch] * m_b1) - (m_z2[ch] * m_b2) - (m_z3[ch] * m_b3) - (m_z4[ch] * m_b4);
+		const double y = (m_a0 * x) + (m_z1[ch] * m_a1) + (m_z2[ch] * m_a2) + (m_z3[ch] * m_a1) + (m_z4[ch] * m_a0);
 		m_z4[ch] = m_z3[ch];
 		m_z3[ch] = m_z2[ch];
 		m_z2[ch] = m_z1[ch];
@@ -140,15 +133,11 @@ private:
 };
 typedef LinkwitzRiley<2> StereoLinkwitzRiley;
 
-template <ch_cnt_t CHANNELS>
-class BiQuad
+template <ch_cnt_t CHANNELS> class BiQuad
 {
 	MM_OPERATORS
 public:
-	BiQuad()
-	{
-		clearHistory();
-	}
+	BiQuad() { clearHistory(); }
 	virtual ~BiQuad() {}
 
 	inline void setCoeffs(float a1, float a2, float b0, float b1, float b2)
@@ -184,8 +173,7 @@ private:
 };
 typedef BiQuad<2> StereoBiQuad;
 
-template <ch_cnt_t CHANNELS>
-class OnePole
+template <ch_cnt_t CHANNELS> class OnePole
 {
 	MM_OPERATORS
 public:
@@ -219,8 +207,7 @@ private:
 };
 typedef OnePole<2> StereoOnePole;
 
-template <ch_cnt_t CHANNELS>
-class BasicFilters
+template <ch_cnt_t CHANNELS> class BasicFilters
 {
 	MM_OPERATORS
 public:
@@ -251,15 +238,9 @@ public:
 		NumFilters
 	};
 
-	static inline float minFreq()
-	{
-		return (5.0f);
-	}
+	static inline float minFreq() { return (5.0f); }
 
-	static inline float minQ()
-	{
-		return (0.01f);
-	}
+	static inline float minQ() { return (0.01f); }
 
 	inline void setFilterType(const int _idx)
 	{
@@ -272,14 +253,10 @@ public:
 
 		// Double lowpass mode, backwards-compat for the goofy
 		// Add-NumFilters to signify doubleFilter stuff
-		m_type = _idx == DoubleLowPass
-			? LowPass
-			: Moog;
+		m_type = _idx == DoubleLowPass ? LowPass : Moog;
 		if (m_subFilter == NULL)
 		{
-			m_subFilter = new BasicFilters<CHANNELS>(
-				static_cast<sample_rate_t>(
-					m_sampleRate));
+			m_subFilter = new BasicFilters<CHANNELS>(static_cast<sample_rate_t>(m_sampleRate));
 		}
 		m_subFilter->m_type = m_type;
 	}
@@ -293,10 +270,7 @@ public:
 		clearHistory();
 	}
 
-	inline ~BasicFilters()
-	{
-		delete m_subFilter;
-	}
+	inline ~BasicFilters() { delete m_subFilter; }
 
 	inline void clearHistory()
 	{
@@ -307,9 +281,8 @@ public:
 		for (ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl)
 		{
 			// reset in/out history for moog-filter
-			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] =
-				m_oldx[_chnl] = m_oldy1[_chnl] =
-					m_oldy2[_chnl] = m_oldy3[_chnl] = 0.0f;
+			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] = m_oldx[_chnl] = m_oldy1[_chnl] = m_oldy2[_chnl] =
+				m_oldy3[_chnl] = 0.0f;
 
 			// tripole
 			m_last[_chnl] = 0.0f;
@@ -339,18 +312,10 @@ public:
 
 			// four cascaded onepole filters
 			// (bilinear transform)
-			m_y1[_chnl] = qBound(-10.0f,
-				(x + m_oldx[_chnl]) * m_p - m_k * m_y1[_chnl],
-				10.0f);
-			m_y2[_chnl] = qBound(-10.0f,
-				(m_y1[_chnl] + m_oldy1[_chnl]) * m_p - m_k * m_y2[_chnl],
-				10.0f);
-			m_y3[_chnl] = qBound(-10.0f,
-				(m_y2[_chnl] + m_oldy2[_chnl]) * m_p - m_k * m_y3[_chnl],
-				10.0f);
-			m_y4[_chnl] = qBound(-10.0f,
-				(m_y3[_chnl] + m_oldy3[_chnl]) * m_p - m_k * m_y4[_chnl],
-				10.0f);
+			m_y1[_chnl] = qBound(-10.0f, (x + m_oldx[_chnl]) * m_p - m_k * m_y1[_chnl], 10.0f);
+			m_y2[_chnl] = qBound(-10.0f, (m_y1[_chnl] + m_oldy1[_chnl]) * m_p - m_k * m_y2[_chnl], 10.0f);
+			m_y3[_chnl] = qBound(-10.0f, (m_y2[_chnl] + m_oldy2[_chnl]) * m_p - m_k * m_y3[_chnl], 10.0f);
+			m_y4[_chnl] = qBound(-10.0f, (m_y3[_chnl] + m_oldy3[_chnl]) * m_p - m_k * m_y4[_chnl], 10.0f);
 
 			m_oldx[_chnl] = x;
 			m_oldy1[_chnl] = m_y1[_chnl];
@@ -370,15 +335,9 @@ public:
 				ip += 0.25f;
 				sample_t x = linearInterpolate(m_last[_chnl], _in0, ip) - m_r * m_y3[_chnl];
 
-				m_y1[_chnl] = qBound(-10.0f,
-					(x + m_oldx[_chnl]) * m_p - m_k * m_y1[_chnl],
-					10.0f);
-				m_y2[_chnl] = qBound(-10.0f,
-					(m_y1[_chnl] + m_oldy1[_chnl]) * m_p - m_k * m_y2[_chnl],
-					10.0f);
-				m_y3[_chnl] = qBound(-10.0f,
-					(m_y2[_chnl] + m_oldy2[_chnl]) * m_p - m_k * m_y3[_chnl],
-					10.0f);
+				m_y1[_chnl] = qBound(-10.0f, (x + m_oldx[_chnl]) * m_p - m_k * m_y1[_chnl], 10.0f);
+				m_y2[_chnl] = qBound(-10.0f, (m_y1[_chnl] + m_oldy1[_chnl]) * m_p - m_k * m_y2[_chnl], 10.0f);
+				m_y3[_chnl] = qBound(-10.0f, (m_y2[_chnl] + m_oldy2[_chnl]) * m_p - m_k * m_y3[_chnl], 10.0f);
 				m_oldx[_chnl] = x;
 				m_oldy1[_chnl] = m_y1[_chnl];
 				m_oldy2[_chnl] = m_y2[_chnl];
@@ -410,9 +369,7 @@ public:
 			}
 
 			/* mix filter output into output buffer */
-			return m_type == Lowpass_SV
-				? m_delay4[_chnl]
-				: m_delay3[_chnl];
+			return m_type == Lowpass_SV ? m_delay4[_chnl] : m_delay3[_chnl];
 		}
 
 		case Highpass_SV: {
@@ -557,9 +514,7 @@ public:
 				m_rcbp0[_chnl] = bp;
 
 				// second stage gets the output of the first stage as input...
-				in = m_type == Highpass_RC24
-					? hp + m_rcbp1[_chnl] * m_rcq
-					: bp + m_rcbp1[_chnl] * m_rcq;
+				in = m_type == Highpass_RC24 ? hp + m_rcbp1[_chnl] * m_rcq : bp + m_rcbp1[_chnl] * m_rcq;
 
 				in = qBound(-1.0f, in, 1.0f);
 
@@ -694,12 +649,8 @@ public:
 		// temp coef vars
 		_q = qMax(_q, minQ());
 
-		if (m_type == Lowpass_RC12 ||
-			m_type == Bandpass_RC12 ||
-			m_type == Highpass_RC12 ||
-			m_type == Lowpass_RC24 ||
-			m_type == Bandpass_RC24 ||
-			m_type == Highpass_RC24)
+		if (m_type == Lowpass_RC12 || m_type == Bandpass_RC12 || m_type == Highpass_RC12 || m_type == Lowpass_RC24 ||
+			m_type == Bandpass_RC24 || m_type == Highpass_RC24)
 		{
 			_freq = qBound(50.0f, _freq, 20000.0f);
 			const float sr = m_sampleRatio * 0.25f;
@@ -714,17 +665,14 @@ public:
 			return;
 		}
 
-		if (m_type == Formantfilter ||
-			m_type == FastFormant)
+		if (m_type == Formantfilter || m_type == FastFormant)
 		{
-			_freq = qBound(minFreq(), _freq, 20000.0f); // limit freq and q for not getting bad noise out of the filter...
+			_freq =
+				qBound(minFreq(), _freq, 20000.0f); // limit freq and q for not getting bad noise out of the filter...
 
 			// formats for a, e, i, o, u, a
-			static const float _f[6][2] = {{1000, 1400}, {500, 2300},
-				{320, 3200},
-				{500, 1000},
-				{320, 800},
-				{1000, 1400}};
+			static const float _f[6][2] = {
+				{1000, 1400}, {500, 2300}, {320, 3200}, {500, 1000}, {320, 800}, {1000, 1400}};
 			static const float freqRatio = 4.0f / 14000.0f;
 
 			// Stretch Q/resonance
@@ -751,8 +699,7 @@ public:
 			return;
 		}
 
-		if (m_type == Moog ||
-			m_type == DoubleMoog)
+		if (m_type == Moog || m_type == DoubleMoog)
 		{
 			// [ 0 - 0.5 ]
 			const float f = qBound(minFreq(), _freq, 20000.0f) * m_sampleRatio;
@@ -781,10 +728,7 @@ public:
 			return;
 		}
 
-		if (m_type == Lowpass_SV ||
-			m_type == Bandpass_SV ||
-			m_type == Highpass_SV ||
-			m_type == Notch_SV)
+		if (m_type == Lowpass_SV || m_type == Bandpass_SV || m_type == Highpass_SV || m_type == Notch_SV)
 		{
 			const float f = sinf(qMax(minFreq(), _freq) * m_sampleRatio * F_PI);
 			m_svf1 = qMin(f, 0.825f);

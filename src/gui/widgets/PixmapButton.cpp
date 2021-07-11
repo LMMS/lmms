@@ -3,7 +3,7 @@
  *                     checkboxes/radiobuttons etc)
  *
  * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -41,9 +41,7 @@ PixmapButton::PixmapButton(QWidget* _parent, const QString& _name)
 	setInactiveGraphic(embed::getIconPixmap("led_off"), false);
 }
 
-PixmapButton::~PixmapButton()
-{
-}
+PixmapButton::~PixmapButton() {}
 
 void PixmapButton::paintEvent(QPaintEvent*)
 {

@@ -47,9 +47,7 @@
 #include "ConfigManager.h"
 
 AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
-	: AudioDevice(qBound<ch_cnt_t>(
-					  DEFAULT_CHANNELS,
-					  ConfigManager::inst()->value("audiosndio", "channels").toInt(),
+	: AudioDevice(qBound<ch_cnt_t>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiosndio", "channels").toInt(),
 					  SURROUND_CHANNELS),
 		  _mixer)
 	, m_convertEndian(false)
@@ -82,8 +80,7 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 	m_par.round = mixer()->framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
-	if ((isLittleEndian() && (m_par.le == 0)) ||
-		(!isLittleEndian() && (m_par.le == 1)))
+	if ((isLittleEndian() && (m_par.le == 0)) || (!isLittleEndian() && (m_par.le == 1)))
 	{
 		m_convertEndian = true;
 	}
@@ -101,9 +98,7 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 		return;
 	}
 
-	if (reqpar.pchan != m_par.pchan ||
-		reqpar.bits != m_par.bits ||
-		reqpar.le != m_par.le ||
+	if (reqpar.pchan != m_par.pchan || reqpar.bits != m_par.bits || reqpar.le != m_par.le ||
 		(::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100) / reqpar.rate > 2)
 	{
 		printf("sndio: returned params not as requested\n");
@@ -137,10 +132,7 @@ void AudioSndio::startProcessing(void)
 	}
 }
 
-void AudioSndio::stopProcessing(void)
-{
-	stopProcessingThread(this);
-}
+void AudioSndio::stopProcessing(void) { stopProcessingThread(this); }
 
 void AudioSndio::applyQualitySettings(void)
 {
@@ -156,10 +148,8 @@ void AudioSndio::applyQualitySettings(void)
 
 void AudioSndio::run(void)
 {
-	surroundSampleFrame* temp =
-		new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t* outbuf =
-		new int_sample_t[mixer()->framesPerPeriod() * channels()];
+	surroundSampleFrame* temp = new surroundSampleFrame[mixer()->framesPerPeriod()];
+	int_sample_t* outbuf = new int_sample_t[mixer()->framesPerPeriod() * channels()];
 
 	while (true)
 	{
@@ -169,8 +159,7 @@ void AudioSndio::run(void)
 			break;
 		}
 
-		uint bytes = convertToS16(temp, frames,
-			mixer()->masterGain(), outbuf, m_convertEndian);
+		uint bytes = convertToS16(temp, frames, mixer()->masterGain(), outbuf, m_convertEndian);
 		if (sio_write(m_hdl, outbuf, bytes) != bytes)
 		{
 			break;
@@ -194,9 +183,7 @@ AudioSndio::setupWidget::setupWidget(QWidget* _parent)
 	LcdSpinBoxModel* m = new LcdSpinBoxModel(/* this */);
 	m->setRange(DEFAULT_CHANNELS, SURROUND_CHANNELS);
 	m->setStep(2);
-	m->setValue(ConfigManager::inst()->value("audiosndio",
-										 "channels")
-					.toInt());
+	m->setValue(ConfigManager::inst()->value("audiosndio", "channels").toInt());
 
 	m_channels = new LcdSpinBox(1, this);
 	m_channels->setModel(m);
@@ -204,16 +191,12 @@ AudioSndio::setupWidget::setupWidget(QWidget* _parent)
 	m_channels->move(180, 20);
 }
 
-AudioSndio::setupWidget::~setupWidget()
-{
-}
+AudioSndio::setupWidget::~setupWidget() {}
 
 void AudioSndio::setupWidget::saveSettings(void)
 {
-	ConfigManager::inst()->setValue("audiosndio", "device",
-		m_device->text());
-	ConfigManager::inst()->setValue("audiosndio", "channels",
-		QString::number(m_channels->value<int>()));
+	ConfigManager::inst()->setValue("audiosndio", "device", m_device->text());
+	ConfigManager::inst()->setValue("audiosndio", "channels", QString::number(m_channels->value<int>()));
 }
 
 #endif /* LMMS_HAVE_SNDIO */

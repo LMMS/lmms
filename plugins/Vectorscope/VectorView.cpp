@@ -32,7 +32,8 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
-VectorView::VectorView(VecControls* controls, LocklessRingBuffer<sampleFrame>* inputBuffer, unsigned short displaySize, QWidget* parent)
+VectorView::VectorView(
+	VecControls* controls, LocklessRingBuffer<sampleFrame>* inputBuffer, unsigned short displaySize, QWidget* parent)
 	: QWidget(parent)
 	, m_controls(controls)
 	, m_inputBuffer(inputBuffer)
@@ -240,14 +241,10 @@ void VectorView::paintEvent(QPaintEvent* event)
 	painter.fillRect(displayLeft, displayTop, displayWidth, displayHeight, QColor(0, 0, 0));
 
 	// Draw the final image
-	QImage temp = QImage(m_displayBuffer.data(),
-		activeSize,
-		activeSize,
-		QImage::Format_RGB32);
+	QImage temp = QImage(m_displayBuffer.data(), activeSize, activeSize, QImage::Format_RGB32);
 	temp.setDevicePixelRatio(devicePixelRatio());
-	painter.drawImage(displayLeft, displayTop,
-		temp.scaledToWidth(displayWidth * devicePixelRatio(),
-			Qt::SmoothTransformation));
+	painter.drawImage(
+		displayLeft, displayTop, temp.scaledToWidth(displayWidth * devicePixelRatio(), Qt::SmoothTransformation));
 
 	// Draw the grid and labels
 	painter.setPen(QPen(m_controls->m_colorGrid, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -258,12 +255,10 @@ void VectorView::paintEvent(QPaintEvent* event)
 
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.setFont(boldFont);
-	painter.drawText(displayLeft + margin, displayTop,
-		labelWidth, labelHeight, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
-		QString("L"));
-	painter.drawText(displayRight - margin - labelWidth, displayTop,
-		labelWidth, labelHeight, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
-		QString("R"));
+	painter.drawText(displayLeft + margin, displayTop, labelWidth, labelHeight,
+		Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, QString("L"));
+	painter.drawText(displayRight - margin - labelWidth, displayTop, labelWidth, labelHeight,
+		Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip, QString("R"));
 
 	// Draw the outline
 	painter.setPen(QPen(m_controls->m_colorOutline, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));

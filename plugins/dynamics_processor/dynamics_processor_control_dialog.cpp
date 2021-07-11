@@ -34,14 +34,12 @@
 #include "dynamics_processor_controls.h"
 #include "embed.h"
 
-dynProcControlDialog::dynProcControlDialog(
-	dynProcControls* _controls)
+dynProcControlDialog::dynProcControlDialog(dynProcControls* _controls)
 	: EffectControlDialog(_controls)
 {
 	setAutoFillBackground(true);
 	QPalette pal;
-	pal.setBrush(backgroundRole(),
-		PLUGIN_NAME::getIconPixmap("artwork"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
 	setPalette(pal);
 	setFixedSize(224, 319);
 
@@ -50,8 +48,7 @@ dynProcControlDialog::dynProcControlDialog(
 	waveGraph->setModel(&_controls->m_wavegraphModel);
 	waveGraph->setAutoFillBackground(true);
 	pal = QPalette();
-	pal.setBrush(backgroundRole(),
-		PLUGIN_NAME::getIconPixmap("wavegraph"));
+	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
 	waveGraph->setPalette(pal);
 	waveGraph->setGraphColor(QColor(85, 204, 145));
 	waveGraph->setMaximumSize(204, 205);
@@ -84,7 +81,7 @@ dynProcControlDialog::dynProcControlDialog(
 	releaseKnob->setLabel(tr("RELEASE"));
 	releaseKnob->setHintText(tr("Peak release time:"), "ms");
 
-	//wavegraph control buttons
+	// wavegraph control buttons
 
 	PixmapButton* resetButton = new PixmapButton(this, tr("Reset wavegraph"));
 	resetButton->move(162, 223);
@@ -114,7 +111,7 @@ dynProcControlDialog::dynProcControlDialog(
 	subOneButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("sub1_inactive"));
 	ToolTip::add(subOneButton, tr("Decrease wavegraph amplitude by 1 dB"));
 
-	//stereomode switches
+	// stereomode switches
 	PixmapButton* smMaxButton = new PixmapButton(this, tr("Stereo mode: maximum"));
 	smMaxButton->move(131, 257);
 	smMaxButton->resize(78, 17);
@@ -142,12 +139,8 @@ dynProcControlDialog::dynProcControlDialog(
 	smGroup->addButton(smUnlButton);
 	smGroup->setModel(&_controls->m_stereomodeModel);
 
-	connect(resetButton, SIGNAL(clicked()),
-		_controls, SLOT(resetClicked()));
-	connect(smoothButton, SIGNAL(clicked()),
-		_controls, SLOT(smoothClicked()));
-	connect(addOneButton, SIGNAL(clicked()),
-		_controls, SLOT(addOneClicked()));
-	connect(subOneButton, SIGNAL(clicked()),
-		_controls, SLOT(subOneClicked()));
+	connect(resetButton, SIGNAL(clicked()), _controls, SLOT(resetClicked()));
+	connect(smoothButton, SIGNAL(clicked()), _controls, SLOT(smoothClicked()));
+	connect(addOneButton, SIGNAL(clicked()), _controls, SLOT(addOneClicked()));
+	connect(subOneButton, SIGNAL(clicked()), _controls, SLOT(subOneClicked()));
 }

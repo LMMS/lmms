@@ -44,10 +44,7 @@ public:
 
 	virtual ~SideBarButton() = default;
 
-	Qt::Orientation orientation() const
-	{
-		return m_orientation;
-	}
+	Qt::Orientation orientation() const { return m_orientation; }
 
 	QSize sizeHint() const override
 	{
@@ -88,13 +85,10 @@ SideBar::SideBar(Qt::Orientation _orientation, QWidget* _parent)
 	setIconSize(QSize(16, 16));
 
 	m_btnGroup.setExclusive(false);
-	connect(&m_btnGroup, SIGNAL(buttonClicked(QAbstractButton*)),
-		this, SLOT(toggleButton(QAbstractButton*)));
+	connect(&m_btnGroup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(toggleButton(QAbstractButton*)));
 }
 
-SideBar::~SideBar()
-{
-}
+SideBar::~SideBar() {}
 
 void SideBar::appendTab(SideBarWidget* widget)
 {
@@ -112,8 +106,7 @@ void SideBar::appendTab(SideBarWidget* widget)
 
 	ToolTip::add(button, widget->title());
 
-	connect(widget, &SideBarWidget::closeButtonClicked,
-		[=]() { button->click(); });
+	connect(widget, &SideBarWidget::closeButtonClicked, [=]() { button->click(); });
 }
 
 void SideBar::toggleButton(QAbstractButton* button)

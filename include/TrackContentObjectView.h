@@ -63,15 +63,9 @@ public:
 
 	bool fixedTCOs();
 
-	inline TrackContentObject* getTrackContentObject()
-	{
-		return m_tco;
-	}
+	inline TrackContentObject* getTrackContentObject() { return m_tco; }
 
-	inline TrackView* getTrackView()
-	{
-		return m_trackView;
-	}
+	inline TrackView* getTrackView() { return m_trackView; }
 
 	// qproperty access func
 	QColor mutedColor() const;
@@ -144,9 +138,7 @@ protected:
 	bool m_marker = false;
 	int m_markerPos = 0;
 
-	virtual void constructContextMenu(QMenu*)
-	{
-	}
+	virtual void constructContextMenu(QMenu*) {}
 
 	void contextMenuEvent(QContextMenuEvent* cme) override;
 	void contextMenuAction(ContextMenuAction action);

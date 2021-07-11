@@ -35,23 +35,15 @@ class EqControls : public EffectControls
 	Q_OBJECT
 public:
 	explicit EqControls(EqEffect* effect);
-	virtual ~EqControls()
-	{
-	}
+	virtual ~EqControls() {}
 
 	virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
 
 	virtual void loadSettings(const QDomElement& _this);
 
-	inline virtual QString nodeName() const
-	{
-		return "Eq";
-	}
+	inline virtual QString nodeName() const { return "Eq"; }
 
-	virtual int controlCount()
-	{
-		return 42;
-	}
+	virtual int controlCount() { return 42; }
 
 	virtual EffectControlDialog* createView();
 

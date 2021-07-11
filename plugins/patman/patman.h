@@ -2,7 +2,7 @@
  * patman.h - header for a GUS-compatible patch instrument plugin
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -49,8 +49,7 @@ public:
 	patmanInstrument(InstrumentTrack* _track);
 	virtual ~patmanInstrument();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -60,10 +59,7 @@ public:
 
 	virtual QString nodeName(void) const;
 
-	virtual f_cnt_t desiredReleaseFrames(void) const
-	{
-		return (128);
-	}
+	virtual f_cnt_t desiredReleaseFrames(void) const { return (128); }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 

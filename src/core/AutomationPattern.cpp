@@ -82,8 +82,7 @@ AutomationPattern::AutomationPattern(const AutomationPattern& _pat_to_copy)
 	// doesn't change while it's being copied
 	QMutexLocker m(&_pat_to_copy.m_patternMutex);
 
-	for (timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
-		 it != _pat_to_copy.m_timeMap.end(); ++it)
+	for (timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin(); it != _pat_to_copy.m_timeMap.end(); ++it)
 	{
 		// Copies the automation node (in/out values and in/out tangents)
 		m_timeMap[POS(it)] = it.value();
@@ -126,22 +125,18 @@ bool AutomationPattern::addObject(AutomatableModel* _obj, bool _search_dup)
 
 	m_objects += _obj;
 
-	connect(_obj, SIGNAL(destroyed(jo_id_t)),
-		this, SLOT(objectDestroyed(jo_id_t)),
-		Qt::DirectConnection);
+	connect(_obj, SIGNAL(destroyed(jo_id_t)), this, SLOT(objectDestroyed(jo_id_t)), Qt::DirectConnection);
 
 	emit dataChanged();
 
 	return true;
 }
 
-void AutomationPattern::setProgressionType(
-	ProgressionTypes _new_progression_type)
+void AutomationPattern::setProgressionType(ProgressionTypes _new_progression_type)
 {
 	QMutexLocker m(&m_patternMutex);
 
-	if (_new_progression_type == DiscreteProgression ||
-		_new_progression_type == LinearProgression ||
+	if (_new_progression_type == DiscreteProgression || _new_progression_type == LinearProgression ||
 		_new_progression_type == CubicHermiteProgression)
 	{
 		m_progressionType = _new_progression_type;
@@ -221,10 +216,7 @@ void AutomationPattern::updateLength()
  * @return TimePos of the recently added automation node
  */
 TimePos AutomationPattern::putValue(
-	const TimePos& time,
-	const float value,
-	const bool quantPos,
-	const bool ignoreSurroundingPoints)
+	const TimePos& time, const float value, const bool quantPos, const bool ignoreSurroundingPoints)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -273,12 +265,8 @@ TimePos AutomationPattern::putValue(
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
  * @return TimePos of the recently added automation node
  */
-TimePos AutomationPattern::putValues(
-	const TimePos& time,
-	const float inValue,
-	const float outValue,
-	const bool quantPos,
-	const bool ignoreSurroundingPoints)
+TimePos AutomationPattern::putValues(const TimePos& time, const float inValue, const float outValue,
+	const bool quantPos, const bool ignoreSurroundingPoints)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -420,10 +408,7 @@ void AutomationPattern::recordValue(TimePos time, float value)
  * @return TimePos with current time of the dragged value
  */
 TimePos AutomationPattern::setDragValue(
-	const TimePos& time,
-	const float value,
-	const bool quantPos,
-	const bool controlKey)
+	const TimePos& time, const float value, const bool quantPos, const bool controlKey)
 {
 	QMutexLocker m(&m_patternMutex);
 
@@ -452,7 +437,7 @@ TimePos AutomationPattern::setDragValue(
 		m_dragging = true;
 	}
 
-	//Restore to the state before it the point were being dragged
+	// Restore to the state before it the point were being dragged
 	m_timeMap = m_oldTimeMap;
 
 	generateTangents();
@@ -528,8 +513,7 @@ float AutomationPattern::valueAt(timeMap::const_iterator v, int offset) const
 	}
 	else if (m_progressionType == LinearProgression)
 	{
-		float slope =
-			(INVAL(v + 1) - OUTVAL(v)) / (POS(v + 1) - POS(v));
+		float slope = (INVAL(v + 1) - OUTVAL(v)) / (POS(v + 1) - POS(v));
 
 		return OUTVAL(v) + offset * slope;
 	}
@@ -550,7 +534,8 @@ float AutomationPattern::valueAt(timeMap::const_iterator v, int offset) const
 
 		auto t2 = pow(t, 2);
 		auto t3 = pow(t, 3);
-		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v) + (t3 - 2 * t2 + t) * m1 + (-2 * t3 + 3 * t2) * INVAL(v + 1) + (t3 - t2) * m2;
+		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v) + (t3 - 2 * t2 + t) * m1 + (-2 * t3 + 3 * t2) * INVAL(v + 1) +
+			(t3 - t2) * m2;
 	}
 }
 
@@ -602,10 +587,7 @@ void AutomationPattern::flipY(int min, int max)
 	}
 }
 
-void AutomationPattern::flipY()
-{
-	flipY(getMin(), getMax());
-}
+void AutomationPattern::flipY() { flipY(getMin(), getMax()); }
 
 void AutomationPattern::flipX(int length)
 {
@@ -722,8 +704,7 @@ void AutomationPattern::saveSettings(QDomDocument& _doc, QDomElement& _this)
 		_this.setAttribute("color", color().name());
 	}
 
-	for (timeMap::const_iterator it = m_timeMap.begin();
-		 it != m_timeMap.end(); ++it)
+	for (timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it)
 	{
 		QDomElement element = _doc.createElement("time");
 		element.setAttribute("pos", POS(it));
@@ -732,14 +713,12 @@ void AutomationPattern::saveSettings(QDomDocument& _doc, QDomElement& _this)
 		_this.appendChild(element);
 	}
 
-	for (objectVector::const_iterator it = m_objects.begin();
-		 it != m_objects.end(); ++it)
+	for (objectVector::const_iterator it = m_objects.begin(); it != m_objects.end(); ++it)
 	{
 		if (*it)
 		{
 			QDomElement element = _doc.createElement("object");
-			element.setAttribute("id",
-				ProjectJournal::idToSave((*it)->id()));
+			element.setAttribute("id", ProjectJournal::idToSave((*it)->id()));
 			_this.appendChild(element);
 		}
 	}
@@ -753,14 +732,11 @@ void AutomationPattern::loadSettings(const QDomElement& _this)
 
 	movePosition(_this.attribute("pos").toInt());
 	setName(_this.attribute("name"));
-	setProgressionType(static_cast<ProgressionTypes>(_this.attribute(
-															  "prog")
-														 .toInt()));
+	setProgressionType(static_cast<ProgressionTypes>(_this.attribute("prog").toInt()));
 	setTension(_this.attribute("tens"));
 	setMuted(_this.attribute("mute", QString::number(false)).toInt());
 
-	for (QDomNode node = _this.firstChild(); !node.isNull();
-		 node = node.nextSibling())
+	for (QDomNode node = _this.firstChild(); !node.isNull(); node = node.nextSibling())
 	{
 		QDomElement element = node.toElement();
 		if (element.isNull())
@@ -831,8 +807,7 @@ bool AutomationPattern::isAutomated(const AutomatableModel* _m)
 
 	for (TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it)
 	{
-		if ((*it)->type() == Track::AutomationTrack ||
-			(*it)->type() == Track::HiddenAutomationTrack)
+		if ((*it)->type() == Track::AutomationTrack || (*it)->type() == Track::HiddenAutomationTrack)
 		{
 			const Track::tcoVector& v = (*it)->getTCOs();
 			for (Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j)
@@ -870,8 +845,7 @@ QVector<AutomationPattern*> AutomationPattern::patternsForModel(const Automatabl
 	for (TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it)
 	{
 		// we want only automation tracks...
-		if ((*it)->type() == Track::AutomationTrack ||
-			(*it)->type() == Track::HiddenAutomationTrack)
+		if ((*it)->type() == Track::AutomationTrack || (*it)->type() == Track::HiddenAutomationTrack)
 		{
 			// get patterns in those tracks....
 			const Track::tcoVector& v = (*it)->getTCOs();
@@ -904,8 +878,7 @@ QVector<AutomationPattern*> AutomationPattern::patternsForModel(const Automatabl
 	return patterns;
 }
 
-AutomationPattern* AutomationPattern::globalAutomationPattern(
-	AutomatableModel* _m)
+AutomationPattern* AutomationPattern::globalAutomationPattern(AutomatableModel* _m)
 {
 	AutomationTrack* t = Engine::getSong()->globalAutomationTrack();
 	Track::tcoVector v = t->getTCOs();
@@ -914,8 +887,7 @@ AutomationPattern* AutomationPattern::globalAutomationPattern(
 		AutomationPattern* a = dynamic_cast<AutomationPattern*>(*j);
 		if (a)
 		{
-			for (objectVector::const_iterator k = a->m_objects.begin();
-				 k != a->m_objects.end(); ++k)
+			for (objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k)
 			{
 				if (*k == _m)
 				{
@@ -932,24 +904,19 @@ AutomationPattern* AutomationPattern::globalAutomationPattern(
 
 void AutomationPattern::resolveAllIDs()
 {
-	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-		Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList l = Engine::getSong()->tracks() + Engine::getBBTrackContainer()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
-	for (TrackContainer::TrackList::iterator it = l.begin();
-		 it != l.end(); ++it)
+	for (TrackContainer::TrackList::iterator it = l.begin(); it != l.end(); ++it)
 	{
-		if ((*it)->type() == Track::AutomationTrack ||
-			(*it)->type() == Track::HiddenAutomationTrack)
+		if ((*it)->type() == Track::AutomationTrack || (*it)->type() == Track::HiddenAutomationTrack)
 		{
 			Track::tcoVector v = (*it)->getTCOs();
-			for (Track::tcoVector::iterator j = v.begin();
-				 j != v.end(); ++j)
+			for (Track::tcoVector::iterator j = v.begin(); j != v.end(); ++j)
 			{
 				AutomationPattern* a = dynamic_cast<AutomationPattern*>(*j);
 				if (a)
 				{
-					for (QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
-						 k != a->m_idsToResolve.end(); ++k)
+					for (QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin(); k != a->m_idsToResolve.end(); ++k)
 					{
 						JournallingObject* o = Engine::projectJournal()->journallingObject(*k);
 						if (o && dynamic_cast<AutomatableModel*>(o))
@@ -1004,13 +971,12 @@ void AutomationPattern::objectDestroyed(jo_id_t _id)
 	// pattern of the destroyed object
 	m_idsToResolve += _id;
 
-	for (objectVector::Iterator objIt = m_objects.begin();
-		 objIt != m_objects.end(); objIt++)
+	for (objectVector::Iterator objIt = m_objects.begin(); objIt != m_objects.end(); objIt++)
 	{
 		Q_ASSERT(!(*objIt).isNull());
 		if ((*objIt)->id() == _id)
 		{
-			//Assign to objIt so that this loop work even break; is removed.
+			// Assign to objIt so that this loop work even break; is removed.
 			objIt = m_objects.erase(objIt);
 			break;
 		}
@@ -1036,10 +1002,7 @@ void AutomationPattern::cleanObjects()
 	}
 }
 
-void AutomationPattern::generateTangents()
-{
-	generateTangents(m_timeMap.begin(), m_timeMap.size());
-}
+void AutomationPattern::generateTangents() { generateTangents(m_timeMap.begin(), m_timeMap.size()); }
 
 // We have two tangents, one for the left side of the node and one for the right side
 // of the node (in case we have discrete value jumps in the middle of a curve).

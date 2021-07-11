@@ -71,16 +71,10 @@ public:
 		return *this;
 	}
 
-	inline const float getInValue() const
-	{
-		return m_inValue;
-	}
+	inline const float getInValue() const { return m_inValue; }
 	void setInValue(float value);
 
-	inline const float getOutValue() const
-	{
-		return m_outValue;
-	}
+	inline const float getOutValue() const { return m_outValue; }
 	void setOutValue(float value);
 	void resetOutValue();
 
@@ -88,56 +82,38 @@ public:
 	 * @brief Gets the offset between inValue and outValue
 	 * @return Float representing the offset between inValue and outValue
 	 */
-	inline const float getValueOffset() const
-	{
-		return m_outValue - m_inValue;
-	}
+	inline const float getValueOffset() const { return m_outValue - m_inValue; }
 
 	/**
 	 * @brief Gets the tangent of the left side of the node
 	 * @return Float with the tangent from the inValue side
 	 */
-	inline const float getInTangent() const
-	{
-		return m_inTangent;
-	}
+	inline const float getInTangent() const { return m_inTangent; }
 
 	/**
 	 * @brief Sets the tangent of the left side of the node
 	 * @param Float with the tangent for the inValue side
 	 */
-	inline void setInTangent(float tangent)
-	{
-		m_inTangent = tangent;
-	}
+	inline void setInTangent(float tangent) { m_inTangent = tangent; }
 
 	/**
 	 * @brief Gets the tangent of the right side of the node
 	 * @return Float with the tangent from the outValue side
 	 */
-	inline const float getOutTangent() const
-	{
-		return m_outTangent;
-	}
+	inline const float getOutTangent() const { return m_outTangent; }
 
 	/**
 	 * @brief Sets the tangent of the right side of the node
 	 * @param Float with the tangent for the outValue side
 	 */
-	inline void setOutTangent(float tangent)
-	{
-		m_outTangent = tangent;
-	}
+	inline void setOutTangent(float tangent) { m_outTangent = tangent; }
 
 	/**
 	 * @brief Sets the pattern this node belongs to
 	 * @param AutomationPattern* pattern that m_pattern will be
 	 * set to
 	 */
-	inline void setPattern(AutomationPattern* pat)
-	{
-		m_pattern = pat;
-	}
+	inline void setPattern(AutomationPattern* pat) { m_pattern = pat; }
 
 private:
 	// Pattern that this node belongs to

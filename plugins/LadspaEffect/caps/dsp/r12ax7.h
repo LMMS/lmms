@@ -1,8 +1,8 @@
 /*
 	dsp/r12ax7.h
-	
+
 	Copyright 2003-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	12AX7 voltage transfer function, sampled from a spice simulation

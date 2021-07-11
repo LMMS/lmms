@@ -54,10 +54,7 @@ public:
 	static QFont getWin32SystemFont();
 #endif
 
-	MainWindow* mainWindow()
-	{
-		return m_mainWindow;
-	}
+	MainWindow* mainWindow() { return m_mainWindow; }
 	FxMixerView* fxMixerView() { return m_fxMixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
 	BBEditor* getBBEditor() { return m_bbEditor; }

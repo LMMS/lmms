@@ -3,7 +3,7 @@
  *                         are a wavetable synthesizer
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -41,9 +41,7 @@ class bSynth
 {
 	MM_OPERATORS
 public:
-	bSynth(float* sample, NotePlayHandle* _nph,
-		bool _interpolation, float factor,
-		const sample_rate_t _sample_rate);
+	bSynth(float* sample, NotePlayHandle* _nph, bool _interpolation, float factor, const sample_rate_t _sample_rate);
 	virtual ~bSynth();
 
 	sample_t nextStringSample(float sample_length);
@@ -65,20 +63,15 @@ public:
 	bitInvader(InstrumentTrack* _instrument_track);
 	virtual ~bitInvader();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-	virtual void saveSettings(QDomDocument& _doc,
-		QDomElement& _parent);
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return (64);
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return (64); }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 
@@ -104,13 +97,12 @@ class bitInvaderView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	bitInvaderView(Instrument* _instrument,
-		QWidget* _parent);
+	bitInvaderView(Instrument* _instrument, QWidget* _parent);
 
 	virtual ~bitInvaderView(){};
 
 protected slots:
-	//void sampleSizeChanged( float _new_sample_length );
+	// void sampleSizeChanged( float _new_sample_length );
 
 	void interpolationToggled(bool value);
 	void normalizeToggled(bool value);

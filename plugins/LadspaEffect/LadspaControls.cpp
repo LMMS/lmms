@@ -34,9 +34,7 @@ LadspaControls::LadspaControls(LadspaEffect* _eff)
 	, m_stereoLinkModel(true, this)
 {
 
-	connect(&m_stereoLinkModel, SIGNAL(dataChanged()),
-		this, SLOT(updateLinkStatesFromGlobal()),
-		Qt::DirectConnection);
+	connect(&m_stereoLinkModel, SIGNAL(dataChanged()), this, SLOT(updateLinkStatesFromGlobal()), Qt::DirectConnection);
 
 	multi_proc_t controls = m_effect->getPortControls();
 	m_controlCount = controls.count();
@@ -51,15 +49,13 @@ LadspaControls::LadspaControls(LadspaEffect* _eff)
 		{
 			if ((*it)->proc == proc)
 			{
-				(*it)->control = new LadspaControl(this, *it,
-					linked_control);
+				(*it)->control = new LadspaControl(this, *it, linked_control);
 
 				p.append((*it)->control);
 
 				if (linked_control)
 				{
-					connect((*it)->control, SIGNAL(linkChanged(int, bool)),
-						this, SLOT(linkPort(int, bool)),
+					connect((*it)->control, SIGNAL(linkChanged(int, bool)), this, SLOT(linkPort(int, bool)),
 						Qt::DirectConnection);
 				}
 			}
@@ -71,8 +67,7 @@ LadspaControls::LadspaControls(LadspaEffect* _eff)
 	// now link all controls
 	if (m_processors > 1)
 	{
-		for (multi_proc_t::Iterator it = controls.begin();
-			 it != controls.end(); it++)
+		for (multi_proc_t::Iterator it = controls.begin(); it != controls.end(); it++)
 		{
 			if ((*it)->proc == 0)
 			{
@@ -100,11 +95,9 @@ void LadspaControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
 
 	multi_proc_t controls = m_effect->getPortControls();
 	_this.setAttribute("ports", controls.count());
-	for (multi_proc_t::Iterator it = controls.begin();
-		 it != controls.end(); it++)
+	for (multi_proc_t::Iterator it = controls.begin(); it != controls.end(); it++)
 	{
-		QString n = "port" + QString::number((*it)->proc) +
-			QString::number((*it)->port_id);
+		QString n = "port" + QString::number((*it)->proc) + QString::number((*it)->port_id);
 		(*it)->control->saveSettings(_doc, _this, n);
 	}
 }
@@ -117,11 +110,9 @@ void LadspaControls::loadSettings(const QDomElement& _this)
 	}
 
 	multi_proc_t controls = m_effect->getPortControls();
-	for (multi_proc_t::Iterator it = controls.begin();
-		 it != controls.end(); it++)
+	for (multi_proc_t::Iterator it = controls.begin(); it != controls.end(); it++)
 	{
-		QString n = "port" + QString::number((*it)->proc) +
-			QString::number((*it)->port_id);
+		QString n = "port" + QString::number((*it)->proc) + QString::number((*it)->port_id);
 		(*it)->control->loadSettings(_this, n);
 	}
 }

@@ -37,19 +37,14 @@ class LMMS_EXPORT TabBar : public QWidget
 {
 	Q_OBJECT
 public:
-	TabBar(QWidget* _parent,
-		QBoxLayout::Direction _dir = QBoxLayout::LeftToRight);
+	TabBar(QWidget* _parent, QBoxLayout::Direction _dir = QBoxLayout::LeftToRight);
 	virtual ~TabBar() = default;
 
-	TabButton* addTab(QWidget* _w, const QString& _text,
-		int _id, bool _add_stretch = false,
-		bool _text_is_tooltip = false);
+	TabButton* addTab(
+		QWidget* _w, const QString& _text, int _id, bool _add_stretch = false, bool _text_is_tooltip = false);
 	void removeTab(int _id);
 
-	inline void setExclusive(bool _on)
-	{
-		m_exclusive = _on;
-	}
+	inline void setExclusive(bool _on) { m_exclusive = _on; }
 
 	int activeTab();
 

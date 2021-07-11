@@ -89,8 +89,7 @@ public:
 	TripleOscillator(InstrumentTrack* _track);
 	virtual ~TripleOscillator();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -98,10 +97,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return (128);
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return (128); }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 
@@ -137,14 +133,7 @@ private:
 	struct OscillatorKnobs
 	{
 		MM_OPERATORS
-		OscillatorKnobs(Knob* v,
-			Knob* p,
-			Knob* c,
-			Knob* fl,
-			Knob* fr,
-			Knob* po,
-			Knob* spd,
-			PixmapButton* uwb,
+		OscillatorKnobs(Knob* v, Knob* p, Knob* c, Knob* fl, Knob* fr, Knob* po, Knob* spd, PixmapButton* uwb,
 			automatableButtonGroup* wsbg)
 			: m_volKnob(v)
 			, m_panKnob(p)
@@ -157,9 +146,7 @@ private:
 			, m_waveShapeBtnGrp(wsbg)
 		{
 		}
-		OscillatorKnobs()
-		{
-		}
+		OscillatorKnobs() {}
 		Knob* m_volKnob;
 		Knob* m_panKnob;
 		Knob* m_coarseKnob;

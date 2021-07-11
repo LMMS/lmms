@@ -1,5 +1,5 @@
 /*
- * CrossoverEQ.cpp - A native 4-band Crossover Equalizer 
+ * CrossoverEQ.cpp - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -33,17 +33,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Crossover Equalizer",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A 4-band Crossover Equalizer"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Crossover Equalizer",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A 4-band Crossover Equalizer"),
+		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 }
 
 CrossoverEQEffect::CrossoverEQEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)

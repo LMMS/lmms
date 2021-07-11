@@ -64,7 +64,8 @@ public:
 	const NativeTimeInfo* handleGetTimeInfo() const;
 	void handleUiParameterChanged(const uint32_t index, const float value) const;
 	void handleUiClosed();
-	intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
+	intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value,
+		void* const ptr, const float opt);
 
 	// LMMS functions
 	virtual Flags flags() const;

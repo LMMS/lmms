@@ -43,12 +43,10 @@ public:
 	audioFileProcessor(InstrumentTrack* _instrument_track);
 	virtual ~audioFileProcessor();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-	virtual void saveSettings(QDomDocument& _doc,
-		QDomElement& _parent);
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
 
 	virtual void loadFile(const QString& _file);
@@ -57,10 +55,7 @@ public:
 
 	virtual int getBeatLen(NotePlayHandle* _n) const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return 128;
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return 128; }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 
@@ -170,20 +165,11 @@ public:
 			setFixedSize(37, 47);
 		}
 
-		void setWaveView(const AudioFileProcessorWaveView* _wv)
-		{
-			m_waveView = _wv;
-		}
+		void setWaveView(const AudioFileProcessorWaveView* _wv) { m_waveView = _wv; }
 
-		void setRelatedKnob(const Knob* _knob)
-		{
-			m_relatedKnob = _knob;
-		}
+		void setRelatedKnob(const Knob* _knob) { m_relatedKnob = _knob; }
 
-		void slideBy(double _v, bool _check_bound = true)
-		{
-			slideTo(model()->value() + _v, _check_bound);
-		}
+		void slideBy(double _v, bool _check_bound = true) { slideTo(model()->value() + _v, _check_bound); }
 
 		void slideTo(double _v, bool _check_bound = true);
 
@@ -247,19 +233,13 @@ private:
 	void slideSamplePointByFrames(knobType _point, f_cnt_t _frames, bool _slide_to = false);
 	void slideSampleByFrames(f_cnt_t _frames);
 
-	void slideSamplePointToFrames(knobType _point, f_cnt_t _frames)
-	{
-		slideSamplePointByFrames(_point, _frames, true);
-	}
+	void slideSamplePointToFrames(knobType _point, f_cnt_t _frames) { slideSamplePointByFrames(_point, _frames, true); }
 
 	void updateGraph();
 	void reverse();
 	void updateCursor(QMouseEvent* _me = nullptr);
 
-	static bool isCloseTo(int _a, int _b)
-	{
-		return qAbs(_a - _b) < 4;
-	}
+	static bool isCloseTo(int _a, int _b) { return qAbs(_a - _b) < 4; }
 };
 
 #endif

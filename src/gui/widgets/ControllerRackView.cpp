@@ -63,8 +63,7 @@ ControllerRackView::ControllerRackView()
 	m_addButton = new QPushButton(this);
 	m_addButton->setText(tr("Add"));
 
-	connect(m_addButton, SIGNAL(clicked()),
-		this, SLOT(addController()));
+	connect(m_addButton, SIGNAL(clicked()), this, SLOT(addController()));
 
 	Song* song = Engine::getSong();
 	connect(song, SIGNAL(controllerAdded(Controller*)), SLOT(onControllerAdded(Controller*)));
@@ -89,20 +88,14 @@ ControllerRackView::ControllerRackView()
 	subWin->setMinimumHeight(200);
 }
 
-ControllerRackView::~ControllerRackView()
-{
-}
+ControllerRackView::~ControllerRackView() {}
 
-void ControllerRackView::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void ControllerRackView::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	MainWindow::saveWidgetState(this, _this);
 }
 
-void ControllerRackView::loadSettings(const QDomElement& _this)
-{
-	MainWindow::restoreWidgetState(this, _this);
-}
+void ControllerRackView::loadSettings(const QDomElement& _this) { MainWindow::restoreWidgetState(this, _this); }
 
 void ControllerRackView::deleteController(ControllerView* _view)
 {
@@ -132,8 +125,8 @@ void ControllerRackView::onControllerAdded(Controller* controller)
 
 	ControllerView* controllerView = new ControllerView(controller, scrollAreaWidget);
 
-	connect(controllerView, SIGNAL(deleteController(ControllerView*)),
-		this, SLOT(deleteController(ControllerView*)), Qt::QueuedConnection);
+	connect(controllerView, SIGNAL(deleteController(ControllerView*)), this, SLOT(deleteController(ControllerView*)),
+		Qt::QueuedConnection);
 
 	m_controllerViews.append(controllerView);
 	m_scrollAreaLayout->insertWidget(m_nextIndex, controllerView);
@@ -158,8 +151,7 @@ void ControllerRackView::onControllerRemoved(Controller* removedController)
 
 	if (viewOfRemovedController)
 	{
-		m_controllerViews.erase(std::find(m_controllerViews.begin(),
-			m_controllerViews.end(), viewOfRemovedController));
+		m_controllerViews.erase(std::find(m_controllerViews.begin(), m_controllerViews.end(), viewOfRemovedController));
 
 		delete viewOfRemovedController;
 		--m_nextIndex;

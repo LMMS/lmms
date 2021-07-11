@@ -87,15 +87,14 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	m_windowTitle->setGraphicsEffect(m_shadow);
 
 	// disable the minimize button
-	setWindowFlags(Qt::SubWindow | Qt::WindowMaximizeButtonHint |
-		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
+	setWindowFlags(Qt::SubWindow | Qt::WindowMaximizeButtonHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
 		Qt::CustomizeWindowHint);
 	connect(mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
 }
 
 /**
  * @brief SubWindow::paintEvent
- * 
+ *
  *  This draws our new title bar with custom colors
  *  and draws a window icon on the left upper corner.
  */
@@ -104,9 +103,7 @@ void SubWindow::paintEvent(QPaintEvent*)
 	QPainter p(this);
 	QRect rect(0, 0, width(), m_titleBarHeight);
 
-	bool isActive = mdiArea()
-		? mdiArea()->activeSubWindow() == this
-		: false;
+	bool isActive = mdiArea() ? mdiArea()->activeSubWindow() == this : false;
 
 	p.fillRect(rect, isActive ? activeColor() : p.pen().brush());
 
@@ -128,7 +125,7 @@ void SubWindow::paintEvent(QPaintEvent*)
 
 /**
  * @brief SubWindow::changeEvent
- * 
+ *
  * Triggers if the window title changes and calls adjustTitleBar().
  * @param event
  */
@@ -144,11 +141,11 @@ void SubWindow::changeEvent(QEvent* event)
 
 /**
  * @brief SubWindow::elideText
- * 
+ *
  *  Stores the given text into the given label.
  *  Shorts the text if it's too big for the labels width
  *  ans adds three dots (...)
- * 
+ *
  * @param label - holds a pointer to the QLabel
  * @param text  - the text which will be stored (and if needed breaked down) into the QLabel.
  */
@@ -162,48 +159,27 @@ void SubWindow::elideText(QLabel* label, QString text)
 
 /**
  * @brief SubWindow::getTrueNormalGeometry
- * 
+ *
  *  same as QWidet::normalGeometry, but works properly under X11
  *  see https://bugreports.qt.io/browse/QTBUG-256
  */
-QRect SubWindow::getTrueNormalGeometry() const
-{
-	return m_trackedNormalGeom;
-}
+QRect SubWindow::getTrueNormalGeometry() const { return m_trackedNormalGeom; }
 
-QBrush SubWindow::activeColor() const
-{
-	return m_activeColor;
-}
+QBrush SubWindow::activeColor() const { return m_activeColor; }
 
-QColor SubWindow::textShadowColor() const
-{
-	return m_textShadowColor;
-}
+QColor SubWindow::textShadowColor() const { return m_textShadowColor; }
 
-QColor SubWindow::borderColor() const
-{
-	return m_borderColor;
-}
+QColor SubWindow::borderColor() const { return m_borderColor; }
 
-void SubWindow::setActiveColor(const QBrush& b)
-{
-	m_activeColor = b;
-}
+void SubWindow::setActiveColor(const QBrush& b) { m_activeColor = b; }
 
-void SubWindow::setTextShadowColor(const QColor& c)
-{
-	m_textShadowColor = c;
-}
+void SubWindow::setTextShadowColor(const QColor& c) { m_textShadowColor = c; }
 
-void SubWindow::setBorderColor(const QColor& c)
-{
-	m_borderColor = c;
-}
+void SubWindow::setBorderColor(const QColor& c) { m_borderColor = c; }
 
 /**
  * @brief SubWindow::moveEvent
- * 
+ *
  *  overides the QMdiSubWindow::moveEvent() for saving the position
  *  of the subwindow into m_trackedNormalGeom. This position
  *  will be saved with the project because of an Qt bug wich doesn't
@@ -223,7 +199,7 @@ void SubWindow::moveEvent(QMoveEvent* event)
 
 /**
  * @brief SubWindow::adjustTitleBar
- * 
+ *
  *  Our title bar needs buttons for maximize/restore and close in the right upper corner.
  *  We check if the subwindow is maximizable and put the buttons on the right positions.
  *  At next we calculate the width of the title label and call elideText() for adding
@@ -274,8 +250,7 @@ void SubWindow::adjustTitleBar()
 		// title QLabel adjustments
 		m_windowTitle->setAlignment(Qt::AlignHCenter);
 		m_windowTitle->setFixedWidth(widget()->width() - (menuButtonSpace + buttonBarWidth));
-		m_windowTitle->move(menuButtonSpace,
-			(m_titleBarHeight / 2) - (m_windowTitle->sizeHint().height() / 2) - 1);
+		m_windowTitle->move(menuButtonSpace, (m_titleBarHeight / 2) - (m_windowTitle->sizeHint().height() / 2) - 1);
 
 		// if minimized we can't use widget()->width(). We have to hard code the width,
 		// as the width of all minimized windows is the same.
@@ -306,16 +281,16 @@ void SubWindow::focusChanged(QMdiSubWindow* subWindow)
 
 /**
  * @brief SubWindow::resizeEvent
- * 
+ *
  *  At first we give the event to QMdiSubWindow::resizeEvent() which handles
  *  the event on its behavior.
  *
  *  On every resize event we have to adjust our title label.
- * 
+ *
  *  At last we store the current size into m_trackedNormalGeom. This size
  *  will be saved with the project because of an Qt bug wich doesn't
  *  save the right size. look at: https://bugreports.qt.io/browse/QTBUG-256
- * 
+ *
  * @param event
  */
 void SubWindow::resizeEvent(QResizeEvent* event)

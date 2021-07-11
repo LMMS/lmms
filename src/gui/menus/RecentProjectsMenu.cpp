@@ -14,10 +14,8 @@ RecentProjectsMenu::RecentProjectsMenu(QWidget* parent)
 {
 	setIcon(embed::getIconPixmap("project_open_recent"));
 
-	connect(this, SIGNAL(aboutToShow()),
-		this, SLOT(fillMenu()));
-	connect(this, SIGNAL(triggered(QAction*)),
-		this, SLOT(openProject(QAction*)));
+	connect(this, SIGNAL(aboutToShow()), this, SLOT(fillMenu()));
+	connect(this, SIGNAL(triggered(QAction*)), this, SLOT(openProject(QAction*)));
 }
 
 void RecentProjectsMenu::fillMenu()
@@ -33,8 +31,7 @@ void RecentProjectsMenu::fillMenu()
 	for (QString& fileName : rup)
 	{
 		QFileInfo recentFile(fileName);
-		if (!recentFile.exists() ||
-			fileName == ConfigManager::inst()->recoveryFile())
+		if (!recentFile.exists() || fileName == ConfigManager::inst()->recoveryFile())
 		{
 			continue;
 		}

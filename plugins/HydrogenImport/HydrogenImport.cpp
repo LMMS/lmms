@@ -24,18 +24,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Hydrogen Import",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Filter for importing Hydrogen files into LMMS"),
-			"frank mather",
-			0x0100,
-			Plugin::ImportFilter,
-			NULL,
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Hydrogen Import",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Filter for importing Hydrogen files into LMMS"), "frank mather", 0x0100,
+		Plugin::ImportFilter, NULL, NULL, NULL};
 }
 
 QString filename;
@@ -129,9 +120,7 @@ HydrogenImport::HydrogenImport(const QString& _file)
 	filename = _file;
 }
 
-HydrogenImport::~HydrogenImport()
-{
-}
+HydrogenImport::~HydrogenImport() {}
 Instrument* ins;
 bool HydrogenImport::readSong()
 {
@@ -215,7 +204,8 @@ bool HydrogenImport::readSong()
 
 					if (nLayer == 0)
 					{
-						drum_track[sId] = (InstrumentTrack*)Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer());
+						drum_track[sId] =
+							(InstrumentTrack*)Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer());
 						drum_track[sId]->volumeModel()->setValue(fVolume * 100);
 						drum_track[sId]->panningModel()->setValue((fPan_R - fPan_L) * 100);
 						ins = drum_track[sId]->loadInstrument("audiofileprocessor");
@@ -342,7 +332,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* _data)
 	{
-		return new HydrogenImport(QString::fromUtf8(
-			static_cast<const char*>(_data)));
+		return new HydrogenImport(QString::fromUtf8(static_cast<const char*>(_data)));
 	}
 }

@@ -8,12 +8,6 @@ QTestSuite::QTestSuite(QObject* parent)
 	m_suites << this;
 }
 
-QTestSuite::~QTestSuite()
-{
-	m_suites.removeAll(this);
-}
+QTestSuite::~QTestSuite() { m_suites.removeAll(this); }
 
-QList<QTestSuite*> QTestSuite::suites()
-{
-	return m_suites;
-}
+QList<QTestSuite*> QTestSuite::suites() { return m_suites; }

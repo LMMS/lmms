@@ -2,7 +2,7 @@
  * string_container.cpp - contains a collection of strings
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,10 +24,8 @@
 
 #include "string_container.h"
 
-stringContainer::stringContainer(const float _pitch,
-	const sample_rate_t _sample_rate,
-	const int _buffer_length,
-	const int _strings)
+stringContainer::stringContainer(
+	const float _pitch, const sample_rate_t _sample_rate, const int _buffer_length, const int _strings)
 	: m_pitch(_pitch)
 	, m_sampleRate(_sample_rate)
 	, m_bufferLength(_buffer_length)
@@ -38,15 +36,8 @@ stringContainer::stringContainer(const float _pitch,
 	}
 }
 
-void stringContainer::addString(int _harm,
-	const float _pick,
-	const float _pickup,
-	const float* _impulse,
-	const float _randomize,
-	const float _string_loss,
-	const float _detune,
-	const int _oversample,
-	const bool _state,
+void stringContainer::addString(int _harm, const float _pick, const float _pickup, const float* _impulse,
+	const float _randomize, const float _string_loss, const float _detune, const int _oversample, const bool _state,
 	const int _id)
 {
 	float harm;
@@ -83,16 +74,7 @@ void stringContainer::addString(int _harm,
 		harm = 1.0f;
 	}
 
-	m_strings.append(new vibratingString(m_pitch * harm,
-		_pick,
-		_pickup,
-		const_cast<float*>(_impulse),
-		m_bufferLength,
-		m_sampleRate,
-		_oversample,
-		_randomize,
-		_string_loss,
-		_detune,
-		_state));
+	m_strings.append(new vibratingString(m_pitch * harm, _pick, _pickup, const_cast<float*>(_impulse), m_bufferLength,
+		m_sampleRate, _oversample, _randomize, _string_loss, _detune, _state));
 	m_exists[_id] = true;
 }

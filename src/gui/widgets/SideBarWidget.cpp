@@ -30,8 +30,7 @@
 
 #include "embed.h"
 
-SideBarWidget::SideBarWidget(const QString& _title, const QPixmap& _icon,
-	QWidget* _parent)
+SideBarWidget::SideBarWidget(const QString& _title, const QPixmap& _icon, QWidget* _parent)
 	: QWidget(_parent)
 	, m_title(_title)
 	, m_icon(_icon)
@@ -44,13 +43,10 @@ SideBarWidget::SideBarWidget(const QString& _title, const QPixmap& _icon,
 	m_closeBtn = new QPushButton(embed::getIconPixmap("close"), QString(), this);
 	m_closeBtn->resize(m_buttonSize);
 	m_closeBtn->setToolTip(tr("Close"));
-	connect(m_closeBtn, &QPushButton::clicked,
-		[=]() { this->closeButtonClicked(); });
+	connect(m_closeBtn, &QPushButton::clicked, [=]() { this->closeButtonClicked(); });
 }
 
-SideBarWidget::~SideBarWidget()
-{
-}
+SideBarWidget::~SideBarWidget() {}
 
 void SideBarWidget::paintEvent(QPaintEvent*)
 {
@@ -77,7 +73,6 @@ void SideBarWidget::paintEvent(QPaintEvent*)
 void SideBarWidget::resizeEvent(QResizeEvent*)
 {
 	const int MARGIN = 6;
-	m_contents->setGeometry(MARGIN, 40 + MARGIN, width() - MARGIN * 2,
-		height() - MARGIN * 2 - 40);
+	m_contents->setGeometry(MARGIN, 40 + MARGIN, width() - MARGIN * 2, height() - MARGIN * 2 - 40);
 	m_closeBtn->move(m_contents->geometry().width() - MARGIN - 5, 5);
 }

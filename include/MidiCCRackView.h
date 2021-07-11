@@ -20,10 +20,7 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& parent) override;
 	void loadSettings(const QDomElement&) override;
 
-	inline QString nodeName() const override
-	{
-		return "MidiCCRackView";
-	}
+	inline QString nodeName() const override { return "MidiCCRackView"; }
 
 private slots:
 	void renameWindow();

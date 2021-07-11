@@ -34,8 +34,10 @@ class TempoSyncKnobModel;
 
 class ModelVisitor
 {
-	template <class ParentType = AutomatableModel, class ModelType>
-	void up(ModelType& m) { visit(static_cast<ParentType&>(m)); }
+	template <class ParentType = AutomatableModel, class ModelType> void up(ModelType& m)
+	{
+		visit(static_cast<ParentType&>(m));
+	}
 
 public:
 	virtual void visit(AutomatableModel&) {}
@@ -49,8 +51,7 @@ public:
 
 class ConstModelVisitor
 {
-	template <class ParentType = AutomatableModel, class ModelType>
-	void up(const ModelType& m)
+	template <class ParentType = AutomatableModel, class ModelType> void up(const ModelType& m)
 	{
 		visit(static_cast<const ParentType&>(m));
 	}

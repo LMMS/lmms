@@ -31,10 +31,8 @@
 
 const float FadeDuration = 300;
 
-FadeButton::FadeButton(const QColor& _normal_color,
-	const QColor& _activated_color,
-	const QColor& holdColor,
-	QWidget* _parent)
+FadeButton::FadeButton(
+	const QColor& _normal_color, const QColor& _activated_color, const QColor& holdColor, QWidget* _parent)
 	: QAbstractButton(_parent)
 	, m_stateTimer()
 	, m_releaseTimer()
@@ -48,14 +46,9 @@ FadeButton::FadeButton(const QColor& _normal_color,
 	activeNotes = 0;
 }
 
-FadeButton::~FadeButton()
-{
-}
+FadeButton::~FadeButton() {}
 
-void FadeButton::setActiveColor(const QColor& activated_color)
-{
-	m_activatedColor = activated_color;
-}
+void FadeButton::setActiveColor(const QColor& activated_color) { m_activatedColor = activated_color; }
 
 void FadeButton::activate()
 {

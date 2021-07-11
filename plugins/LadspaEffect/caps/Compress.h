@@ -1,8 +1,8 @@
 /*
 	Compress.h
-	
+
 	Copyright 2004-5 Tim Goetze <tim@quitte.de>, Steve Harris
-	
+
 	http://quitte.de/dsp/
 
 	mono compressor.
@@ -31,8 +31,7 @@
 #include "dsp/RMS.h"
 #include "dsp/util.h"
 
-class Compress
-	: public Plugin
+class Compress : public Plugin
 {
 public:
 	double fs;
@@ -43,8 +42,7 @@ public:
 
 	int count;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -64,15 +62,9 @@ public:
 		gain_t = 0;
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _COMPRESS_H_ */

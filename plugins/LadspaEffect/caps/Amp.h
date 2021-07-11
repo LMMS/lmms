@@ -1,8 +1,8 @@
 /*
 	Amp.h
-	
+
 	Copyright 2002-9 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Oversampled tube amplifier emulation.
@@ -40,8 +40,7 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class AmpStub
-	: public Plugin
+class AmpStub : public Plugin
 {
 public:
 	DSP::TwelveAX7_3 tube;
@@ -53,8 +52,8 @@ public:
 		/* gain (remember current setting and fade to port setting in run) */
 		double g;
 		/* should also do this for temperature to remove another potential
-			 * source of zippering, but that would be overkill, at the cost of
-			 * at least one pow() per block. */
+		 * source of zippering, but that would be overkill, at the cost of
+		 * at least one pow() per block. */
 	} current;
 
 	/* input is hipass-filtered first */
@@ -78,20 +77,15 @@ public:
 
 	void init(bool adjust_downsampler = false);
 
-	inline sample_t power_transfer(sample_t a)
-	{
-		return i_drive * (a - drive * fabs(a) * a);
-	}
+	inline sample_t power_transfer(sample_t a) { return i_drive * (a - drive * fabs(a) * a); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class PreampIII
-	: public AmpStub
+class PreampIII : public AmpStub
 {
 public:
-	template <sample_func_t F, int OVERSAMPLE>
-	void one_cycle(int frames);
+	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
 	DSP::BiQuad filter;
 
@@ -111,25 +105,17 @@ public:
 		dc_blocker.reset();
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func, OVERSAMPLE>(n);
-	}
+	void run(int n) { one_cycle<store_func, OVERSAMPLE>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func, OVERSAMPLE>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func, OVERSAMPLE>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpIII
-	: public AmpStub
+class AmpIII : public AmpStub
 {
 public:
-	template <sample_func_t F, int OVERSAMPLE>
-	void one_cycle(int frames);
+	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
 	DSP::BiQuad filter;
 
@@ -149,15 +135,9 @@ public:
 		filter.reset();
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func, OVERSAMPLE>(n);
-	}
+	void run(int n) { one_cycle<store_func, OVERSAMPLE>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func, OVERSAMPLE>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func, OVERSAMPLE>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
@@ -178,8 +158,7 @@ public:
 	void init(double _fs);
 	void activate(sample_t**);
 
-	inline void
-	start_cycle(sample_t** ports, double one_over_n)
+	inline void start_cycle(sample_t** ports, double one_over_n)
 	{
 		for (int i = 0; i < 4; ++i)
 		{
@@ -199,22 +178,17 @@ public:
 	double get_band_gain(int i, double g);
 	void set_band_gain(int i, float g);
 
-	inline sample_t process(sample_t x)
-	{
-		return eq.process(x);
-	}
+	inline sample_t process(sample_t x) { return eq.process(x); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class PreampIV
-	: public PreampIII
+class PreampIV : public PreampIII
 {
 public:
 	ToneControls tone;
 
-	template <sample_func_t F, int OVERSAMPLE>
-	void one_cycle(int frames);
+	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -224,27 +198,19 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func, OVERSAMPLE>(n);
-	}
+	void run(int n) { one_cycle<store_func, OVERSAMPLE>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func, OVERSAMPLE>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func, OVERSAMPLE>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpIV
-	: public AmpStub
+class AmpIV : public AmpStub
 {
 public:
 	ToneControls tone;
 
-	template <sample_func_t F, int OVERSAMPLE>
-	void one_cycle(int frames);
+	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -263,25 +229,17 @@ public:
 		dc_blocker.reset();
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func, OVERSAMPLE>(n);
-	}
+	void run(int n) { one_cycle<store_func, OVERSAMPLE>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func, OVERSAMPLE>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func, OVERSAMPLE>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpV
-	: public AmpStub
+class AmpV : public AmpStub
 {
 public:
-	template <sample_func_t F, int OVERSAMPLE>
-	void one_cycle(int frames);
+	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
 	DSP::BiQuad filter[3];
 
@@ -302,8 +260,7 @@ public:
 		current.g = 1;
 
 		for (int i = 0; i < 2; ++i)
-			filter[i].reset(),
-				power_cap[i].reset();
+			filter[i].reset(), power_cap[i].reset();
 
 		up.reset();
 		down.reset();
@@ -315,27 +272,19 @@ public:
 		tone = -1; /* causes initialisation of the filter at first cycle */
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func, OVERSAMPLE>(n);
-	}
+	void run(int n) { one_cycle<store_func, OVERSAMPLE>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func, OVERSAMPLE>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func, OVERSAMPLE>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpVTS
-	: public AmpStub
+class AmpVTS : public AmpStub
 {
 public:
 	DSP::ToneStack tonestack;
 
-	template <sample_func_t F, int OVERSAMPLE>
-	void one_cycle(int frames);
+	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
 	sample_t cut, tone;
 
@@ -364,15 +313,9 @@ public:
 		supply = 0.;
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func, OVERSAMPLE>(n);
-	}
+	void run(int n) { one_cycle<store_func, OVERSAMPLE>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func, OVERSAMPLE>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func, OVERSAMPLE>(n); }
 };
 
 #endif /* _AMP_H_ */

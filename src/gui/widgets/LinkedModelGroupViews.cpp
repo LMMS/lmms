@@ -34,8 +34,7 @@
 	LinkedModelGroupViewBase
 */
 
-LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
-	LinkedModelGroup* model, std::size_t colNum)
+LinkedModelGroupView::LinkedModelGroupView(QWidget* parent, LinkedModelGroup* model, std::size_t colNum)
 	: QWidget(parent)
 	, m_model(model)
 	, m_colNum(colNum)
@@ -53,8 +52,7 @@ LinkedModelGroupView::~LinkedModelGroupView() {}
 void LinkedModelGroupView::modelChanged(LinkedModelGroup* group)
 {
 	// reconnect models
-	group->foreach_model([this](const std::string& str,
-							 const LinkedModelGroup::ModelInfo& minf) {
+	group->foreach_model([this](const std::string& str, const LinkedModelGroup::ModelInfo& minf) {
 		auto itr = m_widgets.find(str);
 		// in case there are new or deleted widgets, the subclass has already
 		// modified m_widgets, so this will go into the else case
@@ -72,8 +70,7 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup* group)
 	m_model = group;
 }
 
-void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
-	const std::string& display, bool removable)
+void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id, const std::string& display, bool removable)
 {
 	int wdgNum = static_cast<int>(m_widgets.size());
 	if (ctrl)
@@ -87,8 +84,8 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 			QPushButton* removeBtn = new QPushButton;
 			removeBtn->setIcon(embed::getIconPixmap("discard"));
 			QObject::connect(
-				removeBtn, &QPushButton::clicked,
-				this, [this, ctrl](bool) {
+				removeBtn, &QPushButton::clicked, this,
+				[this, ctrl](bool) {
 					AutomatableModel* controlModel = ctrl->model();
 					// remove control out of model group
 					// (will also remove it from the UI)
@@ -136,10 +133,7 @@ void LinkedModelGroupView::removeControl(const QString& key)
 	}
 }
 
-void LinkedModelGroupView::removeFocusFromSearchBar()
-{
-	m_layout->removeFocusFromSearchBar();
-}
+void LinkedModelGroupView::removeFocusFromSearchBar() { m_layout->removeFocusFromSearchBar(); }
 
 /*
 	LinkedModelGroupsViewBase

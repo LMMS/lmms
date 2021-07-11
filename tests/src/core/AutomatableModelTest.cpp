@@ -62,10 +62,8 @@ private slots: // tests
 	{
 		BoolModel m1(false), m2(false);
 
-		QObject::connect(&m1, SIGNAL(dataChanged()),
-			this, SLOT(onM1Changed()));
-		QObject::connect(&m2, SIGNAL(dataChanged()),
-			this, SLOT(onM2Changed()));
+		QObject::connect(&m1, SIGNAL(dataChanged()), this, SLOT(onM1Changed()));
+		QObject::connect(&m2, SIGNAL(dataChanged()), this, SLOT(onM2Changed()));
 
 		resetChanged();
 		AutomatableModel::linkModels(&m1, &m1);

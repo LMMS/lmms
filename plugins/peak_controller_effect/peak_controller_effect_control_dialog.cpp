@@ -3,7 +3,7 @@
  *                                             PeakControllerEffect
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -33,8 +33,7 @@
 #include "embed.h"
 #include "peak_controller_effect_controls.h"
 
-PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
-	PeakControllerEffectControls* _controls)
+PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(PeakControllerEffectControls* _controls)
 	: EffectControlDialog(_controls)
 {
 	setWindowIcon(embed::getIconPixmap("controller"));

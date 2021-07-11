@@ -93,8 +93,7 @@ class ControlLayout : public QLayout
 	Q_OBJECT
 
 public:
-	explicit ControlLayout(QWidget* parent,
-		int margin = -1, int hSpacing = -1, int vSpacing = -1);
+	explicit ControlLayout(QWidget* parent, int margin = -1, int hSpacing = -1, int vSpacing = -1);
 	~ControlLayout() override;
 
 	void addItem(QLayoutItem* item) override;

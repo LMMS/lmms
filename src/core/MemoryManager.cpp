@@ -31,14 +31,8 @@
 /// Global static object handling rpmalloc intializing and finalizing
 struct MemoryManagerGlobalGuard
 {
-	MemoryManagerGlobalGuard()
-	{
-		rpmalloc_initialize();
-	}
-	~MemoryManagerGlobalGuard()
-	{
-		rpmalloc_finalize();
-	}
+	MemoryManagerGlobalGuard() { rpmalloc_initialize(); }
+	~MemoryManagerGlobalGuard() { rpmalloc_finalize(); }
 } static mm_global_guard;
 
 namespace

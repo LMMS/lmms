@@ -49,10 +49,7 @@ TrackContainer::TrackContainer()
 {
 }
 
-TrackContainer::~TrackContainer()
-{
-	clearAllTracks();
-}
+TrackContainer::~TrackContainer() { clearAllTracks(); }
 
 void TrackContainer::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
@@ -82,10 +79,8 @@ void TrackContainer::loadSettings(const QDomElement& _this)
 	{
 		if (pd == NULL)
 		{
-			pd = new QProgressDialog(tr("Loading project..."),
-				tr("Cancel"), 0,
-				Engine::getSong()->getLoadingTrackCount(),
-				gui->mainWindow());
+			pd = new QProgressDialog(tr("Loading project..."), tr("Cancel"), 0,
+				Engine::getSong()->getLoadingTrackCount(), gui->mainWindow());
 			pd->setWindowModality(Qt::ApplicationModal);
 			pd->setWindowTitle(tr("Please wait..."));
 			pd->show();
@@ -98,29 +93,29 @@ void TrackContainer::loadSettings(const QDomElement& _this)
 		if (pd != NULL)
 		{
 			pd->setValue(pd->value() + 1);
-			QCoreApplication::instance()->processEvents(
-				QEventLoop::AllEvents, 100);
+			QCoreApplication::instance()->processEvents(QEventLoop::AllEvents, 100);
 			if (pd->wasCanceled())
 			{
 				if (gui)
 				{
-					TextFloat::displayMessage(tr("Loading cancelled"),
-						tr("Project loading was cancelled."),
-						embed::getIconPixmap("project_file", 24, 24),
-						2000);
+					TextFloat::displayMessage(tr("Loading cancelled"), tr("Project loading was cancelled."),
+						embed::getIconPixmap("project_file", 24, 24), 2000);
 				}
 				Engine::getSong()->loadingCancelled();
 				break;
 			}
 		}
 
-		if (node.isElement() &&
-			!node.toElement().attribute("metadata").toInt())
+		if (node.isElement() && !node.toElement().attribute("metadata").toInt())
 		{
-			QString trackName = node.toElement().hasAttribute("name") ? node.toElement().attribute("name") : node.firstChild().toElement().attribute("name");
+			QString trackName = node.toElement().hasAttribute("name") ? node.toElement().attribute("name")
+																	  : node.firstChild().toElement().attribute("name");
 			if (pd != NULL)
 			{
-				pd->setLabelText(tr("Loading Track %1 (%2/Total %3)").arg(trackName).arg(pd->value() + 1).arg(Engine::getSong()->getLoadingTrackCount()));
+				pd->setLabelText(tr("Loading Track %1 (%2/Total %3)")
+									 .arg(trackName)
+									 .arg(pd->value() + 1)
+									 .arg(Engine::getSong()->getLoadingTrackCount()));
 			}
 			Track::create(node.toElement(), this);
 		}
@@ -189,24 +184,21 @@ void TrackContainer::removeTrack(Track* _track)
 	}
 }
 
-void TrackContainer::updateAfterTrackAdd()
-{
-}
+void TrackContainer::updateAfterTrackAdd() {}
 
 void TrackContainer::clearAllTracks()
 {
-	//m_tracksMutex.lockForWrite();
+	// m_tracksMutex.lockForWrite();
 	while (!m_tracks.isEmpty())
 	{
 		delete m_tracks.first();
 	}
-	//m_tracksMutex.unlock();
+	// m_tracksMutex.unlock();
 }
 
 bool TrackContainer::isEmpty() const
 {
-	for (TrackList::const_iterator it = m_tracks.begin();
-		 it != m_tracks.end(); ++it)
+	for (TrackList::const_iterator it = m_tracks.begin(); it != m_tracks.end(); ++it)
 	{
 		if (!(*it)->getTCOs().isEmpty())
 		{

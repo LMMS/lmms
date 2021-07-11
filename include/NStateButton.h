@@ -39,15 +39,9 @@ public:
 	virtual ~NStateButton();
 	void addState(const QPixmap& _pixmap, const QString& _tooltip = "");
 
-	inline void setGeneralToolTip(const QString& _tooltip)
-	{
-		m_generalToolTip = _tooltip;
-	}
+	inline void setGeneralToolTip(const QString& _tooltip) { m_generalToolTip = _tooltip; }
 
-	inline int state() const
-	{
-		return (m_curState);
-	}
+	inline int state() const { return (m_curState); }
 
 public slots:
 	void changeState(int _n);

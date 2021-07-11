@@ -34,18 +34,11 @@ class SideBarWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	SideBarWidget(const QString& _title, const QPixmap& _icon,
-		QWidget* _parent);
+	SideBarWidget(const QString& _title, const QPixmap& _icon, QWidget* _parent);
 	virtual ~SideBarWidget();
 
-	inline const QPixmap& icon() const
-	{
-		return m_icon;
-	}
-	inline const QString& title() const
-	{
-		return m_title;
-	}
+	inline const QPixmap& icon() const { return m_icon; }
+	inline const QString& title() const { return m_title; }
 
 signals:
 	void closeButtonClicked();
@@ -53,24 +46,13 @@ signals:
 protected:
 	void paintEvent(QPaintEvent* _pe) override;
 	void resizeEvent(QResizeEvent* _re) override;
-	void contextMenuEvent(QContextMenuEvent*) override
-	{
-	}
+	void contextMenuEvent(QContextMenuEvent*) override {}
 
-	QWidget* contentParent()
-	{
-		return m_contents;
-	}
+	QWidget* contentParent() { return m_contents; }
 
-	void addContentWidget(QWidget* _w)
-	{
-		m_layout->addWidget(_w);
-	}
+	void addContentWidget(QWidget* _w) { m_layout->addWidget(_w); }
 
-	void addContentLayout(QLayout* _l)
-	{
-		m_layout->addLayout(_l);
-	}
+	void addContentLayout(QLayout* _l) { m_layout->addLayout(_l); }
 
 private:
 	QWidget* m_contents;

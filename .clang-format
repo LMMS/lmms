@@ -7,7 +7,7 @@ Standard:        Cpp11  # Cpp14 and Cpp17 are not supported by clang 11
 TabWidth:        4
 UseTab:          Always
 IndentWidth:     4
-ColumnLimit:     0
+ColumnLimit:     120
 
 # Indentation detail
 AlignAfterOpenBracket: DontAlign

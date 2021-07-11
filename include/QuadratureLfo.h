@@ -50,10 +50,7 @@ public:
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 
-	inline void restart()
-	{
-		m_phase = 0;
-	}
+	inline void restart() { m_phase = 0; }
 
 	inline void setSampleRate(int samplerate)
 	{
@@ -62,10 +59,7 @@ public:
 		m_increment = m_frequency * m_twoPiOverSr;
 	}
 
-	inline void setOffset(double offsetVal)
-	{
-		m_offset = offsetVal;
-	}
+	inline void setOffset(double offsetVal) { m_offset = offsetVal; }
 
 	void tick(float* l, float* r)
 	{

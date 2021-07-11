@@ -33,16 +33,11 @@
 class stereoEnhancerEffect : public Effect
 {
 public:
-	stereoEnhancerEffect(Model* parent,
-		const Descriptor::SubPluginFeatures::Key* _key);
+	stereoEnhancerEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~stereoEnhancerEffect();
-	virtual bool processAudioBuffer(sampleFrame* _buf,
-		const fpp_t _frames);
+	virtual bool processAudioBuffer(sampleFrame* _buf, const fpp_t _frames);
 
-	virtual EffectControls* controls()
-	{
-		return (&m_bbControls);
-	}
+	virtual EffectControls* controls() { return (&m_bbControls); }
 
 	void clearMyBuffer();
 

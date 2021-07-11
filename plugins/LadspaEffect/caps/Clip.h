@@ -1,8 +1,8 @@
 /*
 	Clip.h
-	
+
 	Copyright 2004-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	oversampled hard ('diode', 'transistor', sometimes 'op-amp') clipper.
@@ -33,8 +33,7 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class Clip
-	: public Plugin
+class Clip : public Plugin
 {
 public:
 	sample_t gain, gain_db;
@@ -51,8 +50,7 @@ public:
 	DSP::FIRUpsampler up;
 	DSP::FIR down;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 	inline sample_t clip(sample_t x);
 
@@ -75,15 +73,9 @@ public:
 		gain = DSP::db2lin(gain_db);
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _CLIP_H_ */

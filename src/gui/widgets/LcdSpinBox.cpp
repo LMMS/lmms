@@ -73,8 +73,7 @@ void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdSpinBox::mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::LeftButton &&
-		!(event->modifiers() & Qt::ControlModifier) &&
+	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier) &&
 		event->y() < cellHeight() + 2)
 	{
 		m_mouseMoving = true;
@@ -105,8 +104,7 @@ void LcdSpinBox::mouseMoveEvent(QMouseEvent* event)
 			{
 				fdy = qBound(-4.f, fdy / 4.f, 4.f);
 			}
-			float floatValNotRounded =
-				model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
+			float floatValNotRounded = model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
 			float floatValRounded = roundf(floatValNotRounded);
 			m_remainder = floatValNotRounded - floatValRounded;
 			model()->setInitValue(floatValRounded);
@@ -132,23 +130,16 @@ void LcdSpinBox::wheelEvent(QWheelEvent* we)
 	emit manualChange();
 }
 
-void LcdSpinBox::mouseDoubleClickEvent(QMouseEvent*)
-{
-	enterValue();
-}
+void LcdSpinBox::mouseDoubleClickEvent(QMouseEvent*) { enterValue(); }
 
 void LcdSpinBox::enterValue()
 {
 	bool ok;
 	int new_val;
 
-	new_val = QInputDialog::getInt(
-		this, tr("Set value"),
+	new_val = QInputDialog::getInt(this, tr("Set value"),
 		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
-		model()->value(),
-		model()->minValue(),
-		model()->maxValue(),
-		model()->step<int>(), &ok);
+		model()->value(), model()->minValue(), model()->maxValue(), model()->step<int>(), &ok);
 
 	if (ok)
 	{

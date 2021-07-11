@@ -50,57 +50,36 @@ public:
 
 	virtual ~ControllerConnection();
 
-	inline Controller* getController()
-	{
-		return m_controller;
-	}
+	inline Controller* getController() { return m_controller; }
 
 	void setController(Controller* _controller);
 
 	inline void setController(int _controllerId);
 
-	float currentValue(int _offset)
-	{
-		return m_controller->currentValue(_offset);
-	}
+	float currentValue(int _offset) { return m_controller->currentValue(_offset); }
 
-	ValueBuffer* valueBuffer()
-	{
-		return m_controller->valueBuffer();
-	}
+	ValueBuffer* valueBuffer() { return m_controller->valueBuffer(); }
 
 	inline void setTargetName(const QString& _name);
 
-	inline QString targetName() const
-	{
-		return m_targetName;
-	}
+	inline QString targetName() const { return m_targetName; }
 
-	inline bool isFinalized()
-	{
-		return m_controllerId < 0;
-	}
+	inline bool isFinalized() { return m_controllerId < 0; }
 
 	static void finalizeConnections();
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	static inline const QString classNodeName()
-	{
-		return "connection";
-	}
+	static inline const QString classNodeName() { return "connection"; }
 
-	QString nodeName() const override
-	{
-		return classNodeName();
-	}
+	QString nodeName() const override { return classNodeName(); }
 
 public slots:
 	void deleteConnection();
 
 protected:
-	//virtual controllerDialog * createDialog( QWidget * _parent );
+	// virtual controllerDialog * createDialog( QWidget * _parent );
 	Controller* m_controller;
 	QString m_targetName;
 	int m_controllerId;

@@ -32,23 +32,16 @@ const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;
 const float CUTOFF_RATIO = 0.353553391f;
 const int SILENCEFRAMES = 10;
-const float OS_RESAMPLE[5] = {0.0001490062883964112, 0.1645978376763992, 0.6705063120704088,
-	0.1645978376763992, 0.0001490062883964112};
+const float OS_RESAMPLE[5] = {
+	0.0001490062883964112, 0.1645978376763992, 0.6705063120704088, 0.1645978376763992, 0.0001490062883964112};
 
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Bitcrush",
-			QT_TRANSLATE_NOOP("PluginBrowser", "An oversampling bitcrusher"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Bitcrush",
+		QT_TRANSLATE_NOOP("PluginBrowser", "An oversampling bitcrusher"),
+		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 }
 
 BitcrushEffect::BitcrushEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
@@ -70,10 +63,7 @@ BitcrushEffect::BitcrushEffect(Model* parent, const Descriptor::SubPluginFeature
 	m_silenceCounter = 0;
 }
 
-BitcrushEffect::~BitcrushEffect()
-{
-	MM_FREE(m_buffer);
-}
+BitcrushEffect::~BitcrushEffect() { MM_FREE(m_buffer); }
 
 void BitcrushEffect::sampleRateChanged()
 {
@@ -83,15 +73,9 @@ void BitcrushEffect::sampleRateChanged()
 	m_needsUpdate = true;
 }
 
-inline float BitcrushEffect::depthCrush(float in)
-{
-	return roundf(in * (float)m_levels) * m_levelsRatio;
-}
+inline float BitcrushEffect::depthCrush(float in) { return roundf(in * (float)m_levels) * m_levelsRatio; }
 
-inline float BitcrushEffect::noise(float amt)
-{
-	return fastRandf(amt * 2.0f) - amt;
-}
+inline float BitcrushEffect::noise(float amt) { return fastRandf(amt * 2.0f) - amt; }
 
 bool BitcrushEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
@@ -157,16 +141,14 @@ bool BitcrushEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				if (m_bitCounterL > m_rateCoeffL)
 				{
 					m_bitCounterL -= m_rateCoeffL;
-					m_left = m_depthEnabled
-						? depthCrush(buf[f][0] * m_inGain + noise(buf[f][0] * noiseAmt))
-						: buf[f][0] * m_inGain + noise(buf[f][0] * noiseAmt);
+					m_left = m_depthEnabled ? depthCrush(buf[f][0] * m_inGain + noise(buf[f][0] * noiseAmt))
+											: buf[f][0] * m_inGain + noise(buf[f][0] * noiseAmt);
 				}
 				if (m_bitCounterR > m_rateCoeffR)
 				{
 					m_bitCounterR -= m_rateCoeffR;
-					m_right = m_depthEnabled
-						? depthCrush(buf[f][1] * m_inGain + noise(buf[f][1] * noiseAmt))
-						: buf[f][1] * m_inGain + noise(buf[f][1] * noiseAmt);
+					m_right = m_depthEnabled ? depthCrush(buf[f][1] * m_inGain + noise(buf[f][1] * noiseAmt))
+											 : buf[f][1] * m_inGain + noise(buf[f][1] * noiseAmt);
 				}
 			}
 		}

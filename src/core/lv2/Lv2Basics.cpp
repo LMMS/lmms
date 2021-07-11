@@ -26,23 +26,19 @@
 
 #ifdef LMMS_HAVE_LV2
 
-QString qStringFromPluginNode(const LilvPlugin* plug,
-	LilvNode* (*getFunc)(const LilvPlugin*))
+QString qStringFromPluginNode(const LilvPlugin* plug, LilvNode* (*getFunc)(const LilvPlugin*))
 {
-	return QString::fromUtf8(
-		lilv_node_as_string(AutoLilvNode((*getFunc)(plug)).get()));
+	return QString::fromUtf8(lilv_node_as_string(AutoLilvNode((*getFunc)(plug)).get()));
 }
 
 QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port)
 {
-	return QString::fromUtf8(
-		lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
+	return QString::fromUtf8(lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
 }
 
 std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port)
 {
-	return std::string(
-		lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
+	return std::string(lilv_node_as_string(AutoLilvNode(lilv_port_get_name(plug, port)).get()));
 }
 
 #endif // LMMS_HAVE_LV2

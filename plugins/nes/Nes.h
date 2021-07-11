@@ -1,5 +1,5 @@
 /* Nes.h - A NES instrument plugin for LMMS
- *                        
+ *
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -60,20 +60,21 @@
 
 const float NES_SIMPLE_FILTER = 1.0 / 20.0; // simulate nes analog audio output
 const float NFB = 895000.0f;
-const float NOISE_FREQS[16] =
-	{NFB / 5, NFB / 9, NFB / 17, NFB / 33, NFB / 65, NFB / 97, NFB / 129, NFB / 161, NFB / 193, NFB / 255, NFB / 381, NFB / 509, NFB / 763, NFB / 1017, NFB / 2035, NFB / 4069};
+const float NOISE_FREQS[16] = {NFB / 5, NFB / 9, NFB / 17, NFB / 33, NFB / 65, NFB / 97, NFB / 129, NFB / 161,
+	NFB / 193, NFB / 255, NFB / 381, NFB / 509, NFB / 763, NFB / 1017, NFB / 2035, NFB / 4069};
 const uint16_t LFSR_INIT = 1;
 const float DUTY_CYCLE[4] = {0.125, 0.25, 0.5, 0.75};
 const float DITHER_AMP = 1.0 / 60.0;
 const float MIN_FREQ = 10.0;
-const int TRIANGLE_WAVETABLE[32] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-	15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+const int TRIANGLE_WAVETABLE[32] = {
+	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 
 const float NES_DIST = 0.9f; // simulate the slight nonlinear distortion in nes audio output
 
 const float NES_MIXING_12 = 1.0 / 20.0;
 const float NES_MIXING_34 = 1.0 / 12.0;
-const float NES_MIXING_ALL = 1.0 / (NES_MIXING_12 + NES_MIXING_34); // constants to simulate the hardwired mixing values for nes channels
+const float NES_MIXING_ALL =
+	1.0 / (NES_MIXING_12 + NES_MIXING_34); // constants to simulate the hardwired mixing values for nes channels
 
 const int MIN_WLEN = 4;
 
@@ -122,17 +123,9 @@ public:
 		return false;
 	}
 
-	inline int wavelength(float freq)
-	{
-		return static_cast<int>(m_samplerate / freq);
-	}
+	inline int wavelength(float freq) { return static_cast<int>(m_samplerate / freq); }
 
-	inline float signedPow(float f, float e)
-	{
-		return f < 0
-			? powf(qAbs(f), e) * -1.0f
-			: powf(f, e);
-	}
+	inline float signedPow(float f, float e) { return f < 0 ? powf(qAbs(f), e) * -1.0f : powf(f, e); }
 
 	inline int nearestNoiseFreq(float f)
 	{
@@ -201,20 +194,15 @@ public:
 	NesInstrument(InstrumentTrack* instrumentTrack);
 	virtual ~NesInstrument();
 
-	virtual void playNote(NotePlayHandle* n,
-		sampleFrame* workingBuffer);
+	virtual void playNote(NotePlayHandle* n, sampleFrame* workingBuffer);
 	virtual void deleteNotePluginData(NotePlayHandle* n);
 
-	virtual void saveSettings(QDomDocument& doc,
-		QDomElement& element);
+	virtual void saveSettings(QDomDocument& doc, QDomElement& element);
 	virtual void loadSettings(const QDomElement& element);
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return (8);
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return (8); }
 
 	virtual PluginView* instantiateView(QWidget* parent);
 
@@ -224,7 +212,7 @@ public slots:
 	void updateFreq3();
 
 protected:
-	//freq  helpers
+	// freq  helpers
 	float m_freq1;
 	float m_freq2;
 	float m_freq3;
@@ -260,12 +248,12 @@ private:
 	FloatModel m_ch2SweepAmt;
 	FloatModel m_ch2SweepRate;
 
-	//channel 3
+	// channel 3
 	BoolModel m_ch3Enabled;
 	FloatModel m_ch3Crs;
 	FloatModel m_ch3Volume;
 
-	//channel 4
+	// channel 4
 	BoolModel m_ch4Enabled;
 	FloatModel m_ch4Volume;
 
@@ -280,7 +268,7 @@ private:
 	FloatModel m_ch4Sweep;
 	BoolModel m_ch4NoiseQuantize;
 
-	//master
+	// master
 	FloatModel m_masterVol;
 	FloatModel m_vibrato;
 
@@ -292,8 +280,7 @@ class NesInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	NesInstrumentView(Instrument* instrument,
-		QWidget* parent);
+	NesInstrumentView(Instrument* instrument, QWidget* parent);
 	virtual ~NesInstrumentView();
 
 private:
@@ -329,12 +316,12 @@ private:
 	Knob* m_ch2SweepAmtKnob;
 	Knob* m_ch2SweepRateKnob;
 
-	//channel 3
+	// channel 3
 	PixmapButton* m_ch3EnabledBtn;
 	Knob* m_ch3CrsKnob;
 	Knob* m_ch3VolumeKnob;
 
-	//channel 4
+	// channel 4
 	PixmapButton* m_ch4EnabledBtn;
 	Knob* m_ch4VolumeKnob;
 
@@ -349,7 +336,7 @@ private:
 	Knob* m_ch4SweepKnob;
 	PixmapButton* m_ch4NoiseQuantizeBtn;
 
-	//master
+	// master
 	Knob* m_masterVolKnob;
 	Knob* m_vibratoKnob;
 

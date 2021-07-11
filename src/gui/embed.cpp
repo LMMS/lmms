@@ -32,8 +32,7 @@
 namespace embed
 {
 
-QPixmap getIconPixmap(const QString& pixmapName,
-	int width, int height, const char** xpm)
+QPixmap getIconPixmap(const QString& pixmapName, int width, int height, const char** xpm)
 {
 	QString cacheName;
 	if (width > 0 && height > 0)
@@ -69,7 +68,8 @@ QPixmap getIconPixmap(const QString& pixmapName,
 
 		if (pixmap.isNull())
 		{
-			qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": " << reader.errorString().toLocal8Bit().data();
+			qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": "
+								 << reader.errorString().toLocal8Bit().data();
 			return QPixmap(1, 1);
 		}
 	}

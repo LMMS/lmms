@@ -33,33 +33,20 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Waveshaper Effect",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"plugin for waveshaping"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Waveshaper Effect",
+		QT_TRANSLATE_NOOP("PluginBrowser", "plugin for waveshaping"), "Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
+		0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
-waveShaperEffect::waveShaperEffect(Model* _parent,
-	const Descriptor::SubPluginFeatures::Key* _key)
+waveShaperEffect::waveShaperEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&waveshaper_plugin_descriptor, _parent, _key)
 	, m_wsControls(this)
 {
 }
 
-waveShaperEffect::~waveShaperEffect()
-{
-}
+waveShaperEffect::~waveShaperEffect() {}
 
-bool waveShaperEffect::processAudioBuffer(sampleFrame* _buf,
-	const fpp_t _frames)
+bool waveShaperEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
 	if (!isEnabled() || !isRunning())
 	{
@@ -115,9 +102,7 @@ bool waveShaperEffect::processAudioBuffer(sampleFrame* _buf,
 			}
 			else if (lookup < 200)
 			{
-				s[i] = linearInterpolate(samples[lookup - 1],
-						   samples[lookup], frac) *
-					posneg;
+				s[i] = linearInterpolate(samples[lookup - 1], samples[lookup], frac) * posneg;
 			}
 			else
 			{
@@ -149,8 +134,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 	{
-		return (new waveShaperEffect(_parent,
-			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(
-				_data)));
+		return (new waveShaperEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data)));
 	}
 }

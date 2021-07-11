@@ -43,16 +43,9 @@ public:
 
 	static QString probeDevice();
 
-	inline static QString name()
-	{
-		return (QT_TRANSLATE_NOOP("MidiSetupWidget",
-			"OSS Raw-MIDI (Open Sound System)"));
-	}
+	inline static QString name() { return (QT_TRANSLATE_NOOP("MidiSetupWidget", "OSS Raw-MIDI (Open Sound System)")); }
 
-	inline static QString configSection()
-	{
-		return "midioss";
-	}
+	inline static QString configSection() { return "midioss"; }
 
 protected:
 	void sendByte(const unsigned char c) override;

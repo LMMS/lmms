@@ -47,10 +47,7 @@ public:
 	const QPixmap& syncIcon();
 	void setSyncIcon(const QPixmap& _new_pix);
 
-	TempoSyncKnobModel* model()
-	{
-		return castModel<TempoSyncKnobModel>();
-	}
+	TempoSyncKnobModel* model() { return castModel<TempoSyncKnobModel>(); }
 
 	void modelChanged() override;
 

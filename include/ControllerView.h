@@ -45,15 +45,9 @@ public:
 	ControllerView(Controller* _controller, QWidget* _parent);
 	virtual ~ControllerView();
 
-	inline Controller* getController()
-	{
-		return (castModel<Controller>());
-	}
+	inline Controller* getController() { return (castModel<Controller>()); }
 
-	inline const Controller* getController() const
-	{
-		return (castModel<Controller>());
-	}
+	inline const Controller* getController() const { return (castModel<Controller>()); }
 
 public slots:
 	void editControls();

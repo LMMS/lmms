@@ -1,6 +1,6 @@
 /*
  * LmmsPalette.cpp - dummy class for fetching palette qproperties from CSS
- *                
+ *
  *
  * Copyright (c) 2007-2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *
@@ -50,19 +50,11 @@ LmmsPalette::LmmsPalette(QWidget* parent, QStyle* stylearg)
 	ensurePolished();
 }
 
-LmmsPalette::~LmmsPalette()
-{
-}
+LmmsPalette::~LmmsPalette() {}
 
 #define ACCESSMET(read, write) \
-	QColor LmmsPalette::read() const \
-	{ \
-		return m_##read; \
-	} \
-	void LmmsPalette::write(const QColor& c) \
-	{ \
-		m_##read = QColor(c); \
-	}
+	QColor LmmsPalette::read() const { return m_##read; } \
+	void LmmsPalette::write(const QColor& c) { m_##read = QColor(c); }
 
 ACCESSMET(background, setBackground)
 ACCESSMET(windowText, setWindowText)

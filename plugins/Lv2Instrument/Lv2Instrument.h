@@ -46,8 +46,7 @@ public:
 	/*
 		initialization
 	*/
-	Lv2Instrument(InstrumentTrack* instrumentTrackArg,
-		Descriptor::SubPluginFeatures::Key* key);
+	Lv2Instrument(InstrumentTrack* instrumentTrackArg, Descriptor::SubPluginFeatures::Key* key);
 	~Lv2Instrument() override;
 	//! Must be checked after ctor or reload
 	bool isValid() const;
@@ -64,8 +63,7 @@ public:
 	*/
 	bool hasNoteInput() const override { return Lv2ControlBase::hasNoteInput(); }
 #ifdef LV2_INSTRUMENT_USE_MIDI
-	bool handleMidiEvent(const MidiEvent& event,
-		const TimePos& time = TimePos(), f_cnt_t offset = 0) override;
+	bool handleMidiEvent(const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0) override;
 #else
 	void playNote(NotePlayHandle* nph, sampleFrame*) override;
 #endif

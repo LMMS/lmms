@@ -60,25 +60,17 @@ public:
 	};
 
 	LmmsStyle();
-	virtual ~LmmsStyle()
-	{
-	}
+	virtual ~LmmsStyle() {}
 
 	QPalette standardPalette(void) const override;
 
-	virtual void drawComplexControl(
-		ComplexControl control,
-		const QStyleOptionComplex* option,
-		QPainter* painter,
+	virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex* option, QPainter* painter,
 		const QWidget* widget) const override;
-	virtual void drawPrimitive(PrimitiveElement element,
-		const QStyleOption* option,
-		QPainter* painter,
+	virtual void drawPrimitive(PrimitiveElement element, const QStyleOption* option, QPainter* painter,
 		const QWidget* widget = 0) const override;
 
-	virtual int pixelMetric(PixelMetric metric,
-		const QStyleOption* option = 0,
-		const QWidget* widget = 0) const override;
+	virtual int pixelMetric(
+		PixelMetric metric, const QStyleOption* option = 0, const QWidget* widget = 0) const override;
 
 	static QPalette* s_palette;
 

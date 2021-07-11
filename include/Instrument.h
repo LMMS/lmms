@@ -54,8 +54,7 @@ public:
 
 	Q_DECLARE_FLAGS(Flags, Flag);
 
-	Instrument(InstrumentTrack* _instrument_track,
-		const Descriptor* _descriptor,
+	Instrument(InstrumentTrack* _instrument_track, const Descriptor* _descriptor,
 		const Descriptor::SubPluginFeatures::Key* key = nullptr);
 	virtual ~Instrument() = default;
 
@@ -71,10 +70,7 @@ public:
 	virtual void play(sampleFrame* _working_buffer);
 
 	// to be implemented by actual plugin
-	virtual void playNote(NotePlayHandle* /* _note_to_play */,
-		sampleFrame* /* _working_buf */)
-	{
-	}
+	virtual void playNote(NotePlayHandle* /* _note_to_play */, sampleFrame* /* _working_buf */) {}
 
 	// needed for deleting plugin-specific-data of a note - plugin has to
 	// cast void-ptr so that the plugin-data is deleted properly
@@ -91,15 +87,9 @@ public:
 	// if no envelope is active - such instruments can re-implement this
 	// method for returning how many frames they at least like to have for
 	// release
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return 0;
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return 0; }
 
-	virtual Flags flags() const
-	{
-		return NoFlags;
-	}
+	virtual Flags flags() const { return NoFlags; }
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
@@ -116,17 +106,12 @@ public:
 
 	//! instantiate instrument-plugin with given name or return NULL
 	//! on failure
-	static Instrument* instantiate(const QString& _plugin_name,
-		InstrumentTrack* _instrument_track,
-		const Plugin::Descriptor::SubPluginFeatures::Key* key,
-		bool keyFromDnd = false);
+	static Instrument* instantiate(const QString& _plugin_name, InstrumentTrack* _instrument_track,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd = false);
 
 	virtual bool isFromTrack(const Track* _track) const;
 
-	inline InstrumentTrack* instrumentTrack() const
-	{
-		return m_instrumentTrack;
-	}
+	inline InstrumentTrack* instrumentTrack() const { return m_instrumentTrack; }
 
 protected:
 	// fade in to prevent clicks

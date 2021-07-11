@@ -1,5 +1,5 @@
 /*
- * CrossoverEQControls.cpp - A native 4-band Crossover Equalizer 
+ * CrossoverEQControls.cpp - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -129,7 +129,4 @@ void CrossoverEQControls::xover34Changed()
 	}
 }
 
-void CrossoverEQControls::sampleRateChanged()
-{
-	m_effect->sampleRateChanged();
-}
+void CrossoverEQControls::sampleRateChanged() { m_effect->sampleRateChanged(); }

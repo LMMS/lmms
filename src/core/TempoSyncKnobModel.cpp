@@ -31,29 +31,21 @@
 #include "Engine.h"
 #include "Song.h"
 
-TempoSyncKnobModel::TempoSyncKnobModel(const float _val, const float _min,
-	const float _max, const float _step,
-	const float _scale, Model* _parent,
-	const QString& _display_name)
+TempoSyncKnobModel::TempoSyncKnobModel(const float _val, const float _min, const float _max, const float _step,
+	const float _scale, Model* _parent, const QString& _display_name)
 	: FloatModel(_val, _min, _max, _step, _parent, _display_name)
 	, m_tempoSyncMode(SyncNone)
 	, m_tempoLastSyncMode(SyncNone)
 	, m_scale(_scale)
 	, m_custom(_parent)
 {
-	connect(Engine::getSong(), SIGNAL(tempoChanged(bpm_t)),
-		this, SLOT(calculateTempoSyncTime(bpm_t)),
+	connect(Engine::getSong(), SIGNAL(tempoChanged(bpm_t)), this, SLOT(calculateTempoSyncTime(bpm_t)),
 		Qt::DirectConnection);
 }
 
-TempoSyncKnobModel::~TempoSyncKnobModel()
-{
-}
+TempoSyncKnobModel::~TempoSyncKnobModel() {}
 
-void TempoSyncKnobModel::setTempoSync(QAction* _item)
-{
-	setTempoSync(_item->data().toInt());
-}
+void TempoSyncKnobModel::setTempoSync(QAction* _item) { setTempoSync(_item->data().toInt()); }
 
 void TempoSyncKnobModel::setTempoSync(int _note_type)
 {
@@ -71,8 +63,7 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t _bpm)
 		{
 		case SyncCustom:
 			conversionFactor =
-				static_cast<float>(m_custom.getDenominator()) /
-				static_cast<float>(m_custom.getNumerator());
+				static_cast<float>(m_custom.getDenominator()) / static_cast<float>(m_custom.getNumerator());
 			break;
 		case SyncDoubleWholeNote:
 			conversionFactor = 0.125;
@@ -110,16 +101,14 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t _bpm)
 	}
 }
 
-void TempoSyncKnobModel::saveSettings(QDomDocument& _doc, QDomElement& _this,
-	const QString& _name)
+void TempoSyncKnobModel::saveSettings(QDomDocument& _doc, QDomElement& _this, const QString& _name)
 {
 	_this.setAttribute(_name + "_syncmode", (int)syncMode());
 	m_custom.saveSettings(_doc, _this, _name);
 	FloatModel::saveSettings(_doc, _this, _name);
 }
 
-void TempoSyncKnobModel::loadSettings(const QDomElement& _this,
-	const QString& _name)
+void TempoSyncKnobModel::loadSettings(const QDomElement& _this, const QString& _name)
 {
 	FloatModel::loadSettings(_this, _name);
 	m_custom.loadSettings(_this, _name);
@@ -133,9 +122,7 @@ void TempoSyncKnobModel::setSyncMode(TempoSyncMode _new_mode)
 		m_tempoSyncMode = _new_mode;
 		if (_new_mode == SyncCustom)
 		{
-			connect(&m_custom, SIGNAL(dataChanged()),
-				this, SLOT(updateCustom()),
-				Qt::DirectConnection);
+			connect(&m_custom, SIGNAL(dataChanged()), this, SLOT(updateCustom()), Qt::DirectConnection);
 		}
 	}
 	calculateTempoSyncTime(Engine::getSong()->getTempo());
@@ -148,7 +135,4 @@ void TempoSyncKnobModel::setScale(float _new_scale)
 	emit scaleChanged(_new_scale);
 }
 
-void TempoSyncKnobModel::updateCustom()
-{
-	setSyncMode(SyncCustom);
-}
+void TempoSyncKnobModel::updateCustom() { setSyncMode(SyncCustom); }

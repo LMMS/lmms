@@ -47,14 +47,8 @@ public:
 	EffectView(Effect* _model, QWidget* _parent);
 	virtual ~EffectView();
 
-	inline Effect* effect()
-	{
-		return castModel<Effect>();
-	}
-	inline const Effect* effect() const
-	{
-		return castModel<Effect>();
-	}
+	inline Effect* effect() { return castModel<Effect>(); }
+	inline const Effect* effect() const { return castModel<Effect>(); }
 
 	static constexpr int DEFAULT_WIDTH = 215;
 

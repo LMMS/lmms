@@ -14,7 +14,8 @@
 
 /* New QtXml based methods */
 
-QString LocalFileMng::readXmlString(QDomNode node, const QString& nodeName, const QString& defaultValue, bool bCanBeEmpty, bool bShouldExists, bool tinyXmlCompatMode)
+QString LocalFileMng::readXmlString(QDomNode node, const QString& nodeName, const QString& defaultValue,
+	bool bCanBeEmpty, bool bShouldExists, bool tinyXmlCompatMode)
 {
 	QDomElement element = node.firstChildElement(nodeName);
 
@@ -43,7 +44,8 @@ QString LocalFileMng::readXmlString(QDomNode node, const QString& nodeName, cons
 	}
 }
 
-float LocalFileMng::readXmlFloat(QDomNode node, const QString& nodeName, float defaultValue, bool bCanBeEmpty, bool bShouldExists, bool tinyXmlCompatMode)
+float LocalFileMng::readXmlFloat(QDomNode node, const QString& nodeName, float defaultValue, bool bCanBeEmpty,
+	bool bShouldExists, bool tinyXmlCompatMode)
 {
 	QLocale c_locale = QLocale::c();
 	QDomElement element = node.firstChildElement(nodeName);
@@ -73,7 +75,8 @@ float LocalFileMng::readXmlFloat(QDomNode node, const QString& nodeName, float d
 	}
 }
 
-int LocalFileMng::readXmlInt(QDomNode node, const QString& nodeName, int defaultValue, bool bCanBeEmpty, bool bShouldExists, bool tinyXmlCompatMode)
+int LocalFileMng::readXmlInt(QDomNode node, const QString& nodeName, int defaultValue, bool bCanBeEmpty,
+	bool bShouldExists, bool tinyXmlCompatMode)
 {
 	QLocale c_locale = QLocale::c();
 	QDomElement element = node.firstChildElement(nodeName);
@@ -103,7 +106,8 @@ int LocalFileMng::readXmlInt(QDomNode node, const QString& nodeName, int default
 	}
 }
 
-bool LocalFileMng::readXmlBool(QDomNode node, const QString& nodeName, bool defaultValue, bool bShouldExists, bool tinyXmlCompatMode)
+bool LocalFileMng::readXmlBool(
+	QDomNode node, const QString& nodeName, bool defaultValue, bool bShouldExists, bool tinyXmlCompatMode)
 {
 	QDomElement element = node.firstChildElement(nodeName);
 
@@ -237,9 +241,7 @@ QDomDocument LocalFileMng::openXmlDocument(const QString& filename)
 			enc = "UTF-8";
 		}
 		QByteArray line;
-		QByteArray buf = QString("<?xml version='1.0' encoding='%1' ?>\n")
-							 .arg(enc)
-							 .toLocal8Bit();
+		QByteArray buf = QString("<?xml version='1.0' encoding='%1' ?>\n").arg(enc).toLocal8Bit();
 
 		//_INFOLOG( QString("Using '%1' encoding for TinyXML file").arg(enc) );
 

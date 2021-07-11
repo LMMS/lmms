@@ -44,32 +44,20 @@ public:
 
 	void setKeyState(int key, bool state);
 
-	bool isKeyPressed(int key) const
-	{
-		return m_pressedKeys[key];
-	}
+	bool isKeyPressed(int key) const { return m_pressedKeys[key]; }
 
 	void handleKeyPress(int key, int midiVelocity = -1);
 	void handleKeyRelease(int key);
 
-	InstrumentTrack* instrumentTrack() const
-	{
-		return m_instrumentTrack;
-	}
+	InstrumentTrack* instrumentTrack() const { return m_instrumentTrack; }
 
-	MidiEventProcessor* midiEventProcessor() const
-	{
-		return m_midiEvProc;
-	}
+	MidiEventProcessor* midiEventProcessor() const { return m_midiEvProc; }
 
 	static bool isWhiteKey(int key);
 	static bool isBlackKey(int key);
 
 private:
-	static bool isValidKey(int key)
-	{
-		return key >= 0 && key < NumKeys;
-	}
+	static bool isValidKey(int key) { return key >= 0 && key < NumKeys; }
 
 	InstrumentTrack* m_instrumentTrack;
 	MidiEventProcessor* m_midiEvProc;

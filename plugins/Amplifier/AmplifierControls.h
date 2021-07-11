@@ -37,26 +37,15 @@ class AmplifierControls : public EffectControls
 	Q_OBJECT
 public:
 	AmplifierControls(AmplifierEffect* effect);
-	virtual ~AmplifierControls()
-	{
-	}
+	virtual ~AmplifierControls() {}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return "AmplifierControls";
-	}
+	inline virtual QString nodeName() const { return "AmplifierControls"; }
 
-	virtual int controlCount()
-	{
-		return 4;
-	}
+	virtual int controlCount() { return 4; }
 
-	virtual EffectControlDialog* createView()
-	{
-		return new AmplifierControlDialog(this);
-	}
+	virtual EffectControlDialog* createView() { return new AmplifierControlDialog(this); }
 
 private slots:
 	void changeControl();

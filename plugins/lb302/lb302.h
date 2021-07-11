@@ -104,22 +104,14 @@ class lb302Filter3Pole : public lb302Filter
 public:
 	lb302Filter3Pole(lb302FilterKnobState* p_fs);
 
-	//virtual void recalc();
+	// virtual void recalc();
 	virtual void envRecalc();
 	virtual void recalc();
 	virtual float process(const float& samp);
 
 protected:
-	float kfcn,
-		kp,
-		kp1,
-		kp1h,
-		kres;
-	float ay1,
-		ay2,
-		aout,
-		lastin,
-		value;
+	float kfcn, kp, kp1, kp1h, kres;
+	float ay1, ay2, aout, lastin, value;
 };
 
 class lb302Note
@@ -137,8 +129,7 @@ public:
 	virtual ~lb302Synth();
 
 	virtual void play(sampleFrame* _working_buffer);
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -146,14 +137,11 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed;
-	}
+	virtual Flags flags() const { return IsSingleStreamed; }
 
 	virtual f_cnt_t desiredReleaseFrames() const
 	{
-		return 0; //4048;
+		return 0; // 4048;
 	}
 
 	virtual PluginView* instantiateView(QWidget* _parent);
@@ -265,8 +253,7 @@ class lb302SynthView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	lb302SynthView(Instrument* _instrument,
-		QWidget* _parent);
+	lb302SynthView(Instrument* _instrument, QWidget* _parent);
 	virtual ~lb302SynthView();
 
 private:

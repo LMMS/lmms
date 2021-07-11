@@ -34,8 +34,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 
-TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap,
-	bool resizable)
+TabWidget::TabWidget(const QString& caption, QWidget* parent, bool usePixmap, bool resizable)
 	: QWidget(parent)
 	, m_resizable(resizable)
 	, m_activeTab(0)
@@ -74,7 +73,8 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 		}
 	}
 
-	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
+	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the
+	// PaintEvent
 	int tab_width = horizontalAdvance(fontMetrics(), name) + 10;
 
 	// Register new tab
@@ -136,7 +136,8 @@ int TabWidget::findTabAtPos(const QPoint* pos)
 	return (-1);
 }
 
-// Overload the QWidget::event handler to display tooltips (from https://doc.qt.io/qt-4.8/qt-widgets-tooltips-example.html)
+// Overload the QWidget::event handler to display tooltips (from
+// https://doc.qt.io/qt-4.8/qt-widgets-tooltips-example.html)
 bool TabWidget::event(QEvent* event)
 {
 
@@ -186,8 +187,7 @@ void TabWidget::resizeEvent(QResizeEvent*)
 {
 	if (!m_resizable)
 	{
-		for (widgetStack::iterator it = m_widgets.begin();
-			 it != m_widgets.end(); ++it)
+		for (widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
 			(*it).w->setFixedSize(width() - 4, height() - m_tabbarHeight);
 		}
@@ -297,8 +297,7 @@ QSize TabWidget::minimumSizeHint() const
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for (widgetStack::const_iterator it = m_widgets.begin();
-			 it != m_widgets.end(); ++it)
+		for (widgetStack::const_iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
 			maxWidth = std::max(maxWidth, it->w->minimumSizeHint().width());
 			maxHeight = std::max(maxHeight, it->w->minimumSizeHint().height());
@@ -319,8 +318,7 @@ QSize TabWidget::sizeHint() const
 	if (m_resizable)
 	{
 		int maxWidth = 0, maxHeight = 0;
-		for (widgetStack::const_iterator it = m_widgets.begin();
-			 it != m_widgets.end(); ++it)
+		for (widgetStack::const_iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
 			maxWidth = std::max(maxWidth, it->w->sizeHint().width());
 			maxHeight = std::max(maxHeight, it->w->sizeHint().height());
@@ -337,61 +335,31 @@ QSize TabWidget::sizeHint() const
 }
 
 // Return the color to be used to draw a TabWidget's title text (if any)
-QColor TabWidget::tabTitleText() const
-{
-	return m_tabTitleText;
-}
+QColor TabWidget::tabTitleText() const { return m_tabTitleText; }
 
 // Set the color to be used to draw a TabWidget's title text (if any)
-void TabWidget::setTabTitleText(const QColor& c)
-{
-	m_tabTitleText = c;
-}
+void TabWidget::setTabTitleText(const QColor& c) { m_tabTitleText = c; }
 
 // Return the color to be used to draw a TabWidget's text (if any)
-QColor TabWidget::tabText() const
-{
-	return m_tabText;
-}
+QColor TabWidget::tabText() const { return m_tabText; }
 
 // Set the color to be used to draw a TabWidget's text (if any)
-void TabWidget::setTabText(const QColor& c)
-{
-	m_tabText = c;
-}
+void TabWidget::setTabText(const QColor& c) { m_tabText = c; }
 
 // Return the color to be used to highlight a TabWidget'selected tab (if any)
-QColor TabWidget::tabSelected() const
-{
-	return m_tabSelected;
-}
+QColor TabWidget::tabSelected() const { return m_tabSelected; }
 
 // Set the color to be used to highlight a TabWidget'selected tab (if any)
-void TabWidget::setTabSelected(const QColor& c)
-{
-	m_tabSelected = c;
-}
+void TabWidget::setTabSelected(const QColor& c) { m_tabSelected = c; }
 
 // Return the color to be used for the TabWidget's background
-QColor TabWidget::tabBackground() const
-{
-	return m_tabBackground;
-}
+QColor TabWidget::tabBackground() const { return m_tabBackground; }
 
 // Set the color to be used for the TabWidget's background
-void TabWidget::setTabBackground(const QColor& c)
-{
-	m_tabBackground = c;
-}
+void TabWidget::setTabBackground(const QColor& c) { m_tabBackground = c; }
 
 // Return the color to be used for the TabWidget's borders
-QColor TabWidget::tabBorder() const
-{
-	return m_tabBorder;
-}
+QColor TabWidget::tabBorder() const { return m_tabBorder; }
 
 // Set the color to be used for the TabWidget's borders
-void TabWidget::setTabBorder(const QColor& c)
-{
-	m_tabBorder = c;
-}
+void TabWidget::setTabBorder(const QColor& c) { m_tabBorder = c; }

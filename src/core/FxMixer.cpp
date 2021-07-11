@@ -42,13 +42,11 @@ FxRoute::FxRoute(FxChannel* from, FxChannel* to, float amount)
 	, m_amount(amount, 0, 1, 0.001, NULL,
 		  tr("Amount to send from channel %1 to channel %2").arg(m_from->m_channelIndex).arg(m_to->m_channelIndex))
 {
-	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
+	// qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
 }
 
-FxRoute::~FxRoute()
-{
-}
+FxRoute::~FxRoute() {}
 
 void FxRoute::updateName()
 {
@@ -76,10 +74,7 @@ FxChannel::FxChannel(int idx, Model* _parent)
 	BufferManager::clear(m_buffer, Engine::mixer()->framesPerPeriod());
 }
 
-FxChannel::~FxChannel()
-{
-	delete[] m_buffer;
-}
+FxChannel::~FxChannel() { delete[] m_buffer; }
 
 inline void FxChannel::processed()
 {
@@ -104,7 +99,7 @@ void FxChannel::incrementDeps()
 
 void FxChannel::unmuteForSolo()
 {
-	//TODO: Recursively activate every channel, this channel sends to
+	// TODO: Recursively activate every channel, this channel sends to
 	m_muteModel.setValue(false);
 }
 
@@ -234,12 +229,12 @@ void FxMixer::toggledSolo()
 {
 	int soloedChan = -1;
 	bool resetSolo = m_lastSoloed != -1;
-	//untoggle if lastsoloed is entered
+	// untoggle if lastsoloed is entered
 	if (resetSolo)
 	{
 		m_fxChannels[m_lastSoloed]->m_soloModel.setValue(false);
 	}
-	//determine the soloed channel
+	// determine the soloed channel
 	for (int i = 0; i < m_fxChannels.size(); ++i)
 	{
 		if (m_fxChannels[i]->m_soloModel.value() == true)
@@ -428,13 +423,9 @@ void FxMixer::moveChannelLeft(int index)
 	m_fxChannels[index - 1]->m_channelIndex = index - 1;
 }
 
-void FxMixer::moveChannelRight(int index)
-{
-	moveChannelLeft(index + 1);
-}
+void FxMixer::moveChannelRight(int index) { moveChannelLeft(index + 1); }
 
-FxRoute* FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
-	float amount)
+FxRoute* FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel, float amount)
 {
 	//	qDebug( "requested: %d to %d", fromChannel, toChannel );
 	// find the existing connection
@@ -579,8 +570,7 @@ void FxMixer::mixToChannel(const sampleFrame* _buf, fx_ch_t _ch)
 
 void FxMixer::prepareMasterMix()
 {
-	BufferManager::clear(m_fxChannels[0]->m_buffer,
-		Engine::mixer()->framesPerPeriod());
+	BufferManager::clear(m_fxChannels[0]->m_buffer, Engine::mixer()->framesPerPeriod());
 }
 
 void FxMixer::masterMix(sampleFrame* _buf)
@@ -640,17 +630,14 @@ void FxMixer::masterMix(sampleFrame* _buf)
 		}
 	}
 
-	const float v = volBuf
-		? 1.0f
-		: m_fxChannels[0]->m_volumeModel.value();
+	const float v = volBuf ? 1.0f : m_fxChannels[0]->m_volumeModel.value();
 	MixHelpers::addSanitizedMultiplied(_buf, m_fxChannels[0]->m_buffer, v, fpp);
 
 	// clear all channel buffers and
 	// reset channel process state
 	for (int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear(m_fxChannels[i]->m_buffer,
-			Engine::mixer()->framesPerPeriod());
+		BufferManager::clear(m_fxChannels[i]->m_buffer, Engine::mixer()->framesPerPeriod());
 		m_fxChannels[i]->reset();
 		m_fxChannels[i]->m_queued = false;
 		// also reset hasInput
@@ -769,8 +756,7 @@ void FxMixer::loadSettings(const QDomElement& _this)
 			m_fxChannels[num]->m_color.setNamedColor(fxch.attribute("color"));
 		}
 
-		m_fxChannels[num]->m_fxChain.restoreState(fxch.firstChildElement(
-			m_fxChannels[num]->m_fxChain.nodeName()));
+		m_fxChannels[num]->m_fxChain.restoreState(fxch.firstChildElement(m_fxChannels[num]->m_fxChain.nodeName()));
 
 		// mixer sends
 		QDomNodeList chData = fxch.childNodes();

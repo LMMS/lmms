@@ -1,6 +1,6 @@
 /*
  * LmmsPalette.h - dummy class for fetching palette qproperties from CSS
- *                
+ *
  *
  * Copyright (c) 2007-2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *

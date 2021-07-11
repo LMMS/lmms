@@ -37,42 +37,23 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect* effect, const QString& uri)
 {
 	if (isValid())
 	{
-		connect(Engine::mixer(), &Mixer::sampleRateChanged,
-			this, [this]() { Lv2ControlBase::reloadPlugin(); });
+		connect(Engine::mixer(), &Mixer::sampleRateChanged, this, [this]() { Lv2ControlBase::reloadPlugin(); });
 	}
 }
 
-void Lv2FxControls::saveSettings(QDomDocument& doc, QDomElement& that)
-{
-	Lv2ControlBase::saveSettings(doc, that);
-}
+void Lv2FxControls::saveSettings(QDomDocument& doc, QDomElement& that) { Lv2ControlBase::saveSettings(doc, that); }
 
-void Lv2FxControls::loadSettings(const QDomElement& that)
-{
-	Lv2ControlBase::loadSettings(that);
-}
+void Lv2FxControls::loadSettings(const QDomElement& that) { Lv2ControlBase::loadSettings(that); }
 
-int Lv2FxControls::controlCount()
-{
-	return static_cast<int>(Lv2ControlBase::controlCount());
-}
+int Lv2FxControls::controlCount() { return static_cast<int>(Lv2ControlBase::controlCount()); }
 
-EffectControlDialog* Lv2FxControls::createView()
-{
-	return new Lv2FxControlDialog(this);
-}
+EffectControlDialog* Lv2FxControls::createView() { return new Lv2FxControlDialog(this); }
 
 void Lv2FxControls::changeControl() // TODO: what is that?
 {
 	//	engine::getSong()->setModified();
 }
 
-DataFile::Types Lv2FxControls::settingsType()
-{
-	return DataFile::EffectSettings;
-}
+DataFile::Types Lv2FxControls::settingsType() { return DataFile::EffectSettings; }
 
-void Lv2FxControls::setNameFromFile(const QString& name)
-{
-	effect()->setDisplayName(name);
-}
+void Lv2FxControls::setNameFromFile(const QString& name) { effect()->setDisplayName(name); }

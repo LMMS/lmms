@@ -1,8 +1,8 @@
 /*
 	Eq.h
-	
+
 	Copyright 2004-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	equalizer circuit using recursive filtering.
@@ -33,8 +33,7 @@
 #include "dsp/RBJ.h"
 #include "dsp/util.h"
 
-class Eq
-	: public Plugin
+class Eq : public Plugin
 {
 public:
 	sample_t gain[10];
@@ -46,8 +45,7 @@ public:
 		BlockSize = 64
 	};
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -55,26 +53,18 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class Eq2x2
-	: public Plugin
+class Eq2x2 : public Plugin
 {
 public:
 	sample_t gain[10];
 	DSP::Eq<10> eq[2];
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -82,15 +72,9 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _EQ_H_ */

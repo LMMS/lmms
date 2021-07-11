@@ -1,11 +1,11 @@
 /*
 	Cabinet.h
-	
+
 	Copyright 2002-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
-	CabinetI - 16th order IIR filters modeled after various impulse responses 
+	CabinetI - 16th order IIR filters modeled after various impulse responses
 	from Steve Harris' 'imp' plugin. Limited to 44.1 kHz sample rate.
 
 	CabinetII - 32nd order IIR filters modeled after the same impulse responses
@@ -34,9 +34,9 @@
 
 #include "dsp/util.h"
 
-/* cabinet_float sets the data type used for the IIR history and thus the 
+/* cabinet_float sets the data type used for the IIR history and thus the
  * computing precision. doubles tend to make the sound more vivid and lively.
- * You can squeeze out a few extra cycles by making this 'float' if needed. 
+ * You can squeeze out a few extra cycles by making this 'float' if needed.
  * Be warned though that CabinetII has not been tested with 32-bit floats and
  * might become unstable due to the lower computing precision. */
 typedef double cabinet_float;
@@ -55,8 +55,7 @@ typedef struct
 	float gain;
 } Model32;
 
-class CabinetI
-	: public Plugin
+class CabinetI : public Plugin
 {
 public:
 	sample_t gain;
@@ -69,8 +68,7 @@ public:
 	cabinet_float *a, *b;
 	cabinet_float x[16], y[16];
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -79,22 +77,15 @@ public:
 
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* Second version with 32nd order filters precalculated for
  * 44.1 / 48 / 88.2 / 96 kHz sample rates */
 
-class CabinetII
-	: public Plugin
+class CabinetII : public Plugin
 {
 public:
 	sample_t gain;
@@ -112,8 +103,7 @@ public:
 	cabinet_float *a, *b;
 	cabinet_float x[32], y[32];
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -123,15 +113,9 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _CABINET_H_ */

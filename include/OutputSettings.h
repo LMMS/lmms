@@ -67,10 +67,8 @@ public:
 	};
 
 public:
-	OutputSettings(sample_rate_t sampleRate,
-		BitRateSettings const& bitRateSettings,
-		BitDepth bitDepth,
-		StereoMode stereoMode)
+	OutputSettings(
+		sample_rate_t sampleRate, BitRateSettings const& bitRateSettings, BitDepth bitDepth, StereoMode stereoMode)
 		: m_sampleRate(sampleRate)
 		, m_bitRateSettings(bitRateSettings)
 		, m_bitDepth(bitDepth)
@@ -79,9 +77,7 @@ public:
 	{
 	}
 
-	OutputSettings(sample_rate_t sampleRate,
-		BitRateSettings const& bitRateSettings,
-		BitDepth bitDepth)
+	OutputSettings(sample_rate_t sampleRate, BitRateSettings const& bitRateSettings, BitDepth bitDepth)
 		: OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode_Stereo)
 	{
 	}

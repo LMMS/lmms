@@ -46,13 +46,9 @@ public:
 	bool event(QEvent* event) override;
 #ifdef LMMS_BUILD_WIN32
 	bool winEventFilter(MSG* msg, long* result);
-	bool nativeEventFilter(const QByteArray& eventType, void* message,
-		long* result);
+	bool nativeEventFilter(const QByteArray& eventType, void* message, long* result);
 #endif
-	inline QString& queuedFile()
-	{
-		return m_queuedFile;
-	}
+	inline QString& queuedFile() { return m_queuedFile; }
 
 private:
 	QString m_queuedFile;

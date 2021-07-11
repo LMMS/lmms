@@ -1,7 +1,7 @@
 /* string_container.h - contains a collection of strings
  *
  * Copyright (c) 2006 Danny McRae <khjklujn/at/yahoo/com>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -33,26 +33,13 @@ class stringContainer
 {
 	MM_OPERATORS
 public:
-	stringContainer(const float _pitch,
-		const sample_rate_t _sample_rate,
-		const int _buffer_length,
-		const int _strings = 9);
+	stringContainer(
+		const float _pitch, const sample_rate_t _sample_rate, const int _buffer_length, const int _strings = 9);
 
-	void addString(int _harm,
-		const float _pick,
-		const float _pickup,
-		const float* _impluse,
-		const float _randomize,
-		const float _string_loss,
-		const float _detune,
-		const int _oversample,
-		const bool _state,
-		const int _id);
+	void addString(int _harm, const float _pick, const float _pickup, const float* _impluse, const float _randomize,
+		const float _string_loss, const float _detune, const int _oversample, const bool _state, const int _id);
 
-	bool exists(int _id) const
-	{
-		return m_exists[_id];
-	}
+	bool exists(int _id) const { return m_exists[_id]; }
 
 	~stringContainer()
 	{
@@ -63,10 +50,7 @@ public:
 		}
 	}
 
-	float getStringSample(int _string)
-	{
-		return m_strings[_string]->nextSample();
-	}
+	float getStringSample(int _string) { return m_strings[_string]->nextSample(); }
 
 private:
 	QVector<vibratingString*> m_strings;

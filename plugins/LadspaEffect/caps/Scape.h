@@ -1,8 +1,8 @@
 /*
 	Scape.h
-	
+
 	Copyright 2004-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 */
@@ -37,8 +37,7 @@
 
 typedef DSP::SVF<1> SVF;
 
-class Scape
-	: public Plugin
+class Scape : public Plugin
 {
 public:
 	sample_t time, fb;
@@ -49,8 +48,7 @@ public:
 	SVF svf[4];
 	DSP::OnePoleHP hipass[4];
 
-	template <sample_func_t>
-	void one_cycle(int frames);
+	template <sample_func_t> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -59,21 +57,14 @@ public:
 	{
 		delay.init((int)(2.01 * fs)); /* two seconds = 30 bpm + */
 		for (int i = 0; i < 2; ++i)
-			lfo[i].init(),
-				lfo[i].set_rate(.00000001 * fs);
+			lfo[i].init(), lfo[i].set_rate(.00000001 * fs);
 	}
 
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _SCAPE_H_ */

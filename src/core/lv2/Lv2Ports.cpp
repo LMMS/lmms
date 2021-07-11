@@ -85,22 +85,17 @@ const char* toStr(Vis pv)
 	return "";
 }
 
-std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin,
-	std::size_t portNum)
+std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin, std::size_t portNum)
 {
 	std::vector<PluginIssue> portIssues;
 	auto issue = [&portIssues](PluginIssueType i, std::string msg = "") { portIssues.emplace_back(i, std::move(msg)); };
 
 	Lv2Manager* man = Engine::getLv2Manager();
 
-	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(
-		plugin, static_cast<uint32_t>(portNum));
+	const LilvPort* lilvPort = lilv_plugin_get_port_by_index(plugin, static_cast<uint32_t>(portNum));
 
-	auto portFunc = [&plugin, &lilvPort, &man](
-						bool (*fptr)(const LilvPlugin*, const LilvPort*, const LilvNode*),
-						const char* str) {
-		return fptr(plugin, lilvPort, man->uri(str).get());
-	};
+	auto portFunc = [&plugin, &lilvPort, &man](bool (*fptr)(const LilvPlugin*, const LilvPort*, const LilvNode*),
+						const char* str) { return fptr(plugin, lilvPort, man->uri(str).get()); };
 
 	auto hasProperty = [&portFunc](const char* str) { return portFunc(lilv_port_has_property, str); };
 	auto isA = [&portFunc](const char* str) { return portFunc(lilv_port_is_a, str); };
@@ -109,13 +104,10 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin,
 
 	m_optional = hasProperty(LV2_CORE__connectionOptional);
 
-	m_vis = hasProperty(LV2_CORE__integer)
-		? Vis::Integer // WARNING: this may still be changed below
-		: hasProperty(LV2_CORE__enumeration)
-		? Vis::Enumeration
-		: hasProperty(LV2_CORE__toggled)
-		? Vis::Toggled
-		: Vis::Generic;
+	m_vis = hasProperty(LV2_CORE__integer)	 ? Vis::Integer // WARNING: this may still be changed below
+		: hasProperty(LV2_CORE__enumeration) ? Vis::Enumeration
+		: hasProperty(LV2_CORE__toggled)	 ? Vis::Toggled
+											 : Vis::Generic;
 
 	if (isA(LV2_CORE__InputPort))
 	{
@@ -155,13 +147,10 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin,
 		bool isToggle = m_vis == Vis::Toggled;
 
 		LilvNode *defN, *minN = nullptr, *maxN = nullptr;
-		lilv_port_get_range(plugin, lilvPort, &defN,
-			isToggle ? nullptr : &minN,
-			isToggle ? nullptr : &maxN);
+		lilv_port_get_range(plugin, lilvPort, &defN, isToggle ? nullptr : &minN, isToggle ? nullptr : &maxN);
 		AutoLilvNode def(defN), min(minN), max(maxN);
 
-		auto takeRangeValue = [&](LilvNode* node,
-								  float& storeHere, PluginIssueType it) {
+		auto takeRangeValue = [&](LilvNode* node, float& storeHere, PluginIssueType it) {
 			if (node)
 			{
 				storeHere = lilv_node_as_float(node);
@@ -242,8 +231,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin,
 			}
 
 			// visualization
-			if (!m_min_set() ||
-				!m_max_set() ||
+			if (!m_min_set() || !m_max_set() ||
 				// if we get here, min and max are set, so max-min should not overflow:
 				(m_vis == Vis::Integer && m_max - m_min > 15.0f))
 			{
@@ -318,10 +306,7 @@ QString PortBase::name() const
 	return res;
 }
 
-QString PortBase::uri() const
-{
-	return lilv_node_as_string(lilv_port_get_symbol(m_plugin, m_port));
-}
+QString PortBase::uri() const { return lilv_node_as_string(lilv_port_get_symbol(m_plugin, m_port)); }
 
 Audio::Audio(std::size_t bufferSize, bool isSidechain)
 	: m_buffer(bufferSize)
@@ -329,8 +314,7 @@ Audio::Audio(std::size_t bufferSize, bool isSidechain)
 {
 }
 
-void Audio::copyBuffersFromCore(const sampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames)
+void Audio::copyBuffersFromCore(const sampleFrame* lmmsBuf, unsigned channel, fpp_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{
@@ -338,8 +322,7 @@ void Audio::copyBuffersFromCore(const sampleFrame* lmmsBuf,
 	}
 }
 
-void Audio::averageWithBuffersFromCore(const sampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames)
+void Audio::averageWithBuffersFromCore(const sampleFrame* lmmsBuf, unsigned channel, fpp_t frames)
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{
@@ -347,8 +330,7 @@ void Audio::averageWithBuffersFromCore(const sampleFrame* lmmsBuf,
 	}
 }
 
-void Audio::copyBuffersToCore(sampleFrame* lmmsBuf,
-	unsigned channel, fpp_t frames) const
+void Audio::copyBuffersToCore(sampleFrame* lmmsBuf, unsigned channel, fpp_t frames) const
 {
 	for (std::size_t f = 0; f < static_cast<unsigned>(frames); ++f)
 	{

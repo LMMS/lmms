@@ -74,20 +74,11 @@ void SampleRecordHandle::play(sampleFrame* /*_working_buffer*/)
 	}
 }
 
-bool SampleRecordHandle::isFinished() const
-{
-	return false;
-}
+bool SampleRecordHandle::isFinished() const { return false; }
 
-bool SampleRecordHandle::isFromTrack(const Track* _track) const
-{
-	return (m_track == _track || m_bbTrack == _track);
-}
+bool SampleRecordHandle::isFromTrack(const Track* _track) const { return (m_track == _track || m_bbTrack == _track); }
 
-f_cnt_t SampleRecordHandle::framesRecorded() const
-{
-	return (m_framesRecorded);
-}
+f_cnt_t SampleRecordHandle::framesRecorded() const { return (m_framesRecorded); }
 
 void SampleRecordHandle::createSampleBuffer(SampleBuffer** sampleBuf)
 {
@@ -100,8 +91,7 @@ void SampleRecordHandle::createSampleBuffer(SampleBuffer** sampleBuf)
 	assert(data != NULL);
 
 	// now copy all buffers into big buffer
-	for (bufferList::const_iterator it = m_buffers.begin();
-		 it != m_buffers.end(); ++it)
+	for (bufferList::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it)
 	{
 		memcpy(data_ptr, (*it).first, (*it).second * sizeof(sampleFrame));
 		data_ptr += (*it).second;
@@ -112,8 +102,7 @@ void SampleRecordHandle::createSampleBuffer(SampleBuffer** sampleBuf)
 	delete[] data;
 }
 
-void SampleRecordHandle::writeBuffer(const sampleFrame* _ab,
-	const f_cnt_t _frames)
+void SampleRecordHandle::writeBuffer(const sampleFrame* _ab, const f_cnt_t _frames)
 {
 	sampleFrame* buf = new sampleFrame[_frames];
 	for (f_cnt_t frame = 0; frame < _frames; ++frame)

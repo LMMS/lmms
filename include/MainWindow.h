@@ -46,15 +46,9 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	QMdiArea* workspace()
-	{
-		return m_workspace;
-	}
+	QMdiArea* workspace() { return m_workspace; }
 
-	QWidget* toolBar()
-	{
-		return m_toolBar;
-	}
+	QWidget* toolBar() { return m_toolBar; }
 
 	int addWidgetToToolBar(QWidget* _w, int _row = -1, int _col = -1);
 	void addSpacingToToolBar(int _size);
@@ -73,7 +67,8 @@ public:
 	/// opens another file...) must call this before and may only proceed if
 	/// this function returns true.
 	///
-	/// \param	stopPlayback whether playback should be stopped upon prompting.  If set to false, the caller should ensure that Engine::getSong()->stop() is called before unloading/loading a song.
+	/// \param	stopPlayback whether playback should be stopped upon prompting.  If set to false, the caller should
+	/// ensure that Engine::getSong()->stop() is called before unloading/loading a song.
 	///
 	/// \return	true if the user allows the software to proceed, false if they
 	///         cancel the action.
@@ -96,10 +91,7 @@ public:
 		m_autoSaveTimer.start(msec);
 	}
 
-	int getAutoSaveTimerInterval()
-	{
-		return m_autoSaveTimer.interval();
-	}
+	int getAutoSaveTimerInterval() { return m_autoSaveTimer.interval(); }
 
 	enum SessionState
 	{
@@ -107,15 +99,9 @@ public:
 		Recover
 	};
 
-	void setSession(SessionState session)
-	{
-		m_session = session;
-	}
+	void setSession(SessionState session) { m_session = session; }
 
-	SessionState getSession()
-	{
-		return m_session;
-	}
+	SessionState getSession() { return m_session; }
 
 	void sessionCleanup();
 
@@ -123,10 +109,7 @@ public:
 
 	// TODO Remove this function, since m_shift can get stuck down.
 	// [[deprecated]]
-	bool isShiftPressed()
-	{
-		return m_keyMods.m_shift;
-	}
+	bool isShiftPressed() { return m_keyMods.m_shift; }
 
 	static void saveWidgetState(QWidget* _w, QDomElement& _de);
 	static void restoreWidgetState(QWidget* _w, const QDomElement& _de);

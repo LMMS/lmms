@@ -3,7 +3,7 @@
  *                          which is renamable by double-clicking it
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -66,9 +66,7 @@ TrackLabelButton::TrackLabelButton(TrackView* _tv, QWidget* _parent)
 	connect(m_trackView->getTrack(), SIGNAL(nameChanged()), this, SLOT(nameChanged()));
 }
 
-TrackLabelButton::~TrackLabelButton()
-{
-}
+TrackLabelButton::~TrackLabelButton() {}
 
 void TrackLabelButton::rename()
 {
@@ -110,15 +108,9 @@ void TrackLabelButton::renameFinished()
 	}
 }
 
-void TrackLabelButton::nameChanged()
-{
-	setText(elideName(m_trackView->getTrack()->name()));
-}
+void TrackLabelButton::nameChanged() { setText(elideName(m_trackView->getTrack()->name())); }
 
-void TrackLabelButton::dragEnterEvent(QDragEnterEvent* _dee)
-{
-	m_trackView->dragEnterEvent(_dee);
-}
+void TrackLabelButton::dragEnterEvent(QDragEnterEvent* _dee) { m_trackView->dragEnterEvent(_dee); }
 
 void TrackLabelButton::dropEvent(QDropEvent* _de)
 {
@@ -139,10 +131,7 @@ void TrackLabelButton::mousePressEvent(QMouseEvent* _me)
 	}
 }
 
-void TrackLabelButton::mouseDoubleClickEvent(QMouseEvent* _me)
-{
-	rename();
-}
+void TrackLabelButton::mouseDoubleClickEvent(QMouseEvent* _me) { rename(); }
 
 void TrackLabelButton::mouseReleaseEvent(QMouseEvent* _me)
 {
@@ -158,17 +147,13 @@ void TrackLabelButton::paintEvent(QPaintEvent* _pe)
 {
 	if (m_trackView->getTrack()->type() == Track::InstrumentTrack)
 	{
-		InstrumentTrack* it =
-			dynamic_cast<InstrumentTrack*>(m_trackView->getTrack());
+		InstrumentTrack* it = dynamic_cast<InstrumentTrack*>(m_trackView->getTrack());
 		const PixmapLoader* pl;
 		auto get_logo = [](InstrumentTrack* it) -> const PixmapLoader* {
-			return it->instrument()->key().isValid()
-				? it->instrument()->key().logo()
-				: it->instrument()->descriptor()->logo;
+			return it->instrument()->key().isValid() ? it->instrument()->key().logo()
+													 : it->instrument()->descriptor()->logo;
 		};
-		if (it && it->instrument() &&
-			it->instrument()->descriptor() &&
-			(pl = get_logo(it)))
+		if (it && it->instrument() && it->instrument()->descriptor() && (pl = get_logo(it)))
 		{
 			if (pl->pixmapName() != m_iconName)
 			{
@@ -180,10 +165,7 @@ void TrackLabelButton::paintEvent(QPaintEvent* _pe)
 	QToolButton::paintEvent(_pe);
 }
 
-void TrackLabelButton::resizeEvent(QResizeEvent* _re)
-{
-	setText(elideName(m_trackView->getTrack()->displayName()));
-}
+void TrackLabelButton::resizeEvent(QResizeEvent* _re) { setText(elideName(m_trackView->getTrack()->displayName())); }
 
 QString TrackLabelButton::elideName(const QString& name)
 {

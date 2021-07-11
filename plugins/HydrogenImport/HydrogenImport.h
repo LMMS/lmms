@@ -15,10 +15,7 @@ public:
 
 	virtual ~HydrogenImport();
 
-	virtual PluginView* instantiateView(QWidget*)
-	{
-		return (NULL);
-	}
+	virtual PluginView* instantiateView(QWidget*) { return (NULL); }
 
 private:
 	virtual bool tryImport(TrackContainer* tc);

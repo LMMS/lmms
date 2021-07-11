@@ -38,26 +38,15 @@ class DualFilterControls : public EffectControls
 	Q_OBJECT
 public:
 	DualFilterControls(DualFilterEffect* effect);
-	virtual ~DualFilterControls()
-	{
-	}
+	virtual ~DualFilterControls() {}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return "DualFilterControls";
-	}
+	inline virtual QString nodeName() const { return "DualFilterControls"; }
 
-	virtual int controlCount()
-	{
-		return 11;
-	}
+	virtual int controlCount() { return 11; }
 
-	virtual EffectControlDialog* createView()
-	{
-		return new DualFilterControlDialog(this);
-	}
+	virtual EffectControlDialog* createView() { return new DualFilterControlDialog(this); }
 
 private slots:
 	void updateFilters();

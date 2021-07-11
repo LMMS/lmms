@@ -38,17 +38,10 @@
 
 extern "C"
 {
-	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
-		{
-			"spectrumanalyzer",
-			"Spectrum Analyzer",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A graphical spectrum analyzer."),
-			"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
-			0x0112,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor = {"spectrumanalyzer", "Spectrum Analyzer",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A graphical spectrum analyzer."),
+		"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>", 0x0112, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 }
 
 Analyzer::Analyzer(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)
@@ -79,8 +72,8 @@ bool Analyzer::processAudioBuffer(sampleFrame* buffer, const fpp_t frame_count)
 	unsigned int audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	if (audio_time - m_last_dump_time > 5000000000) // print every 5 seconds
 	{
-		std::cout << "Analyzer audio thread: " << m_sum_execution / m_dump_count << " ms avg / "
-				  << m_max_execution << " ms peak." << std::endl;
+		std::cout << "Analyzer audio thread: " << m_sum_execution / m_dump_count << " ms avg / " << m_max_execution
+				  << " ms peak." << std::endl;
 		m_last_dump_time = audio_time;
 		m_sum_execution = m_max_execution = m_dump_count = 0;
 	}

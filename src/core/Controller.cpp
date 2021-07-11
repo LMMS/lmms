@@ -39,8 +39,7 @@
 long Controller::s_periods = 0;
 QVector<Controller*> Controller::s_controllers;
 
-Controller::Controller(ControllerTypes _type, Model* _parent,
-	const QString& _display_name)
+Controller::Controller(ControllerTypes _type, Model* _parent, const QString& _display_name)
 	: Model(_parent, _display_name)
 	, JournallingObject()
 	, m_valueBuffer(Engine::mixer()->framesPerPeriod())
@@ -54,8 +53,7 @@ Controller::Controller(ControllerTypes _type, Model* _parent,
 		// Determine which name to use
 		for (uint i = s_controllers.size();; i++)
 		{
-			QString new_name = QString(tr("Controller %1"))
-								   .arg(i);
+			QString new_name = QString(tr("Controller %1")).arg(i);
 
 			// Check if name is already in use
 			bool name_used = false;
@@ -125,16 +123,10 @@ void Controller::updateValueBuffer()
 }
 
 // Get position in frames
-unsigned int Controller::runningFrames()
-{
-	return s_periods * Engine::mixer()->framesPerPeriod();
-}
+unsigned int Controller::runningFrames() { return s_periods * Engine::mixer()->framesPerPeriod(); }
 
 // Get position in seconds
-float Controller::runningTime()
-{
-	return runningFrames() / Engine::mixer()->processingSampleRate();
-}
+float Controller::runningTime() { return runningFrames() / Engine::mixer()->processingSampleRate(); }
 
 void Controller::triggerFrameCounter()
 {
@@ -148,7 +140,7 @@ void Controller::triggerFrameCounter()
 	}
 
 	s_periods++;
-	//emit s_signaler.triggerValueChanged();
+	// emit s_signaler.triggerValueChanged();
 }
 
 void Controller::resetFrameCounter()
@@ -169,8 +161,7 @@ Controller* Controller::create(ControllerTypes _ct, Model* _parent)
 	{
 	case Controller::DummyController:
 		if (!dummy)
-			dummy = new Controller(DummyController, NULL,
-				QString());
+			dummy = new Controller(DummyController, NULL, QString());
 		c = dummy;
 		break;
 
@@ -179,7 +170,7 @@ Controller* Controller::create(ControllerTypes _ct, Model* _parent)
 		break;
 
 	case Controller::PeakController:
-		//Already instantiated in EffectChain::loadSettings()
+		// Already instantiated in EffectChain::loadSettings()
 		Q_ASSERT(false);
 		break;
 
@@ -203,9 +194,7 @@ Controller* Controller::create(const QDomElement& _this, Model* _parent)
 	}
 	else
 	{
-		c = create(
-			static_cast<ControllerTypes>(_this.attribute("type").toInt()),
-			_parent);
+		c = create(static_cast<ControllerTypes>(_this.attribute("type").toInt()), _parent);
 	}
 
 	if (c != NULL)
@@ -256,10 +245,7 @@ void Controller::loadSettings(const QDomElement& _this)
 	setName(_this.attribute("name"));
 }
 
-QString Controller::nodeName() const
-{
-	return ("Controller");
-}
+QString Controller::nodeName() const { return ("Controller"); }
 
 ControllerDialog* Controller::createDialog(QWidget* _parent)
 {
@@ -268,10 +254,7 @@ ControllerDialog* Controller::createDialog(QWidget* _parent)
 	return d;
 }
 
-void Controller::addConnection(ControllerConnection*)
-{
-	m_connectionCount++;
-}
+void Controller::addConnection(ControllerConnection*) { m_connectionCount++; }
 
 void Controller::removeConnection(ControllerConnection*)
 {
@@ -279,7 +262,4 @@ void Controller::removeConnection(ControllerConnection*)
 	Q_ASSERT(m_connectionCount >= 0);
 }
 
-int Controller::connectionCount() const
-{
-	return m_connectionCount;
-}
+int Controller::connectionCount() const { return m_connectionCount; }

@@ -13,8 +13,7 @@ TemplatesMenu::TemplatesMenu(QWidget* parent)
 	setIcon(embed::getIconPixmap("project_new"));
 
 	connect(this, SIGNAL(aboutToShow()), SLOT(fillTemplatesMenu()));
-	connect(this, SIGNAL(triggered(QAction*)),
-		SLOT(createNewProjectFromTemplate(QAction*)));
+	connect(this, SIGNAL(triggered(QAction*)), SLOT(createNewProjectFromTemplate(QAction*)));
 }
 
 void TemplatesMenu::createNewProjectFromTemplate(QAction* _action)
@@ -36,8 +35,7 @@ void TemplatesMenu::fillTemplatesMenu()
 
 void TemplatesMenu::addTemplatesFromDir(const QDir& dir)
 {
-	QFileInfoList templates = dir.entryInfoList(QStringList("*.mpt"),
-		QDir::Files | QDir::Readable);
+	QFileInfoList templates = dir.entryInfoList(QStringList("*.mpt"), QDir::Files | QDir::Readable);
 
 	if (!templates.empty() && !actions().isEmpty())
 	{
@@ -48,8 +46,7 @@ void TemplatesMenu::addTemplatesFromDir(const QDir& dir)
 
 	for (const QFileInfo& templateFile : templates)
 	{
-		auto action = addAction(projectFileIcon,
-			templateFile.completeBaseName().replace("&", "&&"));
+		auto action = addAction(projectFileIcon, templateFile.completeBaseName().replace("&", "&&"));
 		action->setData(templateFile.absoluteFilePath());
 #ifdef LMMS_BUILD_APPLE
 		action->setIconVisibleInMenu(false); // QTBUG-44565 workaround

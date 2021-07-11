@@ -56,43 +56,22 @@ typedef uint32_t jo_id_t; // (unique) ID of a journalling object
 #undef min
 #undef max
 
-template <typename T>
-struct typeInfo
+template <typename T> struct typeInfo
 {
-	static inline T min()
-	{
-		return std::numeric_limits<T>::min();
-	}
+	static inline T min() { return std::numeric_limits<T>::min(); }
 
-	static inline T max()
-	{
-		return std::numeric_limits<T>::max();
-	}
+	static inline T max() { return std::numeric_limits<T>::max(); }
 
-	static inline T minEps()
-	{
-		return 1;
-	}
+	static inline T minEps() { return 1; }
 
-	static inline bool isEqual(T x, T y)
-	{
-		return x == y;
-	}
+	static inline bool isEqual(T x, T y) { return x == y; }
 
-	static inline T absVal(T t)
-	{
-		return t >= 0 ? t : -t;
-	}
+	static inline T absVal(T t) { return t >= 0 ? t : -t; }
 };
 
-template <>
-inline float typeInfo<float>::minEps()
-{
-	return 1.0e-10f;
-}
+template <> inline float typeInfo<float>::minEps() { return 1.0e-10f; }
 
-template <>
-inline bool typeInfo<float>::isEqual(float x, float y)
+template <> inline bool typeInfo<float>::isEqual(float x, float y)
 {
 	if (x == y)
 	{

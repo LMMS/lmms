@@ -32,16 +32,11 @@
 class waveShaperEffect : public Effect
 {
 public:
-	waveShaperEffect(Model* _parent,
-		const Descriptor::SubPluginFeatures::Key* _key);
+	waveShaperEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~waveShaperEffect();
-	virtual bool processAudioBuffer(sampleFrame* _buf,
-		const fpp_t _frames);
+	virtual bool processAudioBuffer(sampleFrame* _buf, const fpp_t _frames);
 
-	virtual EffectControls* controls()
-	{
-		return (&m_wsControls);
-	}
+	virtual EffectControls* controls() { return (&m_wsControls); }
 
 private:
 	waveShaperControls m_wsControls;

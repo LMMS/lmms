@@ -60,9 +60,7 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget(QWidget* _parent)
 	m_selectedDevice = m_deviceComboBox->currentIndex();
 
 	m_deviceComboBox->setGeometry(10, 20, 160, 20);
-	connect(m_deviceComboBox,
-		SIGNAL(currentIndexChanged(int)),
-		SLOT(onCurrentIndexChanged(int)));
+	connect(m_deviceComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onCurrentIndexChanged(int)));
 
 	QLabel* dev_lbl = new QLabel(tr("DEVICE"), this);
 	dev_lbl->setFont(pointSize<7>(dev_lbl->font()));
@@ -71,9 +69,7 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget(QWidget* _parent)
 	LcdSpinBoxModel* m = new LcdSpinBoxModel(/* this */);
 	m->setRange(DEFAULT_CHANNELS, SURROUND_CHANNELS);
 	m->setStep(2);
-	m->setValue(ConfigManager::inst()->value("audioalsa",
-										 "channels")
-					.toInt());
+	m->setValue(ConfigManager::inst()->value("audioalsa", "channels").toInt());
 
 	m_channels = new LcdSpinBox(1, this);
 	m_channels->setModel(m);
@@ -81,10 +77,7 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget(QWidget* _parent)
 	m_channels->move(180, 20);
 }
 
-AudioAlsaSetupWidget::~AudioAlsaSetupWidget()
-{
-	delete m_channels->model();
-}
+AudioAlsaSetupWidget::~AudioAlsaSetupWidget() { delete m_channels->model(); }
 
 void AudioAlsaSetupWidget::saveSettings()
 {
@@ -97,13 +90,9 @@ void AudioAlsaSetupWidget::saveSettings()
 	}
 
 	ConfigManager::inst()->setValue("audioalsa", "device", deviceText);
-	ConfigManager::inst()->setValue("audioalsa", "channels",
-		QString::number(m_channels->value<int>()));
+	ConfigManager::inst()->setValue("audioalsa", "channels", QString::number(m_channels->value<int>()));
 }
 
-void AudioAlsaSetupWidget::onCurrentIndexChanged(int index)
-{
-	m_selectedDevice = index;
-}
+void AudioAlsaSetupWidget::onCurrentIndexChanged(int index) { m_selectedDevice = index; }
 
 #endif

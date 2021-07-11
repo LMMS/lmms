@@ -50,8 +50,7 @@ void parameter_print(ostream& file, Alg_parameter_ptr p)
 	}
 }
 
-Alg_event_ptr Alg_seq::write_track_name(ostream& file, int n,
-	Alg_events& events)
+Alg_event_ptr Alg_seq::write_track_name(ostream& file, int n, Alg_events& events)
 // write #track <n> <trackname-or-sequencename>
 // if we write the name on the "#track" line, then we do *not* want
 // to write again as an update: "-seqnames:"Jordu", so if we do
@@ -60,8 +59,7 @@ Alg_event_ptr Alg_seq::write_track_name(ostream& file, int n,
 {
 	Alg_event_ptr e = NULL; // e is the result, default is NULL
 	file << "#track " << n;
-	const char* attr = symbol_table.insert_string(
-		n == 0 ? "seqnames" : "tracknames");
+	const char* attr = symbol_table.insert_string(n == 0 ? "seqnames" : "tracknames");
 	// search for name in events with timestamp of 0
 	for (int i = 0; i < events.length(); i++)
 	{
@@ -104,8 +102,7 @@ void Alg_seq::write(ostream& file, bool in_secs, double offset)
 		{
 			file << "TW" << TIMFMT << b->beat / 4;
 		}
-		double tempo = (beats[i + 1].beat - b->beat) /
-			(beats[i + 1].time - beats[i].time);
+		double tempo = (beats[i + 1].beat - b->beat) / (beats[i + 1].time - beats[i].time);
 		file << " -tempor:" << GFMT << tempo * 60 << "\n";
 	}
 	if (time_map->last_tempo_flag)

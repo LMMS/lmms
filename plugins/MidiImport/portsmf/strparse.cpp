@@ -13,10 +13,7 @@ void String_parse::skip_space()
 	}
 }
 
-char String_parse::peek()
-{
-	return (*str)[pos];
-}
+char String_parse::peek() { return (*str)[pos]; }
 
 void String_parse::get_nonspace_quoted(string& field)
 {

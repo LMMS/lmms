@@ -37,10 +37,7 @@ QAction* ActionGroup::addAction(QAction* a)
 	return QActionGroup::addAction(a);
 }
 
-QAction* ActionGroup::addAction(const QString& text)
-{
-	return addAction(new QAction(text, this));
-}
+QAction* ActionGroup::addAction(const QString& text) { return addAction(new QAction(text, this)); }
 
 QAction* ActionGroup::addAction(const QIcon& icon, const QString& text)
 {

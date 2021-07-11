@@ -54,18 +54,16 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"ZynAddSubFX",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Embedded ZynAddSubFX"),
-			"Tobias Doerffel <tobydox/at/users.sf.net>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			"xiz",
-			NULL,
+	Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor = {
+		STRINGIFY(PLUGIN_NAME),
+		"ZynAddSubFX",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Embedded ZynAddSubFX"),
+		"Tobias Doerffel <tobydox/at/users.sf.net>",
+		0x0100,
+		Plugin::Instrument,
+		new PluginPixmapLoader("logo"),
+		"xiz",
+		NULL,
 	};
 }
 
@@ -75,9 +73,7 @@ ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin()
 	init("RemoteZynAddSubFx", false);
 }
 
-ZynAddSubFxRemotePlugin::~ZynAddSubFxRemotePlugin()
-{
-}
+ZynAddSubFxRemotePlugin::~ZynAddSubFxRemotePlugin() {}
 
 bool ZynAddSubFxRemotePlugin::processMessage(const message& _m)
 {
@@ -93,8 +89,7 @@ bool ZynAddSubFxRemotePlugin::processMessage(const message& _m)
 	return RemotePlugin::processMessage(_m);
 }
 
-ZynAddSubFxInstrument::ZynAddSubFxInstrument(
-	InstrumentTrack* _instrumentTrack)
+ZynAddSubFxInstrument::ZynAddSubFxInstrument(InstrumentTrack* _instrumentTrack)
 	: Instrument(_instrumentTrack, &zynaddsubfx_plugin_descriptor)
 	, m_hasGUI(false)
 	, m_plugin(NULL)
@@ -110,36 +105,28 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 {
 	initPlugin();
 
-	connect(&m_portamentoModel, SIGNAL(dataChanged()),
-		this, SLOT(updatePortamento()), Qt::DirectConnection);
-	connect(&m_filterFreqModel, SIGNAL(dataChanged()),
-		this, SLOT(updateFilterFreq()), Qt::DirectConnection);
-	connect(&m_filterQModel, SIGNAL(dataChanged()),
-		this, SLOT(updateFilterQ()), Qt::DirectConnection);
-	connect(&m_bandwidthModel, SIGNAL(dataChanged()),
-		this, SLOT(updateBandwidth()), Qt::DirectConnection);
-	connect(&m_fmGainModel, SIGNAL(dataChanged()),
-		this, SLOT(updateFmGain()), Qt::DirectConnection);
-	connect(&m_resCenterFreqModel, SIGNAL(dataChanged()),
-		this, SLOT(updateResCenterFreq()), Qt::DirectConnection);
-	connect(&m_resBandwidthModel, SIGNAL(dataChanged()),
-		this, SLOT(updateResBandwidth()), Qt::DirectConnection);
+	connect(&m_portamentoModel, SIGNAL(dataChanged()), this, SLOT(updatePortamento()), Qt::DirectConnection);
+	connect(&m_filterFreqModel, SIGNAL(dataChanged()), this, SLOT(updateFilterFreq()), Qt::DirectConnection);
+	connect(&m_filterQModel, SIGNAL(dataChanged()), this, SLOT(updateFilterQ()), Qt::DirectConnection);
+	connect(&m_bandwidthModel, SIGNAL(dataChanged()), this, SLOT(updateBandwidth()), Qt::DirectConnection);
+	connect(&m_fmGainModel, SIGNAL(dataChanged()), this, SLOT(updateFmGain()), Qt::DirectConnection);
+	connect(&m_resCenterFreqModel, SIGNAL(dataChanged()), this, SLOT(updateResCenterFreq()), Qt::DirectConnection);
+	connect(&m_resBandwidthModel, SIGNAL(dataChanged()), this, SLOT(updateResBandwidth()), Qt::DirectConnection);
 
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle* iph = new InstrumentPlayHandle(this, _instrumentTrack);
 	Engine::mixer()->addPlayHandle(iph);
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
-		this, SLOT(reloadPlugin()));
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(reloadPlugin()));
 
-	connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
-		this, SLOT(updatePitchRange()), Qt::DirectConnection);
+	connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()), this, SLOT(updatePitchRange()),
+		Qt::DirectConnection);
 }
 
 ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 {
-	Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(),
-		PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+	Engine::mixer()->removePlayHandlesOfTypes(
+		instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 
 	m_pluginMutex.lock();
 	delete m_plugin;
@@ -149,8 +136,7 @@ ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 	m_pluginMutex.unlock();
 }
 
-void ZynAddSubFxInstrument::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void ZynAddSubFxInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	m_portamentoModel.saveSettings(_doc, _this, "portamento");
 	m_filterFreqModel.saveSettings(_doc, _this, "filterfreq");
@@ -161,8 +147,7 @@ void ZynAddSubFxInstrument::saveSettings(QDomDocument& _doc,
 	m_resBandwidthModel.saveSettings(_doc, _this, "resbandwidth");
 
 	QString modifiedControllers;
-	for (QMap<int, bool>::ConstIterator it = m_modifiedControllers.begin();
-		 it != m_modifiedControllers.end(); ++it)
+	for (QMap<int, bool>::ConstIterator it = m_modifiedControllers.begin(); it != m_modifiedControllers.end(); ++it)
 	{
 		if (it.value())
 		{
@@ -176,8 +161,7 @@ void ZynAddSubFxInstrument::saveSettings(QDomDocument& _doc,
 	QTemporaryFile tf;
 	if (tf.open())
 	{
-		const std::string fn = QSTR_TO_STDSTR(
-			QDir::toNativeSeparators(tf.fileName()));
+		const std::string fn = QSTR_TO_STDSTR(QDir::toNativeSeparators(tf.fileName()));
 		m_pluginMutex.lock();
 		if (m_remotePlugin)
 		{
@@ -310,10 +294,7 @@ void ZynAddSubFxInstrument::loadFile(const QString& _file)
 	emit settingsChanged();
 }
 
-QString ZynAddSubFxInstrument::nodeName() const
-{
-	return zynaddsubfx_plugin_descriptor.name;
-}
+QString ZynAddSubFxInstrument::nodeName() const { return zynaddsubfx_plugin_descriptor.name; }
 
 void ZynAddSubFxInstrument::play(sampleFrame* _buf)
 {
@@ -337,9 +318,7 @@ bool ZynAddSubFxInstrument::handleMidiEvent(const MidiEvent& event, const TimePo
 {
 	// do not forward external MIDI Control Change events if the according
 	// LED is not checked
-	if (event.type() == MidiControlChange &&
-		event.sourcePort() != this &&
-		m_forwardMidiCcModel.value() == false)
+	if (event.type() == MidiControlChange && event.sourcePort() != this && m_forwardMidiCcModel.value() == false)
 	{
 		return true;
 	}
@@ -378,7 +357,8 @@ void ZynAddSubFxInstrument::updatePitchRange()
 	m_pluginMutex.lock();
 	if (m_remotePlugin)
 	{
-		m_remotePlugin->sendMessage(RemotePlugin::message(IdZasfSetPitchWheelBendRange).addInt(instrumentTrack()->midiPitchRange()));
+		m_remotePlugin->sendMessage(
+			RemotePlugin::message(IdZasfSetPitchWheelBendRange).addInt(instrumentTrack()->midiPitchRange()));
 	}
 	else
 	{
@@ -416,16 +396,19 @@ void ZynAddSubFxInstrument::initPlugin()
 		m_remotePlugin->lock();
 		m_remotePlugin->waitForInitDone(false);
 
+		m_remotePlugin->sendMessage(RemotePlugin::message(IdZasfLmmsWorkingDirectory)
+										.addString(QSTR_TO_STDSTR(QString(ConfigManager::inst()->workingDir()))));
 		m_remotePlugin->sendMessage(
-			RemotePlugin::message(IdZasfLmmsWorkingDirectory).addString(QSTR_TO_STDSTR(QString(ConfigManager::inst()->workingDir()))));
-		m_remotePlugin->sendMessage(
-			RemotePlugin::message(IdZasfPresetDirectory).addString(QSTR_TO_STDSTR(QDir(ConfigManager::inst()->factoryPresetsDir() + "/ZynAddSubFX").absolutePath())));
+			RemotePlugin::message(IdZasfPresetDirectory)
+				.addString(
+					QSTR_TO_STDSTR(QDir(ConfigManager::inst()->factoryPresetsDir() + "/ZynAddSubFX").absolutePath())));
 
 		m_remotePlugin->updateSampleRate(Engine::mixer()->processingSampleRate());
 
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
-		m_remotePlugin->sendMessage(RemotePlugin::message(IdBufferSizeInformation).addInt(Engine::mixer()->framesPerPeriod()));
+		m_remotePlugin->sendMessage(
+			RemotePlugin::message(IdBufferSizeInformation).addInt(Engine::mixer()->framesPerPeriod()));
 
 		m_remotePlugin->showUI();
 		m_remotePlugin->unlock();
@@ -442,13 +425,11 @@ void ZynAddSubFxInstrument::initPlugin()
 
 void ZynAddSubFxInstrument::sendControlChange(MidiControllers midiCtl, float value)
 {
-	handleMidiEvent(MidiEvent(MidiControlChange, instrumentTrack()->midiPort()->realOutputChannel(), midiCtl, (int)value, this));
+	handleMidiEvent(
+		MidiEvent(MidiControlChange, instrumentTrack()->midiPort()->realOutputChannel(), midiCtl, (int)value, this));
 }
 
-PluginView* ZynAddSubFxInstrument::instantiateView(QWidget* _parent)
-{
-	return new ZynAddSubFxView(this, _parent);
-}
+PluginView* ZynAddSubFxInstrument::instantiateView(QWidget* _parent) { return new ZynAddSubFxView(this, _parent); }
 
 ZynAddSubFxView::ZynAddSubFxView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
@@ -498,8 +479,7 @@ ZynAddSubFxView::ZynAddSubFxView(Instrument* _instrument, QWidget* _parent)
 	m_toggleUIButton->setChecked(false);
 	m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
 	m_toggleUIButton->setFont(pointSize<8>(m_toggleUIButton->font()));
-	connect(m_toggleUIButton, SIGNAL(toggled(bool)), this,
-		SLOT(toggleUI()));
+	connect(m_toggleUIButton, SIGNAL(toggled(bool)), this, SLOT(toggleUI()));
 
 	l->addWidget(m_toggleUIButton, 0, 0, 1, 4);
 	l->setRowStretch(1, 5);
@@ -518,9 +498,7 @@ ZynAddSubFxView::ZynAddSubFxView(Instrument* _instrument, QWidget* _parent)
 	setAcceptDrops(true);
 }
 
-ZynAddSubFxView::~ZynAddSubFxView()
-{
-}
+ZynAddSubFxView::~ZynAddSubFxView() {}
 
 void ZynAddSubFxView::dragEnterEvent(QDragEnterEvent* _dee)
 {
@@ -529,8 +507,7 @@ void ZynAddSubFxView::dragEnterEvent(QDragEnterEvent* _dee)
 
 	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
 	{
-		QString txt = _dee->mimeData()->data(
-			mimeType(MimeType::StringPair));
+		QString txt = _dee->mimeData()->data(mimeType(MimeType::StringPair));
 		if (txt.section(':', 0, 0) == "pluginpresetfile")
 		{
 			_dee->acceptProposedAction();
@@ -587,8 +564,7 @@ void ZynAddSubFxView::toggleUI()
 
 		if (model->m_remotePlugin)
 		{
-			connect(model->m_remotePlugin, SIGNAL(clickedCloseButton()),
-				m_toggleUIButton, SLOT(toggle()));
+			connect(model->m_remotePlugin, SIGNAL(clickedCloseButton()), m_toggleUIButton, SLOT(toggle()));
 		}
 	}
 }

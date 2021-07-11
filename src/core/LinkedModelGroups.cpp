@@ -63,8 +63,8 @@ void LinkedModelGroup::addModel(AutomatableModel* model, const QString& name)
 	model->setObjectName(name);
 	m_models.emplace(std::string(name.toUtf8().data()), ModelInfo(name, model));
 	connect(
-		model, &AutomatableModel::destroyed,
-		this, [this, model](jo_id_t) {
+		model, &AutomatableModel::destroyed, this,
+		[this, model](jo_id_t) {
 			if (containsModel(model->objectName()))
 			{
 				emit modelRemoved(model);
@@ -87,15 +87,9 @@ void LinkedModelGroup::removeControl(AutomatableModel* mdl)
 	}
 }
 
-bool LinkedModelGroup::eraseModel(const QString& name)
-{
-	return m_models.erase(name.toStdString()) > 0;
-}
+bool LinkedModelGroup::eraseModel(const QString& name) { return m_models.erase(name.toStdString()) > 0; }
 
-void LinkedModelGroup::clearModels()
-{
-	m_models.clear();
-}
+void LinkedModelGroup::clearModels() { m_models.clear(); }
 
 bool LinkedModelGroup::containsModel(const QString& name) const
 {

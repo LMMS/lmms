@@ -69,8 +69,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum)
 					break;
 				case PortVis::Integer: {
 					sample_rate_t sr = Engine::mixer()->processingSampleRate();
-					m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
-						m_par);
+					m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2, m_par);
 					break;
 				}
 				case PortVis::Enumeration:
@@ -82,8 +81,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum)
 				}
 				m_control->setText(port.name());
 
-				AutoLilvNodes props(lilv_port_get_value(
-					port.m_plugin, port.m_port, m_commentUri));
+				AutoLilvNodes props(lilv_port_get_value(port.m_plugin, port.m_port, m_commentUri));
 				LILV_FOREACH(nodes, itr, props.get())
 				{
 					const LilvNode* nod = lilv_nodes_get(props.get(), itr);
@@ -95,30 +93,23 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum)
 	};
 
 	AutoLilvNode commentUri = uri(LILV_NS_RDFS "comment");
-	ctrlBase->foreach_port(
-		[this, &commentUri](const Lv2Ports::PortBase* port) {
-			SetupWidget setup;
-			setup.m_par = this;
-			setup.m_commentUri = commentUri.get();
-			port->accept(setup);
+	ctrlBase->foreach_port([this, &commentUri](const Lv2Ports::PortBase* port) {
+		SetupWidget setup;
+		setup.m_par = this;
+		setup.m_commentUri = commentUri.get();
+		port->accept(setup);
 
-			if (setup.m_control)
-			{
-				addControl(setup.m_control,
-					lilv_node_as_string(lilv_port_get_symbol(
-						port->m_plugin, port->m_port)),
-					port->name().toUtf8().data(),
-					false);
-			}
-		});
+		if (setup.m_control)
+		{
+			addControl(setup.m_control, lilv_node_as_string(lilv_port_get_symbol(port->m_plugin, port->m_port)),
+				port->name().toUtf8().data(), false);
+		}
+	});
 }
 
 Lv2ViewProc::~Lv2ViewProc() {}
 
-AutoLilvNode Lv2ViewProc::uri(const char* uriStr)
-{
-	return Engine::getLv2Manager()->uri(uriStr);
-}
+AutoLilvNode Lv2ViewProc::uri(const char* uriStr) { return Engine::getLv2Manager()->uri(uriStr); }
 
 Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
 {
@@ -127,20 +118,17 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
 	QHBoxLayout* btnBox = new QHBoxLayout();
 	if (/* DISABLES CODE */ (false))
 	{
-		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
-			meAsWidget);
+		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"), meAsWidget);
 		btnBox->addWidget(m_reloadPluginButton, 0);
 	}
 
 	if (/* DISABLES CODE */ (false)) // TODO: check if the plugin has the UI extension
 	{
-		m_toggleUIButton = new QPushButton(QObject::tr("Show GUI"),
-			meAsWidget);
+		m_toggleUIButton = new QPushButton(QObject::tr("Show GUI"), meAsWidget);
 		m_toggleUIButton->setCheckable(true);
 		m_toggleUIButton->setChecked(false);
 		m_toggleUIButton->setIcon(embed::getIconPixmap("zoom"));
-		m_toggleUIButton->setFont(
-			pointSize<8>(m_toggleUIButton->font()));
+		m_toggleUIButton->setFont(pointSize<8>(m_toggleUIButton->font()));
 		btnBox->addWidget(m_toggleUIButton, 0);
 	}
 	btnBox->addStretch(1);
@@ -150,8 +138,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
 	// note: the lifetime of C++ objects ends after the top expression in the
 	// expression syntax tree, so the AutoLilvNode gets freed after the function
 	// has been called
-	AutoLilvNodes props(lilv_plugin_get_value(ctrlBase->getPlugin(),
-		uri(LILV_NS_RDFS "comment").get()));
+	AutoLilvNodes props(lilv_plugin_get_value(ctrlBase->getPlugin(), uri(LILV_NS_RDFS "comment").get()));
 	LILV_FOREACH(nodes, itr, props.get())
 	{
 		const LilvNode* node = lilv_nodes_get(props.get(), itr);
@@ -164,8 +151,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
 		btnBox->addWidget(m_helpButton);
 
 		m_helpWindow = gui->mainWindow()->addWindowedWidget(infoLabel);
-		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
-			QSizePolicy::Expanding);
+		m_helpWindow->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 		m_helpWindow->hide();
 
@@ -190,9 +176,7 @@ Lv2ViewBase::~Lv2ViewBase()
 	// TODO: hide UI if required
 }
 
-void Lv2ViewBase::toggleUI()
-{
-}
+void Lv2ViewBase::toggleUI() {}
 
 void Lv2ViewBase::toggleHelp(bool visible)
 {
@@ -221,9 +205,6 @@ void Lv2ViewBase::modelChanged(Lv2ControlBase* ctrlBase)
 	LinkedModelGroupsView::modelChanged(ctrlBase);
 }
 
-AutoLilvNode Lv2ViewBase::uri(const char* uriStr)
-{
-	return Engine::getLv2Manager()->uri(uriStr);
-}
+AutoLilvNode Lv2ViewBase::uri(const char* uriStr) { return Engine::getLv2Manager()->uri(uriStr); }
 
 #endif // LMMS_HAVE_LV2

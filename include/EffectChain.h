@@ -42,10 +42,7 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	inline QString nodeName() const override
-	{
-		return "fxchain";
-	}
+	inline QString nodeName() const override { return "fxchain"; }
 
 	void appendEffect(Effect* _effect);
 	void removeEffect(Effect* _effect);

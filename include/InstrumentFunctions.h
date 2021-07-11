@@ -53,10 +53,7 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	inline QString nodeName() const override
-	{
-		return "chordcreator";
-	}
+	inline QString nodeName() const override { return "chordcreator"; }
 
 	struct Chord
 	{
@@ -73,37 +70,19 @@ public:
 
 		Chord(const char* n, const ChordSemiTones& semi_tones);
 
-		int size() const
-		{
-			return m_size;
-		}
+		int size() const { return m_size; }
 
-		bool isScale() const
-		{
-			return size() > 6;
-		}
+		bool isScale() const { return size() > 6; }
 
-		bool isEmpty() const
-		{
-			return size() == 0;
-		}
+		bool isEmpty() const { return size() == 0; }
 
 		bool hasSemiTone(int8_t semiTone) const;
 
-		int8_t last() const
-		{
-			return m_semiTones[size() - 1];
-		}
+		int8_t last() const { return m_semiTones[size() - 1]; }
 
-		const QString& getName() const
-		{
-			return m_name;
-		}
+		const QString& getName() const { return m_name; }
 
-		int8_t operator[](int n) const
-		{
-			return m_semiTones[n];
-		}
+		int8_t operator[](int n) const { return m_semiTones[n]; }
 	};
 
 	struct ChordTable : public QVector<Chord>
@@ -128,15 +107,9 @@ public:
 
 		const Chord& getByName(const QString& name, bool is_scale = false) const;
 
-		const Chord& getScaleByName(const QString& name) const
-		{
-			return getByName(name, true);
-		}
+		const Chord& getScaleByName(const QString& name) const { return getByName(name, true); }
 
-		const Chord& getChordByName(const QString& name) const
-		{
-			return getByName(name, false);
-		}
+		const Chord& getChordByName(const QString& name) const { return getByName(name, false); }
 	};
 
 private:
@@ -169,10 +142,7 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	inline QString nodeName() const override
-	{
-		return "arpeggiator";
-	}
+	inline QString nodeName() const override { return "arpeggiator"; }
 
 private:
 	enum ArpModes

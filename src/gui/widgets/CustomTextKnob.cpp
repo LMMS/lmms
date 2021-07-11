@@ -13,7 +13,4 @@ CustomTextKnob::CustomTextKnob(QWidget* _parent, const QString& _name, const QSt
 {
 }
 
-QString CustomTextKnob::displayValue() const
-{
-	return m_description.trimmed() + m_value_text;
-}
+QString CustomTextKnob::displayValue() const { return m_description.trimmed() + m_value_text; }

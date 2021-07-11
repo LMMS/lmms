@@ -64,8 +64,9 @@ LocklessAllocator::~LocklessAllocator()
 	int available = m_available;
 	if (available != m_capacity)
 	{
-		fprintf(stderr, "LocklessAllocator: "
-						"Destroying with elements still allocated\n");
+		fprintf(stderr,
+			"LocklessAllocator: "
+			"Destroying with elements still allocated\n");
 	}
 
 	delete[] m_pool;
@@ -110,8 +111,7 @@ void* LocklessAllocator::alloc()
 		for (int freeState = m_freeState[set]; freeState != -1;)
 		{
 			int bit = ffs(~freeState) - 1;
-			if (m_freeState[set].compare_exchange_weak(freeState,
-					freeState | 1 << bit))
+			if (m_freeState[set].compare_exchange_weak(freeState, freeState | 1 << bit))
 			{
 				return m_pool + (SIZEOF_SET * set + bit) * m_elementSize;
 			}

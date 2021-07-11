@@ -35,9 +35,7 @@ class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 public:
 	InstrumentPlayHandle(Instrument* instrument, InstrumentTrack* instrumentTrack);
 
-	virtual ~InstrumentPlayHandle()
-	{
-	}
+	virtual ~InstrumentPlayHandle() {}
 
 	void play(sampleFrame* _working_buffer) override
 	{
@@ -51,8 +49,7 @@ public:
 			for (const NotePlayHandle* constNotePlayHandle : nphv)
 			{
 				NotePlayHandle* notePlayHandle = const_cast<NotePlayHandle*>(constNotePlayHandle);
-				if (notePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
-					!notePlayHandle->isFinished())
+				if (notePlayHandle->state() != ThreadableJob::ProcessingState::Done && !notePlayHandle->isFinished())
 				{
 					nphsLeft = true;
 					notePlayHandle->process();
@@ -63,15 +60,9 @@ public:
 		m_instrument->play(_working_buffer);
 	}
 
-	bool isFinished() const override
-	{
-		return false;
-	}
+	bool isFinished() const override { return false; }
 
-	bool isFromTrack(const Track* _track) const override
-	{
-		return m_instrument->isFromTrack(_track);
-	}
+	bool isFromTrack(const Track* _track) const override { return m_instrument->isFromTrack(_track); }
 
 private:
 	Instrument* m_instrument;

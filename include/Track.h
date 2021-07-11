@@ -75,33 +75,24 @@ public:
 	virtual ~Track();
 
 	static Track* create(TrackTypes tt, TrackContainer* tc);
-	static Track* create(const QDomElement& element,
-		TrackContainer* tc);
+	static Track* create(const QDomElement& element, TrackContainer* tc);
 	Track* clone();
 
 	// pure virtual functions
-	TrackTypes type() const
-	{
-		return m_type;
-	}
+	TrackTypes type() const { return m_type; }
 
-	virtual bool play(const TimePos& start, const fpp_t frames,
-		const f_cnt_t frameBase, int tcoNum = -1) = 0;
+	virtual bool play(const TimePos& start, const fpp_t frames, const f_cnt_t frameBase, int tcoNum = -1) = 0;
 
 	virtual TrackView* createView(TrackContainerView* view) = 0;
 	virtual TrackContentObject* createTCO(const TimePos& pos) = 0;
 
-	virtual void saveTrackSpecificSettings(QDomDocument& doc,
-		QDomElement& parent) = 0;
+	virtual void saveTrackSpecificSettings(QDomDocument& doc, QDomElement& parent) = 0;
 	virtual void loadTrackSpecificSettings(const QDomElement& element) = 0;
 
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
 
-	void setSimpleSerializing()
-	{
-		m_simpleSerializingMode = true;
-	}
+	void setSimpleSerializing() { m_simpleSerializingMode = true; }
 
 	// -- for usage by TrackContentObject only ---------------
 	TrackContentObject* addTCO(TrackContentObject* tco);
@@ -113,12 +104,8 @@ public:
 	TrackContentObject* getTCO(int tcoNum);
 	int getTCONum(const TrackContentObject* tco);
 
-	const tcoVector& getTCOs() const
-	{
-		return m_trackContentObjects;
-	}
-	void getTCOsInRange(tcoVector& tcoV, const TimePos& start,
-		const TimePos& end);
+	const tcoVector& getTCOs() const { return m_trackContentObjects; }
+	void getTCOsInRange(tcoVector& tcoV, const TimePos& start, const TimePos& end);
 	void swapPositionOfTCOs(int tcoNum1, int tcoNum2);
 
 	void createTCOsForBB(int bb);
@@ -128,56 +115,24 @@ public:
 
 	bar_t length() const;
 
-	inline TrackContainer* trackContainer() const
-	{
-		return m_trackContainer;
-	}
+	inline TrackContainer* trackContainer() const { return m_trackContainer; }
 
 	// name-stuff
-	virtual const QString& name() const
-	{
-		return m_name;
-	}
+	virtual const QString& name() const { return m_name; }
 
-	QString displayName() const override
-	{
-		return name();
-	}
+	QString displayName() const override { return name(); }
 
 	using Model::dataChanged;
 
-	inline int getHeight()
-	{
-		return m_height >= MINIMAL_TRACK_HEIGHT
-			? m_height
-			: DEFAULT_TRACK_HEIGHT;
-	}
-	inline void setHeight(int height)
-	{
-		m_height = height;
-	}
+	inline int getHeight() { return m_height >= MINIMAL_TRACK_HEIGHT ? m_height : DEFAULT_TRACK_HEIGHT; }
+	inline void setHeight(int height) { m_height = height; }
 
-	void lock()
-	{
-		m_processingLock.lock();
-	}
-	void unlock()
-	{
-		m_processingLock.unlock();
-	}
-	bool tryLock()
-	{
-		return m_processingLock.tryLock();
-	}
+	void lock() { m_processingLock.lock(); }
+	void unlock() { m_processingLock.unlock(); }
+	bool tryLock() { return m_processingLock.tryLock(); }
 
-	QColor color()
-	{
-		return m_color;
-	}
-	bool useColor()
-	{
-		return m_hasColor;
-	}
+	QColor color() { return m_color; }
+	bool useColor() { return m_hasColor; }
 
 	BoolModel* getMutedModel();
 

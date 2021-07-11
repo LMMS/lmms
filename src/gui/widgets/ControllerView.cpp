@@ -83,8 +83,7 @@ ControllerView::ControllerView(Controller* _model, QWidget* _parent)
 
 	m_subWindow->setWindowIcon(m_controllerDlg->windowIcon());
 
-	connect(m_controllerDlg, SIGNAL(closed()),
-		this, SLOT(closeControls()));
+	connect(m_controllerDlg, SIGNAL(closed()), this, SLOT(closeControls()));
 
 	m_subWindow->hide();
 
@@ -120,19 +119,14 @@ void ControllerView::closeControls()
 	m_show = true;
 }
 
-void ControllerView::deleteController()
-{
-	emit(deleteController(this));
-}
+void ControllerView::deleteController() { emit(deleteController(this)); }
 
 void ControllerView::renameController()
 {
 	bool ok;
 	Controller* c = castModel<Controller>();
-	QString new_name = QInputDialog::getText(this,
-		tr("Rename controller"),
-		tr("Enter the new name for this controller"),
-		QLineEdit::Normal, c->name(), &ok);
+	QString new_name = QInputDialog::getText(
+		this, tr("Rename controller"), tr("Enter the new name for this controller"), QLineEdit::Normal, c->name(), &ok);
 	if (ok && !new_name.isEmpty())
 	{
 		c->setName(new_name);
@@ -144,21 +138,15 @@ void ControllerView::renameController()
 	}
 }
 
-void ControllerView::mouseDoubleClickEvent(QMouseEvent* event)
-{
-	renameController();
-}
+void ControllerView::mouseDoubleClickEvent(QMouseEvent* event) { renameController(); }
 
-void ControllerView::modelChanged()
-{
-}
+void ControllerView::modelChanged() {}
 
 void ControllerView::contextMenuEvent(QContextMenuEvent*)
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(model()->displayName(), this);
-	contextMenu->addAction(embed::getIconPixmap("cancel"),
-		tr("&Remove this controller"),
-		this, SLOT(deleteController()));
+	contextMenu->addAction(
+		embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(deleteController()));
 	contextMenu->addAction(tr("Re&name this controller"), this, SLOT(renameController()));
 	contextMenu->addSeparator();
 	contextMenu->exec(QCursor::pos());

@@ -57,19 +57,12 @@ public:
 
 	static QString probeDevice();
 
-	inline static QString name()
-	{
-		return (QT_TRANSLATE_NOOP("MidiSetupWidget",
-			"Jack-MIDI"));
-	}
+	inline static QString name() { return (QT_TRANSLATE_NOOP("MidiSetupWidget", "Jack-MIDI")); }
 
 	void JackMidiWrite(jack_nframes_t nframes);
 	void JackMidiRead(jack_nframes_t nframes);
 
-	inline static QString configSection()
-	{
-		return "MidiJack";
-	}
+	inline static QString configSection() { return "MidiJack"; }
 
 protected:
 	virtual void sendByte(const unsigned char c);

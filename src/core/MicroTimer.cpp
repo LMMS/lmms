@@ -6,19 +6,11 @@ using namespace std::chrono;
 static_assert(ratio_less_equal<steady_clock::duration::period, micro>::value,
 	"MicroTimer: steady_clock doesn't support microsecond resolution");
 
-MicroTimer::MicroTimer()
-{
-	reset();
-}
+MicroTimer::MicroTimer() { reset(); }
 
-MicroTimer::~MicroTimer()
-{
-}
+MicroTimer::~MicroTimer() {}
 
-void MicroTimer::reset()
-{
-	begin = steady_clock::now();
-}
+void MicroTimer::reset() { begin = steady_clock::now(); }
 
 int MicroTimer::elapsed() const
 {

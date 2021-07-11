@@ -37,10 +37,7 @@ public:
 	virtual ~DualFilterEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_dfControls;
-	}
+	virtual EffectControls* controls() { return &m_dfControls; }
 
 private:
 	DualFilterControls m_dfControls;

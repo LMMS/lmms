@@ -36,22 +36,16 @@ public:
 		, m_id(_id)
 	{
 		setCheckable(true);
-		connect(this, SIGNAL(clicked()), this,
-			SLOT(slotClicked()));
+		connect(this, SIGNAL(clicked()), this, SLOT(slotClicked()));
 	}
 
-	~TabButton()
-	{
-	}
+	~TabButton() {}
 
 signals:
 	void clicked(int);
 
 protected slots:
-	void slotClicked()
-	{
-		emit clicked(m_id);
-	}
+	void slotClicked() { emit clicked(m_id); }
 
 private:
 	int m_id;

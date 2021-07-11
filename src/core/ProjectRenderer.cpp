@@ -37,45 +37,34 @@
 #include "sched.h"
 #endif
 
-const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
-	{
+const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] = {
 
-		{ProjectRenderer::WaveFile,
-			QT_TRANSLATE_NOOP("ProjectRenderer", "WAV (*.wav)"),
-			".wav", &AudioFileWave::getInst},
-		{ProjectRenderer::FlacFile,
-			QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
-			".flac",
-			&AudioFileFlac::getInst},
-		{ProjectRenderer::OggFile,
-			QT_TRANSLATE_NOOP("ProjectRenderer", "OGG (*.ogg)"),
-			".ogg",
+	{ProjectRenderer::WaveFile, QT_TRANSLATE_NOOP("ProjectRenderer", "WAV (*.wav)"), ".wav", &AudioFileWave::getInst},
+	{ProjectRenderer::FlacFile, QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"), ".flac",
+		&AudioFileFlac::getInst},
+	{ProjectRenderer::OggFile, QT_TRANSLATE_NOOP("ProjectRenderer", "OGG (*.ogg)"), ".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
-			&AudioFileOgg::getInst
+		&AudioFileOgg::getInst
 #else
-			NULL
+		NULL
 #endif
-		},
-		{ProjectRenderer::MP3File,
-			QT_TRANSLATE_NOOP("ProjectRenderer", "MP3 (*.mp3)"),
-			".mp3",
+	},
+	{ProjectRenderer::MP3File, QT_TRANSLATE_NOOP("ProjectRenderer", "MP3 (*.mp3)"), ".mp3",
 #ifdef LMMS_HAVE_MP3LAME
-			&AudioFileMP3::getInst
+		&AudioFileMP3::getInst
 #else
-			NULL
+		NULL
 #endif
-		},
-		// Insert your own file-encoder infos here.
-		// Maybe one day the user can add own encoders inside the program.
+	},
+	// Insert your own file-encoder infos here.
+	// Maybe one day the user can add own encoders inside the program.
 
-		{ProjectRenderer::NumFileFormats, NULL, NULL, NULL}
+	{ProjectRenderer::NumFileFormats, NULL, NULL, NULL}
 
 };
 
-ProjectRenderer::ProjectRenderer(const Mixer::qualitySettings& qualitySettings,
-	const OutputSettings& outputSettings,
-	ExportFileFormats exportFileFormat,
-	const QString& outputFilename)
+ProjectRenderer::ProjectRenderer(const Mixer::qualitySettings& qualitySettings, const OutputSettings& outputSettings,
+	ExportFileFormats exportFileFormat, const QString& outputFilename)
 	: QThread(Engine::mixer())
 	, m_fileDev(NULL)
 	, m_qualitySettings(qualitySettings)
@@ -88,9 +77,7 @@ ProjectRenderer::ProjectRenderer(const Mixer::qualitySettings& qualitySettings,
 	{
 		bool successful = false;
 
-		m_fileDev = audioEncoderFactory(
-			outputFilename, outputSettings, DEFAULT_CHANNELS,
-			Engine::mixer(), successful);
+		m_fileDev = audioEncoderFactory(outputFilename, outputSettings, DEFAULT_CHANNELS, Engine::mixer(), successful);
 		if (!successful)
 		{
 			delete m_fileDev;
@@ -99,14 +86,11 @@ ProjectRenderer::ProjectRenderer(const Mixer::qualitySettings& qualitySettings,
 	}
 }
 
-ProjectRenderer::~ProjectRenderer()
-{
-}
+ProjectRenderer::~ProjectRenderer() {}
 
 // Little help function for getting file format from a file extension
 // (only for registered file-encoders).
-ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
-	const QString& _ext)
+ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(const QString& _ext)
 {
 	int idx = 0;
 	while (fileEncodeDevices[idx].m_fileFormat != NumFileFormats)
@@ -121,8 +105,7 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 	return (WaveFile); // Default.
 }
 
-QString ProjectRenderer::getFileExtensionFromFormat(
-	ExportFileFormats fmt)
+QString ProjectRenderer::getFileExtensionFromFormat(ExportFileFormats fmt)
 {
 	return fileEncodeDevices[fmt].m_extension;
 }
@@ -134,8 +117,7 @@ void ProjectRenderer::startProcessing()
 	{
 		// Have to do mixer stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::mixer()->setAudioDevice(m_fileDev,
-			m_qualitySettings, false, false);
+		Engine::mixer()->setAudioDevice(m_fileDev, m_qualitySettings, false, false);
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -219,8 +201,7 @@ void ProjectRenderer::updateConsoleProgress()
 
 	const char* activity = (const char*)"|/-\\";
 	memset(buf, 0, sizeof(buf));
-	sprintf(buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
-		activity[rot]);
+	sprintf(buf, "\r|%s|    %3d%%   %c  ", prog, m_progress, activity[rot]);
 	rot = (rot + 1) % 4;
 
 	fprintf(stderr, "%s", buf);

@@ -39,9 +39,7 @@ EffectControlDialog::EffectControlDialog(EffectControls* _controls)
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
-EffectControlDialog::~EffectControlDialog()
-{
-}
+EffectControlDialog::~EffectControlDialog() {}
 
 void EffectControlDialog::closeEvent(QCloseEvent* _ce)
 {

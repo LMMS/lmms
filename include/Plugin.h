@@ -129,8 +129,7 @@ public:
 			{
 				typedef QMap<QString, QString> AttributeMap;
 
-				inline Key(const Plugin::Descriptor* desc = NULL,
-					const QString& name = QString(),
+				inline Key(const Plugin::Descriptor* desc = NULL, const QString& name = QString(),
 					const AttributeMap& am = AttributeMap())
 					: desc(desc)
 					, name(name)
@@ -142,10 +141,7 @@ public:
 
 				QDomElement saveXML(QDomDocument& doc) const;
 
-				inline bool isValid() const
-				{
-					return desc != nullptr;
-				}
+				inline bool isValid() const { return desc != nullptr; }
 
 				//! Key to subplugin: reference to parent descriptor
 				//! Key to plugin: reference to its descriptor
@@ -175,40 +171,25 @@ public:
 			{
 			}
 
-			virtual ~SubPluginFeatures()
-			{
-			}
+			virtual ~SubPluginFeatures() {}
 
-			virtual void fillDescriptionWidget(QWidget*, const Key*) const
-			{
-			}
+			virtual void fillDescriptionWidget(QWidget*, const Key*) const {}
 
 			//! While PluginFactory only collects the plugins,
 			//! this function is used by widgets like EffectSelectDialog
 			//! to find all possible sub plugins
-			virtual void listSubPluginKeys(const Plugin::Descriptor*, KeyList&) const
-			{
-			}
+			virtual void listSubPluginKeys(const Plugin::Descriptor*, KeyList&) const {}
 
 		private:
 			// You can add values mapped by "Key" below
 			// The defaults are sane, i.e. redirect to sub plugin's
 			// supererior descriptor
 
-			virtual QString additionalFileExtensions(const Key&) const
-			{
-				return QString();
-			}
+			virtual QString additionalFileExtensions(const Key&) const { return QString(); }
 
-			virtual QString displayName(const Key& k) const
-			{
-				return k.isValid() ? k.name : QString();
-			}
+			virtual QString displayName(const Key& k) const { return k.isValid() ? k.name : QString(); }
 
-			virtual QString description(const Key& k) const
-			{
-				return k.isValid() ? k.desc->description : QString();
-			}
+			virtual QString description(const Key& k) const { return k.isValid() ? k.desc->description : QString(); }
 
 			virtual const PixmapLoader* logo(const Key& k) const
 			{
@@ -228,8 +209,7 @@ public:
 	//! Constructor of a plugin
 	//! @param key Sub plugins must pass a key here, optional otherwise.
 	//!   See the key() function
-	Plugin(const Descriptor* descriptor, Model* parent,
-		const Descriptor::SubPluginFeatures::Key* key = nullptr);
+	Plugin(const Descriptor* descriptor, Model* parent, const Descriptor::SubPluginFeatures::Key* key = nullptr);
 	virtual ~Plugin();
 
 	//! Return display-name out of sub plugin or descriptor
@@ -239,25 +219,16 @@ public:
 	const PixmapLoader* logo() const;
 
 	//! Return plugin type
-	inline PluginTypes type(void) const
-	{
-		return m_descriptor->type;
-	}
+	inline PluginTypes type(void) const { return m_descriptor->type; }
 
 	//! Return plugin Descriptor
-	inline const Descriptor* descriptor() const
-	{
-		return m_descriptor;
-	}
+	inline const Descriptor* descriptor() const { return m_descriptor; }
 
 	//! Return the key referencing this plugin. If the Plugin has no
 	//! sub plugin features, the key is pretty useless. If it has,
 	//! this key will also contain the sub plugin attributes, and will be
 	//! a key to those SubPluginFeatures.
-	inline const Descriptor::SubPluginFeatures::Key& key() const
-	{
-		return m_key;
-	}
+	inline const Descriptor::SubPluginFeatures::Key& key() const { return m_key; }
 
 	//! Can be called if a file matching supportedFileTypes should be
 	//! loaded/processed with the help of this plugin
@@ -271,8 +242,7 @@ public:
 	//! If you can not pass the key and are aware that it's stored in
 	//! Engine::pickDndPluginKey(), use this function, too
 	static Plugin* instantiateWithKey(const QString& pluginName, Model* parent,
-		const Descriptor::SubPluginFeatures::Key* key,
-		bool keyFromDnd = false);
+		const Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd = false);
 
 	//! Return an instance of a plugin whose name matches to given one
 	//! if specified plugin couldn't be loaded, it creates a dummy-plugin

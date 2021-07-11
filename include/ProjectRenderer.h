@@ -54,19 +54,13 @@ public:
 		AudioFileDeviceInstantiaton m_getDevInst;
 	};
 
-	ProjectRenderer(const Mixer::qualitySettings& _qs,
-		const OutputSettings& _os,
-		ExportFileFormats _file_format,
+	ProjectRenderer(const Mixer::qualitySettings& _qs, const OutputSettings& _os, ExportFileFormats _file_format,
 		const QString& _out_file);
 	virtual ~ProjectRenderer();
 
-	bool isReady() const
-	{
-		return m_fileDev != NULL;
-	}
+	bool isReady() const { return m_fileDev != NULL; }
 
-	static ExportFileFormats getFileFormatFromExtension(
-		const QString& _ext);
+	static ExportFileFormats getFileFormatFromExtension(const QString& _ext);
 
 	static QString getFileExtensionFromFormat(ExportFileFormats fmt);
 

@@ -34,11 +34,9 @@ class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 public:
 	VstSubPluginFeatures(Plugin::PluginTypes _type);
 
-	virtual void fillDescriptionWidget(QWidget* _parent,
-		const Key* _key) const;
+	virtual void fillDescriptionWidget(QWidget* _parent, const Key* _key) const;
 
-	virtual void listSubPluginKeys(const Plugin::Descriptor* _desc,
-		KeyList& _kl) const;
+	virtual void listSubPluginKeys(const Plugin::Descriptor* _desc, KeyList& _kl) const;
 
 private:
 	void addPluginsFromDir(QStringList* filenames, QString path) const;

@@ -46,8 +46,8 @@ public:
 	// Destructor.
 	virtual ~PatchesDialog();
 
-	void setup(GigInstance* pSynth, int iChan, const QString& chanName,
-		LcdSpinBoxModel* bankModel, LcdSpinBoxModel* progModel, QLabel* patchLabel);
+	void setup(GigInstance* pSynth, int iChan, const QString& chanName, LcdSpinBoxModel* bankModel,
+		LcdSpinBoxModel* progModel, QLabel* patchLabel);
 
 public slots:
 

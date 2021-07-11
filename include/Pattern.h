@@ -65,10 +65,7 @@ public:
 	void rearrangeAllNotes();
 	void clearNotes();
 
-	inline const NoteVector& notes() const
-	{
-		return m_notes;
-	}
+	inline const NoteVector& notes() const { return m_notes; }
 
 	Note* addStepNote(int step);
 	void setStep(int step, bool enabled);
@@ -77,10 +74,7 @@ public:
 	void splitNotes(NoteVector notes, TimePos pos);
 
 	// pattern-type stuff
-	inline PatternTypes type() const
-	{
-		return m_patternType;
-	}
+	inline PatternTypes type() const { return m_patternType; }
 
 	// next/previous track based on position in the containing track
 	Pattern* previousPattern() const;
@@ -89,15 +83,9 @@ public:
 	// settings-management
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
-	inline QString nodeName() const override
-	{
-		return "pattern";
-	}
+	inline QString nodeName() const override { return "pattern"; }
 
-	inline InstrumentTrack* instrumentTrack() const
-	{
-		return m_instrumentTrack;
-	}
+	inline InstrumentTrack* instrumentTrack() const { return m_instrumentTrack; }
 
 	bool empty();
 

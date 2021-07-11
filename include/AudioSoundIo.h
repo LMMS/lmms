@@ -59,10 +59,7 @@ public:
 	AudioSoundIo(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioSoundIo();
 
-	inline static QString name()
-	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "soundio");
-	}
+	inline static QString name() { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "soundio"); }
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{

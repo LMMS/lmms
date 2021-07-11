@@ -30,10 +30,7 @@
 
 std::set<LV2_URID> Lv2Options::s_supportedOptions;
 
-bool Lv2Options::isOptionSupported(LV2_URID key)
-{
-	return s_supportedOptions.find(key) != s_supportedOptions.end();
-}
+bool Lv2Options::isOptionSupported(LV2_URID key) { return s_supportedOptions.find(key) != s_supportedOptions.end(); }
 
 void Lv2Options::supportOption(LV2_URID key)
 {
@@ -56,8 +53,7 @@ void Lv2Options::createOptionVectors()
 	m_options.push_back(nullOption);
 }
 
-void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
-	std::shared_ptr<void> value,
+void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type, std::shared_ptr<void> value,
 	LV2_Options_Context context, uint32_t subject)
 {
 	Q_ASSERT(isOptionSupported(key));

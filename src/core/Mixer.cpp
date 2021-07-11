@@ -101,17 +101,14 @@ Mixer::Mixer(bool renderOnly)
 	// size from user configuration
 	if (renderOnly == false)
 	{
-		m_framesPerPeriod =
-			(fpp_t)ConfigManager::inst()->value("mixer", "framesperaudiobuffer").toInt();
+		m_framesPerPeriod = (fpp_t)ConfigManager::inst()->value("mixer", "framesperaudiobuffer").toInt();
 
 		// if the value read from user configuration is not set or
 		// lower than the minimum allowed, use the default value and
 		// save it to the configuration
 		if (m_framesPerPeriod < MINIMUM_BUFFER_SIZE)
 		{
-			ConfigManager::inst()->setValue("mixer",
-				"framesperaudiobuffer",
-				QString::number(DEFAULT_BUFFER_SIZE));
+			ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer", QString::number(DEFAULT_BUFFER_SIZE));
 
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
@@ -234,8 +231,7 @@ void Mixer::stopProcessing()
 
 sample_rate_t Mixer::baseSampleRate() const
 {
-	sample_rate_t sr =
-		ConfigManager::inst()->value("mixer", "samplerate").toInt();
+	sample_rate_t sr = ConfigManager::inst()->value("mixer", "samplerate").toInt();
 	if (sr < 44100)
 	{
 		sr = 44100;
@@ -258,10 +254,7 @@ sample_rate_t Mixer::processingSampleRate() const
 	return outputSampleRate() * m_qualitySettings.sampleRateMultiplier();
 }
 
-bool Mixer::criticalXRuns() const
-{
-	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
-}
+bool Mixer::criticalXRuns() const { return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false; }
 
 void Mixer::pushInputFrames(sampleFrame* _ab, const f_cnt_t _frames)
 {
@@ -350,11 +343,9 @@ const surroundSampleFrame* Mixer::renderNextBuffer()
 	MixerWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
-	for (PlayHandleList::Iterator it = m_playHandles.begin();
-		 it != m_playHandles.end();)
+	for (PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end();)
 	{
-		if ((*it)->affinityMatters() &&
-			(*it)->affinity() != QThread::currentThread())
+		if ((*it)->affinityMatters() && (*it)->affinity() != QThread::currentThread())
 		{
 			++it;
 			continue;
@@ -416,8 +407,8 @@ void Mixer::handleMetronome()
 	Song* song = Engine::getSong();
 	Song::PlayModes currentPlayMode = song->playMode();
 
-	bool metronomeSupported =
-		currentPlayMode == Song::Mode_PlayPattern || currentPlayMode == Song::Mode_PlaySong || currentPlayMode == Song::Mode_PlayBB;
+	bool metronomeSupported = currentPlayMode == Song::Mode_PlayPattern || currentPlayMode == Song::Mode_PlaySong ||
+		currentPlayMode == Song::Mode_PlayBB;
 
 	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
 	{
@@ -451,10 +442,7 @@ void Mixer::handleMetronome()
 	lastMetroTicks = ticks;
 }
 
-void Mixer::clear()
-{
-	m_clearSignal = true;
-}
+void Mixer::clear() { m_clearSignal = true; }
 
 void Mixer::clearNewPlayHandles()
 {
@@ -542,10 +530,7 @@ void Mixer::doSetAudioDevice(AudioDevice* _dev)
 	}
 }
 
-void Mixer::setAudioDevice(AudioDevice* _dev,
-	const struct qualitySettings& _qs,
-	bool _needs_fifo,
-	bool startNow)
+void Mixer::setAudioDevice(AudioDevice* _dev, const struct qualitySettings& _qs, bool _needs_fifo, bool startNow)
 {
 	stopProcessing();
 
@@ -627,9 +612,7 @@ void Mixer::removePlayHandle(PlayHandle* ph)
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
-		for (LocklessListElement *e = m_newPlayHandles.first(),
-								 *ePrev = NULL;
-			 e; ePrev = e, e = e->next)
+		for (LocklessListElement *e = m_newPlayHandles.first(), *ePrev = NULL; e; ePrev = e, e = e->next)
 		{
 			if (e->value == ph)
 			{
@@ -984,12 +967,12 @@ AudioDevice* Mixer::tryAudioDevices()
 #endif
 
 	// add more device-classes here...
-	//dev = new audioXXXX( SAMPLE_RATES[m_qualityLevel], success_ful, this );
-	//if( sucess_ful )
+	// dev = new audioXXXX( SAMPLE_RATES[m_qualityLevel], success_ful, this );
+	// if( sucess_ful )
 	//{
 	//	return dev;
 	//}
-	//delete dev
+	// delete dev
 
 	if (dev_name != AudioDummy::name())
 	{
@@ -1007,8 +990,7 @@ AudioDevice* Mixer::tryAudioDevices()
 
 MidiClient* Mixer::tryMidiClients()
 {
-	QString client_name = ConfigManager::inst()->value("mixer",
-		"mididev");
+	QString client_name = ConfigManager::inst()->value("mixer", "mididev");
 	if (!isMidiDevNameValid(client_name))
 	{
 		client_name = "";
@@ -1128,10 +1110,7 @@ Mixer::fifoWriter::fifoWriter(Mixer* mixer, Fifo* fifo)
 	setObjectName("Mixer::fifoWriter");
 }
 
-void Mixer::fifoWriter::finish()
-{
-	m_writing = false;
-}
+void Mixer::fifoWriter::finish() { m_writing = false; }
 
 void Mixer::fifoWriter::run()
 {

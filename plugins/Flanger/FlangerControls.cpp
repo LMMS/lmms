@@ -68,12 +68,6 @@ void FlangerControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 	m_invertFeedbackModel.saveSettings(doc, parent, "Invert");
 }
 
-void FlangerControls::changedSampleRate()
-{
-	m_effect->changeSampleRate();
-}
+void FlangerControls::changedSampleRate() { m_effect->changeSampleRate(); }
 
-void FlangerControls::changedPlaybackState()
-{
-	m_effect->restartLFO();
-}
+void FlangerControls::changedPlaybackState() { m_effect->restartLFO(); }

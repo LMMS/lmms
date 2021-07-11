@@ -31,20 +31,15 @@
 #include "Mixer.h"
 #include "endian_handling.h"
 
-AudioFileWave::AudioFileWave(OutputSettings const& outputSettings,
-	const ch_cnt_t channels, bool& successful,
-	const QString& file,
-	Mixer* mixer)
+AudioFileWave::AudioFileWave(
+	OutputSettings const& outputSettings, const ch_cnt_t channels, bool& successful, const QString& file, Mixer* mixer)
 	: AudioFileDevice(outputSettings, channels, file, mixer)
 	, m_sf(NULL)
 {
 	successful = outputFileOpened() && startEncoding();
 }
 
-AudioFileWave::~AudioFileWave()
-{
-	finishEncoding();
-}
+AudioFileWave::~AudioFileWave() { finishEncoding(); }
 
 bool AudioFileWave::startEncoding()
 {
@@ -87,9 +82,7 @@ bool AudioFileWave::startEncoding()
 	return true;
 }
 
-void AudioFileWave::writeBuffer(const surroundSampleFrame* _ab,
-	const fpp_t _frames,
-	const float _master_gain)
+void AudioFileWave::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames, const float _master_gain)
 {
 	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
 
@@ -100,8 +93,7 @@ void AudioFileWave::writeBuffer(const surroundSampleFrame* _ab,
 		{
 			for (ch_cnt_t chnl = 0; chnl < channels(); ++chnl)
 			{
-				buf[frame * channels() + chnl] = _ab[frame][chnl] *
-					_master_gain;
+				buf[frame * channels() + chnl] = _ab[frame][chnl] * _master_gain;
 			}
 		}
 		sf_writef_float(m_sf, buf, _frames);
@@ -110,8 +102,7 @@ void AudioFileWave::writeBuffer(const surroundSampleFrame* _ab,
 	else
 	{
 		int_sample_t* buf = new int_sample_t[_frames * channels()];
-		convertToS16(_ab, _frames, _master_gain, buf,
-			!isLittleEndian());
+		convertToS16(_ab, _frames, _master_gain, buf, !isLittleEndian());
 
 		sf_writef_short(m_sf, buf, _frames);
 		delete[] buf;

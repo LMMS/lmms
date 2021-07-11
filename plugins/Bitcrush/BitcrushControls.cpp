@@ -49,9 +49,7 @@ BitcrushControls::BitcrushControls(BitcrushEffect* eff)
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
-BitcrushControls::~BitcrushControls()
-{
-}
+BitcrushControls::~BitcrushControls() {}
 
 void BitcrushControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 {
@@ -81,7 +79,4 @@ void BitcrushControls::loadSettings(const QDomElement& elem)
 	m_effect->m_needsUpdate = true;
 }
 
-void BitcrushControls::sampleRateChanged()
-{
-	m_effect->sampleRateChanged();
-}
+void BitcrushControls::sampleRateChanged() { m_effect->sampleRateChanged(); }

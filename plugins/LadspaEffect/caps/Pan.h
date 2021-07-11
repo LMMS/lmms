@@ -1,11 +1,11 @@
 /*
 	Pan.h
-	
+
 	Copyright 2004-11 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
-	panorama with width control, 
+	panorama with width control,
 	stereo image width reduction
 
 */
@@ -38,10 +38,7 @@ public:
 	int t;
 	DSP::OnePoleLP damper;
 
-	sample_t get(DSP::Delay& delay)
-	{
-		return damper.process(delay[t]);
-	}
+	sample_t get(DSP::Delay& delay) { return damper.process(delay[t]); }
 
 	void reset(double c)
 	{
@@ -50,8 +47,7 @@ public:
 	}
 };
 
-class Pan
-	: public Plugin
+class Pan : public Plugin
 {
 public:
 	sample_t pan;
@@ -61,8 +57,7 @@ public:
 	DSP::Delay delay;
 	PanTap tap;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 	inline void set_pan(sample_t);
 
@@ -72,26 +67,18 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* stereo width reduction */
-class Narrower
-	: public Plugin
+class Narrower : public Plugin
 {
 public:
 	sample_t strength;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -99,15 +86,9 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _PAN_H_ */

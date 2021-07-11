@@ -2,7 +2,7 @@
  * interpolation.h - fast implementations of several interpolation-algorithms
  *
  * Copyright (c) 2004-2005 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -34,13 +34,11 @@
 #include "lmms_constants.h"
 #include "lmms_math.h"
 
-inline float hermiteInterpolate(float x0, float x1, float x2, float x3,
-	float frac_pos)
+inline float hermiteInterpolate(float x0, float x1, float x2, float x3, float frac_pos)
 {
 	const float frsq = frac_pos * frac_pos;
 	const float frsq2 = 2 * frsq;
-	return (((x2 - x0) * 0.5f) * (frac_pos * (frsq + 1) - frsq2) +
-		(frsq2 * frac_pos - 3 * frsq) * (x1 - x2) +
+	return (((x2 - x0) * 0.5f) * (frac_pos * (frsq + 1) - frsq2) + (frsq2 * frac_pos - 3 * frsq) * (x1 - x2) +
 		frsq2 * (frac_pos - 1) * ((x3 - x1) * 0.25f) + x1);
 
 	/*
@@ -49,16 +47,16 @@ inline float hermiteInterpolate(float x0, float x1, float x2, float x3,
    frac_pos *= 0.5;
    const float frcu	= frsq*frac_pos;
    return (
-   
+
    (frcu - frsq + frac_pos) * ((x2 - x0)) +
-   
+
    (4*frcu - 3*frsq) * (x1 - x2)
    //frsq*(2*frac_pos-3) * (x1 - x2)
-   
-   + (frcu - 0.5*frsq)*((x3 - x1))  
-    
+
+   + (frcu - 0.5*frsq)*((x3 - x1))
+
    + x1
-   
+
    );
 */
 }
@@ -69,7 +67,9 @@ inline float cubicInterpolate(float v0, float v1, float v2, float v3, float x)
 	float frcu = frsq * v0;
 	float t1 = v3 + 3 * v1;
 
-	return (v1 + fastFmaf(0.5f, frcu, x) * (v2 - frcu * (1.0f / 6.0f) - fastFmaf(t1, (1.0f / 6.0f), -v0) * (1.0f / 3.0f)) + frsq * x * (t1 * (1.0f / 6.0f) - 0.5f * v2) + frsq * fastFmaf(0.5f, v2, -v1));
+	return (v1 +
+		fastFmaf(0.5f, frcu, x) * (v2 - frcu * (1.0f / 6.0f) - fastFmaf(t1, (1.0f / 6.0f), -v0) * (1.0f / 3.0f)) +
+		frsq * x * (t1 * (1.0f / 6.0f) - 0.5f * v2) + frsq * fastFmaf(0.5f, v2, -v1));
 }
 
 inline float cosinusInterpolate(float v0, float v1, float x)
@@ -78,10 +78,7 @@ inline float cosinusInterpolate(float v0, float v1, float x)
 	return fastFmaf(f, v1 - v0, v0);
 }
 
-inline float linearInterpolate(float v0, float v1, float x)
-{
-	return fastFmaf(x, v1 - v0, v0);
-}
+inline float linearInterpolate(float v0, float v1, float x) { return fastFmaf(x, v1 - v0, v0); }
 
 inline float optimalInterpolate(float v0, float v1, float x)
 {

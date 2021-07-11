@@ -1,8 +1,8 @@
 /*
 	Lorenz.h
-	
+
 	Copyright 2004-11 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	turns the state of a Lorenz fractal into sound.
@@ -30,35 +30,24 @@
 
 #include "dsp/Lorenz.h"
 
-class Lorenz
-	: public Plugin
+class Lorenz : public Plugin
 {
 public:
 	sample_t h, gain;
 
 	DSP::Lorenz lorenz;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
 
 	void init();
-	void activate()
-	{
-		gain = getport(4);
-	}
+	void activate() { gain = getport(4); }
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _LORENZ_H_ */

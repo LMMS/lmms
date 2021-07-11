@@ -53,14 +53,9 @@ public:
 			"Architecture)");
 	}
 
-	inline static QString configSection()
-	{
-		return "Midialsaseq";
-	}
+	inline static QString configSection() { return "Midialsaseq"; }
 
-	virtual void processOutEvent(const MidiEvent& _me,
-		const TimePos& _time,
-		const MidiPort* _port) override;
+	virtual void processOutEvent(const MidiEvent& _me, const TimePos& _time, const MidiPort* _port) override;
 
 	void applyPortMode(MidiPort* _port) override;
 	void applyPortName(MidiPort* _port) override;
@@ -68,38 +63,24 @@ public:
 	void removePort(MidiPort* _port) override;
 
 	// list seq-ports from ALSA
-	QStringList readablePorts() const override
-	{
-		return m_readablePorts;
-	}
+	QStringList readablePorts() const override { return m_readablePorts; }
 
-	QStringList writablePorts() const override
-	{
-		return m_writablePorts;
-	}
+	QStringList writablePorts() const override { return m_writablePorts; }
 
 	// return name of port which specified MIDI event came from
 	QString sourcePortName(const MidiEvent&) const override;
 
 	// (un)subscribe given MidiPort to/from destination-port
-	virtual void subscribeReadablePort(MidiPort* _port,
-		const QString& _dest,
-		bool _subscribe = true) override;
-	virtual void subscribeWritablePort(MidiPort* _port,
-		const QString& _dest,
-		bool _subscribe = true) override;
-	virtual void connectRPChanged(QObject* _receiver,
-		const char* _member) override
+	virtual void subscribeReadablePort(MidiPort* _port, const QString& _dest, bool _subscribe = true) override;
+	virtual void subscribeWritablePort(MidiPort* _port, const QString& _dest, bool _subscribe = true) override;
+	virtual void connectRPChanged(QObject* _receiver, const char* _member) override
 	{
-		connect(this, SIGNAL(readablePortsChanged()),
-			_receiver, _member);
+		connect(this, SIGNAL(readablePortsChanged()), _receiver, _member);
 	}
 
-	virtual void connectWPChanged(QObject* _receiver,
-		const char* _member) override
+	virtual void connectWPChanged(QObject* _receiver, const char* _member) override
 	{
-		connect(this, SIGNAL(writablePortsChanged()),
-			_receiver, _member);
+		connect(this, SIGNAL(writablePortsChanged()), _receiver, _member);
 	}
 
 private slots:

@@ -39,10 +39,7 @@ public:
 	MidiImport(const QString& _file);
 	virtual ~MidiImport();
 
-	virtual PluginView* instantiateView(QWidget*)
-	{
-		return (NULL);
-	}
+	virtual PluginView* instantiateView(QWidget*) { return (NULL); }
 
 private:
 	virtual bool tryImport(TrackContainer* tc);
@@ -101,10 +98,7 @@ private:
 		return (!file().atEnd() ? value : -1);
 	}
 
-	inline int readID()
-	{
-		return read32LE();
-	}
+	inline int readID() { return read32LE(); }
 	inline void skip(int _bytes)
 	{
 		while (_bytes > 0)

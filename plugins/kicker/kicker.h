@@ -46,8 +46,7 @@ public:
 	kickerInstrument(InstrumentTrack* _instrument_track);
 	virtual ~kickerInstrument();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -55,15 +54,9 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual Flags flags() const
-	{
-		return IsNotBendable;
-	}
+	virtual Flags flags() const { return IsNotBendable; }
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return (512);
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return (512); }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 

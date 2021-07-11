@@ -56,10 +56,10 @@ public:
 			// Prevent saving inline automation if there's just one node at the beginning of
 			// the pattern, which has a InValue equal to the value of model (which is going
 			// to be saved anyways) and no offset between the InValue and OutValue
-			AutomationPattern::timeMap::const_iterator firstNode =
-				m_autoPattern->getTimeMap().begin();
+			AutomationPattern::timeMap::const_iterator firstNode = m_autoPattern->getTimeMap().begin();
 
-			if (isAtInitValue() && m_autoPattern->getTimeMap().size() == 1 && POS(firstNode) == 0 && INVAL(firstNode) == value() && OFFSET(firstNode) == 0)
+			if (isAtInitValue() && m_autoPattern->getTimeMap().size() == 1 && POS(firstNode) == 0 &&
+				INVAL(firstNode) == value() && OFFSET(firstNode) == 0)
 			{
 				return false;
 			}

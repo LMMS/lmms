@@ -39,10 +39,7 @@ EffectChain::EffectChain(Model* _parent)
 {
 }
 
-EffectChain::~EffectChain()
-{
-	clear();
-}
+EffectChain::~EffectChain() { clear(); }
 
 void EffectChain::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
@@ -186,8 +183,7 @@ void EffectChain::startRunning()
 		return;
 	}
 
-	for (EffectList::Iterator it = m_effects.begin();
-		 it != m_effects.end(); it++)
+	for (EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); it++)
 	{
 		(*it)->startRunning();
 	}

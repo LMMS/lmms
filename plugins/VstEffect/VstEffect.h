@@ -37,22 +37,14 @@ class VstPlugin;
 class VstEffect : public Effect
 {
 public:
-	VstEffect(Model* _parent,
-		const Descriptor::SubPluginFeatures::Key* _key);
+	VstEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~VstEffect();
 
-	virtual bool processAudioBuffer(sampleFrame* _buf,
-		const fpp_t _frames);
+	virtual bool processAudioBuffer(sampleFrame* _buf, const fpp_t _frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_vstControls;
-	}
+	virtual EffectControls* controls() { return &m_vstControls; }
 
-	virtual inline QString publicName() const
-	{
-		return m_plugin->name();
-	}
+	virtual inline QString publicName() const { return m_plugin->name(); }
 
 private:
 	void openPlugin(const QString& _plugin);

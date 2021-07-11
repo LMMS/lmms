@@ -119,10 +119,7 @@ MixerWorkerThread::MixerWorkerThread(Mixer* mixer)
 	resetJobQueue();
 }
 
-MixerWorkerThread::~MixerWorkerThread()
-{
-	workerThreads.removeAll(this);
-}
+MixerWorkerThread::~MixerWorkerThread() { workerThreads.removeAll(this); }
 
 void MixerWorkerThread::quit()
 {

@@ -129,18 +129,11 @@ public:
 
 	UridMap& uridMap() { return m_uridMap; }
 	const Lv2UridCache& uridCache() const { return m_uridCache; }
-	const std::set<const char*, CmpStr>& supportedFeatureURIs() const
-	{
-		return m_supportedFeatureURIs;
-	}
+	const std::set<const char*, CmpStr>& supportedFeatureURIs() const { return m_supportedFeatureURIs; }
 	bool isFeatureSupported(const char* featName) const;
-	AutoLilvNodes findNodes(const LilvNode* subject,
-		const LilvNode* predicate, const LilvNode* object);
+	AutoLilvNodes findNodes(const LilvNode* subject, const LilvNode* predicate, const LilvNode* object);
 
-	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist()
-	{
-		return pluginBlacklist;
-	}
+	static const std::set<const char*, Lv2Manager::CmpStr>& getPluginBlacklist() { return pluginBlacklist; }
 
 private:
 	// general data

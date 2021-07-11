@@ -1,8 +1,8 @@
 /*
 	dsp/Roessler.h
-	
+
 	Copyright 2003-4 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Roessler fractal.
@@ -48,10 +48,7 @@ public:
 	}
 
 	/* rate is normalized (0 .. 1) */
-	void set_rate(double r)
-	{
-		h = max(.000001, r * .096);
-	}
+	void set_rate(double r) { h = max(.000001, r * .096); }
 
 	void init(double _h = .001, double seed = .0)
 	{
@@ -80,20 +77,11 @@ public:
 		return x[I] * .01725 + z[I] * .015;
 	}
 
-	double get_x()
-	{
-		return x[I];
-	}
+	double get_x() { return x[I]; }
 
-	double get_y()
-	{
-		return y[I];
-	}
+	double get_y() { return y[I]; }
 
-	double get_z()
-	{
-		return z[I];
-	}
+	double get_z() { return z[I]; }
 };
 
 } /* namespace DSP */

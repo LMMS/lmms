@@ -31,11 +31,8 @@
 #include "BBTrackContainer.h"
 #include "Song.h"
 
-RenderManager::RenderManager(
-	const Mixer::qualitySettings& qualitySettings,
-	const OutputSettings& outputSettings,
-	ProjectRenderer::ExportFileFormats fmt,
-	QString outputPath)
+RenderManager::RenderManager(const Mixer::qualitySettings& qualitySettings, const OutputSettings& outputSettings,
+	ProjectRenderer::ExportFileFormats fmt, QString outputPath)
 	: m_qualitySettings(qualitySettings)
 	, m_oldQualitySettings(Engine::mixer()->currentQualitySettings())
 	, m_outputSettings(outputSettings)
@@ -55,8 +52,7 @@ void RenderManager::abortProcessing()
 {
 	if (m_activeRenderer)
 	{
-		disconnect(m_activeRenderer.get(), SIGNAL(finished()),
-			this, SLOT(renderNextTrack()));
+		disconnect(m_activeRenderer.get(), SIGNAL(finished()), this, SLOT(renderNextTrack()));
 		m_activeRenderer->abortProcessing();
 	}
 	restoreMutedState();
@@ -104,8 +100,7 @@ void RenderManager::renderTracks()
 		Track::TrackTypes type = tk->type();
 
 		// Don't render automation tracks
-		if (tk->isMuted() == false &&
-			(type == Track::InstrumentTrack || type == Track::SampleTrack))
+		if (tk->isMuted() == false && (type == Track::InstrumentTrack || type == Track::SampleTrack))
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -118,8 +113,7 @@ void RenderManager::renderTracks()
 		Track::TrackTypes type = tk->type();
 
 		// Don't render automation tracks
-		if (tk->isMuted() == false &&
-			(type == Track::InstrumentTrack || type == Track::SampleTrack))
+		if (tk->isMuted() == false && (type == Track::InstrumentTrack || type == Track::SampleTrack))
 		{
 			m_unmuted.push_back(tk);
 		}
@@ -133,29 +127,20 @@ void RenderManager::renderTracks()
 }
 
 // Render the song into a single track
-void RenderManager::renderProject()
-{
-	render(m_outputPath);
-}
+void RenderManager::renderProject() { render(m_outputPath); }
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = std::make_unique<ProjectRenderer>(
-		m_qualitySettings,
-		m_outputSettings,
-		m_format,
-		outputPath);
+	m_activeRenderer = std::make_unique<ProjectRenderer>(m_qualitySettings, m_outputSettings, m_format, outputPath);
 
 	if (m_activeRenderer->isReady())
 	{
 		// pass progress signals through
-		connect(m_activeRenderer.get(), SIGNAL(progressChanged(int)),
-			this, SIGNAL(progressChanged(int)));
+		connect(m_activeRenderer.get(), SIGNAL(progressChanged(int)), this, SIGNAL(progressChanged(int)));
 
 		// when it is finished, render the next track.
 		// if we have not queued any tracks, renderNextTrack will just clean up
-		connect(m_activeRenderer.get(), SIGNAL(finished()),
-			this, SLOT(renderNextTrack()));
+		connect(m_activeRenderer.get(), SIGNAL(finished()), this, SLOT(renderNextTrack()));
 
 		m_activeRenderer->startProcessing();
 	}

@@ -150,8 +150,7 @@ public:
 
 		m_data = (shmData*)m_shmObj.data();
 #else
-		while ((m_shmID = shmget(++m_shmKey, sizeof(shmData),
-					IPC_CREAT | IPC_EXCL | 0600)) == -1)
+		while ((m_shmID = shmget(++m_shmKey, sizeof(shmData), IPC_CREAT | IPC_EXCL | 0600)) == -1)
 		{
 		}
 		m_data = (shmData*)shmat(m_shmID, 0, 0);
@@ -161,11 +160,8 @@ public:
 		static int k = 0;
 		m_data->dataSem.semKey = (getpid() << 10) + ++k;
 		m_data->messageSem.semKey = (getpid() << 10) + ++k;
-		m_dataSem.setKey(QString::number(m_data->dataSem.semKey),
-			1, QSystemSemaphore::Create);
-		m_messageSem.setKey(QString::number(
-								m_data->messageSem.semKey),
-			0, QSystemSemaphore::Create);
+		m_dataSem.setKey(QString::number(m_data->dataSem.semKey), 1, QSystemSemaphore::Create);
+		m_messageSem.setKey(QString::number(m_data->messageSem.semKey), 0, QSystemSemaphore::Create);
 	}
 
 	// constructor for remote-/client-side - use _shm_key for making up
@@ -200,8 +196,7 @@ public:
 #endif
 		assert(m_data != NULL);
 		m_dataSem.setKey(QString::number(m_data->dataSem.semKey));
-		m_messageSem.setKey(QString::number(
-			m_data->messageSem.semKey));
+		m_messageSem.setKey(QString::number(m_data->messageSem.semKey));
 	}
 
 	~shmFifo()
@@ -218,21 +213,12 @@ public:
 #endif
 	}
 
-	inline bool isInvalid() const
-	{
-		return m_invalid;
-	}
+	inline bool isInvalid() const { return m_invalid; }
 
-	void invalidate()
-	{
-		m_invalid = true;
-	}
+	void invalidate() { m_invalid = true; }
 
 	// do we act as master (i.e. not as remote-process?)
-	inline bool isMaster() const
-	{
-		return m_master;
-	}
+	inline bool isMaster() const { return m_master; }
 
 	// recursive lock
 	inline void lock()
@@ -262,10 +248,7 @@ public:
 	}
 
 	// increase message-semaphore
-	inline void messageSent()
-	{
-		m_messageSem.release();
-	}
+	inline void messageSent() { m_messageSem.release(); }
 
 	inline int32_t readInt()
 	{
@@ -274,10 +257,7 @@ public:
 		return i;
 	}
 
-	inline void writeInt(const int32_t& _i)
-	{
-		write(&_i, sizeof(_i));
-	}
+	inline void writeInt(const int32_t& _i) { write(&_i, sizeof(_i)); }
 
 	inline std::string readString()
 	{
@@ -313,14 +293,10 @@ public:
 		return !empty;
 	}
 
-	inline int shmKey() const
-	{
-		return m_shmKey;
-	}
+	inline int shmKey() const { return m_shmKey; }
 
 private:
-	static inline void fastMemCpy(void* _dest, const void* _src,
-		const int _len)
+	static inline void fastMemCpy(void* _dest, const void* _src, const int _len)
 	{
 		// calling memcpy() for just an integer is obsolete overhead
 		if (_len == 4)
@@ -341,8 +317,7 @@ private:
 			return;
 		}
 		lock();
-		while (isInvalid() == false &&
-			_len > m_data->endPtr - m_data->startPtr)
+		while (isInvalid() == false && _len > m_data->endPtr - m_data->startPtr)
 		{
 			unlock();
 #ifndef LMMS_BUILD_WIN32
@@ -373,11 +348,8 @@ private:
 			// if no space is left, try to move data to front
 			if (m_data->startPtr > 0)
 			{
-				memmove(m_data->data,
-					m_data->data + m_data->startPtr,
-					m_data->endPtr - m_data->startPtr);
-				m_data->endPtr = m_data->endPtr -
-					m_data->startPtr;
+				memmove(m_data->data, m_data->data + m_data->startPtr, m_data->endPtr - m_data->startPtr);
+				m_data->endPtr = m_data->endPtr - m_data->startPtr;
 				m_data->startPtr = 0;
 			}
 			unlock();
@@ -481,32 +453,17 @@ public:
 			return *this;
 		}
 
-		inline std::string getString(int _p = 0) const
-		{
-			return data[_p];
-		}
+		inline std::string getString(int _p = 0) const { return data[_p]; }
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-		inline QString getQString(int _p = 0) const
-		{
-			return QString::fromStdString(getString(_p));
-		}
+		inline QString getQString(int _p = 0) const { return QString::fromStdString(getString(_p)); }
 #endif
 
-		inline int getInt(int _p = 0) const
-		{
-			return atoi(data[_p].c_str());
-		}
+		inline int getInt(int _p = 0) const { return atoi(data[_p].c_str()); }
 
-		inline float getFloat(int _p) const
-		{
-			return (float)atof(data[_p].c_str());
-		}
+		inline float getFloat(int _p) const { return (float)atof(data[_p].c_str()); }
 
-		inline bool operator==(const message& _m) const
-		{
-			return (id == _m.id);
-		}
+		inline bool operator==(const message& _m) const { return (id == _m.id); }
 
 		int id;
 
@@ -545,8 +502,7 @@ public:
 #endif
 	}
 
-	message waitForMessage(const message& _m,
-		bool _busy_waiting = false);
+	message waitForMessage(const message& _m, bool _busy_waiting = false);
 
 	inline message fetchAndProcessNextMessage()
 	{
@@ -563,10 +519,7 @@ public:
 		return i;
 	}
 
-	inline void writeInt(const int32_t& _i)
-	{
-		write(&_i, sizeof(_i));
-	}
+	inline void writeInt(const int32_t& _i) { write(&_i, sizeof(_i)); }
 
 	inline std::string readString()
 	{
@@ -617,25 +570,16 @@ public:
 		}
 	}
 
-	static bool isMainThreadWaiting()
-	{
-		return waitDepthCounter() > 0;
-	}
+	static bool isMainThreadWaiting() { return waitDepthCounter() > 0; }
 #endif
 
 	virtual bool processMessage(const message& _m) = 0;
 
 protected:
 #ifdef SYNC_WITH_SHM_FIFO
-	inline const shmFifo* in() const
-	{
-		return m_in;
-	}
+	inline const shmFifo* in() const { return m_in; }
 
-	inline const shmFifo* out() const
-	{
-		return m_out;
-	}
+	inline const shmFifo* out() const { return m_out; }
 #endif
 
 	inline void invalidate()
@@ -681,8 +625,7 @@ private:
 			switch (nread)
 			{
 			case -1:
-				fprintf(stderr,
-					"Error while reading.\n");
+				fprintf(stderr, "Error while reading.\n");
 			case 0:
 				invalidate();
 				memset(_buf, 0, _len);
@@ -707,8 +650,7 @@ private:
 			switch (nwritten)
 			{
 			case -1:
-				fprintf(stderr,
-					"Error while writing.\n");
+				fprintf(stderr, "Error while writing.\n");
 			case 0:
 				invalidate();
 				return;
@@ -742,10 +684,7 @@ public:
 		quit();
 	}
 
-	void reset()
-	{
-		m_quit = false;
-	}
+	void reset() { m_quit = false; }
 
 private:
 	void run() override;
@@ -772,10 +711,7 @@ public:
 
 	bool init(const QString& pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {});
 
-	inline void waitForHostInfoGotten()
-	{
-		m_failed = waitForMessage(IdHostInfoGotten).id != IdHostInfoGotten;
-	}
+	inline void waitForHostInfoGotten() { m_failed = waitForMessage(IdHostInfoGotten).id != IdHostInfoGotten; }
 
 	inline void waitForInitDone(bool _busyWaiting = true)
 	{
@@ -809,34 +745,21 @@ public:
 		sendMessage(IdIsUIVisible);
 		unlock();
 		message m = waitForMessage(IdIsUIVisible);
-		return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1
-													   : 0;
+		return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1 : 0;
 	}
 
-	inline bool failed() const
-	{
-		return m_failed;
-	}
+	inline bool failed() const { return m_failed; }
 
-	inline void lock()
-	{
-		m_commMutex.lock();
-	}
+	inline void lock() { m_commMutex.lock(); }
 
-	inline void unlock()
-	{
-		m_commMutex.unlock();
-	}
+	inline void unlock() { m_commMutex.unlock(); }
 
 public slots:
 	virtual void showUI();
 	virtual void hideUI();
 
 protected:
-	inline void setSplittedChannels(bool _on)
-	{
-		m_splitChannels = _on;
-	}
+	inline void setSplittedChannels(bool _on) { m_splitChannels = _on; }
 
 	bool m_failed;
 
@@ -892,35 +815,19 @@ public:
 #endif
 	virtual bool processMessage(const message& _m);
 
-	virtual void process(const sampleFrame* _in_buf,
-		sampleFrame* _out_buf) = 0;
+	virtual void process(const sampleFrame* _in_buf, sampleFrame* _out_buf) = 0;
 
-	virtual void processMidiEvent(const MidiEvent&, const f_cnt_t /* _offset */)
-	{
-	}
+	virtual void processMidiEvent(const MidiEvent&, const f_cnt_t /* _offset */) {}
 
-	inline float* sharedMemory()
-	{
-		return m_shm;
-	}
+	inline float* sharedMemory() { return m_shm; }
 
-	virtual void updateSampleRate()
-	{
-	}
+	virtual void updateSampleRate() {}
 
-	virtual void updateBufferSize()
-	{
-	}
+	virtual void updateBufferSize() {}
 
-	inline sample_rate_t sampleRate() const
-	{
-		return m_sampleRate;
-	}
+	inline sample_rate_t sampleRate() const { return m_sampleRate; }
 
-	inline fpp_t bufferSize() const
-	{
-		return m_bufferSize;
-	}
+	inline fpp_t bufferSize() const { return m_bufferSize; }
 
 	void setInputCount(int _i)
 	{
@@ -938,25 +845,14 @@ public:
 	{
 		m_inputCount = i;
 		m_outputCount = o;
-		sendMessage(message(IdChangeInputOutputCount)
-						.addInt(i)
-						.addInt(o));
+		sendMessage(message(IdChangeInputOutputCount).addInt(i).addInt(o));
 	}
 
-	virtual int inputCount() const
-	{
-		return m_inputCount;
-	}
+	virtual int inputCount() const { return m_inputCount; }
 
-	virtual int outputCount() const
-	{
-		return m_outputCount;
-	}
+	virtual int outputCount() const { return m_outputCount; }
 
-	void debugMessage(const std::string& _s)
-	{
-		sendMessage(message(IdDebugMessage).addString(_s));
-	}
+	void debugMessage(const std::string& _s) { sendMessage(message(IdDebugMessage).addString(_s)); }
 
 private:
 	void setShmKey(key_t _key, int _size);
@@ -1073,16 +969,13 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 	return m;
 }
 
-RemotePluginBase::message RemotePluginBase::waitForMessage(
-	const message& _wm,
-	bool _busy_waiting)
+RemotePluginBase::message RemotePluginBase::waitForMessage(const message& _wm, bool _busy_waiting)
 {
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 	if (_busy_waiting)
 	{
 		// No point processing events outside of the main thread
-		_busy_waiting = QThread::currentThread() ==
-			QCoreApplication::instance()->thread();
+		_busy_waiting = QThread::currentThread() == QCoreApplication::instance()->thread();
 	}
 
 	struct WaitDepthCounter
@@ -1116,8 +1009,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 		if (_busy_waiting && !messagesLeft())
 		{
-			QCoreApplication::processEvents(
-				QEventLoop::ExcludeUserInputEvents, 50);
+			QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 50);
 			continue;
 		}
 #endif
@@ -1262,10 +1154,7 @@ RemotePluginClient::~RemotePluginClient()
 }
 
 #ifdef USE_QT_SHMEM
-VstSyncData* RemotePluginClient::getQtVSTshm()
-{
-	return m_vstSyncData;
-}
+VstSyncData* RemotePluginClient::getQtVSTshm() { return m_vstSyncData; }
 #endif
 
 bool RemotePluginClient::processMessage(const message& _m)
@@ -1296,12 +1185,7 @@ bool RemotePluginClient::processMessage(const message& _m)
 		return false;
 
 	case IdMidiEvent:
-		processMidiEvent(
-			MidiEvent(static_cast<MidiEventTypes>(
-						  _m.getInt(0)),
-				_m.getInt(1),
-				_m.getInt(2),
-				_m.getInt(3)),
+		processMidiEvent(MidiEvent(static_cast<MidiEventTypes>(_m.getInt(0)), _m.getInt(1), _m.getInt(2), _m.getInt(3)),
 			_m.getInt(4));
 		break;
 
@@ -1376,9 +1260,7 @@ void RemotePluginClient::doProcessing()
 {
 	if (m_shm != NULL)
 	{
-		process((sampleFrame*)(m_inputCount > 0 ? m_shm : NULL),
-			(sampleFrame*)(m_shm +
-				(m_inputCount * m_bufferSize)));
+		process((sampleFrame*)(m_inputCount > 0 ? m_shm : NULL), (sampleFrame*)(m_shm + (m_inputCount * m_bufferSize)));
 	}
 	else
 	{

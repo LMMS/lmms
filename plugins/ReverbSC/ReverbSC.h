@@ -43,10 +43,7 @@ public:
 	virtual ~ReverbSCEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_reverbSCControls;
-	}
+	virtual EffectControls* controls() { return &m_reverbSCControls; }
 
 	void changeSampleRate();
 

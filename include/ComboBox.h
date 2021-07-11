@@ -38,15 +38,9 @@ public:
 	ComboBox(QWidget* parent = NULL, const QString& name = QString());
 	virtual ~ComboBox();
 
-	ComboBoxModel* model()
-	{
-		return castModel<ComboBoxModel>();
-	}
+	ComboBoxModel* model() { return castModel<ComboBoxModel>(); }
 
-	const ComboBoxModel* model() const
-	{
-		return castModel<ComboBoxModel>();
-	}
+	const ComboBoxModel* model() const { return castModel<ComboBoxModel>(); }
 
 	static constexpr int DEFAULT_HEIGHT = 22;
 

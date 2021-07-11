@@ -33,8 +33,7 @@
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"
 
-Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin* plugin,
-	std::vector<PluginIssue>& issues)
+Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin* plugin, std::vector<PluginIssue>& issues)
 {
 	// for some reason, all checks can be done by one processor...
 	return Lv2Proc::check(plugin, issues);
@@ -51,8 +50,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString& uri)
 			std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, that);
 			if (newOne->isValid())
 			{
-				channelsLeft -= std::max(
-					1 + static_cast<bool>(newOne->inPorts().m_right),
+				channelsLeft -= std::max(1 + static_cast<bool>(newOne->inPorts().m_right),
 					1 + static_cast<bool>(newOne->outPorts().m_right));
 				Q_ASSERT(channelsLeft >= 0);
 				m_procs.push_back(std::move(newOne));
@@ -147,10 +145,7 @@ void Lv2ControlBase::loadSettings(const QDomElement& that)
 	// TODO: load state if supported by plugin
 }
 
-void Lv2ControlBase::loadFile(const QString& file)
-{
-	(void)file;
-}
+void Lv2ControlBase::loadFile(const QString& file) { (void)file; }
 
 void Lv2ControlBase::reloadPlugin()
 {
@@ -169,12 +164,10 @@ std::size_t Lv2ControlBase::controlCount() const
 
 bool Lv2ControlBase::hasNoteInput() const
 {
-	return std::any_of(m_procs.begin(), m_procs.end(),
-		[](const auto& c) { return c->hasNoteInput(); });
+	return std::any_of(m_procs.begin(), m_procs.end(), [](const auto& c) { return c->hasNoteInput(); });
 }
 
-void Lv2ControlBase::handleMidiInputEvent(const MidiEvent& event,
-	const TimePos& time, f_cnt_t offset)
+void Lv2ControlBase::handleMidiInputEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
 	for (auto& c : m_procs)
 	{

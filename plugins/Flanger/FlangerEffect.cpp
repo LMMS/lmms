@@ -31,17 +31,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Flanger",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A native flanger plugin"),
-			"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Flanger",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A native flanger plugin"),
+		"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
+		new PluginPixmapLoader("logo"), NULL, NULL};
 
 	FlangerEffect::FlangerEffect(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)
 		: Effect(&flanger_plugin_descriptor, parent, key)
@@ -128,15 +121,12 @@ extern "C"
 		m_rDelay->setSampleRate(Engine::mixer()->processingSampleRate());
 	}
 
-	void FlangerEffect::restartLFO()
-	{
-		m_lfo->restart();
-	}
+	void FlangerEffect::restartLFO() { m_lfo->restart(); }
 
 	extern "C"
 	{
 
-		//needed for getting plugin out of shared lib
+		// needed for getting plugin out of shared lib
 		PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 		{
 			return new FlangerEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));

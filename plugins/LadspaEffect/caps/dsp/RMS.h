@@ -1,8 +1,8 @@
 /*
 	dsp/RMS.h
-	
+
 	Copyright 2004 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	root-mean-square accumulator.

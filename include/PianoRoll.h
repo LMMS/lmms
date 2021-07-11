@@ -113,30 +113,15 @@ public:
 	void loadGhostNotes(const QDomElement& de);
 	void loadMarkedSemiTones(const QDomElement& de);
 
-	inline void stopRecording()
-	{
-		m_recording = false;
-	}
+	inline void stopRecording() { m_recording = false; }
 
-	inline bool isRecording() const
-	{
-		return m_recording;
-	}
+	inline bool isRecording() const { return m_recording; }
 
-	inline bool isStepRecording() const
-	{
-		return m_stepRecorder.isRecording();
-	}
+	inline bool isStepRecording() const { return m_stepRecorder.isRecording(); }
 
-	const Pattern* currentPattern() const
-	{
-		return m_pattern;
-	}
+	const Pattern* currentPattern() const { return m_pattern; }
 
-	bool hasValidPattern() const
-	{
-		return m_pattern != NULL;
-	}
+	bool hasValidPattern() const { return m_pattern != NULL; }
 
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
@@ -164,9 +149,8 @@ protected:
 	void focusInEvent(QFocusEvent*) override;
 
 	int getKey(int y) const;
-	void drawNoteRect(QPainter& p, int x, int y,
-		int width, const Note* n, const QColor& noteCol, const QColor& noteTextColor,
-		const QColor& selCol, const int noteOpc, const bool borderless, bool drawNoteName);
+	void drawNoteRect(QPainter& p, int x, int y, int width, const Note* n, const QColor& noteCol,
+		const QColor& noteTextColor, const QColor& selCol, const int noteOpc, const bool borderless, bool drawNoteName);
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes() const;
@@ -348,10 +332,7 @@ private:
 	Pattern* m_pattern;
 	NoteVector m_ghostNotes;
 
-	inline const NoteVector& ghostNotes() const
-	{
-		return m_ghostNotes;
-	}
+	inline const NoteVector& ghostNotes() const { return m_ghostNotes; }
 
 	QScrollBar* m_leftRightScroll;
 	QScrollBar* m_topBottomScroll;
@@ -407,7 +388,7 @@ private:
 	volume_t m_lastNoteVolume;
 	panning_t m_lastNotePanning;
 
-	//When resizing several notes, we want to calculate a common minimum length
+	// When resizing several notes, we want to calculate a common minimum length
 	TimePos m_minResizeLen;
 
 	int m_startKey; // first key when drawing
@@ -417,7 +398,7 @@ private:
 	EditModes m_ctrlMode;  // mode they were in before they hit ctrl
 	EditModes m_knifeMode; // mode they where in before entering knife mode
 
-	bool m_mouseDownRight; //true if right click is being held down
+	bool m_mouseDownRight; // true if right click is being held down
 
 	TimeLineWidget* m_timeLine;
 	bool m_scrollBack;
@@ -511,10 +492,7 @@ public:
 	void saveSettings(QDomDocument& doc, QDomElement& de) override;
 	void loadSettings(const QDomElement& de) override;
 
-	inline QString nodeName() const override
-	{
-		return "pianoroll";
-	}
+	inline QString nodeName() const override { return "pianoroll"; }
 
 	QSize sizeHint() const override;
 	bool hasFocus() const;

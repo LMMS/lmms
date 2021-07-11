@@ -40,18 +40,11 @@ public:
 	class LfoInstances
 	{
 	public:
-		LfoInstances()
-		{
-		}
+		LfoInstances() {}
 
-		~LfoInstances()
-		{
-		}
+		~LfoInstances() {}
 
-		inline bool isEmpty() const
-		{
-			return m_lfos.isEmpty();
-		}
+		inline bool isEmpty() const { return m_lfos.isEmpty(); }
 
 		void trigger();
 		void reset();
@@ -65,45 +58,24 @@ public:
 		LfoList m_lfos;
 	};
 
-	EnvelopeAndLfoParameters(float _value_for_zero_amount,
-		Model* _parent);
+	EnvelopeAndLfoParameters(float _value_for_zero_amount, Model* _parent);
 	virtual ~EnvelopeAndLfoParameters();
 
-	static inline float expKnobVal(float _val)
-	{
-		return ((_val < 0) ? -_val : _val) * _val;
-	}
+	static inline float expKnobVal(float _val) { return ((_val < 0) ? -_val : _val) * _val; }
 
-	static LfoInstances* instances()
-	{
-		return s_lfoInstances;
-	}
+	static LfoInstances* instances() { return s_lfoInstances; }
 
-	void fillLevel(float* _buf, f_cnt_t _frame,
-		const f_cnt_t _release_begin,
-		const fpp_t _frames);
+	void fillLevel(float* _buf, f_cnt_t _frame, const f_cnt_t _release_begin, const fpp_t _frames);
 
-	inline bool isUsed() const
-	{
-		return m_used;
-	}
+	inline bool isUsed() const { return m_used; }
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
-	QString nodeName() const override
-	{
-		return "el";
-	}
+	QString nodeName() const override { return "el"; }
 
-	inline f_cnt_t PAHD_Frames() const
-	{
-		return m_pahdFrames;
-	}
+	inline f_cnt_t PAHD_Frames() const { return m_pahdFrames; }
 
-	inline f_cnt_t releaseFrames() const
-	{
-		return m_rFrames;
-	}
+	inline f_cnt_t releaseFrames() const { return m_rFrames; }
 
 public slots:
 	void updateSampleVars();

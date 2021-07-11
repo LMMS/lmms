@@ -36,10 +36,9 @@ AboutDialog::AboutDialog(QWidget* parent)
 
 	iconLabel->setPixmap(embed::getIconPixmap("icon", 64, 64));
 
-	versionLabel->setText(versionLabel->text().arg(LMMS_VERSION).arg(PLATFORM).arg(MACHINE).arg(QT_VERSION_STR).arg(COMPILER_VERSION));
-	versionLabel->setTextInteractionFlags(
-		versionLabel->textInteractionFlags() |
-		Qt::TextSelectableByMouse);
+	versionLabel->setText(
+		versionLabel->text().arg(LMMS_VERSION).arg(PLATFORM).arg(MACHINE).arg(QT_VERSION_STR).arg(COMPILER_VERSION));
+	versionLabel->setTextInteractionFlags(versionLabel->textInteractionFlags() | Qt::TextSelectableByMouse);
 
 	copyrightLabel->setText(copyrightLabel->text().arg(LMMS_PROJECT_COPYRIGHT));
 

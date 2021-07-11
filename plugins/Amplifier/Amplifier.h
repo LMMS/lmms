@@ -37,10 +37,7 @@ public:
 	virtual ~AmplifierEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_ampControls;
-	}
+	virtual EffectControls* controls() { return &m_ampControls; }
 
 private:
 	AmplifierControls m_ampControls;

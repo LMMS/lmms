@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -40,24 +40,13 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"LADSPA Plugin Browser",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"List installed LADSPA plugins"),
-			"Danny McRae <khjklujn/at/users.sourceforge.net>",
-			0x0100,
-			Plugin::Tool,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "LADSPA Plugin Browser",
+		QT_TRANSLATE_NOOP("PluginBrowser", "List installed LADSPA plugins"),
+		"Danny McRae <khjklujn/at/users.sourceforge.net>", 0x0100, Plugin::Tool, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 
 	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
-	{
-		return new ladspaBrowser;
-	}
+	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data) { return new ladspaBrowser; }
 }
 
 ladspaBrowser::ladspaBrowser()
@@ -65,14 +54,9 @@ ladspaBrowser::ladspaBrowser()
 {
 }
 
-ladspaBrowser::~ladspaBrowser()
-{
-}
+ladspaBrowser::~ladspaBrowser() {}
 
-QString ladspaBrowser::nodeName() const
-{
-	return ladspabrowser_plugin_descriptor.name;
-}
+QString ladspaBrowser::nodeName() const { return ladspabrowser_plugin_descriptor.name; }
 
 ladspaBrowserView::ladspaBrowserView(ToolPlugin* _tool)
 	: ToolPluginView(_tool)
@@ -89,29 +73,17 @@ ladspaBrowserView::ladspaBrowserView(ToolPlugin* _tool)
 	ws->setFixedSize(500, 480);
 
 	QWidget* available = createTab(ws, tr("Available Effects"), VALID);
-	QWidget* unavailable = createTab(ws, tr("Unavailable Effects"),
-		INVALID);
+	QWidget* unavailable = createTab(ws, tr("Unavailable Effects"), INVALID);
 	QWidget* instruments = createTab(ws, tr("Instruments"), SOURCE);
 	QWidget* analysis = createTab(ws, tr("Analysis Tools"), SINK);
 	QWidget* other = createTab(ws, tr("Don't know"), OTHER);
 
-	m_tabBar->addTab(available, tr("Available Effects"),
-				0, false, true)
-		->setIcon(embed::getIconPixmap("setup_audio"));
-	m_tabBar->addTab(unavailable, tr("Unavailable Effects"),
-				1, false, true)
-		->setIcon(embed::getIconPixmap(
-			"unavailable_sound"));
-	m_tabBar->addTab(instruments, tr("Instruments"),
-				2, false, true)
-		->setIcon(embed::getIconPixmap(
-			"setup_midi"));
-	m_tabBar->addTab(analysis, tr("Analysis Tools"),
-				3, false, true)
-		->setIcon(embed::getIconPixmap("analysis"));
-	m_tabBar->addTab(other, tr("Don't know"),
-				4, true, true)
-		->setIcon(embed::getIconPixmap("uhoh"));
+	m_tabBar->addTab(available, tr("Available Effects"), 0, false, true)->setIcon(embed::getIconPixmap("setup_audio"));
+	m_tabBar->addTab(unavailable, tr("Unavailable Effects"), 1, false, true)
+		->setIcon(embed::getIconPixmap("unavailable_sound"));
+	m_tabBar->addTab(instruments, tr("Instruments"), 2, false, true)->setIcon(embed::getIconPixmap("setup_midi"));
+	m_tabBar->addTab(analysis, tr("Analysis Tools"), 3, false, true)->setIcon(embed::getIconPixmap("analysis"));
+	m_tabBar->addTab(other, tr("Don't know"), 4, true, true)->setIcon(embed::getIconPixmap("uhoh"));
 
 	m_tabBar->setActiveTab(0);
 
@@ -125,8 +97,7 @@ ladspaBrowserView::ladspaBrowserView(ToolPlugin* _tool)
 	if (parentWidget())
 	{
 		parentWidget()->hide();
-		parentWidget()->layout()->setSizeConstraint(
-			QLayout::SetFixedSize);
+		parentWidget()->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
 		flags |= Qt::MSWindowsFixedSizeDialogHint;
@@ -135,12 +106,9 @@ ladspaBrowserView::ladspaBrowserView(ToolPlugin* _tool)
 	}
 }
 
-ladspaBrowserView::~ladspaBrowserView()
-{
-}
+ladspaBrowserView::~ladspaBrowserView() {}
 
-QWidget* ladspaBrowserView::createTab(QWidget* _parent, const QString& _txt,
-	ladspaPluginType _type)
+QWidget* ladspaBrowserView::createTab(QWidget* _parent, const QString& _txt, ladspaPluginType _type)
 {
 	QWidget* tab = new QWidget(_parent);
 	tab->setFixedSize(500, 400);
@@ -159,8 +127,7 @@ QWidget* ladspaBrowserView::createTab(QWidget* _parent, const QString& _txt,
 	layout->addSpacing(10);
 
 	ladspaDescription* description = new ladspaDescription(tab, _type);
-	connect(description, SIGNAL(doubleClicked(const ladspa_key_t&)),
-		SLOT(showPorts(const ladspa_key_t&)));
+	connect(description, SIGNAL(doubleClicked(const ladspa_key_t&)), SLOT(showPorts(const ladspa_key_t&)));
 	layout->addWidget(description, 1);
 
 	return tab;

@@ -75,8 +75,7 @@ public:
 	virtual ~InstrumentTrack();
 
 	// used by instrument
-	void processAudioBuffer(sampleFrame* _buf, const fpp_t _frames,
-		NotePlayHandle* _n);
+	void processAudioBuffer(sampleFrame* _buf, const fpp_t _frames, NotePlayHandle* _n);
 
 	MidiEvent applyMasterKey(const MidiEvent& event);
 
@@ -85,10 +84,7 @@ public:
 	// silence all running notes played by this track
 	void silenceAllNotes(bool removeIPH = false);
 
-	bool isSustainPedalPressed() const
-	{
-		return m_sustainPedalPressed;
-	}
+	bool isSustainPedalPressed() const { return m_sustainPedalPressed; }
 
 	f_cnt_t beatLen(NotePlayHandle* _n) const;
 
@@ -97,15 +93,9 @@ public:
 	void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 
 	QString instrumentName() const;
-	const Instrument* instrument() const
-	{
-		return m_instrument;
-	}
+	const Instrument* instrument() const { return m_instrument; }
 
-	Instrument* instrument()
-	{
-		return m_instrument;
-	}
+	Instrument* instrument() { return m_instrument; }
 
 	void deleteNotePluginData(NotePlayHandle* _n);
 
@@ -119,18 +109,16 @@ public:
 	// translate pitch to midi-pitch [0,16383]
 	int midiPitch() const
 	{
-		return static_cast<int>(((m_pitchModel.value() + m_pitchModel.range() / 2) * MidiMaxPitchBend) / m_pitchModel.range());
+		return static_cast<int>(
+			((m_pitchModel.value() + m_pitchModel.range() / 2) * MidiMaxPitchBend) / m_pitchModel.range());
 	}
 
 	/*! \brief Returns current range for pitch bend in semitones */
-	int midiPitchRange() const
-	{
-		return m_pitchRangeModel.value();
-	}
+	int midiPitchRange() const { return m_pitchRangeModel.value(); }
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play(const TimePos& _start, const fpp_t _frames,
-		const f_cnt_t _frame_base, int _tco_num = -1) override;
+	virtual bool play(
+		const TimePos& _start, const fpp_t _frames, const f_cnt_t _frame_base, int _tco_num = -1) override;
 	// create new view for me
 	TrackView* createView(TrackContainerView* tcv) override;
 
@@ -138,83 +126,45 @@ public:
 	TrackContentObject* createTCO(const TimePos& pos) override;
 
 	// called by track
-	virtual void saveTrackSpecificSettings(QDomDocument& _doc,
-		QDomElement& _parent) override;
+	virtual void saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadTrackSpecificSettings(const QDomElement& _this) override;
 
 	using Track::setJournalling;
 
 	// load instrument whose name matches given one
 	Instrument* loadInstrument(const QString& _instrument_name,
-		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr,
-		bool keyFromDnd = false);
+		const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr, bool keyFromDnd = false);
 
-	AudioPort* audioPort()
-	{
-		return &m_audioPort;
-	}
+	AudioPort* audioPort() { return &m_audioPort; }
 
-	MidiPort* midiPort()
-	{
-		return &m_midiPort;
-	}
+	MidiPort* midiPort() { return &m_midiPort; }
 
-	const IntModel* baseNoteModel() const
-	{
-		return &m_baseNoteModel;
-	}
+	const IntModel* baseNoteModel() const { return &m_baseNoteModel; }
 
-	IntModel* baseNoteModel()
-	{
-		return &m_baseNoteModel;
-	}
+	IntModel* baseNoteModel() { return &m_baseNoteModel; }
 
 	int baseNote() const;
 
-	Piano* pianoModel()
-	{
-		return &m_piano;
-	}
+	Piano* pianoModel() { return &m_piano; }
 
-	bool isArpeggioEnabled() const
-	{
-		return m_arpeggio.m_arpEnabledModel.value();
-	}
+	bool isArpeggioEnabled() const { return m_arpeggio.m_arpEnabledModel.value(); }
 
 	// simple helper for removing midiport-XML-node when loading presets
 	static void removeMidiPortNode(DataFile& dataFile);
 
-	FloatModel* pitchModel()
-	{
-		return &m_pitchModel;
-	}
+	FloatModel* pitchModel() { return &m_pitchModel; }
 
-	FloatModel* volumeModel()
-	{
-		return &m_volumeModel;
-	}
+	FloatModel* volumeModel() { return &m_volumeModel; }
 
-	FloatModel* panningModel()
-	{
-		return &m_panningModel;
-	}
+	FloatModel* panningModel() { return &m_panningModel; }
 
-	IntModel* pitchRangeModel()
-	{
-		return &m_pitchRangeModel;
-	}
+	IntModel* pitchRangeModel() { return &m_pitchRangeModel; }
 
-	IntModel* effectChannelModel()
-	{
-		return &m_effectChannelModel;
-	}
+	IntModel* effectChannelModel() { return &m_effectChannelModel; }
 
 	void setPreviewMode(const bool);
 
-	bool isPreviewMode() const
-	{
-		return m_previewMode;
-	}
+	bool isPreviewMode() const { return m_previewMode; }
 
 	void autoAssignMidiDevice(bool);
 
@@ -227,10 +177,7 @@ signals:
 	void endNote();
 
 protected:
-	QString nodeName() const override
-	{
-		return "instrumenttrack";
-	}
+	QString nodeName() const override { return "instrumenttrack"; }
 
 	// get the name of the instrument in the saved data
 	QString getSavedInstrumentName(const QDomElement& thisElement) const;
@@ -301,22 +248,13 @@ public:
 
 	InstrumentTrackWindow* getInstrumentTrackWindow();
 
-	InstrumentTrack* model()
-	{
-		return castModel<InstrumentTrack>();
-	}
+	InstrumentTrack* model() { return castModel<InstrumentTrack>(); }
 
-	const InstrumentTrack* model() const
-	{
-		return castModel<InstrumentTrack>();
-	}
+	const InstrumentTrack* model() const { return castModel<InstrumentTrack>(); }
 
 	static InstrumentTrackWindow* topLevelInstrumentTrackWindow();
 
-	QMenu* midiMenu()
-	{
-		return m_midiMenu;
-	}
+	QMenu* midiMenu() { return m_midiMenu; }
 
 	// Create a menu for assigning/creating channels for this track
 	QMenu* createFxMenu(QString title, QString newFxLabel) override;
@@ -358,10 +296,7 @@ private:
 
 	QPoint m_lastPos;
 
-	FadeButton* getActivityIndicator() override
-	{
-		return m_activityIndicator;
-	}
+	FadeButton* getActivityIndicator() override { return m_activityIndicator; }
 
 	friend class InstrumentTrackWindow;
 };
@@ -374,32 +309,17 @@ public:
 	virtual ~InstrumentTrackWindow();
 
 	// parent for all internal tab-widgets
-	TabWidget* tabWidgetParent()
-	{
-		return m_tabWidget;
-	}
+	TabWidget* tabWidgetParent() { return m_tabWidget; }
 
-	InstrumentTrack* model()
-	{
-		return castModel<InstrumentTrack>();
-	}
+	InstrumentTrack* model() { return castModel<InstrumentTrack>(); }
 
-	const InstrumentTrack* model() const
-	{
-		return castModel<InstrumentTrack>();
-	}
+	const InstrumentTrack* model() const { return castModel<InstrumentTrack>(); }
 
 	void setInstrumentTrackView(InstrumentTrackView* _tv);
 
-	InstrumentTrackView* instrumentTrackView()
-	{
-		return m_itv;
-	}
+	InstrumentTrackView* instrumentTrackView() { return m_itv; }
 
-	PianoView* pianoView()
-	{
-		return m_pianoView;
-	}
+	PianoView* pianoView() { return m_pianoView; }
 
 	static void dragEnterEventGeneric(QDragEnterEvent* _dee);
 

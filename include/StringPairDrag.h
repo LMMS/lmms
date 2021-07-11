@@ -38,12 +38,10 @@ class QPixmap;
 class LMMS_EXPORT StringPairDrag : public QDrag
 {
 public:
-	StringPairDrag(const QString& _key, const QString& _value,
-		const QPixmap& _icon, QWidget* _w);
+	StringPairDrag(const QString& _key, const QString& _value, const QPixmap& _icon, QWidget* _w);
 	~StringPairDrag();
 
-	static bool processDragEnterEvent(QDragEnterEvent* _dee,
-		const QString& _allowed_keys);
+	static bool processDragEnterEvent(QDragEnterEvent* _dee, const QString& _allowed_keys);
 	static QString decodeKey(QDropEvent* _de);
 	static QString decodeValue(QDropEvent* _de);
 };

@@ -38,9 +38,8 @@ AudioDevice::AudioDevice(const ch_cnt_t _channels, Mixer* _mixer)
 	, m_buffer(new surroundSampleFrame[mixer()->framesPerPeriod()])
 {
 	int error;
-	if ((m_srcState = src_new(
-			 mixer()->currentQualitySettings().libsrcInterpolation(),
-			 SURROUND_CHANNELS, &error)) == NULL)
+	if ((m_srcState = src_new(mixer()->currentQualitySettings().libsrcInterpolation(), SURROUND_CHANNELS, &error)) ==
+		NULL)
 	{
 		printf("Error: src_new() failed in audio_device.cpp!\n");
 	}
@@ -83,8 +82,7 @@ fpp_t AudioDevice::getNextBuffer(surroundSampleFrame* _ab)
 	// resample if necessary
 	if (mixer()->processingSampleRate() != m_sampleRate)
 	{
-		frames = resample(b, frames, _ab, mixer()->processingSampleRate(),
-			m_sampleRate);
+		frames = resample(b, frames, _ab, mixer()->processingSampleRate(), m_sampleRate);
 	}
 	else
 	{
@@ -131,31 +129,21 @@ void AudioDevice::applyQualitySettings()
 	src_delete(m_srcState);
 
 	int error;
-	if ((m_srcState = src_new(
-			 mixer()->currentQualitySettings().libsrcInterpolation(),
-			 SURROUND_CHANNELS, &error)) == NULL)
+	if ((m_srcState = src_new(mixer()->currentQualitySettings().libsrcInterpolation(), SURROUND_CHANNELS, &error)) ==
+		NULL)
 	{
 		printf("Error: src_new() failed in audio_device.cpp!\n");
 	}
 }
 
-void AudioDevice::registerPort(AudioPort*)
-{
-}
+void AudioDevice::registerPort(AudioPort*) {}
 
-void AudioDevice::unregisterPort(AudioPort* _port)
-{
-}
+void AudioDevice::unregisterPort(AudioPort* _port) {}
 
-void AudioDevice::renamePort(AudioPort*)
-{
-}
+void AudioDevice::renamePort(AudioPort*) {}
 
-fpp_t AudioDevice::resample(const surroundSampleFrame* _src,
-	const fpp_t _frames,
-	surroundSampleFrame* _dst,
-	const sample_rate_t _src_sr,
-	const sample_rate_t _dst_sr)
+fpp_t AudioDevice::resample(const surroundSampleFrame* _src, const fpp_t _frames, surroundSampleFrame* _dst,
+	const sample_rate_t _src_sr, const sample_rate_t _dst_sr)
 {
 	if (m_srcState == NULL)
 	{
@@ -170,17 +158,13 @@ fpp_t AudioDevice::resample(const surroundSampleFrame* _src,
 	int error;
 	if ((error = src_process(m_srcState, &m_srcData)))
 	{
-		printf("AudioDevice::resample(): error while resampling: %s\n",
-			src_strerror(error));
+		printf("AudioDevice::resample(): error while resampling: %s\n", src_strerror(error));
 	}
 	return static_cast<fpp_t>(m_srcData.output_frames_gen);
 }
 
-int AudioDevice::convertToS16(const surroundSampleFrame* _ab,
-	const fpp_t _frames,
-	const float _master_gain,
-	int_sample_t* _output_buffer,
-	const bool _convert_endian)
+int AudioDevice::convertToS16(const surroundSampleFrame* _ab, const fpp_t _frames, const float _master_gain,
+	int_sample_t* _output_buffer, const bool _convert_endian)
 {
 	if (_convert_endian)
 	{
@@ -189,11 +173,10 @@ int AudioDevice::convertToS16(const surroundSampleFrame* _ab,
 		{
 			for (ch_cnt_t chnl = 0; chnl < channels(); ++chnl)
 			{
-				temp = static_cast<int_sample_t>(Mixer::clip(_ab[frame][chnl] * _master_gain) * OUTPUT_SAMPLE_MULTIPLIER);
+				temp =
+					static_cast<int_sample_t>(Mixer::clip(_ab[frame][chnl] * _master_gain) * OUTPUT_SAMPLE_MULTIPLIER);
 
-				(_output_buffer + frame * channels())[chnl] =
-					(temp & 0x00ff) << 8 |
-					(temp & 0xff00) >> 8;
+				(_output_buffer + frame * channels())[chnl] = (temp & 0x00ff) << 8 | (temp & 0xff00) >> 8;
 			}
 		}
 	}
@@ -204,10 +187,7 @@ int AudioDevice::convertToS16(const surroundSampleFrame* _ab,
 			for (ch_cnt_t chnl = 0; chnl < channels(); ++chnl)
 			{
 				(_output_buffer + frame * channels())[chnl] =
-					static_cast<int_sample_t>(
-						Mixer::clip(_ab[frame][chnl] *
-							_master_gain) *
-						OUTPUT_SAMPLE_MULTIPLIER);
+					static_cast<int_sample_t>(Mixer::clip(_ab[frame][chnl] * _master_gain) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 	}
@@ -223,7 +203,4 @@ void AudioDevice::clearS16Buffer(int_sample_t* _outbuf, const fpp_t _frames)
 	memset(_outbuf, 0, _frames * channels() * BYTES_PER_INT_SAMPLE);
 }
 
-bool AudioDevice::hqAudio() const
-{
-	return ConfigManager::inst()->value("mixer", "hqaudio").toInt();
-}
+bool AudioDevice::hqAudio() const { return ConfigManager::inst()->value("mixer", "hqaudio").toInt(); }

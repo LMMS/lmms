@@ -37,15 +37,9 @@ public:
 	InstrumentView(Instrument* _instrument, QWidget* _parent);
 	~InstrumentView() override;
 
-	Instrument* model()
-	{
-		return (castModel<Instrument>());
-	}
+	Instrument* model() { return (castModel<Instrument>()); }
 
-	const Instrument* model() const
-	{
-		return (castModel<Instrument>());
-	}
+	const Instrument* model() const { return (castModel<Instrument>()); }
 
 	void setModel(Model* _model, bool = false) override;
 

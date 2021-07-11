@@ -80,15 +80,12 @@ MidiJack::MidiJack()
 	else
 	{
 		m_jackAudio = NULL;
-		m_jackClient = jack_client_open(probeDevice().toLatin1().data(),
-			JackNoStartServer, NULL);
+		m_jackClient = jack_client_open(probeDevice().toLatin1().data(), JackNoStartServer, NULL);
 
 		if (m_jackClient)
 		{
-			jack_set_process_callback(m_jackClient,
-				JackMidiProcessCallback, this);
-			jack_on_shutdown(m_jackClient,
-				JackMidiShutdown, 0);
+			jack_set_process_callback(m_jackClient, JackMidiProcessCallback, this);
+			jack_on_shutdown(m_jackClient, JackMidiShutdown, 0);
 		}
 	}
 
@@ -104,9 +101,7 @@ MidiJack::MidiJack()
 				JackPortIsOutput, 0);
 		*/
 
-		m_input_port = jack_port_register(
-			jackClient(), "MIDI in", JACK_DEFAULT_MIDI_TYPE,
-			JackPortIsInput, 0);
+		m_input_port = jack_port_register(jackClient(), "MIDI in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
 
 		if (jack_activate(jackClient()) == 0)
 		{
@@ -216,7 +211,7 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 
 void MidiJack::sendByte(const unsigned char c)
 {
-	//m_midiDev.putChar( c );
+	// m_midiDev.putChar( c );
 }
 
 // we write data to jack

@@ -55,39 +55,24 @@ const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
 };
 
 // Vector with all the upgrade methods
-const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
-	&DataFile::upgrade_0_2_1_20070501, &DataFile::upgrade_0_2_1_20070508,
-	&DataFile::upgrade_0_3_0_rc2, &DataFile::upgrade_0_3_0,
-	&DataFile::upgrade_0_4_0_20080104, &DataFile::upgrade_0_4_0_20080118,
-	&DataFile::upgrade_0_4_0_20080129, &DataFile::upgrade_0_4_0_20080409,
-	&DataFile::upgrade_0_4_0_20080607, &DataFile::upgrade_0_4_0_20080622,
-	&DataFile::upgrade_0_4_0_beta1, &DataFile::upgrade_0_4_0_rc2,
-	&DataFile::upgrade_1_0_99, &DataFile::upgrade_1_1_0,
-	&DataFile::upgrade_1_1_91, &DataFile::upgrade_1_2_0_rc3,
-	&DataFile::upgrade_1_3_0, &DataFile::upgrade_noHiddenClipNames,
-	&DataFile::upgrade_automationNodes};
+const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {&DataFile::upgrade_0_2_1_20070501,
+	&DataFile::upgrade_0_2_1_20070508, &DataFile::upgrade_0_3_0_rc2, &DataFile::upgrade_0_3_0,
+	&DataFile::upgrade_0_4_0_20080104, &DataFile::upgrade_0_4_0_20080118, &DataFile::upgrade_0_4_0_20080129,
+	&DataFile::upgrade_0_4_0_20080409, &DataFile::upgrade_0_4_0_20080607, &DataFile::upgrade_0_4_0_20080622,
+	&DataFile::upgrade_0_4_0_beta1, &DataFile::upgrade_0_4_0_rc2, &DataFile::upgrade_1_0_99, &DataFile::upgrade_1_1_0,
+	&DataFile::upgrade_1_1_91, &DataFile::upgrade_1_2_0_rc3, &DataFile::upgrade_1_3_0,
+	&DataFile::upgrade_noHiddenClipNames, &DataFile::upgrade_automationNodes};
 
 // Vector of all versions that have upgrade routines.
-const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {
-	"0.2.1-20070501", "0.2.1-20070508", "0.3.0-rc2",
-	"0.3.0", "0.4.0-20080104", "0.4.0-20080118",
-	"0.4.0-20080129", "0.4.0-20080409", "0.4.0-20080607",
-	"0.4.0-20080622", "0.4.0-beta1", "0.4.0-rc2",
-	"1.0.99-0", "1.1.0-0", "1.1.91-0",
-	"1.2.0-rc3", "1.3.0"};
+const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {"0.2.1-20070501", "0.2.1-20070508", "0.3.0-rc2",
+	"0.3.0", "0.4.0-20080104", "0.4.0-20080118", "0.4.0-20080129", "0.4.0-20080409", "0.4.0-20080607", "0.4.0-20080622",
+	"0.4.0-beta1", "0.4.0-rc2", "1.0.99-0", "1.1.0-0", "1.1.91-0", "1.2.0-rc3", "1.3.0"};
 
-DataFile::typeDescStruct
-	DataFile::s_types[DataFile::TypeCount] =
-		{
-			{DataFile::UnknownType, "unknown"},
-			{DataFile::SongProject, "song"},
-			{DataFile::SongProjectTemplate, "songtemplate"},
-			{DataFile::InstrumentTrackSettings, "instrumenttracksettings"},
-			{DataFile::DragNDropData, "dnddata"},
-			{DataFile::ClipboardData, "clipboard-data"},
-			{DataFile::JournalData, "journaldata"},
-			{DataFile::EffectSettings, "effectsettings"},
-			{DataFile::NotePattern, "pattern"}};
+DataFile::typeDescStruct DataFile::s_types[DataFile::TypeCount] = {{DataFile::UnknownType, "unknown"},
+	{DataFile::SongProject, "song"}, {DataFile::SongProjectTemplate, "songtemplate"},
+	{DataFile::InstrumentTrackSettings, "instrumenttracksettings"}, {DataFile::DragNDropData, "dnddata"},
+	{DataFile::ClipboardData, "clipboard-data"}, {DataFile::JournalData, "journaldata"},
+	{DataFile::EffectSettings, "effectsettings"}, {DataFile::NotePattern, "pattern"}};
 
 DataFile::DataFile(Type type)
 	: QDomDocument("lmms-project")
@@ -124,8 +109,7 @@ DataFile::DataFile(const QString& _fileName)
 	{
 		if (gui)
 		{
-			QMessageBox::critical(NULL,
-				SongEditor::tr("Could not open file"),
+			QMessageBox::critical(NULL, SongEditor::tr("Could not open file"),
 				SongEditor::tr("Could not open file %1. You probably "
 							   "have no permissions to read this "
 							   "file.\n Please make sure to have at "
@@ -150,9 +134,7 @@ DataFile::DataFile(const QByteArray& _data)
 	loadData(_data, "<internal data>");
 }
 
-DataFile::~DataFile()
-{
-}
+DataFile::~DataFile() {}
 
 bool DataFile::validate(QString extension)
 {
@@ -183,8 +165,8 @@ bool DataFile::validate(QString extension)
 		}
 		break;
 	case Type::UnknownType:
-		if (!(extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
-				extension == "xpf" || extension == "xml" ||
+		if (!(extension == "mmp" || extension == "mpt" || extension == "mmpz" || extension == "xpf" ||
+				extension == "xml" ||
 				(extension == "xiz" && !pluginFactory->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
@@ -195,8 +177,7 @@ bool DataFile::validate(QString extension)
 		{
 			return true;
 		}
-		if (extension == "wav" || extension == "ogg" ||
-			extension == "ds")
+		if (extension == "wav" || extension == "ogg" || extension == "ds")
 		{
 			return true;
 		}
@@ -212,13 +193,9 @@ QString DataFile::nameWithExtension(const QString& _fn) const
 	switch (type())
 	{
 	case SongProject:
-		if (_fn.section('.', -1) != "mmp" &&
-			_fn.section('.', -1) != "mpt" &&
-			_fn.section('.', -1) != "mmpz")
+		if (_fn.section('.', -1) != "mmp" && _fn.section('.', -1) != "mpt" && _fn.section('.', -1) != "mmpz")
 		{
-			if (ConfigManager::inst()->value("app",
-										 "nommpz")
-					.toInt() == 0)
+			if (ConfigManager::inst()->value("app", "nommpz").toInt() == 0)
 			{
 				return _fn + ".mmpz";
 			}
@@ -280,9 +257,8 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 
 	const QString bundleDir = fInfo.path() + "/" + fInfo.fileName().section('.', 0, 0);
 	const QString resourcesDir = bundleDir + "/resources";
-	const QString fullName = withResources
-		? nameWithExtension(bundleDir + "/" + fInfo.fileName())
-		: nameWithExtension(filename);
+	const QString fullName =
+		withResources ? nameWithExtension(bundleDir + "/" + fInfo.fileName()) : nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
 
@@ -305,24 +281,21 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		// Create bundle folder
 		if (!QDir().mkdir(bundleDir))
 		{
-			showError(SongEditor::tr("Error"),
-				SongEditor::tr("Couldn't create bundle folder."));
+			showError(SongEditor::tr("Error"), SongEditor::tr("Couldn't create bundle folder."));
 			return false;
 		}
 
 		// Create resources folder
 		if (!QDir().mkdir(resourcesDir))
 		{
-			showError(SongEditor::tr("Error"),
-				SongEditor::tr("Couldn't create resources folder."));
+			showError(SongEditor::tr("Error"), SongEditor::tr("Couldn't create resources folder."));
 			return false;
 		}
 
 		// Copy resources to folder and update paths
 		if (!copyResources(resourcesDir))
 		{
-			showError(SongEditor::tr("Error"),
-				SongEditor::tr("Failed to copy resources."));
+			showError(SongEditor::tr("Error"), SongEditor::tr("Failed to copy resources."));
 			return false;
 		}
 	}
@@ -413,7 +386,8 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					// prefixes aren't converted, so we need to convert it ourselves
 					if (error)
 					{
-						resPath = QFileInfo(m_fileName).path() + "/" + resPath.remove(0, PathUtil::basePrefix(PathUtil::Base::LocalDir).length());
+						resPath = QFileInfo(m_fileName).path() + "/" +
+							resPath.remove(0, PathUtil::basePrefix(PathUtil::Base::LocalDir).length());
 					}
 
 					// Check if we need to add a counter to the filename
@@ -491,10 +465,8 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 		bool skipNode = false;
 		// Skip the nodes allowed to have "local:" attributes, but
 		// still check its children
-		for (
-			ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
-			it != ELEMENTS_WITH_RESOURCES.end();
-			++it)
+		for (ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin(); it != ELEMENTS_WITH_RESOURCES.end();
+			 ++it)
 		{
 			if (childElement.tagName() == it->first)
 			{
@@ -512,8 +484,7 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 			{
 				QDomNode attribute = attributes.item(i);
 				QDomAttr attr = attribute.toAttr();
-				if (attr.value().startsWith(PathUtil::basePrefix(PathUtil::Base::LocalDir),
-						Qt::CaseInsensitive))
+				if (attr.value().startsWith(PathUtil::basePrefix(PathUtil::Base::LocalDir), Qt::CaseInsensitive))
 				{
 					return true;
 				}
@@ -615,10 +586,8 @@ void DataFile::upgrade_0_2_1_20070501()
 		}
 		else
 		{
-			QDomNode node = el.namedItem(
-				"automation-pattern");
-			if (!node.isElement() ||
-				!node.namedItem("vol").isElement())
+			QDomNode node = el.namedItem("automation-pattern");
+			if (!node.isElement() || !node.namedItem("vol").isElement())
 			{
 				el.setAttribute("vol", 100.0f);
 			}
@@ -638,10 +607,7 @@ void DataFile::upgrade_0_2_1_20070501()
 				QString name = node.nodeName();
 				if (name.endsWith("link"))
 				{
-					el.setAttribute(name,
-						node.namedItem("time")
-							.toElement()
-							.attribute("value"));
+					el.setAttribute(name, node.namedItem("time").toElement().attribute("value"));
 					QDomNode oldNode = node;
 					node = node.nextSibling();
 					anode.removeChild(oldNode);
@@ -659,13 +625,10 @@ void DataFile::upgrade_0_2_1_20070501()
 		{
 			if (node.nodeName() == "bpm")
 			{
-				int value = node.toElement().attribute(
-												"value")
-								.toInt();
+				int value = node.toElement().attribute("value").toInt();
 				if (value > 0)
 				{
-					m_head.setAttribute("bpm",
-						value);
+					m_head.setAttribute("bpm", value);
 					QDomNode oldNode = node;
 					node = node.nextSibling();
 					m_head.removeChild(oldNode);
@@ -674,13 +637,10 @@ void DataFile::upgrade_0_2_1_20070501()
 			}
 			else if (node.nodeName() == "mastervol")
 			{
-				int value = node.toElement().attribute(
-												"value")
-								.toInt();
+				int value = node.toElement().attribute("value").toInt();
 				if (value > 0)
 				{
-					m_head.setAttribute(
-						"mastervol", value);
+					m_head.setAttribute("mastervol", value);
 					QDomNode oldNode = node;
 					node = node.nextSibling();
 					m_head.removeChild(oldNode);
@@ -689,10 +649,7 @@ void DataFile::upgrade_0_2_1_20070501()
 			}
 			else if (node.nodeName() == "masterpitch")
 			{
-				m_head.setAttribute("masterpitch",
-					-node.toElement().attribute(
-										 "value")
-						 .toInt());
+				m_head.setAttribute("masterpitch", -node.toElement().attribute("value").toInt());
 				QDomNode oldNode = node;
 				node = node.nextSibling();
 				m_head.removeChild(oldNode);
@@ -712,18 +669,13 @@ void DataFile::upgrade_0_2_1_20070508()
 		QDomElement el = list.item(i).toElement();
 		if (el.hasAttribute("chorddisabled"))
 		{
-			el.setAttribute("chord-enabled",
-				!el.attribute("chorddisabled")
-					 .toInt());
-			el.setAttribute("arp-enabled",
-				!el.attribute("arpdisabled")
-					 .toInt());
+			el.setAttribute("chord-enabled", !el.attribute("chorddisabled").toInt());
+			el.setAttribute("arp-enabled", !el.attribute("arpdisabled").toInt());
 		}
 		else if (!el.hasAttribute("chord-enabled"))
 		{
 			el.setAttribute("chord-enabled", true);
-			el.setAttribute("arp-enabled",
-				el.attribute("arpdir").toInt() != 0);
+			el.setAttribute("arp-enabled", el.attribute("arpdir").toInt() != 0);
 		}
 	}
 
@@ -745,20 +697,13 @@ void DataFile::upgrade_0_2_1_20070508()
 		}
 		else
 		{
-			QDomNodeList vol_list = el.namedItem(
-										  "automation-pattern")
-										.namedItem("vol")
-										.toElement()
-										.elementsByTagName("time");
-			for (int j = 0; !vol_list.item(j).isNull();
-				 ++j)
+			QDomNodeList vol_list =
+				el.namedItem("automation-pattern").namedItem("vol").toElement().elementsByTagName("time");
+			for (int j = 0; !vol_list.item(j).isNull(); ++j)
 			{
-				QDomElement timeEl = list.item(j)
-										 .toElement();
-				int value = timeEl.attribute("value")
-								.toInt();
-				value = (int)roundf(value *
-					0.585786438f);
+				QDomElement timeEl = list.item(j).toElement();
+				int value = timeEl.attribute("value").toInt();
+				value = (int)roundf(value * 0.585786438f);
 				timeEl.setAttribute("value", value);
 			}
 		}
@@ -774,8 +719,7 @@ void DataFile::upgrade_0_3_0_rc2()
 		QDomElement el = list.item(i).toElement();
 		if (el.attribute("arpdir").toInt() > 0)
 		{
-			el.setAttribute("arpdir",
-				el.attribute("arpdir").toInt() - 1);
+			el.setAttribute("arpdir", el.attribute("arpdir").toInt() - 1);
 		}
 	}
 }
@@ -784,9 +728,7 @@ void DataFile::upgrade_0_3_0()
 {
 	// Upgrade to version 0.3.0 (final) from some version greater than or equal to 0.3.0-rc2
 	QDomNodeList list;
-	while (!(list = elementsByTagName(
-				 "pluckedstringsynth"))
-				.isEmpty())
+	while (!(list = elementsByTagName("pluckedstringsynth")).isEmpty())
 	{
 		QDomElement el = list.item(0).toElement();
 		el.setTagName("vibedstrings");
@@ -813,8 +755,7 @@ void DataFile::upgrade_0_4_0_20080104()
 	for (int i = 0; !list.item(i).isNull(); ++i)
 	{
 		QDomElement el = list.item(i).toElement();
-		if (el.hasAttribute("fxdisabled") &&
-			el.attribute("fxdisabled").toInt() == 0)
+		if (el.hasAttribute("fxdisabled") && el.attribute("fxdisabled").toInt() == 0)
 		{
 			el.setAttribute("enabled", 1);
 		}
@@ -836,8 +777,7 @@ void DataFile::upgrade_0_4_0_20080118()
 		{
 			fxchain.appendChild(effects.at(0));
 		}
-		fxchain.setAttribute("numofeffects",
-			rack.toElement().attribute("numofeffects"));
+		fxchain.setAttribute("numofeffects", rack.toElement().attribute("numofeffects"));
 		fxchain.removeChild(rack);
 	}
 }
@@ -846,9 +786,7 @@ void DataFile::upgrade_0_4_0_20080129()
 {
 	// Upgrade to version 0.4.0-20080129 from some version greater than or equal to 0.4.0-20080118
 	QDomNodeList list;
-	while (!(list =
-				 elementsByTagName("arpandchords"))
-				.isEmpty())
+	while (!(list = elementsByTagName("arpandchords")).isEmpty())
 	{
 		QDomElement aac = list.item(0).toElement();
 		aac.setTagName("arpeggiator");
@@ -873,20 +811,16 @@ void DataFile::upgrade_0_4_0_20080409()
 		for (int i = 0; !list.item(i).isNull(); ++i)
 		{
 			QDomElement el = list.item(i).toElement();
-			el.setAttribute("pos",
-				el.attribute("pos").toInt() * 3);
-			el.setAttribute("len",
-				el.attribute("len").toInt() * 3);
+			el.setAttribute("pos", el.attribute("pos").toInt() * 3);
+			el.setAttribute("len", el.attribute("len").toInt() * 3);
 		}
 	}
 	QDomNodeList list = elementsByTagName("timeline");
 	for (int i = 0; !list.item(i).isNull(); ++i)
 	{
 		QDomElement el = list.item(i).toElement();
-		el.setAttribute("lp0pos",
-			el.attribute("lp0pos").toInt() * 3);
-		el.setAttribute("lp1pos",
-			el.attribute("lp1pos").toInt() * 3);
+		el.setAttribute("lp0pos", el.attribute("lp0pos").toInt() * 3);
+		el.setAttribute("lp1pos", el.attribute("lp1pos").toInt() * 3);
 	}
 }
 
@@ -905,9 +839,7 @@ void DataFile::upgrade_0_4_0_20080622()
 {
 	// Upgrade to version 0.4.0-20080622 from some version greater than or equal to 0.3.0-20080607
 	QDomNodeList list;
-	while (!(list = elementsByTagName(
-				 "automation-pattern"))
-				.isEmpty())
+	while (!(list = elementsByTagName("automation-pattern")).isEmpty())
 	{
 		QDomElement el = list.item(0).toElement();
 		el.setTagName("automationpattern");
@@ -918,8 +850,7 @@ void DataFile::upgrade_0_4_0_20080622()
 	{
 		QDomElement el = list.item(i).toElement();
 		QString s = el.attribute("name");
-		s.replace(QRegExp("^Beat/Baseline "),
-			"Beat/Bassline ");
+		s.replace(QRegExp("^Beat/Baseline "), "Beat/Bassline ");
 		el.setAttribute("name", s);
 	}
 }
@@ -936,8 +867,7 @@ void DataFile::upgrade_0_4_0_beta1()
 		QString k = el.attribute("key");
 		if (!k.isEmpty())
 		{
-			const QList<QVariant> l =
-				base64::decode(k, QVariant::List).toList();
+			const QList<QVariant> l = base64::decode(k, QVariant::List).toList();
 			if (!l.isEmpty())
 			{
 				QString name = l[0].toString();
@@ -998,8 +928,7 @@ void DataFile::upgrade_1_0_99()
 	QDomNodeList list = elementsByTagName("ladspacontrols");
 	for (int i = 0; !list.item(i).isNull(); ++i)
 	{
-		for (QDomNode node = list.item(i).firstChild(); !node.isNull();
-			 node = node.nextSibling())
+		for (QDomNode node = list.item(i).firstChild(); !node.isNull(); node = node.nextSibling())
 		{
 			QDomElement el = node.toElement();
 			QDomNode data_child = el.namedItem("data");
@@ -1012,8 +941,7 @@ void DataFile::upgrade_1_0_99()
 					me.setAttribute("scale_type", "log");
 
 					jo_id_t id;
-					for (id = last_assigned_id + 1;
-						 idList.contains(id); id++)
+					for (id = last_assigned_id + 1; idList.contains(id); id++)
 					{
 					}
 
@@ -1105,8 +1033,7 @@ static void upgradeElement_1_2_0_rc2_42(QDomElement& el)
 				names << name.remove("_numerator") + "_syncmode";
 			}
 		}
-		for (QStringList::iterator it = names.begin(); it < names.end();
-			 ++it)
+		for (QStringList::iterator it = names.begin(); it < names.end(); ++it)
 		{
 			el.setAttribute(*it, syncmode);
 		}
@@ -1127,8 +1054,7 @@ void DataFile::upgrade_1_2_0_rc3()
 	QDomNodeList bbtracks = elementsByTagName("bbtrack");
 	for (int i = 0; !bbtracks.item(i).isNull(); ++i)
 	{
-		QDomNodeList patterns = bbtracks.item(i).toElement().elementsByTagName(
-			"pattern");
+		QDomNodeList patterns = bbtracks.item(i).toElement().elementsByTagName("pattern");
 		for (int j = 0; !patterns.item(j).isNull(); ++j)
 		{
 			int patternLength, steps;
@@ -1156,8 +1082,7 @@ void DataFile::upgrade_1_2_0_rc3()
  *  providing the functor with lists to add and remove DomElements. Helpful for
  *  patching port values from savefiles.
  */
-template <class Ftor>
-void iterate_ladspa_ports(QDomElement& effect, Ftor& ftor)
+template <class Ftor> void iterate_ladspa_ports(QDomElement& effect, Ftor& ftor)
 {
 	// Head back up the DOM to upgrade ports
 	QDomNodeList ladspacontrols = effect.elementsByTagName("ladspacontrols");
@@ -1165,8 +1090,8 @@ void iterate_ladspa_ports(QDomElement& effect, Ftor& ftor)
 	{
 		QList<QDomElement> addList, removeList;
 		QDomElement ladspacontrol = ladspacontrols.item(m).toElement();
-		for (QDomElement port = ladspacontrol.firstChild().toElement();
-			 !port.isNull(); port = port.nextSibling().toElement())
+		for (QDomElement port = ladspacontrol.firstChild().toElement(); !port.isNull();
+			 port = port.nextSibling().toElement())
 		{
 			QStringList parts = port.tagName().split("port");
 			// Not a "port"
@@ -1257,8 +1182,7 @@ void DataFile::upgrade_1_3_0()
 
 					QDomElement attribute = attributes.item(k).toElement();
 					if (attribute.attribute("name") == "file" &&
-						(attribute.attribute("value") == "calf" ||
-							attribute.attribute("value") == "calf.so"))
+						(attribute.attribute("value") == "calf" || attribute.attribute("value") == "calf.so"))
 					{
 						attribute.setAttribute("value", "veal");
 					}
@@ -1267,8 +1191,7 @@ void DataFile::upgrade_1_3_0()
 					{
 						attribute.setAttribute("value", "SidechainCompressor");
 					}
-					else if (attribute.attribute("name") == "plugin" &&
-						attribute.attribute("value") == "Sidechaingate")
+					else if (attribute.attribute("name") == "plugin" && attribute.attribute("value") == "Sidechaingate")
 					{
 						attribute.setAttribute("value", "SidechainGate");
 					}
@@ -1277,8 +1200,7 @@ void DataFile::upgrade_1_3_0()
 					{
 						attribute.setAttribute("value", "MultibandCompressor");
 					}
-					else if (attribute.attribute("name") == "plugin" &&
-						attribute.attribute("value") == "Multibandgate")
+					else if (attribute.attribute("name") == "plugin" && attribute.attribute("value") == "Multibandgate")
 					{
 						attribute.setAttribute("value", "MultibandGate");
 					}
@@ -1313,10 +1235,10 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if (attribute.attribute("name") == "plugin" &&
-						(attribute.attribute("value") == "Pulsator"))
+					if (attribute.attribute("name") == "plugin" && (attribute.attribute("value") == "Pulsator"))
 					{
-						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& removeList) {
+						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList,
+									  QList<QDomElement>& removeList) {
 							switch (num)
 							{
 							case 16: {
@@ -1352,8 +1274,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if (attribute.attribute("name") == "plugin" &&
-						(attribute.attribute("value") == "VintageDelay"))
+					if (attribute.attribute("name") == "plugin" && (attribute.attribute("value") == "VintageDelay"))
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>&) {
 							switch (num)
@@ -1387,7 +1308,9 @@ void DataFile::upgrade_1_3_0()
 					}
 
 					if (attribute.attribute("name") == "plugin" &&
-						((attribute.attribute("value") == "Equalizer5Band") || (attribute.attribute("value") == "Equalizer8Band") || (attribute.attribute("value") == "Equalizer12Band")))
+						((attribute.attribute("value") == "Equalizer5Band") ||
+							(attribute.attribute("value") == "Equalizer8Band") ||
+							(attribute.attribute("value") == "Equalizer12Band")))
 					{
 						// NBand equalizers got 4 q nobs inserted. We need to shift everything else...
 						// HOWEVER: 5 band eq has only 2 q nobs inserted (no LS/HS filters)
@@ -1480,8 +1403,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if (attribute.attribute("name") == "plugin" &&
-						attribute.attribute("value") == "Saturator")
+					if (attribute.attribute("name") == "plugin" && attribute.attribute("value") == "Saturator")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>&) {
 							// These ports have been shifted a bit weird...
@@ -1507,8 +1429,7 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if (attribute.attribute("name") == "plugin" &&
-						attribute.attribute("value") == "StereoTools")
+					if (attribute.attribute("name") == "plugin" && attribute.attribute("value") == "StereoTools")
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>&) {
 							// This effect can not be back-ported due to bugs in the old version,
@@ -1589,10 +1510,8 @@ void DataFile::upgrade_automationNodes()
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::for_each(UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
-		[this](UpgradeMethod um) {
-			(this->*um)();
-		});
+	std::for_each(
+		UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(), [this](UpgradeMethod um) { (this->*um)(); });
 
 	// Bump the file version (which should be the size of the upgrade methods vector)
 	m_fileVersion = UPGRADE_METHODS.size();
@@ -1639,8 +1558,7 @@ void DataFile::loadData(const QByteArray& _data, const QString& _sourceFile)
 			qWarning() << "at line" << line << "column" << errorMsg;
 			if (gui)
 			{
-				QMessageBox::critical(NULL,
-					SongEditor::tr("Error in file"),
+				QMessageBox::critical(NULL, SongEditor::tr("Error in file"),
 					SongEditor::tr("The file %1 seems to contain "
 								   "errors and therefore can't be "
 								   "loaded.")
@@ -1680,17 +1598,14 @@ void DataFile::loadData(const QByteArray& _data, const QString& _sourceFile)
 			upgrade();
 		}
 
-		if (createdWith.setCompareType(ProjectVersion::Minor) != openedWith.setCompareType(ProjectVersion::Minor) && gui != nullptr && root.attribute("type") == "song")
+		if (createdWith.setCompareType(ProjectVersion::Minor) != openedWith.setCompareType(ProjectVersion::Minor) &&
+			gui != nullptr && root.attribute("type") == "song")
 		{
 			auto projectType = _sourceFile.endsWith(".mpt") ? SongEditor::tr("template") : SongEditor::tr("project");
 
-			TextFloat::displayMessage(
-				SongEditor::tr("Version difference"),
-				SongEditor::tr("This %1 was created with LMMS %2")
-					.arg(projectType)
-					.arg(createdWith.getVersion()),
-				embed::getIconPixmap("whatsthis", 24, 24),
-				2500);
+			TextFloat::displayMessage(SongEditor::tr("Version difference"),
+				SongEditor::tr("This %1 was created with LMMS %2").arg(projectType).arg(createdWith.getVersion()),
+				embed::getIconPixmap("whatsthis", 24, 24), 2500);
 		}
 	}
 
@@ -1714,8 +1629,7 @@ void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
 unsigned int DataFile::legacyFileVersion()
 {
 	// Version of LMMs that created this project
-	ProjectVersion creator =
-		documentElement().attribute("creatorversion").replace("svn", "");
+	ProjectVersion creator = documentElement().attribute("creatorversion").replace("svn", "");
 
 	// Get an iterator pointing at the first upgrade we need to run (or at the end if there is no such upgrade)
 	auto firstRequiredUpgrade = std::upper_bound(UPGRADE_VERSIONS.begin(), UPGRADE_VERSIONS.end(), creator);

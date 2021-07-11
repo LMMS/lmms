@@ -39,16 +39,9 @@
 
 static PixmapLoader dummyLoader;
 
-static Plugin::Descriptor dummyPluginDescriptor =
-	{
-		"dummy",
-		"dummy",
-		QT_TRANSLATE_NOOP("PluginBrowser", "no description"),
-		"Tobias Doerffel <tobydox/at/users.sf.net>",
-		0x0100,
-		Plugin::Undefined,
-		&dummyLoader,
-		NULL};
+static Plugin::Descriptor dummyPluginDescriptor = {"dummy", "dummy",
+	QT_TRANSLATE_NOOP("PluginBrowser", "no description"), "Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100,
+	Plugin::Undefined, &dummyLoader, NULL};
 
 Plugin::Plugin(const Descriptor* descriptor, Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Model(parent)
@@ -62,20 +55,11 @@ Plugin::Plugin(const Descriptor* descriptor, Model* parent, const Descriptor::Su
 	}
 }
 
-Plugin::~Plugin()
-{
-}
+Plugin::~Plugin() {}
 
-template <class T>
-T use_this_or(T this_param, T or_param)
-{
-	return this_param ? this_param : or_param;
-}
+template <class T> T use_this_or(T this_param, T or_param) { return this_param ? this_param : or_param; }
 
-QString use_this_or(QString this_param, QString or_param)
-{
-	return this_param.isNull() ? or_param : this_param;
-}
+QString use_this_or(QString this_param, QString or_param) { return this_param.isNull() ? or_param : this_param; }
 
 QString Plugin::displayName() const
 {
@@ -90,9 +74,7 @@ QString Plugin::displayName() const
 
 const PixmapLoader* Plugin::logo() const
 {
-	return (m_descriptor->subPluginFeatures && m_key.isValid())
-		? m_key.logo()
-		: m_descriptor->logo;
+	return (m_descriptor->subPluginFeatures && m_key.isValid()) ? m_key.logo() : m_descriptor->logo;
 }
 
 QString Plugin::Descriptor::SubPluginFeatures::Key::additionalFileExtensions() const
@@ -110,8 +92,7 @@ QString Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
 	Q_ASSERT(isValid());
 	return desc->subPluginFeatures
 		// get from sub plugin
-		? use_this_or(desc->subPluginFeatures->displayName(*this),
-			  QString::fromUtf8(desc->displayName))
+		? use_this_or(desc->subPluginFeatures->displayName(*this), QString::fromUtf8(desc->displayName))
 		// get from plugin
 		: desc->displayName;
 }
@@ -119,23 +100,18 @@ QString Plugin::Descriptor::SubPluginFeatures::Key::displayName() const
 const PixmapLoader* Plugin::Descriptor::SubPluginFeatures::Key::logo() const
 {
 	Q_ASSERT(isValid());
-	return desc->subPluginFeatures
-		? use_this_or(desc->subPluginFeatures->logo(*this), desc->logo)
-		: desc->logo;
+	return desc->subPluginFeatures ? use_this_or(desc->subPluginFeatures->logo(*this), desc->logo) : desc->logo;
 }
 
 QString Plugin::Descriptor::SubPluginFeatures::Key::description() const
 {
 	Q_ASSERT(isValid());
 	return desc->subPluginFeatures
-		? use_this_or(desc->subPluginFeatures->description(*this),
-			  QString::fromUtf8(desc->description))
+		? use_this_or(desc->subPluginFeatures->description(*this), QString::fromUtf8(desc->description))
 		: desc->description;
 }
 
-void Plugin::loadFile(const QString&)
-{
-}
+void Plugin::loadFile(const QString&) {}
 
 AutomatableModel* Plugin::childModel(const QString&)
 {
@@ -144,15 +120,13 @@ AutomatableModel* Plugin::childModel(const QString&)
 }
 
 #include "PluginFactory.h"
-Plugin* Plugin::instantiateWithKey(const QString& pluginName, Model* parent,
-	const Descriptor::SubPluginFeatures::Key* key,
-	bool keyFromDnd)
+Plugin* Plugin::instantiateWithKey(
+	const QString& pluginName, Model* parent, const Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd)
 {
 	if (keyFromDnd)
 		Q_ASSERT(!key);
-	const Descriptor::SubPluginFeatures::Key* keyPtr = keyFromDnd
-		? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey())
-		: key;
+	const Descriptor::SubPluginFeatures::Key* keyPtr =
+		keyFromDnd ? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey()) : key;
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 	if (keyPtr)
 	{
@@ -167,8 +141,7 @@ Plugin* Plugin::instantiateWithKey(const QString& pluginName, Model* parent,
 			const_cast<Descriptor::SubPluginFeatures::Key*>(keyPtr));
 }
 
-Plugin* Plugin::instantiate(const QString& pluginName, Model* parent,
-	void* data)
+Plugin* Plugin::instantiate(const QString& pluginName, Model* parent, void* data)
 {
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 
@@ -177,9 +150,10 @@ Plugin* Plugin::instantiate(const QString& pluginName, Model* parent,
 	{
 		if (gui)
 		{
-			QMessageBox::information(NULL,
-				tr("Plugin not found"),
-				tr("The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"").arg(pluginName).arg(pluginFactory->errorString(pluginName)),
+			QMessageBox::information(NULL, tr("Plugin not found"),
+				tr("The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"")
+					.arg(pluginName)
+					.arg(pluginFactory->errorString(pluginName)),
 				QMessageBox::Ok | QMessageBox::Default);
 		}
 		inst = new DummyPlugin();
@@ -199,10 +173,8 @@ Plugin* Plugin::instantiate(const QString& pluginName, Model* parent,
 		{
 			if (gui)
 			{
-				QMessageBox::information(NULL,
-					tr("Error while loading plugin"),
-					tr("Failed to load plugin \"%1\"!").arg(pluginName),
-					QMessageBox::Ok | QMessageBox::Default);
+				QMessageBox::information(NULL, tr("Error while loading plugin"),
+					tr("Failed to load plugin \"%1\"!").arg(pluginName), QMessageBox::Ok | QMessageBox::Default);
 			}
 			inst = new DummyPlugin();
 		}
@@ -211,10 +183,7 @@ Plugin* Plugin::instantiate(const QString& pluginName, Model* parent,
 	return inst;
 }
 
-void Plugin::collectErrorForUI(QString errMsg)
-{
-	Engine::getSong()->collectError(errMsg);
-}
+void Plugin::collectErrorForUI(QString errMsg) { Engine::getSong()->collectError(errMsg); }
 
 PluginView* Plugin::createView(QWidget* parent)
 {
@@ -239,12 +208,10 @@ Plugin::Descriptor::SubPluginFeatures::Key::Key(const QDomElement& key)
 	}
 }
 
-QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
-	QDomDocument& doc) const
+QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(QDomDocument& doc) const
 {
 	QDomElement e = doc.createElement("key");
-	for (AttributeMap::ConstIterator it = attributes.begin();
-		 it != attributes.end(); ++it)
+	for (AttributeMap::ConstIterator it = attributes.begin(); it != attributes.end(); ++it)
 	{
 		QDomElement a = doc.createElement("attribute");
 		a.setAttribute("name", it.key());

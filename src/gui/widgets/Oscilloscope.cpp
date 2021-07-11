@@ -2,7 +2,7 @@
  * Oscilloscope.cpp
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -77,46 +77,28 @@ void Oscilloscope::setActive(bool _active)
 	m_active = _active;
 	if (m_active)
 	{
-		connect(gui->mainWindow(),
-			SIGNAL(periodicUpdate()),
-			this, SLOT(update()));
-		connect(Engine::mixer(),
-			SIGNAL(nextAudioBuffer(const surroundSampleFrame*)),
-			this, SLOT(updateAudioBuffer(const surroundSampleFrame*)));
+		connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
+		connect(Engine::mixer(), SIGNAL(nextAudioBuffer(const surroundSampleFrame*)), this,
+			SLOT(updateAudioBuffer(const surroundSampleFrame*)));
 	}
 	else
 	{
-		disconnect(gui->mainWindow(),
-			SIGNAL(periodicUpdate()),
-			this, SLOT(update()));
-		disconnect(Engine::mixer(),
-			SIGNAL(nextAudioBuffer(const surroundSampleFrame*)),
-			this, SLOT(updateAudioBuffer(const surroundSampleFrame*)));
+		disconnect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
+		disconnect(Engine::mixer(), SIGNAL(nextAudioBuffer(const surroundSampleFrame*)), this,
+			SLOT(updateAudioBuffer(const surroundSampleFrame*)));
 		// we have to update (remove last waves),
 		// because timer doesn't do that anymore
 		update();
 	}
 }
 
-QColor const& Oscilloscope::normalColor() const
-{
-	return m_normalColor;
-}
+QColor const& Oscilloscope::normalColor() const { return m_normalColor; }
 
-void Oscilloscope::setNormalColor(QColor const& normalColor)
-{
-	m_normalColor = normalColor;
-}
+void Oscilloscope::setNormalColor(QColor const& normalColor) { m_normalColor = normalColor; }
 
-QColor const& Oscilloscope::clippingColor() const
-{
-	return m_clippingColor;
-}
+QColor const& Oscilloscope::clippingColor() const { return m_clippingColor; }
 
-void Oscilloscope::setClippingColor(QColor const& clippingColor)
-{
-	m_clippingColor = clippingColor;
-}
+void Oscilloscope::setClippingColor(QColor const& clippingColor) { m_clippingColor = clippingColor; }
 
 void Oscilloscope::paintEvent(QPaintEvent*)
 {
@@ -153,8 +135,7 @@ void Oscilloscope::paintEvent(QPaintEvent*)
 			{
 				sample_t const clippedSample = Mixer::clip(m_buffer[frame][ch]);
 				m_points[frame] = QPointF(
-					x_base + static_cast<qreal>(frame) * xd,
-					y_base + (static_cast<qreal>(clippedSample) * half_h));
+					x_base + static_cast<qreal>(frame) * xd, y_base + (static_cast<qreal>(clippedSample) * half_h));
 			}
 			p.drawPolyline(m_points, frames);
 		}

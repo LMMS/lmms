@@ -73,23 +73,15 @@ public:
 
 	void write(QTextStream& strm);
 	bool writeFile(const QString& fn, bool withResources = false);
-	bool copyResources(const QString& resourcesDir); //!< Copies resources to the resourcesDir and changes the DataFile to use local paths to them
+	bool copyResources(const QString&
+			resourcesDir); //!< Copies resources to the resourcesDir and changes the DataFile to use local paths to them
 	bool hasLocalPlugins(QDomElement parent = QDomElement(), bool firstCall = true) const;
 
-	QDomElement& content()
-	{
-		return m_content;
-	}
+	QDomElement& content() { return m_content; }
 
-	QDomElement& head()
-	{
-		return m_head;
-	}
+	QDomElement& head() { return m_head; }
 
-	Type type() const
-	{
-		return m_type;
-	}
+	Type type() const { return m_type; }
 
 	unsigned int legacyFileVersion();
 

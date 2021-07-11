@@ -55,40 +55,19 @@ public:
 	TrackView(Track* _track, TrackContainerView* tcv);
 	virtual ~TrackView();
 
-	inline const Track* getTrack() const
-	{
-		return m_track;
-	}
+	inline const Track* getTrack() const { return m_track; }
 
-	inline Track* getTrack()
-	{
-		return m_track;
-	}
+	inline Track* getTrack() { return m_track; }
 
-	inline TrackContainerView* trackContainerView()
-	{
-		return m_trackContainerView;
-	}
+	inline TrackContainerView* trackContainerView() { return m_trackContainerView; }
 
-	inline TrackOperationsWidget* getTrackOperationsWidget()
-	{
-		return &m_trackOperationsWidget;
-	}
+	inline TrackOperationsWidget* getTrackOperationsWidget() { return &m_trackOperationsWidget; }
 
-	inline QWidget* getTrackSettingsWidget()
-	{
-		return &m_trackSettingsWidget;
-	}
+	inline QWidget* getTrackSettingsWidget() { return &m_trackSettingsWidget; }
 
-	inline TrackContentWidget* getTrackContentWidget()
-	{
-		return &m_trackContentWidget;
-	}
+	inline TrackContentWidget* getTrackContentWidget() { return &m_trackContentWidget; }
 
-	bool isMovingTrack() const
-	{
-		return m_action == MoveTrack;
-	}
+	bool isMovingTrack() const { return m_action == MoveTrack; }
 
 	virtual void update();
 
@@ -108,15 +87,9 @@ protected:
 		Q_UNUSED(element)
 	}
 
-	void loadSettings(const QDomElement& element) override
-	{
-		Q_UNUSED(element)
-	}
+	void loadSettings(const QDomElement& element) override { Q_UNUSED(element) }
 
-	QString nodeName() const override
-	{
-		return "trackview";
-	}
+	QString nodeName() const override { return "trackview"; }
 
 	void dragEnterEvent(QDragEnterEvent* dee) override;
 	void dropEvent(QDropEvent* de) override;
@@ -143,10 +116,7 @@ private:
 
 	Actions m_action;
 
-	virtual FadeButton* getActivityIndicator()
-	{
-		return nullptr;
-	}
+	virtual FadeButton* getActivityIndicator() { return nullptr; }
 
 	void setIndicatorMute(FadeButton* indicator, bool muted);
 

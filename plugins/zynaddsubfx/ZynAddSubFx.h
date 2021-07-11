@@ -73,10 +73,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed | IsMidiBased;
-	}
+	virtual Flags flags() const { return IsSingleStreamed | IsMidiBased; }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 

@@ -46,10 +46,7 @@ public:
 	AudioSndio(bool& _success_ful, Mixer* _mixer);
 	virtual ~AudioSndio();
 
-	inline static QString name(void)
-	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "sndio");
-	}
+	inline static QString name(void) { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "sndio"); }
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{

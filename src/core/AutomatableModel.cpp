@@ -34,9 +34,8 @@
 
 long AutomatableModel::s_periodCounter = 0;
 
-AutomatableModel::AutomatableModel(
-	const float val, const float min, const float max, const float step,
-	Model* parent, const QString& displayName, bool defaultConstructed)
+AutomatableModel::AutomatableModel(const float val, const float min, const float max, const float step, Model* parent,
+	const QString& displayName, bool defaultConstructed)
 	: Model(parent, displayName, defaultConstructed)
 	, m_scaleType(Linear)
 	, m_minValue(min)
@@ -76,10 +75,7 @@ AutomatableModel::~AutomatableModel()
 	emit destroyed(id());
 }
 
-bool AutomatableModel::isAutomated() const
-{
-	return AutomationPattern::isAutomated(this);
-}
+bool AutomatableModel::isAutomated() const { return AutomationPattern::isAutomated(this); }
 
 bool AutomatableModel::mustQuoteName(const QString& name)
 {
@@ -125,11 +121,12 @@ void AutomatableModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 
 	// Skip saving MIDI connections if we're saving project and
 	// the discardMIDIConnections option is true.
-	auto controllerType = m_controllerConnection
-		? m_controllerConnection->getController()->type()
-		: Controller::DummyController;
-	bool skipMidiController = Engine::getSong()->isSavingProject() && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
-	if (m_controllerConnection && controllerType != Controller::DummyController && !(skipMidiController && controllerType == Controller::MidiController))
+	auto controllerType =
+		m_controllerConnection ? m_controllerConnection->getController()->type() : Controller::DummyController;
+	bool skipMidiController =
+		Engine::getSong()->isSavingProject() && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
+	if (m_controllerConnection && controllerType != Controller::DummyController &&
+		!(skipMidiController && controllerType == Controller::MidiController))
 	{
 		QDomElement controllerElement;
 
@@ -146,8 +143,7 @@ void AutomatableModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 		}
 
 		bool mustQuote = mustQuoteName(name);
-		QString elementName = mustQuote ? "controllerconnection"
-										: name;
+		QString elementName = mustQuote ? "controllerconnection" : name;
 
 		QDomElement element = doc.createElement(elementName);
 		if (mustQuote)
@@ -202,7 +198,7 @@ void AutomatableModel::loadSettings(const QDomElement& element, const QString& n
 		{
 			setControllerConnection(new ControllerConnection((Controller*)NULL, this));
 			m_controllerConnection->loadSettings(thisConnection.toElement());
-			//m_controllerConnection->setTargetName( displayName() );
+			// m_controllerConnection->setTargetName( displayName() );
 		}
 	}
 
@@ -220,16 +216,13 @@ void AutomatableModel::loadSettings(const QDomElement& element, const QString& n
 	// is given as attribute and does not match
 	//  => look for the right node
 	if (node.isNull() ||
-		(node.isElement() &&
-			node.toElement().hasAttribute("nodename") &&
+		(node.isElement() && node.toElement().hasAttribute("nodename") &&
 			node.toElement().attribute("nodename") != name))
 	{
-		for (QDomElement othernode = element.firstChildElement();
-			 !othernode.isNull();
+		for (QDomElement othernode = element.firstChildElement(); !othernode.isNull();
 			 othernode = othernode.nextSiblingElement())
 		{
-			if ((!othernode.hasAttribute("nodename") &&
-					othernode.nodeName() == name) ||
+			if ((!othernode.hasAttribute("nodename") && othernode.nodeName() == name) ||
 				othernode.attribute("nodename") == name)
 			{
 				node = othernode;
@@ -303,29 +296,23 @@ void AutomatableModel::setValue(const float value)
 	--m_setValueDepth;
 }
 
-template <class T>
-T AutomatableModel::logToLinearScale(T value) const
+template <class T> T AutomatableModel::logToLinearScale(T value) const
 {
 	return castValue<T>(::logToLinearScale(minValue<float>(), maxValue<float>(), static_cast<float>(value)));
 }
 
 float AutomatableModel::scaledValue(float value) const
 {
-	return m_scaleType == Linear
-		? value
-		: logToLinearScale<float>((value - minValue<float>()) / m_range);
+	return m_scaleType == Linear ? value : logToLinearScale<float>((value - minValue<float>()) / m_range);
 }
 
 float AutomatableModel::inverseScaledValue(float value) const
 {
-	return m_scaleType == Linear
-		? value
-		: ::linearToLogScale(minValue<float>(), maxValue<float>(), value);
+	return m_scaleType == Linear ? value : ::linearToLogScale(minValue<float>(), maxValue<float>(), value);
 }
 
 //! @todo: this should be moved into a maths header
-template <class T>
-void roundAt(T& value, const T& where, const T& step_size)
+template <class T> void roundAt(T& value, const T& where, const T& step_size)
 {
 	if (qAbs<float>(value - where) < typeInfo<float>::minEps() * qAbs<float>(step_size))
 	{
@@ -333,11 +320,7 @@ void roundAt(T& value, const T& where, const T& step_size)
 	}
 }
 
-template <class T>
-void AutomatableModel::roundAt(T& value, const T& where) const
-{
-	::roundAt(value, where, m_step);
-}
+template <class T> void AutomatableModel::roundAt(T& value, const T& where) const { ::roundAt(value, where, m_step); }
 
 void AutomatableModel::setAutomatedValue(const float value)
 {
@@ -354,8 +337,7 @@ void AutomatableModel::setAutomatedValue(const float value)
 	if (oldValue != m_value)
 	{
 		// notify linked models
-		for (AutoModelVector::Iterator it = m_linkedModels.begin();
-			 it != m_linkedModels.end(); ++it)
+		for (AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it)
 		{
 			if (!((*it)->controllerConnection()) && (*it)->m_setValueDepth < 1 &&
 				(*it)->fittedValue(m_value) != (*it)->m_value)
@@ -369,8 +351,7 @@ void AutomatableModel::setAutomatedValue(const float value)
 	--m_setValueDepth;
 }
 
-void AutomatableModel::setRange(const float min, const float max,
-	const float step)
+void AutomatableModel::setRange(const float min, const float max, const float step)
 {
 	if ((m_maxValue != max) || (m_minValue != min))
 	{
@@ -433,8 +414,7 @@ void AutomatableModel::linkModel(AutomatableModel* model)
 
 		if (!model->hasLinkedModels())
 		{
-			QObject::connect(this, SIGNAL(dataChanged()),
-				model, SIGNAL(dataChanged()), Qt::DirectConnection);
+			QObject::connect(this, SIGNAL(dataChanged()), model, SIGNAL(dataChanged()), Qt::DirectConnection);
 		}
 	}
 }
@@ -456,9 +436,7 @@ void AutomatableModel::linkModels(AutomatableModel* model1, AutomatableModel* mo
 		model1->m_value = model2->m_value;
 		if (model1->valueBuffer() && model2->valueBuffer())
 		{
-			std::copy_n(model2->valueBuffer()->data(),
-				model1->valueBuffer()->length(),
-				model1->valueBuffer()->data());
+			std::copy_n(model2->valueBuffer()->data(), model1->valueBuffer()->length(), model1->valueBuffer()->data());
 		}
 		// send dataChanged() before linking (because linking will
 		// connect the two dataChanged() signals)
@@ -488,8 +466,8 @@ void AutomatableModel::setControllerConnection(ControllerConnection* c)
 	m_controllerConnection = c;
 	if (c)
 	{
-		QObject::connect(m_controllerConnection, SIGNAL(valueChanged()),
-			this, SIGNAL(dataChanged()), Qt::DirectConnection);
+		QObject::connect(
+			m_controllerConnection, SIGNAL(valueChanged()), this, SIGNAL(dataChanged()), Qt::DirectConnection);
 		QObject::connect(m_controllerConnection, SIGNAL(destroyed()), this, SLOT(unlinkControllerConnection()));
 		m_valueChanged = true;
 		emit dataChanged();
@@ -507,8 +485,7 @@ float AutomatableModel::controllerValue(int frameOffset) const
 			v = minValue<float>() + (range() * controllerConnection()->currentValue(frameOffset));
 			break;
 		case Logarithmic:
-			v = logToLinearScale(
-				controllerConnection()->currentValue(frameOffset));
+			v = logToLinearScale(controllerConnection()->currentValue(frameOffset));
 			break;
 		default:
 			qFatal("AutomatableModel::controllerValue(int)"
@@ -537,9 +514,7 @@ ValueBuffer* AutomatableModel::valueBuffer()
 	// if we've already calculated the valuebuffer this period, return the cached buffer
 	if (m_lastUpdatedPeriod == s_periodCounter)
 	{
-		return m_hasSampleExactData
-			? &m_valueBuffer
-			: NULL;
+		return m_hasSampleExactData ? &m_valueBuffer : NULL;
 	}
 
 	float val = m_value; // make sure our m_value doesn't change midway
@@ -609,8 +584,8 @@ ValueBuffer* AutomatableModel::valueBuffer()
 		return &m_valueBuffer;
 	}
 
-	// if we have no sample-exact source for a ValueBuffer, return NULL to signify that no data is available at the moment
-	// in which case the recipient knows to use the static value() instead
+	// if we have no sample-exact source for a ValueBuffer, return NULL to signify that no data is available at the
+	// moment in which case the recipient knows to use the static value() instead
 	m_lastUpdatedPeriod = s_periodCounter;
 	m_hasSampleExactData = false;
 	return NULL;
@@ -636,10 +611,7 @@ void AutomatableModel::setInitValue(const float value)
 	emit initValueChanged(value);
 }
 
-void AutomatableModel::reset()
-{
-	setValue(initValue<float>());
-}
+void AutomatableModel::reset() { setValue(initValue<float>()); }
 
 float AutomatableModel::globalAutomationValueAt(const TimePos& time)
 {
@@ -717,10 +689,7 @@ void AutomatableModel::setUseControllerValue(bool b)
 	}
 }
 
-float FloatModel::getRoundedValue() const
-{
-	return qRound(value() / step<float>()) * step<float>();
-}
+float FloatModel::getRoundedValue() const { return qRound(value() / step<float>()) * step<float>(); }
 
 int FloatModel::getDigitCount() const
 {
@@ -734,17 +703,8 @@ int FloatModel::getDigitCount() const
 	return digits;
 }
 
-QString FloatModel::displayValue(const float val) const
-{
-	return QString::number(castValue<float>(scaledValue(val)));
-}
+QString FloatModel::displayValue(const float val) const { return QString::number(castValue<float>(scaledValue(val))); }
 
-QString IntModel::displayValue(const float val) const
-{
-	return QString::number(castValue<int>(scaledValue(val)));
-}
+QString IntModel::displayValue(const float val) const { return QString::number(castValue<int>(scaledValue(val))); }
 
-QString BoolModel::displayValue(const float val) const
-{
-	return QString::number(castValue<bool>(scaledValue(val)));
-}
+QString BoolModel::displayValue(const float val) const { return QString::number(castValue<bool>(scaledValue(val))); }

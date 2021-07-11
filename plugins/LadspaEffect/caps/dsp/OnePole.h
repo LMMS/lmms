@@ -1,8 +1,8 @@
 /*
 	dsp/OnePole.h
-	
+
 	Copyright 2003-7 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	one pole (or one zero, or one zero, one pole) hi- and lo-pass filters.
@@ -42,15 +42,9 @@ public:
 		y1 = 0.;
 	}
 
-	inline void reset()
-	{
-		y1 = 0.;
-	}
+	inline void reset() { y1 = 0.; }
 
-	inline void set_f(double fc)
-	{
-		set(exp(-2 * M_PI * fc));
-	}
+	inline void set_f(double fc) { set(exp(-2 * M_PI * fc)); }
 
 	inline void set(double d)
 	{
@@ -58,10 +52,7 @@ public:
 		b1 = (sample_t)1. - d;
 	}
 
-	inline sample_t process(sample_t x)
-	{
-		return y1 = a0 * x + b1 * y1;
-	}
+	inline sample_t process(sample_t x) { return y1 = a0 * x + b1 * y1; }
 
 	inline void decay(double d)
 	{
@@ -88,10 +79,7 @@ public:
 		x1 = y1 = 0.;
 	}
 
-	void set_f(double f)
-	{
-		set(exp(-2 * M_PI * f));
-	}
+	void set_f(double f) { set(exp(-2 * M_PI * f)); }
 
 	inline void set(double d)
 	{
@@ -107,10 +95,7 @@ public:
 		return y1;
 	}
 
-	void reset()
-	{
-		x1 = y1 = 0;
-	}
+	void reset() { x1 = y1 = 0; }
 
 	/* clear denormal numbers in history */
 	void flush_0()

@@ -43,10 +43,7 @@ public:
 	SamplePlayHandle(SampleTCO* tco);
 	virtual ~SamplePlayHandle();
 
-	inline bool affinityMatters() const override
-	{
-		return true;
-	}
+	inline bool affinityMatters() const override { return true; }
 
 	void play(sampleFrame* buffer) override;
 	bool isFinished() const override;
@@ -54,24 +51,12 @@ public:
 	bool isFromTrack(const Track* _track) const override;
 
 	f_cnt_t totalFrames() const;
-	inline f_cnt_t framesDone() const
-	{
-		return (m_frame);
-	}
-	void setDoneMayReturnTrue(bool _enable)
-	{
-		m_doneMayReturnTrue = _enable;
-	}
+	inline f_cnt_t framesDone() const { return (m_frame); }
+	void setDoneMayReturnTrue(bool _enable) { m_doneMayReturnTrue = _enable; }
 
-	void setBBTrack(BBTrack* _bb_track)
-	{
-		m_bbTrack = _bb_track;
-	}
+	void setBBTrack(BBTrack* _bb_track) { m_bbTrack = _bb_track; }
 
-	void setVolumeModel(FloatModel* _model)
-	{
-		m_volumeModel = _model;
-	}
+	void setVolumeModel(FloatModel* _model) { m_volumeModel = _model; }
 
 private:
 	SampleBuffer* m_sampleBuffer;

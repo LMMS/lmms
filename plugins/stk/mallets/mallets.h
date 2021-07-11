@@ -2,8 +2,8 @@
  * mallets.h - tuned instruments that one would bang upon
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
- * 
- * 
+ *
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -48,40 +48,19 @@ class malletsSynth
 {
 public:
 	// ModalBar
-	malletsSynth(const StkFloat _pitch,
-		const StkFloat _velocity,
-		const StkFloat _control1,
-		const StkFloat _control2,
-		const StkFloat _control4,
-		const StkFloat _control8,
-		const StkFloat _control11,
-		const int _control16,
-		const uint8_t _delay,
-		const sample_rate_t _sample_rate);
+	malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const StkFloat _control1, const StkFloat _control2,
+		const StkFloat _control4, const StkFloat _control8, const StkFloat _control11, const int _control16,
+		const uint8_t _delay, const sample_rate_t _sample_rate);
 
 	// TubeBell
-	malletsSynth(const StkFloat _pitch,
-		const StkFloat _velocity,
-		const int _preset,
-		const StkFloat _control1,
-		const StkFloat _control2,
-		const StkFloat _control4,
-		const StkFloat _control11,
-		const StkFloat _control128,
-		const uint8_t _delay,
-		const sample_rate_t _sample_rate);
+	malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const int _preset, const StkFloat _control1,
+		const StkFloat _control2, const StkFloat _control4, const StkFloat _control11, const StkFloat _control128,
+		const uint8_t _delay, const sample_rate_t _sample_rate);
 
 	// BandedWG
-	malletsSynth(const StkFloat _pitch,
-		const StkFloat _velocity,
-		const StkFloat _control2,
-		const StkFloat _control4,
-		const StkFloat _control11,
-		const int _control16,
-		const StkFloat _control64,
-		const StkFloat _control128,
-		const uint8_t _delay,
-		const sample_rate_t _sample_rate);
+	malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const StkFloat _control2, const StkFloat _control4,
+		const StkFloat _control11, const int _control16, const StkFloat _control64, const StkFloat _control128,
+		const uint8_t _delay, const sample_rate_t _sample_rate);
 
 	inline ~malletsSynth()
 	{
@@ -123,15 +102,9 @@ public:
 		}
 	}
 
-	inline int presetIndex()
-	{
-		return m_presetIndex;
-	}
+	inline int presetIndex() { return m_presetIndex; }
 
-	inline void setPresetIndex(int presetIndex)
-	{
-		m_presetIndex = presetIndex;
-	}
+	inline void setPresetIndex(int presetIndex) { m_presetIndex = presetIndex; }
 
 protected:
 	int m_presetIndex;
@@ -149,8 +122,7 @@ public:
 	malletsInstrument(InstrumentTrack* _instrument_track);
 	virtual ~malletsInstrument();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -196,8 +168,7 @@ class malletsInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	malletsInstrumentView(malletsInstrument* _instrument,
-		QWidget* _parent);
+	malletsInstrumentView(malletsInstrument* _instrument, QWidget* _parent);
 	virtual ~malletsInstrumentView();
 
 public slots:

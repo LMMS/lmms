@@ -33,16 +33,11 @@
 class dynProcEffect : public Effect
 {
 public:
-	dynProcEffect(Model* _parent,
-		const Descriptor::SubPluginFeatures::Key* _key);
+	dynProcEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~dynProcEffect();
-	virtual bool processAudioBuffer(sampleFrame* _buf,
-		const fpp_t _frames);
+	virtual bool processAudioBuffer(sampleFrame* _buf, const fpp_t _frames);
 
-	virtual EffectControls* controls()
-	{
-		return (&m_dpControls);
-	}
+	virtual EffectControls* controls() { return (&m_dpControls); }
 
 private:
 	void calcAttack();

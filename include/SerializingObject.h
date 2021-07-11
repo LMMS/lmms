@@ -49,10 +49,7 @@ public:
 
 	void setHook(SerializingObjectHook* _hook);
 
-	SerializingObjectHook* hook()
-	{
-		return m_hook;
-	}
+	SerializingObjectHook* hook() { return m_hook; }
 
 protected:
 	// to be implemented by sub-objects

@@ -42,10 +42,7 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset)
 {
 }
 
-PlayHandle::~PlayHandle()
-{
-	BufferManager::release(m_playHandleBuffer);
-}
+PlayHandle::~PlayHandle() { BufferManager::release(m_playHandleBuffer); }
 
 void PlayHandle::doProcessing()
 {
@@ -61,10 +58,7 @@ void PlayHandle::doProcessing()
 	}
 }
 
-void PlayHandle::releaseBuffer()
-{
-	m_bufferReleased = true;
-}
+void PlayHandle::releaseBuffer() { m_bufferReleased = true; }
 
 sampleFrame* PlayHandle::buffer()
 {

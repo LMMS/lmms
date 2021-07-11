@@ -2,7 +2,7 @@
  * ToolButton.cpp - implementation of LMMS-tool-button for common (cool) look
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -26,9 +26,8 @@
 
 #include "ToolTip.h"
 
-ToolButton::ToolButton(const QPixmap& _pixmap, const QString& _tooltip,
-	QObject* _receiver, const char* _slot,
-	QWidget* _parent)
+ToolButton::ToolButton(
+	const QPixmap& _pixmap, const QString& _tooltip, QObject* _receiver, const char* _slot, QWidget* _parent)
 	: QToolButton(_parent)
 {
 	setAutoFillBackground(false);

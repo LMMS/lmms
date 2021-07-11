@@ -66,20 +66,11 @@ public:
 		pthread_create(&m_messageThreadHandle, NULL, messageLoop, this);
 	}
 
-	virtual ~RemoteZynAddSubFx()
-	{
-		Nio::stop();
-	}
+	virtual ~RemoteZynAddSubFx() { Nio::stop(); }
 
-	virtual void updateSampleRate()
-	{
-		LocalZynAddSubFx::setSampleRate(sampleRate());
-	}
+	virtual void updateSampleRate() { LocalZynAddSubFx::setSampleRate(sampleRate()); }
 
-	virtual void updateBufferSize()
-	{
-		LocalZynAddSubFx::setBufferSize(bufferSize());
-	}
+	virtual void updateBufferSize() { LocalZynAddSubFx::setBufferSize(bufferSize()); }
 
 	void messageLoop()
 	{
@@ -139,15 +130,11 @@ public:
 		LocalZynAddSubFx::processMidiEvent(event);
 	}
 
-	virtual void process(const sampleFrame* _in, sampleFrame* _out)
-	{
-		LocalZynAddSubFx::processAudio(_out);
-	}
+	virtual void process(const sampleFrame* _in, sampleFrame* _out) { LocalZynAddSubFx::processAudio(_out); }
 
 	static void* messageLoop(void* _arg)
 	{
-		RemoteZynAddSubFx* _this =
-			static_cast<RemoteZynAddSubFx*>(_arg);
+		RemoteZynAddSubFx* _this = static_cast<RemoteZynAddSubFx*>(_arg);
 
 		_this->messageLoop();
 
@@ -267,8 +254,7 @@ int main(int _argc, char** _argv)
 #endif
 
 #ifdef SYNC_WITH_SHM_FIFO
-	RemoteZynAddSubFx* remoteZASF =
-		new RemoteZynAddSubFx(atoi(_argv[1]), atoi(_argv[2]));
+	RemoteZynAddSubFx* remoteZASF = new RemoteZynAddSubFx(atoi(_argv[1]), atoi(_argv[2]));
 #else
 	RemoteZynAddSubFx* remoteZASF = new RemoteZynAddSubFx(_argv[1]);
 #endif

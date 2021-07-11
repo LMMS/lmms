@@ -61,8 +61,10 @@ float LMMS_EXPORT maximum(const std::vector<float>& abs_spectrum);
  *
  *	@return -1 on error
  */
-int LMMS_EXPORT normalize(const float* abs_spectrum, float* norm_spectrum, unsigned int bin_count, unsigned int block_size);
-int LMMS_EXPORT normalize(const std::vector<float>& abs_spectrum, std::vector<float>& norm_spectrum, unsigned int block_size);
+int LMMS_EXPORT normalize(
+	const float* abs_spectrum, float* norm_spectrum, unsigned int bin_count, unsigned int block_size);
+int LMMS_EXPORT normalize(
+	const std::vector<float>& abs_spectrum, std::vector<float>& norm_spectrum, unsigned int block_size);
 
 /**	Check if the spectrum contains any non-zero value.
  *
@@ -84,8 +86,7 @@ int LMMS_EXPORT precomputeWindow(float* window, unsigned int length, FFT_WINDOWS
  *
  *	@return 0 on success, else -1
  */
-int LMMS_EXPORT absspec(const fftwf_complex* complex_buffer, float* absspec_buffer,
-	unsigned int compl_length);
+int LMMS_EXPORT absspec(const fftwf_complex* complex_buffer, float* absspec_buffer, unsigned int compl_length);
 
 /**	Build fewer subbands from many absolute spectrum values.
  *	Take care that - compressedbands[] array num_new elements long
@@ -93,7 +94,7 @@ int LMMS_EXPORT absspec(const fftwf_complex* complex_buffer, float* absspec_buff
  *
  *	@return 0 on success, else -1
  */
-int LMMS_EXPORT compressbands(const float* _absspec_buffer, float* _compressedband,
-	int _num_old, int _num_new, int _bottom, int _top);
+int LMMS_EXPORT compressbands(
+	const float* _absspec_buffer, float* _compressedband, int _num_old, int _num_new, int _bottom, int _top);
 
 #endif

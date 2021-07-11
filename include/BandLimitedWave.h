@@ -44,12 +44,8 @@ class QString;
 #define MAXTLEN 3 << MAXLEN
 
 // table for table sizes
-const int TLENS[MAXTBL + 1] = {2 << 0, 3 << 0, 2 << 1, 3 << 1,
-	2 << 2, 3 << 2, 2 << 3, 3 << 3,
-	2 << 4, 3 << 4, 2 << 5, 3 << 5,
-	2 << 6, 3 << 6, 2 << 7, 3 << 7,
-	2 << 8, 3 << 8, 2 << 9, 3 << 9,
-	2 << 10, 3 << 10, 2 << 11, 3 << 11};
+const int TLENS[MAXTBL + 1] = {2 << 0, 3 << 0, 2 << 1, 3 << 1, 2 << 2, 3 << 2, 2 << 3, 3 << 3, 2 << 4, 3 << 4, 2 << 5,
+	3 << 5, 2 << 6, 3 << 6, 2 << 7, 3 << 7, 2 << 8, 3 << 8, 2 << 9, 3 << 9, 2 << 10, 3 << 10, 2 << 11, 3 << 11};
 
 typedef struct
 {
@@ -105,28 +101,20 @@ public:
 	/*! \brief This method converts frequency to wavelength. The oscillate function takes wavelength as argument so
 	 * use this to convert your note frequency to wavelength before using it.
 	 */
-	static inline float freqToLen(float f)
-	{
-		return freqToLen(f, Engine::mixer()->processingSampleRate());
-	}
+	static inline float freqToLen(float f) { return freqToLen(f, Engine::mixer()->processingSampleRate()); }
 
 	/*! \brief This method converts frequency to wavelength, but you can use any custom sample rate with it.
 	 */
-	static inline float freqToLen(float f, sample_rate_t sr)
-	{
-		return static_cast<float>(sr) / f;
-	}
+	static inline float freqToLen(float f, sample_rate_t sr) { return static_cast<float>(sr) / f; }
 
 	/*! \brief This method converts phase delta to wavelength. It assumes a phase scale of 0 to 1. */
-	static inline float pdToLen(float pd)
-	{
-		return 1.0f / pd;
-	}
+	static inline float pdToLen(float pd) { return 1.0f / pd; }
 
 	/*! \brief This method provides interpolated samples of bandlimited waveforms.
 	 *  \param _ph The phase of the sample.
-	 *  \param _wavelen The wavelength (length of one cycle, ie. the inverse of frequency) of the wanted oscillation, measured in sample frames
-	 *  \param _wave The wanted waveform. Options currently are saw, triangle, square and moog saw.
+	 *  \param _wavelen The wavelength (length of one cycle, ie. the inverse of frequency) of the wanted oscillation,
+	 * measured in sample frames \param _wave The wanted waveform. Options currently are saw, triangle, square and moog
+	 * saw.
 	 */
 	static inline sample_t oscillate(float _ph, float _wavelen, Waveforms _wave)
 	{

@@ -30,10 +30,7 @@
 // Calling convention
 #define VST_CALL_CONV __cdecl
 
-#define CCONST(a, b, c, d) ((((int32_t)a) << 24) | \
-	(((int32_t)b) << 16) | \
-	(((int32_t)c) << 8) | \
-	(((int32_t)d) << 0))
+#define CCONST(a, b, c, d) ((((int32_t)a) << 24) | (((int32_t)b) << 16) | (((int32_t)c) << 8) | (((int32_t)d) << 0))
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;

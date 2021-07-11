@@ -14,8 +14,7 @@ class FxMixerView;
 class SendButtonIndicator : public QLabel
 {
 public:
-	SendButtonIndicator(QWidget* _parent, FxLine* _owner,
-		FxMixerView* _mv);
+	SendButtonIndicator(QWidget* _parent, FxLine* _owner, FxMixerView* _mv);
 
 	void mousePressEvent(QMouseEvent* e) override;
 	void updateLightStatus();

@@ -28,8 +28,7 @@
 
 #include "MidiEvent.h"
 
-std::size_t writeToByteSeq(
-	const MidiEvent& ev, uint8_t* data, std::size_t bufsize)
+std::size_t writeToByteSeq(const MidiEvent& ev, uint8_t* data, std::size_t bufsize)
 {
 	Q_ASSERT(bufsize >= 3);
 

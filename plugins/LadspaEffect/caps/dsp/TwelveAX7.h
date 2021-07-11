@@ -1,8 +1,8 @@
 /*
 	dsp/TwelveAX7.h
-	
+
 	Copyright 2003-6 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	collection of approximations of the 12AX7 voltage transfer function
@@ -35,7 +35,7 @@ namespace DSP
 typedef sample_t tube_sample;
 
 /* this is the original tube model from caps < 0.1.9 or preamp.so, put
- * back into use in 0.1.11; the replacement (below) is too strong in 
+ * back into use in 0.1.11; the replacement (below) is too strong in
  * odd-order harmonics at the expense of even-order. it has to sound
  * good: it took a good deal of fiddling to get the coefficients right.
  */
@@ -65,10 +65,7 @@ public:
 		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
 	}
 
-	inline tube_sample transfer(tube_sample a)
-	{
-		return a * (b + a * (c + a * d));
-	}
+	inline tube_sample transfer(tube_sample a) { return a * (b + a * (c + a * d)); }
 
 	inline tube_sample transfer_clip(tube_sample a)
 	{
@@ -126,16 +123,12 @@ public:
 		static double x[2] = {-.52, +.98};
 
 		for (int i = 0; i < 2; ++i)
-			clip[i].threshold = x[i],
-			clip[i].value = transfer(x[i]);
+			clip[i].threshold = x[i], clip[i].value = transfer(x[i]);
 
 		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
 	}
 
-	inline tube_sample transfer(tube_sample a)
-	{
-		return a * (b + a * (c + a * d));
-	}
+	inline tube_sample transfer(tube_sample a) { return a * (b + a * (c + a * d)); }
 
 	inline tube_sample transfer_clip(tube_sample a)
 	{
@@ -165,15 +158,10 @@ public:
 public:
 	TwelveAX7_3()
 	{
-		static double x[2] =
-			{
-				(double)r12AX7::Zero /
-					((double)r12AX7::Samples - (double)r12AX7::Zero),
-				1};
+		static double x[2] = {(double)r12AX7::Zero / ((double)r12AX7::Samples - (double)r12AX7::Zero), 1};
 
 		for (int i = 0; i < 2; ++i)
-			clip[i].threshold = x[i],
-			clip[i].value = transfer(x[i]);
+			clip[i].threshold = x[i], clip[i].value = transfer(x[i]);
 
 		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
 	}
@@ -193,10 +181,7 @@ public:
 		return (r12AX7::v2v[i] * (1.f - a) + r12AX7::v2v[i + 1] * a);
 	}
 
-	inline tube_sample transfer_clip(tube_sample a)
-	{
-		return transfer(a);
-	}
+	inline tube_sample transfer_clip(tube_sample a) { return transfer(a); }
 };
 
 /* experimental */
@@ -217,16 +202,12 @@ public:
 		static double x[2] = {-1, 1};
 
 		for (int i = 0; i < 2; ++i)
-			clip[i].threshold = x[i],
-			clip[i].value = transfer(x[i]);
+			clip[i].threshold = x[i], clip[i].value = transfer(x[i]);
 
 		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
 	}
 
-	inline tube_sample transfer(tube_sample a)
-	{
-		return 0.5469181606780 * (pow(1 - a, 1.5) - 1);
-	}
+	inline tube_sample transfer(tube_sample a) { return 0.5469181606780 * (pow(1 - a, 1.5) - 1); }
 
 	inline tube_sample transfer_clip(tube_sample a)
 	{

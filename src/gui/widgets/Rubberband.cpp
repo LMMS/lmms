@@ -30,15 +30,12 @@ RubberBand::RubberBand(QWidget* _parent)
 {
 }
 
-RubberBand::~RubberBand()
-{
-}
+RubberBand::~RubberBand() {}
 
 QVector<selectableObject*> RubberBand::selectedObjects() const
 {
 	QVector<selectableObject*> so = selectableObjects();
-	for (QVector<selectableObject*>::iterator it = so.begin();
-		 it != so.end();)
+	for (QVector<selectableObject*>::iterator it = so.begin(); it != so.end();)
 	{
 		if ((*it)->isSelected() == false)
 		{
@@ -52,10 +49,7 @@ QVector<selectableObject*> RubberBand::selectedObjects() const
 	return (so);
 }
 
-void RubberBand::resizeEvent(QResizeEvent* _re)
-{
-	QRubberBand::resizeEvent(_re);
-}
+void RubberBand::resizeEvent(QResizeEvent* _re) { QRubberBand::resizeEvent(_re); }
 
 QVector<selectableObject*> RubberBand::selectableObjects() const
 {
@@ -65,10 +59,8 @@ QVector<selectableObject*> RubberBand::selectableObjects() const
 		return (so);
 	}
 
-	QList<selectableObject*> l =
-		parentWidget()->findChildren<selectableObject*>();
-	for (QList<selectableObject*>::iterator it = l.begin(); it != l.end();
-		 ++it)
+	QList<selectableObject*> l = parentWidget()->findChildren<selectableObject*>();
+	for (QList<selectableObject*>::iterator it = l.begin(); it != l.end(); ++it)
 	{
 		so.push_back(*it);
 	}

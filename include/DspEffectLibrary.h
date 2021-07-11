@@ -32,8 +32,7 @@
 namespace DspEffectLibrary
 {
 
-template <typename T>
-class MonoBase
+template <typename T> class MonoBase
 {
 public:
 	typedef class MonoBypass bypassType;
@@ -47,8 +46,7 @@ public:
 	}
 };
 
-template <typename T>
-class StereoBase
+template <typename T> class StereoBase
 {
 public:
 	typedef class StereoBypass bypassType;
@@ -62,8 +60,7 @@ public:
 	}
 };
 
-template <class FXL, class FXR = FXL>
-class MonoToStereoAdaptor : public StereoBase<MonoToStereoAdaptor<FXL, FXR>>
+template <class FXL, class FXR = FXL> class MonoToStereoAdaptor : public StereoBase<MonoToStereoAdaptor<FXL, FXR>>
 {
 public:
 	MonoToStereoAdaptor(const FXL& monoFX)
@@ -84,23 +81,16 @@ public:
 		inRight = m_rightFX.nextSample(inRight);
 	}
 
-	FXL& leftFX()
-	{
-		return (m_leftFX);
-	}
+	FXL& leftFX() { return (m_leftFX); }
 
-	FXR& rightFX()
-	{
-		return (m_rightFX);
-	}
+	FXR& rightFX() { return (m_rightFX); }
 
 private:
 	FXL m_leftFX;
 	FXR m_rightFX;
 };
 
-template <class FX>
-class StereoToMonoAdaptor : public MonoBase<StereoToMonoAdaptor<FX>>
+template <class FX> class StereoToMonoAdaptor : public MonoBase<StereoToMonoAdaptor<FX>>
 {
 public:
 	StereoToMonoAdaptor(const FX& fx)
@@ -123,18 +113,13 @@ private:
 class MonoBypass : public MonoBase<MonoBypass>
 {
 public:
-	sample_t nextSample(sample_t in)
-	{
-		return in;
-	}
+	sample_t nextSample(sample_t in) { return in; }
 };
 
 class StereoBypass : public StereoBase<StereoBypass>
 {
 public:
-	void nextSample(sample_t&, sample_t&)
-	{
-	}
+	void nextSample(sample_t&, sample_t&) {}
 };
 
 /* convenient class to build up static FX chains, for example
@@ -151,11 +136,10 @@ public:
 
 	// now you can do simple calls such as which will process a bass-boost-,
 	// stereo enhancer- and foldback distortion effect on your buffer
-        fx_chain.process( (sample_t * *) buf, frames );
+		fx_chain.process( (sample_t * *) buf, frames );
 */
 
-template <class FX0, class FX1 = typename FX0::bypassType>
-class Chain : public FX0::bypassType
+template <class FX0, class FX1 = typename FX0::bypassType> class Chain : public FX0::bypassType
 {
 public:
 	typedef typename FX0::sample_t sample_t;
@@ -176,8 +160,7 @@ private:
 	FX1 m_FX1;
 };
 
-template <typename sample_t>
-inline sample_t saturate(sample_t x)
+template <typename sample_t> inline sample_t saturate(sample_t x)
 {
 	return qMin<sample_t>(qMax<sample_t>(-1.0f, x), 1.0f);
 }
@@ -185,9 +168,7 @@ inline sample_t saturate(sample_t x)
 class FastBassBoost : public MonoBase<FastBassBoost>
 {
 public:
-	FastBassBoost(const sample_t _frequency,
-		const sample_t _gain,
-		const sample_t _ratio,
+	FastBassBoost(const sample_t _frequency, const sample_t _gain, const sample_t _ratio,
 		const FastBassBoost& _orig = FastBassBoost())
 		: m_frequency(qMax<sample_t>(_frequency, 10.0))
 		, m_gain1(1.0 / (m_frequency + 1.0))
@@ -210,15 +191,9 @@ public:
 		m_gain1 = 1.0 / (m_frequency + 1.0);
 	}
 
-	void setGain(const sample_t _gain)
-	{
-		m_gain2 = _gain;
-	}
+	void setGain(const sample_t _gain) { m_gain2 = _gain; }
 
-	void setRatio(const sample_t _ratio)
-	{
-		m_ratio = _ratio;
-	}
+	void setRatio(const sample_t _ratio) { m_ratio = _ratio; }
 
 private:
 	FastBassBoost()
@@ -233,8 +208,7 @@ private:
 	sample_t m_cap;
 };
 
-template <class T>
-class DistortionBase : public MonoBase<T>
+template <class T> class DistortionBase : public MonoBase<T>
 {
 public:
 	DistortionBase(float threshold, float gain)
@@ -243,15 +217,9 @@ public:
 	{
 	}
 
-	void setThreshold(float threshold)
-	{
-		m_threshold = threshold;
-	}
+	void setThreshold(float threshold) { m_threshold = threshold; }
 
-	void setGain(float gain)
-	{
-		m_gain = gain;
-	}
+	void setGain(float gain) { m_gain = gain; }
 
 protected:
 	float m_threshold;
@@ -292,15 +260,9 @@ public:
 	{
 	}
 
-	void setWideCoeff(float wideCoeff)
-	{
-		m_wideCoeff = wideCoeff;
-	}
+	void setWideCoeff(float wideCoeff) { m_wideCoeff = wideCoeff; }
 
-	float wideCoeff()
-	{
-		return m_wideCoeff;
-	}
+	float wideCoeff() { return m_wideCoeff; }
 
 	void nextSample(sample_t& inLeft, sample_t& inRight)
 	{

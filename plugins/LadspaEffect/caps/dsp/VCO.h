@@ -50,15 +50,9 @@ public:
 		tri = .5;
 	}
 
-	inline void set_f(double f, double fs)
-	{
-		set_inc(f / fs);
-	}
+	inline void set_f(double f, double fs) { set_inc(f / fs); }
 
-	inline void set_inc(double i)
-	{
-		inc = i;
-	}
+	inline void set_inc(double i) { inc = i; }
 
 	/* 0: triangle, 1: saw */
 	inline void set_saw(double t)
@@ -69,14 +63,14 @@ public:
 	}
 
 	/* advance and return 1 sample.
-		 * many conditionals, but quicker than a solution based on fmod()
-		 */
+	 * many conditionals, but quicker than a solution based on fmod()
+	 */
 	inline float get()
 	{
 		phase += inc;
 
 		/* the good thing is that tri is always > .5, which implies
-				 * that this first conditional is true more often than not. */
+		 * that this first conditional is true more often than not. */
 		if (phase <= tri)
 			return -1 + phase * tri1;
 		if (phase < 1)
@@ -92,7 +86,7 @@ class TriSawSquare
 {
 public:
 	/* doubles for maximum stability, using floats here increases
-		 * cycle need on my athlon */
+	 * cycle need on my athlon */
 	double phase, inc;
 	double* sync;
 
@@ -104,10 +98,7 @@ public:
 	float st1, st2;
 
 public:
-	TriSawSquare()
-	{
-		reset();
-	}
+	TriSawSquare() { reset(); }
 
 	void reset()
 	{
@@ -117,15 +108,9 @@ public:
 		set_saw_square(.5, .5);
 	}
 
-	inline void set_f(double f, double fs)
-	{
-		set_inc(f / fs);
-	}
+	inline void set_f(double f, double fs) { set_inc(f / fs); }
 
-	inline void set_inc(double i)
-	{
-		inc = i;
-	}
+	inline void set_inc(double i) { inc = i; }
 
 	inline void set_sync(TriSawSquare& tss, float p)
 	{
@@ -133,9 +118,9 @@ public:
 		sync_phase = p;
 	}
 
-	/* t = 0: tri     - 1: saw, 
-		 * s = 0: tri/saw - 1: square 
-		 */
+	/* t = 0: tri     - 1: saw,
+	 * s = 0: tri/saw - 1: square
+	 */
 	inline void set_saw_square(float t, float s)
 	{
 		tri = .5 + .5 * t;
@@ -151,10 +136,10 @@ public:
 		st2 = s * tri;
 	}
 
-	/* advance and return 1 sample. 
-		 * many branching instructions but on this intel chip faster than
-		 * a version using floor() to keep the phase within [0..1].
-		 */
+	/* advance and return 1 sample.
+	 * many branching instructions but on this intel chip faster than
+	 * a version using floor() to keep the phase within [0..1].
+	 */
 	inline float get()
 	{
 		phase += inc;
@@ -185,10 +170,7 @@ public:
 	float blend, i_blend;
 
 public:
-	VCO2()
-	{
-		set_blend(.5);
-	}
+	VCO2() { set_blend(.5); }
 
 	void reset()
 	{
@@ -209,15 +191,9 @@ public:
 		i_blend = 1 - fabs(b);
 	}
 
-	inline void set_sync(float sync)
-	{
-		vco[0].set_sync(sync ? vco[1] : vco[0], sync);
-	}
+	inline void set_sync(float sync) { vco[0].set_sync(sync ? vco[1] : vco[0], sync); }
 
-	inline float get()
-	{
-		return vco[0].get() * blend + vco[1].get() * i_blend;
-	}
+	inline float get() { return vco[0].get() * blend + vco[1].get() * i_blend; }
 };
 
 } /* namespace DSP */

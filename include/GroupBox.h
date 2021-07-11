@@ -41,15 +41,9 @@ public:
 
 	void modelChanged() override;
 
-	PixmapButton* ledButton()
-	{
-		return m_led;
-	}
+	PixmapButton* ledButton() { return m_led; }
 
-	int titleBarHeight() const
-	{
-		return m_titleBarHeight;
-	}
+	int titleBarHeight() const { return m_titleBarHeight; }
 
 protected:
 	void mousePressEvent(QMouseEvent* _me) override;

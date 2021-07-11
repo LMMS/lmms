@@ -46,32 +46,17 @@ public:
 	{
 	}
 
-	virtual ~DummyEffectControls()
-	{
-	}
+	virtual ~DummyEffectControls() {}
 
-	int controlCount() override
-	{
-		return 0;
-	}
+	int controlCount() override { return 0; }
 
-	void saveSettings(QDomDocument&, QDomElement&) override
-	{
-	}
+	void saveSettings(QDomDocument&, QDomElement&) override {}
 
-	void loadSettings(const QDomElement&) override
-	{
-	}
+	void loadSettings(const QDomElement&) override {}
 
-	QString nodeName() const override
-	{
-		return "DummyControls";
-	}
+	QString nodeName() const override { return "DummyControls"; }
 
-	EffectControlDialog* createView() override
-	{
-		return new DummyEffectControlDialog(this);
-	}
+	EffectControlDialog* createView() override { return new DummyEffectControlDialog(this); }
 };
 
 class DummyEffect : public Effect
@@ -86,24 +71,13 @@ public:
 		setName();
 	}
 
-	virtual ~DummyEffect()
-	{
-	}
+	virtual ~DummyEffect() {}
 
-	EffectControls* controls() override
-	{
-		return &m_controls;
-	}
+	EffectControls* controls() override { return &m_controls; }
 
-	bool processAudioBuffer(sampleFrame*, const fpp_t) override
-	{
-		return false;
-	}
+	bool processAudioBuffer(sampleFrame*, const fpp_t) override { return false; }
 
-	const QDomElement& originalPluginData() const
-	{
-		return m_originalPluginData;
-	}
+	const QDomElement& originalPluginData() const { return m_originalPluginData; }
 
 private:
 	DummyEffectControls m_controls;

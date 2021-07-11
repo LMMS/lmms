@@ -40,18 +40,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Kicker",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Versatile drum synthesizer"),
-			"Tobias Doerffel <tobydox/at/users.sf.net>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Kicker",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Versatile drum synthesizer"), "Tobias Doerffel <tobydox/at/users.sf.net>",
+		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 kickerInstrument::kickerInstrument(InstrumentTrack* _instrument_track)
@@ -72,12 +63,9 @@ kickerInstrument::kickerInstrument(InstrumentTrack* _instrument_track)
 {
 }
 
-kickerInstrument::~kickerInstrument()
-{
-}
+kickerInstrument::~kickerInstrument() {}
 
-void kickerInstrument::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void kickerInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	m_startFreqModel.saveSettings(_doc, _this, "startfreq");
 	m_endFreqModel.saveSettings(_doc, _this, "endfreq");
@@ -134,37 +122,25 @@ void kickerInstrument::loadSettings(const QDomElement& _this)
 	m_versionModel.setValue(KICKER_PRESET_VERSION);
 }
 
-QString kickerInstrument::nodeName() const
-{
-	return kicker_plugin_descriptor.name;
-}
+QString kickerInstrument::nodeName() const { return kicker_plugin_descriptor.name; }
 
 typedef DspEffectLibrary::Distortion DistFX;
 typedef KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>> SweepOsc;
 
-void kickerInstrument::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void kickerInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	const float decfr = m_decayModel.value() *
-		Engine::mixer()->processingSampleRate() / 1000.0f;
+	const float decfr = m_decayModel.value() * Engine::mixer()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if (tfp == 0)
 	{
-		_n->m_pluginData = new SweepOsc(
-			DistFX(m_distModel.value(),
-				m_gainModel.value()),
+		_n->m_pluginData = new SweepOsc(DistFX(m_distModel.value(), m_gainModel.value()),
 			m_startNoteModel.value() ? _n->frequency() : m_startFreqModel.value(),
 			m_endNoteModel.value() ? _n->frequency() : m_endFreqModel.value(),
-			m_noiseModel.value() * m_noiseModel.value(),
-			m_clickModel.value() * 0.25f,
-			m_slopeModel.value(),
-			m_envModel.value(),
-			m_distModel.value(),
-			m_distEndModel.value(),
-			decfr);
+			m_noiseModel.value() * m_noiseModel.value(), m_clickModel.value() * 0.25f, m_slopeModel.value(),
+			m_envModel.value(), m_distModel.value(), m_distEndModel.value(), decfr);
 	}
 	else if (tfp > decfr && !_n->isReleased())
 	{
@@ -189,15 +165,9 @@ void kickerInstrument::playNote(NotePlayHandle* _n,
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
 }
 
-void kickerInstrument::deleteNotePluginData(NotePlayHandle* _n)
-{
-	delete static_cast<SweepOsc*>(_n->m_pluginData);
-}
+void kickerInstrument::deleteNotePluginData(NotePlayHandle* _n) { delete static_cast<SweepOsc*>(_n->m_pluginData); }
 
-PluginView* kickerInstrument::instantiateView(QWidget* _parent)
-{
-	return new kickerInstrumentView(this, _parent);
-}
+PluginView* kickerInstrument::instantiateView(QWidget* _parent) { return new kickerInstrumentView(this, _parent); }
 
 class kickerKnob : public Knob
 {
@@ -232,8 +202,7 @@ public:
 	}
 };
 
-kickerInstrumentView::kickerInstrumentView(Instrument* _instrument,
-	QWidget* _parent)
+kickerInstrumentView::kickerInstrumentView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 {
 	const int ROW1 = 14;
@@ -299,9 +268,7 @@ kickerInstrumentView::kickerInstrumentView(Instrument* _instrument,
 	setPalette(pal);
 }
 
-kickerInstrumentView::~kickerInstrumentView()
-{
-}
+kickerInstrumentView::~kickerInstrumentView() {}
 
 void kickerInstrumentView::modelChanged()
 {

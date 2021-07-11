@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -49,25 +49,14 @@
 #include "plugin_export.h"
 #include "portsmf/allegro.h"
 
-#define makeID(_c0, _c1, _c2, _c3) \
-	(0 | \
-		((_c0) | ((_c1) << 8) | ((_c2) << 16) | ((_c3) << 24)))
+#define makeID(_c0, _c1, _c2, _c3) (0 | ((_c0) | ((_c1) << 8) | ((_c2) << 16) | ((_c3) << 24)))
 
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"MIDI Import",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Filter for importing MIDI-files into LMMS"),
-			"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
-			0x0100,
-			Plugin::ImportFilter,
-			NULL,
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "MIDI Import",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Filter for importing MIDI-files into LMMS"),
+		"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>", 0x0100, Plugin::ImportFilter, NULL, NULL, NULL};
 }
 
 MidiImport::MidiImport(const QString& _file)
@@ -77,9 +66,7 @@ MidiImport::MidiImport(const QString& _file)
 {
 }
 
-MidiImport::~MidiImport()
-{
-}
+MidiImport::~MidiImport() {}
 
 bool MidiImport::tryImport(TrackContainer* tc)
 {
@@ -89,11 +76,9 @@ bool MidiImport::tryImport(TrackContainer* tc)
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if (gui != NULL &&
-		ConfigManager::inst()->sf2File().isEmpty())
+	if (gui != NULL && ConfigManager::inst()->sf2File().isEmpty())
 	{
-		QMessageBox::information(gui->mainWindow(),
-			tr("Setup incomplete"),
+		QMessageBox::information(gui->mainWindow(), tr("Setup incomplete"),
 			tr("You have not set up a default soundfont in "
 			   "the settings dialog (Edit->Settings). "
 			   "Therefore no sound will be played back after "
@@ -104,8 +89,7 @@ bool MidiImport::tryImport(TrackContainer* tc)
 #else
 	if (gui)
 	{
-		QMessageBox::information(gui->mainWindow(),
-			tr("Setup incomplete"),
+		QMessageBox::information(gui->mainWindow(), tr("Setup incomplete"),
 			tr("You did not compile LMMS with support for "
 			   "SoundFont2 player, which is used to add default "
 			   "sound to imported MIDI files. "
@@ -175,8 +159,7 @@ public:
 		if (!ap || time > lastPos + DefaultTicksPerBar)
 		{
 			TimePos pPos = TimePos(time.getBar(), 0);
-			ap = dynamic_cast<AutomationPattern*>(
-				at->createTCO(pPos));
+			ap = dynamic_cast<AutomationPattern*>(at->createTCO(pPos));
 			ap->addObject(objModel);
 		}
 
@@ -287,8 +270,8 @@ bool MidiImport::readSMF(TrackContainer* tc)
 {
 	const int MIDI_CC_COUNT = 128 + 1; // 0-127 (128) + pitch bend
 	const int preTrackSteps = 2;
-	QProgressDialog pd(TrackContainer::tr("Importing MIDI-file..."),
-		TrackContainer::tr("Cancel"), 0, preTrackSteps, gui->mainWindow());
+	QProgressDialog pd(TrackContainer::tr("Importing MIDI-file..."), TrackContainer::tr("Cancel"), 0, preTrackSteps,
+		gui->mainWindow());
 	pd.setWindowTitle(TrackContainer::tr("Please wait..."));
 	pd.setWindowModality(Qt::WindowModal);
 	pd.setMinimumDuration(0);
@@ -311,18 +294,14 @@ bool MidiImport::readSMF(TrackContainer* tc)
 	// NOTE: unordered_map::operator[] creates a new element if none exists
 
 	MeterModel& timeSigMM = Engine::getSong()->getTimeSigModel();
-	AutomationTrack* nt = dynamic_cast<AutomationTrack*>(
-		Track::create(Track::AutomationTrack, Engine::getSong()));
+	AutomationTrack* nt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
 	nt->setName(tr("MIDI Time Signature Numerator"));
-	AutomationTrack* dt = dynamic_cast<AutomationTrack*>(
-		Track::create(Track::AutomationTrack, Engine::getSong()));
+	AutomationTrack* dt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
 	dt->setName(tr("MIDI Time Signature Denominator"));
-	AutomationPattern* timeSigNumeratorPat =
-		new AutomationPattern(nt);
+	AutomationPattern* timeSigNumeratorPat = new AutomationPattern(nt);
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
 	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
-	AutomationPattern* timeSigDenominatorPat =
-		new AutomationPattern(dt);
+	AutomationPattern* timeSigDenominatorPat = new AutomationPattern(dt);
 	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
 	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 
@@ -354,8 +333,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		for (int i = 0; i < beats.len - 1; i++)
 		{
 			Alg_beat_ptr b = &(beats[i]);
-			double tempo = (beats[i + 1].beat - b->beat) /
-				(beats[i + 1].time - beats[i].time);
+			double tempo = (beats[i + 1].beat - b->beat) / (beats[i + 1].time - beats[i].time);
 			tap->putValue(b->beat * ticksPerBeat, tempo * 60.0);
 		}
 		if (timeMap->last_tempo_flag)
@@ -376,8 +354,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 
 		if (evt->is_update())
 		{
-			printf("Unhandled SONG update: %d %f %s\n",
-				evt->get_type_code(), evt->time, evt->get_attribute());
+			printf("Unhandled SONG update: %d %f %s\n", evt->get_type_code(), evt->time, evt->get_attribute());
 		}
 	}
 
@@ -415,8 +392,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 				{
 					// Write debug output
 					printf("MISSING GLOBAL HANDLER\n");
-					printf("     Chn: %d, Type Code: %d, Time: %f", (int)evt->chan,
-						evt->get_type_code(), evt->time);
+					printf("     Chn: %d, Type Code: %d, Time: %f", (int)evt->chan, evt->get_type_code(), evt->time);
 					if (evt->is_update())
 					{
 						printf(", Update Type: %s", evt->get_attribute());
@@ -433,8 +409,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 				smfMidiChannel* ch = chs[evt->chan].create(tc, trackName);
 				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>(evt);
 				int ticks = noteEvt->get_duration() * ticksPerBeat;
-				Note n((ticks < 1 ? 1 : ticks),
-					noteEvt->get_start_time() * ticksPerBeat,
+				Note n((ticks < 1 ? 1 : ticks), noteEvt->get_start_time() * ticksPerBeat,
 					noteEvt->get_identifier() - 12,
 					noteEvt->get_loud() * (200.f / 127.f)); // Map from MIDI velocity to LMMS volume
 				ch->addNote(n);
@@ -507,7 +482,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 							cc = cc * 100.0f;
 							break;
 						default:
-							//TODO: something useful for other CCs
+							// TODO: something useful for other CCs
 							break;
 						}
 
@@ -521,7 +496,9 @@ bool MidiImport::readSMF(TrackContainer* tc)
 							{
 								if (ccs[ccid].at == NULL)
 								{
-									ccs[ccid].create(tc, trackName + " > " + (objModel != NULL ? objModel->displayName() : QString("CC %1").arg(ccid)));
+									ccs[ccid].create(tc,
+										trackName + " > " +
+											(objModel != NULL ? objModel->displayName() : QString("CC %1").arg(ccid)));
 								}
 								ccs[ccid].putValue(time, objModel, cc);
 							}
@@ -530,8 +507,8 @@ bool MidiImport::readSMF(TrackContainer* tc)
 				}
 				else
 				{
-					printf("Unhandled update: %d %d %f %s\n", (int)evt->chan,
-						evt->get_type_code(), evt->time, evt->get_attribute());
+					printf("Unhandled update: %d %d %f %s\n", (int)evt->chan, evt->get_type_code(), evt->time,
+						evt->get_attribute());
 				}
 			}
 		}
@@ -549,8 +526,8 @@ bool MidiImport::readSMF(TrackContainer* tc)
 		{
 			printf(" Should remove empty track\n");
 			// must delete trackView first - but where is it?
-			//tc->removeTrack( chs[c].it );
-			//it->deleteLater();
+			// tc->removeTrack( chs[c].it );
+			// it->deleteLater();
 		}
 		// Set channel 10 to drums as per General MIDI's orders
 		if (c.first % 16l == 9 /* channel 10 */
@@ -609,8 +586,7 @@ bool MidiImport::readRIFF(TrackContainer* tc)
 
 void MidiImport::error()
 {
-	printf("MidiImport::readTrack(): invalid MIDI data (offset %#x)\n",
-		(unsigned int)file().pos());
+	printf("MidiImport::readTrack(): invalid MIDI data (offset %#x)\n", (unsigned int)file().pos());
 }
 
 extern "C"
@@ -619,7 +595,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* _data)
 	{
-		return new MidiImport(QString::fromUtf8(
-			static_cast<const char*>(_data)));
+		return new MidiImport(QString::fromUtf8(static_cast<const char*>(_data)));
 	}
 }

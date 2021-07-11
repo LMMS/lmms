@@ -53,8 +53,7 @@ public:
 		@param colNum numbers of columns for the controls
 			(link LEDs not counted)
 	*/
-	LinkedModelGroupView(QWidget* parent, class LinkedModelGroup* model,
-		std::size_t colNum);
+	LinkedModelGroupView(QWidget* parent, class LinkedModelGroup* model, std::size_t colNum);
 	~LinkedModelGroupView();
 
 	//! Reconnect models if model changed
@@ -63,8 +62,7 @@ public:
 protected:
 	//! Add a control to this widget
 	//! @warning This widget will own this control, do not free it
-	void addControl(class Control* ctrl, const std::string& id,
-		const std::string& display, bool removable);
+	void addControl(class Control* ctrl, const std::string& id, const std::string& display, bool removable);
 
 	void removeControl(const QString& key);
 

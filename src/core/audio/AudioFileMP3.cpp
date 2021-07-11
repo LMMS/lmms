@@ -31,11 +31,8 @@
 
 #include "Mixer.h"
 
-AudioFileMP3::AudioFileMP3(OutputSettings const& outputSettings,
-	const ch_cnt_t channels,
-	bool& successful,
-	const QString& file,
-	Mixer* mixer)
+AudioFileMP3::AudioFileMP3(
+	OutputSettings const& outputSettings, const ch_cnt_t channels, bool& successful, const QString& file, Mixer* mixer)
 	: AudioFileDevice(outputSettings, channels, file, mixer)
 {
 	successful = true;
@@ -51,9 +48,7 @@ AudioFileMP3::~AudioFileMP3()
 	tearDownEncoder();
 }
 
-void AudioFileMP3::writeBuffer(const surroundSampleFrame* _buf,
-	const fpp_t _frames,
-	const float _master_gain)
+void AudioFileMP3::writeBuffer(const surroundSampleFrame* _buf, const fpp_t _frames, const float _master_gain)
 {
 	if (_frames < 1)
 	{
@@ -71,7 +66,8 @@ void AudioFileMP3::writeBuffer(const surroundSampleFrame* _buf,
 	size_t minimumBufferSize = 1.25 * _frames + 7200;
 	std::vector<unsigned char> encodingBuffer(minimumBufferSize);
 
-	int bytesWritten = lame_encode_buffer_interleaved_ieee_float(m_lame, &interleavedDataBuffer[0], _frames, &encodingBuffer[0], static_cast<int>(encodingBuffer.size()));
+	int bytesWritten = lame_encode_buffer_interleaved_ieee_float(
+		m_lame, &interleavedDataBuffer[0], _frames, &encodingBuffer[0], static_cast<int>(encodingBuffer.size()));
 	assert(bytesWritten >= 0);
 
 	writeData(&encodingBuffer[0], bytesWritten);
@@ -125,9 +121,6 @@ bool AudioFileMP3::initEncoder()
 	return lame_init_params(m_lame) != -1;
 }
 
-void AudioFileMP3::tearDownEncoder()
-{
-	lame_close(m_lame);
-}
+void AudioFileMP3::tearDownEncoder() { lame_close(m_lame); }
 
 #endif

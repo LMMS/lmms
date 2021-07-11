@@ -31,8 +31,7 @@ class PatchItem : public QTreeWidgetItem
 {
 public:
 	// Constructor.
-	PatchItem(QTreeWidget* pListView,
-		QTreeWidgetItem* pItemAfter)
+	PatchItem(QTreeWidget* pListView, QTreeWidgetItem* pItemAfter)
 		: QTreeWidgetItem(pListView, pItemAfter)
 	{
 	}
@@ -80,34 +79,21 @@ PatchesDialog::PatchesDialog(QWidget* pParent, Qt::WindowFlags wflags)
 	m_progListView->sortItems(0, Qt::AscendingOrder);
 
 	// UI connections...
-	QObject::connect(m_bankListView,
-		SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
-		SLOT(bankChanged()));
-	QObject::connect(m_progListView,
-		SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+	QObject::connect(
+		m_bankListView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), SLOT(bankChanged()));
+	QObject::connect(m_progListView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
 		SLOT(progChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
-	QObject::connect(m_progListView,
-		SIGNAL(itemActivated(QTreeWidgetItem*, int)),
-		SLOT(accept()));
-	QObject::connect(m_okButton,
-		SIGNAL(clicked()),
-		SLOT(accept()));
-	QObject::connect(m_cancelButton,
-		SIGNAL(clicked()),
-		SLOT(reject()));
+	QObject::connect(m_progListView, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(accept()));
+	QObject::connect(m_okButton, SIGNAL(clicked()), SLOT(accept()));
+	QObject::connect(m_cancelButton, SIGNAL(clicked()), SLOT(reject()));
 }
 
 // Destructor.
-PatchesDialog::~PatchesDialog()
-{
-}
+PatchesDialog::~PatchesDialog() {}
 
 // Dialog setup loader.
-void PatchesDialog::setup(GigInstance* pSynth, int iChan,
-	const QString& chanName,
-	LcdSpinBoxModel* bankModel,
-	LcdSpinBoxModel* progModel,
-	QLabel* patchLabel)
+void PatchesDialog::setup(GigInstance* pSynth, int iChan, const QString& chanName, LcdSpinBoxModel* bankModel,
+	LcdSpinBoxModel* progModel, QLabel* patchLabel)
 {
 
 	// We'll going to changes the whole thing...
@@ -130,7 +116,7 @@ void PatchesDialog::setup(GigInstance* pSynth, int iChan,
 	m_pSynth = pSynth;
 	m_iChan = iChan;
 
-	//fluid_preset_t preset;
+	// fluid_preset_t preset;
 	QTreeWidgetItem* pBankItem = NULL;
 
 	// Currently just use zero as the only bank
@@ -188,10 +174,7 @@ void PatchesDialog::setup(GigInstance* pSynth, int iChan,
 }
 
 // Stabilize current state form.
-void PatchesDialog::stabilizeForm()
-{
-	m_okButton->setEnabled(validateForm());
-}
+void PatchesDialog::stabilizeForm() { m_okButton->setEnabled(validateForm()); }
 
 // Validate form fields.
 bool PatchesDialog::validateForm()
@@ -253,8 +236,7 @@ void PatchesDialog::reject()
 // Find the bank item of given bank number id.
 QTreeWidgetItem* PatchesDialog::findBankItem(int iBank)
 {
-	QList<QTreeWidgetItem*> banks = m_bankListView->findItems(
-		QString::number(iBank), Qt::MatchExactly, 0);
+	QList<QTreeWidgetItem*> banks = m_bankListView->findItems(QString::number(iBank), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(banks);
 
@@ -271,8 +253,7 @@ QTreeWidgetItem* PatchesDialog::findBankItem(int iBank)
 // Find the program item of given program number id.
 QTreeWidgetItem* PatchesDialog::findProgItem(int iProg)
 {
-	QList<QTreeWidgetItem*> progs = m_progListView->findItems(
-		QString::number(iProg), Qt::MatchExactly, 0);
+	QList<QTreeWidgetItem*> progs = m_progListView->findItems(QString::number(iProg), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(progs);
 

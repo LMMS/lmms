@@ -62,8 +62,7 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget",
-			"JACK (JACK Audio Connection Kit)");
+		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "JACK (JACK Audio Connection Kit)");
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget
@@ -95,8 +94,7 @@ private:
 
 	int processCallback(jack_nframes_t _nframes, void* _udata);
 
-	static int staticProcessCallback(jack_nframes_t _nframes,
-		void* _udata);
+	static int staticProcessCallback(jack_nframes_t _nframes, void* _udata);
 	static void shutdownCallback(void* _udata);
 
 	jack_client_t* m_client;

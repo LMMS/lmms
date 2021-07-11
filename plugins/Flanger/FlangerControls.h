@@ -36,23 +36,12 @@ class FlangerControls : public EffectControls
 	Q_OBJECT
 public:
 	FlangerControls(FlangerEffect* effect);
-	virtual ~FlangerControls()
-	{
-	}
+	virtual ~FlangerControls() {}
 	virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return "Flanger";
-	}
-	virtual int controlCount()
-	{
-		return 7;
-	}
-	virtual EffectControlDialog* createView()
-	{
-		return new FlangerControlsDialog(this);
-	}
+	inline virtual QString nodeName() const { return "Flanger"; }
+	virtual int controlCount() { return 7; }
+	virtual EffectControlDialog* createView() { return new FlangerControlsDialog(this); }
 
 private slots:
 	void changedSampleRate();

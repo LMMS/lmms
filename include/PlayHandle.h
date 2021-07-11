@@ -69,77 +69,38 @@ public:
 
 	virtual ~PlayHandle();
 
-	virtual bool affinityMatters() const
-	{
-		return false;
-	}
+	virtual bool affinityMatters() const { return false; }
 
-	const QThread* affinity() const
-	{
-		return m_affinity;
-	}
+	const QThread* affinity() const { return m_affinity; }
 
-	Type type() const
-	{
-		return m_type;
-	}
+	Type type() const { return m_type; }
 
 	// required for ThreadableJob
 	void doProcessing() override;
 
-	bool requiresProcessing() const override
-	{
-		return !isFinished();
-	}
+	bool requiresProcessing() const override { return !isFinished(); }
 
-	void lock()
-	{
-		m_processingLock.lock();
-	}
-	void unlock()
-	{
-		m_processingLock.unlock();
-	}
-	bool tryLock()
-	{
-		return m_processingLock.tryLock();
-	}
+	void lock() { m_processingLock.lock(); }
+	void unlock() { m_processingLock.unlock(); }
+	bool tryLock() { return m_processingLock.tryLock(); }
 	virtual void play(sampleFrame* buffer) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
 	// ie. how many empty frames should be inserted at the start of the first period
-	f_cnt_t offset() const
-	{
-		return m_offset;
-	}
+	f_cnt_t offset() const { return m_offset; }
 
-	void setOffset(f_cnt_t _offset)
-	{
-		m_offset = _offset;
-	}
+	void setOffset(f_cnt_t _offset) { m_offset = _offset; }
 
 	virtual bool isFromTrack(const Track* _track) const = 0;
 
-	bool usesBuffer() const
-	{
-		return m_usesBuffer;
-	}
+	bool usesBuffer() const { return m_usesBuffer; }
 
-	void setUsesBuffer(const bool b)
-	{
-		m_usesBuffer = b;
-	}
+	void setUsesBuffer(const bool b) { m_usesBuffer = b; }
 
-	AudioPort* audioPort()
-	{
-		return m_audioPort;
-	}
+	AudioPort* audioPort() { return m_audioPort; }
 
-	void setAudioPort(AudioPort* port)
-	{
-		m_audioPort = port;
-	}
+	void setAudioPort(AudioPort* port) { m_audioPort = port; }
 
 	void releaseBuffer();
 

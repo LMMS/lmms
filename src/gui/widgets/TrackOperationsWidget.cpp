@@ -57,9 +57,10 @@ TrackOperationsWidget::TrackOperationsWidget(TrackView* parent)
 	,					/*!< The parent widget */
 	m_trackView(parent) /*!< The parent track view */
 {
-	ToolTip::add(this, tr("Press <%1> while clicking on move-grip "
-						  "to begin a new drag'n'drop action.")
-						   .arg(UI_CTRL_KEY));
+	ToolTip::add(this,
+		tr("Press <%1> while clicking on move-grip "
+		   "to begin a new drag'n'drop action.")
+			.arg(UI_CTRL_KEY));
 
 	QMenu* toMenu = new QMenu(this);
 	toMenu->setFont(pointSize<9>(toMenu->font()));
@@ -83,9 +84,7 @@ TrackOperationsWidget::TrackOperationsWidget(TrackView* parent)
 	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("led_off"));
 	m_soloBtn->setCheckable(true);
 
-	if (ConfigManager::inst()->value("ui",
-								 "compacttrackbuttons")
-			.toInt())
+	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
 	{
 		m_muteBtn->move(46, 0);
 		m_soloBtn->move(46, 16);
@@ -102,21 +101,16 @@ TrackOperationsWidget::TrackOperationsWidget(TrackView* parent)
 	m_soloBtn->show();
 	ToolTip::add(m_soloBtn, tr("Solo"));
 
-	connect(this, SIGNAL(trackRemovalScheduled(TrackView*)),
-		m_trackView->trackContainerView(),
-		SLOT(deleteTrackView(TrackView*)),
-		Qt::QueuedConnection);
+	connect(this, SIGNAL(trackRemovalScheduled(TrackView*)), m_trackView->trackContainerView(),
+		SLOT(deleteTrackView(TrackView*)), Qt::QueuedConnection);
 
-	connect(m_trackView->getTrack()->getMutedModel(), SIGNAL(dataChanged()),
-		this, SLOT(update()));
+	connect(m_trackView->getTrack()->getMutedModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 }
 
 /*! \brief Destroy an existing trackOperationsWidget
  *
  */
-TrackOperationsWidget::~TrackOperationsWidget()
-{
-}
+TrackOperationsWidget::~TrackOperationsWidget() {}
 
 /*! \brief Respond to trackOperationsWidget mouse events
  *
@@ -130,15 +124,13 @@ TrackOperationsWidget::~TrackOperationsWidget()
  */
 void TrackOperationsWidget::mousePressEvent(QMouseEvent* me)
 {
-	if (me->button() == Qt::LeftButton &&
-		me->modifiers() & Qt::ControlModifier &&
+	if (me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier &&
 		m_trackView->getTrack()->type() != Track::BBTrack)
 	{
 		DataFile dataFile(DataFile::DragNDropData);
 		m_trackView->getTrack()->saveState(dataFile, dataFile.content());
-		new StringPairDrag(QString("track_%1").arg(m_trackView->getTrack()->type()),
-			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
-			this);
+		new StringPairDrag(QString("track_%1").arg(m_trackView->getTrack()->type()), dataFile.toString(),
+			m_trackView->getTrackSettingsWidget()->grab(), this);
 	}
 	else if (me->button() == Qt::LeftButton)
 	{
@@ -213,14 +205,12 @@ void TrackOperationsWidget::clearTrack()
 /*! \brief Remove this track from the track list
  *
  */
-void TrackOperationsWidget::removeTrack()
-{
-	emit trackRemovalScheduled(m_trackView);
-}
+void TrackOperationsWidget::removeTrack() { emit trackRemovalScheduled(m_trackView); }
 
 void TrackOperationsWidget::changeTrackColor()
 {
-	QColor new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Track)->getColor(m_trackView->getTrack()->color());
+	QColor new_color =
+		ColorChooser(this).withPalette(ColorChooser::Palette::Track)->getColor(m_trackView->getTrack()->color());
 
 	if (!new_color.isValid())
 	{
@@ -267,12 +257,8 @@ void TrackOperationsWidget::updateMenu()
 {
 	QMenu* toMenu = m_trackOps->menu();
 	toMenu->clear();
-	toMenu->addAction(embed::getIconPixmap("edit_copy", 16, 16),
-		tr("Clone this track"),
-		this, SLOT(cloneTrack()));
-	toMenu->addAction(embed::getIconPixmap("cancel", 16, 16),
-		tr("Remove this track"),
-		this, SLOT(removeTrack()));
+	toMenu->addAction(embed::getIconPixmap("edit_copy", 16, 16), tr("Clone this track"), this, SLOT(cloneTrack()));
+	toMenu->addAction(embed::getIconPixmap("cancel", 16, 16), tr("Remove this track"), this, SLOT(removeTrack()));
 
 	if (!m_trackView->trackContainerView()->fixedTCOs())
 	{
@@ -295,15 +281,11 @@ void TrackOperationsWidget::updateMenu()
 	}
 
 	toMenu->addSeparator();
-	toMenu->addAction(embed::getIconPixmap("colorize"),
-		tr("Change color"), this, SLOT(changeTrackColor()));
-	toMenu->addAction(embed::getIconPixmap("colorize"),
-		tr("Reset color to default"), this, SLOT(resetTrackColor()));
-	toMenu->addAction(embed::getIconPixmap("colorize"),
-		tr("Set random color"), this, SLOT(randomTrackColor()));
+	toMenu->addAction(embed::getIconPixmap("colorize"), tr("Change color"), this, SLOT(changeTrackColor()));
+	toMenu->addAction(embed::getIconPixmap("colorize"), tr("Reset color to default"), this, SLOT(resetTrackColor()));
+	toMenu->addAction(embed::getIconPixmap("colorize"), tr("Set random color"), this, SLOT(randomTrackColor()));
 	toMenu->addSeparator();
-	toMenu->addAction(embed::getIconPixmap("colorize"),
-		tr("Clear clip colors"), this, SLOT(useTrackColor()));
+	toMenu->addAction(embed::getIconPixmap("colorize"), tr("Clear clip colors"), this, SLOT(useTrackColor()));
 }
 
 void TrackOperationsWidget::toggleRecording(bool on)
@@ -323,12 +305,6 @@ void TrackOperationsWidget::toggleRecording(bool on)
 	}
 }
 
-void TrackOperationsWidget::recordingOn()
-{
-	toggleRecording(true);
-}
+void TrackOperationsWidget::recordingOn() { toggleRecording(true); }
 
-void TrackOperationsWidget::recordingOff()
-{
-	toggleRecording(false);
-}
+void TrackOperationsWidget::recordingOff() { toggleRecording(false); }

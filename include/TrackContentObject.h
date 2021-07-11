@@ -46,15 +46,9 @@ public:
 	TrackContentObject(Track* track);
 	virtual ~TrackContentObject();
 
-	inline Track* getTrack() const
-	{
-		return m_track;
-	}
+	inline Track* getTrack() const { return m_track; }
 
-	inline const QString& name() const
-	{
-		return m_name;
-	}
+	inline const QString& name() const { return m_name; }
 
 	inline void setName(const QString& name)
 	{
@@ -62,15 +56,9 @@ public:
 		emit dataChanged();
 	}
 
-	QString displayName() const override
-	{
-		return name();
-	}
+	QString displayName() const override { return name(); }
 
-	inline const TimePos& startPosition() const
-	{
-		return m_startPosition;
-	}
+	inline const TimePos& startPosition() const { return m_startPosition; }
 
 	inline TimePos endPosition() const
 	{
@@ -78,54 +66,30 @@ public:
 		return sp + m_length;
 	}
 
-	inline const TimePos& length() const
-	{
-		return m_length;
-	}
+	inline const TimePos& length() const { return m_length; }
 
-	inline void setAutoResize(const bool r)
-	{
-		m_autoResize = r;
-	}
+	inline void setAutoResize(const bool r) { m_autoResize = r; }
 
-	inline const bool getAutoResize() const
-	{
-		return m_autoResize;
-	}
+	inline const bool getAutoResize() const { return m_autoResize; }
 
-	QColor color() const
-	{
-		return m_color;
-	}
+	QColor color() const { return m_color; }
 
-	void setColor(const QColor& c)
-	{
-		m_color = c;
-	}
+	void setColor(const QColor& c) { m_color = c; }
 
 	bool hasColor();
 
 	void useCustomClipColor(bool b);
 
-	bool usesCustomClipColor()
-	{
-		return m_useCustomClipColor;
-	}
+	bool usesCustomClipColor() { return m_useCustomClipColor; }
 
 	virtual void movePosition(const TimePos& pos);
 	virtual void changeLength(const TimePos& length);
 
 	virtual TrackContentObjectView* createView(TrackView* tv) = 0;
 
-	inline void selectViewOnCreate(bool select)
-	{
-		m_selectViewOnCreate = select;
-	}
+	inline void selectViewOnCreate(bool select) { m_selectViewOnCreate = select; }
 
-	inline bool getSelectViewOnCreate()
-	{
-		return m_selectViewOnCreate;
-	}
+	inline bool getSelectViewOnCreate() { return m_selectViewOnCreate; }
 
 	/// Returns true if and only if a->startPosition() < b->startPosition()
 	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);

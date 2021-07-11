@@ -45,10 +45,7 @@ public:
 
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
-	inline QString nodeName() const override
-	{
-		return ("bbtco");
-	}
+	inline QString nodeName() const override { return ("bbtco"); }
 
 	int bbTrackIndex();
 
@@ -92,41 +89,25 @@ public:
 	BBTrack(TrackContainer* tc);
 	virtual ~BBTrack();
 
-	virtual bool play(const TimePos& _start, const fpp_t _frames,
-		const f_cnt_t _frame_base, int _tco_num = -1) override;
+	virtual bool play(
+		const TimePos& _start, const fpp_t _frames, const f_cnt_t _frame_base, int _tco_num = -1) override;
 	TrackView* createView(TrackContainerView* tcv) override;
 	TrackContentObject* createTCO(const TimePos& pos) override;
 
-	virtual void saveTrackSpecificSettings(QDomDocument& _doc,
-		QDomElement& _parent) override;
+	virtual void saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadTrackSpecificSettings(const QDomElement& _this) override;
 
 	static BBTrack* findBBTrack(int _bb_num);
 	static void swapBBTracks(Track* _track1, Track* _track2);
 
-	int index()
-	{
-		return s_infoMap[this];
-	}
+	int index() { return s_infoMap[this]; }
 
-	bool automationDisabled(Track* _track)
-	{
-		return (m_disabledTracks.contains(_track));
-	}
-	void disableAutomation(Track* _track)
-	{
-		m_disabledTracks.append(_track);
-	}
-	void enableAutomation(Track* _track)
-	{
-		m_disabledTracks.removeAll(_track);
-	}
+	bool automationDisabled(Track* _track) { return (m_disabledTracks.contains(_track)); }
+	void disableAutomation(Track* _track) { m_disabledTracks.append(_track); }
+	void enableAutomation(Track* _track) { m_disabledTracks.removeAll(_track); }
 
 protected:
-	inline QString nodeName() const override
-	{
-		return ("bbtrack");
-	}
+	inline QString nodeName() const override { return ("bbtrack"); }
 
 private:
 	QList<Track*> m_disabledTracks;
@@ -146,10 +127,7 @@ public:
 
 	bool close() override;
 
-	const BBTrack* getBBTrack() const
-	{
-		return (m_bbTrack);
-	}
+	const BBTrack* getBBTrack() const { return (m_bbTrack); }
 
 public slots:
 	void clickedTrackLabel();

@@ -1,8 +1,8 @@
 /*
 	Phaser.h
-	
+
 	Copyright 2002-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Standard and fractal-modulated phaser units.
@@ -38,15 +38,9 @@ class PhaserAP
 public:
 	sample_t a, m;
 
-	PhaserAP()
-	{
-		a = m = 0.;
-	}
+	PhaserAP() { a = m = 0.; }
 
-	void set(double delay)
-	{
-		a = (1 - delay) / (1 + delay);
-	}
+	void set(double delay) { a = (1 - delay) / (1 + delay); }
 
 	sample_t process(sample_t x)
 	{
@@ -57,8 +51,7 @@ public:
 	}
 };
 
-class PhaserI
-	: public Plugin
+class PhaserI : public Plugin
 {
 public:
 	PhaserAP ap[6];
@@ -72,18 +65,14 @@ public:
 		double bottom, range;
 	} delay;
 
-	template <sample_func_t>
-	void one_cycle(int frames);
+	template <sample_func_t> void one_cycle(int frames);
 
 	int blocksize, remain;
 
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
-		blocksize = 32;
-	}
+	void init() { blocksize = 32; }
 
 	void activate()
 	{
@@ -96,21 +85,14 @@ public:
 		rate = -1; /* force lfo reset in one_cycle() */
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* same as above, but filter sweep is controlled by a Lorenz fractal */
 
-class PhaserII
-	: public Plugin
+class PhaserII : public Plugin
 {
 public:
 	double fs;
@@ -126,8 +108,7 @@ public:
 		double bottom, range;
 	} delay;
 
-	template <sample_func_t>
-	void one_cycle(int frames);
+	template <sample_func_t> void one_cycle(int frames);
 
 	int blocksize, remain;
 
@@ -151,15 +132,9 @@ public:
 		rate = -1; /* force lfo reset in one_cycle() */
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _PHASER_H_ */

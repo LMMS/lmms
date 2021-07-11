@@ -50,25 +50,13 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	QScrollArea* contentWidget()
-	{
-		return m_scrollArea;
-	}
+	QScrollArea* contentWidget() { return m_scrollArea; }
 
-	inline const TimePos& currentPosition() const
-	{
-		return m_currentPosition;
-	}
+	inline const TimePos& currentPosition() const { return m_currentPosition; }
 
-	virtual bool fixedTCOs() const
-	{
-		return false;
-	}
+	virtual bool fixedTCOs() const { return false; }
 
-	inline float pixelsPerBar() const
-	{
-		return m_ppb;
-	}
+	inline float pixelsPerBar() const { return m_ppb; }
 
 	void setPixelsPerBar(int ppb);
 
@@ -77,30 +65,15 @@ public:
 	virtual bool allowRubberband() const;
 	virtual bool knifeMode() const;
 
-	inline bool rubberBandActive() const
-	{
-		return m_rubberBand->isEnabled() && m_rubberBand->isVisible();
-	}
+	inline bool rubberBandActive() const { return m_rubberBand->isEnabled() && m_rubberBand->isVisible(); }
 
-	inline QVector<selectableObject*> selectedObjects()
-	{
-		return m_rubberBand->selectedObjects();
-	}
+	inline QVector<selectableObject*> selectedObjects() { return m_rubberBand->selectedObjects(); }
 
-	TrackContainer* model()
-	{
-		return m_tc;
-	}
+	TrackContainer* model() { return m_tc; }
 
-	const TrackContainer* model() const
-	{
-		return m_tc;
-	}
+	const TrackContainer* model() const { return m_tc; }
 
-	const QList<TrackView*>& trackViews() const
-	{
-		return (m_trackViews);
-	}
+	const QList<TrackView*>& trackViews() const { return (m_trackViews); }
 
 	void moveTrackView(TrackView* trackView, int indexTo);
 	void moveTrackViewUp(TrackView* trackView);
@@ -114,10 +87,7 @@ public:
 
 	void clearAllTracks();
 
-	QString nodeName() const override
-	{
-		return "trackcontainerview";
-	}
+	QString nodeName() const override { return "trackcontainerview"; }
 
 	RubberBand* rubberBand() const;
 
@@ -181,8 +151,7 @@ class InstrumentLoaderThread : public QThread
 {
 	Q_OBJECT
 public:
-	InstrumentLoaderThread(QObject* parent = 0, InstrumentTrack* it = 0,
-		QString name = "");
+	InstrumentLoaderThread(QObject* parent = 0, InstrumentTrack* it = 0, QString name = "");
 
 	void run() override;
 

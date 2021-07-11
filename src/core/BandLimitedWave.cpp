@@ -88,7 +88,7 @@ void BandLimitedWave::generateWaves()
 		for (i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
-			//const double om = 1.0 / len;
+			// const double om = 1.0 / len;
 			double max = 0.0;
 
 			for (int ph = 0; ph < len; ph++)
@@ -100,7 +100,7 @@ void BandLimitedWave::generateWaves()
 				{
 					hlen = static_cast<double>(len) / static_cast<double>(harm);
 					const double amp = -1.0 / static_cast<double>(harm);
-					//const double a2 = cos( om * harm * F_2PI );
+					// const double a2 = cos( om * harm * F_2PI );
 					s += amp * /*a2 **/ sin(static_cast<double>(ph * harm) / static_cast<double>(len) * F_2PI);
 					harm++;
 				} while (hlen > 2.0);
@@ -130,7 +130,7 @@ void BandLimitedWave::generateWaves()
 		for (i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
-			//const double om = 1.0 / len;
+			// const double om = 1.0 / len;
 			double max = 0.0;
 
 			for (int ph = 0; ph < len; ph++)
@@ -142,7 +142,7 @@ void BandLimitedWave::generateWaves()
 				{
 					hlen = static_cast<double>(len) / static_cast<double>(harm);
 					const double amp = 1.0 / static_cast<double>(harm);
-					//const double a2 = cos( om * harm * F_2PI );
+					// const double a2 = cos( om * harm * F_2PI );
 					s += amp * /*a2 **/ sin(static_cast<double>(ph * harm) / static_cast<double>(len) * F_2PI);
 					harm += 2;
 				} while (hlen > 2.0);
@@ -171,7 +171,7 @@ void BandLimitedWave::generateWaves()
 		for (i = 0; i <= MAXTBL; i++)
 		{
 			const int len = TLENS[i];
-			//const double om = 1.0 / len;
+			// const double om = 1.0 / len;
 			double max = 0.0;
 
 			for (int ph = 0; ph < len; ph++)
@@ -183,8 +183,11 @@ void BandLimitedWave::generateWaves()
 				{
 					hlen = static_cast<double>(len) / static_cast<double>(harm);
 					const double amp = 1.0 / static_cast<double>(harm * harm);
-					//const double a2 = cos( om * harm * F_2PI );
-					s += amp * /*a2 **/ sin((static_cast<double>(ph * harm) / static_cast<double>(len) + ((harm + 1) % 4 == 0 ? 0.5 : 0.0)) * F_2PI);
+					// const double a2 = cos( om * harm * F_2PI );
+					s += amp * /*a2 **/
+						sin((static_cast<double>(ph * harm) / static_cast<double>(len) +
+								((harm + 1) % 4 == 0 ? 0.5 : 0.0)) *
+							F_2PI);
 					harm += 2;
 				} while (hlen > 2.0);
 				s_waveforms[BandLimitedWave::BLTriangle].setSampleAt(i, ph, s);

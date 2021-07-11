@@ -1,8 +1,8 @@
 /*
 	Chorus.h
-	
+
 	Copyright 2004-5 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	mono and stereo chorus/flanger units, traditional designs and some
@@ -37,23 +37,20 @@
 #include "dsp/Roessler.h"
 #include "dsp/Sine.h"
 
-class ChorusStub
-	: public Plugin
+class ChorusStub : public Plugin
 {
 public:
 	sample_t time, width, rate;
 };
 
-class ChorusI
-	: public ChorusStub
+class ChorusI : public ChorusStub
 {
 public:
 	DSP::Sine lfo;
 	DSP::Delay delay;
 	DSP::DelayTapA tap;
 
-	template <sample_func_t>
-	void one_cycle(int frames);
+	template <sample_func_t> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -77,19 +74,12 @@ public:
 		lfo.set_f(rate, fs, 0);
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class StereoChorusI
-	: public ChorusStub
+class StereoChorusI : public ChorusStub
 {
 public:
 	sample_t rate;
@@ -103,8 +93,7 @@ public:
 		DSP::DelayTapA tap;
 	} left, right;
 
-	template <sample_func_t>
-	void one_cycle(int frames);
+	template <sample_func_t> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -131,15 +120,9 @@ public:
 		right.lfo.set_f(rate, fs, phase * M_PI);
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* //////////////////////////////////////////////////////////////////////// */
@@ -176,8 +159,7 @@ public:
 	}
 };
 
-class ChorusII
-	: public ChorusStub
+class ChorusII : public ChorusStub
 {
 public:
 	enum
@@ -189,8 +171,7 @@ public:
 	DSP::BiQuad filter;
 	DSP::Delay delay;
 
-	template <sample_func_t>
-	void one_cycle(int frames);
+	template <sample_func_t> void one_cycle(int frames);
 
 	void set_rate(sample_t r)
 	{
@@ -224,19 +205,12 @@ public:
 		filter.reset();
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class StereoChorusII
-	: public ChorusStub
+class StereoChorusII : public ChorusStub
 {
 public:
 	sample_t rate;
@@ -251,8 +225,7 @@ public:
 		DSP::DelayTapA tap;
 	} left, right;
 
-	template <sample_func_t>
-	void one_cycle(int frames);
+	template <sample_func_t> void one_cycle(int frames);
 
 	void set_rate(sample_t r)
 	{
@@ -290,15 +263,9 @@ public:
 		set_rate(*ports[3]);
 	}
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _CHORUS_H_ */

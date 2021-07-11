@@ -123,8 +123,8 @@ public:
 class GigSample
 {
 public:
-	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion,
-		float attenuation, int interpolation, float desiredFreq);
+	GigSample(gig::Sample* pSample, gig::DimensionRegion* pDimRegion, float attenuation, int interpolation,
+		float desiredFreq);
 	~GigSample();
 
 	// Needed when initially creating in QList
@@ -133,8 +133,8 @@ public:
 
 	// Needed since libsamplerate stores data internally between calls
 	void updateSampleRate();
-	bool convertSampleRate(sampleFrame& oldBuf, sampleFrame& newBuf,
-		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used);
+	bool convertSampleRate(
+		sampleFrame& oldBuf, sampleFrame& newBuf, f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used);
 
 	gig::Sample* sample;
 	gig::DimensionRegion* region;
@@ -217,8 +217,7 @@ public:
 
 	virtual void play(sampleFrame* _working_buffer);
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
@@ -230,15 +229,9 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return 0;
-	}
+	virtual f_cnt_t desiredReleaseFrames() const { return 0; }
 
-	virtual Flags flags() const
-	{
-		return IsSingleStreamed | IsNotBendable;
-	}
+	virtual Flags flags() const { return IsSingleStreamed | IsNotBendable; }
 
 	virtual PluginView* instantiateView(QWidget* _parent);
 
@@ -310,8 +303,7 @@ class GigInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	GigInstrumentView(Instrument* _instrument,
-		QWidget* _parent);
+	GigInstrumentView(Instrument* _instrument, QWidget* _parent);
 	virtual ~GigInstrumentView();
 
 private:

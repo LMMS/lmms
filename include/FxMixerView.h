@@ -2,7 +2,7 @@
  * FxMixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -67,15 +67,9 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _this) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	inline FxLine* currentFxLine()
-	{
-		return m_currentFxLine;
-	}
+	inline FxLine* currentFxLine() { return m_currentFxLine; }
 
-	inline FxChannelView* channelView(int index)
-	{
-		return m_fxChannelViews[index];
-	}
+	inline FxChannelView* channelView(int index) { return m_fxChannelViews[index]; }
 
 	void setCurrentFxLine(FxLine* _line);
 	void setCurrentFxLine(int _line);

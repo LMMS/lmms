@@ -1,6 +1,6 @@
 /*
 	TDFII.h
-	
+
 	Copyright 2006-7
 		David Yeh <dtyeh@ccrma.stanford.edu> (implementation)
 		Tim Goetze <tim@quitte.de> (cosmetics)
@@ -34,8 +34,7 @@ namespace DSP
 {
 
 // ORDER is the highest power of s in the transfer function
-template <int Order>
-class TDFII
+template <int Order> class TDFII
 {
 public:
 	double a[Order + 1];
@@ -61,8 +60,8 @@ public:
 	}
 
 	/* per-band recursion:
-		 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2]) 
-		 */
+	 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2])
+	 */
 	sample_t process(sample_t s)
 	{
 		double y = h[0] + b[0] * s;

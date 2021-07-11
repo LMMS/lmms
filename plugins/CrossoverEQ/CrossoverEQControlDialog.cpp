@@ -1,5 +1,5 @@
 /*
- * CrossoverEQControlDialog.cpp - A native 4-band Crossover Equalizer 
+ * CrossoverEQControlDialog.cpp - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -69,26 +69,22 @@ CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls* controls
 	m_fader_knob = QPixmap(PLUGIN_NAME::getIconPixmap("fader_knob2"));
 
 	// faders
-	Fader* gain1 = new Fader(&controls->m_gain1, tr("Band 1 gain"), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob);
+	Fader* gain1 = new Fader(&controls->m_gain1, tr("Band 1 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain1->move(7, 56);
 	gain1->setDisplayConversion(false);
 	gain1->setHintText(tr("Band 1 gain:"), " dBFS");
 
-	Fader* gain2 = new Fader(&controls->m_gain2, tr("Band 2 gain"), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob);
+	Fader* gain2 = new Fader(&controls->m_gain2, tr("Band 2 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain2->move(47, 56);
 	gain2->setDisplayConversion(false);
 	gain2->setHintText(tr("Band 2 gain:"), " dBFS");
 
-	Fader* gain3 = new Fader(&controls->m_gain3, tr("Band 3 gain"), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob);
+	Fader* gain3 = new Fader(&controls->m_gain3, tr("Band 3 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain3->move(87, 56);
 	gain3->setDisplayConversion(false);
 	gain3->setHintText(tr("Band 3 gain:"), " dBFS");
 
-	Fader* gain4 = new Fader(&controls->m_gain4, tr("Band 4 gain"), this,
-		&m_fader_bg, &m_fader_empty, &m_fader_knob);
+	Fader* gain4 = new Fader(&controls->m_gain4, tr("Band 4 gain"), this, &m_fader_bg, &m_fader_empty, &m_fader_knob);
 	gain4->move(127, 56);
 	gain4->setDisplayConversion(false);
 	gain4->setHintText(tr("Band 4 gain:"), " dBFS");

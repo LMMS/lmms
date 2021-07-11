@@ -73,19 +73,20 @@ void StepRecorder::stop()
 
 void StepRecorder::notePressed(const Note& n)
 {
-	//if this is the first pressed note in step, advance position
+	// if this is the first pressed note in step, advance position
 	if (!m_isStepInProgress)
 	{
 		m_isStepInProgress = true;
 
-		//move curser one step forwards
+		// move curser one step forwards
 		stepForwards();
 	}
 
 	StepNote* stepNote = findCurStepNote(n.key());
 	if (stepNote == nullptr)
 	{
-		m_curStepNotes.append(new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
+		m_curStepNotes.append(
+			new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
 		m_pianoRoll.update();
 	}
 	else if (stepNote->isReleased())
@@ -102,14 +103,15 @@ void StepRecorder::noteReleased(const Note& n)
 	{
 		stepNote->setReleased();
 
-		//if m_updateReleasedTimer is not already active, activate it
+		// if m_updateReleasedTimer is not already active, activate it
 		//(when activated, the timer will re-set itself as long as there are released notes)
 		if (!m_updateReleasedTimer.isActive())
 		{
 			m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS);
 		}
 
-		//check if all note are released, apply notes to pattern(or dimiss if length is zero) and prepare to record next step
+		// check if all note are released, apply notes to pattern(or dimiss if length is zero) and prepare to record
+		// next step
 		if (allCurStepNotesReleased())
 		{
 			if (m_curStepLength > 0)
@@ -156,7 +158,7 @@ void StepRecorder::setStepsLength(const TimePos& newLength)
 {
 	if (m_isStepInProgress)
 	{
-		//update current step length by the new amount : (number_of_steps * newLength)
+		// update current step length by the new amount : (number_of_steps * newLength)
 		m_curStepLength = (m_curStepLength / m_stepsLength) * newLength;
 
 		updateCurStepNotes();
@@ -208,7 +210,7 @@ void StepRecorder::stepBackwards()
 		}
 		else
 		{
-			//if length is already zero - move starting position backwards
+			// if length is already zero - move starting position backwards
 			m_curStepStartPos = max(m_curStepStartPos - m_stepsLength, 0);
 		}
 
@@ -287,7 +289,8 @@ void StepRecorder::removeNotesReleasedForTooLong()
 
 		if (stepNote->isReleased())
 		{
-			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
+			const int timeSinceReleased =
+				stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
 			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
 			{
 				delete stepNote;
@@ -317,10 +320,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	}
 }
 
-TimePos StepRecorder::getCurStepEndPos()
-{
-	return m_curStepStartPos + m_curStepLength;
-}
+TimePos StepRecorder::getCurStepEndPos() { return m_curStepStartPos + m_curStepLength; }
 
 void StepRecorder::updateCurStepNotes()
 {

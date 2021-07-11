@@ -34,8 +34,7 @@ public:
 
 	Alg_reader(istream* a_file, Alg_seq_ptr new_seq);
 	void readline();
-	Alg_parameters_ptr process_attributes(Alg_parameters_ptr attributes,
-		double time);
+	Alg_parameters_ptr process_attributes(Alg_parameters_ptr attributes, double time);
 	bool parse();
 	long parse_chan(string& field);
 	long parse_int(string& field);
@@ -111,8 +110,7 @@ void Alg_reader::readline()
 	}
 }
 
-Alg_parameters_ptr Alg_reader::process_attributes(
-	Alg_parameters_ptr attributes, double time)
+Alg_parameters_ptr Alg_reader::process_attributes(Alg_parameters_ptr attributes, double time)
 {
 	// print "process_attributes:", attributes
 	bool ts_flag = false;
@@ -142,8 +140,7 @@ Alg_parameters_ptr Alg_reader::process_attributes(
 		}
 		if (ts_flag)
 		{
-			seq->set_time_sig(seq->get_time_map()->time_to_beat(time),
-				tsnum, tsden);
+			seq->set_time_sig(seq->get_time_map()->time_to_beat(time), tsnum, tsden);
 		}
 		if (in_seconds)
 			seq->convert_to_seconds();
@@ -161,7 +158,7 @@ bool Alg_reader::parse()
 	double time = 0.0;
 	int track_num = 0;
 	seq->convert_to_seconds();
-	//seq->set_real_dur(0.0); // just in case it's not initialized already
+	// seq->set_real_dur(0.0); // just in case it's not initialized already
 	readline();
 	bool valid = false; // ignore blank lines
 	while (line_parser_flag)
@@ -205,10 +202,8 @@ bool Alg_reader::parse()
 					update->set_identifier(-1);
 					// sequence name is whatever is on track 0
 					// other tracks have track names
-					const char* attr =
-						(track_num == 0 ? "seqnames" : "tracknames");
-					update->parameter.set_attr(
-						symbol_table.insert_string(attr));
+					const char* attr = (track_num == 0 ? "seqnames" : "tracknames");
+					update->parameter.set_attr(symbol_table.insert_string(attr));
 					update->parameter.s = heapify(field.c_str());
 					seq->add_event(update, track_num);
 				}
@@ -644,8 +639,7 @@ double Alg_reader::parse_dur(string& field, double base)
 		string real_string = field.substr(1, last - 1);
 		dur = atof(real_string.c_str());
 		// convert dur from seconds to beats
-		dur = seq->get_time_map()->time_to_beat(base + dur) -
-			seq->get_time_map()->time_to_beat(base);
+		dur = seq->get_time_map()->time_to_beat(base + dur) - seq->get_time_map()->time_to_beat(base);
 	}
 	else if ((p = strchr(durs, toupper(field[1]))))
 	{
@@ -658,14 +652,11 @@ double Alg_reader::parse_dur(string& field, double base)
 		return 0;
 	}
 	dur = parse_after_dur(dur, field, last, base);
-	dur = seq->get_time_map()->beat_to_time(
-			  seq->get_time_map()->time_to_beat(base) + dur) -
-		base;
+	dur = seq->get_time_map()->beat_to_time(seq->get_time_map()->time_to_beat(base) + dur) - base;
 	return dur;
 }
 
-double Alg_reader::parse_after_dur(double dur, string& field,
-	int n, double base)
+double Alg_reader::parse_after_dur(double dur, string& field, int n, double base)
 {
 	if ((int)field.length() == n)
 	{
@@ -689,7 +680,8 @@ double Alg_reader::parse_after_dur(double dur, string& field,
 	if (field[n] == '+')
 	{
 		string a_string = field.substr(n + 1);
-		return dur + parse_dur(a_string, seq->get_time_map()->beat_to_time(seq->get_time_map()->time_to_beat(base) + dur));
+		return dur +
+			parse_dur(a_string, seq->get_time_map()->beat_to_time(seq->get_time_map()->time_to_beat(base) + dur));
 	}
 	parse_error(field, n, "Unexpected character in duration");
 	return dur;
@@ -699,9 +691,8 @@ struct loud_lookup_struct
 {
 	const char* str;
 	int val;
-} loud_lookup[] = {{"FFF", 127}, {"FF", 120}, {"F", 110}, {"MF", 100},
-	{"MP", 90}, {"P", 80}, {"PP", 70}, {"PPP", 60},
-	{NULL, 0}};
+} loud_lookup[] = {
+	{"FFF", 127}, {"FF", 120}, {"F", 110}, {"MF", 100}, {"MP", 90}, {"P", 80}, {"PP", 70}, {"PPP", 60}, {NULL, 0}};
 
 double Alg_reader::parse_loud(string& field)
 {
@@ -844,13 +835,11 @@ bool Alg_reader::parse_val(Alg_parameter_ptr param, string& s, int i)
 	}
 	else if (param->attr_type() == 'l')
 	{
-		if (streql(s.c_str() + i, "true") ||
-			streql(s.c_str() + i, "t"))
+		if (streql(s.c_str() + i, "true") || streql(s.c_str() + i, "t"))
 		{
 			param->l = true;
 		}
-		else if (streql(s.c_str() + i, "false") ||
-			streql(s.c_str() + i, "nil"))
+		else if (streql(s.c_str() + i, "false") || streql(s.c_str() + i, "nil"))
 		{
 			param->l = false;
 		}
@@ -917,19 +906,16 @@ bool Alg_reader::parse_val(Alg_parameter_ptr param, string& s, int i)
 	return true;
 }
 
-bool Alg_reader::check_type(char type_char, Alg_parameter_ptr param)
-{
-	return param->attr_type() == type_char;
-}
+bool Alg_reader::check_type(char type_char, Alg_parameter_ptr param) { return param->attr_type() == type_char; }
 
-//duration_lookup = {"S": 0.5, "I": 0.5, "Q": 1, "H": 2, "W": 4}
-//key_lookup = {"C": 12, "D": 14, "E": 16, "F": 17, "G": 19, "A": 21, "B": 23}
+// duration_lookup = {"S": 0.5, "I": 0.5, "Q": 1, "H": 2, "W": 4}
+// key_lookup = {"C": 12, "D": 14, "E": 16, "F": 17, "G": 19, "A": 21, "B": 23}
 
 /*
 def test():
-    reader = Alg_reader(open("data\\test.gro", "r"))
-    reader.parse()
-    score = reader->seq.notes
-    print "score:", score
-    reader = nil
+	reader = Alg_reader(open("data\\test.gro", "r"))
+	reader.parse()
+	score = reader->seq.notes
+	print "score:", score
+	reader = nil
 */

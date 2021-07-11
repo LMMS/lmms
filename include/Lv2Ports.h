@@ -142,8 +142,7 @@ struct PortBase : public Meta
 	virtual ~PortBase();
 };
 
-template <typename Derived, typename Base>
-struct VisitablePort : public Base
+template <typename Derived, typename Base> struct VisitablePort : public Base
 {
 	void accept(Visitor& v) override { v.visit(static_cast<Derived&>(*this)); }
 	void accept(ConstVisitor& v) const override { v.visit(static_cast<const Derived&>(*this)); }
@@ -183,16 +182,13 @@ struct Audio : public VisitablePort<Audio, PortBase>
 
 	//! Copy buffer passed by LMMS into our ports
 	//! @param channel channel index into each sample frame
-	void copyBuffersFromCore(const sampleFrame* lmmsBuf,
-		unsigned channel, fpp_t frames);
+	void copyBuffersFromCore(const sampleFrame* lmmsBuf, unsigned channel, fpp_t frames);
 	//! Add buffer passed by LMMS into our ports, and halve the result
 	//! @param channel channel index into each sample frame
-	void averageWithBuffersFromCore(const sampleFrame* lmmsBuf,
-		unsigned channel, fpp_t frames);
+	void averageWithBuffersFromCore(const sampleFrame* lmmsBuf, unsigned channel, fpp_t frames);
 	//! Copy our ports into buffers passed by LMMS
 	//! @param channel channel index into each sample frame
-	void copyBuffersToCore(sampleFrame* lmmsBuf,
-		unsigned channel, fpp_t frames) const;
+	void copyBuffersToCore(sampleFrame* lmmsBuf, unsigned channel, fpp_t frames) const;
 
 	bool isSideChain() const { return m_sidechain; }
 	bool isOptional() const { return m_optional; }
@@ -232,23 +228,20 @@ struct Unknown : public VisitablePort<Unknown, PortBase>
 /*
 	port casts
 */
-template <class Target>
-struct DCastVisitor : public Visitor
+template <class Target> struct DCastVisitor : public Visitor
 {
 	Target* m_result = nullptr;
 	void visit(Target& tar) { m_result = &tar; }
 };
 
-template <class Target>
-struct ConstDCastVisitor : public ConstVisitor
+template <class Target> struct ConstDCastVisitor : public ConstVisitor
 {
 	const Target* m_result = nullptr;
 	void visit(const Target& tar) { m_result = &tar; }
 };
 
 //! If you don't want to use a whole visitor, you can use dcast
-template <class Target>
-Target* dcast(PortBase* base)
+template <class Target> Target* dcast(PortBase* base)
 {
 	DCastVisitor<Target> vis;
 	base->accept(vis);
@@ -256,8 +249,7 @@ Target* dcast(PortBase* base)
 }
 
 //! const overload
-template <class Target>
-const Target* dcast(const PortBase* base)
+template <class Target> const Target* dcast(const PortBase* base)
 {
 	ConstDCastVisitor<Target> vis;
 	base->accept(vis);

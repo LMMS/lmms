@@ -50,17 +50,13 @@
 
 GuiApplication* GuiApplication::s_instance = nullptr;
 
-GuiApplication* GuiApplication::instance()
-{
-	return s_instance;
-}
+GuiApplication* GuiApplication::instance() { return s_instance; }
 
 GuiApplication::GuiApplication()
 {
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if (!ConfigManager::inst()->hasWorkingDir() &&
-		QMessageBox::question(NULL,
-			tr("Working directory"),
+		QMessageBox::question(NULL, tr("Working directory"),
 			tr("The LMMS working directory %1 does not "
 			   "exist. Create it now? You can change the directory "
 			   "later via Edit -> Settings.")
@@ -111,8 +107,7 @@ GuiApplication::GuiApplication()
 	splashScreen.update();
 	qApp->processEvents();
 
-	connect(Engine::inst(), SIGNAL(initProgress(const QString&)),
-		this, SLOT(displayInitProgress(const QString&)));
+	connect(Engine::inst(), SIGNAL(initProgress(const QString&)), this, SLOT(displayInitProgress(const QString&)));
 
 	// Init central engine which handles all components of LMMS
 	Engine::init(false);
@@ -123,8 +118,7 @@ GuiApplication::GuiApplication()
 
 	m_mainWindow = new MainWindow;
 	connect(m_mainWindow, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
-	connect(m_mainWindow, SIGNAL(initProgress(const QString&)),
-		this, SLOT(displayInitProgress(const QString&)));
+	connect(m_mainWindow, SIGNAL(initProgress(const QString&)), this, SLOT(displayInitProgress(const QString&)));
 
 	displayInitProgress(tr("Preparing song editor"));
 	m_songEditor = new SongEditorWindow(Engine::getSong());
@@ -160,10 +154,7 @@ GuiApplication::GuiApplication()
 	m_loadingProgressLabel = nullptr;
 }
 
-GuiApplication::~GuiApplication()
-{
-	s_instance = nullptr;
-}
+GuiApplication::~GuiApplication() { s_instance = nullptr; }
 
 void GuiApplication::displayInitProgress(const QString& msg)
 {

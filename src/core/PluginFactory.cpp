@@ -40,10 +40,7 @@ QStringList nameFilters("*.dll");
 QStringList nameFilters("lib*.so");
 #endif
 
-qint64 qHash(const QFileInfo& fi)
-{
-	return qHash(fi.absoluteFilePath());
-}
+qint64 qHash(const QFileInfo& fi) { return qHash(fi.absoluteFilePath()); }
 
 std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 
@@ -53,9 +50,7 @@ PluginFactory::PluginFactory()
 	discoverPlugins();
 }
 
-PluginFactory::~PluginFactory()
-{
-}
+PluginFactory::~PluginFactory() {}
 
 void PluginFactory::setupSearchPaths()
 {
@@ -100,20 +95,14 @@ PluginFactory* PluginFactory::instance()
 	return s_instance.get();
 }
 
-const Plugin::DescriptorList PluginFactory::descriptors() const
-{
-	return m_descriptors.values();
-}
+const Plugin::DescriptorList PluginFactory::descriptors() const { return m_descriptors.values(); }
 
 const Plugin::DescriptorList PluginFactory::descriptors(Plugin::PluginTypes type) const
 {
 	return m_descriptors.values(type);
 }
 
-const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const
-{
-	return m_pluginInfos;
-}
+const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const { return m_pluginInfos; }
 
 const PluginFactory::PluginInfoAndKey PluginFactory::pluginSupportingExtension(const QString& ext)
 {
@@ -179,10 +168,14 @@ void PluginFactory::discoverPlugins()
 				descriptorName = descriptorName.mid(3);
 			}
 
-			pluginDescriptor = reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
+			pluginDescriptor =
+				reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
 			if (pluginDescriptor == nullptr)
 			{
-				qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").arg(file.absoluteFilePath()).arg(descriptorName);
+				qWarning() << qApp->translate(
+									  "PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!")
+								  .arg(file.absoluteFilePath())
+								  .arg(descriptorName);
 				continue;
 			}
 		}
@@ -195,36 +188,29 @@ void PluginFactory::discoverPlugins()
 			info.descriptor = pluginDescriptor;
 			pluginInfos << info;
 
-			auto addSupportedFileTypes =
-				[this](QString supportedFileTypes,
-					const PluginInfo& info,
-					const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr) {
-					if (!supportedFileTypes.isNull())
+			auto addSupportedFileTypes = [this](QString supportedFileTypes, const PluginInfo& info,
+											 const Plugin::Descriptor::SubPluginFeatures::Key* key = nullptr) {
+				if (!supportedFileTypes.isNull())
+				{
+					for (const QString& ext : supportedFileTypes.split(','))
 					{
-						for (const QString& ext : supportedFileTypes.split(','))
-						{
-							//qDebug() << "Plugin " << info.name()
-							//	<< "supports" << ext;
-							PluginInfoAndKey infoAndKey;
-							infoAndKey.info = info;
-							infoAndKey.key = key
-								? *key
-								: Plugin::Descriptor::SubPluginFeatures::Key();
-							m_pluginByExt.insert(ext, infoAndKey);
-						}
+						// qDebug() << "Plugin " << info.name()
+						//	<< "supports" << ext;
+						PluginInfoAndKey infoAndKey;
+						infoAndKey.info = info;
+						infoAndKey.key = key ? *key : Plugin::Descriptor::SubPluginFeatures::Key();
+						m_pluginByExt.insert(ext, infoAndKey);
 					}
-				};
+				}
+			};
 
 			if (info.descriptor->supportedFileTypes)
 				addSupportedFileTypes(QString(info.descriptor->supportedFileTypes), info);
 
 			if (info.descriptor->subPluginFeatures)
 			{
-				Plugin::Descriptor::SubPluginFeatures::KeyList
-					subPluginKeys;
-				info.descriptor->subPluginFeatures->listSubPluginKeys(
-					info.descriptor,
-					subPluginKeys);
+				Plugin::Descriptor::SubPluginFeatures::KeyList subPluginKeys;
+				info.descriptor->subPluginFeatures->listSubPluginKeys(info.descriptor, subPluginKeys);
 				for (const Plugin::Descriptor::SubPluginFeatures::Key& key : subPluginKeys)
 				{
 					addSupportedFileTypes(key.additionalFileExtensions(), info, &key);
@@ -239,7 +225,4 @@ void PluginFactory::discoverPlugins()
 	m_descriptors = descriptors;
 }
 
-const QString PluginFactory::PluginInfo::name() const
-{
-	return descriptor ? descriptor->name : QString();
-}
+const QString PluginFactory::PluginInfo::name() const { return descriptor ? descriptor->name : QString(); }

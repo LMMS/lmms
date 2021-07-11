@@ -65,9 +65,7 @@
 #endif
 
 AudioOss::AudioOss(bool& _success_ful, Mixer* _mixer)
-	: AudioDevice(qBound<ch_cnt_t>(
-					  DEFAULT_CHANNELS,
-					  ConfigManager::inst()->value("audiooss", "channels").toInt(),
+	: AudioDevice(qBound<ch_cnt_t>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiooss", "channels").toInt(),
 					  SURROUND_CHANNELS),
 		  _mixer)
 	, m_convertEndian(false)
@@ -94,9 +92,8 @@ AudioOss::AudioOss(bool& _success_ful, Mixer* _mixer)
 	fcntl(m_audioFD, F_SETFD, fcntl(m_audioFD, F_GETFD) | FD_CLOEXEC);
 
 	int frag_spec;
-	for (frag_spec = 0; static_cast<int>(0x01 << frag_spec) <
-		 mixer()->framesPerPeriod() * channels() *
-			 BYTES_PER_INT_SAMPLE;
+	for (frag_spec = 0;
+		 static_cast<int>(0x01 << frag_spec) < mixer()->framesPerPeriod() * channels() * BYTES_PER_INT_SAMPLE;
 		 ++frag_spec)
 	{
 	}
@@ -137,8 +134,7 @@ AudioOss::AudioOss(bool& _success_ful, Mixer* _mixer)
 		printf("Couldn't set audio format\n");
 		return;
 	}
-	if ((isLittleEndian() && (value == AFMT_S16_BE)) ||
-		(!isLittleEndian() && (value == AFMT_S16_LE)))
+	if ((isLittleEndian() && (value == AFMT_S16_BE)) || (!isLittleEndian() && (value == AFMT_S16_LE)))
 	{
 		m_convertEndian = true;
 	}
@@ -232,10 +228,7 @@ void AudioOss::startProcessing()
 	}
 }
 
-void AudioOss::stopProcessing()
-{
-	stopProcessingThread(this);
-}
+void AudioOss::stopProcessing() { stopProcessingThread(this); }
 
 void AudioOss::applyQualitySettings()
 {
@@ -268,11 +261,8 @@ void AudioOss::applyQualitySettings()
 
 void AudioOss::run()
 {
-	surroundSampleFrame* temp =
-		new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t* outbuf =
-		new int_sample_t[mixer()->framesPerPeriod() *
-			channels()];
+	surroundSampleFrame* temp = new surroundSampleFrame[mixer()->framesPerPeriod()];
+	int_sample_t* outbuf = new int_sample_t[mixer()->framesPerPeriod() * channels()];
 
 	while (true)
 	{
@@ -282,9 +272,7 @@ void AudioOss::run()
 			break;
 		}
 
-		int bytes = convertToS16(temp, frames,
-			mixer()->masterGain(), outbuf,
-			m_convertEndian);
+		int bytes = convertToS16(temp, frames, mixer()->masterGain(), outbuf, m_convertEndian);
 		if (write(m_audioFD, outbuf, bytes) != bytes)
 		{
 			break;
@@ -308,9 +296,7 @@ AudioOss::setupWidget::setupWidget(QWidget* _parent)
 	LcdSpinBoxModel* m = new LcdSpinBoxModel(/* this */);
 	m->setRange(DEFAULT_CHANNELS, SURROUND_CHANNELS);
 	m->setStep(2);
-	m->setValue(ConfigManager::inst()->value("audiooss",
-										 "channels")
-					.toInt());
+	m->setValue(ConfigManager::inst()->value("audiooss", "channels").toInt());
 
 	m_channels = new LcdSpinBox(1, this);
 	m_channels->setModel(m);
@@ -318,17 +304,12 @@ AudioOss::setupWidget::setupWidget(QWidget* _parent)
 	m_channels->move(180, 20);
 }
 
-AudioOss::setupWidget::~setupWidget()
-{
-	delete m_channels->model();
-}
+AudioOss::setupWidget::~setupWidget() { delete m_channels->model(); }
 
 void AudioOss::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue("audiooss", "device",
-		m_device->text());
-	ConfigManager::inst()->setValue("audiooss", "channels",
-		QString::number(m_channels->value<int>()));
+	ConfigManager::inst()->setValue("audiooss", "device", m_device->text());
+	ConfigManager::inst()->setValue("audiooss", "channels", QString::number(m_channels->value<int>()));
 }
 
 #endif

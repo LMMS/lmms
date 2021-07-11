@@ -43,26 +43,22 @@ waveShaperControls::waveShaperControls(waveShaperEffect* _eff)
 	, m_wavegraphModel(0.0f, 1.0f, 200, this)
 	, m_clipModel(false, this)
 {
-	connect(&m_wavegraphModel, SIGNAL(samplesChanged(int, int)),
-		this, SLOT(samplesChanged(int, int)));
+	connect(&m_wavegraphModel, SIGNAL(samplesChanged(int, int)), this, SLOT(samplesChanged(int, int)));
 
 	setDefaultShape();
 }
 
-void waveShaperControls::samplesChanged(int _begin, int _end)
-{
-	Engine::getSong()->setModified();
-}
+void waveShaperControls::samplesChanged(int _begin, int _end) { Engine::getSong()->setModified(); }
 
 void waveShaperControls::loadSettings(const QDomElement& _this)
 {
-	//load input, output knobs
+	// load input, output knobs
 	m_inputModel.loadSettings(_this, "inputGain");
 	m_outputModel.loadSettings(_this, "outputGain");
 
 	m_clipModel.loadSettings(_this, "clipInput");
 
-	//load waveshape
+	// load waveshape
 	int size = 0;
 	char* dst = 0;
 	base64::decode(_this.attribute("waveShape"), &dst, &size);
@@ -71,19 +67,17 @@ void waveShaperControls::loadSettings(const QDomElement& _this)
 	delete[] dst;
 }
 
-void waveShaperControls::saveSettings(QDomDocument& _doc,
-	QDomElement& _this)
+void waveShaperControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
-	//save input, output knobs
+	// save input, output knobs
 	m_inputModel.saveSettings(_doc, _this, "inputGain");
 	m_outputModel.saveSettings(_doc, _this, "outputGain");
 
 	m_clipModel.saveSettings(_doc, _this, "clipInput");
 
-	//save waveshape
+	// save waveshape
 	QString sampleString;
-	base64::encode((const char*)m_wavegraphModel.samples(),
-		m_wavegraphModel.length() * sizeof(float), sampleString);
+	base64::encode((const char*)m_wavegraphModel.samples(), m_wavegraphModel.length() * sizeof(float), sampleString);
 	_this.setAttribute("waveShape", sampleString);
 }
 

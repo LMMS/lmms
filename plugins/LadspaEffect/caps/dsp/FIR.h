@@ -1,8 +1,8 @@
 /*
 	dsp/FIR.h
-	
+
 	Copyright 2003-10 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	finite impulse response filters, with options for up- and down-sampling.
@@ -33,10 +33,10 @@
 namespace DSP
 {
 
-/* brute-force FIR filter with downsampling method (decimating). 
+/* brute-force FIR filter with downsampling method (decimating).
  *
- * CAVEAT: constructing it from another FIR makes the filter share the other's 
- * kernel data set. IOW, the other FIR must be valid throughout the lifetime 
+ * CAVEAT: constructing it from another FIR makes the filter share the other's
+ * kernel data set. IOW, the other FIR must be valid throughout the lifetime
  * of this instance.
  */
 class FIR
@@ -83,14 +83,13 @@ public:
 		n = N;
 
 		/* keeping history size a power of 2 makes it possible to wrap the
-				 * history pointer by & instead of %, saving a few cpu cycles. */
+		 * history pointer by & instead of %, saving a few cpu cycles. */
 		m = next_power_of_2(n);
 
 		if (c)
 			borrowed_kernel = true;
 		else
-			borrowed_kernel = false,
-			c = (sample_t*)malloc(n * sizeof(sample_t));
+			borrowed_kernel = false, c = (sample_t*)malloc(n * sizeof(sample_t));
 
 		x = (sample_t*)malloc(m * sizeof(sample_t));
 
@@ -121,19 +120,18 @@ public:
 	}
 
 	/* Z is the time, in samples, since the last non-zero sample.
-		 * OVER is the oversampling factor. just here for documentation, use
-		 * a FIRUpsampler instead.
-		 */
-	template <int Z, int OVER>
-	inline sample_t upsample(sample_t s)
+	 * OVER is the oversampling factor. just here for documentation, use
+	 * a FIRUpsampler instead.
+	 */
+	template <int Z, int OVER> inline sample_t upsample(sample_t s)
 	{
 		x[h] = s;
 
 		s = 0;
 
 		/* for the interpolation, iterate over the history in z ^ -OVER
-				 * steps -- all the samples between are 0.
-				 */
+		 * steps -- all the samples between are 0.
+		 */
 		for (int j = Z, z = h - Z; j < n; --z, j += OVER)
 			s += c[j] * x[z & m];
 
@@ -151,7 +149,7 @@ public:
 };
 
 /* close relative of FIR, but distinct enough to not justify inheritance.
- * 
+ *
  * the difference to the FIR is the shorter history length. don't need
  * to clutter the d-cache with interleaved 0s.
  *
@@ -203,8 +201,8 @@ public:
 		over = _over;
 
 		/* like FIR, keep the history buffer a power of 2; additionally,
-				 * compress and don't store the 0 samples inbetween.
-				 */
+		 * compress and don't store the 0 samples inbetween.
+		 */
 		m = next_power_of_2((n + over - 1) / over);
 
 		c = (sample_t*)malloc(n * sizeof(sample_t));
@@ -237,7 +235,7 @@ public:
 	}
 
 	/* upsample a zero sample (interleaving), Z being the time, in samples,
-		 * since the last non-0 sample. */
+	 * since the last non-0 sample. */
 	inline sample_t pad(int Z)
 	{
 		sample_t s = 0;

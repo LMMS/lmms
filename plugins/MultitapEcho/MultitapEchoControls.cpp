@@ -54,9 +54,7 @@ MultitapEchoControls::MultitapEchoControls(MultitapEchoEffect* eff)
 	setDefaultLpShape();
 }
 
-MultitapEchoControls::~MultitapEchoControls()
-{
-}
+MultitapEchoControls::~MultitapEchoControls() {}
 
 void MultitapEchoControls::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
@@ -130,14 +128,11 @@ void MultitapEchoControls::ampSamplesChanged(int begin, int end)
 	}
 }
 
-void MultitapEchoControls::ampResetClicked()
-{
-	setDefaultAmpShape();
-}
+void MultitapEchoControls::ampResetClicked() { setDefaultAmpShape(); }
 
 void MultitapEchoControls::lpSamplesChanged(int begin, int end)
 {
-	//qDebug( "b/e %d - %d", begin, end );
+	// qDebug( "b/e %d - %d", begin, end );
 	const float* samples = m_lpGraph.samples();
 	for (int i = begin; i <= end; ++i)
 	{
@@ -146,10 +141,7 @@ void MultitapEchoControls::lpSamplesChanged(int begin, int end)
 	m_effect->updateFilters(begin, end);
 }
 
-void MultitapEchoControls::lpResetClicked()
-{
-	setDefaultLpShape();
-}
+void MultitapEchoControls::lpResetClicked() { setDefaultLpShape(); }
 
 void MultitapEchoControls::lengthChanged()
 {

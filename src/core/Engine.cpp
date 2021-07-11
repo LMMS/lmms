@@ -99,7 +99,7 @@ void LmmsCore::destroy()
 #endif
 	deleteHelper(&s_ladspaManager);
 
-	//delete ConfigManager::inst();
+	// delete ConfigManager::inst();
 	deleteHelper(&s_projectJournal);
 
 	deleteHelper(&s_song);
@@ -115,14 +115,12 @@ bool LmmsCore::ignorePluginBlacklist()
 
 float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 {
-	return sampleRate * 60.0f * 4 /
-		DefaultTicksPerBar / s_song->getTempo();
+	return sampleRate * 60.0f * 4 / DefaultTicksPerBar / s_song->getTempo();
 }
 
 void LmmsCore::updateFramesPerTick()
 {
-	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-		DefaultTicksPerBar / s_song->getTempo();
+	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 / DefaultTicksPerBar / s_song->getTempo();
 }
 
 void LmmsCore::setDndPluginKey(void* newKey)
@@ -131,9 +129,6 @@ void LmmsCore::setDndPluginKey(void* newKey)
 	s_dndPluginKey = newKey;
 }
 
-void* LmmsCore::pickDndPluginKey()
-{
-	return s_dndPluginKey;
-}
+void* LmmsCore::pickDndPluginKey() { return s_dndPluginKey; }
 
 LmmsCore* LmmsCore::s_instanceOfMe = NULL;

@@ -40,10 +40,7 @@ public:
 
 	void setAbsolutePosition(double ticks);
 
-	void setPlaybackState(bool enabled)
-	{
-		m_syncData->isPlaying = enabled;
-	}
+	void setPlaybackState(bool enabled) { m_syncData->isPlaying = enabled; }
 
 	void setTempo(int newTempo);
 
@@ -55,15 +52,9 @@ public:
 
 	void startCycle(int startTick, int endTick);
 
-	void stopCycle()
-	{
-		m_syncData->isCycle = false;
-	}
+	void stopCycle() { m_syncData->isCycle = false; }
 
-	void setPlaybackJumped(bool jumped)
-	{
-		m_syncData->m_playbackJumped = jumped;
-	}
+	void setPlaybackJumped(bool jumped) { m_syncData->m_playbackJumped = jumped; }
 
 	void update();
 

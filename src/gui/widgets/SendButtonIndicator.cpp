@@ -5,8 +5,7 @@
 QPixmap* SendButtonIndicator::s_qpmOff = NULL;
 QPixmap* SendButtonIndicator::s_qpmOn = NULL;
 
-SendButtonIndicator::SendButtonIndicator(QWidget* _parent, FxLine* _owner,
-	FxMixerView* _mv)
+SendButtonIndicator::SendButtonIndicator(QWidget* _parent, FxLine* _owner, FxMixerView* _mv)
 	: QLabel(_parent)
 	, m_parent(_owner)
 	, m_mv(_mv)
@@ -51,11 +50,7 @@ void SendButtonIndicator::mousePressEvent(QMouseEvent* e)
 FloatModel* SendButtonIndicator::getSendModel()
 {
 	FxMixer* mix = Engine::fxMixer();
-	return mix->channelSendModel(
-		m_mv->currentFxLine()->channelIndex(), m_parent->channelIndex());
+	return mix->channelSendModel(m_mv->currentFxLine()->channelIndex(), m_parent->channelIndex());
 }
 
-void SendButtonIndicator::updateLightStatus()
-{
-	setPixmap(getSendModel() == NULL ? *s_qpmOff : *s_qpmOn);
-}
+void SendButtonIndicator::updateLightStatus() { setPixmap(getSendModel() == NULL ? *s_qpmOff : *s_qpmOn); }

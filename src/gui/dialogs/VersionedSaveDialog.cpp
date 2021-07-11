@@ -35,11 +35,8 @@
 #include "DeprecationHelper.h"
 #include "LedCheckbox.h"
 
-VersionedSaveDialog::VersionedSaveDialog(QWidget* parent,
-	QWidget* saveOptionsWidget,
-	const QString& caption,
-	const QString& directory,
-	const QString& filter)
+VersionedSaveDialog::VersionedSaveDialog(QWidget* parent, QWidget* saveOptionsWidget, const QString& caption,
+	const QString& directory, const QString& filter)
 	: FileDialog(parent, caption, directory, filter)
 {
 	setAcceptMode(QFileDialog::AcceptSave);
@@ -149,11 +146,11 @@ bool VersionedSaveDialog::fileExistsQuery(QString FileName, QString WindowTitle)
 	{
 		QMessageBox mb;
 		mb.setWindowTitle(WindowTitle);
-		mb.setText(FileName + tr(" already exists. "
-								 "Do you want to replace it?"));
+		mb.setText(FileName +
+			tr(" already exists. "
+			   "Do you want to replace it?"));
 		mb.setIcon(QMessageBox::Warning);
-		mb.setStandardButtons(
-			QMessageBox::Yes | QMessageBox::No);
+		mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
 		if (mb.exec() == QMessageBox::Yes)
 		{

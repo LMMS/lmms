@@ -32,17 +32,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Compressor",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
-			"Lost Robot <r94231@gmail.com>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Compressor",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."), "Lost Robot <r94231@gmail.com>", 0x0100,
+		Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
@@ -60,36 +52,47 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	m_crestTimeConst = exp(-1.f / (0.2f * m_sampleRate));
 
 	connect(&m_compressorControls.m_attackModel, SIGNAL(dataChanged()), this, SLOT(calcAttack()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_releaseModel, SIGNAL(dataChanged()), this, SLOT(calcRelease()), Qt::DirectConnection);
+	connect(
+		&m_compressorControls.m_releaseModel, SIGNAL(dataChanged()), this, SLOT(calcRelease()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_holdModel, SIGNAL(dataChanged()), this, SLOT(calcHold()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_ratioModel, SIGNAL(dataChanged()), this, SLOT(calcRatio()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_rangeModel, SIGNAL(dataChanged()), this, SLOT(calcRange()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_rmsModel, SIGNAL(dataChanged()), this, SLOT(resizeRMS()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_lookaheadLengthModel, SIGNAL(dataChanged()), this, SLOT(calcLookaheadLength()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_thresholdModel, SIGNAL(dataChanged()), this, SLOT(calcThreshold()), Qt::DirectConnection);
+	connect(&m_compressorControls.m_lookaheadLengthModel, SIGNAL(dataChanged()), this, SLOT(calcLookaheadLength()),
+		Qt::DirectConnection);
+	connect(&m_compressorControls.m_thresholdModel, SIGNAL(dataChanged()), this, SLOT(calcThreshold()),
+		Qt::DirectConnection);
 	connect(&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcKnee()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_outGainModel, SIGNAL(dataChanged()), this, SLOT(calcOutGain()), Qt::DirectConnection);
+	connect(
+		&m_compressorControls.m_outGainModel, SIGNAL(dataChanged()), this, SLOT(calcOutGain()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_inGainModel, SIGNAL(dataChanged()), this, SLOT(calcInGain()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_tiltModel, SIGNAL(dataChanged()), this, SLOT(calcTiltCoeffs()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_tiltFreqModel, SIGNAL(dataChanged()), this, SLOT(calcTiltCoeffs()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_limiterModel, SIGNAL(dataChanged()), this, SLOT(redrawKnee()), Qt::DirectConnection);
+	connect(
+		&m_compressorControls.m_tiltModel, SIGNAL(dataChanged()), this, SLOT(calcTiltCoeffs()), Qt::DirectConnection);
+	connect(&m_compressorControls.m_tiltFreqModel, SIGNAL(dataChanged()), this, SLOT(calcTiltCoeffs()),
+		Qt::DirectConnection);
+	connect(
+		&m_compressorControls.m_limiterModel, SIGNAL(dataChanged()), this, SLOT(redrawKnee()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_mixModel, SIGNAL(dataChanged()), this, SLOT(calcMix()), Qt::DirectConnection);
 
-	connect(&m_compressorControls.m_autoAttackModel, SIGNAL(dataChanged()), this, SLOT(calcAutoAttack()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_autoReleaseModel, SIGNAL(dataChanged()), this, SLOT(calcAutoRelease()), Qt::DirectConnection);
+	connect(&m_compressorControls.m_autoAttackModel, SIGNAL(dataChanged()), this, SLOT(calcAutoAttack()),
+		Qt::DirectConnection);
+	connect(&m_compressorControls.m_autoReleaseModel, SIGNAL(dataChanged()), this, SLOT(calcAutoRelease()),
+		Qt::DirectConnection);
 
-	connect(&m_compressorControls.m_thresholdModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_ratioModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
-	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
+	connect(&m_compressorControls.m_thresholdModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()),
+		Qt::DirectConnection);
+	connect(
+		&m_compressorControls.m_ratioModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
+	connect(
+		&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
+	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()),
+		Qt::DirectConnection);
 
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	changeSampleRate();
 }
 
-CompressorEffect::~CompressorEffect()
-{
-}
+CompressorEffect::~CompressorEffect() {}
 
 float CompressorEffect::msToCoeff(float ms)
 {
@@ -105,37 +108,25 @@ void CompressorEffect::calcAutoMakeup()
 	if (-m_thresholdVal < m_kneeVal)
 	{
 		const float temp = -m_thresholdVal + m_kneeVal;
-		tempGainResult = ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
+		tempGainResult =
+			((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 	}
 	else // Above knee
 	{
-		tempGainResult = m_compressorControls.m_limiterModel.value()
-			? m_thresholdVal
-			: m_thresholdVal - m_thresholdVal * m_ratioVal;
+		tempGainResult =
+			m_compressorControls.m_limiterModel.value() ? m_thresholdVal : m_thresholdVal - m_thresholdVal * m_ratioVal;
 	}
 
 	m_autoMakeupVal = 1.f / dbfsToAmp(tempGainResult);
 }
 
-void CompressorEffect::calcAttack()
-{
-	m_attCoeff = msToCoeff(m_compressorControls.m_attackModel.value());
-}
+void CompressorEffect::calcAttack() { m_attCoeff = msToCoeff(m_compressorControls.m_attackModel.value()); }
 
-void CompressorEffect::calcRelease()
-{
-	m_relCoeff = msToCoeff(m_compressorControls.m_releaseModel.value());
-}
+void CompressorEffect::calcRelease() { m_relCoeff = msToCoeff(m_compressorControls.m_releaseModel.value()); }
 
-void CompressorEffect::calcAutoAttack()
-{
-	m_autoAttVal = m_compressorControls.m_autoAttackModel.value() * 0.01f;
-}
+void CompressorEffect::calcAutoAttack() { m_autoAttVal = m_compressorControls.m_autoAttackModel.value() * 0.01f; }
 
-void CompressorEffect::calcAutoRelease()
-{
-	m_autoRelVal = m_compressorControls.m_autoReleaseModel.value() * 0.01f;
-}
+void CompressorEffect::calcAutoRelease() { m_autoRelVal = m_compressorControls.m_autoReleaseModel.value() * 0.01f; }
 
 void CompressorEffect::calcHold()
 {
@@ -191,15 +182,9 @@ void CompressorEffect::calcKnee()
 	m_redrawKnee = true;
 }
 
-void CompressorEffect::calcInGain()
-{
-	m_inGainVal = dbfsToAmp(m_compressorControls.m_inGainModel.value());
-}
+void CompressorEffect::calcInGain() { m_inGainVal = dbfsToAmp(m_compressorControls.m_inGainModel.value()); }
 
-void CompressorEffect::redrawKnee()
-{
-	m_redrawKnee = true;
-}
+void CompressorEffect::redrawKnee() { m_redrawKnee = true; }
 
 void CompressorEffect::calcTiltCoeffs()
 {
@@ -220,10 +205,7 @@ void CompressorEffect::calcTiltCoeffs()
 	m_b1 = (m_sampleRate * 3 - omega) * n;
 }
 
-void CompressorEffect::calcMix()
-{
-	m_mixVal = m_compressorControls.m_mixModel.value() * 0.01;
-}
+void CompressorEffect::calcMix() { m_mixVal = m_compressorControls.m_mixModel.value() * 0.01; }
 
 bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
@@ -308,8 +290,10 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			float inputValue = feedback ? m_prevOut[i] : s[i];
 
 			// Calculate the crest factor of the audio by diving the peak by the RMS
-			m_crestPeakVal[i] = qMax(inputValue * inputValue, m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
-			m_crestRmsVal[i] = m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestPeakVal[i] = qMax(inputValue * inputValue,
+				m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestRmsVal[i] =
+				m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
 			m_crestFactorVal[i] = m_crestPeakVal[i] / m_crestRmsVal[i];
 
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
@@ -355,7 +339,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 				if (--m_maxLookaheadTimer[i] <= 0)
 				{
 					m_maxLookaheadTimer[i] = std::distance(std::begin(m_lookaheadBuf[i]),
-						std::max_element(std::begin(m_lookaheadBuf[i]), std::begin(m_lookaheadBuf[i]) + m_lookaheadLength));
+						std::max_element(
+							std::begin(m_lookaheadBuf[i]), std::begin(m_lookaheadBuf[i]) + m_lookaheadLength));
 					m_maxLookaheadVal[i] = m_lookaheadBuf[i][m_maxLookaheadTimer[i]];
 					m_maxLookaheadTimer[i] = realmod(m_maxLookaheadTimer[i] - m_lookaheadBufLoc[i], m_lookaheadLength);
 				}
@@ -420,9 +405,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 			else // Above knee
 			{
-				m_gainResult[i] = limiter
-					? m_thresholdVal
-					: m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal;
+				m_gainResult[i] =
+					limiter ? m_thresholdVal : m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal;
 			}
 
 			m_gainResult[i] = dbfsToAmp(m_gainResult[i]) / m_yL[i];
@@ -571,16 +555,10 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 }
 
 // Regular modulo doesn't handle negative numbers correctly.  This does.
-inline int CompressorEffect::realmod(int k, int n)
-{
-	return (k %= n) < 0 ? k + n : k;
-}
+inline int CompressorEffect::realmod(int k, int n) { return (k %= n) < 0 ? k + n : k; }
 
 // Regular fmod doesn't handle negative numbers correctly.  This does.
-inline float CompressorEffect::realfmod(float k, float n)
-{
-	return (k = fmod(k, n)) < 0 ? k + n : k;
-}
+inline float CompressorEffect::realfmod(float k, float n) { return (k = fmod(k, n)) < 0 ? k + n : k; }
 
 inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t& outputSample, int filtNum)
 {

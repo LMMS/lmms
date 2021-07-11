@@ -61,25 +61,41 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 	m_parameterWidget = new EqParameterWidget(this, controls);
 	m_parameterWidget->move(26, 17);
 
-	setBand(0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(255, 255, 255), tr("HP"), 0, 0, &controls->m_hp12Model, &controls->m_hp24Model, &controls->m_hp48Model, 0, 0, 0);
-	setBand(1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255, 255, 255), tr("Low-shelf"), &controls->m_lowShelfPeakL, &controls->m_lowShelfPeakR, 0, 0, 0, 0, 0, 0);
-	setBand(2, &controls->m_para1ActiveModel, &controls->m_para1FreqModel, &controls->m_para1BwModel, &controls->m_para1GainModel, QColor(255, 255, 255), tr("Peak 1"), &controls->m_para1PeakL, &controls->m_para1PeakR, 0, 0, 0, 0, 0, 0);
-	setBand(3, &controls->m_para2ActiveModel, &controls->m_para2FreqModel, &controls->m_para2BwModel, &controls->m_para2GainModel, QColor(255, 255, 255), tr("Peak 2"), &controls->m_para2PeakL, &controls->m_para2PeakR, 0, 0, 0, 0, 0, 0);
-	setBand(4, &controls->m_para3ActiveModel, &controls->m_para3FreqModel, &controls->m_para3BwModel, &controls->m_para3GainModel, QColor(255, 255, 255), tr("Peak 3"), &controls->m_para3PeakL, &controls->m_para3PeakR, 0, 0, 0, 0, 0, 0);
-	setBand(5, &controls->m_para4ActiveModel, &controls->m_para4FreqModel, &controls->m_para4BwModel, &controls->m_para4GainModel, QColor(255, 255, 255), tr("Peak 4"), &controls->m_para4PeakL, &controls->m_para4PeakR, 0, 0, 0, 0, 0, 0);
-	setBand(6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255, 255, 255), tr("High-shelf"), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR, 0, 0, 0, 0, 0, 0);
-	setBand(7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255, 255, 255), tr("LP"), 0, 0, 0, 0, 0, &controls->m_lp12Model, &controls->m_lp24Model, &controls->m_lp48Model);
+	setBand(0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(255, 255, 255),
+		tr("HP"), 0, 0, &controls->m_hp12Model, &controls->m_hp24Model, &controls->m_hp48Model, 0, 0, 0);
+	setBand(1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel,
+		&controls->m_lowShelfGainModel, QColor(255, 255, 255), tr("Low-shelf"), &controls->m_lowShelfPeakL,
+		&controls->m_lowShelfPeakR, 0, 0, 0, 0, 0, 0);
+	setBand(2, &controls->m_para1ActiveModel, &controls->m_para1FreqModel, &controls->m_para1BwModel,
+		&controls->m_para1GainModel, QColor(255, 255, 255), tr("Peak 1"), &controls->m_para1PeakL,
+		&controls->m_para1PeakR, 0, 0, 0, 0, 0, 0);
+	setBand(3, &controls->m_para2ActiveModel, &controls->m_para2FreqModel, &controls->m_para2BwModel,
+		&controls->m_para2GainModel, QColor(255, 255, 255), tr("Peak 2"), &controls->m_para2PeakL,
+		&controls->m_para2PeakR, 0, 0, 0, 0, 0, 0);
+	setBand(4, &controls->m_para3ActiveModel, &controls->m_para3FreqModel, &controls->m_para3BwModel,
+		&controls->m_para3GainModel, QColor(255, 255, 255), tr("Peak 3"), &controls->m_para3PeakL,
+		&controls->m_para3PeakR, 0, 0, 0, 0, 0, 0);
+	setBand(5, &controls->m_para4ActiveModel, &controls->m_para4FreqModel, &controls->m_para4BwModel,
+		&controls->m_para4GainModel, QColor(255, 255, 255), tr("Peak 4"), &controls->m_para4PeakL,
+		&controls->m_para4PeakR, 0, 0, 0, 0, 0, 0);
+	setBand(6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel,
+		&controls->m_highShelfGainModel, QColor(255, 255, 255), tr("High-shelf"), &controls->m_highShelfPeakL,
+		&controls->m_highShelfPeakR, 0, 0, 0, 0, 0, 0);
+	setBand(7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255, 255, 255),
+		tr("LP"), 0, 0, 0, 0, 0, &controls->m_lp12Model, &controls->m_lp24Model, &controls->m_lp48Model);
 
 	QPixmap* faderBg = new QPixmap(PLUGIN_NAME::getIconPixmap("faderback"));
 	QPixmap* faderLeds = new QPixmap(PLUGIN_NAME::getIconPixmap("faderleds"));
 	QPixmap* faderKnob = new QPixmap(PLUGIN_NAME::getIconPixmap("faderknob"));
 
-	EqFader* GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, faderBg, faderLeds, faderKnob, &controls->m_inPeakL, &controls->m_inPeakR);
+	EqFader* GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, faderBg, faderLeds, faderKnob,
+		&controls->m_inPeakL, &controls->m_inPeakR);
 	GainFaderIn->move(23, 295);
 	GainFaderIn->setDisplayConversion(false);
 	GainFaderIn->setHintText(tr("Gain"), "dBv");
 
-	EqFader* GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, faderBg, faderLeds, faderKnob, &controls->m_outPeakL, &controls->m_outPeakR);
+	EqFader* GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, faderBg, faderLeds,
+		faderKnob, &controls->m_outPeakL, &controls->m_outPeakR);
 	GainFaderOut->move(453, 295);
 	GainFaderOut->setDisplayConversion(false);
 	GainFaderOut->setHintText(tr("Gain"), "dBv");
@@ -88,7 +104,8 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 	int distance = 126;
 	for (int i = 1; i < m_parameterWidget->bandCount() - 1; i++)
 	{
-		EqFader* gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, faderBg, faderLeds, faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
+		EqFader* gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, faderBg, faderLeds,
+			faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
 		gainFader->move(distance, 295);
 		distance += 44;
 		gainFader->setMinimumHeight(80);
@@ -97,7 +114,7 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 		gainFader->setHintText(tr("Gain"), "dB");
 	}
 
-	//Control Button and Knobs for each Band
+	// Control Button and Knobs for each Band
 	distance = 81;
 	for (int i = 0; i < m_parameterWidget->bandCount(); i++)
 	{
@@ -133,11 +150,15 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 		activeButton->setModel(m_parameterWidget->getBandModels(i)->active);
 
 		// Connects the knobs, Faders and buttons with the curve graphic
-		QObject::connect(m_parameterWidget->getBandModels(i)->freq, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+		QObject::connect(
+			m_parameterWidget->getBandModels(i)->freq, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
 		if (m_parameterWidget->getBandModels(i)->gain)
-			QObject::connect(m_parameterWidget->getBandModels(i)->gain, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
-		QObject::connect(m_parameterWidget->getBandModels(i)->res, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
-		QObject::connect(m_parameterWidget->getBandModels(i)->active, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+			QObject::connect(m_parameterWidget->getBandModels(i)->gain, SIGNAL(dataChanged()), m_parameterWidget,
+				SLOT(updateHandle()));
+		QObject::connect(
+			m_parameterWidget->getBandModels(i)->res, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+		QObject::connect(m_parameterWidget->getBandModels(i)->active, SIGNAL(dataChanged()), m_parameterWidget,
+			SLOT(updateHandle()));
 
 		m_parameterWidget->changeHandle(i);
 		distance += 44;
@@ -153,7 +174,7 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 	outSpecButton->setModel(&controls->m_analyseOutModel);
 	outSpecButton->move(302, 240);
 
-	//hp filter type
+	// hp filter type
 	PixmapButton* hp12Button = new PixmapButton(this, NULL);
 	hp12Button->setModel(m_parameterWidget->getBandModels(0)->hp12);
 	hp12Button->setActiveGraphic(PLUGIN_NAME::getIconPixmap("12dB"));
@@ -171,7 +192,7 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 	hp48Button->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("48dBoff"));
 
 	hp48Button->move(79, 358);
-	//LP filter type
+	// LP filter type
 	PixmapButton* lp12Button = new PixmapButton(this, NULL);
 	lp12Button->setModel(m_parameterWidget->getBandModels(7)->lp12);
 	lp12Button->setActiveGraphic(PLUGIN_NAME::getIconPixmap("12dB"));
@@ -192,13 +213,19 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 
 	lp48Button->move(387, 358);
 	// the curve has to change its appearance
-	QObject::connect(m_parameterWidget->getBandModels(0)->hp12, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
-	QObject::connect(m_parameterWidget->getBandModels(0)->hp24, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
-	QObject::connect(m_parameterWidget->getBandModels(0)->hp48, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+	QObject::connect(
+		m_parameterWidget->getBandModels(0)->hp12, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+	QObject::connect(
+		m_parameterWidget->getBandModels(0)->hp24, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+	QObject::connect(
+		m_parameterWidget->getBandModels(0)->hp48, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
 
-	QObject::connect(m_parameterWidget->getBandModels(7)->lp12, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
-	QObject::connect(m_parameterWidget->getBandModels(7)->lp24, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
-	QObject::connect(m_parameterWidget->getBandModels(7)->lp48, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+	QObject::connect(
+		m_parameterWidget->getBandModels(7)->lp12, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+	QObject::connect(
+		m_parameterWidget->getBandModels(7)->lp24, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
+	QObject::connect(
+		m_parameterWidget->getBandModels(7)->lp48, SIGNAL(dataChanged()), m_parameterWidget, SLOT(updateHandle()));
 
 	automatableButtonGroup* lpBtnGrp = new automatableButtonGroup(this, tr("LP group"));
 	lpBtnGrp->addButton(lp12Button);
@@ -220,7 +247,9 @@ void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent* event)
 	update();
 }
 
-EqBand* EqControlsDialog::setBand(int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain, QColor color, QString name, float* peakL, float* peakR, BoolModel* hp12, BoolModel* hp24, BoolModel* hp48, BoolModel* lp12, BoolModel* lp24, BoolModel* lp48)
+EqBand* EqControlsDialog::setBand(int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain,
+	QColor color, QString name, float* peakL, float* peakR, BoolModel* hp12, BoolModel* hp24, BoolModel* hp48,
+	BoolModel* lp12, BoolModel* lp24, BoolModel* lp48)
 {
 	EqBand* filterModels = m_parameterWidget->getBandModels(index);
 	filterModels->active = active;

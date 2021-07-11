@@ -1,8 +1,8 @@
 /*
 	dsp/Lorenz.h
-	
+
 	Copyright 2001-4 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Lorenz fractal.
@@ -48,10 +48,7 @@ public:
 	}
 
 	/* rate is normalized (0 .. 1) */
-	void set_rate(double r)
-	{
-		h = max(.0000001, r * .015);
-	}
+	void set_rate(double r) { h = max(.0000001, r * .015); }
 
 	void init(double _h = .001, double seed = .0)
 	{
@@ -88,20 +85,11 @@ public:
 		I = J;
 	}
 
-	double get_x()
-	{
-		return .024 * (x[I] - .172);
-	}
+	double get_x() { return .024 * (x[I] - .172); }
 
-	double get_y()
-	{
-		return .018 * (y[I] - .172);
-	}
+	double get_y() { return .018 * (y[I] - .172); }
 
-	double get_z()
-	{
-		return .019 * (z[I] - 25.43);
-	}
+	double get_z() { return .019 * (z[I] - 25.43); }
 };
 
 } /* namespace DSP */

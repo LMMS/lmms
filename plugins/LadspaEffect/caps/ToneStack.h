@@ -1,10 +1,10 @@
 /*
 	ToneStack.h
-	
+
 	Copyright 2006-7
-		David Yeh <dtyeh@ccrma.stanford.edu> 
+		David Yeh <dtyeh@ccrma.stanford.edu>
 		Tim Goetze <tim@quitte.de> (cosmetics)
-	
+
 	Tone Stack emulation.
 
 */
@@ -32,69 +32,44 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class ToneStack
-	: public Plugin
+class ToneStack : public Plugin
 {
 private:
 	DSP::ToneStack tonestack;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
-		tonestack.init(fs);
-	}
+	void init() { tonestack.init(fs); }
 
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class ToneStackLT
-	: public Plugin
+class ToneStackLT : public Plugin
 {
 private:
 	DSP::ToneStackLT tonestack;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
-		tonestack.init(fs);
-	}
+	void init() { tonestack.init(fs); }
 
-	void activate()
-	{
-		tonestack.activate(ports + 1);
-	}
+	void activate() { tonestack.activate(ports + 1); }
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _TONESTACK_H_ */

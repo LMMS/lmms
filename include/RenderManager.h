@@ -35,11 +35,8 @@ class RenderManager : public QObject
 {
 	Q_OBJECT
 public:
-	RenderManager(
-		const Mixer::qualitySettings& qualitySettings,
-		const OutputSettings& outputSettings,
-		ProjectRenderer::ExportFileFormats fmt,
-		QString outputPath);
+	RenderManager(const Mixer::qualitySettings& qualitySettings, const OutputSettings& outputSettings,
+		ProjectRenderer::ExportFileFormats fmt, QString outputPath);
 
 	virtual ~RenderManager();
 

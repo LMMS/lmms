@@ -36,26 +36,15 @@ class BassBoosterControls : public EffectControls
 	Q_OBJECT
 public:
 	BassBoosterControls(BassBoosterEffect* effect);
-	virtual ~BassBoosterControls()
-	{
-	}
+	virtual ~BassBoosterControls() {}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return "bassboostercontrols";
-	}
+	inline virtual QString nodeName() const { return "bassboostercontrols"; }
 
-	virtual int controlCount()
-	{
-		return 3;
-	}
+	virtual int controlCount() { return 3; }
 
-	virtual EffectControlDialog* createView()
-	{
-		return new BassBoosterControlDialog(this);
-	}
+	virtual EffectControlDialog* createView() { return new BassBoosterControlDialog(this); }
 
 private slots:
 	void changeFrequency();

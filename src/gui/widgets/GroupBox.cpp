@@ -50,15 +50,9 @@ GroupBox::GroupBox(const QString& _caption, QWidget* _parent)
 	unsetCursor();
 }
 
-GroupBox::~GroupBox()
-{
-	delete m_led;
-}
+GroupBox::~GroupBox() { delete m_led; }
 
-void GroupBox::modelChanged()
-{
-	m_led->setModel(model());
-}
+void GroupBox::modelChanged() { m_led->setModel(model()); }
 
 void GroupBox::mousePressEvent(QMouseEvent* _me)
 {

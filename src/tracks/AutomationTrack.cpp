@@ -40,16 +40,12 @@ AutomationTrack::AutomationTrack(TrackContainer* tc, bool _hidden)
 	setName(tr("Automation track"));
 }
 
-bool AutomationTrack::play(const TimePos& time_start, const fpp_t _frames,
-	const f_cnt_t _frame_base, int _tco_num)
+bool AutomationTrack::play(const TimePos& time_start, const fpp_t _frames, const f_cnt_t _frame_base, int _tco_num)
 {
 	return false;
 }
 
-TrackView* AutomationTrack::createView(TrackContainerView* tcv)
-{
-	return new AutomationTrackView(this, tcv);
-}
+TrackView* AutomationTrack::createView(TrackContainerView* tcv) { return new AutomationTrackView(this, tcv); }
 
 TrackContentObject* AutomationTrack::createTCO(const TimePos& pos)
 {
@@ -58,10 +54,7 @@ TrackContentObject* AutomationTrack::createTCO(const TimePos& pos)
 	return p;
 }
 
-void AutomationTrack::saveTrackSpecificSettings(QDomDocument& _doc,
-	QDomElement& _this)
-{
-}
+void AutomationTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this) {}
 
 void AutomationTrack::loadTrackSpecificSettings(const QDomElement& _this)
 {
@@ -76,8 +69,7 @@ AutomationTrackView::AutomationTrackView(AutomationTrack* _at, TrackContainerVie
 	: TrackView(_at, tcv)
 {
 	setFixedHeight(32);
-	TrackLabelButton* tlb = new TrackLabelButton(this,
-		getTrackSettingsWidget());
+	TrackLabelButton* tlb = new TrackLabelButton(this, getTrackSettingsWidget());
 	tlb->setIcon(embed::getIconPixmap("automation_track"));
 	tlb->move(3, 1);
 	tlb->show();
@@ -95,14 +87,12 @@ void AutomationTrackView::dropEvent(QDropEvent* _de)
 	QString val = StringPairDrag::decodeValue(_de);
 	if (type == "automatable_model")
 	{
-		AutomatableModel* mod = dynamic_cast<AutomatableModel*>(
-			Engine::projectJournal()->journallingObject(val.toInt()));
+		AutomatableModel* mod =
+			dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != NULL)
 		{
 			TimePos pos = TimePos(trackContainerView()->currentPosition() +
-				(_de->pos().x() -
-					getTrackContentWidget()->x()) *
-					TimePos::ticksPerBar() /
+				(_de->pos().x() - getTrackContentWidget()->x()) * TimePos::ticksPerBar() /
 					static_cast<int>(trackContainerView()->pixelsPerBar()))
 							  .toAbsoluteBar();
 

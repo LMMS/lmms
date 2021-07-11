@@ -51,8 +51,7 @@ public:
 		size
 	};
 
-	template <typename T>
-	struct IdForType;
+	template <typename T> struct IdForType;
 
 	//! Return URID for a cache ID
 	uint32_t operator[](Id id) const;
@@ -63,13 +62,11 @@ private:
 	uint32_t m_cache[static_cast<int>(Id::size)];
 };
 
-template <>
-struct Lv2UridCache::IdForType<float>
+template <> struct Lv2UridCache::IdForType<float>
 {
 	static constexpr auto value = Id::atom_Float;
 };
-template <>
-struct Lv2UridCache::IdForType<std::int32_t>
+template <> struct Lv2UridCache::IdForType<std::int32_t>
 {
 	static constexpr auto value = Id::atom_Int;
 };

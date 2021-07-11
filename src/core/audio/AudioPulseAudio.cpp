@@ -42,9 +42,7 @@ static void stream_write_callback(pa_stream* s, size_t length, void* userdata)
 
 AudioPulseAudio::AudioPulseAudio(bool& _success_ful, Mixer* _mixer)
 	: AudioDevice(qBound<ch_cnt_t>(
-					  DEFAULT_CHANNELS,
-					  ConfigManager::inst()->value("audiopa", "channels").toInt(),
-					  SURROUND_CHANNELS),
+					  DEFAULT_CHANNELS, ConfigManager::inst()->value("audiopa", "channels").toInt(), SURROUND_CHANNELS),
 		  _mixer)
 	, m_s(NULL)
 	, m_quit(false)
@@ -59,10 +57,7 @@ AudioPulseAudio::AudioPulseAudio(bool& _success_ful, Mixer* _mixer)
 	_success_ful = true;
 }
 
-AudioPulseAudio::~AudioPulseAudio()
-{
-	stopProcessing();
-}
+AudioPulseAudio::~AudioPulseAudio() { stopProcessing(); }
 
 QString AudioPulseAudio::probeDevice()
 {
@@ -117,9 +112,7 @@ static void stream_state_callback(pa_stream* s, void* userdata)
 
 	case PA_STREAM_FAILED:
 	default:
-		qCritical("Stream error: %s\n",
-			pa_strerror(pa_context_errno(
-				pa_stream_get_context(s))));
+		qCritical("Stream error: %s\n", pa_strerror(pa_context_errno(pa_stream_get_context(s))));
 	}
 }
 
@@ -150,15 +143,12 @@ static void context_state_callback(pa_context* c, void* userdata)
 		buffer_attr.minreq = (uint32_t)(-1);
 		buffer_attr.fragsize = (uint32_t)(-1);
 
-		double latency = (double)(Engine::mixer()->framesPerPeriod()) /
-			(double)_this->sampleRate();
+		double latency = (double)(Engine::mixer()->framesPerPeriod()) / (double)_this->sampleRate();
 
 		// ask PulseAudio for the desired latency (which might not be approved)
-		buffer_attr.tlength = pa_usec_to_bytes(latency * PA_USEC_PER_MSEC,
-			&_this->m_sampleSpec);
+		buffer_attr.tlength = pa_usec_to_bytes(latency * PA_USEC_PER_MSEC, &_this->m_sampleSpec);
 
-		pa_stream_connect_playback(_this->m_s, NULL, &buffer_attr,
-			PA_STREAM_ADJUST_LATENCY,
+		pa_stream_connect_playback(_this->m_s, NULL, &buffer_attr, PA_STREAM_ADJUST_LATENCY,
 			NULL, // volume
 			NULL);
 		_this->signalConnected(true);
@@ -246,14 +236,10 @@ void AudioPulseAudio::streamWriteCallback(pa_stream* s, size_t length)
 			m_quit = true;
 			break;
 		}
-		int bytes = convertToS16(temp, frames,
-			mixer()->masterGain(),
-			pcmbuf,
-			m_convertEndian);
+		int bytes = convertToS16(temp, frames, mixer()->masterGain(), pcmbuf, m_convertEndian);
 		if (bytes > 0)
 		{
-			pa_stream_write(m_s, pcmbuf, bytes, NULL, 0,
-				PA_SEEK_RELATIVE);
+			pa_stream_write(m_s, pcmbuf, bytes, NULL, 0, PA_SEEK_RELATIVE);
 		}
 		fd += frames;
 	}
@@ -284,9 +270,7 @@ AudioPulseAudio::setupWidget::setupWidget(QWidget* _parent)
 	LcdSpinBoxModel* m = new LcdSpinBoxModel(/* this */);
 	m->setRange(DEFAULT_CHANNELS, SURROUND_CHANNELS);
 	m->setStep(2);
-	m->setValue(ConfigManager::inst()->value("audiopa",
-										 "channels")
-					.toInt());
+	m->setValue(ConfigManager::inst()->value("audiopa", "channels").toInt());
 
 	m_channels = new LcdSpinBox(1, this);
 	m_channels->setModel(m);
@@ -294,17 +278,12 @@ AudioPulseAudio::setupWidget::setupWidget(QWidget* _parent)
 	m_channels->move(180, 20);
 }
 
-AudioPulseAudio::setupWidget::~setupWidget()
-{
-	delete m_channels->model();
-}
+AudioPulseAudio::setupWidget::~setupWidget() { delete m_channels->model(); }
 
 void AudioPulseAudio::setupWidget::saveSettings()
 {
-	ConfigManager::inst()->setValue("audiopa", "device",
-		m_device->text());
-	ConfigManager::inst()->setValue("audiopa", "channels",
-		QString::number(m_channels->value<int>()));
+	ConfigManager::inst()->setValue("audiopa", "device", m_device->text());
+	ConfigManager::inst()->setValue("audiopa", "channels", QString::number(m_channels->value<int>()));
 }
 
 #endif

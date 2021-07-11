@@ -31,9 +31,7 @@ class Lfo
 {
 public:
 	Lfo(int samplerate);
-	~Lfo()
-	{
-	}
+	~Lfo() {}
 
 	inline void setFrequency(double frequency)
 	{

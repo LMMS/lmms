@@ -34,9 +34,7 @@ class ReverbSCControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	ReverbSCControlDialog(ReverbSCControls* controls);
-	virtual ~ReverbSCControlDialog()
-	{
-	}
+	virtual ~ReverbSCControlDialog() {}
 };
 
 #endif

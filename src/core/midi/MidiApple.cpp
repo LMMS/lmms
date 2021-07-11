@@ -47,10 +47,7 @@ MidiApple::MidiApple()
 	openDevices();
 }
 
-MidiApple::~MidiApple()
-{
-	closeDevices();
-}
+MidiApple::~MidiApple() { closeDevices(); }
 
 void MidiApple::processOutEvent(const MidiEvent& event, const TimePos& time, const MidiPort* port)
 {
@@ -305,22 +302,25 @@ void MidiApple::HandleReadCallback(const MIDIPacketList* pktlist, void* srcConnR
 
 				switch (cmdtype)
 				{
-				case MidiNoteOff:	  //0x80:
-				case MidiNoteOn:	  //0x90:
-				case MidiKeyPressure: //0xA0:
-					notifyMidiPortList(m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1 - KeysPerOctave, par2 & 0xff, &endPointRef));
+				case MidiNoteOff:	  // 0x80:
+				case MidiNoteOn:	  // 0x90:
+				case MidiKeyPressure: // 0xA0:
+					notifyMidiPortList(m_inputSubs[refName],
+						MidiEvent(cmdtype, messageChannel, par1 - KeysPerOctave, par2 & 0xff, &endPointRef));
 					break;
 
-				case MidiControlChange:	  //0xB0:
-				case MidiProgramChange:	  //0xC0:
-				case MidiChannelPressure: //0xD0:
-					notifyMidiPortList(m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef));
+				case MidiControlChange:	  // 0xB0:
+				case MidiProgramChange:	  // 0xC0:
+				case MidiChannelPressure: // 0xD0:
+					notifyMidiPortList(
+						m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1, par2 & 0xff, &endPointRef));
 					break;
 
-				case MidiPitchBend: //0xE0:
-					notifyMidiPortList(m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef));
+				case MidiPitchBend: // 0xE0:
+					notifyMidiPortList(
+						m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef));
 					break;
-				case MidiActiveSensing: //0xF0
+				case MidiActiveSensing: // 0xF0
 				case 0xF0:
 					break;
 				default:
@@ -505,7 +505,7 @@ void MidiApple::notifyMidiPortList(MidiPortList l, MidiEvent event)
 
 void MidiApple::NotifyCallback(const MIDINotification* message, void* refCon)
 {
-	//refCon is a pointer to MidiApple class
+	// refCon is a pointer to MidiApple class
 	MidiApple* midiApple = (MidiApple*)refCon;
 	qDebug("MidiApple::NotifyCallback '%d'", message->messageID);
 	switch (message->messageID)
@@ -531,8 +531,7 @@ void MidiApple::NotifyCallback(const MIDINotification* message, void* refCon)
 		break;
 	}
 	case kMIDIMsgObjectRemoved: {
-		MIDIObjectAddRemoveNotification*
-			msg = (MIDIObjectAddRemoveNotification*)message;
+		MIDIObjectAddRemoveNotification* msg = (MIDIObjectAddRemoveNotification*)message;
 		MIDIEndpointRef endpoint_ref = (MIDIEndpointRef)msg->child;
 		char* fullName = midiApple->getFullName(endpoint_ref);
 
@@ -571,7 +570,7 @@ void MidiApple::NotifyCallback(const MIDINotification* message, void* refCon)
 char* MidiApple::getFullName(MIDIEndpointRef& endpoint_ref)
 {
 	MIDIEntityRef entity = 0;
-	MIDIEndpointGetEntity(endpoint_ref, &entity); //get the entity
+	MIDIEndpointGetEntity(endpoint_ref, &entity); // get the entity
 	MIDIDeviceRef device = 0;
 	MIDIEntityGetDevice(entity, &device);
 	char* deviceName = getName(device);

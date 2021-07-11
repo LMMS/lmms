@@ -1,11 +1,11 @@
 /*
 	SweepVF.h
-	
+
 	Copyright 2004-7 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
-	SweepVFI, a lorenz fractal modulating the cutoff frequency of a 
+	SweepVFI, a lorenz fractal modulating the cutoff frequency of a
 	state-variable (ladder) filter.
 
 	SweepVFII, the same with Q being modulated by a second fractal.
@@ -40,8 +40,7 @@
 #include "dsp/Roessler.h"
 #include "dsp/SVF.h"
 
-class SweepVFI
-	: public Plugin
+class SweepVFI : public Plugin
 {
 public:
 	double fs;
@@ -58,8 +57,7 @@ public:
 	DSP::StackedSVF<1, 2> svf;
 	DSP::Lorenz lorenz;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -67,19 +65,12 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class SweepVFII
-	: public Plugin
+class SweepVFII : public Plugin
 {
 public:
 	/* svf parameters */
@@ -95,8 +86,7 @@ public:
 	DSP::Lorenz lorenz1;
 	DSP::Lorenz lorenz2;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -104,21 +94,14 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 /* //////////////////////////////////////////////////////////////////////// */
 
-class AutoWah
-	: public Plugin
+class AutoWah : public Plugin
 {
 public:
 	double fs;
@@ -138,8 +121,7 @@ public:
 	DSP::BiQuad filter;
 	DSP::OnePoleHP hp;
 
-	template <sample_func_t F>
-	void one_cycle(int frames);
+	template <sample_func_t F> void one_cycle(int frames);
 
 public:
 	static PortInfo port_info[];
@@ -147,15 +129,9 @@ public:
 	void init();
 	void activate();
 
-	void run(int n)
-	{
-		one_cycle<store_func>(n);
-	}
+	void run(int n) { one_cycle<store_func>(n); }
 
-	void run_adding(int n)
-	{
-		one_cycle<adding_func>(n);
-	}
+	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
 #endif /* _SWEEP_VF_H_ */

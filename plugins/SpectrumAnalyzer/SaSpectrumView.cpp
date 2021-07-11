@@ -130,16 +130,13 @@ void SaSpectrumView::paintEvent(QPaintEvent* event)
 
 	// always draw the display outline
 	painter.setPen(QPen(m_controls->m_colorGrid, 2, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-	painter.drawRoundedRect(m_displayLeft, 1,
-		m_displayWidth, m_displayBottom,
-		2.0, 2.0);
+	painter.drawRoundedRect(m_displayLeft, 1, m_displayWidth, m_displayBottom, 2.0, 2.0);
 
 #ifdef SA_DEBUG
 	// display performance measurements if enabled
 	total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
 	m_execution_avg = 0.95 * m_execution_avg + 0.05 * total_time / 1000000.0;
-	painter.setPen(QPen(m_controls->m_colorLabels, 1,
-		Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
+	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	painter.drawText(m_displayRight - 150, 10, 130, 16, Qt::AlignLeft,
 		QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).c_str()).append(" ms"));
 	painter.drawText(m_displayRight - 150, 30, 130, 16, Qt::AlignLeft,
@@ -399,9 +396,7 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 	float margin = 5;
 
 	// always draw the background
-	painter.fillRect(m_displayLeft, m_displayTop,
-		m_displayWidth, m_displayBottom,
-		m_controls->m_colorBG);
+	painter.fillRect(m_displayLeft, m_displayTop, m_displayWidth, m_displayBottom, m_controls->m_colorBG);
 
 	// select logarithmic or linear frequency grid and draw it
 	if (m_controls->m_logXModel.value())
@@ -416,10 +411,8 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto& line : *freqTics)
 	{
-		painter.drawLine(m_displayLeft + freqToXPixel(line.first, m_displayWidth),
-			2,
-			m_displayLeft + freqToXPixel(line.first, m_displayWidth),
-			m_displayBottom);
+		painter.drawLine(m_displayLeft + freqToXPixel(line.first, m_displayWidth), 2,
+			m_displayLeft + freqToXPixel(line.first, m_displayWidth), m_displayBottom);
 	}
 	// print frequency labels (line.second is label)
 	painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -429,21 +422,18 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 		// align first and last label to the edge if needed, otherwise center them
 		if (line == freqTics->front() && pos - label_width / 2 < m_displayLeft)
 		{
-			painter.drawText(m_displayLeft, m_displayBottom + margin,
-				label_width, label_height, Qt::AlignLeft | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayLeft, m_displayBottom + margin, label_width, label_height,
+				Qt::AlignLeft | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 		else if (line == freqTics->back() && pos + label_width / 2 > m_displayRight)
 		{
-			painter.drawText(m_displayRight - label_width, m_displayBottom + margin,
-				label_width, label_height, Qt::AlignRight | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayRight - label_width, m_displayBottom + margin, label_width, label_height,
+				Qt::AlignRight | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 		else
 		{
-			painter.drawText(pos - label_width / 2, m_displayBottom + margin,
-				label_width, label_height, Qt::AlignHCenter | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(pos - label_width / 2, m_displayBottom + margin, label_width, label_height,
+				Qt::AlignHCenter | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 	}
 
@@ -461,9 +451,7 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 	painter.setPen(QPen(m_controls->m_colorGrid, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 	for (auto& line : *ampTics)
 	{
-		painter.drawLine(m_displayLeft + 1,
-			ampToYPixel(line.first, m_displayBottom),
-			m_displayRight - 1,
+		painter.drawLine(m_displayLeft + 1, ampToYPixel(line.first, m_displayBottom), m_displayRight - 1,
 			ampToYPixel(line.first, m_displayBottom));
 	}
 	// print amplitude labels
@@ -479,16 +467,14 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 			{
 				painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
-			painter.drawText(m_displayLeft - label_width - margin, m_displayTop - 2,
-				label_width, label_height, Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayLeft - label_width - margin, m_displayTop - 2, label_width, label_height,
+				Qt::AlignRight | Qt::AlignTop | Qt::TextDontClip, QString(line.second.c_str()));
 			if (stereo)
 			{
 				painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
-			painter.drawText(m_displayRight + margin, m_displayTop - 2,
-				label_width, label_height, Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayRight + margin, m_displayTop - 2, label_width, label_height,
+				Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 		else if (line == ampTics->front() && pos > m_displayBottom - label_height)
 		{
@@ -496,16 +482,14 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 			{
 				painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
-			painter.drawText(m_displayLeft - label_width - margin, m_displayBottom - label_height + 2,
-				label_width, label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayLeft - label_width - margin, m_displayBottom - label_height + 2, label_width,
+				label_height, Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip, QString(line.second.c_str()));
 			if (stereo)
 			{
 				painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
-			painter.drawText(m_displayRight + margin, m_displayBottom - label_height + 2,
-				label_width, label_height, Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayRight + margin, m_displayBottom - label_height + 2, label_width, label_height,
+				Qt::AlignLeft | Qt::AlignBottom | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 		else
 		{
@@ -513,16 +497,14 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 			{
 				painter.setPen(QPen(m_controls->m_colorL.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
-			painter.drawText(m_displayLeft - label_width - margin, pos - label_height / 2,
-				label_width, label_height, Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayLeft - label_width - margin, pos - label_height / 2, label_width, label_height,
+				Qt::AlignRight | Qt::AlignVCenter | Qt::TextDontClip, QString(line.second.c_str()));
 			if (stereo)
 			{
 				painter.setPen(QPen(m_controls->m_colorR.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 			}
-			painter.drawText(m_displayRight + margin, pos - label_height / 2,
-				label_width, label_height, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip,
-				QString(line.second.c_str()));
+			painter.drawText(m_displayRight + margin, pos - label_height / 2, label_width, label_height,
+				Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip, QString(line.second.c_str()));
 		}
 	}
 }
@@ -530,7 +512,8 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 // Draw cursor and its coordinates if it is within display bounds.
 void SaSpectrumView::drawCursor(QPainter& painter)
 {
-	if (m_cursor.x() >= m_displayLeft && m_cursor.x() <= m_displayRight && m_cursor.y() >= m_displayTop && m_cursor.y() <= m_displayBottom)
+	if (m_cursor.x() >= m_displayLeft && m_cursor.x() <= m_displayRight && m_cursor.y() >= m_displayTop &&
+		m_cursor.y() <= m_displayBottom)
 	{
 		// cursor lines
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -545,8 +528,7 @@ void SaSpectrumView::drawCursor(QPainter& painter)
 		unsigned int const box_height = 2 * (fontMetrics.size(Qt::TextSingleLine, "0 HzdBFS").height() + box_margin);
 		unsigned int const box_width = fontMetrics.size(Qt::TextSingleLine, "-99.9 dBFS").width() + 2 * box_margin;
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.fillRect(m_displayLeft + box_left, m_displayTop + box_top,
-			box_width, box_height, QColor(0, 0, 0, 64));
+		painter.fillRect(m_displayLeft + box_left, m_displayTop + box_top, box_width, box_height, QColor(0, 0, 0, 64));
 
 		// coordinates: text
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -555,9 +537,8 @@ void SaSpectrumView::drawCursor(QPainter& painter)
 		// frequency
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
 		tmps = QString("%1 Hz").arg(xFreq);
-		painter.drawText(m_displayLeft + box_left + box_margin,
-			m_displayTop + box_top + box_margin,
-			box_width, box_height / 2, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft + box_left + box_margin, m_displayTop + box_top + box_margin, box_width,
+			box_height / 2, Qt::AlignLeft, tmps);
 
 		// amplitude
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
@@ -570,17 +551,13 @@ void SaSpectrumView::drawCursor(QPainter& painter)
 			// add 0.0005 to get proper rounding to 3 decimal places
 			tmps = QString(std::to_string(0.0005f + yAmp).substr(0, 5).c_str());
 		}
-		painter.drawText(m_displayLeft + box_left + box_margin,
-			m_displayTop + box_top + box_height / 2,
-			box_width, box_height / 2, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft + box_left + box_margin, m_displayTop + box_top + box_height / 2, box_width,
+			box_height / 2, Qt::AlignLeft, tmps);
 	}
 }
 
 // Wrappers for most used SaProcessor helpers (to make local code more compact).
-float SaSpectrumView::binToFreq(unsigned int bin_index)
-{
-	return m_processor->binToFreq(bin_index);
-}
+float SaSpectrumView::binToFreq(unsigned int bin_index) { return m_processor->binToFreq(bin_index); }
 
 float SaSpectrumView::freqToXPixel(float frequency, unsigned int width)
 {

@@ -1,8 +1,8 @@
 /*
   ks_tab.h
-	
+
 	Copyright 2006 David Yeh <dtyeh@ccrma.stanford.edu>
-	
+
 	http://quitte.de/dsp/
 
 	Tone Stack emulation coefficient table for lattice filter.

@@ -45,28 +45,17 @@ public:
 		NumStereoModes
 	};
 	dynProcControls(dynProcEffect* _eff);
-	virtual ~dynProcControls()
-	{
-	}
+	virtual ~dynProcControls() {}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return ("dynamicsprocessor_controls");
-	}
+	inline virtual QString nodeName() const { return ("dynamicsprocessor_controls"); }
 
 	virtual void setDefaultShape();
 
-	virtual int controlCount()
-	{
-		return (6);
-	}
+	virtual int controlCount() { return (6); }
 
-	virtual EffectControlDialog* createView()
-	{
-		return (new dynProcControlDialog(this));
-	}
+	virtual EffectControlDialog* createView() { return (new dynProcControlDialog(this)); }
 
 private slots:
 	void samplesChanged(int, int);

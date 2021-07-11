@@ -42,9 +42,7 @@ class EqControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	EqControlsDialog(EqControls* controls);
-	virtual ~EqControlsDialog()
-	{
-	}
+	virtual ~EqControlsDialog() {}
 
 	EqBand* setBand(EqControls* controls);
 
@@ -54,7 +52,9 @@ private:
 
 	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 
-	EqBand* setBand(int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain, QColor color, QString name, float* peakL, float* peakR, BoolModel* hp12, BoolModel* hp24, BoolModel* hp48, BoolModel* lp12, BoolModel* lp24, BoolModel* lp48);
+	EqBand* setBand(int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain, QColor color,
+		QString name, float* peakL, float* peakR, BoolModel* hp12, BoolModel* hp24, BoolModel* hp48, BoolModel* lp12,
+		BoolModel* lp24, BoolModel* lp48);
 
 	int m_originalHeight;
 };

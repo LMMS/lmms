@@ -55,9 +55,7 @@
 
 /*! The scale of C Major - white keys only.
  */
-Keys WhiteKeys[] =
-	{
-		Key_C, Key_D, Key_E, Key_F, Key_G, Key_A, Key_H};
+Keys WhiteKeys[] = {Key_C, Key_D, Key_E, Key_F, Key_G, Key_A, Key_H};
 
 QPixmap* PianoView::s_whiteKeyPm = NULL;		/*!< A white key released */
 QPixmap* PianoView::s_blackKeyPm = NULL;		/*!< A black key released */
@@ -115,8 +113,7 @@ PianoView::PianoView(QWidget* _parent)
 	m_pianoScroll->setValue(Octave_3 * WhiteKeysPerOctave);
 
 	// and connect it to this widget
-	connect(m_pianoScroll, SIGNAL(valueChanged(int)),
-		this, SLOT(pianoScrolled(int)));
+	connect(m_pianoScroll, SIGNAL(valueChanged(int)), this, SLOT(pianoScrolled(int)));
 
 	// create a layout for ourselves
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -175,7 +172,7 @@ int PianoView::getKeyFromKeyEvent(QKeyEvent* _ke)
 		return 14; // . = d
 	case 39:
 		return 15; // ; = d#
-	//case 86: return 16; // / = e
+	// case 86: return 16; // / = e
 	case 53:
 		return 16; // / = e
 	case 16:
@@ -384,8 +381,7 @@ void PianoView::modelChanged()
 	m_piano = castModel<Piano>();
 	if (m_piano != NULL)
 	{
-		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()),
-			this, SLOT(update()));
+		connect(m_piano->instrumentTrack()->baseNoteModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	}
 }
 
@@ -439,14 +435,12 @@ int PianoView::getKeyFromMouse(const QPoint& _p) const
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
 		if (key_num > 0 && Piano::isBlackKey(key_num - 1) &&
-			offset <= (PW_WHITE_KEY_WIDTH / 2) -
-					(PW_BLACK_KEY_WIDTH / 2))
+			offset <= (PW_WHITE_KEY_WIDTH / 2) - (PW_BLACK_KEY_WIDTH / 2))
 		{
 			--key_num;
 		}
 		if (key_num < NumKeys - 1 && Piano::isBlackKey(key_num + 1) &&
-			offset >= (PW_WHITE_KEY_WIDTH -
-						  PW_BLACK_KEY_WIDTH / 2))
+			offset >= (PW_WHITE_KEY_WIDTH - PW_BLACK_KEY_WIDTH / 2))
 		{
 			++key_num;
 		}
@@ -465,8 +459,7 @@ int PianoView::getKeyFromMouse(const QPoint& _p) const
  */
 void PianoView::pianoScrolled(int _new_pos)
 {
-	m_startKey = WhiteKeys[_new_pos % WhiteKeysPerOctave] +
-		(_new_pos / WhiteKeysPerOctave) * KeysPerOctave;
+	m_startKey = WhiteKeys[_new_pos % WhiteKeysPerOctave] + (_new_pos / WhiteKeysPerOctave) * KeysPerOctave;
 
 	update();
 }
@@ -517,15 +510,14 @@ void PianoView::mousePressEvent(QMouseEvent* _me)
 		if (_me->pos().y() > PIANO_BASE)
 		{
 			int y_diff = _me->pos().y() - PIANO_BASE;
-			int velocity = (int)((float)y_diff /
-				(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
-				(float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
+			int velocity =
+				(int)((float)y_diff / (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
+					(float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
 			if (y_diff < 0)
 			{
 				velocity = 0;
 			}
-			else if (y_diff >
-				(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT))
+			else if (y_diff > (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT))
 			{
 				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 			}
@@ -541,8 +533,7 @@ void PianoView::mousePressEvent(QMouseEvent* _me)
 			if (_me->modifiers() & Qt::ControlModifier)
 			{
 				new StringPairDrag("automatable_model",
-					QString::number(m_piano->instrumentTrack()->baseNoteModel()->id()),
-					QPixmap(), this);
+					QString::number(m_piano->instrumentTrack()->baseNoteModel()->id()), QPixmap(), this);
 				_me->accept();
 			}
 			else
@@ -606,8 +597,7 @@ void PianoView::mouseMoveEvent(QMouseEvent* _me)
 
 	int key_num = getKeyFromMouse(_me->pos());
 	int y_diff = _me->pos().y() - PIANO_BASE;
-	int velocity = (int)((float)y_diff /
-		(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
+	int velocity = (int)((float)y_diff / (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
 		(float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
 	// maybe the user moved the mouse-cursor above or under the
 	// piano-widget while holding left button so check that and
@@ -616,8 +606,7 @@ void PianoView::mouseMoveEvent(QMouseEvent* _me)
 	{
 		velocity = 0;
 	}
-	else if (y_diff >
-		(Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT))
+	else if (y_diff > (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT))
 	{
 		velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
 	}
@@ -664,8 +653,7 @@ void PianoView::mouseMoveEvent(QMouseEvent* _me)
  */
 void PianoView::keyPressEvent(QKeyEvent* _ke)
 {
-	const int key_num = getKeyFromKeyEvent(_ke) +
-		(DefaultOctave - 1) * KeysPerOctave;
+	const int key_num = getKeyFromKeyEvent(_ke) + (DefaultOctave - 1) * KeysPerOctave;
 
 	if (_ke->isAutoRepeat() == false && key_num > -1)
 	{
@@ -690,8 +678,7 @@ void PianoView::keyPressEvent(QKeyEvent* _ke)
  */
 void PianoView::keyReleaseEvent(QKeyEvent* _ke)
 {
-	const int key_num = getKeyFromKeyEvent(_ke) +
-		(DefaultOctave - 1) * KeysPerOctave;
+	const int key_num = getKeyFromKeyEvent(_ke) + (DefaultOctave - 1) * KeysPerOctave;
 	if (_ke->isAutoRepeat() == false && key_num > -1)
 	{
 		if (m_piano != NULL)
@@ -744,10 +731,7 @@ void PianoView::focusOutEvent(QFocusEvent*)
 	update();
 }
 
-void PianoView::focusInEvent(QFocusEvent*)
-{
-	m_piano->instrumentTrack()->autoAssignMidiDevice(true);
-}
+void PianoView::focusInEvent(QFocusEvent*) { m_piano->instrumentTrack()->autoAssignMidiDevice(true); }
 
 /*! \brief update scrollbar range after resize
  *
@@ -841,19 +825,14 @@ void PianoView::paintEvent(QPaintEvent*)
 
 	const int base_key = (m_piano != NULL) ? m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
 
-	QColor baseKeyColor = QApplication::palette().color(QPalette::Active,
-		QPalette::BrightText);
+	QColor baseKeyColor = QApplication::palette().color(QPalette::Active, QPalette::BrightText);
 	if (Piano::isWhiteKey(base_key))
 	{
-		p.fillRect(QRect(getKeyX(base_key), 1, PW_WHITE_KEY_WIDTH - 1,
-					   PIANO_BASE - 2),
-			baseKeyColor);
+		p.fillRect(QRect(getKeyX(base_key), 1, PW_WHITE_KEY_WIDTH - 1, PIANO_BASE - 2), baseKeyColor);
 	}
 	else
 	{
-		p.fillRect(QRect(getKeyX(base_key) + 1, 1,
-					   PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2),
-			baseKeyColor);
+		p.fillRect(QRect(getKeyX(base_key) + 1, 1, PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2), baseKeyColor);
 	}
 
 	int cur_key = m_startKey;

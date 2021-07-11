@@ -37,19 +37,15 @@ public:
 	AutomationTrack(TrackContainer* tc, bool _hidden = false);
 	virtual ~AutomationTrack() = default;
 
-	virtual bool play(const TimePos& _start, const fpp_t _frames,
-		const f_cnt_t _frame_base, int _tco_num = -1) override;
+	virtual bool play(
+		const TimePos& _start, const fpp_t _frames, const f_cnt_t _frame_base, int _tco_num = -1) override;
 
-	QString nodeName() const override
-	{
-		return "automationtrack";
-	}
+	QString nodeName() const override { return "automationtrack"; }
 
 	TrackView* createView(TrackContainerView*) override;
 	TrackContentObject* createTCO(const TimePos& pos) override;
 
-	virtual void saveTrackSpecificSettings(QDomDocument& _doc,
-		QDomElement& _parent) override;
+	virtual void saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadTrackSpecificSettings(const QDomElement& _this) override;
 
 private:

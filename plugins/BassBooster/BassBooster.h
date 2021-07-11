@@ -36,10 +36,7 @@ public:
 	virtual ~BassBoosterEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_bbControls;
-	}
+	virtual EffectControls* controls() { return &m_bbControls; }
 
 protected:
 	void changeFrequency();

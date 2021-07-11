@@ -1,8 +1,8 @@
 /*
 	dsp/Sine.h
-	
+
 	Copyright 2003-4 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	direct form I recursive sin() generator.
@@ -46,20 +46,11 @@ public:
 		z = 0;
 	}
 
-	Sine(double f, double fs, double phase)
-	{
-		set_f(f, fs, phase);
-	}
+	Sine(double f, double fs, double phase) { set_f(f, fs, phase); }
 
-	Sine(double omega, double phase = 0.)
-	{
-		set_f(omega, phase);
-	}
+	Sine(double omega, double phase = 0.) { set_f(omega, phase); }
 
-	inline void set_f(double f, double fs, double phase)
-	{
-		set_f(f * M_PI / fs, phase);
-	}
+	inline void set_f(double f, double fs, double phase) { set_f(f * M_PI / fs, phase); }
 
 	inline void set_f(double w, double phase)
 	{

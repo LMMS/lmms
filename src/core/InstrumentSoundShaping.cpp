@@ -41,17 +41,15 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const char* const InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] =
-	{
-		{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume")},
-		{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency")},
-		{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
-			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance")}};
+const char* const InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] = {
+	{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
+		QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume")},
+	{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
+		QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency")},
+	{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
+		QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance")}};
 
-InstrumentSoundShaping::InstrumentSoundShaping(
-	InstrumentTrack* _instrument_track)
+InstrumentSoundShaping::InstrumentSoundShaping(InstrumentTrack* _instrument_track)
 	: Model(_instrument_track, tr("Envelopes/LFOs"))
 	, m_instrumentTrack(_instrument_track)
 	, m_filterEnabledModel(false, this)
@@ -66,11 +64,8 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 		{
 			value_for_zero_amount = 1.0;
 		}
-		m_envLfoParameters[i] = new EnvelopeAndLfoParameters(
-			value_for_zero_amount,
-			this);
-		m_envLfoParameters[i]->setDisplayName(
-			tr(targetNames[i][2]));
+		m_envLfoParameters[i] = new EnvelopeAndLfoParameters(value_for_zero_amount, this);
+		m_envLfoParameters[i]->setDisplayName(tr(targetNames[i][2]));
 	}
 
 	m_filterModel.addItem(tr("Low-pass"), std::make_unique<PixmapLoader>("filter_lp"));
@@ -97,9 +92,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 	m_filterModel.addItem(tr("Tripole"), std::make_unique<PixmapLoader>("filter_lp"));
 }
 
-InstrumentSoundShaping::~InstrumentSoundShaping()
-{
-}
+InstrumentSoundShaping::~InstrumentSoundShaping() {}
 
 float InstrumentSoundShaping::volumeLevel(NotePlayHandle* n, const f_cnt_t frame)
 {
@@ -116,9 +109,7 @@ float InstrumentSoundShaping::volumeLevel(NotePlayHandle* n, const f_cnt_t frame
 	return level;
 }
 
-void InstrumentSoundShaping::processAudioBuffer(sampleFrame* buffer,
-	const fpp_t frames,
-	NotePlayHandle* n)
+void InstrumentSoundShaping::processAudioBuffer(sampleFrame* buffer, const fpp_t frames, NotePlayHandle* n)
 {
 	const f_cnt_t envTotalFrames = n->totalFramesPlayed();
 	f_cnt_t envReleaseBegin = envTotalFrames - n->releaseFramesDone() + n->framesBeforeRelease();
@@ -162,14 +153,12 @@ void InstrumentSoundShaping::processAudioBuffer(sampleFrame* buffer,
 		const float fcv = m_filterCutModel.value();
 		const float frv = m_filterResModel.value();
 
-		if (m_envLfoParameters[Cut]->isUsed() &&
-			m_envLfoParameters[Resonance]->isUsed())
+		if (m_envLfoParameters[Cut]->isUsed() && m_envLfoParameters[Resonance]->isUsed())
 		{
 			for (fpp_t frame = 0; frame < frames; ++frame)
 			{
-				const float new_cut_val = EnvelopeAndLfoParameters::expKnobVal(cutBuffer[frame]) *
-						CUT_FREQ_MULTIPLIER +
-					fcv;
+				const float new_cut_val =
+					EnvelopeAndLfoParameters::expKnobVal(cutBuffer[frame]) * CUT_FREQ_MULTIPLIER + fcv;
 
 				const float new_res_val = frv + RES_MULTIPLIER * resBuffer[frame];
 
@@ -189,9 +178,7 @@ void InstrumentSoundShaping::processAudioBuffer(sampleFrame* buffer,
 		{
 			for (fpp_t frame = 0; frame < frames; ++frame)
 			{
-				float new_cut_val = EnvelopeAndLfoParameters::expKnobVal(cutBuffer[frame]) *
-						CUT_FREQ_MULTIPLIER +
-					fcv;
+				float new_cut_val = EnvelopeAndLfoParameters::expKnobVal(cutBuffer[frame]) * CUT_FREQ_MULTIPLIER + fcv;
 
 				if (static_cast<int>(new_cut_val) != old_filter_cut)
 				{
@@ -268,8 +255,7 @@ f_cnt_t InstrumentSoundShaping::envFrames(const bool _only_vol) const
 	{
 		for (int i = Volume + 1; i < NumTargets; ++i)
 		{
-			if (m_envLfoParameters[i]->isUsed() &&
-				m_envLfoParameters[i]->PAHD_Frames() > ret_val)
+			if (m_envLfoParameters[i]->isUsed() && m_envLfoParameters[i]->PAHD_Frames() > ret_val)
 			{
 				ret_val = m_envLfoParameters[i]->PAHD_Frames();
 			}
@@ -316,7 +302,9 @@ void InstrumentSoundShaping::saveSettings(QDomDocument& _doc, QDomElement& _this
 
 	for (int i = 0; i < NumTargets; ++i)
 	{
-		m_envLfoParameters[i]->saveState(_doc, _this).setTagName(m_envLfoParameters[i]->nodeName() + QString(targetNames[i][1]).toLower());
+		m_envLfoParameters[i]
+			->saveState(_doc, _this)
+			.setTagName(m_envLfoParameters[i]->nodeName() + QString(targetNames[i][1]).toLower());
 	}
 }
 
@@ -334,9 +322,7 @@ void InstrumentSoundShaping::loadSettings(const QDomElement& _this)
 		{
 			for (int i = 0; i < NumTargets; ++i)
 			{
-				if (node.nodeName() ==
-					m_envLfoParameters[i]->nodeName() +
-						QString(targetNames[i][1]).toLower())
+				if (node.nodeName() == m_envLfoParameters[i]->nodeName() + QString(targetNames[i][1]).toLower())
 				{
 					m_envLfoParameters[i]->restoreState(node.toElement());
 				}

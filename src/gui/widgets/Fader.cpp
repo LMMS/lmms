@@ -169,8 +169,7 @@ void Fader::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 void Fader::mousePressEvent(QMouseEvent* mouseEvent)
 {
-	if (mouseEvent->button() == Qt::LeftButton &&
-		!(mouseEvent->modifiers() & Qt::ControlModifier))
+	if (mouseEvent->button() == Qt::LeftButton && !(mouseEvent->modifiers() & Qt::ControlModifier))
 	{
 		AutomatableModel* thisModel = model();
 		if (thisModel)
@@ -206,9 +205,10 @@ void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 	float newValue;
 	// TODO: dbV handling
 	newValue = QInputDialog::getDouble(this, tr("Set value"),
-				   tr("Please enter a new value between %1 and %2:").arg(model()->minValue() * m_conversionFactor).arg(model()->maxValue() * m_conversionFactor),
-				   model()->getRoundedValue() * m_conversionFactor,
-				   model()->minValue() * m_conversionFactor,
+				   tr("Please enter a new value between %1 and %2:")
+					   .arg(model()->minValue() * m_conversionFactor)
+					   .arg(model()->maxValue() * m_conversionFactor),
+				   model()->getRoundedValue() * m_conversionFactor, model()->minValue() * m_conversionFactor,
 				   model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok) /
 		m_conversionFactor;
 
@@ -280,15 +280,9 @@ void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElap
 	}
 }
 
-void Fader::setPeak_L(float fPeak)
-{
-	setPeak(fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L);
-}
+void Fader::setPeak_L(float fPeak) { setPeak(fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L); }
 
-void Fader::setPeak_R(float fPeak)
-{
-	setPeak(fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R);
-}
+void Fader::setPeak_R(float fPeak) { setPeak(fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R); }
 
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
@@ -299,7 +293,8 @@ void Fader::updateTextFloat()
 	}
 	else
 	{
-		s_textFloat->setText(m_description + " " + QString("%1 ").arg(model()->value() * m_conversionFactor) + " " + m_unit);
+		s_textFloat->setText(
+			m_description + " " + QString("%1 ").arg(model()->value() * m_conversionFactor) + " " + m_unit);
 	}
 	s_textFloat->moveGlobal(this, QPoint(width() - (*m_knob).width() - 5, knobPosY() - 46));
 }
@@ -361,8 +356,9 @@ void Fader::paintDBFSLevels(QPaintEvent* ev, QPainter& painter)
 	}
 	if (persistentLeftPeakDBFS > minDB)
 	{
-		QColor const& peakColor = clips(m_persistentPeak_L) ? peakRed() : persistentLeftPeakDBFS >= -6 ? peakYellow()
-																									   : peakGreen();
+		QColor const& peakColor = clips(m_persistentPeak_L) ? peakRed()
+			: persistentLeftPeakDBFS >= -6					? peakYellow()
+															: peakGreen();
 		painter.fillRect(QRect(2, persistentPeak_L, 7, 1), peakColor);
 	}
 
@@ -382,8 +378,9 @@ void Fader::paintDBFSLevels(QPaintEvent* ev, QPainter& painter)
 	}
 	if (persistentRightPeakDBFS > minDB)
 	{
-		QColor const& peakColor = clips(m_persistentPeak_R) ? peakRed() : persistentRightPeakDBFS >= -6 ? peakYellow()
-																										: peakGreen();
+		QColor const& peakColor = clips(m_persistentPeak_R) ? peakRed()
+			: persistentRightPeakDBFS >= -6					? peakYellow()
+															: peakGreen();
 		painter.fillRect(QRect(14, persistentPeak_R, 7, 1), peakColor);
 	}
 }
@@ -391,7 +388,7 @@ void Fader::paintDBFSLevels(QPaintEvent* ev, QPainter& painter)
 void Fader::paintLinearLevels(QPaintEvent* ev, QPainter& painter)
 {
 	// peak leds
-	//float fRange = abs( m_fMaxPeak ) + abs( m_fMinPeak );
+	// float fRange = abs( m_fMaxPeak ) + abs( m_fMinPeak );
 
 	int height = m_back->height();
 	int width = m_back->width() / 2;
@@ -408,7 +405,8 @@ void Fader::paintLinearLevels(QPaintEvent* ev, QPainter& painter)
 
 	int peak_R = calculateDisplayPeak(m_fPeakValue_R - m_fMinPeak);
 	int persistentPeak_R = qMax<int>(3, calculateDisplayPeak(m_persistentPeak_R - m_fMinPeak));
-	painter.drawPixmap(QRect(center, peak_R, width, height - peak_R), *m_leds, QRect(center, peak_R, width, height - peak_R));
+	painter.drawPixmap(
+		QRect(center, peak_R, width, height - peak_R), *m_leds, QRect(center, peak_R, width, height - peak_R));
 
 	if (m_persistentPeak_R > 0.05)
 	{
@@ -416,32 +414,14 @@ void Fader::paintLinearLevels(QPaintEvent* ev, QPainter& painter)
 	}
 }
 
-QColor const& Fader::peakGreen() const
-{
-	return m_peakGreen;
-}
+QColor const& Fader::peakGreen() const { return m_peakGreen; }
 
-QColor const& Fader::peakRed() const
-{
-	return m_peakRed;
-}
+QColor const& Fader::peakRed() const { return m_peakRed; }
 
-QColor const& Fader::peakYellow() const
-{
-	return m_peakYellow;
-}
+QColor const& Fader::peakYellow() const { return m_peakYellow; }
 
-void Fader::setPeakGreen(const QColor& c)
-{
-	m_peakGreen = c;
-}
+void Fader::setPeakGreen(const QColor& c) { m_peakGreen = c; }
 
-void Fader::setPeakRed(const QColor& c)
-{
-	m_peakRed = c;
-}
+void Fader::setPeakRed(const QColor& c) { m_peakRed = c; }
 
-void Fader::setPeakYellow(const QColor& c)
-{
-	m_peakYellow = c;
-}
+void Fader::setPeakYellow(const QColor& c) { m_peakYellow = c; }

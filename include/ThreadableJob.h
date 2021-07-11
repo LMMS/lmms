@@ -45,25 +45,13 @@ public:
 	{
 	}
 
-	inline ProcessingState state() const
-	{
-		return m_state.load();
-	}
+	inline ProcessingState state() const { return m_state.load(); }
 
-	inline void reset()
-	{
-		m_state = ProcessingState::Unstarted;
-	}
+	inline void reset() { m_state = ProcessingState::Unstarted; }
 
-	inline void queue()
-	{
-		m_state = ProcessingState::Queued;
-	}
+	inline void queue() { m_state = ProcessingState::Queued; }
 
-	inline void done()
-	{
-		m_state = ProcessingState::Done;
-	}
+	inline void done() { m_state = ProcessingState::Done; }
 
 	void process()
 	{

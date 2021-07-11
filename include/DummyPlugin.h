@@ -37,28 +37,16 @@ public:
 	{
 	}
 
-	virtual ~DummyPlugin()
-	{
-	}
+	virtual ~DummyPlugin() {}
 
-	void saveSettings(QDomDocument&, QDomElement&) override
-	{
-	}
+	void saveSettings(QDomDocument&, QDomElement&) override {}
 
-	void loadSettings(const QDomElement&) override
-	{
-	}
+	void loadSettings(const QDomElement&) override {}
 
-	QString nodeName() const override
-	{
-		return "DummyPlugin";
-	}
+	QString nodeName() const override { return "DummyPlugin"; }
 
 protected:
-	PluginView* instantiateView(QWidget* _parent) override
-	{
-		return new PluginView(this, _parent);
-	}
+	PluginView* instantiateView(QWidget* _parent) override { return new PluginView(this, _parent); }
 };
 
 #endif

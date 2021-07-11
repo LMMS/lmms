@@ -32,8 +32,7 @@
 #include "MixHelpers.h"
 #include "Mixer.h"
 
-AudioPort::AudioPort(const QString& _name, bool _has_effect_chain,
-	FloatModel* volumeModel, FloatModel* panningModel,
+AudioPort::AudioPort(const QString& _name, bool _has_effect_chain, FloatModel* volumeModel, FloatModel* panningModel,
 	BoolModel* mutedModel)
 	: m_bufferUsage(false)
 	, m_portBuffer(BufferManager::acquire())
@@ -100,12 +99,13 @@ void AudioPort::doProcessing()
 	// clear the buffer
 	BufferManager::clear(m_portBuffer, fpp);
 
-	//qDebug( "Playhandles: %d", m_playHandles.size() );
+	// qDebug( "Playhandles: %d", m_playHandles.size() );
 	for (PlayHandle* ph : m_playHandles) // now we mix all playhandle buffers into the audioport buffer
 	{
 		if (ph->buffer())
 		{
-			if (ph->usesBuffer() && (ph->type() == PlayHandle::TypeNotePlayHandle || !MixHelpers::isSilent(ph->buffer(), fpp)))
+			if (ph->usesBuffer() &&
+				(ph->type() == PlayHandle::TypeNotePlayHandle || !MixHelpers::isSilent(ph->buffer(), fpp)))
 			{
 				m_bufferUsage = true;
 				MixHelpers::add(m_portBuffer, ph->buffer(), fpp);
@@ -207,8 +207,9 @@ void AudioPort::doProcessing()
 	const bool me = processEffects();
 	if (me || m_bufferUsage)
 	{
-		Engine::fxMixer()->mixToChannel(m_portBuffer, m_nextFxChannel); // send output to fx mixer
-																		// TODO: improve the flow here - convert to pull model
+		Engine::fxMixer()->mixToChannel(
+			m_portBuffer, m_nextFxChannel); // send output to fx mixer
+											// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}
 }

@@ -83,12 +83,8 @@ const float MaxDetuning = 4 * 12.0f;
 class LMMS_EXPORT Note : public SerializingObject
 {
 public:
-	Note(const TimePos& length = TimePos(0),
-		const TimePos& pos = TimePos(0),
-		int key = DefaultKey,
-		volume_t volume = DefaultVolume,
-		panning_t panning = DefaultPanning,
-		DetuningHelper* detuning = NULL);
+	Note(const TimePos& length = TimePos(0), const TimePos& pos = TimePos(0), int key = DefaultKey,
+		volume_t volume = DefaultVolume, panning_t panning = DefaultPanning, DetuningHelper* detuning = NULL);
 	Note(const Note& note);
 	virtual ~Note();
 
@@ -97,14 +93,8 @@ public:
 	inline void setOldKey(const int oldKey) { m_oldKey = oldKey; }
 	inline void setOldPos(const TimePos& oldPos) { m_oldPos = oldPos; }
 
-	inline void setOldLength(const TimePos& oldLength)
-	{
-		m_oldLength = oldLength;
-	}
-	inline void setIsPlaying(const bool isPlaying)
-	{
-		m_isPlaying = isPlaying;
-	}
+	inline void setOldLength(const TimePos& oldLength) { m_oldLength = oldLength; }
+	inline void setIsPlaying(const bool isPlaying) { m_isPlaying = isPlaying; }
 
 	void setLength(const TimePos& length);
 	void setPos(const TimePos& pos);
@@ -129,30 +119,15 @@ public:
 		return ((int)(*lhs).key() > (int)(*rhs).key());
 	}
 
-	inline bool selected() const
-	{
-		return m_selected;
-	}
+	inline bool selected() const { return m_selected; }
 
-	inline int oldKey() const
-	{
-		return m_oldKey;
-	}
+	inline int oldKey() const { return m_oldKey; }
 
-	inline TimePos oldPos() const
-	{
-		return m_oldPos;
-	}
+	inline TimePos oldPos() const { return m_oldPos; }
 
-	inline TimePos oldLength() const
-	{
-		return m_oldLength;
-	}
+	inline TimePos oldLength() const { return m_oldLength; }
 
-	inline bool isPlaying() const
-	{
-		return m_isPlaying;
-	}
+	inline bool isPlaying() const { return m_isPlaying; }
 
 	inline TimePos endPos() const
 	{
@@ -160,15 +135,9 @@ public:
 		return pos() + l;
 	}
 
-	inline const TimePos& length() const
-	{
-		return m_length;
-	}
+	inline const TimePos& length() const { return m_length; }
 
-	inline const TimePos& pos() const
-	{
-		return m_pos;
-	}
+	inline const TimePos& pos() const { return m_pos; }
 
 	inline TimePos pos(TimePos basePos) const
 	{
@@ -176,42 +145,24 @@ public:
 		return m_pos - bp;
 	}
 
-	inline int key() const
-	{
-		return m_key;
-	}
+	inline int key() const { return m_key; }
 
-	inline volume_t getVolume() const
-	{
-		return m_volume;
-	}
+	inline volume_t getVolume() const { return m_volume; }
 
 	int midiVelocity(int midiBaseVelocity) const
 	{
 		return qMin(MidiMaxVelocity, getVolume() * midiBaseVelocity / DefaultVolume);
 	}
 
-	inline panning_t getPanning() const
-	{
-		return m_panning;
-	}
+	inline panning_t getPanning() const { return m_panning; }
 
-	static QString classNodeName()
-	{
-		return "note";
-	}
+	static QString classNodeName() { return "note"; }
 
-	inline QString nodeName() const override
-	{
-		return classNodeName();
-	}
+	inline QString nodeName() const override { return classNodeName(); }
 
 	static TimePos quantized(const TimePos& m, const int qGrid);
 
-	DetuningHelper* detuning() const
-	{
-		return m_detuning;
-	}
+	DetuningHelper* detuning() const { return m_detuning; }
 	bool hasDetuningInfo() const;
 	bool withinRange(int tickStart, int tickEnd) const;
 

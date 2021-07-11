@@ -45,15 +45,9 @@ public:
 
 	static QString probeDevice(void);
 
-	inline static QString name(void)
-	{
-		return QT_TRANSLATE_NOOP("MidiSetupWidget", "sndio MIDI");
-	}
+	inline static QString name(void) { return QT_TRANSLATE_NOOP("MidiSetupWidget", "sndio MIDI"); }
 
-	inline static QString configSection()
-	{
-		return "MidiSndio";
-	}
+	inline static QString configSection() { return "MidiSndio"; }
 
 protected:
 	void sendByte(const unsigned char c) override;

@@ -1,8 +1,8 @@
 /*
 	Descriptor.h
-	
+
 	Copyright 2004-10 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Creating a LADSPA_Descriptor for a CAPS plugin via a C++ template,
@@ -12,7 +12,7 @@
 	Descriptor<P> expects P to declare some common methods, like init(),
 	activate() etc, plus a static port_info[] and LADSPA_Data * ports[]
 	and adding_gain.  (P should derive from Plugin, too.)
- 
+
 */
 /*
 	This program is free software; you can redistribute it and/or
@@ -44,14 +44,10 @@
 /* common stub for Descriptor makes it possible to delete() without special-
  * casing for every plugin class.
  */
-class DescriptorStub
-	: public LADSPA_Descriptor
+class DescriptorStub : public LADSPA_Descriptor
 {
 public:
-	DescriptorStub()
-	{
-		PortCount = 0;
-	}
+	DescriptorStub() { PortCount = 0; }
 
 	~DescriptorStub()
 	{
@@ -64,8 +60,7 @@ public:
 	}
 };
 
-inline void
-processor_specific_denormal_measures()
+inline void processor_specific_denormal_measures()
 {
 #ifdef __SSE3__
 	/* this one works reliably on a 6600 Core2 */
@@ -78,9 +73,7 @@ processor_specific_denormal_measures()
 #endif
 }
 
-template <class T>
-class Descriptor
-	: public DescriptorStub
+template <class T> class Descriptor : public DescriptorStub
 {
 public:
 	LADSPA_PortRangeHint* ranges;
@@ -121,8 +114,7 @@ public:
 		cleanup = _cleanup;
 	}
 
-	static LADSPA_Handle _instantiate(
-		const struct _LADSPA_Descriptor* d, ulong fs)
+	static LADSPA_Handle _instantiate(const struct _LADSPA_Descriptor* d, ulong fs)
 	{
 		T* plugin = new T();
 		int n = (int)d->PortCount;
@@ -143,10 +135,7 @@ public:
 		return plugin;
 	}
 
-	static void _connect_port(LADSPA_Handle h, ulong i, LADSPA_Data* p)
-	{
-		((T*)h)->ports[i] = p;
-	}
+	static void _connect_port(LADSPA_Handle h, ulong i, LADSPA_Data* p) { ((T*)h)->ports[i] = p; }
 
 	static void _activate(LADSPA_Handle h)
 	{
@@ -154,11 +143,11 @@ public:
 
 		plugin->first_run = 1;
 
-		/* since none of the plugins do any RT-critical work in 
-				 * activate(), it's safe to defer the actual call to the 
+		/* since none of the plugins do any RT-critical work in
+				 * activate(), it's safe to defer the actual call to the
 				 * plugin's activate() method for the first run() after
 				 * the host called in here.
-				 * 
+				 *
 				 * It's the simplest way to prevent a parameter smoothing sweep
 				 * in the first audio block after activation.
 				plugin->activate();
@@ -172,8 +161,8 @@ public:
 		/* We don't reset the processor flags later, it's true. */
 		processor_specific_denormal_measures();
 
-		/* If this is the first audio block after activation, 
-				 * initialize the plugin from the current set of parameters. */
+		/* If this is the first audio block after activation,
+		 * initialize the plugin from the current set of parameters. */
 		if (plugin->first_run)
 		{
 			plugin->activate();
@@ -191,8 +180,8 @@ public:
 		/* We don't reset the processor flags later, it's true. */
 		processor_specific_denormal_measures();
 
-		/* If this is the first audio block after activation, 
-				 * initialize the plugin from the current set of parameters. */
+		/* If this is the first audio block after activation,
+		 * initialize the plugin from the current set of parameters. */
 		if (plugin->first_run)
 		{
 			plugin->activate();

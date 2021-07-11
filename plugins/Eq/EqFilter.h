@@ -85,10 +85,7 @@ public:
 
 	virtual inline void setParameters(float sampleRate, float freq, float res, float gain)
 	{
-		bool hasChanged = (sampleRate != m_sampleRate ||
-			freq != m_freq ||
-			res != m_res ||
-			gain != m_gain);
+		bool hasChanged = (sampleRate != m_sampleRate || freq != m_freq || res != m_res || gain != m_gain);
 		if (hasChanged)
 		{
 			m_sampleRate = sampleRate;
@@ -126,10 +123,7 @@ protected:
 	/// \brief calcCoefficents
 	///  Override this in child classes to provide the coefficents, based on
 	///  Freq, Res and Gain
-	virtual void calcCoefficents()
-	{
-		setCoeffs(0, 0, 0, 0, 0);
-	}
+	virtual void calcCoefficents() { setCoeffs(0, 0, 0, 0, 0); }
 
 	inline void setCoeffs(float a1, float a2, float b0, float b1, float b2)
 	{
@@ -163,7 +157,7 @@ public:
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-		//calc coefficents
+		// calc coefficents
 		b0 = (1 + c) * 0.5;
 		b1 = (-(1 + c));
 		b2 = (1 + c) * 0.5;
@@ -171,7 +165,7 @@ public:
 		a1 = (-2 * c);
 		a2 = 1 - alpha;
 
-		//normalise
+		// normalise
 		b0 /= a0;
 		b1 /= a0;
 		b2 /= a0;
@@ -203,7 +197,7 @@ public:
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-		//calc coefficents
+		// calc coefficents
 		b0 = (1 - c) * 0.5;
 		b1 = 1 - c;
 		b2 = (1 - c) * 0.5;
@@ -211,7 +205,7 @@ public:
 		a1 = -2 * c;
 		a2 = 1 - alpha;
 
-		//normalise
+		// normalise
 		b0 /= a0;
 		b1 /= a0;
 		b2 /= a0;
@@ -243,7 +237,7 @@ public:
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-		//calc coefficents
+		// calc coefficents
 		b0 = 1 + alpha * A;
 		b1 = -2 * c;
 		b2 = 1 - alpha * A;
@@ -251,7 +245,7 @@ public:
 		a1 = -2 * c;
 		a2 = 1 - alpha / A;
 
-		//normalise
+		// normalise
 		b0 /= a0;
 		b1 /= a0;
 		b2 /= a0;
@@ -309,7 +303,7 @@ public:
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-		//calc coefficents
+		// calc coefficents
 		b0 = A * ((A + 1) - (A - 1) * c + beta * s);
 		b1 = 2 * A * ((A - 1) - (A + 1) * c);
 		b2 = A * ((A + 1) - (A - 1) * c - beta * s);
@@ -317,7 +311,7 @@ public:
 		a1 = -2 * ((A - 1) + (A + 1) * c);
 		a2 = (A + 1) + (A - 1) * c - beta * s;
 
-		//normalise
+		// normalise
 		b0 /= a0;
 		b1 /= a0;
 		b2 /= a0;
@@ -345,14 +339,14 @@ public:
 
 		float a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-		//calc coefficents
+		// calc coefficents
 		b0 = A * ((A + 1) + (A - 1) * c + beta * s);
 		b1 = -2 * A * ((A - 1) + (A + 1) * c);
 		b2 = A * ((A + 1) + (A - 1) * c - beta * s);
 		a0 = (A + 1) - (A - 1) * c + beta * s;
 		a1 = 2 * ((A - 1) - (A + 1) * c);
 		a2 = (A + 1) - (A - 1) * c - beta * s;
-		//normalise
+		// normalise
 		b0 /= a0;
 		b1 /= a0;
 		b2 /= a0;

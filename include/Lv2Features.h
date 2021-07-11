@@ -63,10 +63,7 @@ public:
 	//! Fill m_features and m_featurePointers with all features
 	void createFeatureVectors();
 	//! Return LV2_Feature pointer vector, suited for lilv_plugin_instantiate
-	const LV2_Feature* const* featurePointers() const
-	{
-		return m_featurePointers.data();
-	}
+	const LV2_Feature* const* featurePointers() const { return m_featurePointers.data(); }
 
 private:
 	//! feature storage

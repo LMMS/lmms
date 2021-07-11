@@ -79,9 +79,7 @@ bool PluginIssue::operator==(const PluginIssue& other) const
 
 bool PluginIssue::operator<(const PluginIssue& other) const
 {
-	return (m_issueType != other.m_issueType)
-		? m_issueType < other.m_issueType
-		: m_info < other.m_info;
+	return (m_issueType != other.m_issueType) ? m_issueType < other.m_issueType : m_info < other.m_info;
 }
 
 QDebug operator<<(QDebug stream, const PluginIssue& iss)

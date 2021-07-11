@@ -33,25 +33,16 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Dynamics Processor",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"plugin for processing dynamics in a flexible way"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor = {STRINGIFY(PLUGIN_NAME),
+		"Dynamics Processor", QT_TRANSLATE_NOOP("PluginBrowser", "plugin for processing dynamics in a flexible way"),
+		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+		NULL};
 }
 
 const float DYN_NOISE_FLOOR = 0.00001f; // -100dBFS noise floor
 const double DNF_LOG = 5.0;
 
-dynProcEffect::dynProcEffect(Model* _parent,
-	const Descriptor::SubPluginFeatures::Key* _key)
+dynProcEffect::dynProcEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&dynamicsprocessor_plugin_descriptor, _parent, _key)
 	, m_dpControls(this)
 {
@@ -70,24 +61,25 @@ dynProcEffect::~dynProcEffect()
 
 inline void dynProcEffect::calcAttack()
 {
-	m_attCoeff = exp10((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
+	m_attCoeff =
+		exp10((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
 }
 
 inline void dynProcEffect::calcRelease()
 {
-	m_relCoeff = exp10((-DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
+	m_relCoeff =
+		exp10((-DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
 }
 
-bool dynProcEffect::processAudioBuffer(sampleFrame* _buf,
-	const fpp_t _frames)
+bool dynProcEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
 	if (!isEnabled() || !isRunning())
 	{
-		//apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
+		// apparently we can't keep running after the decay value runs out so we'll just set the peaks to zero
 		m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
 		return (false);
 	}
-	//qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
+	// qDebug( "%f %f", m_currentPeak[0], m_currentPeak[1] );
 
 	// variables for effect
 	int i = 0;
@@ -185,8 +177,7 @@ bool dynProcEffect::processAudioBuffer(sampleFrame* _buf,
 				}
 				else if (lookup < 200)
 				{
-					gain = linearInterpolate(samples[lookup - 1],
-						samples[lookup], frac);
+					gain = linearInterpolate(samples[lookup - 1], samples[lookup], frac);
 				}
 				else
 				{
@@ -219,8 +210,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 	{
-		return (new dynProcEffect(_parent,
-			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(
-				_data)));
+		return (new dynProcEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data)));
 	}
 }

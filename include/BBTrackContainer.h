@@ -41,16 +41,10 @@ public:
 
 	void updateAfterTrackAdd() override;
 
-	inline QString nodeName() const override
-	{
-		return "bbtrackcontainer";
-	}
+	inline QString nodeName() const override { return "bbtrackcontainer"; }
 
 	bar_t lengthOfBB(int bb) const;
-	inline bar_t lengthOfCurrentBB()
-	{
-		return lengthOfBB(currentBB());
-	}
+	inline bar_t lengthOfCurrentBB() { return lengthOfBB(currentBB()); }
 	int numOfBBs() const;
 	void removeBB(int bb);
 

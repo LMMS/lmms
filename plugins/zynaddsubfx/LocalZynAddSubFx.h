@@ -56,10 +56,7 @@ public:
 
 	void processAudio(sampleFrame* _out);
 
-	inline Master* master()
-	{
-		return m_master;
-	}
+	inline Master* master() { return m_master; }
 
 protected:
 	static int s_instanceCount;

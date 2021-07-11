@@ -34,17 +34,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Equalizer",
-			QT_TRANSLATE_NOOP("PluginBrowser", "A native eq plugin"),
-			"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Equalizer",
+		QT_TRANSLATE_NOOP("PluginBrowser", "A native eq plugin"),
+		"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
+		new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 EqEffect::EqEffect(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)
@@ -55,15 +48,13 @@ EqEffect::EqEffect(Model* parent, const Plugin::Descriptor::SubPluginFeatures::K
 {
 }
 
-EqEffect::~EqEffect()
-{
-}
+EqEffect::~EqEffect() {}
 
 bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
 	const int sampleRate = Engine::mixer()->processingSampleRate();
 
-	//wet/dry controls
+	// wet/dry controls
 	const float dry = dryLevel();
 	const float wet = wetLevel();
 	sample_t dryS[2];
@@ -106,8 +97,8 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	float para4Gain = m_eqControls.m_para4GainModel.value();
 	float highShelfGain = m_eqControls.m_highShelfGainModel.value();
 
-	//set all filter parameters once per frame, EqFilter handles
-	//smooth xfading, reducing pops clicks and dc bias offsets
+	// set all filter parameters once per frame, EqFilter handles
+	// smooth xfading, reducing pops clicks and dc bias offsets
 
 	m_hp12.setParameters(sampleRate, hpFreq, hpRes, 1);
 	m_hp24.setParameters(sampleRate, hpFreq, hpRes, 1);
@@ -167,7 +158,7 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	for (fpp_t f = 0; f < frames; ++f)
 	{
 		periodProgress = (float)f / (float)(frames - 1);
-		//wet dry buffer
+		// wet dry buffer
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		if (hpActive)
@@ -248,7 +239,7 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 		}
 
-		//apply wet / dry levels
+		// apply wet / dry levels
 		buf[f][1] = (dry * dryS[1]) + (wet * buf[f][1]);
 		buf[f][0] = (dry * dryS[0]) + (wet * buf[f][0]);
 	}
@@ -295,39 +286,33 @@ void EqEffect::setBandPeaks(EqAnalyser* fft, int samplerate)
 {
 	m_eqControls.m_lowShelfPeakR = m_eqControls.m_lowShelfPeakL =
 		peakBand(m_eqControls.m_lowShelfFreqModel.value() * (1 - m_eqControls.m_lowShelfResModel.value() * 0.5),
-			m_eqControls.m_lowShelfFreqModel.value(),
-			fft, samplerate);
+			m_eqControls.m_lowShelfFreqModel.value(), fft, samplerate);
 
 	m_eqControls.m_para1PeakL = m_eqControls.m_para1PeakR =
 		peakBand(m_eqControls.m_para1FreqModel.value() * (1 - m_eqControls.m_para1BwModel.value() * 0.5),
-			m_eqControls.m_para1FreqModel.value() * (1 + m_eqControls.m_para1BwModel.value() * 0.5),
-			fft, samplerate);
+			m_eqControls.m_para1FreqModel.value() * (1 + m_eqControls.m_para1BwModel.value() * 0.5), fft, samplerate);
 
 	m_eqControls.m_para2PeakL = m_eqControls.m_para2PeakR =
 		peakBand(m_eqControls.m_para2FreqModel.value() * (1 - m_eqControls.m_para2BwModel.value() * 0.5),
-			m_eqControls.m_para2FreqModel.value() * (1 + m_eqControls.m_para2BwModel.value() * 0.5),
-			fft, samplerate);
+			m_eqControls.m_para2FreqModel.value() * (1 + m_eqControls.m_para2BwModel.value() * 0.5), fft, samplerate);
 
 	m_eqControls.m_para3PeakL = m_eqControls.m_para3PeakR =
 		peakBand(m_eqControls.m_para3FreqModel.value() * (1 - m_eqControls.m_para3BwModel.value() * 0.5),
-			m_eqControls.m_para3FreqModel.value() * (1 + m_eqControls.m_para3BwModel.value() * 0.5),
-			fft, samplerate);
+			m_eqControls.m_para3FreqModel.value() * (1 + m_eqControls.m_para3BwModel.value() * 0.5), fft, samplerate);
 
 	m_eqControls.m_para4PeakL = m_eqControls.m_para4PeakR =
 		peakBand(m_eqControls.m_para4FreqModel.value() * (1 - m_eqControls.m_para4BwModel.value() * 0.5),
-			m_eqControls.m_para4FreqModel.value() * (1 + m_eqControls.m_para4BwModel.value() * 0.5),
-			fft, samplerate);
+			m_eqControls.m_para4FreqModel.value() * (1 + m_eqControls.m_para4BwModel.value() * 0.5), fft, samplerate);
 
-	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR =
-		peakBand(m_eqControls.m_highShelfFreqModel.value(),
-			m_eqControls.m_highShelfFreqModel.value() * (1 + m_eqControls.m_highShelfResModel.value() * 0.5),
-			fft, samplerate);
+	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR = peakBand(m_eqControls.m_highShelfFreqModel.value(),
+		m_eqControls.m_highShelfFreqModel.value() * (1 + m_eqControls.m_highShelfResModel.value() * 0.5), fft,
+		samplerate);
 }
 
 extern "C"
 {
 
-	//needed for getting plugin out of shared lib
+	// needed for getting plugin out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
 	{
 		return new EqEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));

@@ -101,28 +101,24 @@ void signalHandler(int signum)
 
 static inline QString baseName(const QString& file)
 {
-	return QFileInfo(file).absolutePath() + "/" +
-		QFileInfo(file).completeBaseName();
+	return QFileInfo(file).absolutePath() + "/" + QFileInfo(file).completeBaseName();
 }
 
 #ifdef LMMS_BUILD_WIN32
 // Workaround for old MinGW
 #ifdef __MINGW32__
-extern "C" _CRTIMP errno_t __cdecl freopen_s(FILE** _File,
-	const char* _Filename, const char* _Mode, FILE* _Stream);
+extern "C" _CRTIMP errno_t __cdecl freopen_s(FILE** _File, const char* _Filename, const char* _Mode, FILE* _Stream);
 #endif
 
 // For qInstallMessageHandler
-void consoleMessageHandler(QtMsgType type,
-	const QMessageLogContext& context, const QString& msg)
+void consoleMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
 	QByteArray localMsg = msg.toLocal8Bit();
 	fprintf(stderr, "%s\n", localMsg.constData());
 }
 #endif
 
-inline void loadTranslation(const QString& tname,
-	const QString& dir = ConfigManager::inst()->localeDir())
+inline void loadTranslation(const QString& tname, const QString& dir = ConfigManager::inst()->localeDir())
 {
 	QTranslator* t = new QTranslator(QCoreApplication::instance());
 	QString name = tname + ".qm";
@@ -142,9 +138,7 @@ void printVersion(char* executableName)
 		   "License as published by the Free Software Foundation; either\n"
 		   "version 2 of the License, or (at your option) any later version.\n\n"
 		   "Try \"%s --help\" for more information.\n\n",
-		LMMS_VERSION,
-		PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION,
-		LMMS_PROJECT_COPYRIGHT, executableName);
+		LMMS_VERSION, PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION, LMMS_PROJECT_COPYRIGHT, executableName);
 }
 
 void printHelp()
@@ -215,40 +209,32 @@ void fileCheck(QString& file)
 
 	if (!fileToCheck.size())
 	{
-		printf("The file %s does not have any content.\n",
-			file.toUtf8().constData());
+		printf("The file %s does not have any content.\n", file.toUtf8().constData());
 		exit(EXIT_FAILURE);
 	}
 	else if (fileToCheck.isDir())
 	{
-		printf("%s is a directory.\n",
-			file.toUtf8().constData());
+		printf("%s is a directory.\n", file.toUtf8().constData());
 		exit(EXIT_FAILURE);
 	}
 }
 
 int usageError(const QString& message)
 {
-	qCritical().noquote() << QString("\n%1.\n\nTry \"%2 --help\" for more information.\n\n")
-								 .arg(message)
-								 .arg(qApp->arguments()[0]);
+	qCritical().noquote()
+		<< QString("\n%1.\n\nTry \"%2 --help\" for more information.\n\n").arg(message).arg(qApp->arguments()[0]);
 	return EXIT_FAILURE;
 }
 
-int noInputFileError()
-{
-	return usageError("No input file specified");
-}
+int noInputFileError() { return usageError("No input file specified"); }
 
 int main(int argc, char** argv)
 {
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
-	feenableexcept(FE_INVALID |
-		FE_DIVBYZERO |
-		FE_OVERFLOW /*|
-			FE_UNDERFLOW*/
+	feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW /*|
+												   FE_UNDERFLOW*/
 	);
 
 	// Install the trap handler
@@ -304,9 +290,8 @@ int main(int argc, char** argv)
 	{
 		QString arg = argv[i];
 
-		if (arg == "--help" || arg == "-h" ||
-			arg == "--version" || arg == "-v" ||
-			arg == "render" || arg == "--render" || arg == "-r")
+		if (arg == "--help" || arg == "-h" || arg == "--version" || arg == "-v" || arg == "render" ||
+			arg == "--render" || arg == "-r")
 		{
 			coreOnly = true;
 		}
@@ -351,7 +336,8 @@ int main(int argc, char** argv)
 	QCoreApplication* app = coreOnly ? new QCoreApplication(argc, argv) : new MainApplication(argc, argv);
 
 	Mixer::qualitySettings qs(Mixer::qualitySettings::Mode_HighQuality);
-	OutputSettings os(44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo);
+	OutputSettings os(44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit,
+		OutputSettings::StereoMode_JointStereo);
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
 	// second of two command-line parsing stages
@@ -457,8 +443,8 @@ int main(int argc, char** argv)
 
 			return EXIT_SUCCESS;
 		}
-		else if (arg == "render" || arg == "--render" || arg == "-r" ||
-			arg == "rendertracks" || arg == "--rendertracks")
+		else if (arg == "render" || arg == "--render" || arg == "-r" || arg == "rendertracks" ||
+			arg == "--rendertracks")
 		{
 			++i;
 
@@ -718,9 +704,7 @@ int main(int argc, char** argv)
 	ConfigManager::inst()->loadConfigFile(configFile);
 
 	// Hidden settings
-	MixHelpers::setNaNHandler(ConfigManager::inst()->value("app",
-													   "nanhandler", "1")
-								  .toInt());
+	MixHelpers::setNaNHandler(ConfigManager::inst()->value("app", "nanhandler", "1").toInt());
 
 	// set language
 	QString pos = ConfigManager::inst()->value("app", "language");
@@ -745,9 +729,7 @@ int main(int argc, char** argv)
 #ifdef LMMS_HAVE_SCHED_H
 #ifndef __OpenBSD__
 	struct sched_param sparam;
-	sparam.sched_priority = (sched_get_priority_max(SCHED_FIFO) +
-								sched_get_priority_min(SCHED_FIFO)) /
-		2;
+	sparam.sched_priority = (sched_get_priority_max(SCHED_FIFO) + sched_get_priority_min(SCHED_FIFO)) / 2;
 	if (sched_setscheduler(0, SCHED_FIFO, &sparam) == -1)
 	{
 		printf("Notice: could not set realtime priority.\n");
@@ -801,19 +783,16 @@ int main(int argc, char** argv)
 		// otherwise, it is a file, so we need to append the file extension
 		if (!renderTracks)
 		{
-			renderOut = baseName(renderOut) +
-				ProjectRenderer::getFileExtensionFromFormat(eff);
+			renderOut = baseName(renderOut) + ProjectRenderer::getFileExtensionFromFormat(eff);
 		}
 
 		// create renderer
 		RenderManager* r = new RenderManager(qs, os, eff, renderOut);
-		QCoreApplication::instance()->connect(r,
-			SIGNAL(finished()), SLOT(quit()));
+		QCoreApplication::instance()->connect(r, SIGNAL(finished()), SLOT(quit()));
 
 		// timer for progress-updates
 		QTimer* t = new QTimer(r);
-		r->connect(t, SIGNAL(timeout()),
-			SLOT(updateConsoleProgress()));
+		r->connect(t, SIGNAL(timeout()), SLOT(updateConsoleProgress()));
 		t->start(200);
 
 		if (profilerOutputFile.isEmpty() == false)
@@ -842,34 +821,30 @@ int main(int argc, char** argv)
 		// recover a file?
 		QString recoveryFile = ConfigManager::inst()->recoveryFile();
 
-		bool recoveryFilePresent = QFileInfo(recoveryFile).exists() &&
-			QFileInfo(recoveryFile).isFile();
-		bool autoSaveEnabled =
-			ConfigManager::inst()->value("ui", "enableautosave").toInt();
+		bool recoveryFilePresent = QFileInfo(recoveryFile).exists() && QFileInfo(recoveryFile).isFile();
+		bool autoSaveEnabled = ConfigManager::inst()->value("ui", "enableautosave").toInt();
 		if (recoveryFilePresent)
 		{
 			QMessageBox mb;
 			mb.setWindowTitle(MainWindow::tr("Project recovery"));
-			mb.setText(QString(
-				"<html>"
-				"<p style=\"margin-left:6\">%1</p>"
-				"<table cellpadding=\"3\">"
-				"  <tr>"
-				"    <td><b>%2</b></td>"
-				"    <td>%3</td>"
-				"  </tr>"
-				"  <tr>"
-				"    <td><b>%4</b></td>"
-				"    <td>%5</td>"
-				"  </tr>"
-				"</table>"
-				"</html>")
-						   .arg(
-							   MainWindow::tr("There is a recovery file present. "
-											  "It looks like the last session did not end "
-											  "properly or another instance of LMMS is "
-											  "already running. Do you want to recover the "
-											  "project of this session?"),
+			mb.setText(QString("<html>"
+							   "<p style=\"margin-left:6\">%1</p>"
+							   "<table cellpadding=\"3\">"
+							   "  <tr>"
+							   "    <td><b>%2</b></td>"
+							   "    <td>%3</td>"
+							   "  </tr>"
+							   "  <tr>"
+							   "    <td><b>%4</b></td>"
+							   "    <td>%5</td>"
+							   "  </tr>"
+							   "</table>"
+							   "</html>")
+						   .arg(MainWindow::tr("There is a recovery file present. "
+											   "It looks like the last session did not end "
+											   "properly or another instance of LMMS is "
+											   "already running. Do you want to recover the "
+											   "project of this session?"),
 							   MainWindow::tr("Recover"),
 							   MainWindow::tr("Recover the file. Please don't run "
 											  "multiple instances of LMMS when you do this."),
@@ -887,10 +862,8 @@ int main(int argc, char** argv)
 
 			// setting all buttons to the same roles allows us
 			// to have a custom layout
-			discard = mb.addButton(MainWindow::tr("Discard"),
-				QMessageBox::AcceptRole);
-			recover = mb.addButton(MainWindow::tr("Recover"),
-				QMessageBox::AcceptRole);
+			discard = mb.addButton(MainWindow::tr("Discard"), QMessageBox::AcceptRole);
+			recover = mb.addButton(MainWindow::tr("Recover"), QMessageBox::AcceptRole);
 
 			// have a hidden exit button
 			exit = mb.addButton("", QMessageBox::RejectRole);
@@ -958,14 +931,12 @@ int main(int argc, char** argv)
 		// If enabled, open last project if there is one. Else, create
 		// a new one.
 		else if (ConfigManager::inst()->value("app", "openlastproject").toInt() &&
-			!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() &&
-			!recoveryFilePresent)
+			!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() && !recoveryFilePresent)
 		{
 			QString f = ConfigManager::inst()->recentlyOpenedProjects().first();
 			QFileInfo recentFile(f);
 
-			if (recentFile.exists() &&
-				recentFile.suffix().toLower() != "mpt")
+			if (recentFile.exists() && recentFile.suffix().toLower() != "mpt")
 			{
 				Engine::getSong()->loadProject(f);
 			}

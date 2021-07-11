@@ -37,10 +37,7 @@ public:
 	DelayEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~DelayEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
-	virtual EffectControls* controls()
-	{
-		return &m_delayControls;
-	}
+	virtual EffectControls* controls() { return &m_delayControls; }
 	void changeSampleRate();
 
 private:

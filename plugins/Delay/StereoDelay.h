@@ -40,10 +40,7 @@ public:
 		}
 	}
 
-	inline void setFeedback(float feedback)
-	{
-		m_feedback = feedback;
-	}
+	inline void setFeedback(float feedback) { m_feedback = feedback; }
 
 	void tick(sampleFrame& frame);
 	void setSampleRate(int sampleRate);

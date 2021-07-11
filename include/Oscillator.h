@@ -65,32 +65,17 @@ public:
 		NumModulationAlgos
 	};
 
-	Oscillator(const IntModel* _wave_shape_model,
-		const IntModel* _mod_algo_model,
-		const float& _freq,
-		const float& _detuning,
-		const float& _phase_offset,
-		const float& _volume,
-		Oscillator* _m_subOsc = NULL);
-	virtual ~Oscillator()
-	{
-		delete m_subOsc;
-	}
+	Oscillator(const IntModel* _wave_shape_model, const IntModel* _mod_algo_model, const float& _freq,
+		const float& _detuning, const float& _phase_offset, const float& _volume, Oscillator* _m_subOsc = NULL);
+	virtual ~Oscillator() { delete m_subOsc; }
 
-	inline void setUserWave(const SampleBuffer* _wave)
-	{
-		m_userWave = _wave;
-	}
+	inline void setUserWave(const SampleBuffer* _wave) { m_userWave = _wave; }
 
-	void update(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
+	void update(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
 
 	// now follow the wave-shape-routines...
 
-	static inline sample_t sinSample(const float _sample)
-	{
-		return sinf(_sample * F_2PI);
-	}
+	static inline sample_t sinSample(const float _sample) { return sinf(_sample * F_2PI); }
 
 	static inline sample_t triangleSample(const float _sample)
 	{
@@ -106,15 +91,9 @@ public:
 		return ph * 4.0f - 4.0f;
 	}
 
-	static inline sample_t sawSample(const float _sample)
-	{
-		return -1.0f + absFraction(_sample) * 2.0f;
-	}
+	static inline sample_t sawSample(const float _sample) { return -1.0f + absFraction(_sample) * 2.0f; }
 
-	static inline sample_t squareSample(const float _sample)
-	{
-		return (absFraction(_sample) > 0.5f) ? -1.0f : 1.0f;
-	}
+	static inline sample_t squareSample(const float _sample) { return (absFraction(_sample) > 0.5f) ? -1.0f : 1.0f; }
 
 	static inline sample_t moogSawSample(const float _sample)
 	{
@@ -145,10 +124,7 @@ public:
 		return 1.0f - fast_rand() * 2.0f / FAST_RAND_MAX;
 	}
 
-	inline sample_t userWaveSample(const float _sample) const
-	{
-		return m_userWave->userWaveSample(_sample);
-	}
+	inline sample_t userWaveSample(const float _sample) const { return m_userWave->userWaveSample(_sample); }
 
 private:
 	const IntModel* m_waveShapeModel;
@@ -162,44 +138,24 @@ private:
 	float m_phase;
 	const SampleBuffer* m_userWave;
 
-	void updateNoSub(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	void updatePM(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	void updateAM(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	void updateMix(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	void updateSync(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	void updateFM(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
+	void updateNoSub(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	void updatePM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	void updateAM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	void updateMix(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	void updateSync(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	void updateFM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
 
-	float syncInit(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
+	float syncInit(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
 	inline bool syncOk(float _osc_coeff);
 
-	template <WaveShapes W>
-	void updateNoSub(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	template <WaveShapes W>
-	void updatePM(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	template <WaveShapes W>
-	void updateAM(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	template <WaveShapes W>
-	void updateMix(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	template <WaveShapes W>
-	void updateSync(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
-	template <WaveShapes W>
-	void updateFM(sampleFrame* _ab, const fpp_t _frames,
-		const ch_cnt_t _chnl);
+	template <WaveShapes W> void updateNoSub(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	template <WaveShapes W> void updatePM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	template <WaveShapes W> void updateAM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	template <WaveShapes W> void updateMix(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	template <WaveShapes W> void updateSync(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
+	template <WaveShapes W> void updateFM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl);
 
-	template <WaveShapes W>
-	inline sample_t getSample(const float _sample);
+	template <WaveShapes W> inline sample_t getSample(const float _sample);
 
 	inline void recalcPhase();
 };

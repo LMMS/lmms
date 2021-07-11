@@ -91,8 +91,7 @@ ControlLayout::ControlLayout(QWidget* parent, int margin, int hSpacing, int vSpa
 	setContentsMargins(margin, margin, margin, margin);
 	m_searchBar->setPlaceholderText("filter");
 	m_searchBar->setObjectName(s_searchBarName);
-	connect(m_searchBar, SIGNAL(textChanged(const QString&)),
-		this, SLOT(onTextChanged(const QString&)));
+	connect(m_searchBar, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
 	addWidget(m_searchBar);
 	m_searchBar->setHidden(true); // nothing to filter yet
 }
@@ -144,22 +143,16 @@ int ControlLayout::verticalSpacing() const
 	}
 }
 
-int ControlLayout::count() const
-{
-	return m_itemMap.size() - 1;
-}
+int ControlLayout::count() const { return m_itemMap.size() - 1; }
 
-QMap<QString, QLayoutItem*>::const_iterator
-ControlLayout::pairAt(int index) const
+QMap<QString, QLayoutItem*>::const_iterator ControlLayout::pairAt(int index) const
 {
 	if (index < 0)
 	{
 		return m_itemMap.cend();
 	}
 
-	auto skip = [&](QLayoutItem* item) -> bool {
-		return item->widget()->objectName() == s_searchBarName;
-	};
+	auto skip = [&](QLayoutItem* item) -> bool { return item->widget()->objectName() == s_searchBarName; };
 
 	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
 	for (; itr != m_itemMap.cend() && (index > 0 || skip(itr.value())); ++itr)
@@ -192,20 +185,11 @@ QLayoutItem* ControlLayout::takeAt(int index)
 	return (itr == m_itemMap.end()) ? nullptr : m_itemMap.take(itr.key());
 }
 
-void ControlLayout::removeFocusFromSearchBar()
-{
-	m_searchBar->clearFocus();
-}
+void ControlLayout::removeFocusFromSearchBar() { m_searchBar->clearFocus(); }
 
-Qt::Orientations ControlLayout::expandingDirections() const
-{
-	return Qt::Orientations();
-}
+Qt::Orientations ControlLayout::expandingDirections() const { return Qt::Orientations(); }
 
-bool ControlLayout::hasHeightForWidth() const
-{
-	return true;
-}
+bool ControlLayout::hasHeightForWidth() const { return true; }
 
 int ControlLayout::heightForWidth(int width) const
 {
@@ -219,10 +203,7 @@ void ControlLayout::setGeometry(const QRect& rect)
 	doLayout(rect, false);
 }
 
-QSize ControlLayout::sizeHint() const
-{
-	return minimumSize();
-}
+QSize ControlLayout::sizeHint() const { return minimumSize(); }
 
 QSize ControlLayout::minimumSize() const
 {
@@ -288,14 +269,14 @@ int ControlLayout::doLayout(const QRect& rect, bool testOnly) const
 				int spaceX = horizontalSpacing();
 				if (spaceX == -1)
 				{
-					spaceX = wid->style()->layoutSpacing(
-						QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Horizontal);
+					spaceX =
+						wid->style()->layoutSpacing(QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Horizontal);
 				}
 				int spaceY = verticalSpacing();
 				if (spaceY == -1)
 				{
-					spaceY = wid->style()->layoutSpacing(
-						QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Vertical);
+					spaceY =
+						wid->style()->layoutSpacing(QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Vertical);
 				}
 				int nextX = x + item->sizeHint().width() + spaceX;
 				if (nextX - spaceX > effectiveRect.right() && lineHeight > 0)

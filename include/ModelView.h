@@ -38,38 +38,19 @@ public:
 	virtual void setModel(Model* model, bool isOldModelValid = true);
 	virtual void unsetModel();
 
-	Model* model()
-	{
-		return m_model;
-	}
+	Model* model() { return m_model; }
 
-	const Model* model() const
-	{
-		return m_model;
-	}
+	const Model* model() const { return m_model; }
 
-	template <class T>
-	T* castModel()
-	{
-		return dynamic_cast<T*>(model());
-	}
+	template <class T> T* castModel() { return dynamic_cast<T*>(model()); }
 
-	template <class T>
-	const T* castModel() const
-	{
-		return dynamic_cast<const T*>(model());
-	}
+	template <class T> const T* castModel() const { return dynamic_cast<const T*>(model()); }
 
 protected:
 	// sub-classes can re-implement this to track model-changes
-	virtual void modelChanged()
-	{
-	}
+	virtual void modelChanged() {}
 
-	QWidget* widget()
-	{
-		return m_widget;
-	}
+	QWidget* widget() { return m_widget; }
 
 	virtual void doConnections();
 

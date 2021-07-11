@@ -36,29 +36,18 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Peak Controller",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Plugin for controlling knobs with sound peaks"),
-			"Paul Giblock <drfaygo/at/gmail.com>",
-			0x0100,
-			Plugin::Effect,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor = {STRINGIFY(PLUGIN_NAME),
+		"Peak Controller", QT_TRANSLATE_NOOP("PluginBrowser", "Plugin for controlling knobs with sound peaks"),
+		"Paul Giblock <drfaygo/at/gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 // We have to keep a list of all the PeakController effects so that we can save
 // an peakEffect-ID to the project.  This ID is referenced in the PeakController
 // settings and is used to set the PeakControllerEffect pointer upon load
 
-//QVector<PeakControllerEffect *> PeakControllerEffect::s_effects;
+// QVector<PeakControllerEffect *> PeakControllerEffect::s_effects;
 
-PeakControllerEffect::PeakControllerEffect(
-	Model* _parent,
-	const Descriptor::SubPluginFeatures::Key* _key)
+PeakControllerEffect::PeakControllerEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&peakcontrollereffect_plugin_descriptor, _parent, _key)
 	, m_effectId(rand())
 	, m_peakControls(this)
@@ -83,8 +72,7 @@ PeakControllerEffect::~PeakControllerEffect()
 	}
 }
 
-bool PeakControllerEffect::processAudioBuffer(sampleFrame* _buf,
-	const fpp_t _frames)
+bool PeakControllerEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
 	PeakControllerEffectControls& c = m_peakControls;
 
@@ -141,7 +129,6 @@ extern "C"
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
 	{
-		return new PeakControllerEffect(_parent,
-			static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data));
+		return new PeakControllerEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data));
 	}
 }

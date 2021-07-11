@@ -1,8 +1,8 @@
 /*
 	dsp/util.h
-	
+
 	Copyright 2002-4 Tim Goetze <tim@quitte.de>
-	
+
 	http://quitte.de/dsp/
 
 	Common math utility functions.
@@ -43,8 +43,7 @@ inline int next_power_of_2(int n)
 	return m;
 }
 
-inline bool
-isprime(int v)
+inline bool isprime(int v)
 {
 	if (v <= 3)
 		return true;
@@ -59,17 +58,9 @@ isprime(int v)
 	return true;
 }
 
-inline double
-db2lin(double db)
-{
-	return pow(10., db * .05);
-}
+inline double db2lin(double db) { return pow(10., db * .05); }
 
-inline double
-lin2db(double lin)
-{
-	return 20. * log10(lin);
-}
+inline double lin2db(double lin) { return 20. * log10(lin); }
 
 } /* namespace DSP */
 

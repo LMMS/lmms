@@ -34,9 +34,7 @@ class FlangerControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	FlangerControlsDialog(FlangerControls* controls);
-	virtual ~FlangerControlsDialog()
-	{
-	}
+	virtual ~FlangerControlsDialog() {}
 };
 
 #endif // FLANGERCONTROLSDIALOG_H

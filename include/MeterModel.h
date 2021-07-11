@@ -37,23 +37,16 @@ public:
 	MeterModel(Model* _parent);
 	~MeterModel();
 
-	void saveSettings(QDomDocument& _doc, QDomElement& _this,
-		const QString& _name);
+	void saveSettings(QDomDocument& _doc, QDomElement& _this, const QString& _name);
 	void loadSettings(const QDomElement& _this, const QString& _name);
 
 	void reset();
 
 	// Must have the sub-models exposed to programatically connect
 	// to automation or controllers
-	IntModel& numeratorModel()
-	{
-		return m_numeratorModel;
-	}
+	IntModel& numeratorModel() { return m_numeratorModel; }
 
-	IntModel& denominatorModel()
-	{
-		return m_denominatorModel;
-	}
+	IntModel& denominatorModel() { return m_denominatorModel; }
 
 private:
 	IntModel m_numeratorModel;

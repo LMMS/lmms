@@ -1,5 +1,5 @@
 /*
- * CrossoverEQ.h - A native 4-band Crossover Equalizer 
+ * CrossoverEQ.h - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -40,10 +40,7 @@ public:
 	virtual ~CrossoverEQEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 
-	virtual EffectControls* controls()
-	{
-		return &m_controls;
-	}
+	virtual EffectControls* controls() { return &m_controls; }
 
 	void clearFilterHistories();
 

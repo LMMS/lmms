@@ -57,25 +57,13 @@ static const double ticksPerBeat = 48.0;
 
 #define handlePtr ((CarlaInstrument*)handle)
 
-static uint32_t host_get_buffer_size(NativeHostHandle handle)
-{
-	return handlePtr->handleGetBufferSize();
-}
+static uint32_t host_get_buffer_size(NativeHostHandle handle) { return handlePtr->handleGetBufferSize(); }
 
-static double host_get_sample_rate(NativeHostHandle handle)
-{
-	return handlePtr->handleGetSampleRate();
-}
+static double host_get_sample_rate(NativeHostHandle handle) { return handlePtr->handleGetSampleRate(); }
 
-static bool host_is_offline(NativeHostHandle handle)
-{
-	return handlePtr->handleIsOffline();
-}
+static bool host_is_offline(NativeHostHandle handle) { return handlePtr->handleIsOffline(); }
 
-static const NativeTimeInfo* host_get_time_info(NativeHostHandle handle)
-{
-	return handlePtr->handleGetTimeInfo();
-}
+static const NativeTimeInfo* host_get_time_info(NativeHostHandle handle) { return handlePtr->handleGetTimeInfo(); }
 
 static bool host_write_midi_event(NativeHostHandle, const NativeMidiEvent*)
 {
@@ -92,12 +80,10 @@ static void host_ui_custom_data_changed(NativeHostHandle handle, const char* key
 	// unused
 }
 
-static void host_ui_closed(NativeHostHandle handle)
-{
-	handlePtr->handleUiClosed();
-}
+static void host_ui_closed(NativeHostHandle handle) { handlePtr->handleUiClosed(); }
 
-static intptr_t host_dispatcher(NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt)
+static intptr_t host_dispatcher(
+	NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
 	return handlePtr->handleDispatcher(opcode, index, value, ptr, opt);
 }
@@ -128,7 +114,8 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 // -----------------------------------------------------------------------
 
-CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
+CarlaInstrument::CarlaInstrument(
+	InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
 	: Instrument(instrumentTrack, descriptor)
 	, kIsPatchbay(isPatchbay)
 	, fHandle(NULL)
@@ -180,7 +167,8 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
 CarlaInstrument::~CarlaInstrument()
 {
-	Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+	Engine::mixer()->removePlayHandlesOfTypes(
+		instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 
 	if (fHost.resourceDir != NULL)
 	{
@@ -208,36 +196,23 @@ CarlaInstrument::~CarlaInstrument()
 
 // -------------------------------------------------------------------
 
-uint32_t CarlaInstrument::handleGetBufferSize() const
-{
-	return Engine::mixer()->framesPerPeriod();
-}
+uint32_t CarlaInstrument::handleGetBufferSize() const { return Engine::mixer()->framesPerPeriod(); }
 
-double CarlaInstrument::handleGetSampleRate() const
-{
-	return Engine::mixer()->processingSampleRate();
-}
+double CarlaInstrument::handleGetSampleRate() const { return Engine::mixer()->processingSampleRate(); }
 
 bool CarlaInstrument::handleIsOffline() const
 {
 	return false; // TODO
 }
 
-const NativeTimeInfo* CarlaInstrument::handleGetTimeInfo() const
-{
-	return &fTimeInfo;
-}
+const NativeTimeInfo* CarlaInstrument::handleGetTimeInfo() const { return &fTimeInfo; }
 
-void CarlaInstrument::handleUiParameterChanged(const uint32_t /*index*/, const float /*value*/) const
-{
-}
+void CarlaInstrument::handleUiParameterChanged(const uint32_t /*index*/, const float /*value*/) const {}
 
-void CarlaInstrument::handleUiClosed()
-{
-	emit uiClosed();
-}
+void CarlaInstrument::handleUiClosed() { emit uiClosed(); }
 
-intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float)
+intptr_t CarlaInstrument::handleDispatcher(
+	const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float)
 {
 	intptr_t ret = 0;
 
@@ -258,15 +233,9 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
 
 // -------------------------------------------------------------------
 
-Instrument::Flags CarlaInstrument::flags() const
-{
-	return IsSingleStreamed | IsMidiBased | IsNotBendable;
-}
+Instrument::Flags CarlaInstrument::flags() const { return IsSingleStreamed | IsMidiBased | IsNotBendable; }
 
-QString CarlaInstrument::nodeName() const
-{
-	return descriptor()->name;
-}
+QString CarlaInstrument::nodeName() const { return descriptor()->name; }
 
 void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
@@ -392,7 +361,7 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 	std::free((char*)fHost.uiName);
 
 	// TODO - get plugin instance name
-	//fHost.uiName = strdup(parent->windowTitle().toUtf8().constData());
+	// fHost.uiName = strdup(parent->windowTitle().toUtf8().constData());
 	fHost.uiName = strdup(kIsPatchbay ? "CarlaPatchbay-LMMS" : "CarlaRack-LMMS");
 
 	return new CarlaInstrumentView(this, parent);
@@ -414,7 +383,9 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
 	setAutoFillBackground(true);
 
 	QPalette pal;
-	pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
+	pal.setBrush(backgroundRole(),
+		instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay")
+								: PLUGIN_NAME::getIconPixmap("artwork-rack"));
 	setPalette(pal);
 
 	QVBoxLayout* l = new QVBoxLayout(this);
@@ -460,14 +431,9 @@ void CarlaInstrumentView::toggleUI(bool visible)
 	}
 }
 
-void CarlaInstrumentView::uiClosed()
-{
-	m_toggleUIButton->setChecked(false);
-}
+void CarlaInstrumentView::uiClosed() { m_toggleUIButton->setChecked(false); }
 
-void CarlaInstrumentView::modelChanged()
-{
-}
+void CarlaInstrumentView::modelChanged() {}
 
 void CarlaInstrumentView::timerEvent(QTimerEvent* event)
 {

@@ -82,8 +82,10 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	// pause and freeze buttons
 	PixmapButton* pauseButton = new PixmapButton(this, tr("Pause"));
 	pauseButton->setToolTip(tr("Pause data acquisition"));
-	QPixmap* pauseOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap* pauseOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* pauseOnPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("play").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* pauseOffPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("pause").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	pauseOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	pauseOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	pauseButton->setActiveGraphic(*pauseOnPixmap);
@@ -94,8 +96,10 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 
 	PixmapButton* refFreezeButton = new PixmapButton(this, tr("Reference freeze"));
 	refFreezeButton->setToolTip(tr("Freeze current input as a reference / disable falloff in peak-hold mode."));
-	QPixmap* freezeOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap* freezeOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* freezeOnPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("freeze").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* freezeOffPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("freeze_off").scaled(buttonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	freezeOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	freezeOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	refFreezeButton->setActiveGraphic(*freezeOnPixmap);
@@ -136,8 +140,10 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	// frequency: linear / log. switch and range selector
 	PixmapButton* logXButton = new PixmapButton(this, tr("Logarithmic frequency"));
 	logXButton->setToolTip(tr("Switch between logarithmic and linear frequency scale"));
-	QPixmap* logXOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap* logXOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* logXOnPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("x_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* logXOffPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("x_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logXOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	logXOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	logXButton->setActiveGraphic(*logXOnPixmap);
@@ -156,8 +162,10 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	// amplitude: linear / log switch and range selector
 	PixmapButton* logYButton = new PixmapButton(this, tr("Logarithmic amplitude"));
 	logYButton->setToolTip(tr("Switch between logarithmic and linear amplitude scale"));
-	QPixmap* logYOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap* logYOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* logYOnPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("y_log").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* logYOffPixmap = new QPixmap(
+		PLUGIN_NAME::getIconPixmap("y_linear").scaled(iconSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	logYOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	logYOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	logYButton->setActiveGraphic(*logYOnPixmap);
@@ -223,7 +231,8 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	Knob* envelopeResolutionKnob = new Knob(knobSmall_17, this);
 	envelopeResolutionKnob->setModel(&controls->m_envelopeResolutionModel);
 	envelopeResolutionKnob->setLabel(tr("Envelope res."));
-	envelopeResolutionKnob->setToolTip(tr("Increase envelope resolution for better details, decrease for better GUI performance."));
+	envelopeResolutionKnob->setToolTip(
+		tr("Increase envelope resolution for better details, decrease for better GUI performance."));
 	envelopeResolutionKnob->setHintText(tr("Draw at most"), tr(" envelope points per pixel"));
 	advanced_layout->addWidget(envelopeResolutionKnob, 0, 0, 1, 1, Qt::AlignCenter);
 
@@ -231,7 +240,8 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	Knob* spectrumResolutionKnob = new Knob(knobSmall_17, this);
 	spectrumResolutionKnob->setModel(&controls->m_spectrumResolutionModel);
 	spectrumResolutionKnob->setLabel(tr("Spectrum res."));
-	spectrumResolutionKnob->setToolTip(tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
+	spectrumResolutionKnob->setToolTip(
+		tr("Increase spectrum resolution for better details, decrease for better GUI performance."));
 	spectrumResolutionKnob->setHintText(tr("Draw at most"), tr(" spectrum points per pixel"));
 	advanced_layout->addWidget(spectrumResolutionKnob, 1, 0, 1, 1, Qt::AlignCenter);
 
@@ -255,7 +265,8 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	Knob* waterfallHeightKnob = new Knob(knobSmall_17, this);
 	waterfallHeightKnob->setModel(&controls->m_waterfallHeightModel);
 	waterfallHeightKnob->setLabel(tr("Waterfall height"));
-	waterfallHeightKnob->setToolTip(tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
+	waterfallHeightKnob->setToolTip(
+		tr("Increase to get slower scrolling, decrease to see fast transitions better. Warning: medium CPU usage."));
 	waterfallHeightKnob->setHintText(tr("Keep"), tr(" lines"));
 	advanced_layout->addWidget(waterfallHeightKnob, 0, 2, 1, 1, Qt::AlignCenter);
 	processor->reallocateBuffers();
@@ -273,7 +284,8 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	Knob* windowOverlapKnob = new Knob(knobSmall_17, this);
 	windowOverlapKnob->setModel(&controls->m_windowOverlapModel);
 	windowOverlapKnob->setLabel(tr("Window overlap"));
-	windowOverlapKnob->setToolTip(tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
+	windowOverlapKnob->setToolTip(
+		tr("Increase to prevent missing fast transitions arriving near FFT window edges. Warning: high CPU usage."));
 	windowOverlapKnob->setHintText(tr("Each sample processed"), tr(" times"));
 	advanced_layout->addWidget(windowOverlapKnob, 0, 3, 1, 1, Qt::AlignCenter);
 
@@ -290,8 +302,12 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	// Advanced settings button
 	PixmapButton* advancedButton = new PixmapButton(this, tr("Advanced settings"));
 	advancedButton->setToolTip(tr("Access advanced settings"));
-	QPixmap* advancedOnPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_on").scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap* advancedOffPixmap = new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_off").scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* advancedOnPixmap =
+		new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_on")
+						.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* advancedOffPixmap =
+		new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_off")
+						.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	advancedOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	advancedOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	advancedButton->setActiveGraphic(*advancedOnPixmap);
@@ -337,7 +353,6 @@ QSize SaControlsDialog::sizeHint() const
 	}
 	else
 	{
-		return QSize(m_spectrum->sizeHint().width(),
-			m_configHeight + m_spectrum->sizeHint().height() + 50);
+		return QSize(m_spectrum->sizeHint().width(), m_configHeight + m_spectrum->sizeHint().height() + 50);
 	}
 }

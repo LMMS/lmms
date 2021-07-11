@@ -181,10 +181,7 @@ private:
 
 	// checks for lower bound for phase, upper bound is already checked by oscillator-functions in both
 	// oscillator.h and bandlimitedwave.h so we save some cpu by only checking lower bound
-	inline float lowBoundCheck(float ph)
-	{
-		return ph < 0.0f ? ph - (static_cast<int>(ph) - 1.0f) : ph;
-	}
+	inline float lowBoundCheck(float ph) { return ph < 0.0f ? ph - (static_cast<int>(ph) - 1.0f) : ph; }
 
 	inline sample_t oscillate(int _wave, const float _ph, float _wavelen)
 	{
@@ -194,19 +191,19 @@ private:
 			return Oscillator::sinSample(_ph);
 			break;
 		case WAVE_TRI:
-			//return Oscillator::triangleSample( _ph );
+			// return Oscillator::triangleSample( _ph );
 			return BandLimitedWave::oscillate(_ph, _wavelen, BandLimitedWave::BLTriangle);
 			break;
 		case WAVE_SAW:
-			//return Oscillator::sawSample( _ph );
+			// return Oscillator::sawSample( _ph );
 			return BandLimitedWave::oscillate(_ph, _wavelen, BandLimitedWave::BLSaw);
 			break;
 		case WAVE_RAMP:
-			//return Oscillator::sawSample( _ph ) * -1.0;
+			// return Oscillator::sawSample( _ph ) * -1.0;
 			return BandLimitedWave::oscillate(_ph, _wavelen, BandLimitedWave::BLSaw) * -1.0;
 			break;
 		case WAVE_SQR:
-			//return Oscillator::squareSample( _ph );
+			// return Oscillator::squareSample( _ph );
 			return BandLimitedWave::oscillate(_ph, _wavelen, BandLimitedWave::BLSquare);
 			break;
 		case WAVE_SQRSOFT: {
@@ -222,7 +219,7 @@ private:
 			break;
 		}
 		case WAVE_MOOG:
-			//return Oscillator::moogSawSample( _ph );
+			// return Oscillator::moogSawSample( _ph );
 			return BandLimitedWave::oscillate(_ph, _wavelen, BandLimitedWave::BLMoog);
 			break;
 		case WAVE_SINABS:
@@ -341,12 +338,10 @@ public:
 	MonstroInstrument(InstrumentTrack* _instrument_track);
 	virtual ~MonstroInstrument();
 
-	virtual void playNote(NotePlayHandle* _n,
-		sampleFrame* _working_buffer);
+	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-	virtual void saveSettings(QDomDocument& _doc,
-		QDomElement& _this);
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _this);
 	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
@@ -424,15 +419,9 @@ protected:
 	int m_counterMax;
 
 private:
-	inline float leftCh(float _vol, float _pan)
-	{
-		return (_pan <= 0 ? 1.0 : 1.0 - (_pan / 100.0)) * _vol / 100.0;
-	}
+	inline float leftCh(float _vol, float _pan) { return (_pan <= 0 ? 1.0 : 1.0 - (_pan / 100.0)) * _vol / 100.0; }
 
-	inline float rightCh(float _vol, float _pan)
-	{
-		return (_pan >= 0 ? 1.0 : 1.0 + (_pan / 100.0)) * _vol / 100.0;
-	}
+	inline float rightCh(float _vol, float _pan) { return (_pan >= 0 ? 1.0 : 1.0 + (_pan / 100.0)) * _vol / 100.0; }
 
 	//////////////////////////////////////
 	//            models of             //
@@ -569,8 +558,7 @@ class MonstroView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	MonstroView(Instrument* _instrument,
-		QWidget* _parent);
+	MonstroView(Instrument* _instrument, QWidget* _parent);
 	virtual ~MonstroView();
 
 protected slots:

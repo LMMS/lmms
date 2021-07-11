@@ -38,28 +38,17 @@ class waveShaperControls : public EffectControls
 	Q_OBJECT
 public:
 	waveShaperControls(waveShaperEffect* _eff);
-	virtual ~waveShaperControls()
-	{
-	}
+	virtual ~waveShaperControls() {}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
-	inline virtual QString nodeName() const
-	{
-		return ("waveshapercontrols");
-	}
+	inline virtual QString nodeName() const { return ("waveshapercontrols"); }
 
 	virtual void setDefaultShape();
 
-	virtual int controlCount()
-	{
-		return (4);
-	}
+	virtual int controlCount() { return (4); }
 
-	virtual EffectControlDialog* createView()
-	{
-		return (new waveShaperControlDialog(this));
-	}
+	virtual EffectControlDialog* createView() { return (new waveShaperControlDialog(this)); }
 
 private slots:
 	void samplesChanged(int, int);

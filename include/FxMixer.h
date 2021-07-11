@@ -96,30 +96,15 @@ public:
 	FxRoute(FxChannel* from, FxChannel* to, float amount);
 	virtual ~FxRoute();
 
-	fx_ch_t senderIndex() const
-	{
-		return m_from->m_channelIndex;
-	}
+	fx_ch_t senderIndex() const { return m_from->m_channelIndex; }
 
-	fx_ch_t receiverIndex() const
-	{
-		return m_to->m_channelIndex;
-	}
+	fx_ch_t receiverIndex() const { return m_to->m_channelIndex; }
 
-	FloatModel* amount()
-	{
-		return &m_amount;
-	}
+	FloatModel* amount() { return &m_amount; }
 
-	FxChannel* sender() const
-	{
-		return m_from;
-	}
+	FxChannel* sender() const { return m_from; }
 
-	FxChannel* receiver() const
-	{
-		return m_to;
-	}
+	FxChannel* receiver() const { return m_to; }
 
 	void updateName();
 
@@ -144,20 +129,13 @@ public:
 	void saveSettings(QDomDocument& _doc, QDomElement& _parent) override;
 	void loadSettings(const QDomElement& _this) override;
 
-	QString nodeName() const override
-	{
-		return "fxmixer";
-	}
+	QString nodeName() const override { return "fxmixer"; }
 
-	FxChannel* effectChannel(int _ch)
-	{
-		return m_fxChannels[_ch];
-	}
+	FxChannel* effectChannel(int _ch) { return m_fxChannels[_ch]; }
 
 	// make the output of channel fromChannel go to the input of channel toChannel
 	// it is safe to call even if the send already exists
-	FxRoute* createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
-		float amount = 1.0f);
+	FxRoute* createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel, float amount = 1.0f);
 	FxRoute* createRoute(FxChannel* from, FxChannel* to, float amount);
 
 	// delete the connection made by createChannelSend
@@ -197,10 +175,7 @@ public:
 	void activateSolo();
 	void deactivateSolo();
 
-	inline fx_ch_t numChannels() const
-	{
-		return m_fxChannels.size();
-	}
+	inline fx_ch_t numChannels() const { return m_fxChannels.size(); }
 
 	FxRouteVector m_fxRoutes;
 

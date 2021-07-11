@@ -101,8 +101,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
 	}
 
 	// Connection to update the name of the track on the label
-	connect(m_track, SIGNAL(nameChanged()),
-		this, SLOT(renameWindow()));
+	connect(m_track, SIGNAL(nameChanged()), this, SLOT(renameWindow()));
 
 	// Adding everything to the main layout
 	mainLayout->addWidget(m_midiCCGroupBox);
@@ -117,15 +116,8 @@ MidiCCRackView::~MidiCCRackView()
 	}
 }
 
-void MidiCCRackView::renameWindow()
-{
-	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
-}
+void MidiCCRackView::renameWindow() { setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name())); }
 
-void MidiCCRackView::saveSettings(QDomDocument& doc, QDomElement& parent)
-{
-}
+void MidiCCRackView::saveSettings(QDomDocument& doc, QDomElement& parent) {}
 
-void MidiCCRackView::loadSettings(const QDomElement&)
-{
-}
+void MidiCCRackView::loadSettings(const QDomElement&) {}

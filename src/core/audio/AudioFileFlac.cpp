@@ -31,17 +31,15 @@
 #include "Mixer.h"
 #include "endian_handling.h"
 
-AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, Mixer* mixer)
+AudioFileFlac::AudioFileFlac(
+	OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, Mixer* mixer)
 	: AudioFileDevice(outputSettings, channels, file, mixer)
 	, m_sf(nullptr)
 {
 	successful = outputFileOpened() && startEncoding();
 }
 
-AudioFileFlac::~AudioFileFlac()
-{
-	finishEncoding();
-}
+AudioFileFlac::~AudioFileFlac() { finishEncoding(); }
 
 bool AudioFileFlac::startEncoding()
 {
@@ -75,8 +73,7 @@ bool AudioFileFlac::startEncoding()
 #else
 		outputFile().toUtf8().constData(),
 #endif
-		SFM_WRITE,
-		&m_sfinfo);
+		SFM_WRITE, &m_sfinfo);
 
 	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 

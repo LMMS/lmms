@@ -57,10 +57,7 @@ void InstrumentView::setModel(Model* _model, bool)
 
 InstrumentTrackWindow* InstrumentView::instrumentTrackWindow(void)
 {
-	return (dynamic_cast<InstrumentTrackWindow*>(
-		parentWidget()->parentWidget()));
+	return (dynamic_cast<InstrumentTrackWindow*>(parentWidget()->parentWidget()));
 }
 
-InstrumentViewFixedSize::~InstrumentViewFixedSize()
-{
-}
+InstrumentViewFixedSize::~InstrumentViewFixedSize() {}

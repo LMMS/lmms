@@ -38,13 +38,8 @@ NotePlayHandle::BaseDetuning::BaseDetuning(DetuningHelper* detuning)
 {
 }
 
-NotePlayHandle::NotePlayHandle(InstrumentTrack* instrumentTrack,
-	const f_cnt_t _offset,
-	const f_cnt_t _frames,
-	const Note& n,
-	NotePlayHandle* parent,
-	int midiEventChannel,
-	Origin origin)
+NotePlayHandle::NotePlayHandle(InstrumentTrack* instrumentTrack, const f_cnt_t _offset, const f_cnt_t _frames,
+	const Note& n, NotePlayHandle* parent, int midiEventChannel, Origin origin)
 	: PlayHandle(TypeNotePlayHandle, _offset)
 	, Note(n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning())
 	, m_pluginData(NULL)
@@ -150,18 +145,13 @@ void NotePlayHandle::setVolume(volume_t _volume)
 
 	const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
-	m_instrumentTrack->processOutEvent(MidiEvent(MidiKeyPressure, midiChannel(), midiKey(), midiVelocity(baseVelocity)));
+	m_instrumentTrack->processOutEvent(
+		MidiEvent(MidiKeyPressure, midiChannel(), midiKey(), midiVelocity(baseVelocity)));
 }
 
-void NotePlayHandle::setPanning(panning_t panning)
-{
-	Note::setPanning(panning);
-}
+void NotePlayHandle::setPanning(panning_t panning) { Note::setPanning(panning); }
 
-int NotePlayHandle::midiKey() const
-{
-	return key() - m_origBaseNote + instrumentTrack()->baseNote();
-}
+int NotePlayHandle::midiKey() const { return key() - m_origBaseNote + instrumentTrack()->baseNote(); }
 
 void NotePlayHandle::play(sampleFrame* _working_buffer)
 {
@@ -183,17 +173,16 @@ void NotePlayHandle::play(sampleFrame* _working_buffer)
 	 * which results in a note-on message being sent without a subsequent note-off message.
 	 * Therefore, we check here whether the note has already been released before sending
 	 * the note-on message. */
-	if (!m_released && m_totalFramesPlayed == 0 && !m_hasMidiNote && (hasParent() || !m_instrumentTrack->isArpeggioEnabled()))
+	if (!m_released && m_totalFramesPlayed == 0 && !m_hasMidiNote &&
+		(hasParent() || !m_instrumentTrack->isArpeggioEnabled()))
 	{
 		m_hasMidiNote = true;
 
 		const int baseVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 
 		// send MidiNoteOn event
-		m_instrumentTrack->processOutEvent(
-			MidiEvent(MidiNoteOn, midiChannel(), midiKey(), midiVelocity(baseVelocity)),
-			TimePos::fromFrames(offset(), Engine::framesPerTick()),
-			offset());
+		m_instrumentTrack->processOutEvent(MidiEvent(MidiNoteOn, midiChannel(), midiKey(), midiVelocity(baseVelocity)),
+			TimePos::fromFrames(offset(), Engine::framesPerTick()), offset());
 	}
 
 	if (m_frequencyNeedsUpdate)
@@ -202,17 +191,16 @@ void NotePlayHandle::play(sampleFrame* _working_buffer)
 	}
 
 	// number of frames that can be played this period
-	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0
-		? Engine::mixer()->framesPerPeriod() - offset()
-		: Engine::mixer()->framesPerPeriod();
+	f_cnt_t framesThisPeriod =
+		m_totalFramesPlayed == 0 ? Engine::mixer()->framesPerPeriod() - offset() : Engine::mixer()->framesPerPeriod();
 
 	// check if we start release during this period
-	if (m_released == false &&
-		instrumentTrack()->isSustainPedalPressed() == false &&
+	if (m_released == false && instrumentTrack()->isSustainPedalPressed() == false &&
 		m_totalFramesPlayed + framesThisPeriod > m_frames)
 	{
 		noteOff(m_totalFramesPlayed == 0
-				? (m_frames + offset())				 // if we have noteon and noteoff during the same period, take offset in account for release frame
+				? (m_frames + offset()) // if we have noteon and noteoff during the same period, take offset in account
+										// for release frame
 				: (m_frames - m_totalFramesPlayed)); // otherwise, the offset is already negated and can be ignored
 	}
 
@@ -341,9 +329,7 @@ void NotePlayHandle::noteOff(const f_cnt_t _s)
 
 		// send MidiNoteOff event
 		m_instrumentTrack->processOutEvent(
-			MidiEvent(MidiNoteOff, midiChannel(), midiKey(), 0),
-			TimePos::fromFrames(_s, Engine::framesPerTick()),
-			_s);
+			MidiEvent(MidiNoteOff, midiChannel(), midiKey(), 0), TimePos::fromFrames(_s, Engine::framesPerTick()), _s);
 	}
 
 	// inform attached components about MIDI finished (used for recording in Piano Roll)
@@ -357,10 +343,7 @@ void NotePlayHandle::noteOff(const f_cnt_t _s)
 	}
 }
 
-f_cnt_t NotePlayHandle::actualReleaseFramesToDo() const
-{
-	return m_instrumentTrack->m_soundShaping.releaseFrames();
-}
+f_cnt_t NotePlayHandle::actualReleaseFramesToDo() const { return m_instrumentTrack->m_soundShaping.releaseFrames(); }
 
 void NotePlayHandle::setFrames(const f_cnt_t _frames)
 {
@@ -415,7 +398,8 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack(const InstrumentTr
 	for (PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it)
 	{
 		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle*>(*it);
-		if (nph != NULL && nph->m_instrumentTrack == _it && ((nph->isReleased() == false && nph->hasParent() == false) || _all_ph == true))
+		if (nph != NULL && nph->m_instrumentTrack == _it &&
+			((nph->isReleased() == false && nph->hasParent() == false) || _all_ph == true))
 		{
 			cnphv.push_back(nph);
 		}
@@ -425,32 +409,17 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack(const InstrumentTr
 
 bool NotePlayHandle::operator==(const NotePlayHandle& _nph) const
 {
-	return length() == _nph.length() &&
-		pos() == _nph.pos() &&
-		key() == _nph.key() &&
-		getVolume() == _nph.getVolume() &&
-		getPanning() == _nph.getPanning() &&
-		m_instrumentTrack == _nph.m_instrumentTrack &&
-		m_frames == _nph.m_frames &&
-		offset() == _nph.offset() &&
-		m_totalFramesPlayed == _nph.m_totalFramesPlayed &&
-		m_released == _nph.m_released &&
-		m_hasParent == _nph.m_hasParent &&
-		m_origBaseNote == _nph.m_origBaseNote &&
-		m_muted == _nph.m_muted &&
-		m_midiChannel == _nph.m_midiChannel &&
-		m_origin == _nph.m_origin;
+	return length() == _nph.length() && pos() == _nph.pos() && key() == _nph.key() && getVolume() == _nph.getVolume() &&
+		getPanning() == _nph.getPanning() && m_instrumentTrack == _nph.m_instrumentTrack && m_frames == _nph.m_frames &&
+		offset() == _nph.offset() && m_totalFramesPlayed == _nph.m_totalFramesPlayed && m_released == _nph.m_released &&
+		m_hasParent == _nph.m_hasParent && m_origBaseNote == _nph.m_origBaseNote && m_muted == _nph.m_muted &&
+		m_midiChannel == _nph.m_midiChannel && m_origin == _nph.m_origin;
 }
 
 void NotePlayHandle::updateFrequency()
 {
 	int mp = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
-	const float pitch =
-		(key() -
-			m_instrumentTrack->baseNoteModel()->value() +
-			mp +
-			m_baseDetuning->value()) /
-		12.0f;
+	const float pitch = (key() - m_instrumentTrack->baseNoteModel()->value() + mp + m_baseDetuning->value()) / 12.0f;
 	m_frequency = BaseFreq * powf(2.0f, pitch + m_instrumentTrack->pitchModel()->value() / (100 * 12.0f));
 	m_unpitchedFrequency = BaseFreq * powf(2.0f, pitch);
 
@@ -475,8 +444,7 @@ void NotePlayHandle::processTimePos(const TimePos& time)
 
 void NotePlayHandle::resize(const bpm_t _new_tempo)
 {
-	if (origin() == OriginMidiInput ||
-		(origin() == OriginNoteStacking && m_parent->origin() == OriginMidiInput))
+	if (origin() == OriginMidiInput || (origin() == OriginNoteStacking && m_parent->origin() == OriginMidiInput))
 	{
 		// Don't resize notes from MIDI input - they should continue to play
 		// until the key is released, and their large duration can cause
@@ -515,12 +483,8 @@ void NotePlayHandleManager::init()
 	s_size = INITIAL_NPH_CACHE;
 }
 
-NotePlayHandle* NotePlayHandleManager::acquire(InstrumentTrack* instrumentTrack,
-	const f_cnt_t offset,
-	const f_cnt_t frames,
-	const Note& noteToPlay,
-	NotePlayHandle* parent,
-	int midiEventChannel,
+NotePlayHandle* NotePlayHandleManager::acquire(InstrumentTrack* instrumentTrack, const f_cnt_t offset,
+	const f_cnt_t frames, const Note& noteToPlay, NotePlayHandle* parent, int midiEventChannel,
 	NotePlayHandle::Origin origin)
 {
 	// TODO: use some lockless data structures
@@ -560,7 +524,4 @@ void NotePlayHandleManager::extend(int c)
 	}
 }
 
-void NotePlayHandleManager::free()
-{
-	MM_FREE(s_available);
-}
+void NotePlayHandleManager::free() { MM_FREE(s_available); }

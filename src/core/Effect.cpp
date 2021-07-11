@@ -32,9 +32,7 @@
 #include "EffectControls.h"
 #include "EffectView.h"
 
-Effect::Effect(const Plugin::Descriptor* _desc,
-	Model* _parent,
-	const Descriptor::SubPluginFeatures::Key* _key)
+Effect::Effect(const Plugin::Descriptor* _desc, Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Plugin(_desc, _parent, _key)
 	, m_parent(NULL)
 	, m_processors(1)
@@ -98,9 +96,7 @@ void Effect::loadSettings(const QDomElement& _this)
 	}
 }
 
-Effect* Effect::instantiate(const QString& pluginName,
-	Model* _parent,
-	Descriptor::SubPluginFeatures::Key* _key)
+Effect* Effect::instantiate(const QString& pluginName, Model* _parent, Descriptor::SubPluginFeatures::Key* _key)
 {
 	Plugin* p = Plugin::instantiateWithKey(pluginName, _parent, _key);
 	// check whether instantiated plugin is an effect
@@ -142,10 +138,7 @@ void Effect::checkGate(double _out_sum)
 	}
 }
 
-PluginView* Effect::instantiateView(QWidget* _parent)
-{
-	return new EffectView(this, _parent);
-}
+PluginView* Effect::instantiateView(QWidget* _parent) { return new EffectView(this, _parent); }
 
 void Effect::reinitSRC()
 {
@@ -157,18 +150,15 @@ void Effect::reinitSRC()
 		}
 		int error;
 		if ((m_srcState[i] = src_new(
-				 Engine::mixer()->currentQualitySettings().libsrcInterpolation(),
-				 DEFAULT_CHANNELS, &error)) == NULL)
+				 Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error)) == NULL)
 		{
 			qFatal("Error: src_new() failed in effect.cpp!\n");
 		}
 	}
 }
 
-void Effect::resample(int _i, const sampleFrame* _src_buf,
-	sample_rate_t _src_sr,
-	sampleFrame* _dst_buf, sample_rate_t _dst_sr,
-	f_cnt_t _frames)
+void Effect::resample(int _i, const sampleFrame* _src_buf, sample_rate_t _src_sr, sampleFrame* _dst_buf,
+	sample_rate_t _dst_sr, f_cnt_t _frames)
 {
 	if (m_srcState[_i] == NULL)
 	{
@@ -183,7 +173,6 @@ void Effect::resample(int _i, const sampleFrame* _src_buf,
 	int error;
 	if ((error = src_process(m_srcState[_i], &m_srcData[_i])))
 	{
-		qFatal("Effect::resample(): error while resampling: %s\n",
-			src_strerror(error));
+		qFatal("Effect::resample(): error while resampling: %s\n", src_strerror(error));
 	}
 }

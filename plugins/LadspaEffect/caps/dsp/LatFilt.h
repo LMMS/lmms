@@ -1,8 +1,8 @@
 /*
 	LatFilt.h
-	
+
 	Copyright 2006 David Yeh <dtyeh@ccrma.stanford.edu>
-	
+
 	Lattice digital filter.
 	Assumes order of b = order of a.
 	Assumes a0 = 1.
@@ -32,8 +32,7 @@ namespace DSP
 {
 
 // ORDER is the highest power of s in the transfer function
-template <int ORDER>
-class LatFilt
+template <int ORDER> class LatFilt
 {
 public:
 	double vcoef[ORDER + 1];
@@ -93,15 +92,9 @@ public:
 		return (sample_t)y;
 	}
 
-	inline void set_vi(double coef, int i)
-	{
-		vcoef[i] = coef;
-	}
+	inline void set_vi(double coef, int i) { vcoef[i] = coef; }
 
-	inline void set_ki(double coef, int i)
-	{
-		kcoef[i] = coef;
-	}
+	inline void set_ki(double coef, int i) { kcoef[i] = coef; }
 };
 
 } /* namespace DSP */

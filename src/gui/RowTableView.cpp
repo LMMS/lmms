@@ -36,27 +36,22 @@ public:
 		, m_table(table)
 	{
 	}
-	virtual void paint(QPainter* painter,
-		const QStyleOptionViewItem& option,
-		const QModelIndex& index) const override;
+	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
 protected:
-	virtual void initStyleOption(QStyleOptionViewItem* option,
-		const QModelIndex& index) const override;
+	virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
 
 private:
 	QAbstractItemView* m_table;
 };
 
-void RowDelegate::initStyleOption(QStyleOptionViewItem* option,
-	const QModelIndex& index) const
+void RowDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
 	QStyledItemDelegate::initStyleOption(option, index);
 	option->state &= ~QStyle::State_HasFocus;
 }
 
-void RowDelegate::paint(QPainter* painter,
-	const QStyleOptionViewItem& option, const QModelIndex& index) const
+void RowDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	QStyledItemDelegate::paint(painter, option, index);
 	if (index.row() == m_table->currentIndex().row())
@@ -70,8 +65,7 @@ void RowDelegate::paint(QPainter* painter,
 		}
 		if (index.column() == index.model()->columnCount() - 1)
 		{
-			painter->drawLine(rect.topRight(),
-				rect.bottomRight());
+			painter->drawLine(rect.topRight(), rect.bottomRight());
 		}
 	}
 }
@@ -82,10 +76,7 @@ RowTableView::RowTableView(QWidget* parent)
 	m_rowDelegate = new RowDelegate(this, this);
 }
 
-RowTableView::~RowTableView()
-{
-	delete m_rowDelegate;
-}
+RowTableView::~RowTableView() { delete m_rowDelegate; }
 
 void RowTableView::setModel(QAbstractItemModel* model)
 {

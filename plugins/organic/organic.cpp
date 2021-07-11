@@ -2,7 +2,7 @@
  * organic.cpp - additive synthesizer for organ-like sounds
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -41,30 +41,22 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
-		{
-			STRINGIFY(PLUGIN_NAME),
-			"Organic",
-			QT_TRANSLATE_NOOP("PluginBrowser",
-				"Additive Synthesizer for organ-like sounds"),
-			"Andreas Brandmaier <andreas/at/brandmaier.de>",
-			0x0100,
-			Plugin::Instrument,
-			new PluginPixmapLoader("logo"),
-			NULL,
-			NULL};
+	Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Organic",
+		QT_TRANSLATE_NOOP("PluginBrowser", "Additive Synthesizer for organ-like sounds"),
+		"Andreas Brandmaier <andreas/at/brandmaier.de>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"),
+		NULL, NULL};
 }
 
 QPixmap* organicInstrumentView::s_artwork = NULL;
 float* organicInstrument::s_harmonics = NULL;
 
 /***********************************************************************
-*
-*	class OrganicInstrument
-*
-*	lmms - plugin 
-*
-***********************************************************************/
+ *
+ *	class OrganicInstrument
+ *
+ *	lmms - plugin
+ *
+ ***********************************************************************/
 
 organicInstrument::organicInstrument(InstrumentTrack* _instrument_track)
 	: Instrument(_instrument_track, &organic_plugin_descriptor)
@@ -81,16 +73,11 @@ organicInstrument::organicInstrument(InstrumentTrack* _instrument_track)
 		m_osc[i]->m_numOscillators = m_numOscillators;
 
 		// Connect events
-		connect(&m_osc[i]->m_oscModel, SIGNAL(dataChanged()),
-			m_osc[i], SLOT(oscButtonChanged()));
-		connect(&m_osc[i]->m_harmModel, SIGNAL(dataChanged()),
-			m_osc[i], SLOT(updateDetuning()));
-		connect(&m_osc[i]->m_volModel, SIGNAL(dataChanged()),
-			m_osc[i], SLOT(updateVolume()));
-		connect(&m_osc[i]->m_panModel, SIGNAL(dataChanged()),
-			m_osc[i], SLOT(updateVolume()));
-		connect(&m_osc[i]->m_detuneModel, SIGNAL(dataChanged()),
-			m_osc[i], SLOT(updateDetuning()));
+		connect(&m_osc[i]->m_oscModel, SIGNAL(dataChanged()), m_osc[i], SLOT(oscButtonChanged()));
+		connect(&m_osc[i]->m_harmModel, SIGNAL(dataChanged()), m_osc[i], SLOT(updateDetuning()));
+		connect(&m_osc[i]->m_volModel, SIGNAL(dataChanged()), m_osc[i], SLOT(updateVolume()));
+		connect(&m_osc[i]->m_panModel, SIGNAL(dataChanged()), m_osc[i], SLOT(updateVolume()));
+		connect(&m_osc[i]->m_detuneModel, SIGNAL(dataChanged()), m_osc[i], SLOT(updateDetuning()));
 
 		m_osc[i]->updateVolume();
 	}
@@ -133,14 +120,10 @@ organicInstrument::organicInstrument(InstrumentTrack* _instrument_track)
 		m_osc[i]->updateDetuning();
 	}
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
-		this, SLOT(updateAllDetuning()));
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateAllDetuning()));
 }
 
-organicInstrument::~organicInstrument()
-{
-	delete[] m_osc;
-}
+organicInstrument::~organicInstrument() { delete[] m_osc; }
 
 void organicInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
@@ -194,13 +177,9 @@ void organicInstrument::loadSettings(const QDomElement& _this)
 	m_fx1Model.loadSettings(_this, "foldback");
 }
 
-QString organicInstrument::nodeName() const
-{
-	return (organic_plugin_descriptor.name);
-}
+QString organicInstrument::nodeName() const { return (organic_plugin_descriptor.name); }
 
-void organicInstrument::playNote(NotePlayHandle* _n,
-	sampleFrame* _working_buffer)
+void organicInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
@@ -222,42 +201,24 @@ void organicInstrument::playNote(NotePlayHandle* _n,
 			if (i == m_numOscillators - 1)
 			{
 				// create left oscillator
-				oscs_l[i] = new Oscillator(
-					&m_osc[i]->m_waveShape,
-					&m_modulationAlgo,
-					_n->frequency(),
-					m_osc[i]->m_detuningLeft,
-					static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetLeft[i],
-					m_osc[i]->m_volumeLeft);
+				oscs_l[i] =
+					new Oscillator(&m_osc[i]->m_waveShape, &m_modulationAlgo, _n->frequency(), m_osc[i]->m_detuningLeft,
+						static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetLeft[i], m_osc[i]->m_volumeLeft);
 				// create right oscillator
-				oscs_r[i] = new Oscillator(
-					&m_osc[i]->m_waveShape,
-					&m_modulationAlgo,
-					_n->frequency(),
-					m_osc[i]->m_detuningRight,
-					static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetRight[i],
+				oscs_r[i] = new Oscillator(&m_osc[i]->m_waveShape, &m_modulationAlgo, _n->frequency(),
+					m_osc[i]->m_detuningRight, static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetRight[i],
 					m_osc[i]->m_volumeRight);
 			}
 			else
 			{
 				// create left oscillator
-				oscs_l[i] = new Oscillator(
-					&m_osc[i]->m_waveShape,
-					&m_modulationAlgo,
-					_n->frequency(),
-					m_osc[i]->m_detuningLeft,
-					static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetLeft[i],
-					m_osc[i]->m_volumeLeft,
-					oscs_l[i + 1]);
+				oscs_l[i] = new Oscillator(&m_osc[i]->m_waveShape, &m_modulationAlgo, _n->frequency(),
+					m_osc[i]->m_detuningLeft, static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetLeft[i],
+					m_osc[i]->m_volumeLeft, oscs_l[i + 1]);
 				// create right oscillator
-				oscs_r[i] = new Oscillator(
-					&m_osc[i]->m_waveShape,
-					&m_modulationAlgo,
-					_n->frequency(),
-					m_osc[i]->m_detuningRight,
-					static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetRight[i],
-					m_osc[i]->m_volumeRight,
-					oscs_r[i + 1]);
+				oscs_r[i] = new Oscillator(&m_osc[i]->m_waveShape, &m_modulationAlgo, _n->frequency(),
+					m_osc[i]->m_detuningRight, static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetRight[i],
+					m_osc[i]->m_volumeRight, oscs_r[i + 1]);
 			}
 		}
 
@@ -278,10 +239,8 @@ void organicInstrument::playNote(NotePlayHandle* _n,
 
 	for (int i = 0; i < frames + offset; i++)
 	{
-		_working_buffer[i][0] = waveshape(_working_buffer[i][0], t) *
-			m_volModel.value() / 100.0f;
-		_working_buffer[i][1] = waveshape(_working_buffer[i][1], t) *
-			m_volModel.value() / 100.0f;
+		_working_buffer[i][0] = waveshape(_working_buffer[i][0], t) * m_volModel.value() / 100.0f;
+		_working_buffer[i][1] = waveshape(_working_buffer[i][1], t) * m_volModel.value() / 100.0f;
 	}
 
 	// -- --
@@ -291,12 +250,8 @@ void organicInstrument::playNote(NotePlayHandle* _n,
 
 void organicInstrument::deleteNotePluginData(NotePlayHandle* _n)
 {
-	delete static_cast<Oscillator*>(static_cast<oscPtr*>(
-		_n->m_pluginData)
-										->oscLeft);
-	delete static_cast<Oscillator*>(static_cast<oscPtr*>(
-		_n->m_pluginData)
-										->oscRight);
+	delete static_cast<Oscillator*>(static_cast<oscPtr*>(_n->m_pluginData)->oscLeft);
+	delete static_cast<Oscillator*>(static_cast<oscPtr*>(_n->m_pluginData)->oscRight);
 
 	delete static_cast<oscPtr*>(_n->m_pluginData);
 }
@@ -305,7 +260,7 @@ void organicInstrument::deleteNotePluginData(NotePlayHandle* _n)
 {
   if (in>threshold || in<-threshold)
   {
-    in= fabs(fabs(fmod(in - threshold, threshold*4)) - threshold*2) - threshold;
+	in= fabs(fabs(fmod(in - threshold, threshold*4)) - threshold*2) - threshold;
   }
   return in;
 }
@@ -349,10 +304,7 @@ int organicInstrument::intRand(int min, int max)
 	return (randn);
 }
 
-PluginView* organicInstrument::instantiateView(QWidget* _parent)
-{
-	return (new organicInstrumentView(this, _parent));
-}
+PluginView* organicInstrument::instantiateView(QWidget* _parent) { return (new organicInstrumentView(this, _parent)); }
 
 class organicKnob : public Knob
 {
@@ -364,8 +316,7 @@ public:
 	}
 };
 
-organicInstrumentView::organicInstrumentView(Instrument* _instrument,
-	QWidget* _parent)
+organicInstrumentView::organicInstrumentView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
 	, m_oscKnobs(NULL)
 {
@@ -394,25 +345,18 @@ organicInstrumentView::organicInstrumentView(Instrument* _instrument,
 	// randomise
 	m_randBtn = new PixmapButton(this, tr("Randomise"));
 	m_randBtn->move(148, 224);
-	m_randBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap(
-		"randomise_pressed"));
-	m_randBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap(
-		"randomise"));
+	m_randBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("randomise_pressed"));
+	m_randBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("randomise"));
 
-	connect(m_randBtn, SIGNAL(clicked()),
-		oi, SLOT(randomiseSettings()));
+	connect(m_randBtn, SIGNAL(clicked()), oi, SLOT(randomiseSettings()));
 
 	if (s_artwork == NULL)
 	{
-		s_artwork = new QPixmap(PLUGIN_NAME::getIconPixmap(
-			"artwork"));
+		s_artwork = new QPixmap(PLUGIN_NAME::getIconPixmap("artwork"));
 	}
 }
 
-organicInstrumentView::~organicInstrumentView()
-{
-	delete[] m_oscKnobs;
-}
+organicInstrumentView::~organicInstrumentView() { delete[] m_oscKnobs; }
 
 void organicInstrumentView::modelChanged()
 {
@@ -442,14 +386,12 @@ void organicInstrumentView::modelChanged()
 		Knob* harmKnob = new organicKnob(this);
 		harmKnob->move(x + i * colWidth, y - rowHeight);
 		harmKnob->setObjectName("harmKnob");
-		connect(&oi->m_osc[i]->m_harmModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobHint()));
+		connect(&oi->m_osc[i]->m_harmModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
 
 		// setup waveform-knob
 		Knob* oscKnob = new organicKnob(this);
 		oscKnob->move(x + i * colWidth, y);
-		connect(&oi->m_osc[i]->m_oscModel, SIGNAL(dataChanged()),
-			this, SLOT(updateKnobHint()));
+		connect(&oi->m_osc[i]->m_oscModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
 
 		oscKnob->setHintText(tr("Osc %1 waveform:").arg(i + 1), QString());
 
@@ -490,42 +432,31 @@ void organicInstrumentView::updateKnobHint()
 		const float harm = oi->m_osc[i]->m_harmModel.value();
 		const float wave = oi->m_osc[i]->m_oscModel.value();
 
-		m_oscKnobs[i].m_harmKnob->setHintText(tr("Osc %1 harmonic:").arg(i + 1), " (" + HARMONIC_NAMES[static_cast<int>(harm)] + ")");
-		m_oscKnobs[i].m_oscKnob->setHintText(tr("Osc %1 waveform:").arg(i + 1), " (" + WAVEFORM_NAMES[static_cast<int>(wave)] + ")");
+		m_oscKnobs[i].m_harmKnob->setHintText(
+			tr("Osc %1 harmonic:").arg(i + 1), " (" + HARMONIC_NAMES[static_cast<int>(harm)] + ")");
+		m_oscKnobs[i].m_oscKnob->setHintText(
+			tr("Osc %1 waveform:").arg(i + 1), " (" + WAVEFORM_NAMES[static_cast<int>(wave)] + ")");
 	}
 }
 
 OscillatorObject::OscillatorObject(Model* _parent, int _index)
 	: Model(_parent)
 	, m_waveShape(Oscillator::SineWave, 0, Oscillator::NumWaveShapes - 1, this)
-	, m_oscModel(0.0f, 0.0f, 5.0f, 1.0f,
-		  this, tr("Osc %1 waveform").arg(_index + 1))
-	, m_harmModel(static_cast<float>(_index), 0.0f, 17.0f, 1.0f,
-		  this, tr("Osc %1 harmonic").arg(_index + 1))
-	, m_volModel(100.0f, 0.0f, 100.0f, 1.0f,
-		  this, tr("Osc %1 volume").arg(_index + 1))
-	, m_panModel(DefaultPanning, PanningLeft, PanningRight, 1.0f,
-		  this, tr("Osc %1 panning").arg(_index + 1))
-	, m_detuneModel(0.0f, -1200.0f, 1200.0f, 1.0f,
-		  this, tr("Osc %1 fine detuning left").arg(_index + 1))
+	, m_oscModel(0.0f, 0.0f, 5.0f, 1.0f, this, tr("Osc %1 waveform").arg(_index + 1))
+	, m_harmModel(static_cast<float>(_index), 0.0f, 17.0f, 1.0f, this, tr("Osc %1 harmonic").arg(_index + 1))
+	, m_volModel(100.0f, 0.0f, 100.0f, 1.0f, this, tr("Osc %1 volume").arg(_index + 1))
+	, m_panModel(DefaultPanning, PanningLeft, PanningRight, 1.0f, this, tr("Osc %1 panning").arg(_index + 1))
+	, m_detuneModel(0.0f, -1200.0f, 1200.0f, 1.0f, this, tr("Osc %1 fine detuning left").arg(_index + 1))
 {
 }
 
-OscillatorObject::~OscillatorObject()
-{
-}
+OscillatorObject::~OscillatorObject() {}
 
 void OscillatorObject::oscButtonChanged()
 {
 
-	static Oscillator::WaveShapes shapes[] =
-		{
-			Oscillator::SineWave,
-			Oscillator::SawWave,
-			Oscillator::SquareWave,
-			Oscillator::TriangleWave,
-			Oscillator::MoogSawWave,
-			Oscillator::ExponentialWave};
+	static Oscillator::WaveShapes shapes[] = {Oscillator::SineWave, Oscillator::SawWave, Oscillator::SquareWave,
+		Oscillator::TriangleWave, Oscillator::MoogSawWave, Oscillator::ExponentialWave};
 
 	m_waveShape.setValue(shapes[(int)roundf(m_oscModel.value())]);
 }
@@ -538,9 +469,13 @@ void OscillatorObject::updateVolume()
 
 void OscillatorObject::updateDetuning()
 {
-	m_detuningLeft = powf(2.0f, organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())] + (float)m_detuneModel.value() * CENT) /
+	m_detuningLeft = powf(2.0f,
+						 organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())] +
+							 (float)m_detuneModel.value() * CENT) /
 		Engine::mixer()->processingSampleRate();
-	m_detuningRight = powf(2.0f, organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())] - (float)m_detuneModel.value() * CENT) /
+	m_detuningRight = powf(2.0f,
+						  organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())] -
+							  (float)m_detuneModel.value() * CENT) /
 		Engine::mixer()->processingSampleRate();
 }
 
@@ -556,10 +491,10 @@ extern "C"
 
 /*
  * some notes & ideas for the future of this plugin:
- * 
+ *
  * - 32.692 Hz in the bass to 5919.85 Hz of treble in  a Hammond organ
  * => implement harmonic foldback
- * 
+ *
  m_osc[i].m_oscModel->setInitValue( 0.0f );
- * - randomize preset 
+ * - randomize preset
  */

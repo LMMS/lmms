@@ -168,8 +168,7 @@ public:
 	virtual void playNote(NotePlayHandle* _n, sampleFrame* _working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* _n);
 
-	virtual void saveSettings(QDomDocument& _doc,
-		QDomElement& _parent);
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _parent);
 	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
@@ -218,8 +217,7 @@ class sfxrInstrumentView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	sfxrInstrumentView(Instrument* _instrument,
-		QWidget* _parent);
+	sfxrInstrumentView(Instrument* _instrument, QWidget* _parent);
 
 	virtual ~sfxrInstrumentView(){};
 
@@ -239,38 +237,38 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-	Knob* m_attKnob;  //Attack Time
-	Knob* m_holdKnob; //Sustain Time
-	Knob* m_susKnob;  //Sustain Punch
-	Knob* m_decKnob;  //Decay Time
+	Knob* m_attKnob;  // Attack Time
+	Knob* m_holdKnob; // Sustain Time
+	Knob* m_susKnob;  // Sustain Punch
+	Knob* m_decKnob;  // Decay Time
 
-	Knob* m_startFreqKnob; //Start Frequency
-	Knob* m_minFreqKnob;   //Min Frequency
-	Knob* m_slideKnob;	   //Slide
-	Knob* m_dSlideKnob;	   //Delta Slide
-	Knob* m_vibDepthKnob;  //Vibrato Depth
-	Knob* m_vibSpeedKnob;  //Vibrato Speed
+	Knob* m_startFreqKnob; // Start Frequency
+	Knob* m_minFreqKnob;   // Min Frequency
+	Knob* m_slideKnob;	   // Slide
+	Knob* m_dSlideKnob;	   // Delta Slide
+	Knob* m_vibDepthKnob;  // Vibrato Depth
+	Knob* m_vibSpeedKnob;  // Vibrato Speed
 
-	Knob* m_changeAmtKnob;	 //Change Amount
-	Knob* m_changeSpeedKnob; //Change Speed
+	Knob* m_changeAmtKnob;	 // Change Amount
+	Knob* m_changeSpeedKnob; // Change Speed
 
-	Knob* m_sqrDutyKnob;  //Square Wave Duty
-	Knob* m_sqrSweepKnob; //Square Wave Duty Sweep
+	Knob* m_sqrDutyKnob;  // Square Wave Duty
+	Knob* m_sqrSweepKnob; // Square Wave Duty Sweep
 
-	Knob* m_repeatSpeedKnob; //Repeat Speed
+	Knob* m_repeatSpeedKnob; // Repeat Speed
 
-	Knob* m_phaserOffsetKnob; //Phaser Offset
-	Knob* m_phaserSweepKnob;  //Phaser Sweep
+	Knob* m_phaserOffsetKnob; // Phaser Offset
+	Knob* m_phaserSweepKnob;  // Phaser Sweep
 
-	Knob* m_lpFilCutKnob;	   //LP Filter Cutoff
-	Knob* m_lpFilCutSweepKnob; //LP Filter Cutoff Sweep
-	Knob* m_lpFilResoKnob;	   //LP Filter Resonance
-	Knob* m_hpFilCutKnob;	   //HP Filter Cutoff
-	Knob* m_hpFilCutSweepKnob; //HP Filter Cutoff Sweep
+	Knob* m_lpFilCutKnob;	   // LP Filter Cutoff
+	Knob* m_lpFilCutSweepKnob; // LP Filter Cutoff Sweep
+	Knob* m_lpFilResoKnob;	   // LP Filter Resonance
+	Knob* m_hpFilCutKnob;	   // HP Filter Cutoff
+	Knob* m_hpFilCutSweepKnob; // HP Filter Cutoff Sweep
 
 	automatableButtonGroup* m_waveBtnGroup;
-	PixmapButton* m_sqrWaveBtn; //NOTE: This button has Square Duty
-								//and Square Speed configurable
+	PixmapButton* m_sqrWaveBtn; // NOTE: This button has Square Duty
+								// and Square Speed configurable
 	PixmapButton* m_sawWaveBtn;
 	PixmapButton* m_sinWaveBtn;
 	PixmapButton* m_noiseWaveBtn;

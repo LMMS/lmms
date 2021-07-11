@@ -1,7 +1,7 @@
 /*
  * EqCurve.h - defination of EqCurve and EqHandle classes.
  *
-* Copyright (c) 2015 Steffen Baranowsky <BaraMGB/at/freenet/dot/de>
+ * Copyright (c) 2015 Steffen Baranowsky <BaraMGB/at/freenet/dot/de>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -90,7 +90,8 @@ protected:
 	QVariant itemChange(GraphicsItemChange change, const QVariant& value);
 
 private:
-	double calculateGain(const double freq, const double a1, const double a2, const double b0, const double b1, const double b2);
+	double calculateGain(
+		const double freq, const double a1, const double a2, const double b0, const double b1, const double b2);
 	void loadPixmap();
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;

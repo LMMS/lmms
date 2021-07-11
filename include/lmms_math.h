@@ -2,7 +2,7 @@
  * lmms_math.h - defines math functions
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -39,15 +39,9 @@ using namespace std;
 
 #ifdef __INTEL_COMPILER
 
-static inline float absFraction(const float _x)
-{
-	return (_x - floorf(_x));
-}
+static inline float absFraction(const float _x) { return (_x - floorf(_x)); }
 
-static inline float fraction(const float _x)
-{
-	return (_x - floorf(_x) - (_x >= 0.0f ? 0.0 : 1.0));
-}
+static inline float fraction(const float _x) { return (_x - floorf(_x) - (_x >= 0.0f ? 0.0 : 1.0)); }
 
 #else
 
@@ -75,10 +69,7 @@ static inline float absFraction(const float _x)
  * Note that if the return value is used as a phase of an oscillator, that the oscillator must support
  * negative phases.
  */
-static inline float fraction(const float _x)
-{
-	return (_x - static_cast<int>(_x));
-}
+static inline float fraction(const float _x) { return (_x - static_cast<int>(_x)); }
 
 #if 0
 // SSE3-version
@@ -191,18 +182,10 @@ static inline double fastPow(double a, double b)
 }
 
 // sinc function
-static inline double sinc(double _x)
-{
-	return _x == 0.0 ? 1.0 : sin(F_PI * _x) / (F_PI * _x);
-}
+static inline double sinc(double _x) { return _x == 0.0 ? 1.0 : sin(F_PI * _x) / (F_PI * _x); }
 
 //! @brief Exponential function that deals with negative bases
-static inline float signedPowf(float v, float e)
-{
-	return v < 0
-		? powf(-v, e) * -1.0f
-		: powf(v, e);
-}
+static inline float signedPowf(float v, float e) { return v < 0 ? powf(-v, e) * -1.0f : powf(v, e); }
 
 //! @brief Scales @value from linear to logarithmic.
 //! Value should be within [0,1]
@@ -238,50 +221,28 @@ static inline float linearToLogScale(float min, float max, float value)
 //! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
 //! @param amp Linear amplitude, where 1.0 = 0dBFS.
 //! @return Amplitude in dBFS. -inf for 0 amplitude.
-static inline float safeAmpToDbfs(float amp)
-{
-	return amp == 0.0f
-		? -INFINITY
-		: log10f(amp) * 20.0f;
-}
+static inline float safeAmpToDbfs(float amp) { return amp == 0.0f ? -INFINITY : log10f(amp) * 20.0f; }
 
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
 //! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
 //! @return Linear amplitude
-static inline float safeDbfsToAmp(float dbfs)
-{
-	return isinf(dbfs)
-		? 0.0f
-		: exp10(dbfs * 0.05f);
-}
+static inline float safeDbfsToAmp(float dbfs) { return isinf(dbfs) ? 0.0f : exp10(dbfs * 0.05f); }
 
 //! @brief Converts linear amplitude (>0-1.0) to dBFS scale.
 //! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
 //! @return Amplitude in dBFS.
-static inline float ampToDbfs(float amp)
-{
-	return log10f(amp) * 20.0f;
-}
+static inline float ampToDbfs(float amp) { return log10f(amp) * 20.0f; }
 
 //! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
 //! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbfsToAmp(float dbfs)
-{
-	return exp10(dbfs * 0.05f);
-}
+static inline float dbfsToAmp(float dbfs) { return exp10(dbfs * 0.05f); }
 
 //! returns 1.0f if val >= 0.0f, -1.0 else
-static inline float sign(float val)
-{
-	return val >= 0.0f ? 1.0f : -1.0f;
-}
+static inline float sign(float val) { return val >= 0.0f ? 1.0f : -1.0f; }
 
 //! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-static inline float sqrt_neg(float val)
-{
-	return sqrtf(fabs(val)) * sign(val);
-}
+static inline float sqrt_neg(float val) { return sqrtf(fabs(val)) * sign(val); }
 
 // fast approximation of square root
 static inline float fastSqrt(float n)
@@ -297,17 +258,9 @@ static inline float fastSqrt(float n)
 }
 
 //! returns value furthest from zero
-template <class T>
-static inline T absMax(T a, T b)
-{
-	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
-}
+template <class T> static inline T absMax(T a, T b) { return qAbs<T>(a) > qAbs<T>(b) ? a : b; }
 
 //! returns value nearest to zero
-template <class T>
-static inline T absMin(T a, T b)
-{
-	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
-}
+template <class T> static inline T absMin(T a, T b) { return qAbs<T>(a) < qAbs<T>(b) ? a : b; }
 
 #endif

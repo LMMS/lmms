@@ -40,20 +40,11 @@ public:
 
 	virtual void saveSettings(QDomDocument& doc, QDomElement& elem);
 	virtual void loadSettings(const QDomElement& elem);
-	inline virtual QString nodeName() const
-	{
-		return ("bitcrushcontrols");
-	}
+	inline virtual QString nodeName() const { return ("bitcrushcontrols"); }
 
-	virtual int controlCount()
-	{
-		return (9);
-	}
+	virtual int controlCount() { return (9); }
 
-	virtual EffectControlDialog* createView()
-	{
-		return (new BitcrushControlDialog(this));
-	}
+	virtual EffectControlDialog* createView() { return (new BitcrushControlDialog(this)); }
 
 private slots:
 	void sampleRateChanged();

@@ -142,8 +142,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 					}
 					else
 					{
-						m_bufferL[m_framesFilledUp] =
-							m_bufferR[m_framesFilledUp] = (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
+						m_bufferL[m_framesFilledUp] = m_bufferR[m_framesFilledUp] =
+							(in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
 					}
 					if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f)
 					{
@@ -163,9 +163,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 				if (total_time - m_last_dump_time > 2000000000)
 				{
 					std::cout << "FFT analysis: " << std::fixed << std::setprecision(2)
-							  << m_sum_execution / m_dump_count << " ms avg / "
-							  << m_max_execution << " ms peak, executing "
-							  << m_dump_count << " times per second ("
+							  << m_sum_execution / m_dump_count << " ms avg / " << m_max_execution
+							  << " ms peak, executing " << m_dump_count << " times per second ("
 							  << m_sum_execution / 20.0 << " % CPU usage)." << std::endl;
 					m_last_dump_time = total_time;
 					m_sum_execution = m_max_execution = m_dump_count = 0;
@@ -210,8 +209,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 				{
 					// move waterfall history one line down and clear the top line
 					QRgb* pixel = (QRgb*)m_history_work.data();
-					std::copy(pixel,
-						pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
+					std::copy(pixel, pixel + waterfallWidth() * m_waterfallHeight - waterfallWidth(),
 						pixel + waterfallWidth());
 					memset(pixel, 0, waterfallWidth() * sizeof(QRgb));
 
@@ -356,22 +354,15 @@ QRgb SaProcessor::makePixel(float left, float right) const
 	{
 		float ampL = pow(left, gamma_correction);
 		// make mono color brighter to compensate for the fact it is not summed
-		return qRgb(m_controls->m_colorMonoW.red() * ampL,
-			m_controls->m_colorMonoW.green() * ampL,
+		return qRgb(m_controls->m_colorMonoW.red() * ampL, m_controls->m_colorMonoW.green() * ampL,
 			m_controls->m_colorMonoW.blue() * ampL);
 	}
 }
 
 // Inform the processor whether any display widgets actually need it.
-void SaProcessor::setSpectrumActive(bool active)
-{
-	m_spectrumActive = active;
-}
+void SaProcessor::setSpectrumActive(bool active) { m_spectrumActive = active; }
 
-void SaProcessor::setWaterfallActive(bool active)
-{
-	m_waterfallActive = active;
-}
+void SaProcessor::setWaterfallActive(bool active) { m_waterfallActive = active; }
 
 // Reallocate data buffers according to newly set block size.
 void SaProcessor::reallocateBuffers()
@@ -454,8 +445,12 @@ void SaProcessor::reallocateBuffers()
 	m_normSpectrumR.resize(new_bins, 0);
 
 	m_waterfallHeight = m_controls->m_waterfallHeightModel.value();
-	m_history_work.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth) * m_waterfallHeight * sizeof qRgb(0, 0, 0), 0);
-	m_history.resize((new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth) * m_waterfallHeight * sizeof qRgb(0, 0, 0), 0);
+	m_history_work.resize(
+		(new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth) * m_waterfallHeight * sizeof qRgb(0, 0, 0),
+		0);
+	m_history.resize(
+		(new_bins < m_waterfallMaxWidth ? new_bins : m_waterfallMaxWidth) * m_waterfallHeight * sizeof qRgb(0, 0, 0),
+		0);
 
 	// done; publish new sizes and clean up
 	m_inBlockSize = new_in_size;
@@ -518,23 +513,14 @@ bool SaProcessor::spectrumNotEmpty()
 //
 
 // Get sample rate value that is valid for currently stored results.
-unsigned int SaProcessor::getSampleRate() const
-{
-	return m_sampleRate;
-}
+unsigned int SaProcessor::getSampleRate() const { return m_sampleRate; }
 
 // Maximum frequency of a sampled signal is equal to half of its sample rate.
-float SaProcessor::getNyquistFreq() const
-{
-	return getSampleRate() / 2.0f;
-}
+float SaProcessor::getNyquistFreq() const { return getSampleRate() / 2.0f; }
 
 // FFTW automatically discards upper half of the symmetric FFT output, so
 // the useful bin count is the transform size divided by 2, plus zero.
-unsigned int SaProcessor::binCount() const
-{
-	return m_fftBlockSize / 2 + 1;
-}
+unsigned int SaProcessor::binCount() const { return m_fftBlockSize / 2 + 1; }
 
 // Return the final width of waterfall display buffer.
 // Normally the waterfall width equals the number of frequency bins, but the
@@ -547,18 +533,12 @@ unsigned int SaProcessor::waterfallWidth() const
 }
 
 // Return the center frequency of given frequency bin.
-float SaProcessor::binToFreq(unsigned int bin_index) const
-{
-	return getNyquistFreq() * bin_index / binCount();
-}
+float SaProcessor::binToFreq(unsigned int bin_index) const { return getNyquistFreq() * bin_index / binCount(); }
 
 // Return width of the frequency range that falls into one bin.
 // The binCount is lowered by one since half of the first and last bin is
 // actually outside the frequency range.
-float SaProcessor::binBandwidth() const
-{
-	return getNyquistFreq() / (binCount() - 1);
-}
+float SaProcessor::binBandwidth() const { return getNyquistFreq() / (binCount() - 1); }
 
 float SaProcessor::getFreqRangeMin(bool linear) const
 {

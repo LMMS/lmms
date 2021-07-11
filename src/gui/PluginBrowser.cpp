@@ -39,12 +39,12 @@
 #include "gui_templates.h"
 
 PluginBrowser::PluginBrowser(QWidget* _parent)
-	: SideBarWidget(tr("Instrument Plugins"),
-		  embed::getIconPixmap("plugins").transformed(QTransform().rotate(90)), _parent)
+	: SideBarWidget(
+		  tr("Instrument Plugins"), embed::getIconPixmap("plugins").transformed(QTransform().rotate(90)), _parent)
 {
 	setWindowTitle(tr("Instrument browser"));
 	m_view = new QWidget(contentParent());
-	//m_view->setFrameShape( QFrame::NoFrame );
+	// m_view->setFrameShape( QFrame::NoFrame );
 
 	addContentWidget(m_view);
 
@@ -70,8 +70,7 @@ PluginBrowser::PluginBrowser(QWidget* _parent)
 	m_descTree->setIndentation(10);
 	m_descTree->setSelectionMode(QAbstractItemView::NoSelection);
 
-	connect(searchBar, SIGNAL(textEdited(const QString&)),
-		this, SLOT(onFilterChanged(const QString&)));
+	connect(searchBar, SIGNAL(textEdited(const QString&)), this, SLOT(onFilterChanged(const QString&)));
 
 	view_layout->addWidget(hint);
 	view_layout->addWidget(searchBar);
@@ -148,10 +147,8 @@ void PluginBrowser::addPlugins()
 
 	// Fetch and sort all instrument plugin descriptors
 	auto descs = pluginFactory->descriptors(Plugin::Instrument);
-	std::sort(descs.begin(), descs.end(),
-		[](auto d1, auto d2) {
-			return qstricmp(d1->displayName, d2->displayName) < 0;
-		});
+	std::sort(
+		descs.begin(), descs.end(), [](auto d1, auto d2) { return qstricmp(d1->displayName, d2->displayName) < 0; });
 
 	// Add a root node to the tree for native LMMS plugins
 	const auto lmmsRoot = addRoot("LMMS");
@@ -165,10 +162,9 @@ void PluginBrowser::addPlugins()
 			// Fetch and sort all subplugins for this plugin descriptor
 			auto subPluginKeys = Plugin::Descriptor::SubPluginFeatures::KeyList{};
 			desc->subPluginFeatures->listSubPluginKeys(desc, subPluginKeys);
-			std::sort(subPluginKeys.begin(), subPluginKeys.end(),
-				[](const auto& l, const auto& r) {
-					return QString::compare(l.displayName(), r.displayName(), Qt::CaseInsensitive) < 0;
-				});
+			std::sort(subPluginKeys.begin(), subPluginKeys.end(), [](const auto& l, const auto& r) {
+				return QString::compare(l.displayName(), r.displayName(), Qt::CaseInsensitive) < 0;
+			});
 
 			// Create a root node for this plugin and add the subplugins under it
 			const auto root = addRoot(desc->displayName);
@@ -184,8 +180,7 @@ void PluginBrowser::addPlugins()
 	}
 }
 
-PluginDescWidget::PluginDescWidget(const PluginKey& _pk,
-	QWidget* _parent)
+PluginDescWidget::PluginDescWidget(const PluginKey& _pk, QWidget* _parent)
 	: QWidget(_parent)
 	, m_pluginKey(_pk)
 	, m_logo(_pk.logo()->pixmap())
@@ -194,15 +189,10 @@ PluginDescWidget::PluginDescWidget(const PluginKey& _pk,
 	setFixedHeight(DEFAULT_HEIGHT);
 	setMouseTracking(true);
 	setCursor(Qt::PointingHandCursor);
-	setToolTip(_pk.desc->subPluginFeatures
-			? _pk.description()
-			: tr(_pk.desc->description));
+	setToolTip(_pk.desc->subPluginFeatures ? _pk.description() : tr(_pk.desc->description));
 }
 
-QString PluginDescWidget::name() const
-{
-	return m_pluginKey.displayName();
-}
+QString PluginDescWidget::name() const { return m_pluginKey.displayName(); }
 
 void PluginDescWidget::paintEvent(QPaintEvent*)
 {
@@ -217,8 +207,7 @@ void PluginDescWidget::paintEvent(QPaintEvent*)
 	// Draw the rest
 	const int s = 16 + (32 * (qBound(24, height(), 60) - 24)) / (60 - 24);
 	const QSize logo_size(s, s);
-	QPixmap logo = m_logo.scaled(logo_size, Qt::KeepAspectRatio,
-		Qt::SmoothTransformation);
+	QPixmap logo = m_logo.scaled(logo_size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	p.drawPixmap(4, 4, logo);
 
 	QFont f = p.font();
@@ -250,8 +239,7 @@ void PluginDescWidget::mousePressEvent(QMouseEvent* _me)
 	if (_me->button() == Qt::LeftButton)
 	{
 		Engine::setDndPluginKey(&m_pluginKey);
-		new StringPairDrag("instrument",
-			QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
+		new StringPairDrag("instrument", QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent(_me);
 	}
 }

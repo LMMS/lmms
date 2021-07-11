@@ -46,8 +46,7 @@ public slots:
 private:
 	TabBar* m_tabBar;
 
-	QWidget* createTab(QWidget* _parent, const QString& _txt,
-		ladspaPluginType _type);
+	QWidget* createTab(QWidget* _parent, const QString& _txt, ladspaPluginType _type);
 };
 
 class ladspaBrowser : public ToolPlugin
@@ -56,10 +55,7 @@ public:
 	ladspaBrowser();
 	virtual ~ladspaBrowser();
 
-	virtual PluginView* instantiateView(QWidget*)
-	{
-		return new ladspaBrowserView(this);
-	}
+	virtual PluginView* instantiateView(QWidget*) { return new ladspaBrowserView(this); }
 
 	virtual QString nodeName() const;
 
@@ -69,10 +65,7 @@ public:
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings(const QDomElement& element)
-	{
-		Q_UNUSED(element)
-	}
+	virtual void loadSettings(const QDomElement& element) { Q_UNUSED(element) }
 };
 
 #endif

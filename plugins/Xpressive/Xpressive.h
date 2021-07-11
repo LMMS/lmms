@@ -2,7 +2,7 @@
  * Xpressive.h - Instrument which uses a mathematical formula parser
  *
  * Copyright (c) 2016-2017 Orr Dvori
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -55,12 +55,10 @@ public:
 	Xpressive(InstrumentTrack* instrument_track);
 	virtual ~Xpressive();
 
-	virtual void playNote(NotePlayHandle* nph,
-		sampleFrame* working_buffer);
+	virtual void playNote(NotePlayHandle* nph, sampleFrame* working_buffer);
 	virtual void deleteNotePluginData(NotePlayHandle* nph);
 
-	virtual void saveSettings(QDomDocument& _doc,
-		QDomElement& _this);
+	virtual void saveSettings(QDomDocument& _doc, QDomElement& _this);
 	virtual void loadSettings(const QDomElement& _this);
 
 	virtual QString nodeName() const;
@@ -134,8 +132,7 @@ class XpressiveView : public InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
-	XpressiveView(Instrument* _instrument,
-		QWidget* _parent);
+	XpressiveView(Instrument* _instrument, QWidget* _parent);
 
 	virtual ~XpressiveView();
 
@@ -199,9 +196,7 @@ public:
 		static XpressiveHelpView instance;
 		return &instance;
 	}
-	static void finalize()
-	{
-	}
+	static void finalize() {}
 
 private:
 	XpressiveHelpView();

@@ -38,20 +38,14 @@
 
 #include "Mixer.h"
 
-AudioFileOgg::AudioFileOgg(OutputSettings const& outputSettings,
-	const ch_cnt_t channels,
-	bool& successful,
-	const QString& file,
-	Mixer* mixer)
+AudioFileOgg::AudioFileOgg(
+	OutputSettings const& outputSettings, const ch_cnt_t channels, bool& successful, const QString& file, Mixer* mixer)
 	: AudioFileDevice(outputSettings, channels, file, mixer)
 {
 	m_ok = successful = outputFileOpened() && startEncoding();
 }
 
-AudioFileOgg::~AudioFileOgg()
-{
-	finishEncoding();
-}
+AudioFileOgg::~AudioFileOgg() { finishEncoding(); }
 
 inline int AudioFileOgg::writePage()
 {
@@ -97,10 +91,8 @@ bool AudioFileOgg::startEncoding()
 	// Have vorbisenc choose a mode for us
 	vorbis_info_init(&m_vi);
 
-	if (vorbis_encode_setup_managed(&m_vi, m_channels, m_rate,
-			(maximumBitrate > 0) ? maximumBitrate * 1000 : -1,
-			nominalBitrate() * 1000,
-			(minimalBitrate > 0) ? minimalBitrate * 1000 : -1))
+	if (vorbis_encode_setup_managed(&m_vi, m_channels, m_rate, (maximumBitrate > 0) ? maximumBitrate * 1000 : -1,
+			nominalBitrate() * 1000, (minimalBitrate > 0) ? minimalBitrate * 1000 : -1))
 	{
 		printf("Mode initialization failed: invalid parameters for "
 			   "bitrate\n");
@@ -146,8 +138,7 @@ bool AudioFileOgg::startEncoding()
 	int result;
 
 	// Build the packets
-	vorbis_analysis_headerout(&m_vd, m_comments, &header_main,
-		&header_comments, &header_codebooks);
+	vorbis_analysis_headerout(&m_vd, m_comments, &header_main, &header_comments, &header_codebooks);
 
 	// And stream them out
 	ogg_stream_packetin(&m_os, &header_main);
@@ -172,9 +163,7 @@ bool AudioFileOgg::startEncoding()
 	return true;
 }
 
-void AudioFileOgg::writeBuffer(const surroundSampleFrame* _ab,
-	const fpp_t _frames,
-	const float _master_gain)
+void AudioFileOgg::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _frames, const float _master_gain)
 {
 	int eos = 0;
 
@@ -207,8 +196,7 @@ void AudioFileOgg::writeBuffer(const surroundSampleFrame* _ab,
 			// are available)
 			while (!eos)
 			{
-				int result = ogg_stream_pageout(&m_os,
-					&m_og);
+				int result = ogg_stream_pageout(&m_os, &m_og);
 				if (!result)
 				{
 					break;

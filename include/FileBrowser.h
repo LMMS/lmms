@@ -52,10 +52,8 @@ public:
 		@param filter Filter as used in QDir::match
 		@param recurse *to be documented*
 	*/
-	FileBrowser(const QString& directories, const QString& filter,
-		const QString& title, const QPixmap& pm,
-		QWidget* parent, bool dirs_as_items = false, bool recurse = false,
-		const QString& userDir = "",
+	FileBrowser(const QString& directories, const QString& filter, const QString& title, const QPixmap& pm,
+		QWidget* parent, bool dirs_as_items = false, bool recurse = false, const QString& userDir = "",
 		const QString& factoryDir = "");
 
 	virtual ~FileBrowser() = default;
@@ -140,8 +138,7 @@ private slots:
 class Directory : public QTreeWidgetItem
 {
 public:
-	Directory(const QString& filename, const QString& path,
-		const QString& filter);
+	Directory(const QString& filename, const QString& path, const QString& filter);
 
 	void update(void);
 
@@ -155,14 +152,10 @@ public:
 		{
 			path += QDir::separator();
 		}
-		return (QDir::cleanPath(path + text(0)) +
-			QDir::separator());
+		return (QDir::cleanPath(path + text(0)) + QDir::separator());
 	}
 
-	inline void addDirectory(const QString& dir)
-	{
-		m_directories.push_back(dir);
-	}
+	inline void addDirectory(const QString& dir) { m_directories.push_back(dir); }
 
 private:
 	void initPixmaps(void);
@@ -211,29 +204,16 @@ public:
 		ImportAsProject
 	};
 
-	FileItem(QTreeWidget* parent, const QString& name,
-		const QString& path);
+	FileItem(QTreeWidget* parent, const QString& name, const QString& path);
 	FileItem(const QString& name, const QString& path);
 
-	QString fullName() const
-	{
-		return QFileInfo(m_path, text(0)).absoluteFilePath();
-	}
+	QString fullName() const { return QFileInfo(m_path, text(0)).absoluteFilePath(); }
 
-	inline FileTypes type(void) const
-	{
-		return (m_type);
-	}
+	inline FileTypes type(void) const { return (m_type); }
 
-	inline FileHandling handling(void) const
-	{
-		return (m_handling);
-	}
+	inline FileHandling handling(void) const { return (m_handling); }
 
-	inline bool isTrack(void) const
-	{
-		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
-	}
+	inline bool isTrack(void) const { return m_handling == LoadAsPreset || m_handling == LoadByPlugin; }
 
 	QString extension(void);
 	static QString extension(const QString& file);

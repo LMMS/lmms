@@ -91,29 +91,21 @@ TrackView::TrackView(Track* track, TrackContainerView* tcv)
 	setAttribute(Qt::WA_DeleteOnClose, true);
 
 	connect(m_track, SIGNAL(destroyedTrack()), this, SLOT(close()));
-	connect(m_track,
-		SIGNAL(trackContentObjectAdded(TrackContentObject*)),
-		this, SLOT(createTCOView(TrackContentObject*)),
-		Qt::QueuedConnection);
+	connect(m_track, SIGNAL(trackContentObjectAdded(TrackContentObject*)), this,
+		SLOT(createTCOView(TrackContentObject*)), Qt::QueuedConnection);
 
-	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()),
-		&m_trackContentWidget, SLOT(update()));
+	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()), &m_trackContentWidget, SLOT(update()));
 
-	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()),
-		this, SLOT(muteChanged()));
+	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()), this, SLOT(muteChanged()));
 
-	connect(&m_track->m_soloModel, SIGNAL(dataChanged()),
-		m_track, SLOT(toggleSolo()), Qt::DirectConnection);
+	connect(&m_track->m_soloModel, SIGNAL(dataChanged()), m_track, SLOT(toggleSolo()), Qt::DirectConnection);
 
-	connect(&m_trackOperationsWidget, SIGNAL(colorChanged(QColor&)),
-		m_track, SLOT(trackColorChanged(QColor&)));
+	connect(&m_trackOperationsWidget, SIGNAL(colorChanged(QColor&)), m_track, SLOT(trackColorChanged(QColor&)));
 
-	connect(&m_trackOperationsWidget, SIGNAL(colorReset()),
-		m_track, SLOT(trackColorReset()));
+	connect(&m_trackOperationsWidget, SIGNAL(colorReset()), m_track, SLOT(trackColorReset()));
 
 	// create views for already existing TCOs
-	for (Track::tcoVector::iterator it =
-			 m_track->m_trackContentObjects.begin();
+	for (Track::tcoVector::iterator it = m_track->m_trackContentObjects.begin();
 		 it != m_track->m_trackContentObjects.end(); ++it)
 	{
 		createTCOView(*it);
@@ -125,9 +117,7 @@ TrackView::TrackView(Track* track, TrackContainerView* tcv)
 /*! \brief Destroy this track View.
  *
  */
-TrackView::~TrackView()
-{
-}
+TrackView::~TrackView() {}
 
 /*! \brief Resize this track View.
  *
@@ -135,9 +125,7 @@ TrackView::~TrackView()
  */
 void TrackView::resizeEvent(QResizeEvent* re)
 {
-	if (ConfigManager::inst()->value("ui",
-								 "compacttrackbuttons")
-			.toInt())
+	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
 	{
 		m_trackOperationsWidget.setFixedSize(TRACK_OP_WIDTH_COMPACT, height() - 1);
 		m_trackSettingsWidget.setFixedSize(DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT, height() - 1);
@@ -246,17 +234,13 @@ void TrackView::mousePressEvent(QMouseEvent* me)
 {
 
 	// If previously dragged too small, restore on shift-leftclick
-	if (height() < DEFAULT_TRACK_HEIGHT &&
-		me->modifiers() & Qt::ShiftModifier &&
-		me->button() == Qt::LeftButton)
+	if (height() < DEFAULT_TRACK_HEIGHT && me->modifiers() & Qt::ShiftModifier && me->button() == Qt::LeftButton)
 	{
 		setFixedHeight(DEFAULT_TRACK_HEIGHT);
 		m_track->setHeight(DEFAULT_TRACK_HEIGHT);
 	}
 
-	int widgetTotal = ConfigManager::inst()->value("ui",
-											   "compacttrackbuttons")
-						  .toInt() == 1
+	int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 	if (m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal)
@@ -268,8 +252,7 @@ void TrackView::mousePressEvent(QMouseEvent* me)
 		if (me->modifiers() & Qt::ShiftModifier)
 		{
 			m_action = ResizeTrack;
-			QCursor::setPos(mapToGlobal(QPoint(me->x(),
-				height())));
+			QCursor::setPos(mapToGlobal(QPoint(me->x(), height())));
 			QCursor c(Qt::SizeVerCursor);
 			QApplication::setOverrideCursor(c);
 		}
@@ -316,9 +299,7 @@ void TrackView::mousePressEvent(QMouseEvent* me)
  */
 void TrackView::mouseMoveEvent(QMouseEvent* me)
 {
-	int widgetTotal = ConfigManager::inst()->value("ui",
-											   "compacttrackbuttons")
-						  .toInt() == 1
+	int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
 	if (m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal)
@@ -328,8 +309,7 @@ void TrackView::mouseMoveEvent(QMouseEvent* me)
 	else if (m_action == MoveTrack)
 	{
 		// look which track-widget the mouse-cursor is over
-		const int yPos =
-			m_trackContainerView->contentWidget()->mapFromGlobal(me->globalPos()).y();
+		const int yPos = m_trackContainerView->contentWidget()->mapFromGlobal(me->globalPos()).y();
 		const TrackView* trackAtY = m_trackContainerView->trackViewAt(yPos);
 
 		// debug code
