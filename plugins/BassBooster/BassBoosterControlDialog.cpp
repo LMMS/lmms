@@ -37,32 +37,23 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 120, 60 );
-
-	QVBoxLayout * tl = new QVBoxLayout( this );
-	tl->addSpacing( 4 );
-
-	QHBoxLayout * l = new QHBoxLayout;
+	setFixedSize( 150, 59 );
 
 	Knob * freqKnob = new Knob( knobBright_26, this);
 	freqKnob->setModel( &controls->m_freqModel );
+	freqKnob->move( 11, 13 );
 	freqKnob->setLabel( tr( "FREQ" ) );
 	freqKnob->setHintText( tr( "Frequency:" ) , "Hz" );
 
 	Knob * gainKnob = new Knob( knobBright_26, this );
 	gainKnob->setModel( &controls->m_gainModel );
+	gainKnob->move( 61, 13 );
 	gainKnob->setLabel( tr( "GAIN" ) );
 	gainKnob->setHintText( tr( "Gain:" ) , "" );
 
 	Knob * ratioKnob = new Knob( knobBright_26, this );
 	ratioKnob->setModel( &controls->m_ratioModel );
+	ratioKnob->move( 111, 13 );
 	ratioKnob->setLabel( tr( "RATIO" ) );
 	ratioKnob->setHintText( tr( "Ratio:" ) , "" );
-
-	l->addWidget( freqKnob );
-	l->addWidget( gainKnob );
-	l->addWidget( ratioKnob );
-
-	tl->addLayout( l );
-	setLayout( tl );
 }

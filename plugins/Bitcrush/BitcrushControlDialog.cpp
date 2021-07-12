@@ -33,6 +33,8 @@
 #include "ToolTip.h"
 #include "LedCheckbox.h"
 #include "Knob.h"
+#include "DeprecationHelper.h"
+#include "gui_templates.h"
 
 BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	EffectControlDialog( controls )
@@ -41,24 +43,24 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(),	PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 181, 128 );
+	setFixedSize( 197, 128 );
 	
 	// labels
 	QLabel * inLabel = new QLabel( tr( "IN" ), this );
-	inLabel->move( 24, 15 );
+	inLabel->move( 31 - horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), tr( "IN" )) / 2, 15 );
 	
 	QLabel * outLabel = new QLabel( tr( "OUT" ), this );
-	outLabel->move( 139, 15 );
+	outLabel->move( 160 - horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), tr( "OUT" )) / 2, 15 );
 	
 	// input knobs
 	Knob * inGain = new Knob( knobBright_26, this );
-	inGain->move( 16, 32 );
+	inGain->move( 20, 32 );
 	inGain->setModel( & controls->m_inGain );
 	inGain->setLabel( tr( "GAIN" ) );
 	inGain->setHintText( tr( "Input gain:" ) , " dBFS" );
 	
 	Knob * inNoise = new Knob( knobBright_26, this );
-	inNoise->move( 14, 76 );
+	inNoise->move( 20, 76 );
 	inNoise->setModel( & controls->m_inNoise );
 	inNoise->setLabel( tr( "NOISE" ) );
 	inNoise->setHintText( tr( "Input noise:" ) , "%" );
@@ -66,13 +68,13 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	// output knobs
 	Knob * outGain = new Knob( knobBright_26, this );
-	outGain->move( 138, 32 );
+	outGain->move( 150, 32 );
 	outGain->setModel( & controls->m_outGain );
 	outGain->setLabel( tr( "GAIN" ) );
 	outGain->setHintText( tr( "Output gain:" ) , " dBFS" );
 	
 	Knob * outClip = new Knob( knobBright_26, this );
-	outClip->move( 138, 76 );
+	outClip->move( 150, 76 );
 	outClip->setModel( & controls->m_outClip );
 	outClip->setLabel( tr( "CLIP" ) );
     outClip->setHintText( tr( "Output clip:" ) , " dBFS");
@@ -81,25 +83,25 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	// leds
 	LedCheckBox * rateEnabled = new LedCheckBox( "", this, tr( "Rate enabled" ), LedCheckBox::Green );
-	rateEnabled->move( 64, 14 );
+	rateEnabled->move( 71, 14 );
 	rateEnabled->setModel( & controls->m_rateEnabled );
 	ToolTip::add( rateEnabled, tr( "Enable sample-rate crushing" ) );
 	
 	LedCheckBox * depthEnabled = new LedCheckBox( "", this, tr( "Depth enabled" ), LedCheckBox::Green );
-	depthEnabled->move( 101, 14 );
+	depthEnabled->move( 110, 14 );
 	depthEnabled->setModel( & controls->m_depthEnabled );
 	ToolTip::add( depthEnabled, tr( "Enable bit-depth crushing" ) );
 	
 	
 	// rate crushing knobs
 	Knob * rate = new Knob( knobBright_26, this );
-	rate->move( 59, 32 );
+	rate->move( 66, 32 );
 	rate->setModel( & controls->m_rate );
 	rate->setLabel( tr( "FREQ" ) );
 	rate->setHintText( tr( "Sample rate:" ) , " Hz" );
 	
 	Knob * stereoDiff = new Knob( knobBright_26, this );
-	stereoDiff->move( 72, 76 );
+	stereoDiff->move( 85, 76 );
 	stereoDiff->setModel( & controls->m_stereoDiff );
 	stereoDiff->setLabel( tr( "STEREO" ) );
 	stereoDiff->setHintText( tr( "Stereo difference:" ) , "%" );
@@ -107,7 +109,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	// depth crushing knob
 	Knob * levels = new Knob( knobBright_26, this );
-	levels->move( 92, 32 );
+	levels->move( 105, 32 );
 	levels->setModel( & controls->m_levels );
 	levels->setLabel( tr( "QUANT" ) );
 	levels->setHintText( tr( "Levels:" ) , "" );
