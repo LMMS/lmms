@@ -137,7 +137,7 @@ public:
 		return m_pluginSubWindow.get();
 	}
 private:
-	unique_ptr<QMdiSubWindow> m_pluginSubWindow;
+	std::unique_ptr<QMdiSubWindow> m_pluginSubWindow;
 };
 
 
