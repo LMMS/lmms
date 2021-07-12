@@ -30,17 +30,17 @@
 CrossoverEQControls::CrossoverEQControls( CrossoverEQEffect * eff ) :
 	EffectControls( eff ),
 	m_effect( eff ),
-	m_xover12( 125.f, 50.f, 10000.f, 1.0f, this, "Band 1/2 Crossover" ),
-	m_xover23( 1250.f, 50.f, 20000.f, 1.0f, this, "Band 2/3 Crossover" ),
-	m_xover34( 5000.f, 50.f, 20000.f, 1.0f, this, "Band 3/4 Crossover" ),
-	m_gain1( 0.f, -60.f, 30.f, 0.1f, this, "Band 1 Gain" ),
-	m_gain2( 0.f, -60.f, 30.f, 0.1f, this, "Band 2 Gain" ),
-	m_gain3( 0.f, -60.f, 30.f, 0.1f, this, "Band 3 Gain" ),
-	m_gain4( 0.f, -60.f, 30.f, 0.1f, this, "Band 4 Gain" ),
-	m_mute1( true, this, "Mute Band 1" ),
-	m_mute2( true, this, "Mute Band 2" ),
-	m_mute3( true, this, "Mute Band 3" ),
-	m_mute4( true, this, "Mute Band 4" )
+	m_xover12( 125.f, 50.f, 10000.f, 1.0f, this, tr( "Band 1/2 Crossover" ) ),
+	m_xover23( 1250.f, 50.f, 20000.f, 1.0f, this, tr( "Band 2/3 Crossover" ) ),
+	m_xover34( 5000.f, 50.f, 20000.f, 1.0f, this, tr( "Band 3/4 Crossover" ) ),
+	m_gain1( 0.f, -60.f, 30.f, 0.1f, this, tr( "Band 1 Gain" ) ),
+	m_gain2( 0.f, -60.f, 30.f, 0.1f, this, tr( "Band 2 Gain" ) ),
+	m_gain3( 0.f, -60.f, 30.f, 0.1f, this, tr( "Band 3 Gain" ) ),
+	m_gain4( 0.f, -60.f, 30.f, 0.1f, this, tr( "Band 4 Gain" ) ),
+	m_mute1( true, this, tr( "Mute Band 1" ) ),
+	m_mute2( true, this, tr( "Mute Band 2" ) ),
+	m_mute3( true, this, tr( "Mute Band 3" ) ),
+	m_mute4( true, this, tr( "Mute Band 4" ) )
 {
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	connect( &m_xover12, SIGNAL( dataChanged() ), this, SLOT( xover12Changed() ) );

@@ -281,11 +281,11 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	const int END_COL = COL1 + 48;
 	
 	m_startFreqKnob = new kickerLargeKnob( this );
-	m_startFreqKnob->setHintText( tr( "Start frequency:" ), "Hz" );
+	m_startFreqKnob->setHintText( tr( "Start frequency:" ), " Hz" );
 	m_startFreqKnob->move( COL1, ROW1 );
 
 	m_endFreqKnob = new kickerLargeKnob( this );
-	m_endFreqKnob->setHintText( tr( "End frequency:" ), "Hz" );
+	m_endFreqKnob->setHintText( tr( "End frequency:" ), " Hz" );
 	m_endFreqKnob->move( END_COL, ROW1 );
 
 	m_slopeKnob = new kickerKnob( this );
@@ -297,7 +297,7 @@ kickerInstrumentView::kickerInstrumentView( Instrument * _instrument,
 	m_gainKnob->move( COL1, ROW3 );
 
 	m_decayKnob = new kickerEnvKnob( this );
-	m_decayKnob->setHintText( tr( "Envelope length:" ), "ms" );
+	m_decayKnob->setHintText( tr( "Envelope length:" ), " ms" );
 	m_decayKnob->move( COL2, ROW3 );
 
 	m_envKnob = new kickerKnob( this );

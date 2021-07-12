@@ -41,7 +41,7 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	inputGainKnob -> move( 16, 10 );
 	inputGainKnob->setModel( &controls->m_inputGainModel );
 	inputGainKnob->setLabel( tr( "Input" ) );
-	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
+	inputGainKnob->setHintText( tr( "Input gain:" ) , " dB" );
 
 	Knob * sizeKnob = new Knob( knobBright_26, this);
 	sizeKnob -> move( 57, 10 );
@@ -59,5 +59,5 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	outputGainKnob -> move( 139, 10 );
 	outputGainKnob->setModel( &controls->m_outputGainModel );
 	outputGainKnob->setLabel( tr( "Output" ) );
-	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
+	outputGainKnob->setHintText( tr( "Output gain:" ) , " dB" );
 }

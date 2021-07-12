@@ -47,7 +47,7 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	Knob * freqKnob = new Knob( knobBright_26, this);
 	freqKnob->setModel( &controls->m_freqModel );
 	freqKnob->setLabel( tr( "FREQ" ) );
-	freqKnob->setHintText( tr( "Frequency:" ) , "Hz" );
+	freqKnob->setHintText( tr( "Frequency:" ) , " Hz" );
 
 	Knob * gainKnob = new Knob( knobBright_26, this );
 	gainKnob->setModel( &controls->m_gainModel );
