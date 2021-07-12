@@ -153,7 +153,7 @@ void Knob::onKnobNumUpdated()
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
-		m_knobPixmap = make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
+		m_knobPixmap = std::make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
 		if (!this->isEnabled())
 		{
 			convertPixmapToGrayScale(*m_knobPixmap.get());
