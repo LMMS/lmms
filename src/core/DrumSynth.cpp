@@ -58,7 +58,6 @@ int DrumSynth::LongestEnv(void) {
   for (e = 0; e < 6; e++) // The filter is excluded here, because... it's not a
                           // sound generator?
   {
-
     // adjust numbering, of course it's different between
     // envelopes and on/off switches for the sections :D
     eon = e;
@@ -190,7 +189,6 @@ inline float DrumSynth::qsFloat(const QString key, float def) {
 
 // Here we assume the file has been loaded and parsed in previously
 int DrumSynth::GetSamples(int16_t *&wave, int channels, sample_rate_t Fs) {
-
   float DF[BUFFER_SIZE];  // The buffer audio is rendered into
   float phi[BUFFER_SIZE]; // Phase buffer... something?
   long wavewords;         // Counter
@@ -445,11 +443,11 @@ int DrumSynth::GetSamples(int16_t *&wave, int channels, sample_rate_t Fs) {
         TT = a * x[0] + b * x[1] + c * x[2] + d * TT;
         DF[t - tpos] = TT * g * envData[ENV_NOISE].value;
       }
+      if (t >= envData[ENV_NOISE].last) {
+        NoiseOn = false;
+      }
     } else {
       std::fill(DF, DF + BUFFER_SIZE, 0.f);
-    }
-    if (t >= envData[ENV_NOISE].last) {
-      NoiseOn = false;
     }
 
     // The main tone

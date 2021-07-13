@@ -32,6 +32,8 @@
 #include <sstream>
 #include <stdint.h>
 
+#define BUFFER_SIZE 1200
+
 class QString;
 using namespace std;
 
@@ -44,7 +46,7 @@ public:
 private:
   const float TwoPi = 6.2831853f;
 
-  float envpts[8][2][32] = {0}; // envelope/time-level/point
+  float envpts[8][2][32] = { {0} }; // envelope/time-level/point
 
   struct envstatus {
     float last;  // Time of last envelope point
@@ -62,8 +64,8 @@ private:
   const int ENV_NOISEBAND2 = 5;
   const int ENV_FILTER = 6;
 
-  const int BUFFER_SIZE =
-      1200; // Identical results not promised if this is changed
+  //const int BUFFER_SIZE =
+  //    1200; // Identical results not promised if this is changed
 
   float timestretch; // overall time scaling
 
