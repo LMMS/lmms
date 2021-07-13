@@ -209,7 +209,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 						it != m_tcoViews.end(); ++it )
 		{
 		if( ( *it )->getTrackContentObject()->
-						startPosition().getBar() == curBB )
+						startPosition().getTicks() / DefaultTicksPerBar == curBB )
 			{
 				( *it )->move( 0, ( *it )->y() );
 				( *it )->raise();
@@ -225,7 +225,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 					it != m_tcoViews.end(); ++it )
 		{
 			if( ( *it )->getTrackContentObject()->
-						startPosition().getBar() != curBB )
+						startPosition().getTicks() / DefaultTicksPerBar != curBB )
 			{
 				( *it )->hide();
 			}
