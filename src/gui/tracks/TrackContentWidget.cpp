@@ -239,7 +239,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		// first show clip for current pattern...
 		for (const auto& clipView : m_clipViews)
 		{
-			if (clipView->getClip()->startPosition().getBar() == curPattern)
+			if (clipView->getClip()->startPosition().getTicks() / DefaultTicksPerBar == curPattern)
 			{
 				clipView->move(0, clipView->y());
 				clipView->raise();
@@ -250,7 +250,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		// ...then hide others to avoid flickering
 		for (const auto& clipView : m_clipViews)
 		{
-			if (clipView->getClip()->startPosition().getBar() != curPattern) { clipView->hide(); }
+			if (clipView->getClip()->startPosition().getTicks() / DefaultTicksPerBar != curPattern) { clipView->hide(); }
 		}
 		setUpdatesEnabled( true );
 		return;
