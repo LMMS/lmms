@@ -27,6 +27,7 @@
 
 #include "DrumSynth.h"
 
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -50,6 +51,11 @@ using namespace std;
 
 #define WORD __u16
 #define DWORD __u32
+
+
+DrumSynth::DrumSynth() {
+	std::fill(envpts[0][0], envpts[0][0] + 8*2*32, 0.f);
+}
 
 int DrumSynth::LongestEnv(void) {
   long e, eon, p;

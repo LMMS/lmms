@@ -39,14 +39,16 @@ using namespace std;
 
 class DrumSynth {
 public:
-  DrumSynth(){};
+  DrumSynth();
   int GetSamples(int16_t *&wave, int channels, sample_rate_t Fs);
   bool LoadFile(QString file);
 
 private:
   const float TwoPi = 6.2831853f;
 
-  float envpts[8][2][32] = { {0} }; // envelope/time-level/point
+  // TODO: C++11 can do float envpts[8][2][32] = { {0} };
+  // but now this is handled in the constructor
+  float envpts[8][2][32];
 
   struct envstatus {
     float last;  // Time of last envelope point
