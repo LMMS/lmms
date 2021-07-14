@@ -683,7 +683,8 @@ f_cnt_t SampleBuffer::decodeSampleDS(
 )
 {
 	DrumSynth ds;
-	f_cnt_t frames = ds.GetDSFileSamples(fileName, buf, channels, samplerate);
+	ds.LoadFile(fileName);
+	f_cnt_t frames = ds.GetSamples(buf, channels, samplerate);
 
 	if (frames > 0 && buf != nullptr)
 	{
