@@ -39,6 +39,10 @@
 #include <QPushButton>
 #include <QTextStream>
 
+#include "Logging.h"
+#include "LoggingThread.h"
+#include "ConsoleLogSink.h"
+
 #ifdef LMMS_BUILD_WIN32
 #include <windows.h>
 #endif
@@ -137,6 +141,43 @@ inline void loadTranslation( const QString & tname,
 }
 
 
+void qDebugToLogManagerAdapter(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+	static LogTopic LT_QtInternal("qtInternal");
+
+	QByteArray localMsg = msg.toLocal8Bit();
+	LogVerbosity verbosity = LogVerbosity::Debug_Hi;
+
+	switch (type) {
+	case QtFatalMsg:
+		verbosity = LogVerbosity::Fatal;
+		break;
+
+	case QtCriticalMsg:
+		verbosity = LogVerbosity::Error;
+		break;
+
+	case QtWarningMsg:
+		verbosity = LogVerbosity::Warning;
+		break;
+
+	case QtInfoMsg:
+		verbosity = LogVerbosity::Info;
+		break;
+
+	case QtDebugMsg:
+		verbosity = LogVerbosity::Debug_Lo;
+		break;
+	}
+
+	LogLine* logLine = new LogLine(verbosity,
+			context.file ? context.file : "",
+			context.line,
+			localMsg.constData(),
+			LT_QtInternal);
+	LogManager::inst().push(logLine);
+
+}
 
 
 void printVersion( char *executableName )
@@ -178,6 +219,23 @@ void printHelp()
 		"  -c, --config <configfile>      Get the configuration from <configfile>\n"
 		"  -h, --help                     Show this usage information and exit.\n"
 		"  -v, --version                  Show version information and exit.\n"
+		"  --log <configuration string>   Configure a log sink to accept the log lines\n"
+		"                                 of defined verbosity level. Can be used more\n"
+		"                                 than once. \n"
+		"          Accepted formats of configuration strings are: \n"
+		"              - <sink>=<level>\n"
+		"              - <sink>#<topic>=<level>\n"
+		"          Possible sinks are:\n"
+		"              - console\n"
+		"          Possible log levels: \n"
+		"              - fatal\n"
+		"              - error\n"
+		"              - warning\n"
+		"              - info\n"
+		"              - debug_lo\n"
+		"              - debug_hi\n"
+		"  --no-logging-thread            Disable the logging thread, forcing all log lines\n"
+		"                                 to appear immediately. Might affect the performance.\n"
 		"\nOptions if no action is given:\n"
 		"      --geometry <geometry>      Specify the size and position of\n"
 		"          the main window\n"
@@ -250,6 +308,89 @@ int noInputFileError()
 	return usageError( "No input file specified" );
 }
 
+void initializeLoggers(std::vector<std::string> configurationStrings)
+{
+	/* Initialize loggers */
+	ConsoleLogSink* consoleLogSink = new ConsoleLogSink();
+	LogManager::inst().registerCurrentThread("main");
+	LogManager::inst().addSink(consoleLogSink);
+
+	/* All sinks will be freed by LogManager */
+
+	for (const std::string& confString: configurationStrings)
+	{
+		std::string sinkName;
+		std::string topicStr;
+		std::string verbosityStr;
+		int posTopicOp = confString.find('#');
+		int posLevelOp = confString.find('=');
+
+		/* Allowed formats are:
+		 * sinkname=level
+		 * sinkname#topic=level
+		*/
+		if (posLevelOp != std::string::npos)
+		{
+			if (posTopicOp != std::string::npos)
+			{
+				sinkName = confString.substr(0, posTopicOp);
+				topicStr = confString.substr(posTopicOp+1,
+						posLevelOp - posTopicOp - 1);
+				verbosityStr = confString.substr(posLevelOp+1);
+			}
+			else
+			{
+				sinkName = confString.substr(0, posLevelOp);
+				verbosityStr = confString.substr(posLevelOp+1);
+
+			}
+		}
+		else
+		{
+			Log_Fatal(LT_Default, "Invalid log configuration string. "
+				"Expected operator '=' not found");
+			continue;
+		}
+
+		LogVerbosity verbosity;
+		try
+		{
+			verbosity = stringToLogVerbosity(verbosityStr);
+		}
+		catch(std::out_of_range)
+		{
+			Log_Fatal(LT_Default, "Invalid log verbosity: %s",
+				verbosityStr.c_str());
+			continue;
+		}
+
+		LogSink* sink = nullptr;
+		if (sinkName == "console")
+		{
+			sink = consoleLogSink;
+		}
+
+		if (!sink)
+		{
+			Log_Fatal(LT_Default, "Invalid log sink: %s",
+				sinkName.c_str());
+			continue;
+		}
+
+		if (topicStr.empty())
+		{
+			sink->setDefaultMaxVerbosity(verbosity);
+		}
+		else
+		{
+			sink->setMaxVerbosity(topicStr, verbosity);
+		}
+
+	}
+
+
+}
+
 
 int main( int argc, char * * argv )
 {
@@ -307,6 +448,8 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
+	bool useLoggingThread = true;
+	std::vector<std::string> logConfigurationStrings;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
@@ -718,6 +861,19 @@ int main( int argc, char * * argv )
 
 			configFile = QString::fromLocal8Bit( argv[i] );
 		}
+		else if (arg == "--log")
+		{
+			++i;
+			if (i == argc)
+			{
+				return usageError("No log configuration specified");
+			}
+			logConfigurationStrings.push_back(argv[i]);
+		}
+		else if (arg == "--no-logging-thread")
+		{
+			useLoggingThread = false;
+		}
 		else
 		{
 			if( argv[i][0] == '-' )
@@ -737,6 +893,18 @@ int main( int argc, char * * argv )
 	{
 		fileCheck( fileToImport );
 	}
+
+	initializeLoggers(logConfigurationStrings);
+
+	if (useLoggingThread)
+	{
+		LoggingThread::inst().start();
+	}
+
+
+	qInstallMessageHandler(qDebugToLogManagerAdapter);
+
+	Log_Inf(LT_Default, "Logging activated");
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
@@ -772,7 +940,7 @@ int main( int argc, char * * argv )
 				sched_get_priority_min( SCHED_FIFO ) ) / 2;
 	if( sched_setscheduler( 0, SCHED_FIFO, &sparam ) == -1 )
 	{
-		printf( "Notice: could not set realtime priority.\n" );
+		Log_Wrn(LT_Default, "Could not set realtime priority.");
 	}
 #endif
 #endif
@@ -781,7 +949,7 @@ int main( int argc, char * * argv )
 #ifdef LMMS_BUILD_WIN32
 	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
 	{
-		printf( "Notice: could not set high priority.\n" );
+		Log_Wrn(LT_Default, "Could not set realtime priority.");
 	}
 #endif
 
@@ -791,11 +959,11 @@ int main( int argc, char * * argv )
 	sa.sa_flags = SA_SIGINFO;
 	if ( sigemptyset( &sa.sa_mask ) )
 	{
-		fprintf( stderr, "Signal initialization failed.\n" );
+		Log_Err(LT_Default, "Signal initialization failed");
 	}
 	if ( sigaction( SIGPIPE, &sa, NULL ) )
 	{
-		fprintf( stderr, "Signal initialization failed.\n" );
+		Log_Err(LT_Default, "Signal initialization failed");
 	}
 #endif
 
@@ -808,14 +976,15 @@ int main( int argc, char * * argv )
 		Engine::init( true );
 		destroyEngine = true;
 
-		printf( "Loading project...\n" );
+		Log_Inf(LT_Default, "Loading project...");
 		Engine::getSong()->loadProject( fileToLoad );
 		if( Engine::getSong()->isEmpty() )
 		{
-			printf("The project %s is empty, aborting!\n", fileToLoad.toUtf8().constData() );
+			Log_Wrn(LT_Default, "The project %s is empty, aborting!",
+				fileToLoad.toUtf8().constData() );
 			exit( EXIT_FAILURE );
 		}
-		printf( "Done\n" );
+		Log_Inf(LT_Default, "Done");
 
 		Engine::getSong()->setExportLoop( renderLoop );
 
