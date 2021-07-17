@@ -194,7 +194,7 @@ Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 	const Descriptor::SubPluginFeatures::Key *keyPtr = keyFromDnd
 		? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey())
 		: key;
-	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	const PluginFactory::PluginInfo& pi = getPluginFactory()->pluginInfo(pluginName.toUtf8());
 	if(keyPtr)
 	{
 		// descriptor is not yet set when loading - set it now
@@ -214,7 +214,7 @@ Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 								void *data)
 {
-	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	const PluginFactory::PluginInfo& pi = getPluginFactory()->pluginInfo(pluginName.toUtf8());
 
 	Plugin* inst;
 	if( pi.isNull() )
@@ -224,7 +224,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 			QMessageBox::information( nullptr,
 				tr( "Plugin not found" ),
 				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
+						arg( pluginName ).arg( getPluginFactory()->errorString(pluginName) ),
 				QMessageBox::Ok | QMessageBox::Default );
 		}
 		inst = new DummyPlugin();

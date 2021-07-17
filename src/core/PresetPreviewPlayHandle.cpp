@@ -138,7 +138,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		if( i == nullptr || !i->descriptor()->supportsFileType( ext ) )
 		{
 			const PluginFactory::PluginInfoAndKey& infoAndKey =
-				pluginFactory->pluginSupportingExtension(ext);
+				getPluginFactory()->pluginSupportingExtension(ext);
 			i = s_previewTC->previewInstrumentTrack()->
 				loadInstrument(infoAndKey.info.name(), &infoAndKey.key);
 		}

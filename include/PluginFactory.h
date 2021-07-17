@@ -103,6 +103,7 @@ private:
 	static std::unique_ptr<PluginFactory> s_instance;
 };
 
-#define pluginFactory PluginFactory::instance()
+//Short-hand function
+PluginFactory* getPluginFactory();
 
 #endif // PLUGINFACTORY_H

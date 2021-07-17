@@ -1951,7 +1951,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		if( !i->descriptor()->supportsFileType( ext ) )
 		{
 			PluginFactory::PluginInfoAndKey piakn =
-				pluginFactory->pluginSupportingExtension(ext);
+				getPluginFactory()->pluginSupportingExtension(ext);
 			i = m_track->loadInstrument(piakn.info.name(), &piakn.key);
 		}
 
