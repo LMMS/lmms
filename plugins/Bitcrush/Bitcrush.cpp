@@ -46,8 +46,8 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 };
 
 }

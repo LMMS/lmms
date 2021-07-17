@@ -54,8 +54,8 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 };
 
 }
@@ -273,7 +273,7 @@ QString vibed::nodeName() const
 
 void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
 				Engine::audioEngine()->processingSampleRate(),

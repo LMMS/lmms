@@ -47,8 +47,8 @@
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QFrame( _parent ),
 	ModelView( _model, this ),
-	m_subWindow( NULL ),
-	m_controllerDlg( NULL ),
+	m_subWindow( nullptr ),
+	m_controllerDlg( nullptr ),
 	m_show( true )
 {
 	this->setFrameStyle( QFrame::StyledPanel );

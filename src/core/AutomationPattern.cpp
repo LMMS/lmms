@@ -598,7 +598,7 @@ float *AutomationPattern::valuesAfter( const TimePos & _time ) const
 	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int numValues = POS(v + 1) - POS(v);
@@ -859,7 +859,7 @@ const QString AutomationPattern::name() const
 	{
 		return TrackContentObject::name();
 	}
-	if( !m_objects.isEmpty() && m_objects.first() != NULL )
+	if( !m_objects.isEmpty() && m_objects.first() != nullptr )
 	{
 		return m_objects.first()->fullDisplayName();
 	}

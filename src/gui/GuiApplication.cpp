@@ -63,7 +63,7 @@ GuiApplication::GuiApplication()
 {
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
-		QMessageBox::question( NULL,
+		QMessageBox::question( nullptr,
 				tr( "Working directory" ),
 				tr( "The LMMS working directory %1 does not "
 				"exist. Create it now? You can change the directory "
@@ -237,9 +237,9 @@ QFont GuiApplication::getWin32SystemFont()
 	if ( pointSize < 0 )
 	{
 		// height is in pixels, convert to points
-		HDC hDC = GetDC( NULL );
+		HDC hDC = GetDC( nullptr );
 		pointSize = MulDiv( abs( pointSize ), 72, GetDeviceCaps( hDC, LOGPIXELSY ) );
-		ReleaseDC( NULL, hDC );
+		ReleaseDC( nullptr, hDC );
 	}
 
 	return QFont( QString::fromUtf8( metrics.lfMessageFont.lfFaceName ), pointSize );

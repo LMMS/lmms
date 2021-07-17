@@ -54,7 +54,7 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 
 		if( gui )
 		{
-			QMessageBox::critical( NULL, title, message,
+			QMessageBox::critical( nullptr, title, message,
 						QMessageBox::Ok,
 						QMessageBox::NoButton );
 		}

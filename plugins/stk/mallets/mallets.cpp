@@ -56,8 +56,8 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -288,7 +288,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	int p = m_presetsModel.value();
 	
 	const float freq = _n->frequency();
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 		// If newer projects, adjust velocity to within stk's limits
 		float velocityAdjust =
@@ -415,7 +415,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
 	// try to inform user about missing Stk-installation
-	if( _instrument->m_filesMissing && gui != NULL )
+	if( _instrument->m_filesMissing && gui != nullptr )
 	{
 		QMessageBox::information( 0, tr( "Missing files" ),
 				tr( "Your Stk-installation seems to be "
@@ -641,7 +641,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	}
 	catch( ... )
 	{
-		m_voice = NULL;
+		m_voice = nullptr;
 	}
 	
 	m_delay = new StkFloat[256];
@@ -690,7 +690,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	}
 	catch( ... )
 	{
-		m_voice = NULL;
+		m_voice = nullptr;
 	}
 	
 	m_delay = new StkFloat[256];
@@ -741,7 +741,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	}
 	catch( ... )
 	{
-		m_voice = NULL;
+		m_voice = nullptr;
 	}
 	
 	m_delay = new StkFloat[256];

@@ -39,7 +39,7 @@
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
-	ModelView(NULL, this),
+	ModelView(nullptr, this),
 	m_track(tv->model()),
 	m_stv(tv)
 {
@@ -84,7 +84,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob(knobBright_26, NULL, tr("Sample volume"));
+	m_volumeKnob = new Knob(knobBright_26, nullptr, tr("Sample volume"));
 	m_volumeKnob->setVolumeKnob(true);
 	m_volumeKnob->setHintText(tr("Volume:"), "%");
 
@@ -98,7 +98,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// set up panning knob
-	m_panningKnob = new Knob(knobBright_26, NULL, tr("Panning"));
+	m_panningKnob = new Knob(knobBright_26, nullptr, tr("Panning"));
 	m_panningKnob->setHintText(tr("Panning:"), "");
 
 	basicControlsLayout->addWidget(m_panningKnob, 0, 1);
@@ -114,7 +114,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox(2, NULL, tr("FX channel"), m_stv);
+	m_effectChannelNumber = new FxLineLcdSpinBox(2, nullptr, tr("FX channel"), m_stv);
 
 	basicControlsLayout->addWidget(m_effectChannelNumber, 0, 3);
 	basicControlsLayout->setAlignment(m_effectChannelNumber, widgetAlignment);

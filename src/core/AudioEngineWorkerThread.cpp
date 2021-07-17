@@ -37,7 +37,7 @@
 #endif
 
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
-QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = NULL;
+QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = nullptr;
 QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
@@ -115,7 +115,7 @@ AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	m_quit( false )
 {
 	// initialize global static data
-	if( queueReadyWaitCond == NULL )
+	if( queueReadyWaitCond == nullptr )
 	{
 		queueReadyWaitCond = new QWaitCondition;
 	}

@@ -49,7 +49,7 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngin
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
 		SURROUND_CHANNELS ), _audioEngine ),
-	m_s( NULL ),
+	m_s( nullptr ),
 	m_quit( false ),
 	m_convertEndian( false )
 {
@@ -78,7 +78,7 @@ QString AudioPulseAudio::probeDevice()
 	QString dev = ConfigManager::inst()->value( "audiopa", "device" );
 	if( dev.isEmpty() )
 	{
-		if( getenv( "AUDIODEV" ) != NULL )
+		if( getenv( "AUDIODEV" ) != nullptr )
 		{
 			return getenv( "AUDIODEV" );
 		}
@@ -161,7 +161,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 		case PA_CONTEXT_READY:
 		{
 			qDebug( "Connection established.\n" );
-			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  NULL);
+			_this->m_s = pa_stream_new( c, "lmms", &_this->m_sampleSpec,  nullptr);
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
 
@@ -181,10 +181,10 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
 														&_this->m_sampleSpec );
 
-			pa_stream_connect_playback( _this->m_s, NULL, &buffer_attr,
+			pa_stream_connect_playback( _this->m_s, nullptr, &buffer_attr,
 										PA_STREAM_ADJUST_LATENCY,
-										NULL,	// volume
-										NULL );
+										nullptr,	// volume
+										nullptr );
 			_this->signalConnected( true );
 			break;
 		}
@@ -213,7 +213,7 @@ void AudioPulseAudio::run()
 	pa_mainloop_api * mainloop_api = pa_mainloop_get_api( mainLoop );
 
 	pa_context *context = pa_context_new( mainloop_api, "lmms" );
-	if ( context == NULL )
+	if ( context == nullptr )
 	{
 		qCritical( "pa_context_new() failed." );
 		return;
@@ -223,10 +223,10 @@ void AudioPulseAudio::run()
 
 	pa_context_set_state_callback( context, context_state_callback, this  );
 	// connect the context
-	pa_context_connect( context, NULL, (pa_context_flags) 0, NULL );
+	pa_context_connect( context, nullptr, (pa_context_flags) 0, nullptr );
 
 	while (!m_connectedSemaphore.tryAcquire()) {
-		pa_mainloop_iterate(mainLoop, 1, NULL);
+		pa_mainloop_iterate(mainLoop, 1, nullptr);
 	}
 
 	// run the main loop
@@ -282,7 +282,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 						m_convertEndian );
 		if( bytes > 0 )
 		{
-			pa_stream_write( m_s, pcmbuf, bytes, NULL, 0,
+			pa_stream_write( m_s, pcmbuf, bytes, nullptr, 0,
 							PA_SEEK_RELATIVE );
 		}
 		fd += frames;

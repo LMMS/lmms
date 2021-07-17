@@ -41,7 +41,7 @@
 #include "Engine.h"
 
 
-QPixmap * AutomationPatternView::s_pat_rec = NULL;
+QPixmap * AutomationPatternView::s_pat_rec = nullptr;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 						TrackView * _parent ) :
@@ -59,7 +59,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 	ToolTip::add(this, m_pat->name());
 	setStyle( QApplication::style() );
 	
-	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
+	if( s_pat_rec == nullptr ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
 							"pat_rec" ) ); }
 							
 	update();
@@ -439,7 +439,7 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
-		if( mod != NULL )
+		if( mod != nullptr )
 		{
 			bool added = m_pat->addObject( mod );
 			if ( !added )

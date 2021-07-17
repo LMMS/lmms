@@ -55,8 +55,8 @@ bool FxLine::eventFilter( QObject *dist, QEvent *event )
 }
 
 const int FxLine::FxLineHeight = 287;
-QPixmap * FxLine::s_sendBgArrow = NULL;
-QPixmap * FxLine::s_receiveBgArrow = NULL;
+QPixmap * FxLine::s_sendBgArrow = nullptr;
+QPixmap * FxLine::s_receiveBgArrow = nullptr;
 
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	QWidget( _parent ),
@@ -207,8 +207,8 @@ QString FxLine::elideName( const QString & name )
 
 void FxLine::paintEvent( QPaintEvent * )
 {
-	bool sendToThis = Engine::fxMixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
-	bool receiveFromThis = Engine::fxMixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
+	bool sendToThis = Engine::fxMixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != nullptr;
+	bool receiveFromThis = Engine::fxMixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != nullptr;
 	QPainter painter;
 	painter.begin( this );
 	drawFxLine( &painter, this, m_mv->currentFxLine() == this, sendToThis, receiveFromThis );

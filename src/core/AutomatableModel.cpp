@@ -50,7 +50,7 @@ AutomatableModel::AutomatableModel(
 	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasStrictStepSize( false ),
-	m_controllerConnection( NULL ),
+	m_controllerConnection( nullptr ),
 	m_valueBuffer( static_cast<int>( Engine::audioEngine()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
 	m_hasSampleExactData(false),
@@ -604,7 +604,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	{
 		return m_hasSampleExactData
 			? &m_valueBuffer
-			: NULL;
+			: nullptr;
 	}
 
 	float val = m_value; // make sure our m_value doesn't change midway
@@ -644,7 +644,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 
 	if (!m_controllerConnection)
 	{
-		AutomatableModel* lm = NULL;
+		AutomatableModel* lm = nullptr;
 		if (hasLinkedModels())
 		{
 			lm = m_linkedModels.first();
@@ -678,7 +678,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 	// in which case the recipient knows to use the static value() instead
 	m_lastUpdatedPeriod = s_periodCounter;
 	m_hasSampleExactData = false;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -689,7 +689,7 @@ void AutomatableModel::unlinkControllerConnection()
 		m_controllerConnection->disconnect( this );
 	}
 
-	m_controllerConnection = NULL;
+	m_controllerConnection = nullptr;
 }
 
 
@@ -737,7 +737,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 			if( s <= time && e >= time ) { patternsInRange += ( *it ); }
 		}
 
-		AutomationPattern * latestPattern = NULL;
+		AutomationPattern * latestPattern = nullptr;
 
 		if( ! patternsInRange.isEmpty() )
 		{

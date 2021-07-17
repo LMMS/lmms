@@ -243,7 +243,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if ( m_embedMethod != "none" )
 	{
-		if( pluginWidget() != NULL )
+		if( pluginWidget() != nullptr )
 		{
 			_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
 		}
@@ -478,7 +478,7 @@ QWidget *VstPlugin::editor()
 void VstPlugin::openPreset( )
 {
 
-	FileDialog ofd( NULL, tr( "Open Preset" ), "",
+	FileDialog ofd( nullptr, tr( "Open Preset" ), "",
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted &&
@@ -558,7 +558,7 @@ void VstPlugin::savePreset( )
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	FileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
+	FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 
 	if( p_name != "" ) // remember last directory
@@ -744,7 +744,7 @@ void VstPlugin::createUI( QWidget * parent )
 		SetWindowLong(pluginHandle, GWL_STYLE, style);
 		SetParent(pluginHandle, targetHandle);
 
-		DWORD threadId = GetWindowThreadProcessId(pluginHandle, NULL);
+		DWORD threadId = GetWindowThreadProcessId(pluginHandle, nullptr);
 		DWORD currentThreadId = GetCurrentThreadId();
 		AttachThreadInput(currentThreadId, threadId, true);
 

@@ -40,7 +40,7 @@
 #include "SongEditor.h"
 
 
-QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
+QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 			Song::PlayPos & pos, const TimePos & begin, Song::PlayModes mode,
@@ -66,14 +66,14 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_begin( begin ),
 	m_mode( mode ),
 	m_savedPos( -1 ),
-	m_hint( NULL ),
+	m_hint( nullptr ),
 	m_action( NoAction ),
 	m_moveXOff( 0 )
 {
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerBar;
 
-	if( s_posMarkerPixmap == NULL )
+	if( s_posMarkerPixmap == nullptr )
 	{
 		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
 							"playpos_marker" ) );
@@ -102,7 +102,7 @@ TimeLineWidget::~TimeLineWidget()
 {
 	if( gui->songEditor() )
 	{
-		m_pos.m_timeLine = NULL;
+		m_pos.m_timeLine = nullptr;
 	}
 	delete m_hint;
 }
@@ -392,7 +392,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;
-				m_hint = NULL;
+				m_hint = nullptr;
 				m_loopPos[i] = t;
 			}
 			else
@@ -431,7 +431,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
-	m_hint = NULL;
+	m_hint = nullptr;
 	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
 	m_action = NoAction;
 }

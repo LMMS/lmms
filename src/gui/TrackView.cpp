@@ -58,7 +58,7 @@
  */
 TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	QWidget( tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
-	ModelView( NULL, this ),            /*!< The model view of this track */
+	ModelView( nullptr, this ),            /*!< The model view of this track */
 	m_track( track ),                  /*!< The track we're displaying */
 	m_trackContainerView( tcv ),       /*!< The track Container View we're displayed in */
 	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */
@@ -81,7 +81,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	layout->addWidget( &m_trackContentWidget, 1 );
 	setFixedHeight( m_track->getHeight() );
 
-	resizeEvent( NULL );
+	resizeEvent( nullptr );
 
 	setAcceptDrops( true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
@@ -172,7 +172,7 @@ QMenu * TrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	Q_UNUSED(title)
 	Q_UNUSED(newFxLabel)
-	return NULL;
+	return nullptr;
 }
 
 
@@ -196,7 +196,7 @@ bool TrackView::close()
 void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
-	Q_ASSERT( m_track != NULL );
+	Q_ASSERT( m_track != nullptr );
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
@@ -356,7 +356,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 		//	qDebug( "y position %d", yPos );
 
 		// a track-widget not equal to ourself?
-		if( trackAtY != NULL && trackAtY != this )
+		if( trackAtY != nullptr && trackAtY != this )
 		{
 			// then move us up/down there!
 			if( me->y() < 0 )
@@ -391,7 +391,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 void TrackView::mouseReleaseEvent( QMouseEvent * me )
 {
 	m_action = NoAction;
-	while( QApplication::overrideCursor() != NULL )
+	while( QApplication::overrideCursor() != nullptr )
 	{
 		QApplication::restoreOverrideCursor();
 	}

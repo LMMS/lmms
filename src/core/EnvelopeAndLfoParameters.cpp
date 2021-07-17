@@ -38,7 +38,7 @@ extern const float SECS_PER_LFO_OSCILLATION = 20.0f;
 const f_cnt_t minimumFrames = 1;
 
 
-EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstances = NULL;
+EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstances = nullptr;
 
 
 void EnvelopeAndLfoParameters::LfoInstances::trigger()
@@ -102,8 +102,8 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),
-	m_pahdEnv( NULL ),
-	m_rEnv( NULL ),
+	m_pahdEnv( nullptr ),
+	m_rEnv( nullptr ),
 	m_pahdBufSize( 0 ),
 	m_rBufSize( 0 ),
 	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO pre-delay" ) ),
@@ -117,12 +117,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
 	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( false ),
-	m_lfoShapeData( NULL )
+	m_lfoShapeData( nullptr )
 {
 	m_amountModel.setCenterValue( 0 );
 	m_lfoAmountModel.setCenterValue( 0 );
 
-	if( s_lfoInstances == NULL )
+	if( s_lfoInstances == nullptr )
 	{
 		s_lfoInstances = new LfoInstances();
 	}
@@ -195,7 +195,7 @@ EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
 	if( instances()->isEmpty() )
 	{
 		delete instances();
-		s_lfoInstances = NULL;
+		s_lfoInstances = nullptr;
 	}
 }
 

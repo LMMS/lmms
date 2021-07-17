@@ -36,7 +36,7 @@ AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
 				const QString & file,
 				AudioEngine* audioEngine ) :
 	AudioFileDevice( outputSettings, channels, file, audioEngine ),
-	m_sf( NULL )
+	m_sf( nullptr )
 {
 	successful = outputFileOpened() && startEncoding();
 }
@@ -86,7 +86,7 @@ bool AudioFileWave::startEncoding()
 	}
 
 	// Prevent fold overs when encountering clipped data
-	sf_command(m_sf, SFC_SET_CLIPPING, NULL, SF_TRUE);
+	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
 	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
 

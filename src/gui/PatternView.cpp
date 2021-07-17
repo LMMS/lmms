@@ -48,25 +48,25 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
-	if( s_stepBtnOn0 == NULL )
+	if( s_stepBtnOn0 == nullptr )
 	{
 		s_stepBtnOn0 = new QPixmap( embed::getIconPixmap(
 							"step_btn_on_0" ) );
 	}
 
-	if( s_stepBtnOn200 == NULL )
+	if( s_stepBtnOn200 == nullptr )
 	{
 		s_stepBtnOn200 = new QPixmap( embed::getIconPixmap(
 							"step_btn_on_200" ) );
 	}
 
-	if( s_stepBtnOff == NULL )
+	if( s_stepBtnOff == nullptr )
 	{
 		s_stepBtnOff = new QPixmap( embed::getIconPixmap(
 							"step_btn_off" ) );
 	}
 
-	if( s_stepBtnOffLight == NULL )
+	if( s_stepBtnOffLight == nullptr )
 	{
 		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
 						"step_btn_off_light" ) );
@@ -209,7 +209,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 
 		Note * n = m_pat->noteAtStep( step );
 
-		if( n == NULL )
+		if( n == nullptr )
 		{
 			m_pat->addStepNote( step );
 		}
@@ -276,7 +276,7 @@ void PatternView::wheelEvent(QWheelEvent * we)
 			n = m_pat->addStepNote( step );
 			n->setVolume( 0 );
 		}
-		if( n != NULL )
+		if( n != nullptr )
 		{
 			int vol = n->getVolume();
 

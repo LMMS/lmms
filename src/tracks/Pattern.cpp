@@ -33,10 +33,10 @@
 #include <limits>
 
 
-QPixmap * PatternView::s_stepBtnOn0 = NULL;
-QPixmap * PatternView::s_stepBtnOn200 = NULL;
-QPixmap * PatternView::s_stepBtnOff = NULL;
-QPixmap * PatternView::s_stepBtnOffLight = NULL;
+QPixmap * PatternView::s_stepBtnOn0 = nullptr;
+QPixmap * PatternView::s_stepBtnOn200 = nullptr;
+QPixmap * PatternView::s_stepBtnOff = nullptr;
+QPixmap * PatternView::s_stepBtnOffLight = nullptr;
 
 
 
@@ -252,7 +252,7 @@ Note * Pattern::noteAtStep( int _step )
 			return *it;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -486,7 +486,7 @@ Pattern * Pattern::adjacentPatternByOffset(int offset) const
 {
 	QVector<TrackContentObject *> tcos = m_instrumentTrack->getTCOs();
 	int tcoNum = m_instrumentTrack->getTCONum(this);
-	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, NULL));
+	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, nullptr));
 }
 
 

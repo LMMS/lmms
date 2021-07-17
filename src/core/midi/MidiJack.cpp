@@ -62,8 +62,8 @@ static void JackMidiShutdown(void *arg)
 MidiJack::MidiJack() :
 	MidiClientRaw(),
 	m_jackClient( nullptr ),
-	m_input_port( NULL ),
-	m_output_port( NULL ),
+	m_input_port( nullptr ),
+	m_output_port( nullptr ),
 	m_quit( false )
 {
 	// if jack is currently used for audio then we share the connection
@@ -77,9 +77,9 @@ MidiJack::MidiJack() :
 		// if a jack connection has been created for audio we use that
 		m_jackAudio->addMidiClient(this);
 	}else{
-		m_jackAudio = NULL;
+		m_jackAudio = nullptr;
 		m_jackClient = jack_client_open(probeDevice().toLatin1().data(),
-										JackNoStartServer, NULL);
+										JackNoStartServer, nullptr);
 
 		if(m_jackClient)
 		{
@@ -155,10 +155,10 @@ MidiJack::~MidiJack()
 
 jack_client_t* MidiJack::jackClient()
 {
-	if( m_jackAudio == NULL && m_jackClient == NULL)
-		return NULL;
+	if( m_jackAudio == nullptr && m_jackClient == nullptr)
+		return nullptr;
 
-	if( m_jackAudio == NULL && m_jackClient )
+	if( m_jackAudio == nullptr && m_jackClient )
 		return m_jackClient;
 
 	return m_jackAudio->jackClient();

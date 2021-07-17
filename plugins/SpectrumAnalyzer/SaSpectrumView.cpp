@@ -398,8 +398,8 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 // Draw background, grid and associated frequency and amplitude labels.
 void SaSpectrumView::drawGrid(QPainter &painter)
 {
-	std::vector<std::pair<int, std::string>> *freqTics = NULL;
-	std::vector<std::pair<float, std::string>> *ampTics = NULL;
+	std::vector<std::pair<int, std::string>> *freqTics = nullptr;
+	std::vector<std::pair<float, std::string>> *ampTics = nullptr;
 	float pos = 0;
 	float label_width = 24;
 	float label_height = 15;

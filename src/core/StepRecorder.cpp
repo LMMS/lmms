@@ -269,7 +269,7 @@ void StepRecorder::prepareNewStep()
 
 void StepRecorder::setCurrentPattern( Pattern* newPattern )
 {
-	if(m_pattern != NULL && m_pattern != newPattern)
+	if(m_pattern != nullptr && m_pattern != newPattern)
 	{
 		dismissStep();
 	}

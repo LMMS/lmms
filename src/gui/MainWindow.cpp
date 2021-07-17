@@ -93,10 +93,10 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 
 MainWindow::MainWindow() :
-	m_workspace( NULL ),
-	m_toolsMenu( NULL ),
+	m_workspace( nullptr ),
+	m_toolsMenu( nullptr ),
 	m_autoSaveTimer( this ),
-	m_viewMenu( NULL ),
+	m_viewMenu( nullptr ),
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
@@ -393,7 +393,7 @@ void MainWindow::finalize()
 	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
-		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
+		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/nullptr )
 						   ->createView(this) );
 	}
 	if( !m_toolsMenu->isEmpty() )
@@ -745,7 +745,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
 	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
-	if( _w->parentWidget() != NULL &&
+	if( _w->parentWidget() != nullptr &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 	{
 		_w = _w->parentWidget();
@@ -782,7 +782,7 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 	{
 		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
-		if ( _w->parentWidget() != NULL &&
+		if ( _w->parentWidget() != nullptr &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 		{
 			_w = _w->parentWidget();

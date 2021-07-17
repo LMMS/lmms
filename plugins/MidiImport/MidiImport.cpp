@@ -70,9 +70,9 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
 	Plugin::ImportFilter,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -103,7 +103,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if( gui != NULL &&
+	if( gui != nullptr &&
 		ConfigManager::inst()->sf2File().isEmpty() )
 	{
 		QMessageBox::information( gui->mainWindow(),
@@ -153,8 +153,8 @@ class smfMidiCC
 
 public:
 	smfMidiCC() :
-		at( NULL ),
-		ap( NULL ),
+		at( nullptr ),
+		ap( nullptr ),
 		lastPos( 0 )
 	{ }
 	
@@ -181,8 +181,8 @@ public:
 
 	void clear()
 	{
-		at = NULL;
-		ap = NULL;
+		at = nullptr;
+		ap = nullptr;
 		lastPos = 0;
 	}
 
@@ -213,9 +213,9 @@ class smfMidiChannel
 
 public:
 	smfMidiChannel() :
-		it( NULL ),
-		p( NULL ),
-		it_inst( NULL ),
+		it( nullptr ),
+		p( nullptr ),
+		it_inst( nullptr ),
 		isSF2( false ),
 		hasNotes( false )
 	{ }
@@ -499,7 +499,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 					if( ccid <= 128 )
 					{
 						double cc = evt->get_real_value();
-						AutomatableModel * objModel = NULL;
+						AutomatableModel * objModel = nullptr;
 
 						switch( ccid ) 
 						{
@@ -539,9 +539,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 							}
 							else
 							{
-								if( ccs[ccid].at == NULL ) {
+								if( ccs[ccid].at == nullptr ) {
 									ccs[ccid].create( tc, trackName + " > " + (
-										  objModel != NULL ? 
+										  objModel != nullptr ?
 										  objModel->displayName() : 
 										  QString("CC %1").arg(ccid) ) );
 								}

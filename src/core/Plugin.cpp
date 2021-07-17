@@ -49,7 +49,7 @@ static Plugin::Descriptor dummyPluginDescriptor =
 	0x0100,
 	Plugin::Undefined,
 	&dummyLoader,
-	NULL
+	nullptr
 } ;
 
 
@@ -62,7 +62,7 @@ Plugin::Plugin(const Descriptor * descriptor, Model * parent, const
 	m_descriptor(descriptor),
 	m_key(key ? *key : Descriptor::SubPluginFeatures::Key(m_descriptor))
 {
-	if( m_descriptor == NULL )
+	if( m_descriptor == nullptr )
 	{
 		m_descriptor = &dummyPluginDescriptor;
 	}
@@ -221,7 +221,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	{
 		if( gui )
 		{
-			QMessageBox::information( NULL,
+			QMessageBox::information( nullptr,
 				tr( "Plugin not found" ),
 				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
 						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
@@ -243,7 +243,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 		{
 			if( gui )
 			{
-				QMessageBox::information( NULL,
+				QMessageBox::information( nullptr,
 					tr( "Error while loading plugin" ),
 					tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
 					QMessageBox::Ok | QMessageBox::Default );
@@ -269,7 +269,7 @@ void Plugin::collectErrorForUI( QString errMsg )
 PluginView * Plugin::createView( QWidget * parent )
 {
 	PluginView * pv = instantiateView( parent );
-	if( pv != NULL )
+	if( pv != nullptr )
 	{
 		pv->setModel( this );
 	}
@@ -280,7 +280,7 @@ PluginView * Plugin::createView( QWidget * parent )
 
 
 Plugin::Descriptor::SubPluginFeatures::Key::Key( const QDomElement & key ) :
-	desc( NULL ),
+	desc( nullptr ),
 	name( key.attribute( "key" ) ),
 	attributes()
 {

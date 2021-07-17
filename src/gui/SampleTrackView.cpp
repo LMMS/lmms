@@ -104,12 +104,12 @@ void SampleTrackView::updateIndicator()
 
 SampleTrackView::~SampleTrackView()
 {
-	if(m_window != NULL)
+	if(m_window != nullptr)
 	{
-		m_window->setSampleTrackView(NULL);
+		m_window->setSampleTrackView(nullptr);
 		m_window->parentWidget()->hide();
 	}
-	m_window = NULL;
+	m_window = nullptr;
 }
 
 

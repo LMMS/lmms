@@ -39,7 +39,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	ui( new Ui::EffectSelectDialog ),
 	m_sourceModel(),
 	m_model(),
-	m_descriptionWidget( NULL )
+	m_descriptionWidget( nullptr )
 {
 	ui->setupUi( this );
 
@@ -174,7 +174,7 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 										const QModelIndex & )
 {
 	delete m_descriptionWidget;
-	m_descriptionWidget = NULL;
+	m_descriptionWidget = nullptr;
 
 	if( m_model.mapToSource( _idx ).row() < 0 )
 	{

@@ -36,7 +36,7 @@
 EffectChain::EffectChain( Model * _parent ) :
 	Model( _parent ),
 	SerializingObject(),
-	m_enabledModel( false, NULL, tr( "Effects enabled" ) )
+	m_enabledModel( false, nullptr, tr( "Effects enabled" ) )
 {
 }
 
@@ -97,7 +97,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 			Effect* e = Effect::instantiate( name.toUtf8(), this, &key );
 
-			if( e != NULL && e->isOkay() && e->nodeName() == node.nodeName() )
+			if( e != nullptr && e->isOkay() && e->nodeName() == node.nodeName() )
 			{
 				e->restoreState( effectData );
 			}

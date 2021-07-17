@@ -89,7 +89,7 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_patternToPlay( NULL ),
+	m_patternToPlay( nullptr ),
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
@@ -187,7 +187,7 @@ void Song::savePos()
 {
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 
-	if( tl != NULL )
+	if( tl != nullptr )
 	{
 		tl->savePos( m_playPos[m_playMode] );
 	}
@@ -549,7 +549,7 @@ void Song::playPattern( const Pattern* patternToPlay, bool loop )
 	m_patternToPlay = patternToPlay;
 	m_loopPattern = loop;
 
-	if( m_patternToPlay != NULL )
+	if( m_patternToPlay != nullptr )
 	{
 		m_playMode = Mode_PlayPattern;
 		m_playing = true;
@@ -886,7 +886,7 @@ void Song::clearProject()
 
 	if( gui && gui->automationEditor() )
 	{
-		gui->automationEditor()->setCurrentPattern( NULL );
+		gui->automationEditor()->setCurrentPattern( nullptr );
 	}
 
 	if( gui && gui->pianoRoll() )
@@ -1037,7 +1037,7 @@ void Song::loadProject( const QString & fileName )
 
 			if (gui)
 			{
-				QMessageBox::critical(NULL, tr("Aborting project load"),
+				QMessageBox::critical(nullptr, tr("Aborting project load"),
 					tr("Project file contains local paths to plugins, which could be used to "
 						"run malicious code."));
 			}
@@ -1205,7 +1205,7 @@ void Song::loadProject( const QString & fileName )
 	{
 		if ( gui )
 		{
-			QMessageBox::warning( NULL, tr("LMMS Error report"), errorSummary(),
+			QMessageBox::warning( nullptr, tr("LMMS Error report"), errorSummary(),
 							QMessageBox::Ok );
 		}
 		else

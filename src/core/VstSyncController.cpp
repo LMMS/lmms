@@ -42,7 +42,7 @@
 
 
 VstSyncController::VstSyncController() :
-	m_syncData( NULL ),
+	m_syncData( nullptr ),
 	m_shmID( -1 ),
 	m_shm( "/usr/bin/lmms" )
 {
@@ -87,7 +87,7 @@ VstSyncController::VstSyncController() :
 		qWarning( "VST sync support disabled in your configuration" );
 	}
 
-	if( m_syncData == NULL )
+	if( m_syncData == nullptr )
 	{
 		m_syncData = new VstSyncData;
 		m_syncData->hasSHM = false;
@@ -124,7 +124,7 @@ VstSyncController::~VstSyncController()
 #else
 		if( shmdt( m_syncData ) != -1 )
 		{
-			shmctl( m_shmID, IPC_RMID, NULL );
+			shmctl( m_shmID, IPC_RMID, nullptr );
 		}
 		else
 		{

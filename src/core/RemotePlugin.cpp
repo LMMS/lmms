@@ -92,7 +92,7 @@ RemotePlugin::RemotePlugin() :
 	m_shmID( 0 ),
 #endif
 	m_shmSize( 0 ),
-	m_shm( NULL ),
+	m_shm( nullptr ),
 	m_inputCount( DEFAULT_CHANNELS ),
 	m_outputCount( DEFAULT_CHANNELS )
 {
@@ -161,7 +161,7 @@ RemotePlugin::~RemotePlugin()
 
 #ifndef USE_QT_SHMEM
 		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
+		shmctl( m_shmID, IPC_RMID, nullptr );
 #endif
 	}
 
@@ -256,7 +256,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 			break;
 
 		default:
-			m_socket = accept( m_server, NULL, NULL );
+			m_socket = accept( m_server, nullptr, nullptr );
 			if ( m_socket == -1 )
 			{
 				qWarning( "Unexpected socket error." );
@@ -284,14 +284,14 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 
 	if( m_failed || !isRunning() )
 	{
-		if( _out_buf != NULL )
+		if( _out_buf != nullptr )
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
 		return false;
 	}
 
-	if( m_shm == NULL )
+	if( m_shm == nullptr )
 	{
 		// m_shm being zero means we didn't initialize everything so
 		// far so process one message each time (and hope we get
@@ -303,7 +303,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if( _out_buf != NULL )
+		if( _out_buf != nullptr )
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
@@ -314,7 +314,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 
 	ch_cnt_t inputs = qMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
 
-	if( _in_buf != NULL && inputs > 0 )
+	if( _in_buf != nullptr && inputs > 0 )
 	{
 		if( m_splitChannels )
 		{
@@ -347,7 +347,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	lock();
 	sendMessage( IdStartProcessing );
 
-	if( m_failed || _out_buf == NULL || m_outputCount == 0 )
+	if( m_failed || _out_buf == nullptr || m_outputCount == 0 )
 	{
 		unlock();
 		return false;
@@ -431,13 +431,13 @@ void RemotePlugin::hideUI()
 void RemotePlugin::resizeSharedProcessingMemory()
 {
 	const size_t s = ( m_inputCount+m_outputCount ) * Engine::audioEngine()->framesPerPeriod() * sizeof( float );
-	if( m_shm != NULL )
+	if( m_shm != nullptr )
 	{
 #ifdef USE_QT_SHMEM
 		m_shmObj.detach();
 #else
 		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
+		shmctl( m_shmID, IPC_RMID, nullptr );
 #endif
 	}
 

@@ -58,10 +58,10 @@
 #include "MainWindow.h"
 
 
-TextFloat * Fader::s_textFloat = NULL;
-QPixmap * Fader::s_back = NULL;
-QPixmap * Fader::s_leds = NULL;
-QPixmap * Fader::s_knob = NULL;
+TextFloat * Fader::s_textFloat = nullptr;
+QPixmap * Fader::s_back = nullptr;
+QPixmap * Fader::s_leds = nullptr;
+QPixmap * Fader::s_knob = nullptr;
 
 Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	QWidget( _parent ),
@@ -79,7 +79,7 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_peakRed( 0, 0, 0 ),
 	m_peakYellow( 0, 0, 0 )
 {
-	if( s_textFloat == NULL )
+	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new TextFloat;
 	}
@@ -121,7 +121,7 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	m_peakGreen( 0, 0, 0 ),
 	m_peakRed( 0, 0, 0 )
 {
-	if( s_textFloat == NULL )
+	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new TextFloat;
 	}

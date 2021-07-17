@@ -50,7 +50,7 @@ using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	JournallingObject(),
 	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
@@ -294,7 +294,7 @@ const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 			return( *it );
 		}
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 

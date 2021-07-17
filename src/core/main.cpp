@@ -793,7 +793,7 @@ int main( int argc, char * * argv )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}
-	if ( sigaction( SIGPIPE, &sa, NULL ) )
+	if ( sigaction( SIGPIPE, &sa, nullptr ) )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}

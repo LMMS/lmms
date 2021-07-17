@@ -180,7 +180,7 @@ void Oscillator::generateFromFFT(int bands, sample_t* table)
 
 void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
 {
-	if (sampleBuffer->m_userAntiAliasWaveTable == NULL) {return;}
+	if (sampleBuffer->m_userAntiAliasWaveTable == nullptr) {return;}
 
 	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
@@ -553,7 +553,7 @@ inline bool Oscillator::syncOk( float _osc_coeff )
 float Oscillator::syncInit( sampleFrame * _ab, const fpp_t _frames,
 						const ch_cnt_t _chnl )
 {
-	if( m_subOsc != NULL )
+	if( m_subOsc != nullptr )
 	{
 		m_subOsc->update( _ab, _frames, _chnl );
 	}

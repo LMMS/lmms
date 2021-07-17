@@ -206,7 +206,7 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
                 break;
 
             k = strtok(line, " \t=");
-            b = strtok(NULL, "\n\r\0");
+            b = strtok(nullptr, "\n\r\0");
 
             if (k != 0 && strcasecmp(k, key)==0) {
                 if (b==0) {
@@ -466,7 +466,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   //if(wave!=NULL) free(wave);
   //wave = new int16_t[channels * (Length + 1280)]; //wave memory buffer
   wave = new int16_t[channels * Length]; //wave memory buffer
-  if(wave==NULL) {return 0;}
+  if(wave==nullptr) {return 0;}
   wavewords = 0;
 
   /*

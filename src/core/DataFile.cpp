@@ -139,7 +139,7 @@ DataFile::DataFile( const QString & _fileName ) :
 	{
 		if( gui )
 		{
-			QMessageBox::critical( NULL,
+			QMessageBox::critical( nullptr,
 				SongEditor::tr( "Could not open file" ),
 				SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
@@ -1005,7 +1005,7 @@ void DataFile::upgrade_0_4_0_beta1()
 					m["plugin"] = sl.value( 0 );
 					m["file"] = sl.value( 1 );
 				}
-				EffectKey key( NULL, name, m );
+				EffectKey key( nullptr, name, m );
 				el.appendChild( key.saveXML( *this ) );
 			}
 		}
@@ -1817,7 +1817,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			qWarning() << "at line" << line << "column" << errorMsg;
 			if( gui )
 			{
-				QMessageBox::critical( NULL,
+				QMessageBox::critical( nullptr,
 					SongEditor::tr( "Error in file" ),
 					SongEditor::tr( "The file %1 seems to contain "
 							"errors and therefore can't be "

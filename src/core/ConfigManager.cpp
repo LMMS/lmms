@@ -53,7 +53,7 @@ static inline QString ensureTrailingSlash(const QString & s )
 }
 
 
-ConfigManager * ConfigManager::s_instanceOfMe = NULL;
+ConfigManager * ConfigManager::s_instanceOfMe = nullptr;
 
 
 ConfigManager::ConfigManager() :
@@ -495,7 +495,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		}
 		else if(gui)
 		{
-			QMessageBox::warning(NULL, MainWindow::tr("Configuration file"),
+			QMessageBox::warning(nullptr, MainWindow::tr("Configuration file"),
 									MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
 													arg(errorLine).
 													arg(errorCol).
@@ -624,7 +624,7 @@ void ConfigManager::saveConfigFile()
 						).arg(m_lmmsRcFile);
 		if(gui)
 		{
-			QMessageBox::critical(NULL, title, message,
+			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,
 						QMessageBox::NoButton);
 		}

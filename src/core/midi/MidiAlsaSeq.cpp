@@ -71,7 +71,7 @@ static QString portName( snd_seq_t * _seq, const snd_seq_addr_t * _addr )
 MidiAlsaSeq::MidiAlsaSeq() :
 	MidiClient(),
 	m_seqMutex(),
-	m_seqHandle( NULL ),
+	m_seqHandle( nullptr ),
 	m_queueID( -1 ),
 	m_quit( false ),
 	m_portListUpdateTimer( this )
@@ -97,7 +97,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 	snd_seq_queue_tempo_free( tempo );
 
-	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
+	snd_seq_start_queue( m_seqHandle, m_queueID, nullptr );
 	changeQueueTempo( Engine::getSong()->getTempo() );
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( changeQueueTempo( bpm_t ) ), Qt::DirectConnection );
@@ -130,7 +130,7 @@ MidiAlsaSeq::~MidiAlsaSeq()
 		wait( EventPollTimeOut*2 );
 
 		m_seqMutex.lock();
-		snd_seq_stop_queue( m_seqHandle, m_queueID, NULL );
+		snd_seq_stop_queue( m_seqHandle, m_queueID, nullptr );
 		snd_seq_free_queue( m_seqHandle, m_queueID );
 		snd_seq_close( m_seqHandle );
 		m_seqMutex.unlock();
@@ -145,7 +145,7 @@ QString MidiAlsaSeq::probeDevice()
 	QString dev = ConfigManager::inst()->value( "Midialsaseq", "device" );
 	if( dev.isEmpty() )
 	{
-		if( getenv( "MIDIDEV" ) != NULL )
+		if( getenv( "MIDIDEV" ) != nullptr )
 		{
 			return getenv( "MIDIDEV" );
 		}
@@ -505,8 +505,8 @@ void MidiAlsaSeq::run()
 			}
 			m_seqMutex.unlock();
 
-			snd_seq_addr_t * source = NULL;
-			MidiPort * dest = NULL;
+			snd_seq_addr_t * source = nullptr;
+			MidiPort * dest = nullptr;
 			for( int i = 0; i < m_portIDs.size(); ++i )
 			{
 				if( m_portIDs.values()[i][0] == ev->dest.port )
@@ -521,7 +521,7 @@ void MidiAlsaSeq::run()
 				}
 			}
 
-			if( dest == NULL )
+			if( dest == nullptr )
 			{
 				continue;
 			}
@@ -622,7 +622,7 @@ void MidiAlsaSeq::changeQueueTempo( bpm_t _bpm )
 	m_seqMutex.lock();
 
 	snd_seq_change_queue_tempo( m_seqHandle, m_queueID,
-					60000000 / (int) _bpm, NULL );
+					60000000 / (int) _bpm, nullptr );
 	snd_seq_drain_output( m_seqHandle );
 
 	m_seqMutex.unlock();

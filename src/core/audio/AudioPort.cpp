@@ -40,7 +40,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
-	m_effects( _has_effect_chain ? new EffectChain( NULL ) : NULL ),
+	m_effects( _has_effect_chain ? new EffectChain( nullptr ) : nullptr ),
 	m_volumeModel( volumeModel ),
 	m_panningModel( panningModel ),
 	m_mutedModel( mutedModel )

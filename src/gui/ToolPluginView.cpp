@@ -34,7 +34,7 @@
 
 
 ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
-	PluginView( _toolPlugin, NULL )
+	PluginView( _toolPlugin, nullptr )
 {
 	gui->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );

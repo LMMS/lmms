@@ -54,7 +54,7 @@
 
 FxMixerView::FxMixerView() :
 	QWidget(),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	SerializingObjectHook()
 {
 	FxMixer * m = Engine::fxMixer();
@@ -365,7 +365,7 @@ void FxMixerView::updateFxLine(int index)
 	thisLine->setToolTip( Engine::fxMixer()->effectChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
-	if( sendModel == NULL )
+	if( sendModel == nullptr )
 	{
 		// does not send, hide send knob
 		thisLine->m_sendKnob->setVisible(false);

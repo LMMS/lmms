@@ -60,8 +60,8 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -278,7 +278,7 @@ QString bitInvader::nodeName() const
 void bitInvader::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 	
 		float factor;

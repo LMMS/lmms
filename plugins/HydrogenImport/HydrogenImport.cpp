@@ -34,9 +34,9 @@ Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 	"frank mather",
 	0x0100,
 	Plugin::ImportFilter,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
 } ;
 
 }

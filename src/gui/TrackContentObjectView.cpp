@@ -62,7 +62,7 @@ const int RESIZE_GRIP_WIDTH = 4;
  * beside the cursor as you move or resize elements of a track about.
  * This pointer keeps track of it, as you only ever need one at a time.
  */
-TextFloat * TrackContentObjectView::s_textFloat = NULL;
+TextFloat * TrackContentObjectView::s_textFloat = nullptr;
 
 
 /*! \brief Create a new trackContentObjectView
@@ -76,7 +76,7 @@ TextFloat * TrackContentObjectView::s_textFloat = NULL;
 TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 							TrackView * tv ) :
 	selectableObject( tv->getTrackContentWidget() ),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	m_trackView( tv ),
 	m_initialTCOPos( TimePos(0) ),
 	m_initialTCOEnd( TimePos(0) ),
@@ -85,7 +85,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_initialOffsets( QVector<TimePos>() ),
-	m_hint( NULL ),
+	m_hint( nullptr ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
 	m_selectedColor( 0, 0, 0 ),
@@ -100,7 +100,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_cursorSetYet( false ),
 	m_needsUpdate( true )
 {
-	if( s_textFloat == NULL )
+	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new TextFloat;
 		s_textFloat->setPixmap( embed::getIconPixmap( "clock" ) );
@@ -473,7 +473,7 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 
 	// Don't allow pasting a tco into itself.
 	QObject* qwSource = de->source();
-	if( qwSource != NULL &&
+	if( qwSource != nullptr &&
 	    dynamic_cast<TrackContentObjectView *>( qwSource ) == this )
 	{
 		return;
@@ -797,7 +797,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				{
 					TrackContentObjectView * tcov =
 						dynamic_cast<TrackContentObjectView *>( *it );
-					if( tcov != NULL )
+					if( tcov != nullptr )
 					{
 						tcoViews.push_back( tcov );
 					}
@@ -829,7 +829,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	if( me->modifiers() & Qt::ControlModifier )
 	{
 		delete m_hint;
-		m_hint = NULL;
+		m_hint = nullptr;
 	}
 
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
@@ -862,7 +862,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		{
 			TrackContentObjectView * tcov =
 				dynamic_cast<TrackContentObjectView *>( *it );
-			if( tcov == NULL ) { continue; }
+			if( tcov == nullptr ) { continue; }
 			tcos.push_back( tcov->m_tco );
 			int index = std::distance( so.begin(), it );
 			leftmost = std::min(leftmost, m_initialOffsets[index].getTicks());
@@ -1021,7 +1021,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 
 	m_action = NoAction;
 	delete m_hint;
-	m_hint = NULL;
+	m_hint = nullptr;
 	s_textFloat->hide();
 	updateCursor(me);
 	selectableObject::mouseReleaseEvent( me );
@@ -1341,7 +1341,7 @@ void TrackContentObjectView::setInitialOffsets()
 	{
 		TrackContentObjectView * tcov =
 			dynamic_cast<TrackContentObjectView *>( *it );
-		if( tcov == NULL )
+		if( tcov == nullptr )
 		{
 			continue;
 		}

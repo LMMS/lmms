@@ -75,7 +75,7 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
         Plugin::Instrument,
         new PluginPixmapLoader( "logo" ),
         "sbi",
-        NULL,
+        nullptr,
 };
 
 // necessary for getting instance out of shared lib
@@ -413,7 +413,7 @@ void OpulenzInstrument::play( sampleFrame * _working_buffer )
 	emulatorMutex.unlock();
 
 	// Throw the data to the track...
-	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frameCount, nullptr );
 
 }
 
@@ -693,7 +693,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
 	knobname->move(xpos,ypos);
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
-	buttname = new PixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
@@ -701,7 +701,7 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
-	buttname = new PixmapButton( this, NULL );\
+	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
         ToolTip::add( buttname, tr( tooltip ) );\

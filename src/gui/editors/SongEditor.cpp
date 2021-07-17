@@ -118,7 +118,7 @@ SongEditor::SongEditor( Song * song ) :
 #if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
-						NULL, NULL, tb );
+						nullptr, nullptr, tb );
 	hq_btn->setCheckable( true );
 	connect( hq_btn, SIGNAL( toggled( bool ) ),
 			this, SLOT( setHighQuality( bool ) ) );
@@ -751,7 +751,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 	{
 		// do smooth scroll animation using QTimeLine
 		QTimeLine *t = scrollBar->findChild<QTimeLine *>();
-		if( t == NULL )
+		if( t == nullptr )
 		{
 			t = new QTimeLine( 600, scrollBar );
 			t->setFrameRange( scrollBar->value(), newVal );
@@ -912,7 +912,7 @@ ComboBoxModel *SongEditor::snappingModel() const
 SongEditorWindow::SongEditorWindow(Song* song) :
 	Editor(Engine::audioEngine()->audioDev()->supportsCapture(), false),
 	m_editor(new SongEditor(song)),
-	m_crtlAction( NULL ),
+	m_crtlAction( nullptr ),
 	m_snapSizeLabel( new QLabel( m_toolBar ) )
 {
 	setWindowTitle( tr( "Song-Editor" ) );

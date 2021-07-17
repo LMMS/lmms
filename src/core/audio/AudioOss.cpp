@@ -204,7 +204,7 @@ QString AudioOss::probeDevice()
 	{
 		char * adev = getenv( "AUDIODEV" );	// Is there a standard
 							// variable name?
-		if( adev != NULL )
+		if( adev != nullptr )
 		{
 			dev = adev;
 		}

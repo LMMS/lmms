@@ -82,8 +82,8 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
-	m_audioDev( NULL ),
-	m_oldAudioDev( NULL ),
+	m_audioDev( nullptr ),
+	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
 	m_profiler(),
 	m_metronomeActive(false),
@@ -222,7 +222,7 @@ void AudioEngine::startProcessing(bool needsFifo)
 	}
 	else
 	{
-		m_fifoWriter = NULL;
+		m_fifoWriter = nullptr;
 	}
 
 	m_audioDev->startProcessing();
@@ -237,13 +237,13 @@ void AudioEngine::stopProcessing()
 {
 	m_isProcessing = false;
 
-	if( m_fifoWriter != NULL )
+	if( m_fifoWriter != nullptr )
 	{
 		m_fifoWriter->finish();
 		m_fifoWriter->wait();
 		m_audioDev->stopProcessing();
 		delete m_fifoWriter;
-		m_fifoWriter = NULL;
+		m_fifoWriter = nullptr;
 	}
 	else
 	{
@@ -270,7 +270,7 @@ sample_rate_t AudioEngine::baseSampleRate() const
 
 sample_rate_t AudioEngine::outputSampleRate() const
 {
-	return m_audioDev != NULL ? m_audioDev->sampleRate() :
+	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
 							baseSampleRate();
 }
 
@@ -279,7 +279,7 @@ sample_rate_t AudioEngine::outputSampleRate() const
 
 sample_rate_t AudioEngine::inputSampleRate() const
 {
-	return m_audioDev != NULL ? m_audioDev->sampleRate() :
+	return m_audioDev != nullptr ? m_audioDev->sampleRate() :
 							baseSampleRate();
 }
 
@@ -651,7 +651,7 @@ void AudioEngine::restoreAudioDevice()
 
 		startProcessing();
 	}
-	m_oldAudioDev = NULL;
+	m_oldAudioDev = nullptr;
 }
 
 
@@ -701,7 +701,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
 		for( LocklessListElement * e = m_newPlayHandles.first(),
-				* ePrev = NULL; e; ePrev = e, e = e->next )
+				* ePrev = nullptr; e; ePrev = e, e = e->next )
 		{
 			if (e->value == ph)
 			{
@@ -955,7 +955,7 @@ bool AudioEngine::isMidiDevNameValid(QString name)
 AudioDevice * AudioEngine::tryAudioDevices()
 {
 	bool success_ful = false;
-	AudioDevice * dev = NULL;
+	AudioDevice * dev = nullptr;
 	QString dev_name = ConfigManager::inst()->value( "mixer", "audiodev" );
 	if( !isAudioDevNameValid( dev_name ) )
 	{
@@ -1267,7 +1267,7 @@ void AudioEngine::fifoWriter::run()
 	}
 
 	// Let audio backend stop processing
-	write( NULL );
+	write( nullptr );
 	m_fifo->waitUntilRead();
 }
 

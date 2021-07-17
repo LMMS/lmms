@@ -40,8 +40,8 @@ class PreviewTrackContainer : public TrackContainer
 {
 public:
 	PreviewTrackContainer() :
-		m_previewInstrumentTrack( NULL ),
-		m_previewNote( NULL ),
+		m_previewInstrumentTrack( nullptr ),
+		m_previewNote( nullptr ),
 		m_dataMutex()
 	{
 		setJournalling( false );
@@ -135,14 +135,14 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		Instrument * i = s_previewTC->previewInstrumentTrack()->instrument();
 		const QString ext = QFileInfo( _preset_file ).
 							suffix().toLower();
-		if( i == NULL || !i->descriptor()->supportsFileType( ext ) )
+		if( i == nullptr || !i->descriptor()->supportsFileType( ext ) )
 		{
 			const PluginFactory::PluginInfoAndKey& infoAndKey =
 				pluginFactory->pluginSupportingExtension(ext);
 			i = s_previewTC->previewInstrumentTrack()->
 				loadInstrument(infoAndKey.info.name(), &infoAndKey.key);
 		}
-		if( i != NULL )
+		if( i != nullptr )
 		{
 			i->loadFile( _preset_file );
 		}
@@ -244,7 +244,7 @@ void PresetPreviewPlayHandle::init()
 void PresetPreviewPlayHandle::cleanup()
 {
 	delete s_previewTC;
-	s_previewTC = NULL;
+	s_previewTC = nullptr;
 }
 
 
@@ -254,7 +254,7 @@ ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(
 						const InstrumentTrack * _it )
 {
 	ConstNotePlayHandleList cnphv;
-	if( s_previewTC->previewNote() != NULL &&
+	if( s_previewTC->previewNote() != nullptr &&
 		s_previewTC->previewNote()->instrumentTrack() == _it )
 	{
 		cnphv.push_back( s_previewTC->previewNote() );

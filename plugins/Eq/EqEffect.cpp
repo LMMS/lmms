@@ -44,8 +44,8 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }

@@ -39,7 +39,7 @@
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
-	m_amount( amount, 0, 1, 0.001, NULL,
+	m_amount( amount, 0, 1, 0.001, nullptr,
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) )
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
@@ -60,7 +60,7 @@ void FxRoute::updateName()
 
 
 FxChannel::FxChannel( int idx, Model * _parent ) :
-	m_fxChain( NULL ),
+	m_fxChain( nullptr ),
 	m_hasInput( false ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
@@ -189,7 +189,7 @@ void FxChannel::doProcessing()
 
 
 FxMixer::FxMixer() :
-	Model( NULL ),
+	Model( nullptr ),
 	JournallingObject(),
 	m_fxChannels()
 {
@@ -467,7 +467,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 {
 	if( from == to )
 	{
-		return NULL;
+		return nullptr;
 	}
 	Engine::audioEngine()->requestChangeInModel();
 	FxRoute * route = new FxRoute( from, to, amount );
@@ -562,7 +562,7 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 {
 	if( fromChannel == toChannel )
 	{
-		return NULL;
+		return nullptr;
 	}
 	const FxChannel * from = m_fxChannels[fromChannel];
 	const FxChannel * to = m_fxChannels[toChannel];
@@ -575,7 +575,7 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 

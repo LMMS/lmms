@@ -41,8 +41,8 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPo
 	m_ownAudioPort( ownAudioPort ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
+	m_track( nullptr ),
+	m_bbTrack( nullptr )
 {
 	if (ownAudioPort)
 	{

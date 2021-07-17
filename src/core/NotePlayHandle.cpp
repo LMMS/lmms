@@ -53,7 +53,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								Origin origin ) :
 	PlayHandle( TypeNotePlayHandle, _offset ),
 	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
-	m_pluginData( NULL ),
+	m_pluginData( nullptr ),
 	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
 	m_totalFramesPlayed( 0 ),
@@ -64,16 +64,16 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_released( false ),
 	m_releaseStarted( false ),
 	m_hasMidiNote( false ),
-	m_hasParent( parent != NULL  ),
+	m_hasParent( parent != nullptr  ),
 	m_parent( parent ),
 	m_hadChildren( false ),
 	m_muted( false ),
-	m_bbTrack( NULL ),
+	m_bbTrack( nullptr ),
 	m_origTempo( Engine::getSong()->getTempo() ),
 	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
-	m_baseDetuning( NULL ),
+	m_baseDetuning( nullptr ),
 	m_songGlobalParentOffset( 0 ),
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin ),
@@ -133,14 +133,14 @@ NotePlayHandle::~NotePlayHandle()
 		m_parent->m_subNotes.removeOne( this );
 	}
 
-	if( m_pluginData != NULL )
+	if( m_pluginData != nullptr )
 	{
 		m_instrumentTrack->deleteNotePluginData( this );
 	}
 
 	if( m_instrumentTrack->m_notes[key()] == this )
 	{
-		m_instrumentTrack->m_notes[key()] = NULL;
+		m_instrumentTrack->m_notes[key()] = nullptr;
 	}
 
 	m_subNotes.clear();
@@ -458,7 +458,7 @@ int NotePlayHandle::index() const
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
 		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
-		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
+		if( nph == nullptr || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
 		{
 			continue;
 		}
@@ -482,7 +482,7 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
 		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
-		if( nph != NULL && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
+		if( nph != nullptr && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
 		}
