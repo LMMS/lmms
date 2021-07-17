@@ -56,7 +56,7 @@ static void JackMidiShutdown(void *arg)
 	QString msg_short = MidiJack::tr("JACK server down");
         //: When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)
 	QString msg_long = MidiJack::tr("The JACK server seems to be shuted down.");
-	QMessageBox::information( gui->mainWindow(), msg_short, msg_long );
+	QMessageBox::information( getGUI()->mainWindow(), msg_short, msg_long );
 }
 
 MidiJack::MidiJack() :

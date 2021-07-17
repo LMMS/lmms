@@ -307,7 +307,7 @@ void FxLine::renameFinished()
 
 void FxLine::removeChannel()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->deleteChannel( m_channelIndex );
 }
 
@@ -316,7 +316,7 @@ void FxLine::removeChannel()
 
 void FxLine::removeUnusedChannels()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->deleteUnusedChannels();
 }
 
@@ -325,7 +325,7 @@ void FxLine::removeUnusedChannels()
 
 void FxLine::moveChannelLeft()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->moveChannelLeft( m_channelIndex );
 }
 
@@ -334,7 +334,7 @@ void FxLine::moveChannelLeft()
 
 void FxLine::moveChannelRight()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->moveChannelRight( m_channelIndex );
 }
 

@@ -178,7 +178,7 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	m_periodicalUpdate( false )
 {
 	setFixedSize( 450, 200 );
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
+	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
 	float totalLength = log10( 20000 );

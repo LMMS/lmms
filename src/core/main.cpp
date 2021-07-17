@@ -928,12 +928,12 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
-				gui->mainWindow()->sessionCleanup();
+				getGUI()->mainWindow()->sessionCleanup();
 			}
 			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
-				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
+				getGUI()->mainWindow()->setSession( MainWindow::SessionState::Recover );
 			}
 			else // Exit
 			{
@@ -945,10 +945,10 @@ int main( int argc, char * * argv )
 
 		// [Settel] workaround: showMaximized() doesn't work with
 		// FVWM2 unless the window is already visible -> show() first
-		gui->mainWindow()->show();
+		getGUI()->mainWindow()->show();
 		if( fullscreen )
 		{
-			gui->mainWindow()->showMaximized();
+			getGUI()->mainWindow()->showMaximized();
 		}
 
 		// Handle macOS-style FileOpen QEvents
@@ -1008,7 +1008,7 @@ int main( int argc, char * * argv )
 		// instances of LMMS.
 		if( autoSaveEnabled )
 		{
-			gui->mainWindow()->autoSaveTimerReset();
+			getGUI()->mainWindow()->autoSaveTimerReset();
 		}
 	}
 

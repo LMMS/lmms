@@ -196,9 +196,9 @@ TimePos Pattern::beatPatternLength() const
 Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 {
 	Note * new_note = new Note( _new_note );
-	if( _quant_pos && gui->pianoRoll() )
+	if( _quant_pos && getGUI()->pianoRoll() )
 	{
-		new_note->quantizePos( gui->pianoRoll()->quantization() );
+		new_note->quantizePos( getGUI()->pianoRoll()->quantization() );
 	}
 
 	instrumentTrack()->lock();
@@ -565,9 +565,11 @@ void Pattern::updateBBTrack()
 		Engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
-	if( gui && gui->pianoRoll() && gui->pianoRoll()->currentPattern() == this )
+	if( getGUI() != nullptr
+		&& getGUI()->pianoRoll()
+		&& getGUI()->pianoRoll()->currentPattern() == this )
 	{
-		gui->pianoRoll()->update();
+		getGUI()->pianoRoll()->update();
 	}
 }
 

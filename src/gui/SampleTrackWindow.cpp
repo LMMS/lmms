@@ -135,7 +135,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 	setModel(tv->model());
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget(this);
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -232,7 +232,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
 	ce->ignore();
 
-	if(gui->mainWindow()->workspace())
+	if(getGUI()->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
 	}

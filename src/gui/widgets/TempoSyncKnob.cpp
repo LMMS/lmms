@@ -290,8 +290,8 @@ void TempoSyncKnob::showCustom()
 {
 	if( m_custom == nullptr )
 	{
-		m_custom = new MeterDialog( gui->mainWindow()->workspace() );
-		QMdiSubWindow * subWindow = gui->mainWindow()->addWindowedWidget( m_custom );
+		m_custom = new MeterDialog( getGUI()->mainWindow()->workspace() );
+		QMdiSubWindow * subWindow = getGUI()->mainWindow()->addWindowedWidget( m_custom );
 		Qt::WindowFlags flags = subWindow->windowFlags();
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		subWindow->setWindowFlags( flags );

@@ -210,7 +210,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 /*! \brief Create and assign a new FX Channel for this track */
 void SampleTrackView::createFxLine()
 {
-	int channelIndex = gui->fxMixerView()->addNewChannel();
+	int channelIndex = getGUI()->fxMixerView()->addNewChannel();
 	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
@@ -227,5 +227,5 @@ void SampleTrackView::assignFxLine(int channelIndex)
 {
 	model()->effectChannelModel()->setValue(channelIndex);
 
-	gui->fxMixerView()->setCurrentFxLine(channelIndex);
+	getGUI()->fxMixerView()->setCurrentFxLine(channelIndex);
 }

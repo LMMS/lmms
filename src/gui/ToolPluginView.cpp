@@ -36,7 +36,7 @@
 ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 	PluginView( _toolPlugin, nullptr )
 {
-	gui->mainWindow()->addWindowedWidget( this );
+	getGUI()->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 
 	setWindowTitle( _toolPlugin->displayName() );

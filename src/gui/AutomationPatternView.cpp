@@ -51,7 +51,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 {
 	connect( m_pat, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
-	connect( gui->automationEditor(), SIGNAL( currentPatternChanged() ),
+	connect( getGUI()->automationEditor(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -77,7 +77,8 @@ AutomationPatternView::~AutomationPatternView()
 
 void AutomationPatternView::openInAutomationEditor()
 {
-	if(gui) gui->automationEditor()->open(m_pat);
+	if(getGUI() != nullptr)
+		getGUI()->automationEditor()->open(m_pat);
 }
 
 
@@ -125,9 +126,9 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 		update();
 
 		//If automation editor is opened, update its display after disconnection
-		if( gui->automationEditor() )
+		if( getGUI()->automationEditor() )
 		{
-			gui->automationEditor()->m_editor->updateAfterPatternChange();
+			getGUI()->automationEditor()->m_editor->updateAfterPatternChange();
 		}
 
 		//if there is no more connection connected to the AutomationPattern
@@ -256,7 +257,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c = getColorForDisplay( painter.background().color() );
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
-	bool current = gui->automationEditor()->currentPattern() == m_pat;
+	bool current = getGUI()->automationEditor()->currentPattern() == m_pat;
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -453,10 +454,10 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		}
 		update();
 
-		if( gui->automationEditor() &&
-			gui->automationEditor()->currentPattern() == m_pat )
+		if( getGUI()->automationEditor() &&
+			getGUI()->automationEditor()->currentPattern() == m_pat )
 		{
-			gui->automationEditor()->setCurrentPattern( m_pat );
+			getGUI()->automationEditor()->setCurrentPattern( m_pat );
 		}
 	}
 	else

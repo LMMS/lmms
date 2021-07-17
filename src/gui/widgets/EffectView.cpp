@@ -96,7 +96,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
-			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
+			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
 
 			if ( !m_controlView->isResizable() )
 			{

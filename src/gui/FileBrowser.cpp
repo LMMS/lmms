@@ -755,7 +755,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( gui->mainWindow()->mayChangeProject(true) )
+			if( getGUI()->mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -886,7 +886,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			gui->mainWindow()->workspace()->
+			getGUI()->mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();

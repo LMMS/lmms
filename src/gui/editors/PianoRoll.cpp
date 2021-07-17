@@ -782,7 +782,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
 
@@ -808,7 +808,7 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
 
@@ -1200,7 +1200,7 @@ void PianoRoll::shiftSemiTone(NoteVector notes, int amount)
 	m_pattern->dataChanged();
 	//We modified the song
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 }
 
 
@@ -1231,7 +1231,7 @@ void PianoRoll::shiftPos(NoteVector notes, int amount)
 	m_pattern->dataChanged();
 	// we modified the song
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 }
 
 
@@ -1636,7 +1636,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		}
 		detuningPattern = n->detuning()->automationPattern();
 		connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
-		gui->automationEditor()->open(detuningPattern);
+		getGUI()->automationEditor()->open(detuningPattern);
 		return;
 	}
 
@@ -1886,7 +1886,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 							// added new notes, so must update engine, song, etc
 							Engine::getSong()->setModified();
 							update();
-							gui->songEditor()->update();
+							getGUI()->songEditor()->update();
 						}
 					}
 
@@ -3644,7 +3644,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	currentKeyCol.setAlpha( 64 );
 
 	// horizontal line for the key under the cursor
-	if(hasValidPattern() && gui->pianoRoll()->hasFocus())
+	if(hasValidPattern() && getGUI()->pianoRoll()->hasFocus())
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
 		p.fillRect( 10, keyAreaBottom() + 3 - m_keyLineHeight *
@@ -3656,7 +3656,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.fillRect( QRect( 0, keyAreaBottom(),
 					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), editAreaCol );
 
-	if (gui->pianoRoll()->hasFocus())
+	if (getGUI()->pianoRoll()->hasFocus())
 	{
 		const QPixmap * cursor = nullptr;
 		// draw current edit-mode-icon below the cursor
@@ -4361,7 +4361,7 @@ void PianoRoll::cutSelectedNotes()
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 }
 
 
@@ -4411,7 +4411,7 @@ void PianoRoll::pasteNotes()
 		// least one note...
 		Engine::getSong()->setModified();
 		update();
-		gui->songEditor()->update();
+		getGUI()->songEditor()->update();
 	}
 }
 
@@ -4432,7 +4432,7 @@ bool PianoRoll::deleteSelectedNotes()
 
 	Engine::getSong()->setModified();
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	return true;
 }
 
@@ -4623,7 +4623,7 @@ void PianoRoll::quantizeNotes(QuantizeActions mode)
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
 

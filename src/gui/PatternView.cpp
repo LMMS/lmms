@@ -45,7 +45,7 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	m_mutedNoteBorderColor(100, 100, 100, 220),
 	m_legacySEBB(ConfigManager::inst()->value("ui","legacysebb","0").toInt())
 {
-	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
+	connect( getGUI()->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
 	if( s_stepBtnOn0 == nullptr )
@@ -100,10 +100,10 @@ void PatternView::update()
 
 void PatternView::openInPianoRoll()
 {
-	gui->pianoRoll()->setCurrentPattern( m_pat );
-	gui->pianoRoll()->parentWidget()->show();
-	gui->pianoRoll()->show();
-	gui->pianoRoll()->setFocus();
+	getGUI()->pianoRoll()->setCurrentPattern( m_pat );
+	getGUI()->pianoRoll()->parentWidget()->show();
+	getGUI()->pianoRoll()->show();
+	getGUI()->pianoRoll()->setFocus();
 }
 
 
@@ -112,10 +112,10 @@ void PatternView::openInPianoRoll()
 
 void PatternView::setGhostInPianoRoll()
 {
-	gui->pianoRoll()->setGhostPattern( m_pat );
-	gui->pianoRoll()->parentWidget()->show();
-	gui->pianoRoll()->show();
-	gui->pianoRoll()->setFocus();
+	getGUI()->pianoRoll()->setGhostPattern( m_pat );
+	getGUI()->pianoRoll()->parentWidget()->show();
+	getGUI()->pianoRoll()->show();
+	getGUI()->pianoRoll()->setFocus();
 }
 
 
@@ -222,9 +222,9 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 		Engine::getSong()->setModified();
 		update();
 
-		if( gui->pianoRoll()->currentPattern() == m_pat )
+		if( getGUI()->pianoRoll()->currentPattern() == m_pat )
 		{
-			gui->pianoRoll()->update();
+			getGUI()->pianoRoll()->update();
 		}
 	}
 	else
@@ -291,9 +291,9 @@ void PatternView::wheelEvent(QWheelEvent * we)
 
 			Engine::getSong()->setModified();
 			update();
-			if( gui->pianoRoll()->currentPattern() == m_pat )
+			if( getGUI()->pianoRoll()->currentPattern() == m_pat )
 			{
-				gui->pianoRoll()->update();
+				getGUI()->pianoRoll()->update();
 			}
 		}
 		we->accept();
@@ -331,7 +331,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	QColor c;
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
-	bool current = gui->pianoRoll()->currentPattern() == m_pat;
+	bool current = getGUI()->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 	
 	if( beatPattern )

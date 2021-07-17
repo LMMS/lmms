@@ -103,10 +103,10 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if( gui != nullptr &&
+	if( getGUI() != nullptr &&
 		ConfigManager::inst()->sf2File().isEmpty() )
 	{
-		QMessageBox::information( gui->mainWindow(),
+		QMessageBox::information( getGUI()->mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You have not set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
@@ -116,9 +116,9 @@ bool MidiImport::tryImport( TrackContainer* tc )
 				"settings dialog and try again." ) );
 	}
 #else
-	if( gui )
+	if( getGUI() != nullptr )
 	{
-		QMessageBox::information( gui->mainWindow(),
+		QMessageBox::information( getGUI()->mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You did not compile LMMS with support for "
 				"SoundFont2 player, which is used to add default "
@@ -307,7 +307,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	const int MIDI_CC_COUNT = 128 + 1; // 0-127 (128) + pitch bend
 	const int preTrackSteps = 2;
 	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
-	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow() );
+	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, getGUI()->mainWindow() );
 	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	pd.setWindowModality(Qt::WindowModal);
 	pd.setMinimumDuration( 0 );

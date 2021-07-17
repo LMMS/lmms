@@ -33,7 +33,7 @@
 
 
 TextFloat::TextFloat() :
-	QWidget( gui->mainWindow(), Qt::ToolTip ),
+	QWidget( getGUI()->mainWindow(), Qt::ToolTip ),
 	m_title(),
 	m_text(),
 	m_pixmap()
@@ -88,7 +88,7 @@ void TextFloat::setVisibilityTimeOut( int _msecs )
 TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
 					QWidget * _parent, int _add_y_margin )
 {
-	QWidget * mw = gui->mainWindow();
+	QWidget * mw = getGUI()->mainWindow();
 	TextFloat * tf = new TextFloat;
 	if( _parent != nullptr )
 	{

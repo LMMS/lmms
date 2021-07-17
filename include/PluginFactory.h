@@ -104,6 +104,6 @@ private:
 };
 
 //Short-hand function
-PluginFactory* getPluginFactory();
+LMMS_EXPORT PluginFactory* getPluginFactory();
 
 #endif // PLUGINFACTORY_H

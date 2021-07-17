@@ -100,7 +100,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 
 TimeLineWidget::~TimeLineWidget()
 {
-	if( gui->songEditor() )
+	if( getGUI()->songEditor() )
 	{
 		m_pos.m_timeLine = nullptr;
 	}

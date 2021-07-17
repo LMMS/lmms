@@ -846,9 +846,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	verticalLayout->addWidget(splitter);
 
 	// -- Sub window
-	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(gui->mainWindow()->workspace()->viewport(), Qt::SubWindow |
+	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(), Qt::SubWindow |
 		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	m_carlaInstrumentView->m_paramsSubWindow = gui->mainWindow()->workspace()->addSubWindow(win);
+	m_carlaInstrumentView->m_paramsSubWindow = getGUI()->mainWindow()->workspace()->addSubWindow(win);
 	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(
 		QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	m_carlaInstrumentView->m_paramsSubWindow->setMinimumHeight(200);

@@ -866,17 +866,17 @@ void Song::clearProject()
 
 	Engine::audioEngine()->requestChangeInModel();
 
-	if( gui && gui->getBBEditor() )
+	if( getGUI() != nullptr && getGUI()->getBBEditor() )
 	{
-		gui->getBBEditor()->trackContainerView()->clearAllTracks();
+		getGUI()->getBBEditor()->trackContainerView()->clearAllTracks();
 	}
-	if( gui && gui->songEditor() )
+	if( getGUI() != nullptr && getGUI()->songEditor() )
 	{
-		gui->songEditor()->m_editor->clearAllTracks();
+		getGUI()->songEditor()->m_editor->clearAllTracks();
 	}
-	if( gui && gui->fxMixerView() )
+	if( getGUI() != nullptr && getGUI()->fxMixerView() )
 	{
-		gui->fxMixerView()->clear();
+		getGUI()->fxMixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
@@ -884,14 +884,14 @@ void Song::clearProject()
 
 	Engine::fxMixer()->clear();
 
-	if( gui && gui->automationEditor() )
+	if( getGUI() != nullptr && getGUI()->automationEditor() )
 	{
-		gui->automationEditor()->setCurrentPattern( nullptr );
+		getGUI()->automationEditor()->setCurrentPattern( nullptr );
 	}
 
-	if( gui && gui->pianoRoll() )
+	if( getGUI() != nullptr && getGUI()->pianoRoll() )
 	{
-		gui->pianoRoll()->reset();
+		getGUI()->pianoRoll()->reset();
 	}
 
 	m_tempoModel.reset();
@@ -910,9 +910,9 @@ void Song::clearProject()
 
 	Engine::audioEngine()->doneChangeInModel();
 
-	if( gui && gui->getProjectNotes() )
+	if( getGUI() != nullptr && getGUI()->getProjectNotes() )
 	{
-		gui->getProjectNotes()->clear();
+		getGUI()->getProjectNotes()->clear();
 	}
 
 	removeAllControllers();
@@ -1035,7 +1035,7 @@ void Song::loadProject( const QString & fileName )
 		{
 			cantLoadProject = true;
 
-			if (gui)
+			if (getGUI() != nullptr)
 			{
 				QMessageBox::critical(nullptr, tr("Aborting project load"),
 					tr("Project file contains local paths to plugins, which could be used to "
@@ -1093,10 +1093,10 @@ void Song::loadProject( const QString & fileName )
 	if( !node.isNull() )
 	{
 		Engine::fxMixer()->restoreState( node.toElement() );
-		if( gui )
+		if( getGUI() != nullptr )
 		{
 			// refresh FxMixerView
-			gui->fxMixerView()->refreshDisplay();
+			getGUI()->fxMixerView()->refreshDisplay();
 		}
 	}
 
@@ -1142,23 +1142,23 @@ void Song::loadProject( const QString & fileName )
 			{
 				restoreKeymapStates(node.toElement());
 			}
-			else if( gui )
+			else if( getGUI() != nullptr )
 			{
-				if( node.nodeName() == gui->getControllerRackView()->nodeName() )
+				if( node.nodeName() == getGUI()->getControllerRackView()->nodeName() )
 				{
-					gui->getControllerRackView()->restoreState( node.toElement() );
+					getGUI()->getControllerRackView()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == gui->pianoRoll()->nodeName() )
+				else if( node.nodeName() == getGUI()->pianoRoll()->nodeName() )
 				{
-					gui->pianoRoll()->restoreState( node.toElement() );
+					getGUI()->pianoRoll()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == gui->automationEditor()->m_editor->nodeName() )
+				else if( node.nodeName() == getGUI()->automationEditor()->m_editor->nodeName() )
 				{
-					gui->automationEditor()->m_editor->restoreState( node.toElement() );
+					getGUI()->automationEditor()->m_editor->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == gui->getProjectNotes()->nodeName() )
+				else if( node.nodeName() == getGUI()->getProjectNotes()->nodeName() )
 				{
-					 gui->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
+					 getGUI()->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
 				}
 				else if( node.nodeName() == m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
 				{
@@ -1203,7 +1203,7 @@ void Song::loadProject( const QString & fileName )
 
 	if ( hasErrors())
 	{
-		if ( gui )
+		if ( getGUI() != nullptr )
 		{
 			QMessageBox::warning( nullptr, tr("LMMS Error report"), errorSummary(),
 							QMessageBox::Ok );
@@ -1239,12 +1239,12 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
-	if( gui )
+	if( getGUI() != nullptr )
 	{
-		gui->getControllerRackView()->saveState( dataFile, dataFile.content() );
-		gui->pianoRoll()->saveState( dataFile, dataFile.content() );
-		gui->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
-		gui->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
+		getGUI()->getControllerRackView()->saveState( dataFile, dataFile.content() );
+		getGUI()->pianoRoll()->saveState( dataFile, dataFile.content() );
+		getGUI()->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
+		getGUI()->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState( dataFile, dataFile.content() );
 	}
 

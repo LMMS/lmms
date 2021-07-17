@@ -149,12 +149,12 @@ FxMixerView::FxMixerView() :
 	updateGeometry();
 
 	// timer for updating faders
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateFaders() ) );
 
 
 	// add ourself to workspace
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );

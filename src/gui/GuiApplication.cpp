@@ -58,6 +58,10 @@ GuiApplication* GuiApplication::instance()
 	return s_instance;
 }
 
+GuiApplication* getGUI()
+{
+	return GuiApplication::instance();
+}
 
 GuiApplication::GuiApplication()
 {
@@ -185,7 +189,7 @@ void GuiApplication::displayInitProgress(const QString &msg)
 
 void GuiApplication::childDestroyed(QObject *obj)
 {
-	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
+	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->fxMixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
 	if (obj == m_mainWindow)
 	{

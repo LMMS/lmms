@@ -873,7 +873,7 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
 	setWindowTitle ( "Xpressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
-	gui->mainWindow()->addWindowedWidget( this );
+	getGUI()->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	parentWidget()->setFixedSize( 300, 500);

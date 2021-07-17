@@ -490,7 +490,7 @@ float Knob::getValue( const QPoint & _p )
 	value = .4f * _p.y();
 
 	// if shift pressed we want slower movement
-	if( gui->mainWindow()->isShiftPressed() )
+	if( getGUI()->mainWindow()->isShiftPressed() )
 	{
 		value /= 4.0f;
 		value = qBound( -4.0f, value, 4.0f );

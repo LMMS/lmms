@@ -121,7 +121,7 @@ public:
 			return;
 		}
 		if ( embedMethod() != "none" ) {
-			m_pluginSubWindow.reset(new vstSubWin( gui->mainWindow()->workspace() ));
+			m_pluginSubWindow.reset(new vstSubWin( getGUI()->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
 			m_pluginSubWindow->setWidget(pluginWidget());
 		} else {
@@ -348,7 +348,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	TextFloat * tf = nullptr;
-	if( gui )
+	if( getGUI() != nullptr )
 	{
 		tf = TextFloat::displayMessage(
 				tr( "Loading plugin" ),
@@ -927,7 +927,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
+	m_vi->m_subWindow = getGUI()->mainWindow()->addWindowedWidget(nullptr, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
 	m_vi->m_subWindow->setFixedWidth( 960 );

@@ -1271,7 +1271,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
 	InstrumentTrackWindow * w = nullptr;
 	for( const QMdiSubWindow * sw :
-				gui->mainWindow()->workspace()->subWindowList(
+				getGUI()->mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{
 		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
@@ -1289,7 +1289,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 /*! \brief Create and assign a new FX Channel for this track */
 void InstrumentTrackView::createFxLine()
 {
-	int channelIndex = gui->fxMixerView()->addNewChannel();
+	int channelIndex = getGUI()->fxMixerView()->addNewChannel();
 	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
@@ -1306,7 +1306,7 @@ void InstrumentTrackView::assignFxLine(int channelIndex)
 {
 	model()->effectChannelModel()->setValue( channelIndex );
 
-	gui->fxMixerView()->setCurrentFxLine( channelIndex );
+	getGUI()->fxMixerView()->setCurrentFxLine( channelIndex );
 }
 
 
@@ -1655,7 +1655,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	vlayout->addWidget( m_pianoView );
 	setModel( _itv->model() );
 
-	QMdiSubWindow* subWin = gui->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow* subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags |= Qt::MSWindowsFixedSizeDialogHint;
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -1880,7 +1880,7 @@ void InstrumentTrackWindow::closeEvent( QCloseEvent* event )
 {
 	event->ignore();
 
-	if( gui->mainWindow()->workspace() )
+	if( getGUI()->mainWindow()->workspace() )
 	{
 		parentWidget()->hide();
 	}

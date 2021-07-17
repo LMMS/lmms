@@ -120,7 +120,7 @@ private:
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( gui
+	m_embedMethod( (getGUI() != nullptr)
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
@@ -386,13 +386,13 @@ bool VstPlugin::processMessage( const message & _m )
 			// so this is legal despite MSDN's warning
 			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
 					GWLP_HWNDPARENT,
-					(LONG_PTR) gui->mainWindow()->winId() );
+					(LONG_PTR) getGUI()->mainWindow()->winId() );
 #endif
 
 #ifdef LMMS_BUILD_LINUX
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
-					gui->mainWindow()->winId() );
+					getGUI()->mainWindow()->winId() );
 #endif
 		}
 		break;

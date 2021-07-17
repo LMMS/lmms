@@ -119,7 +119,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 
 	connect( m_tco, SIGNAL( lengthChanged() ),
 			this, SLOT( updateLength() ) );
-	connect( gui->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
+	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
 	connect( m_tco, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
@@ -653,7 +653,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 			else
 			{
-				gui->songEditor()->m_editor->selectAllTcos( false );
+				getGUI()->songEditor()->m_editor->selectAllTcos( false );
 				m_tco->addJournalCheckPoint();
 
 				// Move, Resize and ResizeLeft
@@ -805,7 +805,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			}
 			else
 			{
-				gui->songEditor()->m_editor->selectAllTcos( false );
+				getGUI()->songEditor()->m_editor->selectAllTcos( false );
 				tcoViews.push_back( this );
 			}
 			// Clear the action here because mouseReleaseEvent will not get
@@ -879,7 +879,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == Resize || m_action == ResizeLeft )
 	{
-		const float snapSize = gui->songEditor()->m_editor->getSnapSize();
+		const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 		// Length in ticks of one snap increment
 		const TimePos snapLength = TimePos( (int)(snapSize * TimePos::ticksPerBar()) );
 
@@ -1147,7 +1147,7 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 QVector<TrackContentObjectView *> TrackContentObjectView::getClickedTCOs()
 {
 	// Get a list of selected selectableObjects
-	QVector<selectableObject *> sos = gui->songEditor()->m_editor->selectedObjects();
+	QVector<selectableObject *> sos = getGUI()->songEditor()->m_editor->selectedObjects();
 
 	// Convert to a list of selected TCOVs
 	QVector<TrackContentObjectView *> selection;
@@ -1315,7 +1315,7 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
 	track->restoreJournallingState();
 	// Update song
 	Engine::getSong()->setModified();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 }
 
 
@@ -1398,10 +1398,10 @@ TimePos TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 	else if ( me->modifiers() & Qt::ShiftModifier )
 	{	// If shift is held, quantize position (Default in 1.2.0 and earlier)
 		// or end position, whichever is closest to the actual position
-		TimePos startQ = newPos.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		TimePos startQ = newPos.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
 		// Find start position that gives snapped clip end position
 		TimePos endQ = ( newPos + m_tco->length() );
-		endQ = endQ.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		endQ = endQ.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
 		endQ = endQ - m_tco->length();
 		// Select the position closest to actual position
 		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
@@ -1409,7 +1409,7 @@ TimePos TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 	}
 	else
 	{	// Otherwise, quantize moved distance (preserves user offsets)
-		newPos = m_initialTCOPos + offset.quantize( gui->songEditor()->m_editor->getSnapSize() );
+		newPos = m_initialTCOPos + offset.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
 	}
 	return newPos;
 }
@@ -1439,7 +1439,7 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 
 TimePos TrackContentObjectView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 {
-	const float snapSize = gui->songEditor()->m_editor->getSnapSize();
+	const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	if ( shiftMode )
 	{	//If shift is held we quantize the length of the new left clip...
 		const TimePos leftPos = midiPos.quantize( snapSize );
