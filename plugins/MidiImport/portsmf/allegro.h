@@ -94,8 +94,7 @@ public:
 		{
 			delete atoms[i];
 		}
-		if (atoms)
-			delete[] atoms;
+		if (atoms) delete[] atoms;
 	}
 	// insert/lookup an atttribute
 	Alg_attribute insert_attribute(Alg_attribute attr);
@@ -359,8 +358,7 @@ public:
 	virtual ~Alg_events();
 	void set_events(Alg_event_ptr* e, long l, long m)
 	{
-		if (events)
-			delete[] events;
+		if (events) delete[] events;
 		events = e;
 		len = l;
 		maxlen = m;
@@ -492,8 +490,7 @@ public:
 	}
 	~Alg_beats()
 	{
-		if (beats)
-			delete[] beats;
+		if (beats) delete[] beats;
 	}
 	void insert(long i, Alg_beat_ptr beat);
 } * Alg_beats_ptr;
@@ -546,8 +543,7 @@ public:
 	void insert_beats(double start, double len);
 	void dereference()
 	{
-		if (--refcount <= 0)
-			delete this;
+		if (--refcount <= 0) delete this;
 	}
 	void reference() { refcount++; }
 } * Alg_time_map_ptr;
@@ -647,8 +643,7 @@ public:
 	// report of memory leakage from automation that doesn't know better. -RBD
 	virtual ~Serial_write_buffer()
 	{
-		if (buffer)
-			delete[] buffer;
+		if (buffer) delete[] buffer;
 	}
 	void init_for_write() { ptr = buffer; }
 	// store_long writes a long at a given offset
@@ -759,8 +754,7 @@ public:
 	Alg_track(Alg_event_list_ref event_list, Alg_time_map_ptr map, bool units_are_seconds);
 	virtual ~Alg_track()
 	{ // note: do not call set_time_map(NULL)!
-		if (time_map)
-			time_map->dereference();
+		if (time_map) time_map->dereference();
 		time_map = NULL;
 	}
 
@@ -962,8 +956,7 @@ public:
 	}
 	~Alg_time_sigs()
 	{
-		if (time_sigs)
-			delete[] time_sigs;
+		if (time_sigs) delete[] time_sigs;
 	}
 	void show();
 	long length() { return len; }

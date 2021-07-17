@@ -50,10 +50,7 @@ AudioFileDevice::AudioFileDevice(
 										  "file and try again!")
 					  .arg(_file);
 
-		if (gui)
-		{
-			QMessageBox::critical(NULL, title, message, QMessageBox::Ok, QMessageBox::NoButton);
-		}
+		if (gui) { QMessageBox::critical(NULL, title, message, QMessageBox::Ok, QMessageBox::NoButton); }
 		else
 		{
 			fprintf(stderr, "%s\n", message.toUtf8().constData());
@@ -66,10 +63,7 @@ AudioFileDevice::~AudioFileDevice() { m_outputFile.close(); }
 
 int AudioFileDevice::writeData(const void* data, int len)
 {
-	if (m_outputFile.isOpen())
-	{
-		return m_outputFile.write((const char*)data, len);
-	}
+	if (m_outputFile.isOpen()) { return m_outputFile.write((const char*)data, len); }
 
 	return -1;
 }

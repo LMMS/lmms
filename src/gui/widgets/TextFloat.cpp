@@ -74,10 +74,7 @@ TextFloat* TextFloat::displayMessage(const QString& _msg, int _timeout, QWidget*
 {
 	QWidget* mw = gui->mainWindow();
 	TextFloat* tf = new TextFloat;
-	if (_parent != NULL)
-	{
-		tf->moveGlobal(_parent, QPoint(_parent->width() + 2, 0));
-	}
+	if (_parent != NULL) { tf->moveGlobal(_parent, QPoint(_parent->width() + 2, 0)); }
 	else
 	{
 		tf->moveGlobal(mw, QPoint(32, mw->height() - tf->height() - 8 - _add_y_margin));
@@ -117,10 +114,7 @@ void TextFloat::paintEvent(QPaintEvent* _pe)
 
 	/*	p.drawRect( 0, 0, rect().right(), rect().bottom() );*/
 
-	if (m_title.isEmpty())
-	{
-		p.drawText(opt.rect, Qt::AlignCenter, m_text);
-	}
+	if (m_title.isEmpty()) { p.drawText(opt.rect, Qt::AlignCenter, m_text); }
 	else
 	{
 		int text_x = opt.rect.left() + 2;
@@ -149,16 +143,10 @@ void TextFloat::updateSize()
 		QFont f = pointSize<8>(font());
 		f.setBold(true);
 		int title_w = QFontMetrics(f).boundingRect(m_title).width();
-		if (title_w > textBound.width())
-		{
-			textBound.setWidth(title_w);
-		}
+		if (title_w > textBound.width()) { textBound.setWidth(title_w); }
 		textBound.setHeight(textBound.height() * 2 + 8);
 	}
-	if (m_pixmap.isNull() == false)
-	{
-		textBound.setWidth(textBound.width() + m_pixmap.width() + 10);
-	}
+	if (m_pixmap.isNull() == false) { textBound.setWidth(textBound.width() + m_pixmap.width() + 10); }
 	resize(textBound.width() + 5, textBound.height() + 2);
 	// move( QPoint( parentWidget()->width() + 5, 5 ) );
 	update();

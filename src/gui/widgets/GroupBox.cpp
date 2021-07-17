@@ -56,10 +56,7 @@ void GroupBox::modelChanged() { m_led->setModel(model()); }
 
 void GroupBox::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton)
-	{
-		model()->setValue(!model()->value());
-	}
+	if (_me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton) { model()->setValue(!model()->value()); }
 }
 
 void GroupBox::paintEvent(QPaintEvent* pe)

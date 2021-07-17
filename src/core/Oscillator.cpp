@@ -291,10 +291,7 @@ inline bool Oscillator::syncOk(float _osc_coeff)
 
 float Oscillator::syncInit(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _chnl)
 {
-	if (m_subOsc != NULL)
-	{
-		m_subOsc->update(_ab, _frames, _chnl);
-	}
+	if (m_subOsc != NULL) { m_subOsc->update(_ab, _frames, _chnl); }
 	recalcPhase();
 	return (m_freq * m_detuning);
 }
@@ -369,10 +366,7 @@ void Oscillator::updateSync(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_
 
 	for (fpp_t frame = 0; frame < _frames; ++frame)
 	{
-		if (m_subOsc->syncOk(sub_osc_coeff))
-		{
-			m_phase = m_phaseOffset;
-		}
+		if (m_subOsc->syncOk(sub_osc_coeff)) { m_phase = m_phaseOffset; }
 		_ab[frame][_chnl] = getSample<W>(m_phase) * m_volume;
 		m_phase += osc_coeff;
 	}

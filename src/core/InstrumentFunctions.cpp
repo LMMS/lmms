@@ -141,10 +141,7 @@ InstrumentFunctionNoteStacking::Chord::Chord(const char* n, const ChordSemiTones
 {
 	for (m_size = 0; m_size < MAX_CHORD_POLYPHONY; m_size++)
 	{
-		if (semi_tones[m_size] == -1)
-		{
-			break;
-		}
+		if (semi_tones[m_size] == -1) { break; }
 
 		m_semiTones[m_size] = semi_tones[m_size];
 	}
@@ -154,10 +151,7 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone(int8_t semi_tone) const
 {
 	for (int i = 0; i < size(); ++i)
 	{
-		if (semi_tone == m_semiTones[i])
-		{
-			return true;
-		}
+		if (semi_tone == m_semiTones[i]) { return true; }
 	}
 	return false;
 }
@@ -176,8 +170,7 @@ const InstrumentFunctionNoteStacking::Chord& InstrumentFunctionNoteStacking::Cho
 {
 	for (int i = 0; i < size(); i++)
 	{
-		if (at(i).getName() == name && is_scale == at(i).isScale())
-			return at(i);
+		if (at(i).getName() == name && is_scale == at(i).isScale()) return at(i);
 	}
 
 	static Chord empty;
@@ -226,10 +219,7 @@ void InstrumentFunctionNoteStacking::processNote(NotePlayHandle* _n)
 				const int sub_note_key = sub_note_key_base + (int)chord_table[selected_chord][i];
 				// maybe we're out of range -> let's get outta
 				// here!
-				if (sub_note_key > NumKeys)
-				{
-					break;
-				}
+				if (sub_note_key > NumKeys) { break; }
 				// create copy of base-note
 				Note note_copy(_n->length(), 0, sub_note_key, _n->getVolume(), _n->getPanning(), _n->detuning());
 
@@ -382,18 +372,12 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 
 		if (m_arpMissModel.value())
 		{
-			if (100 * ((float)rand() / (float)(RAND_MAX + 1.0f)) < m_arpMissModel.value())
-			{
-				dir = ArpDirRandom;
-			}
+			if (100 * ((float)rand() / (float)(RAND_MAX + 1.0f)) < m_arpMissModel.value()) { dir = ArpDirRandom; }
 		}
 
 		int cur_arp_idx = 0;
 		// process according to arpeggio-direction...
-		if (dir == ArpDirUp)
-		{
-			cur_arp_idx = (cur_frame / arp_frames) % range;
-		}
+		if (dir == ArpDirUp) { cur_arp_idx = (cur_frame / arp_frames) % range; }
 		else if (dir == ArpDirDown)
 		{
 			cur_arp_idx = range - (cur_frame / arp_frames) % range - 1;
@@ -407,10 +391,7 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 			cur_arp_idx = (cur_frame / arp_frames) % (range * 2 - 2);
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
-			if (cur_arp_idx >= range)
-			{
-				cur_arp_idx = range - cur_arp_idx % (range - 1) - 1;
-			}
+			if (cur_arp_idx >= range) { cur_arp_idx = range - cur_arp_idx % (range - 1) - 1; }
 		}
 		else if (dir == ArpDirDownAndUp && range > 1)
 		{
@@ -418,10 +399,7 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 			cur_arp_idx = (cur_frame / arp_frames) % (range * 2 - 2);
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
-			if (cur_arp_idx >= range)
-			{
-				cur_arp_idx = range - cur_arp_idx % (range - 1) - 1;
-			}
+			if (cur_arp_idx >= range) { cur_arp_idx = range - cur_arp_idx % (range - 1) - 1; }
 			// inverts direction
 			cur_arp_idx = range - cur_arp_idx - 1;
 		}
@@ -446,10 +424,7 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 			chord_table[selected_arp][cur_arp_idx % cur_chord_size];
 
 		// range-checking
-		if (sub_note_key >= NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns())
-		{
-			continue;
-		}
+		if (sub_note_key >= NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns()) { continue; }
 
 		// create new arp-note
 

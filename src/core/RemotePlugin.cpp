@@ -111,16 +111,10 @@ RemotePlugin::RemotePlugin()
 	sa.sun_path[length] = '\0';
 
 	m_server = socket(PF_LOCAL, SOCK_STREAM, 0);
-	if (m_server == -1)
-	{
-		qWarning("Unable to start the server.");
-	}
+	if (m_server == -1) { qWarning("Unable to start the server."); }
 	remove(path.constData());
 	int ret = bind(m_server, (struct sockaddr*)&sa, sizeof sa);
-	if (ret == -1 || listen(m_server, 1) == -1)
-	{
-		qWarning("Unable to start the server.");
-	}
+	if (ret == -1 || listen(m_server, 1) == -1) { qWarning("Unable to start the server."); }
 #endif
 
 	connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
@@ -158,10 +152,7 @@ RemotePlugin::~RemotePlugin()
 	}
 
 #ifndef SYNC_WITH_SHM_FIFO
-	if (close(m_server) == -1)
-	{
-		qWarning("Error freeing resources.");
-	}
+	if (close(m_server) == -1) { qWarning("Error freeing resources."); }
 	remove(m_socketFile.toUtf8().constData());
 #endif
 }
@@ -180,16 +171,10 @@ bool RemotePlugin::init(const QString& pluginExecutable, bool waitForInitDoneMsg
 #ifdef LMMS_BUILD_APPLE
 	// search current directory first
 	QString curDir = QCoreApplication::applicationDirPath() + "/" + pluginExecutable;
-	if (QFile(curDir).exists())
-	{
-		exec = curDir;
-	}
+	if (QFile(curDir).exists()) { exec = curDir; }
 #endif
 #ifdef LMMS_BUILD_WIN32
-	if (!exec.endsWith(".exe", Qt::CaseInsensitive))
-	{
-		exec += ".exe";
-	}
+	if (!exec.endsWith(".exe", Qt::CaseInsensitive)) { exec += ".exe"; }
 #endif
 
 	if (!QFile(exec).exists())
@@ -244,19 +229,13 @@ bool RemotePlugin::init(const QString& pluginExecutable, bool waitForInitDoneMsg
 
 	default:
 		m_socket = accept(m_server, NULL, NULL);
-		if (m_socket == -1)
-		{
-			qWarning("Unexpected socket error.");
-		}
+		if (m_socket == -1) { qWarning("Unexpected socket error."); }
 	}
 #endif
 
 	resizeSharedProcessingMemory();
 
-	if (waitForInitDoneMsg)
-	{
-		waitForInitDone();
-	}
+	if (waitForInitDoneMsg) { waitForInitDone(); }
 	unlock();
 
 	return failed();
@@ -268,10 +247,7 @@ bool RemotePlugin::process(const sampleFrame* _in_buf, sampleFrame* _out_buf)
 
 	if (m_failed || !isRunning())
 	{
-		if (_out_buf != NULL)
-		{
-			BufferManager::clear(_out_buf, frames);
-		}
+		if (_out_buf != NULL) { BufferManager::clear(_out_buf, frames); }
 		return false;
 	}
 
@@ -287,10 +263,7 @@ bool RemotePlugin::process(const sampleFrame* _in_buf, sampleFrame* _out_buf)
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if (_out_buf != NULL)
-		{
-			BufferManager::clear(_out_buf, frames);
-		}
+		if (_out_buf != NULL) { BufferManager::clear(_out_buf, frames); }
 		return false;
 	}
 
@@ -422,9 +395,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 
 	m_shm = (float*)m_shmObj.data();
 #else
-	while ((m_shmID = shmget(++shm_key, s, IPC_CREAT | IPC_EXCL | 0600)) == -1)
-	{
-	}
+	while ((m_shmID = shmget(++shm_key, s, IPC_CREAT | IPC_EXCL | 0600)) == -1) {}
 
 	m_shm = (float*)shmat(m_shmID, 0, 0);
 #endif
@@ -434,10 +405,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 
 void RemotePlugin::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-	if (exitStatus == QProcess::CrashExit)
-	{
-		qCritical() << "Remote plugin crashed";
-	}
+	if (exitStatus == QProcess::CrashExit) { qCritical() << "Remote plugin crashed"; }
 	else if (exitCode)
 	{
 		qCritical() << "Remote plugin exit code: " << exitCode;
@@ -499,10 +467,7 @@ bool RemotePlugin::processMessage(const message& _m)
 	default:
 		break;
 	}
-	if (reply)
-	{
-		sendMessage(reply_message);
-	}
+	if (reply) { sendMessage(reply_message); }
 	unlock();
 
 	return true;

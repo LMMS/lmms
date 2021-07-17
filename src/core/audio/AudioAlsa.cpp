@@ -83,8 +83,7 @@ AudioAlsa::AudioAlsa(bool& _success_ful, Mixer* _mixer)
 	{
 		const int fd = (i >= count) ? ufds[0].fd + i : ufds[i].fd;
 		int oldflags = fcntl(fd, F_GETFD, 0);
-		if (oldflags < 0)
-			continue;
+		if (oldflags < 0) continue;
 		oldflags |= FD_CLOEXEC;
 		fcntl(fd, F_SETFD, oldflags);
 	}
@@ -95,20 +94,11 @@ AudioAlsa::AudioAlsa(bool& _success_ful, Mixer* _mixer)
 AudioAlsa::~AudioAlsa()
 {
 	stopProcessing();
-	if (m_handle != NULL)
-	{
-		snd_pcm_close(m_handle);
-	}
+	if (m_handle != NULL) { snd_pcm_close(m_handle); }
 
-	if (m_hwParams != NULL)
-	{
-		snd_pcm_hw_params_free(m_hwParams);
-	}
+	if (m_hwParams != NULL) { snd_pcm_hw_params_free(m_hwParams); }
 
-	if (m_swParams != NULL)
-	{
-		snd_pcm_sw_params_free(m_swParams);
-	}
+	if (m_swParams != NULL) { snd_pcm_sw_params_free(m_swParams); }
 }
 
 QString AudioAlsa::probeDevice()
@@ -116,10 +106,7 @@ QString AudioAlsa::probeDevice()
 	QString dev = ConfigManager::inst()->value("audioalsa", "device");
 	if (dev == "")
 	{
-		if (getenv("AUDIODEV") != NULL)
-		{
-			return getenv("AUDIODEV");
-		}
+		if (getenv("AUDIODEV") != NULL) { return getenv("AUDIODEV"); }
 		return "default";
 	}
 	return dev;
@@ -147,10 +134,7 @@ AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
 
 	/* Enumerate sound devices */
 	int err = snd_device_name_hint(-1, "pcm", (void***)&hints);
-	if (err != 0)
-	{
-		return deviceInfos;
-	}
+	if (err != 0) { return deviceInfos; }
 
 	char** n = hints;
 	while (*n != NULL)
@@ -158,10 +142,7 @@ AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
 		char* name = snd_device_name_get_hint(*n, "NAME");
 		char* description = snd_device_name_get_hint(*n, "DESC");
 
-		if (name != 0 && description != 0)
-		{
-			deviceInfos.push_back(DeviceInfo(QString(name), QString(description)));
-		}
+		if (name != 0 && description != 0) { deviceInfos.push_back(DeviceInfo(QString(name), QString(description))); }
 
 		free(name);
 		free(description);
@@ -212,10 +193,7 @@ int AudioAlsa::handleError(int _err)
 
 void AudioAlsa::startProcessing()
 {
-	if (!isRunning())
-	{
-		start(QThread::HighPriority);
-	}
+	if (!isRunning()) { start(QThread::HighPriority); }
 }
 
 void AudioAlsa::stopProcessing() { stopProcessingThread(this); }
@@ -226,10 +204,7 @@ void AudioAlsa::applyQualitySettings()
 	{
 		setSampleRate(Engine::mixer()->processingSampleRate());
 
-		if (m_handle != NULL)
-		{
-			snd_pcm_close(m_handle);
-		}
+		if (m_handle != NULL) { snd_pcm_close(m_handle); }
 
 		int err;
 		if ((err = snd_pcm_open(&m_handle, probeDevice().toLatin1().constData(), SND_PCM_STREAM_PLAYBACK, 0)) < 0)
@@ -299,17 +274,11 @@ void AudioAlsa::run()
 		{
 			int err = snd_pcm_writei(m_handle, ptr, frames);
 
-			if (err == -EAGAIN)
-			{
-				continue;
-			}
+			if (err == -EAGAIN) { continue; }
 
 			if (err < 0)
 			{
-				if (handleError(err) < 0)
-				{
-					printf("Write error: %s\n", snd_strerror(err));
-				}
+				if (handleError(err) < 0) { printf("Write error: %s\n", snd_strerror(err)); }
 				break; // skip this buffer
 			}
 			ptr += err * channels();
@@ -389,10 +358,7 @@ int AudioAlsa::setHWParams(const ch_cnt_t _channels, snd_pcm_access_t _access)
 	}
 	dir = 0;
 	err = snd_pcm_hw_params_get_period_size(m_hwParams, &m_periodSize, &dir);
-	if (err < 0)
-	{
-		printf("Unable to get period size for playback: %s\n", snd_strerror(err));
-	}
+	if (err < 0) { printf("Unable to get period size for playback: %s\n", snd_strerror(err)); }
 
 	dir = 0;
 	err = snd_pcm_hw_params_set_buffer_size_near(m_handle, m_hwParams, &m_bufferSize);

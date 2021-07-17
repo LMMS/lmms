@@ -288,10 +288,7 @@ void VectorView::paintEvent(QPaintEvent* event)
 void VectorView::periodicUpdate()
 {
 	m_visible = isVisible();
-	if (m_visible)
-	{
-		update();
-	}
+	if (m_visible) { update(); }
 }
 
 // Allow to change color on double-click.
@@ -299,10 +296,7 @@ void VectorView::periodicUpdate()
 void VectorView::mouseDoubleClickEvent(QMouseEvent* event)
 {
 	ColorChooser* colorDialog = new ColorChooser(m_controls->m_colorFG, this);
-	if (colorDialog->exec())
-	{
-		m_controls->m_colorFG = colorDialog->currentColor();
-	}
+	if (colorDialog->exec()) { m_controls->m_colorFG = colorDialog->currentColor(); }
 }
 
 // Change zoom level using the mouse wheel

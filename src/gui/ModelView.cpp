@@ -34,20 +34,14 @@ ModelView::ModelView(Model* model, QWidget* widget)
 
 ModelView::~ModelView()
 {
-	if (m_model != NULL && m_model->isDefaultConstructed())
-	{
-		delete m_model;
-	}
+	if (m_model != NULL && m_model->isDefaultConstructed()) { delete m_model; }
 }
 
 void ModelView::setModel(Model* model, bool isOldModelValid)
 {
 	if (isOldModelValid && m_model != NULL)
 	{
-		if (m_model->isDefaultConstructed())
-		{
-			delete m_model;
-		}
+		if (m_model->isDefaultConstructed()) { delete m_model; }
 		else
 		{
 			m_model->disconnect(widget());

@@ -144,10 +144,7 @@ public:
 
 	void setPlaying(bool playing)
 	{
-		if (m_isPlaying != playing)
-		{
-			emit playingChanged();
-		}
+		if (m_isPlaying != playing) { emit playingChanged(); }
 		m_isPlaying = playing;
 	}
 

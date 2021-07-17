@@ -115,20 +115,11 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	m_lp480.setParameters(sampleRate, lpFreq, lpRes, 1);
 	m_lp481.setParameters(sampleRate, lpFreq, lpRes, 1);
 
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 
-	if (m_eqControls.m_outGainModel.isValueChanged())
-	{
-		m_outGain = dbfsToAmp(m_eqControls.m_outGainModel.value());
-	}
+	if (m_eqControls.m_outGainModel.isValueChanged()) { m_outGain = dbfsToAmp(m_eqControls.m_outGainModel.value()); }
 
-	if (m_eqControls.m_inGainModel.isValueChanged())
-	{
-		m_inGain = dbfsToAmp(m_eqControls.m_inGainModel.value());
-	}
+	if (m_eqControls.m_inGainModel.isValueChanged()) { m_inGain = dbfsToAmp(m_eqControls.m_inGainModel.value()); }
 
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;

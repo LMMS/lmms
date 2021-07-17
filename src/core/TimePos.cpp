@@ -108,10 +108,7 @@ tick_t TimePos::getTickWithinBeat(const TimeSig& sig) const { return getTickWith
 
 f_cnt_t TimePos::frames(const float framesPerTick) const
 {
-	if (m_ticks >= 0)
-	{
-		return static_cast<f_cnt_t>(m_ticks * framesPerTick);
-	}
+	if (m_ticks >= 0) { return static_cast<f_cnt_t>(m_ticks * framesPerTick); }
 	return 0;
 }
 

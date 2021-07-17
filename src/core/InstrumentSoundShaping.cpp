@@ -60,10 +60,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(InstrumentTrack* _instrument_trac
 	for (int i = 0; i < NumTargets; ++i)
 	{
 		float value_for_zero_amount = 0.0;
-		if (i == Volume)
-		{
-			value_for_zero_amount = 1.0;
-		}
+		if (i == Volume) { value_for_zero_amount = 1.0; }
 		m_envLfoParameters[i] = new EnvelopeAndLfoParameters(value_for_zero_amount, this);
 		m_envLfoParameters[i]->setDisplayName(tr(targetNames[i][2]));
 	}
@@ -98,10 +95,7 @@ float InstrumentSoundShaping::volumeLevel(NotePlayHandle* n, const f_cnt_t frame
 {
 	f_cnt_t envReleaseBegin = frame - n->releaseFramesDone() + n->framesBeforeRelease();
 
-	if (n->isReleased() == false)
-	{
-		envReleaseBegin += Engine::mixer()->framesPerPeriod();
-	}
+	if (n->isReleased() == false) { envReleaseBegin += Engine::mixer()->framesPerPeriod(); }
 
 	float level;
 	m_envLfoParameters[Volume]->fillLevel(&level, frame, envReleaseBegin, 1);
@@ -266,29 +260,17 @@ f_cnt_t InstrumentSoundShaping::envFrames(const bool _only_vol) const
 
 f_cnt_t InstrumentSoundShaping::releaseFrames() const
 {
-	if (!m_instrumentTrack->instrument())
-	{
-		return 0;
-	}
+	if (!m_instrumentTrack->instrument()) { return 0; }
 
 	f_cnt_t ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
 
-	if (m_instrumentTrack->instrument()->flags().testFlag(Instrument::IsSingleStreamed))
-	{
-		return ret_val;
-	}
+	if (m_instrumentTrack->instrument()->flags().testFlag(Instrument::IsSingleStreamed)) { return ret_val; }
 
-	if (m_envLfoParameters[Volume]->isUsed())
-	{
-		return m_envLfoParameters[Volume]->releaseFrames();
-	}
+	if (m_envLfoParameters[Volume]->isUsed()) { return m_envLfoParameters[Volume]->releaseFrames(); }
 
 	for (int i = Volume + 1; i < NumTargets; ++i)
 	{
-		if (m_envLfoParameters[i]->isUsed())
-		{
-			ret_val = qMax(ret_val, m_envLfoParameters[i]->releaseFrames());
-		}
+		if (m_envLfoParameters[i]->isUsed()) { ret_val = qMax(ret_val, m_envLfoParameters[i]->releaseFrames()); }
 	}
 	return ret_val;
 }

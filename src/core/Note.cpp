@@ -43,10 +43,7 @@ Note::Note(
 	, m_pos(pos)
 	, m_detuning(NULL)
 {
-	if (detuning)
-	{
-		m_detuning = sharedObject::ref(detuning);
-	}
+	if (detuning) { m_detuning = sharedObject::ref(detuning); }
 	else
 	{
 		createDetuning();
@@ -67,18 +64,12 @@ Note::Note(const Note& note)
 	, m_pos(note.m_pos)
 	, m_detuning(NULL)
 {
-	if (note.m_detuning)
-	{
-		m_detuning = sharedObject::ref(note.m_detuning);
-	}
+	if (note.m_detuning) { m_detuning = sharedObject::ref(note.m_detuning); }
 }
 
 Note::~Note()
 {
-	if (m_detuning)
-	{
-		sharedObject::unref(m_detuning);
-	}
+	if (m_detuning) { sharedObject::unref(m_detuning); }
 }
 
 void Note::setLength(const TimePos& length) { m_length = length; }
@@ -106,20 +97,14 @@ void Note::setPanning(panning_t panning)
 TimePos Note::quantized(const TimePos& m, const int qGrid)
 {
 	float p = ((float)m / qGrid);
-	if (p - floorf(p) < 0.5f)
-	{
-		return static_cast<int>(p) * qGrid;
-	}
+	if (p - floorf(p) < 0.5f) { return static_cast<int>(p) * qGrid; }
 	return static_cast<int>(p + 1) * qGrid;
 }
 
 void Note::quantizeLength(const int qGrid)
 {
 	setLength(quantized(length(), qGrid));
-	if (length() == 0)
-	{
-		setLength(qGrid);
-	}
+	if (length() == 0) { setLength(qGrid); }
 }
 
 void Note::quantizePos(const int qGrid) { setPos(quantized(pos(), qGrid)); }
@@ -132,10 +117,7 @@ void Note::saveSettings(QDomDocument& doc, QDomElement& parent)
 	parent.setAttribute("len", m_length);
 	parent.setAttribute("pos", m_pos);
 
-	if (m_detuning && m_length)
-	{
-		m_detuning->saveSettings(doc, parent);
-	}
+	if (m_detuning && m_length) { m_detuning->saveSettings(doc, parent); }
 }
 
 void Note::loadSettings(const QDomElement& _this)

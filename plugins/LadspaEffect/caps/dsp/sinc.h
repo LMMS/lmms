@@ -46,8 +46,7 @@ inline void sinc(double omega, sample_t* s, int n)
 	{
 		double sin_phi = sine.get();
 
-		if (fabs(phi) < 0.000000001)
-			s[i] = 1.;
+		if (fabs(phi) < 0.000000001) s[i] = 1.;
 		else
 			s[i] = sin_phi / phi;
 	}

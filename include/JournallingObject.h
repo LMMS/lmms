@@ -46,10 +46,7 @@ public:
 
 	void restoreJournallingState()
 	{
-		if (!isJournallingStateStackEmpty())
-		{
-			m_journalling = m_journallingStateStack.pop();
-		}
+		if (!isJournallingStateStackEmpty()) { m_journalling = m_journallingStateStack.pop(); }
 	}
 
 	void addJournalCheckPoint();

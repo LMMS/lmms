@@ -67,10 +67,7 @@ void LcdWidget::setValue(int value)
 	if (s.isEmpty())
 	{
 		s = QString::number(value);
-		if (m_leadingZero)
-		{
-			s = s.rightJustified(m_numDigits, '0');
-		}
+		if (m_leadingZero) { s = s.rightJustified(m_numDigits, '0'); }
 	}
 
 	m_display = s;
@@ -101,10 +98,7 @@ void LcdWidget::paintEvent(QPaintEvent*)
 	p.save();
 
 	// Don't skip any space and don't draw margin on the left side in seamless mode
-	if (m_seamlessLeft)
-	{
-		p.translate(0, margin);
-	}
+	if (m_seamlessLeft) { p.translate(0, margin); }
 	else
 	{
 		p.translate(margin, margin);
@@ -128,8 +122,7 @@ void LcdWidget::paintEvent(QPaintEvent*)
 		int val = m_display[i].digitValue();
 		if (val < 0)
 		{
-			if (m_display[i] == '-')
-				val = 11;
+			if (m_display[i] == '-') val = 11;
 			else
 				val = 10;
 		}

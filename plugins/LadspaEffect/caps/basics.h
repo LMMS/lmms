@@ -112,10 +112,8 @@ template <class X, class Y> X max(X x, Y y) { return x > y ? x : (X)y; }
 
 template <class T> T clamp(T value, T lower, T upper)
 {
-	if (value < lower)
-		return lower;
-	if (value > upper)
-		return upper;
+	if (value < lower) return lower;
+	if (value > upper) return upper;
 	return value;
 }
 

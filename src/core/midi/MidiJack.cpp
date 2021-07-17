@@ -41,8 +41,7 @@ static int JackMidiProcessCallback(jack_nframes_t nframes, void* arg)
 {
 	MidiJack* jmd = (MidiJack*)arg;
 
-	if (nframes <= 0)
-		return (0);
+	if (nframes <= 0) return (0);
 
 	jmd->JackMidiRead(nframes);
 	jmd->JackMidiWrite(nframes);
@@ -121,10 +120,7 @@ MidiJack::~MidiJack()
 			m_jackAudio->removeMidiClient();
 		}
 
-		if (jack_port_unregister(jackClient(), m_input_port) != 0)
-		{
-			printf("Failed to unregister jack midi input\n");
-		}
+		if (jack_port_unregister(jackClient(), m_input_port) != 0) { printf("Failed to unregister jack midi input\n"); }
 
 		/* Unused yet, see the corresponding jack_port_register call
 		if( jack_port_unregister( jackClient(), m_output_port) != 0){
@@ -135,15 +131,9 @@ MidiJack::~MidiJack()
 		if (m_jackClient)
 		{
 			// an m_jackClient means we are handling the jack connection
-			if (jack_deactivate(m_jackClient) != 0)
-			{
-				printf("Failed to deactivate jack midi client\n");
-			}
+			if (jack_deactivate(m_jackClient) != 0) { printf("Failed to deactivate jack midi client\n"); }
 
-			if (jack_client_close(m_jackClient) != 0)
-			{
-				printf("Failed close jack midi client\n");
-			}
+			if (jack_client_close(m_jackClient) != 0) { printf("Failed close jack midi client\n"); }
 		}
 	}
 	if (isRunning())
@@ -156,11 +146,9 @@ MidiJack::~MidiJack()
 
 jack_client_t* MidiJack::jackClient()
 {
-	if (m_jackAudio == NULL && m_jackClient == NULL)
-		return NULL;
+	if (m_jackAudio == NULL && m_jackClient == NULL) return NULL;
 
-	if (m_jackAudio == NULL && m_jackClient)
-		return m_jackClient;
+	if (m_jackAudio == NULL && m_jackClient) return m_jackClient;
 
 	return m_jackAudio->jackClient();
 }
@@ -168,10 +156,7 @@ jack_client_t* MidiJack::jackClient()
 QString MidiJack::probeDevice()
 {
 	QString jid = ConfigManager::inst()->value("midijack", "lmms");
-	if (jid.isEmpty())
-	{
-		return "lmms";
-	}
+	if (jid.isEmpty()) { return "lmms"; }
 	return jid;
 }
 
@@ -197,8 +182,7 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 					parseData(*(in_event.buffer + b));
 
 				event_index++;
-				if (event_index < event_count)
-					jack_midi_event_get(&in_event, port_buf, event_index);
+				if (event_index < event_count) jack_midi_event_get(&in_event, port_buf, event_index);
 			}
 		}
 	}

@@ -111,8 +111,5 @@ void AudioFileWave::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _fra
 
 void AudioFileWave::finishEncoding()
 {
-	if (m_sf)
-	{
-		sf_close(m_sf);
-	}
+	if (m_sf) { sf_close(m_sf); }
 }

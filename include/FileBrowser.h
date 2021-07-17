@@ -144,14 +144,8 @@ public:
 
 	inline QString fullName(QString path = QString())
 	{
-		if (path.isEmpty())
-		{
-			path = m_directories[0];
-		}
-		if (!path.isEmpty())
-		{
-			path += QDir::separator();
-		}
+		if (path.isEmpty()) { path = m_directories[0]; }
+		if (!path.isEmpty()) { path += QDir::separator(); }
 		return (QDir::cleanPath(path + text(0)) + QDir::separator());
 	}
 

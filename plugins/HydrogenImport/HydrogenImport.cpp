@@ -63,10 +63,7 @@ public:
 		}
 		int nOctave = sOct.toInt();
 
-		if (sKey == "C")
-		{
-			m_key = NoteKey::C;
-		}
+		if (sKey == "C") { m_key = NoteKey::C; }
 		else if (sKey == "Cs")
 		{
 			m_key = NoteKey::Cs;
@@ -178,18 +175,12 @@ bool HydrogenImport::readSong()
 			}
 			QDomNode filenameNode = instrumentNode.firstChildElement("filename");
 
-			if (!filenameNode.isNull())
-			{
-				return false;
-			}
+			if (!filenameNode.isNull()) { return false; }
 			else
 			{
 				unsigned nLayer = 0;
 				QDomNode instrumentComponentNode = instrumentNode.firstChildElement("instrumentComponent");
-				if (instrumentComponentNode.isNull())
-				{
-					instrumentComponentNode = instrumentNode;
-				}
+				if (instrumentComponentNode.isNull()) { instrumentComponentNode = instrumentNode; }
 
 				QDomNode layerNode = instrumentComponentNode.firstChildElement("layer");
 				while (!layerNode.isNull())
@@ -218,10 +209,7 @@ bool HydrogenImport::readSong()
 
 			instrumentNode = (QDomNode)instrumentNode.nextSiblingElement("instrument");
 		}
-		if (instrumentList_count == 0)
-		{
-			return false;
-		}
+		if (instrumentList_count == 0) { return false; }
 	}
 	else
 	{
@@ -267,10 +255,7 @@ bool HydrogenImport::readSong()
 				Pattern* p = dynamic_cast<Pattern*>(drum_track[instrId]->getTCO(i));
 				Note n;
 				n.setPos(nPosition);
-				if ((nPosition + 48) <= nSize)
-				{
-					n.setLength(48);
-				}
+				if ((nPosition + 48) <= nSize) { n.setLength(48); }
 				else
 				{
 					n.setLength(nSize - nPosition);
@@ -302,27 +287,18 @@ bool HydrogenImport::readSong()
 			Track* t = (BBTrack*)s->tracks().at(i);
 			t->createTCO(pos);
 
-			if (pattern_length[patId] > best_length)
-			{
-				best_length = pattern_length[patId];
-			}
+			if (pattern_length[patId] > best_length) { best_length = pattern_length[patId]; }
 		}
 		pos = pos + best_length;
 		groupNode = groupNode.nextSiblingElement("group");
 	}
 
-	if (pattern_count == 0)
-	{
-		return false;
-	}
+	if (pattern_count == 0) { return false; }
 	return true;
 }
 bool HydrogenImport::tryImport(TrackContainer* tc)
 {
-	if (openFile() == false)
-	{
-		return false;
-	}
+	if (openFile() == false) { return false; }
 	return readSong();
 }
 

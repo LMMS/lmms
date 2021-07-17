@@ -78,10 +78,7 @@ public:
 
 	virtual QPixmap pixmap() const
 	{
-		if (!m_name.isEmpty())
-		{
-			return (embed::getIconPixmap(m_name.toLatin1().constData(), -1, -1, m_xpm));
-		}
+		if (!m_name.isEmpty()) { return (embed::getIconPixmap(m_name.toLatin1().constData(), -1, -1, m_xpm)); }
 		return (QPixmap());
 	}
 
@@ -105,10 +102,7 @@ public:
 
 	virtual QPixmap pixmap() const
 	{
-		if (!m_name.isEmpty())
-		{
-			return (PLUGIN_NAME::getIconPixmap(m_name.toLatin1().constData()));
-		}
+		if (!m_name.isEmpty()) { return (PLUGIN_NAME::getIconPixmap(m_name.toLatin1().constData())); }
 		return (QPixmap());
 	}
 

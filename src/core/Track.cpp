@@ -131,10 +131,7 @@ Track* Track::create(TrackTypes tt, TrackContainer* tc)
 		break;
 	}
 
-	if (tc == Engine::getBBTrackContainer() && t)
-	{
-		t->createTCOsForBB(Engine::getBBTrackContainer()->numOfBBs() - 1);
-	}
+	if (tc == Engine::getBBTrackContainer() && t) { t->createTCOsForBB(Engine::getBBTrackContainer()->numOfBBs() - 1); }
 
 	tc->updateAfterTrackAdd();
 
@@ -153,10 +150,7 @@ Track* Track::create(const QDomElement& element, TrackContainer* tc)
 	Engine::mixer()->requestChangeInModel();
 
 	Track* t = create(static_cast<TrackTypes>(element.attribute("type").toInt()), tc);
-	if (t != NULL)
-	{
-		t->restoreState(element);
-	}
+	if (t != NULL) { t->restoreState(element); }
 
 	Engine::mixer()->doneChangeInModel();
 
@@ -190,10 +184,7 @@ Track* Track::clone()
  */
 void Track::saveSettings(QDomDocument& doc, QDomElement& element)
 {
-	if (!m_simpleSerializingMode)
-	{
-		element.setTagName("track");
-	}
+	if (!m_simpleSerializingMode) { element.setTagName("track"); }
 	element.setAttribute("type", type());
 	element.setAttribute("name", name());
 	m_mutedModel.saveSettings(doc, element, "muted");
@@ -201,15 +192,9 @@ void Track::saveSettings(QDomDocument& doc, QDomElement& element)
 	// Save the mutedBeforeSolo value so we can recover the muted state if any solo was active (issue 5562)
 	element.setAttribute("mutedBeforeSolo", int(m_mutedBeforeSolo));
 
-	if (m_height >= MINIMAL_TRACK_HEIGHT)
-	{
-		element.setAttribute("trackheight", m_height);
-	}
+	if (m_height >= MINIMAL_TRACK_HEIGHT) { element.setAttribute("trackheight", m_height); }
 
-	if (m_hasColor)
-	{
-		element.setAttribute("color", m_color.name());
-	}
+	if (m_hasColor) { element.setAttribute("color", m_color.name()); }
 
 	QDomElement tsDe = doc.createElement(nodeName());
 	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
@@ -292,10 +277,7 @@ void Track::loadSettings(const QDomElement& element)
 	{
 		if (node.isElement())
 		{
-			if (node.nodeName() == nodeName())
-			{
-				loadTrackSpecificSettings(node.toElement());
-			}
+			if (node.nodeName() == nodeName()) { loadTrackSpecificSettings(node.toElement()); }
 			else if (node.nodeName() != "muted" && node.nodeName() != "solo" &&
 				!node.toElement().attribute("metadata").toInt())
 			{
@@ -307,10 +289,7 @@ void Track::loadSettings(const QDomElement& element)
 	}
 
 	int storedHeight = element.attribute("trackheight").toInt();
-	if (storedHeight >= MINIMAL_TRACK_HEIGHT)
-	{
-		m_height = storedHeight;
-	}
+	if (storedHeight >= MINIMAL_TRACK_HEIGHT) { m_height = storedHeight; }
 }
 
 /*! \brief Add another TrackContentObject into this track
@@ -373,10 +352,7 @@ int Track::numOfTCOs() { return m_trackContentObjects.size(); }
  */
 TrackContentObject* Track::getTCO(int tcoNum)
 {
-	if (tcoNum < m_trackContentObjects.size())
-	{
-		return m_trackContentObjects[tcoNum];
-	}
+	if (tcoNum < m_trackContentObjects.size()) { return m_trackContentObjects[tcoNum]; }
 	printf("called Track::getTCO( %d ), "
 		   "but TCO %d doesn't exist\n",
 		tcoNum, tcoNum);
@@ -471,10 +447,7 @@ void Track::insertBar(const TimePos& pos)
 	// one bar
 	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
 	{
-		if ((*it)->startPosition() >= pos)
-		{
-			(*it)->movePosition((*it)->startPosition() + TimePos::ticksPerBar());
-		}
+		if ((*it)->startPosition() >= pos) { (*it)->movePosition((*it)->startPosition() + TimePos::ticksPerBar()); }
 	}
 }
 
@@ -488,10 +461,7 @@ void Track::removeBar(const TimePos& pos)
 	// one bar
 	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
 	{
-		if ((*it)->startPosition() >= pos)
-		{
-			(*it)->movePosition((*it)->startPosition() - TimePos::ticksPerBar());
-		}
+		if ((*it)->startPosition() >= pos) { (*it)->movePosition((*it)->startPosition() - TimePos::ticksPerBar()); }
 	}
 }
 
@@ -507,16 +477,10 @@ bar_t Track::length() const
 	tick_t last = 0;
 	for (tcoVector::const_iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
 	{
-		if (Engine::getSong()->isExporting() && (*it)->isMuted())
-		{
-			continue;
-		}
+		if (Engine::getSong()->isExporting() && (*it)->isMuted()) { continue; }
 
 		const tick_t cur = (*it)->endPosition();
-		if (cur > last)
-		{
-			last = cur;
-		}
+		if (cur > last) { last = cur; }
 	}
 
 	return last / TimePos::ticksPerBar();
@@ -554,32 +518,20 @@ void Track::toggleSolo()
 		if (solo)
 		{
 			// save mute-state in case no track was solo before
-			if (!soloBefore)
-			{
-				(*it)->m_mutedBeforeSolo = (*it)->isMuted();
-			}
+			if (!soloBefore) { (*it)->m_mutedBeforeSolo = (*it)->isMuted(); }
 			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
-			if (*it == this)
-			{
-				(*it)->setMuted(false);
-			}
+			if (*it == this) { (*it)->setMuted(false); }
 			else if (soloLegacyBehavior || (*it)->type() != AutomationTrack)
 			{
 				(*it)->setMuted(true);
 			}
-			if (*it != this)
-			{
-				(*it)->m_soloModel.setValue(false);
-			}
+			if (*it != this) { (*it)->m_soloModel.setValue(false); }
 		}
 		else if (!soloBefore)
 		{
 			// Unless we are on the sololegacybehavior mode, only restores the
 			// mute state if the track isn't an Automation Track
-			if (soloLegacyBehavior || (*it)->type() != AutomationTrack)
-			{
-				(*it)->setMuted((*it)->m_mutedBeforeSolo);
-			}
+			if (soloLegacyBehavior || (*it)->type() != AutomationTrack) { (*it)->setMuted((*it)->m_mutedBeforeSolo); }
 		}
 	}
 }

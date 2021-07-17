@@ -46,12 +46,10 @@ f_cnt_t Instrument::beatLen(NotePlayHandle*) const { return (0); }
 Instrument* Instrument::instantiate(const QString& _plugin_name, InstrumentTrack* _instrument_track,
 	const Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd)
 {
-	if (keyFromDnd)
-		Q_ASSERT(!key);
+	if (keyFromDnd) Q_ASSERT(!key);
 	// copy from above // TODO! common cleaner func
 	Plugin* p = Plugin::instantiateWithKey(_plugin_name, _instrument_track, key, keyFromDnd);
-	if (dynamic_cast<Instrument*>(p))
-		return dynamic_cast<Instrument*>(p);
+	if (dynamic_cast<Instrument*>(p)) return dynamic_cast<Instrument*>(p);
 	delete p;
 	return (new DummyInstrument(_instrument_track));
 }
@@ -75,10 +73,7 @@ static int countZeroCrossings(sampleFrame* buf, fpp_t start, fpp_t frames)
 			if ((buf[f - 1][ch] <= 0.0 && buf[f][ch] > 0.0) || (buf[f - 1][ch] >= 0.0 && buf[f][ch] < 0.0))
 			{
 				++zeroCrossings[ch];
-				if (zeroCrossings[ch] > maxZeroCrossings)
-				{
-					maxZeroCrossings = zeroCrossings[ch];
-				}
+				if (zeroCrossings[ch] > maxZeroCrossings) { maxZeroCrossings = zeroCrossings[ch]; }
 			}
 		}
 	}

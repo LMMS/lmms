@@ -109,10 +109,7 @@ void SaSpectrumView::paintEvent(QPaintEvent* event)
 	}
 
 	// generate freeze request or clear "frozen" status based on freeze button
-	if (!m_frozen && m_controls->m_refFreezeModel.value())
-	{
-		m_freezeRequest = true;
-	}
+	if (!m_frozen && m_controls->m_refFreezeModel.value()) { m_freezeRequest = true; }
 	else if (!m_controls->m_refFreezeModel.value())
 	{
 		m_frozen = false;
@@ -298,16 +295,10 @@ void SaSpectrumView::updateBuffers(const float* spectrum, float* displayBuffer, 
 		// Update peak-hold and reference freeze data (using a shared curve).
 		// Peak hold and freeze can be combined: decay only if not frozen.
 		// Ref. freeze operates on the (possibly averaged) display buffer.
-		if (m_controls->m_refFreezeModel.value() && m_freezeRequest)
-		{
-			peakBuffer[n] = displayBuffer[n];
-		}
+		if (m_controls->m_refFreezeModel.value() && m_freezeRequest) { peakBuffer[n] = displayBuffer[n]; }
 		else if (m_controls->m_peakHoldModel.value() && !m_controls->m_pauseModel.value())
 		{
-			if (spectrum[n] > peakBuffer[n])
-			{
-				peakBuffer[n] = spectrum[n];
-			}
+			if (spectrum[n] > peakBuffer[n]) { peakBuffer[n] = spectrum[n]; }
 			else if (!m_controls->m_refFreezeModel.value())
 			{
 				peakBuffer[n] = peakBuffer[n] * m_controls->m_peakDecayFactorModel.value();
@@ -399,10 +390,7 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 	painter.fillRect(m_displayLeft, m_displayTop, m_displayWidth, m_displayBottom, m_controls->m_colorBG);
 
 	// select logarithmic or linear frequency grid and draw it
-	if (m_controls->m_logXModel.value())
-	{
-		freqTics = &m_logFreqTics;
-	}
+	if (m_controls->m_logXModel.value()) { freqTics = &m_logFreqTics; }
 	else
 	{
 		freqTics = &m_linearFreqTics;
@@ -439,10 +427,7 @@ void SaSpectrumView::drawGrid(QPainter& painter)
 
 	margin = 2;
 	// select logarithmic or linear amplitude grid and draw it
-	if (m_controls->m_logYModel.value())
-	{
-		ampTics = &m_logAmpTics;
-	}
+	if (m_controls->m_logYModel.value()) { ampTics = &m_logAmpTics; }
 	else
 	{
 		ampTics = &m_linearAmpTics;
@@ -586,10 +571,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 			// insert a label from sparse series if it falls within bounds
 			if (i * a[j] >= low && i * a[j] <= high)
 			{
-				if (i * a[j] < 1000)
-				{
-					result.emplace_back(i * a[j], std::to_string(i * a[j]));
-				}
+				if (i * a[j] < 1000) { result.emplace_back(i * a[j], std::to_string(i * a[j])); }
 				else
 				{
 					result.emplace_back(i * a[j], std::to_string(i * a[j] / 1000) + "k");
@@ -598,10 +580,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLogFreqTics(int low
 			// also insert denser series if high and low values are close
 			if ((log10(high) - log10(low) < 2) && (i * b[j] >= low && i * b[j] <= high))
 			{
-				if (i * b[j] < 1500)
-				{
-					result.emplace_back(i * b[j], std::to_string(i * b[j]));
-				}
+				if (i * b[j] < 1500) { result.emplace_back(i * b[j], std::to_string(i * b[j])); }
 				else
 				{
 					result.emplace_back(i * b[j], std::to_string(i * b[j] / 1000) + "k");
@@ -620,10 +599,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 	int i, increment;
 
 	// select a suitable increment based on zoom level
-	if (high - low < 500)
-	{
-		increment = 50;
-	}
+	if (high - low < 500) { increment = 50; }
 	else if (high - low < 1000)
 	{
 		increment = 100;
@@ -642,10 +618,7 @@ std::vector<std::pair<int, std::string>> SaSpectrumView::makeLinearFreqTics(int 
 	{
 		if (i >= low)
 		{
-			if (i < 1000)
-			{
-				result.emplace_back(i, std::to_string(i));
-			}
+			if (i < 1000) { result.emplace_back(i, std::to_string(i)); }
 			else
 			{
 				result.emplace_back(i, std::to_string(i / 1000) + "k");
@@ -683,10 +656,7 @@ std::vector<std::pair<float, std::string>> SaSpectrumView::makeLogAmpTics(int lo
 	// just a little bit to make sure float comparisons do not miss edges.
 	for (i = 0.000000001; 10 * log10(i) <= (high + 0.001); i *= increment)
 	{
-		if (10 * log10(i) >= (low - 0.001))
-		{
-			result.emplace_back(i, std::to_string((int)std::round(10 * log10(i))));
-		}
+		if (10 * log10(i) >= (low - 0.001)) { result.emplace_back(i, std::to_string((int)std::round(10 * log10(i)))); }
 	}
 	return result;
 }

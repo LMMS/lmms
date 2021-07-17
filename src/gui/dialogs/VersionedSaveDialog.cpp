@@ -86,14 +86,12 @@ bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool incremen
 	int idx = regexp.indexIn(fileName);
 	// For file names without extension (no ".mmpz")
 	int insertIndex = fileName.lastIndexOf('.');
-	if (insertIndex < idx + 1)
-		insertIndex = fileName.size();
+	if (insertIndex < idx + 1) insertIndex = fileName.size();
 
 	if (idx == -1)
 	{
 		// Can't decrement if there is no version number
-		if (increment == false)
-			return false;
+		if (increment == false) return false;
 		else
 			fileName.insert(insertIndex, "-01");
 	}
@@ -106,8 +104,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool incremen
 		Q_ASSERT(ok);
 
 		// Can't decrement 0
-		if (!increment && version == 0)
-			return false;
+		if (!increment && version == 0) return false;
 		// Replace version number
 		version = increment ? version + 1 : version - 1;
 		QString newnumber = QString("%1").arg(version, 2, 10, QChar('0'));
@@ -120,8 +117,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool incremen
 void VersionedSaveDialog::incrementVersion()
 {
 	const QStringList& selected = selectedFiles();
-	if (selected.size() != 1)
-		return;
+	if (selected.size() != 1) return;
 	QString file = selected[0];
 	changeFileNameVersion(file, true);
 	clearSelection();
@@ -131,8 +127,7 @@ void VersionedSaveDialog::incrementVersion()
 void VersionedSaveDialog::decrementVersion()
 {
 	const QStringList& selected = selectedFiles();
-	if (selected.size() != 1)
-		return;
+	if (selected.size() != 1) return;
 	QString file = selected[0];
 	changeFileNameVersion(file, false);
 	clearSelection();
@@ -152,10 +147,7 @@ bool VersionedSaveDialog::fileExistsQuery(QString FileName, QString WindowTitle)
 		mb.setIcon(QMessageBox::Warning);
 		mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-		if (mb.exec() == QMessageBox::Yes)
-		{
-			fileExists = true;
-		}
+		if (mb.exec() == QMessageBox::Yes) { fileExists = true; }
 	}
 	return fileExists;
 }

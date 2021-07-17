@@ -34,10 +34,7 @@ Ladspa2LMMS::Ladspa2LMMS()
 		ladspa_key_t key = (*it).second;
 		ladspaManagerDescription* desc = getDescription(key);
 
-		if (desc->type == SOURCE)
-		{
-			m_instruments.append(qMakePair(getName(key), key));
-		}
+		if (desc->type == SOURCE) { m_instruments.append(qMakePair(getName(key), key)); }
 		else if (desc->type == TRANSFER &&
 			(desc->inputChannels == desc->outputChannels &&
 				(desc->inputChannels == 1 || desc->inputChannels == 2 || desc->inputChannels == 4) /* &&
@@ -70,27 +67,12 @@ QString Ladspa2LMMS::getShortName(const ladspa_key_t& _key)
 {
 	QString name = getName(_key);
 
-	if (name.indexOf("(") > 0)
-	{
-		name = name.left(name.indexOf("("));
-	}
-	if (name.indexOf(" - ") > 0)
-	{
-		name = name.left(name.indexOf(" - "));
-	}
-	if (name.indexOf("  ") > 0)
-	{
-		name = name.left(name.indexOf("  "));
-	}
+	if (name.indexOf("(") > 0) { name = name.left(name.indexOf("(")); }
+	if (name.indexOf(" - ") > 0) { name = name.left(name.indexOf(" - ")); }
+	if (name.indexOf("  ") > 0) { name = name.left(name.indexOf("  ")); }
 	Qt::CaseSensitivity cs = Qt::CaseInsensitive;
-	if (name.indexOf(" with ", 0, cs) > 0)
-	{
-		name = name.left(name.indexOf(" with ", 0, cs));
-	}
-	if (name.indexOf(",", 0, cs) > 0)
-	{
-		name = name.left(name.indexOf(",", 0, cs));
-	}
+	if (name.indexOf(" with ", 0, cs) > 0) { name = name.left(name.indexOf(" with ", 0, cs)); }
+	if (name.indexOf(",", 0, cs) > 0) { name = name.left(name.indexOf(",", 0, cs)); }
 	if (name.length() > 40)
 	{
 		int i = 40;
@@ -100,10 +82,7 @@ QString Ladspa2LMMS::getShortName(const ladspa_key_t& _key)
 		}
 		name = name.left(i);
 	}
-	if (name.length() == 0)
-	{
-		name = "LADSPA Plugin";
-	}
+	if (name.length() == 0) { name = "LADSPA Plugin"; }
 
 	return name;
 }

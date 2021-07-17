@@ -56,10 +56,7 @@ PerfTime PerfTime::now()
 	time.m_real = times(&t);
 	time.m_user = t.tms_utime;
 	time.m_system = t.tms_stime;
-	if (time.m_real == -1)
-	{
-		qWarning("PerfTime: now failed");
-	}
+	if (time.m_real == -1) { qWarning("PerfTime: now failed"); }
 #endif
 	return time;
 }
@@ -70,10 +67,7 @@ clock_t PerfTime::ticksPerSecond()
 #ifdef USE_POSIX_TIME
 	if (!clktck)
 	{
-		if ((clktck = sysconf(_SC_CLK_TCK)) < 0)
-		{
-			qWarning("PerfLog::end sysconf()");
-		}
+		if ((clktck = sysconf(_SC_CLK_TCK)) < 0) { qWarning("PerfLog::end sysconf()"); }
 	}
 #endif
 	return clktck;
@@ -100,10 +94,7 @@ void PerfLogTimer::begin() { begin_time = PerfTime::now(); }
 
 void PerfLogTimer::end()
 {
-	if (!begin_time.valid())
-	{
-		return;
-	}
+	if (!begin_time.valid()) { return; }
 
 	long clktck = PerfTime::ticksPerSecond();
 

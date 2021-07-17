@@ -45,20 +45,14 @@ bool BBTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int tco
 {
 	bool notePlayed = false;
 
-	if (lengthOfBB(tcoNum) <= 0)
-	{
-		return false;
-	}
+	if (lengthOfBB(tcoNum) <= 0) { return false; }
 
 	start = start % (lengthOfBB(tcoNum) * TimePos::ticksPerBar());
 
 	TrackList tl = tracks();
 	for (Track* t : tl)
 	{
-		if (t->play(start, frames, offset, tcoNum))
-		{
-			notePlayed = true;
-		}
+		if (t->play(start, frames, offset, tcoNum)) { notePlayed = true; }
 	}
 
 	return notePlayed;
@@ -66,10 +60,7 @@ bool BBTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int tco
 
 void BBTrackContainer::updateAfterTrackAdd()
 {
-	if (numOfBBs() == 0 && !Engine::getSong()->isLoadingProject())
-	{
-		Engine::getSong()->addBBTrack();
-	}
+	if (numOfBBs() == 0 && !Engine::getSong()->isLoadingProject()) { Engine::getSong()->addBBTrack(); }
 }
 
 bar_t BBTrackContainer::lengthOfBB(int bb) const
@@ -80,10 +71,7 @@ bar_t BBTrackContainer::lengthOfBB(int bb) const
 	for (Track* t : tl)
 	{
 		// Don't create TCOs here if they don't exist
-		if (bb < t->numOfTCOs())
-		{
-			maxLength = qMax(maxLength, t->getTCO(bb)->length());
-		}
+		if (bb < t->numOfTCOs()) { maxLength = qMax(maxLength, t->getTCO(bb)->length()); }
 	}
 
 	return maxLength.nextFullBar();
@@ -99,10 +87,7 @@ void BBTrackContainer::removeBB(int bb)
 		delete t->getTCO(bb);
 		t->removeBar(bb * DefaultTicksPerBar);
 	}
-	if (bb <= currentBB())
-	{
-		setCurrentBB(qMax(currentBB() - 1, 0));
-	}
+	if (bb <= currentBB()) { setCurrentBB(qMax(currentBB() - 1, 0)); }
 }
 
 void BBTrackContainer::swapBB(int bb1, int bb2)
@@ -118,10 +103,7 @@ void BBTrackContainer::swapBB(int bb1, int bb2)
 void BBTrackContainer::updateBBTrack(TrackContentObject* tco)
 {
 	BBTrack* t = BBTrack::findBBTrack(tco->startPosition() / DefaultTicksPerBar);
-	if (t != NULL)
-	{
-		t->dataChanged();
-	}
+	if (t != NULL) { t->dataChanged(); }
 }
 
 void BBTrackContainer::fixIncorrectPositions()
@@ -138,10 +120,7 @@ void BBTrackContainer::fixIncorrectPositions()
 
 void BBTrackContainer::play()
 {
-	if (Engine::getSong()->playMode() != Song::Mode_PlayBB)
-	{
-		Engine::getSong()->playBB();
-	}
+	if (Engine::getSong()->playMode() != Song::Mode_PlayBB) { Engine::getSong()->playBB(); }
 	else
 	{
 		Engine::getSong()->togglePause();
@@ -170,10 +149,7 @@ void BBTrackContainer::currentBBChanged()
 	TrackList tl = Engine::getSong()->tracks();
 	for (Track* t : tl)
 	{
-		if (t->type() == Track::BBTrack)
-		{
-			t->dataChanged();
-		}
+		if (t->type() == Track::BBTrack) { t->dataChanged(); }
 	}
 }
 
@@ -193,10 +169,7 @@ AutomatedValueMap BBTrackContainer::automatedValuesAt(TimePos time, int tcoNum) 
 
 	auto lengthBars = lengthOfBB(tcoNum);
 	auto lengthTicks = lengthBars * TimePos::ticksPerBar();
-	if (time > lengthTicks)
-	{
-		time = lengthTicks;
-	}
+	if (time > lengthTicks) { time = lengthTicks; }
 
 	return TrackContainer::automatedValuesAt(time + (TimePos::ticksPerBar() * tcoNum), tcoNum);
 }

@@ -85,10 +85,7 @@ public:
 
 	static inline LmmsCore* inst()
 	{
-		if (s_instanceOfMe == NULL)
-		{
-			s_instanceOfMe = new LmmsCore();
-		}
+		if (s_instanceOfMe == NULL) { s_instanceOfMe = new LmmsCore(); }
 		return s_instanceOfMe;
 	}
 

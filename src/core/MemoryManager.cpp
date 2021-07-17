@@ -42,18 +42,12 @@ static thread_local size_t thread_guard_depth;
 
 MemoryManager::ThreadGuard::ThreadGuard()
 {
-	if (thread_guard_depth++ == 0)
-	{
-		rpmalloc_thread_initialize();
-	}
+	if (thread_guard_depth++ == 0) { rpmalloc_thread_initialize(); }
 }
 
 MemoryManager::ThreadGuard::~ThreadGuard()
 {
-	if (--thread_guard_depth == 0)
-	{
-		rpmalloc_thread_finalize();
-	}
+	if (--thread_guard_depth == 0) { rpmalloc_thread_finalize(); }
 }
 
 static thread_local MemoryManager::ThreadGuard local_mm_thread_guard{};

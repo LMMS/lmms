@@ -177,10 +177,7 @@ private:
 		src_data.src_ratio = static_cast<double>(WAVERATIO);
 		src_data.end_of_input = 0;
 		err = src_process(src_state, &src_data);
-		if (err)
-		{
-			qDebug("Watsyn SRC error: %s", src_strerror(err));
-		}
+		if (err) { qDebug("Watsyn SRC error: %s", src_strerror(err)); }
 		src_delete(src_state);
 	}
 

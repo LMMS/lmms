@@ -51,10 +51,7 @@ public:
 	{
 		std::size_t written = LocklessRingBuffer<T>::m_buffer.write(src, cnt);
 		// Let all waiting readers know new data are available.
-		if (notify)
-		{
-			LocklessRingBuffer<T>::m_notifier.wakeAll();
-		}
+		if (notify) { LocklessRingBuffer<T>::m_notifier.wakeAll(); }
 		return written;
 	}
 

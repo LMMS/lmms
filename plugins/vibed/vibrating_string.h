@@ -153,10 +153,7 @@ private:
 		sample_t* ptr = _dl->pointer;
 		*ptr = _insamp * m_stringLoss;
 		++ptr;
-		if (ptr > _dl->end)
-		{
-			ptr = _dl->data;
-		}
+		if (ptr > _dl->end) { ptr = _dl->data; }
 		_dl->pointer = ptr;
 	}
 
@@ -170,10 +167,7 @@ private:
 	{
 		sample_t* ptr = _dl->pointer;
 		--ptr;
-		if (ptr < _dl->data)
-		{
-			ptr = _dl->end;
-		}
+		if (ptr < _dl->data) { ptr = _dl->end; }
 		*ptr = _insamp * m_stringLoss;
 		_dl->pointer = ptr;
 	}

@@ -78,10 +78,7 @@ Controller::Controller(ControllerTypes _type, Model* _parent, const QString& _di
 Controller::~Controller()
 {
 	int idx = s_controllers.indexOf(this);
-	if (idx >= 0)
-	{
-		s_controllers.remove(idx);
-	}
+	if (idx >= 0) { s_controllers.remove(idx); }
 
 	m_valueBuffer.clear();
 	// Remove connections by destroyed signal
@@ -90,29 +87,20 @@ Controller::~Controller()
 // Get current value, with an offset into the current buffer for sample exactness
 float Controller::currentValue(int _offset)
 {
-	if (_offset == 0 || isSampleExact())
-	{
-		m_currentValue = fittedValue(value(_offset));
-	}
+	if (_offset == 0 || isSampleExact()) { m_currentValue = fittedValue(value(_offset)); }
 
 	return m_currentValue;
 }
 
 float Controller::value(int offset)
 {
-	if (m_bufferLastUpdated != s_periods)
-	{
-		updateValueBuffer();
-	}
+	if (m_bufferLastUpdated != s_periods) { updateValueBuffer(); }
 	return m_valueBuffer.values()[offset];
 }
 
 ValueBuffer* Controller::valueBuffer()
 {
-	if (m_bufferLastUpdated != s_periods)
-	{
-		updateValueBuffer();
-	}
+	if (m_bufferLastUpdated != s_periods) { updateValueBuffer(); }
 	return &m_valueBuffer;
 }
 
@@ -160,8 +148,7 @@ Controller* Controller::create(ControllerTypes _ct, Model* _parent)
 	switch (_ct)
 	{
 	case Controller::DummyController:
-		if (!dummy)
-			dummy = new Controller(DummyController, NULL, QString());
+		if (!dummy) dummy = new Controller(DummyController, NULL, QString());
 		c = dummy;
 		break;
 
@@ -197,10 +184,7 @@ Controller* Controller::create(const QDomElement& _this, Model* _parent)
 		c = create(static_cast<ControllerTypes>(_this.attribute("type").toInt()), _parent);
 	}
 
-	if (c != NULL)
-	{
-		c->restoreState(_this);
-	}
+	if (c != NULL) { c->restoreState(_this); }
 
 	return (c);
 }
@@ -212,16 +196,10 @@ bool Controller::hasModel(const Model* m) const
 		AutomatableModel* am = qobject_cast<AutomatableModel*>(c);
 		if (am != NULL)
 		{
-			if (am == m)
-			{
-				return true;
-			}
+			if (am == m) { return true; }
 
 			ControllerConnection* cc = am->controllerConnection();
-			if (cc != NULL && cc->getController()->hasModel(m))
-			{
-				return true;
-			}
+			if (cc != NULL && cc->getController()->hasModel(m)) { return true; }
 		}
 	}
 

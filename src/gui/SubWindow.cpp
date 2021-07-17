@@ -133,10 +133,7 @@ void SubWindow::changeEvent(QEvent* event)
 {
 	QMdiSubWindow::changeEvent(event);
 
-	if (event->type() == QEvent::WindowTitleChange)
-	{
-		adjustTitleBar();
-	}
+	if (event->type() == QEvent::WindowTitleChange) { adjustTitleBar(); }
 }
 
 /**
@@ -191,10 +188,7 @@ void SubWindow::moveEvent(QMoveEvent* event)
 	QMdiSubWindow::moveEvent(event);
 	// if the window was moved and ISN'T minimized/maximized/fullscreen,
 	// then save the current position
-	if (!isMaximized() && !isMinimized() && !isFullScreen())
-	{
-		m_trackedNormalGeom.moveTopLeft(event->pos());
-	}
+	if (!isMaximized() && !isMinimized() && !isFullScreen()) { m_trackedNormalGeom.moveTopLeft(event->pos()); }
 }
 
 /**
@@ -240,10 +234,7 @@ void SubWindow::adjustTitleBar()
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
 	m_restoreBtn->setVisible(isMaximized() || isMinimized());
-	if (isMinimized())
-	{
-		m_restoreBtn->move(m_maximizeBtn->isHidden() ? middleButtonPos : leftButtonPos);
-	}
+	if (isMinimized()) { m_restoreBtn->move(m_maximizeBtn->isHidden() ? middleButtonPos : leftButtonPos); }
 
 	if (widget())
 	{
@@ -254,10 +245,7 @@ void SubWindow::adjustTitleBar()
 
 		// if minimized we can't use widget()->width(). We have to hard code the width,
 		// as the width of all minimized windows is the same.
-		if (isMinimized())
-		{
-			m_windowTitle->setFixedWidth(120);
-		}
+		if (isMinimized()) { m_windowTitle->setFixedWidth(120); }
 
 		// truncate the label string if the window is to small. Adds "..."
 		elideText(m_windowTitle, widget()->windowTitle());
@@ -303,8 +291,5 @@ void SubWindow::resizeEvent(QResizeEvent* event)
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
-	if (!isMaximized() && !isMinimized() && !isFullScreen())
-	{
-		m_trackedNormalGeom.setSize(event->size());
-	}
+	if (!isMaximized() && !isMinimized() && !isFullScreen()) { m_trackedNormalGeom.setSize(event->size()); }
 }

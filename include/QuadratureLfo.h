@@ -42,10 +42,7 @@ public:
 
 	inline void setFrequency(double frequency)
 	{
-		if (frequency < 0 || frequency > m_samplerate / 2.0 || frequency == m_frequency)
-		{
-			return;
-		}
+		if (frequency < 0 || frequency > m_samplerate / 2.0 || frequency == m_frequency) { return; }
 		m_frequency = frequency;
 		m_increment = m_frequency * m_twoPiOverSr;
 	}

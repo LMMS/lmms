@@ -106,10 +106,7 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id, cons
 		++wdgNum;
 	}
 
-	if (isHidden())
-	{
-		setHidden(false);
-	}
+	if (isHidden()) { setHidden(false); }
 }
 
 void LinkedModelGroupView::removeControl(const QString& key)
@@ -143,8 +140,5 @@ void LinkedModelGroupsView::modelChanged(LinkedModelGroups* groups)
 {
 	LinkedModelGroupView* groupView = getGroupView();
 	LinkedModelGroup* group0 = groups->getGroup(0);
-	if (group0 && groupView)
-	{
-		groupView->modelChanged(group0);
-	}
+	if (group0 && groupView) { groupView->modelChanged(group0); }
 }

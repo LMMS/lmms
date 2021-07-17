@@ -34,10 +34,7 @@ public:
 	~MonoDelay();
 	inline void setLength(float length)
 	{
-		if (length <= m_maxLength && length >= 0)
-		{
-			m_length = length;
-		}
+		if (length <= m_maxLength && length >= 0) { m_length = length; }
 	}
 
 	inline void setFeedback(float feedback) { m_feedback = feedback; }

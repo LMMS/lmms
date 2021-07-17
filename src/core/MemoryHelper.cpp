@@ -38,8 +38,7 @@ void* MemoryHelper::alignedMalloc(size_t byteNum)
 
 	ptr = static_cast<char*>(malloc(byteNum + ALIGN_SIZE + sizeof(int)));
 
-	if (ptr == NULL)
-		return NULL;
+	if (ptr == NULL) return NULL;
 
 	ptr2 = ptr + sizeof(int);
 	aligned_ptr = ptr2 + (ALIGN_SIZE - ((size_t)ptr2 & align_mask));

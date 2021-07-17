@@ -38,10 +38,7 @@ static const size_t SIZEOF_SET = sizeof(int) * 8;
 static size_t align(size_t size, size_t alignment)
 {
 	size_t misalignment = size % alignment;
-	if (misalignment)
-	{
-		size += alignment - misalignment;
-	}
+	if (misalignment) { size += alignment - misalignment; }
 	return size;
 }
 
@@ -76,16 +73,10 @@ LocklessAllocator::~LocklessAllocator()
 #ifdef LMMS_BUILD_WIN32
 static int ffs(int i)
 {
-	if (!i)
-	{
-		return 0;
-	}
+	if (!i) { return 0; }
 	for (int j = 0;;)
 	{
-		if (i & 1 << j++)
-		{
-			return j;
-		}
+		if (i & 1 << j++) { return j; }
 	}
 }
 #endif
@@ -129,10 +120,7 @@ void LocklessAllocator::free(void* ptr)
 		return;
 	}
 	size_t offset = diff / m_elementSize;
-	if (offset >= m_capacity)
-	{
-		goto invalid;
-	}
+	if (offset >= m_capacity) { goto invalid; }
 	size_t set = offset / SIZEOF_SET;
 	int bit = offset % SIZEOF_SET;
 	int mask = 1 << bit;

@@ -39,10 +39,7 @@ InstrumentView::InstrumentView(Instrument* _Instrument, QWidget* _parent)
 
 InstrumentView::~InstrumentView()
 {
-	if (instrumentTrackWindow())
-	{
-		instrumentTrackWindow()->m_instrumentView = NULL;
-	}
+	if (instrumentTrackWindow()) { instrumentTrackWindow()->m_instrumentView = NULL; }
 }
 
 void InstrumentView::setModel(Model* _model, bool)

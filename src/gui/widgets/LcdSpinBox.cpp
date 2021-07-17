@@ -100,10 +100,7 @@ void LcdSpinBox::mouseMoveEvent(QMouseEvent* event)
 		if (dy)
 		{
 			float fdy = static_cast<float>(dy);
-			if (event->modifiers() & Qt::ShiftModifier)
-			{
-				fdy = qBound(-4.f, fdy / 4.f, 4.f);
-			}
+			if (event->modifiers() & Qt::ShiftModifier) { fdy = qBound(-4.f, fdy / 4.f, 4.f); }
 			float floatValNotRounded = model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
 			float floatValRounded = roundf(floatValNotRounded);
 			m_remainder = floatValNotRounded - floatValRounded;
@@ -141,8 +138,5 @@ void LcdSpinBox::enterValue()
 		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
 		model()->value(), model()->minValue(), model()->maxValue(), model()->step<int>(), &ok);
 
-	if (ok)
-	{
-		model()->setValue(new_val);
-	}
+	if (ok) { model()->setValue(new_val); }
 }

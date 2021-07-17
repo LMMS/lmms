@@ -78,22 +78,10 @@ Fader::Fader(FloatModel* _model, const QString& _name, QWidget* _parent)
 	, m_peakRed(0, 0, 0)
 	, m_peakYellow(0, 0, 0)
 {
-	if (s_textFloat == NULL)
-	{
-		s_textFloat = new TextFloat;
-	}
-	if (!s_back)
-	{
-		s_back = new QPixmap(embed::getIconPixmap("fader_background"));
-	}
-	if (!s_leds)
-	{
-		s_leds = new QPixmap(embed::getIconPixmap("fader_leds"));
-	}
-	if (!s_knob)
-	{
-		s_knob = new QPixmap(embed::getIconPixmap("fader_knob"));
-	}
+	if (s_textFloat == NULL) { s_textFloat = new TextFloat; }
+	if (!s_back) { s_back = new QPixmap(embed::getIconPixmap("fader_background")); }
+	if (!s_leds) { s_leds = new QPixmap(embed::getIconPixmap("fader_leds")); }
+	if (!s_knob) { s_knob = new QPixmap(embed::getIconPixmap("fader_knob")); }
 
 	m_back = s_back;
 	m_leds = s_leds;
@@ -119,10 +107,7 @@ Fader::Fader(FloatModel* model, const QString& name, QWidget* parent, QPixmap* b
 	, m_peakGreen(0, 0, 0)
 	, m_peakRed(0, 0, 0)
 {
-	if (s_textFloat == NULL)
-	{
-		s_textFloat = new TextFloat;
-	}
+	if (s_textFloat == NULL) { s_textFloat = new TextFloat; }
 
 	m_back = back;
 	m_leds = leds;
@@ -212,10 +197,7 @@ void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 				   model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok) /
 		m_conversionFactor;
 
-	if (ok)
-	{
-		model()->setValue(newValue);
-	}
+	if (ok) { model()->setValue(newValue); }
 }
 
 void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
@@ -223,10 +205,7 @@ void Fader::mouseReleaseEvent(QMouseEvent* mouseEvent)
 	if (mouseEvent && mouseEvent->button() == Qt::LeftButton)
 	{
 		AutomatableModel* thisModel = model();
-		if (thisModel)
-		{
-			thisModel->restoreJournallingState();
-		}
+		if (thisModel) { thisModel->restoreJournallingState(); }
 	}
 
 	s_textFloat->hide();
@@ -236,10 +215,7 @@ void Fader::wheelEvent(QWheelEvent* ev)
 {
 	ev->accept();
 
-	if (ev->angleDelta().y() > 0)
-	{
-		model()->incValue(1);
-	}
+	if (ev->angleDelta().y() > 0) { model()->incValue(1); }
 	else
 	{
 		model()->incValue(-1);
@@ -253,10 +229,7 @@ void Fader::wheelEvent(QWheelEvent* ev)
 ///
 void Fader::setPeak(float fPeak, float& targetPeak, float& persistentPeak, QElapsedTimer& lastPeakTimer)
 {
-	if (fPeak < m_fMinPeak)
-	{
-		fPeak = m_fMinPeak;
-	}
+	if (fPeak < m_fMinPeak) { fPeak = m_fMinPeak; }
 	else if (fPeak > m_fMaxPeak)
 	{
 		fPeak = m_fMaxPeak;
@@ -314,10 +287,7 @@ void Fader::paintEvent(QPaintEvent* ev)
 	painter.drawPixmap(ev->rect(), *m_back, ev->rect());
 
 	// Draw the levels with peaks
-	if (getLevelsDisplayedInDBFS())
-	{
-		paintDBFSLevels(ev, painter);
-	}
+	if (getLevelsDisplayedInDBFS()) { paintDBFSLevels(ev, painter); }
 	else
 	{
 		paintLinearLevels(ev, painter);
@@ -350,10 +320,7 @@ void Fader::paintDBFSLevels(QPaintEvent* ev, QPainter& painter)
 	int persistentPeak_L = height * (1 - (persistentLeftPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background
-	if (persistentPeak_L <= 4)
-	{
-		persistentPeak_L = 4;
-	}
+	if (persistentPeak_L <= 4) { persistentPeak_L = 4; }
 	if (persistentLeftPeakDBFS > minDB)
 	{
 		QColor const& peakColor = clips(m_persistentPeak_L) ? peakRed()
@@ -372,10 +339,7 @@ void Fader::paintDBFSLevels(QPaintEvent* ev, QPainter& painter)
 	int persistentPeak_R = height * (1 - (persistentRightPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background
-	if (persistentPeak_R <= 4)
-	{
-		persistentPeak_R = 4;
-	}
+	if (persistentPeak_R <= 4) { persistentPeak_R = 4; }
 	if (persistentRightPeakDBFS > minDB)
 	{
 		QColor const& peakColor = clips(m_persistentPeak_R) ? peakRed()

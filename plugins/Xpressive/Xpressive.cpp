@@ -492,8 +492,7 @@ void XpressiveView::expressionChanged()
 		e->outputExpression(1) = text;
 		break;
 	}
-	if (m_wave_expr)
-		m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && text.size() == 0);
+	if (m_wave_expr) m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && text.size() == 0);
 
 	if (text.size() > 0)
 	{
@@ -534,15 +533,11 @@ void XpressiveView::expressionChanged()
 			{
 				t = i / (float)length;
 				samples[i] = expr.evaluate();
-				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0)
-					samples[i] = 0;
+				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0) samples[i] = 0;
 			}
 			m_raw_graph->setSamples(samples);
 			delete[] samples;
-			if (m_wave_expr)
-			{
-				smoothChanged();
-			}
+			if (m_wave_expr) { smoothChanged(); }
 			else
 			{
 				Engine::getSong()->setModified();
@@ -551,15 +546,13 @@ void XpressiveView::expressionChanged()
 		else
 		{
 			e->exprValid().setValue(1);
-			if (m_output_expr)
-				m_raw_graph->clear();
+			if (m_output_expr) m_raw_graph->clear();
 		}
 	}
 	else
 	{
 		e->exprValid().setValue(0);
-		if (m_output_expr)
-			m_raw_graph->clear();
+		if (m_output_expr) m_raw_graph->clear();
 	}
 }
 
@@ -728,8 +721,7 @@ void XpressiveView::updateLayout()
 
 void XpressiveView::sinWaveClicked()
 {
-	if (m_output_expr)
-		m_expressionEditor->appendPlainText("sinew(integrate(f))");
+	if (m_output_expr) m_expressionEditor->appendPlainText("sinew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("sinew(t)");
 	Engine::getSong()->setModified();
@@ -737,8 +729,7 @@ void XpressiveView::sinWaveClicked()
 
 void XpressiveView::triangleWaveClicked()
 {
-	if (m_output_expr)
-		m_expressionEditor->appendPlainText("trianglew(integrate(f))");
+	if (m_output_expr) m_expressionEditor->appendPlainText("trianglew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("trianglew(t)");
 	Engine::getSong()->setModified();
@@ -746,8 +737,7 @@ void XpressiveView::triangleWaveClicked()
 
 void XpressiveView::sawWaveClicked()
 {
-	if (m_output_expr)
-		m_expressionEditor->appendPlainText("saww(integrate(f))");
+	if (m_output_expr) m_expressionEditor->appendPlainText("saww(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("saww(t)");
 	Engine::getSong()->setModified();
@@ -755,8 +745,7 @@ void XpressiveView::sawWaveClicked()
 
 void XpressiveView::sqrWaveClicked()
 {
-	if (m_output_expr)
-		m_expressionEditor->appendPlainText("squarew(integrate(f))");
+	if (m_output_expr) m_expressionEditor->appendPlainText("squarew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("squarew(t)");
 	Engine::getSong()->setModified();
@@ -770,16 +759,14 @@ void XpressiveView::noiseWaveClicked()
 
 void XpressiveView::moogSawWaveClicked()
 {
-	if (m_output_expr)
-		m_expressionEditor->appendPlainText("moogsaww(integrate(f))");
+	if (m_output_expr) m_expressionEditor->appendPlainText("moogsaww(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("moogsaww(t)");
 	Engine::getSong()->setModified();
 }
 void XpressiveView::expWaveClicked()
 {
-	if (m_output_expr)
-		m_expressionEditor->appendPlainText("expw(integrate(f))");
+	if (m_output_expr) m_expressionEditor->appendPlainText("expw(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("expw(t)");
 	Engine::getSong()->setModified();

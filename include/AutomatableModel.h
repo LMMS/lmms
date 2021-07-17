@@ -88,10 +88,7 @@ public:
 	{
 		DCastVisitor<Target> vis;
 		accept(vis);
-		if (doThrow && !vis.result)
-		{
-			Q_ASSERT(false);
-		}
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
 		return vis.result;
 	}
 
@@ -100,10 +97,7 @@ public:
 	{
 		ConstDCastVisitor<Target> vis;
 		accept(vis);
-		if (doThrow && !vis.result)
-		{
-			Q_ASSERT(false);
-		}
+		if (doThrow && !vis.result) { Q_ASSERT(false); }
 		return vis.result;
 	}
 
@@ -122,10 +116,7 @@ public:
 	{
 		if (m_controllerConnection)
 		{
-			if (!m_useControllerValue)
-			{
-				return castValue<T>(m_value);
-			}
+			if (!m_useControllerValue) { return castValue<T>(m_value); }
 			else
 			{
 				return castValue<T>(controllerValue(frameOffset));

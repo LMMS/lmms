@@ -48,10 +48,7 @@ void EffectChain::saveSettings(QDomDocument& _doc, QDomElement& _this)
 
 	for (Effect* effect : m_effects)
 	{
-		if (DummyEffect* dummy = dynamic_cast<DummyEffect*>(effect))
-		{
-			_this.appendChild(dummy->originalPluginData());
-		}
+		if (DummyEffect* dummy = dynamic_cast<DummyEffect*>(effect)) { _this.appendChild(dummy->originalPluginData()); }
 		else
 		{
 			QDomElement ef = effect->saveState(_doc, _this);
@@ -84,10 +81,7 @@ void EffectChain::loadSettings(const QDomElement& _this)
 
 			Effect* e = Effect::instantiate(name.toUtf8(), this, &key);
 
-			if (e != NULL && e->isOkay() && e->nodeName() == node.nodeName())
-			{
-				e->restoreState(effectData);
-			}
+			if (e != NULL && e->isOkay() && e->nodeName() == node.nodeName()) { e->restoreState(effectData); }
 			else
 			{
 				delete e;
@@ -128,10 +122,7 @@ void EffectChain::removeEffect(Effect* _effect)
 
 	Engine::mixer()->doneChangeInModel();
 
-	if (m_effects.isEmpty())
-	{
-		m_enabledModel.setValue(false);
-	}
+	if (m_effects.isEmpty()) { m_enabledModel.setValue(false); }
 
 	emit dataChanged();
 }
@@ -156,10 +147,7 @@ void EffectChain::moveUp(Effect* _effect)
 
 bool EffectChain::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames, bool hasInputNoise)
 {
-	if (m_enabledModel.value() == false)
-	{
-		return false;
-	}
+	if (m_enabledModel.value() == false) { return false; }
 
 	MixHelpers::sanitize(_buf, _frames);
 
@@ -178,10 +166,7 @@ bool EffectChain::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames, boo
 
 void EffectChain::startRunning()
 {
-	if (m_enabledModel.value() == false)
-	{
-		return;
-	}
+	if (m_enabledModel.value() == false) { return; }
 
 	for (EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); it++)
 	{

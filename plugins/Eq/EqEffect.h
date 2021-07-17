@@ -46,14 +46,8 @@ public:
 			buf[f][0] *= scale;
 			buf[f][1] *= scale;
 
-			if (fabs(buf[f][0]) > peak[0][0])
-			{
-				peak[0][0] = fabs(buf[f][0]);
-			}
-			if (fabs(buf[f][1]) > peak[0][1])
-			{
-				peak[0][1] = fabs(buf[f][0]);
-			}
+			if (fabs(buf[f][0]) > peak[0][0]) { peak[0][0] = fabs(buf[f][0]); }
+			if (fabs(buf[f][1]) > peak[0][1]) { peak[0][1] = fabs(buf[f][0]); }
 		}
 	}
 

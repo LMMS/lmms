@@ -63,10 +63,7 @@ void VstSubPluginFeatures::addPluginsFromDir(QStringList* filenames, QString pat
 		QDir(ConfigManager::inst()->vstDir() + path).entryList(QStringList() << "*", QDir::Dirs, QDir::Name);
 	for (int i = 0; i < dirs.size(); i++)
 	{
-		if (dirs.at(i)[0] != '.')
-		{
-			addPluginsFromDir(filenames, path + QDir::separator() + dirs.at(i));
-		}
+		if (dirs.at(i)[0] != '.') { addPluginsFromDir(filenames, path + QDir::separator() + dirs.at(i)); }
 	}
 	QStringList dlls =
 		QDir(ConfigManager::inst()->vstDir() + path).entryList(QStringList() << "*.dll", QDir::Files, QDir::Name);

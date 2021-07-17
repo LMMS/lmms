@@ -147,10 +147,7 @@ bool AudioFileOgg::startEncoding()
 
 	while ((result = ogg_stream_flush(&m_os, &m_og)))
 	{
-		if (!result)
-		{
-			break;
-		}
+		if (!result) { break; }
 		int ret = writePage();
 		if (ret != m_og.header_len + m_og.body_len)
 		{
@@ -197,10 +194,7 @@ void AudioFileOgg::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _fram
 			while (!eos)
 			{
 				int result = ogg_stream_pageout(&m_os, &m_og);
-				if (!result)
-				{
-					break;
-				}
+				if (!result) { break; }
 
 				int ret = writePage();
 				if (ret != m_og.header_len + m_og.body_len)
@@ -210,10 +204,7 @@ void AudioFileOgg::writeBuffer(const surroundSampleFrame* _ab, const fpp_t _fram
 					return;
 				}
 
-				if (ogg_page_eos(&m_og))
-				{
-					eos = 1;
-				}
+				if (ogg_page_eos(&m_og)) { eos = 1; }
 			}
 		}
 	}

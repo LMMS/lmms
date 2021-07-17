@@ -127,8 +127,7 @@ template <window_sample_func_t F> void kaiser(sample_t* s, int n, double beta)
 		double k = besseli((beta * sqrt(1 - pow((2 * i / (n - 1)), 2)))) / bb;
 
 		/* can you spell hack */
-		if (!isfinite(k) || isnan(k))
-			k = 0;
+		if (!isfinite(k) || isnan(k)) k = 0;
 
 		F(s[si], k);
 	}

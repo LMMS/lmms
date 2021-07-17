@@ -37,10 +37,7 @@ void String_parse::get_nonspace_quoted(string& field)
 			}
 			return;
 		}
-		if ((*str)[pos] == '\\')
-		{
-			pos = pos + 1;
-		}
+		if ((*str)[pos] == '\\') { pos = pos + 1; }
 		if ((*str)[pos])
 		{
 			field.append(1, (*str)[pos]);
@@ -54,20 +51,14 @@ static const char* const escape_chars[] = {"\\n", "\\t", "\\\\", "\\r", "\\\""};
 void string_escape(string& result, const char* str, const char* quote)
 {
 	int length = (int)strlen(str);
-	if (quote[0])
-	{
-		result.append(1, quote[0]);
-	}
+	if (quote[0]) { result.append(1, quote[0]); }
 	for (int i = 0; i < length; i++)
 	{
 		if (!isalnum((unsigned char)str[i]))
 		{
 			const char* const chars = "\n\t\\\r\"";
 			const char* const special = strchr(chars, str[i]);
-			if (special)
-			{
-				result.append(escape_chars[special - chars]);
-			}
+			if (special) { result.append(escape_chars[special - chars]); }
 			else
 			{
 				result.append(1, str[i]);

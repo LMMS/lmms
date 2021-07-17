@@ -55,10 +55,7 @@ AudioJack::AudioJack(bool& _success_ful, Mixer* _mixer)
 	m_stopped = true;
 
 	_success_ful = initJackClient();
-	if (_success_ful)
-	{
-		connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection);
-	}
+	if (_success_ful) { connect(this, SIGNAL(zombified()), this, SLOT(restartAfterZombified()), Qt::QueuedConnection); }
 }
 
 AudioJack::~AudioJack()
@@ -73,10 +70,7 @@ AudioJack::~AudioJack()
 
 	if (m_client != NULL)
 	{
-		if (m_active)
-		{
-			jack_deactivate(m_client);
-		}
+		if (m_active) { jack_deactivate(m_client); }
 		jack_client_close(m_client);
 	}
 
@@ -110,8 +104,7 @@ void AudioJack::restartAfterZombified()
 
 AudioJack* AudioJack::addMidiClient(MidiJack* midiClient)
 {
-	if (m_client == NULL)
-		return NULL;
+	if (m_client == NULL) return NULL;
 
 	m_midiClient = midiClient;
 
@@ -121,10 +114,7 @@ AudioJack* AudioJack::addMidiClient(MidiJack* midiClient)
 bool AudioJack::initJackClient()
 {
 	QString clientName = ConfigManager::inst()->value("audiojack", "clientname");
-	if (clientName.isEmpty())
-	{
-		clientName = "lmms";
-	}
+	if (clientName.isEmpty()) { clientName = "lmms"; }
 
 	const char* serverName = NULL;
 	jack_status_t status;
@@ -132,10 +122,7 @@ bool AudioJack::initJackClient()
 	if (m_client == NULL)
 	{
 		printf("jack_client_open() failed, status 0x%2.0x\n", status);
-		if (status & JackServerFailed)
-		{
-			printf("Could not connect to JACK server.\n");
-		}
+		if (status & JackServerFailed) { printf("Could not connect to JACK server.\n"); }
 		return false;
 	}
 	if (status & JackNameNotUnique)
@@ -151,10 +138,7 @@ bool AudioJack::initJackClient()
 	// set shutdown-callback
 	jack_on_shutdown(m_client, shutdownCallback, this);
 
-	if (jack_get_sample_rate(m_client) != sampleRate())
-	{
-		setSampleRate(jack_get_sample_rate(m_client));
-	}
+	if (jack_get_sample_rate(m_client) != sampleRate()) { setSampleRate(jack_get_sample_rate(m_client)); }
 
 	for (ch_cnt_t ch = 0; ch < channels(); ++ch)
 	{
@@ -220,10 +204,7 @@ void AudioJack::applyQualitySettings()
 	{
 		setSampleRate(Engine::mixer()->processingSampleRate());
 
-		if (jack_get_sample_rate(m_client) != sampleRate())
-		{
-			setSampleRate(jack_get_sample_rate(m_client));
-		}
+		if (jack_get_sample_rate(m_client) != sampleRate()) { setSampleRate(jack_get_sample_rate(m_client)); }
 	}
 
 	AudioDevice::applyQualitySettings();
@@ -251,10 +232,7 @@ void AudioJack::unregisterPort(AudioPort* _port)
 	{
 		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 		{
-			if (m_portMap[_port].ports[ch] != NULL)
-			{
-				jack_port_unregister(m_client, m_portMap[_port].ports[ch]);
-			}
+			if (m_portMap[_port].ports[ch] != NULL) { jack_port_unregister(m_client, m_portMap[_port].ports[ch]); }
 		}
 		m_portMap.erase(m_portMap.find(_port));
 	}
@@ -301,10 +279,7 @@ int AudioJack::processCallback(jack_nframes_t _nframes, void* _udata)
 	{
 		for (ch_cnt_t ch = 0; ch < channels(); ++ch)
 		{
-			if (it.value().ports[ch] == NULL)
-			{
-				continue;
-			}
+			if (it.value().ports[ch] == NULL) { continue; }
 			jack_default_audio_sample_t* buf =
 				(jack_default_audio_sample_t*)jack_port_get_buffer(it.value().ports[ch], _nframes);
 			for (int frame = 0; frame < frames; ++frame)
@@ -370,10 +345,7 @@ AudioJack::setupWidget::setupWidget(QWidget* _parent)
 	: AudioDeviceSetupWidget(AudioJack::name(), _parent)
 {
 	QString cn = ConfigManager::inst()->value("audiojack", "clientname");
-	if (cn.isEmpty())
-	{
-		cn = "lmms";
-	}
+	if (cn.isEmpty()) { cn = "lmms"; }
 	m_clientName = new QLineEdit(cn, this);
 	m_clientName->setGeometry(10, 20, 160, 20);
 

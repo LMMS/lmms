@@ -49,22 +49,13 @@ extern "C"
 
 	DelayEffect::~DelayEffect()
 	{
-		if (m_delay)
-		{
-			delete m_delay;
-		}
-		if (m_lfo)
-		{
-			delete m_lfo;
-		}
+		if (m_delay) { delete m_delay; }
+		if (m_lfo) { delete m_lfo; }
 	}
 
 	bool DelayEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
-		if (!isEnabled() || !isRunning())
-		{
-			return (false);
-		}
+		if (!isEnabled() || !isRunning()) { return (false); }
 		double outSum = 0.0;
 		const float sr = Engine::mixer()->processingSampleRate();
 		const float d = dryLevel();

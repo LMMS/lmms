@@ -50,10 +50,7 @@ ProjectVersion::ProjectVersion(QString version, CompareType c)
 	m_patch = mainVersion.at(2).toInt();
 
 	// Any # of optional pre-release identifiers may follow, separated by '.'s
-	if (!prereleaseSegment.isEmpty())
-	{
-		m_labels = prereleaseSegment.split(".");
-	}
+	if (!prereleaseSegment.isEmpty()) { m_labels = prereleaseSegment.split("."); }
 
 	// HACK: Handle old (1.2.2 and earlier), non-standard versions of the form
 	// MAJOR.MINOR.PATCH.COMMITS, used for non-release builds from source.
@@ -98,18 +95,9 @@ int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, Co
 	}
 
 	// Then we can compare as if we care about every identifier
-	if (aMaj != bMaj)
-	{
-		return aMaj - bMaj;
-	}
-	if (aMin != bMin)
-	{
-		return aMin - bMin;
-	}
-	if (aPat != bPat)
-	{
-		return aPat - bPat;
-	}
+	if (aMaj != bMaj) { return aMaj - bMaj; }
+	if (aMin != bMin) { return aMin - bMin; }
+	if (aPat != bPat) { return aPat - bPat; }
 
 	// Decide how many optional identifiers we care about
 	const int maxLabels = qMax(0, limit - 3);
@@ -120,10 +108,7 @@ int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, Co
 	const int commonLabels = qMin(aLabels.size(), bLabels.size());
 	// If one version has optional labels and the other doesn't,
 	// the one without them is bigger
-	if (commonLabels == 0)
-	{
-		return bLabels.size() - aLabels.size();
-	}
+	if (commonLabels == 0) { return bLabels.size() - aLabels.size(); }
 
 	// Otherwise, compare as many labels as we can
 	for (int i = 0; i < commonLabels; i++)
@@ -131,10 +116,7 @@ int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, Co
 		const QString& labelA = aLabels.at(i);
 		const QString& labelB = bLabels.at(i);
 		// If both labels are the same, skip
-		if (labelA == labelB)
-		{
-			continue;
-		}
+		if (labelA == labelB) { continue; }
 		// Numeric and non-numeric identifiers compare differently
 		bool aIsNumeric = false, bIsNumeric = false;
 		const int numA = labelA.toInt(&aIsNumeric);
@@ -143,15 +125,9 @@ int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, Co
 		aIsNumeric &= !labelA.startsWith("-");
 		bIsNumeric &= !labelB.startsWith("-");
 		// If only one identifier is numeric, that one is smaller
-		if (aIsNumeric != bIsNumeric)
-		{
-			return aIsNumeric ? -1 : 1;
-		}
+		if (aIsNumeric != bIsNumeric) { return aIsNumeric ? -1 : 1; }
 		// If both are numeric, compare as numbers
-		if (aIsNumeric && bIsNumeric)
-		{
-			return numA - numB;
-		}
+		if (aIsNumeric && bIsNumeric) { return numA - numB; }
 		// Otherwise, compare lexically
 		return labelA.compare(labelB);
 	}

@@ -90,10 +90,7 @@ void kickerInstrument::loadSettings(const QDomElement& _this)
 	m_endFreqModel.loadSettings(_this, "endfreq");
 	m_decayModel.loadSettings(_this, "decay");
 	m_distModel.loadSettings(_this, "dist");
-	if (_this.hasAttribute("distend"))
-	{
-		m_distEndModel.loadSettings(_this, "distend");
-	}
+	if (_this.hasAttribute("distend")) { m_distEndModel.loadSettings(_this, "distend"); }
 	else
 	{
 		m_distEndModel.setValue(m_distModel.value());
@@ -104,10 +101,7 @@ void kickerInstrument::loadSettings(const QDomElement& _this)
 	m_clickModel.loadSettings(_this, "click");
 	m_slopeModel.loadSettings(_this, "slope");
 	m_startNoteModel.loadSettings(_this, "startnote");
-	if (m_versionModel.value() < 1)
-	{
-		m_startNoteModel.setValue(false);
-	}
+	if (m_versionModel.value() < 1) { m_startNoteModel.setValue(false); }
 	m_endNoteModel.loadSettings(_this, "endnote");
 
 	// Try to maintain backwards compatibility

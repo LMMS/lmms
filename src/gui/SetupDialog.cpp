@@ -173,10 +173,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 		checkBox->move(XDelta, YDelta * counter);
 		checkBox->setChecked(initialState);
 		connect(checkBox, SIGNAL(toggled(bool)), this, toggledSlot);
-		if (showRestartWarning)
-		{
-			connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(showRestartWarning()));
-		}
+		if (showRestartWarning) { connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(showRestartWarning())); }
 	};
 
 	int counter = 0;
@@ -237,10 +234,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 	if (m_lang == "")
 	{
 		QString tmp = QLocale::system().name().left(2);
-		if (m_languages.contains(tmp))
-		{
-			m_lang = tmp;
-		}
+		if (m_languages.contains(tmp)) { m_lang = tmp; }
 		else
 		{
 			m_lang = "en";
@@ -333,18 +327,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 
 	QStringList embedMethods = ConfigManager::availableVstEmbedMethods();
 	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
-	if (embedMethods.contains("qt"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using Qt API"), "qt");
-	}
-	if (embedMethods.contains("win32"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using native Win32 API"), "win32");
-	}
-	if (embedMethods.contains("xembed"))
-	{
-		m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"), "xembed");
-	}
+	if (embedMethods.contains("qt")) { m_vstEmbedComboBox->addItem(tr("Embed using Qt API"), "qt"); }
+	if (embedMethods.contains("win32")) { m_vstEmbedComboBox->addItem(tr("Embed using native Win32 API"), "win32"); }
+	if (embedMethods.contains("xembed")) { m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"), "xembed"); }
 	m_vstEmbedComboBox->setCurrentIndex(m_vstEmbedComboBox->findData(m_vstEmbedMethod));
 	connect(m_vstEmbedComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(vstEmbedMethodChanged()));
 
@@ -582,10 +567,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 		m_assignableMidiDevices->addItem("all");
 	}
 	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
-	if (current >= 0)
-	{
-		m_assignableMidiDevices->setCurrentIndex(current);
-	}
+	if (current >= 0) { m_assignableMidiDevices->setCurrentIndex(current); }
 
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiiface_tw);
@@ -870,10 +852,7 @@ void SetupDialog::setBufferSize(int value)
 	if (value > step && value % step)
 	{
 		int mod_value = value % step;
-		if (mod_value < step / 2)
-		{
-			m_bufferSizeSlider->setValue(value - mod_value);
-		}
+		if (mod_value < step / 2) { m_bufferSizeSlider->setValue(value - mod_value); }
 		else
 		{
 			m_bufferSizeSlider->setValue(value + step - mod_value);
@@ -881,10 +860,7 @@ void SetupDialog::setBufferSize(int value)
 		return;
 	}
 
-	if (m_bufferSizeSlider->value() != value)
-	{
-		m_bufferSizeSlider->setValue(value);
-	}
+	if (m_bufferSizeSlider->value() != value) { m_bufferSizeSlider->setValue(value); }
 
 	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
 	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms")
@@ -911,10 +887,7 @@ void SetupDialog::midiInterfaceChanged(const QString& iface)
 void SetupDialog::openWorkingDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose the LMMS working directory"), m_workingDir);
-	if (!new_dir.isEmpty())
-	{
-		m_workingDirLineEdit->setText(new_dir);
-	}
+	if (!new_dir.isEmpty()) { m_workingDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setWorkingDir(const QString& workingDir) { m_workingDir = workingDir; }
@@ -922,10 +895,7 @@ void SetupDialog::setWorkingDir(const QString& workingDir) { m_workingDir = work
 void SetupDialog::openVSTDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your VST plugins directory"), m_vstDir);
-	if (!new_dir.isEmpty())
-	{
-		m_vstDirLineEdit->setText(new_dir);
-	}
+	if (!new_dir.isEmpty()) { m_vstDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setVSTDir(const QString& vstDir) { m_vstDir = vstDir; }
@@ -935,10 +905,7 @@ void SetupDialog::openLADSPADir()
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your LADSPA plugins directory"), m_ladspaDir);
 	if (!new_dir.isEmpty())
 	{
-		if (m_ladspaDirLineEdit->text() == "")
-		{
-			m_ladspaDirLineEdit->setText(new_dir);
-		}
+		if (m_ladspaDirLineEdit->text() == "") { m_ladspaDirLineEdit->setText(new_dir); }
 		else
 		{
 			m_ladspaDirLineEdit->setText(m_ladspaDirLineEdit->text() + "," + new_dir);
@@ -951,10 +918,7 @@ void SetupDialog::setLADSPADir(const QString& ladspaDir) { m_ladspaDir = ladspaD
 void SetupDialog::openSF2Dir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your SF2 directory"), m_sf2Dir);
-	if (!new_dir.isEmpty())
-	{
-		m_sf2DirLineEdit->setText(new_dir);
-	}
+	if (!new_dir.isEmpty()) { m_sf2DirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setSF2Dir(const QString& sf2Dir) { m_sf2Dir = sf2Dir; }
@@ -965,10 +929,7 @@ void SetupDialog::openSF2File()
 	QString new_file =
 		FileDialog::getOpenFileName(this, tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
 
-	if (!new_file.isEmpty())
-	{
-		m_sf2FileLineEdit->setText(new_file);
-	}
+	if (!new_file.isEmpty()) { m_sf2FileLineEdit->setText(new_file); }
 #endif
 }
 
@@ -982,10 +943,7 @@ void SetupDialog::setSF2File(const QString& sf2File)
 void SetupDialog::openGIGDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your GIG directory"), m_gigDir);
-	if (!new_dir.isEmpty())
-	{
-		m_gigDirLineEdit->setText(new_dir);
-	}
+	if (!new_dir.isEmpty()) { m_gigDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setGIGDir(const QString& gigDir) { m_gigDir = gigDir; }
@@ -993,10 +951,7 @@ void SetupDialog::setGIGDir(const QString& gigDir) { m_gigDir = gigDir; }
 void SetupDialog::openThemeDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your theme directory"), m_themeDir);
-	if (!new_dir.isEmpty())
-	{
-		m_themeDirLineEdit->setText(new_dir);
-	}
+	if (!new_dir.isEmpty()) { m_themeDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setThemeDir(const QString& themeDir) { m_themeDir = themeDir; }
@@ -1009,10 +964,7 @@ void SetupDialog::openBackgroundPicFile()
 	{
 		if (fileTypesList[i] != fileTypesList[i].toUpper())
 		{
-			if (!fileTypes.isEmpty())
-			{
-				fileTypes += " ";
-			}
+			if (!fileTypes.isEmpty()) { fileTypes += " "; }
 			fileTypes += "*." + QString(fileTypesList[i]);
 		}
 	}
@@ -1021,10 +973,7 @@ void SetupDialog::openBackgroundPicFile()
 	QString new_file = FileDialog::getOpenFileName(
 		this, tr("Choose your background picture"), dir, "Picture files (" + fileTypes + ")");
 
-	if (!new_file.isEmpty())
-	{
-		m_backgroundPicFileLineEdit->setText(new_file);
-	}
+	if (!new_file.isEmpty()) { m_backgroundPicFileLineEdit->setText(new_file); }
 }
 
 void SetupDialog::setBackgroundPicFile(const QString& backgroundPicFile) { m_backgroundPicFile = backgroundPicFile; }

@@ -121,27 +121,18 @@ void TrackContainerView::removeTrackView(TrackView* _tv)
 		m_scrollLayout->removeWidget(_tv);
 
 		realignTracks();
-		if (Engine::getSong())
-		{
-			Engine::getSong()->setModified();
-		}
+		if (Engine::getSong()) { Engine::getSong()->setModified(); }
 	}
 }
 
 void TrackContainerView::moveTrackView(TrackView* trackView, int indexTo)
 {
 	// Can't move out of bounds
-	if (indexTo >= m_trackViews.size() || indexTo < 0)
-	{
-		return;
-	}
+	if (indexTo >= m_trackViews.size() || indexTo < 0) { return; }
 
 	// Does not need to move to itself
 	int indexFrom = m_trackViews.indexOf(trackView);
-	if (indexFrom == indexTo)
-	{
-		return;
-	}
+	if (indexFrom == indexTo) { return; }
 
 	BBTrack::swapBBTracks(trackView->getTrack(), m_trackViews[indexTo]->getTrack());
 
@@ -213,10 +204,7 @@ TrackView* TrackContainerView::createTrackView(Track* _t)
 	// Avoid duplicating track views
 	for (trackViewList::iterator it = m_trackViews.begin(); it != m_trackViews.end(); ++it)
 	{
-		if ((*it)->getTrack() == _t)
-		{
-			return (*it);
-		}
+		if ((*it)->getTrack() == _t) { return (*it); }
 	}
 
 	return _t->createView(this);
@@ -247,10 +235,7 @@ const TrackView* TrackContainerView::trackViewAt(const int _y) const
 	{
 		const int y_cnt1 = y_cnt;
 		y_cnt += (*it)->height();
-		if (abs_y >= y_cnt1 && abs_y < y_cnt)
-		{
-			return (*it);
-		}
+		if (abs_y >= y_cnt1 && abs_y < y_cnt) { return (*it); }
 	}
 	return (NULL);
 }
@@ -336,10 +321,7 @@ void TrackContainerView::dropEvent(QDropEvent* _de)
 
 	else if (type == "projectfile")
 	{
-		if (gui->mainWindow()->mayChangeProject(true))
-		{
-			Engine::getSong()->loadProject(value);
-		}
+		if (gui->mainWindow()->mayChangeProject(true)) { Engine::getSong()->loadProject(value); }
 		_de->accept();
 	}
 
@@ -376,10 +358,7 @@ void TrackContainerView::scrollArea::wheelEvent(QWheelEvent* _we)
 	// or scrolling left/right if a modifier-key is pressed, otherwise
 	// they do not accept it and we pass it up to QScrollArea
 	m_trackContainerView->wheelEvent(_we);
-	if (!_we->isAccepted())
-	{
-		QScrollArea::wheelEvent(_we);
-	}
+	if (!_we->isAccepted()) { QScrollArea::wheelEvent(_we); }
 }
 
 InstrumentLoaderThread::InstrumentLoaderThread(QObject* parent, InstrumentTrack* it, QString name)

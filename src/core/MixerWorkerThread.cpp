@@ -56,10 +56,7 @@ void MixerWorkerThread::JobQueue::addJob(ThreadableJob* _job)
 		_job->queue();
 		// actually queue the job via atomic operations
 		auto index = m_writeIndex++;
-		if (index < JOB_QUEUE_SIZE)
-		{
-			m_items[index] = _job;
-		}
+		if (index < JOB_QUEUE_SIZE) { m_items[index] = _job; }
 		else
 		{
 			qWarning() << "Job queue is full!";
@@ -106,10 +103,7 @@ MixerWorkerThread::MixerWorkerThread(Mixer* mixer)
 	, m_quit(false)
 {
 	// initialize global static data
-	if (queueReadyWaitCond == NULL)
-	{
-		queueReadyWaitCond = new QWaitCondition;
-	}
+	if (queueReadyWaitCond == NULL) { queueReadyWaitCond = new QWaitCondition; }
 
 	// keep track of all instantiated worker threads - this is used for
 	// processing the last worker thread "inline", see comments in

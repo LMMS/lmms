@@ -93,40 +93,22 @@ void CrossoverEQControls::loadSettings(const QDomElement& elem)
 void CrossoverEQControls::xover12Changed()
 {
 	float v = m_xover12.value();
-	if (m_xover23.value() < v)
-	{
-		m_xover23.setValue(v);
-	}
-	if (m_xover34.value() < v)
-	{
-		m_xover34.setValue(v);
-	}
+	if (m_xover23.value() < v) { m_xover23.setValue(v); }
+	if (m_xover34.value() < v) { m_xover34.setValue(v); }
 }
 
 void CrossoverEQControls::xover23Changed()
 {
 	float v = m_xover23.value();
-	if (m_xover12.value() > v)
-	{
-		m_xover12.setValue(v);
-	}
-	if (m_xover34.value() < v)
-	{
-		m_xover34.setValue(v);
-	}
+	if (m_xover12.value() > v) { m_xover12.setValue(v); }
+	if (m_xover34.value() < v) { m_xover34.setValue(v); }
 }
 
 void CrossoverEQControls::xover34Changed()
 {
 	float v = m_xover34.value();
-	if (m_xover12.value() > v)
-	{
-		m_xover12.setValue(v);
-	}
-	if (m_xover23.value() > v)
-	{
-		m_xover23.setValue(v);
-	}
+	if (m_xover12.value() > v) { m_xover12.setValue(v); }
+	if (m_xover23.value() > v) { m_xover23.setValue(v); }
 }
 
 void CrossoverEQControls::sampleRateChanged() { m_effect->sampleRateChanged(); }

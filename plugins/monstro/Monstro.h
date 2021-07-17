@@ -208,8 +208,7 @@ private:
 			break;
 		case WAVE_SQRSOFT: {
 			const float ph = fraction(_ph);
-			if (ph < 0.1)
-				return Oscillator::sinSample(ph * 5 + 0.75);
+			if (ph < 0.1) return Oscillator::sinSample(ph * 5 + 0.75);
 			else if (ph < 0.5)
 				return 1.0f;
 			else if (ph < 0.6)

@@ -48,10 +48,7 @@ TrackContentObject::TrackContentObject(Track* track)
 	, m_color(128, 128, 128)
 	, m_useCustomClipColor(false)
 {
-	if (getTrack())
-	{
-		getTrack()->addTCO(this);
-	}
+	if (getTrack()) { getTrack()->addTCO(this); }
 	setJournalling(false);
 	movePosition(0);
 	changeLength(0);
@@ -67,10 +64,7 @@ TrackContentObject::~TrackContentObject()
 {
 	emit destroyedTCO();
 
-	if (getTrack())
-	{
-		getTrack()->removeTCO(this);
-	}
+	if (getTrack()) { getTrack()->removeTCO(this); }
 }
 
 /*! \brief Move this TrackContentObject's position in time
@@ -155,10 +149,7 @@ void TrackContentObject::setStartTimeOffset(const TimePos& startTimeOffset) { m_
 // Update TCO color if it follows the track color
 void TrackContentObject::updateColor()
 {
-	if (!m_useCustomClipColor)
-	{
-		emit trackColorChanged();
-	}
+	if (!m_useCustomClipColor) { emit trackColorChanged(); }
 }
 
 void TrackContentObject::useCustomClipColor(bool b)

@@ -48,10 +48,7 @@ waveShaperEffect::~waveShaperEffect() {}
 
 bool waveShaperEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 
 	// variables for effect
 	int i = 0;
@@ -96,10 +93,7 @@ bool waveShaperEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames
 			const float frac = fraction(qAbs(s[i]) * 200.0f);
 			const float posneg = s[i] < 0 ? -1.0f : 1.0f;
 
-			if (lookup < 1)
-			{
-				s[i] = frac * samples[0] * posneg;
-			}
+			if (lookup < 1) { s[i] = frac * samples[0] * posneg; }
 			else if (lookup < 200)
 			{
 				s[i] = linearInterpolate(samples[lookup - 1], samples[lookup], frac) * posneg;

@@ -71,10 +71,7 @@ QString MidiAlsaRaw::probeDevice()
 	QString dev = ConfigManager::inst()->value("MidiAlsaRaw", "device");
 	if (dev == "")
 	{
-		if (getenv("MIDIDEV") != NULL)
-		{
-			return getenv("MIDIDEV");
-		}
+		if (getenv("MIDIDEV") != NULL) { return getenv("MIDIDEV"); }
 		return "default";
 	}
 	return dev;
@@ -123,15 +120,9 @@ void MidiAlsaRaw::run()
 			printf("POLLERR or POLLHUP\n");
 			break;
 		}
-		if (!(revents & POLLIN))
-		{
-			continue;
-		}
+		if (!(revents & POLLIN)) { continue; }
 		err = snd_rawmidi_read(m_input, buf, sizeof(buf));
-		if (err == -EAGAIN)
-		{
-			continue;
-		}
+		if (err == -EAGAIN) { continue; }
 		if (err < 0)
 		{
 			printf("cannot read from port \"%s\": %s\nWill stop "
@@ -139,10 +130,7 @@ void MidiAlsaRaw::run()
 				/*port_name*/ "default", snd_strerror(err));
 			break;
 		}
-		if (err == 0)
-		{
-			continue;
-		}
+		if (err == 0) { continue; }
 		for (int i = 0; i < err; ++i)
 		{
 			parseData(buf[i]);

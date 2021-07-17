@@ -170,23 +170,18 @@ void Alg_smf_write::write_note(Alg_note_ptr note, bool on)
 
 	char chan = char(note->chan & 15);
 	int pitch = int(note->pitch + 0.5);
-	if (pitch < 0)
-	{
-		pitch = pitch % 12;
-	}
+	if (pitch < 0) { pitch = pitch % 12; }
 	else if (pitch > 127)
 	{
-		pitch = (pitch % 12) + 120; // put pitch in 10th octave
-		if (pitch > 127)
-			pitch -= 12; // or 9th octave
+		pitch = (pitch % 12) + 120;	  // put pitch in 10th octave
+		if (pitch > 127) pitch -= 12; // or 9th octave
 	}
 	out_file->put(0x90 + chan);
 	out_file->put(pitch);
 	if (on)
 	{
 		int vel = (int)note->loud;
-		if (vel <= 0)
-			vel = 1;
+		if (vel <= 0) vel = 1;
 		write_data(vel);
 	}
 	else
@@ -234,8 +229,7 @@ void Alg_smf_write::write_smpteoffset(Alg_update_ptr update, char* s)
 // write_data - limit data to the range of [0...127] and write it
 void Alg_smf_write::write_data(int data)
 {
-	if (data < 0)
-		data = 0;
+	if (data < 0) data = 0;
 	else if (data > 0x7F)
 		data = 0x7F;
 
@@ -246,24 +240,19 @@ int Alg_smf_write::to_midi_channel(int channel)
 {
 	// allegro track number is stored as multiple of 100
 	// also mask off all but 4 channel bits just in case
-	if (channels_per_track > 0)
-		channel %= channels_per_track;
+	if (channels_per_track > 0) channel %= channels_per_track;
 	return channel & 0xF;
 }
 
 int Alg_smf_write::to_track(int channel)
 {
-	if (channel == -1)
-		return 0;
+	if (channel == -1) return 0;
 	return channel / channels_per_track;
 }
 
 static char hex_to_nibble(char c)
 {
-	if (isalpha(c))
-	{
-		return 10 + (toupper(c) - 'A');
-	}
+	if (isalpha(c)) { return 10 + (toupper(c) - 'A'); }
 	else
 	{
 		return c - '0';
@@ -313,10 +302,8 @@ void Alg_smf_write::write_update(Alg_update_ptr update)
 	else if (!strcmp(name, "bendr"))
 	{
 		int temp = ROUND(0x2000 * (update->parameter.r + 1));
-		if (temp > 0x3fff)
-			temp = 0x3fff; // 14 bits maximum
-		if (temp < 0)
-			temp = 0;
+		if (temp > 0x3fff) temp = 0x3fff; // 14 bits maximum
+		if (temp < 0) temp = 0;
 		int c1 = temp & 0x7F; // low 7 bits
 		int c2 = temp >> 7;	  // high 7 bits
 		write_delta(update->time);
@@ -395,21 +382,18 @@ void Alg_smf_write::write_update(Alg_update_ptr update)
 		const char* s = update->parameter.s;
 		int len = strlen(s);
 		char smpteoffset[5];
-		if (len < 24)
-			return; // not long enough, must be bad format
+		if (len < 24) return; // not long enough, must be bad format
 		int fps = 0;
 		if (s[0] == '2')
 		{
-			if (s[1] == '4')
-				fps = 0;
+			if (s[1] == '4') fps = 0;
 			else if (s[1] == '5')
 				fps = 1;
 			else if (s[1] == '9')
 			{
 				fps = 2;
-				if (len != 27)
-					return; // not right length
-				s += 3;		// cancel effect of longer string
+				if (len != 27) return; // not right length
+				s += 3;				   // cancel effect of longer string
 			}
 		}
 		else
@@ -443,8 +427,7 @@ void Alg_smf_write::write_update(Alg_update_ptr update)
 	}
 	else if (!strcmp(name, "modea"))
 	{
-		if (!strcmp(alg_attr_name(update->parameter.a), "major"))
-			keysig_mode = 'M';
+		if (!strcmp(alg_attr_name(update->parameter.a), "major")) keysig_mode = 'M';
 		else
 			keysig_mode = 'm';
 		keysig_when = update->time;
@@ -477,10 +460,7 @@ void Alg_smf_write::write_track(int i)
 	int j = 0; // note index
 	Alg_events& notes = seq->track_list[i];
 	event_queue* pending = NULL;
-	if (notes.length() > 0)
-	{
-		pending = new event_queue('n', TICK_TIME(notes[j]->time, 0), 0, NULL);
-	}
+	if (notes.length() > 0) { pending = new event_queue('n', TICK_TIME(notes[j]->time, 0), 0, NULL); }
 	if (i == 0)
 	{ // track 0 may have tempo and timesig info
 		if (seq->get_time_map()->last_tempo_flag || seq->get_time_map()->beats.len > 0)
@@ -684,8 +664,7 @@ void Alg_smf_write::write_delta(double event_time)
 
 void Alg_smf_write::write_varinum(int value)
 {
-	if (value < 0)
-		value = 0; // this line should not have to be here!
+	if (value < 0) value = 0; // this line should not have to be here!
 	int buffer;
 
 	buffer = value & 0x7f;
@@ -699,8 +678,7 @@ void Alg_smf_write::write_varinum(int value)
 	for (;;)
 	{
 		out_file->put(buffer);
-		if (buffer & 0x80)
-			buffer >>= 8;
+		if (buffer & 0x80) buffer >>= 8;
 		else
 			break;
 	}
@@ -715,8 +693,7 @@ void Alg_seq::smf_write(ostream& file)
 bool Alg_seq::smf_write(const char* filename)
 {
 	ofstream outf(filename, ios::binary | ios::out);
-	if (outf.fail())
-		return false;
+	if (outf.fail()) return false;
 	smf_write(outf);
 	outf.close();
 	return true;

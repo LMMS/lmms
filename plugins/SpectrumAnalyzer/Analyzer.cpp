@@ -79,10 +79,7 @@ bool Analyzer::processAudioBuffer(sampleFrame* buffer, const fpp_t frame_count)
 	}
 #endif
 
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
+	if (!isEnabled() || !isRunning()) { return false; }
 
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
 	if (m_controls.isViewVisible())
@@ -95,10 +92,7 @@ bool Analyzer::processAudioBuffer(sampleFrame* buffer, const fpp_t frame_count)
 	audio_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - audio_time;
 	m_dump_count++;
 	m_sum_execution += audio_time / 1000000.0;
-	if (audio_time / 1000000.0 > m_max_execution)
-	{
-		m_max_execution = audio_time / 1000000.0;
-	}
+	if (audio_time / 1000000.0 > m_max_execution) { m_max_execution = audio_time / 1000000.0; }
 #endif
 
 	return isRunning();

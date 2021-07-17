@@ -69,10 +69,7 @@ MeterDialog::MeterDialog(QWidget* _parent, bool _simple)
 
 	m_denominator = new LcdSpinBox(2, den, tr("Meter Denominator"));
 	ToolTip::add(m_denominator, tr("Meter denominator"));
-	if (_simple)
-	{
-		m_denominator->setLabel(tr("TIME SIG"));
-	}
+	if (_simple) { m_denominator->setLabel(tr("TIME SIG")); }
 
 	den_layout->addWidget(m_denominator);
 

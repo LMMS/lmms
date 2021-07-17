@@ -80,10 +80,7 @@ inline void FxChannel::processed()
 {
 	for (const FxRoute* receiverRoute : m_sends)
 	{
-		if (receiverRoute->receiver()->m_muted == false)
-		{
-			receiverRoute->receiver()->incrementDeps();
-		}
+		if (receiverRoute->receiver()->m_muted == false) { receiverRoute->receiver()->incrementDeps(); }
 	}
 }
 
@@ -230,15 +227,11 @@ void FxMixer::toggledSolo()
 	int soloedChan = -1;
 	bool resetSolo = m_lastSoloed != -1;
 	// untoggle if lastsoloed is entered
-	if (resetSolo)
-	{
-		m_fxChannels[m_lastSoloed]->m_soloModel.setValue(false);
-	}
+	if (resetSolo) { m_fxChannels[m_lastSoloed]->m_soloModel.setValue(false); }
 	// determine the soloed channel
 	for (int i = 0; i < m_fxChannels.size(); ++i)
 	{
-		if (m_fxChannels[i]->m_soloModel.value() == true)
-			soloedChan = i;
+		if (m_fxChannels[i]->m_soloModel.value() == true) soloedChan = i;
 	}
 	// if no channel is soloed, unmute everything, else mute everything
 	if (soloedChan != -1)
@@ -321,10 +314,7 @@ void FxMixer::deleteChannel(int index)
 	}
 
 	// if m_lastSoloed was our index, reset it
-	if (m_lastSoloed == index)
-	{
-		m_lastSoloed = -1;
-	}
+	if (m_lastSoloed == index) { m_lastSoloed = -1; }
 	// if m_lastSoloed is > delete index, it will move left
 	else if (m_lastSoloed > index)
 	{
@@ -359,18 +349,12 @@ void FxMixer::deleteChannel(int index)
 void FxMixer::moveChannelLeft(int index)
 {
 	// can't move master or first channel
-	if (index <= 1 || index >= m_fxChannels.size())
-	{
-		return;
-	}
+	if (index <= 1 || index >= m_fxChannels.size()) { return; }
 	// channels to swap
 	int a = index - 1, b = index;
 
 	// check if m_lastSoloed is one of our swaps
-	if (m_lastSoloed == a)
-	{
-		m_lastSoloed = b;
-	}
+	if (m_lastSoloed == a) { m_lastSoloed = b; }
 	else if (m_lastSoloed == b)
 	{
 		m_lastSoloed = a;
@@ -390,10 +374,7 @@ void FxMixer::moveChannelLeft(int index)
 			{
 				InstrumentTrack* inst = (InstrumentTrack*)trackList[i];
 				int val = inst->effectChannelModel()->value(0);
-				if (val == a)
-				{
-					inst->effectChannelModel()->setValue(b);
-				}
+				if (val == a) { inst->effectChannelModel()->setValue(b); }
 				else if (val == b)
 				{
 					inst->effectChannelModel()->setValue(a);
@@ -403,10 +384,7 @@ void FxMixer::moveChannelLeft(int index)
 			{
 				SampleTrack* strk = (SampleTrack*)trackList[i];
 				int val = strk->effectChannelModel()->value(0);
-				if (val == a)
-				{
-					strk->effectChannelModel()->setValue(b);
-				}
+				if (val == a) { strk->effectChannelModel()->setValue(b); }
 				else if (val == b)
 				{
 					strk->effectChannelModel()->setValue(a);
@@ -448,10 +426,7 @@ FxRoute* FxMixer::createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel, floa
 
 FxRoute* FxMixer::createRoute(FxChannel* from, FxChannel* to, float amount)
 {
-	if (from == to)
-	{
-		return NULL;
-	}
+	if (from == to) { return NULL; }
 	Engine::mixer()->requestChangeInModel();
 	FxRoute* route = new FxRoute(from, to, amount);
 
@@ -501,8 +476,7 @@ void FxMixer::deleteChannelSend(FxRoute* route)
 
 bool FxMixer::isInfiniteLoop(fx_ch_t sendFrom, fx_ch_t sendTo)
 {
-	if (sendFrom == sendTo)
-		return true;
+	if (sendFrom == sendTo) return true;
 	FxChannel* from = m_fxChannels[sendFrom];
 	FxChannel* to = m_fxChannels[sendTo];
 	bool b = checkInfiniteLoop(from, to);
@@ -512,25 +486,16 @@ bool FxMixer::isInfiniteLoop(fx_ch_t sendFrom, fx_ch_t sendTo)
 bool FxMixer::checkInfiniteLoop(FxChannel* from, FxChannel* to)
 {
 	// can't send master to anything
-	if (from == m_fxChannels[0])
-	{
-		return true;
-	}
+	if (from == m_fxChannels[0]) { return true; }
 
 	// can't send channel to itself
-	if (from == to)
-	{
-		return true;
-	}
+	if (from == to) { return true; }
 
 	// follow sendTo's outputs recursively looking for something that sends
 	// to sendFrom
 	for (int i = 0; i < to->m_sends.size(); ++i)
 	{
-		if (checkInfiniteLoop(from, to->m_sends[i]->receiver()))
-		{
-			return true;
-		}
+		if (checkInfiniteLoop(from, to->m_sends[i]->receiver())) { return true; }
 	}
 
 	return false;
@@ -539,19 +504,13 @@ bool FxMixer::checkInfiniteLoop(FxChannel* from, FxChannel* to)
 // how much does fromChannel send its output to the input of toChannel?
 FloatModel* FxMixer::channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel)
 {
-	if (fromChannel == toChannel)
-	{
-		return NULL;
-	}
+	if (fromChannel == toChannel) { return NULL; }
 	const FxChannel* from = m_fxChannels[fromChannel];
 	const FxChannel* to = m_fxChannels[toChannel];
 
 	for (FxRoute* route : from->m_sends)
 	{
-		if (route->receiver() == to)
-		{
-			return route->amount();
-		}
+		if (route->receiver() == to) { return route->amount(); }
 	}
 
 	return NULL;
@@ -611,10 +570,7 @@ void FxMixer::masterMix(sampleFrame* _buf)
 				break;
 			}
 		}
-		if (!found)
-		{
-			break;
-		}
+		if (!found) { break; }
 		MixerWorkerThread::startAndWaitForJobs();
 	}
 
@@ -704,8 +660,7 @@ void FxMixer::saveSettings(QDomDocument& _doc, QDomElement& _this)
 		ch->m_soloModel.saveSettings(_doc, fxch, "soloed");
 		fxch.setAttribute("num", i);
 		fxch.setAttribute("name", ch->m_name);
-		if (ch->m_hasColor)
-			fxch.setAttribute("color", ch->m_color.name());
+		if (ch->m_hasColor) fxch.setAttribute("color", ch->m_color.name());
 
 		// add the channel sends
 		for (int si = 0; si < ch->m_sends.size(); ++si)
@@ -768,8 +723,7 @@ void FxMixer::loadSettings(const QDomElement& _this)
 				int sendTo = chDataItem.attribute("channel").toInt();
 				allocateChannelsTo(sendTo);
 				FxRoute* fxr = createChannelSend(num, sendTo, 1.0f);
-				if (fxr)
-					fxr->amount()->loadSettings(chDataItem, "amount");
+				if (fxr) fxr->amount()->loadSettings(chDataItem, "amount");
 			}
 		}
 

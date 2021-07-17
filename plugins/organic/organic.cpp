@@ -163,10 +163,7 @@ void organicInstrument::loadSettings(const QDomElement& _this)
 		m_osc[i]->m_panModel.loadSettings(_this, "pan" + is);
 		m_osc[i]->m_oscModel.loadSettings(_this, "wavetype" + is);
 
-		if (_this.hasAttribute("newharmonic" + is))
-		{
-			m_osc[i]->m_harmModel.loadSettings(_this, "newharmonic" + is);
-		}
+		if (_this.hasAttribute("newharmonic" + is)) { m_osc[i]->m_harmModel.loadSettings(_this, "newharmonic" + is); }
 		else
 		{
 			m_osc[i]->m_harmModel.setValue(static_cast<float>(i));
@@ -350,10 +347,7 @@ organicInstrumentView::organicInstrumentView(Instrument* _instrument, QWidget* _
 
 	connect(m_randBtn, SIGNAL(clicked()), oi, SLOT(randomiseSettings()));
 
-	if (s_artwork == NULL)
-	{
-		s_artwork = new QPixmap(PLUGIN_NAME::getIconPixmap("artwork"));
-	}
+	if (s_artwork == NULL) { s_artwork = new QPixmap(PLUGIN_NAME::getIconPixmap("artwork")); }
 }
 
 organicInstrumentView::~organicInstrumentView() { delete[] m_oscKnobs; }
@@ -372,10 +366,7 @@ void organicInstrumentView::modelChanged()
 	m_fx1Knob->setModel(&oi->m_fx1Model);
 	m_volKnob->setModel(&oi->m_volModel);
 
-	if (m_oscKnobs != NULL)
-	{
-		delete[] m_oscKnobs;
-	}
+	if (m_oscKnobs != NULL) { delete[] m_oscKnobs; }
 
 	m_oscKnobs = new OscillatorKnobs[m_numOscillators];
 

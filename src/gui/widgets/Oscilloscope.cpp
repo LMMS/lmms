@@ -150,18 +150,12 @@ void Oscilloscope::paintEvent(QPaintEvent*)
 
 void Oscilloscope::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() == Qt::LeftButton)
-	{
-		setActive(!m_active);
-	}
+	if (_me->button() == Qt::LeftButton) { setActive(!m_active); }
 }
 
 QColor const& Oscilloscope::determineLineColor(float level) const
 {
-	if (level <= 1.0f)
-	{
-		return normalColor();
-	}
+	if (level <= 1.0f) { return normalColor(); }
 	else
 	{
 		return clippingColor();

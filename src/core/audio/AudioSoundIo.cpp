@@ -194,10 +194,7 @@ AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
 
-	if (m_outstream)
-	{
-		soundio_outstream_destroy(m_outstream);
-	}
+	if (m_outstream) { soundio_outstream_destroy(m_outstream); }
 
 	if (m_soundio)
 	{
@@ -264,10 +261,7 @@ void AudioSoundIo::underflowCallback() { fprintf(stderr, "soundio: buffer underf
 
 void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 {
-	if (m_stopped)
-	{
-		return;
-	}
+	if (m_stopped) { return; }
 	const struct SoundIoChannelLayout* layout = &m_outstream->layout;
 	SoundIoChannelArea* areas;
 	int bytesPerSample = m_outstream->bytes_per_sample;
@@ -286,8 +280,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 			return;
 		}
 
-		if (!frameCount)
-			break;
+		if (!frameCount) break;
 
 		if (m_stopped)
 		{

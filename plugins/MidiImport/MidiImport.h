@@ -56,10 +56,7 @@ private:
 		do
 		{
 			c = readByte();
-			if (c == -1)
-			{
-				return (-1);
-			}
+			if (c == -1) { return (-1); }
 			value = (value << 8) | c;
 		} while (--_bytes);
 		return (value);
@@ -88,10 +85,7 @@ private:
 				{
 					c = readByte();
 					value = (value << 7) | c;
-					if (c & 0x80)
-					{
-						return -1;
-					}
+					if (c & 0x80) { return -1; }
 				}
 			}
 		}

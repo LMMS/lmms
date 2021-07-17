@@ -49,10 +49,7 @@ TrackLabelButton::TrackLabelButton(TrackView* _tv, QWidget* _parent)
 	m_renameLineEdit = new TrackRenameLineEdit(this);
 	m_renameLineEdit->hide();
 
-	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
-	{
-		setFixedSize(32, 29);
-	}
+	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()) { setFixedSize(32, 29); }
 	else
 	{
 		setFixedSize(160, 29);
@@ -120,10 +117,7 @@ void TrackLabelButton::dropEvent(QDropEvent* _de)
 
 void TrackLabelButton::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() == Qt::RightButton)
-	{
-		rename();
-	}
+	if (_me->button() == Qt::RightButton) { rename(); }
 	else
 	{
 		m_buttonRect = QRect(this->mapToGlobal(pos()), size());

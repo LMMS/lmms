@@ -48,30 +48,15 @@ extern "C"
 
 	FlangerEffect::~FlangerEffect()
 	{
-		if (m_lDelay)
-		{
-			delete m_lDelay;
-		}
-		if (m_rDelay)
-		{
-			delete m_rDelay;
-		}
-		if (m_lfo)
-		{
-			delete m_lfo;
-		}
-		if (m_noise)
-		{
-			delete m_noise;
-		}
+		if (m_lDelay) { delete m_lDelay; }
+		if (m_rDelay) { delete m_rDelay; }
+		if (m_lfo) { delete m_lfo; }
+		if (m_noise) { delete m_noise; }
 	}
 
 	bool FlangerEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	{
-		if (!isEnabled() || !isRunning())
-		{
-			return (false);
-		}
+		if (!isEnabled() || !isRunning()) { return (false); }
 		double outSum = 0.0;
 		const float d = dryLevel();
 		const float w = wetLevel();

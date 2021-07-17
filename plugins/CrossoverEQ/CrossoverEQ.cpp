@@ -77,10 +77,7 @@ void CrossoverEQEffect::sampleRateChanged()
 
 bool CrossoverEQEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 
 	// filters update
 	if (m_needsUpdate || m_controls.m_xover12.isValueChanged())
@@ -100,22 +97,10 @@ bool CrossoverEQEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	}
 
 	// gain values update
-	if (m_needsUpdate || m_controls.m_gain1.isValueChanged())
-	{
-		m_gain1 = dbfsToAmp(m_controls.m_gain1.value());
-	}
-	if (m_needsUpdate || m_controls.m_gain2.isValueChanged())
-	{
-		m_gain2 = dbfsToAmp(m_controls.m_gain2.value());
-	}
-	if (m_needsUpdate || m_controls.m_gain3.isValueChanged())
-	{
-		m_gain3 = dbfsToAmp(m_controls.m_gain3.value());
-	}
-	if (m_needsUpdate || m_controls.m_gain4.isValueChanged())
-	{
-		m_gain4 = dbfsToAmp(m_controls.m_gain4.value());
-	}
+	if (m_needsUpdate || m_controls.m_gain1.isValueChanged()) { m_gain1 = dbfsToAmp(m_controls.m_gain1.value()); }
+	if (m_needsUpdate || m_controls.m_gain2.isValueChanged()) { m_gain2 = dbfsToAmp(m_controls.m_gain2.value()); }
+	if (m_needsUpdate || m_controls.m_gain3.isValueChanged()) { m_gain3 = dbfsToAmp(m_controls.m_gain3.value()); }
+	if (m_needsUpdate || m_controls.m_gain4.isValueChanged()) { m_gain4 = dbfsToAmp(m_controls.m_gain4.value()); }
 
 	// mute values update
 	const bool mute1 = m_controls.m_mute1.value();

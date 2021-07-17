@@ -49,10 +49,7 @@ EffectSelectDialog::EffectSelectDialog(QWidget* _parent)
 
 	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Effect))
 	{
-		if (desc->subPluginFeatures)
-		{
-			desc->subPluginFeatures->listSubPluginKeys(desc, subPluginEffectKeys);
-		}
+		if (desc->subPluginFeatures) { desc->subPluginFeatures->listSubPluginKeys(desc, subPluginEffectKeys); }
 		else
 		{
 			m_effectKeys << EffectKey(desc, desc->name);
@@ -124,19 +121,13 @@ Effect* EffectSelectDialog::instantiateSelectedPlugin(EffectChain* _parent)
 	{
 		result = Effect::instantiate(m_currentSelection.desc->name, _parent, &m_currentSelection);
 	}
-	if (!result)
-	{
-		result = new DummyEffect(_parent, QDomElement());
-	}
+	if (!result) { result = new DummyEffect(_parent, QDomElement()); }
 	return result;
 }
 
 void EffectSelectDialog::acceptSelection()
 {
-	if (m_currentSelection.isValid())
-	{
-		accept();
-	}
+	if (m_currentSelection.isValid()) { accept(); }
 }
 
 void EffectSelectDialog::rowChanged(const QModelIndex& _idx, const QModelIndex&)
@@ -189,10 +180,7 @@ void EffectSelectDialog::rowChanged(const QModelIndex& _idx, const QModelIndex&)
 			m_currentSelection.desc->subPluginFeatures->fillDescriptionWidget(subWidget, &m_currentSelection);
 			for (QWidget* w : subWidget->findChildren<QWidget*>())
 			{
-				if (w->parent() == subWidget)
-				{
-					subLayout->addWidget(w);
-				}
+				if (w->parent() == subWidget) { subLayout->addWidget(w); }
 			}
 
 			textWidgetLayout->addWidget(subWidget);

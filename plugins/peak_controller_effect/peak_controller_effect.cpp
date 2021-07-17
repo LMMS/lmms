@@ -78,10 +78,7 @@ bool PeakControllerEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _fr
 
 	// This appears to be used for determining whether or not to continue processing
 	// audio with this effect
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
+	if (!isEnabled() || !isRunning()) { return false; }
 
 	// RMS:
 	double sum = 0;

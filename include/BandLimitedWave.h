@@ -52,10 +52,7 @@ typedef struct
 public:
 	inline sample_t sampleAt(int table, int ph)
 	{
-		if (table % 2 == 0)
-		{
-			return m_data[TLENS[table] + ph];
-		}
+		if (table % 2 == 0) { return m_data[TLENS[table] + ph]; }
 		else
 		{
 			return m_data3[TLENS[table] + ph];
@@ -63,10 +60,7 @@ public:
 	}
 	inline void setSampleAt(int table, int ph, sample_t sample)
 	{
-		if (table % 2 == 0)
-		{
-			m_data[TLENS[table] + ph] = sample;
-		}
+		if (table % 2 == 0) { m_data[TLENS[table] + ph] = sample; }
 		else
 		{
 			m_data3[TLENS[table] + ph] = sample;

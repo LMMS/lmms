@@ -246,10 +246,7 @@ QString malletsInstrument::nodeName() const { return (malletsstk_plugin_descript
 
 void malletsInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
-	if (m_filesMissing)
-	{
-		return;
-	}
+	if (m_filesMissing) { return; }
 
 	int p = m_presetsModel.value();
 

@@ -69,10 +69,8 @@ public:
 
 	inline tube_sample transfer_clip(tube_sample a)
 	{
-		if (a <= clip[0].threshold)
-			return clip[0].value;
-		if (a >= clip[1].threshold)
-			return clip[1].value;
+		if (a <= clip[0].threshold) return clip[0].value;
+		if (a >= clip[1].threshold) return clip[1].value;
 		return transfer(a);
 	}
 
@@ -132,10 +130,8 @@ public:
 
 	inline tube_sample transfer_clip(tube_sample a)
 	{
-		if (a <= clip[0].threshold)
-			return clip[0].value;
-		if (a >= clip[1].threshold)
-			return clip[1].value;
+		if (a <= clip[0].threshold) return clip[0].value;
+		if (a >= clip[1].threshold) return clip[1].value;
 		return transfer(a);
 	}
 };
@@ -169,10 +165,8 @@ public:
 	inline tube_sample transfer(tube_sample a)
 	{
 		a = r12AX7::Zero + a * (r12AX7::Samples - r12AX7::Zero);
-		if (a <= 0)
-			return r12AX7::v2v[0];
-		if (a >= r12AX7::Samples - 1)
-			return r12AX7::v2v[r12AX7::Samples - 1];
+		if (a <= 0) return r12AX7::v2v[0];
+		if (a >= r12AX7::Samples - 1) return r12AX7::v2v[r12AX7::Samples - 1];
 
 		/* linear interpolation from sampled function */
 		register int i = lrintf(a);
@@ -211,10 +205,8 @@ public:
 
 	inline tube_sample transfer_clip(tube_sample a)
 	{
-		if (a <= clip[0].threshold)
-			return clip[0].value;
-		if (a >= clip[1].threshold)
-			return clip[1].value;
+		if (a <= clip[0].threshold) return clip[0].value;
+		if (a >= clip[1].threshold) return clip[1].value;
 		return transfer(a);
 	}
 };

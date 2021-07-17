@@ -40,10 +40,7 @@ MidiPortMenu::~MidiPortMenu() {}
 void MidiPortMenu::modelChanged()
 {
 	MidiPort* mp = castModel<MidiPort>();
-	if (m_mode == MidiPort::Input)
-	{
-		connect(mp, SIGNAL(readablePortsChanged()), this, SLOT(updateMenu()));
-	}
+	if (m_mode == MidiPort::Input) { connect(mp, SIGNAL(readablePortsChanged()), this, SLOT(updateMenu())); }
 	else if (m_mode == MidiPort::Output)
 	{
 		connect(mp, SIGNAL(writablePortsChanged()), this, SLOT(updateMenu()));
@@ -53,10 +50,7 @@ void MidiPortMenu::modelChanged()
 
 void MidiPortMenu::activatedPort(QAction* _item)
 {
-	if (m_mode == MidiPort::Input)
-	{
-		castModel<MidiPort>()->subscribeReadablePort(_item->text(), _item->isChecked());
-	}
+	if (m_mode == MidiPort::Input) { castModel<MidiPort>()->subscribeReadablePort(_item->text(), _item->isChecked()); }
 	else if (m_mode == MidiPort::Output)
 	{
 		castModel<MidiPort>()->subscribeWritablePort(_item->text(), _item->isChecked());

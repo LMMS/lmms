@@ -30,8 +30,5 @@
 
 void ToolTip::add(QWidget* _w, const QString& _txt)
 {
-	if (!ConfigManager::inst()->value("tooltips", "disabled").toInt())
-	{
-		_w->setToolTip(_txt);
-	}
+	if (!ConfigManager::inst()->value("tooltips", "disabled").toInt()) { _w->setToolTip(_txt); }
 }

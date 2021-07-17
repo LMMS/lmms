@@ -105,19 +105,13 @@ void StepRecorder::noteReleased(const Note& n)
 
 		// if m_updateReleasedTimer is not already active, activate it
 		//(when activated, the timer will re-set itself as long as there are released notes)
-		if (!m_updateReleasedTimer.isActive())
-		{
-			m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS);
-		}
+		if (!m_updateReleasedTimer.isActive()) { m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS); }
 
 		// check if all note are released, apply notes to pattern(or dimiss if length is zero) and prepare to record
 		// next step
 		if (allCurStepNotesReleased())
 		{
-			if (m_curStepLength > 0)
-			{
-				applyStep();
-			}
+			if (m_curStepLength > 0) { applyStep(); }
 			else
 			{
 				dismissStep();
@@ -133,19 +127,13 @@ bool StepRecorder::keyPressEvent(QKeyEvent* ke)
 	switch (ke->key())
 	{
 	case Qt::Key_Right: {
-		if (!ke->isAutoRepeat())
-		{
-			stepForwards();
-		}
+		if (!ke->isAutoRepeat()) { stepForwards(); }
 		event_handled = true;
 		break;
 	}
 
 	case Qt::Key_Left: {
-		if (!ke->isAutoRepeat())
-		{
-			stepBackwards();
-		}
+		if (!ke->isAutoRepeat()) { stepBackwards(); }
 		event_handled = true;
 		break;
 	}
@@ -204,10 +192,7 @@ void StepRecorder::stepBackwards()
 {
 	if (m_isStepInProgress)
 	{
-		if (m_curStepLength > 0)
-		{
-			m_curStepLength = max(m_curStepLength - m_stepsLength, 0);
-		}
+		if (m_curStepLength > 0) { m_curStepLength = max(m_curStepLength - m_stepsLength, 0); }
 		else
 		{
 			// if length is already zero - move starting position backwards
@@ -243,10 +228,7 @@ void StepRecorder::applyStep()
 
 void StepRecorder::dismissStep()
 {
-	if (!m_isStepInProgress)
-	{
-		return;
-	}
+	if (!m_isStepInProgress) { return; }
 
 	prepareNewStep();
 }
@@ -269,10 +251,7 @@ void StepRecorder::prepareNewStep()
 
 void StepRecorder::setCurrentPattern(Pattern* newPattern)
 {
-	if (m_pattern != NULL && m_pattern != newPattern)
-	{
-		dismissStep();
-	}
+	if (m_pattern != NULL && m_pattern != newPattern) { dismissStep(); }
 
 	m_pattern = newPattern;
 }
@@ -304,15 +283,9 @@ void StepRecorder::removeNotesReleasedForTooLong()
 		}
 	}
 
-	if (notesRemoved)
-	{
-		m_pianoRoll.update();
-	}
+	if (notesRemoved) { m_pianoRoll.update(); }
 
-	if (nextTimout != std::numeric_limits<int>::max())
-	{
-		m_updateReleasedTimer.start(nextTimout);
-	}
+	if (nextTimout != std::numeric_limits<int>::max()) { m_updateReleasedTimer.start(nextTimout); }
 	else
 	{
 		// no released note found for next timout, stop timer
@@ -342,10 +315,7 @@ bool StepRecorder::allCurStepNotesReleased()
 {
 	for (const StepNote* stepNote : m_curStepNotes)
 	{
-		if (stepNote->isPressed())
-		{
-			return false;
-		}
+		if (stepNote->isPressed()) { return false; }
 	}
 
 	return true;
@@ -355,10 +325,7 @@ StepRecorder::StepNote* StepRecorder::findCurStepNote(const int key)
 {
 	for (StepNote* stepNote : m_curStepNotes)
 	{
-		if (stepNote->m_note.key() == key)
-		{
-			return stepNote;
-		}
+		if (stepNote->m_note.key() == key) { return stepNote; }
 	}
 
 	return nullptr;

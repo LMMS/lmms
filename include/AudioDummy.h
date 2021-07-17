@@ -75,21 +75,12 @@ private:
 		{
 			timer.reset();
 			const surroundSampleFrame* b = mixer()->nextBuffer();
-			if (!b)
-			{
-				break;
-			}
-			if (mixer()->hasFifoWriter())
-			{
-				delete[] b;
-			}
+			if (!b) { break; }
+			if (mixer()->hasFifoWriter()) { delete[] b; }
 
 			const int microseconds = static_cast<int>(
 				mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed());
-			if (microseconds > 0)
-			{
-				usleep(microseconds);
-			}
+			if (microseconds > 0) { usleep(microseconds); }
 		}
 	}
 };

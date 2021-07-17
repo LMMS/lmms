@@ -79,10 +79,7 @@ inline float BitcrushEffect::noise(float amt) { return fastRandf(amt * 2.0f) - a
 
 bool BitcrushEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 
 	// update values
 	if (m_needsUpdate || m_controls.m_rateEnabled.isValueChanged())
@@ -111,18 +108,9 @@ bool BitcrushEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		m_levels = m_controls.m_levels.value();
 		m_levelsRatio = 1.0f / (float)m_levels;
 	}
-	if (m_needsUpdate || m_controls.m_inGain.isValueChanged())
-	{
-		m_inGain = dbfsToAmp(m_controls.m_inGain.value());
-	}
-	if (m_needsUpdate || m_controls.m_outGain.isValueChanged())
-	{
-		m_outGain = dbfsToAmp(m_controls.m_outGain.value());
-	}
-	if (m_needsUpdate || m_controls.m_outClip.isValueChanged())
-	{
-		m_outClip = dbfsToAmp(m_controls.m_outClip.value());
-	}
+	if (m_needsUpdate || m_controls.m_inGain.isValueChanged()) { m_inGain = dbfsToAmp(m_controls.m_inGain.value()); }
+	if (m_needsUpdate || m_controls.m_outGain.isValueChanged()) { m_outGain = dbfsToAmp(m_controls.m_outGain.value()); }
+	if (m_needsUpdate || m_controls.m_outClip.isValueChanged()) { m_outClip = dbfsToAmp(m_controls.m_outClip.value()); }
 	m_needsUpdate = false;
 
 	const float noiseAmt = m_controls.m_inNoise.value() * 0.01f;
@@ -181,10 +169,7 @@ bool BitcrushEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		}
 		else
 		{
-			if (m_silenceCounter > SILENCEFRAMES)
-			{
-				m_buffer[f][0] = m_buffer[f][1] = 0.0f;
-			}
+			if (m_silenceCounter > SILENCEFRAMES) { m_buffer[f][0] = m_buffer[f][1] = 0.0f; }
 			else
 			{
 				++m_silenceCounter;

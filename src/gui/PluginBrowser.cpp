@@ -113,10 +113,7 @@ void PluginBrowser::onFilterChanged(const QString& filter)
 		{
 			QTreeWidgetItem* item = root->child(itemIndex);
 			PluginDescWidget* descWidget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
-			if (descWidget->name().contains(filter, Qt::CaseInsensitive))
-			{
-				item->setHidden(false);
-			}
+			if (descWidget->name().contains(filter, Qt::CaseInsensitive)) { item->setHidden(false); }
 			else
 			{
 				item->setHidden(true);
@@ -211,10 +208,7 @@ void PluginDescWidget::paintEvent(QPaintEvent*)
 	p.drawPixmap(4, 4, logo);
 
 	QFont f = p.font();
-	if (m_mouseOver)
-	{
-		f.setBold(true);
-	}
+	if (m_mouseOver) { f.setBold(true); }
 
 	p.setFont(f);
 	p.drawText(10 + logo_size.width(), 15, m_pluginKey.displayName());

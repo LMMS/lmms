@@ -43,26 +43,17 @@ AutomatableButton::AutomatableButton(QWidget* _parent, const QString& _name)
 
 AutomatableButton::~AutomatableButton()
 {
-	if (m_group != NULL)
-	{
-		m_group->removeButton(this);
-	}
+	if (m_group != NULL) { m_group->removeButton(this); }
 }
 
 void AutomatableButton::modelChanged()
 {
-	if (QPushButton::isChecked() != model()->value())
-	{
-		QPushButton::setChecked(model()->value());
-	}
+	if (QPushButton::isChecked() != model()->value()) { QPushButton::setChecked(model()->value()); }
 }
 
 void AutomatableButton::update()
 {
-	if (QPushButton::isChecked() != model()->value())
-	{
-		QPushButton::setChecked(model()->value());
-	}
+	if (QPushButton::isChecked() != model()->value()) { QPushButton::setChecked(model()->value()); }
 	QPushButton::update();
 }
 
@@ -93,10 +84,7 @@ void AutomatableButton::mousePressEvent(QMouseEvent* _me)
 	if (_me->button() == Qt::LeftButton && !(_me->modifiers() & Qt::ControlModifier))
 	{
 		// User simply clicked, toggle if needed
-		if (isCheckable())
-		{
-			toggle();
-		}
+		if (isCheckable()) { toggle(); }
 		_me->accept();
 	}
 	else
@@ -122,20 +110,14 @@ void AutomatableButton::mousePressEvent(QMouseEvent* _me)
 
 void AutomatableButton::mouseReleaseEvent(QMouseEvent* _me)
 {
-	if (_me && _me->button() == Qt::LeftButton)
-	{
-		emit clicked();
-	}
+	if (_me && _me->button() == Qt::LeftButton) { emit clicked(); }
 }
 
 void AutomatableButton::toggle()
 {
 	if (isCheckable() && m_group != NULL)
 	{
-		if (model()->value() == false)
-		{
-			m_group->activateButton(this);
-		}
+		if (model()->value() == false) { m_group->activateButton(this); }
 	}
 	else
 	{

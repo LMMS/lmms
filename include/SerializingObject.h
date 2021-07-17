@@ -69,10 +69,7 @@ public:
 	}
 	virtual ~SerializingObjectHook()
 	{
-		if (m_hookedIn != NULL)
-		{
-			m_hookedIn->setHook(NULL);
-		}
+		if (m_hookedIn != NULL) { m_hookedIn->setHook(NULL); }
 	}
 
 	virtual void saveSettings(QDomDocument& _doc, QDomElement& _this) = 0;

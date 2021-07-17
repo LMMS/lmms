@@ -45,10 +45,8 @@ FileDialog::FileDialog(QWidget* parent, const QString& caption, const QString& d
 	urls << QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
 	// Find downloads directory
 	QDir downloadDir(QDir::homePath() + "/Downloads");
-	if (!downloadDir.exists())
-		downloadDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
-	if (downloadDir.exists())
-		urls << QUrl::fromLocalFile(downloadDir.absolutePath());
+	if (!downloadDir.exists()) downloadDir.setPath(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+	if (downloadDir.exists()) urls << QUrl::fromLocalFile(downloadDir.absolutePath());
 
 	urls << QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
 	urls << QUrl::fromLocalFile(ConfigManager::inst()->workingDir());
@@ -57,8 +55,7 @@ FileDialog::FileDialog(QWidget* parent, const QString& caption, const QString& d
 	// external disk drives.
 #ifdef LMMS_BUILD_APPLE
 	QDir volumesDir(QDir("/Volumes"));
-	if (volumesDir.exists())
-		urls << QUrl::fromLocalFile(volumesDir.absolutePath());
+	if (volumesDir.exists()) urls << QUrl::fromLocalFile(volumesDir.absolutePath());
 #endif
 
 	setSidebarUrls(urls);
@@ -70,10 +67,7 @@ QString FileDialog::getExistingDirectory(
 	FileDialog dialog(parent, caption, directory, QString());
 	dialog.setFileMode(QFileDialog::Directory);
 	dialog.setOptions(dialog.options() | options);
-	if (dialog.exec() == QDialog::Accepted)
-	{
-		return dialog.selectedFiles().value(0);
-	}
+	if (dialog.exec() == QDialog::Accepted) { return dialog.selectedFiles().value(0); }
 	return QString();
 }
 
@@ -81,12 +75,10 @@ QString FileDialog::getOpenFileName(
 	QWidget* parent, const QString& caption, const QString& directory, const QString& filter, QString* selectedFilter)
 {
 	FileDialog dialog(parent, caption, directory, filter);
-	if (selectedFilter && !selectedFilter->isEmpty())
-		dialog.selectNameFilter(*selectedFilter);
+	if (selectedFilter && !selectedFilter->isEmpty()) dialog.selectNameFilter(*selectedFilter);
 	if (dialog.exec() == QDialog::Accepted)
 	{
-		if (selectedFilter)
-			*selectedFilter = dialog.selectedNameFilter();
+		if (selectedFilter) *selectedFilter = dialog.selectedNameFilter();
 		return dialog.selectedFiles().value(0);
 	}
 	return QString();

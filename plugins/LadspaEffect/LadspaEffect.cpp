@@ -141,10 +141,7 @@ bool LadspaEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 				break;
 			case AUDIO_RATE_INPUT: {
 				ValueBuffer* vb = pp->control->valueBuffer();
-				if (vb)
-				{
-					memcpy(pp->buffer, vb->values(), frames * sizeof(float));
-				}
+				if (vb) { memcpy(pp->buffer, vb->values(), frames * sizeof(float)); }
 				else
 				{
 					pp->value = static_cast<LADSPA_Data>(pp->control->value() / pp->scale);
@@ -159,10 +156,7 @@ bool LadspaEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 				break;
 			}
 			case CONTROL_RATE_INPUT:
-				if (pp->control == NULL)
-				{
-					break;
-				}
+				if (pp->control == NULL) { break; }
 				pp->value = static_cast<LADSPA_Data>(pp->control->value() / pp->scale);
 				pp->buffer[0] = pp->value;
 				break;
@@ -215,10 +209,7 @@ bool LadspaEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 		}
 	}
 
-	if (o_buf != NULL)
-	{
-		sampleBack(_buf, o_buf, m_maxSampleRate);
-	}
+	if (o_buf != NULL) { sampleBack(_buf, o_buf, m_maxSampleRate); }
 
 	checkGate(out_sum / frames);
 
@@ -229,10 +220,7 @@ bool LadspaEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 
 void LadspaEffect::setControl(int _control, LADSPA_Data _value)
 {
-	if (!isOkay())
-	{
-		return;
-	}
+	if (!isOkay()) { return; }
 	m_portControls[_control]->value = _value;
 }
 
@@ -310,10 +298,7 @@ void LadspaEffect::pluginInstantiation()
 			{
 				p->buffer = MM_ALLOC(LADSPA_Data, 1);
 
-				if (manager->isPortInput(m_key, port))
-				{
-					p->rate = CONTROL_RATE_INPUT;
-				}
+				if (manager->isPortInput(m_key, port)) { p->rate = CONTROL_RATE_INPUT; }
 				else
 				{
 					p->rate = CONTROL_RATE_OUTPUT;
@@ -321,10 +306,7 @@ void LadspaEffect::pluginInstantiation()
 			}
 
 			p->scale = 1.0f;
-			if (manager->isEnum(m_key, port))
-			{
-				p->data_type = ENUM;
-			}
+			if (manager->isEnum(m_key, port)) { p->data_type = ENUM; }
 			else if (manager->isPortToggled(m_key, port))
 			{
 				p->data_type = TOGGLED;
@@ -360,34 +342,19 @@ void LadspaEffect::pluginInstantiation()
 
 			// Get the range and default values.
 			p->max = manager->getUpperBound(m_key, port);
-			if (p->max == NOHINT)
-			{
-				p->max = p->name.toUpper() == "GAIN" ? 10.0f : 1.0f;
-			}
+			if (p->max == NOHINT) { p->max = p->name.toUpper() == "GAIN" ? 10.0f : 1.0f; }
 
-			if (manager->areHintsSampleRateDependent(m_key, port))
-			{
-				p->max *= m_maxSampleRate;
-			}
+			if (manager->areHintsSampleRateDependent(m_key, port)) { p->max *= m_maxSampleRate; }
 
 			p->min = manager->getLowerBound(m_key, port);
-			if (p->min == NOHINT)
-			{
-				p->min = 0.0f;
-			}
+			if (p->min == NOHINT) { p->min = 0.0f; }
 
-			if (manager->areHintsSampleRateDependent(m_key, port))
-			{
-				p->min *= m_maxSampleRate;
-			}
+			if (manager->areHintsSampleRateDependent(m_key, port)) { p->min *= m_maxSampleRate; }
 
 			p->def = manager->getDefaultSetting(m_key, port);
 			if (p->def == NOHINT)
 			{
-				if (p->data_type != TOGGLED)
-				{
-					p->def = (p->min + p->max) / 2.0f;
-				}
+				if (p->data_type != TOGGLED) { p->def = (p->min + p->max) / 2.0f; }
 				else
 				{
 					p->def = 1.0f;
@@ -473,10 +440,7 @@ void LadspaEffect::pluginInstantiation()
 
 void LadspaEffect::pluginDestruction()
 {
-	if (!isOkay())
-	{
-		return;
-	}
+	if (!isOkay()) { return; }
 
 	delete m_controls;
 
@@ -490,8 +454,7 @@ void LadspaEffect::pluginDestruction()
 			port_desc_t* pp = m_ports.at(proc).at(port);
 			if (m_inPlaceBroken || pp->rate != CHANNEL_OUT)
 			{
-				if (pp->buffer)
-					MM_FREE(pp->buffer);
+				if (pp->buffer) MM_FREE(pp->buffer);
 			}
 			delete pp;
 		}
@@ -513,10 +476,7 @@ sample_rate_t LadspaEffect::maxSamplerate(const QString& _name)
 		__buggy_plugins["Notch Filter"] = 96000;
 		__buggy_plugins["TAP Reflector"] = 192000;
 	}
-	if (__buggy_plugins.contains(_name))
-	{
-		return (__buggy_plugins[_name]);
-	}
+	if (__buggy_plugins.contains(_name)) { return (__buggy_plugins[_name]); }
 	return (Engine::mixer()->processingSampleRate());
 }
 

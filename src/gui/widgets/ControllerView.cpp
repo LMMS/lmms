@@ -92,10 +92,7 @@ ControllerView::ControllerView(Controller* _model, QWidget* _parent)
 
 ControllerView::~ControllerView()
 {
-	if (m_subWindow)
-	{
-		delete m_subWindow;
-	}
+	if (m_subWindow) { delete m_subWindow; }
 }
 
 void ControllerView::editControls()

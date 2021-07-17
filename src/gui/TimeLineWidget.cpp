@@ -70,10 +70,7 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerBar;
 
-	if (s_posMarkerPixmap == NULL)
-	{
-		s_posMarkerPixmap = new QPixmap(embed::getIconPixmap("playpos_marker"));
-	}
+	if (s_posMarkerPixmap == NULL) { s_posMarkerPixmap = new QPixmap(embed::getIconPixmap("playpos_marker")); }
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	move(0, yoff);
@@ -91,20 +88,14 @@ TimeLineWidget::TimeLineWidget(const int xoff, const int yoff, const float ppb, 
 
 TimeLineWidget::~TimeLineWidget()
 {
-	if (gui->songEditor())
-	{
-		m_pos.m_timeLine = NULL;
-	}
+	if (gui->songEditor()) { m_pos.m_timeLine = NULL; }
 	delete m_hint;
 }
 
 void TimeLineWidget::setXOffset(const int x)
 {
 	m_xOffset = x;
-	if (s_posMarkerPixmap != nullptr)
-	{
-		m_xOffset -= s_posMarkerPixmap->width() / 2;
-	}
+	if (s_posMarkerPixmap != nullptr) { m_xOffset -= s_posMarkerPixmap->width() / 2; }
 }
 
 void TimeLineWidget::addToolButtons(QToolBar* _tool_bar)
@@ -154,10 +145,7 @@ void TimeLineWidget::loadSettings(const QDomElement& _this)
 	update();
 	emit loopPointStateLoaded(m_loopPoints);
 
-	if (_this.hasAttribute("stopbehaviour"))
-	{
-		emit loadBehaviourAtStop(_this.attribute("stopbehaviour").toInt());
-	}
+	if (_this.hasAttribute("stopbehaviour")) { emit loadBehaviourAtStop(_this.attribute("stopbehaviour").toInt()); }
 }
 
 void TimeLineWidget::updatePosition(const TimePos&)
@@ -254,17 +242,11 @@ void TimeLineWidget::paintEvent(QPaintEvent*)
 
 void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 {
-	if (event->x() < m_xOffset)
-	{
-		return;
-	}
+	if (event->x() < m_xOffset) { return; }
 	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ShiftModifier))
 	{
 		m_action = MovePositionMarker;
-		if (event->x() - m_xOffset < s_posMarkerPixmap->width())
-		{
-			m_moveXOff = event->x() - m_xOffset;
-		}
+		if (event->x() - m_xOffset < s_posMarkerPixmap->width()) { m_moveXOff = event->x() - m_xOffset; }
 		else
 		{
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
@@ -282,19 +264,13 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 			m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
 		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1]) / 2;
 
-		if (t < loopMid)
-		{
-			m_action = MoveLoopBegin;
-		}
+		if (t < loopMid) { m_action = MoveLoopBegin; }
 		else if (t > loopMid)
 		{
 			m_action = MoveLoopEnd;
 		}
 
-		if (m_loopPos[0] > m_loopPos[1])
-		{
-			qSwap(m_loopPos[0], m_loopPos[1]);
-		}
+		if (m_loopPos[0] > m_loopPos[1]) { qSwap(m_loopPos[0], m_loopPos[1]); }
 
 		m_loopPos[(m_action == MoveLoopBegin) ? 0 : 1] = t;
 	}
@@ -349,10 +325,7 @@ void TimeLineWidget::mouseMoveEvent(QMouseEvent* event)
 		{
 			// Note, swap 1 and 0 below and the behavior "skips" the other
 			// marking instead of pushing it.
-			if (m_action == MoveLoopBegin)
-			{
-				m_loopPos[0] -= TimePos::ticksPerBar();
-			}
+			if (m_action == MoveLoopBegin) { m_loopPos[0] -= TimePos::ticksPerBar(); }
 			else
 			{
 				m_loopPos[1] += TimePos::ticksPerBar();
@@ -374,9 +347,6 @@ void TimeLineWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	delete m_hint;
 	m_hint = NULL;
-	if (m_action == SelectSongTCO)
-	{
-		emit selectionFinished();
-	}
+	if (m_action == SelectSongTCO) { emit selectionFinished(); }
 	m_action = NoAction;
 }

@@ -73,8 +73,7 @@ public:
 
 	~FIR()
 	{
-		if (!borrowed_kernel)
-			free(c);
+		if (!borrowed_kernel) free(c);
 		free(x);
 	}
 
@@ -86,8 +85,7 @@ public:
 		 * history pointer by & instead of %, saving a few cpu cycles. */
 		m = next_power_of_2(n);
 
-		if (c)
-			borrowed_kernel = true;
+		if (c) borrowed_kernel = true;
 		else
 			borrowed_kernel = false, c = (sample_t*)malloc(n * sizeof(sample_t));
 
@@ -186,10 +184,8 @@ public:
 
 	~FIRUpsampler()
 	{
-		if (c)
-			free(c);
-		if (x)
-			free(x);
+		if (c) free(c);
+		if (x) free(x);
 	}
 
 	void init(int _n, int _over)

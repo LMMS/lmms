@@ -89,18 +89,12 @@ QString patmanInstrument::nodeName(void) const { return (patman_plugin_descripto
 
 void patmanInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
-	if (m_patchFile == "")
-	{
-		return;
-	}
+	if (m_patchFile == "") { return; }
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if (!_n->m_pluginData)
-	{
-		selectSample(_n);
-	}
+	if (!_n->m_pluginData) { selectSample(_n); }
 	handle_data* hdata = (handle_data*)_n->m_pluginData;
 
 	float play_freq = hdata->tuned ? _n->frequency() : hdata->sample->frequency();
@@ -144,10 +138,7 @@ void patmanInstrument::setFile(const QString& _patch_file, bool _rename)
 
 	m_patchFile = PathUtil::toShortestRelative(_patch_file);
 	LoadErrors error = loadPatch(PathUtil::toAbsolute(_patch_file));
-	if (error)
-	{
-		printf("Load error\n");
-	}
+	if (error) { printf("Load error\n"); }
 
 	emit fileChanged();
 }
@@ -253,10 +244,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(const QString& _filenam
 					return (LoadIO);
 				}
 				sample = swap16IfBE(sample);
-				if (modes & MODES_UNSIGNED)
-				{
-					sample ^= 0x8000;
-				}
+				if (modes & MODES_UNSIGNED) { sample ^= 0x8000; }
 				wave_samples[frame] = sample / 32767.0f;
 			}
 
@@ -276,10 +264,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(const QString& _filenam
 					fclose(fd);
 					return (LoadIO);
 				}
-				if (modes & MODES_UNSIGNED)
-				{
-					sample ^= 0x80;
-				}
+				if (modes & MODES_UNSIGNED) { sample ^= 0x80; }
 				wave_samples[frame] = sample / 127.0f;
 			}
 		}
@@ -343,10 +328,7 @@ void patmanInstrument::selectSample(NotePlayHandle* _n)
 
 	handle_data* hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
-	if (sample)
-	{
-		hdata->sample = sharedObject::ref(sample);
-	}
+	if (sample) { hdata->sample = sharedObject::ref(sample); }
 	else
 	{
 		hdata->sample = new SampleBuffer(NULL, 0);
@@ -410,10 +392,7 @@ void PatmanView::openFile(void)
 
 	if (m_pi->m_patchFile == "")
 	{
-		if (QDir("/usr/share/midi/freepats").exists())
-		{
-			ofd.setDirectory("/usr/share/midi/freepats");
-		}
+		if (QDir("/usr/share/midi/freepats").exists()) { ofd.setDirectory("/usr/share/midi/freepats"); }
 		else
 		{
 			ofd.setDirectory(ConfigManager::inst()->userSamplesDir());
@@ -422,10 +401,7 @@ void PatmanView::openFile(void)
 	else if (QFileInfo(m_pi->m_patchFile).isRelative())
 	{
 		QString f = ConfigManager::inst()->userSamplesDir() + m_pi->m_patchFile;
-		if (QFileInfo(f).exists() == false)
-		{
-			f = ConfigManager::inst()->factorySamplesDir() + m_pi->m_patchFile;
-		}
+		if (QFileInfo(f).exists() == false) { f = ConfigManager::inst()->factorySamplesDir() + m_pi->m_patchFile; }
 
 		ofd.selectFile(f);
 	}
@@ -459,10 +435,7 @@ void PatmanView::updateFilename(void)
 		m_displayFilename = m_pi->m_patchFile[--idx] + m_displayFilename;
 	}
 
-	if (idx > 0)
-	{
-		m_displayFilename = "..." + m_displayFilename;
-	}
+	if (idx > 0) { m_displayFilename = "..." + m_displayFilename; }
 
 	update();
 }
@@ -475,10 +448,7 @@ void PatmanView::dragEnterEvent(QDragEnterEvent* _dee)
 	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
 	{
 		QString txt = _dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == "samplefile")
-		{
-			_dee->acceptProposedAction();
-		}
+		if (txt.section(':', 0, 0) == "samplefile") { _dee->acceptProposedAction(); }
 		else
 		{
 			_dee->ignore();

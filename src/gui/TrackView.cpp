@@ -144,10 +144,7 @@ void TrackView::resizeEvent(QResizeEvent* re)
 void TrackView::update()
 {
 	m_trackContentWidget.update();
-	if (!m_trackContainerView->fixedTCOs())
-	{
-		m_trackContentWidget.changePosition();
-	}
+	if (!m_trackContainerView->fixedTCOs()) { m_trackContentWidget.changePosition(); }
 	QWidget::update();
 }
 
@@ -243,10 +240,7 @@ void TrackView::mousePressEvent(QMouseEvent* me)
 	int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if (m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal)
-	{
-		QWidget::mousePressEvent(me);
-	}
+	if (m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal) { QWidget::mousePressEvent(me); }
 	else if (me->button() == Qt::LeftButton)
 	{
 		if (me->modifiers() & Qt::ShiftModifier)
@@ -302,10 +296,7 @@ void TrackView::mouseMoveEvent(QMouseEvent* me)
 	int widgetTotal = ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt() == 1
 		? DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT
 		: DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	if (m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal)
-	{
-		QWidget::mouseMoveEvent(me);
-	}
+	if (m_trackContainerView->allowRubberband() == true && me->x() > widgetTotal) { QWidget::mouseMoveEvent(me); }
 	else if (m_action == MoveTrack)
 	{
 		// look which track-widget the mouse-cursor is over
@@ -319,10 +310,7 @@ void TrackView::mouseMoveEvent(QMouseEvent* me)
 		if (trackAtY != NULL && trackAtY != this)
 		{
 			// then move us up/down there!
-			if (me->y() < 0)
-			{
-				m_trackContainerView->moveTrackViewUp(this);
-			}
+			if (me->y() < 0) { m_trackContainerView->moveTrackViewUp(this); }
 			else
 			{
 				m_trackContainerView->moveTrackViewDown(this);
@@ -336,10 +324,7 @@ void TrackView::mouseMoveEvent(QMouseEvent* me)
 		m_track->setHeight(height());
 	}
 
-	if (height() < DEFAULT_TRACK_HEIGHT)
-	{
-		ToolTip::add(this, m_track->m_name);
-	}
+	if (height() < DEFAULT_TRACK_HEIGHT) { ToolTip::add(this, m_track->m_name); }
 }
 
 /*! \brief Handle a mouse release event on this track View.
@@ -378,20 +363,14 @@ void TrackView::paintEvent(QPaintEvent* pe)
 void TrackView::createTCOView(TrackContentObject* tco)
 {
 	TrackContentObjectView* tv = tco->createView(this);
-	if (tco->getSelectViewOnCreate() == true)
-	{
-		tv->setSelected(true);
-	}
+	if (tco->getSelectViewOnCreate() == true) { tv->setSelected(true); }
 	tco->selectViewOnCreate(false);
 }
 
 void TrackView::muteChanged()
 {
 	FadeButton* indicator = getActivityIndicator();
-	if (indicator)
-	{
-		setIndicatorMute(indicator, m_track->m_mutedModel.value());
-	}
+	if (indicator) { setIndicatorMute(indicator, m_track->m_mutedModel.value()); }
 }
 
 void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)

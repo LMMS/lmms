@@ -27,8 +27,7 @@ void Midifile_reader::midifile()
 	midifile_error = 0;
 
 	ntrks = readheader();
-	if (midifile_error)
-		return;
+	if (midifile_error) return;
 	if (ntrks <= 0)
 	{
 		mferror("No tracks!");
@@ -61,8 +60,7 @@ retry:
 		b[nread++] = c;
 	}
 	/* See if we found the 4 characters we're looking for */
-	if (s[0] == b[0] && s[1] == b[1] && s[2] == b[2] && s[3] == b[3])
-		return (0);
+	if (s[0] == b[0] && s[1] == b[1] && s[2] == b[2] && s[3] == b[3]) return (0);
 	if (skip)
 	{
 		/* If we are supposed to skip initial garbage, */
@@ -101,21 +99,16 @@ int Midifile_reader::readheader()
 {
 	int format, ntrks, division;
 
-	if (readmt("MThd", Mf_skipinit) == EOF)
-		return (0);
+	if (readmt("MThd", Mf_skipinit) == EOF) return (0);
 
 	Mf_toberead = read32bit();
-	if (midifile_error)
-		return MIDIFILE_ERROR;
+	if (midifile_error) return MIDIFILE_ERROR;
 	format = read16bit();
-	if (midifile_error)
-		return MIDIFILE_ERROR;
+	if (midifile_error) return MIDIFILE_ERROR;
 	ntrks = read16bit();
-	if (midifile_error)
-		return MIDIFILE_ERROR;
+	if (midifile_error) return MIDIFILE_ERROR;
 	division = read16bit();
-	if (midifile_error)
-		return MIDIFILE_ERROR;
+	if (midifile_error) return MIDIFILE_ERROR;
 
 	Mf_header(format, ntrks, division);
 
@@ -142,13 +135,11 @@ void Midifile_reader::readtrack()
 	int status = 0;		   /* (possibly running) status byte */
 	int needed;
 
-	if (readmt("MTrk", 0) == EOF)
-		return;
+	if (readmt("MTrk", 0) == EOF) return;
 
 	Mf_toberead = read32bit();
 
-	if (midifile_error)
-		return;
+	if (midifile_error) return;
 
 	Mf_currtime = 0L;
 
@@ -158,12 +149,10 @@ void Midifile_reader::readtrack()
 	{
 
 		Mf_currtime += readvarinum(); /* delta time */
-		if (midifile_error)
-			return;
+		if (midifile_error) return;
 
 		c = egetc();
-		if (midifile_error)
-			return;
+		if (midifile_error) return;
 
 		if (sysexcontinue && c != 0xf7)
 		{
@@ -190,17 +179,14 @@ void Midifile_reader::readtrack()
 		if (needed)
 		{ /* ie. is it a channel message? */
 
-			if (running)
-				c1 = c;
+			if (running) c1 = c;
 			else
 			{
 				c1 = egetc();
-				if (midifile_error)
-					return;
+				if (midifile_error) return;
 			}
 			chanmessage(status, c1, (needed > 1) ? egetc() : 0);
-			if (midifile_error)
-				return;
+			if (midifile_error) return;
 			continue;
 			;
 		}
@@ -211,20 +197,17 @@ void Midifile_reader::readtrack()
 		case 0xff: /* meta event */
 
 			type = egetc();
-			if (midifile_error)
-				return;
+			if (midifile_error) return;
 			/* watch out - Don't combine the next 2 statements */
 			lng = readvarinum();
-			if (midifile_error)
-				return;
+			if (midifile_error) return;
 			lookfor = Mf_toberead - lng;
 			msginit();
 
 			while (Mf_toberead > lookfor)
 			{
 				unsigned char c = egetc();
-				if (midifile_error)
-					return;
+				if (midifile_error) return;
 				msgadd(c);
 			}
 			metaevent(type);
@@ -234,8 +217,7 @@ void Midifile_reader::readtrack()
 
 			/* watch out - Don't combine the next 2 statements */
 			lng = readvarinum();
-			if (midifile_error)
-				return;
+			if (midifile_error) return;
 			lookfor = Mf_toberead - lng;
 			msginit();
 			msgadd(0xf0);
@@ -243,12 +225,10 @@ void Midifile_reader::readtrack()
 			while (Mf_toberead > lookfor)
 			{
 				c = egetc();
-				if (midifile_error)
-					return;
+				if (midifile_error) return;
 				msgadd(c);
 			}
-			if (c == 0xf7 || Mf_nomerge == 0)
-				sysex();
+			if (c == 0xf7 || Mf_nomerge == 0) sysex();
 			else
 				sysexcontinue = 1; /* merge into next msg */
 			break;
@@ -257,24 +237,18 @@ void Midifile_reader::readtrack()
 
 			/* watch out - Don't combine the next 2 statements */
 			lng = readvarinum();
-			if (midifile_error)
-				return;
+			if (midifile_error) return;
 			lookfor = Mf_toberead - lng;
 
-			if (!sysexcontinue)
-				msginit();
+			if (!sysexcontinue) msginit();
 
 			while (Mf_toberead > lookfor)
 			{
 				c = egetc();
-				if (midifile_error)
-					return;
+				if (midifile_error) return;
 				msgadd(c);
 			}
-			if (!sysexcontinue)
-			{
-				Mf_arbitrary(msgleng(), msg());
-			}
+			if (!sysexcontinue) { Mf_arbitrary(msgleng(), msg()); }
 			else if (c == 0xf7)
 			{
 				sysex();
@@ -400,8 +374,7 @@ long Midifile_reader::readvarinum()
 	int c;
 
 	c = egetc();
-	if (midifile_error)
-		return 0;
+	if (midifile_error) return 0;
 
 	value = (long)c;
 	if (c & 0x80)
@@ -410,8 +383,7 @@ long Midifile_reader::readvarinum()
 		do
 		{
 			c = egetc();
-			if (midifile_error)
-				return 0;
+			if (midifile_error) return 0;
 			value = (value << 7) + (c & 0x7f);
 		} while (c & 0x80);
 	}
@@ -436,17 +408,13 @@ long Midifile_reader::read32bit()
 	int c1, c2, c3, c4;
 
 	c1 = egetc();
-	if (midifile_error)
-		return 0;
+	if (midifile_error) return 0;
 	c2 = egetc();
-	if (midifile_error)
-		return 0;
+	if (midifile_error) return 0;
 	c3 = egetc();
-	if (midifile_error)
-		return 0;
+	if (midifile_error) return 0;
 	c4 = egetc();
-	if (midifile_error)
-		return 0;
+	if (midifile_error) return 0;
 	return to32bit(c1, c2, c3, c4);
 }
 
@@ -454,11 +422,9 @@ int Midifile_reader::read16bit()
 {
 	int c1, c2;
 	c1 = egetc();
-	if (midifile_error)
-		return 0;
+	if (midifile_error) return 0;
 	c2 = egetc();
-	if (midifile_error)
-		return 0;
+	if (midifile_error) return 0;
 	return to16bit(c1, c2);
 }
 
@@ -490,8 +456,7 @@ Midifile_reader::Midifile_reader()
 
 void Midifile_reader::finalize()
 {
-	if (Msgbuff)
-		Mf_free(Msgbuff, Msgsize);
+	if (Msgbuff) Mf_free(Msgbuff, Msgsize);
 	Msgbuff = NULL;
 }
 
@@ -504,8 +469,7 @@ int Midifile_reader::msgleng() { return (Msgindex); }
 void Midifile_reader::msgadd(int c)
 {
 	/* If necessary, allocate larger message buffer. */
-	if (Msgindex >= Msgsize)
-		msgenlarge();
+	if (Msgindex >= Msgsize) msgenlarge();
 	Msgbuff[Msgindex++] = c;
 }
 

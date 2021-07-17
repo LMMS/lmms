@@ -50,10 +50,7 @@ public:
 	{
 		QSize s = QToolButton::sizeHint();
 		s.setWidth(s.width() + 8);
-		if (orientation() == Qt::Horizontal)
-		{
-			return s;
-		}
+		if (orientation() == Qt::Horizontal) { return s; }
 		return QSize(s.height(), s.width());
 	}
 
@@ -130,10 +127,7 @@ void SideBar::toggleButton(QAbstractButton* button)
 			curBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 		}
 
-		if (curWidget)
-		{
-			curWidget->hide();
-		}
+		if (curWidget) { curWidget->hide(); }
 	}
 
 	if (toolButton && activeWidget)

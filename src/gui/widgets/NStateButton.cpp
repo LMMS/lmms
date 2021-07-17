@@ -71,9 +71,6 @@ void NStateButton::changeState(int _n)
 
 void NStateButton::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() == Qt::LeftButton && m_states.size())
-	{
-		changeState((++m_curState) % m_states.size());
-	}
+	if (_me->button() == Qt::LeftButton && m_states.size()) { changeState((++m_curState) % m_states.size()); }
 	ToolButton::mousePressEvent(_me);
 }

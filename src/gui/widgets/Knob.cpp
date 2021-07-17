@@ -77,10 +77,7 @@ Knob::Knob(QWidget* _parent, const QString& _name)
 
 void Knob::initUi(const QString& _name)
 {
-	if (s_textFloat == NULL)
-	{
-		s_textFloat = new TextFloat;
-	}
+	if (s_textFloat == NULL) { s_textFloat = new TextFloat; }
 
 	setWindowTitle(_name);
 
@@ -143,10 +140,7 @@ void Knob::onKnobNumUpdated()
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
 		m_knobPixmap = make_unique<QPixmap>(QPixmap(embed::getIconPixmap(knobFilename.toUtf8().constData())));
-		if (!this->isEnabled())
-		{
-			convertPixmapToGrayScale(*m_knobPixmap.get());
-		}
+		if (!this->isEnabled()) { convertPixmapToGrayScale(*m_knobPixmap.get()); }
 		setFixedSize(m_knobPixmap->width(), m_knobPixmap->height());
 	}
 }
@@ -170,27 +164,18 @@ void Knob::setHtmlLabel(const QString& htmltxt)
 	m_label = htmltxt;
 	m_isHtmlLabel = true;
 	// Put the rendered HTML content into cache
-	if (!m_tdRenderer)
-	{
-		m_tdRenderer = new QTextDocument(this);
-	}
+	if (!m_tdRenderer) { m_tdRenderer = new QTextDocument(this); }
 
 	m_tdRenderer->setHtml(QString("<span style=\"color:%1;\">%2</span>").arg(textColor().name(), m_label));
 
-	if (m_knobPixmap)
-	{
-		setFixedSize(m_knobPixmap->width(), m_knobPixmap->height() + 15);
-	}
+	if (m_knobPixmap) { setFixedSize(m_knobPixmap->width(), m_knobPixmap->height() + 15); }
 
 	update();
 }
 
 void Knob::setTotalAngle(float angle)
 {
-	if (angle < 10.0)
-	{
-		m_totalAngle = 10.0;
-	}
+	if (angle < 10.0) { m_totalAngle = 10.0; }
 	else
 	{
 		m_totalAngle = angle;
@@ -482,10 +467,7 @@ void Knob::mouseReleaseEvent(QMouseEvent* event)
 	if (event && event->button() == Qt::LeftButton)
 	{
 		AutomatableModel* thisModel = model();
-		if (thisModel)
-		{
-			thisModel->restoreJournallingState();
-		}
+		if (thisModel) { thisModel->restoreJournallingState(); }
 	}
 
 	m_buttonPressed = false;
@@ -593,10 +575,7 @@ void Knob::enterValue()
 			tr("Please enter a new value between "
 			   "-96.0 dBFS and 6.0 dBFS:"),
 			ampToDbfs(model()->getRoundedValue() / 100.0), -96.0, 6.0, model()->getDigitCount(), &ok);
-		if (new_val <= -96.0)
-		{
-			new_val = 0.0f;
-		}
+		if (new_val <= -96.0) { new_val = 0.0f; }
 		else
 		{
 			new_val = dbfsToAmp(new_val) * 100.0;
@@ -612,10 +591,7 @@ void Knob::enterValue()
 			model()->getRoundedValue(), model()->minValue(), model()->maxValue(), model()->getDigitCount(), &ok);
 	}
 
-	if (ok)
-	{
-		model()->setValue(new_val);
-	}
+	if (ok) { model()->setValue(new_val); }
 }
 
 void Knob::friendlyUpdate()
@@ -654,10 +630,7 @@ void Knob::changeEvent(QEvent* ev)
 	if (ev->type() == QEvent::EnabledChange)
 	{
 		onKnobNumUpdated();
-		if (!m_label.isEmpty())
-		{
-			setLabel(m_label);
-		}
+		if (!m_label.isEmpty()) { setLabel(m_label); }
 		m_cache = QImage();
 		update();
 	}

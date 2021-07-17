@@ -230,10 +230,7 @@ void ProjectNotes::textSize(const QString& _p)
 void ProjectNotes::textColor()
 {
 	QColor col = QColorDialog::getColor(m_edit->textColor(), this);
-	if (!col.isValid())
-	{
-		return;
-	}
+	if (!col.isValid()) { return; }
 	m_edit->setTextColor(col);
 	QPixmap pix(16, 16);
 	pix.fill(Qt::black);
@@ -242,10 +239,7 @@ void ProjectNotes::textColor()
 
 void ProjectNotes::textAlign(QAction* _a)
 {
-	if (_a == m_actionAlignLeft)
-	{
-		m_edit->setAlignment(Qt::AlignLeft);
-	}
+	if (_a == m_actionAlignLeft) { m_edit->setAlignment(Qt::AlignLeft); }
 	else if (_a == m_actionAlignCenter)
 	{
 		m_edit->setAlignment(Qt::AlignHCenter);
@@ -278,10 +272,7 @@ void ProjectNotes::formatChanged(const QTextCharFormat& _f)
 
 void ProjectNotes::alignmentChanged(int _a)
 {
-	if (_a & Qt::AlignLeft)
-	{
-		m_actionAlignLeft->setChecked(true);
-	}
+	if (_a & Qt::AlignLeft) { m_actionAlignLeft->setChecked(true); }
 	else if ((_a & Qt::AlignHCenter))
 	{
 		m_actionAlignCenter->setChecked(true);
@@ -313,10 +304,7 @@ void ProjectNotes::loadSettings(const QDomElement& _this)
 
 void ProjectNotes::closeEvent(QCloseEvent* _ce)
 {
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
+	if (parentWidget()) { parentWidget()->hide(); }
 	else
 	{
 		hide();

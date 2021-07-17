@@ -110,10 +110,7 @@ public:
 		float initailF = m_biQuadFrameInitial.update(in, ch);
 		float targetF = m_biQuadFrameTarget.update(in, ch);
 
-		if (frameProgress > 0.99999)
-		{
-			m_biQuadFrameInitial = m_biQuadFrameTarget;
-		}
+		if (frameProgress > 0.99999) { m_biQuadFrameInitial = m_biQuadFrameTarget; }
 
 		return (1.0f - frameProgress) * initailF + frameProgress * targetF;
 	}
@@ -280,10 +277,7 @@ public:
 			hasChanged = true;
 		}
 
-		if (hasChanged)
-		{
-			calcCoefficents();
-		}
+		if (hasChanged) { calcCoefficents(); }
 	}
 };
 

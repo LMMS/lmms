@@ -71,10 +71,7 @@ SampleTCO::SampleTCO(Track* _track)
 
 	// care about positionmarker
 	TimeLineWidget* timeLine = Engine::getSong()->getPlayPos(Engine::getSong()->Mode_PlaySong).m_timeLine;
-	if (timeLine)
-	{
-		connect(timeLine, SIGNAL(positionMarkerMoved()), this, SLOT(playbackPositionChanged()));
-	}
+	if (timeLine) { connect(timeLine, SIGNAL(positionMarkerMoved()), this, SLOT(playbackPositionChanged())); }
 	// playbutton clicked or space key / on Export Song set isPlaying to false
 	connect(
 		Engine::getSong(), SIGNAL(playbackStateChanged()), this, SLOT(playbackPositionChanged()), Qt::DirectConnection);
@@ -117,10 +114,7 @@ SampleTCO::SampleTCO(const SampleTCO& orig)
 SampleTCO::~SampleTCO()
 {
 	SampleTrack* sampletrack = dynamic_cast<SampleTrack*>(getTrack());
-	if (sampletrack)
-	{
-		sampletrack->updateTcos();
-	}
+	if (sampletrack) { sampletrack->updateTcos(); }
 	Engine::mixer()->requestChangeInModel();
 	sharedObject::unref(m_sampleBuffer);
 	Engine::mixer()->doneChangeInModel();
@@ -182,10 +176,7 @@ void SampleTCO::playbackPositionChanged()
 void SampleTCO::updateTrackTcos()
 {
 	SampleTrack* sampletrack = dynamic_cast<SampleTrack*>(getTrack());
-	if (sampletrack)
-	{
-		sampletrack->updateTcos();
-	}
+	if (sampletrack) { sampletrack->updateTcos(); }
 }
 
 bool SampleTCO::isPlaying() const { return m_isPlaying; }
@@ -202,10 +193,7 @@ void SampleTCO::setSamplePlayLength(f_cnt_t length) { m_sampleBuffer->setEndFram
 
 void SampleTCO::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
-	if (_this.parentNode().nodeName() == "clipboard")
-	{
-		_this.setAttribute("pos", -1);
-	}
+	if (_this.parentNode().nodeName() == "clipboard") { _this.setAttribute("pos", -1); }
 	else
 	{
 		_this.setAttribute("pos", startPosition());
@@ -221,23 +209,14 @@ void SampleTCO::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	}
 
 	_this.setAttribute("sample_rate", m_sampleBuffer->sampleRate());
-	if (usesCustomClipColor())
-	{
-		_this.setAttribute("color", color().name());
-	}
-	if (m_sampleBuffer->reversed())
-	{
-		_this.setAttribute("reversed", "true");
-	}
+	if (usesCustomClipColor()) { _this.setAttribute("color", color().name()); }
+	if (m_sampleBuffer->reversed()) { _this.setAttribute("reversed", "true"); }
 	// TODO: start- and end-frame
 }
 
 void SampleTCO::loadSettings(const QDomElement& _this)
 {
-	if (_this.attribute("pos").toInt() >= 0)
-	{
-		movePosition(_this.attribute("pos").toInt());
-	}
+	if (_this.attribute("pos").toInt() >= 0) { movePosition(_this.attribute("pos").toInt()); }
 	setSampleFile(_this.attribute("src"));
 	if (sampleFile().isEmpty() && _this.hasAttribute("data"))
 	{
@@ -247,10 +226,7 @@ void SampleTCO::loadSettings(const QDomElement& _this)
 	setMuted(_this.attribute("muted").toInt());
 	setStartTimeOffset(_this.attribute("off").toInt());
 
-	if (_this.hasAttribute("sample_rate"))
-	{
-		m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt());
-	}
+	if (_this.hasAttribute("sample_rate")) { m_sampleBuffer->setSampleRate(_this.attribute("sample_rate").toInt()); }
 
 	if (_this.hasAttribute("color"))
 	{
@@ -299,10 +275,7 @@ void SampleTCOView::contextMenuEvent(QContextMenuEvent* _cme)
 	// different labels for the actions.
 	bool individualTCO = getClickedTCOs().size() <= 1;
 
-	if (_cme->modifiers())
-	{
-		return;
-	}
+	if (_cme->modifiers()) { return; }
 
 	QMenu contextMenu(this);
 
@@ -387,10 +360,7 @@ void SampleTCOView::mousePressEvent(QMouseEvent* _me)
 		if (_me->button() == Qt::MiddleButton && _me->modifiers() == Qt::ControlModifier)
 		{
 			SampleTCO* sTco = dynamic_cast<SampleTCO*>(getTrackContentObject());
-			if (sTco)
-			{
-				sTco->updateTrackTcos();
-			}
+			if (sTco) { sTco->updateTrackTcos(); }
 		}
 		TrackContentObjectView::mousePressEvent(_me);
 	}
@@ -401,10 +371,7 @@ void SampleTCOView::mouseReleaseEvent(QMouseEvent* _me)
 	if (_me->button() == Qt::MiddleButton && !_me->modifiers())
 	{
 		SampleTCO* sTco = dynamic_cast<SampleTCO*>(getTrackContentObject());
-		if (sTco)
-		{
-			sTco->playbackPositionChanged();
-		}
+		if (sTco) { sTco->playbackPositionChanged(); }
 	}
 	TrackContentObjectView::mouseReleaseEvent(_me);
 }
@@ -413,9 +380,7 @@ void SampleTCOView::mouseDoubleClickEvent(QMouseEvent*)
 {
 	QString af = m_tco->m_sampleBuffer->openAudioFile();
 
-	if (af.isEmpty())
-	{
-	} // Don't do anything if no file is loaded
+	if (af.isEmpty()) {} // Don't do anything if no file is loaded
 	else if (af == m_tco->m_sampleBuffer->audioFile())
 	{ // Instead of reloading the existing file, just reset the size
 		int length = (int)(m_tco->m_sampleBuffer->frames() / Engine::framesPerTick());
@@ -440,10 +405,7 @@ void SampleTCOView::paintEvent(QPaintEvent* pe)
 
 	setNeedsUpdate(false);
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
-	{
-		m_paintPixmap = QPixmap(size());
-	}
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size()) { m_paintPixmap = QPixmap(size()); }
 
 	QPainter p(&m_paintPixmap);
 
@@ -457,10 +419,7 @@ void SampleTCOView::paintEvent(QPaintEvent* pe)
 	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
 	p.fillRect(rect(), QColor(0, 0, 0));
 
-	if (gradient())
-	{
-		p.fillRect(rect(), lingrad);
-	}
+	if (gradient()) { p.fillRect(rect(), lingrad); }
 	else
 	{
 		p.fillRect(rect(), c);
@@ -503,10 +462,7 @@ void SampleTCOView::paintEvent(QPaintEvent* pe)
 		p.drawPixmap(spacing, height() - (size + spacing), embed::getIconPixmap("muted", size, size));
 	}
 
-	if (m_marker)
-	{
-		p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top());
-	}
+	if (m_marker) { p.drawLine(m_markerPos, rect().bottom(), m_markerPos, rect().top()); }
 	// recording sample tracks is not possible at the moment
 
 	/* if( m_tco->isRecord() )
@@ -593,14 +549,8 @@ bool SampleTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t
 	::BBTrack* bb_track = NULL;
 	if (_tco_num >= 0)
 	{
-		if (_start > getTCO(_tco_num)->length())
-		{
-			setPlaying(false);
-		}
-		if (_start != 0)
-		{
-			return false;
-		}
+		if (_start > getTCO(_tco_num)->length()) { setPlaying(false); }
+		if (_start != 0) { return false; }
 		tcos.push_back(getTCO(_tco_num));
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
@@ -658,10 +608,7 @@ bool SampleTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t
 			PlayHandle* handle;
 			if (st->isRecord())
 			{
-				if (!Engine::getSong()->isRecording())
-				{
-					return played_a_note;
-				}
+				if (!Engine::getSong()->isRecording()) { return played_a_note; }
 				SampleRecordHandle* smpHandle = new SampleRecordHandle(st);
 				handle = smpHandle;
 			}
@@ -787,10 +734,7 @@ SampleTrackView::SampleTrackView(SampleTrack* _t, TrackContainerView* tcv)
 
 void SampleTrackView::updateIndicator()
 {
-	if (model()->isPlaying())
-	{
-		m_activityIndicator->activateOnce();
-	}
+	if (model()->isPlaying()) { m_activityIndicator->activateOnce(); }
 	else
 	{
 		m_activityIndicator->noteEnd();
@@ -815,10 +759,7 @@ QMenu* SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 	FxChannel* fxChannel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	// If title allows interpolation, pass channel index and name
-	if (title.contains("%2"))
-	{
-		title = title.arg(channelIndex).arg(fxChannel->m_name);
-	}
+	if (title.contains("%2")) { title = title.arg(channelIndex).arg(fxChannel->m_name); }
 
 	QMenu* fxMenu = new QMenu(title);
 
@@ -875,10 +816,7 @@ void SampleTrackView::dropEvent(QDropEvent* de)
 				  .quantize(1.0);
 
 		SampleTCO* sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));
-		if (sTco)
-		{
-			sTco->setSampleFile(value);
-		}
+		if (sTco) { sTco->setSampleFile(value); }
 	}
 }
 
@@ -994,10 +932,7 @@ SampleTrackWindow::~SampleTrackWindow() {}
 
 void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
 {
-	if (m_stv && tv)
-	{
-		m_stv->m_tlb->setChecked(false);
-	}
+	if (m_stv && tv) { m_stv->m_tlb->setChecked(false); }
 
 	m_stv = tv;
 }
@@ -1026,10 +961,7 @@ void SampleTrackView::createFxLine()
 	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor())
-	{
-		channel->setColor(getTrack()->color());
-	}
+	if (getTrack()->useColor()) { channel->setColor(getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }
@@ -1046,10 +978,7 @@ void SampleTrackWindow::updateName()
 {
 	setWindowTitle(m_track->name().length() > 25 ? (m_track->name().left(24) + "...") : m_track->name());
 
-	if (m_nameLineEdit->text() != m_track->name())
-	{
-		m_nameLineEdit->setText(m_track->name());
-	}
+	if (m_nameLineEdit->text() != m_track->name()) { m_nameLineEdit->setText(m_track->name()); }
 }
 
 void SampleTrackWindow::textChanged(const QString& new_name)
@@ -1076,10 +1005,7 @@ void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
 	ce->ignore();
 
-	if (gui->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-	}
+	if (gui->mainWindow()->workspace()) { parentWidget()->hide(); }
 	else
 	{
 		hide();
@@ -1098,8 +1024,5 @@ void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement& element)
 void SampleTrackWindow::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(this, element);
-	if (isVisible())
-	{
-		m_stv->m_tlb->setChecked(true);
-	}
+	if (isVisible()) { m_stv->m_tlb->setChecked(true); }
 }

@@ -238,10 +238,7 @@ ControllerConnectionDialog::ControllerConnectionDialog(QWidget* _parent, const A
 		}
 	}
 
-	if (!cc)
-	{
-		m_midiGroupBox->model()->setValue(true);
-	}
+	if (!cc) { m_midiGroupBox->model()->setValue(true); }
 
 	show();
 }
@@ -303,10 +300,7 @@ void ControllerConnectionDialog::midiToggled()
 	int enabled = m_midiGroupBox->model()->value();
 	if (enabled != 0)
 	{
-		if (m_userGroupBox->model()->value() != 0)
-		{
-			m_userGroupBox->model()->setValue(0);
-		}
+		if (m_userGroupBox->model()->value() != 0) { m_userGroupBox->model()->setValue(0); }
 
 		if (!m_midiController)
 		{
@@ -322,10 +316,7 @@ void ControllerConnectionDialog::midiToggled()
 			m_midiChannelSpinBox->setModel(&m_midiController->m_midiPort.m_inputChannelModel);
 			m_midiControllerSpinBox->setModel(&m_midiController->m_midiPort.m_inputControllerModel);
 
-			if (m_readablePorts)
-			{
-				m_readablePorts->setModel(&m_midiController->m_midiPort);
-			}
+			if (m_readablePorts) { m_readablePorts->setModel(&m_midiController->m_midiPort); }
 
 			connect(m_midiController, SIGNAL(valueChanged()), this, SLOT(midiValueChanged()));
 		}
@@ -340,10 +331,7 @@ void ControllerConnectionDialog::midiToggled()
 void ControllerConnectionDialog::userToggled()
 {
 	int enabled = m_userGroupBox->model()->value();
-	if (enabled != 0 && m_midiGroupBox->model()->value() != 0)
-	{
-		m_midiGroupBox->model()->setValue(0);
-	}
+	if (enabled != 0 && m_midiGroupBox->model()->value() != 0) { m_midiGroupBox->model()->setValue(0); }
 }
 
 void ControllerConnectionDialog::userSelected()
@@ -354,10 +342,7 @@ void ControllerConnectionDialog::userSelected()
 
 void ControllerConnectionDialog::autoDetectToggled()
 {
-	if (m_midiAutoDetect.value())
-	{
-		m_midiController->reset();
-	}
+	if (m_midiAutoDetect.value()) { m_midiController->reset(); }
 }
 
 void ControllerConnectionDialog::midiValueChanged()
@@ -365,17 +350,11 @@ void ControllerConnectionDialog::midiValueChanged()
 	if (m_midiAutoDetect.value())
 	{
 		m_midiController->useDetected();
-		if (m_readablePorts)
-		{
-			m_readablePorts->updateMenu();
-		}
+		if (m_readablePorts) { m_readablePorts->updateMenu(); }
 	}
 }
 
 void ControllerConnectionDialog::enableAutoDetect(QAction* _a)
 {
-	if (_a->isChecked())
-	{
-		m_midiAutoDetectCheckBox->model()->setValue(true);
-	}
+	if (_a->isChecked()) { m_midiAutoDetectCheckBox->model()->setValue(true); }
 }

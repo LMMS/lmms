@@ -39,10 +39,7 @@ ControllerConnection::ControllerConnection(Controller* _controller, AutomatableM
 	, m_ownsController(false)
 	, m_controlledModel(contmod)
 {
-	if (_controller != NULL)
-	{
-		setController(_controller);
-	}
+	if (_controller != NULL) { setController(_controller); }
 	else
 	{
 		m_controller = Controller::create(Controller::DummyController, NULL);
@@ -60,15 +57,9 @@ ControllerConnection::ControllerConnection(int _controllerId)
 
 ControllerConnection::~ControllerConnection()
 {
-	if (m_controller && m_controller->type() != Controller::DummyController)
-	{
-		m_controller->removeConnection(this);
-	}
+	if (m_controller && m_controller->type() != Controller::DummyController) { m_controller->removeConnection(this); }
 	s_connections.remove(s_connections.indexOf(this));
-	if (m_ownsController)
-	{
-		delete m_controller;
-	}
+	if (m_ownsController) { delete m_controller; }
 }
 
 void ControllerConnection::setController(int /*_controllerId*/) {}
@@ -81,15 +72,9 @@ void ControllerConnection::setController(Controller* _controller)
 		m_controller = NULL;
 	}
 
-	if (m_controller && m_controller->type() != Controller::DummyController)
-	{
-		m_controller->removeConnection(this);
-	}
+	if (m_controller && m_controller->type() != Controller::DummyController) { m_controller->removeConnection(this); }
 
-	if (!_controller)
-	{
-		m_controller = Controller::create(Controller::DummyController, NULL);
-	}
+	if (!_controller) { m_controller = Controller::create(Controller::DummyController, NULL); }
 	else
 	{
 		m_controller = _controller;
@@ -111,10 +96,7 @@ void ControllerConnection::setController(Controller* _controller)
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
-	if (!m_ownsController)
-	{
-		QObject::connect(_controller, SIGNAL(destroyed()), this, SLOT(deleteConnection()));
-	}
+	if (!m_ownsController) { QObject::connect(_controller, SIGNAL(destroyed()), this, SLOT(deleteConnection())); }
 }
 
 inline void ControllerConnection::setTargetName(const QString& _name)
@@ -154,17 +136,11 @@ void ControllerConnection::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	if (Engine::getSong())
 	{
-		if (m_ownsController)
-		{
-			m_controller->saveState(_doc, _this);
-		}
+		if (m_ownsController) { m_controller->saveState(_doc, _this); }
 		else
 		{
 			int id = Engine::getSong()->controllers().indexOf(m_controller);
-			if (id >= 0)
-			{
-				_this.setAttribute("id", id);
-			}
+			if (id >= 0) { _this.setAttribute("id", id); }
 		}
 	}
 }
@@ -172,10 +148,7 @@ void ControllerConnection::saveSettings(QDomDocument& _doc, QDomElement& _this)
 void ControllerConnection::loadSettings(const QDomElement& _this)
 {
 	QDomNode node = _this.firstChild();
-	if (!node.isNull())
-	{
-		setController(Controller::create(node.toElement(), Engine::getSong()));
-	}
+	if (!node.isNull()) { setController(Controller::create(node.toElement(), Engine::getSong())); }
 	else
 	{
 		m_controllerId = _this.attribute("id", "-1").toInt();

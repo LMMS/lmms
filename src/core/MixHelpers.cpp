@@ -60,10 +60,7 @@ bool isSilent(const sampleFrame* src, int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		if (fabsf(src[i][0]) >= silenceThreshold || fabsf(src[i][1]) >= silenceThreshold)
-		{
-			return false;
-		}
+		if (fabsf(src[i][0]) >= silenceThreshold || fabsf(src[i][1]) >= silenceThreshold) { return false; }
 	}
 
 	return true;
@@ -76,10 +73,7 @@ void setNaNHandler(bool use) { s_NaNHandler = use; }
 /*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
 bool sanitize(sampleFrame* src, int frames)
 {
-	if (!useNaNHandler())
-	{
-		return false;
-	}
+	if (!useNaNHandler()) { return false; }
 
 	bool found = false;
 	for (int f = 0; f < frames; ++f)

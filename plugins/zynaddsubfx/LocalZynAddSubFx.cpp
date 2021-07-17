@@ -85,10 +85,7 @@ LocalZynAddSubFx::~LocalZynAddSubFx()
 	delete m_master;
 	delete m_ioEngine;
 
-	if (--s_instanceCount == 0)
-	{
-		delete[] denormalkillbuf;
-	}
+	if (--s_instanceCount == 0) { delete[] denormalkillbuf; }
 }
 
 void LocalZynAddSubFx::initConfig()
@@ -165,10 +162,7 @@ void LocalZynAddSubFx::setPresetDir(const std::string& _dir)
 
 void LocalZynAddSubFx::setLmmsWorkingDir(const std::string& _dir)
 {
-	if (config.workingDir != NULL)
-	{
-		free(config.workingDir);
-	}
+	if (config.workingDir != NULL) { free(config.workingDir); }
 	config.workingDir = strdup(_dir.c_str());
 
 	initConfig();
@@ -189,27 +183,15 @@ void LocalZynAddSubFx::processMidiEvent(const MidiEvent& event)
 	case MidiNoteOn:
 		if (event.velocity() > 0)
 		{
-			if (event.key() < 0 || event.key() > MidiMaxKey)
-			{
-				break;
-			}
-			if (m_runningNotes[event.key()] > 0)
-			{
-				m_master->noteOff(event.channel(), event.key());
-			}
+			if (event.key() < 0 || event.key() > MidiMaxKey) { break; }
+			if (m_runningNotes[event.key()] > 0) { m_master->noteOff(event.channel(), event.key()); }
 			++m_runningNotes[event.key()];
 			m_master->noteOn(event.channel(), event.key(), event.velocity());
 			break;
 		}
 	case MidiNoteOff:
-		if (event.key() < 0 || event.key() > MidiMaxKey)
-		{
-			break;
-		}
-		if (--m_runningNotes[event.key()] <= 0)
-		{
-			m_master->noteOff(event.channel(), event.key());
-		}
+		if (event.key() < 0 || event.key() > MidiMaxKey) { break; }
+		if (--m_runningNotes[event.key()] <= 0) { m_master->noteOff(event.channel(), event.key()); }
 		break;
 	case MidiPitchBend:
 		m_master->setController(event.channel(), C_pitchwheel, event.pitchBend() - 8192);

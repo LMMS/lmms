@@ -97,19 +97,13 @@ void EqParameterWidget::updateHandle()
 			bool hover = false; // prevents an action if handle is moved
 			for (int j = 0; j < bandCount(); j++)
 			{
-				if (m_handleList->at(j)->isMouseHover())
-				{
-					hover = true;
-				}
+				if (m_handleList->at(j)->isMouseHover()) { hover = true; }
 			}
 			if (!hover)
 			{
-				if (sender() == m_bands[i].gain)
-					m_bands[i].active->setValue(true);
-				if (sender() == m_bands[i].freq)
-					m_bands[i].active->setValue(true);
-				if (sender() == m_bands[i].res)
-					m_bands[i].active->setValue(true);
+				if (sender() == m_bands[i].gain) m_bands[i].active->setValue(true);
+				if (sender() == m_bands[i].freq) m_bands[i].active->setValue(true);
+				if (sender() == m_bands[i].res) m_bands[i].active->setValue(true);
 			}
 			changeHandle(i);
 		}
@@ -118,18 +112,12 @@ void EqParameterWidget::updateHandle()
 			m_handleList->at(i)->setHandleActive(m_bands[i].active->value());
 		}
 	}
-	if (m_bands[0].hp12->value())
-		m_handleList->at(0)->sethp12();
-	if (m_bands[0].hp24->value())
-		m_handleList->at(0)->sethp24();
-	if (m_bands[0].hp48->value())
-		m_handleList->at(0)->sethp48();
-	if (m_bands[7].lp12->value())
-		m_handleList->at(7)->setlp12();
-	if (m_bands[7].lp24->value())
-		m_handleList->at(7)->setlp24();
-	if (m_bands[7].lp48->value())
-		m_handleList->at(7)->setlp48();
+	if (m_bands[0].hp12->value()) m_handleList->at(0)->sethp12();
+	if (m_bands[0].hp24->value()) m_handleList->at(0)->sethp24();
+	if (m_bands[0].hp48->value()) m_handleList->at(0)->sethp48();
+	if (m_bands[7].lp12->value()) m_handleList->at(7)->setlp12();
+	if (m_bands[7].lp24->value()) m_handleList->at(7)->setlp24();
+	if (m_bands[7].lp48->value()) m_handleList->at(7)->setlp48();
 }
 
 void EqParameterWidget::changeHandle(int i)
@@ -183,10 +171,7 @@ void EqParameterWidget::changeHandle(int i)
 	}
 
 	// set resonance/bandwidth for each handle
-	if (m_handleList->at(i)->getResonance() != bw)
-	{
-		m_handleList->at(i)->setResonance(bw);
-	}
+	if (m_handleList->at(i)->getResonance() != bw) { m_handleList->at(i)->setResonance(bw); }
 
 	// and the active status
 	m_handleList->at(i)->setHandleActive(m_bands[i].active->value());
@@ -209,10 +194,7 @@ void EqParameterWidget::updateModels()
 
 		m_bands[i].res->setValue(m_handleList->at(i)->getResonance());
 		// identifies the handle which is moved and set the band active
-		if (sender() == m_handleList->at(i))
-		{
-			m_bands[i].active->setValue(true);
-		}
+		if (sender() == m_handleList->at(i)) { m_bands[i].active->setValue(true); }
 	}
 	m_eqcurve->update();
 }

@@ -70,8 +70,7 @@ public:
 	void flush_0()
 	{
 		for (int i = 0; i < 2; ++i)
-			if (is_denormal(y[i]))
-				y[i] = 0;
+			if (is_denormal(y[i])) y[i] = 0;
 	}
 
 	inline sample_t process(sample_t s)

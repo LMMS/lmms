@@ -66,10 +66,7 @@ AudioPortAudio::AudioPortAudio(bool& _success_ful, Mixer* _mixer)
 		return;
 	}
 
-	if (Pa_GetDeviceCount() <= 0)
-	{
-		return;
-	}
+	if (Pa_GetDeviceCount() <= 0) { return; }
 
 	const QString& backend = ConfigManager::inst()->value("audioportaudio", "backend");
 	const QString& device = ConfigManager::inst()->value("audioportaudio", "device");
@@ -87,20 +84,11 @@ AudioPortAudio::AudioPortAudio(bool& _success_ful, Mixer* _mixer)
 		}
 	}
 
-	if (inDevIdx < 0)
-	{
-		inDevIdx = Pa_GetDefaultInputDevice();
-	}
+	if (inDevIdx < 0) { inDevIdx = Pa_GetDefaultInputDevice(); }
 
-	if (outDevIdx < 0)
-	{
-		outDevIdx = Pa_GetDefaultOutputDevice();
-	}
+	if (outDevIdx < 0) { outDevIdx = Pa_GetDefaultOutputDevice(); }
 
-	if (inDevIdx < 0 || outDevIdx < 0)
-	{
-		return;
-	}
+	if (inDevIdx < 0 || outDevIdx < 0) { return; }
 
 	double inLatency = 0;  //(double)mixer()->framesPerPeriod() / (double)sampleRate();
 	double outLatency = 0; //(double)mixer()->framesPerPeriod() / (double)sampleRate();
@@ -168,10 +156,7 @@ AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
 
-	if (!m_wasPAInitError)
-	{
-		Pa_Terminate();
-	}
+	if (!m_wasPAInitError) { Pa_Terminate(); }
 	delete[] m_outBuf;
 }
 
@@ -194,10 +179,7 @@ void AudioPortAudio::stopProcessing()
 		m_stopped = true;
 		PaError err = Pa_StopStream(m_paStream);
 
-		if (err != paNoError)
-		{
-			printf("PortAudio error: %s\n", Pa_GetErrorText(err));
-		}
+		if (err != paNoError) { printf("PortAudio error: %s\n", Pa_GetErrorText(err)); }
 	}
 }
 
@@ -229,10 +211,7 @@ void AudioPortAudio::applyQualitySettings()
 
 int AudioPortAudio::process_callback(const float* _inputBuffer, float* _outputBuffer, unsigned long _framesPerBuffer)
 {
-	if (supportsCapture())
-	{
-		mixer()->pushInputFrames((sampleFrame*)_inputBuffer, _framesPerBuffer);
-	}
+	if (supportsCapture()) { mixer()->pushInputFrames((sampleFrame*)_inputBuffer, _framesPerBuffer); }
 
 	if (m_stopped)
 	{
@@ -333,10 +312,7 @@ void AudioPortAudioSetupUtil::updateDevices()
 	for (int i = 0; i < Pa_GetDeviceCount(); ++i)
 	{
 		di = Pa_GetDeviceInfo(i);
-		if (di->hostApi == hostApi)
-		{
-			m_deviceModel.addItem(di->name);
-		}
+		if (di->hostApi == hostApi) { m_deviceModel.addItem(di->name); }
 	}
 	Pa_Terminate();
 }

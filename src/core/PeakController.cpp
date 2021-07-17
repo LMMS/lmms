@@ -44,10 +44,7 @@ PeakController::PeakController(Model* _parent, PeakControllerEffect* _peak_effec
 	, m_currentSample(0.0f)
 {
 	setSampleExact(true);
-	if (m_peakEffect)
-	{
-		connect(m_peakEffect, SIGNAL(destroyed()), this, SLOT(handleDestroyedEffect()));
-	}
+	if (m_peakEffect) { connect(m_peakEffect, SIGNAL(destroyed()), this, SLOT(handleDestroyedEffect())); }
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateCoeffs()));
 	connect(m_peakEffect->attackModel(), SIGNAL(dataChanged()), this, SLOT(updateCoeffs()), Qt::DirectConnection);
 	connect(m_peakEffect->decayModel(), SIGNAL(dataChanged()), this, SLOT(updateCoeffs()), Qt::DirectConnection);
@@ -133,10 +130,7 @@ void PeakController::loadSettings(const QDomElement& _this)
 	Controller::loadSettings(_this);
 
 	int effectId = _this.attribute("effectId").toInt();
-	if (m_buggedFile == true)
-	{
-		effectId = m_loadCount++;
-	}
+	if (m_buggedFile == true) { effectId = m_loadCount++; }
 
 	PeakControllerEffectVector::Iterator i;
 	for (i = s_effects.begin(); i != s_effects.end(); ++i)
@@ -170,10 +164,7 @@ PeakController* PeakController::getControllerBySetting(const QDomElement& _this)
 	{
 		for (i = s_effects.begin(); i != s_effects.end(); ++i)
 		{
-			if ((*i)->m_effectId == effectId)
-			{
-				foundCount++;
-			}
+			if ((*i)->m_effectId == effectId) { foundCount++; }
 		}
 		if (foundCount >= 2)
 		{
@@ -196,18 +187,12 @@ PeakController* PeakController::getControllerBySetting(const QDomElement& _this)
 		}
 	}
 
-	if (m_buggedFile == true)
-	{
-		effectId = m_getCount;
-	}
+	if (m_buggedFile == true) { effectId = m_getCount; }
 	m_getCount++; // NB: m_getCount should be increased even m_buggedFile is false
 
 	for (i = s_effects.begin(); i != s_effects.end(); ++i)
 	{
-		if ((*i)->m_effectId == effectId)
-		{
-			return (*i)->controller();
-		}
+		if ((*i)->m_effectId == effectId) { return (*i)->controller(); }
 	}
 
 	return NULL;

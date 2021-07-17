@@ -180,28 +180,19 @@ void EqSpectrumView::paintEvent(QPaintEvent* event)
 	for (int x = 0; x < MAX_BANDS; ++x, ++bands)
 	{
 		peak = (fh * 2.0 / 3.0 * (20 * (log10(*bands / energy)) - LOWER_Y) / (-LOWER_Y));
-		if (peak < 0)
-		{
-			peak = 0;
-		}
+		if (peak < 0) { peak = 0; }
 		else if (peak >= fh)
 		{
 			continue;
 		}
 
-		if (peak > m_bandHeight[x])
-		{
-			m_bandHeight[x] = peak;
-		}
+		if (peak > m_bandHeight[x]) { m_bandHeight[x] = peak; }
 		else
 		{
 			m_bandHeight[x] = m_bandHeight[x] / fallOff;
 		}
 
-		if (m_bandHeight[x] < 0)
-		{
-			m_bandHeight[x] = 0;
-		}
+		if (m_bandHeight[x] < 0) { m_bandHeight[x] = 0; }
 
 		m_path.lineTo(EqHandle::freqToXPixel(bandToFreq(x), width()), fh - m_bandHeight[x]);
 		m_peakSum += m_bandHeight[x];

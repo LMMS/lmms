@@ -47,10 +47,7 @@ AmplifierEffect::~AmplifierEffect() {}
 
 bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 
 	double outSum = 0.0;
 	const float d = dryLevel();

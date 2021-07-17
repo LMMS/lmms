@@ -64,20 +64,14 @@ public:
 
 	inline ~malletsSynth()
 	{
-		if (m_voice)
-		{
-			m_voice->noteOff(0.0);
-		}
+		if (m_voice) { m_voice->noteOff(0.0); }
 		delete[] m_delay;
 		delete m_voice;
 	}
 
 	inline sample_t nextSampleLeft()
 	{
-		if (m_voice == NULL)
-		{
-			return (0.0f);
-		}
+		if (m_voice == NULL) { return (0.0f); }
 		else
 		{
 			StkFloat s = m_voice->tick();
@@ -96,10 +90,7 @@ public:
 
 	inline void setFrequency(const StkFloat _pitch)
 	{
-		if (m_voice)
-		{
-			m_voice->setFrequency(_pitch);
-		}
+		if (m_voice) { m_voice->setFrequency(_pitch); }
 	}
 
 	inline int presetIndex() { return m_presetIndex; }

@@ -347,8 +347,7 @@ void FxMixerView::updateFxLine(int index)
 void FxMixerView::deleteChannel(int index)
 {
 	// can't delete master
-	if (index == 0)
-		return;
+	if (index == 0) return;
 
 	// remember selected line
 	int selLine = m_currentFxLine->channelIndex();
@@ -381,10 +380,7 @@ void FxMixerView::deleteChannel(int index)
 	m_fxChannelViews.remove(index);
 
 	// select the next channel
-	if (selLine >= m_fxChannelViews.size())
-	{
-		selLine = m_fxChannelViews.size() - 1;
-	}
+	if (selLine >= m_fxChannelViews.size()) { selLine = m_fxChannelViews.size() - 1; }
 	setCurrentFxLine(selLine);
 
 	updateMaxChannelSelector();
@@ -420,18 +416,14 @@ void FxMixerView::deleteUnusedChannels()
 	// Check all channels except master, delete those with no incoming sends
 	for (int i = m_fxChannelViews.size() - 1; i > 0; --i)
 	{
-		if (!inUse[i] && Engine::fxMixer()->effectChannel(i)->m_receives.isEmpty())
-		{
-			deleteChannel(i);
-		}
+		if (!inUse[i] && Engine::fxMixer()->effectChannel(i)->m_receives.isEmpty()) { deleteChannel(i); }
 	}
 }
 
 void FxMixerView::moveChannelLeft(int index, int focusIndex)
 {
 	// can't move master or first channel left or last channel right
-	if (index <= 1 || index >= m_fxChannelViews.size())
-		return;
+	if (index <= 1 || index >= m_fxChannelViews.size()) return;
 
 	FxMixer* m = Engine::fxMixer();
 
@@ -460,10 +452,7 @@ void FxMixerView::keyPressEvent(QKeyEvent* e)
 		deleteChannel(m_currentFxLine->channelIndex());
 		break;
 	case Qt::Key_Left:
-		if (e->modifiers() & Qt::AltModifier)
-		{
-			moveChannelLeft(m_currentFxLine->channelIndex());
-		}
+		if (e->modifiers() & Qt::AltModifier) { moveChannelLeft(m_currentFxLine->channelIndex()); }
 		else
 		{
 			// select channel to the left
@@ -471,10 +460,7 @@ void FxMixerView::keyPressEvent(QKeyEvent* e)
 		}
 		break;
 	case Qt::Key_Right:
-		if (e->modifiers() & Qt::AltModifier)
-		{
-			moveChannelRight(m_currentFxLine->channelIndex());
-		}
+		if (e->modifiers() & Qt::AltModifier) { moveChannelRight(m_currentFxLine->channelIndex()); }
 		else
 		{
 			// select channel to the right
@@ -482,10 +468,7 @@ void FxMixerView::keyPressEvent(QKeyEvent* e)
 		}
 		break;
 	case Qt::Key_Insert:
-		if (e->modifiers() & Qt::ShiftModifier)
-		{
-			addNewChannel();
-		}
+		if (e->modifiers() & Qt::ShiftModifier) { addNewChannel(); }
 		break;
 	case Qt::Key_Enter:
 	case Qt::Key_Return:
@@ -497,10 +480,7 @@ void FxMixerView::keyPressEvent(QKeyEvent* e)
 
 void FxMixerView::closeEvent(QCloseEvent* _ce)
 {
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
+	if (parentWidget()) { parentWidget()->hide(); }
 	else
 	{
 		hide();
@@ -510,10 +490,7 @@ void FxMixerView::closeEvent(QCloseEvent* _ce)
 
 void FxMixerView::setCurrentFxLine(int _line)
 {
-	if (_line >= 0 && _line < m_fxChannelViews.size())
-	{
-		setCurrentFxLine(m_fxChannelViews[_line]->m_fxLine);
-	}
+	if (_line >= 0 && _line < m_fxChannelViews.size()) { setCurrentFxLine(m_fxChannelViews[_line]->m_fxLine); }
 }
 
 void FxMixerView::clear()

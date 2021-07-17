@@ -63,8 +63,7 @@ public:
 	/* clear denormal numbers in history */
 	void flush_0()
 	{
-		if (is_denormal(y1))
-			y1 = 0;
+		if (is_denormal(y1)) y1 = 0;
 	}
 };
 
@@ -100,8 +99,7 @@ public:
 	/* clear denormal numbers in history */
 	void flush_0()
 	{
-		if (is_denormal(y1))
-			y1 = 0;
+		if (is_denormal(y1)) y1 = 0;
 	}
 };
 

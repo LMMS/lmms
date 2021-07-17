@@ -56,10 +56,7 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 
 	QString dev = ConfigManager::inst()->value("audiosndio", "device");
 
-	if (dev == "")
-	{
-		m_hdl = sio_open(NULL, SIO_PLAY, 0);
-	}
+	if (dev == "") { m_hdl = sio_open(NULL, SIO_PLAY, 0); }
 	else
 	{
 		m_hdl = sio_open(dev.toLatin1().constData(), SIO_PLAY, 0);
@@ -80,10 +77,7 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 	m_par.round = mixer()->framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
-	if ((isLittleEndian() && (m_par.le == 0)) || (!isLittleEndian() && (m_par.le == 1)))
-	{
-		m_convertEndian = true;
-	}
+	if ((isLittleEndian() && (m_par.le == 0)) || (!isLittleEndian() && (m_par.le == 1))) { m_convertEndian = true; }
 
 	struct sio_par reqpar = m_par;
 
@@ -126,10 +120,7 @@ AudioSndio::~AudioSndio()
 
 void AudioSndio::startProcessing(void)
 {
-	if (!isRunning())
-	{
-		start(QThread::HighPriority);
-	}
+	if (!isRunning()) { start(QThread::HighPriority); }
 }
 
 void AudioSndio::stopProcessing(void) { stopProcessingThread(this); }
@@ -154,16 +145,10 @@ void AudioSndio::run(void)
 	while (true)
 	{
 		const fpp_t frames = getNextBuffer(temp);
-		if (!frames)
-		{
-			break;
-		}
+		if (!frames) { break; }
 
 		uint bytes = convertToS16(temp, frames, mixer()->masterGain(), outbuf, m_convertEndian);
-		if (sio_write(m_hdl, outbuf, bytes) != bytes)
-		{
-			break;
-		}
+		if (sio_write(m_hdl, outbuf, bytes) != bytes) { break; }
 	}
 
 	delete[] temp;

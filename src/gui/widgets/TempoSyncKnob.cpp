@@ -45,22 +45,13 @@ TempoSyncKnob::TempoSyncKnob(knobTypes _knob_num, QWidget* _parent, const QStrin
 
 TempoSyncKnob::~TempoSyncKnob()
 {
-	if (m_custom)
-	{
-		delete m_custom->parentWidget();
-	}
+	if (m_custom) { delete m_custom->parentWidget(); }
 }
 
 void TempoSyncKnob::modelChanged()
 {
-	if (model() == NULL)
-	{
-		qWarning("no TempoSyncKnobModel has been set!");
-	}
-	if (m_custom != NULL)
-	{
-		m_custom->setModel(&model()->m_custom);
-	}
+	if (model() == NULL) { qWarning("no TempoSyncKnobModel has been set!"); }
+	if (m_custom != NULL) { m_custom->setModel(&model()->m_custom); }
 	connect(model(), SIGNAL(syncModeChanged(TempoSyncMode)), this, SLOT(updateDescAndIcon()));
 	connect(this, SIGNAL(sliderMoved(float)), model(), SLOT(disableSync()));
 	updateDescAndIcon();

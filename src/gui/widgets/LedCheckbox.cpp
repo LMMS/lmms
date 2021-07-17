@@ -62,10 +62,7 @@ void LedCheckBox::paintEvent(QPaintEvent*)
 	QPainter p(this);
 	p.setFont(pointSize<7>(font()));
 
-	if (model()->value() == true)
-	{
-		p.drawPixmap(0, 0, *m_ledOnPixmap);
-	}
+	if (model()->value() == true) { p.drawPixmap(0, 0, *m_ledOnPixmap); }
 	else
 	{
 		p.drawPixmap(0, 0, *m_ledOffPixmap);
@@ -81,10 +78,7 @@ void LedCheckBox::initUi(LedColors _color)
 {
 	setCheckable(true);
 
-	if (_color >= NumColors || _color < Yellow)
-	{
-		_color = Yellow;
-	}
+	if (_color >= NumColors || _color < Yellow) { _color = Yellow; }
 	m_ledOnPixmap = new QPixmap(embed::getIconPixmap(names[_color].toUtf8().constData()));
 	m_ledOffPixmap = new QPixmap(embed::getIconPixmap("led_off"));
 

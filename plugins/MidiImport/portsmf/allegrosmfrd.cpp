@@ -142,8 +142,7 @@ void Alg_midifile_reader::Mf_endtrack()
 	channel_offset += seq->channel_offset_per_track;
 	track = NULL;
 	double now = get_time();
-	if (seq->get_beat_dur() < now)
-		seq->set_beat_dur(now);
+	if (seq->get_beat_dur() < now) seq->set_beat_dur(now);
 	meta_channel = -1;
 	port = 0;
 }
@@ -232,16 +231,12 @@ void Alg_midifile_reader::update(int chan, int key, Alg_parameter_ptr param)
 	Alg_update_ptr update = new Alg_update;
 	update->time = get_time();
 	update->chan = chan;
-	if (chan != -1)
-	{
-		update->chan = chan + channel_offset + port * channel_offset_per_port;
-	}
+	if (chan != -1) { update->chan = chan + channel_offset + port * channel_offset_per_port; }
 	update->set_identifier(key);
 	update->parameter = *param;
 	// prevent the destructor from destroying the string twice!
 	// the new Update takes the string from param
-	if (param->attr_type() == 's')
-		param->s = NULL;
+	if (param->attr_type() == 's') param->s = NULL;
 	track->append(update);
 }
 
@@ -396,8 +391,7 @@ void Alg_midifile_reader::Mf_text(int type, int len, unsigned char* msg)
 	Alg_parameter text;
 	text.s = heapify2(len, msg);
 	const char* attr = "miscs";
-	if (type == 1)
-		attr = "texts";
+	if (type == 1) attr = "texts";
 	else if (type == 2)
 		attr = "copyrights";
 	else if (type == 3)

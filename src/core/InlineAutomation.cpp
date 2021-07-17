@@ -44,9 +44,6 @@ void InlineAutomation::loadSettings(const QDomElement& _this)
 	if (node.isElement())
 	{
 		node = node.namedItem(nodeName());
-		if (node.isElement())
-		{
-			automationPattern()->loadSettings(node.toElement());
-		}
+		if (node.isElement()) { automationPattern()->loadSettings(node.toElement()); }
 	}
 }

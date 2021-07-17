@@ -49,10 +49,7 @@ Plugin::Plugin(const Descriptor* descriptor, Model* parent, const Descriptor::Su
 	, m_descriptor(descriptor)
 	, m_key(key ? *key : Descriptor::SubPluginFeatures::Key(m_descriptor))
 {
-	if (m_descriptor == NULL)
-	{
-		m_descriptor = &dummyPluginDescriptor;
-	}
+	if (m_descriptor == NULL) { m_descriptor = &dummyPluginDescriptor; }
 }
 
 Plugin::~Plugin() {}
@@ -123,8 +120,7 @@ AutomatableModel* Plugin::childModel(const QString&)
 Plugin* Plugin::instantiateWithKey(
 	const QString& pluginName, Model* parent, const Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd)
 {
-	if (keyFromDnd)
-		Q_ASSERT(!key);
+	if (keyFromDnd) Q_ASSERT(!key);
 	const Descriptor::SubPluginFeatures::Key* keyPtr =
 		keyFromDnd ? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey()) : key;
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
@@ -164,10 +160,7 @@ Plugin* Plugin::instantiate(const QString& pluginName, Model* parent, void* data
 		if ((instantiationHook = (InstantiationHook)pi.library->resolve("lmms_plugin_main")))
 		{
 			inst = instantiationHook(parent, data);
-			if (!inst)
-			{
-				inst = new DummyPlugin();
-			}
+			if (!inst) { inst = new DummyPlugin(); }
 		}
 		else
 		{
@@ -188,10 +181,7 @@ void Plugin::collectErrorForUI(QString errMsg) { Engine::getSong()->collectError
 PluginView* Plugin::createView(QWidget* parent)
 {
 	PluginView* pv = instantiateView(parent);
-	if (pv != NULL)
-	{
-		pv->setModel(this);
-	}
+	if (pv != NULL) { pv->setModel(this); }
 	return pv;
 }
 

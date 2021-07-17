@@ -40,10 +40,7 @@ void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod
 	const float newCpuLoad = periodElapsed / 10000.0f * sampleRate / framesPerPeriod;
 	m_cpuLoad = qBound<int>(0, (newCpuLoad * 0.1f + m_cpuLoad * 0.9f), 100);
 
-	if (m_outputFile.isOpen())
-	{
-		m_outputFile.write(QString("%1\n").arg(periodElapsed).toLatin1());
-	}
+	if (m_outputFile.isOpen()) { m_outputFile.write(QString("%1\n").arg(periodElapsed).toLatin1()); }
 }
 
 void MixerProfiler::setOutputFile(const QString& outputFile)

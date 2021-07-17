@@ -95,10 +95,7 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(c
 	int idx = 0;
 	while (fileEncodeDevices[idx].m_fileFormat != NumFileFormats)
 	{
-		if (QString(fileEncodeDevices[idx].m_extension) == _ext)
-		{
-			return (fileEncodeDevices[idx].m_fileFormat);
-		}
+		if (QString(fileEncodeDevices[idx].m_extension) == _ext) { return (fileEncodeDevices[idx].m_fileFormat); }
 		++idx;
 	}
 
@@ -174,10 +171,7 @@ void ProjectRenderer::run()
 
 	// If the user aborted export-process, the file has to be deleted.
 	const QString f = m_fileDev->outputFile();
-	if (m_abort)
-	{
-		QFile(f).remove();
-	}
+	if (m_abort) { QFile(f).remove(); }
 }
 
 void ProjectRenderer::abortProcessing()

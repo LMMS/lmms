@@ -17,10 +17,7 @@ Base relativeBases[] = {Base::ProjectDir, Base::FactorySample, Base::UserSample,
 QString baseLocation(const Base base, bool* error /* = nullptr*/)
 {
 	// error is false unless something goes wrong
-	if (error)
-	{
-		*error = false;
-	}
+	if (error) { *error = false; }
 
 	QString loc = "";
 	switch (base)
@@ -70,10 +67,7 @@ QString baseLocation(const Base base, bool* error /* = nullptr*/)
 		}
 		// We resolved it properly if we had an open Song and the project
 		// filename wasn't empty
-		if (error)
-		{
-			*error = (!s || projectPath.isEmpty());
-		}
+		if (error) { *error = (!s || projectPath.isEmpty()); }
 		break;
 	}
 	default:
@@ -86,10 +80,7 @@ QDir baseQDir(const Base base, bool* error /* = nullptr*/)
 {
 	if (base == Base::Absolute)
 	{
-		if (error)
-		{
-			*error = false;
-		}
+		if (error) { *error = false; }
 		return QDir::root();
 	}
 	return QDir(baseLocation(base, error));
@@ -133,10 +124,7 @@ Base baseLookup(const QString& path)
 	for (auto base : relativeBases)
 	{
 		QString prefix = basePrefix(base);
-		if (path.startsWith(prefix))
-		{
-			return base;
-		}
+		if (path.startsWith(prefix)) { return base; }
 	}
 	return Base::Absolute;
 }
@@ -147,10 +135,7 @@ QString cleanName(const QString& path) { return stripPrefix(QFileInfo(path).base
 
 QString oldRelativeUpgrade(const QString& input)
 {
-	if (input.isEmpty())
-	{
-		return input;
-	}
+	if (input.isEmpty()) { return input; }
 
 	// Start by assuming that the file is a user sample
 	Base assumedBase = Base::UserSample;
@@ -158,18 +143,12 @@ QString oldRelativeUpgrade(const QString& input)
 	// Check if it's a factory sample
 	QString factoryPath = baseLocation(Base::FactorySample) + input;
 	QFileInfo factoryInfo(factoryPath);
-	if (factoryInfo.exists())
-	{
-		assumedBase = Base::FactorySample;
-	}
+	if (factoryInfo.exists()) { assumedBase = Base::FactorySample; }
 
 	// Check if it's a VST
 	QString vstPath = baseLocation(Base::UserVST) + input;
 	QFileInfo vstInfo(vstPath);
-	if (vstInfo.exists())
-	{
-		assumedBase = Base::UserVST;
-	}
+	if (vstInfo.exists()) { assumedBase = Base::UserVST; }
 
 	// Assume we've found the correct base location, return the full path
 	return basePrefix(assumedBase) + input;
@@ -181,10 +160,7 @@ QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 	QFileInfo inputFileInfo = QFileInfo(input);
 	if (inputFileInfo.isAbsolute())
 	{
-		if (error)
-		{
-			*error = false;
-		}
+		if (error) { *error = false; }
 		return input;
 	}
 	// Next, handle old relative paths with no prefix
@@ -196,15 +172,9 @@ QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 
 QString relativeOrAbsolute(const QString& input, const Base base)
 {
-	if (input.isEmpty())
-	{
-		return input;
-	}
+	if (input.isEmpty()) { return input; }
 	QString absolutePath = toAbsolute(input);
-	if (base == Base::Absolute)
-	{
-		return absolutePath;
-	}
+	if (base == Base::Absolute) { return absolutePath; }
 	bool error;
 	QString relativePath = baseQDir(base, &error).relativeFilePath(absolutePath);
 	// Return the relative path if it didn't result in a path starting with ..
@@ -223,10 +193,7 @@ QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
 	{
 		// Skip local paths when searching for the shortest relative if those
 		// are not allowed for that resource
-		if (base == Base::LocalDir && !allowLocal)
-		{
-			continue;
-		}
+		if (base == Base::LocalDir && !allowLocal) { continue; }
 
 		QString otherPath = relativeOrAbsolute(absolutePath, base);
 		if (otherPath.length() < shortestPath.length())

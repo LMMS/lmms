@@ -89,10 +89,7 @@ public:
 	{
 		m_file.open(QFile::ReadOnly);
 		m_map = m_file.map(0, m_file.size());
-		if (m_map == nullptr)
-		{
-			throw std::runtime_error("Cannot map file");
-		}
+		if (m_map == nullptr) { throw std::runtime_error("Cannot map file"); }
 	}
 	~FileInfo() { m_file.unmap(m_map); }
 
@@ -100,10 +97,7 @@ public:
 	{
 		int32_t peOffset = qFromLittleEndian(*reinterpret_cast<int32_t*>(m_map + 0x3C));
 		uchar* peSignature = m_map + peOffset;
-		if (memcmp(peSignature, "PE\0\0", 4))
-		{
-			throw std::runtime_error("Invalid PE file");
-		}
+		if (memcmp(peSignature, "PE\0\0", 4)) { throw std::runtime_error("Invalid PE file"); }
 		uchar* coffHeader = peSignature + 4;
 		uint16_t machineType = qFromLittleEndian(*reinterpret_cast<uint16_t*>(coffHeader));
 		return static_cast<MachineType>(machineType);
@@ -167,10 +161,7 @@ void VstPlugin::tryLoad(const QString& remoteVstPluginExecutable)
 	init(remoteVstPluginExecutable, false, {m_embedMethod});
 
 	waitForHostInfoGotten();
-	if (failed())
-	{
-		return;
-	}
+	if (failed()) { return; }
 
 	lock();
 
@@ -208,17 +199,11 @@ void VstPlugin::tryLoad(const QString& remoteVstPluginExecutable)
 
 void VstPlugin::loadSettings(const QDomElement& _this)
 {
-	if (_this.hasAttribute("program"))
-	{
-		setProgram(_this.attribute("program").toInt());
-	}
+	if (_this.hasAttribute("program")) { setProgram(_this.attribute("program").toInt()); }
 
 	const int num_params = _this.attribute("numparams").toInt();
 	// if it exists try to load settings chunk
-	if (_this.hasAttribute("chunk"))
-	{
-		loadChunk(QByteArray::fromBase64(_this.attribute("chunk").toUtf8()));
-	}
+	if (_this.hasAttribute("chunk")) { loadChunk(QByteArray::fromBase64(_this.attribute("chunk").toUtf8())); }
 	else if (num_params > 0)
 	{
 		// no chunk, restore individual parameters
@@ -236,26 +221,17 @@ void VstPlugin::saveSettings(QDomDocument& _doc, QDomElement& _this)
 {
 	if (m_embedMethod != "none")
 	{
-		if (pluginWidget() != NULL)
-		{
-			_this.setAttribute("guivisible", pluginWidget()->isVisible());
-		}
+		if (pluginWidget() != NULL) { _this.setAttribute("guivisible", pluginWidget()->isVisible()); }
 	}
 	else
 	{
 		int visible = isUIVisible();
-		if (visible != -1)
-		{
-			_this.setAttribute("guivisible", visible);
-		}
+		if (visible != -1) { _this.setAttribute("guivisible", visible); }
 	}
 
 	// try to save all settings in a chunk
 	QByteArray chunk = saveChunk();
-	if (!chunk.isEmpty())
-	{
-		_this.setAttribute("chunk", QString(chunk.toBase64()));
-	}
+	if (!chunk.isEmpty()) { _this.setAttribute("chunk", QString(chunk.toBase64())); }
 	else
 	{
 		// plugin doesn't seem to support chunks, therefore save
@@ -273,10 +249,7 @@ void VstPlugin::saveSettings(QDomDocument& _doc, QDomElement& _this)
 
 void VstPlugin::toggleUI()
 {
-	if (m_embedMethod == "none")
-	{
-		RemotePlugin::toggleUI();
-	}
+	if (m_embedMethod == "none") { RemotePlugin::toggleUI(); }
 	else if (pluginWidget())
 	{
 		toggleEditorVisibility();
@@ -529,26 +502,17 @@ void VstPlugin::idleUpdate()
 
 void VstPlugin::showUI()
 {
-	if (m_embedMethod == "none")
-	{
-		RemotePlugin::showUI();
-	}
+	if (m_embedMethod == "none") { RemotePlugin::showUI(); }
 	else if (m_embedMethod != "headless")
 	{
-		if (!editor())
-		{
-			qWarning() << "VstPlugin::showUI called before VstPlugin::createUI";
-		}
+		if (!editor()) { qWarning() << "VstPlugin::showUI called before VstPlugin::createUI"; }
 		toggleEditorVisibility(true);
 	}
 }
 
 void VstPlugin::hideUI()
 {
-	if (m_embedMethod == "none")
-	{
-		RemotePlugin::hideUI();
-	}
+	if (m_embedMethod == "none") { RemotePlugin::hideUI(); }
 	else if (pluginWidget() != nullptr)
 	{
 		toggleEditorVisibility(false);
@@ -599,15 +563,9 @@ QByteArray VstPlugin::saveChunk()
 void VstPlugin::toggleEditorVisibility(int visible)
 {
 	QWidget* w = editor();
-	if (!w)
-	{
-		return;
-	}
+	if (!w) { return; }
 
-	if (visible < 0)
-	{
-		visible = !w->isVisible();
-	}
+	if (visible < 0) { visible = !w->isVisible(); }
 	w->setVisible(visible);
 }
 
@@ -620,10 +578,7 @@ void VstPlugin::createUI(QWidget* parent)
 		return;
 	}
 
-	if (m_pluginWindowID == 0)
-	{
-		return;
-	}
+	if (m_pluginWindowID == 0) { return; }
 
 	QWidget* container = nullptr;
 
@@ -671,10 +626,7 @@ void VstPlugin::createUI(QWidget* parent)
 #ifdef LMMS_BUILD_LINUX
 		if (m_embedMethod == "xembed")
 	{
-		if (parent)
-		{
-			parent->setAttribute(Qt::WA_NativeWindow);
-		}
+		if (parent) { parent->setAttribute(Qt::WA_NativeWindow); }
 		QX11EmbedContainer* embedContainer = new QX11EmbedContainer(parent);
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient(m_pluginWindowID);
@@ -698,10 +650,7 @@ bool VstPlugin::eventFilter(QObject* obj, QEvent* event)
 #if QT_VERSION >= 0x050100
 	if (embedMethod() == "qt" && obj == m_pluginWidget)
 	{
-		if (event->type() == QEvent::Show)
-		{
-			RemotePlugin::showUI();
-		}
+		if (event->type() == QEvent::Show) { RemotePlugin::showUI(); }
 		qDebug() << obj << event;
 	}
 #endif

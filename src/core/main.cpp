@@ -123,10 +123,7 @@ inline void loadTranslation(const QString& tname, const QString& dir = ConfigMan
 	QTranslator* t = new QTranslator(QCoreApplication::instance());
 	QString name = tname + ".qm";
 
-	if (t->load(name, dir))
-	{
-		QCoreApplication::instance()->installTranslator(t);
-	}
+	if (t->load(name, dir)) { QCoreApplication::instance()->installTranslator(t); }
 }
 
 void printVersion(char* executableName)
@@ -252,18 +249,9 @@ int main(int argc, char** argv)
 	// Enable console output if available
 	if (AttachConsole(ATTACH_PARENT_PROCESS))
 	{
-		if (!hStdIn)
-		{
-			freopen_s(&fIn, "CONIN$", "r", stdin);
-		}
-		if (!hStdOut)
-		{
-			freopen_s(&fOut, "CONOUT$", "w", stdout);
-		}
-		if (!hStdErr)
-		{
-			freopen_s(&fErr, "CONOUT$", "w", stderr);
-		}
+		if (!hStdIn) { freopen_s(&fIn, "CONIN$", "r", stdin); }
+		if (!hStdOut) { freopen_s(&fOut, "CONOUT$", "w", stdout); }
+		if (!hStdErr) { freopen_s(&fErr, "CONOUT$", "w", stderr); }
 	}
 	// Make Qt's debug message handlers work
 	qInstallMessageHandler(consoleMessageHandler);
@@ -359,10 +347,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return noInputFileError();
-			}
+			if (i == argc) { return noInputFileError(); }
 
 			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
 
@@ -383,10 +368,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return noInputFileError();
-			}
+			if (i == argc) { return noInputFileError(); }
 
 			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
 
@@ -405,20 +387,14 @@ int main(int argc, char** argv)
 		{
 			// Ignore, processed earlier
 #ifdef LMMS_BUILD_WIN32
-			if (allowRoot)
-			{
-				printf("\nOption \"--allowroot\" will be ignored on this platform.\n\n");
-			}
+			if (allowRoot) { printf("\nOption \"--allowroot\" will be ignored on this platform.\n\n"); }
 #endif
 		}
 		else if (arg == "dump" || arg == "--dump" || arg == "-d")
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return noInputFileError();
-			}
+			if (i == argc) { return noInputFileError(); }
 
 			QFile f(QString::fromLocal8Bit(argv[i]));
 			f.open(QIODevice::ReadOnly);
@@ -431,10 +407,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return noInputFileError();
-			}
+			if (i == argc) { return noInputFileError(); }
 
 			QFile f(QString::fromLocal8Bit(argv[i]));
 			f.open(QIODevice::ReadOnly);
@@ -448,10 +421,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return noInputFileError();
-			}
+			if (i == argc) { return noInputFileError(); }
 
 			fileToLoad = QString::fromLocal8Bit(argv[i]);
 			renderOut = fileToLoad;
@@ -464,10 +434,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No output file specified");
-			}
+			if (i == argc) { return usageError("No output file specified"); }
 
 			renderOut = QString::fromLocal8Bit(argv[i]);
 		}
@@ -475,17 +442,11 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No output format specified");
-			}
+			if (i == argc) { return usageError("No output format specified"); }
 
 			const QString ext = QString(argv[i]);
 
-			if (ext == "wav")
-			{
-				eff = ProjectRenderer::WaveFile;
-			}
+			if (ext == "wav") { eff = ProjectRenderer::WaveFile; }
 #ifdef LMMS_HAVE_OGGVORBIS
 			else if (ext == "ogg")
 			{
@@ -511,16 +472,10 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No samplerate specified");
-			}
+			if (i == argc) { return usageError("No samplerate specified"); }
 
 			sample_rate_t sr = QString(argv[i]).toUInt();
-			if (sr >= 44100 && sr <= 192000)
-			{
-				os.setSampleRate(sr);
-			}
+			if (sr >= 44100 && sr <= 192000) { os.setSampleRate(sr); }
 			else
 			{
 				return usageError(QString("Invalid samplerate %1").arg(argv[i]));
@@ -530,10 +485,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No bitrate specified");
-			}
+			if (i == argc) { return usageError("No bitrate specified"); }
 
 			int br = QString(argv[i]).toUInt();
 
@@ -552,17 +504,11 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No stereo mode specified");
-			}
+			if (i == argc) { return usageError("No stereo mode specified"); }
 
 			QString const mode(argv[i]);
 
-			if (mode == "s")
-			{
-				os.setStereoMode(OutputSettings::StereoMode_Stereo);
-			}
+			if (mode == "s") { os.setStereoMode(OutputSettings::StereoMode_Stereo); }
 			else if (mode == "j")
 			{
 				os.setStereoMode(OutputSettings::StereoMode_JointStereo);
@@ -584,17 +530,11 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No interpolation method specified");
-			}
+			if (i == argc) { return usageError("No interpolation method specified"); }
 
 			const QString ip = QString(argv[i]);
 
-			if (ip == "linear")
-			{
-				qs.interpolation = Mixer::qualitySettings::Interpolation_Linear;
-			}
+			if (ip == "linear") { qs.interpolation = Mixer::qualitySettings::Interpolation_Linear; }
 			else if (ip == "sincfastest")
 			{
 				qs.interpolation = Mixer::qualitySettings::Interpolation_SincFastest;
@@ -616,10 +556,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No oversampling specified");
-			}
+			if (i == argc) { return usageError("No oversampling specified"); }
 
 			int o = QString(argv[i]).toUInt();
 
@@ -645,10 +582,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No file specified for importing");
-			}
+			if (i == argc) { return usageError("No file specified for importing"); }
 
 			fileToImport = QString::fromLocal8Bit(argv[i]);
 
@@ -663,10 +597,7 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No profile specified");
-			}
+			if (i == argc) { return usageError("No profile specified"); }
 
 			profilerOutputFile = QString::fromLocal8Bit(argv[i]);
 		}
@@ -674,28 +605,19 @@ int main(int argc, char** argv)
 		{
 			++i;
 
-			if (i == argc)
-			{
-				return usageError("No configuration file specified");
-			}
+			if (i == argc) { return usageError("No configuration file specified"); }
 
 			configFile = QString::fromLocal8Bit(argv[i]);
 		}
 		else
 		{
-			if (argv[i][0] == '-')
-			{
-				return usageError(QString("Invalid option %1").arg(argv[i]));
-			}
+			if (argv[i][0] == '-') { return usageError(QString("Invalid option %1").arg(argv[i])); }
 			fileToLoad = QString::fromLocal8Bit(argv[i]);
 		}
 	}
 
 	// Test file argument before continuing
-	if (!fileToLoad.isEmpty())
-	{
-		fileCheck(fileToLoad);
-	}
+	if (!fileToLoad.isEmpty()) { fileCheck(fileToLoad); }
 	else if (!fileToImport.isEmpty())
 	{
 		fileCheck(fileToImport);
@@ -708,10 +630,7 @@ int main(int argc, char** argv)
 
 	// set language
 	QString pos = ConfigManager::inst()->value("app", "language");
-	if (pos.isEmpty())
-	{
-		pos = QLocale::system().name().left(2);
-	}
+	if (pos.isEmpty()) { pos = QLocale::system().name().left(2); }
 
 	// load actual translation for LMMS
 	loadTranslation(pos);
@@ -730,10 +649,7 @@ int main(int argc, char** argv)
 #ifndef __OpenBSD__
 	struct sched_param sparam;
 	sparam.sched_priority = (sched_get_priority_max(SCHED_FIFO) + sched_get_priority_min(SCHED_FIFO)) / 2;
-	if (sched_setscheduler(0, SCHED_FIFO, &sparam) == -1)
-	{
-		printf("Notice: could not set realtime priority.\n");
-	}
+	if (sched_setscheduler(0, SCHED_FIFO, &sparam) == -1) { printf("Notice: could not set realtime priority.\n"); }
 #endif
 #endif
 #endif
@@ -749,14 +665,8 @@ int main(int argc, char** argv)
 	struct sigaction sa;
 	sa.sa_handler = SIG_IGN;
 	sa.sa_flags = SA_SIGINFO;
-	if (sigemptyset(&sa.sa_mask))
-	{
-		fprintf(stderr, "Signal initialization failed.\n");
-	}
-	if (sigaction(SIGPIPE, &sa, NULL))
-	{
-		fprintf(stderr, "Signal initialization failed.\n");
-	}
+	if (sigemptyset(&sa.sa_mask)) { fprintf(stderr, "Signal initialization failed.\n"); }
+	if (sigaction(SIGPIPE, &sa, NULL)) { fprintf(stderr, "Signal initialization failed.\n"); }
 #endif
 
 	bool destroyEngine = false;
@@ -781,10 +691,7 @@ int main(int argc, char** argv)
 
 		// when rendering multiple tracks, renderOut is a directory
 		// otherwise, it is a file, so we need to append the file extension
-		if (!renderTracks)
-		{
-			renderOut = baseName(renderOut) + ProjectRenderer::getFileExtensionFromFormat(eff);
-		}
+		if (!renderTracks) { renderOut = baseName(renderOut) + ProjectRenderer::getFileExtensionFromFormat(eff); }
 
 		// create renderer
 		RenderManager* r = new RenderManager(qs, os, eff, renderOut);
@@ -795,16 +702,10 @@ int main(int argc, char** argv)
 		r->connect(t, SIGNAL(timeout()), SLOT(updateConsoleProgress()));
 		t->start(200);
 
-		if (profilerOutputFile.isEmpty() == false)
-		{
-			Engine::mixer()->profiler().setOutputFile(profilerOutputFile);
-		}
+		if (profilerOutputFile.isEmpty() == false) { Engine::mixer()->profiler().setOutputFile(profilerOutputFile); }
 
 		// start now!
-		if (renderTracks)
-		{
-			r->renderTracks();
-		}
+		if (renderTracks) { r->renderTracks(); }
 		else
 		{
 			r->renderProject();
@@ -877,10 +778,7 @@ int main(int argc, char** argv)
 			mb.setEscapeButton(exit);
 
 			mb.exec();
-			if (mb.clickedButton() == discard)
-			{
-				gui->mainWindow()->sessionCleanup();
-			}
+			if (mb.clickedButton() == discard) { gui->mainWindow()->sessionCleanup(); }
 			else if (mb.clickedButton() == recover) // Recover
 			{
 				fileToLoad = recoveryFile;
@@ -897,24 +795,15 @@ int main(int argc, char** argv)
 		// [Settel] workaround: showMaximized() doesn't work with
 		// FVWM2 unless the window is already visible -> show() first
 		gui->mainWindow()->show();
-		if (fullscreen)
-		{
-			gui->mainWindow()->showMaximized();
-		}
+		if (fullscreen) { gui->mainWindow()->showMaximized(); }
 
 		// Handle macOS-style FileOpen QEvents
 		QString queuedFile = static_cast<MainApplication*>(app)->queuedFile();
-		if (!queuedFile.isEmpty())
-		{
-			fileToLoad = queuedFile;
-		}
+		if (!queuedFile.isEmpty()) { fileToLoad = queuedFile; }
 
 		if (!fileToLoad.isEmpty())
 		{
-			if (fileToLoad == recoveryFile)
-			{
-				Engine::getSong()->createNewProjectFromTemplate(fileToLoad);
-			}
+			if (fileToLoad == recoveryFile) { Engine::getSong()->createNewProjectFromTemplate(fileToLoad); }
 			else
 			{
 				Engine::getSong()->loadProject(fileToLoad);
@@ -923,10 +812,7 @@ int main(int argc, char** argv)
 		else if (!fileToImport.isEmpty())
 		{
 			ImportFilter::import(fileToImport, Engine::getSong());
-			if (exitAfterImport)
-			{
-				return EXIT_SUCCESS;
-			}
+			if (exitAfterImport) { return EXIT_SUCCESS; }
 		}
 		// If enabled, open last project if there is one. Else, create
 		// a new one.
@@ -936,10 +822,7 @@ int main(int argc, char** argv)
 			QString f = ConfigManager::inst()->recentlyOpenedProjects().first();
 			QFileInfo recentFile(f);
 
-			if (recentFile.exists() && recentFile.suffix().toLower() != "mpt")
-			{
-				Engine::getSong()->loadProject(f);
-			}
+			if (recentFile.exists() && recentFile.suffix().toLower() != "mpt") { Engine::getSong()->loadProject(f); }
 			else
 			{
 				Engine::getSong()->createNewProject();
@@ -953,25 +836,16 @@ int main(int argc, char** argv)
 		// Finally we start the auto save timer and also trigger the
 		// autosave one time as recover.mmp is a signal to possible other
 		// instances of LMMS.
-		if (autoSaveEnabled)
-		{
-			gui->mainWindow()->autoSaveTimerReset();
-		}
+		if (autoSaveEnabled) { gui->mainWindow()->autoSaveTimerReset(); }
 	}
 
 	const int ret = app->exec();
 	delete app;
 
-	if (destroyEngine)
-	{
-		Engine::destroy();
-	}
+	if (destroyEngine) { Engine::destroy(); }
 
 	// ProjectRenderer::updateConsoleProgress() doesn't return line after render
-	if (coreOnly)
-	{
-		printf("\n");
-	}
+	if (coreOnly) { printf("\n"); }
 
 #ifdef LMMS_BUILD_WIN32
 	// Cleanup console

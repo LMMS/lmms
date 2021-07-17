@@ -116,10 +116,7 @@ void Lv2Manager::initPlugins()
 		Lv2Info info(curPlug, type, issues.empty());
 
 		m_lv2InfoMap[lilv_node_as_uri(lilv_plugin_get_uri(curPlug))] = std::move(info);
-		if (issues.empty())
-		{
-			++pluginsLoaded;
-		}
+		if (issues.empty()) { ++pluginsLoaded; }
 		else
 		{
 			if (std::any_of(issues.begin(), issues.end(),

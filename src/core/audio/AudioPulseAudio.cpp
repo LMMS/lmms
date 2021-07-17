@@ -64,10 +64,7 @@ QString AudioPulseAudio::probeDevice()
 	QString dev = ConfigManager::inst()->value("audiopa", "device");
 	if (dev.isEmpty())
 	{
-		if (getenv("AUDIODEV") != NULL)
-		{
-			return getenv("AUDIODEV");
-		}
+		if (getenv("AUDIODEV") != NULL) { return getenv("AUDIODEV"); }
 		return "default";
 	}
 	return dev;
@@ -75,10 +72,7 @@ QString AudioPulseAudio::probeDevice()
 
 void AudioPulseAudio::startProcessing()
 {
-	if (!isRunning())
-	{
-		start(QThread::HighPriority);
-	}
+	if (!isRunning()) { start(QThread::HighPriority); }
 }
 
 void AudioPulseAudio::stopProcessing()
@@ -198,9 +192,7 @@ void AudioPulseAudio::run()
 	{
 		int ret = 0;
 		m_quit = false;
-		while (m_quit == false && pa_mainloop_iterate(mainLoop, 1, &ret) >= 0)
-		{
-		}
+		while (m_quit == false && pa_mainloop_iterate(mainLoop, 1, &ret) >= 0) {}
 
 		pa_stream_disconnect(m_s);
 		pa_stream_unref(m_s);
@@ -209,9 +201,7 @@ void AudioPulseAudio::run()
 	{
 		const fpp_t fpp = mixer()->framesPerPeriod();
 		surroundSampleFrame* temp = new surroundSampleFrame[fpp];
-		while (getNextBuffer(temp))
-		{
-		}
+		while (getNextBuffer(temp)) {}
 		delete[] temp;
 	}
 
@@ -237,10 +227,7 @@ void AudioPulseAudio::streamWriteCallback(pa_stream* s, size_t length)
 			break;
 		}
 		int bytes = convertToS16(temp, frames, mixer()->masterGain(), pcmbuf, m_convertEndian);
-		if (bytes > 0)
-		{
-			pa_stream_write(m_s, pcmbuf, bytes, NULL, 0, PA_SEEK_RELATIVE);
-		}
+		if (bytes > 0) { pa_stream_write(m_s, pcmbuf, bytes, NULL, 0, PA_SEEK_RELATIVE); }
 		fd += frames;
 	}
 

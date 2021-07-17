@@ -60,10 +60,7 @@ void AudioPort::setExtOutputEnabled(bool _enabled)
 	if (_enabled != m_extOutputEnabled)
 	{
 		m_extOutputEnabled = _enabled;
-		if (m_extOutputEnabled)
-		{
-			Engine::mixer()->audioDev()->registerPort(this);
-		}
+		if (m_extOutputEnabled) { Engine::mixer()->audioDev()->registerPort(this); }
 		else
 		{
 			Engine::mixer()->audioDev()->unregisterPort(this);
@@ -89,10 +86,7 @@ bool AudioPort::processEffects()
 
 void AudioPort::doProcessing()
 {
-	if (m_mutedModel && m_mutedModel->value())
-	{
-		return;
-	}
+	if (m_mutedModel && m_mutedModel->value()) { return; }
 
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
@@ -225,9 +219,6 @@ void AudioPort::removePlayHandle(PlayHandle* handle)
 {
 	m_playHandleLock.lock();
 	PlayHandleList::Iterator it = std::find(m_playHandles.begin(), m_playHandles.end(), handle);
-	if (it != m_playHandles.end())
-	{
-		m_playHandles.erase(it);
-	}
+	if (it != m_playHandles.end()) { m_playHandles.erase(it); }
 	m_playHandleLock.unlock();
 }

@@ -135,10 +135,7 @@ Mixer::Mixer(bool renderOnly)
 	for (int i = 0; i < m_numWorkers + 1; ++i)
 	{
 		MixerWorkerThread* wt = new MixerWorkerThread(this);
-		if (i < m_numWorkers)
-		{
-			wt->start(QThread::TimeCriticalPriority);
-		}
+		if (i < m_numWorkers) { wt->start(QThread::TimeCriticalPriority); }
 		m_workers.push_back(wt);
 	}
 }
@@ -232,10 +229,7 @@ void Mixer::stopProcessing()
 sample_rate_t Mixer::baseSampleRate() const
 {
 	sample_rate_t sr = ConfigManager::inst()->value("mixer", "samplerate").toInt();
-	if (sr < 44100)
-	{
-		sr = 44100;
-	}
+	if (sr < 44100) { sr = 44100; }
 	return sr;
 }
 
@@ -410,30 +404,18 @@ void Mixer::handleMetronome()
 	bool metronomeSupported = currentPlayMode == Song::Mode_PlayPattern || currentPlayMode == Song::Mode_PlaySong ||
 		currentPlayMode == Song::Mode_PlayBB;
 
-	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
-	{
-		return;
-	}
+	if (!metronomeSupported || !m_metronomeActive || song->isExporting()) { return; }
 
 	// stop crash with metronome if empty project
-	if (song->countTracks() == 0)
-	{
-		return;
-	}
+	if (song->countTracks() == 0) { return; }
 
 	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
 	tick_t ticksPerBar = TimePos::ticksPerBar();
 	int numerator = song->getTimeSigModel().getNumerator();
 
-	if (ticks == lastMetroTicks)
-	{
-		return;
-	}
+	if (ticks == lastMetroTicks) { return; }
 
-	if (ticks % (ticksPerBar / 1) == 0)
-	{
-		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
-	}
+	if (ticks % (ticksPerBar / 1) == 0) { addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg")); }
 	else if (ticks % (ticksPerBar / numerator) == 0)
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
@@ -463,10 +445,7 @@ void Mixer::clearInternal()
 	// TODO: m_midiClient->noteOffAll();
 	for (auto ph : m_playHandles)
 	{
-		if (ph->type() != PlayHandle::TypeInstrumentPlayHandle)
-		{
-			m_playHandlesToRemove.push_back(ph);
-		}
+		if (ph->type() != PlayHandle::TypeInstrumentPlayHandle) { m_playHandlesToRemove.push_back(ph); }
 	}
 }
 
@@ -479,15 +458,9 @@ Mixer::StereoSample Mixer::getPeakValues(sampleFrame* ab, const f_cnt_t frames) 
 	{
 		float const absLeft = qAbs(ab[f][0]);
 		float const absRight = qAbs(ab[f][1]);
-		if (absLeft > peakLeft)
-		{
-			peakLeft = absLeft;
-		}
+		if (absLeft > peakLeft) { peakLeft = absLeft; }
 
-		if (absRight > peakRight)
-		{
-			peakRight = absRight;
-		}
+		if (absRight > peakRight) { peakRight = absRight; }
 	}
 
 	return StereoSample(peakLeft, peakRight);
@@ -513,15 +486,9 @@ void Mixer::doSetAudioDevice(AudioDevice* _dev)
 	// Currently, this is safe, because this is only called by
 	// ProjectRenderer, and after ProjectRenderer calls this function,
 	// it does not access the old device anymore.
-	if (m_audioDev != m_oldAudioDev)
-	{
-		delete m_audioDev;
-	}
+	if (m_audioDev != m_oldAudioDev) { delete m_audioDev; }
 
-	if (_dev)
-	{
-		m_audioDev = _dev;
-	}
+	if (_dev) { m_audioDev = _dev; }
 	else
 	{
 		printf("param _dev == NULL in Mixer::setAudioDevice(...). "
@@ -541,18 +508,12 @@ void Mixer::setAudioDevice(AudioDevice* _dev, const struct qualitySettings& _qs,
 	emit qualitySettingsChanged();
 	emit sampleRateChanged();
 
-	if (startNow)
-	{
-		startProcessing(_needs_fifo);
-	}
+	if (startNow) { startProcessing(_needs_fifo); }
 }
 
 void Mixer::storeAudioDevice()
 {
-	if (!m_oldAudioDev)
-	{
-		m_oldAudioDev = m_audioDev;
-	}
+	if (!m_oldAudioDev) { m_oldAudioDev = m_audioDev; }
 }
 
 void Mixer::restoreAudioDevice()
@@ -575,10 +536,7 @@ void Mixer::removeAudioPort(AudioPort* port)
 	requestChangeInModel();
 
 	QVector<AudioPort*>::Iterator it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
-	if (it != m_audioPorts.end())
-	{
-		m_audioPorts.erase(it);
-	}
+	if (it != m_audioPorts.end()) { m_audioPorts.erase(it); }
 	doneChangeInModel();
 }
 
@@ -591,10 +549,7 @@ bool Mixer::addPlayHandle(PlayHandle* handle)
 		return true;
 	}
 
-	if (handle->type() == PlayHandle::TypeNotePlayHandle)
-	{
-		NotePlayHandleManager::release((NotePlayHandle*)handle);
-	}
+	if (handle->type() == PlayHandle::TypeNotePlayHandle) { NotePlayHandleManager::release((NotePlayHandle*)handle); }
 	else
 		delete handle;
 
@@ -616,10 +571,7 @@ void Mixer::removePlayHandle(PlayHandle* ph)
 		{
 			if (e->value == ph)
 			{
-				if (ePrev)
-				{
-					ePrev->next = e->next;
-				}
+				if (ePrev) { ePrev->next = e->next; }
 				else
 				{
 					m_newPlayHandles.setFirst(e->next);
@@ -685,8 +637,7 @@ void Mixer::removePlayHandlesOfTypes(Track* track, const quint8 types)
 
 void Mixer::requestChangeInModel()
 {
-	if (s_renderingThread)
-		return;
+	if (s_renderingThread) return;
 
 	m_changesMutex.lock();
 	m_changes++;
@@ -704,8 +655,7 @@ void Mixer::requestChangeInModel()
 
 void Mixer::doneChangeInModel()
 {
-	if (s_renderingThread)
-		return;
+	if (s_renderingThread) return;
 
 	m_changesMutex.lock();
 	bool moreChanges = --m_changes;
@@ -735,65 +685,38 @@ void Mixer::runChangesInModel()
 bool Mixer::isAudioDevNameValid(QString name)
 {
 #ifdef LMMS_HAVE_SDL
-	if (name == AudioSdl::name())
-	{
-		return true;
-	}
+	if (name == AudioSdl::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_ALSA
-	if (name == AudioAlsa::name())
-	{
-		return true;
-	}
+	if (name == AudioAlsa::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_PULSEAUDIO
-	if (name == AudioPulseAudio::name())
-	{
-		return true;
-	}
+	if (name == AudioPulseAudio::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_OSS
-	if (name == AudioOss::name())
-	{
-		return true;
-	}
+	if (name == AudioOss::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_SNDIO
-	if (name == AudioSndio::name())
-	{
-		return true;
-	}
+	if (name == AudioSndio::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_JACK
-	if (name == AudioJack::name())
-	{
-		return true;
-	}
+	if (name == AudioJack::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_PORTAUDIO
-	if (name == AudioPortAudio::name())
-	{
-		return true;
-	}
+	if (name == AudioPortAudio::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_SOUNDIO
-	if (name == AudioSoundIo::name())
-	{
-		return true;
-	}
+	if (name == AudioSoundIo::name()) { return true; }
 #endif
 
-	if (name == AudioDummy::name())
-	{
-		return true;
-	}
+	if (name == AudioDummy::name()) { return true; }
 
 	return false;
 }
@@ -801,51 +724,30 @@ bool Mixer::isAudioDevNameValid(QString name)
 bool Mixer::isMidiDevNameValid(QString name)
 {
 #ifdef LMMS_HAVE_ALSA
-	if (name == MidiAlsaSeq::name() || name == MidiAlsaRaw::name())
-	{
-		return true;
-	}
+	if (name == MidiAlsaSeq::name() || name == MidiAlsaRaw::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_JACK
-	if (name == MidiJack::name())
-	{
-		return true;
-	}
+	if (name == MidiJack::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_OSS
-	if (name == MidiOss::name())
-	{
-		return true;
-	}
+	if (name == MidiOss::name()) { return true; }
 #endif
 
 #ifdef LMMS_HAVE_SNDIO
-	if (name == MidiSndio::name())
-	{
-		return true;
-	}
+	if (name == MidiSndio::name()) { return true; }
 #endif
 
 #ifdef LMMS_BUILD_WIN32
-	if (name == MidiWinMM::name())
-	{
-		return true;
-	}
+	if (name == MidiWinMM::name()) { return true; }
 #endif
 
 #ifdef LMMS_BUILD_APPLE
-	if (name == MidiApple::name())
-	{
-		return true;
-	}
+	if (name == MidiApple::name()) { return true; }
 #endif
 
-	if (name == MidiDummy::name())
-	{
-		return true;
-	}
+	if (name == MidiDummy::name()) { return true; }
 
 	return false;
 }
@@ -855,10 +757,7 @@ AudioDevice* Mixer::tryAudioDevices()
 	bool success_ful = false;
 	AudioDevice* dev = NULL;
 	QString dev_name = ConfigManager::inst()->value("mixer", "audiodev");
-	if (!isAudioDevNameValid(dev_name))
-	{
-		dev_name = "";
-	}
+	if (!isAudioDevNameValid(dev_name)) { dev_name = ""; }
 
 	m_audioDevStartFailed = false;
 
@@ -991,10 +890,7 @@ AudioDevice* Mixer::tryAudioDevices()
 MidiClient* Mixer::tryMidiClients()
 {
 	QString client_name = ConfigManager::inst()->value("mixer", "mididev");
-	if (!isMidiDevNameValid(client_name))
-	{
-		client_name = "";
-	}
+	if (!isMidiDevNameValid(client_name)) { client_name = ""; }
 
 #ifdef LMMS_HAVE_ALSA
 	if (client_name == MidiAlsaSeq::name() || client_name == "")
@@ -1086,10 +982,7 @@ MidiClient* Mixer::tryMidiClients()
 
 	if (client_name != MidiDummy::name())
 	{
-		if (client_name.isEmpty())
-		{
-			printf("Unknown MIDI-client. ");
-		}
+		if (client_name.isEmpty()) { printf("Unknown MIDI-client. "); }
 		else
 		{
 			printf("Couldn't create %s MIDI-client. ", client_name.toUtf8().constData());

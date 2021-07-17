@@ -47,16 +47,10 @@ void MidiClient::addPort(MidiPort* port) { m_midiPorts.push_back(port); }
 
 void MidiClient::removePort(MidiPort* port)
 {
-	if (!port)
-	{
-		return;
-	}
+	if (!port) { return; }
 
 	QVector<MidiPort*>::Iterator it = std::find(m_midiPorts.begin(), m_midiPorts.end(), port);
-	if (it != m_midiPorts.end())
-	{
-		m_midiPorts.erase(it);
-	}
+	if (it != m_midiPorts.end()) { m_midiPorts.erase(it); }
 }
 
 void MidiClient::subscribeReadablePort(MidiPort*, const QString&, bool) {}
@@ -139,17 +133,11 @@ void MidiClientRaw::parseData(const unsigned char c)
 	}
 
 	/* Store the first couple of bytes */
-	if (m_midiParseData.m_bytes < RAW_MIDI_PARSE_BUF_SIZE)
-	{
-		m_midiParseData.m_buffer[m_midiParseData.m_bytes] = c;
-	}
+	if (m_midiParseData.m_bytes < RAW_MIDI_PARSE_BUF_SIZE) { m_midiParseData.m_buffer[m_midiParseData.m_bytes] = c; }
 	++m_midiParseData.m_bytes;
 
 	/* Do we still need more data to get this event complete? */
-	if (m_midiParseData.m_bytes < m_midiParseData.m_bytesTotal)
-	{
-		return;
-	}
+	if (m_midiParseData.m_bytes < m_midiParseData.m_bytesTotal) { return; }
 
 	/*********************************************************************/
 	/* Send the event                                                    */
@@ -253,10 +241,7 @@ static const unsigned char REMAINS_80E0[] = {
 // Taken from Nagano Daisuke's USB-MIDI driver
 int MidiClientRaw::eventLength(const unsigned char event)
 {
-	if (event < 0xF0)
-	{
-		return REMAINS_80E0[((event - 0x80) >> 4) & 0x0F];
-	}
+	if (event < 0xF0) { return REMAINS_80E0[((event - 0x80) >> 4) & 0x0F]; }
 	else if (event < 0xF7)
 	{
 		return REMAINS_F0F6[event - 0xF0];

@@ -75,22 +75,10 @@ SaProcessor::SaProcessor(const SaControls* controls)
 
 SaProcessor::~SaProcessor()
 {
-	if (m_fftPlanL != NULL)
-	{
-		fftwf_destroy_plan(m_fftPlanL);
-	}
-	if (m_fftPlanR != NULL)
-	{
-		fftwf_destroy_plan(m_fftPlanR);
-	}
-	if (m_spectrumL != NULL)
-	{
-		fftwf_free(m_spectrumL);
-	}
-	if (m_spectrumR != NULL)
-	{
-		fftwf_free(m_spectrumR);
-	}
+	if (m_fftPlanL != NULL) { fftwf_destroy_plan(m_fftPlanL); }
+	if (m_fftPlanR != NULL) { fftwf_destroy_plan(m_fftPlanR); }
+	if (m_spectrumL != NULL) { fftwf_free(m_spectrumL); }
+	if (m_spectrumR != NULL) { fftwf_free(m_spectrumR); }
 
 	m_fftPlanL = NULL;
 	m_fftPlanR = NULL;
@@ -107,10 +95,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 	while (!m_terminate)
 	{
 		// If there is nothing to read, wait for notification from the writing side.
-		if (reader.empty())
-		{
-			reader.waitForData();
-		}
+		if (reader.empty()) { reader.waitForData(); }
 
 		// skip waterfall render if processing can't keep up with input
 		bool overload = ring_buffer.free() < ring_buffer.capacity() / 2;
@@ -145,17 +130,11 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 						m_bufferL[m_framesFilledUp] = m_bufferR[m_framesFilledUp] =
 							(in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
 					}
-					if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f)
-					{
-						block_empty = false;
-					}
+					if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f) { block_empty = false; }
 				}
 
 				// Run analysis only if buffers contain enough data.
-				if (m_framesFilledUp < m_inBlockSize)
-				{
-					break;
-				}
+				if (m_framesFilledUp < m_inBlockSize) { break; }
 
 // Print performance analysis once per 2 seconds if debug is enabled
 #ifdef SA_DEBUG
@@ -196,10 +175,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 				}
 
 				// count empty lines so that empty history does not have to update
-				if (block_empty && m_waterfallNotEmpty)
-				{
-					m_waterfallNotEmpty -= 1;
-				}
+				if (block_empty && m_waterfallNotEmpty) { m_waterfallNotEmpty -= 1; }
 				else if (!block_empty)
 				{
 					m_waterfallNotEmpty = m_waterfallHeight + 2;
@@ -323,10 +299,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 				total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
 				m_dump_count++;
 				m_sum_execution += total_time / 1000000.0;
-				if (total_time / 1000000.0 > m_max_execution)
-				{
-					m_max_execution = total_time / 1000000.0;
-				}
+				if (total_time / 1000000.0 > m_max_execution) { m_max_execution = total_time / 1000000.0; }
 #endif
 			} // frame filler and processing
 		}	  // process if active
@@ -372,10 +345,7 @@ void SaProcessor::reallocateBuffers()
 	unsigned int new_bins;
 
 	// get new block sizes and bin count based on selected index
-	if (new_size_index < FFT_BLOCK_SIZES.size())
-	{
-		new_in_size = FFT_BLOCK_SIZES[new_size_index];
-	}
+	if (new_size_index < FFT_BLOCK_SIZES.size()) { new_in_size = FFT_BLOCK_SIZES[new_size_index]; }
 	else
 	{
 		new_in_size = FFT_BLOCK_SIZES.back();
@@ -404,22 +374,10 @@ void SaProcessor::reallocateBuffers()
 	QMutexLocker data_lock(&m_dataAccess);
 
 	// destroy old FFT plan and free the result buffer
-	if (m_fftPlanL != NULL)
-	{
-		fftwf_destroy_plan(m_fftPlanL);
-	}
-	if (m_fftPlanR != NULL)
-	{
-		fftwf_destroy_plan(m_fftPlanR);
-	}
-	if (m_spectrumL != NULL)
-	{
-		fftwf_free(m_spectrumL);
-	}
-	if (m_spectrumR != NULL)
-	{
-		fftwf_free(m_spectrumR);
-	}
+	if (m_fftPlanL != NULL) { fftwf_destroy_plan(m_fftPlanL); }
+	if (m_fftPlanR != NULL) { fftwf_destroy_plan(m_fftPlanR); }
+	if (m_spectrumL != NULL) { fftwf_free(m_spectrumL); }
+	if (m_spectrumR != NULL) { fftwf_free(m_spectrumR); }
 
 	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
@@ -581,10 +539,7 @@ float SaProcessor::freqToXPixel(float freq, unsigned int width) const
 {
 	if (m_controls->m_logXModel.value())
 	{
-		if (freq <= 1)
-		{
-			return 0;
-		}
+		if (freq <= 1) { return 0; }
 		float min = log10(getFreqRangeMin());
 		float range = log10(getFreqRangeMax()) - min;
 		return (log10(freq) - min) / range * width;
@@ -621,10 +576,7 @@ float SaProcessor::xPixelToFreq(float x, unsigned int width) const
 float SaProcessor::getAmpRangeMin(bool linear) const
 {
 	// return very low limit to make sure zero gets included at linear grid
-	if (linear)
-	{
-		return -900;
-	}
+	if (linear) { return -900; }
 	switch (m_controls->m_ampRangeModel.value())
 	{
 	case ARANGE_EXTENDED:
@@ -663,10 +615,7 @@ float SaProcessor::ampToYPixel(float amplitude, unsigned int height) const
 	{
 		// logarithmic scale: convert linear amplitude to dB (relative to 1.0)
 		float amplitude_dB = 10 * log10(amplitude);
-		if (amplitude_dB < getAmpRangeMin())
-		{
-			return height;
-		}
+		if (amplitude_dB < getAmpRangeMin()) { return height; }
 		else
 		{
 			float max = getAmpRangeMax();

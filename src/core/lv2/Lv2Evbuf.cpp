@@ -97,10 +97,7 @@ bool lv2_evbuf_is_valid(LV2_Evbuf_Iterator iter) { return iter.offset < lv2_evbu
 
 LV2_Evbuf_Iterator lv2_evbuf_next(LV2_Evbuf_Iterator iter)
 {
-	if (!lv2_evbuf_is_valid(iter))
-	{
-		return iter;
-	}
+	if (!lv2_evbuf_is_valid(iter)) { return iter; }
 
 	LV2_Evbuf* evbuf = iter.evbuf;
 	uint32_t offset = iter.offset;
@@ -117,10 +114,7 @@ bool lv2_evbuf_get(LV2_Evbuf_Iterator iter, uint32_t* frames, uint32_t* type, ui
 	*frames = *type = *size = 0;
 	*data = NULL;
 
-	if (!lv2_evbuf_is_valid(iter))
-	{
-		return false;
-	}
+	if (!lv2_evbuf_is_valid(iter)) { return false; }
 
 	LV2_Atom_Sequence* aseq = &iter.evbuf->buf;
 	LV2_Atom_Event* aev = (LV2_Atom_Event*)((char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, aseq) + iter.offset);
@@ -136,10 +130,7 @@ bool lv2_evbuf_get(LV2_Evbuf_Iterator iter, uint32_t* frames, uint32_t* type, ui
 bool lv2_evbuf_write(LV2_Evbuf_Iterator* iter, uint32_t frames, uint32_t type, uint32_t size, const uint8_t* data)
 {
 	LV2_Atom_Sequence* aseq = &iter->evbuf->buf;
-	if (iter->evbuf->capacity - sizeof(LV2_Atom) - aseq->atom.size < sizeof(LV2_Atom_Event) + size)
-	{
-		return false;
-	}
+	if (iter->evbuf->capacity - sizeof(LV2_Atom) - aseq->atom.size < sizeof(LV2_Atom_Event) + size) { return false; }
 
 	LV2_Atom_Event* aev = (LV2_Atom_Event*)((char*)LV2_ATOM_CONTENTS(LV2_Atom_Sequence, aseq) + iter->offset);
 

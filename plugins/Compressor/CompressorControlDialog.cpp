@@ -374,10 +374,7 @@ void CompressorControlDialog::updateDisplay()
 	m_timeSinceLastUpdate %= COMP_MILLI_PER_PIXEL;
 
 	// Time Change / Daylight Savings Time protection
-	if (!m_compPixelMovement || m_compPixelMovement <= 0)
-	{
-		return;
-	}
+	if (!m_compPixelMovement || m_compPixelMovement <= 0) { return; }
 
 	if (!m_controls->m_effect->isEnabled() || !m_controls->m_effect->isRunning())
 	{
@@ -403,17 +400,11 @@ void CompressorControlDialog::updateDisplay()
 
 	drawVisPixmap();
 
-	if (m_controls->m_effect->m_redrawKnee)
-	{
-		redrawKnee();
-	}
+	if (m_controls->m_effect->m_redrawKnee) { redrawKnee(); }
 
 	drawKneePixmap2();
 
-	if (m_controls->m_effect->m_redrawThreshold)
-	{
-		drawMiscPixmap();
-	}
+	if (m_controls->m_effect->m_redrawThreshold) { drawMiscPixmap(); }
 
 	m_lastPoint = m_yPoint;
 	m_lastGainPoint = m_yGainPoint;
@@ -593,10 +584,7 @@ void CompressorControlDialog::drawMiscPixmap()
 
 void CompressorControlDialog::paintEvent(QPaintEvent* event)
 {
-	if (!isVisible())
-	{
-		return;
-	}
+	if (!isVisible()) { return; }
 
 	m_p.begin(this);
 
@@ -609,10 +597,7 @@ void CompressorControlDialog::paintEvent(QPaintEvent* event)
 	m_p.setOpacity(0.25);
 	m_p.drawPixmap(0, 0, m_kneePixmap);
 	m_p.setOpacity(1);
-	if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning())
-	{
-		m_p.drawPixmap(0, 0, m_kneePixmap2);
-	}
+	if (m_controls->m_effect->isEnabled() && m_controls->m_effect->isRunning()) { m_p.drawPixmap(0, 0, m_kneePixmap2); }
 	m_p.drawPixmap(0, 0, m_miscPixmap);
 
 	m_p.end();

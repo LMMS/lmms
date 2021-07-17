@@ -45,10 +45,7 @@ MidiSndio::MidiSndio(void)
 {
 	QString dev = probeDevice();
 
-	if (dev == "")
-	{
-		m_hdl = mio_open(NULL, MIO_IN | MIO_OUT, 0);
-	}
+	if (dev == "") { m_hdl = mio_open(NULL, MIO_IN | MIO_OUT, 0); }
 	else
 	{
 		m_hdl = mio_open(dev.toLatin1().constData(), MIO_IN | MIO_OUT, 0);
@@ -93,15 +90,10 @@ void MidiSndio::run(void)
 	{
 		nfds = mio_pollfd(m_hdl, &pfd, POLLIN);
 		ret = poll(&pfd, nfds, 100);
-		if (ret < 0)
-			break;
-		if (!ret || !(mio_revents(m_hdl, &pfd) & POLLIN))
-			continue;
+		if (ret < 0) break;
+		if (!ret || !(mio_revents(m_hdl, &pfd) & POLLIN)) continue;
 		n = mio_read(m_hdl, buf, sizeof(buf));
-		if (!n)
-		{
-			break;
-		}
+		if (!n) { break; }
 		for (p = buf; n > 0; n--, p++)
 		{
 			parseData(*p);

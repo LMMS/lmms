@@ -43,10 +43,7 @@ public:
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
 		const QString& s1 = text(iColumn);
 		const QString& s2 = other.text(iColumn);
-		if (iColumn == 0 || iColumn == 2)
-		{
-			return (s1.toInt() < s2.toInt());
-		}
+		if (iColumn == 0 || iColumn == 2) { return (s1.toInt() < s2.toInt()); }
 		else
 		{
 			return (s1 < s2);
@@ -146,8 +143,7 @@ void patchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chan
 				if (!findBankItem(iBank))
 				{
 					pBankItem = new patchItem(m_bankListView, pBankItem);
-					if (pBankItem)
-						pBankItem->setText(0, QString::number(iBank));
+					if (pBankItem) pBankItem->setText(0, QString::number(iBank));
 				}
 			}
 		}
@@ -171,8 +167,7 @@ void patchesDialog::setup(fluid_synth_t* pSynth, int iChan, const QString& _chan
 	bankChanged();
 
 	// Set the selected program.
-	if (pPreset)
-		m_iProg = fluid_preset_get_num(pPreset);
+	if (pPreset) m_iProg = fluid_preset_get_num(pPreset);
 	QTreeWidgetItem* pProgItem = findProgItem(m_iProg);
 	m_progListView->setCurrentItem(pProgItem);
 	m_progListView->scrollToItem(pProgItem);
@@ -198,8 +193,7 @@ bool patchesDialog::validateForm()
 // Realize a bank-program selection preset.
 void patchesDialog::setBankProg(int iBank, int iProg)
 {
-	if (m_pSynth == NULL)
-		return;
+	if (m_pSynth == NULL) return;
 
 	// just select the synth's program preset...
 	::fluid_synth_bank_select(m_pSynth, m_iChan, iBank);
@@ -238,8 +232,7 @@ void patchesDialog::accept()
 void patchesDialog::reject(void)
 {
 	// Reset selection to initial selection, if applicable...
-	if (m_dirty > 0)
-		setBankProg(m_bankModel->value(), m_progModel->value());
+	if (m_dirty > 0) setBankProg(m_bankModel->value(), m_progModel->value());
 	// Done (hopefully nothing).
 	QDialog::reject();
 }
@@ -250,8 +243,7 @@ QTreeWidgetItem* patchesDialog::findBankItem(int iBank)
 	QList<QTreeWidgetItem*> banks = m_bankListView->findItems(QString::number(iBank), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(banks);
-	if (iter.hasNext())
-		return iter.next();
+	if (iter.hasNext()) return iter.next();
 	else
 		return NULL;
 }
@@ -262,8 +254,7 @@ QTreeWidgetItem* patchesDialog::findProgItem(int iProg)
 	QList<QTreeWidgetItem*> progs = m_progListView->findItems(QString::number(iProg), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(progs);
-	if (iter.hasNext())
-		return iter.next();
+	if (iter.hasNext()) return iter.next();
 	else
 		return NULL;
 }
@@ -271,12 +262,10 @@ QTreeWidgetItem* patchesDialog::findProgItem(int iProg)
 // Bank change slot.
 void patchesDialog::bankChanged(void)
 {
-	if (m_pSynth == NULL)
-		return;
+	if (m_pSynth == NULL) return;
 
 	QTreeWidgetItem* pBankItem = m_bankListView->currentItem();
-	if (pBankItem == NULL)
-		return;
+	if (pBankItem == NULL) return;
 
 	int iBankSelected = pBankItem->text(0).toInt();
 
@@ -332,8 +321,7 @@ void patchesDialog::bankChanged(void)
 // Program change slot.
 void patchesDialog::progChanged(QTreeWidgetItem* _curr, QTreeWidgetItem* _prev)
 {
-	if (m_pSynth == NULL || _curr == NULL)
-		return;
+	if (m_pSynth == NULL || _curr == NULL) return;
 
 	// Which preview state...
 	if (validateForm())

@@ -111,12 +111,8 @@ private:
 
 inline float positiveFraction(float x)
 {
-	if (std::isnan(x) || std::isinf(x))
-		return 0;
-	if (x < 0)
-	{
-		x += static_cast<int>(1 - x);
-	}
+	if (std::isnan(x) || std::isinf(x)) return 0;
+	if (x < 0) { x += static_cast<int>(1 - x); }
 	return x - static_cast<int>(x);
 }
 

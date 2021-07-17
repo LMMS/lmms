@@ -72,10 +72,7 @@ public:
 	bool isPreviewing()
 	{
 		bool ret = !m_dataMutex.tryLock();
-		if (ret == false)
-		{
-			m_dataMutex.unlock();
-		}
+		if (ret == false) { m_dataMutex.unlock(); }
 		return ret;
 	}
 
@@ -114,10 +111,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle(const QString& _preset_file, bo
 			const PluginFactory::PluginInfoAndKey& infoAndKey = pluginFactory->pluginSupportingExtension(ext);
 			i = s_previewTC->previewInstrumentTrack()->loadInstrument(infoAndKey.info.name(), &infoAndKey.key);
 		}
-		if (i != NULL)
-		{
-			i->loadFile(_preset_file);
-		}
+		if (i != NULL) { i->loadFile(_preset_file); }
 	}
 	else
 	{
@@ -130,10 +124,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle(const QString& _preset_file, bo
 
 		s_previewTC->previewInstrumentTrack()->loadTrackSpecificSettings(dataFile->content().firstChild().toElement());
 
-		if (dataFileCreated)
-		{
-			delete dataFile;
-		}
+		if (dataFileCreated) { delete dataFile; }
 	}
 	dataFile = 0;
 	// make sure, our preset-preview-track does not appear in any MIDI-
@@ -160,10 +151,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 {
 	Engine::mixer()->requestChangeInModel();
 	// not muted by other preset-preview-handle?
-	if (s_previewTC->testAndSetPreviewNote(m_previewNote, nullptr))
-	{
-		m_previewNote->noteOff();
-	}
+	if (s_previewTC->testAndSetPreviewNote(m_previewNote, nullptr)) { m_previewNote->noteOff(); }
 	Engine::mixer()->doneChangeInModel();
 }
 
@@ -182,10 +170,7 @@ bool PresetPreviewPlayHandle::isFromTrack(const Track* _track) const
 
 void PresetPreviewPlayHandle::init()
 {
-	if (!s_previewTC)
-	{
-		s_previewTC = new PreviewTrackContainer;
-	}
+	if (!s_previewTC) { s_previewTC = new PreviewTrackContainer; }
 }
 
 void PresetPreviewPlayHandle::cleanup()
@@ -206,9 +191,6 @@ ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(const Ins
 
 bool PresetPreviewPlayHandle::isPreviewing()
 {
-	if (s_previewTC)
-	{
-		return s_previewTC->isPreviewing();
-	}
+	if (s_previewTC) { return s_previewTC->isPreviewing(); }
 	return false;
 }

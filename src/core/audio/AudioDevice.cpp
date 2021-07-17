@@ -57,10 +57,7 @@ AudioDevice::~AudioDevice()
 void AudioDevice::processNextBuffer()
 {
 	const fpp_t frames = getNextBuffer(m_buffer);
-	if (frames)
-	{
-		writeBuffer(m_buffer, frames, mixer()->masterGain());
-	}
+	if (frames) { writeBuffer(m_buffer, frames, mixer()->masterGain()); }
 	else
 	{
 		m_inProcess = false;
@@ -71,10 +68,7 @@ fpp_t AudioDevice::getNextBuffer(surroundSampleFrame* _ab)
 {
 	fpp_t frames = mixer()->framesPerPeriod();
 	const surroundSampleFrame* b = mixer()->nextBuffer();
-	if (!b)
-	{
-		return 0;
-	}
+	if (!b) { return 0; }
 
 	// make sure, no other thread is accessing device
 	lock();
@@ -92,10 +86,7 @@ fpp_t AudioDevice::getNextBuffer(surroundSampleFrame* _ab)
 	// release lock
 	unlock();
 
-	if (mixer()->hasFifoWriter())
-	{
-		delete[] b;
-	}
+	if (mixer()->hasFifoWriter()) { delete[] b; }
 
 	return frames;
 }
@@ -117,10 +108,7 @@ void AudioDevice::stopProcessingThread(QThread* thread)
 	{
 		fprintf(stderr, "Terminating audio device thread\n");
 		thread->terminate();
-		if (!thread->wait(1000))
-		{
-			fprintf(stderr, "Thread not terminated yet\n");
-		}
+		if (!thread->wait(1000)) { fprintf(stderr, "Thread not terminated yet\n"); }
 	}
 }
 
@@ -145,10 +133,7 @@ void AudioDevice::renamePort(AudioPort*) {}
 fpp_t AudioDevice::resample(const surroundSampleFrame* _src, const fpp_t _frames, surroundSampleFrame* _dst,
 	const sample_rate_t _src_sr, const sample_rate_t _dst_sr)
 {
-	if (m_srcState == NULL)
-	{
-		return _frames;
-	}
+	if (m_srcState == NULL) { return _frames; }
 	m_srcData.input_frames = _frames;
 	m_srcData.output_frames = _frames;
 	m_srcData.data_in = const_cast<float*>(_src[0].data());

@@ -48,10 +48,7 @@ bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _fram
 
 	// This appears to be used for determining whether or not to continue processing
 	// audio with this effect
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 
 	double out_sum = 0.0;
 

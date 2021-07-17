@@ -177,10 +177,7 @@ sf2Instrument::~sf2Instrument()
 	freeFont();
 	delete_fluid_synth(m_synth);
 	delete_fluid_settings(m_settings);
-	if (m_srcState != NULL)
-	{
-		src_delete(m_srcState);
-	}
+	if (m_srcState != NULL) { src_delete(m_srcState); }
 }
 
 void sf2Instrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
@@ -283,10 +280,7 @@ void sf2Instrument::loadFile(const QString& _file)
 
 AutomatableModel* sf2Instrument::childModel(const QString& _modelName)
 {
-	if (_modelName == "bank")
-	{
-		return &m_bankNum;
-	}
+	if (_modelName == "bank") { return &m_bankNum; }
 	else if (_modelName == "patch")
 	{
 		return &m_patchNum;
@@ -438,10 +432,7 @@ QString sf2Instrument::getCurrentPatchName()
 				iBank += iBankOffset;
 #endif
 				int iProg = fluid_preset_get_num(pCurPreset);
-				if (iBank == iBankSelected && iProg == iProgSelected)
-				{
-					return fluid_preset_get_name(pCurPreset);
-				}
+				if (iBank == iBankSelected && iProg == iProgSelected) { return fluid_preset_get_name(pCurPreset); }
 			}
 		}
 	}
@@ -512,10 +503,7 @@ void sf2Instrument::updateSampleRate()
 	if (m_internalSampleRate < Engine::mixer()->processingSampleRate())
 	{
 		m_synthMutex.lock();
-		if (m_srcState != NULL)
-		{
-			src_delete(m_srcState);
-		}
+		if (m_srcState != NULL) { src_delete(m_srcState); }
 		int error;
 		m_srcState = src_new(Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error);
 		if (m_srcState == NULL || error)
@@ -538,10 +526,7 @@ void sf2Instrument::updateSampleRate()
 
 void sf2Instrument::playNote(NotePlayHandle* _n, sampleFrame*)
 {
-	if (_n->isMasterNote() || (_n->hasParent() && _n->isReleased()))
-	{
-		return;
-	}
+	if (_n->isMasterNote() || (_n->hasParent() && _n->isReleased())) { return; }
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
@@ -552,10 +537,7 @@ void sf2Instrument::playNote(NotePlayHandle* _n, sampleFrame*)
 		int midiNote = (int)floor(12.0 * (log2(_n->unpitchedFrequency()) - LOG440) - 4.0);
 
 		// out of range?
-		if (midiNote <= 0 || midiNote >= 128)
-		{
-			return;
-		}
+		if (midiNote <= 0 || midiNote >= 128) { return; }
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
 
 		SF2PluginData* pluginData = new SF2PluginData;
@@ -683,10 +665,7 @@ void sf2Instrument::play(sampleFrame* _working_buffer)
 		{
 			SF2PluginData* currentData = static_cast<SF2PluginData*>(currentNote->m_pluginData);
 			SF2PluginData* iData = static_cast<SF2PluginData*>(m_playingNotes[i]->m_pluginData);
-			if (currentData->offset > iData->offset)
-			{
-				currentNote = m_playingNotes[i];
-			}
+			if (currentData->offset > iData->offset) { currentNote = m_playingNotes[i]; }
 		}
 
 		// process the current note:
@@ -722,10 +701,7 @@ void sf2Instrument::play(sampleFrame* _working_buffer)
 		}
 	}
 
-	if (currentFrame < frames)
-	{
-		renderFrames(frames - currentFrame, _working_buffer + currentFrame);
-	}
+	if (currentFrame < frames) { renderFrames(frames - currentFrame, _working_buffer + currentFrame); }
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames, NULL);
 }
 
@@ -753,10 +729,7 @@ void sf2Instrument::renderFrames(f_cnt_t frames, sampleFrame* buf)
 #ifndef __GNUC__
 		delete[] tmp;
 #endif
-		if (error)
-		{
-			qCritical("sf2Instrument: error while resampling: %s", src_strerror(error));
-		}
+		if (error) { qCritical("sf2Instrument: error while resampling: %s", src_strerror(error)); }
 		if (src_data.output_frames_gen > frames)
 		{
 			qCritical("sf2Instrument: not enough frames: %ld / %d", src_data.output_frames_gen, frames);
@@ -777,10 +750,7 @@ void sf2Instrument::deleteNotePluginData(NotePlayHandle* _n)
 	{
 		noteOff(pluginData);
 		m_playingNotesMutex.lock();
-		if (m_playingNotes.indexOf(_n) >= 0)
-		{
-			m_playingNotes.remove(m_playingNotes.indexOf(_n));
-		}
+		if (m_playingNotes.indexOf(_n) >= 0) { m_playingNotes.remove(m_playingNotes.indexOf(_n)); }
 		m_playingNotesMutex.unlock();
 	}
 	delete pluginData;

@@ -88,10 +88,7 @@ Alg_error alg_read(istream& file, Alg_seq_ptr new_seq, double* offset_ptr)
 	assert(new_seq);
 	Alg_reader alg_reader(&file, new_seq);
 	bool err = alg_reader.parse();
-	if (!err && offset_ptr)
-	{
-		*offset_ptr = alg_reader.offset;
-	}
+	if (!err && offset_ptr) { *offset_ptr = alg_reader.offset; }
 	return (err ? alg_error_syntax : alg_no_error);
 }
 
@@ -138,12 +135,8 @@ Alg_parameters_ptr Alg_reader::process_attributes(Alg_parameters_ptr attributes,
 			tsden = a->parm.r;
 			ts_flag = true;
 		}
-		if (ts_flag)
-		{
-			seq->set_time_sig(seq->get_time_map()->time_to_beat(time), tsnum, tsden);
-		}
-		if (in_seconds)
-			seq->convert_to_seconds();
+		if (ts_flag) { seq->set_time_sig(seq->get_time_map()->time_to_beat(time), tsnum, tsden); }
+		if (in_seconds) seq->convert_to_seconds();
 	}
 	return attributes; // in case it was modified
 }
@@ -210,10 +203,7 @@ bool Alg_reader::parse()
 			}
 			else if (streql(field.c_str(), "#offset"))
 			{
-				if (offset_found)
-				{
-					parse_error(field, 0, "#offset specified twice");
-				}
+				if (offset_found) { parse_error(field, 0, "#offset specified twice"); }
 				offset_found = true;
 				line_parser.get_nonspace_quoted(field); // number
 				field.insert(0, " ");					// need char at beginning because
@@ -224,8 +214,7 @@ bool Alg_reader::parse()
 		else
 		{
 			// we must have a track to insert into
-			if (seq->tracks() == 0)
-				seq->add_track(0);
+			if (seq->tracks() == 0) seq->add_track(0);
 			line_parser.get_nonspace_quoted(field);
 			char pk = line_parser.peek();
 			// attributes are parsed as two adjacent nonspace_quoted tokens
@@ -245,10 +234,7 @@ bool Alg_reader::parse()
 				}
 				if (first == 'V')
 				{
-					if (voice_flag)
-					{
-						parse_error(field, 0, "Voice specified twice");
-					}
+					if (voice_flag) { parse_error(field, 0, "Voice specified twice"); }
 					else
 					{
 						voice = parse_chan(field);
@@ -257,10 +243,7 @@ bool Alg_reader::parse()
 				}
 				else if (first == 'T')
 				{
-					if (time_flag)
-					{
-						parse_error(field, 0, "Time specified twice");
-					}
+					if (time_flag) { parse_error(field, 0, "Time specified twice"); }
 					else
 					{
 						time = parse_dur(field, 0.0);
@@ -269,10 +252,7 @@ bool Alg_reader::parse()
 				}
 				else if (first == 'N')
 				{
-					if (next_flag)
-					{
-						parse_error(field, 0, "Next specified twice");
-					}
+					if (next_flag) { parse_error(field, 0, "Next specified twice"); }
 					else
 					{
 						next = parse_dur(field, time);
@@ -281,10 +261,7 @@ bool Alg_reader::parse()
 				}
 				else if (first == 'K')
 				{
-					if (new_key_flag)
-					{
-						parse_error(field, 0, "Key specified twice");
-					}
+					if (new_key_flag) { parse_error(field, 0, "Key specified twice"); }
 					else
 					{
 						new_key = parse_key(field);
@@ -293,10 +270,7 @@ bool Alg_reader::parse()
 				}
 				else if (first == 'L')
 				{
-					if (loud_flag)
-					{
-						parse_error(field, 0, "Loudness specified twice");
-					}
+					if (loud_flag) { parse_error(field, 0, "Loudness specified twice"); }
 					else
 					{
 						loud = parse_loud(field);
@@ -305,10 +279,7 @@ bool Alg_reader::parse()
 				}
 				else if (first == 'P')
 				{
-					if (new_pitch_flag)
-					{
-						parse_error(field, 0, "Pitch specified twice");
-					}
+					if (new_pitch_flag) { parse_error(field, 0, "Pitch specified twice"); }
 					else
 					{
 						new_pitch = parse_pitch(field);
@@ -317,10 +288,7 @@ bool Alg_reader::parse()
 				}
 				else if (first == 'U')
 				{
-					if (dur_flag)
-					{
-						parse_error(field, 0, "Dur specified twice");
-					}
+					if (dur_flag) { parse_error(field, 0, "Dur specified twice"); }
 					else
 					{
 						dur = parse_dur(field, time);
@@ -329,10 +297,7 @@ bool Alg_reader::parse()
 				}
 				else if (strchr("SIQHW", first))
 				{
-					if (dur_flag)
-					{
-						parse_error(field, 0, "Dur specified twice");
-					}
+					if (dur_flag) { parse_error(field, 0, "Dur specified twice"); }
 					else
 					{
 						// prepend 'U' to field, copy EOS too
@@ -343,10 +308,7 @@ bool Alg_reader::parse()
 				}
 				else if (strchr("ABCDEFG", first))
 				{
-					if (new_pitch_flag)
-					{
-						parse_error(field, 0, "Pitch specified twice");
-					}
+					if (new_pitch_flag) { parse_error(field, 0, "Pitch specified twice"); }
 					else
 					{
 						// prepend 'P' to field
@@ -418,10 +380,7 @@ bool Alg_reader::parse()
 				// pitch was specified, but key was not; get key from pitch
 				key = (int)(new_pitch + 0.5); // round to integer key number
 			}
-			if (new_pitch_flag)
-			{
-				pitch = new_pitch;
-			}
+			if (new_pitch_flag) { pitch = new_pitch; }
 			else if (key < 128 && new_key_flag)
 			{
 				// no explicit pitch, but key < 128, so it implies pitch
@@ -446,18 +405,14 @@ bool Alg_reader::parse()
 					note_ptr->loud = (float)loud;
 					note_ptr->parameters = attributes;
 					seq->add_event(note_ptr, track_num); // sort later
-					if (seq->get_real_dur() < (time + dur))
-						seq->set_real_dur(time + dur);
+					if (seq->get_real_dur() < (time + dur)) seq->set_real_dur(time + dur);
 				}
 				else
 				{
 					int update_key = -1;
 					// key must appear explicitly; otherwise
 					//    update applies to channel
-					if (new_key_flag)
-					{
-						update_key = key;
-					}
+					if (new_key_flag) { update_key = key; }
 					if (loud_flag)
 					{
 						Alg_update_ptr new_upd = new Alg_update;
@@ -467,8 +422,7 @@ bool Alg_reader::parse()
 						new_upd->parameter.set_attr(symbol_table.insert_string("loudr"));
 						new_upd->parameter.r = pitch;
 						seq->add_event(new_upd, track_num);
-						if (seq->get_real_dur() < time)
-							seq->set_real_dur(time);
+						if (seq->get_real_dur() < time) seq->set_real_dur(time);
 					}
 					if (attributes)
 					{
@@ -487,10 +441,7 @@ bool Alg_reader::parse()
 						}
 					}
 				}
-				if (next_flag)
-				{
-					time = time + next;
-				}
+				if (next_flag) { time = time + next; }
 				else if (dur_flag || new_pitch_flag)
 				{ // a note: incr by dur
 					time = time + dur;
@@ -568,17 +519,13 @@ int Alg_reader::find_real_in(string& field, int n)
 	// scans from offset n to the end of a real constant
 	bool decimal = false;
 	int len = field.length();
-	if (n < len && field[n] == '-')
-		n += 1; // parse one minus sign
+	if (n < len && field[n] == '-') n += 1; // parse one minus sign
 	for (int i = n; i < len; i++)
 	{
 		char c = field[i];
 		if (!isdigit(c))
 		{
-			if (c == '.' && !decimal)
-			{
-				decimal = true;
-			}
+			if (c == '.' && !decimal) { decimal = true; }
 			else
 			{
 				return i;
@@ -658,18 +605,9 @@ double Alg_reader::parse_dur(string& field, double base)
 
 double Alg_reader::parse_after_dur(double dur, string& field, int n, double base)
 {
-	if ((int)field.length() == n)
-	{
-		return dur;
-	}
-	if (toupper(field[n]) == 'T')
-	{
-		return parse_after_dur(dur * 2 / 3, field, n + 1, base);
-	}
-	if (field[n] == '.')
-	{
-		return parse_after_dur(dur * 1.5, field, n + 1, base);
-	}
+	if ((int)field.length() == n) { return dur; }
+	if (toupper(field[n]) == 'T') { return parse_after_dur(dur * 2 / 3, field, n + 1, base); }
+	if (field[n] == '.') { return parse_after_dur(dur * 1.5, field, n + 1, base); }
 	if (isdigit(field[n]))
 	{
 		int last = find_real_in(field, n);
@@ -697,20 +635,14 @@ struct loud_lookup_struct
 double Alg_reader::parse_loud(string& field)
 {
 	const char* msg = "Loudness expected";
-	if (isdigit(field[1]))
-	{
-		return parse_int(field);
-	}
+	if (isdigit(field[1])) { return parse_int(field); }
 	else
 	{
 		string dyn = field.substr(1);
 		transform(dyn.begin(), dyn.end(), dyn.begin(), ::toupper);
 		for (int i = 0; loud_lookup[i].str; i++)
 		{
-			if (streql(loud_lookup[i].str, dyn.c_str()))
-			{
-				return (double)loud_lookup[i].val;
-			}
+			if (streql(loud_lookup[i].str, dyn.c_str())) { return (double)loud_lookup[i].val; }
 		}
 	}
 	parse_error(field, 1, msg);
@@ -746,19 +678,10 @@ long Alg_reader::parse_key(string& field)
 
 long Alg_reader::parse_after_key(int key, string& field, int n)
 {
-	if ((int)field.length() == n)
-	{
-		return key;
-	}
+	if ((int)field.length() == n) { return key; }
 	char c = toupper(field[n]);
-	if (c == 'S')
-	{
-		return parse_after_key(key + 1, field, n + 1);
-	}
-	if (c == 'F')
-	{
-		return parse_after_key(key - 1, field, n + 1);
-	}
+	if (c == 'S') { return parse_after_key(key + 1, field, n + 1); }
+	if (c == 'F') { return parse_after_key(key - 1, field, n + 1); }
 	if (isdigit(field[n]))
 	{
 		int last = find_int_in(field, n);
@@ -807,16 +730,10 @@ bool Alg_reader::parse_attribute(string& field, Alg_parameter_ptr param)
 bool Alg_reader::parse_val(Alg_parameter_ptr param, string& s, int i)
 {
 	int len = (int)s.length();
-	if (i >= len)
-	{
-		return false;
-	}
+	if (i >= len) { return false; }
 	if (s[i] == '"')
 	{
-		if (!check_type('s', param))
-		{
-			return false;
-		}
+		if (!check_type('s', param)) { return false; }
 		// note: (len - i) includes 2 quote characters but no EOS character
 		// so total memory to allocate is (len - i) - 1
 		char* r = new char[(len - i) - 1];
@@ -826,19 +743,13 @@ bool Alg_reader::parse_val(Alg_parameter_ptr param, string& s, int i)
 	}
 	else if (s[i] == '\'')
 	{
-		if (!check_type('a', param))
-		{
-			return false;
-		}
+		if (!check_type('a', param)) { return false; }
 		string r = s.substr(i + 1, len - i - 2);
 		param->a = symbol_table.insert_string(r.c_str());
 	}
 	else if (param->attr_type() == 'l')
 	{
-		if (streql(s.c_str() + i, "true") || streql(s.c_str() + i, "t"))
-		{
-			param->l = true;
-		}
+		if (streql(s.c_str() + i, "true") || streql(s.c_str() + i, "t")) { param->l = true; }
 		else if (streql(s.c_str() + i, "false") || streql(s.c_str() + i, "nil"))
 		{
 			param->l = false;
@@ -858,10 +769,7 @@ bool Alg_reader::parse_val(Alg_parameter_ptr param, string& s, int i)
 		}
 		while (pos < len)
 		{
-			if (isdigit(s[pos]))
-			{
-				;
-			}
+			if (isdigit(s[pos])) { ; }
 			else if (!period && s[pos] == '.')
 			{
 				period = true;
@@ -876,18 +784,12 @@ bool Alg_reader::parse_val(Alg_parameter_ptr param, string& s, int i)
 		string r = s.substr(i, len - i);
 		if (period)
 		{
-			if (!check_type('r', param))
-			{
-				return false;
-			}
+			if (!check_type('r', param)) { return false; }
 			param->r = atof(r.c_str());
 		}
 		else
 		{
-			if (param->attr_type() == 'r')
-			{
-				param->r = atoi(r.c_str());
-			}
+			if (param->attr_type() == 'r') { param->r = atoi(r.c_str()); }
 			else if (!check_type('i', param))
 			{
 				return false;

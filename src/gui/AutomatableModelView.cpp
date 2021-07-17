@@ -93,10 +93,7 @@ void AutomatableModelView::addDefaultActions(QMenu* menu)
 	if (model->controllerConnection())
 	{
 		Controller* cont = model->controllerConnection()->getController();
-		if (cont)
-		{
-			controllerTxt = AutomatableModel::tr("Connected to %1").arg(cont->name());
-		}
+		if (cont) { controllerTxt = AutomatableModel::tr("Connected to %1").arg(cont->name()); }
 		else
 		{
 			controllerTxt = AutomatableModel::tr("Connected to controller");
@@ -122,10 +119,7 @@ void AutomatableModelView::setModel(Model* model, bool isOldModelValid) { ModelV
 // "defaultConstructed", so the next call to setModel will delete it.
 void AutomatableModelView::unsetModel()
 {
-	if (dynamic_cast<FloatModelView*>(this))
-	{
-		setModel(new FloatModel(0, 0, 0, 1, nullptr, QString(), true));
-	}
+	if (dynamic_cast<FloatModelView*>(this)) { setModel(new FloatModel(0, 0, 0, 1, nullptr, QString(), true)); }
 	else if (dynamic_cast<IntModelView*>(this))
 	{
 		setModel(new IntModel(0, 0, 0, nullptr, QString(), true));
@@ -155,10 +149,7 @@ void AutomatableModelView::mousePressEvent(QMouseEvent* event)
 
 void AutomatableModelView::setConversionFactor(float factor)
 {
-	if (factor != 0.0)
-	{
-		m_conversionFactor = factor;
-	}
+	if (factor != 0.0) { m_conversionFactor = factor; }
 }
 
 float AutomatableModelView::getConversionFactor() { return m_conversionFactor; }
@@ -185,10 +176,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 		if (d.chosenController())
 		{
 			// Update
-			if (m->controllerConnection())
-			{
-				m->controllerConnection()->setController(d.chosenController());
-			}
+			if (m->controllerConnection()) { m->controllerConnection()->setController(d.chosenController()); }
 			// New
 			else
 			{
@@ -243,10 +231,7 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 {
 	bool isNumber = false;
 	const float number = floatFromClipboard(&isNumber);
-	if (isNumber)
-	{
-		m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor());
-	}
+	if (isNumber) { m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor()); }
 }
 
 /// Attempt to parse a float from the clipboard

@@ -93,10 +93,7 @@ void VstEffectControls::setParameter(Model* action)
 {
 	int knobUNID = action->displayName().toInt();
 
-	if (m_effect->m_plugin != NULL)
-	{
-		m_effect->m_plugin->setParam(knobUNID, knobFModel[knobUNID]->value());
-	}
+	if (m_effect->m_plugin != NULL) { m_effect->m_plugin->setParam(knobUNID, knobFModel[knobUNID]->value()); }
 }
 
 void VstEffectControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
@@ -192,10 +189,7 @@ void VstEffectControls::updateMenu(void)
 
 			presetAction->setText(QString("%1. %2").arg(QString::number(i + 1), list1.at(i)));
 			presetAction->setData(i);
-			if (i == lastPosInMenu)
-			{
-				presetAction->setIcon(embed::getIconPixmap("sample_file", 16, 16));
-			}
+			if (i == lastPosInMenu) { presetAction->setIcon(embed::getIconPixmap("sample_file", 16, 16)); }
 			else
 				presetAction->setIcon(embed::getIconPixmap("edit_copy", 16, 16));
 			to_menu->addAction(presetAction);
@@ -211,8 +205,7 @@ void VstEffectControls::openPreset(void)
 		m_effect->m_plugin->openPreset();
 		bool converted;
 		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
-		if (str != "")
-			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		// QWidget::update();
 	}
 }
@@ -225,8 +218,7 @@ void VstEffectControls::rollPreset(void)
 		m_effect->m_plugin->rotateProgram(1);
 		bool converted;
 		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
-		if (str != "")
-			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		// QWidget::update();
 	}
 }
@@ -239,8 +231,7 @@ void VstEffectControls::rolrPreset(void)
 		m_effect->m_plugin->rotateProgram(-1);
 		bool converted;
 		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
-		if (str != "")
-			lastPosInMenu = str.toInt(&converted, 10) - 1;
+		if (str != "") lastPosInMenu = str.toInt(&converted, 10) - 1;
 		// QWidget::update();
 	}
 }
@@ -344,10 +335,7 @@ manageVSTEffectView::manageVSTEffectView(VstEffect* _eff, VstEffectControls* m_v
 	{
 		for (int lcolumn = 0; lcolumn < 10; lcolumn++)
 		{
-			if (i < m_vi->paramCount)
-			{
-				l->addWidget(vstKnobs[i], lrow, lcolumn, Qt::AlignCenter);
-			}
+			if (i < m_vi->paramCount) { l->addWidget(vstKnobs[i], lrow, lcolumn, Qt::AlignCenter); }
 			i++;
 		}
 	}
@@ -492,10 +480,7 @@ manageVSTEffectView::~manageVSTEffectView()
 		m_vi2->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 		m_vi2->m_subWindow->close();
 
-		if (m_vi2->m_subWindow != NULL)
-		{
-			delete m_vi2->m_subWindow;
-		}
+		if (m_vi2->m_subWindow != NULL) { delete m_vi2->m_subWindow; }
 		m_vi2->m_subWindow = NULL;
 	}
 	// delete m_vi2->m_subWindow;

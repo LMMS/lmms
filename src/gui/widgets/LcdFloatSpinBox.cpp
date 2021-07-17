@@ -138,10 +138,7 @@ void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width())
-	{
-		m_intStep = true;
-	}
+	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else
 	{
 		m_intStep = false;
@@ -150,10 +147,7 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 	if (m_mouseMoving)
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if (gui->mainWindow()->isShiftPressed())
-		{
-			dy = qBound(-4, dy / 4, 4);
-		}
+		if (gui->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy / 4, 4); }
 		if (dy > 1 || dy < -1)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());
@@ -175,10 +169,7 @@ void LcdFloatSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdFloatSpinBox::wheelEvent(QWheelEvent* event)
 {
 	// switch between integer and fractional step based on cursor position
-	if (event->x() < m_wholeDisplay.width())
-	{
-		m_intStep = true;
-	}
+	if (event->x() < m_wholeDisplay.width()) { m_intStep = true; }
 	else
 	{
 		m_intStep = false;
@@ -200,18 +191,12 @@ void LcdFloatSpinBox::enterValue()
 		tr("Please enter a new value between %1 and %2:").arg(model()->minValue()).arg(model()->maxValue()),
 		model()->value(), model()->minValue(), model()->maxValue(), m_fractionDisplay.numDigits(), &ok);
 
-	if (ok)
-	{
-		model()->setValue(newVal);
-	}
+	if (ok) { model()->setValue(newVal); }
 }
 
 float LcdFloatSpinBox::getStep() const
 {
-	if (m_intStep)
-	{
-		return 1;
-	}
+	if (m_intStep) { return 1; }
 	else
 	{
 		return model()->step<float>();

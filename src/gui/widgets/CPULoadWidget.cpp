@@ -65,10 +65,7 @@ void CPULoadWidget::paintEvent(QPaintEvent*)
 		// 1 pixel spacing, we have to make sure, only whole leds are
 		// shown which we achieve by the following formula
 		int w = (m_leds.width() * m_currentLoad / 300) * 3;
-		if (w > 0)
-		{
-			p.drawPixmap(23, 3, m_leds, 0, 0, w, m_leds.height());
-		}
+		if (w > 0) { p.drawPixmap(23, 3, m_leds, 0, 0, w, m_leds.height()); }
 	}
 	QPainter p(this);
 	p.drawPixmap(0, 0, m_temp);

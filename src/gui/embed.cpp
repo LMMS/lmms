@@ -35,10 +35,7 @@ namespace embed
 QPixmap getIconPixmap(const QString& pixmapName, int width, int height, const char** xpm)
 {
 	QString cacheName;
-	if (width > 0 && height > 0)
-	{
-		cacheName = QString("%1_%2_%3").arg(pixmapName, width, height);
-	}
+	if (width > 0 && height > 0) { cacheName = QString("%1_%2_%3").arg(pixmapName, width, height); }
 	else
 	{
 		cacheName = pixmapName;
@@ -46,23 +43,14 @@ QPixmap getIconPixmap(const QString& pixmapName, int width, int height, const ch
 
 	// Return cached pixmap
 	QPixmap pixmap;
-	if (QPixmapCache::find(cacheName, &pixmap))
-	{
-		return pixmap;
-	}
+	if (QPixmapCache::find(cacheName, &pixmap)) { return pixmap; }
 
-	if (xpm)
-	{
-		pixmap = QPixmap(xpm);
-	}
+	if (xpm) { pixmap = QPixmap(xpm); }
 	else
 	{
 		QImageReader reader(QString("artwork:%1").arg(pixmapName));
 
-		if (width > 0 && height > 0)
-		{
-			reader.setScaledSize(QSize(width, height));
-		}
+		if (width > 0 && height > 0) { reader.setScaledSize(QSize(width, height)); }
 
 		pixmap = QPixmap::fromImageReader(&reader);
 

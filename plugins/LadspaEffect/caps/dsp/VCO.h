@@ -71,10 +71,8 @@ public:
 
 		/* the good thing is that tri is always > .5, which implies
 		 * that this first conditional is true more often than not. */
-		if (phase <= tri)
-			return -1 + phase * tri1;
-		if (phase < 1)
-			return 1 - (phase - tri) * tri2;
+		if (phase <= tri) return -1 + phase * tri1;
+		if (phase < 1) return 1 - (phase - tri) * tri2;
 
 		phase -= 1;
 		return -1 + phase * tri1;

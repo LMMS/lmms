@@ -102,10 +102,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(float _value_for_zero_amount,
 	m_amountModel.setCenterValue(0);
 	m_lfoAmountModel.setCenterValue(0);
 
-	if (s_lfoInstances == NULL)
-	{
-		s_lfoInstances = new LfoInstances();
-	}
+	if (s_lfoInstances == NULL) { s_lfoInstances = new LfoInstances(); }
 
 	instances()->add(this);
 
@@ -180,10 +177,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample(fpp_t _frame_offset)
 		shape_sample = m_userWave.userWaveSample(phase);
 		break;
 	case RandomWave:
-		if (frame == 0)
-		{
-			m_random = Oscillator::noiseSample(0.0f);
-		}
+		if (frame == 0) { m_random = Oscillator::noiseSample(0.0f); }
 		shape_sample = m_random;
 		break;
 	case SineWave:
@@ -216,10 +210,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf, f_cnt_t _frame, 
 	}
 	_frame -= m_lfoPredelayFrames;
 
-	if (m_bad_lfoShapeData)
-	{
-		updateLfoShapeData();
-	}
+	if (m_bad_lfoShapeData) { updateLfoShapeData(); }
 
 	fpp_t offset = 0;
 	const float lafI = 1.0f / qMax(minimumFrames, m_lfoAttackFrames);
@@ -237,10 +228,7 @@ void EnvelopeAndLfoParameters::fillLevel(float* _buf, f_cnt_t _frame, const f_cn
 {
 	QMutexLocker m(&m_paramMutex);
 
-	if (_frame < 0 || _release_begin < 0)
-	{
-		return;
-	}
+	if (_frame < 0 || _release_begin < 0) { return; }
 
 	fillLfoLevel(_buf, _frame, _frames);
 
@@ -249,10 +237,7 @@ void EnvelopeAndLfoParameters::fillLevel(float* _buf, f_cnt_t _frame, const f_cn
 		float env_level;
 		if (_frame < _release_begin)
 		{
-			if (_frame < m_pahdFrames)
-			{
-				env_level = m_pahdEnv[_frame];
-			}
+			if (_frame < m_pahdFrames) { env_level = m_pahdEnv[_frame]; }
 			else
 			{
 				env_level = m_sustainLevel;
@@ -342,10 +327,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
-	if (m_amount >= 0)
-	{
-		m_amountAdd = (1.0f - m_amount) * m_valueForZeroAmount;
-	}
+	if (m_amount >= 0) { m_amountAdd = (1.0f - m_amount) * m_valueForZeroAmount; }
 	else
 	{
 		m_amountAdd = m_valueForZeroAmount;
@@ -355,10 +337,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_rFrames = static_cast<f_cnt_t>(frames_per_env_seg * expKnobVal(m_releaseModel.value()));
 	m_rFrames = qMax(minimumFrames, m_rFrames);
 
-	if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0)
-	{
-		m_rFrames = minimumFrames;
-	}
+	if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0) { m_rFrames = minimumFrames; }
 
 	// if the buffers are too small, make bigger ones - so we only alloc new memory when necessary
 	if (m_pahdBufSize < m_pahdFrames)
@@ -423,20 +402,14 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_lfoPredelayFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation * expKnobVal(m_lfoPredelayModel.value()));
 	m_lfoAttackFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation * expKnobVal(m_lfoAttackModel.value()));
 	m_lfoOscillationFrames = static_cast<f_cnt_t>(frames_per_lfo_oscillation * m_lfoSpeedModel.value());
-	if (m_x100Model.value())
-	{
-		m_lfoOscillationFrames /= 100;
-	}
+	if (m_x100Model.value()) { m_lfoOscillationFrames /= 100; }
 	m_lfoAmount = m_lfoAmountModel.value() * 0.5f;
 
 	m_used = true;
 	if (static_cast<int>(floorf(m_lfoAmount * 1000.0f)) == 0)
 	{
 		m_lfoAmountIsZero = true;
-		if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0)
-		{
-			m_used = false;
-		}
+		if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0) { m_used = false; }
 	}
 	else
 	{

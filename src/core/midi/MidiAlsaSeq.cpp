@@ -100,10 +100,7 @@ MidiAlsaSeq::MidiAlsaSeq()
 	m_portListUpdateTimer.start(1000);
 
 	// use a pipe to detect shutdown
-	if (pipe(m_pipe) == -1)
-	{
-		perror("MidiAlsaSeq: pipe");
-	}
+	if (pipe(m_pipe) == -1) { perror("MidiAlsaSeq: pipe"); }
 
 	start(QThread::IdlePriority);
 }
@@ -128,10 +125,7 @@ QString MidiAlsaSeq::probeDevice()
 	QString dev = ConfigManager::inst()->value("Midialsaseq", "device");
 	if (dev.isEmpty())
 	{
-		if (getenv("MIDIDEV") != NULL)
-		{
-			return getenv("MIDIDEV");
-		}
+		if (getenv("MIDIDEV") != NULL) { return getenv("MIDIDEV"); }
 		return "default";
 	}
 	return dev;
@@ -252,10 +246,7 @@ void MidiAlsaSeq::applyPortName(MidiPort* _port)
 
 	for (int i = 0; i < 2; ++i)
 	{
-		if (m_portIDs[_port][i] == -1)
-		{
-			continue;
-		}
+		if (m_portIDs[_port][i] == -1) { continue; }
 		snd_seq_port_info_t* port_info;
 		snd_seq_port_info_malloc(&port_info);
 		snd_seq_get_port_info(m_seqHandle, m_portIDs[_port][i], port_info);
@@ -293,10 +284,7 @@ QString MidiAlsaSeq::sourcePortName(const MidiEvent& _event) const
 
 void MidiAlsaSeq::subscribeReadablePort(MidiPort* _port, const QString& _dest, bool _subscribe)
 {
-	if (!m_portIDs.contains(_port) || m_portIDs[_port][0] < 0)
-	{
-		return;
-	}
+	if (!m_portIDs.contains(_port) || m_portIDs[_port][0] < 0) { return; }
 
 	m_seqMutex.lock();
 
@@ -316,10 +304,7 @@ void MidiAlsaSeq::subscribeReadablePort(MidiPort* _port, const QString& _dest, b
 	snd_seq_port_subscribe_malloc(&subs);
 	snd_seq_port_subscribe_set_sender(subs, &sender);
 	snd_seq_port_subscribe_set_dest(subs, dest);
-	if (_subscribe)
-	{
-		snd_seq_subscribe_port(m_seqHandle, subs);
-	}
+	if (_subscribe) { snd_seq_subscribe_port(m_seqHandle, subs); }
 	else
 	{
 		snd_seq_unsubscribe_port(m_seqHandle, subs);
@@ -332,15 +317,9 @@ void MidiAlsaSeq::subscribeReadablePort(MidiPort* _port, const QString& _dest, b
 
 void MidiAlsaSeq::subscribeWritablePort(MidiPort* _port, const QString& _dest, bool _subscribe)
 {
-	if (!m_portIDs.contains(_port))
-	{
-		return;
-	}
+	if (!m_portIDs.contains(_port)) { return; }
 	const int pid = m_portIDs[_port][1] < 0 ? m_portIDs[_port][0] : m_portIDs[_port][1];
-	if (pid < 0)
-	{
-		return;
-	}
+	if (pid < 0) { return; }
 
 	m_seqMutex.lock();
 
@@ -359,10 +338,7 @@ void MidiAlsaSeq::subscribeWritablePort(MidiPort* _port, const QString& _dest, b
 	snd_seq_port_subscribe_malloc(&subs);
 	snd_seq_port_subscribe_set_sender(subs, sender);
 	snd_seq_port_subscribe_set_dest(subs, &dest);
-	if (_subscribe)
-	{
-		snd_seq_subscribe_port(m_seqHandle, subs);
-	}
+	if (_subscribe) { snd_seq_subscribe_port(m_seqHandle, subs); }
 	else
 	{
 		snd_seq_unsubscribe_port(m_seqHandle, subs);
@@ -385,25 +361,16 @@ void MidiAlsaSeq::run()
 	while (m_quit == false)
 	{
 		int pollRet = poll(pollfd_set, pollfd_count, EventPollTimeOut);
-		if (pollRet == 0)
-		{
-			continue;
-		}
+		if (pollRet == 0) { continue; }
 		else if (pollRet == -1)
 		{
 			// gdb may interrupt the poll
-			if (errno == EINTR)
-			{
-				continue;
-			}
+			if (errno == EINTR) { continue; }
 			qCritical("error while polling ALSA sequencer handle");
 			break;
 		}
 		// shutdown?
-		if (m_quit)
-		{
-			break;
-		}
+		if (m_quit) { break; }
 
 		m_seqMutex.lock();
 
@@ -424,10 +391,7 @@ void MidiAlsaSeq::run()
 			MidiPort* dest = NULL;
 			for (int i = 0; i < m_portIDs.size(); ++i)
 			{
-				if (m_portIDs.values()[i][0] == ev->dest.port)
-				{
-					dest = m_portIDs.keys()[i];
-				}
+				if (m_portIDs.values()[i][0] == ev->dest.port) { dest = m_portIDs.keys()[i]; }
 				if ((m_portIDs.values()[i][1] != -1 && m_portIDs.values()[i][1] == ev->source.port) ||
 					m_portIDs.values()[i][0] == ev->source.port)
 				{
@@ -435,10 +399,7 @@ void MidiAlsaSeq::run()
 				}
 			}
 
-			if (dest == NULL)
-			{
-				continue;
-			}
+			if (dest == NULL) { continue; }
 
 			switch (ev->type)
 			{

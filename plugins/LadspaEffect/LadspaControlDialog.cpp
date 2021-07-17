@@ -78,10 +78,7 @@ void LadspaControlDialog::updateEffectView(LadspaControls* _ctl)
 		buffer_data_t last_port = NONE;
 
 		QGroupBox* grouper;
-		if (_ctl->m_processors > 1)
-		{
-			grouper = new QGroupBox(tr("Channel ") + QString::number(proc + 1), this);
-		}
+		if (_ctl->m_processors > 1) { grouper = new QGroupBox(tr("Channel ") + QString::number(proc + 1), this); }
 		else
 		{
 			grouper = new QGroupBox(this);
@@ -115,10 +112,7 @@ void LadspaControlDialog::updateEffectView(LadspaControls* _ctl)
 		m_effectLayout->addWidget(grouper);
 	}
 
-	if (_ctl->m_processors > 1 && m_stereoLink != NULL)
-	{
-		m_stereoLink->setModel(&_ctl->m_stereoLinkModel);
-	}
+	if (_ctl->m_processors > 1 && m_stereoLink != NULL) { m_stereoLink->setModel(&_ctl->m_stereoLinkModel); }
 
 	connect(_ctl, SIGNAL(effectModelChanged(LadspaControls*)), this, SLOT(updateEffectView(LadspaControls*)),
 		Qt::DirectConnection);

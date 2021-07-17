@@ -42,10 +42,7 @@ const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS =
 
 static inline QString ensureTrailingSlash(const QString& s)
 {
-	if (!s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\'))
-	{
-		return s + '/';
-	}
+	if (!s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\')) { return s + '/'; }
 	return s;
 }
 
@@ -55,10 +52,7 @@ ConfigManager::ConfigManager()
 	: m_version(defaultVersion())
 	, m_configVersion(UPGRADE_METHODS.size())
 {
-	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
-	{
-		initPortableWorkingDir();
-	}
+	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE)) { initPortableWorkingDir(); }
 	else
 	{
 		initInstalledWorkingDir();
@@ -86,10 +80,7 @@ ConfigManager::~ConfigManager() { saveConfigFile(); }
 void ConfigManager::upgrade_1_1_90()
 {
 	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
-	if (value("mixer", "audiodev").startsWith("PulseAudio ("))
-	{
-		setValue("mixer", "audiodev", "PulseAudio");
-	}
+	if (value("mixer", "audiodev").startsWith("PulseAudio (")) { setValue("mixer", "audiodev", "PulseAudio"); }
 
 	// MidiAlsaRaw used to store the device info as "Device" instead of "device"
 	if (value("MidiAlsaRaw", "device").isNull())
@@ -119,10 +110,7 @@ void ConfigManager::upgrade_1_1_91()
 void ConfigManager::upgrade()
 {
 	// Skip the upgrade if versions match
-	if (m_version == LMMS_VERSION)
-	{
-		return;
-	}
+	if (m_version == LMMS_VERSION) { return; }
 
 	// Runs all necessary upgrade methods
 	std::for_each(
@@ -131,10 +119,7 @@ void ConfigManager::upgrade()
 	ProjectVersion createdWith = m_version;
 
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
-	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
-	{
-		m_themeDir = defaultThemeDir();
-	}
+	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION) { m_themeDir = defaultThemeDir(); }
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
@@ -154,10 +139,7 @@ QStringList ConfigManager::availableVstEmbedMethods()
 	methods.append("win32");
 #endif
 #ifdef LMMS_BUILD_LINUX
-	if (static_cast<QGuiApplication*>(QApplication::instance())->platformName() == "xcb")
-	{
-		methods.append("xembed");
-	}
+	if (static_cast<QGuiApplication*>(QApplication::instance())->platformName() == "xcb") { methods.append("xembed"); }
 #endif
 	return methods;
 }
@@ -224,10 +206,7 @@ void ConfigManager::addRecentlyOpenedProject(const QString& file)
 		recentFile.suffix().toLower() == "mpt")
 	{
 		m_recentlyOpenedProjects.removeAll(file);
-		if (m_recentlyOpenedProjects.size() > 50)
-		{
-			m_recentlyOpenedProjects.removeLast();
-		}
+		if (m_recentlyOpenedProjects.size() > 50) { m_recentlyOpenedProjects.removeLast(); }
 		m_recentlyOpenedProjects.push_front(file);
 		ConfigManager::inst()->saveConfigFile();
 	}
@@ -239,10 +218,7 @@ const QString& ConfigManager::value(const QString& cls, const QString& attribute
 	{
 		for (stringPairVector::const_iterator it = m_settings[cls].begin(); it != m_settings[cls].end(); ++it)
 		{
-			if ((*it).first == attribute)
-			{
-				return (*it).second;
-			}
+			if ((*it).first == attribute) { return (*it).second; }
 		}
 	}
 	static QString empty;
@@ -295,10 +271,7 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 {
 	// read the XML file and create DOM tree
 	// Allow configuration file override through --config commandline option
-	if (!configFile.isEmpty())
-	{
-		m_lmmsRcFile = configFile;
-	}
+	if (!configFile.isEmpty()) { m_lmmsRcFile = configFile; }
 
 	QFile cfg_file(m_lmmsRcFile);
 	QDomDocument dom_tree;
@@ -315,10 +288,7 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 			QDomNode node = root.firstChild();
 
 			// Cache LMMS version
-			if (!root.attribute("version").isNull())
-			{
-				m_version = root.attribute("version");
-			}
+			if (!root.attribute("version").isNull()) { m_version = root.attribute("version"); }
 
 			// Get the version of the configuration file (for upgrade purposes)
 			if (root.attribute("configversion").isNull())
@@ -329,8 +299,7 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 			{
 				bool success;
 				m_configVersion = root.attribute("configversion").toUInt(&success);
-				if (!success)
-					qWarning("Config Version conversion failure.");
+				if (!success) qWarning("Config Version conversion failure.");
 			}
 
 			// create the settings-map out of the DOM
@@ -343,10 +312,7 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 					for (int i = 0; i < node_attr.count(); ++i)
 					{
 						QDomNode n = node_attr.item(i);
-						if (n.isAttr())
-						{
-							attr.push_back(qMakePair(n.toAttr().name(), n.toAttr().value()));
-						}
+						if (n.isAttr()) { attr.push_back(qMakePair(n.toAttr().name(), n.toAttr().value())); }
 					}
 					m_settings[node.nodeName()] = attr;
 				}
@@ -420,10 +386,7 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 #endif
 	}
 
-	if (m_ladspaDir.isEmpty())
-	{
-		m_ladspaDir = userLadspaDir();
-	}
+	if (m_ladspaDir.isEmpty()) { m_ladspaDir = userLadspaDir(); }
 
 #ifdef LMMS_HAVE_STK
 	if (m_stkDir.isEmpty() || m_stkDir == QDir::separator() || m_stkDir == "/" || !QDir(m_stkDir).exists())
@@ -434,14 +397,8 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 		// Look for bundled raw waves first
 		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 		// Try system installations if not exists
-		if (!QDir(m_stkDir).exists())
-		{
-			m_stkDir = "/usr/local/share/stk/rawwaves/";
-		}
-		if (!QDir(m_stkDir).exists())
-		{
-			m_stkDir = "/usr/share/stk/rawwaves/";
-		}
+		if (!QDir(m_stkDir).exists()) { m_stkDir = "/usr/local/share/stk/rawwaves/"; }
+		if (!QDir(m_stkDir).exists()) { m_stkDir = "/usr/share/stk/rawwaves/"; }
 #endif
 	}
 #endif
@@ -449,16 +406,12 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 	upgrade();
 
 	QStringList searchPaths;
-	if (!qgetenv("LMMS_THEME_PATH").isNull())
-		searchPaths << qgetenv("LMMS_THEME_PATH");
+	if (!qgetenv("LMMS_THEME_PATH").isNull()) searchPaths << qgetenv("LMMS_THEME_PATH");
 	searchPaths << themeDir() << defaultThemeDir();
 	QDir::setSearchPaths("resources", searchPaths);
 
 	// Create any missing subdirectories in the working dir, but only if the working dir exists
-	if (hasWorkingDir())
-	{
-		createWorkingDir();
-	}
+	if (hasWorkingDir()) { createWorkingDir(); }
 }
 
 void ConfigManager::saveConfigFile()
@@ -518,10 +471,7 @@ void ConfigManager::saveConfigFile()
 								 "the directory containing the "
 								 "file and try again!")
 					  .arg(m_lmmsRcFile);
-		if (gui)
-		{
-			QMessageBox::critical(NULL, title, message, QMessageBox::Ok, QMessageBox::NoButton);
-		}
+		if (gui) { QMessageBox::critical(NULL, title, message, QMessageBox::Ok, QMessageBox::NoButton); }
 		return;
 	}
 
@@ -551,10 +501,7 @@ void ConfigManager::initDevelopmentWorkingDir()
 	// binary directories by reading the CMake Cache
 	QDir appPath = qApp->applicationDirPath();
 	// If in tests, get parent directory
-	if (appPath.dirName() == "tests")
-	{
-		appPath.cdUp();
-	}
+	if (appPath.dirName() == "tests") { appPath.cdUp(); }
 	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
 	if (cmakeCache.exists())
 	{
@@ -579,10 +526,7 @@ void ConfigManager::initDevelopmentWorkingDir()
 				m_lmmsRcFile = line.section('=', -1).trimmed() + QDir::separator() + ".lmmsrc.xml";
 				done++;
 			}
-			if (done == 2)
-			{
-				break;
-			}
+			if (done == 2) { break; }
 		}
 
 		cmakeCache.close();
@@ -597,10 +541,7 @@ unsigned int ConfigManager::legacyConfigVersion()
 
 	createdWith.setCompareType(ProjectVersion::Build);
 
-	if (createdWith < "1.1.90")
-	{
-		return 0;
-	}
+	if (createdWith < "1.1.90") { return 0; }
 	else if (createdWith < "1.1.91")
 	{
 		return 1;

@@ -21,10 +21,7 @@ QString LocalFileMng::readXmlString(QDomNode node, const QString& nodeName, cons
 
 	if (!node.isNull() && !element.isNull())
 	{
-		if (!element.text().isEmpty())
-		{
-			return element.text();
-		}
+		if (!element.text().isEmpty()) { return element.text(); }
 		else
 		{
 			if (!bCanBeEmpty)
@@ -52,10 +49,7 @@ float LocalFileMng::readXmlFloat(QDomNode node, const QString& nodeName, float d
 
 	if (!node.isNull() && !element.isNull())
 	{
-		if (!element.text().isEmpty())
-		{
-			return c_locale.toFloat(element.text());
-		}
+		if (!element.text().isEmpty()) { return c_locale.toFloat(element.text()); }
 		else
 		{
 			if (!bCanBeEmpty)
@@ -83,10 +77,7 @@ int LocalFileMng::readXmlInt(QDomNode node, const QString& nodeName, int default
 
 	if (!node.isNull() && !element.isNull())
 	{
-		if (!element.text().isEmpty())
-		{
-			return c_locale.toInt(element.text());
-		}
+		if (!element.text().isEmpty()) { return c_locale.toInt(element.text()); }
 		else
 		{
 			if (!bCanBeEmpty)
@@ -115,10 +106,7 @@ bool LocalFileMng::readXmlBool(
 	{
 		if (!element.text().isEmpty())
 		{
-			if (element.text() == "true")
-			{
-				return true;
-			}
+			if (element.text() == "true") { return true; }
 			else
 			{
 				return false;
@@ -177,13 +165,11 @@ void LocalFileMng::convertFromTinyXMLString(QByteArray* str)
 			char w2 = str->at(pos + 4);
 
 			w1 = tolower(w1) - 0x30; // '0' = 0x30
-			if (w1 > 9)
-				w1 -= 0x27; // '9' = 0x39, 'a' = 0x61
+			if (w1 > 9) w1 -= 0x27;	 // '9' = 0x39, 'a' = 0x61
 			w1 = (w1 & 0xF);
 
 			w2 = tolower(w2) - 0x30; // '0' = 0x30
-			if (w2 > 9)
-				w2 -= 0x27; // '9' = 0x39, 'a' = 0x61
+			if (w2 > 9) w2 -= 0x27;	 // '9' = 0x39, 'a' = 0x61
 			w2 = (w2 & 0xF);
 
 			char ch = (w1 << 4) | w2;
@@ -205,15 +191,11 @@ bool LocalFileMng::checkTinyXMLCompatMode(const QString& filename)
 
 	QFile file(filename);
 
-	if (!file.open(QIODevice::ReadOnly))
-		return false;
+	if (!file.open(QIODevice::ReadOnly)) return false;
 
 	QString line = file.readLine();
 	file.close();
-	if (line.startsWith("<?xml"))
-	{
-		return false;
-	}
+	if (line.startsWith("<?xml")) { return false; }
 	else
 	{
 		//_WARNINGLOG( QString("File '%1' is being read in "
@@ -230,16 +212,12 @@ QDomDocument LocalFileMng::openXmlDocument(const QString& filename)
 	QDomDocument doc;
 	QFile file(filename);
 
-	if (!file.open(QIODevice::ReadOnly))
-		return QDomDocument();
+	if (!file.open(QIODevice::ReadOnly)) return QDomDocument();
 
 	if (TinyXMLCompat)
 	{
 		QString enc = QTextCodec::codecForLocale()->name();
-		if (enc == QString("System"))
-		{
-			enc = "UTF-8";
-		}
+		if (enc == QString("System")) { enc = "UTF-8"; }
 		QByteArray line;
 		QByteArray buf = QString("<?xml version='1.0' encoding='%1' ?>\n").arg(enc).toLocal8Bit();
 

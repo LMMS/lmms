@@ -14,10 +14,7 @@ inline int feenableexcept(unsigned int excepts)
 	// previous masks
 	unsigned int old_excepts;
 
-	if (fegetenv(&fenv))
-	{
-		return -1;
-	}
+	if (fegetenv(&fenv)) { return -1; }
 	old_excepts = fenv.__control & FE_ALL_EXCEPT;
 
 	// unmask
@@ -34,10 +31,7 @@ inline int fedisableexcept(unsigned int excepts)
 	// all previous masks
 	unsigned int old_excepts;
 
-	if (fegetenv(&fenv))
-	{
-		return -1;
-	}
+	if (fegetenv(&fenv)) { return -1; }
 	old_excepts = fenv.__control & FE_ALL_EXCEPT;
 
 	// mask

@@ -49,10 +49,7 @@ void PixmapButton::paintEvent(QPaintEvent*)
 
 	if ((model() != NULL && model()->value()) || m_pressed)
 	{
-		if (!m_activePixmap.isNull())
-		{
-			p.drawPixmap(0, 0, m_activePixmap);
-		}
+		if (!m_activePixmap.isNull()) { p.drawPixmap(0, 0, m_activePixmap); }
 	}
 	else if (!m_inactivePixmap.isNull())
 	{
@@ -98,18 +95,12 @@ void PixmapButton::setActiveGraphic(const QPixmap& _pm)
 void PixmapButton::setInactiveGraphic(const QPixmap& _pm, bool _update)
 {
 	m_inactivePixmap = _pm;
-	if (_update)
-	{
-		update();
-	}
+	if (_update) { update(); }
 }
 
 QSize PixmapButton::sizeHint() const
 {
-	if ((model() != NULL && model()->value()) || m_pressed)
-	{
-		return m_activePixmap.size() / devicePixelRatio();
-	}
+	if ((model() != NULL && model()->value()) || m_pressed) { return m_activePixmap.size() / devicePixelRatio(); }
 	else
 	{
 		return m_inactivePixmap.size() / devicePixelRatio();

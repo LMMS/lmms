@@ -40,18 +40,12 @@ JournallingObject::JournallingObject()
 
 JournallingObject::~JournallingObject()
 {
-	if (Engine::projectJournal())
-	{
-		Engine::projectJournal()->freeID(id());
-	}
+	if (Engine::projectJournal()) { Engine::projectJournal()->freeID(id()); }
 }
 
 void JournallingObject::addJournalCheckPoint()
 {
-	if (isJournalling())
-	{
-		Engine::projectJournal()->addJournalCheckPoint(this);
-	}
+	if (isJournalling()) { Engine::projectJournal()->addJournalCheckPoint(this); }
 }
 
 QDomElement JournallingObject::saveState(QDomDocument& _doc, QDomElement& _parent)
@@ -86,10 +80,7 @@ void JournallingObject::restoreState(const QDomElement& _this)
 		if (node.isElement() && node.nodeName() == "journal")
 		{
 			const jo_id_t new_id = node.toElement().attribute("id").toInt();
-			if (new_id)
-			{
-				changeID(new_id);
-			}
+			if (new_id) { changeID(new_id); }
 		}
 		node = node.nextSibling();
 	}

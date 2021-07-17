@@ -68,14 +68,8 @@ FxLine::FxLine(QWidget* _parent, FxMixerView* _mv, int _channelIndex)
 	, m_strokeInnerInactive(0, 0, 0)
 	, m_inRename(false)
 {
-	if (!s_sendBgArrow)
-	{
-		s_sendBgArrow = new QPixmap(embed::getIconPixmap("send_bg_arrow", 29, 56));
-	}
-	if (!s_receiveBgArrow)
-	{
-		s_receiveBgArrow = new QPixmap(embed::getIconPixmap("receive_bg_arrow", 29, 56));
-	}
+	if (!s_sendBgArrow) { s_sendBgArrow = new QPixmap(embed::getIconPixmap("send_bg_arrow", 29, 56)); }
+	if (!s_receiveBgArrow) { s_receiveBgArrow = new QPixmap(embed::getIconPixmap("receive_bg_arrow", 29, 56)); }
 
 	setFixedSize(33, FxLineHeight);
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -145,18 +139,12 @@ void FxLine::drawFxLine(QPainter* p, const FxLine* fxLine, bool isActive, bool s
 	bool muted = channel->m_muteModel.value();
 	QString name = channel->m_name;
 	QString elidedName = elideName(name);
-	if (!m_inRename && m_renameLineEdit->text() != elidedName)
-	{
-		m_renameLineEdit->setText(elidedName);
-	}
+	if (!m_inRename && m_renameLineEdit->text() != elidedName) { m_renameLineEdit->setText(elidedName); }
 
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
 
-	if (channel->m_hasColor && !muted)
-	{
-		p->fillRect(fxLine->rect(), channel->m_color.darker(isActive ? 120 : 150));
-	}
+	if (channel->m_hasColor && !muted) { p->fillRect(fxLine->rect(), channel->m_color.darker(isActive ? 120 : 150)); }
 	else
 	{
 		p->fillRect(fxLine->rect(), isActive ? fxLine->backgroundActive().color() : p->background().color());
@@ -171,10 +159,7 @@ void FxLine::drawFxLine(QPainter* p, const FxLine* fxLine, bool isActive, bool s
 	p->drawRect(0, 0, width - 1, height - 1);
 
 	// draw the mixer send background
-	if (sendToThis)
-	{
-		p->drawPixmap(2, 0, 29, 56, *s_sendBgArrow);
-	}
+	if (sendToThis) { p->drawPixmap(2, 0, 29, 56, *s_sendBgArrow); }
 	else if (receiveFromThis)
 	{
 		p->drawPixmap(2, 0, 29, 56, *s_receiveBgArrow);
@@ -313,10 +298,7 @@ void FxLine::changeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel(m_channelIndex);
 	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
-	if (!new_color.isValid())
-	{
-		return;
-	}
+	if (!new_color.isValid()) { return; }
 	channel->setColor(new_color);
 	update();
 }

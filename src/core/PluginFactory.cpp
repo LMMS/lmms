@@ -57,10 +57,7 @@ void PluginFactory::setupSearchPaths()
 	// Adds a search path relative to the main executable if the path exists.
 	auto addRelativeIfExists = [](const QString& path) {
 		QDir dir(qApp->applicationDirPath());
-		if (!path.isEmpty() && dir.cd(path))
-		{
-			QDir::addSearchPath("plugins", dir.absolutePath());
-		}
+		if (!path.isEmpty() && dir.cd(path)) { QDir::addSearchPath("plugins", dir.absolutePath()); }
 	};
 
 	// We're either running LMMS installed on an Unixoid or we're running a
@@ -81,16 +78,14 @@ void PluginFactory::setupSearchPaths()
 #endif
 	// Or via an environment variable:
 	QString env_path;
-	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty())
-		QDir::addSearchPath("plugins", env_path);
+	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty()) QDir::addSearchPath("plugins", env_path);
 
 	QDir::addSearchPath("plugins", ConfigManager::inst()->workingDir() + "plugins");
 }
 
 PluginFactory* PluginFactory::instance()
 {
-	if (s_instance == nullptr)
-		s_instance.reset(new PluginFactory());
+	if (s_instance == nullptr) s_instance.reset(new PluginFactory());
 
 	return s_instance.get();
 }
@@ -113,8 +108,7 @@ const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) cons
 {
 	for (const PluginInfo& info : m_pluginInfos)
 	{
-		if (qstrcmp(info.descriptor->name, name) == 0)
-			return info;
+		if (qstrcmp(info.descriptor->name, name) == 0) return info;
 	}
 	return PluginInfo();
 }
@@ -163,10 +157,7 @@ void PluginFactory::discoverPlugins()
 		if (library->resolve("lmms_plugin_main"))
 		{
 			QString descriptorName = file.baseName() + "_plugin_descriptor";
-			if (descriptorName.left(3) == "lib")
-			{
-				descriptorName = descriptorName.mid(3);
-			}
+			if (descriptorName.left(3) == "lib") { descriptorName = descriptorName.mid(3); }
 
 			pluginDescriptor =
 				reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));

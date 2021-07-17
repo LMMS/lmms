@@ -30,10 +30,7 @@ QString Model::fullDisplayName() const
 	if (parentModel())
 	{
 		const QString p = parentModel()->fullDisplayName();
-		if (n.isEmpty() && p.isEmpty())
-		{
-			return QString();
-		}
+		if (n.isEmpty() && p.isEmpty()) { return QString(); }
 		else if (p.isEmpty())
 		{
 			return n;

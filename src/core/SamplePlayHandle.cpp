@@ -42,10 +42,7 @@ SamplePlayHandle::SamplePlayHandle(SampleBuffer* sampleBuffer, bool ownAudioPort
 	, m_track(NULL)
 	, m_bbTrack(NULL)
 {
-	if (ownAudioPort)
-	{
-		setAudioPort(new AudioPort("SamplePlayHandle", false));
-	}
+	if (ownAudioPort) { setAudioPort(new AudioPort("SamplePlayHandle", false)); }
 }
 
 SamplePlayHandle::SamplePlayHandle(const QString& sampleFile)
@@ -64,10 +61,7 @@ SamplePlayHandle::SamplePlayHandle(SampleTCO* tco)
 SamplePlayHandle::~SamplePlayHandle()
 {
 	sharedObject::unref(m_sampleBuffer);
-	if (m_ownAudioPort)
-	{
-		delete audioPort();
-	}
+	if (m_ownAudioPort) { delete audioPort(); }
 }
 
 void SamplePlayHandle::play(sampleFrame* buffer)

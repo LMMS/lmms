@@ -33,10 +33,7 @@ SerializingObject::SerializingObject()
 
 SerializingObject::~SerializingObject()
 {
-	if (m_hook)
-	{
-		m_hook->m_hookedIn = NULL;
-	}
+	if (m_hook) { m_hook->m_hookedIn = NULL; }
 }
 
 QDomElement SerializingObject::saveState(QDomDocument& doc, QDomElement& parent)
@@ -46,10 +43,7 @@ QDomElement SerializingObject::saveState(QDomDocument& doc, QDomElement& parent)
 
 	saveSettings(doc, element);
 
-	if (hook())
-	{
-		hook()->saveSettings(doc, element);
-	}
+	if (hook()) { hook()->saveSettings(doc, element); }
 
 	return element;
 }
@@ -58,25 +52,16 @@ void SerializingObject::restoreState(const QDomElement& element)
 {
 	loadSettings(element);
 
-	if (hook())
-	{
-		hook()->loadSettings(element);
-	}
+	if (hook()) { hook()->loadSettings(element); }
 }
 
 void SerializingObject::setHook(SerializingObjectHook* hook)
 {
-	if (m_hook)
-	{
-		m_hook->m_hookedIn = NULL;
-	}
+	if (m_hook) { m_hook->m_hookedIn = NULL; }
 
 	m_hook = hook;
 
-	if (m_hook)
-	{
-		m_hook->m_hookedIn = this;
-	}
+	if (m_hook) { m_hook->m_hookedIn = this; }
 }
 
 void SerializingObject::saveSettings(QDomDocument& doc, QDomElement& element)

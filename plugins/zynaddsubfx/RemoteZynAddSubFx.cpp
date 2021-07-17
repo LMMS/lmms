@@ -159,10 +159,7 @@ void RemoteZynAddSubFx::guiLoop()
 
 	while (!m_guiExit)
 	{
-		if (ui)
-		{
-			Fl::wait(m_guiSleepTime / 1000.0);
-		}
+		if (ui) { Fl::wait(m_guiSleepTime / 1000.0); }
 		else
 		{
 #ifdef LMMS_BUILD_WIN32
@@ -198,10 +195,7 @@ void RemoteZynAddSubFx::guiLoop()
 
 			case IdLoadSettingsFromFile: {
 				LocalZynAddSubFx::loadXML(m.getString());
-				if (ui)
-				{
-					ui->refresh_master_ui();
-				}
+				if (ui) { ui->refresh_master_ui(); }
 				pthread_mutex_lock(&m_master->mutex);
 				sendMessage(IdLoadSettingsFromFile);
 				pthread_mutex_unlock(&m_master->mutex);

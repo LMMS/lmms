@@ -50,20 +50,11 @@ ComboBox::ComboBox(QWidget* _parent, const QString& _name)
 {
 	setFixedHeight(ComboBox::DEFAULT_HEIGHT);
 
-	if (s_background == NULL)
-	{
-		s_background = new QPixmap(embed::getIconPixmap("combobox_bg"));
-	}
+	if (s_background == NULL) { s_background = new QPixmap(embed::getIconPixmap("combobox_bg")); }
 
-	if (s_arrow == NULL)
-	{
-		s_arrow = new QPixmap(embed::getIconPixmap("combobox_arrow"));
-	}
+	if (s_arrow == NULL) { s_arrow = new QPixmap(embed::getIconPixmap("combobox_arrow")); }
 
-	if (s_arrowSelected == NULL)
-	{
-		s_arrowSelected = new QPixmap(embed::getIconPixmap("combobox_arrow_selected"));
-	}
+	if (s_arrowSelected == NULL) { s_arrowSelected = new QPixmap(embed::getIconPixmap("combobox_arrow_selected")); }
 
 	setFont(pointSize<9>(font()));
 	m_menu.setFont(pointSize<8>(m_menu.font()));
@@ -95,10 +86,7 @@ void ComboBox::contextMenuEvent(QContextMenuEvent* event)
 
 void ComboBox::mousePressEvent(QMouseEvent* event)
 {
-	if (model() == NULL)
-	{
-		return;
-	}
+	if (model() == NULL) { return; }
 
 	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier))
 	{
@@ -116,10 +104,7 @@ void ComboBox::mousePressEvent(QMouseEvent* event)
 			}
 
 			QPoint gpos = mapToGlobal(QPoint(0, height()));
-			if (gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height())
-			{
-				m_menu.exec(gpos);
-			}
+			if (gpos.y() + m_menu.sizeHint().height() < qApp->desktop()->height()) { m_menu.exec(gpos); }
 			else
 			{
 				m_menu.exec(mapToGlobal(QPoint(width(), 0)));
@@ -182,10 +167,7 @@ void ComboBox::paintEvent(QPaintEvent* _pe)
 		int tx = 5;
 		if (!pm.isNull())
 		{
-			if (pm.height() > 16)
-			{
-				pm = pm.scaledToHeight(16, Qt::SmoothTransformation);
-			}
+			if (pm.height() > 16) { pm = pm.scaledToHeight(16, Qt::SmoothTransformation); }
 			p.drawPixmap(tx, 3, pm);
 			tx += pm.width() + 3;
 		}
@@ -209,8 +191,5 @@ void ComboBox::wheelEvent(QWheelEvent* event)
 
 void ComboBox::setItem(QAction* item)
 {
-	if (model())
-	{
-		model()->setInitValue(item->data().toInt());
-	}
+	if (model()) { model()->setInitValue(item->data().toInt()); }
 }

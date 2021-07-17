@@ -181,8 +181,7 @@ f_cnt_t SidInstrument::desiredReleaseFrames() const
 	int maxrel = 0;
 	for (int i = 0; i < 3; ++i)
 	{
-		if (maxrel < m_voice[i]->m_releaseModel.value())
-			maxrel = (int)m_voice[i]->m_releaseModel.value();
+		if (maxrel < m_voice[i]->m_releaseModel.value()) maxrel = (int)m_voice[i]->m_releaseModel.value();
 	}
 
 	return f_cnt_t(float(relTime[maxrel]) * samplerate / 1000.0);
@@ -270,10 +269,7 @@ void SidInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 		sidreg[c] = 0x00;
 	}
 
-	if ((ChipModel)m_chipModel.value() == sidMOS6581)
-	{
-		sid->set_chip_model(MOS6581);
-	}
+	if ((ChipModel)m_chipModel.value() == sidMOS6581) { sid->set_chip_model(MOS6581); }
 	else
 	{
 		sid->set_chip_model(MOS8580);
@@ -380,8 +376,7 @@ void SidInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 	sidreg[24] = data8 & 0x00FF;
 
 	int num = sid_fillbuffer(sidreg, sid, delta_t, buf, frames);
-	if (num != frames)
-		printf("!!!Not enough samples\n");
+	if (num != frames) printf("!!!Not enough samples\n");
 
 	// loop backwards to avoid overwriting data in the short-to-float conversion
 	for (fpp_t frame = frames - 1; frame >= 0; frame--)

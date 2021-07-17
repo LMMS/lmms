@@ -68,10 +68,7 @@ void MidiApple::processOutEvent(const MidiEvent& event, const TimePos& time, con
 
 	for (QMap<QString, MIDIEndpointRef>::Iterator it = m_outputDevices.begin(); it != m_outputDevices.end(); ++it)
 	{
-		if (outDevs.contains(it.key()))
-		{
-			sendMidiOut(it.value(), event);
-		}
+		if (outDevs.contains(it.key())) { sendMidiOut(it.value(), event); }
 	}
 }
 
@@ -163,10 +160,7 @@ void MidiApple::subscribeReadablePort(MidiPort* port, const QString& dest, bool 
 	else
 	{
 		MidiPortList list = m_inputSubs[dest];
-		if (list.empty())
-		{
-			m_inputSubs.remove(dest);
-		}
+		if (list.empty()) { m_inputSubs.remove(dest); }
 	}
 }
 
@@ -181,17 +175,11 @@ void MidiApple::subscribeWritablePort(MidiPort* port, const QString& dest, bool 
 	}
 
 	m_outputSubs[dest].removeAll(port);
-	if (subscribe)
-	{
-		m_outputSubs[dest].push_back(port);
-	}
+	if (subscribe) { m_outputSubs[dest].push_back(port); }
 	else
 	{
 		MidiPortList list = m_outputSubs[dest];
-		if (list.empty())
-		{
-			m_outputSubs.remove(dest);
-		}
+		if (list.empty()) { m_outputSubs.remove(dest); }
 	}
 }
 
@@ -255,10 +243,7 @@ void MidiApple::HandleReadCallback(const MIDIPacketList* pktlist, void* srcConnR
 
 				// First byte should be status
 				unsigned char status = packet->data[iByte];
-				if (status < 0xC0)
-				{
-					size = 3;
-				}
+				if (status < 0xC0) { size = 3; }
 				else if (status < 0xE0)
 				{
 					size = 2;
@@ -375,8 +360,7 @@ char* getName(MIDIObjectRef& object)
 {
 	// Returns the name of a given MIDIObjectRef as char *
 	CFStringRef name = nullptr;
-	if (noErr != MIDIObjectGetStringProperty(object, kMIDIPropertyName, &name))
-		return nullptr;
+	if (noErr != MIDIObjectGetStringProperty(object, kMIDIPropertyName, &name)) return nullptr;
 	int len = CFStringGetLength(name) + 1;
 	char* value = (char*)malloc(len);
 
@@ -470,10 +454,7 @@ void MidiApple::openMidiReference(MIDIEndpointRef reference, QString refName, bo
 	MIDIPortRef mPort = 0;
 
 	CFStringRef inName = CFStringCreateWithCString(0, registeredName, kCFStringEncodingASCII);
-	if (isIn)
-	{
-		MIDIInputPortCreate(mClient, inName, &MidiApple::ReadCallback, this, &mPort);
-	}
+	if (isIn) { MIDIInputPortCreate(mClient, inName, &MidiApple::ReadCallback, this, &mPort); }
 	else
 	{
 		MIDIOutputPortCreate(mClient, inName, &mPort);
@@ -580,14 +561,8 @@ char* MidiApple::getFullName(MIDIEndpointRef& endpoint_ref)
 	size_t endPointNameLen = endPointName == nullptr ? 0 : strlen(endPointName);
 	char* fullName = (char*)malloc(deviceNameLen + endPointNameLen + 2);
 	sprintf(fullName, "%s:%s", deviceName, endPointName);
-	if (deviceName != nullptr)
-	{
-		free(deviceName);
-	}
-	if (endPointName != nullptr)
-	{
-		free(endPointName);
-	}
+	if (deviceName != nullptr) { free(deviceName); }
+	if (endPointName != nullptr) { free(endPointName); }
 	return fullName;
 }
 

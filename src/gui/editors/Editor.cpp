@@ -36,8 +36,7 @@
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
-	if (displayPauseIcon)
-		m_playAction->setIcon(embed::getIconPixmap("pause"));
+	if (displayPauseIcon) m_playAction->setIcon(embed::getIconPixmap("pause"));
 	else
 		m_playAction->setIcon(embed::getIconPixmap("play"));
 }
@@ -66,8 +65,7 @@ DropToolBar* Editor::addDropToolBar(QWidget* parent, Qt::ToolBarArea whereToAdd,
 
 void Editor::togglePlayStop()
 {
-	if (Engine::getSong()->isPlaying())
-		stop();
+	if (Engine::getSong()->isPlaying()) stop();
 	else
 		play();
 }
@@ -117,10 +115,7 @@ Editor::Editor(bool record, bool stepRecord)
 		addButton(m_recordAction, "recordButton");
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
 	}
-	if (stepRecord)
-	{
-		addButton(m_toggleStepRecordingAction, "stepRecordButton");
-	}
+	if (stepRecord) { addButton(m_toggleStepRecordingAction, "stepRecordButton"); }
 	addButton(m_stopAction, "stopButton");
 }
 
@@ -130,10 +125,7 @@ QAction* Editor::playAction() const { return m_playAction; }
 
 void Editor::closeEvent(QCloseEvent* _ce)
 {
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
+	if (parentWidget()) { parentWidget()->hide(); }
 	else
 	{
 		hide();

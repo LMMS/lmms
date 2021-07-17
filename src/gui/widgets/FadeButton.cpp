@@ -59,10 +59,7 @@ void FadeButton::activate()
 
 void FadeButton::activateOnce()
 {
-	if (activeNotes == 0)
-	{
-		activate();
-	}
+	if (activeNotes == 0) { activate(); }
 }
 
 void FadeButton::noteEnd()
@@ -77,10 +74,7 @@ void FadeButton::noteEnd()
 		activeNotes--;
 	}
 
-	if (activeNotes == 0)
-	{
-		m_releaseTimer.restart();
-	}
+	if (activeNotes == 0) { m_releaseTimer.restart(); }
 
 	update();
 }

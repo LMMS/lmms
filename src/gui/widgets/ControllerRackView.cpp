@@ -109,10 +109,7 @@ void ControllerRackView::deleteController(ControllerView* _view)
 		msgBox.setText(tr("Confirm delete? There are existing connection(s) "
 						  "associated with this controller. There is no way to undo."));
 		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-		if (msgBox.exec() != QMessageBox::Ok)
-		{
-			return;
-		}
+		if (msgBox.exec() != QMessageBox::Ok) { return; }
 	}
 
 	Song* song = Engine::getSong();
@@ -171,10 +168,7 @@ void ControllerRackView::addController()
 
 void ControllerRackView::closeEvent(QCloseEvent* _ce)
 {
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
+	if (parentWidget()) { parentWidget()->hide(); }
 	else
 	{
 		hide();

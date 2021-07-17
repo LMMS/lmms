@@ -45,15 +45,12 @@ inline int next_power_of_2(int n)
 
 inline bool isprime(int v)
 {
-	if (v <= 3)
-		return true;
+	if (v <= 3) return true;
 
-	if (!(v & 1))
-		return false;
+	if (!(v & 1)) return false;
 
 	for (int i = 3; i < (int)sqrt(v) + 1; i += 2)
-		if ((v % i) == 0)
-			return false;
+		if ((v % i) == 0) return false;
 
 	return true;
 }

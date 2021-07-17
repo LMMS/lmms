@@ -31,15 +31,9 @@ void RecentProjectsMenu::fillMenu()
 	for (QString& fileName : rup)
 	{
 		QFileInfo recentFile(fileName);
-		if (!recentFile.exists() || fileName == ConfigManager::inst()->recoveryFile())
-		{
-			continue;
-		}
+		if (!recentFile.exists() || fileName == ConfigManager::inst()->recoveryFile()) { continue; }
 
-		if (recentFile.suffix().toLower() == "mpt")
-		{
-			continue;
-		}
+		if (recentFile.suffix().toLower() == "mpt") { continue; }
 
 		addAction(projectFileIcon, fileName.replace("&", "&&"));
 #ifdef LMMS_BUILD_APPLE
@@ -48,10 +42,7 @@ void RecentProjectsMenu::fillMenu()
 #endif
 
 		shownInMenu++;
-		if (shownInMenu >= 15)
-		{
-			break;
-		}
+		if (shownInMenu >= 15) { break; }
 	}
 }
 

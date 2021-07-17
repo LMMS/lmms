@@ -84,10 +84,8 @@ WatsynObject::~WatsynObject()
 
 void WatsynObject::renderOutput(fpp_t _frames)
 {
-	if (m_abuf == NULL)
-		m_abuf = new sampleFrame[m_fpp];
-	if (m_bbuf == NULL)
-		m_bbuf = new sampleFrame[m_fpp];
+	if (m_abuf == NULL) m_abuf = new sampleFrame[m_fpp];
+	if (m_bbuf == NULL) m_bbuf = new sampleFrame[m_fpp];
 
 	for (fpp_t frame = 0; frame < _frames; frame++)
 	{
@@ -111,11 +109,9 @@ void WatsynObject::renderOutput(fpp_t _frames)
 		if (m_amod == MOD_PM)
 		{
 			A1_lphase = fmodf(A1_lphase + A2_L * PMOD_AMT, WAVELEN);
-			if (A1_lphase < 0)
-				A1_lphase += WAVELEN;
+			if (A1_lphase < 0) A1_lphase += WAVELEN;
 			A1_rphase = fmodf(A1_rphase + A2_R * PMOD_AMT, WAVELEN);
-			if (A1_rphase < 0)
-				A1_rphase += WAVELEN;
+			if (A1_rphase < 0) A1_rphase += WAVELEN;
 		}
 		// A1
 		sample_t A1_L = linearInterpolate(m_A1wave[static_cast<int>(A1_lphase)],
@@ -147,11 +143,9 @@ void WatsynObject::renderOutput(fpp_t _frames)
 		if (m_bmod == MOD_PM)
 		{
 			B1_lphase = fmodf(B1_lphase + B2_L * PMOD_AMT, WAVELEN);
-			if (B1_lphase < 0)
-				B1_lphase += WAVELEN;
+			if (B1_lphase < 0) B1_lphase += WAVELEN;
 			B1_rphase = fmodf(B1_rphase + B2_R * PMOD_AMT, WAVELEN);
-			if (B1_rphase < 0)
-				B1_rphase += WAVELEN;
+			if (B1_rphase < 0) B1_rphase += WAVELEN;
 		}
 		// B1
 		sample_t B1_L = linearInterpolate(m_B1wave[static_cast<int>(B1_lphase) % WAVELEN],
@@ -393,10 +387,7 @@ void WatsynInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer
 			float mixvalue = mixvalue_;
 			const float tfp = tfp_ + f;
 			// handle mixing envelope
-			if (tfp < envAtt)
-			{
-				mixvalue = qBound(-100.0f, mixvalue + (tfp / envAtt * envAmt), 100.0f);
-			}
+			if (tfp < envAtt) { mixvalue = qBound(-100.0f, mixvalue + (tfp / envAtt * envAmt), 100.0f); }
 			else if (tfp >= envAtt && tfp < envAtt + envHold)
 			{
 				mixvalue = qBound(-100.0f, mixvalue + envAmt, 100.0f);

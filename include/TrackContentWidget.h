@@ -57,10 +57,7 @@ public:
 	void removeTCOView(TrackContentObjectView* tcov);
 	void removeTCOView(int tcoNum)
 	{
-		if (tcoNum >= 0 && tcoNum < m_tcoViews.size())
-		{
-			removeTCOView(m_tcoViews[tcoNum]);
-		}
+		if (tcoNum >= 0 && tcoNum < m_tcoViews.size()) { removeTCOView(m_tcoViews[tcoNum]); }
 	}
 
 	bool canPasteSelection(TimePos tcoPos, const QDropEvent* de);

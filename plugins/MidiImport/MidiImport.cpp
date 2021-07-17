@@ -70,10 +70,7 @@ MidiImport::~MidiImport() {}
 
 bool MidiImport::tryImport(TrackContainer* tc)
 {
-	if (openFile() == false)
-	{
-		return false;
-	}
+	if (openFile() == false) { return false; }
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	if (gui != NULL && ConfigManager::inst()->sf2File().isEmpty())
@@ -140,10 +137,7 @@ public:
 			qApp->processEvents();
 			at = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, tc));
 		}
-		if (tn != "")
-		{
-			at->setName(tn);
-		}
+		if (tn != "") { at->setName(tn); }
 		return *this;
 	}
 
@@ -218,10 +212,7 @@ public:
 			it_inst = it->loadInstrument("patman");
 #endif
 			trackName = tn;
-			if (trackName != "")
-			{
-				it->setName(tn);
-			}
+			if (trackName != "") { it->setName(tn); }
 			// General MIDI default
 			it->pitchRangeModel()->setInitValue(2);
 
@@ -233,10 +224,7 @@ public:
 
 	void addNote(Note& n)
 	{
-		if (!p)
-		{
-			p = dynamic_cast<Pattern*>(it->createTCO(0));
-		}
+		if (!p) { p = dynamic_cast<Pattern*>(it->createTCO(0)); }
 		p->addNote(n, false);
 		hasNotes = true;
 	}
@@ -396,10 +384,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 					if (evt->is_update())
 					{
 						printf(", Update Type: %s", evt->get_attribute());
-						if (evt->get_update_type() == 'a')
-						{
-							printf(", Atom: %s", evt->get_atom_value());
-						}
+						if (evt->get_update_type() == 'a') { printf(", Atom: %s", evt->get_atom_value()); }
 					}
 					printf("\n");
 				}
@@ -437,20 +422,14 @@ bool MidiImport::readSMF(TrackContainer* tc)
 						const QString dir = "/usr/share/midi/"
 											"freepats/Tone_000/";
 						const QStringList files = QDir(dir).entryList(QStringList(filter));
-						if (ch->it_inst && !files.empty())
-						{
-							ch->it_inst->loadFile(dir + files.front());
-						}
+						if (ch->it_inst && !files.empty()) { ch->it_inst->loadFile(dir + files.front()); }
 					}
 				}
 
 				else if (update.startsWith("control") || update == "bendr")
 				{
 					int ccid = update.mid(7, update.length() - 8).toInt();
-					if (update == "bendr")
-					{
-						ccid = 128;
-					}
+					if (update == "bendr") { ccid = 128; }
 					if (ccid <= 128)
 					{
 						double cc = evt->get_real_value();
@@ -488,10 +467,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 
 						if (objModel)
 						{
-							if (time == 0 && objModel)
-							{
-								objModel->setInitValue(cc);
-							}
+							if (time == 0 && objModel) { objModel->setInitValue(cc); }
 							else
 							{
 								if (ccs[ccid].at == NULL)
@@ -518,10 +494,7 @@ bool MidiImport::readSMF(TrackContainer* tc)
 
 	for (auto& c : chs)
 	{
-		if (c.second.hasNotes)
-		{
-			c.second.splitPatterns();
-		}
+		if (c.second.hasNotes) { c.second.splitPatterns(); }
 		else if (c.second.it)
 		{
 			printf(" Should remove empty track\n");
@@ -565,22 +538,13 @@ bool MidiImport::readRIFF(TrackContainer* tc)
 			qWarning("MidiImport::readRIFF(): data chunk not found");
 			return false;
 		}
-		if (id == makeID('d', 'a', 't', 'a'))
-		{
-			break;
-		}
-		if (len < 0)
-		{
-			goto data_not_found;
-		}
+		if (id == makeID('d', 'a', 't', 'a')) { break; }
+		if (len < 0) { goto data_not_found; }
 		skip((len + 1) & ~1);
 	}
 
 	// the "data" chunk must contain data in SMF format
-	if (readID() != makeID('M', 'T', 'h', 'd'))
-	{
-		goto invalid_format;
-	}
+	if (readID() != makeID('M', 'T', 'h', 'd')) { goto invalid_format; }
 	return readSMF(tc);
 }
 

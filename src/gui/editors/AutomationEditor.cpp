@@ -123,14 +123,8 @@ AutomationEditor::AutomationEditor()
 	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
 	m_quantizeModel.setValue(m_quantizeModel.findText("1/8"));
 
-	if (s_toolYFlip == nullptr)
-	{
-		s_toolYFlip = new QPixmap(embed::getIconPixmap("flip_y"));
-	}
-	if (s_toolXFlip == nullptr)
-	{
-		s_toolXFlip = new QPixmap(embed::getIconPixmap("flip_x"));
-	}
+	if (s_toolYFlip == nullptr) { s_toolYFlip = new QPixmap(embed::getIconPixmap("flip_y")); }
+	if (s_toolXFlip == nullptr) { s_toolXFlip = new QPixmap(embed::getIconPixmap("flip_x")); }
 
 	// add time-line
 	m_timeLine =
@@ -150,22 +144,10 @@ AutomationEditor::AutomationEditor()
 	connect(m_topBottomScroll, SIGNAL(valueChanged(int)), this, SLOT(verScrolled(int)));
 
 	// init pixmaps
-	if (s_toolDraw == nullptr)
-	{
-		s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw"));
-	}
-	if (s_toolErase == nullptr)
-	{
-		s_toolErase = new QPixmap(embed::getIconPixmap("edit_erase"));
-	}
-	if (s_toolDrawOut == nullptr)
-	{
-		s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue"));
-	}
-	if (s_toolMove == nullptr)
-	{
-		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
-	}
+	if (s_toolDraw == nullptr) { s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw")); }
+	if (s_toolErase == nullptr) { s_toolErase = new QPixmap(embed::getIconPixmap("edit_erase")); }
+	if (s_toolDrawOut == nullptr) { s_toolDrawOut = new QPixmap(embed::getIconPixmap("edit_draw_outvalue")); }
+	if (s_toolMove == nullptr) { s_toolMove = new QPixmap(embed::getIconPixmap("edit_move")); }
 
 	setCurrentPattern(nullptr);
 
@@ -186,17 +168,11 @@ AutomationEditor::~AutomationEditor()
 
 void AutomationEditor::setCurrentPattern(AutomationPattern* new_pattern)
 {
-	if (m_pattern)
-	{
-		m_pattern->disconnect(this);
-	}
+	if (m_pattern) { m_pattern->disconnect(this); }
 
 	m_pattern = new_pattern;
 
-	if (m_pattern != nullptr)
-	{
-		connect(m_pattern, SIGNAL(dataChanged()), this, SLOT(update()));
-	}
+	if (m_pattern != nullptr) { connect(m_pattern, SIGNAL(dataChanged()), this, SLOT(update())); }
 
 	emit currentPatternChanged();
 }
@@ -242,10 +218,7 @@ void AutomationEditor::update()
 	QWidget::update();
 
 	// Note detuning?
-	if (m_pattern && !m_pattern->getTrack())
-	{
-		gui->pianoRoll()->update();
-	}
+	if (m_pattern && !m_pattern->getTrack()) { gui->pianoRoll()->update(); }
 }
 
 void AutomationEditor::keyPressEvent(QKeyEvent* ke)
@@ -263,10 +236,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent* ke)
 		break;
 
 	case Qt::Key_Left:
-		if ((m_timeLine->pos() -= 16) < 0)
-		{
-			m_timeLine->pos().setTicks(0);
-		}
+		if ((m_timeLine->pos() -= 16) < 0) { m_timeLine->pos().setTicks(0); }
 		m_timeLine->updatePosition();
 		ke->accept();
 		break;
@@ -309,19 +279,13 @@ void AutomationEditor::drawLine(int x0In, float y0, int x1In, float y1)
 	int xstep;
 	int ystep;
 
-	if (deltax < AutomationPattern::quantization())
-	{
-		return;
-	}
+	if (deltax < AutomationPattern::quantization()) { return; }
 
 	deltax /= AutomationPattern::quantization();
 
 	float yscale = deltay / (deltax);
 
-	if (x0 < x1)
-	{
-		xstep = AutomationPattern::quantization();
-	}
+	if (x0 < x1) { xstep = AutomationPattern::quantization(); }
 	else
 	{
 		xstep = -(AutomationPattern::quantization());
@@ -353,10 +317,7 @@ void AutomationEditor::drawLine(int x0In, float y0, int x1In, float y1)
 
 bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValue)
 {
-	if (node == m_pattern->getTimeMap().end())
-	{
-		return false;
-	}
+	if (node == m_pattern->getTimeMap().end()) { return false; }
 
 	// Display dialog to edit the value
 	bool ok;
@@ -365,24 +326,15 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 		m_pattern->firstObject()->minValue<float>(), m_pattern->firstObject()->maxValue<float>(), 3, &ok);
 
 	// If dialog failed return false
-	if (!ok)
-	{
-		return false;
-	}
+	if (!ok) { return false; }
 
 	// Set the new inValue/outValue
-	if (editingOutValue)
-	{
-		node.value().setOutValue(value);
-	}
+	if (editingOutValue) { node.value().setOutValue(value); }
 	else
 	{
 		// If the outValue is equal to the inValue we
 		// set both to the given value
-		if (OFFSET(node) == 0)
-		{
-			node.value().setOutValue(value);
-		}
+		if (OFFSET(node) == 0) { node.value().setOutValue(value); }
 		node.value().setInValue(value);
 	}
 
@@ -392,10 +344,7 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 
 void AutomationEditor::mousePressEvent(QMouseEvent* mouseEvent)
 {
-	if (!validPattern())
-	{
-		return;
-	}
+	if (!validPattern()) { return; }
 
 	// Some helper lambda functions to avoid repetition of code
 	auto eraseNode = [this](timeMap::iterator node) {
@@ -587,16 +536,10 @@ void AutomationEditor::mousePressEvent(QMouseEvent* mouseEvent)
 
 void AutomationEditor::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
-	if (!validPattern())
-	{
-		return;
-	}
+	if (!validPattern()) { return; }
 
 	// If we double clicked outside the AutomationEditor viewport return
-	if (mouseEvent->y() <= TOP_MARGIN || mouseEvent->x() < VALUES_WIDTH)
-	{
-		return;
-	}
+	if (mouseEvent->y() <= TOP_MARGIN || mouseEvent->x() < VALUES_WIDTH) { return; }
 
 	// Are we fine tuning the inValue or outValue?
 	const bool isOutVal = (m_editMode == DRAW_OUTVALUES);
@@ -606,10 +549,7 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 	{
 	case DRAW:
 	case DRAW_OUTVALUES:
-		if (fineTuneValue(clickedNode, isOutVal))
-		{
-			update();
-		}
+		if (fineTuneValue(clickedNode, isOutVal)) { update(); }
 		break;
 	default:
 		break;
@@ -644,10 +584,7 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent* mouseEvent)
 
 	m_action = NONE;
 
-	if (mustRepaint)
-	{
-		repaint();
-	}
+	if (mustRepaint) { repaint(); }
 }
 
 void AutomationEditor::mouseMoveEvent(QMouseEvent* mouseEvent)
@@ -1037,10 +974,7 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 				}
 
 				int x = xCoordOfTick(POS(it));
-				if (x > width())
-				{
-					break;
-				}
+				if (x > width()) { break; }
 
 				float* values = m_pattern->valuesAfter(POS(it));
 
@@ -1051,10 +985,7 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 				// the value of the end of the shape between the two nodes will be the inValue of
 				// the next node.
 				float nextValue;
-				if (m_pattern->progressionType() == AutomationPattern::DiscreteProgression)
-				{
-					nextValue = OUTVAL(it);
-				}
+				if (m_pattern->progressionType() == AutomationPattern::DiscreteProgression) { nextValue = OUTVAL(it); }
 				else
 				{
 					nextValue = INVAL(it + 1);
@@ -1112,20 +1043,14 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 		m_leftRightScroll->setPageStep(l);
 	}
 
-	if (validPattern() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
-	{
-		drawCross(p);
-	}
+	if (validPattern() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus()) { drawCross(p); }
 
 	const QPixmap* cursor = nullptr;
 	// draw current edit-mode-icon below the cursor
 	switch (m_editMode)
 	{
 	case DRAW: {
-		if (m_action == ERASE_VALUES)
-		{
-			cursor = s_toolErase;
-		}
+		if (m_action == ERASE_VALUES) { cursor = s_toolErase; }
 		else if (m_action == MOVE_VALUE)
 		{
 			cursor = s_toolMove;
@@ -1141,10 +1066,7 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 		break;
 	}
 	case DRAW_OUTVALUES: {
-		if (m_action == RESET_OUTVALUES)
-		{
-			cursor = s_toolErase;
-		}
+		if (m_action == RESET_OUTVALUES) { cursor = s_toolErase; }
 		else if (m_action == MOVE_OUTVALUE)
 		{
 			cursor = s_toolMove;
@@ -1276,10 +1198,7 @@ void AutomationEditor::wheelEvent(QWheelEvent* we)
 	if (we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier)
 	{
 		int y = m_zoomingYModel.value();
-		if (we->angleDelta().y() > 0)
-		{
-			y++;
-		}
+		if (we->angleDelta().y() > 0) { y++; }
 		else if (we->angleDelta().y() < 0)
 		{
 			y--;
@@ -1305,10 +1224,7 @@ void AutomationEditor::wheelEvent(QWheelEvent* we)
 	else if (we->modifiers() & Qt::ControlModifier)
 	{
 		int x = m_zoomingXModel.value();
-		if (we->angleDelta().y() > 0)
-		{
-			x++;
-		}
+		if (we->angleDelta().y() > 0) { x++; }
 		else if (we->angleDelta().y() < 0)
 		{
 			x--;
@@ -1365,10 +1281,7 @@ inline bool AutomationEditor::inBBEditor()
 
 void AutomationEditor::play()
 {
-	if (!validPattern())
-	{
-		return;
-	}
+	if (!validPattern()) { return; }
 
 	if (!m_pattern->getTrack())
 	{
@@ -1392,10 +1305,7 @@ void AutomationEditor::play()
 	}
 	else
 	{
-		if (Engine::getSong()->isStopped() == true)
-		{
-			Engine::getSong()->playSong();
-		}
+		if (Engine::getSong()->isStopped() == true) { Engine::getSong()->playSong(); }
 		else
 		{
 			Engine::getSong()->togglePause();
@@ -1405,14 +1315,8 @@ void AutomationEditor::play()
 
 void AutomationEditor::stop()
 {
-	if (!validPattern())
-	{
-		return;
-	}
-	if (m_pattern->getTrack() && inBBEditor())
-	{
-		Engine::getBBTrackContainer()->stop();
-	}
+	if (!validPattern()) { return; }
+	if (m_pattern->getTrack() && inBBEditor()) { Engine::getBBTrackContainer()->stop(); }
 	else
 	{
 		Engine::getSong()->stop();
@@ -1436,8 +1340,7 @@ void AutomationEditor::verScrolled(int new_pos)
 
 void AutomationEditor::setEditMode(AutomationEditor::EditModes mode)
 {
-	if (m_editMode == mode)
-		return;
+	if (m_editMode == mode) return;
 
 	m_editMode = mode;
 
@@ -1501,10 +1404,7 @@ void AutomationEditor::zoomingYChanged()
 {
 	const QString& zfac = m_zoomingYModel.currentText();
 	m_y_auto = zfac == "Auto";
-	if (!m_y_auto)
-	{
-		m_y_delta = zfac.left(zfac.length() - 1).toInt() * DEFAULT_Y_DELTA / 100;
-	}
+	if (!m_y_auto) { m_y_delta = zfac.left(zfac.length() - 1).toInt() * DEFAULT_Y_DELTA / 100; }
 #ifdef LMMS_DEBUG
 	assert(m_y_delta > 0);
 #endif
@@ -1588,10 +1488,7 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(
 	while (it != tm.end())
 	{
 		// The node we are checking is past the coordinates already, so the others will be too
-		if (posTicks < POS(it) - ticksOffset)
-		{
-			break;
-		}
+		if (posTicks < POS(it) - ticksOffset) { break; }
 
 		// If the x coordinate is within "r" pixels of the node's position
 		// POS(it) - ticksOffset <= posTicks <= POS(it) + ticksOffset
@@ -1600,10 +1497,7 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(
 			// The y position of the node
 			float valueY = yCoordOfLevel(outValue ? OUTVAL(it) : INVAL(it));
 			// If the y coordinate is within "r" pixels of the node's value
-			if (y >= (valueY - r) && y <= (valueY + r))
-			{
-				return it;
-			}
+			if (y >= (valueY - r) && y <= (valueY + r)) { return it; }
 		}
 		++it;
 	}
@@ -1830,10 +1724,7 @@ void AutomationEditorWindow::dropEvent(QDropEvent* _de)
 
 void AutomationEditorWindow::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	if (!m_editor->validPattern())
-	{
-		return;
-	}
+	if (!m_editor->validPattern()) { return; }
 	StringPairDrag::processDragEnterEvent(_dee, "automatable_model");
 }
 

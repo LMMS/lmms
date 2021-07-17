@@ -111,10 +111,7 @@ void TimeDisplayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
 	if (mouseEvent->button() == Qt::LeftButton)
 	{
-		if (m_displayMode == MinutesSeconds)
-		{
-			setDisplayMode(BarsTicks);
-		}
+		if (m_displayMode == MinutesSeconds) { setDisplayMode(BarsTicks); }
 		else
 		{
 			setDisplayMode(MinutesSeconds);

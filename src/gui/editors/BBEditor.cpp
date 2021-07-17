@@ -119,10 +119,7 @@ void BBEditor::removeBBView(int bb) { m_trackContainerView->removeBBView(bb); }
 
 void BBEditor::play()
 {
-	if (Engine::getSong()->playMode() != Song::Mode_PlayBB)
-	{
-		Engine::getSong()->playBB();
-	}
+	if (Engine::getSong()->playMode() != Song::Mode_PlayBB) { Engine::getSong()->playBB(); }
 	else
 	{
 		Engine::getSong()->togglePause();
@@ -232,10 +229,7 @@ void BBTrackContainerView::makeSteps(bool clone)
 		if ((*it)->type() == Track::InstrumentTrack)
 		{
 			Pattern* p = static_cast<Pattern*>((*it)->getTCO(m_bbtc->currentBB()));
-			if (clone)
-			{
-				p->cloneSteps();
-			}
+			if (clone) { p->cloneSteps(); }
 			else
 			{
 				p->addSteps();

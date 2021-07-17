@@ -59,10 +59,7 @@ void AutomationTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement&
 void AutomationTrack::loadTrackSpecificSettings(const QDomElement& _this)
 {
 	// just in case something somehow wrent wrong...
-	if (type() == HiddenAutomationTrack)
-	{
-		setMuted(false);
-	}
+	if (type() == HiddenAutomationTrack) { setMuted(false); }
 }
 
 AutomationTrackView::AutomationTrackView(AutomationTrack* _at, TrackContainerView* tcv)
@@ -96,10 +93,7 @@ void AutomationTrackView::dropEvent(QDropEvent* _de)
 					static_cast<int>(trackContainerView()->pixelsPerBar()))
 							  .toAbsoluteBar();
 
-			if (pos.getTicks() < 0)
-			{
-				pos.setTicks(0);
-			}
+			if (pos.getTicks() < 0) { pos.setTicks(0); }
 
 			TrackContentObject* tco = getTrack()->createTCO(pos);
 			AutomationPattern* pat = dynamic_cast<AutomationPattern*>(tco);

@@ -188,14 +188,8 @@ void InstrumentMidiIOView::modelChanged()
 	m_baseVelocitySpinBox->setModel(&mp->m_baseVelocityModel);
 #endif
 
-	if (m_rpBtn)
-	{
-		m_rpBtn->setMenu(mp->m_readablePortsMenu);
-	}
-	if (m_wpBtn)
-	{
-		m_wpBtn->setMenu(mp->m_writablePortsMenu);
-	}
+	if (m_rpBtn) { m_rpBtn->setMenu(mp->m_readablePortsMenu); }
+	if (m_wpBtn) { m_wpBtn->setMenu(mp->m_writablePortsMenu); }
 }
 
 InstrumentMiscView::InstrumentMiscView(InstrumentTrack* it, QWidget* parent)

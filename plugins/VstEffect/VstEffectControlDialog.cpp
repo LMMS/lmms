@@ -62,10 +62,7 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 
 		if (embed_vst)
 		{
-			if (m_plugin->hasEditor() && !m_plugin->pluginWidget())
-			{
-				m_plugin->createUI(this);
-			}
+			if (m_plugin->hasEditor() && !m_plugin->pluginWidget()) { m_plugin->createUI(this); }
 			m_pluginWidget = m_plugin->pluginWidget();
 		}
 	}
@@ -186,10 +183,7 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 
 		int newSize = 0;
 
-		if (m_pluginWidget)
-		{
-			newSize = m_pluginWidget->width() + 20;
-		}
+		if (m_pluginWidget) { newSize = m_pluginWidget->width() + 20; }
 		newSize = std::max(newSize, 250);
 
 		QWidget* resize = new QWidget(this);
@@ -202,10 +196,7 @@ VstEffectControlDialog::VstEffectControlDialog(VstEffectControls* _ctl)
 
 		l->addItem(new QSpacerItem(newSize - 20, 30, QSizePolicy::Fixed, QSizePolicy::Fixed), 1, 0);
 		l->addWidget(resize, 2, 0, 1, 1, Qt::AlignCenter);
-		if (m_pluginWidget)
-		{
-			l->addWidget(m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter);
-		}
+		if (m_pluginWidget) { l->addWidget(m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter); }
 		l->setRowStretch(5, 1);
 		l->setColumnStretch(1, 1);
 
@@ -244,10 +235,7 @@ void VstEffectControlDialog::showEvent(QShowEvent* _se)
 	// Workaround for a (unexplained) bug where on project-load the effect
 	// control window has size 0 and would only restore to the proper size upon
 	// moving the window or interacting with it.
-	if (parentWidget())
-	{
-		parentWidget()->adjustSize();
-	}
+	if (parentWidget()) { parentWidget()->adjustSize(); }
 }
 
 VstEffectControlDialog::~VstEffectControlDialog()
@@ -261,20 +249,11 @@ VstEffectControlDialog::~VstEffectControlDialog()
 
 void VstEffectControlDialog::togglePluginUI(bool checked)
 {
-	if (!m_plugin)
-	{
-		return;
-	}
+	if (!m_plugin) { return; }
 
-	if (m_togglePluginButton->isChecked() != checked)
-	{
-		m_togglePluginButton->setChecked(checked);
-	}
+	if (m_togglePluginButton->isChecked() != checked) { m_togglePluginButton->setChecked(checked); }
 
-	if (checked)
-	{
-		m_plugin->showUI();
-	}
+	if (checked) { m_plugin->showUI(); }
 	else
 	{
 		m_plugin->hideUI();

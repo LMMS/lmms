@@ -133,29 +133,14 @@ void NesObject::renderOutput(sampleFrame* buf, fpp_t frames)
 	int ch2Sweep = static_cast<int>(m_parent->m_ch2SweepAmt.value() * -1.0);
 
 	int ch4Sweep = 0;
-	if (m_parent->m_ch4Sweep.value() != 0.0f)
-	{
-		ch4Sweep = m_parent->m_ch4Sweep.value() > 0.0f ? -1 : 1;
-	}
+	if (m_parent->m_ch4Sweep.value() != 0.0f) { ch4Sweep = m_parent->m_ch4Sweep.value() > 0.0f ? -1 : 1; }
 
 	// the amounts are inverted so we correct them here
-	if (ch1Sweep > 0)
-	{
-		ch1Sweep = 8 - ch1Sweep;
-	}
-	if (ch1Sweep < 0)
-	{
-		ch1Sweep = -8 - ch1Sweep;
-	}
+	if (ch1Sweep > 0) { ch1Sweep = 8 - ch1Sweep; }
+	if (ch1Sweep < 0) { ch1Sweep = -8 - ch1Sweep; }
 
-	if (ch2Sweep > 0)
-	{
-		ch2Sweep = 8 - ch2Sweep;
-	}
-	if (ch2Sweep < 0)
-	{
-		ch2Sweep = -8 - ch2Sweep;
-	}
+	if (ch2Sweep > 0) { ch2Sweep = 8 - ch2Sweep; }
+	if (ch2Sweep < 0) { ch2Sweep = -8 - ch2Sweep; }
 
 	// start framebuffer loop
 
@@ -199,10 +184,7 @@ void NesObject::renderOutput(sampleFrame* buf, fpp_t frames)
 			if (m_parent->m_ch1SweepEnabled.value() && m_wlen1 <= m_maxWlen && m_wlen1 >= MIN_WLEN)
 			{
 				// check if the sweep goes up or down
-				if (ch1Sweep > 0)
-				{
-					m_wlen1 += m_wlen1 >> qAbs(ch1Sweep);
-				}
+				if (ch1Sweep > 0) { m_wlen1 += m_wlen1 >> qAbs(ch1Sweep); }
 				if (ch1Sweep < 0)
 				{
 					m_wlen1 -= m_wlen1 >> qAbs(ch1Sweep);
@@ -220,10 +202,7 @@ void NesObject::renderOutput(sampleFrame* buf, fpp_t frames)
 		{
 			m_ch1EnvCounter = 0;
 			m_ch1EnvValue--;
-			if (m_ch1EnvValue < 0)
-			{
-				m_ch1EnvValue = ch1EnvLoop ? 15 : 0;
-			}
+			if (m_ch1EnvValue < 0) { m_ch1EnvValue = ch1EnvLoop ? 15 : 0; }
 		}
 
 		////////////////////////////////
@@ -251,14 +230,8 @@ void NesObject::renderOutput(sampleFrame* buf, fpp_t frames)
 			if (m_parent->m_ch2SweepEnabled.value() && m_wlen2 <= m_maxWlen && m_wlen2 >= MIN_WLEN)
 			{
 				// check if the sweep goes up or down
-				if (ch2Sweep > 0)
-				{
-					m_wlen2 += m_wlen2 >> qAbs(ch2Sweep);
-				}
-				if (ch2Sweep < 0)
-				{
-					m_wlen2 -= m_wlen2 >> qAbs(ch2Sweep);
-				}
+				if (ch2Sweep > 0) { m_wlen2 += m_wlen2 >> qAbs(ch2Sweep); }
+				if (ch2Sweep < 0) { m_wlen2 -= m_wlen2 >> qAbs(ch2Sweep); }
 			}
 		}
 
@@ -271,10 +244,7 @@ void NesObject::renderOutput(sampleFrame* buf, fpp_t frames)
 		{
 			m_ch2EnvCounter = 0;
 			m_ch2EnvValue--;
-			if (m_ch2EnvValue < 0)
-			{
-				m_ch2EnvValue = ch2EnvLoop ? 15 : 0;
-			}
+			if (m_ch2EnvValue < 0) { m_ch2EnvValue = ch2EnvLoop ? 15 : 0; }
 		}
 
 		////////////////////////////////
@@ -327,10 +297,7 @@ void NesObject::renderOutput(sampleFrame* buf, fpp_t frames)
 		{
 			m_ch4EnvCounter = 0;
 			m_ch4EnvValue--;
-			if (m_ch4EnvValue < 0)
-			{
-				m_ch4EnvValue = ch4EnvLoop ? 15 : 0;
-			}
+			if (m_ch4EnvValue < 0) { m_ch4EnvValue = ch4EnvLoop ? 15 : 0; }
 		}
 
 		m_ch4SweepCounter++;
@@ -416,10 +383,7 @@ void NesObject::updatePitch()
 {
 	float freq = m_nph->frequency();
 	// if vibrato is active, update vibrato
-	if (m_parent->m_vibrato.value() > 0)
-	{
-		updateVibrato(&freq);
-	}
+	if (m_parent->m_vibrato.value() > 0) { updateVibrato(&freq); }
 	// check if frequency has changed, if so, update wavelengths of ch1-3
 	if (freq != m_lastNoteFreq)
 	{
@@ -676,10 +640,7 @@ NesInstrumentView::NesInstrumentView(Instrument* instrument, QWidget* parent)
 	setAutoFillBackground(true);
 	QPalette pal;
 
-	if (s_artwork == NULL)
-	{
-		s_artwork = new QPixmap(PLUGIN_NAME::getIconPixmap("artwork"));
-	}
+	if (s_artwork == NULL) { s_artwork = new QPixmap(PLUGIN_NAME::getIconPixmap("artwork")); }
 
 	pal.setBrush(backgroundRole(), *s_artwork);
 	setPalette(pal);

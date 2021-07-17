@@ -150,9 +150,7 @@ public:
 
 		m_data = (shmData*)m_shmObj.data();
 #else
-		while ((m_shmID = shmget(++m_shmKey, sizeof(shmData), IPC_CREAT | IPC_EXCL | 0600)) == -1)
-		{
-		}
+		while ((m_shmID = shmget(++m_shmKey, sizeof(shmData), IPC_CREAT | IPC_EXCL | 0600)) == -1) {}
 		m_data = (shmData*)shmat(m_shmID, 0, 0);
 #endif
 		assert(m_data != NULL);
@@ -184,15 +182,9 @@ public:
 		, m_lockDepth(0)
 	{
 #ifdef USE_QT_SHMEM
-		if (m_shmObj.attach())
-		{
-			m_data = (shmData*)m_shmObj.data();
-		}
+		if (m_shmObj.attach()) { m_data = (shmData*)m_shmObj.data(); }
 #else
-		if (m_shmID != -1)
-		{
-			m_data = (shmData*)shmat(m_shmID, 0, 0);
-		}
+		if (m_shmID != -1) { m_data = (shmData*)shmat(m_shmID, 0, 0); }
 #endif
 		assert(m_data != NULL);
 		m_dataSem.setKey(QString::number(m_data->dataSem.semKey));
@@ -223,28 +215,19 @@ public:
 	// recursive lock
 	inline void lock()
 	{
-		if (!isInvalid() && m_lockDepth.fetch_add(1) == 0)
-		{
-			m_dataSem.acquire();
-		}
+		if (!isInvalid() && m_lockDepth.fetch_add(1) == 0) { m_dataSem.acquire(); }
 	}
 
 	// recursive unlock
 	inline void unlock()
 	{
-		if (m_lockDepth.fetch_sub(1) <= 1)
-		{
-			m_dataSem.release();
-		}
+		if (m_lockDepth.fetch_sub(1) <= 1) { m_dataSem.release(); }
 	}
 
 	// wait until message-semaphore is available
 	inline void waitForMessage()
 	{
-		if (!isInvalid())
-		{
-			m_messageSem.acquire();
-		}
+		if (!isInvalid()) { m_messageSem.acquire(); }
 	}
 
 	// increase message-semaphore
@@ -283,10 +266,7 @@ public:
 
 	inline bool messagesLeft()
 	{
-		if (isInvalid())
-		{
-			return false;
-		}
+		if (isInvalid()) { return false; }
 		lock();
 		const bool empty = (m_data->startPtr == m_data->endPtr);
 		unlock();
@@ -299,10 +279,7 @@ private:
 	static inline void fastMemCpy(void* _dest, const void* _src, const int _len)
 	{
 		// calling memcpy() for just an integer is obsolete overhead
-		if (_len == 4)
-		{
-			*((int32_t*)_dest) = *((int32_t*)_src);
-		}
+		if (_len == 4) { *((int32_t*)_dest) = *((int32_t*)_src); }
 		else
 		{
 			memcpy(_dest, _src, _len);
@@ -338,10 +315,7 @@ private:
 
 	void write(const void* _buf, int _len)
 	{
-		if (isInvalid() || _len > SHM_FIFO_SIZE)
-		{
-			return;
-		}
+		if (isInvalid() || _len > SHM_FIFO_SIZE) { return; }
 		lock();
 		while (_len > SHM_FIFO_SIZE - m_data->endPtr)
 		{
@@ -554,10 +528,7 @@ public:
 		pollin.fd = m_socket;
 		pollin.events = POLLIN;
 
-		if (poll(&pollin, 1, 0) == -1)
-		{
-			qWarning("Unexpected poll error.");
-		}
+		if (poll(&pollin, 1, 0) == -1) { qWarning("Unexpected poll error."); }
 		return pollin.revents & POLLIN;
 #endif
 	}
@@ -638,10 +609,7 @@ private:
 
 	void write(const void* _buf, int _len)
 	{
-		if (isInvalid())
-		{
-			return;
-		}
+		if (isInvalid()) { return; }
 		const char* buf = (const char*)_buf;
 		int remaining = _len;
 		while (remaining)
@@ -984,18 +952,12 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(const message& _wm, b
 			: m_depth(depth)
 			, m_busy(busy)
 		{
-			if (m_busy)
-			{
-				++m_depth;
-			}
+			if (m_busy) { ++m_depth; }
 		}
 
 		~WaitDepthCounter()
 		{
-			if (m_busy)
-			{
-				--m_depth;
-			}
+			if (m_busy) { --m_depth; }
 		}
 
 		int& m_depth;
@@ -1015,10 +977,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(const message& _wm, b
 #endif
 		message m = receiveMessage();
 		processMessage(m);
-		if (m.id == _wm.id)
-		{
-			return m;
-		}
+		if (m.id == _wm.id) { return m; }
 		else if (m.id == IdUndefined)
 		{
 			return m;
@@ -1067,10 +1026,7 @@ RemotePluginClient::RemotePluginClient(const char* socketPath)
 	sa.sun_path[length] = '\0';
 
 	m_socket = socket(PF_LOCAL, SOCK_STREAM, 0);
-	if (m_socket == -1)
-	{
-		fprintf(stderr, "Could not connect to local server.\n");
-	}
+	if (m_socket == -1) { fprintf(stderr, "Could not connect to local server.\n"); }
 	if (::connect(m_socket, (struct sockaddr*)&sa, sizeof sa) == -1)
 	{
 		fprintf(stderr, "Could not connect to local server.\n");
@@ -1090,23 +1046,14 @@ RemotePluginClient::RemotePluginClient(const char* socketPath)
 	key_t key;
 	int m_shmID;
 
-	if ((key = ftok(VST_SNC_SHM_KEY_FILE, 'R')) == -1)
-	{
-		perror("RemotePluginClient::ftok");
-	}
+	if ((key = ftok(VST_SNC_SHM_KEY_FILE, 'R')) == -1) { perror("RemotePluginClient::ftok"); }
 	else
 	{ // connect to shared memory segment
-		if ((m_shmID = shmget(key, 0, 0)) == -1)
-		{
-			perror("RemotePluginClient::shmget");
-		}
+		if ((m_shmID = shmget(key, 0, 0)) == -1) { perror("RemotePluginClient::shmget"); }
 		else
 		{ // attach segment
 			m_vstSyncData = (VstSyncData*)shmat(m_shmID, 0, 0);
-			if (m_vstSyncData == (VstSyncData*)(-1))
-			{
-				perror("RemotePluginClient::shmat");
-			}
+			if (m_vstSyncData == (VstSyncData*)(-1)) { perror("RemotePluginClient::shmat"); }
 			else
 			{
 				m_bufferSize = m_vstSyncData->m_bufferSize;
@@ -1114,10 +1061,7 @@ RemotePluginClient::RemotePluginClient(const char* socketPath)
 				sendMessage(IdHostInfoGotten);
 
 				// detach segment
-				if (shmdt(m_vstSyncData) == -1)
-				{
-					perror("RemotePluginClient::shmdt");
-				}
+				if (shmdt(m_vstSyncData) == -1) { perror("RemotePluginClient::shmdt"); }
 				return;
 			}
 		}
@@ -1146,10 +1090,7 @@ RemotePluginClient::~RemotePluginClient()
 #endif
 
 #ifndef SYNC_WITH_SHM_FIFO
-	if (close(m_socket) == -1)
-	{
-		fprintf(stderr, "Error freeing resources.\n");
-	}
+	if (close(m_socket) == -1) { fprintf(stderr, "Error freeing resources.\n"); }
 #endif
 }
 
@@ -1209,10 +1150,7 @@ bool RemotePluginClient::processMessage(const message& _m)
 		break;
 	}
 	}
-	if (reply)
-	{
-		sendMessage(reply_message);
-	}
+	if (reply) { sendMessage(reply_message); }
 
 	return true;
 }
@@ -1221,10 +1159,7 @@ void RemotePluginClient::setShmKey(key_t _key, int _size)
 {
 #ifdef USE_QT_SHMEM
 	m_shmObj.setKey(QString::number(_key));
-	if (m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError)
-	{
-		m_shm = (float*)m_shmObj.data();
-	}
+	if (m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError) { m_shm = (float*)m_shmObj.data(); }
 	else
 	{
 		char buf[64];
@@ -1239,16 +1174,10 @@ void RemotePluginClient::setShmKey(key_t _key, int _size)
 	}
 
 	// only called for detaching SHM?
-	if (_key == 0)
-	{
-		return;
-	}
+	if (_key == 0) { return; }
 
 	int shm_id = shmget(_key, _size, 0);
-	if (shm_id == -1)
-	{
-		debugMessage("failed getting shared memory\n");
-	}
+	if (shm_id == -1) { debugMessage("failed getting shared memory\n"); }
 	else
 	{
 		m_shm = (float*)shmat(shm_id, 0, 0);

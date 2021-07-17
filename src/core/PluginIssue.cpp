@@ -85,9 +85,6 @@ bool PluginIssue::operator<(const PluginIssue& other) const
 QDebug operator<<(QDebug stream, const PluginIssue& iss)
 {
 	stream << PluginIssue::msgFor(iss.m_issueType);
-	if (iss.m_info.length())
-	{
-		stream.nospace() << ": " << iss.m_info.c_str();
-	}
+	if (iss.m_info.length()) { stream.nospace() << ": " << iss.m_info.c_str(); }
 	return stream;
 }

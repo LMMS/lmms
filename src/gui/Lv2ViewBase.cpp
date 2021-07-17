@@ -197,10 +197,7 @@ void Lv2ViewBase::toggleHelp(bool visible)
 void Lv2ViewBase::modelChanged(Lv2ControlBase* ctrlBase)
 {
 	// reconnect models
-	if (m_toggleUIButton)
-	{
-		m_toggleUIButton->setChecked(ctrlBase->hasGui());
-	}
+	if (m_toggleUIButton) { m_toggleUIButton->setChecked(ctrlBase->hasGui()); }
 
 	LinkedModelGroupsView::modelChanged(ctrlBase);
 }

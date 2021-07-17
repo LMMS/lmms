@@ -100,10 +100,7 @@ public:
 	inline double update(double in, ch_cnt_t ch)
 	{
 		int readPos = m_position - m_delay;
-		if (readPos < 0)
-		{
-			readPos += m_size;
-		}
+		if (readPos < 0) { readPos += m_size; }
 
 		const double y = linearInterpolate(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction);
 
@@ -163,10 +160,7 @@ template <ch_cnt_t CHANNELS> class CombFeedfwd
 	inline double update(double in, ch_cnt_t ch)
 	{
 		int readPos = m_position - m_delay;
-		if (readPos < 0)
-		{
-			readPos += m_size;
-		}
+		if (readPos < 0) { readPos += m_size; }
 
 		const double y =
 			linearInterpolate(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction) + in * m_gain;
@@ -230,16 +224,10 @@ template <ch_cnt_t CHANNELS> class CombFeedbackDualtap
 	inline double update(double in, ch_cnt_t ch)
 	{
 		int readPos1 = m_position - m_delay1;
-		if (readPos1 < 0)
-		{
-			readPos1 += m_size;
-		}
+		if (readPos1 < 0) { readPos1 += m_size; }
 
 		int readPos2 = m_position - m_delay2;
-		if (readPos2 < 0)
-		{
-			readPos2 += m_size;
-		}
+		if (readPos2 < 0) { readPos2 += m_size; }
 
 		const double y = linearInterpolate(m_buffer[readPos1][ch], m_buffer[(readPos1 + 1) % m_size][ch], m_fraction1) +
 			linearInterpolate(m_buffer[readPos2][ch], m_buffer[(readPos2 + 1) % m_size][ch], m_fraction2);
@@ -303,10 +291,7 @@ public:
 	inline double update(double in, ch_cnt_t ch)
 	{
 		int readPos = m_position - m_delay;
-		if (readPos < 0)
-		{
-			readPos += m_size;
-		}
+		if (readPos < 0) { readPos += m_size; }
 
 		const double y =
 			linearInterpolate(m_buffer[readPos][ch], m_buffer[(readPos + 1) % m_size][ch], m_fraction) + in * -m_gain;

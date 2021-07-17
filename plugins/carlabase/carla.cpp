@@ -155,8 +155,7 @@ CarlaInstrument::CarlaInstrument(
 	fHandle = fDescriptor->instantiate(&fHost);
 	Q_ASSERT(fHandle != NULL);
 
-	if (fHandle != NULL && fDescriptor->activate != NULL)
-		fDescriptor->activate(fHandle);
+	if (fHandle != NULL && fDescriptor->activate != NULL) fDescriptor->activate(fHandle);
 
 	// we need a play-handle which cares for calling play()
 	InstrumentPlayHandle* iph = new InstrumentPlayHandle(this, instrumentTrack);
@@ -182,14 +181,11 @@ CarlaInstrument::~CarlaInstrument()
 		fHost.uiName = NULL;
 	}
 
-	if (fHandle == NULL)
-		return;
+	if (fHandle == NULL) return;
 
-	if (fDescriptor->deactivate != NULL)
-		fDescriptor->deactivate(fHandle);
+	if (fDescriptor->deactivate != NULL) fDescriptor->deactivate(fHandle);
 
-	if (fDescriptor->cleanup != NULL)
-		fDescriptor->cleanup(fHandle);
+	if (fDescriptor->cleanup != NULL) fDescriptor->cleanup(fHandle);
 
 	fHandle = NULL;
 }
@@ -239,13 +235,11 @@ QString CarlaInstrument::nodeName() const { return descriptor()->name; }
 
 void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
-	if (fHandle == NULL || fDescriptor->get_state == NULL)
-		return;
+	if (fHandle == NULL || fDescriptor->get_state == NULL) return;
 
 	char* const state = fDescriptor->get_state(fHandle);
 
-	if (state == NULL)
-		return;
+	if (state == NULL) return;
 
 	QDomDocument carlaDoc("carla");
 
@@ -260,8 +254,7 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 
 void CarlaInstrument::loadSettings(const QDomElement& elem)
 {
-	if (fHandle == NULL || fDescriptor->set_state == NULL)
-		return;
+	if (fHandle == NULL || fDescriptor->set_state == NULL) return;
 
 	QDomDocument carlaDoc("carla");
 	carlaDoc.appendChild(carlaDoc.importNode(elem.firstChildElement(), true));
@@ -326,8 +319,7 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_
 {
 	const QMutexLocker ml(&fMutex);
 
-	if (fMidiEventCount >= kMaxMidiEvents)
-		return false;
+	if (fMidiEventCount >= kMaxMidiEvents) return false;
 
 	NativeMidiEvent& nEvent(fMidiEvents[fMidiEventCount++]);
 	std::memset(&nEvent, 0, sizeof(NativeMidiEvent));
@@ -335,10 +327,7 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_
 	nEvent.port = 0;
 	nEvent.time = offset;
 	std::size_t written = writeToByteSeq(event, nEvent.data, sizeof(NativeMidiEvent::data));
-	if (written)
-	{
-		nEvent.size = written;
-	}
+	if (written) { nEvent.size = written; }
 	else
 	{
 		--fMidiEventCount;
@@ -407,8 +396,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
 
 CarlaInstrumentView::~CarlaInstrumentView()
 {
-	if (m_toggleUIButton->isChecked())
-		toggleUI(false);
+	if (m_toggleUIButton->isChecked()) toggleUI(false);
 }
 
 void CarlaInstrumentView::toggleUI(bool visible)
@@ -437,8 +425,7 @@ void CarlaInstrumentView::modelChanged() {}
 
 void CarlaInstrumentView::timerEvent(QTimerEvent* event)
 {
-	if (event->timerId() == fTimerId)
-		fDescriptor->ui_idle(fHandle);
+	if (event->timerId() == fTimerId) fDescriptor->ui_idle(fHandle);
 
 	InstrumentView::timerEvent(event);
 }

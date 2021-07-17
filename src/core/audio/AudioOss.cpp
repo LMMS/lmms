@@ -116,10 +116,7 @@ AudioOss::AudioOss(bool& _success_ful, Mixer* _mixer)
 	}
 
 	// Set the audio format
-	if (value & AFMT_S16_LE)
-	{
-		value = AFMT_S16_LE;
-	}
+	if (value & AFMT_S16_LE) { value = AFMT_S16_LE; }
 	else if (value & AFMT_S16_BE)
 	{
 		value = AFMT_S16_BE;
@@ -189,10 +186,7 @@ QString AudioOss::probeDevice()
 	{
 		char* adev = getenv("AUDIODEV"); // Is there a standard
 										 // variable name?
-		if (adev != NULL)
-		{
-			dev = adev;
-		}
+		if (adev != NULL) { dev = adev; }
 		else
 		{
 			dev = _PATH_DEV_DSP; // default device
@@ -211,10 +205,7 @@ QString AudioOss::probeDevice()
 				dev = _PATH_DEV_DSP;
 				break;
 			}
-			if (QFileInfo(dev).isWritable())
-			{
-				break;
-			}
+			if (QFileInfo(dev).isWritable()) { break; }
 		}
 	}
 	return dev;
@@ -222,10 +213,7 @@ QString AudioOss::probeDevice()
 
 void AudioOss::startProcessing()
 {
-	if (!isRunning())
-	{
-		start(QThread::HighPriority);
-	}
+	if (!isRunning()) { start(QThread::HighPriority); }
 }
 
 void AudioOss::stopProcessing() { stopProcessingThread(this); }
@@ -267,16 +255,10 @@ void AudioOss::run()
 	while (true)
 	{
 		const fpp_t frames = getNextBuffer(temp);
-		if (!frames)
-		{
-			break;
-		}
+		if (!frames) { break; }
 
 		int bytes = convertToS16(temp, frames, mixer()->masterGain(), outbuf, m_convertEndian);
-		if (write(m_audioFD, outbuf, bytes) != bytes)
-		{
-			break;
-		}
+		if (write(m_audioFD, outbuf, bytes) != bytes) { break; }
 	}
 
 	delete[] temp;

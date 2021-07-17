@@ -160,8 +160,7 @@ InstrumentTrack::~InstrumentTrack()
 	silenceAllNotes(true);
 
 	// now we're save deleting the instrument
-	if (m_instrument)
-		delete m_instrument;
+	if (m_instrument) delete m_instrument;
 }
 
 void InstrumentTrack::processAudioBuffer(sampleFrame* buf, const fpp_t frames, NotePlayHandle* n)
@@ -242,10 +241,7 @@ MidiEvent InstrumentTrack::applyMasterKey(const MidiEvent& event)
 void InstrumentTrack::processCCEvent(int controller)
 {
 	// Does nothing if the LED is disabled
-	if (!m_midiCCEnable->value())
-	{
-		return;
-	}
+	if (!m_midiCCEnable->value()) { return; }
 
 	uint8_t channel = static_cast<uint8_t>(midiPort()->realOutputChannel());
 	uint16_t cc = static_cast<uint16_t>(controller);
@@ -259,10 +255,7 @@ void InstrumentTrack::processCCEvent(int controller)
 
 void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
-	if (Engine::getSong()->isExporting() && event.source() == MidiEvent::Source::External)
-	{
-		return;
-	}
+	if (Engine::getSong()->isExporting() && event.source() == MidiEvent::Source::External) { return; }
 
 	bool eventHandled = false;
 
@@ -280,10 +273,7 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 					Note(TimePos(), TimePos(), event.key(), event.volume(midiPort()->baseVelocity())), NULL,
 					event.channel(), NotePlayHandle::OriginMidiInput);
 				m_notes[event.key()] = nph;
-				if (!Engine::mixer()->addPlayHandle(nph))
-				{
-					m_notes[event.key()] = NULL;
-				}
+				if (!Engine::mixer()->addPlayHandle(nph)) { m_notes[event.key()] = NULL; }
 			}
 			eventHandled = true;
 			break;
@@ -325,10 +315,7 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 	case MidiControlChange:
 		if (event.controllerNumber() == MidiControllerSustain)
 		{
-			if (event.controllerValue() > MidiMaxControllerValue / 2)
-			{
-				m_sustainPedalPressed = true;
-			}
+			if (event.controllerValue() > MidiMaxControllerValue / 2) { m_sustainPedalPressed = true; }
 			else if (isSustainPedalPressed())
 			{
 				for (NotePlayHandle* nph : m_sustainedNotes)
@@ -388,10 +375,7 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
 {
 	// do nothing if we do not have an instrument instance (e.g. when loading settings)
-	if (m_instrument == NULL)
-	{
-		return;
-	}
+	if (m_instrument == NULL) { return; }
 
 	const MidiEvent transposedEvent = applyMasterKey(event);
 	const int key = transposedEvent.key();
@@ -457,10 +441,7 @@ void InstrumentTrack::silenceAllNotes(bool removeIPH)
 	m_processHandles.clear();
 
 	quint8 flags = PlayHandle::TypeNotePlayHandle | PlayHandle::TypePresetPreviewHandle;
-	if (removeIPH)
-	{
-		flags |= PlayHandle::TypeInstrumentPlayHandle;
-	}
+	if (removeIPH) { flags |= PlayHandle::TypeInstrumentPlayHandle; }
 	Engine::mixer()->removePlayHandlesOfTypes(this, flags);
 	Engine::mixer()->doneChangeInModel();
 }
@@ -470,10 +451,7 @@ f_cnt_t InstrumentTrack::beatLen(NotePlayHandle* _n) const
 	if (m_instrument != NULL)
 	{
 		const f_cnt_t len = m_instrument->beatLen(_n);
-		if (len > 0)
-		{
-			return len;
-		}
+		if (len > 0) { return len; }
 	}
 	return m_soundShaping.envFrames();
 }
@@ -494,19 +472,13 @@ void InstrumentTrack::playNote(NotePlayHandle* n, sampleFrame* workingBuffer)
 
 QString InstrumentTrack::instrumentName() const
 {
-	if (m_instrument != NULL)
-	{
-		return m_instrument->displayName();
-	}
+	if (m_instrument != NULL) { return m_instrument->displayName(); }
 	return QString();
 }
 
 void InstrumentTrack::deleteNotePluginData(NotePlayHandle* n)
 {
-	if (m_instrument != NULL)
-	{
-		m_instrument->deleteNotePluginData(n);
-	}
+	if (m_instrument != NULL) { m_instrument->deleteNotePluginData(n); }
 }
 
 void InstrumentTrack::setName(const QString& _new_name)
@@ -565,10 +537,7 @@ void InstrumentTrack::removeMidiPortNode(DataFile& _dataFile)
 
 bool InstrumentTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t _offset, int _tco_num)
 {
-	if (!m_instrument || !tryLock())
-	{
-		return false;
-	}
+	if (!m_instrument || !tryLock()) { return false; }
 	const float frames_per_tick = Engine::framesPerTick();
 
 	tcoVector tcos;
@@ -606,15 +575,9 @@ bool InstrumentTrack::play(const TimePos& _start, const fpp_t _frames, const f_c
 		Pattern* p = dynamic_cast<Pattern*>(*it);
 		// everything which is not a pattern won't be played
 		// A pattern playing in the Piano Roll window will always play
-		if (p == NULL || (Engine::getSong()->playMode() != Song::Mode_PlayPattern && (*it)->isMuted()))
-		{
-			continue;
-		}
+		if (p == NULL || (Engine::getSong()->playMode() != Song::Mode_PlayPattern && (*it)->isMuted())) { continue; }
 		TimePos cur_start = _start;
-		if (_tco_num < 0)
-		{
-			cur_start -= p->startPosition();
-		}
+		if (_tco_num < 0) { cur_start -= p->startPosition(); }
 
 		// get all notes from the given pattern...
 		const NoteVector& notes = p->notes();
@@ -691,10 +654,7 @@ void InstrumentTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& 
 		QDomElement i = doc.createElement("instrument");
 		i.setAttribute("name", m_instrument->descriptor()->name);
 		QDomElement ins = m_instrument->saveState(doc, i);
-		if (m_instrument->key().isValid())
-		{
-			ins.appendChild(m_instrument->key().saveXML(doc));
-		}
+		if (m_instrument->key().isValid()) { ins.appendChild(m_instrument->key().saveXML(doc)); }
 		thisElement.appendChild(i);
 	}
 	m_soundShaping.saveState(doc, thisElement);
@@ -732,10 +692,7 @@ void InstrumentTrack::loadTrackSpecificSettings(const QDomElement& thisElement)
 	m_pitchRangeModel.loadSettings(thisElement, "pitchrange");
 	m_pitchModel.loadSettings(thisElement, "pitch");
 	m_effectChannelModel.setRange(0, Engine::fxMixer()->numChannels() - 1);
-	if (!m_previewMode)
-	{
-		m_effectChannelModel.loadSettings(thisElement, "fxch");
-	}
+	if (!m_previewMode) { m_effectChannelModel.loadSettings(thisElement, "fxch"); }
 	m_baseNoteModel.loadSettings(thisElement, "basenote");
 	m_useMasterPitchModel.loadSettings(thisElement, "usemasterpitch");
 
@@ -751,10 +708,7 @@ void InstrumentTrack::loadTrackSpecificSettings(const QDomElement& thisElement)
 	{
 		if (node.isElement())
 		{
-			if (m_soundShaping.nodeName() == node.nodeName())
-			{
-				m_soundShaping.restoreState(node.toElement());
-			}
+			if (m_soundShaping.nodeName() == node.nodeName()) { m_soundShaping.restoreState(node.toElement()); }
 			else if (m_noteStacking.nodeName() == node.nodeName())
 			{
 				m_noteStacking.restoreState(node.toElement());
@@ -776,10 +730,7 @@ void InstrumentTrack::loadTrackSpecificSettings(const QDomElement& thisElement)
 				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
 				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
-				if (reuseInstrument)
-				{
-					m_instrument->restoreState(node.firstChildElement());
-				}
+				if (reuseInstrument) { m_instrument->restoreState(node.firstChildElement()); }
 				else
 				{
 					delete m_instrument;
@@ -805,10 +756,7 @@ void InstrumentTrack::loadTrackSpecificSettings(const QDomElement& thisElement)
 				delete m_instrument;
 				m_instrument = NULL;
 				m_instrument = Instrument::instantiate(node.nodeName(), this, nullptr, true);
-				if (m_instrument->nodeName() == node.nodeName())
-				{
-					m_instrument->restoreState(node.toElement());
-				}
+				if (m_instrument->nodeName() == node.nodeName()) { m_instrument->restoreState(node.toElement()); }
 				emit instrumentChanged();
 			}
 		}
@@ -827,18 +775,14 @@ void InstrumentTrack::setPreviewMode(const bool value) { m_previewMode = value; 
 QString InstrumentTrack::getSavedInstrumentName(const QDomElement& thisElement) const
 {
 	QDomElement elem = thisElement.firstChildElement("instrument");
-	if (!elem.isNull())
-	{
-		return elem.attribute("name");
-	}
+	if (!elem.isNull()) { return elem.attribute("name"); }
 	return "";
 }
 
 Instrument* InstrumentTrack::loadInstrument(
 	const QString& _plugin_name, const Plugin::Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd)
 {
-	if (keyFromDnd)
-		Q_ASSERT(!key);
+	if (keyFromDnd) Q_ASSERT(!key);
 
 	silenceAllNotes(true);
 
@@ -863,10 +807,7 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 {
 	if (assign)
 	{
-		if (s_autoAssignedTrack)
-		{
-			s_autoAssignedTrack->autoAssignMidiDevice(false);
-		}
+		if (s_autoAssignedTrack) { s_autoAssignedTrack->autoAssignMidiDevice(false); }
 		s_autoAssignedTrack = this;
 	}
 
@@ -990,15 +931,9 @@ void InstrumentTrackView::toggleMidiCCRack()
 {
 	// Lazy creation: midiCCRackView is only created when accessed the first time.
 	// this->model() returns pointer to the InstrumentTrack who owns this InstrumentTrackView.
-	if (!m_midiCCRackView)
-	{
-		m_midiCCRackView = std::unique_ptr<MidiCCRackView>(new MidiCCRackView(this->model()));
-	}
+	if (!m_midiCCRackView) { m_midiCCRackView = std::unique_ptr<MidiCCRackView>(new MidiCCRackView(this->model())); }
 
-	if (m_midiCCRackView->parentWidget()->isVisible())
-	{
-		m_midiCCRackView->parentWidget()->hide();
-	}
+	if (m_midiCCRackView->parentWidget()->isVisible()) { m_midiCCRackView->parentWidget()->hide(); }
 	else
 	{
 		m_midiCCRackView->parentWidget()->show();
@@ -1027,10 +962,7 @@ void InstrumentTrackView::createFxLine()
 	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor())
-	{
-		channel->setColor(getTrack()->color());
-	}
+	if (getTrack()->useColor()) { channel->setColor(getTrack()->color()); }
 
 	assignFxLine(channelIndex);
 }
@@ -1045,10 +977,7 @@ void InstrumentTrackView::assignFxLine(int channelIndex)
 
 InstrumentTrackWindow* InstrumentTrackView::getInstrumentTrackWindow()
 {
-	if (!m_window)
-	{
-		m_window = new InstrumentTrackWindow(this);
-	}
+	if (!m_window) { m_window = new InstrumentTrackWindow(this); }
 
 	return m_window;
 }
@@ -1066,10 +995,7 @@ void InstrumentTrackView::handleConfigChange(QString cls, QString attr, QString 
 void InstrumentTrackView::dragEnterEvent(QDragEnterEvent* _dee)
 {
 	InstrumentTrackWindow::dragEnterEventGeneric(_dee);
-	if (!_dee->isAccepted())
-	{
-		TrackView::dragEnterEvent(_dee);
-	}
+	if (!_dee->isAccepted()) { TrackView::dragEnterEvent(_dee); }
 }
 
 void InstrumentTrackView::dropEvent(QDropEvent* _de)
@@ -1082,10 +1008,7 @@ void InstrumentTrackView::toggleInstrumentWindow(bool _on)
 {
 	if (_on && ConfigManager::inst()->value("ui", "oneinstrumenttrackwindow").toInt())
 	{
-		if (topLevelInstrumentTrackWindow())
-		{
-			topLevelInstrumentTrackWindow()->m_itv->m_tlb->setChecked(false);
-		}
+		if (topLevelInstrumentTrackWindow()) { topLevelInstrumentTrackWindow()->m_itv->m_tlb->setChecked(false); }
 	}
 
 	getInstrumentTrackWindow()->toggleVisibility(_on);
@@ -1103,18 +1026,12 @@ void InstrumentTrackView::activityIndicatorReleased()
 
 void InstrumentTrackView::midiInSelected()
 {
-	if (model())
-	{
-		model()->m_midiPort.setReadable(m_midiInputAction->isChecked());
-	}
+	if (model()) { model()->m_midiPort.setReadable(m_midiInputAction->isChecked()); }
 }
 
 void InstrumentTrackView::midiOutSelected()
 {
-	if (model())
-	{
-		model()->m_midiPort.setWritable(m_midiOutputAction->isChecked());
-	}
+	if (model()) { model()->m_midiPort.setWritable(m_midiOutputAction->isChecked()); }
 }
 
 void InstrumentTrackView::midiConfigChanged()
@@ -1131,10 +1048,7 @@ QMenu* InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 	FxChannel* fxChannel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	// If title allows interpolation, pass channel index and name
-	if (title.contains("%2"))
-	{
-		title = title.arg(channelIndex).arg(fxChannel->m_name);
-	}
+	if (title.contains("%2")) { title = title.arg(channelIndex).arg(fxChannel->m_name); }
 
 	QMenu* fxMenu = new QMenu(title);
 
@@ -1373,10 +1287,7 @@ InstrumentTrackWindow::~InstrumentTrackWindow()
 
 void InstrumentTrackWindow::setInstrumentTrackView(InstrumentTrackView* view)
 {
-	if (m_itv && view)
-	{
-		m_itv->m_tlb->setChecked(false);
-	}
+	if (m_itv && view) { m_itv->m_tlb->setChecked(false); }
 
 	m_itv = view;
 	m_effectChannelNumber->setTrackView(m_itv);
@@ -1431,14 +1342,8 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	FileDialog sfd(this, tr("Save preset"), "", tr("XML preset file (*.xpf)"));
 
 	QString presetRoot = ConfigManager::inst()->userPresetsDir();
-	if (!QDir(presetRoot).exists())
-	{
-		QDir().mkdir(presetRoot);
-	}
-	if (!QDir(presetRoot + m_track->instrumentName()).exists())
-	{
-		QDir(presetRoot).mkdir(m_track->instrumentName());
-	}
+	if (!QDir(presetRoot).exists()) { QDir().mkdir(presetRoot); }
+	if (!QDir(presetRoot + m_track->instrumentName()).exists()) { QDir(presetRoot).mkdir(m_track->instrumentName()); }
 
 	sfd.setAcceptMode(FileDialog::AcceptSave);
 	sfd.setDirectory(presetRoot + m_track->instrumentName());
@@ -1461,10 +1366,7 @@ void InstrumentTrackWindow::updateName()
 {
 	setWindowTitle(m_track->name().length() > 25 ? (m_track->name().left(24) + "...") : m_track->name());
 
-	if (m_nameLineEdit->text() != m_track->name())
-	{
-		m_nameLineEdit->setText(m_track->name());
-	}
+	if (m_nameLineEdit->text() != m_track->name()) { m_nameLineEdit->setText(m_track->name()); }
 }
 
 void InstrumentTrackWindow::updateInstrumentView()
@@ -1486,10 +1388,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 		// adjust window size
 		layout()->invalidate();
 		resize(sizeHint());
-		if (parentWidget())
-		{
-			parentWidget()->resize(parentWidget()->sizeHint());
-		}
+		if (parentWidget()) { parentWidget()->resize(parentWidget()->sizeHint()); }
 		update();
 		m_instrumentView->update();
 	}
@@ -1519,10 +1418,7 @@ void InstrumentTrackWindow::closeEvent(QCloseEvent* event)
 {
 	event->ignore();
 
-	if (gui->mainWindow()->workspace())
-	{
-		parentWidget()->hide();
-	}
+	if (gui->mainWindow()->workspace()) { parentWidget()->hide(); }
 	else
 	{
 		hide();
@@ -1534,10 +1430,7 @@ void InstrumentTrackWindow::closeEvent(QCloseEvent* event)
 
 void InstrumentTrackWindow::focusInEvent(QFocusEvent*)
 {
-	if (m_pianoView->isVisible())
-	{
-		m_pianoView->setFocus();
-	}
+	if (m_pianoView->isVisible()) { m_pianoView->setFocus(); }
 }
 
 void InstrumentTrackWindow::dragEnterEventGeneric(QDragEnterEvent* event)
@@ -1601,10 +1494,7 @@ void InstrumentTrackWindow::loadSettings(const QDomElement& thisElement)
 {
 	m_tabWidget->setActiveTab(thisElement.attribute("tab").toInt());
 	MainWindow::restoreWidgetState(this, thisElement);
-	if (isVisible())
-	{
-		m_itv->m_tlb->setChecked(true);
-	}
+	if (isVisible()) { m_itv->m_tlb->setChecked(true); }
 }
 
 void InstrumentTrackWindow::viewInstrumentInDirection(int d)
@@ -1628,15 +1518,9 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		idxOfNext = (idxOfNext + d + trackViews.size()) % trackViews.size();
 		newView = dynamic_cast<InstrumentTrackView*>(trackViews[idxOfNext]);
 		// the window that should be brought to focus is the FIRST InstrumentTrackView that comes after us
-		if (bringToFront == nullptr && newView != nullptr)
-		{
-			bringToFront = newView;
-		}
+		if (bringToFront == nullptr && newView != nullptr) { bringToFront = newView; }
 		// if the next instrument doesn't have an active window, then exit loop & load that one into our window.
-		if (newView != nullptr && !newView->m_tlb->isChecked())
-		{
-			break;
-		}
+		if (newView != nullptr && !newView->m_tlb->isChecked()) { break; }
 	} while (idxOfNext != idxOfMe);
 
 	// avoid reloading the window if there is only one instrument, as that will just change the active tab

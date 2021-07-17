@@ -59,10 +59,7 @@ void RowDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, c
 		const QRect rect(option.rect);
 		painter->drawLine(rect.topLeft(), rect.topRight());
 		painter->drawLine(rect.bottomLeft(), rect.bottomRight());
-		if (index.column() == 0)
-		{
-			painter->drawLine(rect.topLeft(), rect.bottomLeft());
-		}
+		if (index.column() == 0) { painter->drawLine(rect.topLeft(), rect.bottomLeft()); }
 		if (index.column() == index.model()->columnCount() - 1)
 		{
 			painter->drawLine(rect.topRight(), rect.bottomRight());

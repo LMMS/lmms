@@ -60,10 +60,7 @@ void MidiWinMM::processOutEvent(const MidiEvent& event, const TimePos& time, con
 
 	for (QMap<HMIDIOUT, QString>::Iterator it = m_outputDevices.begin(); it != m_outputDevices.end(); ++it)
 	{
-		if (outDevs.contains(*it))
-		{
-			midiOutShortMsg(it.key(), shortMsg);
-		}
+		if (outDevs.contains(*it)) { midiOutShortMsg(it.key(), shortMsg); }
 	}
 }
 
@@ -105,10 +102,7 @@ void MidiWinMM::removePort(MidiPort* port)
 
 QString MidiWinMM::sourcePortName(const MidiEvent& event) const
 {
-	if (event.sourcePort())
-	{
-		return m_inputDevices.value(*static_cast<const HMIDIIN*>(event.sourcePort()));
-	}
+	if (event.sourcePort()) { return m_inputDevices.value(*static_cast<const HMIDIIN*>(event.sourcePort())); }
 
 	return MidiClient::sourcePortName(event);
 }
@@ -122,10 +116,7 @@ void MidiWinMM::subscribeReadablePort(MidiPort* port, const QString& dest, bool 
 	}
 
 	m_inputSubs[dest].removeAll(port);
-	if (subscribe)
-	{
-		m_inputSubs[dest].push_back(port);
-	}
+	if (subscribe) { m_inputSubs[dest].push_back(port); }
 }
 
 void MidiWinMM::subscribeWritablePort(MidiPort* port, const QString& dest, bool subscribe)
@@ -137,37 +128,25 @@ void MidiWinMM::subscribeWritablePort(MidiPort* port, const QString& dest, bool 
 	}
 
 	m_outputSubs[dest].removeAll(port);
-	if (subscribe)
-	{
-		m_outputSubs[dest].push_back(port);
-	}
+	if (subscribe) { m_outputSubs[dest].push_back(port); }
 }
 
 void WINAPI CALLBACK MidiWinMM::inputCallback(HMIDIIN hm, UINT msg, DWORD_PTR inst, DWORD_PTR param1, DWORD_PTR param2)
 {
-	if (msg == MIM_DATA)
-	{
-		((MidiWinMM*)inst)->handleInputEvent(hm, param1);
-	}
+	if (msg == MIM_DATA) { ((MidiWinMM*)inst)->handleInputEvent(hm, param1); }
 }
 
 void MidiWinMM::handleInputEvent(HMIDIIN hm, DWORD ev)
 {
 	const int cmd = ev & 0xff;
-	if (cmd == MidiActiveSensing)
-	{
-		return;
-	}
+	if (cmd == MidiActiveSensing) { return; }
 	const int par1 = (ev >> 8) & 0xff;
 	const int par2 = ev >> 16;
 	const MidiEventTypes cmdtype = static_cast<MidiEventTypes>(cmd & 0xf0);
 	const int chan = cmd & 0x0f;
 
 	const QString d = m_inputDevices.value(hm);
-	if (d.isEmpty() || !m_inputSubs.contains(d))
-	{
-		return;
-	}
+	if (d.isEmpty() || !m_inputSubs.contains(d)) { return; }
 
 	const MidiPortList& l = m_inputSubs[d];
 	for (MidiPortList::ConstIterator it = l.begin(); it != l.end(); ++it)
@@ -254,10 +233,7 @@ void MidiWinMM::openDevices()
 		midiOutGetDevCaps(i, &c, sizeof(c));
 		HMIDIOUT hm = 0;
 		MMRESULT res = midiOutOpen(&hm, i, 0, 0, CALLBACK_NULL);
-		if (res == MMSYSERR_NOERROR)
-		{
-			m_outputDevices[hm] = qstrdup(c.szPname);
-		}
+		if (res == MMSYSERR_NOERROR) { m_outputDevices[hm] = qstrdup(c.szPname); }
 	}
 }
 

@@ -48,10 +48,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& _file_name, QWidget* _pa
 	// Get the extension of the chosen file.
 	QStringList parts = _file_name.split('.');
 	QString fileExt;
-	if (parts.size() > 0)
-	{
-		fileExt = "." + parts[parts.size() - 1];
-	}
+	if (parts.size() > 0) { fileExt = "." + parts[parts.size() - 1]; }
 
 	int cbIndex = 0;
 	for (int i = 0; i < ProjectRenderer::NumFileFormats; ++i)
@@ -81,10 +78,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& _file_name, QWidget* _pa
 	for (int i = 0; i <= MAX_LEVEL; ++i)
 	{
 		QString info = "";
-		if (i == 0)
-		{
-			info = tr("( Fastest - biggest )");
-		}
+		if (i == 0) { info = tr("( Fastest - biggest )"); }
 		else if (i == MAX_LEVEL)
 		{
 			info = tr("( Slowest - smallest )");
@@ -103,10 +97,7 @@ ExportProjectDialog::ExportProjectDialog(const QString& _file_name, QWidget* _pa
 
 void ExportProjectDialog::reject()
 {
-	if (m_renderManager)
-	{
-		m_renderManager->abortProcessing();
-	}
+	if (m_renderManager) { m_renderManager->abortProcessing(); }
 	m_renderManager.reset(nullptr);
 
 	QDialog::reject();
@@ -123,10 +114,7 @@ void ExportProjectDialog::accept()
 void ExportProjectDialog::closeEvent(QCloseEvent* _ce)
 {
 	Engine::getSong()->setLoopRenderCount(1);
-	if (m_renderManager)
-	{
-		m_renderManager->abortProcessing();
-	}
+	if (m_renderManager) { m_renderManager->abortProcessing(); }
 
 	QDialog::closeEvent(_ce);
 }
@@ -186,10 +174,7 @@ void ExportProjectDialog::startExport()
 	connect(m_renderManager.get(), SIGNAL(finished()), this, SLOT(accept()));
 	connect(m_renderManager.get(), SIGNAL(finished()), gui->mainWindow(), SLOT(resetWindowTitle()));
 
-	if (m_multiExport)
-	{
-		m_renderManager->renderTracks();
-	}
+	if (m_multiExport) { m_renderManager->renderTracks(); }
 	else
 	{
 		m_renderManager->renderProject();

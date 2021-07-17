@@ -32,10 +32,7 @@ ToolButton::ToolButton(
 {
 	setAutoFillBackground(false);
 
-	if (_receiver != NULL && _slot != NULL)
-	{
-		connect(this, SIGNAL(clicked()), _receiver, _slot);
-	}
+	if (_receiver != NULL && _slot != NULL) { connect(this, SIGNAL(clicked()), _receiver, _slot); }
 	ToolTip::add(this, _tooltip);
 	setIcon(_pixmap);
 }

@@ -86,20 +86,11 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 
 		if (manager->areHintsSampleRateDependent(_key, row))
 		{
-			if (min != NOHINT)
-			{
-				min *= Engine::mixer()->processingSampleRate();
-			}
-			if (max != NOHINT)
-			{
-				max *= Engine::mixer()->processingSampleRate();
-			}
+			if (min != NOHINT) { min *= Engine::mixer()->processingSampleRate(); }
+			if (max != NOHINT) { max *= Engine::mixer()->processingSampleRate(); }
 		}
 
-		if (min == NOHINT)
-		{
-			range += "-Inf < ";
-		}
+		if (min == NOHINT) { range += "-Inf < "; }
 		else if (manager->isInteger(_key, row))
 		{
 			range += QString::number(static_cast<int>(min)) + " < ";
@@ -109,10 +100,7 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 			range += QString::number(min) + " < ";
 		}
 
-		if (def == NOHINT)
-		{
-			range += "None < ";
-		}
+		if (def == NOHINT) { range += "None < "; }
 		else if (manager->isInteger(_key, row))
 		{
 			range += QString::number(static_cast<int>(def)) + " < ";
@@ -122,10 +110,7 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 			range += QString::number(def) + " < ";
 		}
 
-		if (max == NOHINT)
-		{
-			range += "Inf";
-		}
+		if (max == NOHINT) { range += "Inf"; }
 		else if (manager->isInteger(_key, row))
 		{
 			range += QString::number(static_cast<int>(max));
@@ -135,23 +120,14 @@ ladspaPortDialog::ladspaPortDialog(const ladspa_key_t& _key)
 			range += QString::number(max);
 		}
 
-		if (manager->isPortOutput(_key, row) || manager->isPortToggled(_key, row))
-		{
-			range = "";
-		}
+		if (manager->isPortOutput(_key, row) || manager->isPortToggled(_key, row)) { range = ""; }
 
 		settings->item(row, col++)->setText(range);
 
-		if (manager->isLogarithmic(_key, row))
-		{
-			settings->item(row, col)->setText(tr("Yes"));
-		}
+		if (manager->isLogarithmic(_key, row)) { settings->item(row, col)->setText(tr("Yes")); }
 		col++;
 
-		if (manager->areHintsSampleRateDependent(_key, row))
-		{
-			settings->item(row, col)->setText(tr("Yes"));
-		}
+		if (manager->areHintsSampleRateDependent(_key, row)) { settings->item(row, col)->setText(tr("Yes")); }
 	}
 
 	vlayout->addWidget(settings);

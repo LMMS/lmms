@@ -110,14 +110,8 @@ bool dynProcEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 	}
 	else
 	{
-		if (m_dpControls.m_attackModel.isValueChanged())
-		{
-			calcAttack();
-		}
-		if (m_dpControls.m_releaseModel.isValueChanged())
-		{
-			calcRelease();
-		}
+		if (m_dpControls.m_attackModel.isValueChanged()) { calcAttack(); }
+		if (m_dpControls.m_releaseModel.isValueChanged()) { calcRelease(); }
 	}
 
 	for (fpp_t f = 0; f < _frames; ++f)
@@ -132,10 +126,7 @@ bool dynProcEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 		for (i = 0; i <= 1; i++)
 		{
 			const double t = m_rms[i]->update(s[i]);
-			if (t > m_currentPeak[i])
-			{
-				m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, t);
-			}
+			if (t > m_currentPeak[i]) { m_currentPeak[i] = qMin(m_currentPeak[i] * m_attCoeff, t); }
 			else if (t < m_currentPeak[i])
 			{
 				m_currentPeak[i] = qMax(m_currentPeak[i] * m_relCoeff, t);
@@ -171,10 +162,7 @@ bool dynProcEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 
 			if (sm_peak[i] > DYN_NOISE_FLOOR)
 			{
-				if (lookup < 1)
-				{
-					gain = frac * samples[0];
-				}
+				if (lookup < 1) { gain = frac * samples[0]; }
 				else if (lookup < 200)
 				{
 					gain = linearInterpolate(samples[lookup - 1], samples[lookup], frac);

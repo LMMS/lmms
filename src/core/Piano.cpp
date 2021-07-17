@@ -87,10 +87,7 @@ void Piano::setKeyState(int key, bool state)
  */
 void Piano::handleKeyPress(int key, int midiVelocity)
 {
-	if (midiVelocity == -1)
-	{
-		midiVelocity = m_instrumentTrack->midiPort()->baseVelocity();
-	}
+	if (midiVelocity == -1) { midiVelocity = m_instrumentTrack->midiPort()->baseVelocity(); }
 	if (isValidKey(key))
 	{
 		m_midiEvProc->processInEvent(MidiEvent(MidiNoteOn, -1, key, midiVelocity));

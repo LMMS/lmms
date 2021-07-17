@@ -81,14 +81,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView(QWidget* _parent)
 	, ModelView(NULL, this)
 	, m_params(NULL)
 {
-	if (s_envGraph == NULL)
-	{
-		s_envGraph = new QPixmap(embed::getIconPixmap("envelope_graph"));
-	}
-	if (s_lfoGraph == NULL)
-	{
-		s_lfoGraph = new QPixmap(embed::getIconPixmap("lfo_graph"));
-	}
+	if (s_envGraph == NULL) { s_envGraph = new QPixmap(embed::getIconPixmap("envelope_graph")); }
+	if (s_lfoGraph == NULL) { s_lfoGraph = new QPixmap(embed::getIconPixmap("lfo_graph")); }
 
 	m_predelayKnob = new Knob(knobBright_26, this);
 	m_predelayKnob->setLabel(tr("DEL"));
@@ -221,17 +215,11 @@ void EnvelopeAndLfoView::modelChanged()
 
 void EnvelopeAndLfoView::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() != Qt::LeftButton)
-	{
-		return;
-	}
+	if (_me->button() != Qt::LeftButton) { return; }
 
 	if (QRect(ENV_GRAPH_X, ENV_GRAPH_Y, s_envGraph->width(), s_envGraph->height()).contains(_me->pos()) == true)
 	{
-		if (m_params->m_amountModel.value() < 1.0f)
-		{
-			m_params->m_amountModel.setValue(1.0f);
-		}
+		if (m_params->m_amountModel.value() < 1.0f) { m_params->m_amountModel.setValue(1.0f); }
 		else
 		{
 			m_params->m_amountModel.setValue(0.0f);
@@ -239,10 +227,7 @@ void EnvelopeAndLfoView::mousePressEvent(QMouseEvent* _me)
 	}
 	else if (QRect(LFO_GRAPH_X, LFO_GRAPH_Y, s_lfoGraph->width(), s_lfoGraph->height()).contains(_me->pos()) == true)
 	{
-		if (m_params->m_lfoAmountModel.value() < 1.0f)
-		{
-			m_params->m_lfoAmountModel.setValue(1.0f);
-		}
+		if (m_params->m_lfoAmountModel.value() < 1.0f) { m_params->m_lfoAmountModel.setValue(1.0f); }
 		else
 		{
 			m_params->m_lfoAmountModel.setValue(0.0f);
@@ -360,10 +345,7 @@ void EnvelopeAndLfoView::paintEvent(QPaintEvent*)
 
 	float osc_frames = m_params->m_lfoOscillationFrames;
 
-	if (m_params->m_x100Model.value())
-	{
-		osc_frames *= 100.0f;
-	}
+	if (m_params->m_x100Model.value()) { osc_frames *= 100.0f; }
 
 	// userWaveSample() may be used, called out of loop for efficiency
 	m_params->m_userWave.dataReadLock();

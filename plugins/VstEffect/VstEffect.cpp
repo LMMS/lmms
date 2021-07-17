@@ -48,10 +48,7 @@ VstEffect::VstEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _
 	, m_key(*_key)
 	, m_vstControls(this)
 {
-	if (!m_key.attributes["file"].isEmpty())
-	{
-		openPlugin(m_key.attributes["file"]);
-	}
+	if (!m_key.attributes["file"].isEmpty()) { openPlugin(m_key.attributes["file"]); }
 	setDisplayName(m_key.attributes["file"].section(".dll", 0, 0).isEmpty()
 			? m_key.name
 			: m_key.attributes["file"].section(".dll", 0, 0));
@@ -61,10 +58,7 @@ VstEffect::~VstEffect() {}
 
 bool VstEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return false;
-	}
+	if (!isEnabled() || !isRunning()) { return false; }
 
 	if (m_plugin)
 	{

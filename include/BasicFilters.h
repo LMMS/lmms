@@ -196,8 +196,7 @@ public:
 
 	inline float update(float s, ch_cnt_t ch)
 	{
-		if (qAbs(s) < 1.0e-10f && qAbs(m_z1[ch]) < 1.0e-10f)
-			return 0.0f;
+		if (qAbs(s) < 1.0e-10f && qAbs(m_z1[ch]) < 1.0e-10f) return 0.0f;
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
 
@@ -254,10 +253,7 @@ public:
 		// Double lowpass mode, backwards-compat for the goofy
 		// Add-NumFilters to signify doubleFilter stuff
 		m_type = _idx == DoubleLowPass ? LowPass : Moog;
-		if (m_subFilter == NULL)
-		{
-			m_subFilter = new BasicFilters<CHANNELS>(static_cast<sample_rate_t>(m_sampleRate));
-		}
+		if (m_subFilter == NULL) { m_subFilter = new BasicFilters<CHANNELS>(static_cast<sample_rate_t>(m_sampleRate)); }
 		m_subFilter->m_type = m_type;
 	}
 
@@ -635,10 +631,7 @@ public:
 			break;
 		}
 
-		if (m_doubleFilter)
-		{
-			return m_subFilter->update(out, _chnl);
-		}
+		if (m_doubleFilter) { return m_subFilter->update(out, _chnl); }
 
 		// Clipper band limited sigmoid
 		return out;

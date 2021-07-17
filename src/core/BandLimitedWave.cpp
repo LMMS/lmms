@@ -60,8 +60,7 @@ QDataStream& operator>>(QDataStream& in, WaveMipMap& waveMipMap)
 void BandLimitedWave::generateWaves()
 {
 	// don't generate if they already exist
-	if (s_wavesGenerated)
-		return;
+	if (s_wavesGenerated) return;
 
 	int i;
 

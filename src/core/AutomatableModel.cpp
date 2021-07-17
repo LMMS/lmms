@@ -65,10 +65,7 @@ AutomatableModel::~AutomatableModel()
 		m_linkedModels.erase(m_linkedModels.end() - 1);
 	}
 
-	if (m_controllerConnection)
-	{
-		delete m_controllerConnection;
-	}
+	if (m_controllerConnection) { delete m_controllerConnection; }
 
 	m_valueBuffer.clear();
 
@@ -97,10 +94,7 @@ void AutomatableModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 		me.setAttribute("id", ProjectJournal::idToSave(id()));
 		me.setAttribute("value", m_value);
 		me.setAttribute("scale_type", m_scaleType == Logarithmic ? "log" : "linear");
-		if (mustQuote)
-		{
-			me.setAttribute("nodename", name);
-		}
+		if (mustQuote) { me.setAttribute("nodename", name); }
 		element.appendChild(me);
 	}
 	else
@@ -132,10 +126,7 @@ void AutomatableModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 
 		// get "connection" element (and create it if needed)
 		QDomNode node = element.namedItem("connection");
-		if (node.isElement())
-		{
-			controllerElement = node.toElement();
-		}
+		if (node.isElement()) { controllerElement = node.toElement(); }
 		else
 		{
 			controllerElement = doc.createElement("connection");
@@ -146,8 +137,7 @@ void AutomatableModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 		QString elementName = mustQuote ? "controllerconnection" : name;
 
 		QDomElement element = doc.createElement(elementName);
-		if (mustQuote)
-			element.setAttribute("nodename", name);
+		if (mustQuote) element.setAttribute("nodename", name);
 		m_controllerConnection->saveSettings(doc, element);
 
 		controllerElement.appendChild(element);
@@ -168,10 +158,7 @@ void AutomatableModel::loadSettings(const QDomElement& element, const QString& n
 			setValue(p->valueAt(0));
 			// in older projects we sometimes have odd automations
 			// with just one value in - eliminate if necessary
-			if (!p->hasAutomation())
-			{
-				delete p;
-			}
+			if (!p->hasAutomation()) { delete p; }
 			return;
 		}
 		// logscales were not existing at this point of time
@@ -237,10 +224,7 @@ void AutomatableModel::loadSettings(const QDomElement& element, const QString& n
 		setValue(LocaleHelper::toFloat(nodeElement.attribute("value")));
 		if (nodeElement.hasAttribute("scale_type"))
 		{
-			if (nodeElement.attribute("scale_type") == "linear")
-			{
-				setScaleType(Linear);
-			}
+			if (nodeElement.attribute("scale_type") == "linear") { setScaleType(Linear); }
 			else if (nodeElement.attribute("scale_type") == "log")
 			{
 				setScaleType(Logarithmic);
@@ -314,10 +298,7 @@ float AutomatableModel::inverseScaledValue(float value) const
 //! @todo: this should be moved into a maths header
 template <class T> void roundAt(T& value, const T& where, const T& step_size)
 {
-	if (qAbs<float>(value - where) < typeInfo<float>::minEps() * qAbs<float>(step_size))
-	{
-		value = where;
-	}
+	if (qAbs<float>(value - where) < typeInfo<float>::minEps() * qAbs<float>(step_size)) { value = where; }
 }
 
 template <class T> void AutomatableModel::roundAt(T& value, const T& where) const { ::roundAt(value, where, m_step); }
@@ -357,10 +338,7 @@ void AutomatableModel::setRange(const float min, const float max, const float st
 	{
 		m_minValue = min;
 		m_maxValue = max;
-		if (m_minValue > m_maxValue)
-		{
-			qSwap<float>(m_minValue, m_maxValue);
-		}
+		if (m_minValue > m_maxValue) { qSwap<float>(m_minValue, m_maxValue); }
 		m_range = m_maxValue - m_minValue;
 
 		setStep(step);
@@ -385,19 +363,13 @@ float AutomatableModel::fittedValue(float value) const
 {
 	value = qBound<float>(m_minValue, value, m_maxValue);
 
-	if (m_step != 0 && m_hasStrictStepSize)
-	{
-		value = nearbyintf(value / m_step) * m_step;
-	}
+	if (m_step != 0 && m_hasStrictStepSize) { value = nearbyintf(value / m_step) * m_step; }
 
 	roundAt(value, m_maxValue);
 	roundAt(value, m_minValue);
 	roundAt(value, 0.0f);
 
-	if (value < m_minValue)
-	{
-		return m_minValue;
-	}
+	if (value < m_minValue) { return m_minValue; }
 	else if (value > m_maxValue)
 	{
 		return m_maxValue;
@@ -422,10 +394,7 @@ void AutomatableModel::linkModel(AutomatableModel* model)
 void AutomatableModel::unlinkModel(AutomatableModel* model)
 {
 	AutoModelVector::Iterator it = std::find(m_linkedModels.begin(), m_linkedModels.end(), model);
-	if (it != m_linkedModels.end())
-	{
-		m_linkedModels.erase(it);
-	}
+	if (it != m_linkedModels.end()) { m_linkedModels.erase(it); }
 }
 
 void AutomatableModel::linkModels(AutomatableModel* model1, AutomatableModel* model2)
@@ -492,10 +461,7 @@ float AutomatableModel::controllerValue(int frameOffset) const
 				   "lacks implementation for a scale type");
 			break;
 		}
-		if (typeInfo<float>::isEqual(m_step, 1) && m_hasStrictStepSize)
-		{
-			return qRound(v);
-		}
+		if (typeInfo<float>::isEqual(m_step, 1) && m_hasStrictStepSize) { return qRound(v); }
 		return v;
 	}
 
@@ -512,10 +478,7 @@ ValueBuffer* AutomatableModel::valueBuffer()
 {
 	QMutexLocker m(&m_valueBufferMutex);
 	// if we've already calculated the valuebuffer this period, return the cached buffer
-	if (m_lastUpdatedPeriod == s_periodCounter)
-	{
-		return m_hasSampleExactData ? &m_valueBuffer : NULL;
-	}
+	if (m_lastUpdatedPeriod == s_periodCounter) { return m_hasSampleExactData ? &m_valueBuffer : NULL; }
 
 	float val = m_value; // make sure our m_value doesn't change midway
 
@@ -555,10 +518,7 @@ ValueBuffer* AutomatableModel::valueBuffer()
 	if (!m_controllerConnection)
 	{
 		AutomatableModel* lm = NULL;
-		if (hasLinkedModels())
-		{
-			lm = m_linkedModels.first();
-		}
+		if (hasLinkedModels()) { lm = m_linkedModels.first(); }
 		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
 			lm->controllerConnection()->getController()->isSampleExact())
 		{
@@ -593,10 +553,7 @@ ValueBuffer* AutomatableModel::valueBuffer()
 
 void AutomatableModel::unlinkControllerConnection()
 {
-	if (m_controllerConnection)
-	{
-		m_controllerConnection->disconnect(this);
-	}
+	if (m_controllerConnection) { m_controllerConnection->disconnect(this); }
 
 	m_controllerConnection = NULL;
 }
@@ -631,10 +588,7 @@ float AutomatableModel::globalAutomationValueAt(const TimePos& time)
 		{
 			int s = (*it)->startPosition();
 			int e = (*it)->endPosition();
-			if (s <= time && e >= time)
-			{
-				patternsInRange += (*it);
-			}
+			if (s <= time && e >= time) { patternsInRange += (*it); }
 		}
 
 		AutomationPattern* latestPattern = NULL;

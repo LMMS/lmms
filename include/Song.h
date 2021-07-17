@@ -163,8 +163,7 @@ public:
 
 	inline void setLoopRenderCount(int count)
 	{
-		if (count < 1)
-			m_loopRenderCount = 1;
+		if (count < 1) m_loopRenderCount = 1;
 		else
 			m_loopRenderCount = count;
 		m_loopRenderRemaining = m_loopRenderCount;

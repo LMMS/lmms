@@ -75,8 +75,7 @@ public:
 		double phi = asin(x0);
 
 		/* slope is falling, we're into the 2nd half. */
-		if (x1 < x0)
-			return M_PI - phi;
+		if (x1 < x0) return M_PI - phi;
 
 		return phi;
 	}

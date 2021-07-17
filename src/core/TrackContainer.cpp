@@ -68,10 +68,7 @@ void TrackContainer::saveSettings(QDomDocument& _doc, QDomElement& _this)
 void TrackContainer::loadSettings(const QDomElement& _this)
 {
 	bool journalRestore = _this.parentNode().nodeName() == "journaldata";
-	if (journalRestore)
-	{
-		clearAllTracks();
-	}
+	if (journalRestore) { clearAllTracks(); }
 
 	static QProgressDialog* pd = NULL;
 	bool was_null = (pd == NULL);
@@ -138,10 +135,7 @@ int TrackContainer::countTracks(Track::TrackTypes _tt) const
 	m_tracksMutex.lockForRead();
 	for (int i = 0; i < m_tracks.size(); ++i)
 	{
-		if (m_tracks[i]->type() == _tt || _tt == Track::NumTrackTypes)
-		{
-			++cnt;
-		}
+		if (m_tracks[i]->type() == _tt || _tt == Track::NumTrackTypes) { ++cnt; }
 	}
 	m_tracksMutex.unlock();
 	return (cnt);
@@ -170,17 +164,11 @@ void TrackContainer::removeTrack(Track* _track)
 	if (index != -1)
 	{
 		// If the track is solo, all other tracks are muted. Change this before removing the solo track:
-		if (_track->isSolo())
-		{
-			_track->setSolo(false);
-		}
+		if (_track->isSolo()) { _track->setSolo(false); }
 		m_tracks.remove(index);
 		lockTracksAccess.unlock();
 
-		if (Engine::getSong())
-		{
-			Engine::getSong()->setModified();
-		}
+		if (Engine::getSong()) { Engine::getSong()->setModified(); }
 	}
 }
 
@@ -200,10 +188,7 @@ bool TrackContainer::isEmpty() const
 {
 	for (TrackList::const_iterator it = m_tracks.begin(); it != m_tracks.end(); ++it)
 	{
-		if (!(*it)->getTCOs().isEmpty())
-		{
-			return false;
-		}
+		if (!(*it)->getTCOs().isEmpty()) { return false; }
 	}
 	return true;
 }
@@ -219,20 +204,14 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList& tra
 
 	for (Track* track : tracks)
 	{
-		if (track->isMuted())
-		{
-			continue;
-		}
+		if (track->isMuted()) { continue; }
 
 		switch (track->type())
 		{
 		case Track::AutomationTrack:
 		case Track::HiddenAutomationTrack:
 		case Track::BBTrack:
-			if (tcoNum < 0)
-			{
-				track->getTCOsInRange(tcos, 0, time);
-			}
+			if (tcoNum < 0) { track->getTCOsInRange(tcos, 0, time); }
 			else
 			{
 				Q_ASSERT(track->numOfTCOs() > tcoNum);
@@ -249,22 +228,13 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList& tra
 
 	for (TrackContentObject* tco : tcos)
 	{
-		if (tco->isMuted() || tco->startPosition() > time)
-		{
-			continue;
-		}
+		if (tco->isMuted() || tco->startPosition() > time) { continue; }
 
 		if (auto* p = dynamic_cast<AutomationPattern*>(tco))
 		{
-			if (!p->hasAutomation())
-			{
-				continue;
-			}
+			if (!p->hasAutomation()) { continue; }
 			TimePos relTime = time - p->startPosition();
-			if (!p->getAutoResize())
-			{
-				relTime = qMin(relTime, p->length());
-			}
+			if (!p->getAutoResize()) { relTime = qMin(relTime, p->length()); }
 			float value = p->valueAt(relTime);
 
 			for (AutomatableModel* model : p->objects())

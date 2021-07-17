@@ -51,10 +51,7 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget(QWidget* _parent)
 		QString toolTipText = currentDeviceInfo.getDeviceDescription();
 		m_deviceComboBox->setItemData(i, toolTipText, Qt::ToolTipRole);
 
-		if (currentDeviceInfo.getDeviceName() == deviceText)
-		{
-			m_deviceComboBox->setCurrentIndex(static_cast<int>(i));
-		}
+		if (currentDeviceInfo.getDeviceName() == deviceText) { m_deviceComboBox->setCurrentIndex(static_cast<int>(i)); }
 	}
 
 	m_selectedDevice = m_deviceComboBox->currentIndex();

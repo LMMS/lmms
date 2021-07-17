@@ -158,8 +158,7 @@ float lb302FilterIIR2::process(const float& samp)
 	vcf_d2 = vcf_d1;
 	vcf_d1 = ret;
 
-	if (fs->dist > 0)
-		ret = m_dist->nextSample(ret);
+	if (fs->dist > 0) ret = m_dist->nextSample(ret);
 
 	// output = IIR2 + dry
 	return ret;
@@ -415,10 +414,7 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 	// Hold on to the current VCF, and use it throughout this period
 	lb302Filter* filter = vcf.loadAcquire();
 
-	if (release_frame == 0 || !m_playingNote)
-	{
-		vca_mode = decay;
-	}
+	if (release_frame == 0 || !m_playingNote) { vca_mode = decay; }
 
 	if (new_freq)
 	{
@@ -437,10 +433,7 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 	for (int i = 0; i < size; i++)
 	{
 		// start decay if we're past release
-		if (i >= release_frame)
-		{
-			vca_mode = decay;
-		}
+		if (i >= release_frame) { vca_mode = decay; }
 
 		// update vcf
 		if (vcf_envpos >= ENVINC)
@@ -466,8 +459,7 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 		// update vco
 		vco_c += vco_inc;
 
-		if (vco_c > 0.5)
-			vco_c -= 1.0;
+		if (vco_c > 0.5) vco_c -= 1.0;
 
 		switch (int(rint(wave_shape.value())))
 		{
@@ -522,8 +514,7 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 
 		case TRIANGLE: // p0: duty rev.saw<->triangle<->saw p1: curviness
 			vco_k = (vco_c * 2.0) + 0.5;
-			if (vco_k > 0.5)
-				vco_k = 1.0 - vco_k;
+			if (vco_k > 0.5) vco_k = 1.0 - vco_k;
 			break;
 
 		case SQUARE: // p0: slope of top
@@ -537,10 +528,7 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 		case MOOG: // Maybe the fall should be exponential/sinsoidal instead of quadric.
 			// [-0.5, 0]: Rise, [0,0.25]: Slope down, [0.25,0.5]: Low
 			vco_k = (vco_c * 2.0) + 0.5;
-			if (vco_k > 1.0)
-			{
-				vco_k = -0.5;
-			}
+			if (vco_k > 1.0) { vco_k = -0.5; }
 			else if (vco_k > 0.5)
 			{
 				w = 2.0 * (vco_k - 0.5) - 1.0;
@@ -619,8 +607,7 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 		if (vca_mode == attack)
 		{
 			vca_a += (vca_a0 - vca_a) * vca_attack;
-			if (sample_cnt >= 0.5 * Engine::mixer()->processingSampleRate())
-				vca_mode = idle;
+			if (sample_cnt >= 0.5 * Engine::mixer()->processingSampleRate()) vca_mode = idle;
 		}
 		else if (vca_mode == decay)
 		{
@@ -708,17 +695,11 @@ void lb302Synth::initSlide()
 
 void lb302Synth::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
-	if (_n->isMasterNote() || (_n->hasParent() && _n->isReleased()))
-	{
-		return;
-	}
+	if (_n->isMasterNote() || (_n->hasParent() && _n->isReleased())) { return; }
 
 	// sort notes: new notes to the end
 	m_notesMutex.lock();
-	if (_n->totalFramesPlayed() == 0)
-	{
-		m_notes.append(_n);
-	}
+	if (_n->totalFramesPlayed() == 0) { m_notes.append(_n); }
 	else
 	{
 		m_notes.prepend(_n);
@@ -741,10 +722,7 @@ void lb302Synth::processNote(NotePlayHandle* _n)
 	if (!m_playingNote && !_n->isReleased() && release_frame > 0)
 	{
 		m_playingNote = _n;
-		if (slideToggle.value())
-		{
-			vco_slideinc = GET_INC(_n->frequency());
-		}
+		if (slideToggle.value()) { vco_slideinc = GET_INC(_n->frequency()); }
 	}
 
 	// Check for slide
@@ -782,10 +760,7 @@ void lb302Synth::play(sampleFrame* _working_buffer)
 void lb302Synth::deleteNotePluginData(NotePlayHandle* _n)
 {
 	// printf("GONE\n");
-	if (m_playingNote == _n)
-	{
-		m_playingNote = NULL;
-	}
+	if (m_playingNote == _n) { m_playingNote = NULL; }
 }
 
 PluginView* lb302Synth::instantiateView(QWidget* _parent) { return (new lb302SynthView(this, _parent)); }

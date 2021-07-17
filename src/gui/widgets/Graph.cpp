@@ -165,10 +165,7 @@ void Graph::drawLineAt(int _x, int _y, int _lastx)
 {
 	float minVal = model()->minValue();
 	float maxVal = model()->maxValue();
-	if (width() <= 4)
-	{
-		return;
-	}
+	if (width() <= 4) { return; }
 
 	float xscale = static_cast<float>(model()->length()) / (width() - 4);
 
@@ -205,10 +202,7 @@ void Graph::drawLineAt(int _x, int _y, int _lastx)
 
 	// calculate line drawing variables
 	int linelen = sample_end - sample_begin;
-	if (linelen == 1)
-	{
-		val_begin = val;
-	}
+	if (linelen == 1) { val_begin = val; }
 	// int xstep = _x > _lastx ? -1 : 1;
 	float ystep = (val_end - val_begin) / linelen;
 
@@ -228,10 +222,7 @@ void Graph::changeSampleAt(int _x, int _y)
 	float minVal = model()->minValue();
 	float maxVal = model()->maxValue();
 
-	if (width() <= 4)
-	{
-		return;
-	}
+	if (width() <= 4) { return; }
 
 	float xscale = static_cast<float>(model()->length()) / (width() - 4);
 
@@ -371,10 +362,7 @@ void Graph::dropEvent(QDropEvent* _de)
 
 void Graph::dragEnterEvent(QDragEnterEvent* _dee)
 {
-	if (StringPairDrag::processDragEnterEvent(_dee, QString("samplefile")) == false)
-	{
-		_dee->ignore();
-	}
+	if (StringPairDrag::processDragEnterEvent(_dee, QString("samplefile")) == false) { _dee->ignore(); }
 }
 
 void Graph::modelChanged()
@@ -429,10 +417,7 @@ void graphModel::setLength(int _length)
 	if (_length != m_length)
 	{
 		m_length = _length;
-		if (m_samples.size() < m_length)
-		{
-			m_samples.resize(m_length);
-		}
+		if (m_samples.size() < m_length) { m_samples.resize(m_length); }
 		emit lengthChanged();
 	}
 }
@@ -591,8 +576,7 @@ void graphModel::normalize()
 		m_samples[i] = qBound(m_minValue, m_samples[i] / max, m_maxValue);
 
 	// signal changes if any
-	if (max != 1.0f || avg != 0.0f)
-		emit samplesChanged(0, length() - 1);
+	if (max != 1.0f || avg != 0.0f) emit samplesChanged(0, length() - 1);
 }
 
 void graphModel::invert()

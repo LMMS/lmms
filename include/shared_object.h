@@ -67,10 +67,7 @@ public:
 		// approach.
 		const bool deleteObject = object->m_referenceCount.fetch_sub(1, std::memory_order_acq_rel) == 1;
 
-		if (deleteObject)
-		{
-			object->deleteLater();
-		}
+		if (deleteObject) { object->deleteLater(); }
 	}
 
 private:

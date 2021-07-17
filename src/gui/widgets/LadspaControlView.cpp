@@ -60,10 +60,7 @@ LadspaControlView::LadspaControlView(QWidget* _parent, LadspaControl* _ctl)
 		LedCheckBox* toggle = new LedCheckBox(m_ctl->port()->name, this, QString(), LedCheckBox::Green);
 		toggle->setModel(m_ctl->toggledModel());
 		layout->addWidget(toggle);
-		if (link != NULL)
-		{
-			setFixedSize(link->width() + toggle->width(), toggle->height());
-		}
+		if (link != NULL) { setFixedSize(link->width() + toggle->width(), toggle->height()); }
 		else
 		{
 			setFixedSize(toggle->width(), toggle->height());
@@ -87,10 +84,7 @@ LadspaControlView::LadspaControlView(QWidget* _parent, LadspaControl* _ctl)
 
 	if (knb != NULL)
 	{
-		if (m_ctl->port()->data_type != TIME)
-		{
-			knb->setModel(m_ctl->knobModel());
-		}
+		if (m_ctl->port()->data_type != TIME) { knb->setModel(m_ctl->knobModel()); }
 		else
 		{
 			knb->setModel(m_ctl->tempoSyncKnobModel());
@@ -98,10 +92,7 @@ LadspaControlView::LadspaControlView(QWidget* _parent, LadspaControl* _ctl)
 		knb->setLabel(m_ctl->port()->name);
 		knb->setHintText(tr("Value:"), "");
 		layout->addWidget(knb);
-		if (link != NULL)
-		{
-			setFixedSize(link->width() + knb->width(), knb->height());
-		}
+		if (link != NULL) { setFixedSize(link->width() + knb->width(), knb->height()); }
 		else
 		{
 			setFixedSize(knb->width(), knb->height());

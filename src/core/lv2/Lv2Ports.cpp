@@ -109,10 +109,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin, std::size_t portNum
 		: hasProperty(LV2_CORE__toggled)	 ? Vis::Toggled
 											 : Vis::Generic;
 
-	if (isA(LV2_CORE__InputPort))
-	{
-		m_flow = Flow::Input;
-	}
+	if (isA(LV2_CORE__InputPort)) { m_flow = Flow::Input; }
 	else if (isA(LV2_CORE__OutputPort))
 	{
 		m_flow = Flow::Output;
@@ -151,17 +148,11 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin, std::size_t portNum
 		AutoLilvNode def(defN), min(minN), max(maxN);
 
 		auto takeRangeValue = [&](LilvNode* node, float& storeHere, PluginIssueType it) {
-			if (node)
-			{
-				storeHere = lilv_node_as_float(node);
-			}
+			if (node) { storeHere = lilv_node_as_float(node); }
 			else
 			{
 				// CV ports do not require ranges
-				if (m_flow == Flow::Input && m_type != Type::Cv)
-				{
-					issue(it, portName);
-				}
+				if (m_flow == Flow::Input && m_type != Type::Cv) { issue(it, portName); }
 			}
 		};
 
@@ -170,10 +161,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin, std::size_t portNum
 		{
 			m_min = .0f;
 			m_max = 1.f;
-			if (def.get() && m_def != m_min && m_def != m_max)
-			{
-				issue(defaultValueNotInRange, portName);
-			}
+			if (def.get() && m_def != m_min && m_def != m_max) { issue(defaultValueNotInRange, portName); }
 		}
 		else
 		{
@@ -198,24 +186,15 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin, std::size_t portNum
 					issue(portHasNoMax, portName);
 				}
 			}
-			if (m_min > m_max)
-			{
-				issue(minGreaterMax, portName);
-			}
+			if (m_min > m_max) { issue(minGreaterMax, portName); }
 
 			// sampleRate
-			if (hasProperty(LV2_CORE__sampleRate))
-			{
-				m_sampleRate = true;
-			}
+			if (hasProperty(LV2_CORE__sampleRate)) { m_sampleRate = true; }
 
 			// default value
 			if (def.get())
 			{
-				if (m_def < m_min)
-				{
-					issue(defaultValueNotInRange, portName);
-				}
+				if (m_def < m_min) { issue(defaultValueNotInRange, portName); }
 				else if (m_def > m_max)
 				{
 					if (m_sampleRate)
@@ -265,10 +244,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin, std::size_t portNum
 
 	if (m_type == Type::Unknown)
 	{
-		if (m_optional)
-		{
-			m_used = false;
-		}
+		if (m_optional) { m_used = false; }
 		else
 		{
 			issue(PluginIssueType::unknownPortType, portName);
@@ -289,10 +265,7 @@ std::vector<PluginIssue> Meta::get(const LilvPlugin* plugin, std::size_t portNum
 			issue(PluginIssueType::logScaleMaxMissing, portName);
 		}
 		// forbid min < 0 < max
-		if (m_min < 0.f && m_max > 0.f)
-		{
-			issue(PluginIssueType::logScaleMinMaxDifferentSigns, portName);
-		}
+		if (m_min < 0.f && m_max > 0.f) { issue(PluginIssueType::logScaleMinMaxDifferentSigns, portName); }
 		m_logarithmic = true;
 	}
 

@@ -48,10 +48,7 @@ LadspaControl::LadspaControl(Model* _parent, port_desc_t* _port, bool _link)
 	case TOGGLED:
 		m_toggledModel.setInitValue(static_cast<bool>(m_port->def));
 		connect(&m_toggledModel, SIGNAL(dataChanged()), this, SLOT(ledChanged()));
-		if (m_port->def == 1.0f)
-		{
-			m_toggledModel.setValue(true);
-		}
+		if (m_port->def == 1.0f) { m_toggledModel.setValue(true); }
 		// TODO: careful: we must prevent saved scales
 		m_toggledModel.setScaleLogarithmic(m_port->suggests_logscale);
 		break;
@@ -160,10 +157,7 @@ void LadspaControl::saveSettings(QDomDocument& doc, QDomElement& parent, const Q
 {
 	QDomElement e = doc.createElement(name);
 
-	if (m_link)
-	{
-		m_linkEnabledModel.saveSettings(doc, e, "link");
-	}
+	if (m_link) { m_linkEnabledModel.saveSettings(doc, e, "link"); }
 	switch (m_port->data_type)
 	{
 	case TOGGLED:
@@ -195,8 +189,7 @@ void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
 	{
 		// the port exists in the current effect, but not in the
 		// savefile => it's a new port, so load the default value
-		if (m_link)
-			m_linkEnabledModel.setValue(m_linkEnabledModel.initValue());
+		if (m_link) m_linkEnabledModel.setValue(m_linkEnabledModel.initValue());
 		switch (m_port->data_type)
 		{
 		case TOGGLED:
@@ -227,10 +220,7 @@ void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
 			e = parent;
 		}
 
-		if (m_link)
-		{
-			m_linkEnabledModel.loadSettings(e, linkModelName);
-		}
+		if (m_link) { m_linkEnabledModel.loadSettings(e, linkModelName); }
 
 		switch (m_port->data_type)
 		{

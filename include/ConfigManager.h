@@ -57,10 +57,7 @@ class LMMS_EXPORT ConfigManager : public QObject
 public:
 	static inline ConfigManager* inst()
 	{
-		if (s_instanceOfMe == NULL)
-		{
-			s_instanceOfMe = new ConfigManager();
-		}
+		if (s_instanceOfMe == NULL) { s_instanceOfMe = new ConfigManager(); }
 		return s_instanceOfMe;
 	}
 

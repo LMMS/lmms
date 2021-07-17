@@ -39,10 +39,7 @@ StringPairDrag::StringPairDrag(const QString& _key, const QString& _value, const
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	if (_icon.isNull() && _w)
-	{
-		setPixmap(_w->grab().scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-	}
+	if (_icon.isNull() && _w) { setPixmap(_w->grab().scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation)); }
 	else
 	{
 		setPixmap(_icon);
@@ -58,10 +55,7 @@ StringPairDrag::~StringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	if (gui->mainWindow())
-	{
-		gui->mainWindow()->clearKeyModifiers();
-	}
+	if (gui->mainWindow()) { gui->mainWindow()->clearKeyModifiers(); }
 }
 
 bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee, const QString& _allowed_keys)
@@ -69,10 +63,7 @@ bool StringPairDrag::processDragEnterEvent(QDragEnterEvent* _dee, const QString&
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	if (!_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
-	{
-		return (false);
-	}
+	if (!_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair))) { return (false); }
 	QString txt = _dee->mimeData()->data(mimeType(MimeType::StringPair));
 	if (_allowed_keys.split(',').contains(txt.section(':', 0, 0)))
 	{

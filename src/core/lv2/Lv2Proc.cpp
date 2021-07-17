@@ -94,15 +94,12 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin* plugin, std::vector<PluginI
 		}
 	}
 
-	if (audioChannels[inCount] > 2)
-		issues.emplace_back(tooManyInputChannels, std::to_string(audioChannels[inCount]));
-	if (audioChannels[outCount] == 0)
-		issues.emplace_back(noOutputChannel);
+	if (audioChannels[inCount] > 2) issues.emplace_back(tooManyInputChannels, std::to_string(audioChannels[inCount]));
+	if (audioChannels[outCount] == 0) issues.emplace_back(noOutputChannel);
 	else if (audioChannels[outCount] > 2)
 		issues.emplace_back(tooManyOutputChannels, std::to_string(audioChannels[outCount]));
 
-	if (midiChannels[inCount] > 1)
-		issues.emplace_back(tooManyMidiInputChannels, std::to_string(midiChannels[inCount]));
+	if (midiChannels[inCount] > 1) issues.emplace_back(tooManyMidiInputChannels, std::to_string(midiChannels[inCount]));
 	if (midiChannels[outCount] > 1)
 		issues.emplace_back(tooManyMidiOutputChannels, std::to_string(midiChannels[outCount]));
 
@@ -110,10 +107,7 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin* plugin, std::vector<PluginI
 	LILV_FOREACH(nodes, itr, reqFeats.get())
 	{
 		const char* reqFeatName = lilv_node_as_string(lilv_nodes_get(reqFeats.get(), itr));
-		if (!Lv2Features::isFeatureSupported(reqFeatName))
-		{
-			issues.emplace_back(featureNotSupported, reqFeatName);
-		}
+		if (!Lv2Features::isFeatureSupported(reqFeatName)) { issues.emplace_back(featureNotSupported, reqFeatName); }
 	}
 
 	Lv2Manager* mgr = Engine::getLv2Manager();
@@ -194,10 +188,7 @@ void Lv2Proc::copyModelsFromCore()
 	// feed each input port with the respective data from the LMMS core
 	for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
 	{
-		if (port->m_flow == Lv2Ports::Flow::Input)
-		{
-			port->accept(copy);
-		}
+		if (port->m_flow == Lv2Ports::Flow::Input) { port->accept(copy); }
 	}
 
 	// send pending MIDI events to atom port
@@ -212,10 +203,7 @@ void Lv2Proc::copyModelsFromCore()
 			uint32_t type = Engine::getLv2Manager()->uridCache()[Lv2UridCache::Id::midi_MidiEvent];
 			uint8_t buf[4];
 			std::size_t bufsize = writeToByteSeq(ev.ev, buf, sizeof(buf));
-			if (bufsize)
-			{
-				lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf);
-			}
+			if (bufsize) { lv2_evbuf_write(&iter, atomStamp, type, bufsize, buf); }
 		}
 	}
 }
@@ -235,10 +223,7 @@ void Lv2Proc::copyModelsToCore()
 	// fetch data from each output port and bring it to the LMMS core
 	for (const std::unique_ptr<Lv2Ports::PortBase>& port : m_ports)
 	{
-		if (port->m_flow == Lv2Ports::Flow::Output)
-		{
-			port->accept(copy);
-		}
+		if (port->m_flow == Lv2Ports::Flow::Output) { port->accept(copy); }
 	}
 }
 
@@ -251,10 +236,7 @@ void Lv2Proc::copyBuffersFromCore(const sampleFrame* buf, unsigned firstChan, un
 		// have one input channel... take medium of left and right for
 		// mono input
 		// (this happens if we have two outputs and only one input)
-		if (inPorts().m_right)
-		{
-			inPorts().m_right->copyBuffersFromCore(buf, firstChan + 1, frames);
-		}
+		if (inPorts().m_right) { inPorts().m_right->copyBuffersFromCore(buf, firstChan + 1, frames); }
 		else
 		{
 			inPorts().m_left->averageWithBuffersFromCore(buf, firstChan + 1, frames);
@@ -295,10 +277,7 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent& event, const TimePos& time, 
 
 		MidiInputEvent ev{event, time, offset};
 		std::size_t written = m_midiInputBuf.write(&ev, 1);
-		if (written != 1)
-		{
-			qWarning("MIDI ringbuffer is too small! Discarding MIDI event.");
-		}
+		if (written != 1) { qWarning("MIDI ringbuffer is too small! Discarding MIDI event."); }
 
 		m_ringLock.clear(std::memory_order_release);
 	}
@@ -314,10 +293,7 @@ AutomatableModel* Lv2Proc::modelAtPort(const QString& uri)
 	// unused currently
 	AutomatableModel* mod;
 	auto itr = m_connectedModels.find(uri.toUtf8().data());
-	if (itr != m_connectedModels.end())
-	{
-		mod = itr->second;
-	}
+	if (itr != m_connectedModels.end()) { mod = itr->second; }
 	else
 	{
 		mod = nullptr;
@@ -462,10 +438,7 @@ void Lv2Proc::createPort(std::size_t portNum)
 				ctrl->m_connectedModel.reset(new BoolModel(static_cast<bool>(meta.def()), nullptr, dispName));
 				break;
 			}
-			if (meta.m_logarithmic)
-			{
-				ctrl->m_connectedModel->setScaleLogarithmic();
-			}
+			if (meta.m_logarithmic) { ctrl->m_connectedModel->setScaleLogarithmic(); }
 
 		} // if m_flow == Input
 		port = ctrl;
@@ -566,10 +539,7 @@ void Lv2Proc::createPorts()
 					break;
 				}
 				// in Lv2, leftPort is defined to be the first port
-				if (!portRef->m_left)
-				{
-					portRef->m_left = &audio;
-				}
+				if (!portRef->m_left) { portRef->m_left = &audio; }
 				else if (!portRef->m_right)
 				{
 					portRef->m_right = &audio;
@@ -586,8 +556,7 @@ void Lv2Proc::createPorts()
 					// take any MIDI input, prefer mandatory MIDI input
 					// (Lv2Proc::check() assures there are <=1 mandatory MIDI
 					// input ports)
-					if (!m_proc->m_midiIn || !atomPort.m_optional)
-						m_proc->m_midiIn = &atomPort;
+					if (!m_proc->m_midiIn || !atomPort.m_optional) m_proc->m_midiIn = &atomPort;
 				}
 			}
 			else if (atomPort.m_flow == Lv2Ports::Flow::Output)
@@ -597,8 +566,7 @@ void Lv2Proc::createPorts()
 					// take any MIDI output, prefer mandatory MIDI output
 					// (Lv2Proc::check() assures there are <=1 mandatory MIDI
 					// output ports)
-					if (!m_proc->m_midiOut || !atomPort.m_optional)
-						m_proc->m_midiOut = &atomPort;
+					if (!m_proc->m_midiOut || !atomPort.m_optional) m_proc->m_midiOut = &atomPort;
 				}
 			}
 			else
@@ -658,10 +626,7 @@ void Lv2Proc::dumpPort(std::size_t num)
 		{
 			qDebug() << "  control port";
 			// output ports may be uninitialized yet, only print inputs
-			if (ctrl.m_flow == Lv2Ports::Flow::Input)
-			{
-				qDebug() << "    value:" << ctrl.m_val;
-			}
+			if (ctrl.m_flow == Lv2Ports::Flow::Input) { qDebug() << "    value:" << ctrl.m_val; }
 		}
 		void visit(const Lv2Ports::Audio& audio) override
 		{

@@ -56,10 +56,7 @@ LadspaManager::LadspaManager()
 	for (QStringList::iterator it = ladspaDirectories.begin(); it != ladspaDirectories.end(); ++it)
 	{
 		// Skip empty entries as QDir will interpret it as the working directory
-		if ((*it).isEmpty())
-		{
-			continue;
-		}
+		if ((*it).isEmpty()) { continue; }
 		QDir directory((*it));
 		QFileInfoList list = directory.entryInfoList();
 		for (QFileInfoList::iterator file = list.begin(); file != list.end(); ++file)
@@ -83,10 +80,7 @@ LadspaManager::LadspaManager()
 			{
 				LADSPA_Descriptor_Function descriptorFunction =
 					(LADSPA_Descriptor_Function)plugin_lib.resolve("ladspa_descriptor");
-				if (descriptorFunction != NULL)
-				{
-					addPlugins(descriptorFunction, f.fileName());
-				}
+				if (descriptorFunction != NULL) { addPlugins(descriptorFunction, f.fileName()); }
 			}
 			else
 			{
@@ -113,10 +107,7 @@ LadspaManager::~LadspaManager()
 
 ladspaManagerDescription* LadspaManager::getDescription(const ladspa_key_t& _plugin)
 {
-	if (m_ladspaManagerMap.contains(_plugin))
-	{
-		return (m_ladspaManagerMap[_plugin]);
-	}
+	if (m_ladspaManagerMap.contains(_plugin)) { return (m_ladspaManagerMap[_plugin]); }
 	else
 	{
 		return (NULL);
@@ -130,10 +121,7 @@ void LadspaManager::addPlugins(LADSPA_Descriptor_Function _descriptor_func, cons
 	for (long pluginIndex = 0; (descriptor = _descriptor_func(pluginIndex)) != NULL; ++pluginIndex)
 	{
 		ladspa_key_t key(_file, QString(descriptor->Label));
-		if (m_ladspaManagerMap.contains(key))
-		{
-			continue;
-		}
+		if (m_ladspaManagerMap.contains(key)) { continue; }
 
 		ladspaManagerDescription* plugIn = new ladspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
@@ -141,10 +129,7 @@ void LadspaManager::addPlugins(LADSPA_Descriptor_Function _descriptor_func, cons
 		plugIn->inputChannels = getPluginInputs(descriptor);
 		plugIn->outputChannels = getPluginOutputs(descriptor);
 
-		if (plugIn->inputChannels == 0 && plugIn->outputChannels > 0)
-		{
-			plugIn->type = SOURCE;
-		}
+		if (plugIn->inputChannels == 0 && plugIn->outputChannels > 0) { plugIn->type = SOURCE; }
 		else if (plugIn->inputChannels > 0 && plugIn->outputChannels > 0)
 		{
 			plugIn->type = TRANSFER;
@@ -172,10 +157,7 @@ uint16_t LadspaManager::getPluginInputs(const LADSPA_Descriptor* _descriptor)
 			LADSPA_IS_PORT_AUDIO(_descriptor->PortDescriptors[port]))
 		{
 			QString name = QString(_descriptor->PortNames[port]);
-			if (name.toUpper().contains("IN"))
-			{
-				inputs++;
-			}
+			if (name.toUpper().contains("IN")) { inputs++; }
 		}
 	}
 	return inputs;
@@ -191,10 +173,7 @@ uint16_t LadspaManager::getPluginOutputs(const LADSPA_Descriptor* _descriptor)
 			LADSPA_IS_PORT_AUDIO(_descriptor->PortDescriptors[port]))
 		{
 			QString name = QString(_descriptor->PortNames[port]);
-			if (name.toUpper().contains("OUT"))
-			{
-				outputs++;
-			}
+			if (name.toUpper().contains("OUT")) { outputs++; }
 		}
 	}
 	return outputs;
@@ -203,20 +182,14 @@ uint16_t LadspaManager::getPluginOutputs(const LADSPA_Descriptor* _descriptor)
 const LADSPA_PortDescriptor* LadspaManager::getPortDescriptor(const ladspa_key_t& _plugin, uint32_t _port)
 {
 	const LADSPA_Descriptor* descriptor = getDescriptor(_plugin);
-	if (descriptor && _port < getPortCount(_plugin))
-	{
-		return (&descriptor->PortDescriptors[_port]);
-	}
+	if (descriptor && _port < getPortCount(_plugin)) { return (&descriptor->PortDescriptors[_port]); }
 	return (NULL);
 }
 
 const LADSPA_PortRangeHint* LadspaManager::getPortRangeHint(const ladspa_key_t& _plugin, uint32_t _port)
 {
 	const LADSPA_Descriptor* descriptor = getDescriptor(_plugin);
-	if (descriptor && _port < getPortCount(_plugin))
-	{
-		return (&descriptor->PortRangeHints[_port]);
-	}
+	if (descriptor && _port < getPortCount(_plugin)) { return (&descriptor->PortRangeHints[_port]); }
 	return (NULL);
 }
 

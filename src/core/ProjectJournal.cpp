@@ -116,9 +116,7 @@ void ProjectJournal::addJournalCheckPoint(JournallingObject* jo)
 jo_id_t ProjectJournal::allocID(JournallingObject* _obj)
 {
 	jo_id_t id;
-	for (jo_id_t tid = rand(); m_joIDs.contains(id = tid % EO_ID_MSB | EO_ID_MSB); tid++)
-	{
-	}
+	for (jo_id_t tid = rand(); m_joIDs.contains(id = tid % EO_ID_MSB | EO_ID_MSB); tid++) {}
 
 	m_joIDs[id] = _obj;
 	// printf("new id: %d\n", id );
@@ -145,10 +143,7 @@ void ProjectJournal::clearJournal()
 
 	for (JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end();)
 	{
-		if (it.value() == NULL)
-		{
-			it = m_joIDs.erase(it);
-		}
+		if (it.value() == NULL) { it = m_joIDs.erase(it); }
 		else
 		{
 			++it;
@@ -160,10 +155,7 @@ void ProjectJournal::stopAllJournalling()
 {
 	for (JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
 	{
-		if (it.value() != NULL)
-		{
-			it.value()->setJournalling(false);
-		}
+		if (it.value() != NULL) { it.value()->setJournalling(false); }
 	}
 	setJournalling(false);
 }

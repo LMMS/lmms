@@ -149,10 +149,7 @@ void ZynAddSubFxInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	QString modifiedControllers;
 	for (QMap<int, bool>::ConstIterator it = m_modifiedControllers.begin(); it != m_modifiedControllers.end(); ++it)
 	{
-		if (it.value())
-		{
-			modifiedControllers += QString("%1,").arg(it.key());
-		}
+		if (it.value()) { modifiedControllers += QString("%1,").arg(it.key()); }
 	}
 	_this.setAttribute("modifiedcontrollers", modifiedControllers);
 
@@ -187,10 +184,7 @@ void ZynAddSubFxInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 
 void ZynAddSubFxInstrument::loadSettings(const QDomElement& _this)
 {
-	if (!_this.hasChildNodes())
-	{
-		return;
-	}
+	if (!_this.hasChildNodes()) { return; }
 
 	m_portamentoModel.loadSettings(_this, "portamento");
 	m_filterFreqModel.loadSettings(_this, "filterfreq");
@@ -203,10 +197,7 @@ void ZynAddSubFxInstrument::loadSettings(const QDomElement& _this)
 
 	QDomDocument doc;
 	QDomElement data = _this.firstChildElement("ZynAddSubFX-data");
-	if (data.isNull())
-	{
-		data = _this.firstChildElement();
-	}
+	if (data.isNull()) { data = _this.firstChildElement(); }
 	doc.appendChild(doc.importNode(data, true));
 
 	QTemporaryFile tf;
@@ -298,14 +289,8 @@ QString ZynAddSubFxInstrument::nodeName() const { return zynaddsubfx_plugin_desc
 
 void ZynAddSubFxInstrument::play(sampleFrame* _buf)
 {
-	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
-	{
-		return;
-	}
-	if (m_remotePlugin)
-	{
-		m_remotePlugin->process(NULL, _buf);
-	}
+	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
+	if (m_remotePlugin) { m_remotePlugin->process(NULL, _buf); }
 	else
 	{
 		m_plugin->processAudio(_buf);
@@ -326,10 +311,7 @@ bool ZynAddSubFxInstrument::handleMidiEvent(const MidiEvent& event, const TimePo
 	MidiEvent localEvent = event;
 	localEvent.setChannel(0);
 	m_pluginMutex.lock();
-	if (m_remotePlugin)
-	{
-		m_remotePlugin->processMidiEvent(localEvent, 0);
-	}
+	if (m_remotePlugin) { m_remotePlugin->processMidiEvent(localEvent, 0); }
 	else
 	{
 		m_plugin->processMidiEvent(localEvent);
@@ -508,10 +490,7 @@ void ZynAddSubFxView::dragEnterEvent(QDragEnterEvent* _dee)
 	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
 	{
 		QString txt = _dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == "pluginpresetfile")
-		{
-			_dee->acceptProposedAction();
-		}
+		if (txt.section(':', 0, 0) == "pluginpresetfile") { _dee->acceptProposedAction(); }
 		else
 		{
 			_dee->ignore();

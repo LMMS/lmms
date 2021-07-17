@@ -54,10 +54,7 @@ AutomationPatternView::AutomationPatternView(AutomationPattern* _pattern, TrackV
 	ToolTip::add(this, m_pat->name());
 	setStyle(QApplication::style());
 
-	if (s_pat_rec == NULL)
-	{
-		s_pat_rec = new QPixmap(embed::getIconPixmap("pat_rec"));
-	}
+	if (s_pat_rec == NULL) { s_pat_rec = new QPixmap(embed::getIconPixmap("pat_rec")); }
 
 	update();
 }
@@ -66,8 +63,7 @@ AutomationPatternView::~AutomationPatternView() {}
 
 void AutomationPatternView::openInAutomationEditor()
 {
-	if (gui)
-		gui->automationEditor()->open(m_pat);
+	if (gui) gui->automationEditor()->open(m_pat);
 }
 
 void AutomationPatternView::update()
@@ -101,10 +97,7 @@ void AutomationPatternView::disconnectObject(QAction* _a)
 		update();
 
 		// If automation editor is opened, update its display after disconnection
-		if (gui->automationEditor())
-		{
-			gui->automationEditor()->m_editor->updateAfterPatternChange();
-		}
+		if (gui->automationEditor()) { gui->automationEditor()->m_editor->updateAfterPatternChange(); }
 
 		// if there is no more connection connected to the AutomationPattern
 		if (m_pat->m_objects.size() == 0)
@@ -191,10 +184,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 
 	setNeedsUpdate(false);
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
-	{
-		m_paintPixmap = QPixmap(size());
-	}
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size()) { m_paintPixmap = QPixmap(size()); }
 
 	QPainter p(&m_paintPixmap);
 
@@ -209,10 +199,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
 	p.fillRect(rect(), QColor(0, 0, 0));
 
-	if (gradient())
-	{
-		p.fillRect(rect(), lingrad);
-	}
+	if (gradient()) { p.fillRect(rect(), lingrad); }
 	else
 	{
 		p.fillRect(rect(), c);
@@ -251,13 +238,9 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		{
 			const float x1 = x_base + POS(it) * ppTick;
 			const float x2 = (float)(width() - TCO_BORDER_WIDTH);
-			if (x1 > (width() - TCO_BORDER_WIDTH))
-				break;
+			if (x1 > (width() - TCO_BORDER_WIDTH)) break;
 			// We are drawing the space after the last node, so we use the outValue
-			if (gradient())
-			{
-				p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), lin2grad);
-			}
+			if (gradient()) { p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), lin2grad); }
 			else
 			{
 				p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), col);
@@ -274,10 +257,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		// the value of the end of the shape between the two nodes will be the inValue of
 		// the next node.
 		float nextValue;
-		if (m_pat->progressionType() == AutomationPattern::DiscreteProgression)
-		{
-			nextValue = OUTVAL(it);
-		}
+		if (m_pat->progressionType() == AutomationPattern::DiscreteProgression) { nextValue = OUTVAL(it); }
 		else
 		{
 			nextValue = INVAL(it + 1);
@@ -291,8 +271,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
 			x = x_base + i * ppTick;
-			if (x > (width() - TCO_BORDER_WIDTH))
-				break;
+			if (x > (width() - TCO_BORDER_WIDTH)) break;
 			float value = values[i - POS(it)];
 			path.lineTo(QPointF(x, value));
 		}
@@ -300,10 +279,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		path.lineTo(x_base + (POS(it + 1)) * ppTick, 0.0f);
 		path.lineTo(origin);
 
-		if (gradient())
-		{
-			p.fillPath(path, lin2grad);
-		}
+		if (gradient()) { p.fillPath(path, lin2grad); }
 		else
 		{
 			p.fillPath(path, col);
@@ -326,10 +302,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	}
 
 	// recording icon for when recording automation
-	if (m_pat->isRecording())
-	{
-		p.drawPixmap(1, rect().bottom() - s_pat_rec->height(), *s_pat_rec);
-	}
+	if (m_pat->isRecording()) { p.drawPixmap(1, rect().bottom() - s_pat_rec->height(), *s_pat_rec); }
 
 	// pattern name
 	paintTextLabel(m_pat->name(), p);
@@ -358,10 +331,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 void AutomationPatternView::dragEnterEvent(QDragEnterEvent* _dee)
 {
 	StringPairDrag::processDragEnterEvent(_dee, "automatable_model");
-	if (!_dee->isAccepted())
-	{
-		TrackContentObjectView::dragEnterEvent(_dee);
-	}
+	if (!_dee->isAccepted()) { TrackContentObjectView::dragEnterEvent(_dee); }
 }
 
 void AutomationPatternView::dropEvent(QDropEvent* _de)
@@ -404,10 +374,7 @@ void AutomationPatternView::scaleTimemapToFit(float oldMin, float oldMax)
 	float newMin = m_pat->getMin();
 	float newMax = m_pat->getMax();
 
-	if (oldMin == newMin && oldMax == newMax)
-	{
-		return;
-	}
+	if (oldMin == newMin && oldMax == newMax) { return; }
 
 	// TODO: Currently when rescaling the timeMap values to fit the new range of values (newMin and newMax)
 	// only the inValue is being considered and the outValue is being reset to the inValue (so discrete jumps
@@ -417,10 +384,7 @@ void AutomationPatternView::scaleTimemapToFit(float oldMin, float oldMax)
 	{
 		// If the values are out of the previous range, fix them so they are
 		// between oldMin and oldMax.
-		if (INVAL(it) < oldMin)
-		{
-			it.value().setInValue(oldMin);
-		}
+		if (INVAL(it) < oldMin) { it.value().setInValue(oldMin); }
 		else if (INVAL(it) > oldMax)
 		{
 			it.value().setInValue(oldMax);

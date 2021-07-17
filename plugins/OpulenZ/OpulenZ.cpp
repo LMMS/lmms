@@ -236,10 +236,7 @@ void OpulenzInstrument::setVoiceVelocity(int voice, int vel)
 	int vel_adjusted;
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
-	if (fm_mdl.value() == false)
-	{
-		vel_adjusted = 63 - (op1_lvl_mdl.value() * vel / 127.0);
-	}
+	if (fm_mdl.value() == false) { vel_adjusted = 63 - (op1_lvl_mdl.value() * vel / 127.0); }
 	else
 	{
 		vel_adjusted = 63 - op1_lvl_mdl.value();
@@ -273,10 +270,7 @@ int OpulenzInstrument::pushVoice(int v)
 	assert(voiceLRU[OPL2_VOICES - 1] == OPL2_NO_VOICE);
 	for (i = OPL2_VOICES - 1; i > 0; --i)
 	{
-		if (voiceLRU[i - 1] != OPL2_NO_VOICE)
-		{
-			break;
-		}
+		if (voiceLRU[i - 1] != OPL2_NO_VOICE) { break; }
 	}
 	voiceLRU[i] = v;
 #ifdef false
@@ -327,16 +321,10 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 	case MidiKeyPressure:
 		key = event.key() + 12;
 		vel = event.velocity();
-		if (velocities[key] != 0)
-		{
-			velocities[key] = vel;
-		}
+		if (velocities[key] != 0) { velocities[key] = vel; }
 		for (voice = 0; voice < OPL2_VOICES; ++voice)
 		{
-			if (voiceNote[voice] == key)
-			{
-				setVoiceVelocity(voice, vel);
-			}
+			if (voiceNote[voice] == key) { setVoiceVelocity(voice, vel); }
 		}
 		break;
 	case MidiPitchBend:
@@ -519,10 +507,7 @@ int OpulenzInstrument::Hz2fnum(float Hz)
 	for (int block = 0; block < 8; ++block)
 	{
 		unsigned int fnum = Hz * pow(2.0, 20.0 - (double)block) * (1.0 / 49716.0);
-		if (fnum < 1023)
-		{
-			return fnum + (block << 10);
-		}
+		if (fnum < 1023) { return fnum + (block << 10); }
 	}
 	return 0;
 }
@@ -564,10 +549,7 @@ void OpulenzInstrument::updatePatch()
 	// have to do this, as the level knobs might've changed
 	for (int voice = 0; voice < OPL2_VOICES; ++voice)
 	{
-		if (voiceNote[voice] && OPL2_VOICE_FREE == 0)
-		{
-			setVoiceVelocity(voice, velocities[voiceNote[voice]]);
-		}
+		if (voiceNote[voice] && OPL2_VOICE_FREE == 0) { setVoiceVelocity(voice, velocities[voiceNote[voice]]); }
 	}
 #ifdef false
 	printf("UPD: %02x %02x %02x %02x %02x -- %02x %02x %02x %02x %02x %02x\n", inst[0], inst[1], inst[2], inst[3],
@@ -597,17 +579,11 @@ void OpulenzInstrument::loadFile(const QString& file)
 			printf("No SBI signature\n");
 			return;
 		}
-		if (sbidata.size() != 52)
-		{
-			printf("SBI size error: expected 52, got %d\n", sbidata.size());
-		}
+		if (sbidata.size() != 52) { printf("SBI size error: expected 52, got %d\n", sbidata.size()); }
 
 		// Minimum size of SBI if we ignore "reserved" bytes at end
 		// https://courses.engr.illinois.edu/ece390/resources/sound/cmf.txt.html
-		if (sbidata.size() < 47)
-		{
-			return;
-		}
+		if (sbidata.size() < 47) { return; }
 
 		QString sbiname = sbidata.mid(4, 32);
 		// If user has changed track name... let's hope my logic is valid.
@@ -760,10 +736,7 @@ OpulenzInstrumentView::~OpulenzInstrumentView()
 // Returns text for time knob formatted nicely
 inline QString OpulenzInstrumentView::knobHintHelper(float n)
 {
-	if (n > 1000)
-	{
-		return QString::number(n / 1000, 'f', 0) + " s";
-	}
+	if (n > 1000) { return QString::number(n / 1000, 'f', 0) + " s"; }
 	else if (n > 10)
 	{
 		return QString::number(n, 'f', 0) + " ms";

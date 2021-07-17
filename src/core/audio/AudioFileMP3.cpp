@@ -50,10 +50,7 @@ AudioFileMP3::~AudioFileMP3()
 
 void AudioFileMP3::writeBuffer(const surroundSampleFrame* _buf, const fpp_t _frames, const float _master_gain)
 {
-	if (_frames < 1)
-	{
-		return;
-	}
+	if (_frames < 1) { return; }
 
 	// TODO Why isn't the gain applied by the driver but inside the device?
 	std::vector<float> interleavedDataBuffer(_frames * 2);

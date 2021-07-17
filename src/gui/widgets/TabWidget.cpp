@@ -68,9 +68,7 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 	// Append tab when position is not given
 	if (idx < 0 /* || m_widgets.contains( idx ) == true*/)
 	{
-		while (m_widgets.contains(++idx) == true)
-		{
-		}
+		while (m_widgets.contains(++idx) == true) {}
 	}
 
 	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the
@@ -82,10 +80,7 @@ void TabWidget::addTab(QWidget* w, const QString& name, const char* pixmap, int 
 	m_widgets[idx] = d;
 
 	// Position tab's window
-	if (!m_resizable)
-	{
-		w->setFixedSize(width() - 4, height() - m_tabbarHeight);
-	}
+	if (!m_resizable) { w->setFixedSize(width() - 4, height() - m_tabbarHeight); }
 	w->move(2, m_tabbarHeight - 1);
 	w->hide();
 
@@ -106,10 +101,7 @@ void TabWidget::setActiveTab(int idx)
 		m_activeTab = idx;
 		m_widgets[m_activeTab].w->raise();
 		m_widgets[m_activeTab].w->show();
-		if (old_active != idx && m_widgets.contains(old_active))
-		{
-			m_widgets[old_active].w->hide();
-		}
+		if (old_active != idx && m_widgets.contains(old_active)) { m_widgets[old_active].w->hide(); }
 		update();
 	}
 }
@@ -124,10 +116,7 @@ int TabWidget::findTabAtPos(const QPoint* pos)
 
 		for (widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it)
 		{
-			if (pos->x() >= cx && pos->x() <= cx + (*it).nwidth)
-			{
-				return (it.key());
-			}
+			if (pos->x() >= cx && pos->x() <= cx + (*it).nwidth) { return (it.key()); }
 			cx += (*it).nwidth;
 		}
 	}
@@ -225,10 +214,7 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 	widgetStack::iterator first = m_widgets.begin();
 	widgetStack::iterator last = m_widgets.end();
 	int tab_width = width();
-	if (first != last)
-	{
-		tab_width = (width() - tab_x_offset) / std::distance(first, last);
-	}
+	if (first != last) { tab_width = (width() - tab_x_offset) / std::distance(first, last); }
 
 	// Draw all tabs
 	p.setPen(tabText());
@@ -272,10 +258,7 @@ void TabWidget::paintEvent(QPaintEvent* pe)
 // Switch between tabs with mouse wheel
 void TabWidget::wheelEvent(QWheelEvent* we)
 {
-	if (position(we).y() > m_tabheight)
-	{
-		return;
-	}
+	if (position(we).y() > m_tabheight) { return; }
 
 	we->accept();
 	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
@@ -283,10 +266,7 @@ void TabWidget::wheelEvent(QWheelEvent* we)
 	while (tab > -1 && static_cast<int>(tab) < m_widgets.count())
 	{
 		tab += dir;
-		if (m_widgets.contains(tab))
-		{
-			break;
-		}
+		if (m_widgets.contains(tab)) { break; }
 	}
 	setActiveTab(tab);
 }

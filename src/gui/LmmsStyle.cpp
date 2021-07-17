@@ -85,16 +85,14 @@ void drawPath(QPainter* p, const QPainterPath& path, const QColor& col, const QC
 	p->setOpacity(0.25);
 
 	// glow
-	if (dark)
-		p->strokePath(path, QPen(darkGradient, 4));
+	if (dark) p->strokePath(path, QPen(darkGradient, 4));
 	else
 		p->strokePath(path, QPen(baseGradient, 4));
 
 	p->setOpacity(1.0);
 
 	// fill
-	if (dark)
-		p->fillPath(path, darkGradient);
+	if (dark) p->fillPath(path, darkGradient);
 	else
 		p->fillPath(path, baseGradient);
 
@@ -110,8 +108,7 @@ void drawPath(QPainter* p, const QPainterPath& path, const QColor& col, const QC
 	p->setOpacity(0.5);
 
 	// highlight (bb)
-	if (dark)
-		p->strokePath(path, QPen(borderCol.lighter(133), 2));
+	if (dark) p->strokePath(path, QPen(borderCol.lighter(133), 2));
 	else
 		p->strokePath(path, QPen(borderCol, 2));
 }
@@ -123,20 +120,14 @@ LmmsStyle::LmmsStyle()
 	file.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(file.readAll());
 
-	if (s_palette != NULL)
-	{
-		qApp->setPalette(*s_palette);
-	}
+	if (s_palette != NULL) { qApp->setPalette(*s_palette); }
 
 	setBaseStyle(QStyleFactory::create("Fusion"));
 }
 
 QPalette LmmsStyle::standardPalette(void) const
 {
-	if (s_palette != NULL)
-	{
-		return *s_palette;
-	}
+	if (s_palette != NULL) { return *s_palette; }
 
 	QPalette pal = QProxyStyle::standardPalette();
 

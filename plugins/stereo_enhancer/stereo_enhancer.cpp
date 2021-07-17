@@ -49,10 +49,7 @@ stereoEnhancerEffect::stereoEnhancerEffect(Model* _parent, const Descriptor::Sub
 
 stereoEnhancerEffect::~stereoEnhancerEffect()
 {
-	if (m_delayBuffer)
-	{
-		delete[] m_delayBuffer;
-	}
+	if (m_delayBuffer) { delete[] m_delayBuffer; }
 
 	m_currFrame = 0;
 }
@@ -67,10 +64,7 @@ bool stereoEnhancerEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _fr
 	float width;
 	int frameIndex = 0;
 
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 
 	const float d = dryLevel();
 	const float w = wetLevel();
@@ -109,10 +103,7 @@ bool stereoEnhancerEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _fr
 	}
 
 	checkGate(out_sum / _frames);
-	if (!isRunning())
-	{
-		clearMyBuffer();
-	}
+	if (!isRunning()) { clearMyBuffer(); }
 
 	return (isRunning());
 }

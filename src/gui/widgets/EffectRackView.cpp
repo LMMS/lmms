@@ -89,10 +89,7 @@ void EffectRackView::moveUp(EffectView* view)
 		int i = 0;
 		for (QVector<EffectView*>::Iterator it = m_effectViews.begin(); it != m_effectViews.end(); it++, i++)
 		{
-			if (*it == view)
-			{
-				break;
-			}
+			if (*it == view) { break; }
 		}
 
 		EffectView* temp = m_effectViews[i - 1];
@@ -148,10 +145,7 @@ void EffectRackView::update()
 				view, SIGNAL(deletePlugin(EffectView*)), this, SLOT(deletePlugin(EffectView*)), Qt::QueuedConnection);
 			view->show();
 			m_effectViews.append(view);
-			if (i < view_map.size())
-			{
-				view_map[i] = true;
-			}
+			if (i < view_map.size()) { view_map[i] = true; }
 			else
 			{
 				view_map.append(true);
@@ -190,10 +184,7 @@ void EffectRackView::addEffect()
 	EffectSelectDialog esd(this);
 	esd.exec();
 
-	if (esd.result() == QDialog::Rejected)
-	{
-		return;
-	}
+	if (esd.result() == QDialog::Rejected) { return; }
 
 	Effect* fx = esd.instantiateSelectedPlugin(fxChain());
 

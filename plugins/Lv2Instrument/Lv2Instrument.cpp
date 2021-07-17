@@ -163,10 +163,7 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent* _dee)
 	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
 	{
 		const QString txt = _dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == "pluginpresetfile")
-		{
-			reaction = &QDragEnterEvent::acceptProposedAction;
-		}
+		if (txt.section(':', 0, 0) == "pluginpresetfile") { reaction = &QDragEnterEvent::acceptProposedAction; }
 	}
 
 	(_dee->*reaction)();

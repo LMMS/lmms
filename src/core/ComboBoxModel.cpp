@@ -48,10 +48,7 @@ int ComboBoxModel::findText(const QString& txt) const
 {
 	for (auto it = m_items.begin(); it != m_items.end(); ++it)
 	{
-		if ((*it).first == txt)
-		{
-			return it - m_items.begin();
-		}
+		if ((*it).first == txt) { return it - m_items.begin(); }
 	}
 	return -1;
 }

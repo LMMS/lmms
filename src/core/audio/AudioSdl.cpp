@@ -101,10 +101,7 @@ AudioSdl::AudioSdl(bool& _success_ful, Mixer* _mixer)
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
 	m_inputDevice = SDL_OpenAudioDevice(NULL, 1, &m_inputAudioHandle, &actual, 0);
-	if (m_inputDevice != 0)
-	{
-		m_supportsCapture = true;
-	}
+	if (m_inputDevice != 0) { m_supportsCapture = true; }
 	else
 	{
 		m_supportsCapture = false;
@@ -119,10 +116,8 @@ AudioSdl::~AudioSdl()
 	stopProcessing();
 
 #ifdef LMMS_HAVE_SDL2
-	if (m_inputDevice != 0)
-		SDL_CloseAudioDevice(m_inputDevice);
-	if (m_outputDevice != 0)
-		SDL_CloseAudioDevice(m_outputDevice);
+	if (m_inputDevice != 0) SDL_CloseAudioDevice(m_inputDevice);
+	if (m_outputDevice != 0) SDL_CloseAudioDevice(m_outputDevice);
 #else
 	SDL_CloseAudio();
 	delete[] m_convertedBuf;

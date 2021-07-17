@@ -51,24 +51,15 @@ BassBoosterEffect::~BassBoosterEffect() {}
 
 bool BassBoosterEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	if (!isEnabled() || !isRunning())
-	{
-		return (false);
-	}
+	if (!isEnabled() || !isRunning()) { return (false); }
 	// check out changed controls
 	if (m_frequencyChangeNeeded || m_bbControls.m_freqModel.isValueChanged())
 	{
 		changeFrequency();
 		m_frequencyChangeNeeded = false;
 	}
-	if (m_bbControls.m_gainModel.isValueChanged())
-	{
-		changeGain();
-	}
-	if (m_bbControls.m_ratioModel.isValueChanged())
-	{
-		changeRatio();
-	}
+	if (m_bbControls.m_gainModel.isValueChanged()) { changeGain(); }
+	if (m_bbControls.m_ratioModel.isValueChanged()) { changeRatio(); }
 
 	const float const_gain = m_bbControls.m_gainModel.value();
 	const ValueBuffer* gainBuffer = m_bbControls.m_gainModel.valueBuffer();

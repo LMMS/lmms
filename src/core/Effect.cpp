@@ -49,20 +49,14 @@ Effect::Effect(const Plugin::Descriptor* _desc, Model* _parent, const Descriptor
 	m_srcState[0] = m_srcState[1] = NULL;
 	reinitSRC();
 
-	if (ConfigManager::inst()->value("ui", "disableautoquit").toInt())
-	{
-		m_autoQuitDisabled = true;
-	}
+	if (ConfigManager::inst()->value("ui", "disableautoquit").toInt()) { m_autoQuitDisabled = true; }
 }
 
 Effect::~Effect()
 {
 	for (int i = 0; i < 2; ++i)
 	{
-		if (m_srcState[i] != NULL)
-		{
-			src_delete(m_srcState[i]);
-		}
+		if (m_srcState[i] != NULL) { src_delete(m_srcState[i]); }
 	}
 }
 
@@ -87,10 +81,7 @@ void Effect::loadSettings(const QDomElement& _this)
 	{
 		if (node.isElement())
 		{
-			if (controls()->nodeName() == node.nodeName())
-			{
-				controls()->restoreState(node.toElement());
-			}
+			if (controls()->nodeName() == node.nodeName()) { controls()->restoreState(node.toElement()); }
 		}
 		node = node.nextSibling();
 	}
@@ -116,10 +107,7 @@ Effect* Effect::instantiate(const QString& pluginName, Model* _parent, Descripto
 
 void Effect::checkGate(double _out_sum)
 {
-	if (m_autoQuitDisabled)
-	{
-		return;
-	}
+	if (m_autoQuitDisabled) { return; }
 
 	// Check whether we need to continue processing input.  Restart the
 	// counter if the threshold has been exceeded.
@@ -144,10 +132,7 @@ void Effect::reinitSRC()
 {
 	for (int i = 0; i < 2; ++i)
 	{
-		if (m_srcState[i] != NULL)
-		{
-			src_delete(m_srcState[i]);
-		}
+		if (m_srcState[i] != NULL) { src_delete(m_srcState[i]); }
 		int error;
 		if ((m_srcState[i] = src_new(
 				 Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error)) == NULL)
@@ -160,10 +145,7 @@ void Effect::reinitSRC()
 void Effect::resample(int _i, const sampleFrame* _src_buf, sample_rate_t _src_sr, sampleFrame* _dst_buf,
 	sample_rate_t _dst_sr, f_cnt_t _frames)
 {
-	if (m_srcState[_i] == NULL)
-	{
-		return;
-	}
+	if (m_srcState[_i] == NULL) { return; }
 	m_srcData[_i].input_frames = _frames;
 	m_srcData[_i].output_frames = Engine::mixer()->framesPerPeriod();
 	m_srcData[_i].data_in = const_cast<float*>(_src_buf[0].data());

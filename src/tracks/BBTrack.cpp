@@ -59,34 +59,22 @@ BBTCO::BBTCO(Track* _track)
 void BBTCO::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	element.setAttribute("name", name());
-	if (element.parentNode().nodeName() == "clipboard")
-	{
-		element.setAttribute("pos", -1);
-	}
+	if (element.parentNode().nodeName() == "clipboard") { element.setAttribute("pos", -1); }
 	else
 	{
 		element.setAttribute("pos", startPosition());
 	}
 	element.setAttribute("len", length());
 	element.setAttribute("muted", isMuted());
-	if (usesCustomClipColor())
-	{
-		element.setAttribute("color", color().name());
-	}
+	if (usesCustomClipColor()) { element.setAttribute("color", color().name()); }
 }
 
 void BBTCO::loadSettings(const QDomElement& element)
 {
 	setName(element.attribute("name"));
-	if (element.attribute("pos").toInt() >= 0)
-	{
-		movePosition(element.attribute("pos").toInt());
-	}
+	if (element.attribute("pos").toInt() >= 0) { movePosition(element.attribute("pos").toInt()); }
 	changeLength(element.attribute("len").toInt());
-	if (element.attribute("muted").toInt() != isMuted())
-	{
-		toggleMute();
-	}
+	if (element.attribute("muted").toInt() != isMuted()) { toggleMute(); }
 
 	// for colors saved in 1.3-onwards
 	if (element.hasAttribute("color") && !element.hasAttribute("usestyle"))
@@ -98,10 +86,7 @@ void BBTCO::loadSettings(const QDomElement& element)
 	// for colors saved before 1.3
 	else
 	{
-		if (element.hasAttribute("color"))
-		{
-			setColor(QColor(element.attribute("color").toUInt()));
-		}
+		if (element.hasAttribute("color")) { setColor(QColor(element.attribute("color").toUInt())); }
 
 		// usestyle attribute is no longer used
 	}
@@ -146,10 +131,7 @@ void BBTCOView::paintEvent(QPaintEvent*)
 
 	setNeedsUpdate(false);
 
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
-	{
-		m_paintPixmap = QPixmap(size());
-	}
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size()) { m_paintPixmap = QPixmap(size()); }
 
 	QPainter p(&m_paintPixmap);
 
@@ -162,10 +144,7 @@ void BBTCOView::paintEvent(QPaintEvent*)
 	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
 	p.fillRect(rect(), QColor(0, 0, 0));
 
-	if (gradient())
-	{
-		p.fillRect(rect(), lingrad);
-	}
+	if (gradient()) { p.fillRect(rect(), lingrad); }
 	else
 	{
 		p.fillRect(rect(), c);
@@ -256,10 +235,7 @@ BBTrack::~BBTrack()
 	Engine::getBBTrackContainer()->removeBB(bb);
 	for (infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end(); ++it)
 	{
-		if (it.value() > bb)
-		{
-			--it.value();
-		}
+		if (it.value() > bb) { --it.value(); }
 	}
 	s_infoMap.remove(this);
 
@@ -272,23 +248,14 @@ BBTrack::~BBTrack()
 // play _frames frames of given TCO within starting with _start
 bool BBTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t _offset, int _tco_num)
 {
-	if (isMuted())
-	{
-		return false;
-	}
+	if (isMuted()) { return false; }
 
-	if (_tco_num >= 0)
-	{
-		return Engine::getBBTrackContainer()->play(_start, _frames, _offset, s_infoMap[this]);
-	}
+	if (_tco_num >= 0) { return Engine::getBBTrackContainer()->play(_start, _frames, _offset, s_infoMap[this]); }
 
 	tcoVector tcos;
 	getTCOsInRange(tcos, _start, _start + static_cast<int>(_frames / Engine::framesPerTick()));
 
-	if (tcos.size() == 0)
-	{
-		return false;
-	}
+	if (tcos.size() == 0) { return false; }
 
 	TimePos lastPosition;
 	TimePos lastLen;
@@ -327,10 +294,7 @@ void BBTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this)
 	{
 		((JournallingObject*)(Engine::getBBTrackContainer()))->saveState(_doc, _this);
 	}
-	if (_this.parentNode().parentNode().nodeName() == "clone")
-	{
-		_this.setAttribute("clonebbt", s_infoMap[this]);
-	}
+	if (_this.parentNode().parentNode().nodeName() == "clone") { _this.setAttribute("clonebbt", s_infoMap[this]); }
 }
 
 void BBTrack::loadTrackSpecificSettings(const QDomElement& _this)
@@ -356,10 +320,7 @@ void BBTrack::loadTrackSpecificSettings(const QDomElement& _this)
 	else
 	{
 		QDomNode node = _this.namedItem(TrackContainer::classNodeName());
-		if (node.isElement())
-		{
-			((JournallingObject*)Engine::getBBTrackContainer())->restoreState(node.toElement());
-		}
+		if (node.isElement()) { ((JournallingObject*)Engine::getBBTrackContainer())->restoreState(node.toElement()); }
 	}
 	/*	doesn't work yet because BBTrack-ctor also sets current bb so if
 	bb-tracks are created after this function is called, this doesn't
@@ -375,10 +336,7 @@ BBTrack* BBTrack::findBBTrack(int _bb_num)
 {
 	for (infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end(); ++it)
 	{
-		if (it.value() == _bb_num)
-		{
-			return it.key();
-		}
+		if (it.value() == _bb_num) { return it.key(); }
 	}
 	return NULL;
 }

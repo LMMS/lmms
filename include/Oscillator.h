@@ -80,10 +80,7 @@ public:
 	static inline sample_t triangleSample(const float _sample)
 	{
 		const float ph = absFraction(_sample);
-		if (ph <= 0.25f)
-		{
-			return ph * 4.0f;
-		}
+		if (ph <= 0.25f) { return ph * 4.0f; }
 		else if (ph <= 0.75f)
 		{
 			return 2.0f - ph * 4.0f;
@@ -98,20 +95,14 @@ public:
 	static inline sample_t moogSawSample(const float _sample)
 	{
 		const float ph = absFraction(_sample);
-		if (ph < 0.5f)
-		{
-			return -1.0f + ph * 4.0f;
-		}
+		if (ph < 0.5f) { return -1.0f + ph * 4.0f; }
 		return 1.0f - 2.0f * ph;
 	}
 
 	static inline sample_t expSample(const float _sample)
 	{
 		float ph = absFraction(_sample);
-		if (ph > 0.5f)
-		{
-			ph = 1.0f - ph;
-		}
+		if (ph > 0.5f) { ph = 1.0f - ph; }
 		return -1.0f + 8.0f * ph * ph;
 	}
 

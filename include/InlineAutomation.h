@@ -41,10 +41,7 @@ public:
 
 	virtual ~InlineAutomation()
 	{
-		if (m_autoPattern)
-		{
-			delete m_autoPattern;
-		}
+		if (m_autoPattern) { delete m_autoPattern; }
 	}
 
 	virtual float defaultValue() const = 0;

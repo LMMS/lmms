@@ -182,10 +182,7 @@ float SaWaterfallView::timeToYPixel(float time, int height)
 // Convert Y coordinate on display of given height back to time value.
 float SaWaterfallView::yPixelToTime(float position, int height)
 {
-	if (height == 0)
-	{
-		height = 1;
-	}
+	if (height == 0) { height = 1; }
 	float pixels_per_line = (float)height / m_processor->waterfallHeight();
 
 	return (position / pixels_per_line) * secondsPerLine();
@@ -202,18 +199,12 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 
 	// set increment to about 30 pixels (but min. 0.1 s)
 	float increment = std::round(10 * limit / (m_displayHeight / 30)) / 10;
-	if (increment < 0.1)
-	{
-		increment = 0.1;
-	}
+	if (increment < 0.1) { increment = 0.1; }
 
 	// NOTE: labels positions are rounded to match the (rounded) label value
 	for (i = 0; i <= limit; i += increment)
 	{
-		if (i > 99)
-		{
-			result.emplace_back(std::round(i), std::to_string(std::round(i)).substr(0, 3));
-		}
+		if (i > 99) { result.emplace_back(std::round(i), std::to_string(std::round(i)).substr(0, 3)); }
 		else if (i < 10)
 		{
 			result.emplace_back(std::round(i * 10) / 10, std::to_string(std::round(i * 10) / 10).substr(0, 3));
@@ -231,10 +222,7 @@ std::vector<std::pair<float, std::string>> SaWaterfallView::makeTimeTics()
 void SaWaterfallView::periodicUpdate()
 {
 	m_processor->setWaterfallActive(isVisible());
-	if (isVisible())
-	{
-		update();
-	}
+	if (isVisible()) { update(); }
 }
 
 // Adjust window size and widget visibility when waterfall is enabled or disabbled.

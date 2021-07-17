@@ -116,10 +116,7 @@ public:
 
 	inline bool LFSR() // returns true if bit 14 is set
 	{
-		if (m_LFSR & (1 << 14))
-		{
-			return true;
-		}
+		if (m_LFSR & (1 << 14)) { return true; }
 		return false;
 	}
 
@@ -132,10 +129,7 @@ public:
 		int n = 15;
 		for (int i = 15; i >= 0; i--)
 		{
-			if (f >= NOISE_FREQS[i])
-			{
-				n = i;
-			}
+			if (f >= NOISE_FREQS[i]) { n = i; }
 		}
 		return n;
 	}

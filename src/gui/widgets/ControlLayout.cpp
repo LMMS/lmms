@@ -121,10 +121,7 @@ void ControlLayout::addItem(QLayoutItem* item)
 
 int ControlLayout::horizontalSpacing() const
 {
-	if (m_hSpace >= 0)
-	{
-		return m_hSpace;
-	}
+	if (m_hSpace >= 0) { return m_hSpace; }
 	else
 	{
 		return smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
@@ -133,10 +130,7 @@ int ControlLayout::horizontalSpacing() const
 
 int ControlLayout::verticalSpacing() const
 {
-	if (m_vSpace >= 0)
-	{
-		return m_vSpace;
-	}
+	if (m_vSpace >= 0) { return m_vSpace; }
 	else
 	{
 		return smartSpacing(QStyle::PM_LayoutVerticalSpacing);
@@ -147,20 +141,14 @@ int ControlLayout::count() const { return m_itemMap.size() - 1; }
 
 QMap<QString, QLayoutItem*>::const_iterator ControlLayout::pairAt(int index) const
 {
-	if (index < 0)
-	{
-		return m_itemMap.cend();
-	}
+	if (index < 0) { return m_itemMap.cend(); }
 
 	auto skip = [&](QLayoutItem* item) -> bool { return item->widget()->objectName() == s_searchBarName; };
 
 	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
 	for (; itr != m_itemMap.cend() && (index > 0 || skip(itr.value())); ++itr)
 	{
-		if (!skip(itr.value()))
-		{
-			index--;
-		}
+		if (!skip(itr.value())) { index--; }
 	}
 	return itr;
 }
@@ -252,10 +240,7 @@ int ControlLayout::doLayout(const QRect& rect, bool testOnly) const
 				{
 					// for the search bar, only show it if there are at least
 					// two control widgets (i.e. at least 3 widgets)
-					if (m_itemMap.size() > 2)
-					{
-						wid->show();
-					}
+					if (m_itemMap.size() > 2) { wid->show(); }
 					else
 					{
 						wid->hide();
@@ -287,10 +272,7 @@ int ControlLayout::doLayout(const QRect& rect, bool testOnly) const
 					lineHeight = 0;
 				}
 
-				if (!testOnly)
-				{
-					item->setGeometry(QRect(QPoint(x, y), item->sizeHint()));
-				}
+				if (!testOnly) { item->setGeometry(QRect(QPoint(x, y), item->sizeHint())); }
 
 				x = nextX;
 				lineHeight = qMax(lineHeight, item->sizeHint().height());
@@ -308,10 +290,7 @@ int ControlLayout::doLayout(const QRect& rect, bool testOnly) const
 int ControlLayout::smartSpacing(QStyle::PixelMetric pm) const
 {
 	QObject* parent = this->parent();
-	if (!parent)
-	{
-		return -1;
-	}
+	if (!parent) { return -1; }
 	else if (parent->isWidgetType())
 	{
 		QWidget* pw = static_cast<QWidget*>(parent);

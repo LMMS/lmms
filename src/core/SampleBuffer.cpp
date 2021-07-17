@@ -78,10 +78,7 @@ SampleBuffer::SampleBuffer()
 SampleBuffer::SampleBuffer(const QString& audioFile, bool isBase64Data)
 	: SampleBuffer()
 {
-	if (isBase64Data)
-	{
-		loadFromBase64(audioFile);
-	}
+	if (isBase64Data) { loadFromBase64(audioFile); }
 	else
 	{
 		m_audioFile = audioFile;
@@ -134,14 +131,8 @@ SampleBuffer::SampleBuffer(const SampleBuffer& orig)
 	// Deep copy m_origData and m_data from original
 	const auto origFrameBytes = m_origFrames * BYTES_PER_FRAME;
 	const auto frameBytes = m_frames * BYTES_PER_FRAME;
-	if (orig.m_origData != nullptr && origFrameBytes > 0)
-	{
-		memcpy(m_origData, orig.m_origData, origFrameBytes);
-	}
-	if (orig.m_data != nullptr && frameBytes > 0)
-	{
-		memcpy(m_data, orig.m_data, frameBytes);
-	}
+	if (orig.m_origData != nullptr && origFrameBytes > 0) { memcpy(m_origData, orig.m_origData, origFrameBytes); }
+	if (orig.m_data != nullptr && frameBytes > 0) { memcpy(m_data, orig.m_data, frameBytes); }
 
 	orig.m_varLock.unlock();
 }
@@ -151,10 +142,7 @@ void swap(SampleBuffer& first, SampleBuffer& second) noexcept
 	using std::swap;
 
 	// Lock both buffers for writing, with address as lock ordering
-	if (&first == &second)
-	{
-		return;
-	}
+	if (&first == &second) { return; }
 	else if (&first > &second)
 	{
 		first.m_varLock.lockForWrite();
@@ -239,10 +227,7 @@ void SampleBuffer::update(bool keepSettings)
 		m_frames = 0;
 
 		const QFileInfo fileInfo(file);
-		if (fileInfo.size() > fileSizeMax * 1024 * 1024)
-		{
-			fileLoadError = true;
-		}
+		if (fileInfo.size() > fileSizeMax * 1024 * 1024) { fileLoadError = true; }
 		else
 		{
 			// Use QFile to handle unicode file names on Windows
@@ -254,10 +239,7 @@ void SampleBuffer::update(bool keepSettings)
 			{
 				f_cnt_t frames = sfInfo.frames;
 				int rate = sfInfo.samplerate;
-				if (frames / rate > sampleLengthMax * 60)
-				{
-					fileLoadError = true;
-				}
+				if (frames / rate > sampleLengthMax * 60) { fileLoadError = true; }
 				sf_close(sndFile);
 			}
 			f.close();
@@ -274,20 +256,11 @@ void SampleBuffer::update(bool keepSettings)
 				m_frames = decodeSampleOGGVorbis(file, buf, channels, samplerate);
 			}
 #endif
-			if (m_frames == 0)
-			{
-				m_frames = decodeSampleSF(file, fbuf, channels, samplerate);
-			}
+			if (m_frames == 0) { m_frames = decodeSampleSF(file, fbuf, channels, samplerate); }
 #ifdef LMMS_HAVE_OGGVORBIS
-			if (m_frames == 0)
-			{
-				m_frames = decodeSampleOGGVorbis(file, buf, channels, samplerate);
-			}
+			if (m_frames == 0) { m_frames = decodeSampleOGGVorbis(file, buf, channels, samplerate); }
 #endif
-			if (m_frames == 0)
-			{
-				m_frames = decodeSampleDS(file, buf, channels, samplerate);
-			}
+			if (m_frames == 0) { m_frames = decodeSampleDS(file, buf, channels, samplerate); }
 		}
 
 		if (m_frames == 0 || fileLoadError) // if still no frames, bail
@@ -331,10 +304,7 @@ void SampleBuffer::update(bool keepSettings)
 							 "in size and %2 minutes of playing time")
 							  .arg(fileSizeMax)
 							  .arg(sampleLengthMax);
-		if (gui)
-		{
-			QMessageBox::information(nullptr, title, message, QMessageBox::Ok);
-		}
+		if (gui) { QMessageBox::information(nullptr, title, message, QMessageBox::Ok); }
 		else
 		{
 			fprintf(stderr, "%s\n", message.toUtf8().constData());
@@ -457,10 +427,7 @@ f_cnt_t SampleBuffer::decodeSampleSF(QString fileName, sample_t*& buf, ch_cnt_t&
 
 	// write down either directly or convert i->f depending on file type
 
-	if (frames > 0 && buf != nullptr)
-	{
-		directFloatWrite(buf, frames, channels);
-	}
+	if (frames > 0 && buf != nullptr) { directFloatWrite(buf, frames, channels); }
 
 	return frames;
 }
@@ -478,10 +445,7 @@ int qfileSeekCallback(void* udata, ogg_int64_t offset, int whence)
 {
 	QFile* f = static_cast<QFile*>(udata);
 
-	if (whence == SEEK_CUR)
-	{
-		f->seek(f->pos() + offset);
-	}
+	if (whence == SEEK_CUR) { f->seek(f->pos() + offset); }
 	else if (whence == SEEK_END)
 	{
 		f->seek(f->size() + offset);
@@ -564,20 +528,14 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis(
 		bytesRead = ov_read(&vf, (char*)&buf[frames * channels], (total - frames) * channels * BYTES_PER_INT_SAMPLE,
 			isLittleEndian() ? 0 : 1, BYTES_PER_INT_SAMPLE, 1, &bitstream);
 
-		if (bytesRead < 0)
-		{
-			break;
-		}
+		if (bytesRead < 0) { break; }
 		frames += bytesRead / (channels * BYTES_PER_INT_SAMPLE);
 	} while (bytesRead != 0 && bitstream == 0);
 
 	ov_clear(&vf);
 
 	// if buffer isn't empty, convert it to float and write it down
-	if (frames > 0 && buf != nullptr)
-	{
-		convertIntToFloat(buf, frames, channels);
-	}
+	if (frames > 0 && buf != nullptr) { convertIntToFloat(buf, frames, channels); }
 
 	return frames;
 }
@@ -589,10 +547,7 @@ f_cnt_t SampleBuffer::decodeSampleDS(
 	DrumSynth ds;
 	f_cnt_t frames = ds.GetDSFileSamples(fileName, buf, channels, samplerate);
 
-	if (frames > 0 && buf != nullptr)
-	{
-		convertIntToFloat(buf, frames, channels);
-	}
+	if (frames > 0 && buf != nullptr) { convertIntToFloat(buf, frames, channels); }
 
 	return frames;
 }
@@ -605,10 +560,7 @@ bool SampleBuffer::play(
 	f_cnt_t loopStartFrame = m_loopStartFrame;
 	f_cnt_t loopEndFrame = m_loopEndFrame;
 
-	if (endFrame == 0 || frames == 0)
-	{
-		return false;
-	}
+	if (endFrame == 0 || frames == 0) { return false; }
 
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool isBackwards = state->isBackwards();
@@ -619,10 +571,7 @@ bool SampleBuffer::play(
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>((endFrame - startFrame) / freqFactor);
 
-	if (totalFramesForCurrentPitch == 0)
-	{
-		return false;
-	}
+	if (totalFramesForCurrentPitch == 0) { return false; }
 
 	// this holds the index of the first frame to play
 	f_cnt_t playFrame = qMax(state->m_frameIndex, startFrame);
@@ -662,10 +611,7 @@ bool SampleBuffer::play(
 		srcData.src_ratio = 1.0 / freqFactor;
 		srcData.end_of_input = 0;
 		int error = src_process(state->m_resamplingData, &srcData);
-		if (error)
-		{
-			printf("SampleBuffer: error while resampling: %s\n", src_strerror(error));
-		}
+		if (error) { printf("SampleBuffer: error while resampling: %s\n", src_strerror(error)); }
 		if (srcData.output_frames_gen > frames)
 		{
 			printf("SampleBuffer: not enough frames: %ld / %d\n", srcData.output_frames_gen, frames);
@@ -738,10 +684,7 @@ bool SampleBuffer::play(
 		}
 	}
 
-	if (tmp != nullptr)
-	{
-		MM_FREE(tmp);
-	}
+	if (tmp != nullptr) { MM_FREE(tmp); }
 
 	state->setBackwards(isBackwards);
 	state->setFrameIndex(playFrame);
@@ -760,24 +703,15 @@ sampleFrame* SampleBuffer::getSampleFragment(f_cnt_t index, f_cnt_t frames, Loop
 {
 	if (loopMode == LoopOff)
 	{
-		if (index + frames <= end)
-		{
-			return m_data + index;
-		}
+		if (index + frames <= end) { return m_data + index; }
 	}
 	else if (loopMode == LoopOn)
 	{
-		if (index + frames <= loopEnd)
-		{
-			return m_data + index;
-		}
+		if (index + frames <= loopEnd) { return m_data + index; }
 	}
 	else
 	{
-		if (!*backwards && index + frames < loopEnd)
-		{
-			return m_data + index;
-		}
+		if (!*backwards && index + frames < loopEnd) { return m_data + index; }
 	}
 
 	*tmp = MM_ALLOC(sampleFrame, frames);
@@ -815,20 +749,14 @@ sampleFrame* SampleBuffer::getSampleFragment(f_cnt_t index, f_cnt_t frames, Loop
 				(*tmp)[i][1] = m_data[pos - i][1];
 			}
 			pos -= copied;
-			if (pos == loopStart)
-			{
-				currentBackwards = false;
-			}
+			if (pos == loopStart) { currentBackwards = false; }
 		}
 		else
 		{
 			copied = qMin(frames, loopEnd - pos);
 			memcpy(*tmp, m_data + pos, copied * BYTES_PER_FRAME);
 			pos += copied;
-			if (pos == loopEnd)
-			{
-				currentBackwards = true;
-			}
+			if (pos == loopEnd) { currentBackwards = true; }
 		}
 
 		while (copied < frames)
@@ -843,10 +771,7 @@ sampleFrame* SampleBuffer::getSampleFragment(f_cnt_t index, f_cnt_t frames, Loop
 				}
 				pos -= todo;
 				copied += todo;
-				if (pos <= loopStart)
-				{
-					currentBackwards = false;
-				}
+				if (pos <= loopStart) { currentBackwards = false; }
 			}
 			else
 			{
@@ -854,10 +779,7 @@ sampleFrame* SampleBuffer::getSampleFragment(f_cnt_t index, f_cnt_t frames, Loop
 				memcpy(*tmp + copied, m_data + pos, todo * BYTES_PER_FRAME);
 				pos += todo;
 				copied += todo;
-				if (pos >= loopEnd)
-				{
-					currentBackwards = true;
-				}
+				if (pos >= loopEnd) { currentBackwards = true; }
 			}
 		}
 		*backwards = currentBackwards;
@@ -868,19 +790,13 @@ sampleFrame* SampleBuffer::getSampleFragment(f_cnt_t index, f_cnt_t frames, Loop
 
 f_cnt_t SampleBuffer::getLoopedIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const
 {
-	if (index < endf)
-	{
-		return index;
-	}
+	if (index < endf) { return index; }
 	return startf + (index - startf) % (endf - startf);
 }
 
 f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t endf) const
 {
-	if (index < endf)
-	{
-		return index;
-	}
+	if (index < endf) { return index; }
 	const f_cnt_t loopLen = endf - startf;
 	const f_cnt_t loopPos = (index - endf) % (loopLen * 2);
 
@@ -889,10 +805,7 @@ f_cnt_t SampleBuffer::getPingPongIndex(f_cnt_t index, f_cnt_t startf, f_cnt_t en
 
 void SampleBuffer::visualize(QPainter& p, const QRect& dr, const QRect& clip, f_cnt_t fromFrame, f_cnt_t toFrame)
 {
-	if (m_frames == 0)
-	{
-		return;
-	}
+	if (m_frames == 0) { return; }
 
 	const bool focusOnRange = toFrame <= m_frames && 0 <= fromFrame && fromFrame < toFrame;
 	// p.setClipRect(clip);
@@ -940,10 +853,7 @@ QString SampleBuffer::openAudioFile() const
 		if (QFileInfo(f).isRelative())
 		{
 			f = ConfigManager::inst()->userSamplesDir() + f;
-			if (QFileInfo(f).exists() == false)
-			{
-				f = ConfigManager::inst()->factorySamplesDir() + m_audioFile;
-			}
+			if (QFileInfo(f).exists() == false) { f = ConfigManager::inst()->factorySamplesDir() + m_audioFile; }
 		}
 		dir = QFileInfo(f).absolutePath();
 	}
@@ -977,10 +887,7 @@ QString SampleBuffer::openAudioFile() const
 
 	if (ofd.exec() == QDialog::Accepted)
 	{
-		if (ofd.selectedFiles().isEmpty())
-		{
-			return QString();
-		}
+		if (ofd.selectedFiles().isEmpty()) { return QString(); }
 		return PathUtil::toShortestRelative(ofd.selectedFiles()[0]);
 	}
 
@@ -991,27 +898,18 @@ QString SampleBuffer::openAndSetAudioFile()
 {
 	QString fileName = this->openAudioFile();
 
-	if (!fileName.isEmpty())
-	{
-		this->setAudioFile(fileName);
-	}
+	if (!fileName.isEmpty()) { this->setAudioFile(fileName); }
 
 	return fileName;
 }
 
 QString SampleBuffer::openAndSetWaveformFile()
 {
-	if (m_audioFile.isEmpty())
-	{
-		m_audioFile = ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac";
-	}
+	if (m_audioFile.isEmpty()) { m_audioFile = ConfigManager::inst()->factorySamplesDir() + "waveforms/10saw.flac"; }
 
 	QString fileName = this->openAudioFile();
 
-	if (!fileName.isEmpty())
-	{
-		this->setAudioFile(fileName);
-	}
+	if (!fileName.isEmpty()) { this->setAudioFile(fileName); }
 	else
 	{
 		m_audioFile = "";
@@ -1281,10 +1179,7 @@ void SampleBuffer::setReversed(bool on)
 {
 	Engine::mixer()->requestChangeInModel();
 	m_varLock.lockForWrite();
-	if (m_reversed != on)
-	{
-		std::reverse(m_data, m_data + m_frames);
-	}
+	if (m_reversed != on) { std::reverse(m_data, m_data + m_frames); }
 	m_reversed = on;
 	m_varLock.unlock();
 	Engine::mixer()->doneChangeInModel();

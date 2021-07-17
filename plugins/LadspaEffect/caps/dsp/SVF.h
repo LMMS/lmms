@@ -115,8 +115,7 @@ public:
 
 	void set_out(int o)
 	{
-		if (o == Low)
-			out = &lo;
+		if (o == Low) out = &lo;
 		else if (o == Band)
 			out = &band;
 		else

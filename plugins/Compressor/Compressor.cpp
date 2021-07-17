@@ -308,20 +308,14 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			{
 				// Pre-lookahead delay, so the total delay always matches 20 ms
 				++m_preLookaheadBufLoc[i];
-				if (m_preLookaheadBufLoc[i] >= m_preLookaheadLength)
-				{
-					m_preLookaheadBufLoc[i] = 0;
-				}
+				if (m_preLookaheadBufLoc[i] >= m_preLookaheadLength) { m_preLookaheadBufLoc[i] = 0; }
 				const float tempInputValue = inputValue;
 				inputValue = m_preLookaheadBuf[i][m_preLookaheadBufLoc[i]];
 				m_preLookaheadBuf[i][m_preLookaheadBufLoc[i]] = tempInputValue;
 
 				// Increment ring buffer location
 				++m_lookaheadBufLoc[i];
-				if (m_lookaheadBufLoc[i] >= m_lookaheadLength)
-				{
-					m_lookaheadBufLoc[i] = 0;
-				}
+				if (m_lookaheadBufLoc[i] >= m_lookaheadLength) { m_lookaheadBufLoc[i] = 0; }
 
 				m_lookaheadBuf[i][m_lookaheadBufLoc[i]] = inputValue;
 
@@ -473,10 +467,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		if (lookahead)
 		{
 			++m_inputBufLoc;
-			if (m_inputBufLoc >= m_lookaheadDelayLength)
-			{
-				m_inputBufLoc = 0;
-			}
+			if (m_inputBufLoc >= m_lookaheadDelayLength) { m_inputBufLoc = 0; }
 
 			const float temp[2] = {drySignal[0], drySignal[1]};
 			s[0] = m_inputBuf[0][m_inputBufLoc];

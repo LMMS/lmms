@@ -170,10 +170,7 @@ void GuiApplication::childDestroyed(QObject* obj)
 {
 	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
-	if (obj == m_mainWindow)
-	{
-		m_mainWindow = nullptr;
-	}
+	if (obj == m_mainWindow) { m_mainWindow = nullptr; }
 	else if (obj == m_fxMixerView)
 	{
 		m_fxMixerView = nullptr;

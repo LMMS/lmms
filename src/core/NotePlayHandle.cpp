@@ -91,10 +91,7 @@ NotePlayHandle::NotePlayHandle(InstrumentTrack* instrumentTrack, const f_cnt_t _
 	setFrames(_frames);
 
 	// inform attached components about new MIDI note (used for recording in Piano Roll)
-	if (m_origin == OriginMidiInput)
-	{
-		m_instrumentTrack->midiNoteOn(*this);
-	}
+	if (m_origin == OriginMidiInput) { m_instrumentTrack->midiNoteOn(*this); }
 
 	if (m_instrumentTrack->instrument() && m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed)
 	{
@@ -121,20 +118,13 @@ NotePlayHandle::~NotePlayHandle()
 		m_parent->m_subNotes.removeOne(this);
 	}
 
-	if (m_pluginData != NULL)
-	{
-		m_instrumentTrack->deleteNotePluginData(this);
-	}
+	if (m_pluginData != NULL) { m_instrumentTrack->deleteNotePluginData(this); }
 
-	if (m_instrumentTrack->m_notes[key()] == this)
-	{
-		m_instrumentTrack->m_notes[key()] = NULL;
-	}
+	if (m_instrumentTrack->m_notes[key()] == this) { m_instrumentTrack->m_notes[key()] = NULL; }
 
 	m_subNotes.clear();
 
-	if (buffer())
-		releaseBuffer();
+	if (buffer()) releaseBuffer();
 
 	unlock();
 }
@@ -155,10 +145,7 @@ int NotePlayHandle::midiKey() const { return key() - m_origBaseNote + instrument
 
 void NotePlayHandle::play(sampleFrame* _working_buffer)
 {
-	if (m_muted)
-	{
-		return;
-	}
+	if (m_muted) { return; }
 
 	// if the note offset falls over to next period, then don't start playback yet
 	if (offset() >= Engine::mixer()->framesPerPeriod())
@@ -185,10 +172,7 @@ void NotePlayHandle::play(sampleFrame* _working_buffer)
 			TimePos::fromFrames(offset(), Engine::framesPerTick()), offset());
 	}
 
-	if (m_frequencyNeedsUpdate)
-	{
-		updateFrequency();
-	}
+	if (m_frequencyNeedsUpdate) { updateFrequency(); }
 
 	// number of frames that can be played this period
 	f_cnt_t framesThisPeriod =
@@ -274,10 +258,7 @@ void NotePlayHandle::play(sampleFrame* _working_buffer)
 
 f_cnt_t NotePlayHandle::framesLeft() const
 {
-	if (instrumentTrack()->isSustainPedalPressed())
-	{
-		return 4 * Engine::mixer()->framesPerPeriod();
-	}
+	if (instrumentTrack()->isSustainPedalPressed()) { return 4 * Engine::mixer()->framesPerPeriod(); }
 	else if (m_released && actualReleaseFramesToDo() == 0)
 	{
 		return m_framesBeforeRelease;
@@ -305,10 +286,7 @@ bool NotePlayHandle::isFromTrack(const Track* _track) const
 
 void NotePlayHandle::noteOff(const f_cnt_t _s)
 {
-	if (m_released)
-	{
-		return;
-	}
+	if (m_released) { return; }
 	m_released = true;
 
 	// first note-off all sub-notes
@@ -348,10 +326,7 @@ f_cnt_t NotePlayHandle::actualReleaseFramesToDo() const { return m_instrumentTra
 void NotePlayHandle::setFrames(const f_cnt_t _frames)
 {
 	m_frames = _frames;
-	if (m_frames == 0)
-	{
-		m_frames = m_instrumentTrack->beatLen(this);
-	}
+	if (m_frames == 0) { m_frames = m_instrumentTrack->beatLen(this); }
 	m_origFrames = m_frames;
 }
 
@@ -381,10 +356,7 @@ int NotePlayHandle::index() const
 		{
 			continue;
 		}
-		if (nph == this)
-		{
-			return idx;
-		}
+		if (nph == this) { return idx; }
 		++idx;
 	}
 	return -1;
@@ -489,10 +461,7 @@ NotePlayHandle* NotePlayHandleManager::acquire(InstrumentTrack* instrumentTrack,
 {
 	// TODO: use some lockless data structures
 	s_mutex.lockForWrite();
-	if (s_availableIndex < 0)
-	{
-		extend(NPH_CACHE_INCREMENT);
-	}
+	if (s_availableIndex < 0) { extend(NPH_CACHE_INCREMENT); }
 	NotePlayHandle* nph = s_available[s_availableIndex--];
 	s_mutex.unlock();
 

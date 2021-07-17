@@ -76,10 +76,7 @@ public:
 	void stopAllJournalling();
 	JournallingObject* journallingObject(const jo_id_t _id)
 	{
-		if (m_joIDs.contains(_id))
-		{
-			return m_joIDs[_id];
-		}
+		if (m_joIDs.contains(_id)) { return m_joIDs[_id]; }
 		return NULL;
 	}
 

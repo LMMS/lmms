@@ -37,10 +37,7 @@ void TemplatesMenu::addTemplatesFromDir(const QDir& dir)
 {
 	QFileInfoList templates = dir.entryInfoList(QStringList("*.mpt"), QDir::Files | QDir::Readable);
 
-	if (!templates.empty() && !actions().isEmpty())
-	{
-		addSeparator();
-	}
+	if (!templates.empty() && !actions().isEmpty()) { addSeparator(); }
 
 	auto projectFileIcon = embed::getIconPixmap("project_file");
 

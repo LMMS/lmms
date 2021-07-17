@@ -217,10 +217,7 @@ SongEditor::SongEditor(Song* song)
 	// Set up snapping model, 2^i
 	for (int i = 3; i >= -4; i--)
 	{
-		if (i > 0)
-		{
-			m_snappingModel->addItem(QString("%1 Bars").arg(1 << i));
-		}
+		if (i > 0) { m_snappingModel->addItem(QString("%1 Bars").arg(1 << i)); }
 		else if (i == 0)
 		{
 			m_snappingModel->addItem("1 Bar");
@@ -250,16 +247,10 @@ float SongEditor::getSnapSize() const
 	// 1 Bar is the third value in the snapping dropdown
 	int val = -m_snappingModel->value() + 3;
 	// If proportional snap is on, we snap to finer values when zoomed in
-	if (m_proportionalSnap)
-	{
-		val = val - m_zoomingModel->value() + 3;
-	}
+	if (m_proportionalSnap) { val = val - m_zoomingModel->value() + 3; }
 	val = std::max(val, -6); // -6 gives 1/64th bar snapping. Lower values cause crashing.
 
-	if (val >= 0)
-	{
-		return 1 << val;
-	}
+	if (val >= 0) { return 1 << val; }
 	else
 	{
 		return 1.0 / (1 << -val);
@@ -275,10 +266,7 @@ QString SongEditor::getSnapSizeString() const
 	if (val >= 0)
 	{
 		int bars = 1 << val;
-		if (bars == 1)
-		{
-			return QString("1 Bar");
-		}
+		if (bars == 1) { return QString("1 Bar"); }
 		else
 		{
 			return QString("%1 Bars").arg(bars);
@@ -411,18 +399,12 @@ void SongEditor::keyPressEvent(QKeyEvent* ke)
 	else if (ke->key() == Qt::Key_Left)
 	{
 		tick_t t = m_song->currentTick() - TimePos::ticksPerBar();
-		if (t >= 0)
-		{
-			m_song->setPlayPos(t, Song::Mode_PlaySong);
-		}
+		if (t >= 0) { m_song->setPlayPos(t, Song::Mode_PlaySong); }
 	}
 	else if (ke->key() == Qt::Key_Right)
 	{
 		tick_t t = m_song->currentTick() + TimePos::ticksPerBar();
-		if (t < MaxSongLength)
-		{
-			m_song->setPlayPos(t, Song::Mode_PlaySong);
-		}
+		if (t < MaxSongLength) { m_song->setPlayPos(t, Song::Mode_PlaySong); }
 	}
 	else if (ke->key() == Qt::Key_Home)
 	{
@@ -457,10 +439,7 @@ void SongEditor::wheelEvent(QWheelEvent* we)
 	{
 		int z = m_zoomingModel->value();
 
-		if (we->angleDelta().y() > 0)
-		{
-			z++;
-		}
+		if (we->angleDelta().y() > 0) { z++; }
 		else if (we->angleDelta().y() < 0)
 		{
 			z--;
@@ -503,10 +482,7 @@ void SongEditor::wheelEvent(QWheelEvent* we)
 
 void SongEditor::closeEvent(QCloseEvent* ce)
 {
-	if (parentWidget())
-	{
-		parentWidget()->hide();
-	}
+	if (parentWidget()) { parentWidget()->hide(); }
 	else
 	{
 		hide();
@@ -598,10 +574,7 @@ void SongEditor::updateScrollBar(int len) { m_leftRightScroll->setMaximum(len); 
 
 static inline void animateScroll(QScrollBar* scrollBar, int newVal, bool smoothScroll)
 {
-	if (smoothScroll == false)
-	{
-		scrollBar->setValue(newVal);
-	}
+	if (smoothScroll == false) { scrollBar->setValue(newVal); }
 	else
 	{
 		// do smooth scroll animation using QTimeLine
@@ -849,19 +822,13 @@ void SongEditorWindow::resizeEvent(QResizeEvent* event) { emit resized(); }
 void SongEditorWindow::changeEvent(QEvent* event)
 {
 	QWidget::changeEvent(event);
-	if (event->type() == QEvent::WindowStateChange)
-	{
-		m_editor->realignTracks();
-	}
+	if (event->type() == QEvent::WindowStateChange) { m_editor->realignTracks(); }
 }
 
 void SongEditorWindow::play()
 {
 	emit playTriggered();
-	if (Engine::getSong()->playMode() != Song::Mode_PlaySong)
-	{
-		Engine::getSong()->playSong();
-	}
+	if (Engine::getSong()->playMode() != Song::Mode_PlaySong) { Engine::getSong()->playSong(); }
 	else
 	{
 		Engine::getSong()->togglePause();

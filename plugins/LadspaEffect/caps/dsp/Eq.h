@@ -140,8 +140,7 @@ public:
 	void flush_0()
 	{
 		for (int i = 0; i < Bands; ++i)
-			if (is_denormal(y[0][i]))
-				y[0][i] = 0;
+			if (is_denormal(y[0][i])) y[0][i] = 0;
 	}
 };
 

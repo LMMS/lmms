@@ -243,36 +243,15 @@ PianoRoll::PianoRoll()
 	m_semiToneMarkerMenu->addAction(copyAllNotesAction);
 
 	// init pixmaps
-	if (s_toolDraw == NULL)
-	{
-		s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw"));
-	}
-	if (s_toolErase == NULL)
-	{
-		s_toolErase = new QPixmap(embed::getIconPixmap("edit_erase"));
-	}
-	if (s_toolSelect == NULL)
-	{
-		s_toolSelect = new QPixmap(embed::getIconPixmap("edit_select"));
-	}
-	if (s_toolMove == NULL)
-	{
-		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
-	}
-	if (s_toolOpen == NULL)
-	{
-		s_toolOpen = new QPixmap(embed::getIconPixmap("automation"));
-	}
-	if (s_toolKnife == nullptr)
-	{
-		s_toolKnife = new QPixmap(embed::getIconPixmap("edit_knife"));
-	}
+	if (s_toolDraw == NULL) { s_toolDraw = new QPixmap(embed::getIconPixmap("edit_draw")); }
+	if (s_toolErase == NULL) { s_toolErase = new QPixmap(embed::getIconPixmap("edit_erase")); }
+	if (s_toolSelect == NULL) { s_toolSelect = new QPixmap(embed::getIconPixmap("edit_select")); }
+	if (s_toolMove == NULL) { s_toolMove = new QPixmap(embed::getIconPixmap("edit_move")); }
+	if (s_toolOpen == NULL) { s_toolOpen = new QPixmap(embed::getIconPixmap("automation")); }
+	if (s_toolKnife == nullptr) { s_toolKnife = new QPixmap(embed::getIconPixmap("edit_knife")); }
 
 	// init text-float
-	if (s_textFloat == NULL)
-	{
-		s_textFloat = new TextFloat;
-	}
+	if (s_textFloat == NULL) { s_textFloat = new TextFloat; }
 
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 
@@ -373,10 +352,7 @@ PianoRoll::PianoRoll()
 	m_scaleModel.addItem(tr("No scale"));
 	for (const InstrumentFunctionNoteStacking::Chord& chord : chord_table)
 	{
-		if (chord.isScale())
-		{
-			m_scaleModel.addItem(chord.getName());
-		}
+		if (chord.isScale()) { m_scaleModel.addItem(chord.getName()); }
 	}
 
 	m_scaleModel.setValue(0);
@@ -389,10 +365,7 @@ PianoRoll::PianoRoll()
 	m_chordModel.addItem(tr("No chord"));
 	for (const InstrumentFunctionNoteStacking::Chord& chord : chord_table)
 	{
-		if (!chord.isScale())
-		{
-			m_chordModel.addItem(chord.getName());
-		}
+		if (!chord.isScale()) { m_chordModel.addItem(chord.getName()); }
 	}
 
 	m_chordModel.setValue(0);
@@ -433,10 +406,7 @@ void PianoRoll::showTextFloat(const QString& text, const QPoint& pos, int timeou
 	s_textFloat->setText(text);
 	// show the float, offset slightly so as to not obscure anything
 	s_textFloat->moveGlobal(this, pos + QPoint(4, 16));
-	if (timeout == -1)
-	{
-		s_textFloat->show();
-	}
+	if (timeout == -1) { s_textFloat->show(); }
 	else
 	{
 		s_textFloat->setVisibilityTimeOut(timeout);
@@ -453,10 +423,7 @@ void PianoRoll::showVolTextFloat(volume_t vol, const QPoint& pos, int timeout)
 void PianoRoll::showPanTextFloat(panning_t pan, const QPoint& pos, int timeout)
 {
 	QString text;
-	if (pan < 0)
-	{
-		text = tr("Panning: %1% left").arg(qAbs(pan));
-	}
+	if (pan < 0) { text = tr("Panning: %1% left").arg(qAbs(pan)); }
 	else if (pan > 0)
 	{
 		text = tr("Panning: %1% right").arg(qAbs(pan));
@@ -481,10 +448,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 
 	// if "No key" is selected, key is -1, unmark all semitones
 	// or if scale changed from toolbar to "No scale", unmark all semitones
-	if (!fromMenu && (key < 0 || m_scaleModel.value() == 0))
-	{
-		i = stmaUnmarkAll;
-	}
+	if (!fromMenu && (key < 0 || m_scaleModel.value() == 0)) { i = stmaUnmarkAll; }
 
 	switch (static_cast<SemiToneMarkerAction>(i))
 	{
@@ -493,10 +457,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 		break;
 	case stmaMarkCurrentSemiTone: {
 		QList<int>::iterator it = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), key);
-		if (it != m_markedSemiTones.end())
-		{
-			m_markedSemiTones.erase(it);
-		}
+		if (it != m_markedSemiTones.end()) { m_markedSemiTones.erase(it); }
 		else
 		{
 			m_markedSemiTones.push_back(key);
@@ -513,10 +474,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 			for (int ix = 0; ix < aok.size(); ++ix)
 			{
 				i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
-				if (i != m_markedSemiTones.end())
-				{
-					m_markedSemiTones.erase(i);
-				}
+				if (i != m_markedSemiTones.end()) { m_markedSemiTones.erase(i); }
 			}
 		}
 		else
@@ -536,10 +494,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 				&InstrumentFunctionNoteStacking::ChordTable::getInstance().getChordByName(m_chordModel.currentText());
 		}
 
-		if (chord->isEmpty())
-		{
-			break;
-		}
+		if (chord->isEmpty()) { break; }
 		else if (chord->isScale())
 		{
 			m_markedSemiTones.clear();
@@ -551,10 +506,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 
 		for (int i = first; i <= last; i++)
 		{
-			if (chord->hasSemiTone((i + cap - (key % cap)) % cap))
-			{
-				m_markedSemiTones.push_back(i);
-			}
+			if (chord->hasSemiTone((i + cap - (key % cap)) % cap)) { m_markedSemiTones.push_back(i); }
 		}
 		break;
 	}
@@ -630,10 +582,7 @@ void PianoRoll::glueNotes()
 
 		// Sort notes on key and then pos.
 		std::sort(selectedNotes.begin(), selectedNotes.end(), [](const Note* note, const Note* compareNote) -> bool {
-			if (note->key() == compareNote->key())
-			{
-				return note->pos() < compareNote->pos();
-			}
+			if (note->key() == compareNote->key()) { return note->pos() < compareNote->pos(); }
 			return note->key() < compareNote->key();
 		});
 
@@ -675,10 +624,7 @@ void PianoRoll::glueNotes()
 
 void PianoRoll::fitNoteLengths(bool fill)
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 	m_pattern->addJournalCheckPoint();
 
 	// Reference notes
@@ -687,10 +633,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 
 	// Notes to edit
 	NoteVector notes = getSelectedNotes();
-	if (notes.empty())
-	{
-		notes = refNotes;
-	}
+	if (notes.empty()) { notes = refNotes; }
 	else if (!fill)
 	{
 		std::sort(notes.begin(), notes.end(), Note::lessThan);
@@ -711,10 +654,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 		}
 		if (ref == refNotes.end())
 		{
-			if (!fill)
-			{
-				break;
-			}
+			if (!fill) { break; }
 			// Last notes stretch to end of last bar
 			length = notes.last()->endPos().nextFullBar() * TimePos::ticksPerBar() - note->pos();
 		}
@@ -722,10 +662,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 		{
 			length = (*ref)->pos() - note->pos();
 		}
-		if (fill ? note->length() < length : note->length() > length)
-		{
-			note->setLength(length);
-		}
+		if (fill ? note->length() < length : note->length() > length) { note->setLength(length); }
 	}
 
 	update();
@@ -735,25 +672,16 @@ void PianoRoll::fitNoteLengths(bool fill)
 
 void PianoRoll::constrainNoteLengths(bool constrainMax)
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 	m_pattern->addJournalCheckPoint();
 
 	NoteVector notes = getSelectedNotes();
-	if (notes.empty())
-	{
-		notes = m_pattern->notes();
-	}
+	if (notes.empty()) { notes = m_pattern->notes(); }
 
 	TimePos bound = m_lenOfNewNotes; // will be length of last note
 	for (Note* note : notes)
 	{
-		if (constrainMax ? note->length() > bound : note->length() < bound)
-		{
-			note->setLength(bound);
-		}
+		if (constrainMax ? note->length() > bound : note->length() < bound) { note->setLength(bound); }
 	}
 
 	update();
@@ -772,10 +700,7 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement& de)
 		{
 			bool ok;
 			int key = node.toElement().attribute(QString("key"), QString("-1")).toInt(&ok, 10);
-			if (ok && key >= 0)
-			{
-				m_markedSemiTones.append(key);
-			}
+			if (ok && key >= 0) { m_markedSemiTones.append(key); }
 			node = node.nextSibling();
 		}
 	}
@@ -787,10 +712,7 @@ void PianoRoll::loadMarkedSemiTones(const QDomElement& de)
 
 void PianoRoll::setCurrentPattern(Pattern* newPattern)
 {
-	if (hasValidPattern())
-	{
-		m_pattern->instrumentTrack()->disconnect(this);
-	}
+	if (hasValidPattern()) { m_pattern->instrumentTrack()->disconnect(this); }
 
 	// force the song-editor to stop playing if it played pattern before
 	if (Engine::getSong()->isPlaying() && Engine::getSong()->playMode() == Song::Mode_PlayPattern)
@@ -798,10 +720,7 @@ void PianoRoll::setCurrentPattern(Pattern* newPattern)
 		Engine::getSong()->playPattern(NULL);
 	}
 
-	if (m_stepRecorder.isRecording())
-	{
-		m_stepRecorder.stop();
-	}
+	if (m_stepRecorder.isRecording()) { m_stepRecorder.stop(); }
 
 	// set new data
 	m_pattern = newPattern;
@@ -857,10 +776,7 @@ void PianoRoll::setCurrentPattern(Pattern* newPattern)
 
 void PianoRoll::hidePattern(Pattern* pattern)
 {
-	if (m_pattern == pattern)
-	{
-		setCurrentPattern(NULL);
-	}
+	if (m_pattern == pattern) { setCurrentPattern(NULL); }
 }
 
 void PianoRoll::selectRegionFromPixels(int xStart, int xEnd)
@@ -883,15 +799,9 @@ void PianoRoll::selectRegionFromPixels(int xStart, int xEnd)
 	keyNum = 120;
 
 	m_selectedTick = posTicks - m_selectStartTick;
-	if ((int)m_selectStartTick + m_selectedTick < 0)
-	{
-		m_selectedTick = -static_cast<int>(m_selectStartTick);
-	}
+	if ((int)m_selectStartTick + m_selectedTick < 0) { m_selectedTick = -static_cast<int>(m_selectStartTick); }
 	m_selectedKeys = keyNum - m_selectStartKey;
-	if (keyNum <= m_selectStartKey)
-	{
-		--m_selectedKeys;
-	}
+	if (keyNum <= m_selectStartKey) { --m_selectedKeys; }
 
 	computeSelectedNotes(false);
 }
@@ -903,10 +813,7 @@ void PianoRoll::drawNoteRect(QPainter& p, int x, int y, int width, const Note* n
 	++y;
 	width -= 2;
 
-	if (width <= 0)
-	{
-		width = 2;
-	}
+	if (width <= 0) { width = 2; }
 
 	// Volume
 	float const volumeRange = static_cast<float>(MaxVolume - MinVolume);
@@ -925,10 +832,7 @@ void PianoRoll::drawNoteRect(QPainter& p, int x, int y, int width, const Note* n
 	QColor col = QColor(noteCol);
 	QPen pen;
 
-	if (n->selected())
-	{
-		col = QColor(selCol);
-	}
+	if (n->selected()) { col = QColor(selCol); }
 
 	const int borderWidth = borders ? 1 : 0;
 
@@ -945,10 +849,7 @@ void PianoRoll::drawNoteRect(QPainter& p, int x, int y, int width, const Note* n
 	gradient.setColorAt(1, lcol);
 	p.setBrush(gradient);
 
-	if (borders)
-	{
-		p.setPen(col);
-	}
+	if (borders) { p.setPen(col); }
 	else
 	{
 		p.setPen(Qt::NoPen);
@@ -1037,10 +938,7 @@ void PianoRoll::drawDetuningInfo(QPainter& _p, const Note* _n, int _x, int _y) c
 			int pre_y = middle_y - pre_level * m_keyLineHeight;
 
 			// Draws the line representing the discrete jump if there's one
-			if (old_y != pre_y)
-			{
-				_p.drawLine(old_x, old_y, old_x, pre_y);
-			}
+			if (old_y != pre_y) { _p.drawLine(old_x, old_y, old_x, pre_y); }
 
 			// Now draw the lines representing the actual progression from one
 			// node to the other
@@ -1095,17 +993,11 @@ void PianoRoll::clearSelectedNotes()
 
 void PianoRoll::shiftSemiTone(int amount) // Shift notes by amount semitones
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	auto selectedNotes = getSelectedNotes();
 	// If no notes are selected, shift all of them, otherwise shift selection
-	if (selectedNotes.empty())
-	{
-		return shiftSemiTone(m_pattern->notes(), amount);
-	}
+	if (selectedNotes.empty()) { return shiftSemiTone(m_pattern->notes(), amount); }
 	else
 	{
 		return shiftSemiTone(selectedNotes, amount);
@@ -1129,17 +1021,11 @@ void PianoRoll::shiftSemiTone(NoteVector notes, int amount)
 
 void PianoRoll::shiftPos(int amount) // Shift notes pos by amount
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	auto selectedNotes = getSelectedNotes();
 	// If no notes are selected, shift all of them, otherwise shift selection
-	if (selectedNotes.empty())
-	{
-		return shiftPos(m_pattern->notes(), amount);
-	}
+	if (selectedNotes.empty()) { return shiftPos(m_pattern->notes(), amount); }
 	else
 	{
 		return shiftPos(selectedNotes, amount);
@@ -1152,10 +1038,7 @@ void PianoRoll::shiftPos(NoteVector notes, int amount)
 	auto leftMostPos = notes.first()->pos();
 	// Limit leftwards shifts to prevent moving left of pattern start
 	auto shiftAmount = (leftMostPos > -amount) ? amount : -leftMostPos;
-	if (shiftAmount == 0)
-	{
-		return;
-	}
+	if (shiftAmount == 0) { return; }
 
 	for (Note* note : notes)
 	{
@@ -1174,10 +1057,7 @@ bool PianoRoll::isSelection() const // are any notes selected?
 {
 	for (const Note* note : m_pattern->notes())
 	{
-		if (note->selected())
-		{
-			return true;
-		}
+		if (note->selected()) { return true; }
 	}
 
 	return false;
@@ -1223,18 +1103,12 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		{
 			// shift selection up an octave
 			// if nothing selected, shift _everything_
-			if (hasValidPattern())
-			{
-				shiftSemiTone(12 * direction);
-			}
+			if (hasValidPattern()) { shiftSemiTone(12 * direction); }
 		}
 		else if ((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
 		{
 			// Move selected notes up by one semitone
-			if (hasValidPattern())
-			{
-				shiftSemiTone(1 * direction);
-			}
+			if (hasValidPattern()) { shiftSemiTone(1 * direction); }
 		}
 		else
 		{
@@ -1259,10 +1133,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		if (ke->modifiers() & Qt::ControlModifier && m_action == ActionNone)
 		{
 			// Move selected notes by one bar to the left
-			if (hasValidPattern())
-			{
-				shiftPos(direction * TimePos::ticksPerBar());
-			}
+			if (hasValidPattern()) { shiftPos(direction * TimePos::ticksPerBar()); }
 		}
 		else if (ke->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
 		{
@@ -1280,10 +1151,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			if (hasValidPattern())
 			{
 				Pattern* p = direction > 0 ? m_pattern->nextPattern() : m_pattern->previousPattern();
-				if (p != NULL)
-				{
-					setCurrentPattern(p);
-				}
+				if (p != NULL) { setCurrentPattern(p); }
 			}
 		}
 		else
@@ -1323,10 +1191,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 
 	case Qt::Key_Escape:
 		// On the Knife mode, ESC cancels it
-		if (m_editMode == ModeEditKnife)
-		{
-			cancelKnifeAction();
-		}
+		if (m_editMode == ModeEditKnife) { cancelKnifeAction(); }
 		else
 		{
 			// Same as Ctrl + Shift + A
@@ -1357,10 +1222,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 	case Qt::Key_8:
 	case Qt::Key_9: {
 		int len = 1 + ke->key() - Qt::Key_0;
-		if (len == 10)
-		{
-			len = 0;
-		}
+		if (len == 10) { len = 0; }
 		if (ke->modifiers() & (Qt::ControlModifier | Qt::KeypadModifier))
 		{
 			m_noteLenModel.setValue(len);
@@ -1377,10 +1239,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 	case Qt::Key_Control:
 		// Ctrl will not enter selection mode if we are
 		// in Knife mode, but unquantize it
-		if (m_editMode == ModeEditKnife)
-		{
-			break;
-		}
+		if (m_editMode == ModeEditKnife) { break; }
 		// Enter selection mode if:
 		// -> this window is active
 		// -> shift is not pressed
@@ -1417,10 +1276,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke)
 	switch (ke->key())
 	{
 	case Qt::Key_Control:
-		if (m_editMode == ModeEditKnife)
-		{
-			break;
-		}
+		if (m_editMode == ModeEditKnife) { break; }
 		computeSelectedNotes(ke->modifiers() & Qt::ShiftModifier);
 		m_editMode = m_ctrlMode;
 		update();
@@ -1429,10 +1285,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke)
 	// update after undo/redo
 	case Qt::Key_Z:
 	case Qt::Key_R:
-		if (hasValidPattern() && ke->modifiers() == Qt::ControlModifier)
-		{
-			update();
-		}
+		if (hasValidPattern() && ke->modifiers() == Qt::ControlModifier) { update(); }
 		break;
 	}
 
@@ -1462,10 +1315,7 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 {
 	m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
 
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	// -- Knife
 	if (m_editMode == ModeEditKnife && me->button() == Qt::LeftButton)
@@ -1490,15 +1340,9 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 	if (m_editMode == ModeEditDetuning && noteUnderMouse())
 	{
 		static QPointer<AutomationPattern> detuningPattern = nullptr;
-		if (detuningPattern.data() != nullptr)
-		{
-			detuningPattern->disconnect(this);
-		}
+		if (detuningPattern.data() != nullptr) { detuningPattern->disconnect(this); }
 		Note* n = noteUnderMouse();
-		if (n->detuning() == nullptr)
-		{
-			n->createDetuning();
-		}
+		if (n->detuning() == nullptr) { n->createDetuning(); }
 		detuningPattern = n->detuning()->automationPattern();
 		connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
 		gui->automationEditor()->open(detuningPattern);
@@ -1556,10 +1400,7 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 			{
 				Note* note = *it;
 				TimePos len = note->length();
-				if (len < 0)
-				{
-					len = 4;
-				}
+				if (len < 0) { len = 4; }
 				// and check whether the user clicked on an
 				// existing note or an edit-line
 				if (pos_ticks >= note->pos() && len > 0 &&
@@ -1623,10 +1464,7 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 						const bool arpeggio = me->modifiers() & Qt::ShiftModifier;
 						for (int i = 1; i < chord.size(); i++)
 						{
-							if (arpeggio)
-							{
-								note_pos += note_len;
-							}
+							if (arpeggio) { note_pos += note_len; }
 							Note new_note(note_len, note_pos, key_num + chord[i]);
 							new_note.setSelected(true);
 							new_note.setPanning(m_lastNotePanning);
@@ -1699,20 +1537,14 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 					{
 						// Notes from the BB editor can have a negative length, so
 						// change their length to the displayed one before resizing
-						if (note->oldLength() <= 0)
-						{
-							note->setOldLength(4);
-						}
+						if (note->oldLength() <= 0) { note->setOldLength(4); }
 						// Let the note be sized down by quantized increments, stopping
 						// when the next step down would result in a negative length
 						int thisMin = note->oldLength() % quantization();
 						// The initial value for m_minResizeLen is the minimum length of
 						// a note divisible by the current Q. Therefore we ignore notes
 						// where thisMin == 0 when checking for a new minimum
-						if (thisMin > 0 && thisMin < m_minResizeLen)
-						{
-							m_minResizeLen = thisMin;
-						}
+						if (thisMin > 0 && thisMin < m_minResizeLen) { m_minResizeLen = thisMin; }
 					}
 
 					// set resize-cursor
@@ -1720,10 +1552,7 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 				}
 				else
 				{
-					if (!created_new_note)
-					{
-						m_pattern->addJournalCheckPoint();
-					}
+					if (!created_new_note) { m_pattern->addJournalCheckPoint(); }
 
 					// otherwise move it
 					m_action = ActionMoveNote;
@@ -1812,10 +1641,7 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 			{
 				// clicked in the box below the keys to the left of note edit area
 				m_noteEditMode = (NoteEditMode)(((int)m_noteEditMode) + 1);
-				if (m_noteEditMode == NoteEditCount)
-				{
-					m_noteEditMode = (NoteEditMode)0;
-				}
+				if (m_noteEditMode == NoteEditCount) { m_noteEditMode = (NoteEditMode)0; }
 				repaint();
 			}
 			else if (me->buttons() == Qt::RightButton)
@@ -1829,10 +1655,7 @@ void PianoRoll::mousePressEvent(QMouseEvent* me)
 
 void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	// if they clicked in the note edit area, enter value for the volume bar
 	if (me->x() > noteEditLeft() && me->x() < noteEditRight() && me->y() > noteEditTop() && me->y() < noteEditBottom())
@@ -1849,10 +1672,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 		NoteVector nv;
 		for (Note* i : m_pattern->notes())
 		{
-			if (i->withinRange(ticks_start, ticks_end) || (i->selected() && !altPressed))
-			{
-				nv += i;
-			}
+			if (i->withinRange(ticks_start, ticks_end) || (i->selected() && !altPressed)) { nv += i; }
 		}
 		// make sure we're on a note
 		if (nv.size() > 0)
@@ -1877,10 +1697,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent* me)
 				while (it != nv.end())
 				{
 					const Note* note = *it;
-					if (note->pos().getTicks() != closest->pos().getTicks())
-					{
-						it = nv.erase(it);
-					}
+					if (note->pos().getTicks() != closest->pos().getTicks()) { it = nv.erase(it); }
 					else
 					{
 						it++;
@@ -2020,17 +1837,11 @@ void PianoRoll::computeSelectedNotes(bool shift)
 	// setup selection-vars
 	int sel_pos_start = m_selectStartTick;
 	int sel_pos_end = m_selectStartTick + m_selectedTick;
-	if (sel_pos_start > sel_pos_end)
-	{
-		qSwap<int>(sel_pos_start, sel_pos_end);
-	}
+	if (sel_pos_start > sel_pos_end) { qSwap<int>(sel_pos_start, sel_pos_end); }
 
 	int sel_key_start = m_selectStartKey - m_startKey + 1;
 	int sel_key_end = sel_key_start + m_selectedKeys;
-	if (sel_key_start > sel_key_end)
-	{
-		qSwap<int>(sel_key_start, sel_key_end);
-	}
+	if (sel_key_start > sel_key_end) { qSwap<int>(sel_key_start, sel_key_end); }
 
 	// int y_base = noteEditTop() - 1;
 	if (hasValidPattern())
@@ -2038,17 +1849,11 @@ void PianoRoll::computeSelectedNotes(bool shift)
 		for (Note* note : m_pattern->notes())
 		{
 			// make a new selection unless they're holding shift
-			if (!shift)
-			{
-				note->setSelected(false);
-			}
+			if (!shift) { note->setSelected(false); }
 
 			int len_ticks = note->length();
 
-			if (len_ticks == 0)
-			{
-				continue;
-			}
+			if (len_ticks == 0) { continue; }
 			else if (len_ticks < 0)
 			{
 				len_ticks = 4;
@@ -2080,10 +1885,7 @@ void PianoRoll::mouseReleaseEvent(QMouseEvent* me)
 	s_textFloat->hide();
 
 	// Quit knife mode if we pressed and released the right mouse button
-	if (m_editMode == ModeEditKnife && me->button() == Qt::RightButton)
-	{
-		cancelKnifeAction();
-	}
+	if (m_editMode == ModeEditKnife && me->button() == Qt::RightButton) { cancelKnifeAction(); }
 
 	if (me->button() & Qt::LeftButton)
 	{
@@ -2107,10 +1909,7 @@ void PianoRoll::mouseReleaseEvent(QMouseEvent* me)
 		{
 			// if we only moved one note, deselect it so we can
 			// edit the notes in the note edit area
-			if (selectionCount() == 1)
-			{
-				clearSelectedNotes();
-			}
+			if (selectionCount() == 1) { clearSelectedNotes(); }
 		}
 	}
 
@@ -2140,20 +1939,11 @@ void PianoRoll::mouseReleaseEvent(QMouseEvent* me)
 
 	m_currentNote = NULL;
 
-	if (m_action != ActionKnife)
-	{
-		m_action = ActionNone;
-	}
+	if (m_action != ActionKnife) { m_action = ActionNone; }
 
-	if (m_editMode == ModeDraw)
-	{
-		setCursor(Qt::ArrowCursor);
-	}
+	if (m_editMode == ModeDraw) { setCursor(Qt::ArrowCursor); }
 
-	if (mustRepaint)
-	{
-		repaint();
-	}
+	if (mustRepaint) { repaint(); }
 }
 
 void PianoRoll::mouseMoveEvent(QMouseEvent* me)
@@ -2177,10 +1967,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 	else if (m_action == ActionResizeNoteEditArea)
 	{
 		// Don't try to show more keys than the full keyboard, bail if trying to
-		if (m_pianoKeysVisible == NumKeys && me->y() > m_moveStartY)
-		{
-			return;
-		}
+		if (m_pianoKeysVisible == NumKeys && me->y() > m_moveStartY) { return; }
 		int newHeight = height() - me->y();
 		if (me->y() < KEY_AREA_MIN_HEIGHT)
 		{
@@ -2197,10 +1984,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 	}
 
 	// Update Knife position if we are on knife mode
-	if (m_editMode == ModeEditKnife)
-	{
-		updateKnifePos(me);
-	}
+	if (m_editMode == ModeEditKnife) { updateKnifePos(me); }
 
 	if (me->y() > PR_TOP_MARGIN || m_action != ActionNone)
 	{
@@ -2301,10 +2085,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 
 				bool isUnderPosition = n->withinRange(ticks_start, ticks_end);
 				// Play note under the cursor
-				if (isUnderPosition)
-				{
-					testPlayNote(n);
-				}
+				if (isUnderPosition) { testPlayNote(n); }
 				// If note is:
 				// Under the cursor, when there is no selection
 				// Selected, and alt is not pressed
@@ -2398,15 +2179,9 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 			int pos_ticks = x * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 			m_selectedTick = pos_ticks - m_selectStartTick;
-			if ((int)m_selectStartTick + m_selectedTick < 0)
-			{
-				m_selectedTick = -static_cast<int>(m_selectStartTick);
-			}
+			if ((int)m_selectStartTick + m_selectedTick < 0) { m_selectedTick = -static_cast<int>(m_selectStartTick); }
 			m_selectedKeys = key_num - m_selectStartKey;
-			if (key_num <= m_selectStartKey)
-			{
-				--m_selectedKeys;
-			}
+			if (key_num <= m_selectStartKey) { --m_selectedKeys; }
 		}
 		else if ((m_editMode == ModeDraw && me->buttons() & Qt::RightButton) ||
 			(m_editMode == ModeErase && me->buttons()))
@@ -2428,10 +2203,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 			{
 				Note* note = *it;
 				TimePos len = note->length();
-				if (len < 0)
-				{
-					len = 4;
-				}
+				if (len < 0) { len = 4; }
 				// and check whether the user clicked on an
 				// existing note or an edit-line
 				if (pos_ticks >= note->pos() && len > 0 &&
@@ -2466,10 +2238,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 			{
 				x = 0;
 				QCursor::setPos(mapToGlobal(QPoint(m_whiteKeyWidth, me->y())));
-				if (m_currentPosition >= 4)
-				{
-					m_leftRightScroll->setValue(m_currentPosition - 4);
-				}
+				if (m_currentPosition >= 4) { m_leftRightScroll->setValue(m_currentPosition - 4); }
 				else
 				{
 					m_leftRightScroll->setValue(0);
@@ -2486,10 +2255,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 			int pos_ticks = x * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 			m_selectedTick = pos_ticks - m_selectStartTick;
-			if ((int)m_selectStartTick + m_selectedTick < 0)
-			{
-				m_selectedTick = -static_cast<int>(m_selectStartTick);
-			}
+			if ((int)m_selectStartTick + m_selectedTick < 0) { m_selectedTick = -static_cast<int>(m_selectStartTick); }
 
 			int key_num = getKey(me->y());
 			int visible_keys = (height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN - m_notesEditHeight) / m_keyLineHeight + 2;
@@ -2509,10 +2275,7 @@ void PianoRoll::mouseMoveEvent(QMouseEvent* me)
 			}
 
 			m_selectedKeys = key_num - m_selectStartKey;
-			if (key_num <= m_selectStartKey)
-			{
-				--m_selectedKeys;
-			}
+			if (key_num <= m_selectStartKey) { --m_selectedKeys; }
 		}
 		setCursor(Qt::ArrowCursor);
 	}
@@ -2583,25 +2346,13 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		else if (m_gridMode == gridNudge)
 		{
 			// if they're not holding alt, quantize the offset
-			if (!alt)
-			{
-				noteOffset = floor(off_ticks / quantization()) * quantization();
-			}
+			if (!alt) { noteOffset = floor(off_ticks / quantization()) * quantization(); }
 		}
 
 		// Make sure notes won't go outside boundary conditions
-		if (m_moveBoundaryLeft + noteOffset < 0)
-		{
-			noteOffset = -m_moveBoundaryLeft;
-		}
-		if (m_moveBoundaryTop + off_key >= NumKeys)
-		{
-			off_key = -m_moveBoundaryTop + NumKeys - 1;
-		}
-		if (m_moveBoundaryBottom + off_key < 0)
-		{
-			off_key = -m_moveBoundaryBottom;
-		}
+		if (m_moveBoundaryLeft + noteOffset < 0) { noteOffset = -m_moveBoundaryLeft; }
+		if (m_moveBoundaryTop + off_key >= NumKeys) { off_key = -m_moveBoundaryTop + NumKeys - 1; }
+		if (m_moveBoundaryBottom + off_key < 0) { off_key = -m_moveBoundaryBottom; }
 
 		// Apply offset to all selected notes
 		for (Note* note : getSelectedNotes())
@@ -2612,10 +2363,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			{
 				// quick resize, toggled by holding shift after starting a note move, but not before
 				int ticks_new = note->oldLength().getTicks() + noteOffset;
-				if (ticks_new <= 0)
-				{
-					ticks_new = 1;
-				}
+				if (ticks_new <= 0) { ticks_new = 1; }
 				note->setLength(TimePos(ticks_new));
 				m_lenOfNewNotes = note->length();
 			}
@@ -2641,10 +2389,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		// If shift is pressed but only one note is selected, apply sticky
 
 		// Quantize the resizing if alt is not pressed
-		if (!alt)
-		{
-			off_ticks = floor(off_ticks / quantization()) * quantization();
-		}
+		if (!alt) { off_ticks = floor(off_ticks / quantization()) * quantization(); }
 
 		auto selectedNotes = getSelectedNotes();
 
@@ -2853,10 +2598,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		{
 			// we're under 100% zoom
 			// allow quantization grid up to 1/24 for triplets
-			if (q % 3 != 0 && q < 8)
-			{
-				q = 8;
-			}
+			if (q % 3 != 0 && q < 8) { q = 8; }
 			// allow quantization grid up to 1/32 for normal notes
 			else if (q < 6)
 			{
@@ -2900,10 +2642,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 				return m_whiteKeySmallHeight;
 			case PR_WHITE_KEY_SMALL:
 				// These two keys need to adjust up small height instead of only key line height
-				if (keyCode == Key_C || keyCode == Key_F)
-				{
-					return m_whiteKeySmallHeight;
-				}
+				if (keyCode == Key_C || keyCode == Key_F) { return m_whiteKeySmallHeight; }
 			case PR_BLACK_KEY:
 				return m_blackKeyHeight;
 			}
@@ -2958,10 +2697,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		};
 		// lambda for drawing the horizontal grid line
 		auto drawHorizontalLine = [&](const int key, const int y) {
-			if (key % KeysPerOctave == Key_C)
-			{
-				p.setPen(m_beatLineColor);
-			}
+			if (key % KeysPerOctave == Key_C) { p.setPen(m_beatLineColor); }
 			else
 			{
 				p.setPen(m_lineColor);
@@ -3046,10 +2782,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		{
 			const int key_num = m_markedSemiTones.at(x);
 			const int y = keyAreaBottom() + 5 - m_keyLineHeight * (key_num - m_startKey + 1);
-			if (y > keyAreaBottom())
-			{
-				break;
-			}
+			if (y > keyAreaBottom()) { break; }
 			p.fillRect(
 				m_whiteKeyWidth + 1, y - m_keyLineHeight / 2, width() - 10, m_keyLineHeight + 1, m_markedSemitoneColor);
 		}
@@ -3081,17 +2814,11 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 	// setup selection-vars
 	int sel_pos_start = m_selectStartTick;
 	int sel_pos_end = m_selectStartTick + m_selectedTick;
-	if (sel_pos_start > sel_pos_end)
-	{
-		qSwap<int>(sel_pos_start, sel_pos_end);
-	}
+	if (sel_pos_start > sel_pos_end) { qSwap<int>(sel_pos_start, sel_pos_end); }
 
 	int sel_key_start = m_selectStartKey - m_startKey + 1;
 	int sel_key_end = sel_key_start + m_selectedKeys;
-	if (sel_key_start > sel_key_end)
-	{
-		qSwap<int>(sel_key_start, sel_key_end);
-	}
+	if (sel_key_start > sel_key_end) { qSwap<int>(sel_key_start, sel_key_end); }
 
 	int y_base = keyAreaBottom() - 1;
 	if (hasValidPattern())
@@ -3113,10 +2840,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 			{
 				int len_ticks = note->length();
 
-				if (len_ticks == 0)
-				{
-					continue;
-				}
+				if (len_ticks == 0) { continue; }
 				else if (len_ticks < 0)
 				{
 					len_ticks = 4;
@@ -3127,10 +2851,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 				int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 				const int x = (pos_ticks - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 				// skip this note if not in visible area at all
-				if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth))
-				{
-					continue;
-				}
+				if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth)) { continue; }
 
 				// is the note in visible area?
 				if (note->key() > bottomKey && note->key() <= topKey)
@@ -3149,10 +2870,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		{
 			int len_ticks = note->length();
 
-			if (len_ticks == 0)
-			{
-				continue;
-			}
+			if (len_ticks == 0) { continue; }
 			else if (len_ticks < 0)
 			{
 				len_ticks = 4;
@@ -3163,10 +2881,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 			const int x = (pos_ticks - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 			// skip this note if not in visible area at all
-			if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth))
-			{
-				continue;
-			}
+			if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth)) { continue; }
 
 			// is the note in visible area?
 			if (note->key() > bottomKey && note->key() <= topKey)
@@ -3181,10 +2896,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 			if (m_noteEditMode == NoteEditVolume)
 			{
 				QColor color = m_barColor.lighter(30 + (note->getVolume() * 90 / MaxVolume));
-				if (note->selected())
-				{
-					color = m_selectedNoteColor;
-				}
+				if (note->selected()) { color = m_selectedNoteColor; }
 				p.setPen(QPen(color, NOTE_EDIT_LINE_WIDTH));
 
 				editHandleTop = noteEditBottom() -
@@ -3197,10 +2909,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 			else if (m_noteEditMode == NoteEditPanning)
 			{
 				QColor color = m_noteColor;
-				if (note->selected())
-				{
-					color = m_selectedNoteColor;
-				}
+				if (note->selected()) { color = m_selectedNoteColor; }
 
 				p.setPen(QPen(color, NOTE_EDIT_LINE_WIDTH));
 
@@ -3258,20 +2967,14 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		{
 			int len_ticks = note->length();
 
-			if (len_ticks == 0)
-			{
-				continue;
-			}
+			if (len_ticks == 0) { continue; }
 
 			int pos_ticks = note->pos();
 
 			int note_width = len_ticks * m_ppb / TimePos::ticksPerBar();
 			const int x = (pos_ticks - m_currentPosition) * m_ppb / TimePos::ticksPerBar();
 			// skip this note if not in visible area at all
-			if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth))
-			{
-				continue;
-			}
+			if (!(x + note_width >= 0 && x <= width() - m_whiteKeyWidth)) { continue; }
 
 			// is the note in visible area?
 			if (note->key() > bottomKey && note->key() <= topKey)
@@ -3346,10 +3049,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		switch (m_editMode)
 		{
 		case ModeDraw:
-			if (m_mouseDownRight)
-			{
-				cursor = s_toolErase;
-			}
+			if (m_mouseDownRight) { cursor = s_toolErase; }
 			else if (m_action == ActionMoveNote)
 			{
 				cursor = s_toolMove;
@@ -3390,10 +3090,7 @@ void PianoRoll::updateScrollbars()
 	int numKeysVisible = pianoAreaHeight / m_keyLineHeight;
 	m_totalKeysToScroll = qMax(0, NumKeys - numKeysVisible);
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
-	if (m_startKey > m_totalKeysToScroll)
-	{
-		m_startKey = qMax(0, m_totalKeysToScroll);
-	}
+	if (m_startKey > m_totalKeysToScroll) { m_startKey = qMax(0, m_totalKeysToScroll); }
 	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
 }
 
@@ -3413,10 +3110,7 @@ void PianoRoll::wheelEvent(QWheelEvent* we)
 	if (position(we).x() > noteEditLeft() && position(we).x() < noteEditRight() && position(we).y() > noteEditTop() &&
 		position(we).y() < noteEditBottom())
 	{
-		if (!hasValidPattern())
-		{
-			return;
-		}
+		if (!hasValidPattern()) { return; }
 		// get values for going through notes
 		int pixel_range = 8;
 		int x = position(we).x() - m_whiteKeyWidth;
@@ -3429,10 +3123,7 @@ void PianoRoll::wheelEvent(QWheelEvent* we)
 		NoteVector nv;
 		for (Note* i : m_pattern->notes())
 		{
-			if (i->withinRange(ticks_start, ticks_end) || (i->selected() && !altPressed))
-			{
-				nv += i;
-			}
+			if (i->withinRange(ticks_start, ticks_end) || (i->selected() && !altPressed)) { nv += i; }
 		}
 		if (nv.size() > 0)
 		{
@@ -3491,10 +3182,7 @@ void PianoRoll::wheelEvent(QWheelEvent* we)
 	else if (we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier)
 	{
 		int l = m_noteLenModel.value();
-		if (we->angleDelta().y() > 0)
-		{
-			l--;
-		}
+		if (we->angleDelta().y() > 0) { l--; }
 		else if (we->angleDelta().y() < 0)
 		{
 			l++;
@@ -3505,10 +3193,7 @@ void PianoRoll::wheelEvent(QWheelEvent* we)
 	else if (we->modifiers() & Qt::ControlModifier)
 	{
 		int z = m_zoomingModel.value();
-		if (we->angleDelta().y() > 0)
-		{
-			z++;
-		}
+		if (we->angleDelta().y() > 0) { z++; }
 		else if (we->angleDelta().y() < 0)
 		{
 			z--;
@@ -3577,10 +3262,7 @@ void PianoRoll::focusInEvent(QFocusEvent* ev)
 int PianoRoll::getKey(int y) const
 {
 	// handle case that very top pixel maps to next key above
-	if (y - keyAreaTop() <= 1)
-	{
-		y = keyAreaTop() + 2;
-	}
+	if (y - keyAreaTop() <= 1) { y = keyAreaTop() + 2; }
 	int key_num = qBound(0,
 		// add + 1 to stay within the grid lines
 		((keyAreaBottom() - y + 1) / m_keyLineHeight) + m_startKey, NumKeys - 1);
@@ -3601,24 +3283,15 @@ QList<int> PianoRoll::getAllOctavesForKey(int keyToMirror) const
 
 Song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
 {
-	if (m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer())
-	{
-		return Song::Mode_PlayBB;
-	}
+	if (m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer()) { return Song::Mode_PlayBB; }
 	return Song::Mode_PlaySong;
 }
 
 void PianoRoll::play()
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
-	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
-	{
-		Engine::getSong()->playPattern(m_pattern);
-	}
+	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern) { Engine::getSong()->playPattern(m_pattern); }
 	else
 	{
 		Engine::getSong()->togglePause();
@@ -3627,14 +3300,8 @@ void PianoRoll::play()
 
 void PianoRoll::record()
 {
-	if (Engine::getSong()->isPlaying())
-	{
-		stop();
-	}
-	if (m_recording || !hasValidPattern())
-	{
-		return;
-	}
+	if (Engine::getSong()->isPlaying()) { stop(); }
+	if (m_recording || !hasValidPattern()) { return; }
 
 	m_pattern->addJournalCheckPoint();
 	m_recording = true;
@@ -3644,22 +3311,13 @@ void PianoRoll::record()
 
 void PianoRoll::recordAccompany()
 {
-	if (Engine::getSong()->isPlaying())
-	{
-		stop();
-	}
-	if (m_recording || !hasValidPattern())
-	{
-		return;
-	}
+	if (Engine::getSong()->isPlaying()) { stop(); }
+	if (m_recording || !hasValidPattern()) { return; }
 
 	m_pattern->addJournalCheckPoint();
 	m_recording = true;
 
-	if (m_pattern->getTrack()->trackContainer() == Engine::getSong())
-	{
-		Engine::getSong()->playSong();
-	}
+	if (m_pattern->getTrack()->trackContainer() == Engine::getSong()) { Engine::getSong()->playSong(); }
 	else
 	{
 		Engine::getSong()->playBB();
@@ -3668,18 +3326,12 @@ void PianoRoll::recordAccompany()
 
 bool PianoRoll::toggleStepRecording()
 {
-	if (m_stepRecorder.isRecording())
-	{
-		m_stepRecorder.stop();
-	}
+	if (m_stepRecorder.isRecording()) { m_stepRecorder.stop(); }
 	else
 	{
 		if (hasValidPattern())
 		{
-			if (Engine::getSong()->isPlaying())
-			{
-				m_stepRecorder.start(0, newNoteLen());
-			}
+			if (Engine::getSong()->isPlaying()) { m_stepRecorder.start(0, newNoteLen()); }
 			else
 			{
 				m_stepRecorder.start(Engine::getSong()->getPlayPos(Song::Mode_PlayPattern), newNoteLen());
@@ -3707,16 +3359,10 @@ void PianoRoll::startRecordNote(const Note& n)
 				Engine::getSong()->playMode() == Song::Mode_PlayPattern))
 		{
 			TimePos sub;
-			if (Engine::getSong()->playMode() == Song::Mode_PlaySong)
-			{
-				sub = m_pattern->startPosition();
-			}
+			if (Engine::getSong()->playMode() == Song::Mode_PlaySong) { sub = m_pattern->startPosition(); }
 			Note n1(1, Engine::getSong()->getPlayPos(Engine::getSong()->playMode()) - sub, n.key(), n.getVolume(),
 				n.getPanning());
-			if (n1.pos() >= 0)
-			{
-				m_recordingNotes << n1;
-			}
+			if (n1.pos() >= 0) { m_recordingNotes << n1; }
 		}
 		else if (m_stepRecorder.isRecording())
 		{
@@ -3773,10 +3419,7 @@ void PianoRoll::setEditMode(int mode) { m_ctrlMode = m_editMode = (EditModes)mod
 
 void PianoRoll::selectAll()
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	// if first_time = true, we HAVE to set the vars for select
 	bool first_time = true;
@@ -3797,14 +3440,8 @@ void PianoRoll::selectAll()
 			m_selectedKeys += m_selectStartKey - (key - 1);
 			m_selectStartKey = key - 1;
 		}
-		if (key >= m_selectedKeys + m_selectStartKey || first_time)
-		{
-			m_selectedKeys = key - m_selectStartKey;
-		}
-		if (pos_ticks < m_selectStartTick || first_time)
-		{
-			m_selectStartTick = pos_ticks;
-		}
+		if (key >= m_selectedKeys + m_selectStartKey || first_time) { m_selectedKeys = key - m_selectStartKey; }
+		if (pos_ticks < m_selectStartTick || first_time) { m_selectStartTick = pos_ticks; }
 		if (pos_ticks + len_ticks > m_selectStartTick + m_selectedTick || first_time)
 		{
 			m_selectedTick = pos_ticks + len_ticks - m_selectStartTick;
@@ -3822,10 +3459,7 @@ NoteVector PianoRoll::getSelectedNotes() const
 	{
 		for (Note* note : m_pattern->notes())
 		{
-			if (note->selected())
-			{
-				selectedNotes.push_back(note);
-			}
+			if (note->selected()) { selectedNotes.push_back(note); }
 		}
 	}
 	return selectedNotes;
@@ -3838,10 +3472,7 @@ void PianoRoll::selectNotesOnKey()
 	{
 		for (Note* note : m_pattern->notes())
 		{
-			if (note->key() == m_lastKey)
-			{
-				note->setSelected(true);
-			}
+			if (note->key() == m_lastKey) { note->setSelected(true); }
 		}
 	}
 }
@@ -3895,10 +3526,7 @@ void PianoRoll::updateYScroll()
 
 	m_topBottomScroll->setRange(0, m_totalKeysToScroll);
 
-	if (m_startKey > m_totalKeysToScroll)
-	{
-		m_startKey = qMax(0, m_totalKeysToScroll);
-	}
+	if (m_startKey > m_totalKeysToScroll) { m_startKey = qMax(0, m_totalKeysToScroll); }
 	m_topBottomScroll->setValue(m_totalKeysToScroll - m_startKey);
 }
 
@@ -3926,18 +3554,12 @@ void PianoRoll::copySelectedNotes()
 {
 	NoteVector selected_notes = getSelectedNotes();
 
-	if (!selected_notes.empty())
-	{
-		copyToClipboard(selected_notes);
-	}
+	if (!selected_notes.empty()) { copyToClipboard(selected_notes); }
 }
 
 void PianoRoll::cutSelectedNotes()
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	NoteVector selected_notes = getSelectedNotes();
 
@@ -3966,10 +3588,7 @@ void PianoRoll::pasteNotes()
 	// For getString() and MimeType enum class
 	using namespace Clipboard;
 
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	QString value = getString(MimeType::Default);
 
@@ -3982,10 +3601,7 @@ void PianoRoll::pasteNotes()
 		// remove selection and select the newly pasted notes
 		clearSelectedNotes();
 
-		if (!list.isEmpty())
-		{
-			m_pattern->addJournalCheckPoint();
-		}
+		if (!list.isEmpty()) { m_pattern->addJournalCheckPoint(); }
 
 		for (int i = 0; !list.item(i).isNull(); ++i)
 		{
@@ -4012,16 +3628,10 @@ void PianoRoll::pasteNotes()
 // Return false if no notes are deleted
 bool PianoRoll::deleteSelectedNotes()
 {
-	if (!hasValidPattern())
-	{
-		return false;
-	}
+	if (!hasValidPattern()) { return false; }
 
 	auto selectedNotes = getSelectedNotes();
-	if (selectedNotes.empty())
-	{
-		return false;
-	}
+	if (selectedNotes.empty()) { return false; }
 
 	m_pattern->addJournalCheckPoint();
 
@@ -4080,10 +3690,7 @@ void PianoRoll::updatePositionAccompany(const TimePos& t)
 	if (m_recording && hasValidPattern() && s->playMode() != Song::Mode_PlayPattern)
 	{
 		TimePos pos = t;
-		if (s->playMode() != Song::Mode_PlayBB)
-		{
-			pos -= m_pattern->startPosition();
-		}
+		if (s->playMode() != Song::Mode_PlayBB) { pos -= m_pattern->startPosition(); }
 		if ((int)pos > 0)
 		{
 			s->getPlayPos(Song::Mode_PlayPattern).setTicks(pos);
@@ -4094,10 +3701,7 @@ void PianoRoll::updatePositionAccompany(const TimePos& t)
 
 void PianoRoll::updatePositionStepRecording(const TimePos& t)
 {
-	if (m_stepRecorder.isRecording())
-	{
-		autoScroll(t);
-	}
+	if (m_stepRecorder.isRecording()) { autoScroll(t); }
 }
 
 void PianoRoll::zoomingChanged()
@@ -4139,10 +3743,7 @@ int PianoRoll::quantization() const
 {
 	if (m_quantizeModel.value() == 0)
 	{
-		if (m_noteLenModel.value() > 0)
-		{
-			return newNoteLen();
-		}
+		if (m_noteLenModel.value() > 0) { return newNoteLen(); }
 		else
 		{
 			return DefaultTicksPerBar / 16;
@@ -4154,10 +3755,7 @@ int PianoRoll::quantization() const
 
 void PianoRoll::quantizeNotes(QuantizeActions mode)
 {
-	if (!hasValidPattern())
-	{
-		return;
-	}
+	if (!hasValidPattern()) { return; }
 
 	m_pattern->addJournalCheckPoint();
 
@@ -4173,21 +3771,12 @@ void PianoRoll::quantizeNotes(QuantizeActions mode)
 
 	for (Note* n : notes)
 	{
-		if (n->length() == TimePos(0))
-		{
-			continue;
-		}
+		if (n->length() == TimePos(0)) { continue; }
 
 		Note copy(*n);
 		m_pattern->removeNote(n);
-		if (mode == QuantizeBoth || mode == QuantizePos)
-		{
-			copy.quantizePos(quantization());
-		}
-		if (mode == QuantizeBoth || mode == QuantizeLength)
-		{
-			copy.quantizeLength(quantization());
-		}
+		if (mode == QuantizeBoth || mode == QuantizePos) { copy.quantizePos(quantization()); }
+		if (mode == QuantizeBoth || mode == QuantizeLength) { copy.quantizeLength(quantization()); }
 		m_pattern->addNote(copy, false);
 	}
 
@@ -4209,10 +3798,7 @@ void PianoRoll::updateSemiToneMarkerMenu()
 
 TimePos PianoRoll::newNoteLen() const
 {
-	if (m_noteLenModel.value() == 0)
-	{
-		return m_lenOfNewNotes;
-	}
+	if (m_noteLenModel.value() == 0) { return m_lenOfNewNotes; }
 
 	QString text = m_noteLenModel.currentText();
 	return DefaultTicksPerBar / text.right(text.length() - 2).toInt();
@@ -4738,10 +4324,7 @@ void PianoRollWindow::importPattern()
 		const QString fullPath = importDialog.selectedFiles()[0];
 		DataFile dataFile(fullPath);
 
-		if (dataFile.head().isNull())
-		{
-			return;
-		}
+		if (dataFile.head().isNull()) { return; }
 
 		TimePos pos = m_editor->m_pattern->startPosition(); // Backup position in timeline.
 
@@ -4770,10 +4353,7 @@ void PianoRollWindow::stopStepRecording()
 
 void PianoRollWindow::updateStepRecordingIcon()
 {
-	if (m_editor->isStepRecording())
-	{
-		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_on"));
-	}
+	if (m_editor->isStepRecording()) { m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_on")); }
 	else
 	{
 		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_off"));

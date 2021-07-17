@@ -165,10 +165,7 @@ public:
 		sampleFrame* data = m_data;
 		const float frame = sample * frames;
 		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % frames;
-		if (f1 < 0)
-		{
-			f1 += frames;
-		}
+		if (f1 < 0) { f1 += frames; }
 		return linearInterpolate(data[f1][0], data[(f1 + 1) % frames][0], fraction(frame));
 	}
 

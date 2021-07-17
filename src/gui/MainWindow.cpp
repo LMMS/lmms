@@ -80,10 +80,7 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
 	DisablerFunc setNoAccelerators =
 		reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
-	if (setNoAccelerators)
-	{
-		setNoAccelerators(mainWindow);
-	}
+	if (setNoAccelerators) { setNoAccelerators(mainWindow); }
 	kf5WidgetsAddon.unload();
 }
 #endif
@@ -165,14 +162,8 @@ MainWindow::MainWindow()
 	emit initProgress(tr("Loading background picture"));
 	QString backgroundPicFile = ConfigManager::inst()->backgroundPicFile();
 	QImage backgroundPic;
-	if (!backgroundPicFile.isEmpty())
-	{
-		backgroundPic = QImage(backgroundPicFile);
-	}
-	if (!backgroundPicFile.isNull())
-	{
-		m_workspace->setBackground(backgroundPic);
-	}
+	if (!backgroundPicFile.isEmpty()) { backgroundPic = QImage(backgroundPicFile); }
+	if (!backgroundPicFile.isNull()) { m_workspace->setBackground(backgroundPic); }
 	else
 	{
 		m_workspace->setBackground(Qt::NoBrush);
@@ -338,10 +329,7 @@ void MainWindow::finalize()
 	QMenu* help_menu = new QMenu(this);
 	menuBar()->addMenu(help_menu)->setText(tr("&Help"));
 	// May use offline help
-	if (true)
-	{
-		help_menu->addAction(embed::getIconPixmap("help"), tr("Online Help"), this, SLOT(browseHelp()));
-	}
+	if (true) { help_menu->addAction(embed::getIconPixmap("help"), tr("Online Help"), this, SLOT(browseHelp())); }
 	else
 	{
 		help_menu->addAction(embed::getIconPixmap("help"), tr("Help"), this, SLOT(help()));
@@ -476,10 +464,7 @@ void MainWindow::finalize()
 int MainWindow::addWidgetToToolBar(QWidget* _w, int _row, int _col)
 {
 	int col = (_col == -1) ? m_toolBarLayout->columnCount() + 7 : _col;
-	if (_w->height() > 32 || _row == -1)
-	{
-		m_toolBarLayout->addWidget(_w, 0, col, 2, 1);
-	}
+	if (_w->height() > 32 || _row == -1) { m_toolBarLayout->addWidget(_w, 0, col, 2, 1); }
 	else
 	{
 		m_toolBarLayout->addWidget(_w, _row, col);
@@ -498,10 +483,7 @@ SubWindow* MainWindow::addWindowedWidget(QWidget* w, Qt::WindowFlags windowFlags
 	SubWindow* win = new SubWindow(m_workspace->viewport(), windowFlags);
 	win->setAttribute(Qt::WA_DeleteOnClose);
 	win->setWidget(w);
-	if (w && w->sizeHint().isValid())
-	{
-		win->resize(w->sizeHint());
-	}
+	if (w && w->sizeHint().isValid()) { win->resize(w->sizeHint()); }
 	m_workspace->addSubWindow(win);
 	return win;
 }
@@ -515,30 +497,18 @@ void MainWindow::resetWindowTitle()
 		title = QFileInfo(Engine::getSong()->projectFileName()).completeBaseName();
 	}
 
-	if (Engine::getSong()->isModified())
-	{
-		title += '*';
-	}
+	if (Engine::getSong()->isModified()) { title += '*'; }
 
-	if (getSession() == Recover)
-	{
-		title += " - " + tr("Recover session. Please save your work!");
-	}
+	if (getSession() == Recover) { title += " - " + tr("Recover session. Please save your work!"); }
 
 	setWindowTitle(title + " - " + tr("LMMS %1").arg(LMMS_VERSION));
 }
 
 bool MainWindow::mayChangeProject(bool stopPlayback)
 {
-	if (stopPlayback)
-	{
-		Engine::getSong()->stop();
-	}
+	if (stopPlayback) { Engine::getSong()->stop(); }
 
-	if (!Engine::getSong()->isModified() && getSession() != Recover)
-	{
-		return (true);
-	}
+	if (!Engine::getSong()->isModified() && getSession() != Recover) { return (true); }
 
 	// Separate message strings for modified and recovered files
 	QString messageTitleRecovered = tr("Recovered project not saved");
@@ -557,16 +527,10 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 		QMessageBox::Discard, QMessageBox::Cancel, this);
 	int answer = mb.exec();
 
-	if (answer == QMessageBox::Save)
-	{
-		return (saveProject());
-	}
+	if (answer == QMessageBox::Save) { return (saveProject()); }
 	else if (answer == QMessageBox::Discard)
 	{
-		if (getSession() == Recover)
-		{
-			sessionCleanup();
-		}
+		if (getSession() == Recover) { sessionCleanup(); }
 		return (true);
 	}
 
@@ -584,10 +548,7 @@ void MainWindow::saveWidgetState(QWidget* _w, QDomElement& _de)
 {
 	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
-	if (_w->parentWidget() != NULL && _w->parentWidget()->inherits("QMdiSubWindow"))
-	{
-		_w = _w->parentWidget();
-	}
+	if (_w->parentWidget() != NULL && _w->parentWidget()->inherits("QMdiSubWindow")) { _w = _w->parentWidget(); }
 
 	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that
 	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
@@ -616,18 +577,12 @@ void MainWindow::restoreWidgetState(QWidget* _w, const QDomElement& _de)
 	{
 		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
-		if (_w->parentWidget() != NULL && _w->parentWidget()->inherits("QMdiSubWindow"))
-		{
-			_w = _w->parentWidget();
-		}
+		if (_w->parentWidget() != NULL && _w->parentWidget()->inherits("QMdiSubWindow")) { _w = _w->parentWidget(); }
 		// first restore the window, as attempting to resize a maximized window causes graphics glitching
 		_w->setWindowState(_w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized));
 
 		// Check isEmpty() to work around corrupt project files with empty size
-		if (!r.size().isEmpty())
-		{
-			_w->resize(r.size());
-		}
+		if (!r.size().isEmpty()) { _w->resize(r.size()); }
 		_w->move(r.topLeft());
 
 		// set the window to its correct minimized/maximized/restored state
@@ -644,10 +599,7 @@ void MainWindow::emptySlot() {}
 
 void MainWindow::createNewProject()
 {
-	if (mayChangeProject(true))
-	{
-		Engine::getSong()->createNewProject();
-	}
+	if (mayChangeProject(true)) { Engine::getSong()->createNewProject(); }
 }
 
 void MainWindow::openProject()
@@ -672,16 +624,10 @@ void MainWindow::openProject()
 
 bool MainWindow::saveProject()
 {
-	if (Engine::getSong()->projectFileName() == "")
-	{
-		return (saveProjectAs());
-	}
+	if (Engine::getSong()->projectFileName() == "") { return (saveProjectAs()); }
 	else if (this->guiSaveProject())
 	{
-		if (getSession() == Recover)
-		{
-			sessionCleanup();
-		}
+		if (getSession() == Recover) { sessionCleanup(); }
 		return true;
 	}
 	return false;
@@ -724,10 +670,7 @@ bool MainWindow::saveProjectAs()
 		}
 		if (this->guiSaveProjectAs(fname))
 		{
-			if (getSession() == Recover)
-			{
-				sessionCleanup();
-			}
+			if (getSession() == Recover) { sessionCleanup(); }
 			return true;
 		}
 	}
@@ -737,10 +680,7 @@ bool MainWindow::saveProjectAs()
 bool MainWindow::saveProjectAsNewVersion()
 {
 	QString fileName = Engine::getSong()->projectFileName();
-	if (fileName == "")
-	{
-		return saveProjectAs();
-	}
+	if (fileName == "") { return saveProjectAs(); }
 	else
 	{
 		do
@@ -847,8 +787,7 @@ void MainWindow::refocus()
 		}
 	}
 
-	if (!found)
-		this->setFocus();
+	if (!found) this->setFocus();
 }
 
 void MainWindow::toggleBBEditorWin(bool forceShow) { toggleWindow(gui->getBBEditor(), forceShow); }
@@ -935,10 +874,7 @@ void MainWindow::updateConfig(QAction* _who)
 	QString tag = _who->data().toString();
 	bool checked = _who->isChecked();
 
-	if (tag == "displaydbfs")
-	{
-		ConfigManager::inst()->setValue("app", "displaydbfs", QString::number(checked));
-	}
+	if (tag == "displaydbfs") { ConfigManager::inst()->setValue("app", "displaydbfs", QString::number(checked)); }
 	else if (tag == "tooltips")
 	{
 		ConfigManager::inst()->setValue("tooltips", "disabled", QString::number(!checked));
@@ -1059,14 +995,8 @@ void MainWindow::keyPressEvent(QKeyEvent* _ke)
 		break;
 	default: {
 		InstrumentTrackWindow* w = InstrumentTrackView::topLevelInstrumentTrackWindow();
-		if (w)
-		{
-			w->pianoView()->keyPressEvent(_ke);
-		}
-		if (!_ke->isAccepted())
-		{
-			QMainWindow::keyPressEvent(_ke);
-		}
+		if (w) { w->pianoView()->keyPressEvent(_ke); }
+		if (!_ke->isAccepted()) { QMainWindow::keyPressEvent(_ke); }
 	}
 	}
 }
@@ -1089,10 +1019,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent* _ke)
 		{
 			InstrumentTrackView::topLevelInstrumentTrackWindow()->pianoView()->keyReleaseEvent(_ke);
 		}
-		if (!_ke->isAccepted())
-		{
-			QMainWindow::keyReleaseEvent(_ke);
-		}
+		if (!_ke->isAccepted()) { QMainWindow::keyReleaseEvent(_ke); }
 	}
 }
 
@@ -1126,10 +1053,7 @@ void MainWindow::autoSave()
 	else
 	{
 		// try again in 10 seconds
-		if (getAutoSaveTimerInterval() != m_autoSaveShortTime)
-		{
-			autoSaveTimerReset(m_autoSaveShortTime);
-		}
+		if (getAutoSaveTimerInterval() != m_autoSaveShortTime) { autoSaveTimerReset(m_autoSaveShortTime); }
 	}
 }
 
@@ -1165,8 +1089,7 @@ void MainWindow::onExportProjectMidi()
 		const QString suffix = ".mid";
 
 		QString export_filename = efd.selectedFiles()[0];
-		if (!export_filename.endsWith(suffix))
-			export_filename += suffix;
+		if (!export_filename.endsWith(suffix)) export_filename += suffix;
 
 		Engine::getSong()->exportProjectMidi(export_filename);
 	}
@@ -1182,10 +1105,7 @@ void MainWindow::exportProject(bool multiExport)
 	{
 		efd.setFileMode(FileDialog::Directory);
 		efd.setWindowTitle(tr("Select directory for writing exported tracks..."));
-		if (!projectFileName.isEmpty())
-		{
-			efd.setDirectory(QFileInfo(projectFileName).absolutePath());
-		}
+		if (!projectFileName.isEmpty()) { efd.setDirectory(QFileInfo(projectFileName).absolutePath()); }
 	}
 	else
 	{
@@ -1355,10 +1275,7 @@ void MainWindow::onSongModified()
 	// The assumption seems to be that the Song can also be set as modified from other
 	// threads. This is not a good design! Copied from the original implementation of
 	// Song::setModified.
-	if (QThread::currentThread() == this->thread())
-	{
-		this->resetWindowTitle();
-	}
+	if (QThread::currentThread() == this->thread()) { this->resetWindowTitle(); }
 }
 
 void MainWindow::onProjectFileNameChanged() { this->resetWindowTitle(); }

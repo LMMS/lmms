@@ -18,8 +18,12 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 BinPackParameters: true
 BinPackArguments: true
 AlignOperands: false
+
+# Alignment
 AlignEscapedNewlines: DontAlign
 AccessModifierOffset: -4
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: Always
 
 # Includes
 IncludeBlocks:   Regroup

@@ -108,15 +108,9 @@ void MidiPort::processInEvent(const MidiEvent& event, const TimePos& time)
 		MidiEvent inEvent = event;
 		if (event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure)
 		{
-			if (inEvent.key() < 0 || inEvent.key() >= NumKeys)
-			{
-				return;
-			}
+			if (inEvent.key() < 0 || inEvent.key() >= NumKeys) { return; }
 
-			if (fixedInputVelocity() >= 0 && inEvent.velocity() > 0)
-			{
-				inEvent.setVelocity(fixedInputVelocity());
-			}
+			if (fixedInputVelocity() >= 0 && inEvent.velocity() > 0) { inEvent.setVelocity(fixedInputVelocity()); }
 		}
 
 		m_midiEventProcessor->processInEvent(inEvent, time);
@@ -160,16 +154,10 @@ void MidiPort::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 		QString rp;
 		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
 		{
-			if (it.value())
-			{
-				rp += it.key() + ",";
-			}
+			if (it.value()) { rp += it.key() + ","; }
 		}
 		// cut off comma
-		if (rp.length() > 0)
-		{
-			rp.truncate(rp.length() - 1);
-		}
+		if (rp.length() > 0) { rp.truncate(rp.length() - 1); }
 		thisElement.setAttribute("inports", rp);
 	}
 
@@ -178,16 +166,10 @@ void MidiPort::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 		QString wp;
 		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
 		{
-			if (it.value())
-			{
-				wp += it.key() + ",";
-			}
+			if (it.value()) { wp += it.key() + ","; }
 		}
 		// cut off comma
-		if (wp.length() > 0)
-		{
-			wp.truncate(wp.length() - 1);
-		}
+		if (wp.length() > 0) { wp.truncate(wp.length() - 1); }
 		thisElement.setAttribute("outports", wp);
 	}
 }
@@ -212,10 +194,7 @@ void MidiPort::loadSettings(const QDomElement& thisElement)
 		QStringList rp = thisElement.attribute("inports").split(',');
 		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
 		{
-			if (it.value() != (rp.indexOf(it.key()) != -1))
-			{
-				subscribeReadablePort(it.key());
-			}
+			if (it.value() != (rp.indexOf(it.key()) != -1)) { subscribeReadablePort(it.key()); }
 		}
 		emit readablePortsChanged();
 	}
@@ -225,10 +204,7 @@ void MidiPort::loadSettings(const QDomElement& thisElement)
 		QStringList wp = thisElement.attribute("outports").split(',');
 		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
 		{
-			if (it.value() != (wp.indexOf(it.key()) != -1))
-			{
-				subscribeWritablePort(it.key());
-			}
+			if (it.value() != (wp.indexOf(it.key()) != -1)) { subscribeWritablePort(it.key()); }
 		}
 		emit writablePortsChanged();
 	}
@@ -247,10 +223,7 @@ void MidiPort::subscribeReadablePort(const QString& port, bool subscribe)
 	m_readablePorts[port] = subscribe;
 
 	// make sure, MIDI-port is configured for input
-	if (subscribe == true && !isInputEnabled())
-	{
-		m_readableModel.setValue(true);
-	}
+	if (subscribe == true && !isInputEnabled()) { m_readableModel.setValue(true); }
 
 	m_midiClient->subscribeReadablePort(this, port, subscribe);
 }
@@ -260,10 +233,7 @@ void MidiPort::subscribeWritablePort(const QString& port, bool subscribe)
 	m_writablePorts[port] = subscribe;
 
 	// make sure, MIDI-port is configured for output
-	if (subscribe == true && !isOutputEnabled())
-	{
-		m_writableModel.setValue(true);
-	}
+	if (subscribe == true && !isOutputEnabled()) { m_writableModel.setValue(true); }
 	m_midiClient->subscribeWritablePort(this, port, subscribe);
 }
 
@@ -279,10 +249,7 @@ void MidiPort::updateMidiPortMode()
 		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
 		{
 			// subscribed?
-			if (it.value())
-			{
-				subscribeReadablePort(it.key(), false);
-			}
+			if (it.value()) { subscribeReadablePort(it.key(), false); }
 		}
 	}
 
@@ -291,10 +258,7 @@ void MidiPort::updateMidiPortMode()
 		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
 		{
 			// subscribed?
-			if (it.value())
-			{
-				subscribeWritablePort(it.key(), false);
-			}
+			if (it.value()) { subscribeWritablePort(it.key(), false); }
 		}
 	}
 
@@ -302,10 +266,7 @@ void MidiPort::updateMidiPortMode()
 	emit writablePortsChanged();
 	emit modeChanged();
 
-	if (Engine::getSong())
-	{
-		Engine::getSong()->setModified();
-	}
+	if (Engine::getSong()) { Engine::getSong()->setModified(); }
 }
 
 void MidiPort::updateReadablePorts()
@@ -314,10 +275,7 @@ void MidiPort::updateReadablePorts()
 	QStringList selectedPorts;
 	for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
 	{
-		if (it.value())
-		{
-			selectedPorts.push_back(it.key());
-		}
+		if (it.value()) { selectedPorts.push_back(it.key()); }
 	}
 
 	m_readablePorts.clear();
@@ -337,10 +295,7 @@ void MidiPort::updateWritablePorts()
 	QStringList selectedPorts;
 	for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
 	{
-		if (it.value())
-		{
-			selectedPorts.push_back(it.key());
-		}
+		if (it.value()) { selectedPorts.push_back(it.key()); }
 	}
 
 	m_writablePorts.clear();
