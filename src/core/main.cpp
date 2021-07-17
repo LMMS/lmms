@@ -562,20 +562,11 @@ int main(int argc, char** argv)
 
 			switch (o)
 			{
-			case 1:
-				qs.oversampling = Mixer::qualitySettings::Oversampling_None;
-				break;
-			case 2:
-				qs.oversampling = Mixer::qualitySettings::Oversampling_2x;
-				break;
-			case 4:
-				qs.oversampling = Mixer::qualitySettings::Oversampling_4x;
-				break;
-			case 8:
-				qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
-				break;
-			default:
-				return usageError(QString("Invalid oversampling %1").arg(argv[i]));
+			case 1: qs.oversampling = Mixer::qualitySettings::Oversampling_None; break;
+			case 2: qs.oversampling = Mixer::qualitySettings::Oversampling_2x; break;
+			case 4: qs.oversampling = Mixer::qualitySettings::Oversampling_4x; break;
+			case 8: qs.oversampling = Mixer::qualitySettings::Oversampling_8x; break;
+			default: return usageError(QString("Invalid oversampling %1").arg(argv[i]));
 			}
 		}
 		else if (arg == "--import")

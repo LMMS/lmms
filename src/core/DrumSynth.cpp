@@ -158,12 +158,8 @@ float DrumSynth::waveform(float ph, int form)
 
 	switch (form)
 	{
-	case 0:
-		w = (float)sin(fmod(ph, TwoPi));
-		break; // sine
-	case 1:
-		w = (float)fabs(2.0f * (float)sin(fmod(0.5f * ph, TwoPi))) - 1.f;
-		break; // sine^2
+	case 0: w = (float)sin(fmod(ph, TwoPi)); break;									 // sine
+	case 1: w = (float)fabs(2.0f * (float)sin(fmod(0.5f * ph, TwoPi))) - 1.f; break; // sine^2
 	case 2:
 		while (ph < TwoPi)
 			ph += TwoPi;
@@ -174,9 +170,7 @@ float DrumSynth::waveform(float ph, int form)
 		w = ph - TwoPi * (float)(int)(ph / TwoPi); // saw
 		w = (0.3183098f * w) - 1.f;
 		break;
-	default:
-		w = (sin(fmod(ph, TwoPi)) > 0.0) ? 1.f : -1.f;
-		break; // square
+	default: w = (sin(fmod(ph, TwoPi)) > 0.0) ? 1.f : -1.f; break; // square
 	}
 
 	return w;

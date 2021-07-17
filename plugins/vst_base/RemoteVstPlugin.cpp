@@ -480,13 +480,9 @@ bool RemoteVstPlugin::processMessage(const message& _m)
 	{
 		switch (_m.id)
 		{
-		case IdShowUI:
-			showEditor();
-			return true;
+		case IdShowUI: showEditor(); return true;
 
-		case IdHideUI:
-			hideEditor();
-			return true;
+		case IdHideUI: hideEditor(); return true;
 
 		case IdToggleUI:
 			if (m_window && IsWindowVisible(m_window)) { hideEditor(); }
@@ -511,25 +507,15 @@ bool RemoteVstPlugin::processMessage(const message& _m)
 
 	switch (_m.id)
 	{
-	case IdVstLoadPlugin:
-		init(_m.getString());
-		break;
+	case IdVstLoadPlugin: init(_m.getString()); break;
 
-	case IdVstSetTempo:
-		setBPM(_m.getInt());
-		break;
+	case IdVstSetTempo: setBPM(_m.getInt()); break;
 
-	case IdVstSetLanguage:
-		hlang = static_cast<VstHostLanguages>(_m.getInt());
-		break;
+	case IdVstSetLanguage: hlang = static_cast<VstHostLanguages>(_m.getInt()); break;
 
-	case IdVstGetParameterDump:
-		getParameterDump();
-		break;
+	case IdVstGetParameterDump: getParameterDump(); break;
 
-	case IdVstSetParameterDump:
-		setParameterDump(_m);
-		break;
+	case IdVstSetParameterDump: setParameterDump(_m); break;
 
 	case IdSaveSettingsToFile:
 		saveChunkToFile(_m.getString());
@@ -551,18 +537,14 @@ bool RemoteVstPlugin::processMessage(const message& _m)
 		sendMessage(IdVstSetProgram);
 		break;
 
-	case IdVstCurrentProgram:
-		sendMessage(message(IdVstCurrentProgram).addInt(m_currentProgram));
-		break;
+	case IdVstCurrentProgram: sendMessage(message(IdVstCurrentProgram).addInt(m_currentProgram)); break;
 
 	case IdVstRotateProgram:
 		rotateProgram(_m.getInt(0));
 		sendMessage(IdVstRotateProgram);
 		break;
 
-	case IdVstProgramNames:
-		getProgramNames();
-		break;
+	case IdVstProgramNames: getProgramNames(); break;
 
 	case IdSavePresetFile:
 		savePreset(_m.getString(0));
@@ -574,13 +556,9 @@ bool RemoteVstPlugin::processMessage(const message& _m)
 		// sendMessage( IdVstSetParameter );
 		break;
 
-	case IdVstParameterDisplays:
-		getParameterDisplays();
-		break;
+	case IdVstParameterDisplays: getParameterDisplays(); break;
 
-	case IdVstParameterLabels:
-		getParameterLabels();
-		break;
+	case IdVstParameterLabels: getParameterLabels(); break;
 
 	case IdVstIdleUpdate: {
 		int newCurrentProgram = pluginDispatch(effGetProgram);
@@ -593,8 +571,7 @@ bool RemoteVstPlugin::processMessage(const message& _m)
 		break;
 	}
 
-	default:
-		return RemotePluginClient::processMessage(_m);
+	default: return RemotePluginClient::processMessage(_m);
 	}
 	return true;
 }
@@ -1374,9 +1351,7 @@ intptr_t RemoteVstPlugin::hostCallback(
 		// index, value, returns 0
 		return 0;
 
-	case audioMasterVersion:
-		SHOW_CALLBACK("amc: audioMasterVersion\n");
-		return 2300;
+	case audioMasterVersion: SHOW_CALLBACK("amc: audioMasterVersion\n"); return 2300;
 
 	case audioMasterCurrentId:
 		SHOW_CALLBACK("amc: audioMasterCurrentId\n");
@@ -1491,9 +1466,7 @@ intptr_t RemoteVstPlugin::hostCallback(
 		// supported
 		return 0;
 
-	case audioMasterTempoAt:
-		SHOW_CALLBACK("amc: audioMasterTempoAt\n");
-		return __plugin->m_bpm * 10000;
+	case audioMasterTempoAt: SHOW_CALLBACK("amc: audioMasterTempoAt\n"); return __plugin->m_bpm * 10000;
 
 	case audioMasterGetNumAutomatableParameters:
 		SHOW_CALLBACK("amc: audioMasterGetNumAutomatable"
@@ -1579,18 +1552,11 @@ intptr_t RemoteVstPlugin::hostCallback(
 		return 1;
 	}
 
-	case audioMasterGetSampleRate:
-		SHOW_CALLBACK("amc: audioMasterGetSampleRate\n");
-		return __plugin->sampleRate();
+	case audioMasterGetSampleRate: SHOW_CALLBACK("amc: audioMasterGetSampleRate\n"); return __plugin->sampleRate();
 
-	case audioMasterGetBlockSize:
-		SHOW_CALLBACK("amc: audioMasterGetBlockSize\n");
+	case audioMasterGetBlockSize: SHOW_CALLBACK("amc: audioMasterGetBlockSize\n"); return __plugin->bufferSize();
 
-		return __plugin->bufferSize();
-
-	case audioMasterGetInputLatency:
-		SHOW_CALLBACK("amc: audioMasterGetInputLatency\n");
-		return __plugin->bufferSize();
+	case audioMasterGetInputLatency: SHOW_CALLBACK("amc: audioMasterGetInputLatency\n"); return __plugin->bufferSize();
 
 	case audioMasterGetOutputLatency:
 		SHOW_CALLBACK("amc: audioMasterGetOutputLatency\n");
@@ -1616,9 +1582,7 @@ intptr_t RemoteVstPlugin::hostCallback(
 		// 4:read/write offline
 		return 0;
 
-	case audioMasterOfflineStart:
-		SHOW_CALLBACK("amc: audioMasterOfflineStart\n");
-		return 0;
+	case audioMasterOfflineStart: SHOW_CALLBACK("amc: audioMasterOfflineStart\n"); return 0;
 
 	case audioMasterOfflineRead:
 		SHOW_CALLBACK("amc: audioMasterOfflineRead\n");
@@ -1671,9 +1635,7 @@ intptr_t RemoteVstPlugin::hostCallback(
 			!strcmp((char*)_ptr, "sendVstTimeInfo") || !strcmp((char*)_ptr, "sizeWindow") ||
 			!strcmp((char*)_ptr, "supplyIdle");
 
-	case audioMasterGetLanguage:
-		SHOW_CALLBACK("amc: audioMasterGetLanguage\n");
-		return hlang;
+	case audioMasterGetLanguage: SHOW_CALLBACK("amc: audioMasterGetLanguage\n"); return hlang;
 
 	case audioMasterGetDirectory:
 		SHOW_CALLBACK("amc: audioMasterGetDirectory\n");
@@ -1705,9 +1667,7 @@ intptr_t RemoteVstPlugin::hostCallback(
 		// in <ptr>
 		return 0;
 #endif
-	default:
-		SHOW_CALLBACK("amd: not handled");
-		break;
+	default: SHOW_CALLBACK("amd: not handled"); break;
 	}
 
 	return 0;
@@ -1823,16 +1783,11 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc(HWND hwnd, UINT uMsg, WPARAM wParam, L
 			return 0;
 		}
 
-		case GiveIdle:
-			__plugin->idle();
-			return 0;
+		case GiveIdle: __plugin->idle(); return 0;
 
-		case ClosePlugin:
-			PostQuitMessage(0);
-			return 0;
+		case ClosePlugin: PostQuitMessage(0); return 0;
 
-		default:
-			break;
+		default: break;
 		}
 	}
 	else if (uMsg == WM_SYSCOMMAND && (wParam & 0xfff0) == SC_CLOSE)

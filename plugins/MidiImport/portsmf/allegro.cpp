@@ -107,21 +107,11 @@ void Alg_parameter::show()
 {
 	switch (attr[0])
 	{
-	case 'r':
-		printf("%s:%g", attr_name(), r);
-		break;
-	case 's':
-		printf("%s:%s", attr_name(), s);
-		break;
-	case 'i':
-		printf("%s:%ld", attr_name(), i);
-		break;
-	case 'l':
-		printf("%s:%s", attr_name(), (l ? "t" : "f"));
-		break;
-	case 'a':
-		printf("%s:%s", attr_name(), a);
-		break;
+	case 'r': printf("%s:%g", attr_name(), r); break;
+	case 's': printf("%s:%s", attr_name(), s); break;
+	case 'i': printf("%s:%ld", attr_name(), i); break;
+	case 'l': printf("%s:%s", attr_name(), (l ? "t" : "f")); break;
+	case 'a': printf("%s:%s", attr_name(), a); break;
 	}
 }
 
@@ -1630,9 +1620,7 @@ void Alg_track::unserialize_parameter(Alg_parameter_ptr parm_ptr)
 		ser_read_buf.check_input_buffer(8);
 		parm_ptr->r = ser_read_buf.get_double();
 		break;
-	case 's':
-		parm_ptr->s = heapify(ser_read_buf.get_string());
-		break;
+	case 's': parm_ptr->s = heapify(ser_read_buf.get_string()); break;
 	case 'i':
 		ser_read_buf.check_input_buffer(4);
 		parm_ptr->i = ser_read_buf.get_int32();
@@ -1641,9 +1629,7 @@ void Alg_track::unserialize_parameter(Alg_parameter_ptr parm_ptr)
 		ser_read_buf.check_input_buffer(4);
 		parm_ptr->l = ser_read_buf.get_int32() != 0;
 		break;
-	case 'a':
-		parm_ptr->a = symbol_table.insert_attribute(ser_read_buf.get_string());
-		break;
+	case 'a': parm_ptr->a = symbol_table.insert_attribute(ser_read_buf.get_string()); break;
 	}
 }
 
@@ -2530,7 +2516,10 @@ void Alg_time_sigs::insert_beats(double start, double dur)
 		// there is a time signature change before bar, in which case we
 		// should not insert a new time signature
 		// The next time signature after start is at i if i < len
-		if (i < len && time_sigs[i].beat < bar_loc) { /* do not insert */; }
+		if (i < len && time_sigs[i].beat < bar_loc)
+		{ /* do not insert */
+			;
+		}
 		else
 		{
 			insert(bar_loc, tsnum, tsden);

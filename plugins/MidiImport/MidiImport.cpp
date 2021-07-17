@@ -97,13 +97,9 @@ bool MidiImport::tryImport(TrackContainer* tc)
 
 	switch (readID())
 	{
-	case makeID('M', 'T', 'h', 'd'):
-		printf("MidiImport::tryImport(): found MThd\n");
-		return readSMF(tc);
+	case makeID('M', 'T', 'h', 'd'): printf("MidiImport::tryImport(): found MThd\n"); return readSMF(tc);
 
-	case makeID('R', 'I', 'F', 'F'):
-		printf("MidiImport::tryImport(): found RIFF\n");
-		return readRIFF(tc);
+	case makeID('R', 'I', 'F', 'F'): printf("MidiImport::tryImport(): found RIFF\n"); return readRIFF(tc);
 
 	default:
 		printf("MidiImport::tryImport(): not a Standard MIDI "

@@ -334,12 +334,9 @@ void TimeLineWidget::mouseMoveEvent(QMouseEvent* event)
 		update();
 		break;
 	}
-	case SelectSongTCO:
-		emit regionSelectedFromPixels(m_initalXSelect, event->x());
-		break;
+	case SelectSongTCO: emit regionSelectedFromPixels(m_initalXSelect, event->x()); break;
 
-	default:
-		break;
+	default: break;
 	}
 }
 

@@ -173,9 +173,7 @@ void Song::processNextBuffer()
 	// Determine the list of tracks to play and the clip number
 	switch (m_playMode)
 	{
-	case Mode_PlaySong:
-		trackList = tracks();
-		break;
+	case Mode_PlaySong: trackList = tracks(); break;
 
 	case Mode_PlayBB:
 		if (Engine::getBBTrackContainer()->numOfBBs() > 0)
@@ -193,8 +191,7 @@ void Song::processNextBuffer()
 		}
 		break;
 
-	default:
-		return;
+	default: return;
 	}
 
 	// If we have no tracks to play, there is nothing to do
@@ -320,8 +317,7 @@ void Song::processAutomations(const TrackList& tracklist, TimePos timeStart, fpp
 
 	switch (m_playMode)
 	{
-	case Mode_PlaySong:
-		break;
+	case Mode_PlaySong: break;
 	case Mode_PlayBB: {
 		Q_ASSERT(tracklist.size() == 1);
 		Q_ASSERT(tracklist.at(0)->type() == Track::BBTrack);
@@ -331,8 +327,7 @@ void Song::processAutomations(const TrackList& tracklist, TimePos timeStart, fpp
 		tcoNum = bbTrack->index();
 	}
 	break;
-	default:
-		return;
+	default: return;
 	}
 
 	values = container->automatedValuesAt(timeStart, tcoNum);
@@ -562,8 +557,7 @@ void Song::stop()
 			}
 			break;
 
-		case TimeLineWidget::KeepStopPosition:
-			break;
+		case TimeLineWidget::KeepStopPosition: break;
 		}
 	}
 	else

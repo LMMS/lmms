@@ -139,9 +139,7 @@ VstPlugin::VstPlugin(const QString& _plugin)
 	case PE::MachineType::i386:
 		tryLoad(REMOTE_VST_PLUGIN_FILEPATH_32); // Default: 32/RemoteVstPlugin32
 		break;
-	default:
-		m_failed = true;
-		return;
+	default: m_failed = true; return;
 	}
 
 	setTempo(Engine::getSong()->getTempo());
@@ -168,26 +166,13 @@ void VstPlugin::tryLoad(const QString& remoteVstPluginExecutable)
 	VstHostLanguages hlang = LanguageEnglish;
 	switch (QLocale::system().language())
 	{
-	case QLocale::French:
-		hlang = LanguageFrench;
-		break;
-	case QLocale::German:
-		hlang = LanguageGerman;
-		break;
-	case QLocale::Italian:
-		hlang = LanguageItalian;
-		break;
-	case QLocale::Japanese:
-		hlang = LanguageJapanese;
-		break;
-	case QLocale::Korean:
-		hlang = LanguageKorean;
-		break;
-	case QLocale::Spanish:
-		hlang = LanguageSpanish;
-		break;
-	default:
-		break;
+	case QLocale::French: hlang = LanguageFrench; break;
+	case QLocale::German: hlang = LanguageGerman; break;
+	case QLocale::Italian: hlang = LanguageItalian; break;
+	case QLocale::Japanese: hlang = LanguageJapanese; break;
+	case QLocale::Korean: hlang = LanguageKorean; break;
+	case QLocale::Spanish: hlang = LanguageSpanish; break;
+	default: break;
 	}
 	sendMessage(message(IdVstSetLanguage).addInt(hlang));
 	sendMessage(message(IdVstLoadPlugin).addString(QSTR_TO_STDSTR(m_plugin)));
@@ -330,45 +315,25 @@ bool VstPlugin::processMessage(const message& _m)
 		}
 		break;
 
-	case IdVstPluginEditorGeometry:
-		m_pluginGeometry = QSize(_m.getInt(0), _m.getInt(1));
-		break;
+	case IdVstPluginEditorGeometry: m_pluginGeometry = QSize(_m.getInt(0), _m.getInt(1)); break;
 
-	case IdVstPluginName:
-		m_name = _m.getQString();
-		break;
+	case IdVstPluginName: m_name = _m.getQString(); break;
 
-	case IdVstPluginVersion:
-		m_version = _m.getInt();
-		break;
+	case IdVstPluginVersion: m_version = _m.getInt(); break;
 
-	case IdVstPluginVendorString:
-		m_vendorString = _m.getQString();
-		break;
+	case IdVstPluginVendorString: m_vendorString = _m.getQString(); break;
 
-	case IdVstPluginProductString:
-		m_productString = _m.getQString();
-		break;
+	case IdVstPluginProductString: m_productString = _m.getQString(); break;
 
-	case IdVstCurrentProgram:
-		m_currentProgram = _m.getInt();
-		break;
+	case IdVstCurrentProgram: m_currentProgram = _m.getInt(); break;
 
-	case IdVstCurrentProgramName:
-		m_currentProgramName = _m.getQString();
-		break;
+	case IdVstCurrentProgramName: m_currentProgramName = _m.getQString(); break;
 
-	case IdVstProgramNames:
-		m_allProgramNames = _m.getQString();
-		break;
+	case IdVstProgramNames: m_allProgramNames = _m.getQString(); break;
 
-	case IdVstParameterLabels:
-		m_allParameterLabels = _m.getQString();
-		break;
+	case IdVstParameterLabels: m_allParameterLabels = _m.getQString(); break;
 
-	case IdVstParameterDisplays:
-		m_allParameterDisplays = _m.getQString();
-		break;
+	case IdVstParameterDisplays: m_allParameterDisplays = _m.getQString(); break;
 
 	case IdVstPluginUniqueID:
 		// TODO: display graphically in case of failure
@@ -391,8 +356,7 @@ bool VstPlugin::processMessage(const message& _m)
 		}
 		break;
 	}
-	default:
-		return RemotePlugin::processMessage(_m);
+	default: return RemotePlugin::processMessage(_m);
 	}
 	return true;
 }

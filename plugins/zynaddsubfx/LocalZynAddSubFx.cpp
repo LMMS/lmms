@@ -193,14 +193,11 @@ void LocalZynAddSubFx::processMidiEvent(const MidiEvent& event)
 		if (event.key() < 0 || event.key() > MidiMaxKey) { break; }
 		if (--m_runningNotes[event.key()] <= 0) { m_master->noteOff(event.channel(), event.key()); }
 		break;
-	case MidiPitchBend:
-		m_master->setController(event.channel(), C_pitchwheel, event.pitchBend() - 8192);
-		break;
+	case MidiPitchBend: m_master->setController(event.channel(), C_pitchwheel, event.pitchBend() - 8192); break;
 	case MidiControlChange:
 		m_master->setController(event.channel(), event.controllerNumber(), event.controllerValue());
 		break;
-	default:
-		break;
+	default: break;
 	}
 }
 

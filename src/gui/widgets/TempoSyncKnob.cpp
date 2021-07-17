@@ -125,27 +125,13 @@ void TempoSyncKnob::updateDescAndIcon()
 			m_tempoSyncDescription = tr("Custom ") + "(" + QString::number(model()->m_custom.numeratorModel().value()) +
 				"/" + QString::number(model()->m_custom.denominatorModel().value()) + ")";
 			break;
-		case TempoSyncKnobModel::SyncDoubleWholeNote:
-			m_tempoSyncDescription = tr("Synced to Eight Beats");
-			break;
-		case TempoSyncKnobModel::SyncWholeNote:
-			m_tempoSyncDescription = tr("Synced to Whole Note");
-			break;
-		case TempoSyncKnobModel::SyncHalfNote:
-			m_tempoSyncDescription = tr("Synced to Half Note");
-			break;
-		case TempoSyncKnobModel::SyncQuarterNote:
-			m_tempoSyncDescription = tr("Synced to Quarter Note");
-			break;
-		case TempoSyncKnobModel::SyncEighthNote:
-			m_tempoSyncDescription = tr("Synced to 8th Note");
-			break;
-		case TempoSyncKnobModel::SyncSixteenthNote:
-			m_tempoSyncDescription = tr("Synced to 16th Note");
-			break;
-		case TempoSyncKnobModel::SyncThirtysecondNote:
-			m_tempoSyncDescription = tr("Synced to 32nd Note");
-			break;
+		case TempoSyncKnobModel::SyncDoubleWholeNote: m_tempoSyncDescription = tr("Synced to Eight Beats"); break;
+		case TempoSyncKnobModel::SyncWholeNote: m_tempoSyncDescription = tr("Synced to Whole Note"); break;
+		case TempoSyncKnobModel::SyncHalfNote: m_tempoSyncDescription = tr("Synced to Half Note"); break;
+		case TempoSyncKnobModel::SyncQuarterNote: m_tempoSyncDescription = tr("Synced to Quarter Note"); break;
+		case TempoSyncKnobModel::SyncEighthNote: m_tempoSyncDescription = tr("Synced to 8th Note"); break;
+		case TempoSyncKnobModel::SyncSixteenthNote: m_tempoSyncDescription = tr("Synced to 16th Note"); break;
+		case TempoSyncKnobModel::SyncThirtysecondNote: m_tempoSyncDescription = tr("Synced to 32nd Note"); break;
 		default:;
 		}
 	}
@@ -160,33 +146,15 @@ void TempoSyncKnob::updateDescAndIcon()
 
 	switch (model()->m_tempoSyncMode)
 	{
-	case TempoSyncKnobModel::SyncNone:
-		m_tempoSyncIcon = embed::getIconPixmap("tempo_sync");
-		break;
-	case TempoSyncKnobModel::SyncCustom:
-		m_tempoSyncIcon = embed::getIconPixmap("dont_know");
-		break;
-	case TempoSyncKnobModel::SyncDoubleWholeNote:
-		m_tempoSyncIcon = embed::getIconPixmap("note_double_whole");
-		break;
-	case TempoSyncKnobModel::SyncWholeNote:
-		m_tempoSyncIcon = embed::getIconPixmap("note_whole");
-		break;
-	case TempoSyncKnobModel::SyncHalfNote:
-		m_tempoSyncIcon = embed::getIconPixmap("note_half");
-		break;
-	case TempoSyncKnobModel::SyncQuarterNote:
-		m_tempoSyncIcon = embed::getIconPixmap("note_quarter");
-		break;
-	case TempoSyncKnobModel::SyncEighthNote:
-		m_tempoSyncIcon = embed::getIconPixmap("note_eighth");
-		break;
-	case TempoSyncKnobModel::SyncSixteenthNote:
-		m_tempoSyncIcon = embed::getIconPixmap("note_sixteenth");
-		break;
-	case TempoSyncKnobModel::SyncThirtysecondNote:
-		m_tempoSyncIcon = embed::getIconPixmap("note_thirtysecond");
-		break;
+	case TempoSyncKnobModel::SyncNone: m_tempoSyncIcon = embed::getIconPixmap("tempo_sync"); break;
+	case TempoSyncKnobModel::SyncCustom: m_tempoSyncIcon = embed::getIconPixmap("dont_know"); break;
+	case TempoSyncKnobModel::SyncDoubleWholeNote: m_tempoSyncIcon = embed::getIconPixmap("note_double_whole"); break;
+	case TempoSyncKnobModel::SyncWholeNote: m_tempoSyncIcon = embed::getIconPixmap("note_whole"); break;
+	case TempoSyncKnobModel::SyncHalfNote: m_tempoSyncIcon = embed::getIconPixmap("note_half"); break;
+	case TempoSyncKnobModel::SyncQuarterNote: m_tempoSyncIcon = embed::getIconPixmap("note_quarter"); break;
+	case TempoSyncKnobModel::SyncEighthNote: m_tempoSyncIcon = embed::getIconPixmap("note_eighth"); break;
+	case TempoSyncKnobModel::SyncSixteenthNote: m_tempoSyncIcon = embed::getIconPixmap("note_sixteenth"); break;
+	case TempoSyncKnobModel::SyncThirtysecondNote: m_tempoSyncIcon = embed::getIconPixmap("note_thirtysecond"); break;
 	default:
 		qWarning("TempoSyncKnob::calculateTempoSyncTime:"
 				 "invalid TempoSyncMode");

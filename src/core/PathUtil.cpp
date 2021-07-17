@@ -22,41 +22,21 @@ QString baseLocation(const Base base, bool* error /* = nullptr*/)
 	QString loc = "";
 	switch (base)
 	{
-	case Base::ProjectDir:
-		loc = ConfigManager::inst()->userProjectsDir();
-		break;
+	case Base::ProjectDir: loc = ConfigManager::inst()->userProjectsDir(); break;
 	case Base::FactorySample: {
 		QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
 		loc = fsd.absolutePath();
 		break;
 	}
-	case Base::UserSample:
-		loc = ConfigManager::inst()->userSamplesDir();
-		break;
-	case Base::UserVST:
-		loc = ConfigManager::inst()->userVstDir();
-		break;
-	case Base::Preset:
-		loc = ConfigManager::inst()->userPresetsDir();
-		break;
-	case Base::UserLADSPA:
-		loc = ConfigManager::inst()->ladspaDir();
-		break;
-	case Base::DefaultLADSPA:
-		loc = ConfigManager::inst()->userLadspaDir();
-		break;
-	case Base::UserSoundfont:
-		loc = ConfigManager::inst()->sf2Dir();
-		break;
-	case Base::DefaultSoundfont:
-		loc = ConfigManager::inst()->userSf2Dir();
-		break;
-	case Base::UserGIG:
-		loc = ConfigManager::inst()->gigDir();
-		break;
-	case Base::DefaultGIG:
-		loc = ConfigManager::inst()->userGigDir();
-		break;
+	case Base::UserSample: loc = ConfigManager::inst()->userSamplesDir(); break;
+	case Base::UserVST: loc = ConfigManager::inst()->userVstDir(); break;
+	case Base::Preset: loc = ConfigManager::inst()->userPresetsDir(); break;
+	case Base::UserLADSPA: loc = ConfigManager::inst()->ladspaDir(); break;
+	case Base::DefaultLADSPA: loc = ConfigManager::inst()->userLadspaDir(); break;
+	case Base::UserSoundfont: loc = ConfigManager::inst()->sf2Dir(); break;
+	case Base::DefaultSoundfont: loc = ConfigManager::inst()->userSf2Dir(); break;
+	case Base::UserGIG: loc = ConfigManager::inst()->gigDir(); break;
+	case Base::DefaultGIG: loc = ConfigManager::inst()->userGigDir(); break;
 	case Base::LocalDir: {
 		const Song* s = Engine::getSong();
 		QString projectPath;
@@ -70,8 +50,7 @@ QString baseLocation(const Base base, bool* error /* = nullptr*/)
 		if (error) { *error = (!s || projectPath.isEmpty()); }
 		break;
 	}
-	default:
-		return QString("");
+	default: return QString("");
 	}
 	return QDir::cleanPath(loc) + "/";
 }
@@ -90,32 +69,19 @@ QString basePrefix(const Base base)
 {
 	switch (base)
 	{
-	case Base::ProjectDir:
-		return QStringLiteral("userprojects:");
-	case Base::FactorySample:
-		return QStringLiteral("factorysample:");
-	case Base::UserSample:
-		return QStringLiteral("usersample:");
-	case Base::UserVST:
-		return QStringLiteral("uservst:");
-	case Base::Preset:
-		return QStringLiteral("preset:");
-	case Base::UserLADSPA:
-		return QStringLiteral("userladspa:");
-	case Base::DefaultLADSPA:
-		return QStringLiteral("defaultladspa:");
-	case Base::UserSoundfont:
-		return QStringLiteral("usersoundfont:");
-	case Base::DefaultSoundfont:
-		return QStringLiteral("defaultsoundfont:");
-	case Base::UserGIG:
-		return QStringLiteral("usergig:");
-	case Base::DefaultGIG:
-		return QStringLiteral("defaultgig:");
-	case Base::LocalDir:
-		return QStringLiteral("local:");
-	default:
-		return QStringLiteral("");
+	case Base::ProjectDir: return QStringLiteral("userprojects:");
+	case Base::FactorySample: return QStringLiteral("factorysample:");
+	case Base::UserSample: return QStringLiteral("usersample:");
+	case Base::UserVST: return QStringLiteral("uservst:");
+	case Base::Preset: return QStringLiteral("preset:");
+	case Base::UserLADSPA: return QStringLiteral("userladspa:");
+	case Base::DefaultLADSPA: return QStringLiteral("defaultladspa:");
+	case Base::UserSoundfont: return QStringLiteral("usersoundfont:");
+	case Base::DefaultSoundfont: return QStringLiteral("defaultsoundfont:");
+	case Base::UserGIG: return QStringLiteral("usergig:");
+	case Base::DefaultGIG: return QStringLiteral("defaultgig:");
+	case Base::LocalDir: return QStringLiteral("local:");
+	default: return QStringLiteral("");
 	}
 }
 

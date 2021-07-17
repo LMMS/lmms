@@ -65,27 +65,13 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t _bpm)
 			conversionFactor =
 				static_cast<float>(m_custom.getDenominator()) / static_cast<float>(m_custom.getNumerator());
 			break;
-		case SyncDoubleWholeNote:
-			conversionFactor = 0.125;
-			break;
-		case SyncWholeNote:
-			conversionFactor = 0.25;
-			break;
-		case SyncHalfNote:
-			conversionFactor = 0.5;
-			break;
-		case SyncQuarterNote:
-			conversionFactor = 1.0;
-			break;
-		case SyncEighthNote:
-			conversionFactor = 2.0;
-			break;
-		case SyncSixteenthNote:
-			conversionFactor = 4.0;
-			break;
-		case SyncThirtysecondNote:
-			conversionFactor = 8.0;
-			break;
+		case SyncDoubleWholeNote: conversionFactor = 0.125; break;
+		case SyncWholeNote: conversionFactor = 0.25; break;
+		case SyncHalfNote: conversionFactor = 0.5; break;
+		case SyncQuarterNote: conversionFactor = 1.0; break;
+		case SyncEighthNote: conversionFactor = 2.0; break;
+		case SyncSixteenthNote: conversionFactor = 4.0; break;
+		case SyncThirtysecondNote: conversionFactor = 8.0; break;
 		default:;
 		}
 		bool journalling = testAndSetJournalling(false);

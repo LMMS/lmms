@@ -619,9 +619,7 @@ bool SampleBuffer::play(
 		// Advance
 		switch (loopMode)
 		{
-		case LoopOff:
-			playFrame += srcData.input_frames_used;
-			break;
+		case LoopOff: playFrame += srcData.input_frames_used; break;
 		case LoopOn:
 			playFrame += srcData.input_frames_used;
 			playFrame = getLoopedIndex(playFrame, loopStartFrame, loopEndFrame);
@@ -657,9 +655,7 @@ bool SampleBuffer::play(
 		// Advance
 		switch (loopMode)
 		{
-		case LoopOff:
-			playFrame += frames;
-			break;
+		case LoopOff: playFrame += frames; break;
 		case LoopOn:
 			playFrame += frames;
 			playFrame = getLoopedIndex(playFrame, loopStartFrame, loopEndFrame);

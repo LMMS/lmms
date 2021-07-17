@@ -476,21 +476,11 @@ void XpressiveView::expressionChanged()
 
 	switch (m_selectedGraphGroup->model()->value())
 	{
-	case W1_EXPR:
-		e->wavesExpression(0) = text;
-		break;
-	case W2_EXPR:
-		e->wavesExpression(1) = text;
-		break;
-	case W3_EXPR:
-		e->wavesExpression(2) = text;
-		break;
-	case O1_EXPR:
-		e->outputExpression(0) = text;
-		break;
-	case O2_EXPR:
-		e->outputExpression(1) = text;
-		break;
+	case W1_EXPR: e->wavesExpression(0) = text; break;
+	case W2_EXPR: e->wavesExpression(1) = text; break;
+	case W3_EXPR: e->wavesExpression(2) = text; break;
+	case O1_EXPR: e->outputExpression(0) = text; break;
+	case O2_EXPR: e->outputExpression(1) = text; break;
 	}
 	if (m_wave_expr) m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && text.size() == 0);
 
@@ -590,28 +580,16 @@ void XpressiveView::smoothChanged()
 	float smoothness = 0;
 	switch (m_selectedGraphGroup->model()->value())
 	{
-	case W1_EXPR:
-		smoothness = e->smoothW1().value();
-		break;
-	case W2_EXPR:
-		smoothness = e->smoothW2().value();
-		break;
-	case W3_EXPR:
-		smoothness = e->smoothW3().value();
-		break;
+	case W1_EXPR: smoothness = e->smoothW1().value(); break;
+	case W2_EXPR: smoothness = e->smoothW2().value(); break;
+	case W3_EXPR: smoothness = e->smoothW3().value(); break;
 	}
 	Xpressive::smooth(smoothness, m_raw_graph, m_graph->model());
 	switch (m_selectedGraphGroup->model()->value())
 	{
-	case W1_EXPR:
-		e->W1().copyFrom(m_graph->model());
-		break;
-	case W2_EXPR:
-		e->W2().copyFrom(m_graph->model());
-		break;
-	case W3_EXPR:
-		e->W3().copyFrom(m_graph->model());
-		break;
+	case W1_EXPR: e->W1().copyFrom(m_graph->model()); break;
+	case W2_EXPR: e->W2().copyFrom(m_graph->model()); break;
+	case W3_EXPR: e->W3().copyFrom(m_graph->model()); break;
 	}
 	Engine::getSong()->setModified();
 	m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && m_expressionEditor->toPlainText().size() == 0);
@@ -623,15 +601,9 @@ void XpressiveView::graphDrawn()
 	Xpressive* e = castModel<Xpressive>();
 	switch (m_selectedGraphGroup->model()->value())
 	{
-	case W1_EXPR:
-		e->W1().copyFrom(m_graph->model());
-		break;
-	case W2_EXPR:
-		e->W2().copyFrom(m_graph->model());
-		break;
-	case W3_EXPR:
-		e->W3().copyFrom(m_graph->model());
-		break;
+	case W1_EXPR: e->W1().copyFrom(m_graph->model()); break;
+	case W2_EXPR: e->W2().copyFrom(m_graph->model()); break;
+	case W3_EXPR: e->W3().copyFrom(m_graph->model()); break;
 	}
 	Engine::getSong()->setModified();
 }

@@ -55,13 +55,9 @@ inline const char* mimeType(MimeType type)
 {
 	switch (type)
 	{
-	case MimeType::StringPair:
-		return "application/x-lmms-stringpair";
-		break;
+	case MimeType::StringPair: return "application/x-lmms-stringpair"; break;
 	case MimeType::Default:
-	default:
-		return "application/x-lmms-clipboard";
-		break;
+	default: return "application/x-lmms-clipboard"; break;
 	}
 }
 }; // namespace Clipboard

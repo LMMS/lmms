@@ -55,20 +55,11 @@ void Oscillator::update(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t _c
 	{
 		switch (m_modulationAlgoModel->value())
 		{
-		case PhaseModulation:
-			updatePM(_ab, _frames, _chnl);
-			break;
-		case AmplitudeModulation:
-			updateAM(_ab, _frames, _chnl);
-			break;
-		case SignalMix:
-			updateMix(_ab, _frames, _chnl);
-			break;
-		case SynchronizedBySubOsc:
-			updateSync(_ab, _frames, _chnl);
-			break;
-		case FrequencyModulation:
-			updateFM(_ab, _frames, _chnl);
+		case PhaseModulation: updatePM(_ab, _frames, _chnl); break;
+		case AmplitudeModulation: updateAM(_ab, _frames, _chnl); break;
+		case SignalMix: updateMix(_ab, _frames, _chnl); break;
+		case SynchronizedBySubOsc: updateSync(_ab, _frames, _chnl); break;
+		case FrequencyModulation: updateFM(_ab, _frames, _chnl);
 		}
 	}
 	else
@@ -82,30 +73,14 @@ void Oscillator::updateNoSub(sampleFrame* _ab, const fpp_t _frames, const ch_cnt
 	switch (m_waveShapeModel->value())
 	{
 	case SineWave:
-	default:
-		updateNoSub<SineWave>(_ab, _frames, _chnl);
-		break;
-	case TriangleWave:
-		updateNoSub<TriangleWave>(_ab, _frames, _chnl);
-		break;
-	case SawWave:
-		updateNoSub<SawWave>(_ab, _frames, _chnl);
-		break;
-	case SquareWave:
-		updateNoSub<SquareWave>(_ab, _frames, _chnl);
-		break;
-	case MoogSawWave:
-		updateNoSub<MoogSawWave>(_ab, _frames, _chnl);
-		break;
-	case ExponentialWave:
-		updateNoSub<ExponentialWave>(_ab, _frames, _chnl);
-		break;
-	case WhiteNoise:
-		updateNoSub<WhiteNoise>(_ab, _frames, _chnl);
-		break;
-	case UserDefinedWave:
-		updateNoSub<UserDefinedWave>(_ab, _frames, _chnl);
-		break;
+	default: updateNoSub<SineWave>(_ab, _frames, _chnl); break;
+	case TriangleWave: updateNoSub<TriangleWave>(_ab, _frames, _chnl); break;
+	case SawWave: updateNoSub<SawWave>(_ab, _frames, _chnl); break;
+	case SquareWave: updateNoSub<SquareWave>(_ab, _frames, _chnl); break;
+	case MoogSawWave: updateNoSub<MoogSawWave>(_ab, _frames, _chnl); break;
+	case ExponentialWave: updateNoSub<ExponentialWave>(_ab, _frames, _chnl); break;
+	case WhiteNoise: updateNoSub<WhiteNoise>(_ab, _frames, _chnl); break;
+	case UserDefinedWave: updateNoSub<UserDefinedWave>(_ab, _frames, _chnl); break;
 	}
 }
 
@@ -114,30 +89,14 @@ void Oscillator::updatePM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t 
 	switch (m_waveShapeModel->value())
 	{
 	case SineWave:
-	default:
-		updatePM<SineWave>(_ab, _frames, _chnl);
-		break;
-	case TriangleWave:
-		updatePM<TriangleWave>(_ab, _frames, _chnl);
-		break;
-	case SawWave:
-		updatePM<SawWave>(_ab, _frames, _chnl);
-		break;
-	case SquareWave:
-		updatePM<SquareWave>(_ab, _frames, _chnl);
-		break;
-	case MoogSawWave:
-		updatePM<MoogSawWave>(_ab, _frames, _chnl);
-		break;
-	case ExponentialWave:
-		updatePM<ExponentialWave>(_ab, _frames, _chnl);
-		break;
-	case WhiteNoise:
-		updatePM<WhiteNoise>(_ab, _frames, _chnl);
-		break;
-	case UserDefinedWave:
-		updatePM<UserDefinedWave>(_ab, _frames, _chnl);
-		break;
+	default: updatePM<SineWave>(_ab, _frames, _chnl); break;
+	case TriangleWave: updatePM<TriangleWave>(_ab, _frames, _chnl); break;
+	case SawWave: updatePM<SawWave>(_ab, _frames, _chnl); break;
+	case SquareWave: updatePM<SquareWave>(_ab, _frames, _chnl); break;
+	case MoogSawWave: updatePM<MoogSawWave>(_ab, _frames, _chnl); break;
+	case ExponentialWave: updatePM<ExponentialWave>(_ab, _frames, _chnl); break;
+	case WhiteNoise: updatePM<WhiteNoise>(_ab, _frames, _chnl); break;
+	case UserDefinedWave: updatePM<UserDefinedWave>(_ab, _frames, _chnl); break;
 	}
 }
 
@@ -146,30 +105,14 @@ void Oscillator::updateAM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t 
 	switch (m_waveShapeModel->value())
 	{
 	case SineWave:
-	default:
-		updateAM<SineWave>(_ab, _frames, _chnl);
-		break;
-	case TriangleWave:
-		updateAM<TriangleWave>(_ab, _frames, _chnl);
-		break;
-	case SawWave:
-		updateAM<SawWave>(_ab, _frames, _chnl);
-		break;
-	case SquareWave:
-		updateAM<SquareWave>(_ab, _frames, _chnl);
-		break;
-	case MoogSawWave:
-		updateAM<MoogSawWave>(_ab, _frames, _chnl);
-		break;
-	case ExponentialWave:
-		updateAM<ExponentialWave>(_ab, _frames, _chnl);
-		break;
-	case WhiteNoise:
-		updateAM<WhiteNoise>(_ab, _frames, _chnl);
-		break;
-	case UserDefinedWave:
-		updateAM<UserDefinedWave>(_ab, _frames, _chnl);
-		break;
+	default: updateAM<SineWave>(_ab, _frames, _chnl); break;
+	case TriangleWave: updateAM<TriangleWave>(_ab, _frames, _chnl); break;
+	case SawWave: updateAM<SawWave>(_ab, _frames, _chnl); break;
+	case SquareWave: updateAM<SquareWave>(_ab, _frames, _chnl); break;
+	case MoogSawWave: updateAM<MoogSawWave>(_ab, _frames, _chnl); break;
+	case ExponentialWave: updateAM<ExponentialWave>(_ab, _frames, _chnl); break;
+	case WhiteNoise: updateAM<WhiteNoise>(_ab, _frames, _chnl); break;
+	case UserDefinedWave: updateAM<UserDefinedWave>(_ab, _frames, _chnl); break;
 	}
 }
 
@@ -178,30 +121,14 @@ void Oscillator::updateMix(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t
 	switch (m_waveShapeModel->value())
 	{
 	case SineWave:
-	default:
-		updateMix<SineWave>(_ab, _frames, _chnl);
-		break;
-	case TriangleWave:
-		updateMix<TriangleWave>(_ab, _frames, _chnl);
-		break;
-	case SawWave:
-		updateMix<SawWave>(_ab, _frames, _chnl);
-		break;
-	case SquareWave:
-		updateMix<SquareWave>(_ab, _frames, _chnl);
-		break;
-	case MoogSawWave:
-		updateMix<MoogSawWave>(_ab, _frames, _chnl);
-		break;
-	case ExponentialWave:
-		updateMix<ExponentialWave>(_ab, _frames, _chnl);
-		break;
-	case WhiteNoise:
-		updateMix<WhiteNoise>(_ab, _frames, _chnl);
-		break;
-	case UserDefinedWave:
-		updateMix<UserDefinedWave>(_ab, _frames, _chnl);
-		break;
+	default: updateMix<SineWave>(_ab, _frames, _chnl); break;
+	case TriangleWave: updateMix<TriangleWave>(_ab, _frames, _chnl); break;
+	case SawWave: updateMix<SawWave>(_ab, _frames, _chnl); break;
+	case SquareWave: updateMix<SquareWave>(_ab, _frames, _chnl); break;
+	case MoogSawWave: updateMix<MoogSawWave>(_ab, _frames, _chnl); break;
+	case ExponentialWave: updateMix<ExponentialWave>(_ab, _frames, _chnl); break;
+	case WhiteNoise: updateMix<WhiteNoise>(_ab, _frames, _chnl); break;
+	case UserDefinedWave: updateMix<UserDefinedWave>(_ab, _frames, _chnl); break;
 	}
 }
 
@@ -210,30 +137,14 @@ void Oscillator::updateSync(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_
 	switch (m_waveShapeModel->value())
 	{
 	case SineWave:
-	default:
-		updateSync<SineWave>(_ab, _frames, _chnl);
-		break;
-	case TriangleWave:
-		updateSync<TriangleWave>(_ab, _frames, _chnl);
-		break;
-	case SawWave:
-		updateSync<SawWave>(_ab, _frames, _chnl);
-		break;
-	case SquareWave:
-		updateSync<SquareWave>(_ab, _frames, _chnl);
-		break;
-	case MoogSawWave:
-		updateSync<MoogSawWave>(_ab, _frames, _chnl);
-		break;
-	case ExponentialWave:
-		updateSync<ExponentialWave>(_ab, _frames, _chnl);
-		break;
-	case WhiteNoise:
-		updateSync<WhiteNoise>(_ab, _frames, _chnl);
-		break;
-	case UserDefinedWave:
-		updateSync<UserDefinedWave>(_ab, _frames, _chnl);
-		break;
+	default: updateSync<SineWave>(_ab, _frames, _chnl); break;
+	case TriangleWave: updateSync<TriangleWave>(_ab, _frames, _chnl); break;
+	case SawWave: updateSync<SawWave>(_ab, _frames, _chnl); break;
+	case SquareWave: updateSync<SquareWave>(_ab, _frames, _chnl); break;
+	case MoogSawWave: updateSync<MoogSawWave>(_ab, _frames, _chnl); break;
+	case ExponentialWave: updateSync<ExponentialWave>(_ab, _frames, _chnl); break;
+	case WhiteNoise: updateSync<WhiteNoise>(_ab, _frames, _chnl); break;
+	case UserDefinedWave: updateSync<UserDefinedWave>(_ab, _frames, _chnl); break;
 	}
 }
 
@@ -242,30 +153,14 @@ void Oscillator::updateFM(sampleFrame* _ab, const fpp_t _frames, const ch_cnt_t 
 	switch (m_waveShapeModel->value())
 	{
 	case SineWave:
-	default:
-		updateFM<SineWave>(_ab, _frames, _chnl);
-		break;
-	case TriangleWave:
-		updateFM<TriangleWave>(_ab, _frames, _chnl);
-		break;
-	case SawWave:
-		updateFM<SawWave>(_ab, _frames, _chnl);
-		break;
-	case SquareWave:
-		updateFM<SquareWave>(_ab, _frames, _chnl);
-		break;
-	case MoogSawWave:
-		updateFM<MoogSawWave>(_ab, _frames, _chnl);
-		break;
-	case ExponentialWave:
-		updateFM<ExponentialWave>(_ab, _frames, _chnl);
-		break;
-	case WhiteNoise:
-		updateFM<WhiteNoise>(_ab, _frames, _chnl);
-		break;
-	case UserDefinedWave:
-		updateFM<UserDefinedWave>(_ab, _frames, _chnl);
-		break;
+	default: updateFM<SineWave>(_ab, _frames, _chnl); break;
+	case TriangleWave: updateFM<TriangleWave>(_ab, _frames, _chnl); break;
+	case SawWave: updateFM<SawWave>(_ab, _frames, _chnl); break;
+	case SquareWave: updateFM<SquareWave>(_ab, _frames, _chnl); break;
+	case MoogSawWave: updateFM<MoogSawWave>(_ab, _frames, _chnl); break;
+	case ExponentialWave: updateFM<ExponentialWave>(_ab, _frames, _chnl); break;
+	case WhiteNoise: updateFM<WhiteNoise>(_ab, _frames, _chnl); break;
+	case UserDefinedWave: updateFM<UserDefinedWave>(_ab, _frames, _chnl); break;
 	}
 }
 

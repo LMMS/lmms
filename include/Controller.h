@@ -75,12 +75,9 @@ public:
 	{
 		switch (m_type)
 		{
-		case LfoController:
-			return (true);
-		case PeakController:
-			return (true);
-		default:
-			break;
+		case LfoController: return (true);
+		case PeakController: return (true);
+		default: break;
 		}
 		return (false);
 	}

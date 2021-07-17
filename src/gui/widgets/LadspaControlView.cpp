@@ -70,16 +70,11 @@ LadspaControlView::LadspaControlView(QWidget* _parent, LadspaControl* _ctl)
 
 	case INTEGER:
 	case ENUM:
-	case FLOATING:
-		knb = new Knob(knobBright_26, this, m_ctl->port()->name);
-		break;
+	case FLOATING: knb = new Knob(knobBright_26, this, m_ctl->port()->name); break;
 
-	case TIME:
-		knb = new TempoSyncKnob(knobBright_26, this, m_ctl->port()->name);
-		break;
+	case TIME: knb = new TempoSyncKnob(knobBright_26, this, m_ctl->port()->name); break;
 
-	default:
-		break;
+	default: break;
 	}
 
 	if (knb != NULL)

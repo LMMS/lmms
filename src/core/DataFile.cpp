@@ -167,8 +167,7 @@ bool DataFile::validate(QString extension)
 		}
 		if (extension == "wav" || extension == "ogg" || extension == "ds") { return true; }
 		break;
-	default:
-		return false;
+	default: return false;
 	}
 	return false;
 }
@@ -1175,9 +1174,7 @@ void DataFile::upgrade_1_3_0()
 								break;
 							}
 							// port 18 (modulation) => 17
-							case 17:
-								port.setTagName("port016");
-								break;
+							case 17: port.setTagName("port016"); break;
 							case 18: {
 								// leave port 18 (offsetr), but add port 17 (offsetl)
 								QDomElement offsetl = createElement("port017");

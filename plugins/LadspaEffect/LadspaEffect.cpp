@@ -162,10 +162,8 @@ bool LadspaEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 				break;
 			case CHANNEL_OUT:
 			case AUDIO_RATE_OUTPUT:
-			case CONTROL_RATE_OUTPUT:
-				break;
-			default:
-				break;
+			case CONTROL_RATE_OUTPUT: break;
+			default: break;
 			}
 		}
 	}
@@ -190,8 +188,7 @@ bool LadspaEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 			{
 			case CHANNEL_IN:
 			case AUDIO_RATE_INPUT:
-			case CONTROL_RATE_INPUT:
-				break;
+			case CONTROL_RATE_INPUT: break;
 			case CHANNEL_OUT:
 				for (fpp_t frame = 0; frame < frames; ++frame)
 				{
@@ -201,10 +198,8 @@ bool LadspaEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 				++channel;
 				break;
 			case AUDIO_RATE_OUTPUT:
-			case CONTROL_RATE_OUTPUT:
-				break;
-			default:
-				break;
+			case CONTROL_RATE_OUTPUT: break;
+			default: break;
 			}
 		}
 	}

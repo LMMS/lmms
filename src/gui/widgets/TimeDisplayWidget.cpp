@@ -74,8 +74,7 @@ void TimeDisplayWidget::setDisplayMode(DisplayMode displayMode)
 		m_milliSecondsLCD.setLabel(tr("TICK"));
 		break;
 
-	default:
-		break;
+	default: break;
 	}
 }
 
@@ -102,8 +101,7 @@ void TimeDisplayWidget::updateTime()
 			(tick % s->ticksPerBar()) % (s->ticksPerBar() / s->getTimeSigModel().getNumerator()));
 		break;
 
-	default:
-		break;
+	default: break;
 	}
 }
 

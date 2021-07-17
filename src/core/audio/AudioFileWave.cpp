@@ -53,16 +53,10 @@ bool AudioFileWave::startEncoding()
 
 	switch (getOutputSettings().getBitDepth())
 	{
-	case OutputSettings::Depth_32Bit:
-		m_si.format |= SF_FORMAT_FLOAT;
-		break;
-	case OutputSettings::Depth_24Bit:
-		m_si.format |= SF_FORMAT_PCM_24;
-		break;
+	case OutputSettings::Depth_32Bit: m_si.format |= SF_FORMAT_FLOAT; break;
+	case OutputSettings::Depth_24Bit: m_si.format |= SF_FORMAT_PCM_24; break;
 	case OutputSettings::Depth_16Bit:
-	default:
-		m_si.format |= SF_FORMAT_PCM_16;
-		break;
+	default: m_si.format |= SF_FORMAT_PCM_16; break;
 	}
 
 	// Use file handle to handle unicode file name on Windows

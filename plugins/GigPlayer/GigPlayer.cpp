@@ -643,9 +643,7 @@ Dimension GigInstrument::getDimensions(gig::Region* pRegion, int velocity, bool 
 			// TODO: implement this
 			dim.DimValues[i] = 0;
 			break;
-		case gig::dimension_velocity:
-			dim.DimValues[i] = velocity;
-			break;
+		case gig::dimension_velocity: dim.DimValues[i] = velocity; break;
 		case gig::dimension_releasetrigger:
 			dim.release = true;
 			dim.DimValues[i] = (uint)release;
@@ -689,9 +687,7 @@ Dimension GigInstrument::getDimensions(gig::Region* pRegion, int velocity, bool 
 		case gig::dimension_effect4depth:
 		case gig::dimension_effect5depth:
 		case gig::dimension_none:
-		default:
-			dim.DimValues[i] = 0;
-			break;
+		default: dim.DimValues[i] = 0; break;
 		}
 	}
 

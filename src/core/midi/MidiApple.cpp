@@ -306,11 +306,8 @@ void MidiApple::HandleReadCallback(const MIDIPacketList* pktlist, void* srcConnR
 						m_inputSubs[refName], MidiEvent(cmdtype, messageChannel, par1 + par2 * 128, 0, &endPointRef));
 					break;
 				case MidiActiveSensing: // 0xF0
-				case 0xF0:
-					break;
-				default:
-					qDebug("endPointRef name='%s':Some other message %d", refName, cmdtype);
-					break;
+				case 0xF0: break;
+				default: qDebug("endPointRef name='%s':Some other message %d", refName, cmdtype); break;
 				}
 				iByte += size;
 			}
@@ -542,9 +539,7 @@ void MidiApple::NotifyCallback(const MIDINotification* message, void* refCon)
 		// Currently ignored
 		qDebug("kMIDIMsgSerialPortOwnerChanged");
 		break;
-	default:
-		qDebug("unhandled message type");
-		break;
+	default: qDebug("unhandled message type"); break;
 	}
 }
 

@@ -43,35 +43,16 @@ void stringContainer::addString(int _harm, const float _pick, const float _picku
 	float harm;
 	switch (_harm)
 	{
-	case 0:
-		harm = 0.25f;
-		break;
-	case 1:
-		harm = 0.5f;
-		break;
-	case 2:
-		harm = 1.0f;
-		break;
-	case 3:
-		harm = 2.0f;
-		break;
-	case 4:
-		harm = 3.0f;
-		break;
-	case 5:
-		harm = 4.0f;
-		break;
-	case 6:
-		harm = 5.0f;
-		break;
-	case 7:
-		harm = 6.0f;
-		break;
-	case 8:
-		harm = 7.0f;
-		break;
-	default:
-		harm = 1.0f;
+	case 0: harm = 0.25f; break;
+	case 1: harm = 0.5f; break;
+	case 2: harm = 1.0f; break;
+	case 3: harm = 2.0f; break;
+	case 4: harm = 3.0f; break;
+	case 5: harm = 4.0f; break;
+	case 6: harm = 5.0f; break;
+	case 7: harm = 6.0f; break;
+	case 8: harm = 7.0f; break;
+	default: harm = 1.0f;
 	}
 
 	m_strings.append(new vibratingString(m_pitch * harm, _pick, _pickup, const_cast<float*>(_impulse), m_bufferLength,

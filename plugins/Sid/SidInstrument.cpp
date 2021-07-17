@@ -305,20 +305,11 @@ void SidInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 		data8 += m_voice[i]->m_testModel.value() ? 8 : 0;
 		switch (m_voice[i]->m_waveFormModel.value())
 		{
-		default:
-			break;
-		case voiceObject::NoiseWave:
-			data8 += 128;
-			break;
-		case voiceObject::SquareWave:
-			data8 += 64;
-			break;
-		case voiceObject::SawWave:
-			data8 += 32;
-			break;
-		case voiceObject::TriangleWave:
-			data8 += 16;
-			break;
+		default: break;
+		case voiceObject::NoiseWave: data8 += 128; break;
+		case voiceObject::SquareWave: data8 += 64; break;
+		case voiceObject::SawWave: data8 += 32; break;
+		case voiceObject::TriangleWave: data8 += 16; break;
 		}
 		sidreg[base + 4] = data8 & 0x00FF;
 		// ad
@@ -360,17 +351,10 @@ void SidInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 
 	switch (m_filterModeModel.value())
 	{
-	default:
-		break;
-	case LowPass:
-		data8 += 16;
-		break;
-	case BandPass:
-		data8 += 32;
-		break;
-	case HighPass:
-		data8 += 64;
-		break;
+	default: break;
+	case LowPass: data8 += 16; break;
+	case BandPass: data8 += 32; break;
+	case HighPass: data8 += 64; break;
 	}
 
 	sidreg[24] = data8 & 0x00FF;

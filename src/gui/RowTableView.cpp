@@ -94,7 +94,6 @@ void RowTableView::keyPressEvent(QKeyEvent* event)
 		{
 			QTableView::keyPressEvent(event);
 		}
-	default:
-		QTableView::keyPressEvent(event);
+	default: QTableView::keyPressEvent(event);
 	}
 }

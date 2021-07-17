@@ -332,8 +332,7 @@ void Graph::paintEvent(QPaintEvent*)
 
 		break;
 
-	default:
-		break;
+	default: break;
 	}
 
 	// draw Pointer

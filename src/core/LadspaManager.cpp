@@ -307,10 +307,8 @@ float LadspaManager::getDefaultSetting(const ladspa_key_t& _plugin, uint32_t _po
 		LADSPA_PortRangeHintDescriptor hintDescriptor = portRangeHint->HintDescriptor;
 		switch (hintDescriptor & LADSPA_HINT_DEFAULT_MASK)
 		{
-		case LADSPA_HINT_DEFAULT_NONE:
-			return (NOHINT);
-		case LADSPA_HINT_DEFAULT_MINIMUM:
-			return (portRangeHint->LowerBound);
+		case LADSPA_HINT_DEFAULT_NONE: return (NOHINT);
+		case LADSPA_HINT_DEFAULT_MINIMUM: return (portRangeHint->LowerBound);
 		case LADSPA_HINT_DEFAULT_LOW:
 			if (LADSPA_IS_HINT_LOGARITHMIC(hintDescriptor))
 			{
@@ -338,18 +336,12 @@ float LadspaManager::getDefaultSetting(const ladspa_key_t& _plugin, uint32_t _po
 			{
 				return (portRangeHint->LowerBound * 0.25 + portRangeHint->UpperBound * 0.75);
 			}
-		case LADSPA_HINT_DEFAULT_MAXIMUM:
-			return (portRangeHint->UpperBound);
-		case LADSPA_HINT_DEFAULT_0:
-			return (0.0);
-		case LADSPA_HINT_DEFAULT_1:
-			return (1.0);
-		case LADSPA_HINT_DEFAULT_100:
-			return (100.0);
-		case LADSPA_HINT_DEFAULT_440:
-			return (440.0);
-		default:
-			return (NOHINT);
+		case LADSPA_HINT_DEFAULT_MAXIMUM: return (portRangeHint->UpperBound);
+		case LADSPA_HINT_DEFAULT_0: return (0.0);
+		case LADSPA_HINT_DEFAULT_1: return (1.0);
+		case LADSPA_HINT_DEFAULT_100: return (100.0);
+		case LADSPA_HINT_DEFAULT_440: return (440.0);
+		default: return (NOHINT);
 		}
 	}
 	else

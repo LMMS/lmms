@@ -161,17 +161,11 @@ void MidiWinMM::handleInputEvent(HMIDIIN hm, DWORD ev)
 
 		case MidiControlChange:
 		case MidiProgramChange:
-		case MidiChannelPressure:
-			(*it)->processInEvent(MidiEvent(cmdtype, chan, par1, par2 & 0xff, &hm));
-			break;
+		case MidiChannelPressure: (*it)->processInEvent(MidiEvent(cmdtype, chan, par1, par2 & 0xff, &hm)); break;
 
-		case MidiPitchBend:
-			(*it)->processInEvent(MidiEvent(cmdtype, chan, par1 + par2 * 128, 0, &hm));
-			break;
+		case MidiPitchBend: (*it)->processInEvent(MidiEvent(cmdtype, chan, par1 + par2 * 128, 0, &hm)); break;
 
-		default:
-			qWarning("MidiWinMM: unhandled input event %d\n", cmdtype);
-			break;
+		default: qWarning("MidiWinMM: unhandled input event %d\n", cmdtype); break;
 		}
 	}
 }

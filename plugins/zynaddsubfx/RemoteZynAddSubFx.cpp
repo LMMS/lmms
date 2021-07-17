@@ -88,8 +88,7 @@ public:
 	{
 		switch (_m.id)
 		{
-		case IdQuit:
-			break;
+		case IdQuit: break;
 
 		case IdShowUI:
 		case IdHideUI:
@@ -106,20 +105,13 @@ public:
 			break;
 		}
 
-		case IdZasfPresetDirectory:
-			LocalZynAddSubFx::setPresetDir(_m.getString());
-			break;
+		case IdZasfPresetDirectory: LocalZynAddSubFx::setPresetDir(_m.getString()); break;
 
-		case IdZasfLmmsWorkingDirectory:
-			LocalZynAddSubFx::setLmmsWorkingDir(_m.getString());
-			break;
+		case IdZasfLmmsWorkingDirectory: LocalZynAddSubFx::setLmmsWorkingDir(_m.getString()); break;
 
-		case IdZasfSetPitchWheelBendRange:
-			LocalZynAddSubFx::setPitchWheelBendRange(_m.getInt());
-			break;
+		case IdZasfSetPitchWheelBendRange: LocalZynAddSubFx::setPitchWheelBendRange(_m.getInt()); break;
 
-		default:
-			return RemotePluginClient::processMessage(_m);
+		default: return RemotePluginClient::processMessage(_m);
 		}
 		return true;
 	}
@@ -216,8 +208,7 @@ void RemoteZynAddSubFx::guiLoop()
 				break;
 			}
 
-			default:
-				break;
+			default: break;
 			}
 		}
 		pthread_mutex_unlock(&m_guiMutex);

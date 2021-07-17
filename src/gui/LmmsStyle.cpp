@@ -268,23 +268,17 @@ int LmmsStyle::pixelMetric(PixelMetric _metric, const QStyleOption* _option, con
 {
 	switch (_metric)
 	{
-	case QStyle::PM_ButtonMargin:
-		return 3;
+	case QStyle::PM_ButtonMargin: return 3;
 
-	case QStyle::PM_ButtonIconSize:
-		return 20;
+	case QStyle::PM_ButtonIconSize: return 20;
 
-	case QStyle::PM_ToolBarItemMargin:
-		return 1;
+	case QStyle::PM_ToolBarItemMargin: return 1;
 
-	case QStyle::PM_ToolBarItemSpacing:
-		return 2;
+	case QStyle::PM_ToolBarItemSpacing: return 2;
 
-	case QStyle::PM_TitleBarHeight:
-		return 24;
+	case QStyle::PM_TitleBarHeight: return 24;
 
-	default:
-		return QProxyStyle::pixelMetric(_metric, _option, _widget);
+	default: return QProxyStyle::pixelMetric(_metric, _option, _widget);
 	}
 }
 

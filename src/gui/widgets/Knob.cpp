@@ -108,8 +108,7 @@ void Knob::initUi(const QString& _name)
 		m_arcActiveColor = QColor(QApplication::palette().color(QPalette::Active, QPalette::Shadow));
 		m_arcActiveColor.setAlpha(70);
 		break;
-	default:
-		break;
+	default: break;
 	}
 
 	doConnections();
@@ -122,18 +121,10 @@ void Knob::onKnobNumUpdated()
 		QString knobFilename;
 		switch (m_knobNum)
 		{
-		case knobDark_28:
-			knobFilename = "knob01";
-			break;
-		case knobBright_26:
-			knobFilename = "knob02";
-			break;
-		case knobSmall_17:
-			knobFilename = "knob03";
-			break;
-		case knobVintage_32:
-			knobFilename = "knob05";
-			break;
+		case knobDark_28: knobFilename = "knob01"; break;
+		case knobBright_26: knobFilename = "knob02"; break;
+		case knobSmall_17: knobFilename = "knob03"; break;
+		case knobVintage_32: knobFilename = "knob05"; break;
 		case knobStyled: // only here to stop the compiler from complaining
 			break;
 		}
@@ -338,8 +329,7 @@ void Knob::drawKnob(QPainter* _p)
 		p.drawLine(calculateLine(mid, radius - 2, 2));
 		break;
 	}
-	case knobStyled:
-		break;
+	case knobStyled: break;
 	}
 
 	p.drawArc(

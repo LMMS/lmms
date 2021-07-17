@@ -448,9 +448,7 @@ void FxMixerView::keyPressEvent(QKeyEvent* e)
 {
 	switch (e->key())
 	{
-	case Qt::Key_Delete:
-		deleteChannel(m_currentFxLine->channelIndex());
-		break;
+	case Qt::Key_Delete: deleteChannel(m_currentFxLine->channelIndex()); break;
 	case Qt::Key_Left:
 		if (e->modifiers() & Qt::AltModifier) { moveChannelLeft(m_currentFxLine->channelIndex()); }
 		else
@@ -472,9 +470,7 @@ void FxMixerView::keyPressEvent(QKeyEvent* e)
 		break;
 	case Qt::Key_Enter:
 	case Qt::Key_Return:
-	case Qt::Key_F2:
-		renameChannel(m_currentFxLine->channelIndex());
-		break;
+	case Qt::Key_F2: renameChannel(m_currentFxLine->channelIndex()); break;
 	}
 }
 

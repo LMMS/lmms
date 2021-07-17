@@ -29,18 +29,10 @@ void parameter_print(ostream& file, Alg_parameter_ptr p)
 	file << " -" << p->attr_name() << ":";
 	switch (p->attr_type())
 	{
-	case 'a':
-		file << "'" << alg_attr_name(p->a) << "'";
-		break;
-	case 'i':
-		file << p->i;
-		break;
-	case 'l':
-		file << (p->l ? "true" : "false");
-		break;
-	case 'r':
-		file << p->r;
-		break;
+	case 'a': file << "'" << alg_attr_name(p->a) << "'"; break;
+	case 'i': file << p->i; break;
+	case 'l': file << (p->l ? "true" : "false"); break;
+	case 'r': file << p->r; break;
 	case 's': {
 		string str;
 		string_escape(str, p->s, "\"");

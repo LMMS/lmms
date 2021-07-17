@@ -24,6 +24,7 @@ AlignEscapedNewlines: DontAlign
 AccessModifierOffset: -4
 AllowShortBlocksOnASingleLine: Always
 AllowShortIfStatementsOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
 
 # Includes
 IncludeBlocks:   Regroup

@@ -83,8 +83,7 @@ LadspaControl::LadspaControl(Model* _parent, port_desc_t* _port, bool _link)
 		m_tempoSyncKnobModel.setScaleLogarithmic(m_port->suggests_logscale);
 		break;
 
-	default:
-		break;
+	default: break;
 	}
 }
 
@@ -94,17 +93,12 @@ LADSPA_Data LadspaControl::value()
 {
 	switch (m_port->data_type)
 	{
-	case TOGGLED:
-		return static_cast<LADSPA_Data>(m_toggledModel.value());
+	case TOGGLED: return static_cast<LADSPA_Data>(m_toggledModel.value());
 	case INTEGER:
 	case ENUM:
-	case FLOATING:
-		return static_cast<LADSPA_Data>(m_knobModel.value());
-	case TIME:
-		return static_cast<LADSPA_Data>(m_tempoSyncKnobModel.value());
-	default:
-		qWarning("LadspaControl::value(): BAD BAD BAD\n");
-		break;
+	case FLOATING: return static_cast<LADSPA_Data>(m_knobModel.value());
+	case TIME: return static_cast<LADSPA_Data>(m_tempoSyncKnobModel.value());
+	default: qWarning("LadspaControl::value(): BAD BAD BAD\n"); break;
 	}
 
 	return 0;
@@ -116,15 +110,10 @@ ValueBuffer* LadspaControl::valueBuffer()
 	{
 	case TOGGLED:
 	case INTEGER:
-	case ENUM:
-		return NULL;
-	case FLOATING:
-		return m_knobModel.valueBuffer();
-	case TIME:
-		return m_tempoSyncKnobModel.valueBuffer();
-	default:
-		qWarning("LadspaControl::valueBuffer(): BAD BAD BAD\n");
-		break;
+	case ENUM: return NULL;
+	case FLOATING: return m_knobModel.valueBuffer();
+	case TIME: return m_tempoSyncKnobModel.valueBuffer();
+	default: qWarning("LadspaControl::valueBuffer(): BAD BAD BAD\n"); break;
 	}
 
 	return NULL;
@@ -134,22 +123,12 @@ void LadspaControl::setValue(LADSPA_Data _value)
 {
 	switch (m_port->data_type)
 	{
-	case TOGGLED:
-		m_toggledModel.setValue(static_cast<bool>(_value));
-		break;
+	case TOGGLED: m_toggledModel.setValue(static_cast<bool>(_value)); break;
 	case INTEGER:
-	case ENUM:
-		m_knobModel.setValue(static_cast<int>(_value));
-		break;
-	case FLOATING:
-		m_knobModel.setValue(static_cast<float>(_value));
-		break;
-	case TIME:
-		m_tempoSyncKnobModel.setValue(static_cast<float>(_value));
-		break;
-	default:
-		printf("LadspaControl::setValue BAD BAD BAD\n");
-		break;
+	case ENUM: m_knobModel.setValue(static_cast<int>(_value)); break;
+	case FLOATING: m_knobModel.setValue(static_cast<float>(_value)); break;
+	case TIME: m_tempoSyncKnobModel.setValue(static_cast<float>(_value)); break;
+	default: printf("LadspaControl::setValue BAD BAD BAD\n"); break;
 	}
 }
 
@@ -160,20 +139,12 @@ void LadspaControl::saveSettings(QDomDocument& doc, QDomElement& parent, const Q
 	if (m_link) { m_linkEnabledModel.saveSettings(doc, e, "link"); }
 	switch (m_port->data_type)
 	{
-	case TOGGLED:
-		m_toggledModel.saveSettings(doc, e, "data");
-		break;
+	case TOGGLED: m_toggledModel.saveSettings(doc, e, "data"); break;
 	case INTEGER:
 	case ENUM:
-	case FLOATING:
-		m_knobModel.saveSettings(doc, e, "data");
-		break;
-	case TIME:
-		m_tempoSyncKnobModel.saveSettings(doc, e, "data");
-		break;
-	default:
-		printf("LadspaControl::saveSettings BAD BAD BAD\n");
-		break;
+	case FLOATING: m_knobModel.saveSettings(doc, e, "data"); break;
+	case TIME: m_tempoSyncKnobModel.saveSettings(doc, e, "data"); break;
+	default: printf("LadspaControl::saveSettings BAD BAD BAD\n"); break;
 	}
 
 	parent.appendChild(e);
@@ -192,20 +163,12 @@ void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
 		if (m_link) m_linkEnabledModel.setValue(m_linkEnabledModel.initValue());
 		switch (m_port->data_type)
 		{
-		case TOGGLED:
-			m_toggledModel.setValue(m_toggledModel.initValue());
-			break;
+		case TOGGLED: m_toggledModel.setValue(m_toggledModel.initValue()); break;
 		case INTEGER:
 		case ENUM:
-		case FLOATING:
-			m_knobModel.setValue(m_knobModel.initValue());
-			break;
-		case TIME:
-			m_tempoSyncKnobModel.setValue(m_tempoSyncKnobModel.initValue());
-			break;
-		default:
-			printf("LadspaControl::loadSettings BAD BAD BAD\n");
-			break;
+		case FLOATING: m_knobModel.setValue(m_knobModel.initValue()); break;
+		case TIME: m_tempoSyncKnobModel.setValue(m_tempoSyncKnobModel.initValue()); break;
+		default: printf("LadspaControl::loadSettings BAD BAD BAD\n"); break;
 		}
 	}
 	else
@@ -224,20 +187,12 @@ void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
 
 		switch (m_port->data_type)
 		{
-		case TOGGLED:
-			m_toggledModel.loadSettings(e, dataModelName);
-			break;
+		case TOGGLED: m_toggledModel.loadSettings(e, dataModelName); break;
 		case INTEGER:
 		case ENUM:
-		case FLOATING:
-			m_knobModel.loadSettings(e, dataModelName);
-			break;
-		case TIME:
-			m_tempoSyncKnobModel.loadSettings(e, dataModelName);
-			break;
-		default:
-			printf("LadspaControl::loadSettings BAD BAD BAD\n");
-			break;
+		case FLOATING: m_knobModel.loadSettings(e, dataModelName); break;
+		case TIME: m_tempoSyncKnobModel.loadSettings(e, dataModelName); break;
+		default: printf("LadspaControl::loadSettings BAD BAD BAD\n"); break;
 		}
 	}
 }
@@ -246,19 +201,12 @@ void LadspaControl::linkControls(LadspaControl* _control)
 {
 	switch (m_port->data_type)
 	{
-	case TOGGLED:
-		BoolModel::linkModels(&m_toggledModel, _control->toggledModel());
-		break;
+	case TOGGLED: BoolModel::linkModels(&m_toggledModel, _control->toggledModel()); break;
 	case INTEGER:
 	case ENUM:
-	case FLOATING:
-		FloatModel::linkModels(&m_knobModel, _control->knobModel());
-		break;
-	case TIME:
-		TempoSyncKnobModel::linkModels(&m_tempoSyncKnobModel, _control->tempoSyncKnobModel());
-		break;
-	default:
-		break;
+	case FLOATING: FloatModel::linkModels(&m_knobModel, _control->knobModel()); break;
+	case TIME: TempoSyncKnobModel::linkModels(&m_tempoSyncKnobModel, _control->tempoSyncKnobModel()); break;
+	default: break;
 	}
 }
 
@@ -275,19 +223,12 @@ void LadspaControl::unlinkControls(LadspaControl* _control)
 {
 	switch (m_port->data_type)
 	{
-	case TOGGLED:
-		BoolModel::unlinkModels(&m_toggledModel, _control->toggledModel());
-		break;
+	case TOGGLED: BoolModel::unlinkModels(&m_toggledModel, _control->toggledModel()); break;
 	case INTEGER:
 	case ENUM:
-	case FLOATING:
-		FloatModel::unlinkModels(&m_knobModel, _control->knobModel());
-		break;
-	case TIME:
-		TempoSyncKnobModel::unlinkModels(&m_tempoSyncKnobModel, _control->tempoSyncKnobModel());
-		break;
-	default:
-		break;
+	case FLOATING: FloatModel::unlinkModels(&m_knobModel, _control->knobModel()); break;
+	case TIME: TempoSyncKnobModel::unlinkModels(&m_tempoSyncKnobModel, _control->tempoSyncKnobModel()); break;
+	default: break;
 	}
 }
 

@@ -219,13 +219,9 @@ bool RemotePlugin::init(const QString& pluginExecutable, bool waitForInitDoneMsg
 
 	switch (poll(&pollin, 1, 30000))
 	{
-	case -1:
-		qWarning("Unexpected poll error.");
-		break;
+	case -1: qWarning("Unexpected poll error."); break;
 
-	case 0:
-		qWarning("Remote plugin did not connect.");
-		break;
+	case 0: qWarning("Remote plugin did not connect."); break;
 
 	default:
 		m_socket = accept(m_server, NULL, NULL);
@@ -424,13 +420,9 @@ bool RemotePlugin::processMessage(const message& _m)
 	bool reply = false;
 	switch (_m.id)
 	{
-	case IdUndefined:
-		unlock();
-		return false;
+	case IdUndefined: unlock(); return false;
 
-	case IdInitDone:
-		reply = true;
-		break;
+	case IdInitDone: reply = true; break;
 
 	case IdSampleRateInformation:
 		reply = true;
@@ -458,14 +450,11 @@ bool RemotePlugin::processMessage(const message& _m)
 		resizeSharedProcessingMemory();
 		break;
 
-	case IdDebugMessage:
-		fprintf(stderr, "RemotePlugin::DebugMessage: %s", _m.getString(0).c_str());
-		break;
+	case IdDebugMessage: fprintf(stderr, "RemotePlugin::DebugMessage: %s", _m.getString(0).c_str()); break;
 
 	case IdProcessingDone:
 	case IdQuit:
-	default:
-		break;
+	default: break;
 	}
 	if (reply) { sendMessage(reply_message); }
 	unlock();

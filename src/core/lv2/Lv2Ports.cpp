@@ -41,12 +41,9 @@ const char* toStr(Flow pf)
 {
 	switch (pf)
 	{
-	case Flow::Unknown:
-		return "unknown";
-	case Flow::Input:
-		return "input";
-	case Flow::Output:
-		return "output";
+	case Flow::Unknown: return "unknown";
+	case Flow::Input: return "input";
+	case Flow::Output: return "output";
 	}
 	return "";
 }
@@ -55,16 +52,11 @@ const char* toStr(Type pt)
 {
 	switch (pt)
 	{
-	case Type::Unknown:
-		return "unknown";
-	case Type::Control:
-		return "control";
-	case Type::Audio:
-		return "audio";
-	case Type::AtomSeq:
-		return "atom-sequence";
-	case Type::Cv:
-		return "cv";
+	case Type::Unknown: return "unknown";
+	case Type::Control: return "control";
+	case Type::Audio: return "audio";
+	case Type::AtomSeq: return "atom-sequence";
+	case Type::Cv: return "cv";
 	}
 	return "";
 }
@@ -73,14 +65,10 @@ const char* toStr(Vis pv)
 {
 	switch (pv)
 	{
-	case Vis::Toggled:
-		return "toggled";
-	case Vis::Enumeration:
-		return "enumeration";
-	case Vis::Integer:
-		return "integer";
-	case Vis::Generic:
-		return "none";
+	case Vis::Toggled: return "toggled";
+	case Vis::Enumeration: return "enumeration";
+	case Vis::Integer: return "integer";
+	case Vis::Generic: return "none";
 	}
 	return "";
 }

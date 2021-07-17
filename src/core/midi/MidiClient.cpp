@@ -210,9 +210,7 @@ void MidiClientRaw::processOutEvent(const MidiEvent& event, const TimePos&, cons
 		sendByte(event.velocity());
 		break;
 
-	default:
-		qWarning("MidiClientRaw: unhandled MIDI-event %d\n", (int)event.type());
-		break;
+	default: qWarning("MidiClientRaw: unhandled MIDI-event %d\n", (int)event.type()); break;
 	}
 }
 

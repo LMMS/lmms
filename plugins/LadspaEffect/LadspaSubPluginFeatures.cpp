@@ -115,21 +115,14 @@ void LadspaSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* _desc,
 	l_sortable_plugin_t plugins;
 	switch (m_type)
 	{
-	case Plugin::Instrument:
-		plugins = lm->getInstruments();
-		break;
+	case Plugin::Instrument: plugins = lm->getInstruments(); break;
 	case Plugin::Effect:
 		plugins = lm->getValidEffects();
 		// plugins += lm->getInvalidEffects();
 		break;
-	case Plugin::Tool:
-		plugins = lm->getAnalysisTools();
-		break;
-	case Plugin::Other:
-		plugins = lm->getOthers();
-		break;
-	default:
-		break;
+	case Plugin::Tool: plugins = lm->getAnalysisTools(); break;
+	case Plugin::Other: plugins = lm->getOthers(); break;
+	default: break;
 	}
 
 	for (l_sortable_plugin_t::const_iterator it = plugins.begin(); it != plugins.end(); ++it)

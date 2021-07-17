@@ -115,16 +115,11 @@ void LfoController::updateDuration()
 
 	switch (m_multiplierModel.value())
 	{
-	case 1:
-		newDurationF /= 100.0;
-		break;
+	case 1: newDurationF /= 100.0; break;
 
-	case 2:
-		newDurationF *= 100.0;
-		break;
+	case 2: newDurationF *= 100.0; break;
 
-	default:
-		break;
+	default: break;
 	}
 
 	m_duration = newDurationF;
@@ -134,27 +129,13 @@ void LfoController::updateSampleFunction()
 {
 	switch (m_waveModel.value())
 	{
-	case Oscillator::SineWave:
-		m_sampleFunction = &Oscillator::sinSample;
-		break;
-	case Oscillator::TriangleWave:
-		m_sampleFunction = &Oscillator::triangleSample;
-		break;
-	case Oscillator::SawWave:
-		m_sampleFunction = &Oscillator::sawSample;
-		break;
-	case Oscillator::SquareWave:
-		m_sampleFunction = &Oscillator::squareSample;
-		break;
-	case Oscillator::MoogSawWave:
-		m_sampleFunction = &Oscillator::moogSawSample;
-		break;
-	case Oscillator::ExponentialWave:
-		m_sampleFunction = &Oscillator::expSample;
-		break;
-	case Oscillator::WhiteNoise:
-		m_sampleFunction = &Oscillator::noiseSample;
-		break;
+	case Oscillator::SineWave: m_sampleFunction = &Oscillator::sinSample; break;
+	case Oscillator::TriangleWave: m_sampleFunction = &Oscillator::triangleSample; break;
+	case Oscillator::SawWave: m_sampleFunction = &Oscillator::sawSample; break;
+	case Oscillator::SquareWave: m_sampleFunction = &Oscillator::squareSample; break;
+	case Oscillator::MoogSawWave: m_sampleFunction = &Oscillator::moogSawSample; break;
+	case Oscillator::ExponentialWave: m_sampleFunction = &Oscillator::expSample; break;
+	case Oscillator::WhiteNoise: m_sampleFunction = &Oscillator::noiseSample; break;
 	case Oscillator::UserDefinedWave:
 		m_sampleFunction = NULL;
 		/*TODO: If C++11 is allowed, should change the type of

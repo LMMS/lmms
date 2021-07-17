@@ -64,20 +64,14 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum)
 
 				switch (port.m_vis)
 				{
-				case PortVis::Generic:
-					m_control = new KnobControl(m_par);
-					break;
+				case PortVis::Generic: m_control = new KnobControl(m_par); break;
 				case PortVis::Integer: {
 					sample_rate_t sr = Engine::mixer()->processingSampleRate();
 					m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2, m_par);
 					break;
 				}
-				case PortVis::Enumeration:
-					m_control = new ComboControl(m_par);
-					break;
-				case PortVis::Toggled:
-					m_control = new CheckControl(m_par);
-					break;
+				case PortVis::Enumeration: m_control = new ComboControl(m_par); break;
+				case PortVis::Toggled: m_control = new CheckControl(m_par); break;
 				}
 				m_control->setText(port.name());
 

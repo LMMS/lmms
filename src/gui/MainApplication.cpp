@@ -62,8 +62,7 @@ bool MainApplication::event(QEvent* event)
 		}
 		return true;
 	}
-	default:
-		return QApplication::event(event);
+	default: return QApplication::event(event);
 	}
 }
 
@@ -83,8 +82,7 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 			return true;
 		}
 		return false;
-	default:
-		return false;
+	default: return false;
 	}
 }
 

@@ -79,11 +79,8 @@ bool ZynAddSubFxRemotePlugin::processMessage(const message& _m)
 {
 	switch (_m.id)
 	{
-	case IdHideUI:
-		emit clickedCloseButton();
-		return true;
-	default:
-		break;
+	case IdHideUI: emit clickedCloseButton(); return true;
+	default: break;
 	}
 
 	return RemotePlugin::processMessage(_m);
@@ -229,29 +226,14 @@ void ZynAddSubFxInstrument::loadSettings(const QDomElement& _this)
 			{
 				switch (c.toInt())
 				{
-				case C_portamento:
-					updatePortamento();
-					break;
-				case C_filtercutoff:
-					updateFilterFreq();
-					break;
-				case C_filterq:
-					updateFilterQ();
-					break;
-				case C_bandwidth:
-					updateBandwidth();
-					break;
-				case C_fmamp:
-					updateFmGain();
-					break;
-				case C_resonance_center:
-					updateResCenterFreq();
-					break;
-				case C_resonance_bandwidth:
-					updateResBandwidth();
-					break;
-				default:
-					break;
+				case C_portamento: updatePortamento(); break;
+				case C_filtercutoff: updateFilterFreq(); break;
+				case C_filterq: updateFilterQ(); break;
+				case C_bandwidth: updateBandwidth(); break;
+				case C_fmamp: updateFmGain(); break;
+				case C_resonance_center: updateResCenterFreq(); break;
+				case C_resonance_bandwidth: updateResBandwidth(); break;
+				default: break;
 				}
 			}
 		}

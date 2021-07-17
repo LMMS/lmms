@@ -187,9 +187,7 @@ private:
 	{
 		switch (_wave)
 		{
-		case WAVE_SINE:
-			return Oscillator::sinSample(_ph);
-			break;
+		case WAVE_SINE: return Oscillator::sinSample(_ph); break;
 		case WAVE_TRI:
 			// return Oscillator::triangleSample( _ph );
 			return BandLimitedWave::oscillate(_ph, _wavelen, BandLimitedWave::BLTriangle);
@@ -221,31 +219,15 @@ private:
 			// return Oscillator::moogSawSample( _ph );
 			return BandLimitedWave::oscillate(_ph, _wavelen, BandLimitedWave::BLMoog);
 			break;
-		case WAVE_SINABS:
-			return qAbs(Oscillator::sinSample(_ph));
-			break;
-		case WAVE_EXP:
-			return Oscillator::expSample(_ph);
-			break;
-		case WAVE_NOISE:
-			return Oscillator::noiseSample(_ph);
-			break;
+		case WAVE_SINABS: return qAbs(Oscillator::sinSample(_ph)); break;
+		case WAVE_EXP: return Oscillator::expSample(_ph); break;
+		case WAVE_NOISE: return Oscillator::noiseSample(_ph); break;
 
-		case WAVE_TRI_D:
-			return Oscillator::triangleSample(_ph);
-			break;
-		case WAVE_SAW_D:
-			return Oscillator::sawSample(_ph);
-			break;
-		case WAVE_RAMP_D:
-			return Oscillator::sawSample(_ph) * -1.0;
-			break;
-		case WAVE_SQR_D:
-			return Oscillator::squareSample(_ph);
-			break;
-		case WAVE_MOOG_D:
-			return Oscillator::moogSawSample(_ph);
-			break;
+		case WAVE_TRI_D: return Oscillator::triangleSample(_ph); break;
+		case WAVE_SAW_D: return Oscillator::sawSample(_ph); break;
+		case WAVE_RAMP_D: return Oscillator::sawSample(_ph) * -1.0; break;
+		case WAVE_SQR_D: return Oscillator::squareSample(_ph); break;
+		case WAVE_MOOG_D: return Oscillator::moogSawSample(_ph); break;
 		}
 		return 0.0;
 	}

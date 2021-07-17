@@ -255,11 +255,7 @@ void Midifile_reader::readtrack()
 				sysexcontinue = 0;
 			}
 			break;
-		default:
-
-			badbyte(c);
-
-			break;
+		default: badbyte(c); break;
 		}
 	}
 	Mf_endtrack();
@@ -283,9 +279,7 @@ void Midifile_reader::metaevent(int type)
 
 	switch (type)
 	{
-	case 0x00:
-		Mf_seqnum(to16bit(m[0], m[1]));
-		break;
+	case 0x00: Mf_seqnum(to16bit(m[0], m[1])); break;
 	case 0x01: /* Text event */
 	case 0x02: /* Copyright notice */
 	case 0x03: /* Sequence/Track name */
@@ -304,32 +298,15 @@ void Midifile_reader::metaevent(int type)
 		/* These are all text events */
 		Mf_text(type, leng, m);
 		break;
-	case 0x20:
-		Mf_chanprefix(m[0]);
-		break;
-	case 0x21:
-		Mf_portprefix(m[0]);
-		break;
-	case 0x2f: /* End of Track */
-		Mf_eot();
-		break;
-	case 0x51: /* Set tempo */
-		Mf_tempo(to32bit(0, m[0], m[1], m[2]));
-		break;
-	case 0x54:
-		Mf_smpte(m[0], m[1], m[2], m[3], m[4]);
-		break;
-	case 0x58:
-		Mf_timesig(m[0], m[1], m[2], m[3]);
-		break;
-	case 0x59:
-		Mf_keysig(m[0], m[1]);
-		break;
-	case 0x7f:
-		Mf_sqspecific(leng, m);
-		break;
-	default:
-		Mf_metamisc(type, leng, m);
+	case 0x20: Mf_chanprefix(m[0]); break;
+	case 0x21: Mf_portprefix(m[0]); break;
+	case 0x2f: /* End of Track */ Mf_eot(); break;
+	case 0x51: /* Set tempo */ Mf_tempo(to32bit(0, m[0], m[1], m[2])); break;
+	case 0x54: Mf_smpte(m[0], m[1], m[2], m[3], m[4]); break;
+	case 0x58: Mf_timesig(m[0], m[1], m[2], m[3]); break;
+	case 0x59: Mf_keysig(m[0], m[1]); break;
+	case 0x7f: Mf_sqspecific(leng, m); break;
+	default: Mf_metamisc(type, leng, m);
 	}
 }
 
@@ -341,27 +318,13 @@ void Midifile_reader::chanmessage(int status, int c1, int c2)
 
 	switch (status & 0xf0)
 	{
-	case NOTEOFF:
-		Mf_off(chan, c1, c2);
-		break;
-	case NOTEON:
-		Mf_on(chan, c1, c2);
-		break;
-	case PRESSURE:
-		Mf_pressure(chan, c1, c2);
-		break;
-	case CONTROLLER:
-		Mf_controller(chan, c1, c2);
-		break;
-	case PITCHBEND:
-		Mf_pitchbend(chan, c1, c2);
-		break;
-	case PROGRAM:
-		Mf_program(chan, c1);
-		break;
-	case CHANPRESSURE:
-		Mf_chanpressure(chan, c1);
-		break;
+	case NOTEOFF: Mf_off(chan, c1, c2); break;
+	case NOTEON: Mf_on(chan, c1, c2); break;
+	case PRESSURE: Mf_pressure(chan, c1, c2); break;
+	case CONTROLLER: Mf_controller(chan, c1, c2); break;
+	case PITCHBEND: Mf_pitchbend(chan, c1, c2); break;
+	case PROGRAM: Mf_program(chan, c1); break;
+	case CHANPRESSURE: Mf_chanpressure(chan, c1); break;
 	}
 }
 

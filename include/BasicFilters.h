@@ -626,9 +626,7 @@ public:
 			return m_type == FastFormant ? out * 2.0f : out * 0.5f;
 		}
 
-		default:
-			out = m_biQuad.update(_in0, _chnl);
-			break;
+		default: out = m_biQuad.update(_in0, _chnl); break;
 		}
 
 		if (m_doubleFilter) { return m_subFilter->update(out, _chnl); }
@@ -775,8 +773,7 @@ public:
 			m_biQuad.setCoeffs(a1, a2, a2, a1, 1.0f);
 			break;
 		}
-		default:
-			break;
+		default: break;
 		}
 
 		if (m_doubleFilter)

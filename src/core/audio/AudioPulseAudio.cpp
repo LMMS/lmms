@@ -97,16 +97,12 @@ static void stream_state_callback(pa_stream* s, void* userdata)
 	switch (pa_stream_get_state(s))
 	{
 	case PA_STREAM_CREATING:
-	case PA_STREAM_TERMINATED:
-		break;
+	case PA_STREAM_TERMINATED: break;
 
-	case PA_STREAM_READY:
-		qDebug("Stream successfully created\n");
-		break;
+	case PA_STREAM_READY: qDebug("Stream successfully created\n"); break;
 
 	case PA_STREAM_FAILED:
-	default:
-		qCritical("Stream error: %s\n", pa_strerror(pa_context_errno(pa_stream_get_context(s))));
+	default: qCritical("Stream error: %s\n", pa_strerror(pa_context_errno(pa_stream_get_context(s))));
 	}
 }
 
@@ -118,8 +114,7 @@ static void context_state_callback(pa_context* c, void* userdata)
 	{
 	case PA_CONTEXT_CONNECTING:
 	case PA_CONTEXT_AUTHORIZING:
-	case PA_CONTEXT_SETTING_NAME:
-		break;
+	case PA_CONTEXT_SETTING_NAME: break;
 
 	case PA_CONTEXT_READY: {
 		qDebug("Connection established.\n");
@@ -149,13 +144,10 @@ static void context_state_callback(pa_context* c, void* userdata)
 		break;
 	}
 
-	case PA_CONTEXT_TERMINATED:
-		break;
+	case PA_CONTEXT_TERMINATED: break;
 
 	case PA_CONTEXT_FAILED:
-	default:
-		qCritical("Connection failure: %s\n", pa_strerror(pa_context_errno(c)));
-		_this->signalConnected(false);
+	default: qCritical("Connection failure: %s\n", pa_strerror(pa_context_errno(c))); _this->signalConnected(false);
 	}
 }
 

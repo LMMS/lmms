@@ -72,15 +72,11 @@ Pattern::Pattern(const Pattern& other)
 	init();
 	switch (getTrack()->trackContainer()->type())
 	{
-	case TrackContainer::BBContainer:
-		setAutoResize(true);
-		break;
+	case TrackContainer::BBContainer: setAutoResize(true); break;
 
 	case TrackContainer::SongContainer:
 		// move down
-	default:
-		setAutoResize(false);
-		break;
+	default: setAutoResize(false); break;
 	}
 }
 

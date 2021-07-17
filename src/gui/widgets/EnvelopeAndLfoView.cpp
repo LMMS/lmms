@@ -359,18 +359,10 @@ void EnvelopeAndLfoView::paintEvent(QPaintEvent*)
 			float phase = (cur_sample -= m_params->m_lfoPredelayFrames) / osc_frames;
 			switch (m_params->m_lfoWaveModel.value())
 			{
-			case EnvelopeAndLfoParameters::SineWave:
-				val = Oscillator::sinSample(phase);
-				break;
-			case EnvelopeAndLfoParameters::TriangleWave:
-				val = Oscillator::triangleSample(phase);
-				break;
-			case EnvelopeAndLfoParameters::SawWave:
-				val = Oscillator::sawSample(phase);
-				break;
-			case EnvelopeAndLfoParameters::SquareWave:
-				val = Oscillator::squareSample(phase);
-				break;
+			case EnvelopeAndLfoParameters::SineWave: val = Oscillator::sinSample(phase); break;
+			case EnvelopeAndLfoParameters::TriangleWave: val = Oscillator::triangleSample(phase); break;
+			case EnvelopeAndLfoParameters::SawWave: val = Oscillator::sawSample(phase); break;
+			case EnvelopeAndLfoParameters::SquareWave: val = Oscillator::squareSample(phase); break;
 			case EnvelopeAndLfoParameters::RandomWave:
 				if (x % (int)(900 * m_lfoSpeedKnob->value<float>() + 1) == 0)
 				{
@@ -378,9 +370,7 @@ void EnvelopeAndLfoView::paintEvent(QPaintEvent*)
 				}
 				val = m_randomGraph;
 				break;
-			case EnvelopeAndLfoParameters::UserDefinedWave:
-				val = m_params->m_userWave.userWaveSample(phase);
-				break;
+			case EnvelopeAndLfoParameters::UserDefinedWave: val = m_params->m_userWave.userWaveSample(phase); break;
 			}
 			if (static_cast<f_cnt_t>(cur_sample) <= m_params->m_lfoAttackFrames)
 			{

@@ -43,26 +43,13 @@ ladspaDescription::ladspaDescription(QWidget* _parent, ladspaPluginType _type)
 	l_sortable_plugin_t plugins;
 	switch (_type)
 	{
-	case SOURCE:
-		plugins = manager->getInstruments();
-		break;
-	case TRANSFER:
-		plugins = manager->getValidEffects();
-		break;
-	case VALID:
-		plugins = manager->getValidEffects();
-		break;
-	case INVALID:
-		plugins = manager->getInvalidEffects();
-		break;
-	case SINK:
-		plugins = manager->getAnalysisTools();
-		break;
-	case OTHER:
-		plugins = manager->getOthers();
-		break;
-	default:
-		break;
+	case SOURCE: plugins = manager->getInstruments(); break;
+	case TRANSFER: plugins = manager->getValidEffects(); break;
+	case VALID: plugins = manager->getValidEffects(); break;
+	case INVALID: plugins = manager->getInvalidEffects(); break;
+	case SINK: plugins = manager->getAnalysisTools(); break;
+	case OTHER: plugins = manager->getOthers(); break;
+	default: break;
 	}
 
 	QList<QString> pluginNames;

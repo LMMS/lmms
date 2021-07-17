@@ -164,26 +164,16 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample(fpp_t _frame_offset)
 	sample_t shape_sample;
 	switch (m_lfoWaveModel.value())
 	{
-	case TriangleWave:
-		shape_sample = Oscillator::triangleSample(phase);
-		break;
-	case SquareWave:
-		shape_sample = Oscillator::squareSample(phase);
-		break;
-	case SawWave:
-		shape_sample = Oscillator::sawSample(phase);
-		break;
-	case UserDefinedWave:
-		shape_sample = m_userWave.userWaveSample(phase);
-		break;
+	case TriangleWave: shape_sample = Oscillator::triangleSample(phase); break;
+	case SquareWave: shape_sample = Oscillator::squareSample(phase); break;
+	case SawWave: shape_sample = Oscillator::sawSample(phase); break;
+	case UserDefinedWave: shape_sample = m_userWave.userWaveSample(phase); break;
 	case RandomWave:
 		if (frame == 0) { m_random = Oscillator::noiseSample(0.0f); }
 		shape_sample = m_random;
 		break;
 	case SineWave:
-	default:
-		shape_sample = Oscillator::sinSample(phase);
-		break;
+	default: shape_sample = Oscillator::sinSample(phase); break;
 	}
 	return shape_sample * m_lfoAmount;
 }

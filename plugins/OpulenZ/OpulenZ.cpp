@@ -350,12 +350,8 @@ bool OpulenzInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 	case MidiControlChange:
 		switch (event.controllerNumber())
 		{
-		case MidiControllerRegisteredParameterNumberLSB:
-			RPNfine = event.controllerValue();
-			break;
-		case MidiControllerRegisteredParameterNumberMSB:
-			RPNcoarse = event.controllerValue();
-			break;
+		case MidiControllerRegisteredParameterNumberLSB: RPNfine = event.controllerValue(); break;
+		case MidiControllerRegisteredParameterNumberMSB: RPNcoarse = event.controllerValue(); break;
 		case MidiControllerDataEntry:
 			if ((RPNcoarse << 8) + RPNfine == MidiPitchBendSensitivityRPN)
 			{

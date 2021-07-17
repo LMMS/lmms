@@ -452,9 +452,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 
 	switch (static_cast<SemiToneMarkerAction>(i))
 	{
-	case stmaUnmarkAll:
-		m_markedSemiTones.clear();
-		break;
+	case stmaUnmarkAll: m_markedSemiTones.clear(); break;
 	case stmaMarkCurrentSemiTone: {
 		QList<int>::iterator it = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), key);
 		if (it != m_markedSemiTones.end()) { m_markedSemiTones.erase(it); }
@@ -949,9 +947,7 @@ void PianoRoll::drawDetuningInfo(QPainter& _p, const Note* _n, int _x, int _y) c
 				_p.drawLine(cur_x, pre_y, cur_x, cur_y);
 				break;
 			case AutomationPattern::CubicHermiteProgression: /* TODO */
-			case AutomationPattern::LinearProgression:
-				_p.drawLine(old_x, pre_y, cur_x, cur_y);
-				break;
+			case AutomationPattern::LinearProgression: _p.drawLine(old_x, pre_y, cur_x, cur_y); break;
 			}
 
 			// If we are in the last node and there's a discrete jump, we draw a
@@ -1252,8 +1248,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			ke->accept();
 		}
 		break;
-	default:
-		break;
+	default: break;
 	}
 
 	update();
@@ -2624,12 +2619,9 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		auto keyHeight = [&](const int key) -> int {
 			switch (prKeyOrder[key % KeysPerOctave])
 			{
-			case PR_WHITE_KEY_BIG:
-				return m_whiteKeyBigHeight;
-			case PR_WHITE_KEY_SMALL:
-				return m_whiteKeySmallHeight;
-			case PR_BLACK_KEY:
-				return m_blackKeyHeight;
+			case PR_WHITE_KEY_BIG: return m_whiteKeyBigHeight;
+			case PR_WHITE_KEY_SMALL: return m_whiteKeySmallHeight;
+			case PR_BLACK_KEY: return m_blackKeyHeight;
 			}
 			return 0; // should never happen
 		};
@@ -2638,13 +2630,11 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 			const int keyCode = key % KeysPerOctave;
 			switch (prKeyOrder[keyCode])
 			{
-			case PR_WHITE_KEY_BIG:
-				return m_whiteKeySmallHeight;
+			case PR_WHITE_KEY_BIG: return m_whiteKeySmallHeight;
 			case PR_WHITE_KEY_SMALL:
 				// These two keys need to adjust up small height instead of only key line height
 				if (keyCode == Key_C || keyCode == Key_F) { return m_whiteKeySmallHeight; }
-			case PR_BLACK_KEY:
-				return m_blackKeyHeight;
+			case PR_BLACK_KEY: return m_blackKeyHeight;
 			}
 			return 0; // should never happen
 		};
@@ -2652,10 +2642,8 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 			switch (prKeyOrder[key % KeysPerOctave])
 			{
 			case PR_WHITE_KEY_SMALL:
-			case PR_WHITE_KEY_BIG:
-				return m_whiteKeyWidth;
-			case PR_BLACK_KEY:
-				return m_blackKeyWidth;
+			case PR_WHITE_KEY_BIG: return m_whiteKeyWidth;
+			case PR_BLACK_KEY: return m_blackKeyWidth;
 			}
 			return 0; // should never happen
 		};
@@ -2674,8 +2662,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 			case PR_WHITE_KEY_BIG:
 				p.setBrush(pressed ? m_whiteKeyActiveBackground : m_whiteKeyInactiveBackground);
 				break;
-			case PR_BLACK_KEY:
-				p.setBrush(pressed ? m_blackKeyActiveBackground : m_blackKeyInactiveBackground);
+			case PR_BLACK_KEY: p.setBrush(pressed ? m_blackKeyActiveBackground : m_blackKeyInactiveBackground);
 			}
 			// draw key
 			p.drawRect(PIANO_X, yt, kw, kh);
@@ -2708,8 +2695,7 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 		switch (prKeyOrder[topNote])
 		{
 		case PR_WHITE_KEY_SMALL:
-		case PR_WHITE_KEY_BIG:
-			break;
+		case PR_WHITE_KEY_BIG: break;
 		case PR_BLACK_KEY:
 			// draw extra white key
 			drawKey(topKey + 1, grid_line_y - m_keyLineHeight);
@@ -3059,18 +3045,10 @@ void PianoRoll::paintEvent(QPaintEvent* pe)
 				cursor = s_toolDraw;
 			}
 			break;
-		case ModeErase:
-			cursor = s_toolErase;
-			break;
-		case ModeSelect:
-			cursor = s_toolSelect;
-			break;
-		case ModeEditDetuning:
-			cursor = s_toolOpen;
-			break;
-		case ModeEditKnife:
-			cursor = s_toolKnife;
-			break;
+		case ModeErase: cursor = s_toolErase; break;
+		case ModeSelect: cursor = s_toolSelect; break;
+		case ModeEditDetuning: cursor = s_toolOpen; break;
+		case ModeEditKnife: cursor = s_toolKnife; break;
 		}
 		QPoint mousePosition = mapFromGlobal(QCursor::pos());
 		if (cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())

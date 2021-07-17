@@ -595,8 +595,7 @@ private:
 			ssize_t nread = ::read(m_socket, buf, remaining);
 			switch (nread)
 			{
-			case -1:
-				fprintf(stderr, "Error while reading.\n");
+			case -1: fprintf(stderr, "Error while reading.\n");
 			case 0:
 				invalidate();
 				memset(_buf, 0, _len);
@@ -617,11 +616,8 @@ private:
 			ssize_t nwritten = ::write(m_socket, buf, remaining);
 			switch (nwritten)
 			{
-			case -1:
-				fprintf(stderr, "Error while writing.\n");
-			case 0:
-				invalidate();
-				return;
+			case -1: fprintf(stderr, "Error while writing.\n");
+			case 0: invalidate(); return;
 			}
 			buf += nwritten;
 			remaining -= nwritten;
@@ -1104,8 +1100,7 @@ bool RemotePluginClient::processMessage(const message& _m)
 	bool reply = false;
 	switch (_m.id)
 	{
-	case IdUndefined:
-		return false;
+	case IdUndefined: return false;
 
 	case IdSampleRateInformation:
 		m_sampleRate = _m.getInt();
@@ -1122,8 +1117,7 @@ bool RemotePluginClient::processMessage(const message& _m)
 		updateBufferSize();
 		break;
 
-	case IdQuit:
-		return false;
+	case IdQuit: return false;
 
 	case IdMidiEvent:
 		processMidiEvent(MidiEvent(static_cast<MidiEventTypes>(_m.getInt(0)), _m.getInt(1), _m.getInt(2), _m.getInt(3)),
@@ -1136,12 +1130,9 @@ bool RemotePluginClient::processMessage(const message& _m)
 		reply = true;
 		break;
 
-	case IdChangeSharedMemoryKey:
-		setShmKey(_m.getInt(0), _m.getInt(1));
-		break;
+	case IdChangeSharedMemoryKey: setShmKey(_m.getInt(0), _m.getInt(1)); break;
 
-	case IdInitDone:
-		break;
+	case IdInitDone: break;
 
 	default: {
 		char buf[64];

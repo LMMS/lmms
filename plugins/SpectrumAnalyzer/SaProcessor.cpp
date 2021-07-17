@@ -502,17 +502,12 @@ float SaProcessor::getFreqRangeMin(bool linear) const
 {
 	switch (m_controls->m_freqRangeModel.value())
 	{
-	case FRANGE_AUDIBLE:
-		return FRANGE_AUDIBLE_START;
-	case FRANGE_BASS:
-		return FRANGE_BASS_START;
-	case FRANGE_MIDS:
-		return FRANGE_MIDS_START;
-	case FRANGE_HIGH:
-		return FRANGE_HIGH_START;
+	case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_START;
+	case FRANGE_BASS: return FRANGE_BASS_START;
+	case FRANGE_MIDS: return FRANGE_MIDS_START;
+	case FRANGE_HIGH: return FRANGE_HIGH_START;
 	default:
-	case FRANGE_FULL:
-		return linear ? 0 : LOWEST_LOG_FREQ;
+	case FRANGE_FULL: return linear ? 0 : LOWEST_LOG_FREQ;
 	}
 }
 
@@ -520,17 +515,12 @@ float SaProcessor::getFreqRangeMax() const
 {
 	switch (m_controls->m_freqRangeModel.value())
 	{
-	case FRANGE_AUDIBLE:
-		return FRANGE_AUDIBLE_END;
-	case FRANGE_BASS:
-		return FRANGE_BASS_END;
-	case FRANGE_MIDS:
-		return FRANGE_MIDS_END;
-	case FRANGE_HIGH:
-		return FRANGE_HIGH_END;
+	case FRANGE_AUDIBLE: return FRANGE_AUDIBLE_END;
+	case FRANGE_BASS: return FRANGE_BASS_END;
+	case FRANGE_MIDS: return FRANGE_MIDS_END;
+	case FRANGE_HIGH: return FRANGE_HIGH_END;
 	default:
-	case FRANGE_FULL:
-		return getNyquistFreq();
+	case FRANGE_FULL: return getNyquistFreq();
 	}
 }
 
@@ -579,15 +569,11 @@ float SaProcessor::getAmpRangeMin(bool linear) const
 	if (linear) { return -900; }
 	switch (m_controls->m_ampRangeModel.value())
 	{
-	case ARANGE_EXTENDED:
-		return ARANGE_EXTENDED_START;
-	case ARANGE_SILENT:
-		return ARANGE_SILENT_START;
-	case ARANGE_LOUD:
-		return ARANGE_LOUD_START;
+	case ARANGE_EXTENDED: return ARANGE_EXTENDED_START;
+	case ARANGE_SILENT: return ARANGE_SILENT_START;
+	case ARANGE_LOUD: return ARANGE_LOUD_START;
 	default:
-	case ARANGE_AUDIBLE:
-		return ARANGE_AUDIBLE_START;
+	case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_START;
 	}
 }
 
@@ -595,15 +581,11 @@ float SaProcessor::getAmpRangeMax() const
 {
 	switch (m_controls->m_ampRangeModel.value())
 	{
-	case ARANGE_EXTENDED:
-		return ARANGE_EXTENDED_END;
-	case ARANGE_SILENT:
-		return ARANGE_SILENT_END;
-	case ARANGE_LOUD:
-		return ARANGE_LOUD_END;
+	case ARANGE_EXTENDED: return ARANGE_EXTENDED_END;
+	case ARANGE_SILENT: return ARANGE_SILENT_END;
+	case ARANGE_LOUD: return ARANGE_LOUD_END;
 	default:
-	case ARANGE_AUDIBLE:
-		return ARANGE_AUDIBLE_END;
+	case ARANGE_AUDIBLE: return ARANGE_AUDIBLE_END;
 	}
 }
 

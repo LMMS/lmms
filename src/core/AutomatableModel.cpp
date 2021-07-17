@@ -450,12 +450,8 @@ float AutomatableModel::controllerValue(int frameOffset) const
 		float v = 0;
 		switch (m_scaleType)
 		{
-		case Linear:
-			v = minValue<float>() + (range() * controllerConnection()->currentValue(frameOffset));
-			break;
-		case Logarithmic:
-			v = logToLinearScale(controllerConnection()->currentValue(frameOffset));
-			break;
+		case Linear: v = minValue<float>() + (range() * controllerConnection()->currentValue(frameOffset)); break;
+		case Logarithmic: v = logToLinearScale(controllerConnection()->currentValue(frameOffset)); break;
 		default:
 			qFatal("AutomatableModel::controllerValue(int)"
 				   "lacks implementation for a scale type");

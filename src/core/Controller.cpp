@@ -152,21 +152,16 @@ Controller* Controller::create(ControllerTypes _ct, Model* _parent)
 		c = dummy;
 		break;
 
-	case Controller::LfoController:
-		c = new ::LfoController(_parent);
-		break;
+	case Controller::LfoController: c = new ::LfoController(_parent); break;
 
 	case Controller::PeakController:
 		// Already instantiated in EffectChain::loadSettings()
 		Q_ASSERT(false);
 		break;
 
-	case Controller::MidiController:
-		c = new ::MidiController(_parent);
-		break;
+	case Controller::MidiController: c = new ::MidiController(_parent); break;
 
-	default:
-		break;
+	default: break;
 	}
 
 	return (c);

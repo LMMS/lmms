@@ -900,24 +900,12 @@ void TrackContentObjectView::contextMenuAction(ContextMenuAction action)
 
 	switch (action)
 	{
-	case Remove:
-		remove(active);
-		break;
-	case Cut:
-		cut(active);
-		break;
-	case Copy:
-		copy(active);
-		break;
-	case Paste:
-		paste();
-		break;
-	case Mute:
-		toggleMute(active);
-		break;
-	case Merge:
-		mergeTCOs(active);
-		break;
+	case Remove: remove(active); break;
+	case Cut: cut(active); break;
+	case Copy: copy(active); break;
+	case Paste: paste(); break;
+	case Mute: toggleMute(active); break;
+	case Merge: mergeTCOs(active); break;
 	}
 }
 

@@ -120,15 +120,9 @@ void audioFileProcessor::playNote(NotePlayHandle* _n, sampleFrame* _working_buff
 		int srcmode = SRC_LINEAR;
 		switch (m_interpolationModel.value())
 		{
-		case 0:
-			srcmode = SRC_ZERO_ORDER_HOLD;
-			break;
-		case 1:
-			srcmode = SRC_LINEAR;
-			break;
-		case 2:
-			srcmode = SRC_SINC_MEDIUM_QUALITY;
-			break;
+		case 0: srcmode = SRC_ZERO_ORDER_HOLD; break;
+		case 1: srcmode = SRC_LINEAR; break;
+		case 2: srcmode = SRC_SINC_MEDIUM_QUALITY; break;
 		}
 		_n->m_pluginData = new handleState(_n->hasDetuningInfo(), srcmode);
 		((handleState*)_n->m_pluginData)->setFrameIndex(m_nextPlayStartPoint);
@@ -652,15 +646,9 @@ void AudioFileProcessorWaveView::mouseMoveEvent(QMouseEvent* _me)
 	const int step = _me->x() - m_draggingLastPoint.x();
 	switch (m_draggingType)
 	{
-	case sample_start:
-		slideSamplePointByPx(start, step);
-		break;
-	case sample_end:
-		slideSamplePointByPx(end, step);
-		break;
-	case sample_loop:
-		slideSamplePointByPx(loop, step);
-		break;
+	case sample_start: slideSamplePointByPx(start, step); break;
+	case sample_end: slideSamplePointByPx(end, step); break;
+	case sample_loop: slideSamplePointByPx(loop, step); break;
 	case wave:
 	default:
 		if (qAbs(_me->y() - m_draggingLastPoint.y()) < 2 * qAbs(_me->x() - m_draggingLastPoint.x())) { slide(step); }
@@ -858,14 +846,9 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames(knobType _point, f_cnt
 	knob* a_knob = m_startKnob;
 	switch (_point)
 	{
-	case end:
-		a_knob = m_endKnob;
-		break;
-	case loop:
-		a_knob = m_loopKnob;
-		break;
-	case start:
-		break;
+	case end: a_knob = m_endKnob; break;
+	case loop: a_knob = m_loopKnob; break;
+	case start: break;
 	}
 	if (a_knob == NULL) { return; }
 	else

@@ -58,8 +58,7 @@ bool AudioFileFlac::startEncoding()
 		// FLAC does not support 32bit sampling, so take it as 24.
 		m_sfinfo.format |= SF_FORMAT_PCM_24;
 		break;
-	default:
-		m_sfinfo.format |= SF_FORMAT_PCM_16;
+	default: m_sfinfo.format |= SF_FORMAT_PCM_16;
 	}
 
 #ifdef LMMS_HAVE_SF_COMPLEVEL

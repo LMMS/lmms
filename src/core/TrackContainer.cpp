@@ -217,8 +217,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList& tra
 				Q_ASSERT(track->numOfTCOs() > tcoNum);
 				tcos << track->getTCO(tcoNum);
 			}
-		default:
-			break;
+		default: break;
 		}
 	}
 

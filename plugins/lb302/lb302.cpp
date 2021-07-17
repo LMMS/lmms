@@ -463,45 +463,19 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 
 		switch (int(rint(wave_shape.value())))
 		{
-		case 0:
-			vco_shape = SAWTOOTH;
-			break;
-		case 1:
-			vco_shape = TRIANGLE;
-			break;
-		case 2:
-			vco_shape = SQUARE;
-			break;
-		case 3:
-			vco_shape = ROUND_SQUARE;
-			break;
-		case 4:
-			vco_shape = MOOG;
-			break;
-		case 5:
-			vco_shape = SINE;
-			break;
-		case 6:
-			vco_shape = EXPONENTIAL;
-			break;
-		case 7:
-			vco_shape = WHITE_NOISE;
-			break;
-		case 8:
-			vco_shape = BL_SAWTOOTH;
-			break;
-		case 9:
-			vco_shape = BL_SQUARE;
-			break;
-		case 10:
-			vco_shape = BL_TRIANGLE;
-			break;
-		case 11:
-			vco_shape = BL_MOOG;
-			break;
-		default:
-			vco_shape = SAWTOOTH;
-			break;
+		case 0: vco_shape = SAWTOOTH; break;
+		case 1: vco_shape = TRIANGLE; break;
+		case 2: vco_shape = SQUARE; break;
+		case 3: vco_shape = ROUND_SQUARE; break;
+		case 4: vco_shape = MOOG; break;
+		case 5: vco_shape = SINE; break;
+		case 6: vco_shape = EXPONENTIAL; break;
+		case 7: vco_shape = WHITE_NOISE; break;
+		case 8: vco_shape = BL_SAWTOOTH; break;
+		case 9: vco_shape = BL_SQUARE; break;
+		case 10: vco_shape = BL_TRIANGLE; break;
+		case 11: vco_shape = BL_MOOG; break;
+		default: vco_shape = SAWTOOTH; break;
 		}
 
 		// add vco_shape_param the changes the shape of each curve.
@@ -542,13 +516,9 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 			vco_k = 0.5f * Oscillator::sinSample(vco_c);
 			break;
 
-		case EXPONENTIAL:
-			vco_k = 0.5 * Oscillator::expSample(vco_c);
-			break;
+		case EXPONENTIAL: vco_k = 0.5 * Oscillator::expSample(vco_c); break;
 
-		case WHITE_NOISE:
-			vco_k = 0.5 * Oscillator::noiseSample(vco_c);
-			break;
+		case WHITE_NOISE: vco_k = 0.5 * Oscillator::noiseSample(vco_c); break;
 
 		case BL_SAWTOOTH:
 			vco_k =

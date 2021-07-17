@@ -253,8 +253,7 @@ void AutomationEditor::keyPressEvent(QKeyEvent* ke)
 		ke->accept();
 		break;
 
-	default:
-		break;
+	default: break;
 	}
 }
 
@@ -551,8 +550,7 @@ void AutomationEditor::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 	case DRAW_OUTVALUES:
 		if (fineTuneValue(clickedNode, isOutVal)) { update(); }
 		break;
-	default:
-		break;
+	default: break;
 	}
 }
 

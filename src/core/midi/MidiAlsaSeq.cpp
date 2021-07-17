@@ -146,9 +146,7 @@ void MidiAlsaSeq::processOutEvent(const MidiEvent& event, const TimePos& time, c
 	ev.queue = m_queueID;
 	switch (event.type())
 	{
-	case MidiNoteOn:
-		snd_seq_ev_set_noteon(&ev, event.channel(), event.key() + KeysPerOctave, event.velocity());
-		break;
+	case MidiNoteOn: snd_seq_ev_set_noteon(&ev, event.channel(), event.key() + KeysPerOctave, event.velocity()); break;
 
 	case MidiNoteOff:
 		snd_seq_ev_set_noteoff(&ev, event.channel(), event.key() + KeysPerOctave, event.velocity());
@@ -162,21 +160,13 @@ void MidiAlsaSeq::processOutEvent(const MidiEvent& event, const TimePos& time, c
 		snd_seq_ev_set_controller(&ev, event.channel(), event.controllerNumber(), event.controllerValue());
 		break;
 
-	case MidiProgramChange:
-		snd_seq_ev_set_pgmchange(&ev, event.channel(), event.program());
-		break;
+	case MidiProgramChange: snd_seq_ev_set_pgmchange(&ev, event.channel(), event.program()); break;
 
-	case MidiChannelPressure:
-		snd_seq_ev_set_chanpress(&ev, event.channel(), event.channelPressure());
-		break;
+	case MidiChannelPressure: snd_seq_ev_set_chanpress(&ev, event.channel(), event.channelPressure()); break;
 
-	case MidiPitchBend:
-		snd_seq_ev_set_pitchbend(&ev, event.channel(), event.param(0) - 8192);
-		break;
+	case MidiPitchBend: snd_seq_ev_set_pitchbend(&ev, event.channel(), event.param(0) - 8192); break;
 
-	default:
-		qWarning("MidiAlsaSeq: unhandled output event %d\n", (int)event.type());
-		return;
+	default: qWarning("MidiAlsaSeq: unhandled output event %d\n", (int)event.type()); return;
 	}
 
 	m_seqMutex.lock();
@@ -194,19 +184,13 @@ void MidiAlsaSeq::applyPortMode(MidiPort* _port)
 
 	switch (_port->mode())
 	{
-	case MidiPort::Duplex:
-		caps[1] |= SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
+	case MidiPort::Duplex: caps[1] |= SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
 
-	case MidiPort::Input:
-		caps[0] |= SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE;
-		break;
+	case MidiPort::Input: caps[0] |= SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE; break;
 
-	case MidiPort::Output:
-		caps[1] |= SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ;
-		break;
+	case MidiPort::Output: caps[1] |= SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ; break;
 
-	default:
-		break;
+	default: break;
 	}
 
 	for (int i = 0; i < 2; ++i)
@@ -446,8 +430,7 @@ void MidiAlsaSeq::run()
 				break;
 
 			case SND_SEQ_EVENT_SENSING:
-			case SND_SEQ_EVENT_CLOCK:
-				break;
+			case SND_SEQ_EVENT_CLOCK: break;
 
 			default:
 				fprintf(stderr,

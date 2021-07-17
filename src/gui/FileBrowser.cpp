@@ -302,11 +302,8 @@ void FileBrowser::keyPressEvent(QKeyEvent* ke)
 {
 	switch (ke->key())
 	{
-	case Qt::Key_F5:
-		reloadTree();
-		break;
-	default:
-		ke->ignore();
+	case Qt::Key_F5: reloadTree(); break;
+	default: ke->ignore();
 	}
 }
 
@@ -601,8 +598,7 @@ void FileBrowserTreeWidget::mouseMoveEvent(QMouseEvent* me)
 				new StringPairDrag("projectfile", f->fullName(), embed::getIconPixmap("project_file"), this);
 				break;
 
-			default:
-				break;
+			default: break;
 			}
 		}
 	}
@@ -653,13 +649,10 @@ void FileBrowserTreeWidget::handleFile(FileItem* f, InstrumentTrack* it)
 		break;
 	}
 
-	case FileItem::ImportAsProject:
-		ImportFilter::import(f->fullName(), Engine::getSong());
-		break;
+	case FileItem::ImportAsProject: ImportFilter::import(f->fullName(), Engine::getSong()); break;
 
 	case FileItem::NotSupported:
-	default:
-		break;
+	default: break;
 	}
 	Engine::mixer()->doneChangeInModel();
 }
@@ -947,29 +940,17 @@ void FileItem::initPixmaps(void)
 
 	switch (m_type)
 	{
-	case ProjectFile:
-		setIcon(0, *s_projectFilePixmap);
-		break;
-	case PresetFile:
-		setIcon(0, *s_presetFilePixmap);
-		break;
-	case SoundFontFile:
-		setIcon(0, *s_soundfontFilePixmap);
-		break;
-	case VstPluginFile:
-		setIcon(0, *s_vstPluginFilePixmap);
-		break;
+	case ProjectFile: setIcon(0, *s_projectFilePixmap); break;
+	case PresetFile: setIcon(0, *s_presetFilePixmap); break;
+	case SoundFontFile: setIcon(0, *s_soundfontFilePixmap); break;
+	case VstPluginFile: setIcon(0, *s_vstPluginFilePixmap); break;
 	case SampleFile:
 	case PatchFile: // TODO
 		setIcon(0, *s_sampleFilePixmap);
 		break;
-	case MidiFile:
-		setIcon(0, *s_midiFilePixmap);
-		break;
+	case MidiFile: setIcon(0, *s_midiFilePixmap); break;
 	case UnknownFile:
-	default:
-		setIcon(0, *s_unknownFilePixmap);
-		break;
+	default: setIcon(0, *s_unknownFilePixmap); break;
 	}
 }
 

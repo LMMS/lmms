@@ -913,24 +913,15 @@ void MainWindow::updatePlayPauseIcons()
 	{
 		switch (Engine::getSong()->playMode())
 		{
-		case Song::Mode_PlaySong:
-			gui->songEditor()->setPauseIcon(true);
-			break;
+		case Song::Mode_PlaySong: gui->songEditor()->setPauseIcon(true); break;
 
-		case Song::Mode_PlayAutomationPattern:
-			gui->automationEditor()->setPauseIcon(true);
-			break;
+		case Song::Mode_PlayAutomationPattern: gui->automationEditor()->setPauseIcon(true); break;
 
-		case Song::Mode_PlayBB:
-			gui->getBBEditor()->setPauseIcon(true);
-			break;
+		case Song::Mode_PlayBB: gui->getBBEditor()->setPauseIcon(true); break;
 
-		case Song::Mode_PlayPattern:
-			gui->pianoRoll()->setPauseIcon(true);
-			break;
+		case Song::Mode_PlayPattern: gui->pianoRoll()->setPauseIcon(true); break;
 
-		default:
-			break;
+		default: break;
 		}
 	}
 }
@@ -984,15 +975,9 @@ void MainWindow::keyPressEvent(QKeyEvent* _ke)
 {
 	switch (_ke->key())
 	{
-	case Qt::Key_Control:
-		m_keyMods.m_ctrl = true;
-		break;
-	case Qt::Key_Shift:
-		m_keyMods.m_shift = true;
-		break;
-	case Qt::Key_Alt:
-		m_keyMods.m_alt = true;
-		break;
+	case Qt::Key_Control: m_keyMods.m_ctrl = true; break;
+	case Qt::Key_Shift: m_keyMods.m_shift = true; break;
+	case Qt::Key_Alt: m_keyMods.m_alt = true; break;
 	default: {
 		InstrumentTrackWindow* w = InstrumentTrackView::topLevelInstrumentTrackWindow();
 		if (w) { w->pianoView()->keyPressEvent(_ke); }
@@ -1005,15 +990,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent* _ke)
 {
 	switch (_ke->key())
 	{
-	case Qt::Key_Control:
-		m_keyMods.m_ctrl = false;
-		break;
-	case Qt::Key_Shift:
-		m_keyMods.m_shift = false;
-		break;
-	case Qt::Key_Alt:
-		m_keyMods.m_alt = false;
-		break;
+	case Qt::Key_Control: m_keyMods.m_ctrl = false; break;
+	case Qt::Key_Shift: m_keyMods.m_shift = false; break;
+	case Qt::Key_Alt: m_keyMods.m_alt = false; break;
 	default:
 		if (InstrumentTrackView::topLevelInstrumentTrackWindow())
 		{
@@ -1263,8 +1242,7 @@ void MainWindow::onSongStopped()
 			}
 			break;
 
-		case TimeLineWidget::KeepStopPosition:
-			break;
+		case TimeLineWidget::KeepStopPosition: break;
 		}
 	}
 }

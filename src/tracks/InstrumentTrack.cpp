@@ -229,11 +229,8 @@ MidiEvent InstrumentTrack::applyMasterKey(const MidiEvent& event)
 	{
 	case MidiNoteOn:
 	case MidiNoteOff:
-	case MidiKeyPressure:
-		copy.setKey(masterKey(event.key()));
-		break;
-	default:
-		break;
+	case MidiKeyPressure: copy.setKey(masterKey(event.key())); break;
+	default: break;
 	}
 	return copy;
 }
@@ -354,14 +351,11 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 				m_notes[event.key()]->setPanning(event.panning());
 			}
 			break;
-		default:
-			qWarning("InstrumentTrack: unhandled MIDI meta event: %i", event.metaEvent());
-			break;
+		default: qWarning("InstrumentTrack: unhandled MIDI meta event: %i", event.metaEvent()); break;
 		}
 		break;
 
-	default:
-		break;
+	default: break;
 	}
 
 	// If the event wasn't handled, check if there's a loaded instrument and if so send the
@@ -417,9 +411,7 @@ void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& tim
 		emit endNote();
 		break;
 
-	default:
-		m_instrument->handleMidiEvent(transposedEvent, time, offset);
-		break;
+	default: m_instrument->handleMidiEvent(transposedEvent, time, offset); break;
 	}
 
 	// if appropriate, midi-port does futher routing

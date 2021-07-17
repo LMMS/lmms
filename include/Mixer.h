@@ -120,14 +120,10 @@ public:
 		{
 			switch (oversampling)
 			{
-			case Oversampling_None:
-				return 1;
-			case Oversampling_2x:
-				return 2;
-			case Oversampling_4x:
-				return 4;
-			case Oversampling_8x:
-				return 8;
+			case Oversampling_None: return 1;
+			case Oversampling_2x: return 2;
+			case Oversampling_4x: return 4;
+			case Oversampling_8x: return 8;
 			}
 			return 1;
 		}
@@ -136,14 +132,10 @@ public:
 		{
 			switch (interpolation)
 			{
-			case Interpolation_Linear:
-				return SRC_ZERO_ORDER_HOLD;
-			case Interpolation_SincFastest:
-				return SRC_SINC_FASTEST;
-			case Interpolation_SincMedium:
-				return SRC_SINC_MEDIUM_QUALITY;
-			case Interpolation_SincBest:
-				return SRC_SINC_BEST_QUALITY;
+			case Interpolation_Linear: return SRC_ZERO_ORDER_HOLD;
+			case Interpolation_SincFastest: return SRC_SINC_FASTEST;
+			case Interpolation_SincMedium: return SRC_SINC_MEDIUM_QUALITY;
+			case Interpolation_SincBest: return SRC_SINC_BEST_QUALITY;
 			}
 			return SRC_LINEAR;
 		}
