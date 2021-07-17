@@ -572,8 +572,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 			so.at( i )->setSelected( false);
 		}
 		getTrack()->addJournalCheckPoint();
-		const TimePos pos = getPosition( me->x() ).getBar() *
-						TimePos::ticksPerBar();
+		const TimePos pos = getPosition( me->x() ).getTicks();
 		getTrack()->createTCO(pos);
 	}
 }
