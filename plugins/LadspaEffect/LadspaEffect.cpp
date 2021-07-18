@@ -324,7 +324,7 @@ void LadspaEffect::pluginInstantiation()
 					manager->isPortInput( m_key, port ) )
 				{
 					p->rate = CHANNEL_IN;
-					p->buffer = MM_ALLOC( LADSPA_Data, Engine::audioEngine()->framesPerPeriod() );
+					p->buffer = MM_ALLOC<LADSPA_Data>( Engine::audioEngine()->framesPerPeriod() );
 					inbuf[ inputch ] = p->buffer;
 					inputch++;
 				}
@@ -339,24 +339,24 @@ void LadspaEffect::pluginInstantiation()
 					}
 					else
 					{
-						p->buffer = MM_ALLOC( LADSPA_Data, Engine::audioEngine()->framesPerPeriod() );
+						p->buffer = MM_ALLOC<LADSPA_Data>( Engine::audioEngine()->framesPerPeriod() );
 						m_inPlaceBroken = true;
 					}
 				}
 				else if( manager->isPortInput( m_key, port ) )
 				{
 					p->rate = AUDIO_RATE_INPUT;
-					p->buffer = MM_ALLOC( LADSPA_Data, Engine::audioEngine()->framesPerPeriod() );
+					p->buffer = MM_ALLOC<LADSPA_Data>( Engine::audioEngine()->framesPerPeriod() );
 				}
 				else
 				{
 					p->rate = AUDIO_RATE_OUTPUT;
-					p->buffer = MM_ALLOC( LADSPA_Data, Engine::audioEngine()->framesPerPeriod() );
+					p->buffer = MM_ALLOC<LADSPA_Data>( Engine::audioEngine()->framesPerPeriod() );
 				}
 			}
 			else
 			{
-				p->buffer = MM_ALLOC( LADSPA_Data, 1 );
+				p->buffer = MM_ALLOC<LADSPA_Data>( 1 );
 
 				if( manager->isPortInput( m_key, port ) )
 				{

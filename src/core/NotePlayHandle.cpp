@@ -602,9 +602,9 @@ int NotePlayHandleManager::s_size;
 
 void NotePlayHandleManager::init()
 {
-	s_available = MM_ALLOC( NotePlayHandle*, INITIAL_NPH_CACHE );
+	s_available = MM_ALLOC<NotePlayHandle*>( INITIAL_NPH_CACHE );
 
-	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, INITIAL_NPH_CACHE );
+	NotePlayHandle * n = MM_ALLOC<NotePlayHandle>( INITIAL_NPH_CACHE );
 
 	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
 	{
@@ -647,11 +647,11 @@ void NotePlayHandleManager::release( NotePlayHandle * nph )
 void NotePlayHandleManager::extend( int c )
 {
 	s_size += c;
-	NotePlayHandle ** tmp = MM_ALLOC( NotePlayHandle*, s_size );
+	NotePlayHandle ** tmp = MM_ALLOC<NotePlayHandle*>( s_size );
 	MM_FREE( s_available );
 	s_available = tmp;
 
-	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, c );
+	NotePlayHandle * n = MM_ALLOC<NotePlayHandle>( c );
 
 	for( int i=0; i < c; ++i )
 	{
