@@ -127,14 +127,14 @@ void OscillatorObject::updateVolume()
 
 void OscillatorObject::updateDetuningLeft()
 {
-	m_detuningLeft = powf(2.0f, ((float)m_coarseModel.value() * 100.0f + (float)m_fineLeftModel.value()) / 1200.0f) /
-		Engine::mixer()->processingSampleRate();
+	m_detuningLeft = powf(2.0f, ((float)m_coarseModel.value() * 100.0f + (float)m_fineLeftModel.value()) / 1200.0f)
+		/ Engine::mixer()->processingSampleRate();
 }
 
 void OscillatorObject::updateDetuningRight()
 {
-	m_detuningRight = powf(2.0f, ((float)m_coarseModel.value() * 100.0f + (float)m_fineRightModel.value()) / 1200.0f) /
-		Engine::mixer()->processingSampleRate();
+	m_detuningRight = powf(2.0f, ((float)m_coarseModel.value() * 100.0f + (float)m_fineRightModel.value()) / 1200.0f)
+		/ Engine::mixer()->processingSampleRate();
 }
 
 void OscillatorObject::updatePhaseOffsetLeft()
@@ -215,8 +215,8 @@ void TripleOscillator::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer
 			}
 			else
 			{
-				oscs_l[i] =
-					new Oscillator(&m_osc[i]->m_waveShapeModel, &m_osc[i]->m_modulationAlgoModel, _n->frequency(),
+				oscs_l[i]
+					= new Oscillator(&m_osc[i]->m_waveShapeModel, &m_osc[i]->m_modulationAlgoModel, _n->frequency(),
 						m_osc[i]->m_detuningLeft, m_osc[i]->m_phaseOffsetLeft, m_osc[i]->m_volumeLeft, oscs_l[i + 1]);
 				oscs_r[i] = new Oscillator(&m_osc[i]->m_waveShapeModel, &m_osc[i]->m_modulationAlgoModel,
 					_n->frequency(), m_osc[i]->m_detuningRight, m_osc[i]->m_phaseOffsetRight, m_osc[i]->m_volumeRight,

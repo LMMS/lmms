@@ -209,8 +209,8 @@ void Alg_midifile_reader::Mf_off(int chan, int key, int vel)
 	Alg_note_list_ptr* p = &note_list;
 	while (*p)
 	{
-		if ((*p)->note->get_identifier() == key &&
-			(*p)->note->chan == chan + channel_offset + port * channel_offset_per_port)
+		if ((*p)->note->get_identifier() == key
+			&& (*p)->note->chan == chan + channel_offset + port * channel_offset_per_port)
 		{
 			(*p)->note->dur = time - (*p)->note->time;
 			// trace("updated %d dur %g\n", (*p)->note->key, (*p)->note->dur);

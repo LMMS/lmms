@@ -90,8 +90,8 @@ void LfoController::updateValueBuffer()
 
 	for (float& f : m_valueBuffer)
 	{
-		const float currentSample =
-			m_sampleFunction != NULL ? m_sampleFunction(phase) : m_userDefSampleBuffer->userWaveSample(phase);
+		const float currentSample
+			= m_sampleFunction != NULL ? m_sampleFunction(phase) : m_userDefSampleBuffer->userWaveSample(phase);
 
 		f = qBound(0.0f, m_baseModel.value() + (*amountPtr * currentSample / 2.0f), 1.0f);
 

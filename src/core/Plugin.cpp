@@ -39,9 +39,9 @@
 
 static PixmapLoader dummyLoader;
 
-static Plugin::Descriptor dummyPluginDescriptor = {"dummy", "dummy",
-	QT_TRANSLATE_NOOP("PluginBrowser", "no description"), "Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100,
-	Plugin::Undefined, &dummyLoader, NULL};
+static Plugin::Descriptor dummyPluginDescriptor
+	= {"dummy", "dummy", QT_TRANSLATE_NOOP("PluginBrowser", "no description"),
+		"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100, Plugin::Undefined, &dummyLoader, NULL};
 
 Plugin::Plugin(const Descriptor* descriptor, Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Model(parent)
@@ -121,8 +121,8 @@ Plugin* Plugin::instantiateWithKey(
 	const QString& pluginName, Model* parent, const Descriptor::SubPluginFeatures::Key* key, bool keyFromDnd)
 {
 	if (keyFromDnd) Q_ASSERT(!key);
-	const Descriptor::SubPluginFeatures::Key* keyPtr =
-		keyFromDnd ? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey()) : key;
+	const Descriptor::SubPluginFeatures::Key* keyPtr
+		= keyFromDnd ? static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(Engine::pickDndPluginKey()) : key;
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 	if (keyPtr)
 	{

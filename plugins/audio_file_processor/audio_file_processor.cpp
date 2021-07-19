@@ -50,14 +50,14 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor = {STRINGIFY(PLUGIN_NAME),
-		"AudioFileProcessor",
-		QT_TRANSLATE_NOOP("PluginBrowser",
-			"Simple sampler with various settings for "
-			"using samples (e.g. drums) in an "
-			"instrument-track"),
-		"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"),
-		"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw", NULL};
+	Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "AudioFileProcessor",
+			QT_TRANSLATE_NOOP("PluginBrowser",
+				"Simple sampler with various settings for "
+				"using samples (e.g. drums) in an "
+				"instrument-track"),
+			"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"),
+			"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw", NULL};
 }
 
 audioFileProcessor::audioFileProcessor(InstrumentTrack* _instrument_track)
@@ -233,8 +233,8 @@ QString audioFileProcessor::nodeName(void) const { return audiofileprocessor_plu
 
 int audioFileProcessor::getBeatLen(NotePlayHandle* _n) const
 {
-	const float freq_factor =
-		BaseFreq / _n->frequency() * Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
+	const float freq_factor
+		= BaseFreq / _n->frequency() * Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
 
 	return static_cast<int>(floorf((m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame()) * freq_factor));
 }
@@ -244,9 +244,9 @@ PluginView* audioFileProcessor::instantiateView(QWidget* _parent) { return new A
 void audioFileProcessor::setAudioFile(const QString& _audio_file, bool _rename)
 {
 	// is current channel-name equal to previous-filename??
-	if (_rename &&
-		(instrumentTrack()->name() == QFileInfo(m_sampleBuffer.audioFile()).fileName() ||
-			m_sampleBuffer.audioFile().isEmpty()))
+	if (_rename
+		&& (instrumentTrack()->name() == QFileInfo(m_sampleBuffer.audioFile()).fileName()
+			|| m_sampleBuffer.audioFile().isEmpty()))
 	{
 		// then set it to new one
 		instrumentTrack()->setName(PathUtil::cleanName(_audio_file));
@@ -885,8 +885,9 @@ void AudioFileProcessorWaveView::reverse()
 void AudioFileProcessorWaveView::updateCursor(QMouseEvent* _me)
 {
 	bool const waveIsDragged = m_isDragging && (m_draggingType == wave);
-	bool const pointerCloseToStartEndOrLoop = (_me != nullptr) &&
-		(isCloseTo(_me->x(), m_startFrameX) || isCloseTo(_me->x(), m_endFrameX) || isCloseTo(_me->x(), m_loopFrameX));
+	bool const pointerCloseToStartEndOrLoop = (_me != nullptr)
+		&& (isCloseTo(_me->x(), m_startFrameX) || isCloseTo(_me->x(), m_endFrameX)
+			|| isCloseTo(_me->x(), m_loopFrameX));
 
 	if (!m_isDragging && pointerCloseToStartEndOrLoop) setCursor(Qt::SizeHorCursor);
 	else if (waveIsDragged)
@@ -904,8 +905,8 @@ void AudioFileProcessorWaveView::knob::slideTo(double _v, bool _check_bound)
 
 float AudioFileProcessorWaveView::knob::getValue(const QPoint& _p)
 {
-	const double dec_fact =
-		!m_waveView ? 1 : double(m_waveView->m_to - m_waveView->m_from) / m_waveView->m_sampleBuffer.frames();
+	const double dec_fact
+		= !m_waveView ? 1 : double(m_waveView->m_to - m_waveView->m_from) / m_waveView->m_sampleBuffer.frames();
 	const float inc = ::Knob::getValue(_p) * dec_fact;
 
 	return inc;
@@ -918,11 +919,11 @@ bool AudioFileProcessorWaveView::knob::checkBound(double _v) const
 	if ((m_relatedKnob->model()->value() - _v > 0) != (m_relatedKnob->model()->value() - model()->value() >= 0))
 		return false;
 
-	const double d1 = qAbs(m_relatedKnob->model()->value() - model()->value()) * (m_waveView->m_sampleBuffer.frames()) /
-		m_waveView->m_sampleBuffer.sampleRate();
+	const double d1 = qAbs(m_relatedKnob->model()->value() - model()->value()) * (m_waveView->m_sampleBuffer.frames())
+		/ m_waveView->m_sampleBuffer.sampleRate();
 
-	const double d2 = qAbs(m_relatedKnob->model()->value() - _v) * (m_waveView->m_sampleBuffer.frames()) /
-		m_waveView->m_sampleBuffer.sampleRate();
+	const double d2 = qAbs(m_relatedKnob->model()->value() - _v) * (m_waveView->m_sampleBuffer.frames())
+		/ m_waveView->m_sampleBuffer.sampleRate();
 
 	return d1 < d2 || d2 > 0.005;
 }

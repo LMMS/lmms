@@ -68,8 +68,8 @@ void AutomatableModelView::addDefaultActions(QMenu* menu)
 	const float valueToPaste = floatFromClipboard(&canPaste);
 	const QString pasteDesc = canPaste ? AutomatableModel::tr("&Paste value (%1%2)").arg(valueToPaste).arg(m_unit)
 									   : AutomatableModel::tr("&Paste value");
-	QAction* pasteAction =
-		menu->addAction(embed::getIconPixmap("edit_paste"), pasteDesc, amvSlots, SLOT(pasteFromClipboard()));
+	QAction* pasteAction
+		= menu->addAction(embed::getIconPixmap("edit_paste"), pasteDesc, amvSlots, SLOT(pasteFromClipboard()));
 	pasteAction->setEnabled(canPaste);
 
 	menu->addSeparator();

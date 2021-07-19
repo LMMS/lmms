@@ -302,12 +302,12 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	// Advanced settings button
 	PixmapButton* advancedButton = new PixmapButton(this, tr("Advanced settings"));
 	advancedButton->setToolTip(tr("Access advanced settings"));
-	QPixmap* advancedOnPixmap =
-		new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_on")
-						.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-	QPixmap* advancedOffPixmap =
-		new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_off")
-						.scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* advancedOnPixmap
+		= new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_on")
+						  .scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+	QPixmap* advancedOffPixmap
+		= new QPixmap(PLUGIN_NAME::getIconPixmap("advanced_off")
+						  .scaled(advButtonSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	advancedOnPixmap->setDevicePixelRatio(devicePixelRatio());
 	advancedOffPixmap->setDevicePixelRatio(devicePixelRatio());
 	advancedButton->setActiveGraphic(*advancedOnPixmap);

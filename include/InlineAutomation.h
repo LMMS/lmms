@@ -55,8 +55,8 @@ public:
 			// to be saved anyways) and no offset between the InValue and OutValue
 			AutomationPattern::timeMap::const_iterator firstNode = m_autoPattern->getTimeMap().begin();
 
-			if (isAtInitValue() && m_autoPattern->getTimeMap().size() == 1 && POS(firstNode) == 0 &&
-				INVAL(firstNode) == value() && OFFSET(firstNode) == 0)
+			if (isAtInitValue() && m_autoPattern->getTimeMap().size() == 1 && POS(firstNode) == 0
+				&& INVAL(firstNode) == value() && OFFSET(firstNode) == 0)
 			{
 				return false;
 			}

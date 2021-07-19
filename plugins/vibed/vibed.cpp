@@ -223,8 +223,8 @@ void vibed::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 {
 	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL)
 	{
-		_n->m_pluginData =
-			new stringContainer(_n->frequency(), Engine::mixer()->processingSampleRate(), __sampleLength);
+		_n->m_pluginData
+			= new stringContainer(_n->frequency(), Engine::mixer()->processingSampleRate(), __sampleLength);
 
 		for (int i = 0; i < 9; ++i)
 		{
@@ -314,21 +314,21 @@ vibedView::vibedView(Instrument* _instrument, QWidget* _parent)
 	m_impulse->move(23, 94);
 	ToolTip::add(m_impulse, tr("Impulse"));
 
-	m_harmonic =
-		new nineButtonSelector(PLUGIN_NAME::getIconPixmap("button_-2_on"), PLUGIN_NAME::getIconPixmap("button_-2_off"),
-			PLUGIN_NAME::getIconPixmap("button_-1_on"), PLUGIN_NAME::getIconPixmap("button_-1_off"),
-			PLUGIN_NAME::getIconPixmap("button_f_on"), PLUGIN_NAME::getIconPixmap("button_f_off"),
-			PLUGIN_NAME::getIconPixmap("button_2_on"), PLUGIN_NAME::getIconPixmap("button_2_off"),
-			PLUGIN_NAME::getIconPixmap("button_3_on"), PLUGIN_NAME::getIconPixmap("button_3_off"),
-			PLUGIN_NAME::getIconPixmap("button_4_on"), PLUGIN_NAME::getIconPixmap("button_4_off"),
-			PLUGIN_NAME::getIconPixmap("button_5_on"), PLUGIN_NAME::getIconPixmap("button_5_off"),
-			PLUGIN_NAME::getIconPixmap("button_6_on"), PLUGIN_NAME::getIconPixmap("button_6_off"),
-			PLUGIN_NAME::getIconPixmap("button_7_on"), PLUGIN_NAME::getIconPixmap("button_7_off"), 2, 21, 127, this);
+	m_harmonic = new nineButtonSelector(PLUGIN_NAME::getIconPixmap("button_-2_on"),
+		PLUGIN_NAME::getIconPixmap("button_-2_off"), PLUGIN_NAME::getIconPixmap("button_-1_on"),
+		PLUGIN_NAME::getIconPixmap("button_-1_off"), PLUGIN_NAME::getIconPixmap("button_f_on"),
+		PLUGIN_NAME::getIconPixmap("button_f_off"), PLUGIN_NAME::getIconPixmap("button_2_on"),
+		PLUGIN_NAME::getIconPixmap("button_2_off"), PLUGIN_NAME::getIconPixmap("button_3_on"),
+		PLUGIN_NAME::getIconPixmap("button_3_off"), PLUGIN_NAME::getIconPixmap("button_4_on"),
+		PLUGIN_NAME::getIconPixmap("button_4_off"), PLUGIN_NAME::getIconPixmap("button_5_on"),
+		PLUGIN_NAME::getIconPixmap("button_5_off"), PLUGIN_NAME::getIconPixmap("button_6_on"),
+		PLUGIN_NAME::getIconPixmap("button_6_off"), PLUGIN_NAME::getIconPixmap("button_7_on"),
+		PLUGIN_NAME::getIconPixmap("button_7_off"), 2, 21, 127, this);
 
 	m_harmonic->setWindowTitle(tr("Octave"));
 
-	m_stringSelector =
-		new nineButtonSelector(PLUGIN_NAME::getIconPixmap("button_1_on"), PLUGIN_NAME::getIconPixmap("button_1_off"),
+	m_stringSelector
+		= new nineButtonSelector(PLUGIN_NAME::getIconPixmap("button_1_on"), PLUGIN_NAME::getIconPixmap("button_1_off"),
 			PLUGIN_NAME::getIconPixmap("button_2_on"), PLUGIN_NAME::getIconPixmap("button_2_off"),
 			PLUGIN_NAME::getIconPixmap("button_3_on"), PLUGIN_NAME::getIconPixmap("button_3_off"),
 			PLUGIN_NAME::getIconPixmap("button_4_on"), PLUGIN_NAME::getIconPixmap("button_4_off"),

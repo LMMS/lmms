@@ -134,8 +134,9 @@ void Effect::reinitSRC()
 	{
 		if (m_srcState[i] != NULL) { src_delete(m_srcState[i]); }
 		int error;
-		if ((m_srcState[i] = src_new(
-				 Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error)) == NULL)
+		if ((m_srcState[i]
+				= src_new(Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error))
+			== NULL)
 		{
 			qFatal("Error: src_new() failed in effect.cpp!\n");
 		}

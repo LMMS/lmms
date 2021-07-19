@@ -122,8 +122,8 @@ void AutomationPattern::setProgressionType(ProgressionTypes _new_progression_typ
 {
 	QMutexLocker m(&m_patternMutex);
 
-	if (_new_progression_type == DiscreteProgression || _new_progression_type == LinearProgression ||
-		_new_progression_type == CubicHermiteProgression)
+	if (_new_progression_type == DiscreteProgression || _new_progression_type == LinearProgression
+		|| _new_progression_type == CubicHermiteProgression)
 	{
 		m_progressionType = _new_progression_type;
 		emit dataChanged();
@@ -481,8 +481,8 @@ float AutomationPattern::valueAt(timeMap::const_iterator v, int offset) const
 
 		auto t2 = pow(t, 2);
 		auto t3 = pow(t, 3);
-		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v) + (t3 - 2 * t2 + t) * m1 + (-2 * t3 + 3 * t2) * INVAL(v + 1) +
-			(t3 - t2) * m2;
+		return (2 * t3 - 3 * t2 + 1) * OUTVAL(v) + (t3 - 2 * t2 + t) * m1 + (-2 * t3 + 3 * t2) * INVAL(v + 1)
+			+ (t3 - t2) * m2;
 	}
 }
 

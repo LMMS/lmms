@@ -122,8 +122,8 @@ void TempoSyncKnob::updateDescAndIcon()
 		switch (model()->m_tempoSyncMode)
 		{
 		case TempoSyncKnobModel::SyncCustom:
-			m_tempoSyncDescription = tr("Custom ") + "(" + QString::number(model()->m_custom.numeratorModel().value()) +
-				"/" + QString::number(model()->m_custom.denominatorModel().value()) + ")";
+			m_tempoSyncDescription = tr("Custom ") + "(" + QString::number(model()->m_custom.numeratorModel().value())
+				+ "/" + QString::number(model()->m_custom.denominatorModel().value()) + ")";
 			break;
 		case TempoSyncKnobModel::SyncDoubleWholeNote: m_tempoSyncDescription = tr("Synced to Eight Beats"); break;
 		case TempoSyncKnobModel::SyncWholeNote: m_tempoSyncDescription = tr("Synced to Whole Note"); break;

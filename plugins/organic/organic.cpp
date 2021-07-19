@@ -198,9 +198,9 @@ void organicInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 			if (i == m_numOscillators - 1)
 			{
 				// create left oscillator
-				oscs_l[i] =
-					new Oscillator(&m_osc[i]->m_waveShape, &m_modulationAlgo, _n->frequency(), m_osc[i]->m_detuningLeft,
-						static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetLeft[i], m_osc[i]->m_volumeLeft);
+				oscs_l[i] = new Oscillator(&m_osc[i]->m_waveShape, &m_modulationAlgo, _n->frequency(),
+					m_osc[i]->m_detuningLeft, static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetLeft[i],
+					m_osc[i]->m_volumeLeft);
 				// create right oscillator
 				oscs_r[i] = new Oscillator(&m_osc[i]->m_waveShape, &m_modulationAlgo, _n->frequency(),
 					m_osc[i]->m_detuningRight, static_cast<oscPtr*>(_n->m_pluginData)->phaseOffsetRight[i],
@@ -461,13 +461,13 @@ void OscillatorObject::updateVolume()
 void OscillatorObject::updateDetuning()
 {
 	m_detuningLeft = powf(2.0f,
-						 organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())] +
-							 (float)m_detuneModel.value() * CENT) /
-		Engine::mixer()->processingSampleRate();
+						 organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())]
+							 + (float)m_detuneModel.value() * CENT)
+		/ Engine::mixer()->processingSampleRate();
 	m_detuningRight = powf(2.0f,
-						  organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())] -
-							  (float)m_detuneModel.value() * CENT) /
-		Engine::mixer()->processingSampleRate();
+						  organicInstrument::s_harmonics[static_cast<int>(m_harmModel.value())]
+							  - (float)m_detuneModel.value() * CENT)
+		/ Engine::mixer()->processingSampleRate();
 }
 
 extern "C"

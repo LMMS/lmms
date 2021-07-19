@@ -38,8 +38,8 @@ AudioDevice::AudioDevice(const ch_cnt_t _channels, Mixer* _mixer)
 	, m_buffer(new surroundSampleFrame[mixer()->framesPerPeriod()])
 {
 	int error;
-	if ((m_srcState = src_new(mixer()->currentQualitySettings().libsrcInterpolation(), SURROUND_CHANNELS, &error)) ==
-		NULL)
+	if ((m_srcState = src_new(mixer()->currentQualitySettings().libsrcInterpolation(), SURROUND_CHANNELS, &error))
+		== NULL)
 	{
 		printf("Error: src_new() failed in audio_device.cpp!\n");
 	}
@@ -117,8 +117,8 @@ void AudioDevice::applyQualitySettings()
 	src_delete(m_srcState);
 
 	int error;
-	if ((m_srcState = src_new(mixer()->currentQualitySettings().libsrcInterpolation(), SURROUND_CHANNELS, &error)) ==
-		NULL)
+	if ((m_srcState = src_new(mixer()->currentQualitySettings().libsrcInterpolation(), SURROUND_CHANNELS, &error))
+		== NULL)
 	{
 		printf("Error: src_new() failed in audio_device.cpp!\n");
 	}
@@ -158,8 +158,8 @@ int AudioDevice::convertToS16(const surroundSampleFrame* _ab, const fpp_t _frame
 		{
 			for (ch_cnt_t chnl = 0; chnl < channels(); ++chnl)
 			{
-				temp =
-					static_cast<int_sample_t>(Mixer::clip(_ab[frame][chnl] * _master_gain) * OUTPUT_SAMPLE_MULTIPLIER);
+				temp = static_cast<int_sample_t>(
+					Mixer::clip(_ab[frame][chnl] * _master_gain) * OUTPUT_SAMPLE_MULTIPLIER);
 
 				(_output_buffer + frame * channels())[chnl] = (temp & 0x00ff) << 8 | (temp & 0xff00) >> 8;
 			}
@@ -171,8 +171,8 @@ int AudioDevice::convertToS16(const surroundSampleFrame* _ab, const fpp_t _frame
 		{
 			for (ch_cnt_t chnl = 0; chnl < channels(); ++chnl)
 			{
-				(_output_buffer + frame * channels())[chnl] =
-					static_cast<int_sample_t>(Mixer::clip(_ab[frame][chnl] * _master_gain) * OUTPUT_SAMPLE_MULTIPLIER);
+				(_output_buffer + frame * channels())[chnl] = static_cast<int_sample_t>(
+					Mixer::clip(_ab[frame][chnl] * _master_gain) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 	}

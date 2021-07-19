@@ -40,13 +40,13 @@ class PixmapButton;
 
 const int NUM_OSCILLATORS = 8;
 const int NUM_HARMONICS = 18;
-const QString HARMONIC_NAMES[NUM_HARMONICS] = {"Octave below", "Fifth below", "Fundamental", "2nd harmonic",
-	"3rd harmonic", "4th harmonic", "5th harmonic", "6th harmonic", "7th harmonic", "8th harmonic", "9th harmonic",
-	"10th harmonic", "11th harmonic", "12th harmonic", "13th harmonic", "14th harmonic", "15th harmonic",
-	"16th harmonic"};
+const QString HARMONIC_NAMES[NUM_HARMONICS]
+	= {"Octave below", "Fifth below", "Fundamental", "2nd harmonic", "3rd harmonic", "4th harmonic", "5th harmonic",
+		"6th harmonic", "7th harmonic", "8th harmonic", "9th harmonic", "10th harmonic", "11th harmonic",
+		"12th harmonic", "13th harmonic", "14th harmonic", "15th harmonic", "16th harmonic"};
 
-const QString WAVEFORM_NAMES[6] = {
-	"Sine wave", "Saw wave", "Square wave", "Triangle wave", "Moog saw wave", "Exponential wave"};
+const QString WAVEFORM_NAMES[6]
+	= {"Sine wave", "Saw wave", "Square wave", "Triangle wave", "Moog saw wave", "Exponential wave"};
 
 const float CENT = 1.0f / 1200.0f;
 

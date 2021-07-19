@@ -294,8 +294,8 @@ void TrackContainerView::dropEvent(QDropEvent* _de)
 		// it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if (type == "samplefile" || type == "pluginpresetfile" || type == "soundfontfile" || type == "vstpluginfile" ||
-		type == "patchfile")
+	else if (type == "samplefile" || type == "pluginpresetfile" || type == "soundfontfile" || type == "vstpluginfile"
+		|| type == "patchfile")
 	{
 		InstrumentTrack* it = dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, m_tc));
 		PluginFactory::PluginInfoAndKey piakn = pluginFactory->pluginSupportingExtension(FileItem::extension(value));

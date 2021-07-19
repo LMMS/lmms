@@ -301,8 +301,8 @@ void GigInstrument::play(sampleFrame* _working_buffer)
 			// Delete if the ADSR for a sample is complete for normal
 			// notes, or if a release sample, then if we've reached
 			// the end of the sample
-			if (sample->sample == NULL || sample->adsr.done() ||
-				(it->isRelease == true && sample->pos >= sample->sample->SamplesTotal - 1))
+			if (sample->sample == NULL || sample->adsr.done()
+				|| (it->isRelease == true && sample->pos >= sample->sample->SamplesTotal - 1))
 			{
 				sample = it->samples.erase(sample);
 
@@ -489,8 +489,9 @@ void GigInstrument::loadSample(GigSample& sample, sampleFrame* sampleData, f_cnt
 		{
 			// libgig gives 24-bit data as little endian, so we must
 			// convert if on a big endian system
-			int32_t valueLeft = swap32IfBE((pInt[3 * sample.sample->Channels * i] << 8) |
-				(pInt[3 * sample.sample->Channels * i + 1] << 16) | (pInt[3 * sample.sample->Channels * i + 2] << 24));
+			int32_t valueLeft = swap32IfBE((pInt[3 * sample.sample->Channels * i] << 8)
+				| (pInt[3 * sample.sample->Channels * i + 1] << 16)
+				| (pInt[3 * sample.sample->Channels * i + 2] << 24));
 
 			// Store the notes to this buffer before saving to output
 			// so we can fade them out as needed
@@ -499,9 +500,9 @@ void GigInstrument::loadSample(GigSample& sample, sampleFrame* sampleData, f_cnt
 			if (sample.sample->Channels == 1) { sampleData[i][1] = sampleData[i][0]; }
 			else
 			{
-				int32_t valueRight = swap32IfBE((pInt[3 * sample.sample->Channels * i + 3] << 8) |
-					(pInt[3 * sample.sample->Channels * i + 4] << 16) |
-					(pInt[3 * sample.sample->Channels * i + 5] << 24));
+				int32_t valueRight = swap32IfBE((pInt[3 * sample.sample->Channels * i + 3] << 8)
+					| (pInt[3 * sample.sample->Channels * i + 4] << 16)
+					| (pInt[3 * sample.sample->Channels * i + 5] << 24));
 
 				sampleData[i][1] = 1.0 / 0x100000000 * sample.attenuation * valueRight;
 			}
@@ -572,11 +573,11 @@ void GigInstrument::addSamples(GigNote& gignote, bool wantReleaseSample)
 {
 	// Change key dimension, e.g. change samples based on what key is pressed
 	// in a certain range. From LinuxSampler
-	if (wantReleaseSample == true && gignote.midiNote >= m_instrument->DimensionKeyRange.low &&
-		gignote.midiNote <= m_instrument->DimensionKeyRange.high)
+	if (wantReleaseSample == true && gignote.midiNote >= m_instrument->DimensionKeyRange.low
+		&& gignote.midiNote <= m_instrument->DimensionKeyRange.high)
 	{
-		m_currentKeyDimension = float(gignote.midiNote - m_instrument->DimensionKeyRange.low) /
-			(m_instrument->DimensionKeyRange.high - m_instrument->DimensionKeyRange.low + 1);
+		m_currentKeyDimension = float(gignote.midiNote - m_instrument->DimensionKeyRange.low)
+			/ (m_instrument->DimensionKeyRange.high - m_instrument->DimensionKeyRange.low + 1);
 	}
 
 	gig::Region* pRegion = m_instrument->GetFirstRegion();

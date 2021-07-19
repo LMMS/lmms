@@ -66,15 +66,15 @@ const uint16_t LFSR_INIT = 1;
 const float DUTY_CYCLE[4] = {0.125, 0.25, 0.5, 0.75};
 const float DITHER_AMP = 1.0 / 60.0;
 const float MIN_FREQ = 10.0;
-const int TRIANGLE_WAVETABLE[32] = {
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+const int TRIANGLE_WAVETABLE[32]
+	= {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 
 const float NES_DIST = 0.9f; // simulate the slight nonlinear distortion in nes audio output
 
 const float NES_MIXING_12 = 1.0 / 20.0;
 const float NES_MIXING_34 = 1.0 / 12.0;
-const float NES_MIXING_ALL =
-	1.0 / (NES_MIXING_12 + NES_MIXING_34); // constants to simulate the hardwired mixing values for nes channels
+const float NES_MIXING_ALL
+	= 1.0 / (NES_MIXING_12 + NES_MIXING_34); // constants to simulate the hardwired mixing values for nes channels
 
 const int MIN_WLEN = 4;
 

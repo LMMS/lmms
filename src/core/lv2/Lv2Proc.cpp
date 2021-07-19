@@ -82,8 +82,8 @@ Plugin::PluginTypes Lv2Proc::check(const LilvPlugin* plugin, std::vector<PluginI
 		std::vector<PluginIssue> tmp = meta.get(plugin, portNum);
 		std::move(tmp.begin(), tmp.end(), std::back_inserter(issues));
 
-		bool portMustBeUsed =
-			!portIsSideChain(plugin, lilv_plugin_get_port_by_index(plugin, portNum)) && !meta.m_optional;
+		bool portMustBeUsed
+			= !portIsSideChain(plugin, lilv_plugin_get_port_by_index(plugin, portNum)) && !meta.m_optional;
 		if (meta.m_type == Lv2Ports::Type::Audio && portMustBeUsed)
 		{
 			++audioChannels[meta.m_flow == Lv2Ports::Flow::Output ? outCount : inCount];
@@ -309,8 +309,8 @@ void Lv2Proc::initPlugin()
 
 	createPorts();
 
-	m_instance =
-		lilv_plugin_instantiate(m_plugin, Engine::mixer()->processingSampleRate(), m_features.featurePointers());
+	m_instance
+		= lilv_plugin_instantiate(m_plugin, Engine::mixer()->processingSampleRate(), m_features.featurePointers());
 
 	if (m_instance)
 	{

@@ -206,8 +206,8 @@ void TimeLineWidget::paintEvent(QPaintEvent*)
 	QColor const& barNumberColor = getBarNumberColor();
 
 	bar_t barNumber = m_begin.getBar();
-	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
-		((static_cast<int>(m_begin * m_ppb) / TimePos::ticksPerBar()) % static_cast<int>(m_ppb));
+	int const x = m_xOffset + s_posMarkerPixmap->width() / 2
+		- ((static_cast<int>(m_begin * m_ppb) / TimePos::ticksPerBar()) % static_cast<int>(m_ppb));
 
 	for (int i = 0; x + i * m_ppb < width(); ++i)
 	{
@@ -260,8 +260,8 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 	else if (event->button() == Qt::RightButton)
 	{
 		m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const TimePos t =
-			m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
+		const TimePos t
+			= m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
 		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1]) / 2;
 
 		if (t < loopMid) { m_action = MoveLoopBegin; }
@@ -287,8 +287,8 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 void TimeLineWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
-	const TimePos t =
-		m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
+	const TimePos t
+		= m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * TimePos::ticksPerBar() / m_ppb);
 
 	switch (m_action)
 	{

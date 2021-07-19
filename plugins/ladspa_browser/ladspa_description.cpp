@@ -55,8 +55,8 @@ ladspaDescription::ladspaDescription(QWidget* _parent, ladspaPluginType _type)
 	QList<QString> pluginNames;
 	for (l_sortable_plugin_t::iterator it = plugins.begin(); it != plugins.end(); ++it)
 	{
-		if (_type != VALID ||
-			manager->getDescription((*it).second)->inputChannels <= Engine::mixer()->audioDev()->channels())
+		if (_type != VALID
+			|| manager->getDescription((*it).second)->inputChannels <= Engine::mixer()->audioDev()->channels())
 		{
 			pluginNames.push_back((*it).first);
 			m_pluginKeys.push_back((*it).second);
@@ -138,13 +138,13 @@ void ladspaDescription::update(const ladspa_key_t& _key)
 	copyrightLayout->addWidget(copyright_content, 1);
 
 	QLabel* requiresRealTime = new QLabel(description);
-	requiresRealTime->setText(QWidget::tr("Requires Real Time: ") +
-		(manager->hasRealTimeDependency(_key) ? QWidget::tr("Yes") : QWidget::tr("No")));
+	requiresRealTime->setText(QWidget::tr("Requires Real Time: ")
+		+ (manager->hasRealTimeDependency(_key) ? QWidget::tr("Yes") : QWidget::tr("No")));
 	layout->addWidget(requiresRealTime);
 
 	QLabel* realTimeCapable = new QLabel(description);
-	realTimeCapable->setText(QWidget::tr("Real Time Capable: ") +
-		(manager->isRealTimeCapable(_key) ? QWidget::tr("Yes") : QWidget::tr("No")));
+	realTimeCapable->setText(QWidget::tr("Real Time Capable: ")
+		+ (manager->isRealTimeCapable(_key) ? QWidget::tr("Yes") : QWidget::tr("No")));
 	layout->addWidget(realTimeCapable);
 
 	QLabel* inplaceBroken = new QLabel(description);

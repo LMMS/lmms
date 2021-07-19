@@ -41,9 +41,9 @@ inline stereoVolumeVector panningToVolumeVector(panning_t _p, float _scale = 1.0
 
 inline int panningToMidi(panning_t _p)
 {
-	return MidiMinPanning +
-		(int)(((float)(_p - PanningLeft)) / ((float)(PanningRight - PanningLeft)) *
-			((float)(MidiMaxPanning - MidiMinPanning)));
+	return MidiMinPanning
+		+ (int)(((float)(_p - PanningLeft)) / ((float)(PanningRight - PanningLeft))
+			* ((float)(MidiMaxPanning - MidiMinPanning)));
 }
 
 #endif

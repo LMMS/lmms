@@ -282,8 +282,8 @@ void VstPlugin::setParameterDump(const QMap<QString, QString>& _pdump)
 	m.addInt(_pdump.size());
 	for (QMap<QString, QString>::ConstIterator it = _pdump.begin(); it != _pdump.end(); ++it)
 	{
-		const VstParameterDumpItem item = {
-			(*it).section(':', 0, 0).toInt(), "", LocaleHelper::toFloat((*it).section(':', 2, -1))};
+		const VstParameterDumpItem item
+			= {(*it).section(':', 0, 0).toInt(), "", LocaleHelper::toFloat((*it).section(':', 2, -1))};
 		m.addInt(item.index);
 		m.addString(item.shortLabel);
 		m.addFloat(item.value);
@@ -351,8 +351,8 @@ bool VstPlugin::processMessage(const message& _m)
 			item.shortLabel = _m.getString(++p);
 			item.value = _m.getFloat(++p);
 			m_parameterDump["param" + QString::number(item.index)] = QString::number(item.index) + ":" +
-				/*uncomented*/ /*QString( item.shortLabel )*/ QString::fromStdString(item.shortLabel) + ":" +
-				QString::number(item.value);
+				/*uncomented*/ /*QString( item.shortLabel )*/ QString::fromStdString(item.shortLabel) + ":"
+				+ QString::number(item.value);
 		}
 		break;
 	}

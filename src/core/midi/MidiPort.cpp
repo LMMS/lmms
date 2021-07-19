@@ -125,8 +125,8 @@ void MidiPort::processOutEvent(const MidiEvent& event, const TimePos& time)
 	{
 		MidiEvent outEvent = event;
 
-		if (fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
-			(event.type() == MidiNoteOn || event.type() == MidiKeyPressure))
+		if (fixedOutputVelocity() >= 0 && event.velocity() > 0
+			&& (event.type() == MidiNoteOn || event.type() == MidiKeyPressure))
 		{
 			outEvent.setVelocity(fixedOutputVelocity());
 		}

@@ -278,8 +278,8 @@ int main(int argc, char** argv)
 	{
 		QString arg = argv[i];
 
-		if (arg == "--help" || arg == "-h" || arg == "--version" || arg == "-v" || arg == "render" ||
-			arg == "--render" || arg == "-r")
+		if (arg == "--help" || arg == "-h" || arg == "--version" || arg == "-v" || arg == "render" || arg == "--render"
+			|| arg == "-r")
 		{
 			coreOnly = true;
 		}
@@ -416,8 +416,8 @@ int main(int argc, char** argv)
 
 			return EXIT_SUCCESS;
 		}
-		else if (arg == "render" || arg == "--render" || arg == "-r" || arg == "rendertracks" ||
-			arg == "--rendertracks")
+		else if (arg == "render" || arg == "--render" || arg == "-r" || arg == "rendertracks"
+			|| arg == "--rendertracks")
 		{
 			++i;
 
@@ -807,8 +807,8 @@ int main(int argc, char** argv)
 		}
 		// If enabled, open last project if there is one. Else, create
 		// a new one.
-		else if (ConfigManager::inst()->value("app", "openlastproject").toInt() &&
-			!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() && !recoveryFilePresent)
+		else if (ConfigManager::inst()->value("app", "openlastproject").toInt()
+			&& !ConfigManager::inst()->recentlyOpenedProjects().isEmpty() && !recoveryFilePresent)
 		{
 			QString f = ConfigManager::inst()->recentlyOpenedProjects().first();
 			QFileInfo recentFile(f);

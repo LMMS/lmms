@@ -101,9 +101,9 @@ public:
 
 	panning_t panning() const
 	{
-		return (panning_t)(PanningLeft +
-			((float)(midiPanning() - MidiMinPanning)) / ((float)(MidiMaxPanning - MidiMinPanning)) *
-				((float)(PanningRight - PanningLeft)));
+		return (panning_t)(PanningLeft
+			+ ((float)(midiPanning() - MidiMinPanning)) / ((float)(MidiMaxPanning - MidiMinPanning))
+				* ((float)(PanningRight - PanningLeft)));
 	}
 	int16_t midiPanning() const { return m_data.m_param[1]; }
 

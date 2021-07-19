@@ -40,7 +40,7 @@
 
 PluginBrowser::PluginBrowser(QWidget* _parent)
 	: SideBarWidget(
-		  tr("Instrument Plugins"), embed::getIconPixmap("plugins").transformed(QTransform().rotate(90)), _parent)
+		tr("Instrument Plugins"), embed::getIconPixmap("plugins").transformed(QTransform().rotate(90)), _parent)
 {
 	setWindowTitle(tr("Instrument browser"));
 	m_view = new QWidget(contentParent());

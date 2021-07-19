@@ -32,10 +32,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Delay",
-		QT_TRANSLATE_NOOP("PluginBrowser", "A native delay plugin"),
-		"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
-		new PluginPixmapLoader("logo"), NULL, NULL};
+	Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "Delay", QT_TRANSLATE_NOOP("PluginBrowser", "A native delay plugin"),
+			"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
+			new PluginPixmapLoader("logo"), NULL, NULL};
 
 	DelayEffect::DelayEffect(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)
 		: Effect(&delay_plugin_descriptor, parent, key)

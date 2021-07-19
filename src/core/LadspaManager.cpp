@@ -62,8 +62,8 @@ LadspaManager::LadspaManager()
 		for (QFileInfoList::iterator file = list.begin(); file != list.end(); ++file)
 		{
 			const QFileInfo& f = *file;
-			if (!f.isFile() ||
-				f.fileName().right(3).toLower() !=
+			if (!f.isFile()
+				|| f.fileName().right(3).toLower() !=
 #ifdef LMMS_BUILD_WIN32
 					"dll"
 #else
@@ -78,8 +78,8 @@ LadspaManager::LadspaManager()
 
 			if (plugin_lib.load() == true)
 			{
-				LADSPA_Descriptor_Function descriptorFunction =
-					(LADSPA_Descriptor_Function)plugin_lib.resolve("ladspa_descriptor");
+				LADSPA_Descriptor_Function descriptorFunction
+					= (LADSPA_Descriptor_Function)plugin_lib.resolve("ladspa_descriptor");
 				if (descriptorFunction != NULL) { addPlugins(descriptorFunction, f.fileName()); }
 			}
 			else
@@ -153,8 +153,8 @@ uint16_t LadspaManager::getPluginInputs(const LADSPA_Descriptor* _descriptor)
 
 	for (uint16_t port = 0; port < _descriptor->PortCount; port++)
 	{
-		if (LADSPA_IS_PORT_INPUT(_descriptor->PortDescriptors[port]) &&
-			LADSPA_IS_PORT_AUDIO(_descriptor->PortDescriptors[port]))
+		if (LADSPA_IS_PORT_INPUT(_descriptor->PortDescriptors[port])
+			&& LADSPA_IS_PORT_AUDIO(_descriptor->PortDescriptors[port]))
 		{
 			QString name = QString(_descriptor->PortNames[port]);
 			if (name.toUpper().contains("IN")) { inputs++; }
@@ -169,8 +169,8 @@ uint16_t LadspaManager::getPluginOutputs(const LADSPA_Descriptor* _descriptor)
 
 	for (uint16_t port = 0; port < _descriptor->PortCount; port++)
 	{
-		if (LADSPA_IS_PORT_OUTPUT(_descriptor->PortDescriptors[port]) &&
-			LADSPA_IS_PORT_AUDIO(_descriptor->PortDescriptors[port]))
+		if (LADSPA_IS_PORT_OUTPUT(_descriptor->PortDescriptors[port])
+			&& LADSPA_IS_PORT_AUDIO(_descriptor->PortDescriptors[port]))
 		{
 			QString name = QString(_descriptor->PortNames[port]);
 			if (name.toUpper().contains("OUT")) { outputs++; }

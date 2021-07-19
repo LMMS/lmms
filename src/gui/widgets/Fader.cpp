@@ -194,8 +194,8 @@ void Fader::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 					   .arg(model()->minValue() * m_conversionFactor)
 					   .arg(model()->maxValue() * m_conversionFactor),
 				   model()->getRoundedValue() * m_conversionFactor, model()->minValue() * m_conversionFactor,
-				   model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok) /
-		m_conversionFactor;
+				   model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok)
+		/ m_conversionFactor;
 
 	if (ok) { model()->setValue(newValue); }
 }

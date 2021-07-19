@@ -1378,8 +1378,8 @@ void MonstroInstrument::updateEnvelope1()
 	else
 		m_env1_rel = 1.0f / (m_env1Rel.value() / 1000.0f) / m_samplerate;
 
-	m_env1_len =
-		(m_env1Pre.value() + m_env1Att.value() + m_env1Hold.value() + m_env1Dec.value()) * m_samplerate / 1000.0f;
+	m_env1_len
+		= (m_env1Pre.value() + m_env1Att.value() + m_env1Hold.value() + m_env1Dec.value()) * m_samplerate / 1000.0f;
 	m_env1_relF = m_env1Rel.value() * m_samplerate / 1000.0f;
 }
 void MonstroInstrument::updateEnvelope2()
@@ -1400,8 +1400,8 @@ void MonstroInstrument::updateEnvelope2()
 	else
 		m_env2_rel = 1.0f / (m_env2Rel.value() / 1000.0f) / m_samplerate;
 
-	m_env2_len =
-		(m_env2Pre.value() + m_env2Att.value() + m_env2Hold.value() + m_env2Dec.value()) * m_samplerate / 1000.0f;
+	m_env2_len
+		= (m_env2Pre.value() + m_env2Att.value() + m_env2Hold.value() + m_env2Dec.value()) * m_samplerate / 1000.0f;
 	m_env2_relF = m_env2Rel.value() * m_samplerate / 1000.0f;
 }
 
@@ -1670,7 +1670,8 @@ QWidget* MonstroView::setupOperatorsView(QWidget* _parent)
 	maketinyled(m_osc3SyncHButton, 212, O3ROW - 3, tr("Hard sync oscillator 3"))
 		maketinyled(m_osc3SyncRButton, 191, O3ROW - 3, tr("Reverse sync oscillator 3"))
 
-			m_lfo1WaveBox = new ComboBox(view);
+			m_lfo1WaveBox
+		= new ComboBox(view);
 	m_lfo1WaveBox->setGeometry(2, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT);
 	m_lfo1WaveBox->setFont(pointSize<8>(m_lfo1WaveBox->font()));
 
@@ -1678,7 +1679,8 @@ QWidget* MonstroView::setupOperatorsView(QWidget* _parent)
 		maketsknob(m_lfo1RateKnob, LFOCOL2, LFOROW, tr("Rate"), " ms", "lfoKnob")
 			makeknob(m_lfo1PhsKnob, LFOCOL3, LFOROW, tr("Phase"), tr(" deg"), "lfoKnob")
 
-				m_lfo2WaveBox = new ComboBox(view);
+				m_lfo2WaveBox
+		= new ComboBox(view);
 	m_lfo2WaveBox->setGeometry(127, LFOROW + 7, 42, ComboBox::DEFAULT_HEIGHT);
 	m_lfo2WaveBox->setFont(pointSize<8>(m_lfo2WaveBox->font()));
 
@@ -1702,7 +1704,8 @@ QWidget* MonstroView::setupOperatorsView(QWidget* _parent)
 												makeknob(m_env2SlopeKnob, KNOBCOL7, E2ROW, tr("Slope"), "", "envKnob")
 
 		// mod selector
-		PixmapButton* m_mixButton = new PixmapButton(view, NULL);
+		PixmapButton* m_mixButton
+		= new PixmapButton(view, NULL);
 	m_mixButton->move(225, 185);
 	m_mixButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("mix_active"));
 	m_mixButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("mix_inactive"));

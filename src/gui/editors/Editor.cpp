@@ -95,8 +95,8 @@ Editor::Editor(bool record, bool stepRecord)
 
 	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
 	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
-	m_toggleStepRecordingAction =
-		new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
+	m_toggleStepRecordingAction
+		= new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);
 
 	// Set up connections
 	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));

@@ -453,8 +453,8 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 	QList<QAction*> result = QList<QAction*>();
 	const bool fileIsSample = file->type() == FileItem::SampleFile;
 
-	QString instrumentAction =
-		fileIsSample ? tr("Send to new AudioFileProcessor instance") : tr("Send to new instrument track");
+	QString instrumentAction
+		= fileIsSample ? tr("Send to new AudioFileProcessor instance") : tr("Send to new instrument track");
 	QString shortcutMod = songEditor ? "" : UI_CTRL_KEY + QString(" + ");
 
 	QAction* toInstrument = new QAction(instrumentAction + tr(" (%2Enter)").arg(shortcutMod), nullptr);
@@ -521,8 +521,8 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		newPPH = s;
 		delete tf;
 	}
-	else if ((ext == "xiz" || ext == "sf2" || ext == "sf3" || ext == "gig" || ext == "pat") &&
-		!pluginFactory->pluginSupportingExtension(ext).isNull())
+	else if ((ext == "xiz" || ext == "sf2" || ext == "sf3" || ext == "gig" || ext == "pat")
+		&& !pluginFactory->pluginSupportingExtension(ext).isNull())
 	{
 		const bool isPlugin = file->handling() == FileItem::LoadByPlugin;
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
@@ -668,8 +668,8 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem* item, int column)
 	}
 	else if (f->handling() != FileItem::NotSupported)
 	{
-		InstrumentTrack* it =
-			dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer()));
+		InstrumentTrack* it
+			= dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer()));
 		handleFile(f, it);
 	}
 }

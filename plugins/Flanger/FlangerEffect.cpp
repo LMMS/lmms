@@ -31,10 +31,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Flanger",
-		QT_TRANSLATE_NOOP("PluginBrowser", "A native flanger plugin"),
-		"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
-		new PluginPixmapLoader("logo"), NULL, NULL};
+	Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "Flanger", QT_TRANSLATE_NOOP("PluginBrowser", "A native flanger plugin"),
+			"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
+			new PluginPixmapLoader("logo"), NULL, NULL};
 
 	FlangerEffect::FlangerEffect(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)
 		: Effect(&flanger_plugin_descriptor, parent, key)

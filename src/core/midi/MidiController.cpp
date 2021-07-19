@@ -72,8 +72,8 @@ void MidiController::processInEvent(const MidiEvent& event, const TimePos& time,
 	case MidiControlChange:
 		controllerNum = event.controllerNumber();
 
-		if (m_midiPort.inputController() == controllerNum + 1 &&
-			(m_midiPort.inputChannel() == event.channel() + 1 || m_midiPort.inputChannel() == 0))
+		if (m_midiPort.inputController() == controllerNum + 1
+			&& (m_midiPort.inputChannel() == event.channel() + 1 || m_midiPort.inputChannel() == 0))
 		{
 			unsigned char val = event.controllerValue();
 			m_previousValue = m_lastValue;

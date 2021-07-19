@@ -35,18 +35,18 @@ Ladspa2LMMS::Ladspa2LMMS()
 		ladspaManagerDescription* desc = getDescription(key);
 
 		if (desc->type == SOURCE) { m_instruments.append(qMakePair(getName(key), key)); }
-		else if (desc->type == TRANSFER &&
-			(desc->inputChannels == desc->outputChannels &&
-				(desc->inputChannels == 1 || desc->inputChannels == 2 || desc->inputChannels == 4) /* &&
-																 isRealTimeCapable( key )*/
+		else if (desc->type == TRANSFER
+			&& (desc->inputChannels == desc->outputChannels
+				&& (desc->inputChannels == 1 || desc->inputChannels == 2 || desc->inputChannels == 4) /* &&
+																	isRealTimeCapable( key )*/
 				))
 		{
 			m_validEffects.append(qMakePair(getName(key), key));
 		}
-		else if (desc->type == TRANSFER &&
-			(desc->inputChannels != desc->outputChannels ||
-				(desc->inputChannels != 1 && desc->inputChannels != 2 && desc->inputChannels != 4) ||
-				!isRealTimeCapable(key)))
+		else if (desc->type == TRANSFER
+			&& (desc->inputChannels != desc->outputChannels
+				|| (desc->inputChannels != 1 && desc->inputChannels != 2 && desc->inputChannels != 4)
+				|| !isRealTimeCapable(key)))
 		{
 			m_invalidEffects.append(qMakePair(getName(key), key));
 		}

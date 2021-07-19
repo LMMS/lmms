@@ -49,7 +49,7 @@
 AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 	: AudioDevice(qBound<ch_cnt_t>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiosndio", "channels").toInt(),
 					  SURROUND_CHANNELS),
-		  _mixer)
+		_mixer)
 	, m_convertEndian(false)
 {
 	_success_ful = false;
@@ -92,8 +92,8 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 		return;
 	}
 
-	if (reqpar.pchan != m_par.pchan || reqpar.bits != m_par.bits || reqpar.le != m_par.le ||
-		(::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100) / reqpar.rate > 2)
+	if (reqpar.pchan != m_par.pchan || reqpar.bits != m_par.bits || reqpar.le != m_par.le
+		|| (::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100) / reqpar.rate > 2)
 	{
 		printf("sndio: returned params not as requested\n");
 		return;

@@ -37,8 +37,8 @@
 #include "lmmsversion.h"
 
 // Vector with all the upgrade methods
-const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
-	&ConfigManager::upgrade_1_1_90, &ConfigManager::upgrade_1_1_91};
+const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS
+	= {&ConfigManager::upgrade_1_1_90, &ConfigManager::upgrade_1_1_91};
 
 static inline QString ensureTrailingSlash(const QString& s)
 {
@@ -202,8 +202,8 @@ void ConfigManager::createWorkingDir()
 void ConfigManager::addRecentlyOpenedProject(const QString& file)
 {
 	QFileInfo recentFile(file);
-	if (recentFile.suffix().toLower() == "mmp" || recentFile.suffix().toLower() == "mmpz" ||
-		recentFile.suffix().toLower() == "mpt")
+	if (recentFile.suffix().toLower() == "mmp" || recentFile.suffix().toLower() == "mmpz"
+		|| recentFile.suffix().toLower() == "mpt")
 	{
 		m_recentlyOpenedProjects.removeAll(file);
 		if (m_recentlyOpenedProjects.size() > 50) { m_recentlyOpenedProjects.removeLast(); }
@@ -375,8 +375,8 @@ void ConfigManager::loadConfigFile(const QString& configFile)
 	}
 
 	// Plugins are searched recursively, blacklist problematic locations
-	if (m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
-		m_vstDir == ensureTrailingSlash(QDir::homePath()) || !QDir(m_vstDir).exists())
+	if (m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/"
+		|| m_vstDir == ensureTrailingSlash(QDir::homePath()) || !QDir(m_vstDir).exists())
 	{
 #ifdef LMMS_BUILD_WIN32
 		QString programFiles = QString::fromLocal8Bit(getenv("ProgramFiles"));

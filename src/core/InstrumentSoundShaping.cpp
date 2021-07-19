@@ -41,13 +41,13 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const char* const InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] = {
-	{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
-		QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume")},
-	{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
-		QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency")},
-	{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
-		QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance")}};
+const char* const InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3]
+	= {{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "VOLUME"), "vol",
+		   QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Volume")},
+		{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "CUTOFF"), "cut",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Cutoff frequency")},
+		{QT_TRANSLATE_NOOP("InstrumentSoundShaping", "RESO"), "res",
+			QT_TRANSLATE_NOOP("InstrumentSoundShaping", "Resonance")}};
 
 InstrumentSoundShaping::InstrumentSoundShaping(InstrumentTrack* _instrument_track)
 	: Model(_instrument_track, tr("Envelopes/LFOs"))
@@ -151,13 +151,13 @@ void InstrumentSoundShaping::processAudioBuffer(sampleFrame* buffer, const fpp_t
 		{
 			for (fpp_t frame = 0; frame < frames; ++frame)
 			{
-				const float new_cut_val =
-					EnvelopeAndLfoParameters::expKnobVal(cutBuffer[frame]) * CUT_FREQ_MULTIPLIER + fcv;
+				const float new_cut_val
+					= EnvelopeAndLfoParameters::expKnobVal(cutBuffer[frame]) * CUT_FREQ_MULTIPLIER + fcv;
 
 				const float new_res_val = frv + RES_MULTIPLIER * resBuffer[frame];
 
-				if (static_cast<int>(new_cut_val) != old_filter_cut ||
-					static_cast<int>(new_res_val * RES_PRECISION) != old_filter_res)
+				if (static_cast<int>(new_cut_val) != old_filter_cut
+					|| static_cast<int>(new_res_val * RES_PRECISION) != old_filter_res)
 				{
 					n->m_filter->calcFilterCoeffs(new_cut_val, new_res_val);
 					old_filter_cut = static_cast<int>(new_cut_val);

@@ -196,10 +196,10 @@ void lb302Filter3Pole::envRecalc()
 	// sampleRateCutoff should not be changed to anything dynamic that is outside the
 	// scope of lb302 (like e.g. the mixers sample rate) as this changes the filters cutoff
 	// behavior without any modification to its controls.
-	kfco = 50.f +
-		(k) *
-			((2300.f - 1600.f * (fs->envmod)) +
-				(w) * (700.f + 1500.f * (k) + (1500.f + (k) * (sampleRateCutoff / 2.f - 6000.f)) * (fs->envmod)));
+	kfco = 50.f
+		+ (k)
+			* ((2300.f - 1600.f * (fs->envmod))
+				+ (w) * (700.f + 1500.f * (k) + (1500.f + (k) * (sampleRateCutoff / 2.f - 6000.f)) * (fs->envmod)));
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
 #ifdef LB_24_IGNORE_ENVELOPE
@@ -446,8 +446,8 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 			{
 				vco_inc = vco_slidebase - vco_slide;
 				// Calculate coeff from dec_knob on knob change.
-				vco_slide -=
-					vco_slide * (0.1f - slide_dec_knob.value() * 0.0999f) * sampleRatio; // TODO: Adjust for ENVINC
+				vco_slide
+					-= vco_slide * (0.1f - slide_dec_knob.value() * 0.0999f) * sampleRatio; // TODO: Adjust for ENVINC
 			}
 		}
 
@@ -521,26 +521,25 @@ int lb302Synth::process(sampleFrame* outbuf, const int size)
 		case WHITE_NOISE: vco_k = 0.5 * Oscillator::noiseSample(vco_c); break;
 
 		case BL_SAWTOOTH:
-			vco_k =
-				BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLSaw) *
-				0.5f;
+			vco_k = BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLSaw)
+				* 0.5f;
 			break;
 
 		case BL_SQUARE:
-			vco_k =
-				BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLSquare) *
-				0.5f;
+			vco_k
+				= BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLSquare)
+				* 0.5f;
 			break;
 
 		case BL_TRIANGLE:
 			vco_k = BandLimitedWave::oscillate(
-						vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLTriangle) *
-				0.5f;
+						vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLTriangle)
+				* 0.5f;
 			break;
 
 		case BL_MOOG:
-			vco_k =
-				BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLMoog);
+			vco_k
+				= BandLimitedWave::oscillate(vco_c + 0.5f, BandLimitedWave::pdToLen(vco_inc), BandLimitedWave::BLMoog);
 			break;
 		}
 

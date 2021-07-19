@@ -73,8 +73,8 @@ void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdSpinBox::mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier) &&
-		event->y() < cellHeight() + 2)
+	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier)
+		&& event->y() < cellHeight() + 2)
 	{
 		m_mouseMoving = true;
 		m_lastMousePos = event->globalPos();

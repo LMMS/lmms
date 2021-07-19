@@ -189,8 +189,8 @@ void EffectSelectDialog::rowChanged(const QModelIndex& _idx, const QModelIndex&)
 		{
 			QLabel* label = new QLabel(m_descriptionWidget);
 			QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
-			labelText += "<p><b>" + tr("Description") + ":</b> " +
-				qApp->translate("PluginBrowser", descriptor.description) + "</p>";
+			labelText += "<p><b>" + tr("Description") + ":</b> "
+				+ qApp->translate("PluginBrowser", descriptor.description) + "</p>";
 			labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
 
 			label->setText(labelText);

@@ -672,13 +672,15 @@ NesInstrumentView::NesInstrumentView(Instrument* instrument, QWidget* parent)
 								makeknob(m_ch1SweepAmtKnob, KNOB_X6, KNOB_Y1, tr("Sweep amount"), "", "")
 									makeknob(m_ch1SweepRateKnob, KNOB_X7, KNOB_Y1, tr("Sweep rate"), "", "")
 
-										int dcx = 117;
+										int dcx
+		= 117;
 	makedcled(ch1_dc1, dcx, 42, tr("12.5% Duty cycle"), "nesdc1_on") dcx += 13;
 	makedcled(ch1_dc2, dcx, 42, tr("25% Duty cycle"), "nesdc2_on") dcx += 13;
 	makedcled(ch1_dc3, dcx, 42, tr("50% Duty cycle"), "nesdc3_on") dcx += 13;
 	makedcled(ch1_dc4, dcx, 42, tr("75% Duty cycle"), "nesdc4_on")
 
-		m_ch1DutyCycleGrp = new automatableButtonGroup(this);
+		m_ch1DutyCycleGrp
+		= new automatableButtonGroup(this);
 	m_ch1DutyCycleGrp->addButton(ch1_dc1);
 	m_ch1DutyCycleGrp->addButton(ch1_dc2);
 	m_ch1DutyCycleGrp->addButton(ch1_dc3);
@@ -698,13 +700,15 @@ NesInstrumentView::NesInstrumentView(Instrument* instrument, QWidget* parent)
 								makeknob(m_ch2SweepAmtKnob, KNOB_X6, KNOB_Y2, tr("Sweep amount"), "", "")
 									makeknob(m_ch2SweepRateKnob, KNOB_X7, KNOB_Y2, tr("Sweep rate"), "", "")
 
-										dcx = 117;
+										dcx
+		= 117;
 	makedcled(ch2_dc1, dcx, 99, tr("12.5% Duty cycle"), "nesdc1_on") dcx += 13;
 	makedcled(ch2_dc2, dcx, 99, tr("25% Duty cycle"), "nesdc2_on") dcx += 13;
 	makedcled(ch2_dc3, dcx, 99, tr("50% Duty cycle"), "nesdc3_on") dcx += 13;
 	makedcled(ch2_dc4, dcx, 99, tr("75% Duty cycle"), "nesdc4_on")
 
-		m_ch2DutyCycleGrp = new automatableButtonGroup(this);
+		m_ch2DutyCycleGrp
+		= new automatableButtonGroup(this);
 	m_ch2DutyCycleGrp->addButton(ch2_dc1);
 	m_ch2DutyCycleGrp->addButton(ch2_dc2);
 	m_ch2DutyCycleGrp->addButton(ch2_dc3);

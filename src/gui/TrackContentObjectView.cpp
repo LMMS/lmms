@@ -152,8 +152,8 @@ void TrackContentObjectView::update()
 	if (!m_cursorSetYet)
 	{
 		m_cursorHand = QCursor(embed::getIconPixmap("hand"), m_mouseHotspotHand.width(), m_mouseHotspotHand.height());
-		m_cursorKnife =
-			QCursor(embed::getIconPixmap("cursor_knife"), m_mouseHotspotKnife.width(), m_mouseHotspotKnife.height());
+		m_cursorKnife
+			= QCursor(embed::getIconPixmap("cursor_knife"), m_mouseHotspotKnife.width(), m_mouseHotspotKnife.height());
 		setCursor(m_cursorHand);
 		m_cursorSetYet = true;
 	}
@@ -253,9 +253,9 @@ void TrackContentObjectView::updateLength()
 	if (fixedTCOs()) { setFixedWidth(parentWidget()->width()); }
 	else
 	{
-		setFixedWidth(static_cast<int>(m_tco->length() * pixelsPerBar() / TimePos::ticksPerBar()) +
-			1 /*+
-						TCO_BORDER_WIDTH * 2-1*/
+		setFixedWidth(static_cast<int>(m_tco->length() * pixelsPerBar() / TimePos::ticksPerBar())
+			+ 1 /*+
+						  TCO_BORDER_WIDTH * 2-1*/
 		);
 	}
 	m_trackView->trackContainerView()->update();
@@ -364,8 +364,8 @@ void TrackContentObjectView::updateCursor(QMouseEvent* me)
 	SampleTCO* sTco = dynamic_cast<SampleTCO*>(m_tco);
 
 	// If we are at the edges, use the resize cursor
-	if ((me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize()) ||
-		(me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize()))
+	if ((me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize())
+		|| (me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize()))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
@@ -734,8 +734,8 @@ void TrackContentObjectView::mouseMoveEvent(QMouseEvent* me)
 				const int x = mapToParent(me->pos()).x() - m_initialMousePos.x();
 
 				TimePos t = qMax(0,
-					(int)m_trackView->trackContainerView()->currentPosition() +
-						static_cast<int>(x * TimePos::ticksPerBar() / ppb));
+					(int)m_trackView->trackContainerView()->currentPosition()
+						+ static_cast<int>(x * TimePos::ticksPerBar() / ppb));
 
 				if (unquantizedModHeld(me))
 				{ // We want to preserve this adjusted offset,
@@ -1197,8 +1197,8 @@ TimePos TrackContentObjectView::quantizeSplitPos(TimePos midiPos, bool shiftMode
 QColor TrackContentObjectView::getColorForDisplay(QColor defaultColor)
 {
 	// Get the pure TCO color
-	auto tcoColor =
-		m_tco->hasColor() ? m_tco->usesCustomClipColor() ? m_tco->color() : m_tco->getTrack()->color() : defaultColor;
+	auto tcoColor
+		= m_tco->hasColor() ? m_tco->usesCustomClipColor() ? m_tco->color() : m_tco->getTrack()->color() : defaultColor;
 
 	// Set variables
 	QColor c, mutedCustomColor;

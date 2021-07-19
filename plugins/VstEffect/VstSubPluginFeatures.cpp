@@ -59,14 +59,14 @@ void VstSubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor* _desc, Ke
 
 void VstSubPluginFeatures::addPluginsFromDir(QStringList* filenames, QString path) const
 {
-	QStringList dirs =
-		QDir(ConfigManager::inst()->vstDir() + path).entryList(QStringList() << "*", QDir::Dirs, QDir::Name);
+	QStringList dirs
+		= QDir(ConfigManager::inst()->vstDir() + path).entryList(QStringList() << "*", QDir::Dirs, QDir::Name);
 	for (int i = 0; i < dirs.size(); i++)
 	{
 		if (dirs.at(i)[0] != '.') { addPluginsFromDir(filenames, path + QDir::separator() + dirs.at(i)); }
 	}
-	QStringList dlls =
-		QDir(ConfigManager::inst()->vstDir() + path).entryList(QStringList() << "*.dll", QDir::Files, QDir::Name);
+	QStringList dlls
+		= QDir(ConfigManager::inst()->vstDir() + path).entryList(QStringList() << "*.dll", QDir::Files, QDir::Name);
 	for (int i = 0; i < dlls.size(); i++)
 	{
 		QString fName = path + QDir::separator() + dlls.at(i);

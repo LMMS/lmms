@@ -41,9 +41,9 @@
 #include "gui_templates.h"
 
 AudioJack::AudioJack(bool& _success_ful, Mixer* _mixer)
-	: AudioDevice(qBound<int>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiojack", "channels").toInt(),
-					  SURROUND_CHANNELS),
-		  _mixer)
+	: AudioDevice(
+		qBound<int>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiojack", "channels").toInt(), SURROUND_CHANNELS),
+		_mixer)
 	, m_client(NULL)
 	, m_active(false)
 	, m_midiClient(NULL)
@@ -219,8 +219,8 @@ void AudioJack::registerPort(AudioPort* _port)
 
 	for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 	{
-		m_portMap[_port].ports[ch] =
-			jack_port_register(m_client, name[ch].toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+		m_portMap[_port].ports[ch] = jack_port_register(
+			m_client, name[ch].toLatin1().constData(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 	}
 #endif
 }
@@ -280,8 +280,8 @@ int AudioJack::processCallback(jack_nframes_t _nframes, void* _udata)
 		for (ch_cnt_t ch = 0; ch < channels(); ++ch)
 		{
 			if (it.value().ports[ch] == NULL) { continue; }
-			jack_default_audio_sample_t* buf =
-				(jack_default_audio_sample_t*)jack_port_get_buffer(it.value().ports[ch], _nframes);
+			jack_default_audio_sample_t* buf
+				= (jack_default_audio_sample_t*)jack_port_get_buffer(it.value().ports[ch], _nframes);
 			for (int frame = 0; frame < frames; ++frame)
 			{
 				buf[frame] = it.key()->buffer()[frame][ch];

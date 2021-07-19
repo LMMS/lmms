@@ -160,8 +160,8 @@ void NotePlayHandle::play(sampleFrame* _working_buffer)
 	 * which results in a note-on message being sent without a subsequent note-off message.
 	 * Therefore, we check here whether the note has already been released before sending
 	 * the note-on message. */
-	if (!m_released && m_totalFramesPlayed == 0 && !m_hasMidiNote &&
-		(hasParent() || !m_instrumentTrack->isArpeggioEnabled()))
+	if (!m_released && m_totalFramesPlayed == 0 && !m_hasMidiNote
+		&& (hasParent() || !m_instrumentTrack->isArpeggioEnabled()))
 	{
 		m_hasMidiNote = true;
 
@@ -175,12 +175,12 @@ void NotePlayHandle::play(sampleFrame* _working_buffer)
 	if (m_frequencyNeedsUpdate) { updateFrequency(); }
 
 	// number of frames that can be played this period
-	f_cnt_t framesThisPeriod =
-		m_totalFramesPlayed == 0 ? Engine::mixer()->framesPerPeriod() - offset() : Engine::mixer()->framesPerPeriod();
+	f_cnt_t framesThisPeriod
+		= m_totalFramesPlayed == 0 ? Engine::mixer()->framesPerPeriod() - offset() : Engine::mixer()->framesPerPeriod();
 
 	// check if we start release during this period
-	if (m_released == false && instrumentTrack()->isSustainPedalPressed() == false &&
-		m_totalFramesPlayed + framesThisPeriod > m_frames)
+	if (m_released == false && instrumentTrack()->isSustainPedalPressed() == false
+		&& m_totalFramesPlayed + framesThisPeriod > m_frames)
 	{
 		noteOff(m_totalFramesPlayed == 0
 				? (m_frames + offset()) // if we have noteon and noteoff during the same period, take offset in account
@@ -370,8 +370,8 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack(const InstrumentTr
 	for (PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it)
 	{
 		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle*>(*it);
-		if (nph != NULL && nph->m_instrumentTrack == _it &&
-			((nph->isReleased() == false && nph->hasParent() == false) || _all_ph == true))
+		if (nph != NULL && nph->m_instrumentTrack == _it
+			&& ((nph->isReleased() == false && nph->hasParent() == false) || _all_ph == true))
 		{
 			cnphv.push_back(nph);
 		}
@@ -381,11 +381,11 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack(const InstrumentTr
 
 bool NotePlayHandle::operator==(const NotePlayHandle& _nph) const
 {
-	return length() == _nph.length() && pos() == _nph.pos() && key() == _nph.key() && getVolume() == _nph.getVolume() &&
-		getPanning() == _nph.getPanning() && m_instrumentTrack == _nph.m_instrumentTrack && m_frames == _nph.m_frames &&
-		offset() == _nph.offset() && m_totalFramesPlayed == _nph.m_totalFramesPlayed && m_released == _nph.m_released &&
-		m_hasParent == _nph.m_hasParent && m_origBaseNote == _nph.m_origBaseNote && m_muted == _nph.m_muted &&
-		m_midiChannel == _nph.m_midiChannel && m_origin == _nph.m_origin;
+	return length() == _nph.length() && pos() == _nph.pos() && key() == _nph.key() && getVolume() == _nph.getVolume()
+		&& getPanning() == _nph.getPanning() && m_instrumentTrack == _nph.m_instrumentTrack && m_frames == _nph.m_frames
+		&& offset() == _nph.offset() && m_totalFramesPlayed == _nph.m_totalFramesPlayed && m_released == _nph.m_released
+		&& m_hasParent == _nph.m_hasParent && m_origBaseNote == _nph.m_origBaseNote && m_muted == _nph.m_muted
+		&& m_midiChannel == _nph.m_midiChannel && m_origin == _nph.m_origin;
 }
 
 void NotePlayHandle::updateFrequency()

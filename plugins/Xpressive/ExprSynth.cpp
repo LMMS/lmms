@@ -247,8 +247,8 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 		const unsigned int sa = irseed / data_size;
 		unsigned int res = rotateLeft(
 			random_data[(xi + 23 * si + 1) % data_size] ^ random_data[(xi / data_size + sa) % data_size], sa % 31 + 1);
-		res ^= rotateLeft(random_data[(3 * xi + si + 13) % data_size], (xi + 2 * si) % 32) ^
-			rotateLeft(random_data[(xi / data_size + 2 * sa) % data_size], xi % 31 + 1);
+		res ^= rotateLeft(random_data[(3 * xi + si + 13) % data_size], (xi + 2 * si) % 32)
+			^ rotateLeft(random_data[(xi / data_size + 2 * sa) % data_size], xi % 31 + 1);
 		return static_cast<int>(res) / (float)(1 << 31);
 	}
 
@@ -617,8 +617,8 @@ ExprSynth::ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSam
 	m_note_sample_sec = 0;
 	m_released = 0;
 	m_frequency = m_nph->frequency();
-	m_rel_inc =
-		1000.0 / (m_sample_rate * m_rel_transition); // rel_transition in ms. compute how much increment in each frame
+	m_rel_inc
+		= 1000.0 / (m_sample_rate * m_rel_transition); // rel_transition in ms. compute how much increment in each frame
 
 	auto init_expression_step2 = [this](ExprFront* e) {
 		e->add_cyclic_vector("W1", m_W1->m_samples, m_W1->m_length, m_W1->m_interpolate);

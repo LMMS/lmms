@@ -32,16 +32,16 @@ const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;
 const float CUTOFF_RATIO = 0.353553391f;
 const int SILENCEFRAMES = 10;
-const float OS_RESAMPLE[5] = {
-	0.0001490062883964112, 0.1645978376763992, 0.6705063120704088, 0.1645978376763992, 0.0001490062883964112};
+const float OS_RESAMPLE[5]
+	= {0.0001490062883964112, 0.1645978376763992, 0.6705063120704088, 0.1645978376763992, 0.0001490062883964112};
 
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Bitcrush",
-		QT_TRANSLATE_NOOP("PluginBrowser", "An oversampling bitcrusher"),
-		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
-		NULL};
+	Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "Bitcrush", QT_TRANSLATE_NOOP("PluginBrowser", "An oversampling bitcrusher"),
+			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"),
+			NULL, NULL};
 }
 
 BitcrushEffect::BitcrushEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)

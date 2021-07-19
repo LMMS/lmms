@@ -31,10 +31,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Multitap Echo",
-		QT_TRANSLATE_NOOP("PluginBrowser", "A multitap echo delay plugin"),
-		"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
-		NULL};
+	Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "Multitap Echo", QT_TRANSLATE_NOOP("PluginBrowser", "A multitap echo delay plugin"),
+			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"),
+			NULL, NULL};
 }
 
 MultitapEchoEffect::MultitapEchoEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)

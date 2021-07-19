@@ -346,8 +346,8 @@ void SampleTCOView::dropEvent(QDropEvent* _de)
 
 void SampleTCOView::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() == Qt::LeftButton && _me->modifiers() & Qt::ControlModifier &&
-		_me->modifiers() & Qt::ShiftModifier)
+	if (_me->button() == Qt::LeftButton && _me->modifiers() & Qt::ControlModifier
+		&& _me->modifiers() & Qt::ShiftModifier)
 	{
 		m_tco->toggleRecord();
 	}
@@ -567,15 +567,15 @@ bool SampleTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t
 				if (sTco->isPlaying() == false && _start >= (sTco->startPosition() + sTco->startTimeOffset()))
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick(sTco->sampleBuffer()->sampleRate());
-					f_cnt_t sampleStart =
-						bufferFramesPerTick * (_start - sTco->startPosition() - sTco->startTimeOffset());
-					f_cnt_t tcoFrameLength =
-						bufferFramesPerTick * (sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset());
+					f_cnt_t sampleStart
+						= bufferFramesPerTick * (_start - sTco->startPosition() - sTco->startTimeOffset());
+					f_cnt_t tcoFrameLength
+						= bufferFramesPerTick * (sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset());
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					// if the Tco smaller than the sample length we play only until Tco end
 					// else we play the sample to the end but nothing more
-					f_cnt_t samplePlayLength =
-						tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
+					f_cnt_t samplePlayLength
+						= tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
 					// we only play within the sampleBuffer limits
 					if (sampleStart < sampleBufferLength)
 					{
@@ -807,8 +807,8 @@ void SampleTrackView::dropEvent(QDropEvent* de)
 
 		TimePos tcoPos = trackContainerView()->fixedTCOs()
 			? TimePos(0)
-			: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar() * TimePos::ticksPerBar()) +
-				  trackContainerView()->currentPosition())
+			: TimePos(((xPos - trackHeadWidth) / trackContainerView()->pixelsPerBar() * TimePos::ticksPerBar())
+				+ trackContainerView()->currentPosition())
 				  .quantize(1.0);
 
 		SampleTCO* sTco = static_cast<SampleTCO*>(getTrack()->createTCO(tcoPos));

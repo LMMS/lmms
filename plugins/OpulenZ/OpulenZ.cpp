@@ -519,11 +519,11 @@ void OpulenzInstrument::loadGMPatch()
 void OpulenzInstrument::updatePatch()
 {
 	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	inst[0] = (op1_trem_mdl.value() ? 128 : 0) + (op1_vib_mdl.value() ? 64 : 0) +
-		(op1_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
+	inst[0] = (op1_trem_mdl.value() ? 128 : 0) + (op1_vib_mdl.value() ? 64 : 0) + (op1_perc_mdl.value() ? 0 : 32)
+		+ // NB. This envelope mode is "perc", not "sus"
 		(op1_ksr_mdl.value() ? 16 : 0) + ((int)op1_mul_mdl.value() & 0x0f);
-	inst[1] = (op2_trem_mdl.value() ? 128 : 0) + (op2_vib_mdl.value() ? 64 : 0) +
-		(op2_perc_mdl.value() ? 0 : 32) + // NB. This envelope mode is "perc", not "sus"
+	inst[1] = (op2_trem_mdl.value() ? 128 : 0) + (op2_vib_mdl.value() ? 64 : 0) + (op2_perc_mdl.value() ? 0 : 32)
+		+ // NB. This envelope mode is "perc", not "sus"
 		(op2_ksr_mdl.value() ? 16 : 0) + ((int)op2_mul_mdl.value() & 0x0f);
 	inst[2] = (((int)op1_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op1_lvl_mdl.value() & 0x3f));
 	inst[3] = (((int)op2_scale_mdl.value() & 0x03) << 6) + (63 - ((int)op2_lvl_mdl.value() & 0x3f));
@@ -747,11 +747,11 @@ void OpulenzInstrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
-	const float attack_times[16] = {
-		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 15.0, 30.0, 60.0, 120.0, 240.0, 480.0, 950.0, 1900.0, 3800.0};
+	const float attack_times[16]
+		= {0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 15.0, 30.0, 60.0, 120.0, 240.0, 480.0, 950.0, 1900.0, 3800.0};
 
-	const float dr_times[16] = {
-		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 5200.0, 10000.0, 20000.0};
+	const float dr_times[16]
+		= {0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 5200.0, 10000.0, 20000.0};
 
 	const int fmultipliers[16] = {-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47};
 

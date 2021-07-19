@@ -224,8 +224,8 @@ void VstEffectControlDialog::paintEvent(QPaintEvent*)
 {
 	if (m_plugin != NULL && tbLabel != NULL)
 	{
-		tbLabel->setText(tr("Effect by: ") + m_plugin->vendorString() +
-			tr("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />") + m_plugin->currentProgramName());
+		tbLabel->setText(tr("Effect by: ") + m_plugin->vendorString()
+			+ tr("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />") + m_plugin->currentProgramName());
 	}
 }
 

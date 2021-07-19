@@ -308,13 +308,13 @@ int PianoView::getKeyFromMouse(const QPoint& _p) const
 	{
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
-		if (key_num > 0 && Piano::isBlackKey(key_num - 1) &&
-			offset <= (PW_WHITE_KEY_WIDTH / 2) - (PW_BLACK_KEY_WIDTH / 2))
+		if (key_num > 0 && Piano::isBlackKey(key_num - 1)
+			&& offset <= (PW_WHITE_KEY_WIDTH / 2) - (PW_BLACK_KEY_WIDTH / 2))
 		{
 			--key_num;
 		}
-		if (key_num < NumKeys - 1 && Piano::isBlackKey(key_num + 1) &&
-			offset >= (PW_WHITE_KEY_WIDTH - PW_BLACK_KEY_WIDTH / 2))
+		if (key_num < NumKeys - 1 && Piano::isBlackKey(key_num + 1)
+			&& offset >= (PW_WHITE_KEY_WIDTH - PW_BLACK_KEY_WIDTH / 2))
 		{
 			++key_num;
 		}
@@ -384,9 +384,9 @@ void PianoView::mousePressEvent(QMouseEvent* _me)
 		if (_me->pos().y() > PIANO_BASE)
 		{
 			int y_diff = _me->pos().y() - PIANO_BASE;
-			int velocity =
-				(int)((float)y_diff / (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
-					(float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
+			int velocity
+				= (int)((float)y_diff / (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT)
+					* (float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
 			if (y_diff < 0) { velocity = 0; }
 			else if (y_diff > (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT))
 			{
@@ -465,8 +465,8 @@ void PianoView::mouseMoveEvent(QMouseEvent* _me)
 
 	int key_num = getKeyFromMouse(_me->pos());
 	int y_diff = _me->pos().y() - PIANO_BASE;
-	int velocity = (int)((float)y_diff / (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT) *
-		(float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
+	int velocity = (int)((float)y_diff / (Piano::isWhiteKey(key_num) ? PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT)
+		* (float)m_piano->instrumentTrack()->midiPort()->baseVelocity());
 	// maybe the user moved the mouse-cursor above or under the
 	// piano-widget while holding left button so check that and
 	// correct volume if necessary
@@ -571,10 +571,9 @@ void PianoView::focusOutEvent(QFocusEvent*)
 
 	// focus just switched to another control inside the instrument track
 	// window we live in?
-	if (parentWidget()->parentWidget()->focusWidget() != this &&
-		parentWidget()->parentWidget()->focusWidget() != NULL &&
-		!(parentWidget()->parentWidget()->focusWidget()->inherits("QLineEdit") ||
-			parentWidget()->parentWidget()->focusWidget()->inherits("QPlainTextEdit")))
+	if (parentWidget()->parentWidget()->focusWidget() != this && parentWidget()->parentWidget()->focusWidget() != NULL
+		&& !(parentWidget()->parentWidget()->focusWidget()->inherits("QLineEdit")
+			|| parentWidget()->parentWidget()->focusWidget()->inherits("QPlainTextEdit")))
 	{
 		// then reclaim keyboard focus!
 		setFocus();

@@ -618,8 +618,8 @@ double Alg_reader::parse_after_dur(double dur, string& field, int n, double base
 	if (field[n] == '+')
 	{
 		string a_string = field.substr(n + 1);
-		return dur +
-			parse_dur(a_string, seq->get_time_map()->beat_to_time(seq->get_time_map()->time_to_beat(base) + dur));
+		return dur
+			+ parse_dur(a_string, seq->get_time_map()->beat_to_time(seq->get_time_map()->time_to_beat(base) + dur));
 	}
 	parse_error(field, n, "Unexpected character in duration");
 	return dur;
@@ -629,8 +629,8 @@ struct loud_lookup_struct
 {
 	const char* str;
 	int val;
-} loud_lookup[] = {
-	{"FFF", 127}, {"FF", 120}, {"F", 110}, {"MF", 100}, {"MP", 90}, {"P", 80}, {"PP", 70}, {"PPP", 60}, {NULL, 0}};
+} loud_lookup[]
+	= {{"FFF", 127}, {"FF", 120}, {"F", 110}, {"MF", 100}, {"MP", 90}, {"P", 80}, {"PP", 70}, {"PPP", 60}, {NULL, 0}};
 
 double Alg_reader::parse_loud(string& field)
 {

@@ -289,8 +289,8 @@ void BBTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this)
 	//	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 	/*	_this.setAttribute( "current", s_infoMap[this] ==
 					engine::getBBEditor()->currentBB() );*/
-	if (s_infoMap[this] == 0 && _this.parentNode().parentNode().nodeName() != "clone" &&
-		_this.parentNode().parentNode().nodeName() != "journaldata")
+	if (s_infoMap[this] == 0 && _this.parentNode().parentNode().nodeName() != "clone"
+		&& _this.parentNode().parentNode().nodeName() != "journaldata")
 	{
 		((JournallingObject*)(Engine::getBBTrackContainer()))->saveState(_doc, _this);
 	}

@@ -401,8 +401,8 @@ void Mixer::handleMetronome()
 	Song* song = Engine::getSong();
 	Song::PlayModes currentPlayMode = song->playMode();
 
-	bool metronomeSupported = currentPlayMode == Song::Mode_PlayPattern || currentPlayMode == Song::Mode_PlaySong ||
-		currentPlayMode == Song::Mode_PlayBB;
+	bool metronomeSupported = currentPlayMode == Song::Mode_PlayPattern || currentPlayMode == Song::Mode_PlaySong
+		|| currentPlayMode == Song::Mode_PlayBB;
 
 	if (!metronomeSupported || !m_metronomeActive || song->isExporting()) { return; }
 

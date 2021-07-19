@@ -307,8 +307,8 @@ bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QMimeData* md, 
 
 	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode("trackContainerId").value().toUInt();
-	if (!allowSameBar && sourceTrackContainerId == t->trackContainer()->id() && tcoPos == grabbedTCOBar &&
-		currentTrackIndex == initialTrackIndex)
+	if (!allowSameBar && sourceTrackContainerId == t->trackContainer()->id() && tcoPos == grabbedTCOBar
+		&& currentTrackIndex == initialTrackIndex)
 	{
 		return false;
 	}

@@ -254,8 +254,8 @@ void SaWaterfallView::updateVisibility()
 // Draw cursor and its coordinates if it is within display bounds.
 void SaWaterfallView::drawCursor(QPainter& painter)
 {
-	if (m_cursor.x() >= m_displayLeft && m_cursor.x() <= m_displayRight && m_cursor.y() >= m_displayTop &&
-		m_cursor.y() <= m_displayBottom)
+	if (m_cursor.x() >= m_displayLeft && m_cursor.x() <= m_displayRight && m_cursor.y() >= m_displayTop
+		&& m_cursor.y() <= m_displayBottom)
 	{
 		// cursor lines
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));

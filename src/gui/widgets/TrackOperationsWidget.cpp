@@ -124,8 +124,8 @@ TrackOperationsWidget::~TrackOperationsWidget() {}
  */
 void TrackOperationsWidget::mousePressEvent(QMouseEvent* me)
 {
-	if (me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier &&
-		m_trackView->getTrack()->type() != Track::BBTrack)
+	if (me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier
+		&& m_trackView->getTrack()->type() != Track::BBTrack)
 	{
 		DataFile dataFile(DataFile::DragNDropData);
 		m_trackView->getTrack()->saveState(dataFile, dataFile.content());
@@ -206,8 +206,8 @@ void TrackOperationsWidget::removeTrack() { emit trackRemovalScheduled(m_trackVi
 
 void TrackOperationsWidget::changeTrackColor()
 {
-	QColor new_color =
-		ColorChooser(this).withPalette(ColorChooser::Palette::Track)->getColor(m_trackView->getTrack()->color());
+	QColor new_color
+		= ColorChooser(this).withPalette(ColorChooser::Palette::Track)->getColor(m_trackView->getTrack()->color());
 
 	if (!new_color.isValid()) { return; }
 

@@ -38,8 +38,8 @@ inline float hermiteInterpolate(float x0, float x1, float x2, float x3, float fr
 {
 	const float frsq = frac_pos * frac_pos;
 	const float frsq2 = 2 * frsq;
-	return (((x2 - x0) * 0.5f) * (frac_pos * (frsq + 1) - frsq2) + (frsq2 * frac_pos - 3 * frsq) * (x1 - x2) +
-		frsq2 * (frac_pos - 1) * ((x3 - x1) * 0.25f) + x1);
+	return (((x2 - x0) * 0.5f) * (frac_pos * (frsq + 1) - frsq2) + (frsq2 * frac_pos - 3 * frsq) * (x1 - x2)
+		+ frsq2 * (frac_pos - 1) * ((x3 - x1) * 0.25f) + x1);
 
 	/*
    const float frsq	= frac_pos*frac_pos;
@@ -67,9 +67,9 @@ inline float cubicInterpolate(float v0, float v1, float v2, float v3, float x)
 	float frcu = frsq * v0;
 	float t1 = v3 + 3 * v1;
 
-	return (v1 +
-		fastFmaf(0.5f, frcu, x) * (v2 - frcu * (1.0f / 6.0f) - fastFmaf(t1, (1.0f / 6.0f), -v0) * (1.0f / 3.0f)) +
-		frsq * x * (t1 * (1.0f / 6.0f) - 0.5f * v2) + frsq * fastFmaf(0.5f, v2, -v1));
+	return (v1
+		+ fastFmaf(0.5f, frcu, x) * (v2 - frcu * (1.0f / 6.0f) - fastFmaf(t1, (1.0f / 6.0f), -v0) * (1.0f / 3.0f))
+		+ frsq * x * (t1 * (1.0f / 6.0f) - 0.5f * v2) + frsq * fastFmaf(0.5f, v2, -v1));
 }
 
 inline float cosinusInterpolate(float v0, float v1, float x)

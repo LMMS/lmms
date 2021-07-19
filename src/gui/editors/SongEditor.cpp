@@ -312,8 +312,8 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 		m_currentZoomingValue = zoomingModel()->value();
 
 		// calculate the song position where the mouse was clicked
-		m_rubberbandStartTimePos =
-			TimePos((xStart - m_trackHeadWidth) / pixelsPerBar() * TimePos::ticksPerBar()) + m_currentPosition;
+		m_rubberbandStartTimePos
+			= TimePos((xStart - m_trackHeadWidth) / pixelsPerBar() * TimePos::ticksPerBar()) + m_currentPosition;
 		m_rubberBandStartTrackview = 0;
 	}
 	// the current mouse position within the borders of song editor
@@ -332,9 +332,9 @@ void SongEditor::updateRubberband()
 		// take care of the zooming
 		if (m_currentZoomingValue != m_zoomingModel->value())
 		{
-			originX = m_trackHeadWidth +
-				(originX - m_trackHeadWidth) * m_zoomLevels[m_zoomingModel->value()] /
-					m_zoomLevels[m_currentZoomingValue];
+			originX = m_trackHeadWidth
+				+ (originX - m_trackHeadWidth) * m_zoomLevels[m_zoomingModel->value()]
+					/ m_zoomLevels[m_currentZoomingValue];
 		}
 
 		// take care of the scrollbar position
@@ -352,9 +352,9 @@ void SongEditor::updateRubberband()
 		int rubberBandTrackview = trackIndexFromSelectionPoint(m_mousePos.y());
 
 		// the time position the mouse is hover
-		TimePos rubberbandTimePos =
-			TimePos((qMin(m_mousePos.x(), width()) - m_trackHeadWidth) / pixelsPerBar() * TimePos::ticksPerBar()) +
-			m_currentPosition;
+		TimePos rubberbandTimePos
+			= TimePos((qMin(m_mousePos.x(), width()) - m_trackHeadWidth) / pixelsPerBar() * TimePos::ticksPerBar())
+			+ m_currentPosition;
 
 		// are tcos in the rect of selection?
 		for (auto& it : findChildren<selectableObject*>())
@@ -363,12 +363,13 @@ void SongEditor::updateRubberband()
 			if (tco)
 			{
 				auto indexOfTrackView = trackViews().indexOf(tco->getTrackView());
-				bool isBeetweenRubberbandViews =
-					indexOfTrackView >= qMin(m_rubberBandStartTrackview, rubberBandTrackview) &&
-					indexOfTrackView <= qMax(m_rubberBandStartTrackview, rubberBandTrackview);
-				bool isBeetweenRubberbandTimePos =
-					tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos) &&
-					tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
+				bool isBeetweenRubberbandViews
+					= indexOfTrackView >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
+					&& indexOfTrackView <= qMax(m_rubberBandStartTrackview, rubberBandTrackview);
+				bool isBeetweenRubberbandTimePos
+					= tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos)
+					&& tco->getTrackContentObject()->startPosition()
+						<= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
 				it->setSelected(isBeetweenRubberbandViews && isBeetweenRubberbandTimePos);
 			}
 		}
@@ -506,8 +507,8 @@ void SongEditor::mousePressEvent(QMouseEvent* me)
 
 		// the trackView(index) and the time position where the mouse was clicked
 		m_rubberBandStartTrackview = trackIndexFromSelectionPoint(me->y());
-		m_rubberbandStartTimePos =
-			TimePos((me->x() - m_trackHeadWidth) / pixelsPerBar() * TimePos::ticksPerBar()) + m_currentPosition;
+		m_rubberbandStartTimePos
+			= TimePos((me->x() - m_trackHeadWidth) / pixelsPerBar() * TimePos::ticksPerBar()) + m_currentPosition;
 	}
 	QWidget::mousePressEvent(me);
 }
@@ -611,13 +612,13 @@ void SongEditor::updatePosition(const TimePos& t)
 		trackOpWidth = TRACK_OP_WIDTH;
 	}
 
-	if ((m_song->isPlaying() && m_song->m_playMode == Song::Mode_PlaySong &&
-			m_timeLine->autoScroll() == TimeLineWidget::AutoScrollEnabled) ||
-		m_scrollBack == true)
+	if ((m_song->isPlaying() && m_song->m_playMode == Song::Mode_PlaySong
+			&& m_timeLine->autoScroll() == TimeLineWidget::AutoScrollEnabled)
+		|| m_scrollBack == true)
 	{
 		m_smoothScroll = ConfigManager::inst()->value("ui", "smoothscroll").toInt();
-		const int w = width() - widgetWidth - trackOpWidth -
-			contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
+		const int w = width() - widgetWidth - trackOpWidth
+			- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
 		if (t > m_currentPosition + w * TimePos::ticksPerBar() / pixelsPerBar())
 		{
 			animateScroll(m_leftRightScroll, t.getBar(), m_smoothScroll);
@@ -728,10 +729,10 @@ SongEditorWindow::SongEditorWindow(Song* song)
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
-	m_knifeModeAction =
-		m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
-	m_selectModeAction =
-		m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
+	m_knifeModeAction
+		= m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
+	m_selectModeAction
+		= m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
@@ -780,8 +781,8 @@ SongEditorWindow::SongEditorWindow(Song* song)
 	m_snappingComboBox->setToolTip(tr("Clip snapping size"));
 	connect(m_editor->snappingModel(), SIGNAL(dataChanged()), this, SLOT(updateSnapLabel()));
 
-	m_setProportionalSnapAction =
-		new QAction(embed::getIconPixmap("proportional_snap"), tr("Toggle proportional snap on/off"), this);
+	m_setProportionalSnapAction
+		= new QAction(embed::getIconPixmap("proportional_snap"), tr("Toggle proportional snap on/off"), this);
 	m_setProportionalSnapAction->setCheckable(true);
 	m_setProportionalSnapAction->setChecked(false);
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));

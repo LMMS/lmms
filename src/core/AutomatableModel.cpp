@@ -115,12 +115,12 @@ void AutomatableModel::saveSettings(QDomDocument& doc, QDomElement& element, con
 
 	// Skip saving MIDI connections if we're saving project and
 	// the discardMIDIConnections option is true.
-	auto controllerType =
-		m_controllerConnection ? m_controllerConnection->getController()->type() : Controller::DummyController;
-	bool skipMidiController =
-		Engine::getSong()->isSavingProject() && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
-	if (m_controllerConnection && controllerType != Controller::DummyController &&
-		!(skipMidiController && controllerType == Controller::MidiController))
+	auto controllerType
+		= m_controllerConnection ? m_controllerConnection->getController()->type() : Controller::DummyController;
+	bool skipMidiController
+		= Engine::getSong()->isSavingProject() && Engine::getSong()->getSaveOptions().discardMIDIConnections.value();
+	if (m_controllerConnection && controllerType != Controller::DummyController
+		&& !(skipMidiController && controllerType == Controller::MidiController))
 	{
 		QDomElement controllerElement;
 
@@ -202,15 +202,15 @@ void AutomatableModel::loadSettings(const QDomElement& element, const QString& n
 	// or: element with namedItem() "name" was found, but it's real nodename
 	// is given as attribute and does not match
 	//  => look for the right node
-	if (node.isNull() ||
-		(node.isElement() && node.toElement().hasAttribute("nodename") &&
-			node.toElement().attribute("nodename") != name))
+	if (node.isNull()
+		|| (node.isElement() && node.toElement().hasAttribute("nodename")
+			&& node.toElement().attribute("nodename") != name))
 	{
 		for (QDomElement othernode = element.firstChildElement(); !othernode.isNull();
 			 othernode = othernode.nextSiblingElement())
 		{
-			if ((!othernode.hasAttribute("nodename") && othernode.nodeName() == name) ||
-				othernode.attribute("nodename") == name)
+			if ((!othernode.hasAttribute("nodename") && othernode.nodeName() == name)
+				|| othernode.attribute("nodename") == name)
 			{
 				node = othernode;
 				break;
@@ -320,8 +320,8 @@ void AutomatableModel::setAutomatedValue(const float value)
 		// notify linked models
 		for (AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it)
 		{
-			if (!((*it)->controllerConnection()) && (*it)->m_setValueDepth < 1 &&
-				(*it)->fittedValue(m_value) != (*it)->m_value)
+			if (!((*it)->controllerConnection()) && (*it)->m_setValueDepth < 1
+				&& (*it)->fittedValue(m_value) != (*it)->m_value)
 			{
 				(*it)->setAutomatedValue(value);
 			}
@@ -515,8 +515,8 @@ ValueBuffer* AutomatableModel::valueBuffer()
 	{
 		AutomatableModel* lm = NULL;
 		if (hasLinkedModels()) { lm = m_linkedModels.first(); }
-		if (lm && lm->controllerConnection() && lm->useControllerValue() &&
-			lm->controllerConnection()->getController()->isSampleExact())
+		if (lm && lm->controllerConnection() && lm->useControllerValue()
+			&& lm->controllerConnection()->getController()->isSampleExact())
 		{
 			vb = lm->valueBuffer();
 			float* values = vb->values();

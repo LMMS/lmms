@@ -84,13 +84,13 @@ void AutomationTrackView::dropEvent(QDropEvent* _de)
 	QString val = StringPairDrag::decodeValue(_de);
 	if (type == "automatable_model")
 	{
-		AutomatableModel* mod =
-			dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		AutomatableModel* mod
+			= dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != NULL)
 		{
-			TimePos pos = TimePos(trackContainerView()->currentPosition() +
-				(_de->pos().x() - getTrackContentWidget()->x()) * TimePos::ticksPerBar() /
-					static_cast<int>(trackContainerView()->pixelsPerBar()))
+			TimePos pos = TimePos(trackContainerView()->currentPosition()
+				+ (_de->pos().x() - getTrackContentWidget()->x()) * TimePos::ticksPerBar()
+					/ static_cast<int>(trackContainerView()->pixelsPerBar()))
 							  .toAbsoluteBar();
 
 			if (pos.getTicks() < 0) { pos.setTicks(0); }

@@ -55,13 +55,13 @@ const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
 };
 
 // Vector with all the upgrade methods
-const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {&DataFile::upgrade_0_2_1_20070501,
-	&DataFile::upgrade_0_2_1_20070508, &DataFile::upgrade_0_3_0_rc2, &DataFile::upgrade_0_3_0,
-	&DataFile::upgrade_0_4_0_20080104, &DataFile::upgrade_0_4_0_20080118, &DataFile::upgrade_0_4_0_20080129,
-	&DataFile::upgrade_0_4_0_20080409, &DataFile::upgrade_0_4_0_20080607, &DataFile::upgrade_0_4_0_20080622,
-	&DataFile::upgrade_0_4_0_beta1, &DataFile::upgrade_0_4_0_rc2, &DataFile::upgrade_1_0_99, &DataFile::upgrade_1_1_0,
-	&DataFile::upgrade_1_1_91, &DataFile::upgrade_1_2_0_rc3, &DataFile::upgrade_1_3_0,
-	&DataFile::upgrade_noHiddenClipNames, &DataFile::upgrade_automationNodes};
+const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS
+	= {&DataFile::upgrade_0_2_1_20070501, &DataFile::upgrade_0_2_1_20070508, &DataFile::upgrade_0_3_0_rc2,
+		&DataFile::upgrade_0_3_0, &DataFile::upgrade_0_4_0_20080104, &DataFile::upgrade_0_4_0_20080118,
+		&DataFile::upgrade_0_4_0_20080129, &DataFile::upgrade_0_4_0_20080409, &DataFile::upgrade_0_4_0_20080607,
+		&DataFile::upgrade_0_4_0_20080622, &DataFile::upgrade_0_4_0_beta1, &DataFile::upgrade_0_4_0_rc2,
+		&DataFile::upgrade_1_0_99, &DataFile::upgrade_1_1_0, &DataFile::upgrade_1_1_91, &DataFile::upgrade_1_2_0_rc3,
+		&DataFile::upgrade_1_3_0, &DataFile::upgrade_noHiddenClipNames, &DataFile::upgrade_automationNodes};
 
 // Vector of all versions that have upgrade routines.
 const std::vector<ProjectVersion> DataFile::UPGRADE_VERSIONS = {"0.2.1-20070501", "0.2.1-20070508", "0.3.0-rc2",
@@ -153,11 +153,11 @@ bool DataFile::validate(QString extension)
 		if (extension == "xpt" || extension == "xptz") { return true; }
 		break;
 	case Type::UnknownType:
-		if (!(extension == "mmp" || extension == "mpt" || extension == "mmpz" || extension == "xpf" ||
-				extension == "xml" ||
-				(extension == "xiz" && !pluginFactory->pluginSupportingExtension(extension).isNull()) ||
-				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
-				extension == "dll"
+		if (!(extension == "mmp" || extension == "mpt" || extension == "mmpz" || extension == "xpf"
+				|| extension == "xml"
+				|| (extension == "xiz" && !pluginFactory->pluginSupportingExtension(extension).isNull())
+				|| extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid"
+				|| extension == "dll"
 #ifdef LMMS_HAVE_LV2
 				|| extension == "lv2"
 #endif
@@ -232,8 +232,8 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 
 	const QString bundleDir = fInfo.path() + "/" + fInfo.fileName().section('.', 0, 0);
 	const QString resourcesDir = bundleDir + "/resources";
-	const QString fullName =
-		withResources ? nameWithExtension(bundleDir + "/" + fInfo.fileName()) : nameWithExtension(filename);
+	const QString fullName
+		= withResources ? nameWithExtension(bundleDir + "/" + fInfo.fileName()) : nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
 
@@ -361,8 +361,8 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					// prefixes aren't converted, so we need to convert it ourselves
 					if (error)
 					{
-						resPath = QFileInfo(m_fileName).path() + "/" +
-							resPath.remove(0, PathUtil::basePrefix(PathUtil::Base::LocalDir).length());
+						resPath = QFileInfo(m_fileName).path() + "/"
+							+ resPath.remove(0, PathUtil::basePrefix(PathUtil::Base::LocalDir).length());
 					}
 
 					// Check if we need to add a counter to the filename
@@ -642,8 +642,8 @@ void DataFile::upgrade_0_2_1_20070508()
 		}
 		else
 		{
-			QDomNodeList vol_list =
-				el.namedItem("automation-pattern").namedItem("vol").toElement().elementsByTagName("time");
+			QDomNodeList vol_list
+				= el.namedItem("automation-pattern").namedItem("vol").toElement().elementsByTagName("time");
 			for (int j = 0; !vol_list.item(j).isNull(); ++j)
 			{
 				QDomElement timeEl = list.item(j).toElement();
@@ -1103,13 +1103,13 @@ void DataFile::upgrade_1_3_0()
 					// Effect name changes
 
 					QDomElement attribute = attributes.item(k).toElement();
-					if (attribute.attribute("name") == "file" &&
-						(attribute.attribute("value") == "calf" || attribute.attribute("value") == "calf.so"))
+					if (attribute.attribute("name") == "file"
+						&& (attribute.attribute("value") == "calf" || attribute.attribute("value") == "calf.so"))
 					{
 						attribute.setAttribute("value", "veal");
 					}
-					else if (attribute.attribute("name") == "plugin" &&
-						attribute.attribute("value") == "Sidechaincompressor")
+					else if (attribute.attribute("name") == "plugin"
+						&& attribute.attribute("value") == "Sidechaincompressor")
 					{
 						attribute.setAttribute("value", "SidechainCompressor");
 					}
@@ -1117,8 +1117,8 @@ void DataFile::upgrade_1_3_0()
 					{
 						attribute.setAttribute("value", "SidechainGate");
 					}
-					else if (attribute.attribute("name") == "plugin" &&
-						attribute.attribute("value") == "Multibandcompressor")
+					else if (attribute.attribute("name") == "plugin"
+						&& attribute.attribute("value") == "Multibandcompressor")
 					{
 						attribute.setAttribute("value", "MultibandCompressor");
 					}
@@ -1126,18 +1126,18 @@ void DataFile::upgrade_1_3_0()
 					{
 						attribute.setAttribute("value", "MultibandGate");
 					}
-					else if (attribute.attribute("name") == "plugin" &&
-						attribute.attribute("value") == "Multibandlimiter")
+					else if (attribute.attribute("name") == "plugin"
+						&& attribute.attribute("value") == "Multibandlimiter")
 					{
 						attribute.setAttribute("value", "MultibandLimiter");
 					}
 
 					// Handle port changes
 
-					if (attribute.attribute("name") == "plugin" &&
-						(attribute.attribute("value") == "MultibandLimiter" ||
-							attribute.attribute("value") == "MultibandCompressor" ||
-							attribute.attribute("value") == "MultibandGate"))
+					if (attribute.attribute("name") == "plugin"
+						&& (attribute.attribute("value") == "MultibandLimiter"
+							|| attribute.attribute("value") == "MultibandCompressor"
+							|| attribute.attribute("value") == "MultibandGate"))
 					{
 						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& removeList) {
 							// Mark ports for removal
@@ -1224,10 +1224,10 @@ void DataFile::upgrade_1_3_0()
 						iterate_ladspa_ports(effect, fn);
 					}
 
-					if (attribute.attribute("name") == "plugin" &&
-						((attribute.attribute("value") == "Equalizer5Band") ||
-							(attribute.attribute("value") == "Equalizer8Band") ||
-							(attribute.attribute("value") == "Equalizer12Band")))
+					if (attribute.attribute("name") == "plugin"
+						&& ((attribute.attribute("value") == "Equalizer5Band")
+							|| (attribute.attribute("value") == "Equalizer8Band")
+							|| (attribute.attribute("value") == "Equalizer12Band")))
 					{
 						// NBand equalizers got 4 q nobs inserted. We need to shift everything else...
 						// HOWEVER: 5 band eq has only 2 q nobs inserted (no LS/HS filters)
@@ -1495,8 +1495,8 @@ void DataFile::loadData(const QByteArray& _data, const QString& _sourceFile)
 
 		if (createdWith < openedWith) { upgrade(); }
 
-		if (createdWith.setCompareType(ProjectVersion::Minor) != openedWith.setCompareType(ProjectVersion::Minor) &&
-			gui != nullptr && root.attribute("type") == "song")
+		if (createdWith.setCompareType(ProjectVersion::Minor) != openedWith.setCompareType(ProjectVersion::Minor)
+			&& gui != nullptr && root.attribute("type") == "song")
 		{
 			auto projectType = _sourceFile.endsWith(".mpt") ? SongEditor::tr("template") : SongEditor::tr("project");
 

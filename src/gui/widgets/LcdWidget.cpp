@@ -145,8 +145,8 @@ void LcdWidget::paintEvent(QPaintEvent*)
 		QStyleOptionFrame opt;
 		opt.initFrom(this);
 		opt.state = QStyle::State_Sunken;
-		opt.rect =
-			QRect(0, 0, m_cellWidth * m_numDigits + (margin + m_marginWidth) * 2 - 1, m_cellHeight + (margin * 2));
+		opt.rect
+			= QRect(0, 0, m_cellWidth * m_numDigits + (margin + m_marginWidth) * 2 - 1, m_cellHeight + (margin * 2));
 
 		style()->drawPrimitive(QStyle::PE_Frame, &opt, &p, this);
 	}

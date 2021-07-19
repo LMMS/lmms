@@ -396,8 +396,8 @@ void Knob::dropEvent(QDropEvent* _de)
 	}
 	else if (type == "automatable_model")
 	{
-		AutomatableModel* mod =
-			dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		AutomatableModel* mod
+			= dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != NULL)
 		{
 			AutomatableModel::linkModels(model(), mod);
@@ -408,8 +408,8 @@ void Knob::dropEvent(QDropEvent* _de)
 
 void Knob::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() == Qt::LeftButton && !(_me->modifiers() & Qt::ControlModifier) &&
-		!(_me->modifiers() & Qt::ShiftModifier))
+	if (_me->button() == Qt::LeftButton && !(_me->modifiers() & Qt::ControlModifier)
+		&& !(_me->modifiers() & Qt::ShiftModifier))
 	{
 		AutomatableModel* thisModel = model();
 		if (thisModel)
@@ -586,10 +586,10 @@ void Knob::enterValue()
 
 void Knob::friendlyUpdate()
 {
-	if (model() &&
-		(model()->controllerConnection() == NULL ||
-			model()->controllerConnection()->getController()->frequentUpdates() == false ||
-			Controller::runningFrames() % (256 * 4) == 0))
+	if (model()
+		&& (model()->controllerConnection() == NULL
+			|| model()->controllerConnection()->getController()->frequentUpdates() == false
+			|| Controller::runningFrames() % (256 * 4) == 0))
 	{
 		update();
 	}
@@ -599,8 +599,8 @@ QString Knob::displayValue() const
 {
 	if (isVolumeKnob() && ConfigManager::inst()->value("app", "displaydbfs").toInt())
 	{
-		return m_description.trimmed() +
-			QString(" %1 dBFS").arg(ampToDbfs(model()->getRoundedValue() / volumeRatio()), 3, 'f', 2);
+		return m_description.trimmed()
+			+ QString(" %1 dBFS").arg(ampToDbfs(model()->getRoundedValue() / volumeRatio()), 3, 'f', 2);
 	}
 	return m_description.trimmed() + QString(" %1").arg(model()->getRoundedValue()) + m_unit;
 }

@@ -50,8 +50,8 @@ Lv2UridCache::Lv2UridCache(UridMap& mapper)
 	const uint32_t noIdYet = 0;
 	std::fill_n(m_cache, static_cast<std::size_t>(Id::size), noIdYet);
 
-	auto init = [this, &mapper](
-					Id id, const char* uridStr) { m_cache[static_cast<std::size_t>(id)] = mapper.map(uridStr); };
+	auto init
+		= [this, &mapper](Id id, const char* uridStr) { m_cache[static_cast<std::size_t>(id)] = mapper.map(uridStr); };
 
 	init(Id::atom_Float, LV2_ATOM__Float);
 	init(Id::atom_Int, LV2_ATOM__Int);

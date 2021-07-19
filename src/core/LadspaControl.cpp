@@ -65,8 +65,8 @@ LadspaControl::LadspaControl(Model* _parent, port_desc_t* _port, bool _link)
 
 	case FLOATING:
 		m_knobModel.setRange(m_port->min, m_port->max,
-			(m_port->max - m_port->min) /
-				(m_port->name.toUpper() == "GAIN" && m_port->max == 10.0f
+			(m_port->max - m_port->min)
+				/ (m_port->name.toUpper() == "GAIN" && m_port->max == 10.0f
 						? 4000.0f
 						: (m_port->suggests_logscale ? 8000000.0f : 800000.0f)));
 		m_knobModel.setInitValue(m_port->def);

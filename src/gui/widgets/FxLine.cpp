@@ -176,10 +176,10 @@ QString FxLine::elideName(const QString& name)
 
 void FxLine::paintEvent(QPaintEvent*)
 {
-	bool sendToThis =
-		Engine::fxMixer()->channelSendModel(m_mv->currentFxLine()->m_channelIndex, m_channelIndex) != NULL;
-	bool receiveFromThis =
-		Engine::fxMixer()->channelSendModel(m_channelIndex, m_mv->currentFxLine()->m_channelIndex) != NULL;
+	bool sendToThis
+		= Engine::fxMixer()->channelSendModel(m_mv->currentFxLine()->m_channelIndex, m_channelIndex) != NULL;
+	bool receiveFromThis
+		= Engine::fxMixer()->channelSendModel(m_channelIndex, m_mv->currentFxLine()->m_channelIndex) != NULL;
 	QPainter painter;
 	painter.begin(this);
 	drawFxLine(&painter, this, m_mv->currentFxLine() == this, sendToThis, receiveFromThis);

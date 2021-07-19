@@ -124,8 +124,8 @@ InstrumentTrack::InstrumentTrack(TrackContainer* tc)
 	// the midi cc events
 	for (int i = 0; i < MidiControllerCount; ++i)
 	{
-		m_midiCCModel[i] =
-			std::make_unique<FloatModel>(0.0f, 0.0f, 127.0f, 1.0f, nullptr, tr("CC Controller %1").arg(i));
+		m_midiCCModel[i]
+			= std::make_unique<FloatModel>(0.0f, 0.0f, 127.0f, 1.0f, nullptr, tr("CC Controller %1").arg(i));
 
 		connect(
 			m_midiCCModel[i].get(), &FloatModel::dataChanged, this, [this, i] { processCCEvent(i); },
@@ -166,8 +166,8 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer(sampleFrame* buf, const fpp_t frames, NotePlayHandle* n)
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if (isMuted() || (Engine::getSong()->playMode() != Song::Mode_PlayPattern && n && n->isBbTrackMuted()) ||
-		!m_instrument)
+	if (isMuted() || (Engine::getSong()->playMode() != Song::Mode_PlayPattern && n && n->isBbTrackMuted())
+		|| !m_instrument)
 	{
 		return;
 	}
@@ -331,10 +331,10 @@ void InstrumentTrack::processInEvent(const MidiEvent& event, const TimePos& time
 				m_sustainPedalPressed = false;
 			}
 		}
-		if (event.controllerNumber() == MidiControllerAllSoundOff ||
-			event.controllerNumber() == MidiControllerAllNotesOff || event.controllerNumber() == MidiControllerOmniOn ||
-			event.controllerNumber() == MidiControllerOmniOff || event.controllerNumber() == MidiControllerMonoOn ||
-			event.controllerNumber() == MidiControllerPolyOn)
+		if (event.controllerNumber() == MidiControllerAllSoundOff
+			|| event.controllerNumber() == MidiControllerAllNotesOff || event.controllerNumber() == MidiControllerOmniOn
+			|| event.controllerNumber() == MidiControllerOmniOff || event.controllerNumber() == MidiControllerMonoOn
+			|| event.controllerNumber() == MidiControllerPolyOn)
 		{
 			silenceAllNotes();
 		}
@@ -376,8 +376,8 @@ void InstrumentTrack::processOutEvent(const MidiEvent& event, const TimePos& tim
 
 	// If we have a selected output midi channel between 1-16, we will use that channel to handle the midi event.
 	// But if our selected midi output channel is 0 ("--"), we will use the event channel instead.
-	const auto handleEventOutputChannel =
-		midiPort()->outputChannel() == 0 ? event.channel() : midiPort()->realOutputChannel();
+	const auto handleEventOutputChannel
+		= midiPort()->outputChannel() == 0 ? event.channel() : midiPort()->realOutputChannel();
 
 	switch (event.type())
 	{
@@ -672,8 +672,8 @@ void InstrumentTrack::loadTrackSpecificSettings(const QDomElement& thisElement)
 {
 	// don't delete instrument in preview mode if it's the same
 	// we can't do this for other situations due to some issues with linked models
-	bool reuseInstrument =
-		m_previewMode && m_instrument && m_instrument->nodeName() == getSavedInstrumentName(thisElement);
+	bool reuseInstrument
+		= m_previewMode && m_instrument && m_instrument->nodeName() == getSavedInstrumentName(thisElement);
 	// remove the InstrumentPlayHandle if and only if we need to delete the instrument
 	silenceAllNotes(!reuseInstrument);
 
@@ -742,8 +742,8 @@ void InstrumentTrack::loadTrackSpecificSettings(const QDomElement& thisElement)
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if (AutomationPattern::classNodeName() != node.nodeName() &&
-				ControllerConnection::classNodeName() != node.nodeName() && !node.toElement().hasAttribute("id"))
+			else if (AutomationPattern::classNodeName() != node.nodeName()
+				&& ControllerConnection::classNodeName() != node.nodeName() && !node.toElement().hasAttribute("id"))
 			{
 				delete m_instrument;
 				m_instrument = NULL;

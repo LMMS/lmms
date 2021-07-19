@@ -127,8 +127,8 @@ std::string GetErrorAsString(DWORD errorMessageID)
 	if (errorMessageID == 0) return std::string(); // No error message has been recorded
 
 	LPSTR messageBuffer = nullptr;
-	size_t size =
-		FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+	size_t size
+		= FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
 
 	std::string message(messageBuffer, size);
@@ -1387,8 +1387,8 @@ intptr_t RemoteVstPlugin::hostCallback(
 
 		memset(&_timeInfo, 0, sizeof(_timeInfo));
 		_timeInfo.samplePos = __plugin->m_currentSamplePos;
-		_timeInfo.sampleRate =
-			__plugin->m_vstSyncData->hasSHM ? __plugin->m_vstSyncData->m_sampleRate : __plugin->sampleRate();
+		_timeInfo.sampleRate
+			= __plugin->m_vstSyncData->hasSHM ? __plugin->m_vstSyncData->m_sampleRate : __plugin->sampleRate();
 		_timeInfo.flags = 0;
 		_timeInfo.tempo = __plugin->m_vstSyncData->hasSHM ? __plugin->m_vstSyncData->m_bpm : __plugin->m_bpm;
 		_timeInfo.timeSigNumerator = __plugin->m_vstSyncData->timeSigNumer;
@@ -1414,8 +1414,8 @@ intptr_t RemoteVstPlugin::hostCallback(
 		{
 			if (__plugin->m_vstSyncData->hasSHM)
 			{
-				__plugin->m_in->lastppqPos += __plugin->m_vstSyncData->m_bpm / 60.0 *
-					__plugin->m_vstSyncData->m_bufferSize / __plugin->m_vstSyncData->m_sampleRate;
+				__plugin->m_in->lastppqPos += __plugin->m_vstSyncData->m_bpm / 60.0
+					* __plugin->m_vstSyncData->m_bufferSize / __plugin->m_vstSyncData->m_sampleRate;
 			}
 			else
 			{
@@ -1427,16 +1427,16 @@ intptr_t RemoteVstPlugin::hostCallback(
 		_timeInfo.flags |= kVstPpqPosValid;
 
 		if (__plugin->m_vstSyncData->isPlaying) { _timeInfo.flags |= kVstTransportPlaying; }
-		_timeInfo.barStartPos =
-			((int)(_timeInfo.ppqPos /
-				(4 * __plugin->m_vstSyncData->timeSigNumer / (float)__plugin->m_vstSyncData->timeSigDenom))) *
-			(4 * __plugin->m_vstSyncData->timeSigNumer / (float)__plugin->m_vstSyncData->timeSigDenom);
+		_timeInfo.barStartPos
+			= ((int)(_timeInfo.ppqPos
+				  / (4 * __plugin->m_vstSyncData->timeSigNumer / (float)__plugin->m_vstSyncData->timeSigDenom)))
+			* (4 * __plugin->m_vstSyncData->timeSigNumer / (float)__plugin->m_vstSyncData->timeSigDenom);
 
 		_timeInfo.flags |= kVstBarsValid;
 
-		if ((_timeInfo.flags & (kVstTransportPlaying | kVstTransportCycleActive)) !=
-				(__plugin->m_in->m_lastFlags & (kVstTransportPlaying | kVstTransportCycleActive)) ||
-			__plugin->m_vstSyncData->m_playbackJumped)
+		if ((_timeInfo.flags & (kVstTransportPlaying | kVstTransportCycleActive))
+				!= (__plugin->m_in->m_lastFlags & (kVstTransportPlaying | kVstTransportCycleActive))
+			|| __plugin->m_vstSyncData->m_playbackJumped)
 		{
 			_timeInfo.flags |= kVstTransportChanged;
 		}
@@ -1631,9 +1631,9 @@ intptr_t RemoteVstPlugin::hostCallback(
 
 	case audioMasterCanDo:
 		SHOW_CALLBACK("amc: audioMasterCanDo\n");
-		return !strcmp((char*)_ptr, "sendVstEvents") || !strcmp((char*)_ptr, "sendVstMidiEvent") ||
-			!strcmp((char*)_ptr, "sendVstTimeInfo") || !strcmp((char*)_ptr, "sizeWindow") ||
-			!strcmp((char*)_ptr, "supplyIdle");
+		return !strcmp((char*)_ptr, "sendVstEvents") || !strcmp((char*)_ptr, "sendVstMidiEvent")
+			|| !strcmp((char*)_ptr, "sendVstTimeInfo") || !strcmp((char*)_ptr, "sizeWindow")
+			|| !strcmp((char*)_ptr, "supplyIdle");
 
 	case audioMasterGetLanguage: SHOW_CALLBACK("amc: audioMasterGetLanguage\n"); return hlang;
 

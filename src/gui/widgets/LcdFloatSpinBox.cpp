@@ -116,8 +116,8 @@ void LcdFloatSpinBox::contextMenuEvent(QContextMenuEvent* event)
 
 void LcdFloatSpinBox::mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier) &&
-		event->y() < m_wholeDisplay.cellHeight() + 2)
+	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier)
+		&& event->y() < m_wholeDisplay.cellHeight() + 2)
 	{
 		m_mouseMoving = true;
 		m_origMousePos = event->globalPos();

@@ -132,8 +132,8 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	Mixer::qualitySettings qs =
-		Mixer::qualitySettings(static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
+	Mixer::qualitySettings qs
+		= Mixer::qualitySettings(static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
 			static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()));
 
 	const int samplerates[5] = {44100, 48000, 88200, 96000, 192000};
@@ -190,14 +190,14 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 
 	bool sampleRateControlsVisible = (exportFormat != ProjectRenderer::MP3File);
 
-	bool bitRateControlsEnabled =
-		(exportFormat == ProjectRenderer::OggFile || exportFormat == ProjectRenderer::MP3File);
+	bool bitRateControlsEnabled
+		= (exportFormat == ProjectRenderer::OggFile || exportFormat == ProjectRenderer::MP3File);
 
-	bool bitDepthControlEnabled =
-		(exportFormat == ProjectRenderer::WaveFile || exportFormat == ProjectRenderer::FlacFile);
+	bool bitDepthControlEnabled
+		= (exportFormat == ProjectRenderer::WaveFile || exportFormat == ProjectRenderer::FlacFile);
 
-	bool variableBitrateVisible =
-		!(exportFormat == ProjectRenderer::MP3File || exportFormat == ProjectRenderer::FlacFile);
+	bool variableBitrateVisible
+		= !(exportFormat == ProjectRenderer::MP3File || exportFormat == ProjectRenderer::FlacFile);
 
 #ifdef LMMS_HAVE_SF_COMPLEVEL
 	bool compressionLevelVisible = (exportFormat == ProjectRenderer::FlacFile);

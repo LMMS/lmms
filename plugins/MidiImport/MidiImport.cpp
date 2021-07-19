@@ -469,8 +469,9 @@ bool MidiImport::readSMF(TrackContainer* tc)
 								if (ccs[ccid].at == NULL)
 								{
 									ccs[ccid].create(tc,
-										trackName + " > " +
-											(objModel != NULL ? objModel->displayName() : QString("CC %1").arg(ccid)));
+										trackName + " > "
+											+ (objModel != NULL ? objModel->displayName()
+																: QString("CC %1").arg(ccid)));
 								}
 								ccs[ccid].putValue(time, objModel, cc);
 							}

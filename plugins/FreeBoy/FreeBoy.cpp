@@ -48,12 +48,12 @@ const long CLOCK_RATE = 4194304;
 
 extern "C"
 {
-	Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "FreeBoy",
-		QT_TRANSLATE_NOOP("PluginBrowser", "Emulation of GameBoy (TM) APU"),
+	Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "FreeBoy", QT_TRANSLATE_NOOP("PluginBrowser", "Emulation of GameBoy (TM) APU"),
 
-		"Attila Herman <attila589/at/gmail.com>"
-		"Csaba Hruska <csaba.hruska/at/gmail.com>",
-		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL};
+			"Attila Herman <attila589/at/gmail.com>"
+			"Csaba Hruska <csaba.hruska/at/gmail.com>",
+			0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL};
 }
 
 FreeBoyInstrument::FreeBoyInstrument(InstrumentTrack* _instrument_track)

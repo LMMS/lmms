@@ -25,6 +25,7 @@ AccessModifierOffset: -4
 AllowShortBlocksOnASingleLine: Always
 AllowShortIfStatementsOnASingleLine: Always
 AllowShortCaseLabelsOnASingleLine: true
+BreakBeforeBinaryOperators: All
 
 # Includes
 IncludeBlocks:   Regroup

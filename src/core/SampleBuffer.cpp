@@ -565,8 +565,8 @@ bool SampleBuffer::play(
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool isBackwards = state->isBackwards();
 
-	const double freqFactor =
-		(double)freq / (double)m_frequency * m_sampleRate / Engine::mixer()->processingSampleRate();
+	const double freqFactor
+		= (double)freq / (double)m_frequency * m_sampleRate / Engine::mixer()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>((endFrame - startFrame) / freqFactor);
@@ -975,8 +975,8 @@ QString& SampleBuffer::toBase64(QString& dst) const
 		{
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
-				buf[f * DEFAULT_CHANNELS + ch] =
-					(FLAC__int32)(Mixer::clip(m_data[f + frameCnt][ch]) * OUTPUT_SAMPLE_MULTIPLIER);
+				buf[f * DEFAULT_CHANNELS + ch]
+					= (FLAC__int32)(Mixer::clip(m_data[f + frameCnt][ch]) * OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
 		FLAC__stream_encoder_process_interleaved(flacEnc, buf, remaining);

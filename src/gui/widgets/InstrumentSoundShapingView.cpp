@@ -76,8 +76,8 @@ InstrumentSoundShapingView::InstrumentSoundShapingView(QWidget* _parent)
 	m_filterResKnob->move(196, 18);
 	m_filterResKnob->setHintText(tr("Q/Resonance:"), "");
 
-	m_singleStreamInfoLabel =
-		new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
+	m_singleStreamInfoLabel
+		= new QLabel(tr("Envelopes, LFOs and filters are not supported by the current instrument."), this);
 	m_singleStreamInfoLabel->setWordWrap(true);
 	m_singleStreamInfoLabel->setFont(pointSize<8>(m_singleStreamInfoLabel->font()));
 

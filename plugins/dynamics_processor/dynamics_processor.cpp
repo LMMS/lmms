@@ -61,14 +61,14 @@ dynProcEffect::~dynProcEffect()
 
 inline void dynProcEffect::calcAttack()
 {
-	m_attCoeff =
-		exp10((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
+	m_attCoeff
+		= exp10((DNF_LOG / (m_dpControls.m_attackModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
 }
 
 inline void dynProcEffect::calcRelease()
 {
-	m_relCoeff =
-		exp10((-DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
+	m_relCoeff
+		= exp10((-DNF_LOG / (m_dpControls.m_releaseModel.value() * 0.001)) / Engine::mixer()->processingSampleRate());
 }
 
 bool dynProcEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)

@@ -926,8 +926,8 @@ void SetupDialog::setSF2Dir(const QString& sf2Dir) { m_sf2Dir = sf2Dir; }
 void SetupDialog::openSF2File()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	QString new_file =
-		FileDialog::getOpenFileName(this, tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
+	QString new_file
+		= FileDialog::getOpenFileName(this, tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
 
 	if (!new_file.isEmpty()) { m_sf2FileLineEdit->setText(new_file); }
 #endif

@@ -127,8 +127,8 @@ AutomationEditor::AutomationEditor()
 	if (s_toolXFlip == nullptr) { s_toolXFlip = new QPixmap(embed::getIconPixmap("flip_x")); }
 
 	// add time-line
-	m_timeLine =
-		new TimeLineWidget(VALUES_WIDTH, 0, m_ppb, Engine::getSong()->getPlayPos(Song::Mode_PlayAutomationPattern),
+	m_timeLine
+		= new TimeLineWidget(VALUES_WIDTH, 0, m_ppb, Engine::getSong()->getPlayPos(Song::Mode_PlayAutomationPattern),
 			m_currentPosition, Song::Mode_PlayAutomationPattern, this);
 	connect(this, SIGNAL(positionChanged(const TimePos&)), m_timeLine, SLOT(updatePosition(const TimePos&)));
 	connect(m_timeLine, SIGNAL(positionChanged(const TimePos&)), this, SLOT(updatePosition(const TimePos&)));
@@ -748,8 +748,8 @@ inline void AutomationEditor::drawCross(QPainter& p)
 	float scaledLevel = m_pattern->firstObject()->scaledValue(level);
 
 	// Limit the scaled-level tooltip to the grid
-	if (mouse_pos.x() >= 0 && mouse_pos.x() <= width() - SCROLLBAR_SIZE && mouse_pos.y() >= 0 &&
-		mouse_pos.y() <= height() - SCROLLBAR_SIZE)
+	if (mouse_pos.x() >= 0 && mouse_pos.x() <= width() - SCROLLBAR_SIZE && mouse_pos.y() >= 0
+		&& mouse_pos.y() <= height() - SCROLLBAR_SIZE)
 	{
 		QToolTip::showText(tt_pos, QString::number(scaledLevel), this);
 	}
@@ -853,9 +853,9 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 	if (m_pattern)
 	{
 		int tick, x, q;
-		int x_line_end =
-			(int)(m_y_auto || m_topLevel < m_maxLevel ? TOP_MARGIN
-													  : grid_bottom - (m_topLevel - m_bottomLevel) * m_y_delta);
+		int x_line_end
+			= (int)(m_y_auto || m_topLevel < m_maxLevel ? TOP_MARGIN
+														: grid_bottom - (m_topLevel - m_bottomLevel) * m_y_delta);
 
 		if (m_zoomingXModel.value() > 3)
 		{
@@ -912,8 +912,8 @@ void AutomationEditor::paintEvent(QPaintEvent* pe)
 		}
 
 		// alternating shades for better contrast
-		float timeSignature = static_cast<float>(Engine::getSong()->getTimeSigModel().getNumerator()) /
-			static_cast<float>(Engine::getSong()->getTimeSigModel().getDenominator());
+		float timeSignature = static_cast<float>(Engine::getSong()->getTimeSigModel().getNumerator())
+			/ static_cast<float>(Engine::getSong()->getTimeSigModel().getDenominator());
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
 		// the bars which disappears at the left side by scrolling
 		int leftBars = m_currentPosition * zoomFactor / TimePos::ticksPerBar();
@@ -1108,8 +1108,8 @@ void AutomationEditor::drawLevelTick(QPainter& p, int tick, float value)
 	int rect_width = xCoordOfTick(tick + 1) - x;
 
 	// is the level in visible area?
-	if ((value >= m_bottomLevel && value <= m_topLevel) || (value > m_topLevel && m_topLevel >= 0) ||
-		(value < m_bottomLevel && m_bottomLevel <= 0))
+	if ((value >= m_bottomLevel && value <= m_topLevel) || (value > m_topLevel && m_topLevel >= 0)
+		|| (value < m_bottomLevel && m_bottomLevel <= 0))
 	{
 		int y_start = yCoordOfLevel(value);
 		int rect_height;
@@ -1260,12 +1260,12 @@ float AutomationEditor::getLevel(int y)
 {
 	int level_line_y = height() - SCROLLBAR_SIZE - 1;
 	// pressed level
-	float level =
-		roundf((m_bottomLevel +
-				   (m_y_auto ? (m_maxLevel - m_minLevel) * (level_line_y - y) / (float)(level_line_y - (TOP_MARGIN + 2))
-							 : (level_line_y - y) / (float)m_y_delta)) /
-			m_step) *
-		m_step;
+	float level = roundf((m_bottomLevel
+							 + (m_y_auto ? (m_maxLevel - m_minLevel) * (level_line_y - y)
+										 / (float)(level_line_y - (TOP_MARGIN + 2))
+										 : (level_line_y - y) / (float)m_y_delta))
+					  / m_step)
+		* m_step;
 	// some range-checking-stuff
 	level = qBound(m_bottomLevel, level, m_topLevel);
 
@@ -1371,8 +1371,8 @@ void AutomationEditor::setTension()
 
 void AutomationEditor::updatePosition(const TimePos& t)
 {
-	if ((Engine::getSong()->isPlaying() && Engine::getSong()->playMode() == Song::Mode_PlayAutomationPattern) ||
-		m_scrollBack == true)
+	if ((Engine::getSong()->isPlaying() && Engine::getSong()->playMode() == Song::Mode_PlayAutomationPattern)
+		|| m_scrollBack == true)
 	{
 		const int w = width() - VALUES_WIDTH;
 		if (t > m_currentPosition + w * TimePos::ticksPerBar() / m_ppb)
@@ -1525,8 +1525,8 @@ AutomationEditorWindow::AutomationEditorWindow()
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
 
-	QAction* drawOutAction =
-		editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
+	QAction* drawOutAction
+		= editModeGroup->addAction(embed::getIconPixmap("edit_draw_outvalue"), tr("Draw outValues mode (Shift+C)"));
 	drawOutAction->setShortcut(Qt::SHIFT | Qt::Key_C);
 
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
@@ -1545,12 +1545,12 @@ AutomationEditorWindow::AutomationEditorWindow()
 
 	ActionGroup* progression_type_group = new ActionGroup(this);
 
-	m_discreteAction =
-		progression_type_group->addAction(embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
+	m_discreteAction
+		= progression_type_group->addAction(embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
 	m_discreteAction->setChecked(true);
 
-	m_linearAction =
-		progression_type_group->addAction(embed::getIconPixmap("progression_linear"), tr("Linear progression"));
+	m_linearAction
+		= progression_type_group->addAction(embed::getIconPixmap("progression_linear"), tr("Linear progression"));
 	m_cubicHermiteAction = progression_type_group->addAction(
 		embed::getIconPixmap("progression_cubic_hermite"), tr("Cubic Hermite progression"));
 
@@ -1701,8 +1701,8 @@ void AutomationEditorWindow::dropEvent(QDropEvent* _de)
 	QString val = StringPairDrag::decodeValue(_de);
 	if (type == "automatable_model")
 	{
-		AutomatableModel* mod =
-			dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
+		AutomatableModel* mod
+			= dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
 		if (mod != nullptr)
 		{
 			bool added = m_editor->m_pattern->addObject(mod);

@@ -39,7 +39,7 @@
 AudioSoundIo::AudioSoundIo(bool& outSuccessful, Mixer* _mixer)
 	: AudioDevice(qBound<ch_cnt_t>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiosoundio", "channels").toInt(),
 					  SURROUND_CHANNELS),
-		  _mixer)
+		_mixer)
 {
 	outSuccessful = false;
 	m_soundio = NULL;
@@ -153,8 +153,8 @@ AudioSoundIo::AudioSoundIo(bool& outSuccessful, Mixer* _mixer)
 			closestSupportedSampleRate = currentSampleRate;
 			break;
 		}
-		if (closestSupportedSampleRate == -1 ||
-			abs(range->max - currentSampleRate) < abs(closestSupportedSampleRate - currentSampleRate))
+		if (closestSupportedSampleRate == -1
+			|| abs(range->max - currentSampleRate) < abs(closestSupportedSampleRate - currentSampleRate))
 		{
 			closestSupportedSampleRate = range->max;
 		}
@@ -344,8 +344,8 @@ static void setup_widget_on_devices_change(SoundIo* soundio)
 
 void AudioSoundIo::setupWidget::reconnectSoundIo()
 {
-	const QString& configBackend =
-		m_isFirst ? ConfigManager::inst()->value("audiosoundio", "backend") : m_backendModel.currentText();
+	const QString& configBackend
+		= m_isFirst ? ConfigManager::inst()->value("audiosoundio", "backend") : m_backendModel.currentText();
 	m_isFirst = false;
 
 	soundio_disconnect(m_soundio);

@@ -195,8 +195,8 @@ bool HydrogenImport::readSong()
 
 					if (nLayer == 0)
 					{
-						drum_track[sId] =
-							(InstrumentTrack*)Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer());
+						drum_track[sId]
+							= (InstrumentTrack*)Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer());
 						drum_track[sId]->volumeModel()->setValue(fVolume * 100);
 						drum_track[sId]->panningModel()->setValue((fPan_R - fPan_L) * 100);
 						ins = drum_track[sId]->loadInstrument("audiofileprocessor");

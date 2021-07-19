@@ -141,9 +141,9 @@ bool VersionedSaveDialog::fileExistsQuery(QString FileName, QString WindowTitle)
 	{
 		QMessageBox mb;
 		mb.setWindowTitle(WindowTitle);
-		mb.setText(FileName +
-			tr(" already exists. "
-			   "Do you want to replace it?"));
+		mb.setText(FileName
+			+ tr(" already exists. "
+				 "Do you want to replace it?"));
 		mb.setIcon(QMessageBox::Warning);
 		mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 

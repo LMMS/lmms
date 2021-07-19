@@ -48,10 +48,10 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "PatMan",
-		QT_TRANSLATE_NOOP("PluginBrowser", "GUS-compatible patch instrument"),
-		"Javier Serrano Polo <jasp00/at/users.sourceforge.net>", 0x0100, Plugin::Instrument,
-		new PluginPixmapLoader("logo"), "pat", NULL};
+	Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "PatMan", QT_TRANSLATE_NOOP("PluginBrowser", "GUS-compatible patch instrument"),
+			"Javier Serrano Polo <jasp00/at/users.sourceforge.net>", 0x0100, Plugin::Instrument,
+			new PluginPixmapLoader("logo"), "pat", NULL};
 
 	// necessary for getting instance out of shared lib
 	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
@@ -156,8 +156,8 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(const QString& _filenam
 
 	unsigned char header[239];
 
-	if (fread(header, 1, 239, fd) != 239 ||
-		(memcmp(header, "GF1PATCH110\0ID#000002", 22) && memcmp(header, "GF1PATCH100\0ID#000002", 22)))
+	if (fread(header, 1, 239, fd) != 239
+		|| (memcmp(header, "GF1PATCH110\0ID#000002", 22) && memcmp(header, "GF1PATCH100\0ID#000002", 22)))
 	{
 		fclose(fd);
 		return (LoadNotGUS);

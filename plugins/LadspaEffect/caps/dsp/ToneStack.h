@@ -132,8 +132,8 @@ public:
 		a2lm = C1 * C3 * R2 * R3 + C2 * C3 * R2 * R3;
 		a2m2 = -(C1 * C3 * R3 * R3 + C2 * C3 * R3 * R3);
 		a2l = C1 * C2 * R2 * R4 + C1 * C2 * R1 * R2 + C1 * C3 * R2 * R4 + C2 * C3 * R2 * R4;
-		a2d = C1 * C2 * R1 * R4 + C1 * C3 * R1 * R4 + C1 * C2 * R3 * R4 + C1 * C2 * R1 * R3 + C1 * C3 * R3 * R4 +
-			C2 * C3 * R3 * R4;
+		a2d = C1 * C2 * R1 * R4 + C1 * C3 * R1 * R4 + C1 * C2 * R3 * R4 + C1 * C2 * R1 * R3 + C1 * C3 * R3 * R4
+			+ C2 * C3 * R3 * R4;
 		a3lm = C1 * C2 * C3 * R1 * R2 * R3 + C1 * C2 * C3 * R2 * R3 * R4;
 		a3m2 = -(C1 * C2 * C3 * R1 * R3 * R3 + C1 * C2 * C3 * R3 * R3 * R4);
 		a3m = C1 * C2 * C3 * R3 * R3 * R4 + C1 * C2 * C3 * R1 * R3 * R3 - C1 * C2 * C3 * R1 * R3 * R4;

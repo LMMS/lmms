@@ -38,7 +38,7 @@
 AudioAlsa::AudioAlsa(bool& _success_ful, Mixer* _mixer)
 	: AudioDevice(qBound<ch_cnt_t>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audioalsa", "channels").toInt(),
 					  SURROUND_CHANNELS),
-		  _mixer)
+		_mixer)
 	, m_handle(NULL)
 	, m_hwParams(NULL)
 	, m_swParams(NULL)

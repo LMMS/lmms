@@ -78,8 +78,8 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
 	using DisablerFunc = void (*)(QWidget*);
 	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
-	DisablerFunc setNoAccelerators =
-		reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
+	DisablerFunc setNoAccelerators
+		= reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
 	if (setNoAccelerators) { setNoAccelerators(mainWindow); }
 	kf5WidgetsAddon.unload();
 }
@@ -290,10 +290,10 @@ void MainWindow::finalize()
 
 	QMenu* edit_menu = new QMenu(this);
 	menuBar()->addMenu(edit_menu)->setText(tr("&Edit"));
-	m_undoAction =
-		edit_menu->addAction(embed::getIconPixmap("edit_undo"), tr("Undo"), this, SLOT(undo()), QKeySequence::Undo);
-	m_redoAction =
-		edit_menu->addAction(embed::getIconPixmap("edit_redo"), tr("Redo"), this, SLOT(redo()), QKeySequence::Redo);
+	m_undoAction
+		= edit_menu->addAction(embed::getIconPixmap("edit_undo"), tr("Undo"), this, SLOT(undo()), QKeySequence::Undo);
+	m_redoAction
+		= edit_menu->addAction(embed::getIconPixmap("edit_redo"), tr("Redo"), this, SLOT(redo()), QKeySequence::Redo);
 	// Ensure that both (Ctrl+Y) and (Ctrl+Shift+Z) activate redo shortcut regardless of OS defaults
 	if (QKeySequence(QKeySequence::Redo) != QKeySequence(Qt::CTRL + Qt::Key_Y))
 	{
@@ -364,8 +364,8 @@ void MainWindow::finalize()
 	ToolButton* project_export = new ToolButton(
 		embed::getIconPixmap("project_export"), tr("Export current project"), this, SLOT(onExportProject()), m_toolBar);
 
-	m_metronomeToggle =
-		new ToolButton(embed::getIconPixmap("metronome"), tr("Metronome"), this, SLOT(onToggleMetronome()), m_toolBar);
+	m_metronomeToggle = new ToolButton(
+		embed::getIconPixmap("metronome"), tr("Metronome"), this, SLOT(onToggleMetronome()), m_toolBar);
 	m_metronomeToggle->setCheckable(true);
 	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
 
@@ -427,8 +427,8 @@ void MainWindow::finalize()
 	// look whether mixer failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
 	// or the audio device is set to invalid one
-	else if (Engine::mixer()->audioDevStartFailed() ||
-		!Mixer::isAudioDevNameValid(ConfigManager::inst()->value("mixer", "audiodev")))
+	else if (Engine::mixer()->audioDevStartFailed()
+		|| !Mixer::isAudioDevNameValid(ConfigManager::inst()->value("mixer", "audiodev")))
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd(SetupDialog::AudioSettings);
@@ -699,8 +699,8 @@ void MainWindow::saveProjectAsDefaultTemplate()
 	if (fileInfo.exists())
 	{
 		if (QMessageBox::warning(this, tr("Overwrite default template?"),
-				tr("This will overwrite your current default template."), QMessageBox::Ok,
-				QMessageBox::Cancel) != QMessageBox::Ok)
+				tr("This will overwrite your current default template."), QMessageBox::Ok, QMessageBox::Cancel)
+			!= QMessageBox::Ok)
 		{
 			return;
 		}
@@ -1022,9 +1022,9 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if (!Engine::getSong()->isExporting() && !Engine::getSong()->isLoadingProject() &&
-		!RemotePluginBase::isMainThreadWaiting() && !QApplication::mouseButtons() &&
-		(ConfigManager::inst()->value("ui", "enablerunningautosave").toInt() || !Engine::getSong()->isPlaying()))
+	if (!Engine::getSong()->isExporting() && !Engine::getSong()->isLoadingProject()
+		&& !RemotePluginBase::isMainThreadWaiting() && !QApplication::mouseButtons()
+		&& (ConfigManager::inst()->value("ui", "enablerunningautosave").toInt() || !Engine::getSong()->isPlaying()))
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset(); // Reset timer
@@ -1199,8 +1199,8 @@ void MainWindow::onImportProject()
 	if (song)
 	{
 		FileDialog ofd(nullptr, tr("Import file"), ConfigManager::inst()->userProjectsDir(),
-			tr("MIDI sequences") + " (*.mid *.midi *.rmi);;" + tr("Hydrogen projects") + " (*.h2song);;" +
-				tr("All file types") + " (*.*)");
+			tr("MIDI sequences") + " (*.mid *.midi *.rmi);;" + tr("Hydrogen projects") + " (*.h2song);;"
+				+ tr("All file types") + " (*.*)");
 
 		ofd.setFileMode(FileDialog::ExistingFiles);
 		if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())

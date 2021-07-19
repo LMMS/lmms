@@ -376,8 +376,8 @@ void MidiAlsaSeq::run()
 			for (int i = 0; i < m_portIDs.size(); ++i)
 			{
 				if (m_portIDs.values()[i][0] == ev->dest.port) { dest = m_portIDs.keys()[i]; }
-				if ((m_portIDs.values()[i][1] != -1 && m_portIDs.values()[i][1] == ev->source.port) ||
-					m_portIDs.values()[i][0] == ev->source.port)
+				if ((m_portIDs.values()[i][1] != -1 && m_portIDs.values()[i][1] == ev->source.port)
+					|| m_portIDs.values()[i][0] == ev->source.port)
 				{
 					source = &ev->source;
 				}
@@ -485,13 +485,13 @@ void MidiAlsaSeq::updatePortList()
 		while (snd_seq_query_next_port(m_seqHandle, pinfo) >= 0)
 		{
 			// we need both READ and SUBS_READ
-			if ((snd_seq_port_info_get_capability(pinfo) & (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ)) ==
-				(SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
+			if ((snd_seq_port_info_get_capability(pinfo) & (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
+				== (SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ))
 			{
 				readablePorts.push_back(portName(cinfo, pinfo));
 			}
-			if ((snd_seq_port_info_get_capability(pinfo) & (SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE)) ==
-				(SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE))
+			if ((snd_seq_port_info_get_capability(pinfo) & (SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE))
+				== (SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE))
 			{
 				writablePorts.push_back(portName(cinfo, pinfo));
 			}

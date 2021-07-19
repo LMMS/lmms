@@ -398,14 +398,14 @@ int Song::getExportProgress() const
 	}
 	else if (pos >= m_exportLoopEnd)
 	{
-		pos = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount +
-			(pos - m_exportLoopEnd);
+		pos = (m_exportLoopBegin - m_exportSongBegin) + (m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount
+			+ (pos - m_exportLoopEnd);
 	}
 	else if (pos >= m_exportLoopBegin)
 	{
-		pos = (m_exportLoopBegin - m_exportSongBegin) +
-			((m_exportLoopEnd - m_exportLoopBegin) * (m_loopRenderCount - m_loopRenderRemaining)) +
-			(pos - m_exportLoopBegin);
+		pos = (m_exportLoopBegin - m_exportSongBegin)
+			+ ((m_exportLoopEnd - m_exportLoopBegin) * (m_loopRenderCount - m_loopRenderRemaining))
+			+ (pos - m_exportLoopBegin);
 	}
 	else
 	{
@@ -615,12 +615,12 @@ void Song::startExport()
 		// FIXME: remove this check once we load timeline in headless mode
 		if (m_playPos[Mode_PlaySong].m_timeLine)
 		{
-			m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd &&
-					m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd
+			m_exportLoopBegin = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd
+					&& m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd
 				? m_playPos[Mode_PlaySong].m_timeLine->loopBegin()
 				: TimePos(0, 0);
-			m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd &&
-					m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd
+			m_exportLoopEnd = m_playPos[Mode_PlaySong].m_timeLine->loopBegin() < m_exportSongEnd
+					&& m_playPos[Mode_PlaySong].m_timeLine->loopEnd() <= m_exportSongEnd
 				? m_playPos[Mode_PlaySong].m_timeLine->loopEnd()
 				: TimePos(0, 0);
 		}
@@ -628,8 +628,8 @@ void Song::startExport()
 		m_playPos[Mode_PlaySong].setTicks(0);
 	}
 
-	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin) +
-		(m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
+	m_exportEffectiveLength = (m_exportLoopBegin - m_exportSongBegin)
+		+ (m_exportLoopEnd - m_exportLoopBegin) * m_loopRenderCount + (m_exportSongEnd - m_exportLoopEnd);
 	m_loopRenderRemaining = m_loopRenderCount;
 
 	playSong();

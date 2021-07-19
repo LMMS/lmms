@@ -539,16 +539,16 @@ void PatternView::constructContextMenu(QMenu* _cm)
 
 void PatternView::mousePressEvent(QMouseEvent* _me)
 {
-	if (_me->button() == Qt::LeftButton && m_pat->m_patternType == Pattern::BeatPattern &&
-		(fixedTCOs() || pixelsPerBar() >= 96) && _me->y() > height() - s_stepBtnOff->height())
+	if (_me->button() == Qt::LeftButton && m_pat->m_patternType == Pattern::BeatPattern
+		&& (fixedTCOs() || pixelsPerBar() >= 96) && _me->y() > height() - s_stepBtnOff->height())
 
 	// when mouse button is pressed in beat/bassline -mode
 
 	{
 		//	get the step number that was clicked on and
 		//	do calculations in floats to prevent rounding errors...
-		float tmp =
-			((float(_me->x()) - TCO_BORDER_WIDTH) * float(m_pat->m_steps)) / float(width() - TCO_BORDER_WIDTH * 2);
+		float tmp
+			= ((float(_me->x()) - TCO_BORDER_WIDTH) * float(m_pat->m_steps)) / float(width() - TCO_BORDER_WIDTH * 2);
 
 		int step = int(tmp);
 
@@ -596,13 +596,13 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent* _me)
 
 void PatternView::wheelEvent(QWheelEvent* we)
 {
-	if (m_pat->m_patternType == Pattern::BeatPattern && (fixedTCOs() || pixelsPerBar() >= 96) &&
-		position(we).y() > height() - s_stepBtnOff->height())
+	if (m_pat->m_patternType == Pattern::BeatPattern && (fixedTCOs() || pixelsPerBar() >= 96)
+		&& position(we).y() > height() - s_stepBtnOff->height())
 	{
 		//	get the step number that was wheeled on and
 		//	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - TCO_BORDER_WIDTH) * float(m_pat->m_steps)) /
-			float(width() - TCO_BORDER_WIDTH * 2);
+		float tmp = ((float(position(we).x()) - TCO_BORDER_WIDTH) * float(m_pat->m_steps))
+			/ float(width() - TCO_BORDER_WIDTH * 2);
 
 		int step = int(tmp);
 
@@ -773,8 +773,8 @@ void PatternView::paintEvent(QPaintEvent*)
 
 		// set colour based on mute status
 		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
-		QColor noteBorderColor =
-			muted ? getMutedNoteBorderColor() : (m_pat->hasColor() ? c.lighter(200) : getNoteBorderColor());
+		QColor noteBorderColor
+			= muted ? getMutedNoteBorderColor() : (m_pat->hasColor() ? c.lighter(200) : getNoteBorderColor());
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines) { p.setPen(noteFillColor); }
@@ -831,12 +831,12 @@ void PatternView::paintEvent(QPaintEvent*)
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
 
 		// scale step graphics to fit the beat pattern length
-		stepon0 =
-			s_stepBtnOn0->scaled(w / steps, s_stepBtnOn0->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		stepon0
+			= s_stepBtnOn0->scaled(w / steps, s_stepBtnOn0->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		stepon200 = s_stepBtnOn200->scaled(
 			w / steps, s_stepBtnOn200->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-		stepoff =
-			s_stepBtnOff->scaled(w / steps, s_stepBtnOff->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+		stepoff
+			= s_stepBtnOff->scaled(w / steps, s_stepBtnOff->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		stepoffl = s_stepBtnOffLight->scaled(
 			w / steps, s_stepBtnOffLight->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 

@@ -127,8 +127,8 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame>& ring_buffer)
 					}
 					else
 					{
-						m_bufferL[m_framesFilledUp] = m_bufferR[m_framesFilledUp] =
-							(in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
+						m_bufferL[m_framesFilledUp] = m_bufferR[m_framesFilledUp]
+							= (in_buffer[in_frame][0] + in_buffer[in_frame][1]) * 0.5f;
 					}
 					if (in_buffer[in_frame][0] != 0.f || in_buffer[in_frame][1] != 0.f) { block_empty = false; }
 				}

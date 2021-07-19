@@ -181,14 +181,14 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls)
 	m_autoReleaseKnob->setModel(&controls->m_autoReleaseModel);
 	ToolTip::add(m_autoReleaseKnob, tr("Automatically control release value depending on crest factor"));
 
-	m_outFader =
-		new EqFader(&controls->m_outGainModel, tr("Output gain"), this, &controls->m_outPeakL, &controls->m_outPeakR);
+	m_outFader
+		= new EqFader(&controls->m_outGainModel, tr("Output gain"), this, &controls->m_outPeakL, &controls->m_outPeakR);
 	m_outFader->setDisplayConversion(false);
 	m_outFader->setHintText(tr("Gain"), "dBFS");
 	ToolTip::add(m_outFader, tr("Output volume"));
 
-	m_inFader =
-		new EqFader(&controls->m_inGainModel, tr("Input gain"), this, &controls->m_inPeakL, &controls->m_inPeakR);
+	m_inFader
+		= new EqFader(&controls->m_inGainModel, tr("Input gain"), this, &controls->m_inPeakL, &controls->m_inPeakR);
 	m_inFader->setDisplayConversion(false);
 	m_inFader->setHintText(tr("Gain"), "dBFS");
 	ToolTip::add(m_inFader, tr("Input volume"));
@@ -483,9 +483,9 @@ void CompressorControlDialog::redrawKnee()
 	// Calculate endpoints for the two straight lines
 	float kneePoint1 = m_controls->m_effect->m_thresholdVal - m_controls->m_effect->m_kneeVal;
 	float kneePoint2X = m_controls->m_effect->m_thresholdVal + m_controls->m_effect->m_kneeVal;
-	float kneePoint2Y = (m_controls->m_effect->m_thresholdVal +
-		(-m_controls->m_effect->m_thresholdVal *
-			(actualRatio * (m_controls->m_effect->m_kneeVal / -m_controls->m_effect->m_thresholdVal))));
+	float kneePoint2Y = (m_controls->m_effect->m_thresholdVal
+		+ (-m_controls->m_effect->m_thresholdVal
+			* (actualRatio * (m_controls->m_effect->m_kneeVal / -m_controls->m_effect->m_thresholdVal))));
 	float ratioPoint = m_controls->m_effect->m_thresholdVal + (-m_controls->m_effect->m_thresholdVal * actualRatio);
 
 	// Draw two straight lines

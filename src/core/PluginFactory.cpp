@@ -159,8 +159,8 @@ void PluginFactory::discoverPlugins()
 			QString descriptorName = file.baseName() + "_plugin_descriptor";
 			if (descriptorName.left(3) == "lib") { descriptorName = descriptorName.mid(3); }
 
-			pluginDescriptor =
-				reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
+			pluginDescriptor
+				= reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
 			if (pluginDescriptor == nullptr)
 			{
 				qWarning() << qApp->translate(

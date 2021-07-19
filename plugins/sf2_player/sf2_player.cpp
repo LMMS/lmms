@@ -98,8 +98,8 @@ sf2Instrument::sf2Instrument(InstrumentTrack* _instrument_track)
 		m_notesRunning[i] = 0;
 	}
 
-#if QT_VERSION_CHECK(FLUIDSYNTH_VERSION_MAJOR, FLUIDSYNTH_VERSION_MINOR, FLUIDSYNTH_VERSION_MICRO) >= \
-	QT_VERSION_CHECK(1, 1, 9)
+#if QT_VERSION_CHECK(FLUIDSYNTH_VERSION_MAJOR, FLUIDSYNTH_VERSION_MINOR, FLUIDSYNTH_VERSION_MICRO) \
+	>= QT_VERSION_CHECK(1, 1, 9)
 	// Deactivate all audio drivers in fluidsynth
 	const char* none[] = {NULL};
 	fluid_audio_driver_register(none);

@@ -277,8 +277,8 @@ public:
 		for (ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl)
 		{
 			// reset in/out history for moog-filter
-			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] = m_oldx[_chnl] = m_oldy1[_chnl] = m_oldy2[_chnl] =
-				m_oldy3[_chnl] = 0.0f;
+			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] = m_oldx[_chnl] = m_oldy1[_chnl] = m_oldy2[_chnl]
+				= m_oldy3[_chnl] = 0.0f;
 
 			// tripole
 			m_last[_chnl] = 0.0f;
@@ -640,8 +640,8 @@ public:
 		// temp coef vars
 		_q = qMax(_q, minQ());
 
-		if (m_type == Lowpass_RC12 || m_type == Bandpass_RC12 || m_type == Highpass_RC12 || m_type == Lowpass_RC24 ||
-			m_type == Bandpass_RC24 || m_type == Highpass_RC24)
+		if (m_type == Lowpass_RC12 || m_type == Bandpass_RC12 || m_type == Highpass_RC12 || m_type == Lowpass_RC24
+			|| m_type == Bandpass_RC24 || m_type == Highpass_RC24)
 		{
 			_freq = qBound(50.0f, _freq, 20000.0f);
 			const float sr = m_sampleRatio * 0.25f;
@@ -658,12 +658,12 @@ public:
 
 		if (m_type == Formantfilter || m_type == FastFormant)
 		{
-			_freq =
-				qBound(minFreq(), _freq, 20000.0f); // limit freq and q for not getting bad noise out of the filter...
+			_freq
+				= qBound(minFreq(), _freq, 20000.0f); // limit freq and q for not getting bad noise out of the filter...
 
 			// formats for a, e, i, o, u, a
-			static const float _f[6][2] = {
-				{1000, 1400}, {500, 2300}, {320, 3200}, {500, 1000}, {320, 800}, {1000, 1400}};
+			static const float _f[6][2]
+				= {{1000, 1400}, {500, 2300}, {320, 3200}, {500, 1000}, {320, 800}, {1000, 1400}};
 			static const float freqRatio = 4.0f / 14000.0f;
 
 			// Stretch Q/resonance

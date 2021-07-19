@@ -105,6 +105,6 @@ bool SamplePlayHandle::isFromTrack(const Track* _track) const { return m_track =
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return (m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame()) *
-		(Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate());
+	return (m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame())
+		* (Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate());
 }

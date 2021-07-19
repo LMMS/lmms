@@ -282,15 +282,15 @@ QString vestigeInstrument::nodeName(void) const { return (vestige_plugin_descrip
 void vestigeInstrument::loadFile(const QString& _file)
 {
 	m_pluginMutex.lock();
-	const bool set_ch_name = (m_plugin != NULL && instrumentTrack()->name() == m_plugin->name()) ||
-		instrumentTrack()->name() == InstrumentTrack::tr("Default preset") ||
-		instrumentTrack()->name() == displayName();
+	const bool set_ch_name = (m_plugin != NULL && instrumentTrack()->name() == m_plugin->name())
+		|| instrumentTrack()->name() == InstrumentTrack::tr("Default preset")
+		|| instrumentTrack()->name() == displayName();
 
 	m_pluginMutex.unlock();
 
 	// if the same is loaded don't load again (for preview)
-	if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode() &&
-		m_pluginDLL == PathUtil::toShortestRelative(_file))
+	if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode()
+		&& m_pluginDLL == PathUtil::toShortestRelative(_file))
 		return;
 
 	if (m_plugin != NULL) { closePlugin(); }

@@ -32,9 +32,9 @@
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Compressor",
-		QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."), "Lost Robot <r94231@gmail.com>", 0x0100,
-		Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
+	Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "Compressor", QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
+			"Lost Robot <r94231@gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
@@ -108,13 +108,13 @@ void CompressorEffect::calcAutoMakeup()
 	if (-m_thresholdVal < m_kneeVal)
 	{
 		const float temp = -m_thresholdVal + m_kneeVal;
-		tempGainResult =
-			((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
+		tempGainResult
+			= ((m_compressorControls.m_limiterModel.value() ? 0 : m_ratioVal) - 1) * temp * temp / (4 * m_kneeVal);
 	}
 	else // Above knee
 	{
-		tempGainResult =
-			m_compressorControls.m_limiterModel.value() ? m_thresholdVal : m_thresholdVal - m_thresholdVal * m_ratioVal;
+		tempGainResult = m_compressorControls.m_limiterModel.value() ? m_thresholdVal
+																	 : m_thresholdVal - m_thresholdVal * m_ratioVal;
 	}
 
 	m_autoMakeupVal = 1.f / dbfsToAmp(tempGainResult);
@@ -292,8 +292,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			// Calculate the crest factor of the audio by diving the peak by the RMS
 			m_crestPeakVal[i] = qMax(inputValue * inputValue,
 				m_crestTimeConst * m_crestPeakVal[i] + (1 - m_crestTimeConst) * (inputValue * inputValue));
-			m_crestRmsVal[i] =
-				m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
+			m_crestRmsVal[i]
+				= m_crestTimeConst * m_crestRmsVal[i] + ((1 - m_crestTimeConst) * (inputValue * inputValue));
 			m_crestFactorVal[i] = m_crestPeakVal[i] / m_crestRmsVal[i];
 
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
@@ -399,8 +399,8 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 			else // Above knee
 			{
-				m_gainResult[i] =
-					limiter ? m_thresholdVal : m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal;
+				m_gainResult[i]
+					= limiter ? m_thresholdVal : m_thresholdVal + (currentPeakDbfs - m_thresholdVal) * m_ratioVal;
 			}
 
 			m_gainResult[i] = dbfsToAmp(m_gainResult[i]) / m_yL[i];

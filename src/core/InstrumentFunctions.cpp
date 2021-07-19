@@ -32,109 +32,109 @@
 #include "PresetPreviewPlayHandle.h"
 #include "embed.h"
 
-InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] = {
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "octave"), {0, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major"), {0, 4, 7, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Majb5"), {0, 4, 6, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "minor"), {0, 3, 7, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "minb5"), {0, 3, 6, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "sus2"), {0, 2, 7, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "sus4"), {0, 5, 7, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "aug"), {0, 4, 8, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "augsus4"), {0, 5, 8, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "tri"), {0, 3, 6, 9, -1}},
+InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[]
+	= {{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "octave"), {0, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major"), {0, 4, 7, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Majb5"), {0, 4, 6, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "minor"), {0, 3, 7, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "minb5"), {0, 3, 6, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "sus2"), {0, 2, 7, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "sus4"), {0, 5, 7, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "aug"), {0, 4, 8, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "augsus4"), {0, 5, 8, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "tri"), {0, 3, 6, 9, -1}},
 
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "6"), {0, 4, 7, 9, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "6sus4"), {0, 5, 7, 9, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "6add9"), {0, 4, 7, 9, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m6"), {0, 3, 7, 9, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m6add9"), {0, 3, 7, 9, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "6"), {0, 4, 7, 9, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "6sus4"), {0, 5, 7, 9, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "6add9"), {0, 4, 7, 9, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m6"), {0, 3, 7, 9, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m6add9"), {0, 3, 7, 9, 14, -1}},
 
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7"), {0, 4, 7, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7sus4"), {0, 5, 7, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#5"), {0, 4, 8, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7b5"), {0, 4, 6, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#9"), {0, 4, 7, 10, 15, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7b9"), {0, 4, 7, 10, 13, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#5#9"), {0, 4, 8, 10, 15, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#5b9"), {0, 4, 8, 10, 13, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7b5b9"), {0, 4, 6, 10, 13, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7add11"), {0, 4, 7, 10, 17, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7add13"), {0, 4, 7, 10, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#11"), {0, 4, 7, 10, 18, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7"), {0, 4, 7, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7b5"), {0, 4, 6, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7#5"), {0, 4, 8, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7#11"), {0, 4, 7, 11, 18, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7add13"), {0, 4, 7, 11, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7"), {0, 3, 7, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7b5"), {0, 3, 6, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7b9"), {0, 3, 7, 10, 13, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7add11"), {0, 3, 7, 10, 17, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7add13"), {0, 3, 7, 10, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj7"), {0, 3, 7, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj7add11"), {0, 3, 7, 11, 17, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj7add13"), {0, 3, 7, 11, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7"), {0, 4, 7, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7sus4"), {0, 5, 7, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#5"), {0, 4, 8, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7b5"), {0, 4, 6, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#9"), {0, 4, 7, 10, 15, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7b9"), {0, 4, 7, 10, 13, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#5#9"), {0, 4, 8, 10, 15, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#5b9"), {0, 4, 8, 10, 13, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7b5b9"), {0, 4, 6, 10, 13, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7add11"), {0, 4, 7, 10, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7add13"), {0, 4, 7, 10, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "7#11"), {0, 4, 7, 10, 18, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7"), {0, 4, 7, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7b5"), {0, 4, 6, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7#5"), {0, 4, 8, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7#11"), {0, 4, 7, 11, 18, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj7add13"), {0, 4, 7, 11, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7"), {0, 3, 7, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7b5"), {0, 3, 6, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7b9"), {0, 3, 7, 10, 13, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7add11"), {0, 3, 7, 10, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m7add13"), {0, 3, 7, 10, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj7"), {0, 3, 7, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj7add11"), {0, 3, 7, 11, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj7add13"), {0, 3, 7, 11, 21, -1}},
 
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9"), {0, 4, 7, 10, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9sus4"), {0, 5, 7, 10, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "add9"), {0, 4, 7, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9#5"), {0, 4, 8, 10, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9b5"), {0, 4, 6, 10, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9#11"), {0, 4, 7, 10, 14, 18, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9b13"), {0, 4, 7, 10, 14, 20, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9"), {0, 4, 7, 11, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9sus4"), {0, 5, 7, 11, 15, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9#5"), {0, 4, 8, 11, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9#11"), {0, 4, 7, 11, 14, 18, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m9"), {0, 3, 7, 10, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "madd9"), {0, 3, 7, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m9b5"), {0, 3, 6, 10, 14, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m9-Maj7"), {0, 3, 7, 11, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9"), {0, 4, 7, 10, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9sus4"), {0, 5, 7, 10, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "add9"), {0, 4, 7, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9#5"), {0, 4, 8, 10, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9b5"), {0, 4, 6, 10, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9#11"), {0, 4, 7, 10, 14, 18, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "9b13"), {0, 4, 7, 10, 14, 20, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9"), {0, 4, 7, 11, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9sus4"), {0, 5, 7, 11, 15, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9#5"), {0, 4, 8, 11, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj9#11"), {0, 4, 7, 11, 14, 18, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m9"), {0, 3, 7, 10, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "madd9"), {0, 3, 7, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m9b5"), {0, 3, 6, 10, 14, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m9-Maj7"), {0, 3, 7, 11, 14, -1}},
 
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "11"), {0, 4, 7, 10, 14, 17, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "11b9"), {0, 4, 7, 10, 13, 17, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj11"), {0, 4, 7, 11, 14, 17, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m11"), {0, 3, 7, 10, 14, 17, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj11"), {0, 3, 7, 11, 14, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "11"), {0, 4, 7, 10, 14, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "11b9"), {0, 4, 7, 10, 13, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj11"), {0, 4, 7, 11, 14, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m11"), {0, 3, 7, 10, 14, 17, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj11"), {0, 3, 7, 11, 14, 17, -1}},
 
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13"), {0, 4, 7, 10, 14, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13#9"), {0, 4, 7, 10, 15, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13b9"), {0, 4, 7, 10, 13, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13b5b9"), {0, 4, 6, 10, 13, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj13"), {0, 4, 7, 11, 14, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m13"), {0, 3, 7, 10, 14, 21, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj13"), {0, 3, 7, 11, 14, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13"), {0, 4, 7, 10, 14, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13#9"), {0, 4, 7, 10, 15, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13b9"), {0, 4, 7, 10, 13, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "13b5b9"), {0, 4, 6, 10, 13, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Maj13"), {0, 4, 7, 11, 14, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m13"), {0, 3, 7, 10, 14, 21, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "m-Maj13"), {0, 3, 7, 11, 14, 21, -1}},
 
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major"), {0, 2, 4, 5, 7, 9, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Harmonic minor"), {0, 2, 3, 5, 7, 8, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Melodic minor"), {0, 2, 3, 5, 7, 9, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Whole tone"), {0, 2, 4, 6, 8, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Diminished"), {0, 2, 3, 5, 6, 8, 9, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major pentatonic"), {0, 2, 4, 7, 9, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Minor pentatonic"), {0, 3, 5, 7, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Jap in sen"), {0, 1, 5, 7, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major bebop"), {0, 2, 4, 5, 7, 8, 9, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Dominant bebop"), {0, 2, 4, 5, 7, 9, 10, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Blues"), {0, 3, 5, 6, 7, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Arabic"), {0, 1, 4, 5, 7, 8, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Enigmatic"), {0, 1, 4, 6, 8, 10, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Neopolitan"), {0, 1, 3, 5, 7, 9, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Neopolitan minor"), {0, 1, 3, 5, 7, 8, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Hungarian minor"), {0, 2, 3, 6, 7, 8, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Dorian"), {0, 2, 3, 5, 7, 9, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Phrygian"), {0, 1, 3, 5, 7, 8, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Lydian"), {0, 2, 4, 6, 7, 9, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Mixolydian"), {0, 2, 4, 5, 7, 9, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Aeolian"), {0, 2, 3, 5, 7, 8, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Locrian"), {0, 1, 3, 5, 6, 8, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Minor"), {0, 2, 3, 5, 7, 8, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Chromatic"), {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Half-Whole Diminished"), {0, 1, 3, 4, 6, 7, 9, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major"), {0, 2, 4, 5, 7, 9, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Harmonic minor"), {0, 2, 3, 5, 7, 8, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Melodic minor"), {0, 2, 3, 5, 7, 9, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Whole tone"), {0, 2, 4, 6, 8, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Diminished"), {0, 2, 3, 5, 6, 8, 9, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major pentatonic"), {0, 2, 4, 7, 9, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Minor pentatonic"), {0, 3, 5, 7, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Jap in sen"), {0, 1, 5, 7, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Major bebop"), {0, 2, 4, 5, 7, 8, 9, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Dominant bebop"), {0, 2, 4, 5, 7, 9, 10, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Blues"), {0, 3, 5, 6, 7, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Arabic"), {0, 1, 4, 5, 7, 8, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Enigmatic"), {0, 1, 4, 6, 8, 10, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Neopolitan"), {0, 1, 3, 5, 7, 9, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Neopolitan minor"), {0, 1, 3, 5, 7, 8, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Hungarian minor"), {0, 2, 3, 6, 7, 8, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Dorian"), {0, 2, 3, 5, 7, 9, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Phrygian"), {0, 1, 3, 5, 7, 8, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Lydian"), {0, 2, 4, 6, 7, 9, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Mixolydian"), {0, 2, 4, 5, 7, 9, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Aeolian"), {0, 2, 3, 5, 7, 8, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Locrian"), {0, 1, 3, 5, 6, 8, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Minor"), {0, 2, 3, 5, 7, 8, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Chromatic"), {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Half-Whole Diminished"), {0, 1, 3, 4, 6, 7, 9, 10, -1}},
 
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "5"), {0, 7, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Phrygian dominant"), {0, 1, 4, 5, 7, 8, 10, -1}},
-	{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Persian"), {0, 1, 4, 5, 6, 8, 11, -1}}};
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "5"), {0, 7, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Phrygian dominant"), {0, 1, 4, 5, 7, 8, 10, -1}},
+		{QT_TRANSLATE_NOOP("InstrumentFunctionNoteStacking", "Persian"), {0, 1, 4, 5, 6, 8, 11, -1}}};
 
 InstrumentFunctionNoteStacking::Chord::Chord(const char* n, const ChordSemiTones& semi_tones)
 	: m_name(InstrumentFunctionNoteStacking::tr(n))
@@ -201,9 +201,9 @@ void InstrumentFunctionNoteStacking::processNote(NotePlayHandle* _n)
 	// at the same time we only add sub-notes if nothing of the note was
 	// played yet, because otherwise we would add chord-subnotes every
 	// time an audio-buffer is rendered...
-	if ((_n->origin() == NotePlayHandle::OriginArpeggio ||
-			(_n->hasParent() == false && _n->instrumentTrack()->isArpeggioEnabled() == false)) &&
-		_n->totalFramesPlayed() == 0 && m_chordsEnabledModel.value() == true && !_n->isReleased())
+	if ((_n->origin() == NotePlayHandle::OriginArpeggio
+			|| (_n->hasParent() == false && _n->instrumentTrack()->isArpeggioEnabled() == false))
+		&& _n->totalFramesPlayed() == 0 && m_chordsEnabledModel.value() == true && !_n->isReleased())
 	{
 		// then insert sub-notes for chord
 		const int selected_chord = m_chordsModel.value();
@@ -260,8 +260,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio(Model* _parent)
 	, m_arpDirectionModel(this, tr("Arpeggio direction"))
 	, m_arpModeModel(this, tr("Arpeggio mode"))
 {
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-		InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable& chord_table
+		= InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	for (int i = 0; i < chord_table.size(); ++i)
 	{
 		m_arpModel.addItem(chord_table[i].getName());
@@ -284,8 +284,8 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio() {}
 void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 {
 	const int base_note_key = _n->key();
-	if (_n->origin() == NotePlayHandle::OriginArpeggio || _n->origin() == NotePlayHandle::OriginNoteStacking ||
-		!m_arpEnabledModel.value() || _n->isReleased())
+	if (_n->origin() == NotePlayHandle::OriginArpeggio || _n->origin() == NotePlayHandle::OriginNoteStacking
+		|| !m_arpEnabledModel.value() || _n->isReleased())
 	{
 		return;
 	}
@@ -309,8 +309,8 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 		}
 	}
 
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-		InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const InstrumentFunctionNoteStacking::ChordTable& chord_table
+		= InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table[selected_arp].size();
 	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value());
 	const int total_range = range * cnphv.size();
@@ -322,9 +322,9 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
-	int cur_frame =
-		((m_arpModeModel.value() != FreeMode) ? cnphv.first()->totalFramesPlayed() : _n->totalFramesPlayed()) +
-		arp_frames - 1;
+	int cur_frame
+		= ((m_arpModeModel.value() != FreeMode) ? cnphv.first()->totalFramesPlayed() : _n->totalFramesPlayed())
+		+ arp_frames - 1;
 	// used for loop
 	f_cnt_t frames_processed = (m_arpModeModel.value() != FreeMode) ? cnphv.first()->noteOffset() : _n->noteOffset();
 
@@ -333,8 +333,8 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames - (cur_frame % arp_frames);
 		// does current arp-note fill whole audio-buffer or is the remaining time just
 		// a short bit that we can discard?
-		if (remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() ||
-			_n->frames() - _n->totalFramesPlayed() < arp_frames / 5)
+		if (remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod()
+			|| _n->frames() - _n->totalFramesPlayed() < arp_frames / 5)
 		{
 			// then we don't have to do something!
 			break;
@@ -344,8 +344,8 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 
 		// in sorted mode: is it our turn or do we have to be quiet for
 		// now?
-		if (m_arpModeModel.value() == SortMode &&
-			((cur_frame / arp_frames) % total_range) / range != (f_cnt_t)_n->index())
+		if (m_arpModeModel.value() == SortMode
+			&& ((cur_frame / arp_frames) % total_range) / range != (f_cnt_t)_n->index())
 		{
 			// update counters
 			frames_processed += arp_frames;
@@ -420,8 +420,8 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle* _n)
 		}
 
 		// now calculate final key for our arp-note
-		const int sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size) * KeysPerOctave +
-			chord_table[selected_arp][cur_arp_idx % cur_chord_size];
+		const int sub_note_key = base_note_key + (cur_arp_idx / cur_chord_size) * KeysPerOctave
+			+ chord_table[selected_arp][cur_arp_idx % cur_chord_size];
 
 		// range-checking
 		if (sub_note_key >= NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns()) { continue; }

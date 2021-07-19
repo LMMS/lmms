@@ -291,8 +291,8 @@ void EnvelopeAndLfoView::paintEvent(QPaintEvent*)
 	int x1 = static_cast<int>(m_predelayKnob->value<float>() * TIME_UNIT_WIDTH);
 	int x2 = x1 + static_cast<int>(m_attackKnob->value<float>() * TIME_UNIT_WIDTH);
 	int x3 = x2 + static_cast<int>(m_holdKnob->value<float>() * TIME_UNIT_WIDTH);
-	int x4 =
-		x3 + static_cast<int>((m_decayKnob->value<float>() * (1 - m_sustainKnob->value<float>())) * TIME_UNIT_WIDTH);
+	int x4
+		= x3 + static_cast<int>((m_decayKnob->value<float>() * (1 - m_sustainKnob->value<float>())) * TIME_UNIT_WIDTH);
 	int x5 = x4 + static_cast<int>(m_releaseKnob->value<float>() * TIME_UNIT_WIDTH);
 
 	if (x5 > 174)

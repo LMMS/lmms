@@ -62,8 +62,8 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t _bpm)
 		switch (m_tempoSyncMode)
 		{
 		case SyncCustom:
-			conversionFactor =
-				static_cast<float>(m_custom.getDenominator()) / static_cast<float>(m_custom.getNumerator());
+			conversionFactor
+				= static_cast<float>(m_custom.getDenominator()) / static_cast<float>(m_custom.getNumerator());
 			break;
 		case SyncDoubleWholeNote: conversionFactor = 0.125; break;
 		case SyncWholeNote: conversionFactor = 0.25; break;

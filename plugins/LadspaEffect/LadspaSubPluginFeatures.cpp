@@ -90,8 +90,8 @@ void LadspaSubPluginFeatures::fillDescriptionWidget(QWidget* _parent, const Key*
 	l->addWidget(copyright_content, 1);
 
 	QLabel* requiresRealTime = new QLabel(_parent);
-	requiresRealTime->setText(QWidget::tr("Requires Real Time: ") +
-		(lm->hasRealTimeDependency(lkey) ? QWidget::tr("Yes") : QWidget::tr("No")));
+	requiresRealTime->setText(QWidget::tr("Requires Real Time: ")
+		+ (lm->hasRealTimeDependency(lkey) ? QWidget::tr("Yes") : QWidget::tr("No")));
 
 	QLabel* realTimeCapable = new QLabel(_parent);
 	realTimeCapable->setText(

@@ -51,9 +51,9 @@ float frnd(float range) { return (float)rnd(10000) / 10000 * range; }
 extern "C"
 {
 
-	Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "sfxr",
-		QT_TRANSLATE_NOOP("PluginBrowser", "LMMS port of sfxr"), "Wong Cho Ching", 0x0100, Plugin::Instrument,
-		new PluginPixmapLoader("logo"), NULL, NULL};
+	Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor
+		= {STRINGIFY(PLUGIN_NAME), "sfxr", QT_TRANSLATE_NOOP("PluginBrowser", "LMMS port of sfxr"), "Wong Cho Ching",
+			0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 SfxrSynth::SfxrSynth(const sfxrInstrument* s)

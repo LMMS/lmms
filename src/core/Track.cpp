@@ -269,8 +269,8 @@ void Track::loadSettings(const QDomElement& element)
 		if (node.isElement())
 		{
 			if (node.nodeName() == nodeName()) { loadTrackSpecificSettings(node.toElement()); }
-			else if (node.nodeName() != "muted" && node.nodeName() != "solo" &&
-				!node.toElement().attribute("metadata").toInt())
+			else if (node.nodeName() != "muted" && node.nodeName() != "solo"
+				&& !node.toElement().attribute("metadata").toInt())
 			{
 				TrackContentObject* tco = createTCO(TimePos(0));
 				tco->restoreState(node.toElement());

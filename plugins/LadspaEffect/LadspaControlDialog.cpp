@@ -93,8 +93,8 @@ void LadspaControlDialog::updateEffectView(LadspaControls* _ctl)
 			if ((*it)->port()->proc == proc)
 			{
 				buffer_data_t this_port = (*it)->port()->data_type;
-				if (last_port != NONE && (this_port == TOGGLED || this_port == ENUM) &&
-					(last_port != TOGGLED && last_port != ENUM))
+				if (last_port != NONE && (this_port == TOGGLED || this_port == ENUM)
+					&& (last_port != TOGGLED && last_port != ENUM))
 				{
 					++row;
 					col = 0;

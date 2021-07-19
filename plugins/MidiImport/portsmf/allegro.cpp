@@ -1505,8 +1505,8 @@ Alg_track* Alg_track::unserialize(void* buffer, long len)
 void Alg_seq::unserialize_seq()
 {
 	ser_read_buf.check_input_buffer(48);
-	bool algs = (ser_read_buf.get_char() == 'A') && (ser_read_buf.get_char() == 'L') &&
-		(ser_read_buf.get_char() == 'G') && (ser_read_buf.get_char() == 'S');
+	bool algs = (ser_read_buf.get_char() == 'A') && (ser_read_buf.get_char() == 'L') && (ser_read_buf.get_char() == 'G')
+		&& (ser_read_buf.get_char() == 'S');
 	assert(algs);
 	(void)algs; // unused variable
 	long len = ser_read_buf.get_int32();
@@ -1555,8 +1555,8 @@ void Alg_seq::unserialize_seq()
 void Alg_track::unserialize_track()
 {
 	ser_read_buf.check_input_buffer(32);
-	bool algt = (ser_read_buf.get_char() == 'A') && (ser_read_buf.get_char() == 'L') &&
-		(ser_read_buf.get_char() == 'G') && (ser_read_buf.get_char() == 'T');
+	bool algt = (ser_read_buf.get_char() == 'A') && (ser_read_buf.get_char() == 'L') && (ser_read_buf.get_char() == 'G')
+		&& (ser_read_buf.get_char() == 'T');
 	assert(algt);
 	(void)algt;							   // unused variable
 	long offset = ser_read_buf.get_posn(); // stored length does not include 'ALGT'
@@ -1948,8 +1948,8 @@ Alg_event_list* Alg_track::find(double t, double len, bool all, long channel_mas
 		Alg_event_ptr event = events[i];
 		if (event->overlap(t, len, all))
 		{
-			if ((channel_mask == 0 || (event->chan < 32 && (channel_mask & (1 << event->chan)))) &&
-				((event_type_mask == 0 || (event_type_mask & (1 << event->get_type_code())))))
+			if ((channel_mask == 0 || (event->chan < 32 && (channel_mask & (1 << event->chan))))
+				&& ((event_type_mask == 0 || (event_type_mask & (1 << event->get_type_code())))))
 			{
 				list->append(event);
 			}
@@ -1986,9 +1986,10 @@ void Alg_time_sigs::insert(double beat, double num, double den, bool force)
 		else if (time_sigs[i].beat > beat)
 		{
 			if ((i > 0 && // check if redundant with prev. time sig
-					time_sigs[i - 1].num == num && time_sigs[i - 1].den == den &&
-					within(fmod(beat - time_sigs[i - 1].beat, 4 * time_sigs[i - 1].num / time_sigs[i - 1].den), 0,
-						ALG_EPS)) ||
+					time_sigs[i - 1].num == num && time_sigs[i - 1].den == den
+					&& within(fmod(beat - time_sigs[i - 1].beat, 4 * time_sigs[i - 1].num / time_sigs[i - 1].den), 0,
+						ALG_EPS))
+				||
 				// check if redundant with implied initial 4/4 time sig:
 				(i == 0 && num == 4 && den == 4 && within(fmod(beat, 4), 0, ALG_EPS)))
 			{
@@ -2153,8 +2154,8 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 	}
 	// compare: If meter changes and there is no time signature at end,
 	// insert a time signature at end
-	if (end < dur - ALG_EPS && (start_num != end_num || start_den != end_den) &&
-		(j >= len || !within(time_sigs[j].beat, end, ALG_EPS)))
+	if (end < dur - ALG_EPS && (start_num != end_num || start_den != end_den)
+		&& (j >= len || !within(time_sigs[j].beat, end, ALG_EPS)))
 	{
 		insert(end, end_num, end_den, true);
 	}
@@ -3406,17 +3407,17 @@ Alg_event_ptr Alg_iterator::next(bool* note_on, void** cookie_ptr, double* offse
 	Alg_event_ptr event = (*events_ptr)[index];
 	if (on)
 	{
-		if (note_off_flag && event->is_note() &&
-			(end_time == 0 || (*events_ptr)[index]->get_end_time() + offset < end_time))
+		if (note_off_flag && event->is_note()
+			&& (end_time == 0 || (*events_ptr)[index]->get_end_time() + offset < end_time))
 		{
 			// this was a note-on, so insert pending note-off
 			insert(events_ptr, index, false, cookie, offset);
 		}
 		// for both note-ons and updates, insert next event (at index + 1)
 		// DO NOT INCREMENT index: it must be preserved for request_note_off()
-		if (index + 1 < events_ptr->length() &&
-			(end_time == 0 || // zero means ignore end time
-							  // stop iterating when end time is reached
+		if (index + 1 < events_ptr->length()
+			&& (end_time == 0 || // zero means ignore end time
+								 // stop iterating when end time is reached
 				(*events_ptr)[index + 1]->time + offset < end_time))
 		{
 			insert(events_ptr, index + 1, true, cookie, offset);

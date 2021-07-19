@@ -381,8 +381,8 @@ double EqHandle::calculateGain(
 	const double w = 2 * LD_PI * freq / SR;
 	const double PHI = pow(sin(w / 2), 2) * 4;
 
-	double gain = 10 * log10(pow(b0 + b1 + b2, 2) + (b0 * b2 * PHI - (b1 * (b0 + b2) + 4 * b0 * b2)) * PHI) -
-		10 * log10(pow(1 + a1 + a2, 2) + (1 * a2 * PHI - (a1 * (1 + a2) + 4 * 1 * a2)) * PHI);
+	double gain = 10 * log10(pow(b0 + b1 + b2, 2) + (b0 * b2 * PHI - (b1 * (b0 + b2) + 4 * b0 * b2)) * PHI)
+		- 10 * log10(pow(1 + a1 + a2, 2) + (1 * a2 * PHI - (a1 * (1 + a2) + 4 * 1 * a2)) * PHI);
 	return gain;
 }
 
@@ -506,31 +506,29 @@ void EqCurve::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
 				{
 					if (m_handle->at(thatHandle)->getType() == highpass)
 					{
-						mainCurve[x] = (mainCurve[x] + (m_handle->at(thatHandle)->getLowCutCurve(x) * (activeHandles)) -
-							((activeHandles * (m_heigth / 2)) - m_heigth));
+						mainCurve[x] = (mainCurve[x] + (m_handle->at(thatHandle)->getLowCutCurve(x) * (activeHandles))
+							- ((activeHandles * (m_heigth / 2)) - m_heigth));
 					}
 					if (m_handle->at(thatHandle)->getType() == lowshelf)
 					{
-						mainCurve[x] =
-							(mainCurve[x] + (m_handle->at(thatHandle)->getLowShelfCurve(x) * (activeHandles)) -
-								((activeHandles * (m_heigth / 2)) - m_heigth));
+						mainCurve[x] = (mainCurve[x] + (m_handle->at(thatHandle)->getLowShelfCurve(x) * (activeHandles))
+							- ((activeHandles * (m_heigth / 2)) - m_heigth));
 					}
 					if (m_handle->at(thatHandle)->getType() == para)
 					{
-						mainCurve[x] = (mainCurve[x] + (m_handle->at(thatHandle)->getPeakCurve(x) * (activeHandles)) -
-							((activeHandles * (m_heigth / 2)) - m_heigth));
+						mainCurve[x] = (mainCurve[x] + (m_handle->at(thatHandle)->getPeakCurve(x) * (activeHandles))
+							- ((activeHandles * (m_heigth / 2)) - m_heigth));
 					}
 					if (m_handle->at(thatHandle)->getType() == highshelf)
 					{
-						mainCurve[x] =
-							(mainCurve[x] + (m_handle->at(thatHandle)->getHighShelfCurve(x) * (activeHandles)) -
-								((activeHandles * (m_heigth / 2)) - m_heigth));
+						mainCurve[x]
+							= (mainCurve[x] + (m_handle->at(thatHandle)->getHighShelfCurve(x) * (activeHandles))
+								- ((activeHandles * (m_heigth / 2)) - m_heigth));
 					}
 					if (m_handle->at(thatHandle)->getType() == lowpass)
 					{
-						mainCurve[x] =
-							(mainCurve[x] + (m_handle->at(thatHandle)->getHighCutCurve(x) * (activeHandles)) -
-								((activeHandles * (m_heigth / 2)) - m_heigth));
+						mainCurve[x] = (mainCurve[x] + (m_handle->at(thatHandle)->getHighCutCurve(x) * (activeHandles))
+							- ((activeHandles * (m_heigth / 2)) - m_heigth));
 					}
 				}
 			}
@@ -563,9 +561,9 @@ void EqCurve::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, Q
 	// if mouse hover a handle, m_alpha counts up slow for blend in the filled EQ curve
 	// todo: a smarter way of this "if-monster"
 	QColor curveColor;
-	if (m_handle->at(0)->isMouseHover() || m_handle->at(1)->isMouseHover() || m_handle->at(2)->isMouseHover() ||
-		m_handle->at(3)->isMouseHover() || m_handle->at(4)->isMouseHover() || m_handle->at(5)->isMouseHover() ||
-		m_handle->at(6)->isMouseHover() || m_handle->at(7)->isMouseHover())
+	if (m_handle->at(0)->isMouseHover() || m_handle->at(1)->isMouseHover() || m_handle->at(2)->isMouseHover()
+		|| m_handle->at(3)->isMouseHover() || m_handle->at(4)->isMouseHover() || m_handle->at(5)->isMouseHover()
+		|| m_handle->at(6)->isMouseHover() || m_handle->at(7)->isMouseHover())
 	{
 		if (m_alpha < 40) { m_alpha = m_alpha + 10; }
 	}
