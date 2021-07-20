@@ -330,7 +330,7 @@ void BBTrackContainerView::clonePattern()
 	{
 		// Clone the track
 		Track *newTrack = bbt->clone();
-		bbtc->setCurrentBB( dynamic_cast<BBTrack *>( newTrack )->index() );
+		bbtc->setCurrentBB( static_cast<BBTrack *>( newTrack )->index() );
 
 		// Track still have the TCOs which is undesirable in this case, clear the track
 		newTrack->lock();
