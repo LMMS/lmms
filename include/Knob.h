@@ -79,8 +79,8 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
-	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
+	Knob( knobTypes _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
 
 	// TODO: remove

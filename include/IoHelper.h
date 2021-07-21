@@ -59,7 +59,7 @@ std::wstring toWString(const std::string& s)
 int fileToDescriptor(FILE* f, bool closeFile = true)
 {
 	int fh;
-	if (f == NULL) {return -1;}
+	if (f == nullptr) {return -1;}
 
 #ifdef LMMS_BUILD_WIN32
 	fh = _dup(_fileno(f));

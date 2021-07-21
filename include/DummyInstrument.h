@@ -39,7 +39,7 @@ class DummyInstrument : public Instrument
 {
 public:
 	DummyInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, NULL )
+		Instrument( _instrument_track, nullptr )
 	{
 	}
 

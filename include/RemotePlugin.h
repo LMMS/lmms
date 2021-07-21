@@ -137,7 +137,7 @@ public:
 #else
 		m_shmID( -1 ),
 #endif
-		m_data( NULL ),
+		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
@@ -157,7 +157,7 @@ public:
 		}
 		m_data = (shmData *) shmat( m_shmID, 0, 0 );
 #endif
-		assert( m_data != NULL );
+		assert( m_data != nullptr );
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
@@ -180,7 +180,7 @@ public:
 #else
 		m_shmID( shmget( _shm_key, 0, 0 ) ),
 #endif
-		m_data( NULL ),
+		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
@@ -196,7 +196,7 @@ public:
 			m_data = (shmData *) shmat( m_shmID, 0, 0 );
 		}
 #endif
-		assert( m_data != NULL );
+		assert( m_data != nullptr );
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ) );
@@ -208,7 +208,7 @@ public:
 		if( m_master )
 		{
 #ifndef USE_QT_SHMEM
-			shmctl( m_shmID, IPC_RMID, NULL );
+			shmctl( m_shmID, IPC_RMID, nullptr );
 #endif
 		}
 #ifndef USE_QT_SHMEM
@@ -1031,8 +1031,8 @@ RemotePluginBase::RemotePluginBase() :
 	setlocale( LC_NUMERIC, "C" );
 #endif
 #ifndef SYNC_WITH_SHM_FIFO
-	pthread_mutex_init( &m_receiveMutex, NULL );
-	pthread_mutex_init( &m_sendMutex, NULL );
+	pthread_mutex_init( &m_receiveMutex, nullptr );
+	pthread_mutex_init( &m_sendMutex, nullptr );
 #endif
 }
 
@@ -1194,8 +1194,8 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	m_shmObj(),
 	m_shmQtID( "/usr/bin/lmms" ),
 #endif
-	m_vstSyncData( NULL ),
-	m_shm( NULL ),
+	m_vstSyncData( nullptr ),
+	m_shm( nullptr ),
 	m_inputCount( 0 ),
 	m_outputCount( 0 ),
 	m_sampleRate( 44100 ),
@@ -1400,10 +1400,10 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 		debugMessage( buf );
 	}
 #else
-	if( m_shm != NULL )
+	if( m_shm != nullptr )
 	{
 		shmdt( m_shm );
-		m_shm = NULL;
+		m_shm = nullptr;
 	}
 
 	// only called for detaching SHM?
@@ -1429,9 +1429,9 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 
 void RemotePluginClient::doProcessing()
 {
-	if( m_shm != NULL )
+	if( m_shm != nullptr )
 	{
-		process( (sampleFrame *)( m_inputCount > 0 ? m_shm : NULL ),
+		process( (sampleFrame *)( m_inputCount > 0 ? m_shm : nullptr ),
 				(sampleFrame *)( m_shm +
 					( m_inputCount*m_bufferSize ) ) );
 	}

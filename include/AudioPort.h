@@ -42,8 +42,8 @@ class AudioPort : public ThreadableJob
 	MM_OPERATORS
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true,
-		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL,
-		BoolModel * mutedModel = NULL );
+		FloatModel * volumeModel = nullptr, FloatModel * panningModel = nullptr,
+		BoolModel * mutedModel = nullptr );
 	virtual ~AudioPort();
 
 	inline sampleFrame * buffer()

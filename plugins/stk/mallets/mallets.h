@@ -92,7 +92,7 @@ public:
 
 	inline sample_t nextSampleLeft()
 	{
-		if( m_voice == NULL )
+		if( m_voice == nullptr )
 		{
 			return( 0.0f );
 		}
