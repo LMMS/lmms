@@ -35,6 +35,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QSaveFile>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -379,12 +380,12 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		}
 	}
 
-	QFile outfile (fullNameTemp);
+	QSaveFile outfile (fullNameTemp);
 
 	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		showError(SongEditor::tr("Could not write file"),
-			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to"
+			SongEditor::tr("Could not open %1 for writing. You probably are not permitted to "
 				"write to this file. Please make sure you have write-access to "
 				"the file and try again.").arg(fullName));
 
@@ -405,7 +406,18 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		write( ts );
 	}
 
-	outfile.close();
+	if (!outfile.commit())
+	{
+		if (gui)
+		{
+			QMessageBox::critical(NULL,
+				SongEditor::tr("Could not write file"),
+				SongEditor::tr("An unknown error has occured and the file could not "
+						"be saved.").arg(fullName));
+		}
+
+		return false;
+	}
 
 	// make sure the file has been written correctly
 	if( QFileInfo( outfile.fileName() ).size() > 0 )
