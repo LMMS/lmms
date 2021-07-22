@@ -412,8 +412,8 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		{
 			QMessageBox::critical(NULL,
 				SongEditor::tr("Could not write file"),
-				SongEditor::tr("An unknown error has occured and the file could not "
-						"be saved.").arg(fullName));
+				SongEditor::tr("An unknown error has occured and the file "
+						"could not be saved."));
 		}
 
 		return false;
