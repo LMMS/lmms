@@ -41,6 +41,7 @@
 #include "PatternTrack.h"
 #include "SampleTrack.h"
 #include "Song.h"
+#include "TimePos.h"
 
 
 namespace lmms
@@ -498,9 +499,9 @@ void Track::createClipsForPattern(int pattern)
 {
 	while( numOfClips() < pattern + 1 )
 	{
-		TimePos position = TimePos( numOfClips(), 0 );
+		auto position = TimePos(numOfClips() * DefaultTicksPerBar);
 		Clip * clip = createClip( position );
-		clip->changeLength( TimePos( 1, 0 ) );
+		clip->changeLength(TimePos(DefaultTicksPerBar));
 	}
 }
 
