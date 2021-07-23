@@ -497,9 +497,9 @@ void Track::createTCOsForBB( int bb )
 {
 	while( numOfTCOs() < bb + 1 )
 	{
-		TimePos position = TimePos( numOfTCOs(), 0 );
+		TimePos position = TimePos( numOfTCOs() * DefaultTicksPerBar );
 		TrackContentObject * tco = createTCO( position );
-		tco->changeLength( TimePos( 1, 0 ) );
+		tco->changeLength( TimePos( DefaultTicksPerBar ) );
 	}
 }
 
