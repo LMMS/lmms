@@ -328,7 +328,7 @@ bool CompressorEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			m_rmsVal[i] = m_rmsTimeConst * m_rmsVal[i] + ((1 - m_rmsTimeConst) * (inputValue * inputValue));
 
 			// Grab the peak or RMS value
-			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? abs(inputValue) : sqrt(m_rmsVal[i]));
+			inputValue = qMax(COMP_NOISE_FLOOR, peakmode ? std::abs(inputValue) : std::sqrt(m_rmsVal[i]));
 
 			// The following code uses math magic to semi-efficiently
 			// find the largest value in the lookahead buffer.
