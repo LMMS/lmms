@@ -33,10 +33,8 @@
 
 Lv2FxControls::Lv2FxControls(class Lv2Effect* effect, const QString& uri)
 	: EffectControls(effect)
-	, Lv2ControlBase(this, uri)
-{
-	if (isValid())
-	{
+	, Lv2ControlBase(this, uri) {
+	if (isValid()) {
 		connect(Engine::mixer(), &Mixer::sampleRateChanged, this, [this]() { Lv2ControlBase::reloadPlugin(); });
 	}
 }

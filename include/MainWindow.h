@@ -42,8 +42,7 @@ class ConfigManager;
 class PluginView;
 class ToolButton;
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
 	Q_OBJECT
 public:
 	QMdiArea* workspace() { return m_workspace; }
@@ -82,8 +81,7 @@ public:
 
 	static const int m_autoSaveShortTime = 10 * 1000; // 10s short loop
 
-	void autoSaveTimerReset(int msec = ConfigManager::inst()->value("ui", "saveinterval").toInt() * 60 * 1000)
-	{
+	void autoSaveTimerReset(int msec = ConfigManager::inst()->value("ui", "saveinterval").toInt() * 60 * 1000) {
 		if (msec < m_autoSaveShortTime) // No 'saveinterval' in .lmmsrc.xml
 		{
 			msec = DEFAULT_AUTO_SAVE_INTERVAL;
@@ -93,11 +91,7 @@ public:
 
 	int getAutoSaveTimerInterval() { return m_autoSaveTimer.interval(); }
 
-	enum SessionState
-	{
-		Normal,
-		Recover
-	};
+	enum SessionState { Normal, Recover };
 
 	void setSession(SessionState session) { m_session = session; }
 
@@ -174,14 +168,11 @@ private:
 	QWidget* m_toolBar;
 	QGridLayout* m_toolBarLayout;
 
-	struct keyModifiers
-	{
+	struct keyModifiers {
 		keyModifiers()
 			: m_ctrl(false)
 			, m_shift(false)
-			, m_alt(false)
-		{
-		}
+			, m_alt(false) {}
 		bool m_ctrl;
 		bool m_shift;
 		bool m_alt;

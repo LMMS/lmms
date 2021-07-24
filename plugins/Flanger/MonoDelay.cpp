@@ -28,8 +28,7 @@
 #include "lmms_math.h"
 #include "string.h"
 
-MonoDelay::MonoDelay(int maxTime, int sampleRate)
-{
+MonoDelay::MonoDelay(int maxTime, int sampleRate) {
 	m_buffer = 0;
 	m_maxTime = maxTime;
 	m_maxLength = maxTime * sampleRate;
@@ -40,13 +39,11 @@ MonoDelay::MonoDelay(int maxTime, int sampleRate)
 	setSampleRate(sampleRate);
 }
 
-MonoDelay::~MonoDelay()
-{
+MonoDelay::~MonoDelay() {
 	if (m_buffer) { delete m_buffer; }
 }
 
-void MonoDelay::tick(sample_t* sample)
-{
+void MonoDelay::tick(sample_t* sample) {
 	m_writeIndex = (m_writeIndex + 1) % (int)m_maxLength;
 	int readIndex = m_writeIndex - m_length;
 	if (readIndex < 0) { readIndex += m_maxLength; }
@@ -55,8 +52,7 @@ void MonoDelay::tick(sample_t* sample)
 	*sample = out;
 }
 
-void MonoDelay::setSampleRate(int sampleRate)
-{
+void MonoDelay::setSampleRate(int sampleRate) {
 	if (m_buffer) { delete m_buffer; }
 
 	m_buffer = new sample_t[(int)(sampleRate * m_maxTime)];

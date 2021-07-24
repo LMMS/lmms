@@ -30,19 +30,16 @@
 #include "EqFilter.h"
 #include "lmms_math.h"
 
-class EqEffect : public Effect
-{
+class EqEffect : public Effect {
 public:
 	EqEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~EqEffect();
 	virtual bool processAudioBuffer(sampleFrame* buf, const fpp_t frames);
 	virtual EffectControls* controls() { return &m_eqControls; }
-	inline void gain(sampleFrame* buf, const fpp_t frames, float scale, sampleFrame* peak)
-	{
+	inline void gain(sampleFrame* buf, const fpp_t frames, float scale, sampleFrame* peak) {
 		peak[0][0] = 0.0f;
 		peak[0][1] = 0.0f;
-		for (fpp_t f = 0; f < frames; ++f)
-		{
+		for (fpp_t f = 0; f < frames; ++f) {
 			buf[f][0] *= scale;
 			buf[f][1] *= scale;
 

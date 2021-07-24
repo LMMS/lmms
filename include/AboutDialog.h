@@ -29,8 +29,7 @@
 
 #include "ui_about_dialog.h"
 
-class AboutDialog : public QDialog, public Ui::AboutDialog
-{
+class AboutDialog : public QDialog, public Ui::AboutDialog {
 public:
 	AboutDialog(QWidget* parent = 0);
 };

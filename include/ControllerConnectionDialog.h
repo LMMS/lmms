@@ -44,8 +44,7 @@ class LcdSpinBox;
 class LedCheckBox;
 class MidiPortMenu;
 
-class ControllerConnectionDialog : public QDialog
-{
+class ControllerConnectionDialog : public QDialog {
 	Q_OBJECT
 public:
 	ControllerConnectionDialog(QWidget* _parent, const AutomatableModel* _target_model);

@@ -35,8 +35,7 @@
 class vibedView;
 class NotePlayHandle;
 
-class vibed : public Instrument
-{
+class vibed : public Instrument {
 	Q_OBJECT
 public:
 	vibed(InstrumentTrack* _instrument_track);
@@ -73,8 +72,7 @@ private:
 	friend class vibedView;
 };
 
-class vibedView : public InstrumentViewFixedSize
-{
+class vibedView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	vibedView(Instrument* _instrument, QWidget* _parent);

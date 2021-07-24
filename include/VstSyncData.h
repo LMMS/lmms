@@ -37,8 +37,7 @@
 #define VST_SNC_SHM_KEY_FILE "/dev/null"
 //#define VST_SNC_SHM_RND_KEY 3561653564469
 
-struct VstSyncData
-{
+struct VstSyncData {
 	double ppqPos;
 	int timeSigNumer;
 	int timeSigDenom;

@@ -36,8 +36,7 @@ class QToolButton;
 class LedCheckBox;
 class InstrumentTrack;
 
-class InstrumentMidiIOView : public QWidget, public ModelView
-{
+class InstrumentMidiIOView : public QWidget, public ModelView {
 	Q_OBJECT
 public:
 	InstrumentMidiIOView(QWidget* parent);
@@ -61,8 +60,7 @@ private:
 	LcdSpinBox* m_baseVelocitySpinBox;
 };
 
-class InstrumentMiscView : public QWidget
-{
+class InstrumentMiscView : public QWidget {
 	Q_OBJECT
 public:
 	InstrumentMiscView(InstrumentTrack* it, QWidget* parent);

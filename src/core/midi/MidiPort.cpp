@@ -52,8 +52,7 @@ MidiPort::MidiPort(
 	, m_outputProgramModel(1, 1, MidiProgramCount, this, tr("Output MIDI program"))
 	, m_baseVelocityModel(MidiMaxVelocity / 2, 1, MidiMaxVelocity, this, tr("Base velocity"))
 	, m_readableModel(false, this, tr("Receive MIDI-events"))
-	, m_writableModel(false, this, tr("Send MIDI-events"))
-{
+	, m_writableModel(false, this, tr("Send MIDI-events")) {
 	m_midiClient->addPort(this);
 
 	m_readableModel.setValue(m_mode == Input || m_mode == Duplex);
@@ -65,8 +64,7 @@ MidiPort::MidiPort(
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if (m_midiClient->isRaw() == false)
-	{
+	if (m_midiClient->isRaw() == false) {
 		updateReadablePorts();
 		updateWritablePorts();
 
@@ -78,8 +76,7 @@ MidiPort::MidiPort(
 	updateMidiPortMode();
 }
 
-MidiPort::~MidiPort()
-{
+MidiPort::~MidiPort() {
 	// unsubscribe ports
 	m_readableModel.setValue(false);
 	m_writableModel.setValue(false);
@@ -88,26 +85,21 @@ MidiPort::~MidiPort()
 	m_midiClient->removePort(this);
 }
 
-void MidiPort::setName(const QString& name)
-{
+void MidiPort::setName(const QString& name) {
 	setDisplayName(name);
 	m_midiClient->applyPortName(this);
 }
 
-void MidiPort::setMode(Mode mode)
-{
+void MidiPort::setMode(Mode mode) {
 	m_mode = mode;
 	m_midiClient->applyPortMode(this);
 }
 
-void MidiPort::processInEvent(const MidiEvent& event, const TimePos& time)
-{
+void MidiPort::processInEvent(const MidiEvent& event, const TimePos& time) {
 	// mask event
-	if (isInputEnabled() && (inputChannel() == 0 || inputChannel() - 1 == event.channel()))
-	{
+	if (isInputEnabled() && (inputChannel() == 0 || inputChannel() - 1 == event.channel())) {
 		MidiEvent inEvent = event;
-		if (event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure)
-		{
+		if (event.type() == MidiNoteOn || event.type() == MidiNoteOff || event.type() == MidiKeyPressure) {
 			if (inEvent.key() < 0 || inEvent.key() >= NumKeys) { return; }
 
 			if (fixedInputVelocity() >= 0 && inEvent.velocity() > 0) { inEvent.setVelocity(fixedInputVelocity()); }
@@ -117,17 +109,14 @@ void MidiPort::processInEvent(const MidiEvent& event, const TimePos& time)
 	}
 }
 
-void MidiPort::processOutEvent(const MidiEvent& event, const TimePos& time)
-{
+void MidiPort::processOutEvent(const MidiEvent& event, const TimePos& time) {
 	// When output is enabled, route midi events if the selected channel matches
 	// the event channel or if there's no selected channel (value 0, represented by "--")
-	if (isOutputEnabled() && (outputChannel() == 0 || realOutputChannel() == event.channel()))
-	{
+	if (isOutputEnabled() && (outputChannel() == 0 || realOutputChannel() == event.channel())) {
 		MidiEvent outEvent = event;
 
 		if (fixedOutputVelocity() >= 0 && event.velocity() > 0
-			&& (event.type() == MidiNoteOn || event.type() == MidiKeyPressure))
-		{
+			&& (event.type() == MidiNoteOn || event.type() == MidiKeyPressure)) {
 			outEvent.setVelocity(fixedOutputVelocity());
 		}
 
@@ -135,8 +124,7 @@ void MidiPort::processOutEvent(const MidiEvent& event, const TimePos& time)
 	}
 }
 
-void MidiPort::saveSettings(QDomDocument& doc, QDomElement& thisElement)
-{
+void MidiPort::saveSettings(QDomDocument& doc, QDomElement& thisElement) {
 	m_inputChannelModel.saveSettings(doc, thisElement, "inputchannel");
 	m_outputChannelModel.saveSettings(doc, thisElement, "outputchannel");
 	m_inputControllerModel.saveSettings(doc, thisElement, "inputcontroller");
@@ -149,11 +137,9 @@ void MidiPort::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 	m_readableModel.saveSettings(doc, thisElement, "readable");
 	m_writableModel.saveSettings(doc, thisElement, "writable");
 
-	if (isInputEnabled())
-	{
+	if (isInputEnabled()) {
 		QString rp;
-		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
-		{
+		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it) {
 			if (it.value()) { rp += it.key() + ","; }
 		}
 		// cut off comma
@@ -161,11 +147,9 @@ void MidiPort::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 		thisElement.setAttribute("inports", rp);
 	}
 
-	if (isOutputEnabled())
-	{
+	if (isOutputEnabled()) {
 		QString wp;
-		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
-		{
+		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it) {
 			if (it.value()) { wp += it.key() + ","; }
 		}
 		// cut off comma
@@ -174,8 +158,7 @@ void MidiPort::saveSettings(QDomDocument& doc, QDomElement& thisElement)
 	}
 }
 
-void MidiPort::loadSettings(const QDomElement& thisElement)
-{
+void MidiPort::loadSettings(const QDomElement& thisElement) {
 	m_inputChannelModel.loadSettings(thisElement, "inputchannel");
 	m_outputChannelModel.loadSettings(thisElement, "outputchannel");
 	m_inputControllerModel.loadSettings(thisElement, "inputcontroller");
@@ -189,28 +172,23 @@ void MidiPort::loadSettings(const QDomElement& thisElement)
 
 	// restore connections
 
-	if (isInputEnabled())
-	{
+	if (isInputEnabled()) {
 		QStringList rp = thisElement.attribute("inports").split(',');
-		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
-		{
+		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it) {
 			if (it.value() != (rp.indexOf(it.key()) != -1)) { subscribeReadablePort(it.key()); }
 		}
 		emit readablePortsChanged();
 	}
 
-	if (isOutputEnabled())
-	{
+	if (isOutputEnabled()) {
 		QStringList wp = thisElement.attribute("outports").split(',');
-		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
-		{
+		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it) {
 			if (it.value() != (wp.indexOf(it.key()) != -1)) { subscribeWritablePort(it.key()); }
 		}
 		emit writablePortsChanged();
 	}
 
-	if (thisElement.hasAttribute("basevelocity") == false)
-	{
+	if (thisElement.hasAttribute("basevelocity") == false) {
 		// for projects created by LMMS < 0.9.92 there's no value for the base
 		// velocity and for compat reasons we have to stick with maximum velocity
 		// which did not allow note volumes > 100%
@@ -218,8 +196,7 @@ void MidiPort::loadSettings(const QDomElement& thisElement)
 	}
 }
 
-void MidiPort::subscribeReadablePort(const QString& port, bool subscribe)
-{
+void MidiPort::subscribeReadablePort(const QString& port, bool subscribe) {
 	m_readablePorts[port] = subscribe;
 
 	// make sure, MIDI-port is configured for input
@@ -228,8 +205,7 @@ void MidiPort::subscribeReadablePort(const QString& port, bool subscribe)
 	m_midiClient->subscribeReadablePort(this, port, subscribe);
 }
 
-void MidiPort::subscribeWritablePort(const QString& port, bool subscribe)
-{
+void MidiPort::subscribeWritablePort(const QString& port, bool subscribe) {
 	m_writablePorts[port] = subscribe;
 
 	// make sure, MIDI-port is configured for output
@@ -237,26 +213,21 @@ void MidiPort::subscribeWritablePort(const QString& port, bool subscribe)
 	m_midiClient->subscribeWritablePort(this, port, subscribe);
 }
 
-void MidiPort::updateMidiPortMode()
-{
+void MidiPort::updateMidiPortMode() {
 	// this small lookup-table makes everything easier
 	static const Modes modeTable[2][2] = {{Disabled, Output}, {Input, Duplex}};
 	setMode(modeTable[m_readableModel.value()][m_writableModel.value()]);
 
 	// check whether we have to dis-check items in connection-menu
-	if (!isInputEnabled())
-	{
-		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
-		{
+	if (!isInputEnabled()) {
+		for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it) {
 			// subscribed?
 			if (it.value()) { subscribeReadablePort(it.key(), false); }
 		}
 	}
 
-	if (!isOutputEnabled())
-	{
-		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
-		{
+	if (!isOutputEnabled()) {
+		for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it) {
 			// subscribed?
 			if (it.value()) { subscribeWritablePort(it.key(), false); }
 		}
@@ -269,48 +240,41 @@ void MidiPort::updateMidiPortMode()
 	if (Engine::getSong()) { Engine::getSong()->setModified(); }
 }
 
-void MidiPort::updateReadablePorts()
-{
+void MidiPort::updateReadablePorts() {
 	// first save all selected ports
 	QStringList selectedPorts;
-	for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it)
-	{
+	for (Map::ConstIterator it = m_readablePorts.begin(); it != m_readablePorts.end(); ++it) {
 		if (it.value()) { selectedPorts.push_back(it.key()); }
 	}
 
 	m_readablePorts.clear();
 	const QStringList& wp = m_midiClient->readablePorts();
 	// now insert new ports and restore selections
-	for (QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it)
-	{
+	for (QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it) {
 		m_readablePorts[*it] = (selectedPorts.indexOf(*it) != -1);
 	}
 
 	emit readablePortsChanged();
 }
 
-void MidiPort::updateWritablePorts()
-{
+void MidiPort::updateWritablePorts() {
 	// first save all selected ports
 	QStringList selectedPorts;
-	for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it)
-	{
+	for (Map::ConstIterator it = m_writablePorts.begin(); it != m_writablePorts.end(); ++it) {
 		if (it.value()) { selectedPorts.push_back(it.key()); }
 	}
 
 	m_writablePorts.clear();
 	const QStringList& wp = m_midiClient->writablePorts();
 	// now insert new ports and restore selections
-	for (QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it)
-	{
+	for (QStringList::ConstIterator it = wp.begin(); it != wp.end(); ++it) {
 		m_writablePorts[*it] = (selectedPorts.indexOf(*it) != -1);
 	}
 
 	emit writablePortsChanged();
 }
 
-void MidiPort::updateOutputProgram()
-{
+void MidiPort::updateOutputProgram() {
 	processOutEvent(MidiEvent(MidiProgramChange, realOutputChannel(), outputProgram() - 1));
 }
 

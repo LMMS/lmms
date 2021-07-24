@@ -32,16 +32,14 @@
 #include "MainWindow.h"
 #include "TextFloat.h"
 
-class EqFader : public Fader
-{
+class EqFader : public Fader {
 
 public:
 	Q_OBJECT
 public:
 	EqFader(FloatModel* model, const QString& name, QWidget* parent, QPixmap* backg, QPixmap* leds, QPixmap* knobpi,
 		float* lPeak, float* rPeak)
-		: Fader(model, name, parent, backg, leds, knobpi)
-	{
+		: Fader(model, name, parent, backg, leds, knobpi) {
 		setMinimumSize(23, 80);
 		setMaximumSize(23, 80);
 		resize(23, 80);
@@ -54,8 +52,7 @@ public:
 	}
 
 	EqFader(FloatModel* model, const QString& name, QWidget* parent, float* lPeak, float* rPeak)
-		: Fader(model, name, parent)
-	{
+		: Fader(model, name, parent) {
 		setMinimumSize(23, 116);
 		setMaximumSize(23, 116);
 		resize(23, 116);
@@ -71,28 +68,21 @@ public:
 
 private slots:
 
-	void updateVuMeters()
-	{
+	void updateVuMeters() {
 		const float opl = getPeak_L();
 		const float opr = getPeak_R();
 		const float fallOff = 1.07;
-		if (*m_lPeak > opl)
-		{
+		if (*m_lPeak > opl) {
 			setPeak_L(*m_lPeak);
 			*m_lPeak = 0;
-		}
-		else
-		{
+		} else {
 			setPeak_L(opl / fallOff);
 		}
 
-		if (*m_rPeak > opr)
-		{
+		if (*m_rPeak > opr) {
 			setPeak_R(*m_rPeak);
 			*m_rPeak = 0;
-		}
-		else
-		{
+		} else {
 			setPeak_R(opr / fallOff);
 		}
 		update();

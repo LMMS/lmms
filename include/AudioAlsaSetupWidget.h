@@ -35,8 +35,7 @@
 class QComboBox;
 class LcdSpinBox;
 
-class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
-{
+class AudioAlsaSetupWidget : public AudioDeviceSetupWidget {
 	Q_OBJECT
 
 public:

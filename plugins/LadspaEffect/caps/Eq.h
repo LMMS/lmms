@@ -33,17 +33,13 @@
 #include "dsp/RBJ.h"
 #include "dsp/util.h"
 
-class Eq : public Plugin
-{
+class Eq : public Plugin {
 public:
 	sample_t gain[10];
 	DSP::Eq<10> eq;
 
 	int block;
-	enum
-	{
-		BlockSize = 64
-	};
+	enum { BlockSize = 64 };
 
 	template <sample_func_t F> void one_cycle(int frames);
 
@@ -58,8 +54,7 @@ public:
 	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class Eq2x2 : public Plugin
-{
+class Eq2x2 : public Plugin {
 public:
 	sample_t gain[10];
 	DSP::Eq<10> eq[2];

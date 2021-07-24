@@ -32,8 +32,7 @@
 /// This class provides the same functionality as QActionGroup, but in addition
 /// has the actionTriggered(int) signal.
 /// It also sets every added action's checkable property to true.
-class ActionGroup : public QActionGroup
-{
+class ActionGroup : public QActionGroup {
 	Q_OBJECT
 public:
 	ActionGroup(QObject* parent);

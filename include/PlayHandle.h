@@ -38,11 +38,9 @@ class QThread;
 class Track;
 class AudioPort;
 
-class LMMS_EXPORT PlayHandle : public ThreadableJob
-{
+class LMMS_EXPORT PlayHandle : public ThreadableJob {
 public:
-	enum Types
-	{
+	enum Types {
 		TypeNotePlayHandle = 0x01,
 		TypeInstrumentPlayHandle = 0x02,
 		TypeSamplePlayHandle = 0x04,
@@ -50,15 +48,11 @@ public:
 	};
 	typedef Types Type;
 
-	enum
-	{
-		MaxNumber = 1024
-	};
+	enum { MaxNumber = 1024 };
 
 	PlayHandle(const Type type, f_cnt_t offset = 0);
 
-	PlayHandle& operator=(PlayHandle& p)
-	{
+	PlayHandle& operator=(PlayHandle& p) {
 		m_type = p.m_type;
 		m_offset = p.m_offset;
 		m_affinity = p.m_affinity;

@@ -38,37 +38,30 @@ SampleRecordHandle::SampleRecordHandle(SampleTCO* tco)
 	, m_minLength(tco->length())
 	, m_track(tco->getTrack())
 	, m_bbTrack(NULL)
-	, m_tco(tco)
-{
-}
+	, m_tco(tco) {}
 
-SampleRecordHandle::~SampleRecordHandle()
-{
-	if (!m_buffers.empty())
-	{
+SampleRecordHandle::~SampleRecordHandle() {
+	if (!m_buffers.empty()) {
 		SampleBuffer* sb;
 		createSampleBuffer(&sb);
 		m_tco->setSampleBuffer(sb);
 	}
 
-	while (!m_buffers.empty())
-	{
+	while (!m_buffers.empty()) {
 		delete[] m_buffers.front().first;
 		m_buffers.erase(m_buffers.begin());
 	}
 	m_tco->setRecord(false);
 }
 
-void SampleRecordHandle::play(sampleFrame* /*_working_buffer*/)
-{
+void SampleRecordHandle::play(sampleFrame* /*_working_buffer*/) {
 	const sampleFrame* recbuf = Engine::mixer()->inputBuffer();
 	const f_cnt_t frames = Engine::mixer()->inputBufferFrames();
 	writeBuffer(recbuf, frames);
 	m_framesRecorded += frames;
 
 	TimePos len = (tick_t)(m_framesRecorded / Engine::framesPerTick());
-	if (len > m_minLength)
-	{
+	if (len > m_minLength) {
 		//		m_tco->changeLength( len );
 		m_minLength = len;
 	}
@@ -80,8 +73,7 @@ bool SampleRecordHandle::isFromTrack(const Track* _track) const { return (m_trac
 
 f_cnt_t SampleRecordHandle::framesRecorded() const { return (m_framesRecorded); }
 
-void SampleRecordHandle::createSampleBuffer(SampleBuffer** sampleBuf)
-{
+void SampleRecordHandle::createSampleBuffer(SampleBuffer** sampleBuf) {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
 	sampleFrame* data = new sampleFrame[frames];
@@ -91,8 +83,7 @@ void SampleRecordHandle::createSampleBuffer(SampleBuffer** sampleBuf)
 	assert(data != NULL);
 
 	// now copy all buffers into big buffer
-	for (bufferList::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it)
-	{
+	for (bufferList::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it) {
 		memcpy(data_ptr, (*it).first, (*it).second * sizeof(sampleFrame));
 		data_ptr += (*it).second;
 	}
@@ -102,13 +93,10 @@ void SampleRecordHandle::createSampleBuffer(SampleBuffer** sampleBuf)
 	delete[] data;
 }
 
-void SampleRecordHandle::writeBuffer(const sampleFrame* _ab, const f_cnt_t _frames)
-{
+void SampleRecordHandle::writeBuffer(const sampleFrame* _ab, const f_cnt_t _frames) {
 	sampleFrame* buf = new sampleFrame[_frames];
-	for (f_cnt_t frame = 0; frame < _frames; ++frame)
-	{
-		for (ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl)
-		{
+	for (f_cnt_t frame = 0; frame < _frames; ++frame) {
+		for (ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl) {
 			buf[frame][chnl] = _ab[frame][chnl];
 		}
 	}

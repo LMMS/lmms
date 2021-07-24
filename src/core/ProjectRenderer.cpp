@@ -69,17 +69,14 @@ ProjectRenderer::ProjectRenderer(const Mixer::qualitySettings& qualitySettings, 
 	, m_fileDev(NULL)
 	, m_qualitySettings(qualitySettings)
 	, m_progress(0)
-	, m_abort(false)
-{
+	, m_abort(false) {
 	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[exportFileFormat].m_getDevInst;
 
-	if (audioEncoderFactory)
-	{
+	if (audioEncoderFactory) {
 		bool successful = false;
 
 		m_fileDev = audioEncoderFactory(outputFilename, outputSettings, DEFAULT_CHANNELS, Engine::mixer(), successful);
-		if (!successful)
-		{
+		if (!successful) {
 			delete m_fileDev;
 			m_fileDev = NULL;
 		}
@@ -90,11 +87,9 @@ ProjectRenderer::~ProjectRenderer() {}
 
 // Little help function for getting file format from a file extension
 // (only for registered file-encoders).
-ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(const QString& _ext)
-{
+ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(const QString& _ext) {
 	int idx = 0;
-	while (fileEncodeDevices[idx].m_fileFormat != NumFileFormats)
-	{
+	while (fileEncodeDevices[idx].m_fileFormat != NumFileFormats) {
 		if (QString(fileEncodeDevices[idx].m_extension) == _ext) { return (fileEncodeDevices[idx].m_fileFormat); }
 		++idx;
 	}
@@ -102,16 +97,13 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(c
 	return (WaveFile); // Default.
 }
 
-QString ProjectRenderer::getFileExtensionFromFormat(ExportFileFormats fmt)
-{
+QString ProjectRenderer::getFileExtensionFromFormat(ExportFileFormats fmt) {
 	return fileEncodeDevices[fmt].m_extension;
 }
 
-void ProjectRenderer::startProcessing()
-{
+void ProjectRenderer::startProcessing() {
 
-	if (isReady())
-	{
+	if (isReady()) {
 		// Have to do mixer stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
 		Engine::mixer()->setAudioDevice(m_fileDev, m_qualitySettings, false, false);
@@ -124,8 +116,7 @@ void ProjectRenderer::startProcessing()
 	}
 }
 
-void ProjectRenderer::run()
-{
+void ProjectRenderer::run() {
 	MemoryManager::ThreadGuard mmThreadGuard;
 	Q_UNUSED(mmThreadGuard);
 #if 0
@@ -151,12 +142,10 @@ void ProjectRenderer::run()
 	Engine::mixer()->startProcessing(false);
 
 	// Continually track and emit progress percentage to listeners.
-	while (!Engine::getSong()->isExportDone() && !m_abort)
-	{
+	while (!Engine::getSong()->isExportDone() && !m_abort) {
 		m_fileDev->processNextBuffer();
 		const int nprog = Engine::getSong()->getExportProgress();
-		if (m_progress != nprog)
-		{
+		if (m_progress != nprog) {
 			m_progress = nprog;
 			emit progressChanged(m_progress);
 		}
@@ -174,21 +163,18 @@ void ProjectRenderer::run()
 	if (m_abort) { QFile(f).remove(); }
 }
 
-void ProjectRenderer::abortProcessing()
-{
+void ProjectRenderer::abortProcessing() {
 	m_abort = true;
 	wait();
 }
 
-void ProjectRenderer::updateConsoleProgress()
-{
+void ProjectRenderer::updateConsoleProgress() {
 	const int cols = 50;
 	static int rot = 0;
 	char buf[80];
 	char prog[cols + 1];
 
-	for (int i = 0; i < cols; ++i)
-	{
+	for (int i = 0; i < cols; ++i) {
 		prog[i] = (i * 100 / cols <= m_progress ? '-' : ' ');
 	}
 	prog[cols] = 0;

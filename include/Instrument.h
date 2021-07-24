@@ -40,12 +40,10 @@ class MidiEvent;
 class NotePlayHandle;
 class Track;
 
-class LMMS_EXPORT Instrument : public Plugin
-{
+class LMMS_EXPORT Instrument : public Plugin {
 	MM_OPERATORS
 public:
-	enum Flag
-	{
+	enum Flag {
 		NoFlags = 0x00,
 		IsSingleStreamed = 0x01, /*! Instrument provides a single audio stream for all notes */
 		IsMidiBased = 0x02,		 /*! Instrument is controlled by MIDI events rather than NotePlayHandles */
@@ -93,8 +91,7 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent(const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0)
-	{
+	inline virtual bool handleMidiEvent(const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0) {
 		return true;
 	}
 

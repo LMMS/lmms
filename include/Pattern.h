@@ -37,15 +37,10 @@
 
 class InstrumentTrack;
 
-class LMMS_EXPORT Pattern : public TrackContentObject
-{
+class LMMS_EXPORT Pattern : public TrackContentObject {
 	Q_OBJECT
 public:
-	enum PatternTypes
-	{
-		BeatPattern,
-		MelodyPattern
-	};
+	enum PatternTypes { BeatPattern, MelodyPattern };
 
 	Pattern(InstrumentTrack* instrumentTrack);
 	Pattern(const Pattern& other);
@@ -128,8 +123,7 @@ signals:
 	void destroyedPattern(Pattern*);
 };
 
-class PatternView : public TrackContentObjectView
-{
+class PatternView : public TrackContentObjectView {
 	Q_OBJECT
 
 public:

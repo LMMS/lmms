@@ -44,11 +44,9 @@
 BBTrack::infoMap BBTrack::s_infoMap;
 
 BBTCO::BBTCO(Track* _track)
-	: TrackContentObject(_track)
-{
+	: TrackContentObject(_track) {
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB(bbTrackIndex());
-	if (t > 0)
-	{
+	if (t > 0) {
 		saveJournallingState(false);
 		changeLength(TimePos(t, 0));
 		restoreJournallingState();
@@ -56,12 +54,11 @@ BBTCO::BBTCO(Track* _track)
 	setAutoResize(false);
 }
 
-void BBTCO::saveSettings(QDomDocument& doc, QDomElement& element)
-{
+void BBTCO::saveSettings(QDomDocument& doc, QDomElement& element) {
 	element.setAttribute("name", name());
-	if (element.parentNode().nodeName() == "clipboard") { element.setAttribute("pos", -1); }
-	else
-	{
+	if (element.parentNode().nodeName() == "clipboard") {
+		element.setAttribute("pos", -1);
+	} else {
 		element.setAttribute("pos", startPosition());
 	}
 	element.setAttribute("len", length());
@@ -69,23 +66,20 @@ void BBTCO::saveSettings(QDomDocument& doc, QDomElement& element)
 	if (usesCustomClipColor()) { element.setAttribute("color", color().name()); }
 }
 
-void BBTCO::loadSettings(const QDomElement& element)
-{
+void BBTCO::loadSettings(const QDomElement& element) {
 	setName(element.attribute("name"));
 	if (element.attribute("pos").toInt() >= 0) { movePosition(element.attribute("pos").toInt()); }
 	changeLength(element.attribute("len").toInt());
 	if (element.attribute("muted").toInt() != isMuted()) { toggleMute(); }
 
 	// for colors saved in 1.3-onwards
-	if (element.hasAttribute("color") && !element.hasAttribute("usestyle"))
-	{
+	if (element.hasAttribute("color") && !element.hasAttribute("usestyle")) {
 		useCustomClipColor(true);
 		setColor(element.attribute("color"));
 	}
 
 	// for colors saved before 1.3
-	else
-	{
+	else {
 		if (element.hasAttribute("color")) { setColor(QColor(element.attribute("color").toUInt())); }
 
 		// usestyle attribute is no longer used
@@ -99,15 +93,13 @@ TrackContentObjectView* BBTCO::createView(TrackView* _tv) { return new BBTCOView
 BBTCOView::BBTCOView(TrackContentObject* _tco, TrackView* _tv)
 	: TrackContentObjectView(_tco, _tv)
 	, m_bbTCO(dynamic_cast<BBTCO*>(_tco))
-	, m_paintPixmap()
-{
+	, m_paintPixmap() {
 	connect(_tco->getTrack(), SIGNAL(dataChanged()), this, SLOT(update()));
 
 	setStyle(QApplication::style());
 }
 
-void BBTCOView::constructContextMenu(QMenu* _cm)
-{
+void BBTCOView::constructContextMenu(QMenu* _cm) {
 	QAction* a = new QAction(embed::getIconPixmap("bb_track"), tr("Open in Beat+Bassline-Editor"), _cm);
 	_cm->insertAction(_cm->actions()[0], a);
 	connect(a, SIGNAL(triggered(bool)), this, SLOT(openInBBEditor()));
@@ -119,12 +111,10 @@ void BBTCOView::constructContextMenu(QMenu* _cm)
 
 void BBTCOView::mouseDoubleClickEvent(QMouseEvent*) { openInBBEditor(); }
 
-void BBTCOView::paintEvent(QPaintEvent*)
-{
+void BBTCOView::paintEvent(QPaintEvent*) {
 	QPainter painter(this);
 
-	if (!needsUpdate())
-	{
+	if (!needsUpdate()) {
 		painter.drawPixmap(0, 0, m_paintPixmap);
 		return;
 	}
@@ -144,9 +134,9 @@ void BBTCOView::paintEvent(QPaintEvent*)
 	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
 	p.fillRect(rect(), QColor(0, 0, 0));
 
-	if (gradient()) { p.fillRect(rect(), lingrad); }
-	else
-	{
+	if (gradient()) {
+		p.fillRect(rect(), lingrad);
+	} else {
 		p.fillRect(rect(), c);
 	}
 
@@ -155,10 +145,8 @@ void BBTCOView::paintEvent(QPaintEvent*)
 	p.setPen(c.darker(200));
 
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB(m_bbTCO->bbTrackIndex());
-	if (m_bbTCO->length() > TimePos::ticksPerBar() && t > 0)
-	{
-		for (int x = static_cast<int>(t * pixelsPerBar()); x < width() - 2; x += static_cast<int>(t * pixelsPerBar()))
-		{
+	if (m_bbTCO->length() > TimePos::ticksPerBar() && t > 0) {
+		for (int x = static_cast<int>(t * pixelsPerBar()); x < width() - 2; x += static_cast<int>(t * pixelsPerBar())) {
 			p.drawLine(x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize);
 			p.drawLine(x, rect().bottom() - (TCO_BORDER_WIDTH + lineSize), x, rect().bottom() - TCO_BORDER_WIDTH);
 		}
@@ -176,8 +164,7 @@ void BBTCOView::paintEvent(QPaintEvent*)
 	p.drawRect(0, 0, rect().right(), rect().bottom());
 
 	// draw the 'muted' pixmap only if the pattern was manualy muted
-	if (m_bbTCO->isMuted())
-	{
+	if (m_bbTCO->isMuted()) {
 		const int spacing = TCO_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap(spacing, height() - (size + spacing), embed::getIconPixmap("muted", size, size));
@@ -188,8 +175,7 @@ void BBTCOView::paintEvent(QPaintEvent*)
 	painter.drawPixmap(0, 0, m_paintPixmap);
 }
 
-void BBTCOView::openInBBEditor()
-{
+void BBTCOView::openInBBEditor() {
 	Engine::getBBTrackContainer()->setCurrentBB(m_bbTCO->bbTrackIndex());
 
 	gui->mainWindow()->toggleBBEditorWin(true);
@@ -197,24 +183,21 @@ void BBTCOView::openInBBEditor()
 
 void BBTCOView::resetName() { m_bbTCO->setName(""); }
 
-void BBTCOView::changeName()
-{
+void BBTCOView::changeName() {
 	QString s = m_bbTCO->name();
 	RenameDialog rename_dlg(s);
 	rename_dlg.exec();
 	m_bbTCO->setName(s);
 }
 
-void BBTCOView::update()
-{
+void BBTCOView::update() {
 	ToolTip::add(this, m_bbTCO->name());
 
 	TrackContentObjectView::update();
 }
 
 BBTrack::BBTrack(TrackContainer* tc)
-	: Track(Track::BBTrack, tc)
-{
+	: Track(Track::BBTrack, tc) {
 	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
 
@@ -226,15 +209,13 @@ BBTrack::BBTrack(TrackContainer* tc)
 	connect(this, SIGNAL(nameChanged()), Engine::getBBTrackContainer(), SLOT(updateComboBox()));
 }
 
-BBTrack::~BBTrack()
-{
+BBTrack::~BBTrack() {
 	Engine::mixer()->removePlayHandlesOfTypes(
 		this, PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle | PlayHandle::TypeSamplePlayHandle);
 
 	const int bb = s_infoMap[this];
 	Engine::getBBTrackContainer()->removeBB(bb);
-	for (infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end(); ++it)
-	{
+	for (infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end(); ++it) {
 		if (it.value() > bb) { --it.value(); }
 	}
 	s_infoMap.remove(this);
@@ -246,8 +227,7 @@ BBTrack::~BBTrack()
 }
 
 // play _frames frames of given TCO within starting with _start
-bool BBTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t _offset, int _tco_num)
-{
+bool BBTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t _offset, int _tco_num) {
 	if (isMuted()) { return false; }
 
 	if (_tco_num >= 0) { return Engine::getBBTrackContainer()->play(_start, _frames, _offset, s_infoMap[this]); }
@@ -259,17 +239,14 @@ bool BBTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t _of
 
 	TimePos lastPosition;
 	TimePos lastLen;
-	for (tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it)
-	{
-		if (!(*it)->isMuted() && (*it)->startPosition() >= lastPosition)
-		{
+	for (tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it) {
+		if (!(*it)->isMuted() && (*it)->startPosition() >= lastPosition) {
 			lastPosition = (*it)->startPosition();
 			lastLen = (*it)->length();
 		}
 	}
 
-	if (_start - lastPosition < lastLen)
-	{
+	if (_start - lastPosition < lastLen) {
 		return Engine::getBBTrackContainer()->play(_start - lastPosition, _frames, _offset, s_infoMap[this]);
 	}
 	return false;
@@ -277,48 +254,40 @@ bool BBTrack::play(const TimePos& _start, const fpp_t _frames, const f_cnt_t _of
 
 TrackView* BBTrack::createView(TrackContainerView* tcv) { return new BBTrackView(this, tcv); }
 
-TrackContentObject* BBTrack::createTCO(const TimePos& pos)
-{
+TrackContentObject* BBTrack::createTCO(const TimePos& pos) {
 	BBTCO* bbtco = new BBTCO(this);
 	bbtco->movePosition(pos);
 	return bbtco;
 }
 
-void BBTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void BBTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this) {
 	//	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 	/*	_this.setAttribute( "current", s_infoMap[this] ==
 					engine::getBBEditor()->currentBB() );*/
 	if (s_infoMap[this] == 0 && _this.parentNode().parentNode().nodeName() != "clone"
-		&& _this.parentNode().parentNode().nodeName() != "journaldata")
-	{
+		&& _this.parentNode().parentNode().nodeName() != "journaldata") {
 		((JournallingObject*)(Engine::getBBTrackContainer()))->saveState(_doc, _this);
 	}
 	if (_this.parentNode().parentNode().nodeName() == "clone") { _this.setAttribute("clonebbt", s_infoMap[this]); }
 }
 
-void BBTrack::loadTrackSpecificSettings(const QDomElement& _this)
-{
+void BBTrack::loadTrackSpecificSettings(const QDomElement& _this) {
 	/*	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}*/
 
-	if (_this.hasAttribute("clonebbt"))
-	{
+	if (_this.hasAttribute("clonebbt")) {
 		const int src = _this.attribute("clonebbt").toInt();
 		const int dst = s_infoMap[this];
 		TrackContainer::TrackList tl = Engine::getBBTrackContainer()->tracks();
 		// copy TCOs of all tracks from source BB (at bar "src") to destination
 		// TCOs (which are created if they do not exist yet)
-		for (TrackContainer::TrackList::iterator it = tl.begin(); it != tl.end(); ++it)
-		{
+		for (TrackContainer::TrackList::iterator it = tl.begin(); it != tl.end(); ++it) {
 			TrackContentObject::copyStateTo((*it)->getTCO(src), (*it)->getTCO(dst));
 		}
 		setName(tr("Clone of %1").arg(_this.parentNode().toElement().attribute("name")));
-	}
-	else
-	{
+	} else {
 		QDomNode node = _this.namedItem(TrackContainer::classNodeName());
 		if (node.isElement()) { ((JournallingObject*)Engine::getBBTrackContainer())->restoreState(node.toElement()); }
 	}
@@ -332,21 +301,17 @@ void BBTrack::loadTrackSpecificSettings(const QDomElement& _this)
 }
 
 // return pointer to BBTrack specified by _bb_num
-BBTrack* BBTrack::findBBTrack(int _bb_num)
-{
-	for (infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end(); ++it)
-	{
+BBTrack* BBTrack::findBBTrack(int _bb_num) {
+	for (infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end(); ++it) {
 		if (it.value() == _bb_num) { return it.key(); }
 	}
 	return NULL;
 }
 
-void BBTrack::swapBBTracks(Track* _track1, Track* _track2)
-{
+void BBTrack::swapBBTracks(Track* _track1, Track* _track2) {
 	BBTrack* t1 = dynamic_cast<BBTrack*>(_track1);
 	BBTrack* t2 = dynamic_cast<BBTrack*>(_track2);
-	if (t1 != NULL && t2 != NULL)
-	{
+	if (t1 != NULL && t2 != NULL) {
 		qSwap(s_infoMap[t1], s_infoMap[t2]);
 		Engine::getBBTrackContainer()->swapBB(s_infoMap[t1], s_infoMap[t2]);
 		Engine::getBBTrackContainer()->setCurrentBB(s_infoMap[t1]);
@@ -355,8 +320,7 @@ void BBTrack::swapBBTracks(Track* _track1, Track* _track2)
 
 BBTrackView::BBTrackView(BBTrack* _bbt, TrackContainerView* tcv)
 	: TrackView(_bbt, tcv)
-	, m_bbTrack(_bbt)
-{
+	, m_bbTrack(_bbt) {
 	setFixedHeight(32);
 	// drag'n'drop with bb-tracks only causes troubles (and makes no sense
 	// too), so disable it
@@ -372,14 +336,12 @@ BBTrackView::BBTrackView(BBTrack* _bbt, TrackContainerView* tcv)
 
 BBTrackView::~BBTrackView() { gui->getBBEditor()->removeBBView(BBTrack::s_infoMap[m_bbTrack]); }
 
-bool BBTrackView::close()
-{
+bool BBTrackView::close() {
 	gui->getBBEditor()->removeBBView(BBTrack::s_infoMap[m_bbTrack]);
 	return TrackView::close();
 }
 
-void BBTrackView::clickedTrackLabel()
-{
+void BBTrackView::clickedTrackLabel() {
 	Engine::getBBTrackContainer()->setCurrentBB(m_bbTrack->index());
 	gui->getBBEditor()->parentWidget()->show();
 	gui->getBBEditor()->setFocus(Qt::ActiveWindowFocusReason);

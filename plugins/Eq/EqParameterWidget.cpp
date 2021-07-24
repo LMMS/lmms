@@ -57,8 +57,7 @@ EqParameterWidget::EqParameterWidget(QWidget* parent, EqControls* controls)
 
 	// adds the handles
 	m_handleList = new QList<EqHandle*>;
-	for (int i = 0; i < bandCount(); i++)
-	{
+	for (int i = 0; i < bandCount(); i++) {
 		m_handle = new EqHandle(i, m_displayWidth, m_displayHeigth);
 		m_handleList->append(m_handle);
 		m_handle->setZValue(1);
@@ -68,17 +67,14 @@ EqParameterWidget::EqParameterWidget(QWidget* parent, EqControls* controls)
 	// adds the curve widget
 	m_eqcurve = new EqCurve(m_handleList, m_displayWidth, m_displayHeigth);
 	scene->addItem(m_eqcurve);
-	for (int i = 0; i < bandCount(); i++)
-	{
+	for (int i = 0; i < bandCount(); i++) {
 		// if the data of handle position has changed update the models
 		QObject::connect(m_handleList->at(i), SIGNAL(positionChanged()), this, SLOT(updateModels()));
 	}
 }
 
-EqParameterWidget::~EqParameterWidget()
-{
-	if (m_bands)
-	{
+EqParameterWidget::~EqParameterWidget() {
+	if (m_bands) {
 		delete[] m_bands;
 		m_bands = 0;
 	}
@@ -86,29 +82,23 @@ EqParameterWidget::~EqParameterWidget()
 
 EqBand* EqParameterWidget::getBandModels(int i) { return &m_bands[i]; }
 
-void EqParameterWidget::updateHandle()
-{
+void EqParameterWidget::updateHandle() {
 	m_eqcurve->setModelChanged(true);
-	for (int i = 0; i < bandCount(); i++)
-	{
+	for (int i = 0; i < bandCount(); i++) {
 		if (!m_handleList->at(i)->mousePressed()) // prevents a short circuit between handle and data model
 		{
 			// sets the band on active if a fader or a knob is moved
 			bool hover = false; // prevents an action if handle is moved
-			for (int j = 0; j < bandCount(); j++)
-			{
+			for (int j = 0; j < bandCount(); j++) {
 				if (m_handleList->at(j)->isMouseHover()) { hover = true; }
 			}
-			if (!hover)
-			{
+			if (!hover) {
 				if (sender() == m_bands[i].gain) m_bands[i].active->setValue(true);
 				if (sender() == m_bands[i].freq) m_bands[i].active->setValue(true);
 				if (sender() == m_bands[i].res) m_bands[i].active->setValue(true);
 			}
 			changeHandle(i);
-		}
-		else
-		{
+		} else {
 			m_handleList->at(i)->setHandleActive(m_bands[i].active->value());
 		}
 	}
@@ -120,22 +110,19 @@ void EqParameterWidget::updateHandle()
 	if (m_bands[7].lp48->value()) m_handleList->at(7)->setlp48();
 }
 
-void EqParameterWidget::changeHandle(int i)
-{
+void EqParameterWidget::changeHandle(int i) {
 	// fill x, y, and bw with data from model
 	float x = EqHandle::freqToXPixel(m_bands[i].freq->value(), m_displayWidth);
 	float y = m_handleList->at(i)->y();
 	// for pass filters there is no gain model
-	if (m_bands[i].gain)
-	{
+	if (m_bands[i].gain) {
 		float gain = m_bands[i].gain->value();
 		y = EqHandle::gainToYPixel(gain, m_displayHeigth, m_pixelsPerUnitHeight);
 	}
 	float bw = m_bands[i].res->value();
 
 	// set the handle position, filter type for each handle
-	switch (i)
-	{
+	switch (i) {
 	case 0:
 		m_handleList->at(i)->setType(highpass);
 		m_handleList->at(i)->setPos(x, m_displayHeigth / 2);
@@ -180,14 +167,11 @@ void EqParameterWidget::changeHandle(int i)
 }
 
 // this is called if a handle is moved
-void EqParameterWidget::updateModels()
-{
-	for (int i = 0; i < bandCount(); i++)
-	{
+void EqParameterWidget::updateModels() {
+	for (int i = 0; i < bandCount(); i++) {
 		m_bands[i].freq->setValue(EqHandle::xPixelToFreq(m_handleList->at(i)->x(), m_displayWidth));
 
-		if (m_bands[i].gain)
-		{
+		if (m_bands[i].gain) {
 			m_bands[i].gain->setValue(
 				EqHandle::yPixelToGain(m_handleList->at(i)->y(), m_displayHeigth, m_pixelsPerUnitHeight));
 		}
@@ -208,6 +192,4 @@ EqBand::EqBand()
 	, y(0)
 	, name(QString(""))
 	, peakL(0)
-	, peakR(0)
-{
-}
+	, peakR(0) {}

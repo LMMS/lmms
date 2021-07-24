@@ -36,8 +36,7 @@ TextFloat::TextFloat()
 	: QWidget(gui->mainWindow(), Qt::ToolTip)
 	, m_title()
 	, m_text()
-	, m_pixmap()
-{
+	, m_pixmap() {
 	resize(20, 20);
 	hide();
 
@@ -46,43 +45,37 @@ TextFloat::TextFloat()
 	setFont(pointSize<8>(font()));
 }
 
-void TextFloat::setTitle(const QString& _title)
-{
+void TextFloat::setTitle(const QString& _title) {
 	m_title = _title;
 	updateSize();
 }
 
-void TextFloat::setText(const QString& _text)
-{
+void TextFloat::setText(const QString& _text) {
 	m_text = _text;
 	updateSize();
 }
 
-void TextFloat::setPixmap(const QPixmap& _pixmap)
-{
+void TextFloat::setPixmap(const QPixmap& _pixmap) {
 	m_pixmap = _pixmap;
 	updateSize();
 }
 
-void TextFloat::setVisibilityTimeOut(int _msecs)
-{
+void TextFloat::setVisibilityTimeOut(int _msecs) {
 	QTimer::singleShot(_msecs, this, SLOT(hide()));
 	show();
 }
 
-TextFloat* TextFloat::displayMessage(const QString& _msg, int _timeout, QWidget* _parent, int _add_y_margin)
-{
+TextFloat* TextFloat::displayMessage(const QString& _msg, int _timeout, QWidget* _parent, int _add_y_margin) {
 	QWidget* mw = gui->mainWindow();
 	TextFloat* tf = new TextFloat;
-	if (_parent != NULL) { tf->moveGlobal(_parent, QPoint(_parent->width() + 2, 0)); }
-	else
-	{
+	if (_parent != NULL) {
+		tf->moveGlobal(_parent, QPoint(_parent->width() + 2, 0));
+	} else {
 		tf->moveGlobal(mw, QPoint(32, mw->height() - tf->height() - 8 - _add_y_margin));
 	}
 	tf->setText(_msg);
 	tf->show();
-	if (_timeout > 0)
-	{
+	if (_timeout > 0) {
 		tf->setAttribute(Qt::WA_DeleteOnClose, true);
 		QTimer::singleShot(_timeout, tf, SLOT(close()));
 	}
@@ -90,16 +83,14 @@ TextFloat* TextFloat::displayMessage(const QString& _msg, int _timeout, QWidget*
 }
 
 TextFloat* TextFloat::displayMessage(
-	const QString& _title, const QString& _msg, const QPixmap& _pixmap, int _timeout, QWidget* _parent)
-{
+	const QString& _title, const QString& _msg, const QPixmap& _pixmap, int _timeout, QWidget* _parent) {
 	TextFloat* tf = displayMessage(_msg, _timeout, _parent, 16);
 	tf->setTitle(_title);
 	tf->setPixmap(_pixmap);
 	return (tf);
 }
 
-void TextFloat::paintEvent(QPaintEvent* _pe)
-{
+void TextFloat::paintEvent(QPaintEvent* _pe) {
 	QStyleOption opt;
 	opt.init(this);
 	QPainter p(this);
@@ -114,13 +105,12 @@ void TextFloat::paintEvent(QPaintEvent* _pe)
 
 	/*	p.drawRect( 0, 0, rect().right(), rect().bottom() );*/
 
-	if (m_title.isEmpty()) { p.drawText(opt.rect, Qt::AlignCenter, m_text); }
-	else
-	{
+	if (m_title.isEmpty()) {
+		p.drawText(opt.rect, Qt::AlignCenter, m_text);
+	} else {
 		int text_x = opt.rect.left() + 2;
 		int text_y = opt.rect.top() + 12;
-		if (m_pixmap.isNull() == false)
-		{
+		if (m_pixmap.isNull() == false) {
 			p.drawPixmap(opt.rect.topLeft() + QPoint(5, 5), m_pixmap);
 			text_x += m_pixmap.width() + 8;
 		}
@@ -134,12 +124,10 @@ void TextFloat::paintEvent(QPaintEvent* _pe)
 
 void TextFloat::mousePressEvent(QMouseEvent*) { close(); }
 
-void TextFloat::updateSize()
-{
+void TextFloat::updateSize() {
 	QFontMetrics metrics(pointSize<8>(font()));
 	QRect textBound = metrics.boundingRect(m_text);
-	if (!m_title.isEmpty())
-	{
+	if (!m_title.isEmpty()) {
 		QFont f = pointSize<8>(font());
 		f.setBold(true);
 		int title_w = QFontMetrics(f).boundingRect(m_title).width();

@@ -31,29 +31,24 @@
 #include "embed.h"
 
 InstrumentView::InstrumentView(Instrument* _Instrument, QWidget* _parent)
-	: PluginView(_Instrument, _parent)
-{
+	: PluginView(_Instrument, _parent) {
 	setModel(_Instrument);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 }
 
-InstrumentView::~InstrumentView()
-{
+InstrumentView::~InstrumentView() {
 	if (instrumentTrackWindow()) { instrumentTrackWindow()->m_instrumentView = NULL; }
 }
 
-void InstrumentView::setModel(Model* _model, bool)
-{
-	if (dynamic_cast<Instrument*>(_model) != NULL)
-	{
+void InstrumentView::setModel(Model* _model, bool) {
+	if (dynamic_cast<Instrument*>(_model) != NULL) {
 		ModelView::setModel(_model);
 		instrumentTrackWindow()->setWindowIcon(model()->logo()->pixmap());
 		connect(model(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
 	}
 }
 
-InstrumentTrackWindow* InstrumentView::instrumentTrackWindow(void)
-{
+InstrumentTrackWindow* InstrumentView::instrumentTrackWindow(void) {
 	return (dynamic_cast<InstrumentTrackWindow*>(parentWidget()->parentWidget()));
 }
 

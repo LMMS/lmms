@@ -39,8 +39,7 @@
 class LcdSpinBox;
 class QLineEdit;
 
-class AudioSndio : public QThread, public AudioDevice
-{
+class AudioSndio : public QThread, public AudioDevice {
 	Q_OBJECT
 public:
 	AudioSndio(bool& _success_ful, Mixer* _mixer);
@@ -48,8 +47,7 @@ public:
 
 	inline static QString name(void) { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "sndio"); }
 
-	class setupWidget : public AudioDeviceSetupWidget
-	{
+	class setupWidget : public AudioDeviceSetupWidget {
 	public:
 		setupWidget(QWidget* _parent);
 		virtual ~setupWidget();

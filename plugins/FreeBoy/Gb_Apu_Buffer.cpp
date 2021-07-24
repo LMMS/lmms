@@ -25,15 +25,13 @@
 Gb_Apu_Buffer::Gb_Apu_Buffer() {}
 Gb_Apu_Buffer::~Gb_Apu_Buffer() {}
 
-void Gb_Apu_Buffer::end_frame(blip_time_t end_time)
-{
+void Gb_Apu_Buffer::end_frame(blip_time_t end_time) {
 	Gb_Apu::end_frame(end_time);
 	m_buf.end_frame(end_time);
 }
 
 // Sets specified sample rate and clock rate in Multi_Buffer
-blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate)
-{
+blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate) {
 	Gb_Apu_Buffer::output(m_buf.center(), m_buf.left(), m_buf.right());
 	m_buf.clock_rate(clock_rate);
 	return m_buf.set_sample_rate(sample_rate);

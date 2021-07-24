@@ -27,14 +27,11 @@
 MixerProfiler::MixerProfiler()
 	: m_periodTimer()
 	, m_cpuLoad(0)
-	, m_outputFile()
-{
-}
+	, m_outputFile() {}
 
 MixerProfiler::~MixerProfiler() {}
 
-void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod)
-{
+void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod) {
 	int periodElapsed = m_periodTimer.elapsed();
 
 	const float newCpuLoad = periodElapsed / 10000.0f * sampleRate / framesPerPeriod;
@@ -43,8 +40,7 @@ void MixerProfiler::finishPeriod(sample_rate_t sampleRate, fpp_t framesPerPeriod
 	if (m_outputFile.isOpen()) { m_outputFile.write(QString("%1\n").arg(periodElapsed).toLatin1()); }
 }
 
-void MixerProfiler::setOutputFile(const QString& outputFile)
-{
+void MixerProfiler::setOutputFile(const QString& outputFile) {
 	m_outputFile.close();
 	m_outputFile.setFileName(outputFile);
 	m_outputFile.open(QFile::WriteOnly | QFile::Truncate);

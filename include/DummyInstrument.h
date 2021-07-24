@@ -33,18 +33,14 @@
 #include "InstrumentView.h"
 #include "Mixer.h"
 
-class DummyInstrument : public Instrument
-{
+class DummyInstrument : public Instrument {
 public:
 	DummyInstrument(InstrumentTrack* _instrument_track)
-		: Instrument(_instrument_track, NULL)
-	{
-	}
+		: Instrument(_instrument_track, NULL) {}
 
 	virtual ~DummyInstrument() {}
 
-	void playNote(NotePlayHandle*, sampleFrame* buffer) override
-	{
+	void playNote(NotePlayHandle*, sampleFrame* buffer) override {
 		memset(buffer, 0, sizeof(sampleFrame) * Engine::mixer()->framesPerPeriod());
 	}
 

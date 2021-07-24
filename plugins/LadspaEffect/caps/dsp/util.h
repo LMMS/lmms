@@ -28,11 +28,9 @@
 #ifndef _DSP_UTIL_H_
 #define _DSP_UTIL_H_
 
-namespace DSP
-{
+namespace DSP {
 
-inline int next_power_of_2(int n)
-{
+inline int next_power_of_2(int n) {
 	assert(n <= 0x40000000);
 
 	int m = 1;
@@ -43,8 +41,7 @@ inline int next_power_of_2(int n)
 	return m;
 }
 
-inline bool isprime(int v)
-{
+inline bool isprime(int v) {
 	if (v <= 3) return true;
 
 	if (!(v & 1)) return false;

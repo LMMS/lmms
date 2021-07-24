@@ -37,15 +37,13 @@ DelayControls::DelayControls(DelayEffect* effect)
 	, m_feedbackModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Feedback"))
 	, m_lfoTimeModel(2.0, 0.01, 5.0, 0.0001, 20000.0, this, tr("LFO frequency"))
 	, m_lfoAmountModel(0.0, 0.0, 0.5, 0.0001, 2000.0, this, tr("LFO amount"))
-	, m_outGainModel(0.0, -60.0, 20.0, 0.01, this, tr("Output gain"))
-{
+	, m_outGainModel(0.0, -60.0, 20.0, 0.01, this, tr("Output gain")) {
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	m_outPeakL = 0.0;
 	m_outPeakR = 0.0;
 }
 
-void DelayControls::loadSettings(const QDomElement& _this)
-{
+void DelayControls::loadSettings(const QDomElement& _this) {
 	m_delayTimeModel.loadSettings(_this, "DelayTimeSamples");
 	m_feedbackModel.loadSettings(_this, "FeebackAmount");
 	m_lfoTimeModel.loadSettings(_this, "LfoFrequency");
@@ -53,8 +51,7 @@ void DelayControls::loadSettings(const QDomElement& _this)
 	m_outGainModel.loadSettings(_this, "OutGain");
 }
 
-void DelayControls::saveSettings(QDomDocument& doc, QDomElement& _this)
-{
+void DelayControls::saveSettings(QDomDocument& doc, QDomElement& _this) {
 	m_delayTimeModel.saveSettings(doc, _this, "DelayTimeSamples");
 	m_feedbackModel.saveSettings(doc, _this, "FeebackAmount");
 	m_lfoTimeModel.saveSettings(doc, _this, "LfoFrequency");

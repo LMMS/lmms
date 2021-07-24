@@ -30,8 +30,7 @@
 #include "TimePos.h"
 
 // all classes being able to process MIDI-events should inherit from this
-class MidiEventProcessor
-{
+class MidiEventProcessor {
 	MM_OPERATORS
 public:
 	MidiEventProcessor() {}

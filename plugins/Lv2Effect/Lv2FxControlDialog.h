@@ -30,8 +30,7 @@
 
 class Lv2FxControls;
 
-class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase
-{
+class Lv2FxControlDialog : public EffectControlDialog, public Lv2ViewBase {
 	Q_OBJECT
 
 public:

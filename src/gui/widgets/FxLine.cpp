@@ -34,16 +34,12 @@
 #include "Song.h"
 #include "gui_templates.h"
 
-bool FxLine::eventFilter(QObject* dist, QEvent* event)
-{
+bool FxLine::eventFilter(QObject* dist, QEvent* event) {
 	// If we are in a rename, capture the enter/return events and handle them
-	if (event->type() == QEvent::KeyPress)
-	{
+	if (event->type() == QEvent::KeyPress) {
 		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-		if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
-		{
-			if (m_inRename)
-			{
+		if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+			if (m_inRename) {
 				renameFinished();
 				event->accept(); // Stop the event from propagating
 				return true;
@@ -66,8 +62,7 @@ FxLine::FxLine(QWidget* _parent, FxMixerView* _mv, int _channelIndex)
 	, m_strokeOuterInactive(0, 0, 0)
 	, m_strokeInnerActive(0, 0, 0)
 	, m_strokeInnerInactive(0, 0, 0)
-	, m_inRename(false)
-{
+	, m_inRename(false) {
 	if (!s_sendBgArrow) { s_sendBgArrow = new QPixmap(embed::getIconPixmap("send_bg_arrow", 29, 56)); }
 	if (!s_receiveBgArrow) { s_receiveBgArrow = new QPixmap(embed::getIconPixmap("receive_bg_arrow", 29, 56)); }
 
@@ -119,22 +114,19 @@ FxLine::FxLine(QWidget* _parent, FxMixerView* _mv, int _channelIndex)
 		&Engine::fxMixer()->effectChannel(m_channelIndex)->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
 }
 
-FxLine::~FxLine()
-{
+FxLine::~FxLine() {
 	delete m_sendKnob;
 	delete m_sendBtn;
 	delete m_lcd;
 }
 
-void FxLine::setChannelIndex(int index)
-{
+void FxLine::setChannelIndex(int index) {
 	m_channelIndex = index;
 	m_lcd->setValue(m_channelIndex);
 	m_lcd->update();
 }
 
-void FxLine::drawFxLine(QPainter* p, const FxLine* fxLine, bool isActive, bool sendToThis, bool receiveFromThis)
-{
+void FxLine::drawFxLine(QPainter* p, const FxLine* fxLine, bool isActive, bool sendToThis, bool receiveFromThis) {
 	auto channel = Engine::fxMixer()->effectChannel(m_channelIndex);
 	bool muted = channel->m_muteModel.value();
 	QString name = channel->m_name;
@@ -144,9 +136,9 @@ void FxLine::drawFxLine(QPainter* p, const FxLine* fxLine, bool isActive, bool s
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
 
-	if (channel->m_hasColor && !muted) { p->fillRect(fxLine->rect(), channel->m_color.darker(isActive ? 120 : 150)); }
-	else
-	{
+	if (channel->m_hasColor && !muted) {
+		p->fillRect(fxLine->rect(), channel->m_color.darker(isActive ? 120 : 150));
+	} else {
 		p->fillRect(fxLine->rect(), isActive ? fxLine->backgroundActive().color() : p->background().color());
 	}
 
@@ -159,23 +151,21 @@ void FxLine::drawFxLine(QPainter* p, const FxLine* fxLine, bool isActive, bool s
 	p->drawRect(0, 0, width - 1, height - 1);
 
 	// draw the mixer send background
-	if (sendToThis) { p->drawPixmap(2, 0, 29, 56, *s_sendBgArrow); }
-	else if (receiveFromThis)
-	{
+	if (sendToThis) {
+		p->drawPixmap(2, 0, 29, 56, *s_sendBgArrow);
+	} else if (receiveFromThis) {
 		p->drawPixmap(2, 0, 29, 56, *s_receiveBgArrow);
 	}
 }
 
-QString FxLine::elideName(const QString& name)
-{
+QString FxLine::elideName(const QString& name) {
 	const int maxTextHeight = 60;
 	QFontMetrics metrics(m_renameLineEdit->font());
 	QString elidedName = metrics.elidedText(name, Qt::ElideRight, maxTextHeight);
 	return elidedName;
 }
 
-void FxLine::paintEvent(QPaintEvent*)
-{
+void FxLine::paintEvent(QPaintEvent*) {
 	bool sendToThis
 		= Engine::fxMixer()->channelSendModel(m_mv->currentFxLine()->m_channelIndex, m_channelIndex) != NULL;
 	bool receiveFromThis
@@ -190,8 +180,7 @@ void FxLine::mousePressEvent(QMouseEvent*) { m_mv->setCurrentFxLine(this); }
 
 void FxLine::mouseDoubleClickEvent(QMouseEvent*) { renameChannel(); }
 
-void FxLine::contextMenuEvent(QContextMenuEvent*)
-{
+void FxLine::contextMenuEvent(QContextMenuEvent*) {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(Engine::fxMixer()->effectChannel(m_channelIndex)->m_name, this);
 	if (m_channelIndex != 0) // no move-options in master
 	{
@@ -217,8 +206,7 @@ void FxLine::contextMenuEvent(QContextMenuEvent*)
 	delete contextMenu;
 }
 
-void FxLine::renameChannel()
-{
+void FxLine::renameChannel() {
 	m_inRename = true;
 	setToolTip("");
 	m_renameLineEdit->setReadOnly(false);
@@ -230,8 +218,7 @@ void FxLine::renameChannel()
 	m_renameLineEdit->setFocus();
 }
 
-void FxLine::renameFinished()
-{
+void FxLine::renameFinished() {
 	m_inRename = false;
 	m_renameLineEdit->deselect();
 	m_renameLineEdit->setReadOnly(true);
@@ -239,8 +226,7 @@ void FxLine::renameFinished()
 	m_lcd->show();
 	QString newName = m_renameLineEdit->text();
 	setFocus();
-	if (!newName.isEmpty() && Engine::fxMixer()->effectChannel(m_channelIndex)->m_name != newName)
-	{
+	if (!newName.isEmpty() && Engine::fxMixer()->effectChannel(m_channelIndex)->m_name != newName) {
 		Engine::fxMixer()->effectChannel(m_channelIndex)->m_name = newName;
 		m_renameLineEdit->setText(elideName(newName));
 		Engine::getSong()->setModified();
@@ -249,26 +235,22 @@ void FxLine::renameFinished()
 	setToolTip(name);
 }
 
-void FxLine::removeChannel()
-{
+void FxLine::removeChannel() {
 	FxMixerView* mix = gui->fxMixerView();
 	mix->deleteChannel(m_channelIndex);
 }
 
-void FxLine::removeUnusedChannels()
-{
+void FxLine::removeUnusedChannels() {
 	FxMixerView* mix = gui->fxMixerView();
 	mix->deleteUnusedChannels();
 }
 
-void FxLine::moveChannelLeft()
-{
+void FxLine::moveChannelLeft() {
 	FxMixerView* mix = gui->fxMixerView();
 	mix->moveChannelLeft(m_channelIndex);
 }
 
-void FxLine::moveChannelRight()
-{
+void FxLine::moveChannelRight() {
 	FxMixerView* mix = gui->fxMixerView();
 	mix->moveChannelRight(m_channelIndex);
 }
@@ -294,8 +276,7 @@ QColor FxLine::strokeInnerInactive() const { return m_strokeInnerInactive; }
 void FxLine::setStrokeInnerInactive(const QColor& c) { m_strokeInnerInactive = c; }
 
 // Ask user for a color, and set it as the mixer line color
-void FxLine::changeColor()
-{
+void FxLine::changeColor() {
 	auto channel = Engine::fxMixer()->effectChannel(m_channelIndex);
 	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
 	if (!new_color.isValid()) { return; }
@@ -304,15 +285,13 @@ void FxLine::changeColor()
 }
 
 // Disable the usage of color on this mixer line
-void FxLine::resetColor()
-{
+void FxLine::resetColor() {
 	Engine::fxMixer()->effectChannel(m_channelIndex)->m_hasColor = false;
 	update();
 }
 
 // Pick a random color from the mixer palette and set it as our color
-void FxLine::randomColor()
-{
+void FxLine::randomColor() {
 	auto channel = Engine::fxMixer()->effectChannel(m_channelIndex);
 	channel->setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
 	update();

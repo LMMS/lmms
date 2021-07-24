@@ -31,27 +31,23 @@
 #include "lmms_math.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor
-		= {STRINGIFY(PLUGIN_NAME), "Equalizer", QT_TRANSLATE_NOOP("PluginBrowser", "A native eq plugin"),
-			"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
-			new PluginPixmapLoader("logo"), NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor
+	= {STRINGIFY(PLUGIN_NAME), "Equalizer", QT_TRANSLATE_NOOP("PluginBrowser", "A native eq plugin"),
+		"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>", 0x0100, Plugin::Effect,
+		new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 EqEffect::EqEffect(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&eq_plugin_descriptor, parent, key)
 	, m_eqControls(this)
 	, m_inGain(1.0)
-	, m_outGain(1.0)
-{
-}
+	, m_outGain(1.0) {}
 
 EqEffect::~EqEffect() {}
 
-bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
-{
+bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames) {
 	const int sampleRate = Engine::mixer()->processingSampleRate();
 
 	// wet/dry controls
@@ -124,20 +120,16 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	m_eqControls.m_inProgress = true;
 	double outSum = 0.0;
 
-	for (fpp_t f = 0; f < frames; ++f)
-	{
+	for (fpp_t f = 0; f < frames; ++f) {
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
 	const float outGain = m_outGain;
 	sampleFrame m_inPeak = {0, 0};
 
-	if (m_eqControls.m_analyseInModel.value(true) && outSum > 0 && m_eqControls.isViewVisible())
-	{
+	if (m_eqControls.m_analyseInModel.value(true) && outSum > 0 && m_eqControls.isViewVisible()) {
 		m_eqControls.m_inFftBands.analyze(buf, frames);
-	}
-	else
-	{
+	} else {
 		m_eqControls.m_inFftBands.clear();
 	}
 
@@ -146,25 +138,21 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	m_eqControls.m_inPeakR = m_eqControls.m_inPeakR < m_inPeak[1] ? m_inPeak[1] : m_eqControls.m_inPeakR;
 
 	float periodProgress = 0.0f; // percentage of period processed
-	for (fpp_t f = 0; f < frames; ++f)
-	{
+	for (fpp_t f = 0; f < frames; ++f) {
 		periodProgress = (float)f / (float)(frames - 1);
 		// wet dry buffer
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
-		if (hpActive)
-		{
+		if (hpActive) {
 			buf[f][0] = m_hp12.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_hp12.update(buf[f][1], 1, periodProgress);
 
-			if (hp24Active || hp48Active)
-			{
+			if (hp24Active || hp48Active) {
 				buf[f][0] = m_hp24.update(buf[f][0], 0, periodProgress);
 				buf[f][1] = m_hp24.update(buf[f][1], 1, periodProgress);
 			}
 
-			if (hp48Active)
-			{
+			if (hp48Active) {
 				buf[f][0] = m_hp480.update(buf[f][0], 0, periodProgress);
 				buf[f][1] = m_hp480.update(buf[f][1], 1, periodProgress);
 
@@ -173,55 +161,46 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 			}
 		}
 
-		if (lowShelfActive)
-		{
+		if (lowShelfActive) {
 			buf[f][0] = m_lowShelf.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_lowShelf.update(buf[f][1], 1, periodProgress);
 		}
 
-		if (para1Active)
-		{
+		if (para1Active) {
 			buf[f][0] = m_para1.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_para1.update(buf[f][1], 1, periodProgress);
 		}
 
-		if (para2Active)
-		{
+		if (para2Active) {
 			buf[f][0] = m_para2.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_para2.update(buf[f][1], 1, periodProgress);
 		}
 
-		if (para3Active)
-		{
+		if (para3Active) {
 			buf[f][0] = m_para3.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_para3.update(buf[f][1], 1, periodProgress);
 		}
 
-		if (para4Active)
-		{
+		if (para4Active) {
 			buf[f][0] = m_para4.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_para4.update(buf[f][1], 1, periodProgress);
 		}
 
-		if (highShelfActive)
-		{
+		if (highShelfActive) {
 			buf[f][0] = m_highShelf.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_highShelf.update(buf[f][1], 1, periodProgress);
 		}
 
-		if (lpActive)
-		{
+		if (lpActive) {
 			buf[f][0] = m_lp12.update(buf[f][0], 0, periodProgress);
 			buf[f][1] = m_lp12.update(buf[f][1], 1, periodProgress);
 
-			if (lp24Active || lp48Active)
-			{
+			if (lp24Active || lp48Active) {
 				buf[f][0] = m_lp24.update(buf[f][0], 0, periodProgress);
 				buf[f][1] = m_lp24.update(buf[f][1], 1, periodProgress);
 			}
 
-			if (lp48Active)
-			{
+			if (lp48Active) {
 				buf[f][0] = m_lp480.update(buf[f][0], 0, periodProgress);
 				buf[f][1] = m_lp480.update(buf[f][1], 1, periodProgress);
 
@@ -242,13 +221,10 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 
 	checkGate(outSum / frames);
 
-	if (m_eqControls.m_analyseOutModel.value(true) && outSum > 0 && m_eqControls.isViewVisible())
-	{
+	if (m_eqControls.m_analyseOutModel.value(true) && outSum > 0 && m_eqControls.isViewVisible()) {
 		m_eqControls.m_outFftBands.analyze(buf, frames);
 		setBandPeaks(&m_eqControls.m_outFftBands, (int)(sampleRate));
-	}
-	else
-	{
+	} else {
 		m_eqControls.m_outFftBands.clear();
 	}
 
@@ -256,15 +232,12 @@ bool EqEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	return isRunning();
 }
 
-float EqEffect::peakBand(float minF, float maxF, EqAnalyser* fft, int sr)
-{
+float EqEffect::peakBand(float minF, float maxF, EqAnalyser* fft, int sr) {
 	float peak = -60;
 	float* b = fft->m_bands;
 	float h = 0;
-	for (int x = 0; x < MAX_BANDS; x++, b++)
-	{
-		if (bandToFreq(x, sr) >= minF && bandToFreq(x, sr) <= maxF)
-		{
+	for (int x = 0; x < MAX_BANDS; x++, b++) {
+		if (bandToFreq(x, sr) >= minF && bandToFreq(x, sr) <= maxF) {
 			h = 20 * (log10(*b / fft->getEnergy()));
 			peak = h > peak ? h : peak;
 		}
@@ -273,8 +246,7 @@ float EqEffect::peakBand(float minF, float maxF, EqAnalyser* fft, int sr)
 	return (peak + 60) / 100;
 }
 
-void EqEffect::setBandPeaks(EqAnalyser* fft, int samplerate)
-{
+void EqEffect::setBandPeaks(EqAnalyser* fft, int samplerate) {
 	m_eqControls.m_lowShelfPeakR = m_eqControls.m_lowShelfPeakL
 		= peakBand(m_eqControls.m_lowShelfFreqModel.value() * (1 - m_eqControls.m_lowShelfResModel.value() * 0.5),
 			m_eqControls.m_lowShelfFreqModel.value(), fft, samplerate);
@@ -300,12 +272,10 @@ void EqEffect::setBandPeaks(EqAnalyser* fft, int samplerate)
 		samplerate);
 }
 
-extern "C"
-{
+extern "C" {
 
-	// needed for getting plugin out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
-	{
-		return new EqEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
-	}
+// needed for getting plugin out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data) {
+	return new EqEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+}
 }

@@ -30,8 +30,7 @@
 
 #include "dsp/Roessler.h"
 
-class Roessler : public Plugin
-{
+class Roessler : public Plugin {
 public:
 	sample_t h, gain;
 

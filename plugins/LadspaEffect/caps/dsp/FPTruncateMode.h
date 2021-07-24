@@ -26,17 +26,14 @@
 inline void fistp(float f, int32_t& i) { i = static_cast<int32_t>(f); }
 #endif
 
-namespace DSP
-{
+namespace DSP {
 
-class FPTruncateMode
-{
+class FPTruncateMode {
 public:
 #ifdef __i386__
 	int cw0; /* fp control word */
 
-	FPTruncateMode()
-	{
+	FPTruncateMode() {
 		fstcw(cw0);
 		const int cw1 = cw0 | 0xC00;
 		fldcw(cw1);

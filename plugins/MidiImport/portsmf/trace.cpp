@@ -9,8 +9,7 @@
 #include "stdarg.h"
 #include "stdio.h"
 
-void trace(char* format, ...)
-{
+void trace(char* format, ...) {
 	char msg[256];
 	va_list args;
 	va_start(args, format);

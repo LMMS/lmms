@@ -36,16 +36,14 @@
 LadspaControlView::LadspaControlView(QWidget* _parent, LadspaControl* _ctl)
 	: QWidget(_parent)
 	, ModelView(_ctl, this)
-	, m_ctl(_ctl)
-{
+	, m_ctl(_ctl) {
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setMargin(0);
 	layout->setSpacing(0);
 
 	LedCheckBox* link = NULL;
 
-	if (m_ctl->m_link)
-	{
+	if (m_ctl->m_link) {
 		link = new LedCheckBox("", this);
 		link->setModel(&m_ctl->m_linkEnabledModel);
 		ToolTip::add(link, tr("Link channels"));
@@ -54,15 +52,14 @@ LadspaControlView::LadspaControlView(QWidget* _parent, LadspaControl* _ctl)
 
 	Knob* knb = NULL;
 
-	switch (m_ctl->port()->data_type)
-	{
+	switch (m_ctl->port()->data_type) {
 	case TOGGLED: {
 		LedCheckBox* toggle = new LedCheckBox(m_ctl->port()->name, this, QString(), LedCheckBox::Green);
 		toggle->setModel(m_ctl->toggledModel());
 		layout->addWidget(toggle);
-		if (link != NULL) { setFixedSize(link->width() + toggle->width(), toggle->height()); }
-		else
-		{
+		if (link != NULL) {
+			setFixedSize(link->width() + toggle->width(), toggle->height());
+		} else {
 			setFixedSize(toggle->width(), toggle->height());
 		}
 		break;
@@ -77,19 +74,18 @@ LadspaControlView::LadspaControlView(QWidget* _parent, LadspaControl* _ctl)
 	default: break;
 	}
 
-	if (knb != NULL)
-	{
-		if (m_ctl->port()->data_type != TIME) { knb->setModel(m_ctl->knobModel()); }
-		else
-		{
+	if (knb != NULL) {
+		if (m_ctl->port()->data_type != TIME) {
+			knb->setModel(m_ctl->knobModel());
+		} else {
 			knb->setModel(m_ctl->tempoSyncKnobModel());
 		}
 		knb->setLabel(m_ctl->port()->name);
 		knb->setHintText(tr("Value:"), "");
 		layout->addWidget(knb);
-		if (link != NULL) { setFixedSize(link->width() + knb->width(), knb->height()); }
-		else
-		{
+		if (link != NULL) {
+			setFixedSize(link->width() + knb->width(), knb->height());
+		} else {
 			setFixedSize(knb->width(), knb->height());
 		}
 	}

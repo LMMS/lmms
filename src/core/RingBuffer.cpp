@@ -32,8 +32,7 @@
 RingBuffer::RingBuffer(f_cnt_t size)
 	: m_fpp(Engine::mixer()->framesPerPeriod())
 	, m_samplerate(Engine::mixer()->processingSampleRate())
-	, m_size(size + m_fpp)
-{
+	, m_size(size + m_fpp) {
 	m_buffer = new sampleFrame[m_size];
 	memset(m_buffer, 0, m_size * sizeof(sampleFrame));
 	m_position = 0;
@@ -41,8 +40,7 @@ RingBuffer::RingBuffer(f_cnt_t size)
 
 RingBuffer::RingBuffer(float size)
 	: m_fpp(Engine::mixer()->framesPerPeriod())
-	, m_samplerate(Engine::mixer()->processingSampleRate())
-{
+	, m_samplerate(Engine::mixer()->processingSampleRate()) {
 	m_size = msToFrames(size) + m_fpp;
 	m_buffer = new sampleFrame[m_size];
 	memset(m_buffer, 0, m_size * sizeof(sampleFrame));
@@ -53,14 +51,12 @@ RingBuffer::RingBuffer(float size)
 
 RingBuffer::~RingBuffer() { delete[] m_buffer; }
 
-void RingBuffer::reset()
-{
+void RingBuffer::reset() {
 	memset(m_buffer, 0, m_size * sizeof(sampleFrame));
 	m_position = 0;
 }
 
-void RingBuffer::changeSize(f_cnt_t size)
-{
+void RingBuffer::changeSize(f_cnt_t size) {
 	size += m_fpp;
 	sampleFrame* tmp = m_buffer;
 	m_size = size;
@@ -72,14 +68,10 @@ void RingBuffer::changeSize(f_cnt_t size)
 
 void RingBuffer::changeSize(float size) { changeSize(msToFrames(size)); }
 
-void RingBuffer::setSamplerateAware(bool b)
-{
-	if (b)
-	{
+void RingBuffer::setSamplerateAware(bool b) {
+	if (b) {
 		connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()), Qt::UniqueConnection);
-	}
-	else
-	{
+	} else {
 		disconnect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()));
 	}
 }
@@ -90,15 +82,12 @@ void RingBuffer::movePosition(f_cnt_t amount) { m_position = (m_position + amoun
 
 void RingBuffer::movePosition(float amount) { movePosition(msToFrames(amount)); }
 
-void RingBuffer::pop(sampleFrame* dst)
-{
+void RingBuffer::pop(sampleFrame* dst) {
 	if (m_position + m_fpp <= m_size) // we won't go over the edge so we can just memcpy here
 	{
 		memcpy(dst, &m_buffer[m_position], m_fpp * sizeof(sampleFrame));
 		memset(&m_buffer[m_position], 0, m_fpp * sizeof(sampleFrame));
-	}
-	else
-	{
+	} else {
 		f_cnt_t first = m_size - m_position;
 		f_cnt_t second = m_fpp - first;
 
@@ -112,17 +101,14 @@ void RingBuffer::pop(sampleFrame* dst)
 	m_position = (m_position + m_fpp) % m_size;
 }
 
-void RingBuffer::read(sampleFrame* dst, f_cnt_t offset)
-{
+void RingBuffer::read(sampleFrame* dst, f_cnt_t offset) {
 	f_cnt_t pos = (m_position + offset) % m_size;
 	if (pos < 0) { pos += m_size; }
 
 	if (pos + m_fpp <= m_size) // we won't go over the edge so we can just memcpy here
 	{
 		memcpy(dst, &m_buffer[pos], m_fpp * sizeof(sampleFrame));
-	}
-	else
-	{
+	} else {
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = m_fpp - first;
 
@@ -134,17 +120,14 @@ void RingBuffer::read(sampleFrame* dst, f_cnt_t offset)
 
 void RingBuffer::read(sampleFrame* dst, float offset) { read(dst, msToFrames(offset)); }
 
-void RingBuffer::read(sampleFrame* dst, f_cnt_t offset, f_cnt_t length)
-{
+void RingBuffer::read(sampleFrame* dst, f_cnt_t offset, f_cnt_t length) {
 	f_cnt_t pos = (m_position + offset) % m_size;
 	if (pos < 0) { pos += m_size; }
 
 	if (pos + length <= m_size) // we won't go over the edge so we can just memcpy here
 	{
 		memcpy(dst, &m_buffer[pos], length * sizeof(sampleFrame));
-	}
-	else
-	{
+	} else {
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = length - first;
 
@@ -156,17 +139,14 @@ void RingBuffer::read(sampleFrame* dst, f_cnt_t offset, f_cnt_t length)
 
 void RingBuffer::read(sampleFrame* dst, float offset, f_cnt_t length) { read(dst, msToFrames(offset), length); }
 
-void RingBuffer::write(sampleFrame* src, f_cnt_t offset, f_cnt_t length)
-{
+void RingBuffer::write(sampleFrame* src, f_cnt_t offset, f_cnt_t length) {
 	const f_cnt_t pos = (m_position + offset) % m_size;
 	if (length == 0) { length = m_fpp; }
 
 	if (pos + length <= m_size) // we won't go over the edge so we can just memcpy here
 	{
 		memcpy(&m_buffer[pos], src, length * sizeof(sampleFrame));
-	}
-	else
-	{
+	} else {
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = length - first;
 
@@ -178,17 +158,14 @@ void RingBuffer::write(sampleFrame* src, f_cnt_t offset, f_cnt_t length)
 
 void RingBuffer::write(sampleFrame* src, float offset, f_cnt_t length) { write(src, msToFrames(offset), length); }
 
-void RingBuffer::writeAdding(sampleFrame* src, f_cnt_t offset, f_cnt_t length)
-{
+void RingBuffer::writeAdding(sampleFrame* src, f_cnt_t offset, f_cnt_t length) {
 	const f_cnt_t pos = (m_position + offset) % m_size;
 	if (length == 0) { length = m_fpp; }
 
 	if (pos + length <= m_size) // we won't go over the edge so we can just memcpy here
 	{
 		MixHelpers::add(&m_buffer[pos], src, length);
-	}
-	else
-	{
+	} else {
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = length - first;
 
@@ -198,13 +175,11 @@ void RingBuffer::writeAdding(sampleFrame* src, f_cnt_t offset, f_cnt_t length)
 	}
 }
 
-void RingBuffer::writeAdding(sampleFrame* src, float offset, f_cnt_t length)
-{
+void RingBuffer::writeAdding(sampleFrame* src, float offset, f_cnt_t length) {
 	writeAdding(src, msToFrames(offset), length);
 }
 
-void RingBuffer::writeAddingMultiplied(sampleFrame* src, f_cnt_t offset, f_cnt_t length, float level)
-{
+void RingBuffer::writeAddingMultiplied(sampleFrame* src, f_cnt_t offset, f_cnt_t length, float level) {
 	const f_cnt_t pos = (m_position + offset) % m_size;
 	// qDebug( "pos %d m_pos %d ofs %d siz %d", pos, m_position, offset, m_size );
 	if (length == 0) { length = m_fpp; }
@@ -212,9 +187,7 @@ void RingBuffer::writeAddingMultiplied(sampleFrame* src, f_cnt_t offset, f_cnt_t
 	if (pos + length <= m_size) // we won't go over the edge so we can just memcpy here
 	{
 		MixHelpers::addMultiplied(&m_buffer[pos], src, level, length);
-	}
-	else
-	{
+	} else {
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = length - first;
 
@@ -224,23 +197,19 @@ void RingBuffer::writeAddingMultiplied(sampleFrame* src, f_cnt_t offset, f_cnt_t
 	}
 }
 
-void RingBuffer::writeAddingMultiplied(sampleFrame* src, float offset, f_cnt_t length, float level)
-{
+void RingBuffer::writeAddingMultiplied(sampleFrame* src, float offset, f_cnt_t length, float level) {
 	f_cnt_t ofs = msToFrames(offset);
 	writeAddingMultiplied(src, ofs, length, level);
 }
 
-void RingBuffer::writeSwappedAddingMultiplied(sampleFrame* src, f_cnt_t offset, f_cnt_t length, float level)
-{
+void RingBuffer::writeSwappedAddingMultiplied(sampleFrame* src, f_cnt_t offset, f_cnt_t length, float level) {
 	const f_cnt_t pos = (m_position + offset) % m_size;
 	if (length == 0) { length = m_fpp; }
 
 	if (pos + length <= m_size) // we won't go over the edge so we can just memcpy here
 	{
 		MixHelpers::addSwappedMultiplied(&m_buffer[pos], src, level, length);
-	}
-	else
-	{
+	} else {
 		f_cnt_t first = m_size - pos;
 		f_cnt_t second = length - first;
 
@@ -250,13 +219,11 @@ void RingBuffer::writeSwappedAddingMultiplied(sampleFrame* src, f_cnt_t offset, 
 	}
 }
 
-void RingBuffer::writeSwappedAddingMultiplied(sampleFrame* src, float offset, f_cnt_t length, float level)
-{
+void RingBuffer::writeSwappedAddingMultiplied(sampleFrame* src, float offset, f_cnt_t length, float level) {
 	writeSwappedAddingMultiplied(src, msToFrames(offset), length, level);
 }
 
-void RingBuffer::updateSamplerate()
-{
+void RingBuffer::updateSamplerate() {
 	float newsize = static_cast<float>((m_size - m_fpp) * Engine::mixer()->processingSampleRate()) / m_samplerate;
 	m_size = static_cast<f_cnt_t>(ceilf(newsize)) + m_fpp;
 	m_samplerate = Engine::mixer()->processingSampleRate();

@@ -33,8 +33,7 @@
 #include "dsp/Sine.h"
 
 /* all-pass as used by the phaser. */
-class PhaserAP
-{
+class PhaserAP {
 public:
 	sample_t a, m;
 
@@ -42,8 +41,7 @@ public:
 
 	void set(double delay) { a = (1 - delay) / (1 + delay); }
 
-	sample_t process(sample_t x)
-	{
+	sample_t process(sample_t x) {
 		register sample_t y = -a * x + m;
 		m = a * y + x;
 
@@ -51,8 +49,7 @@ public:
 	}
 };
 
-class PhaserI : public Plugin
-{
+class PhaserI : public Plugin {
 public:
 	PhaserAP ap[6];
 	DSP::Sine lfo;
@@ -60,8 +57,7 @@ public:
 	sample_t rate;
 	sample_t y0;
 
-	struct
-	{
+	struct {
 		double bottom, range;
 	} delay;
 
@@ -74,8 +70,7 @@ public:
 
 	void init() { blocksize = 32; }
 
-	void activate()
-	{
+	void activate() {
 		y0 = 0.;
 		remain = 0;
 
@@ -92,8 +87,7 @@ public:
 
 /* same as above, but filter sweep is controlled by a Lorenz fractal */
 
-class PhaserII : public Plugin
-{
+class PhaserII : public Plugin {
 public:
 	double fs;
 
@@ -103,8 +97,7 @@ public:
 	sample_t rate;
 	sample_t y0;
 
-	struct
-	{
+	struct {
 		double bottom, range;
 	} delay;
 
@@ -115,14 +108,12 @@ public:
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
+	void init() {
 		blocksize = 32;
 		lorenz.init();
 	}
 
-	void activate()
-	{
+	void activate() {
 		y0 = 0.;
 		remain = 0;
 

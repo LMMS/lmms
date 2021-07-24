@@ -33,8 +33,7 @@
 
 class TabBar;
 
-class ladspaBrowserView : public ToolPluginView
-{
+class ladspaBrowserView : public ToolPluginView {
 	Q_OBJECT
 public:
 	ladspaBrowserView(ToolPlugin* _tool);
@@ -49,8 +48,7 @@ private:
 	QWidget* createTab(QWidget* _parent, const QString& _txt, ladspaPluginType _type);
 };
 
-class ladspaBrowser : public ToolPlugin
-{
+class ladspaBrowser : public ToolPlugin {
 public:
 	ladspaBrowser();
 	virtual ~ladspaBrowser();
@@ -59,8 +57,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual void saveSettings(QDomDocument& doc, QDomElement& element)
-	{
+	virtual void saveSettings(QDomDocument& doc, QDomElement& element) {
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}

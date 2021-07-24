@@ -37,8 +37,7 @@
 
 typedef DSP::SVF<1> SVF;
 
-class Scape : public Plugin
-{
+class Scape : public Plugin {
 public:
 	sample_t time, fb;
 	double period;
@@ -53,8 +52,7 @@ public:
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
+	void init() {
 		delay.init((int)(2.01 * fs)); /* two seconds = 30 bpm + */
 		for (int i = 0; i < 2; ++i)
 			lfo[i].init(), lfo[i].set_rate(.00000001 * fs);

@@ -33,8 +33,7 @@
 #include "ValueBuffer.h"
 #include "lmms_math.h"
 
-class MultitapEchoEffect : public Effect
-{
+class MultitapEchoEffect : public Effect {
 public:
 	MultitapEchoEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~MultitapEchoEffect();
@@ -46,8 +45,7 @@ private:
 	void updateFilters(int begin, int end);
 	void runFilter(sampleFrame* dst, sampleFrame* src, StereoOnePole& filter, const fpp_t frames);
 
-	inline void setFilterFreq(float fc, StereoOnePole& f)
-	{
+	inline void setFilterFreq(float fc, StereoOnePole& f) {
 		const float b1 = expf(-2.0f * F_PI * fc);
 		f.setCoeffs(1.0f - b1, b1);
 	}

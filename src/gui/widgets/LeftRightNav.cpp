@@ -31,8 +31,7 @@ LeftRightNav::LeftRightNav(QWidget* parent)
 	: QWidget(parent)
 	, m_layout(this)
 	, m_leftBtn(this, tr("Previous"))
-	, m_rightBtn(this, tr("Next"))
-{
+	, m_rightBtn(this, tr("Next")) {
 	m_layout.setContentsMargins(0, 0, 0, 0);
 	m_layout.setSpacing(2);
 
@@ -68,8 +67,7 @@ LeftRightNav::LeftRightNav(QWidget* parent)
 PixmapButton* LeftRightNav::getLeftBtn() { return &m_leftBtn; }
 PixmapButton* LeftRightNav::getRightBtn() { return &m_rightBtn; }
 
-void LeftRightNav::setShortcuts(const QKeySequence& leftShortcut, const QKeySequence& rightShortcut)
-{
+void LeftRightNav::setShortcuts(const QKeySequence& leftShortcut, const QKeySequence& rightShortcut) {
 	m_leftBtn.setShortcut(leftShortcut);
 	m_rightBtn.setShortcut(rightShortcut);
 

@@ -70,8 +70,7 @@
 
 constexpr int BUFFERSIZE_RESOLUTION = 32;
 
-inline void labelWidget(QWidget* w, const QString& txt)
-{
+inline void labelWidget(QWidget* w, const QString& txt) {
 	QLabel* title = new QLabel(txt, w);
 	QFont f = title->font();
 	f.setBold(true);
@@ -122,8 +121,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 	,
 #endif
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir()))
-	, m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
-{
+	, m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile())) {
 	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
 	// TODO: Equivalent to the new setWindowFlag(Qt::WindowContextHelpButtonHint, false)
@@ -221,8 +219,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 
 	QDir dir(ConfigManager::inst()->localeDir());
 	QStringList fileNames = dir.entryList(QStringList("*.qm"));
-	for (int i = 0; i < fileNames.size(); ++i)
-	{
+	for (int i = 0; i < fileNames.size(); ++i) {
 		// Get locale extracted by filename.
 		fileNames[i].truncate(fileNames[i].lastIndexOf('.'));
 		m_languages.append(fileNames[i]);
@@ -231,20 +228,17 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 	}
 
 	// If language unset, fallback to system language when available.
-	if (m_lang == "")
-	{
+	if (m_lang == "") {
 		QString tmp = QLocale::system().name().left(2);
-		if (m_languages.contains(tmp)) { m_lang = tmp; }
-		else
-		{
+		if (m_languages.contains(tmp)) {
+			m_lang = tmp;
+		} else {
 			m_lang = "en";
 		}
 	}
 
-	for (int i = 0; i < changeLang->count(); ++i)
-	{
-		if (m_lang == m_languages.at(i))
-		{
+	for (int i = 0; i < changeLang->count(); ++i) {
+		if (m_lang == m_languages.at(i)) {
 			changeLang->setCurrentIndex(i);
 			break;
 		}
@@ -411,12 +405,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 
 	m_audioIfaceSetupWidgets[AudioDummy::name()] = new AudioDummy::setupWidget(as_w);
 
-	for (AswMap::iterator it = m_audioIfaceSetupWidgets.begin(); it != m_audioIfaceSetupWidgets.end(); ++it)
-	{
+	for (AswMap::iterator it = m_audioIfaceSetupWidgets.begin(); it != m_audioIfaceSetupWidgets.end(); ++it) {
 		m_audioIfaceNames[AudioDeviceSetupWidget::tr(it.key().toUtf8())] = it.key();
 	}
-	for (trMap::iterator it = m_audioIfaceNames.begin(); it != m_audioIfaceNames.end(); ++it)
-	{
+	for (trMap::iterator it = m_audioIfaceNames.begin(); it != m_audioIfaceNames.end(); ++it) {
 		QWidget* audioWidget = m_audioIfaceSetupWidgets[it.value()];
 		audioWidget->hide();
 		as_w_layout->addWidget(audioWidget);
@@ -425,8 +417,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 
 	// If no preferred audio device is saved, save the current one.
 	QString audioDevName = ConfigManager::inst()->value("mixer", "audiodev");
-	if (m_audioInterfaces->findText(audioDevName) < 0)
-	{
+	if (m_audioInterfaces->findText(audioDevName) < 0) {
 		audioDevName = Engine::mixer()->audioDevName();
 		ConfigManager::inst()->setValue("mixer", "audiodev", audioDevName);
 	}
@@ -436,8 +427,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 	connect(m_audioInterfaces, SIGNAL(activated(const QString&)), this, SLOT(audioInterfaceChanged(const QString&)));
 
 	// Advanced setting, hidden for now
-	if (false)
-	{
+	if (false) {
 		LedCheckBox* useNaNHandler = new LedCheckBox(tr("Use built-in NaN handler"), audio_w);
 		useNaNHandler->setChecked(m_NaNHandler);
 	}
@@ -528,12 +518,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 
 	m_midiIfaceSetupWidgets[MidiDummy::name()] = MidiSetupWidget::create<MidiDummy>(ms_w);
 
-	for (MswMap::iterator it = m_midiIfaceSetupWidgets.begin(); it != m_midiIfaceSetupWidgets.end(); ++it)
-	{
+	for (MswMap::iterator it = m_midiIfaceSetupWidgets.begin(); it != m_midiIfaceSetupWidgets.end(); ++it) {
 		m_midiIfaceNames[MidiSetupWidget::tr(it.key().toUtf8())] = it.key();
 	}
-	for (trMap::iterator it = m_midiIfaceNames.begin(); it != m_midiIfaceNames.end(); ++it)
-	{
+	for (trMap::iterator it = m_midiIfaceNames.begin(); it != m_midiIfaceNames.end(); ++it) {
 		QWidget* midiWidget = m_midiIfaceSetupWidgets[it.value()];
 		midiWidget->hide();
 		ms_w_layout->addWidget(midiWidget);
@@ -541,8 +529,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 	}
 
 	QString midiDevName = ConfigManager::inst()->value("mixer", "mididev");
-	if (m_midiInterfaces->findText(midiDevName) < 0)
-	{
+	if (m_midiInterfaces->findText(midiDevName) < 0) {
 		midiDevName = Engine::mixer()->midiClientName();
 		ConfigManager::inst()->setValue("mixer", "mididev", midiDevName);
 	}
@@ -558,12 +545,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
 	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
 	m_assignableMidiDevices->addItem("none");
-	if (!Engine::mixer()->midiClient()->isRaw())
-	{
+	if (!Engine::mixer()->midiClient()->isRaw()) {
 		m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
-	}
-	else
-	{
+	} else {
 		m_assignableMidiDevices->addItem("all");
 	}
 	int current = m_assignableMidiDevices->findText(ConfigManager::inst()->value("midi", "midiautoassign"));
@@ -699,8 +683,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open)
 
 SetupDialog::~SetupDialog() { Engine::projectJournal()->setJournalling(true); }
 
-void SetupDialog::accept()
-{
+void SetupDialog::accept() {
 	/* Hide dialog before setting values. This prevents an obscure bug
 	where non-embedded VST windows would steal focus and prevent LMMS
 	from taking mouse input, rendering the application unusable. */
@@ -747,13 +730,11 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setBackgroundPicFile(m_backgroundPicFile);
 
 	// Tell all audio-settings-widgets to save their settings.
-	for (AswMap::iterator it = m_audioIfaceSetupWidgets.begin(); it != m_audioIfaceSetupWidgets.end(); ++it)
-	{
+	for (AswMap::iterator it = m_audioIfaceSetupWidgets.begin(); it != m_audioIfaceSetupWidgets.end(); ++it) {
 		it.value()->saveSettings();
 	}
 	// Tell all MIDI-settings-widgets to save their settings.
-	for (MswMap::iterator it = m_midiIfaceSetupWidgets.begin(); it != m_midiIfaceSetupWidgets.end(); ++it)
-	{
+	for (MswMap::iterator it = m_midiIfaceSetupWidgets.begin(); it != m_midiIfaceSetupWidgets.end(); ++it) {
 		it.value()->saveSettings();
 	}
 	ConfigManager::inst()->saveConfigFile();
@@ -789,8 +770,7 @@ void SetupDialog::toggleSoloLegacyBehavior(bool enabled) { m_soloLegacyBehavior 
 
 // Performance settings slots.
 
-void SetupDialog::setAutoSaveInterval(int value)
-{
+void SetupDialog::setAutoSaveInterval(int value) {
 	m_saveInterval = value;
 	m_saveIntervalSlider->setValue(m_saveInterval);
 	QString minutes = m_saveInterval > 1 ? tr("minutes") : tr("minute");
@@ -799,8 +779,7 @@ void SetupDialog::setAutoSaveInterval(int value)
 	m_saveIntervalLbl->setText(tr("Autosave interval: %1").arg(minutes));
 }
 
-void SetupDialog::toggleAutoSave(bool enabled)
-{
+void SetupDialog::toggleAutoSave(bool enabled) {
 	m_enableAutoSave = enabled;
 	m_saveIntervalSlider->setEnabled(enabled);
 	m_runningAutoSave->setVisible(enabled);
@@ -809,8 +788,7 @@ void SetupDialog::toggleAutoSave(bool enabled)
 
 void SetupDialog::toggleRunningAutoSave(bool enabled) { m_enableRunningAutoSave = enabled; }
 
-void SetupDialog::resetAutoSave()
-{
+void SetupDialog::resetAutoSave() {
 	setAutoSaveInterval(MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES);
 	m_autoSave->setChecked(true);
 	m_runningAutoSave->setChecked(false);
@@ -822,8 +800,7 @@ void SetupDialog::toggleAnimateAFP(bool enabled) { m_animateAFP = enabled; }
 
 void SetupDialog::toggleSyncVSTPlugins(bool enabled) { m_syncVSTPlugins = enabled; }
 
-void SetupDialog::vstEmbedMethodChanged()
-{
+void SetupDialog::vstEmbedMethodChanged() {
 	m_vstEmbedMethod = m_vstEmbedComboBox->currentData().toString();
 	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
 }
@@ -836,25 +813,21 @@ void SetupDialog::toggleDisableAutoQuit(bool enabled) { m_disableAutoQuit = enab
 
 void SetupDialog::toggleHQAudioDev(bool enabled) { m_hqAudioDev = enabled; }
 
-void SetupDialog::audioInterfaceChanged(const QString& iface)
-{
-	for (AswMap::iterator it = m_audioIfaceSetupWidgets.begin(); it != m_audioIfaceSetupWidgets.end(); ++it)
-	{
+void SetupDialog::audioInterfaceChanged(const QString& iface) {
+	for (AswMap::iterator it = m_audioIfaceSetupWidgets.begin(); it != m_audioIfaceSetupWidgets.end(); ++it) {
 		it.value()->hide();
 	}
 
 	m_audioIfaceSetupWidgets[m_audioIfaceNames[iface]]->show();
 }
 
-void SetupDialog::setBufferSize(int value)
-{
+void SetupDialog::setBufferSize(int value) {
 	const int step = DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION;
-	if (value > step && value % step)
-	{
+	if (value > step && value % step) {
 		int mod_value = value % step;
-		if (mod_value < step / 2) { m_bufferSizeSlider->setValue(value - mod_value); }
-		else
-		{
+		if (mod_value < step / 2) {
+			m_bufferSizeSlider->setValue(value - mod_value);
+		} else {
 			m_bufferSizeSlider->setValue(value + step - mod_value);
 		}
 		return;
@@ -872,10 +845,8 @@ void SetupDialog::resetBufferSize() { setBufferSize(DEFAULT_BUFFER_SIZE / BUFFER
 
 // MIDI settings slots.
 
-void SetupDialog::midiInterfaceChanged(const QString& iface)
-{
-	for (MswMap::iterator it = m_midiIfaceSetupWidgets.begin(); it != m_midiIfaceSetupWidgets.end(); ++it)
-	{
+void SetupDialog::midiInterfaceChanged(const QString& iface) {
+	for (MswMap::iterator it = m_midiIfaceSetupWidgets.begin(); it != m_midiIfaceSetupWidgets.end(); ++it) {
 		it.value()->hide();
 	}
 
@@ -884,30 +855,26 @@ void SetupDialog::midiInterfaceChanged(const QString& iface)
 
 // Paths settings slots.
 
-void SetupDialog::openWorkingDir()
-{
+void SetupDialog::openWorkingDir() {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose the LMMS working directory"), m_workingDir);
 	if (!new_dir.isEmpty()) { m_workingDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setWorkingDir(const QString& workingDir) { m_workingDir = workingDir; }
 
-void SetupDialog::openVSTDir()
-{
+void SetupDialog::openVSTDir() {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your VST plugins directory"), m_vstDir);
 	if (!new_dir.isEmpty()) { m_vstDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setVSTDir(const QString& vstDir) { m_vstDir = vstDir; }
 
-void SetupDialog::openLADSPADir()
-{
+void SetupDialog::openLADSPADir() {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your LADSPA plugins directory"), m_ladspaDir);
-	if (!new_dir.isEmpty())
-	{
-		if (m_ladspaDirLineEdit->text() == "") { m_ladspaDirLineEdit->setText(new_dir); }
-		else
-		{
+	if (!new_dir.isEmpty()) {
+		if (m_ladspaDirLineEdit->text() == "") {
+			m_ladspaDirLineEdit->setText(new_dir);
+		} else {
 			m_ladspaDirLineEdit->setText(m_ladspaDirLineEdit->text() + "," + new_dir);
 		}
 	}
@@ -915,16 +882,14 @@ void SetupDialog::openLADSPADir()
 
 void SetupDialog::setLADSPADir(const QString& ladspaDir) { m_ladspaDir = ladspaDir; }
 
-void SetupDialog::openSF2Dir()
-{
+void SetupDialog::openSF2Dir() {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your SF2 directory"), m_sf2Dir);
 	if (!new_dir.isEmpty()) { m_sf2DirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setSF2Dir(const QString& sf2Dir) { m_sf2Dir = sf2Dir; }
 
-void SetupDialog::openSF2File()
-{
+void SetupDialog::openSF2File() {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file
 		= FileDialog::getOpenFileName(this, tr("Choose your default SF2"), m_sf2File, "SoundFont 2 files (*.sf2)");
@@ -933,37 +898,31 @@ void SetupDialog::openSF2File()
 #endif
 }
 
-void SetupDialog::setSF2File(const QString& sf2File)
-{
+void SetupDialog::setSF2File(const QString& sf2File) {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_sf2File = sf2File;
 #endif
 }
 
-void SetupDialog::openGIGDir()
-{
+void SetupDialog::openGIGDir() {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your GIG directory"), m_gigDir);
 	if (!new_dir.isEmpty()) { m_gigDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setGIGDir(const QString& gigDir) { m_gigDir = gigDir; }
 
-void SetupDialog::openThemeDir()
-{
+void SetupDialog::openThemeDir() {
 	QString new_dir = FileDialog::getExistingDirectory(this, tr("Choose your theme directory"), m_themeDir);
 	if (!new_dir.isEmpty()) { m_themeDirLineEdit->setText(new_dir); }
 }
 
 void SetupDialog::setThemeDir(const QString& themeDir) { m_themeDir = themeDir; }
 
-void SetupDialog::openBackgroundPicFile()
-{
+void SetupDialog::openBackgroundPicFile() {
 	QList<QByteArray> fileTypesList = QImageReader::supportedImageFormats();
 	QString fileTypes;
-	for (int i = 0; i < fileTypesList.count(); i++)
-	{
-		if (fileTypesList[i] != fileTypesList[i].toUpper())
-		{
+	for (int i = 0; i < fileTypesList.count(); i++) {
+		if (fileTypesList[i] != fileTypesList[i].toUpper()) {
 			if (!fileTypes.isEmpty()) { fileTypes += " "; }
 			fileTypes += "*." + QString(fileTypesList[i]);
 		}

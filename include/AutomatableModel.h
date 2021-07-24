@@ -55,19 +55,13 @@ public slots: \
 
 class ControllerConnection;
 
-class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
-{
+class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject {
 	Q_OBJECT
 	MM_OPERATORS
 public:
 	typedef QVector<AutomatableModel*> AutoModelVector;
 
-	enum ScaleType
-	{
-		Linear,
-		Logarithmic,
-		Decibel
-	};
+	enum ScaleType { Linear, Logarithmic, Decibel };
 
 	virtual ~AutomatableModel();
 
@@ -84,8 +78,7 @@ public:
 	   @return the casted class if Target is the exact or a base class of
 		 *this, nullptr otherwise
 	*/
-	template <class Target> Target* dynamicCast(bool doThrow = false)
-	{
+	template <class Target> Target* dynamicCast(bool doThrow = false) {
 		DCastVisitor<Target> vis;
 		accept(vis);
 		if (doThrow && !vis.result) { Q_ASSERT(false); }
@@ -93,8 +86,7 @@ public:
 	}
 
 	//! const overload, see overloaded function
-	template <class Target> const Target* dynamicCast(bool doThrow = false) const
-	{
+	template <class Target> const Target* dynamicCast(bool doThrow = false) const {
 		ConstDCastVisitor<Target> vis;
 		accept(vis);
 		if (doThrow && !vis.result) { Q_ASSERT(false); }
@@ -112,18 +104,14 @@ public:
 
 	template <bool> static bool castValue(const float v) { return (qRound(v) != 0); }
 
-	template <class T> inline T value(int frameOffset = 0) const
-	{
-		if (m_controllerConnection)
-		{
-			if (!m_useControllerValue) { return castValue<T>(m_value); }
-			else
-			{
+	template <class T> inline T value(int frameOffset = 0) const {
+		if (m_controllerConnection) {
+			if (!m_useControllerValue) {
+				return castValue<T>(m_value);
+			} else {
 				return castValue<T>(controllerValue(frameOffset));
 			}
-		}
-		else if (hasLinkedModels())
-		{
+		} else if (hasLinkedModels()) {
 			return castValue<T>(controllerValue(frameOffset));
 		}
 
@@ -200,10 +188,8 @@ public:
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
 	// note that this method should only be called once per period since it resets the state of the variable - so if
 	// your model has to be accessed by more than one object, then this function shouldn't be used.
-	bool isValueChanged()
-	{
-		if (m_valueChanged || valueBuffer())
-		{
+	bool isValueChanged() {
+		if (m_valueChanged || valueBuffer()) {
 			m_valueChanged = false;
 			return true;
 		}
@@ -236,15 +222,13 @@ protected:
 
 private:
 	// dynamicCast implementation
-	template <class Target> struct DCastVisitor : public ModelVisitor
-	{
+	template <class Target> struct DCastVisitor : public ModelVisitor {
 		Target* result = nullptr;
 		void visit(Target& tar) { result = &tar; }
 	};
 
 	// dynamicCast implementation
-	template <class Target> struct ConstDCastVisitor : public ConstModelVisitor
-	{
+	template <class Target> struct ConstDCastVisitor : public ConstModelVisitor {
 		const Target* result = nullptr;
 		void visit(const Target& tar) { result = &tar; }
 	};
@@ -306,8 +290,7 @@ signals:
 	void destroyed(jo_id_t id);
 };
 
-template <typename T> class LMMS_EXPORT TypedAutomatableModel : public AutomatableModel
-{
+template <typename T> class LMMS_EXPORT TypedAutomatableModel : public AutomatableModel {
 public:
 	using AutomatableModel::AutomatableModel;
 	T value(int frameOffset = 0) const { return AutomatableModel::value<T>(frameOffset); }
@@ -321,44 +304,35 @@ public:
 
 // some typed AutomatableModel-definitions
 
-class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float>
-{
+class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float> {
 	Q_OBJECT
 	MODEL_IS_VISITABLE
 public:
 	FloatModel(float val = 0, float min = 0, float max = 0, float step = 0, Model* parent = NULL,
 		const QString& displayName = QString(), bool defaultConstructed = false)
-		: TypedAutomatableModel(val, min, max, step, parent, displayName, defaultConstructed)
-	{
-	}
+		: TypedAutomatableModel(val, min, max, step, parent, displayName, defaultConstructed) {}
 	float getRoundedValue() const;
 	int getDigitCount() const;
 	QString displayValue(const float val) const override;
 };
 
-class LMMS_EXPORT IntModel : public TypedAutomatableModel<int>
-{
+class LMMS_EXPORT IntModel : public TypedAutomatableModel<int> {
 	Q_OBJECT
 	MODEL_IS_VISITABLE
 public:
 	IntModel(int val = 0, int min = 0, int max = 0, Model* parent = NULL, const QString& displayName = QString(),
 		bool defaultConstructed = false)
-		: TypedAutomatableModel(val, min, max, 1, parent, displayName, defaultConstructed)
-	{
-	}
+		: TypedAutomatableModel(val, min, max, 1, parent, displayName, defaultConstructed) {}
 	QString displayValue(const float val) const override;
 };
 
-class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
-{
+class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool> {
 	Q_OBJECT
 	MODEL_IS_VISITABLE
 public:
 	BoolModel(const bool val = false, Model* parent = NULL, const QString& displayName = QString(),
 		bool defaultConstructed = false)
-		: TypedAutomatableModel(val, false, true, 1, parent, displayName, defaultConstructed)
-	{
-	}
+		: TypedAutomatableModel(val, false, true, 1, parent, displayName, defaultConstructed) {}
 	QString displayValue(const float val) const override;
 };
 

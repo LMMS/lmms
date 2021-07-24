@@ -30,20 +30,17 @@
 
 #include "Sine.h"
 
-namespace DSP
-{
+namespace DSP {
 
 /* sample sinc() with step size omega into s[], centered around s + n / 2 */
 
-inline void sinc(double omega, sample_t* s, int n)
-{
+inline void sinc(double omega, sample_t* s, int n) {
 	/* initial phase */
 	double phi = (n / 2) * -omega;
 
 	Sine sine(omega, phi);
 
-	for (int i = 0; i < n; ++i, phi += omega)
-	{
+	for (int i = 0; i < n; ++i, phi += omega) {
 		double sin_phi = sine.get();
 
 		if (fabs(phi) < 0.000000001) s[i] = 1.;

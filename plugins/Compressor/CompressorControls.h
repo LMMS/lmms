@@ -31,8 +31,7 @@
 
 class CompressorEffect;
 
-class CompressorControls : public EffectControls
-{
+class CompressorControls : public EffectControls {
 	Q_OBJECT
 public:
 	CompressorControls(CompressorEffect* effect);

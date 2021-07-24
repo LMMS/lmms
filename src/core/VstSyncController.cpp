@@ -44,47 +44,37 @@
 VstSyncController::VstSyncController()
 	: m_syncData(NULL)
 	, m_shmID(-1)
-	, m_shm("/usr/bin/lmms")
-{
-	if (ConfigManager::inst()->value("ui", "syncvstplugins").toInt())
-	{
+	, m_shm("/usr/bin/lmms") {
+	if (ConfigManager::inst()->value("ui", "syncvstplugins").toInt()) {
 		connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(updateSampleRate()));
 
 #ifdef USE_QT_SHMEM
-		if (m_shm.create(sizeof(VstSyncData))) { m_syncData = (VstSyncData*)m_shm.data(); }
-		else
-		{
+		if (m_shm.create(sizeof(VstSyncData))) {
+			m_syncData = (VstSyncData*)m_shm.data();
+		} else {
 			qWarning() << QString("Failed to allocate shared memory for VST sync: %1").arg(m_shm.errorString());
 		}
 #else
 		key_t key; // make the key:
-		if ((key = ftok(VST_SNC_SHM_KEY_FILE, 'R')) == -1) { qWarning("VstSyncController: ftok() failed"); }
-		else
-		{ // connect to shared memory segment
-			if ((m_shmID = shmget(key, sizeof(VstSyncData), 0644 | IPC_CREAT)) == -1)
-			{
+		if ((key = ftok(VST_SNC_SHM_KEY_FILE, 'R')) == -1) {
+			qWarning("VstSyncController: ftok() failed");
+		} else { // connect to shared memory segment
+			if ((m_shmID = shmget(key, sizeof(VstSyncData), 0644 | IPC_CREAT)) == -1) {
 				qWarning("VstSyncController: shmget() failed");
-			}
-			else
-			{ // attach segment
+			} else { // attach segment
 				m_syncData = (VstSyncData*)shmat(m_shmID, 0, 0);
 				if (m_syncData == (VstSyncData*)(-1)) { qWarning("VstSyncController: shmat() failed"); }
 			}
 		}
 #endif
-	}
-	else
-	{
+	} else {
 		qWarning("VST sync support disabled in your configuration");
 	}
 
-	if (m_syncData == NULL)
-	{
+	if (m_syncData == NULL) {
 		m_syncData = new VstSyncData;
 		m_syncData->hasSHM = false;
-	}
-	else
-	{
+	} else {
 		m_syncData->hasSHM = true;
 	}
 
@@ -96,29 +86,26 @@ VstSyncController::VstSyncController()
 	updateSampleRate();
 }
 
-VstSyncController::~VstSyncController()
-{
-	if (m_syncData->hasSHM == false) { delete m_syncData; }
-	else
-	{
+VstSyncController::~VstSyncController() {
+	if (m_syncData->hasSHM == false) {
+		delete m_syncData;
+	} else {
 #ifdef USE_QT_SHMEM
-		if (m_shm.data())
-		{
+		if (m_shm.data()) {
 			// detach shared memory, delete it:
 			m_shm.detach();
 		}
 #else
-		if (shmdt(m_syncData) != -1) { shmctl(m_shmID, IPC_RMID, NULL); }
-		else
-		{
+		if (shmdt(m_syncData) != -1) {
+			shmctl(m_shmID, IPC_RMID, NULL);
+		} else {
 			qWarning("VstSyncController: shmdt() failed");
 		}
 #endif
 	}
 }
 
-void VstSyncController::setAbsolutePosition(double ticks)
-{
+void VstSyncController::setAbsolutePosition(double ticks) {
 #ifdef VST_SNC_LATENCY
 	m_syncData->ppqPos = ((ticks + 0) / 48.0) - m_syncData->m_latency;
 #else
@@ -126,8 +113,7 @@ void VstSyncController::setAbsolutePosition(double ticks)
 #endif
 }
 
-void VstSyncController::setTempo(int newTempo)
-{
+void VstSyncController::setTempo(int newTempo) {
 	m_syncData->m_bpm = newTempo;
 
 #ifdef VST_SNC_LATENCY
@@ -135,15 +121,13 @@ void VstSyncController::setTempo(int newTempo)
 #endif
 }
 
-void VstSyncController::startCycle(int startTick, int endTick)
-{
+void VstSyncController::startCycle(int startTick, int endTick) {
 	m_syncData->isCycle = true;
 	m_syncData->cycleStart = startTick / (float)48;
 	m_syncData->cycleEnd = endTick / (float)48;
 }
 
-void VstSyncController::update()
-{
+void VstSyncController::update() {
 	m_syncData->m_bufferSize = Engine::mixer()->framesPerPeriod();
 
 #ifdef VST_SNC_LATENCY
@@ -151,8 +135,7 @@ void VstSyncController::update()
 #endif
 }
 
-void VstSyncController::updateSampleRate()
-{
+void VstSyncController::updateSampleRate() {
 	m_syncData->m_sampleRate = Engine::mixer()->processingSampleRate();
 
 #ifdef VST_SNC_LATENCY

@@ -21,15 +21,13 @@
 /* public stuff */
 extern int abort_flag;
 
-void Midifile_reader::midifile()
-{
+void Midifile_reader::midifile() {
 	int ntrks;
 	midifile_error = 0;
 
 	ntrks = readheader();
 	if (midifile_error) return;
-	if (ntrks <= 0)
-	{
+	if (ntrks <= 0) {
 		mferror("No tracks!");
 		/* no need to return since midifile_error is set */
 	}
@@ -49,11 +47,9 @@ int Midifile_reader::readmt(const char* s, int skip)
 	const char* errmsg = "expecting ";
 
 retry:
-	while (nread < 4)
-	{
+	while (nread < 4) {
 		c = Mf_getc();
-		if (c == EOF)
-		{
+		if (c == EOF) {
 			errmsg = "EOF while expecting ";
 			goto err;
 		}
@@ -61,8 +57,7 @@ retry:
 	}
 	/* See if we found the 4 characters we're looking for */
 	if (s[0] == b[0] && s[1] == b[1] && s[2] == b[2] && s[3] == b[3]) return (0);
-	if (skip)
-	{
+	if (skip) {
 		/* If we are supposed to skip initial garbage, */
 		/* try again with the next character. */
 		b[0] = b[1];
@@ -85,8 +80,7 @@ int Midifile_reader::egetc()
 {
 	int c = Mf_getc();
 
-	if (c == EOF)
-	{
+	if (c == EOF) {
 		mferror("premature EOF");
 		return EOF;
 	}
@@ -145,8 +139,7 @@ void Midifile_reader::readtrack()
 
 	Mf_starttrack();
 
-	while (Mf_toberead > 0)
-	{
+	while (Mf_toberead > 0) {
 
 		Mf_currtime += readvarinum(); /* delta time */
 		if (midifile_error) return;
@@ -154,34 +147,27 @@ void Midifile_reader::readtrack()
 		c = egetc();
 		if (midifile_error) return;
 
-		if (sysexcontinue && c != 0xf7)
-		{
+		if (sysexcontinue && c != 0xf7) {
 			mferror("didn't find expected continuation of a sysex");
 			return;
 		}
-		if ((c & 0x80) == 0)
-		{ /* running status? */
-			if (status == 0)
-			{
+		if ((c & 0x80) == 0) { /* running status? */
+			if (status == 0) {
 				mferror("unexpected running status");
 				return;
 			}
 			running = 1;
-		}
-		else
-		{
+		} else {
 			status = c;
 			running = 0;
 		}
 
 		needed = chantype[(status >> 4) & 0xf];
 
-		if (needed)
-		{ /* ie. is it a channel message? */
+		if (needed) { /* ie. is it a channel message? */
 
 			if (running) c1 = c;
-			else
-			{
+			else {
 				c1 = egetc();
 				if (midifile_error) return;
 			}
@@ -191,8 +177,7 @@ void Midifile_reader::readtrack()
 			;
 		}
 
-		switch (c)
-		{
+		switch (c) {
 
 		case 0xff: /* meta event */
 
@@ -204,8 +189,7 @@ void Midifile_reader::readtrack()
 			lookfor = Mf_toberead - lng;
 			msginit();
 
-			while (Mf_toberead > lookfor)
-			{
+			while (Mf_toberead > lookfor) {
 				unsigned char c = egetc();
 				if (midifile_error) return;
 				msgadd(c);
@@ -222,8 +206,7 @@ void Midifile_reader::readtrack()
 			msginit();
 			msgadd(0xf0);
 
-			while (Mf_toberead > lookfor)
-			{
+			while (Mf_toberead > lookfor) {
 				c = egetc();
 				if (midifile_error) return;
 				msgadd(c);
@@ -242,15 +225,14 @@ void Midifile_reader::readtrack()
 
 			if (!sysexcontinue) msginit();
 
-			while (Mf_toberead > lookfor)
-			{
+			while (Mf_toberead > lookfor) {
 				c = egetc();
 				if (midifile_error) return;
 				msgadd(c);
 			}
-			if (!sysexcontinue) { Mf_arbitrary(msgleng(), msg()); }
-			else if (c == 0xf7)
-			{
+			if (!sysexcontinue) {
+				Mf_arbitrary(msgleng(), msg());
+			} else if (c == 0xf7) {
 				sysex();
 				sysexcontinue = 0;
 			}
@@ -262,8 +244,7 @@ void Midifile_reader::readtrack()
 	return;
 }
 
-void Midifile_reader::badbyte(int c)
-{
+void Midifile_reader::badbyte(int c) {
 	char buff[32];
 	//#pragma warning(disable: 4996) // safe in this case
 	(void)sprintf(buff, "unexpected byte: 0x%02x", c);
@@ -271,14 +252,12 @@ void Midifile_reader::badbyte(int c)
 	mferror(buff);
 }
 
-void Midifile_reader::metaevent(int type)
-{
+void Midifile_reader::metaevent(int type) {
 	int leng = msgleng();
 	// made this unsigned to avoid sign extend
 	unsigned char* m = msg();
 
-	switch (type)
-	{
+	switch (type) {
 	case 0x00: Mf_seqnum(to16bit(m[0], m[1])); break;
 	case 0x01: /* Text event */
 	case 0x02: /* Copyright notice */
@@ -312,12 +291,10 @@ void Midifile_reader::metaevent(int type)
 
 void Midifile_reader::sysex() { Mf_sysex(msgleng(), msg()); }
 
-void Midifile_reader::chanmessage(int status, int c1, int c2)
-{
+void Midifile_reader::chanmessage(int status, int c1, int c2) {
 	int chan = status & 0xf;
 
-	switch (status & 0xf0)
-	{
+	switch (status & 0xf0) {
 	case NOTEOFF: Mf_off(chan, c1, c2); break;
 	case NOTEON: Mf_on(chan, c1, c2); break;
 	case PRESSURE: Mf_pressure(chan, c1, c2); break;
@@ -331,8 +308,7 @@ void Midifile_reader::chanmessage(int status, int c1, int c2)
 /* readvarinum - read a varying-length number, and return the */
 /* number of characters it took. */
 
-long Midifile_reader::readvarinum()
-{
+long Midifile_reader::readvarinum() {
 	long value;
 	int c;
 
@@ -340,11 +316,9 @@ long Midifile_reader::readvarinum()
 	if (midifile_error) return 0;
 
 	value = (long)c;
-	if (c & 0x80)
-	{
+	if (c & 0x80) {
 		value &= 0x7f;
-		do
-		{
+		do {
 			c = egetc();
 			if (midifile_error) return 0;
 			value = (value << 7) + (c & 0x7f);
@@ -353,8 +327,7 @@ long Midifile_reader::readvarinum()
 	return (value);
 }
 
-long Midifile_reader::to32bit(int c1, int c2, int c3, int c4)
-{
+long Midifile_reader::to32bit(int c1, int c2, int c3, int c4) {
 	long value = 0L;
 
 	value = (c1 & 0xff);
@@ -366,8 +339,7 @@ long Midifile_reader::to32bit(int c1, int c2, int c3, int c4)
 
 int Midifile_reader::to16bit(int c1, int c2) { return ((c1 & 0xff) << 8) + (c2 & 0xff); }
 
-long Midifile_reader::read32bit()
-{
+long Midifile_reader::read32bit() {
 	int c1, c2, c3, c4;
 
 	c1 = egetc();
@@ -381,8 +353,7 @@ long Midifile_reader::read32bit()
 	return to32bit(c1, c2, c3, c4);
 }
 
-int Midifile_reader::read16bit()
-{
+int Midifile_reader::read16bit() {
 	int c1, c2;
 	c1 = egetc();
 	if (midifile_error) return 0;
@@ -391,8 +362,7 @@ int Midifile_reader::read16bit()
 	return to16bit(c1, c2);
 }
 
-void Midifile_reader::mferror(char* s)
-{
+void Midifile_reader::mferror(char* s) {
 	Mf_error(s);
 	midifile_error = 1;
 }
@@ -405,8 +375,7 @@ void Midifile_reader::mferror(const char* s) { mferror(const_cast<char*>(s)); }
 
 #define MSGINCREMENT 128
 
-Midifile_reader::Midifile_reader()
-{
+Midifile_reader::Midifile_reader() {
 	Mf_nomerge = 0;
 	Mf_currtime = 0L;
 	Mf_skipinit = 0;
@@ -417,8 +386,7 @@ Midifile_reader::Midifile_reader()
 	Msgindex = 0; /* index of next available location in Msg */
 }
 
-void Midifile_reader::finalize()
-{
+void Midifile_reader::finalize() {
 	if (Msgbuff) Mf_free(Msgbuff, Msgsize);
 	Msgbuff = NULL;
 }
@@ -429,15 +397,13 @@ unsigned char* Midifile_reader::msg() { return (Msgbuff); }
 
 int Midifile_reader::msgleng() { return (Msgindex); }
 
-void Midifile_reader::msgadd(int c)
-{
+void Midifile_reader::msgadd(int c) {
 	/* If necessary, allocate larger message buffer. */
 	if (Msgindex >= Msgsize) msgenlarge();
 	Msgbuff[Msgindex++] = c;
 }
 
-void Midifile_reader::msgenlarge()
-{
+void Midifile_reader::msgenlarge() {
 	unsigned char* newmess;
 	unsigned char* oldmess = Msgbuff;
 	int oldleng = Msgsize;
@@ -446,8 +412,7 @@ void Midifile_reader::msgenlarge()
 	newmess = (unsigned char*)Mf_malloc((sizeof(unsigned char) * Msgsize));
 
 	/* copy old message into larger new one */
-	if (oldmess != 0)
-	{
+	if (oldmess != 0) {
 		memcpy(newmess, oldmess, oldleng);
 		Mf_free(oldmess, oldleng);
 	}

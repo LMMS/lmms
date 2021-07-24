@@ -37,14 +37,12 @@
 #include "dsp/Roessler.h"
 #include "dsp/Sine.h"
 
-class ChorusStub : public Plugin
-{
+class ChorusStub : public Plugin {
 public:
 	sample_t time, width, rate;
 };
 
-class ChorusI : public ChorusStub
-{
+class ChorusI : public ChorusStub {
 public:
 	DSP::Sine lfo;
 	DSP::Delay delay;
@@ -55,14 +53,12 @@ public:
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
+	void init() {
 		rate = .15;
 		delay.init((int)(.040 * fs));
 	}
 
-	void activate()
-	{
+	void activate() {
 		time = 0;
 		width = 0;
 
@@ -79,16 +75,14 @@ public:
 	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class StereoChorusI : public ChorusStub
-{
+class StereoChorusI : public ChorusStub {
 public:
 	sample_t rate;
 	sample_t phase;
 
 	DSP::Delay delay;
 
-	struct
-	{
+	struct {
 		DSP::Sine lfo;
 		DSP::DelayTapA tap;
 	} left, right;
@@ -98,16 +92,14 @@ public:
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
+	void init() {
 		rate = .15;
 		phase = .5; /* pi */
 
 		delay.init((int)(.040 * fs));
 	}
 
-	void activate()
-	{
+	void activate() {
 		time = 0;
 		width = 0;
 
@@ -131,41 +123,33 @@ public:
 
 /* fractally modulated Chorus units */
 
-class FracTap
-{
+class FracTap {
 public:
 	DSP::Lorenz f1;
 	DSP::Roessler f2;
 	DSP::OnePoleLP lp;
 
-	void init(double fs)
-	{
+	void init(double fs) {
 		lp.set_f(30. / fs);
 		f1.init(.001, frandom());
 		f2.init(.001, frandom());
 	}
 
-	void set_rate(sample_t r)
-	{
+	void set_rate(sample_t r) {
 		f1.set_rate(r * FRACTAL_RATE);
 		f2.set_rate(3.3 * r * FRACTAL_RATE);
 	}
 
 	/* t = time, w = width, should inline nicely */
-	sample_t get(DSP::Delay& d, double t, double w)
-	{
+	sample_t get(DSP::Delay& d, double t, double w) {
 		double m = lp.process(f1.get() + .3 * f2.get());
 		return d.get_cubic(t + w * m);
 	}
 };
 
-class ChorusII : public ChorusStub
-{
+class ChorusII : public ChorusStub {
 public:
-	enum
-	{
-		Taps = 1
-	};
+	enum { Taps = 1 };
 
 	FracTap taps[Taps];
 	DSP::BiQuad filter;
@@ -173,11 +157,9 @@ public:
 
 	template <sample_func_t> void one_cycle(int frames);
 
-	void set_rate(sample_t r)
-	{
+	void set_rate(sample_t r) {
 		rate = r;
-		for (int i = 0; i < Taps; ++i)
-		{
+		for (int i = 0; i < Taps; ++i) {
 			taps[i].set_rate(rate * (i * FRACTAL_RATE) / Taps);
 			// fprintf (stderr, "[%d] %.3f\n", i, (rate * (i * FRACTAL_RATE) / Taps));
 		}
@@ -186,16 +168,14 @@ public:
 public:
 	static PortInfo port_info[];
 
-	void init()
-	{
+	void init() {
 		delay.init((int)(.040 * fs));
 		for (int i = 0; i < Taps; ++i)
 			taps[i].init(fs);
 		DSP::RBJ::HiShelve(1000. / fs, 1., 6, filter.a, filter.b);
 	}
 
-	void activate()
-	{
+	void activate() {
 		time = 0;
 		width = 0;
 
@@ -210,16 +190,14 @@ public:
 	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class StereoChorusII : public ChorusStub
-{
+class StereoChorusII : public ChorusStub {
 public:
 	sample_t rate;
 	sample_t phase;
 
 	DSP::Delay delay;
 
-	struct
-	{
+	struct {
 		DSP::Roessler fractal;
 		DSP::OnePoleLP lfo_lp;
 		DSP::DelayTapA tap;
@@ -227,8 +205,7 @@ public:
 
 	template <sample_func_t> void one_cycle(int frames);
 
-	void set_rate(sample_t r)
-	{
+	void set_rate(sample_t r) {
 		rate = r;
 		left.fractal.set_rate(rate * FRACTAL_RATE);
 		right.fractal.set_rate(rate * FRACTAL_RATE);
@@ -240,8 +217,7 @@ public:
 	static PortInfo port_info[];
 	sample_t adding_gain;
 
-	void init()
-	{
+	void init() {
 		phase = .5; /* pi */
 
 		delay.init((int)(.040 * fs));
@@ -250,8 +226,7 @@ public:
 		right.fractal.init(.001, frandom());
 	}
 
-	void activate()
-	{
+	void activate() {
 		time = 0;
 		width = 0;
 

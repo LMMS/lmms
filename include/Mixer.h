@@ -59,42 +59,26 @@ const Octaves BaseOctave = DefaultOctave;
 
 class MixerWorkerThread;
 
-class LMMS_EXPORT Mixer : public QObject
-{
+class LMMS_EXPORT Mixer : public QObject {
 	Q_OBJECT
 public:
-	struct qualitySettings
-	{
-		enum Mode
-		{
-			Mode_Draft,
-			Mode_HighQuality,
-			Mode_FinalMix
-		};
+	struct qualitySettings {
+		enum Mode { Mode_Draft, Mode_HighQuality, Mode_FinalMix };
 
-		enum Interpolation
-		{
+		enum Interpolation {
 			Interpolation_Linear,
 			Interpolation_SincFastest,
 			Interpolation_SincMedium,
 			Interpolation_SincBest
 		};
 
-		enum Oversampling
-		{
-			Oversampling_None,
-			Oversampling_2x,
-			Oversampling_4x,
-			Oversampling_8x
-		};
+		enum Oversampling { Oversampling_None, Oversampling_2x, Oversampling_4x, Oversampling_8x };
 
 		Interpolation interpolation;
 		Oversampling oversampling;
 
-		qualitySettings(Mode m)
-		{
-			switch (m)
-			{
+		qualitySettings(Mode m) {
+			switch (m) {
 			case Mode_Draft:
 				interpolation = Interpolation_Linear;
 				oversampling = Oversampling_None;
@@ -112,14 +96,10 @@ public:
 
 		qualitySettings(Interpolation i, Oversampling o)
 			: interpolation(i)
-			, oversampling(o)
-		{
-		}
+			, oversampling(o) {}
 
-		int sampleRateMultiplier() const
-		{
-			switch (oversampling)
-			{
+		int sampleRateMultiplier() const {
+			switch (oversampling) {
 			case Oversampling_None: return 1;
 			case Oversampling_2x: return 2;
 			case Oversampling_4x: return 4;
@@ -128,10 +108,8 @@ public:
 			return 1;
 		}
 
-		int libsrcInterpolation() const
-		{
-			switch (interpolation)
-			{
+		int libsrcInterpolation() const {
+			switch (interpolation) {
 			case Interpolation_Linear: return SRC_ZERO_ORDER_HOLD;
 			case Interpolation_SincFastest: return SRC_SINC_FASTEST;
 			case Interpolation_SincMedium: return SRC_SINC_MEDIUM_QUALITY;
@@ -160,8 +138,7 @@ public:
 	inline AudioDevice* audioDev() { return m_audioDev; }
 
 	// audio-port-stuff
-	inline void addAudioPort(AudioPort* port)
-	{
+	inline void addAudioPort(AudioPort* port) {
 		requestChangeInModel();
 		m_audioPorts.push_back(port);
 		doneChangeInModel();
@@ -201,23 +178,19 @@ public:
 
 	inline void setMasterGain(const float mo) { m_masterGain = mo; }
 
-	static inline sample_t clip(const sample_t s)
-	{
-		if (s > 1.0f) { return 1.0f; }
-		else if (s < -1.0f)
-		{
+	static inline sample_t clip(const sample_t s) {
+		if (s > 1.0f) {
+			return 1.0f;
+		} else if (s < -1.0f) {
 			return -1.0f;
 		}
 		return s;
 	}
 
-	struct StereoSample
-	{
+	struct StereoSample {
 		StereoSample(sample_t _left, sample_t _right)
 			: left(_left)
-			, right(_right)
-		{
-		}
+			, right(_right) {}
 		sample_t left;
 		sample_t right;
 	};
@@ -255,8 +228,7 @@ signals:
 private:
 	typedef FifoBuffer<surroundSampleFrame*> Fifo;
 
-	class fifoWriter : public QThread
-	{
+	class fifoWriter : public QThread {
 	public:
 		fifoWriter(Mixer* mixer, Fifo* fifo);
 

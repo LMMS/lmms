@@ -29,15 +29,12 @@
 
 class TrackView;
 
-class FxLineLcdSpinBox : public LcdSpinBox
-{
+class FxLineLcdSpinBox : public LcdSpinBox {
 	Q_OBJECT
 public:
 	FxLineLcdSpinBox(int numDigits, QWidget* parent, const QString& name, TrackView* tv = NULL)
 		: LcdSpinBox(numDigits, parent, name)
-		, m_tv(tv)
-	{
-	}
+		, m_tv(tv) {}
 	virtual ~FxLineLcdSpinBox() {}
 
 	void setTrackView(TrackView* tv);

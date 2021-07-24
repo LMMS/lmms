@@ -33,8 +33,7 @@
 #include "RenderManager.h"
 #include "ui_export_project.h"
 
-class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
-{
+class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog {
 	Q_OBJECT
 public:
 	ExportProjectDialog(const QString& _file_name, QWidget* _parent, bool multi_export);

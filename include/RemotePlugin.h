@@ -103,17 +103,14 @@ typedef int32_t key_t;
 const int SHM_FIFO_SIZE = 512 * 1024;
 
 // implements a FIFO inside a shared memory segment
-class shmFifo
-{
+class shmFifo {
 	// need this union to handle different sizes of sem_t on 32 bit
 	// and 64 bit platforms
-	union sem32_t
-	{
+	union sem32_t {
 		int semKey;
 		char fill[32];
 	};
-	struct shmData
-	{
+	struct shmData {
 		sem32_t dataSem;		   // semaphore for locking this
 								   // FIFO management data
 		sem32_t messageSem;		   // semaphore for incoming messages
@@ -139,11 +136,9 @@ public:
 		m_data(NULL)
 		, m_dataSem(QString())
 		, m_messageSem(QString())
-		, m_lockDepth(0)
-	{
+		, m_lockDepth(0) {
 #ifdef USE_QT_SHMEM
-		do
-		{
+		do {
 			m_shmObj.setKey(QString("%1").arg(++m_shmKey));
 			m_shmObj.create(sizeof(shmData));
 		} while (m_shmObj.error() != QSharedMemory::NoError);
@@ -179,8 +174,7 @@ public:
 		m_data(NULL)
 		, m_dataSem(QString())
 		, m_messageSem(QString())
-		, m_lockDepth(0)
-	{
+		, m_lockDepth(0) {
 #ifdef USE_QT_SHMEM
 		if (m_shmObj.attach()) { m_data = (shmData*)m_shmObj.data(); }
 #else
@@ -191,11 +185,9 @@ public:
 		m_messageSem.setKey(QString::number(m_data->messageSem.semKey));
 	}
 
-	~shmFifo()
-	{
+	~shmFifo() {
 		// master?
-		if (m_master)
-		{
+		if (m_master) {
 #ifndef USE_QT_SHMEM
 			shmctl(m_shmID, IPC_RMID, NULL);
 #endif
@@ -213,28 +205,24 @@ public:
 	inline bool isMaster() const { return m_master; }
 
 	// recursive lock
-	inline void lock()
-	{
+	inline void lock() {
 		if (!isInvalid() && m_lockDepth.fetch_add(1) == 0) { m_dataSem.acquire(); }
 	}
 
 	// recursive unlock
-	inline void unlock()
-	{
+	inline void unlock() {
 		if (m_lockDepth.fetch_sub(1) <= 1) { m_dataSem.release(); }
 	}
 
 	// wait until message-semaphore is available
-	inline void waitForMessage()
-	{
+	inline void waitForMessage() {
 		if (!isInvalid()) { m_messageSem.acquire(); }
 	}
 
 	// increase message-semaphore
 	inline void messageSent() { m_messageSem.release(); }
 
-	inline int32_t readInt()
-	{
+	inline int32_t readInt() {
 		int32_t i;
 		read(&i, sizeof(i));
 		return i;
@@ -242,11 +230,9 @@ public:
 
 	inline void writeInt(const int32_t& _i) { write(&_i, sizeof(_i)); }
 
-	inline std::string readString()
-	{
+	inline std::string readString() {
 		const int len = readInt();
-		if (len)
-		{
+		if (len) {
 			char* sc = new char[len + 1];
 			read(sc, len);
 			sc[len] = 0;
@@ -257,15 +243,13 @@ public:
 		return std::string();
 	}
 
-	inline void writeString(const std::string& _s)
-	{
+	inline void writeString(const std::string& _s) {
 		const int len = _s.size();
 		writeInt(len);
 		write(_s.c_str(), len);
 	}
 
-	inline bool messagesLeft()
-	{
+	inline bool messagesLeft() {
 		if (isInvalid()) { return false; }
 		lock();
 		const bool empty = (m_data->startPtr == m_data->endPtr);
@@ -276,26 +260,22 @@ public:
 	inline int shmKey() const { return m_shmKey; }
 
 private:
-	static inline void fastMemCpy(void* _dest, const void* _src, const int _len)
-	{
+	static inline void fastMemCpy(void* _dest, const void* _src, const int _len) {
 		// calling memcpy() for just an integer is obsolete overhead
-		if (_len == 4) { *((int32_t*)_dest) = *((int32_t*)_src); }
-		else
-		{
+		if (_len == 4) {
+			*((int32_t*)_dest) = *((int32_t*)_src);
+		} else {
 			memcpy(_dest, _src, _len);
 		}
 	}
 
-	void read(void* _buf, int _len)
-	{
-		if (isInvalid())
-		{
+	void read(void* _buf, int _len) {
+		if (isInvalid()) {
 			memset(_buf, 0, _len);
 			return;
 		}
 		lock();
-		while (isInvalid() == false && _len > m_data->endPtr - m_data->startPtr)
-		{
+		while (isInvalid() == false && _len > m_data->endPtr - m_data->startPtr) {
 			unlock();
 #ifndef LMMS_BUILD_WIN32
 			usleep(5);
@@ -305,23 +285,19 @@ private:
 		fastMemCpy(_buf, m_data->data + m_data->startPtr, _len);
 		m_data->startPtr += _len;
 		// nothing left?
-		if (m_data->startPtr == m_data->endPtr)
-		{
+		if (m_data->startPtr == m_data->endPtr) {
 			// then reset to 0
 			m_data->startPtr = m_data->endPtr = 0;
 		}
 		unlock();
 	}
 
-	void write(const void* _buf, int _len)
-	{
+	void write(const void* _buf, int _len) {
 		if (isInvalid() || _len > SHM_FIFO_SIZE) { return; }
 		lock();
-		while (_len > SHM_FIFO_SIZE - m_data->endPtr)
-		{
+		while (_len > SHM_FIFO_SIZE - m_data->endPtr) {
 			// if no space is left, try to move data to front
-			if (m_data->startPtr > 0)
-			{
+			if (m_data->startPtr > 0) {
 				memmove(m_data->data, m_data->data + m_data->startPtr, m_data->endPtr - m_data->startPtr);
 				m_data->endPtr = m_data->endPtr - m_data->startPtr;
 				m_data->startPtr = 0;
@@ -352,8 +328,7 @@ private:
 };
 #endif
 
-enum RemoteMessageIDs
-{
+enum RemoteMessageIDs {
 	IdUndefined,
 	IdHostInfoGotten,
 	IdInitDone,
@@ -382,45 +357,34 @@ enum RemoteMessageIDs
 	IdUserBase = 64
 };
 
-class LMMS_EXPORT RemotePluginBase
-{
+class LMMS_EXPORT RemotePluginBase {
 public:
-	struct message
-	{
+	struct message {
 		message()
 			: id(IdUndefined)
-			, data()
-		{
-		}
+			, data() {}
 
 		message(const message& _m)
 			: id(_m.id)
-			, data(_m.data)
-		{
-		}
+			, data(_m.data) {}
 
 		message(int _id)
 			: id(_id)
-			, data()
-		{
-		}
+			, data() {}
 
-		inline message& addString(const std::string& _s)
-		{
+		inline message& addString(const std::string& _s) {
 			data.push_back(_s);
 			return *this;
 		}
 
-		message& addInt(int _i)
-		{
+		message& addInt(int _i) {
 			char buf[32];
 			sprintf(buf, "%d", _i);
 			data.push_back(std::string(buf));
 			return *this;
 		}
 
-		message& addFloat(float _f)
-		{
+		message& addFloat(float _f) {
 			char buf[32];
 			sprintf(buf, "%f", _f);
 			data.push_back(std::string(buf));
@@ -455,8 +419,7 @@ public:
 	virtual ~RemotePluginBase();
 
 #ifdef SYNC_WITH_SHM_FIFO
-	void reset(shmFifo* in, shmFifo* out)
-	{
+	void reset(shmFifo* in, shmFifo* out) {
 		delete m_in;
 		delete m_out;
 		m_in = in;
@@ -467,8 +430,7 @@ public:
 	int sendMessage(const message& _m);
 	message receiveMessage();
 
-	inline bool isInvalid() const
-	{
+	inline bool isInvalid() const {
 #ifdef SYNC_WITH_SHM_FIFO
 		return m_in->isInvalid() || m_out->isInvalid();
 #else
@@ -478,16 +440,14 @@ public:
 
 	message waitForMessage(const message& _m, bool _busy_waiting = false);
 
-	inline message fetchAndProcessNextMessage()
-	{
+	inline message fetchAndProcessNextMessage() {
 		message m = receiveMessage();
 		processMessage(m);
 		return m;
 	}
 
 #ifndef SYNC_WITH_SHM_FIFO
-	inline int32_t readInt()
-	{
+	inline int32_t readInt() {
 		int32_t i;
 		read(&i, sizeof(i));
 		return i;
@@ -495,11 +455,9 @@ public:
 
 	inline void writeInt(const int32_t& _i) { write(&_i, sizeof(_i)); }
 
-	inline std::string readString()
-	{
+	inline std::string readString() {
 		const int len = readInt();
-		if (len)
-		{
+		if (len) {
 			char* sc = new char[len + 1];
 			read(sc, len);
 			sc[len] = 0;
@@ -510,8 +468,7 @@ public:
 		return std::string();
 	}
 
-	inline void writeString(const std::string& _s)
-	{
+	inline void writeString(const std::string& _s) {
 		const int len = _s.size();
 		writeInt(len);
 		write(_s.c_str(), len);
@@ -519,8 +476,7 @@ public:
 #endif
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-	inline bool messagesLeft()
-	{
+	inline bool messagesLeft() {
 #ifdef SYNC_WITH_SHM_FIFO
 		return m_in->messagesLeft();
 #else
@@ -533,10 +489,8 @@ public:
 #endif
 	}
 
-	inline void fetchAndProcessAllMessages()
-	{
-		while (messagesLeft())
-		{
+	inline void fetchAndProcessAllMessages() {
+		while (messagesLeft()) {
 			fetchAndProcessNextMessage();
 		}
 	}
@@ -553,8 +507,7 @@ protected:
 	inline const shmFifo* out() const { return m_out; }
 #endif
 
-	inline void invalidate()
-	{
+	inline void invalidate() {
 #ifdef SYNC_WITH_SHM_FIFO
 		m_in->invalidate();
 		m_out->invalidate();
@@ -570,8 +523,7 @@ protected:
 
 private:
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-	static int& waitDepthCounter()
-	{
+	static int& waitDepthCounter() {
 		static int waitDepth = 0;
 		return waitDepth;
 	}
@@ -581,20 +533,16 @@ private:
 	shmFifo* m_in;
 	shmFifo* m_out;
 #else
-	void read(void* _buf, int _len)
-	{
-		if (isInvalid())
-		{
+	void read(void* _buf, int _len) {
+		if (isInvalid()) {
 			memset(_buf, 0, _len);
 			return;
 		}
 		char* buf = (char*)_buf;
 		int remaining = _len;
-		while (remaining)
-		{
+		while (remaining) {
 			ssize_t nread = ::read(m_socket, buf, remaining);
-			switch (nread)
-			{
+			switch (nread) {
 			case -1: fprintf(stderr, "Error while reading.\n");
 			case 0:
 				invalidate();
@@ -606,16 +554,13 @@ private:
 		}
 	}
 
-	void write(const void* _buf, int _len)
-	{
+	void write(const void* _buf, int _len) {
 		if (isInvalid()) { return; }
 		const char* buf = (const char*)_buf;
 		int remaining = _len;
-		while (remaining)
-		{
+		while (remaining) {
 			ssize_t nwritten = ::write(m_socket, buf, remaining);
-			switch (nwritten)
-			{
+			switch (nwritten) {
 			case -1: fprintf(stderr, "Error while writing.\n");
 			case 0: invalidate(); return;
 			}
@@ -635,15 +580,13 @@ private:
 
 class RemotePlugin;
 
-class ProcessWatcher : public QThread
-{
+class ProcessWatcher : public QThread {
 	Q_OBJECT
 public:
 	ProcessWatcher(RemotePlugin*);
 	virtual ~ProcessWatcher() = default;
 
-	void stop()
-	{
+	void stop() {
 		m_quit = true;
 		quit();
 	}
@@ -657,15 +600,13 @@ private:
 	volatile bool m_quit;
 };
 
-class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
-{
+class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase {
 	Q_OBJECT
 public:
 	RemotePlugin();
 	virtual ~RemotePlugin();
 
-	inline bool isRunning()
-	{
+	inline bool isRunning() {
 #ifdef DEBUG_REMOTE_PLUGIN
 		return true;
 #else
@@ -677,8 +618,7 @@ public:
 
 	inline void waitForHostInfoGotten() { m_failed = waitForMessage(IdHostInfoGotten).id != IdHostInfoGotten; }
 
-	inline void waitForInitDone(bool _busyWaiting = true)
-	{
+	inline void waitForInitDone(bool _busyWaiting = true) {
 		m_failed = waitForMessage(IdInitDone, _busyWaiting).id != IdInitDone;
 	}
 
@@ -688,23 +628,20 @@ public:
 
 	void processMidiEvent(const MidiEvent&, const f_cnt_t _offset);
 
-	void updateSampleRate(sample_rate_t _sr)
-	{
+	void updateSampleRate(sample_rate_t _sr) {
 		lock();
 		sendMessage(message(IdSampleRateInformation).addInt(_sr));
 		waitForMessage(IdInformationUpdated, true);
 		unlock();
 	}
 
-	virtual void toggleUI()
-	{
+	virtual void toggleUI() {
 		lock();
 		sendMessage(IdToggleUI);
 		unlock();
 	}
 
-	int isUIVisible()
-	{
+	int isUIVisible() {
 		lock();
 		sendMessage(IdIsUIVisible);
 		unlock();
@@ -765,8 +702,7 @@ private slots:
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
 
-class RemotePluginClient : public RemotePluginBase
-{
+class RemotePluginClient : public RemotePluginBase {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
 	RemotePluginClient(key_t _shm_in, key_t _shm_out);
@@ -793,20 +729,17 @@ public:
 
 	inline fpp_t bufferSize() const { return m_bufferSize; }
 
-	void setInputCount(int _i)
-	{
+	void setInputCount(int _i) {
 		m_inputCount = _i;
 		sendMessage(message(IdChangeInputCount).addInt(_i));
 	}
 
-	void setOutputCount(int _i)
-	{
+	void setOutputCount(int _i) {
 		m_outputCount = _i;
 		sendMessage(message(IdChangeOutputCount).addInt(_i));
 	}
 
-	void setInputOutputCount(int i, int o)
-	{
+	void setInputOutputCount(int i, int o) {
 		m_inputCount = i;
 		m_outputCount = o;
 		sendMessage(message(IdChangeInputOutputCount).addInt(i).addInt(o));
@@ -865,8 +798,7 @@ RemotePluginBase::RemotePluginBase()
 #endif
 }
 
-RemotePluginBase::~RemotePluginBase()
-{
+RemotePluginBase::~RemotePluginBase() {
 #ifdef SYNC_WITH_SHM_FIFO
 	delete m_in;
 	delete m_out;
@@ -876,15 +808,13 @@ RemotePluginBase::~RemotePluginBase()
 #endif
 }
 
-int RemotePluginBase::sendMessage(const message& _m)
-{
+int RemotePluginBase::sendMessage(const message& _m) {
 #ifdef SYNC_WITH_SHM_FIFO
 	m_out->lock();
 	m_out->writeInt(_m.id);
 	m_out->writeInt(_m.data.size());
 	int j = 8;
-	for (unsigned int i = 0; i < _m.data.size(); ++i)
-	{
+	for (unsigned int i = 0; i < _m.data.size(); ++i) {
 		m_out->writeString(_m.data[i]);
 		j += 4 + _m.data[i].size();
 	}
@@ -895,8 +825,7 @@ int RemotePluginBase::sendMessage(const message& _m)
 	writeInt(_m.id);
 	writeInt(_m.data.size());
 	int j = 8;
-	for (unsigned int i = 0; i < _m.data.size(); ++i)
-	{
+	for (unsigned int i = 0; i < _m.data.size(); ++i) {
 		writeString(_m.data[i]);
 		j += 4 + _m.data[i].size();
 	}
@@ -906,16 +835,14 @@ int RemotePluginBase::sendMessage(const message& _m)
 	return j;
 }
 
-RemotePluginBase::message RemotePluginBase::receiveMessage()
-{
+RemotePluginBase::message RemotePluginBase::receiveMessage() {
 #ifdef SYNC_WITH_SHM_FIFO
 	m_in->waitForMessage();
 	m_in->lock();
 	message m;
 	m.id = m_in->readInt();
 	const int s = m_in->readInt();
-	for (int i = 0; i < s; ++i)
-	{
+	for (int i = 0; i < s; ++i) {
 		m.data.push_back(m_in->readString());
 	}
 	m_in->unlock();
@@ -924,8 +851,7 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 	message m;
 	m.id = readInt();
 	const int s = readInt();
-	for (int i = 0; i < s; ++i)
-	{
+	for (int i = 0; i < s; ++i) {
 		m.data.push_back(readString());
 	}
 	pthread_mutex_unlock(&m_receiveMutex);
@@ -933,26 +859,21 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 	return m;
 }
 
-RemotePluginBase::message RemotePluginBase::waitForMessage(const message& _wm, bool _busy_waiting)
-{
+RemotePluginBase::message RemotePluginBase::waitForMessage(const message& _wm, bool _busy_waiting) {
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-	if (_busy_waiting)
-	{
+	if (_busy_waiting) {
 		// No point processing events outside of the main thread
 		_busy_waiting = QThread::currentThread() == QCoreApplication::instance()->thread();
 	}
 
-	struct WaitDepthCounter
-	{
+	struct WaitDepthCounter {
 		WaitDepthCounter(int& depth, bool busy)
 			: m_depth(depth)
-			, m_busy(busy)
-		{
+			, m_busy(busy) {
 			if (m_busy) { ++m_depth; }
 		}
 
-		~WaitDepthCounter()
-		{
+		~WaitDepthCounter() {
 			if (m_busy) { --m_depth; }
 		}
 
@@ -962,20 +883,18 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(const message& _wm, b
 
 	WaitDepthCounter wdc(waitDepthCounter(), _busy_waiting);
 #endif
-	while (!isInvalid())
-	{
+	while (!isInvalid()) {
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-		if (_busy_waiting && !messagesLeft())
-		{
+		if (_busy_waiting && !messagesLeft()) {
 			QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 50);
 			continue;
 		}
 #endif
 		message m = receiveMessage();
 		processMessage(m);
-		if (m.id == _wm.id) { return m; }
-		else if (m.id == IdUndefined)
-		{
+		if (m.id == _wm.id) {
+			return m;
+		} else if (m.id == IdUndefined) {
 			return m;
 		}
 	}
@@ -1006,15 +925,13 @@ RemotePluginClient::RemotePluginClient(const char* socketPath)
 	, m_inputCount(0)
 	, m_outputCount(0)
 	, m_sampleRate(44100)
-	, m_bufferSize(0)
-{
+	, m_bufferSize(0) {
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
 	sa.sun_family = AF_LOCAL;
 
 	size_t length = strlen(socketPath);
-	if (length >= sizeof sa.sun_path)
-	{
+	if (length >= sizeof sa.sun_path) {
 		length = sizeof sa.sun_path - 1;
 		fprintf(stderr, "Socket path too long.\n");
 	}
@@ -1023,15 +940,13 @@ RemotePluginClient::RemotePluginClient(const char* socketPath)
 
 	m_socket = socket(PF_LOCAL, SOCK_STREAM, 0);
 	if (m_socket == -1) { fprintf(stderr, "Could not connect to local server.\n"); }
-	if (::connect(m_socket, (struct sockaddr*)&sa, sizeof sa) == -1)
-	{
+	if (::connect(m_socket, (struct sockaddr*)&sa, sizeof sa) == -1) {
 		fprintf(stderr, "Could not connect to local server.\n");
 	}
 #endif
 
 #ifdef USE_QT_SHMEM
-	if (m_shmQtID.attach(QSharedMemory::ReadOnly))
-	{
+	if (m_shmQtID.attach(QSharedMemory::ReadOnly)) {
 		m_vstSyncData = (VstSyncData*)m_shmQtID.data();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
@@ -1042,16 +957,16 @@ RemotePluginClient::RemotePluginClient(const char* socketPath)
 	key_t key;
 	int m_shmID;
 
-	if ((key = ftok(VST_SNC_SHM_KEY_FILE, 'R')) == -1) { perror("RemotePluginClient::ftok"); }
-	else
-	{ // connect to shared memory segment
-		if ((m_shmID = shmget(key, 0, 0)) == -1) { perror("RemotePluginClient::shmget"); }
-		else
-		{ // attach segment
+	if ((key = ftok(VST_SNC_SHM_KEY_FILE, 'R')) == -1) {
+		perror("RemotePluginClient::ftok");
+	} else { // connect to shared memory segment
+		if ((m_shmID = shmget(key, 0, 0)) == -1) {
+			perror("RemotePluginClient::shmget");
+		} else { // attach segment
 			m_vstSyncData = (VstSyncData*)shmat(m_shmID, 0, 0);
-			if (m_vstSyncData == (VstSyncData*)(-1)) { perror("RemotePluginClient::shmat"); }
-			else
-			{
+			if (m_vstSyncData == (VstSyncData*)(-1)) {
+				perror("RemotePluginClient::shmat");
+			} else {
 				m_bufferSize = m_vstSyncData->m_bufferSize;
 				m_sampleRate = m_vstSyncData->m_sampleRate;
 				sendMessage(IdHostInfoGotten);
@@ -1067,15 +982,13 @@ RemotePluginClient::RemotePluginClient(const char* socketPath)
 	// if attaching shared memory fails
 	sendMessage(IdSampleRateInformation);
 	sendMessage(IdBufferSizeInformation);
-	if (waitForMessage(IdBufferSizeInformation).id != IdBufferSizeInformation)
-	{
+	if (waitForMessage(IdBufferSizeInformation).id != IdBufferSizeInformation) {
 		fprintf(stderr, "Could not get buffer size information\n");
 	}
 	sendMessage(IdHostInfoGotten);
 }
 
-RemotePluginClient::~RemotePluginClient()
-{
+RemotePluginClient::~RemotePluginClient() {
 #ifdef USE_QT_SHMEM
 	m_shmQtID.detach();
 #endif
@@ -1094,12 +1007,10 @@ RemotePluginClient::~RemotePluginClient()
 VstSyncData* RemotePluginClient::getQtVSTshm() { return m_vstSyncData; }
 #endif
 
-bool RemotePluginClient::processMessage(const message& _m)
-{
+bool RemotePluginClient::processMessage(const message& _m) {
 	message reply_message(_m.id);
 	bool reply = false;
-	switch (_m.id)
-	{
+	switch (_m.id) {
 	case IdUndefined: return false;
 
 	case IdSampleRateInformation:
@@ -1146,20 +1057,18 @@ bool RemotePluginClient::processMessage(const message& _m)
 	return true;
 }
 
-void RemotePluginClient::setShmKey(key_t _key, int _size)
-{
+void RemotePluginClient::setShmKey(key_t _key, int _size) {
 #ifdef USE_QT_SHMEM
 	m_shmObj.setKey(QString::number(_key));
-	if (m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError) { m_shm = (float*)m_shmObj.data(); }
-	else
-	{
+	if (m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError) {
+		m_shm = (float*)m_shmObj.data();
+	} else {
 		char buf[64];
 		sprintf(buf, "failed getting shared memory: %d\n", m_shmObj.error());
 		debugMessage(buf);
 	}
 #else
-	if (m_shm != NULL)
-	{
+	if (m_shm != NULL) {
 		shmdt(m_shm);
 		m_shm = NULL;
 	}
@@ -1168,22 +1077,18 @@ void RemotePluginClient::setShmKey(key_t _key, int _size)
 	if (_key == 0) { return; }
 
 	int shm_id = shmget(_key, _size, 0);
-	if (shm_id == -1) { debugMessage("failed getting shared memory\n"); }
-	else
-	{
+	if (shm_id == -1) {
+		debugMessage("failed getting shared memory\n");
+	} else {
 		m_shm = (float*)shmat(shm_id, 0, 0);
 	}
 #endif
 }
 
-void RemotePluginClient::doProcessing()
-{
-	if (m_shm != NULL)
-	{
+void RemotePluginClient::doProcessing() {
+	if (m_shm != NULL) {
 		process((sampleFrame*)(m_inputCount > 0 ? m_shm : NULL), (sampleFrame*)(m_shm + (m_inputCount * m_bufferSize)));
-	}
-	else
-	{
+	} else {
 		debugMessage("doProcessing(): have no shared memory!\n");
 	}
 }

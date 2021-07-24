@@ -27,12 +27,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-extern "C"
-{
-	Plugin::Descriptor PLUGIN_EXPORT vectorscope_plugin_descriptor
-		= {STRINGIFY(PLUGIN_NAME), "Vectorscope", QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."),
-			"Martin Pavelek <he29/dot/HS/at/gmail/dot/com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"),
-			NULL, NULL};
+extern "C" {
+Plugin::Descriptor PLUGIN_EXPORT vectorscope_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Vectorscope",
+	QT_TRANSLATE_NOOP("PluginBrowser", "A stereo field visualizer."), "Martin Pavelek <he29/dot/HS/at/gmail/dot/com>",
+	0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 Vectorscope::Vectorscope(Model* parent, const Plugin::Descriptor::SubPluginFeatures::Key* key)
@@ -41,18 +39,14 @@ Vectorscope::Vectorscope(Model* parent, const Plugin::Descriptor::SubPluginFeatu
 	,
 	// Buffer is sized to cover 4* the current maximum LMMS audio buffer size,
 	// so that it has some reserve space in case GUI thresd is busy.
-	m_inputBuffer(4 * m_maxBufferSize)
-{
-}
+	m_inputBuffer(4 * m_maxBufferSize) {}
 
 // Take audio data and store them for processing and display in the GUI thread.
-bool Vectorscope::processAudioBuffer(sampleFrame* buffer, const fpp_t frame_count)
-{
+bool Vectorscope::processAudioBuffer(sampleFrame* buffer, const fpp_t frame_count) {
 	if (!isEnabled() || !isRunning()) { return false; }
 
 	// Skip processing if the controls dialog isn't visible, it would only waste CPU cycles.
-	if (m_controls.isViewVisible())
-	{
+	if (m_controls.isViewVisible()) {
 		// To avoid processing spikes on audio thread, data are stored in
 		// a lockless ringbuffer and processed in a separate thread.
 		m_inputBuffer.write(buffer, frame_count);
@@ -60,11 +54,9 @@ bool Vectorscope::processAudioBuffer(sampleFrame* buffer, const fpp_t frame_coun
 	return isRunning();
 }
 
-extern "C"
-{
-	// needed for getting plugin out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
-	{
-		return new Vectorscope(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
-	}
+extern "C" {
+// needed for getting plugin out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data) {
+	return new Vectorscope(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+}
 }

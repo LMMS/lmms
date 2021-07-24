@@ -54,14 +54,7 @@ const float F_E_R = (float)LD_E_R;
 const int LOWEST_LOG_FREQ = 10;
 
 // Full range is defined by LOWEST_LOG_FREQ and current sample rate.
-enum FREQUENCY_RANGES
-{
-	FRANGE_FULL = 0,
-	FRANGE_AUDIBLE,
-	FRANGE_BASS,
-	FRANGE_MIDS,
-	FRANGE_HIGH
-};
+enum FREQUENCY_RANGES { FRANGE_FULL = 0, FRANGE_AUDIBLE, FRANGE_BASS, FRANGE_MIDS, FRANGE_HIGH };
 
 const int FRANGE_AUDIBLE_START = 20;
 const int FRANGE_AUDIBLE_END = 20000;
@@ -75,13 +68,7 @@ const int FRANGE_HIGH_END = 20000;
 // Amplitude ranges (in dBFS).
 // Reference: full scale sine wave (-1.0 to 1.0) is 0 dB.
 // Doubling or halving the amplitude produces 3 dB difference.
-enum AMPLITUDE_RANGES
-{
-	ARANGE_EXTENDED = 0,
-	ARANGE_AUDIBLE,
-	ARANGE_LOUD,
-	ARANGE_SILENT
-};
+enum AMPLITUDE_RANGES { ARANGE_EXTENDED = 0, ARANGE_AUDIBLE, ARANGE_LOUD, ARANGE_SILENT };
 
 const int ARANGE_EXTENDED_START = -80;
 const int ARANGE_EXTENDED_END = 20;

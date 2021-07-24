@@ -42,8 +42,7 @@
 #include "embed.h"
 
 ProjectNotes::ProjectNotes()
-	: QMainWindow(gui->mainWindow()->workspace())
-{
+	: QMainWindow(gui->mainWindow()->workspace()) {
 	m_edit = new QTextEdit(this);
 	m_edit->setAutoFillBackground(true);
 	QPalette pal;
@@ -74,8 +73,7 @@ ProjectNotes::ProjectNotes()
 
 ProjectNotes::~ProjectNotes() {}
 
-void ProjectNotes::clear()
-{
+void ProjectNotes::clear() {
 	m_edit->setHtml(tr("Enter project notes here"));
 	m_edit->selectAll();
 	m_edit->setTextColor(QColor(224, 224, 224));
@@ -86,8 +84,7 @@ void ProjectNotes::clear()
 
 void ProjectNotes::setText(const QString& _text) { m_edit->setHtml(_text); }
 
-void ProjectNotes::setupActions()
-{
+void ProjectNotes::setupActions() {
 	QToolBar* tb = addToolBar(tr("Edit Actions"));
 	QAction* a;
 
@@ -129,8 +126,7 @@ void ProjectNotes::setupActions()
 	m_comboSize->setEditable(true);
 	QList<int> sizes = db.standardSizes();
 	QList<int>::Iterator it = sizes.begin();
-	for (; it != sizes.end(); ++it)
-	{
+	for (; it != sizes.end(); ++it) {
 		m_comboSize->addItem(QString::number(*it));
 	}
 	connect(m_comboSize, SIGNAL(activated(const QString&)), this, SLOT(textSize(const QString&)));
@@ -195,40 +191,34 @@ void ProjectNotes::setupActions()
 	tb->addAction(m_actionTextColor);
 }
 
-void ProjectNotes::textBold()
-{
+void ProjectNotes::textBold() {
 	m_edit->setFontWeight(m_actionTextBold->isChecked() ? QFont::Bold : QFont::Normal);
 	Engine::getSong()->setModified();
 }
 
-void ProjectNotes::textUnderline()
-{
+void ProjectNotes::textUnderline() {
 	m_edit->setFontUnderline(m_actionTextUnderline->isChecked());
 	Engine::getSong()->setModified();
 }
 
-void ProjectNotes::textItalic()
-{
+void ProjectNotes::textItalic() {
 	m_edit->setFontItalic(m_actionTextItalic->isChecked());
 	Engine::getSong()->setModified();
 }
 
-void ProjectNotes::textFamily(const QString& _f)
-{
+void ProjectNotes::textFamily(const QString& _f) {
 	m_edit->setFontFamily(_f);
 	m_edit->viewport()->setFocus();
 	Engine::getSong()->setModified();
 }
 
-void ProjectNotes::textSize(const QString& _p)
-{
+void ProjectNotes::textSize(const QString& _p) {
 	m_edit->setFontPointSize(_p.toInt());
 	m_edit->viewport()->setFocus();
 	Engine::getSong()->setModified();
 }
 
-void ProjectNotes::textColor()
-{
+void ProjectNotes::textColor() {
 	QColor col = QColorDialog::getColor(m_edit->textColor(), this);
 	if (!col.isValid()) { return; }
 	m_edit->setTextColor(col);
@@ -237,25 +227,19 @@ void ProjectNotes::textColor()
 	m_actionTextColor->setIcon(pix);
 }
 
-void ProjectNotes::textAlign(QAction* _a)
-{
-	if (_a == m_actionAlignLeft) { m_edit->setAlignment(Qt::AlignLeft); }
-	else if (_a == m_actionAlignCenter)
-	{
+void ProjectNotes::textAlign(QAction* _a) {
+	if (_a == m_actionAlignLeft) {
+		m_edit->setAlignment(Qt::AlignLeft);
+	} else if (_a == m_actionAlignCenter) {
 		m_edit->setAlignment(Qt::AlignHCenter);
-	}
-	else if (_a == m_actionAlignRight)
-	{
+	} else if (_a == m_actionAlignRight) {
 		m_edit->setAlignment(Qt::AlignRight);
-	}
-	else if (_a == m_actionAlignJustify)
-	{
+	} else if (_a == m_actionAlignJustify) {
 		m_edit->setAlignment(Qt::AlignJustify);
 	}
 }
 
-void ProjectNotes::formatChanged(const QTextCharFormat& _f)
-{
+void ProjectNotes::formatChanged(const QTextCharFormat& _f) {
 	QFont font = _f.font();
 	m_comboFont->lineEdit()->setText(font.family());
 	m_comboSize->lineEdit()->setText(QString::number(font.pointSize()));
@@ -270,43 +254,35 @@ void ProjectNotes::formatChanged(const QTextCharFormat& _f)
 	Engine::getSong()->setModified();
 }
 
-void ProjectNotes::alignmentChanged(int _a)
-{
-	if (_a & Qt::AlignLeft) { m_actionAlignLeft->setChecked(true); }
-	else if ((_a & Qt::AlignHCenter))
-	{
+void ProjectNotes::alignmentChanged(int _a) {
+	if (_a & Qt::AlignLeft) {
+		m_actionAlignLeft->setChecked(true);
+	} else if ((_a & Qt::AlignHCenter)) {
 		m_actionAlignCenter->setChecked(true);
-	}
-	else if ((_a & Qt::AlignRight))
-	{
+	} else if ((_a & Qt::AlignRight)) {
 		m_actionAlignRight->setChecked(true);
-	}
-	else if ((_a & Qt::AlignJustify))
-	{
+	} else if ((_a & Qt::AlignJustify)) {
 		m_actionAlignJustify->setChecked(true);
 	}
 	Engine::getSong()->setModified();
 }
 
-void ProjectNotes::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void ProjectNotes::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	MainWindow::saveWidgetState(this, _this);
 
 	QDomCDATASection ds = _doc.createCDATASection(m_edit->toHtml());
 	_this.appendChild(ds);
 }
 
-void ProjectNotes::loadSettings(const QDomElement& _this)
-{
+void ProjectNotes::loadSettings(const QDomElement& _this) {
 	MainWindow::restoreWidgetState(this, _this);
 	m_edit->setHtml(_this.text());
 }
 
-void ProjectNotes::closeEvent(QCloseEvent* _ce)
-{
-	if (parentWidget()) { parentWidget()->hide(); }
-	else
-	{
+void ProjectNotes::closeEvent(QCloseEvent* _ce) {
+	if (parentWidget()) {
+		parentWidget()->hide();
+	} else {
 		hide();
 	}
 	_ce->ignore();

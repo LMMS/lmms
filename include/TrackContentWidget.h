@@ -36,8 +36,7 @@ class Track;
 class TrackContentObjectView;
 class TrackView;
 
-class TrackContentWidget : public QWidget, public JournallingObject
-{
+class TrackContentWidget : public QWidget, public JournallingObject {
 	Q_OBJECT
 
 	// qproperties for track background gradients
@@ -55,8 +54,7 @@ public:
 
 	void addTCOView(TrackContentObjectView* tcov);
 	void removeTCOView(TrackContentObjectView* tcov);
-	void removeTCOView(int tcoNum)
-	{
+	void removeTCOView(int tcoNum) {
 		if (tcoNum >= 0 && tcoNum < m_tcoViews.size()) { removeTCOView(m_tcoViews[tcoNum]); }
 	}
 
@@ -84,10 +82,7 @@ public slots:
 	void changePosition(const TimePos& newPos = TimePos(-1));
 
 protected:
-	enum ContextMenuAction
-	{
-		Paste
-	};
+	enum ContextMenuAction { Paste };
 
 	void contextMenuEvent(QContextMenuEvent* cme) override;
 	void contextMenuAction(QContextMenuEvent* cme, ContextMenuAction action);
@@ -100,8 +95,7 @@ protected:
 
 	QString nodeName() const override { return "trackcontentwidget"; }
 
-	void saveSettings(QDomDocument& doc, QDomElement& element) override
-	{
+	void saveSettings(QDomDocument& doc, QDomElement& element) override {
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}

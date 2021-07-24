@@ -31,8 +31,7 @@
 
 class LadspaControl;
 
-typedef enum BufferRates
-{
+typedef enum BufferRates {
 	CHANNEL_IN,
 	CHANNEL_OUT,
 	AUDIO_RATE_INPUT,
@@ -41,20 +40,11 @@ typedef enum BufferRates
 	CONTROL_RATE_OUTPUT
 } buffer_rate_t;
 
-typedef enum BufferData
-{
-	TOGGLED,
-	ENUM,
-	INTEGER,
-	FLOATING,
-	TIME,
-	NONE
-} buffer_data_t;
+typedef enum BufferData { TOGGLED, ENUM, INTEGER, FLOATING, TIME, NONE } buffer_data_t;
 
 //! This struct is used to hold port descriptions internally
 //! which where received from the ladspa plugin
-typedef struct PortDescription
-{
+typedef struct PortDescription {
 	QString name;
 	ch_cnt_t proc;
 	uint16_t port_id;
@@ -74,8 +64,7 @@ typedef struct PortDescription
 } port_desc_t;
 
 inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
-	const Plugin::Descriptor* _desc, const QString& _name, const ladspa_key_t& _key)
-{
+	const Plugin::Descriptor* _desc, const QString& _name, const ladspa_key_t& _key) {
 	Plugin::Descriptor::SubPluginFeatures::Key::AttributeMap m;
 	QString file = _key.first;
 	m["file"] = file.remove(QRegExp("\\.so$")).remove(QRegExp("\\.dll$"));

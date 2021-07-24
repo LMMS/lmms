@@ -37,21 +37,18 @@
 
 class QLineEdit;
 
-class MidiApple : public QObject, public MidiClient
-{
+class MidiApple : public QObject, public MidiClient {
 	Q_OBJECT
 public:
 	MidiApple();
 	virtual ~MidiApple();
 
-	inline static QString probeDevice()
-	{
+	inline static QString probeDevice() {
 		return QString(); // no midi device name
 	}
 
 	inline static QString name() { return QT_TRANSLATE_NOOP("MidiSetupWidget", "Apple MIDI"); }
-	inline static QString configSection()
-	{
+	inline static QString configSection() {
 		return QString(); // no configuration settings
 	}
 
@@ -73,13 +70,11 @@ public:
 
 	virtual void subscribeWritablePort(MidiPort* _port, const QString& _dest, bool _subscribe = true);
 
-	virtual void connectRPChanged(QObject* _receiver, const char* _member)
-	{
+	virtual void connectRPChanged(QObject* _receiver, const char* _member) {
 		connect(this, SIGNAL(readablePortsChanged()), _receiver, _member);
 	}
 
-	virtual void connectWPChanged(QObject* _receiver, const char* _member)
-	{
+	virtual void connectWPChanged(QObject* _receiver, const char* _member) {
 		connect(this, SIGNAL(writablePortsChanged()), _receiver, _member);
 	}
 

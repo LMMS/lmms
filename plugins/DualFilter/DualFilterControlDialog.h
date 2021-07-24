@@ -30,8 +30,7 @@
 
 class DualFilterControls;
 
-class DualFilterControlDialog : public EffectControlDialog
-{
+class DualFilterControlDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	DualFilterControlDialog(DualFilterControls* controls);

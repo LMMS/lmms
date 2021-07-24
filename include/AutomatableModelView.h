@@ -32,8 +32,7 @@
 class QMenu;
 class QMouseEvent;
 
-class LMMS_EXPORT AutomatableModelView : public ModelView
-{
+class LMMS_EXPORT AutomatableModelView : public ModelView {
 public:
 	AutomatableModelView(Model* model, QWidget* _this);
 	virtual ~AutomatableModelView() = default;
@@ -65,8 +64,7 @@ protected:
 	float m_conversionFactor; // Factor to be applied when the m_model->value is displayed
 };
 
-class AutomatableModelViewSlots : public QObject
-{
+class AutomatableModelViewSlots : public QObject {
 	Q_OBJECT
 public:
 	AutomatableModelViewSlots(AutomatableModelView* amv, QObject* parent);
@@ -88,13 +86,10 @@ protected:
 	AutomatableModelView* m_amv;
 };
 
-template <typename ModelType> class LMMS_EXPORT TypedModelView : public AutomatableModelView
-{
+template <typename ModelType> class LMMS_EXPORT TypedModelView : public AutomatableModelView {
 public:
 	TypedModelView(Model* model, QWidget* _this)
-		: AutomatableModelView(model, _this)
-	{
-	}
+		: AutomatableModelView(model, _this) {}
 
 	ModelType* model() { return castModel<ModelType>(); }
 	const ModelType* model() const { return castModel<ModelType>(); }

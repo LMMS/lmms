@@ -33,16 +33,14 @@
 #include "AudioFileDevice.h"
 #include "lame/lame.h"
 
-class AudioFileMP3 : public AudioFileDevice
-{
+class AudioFileMP3 : public AudioFileDevice {
 public:
 	AudioFileMP3(OutputSettings const& outputSettings, const ch_cnt_t _channels, bool& successful, const QString& _file,
 		Mixer* mixer);
 	virtual ~AudioFileMP3();
 
 	static AudioFileDevice* getInst(const QString& outputFilename, OutputSettings const& outputSettings,
-		const ch_cnt_t channels, Mixer* mixer, bool& successful)
-	{
+		const ch_cnt_t channels, Mixer* mixer, bool& successful) {
 		return new AudioFileMP3(outputSettings, channels, successful, outputFilename, mixer);
 	}
 

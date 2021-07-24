@@ -41,22 +41,19 @@
  * might become unstable due to the lower computing precision. */
 typedef double cabinet_float;
 
-typedef struct
-{
+typedef struct {
 	int n;
 	cabinet_float a[16], b[16];
 	float gain;
 } Model16;
 
-typedef struct
-{
+typedef struct {
 	int n;
 	cabinet_float a[32], b[32];
 	float gain;
 } Model32;
 
-class CabinetI : public Plugin
-{
+class CabinetI : public Plugin {
 public:
 	sample_t gain;
 	static Model16 models[];
@@ -85,8 +82,7 @@ public:
 /* Second version with 32nd order filters precalculated for
  * 44.1 / 48 / 88.2 / 96 kHz sample rates */
 
-class CabinetII : public Plugin
-{
+class CabinetII : public Plugin {
 public:
 	sample_t gain;
 

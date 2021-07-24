@@ -39,8 +39,7 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
 	: QMdiSubWindow(parent, windowFlags)
 	, m_buttonSize(17, 17)
 	, m_titleBarHeight(24)
-	, m_hasFocus(false)
-{
+	, m_hasFocus(false) {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
 	m_trackedNormalGeom = normalGeometry();
@@ -98,8 +97,7 @@ SubWindow::SubWindow(QWidget* parent, Qt::WindowFlags windowFlags)
  *  This draws our new title bar with custom colors
  *  and draws a window icon on the left upper corner.
  */
-void SubWindow::paintEvent(QPaintEvent*)
-{
+void SubWindow::paintEvent(QPaintEvent*) {
 	QPainter p(this);
 	QRect rect(0, 0, width(), m_titleBarHeight);
 
@@ -116,8 +114,7 @@ void SubWindow::paintEvent(QPaintEvent*)
 	p.drawLine(width() - 1, m_titleBarHeight, width() - 1, height() - 1);
 
 	// window icon
-	if (widget())
-	{
+	if (widget()) {
 		QPixmap winicon(widget()->windowIcon().pixmap(m_buttonSize));
 		p.drawPixmap(3, 3, m_buttonSize.width(), m_buttonSize.height(), winicon);
 	}
@@ -129,8 +126,7 @@ void SubWindow::paintEvent(QPaintEvent*)
  * Triggers if the window title changes and calls adjustTitleBar().
  * @param event
  */
-void SubWindow::changeEvent(QEvent* event)
-{
+void SubWindow::changeEvent(QEvent* event) {
 	QMdiSubWindow::changeEvent(event);
 
 	if (event->type() == QEvent::WindowTitleChange) { adjustTitleBar(); }
@@ -146,8 +142,7 @@ void SubWindow::changeEvent(QEvent* event)
  * @param label - holds a pointer to the QLabel
  * @param text  - the text which will be stored (and if needed breaked down) into the QLabel.
  */
-void SubWindow::elideText(QLabel* label, QString text)
-{
+void SubWindow::elideText(QLabel* label, QString text) {
 	QFontMetrics metrix(label->font());
 	int width = label->width() - 2;
 	QString clippedText = metrix.elidedText(text, Qt::ElideRight, width);
@@ -183,8 +178,7 @@ void SubWindow::setBorderColor(const QColor& c) { m_borderColor = c; }
  *  save the right position. look at: https://bugreports.qt.io/browse/QTBUG-256
  * @param event
  */
-void SubWindow::moveEvent(QMoveEvent* event)
-{
+void SubWindow::moveEvent(QMoveEvent* event) {
 	QMdiSubWindow::moveEvent(event);
 	// if the window was moved and ISN'T minimized/maximized/fullscreen,
 	// then save the current position
@@ -199,8 +193,7 @@ void SubWindow::moveEvent(QMoveEvent* event)
  *  At next we calculate the width of the title label and call elideText() for adding
  *  the window title to m_windowTitle (which is a QLabel)
  */
-void SubWindow::adjustTitleBar()
-{
+void SubWindow::adjustTitleBar() {
 	// button adjustments
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
@@ -223,8 +216,7 @@ void SubWindow::adjustTitleBar()
 
 	// here we ask: is the Subwindow maximizable and
 	// then we set the buttons and show them if needed
-	if (windowFlags() & Qt::WindowMaximizeButtonHint)
-	{
+	if (windowFlags() & Qt::WindowMaximizeButtonHint) {
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move(middleButtonPos);
 		m_restoreBtn->move(middleButtonPos);
@@ -236,8 +228,7 @@ void SubWindow::adjustTitleBar()
 	m_restoreBtn->setVisible(isMaximized() || isMinimized());
 	if (isMinimized()) { m_restoreBtn->move(m_maximizeBtn->isHidden() ? middleButtonPos : leftButtonPos); }
 
-	if (widget())
-	{
+	if (widget()) {
 		// title QLabel adjustments
 		m_windowTitle->setAlignment(Qt::AlignHCenter);
 		m_windowTitle->setFixedWidth(widget()->width() - (menuButtonSpace + buttonBarWidth));
@@ -254,15 +245,11 @@ void SubWindow::adjustTitleBar()
 	}
 }
 
-void SubWindow::focusChanged(QMdiSubWindow* subWindow)
-{
-	if (m_hasFocus && subWindow != this)
-	{
+void SubWindow::focusChanged(QMdiSubWindow* subWindow) {
+	if (m_hasFocus && subWindow != this) {
 		m_hasFocus = false;
 		emit focusLost();
-	}
-	else if (subWindow == this)
-	{
+	} else if (subWindow == this) {
 		m_hasFocus = true;
 	}
 }
@@ -281,8 +268,7 @@ void SubWindow::focusChanged(QMdiSubWindow* subWindow)
  *
  * @param event
  */
-void SubWindow::resizeEvent(QResizeEvent* event)
-{
+void SubWindow::resizeEvent(QResizeEvent* event) {
 	// When the parent QMdiArea gets resized, maximized subwindows also gets resized, if any.
 	// In that case, we should call QMdiSubWindow::resizeEvent first
 	// to ensure we get the correct window state.

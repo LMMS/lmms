@@ -33,8 +33,7 @@
 #include "embed.h"
 
 DelayControlsDialog::DelayControlsDialog(DelayControls* controls)
-	: EffectControlDialog(controls)
-{
+	: EffectControlDialog(controls) {
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
@@ -85,14 +84,12 @@ XyPad::XyPad(QWidget* parent, FloatModel* xModel, FloatModel* yModel)
 	: QWidget(parent)
 	, m_xModel(xModel)
 	, m_yModel(yModel)
-	, m_acceptInput(false)
-{
+	, m_acceptInput(false) {
 	connect(m_xModel, SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_yModel, SIGNAL(dataChanged()), this, SLOT(update()));
 }
 
-void XyPad::paintEvent(QPaintEvent* event)
-{
+void XyPad::paintEvent(QPaintEvent* event) {
 	QPainter painter(this);
 	// Draw Frequecy maker lines
 	painter.setPen(QPen(QColor(200, 200, 200, 200), 8, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
@@ -113,10 +110,8 @@ void XyPad::mousePressEvent(QMouseEvent* event) { m_acceptInput = true; }
 
 void XyPad::mouseReleaseEvent(QMouseEvent* event) { m_acceptInput = false; }
 
-void XyPad::mouseMoveEvent(QMouseEvent* event)
-{
-	if (m_acceptInput && (event->x() >= 0) && (event->x() < width()) && (event->y() >= 0) && (event->y() < height()))
-	{
+void XyPad::mouseMoveEvent(QMouseEvent* event) {
+	if (m_acceptInput && (event->x() >= 0) && (event->x() < width()) && (event->y() >= 0) && (event->y() < height())) {
 		// set xmodel
 		float xRange = m_xModel->maxValue() - m_xModel->minValue();
 		float xInc = xRange / width();

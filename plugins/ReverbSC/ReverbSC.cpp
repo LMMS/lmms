@@ -29,18 +29,16 @@
 
 #define DB2LIN(X) pow(10, X / 20.0f);
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor
-		= {STRINGIFY(PLUGIN_NAME), "ReverbSC", QT_TRANSLATE_NOOP("PluginBrowser", "Reverb algorithm by Sean Costello"),
-			"Paul Batchelor", 0x0123, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor
+	= {STRINGIFY(PLUGIN_NAME), "ReverbSC", QT_TRANSLATE_NOOP("PluginBrowser", "Reverb algorithm by Sean Costello"),
+		"Paul Batchelor", 0x0123, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 ReverbSCEffect::ReverbSCEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&reverbsc_plugin_descriptor, parent, key)
-	, m_reverbSCControls(this)
-{
+	, m_reverbSCControls(this) {
 	sp_create(&sp);
 	sp->sr = Engine::mixer()->processingSampleRate();
 
@@ -54,16 +52,14 @@ ReverbSCEffect::ReverbSCEffect(Model* parent, const Descriptor::SubPluginFeature
 	sp_dcblock_init(sp, dcblk[1], Engine::mixer()->currentQualitySettings().sampleRateMultiplier());
 }
 
-ReverbSCEffect::~ReverbSCEffect()
-{
+ReverbSCEffect::~ReverbSCEffect() {
 	sp_revsc_destroy(&revsc);
 	sp_dcblock_destroy(&dcblk[0]);
 	sp_dcblock_destroy(&dcblk[1]);
 	sp_destroy(&sp);
 }
 
-bool ReverbSCEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
-{
+bool ReverbSCEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames) {
 	if (!isEnabled() || !isRunning()) { return (false); }
 
 	double outSum = 0.0;
@@ -78,8 +74,7 @@ bool ReverbSCEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	ValueBuffer* colorBuf = m_reverbSCControls.m_colorModel.valueBuffer();
 	ValueBuffer* outGainBuf = m_reverbSCControls.m_outputGainModel.valueBuffer();
 
-	for (fpp_t f = 0; f < frames; ++f)
-	{
+	for (fpp_t f = 0; f < frames; ++f) {
 		sample_t s[2] = {buf[f][0], buf[f][1]};
 
 		const SPFLOAT inGain
@@ -107,8 +102,7 @@ bool ReverbSCEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	return isRunning();
 }
 
-void ReverbSCEffect::changeSampleRate()
-{
+void ReverbSCEffect::changeSampleRate() {
 	// Change sr variable in Soundpipe. does not need to be destroyed
 	sp->sr = Engine::mixer()->processingSampleRate();
 
@@ -128,12 +122,10 @@ void ReverbSCEffect::changeSampleRate()
 	mutex.unlock();
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
-	{
-		return new ReverbSCEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data) {
+	return new ReverbSCEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+}
 }

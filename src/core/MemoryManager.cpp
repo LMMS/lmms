@@ -29,31 +29,26 @@
 #include "rpmalloc.h"
 
 /// Global static object handling rpmalloc intializing and finalizing
-struct MemoryManagerGlobalGuard
-{
+struct MemoryManagerGlobalGuard {
 	MemoryManagerGlobalGuard() { rpmalloc_initialize(); }
 	~MemoryManagerGlobalGuard() { rpmalloc_finalize(); }
 } static mm_global_guard;
 
-namespace
-{
+namespace {
 static thread_local size_t thread_guard_depth;
 }
 
-MemoryManager::ThreadGuard::ThreadGuard()
-{
+MemoryManager::ThreadGuard::ThreadGuard() {
 	if (thread_guard_depth++ == 0) { rpmalloc_thread_initialize(); }
 }
 
-MemoryManager::ThreadGuard::~ThreadGuard()
-{
+MemoryManager::ThreadGuard::~ThreadGuard() {
 	if (--thread_guard_depth == 0) { rpmalloc_thread_finalize(); }
 }
 
 static thread_local MemoryManager::ThreadGuard local_mm_thread_guard{};
 
-void* MemoryManager::alloc(size_t size)
-{
+void* MemoryManager::alloc(size_t size) {
 	// Reference local thread guard to ensure it is initialized.
 	// Compilers may optimize the instance away otherwise.
 	Q_UNUSED(&local_mm_thread_guard);
@@ -61,8 +56,7 @@ void* MemoryManager::alloc(size_t size)
 	return rpmalloc(size);
 }
 
-void MemoryManager::free(void* ptr)
-{
+void MemoryManager::free(void* ptr) {
 	Q_UNUSED(&local_mm_thread_guard);
 	Q_ASSERT_X(rpmalloc_is_thread_initialized(), "MemoryManager::free", "Thread not initialized");
 	return rpfree(ptr);

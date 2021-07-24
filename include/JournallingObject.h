@@ -30,22 +30,19 @@
 #include "SerializingObject.h"
 #include "lmms_basics.h"
 
-class LMMS_EXPORT JournallingObject : public SerializingObject
-{
+class LMMS_EXPORT JournallingObject : public SerializingObject {
 public:
 	JournallingObject();
 	virtual ~JournallingObject();
 
 	inline jo_id_t id() const { return m_id; }
 
-	void saveJournallingState(const bool newState)
-	{
+	void saveJournallingState(const bool newState) {
 		m_journallingStateStack.push(m_journalling);
 		m_journalling = newState;
 	}
 
-	void restoreJournallingState()
-	{
+	void restoreJournallingState() {
 		if (!isJournallingStateStackEmpty()) { m_journalling = m_journallingStateStack.pop(); }
 	}
 
@@ -59,8 +56,7 @@ public:
 
 	inline void setJournalling(const bool _sr) { m_journalling = _sr; }
 
-	inline bool testAndSetJournalling(const bool newState)
-	{
+	inline bool testAndSetJournalling(const bool newState) {
 		const bool oldJournalling = m_journalling;
 		m_journalling = newState;
 		return oldJournalling;

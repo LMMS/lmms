@@ -37,8 +37,7 @@
 class TrackLabelButton;
 class TrackContainer;
 
-class BBTCO : public TrackContentObject
-{
+class BBTCO : public TrackContentObject {
 public:
 	BBTCO(Track* _track);
 	virtual ~BBTCO() = default;
@@ -55,8 +54,7 @@ private:
 	friend class BBTCOView;
 };
 
-class BBTCOView : public TrackContentObjectView
-{
+class BBTCOView : public TrackContentObjectView {
 	Q_OBJECT
 public:
 	BBTCOView(TrackContentObject* _tco, TrackView* _tv);
@@ -82,8 +80,7 @@ private:
 	QStaticText m_staticTextName;
 };
 
-class LMMS_EXPORT BBTrack : public Track
-{
+class LMMS_EXPORT BBTrack : public Track {
 	Q_OBJECT
 public:
 	BBTrack(TrackContainer* tc);
@@ -118,8 +115,7 @@ private:
 	friend class BBTrackView;
 };
 
-class BBTrackView : public TrackView
-{
+class BBTrackView : public TrackView {
 	Q_OBJECT
 public:
 	BBTrackView(BBTrack* bbt, TrackContainerView* tcv);

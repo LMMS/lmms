@@ -33,8 +33,7 @@
 
 class DualFilterEffect;
 
-class DualFilterControls : public EffectControls
-{
+class DualFilterControls : public EffectControls {
 	Q_OBJECT
 public:
 	DualFilterControls(DualFilterEffect* effect);

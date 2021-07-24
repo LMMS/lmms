@@ -34,13 +34,11 @@
 #include <memory>
 #include <string>
 
-struct LilvNodeDeleter
-{
+struct LilvNodeDeleter {
 	void operator()(LilvNode* n) { lilv_node_free(n); }
 };
 
-struct LilvNodesDeleter
-{
+struct LilvNodesDeleter {
 	void operator()(LilvNodes* n) { lilv_nodes_free(n); }
 };
 

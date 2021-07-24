@@ -44,8 +44,7 @@
 SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	: EffectControlDialog(controls)
 	, m_controls(controls)
-	, m_processor(processor)
-{
+	, m_processor(processor) {
 	// Top level placement of sections is handled by QSplitter widget.
 	QHBoxLayout* master_layout = new QHBoxLayout;
 	QSplitter* display_splitter = new QSplitter(Qt::Vertical);
@@ -317,13 +316,10 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 	controls_layout->addWidget(advancedButton);
 
 	connect(advancedButton, &PixmapButton::toggled, [=](bool checked) {
-		if (checked)
-		{
+		if (checked) {
 			config_widget->hide();
 			advanced_widget->show();
-		}
-		else
-		{
+		} else {
 			config_widget->show();
 			advanced_widget->hide();
 		}
@@ -340,19 +336,15 @@ SaControlsDialog::SaControlsDialog(SaControls* controls, SaProcessor* processor)
 }
 
 // Suggest the best current widget size.
-QSize SaControlsDialog::sizeHint() const
-{
+QSize SaControlsDialog::sizeHint() const {
 	// Best width is determined by spectrum display sizeHint.
 	// Best height depends on whether waterfall is visible and
 	// consists of heights of the config section, spectrum, waterfall
 	// and some reserve for margins.
-	if (m_waterfall->isVisible())
-	{
+	if (m_waterfall->isVisible()) {
 		return QSize(m_spectrum->sizeHint().width(),
 			m_configHeight + m_spectrum->sizeHint().height() + m_waterfall->sizeHint().height() + 50);
-	}
-	else
-	{
+	} else {
 		return QSize(m_spectrum->sizeHint().width(), m_configHeight + m_spectrum->sizeHint().height() + 50);
 	}
 }

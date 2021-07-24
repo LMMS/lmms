@@ -33,21 +33,17 @@
 
 // internal helper class allowing to create QToolButtons with
 // vertical orientation
-class SideBarButton : public QToolButton
-{
+class SideBarButton : public QToolButton {
 public:
 	SideBarButton(Qt::Orientation _orientation, QWidget* _parent)
 		: QToolButton(_parent)
-		, m_orientation(_orientation)
-	{
-	}
+		, m_orientation(_orientation) {}
 
 	virtual ~SideBarButton() = default;
 
 	Qt::Orientation orientation() const { return m_orientation; }
 
-	QSize sizeHint() const override
-	{
+	QSize sizeHint() const override {
 		QSize s = QToolButton::sizeHint();
 		s.setWidth(s.width() + 8);
 		if (orientation() == Qt::Horizontal) { return s; }
@@ -55,13 +51,11 @@ public:
 	}
 
 protected:
-	void paintEvent(QPaintEvent*) override
-	{
+	void paintEvent(QPaintEvent*) override {
 		QStylePainter p(this);
 		QStyleOptionToolButton opt;
 		initStyleOption(&opt);
-		if (orientation() == Qt::Vertical)
-		{
+		if (orientation() == Qt::Vertical) {
 			const QSize s = sizeHint();
 			p.rotate(270);
 			p.translate(-s.height(), 0);
@@ -76,8 +70,7 @@ private:
 
 SideBar::SideBar(Qt::Orientation _orientation, QWidget* _parent)
 	: QToolBar(_parent)
-	, m_btnGroup(this)
-{
+	, m_btnGroup(this) {
 	setOrientation(_orientation);
 	setIconSize(QSize(16, 16));
 
@@ -87,8 +80,7 @@ SideBar::SideBar(Qt::Orientation _orientation, QWidget* _parent)
 
 SideBar::~SideBar() {}
 
-void SideBar::appendTab(SideBarWidget* widget)
-{
+void SideBar::appendTab(SideBarWidget* widget) {
 	SideBarButton* button = new SideBarButton(orientation(), this);
 	button->setText(" " + widget->title());
 	button->setIcon(widget->icon());
@@ -106,23 +98,18 @@ void SideBar::appendTab(SideBarWidget* widget)
 	connect(widget, &SideBarWidget::closeButtonClicked, [=]() { button->click(); });
 }
 
-void SideBar::toggleButton(QAbstractButton* button)
-{
+void SideBar::toggleButton(QAbstractButton* button) {
 	QToolButton* toolButton = NULL;
 	QWidget* activeWidget = NULL;
 
-	for (auto it = m_widgets.begin(); it != m_widgets.end(); ++it)
-	{
+	for (auto it = m_widgets.begin(); it != m_widgets.end(); ++it) {
 		QToolButton* curBtn = it.key();
 		QWidget* curWidget = it.value();
 
-		if (curBtn == button)
-		{
+		if (curBtn == button) {
 			toolButton = curBtn;
 			activeWidget = curWidget;
-		}
-		else
-		{
+		} else {
 			curBtn->setChecked(false);
 			curBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 		}
@@ -130,8 +117,7 @@ void SideBar::toggleButton(QAbstractButton* button)
 		if (curWidget) { curWidget->hide(); }
 	}
 
-	if (toolButton && activeWidget)
-	{
+	if (toolButton && activeWidget) {
 		activeWidget->setVisible(button->isChecked());
 		toolButton->setToolButtonStyle(button->isChecked() ? Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly);
 	}

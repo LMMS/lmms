@@ -30,16 +30,13 @@
 
 #include "lmms_export.h"
 
-class LMMS_EXPORT Model : public QObject
-{
+class LMMS_EXPORT Model : public QObject {
 	Q_OBJECT
 public:
 	Model(Model* _parent, QString _display_name = QString(), bool _default_constructed = false)
 		: QObject(_parent)
 		, m_displayName(_display_name)
-		, m_defaultConstructed(_default_constructed)
-	{
-	}
+		, m_defaultConstructed(_default_constructed) {}
 
 	virtual ~Model() {}
 

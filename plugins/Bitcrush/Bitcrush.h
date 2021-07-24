@@ -32,8 +32,7 @@
 #include "ValueBuffer.h"
 #include "lmms_math.h"
 
-class BitcrushEffect : public Effect
-{
+class BitcrushEffect : public Effect {
 public:
 	BitcrushEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~BitcrushEffect();

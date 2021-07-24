@@ -29,8 +29,7 @@
 
 #include "lmms_export.h"
 
-class LMMS_EXPORT FileDialog : public QFileDialog
-{
+class LMMS_EXPORT FileDialog : public QFileDialog {
 	Q_OBJECT
 public:
 	explicit FileDialog(QWidget* parent = 0, const QString& caption = QString(), const QString& directory = QString(),

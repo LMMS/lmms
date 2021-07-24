@@ -44,8 +44,7 @@ QPixmap* AutomationPatternView::s_pat_rec = NULL;
 AutomationPatternView::AutomationPatternView(AutomationPattern* _pattern, TrackView* _parent)
 	: TrackContentObjectView(_pattern, _parent)
 	, m_pat(_pattern)
-	, m_paintPixmap()
-{
+	, m_paintPixmap() {
 	connect(m_pat, SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(gui->automationEditor(), SIGNAL(currentPatternChanged()), this, SLOT(update()));
 
@@ -61,13 +60,11 @@ AutomationPatternView::AutomationPatternView(AutomationPattern* _pattern, TrackV
 
 AutomationPatternView::~AutomationPatternView() {}
 
-void AutomationPatternView::openInAutomationEditor()
-{
+void AutomationPatternView::openInAutomationEditor() {
 	if (gui) gui->automationEditor()->open(m_pat);
 }
 
-void AutomationPatternView::update()
-{
+void AutomationPatternView::update() {
 	ToolTip::add(this, m_pat->name());
 
 	TrackContentObjectView::update();
@@ -75,8 +72,7 @@ void AutomationPatternView::update()
 
 void AutomationPatternView::resetName() { m_pat->setName(QString()); }
 
-void AutomationPatternView::changeName()
-{
+void AutomationPatternView::changeName() {
 	QString s = m_pat->name();
 	RenameDialog rename_dlg(s);
 	rename_dlg.exec();
@@ -84,11 +80,9 @@ void AutomationPatternView::changeName()
 	update();
 }
 
-void AutomationPatternView::disconnectObject(QAction* _a)
-{
+void AutomationPatternView::disconnectObject(QAction* _a) {
 	JournallingObject* j = Engine::projectJournal()->journallingObject(_a->data().toInt());
-	if (j && dynamic_cast<AutomatableModel*>(j))
-	{
+	if (j && dynamic_cast<AutomatableModel*>(j)) {
 		float oldMin = m_pat->getMin();
 		float oldMax = m_pat->getMax();
 
@@ -100,34 +94,29 @@ void AutomationPatternView::disconnectObject(QAction* _a)
 		if (gui->automationEditor()) { gui->automationEditor()->m_editor->updateAfterPatternChange(); }
 
 		// if there is no more connection connected to the AutomationPattern
-		if (m_pat->m_objects.size() == 0)
-		{
+		if (m_pat->m_objects.size() == 0) {
 			// scale the points to fit the new min. and max. value
 			this->scaleTimemapToFit(oldMin, oldMax);
 		}
 	}
 }
 
-void AutomationPatternView::toggleRecording()
-{
+void AutomationPatternView::toggleRecording() {
 	m_pat->setRecording(!m_pat->isRecording());
 	update();
 }
 
-void AutomationPatternView::flipY()
-{
+void AutomationPatternView::flipY() {
 	m_pat->flipY(m_pat->getMin(), m_pat->getMax());
 	update();
 }
 
-void AutomationPatternView::flipX()
-{
+void AutomationPatternView::flipX() {
 	m_pat->flipX(m_pat->length());
 	update();
 }
 
-void AutomationPatternView::constructContextMenu(QMenu* _cm)
-{
+void AutomationPatternView::constructContextMenu(QMenu* _cm) {
 	QAction* a = new QAction(embed::getIconPixmap("automation"), tr("Open in Automation editor"), _cm);
 	_cm->insertAction(_cm->actions()[0], a);
 	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
@@ -143,15 +132,12 @@ void AutomationPatternView::constructContextMenu(QMenu* _cm)
 	_cm->addAction(embed::getIconPixmap("record"), tr("Set/clear record"), this, SLOT(toggleRecording()));
 	_cm->addAction(embed::getIconPixmap("flip_y"), tr("Flip Vertically (Visible)"), this, SLOT(flipY()));
 	_cm->addAction(embed::getIconPixmap("flip_x"), tr("Flip Horizontally (Visible)"), this, SLOT(flipX()));
-	if (!m_pat->m_objects.isEmpty())
-	{
+	if (!m_pat->m_objects.isEmpty()) {
 		_cm->addSeparator();
 		QMenu* m = new QMenu(tr("%1 Connections").arg(m_pat->m_objects.count()), _cm);
 		for (AutomationPattern::objectVector::iterator it = m_pat->m_objects.begin(); it != m_pat->m_objects.end();
-			 ++it)
-		{
-			if (*it)
-			{
+			 ++it) {
+			if (*it) {
 				a = new QAction(tr("Disconnect \"%1\"").arg((*it)->fullDisplayName()), m);
 				a->setData((*it)->id());
 				m->addAction(a);
@@ -162,22 +148,18 @@ void AutomationPatternView::constructContextMenu(QMenu* _cm)
 	}
 }
 
-void AutomationPatternView::mouseDoubleClickEvent(QMouseEvent* me)
-{
-	if (me->button() != Qt::LeftButton)
-	{
+void AutomationPatternView::mouseDoubleClickEvent(QMouseEvent* me) {
+	if (me->button() != Qt::LeftButton) {
 		me->ignore();
 		return;
 	}
 	openInAutomationEditor();
 }
 
-void AutomationPatternView::paintEvent(QPaintEvent*)
-{
+void AutomationPatternView::paintEvent(QPaintEvent*) {
 	QPainter painter(this);
 
-	if (!needsUpdate())
-	{
+	if (!needsUpdate()) {
 		painter.drawPixmap(0, 0, m_paintPixmap);
 		return;
 	}
@@ -199,9 +181,9 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
 	p.fillRect(rect(), QColor(0, 0, 0));
 
-	if (gradient()) { p.fillRect(rect(), lingrad); }
-	else
-	{
+	if (gradient()) {
+		p.fillRect(rect(), lingrad);
+	} else {
 		p.fillRect(rect(), c);
 	}
 
@@ -232,17 +214,15 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 
 	p.setRenderHints(QPainter::Antialiasing, true);
 	for (AutomationPattern::timeMap::const_iterator it = m_pat->getTimeMap().begin(); it != m_pat->getTimeMap().end();
-		 ++it)
-	{
-		if (it + 1 == m_pat->getTimeMap().end())
-		{
+		 ++it) {
+		if (it + 1 == m_pat->getTimeMap().end()) {
 			const float x1 = x_base + POS(it) * ppTick;
 			const float x2 = (float)(width() - TCO_BORDER_WIDTH);
 			if (x1 > (width() - TCO_BORDER_WIDTH)) break;
 			// We are drawing the space after the last node, so we use the outValue
-			if (gradient()) { p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), lin2grad); }
-			else
-			{
+			if (gradient()) {
+				p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), lin2grad);
+			} else {
 				p.fillRect(QRectF(x1, 0.0f, x2 - x1, OUTVAL(it)), col);
 			}
 			break;
@@ -257,9 +237,9 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		// the value of the end of the shape between the two nodes will be the inValue of
 		// the next node.
 		float nextValue;
-		if (m_pat->progressionType() == AutomationPattern::DiscreteProgression) { nextValue = OUTVAL(it); }
-		else
-		{
+		if (m_pat->progressionType() == AutomationPattern::DiscreteProgression) {
+			nextValue = OUTVAL(it);
+		} else {
 			nextValue = INVAL(it + 1);
 		}
 
@@ -268,8 +248,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		path.moveTo(origin);
 		path.moveTo(QPointF(x_base + POS(it) * ppTick, values[0]));
 		float x;
-		for (int i = POS(it) + 1; i < POS(it + 1); i++)
-		{
+		for (int i = POS(it) + 1; i < POS(it + 1); i++) {
 			x = x_base + i * ppTick;
 			if (x > (width() - TCO_BORDER_WIDTH)) break;
 			float value = values[i - POS(it)];
@@ -279,9 +258,9 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 		path.lineTo(x_base + (POS(it + 1)) * ppTick, 0.0f);
 		path.lineTo(origin);
 
-		if (gradient()) { p.fillPath(path, lin2grad); }
-		else
-		{
+		if (gradient()) {
+			p.fillPath(path, lin2grad);
+		} else {
 			p.fillPath(path, col);
 		}
 		delete[] values;
@@ -294,8 +273,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	const int lineSize = 3;
 	p.setPen(c.darker(300));
 
-	for (bar_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t)
-	{
+	for (bar_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t) {
 		const int tx = x_base + static_cast<int>(ppb * t) - 2;
 		p.drawLine(tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize);
 		p.drawLine(tx, rect().bottom() - (lineSize + TCO_BORDER_WIDTH), tx, rect().bottom() - TCO_BORDER_WIDTH);
@@ -316,8 +294,7 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	p.drawRect(0, 0, rect().right(), rect().bottom());
 
 	// draw the 'muted' pixmap only if the pattern was manualy muted
-	if (m_pat->isMuted())
-	{
+	if (m_pat->isMuted()) {
 		const int spacing = TCO_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap(spacing, height() - (size + spacing), embed::getIconPixmap("muted", size, size));
@@ -328,25 +305,20 @@ void AutomationPatternView::paintEvent(QPaintEvent*)
 	painter.drawPixmap(0, 0, m_paintPixmap);
 }
 
-void AutomationPatternView::dragEnterEvent(QDragEnterEvent* _dee)
-{
+void AutomationPatternView::dragEnterEvent(QDragEnterEvent* _dee) {
 	StringPairDrag::processDragEnterEvent(_dee, "automatable_model");
 	if (!_dee->isAccepted()) { TrackContentObjectView::dragEnterEvent(_dee); }
 }
 
-void AutomationPatternView::dropEvent(QDropEvent* _de)
-{
+void AutomationPatternView::dropEvent(QDropEvent* _de) {
 	QString type = StringPairDrag::decodeKey(_de);
 	QString val = StringPairDrag::decodeValue(_de);
-	if (type == "automatable_model")
-	{
+	if (type == "automatable_model") {
 		AutomatableModel* mod
 			= dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if (mod != NULL)
-		{
+		if (mod != NULL) {
 			bool added = m_pat->addObject(mod);
-			if (!added)
-			{
+			if (!added) {
 				TextFloat::displayMessage(mod->displayName(),
 					tr("Model is already connected "
 					   "to this pattern."),
@@ -355,13 +327,10 @@ void AutomationPatternView::dropEvent(QDropEvent* _de)
 		}
 		update();
 
-		if (gui->automationEditor() && gui->automationEditor()->currentPattern() == m_pat)
-		{
+		if (gui->automationEditor() && gui->automationEditor()->currentPattern() == m_pat) {
 			gui->automationEditor()->setCurrentPattern(m_pat);
 		}
-	}
-	else
-	{
+	} else {
 		TrackContentObjectView::dropEvent(_de);
 	}
 }
@@ -369,8 +338,7 @@ void AutomationPatternView::dropEvent(QDropEvent* _de)
 /**
  * @brief Preserves the auto points over different scale
  */
-void AutomationPatternView::scaleTimemapToFit(float oldMin, float oldMax)
-{
+void AutomationPatternView::scaleTimemapToFit(float oldMin, float oldMax) {
 	float newMin = m_pat->getMin();
 	float newMax = m_pat->getMax();
 
@@ -380,13 +348,12 @@ void AutomationPatternView::scaleTimemapToFit(float oldMin, float oldMax)
 	// only the inValue is being considered and the outValue is being reset to the inValue (so discrete jumps
 	// are discarded). Possibly later we will want discrete jumps to be maintained so we will need to upgrade
 	// the logic to account for them.
-	for (AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin(); it != m_pat->m_timeMap.end(); ++it)
-	{
+	for (AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin(); it != m_pat->m_timeMap.end(); ++it) {
 		// If the values are out of the previous range, fix them so they are
 		// between oldMin and oldMax.
-		if (INVAL(it) < oldMin) { it.value().setInValue(oldMin); }
-		else if (INVAL(it) > oldMax)
-		{
+		if (INVAL(it) < oldMin) {
+			it.value().setInValue(oldMin);
+		} else if (INVAL(it) > oldMax) {
 			it.value().setInValue(oldMax);
 		}
 		// Calculate what the value would be proportionally in the new range

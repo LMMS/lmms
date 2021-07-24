@@ -41,8 +41,7 @@ CrossoverEQControls::CrossoverEQControls(CrossoverEQEffect* eff)
 	, m_mute1(true, this, "Mute Band 1")
 	, m_mute2(true, this, "Mute Band 2")
 	, m_mute3(true, this, "Mute Band 3")
-	, m_mute4(true, this, "Mute Band 4")
-{
+	, m_mute4(true, this, "Mute Band 4") {
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 	connect(&m_xover12, SIGNAL(dataChanged()), this, SLOT(xover12Changed()));
 	connect(&m_xover23, SIGNAL(dataChanged()), this, SLOT(xover23Changed()));
@@ -53,8 +52,7 @@ CrossoverEQControls::CrossoverEQControls(CrossoverEQEffect* eff)
 	m_xover34.setScaleLogarithmic(true);
 }
 
-void CrossoverEQControls::saveSettings(QDomDocument& doc, QDomElement& elem)
-{
+void CrossoverEQControls::saveSettings(QDomDocument& doc, QDomElement& elem) {
 	m_xover12.saveSettings(doc, elem, "xover12");
 	m_xover23.saveSettings(doc, elem, "xover23");
 	m_xover34.saveSettings(doc, elem, "xover34");
@@ -70,8 +68,7 @@ void CrossoverEQControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 	m_mute4.saveSettings(doc, elem, "mute4");
 }
 
-void CrossoverEQControls::loadSettings(const QDomElement& elem)
-{
+void CrossoverEQControls::loadSettings(const QDomElement& elem) {
 	m_xover12.loadSettings(elem, "xover12");
 	m_xover23.loadSettings(elem, "xover23");
 	m_xover34.loadSettings(elem, "xover34");
@@ -90,22 +87,19 @@ void CrossoverEQControls::loadSettings(const QDomElement& elem)
 	m_effect->clearFilterHistories();
 }
 
-void CrossoverEQControls::xover12Changed()
-{
+void CrossoverEQControls::xover12Changed() {
 	float v = m_xover12.value();
 	if (m_xover23.value() < v) { m_xover23.setValue(v); }
 	if (m_xover34.value() < v) { m_xover34.setValue(v); }
 }
 
-void CrossoverEQControls::xover23Changed()
-{
+void CrossoverEQControls::xover23Changed() {
 	float v = m_xover23.value();
 	if (m_xover12.value() > v) { m_xover12.setValue(v); }
 	if (m_xover34.value() < v) { m_xover34.setValue(v); }
 }
 
-void CrossoverEQControls::xover34Changed()
-{
+void CrossoverEQControls::xover34Changed() {
 	float v = m_xover34.value();
 	if (m_xover12.value() > v) { m_xover12.setValue(v); }
 	if (m_xover23.value() > v) { m_xover23.setValue(v); }

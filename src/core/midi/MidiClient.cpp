@@ -30,11 +30,9 @@
 
 MidiClient::MidiClient() {}
 
-MidiClient::~MidiClient()
-{
+MidiClient::~MidiClient() {
 	// TODO: noteOffAll(); / clear all ports
-	for (MidiPort* port : m_midiPorts)
-	{
+	for (MidiPort* port : m_midiPorts) {
 		port->invalidateCilent();
 	}
 }
@@ -45,8 +43,7 @@ void MidiClient::applyPortName(MidiPort*) {}
 
 void MidiClient::addPort(MidiPort* port) { m_midiPorts.push_back(port); }
 
-void MidiClient::removePort(MidiPort* port)
-{
+void MidiClient::removePort(MidiPort* port) {
 	if (!port) { return; }
 
 	QVector<MidiPort*>::Iterator it = std::find(m_midiPorts.begin(), m_midiPorts.end(), port);
@@ -61,8 +58,7 @@ MidiClientRaw::MidiClientRaw() {}
 
 MidiClientRaw::~MidiClientRaw() {}
 
-void MidiClientRaw::parseData(const unsigned char c)
-{
+void MidiClientRaw::parseData(const unsigned char c) {
 	/*********************************************************************/
 	/* 'Process' system real-time messages                               */
 	/*********************************************************************/
@@ -71,10 +67,8 @@ void MidiClientRaw::parseData(const unsigned char c)
 	 * Real-time range: 0xF8 .. 0xFF
 	 * Note: Real-time does not affect (running) status.
 	 */
-	if (c >= 0xF8)
-	{
-		if (c == MidiSystemReset)
-		{
+	if (c >= 0xF8) {
+		if (c == MidiSystemReset) {
 			m_midiParseData.m_midiEvent.setType(MidiSystemReset);
 			m_midiParseData.m_status = 0;
 			processParsedEvent();
@@ -88,8 +82,7 @@ void MidiClientRaw::parseData(const unsigned char c)
 	/* There are no system common messages that are of interest here.
 	 * System common range: 0xF0 .. 0xF7
 	 */
-	if (c > 0xF0)
-	{
+	if (c > 0xF0) {
 		/* MIDI spec say: To ignore a non-real-time message, just discard all
 		 * data up to the next status byte.  And our parser will ignore data
 		 * that is received without a valid status.
@@ -108,8 +101,7 @@ void MidiClientRaw::parseData(const unsigned char c)
 	 * as soon as a byte >= 0x80 comes in, we are dealing with a status byte
 	 * and start a new event.
 	 */
-	if (c & 0x80)
-	{
+	if (c & 0x80) {
 		m_midiParseData.m_channel = c & 0x0F;
 		m_midiParseData.m_status = c & 0xF0;
 		/* The event consumes x bytes of data...
@@ -125,8 +117,7 @@ void MidiClientRaw::parseData(const unsigned char c)
 	/*********************************************************************/
 	/* If we made it this far, then the received char belongs to the data
 	 * of the last event. */
-	if (m_midiParseData.m_status == 0)
-	{
+	if (m_midiParseData.m_status == 0) {
 		/* We are not interested in the event currently received.
 							Discard the data. */
 		return;
@@ -154,8 +145,7 @@ void MidiClientRaw::parseData(const unsigned char c)
 	m_midiParseData.m_midiEvent.setType(static_cast<MidiEventTypes>(m_midiParseData.m_status));
 	m_midiParseData.m_midiEvent.setChannel(m_midiParseData.m_channel);
 	m_midiParseData.m_bytes = 0; /* Related to running status! */
-	switch (m_midiParseData.m_midiEvent.type())
-	{
+	switch (m_midiParseData.m_midiEvent.type()) {
 	case MidiNoteOff:
 	case MidiNoteOn:
 	case MidiKeyPressure:
@@ -189,19 +179,15 @@ void MidiClientRaw::parseData(const unsigned char c)
 	processParsedEvent();
 }
 
-void MidiClientRaw::processParsedEvent()
-{
-	for (int i = 0; i < m_midiPorts.size(); ++i)
-	{
+void MidiClientRaw::processParsedEvent() {
+	for (int i = 0; i < m_midiPorts.size(); ++i) {
 		m_midiPorts[i]->processInEvent(m_midiParseData.m_midiEvent);
 	}
 }
 
-void MidiClientRaw::processOutEvent(const MidiEvent& event, const TimePos&, const MidiPort* port)
-{
+void MidiClientRaw::processOutEvent(const MidiEvent& event, const TimePos&, const MidiPort* port) {
 	// TODO: also evaluate _time and queue event if necessary
-	switch (event.type())
-	{
+	switch (event.type()) {
 	case MidiNoteOn:
 	case MidiNoteOff:
 	case MidiKeyPressure:
@@ -237,11 +223,10 @@ static const unsigned char REMAINS_80E0[] = {
 
 // Returns the length of the MIDI message starting with _event.
 // Taken from Nagano Daisuke's USB-MIDI driver
-int MidiClientRaw::eventLength(const unsigned char event)
-{
-	if (event < 0xF0) { return REMAINS_80E0[((event - 0x80) >> 4) & 0x0F]; }
-	else if (event < 0xF7)
-	{
+int MidiClientRaw::eventLength(const unsigned char event) {
+	if (event < 0xF0) {
+		return REMAINS_80E0[((event - 0x80) >> 4) & 0x0F];
+	} else if (event < 0xF7) {
 		return REMAINS_F0F6[event - 0xF0];
 	}
 	return 1;

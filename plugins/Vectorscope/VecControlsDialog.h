@@ -30,8 +30,7 @@
 class VecControls;
 
 //! Top-level widget holding the configuration GUI and vector display
-class VecControlsDialog : public EffectControlDialog
-{
+class VecControlsDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	explicit VecControlsDialog(VecControls* controls);

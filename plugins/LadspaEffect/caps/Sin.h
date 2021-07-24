@@ -30,8 +30,7 @@
 
 #include "dsp/Sine.h"
 
-class Sin : public Plugin
-{
+class Sin : public Plugin {
 public:
 	sample_t f, gain;
 

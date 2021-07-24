@@ -31,8 +31,7 @@
 
 class stereoMatrixEffect;
 
-class stereoMatrixControls : public EffectControls
-{
+class stereoMatrixControls : public EffectControls {
 	Q_OBJECT
 public:
 	stereoMatrixControls(stereoMatrixEffect(*_eff));

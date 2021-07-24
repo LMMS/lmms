@@ -39,34 +39,28 @@ const f_cnt_t minimumFrames = 1;
 
 EnvelopeAndLfoParameters::LfoInstances* EnvelopeAndLfoParameters::s_lfoInstances = NULL;
 
-void EnvelopeAndLfoParameters::LfoInstances::trigger()
-{
+void EnvelopeAndLfoParameters::LfoInstances::trigger() {
 	QMutexLocker m(&m_lfoListMutex);
-	for (LfoList::Iterator it = m_lfos.begin(); it != m_lfos.end(); ++it)
-	{
+	for (LfoList::Iterator it = m_lfos.begin(); it != m_lfos.end(); ++it) {
 		(*it)->m_lfoFrame += Engine::mixer()->framesPerPeriod();
 		(*it)->m_bad_lfoShapeData = true;
 	}
 }
 
-void EnvelopeAndLfoParameters::LfoInstances::reset()
-{
+void EnvelopeAndLfoParameters::LfoInstances::reset() {
 	QMutexLocker m(&m_lfoListMutex);
-	for (LfoList::Iterator it = m_lfos.begin(); it != m_lfos.end(); ++it)
-	{
+	for (LfoList::Iterator it = m_lfos.begin(); it != m_lfos.end(); ++it) {
 		(*it)->m_lfoFrame = 0;
 		(*it)->m_bad_lfoShapeData = true;
 	}
 }
 
-void EnvelopeAndLfoParameters::LfoInstances::add(EnvelopeAndLfoParameters* lfo)
-{
+void EnvelopeAndLfoParameters::LfoInstances::add(EnvelopeAndLfoParameters* lfo) {
 	QMutexLocker m(&m_lfoListMutex);
 	m_lfos.append(lfo);
 }
 
-void EnvelopeAndLfoParameters::LfoInstances::remove(EnvelopeAndLfoParameters* lfo)
-{
+void EnvelopeAndLfoParameters::LfoInstances::remove(EnvelopeAndLfoParameters* lfo) {
 	QMutexLocker m(&m_lfoListMutex);
 	m_lfos.removeAll(lfo);
 }
@@ -97,8 +91,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(float _value_for_zero_amount,
 	, m_controlEnvAmountModel(false, this, tr("Modulate env amount"))
 	, m_lfoFrame(0)
 	, m_lfoAmountIsZero(false)
-	, m_lfoShapeData(NULL)
-{
+	, m_lfoShapeData(NULL) {
 	m_amountModel.setCenterValue(0);
 	m_lfoAmountModel.setCenterValue(0);
 
@@ -128,8 +121,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(float _value_for_zero_amount,
 	updateSampleVars();
 }
 
-EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
-{
+EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters() {
 	m_predelayModel.disconnect(this);
 	m_attackModel.disconnect(this);
 	m_holdModel.disconnect(this);
@@ -150,20 +142,17 @@ EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
 
 	instances()->remove(this);
 
-	if (instances()->isEmpty())
-	{
+	if (instances()->isEmpty()) {
 		delete instances();
 		s_lfoInstances = NULL;
 	}
 }
 
-inline sample_t EnvelopeAndLfoParameters::lfoShapeSample(fpp_t _frame_offset)
-{
+inline sample_t EnvelopeAndLfoParameters::lfoShapeSample(fpp_t _frame_offset) {
 	f_cnt_t frame = (m_lfoFrame + _frame_offset) % m_lfoOscillationFrames;
 	const float phase = frame / static_cast<float>(m_lfoOscillationFrames);
 	sample_t shape_sample;
-	switch (m_lfoWaveModel.value())
-	{
+	switch (m_lfoWaveModel.value()) {
 	case TriangleWave: shape_sample = Oscillator::triangleSample(phase); break;
 	case SquareWave: shape_sample = Oscillator::squareSample(phase); break;
 	case SawWave: shape_sample = Oscillator::sawSample(phase); break;
@@ -178,22 +167,17 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample(fpp_t _frame_offset)
 	return shape_sample * m_lfoAmount;
 }
 
-void EnvelopeAndLfoParameters::updateLfoShapeData()
-{
+void EnvelopeAndLfoParameters::updateLfoShapeData() {
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
-	for (fpp_t offset = 0; offset < frames; ++offset)
-	{
+	for (fpp_t offset = 0; offset < frames; ++offset) {
 		m_lfoShapeData[offset] = lfoShapeSample(offset);
 	}
 	m_bad_lfoShapeData = false;
 }
 
-inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf, f_cnt_t _frame, const fpp_t _frames)
-{
-	if (m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames)
-	{
-		for (fpp_t offset = 0; offset < _frames; ++offset)
-		{
+inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf, f_cnt_t _frame, const fpp_t _frames) {
+	if (m_lfoAmountIsZero || _frame <= m_lfoPredelayFrames) {
+		for (fpp_t offset = 0; offset < _frames; ++offset) {
 			*_buf++ = 0.0f;
 		}
 		return;
@@ -204,42 +188,34 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel(float* _buf, f_cnt_t _frame, 
 
 	fpp_t offset = 0;
 	const float lafI = 1.0f / qMax(minimumFrames, m_lfoAttackFrames);
-	for (; offset < _frames && _frame < m_lfoAttackFrames; ++offset, ++_frame)
-	{
+	for (; offset < _frames && _frame < m_lfoAttackFrames; ++offset, ++_frame) {
 		*_buf++ = m_lfoShapeData[offset] * _frame * lafI;
 	}
-	for (; offset < _frames; ++offset)
-	{
+	for (; offset < _frames; ++offset) {
 		*_buf++ = m_lfoShapeData[offset];
 	}
 }
 
-void EnvelopeAndLfoParameters::fillLevel(float* _buf, f_cnt_t _frame, const f_cnt_t _release_begin, const fpp_t _frames)
-{
+void EnvelopeAndLfoParameters::fillLevel(
+	float* _buf, f_cnt_t _frame, const f_cnt_t _release_begin, const fpp_t _frames) {
 	QMutexLocker m(&m_paramMutex);
 
 	if (_frame < 0 || _release_begin < 0) { return; }
 
 	fillLfoLevel(_buf, _frame, _frames);
 
-	for (fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame)
-	{
+	for (fpp_t offset = 0; offset < _frames; ++offset, ++_buf, ++_frame) {
 		float env_level;
-		if (_frame < _release_begin)
-		{
-			if (_frame < m_pahdFrames) { env_level = m_pahdEnv[_frame]; }
-			else
-			{
+		if (_frame < _release_begin) {
+			if (_frame < m_pahdFrames) {
+				env_level = m_pahdEnv[_frame];
+			} else {
 				env_level = m_sustainLevel;
 			}
-		}
-		else if ((_frame - _release_begin) < m_rFrames)
-		{
+		} else if ((_frame - _release_begin) < m_rFrames) {
 			env_level = m_rEnv[_frame - _release_begin]
 				* ((_release_begin < m_pahdFrames) ? m_pahdEnv[_release_begin] : m_sustainLevel);
-		}
-		else
-		{
+		} else {
 			env_level = 0.0f;
 		}
 
@@ -248,8 +224,7 @@ void EnvelopeAndLfoParameters::fillLevel(float* _buf, f_cnt_t _frame, const f_cn
 	}
 }
 
-void EnvelopeAndLfoParameters::saveSettings(QDomDocument& _doc, QDomElement& _parent)
-{
+void EnvelopeAndLfoParameters::saveSettings(QDomDocument& _doc, QDomElement& _parent) {
 	m_predelayModel.saveSettings(_doc, _parent, "pdel");
 	m_attackModel.saveSettings(_doc, _parent, "att");
 	m_holdModel.saveSettings(_doc, _parent, "hold");
@@ -267,8 +242,7 @@ void EnvelopeAndLfoParameters::saveSettings(QDomDocument& _doc, QDomElement& _pa
 	_parent.setAttribute("userwavefile", m_userWave.audioFile());
 }
 
-void EnvelopeAndLfoParameters::loadSettings(const QDomElement& _this)
-{
+void EnvelopeAndLfoParameters::loadSettings(const QDomElement& _this) {
 	m_predelayModel.loadSettings(_this, "pdel");
 	m_attackModel.loadSettings(_this, "att");
 	m_holdModel.loadSettings(_this, "hold");
@@ -287,8 +261,7 @@ void EnvelopeAndLfoParameters::loadSettings(const QDomElement& _this)
 	/*	 ### TODO:
 	Old reversed sustain kept for backward compatibility
 	with 4.15 file format*/
-	if (_this.hasAttribute("sus"))
-	{
+	if (_this.hasAttribute("sus")) {
 		m_sustainModel.loadSettings(_this, "sus");
 		m_sustainModel.setValue(1.0 - m_sustainModel.value());
 	}
@@ -298,8 +271,7 @@ void EnvelopeAndLfoParameters::loadSettings(const QDomElement& _this)
 	updateSampleVars();
 }
 
-void EnvelopeAndLfoParameters::updateSampleVars()
-{
+void EnvelopeAndLfoParameters::updateSampleVars() {
 	QMutexLocker m(&m_paramMutex);
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT * Engine::mixer()->processingSampleRate();
@@ -317,9 +289,9 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
-	if (m_amount >= 0) { m_amountAdd = (1.0f - m_amount) * m_valueForZeroAmount; }
-	else
-	{
+	if (m_amount >= 0) {
+		m_amountAdd = (1.0f - m_amount) * m_valueForZeroAmount;
+	} else {
 		m_amountAdd = m_valueForZeroAmount;
 	}
 
@@ -330,15 +302,13 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0) { m_rFrames = minimumFrames; }
 
 	// if the buffers are too small, make bigger ones - so we only alloc new memory when necessary
-	if (m_pahdBufSize < m_pahdFrames)
-	{
+	if (m_pahdBufSize < m_pahdFrames) {
 		sample_t* tmp = m_pahdEnv;
 		m_pahdEnv = new sample_t[m_pahdFrames];
 		delete[] tmp;
 		m_pahdBufSize = m_pahdFrames;
 	}
-	if (m_rBufSize < m_rFrames)
-	{
+	if (m_rBufSize < m_rFrames) {
 		sample_t* tmp = m_rEnv;
 		m_rEnv = new sample_t[m_rFrames];
 		delete[] tmp;
@@ -346,30 +316,26 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	}
 
 	const float aa = m_amountAdd;
-	for (f_cnt_t i = 0; i < predelay_frames; ++i)
-	{
+	for (f_cnt_t i = 0; i < predelay_frames; ++i) {
 		m_pahdEnv[i] = aa;
 	}
 
 	f_cnt_t add = predelay_frames;
 
 	const float afI = (1.0f / attack_frames) * m_amount;
-	for (f_cnt_t i = 0; i < attack_frames; ++i)
-	{
+	for (f_cnt_t i = 0; i < attack_frames; ++i) {
 		m_pahdEnv[add + i] = i * afI + aa;
 	}
 
 	add += attack_frames;
 	const float amsum = m_amount + m_amountAdd;
-	for (f_cnt_t i = 0; i < hold_frames; ++i)
-	{
+	for (f_cnt_t i = 0; i < hold_frames; ++i) {
 		m_pahdEnv[add + i] = amsum;
 	}
 
 	add += hold_frames;
 	const float dfI = (1.0 / decay_frames) * (m_sustainLevel - 1) * m_amount;
-	for (f_cnt_t i = 0; i < decay_frames; ++i)
-	{
+	for (f_cnt_t i = 0; i < decay_frames; ++i) {
 		/*
 		m_pahdEnv[add + i] = ( m_sustainLevel + ( 1.0f -
 						(float)i / decay_frames ) *
@@ -380,8 +346,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	}
 
 	const float rfI = (1.0f / m_rFrames) * m_amount;
-	for (f_cnt_t i = 0; i < m_rFrames; ++i)
-	{
+	for (f_cnt_t i = 0; i < m_rFrames; ++i) {
 		m_rEnv[i] = (float)(m_rFrames - i) * rfI;
 	}
 
@@ -396,13 +361,10 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	m_lfoAmount = m_lfoAmountModel.value() * 0.5f;
 
 	m_used = true;
-	if (static_cast<int>(floorf(m_lfoAmount * 1000.0f)) == 0)
-	{
+	if (static_cast<int>(floorf(m_lfoAmount * 1000.0f)) == 0) {
 		m_lfoAmountIsZero = true;
 		if (static_cast<int>(floorf(m_amount * 1000.0f)) == 0) { m_used = false; }
-	}
-	else
-	{
+	} else {
 		m_lfoAmountIsZero = false;
 	}
 

@@ -27,8 +27,7 @@
 #include "embed.h"
 
 CaptionMenu::CaptionMenu(const QString& _title, QWidget* _parent)
-	: QMenu(_title, _parent)
-{
+	: QMenu(_title, _parent) {
 	QAction* caption = addAction(_title);
 	caption->setEnabled(false);
 }

@@ -27,8 +27,7 @@
 #ifndef _DSP_TWELVE_AX_7_H_
 #define _DSP_TWELVE_AX_7_H_
 
-namespace DSP
-{
+namespace DSP {
 
 #include "r12ax7.h"
 
@@ -39,13 +38,11 @@ typedef sample_t tube_sample;
  * odd-order harmonics at the expense of even-order. it has to sound
  * good: it took a good deal of fiddling to get the coefficients right.
  */
-class TwelveAX7
-{
+class TwelveAX7 {
 public:
 	tube_sample b, c, d;
 
-	struct
-	{
+	struct {
 		tube_sample threshold, value;
 	} clip[2];
 
@@ -53,8 +50,7 @@ public:
 	tube_sample scale;
 
 public:
-	TwelveAX7()
-	{
+	TwelveAX7() {
 		/* transfer polynomial parameters */
 		b = -0.79618574210627535;
 		c = -0.21108555430962023;
@@ -67,21 +63,18 @@ public:
 
 	inline tube_sample transfer(tube_sample a) { return a * (b + a * (c + a * d)); }
 
-	inline tube_sample transfer_clip(tube_sample a)
-	{
+	inline tube_sample transfer_clip(tube_sample a) {
 		if (a <= clip[0].threshold) return clip[0].value;
 		if (a >= clip[1].threshold) return clip[1].value;
 		return transfer(a);
 	}
 
-	inline double get_root(double sign)
-	{
+	inline double get_root(double sign) {
 		/* only once, no need to optimize */
 		return (-2 * c + sign * sqrt((2 * c) * (2 * c) - 4 * (3 * d * b))) / (6 * d);
 	}
 
-	inline void set_clips()
-	{
+	inline void set_clips() {
 		/* find 0 crossings in the derived, this is where we'll clip */
 		double x0 = get_root(-1);
 		double x1 = get_root(+1);
@@ -98,21 +91,18 @@ public:
  * sonically the difference is minim, and the cycle count increases
  * dramatically.
  */
-class TwelveAX7_2
-{
+class TwelveAX7_2 {
 public:
 	tube_sample b, c, d;
 
-	struct
-	{
+	struct {
 		tube_sample threshold, value;
 	} clip[2];
 
 	tube_sample scale;
 
 public:
-	TwelveAX7_2()
-	{
+	TwelveAX7_2() {
 		/* transfer polynomial parameters, made with gnuplot::fit() */
 		b = -1.08150605597883;
 		c = -0.262760944760536;
@@ -128,8 +118,7 @@ public:
 
 	inline tube_sample transfer(tube_sample a) { return a * (b + a * (c + a * d)); }
 
-	inline tube_sample transfer_clip(tube_sample a)
-	{
+	inline tube_sample transfer_clip(tube_sample a) {
 		if (a <= clip[0].threshold) return clip[0].value;
 		if (a >= clip[1].threshold) return clip[1].value;
 		return transfer(a);
@@ -139,21 +128,18 @@ public:
 /* third model relies on linear interpolation based on the transfer function
  * as calculated from a spice model.
  */
-class TwelveAX7_3
-{
+class TwelveAX7_3 {
 public:
 	tube_sample b, c, d;
 
-	struct
-	{
+	struct {
 		tube_sample threshold, value;
 	} clip[2];
 
 	tube_sample scale;
 
 public:
-	TwelveAX7_3()
-	{
+	TwelveAX7_3() {
 		static double x[2] = {(double)r12AX7::Zero / ((double)r12AX7::Samples - (double)r12AX7::Zero), 1};
 
 		for (int i = 0; i < 2; ++i)
@@ -162,8 +148,7 @@ public:
 		scale = min(fabs(clip[0].threshold), fabs(clip[1].threshold));
 	}
 
-	inline tube_sample transfer(tube_sample a)
-	{
+	inline tube_sample transfer(tube_sample a) {
 		a = r12AX7::Zero + a * (r12AX7::Samples - r12AX7::Zero);
 		if (a <= 0) return r12AX7::v2v[0];
 		if (a >= r12AX7::Samples - 1) return r12AX7::v2v[r12AX7::Samples - 1];
@@ -179,11 +164,9 @@ public:
 };
 
 /* experimental */
-class NoTwelveAX7
-{
+class NoTwelveAX7 {
 public:
-	struct
-	{
+	struct {
 		tube_sample threshold, value;
 	} clip[2];
 
@@ -191,8 +174,7 @@ public:
 	tube_sample scale;
 
 public:
-	NoTwelveAX7()
-	{
+	NoTwelveAX7() {
 		static double x[2] = {-1, 1};
 
 		for (int i = 0; i < 2; ++i)
@@ -203,8 +185,7 @@ public:
 
 	inline tube_sample transfer(tube_sample a) { return 0.5469181606780 * (pow(1 - a, 1.5) - 1); }
 
-	inline tube_sample transfer_clip(tube_sample a)
-	{
+	inline tube_sample transfer_clip(tube_sample a) {
 		if (a <= clip[0].threshold) return clip[0].value;
 		if (a >= clip[1].threshold) return clip[1].value;
 		return transfer(a);

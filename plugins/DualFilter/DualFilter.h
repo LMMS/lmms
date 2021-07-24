@@ -30,8 +30,7 @@
 #include "DualFilterControls.h"
 #include "Effect.h"
 
-class DualFilterEffect : public Effect
-{
+class DualFilterEffect : public Effect {
 public:
 	DualFilterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~DualFilterEffect();

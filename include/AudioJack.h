@@ -46,8 +46,7 @@ class QLineEdit;
 class LcdSpinBox;
 class MidiJack;
 
-class AudioJack : public QObject, public AudioDevice
-{
+class AudioJack : public QObject, public AudioDevice {
 	Q_OBJECT
 public:
 	AudioJack(bool& _success_ful, Mixer* mixer);
@@ -60,13 +59,11 @@ public:
 	void removeMidiClient(void) { m_midiClient = nullptr; }
 	jack_client_t* jackClient() { return m_client; };
 
-	inline static QString name()
-	{
+	inline static QString name() {
 		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "JACK (JACK Audio Connection Kit)");
 	}
 
-	class setupWidget : public AudioDeviceSetupWidget
-	{
+	class setupWidget : public AudioDeviceSetupWidget {
 	public:
 		setupWidget(QWidget* _parent);
 		virtual ~setupWidget();
@@ -111,8 +108,7 @@ private:
 	f_cnt_t m_framesToDoInCurBuf;
 
 #ifdef AUDIO_PORT_SUPPORT
-	struct StereoPort
-	{
+	struct StereoPort {
 		jack_port_t* ports[2];
 	};
 

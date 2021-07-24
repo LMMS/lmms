@@ -43,9 +43,7 @@ LcdSpinBox::LcdSpinBox(int numDigits, QWidget* parent, const QString& name)
 	, m_remainder(0.f)
 	, m_mouseMoving(false)
 	, m_lastMousePos()
-	, m_displayOffset(0)
-{
-}
+	, m_displayOffset(0) {}
 
 LcdSpinBox::LcdSpinBox(int numDigits, const QString& style, QWidget* parent, const QString& name)
 	: LcdWidget(numDigits, style, parent, name)
@@ -53,52 +51,40 @@ LcdSpinBox::LcdSpinBox(int numDigits, const QString& style, QWidget* parent, con
 	, m_remainder(0.f)
 	, m_mouseMoving(false)
 	, m_lastMousePos()
-	, m_displayOffset(0)
-{
-}
+	, m_displayOffset(0) {}
 
-void LcdSpinBox::update()
-{
+void LcdSpinBox::update() {
 	setValue(model()->value() + m_displayOffset);
 
 	QWidget::update();
 }
 
-void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
-{
+void LcdSpinBox::contextMenuEvent(QContextMenuEvent* event) {
 	CaptionMenu contextMenu(model()->displayName());
 	addDefaultActions(&contextMenu);
 	contextMenu.exec(QCursor::pos());
 }
 
-void LcdSpinBox::mousePressEvent(QMouseEvent* event)
-{
+void LcdSpinBox::mousePressEvent(QMouseEvent* event) {
 	if (event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ControlModifier)
-		&& event->y() < cellHeight() + 2)
-	{
+		&& event->y() < cellHeight() + 2) {
 		m_mouseMoving = true;
 		m_lastMousePos = event->globalPos();
 
 		AutomatableModel* thisModel = model();
-		if (thisModel)
-		{
+		if (thisModel) {
 			thisModel->addJournalCheckPoint();
 			thisModel->saveJournallingState(false);
 		}
-	}
-	else
-	{
+	} else {
 		IntModelView::mousePressEvent(event);
 	}
 }
 
-void LcdSpinBox::mouseMoveEvent(QMouseEvent* event)
-{
-	if (m_mouseMoving)
-	{
+void LcdSpinBox::mouseMoveEvent(QMouseEvent* event) {
+	if (m_mouseMoving) {
 		int dy = event->globalY() - m_lastMousePos.y();
-		if (dy)
-		{
+		if (dy) {
 			float fdy = static_cast<float>(dy);
 			if (event->modifiers() & Qt::ShiftModifier) { fdy = qBound(-4.f, fdy / 4.f, 4.f); }
 			float floatValNotRounded = model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
@@ -111,17 +97,14 @@ void LcdSpinBox::mouseMoveEvent(QMouseEvent* event)
 	}
 }
 
-void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
-{
-	if (m_mouseMoving)
-	{
+void LcdSpinBox::mouseReleaseEvent(QMouseEvent*) {
+	if (m_mouseMoving) {
 		model()->restoreJournallingState();
 		m_mouseMoving = false;
 	}
 }
 
-void LcdSpinBox::wheelEvent(QWheelEvent* we)
-{
+void LcdSpinBox::wheelEvent(QWheelEvent* we) {
 	we->accept();
 	model()->setInitValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
 	emit manualChange();
@@ -129,8 +112,7 @@ void LcdSpinBox::wheelEvent(QWheelEvent* we)
 
 void LcdSpinBox::mouseDoubleClickEvent(QMouseEvent*) { enterValue(); }
 
-void LcdSpinBox::enterValue()
-{
+void LcdSpinBox::enterValue() {
 	bool ok;
 	int new_val;
 

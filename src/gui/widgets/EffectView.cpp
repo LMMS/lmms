@@ -47,8 +47,7 @@ EffectView::EffectView(Effect* _model, QWidget* _parent)
 	: PluginView(_model, _parent)
 	, m_bg(embed::getIconPixmap("effect_plugin"))
 	, m_subWindow(NULL)
-	, m_controlView(NULL)
-{
+	, m_controlView(NULL) {
 	setFixedSize(EffectView::DEFAULT_WIDTH, 60);
 
 	// Disable effects that are of type "DummyEffect"
@@ -79,8 +78,7 @@ EffectView::EffectView(Effect* _model, QWidget* _parent)
 
 	setModel(_model);
 
-	if (effect()->controls()->controlCount() > 0)
-	{
+	if (effect()->controls()->controlCount() > 0) {
 		QPushButton* ctls_btn = new QPushButton(tr("Controls"), this);
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont(pointSize<8>(f));
@@ -88,12 +86,10 @@ EffectView::EffectView(Effect* _model, QWidget* _parent)
 		connect(ctls_btn, SIGNAL(clicked()), this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
-		if (m_controlView)
-		{
+		if (m_controlView) {
 			m_subWindow = gui->mainWindow()->addWindowedWidget(m_controlView);
 
-			if (!m_controlView->isResizable())
-			{
+			if (!m_controlView->isResizable()) {
 				m_subWindow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 				if (m_subWindow->layout()) { m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize); }
 			}
@@ -114,18 +110,13 @@ EffectView::EffectView(Effect* _model, QWidget* _parent)
 
 EffectView::~EffectView() { delete m_subWindow; }
 
-void EffectView::editControls()
-{
-	if (m_subWindow)
-	{
-		if (!m_subWindow->isVisible())
-		{
+void EffectView::editControls() {
+	if (m_subWindow) {
+		if (!m_subWindow->isVisible()) {
 			m_subWindow->show();
 			m_subWindow->raise();
 			effect()->controls()->setViewVisible(true);
-		}
-		else
-		{
+		} else {
 			m_subWindow->hide();
 			effect()->controls()->setViewVisible(false);
 		}
@@ -138,14 +129,12 @@ void EffectView::moveDown() { emit moveDown(this); }
 
 void EffectView::deletePlugin() { emit deletePlugin(this); }
 
-void EffectView::closeEffects()
-{
+void EffectView::closeEffects() {
 	if (m_subWindow) { m_subWindow->hide(); }
 	effect()->controls()->setViewVisible(false);
 }
 
-void EffectView::contextMenuEvent(QContextMenuEvent*)
-{
+void EffectView::contextMenuEvent(QContextMenuEvent*) {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(model()->displayName(), this);
 	contextMenu->addAction(embed::getIconPixmap("arp_up"), tr("Move &up"), this, SLOT(moveUp()));
 	contextMenu->addAction(embed::getIconPixmap("arp_down"), tr("Move &down"), this, SLOT(moveDown()));
@@ -156,8 +145,7 @@ void EffectView::contextMenuEvent(QContextMenuEvent*)
 	delete contextMenu;
 }
 
-void EffectView::paintEvent(QPaintEvent*)
-{
+void EffectView::paintEvent(QPaintEvent*) {
 	QPainter p(this);
 	p.drawPixmap(0, 0, m_bg);
 
@@ -173,8 +161,7 @@ void EffectView::paintEvent(QPaintEvent*)
 	p.drawText(5, 54, elidedText);
 }
 
-void EffectView::modelChanged()
-{
+void EffectView::modelChanged() {
 	m_bypass->setModel(&effect()->m_enabledModel);
 	m_wetDry->setModel(&effect()->m_wetDryModel);
 	m_autoQuit->setModel(&effect()->m_autoQuitModel);

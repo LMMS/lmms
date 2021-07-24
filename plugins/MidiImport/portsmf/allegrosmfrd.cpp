@@ -14,20 +14,17 @@
 
 using namespace std;
 
-typedef class Alg_note_list
-{
+typedef class Alg_note_list {
 public:
 	Alg_note_ptr note;
 	class Alg_note_list* next;
-	Alg_note_list(Alg_note_ptr n, class Alg_note_list* list)
-	{
+	Alg_note_list(Alg_note_ptr n, class Alg_note_list* list) {
 		note = n;
 		next = list;
 	}
 } * Alg_note_list_ptr;
 
-class Alg_midifile_reader : public Midifile_reader
-{
+class Alg_midifile_reader : public Midifile_reader {
 public:
 	istream* file;
 	Alg_seq_ptr seq;
@@ -44,8 +41,7 @@ public:
 	// while reading, this is channel_offset_per_track * track_num
 	int channel_offset;
 
-	Alg_midifile_reader(istream& f, Alg_seq_ptr new_seq)
-	{
+	Alg_midifile_reader(istream& f, Alg_seq_ptr new_seq) {
 		file = &f;
 		note_list = NULL;
 		seq = new_seq;
@@ -103,10 +99,8 @@ protected:
 	void Mf_text(int, int, unsigned char*);
 };
 
-Alg_midifile_reader::~Alg_midifile_reader()
-{
-	while (note_list)
-	{
+Alg_midifile_reader::~Alg_midifile_reader() {
+	while (note_list) {
 		Alg_note_list_ptr to_be_freed = note_list;
 		note_list = note_list->next;
 		delete to_be_freed;
@@ -114,8 +108,7 @@ Alg_midifile_reader::~Alg_midifile_reader()
 	finalize(); // free Mf reader memory
 }
 
-bool Alg_midifile_reader::parse()
-{
+bool Alg_midifile_reader::parse() {
 	channel_offset = 0;
 	seq->convert_to_beats();
 	midifile();
@@ -123,8 +116,7 @@ bool Alg_midifile_reader::parse()
 	return midifile_error != 0;
 }
 
-void Alg_midifile_reader::Mf_starttrack()
-{
+void Alg_midifile_reader::Mf_starttrack() {
 	// printf("starting new track\n");
 	// create a new track that will share the sequence time map
 	// since time is in beats, the seconds parameter is false
@@ -135,8 +127,7 @@ void Alg_midifile_reader::Mf_starttrack()
 	port = 0;
 }
 
-void Alg_midifile_reader::Mf_endtrack()
-{
+void Alg_midifile_reader::Mf_endtrack() {
 	// note: track is already part of seq, so do not add it here
 	// printf("finished track, length %d number %d\n", track->len, track_num / 100);
 	channel_offset += seq->channel_offset_per_track;
@@ -153,8 +144,7 @@ void Alg_midifile_reader::Mf_chanprefix(int chan) { meta_channel = chan; }
 
 void Alg_midifile_reader::Mf_portprefix(int p) { port = p; }
 
-void Alg_midifile_reader::Mf_eot()
-{
+void Alg_midifile_reader::Mf_eot() {
 	meta_channel = -1;
 	port = 0;
 }
@@ -163,10 +153,8 @@ void Alg_midifile_reader::Mf_error(char* msg) { fprintf(stdout, "Midifile reader
 
 void Alg_midifile_reader::Mf_error(const char* msg) { Mf_error(const_cast<char*>(msg)); }
 
-void Alg_midifile_reader::Mf_header(int format, int ntrks, int division)
-{
-	if (format > 1)
-	{
+void Alg_midifile_reader::Mf_header(int format, int ntrks, int division) {
+	if (format > 1) {
 		char msg[80];
 		//#pragma warning(disable: 4996) // msg is long enough
 		sprintf(msg, "file format %d not implemented", format);
@@ -176,17 +164,14 @@ void Alg_midifile_reader::Mf_header(int format, int ntrks, int division)
 	divisions = division;
 }
 
-double Alg_midifile_reader::get_time()
-{
+double Alg_midifile_reader::get_time() {
 	double beat = ((double)get_currtime()) / divisions;
 	return beat;
 }
 
-void Alg_midifile_reader::Mf_on(int chan, int key, int vel)
-{
+void Alg_midifile_reader::Mf_on(int chan, int key, int vel) {
 	assert(!seq->get_units_are_seconds());
-	if (vel == 0)
-	{
+	if (vel == 0) {
 		Mf_off(chan, key, vel);
 		return;
 	}
@@ -203,31 +188,25 @@ void Alg_midifile_reader::Mf_on(int chan, int key, int vel)
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::Mf_off(int chan, int key, int vel)
-{
+void Alg_midifile_reader::Mf_off(int chan, int key, int vel) {
 	double time = get_time();
 	Alg_note_list_ptr* p = &note_list;
-	while (*p)
-	{
+	while (*p) {
 		if ((*p)->note->get_identifier() == key
-			&& (*p)->note->chan == chan + channel_offset + port * channel_offset_per_port)
-		{
+			&& (*p)->note->chan == chan + channel_offset + port * channel_offset_per_port) {
 			(*p)->note->dur = time - (*p)->note->time;
 			// trace("updated %d dur %g\n", (*p)->note->key, (*p)->note->dur);
 			Alg_note_list_ptr to_be_freed = *p;
 			*p = to_be_freed->next;
 			delete to_be_freed;
-		}
-		else
-		{
+		} else {
 			p = &((*p)->next);
 		}
 	}
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::update(int chan, int key, Alg_parameter_ptr param)
-{
+void Alg_midifile_reader::update(int chan, int key, Alg_parameter_ptr param) {
 	Alg_update_ptr update = new Alg_update;
 	update->time = get_time();
 	update->chan = chan;
@@ -240,8 +219,7 @@ void Alg_midifile_reader::update(int chan, int key, Alg_parameter_ptr param)
 	track->append(update);
 }
 
-void Alg_midifile_reader::Mf_pressure(int chan, int key, int val)
-{
+void Alg_midifile_reader::Mf_pressure(int chan, int key, int val) {
 	Alg_parameter parameter;
 	parameter.set_attr(symbol_table.insert_string("pressurer"));
 	parameter.r = val / 127.0;
@@ -249,8 +227,7 @@ void Alg_midifile_reader::Mf_pressure(int chan, int key, int val)
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::Mf_controller(int chan, int control, int val)
-{
+void Alg_midifile_reader::Mf_controller(int chan, int control, int val) {
 	Alg_parameter parameter;
 	char name[32];
 	//#pragma warning(disable: 4996) // name is long enough
@@ -262,8 +239,7 @@ void Alg_midifile_reader::Mf_controller(int chan, int control, int val)
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::Mf_pitchbend(int chan, int c1, int c2)
-{
+void Alg_midifile_reader::Mf_pitchbend(int chan, int c1, int c2) {
 	Alg_parameter parameter;
 	parameter.set_attr(symbol_table.insert_string("bendr"));
 	parameter.r = ((c2 << 7) + c1) / 8192.0 - 1.0;
@@ -271,8 +247,7 @@ void Alg_midifile_reader::Mf_pitchbend(int chan, int c1, int c2)
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::Mf_program(int chan, int program)
-{
+void Alg_midifile_reader::Mf_program(int chan, int program) {
 	Alg_parameter parameter;
 	parameter.set_attr(symbol_table.insert_string("programi"));
 	parameter.i = program;
@@ -280,8 +255,7 @@ void Alg_midifile_reader::Mf_program(int chan, int program)
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::Mf_chanpressure(int chan, int val)
-{
+void Alg_midifile_reader::Mf_chanpressure(int chan, int val) {
 	Alg_parameter parameter;
 	parameter.set_attr(symbol_table.insert_string("pressurer"));
 	parameter.r = val / 127.0;
@@ -289,12 +263,10 @@ void Alg_midifile_reader::Mf_chanpressure(int chan, int val)
 	meta_channel = -1;
 }
 
-void Alg_midifile_reader::binary_msg(int len, unsigned char* msg, const char* attr_string)
-{
+void Alg_midifile_reader::binary_msg(int len, unsigned char* msg, const char* attr_string) {
 	Alg_parameter parameter;
 	char* hexstr = new char[len * 2 + 1];
-	for (int i = 0; i < len; i++)
-	{
+	for (int i = 0; i < len; i++) {
 		//#pragma warning(disable: 4996) // hexstr is long enough
 		sprintf(hexstr + 2 * i, "%02x", (0xFF & msg[i]));
 		//#pragma warning(default: 4996)
@@ -304,16 +276,14 @@ void Alg_midifile_reader::binary_msg(int len, unsigned char* msg, const char* at
 	update(meta_channel, -1, &parameter);
 }
 
-void Alg_midifile_reader::Mf_sysex(int len, unsigned char* msg)
-{
+void Alg_midifile_reader::Mf_sysex(int len, unsigned char* msg) {
 	// sysex messages become updates with attribute sysexs and a hex string
 	binary_msg(len, msg, "sysexs");
 }
 
 void Alg_midifile_reader::Mf_arbitrary(int len, unsigned char* msg) { Mf_error("arbitrary data ignored"); }
 
-void Alg_midifile_reader::Mf_metamisc(int type, int len, unsigned char* msg)
-{
+void Alg_midifile_reader::Mf_metamisc(int type, int len, unsigned char* msg) {
 	char text[128];
 	//#pragma warning(disable: 4996) // text is long enough
 	sprintf(text, "metamsic data, type 0x%x, ignored", type);
@@ -325,8 +295,7 @@ void Alg_midifile_reader::Mf_seqnum(int n) { Mf_error("seqnum data ignored"); }
 
 static const char* fpsstr[4] = {"24", "25", "29.97", "30"};
 
-void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs, int frames, int subframes)
-{
+void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs, int frames, int subframes) {
 	// string will look like "24fps:01h:27m:07s:19.00f"
 	// 30fps (drop frame) is notated as "29.97fps"
 	char text[32];
@@ -342,13 +311,11 @@ void Alg_midifile_reader::Mf_smpte(int hours, int mins, int secs, int frames, in
 	// Mf_error("SMPTE data ignored");
 }
 
-void Alg_midifile_reader::Mf_timesig(int i1, int i2, int i3, int i4)
-{
+void Alg_midifile_reader::Mf_timesig(int i1, int i2, int i3, int i4) {
 	seq->set_time_sig(double(get_currtime()) / divisions, i1, 1 << i2);
 }
 
-void Alg_midifile_reader::Mf_tempo(int tempo)
-{
+void Alg_midifile_reader::Mf_tempo(int tempo) {
 	double beat = get_currtime();
 	beat = beat / divisions; // convert to quarters
 	// 6000000 us/min / n us/beat => beat / min
@@ -356,8 +323,7 @@ void Alg_midifile_reader::Mf_tempo(int tempo)
 	seq->insert_tempo(bpm, beat);
 }
 
-void Alg_midifile_reader::Mf_keysig(int key, int mode)
-{
+void Alg_midifile_reader::Mf_keysig(int key, int mode) {
 	Alg_parameter key_parm;
 	key_parm.set_attr(symbol_table.insert_string("keysigi"));
 	// use 0 for C major, 1 for G, -1 for F, etc., that is,
@@ -371,23 +337,20 @@ void Alg_midifile_reader::Mf_keysig(int key, int mode)
 	update(meta_channel, -1, &mode_parm);
 }
 
-void Alg_midifile_reader::Mf_sqspecific(int len, unsigned char* msg)
-{
+void Alg_midifile_reader::Mf_sqspecific(int len, unsigned char* msg) {
 	// sequencer specific messages become updates with attribute sqspecifics
 	// and a hex string for the value
 	binary_msg(len, msg, "sqspecifics");
 }
 
-char* heapify2(int len, unsigned char* s)
-{
+char* heapify2(int len, unsigned char* s) {
 	char* h = new char[len + 1];
 	memcpy(h, s, len);
 	h[len] = 0;
 	return h;
 }
 
-void Alg_midifile_reader::Mf_text(int type, int len, unsigned char* msg)
-{
+void Alg_midifile_reader::Mf_text(int type, int len, unsigned char* msg) {
 	Alg_parameter text;
 	text.s = heapify2(len, msg);
 	const char* attr = "miscs";
@@ -409,8 +372,7 @@ void Alg_midifile_reader::Mf_text(int type, int len, unsigned char* msg)
 }
 
 // parse file into a seq.
-Alg_error alg_smf_read(istream& file, Alg_seq_ptr new_seq)
-{
+Alg_error alg_smf_read(istream& file, Alg_seq_ptr new_seq) {
 	assert(new_seq);
 	Alg_midifile_reader ar(file, new_seq);
 	bool err = ar.parse();

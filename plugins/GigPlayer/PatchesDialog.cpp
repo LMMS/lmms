@@ -27,25 +27,21 @@
 #include <QHeaderView>
 
 // Custom list-view item (as for numerical sort purposes...)
-class PatchItem : public QTreeWidgetItem
-{
+class PatchItem : public QTreeWidgetItem {
 public:
 	// Constructor.
 	PatchItem(QTreeWidget* pListView, QTreeWidgetItem* pItemAfter)
-		: QTreeWidgetItem(pListView, pItemAfter)
-	{
-	}
+		: QTreeWidgetItem(pListView, pItemAfter) {}
 
 	// Sort/compare overriden method.
-	bool operator<(const QTreeWidgetItem& other) const
-	{
+	bool operator<(const QTreeWidgetItem& other) const {
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
 		const QString& s1 = text(iColumn);
 		const QString& s2 = other.text(iColumn);
 
-		if (iColumn == 0 || iColumn == 2) { return s1.toInt() < s2.toInt(); }
-		else
-		{
+		if (iColumn == 0 || iColumn == 2) {
+			return s1.toInt() < s2.toInt();
+		} else {
 			return s1 < s2;
 		}
 	}
@@ -53,8 +49,7 @@ public:
 
 // Constructor.
 PatchesDialog::PatchesDialog(QWidget* pParent, Qt::WindowFlags wflags)
-	: QDialog(pParent, wflags)
-{
+	: QDialog(pParent, wflags) {
 	// Setup UI struct...
 	setupUi(this);
 
@@ -90,8 +85,7 @@ PatchesDialog::~PatchesDialog() {}
 
 // Dialog setup loader.
 void PatchesDialog::setup(GigInstance* pSynth, int iChan, const QString& chanName, LcdSpinBoxModel* bankModel,
-	LcdSpinBoxModel* progModel, QLabel* patchLabel)
-{
+	LcdSpinBoxModel* progModel, QLabel* patchLabel) {
 
 	// We'll going to changes the whole thing...
 	m_dirty = 0;
@@ -122,21 +116,17 @@ void PatchesDialog::setup(GigInstance* pSynth, int iChan, const QString& chanNam
 
 	gig::Instrument* pInstrument = m_pSynth->gig.GetFirstInstrument();
 
-	while (pInstrument)
-	{
+	while (pInstrument) {
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if (!findBankItem(iBank))
-		{
+		if (!findBankItem(iBank)) {
 			pBankItem = new PatchItem(m_bankListView, pBankItem);
 
-			if (pBankItem)
-			{
+			if (pBankItem) {
 				pBankItem->setText(0, QString::number(iBank));
 
-				if (iBankDefault == -1)
-				{
+				if (iBankDefault == -1) {
 					iBankDefault = iBank;
 					iProgDefault = iProg;
 				}
@@ -168,8 +158,7 @@ void PatchesDialog::setup(GigInstance* pSynth, int iChan, const QString& chanNam
 void PatchesDialog::stabilizeForm() { m_okButton->setEnabled(validateForm()); }
 
 // Validate form fields.
-bool PatchesDialog::validateForm()
-{
+bool PatchesDialog::validateForm() {
 	bool bValid = true;
 
 	bValid = bValid && (m_bankListView->currentItem() != NULL);
@@ -179,16 +168,13 @@ bool PatchesDialog::validateForm()
 }
 
 // Realize a bank-program selection preset.
-void PatchesDialog::setBankProg(int iBank, int iProg)
-{
+void PatchesDialog::setBankProg(int iBank, int iProg) {
 	if (m_pSynth == NULL) { return; }
 }
 
 // Validate form fields and accept it valid.
-void PatchesDialog::accept()
-{
-	if (validateForm())
-	{
+void PatchesDialog::accept() {
+	if (validateForm()) {
 		// Unload from current selected dialog items.
 		int iBank = (m_bankListView->currentItem())->text(0).toInt();
 		int iProg = (m_progListView->currentItem())->text(0).toInt();
@@ -196,8 +182,7 @@ void PatchesDialog::accept()
 		// And set it right away...
 		setBankProg(iBank, iProg);
 
-		if (m_dirty > 0)
-		{
+		if (m_dirty > 0) {
 			m_bankModel->setValue(iBank);
 			m_progModel->setValue(iProg);
 			m_patchLabel->setText(m_progListView->currentItem()->text(1));
@@ -209,8 +194,7 @@ void PatchesDialog::accept()
 }
 
 // Reject settings (Cancel button slot).
-void PatchesDialog::reject()
-{
+void PatchesDialog::reject() {
 	// Reset selection to initial selection, if applicable...
 	if (m_dirty > 0) { setBankProg(m_bankModel->value(), m_progModel->value()); }
 
@@ -219,36 +203,33 @@ void PatchesDialog::reject()
 }
 
 // Find the bank item of given bank number id.
-QTreeWidgetItem* PatchesDialog::findBankItem(int iBank)
-{
+QTreeWidgetItem* PatchesDialog::findBankItem(int iBank) {
 	QList<QTreeWidgetItem*> banks = m_bankListView->findItems(QString::number(iBank), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(banks);
 
-	if (iter.hasNext()) { return iter.next(); }
-	else
-	{
+	if (iter.hasNext()) {
+		return iter.next();
+	} else {
 		return NULL;
 	}
 }
 
 // Find the program item of given program number id.
-QTreeWidgetItem* PatchesDialog::findProgItem(int iProg)
-{
+QTreeWidgetItem* PatchesDialog::findProgItem(int iProg) {
 	QList<QTreeWidgetItem*> progs = m_progListView->findItems(QString::number(iProg), Qt::MatchExactly, 0);
 
 	QListIterator<QTreeWidgetItem*> iter(progs);
 
-	if (iter.hasNext()) { return iter.next(); }
-	else
-	{
+	if (iter.hasNext()) {
+		return iter.next();
+	} else {
 		return NULL;
 	}
 }
 
 // Bank change slot.
-void PatchesDialog::bankChanged()
-{
+void PatchesDialog::bankChanged() {
 	if (m_pSynth == NULL) { return; }
 
 	QTreeWidgetItem* pBankItem = m_bankListView->currentItem();
@@ -264,8 +245,7 @@ void PatchesDialog::bankChanged()
 
 	gig::Instrument* pInstrument = m_pSynth->gig.GetFirstInstrument();
 
-	while (pInstrument)
-	{
+	while (pInstrument) {
 		QString name = QString::fromStdString(pInstrument->pInfo->Name);
 
 		if (name == "") { name = "<no name>"; }
@@ -273,12 +253,10 @@ void PatchesDialog::bankChanged()
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
 
-		if (iBank == iBankSelected && !findProgItem(iProg))
-		{
+		if (iBank == iBankSelected && !findProgItem(iProg)) {
 			pProgItem = new PatchItem(m_progListView, pProgItem);
 
-			if (pProgItem)
-			{
+			if (pProgItem) {
 				pProgItem->setText(0, QString::number(iProg));
 				pProgItem->setText(1, name);
 			}
@@ -294,13 +272,11 @@ void PatchesDialog::bankChanged()
 }
 
 // Program change slot.
-void PatchesDialog::progChanged(QTreeWidgetItem* curr, QTreeWidgetItem* prev)
-{
+void PatchesDialog::progChanged(QTreeWidgetItem* curr, QTreeWidgetItem* prev) {
 	if (m_pSynth == NULL || curr == NULL) { return; }
 
 	// Which preview state...
-	if (validateForm())
-	{
+	if (validateForm()) {
 		// Set current selection.
 		int iBank = (m_bankListView->currentItem())->text(0).toInt();
 		int iProg = curr->text(0).toInt();

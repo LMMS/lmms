@@ -28,14 +28,12 @@
 #ifndef _DSP_WHITE_H_
 #define _DSP_WHITE_H_
 
-namespace DSP
-{
+namespace DSP {
 
 /* after initializing, call either get() or get_31() to get a sample, don't
  * mix them. (get_31 output goes out of range if called after get()).
  */
-class White
-{
+class White {
 public:
 	uint32 b;
 
@@ -46,8 +44,7 @@ public:
 	sample_t abs() { return fabs(get()); }
 
 	/* 32-bit version */
-	sample_t get()
-	{
+	sample_t get() {
 #define BIT(y) ((b << (31 - y)) & 0x80000000)
 
 		b = ((BIT(28) ^ BIT(27) ^ BIT(1) ^ BIT(0))) | (b >> 1);
@@ -58,8 +55,7 @@ public:
 
 	/* 31-bit version, at least 6 instructions less / sample. probably only
 	 * pays off on a processor not providing a decent binary shift. */
-	sample_t get_31()
-	{
+	sample_t get_31() {
 #define BIT(y) ((b << (30 - y)) & 0x40000000)
 
 		b = ((BIT(3) ^ BIT(0))) | (b >> 1);

@@ -40,8 +40,7 @@ class FileBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
 
-class FileBrowser : public SideBarWidget
-{
+class FileBrowser : public SideBarWidget {
 	Q_OBJECT
 public:
 	/**
@@ -87,8 +86,7 @@ private:
 	QString m_factoryDir;
 };
 
-class FileBrowserTreeWidget : public QTreeWidget
-{
+class FileBrowserTreeWidget : public QTreeWidget {
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget(QWidget* parent);
@@ -135,15 +133,13 @@ private slots:
 	void openContainingFolder(FileItem* item);
 };
 
-class Directory : public QTreeWidgetItem
-{
+class Directory : public QTreeWidgetItem {
 public:
 	Directory(const QString& filename, const QString& path, const QString& filter);
 
 	void update(void);
 
-	inline QString fullName(QString path = QString())
-	{
+	inline QString fullName(QString path = QString()) {
 		if (path.isEmpty()) { path = m_directories[0]; }
 		if (!path.isEmpty()) { path += QDir::separator(); }
 		return (QDir::cleanPath(path + text(0)) + QDir::separator());
@@ -173,11 +169,9 @@ private:
 	int m_dirCount;
 };
 
-class FileItem : public QTreeWidgetItem
-{
+class FileItem : public QTreeWidgetItem {
 public:
-	enum FileTypes
-	{
+	enum FileTypes {
 		ProjectFile,
 		PresetFile,
 		SampleFile,
@@ -189,14 +183,7 @@ public:
 		NumFileTypes
 	};
 
-	enum FileHandling
-	{
-		NotSupported,
-		LoadAsProject,
-		LoadAsPreset,
-		LoadByPlugin,
-		ImportAsProject
-	};
+	enum FileHandling { NotSupported, LoadAsProject, LoadAsPreset, LoadByPlugin, ImportAsProject };
 
 	FileItem(QTreeWidget* parent, const QString& name, const QString& path);
 	FileItem(const QString& name, const QString& path);

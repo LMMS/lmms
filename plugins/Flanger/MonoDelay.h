@@ -27,13 +27,11 @@
 
 #include "lmms_basics.h"
 
-class MonoDelay
-{
+class MonoDelay {
 public:
 	MonoDelay(int maxTime, int sampleRate);
 	~MonoDelay();
-	inline void setLength(float length)
-	{
+	inline void setLength(float length) {
 		if (length <= m_maxLength && length >= 0) { m_length = length; }
 	}
 

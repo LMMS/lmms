@@ -57,29 +57,25 @@
 #include "embed.h"
 #include "gui_templates.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor Q_DECL_EXPORT vestige_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "VeSTige",
-		QT_TRANSLATE_NOOP("PluginBrowser", "VST-host for using VST(i)-plugins within LMMS"),
-		"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), "dll",
-		NULL};
+Plugin::Descriptor Q_DECL_EXPORT vestige_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "VeSTige",
+	QT_TRANSLATE_NOOP("PluginBrowser", "VST-host for using VST(i)-plugins within LMMS"),
+	"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), "dll",
+	NULL};
 }
 
-class vstSubWin : public SubWindow
-{
+class vstSubWin : public SubWindow {
 public:
 	vstSubWin(QWidget* _parent)
-		: SubWindow(_parent)
-	{
+		: SubWindow(_parent) {
 		setAttribute(Qt::WA_DeleteOnClose, false);
 		setWindowFlags(Qt::WindowCloseButtonHint);
 	}
 
 	virtual ~vstSubWin() {}
 
-	virtual void closeEvent(QCloseEvent* e)
-	{
+	virtual void closeEvent(QCloseEvent* e) {
 		// ignore close-events - for some reason otherwise the VST GUI
 		// remains hidden when re-opening
 		hide();
@@ -87,23 +83,18 @@ public:
 	}
 };
 
-class VstInstrumentPlugin : public VstPlugin
-{
+class VstInstrumentPlugin : public VstPlugin {
 public:
 	using VstPlugin::VstPlugin;
 
-	void createUI(QWidget* parent) override
-	{
+	void createUI(QWidget* parent) override {
 		Q_UNUSED(parent);
 		if (!hasEditor()) { return; }
-		if (embedMethod() != "none")
-		{
+		if (embedMethod() != "none") {
 			m_pluginSubWindow.reset(new vstSubWin(gui->mainWindow()->workspace()));
 			VstPlugin::createUI(m_pluginSubWindow.get());
 			m_pluginSubWindow->setWidget(pluginWidget());
-		}
-		else
-		{
+		} else {
 			VstPlugin::createUI(nullptr);
 		}
 	}
@@ -127,8 +118,7 @@ vestigeInstrument::vestigeInstrument(InstrumentTrack* _instrument_track)
 	, m_subWindow(NULL)
 	, m_scrollArea(NULL)
 	, knobFModel(NULL)
-	, p_subWindow(NULL)
-{
+	, p_subWindow(NULL) {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle* iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::mixer()->addPlayHandle(iph);
@@ -137,16 +127,13 @@ vestigeInstrument::vestigeInstrument(InstrumentTrack* _instrument_track)
 		SLOT(handleConfigChange(QString, QString, QString)), Qt::QueuedConnection);
 }
 
-vestigeInstrument::~vestigeInstrument()
-{
-	if (p_subWindow != NULL)
-	{
+vestigeInstrument::~vestigeInstrument() {
+	if (p_subWindow != NULL) {
 		delete p_subWindow;
 		p_subWindow = NULL;
 	}
 
-	if (knobFModel != NULL)
-	{
+	if (knobFModel != NULL) {
 		delete[] knobFModel;
 		knobFModel = NULL;
 	}
@@ -156,24 +143,20 @@ vestigeInstrument::~vestigeInstrument()
 	closePlugin();
 }
 
-void vestigeInstrument::loadSettings(const QDomElement& _this)
-{
+void vestigeInstrument::loadSettings(const QDomElement& _this) {
 	QString plugin = _this.attribute("plugin");
 	if (plugin.isEmpty()) { return; }
 
 	loadFile(plugin);
 	m_pluginMutex.lock();
-	if (m_plugin != NULL)
-	{
+	if (m_plugin != NULL) {
 		m_plugin->loadSettings(_this);
 
-		if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode()) { m_plugin->hideUI(); }
-		else if (_this.attribute("guivisible").toInt())
-		{
+		if (instrumentTrack() != NULL && instrumentTrack()->isPreviewMode()) {
+			m_plugin->hideUI();
+		} else if (_this.attribute("guivisible").toInt()) {
 			m_plugin->showUI();
-		}
-		else
-		{
+		} else {
 			m_plugin->hideUI();
 		}
 
@@ -182,16 +165,14 @@ void vestigeInstrument::loadSettings(const QDomElement& _this)
 		char paramStr[35];
 		knobFModel = new FloatModel*[paramCount];
 		QStringList s_dumpValues;
-		for (int i = 0; i < paramCount; i++)
-		{
+		for (int i = 0; i < paramCount; i++) {
 			sprintf(paramStr, "param%d", i);
 			s_dumpValues = dump[paramStr].split(":");
 
 			knobFModel[i] = new FloatModel(0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i));
 			knobFModel[i]->loadSettings(_this, paramStr);
 
-			if (!(knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()))
-			{
+			if (!(knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection())) {
 				knobFModel[i]->setValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 				knobFModel[i]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
@@ -204,15 +185,13 @@ void vestigeInstrument::loadSettings(const QDomElement& _this)
 	m_pluginMutex.unlock();
 }
 
-void vestigeInstrument::setParameter(Model* action)
-{
+void vestigeInstrument::setParameter(Model* action) {
 	int knobUNID = action->displayName().toInt();
 
 	if (m_plugin != NULL) { m_plugin->setParam(knobUNID, knobFModel[knobUNID]->value()); }
 }
 
-void vestigeInstrument::handleConfigChange(QString cls, QString attr, QString value)
-{
+void vestigeInstrument::handleConfigChange(QString cls, QString attr, QString value) {
 	Q_UNUSED(cls);
 	Q_UNUSED(attr);
 	Q_UNUSED(value);
@@ -223,28 +202,22 @@ void vestigeInstrument::handleConfigChange(QString cls, QString attr, QString va
 	// }
 }
 
-void vestigeInstrument::reloadPlugin()
-{
+void vestigeInstrument::reloadPlugin() {
 	closePlugin();
 	loadFile(m_pluginDLL);
 }
 
-void vestigeInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void vestigeInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	_this.setAttribute("plugin", PathUtil::toShortestRelative(m_pluginDLL));
 	m_pluginMutex.lock();
-	if (m_plugin != NULL)
-	{
+	if (m_plugin != NULL) {
 		m_plugin->saveSettings(_doc, _this);
-		if (knobFModel != NULL)
-		{
+		if (knobFModel != NULL) {
 			const QMap<QString, QString>& dump = m_plugin->parameterDump();
 			paramCount = dump.size();
 			char paramStr[35];
-			for (int i = 0; i < paramCount; i++)
-			{
-				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection())
-				{
+			for (int i = 0; i < paramCount; i++) {
+				if (knobFModel[i]->isAutomated() || knobFModel[i]->controllerConnection()) {
 					sprintf(paramStr, "param%d", i);
 					knobFModel[i]->saveSettings(_doc, _this, paramStr);
 				}
@@ -279,8 +252,7 @@ void vestigeInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 
 QString vestigeInstrument::nodeName(void) const { return (vestige_plugin_descriptor.name); }
 
-void vestigeInstrument::loadFile(const QString& _file)
-{
+void vestigeInstrument::loadFile(const QString& _file) {
 	m_pluginMutex.lock();
 	const bool set_ch_name = (m_plugin != NULL && instrumentTrack()->name() == m_plugin->name())
 		|| instrumentTrack()->name() == InstrumentTrack::tr("Default preset")
@@ -296,16 +268,14 @@ void vestigeInstrument::loadFile(const QString& _file)
 	if (m_plugin != NULL) { closePlugin(); }
 	m_pluginDLL = PathUtil::toShortestRelative(_file);
 	TextFloat* tf = NULL;
-	if (gui)
-	{
+	if (gui) {
 		tf = TextFloat::displayMessage(tr("Loading plugin"), tr("Please wait while loading the VST plugin..."),
 			PLUGIN_NAME::getIconPixmap("logo", 24, 24), 0);
 	}
 
 	m_pluginMutex.lock();
 	m_plugin = new VstInstrumentPlugin(m_pluginDLL);
-	if (m_plugin->failed())
-	{
+	if (m_plugin->failed()) {
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
@@ -314,8 +284,7 @@ void vestigeInstrument::loadFile(const QString& _file)
 		return;
 	}
 
-	if (!(instrumentTrack() != NULL && instrumentTrack()->isPreviewMode()))
-	{
+	if (!(instrumentTrack() != NULL && instrumentTrack()->isPreviewMode())) {
 		m_plugin->createUI(nullptr);
 		m_plugin->showUI();
 	}
@@ -329,14 +298,12 @@ void vestigeInstrument::loadFile(const QString& _file)
 	delete tf;
 }
 
-void vestigeInstrument::play(sampleFrame* _buf)
-{
+void vestigeInstrument::play(sampleFrame* _buf) {
 	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) { return; }
 
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
-	if (m_plugin == NULL)
-	{
+	if (m_plugin == NULL) {
 		m_pluginMutex.unlock();
 		return;
 	}
@@ -348,8 +315,7 @@ void vestigeInstrument::play(sampleFrame* _buf)
 	m_pluginMutex.unlock();
 }
 
-bool vestigeInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset)
-{
+bool vestigeInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) {
 	m_pluginMutex.lock();
 	if (m_plugin != NULL) { m_plugin->processMidiEvent(event, offset); }
 	m_pluginMutex.unlock();
@@ -357,31 +323,25 @@ bool vestigeInstrument::handleMidiEvent(const MidiEvent& event, const TimePos& t
 	return true;
 }
 
-void vestigeInstrument::closePlugin(void)
-{
+void vestigeInstrument::closePlugin(void) {
 	// disconnect all signals
-	if (knobFModel != NULL)
-	{
-		for (int i = 0; i < paramCount; i++)
-		{
+	if (knobFModel != NULL) {
+		for (int i = 0; i < paramCount; i++) {
 			delete knobFModel[i];
 		}
 	}
 
-	if (knobFModel != NULL)
-	{
+	if (knobFModel != NULL) {
 		delete[] knobFModel;
 		knobFModel = NULL;
 	}
 
-	if (m_scrollArea != NULL)
-	{
+	if (m_scrollArea != NULL) {
 		//		delete m_scrollArea;
 		m_scrollArea = NULL;
 	}
 
-	if (m_subWindow != NULL)
-	{
+	if (m_subWindow != NULL) {
 		m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 		m_subWindow->close();
 
@@ -401,8 +361,7 @@ PluginView* vestigeInstrument::instantiateView(QWidget* _parent) { return new Ve
 
 VestigeInstrumentView::VestigeInstrumentView(Instrument* _instrument, QWidget* _parent)
 	: InstrumentViewFixedSize(_instrument, _parent)
-	, lastPosInMenu(0)
-{
+	, lastPosInMenu(0) {
 	if (s_artwork == NULL) { s_artwork = new QPixmap(PLUGIN_NAME::getIconPixmap("artwork")); }
 
 	m_openPluginButton = new PixmapButton(this, "");
@@ -493,33 +452,24 @@ VestigeInstrumentView::VestigeInstrumentView(Instrument* _instrument, QWidget* _
 	_parent2 = _parent;
 }
 
-void VestigeInstrumentView::managePlugin(void)
-{
-	if (m_vi->m_plugin != NULL && m_vi->m_subWindow == NULL)
-	{
+void VestigeInstrumentView::managePlugin(void) {
+	if (m_vi->m_plugin != NULL && m_vi->m_subWindow == NULL) {
 		m_vi->p_subWindow = new manageVestigeInstrumentView(_instrument2, _parent2, m_vi);
-	}
-	else if (m_vi->m_subWindow != NULL)
-	{
-		if (m_vi->m_subWindow->widget()->isVisible() == false)
-		{
+	} else if (m_vi->m_subWindow != NULL) {
+		if (m_vi->m_subWindow->widget()->isVisible() == false) {
 			m_vi->m_scrollArea->show();
 			m_vi->m_subWindow->show();
-		}
-		else
-		{
+		} else {
 			m_vi->m_scrollArea->hide();
 			m_vi->m_subWindow->hide();
 		}
 	}
 }
 
-void VestigeInstrumentView::updateMenu(void)
-{
+void VestigeInstrumentView::updateMenu(void) {
 
 	// get all presets -
-	if (m_vi->m_plugin != NULL)
-	{
+	if (m_vi->m_plugin != NULL) {
 		m_vi->m_plugin->loadProgramNames();
 		QWidget::update();
 
@@ -532,15 +482,15 @@ void VestigeInstrumentView::updateMenu(void)
 
 		QVector<QAction*> presetActions(list1.size());
 
-		for (int i = 0; i < list1.size(); i++)
-		{
+		for (int i = 0; i < list1.size(); i++) {
 			presetActions[i] = new QAction(this);
 			connect(presetActions[i], SIGNAL(triggered()), this, SLOT(selPreset()));
 
 			presetActions[i]->setText(QString("%1. %2").arg(QString::number(i + 1), list1.at(i)));
 			presetActions[i]->setData(i);
-			if (i == lastPosInMenu) { presetActions[i]->setIcon(embed::getIconPixmap("sample_file", 16, 16)); }
-			else
+			if (i == lastPosInMenu) {
+				presetActions[i]->setIcon(embed::getIconPixmap("sample_file", 16, 16));
+			} else
 				presetActions[i]->setIcon(embed::getIconPixmap("edit_copy", 16, 16));
 			to_menu->addAction(presetActions[i]);
 		}
@@ -551,8 +501,7 @@ VestigeInstrumentView::~VestigeInstrumentView() {}
 
 void VestigeInstrumentView::modelChanged() { m_vi = castModel<vestigeInstrument>(); }
 
-void VestigeInstrumentView::openPlugin()
-{
+void VestigeInstrumentView::openPlugin() {
 	FileDialog ofd(NULL, tr("Open VST plugin"));
 
 	// set filters
@@ -560,42 +509,34 @@ void VestigeInstrumentView::openPlugin()
 	types << tr("DLL-files (*.dll)") << tr("EXE-files (*.exe)");
 	ofd.setNameFilters(types);
 
-	if (m_vi->m_pluginDLL != "")
-	{
+	if (m_vi->m_pluginDLL != "") {
 		QString f = PathUtil::toAbsolute(m_vi->m_pluginDLL);
 		ofd.setDirectory(QFileInfo(f).absolutePath());
 		ofd.selectFile(QFileInfo(f).fileName());
-	}
-	else
-	{
+	} else {
 		ofd.setDirectory(ConfigManager::inst()->vstDir());
 	}
 
-	if (ofd.exec() == QDialog::Accepted)
-	{
+	if (ofd.exec() == QDialog::Accepted) {
 		if (ofd.selectedFiles().isEmpty()) { return; }
 		Engine::mixer()->requestChangeInModel();
 
-		if (m_vi->p_subWindow != NULL)
-		{
+		if (m_vi->p_subWindow != NULL) {
 			delete m_vi->p_subWindow;
 			m_vi->p_subWindow = NULL;
 		}
 
 		m_vi->loadFile(ofd.selectedFiles()[0]);
 		Engine::mixer()->doneChangeInModel();
-		if (m_vi->m_plugin && m_vi->m_plugin->pluginWidget())
-		{
+		if (m_vi->m_plugin && m_vi->m_plugin->pluginWidget()) {
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(PLUGIN_NAME::getIconPixmap("logo"));
 		}
 	}
 }
 
-void VestigeInstrumentView::openPreset()
-{
+void VestigeInstrumentView::openPreset() {
 
-	if (m_vi->m_plugin != NULL)
-	{
+	if (m_vi->m_plugin != NULL) {
 		m_vi->m_plugin->openPreset();
 		bool converted;
 		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
@@ -604,11 +545,9 @@ void VestigeInstrumentView::openPreset()
 	}
 }
 
-void VestigeInstrumentView::savePreset()
-{
+void VestigeInstrumentView::savePreset() {
 
-	if (m_vi->m_plugin != NULL)
-	{
+	if (m_vi->m_plugin != NULL) {
 		m_vi->m_plugin->savePreset();
 		/*    		bool converted;
 			QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
@@ -618,11 +557,9 @@ void VestigeInstrumentView::savePreset()
 	}
 }
 
-void VestigeInstrumentView::nextProgram()
-{
+void VestigeInstrumentView::nextProgram() {
 
-	if (m_vi->m_plugin != NULL)
-	{
+	if (m_vi->m_plugin != NULL) {
 		m_vi->m_plugin->rotateProgram(1);
 		bool converted;
 		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
@@ -631,11 +568,9 @@ void VestigeInstrumentView::nextProgram()
 	}
 }
 
-void VestigeInstrumentView::previousProgram()
-{
+void VestigeInstrumentView::previousProgram() {
 
-	if (m_vi->m_plugin != NULL)
-	{
+	if (m_vi->m_plugin != NULL) {
 		m_vi->m_plugin->rotateProgram(-1);
 		bool converted;
 		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
@@ -644,64 +579,52 @@ void VestigeInstrumentView::previousProgram()
 	}
 }
 
-void VestigeInstrumentView::selPreset(void)
-{
+void VestigeInstrumentView::selPreset(void) {
 
 	QAction* action = qobject_cast<QAction*>(sender());
 	if (action)
-		if (m_vi->m_plugin != NULL)
-		{
+		if (m_vi->m_plugin != NULL) {
 			lastPosInMenu = action->data().toInt();
 			m_vi->m_plugin->setProgram(action->data().toInt());
 			QWidget::update();
 		}
 }
 
-void VestigeInstrumentView::toggleGUI(void)
-{
+void VestigeInstrumentView::toggleGUI(void) {
 	if (m_vi == NULL || m_vi->m_plugin == NULL) { return; }
 	m_vi->m_plugin->toggleUI();
 }
 
-void VestigeInstrumentView::noteOffAll(void)
-{
+void VestigeInstrumentView::noteOffAll(void) {
 	m_vi->m_pluginMutex.lock();
-	if (m_vi->m_plugin != NULL)
-	{
-		for (int key = 0; key <= MidiMaxKey; ++key)
-		{
+	if (m_vi->m_plugin != NULL) {
+		for (int key = 0; key <= MidiMaxKey; ++key) {
 			m_vi->m_plugin->processMidiEvent(MidiEvent(MidiNoteOff, 0, key, 0), 0);
 		}
 	}
 	m_vi->m_pluginMutex.unlock();
 }
 
-void VestigeInstrumentView::dragEnterEvent(QDragEnterEvent* _dee)
-{
+void VestigeInstrumentView::dragEnterEvent(QDragEnterEvent* _dee) {
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
-	{
+	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair))) {
 		QString txt = _dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == "vstplugin") { _dee->acceptProposedAction(); }
-		else
-		{
+		if (txt.section(':', 0, 0) == "vstplugin") {
+			_dee->acceptProposedAction();
+		} else {
 			_dee->ignore();
 		}
-	}
-	else
-	{
+	} else {
 		_dee->ignore();
 	}
 }
 
-void VestigeInstrumentView::dropEvent(QDropEvent* _de)
-{
+void VestigeInstrumentView::dropEvent(QDropEvent* _de) {
 	QString type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue(_de);
-	if (type == "vstplugin")
-	{
+	if (type == "vstplugin") {
 		m_vi->loadFile(value);
 		_de->accept();
 		return;
@@ -709,8 +632,7 @@ void VestigeInstrumentView::dropEvent(QDropEvent* _de)
 	_de->ignore();
 }
 
-void VestigeInstrumentView::paintEvent(QPaintEvent*)
-{
+void VestigeInstrumentView::paintEvent(QPaintEvent*) {
 	QPainter p(this);
 
 	p.drawPixmap(0, 0, *s_artwork);
@@ -728,8 +650,7 @@ void VestigeInstrumentView::paintEvent(QPaintEvent*)
 	p.drawText(10, 211, tr("Preset"));
 
 	//	m_pluginMutex.lock();
-	if (m_vi->m_plugin != NULL)
-	{
+	if (m_vi->m_plugin != NULL) {
 		p.setPen(QColor(0, 0, 0));
 		f.setBold(false);
 		p.setFont(pointSize<8>(f));
@@ -738,8 +659,7 @@ void VestigeInstrumentView::paintEvent(QPaintEvent*)
 		p.drawText(10, 225, m_vi->m_plugin->currentProgramName());
 	}
 
-	if (m_vi->m_subWindow != NULL)
-	{
+	if (m_vi->m_subWindow != NULL) {
 		m_vi->m_subWindow->setWindowTitle(m_vi->instrumentTrack()->name() + tr(" - VST plugin control"));
 	}
 	//	m_pluginMutex.unlock();
@@ -747,8 +667,7 @@ void VestigeInstrumentView::paintEvent(QPaintEvent*)
 
 manageVestigeInstrumentView::manageVestigeInstrumentView(
 	Instrument* _instrument, QWidget* _parent, vestigeInstrument* m_vi2)
-	: InstrumentViewFixedSize(_instrument, _parent)
-{
+	: InstrumentViewFixedSize(_instrument, _parent) {
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea(this);
 	widget = new QWidget(this);
@@ -783,8 +702,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView(
 
 	l->addWidget(m_closeButton, 0, 2, 1, 7, Qt::AlignLeft);
 
-	for (int i = 0; i < 10; i++)
-	{
+	for (int i = 0; i < 10; i++) {
 		l->addItem(new QSpacerItem(68, 45, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, i);
 	}
 
@@ -794,8 +712,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView(
 	vstKnobs = new CustomTextKnob*[m_vi->paramCount];
 
 	bool hasKnobModel = true;
-	if (m_vi->knobFModel == NULL)
-	{
+	if (m_vi->knobFModel == NULL) {
 		m_vi->knobFModel = new FloatModel*[m_vi->paramCount];
 		hasKnobModel = false;
 	}
@@ -803,8 +720,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView(
 	char paramStr[35];
 	QStringList s_dumpValues;
 
-	for (int i = 0; i < m_vi->paramCount; i++)
-	{
+	for (int i = 0; i < m_vi->paramCount; i++) {
 		sprintf(paramStr, "param%d", i);
 		s_dumpValues = dump[paramStr].split(":");
 
@@ -812,8 +728,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView(
 		vstKnobs[i]->setDescription(s_dumpValues.at(1) + ":");
 		vstKnobs[i]->setLabel(s_dumpValues.at(1).left(15));
 
-		if (!hasKnobModel)
-		{
+		if (!hasKnobModel) {
 			sprintf(paramStr, "%d", i);
 			m_vi->knobFModel[i] = new FloatModel(
 				LocaleHelper::toFloat(s_dumpValues.at(2)), 0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), paramStr);
@@ -827,10 +742,8 @@ manageVestigeInstrumentView::manageVestigeInstrumentView(
 	syncParameterText();
 
 	int i = 0;
-	for (int lrow = 1; lrow < (int(m_vi->paramCount / 10) + 1) + 1; lrow++)
-	{
-		for (int lcolumn = 0; lcolumn < 10; lcolumn++)
-		{
+	for (int lrow = 1; lrow < (int(m_vi->paramCount / 10) + 1) + 1; lrow++) {
+		for (int lcolumn = 0; lcolumn < 10; lcolumn++) {
 			if (i < m_vi->paramCount) { l->addWidget(vstKnobs[i], lrow, lcolumn, Qt::AlignCenter); }
 			i++;
 		}
@@ -853,19 +766,16 @@ manageVestigeInstrumentView::manageVestigeInstrumentView(
 
 void manageVestigeInstrumentView::closeWindow() { m_vi->m_subWindow->hide(); }
 
-void manageVestigeInstrumentView::syncPlugin(void)
-{
+void manageVestigeInstrumentView::syncPlugin(void) {
 	char paramStr[35];
 	QStringList s_dumpValues;
 	const QMap<QString, QString>& dump = m_vi->m_plugin->parameterDump();
 	float f_value;
 
-	for (int i = 0; i < m_vi->paramCount; i++)
-	{
+	for (int i = 0; i < m_vi->paramCount; i++) {
 		// only not automated knobs are synced from VST
 		// those auto-setted values are not jurnaled, tracked for undo / redo
-		if (!(m_vi->knobFModel[i]->isAutomated() || m_vi->knobFModel[i]->controllerConnection()))
-		{
+		if (!(m_vi->knobFModel[i]->isAutomated() || m_vi->knobFModel[i]->controllerConnection())) {
 			sprintf(paramStr, "param%d", i);
 			s_dumpValues = dump[paramStr].split(":");
 			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
@@ -876,22 +786,16 @@ void manageVestigeInstrumentView::syncPlugin(void)
 	syncParameterText();
 }
 
-void manageVestigeInstrumentView::displayAutomatedOnly(void)
-{
+void manageVestigeInstrumentView::displayAutomatedOnly(void) {
 	bool isAuto = QString::compare(m_displayAutomatedOnly->text(), tr("Automated")) == 0;
 
-	for (int i = 0; i < m_vi->paramCount; i++)
-	{
+	for (int i = 0; i < m_vi->paramCount; i++) {
 
-		if (!(m_vi->knobFModel[i]->isAutomated() || m_vi->knobFModel[i]->controllerConnection()))
-		{
-			if (vstKnobs[i]->isVisible() == true && isAuto)
-			{
+		if (!(m_vi->knobFModel[i]->isAutomated() || m_vi->knobFModel[i]->controllerConnection())) {
+			if (vstKnobs[i]->isVisible() == true && isAuto) {
 				vstKnobs[i]->hide();
 				m_displayAutomatedOnly->setText("All");
-			}
-			else
-			{
+			} else {
 				vstKnobs[i]->show();
 				m_displayAutomatedOnly->setText("Automated");
 			}
@@ -899,37 +803,30 @@ void manageVestigeInstrumentView::displayAutomatedOnly(void)
 	}
 }
 
-manageVestigeInstrumentView::~manageVestigeInstrumentView()
-{
-	if (m_vi->knobFModel != NULL)
-	{
-		for (int i = 0; i < m_vi->paramCount; i++)
-		{
+manageVestigeInstrumentView::~manageVestigeInstrumentView() {
+	if (m_vi->knobFModel != NULL) {
+		for (int i = 0; i < m_vi->paramCount; i++) {
 			delete m_vi->knobFModel[i];
 			delete vstKnobs[i];
 		}
 	}
 
-	if (vstKnobs != NULL)
-	{
+	if (vstKnobs != NULL) {
 		delete[] vstKnobs;
 		vstKnobs = NULL;
 	}
 
-	if (m_vi->knobFModel != NULL)
-	{
+	if (m_vi->knobFModel != NULL) {
 		delete[] m_vi->knobFModel;
 		m_vi->knobFModel = NULL;
 	}
 
-	if (m_vi->m_scrollArea != NULL)
-	{
+	if (m_vi->m_scrollArea != NULL) {
 		delete m_vi->m_scrollArea;
 		m_vi->m_scrollArea = NULL;
 	}
 
-	if (m_vi->m_subWindow != NULL)
-	{
+	if (m_vi->m_subWindow != NULL) {
 		m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
 		m_vi->m_subWindow->close();
 
@@ -940,19 +837,16 @@ manageVestigeInstrumentView::~manageVestigeInstrumentView()
 	m_vi->p_subWindow = NULL;
 }
 
-void manageVestigeInstrumentView::setParameter(Model* action)
-{
+void manageVestigeInstrumentView::setParameter(Model* action) {
 	int knobUNID = action->displayName().toInt();
 
-	if (m_vi->m_plugin != NULL)
-	{
+	if (m_vi->m_plugin != NULL) {
 		m_vi->m_plugin->setParam(knobUNID, m_vi->knobFModel[knobUNID]->value());
 		syncParameterText();
 	}
 }
 
-void manageVestigeInstrumentView::syncParameterText()
-{
+void manageVestigeInstrumentView::syncParameterText() {
 	m_vi->m_plugin->loadParameterLabels();
 	m_vi->m_plugin->loadParameterDisplays();
 
@@ -962,52 +856,43 @@ void manageVestigeInstrumentView::syncParameterText()
 	QStringList paramLabelList;
 	QStringList paramDisplayList;
 
-	for (int i = 0; i < paramLabelStr.size();)
-	{
+	for (int i = 0; i < paramLabelStr.size();) {
 		const int length = paramLabelStr[i].digitValue();
 		paramLabelList.append(paramLabelStr.mid(i + 1, length));
 		i += length + 1;
 	}
 
-	for (int i = 0; i < paramDisplayStr.size();)
-	{
+	for (int i = 0; i < paramDisplayStr.size();) {
 		const int length = paramDisplayStr[i].digitValue();
 		paramDisplayList.append(paramDisplayStr.mid(i + 1, length));
 		i += length + 1;
 	}
 
-	for (int i = 0; i < paramLabelList.size(); ++i)
-	{
+	for (int i = 0; i < paramLabelList.size(); ++i) {
 		vstKnobs[i]->setValueText(paramDisplayList[i] + ' ' + paramLabelList[i]);
 	}
 }
 
-void manageVestigeInstrumentView::dragEnterEvent(QDragEnterEvent* _dee)
-{
+void manageVestigeInstrumentView::dragEnterEvent(QDragEnterEvent* _dee) {
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair)))
-	{
+	if (_dee->mimeData()->hasFormat(mimeType(MimeType::StringPair))) {
 		QString txt = _dee->mimeData()->data(mimeType(MimeType::StringPair));
-		if (txt.section(':', 0, 0) == "vstplugin") { _dee->acceptProposedAction(); }
-		else
-		{
+		if (txt.section(':', 0, 0) == "vstplugin") {
+			_dee->acceptProposedAction();
+		} else {
 			_dee->ignore();
 		}
-	}
-	else
-	{
+	} else {
 		_dee->ignore();
 	}
 }
 
-void manageVestigeInstrumentView::dropEvent(QDropEvent* _de)
-{
+void manageVestigeInstrumentView::dropEvent(QDropEvent* _de) {
 	QString type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue(_de);
-	if (type == "vstplugin")
-	{
+	if (type == "vstplugin") {
 		m_vi->loadFile(value);
 		_de->accept();
 		return;
@@ -1015,17 +900,14 @@ void manageVestigeInstrumentView::dropEvent(QDropEvent* _de)
 	_de->ignore();
 }
 
-void manageVestigeInstrumentView::paintEvent(QPaintEvent*)
-{
+void manageVestigeInstrumentView::paintEvent(QPaintEvent*) {
 	m_vi->m_subWindow->setWindowTitle(m_vi->instrumentTrack()->name() + tr(" - VST plugin control"));
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	Q_DECL_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-	{
-		return new vestigeInstrument(static_cast<InstrumentTrack*>(m));
-	}
+// necessary for getting instance out of shared lib
+Q_DECL_EXPORT Plugin* lmms_plugin_main(Model* m, void*) {
+	return new vestigeInstrument(static_cast<InstrumentTrack*>(m));
+}
 }

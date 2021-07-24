@@ -37,8 +37,7 @@ TempoSyncKnobModel::TempoSyncKnobModel(const float _val, const float _min, const
 	, m_tempoSyncMode(SyncNone)
 	, m_tempoLastSyncMode(SyncNone)
 	, m_scale(_scale)
-	, m_custom(_parent)
-{
+	, m_custom(_parent) {
 	connect(Engine::getSong(), SIGNAL(tempoChanged(bpm_t)), this, SLOT(calculateTempoSyncTime(bpm_t)),
 		Qt::DirectConnection);
 }
@@ -47,20 +46,16 @@ TempoSyncKnobModel::~TempoSyncKnobModel() {}
 
 void TempoSyncKnobModel::setTempoSync(QAction* _item) { setTempoSync(_item->data().toInt()); }
 
-void TempoSyncKnobModel::setTempoSync(int _note_type)
-{
+void TempoSyncKnobModel::setTempoSync(int _note_type) {
 	setSyncMode((TempoSyncMode)_note_type);
 	Engine::getSong()->setModified();
 }
 
-void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t _bpm)
-{
+void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t _bpm) {
 	float conversionFactor = 1.0;
 
-	if (m_tempoSyncMode)
-	{
-		switch (m_tempoSyncMode)
-		{
+	if (m_tempoSyncMode) {
+		switch (m_tempoSyncMode) {
 		case SyncCustom:
 			conversionFactor
 				= static_cast<float>(m_custom.getDenominator()) / static_cast<float>(m_custom.getNumerator());
@@ -80,42 +75,35 @@ void TempoSyncKnobModel::calculateTempoSyncTime(bpm_t _bpm)
 		setJournalling(journalling);
 	}
 
-	if (m_tempoSyncMode != m_tempoLastSyncMode)
-	{
+	if (m_tempoSyncMode != m_tempoLastSyncMode) {
 		emit syncModeChanged(m_tempoSyncMode);
 		m_tempoLastSyncMode = m_tempoSyncMode;
 	}
 }
 
-void TempoSyncKnobModel::saveSettings(QDomDocument& _doc, QDomElement& _this, const QString& _name)
-{
+void TempoSyncKnobModel::saveSettings(QDomDocument& _doc, QDomElement& _this, const QString& _name) {
 	_this.setAttribute(_name + "_syncmode", (int)syncMode());
 	m_custom.saveSettings(_doc, _this, _name);
 	FloatModel::saveSettings(_doc, _this, _name);
 }
 
-void TempoSyncKnobModel::loadSettings(const QDomElement& _this, const QString& _name)
-{
+void TempoSyncKnobModel::loadSettings(const QDomElement& _this, const QString& _name) {
 	FloatModel::loadSettings(_this, _name);
 	m_custom.loadSettings(_this, _name);
 	setSyncMode((TempoSyncMode)_this.attribute(_name + "_syncmode").toInt());
 }
 
-void TempoSyncKnobModel::setSyncMode(TempoSyncMode _new_mode)
-{
-	if (m_tempoSyncMode != _new_mode)
-	{
+void TempoSyncKnobModel::setSyncMode(TempoSyncMode _new_mode) {
+	if (m_tempoSyncMode != _new_mode) {
 		m_tempoSyncMode = _new_mode;
-		if (_new_mode == SyncCustom)
-		{
+		if (_new_mode == SyncCustom) {
 			connect(&m_custom, SIGNAL(dataChanged()), this, SLOT(updateCustom()), Qt::DirectConnection);
 		}
 	}
 	calculateTempoSyncTime(Engine::getSong()->getTempo());
 }
 
-void TempoSyncKnobModel::setScale(float _new_scale)
-{
+void TempoSyncKnobModel::setScale(float _new_scale) {
 	m_scale = _new_scale;
 	calculateTempoSyncTime(Engine::getSong()->getTempo());
 	emit scaleChanged(_new_scale);

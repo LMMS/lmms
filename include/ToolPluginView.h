@@ -30,8 +30,7 @@
 
 class ToolPlugin;
 
-class LMMS_EXPORT ToolPluginView : public PluginView
-{
+class LMMS_EXPORT ToolPluginView : public PluginView {
 public:
 	ToolPluginView(ToolPlugin* _toolPlugin);
 };

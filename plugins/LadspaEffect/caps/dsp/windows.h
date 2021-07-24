@@ -28,8 +28,7 @@
 #ifndef _DSP_WINDOWS_H_
 #define _DSP_WINDOWS_H_
 
-namespace DSP
-{
+namespace DSP {
 
 /* prototypes for window value application ... */
 typedef void (*window_sample_func_t)(sample_t&, sample_t);
@@ -39,22 +38,18 @@ inline void store_sample(sample_t& d, sample_t s) { d = s; }
 
 inline void apply_window(sample_t& d, sample_t s) { d *= s; }
 
-template <window_sample_func_t F> void hanning(sample_t* s, int n)
-{
+template <window_sample_func_t F> void hanning(sample_t* s, int n) {
 	/* could speed up by using DSP::Sine but we rarely use this window */
-	for (int i = 0; i < n; ++i)
-	{
+	for (int i = 0; i < n; ++i) {
 		register double f = (double)i / n - 1;
 		F(s[i], .5 - .5 * cos(2 * M_PI * f));
 	}
 }
 
-template <window_sample_func_t F> void blackman(sample_t* s, int n)
-{
+template <window_sample_func_t F> void blackman(sample_t* s, int n) {
 	register float w = n;
 
-	for (int i = 0; i < n; ++i)
-	{
+	for (int i = 0; i < n; ++i) {
 		register float f = (float)i;
 
 		register double b = .42f - .5f * cos(2.f * f * M_PI / w) + .08 * cos(4.f * f * M_PI / w);
@@ -63,14 +58,12 @@ template <window_sample_func_t F> void blackman(sample_t* s, int n)
 	}
 }
 
-template <window_sample_func_t F> void blackman_harris(sample_t* s, int n)
-{
+template <window_sample_func_t F> void blackman_harris(sample_t* s, int n) {
 	register double w1 = 2.f * M_PI / (n - 1);
 	register double w2 = 2.f * w1;
 	register double w3 = 3.f * w1;
 
-	for (int i = 0; i < n; ++i)
-	{
+	for (int i = 0; i < n; ++i) {
 		register double f = (double)i;
 
 		register double bh = .35875f - .48829f * cos(w1 * f) + .14128f * cos(w2 * f) - .01168f * cos(w3 * f);
@@ -82,22 +75,18 @@ template <window_sample_func_t F> void blackman_harris(sample_t* s, int n)
 }
 
 /* helper for the kaiser window, courtesy of R. Dobson, courtesy of csound */
-inline double besseli(double x)
-{
+inline double besseli(double x) {
 	double ax, ans;
 	double y;
 
-	if ((ax = fabs(x)) < 3.75)
-	{
+	if ((ax = fabs(x)) < 3.75) {
 		y = x / 3.75;
 		y *= y;
 		ans = (1.0
 			+ y
 				* (3.5156229
 					+ y * (3.0899424 + y * (1.2067492 + y * (0.2659732 + y * (0.360768e-1 + y * 0.45813e-2))))));
-	}
-	else
-	{
+	} else {
 		y = 3.75 / ax;
 		ans = ((exp(ax) / sqrt(ax))
 			* (0.39894228
@@ -119,13 +108,11 @@ inline double besseli(double x)
 	return ans;
 }
 
-template <window_sample_func_t F> void kaiser(sample_t* s, int n, double beta)
-{
+template <window_sample_func_t F> void kaiser(sample_t* s, int n, double beta) {
 	double bb = besseli(beta);
 	int si = 0;
 
-	for (double i = -n / 2 + .1; si < n; ++si, ++i)
-	{
+	for (double i = -n / 2 + .1; si < n; ++si, ++i) {
 		double k = besseli((beta * sqrt(1 - pow((2 * i / (n - 1)), 2)))) / bb;
 
 		/* can you spell hack */

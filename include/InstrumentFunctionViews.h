@@ -38,8 +38,7 @@ class TempoSyncKnob;
 class InstrumentFunctionArpeggio;
 class InstrumentFunctionNoteStacking;
 
-class InstrumentFunctionNoteStackingView : public QWidget, public ModelView
-{
+class InstrumentFunctionNoteStackingView : public QWidget, public ModelView {
 	Q_OBJECT
 public:
 	InstrumentFunctionNoteStackingView(InstrumentFunctionNoteStacking* cc, QWidget* parent = NULL);
@@ -55,8 +54,7 @@ private:
 	Knob* m_chordRangeKnob;
 };
 
-class InstrumentFunctionArpeggioView : public QWidget, public ModelView
-{
+class InstrumentFunctionArpeggioView : public QWidget, public ModelView {
 	Q_OBJECT
 public:
 	InstrumentFunctionArpeggioView(InstrumentFunctionArpeggio* arp, QWidget* parent = NULL);

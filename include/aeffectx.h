@@ -143,8 +143,7 @@ const int kVstSmpte249fps = 11;
 const int kVstSmpte599fps = 12;
 const int kVstSmpte60fps = 13;
 
-class VstMidiEvent
-{
+class VstMidiEvent {
 public:
 	// 00
 	int32_t type;
@@ -170,13 +169,11 @@ public:
 	char reserved2;
 };
 
-class VstEvent
-{
+class VstEvent {
 	char dump[sizeof(VstMidiEvent)];
 };
 
-class VstEvents
-{
+class VstEvents {
 public:
 	// 00
 	int32_t numEvents;
@@ -186,8 +183,7 @@ public:
 	VstEvent* events[1];
 };
 
-class AEffect
-{
+class AEffect {
 public:
 	// Never use virtual functions!!!
 	// 00-03
@@ -229,8 +225,7 @@ public:
 	void(VST_CALL_CONV* processReplacing)(AEffect*, float**, float**, int);
 };
 
-class VstTimeInfo
-{
+class VstTimeInfo {
 public:
 	// 00
 	double samplePos;

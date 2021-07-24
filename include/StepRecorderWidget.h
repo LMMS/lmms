@@ -29,8 +29,7 @@
 #include "Note.h"
 #include "lmms_basics.h"
 
-class StepRecorderWidget : public QWidget
-{
+class StepRecorderWidget : public QWidget {
 	Q_OBJECT
 
 public:

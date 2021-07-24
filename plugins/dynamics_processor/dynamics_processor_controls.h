@@ -33,17 +33,10 @@
 
 class dynProcEffect;
 
-class dynProcControls : public EffectControls
-{
+class dynProcControls : public EffectControls {
 	Q_OBJECT
 public:
-	enum StereoModes
-	{
-		SM_Maximum,
-		SM_Average,
-		SM_Unlinked,
-		NumStereoModes
-	};
+	enum StereoModes { SM_Maximum, SM_Average, SM_Unlinked, NumStereoModes };
 	dynProcControls(dynProcEffect* _eff);
 	virtual ~dynProcControls() {}
 

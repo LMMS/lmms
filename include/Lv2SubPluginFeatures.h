@@ -36,8 +36,7 @@
 #include "Plugin.h"
 #include "lmms_export.h"
 
-class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
-{
+class LMMS_EXPORT Lv2SubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures {
 private:
 	static const LilvPlugin* getPlugin(const Key& k);
 	static QString pluginName(const LilvPlugin* plug);

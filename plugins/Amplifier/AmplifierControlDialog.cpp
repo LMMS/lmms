@@ -31,8 +31,7 @@
 #include "embed.h"
 
 AmplifierControlDialog::AmplifierControlDialog(AmplifierControls* controls)
-	: EffectControlDialog(controls)
-{
+	: EffectControlDialog(controls) {
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));

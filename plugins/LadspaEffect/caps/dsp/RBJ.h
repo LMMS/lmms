@@ -30,21 +30,17 @@
 
 #include "BiQuad.h"
 
-namespace DSP
-{
-namespace RBJ
-{
+namespace DSP {
+namespace RBJ {
 
 /* base class, prepares common parameters */
-class RBJ
-{
+class RBJ {
 public:
 	double Q, alpha, sin, cos;
 	double a[3], b[3];
 
 public:
-	RBJ(double f, double _Q)
-	{
+	RBJ(double f, double _Q) {
 		Q = _Q;
 
 		double w = 2 * M_PI * f;
@@ -57,8 +53,7 @@ public:
 
 	/* templated so we can set double and float coefficients from the same
 	 * piece of code */
-	template <class T> void make_direct_I(T* ca, T* cb)
-	{
+	template <class T> void make_direct_I(T* ca, T* cb) {
 		double a0i = 1 / a[0];
 
 		ca[0] = b[0] * a0i;
@@ -77,24 +72,20 @@ public:
 /* now the individual prototypes.
  * set-up is not optimal, i.e. does a lot of operations twice for readability.
  */
-class LP : public RBJ
-{
+class LP : public RBJ {
 public:
 	LP(double f, double Q, BiQuad& bq)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(bq.a, bq.b);
 	}
 
 	template <class T>
 	LP(double f, double Q, T* ca, T* cb)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(ca, cb);
 	}
 
-	template <class T> void ab(T* ca, T* cb)
-	{
+	template <class T> void ab(T* ca, T* cb) {
 		b[0] = (1 - cos) * .5;
 		b[1] = (1 - cos);
 		b[2] = (1 - cos) * .5;
@@ -107,24 +98,20 @@ public:
 	}
 };
 
-class BP : public RBJ
-{
+class BP : public RBJ {
 public:
 	BP(double f, double Q, BiQuad& bq)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(bq.a, bq.b);
 	}
 
 	template <class T>
 	BP(double f, double Q, T* ca, T* cb)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(ca, cb);
 	}
 
-	template <class T> void ab(T* ca, T* cb)
-	{
+	template <class T> void ab(T* ca, T* cb) {
 		b[0] = Q * alpha;
 		b[1] = 0;
 		b[2] = -Q * alpha;
@@ -137,24 +124,20 @@ public:
 	}
 };
 
-class HP : public RBJ
-{
+class HP : public RBJ {
 public:
 	HP(double f, double Q, BiQuad& bq)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(bq.a, bq.b);
 	}
 
 	template <class T>
 	HP(double f, double Q, T* ca, T* cb)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(ca, cb);
 	}
 
-	template <class T> void ab(T* ca, T* cb)
-	{
+	template <class T> void ab(T* ca, T* cb) {
 		b[0] = (1 + cos) * .5;
 		b[1] = -(1 + cos);
 		b[2] = (1 + cos) * .5;
@@ -167,24 +150,20 @@ public:
 	}
 };
 
-class Notch : public RBJ
-{
+class Notch : public RBJ {
 public:
 	Notch(double f, double Q, BiQuad& bq)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(bq.a, bq.b);
 	}
 
 	template <class T>
 	Notch(double f, double Q, T* ca, T* cb)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		ab(ca, cb);
 	}
 
-	template <class T> void ab(T* ca, T* cb)
-	{
+	template <class T> void ab(T* ca, T* cb) {
 		b[0] = 1;
 		b[1] = -2 * cos;
 		b[2] = 1;
@@ -199,39 +178,33 @@ public:
 
 /* shelving and peaking dept. ////////////////////////////////////////////// */
 
-class PeakShelve : public RBJ
-{
+class PeakShelve : public RBJ {
 public:
 	double A, beta;
 
 public:
 	PeakShelve(double f, double Q, double dB)
-		: RBJ(f, Q)
-	{
+		: RBJ(f, Q) {
 		A = pow(10, dB * .025);
 		double S = Q; /* slope */
 		beta = sqrt((A * A + 1) / S - (A - 1) * (A - 1));
 	}
 };
 
-class LoShelve : public PeakShelve
-{
+class LoShelve : public PeakShelve {
 public:
 	LoShelve(double f, double Q, double dB, BiQuad& bq)
-		: PeakShelve(f, Q, dB)
-	{
+		: PeakShelve(f, Q, dB) {
 		ab(bq.a, bq.b);
 	}
 
 	template <class T>
 	LoShelve(double f, double Q, double dB, T* ca, T* cb)
-		: PeakShelve(f, Q, dB)
-	{
+		: PeakShelve(f, Q, dB) {
 		ab(ca, cb);
 	}
 
-	template <class T> void ab(T* ca, T* cb)
-	{
+	template <class T> void ab(T* ca, T* cb) {
 		double Ap1 = A + 1, Am1 = A - 1;
 		double beta_sin = beta * sin;
 
@@ -247,24 +220,20 @@ public:
 	}
 };
 
-class PeakingEQ : public PeakShelve
-{
+class PeakingEQ : public PeakShelve {
 public:
 	PeakingEQ(double f, double Q, double dB, BiQuad& bq)
-		: PeakShelve(f, Q, dB)
-	{
+		: PeakShelve(f, Q, dB) {
 		ab(bq.a, bq.b);
 	}
 
 	template <class T>
 	PeakingEQ(double f, double Q, double dB, T* ca, T* cb)
-		: PeakShelve(f, Q, dB)
-	{
+		: PeakShelve(f, Q, dB) {
 		ab(ca, cb);
 	}
 
-	template <class T> void ab(T* ca, T* cb)
-	{
+	template <class T> void ab(T* ca, T* cb) {
 		b[0] = 1 + alpha * A;
 		b[1] = -2 * cos;
 		b[2] = 1 - alpha * A;
@@ -277,24 +246,20 @@ public:
 	}
 };
 
-class HiShelve : public PeakShelve
-{
+class HiShelve : public PeakShelve {
 public:
 	HiShelve(double f, double Q, double dB, BiQuad& bq)
-		: PeakShelve(f, Q, dB)
-	{
+		: PeakShelve(f, Q, dB) {
 		ab(bq.a, bq.b);
 	}
 
 	template <class T>
 	HiShelve(double f, double Q, double dB, T* ca, T* cb)
-		: PeakShelve(f, Q, dB)
-	{
+		: PeakShelve(f, Q, dB) {
 		ab(ca, cb);
 	}
 
-	template <class T> void ab(T* ca, T* cb)
-	{
+	template <class T> void ab(T* ca, T* cb) {
 		double Ap1 = A + 1, Am1 = A - 1;
 		double beta_sin = beta * sin;
 

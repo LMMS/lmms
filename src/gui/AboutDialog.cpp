@@ -30,8 +30,7 @@
 
 AboutDialog::AboutDialog(QWidget* parent)
 	: QDialog(parent)
-	, Ui::AboutDialog()
-{
+	, Ui::AboutDialog() {
 	setupUi(this);
 
 	iconLabel->setPixmap(embed::getIconPixmap("icon", 64, 64));

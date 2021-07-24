@@ -32,8 +32,7 @@
 
 class QPixmap;
 
-class GroupBox : public QWidget, public BoolModelView
-{
+class GroupBox : public QWidget, public BoolModelView {
 	Q_OBJECT
 public:
 	GroupBox(const QString& _caption, QWidget* _parent = NULL);

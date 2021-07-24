@@ -30,14 +30,11 @@
 #include "ModelView.h"
 #include "Plugin.h"
 
-class LMMS_EXPORT PluginView : public QWidget, public ModelView
-{
+class LMMS_EXPORT PluginView : public QWidget, public ModelView {
 public:
 	PluginView(Plugin* _plugin, QWidget* _parent)
 		: QWidget(_parent)
-		, ModelView(_plugin, this)
-	{
-	}
+		, ModelView(_plugin, this) {}
 };
 
 #endif

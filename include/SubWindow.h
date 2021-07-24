@@ -47,8 +47,7 @@ class QWidget;
  *  for cusomizing the title bar appearance, lmms implements its own subwindow
  *  class.
  */
-class LMMS_EXPORT SubWindow : public QMdiSubWindow
-{
+class LMMS_EXPORT SubWindow : public QMdiSubWindow {
 	Q_OBJECT
 	Q_PROPERTY(QBrush activeColor READ activeColor WRITE setActiveColor)
 	Q_PROPERTY(QColor textShadowColor READ textShadowColor WRITE setTextShadowColor)

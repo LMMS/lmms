@@ -32,8 +32,7 @@
 class QListWidgetItem;
 class QScrollArea;
 
-class ladspaDescription : public QWidget
-{
+class ladspaDescription : public QWidget {
 	Q_OBJECT
 public:
 	ladspaDescription(QWidget* _parent, ladspaPluginType _type);

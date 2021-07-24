@@ -28,19 +28,16 @@
 #ifndef _DSP_LORENZ_H_
 #define _DSP_LORENZ_H_
 
-namespace DSP
-{
+namespace DSP {
 
-class Lorenz
-{
+class Lorenz {
 public:
 	double x[2], y[2], z[2];
 	double h, a, b, c;
 	int I;
 
 public:
-	Lorenz()
-	{
+	Lorenz() {
 		h = 0.001;
 		a = 10.0;
 		b = 28.0;
@@ -50,8 +47,7 @@ public:
 	/* rate is normalized (0 .. 1) */
 	void set_rate(double r) { h = max(.0000001, r * .015); }
 
-	void init(double _h = .001, double seed = .0)
-	{
+	void init(double _h = .001, double seed = .0) {
 		I = 0;
 
 		x[0] = .1 + seed - frandom() * .1;
@@ -68,14 +64,12 @@ public:
 		h = _h;
 	}
 
-	sample_t get()
-	{
+	sample_t get() {
 		step();
 		return .5 * get_y() + get_z();
 	}
 
-	void step()
-	{
+	void step() {
 		int J = I ^ 1;
 
 		x[J] = x[I] + h * a * (y[I] - x[I]);

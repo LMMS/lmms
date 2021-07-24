@@ -1,10 +1,8 @@
 #ifndef _ELEV_0_H_
 #define _ELEV_0_H_
 
-static struct
-{
-	struct
-	{
+static struct {
+	struct {
 		double a[31], b[31];
 	} left, right;
 } elev0[] = {

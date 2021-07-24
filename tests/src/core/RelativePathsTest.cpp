@@ -29,12 +29,10 @@
 #include "QTestSuite.h"
 #include "SampleBuffer.h"
 
-class RelativePathsTest : QTestSuite
-{
+class RelativePathsTest : QTestSuite {
 	Q_OBJECT
 private slots:
-	void PathUtilComparisonTests()
-	{
+	void PathUtilComparisonTests() {
 		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
 		QVERIFY(fi.exists());
 

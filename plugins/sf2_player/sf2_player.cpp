@@ -47,16 +47,14 @@
 #include "patches_dialog.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Sf2 Player",
-		QT_TRANSLATE_NOOP("PluginBrowser", "Player for SoundFont files"), "Paul Giblock <drfaygo/at/gmail/dot/com>",
-		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), "sf2,sf3", NULL};
+Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Sf2 Player",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Player for SoundFont files"), "Paul Giblock <drfaygo/at/gmail/dot/com>", 0x0100,
+	Plugin::Instrument, new PluginPixmapLoader("logo"), "sf2,sf3", NULL};
 }
 
-struct SF2PluginData
-{
+struct SF2PluginData {
 	int midiNote;
 	int lastPanning;
 	float lastVelocity;
@@ -91,10 +89,8 @@ sf2Instrument::sf2Instrument(InstrumentTrack* _instrument_track)
 	, m_chorusNum(FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this, tr("Chorus voices"))
 	, m_chorusLevel(FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this, tr("Chorus level"))
 	, m_chorusSpeed(FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr("Chorus speed"))
-	, m_chorusDepth(FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr("Chorus depth"))
-{
-	for (int i = 0; i < 128; ++i)
-	{
+	, m_chorusDepth(FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr("Chorus depth")) {
+	for (int i = 0; i < 128; ++i) {
 		m_notesRunning[i] = 0;
 	}
 
@@ -170,8 +166,7 @@ sf2Instrument::sf2Instrument(InstrumentTrack* _instrument_track)
 	Engine::mixer()->addPlayHandle(iph);
 }
 
-sf2Instrument::~sf2Instrument()
-{
+sf2Instrument::~sf2Instrument() {
 	Engine::mixer()->removePlayHandlesOfTypes(
 		instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 	freeFont();
@@ -180,8 +175,7 @@ sf2Instrument::~sf2Instrument()
 	if (m_srcState != NULL) { src_delete(m_srcState); }
 }
 
-void sf2Instrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void sf2Instrument::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	_this.setAttribute("src", m_filename);
 	m_patchNum.saveSettings(_doc, _this, "patch");
 	m_bankNum.saveSettings(_doc, _this, "bank");
@@ -201,8 +195,7 @@ void sf2Instrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	m_chorusDepth.saveSettings(_doc, _this, "chorusDepth");
 }
 
-void sf2Instrument::loadSettings(const QDomElement& _this)
-{
+void sf2Instrument::loadSettings(const QDomElement& _this) {
 	openFile(_this.attribute("src"), false);
 	m_patchNum.loadSettings(_this, "patch");
 	m_bankNum.loadSettings(_this, "bank");
@@ -225,10 +218,8 @@ void sf2Instrument::loadSettings(const QDomElement& _this)
 	updateGain();
 }
 
-void sf2Instrument::loadFile(const QString& _file)
-{
-	if (!_file.isEmpty() && QFileInfo(_file).exists())
-	{
+void sf2Instrument::loadFile(const QString& _file) {
+	if (!_file.isEmpty() && QFileInfo(_file).exists()) {
 		openFile(_file, false);
 		updatePatch();
 
@@ -239,14 +230,12 @@ void sf2Instrument::loadFile(const QString& _file)
 
 	// setting the first bank and patch number that is found
 	auto sSoundCount = ::fluid_synth_sfcount(m_synth);
-	for (int i = 0; i < sSoundCount; ++i)
-	{
+	for (int i = 0; i < sSoundCount; ++i) {
 		int iBank = 0;
 		int iProg = 0;
 		fluid_sfont_t* pSoundFont = ::fluid_synth_get_sfont(m_synth, i);
 
-		if (pSoundFont)
-		{
+		if (pSoundFont) {
 #ifdef CONFIG_FLUID_BANK_OFFSET
 			int iBankOff = ::fluid_synth_get_bank_offset(m_synth, fluid_sfont_get_id(pSoundFont));
 #endif
@@ -259,8 +248,7 @@ void sf2Instrument::loadFile(const QString& _file)
 			fluid_preset_t* pCurPreset;
 #endif
 
-			if ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
-			{
+			if ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
 				iBank = fluid_preset_get_banknum(pCurPreset);
 				iProg = fluid_preset_get_num(pCurPreset);
 
@@ -278,11 +266,10 @@ void sf2Instrument::loadFile(const QString& _file)
 	}
 }
 
-AutomatableModel* sf2Instrument::childModel(const QString& _modelName)
-{
-	if (_modelName == "bank") { return &m_bankNum; }
-	else if (_modelName == "patch")
-	{
+AutomatableModel* sf2Instrument::childModel(const QString& _modelName) {
+	if (_modelName == "bank") {
+		return &m_bankNum;
+	} else if (_modelName == "patch") {
 		return &m_patchNum;
 	}
 	qCritical() << "requested unknown model " << _modelName;
@@ -291,18 +278,15 @@ AutomatableModel* sf2Instrument::childModel(const QString& _modelName)
 
 QString sf2Instrument::nodeName() const { return sf2player_plugin_descriptor.name; }
 
-void sf2Instrument::freeFont()
-{
+void sf2Instrument::freeFont() {
 	m_synthMutex.lock();
 
-	if (m_font != NULL)
-	{
+	if (m_font != NULL) {
 		s_fontsMutex.lock();
 		--(m_font->refCount);
 
 		// No more references
-		if (m_font->refCount <= 0)
-		{
+		if (m_font->refCount <= 0) {
 			qDebug() << "Really deleting " << m_filename;
 
 			fluid_synth_sfunload(m_synth, m_fontId, true);
@@ -310,8 +294,7 @@ void sf2Instrument::freeFont()
 			delete m_font;
 		}
 		// Just remove our reference
-		else
-		{
+		else {
 			qDebug() << "un-referencing " << m_filename;
 
 			fluid_synth_remove_sfont(m_synth, m_font->fluidFont);
@@ -323,8 +306,7 @@ void sf2Instrument::freeFont()
 	m_synthMutex.unlock();
 }
 
-void sf2Instrument::openFile(const QString& _sf2File, bool updateTrackName)
-{
+void sf2Instrument::openFile(const QString& _sf2File, bool updateTrackName) {
 	emit fileLoading();
 
 	// Used for loading file
@@ -338,8 +320,7 @@ void sf2Instrument::openFile(const QString& _sf2File, bool updateTrackName)
 	s_fontsMutex.lock();
 
 	// Increment Reference
-	if (s_fonts.contains(relativePath))
-	{
+	if (s_fonts.contains(relativePath)) {
 		qDebug() << "Using existing reference to " << relativePath;
 
 		m_font = s_fonts[relativePath];
@@ -350,15 +331,12 @@ void sf2Instrument::openFile(const QString& _sf2File, bool updateTrackName)
 	}
 
 	// Add to map, if doesn't exist.
-	else
-	{
+	else {
 		bool loaded = false;
-		if (fluid_is_soundfont(sf2Ascii))
-		{
+		if (fluid_is_soundfont(sf2Ascii)) {
 			m_fontId = fluid_synth_sfload(m_synth, sf2Ascii, true);
 
-			if (fluid_synth_sfcount(m_synth) > 0)
-			{
+			if (fluid_synth_sfcount(m_synth) > 0) {
 				// Grab this sf from the top of the stack and add to list
 				m_font = new sf2Font(fluid_synth_get_sfont(m_synth, 0));
 				s_fonts.insert(relativePath, m_font);
@@ -366,8 +344,7 @@ void sf2Instrument::openFile(const QString& _sf2File, bool updateTrackName)
 			}
 		}
 
-		if (!loaded)
-		{
+		if (!loaded) {
 			collectErrorForUI(
 				sf2Instrument::tr("A soundfont %1 could not be loaded.").arg(QFileInfo(_sf2File).baseName()));
 		}
@@ -376,8 +353,7 @@ void sf2Instrument::openFile(const QString& _sf2File, bool updateTrackName)
 	s_fontsMutex.unlock();
 	m_synthMutex.unlock();
 
-	if (m_fontId >= 0)
-	{
+	if (m_fontId >= 0) {
 		// Don't reset patch/bank, so that it isn't cleared when
 		// someone resolves a missing file
 		// m_patchNum.setValue( 0 );
@@ -389,32 +365,26 @@ void sf2Instrument::openFile(const QString& _sf2File, bool updateTrackName)
 
 	delete[] sf2Ascii;
 
-	if (updateTrackName || instrumentTrack()->displayName() == displayName())
-	{
+	if (updateTrackName || instrumentTrack()->displayName() == displayName()) {
 		instrumentTrack()->setName(PathUtil::cleanName(_sf2File));
 	}
 }
 
-void sf2Instrument::updatePatch()
-{
-	if (m_bankNum.value() >= 0 && m_patchNum.value() >= 0)
-	{
+void sf2Instrument::updatePatch() {
+	if (m_bankNum.value() >= 0 && m_patchNum.value() >= 0) {
 		fluid_synth_program_select(m_synth, m_channel, m_fontId, m_bankNum.value(), m_patchNum.value());
 	}
 }
 
-QString sf2Instrument::getCurrentPatchName()
-{
+QString sf2Instrument::getCurrentPatchName() {
 	int iBankSelected = m_bankNum.value();
 	int iProgSelected = m_patchNum.value();
 
 	// For all soundfonts (in reversed stack order) fill the available programs...
 	int cSoundFonts = ::fluid_synth_sfcount(m_synth);
-	for (int i = 0; i < cSoundFonts; i++)
-	{
+	for (int i = 0; i < cSoundFonts; i++) {
 		fluid_sfont_t* pSoundFont = fluid_synth_get_sfont(m_synth, i);
-		if (pSoundFont)
-		{
+		if (pSoundFont) {
 #ifdef CONFIG_FLUID_BANK_OFFSET
 			int iBankOffset = fluid_synth_get_bank_offset(m_synth, fluid_sfont_get_id(pSoundFont));
 #endif
@@ -425,8 +395,7 @@ QString sf2Instrument::getCurrentPatchName()
 #else
 			fluid_preset_t* pCurPreset;
 #endif
-			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset)))
-			{
+			while ((pCurPreset = fluid_sfont_iteration_next_wrapper(pSoundFont, pCurPreset))) {
 				int iBank = fluid_preset_get_banknum(pCurPreset);
 #ifdef CONFIG_FLUID_BANK_OFFSET
 				iBank += iBankOffset;
@@ -443,22 +412,19 @@ void sf2Instrument::updateGain() { fluid_synth_set_gain(m_synth, m_gain.value())
 
 void sf2Instrument::updateReverbOn() { fluid_synth_set_reverb_on(m_synth, m_reverbOn.value() ? 1 : 0); }
 
-void sf2Instrument::updateReverb()
-{
+void sf2Instrument::updateReverb() {
 	fluid_synth_set_reverb(
 		m_synth, m_reverbRoomSize.value(), m_reverbDamping.value(), m_reverbWidth.value(), m_reverbLevel.value());
 }
 
 void sf2Instrument::updateChorusOn() { fluid_synth_set_chorus_on(m_synth, m_chorusOn.value() ? 1 : 0); }
 
-void sf2Instrument::updateChorus()
-{
+void sf2Instrument::updateChorus() {
 	fluid_synth_set_chorus(m_synth, static_cast<int>(m_chorusNum.value()), m_chorusLevel.value(), m_chorusSpeed.value(),
 		m_chorusDepth.value(), 0);
 }
 
-void sf2Instrument::updateSampleRate()
-{
+void sf2Instrument::updateSampleRate() {
 	double tempRate;
 
 	// Set & get, returns the true sample rate
@@ -466,8 +432,7 @@ void sf2Instrument::updateSampleRate()
 	fluid_settings_getnum(m_settings, (char*)"synth.sample-rate", &tempRate);
 	m_internalSampleRate = static_cast<int>(tempRate);
 
-	if (m_font)
-	{
+	if (m_font) {
 		// Now, delete the old one and replace
 		m_synthMutex.lock();
 		fluid_synth_remove_sfont(m_synth, m_font->fluidFont);
@@ -480,9 +445,7 @@ void sf2Instrument::updateSampleRate()
 
 		// synth program change (set bank and patch)
 		updatePatch();
-	}
-	else
-	{
+	} else {
 		// Recreate synth with no soundfonts
 		m_synthMutex.lock();
 		delete_fluid_synth(m_synth);
@@ -491,23 +454,18 @@ void sf2Instrument::updateSampleRate()
 	}
 
 	m_synthMutex.lock();
-	if (Engine::mixer()->currentQualitySettings().interpolation >= Mixer::qualitySettings::Interpolation_SincFastest)
-	{
+	if (Engine::mixer()->currentQualitySettings().interpolation >= Mixer::qualitySettings::Interpolation_SincFastest) {
 		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_7THORDER);
-	}
-	else
-	{
+	} else {
 		fluid_synth_set_interp_method(m_synth, -1, FLUID_INTERP_DEFAULT);
 	}
 	m_synthMutex.unlock();
-	if (m_internalSampleRate < Engine::mixer()->processingSampleRate())
-	{
+	if (m_internalSampleRate < Engine::mixer()->processingSampleRate()) {
 		m_synthMutex.lock();
 		if (m_srcState != NULL) { src_delete(m_srcState); }
 		int error;
 		m_srcState = src_new(Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error);
-		if (m_srcState == NULL || error)
-		{
+		if (m_srcState == NULL || error) {
 			qCritical("error while creating libsamplerate data structure in Sf2Instrument::updateSampleRate()");
 		}
 		m_synthMutex.unlock();
@@ -524,14 +482,12 @@ void sf2Instrument::updateSampleRate()
 	m_lastMidiPitchRange = -1;
 }
 
-void sf2Instrument::playNote(NotePlayHandle* _n, sampleFrame*)
-{
+void sf2Instrument::playNote(NotePlayHandle* _n, sampleFrame*) {
 	if (_n->isMasterNote() || (_n->hasParent() && _n->isReleased())) { return; }
 
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
-	if (tfp == 0)
-	{
+	if (tfp == 0) {
 		const float LOG440 = 2.643452676f;
 
 		int midiNote = (int)floor(12.0 * (log2(_n->unpitchedFrequency()) - LOG440) - 4.0);
@@ -555,8 +511,8 @@ void sf2Instrument::playNote(NotePlayHandle* _n, sampleFrame*)
 		m_playingNotesMutex.lock();
 		m_playingNotes.append(_n);
 		m_playingNotesMutex.unlock();
-	}
-	else if (_n->isReleased() && !_n->instrumentTrack()->isSustainPedalPressed()) // note is released during this period
+	} else if (_n->isReleased()
+		&& !_n->instrumentTrack()->isSustainPedalPressed()) // note is released during this period
 	{
 		SF2PluginData* pluginData = static_cast<SF2PluginData*>(_n->m_pluginData);
 		pluginData->offset = _n->framesBeforeRelease();
@@ -568,8 +524,7 @@ void sf2Instrument::playNote(NotePlayHandle* _n, sampleFrame*)
 	}
 }
 
-void sf2Instrument::noteOn(SF2PluginData* n)
-{
+void sf2Instrument::noteOn(SF2PluginData* n) {
 	m_synthMutex.lock();
 
 	// get list of current voice IDs so we can easily spot the new
@@ -578,12 +533,10 @@ void sf2Instrument::noteOn(SF2PluginData* n)
 	fluid_voice_t* voices[poly];
 	unsigned int id[poly];
 	fluid_synth_get_voicelist(m_synth, voices, poly, -1);
-	for (int i = 0; i < poly; ++i)
-	{
+	for (int i = 0; i < poly; ++i) {
 		id[i] = 0;
 	}
-	for (int i = 0; i < poly && voices[i]; ++i)
-	{
+	for (int i = 0; i < poly && voices[i]; ++i) {
 		id[i] = fluid_voice_get_id(voices[i]);
 	}
 
@@ -591,11 +544,9 @@ void sf2Instrument::noteOn(SF2PluginData* n)
 
 	// get new voice and save it
 	fluid_synth_get_voicelist(m_synth, voices, poly, -1);
-	for (int i = 0; i < poly && voices[i]; ++i)
-	{
+	for (int i = 0; i < poly && voices[i]; ++i) {
 		const unsigned int newID = fluid_voice_get_id(voices[i]);
-		if (id[i] != newID || newID == 0)
-		{
+		if (id[i] != newID || newID == 0) {
 			n->fluidVoice = voices[i];
 			break;
 		}
@@ -608,29 +559,25 @@ void sf2Instrument::noteOn(SF2PluginData* n)
 	m_notesRunningMutex.unlock();
 }
 
-void sf2Instrument::noteOff(SF2PluginData* n)
-{
+void sf2Instrument::noteOff(SF2PluginData* n) {
 	n->noteOffSent = true;
 	m_notesRunningMutex.lock();
 	const int notes = --m_notesRunning[n->midiNote];
 	m_notesRunningMutex.unlock();
 
-	if (notes <= 0)
-	{
+	if (notes <= 0) {
 		m_synthMutex.lock();
 		fluid_synth_noteoff(m_synth, m_channel, n->midiNote);
 		m_synthMutex.unlock();
 	}
 }
 
-void sf2Instrument::play(sampleFrame* _working_buffer)
-{
+void sf2Instrument::play(sampleFrame* _working_buffer) {
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
-	if (m_lastMidiPitch != currentMidiPitch)
-	{
+	if (m_lastMidiPitch != currentMidiPitch) {
 		m_lastMidiPitch = currentMidiPitch;
 		m_synthMutex.lock();
 		fluid_synth_pitch_bend(m_synth, m_channel, m_lastMidiPitch);
@@ -638,16 +585,14 @@ void sf2Instrument::play(sampleFrame* _working_buffer)
 	}
 
 	const int currentMidiPitchRange = instrumentTrack()->midiPitchRange();
-	if (m_lastMidiPitchRange != currentMidiPitchRange)
-	{
+	if (m_lastMidiPitchRange != currentMidiPitchRange) {
 		m_lastMidiPitchRange = currentMidiPitchRange;
 		m_synthMutex.lock();
 		fluid_synth_pitch_wheel_sens(m_synth, m_channel, m_lastMidiPitchRange);
 		m_synthMutex.unlock();
 	}
 	// if we have no new noteons/noteoffs, just render a period and call it a day
-	if (m_playingNotes.isEmpty())
-	{
+	if (m_playingNotes.isEmpty()) {
 		renderFrames(frames, _working_buffer);
 		instrumentTrack()->processAudioBuffer(_working_buffer, frames, NULL);
 		return;
@@ -657,12 +602,10 @@ void sf2Instrument::play(sampleFrame* _working_buffer)
 	// go through noteplayhandles in processing order
 	f_cnt_t currentFrame = 0;
 
-	while (!m_playingNotes.isEmpty())
-	{
+	while (!m_playingNotes.isEmpty()) {
 		// find the note with lowest offset
 		NotePlayHandle* currentNote = m_playingNotes[0];
-		for (int i = 1; i < m_playingNotes.size(); ++i)
-		{
+		for (int i = 1; i < m_playingNotes.size(); ++i) {
 			SF2PluginData* currentData = static_cast<SF2PluginData*>(currentNote->m_pluginData);
 			SF2PluginData* iData = static_cast<SF2PluginData*>(m_playingNotes[i]->m_pluginData);
 			if (currentData->offset > iData->offset) { currentNote = m_playingNotes[i]; }
@@ -671,29 +614,24 @@ void sf2Instrument::play(sampleFrame* _working_buffer)
 		// process the current note:
 		// first see if we're synced in frame count
 		SF2PluginData* currentData = static_cast<SF2PluginData*>(currentNote->m_pluginData);
-		if (currentData->offset > currentFrame)
-		{
+		if (currentData->offset > currentFrame) {
 			renderFrames(currentData->offset - currentFrame, _working_buffer + currentFrame);
 			currentFrame = currentData->offset;
 		}
-		if (currentData->isNew)
-		{
+		if (currentData->isNew) {
 			noteOn(currentData);
 			if (currentNote->isReleased()) // if the note is released during the same period, we have to process it
 										   // again for noteoff
 			{
 				currentData->isNew = false;
 				currentData->offset = currentNote->framesBeforeRelease();
-			}
-			else // otherwise remove the handle
+			} else // otherwise remove the handle
 			{
 				m_playingNotesMutex.lock();
 				m_playingNotes.remove(m_playingNotes.indexOf(currentNote));
 				m_playingNotesMutex.unlock();
 			}
-		}
-		else
-		{
+		} else {
 			noteOff(currentData);
 			m_playingNotesMutex.lock();
 			m_playingNotes.remove(m_playingNotes.indexOf(currentNote));
@@ -705,11 +643,9 @@ void sf2Instrument::play(sampleFrame* _working_buffer)
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames, NULL);
 }
 
-void sf2Instrument::renderFrames(f_cnt_t frames, sampleFrame* buf)
-{
+void sf2Instrument::renderFrames(f_cnt_t frames, sampleFrame* buf) {
 	m_synthMutex.lock();
-	if (m_internalSampleRate < Engine::mixer()->processingSampleRate() && m_srcState != NULL)
-	{
+	if (m_internalSampleRate < Engine::mixer()->processingSampleRate() && m_srcState != NULL) {
 		const fpp_t f = frames * m_internalSampleRate / Engine::mixer()->processingSampleRate();
 #ifdef __GNUC__
 		sampleFrame tmp[f];
@@ -730,20 +666,16 @@ void sf2Instrument::renderFrames(f_cnt_t frames, sampleFrame* buf)
 		delete[] tmp;
 #endif
 		if (error) { qCritical("sf2Instrument: error while resampling: %s", src_strerror(error)); }
-		if (src_data.output_frames_gen > frames)
-		{
+		if (src_data.output_frames_gen > frames) {
 			qCritical("sf2Instrument: not enough frames: %ld / %d", src_data.output_frames_gen, frames);
 		}
-	}
-	else
-	{
+	} else {
 		fluid_synth_write_float(m_synth, frames, buf, 0, 2, buf, 1, 2);
 	}
 	m_synthMutex.unlock();
 }
 
-void sf2Instrument::deleteNotePluginData(NotePlayHandle* _n)
-{
+void sf2Instrument::deleteNotePluginData(NotePlayHandle* _n) {
 	SF2PluginData* pluginData = static_cast<SF2PluginData*>(_n->m_pluginData);
 	if (!pluginData->noteOffSent) // if we for some reason haven't noteoffed the note before it gets deleted,
 								  // do it here
@@ -758,19 +690,16 @@ void sf2Instrument::deleteNotePluginData(NotePlayHandle* _n)
 
 PluginView* sf2Instrument::instantiateView(QWidget* _parent) { return new sf2InstrumentView(this, _parent); }
 
-class sf2Knob : public Knob
-{
+class sf2Knob : public Knob {
 public:
 	sf2Knob(QWidget* _parent)
-		: Knob(knobStyled, _parent)
-	{
+		: Knob(knobStyled, _parent) {
 		setFixedSize(31, 38);
 	}
 };
 
 sf2InstrumentView::sf2InstrumentView(Instrument* _instrument, QWidget* _parent)
-	: InstrumentViewFixedSize(_instrument, _parent)
-{
+	: InstrumentViewFixedSize(_instrument, _parent) {
 	//	QVBoxLayout * vl = new QVBoxLayout( this );
 	//	QHBoxLayout * hl = new QHBoxLayout();
 
@@ -917,8 +846,7 @@ sf2InstrumentView::sf2InstrumentView(Instrument* _instrument, QWidget* _parent)
 
 sf2InstrumentView::~sf2InstrumentView() {}
 
-void sf2InstrumentView::modelChanged()
-{
+void sf2InstrumentView::modelChanged() {
 	sf2Instrument* k = castModel<sf2Instrument>();
 	m_bankNumLcd->setModel(&k->m_bankNum);
 	m_patchNumLcd->setModel(&k->m_patchNum);
@@ -944,8 +872,7 @@ void sf2InstrumentView::modelChanged()
 	updateFilename();
 }
 
-void sf2InstrumentView::updateFilename()
-{
+void sf2InstrumentView::updateFilename() {
 	sf2Instrument* i = castModel<sf2Instrument>();
 	QFontMetrics fm(m_filenameLabel->font());
 	QString file = i->m_filename.endsWith(".sf2", Qt::CaseInsensitive) ? i->m_filename.left(i->m_filename.length() - 4)
@@ -960,8 +887,7 @@ void sf2InstrumentView::updateFilename()
 	update();
 }
 
-void sf2InstrumentView::updatePatchName()
-{
+void sf2InstrumentView::updatePatchName() {
 	sf2Instrument* i = castModel<sf2Instrument>();
 	QFontMetrics fm(font());
 	QString patch = i->getCurrentPatchName();
@@ -972,8 +898,7 @@ void sf2InstrumentView::updatePatchName()
 
 void sf2InstrumentView::invalidateFile() { m_patchDialogButton->setEnabled(false); }
 
-void sf2InstrumentView::showFileDialog()
-{
+void sf2InstrumentView::showFileDialog() {
 	sf2Instrument* k = castModel<sf2Instrument>();
 
 	FileDialog ofd(NULL, tr("Open SoundFont file"));
@@ -983,24 +908,19 @@ void sf2InstrumentView::showFileDialog()
 	types << tr("SoundFont Files (*.sf2 *.sf3)");
 	ofd.setNameFilters(types);
 
-	if (k->m_filename != "")
-	{
+	if (k->m_filename != "") {
 		QString f = PathUtil::toAbsolute(k->m_filename);
 		ofd.setDirectory(QFileInfo(f).absolutePath());
 		ofd.selectFile(QFileInfo(f).fileName());
-	}
-	else
-	{
+	} else {
 		ofd.setDirectory(ConfigManager::inst()->sf2Dir());
 	}
 
 	m_fileDialogButton->setEnabled(false);
 
-	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty())
-	{
+	if (ofd.exec() == QDialog::Accepted && !ofd.selectedFiles().isEmpty()) {
 		QString f = ofd.selectedFiles()[0];
-		if (f != "")
-		{
+		if (f != "") {
 			k->openFile(f);
 			Engine::getSong()->setModified();
 		}
@@ -1009,8 +929,7 @@ void sf2InstrumentView::showFileDialog()
 	m_fileDialogButton->setEnabled(true);
 }
 
-void sf2InstrumentView::showPatchDialog()
-{
+void sf2InstrumentView::showPatchDialog() {
 	sf2Instrument* k = castModel<sf2Instrument>();
 
 	patchesDialog pd(this);
@@ -1020,12 +939,8 @@ void sf2InstrumentView::showPatchDialog()
 	pd.exec();
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-	{
-		return new sf2Instrument(static_cast<InstrumentTrack*>(m));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*) { return new sf2Instrument(static_cast<InstrumentTrack*>(m)); }
 }

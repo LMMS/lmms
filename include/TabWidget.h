@@ -31,8 +31,7 @@
 const int TEXT_TAB_HEIGHT = 14;
 const int GRAPHIC_TAB_HEIGHT = 17;
 
-class TabWidget : public QWidget
-{
+class TabWidget : public QWidget {
 	Q_OBJECT
 public:
 	//! @param resizable If true, the widget resizes to fit the size of all tabs
@@ -76,8 +75,7 @@ protected:
 	QSize sizeHint() const override;
 
 private:
-	struct widgetDesc
-	{
+	struct widgetDesc {
 		QWidget* w;			// ptr to widget
 		const char* pixmap; // artwork for the widget
 		QString name;		// name for widget

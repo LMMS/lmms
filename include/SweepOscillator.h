@@ -28,22 +28,17 @@
 #include "DspEffectLibrary.h"
 #include "Oscillator.h"
 
-template <class FX = DspEffectLibrary::StereoBypass> class SweepOscillator
-{
+template <class FX = DspEffectLibrary::StereoBypass> class SweepOscillator {
 public:
 	SweepOscillator(const FX& _fx = FX())
 		: m_phase(0.0f)
-		, m_FX(_fx)
-	{
-	}
+		, m_FX(_fx) {}
 
 	virtual ~SweepOscillator() {}
 
-	void update(sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate)
-	{
+	void update(sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate) {
 		const float df = freq2 - freq1;
-		for (fpp_t frame = 0; frame < frames; ++frame)
-		{
+		for (fpp_t frame = 0; frame < frames; ++frame) {
 			const sample_t s = Oscillator::sinSample(m_phase);
 			buf[frame][0] = s;
 			buf[frame][1] = s;

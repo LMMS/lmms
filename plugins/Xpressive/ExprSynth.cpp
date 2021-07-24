@@ -41,31 +41,26 @@ typedef exprtk::symbol_table<float> symbol_table_t;
 typedef exprtk::expression<float> expression_t;
 typedef exprtk::parser<float> parser_t;
 
-template <typename T, typename Functor, bool optimize> struct freefunc0 : public exprtk::ifunction<T>
-{
+template <typename T, typename Functor, bool optimize> struct freefunc0 : public exprtk::ifunction<T> {
 	using exprtk::ifunction<T>::operator();
 
 	freefunc0()
-		: exprtk::ifunction<T>(0)
-	{
+		: exprtk::ifunction<T>(0) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
 	inline T operator()() { return Functor::process(); }
 };
-template <typename T, typename Functor, bool optimize> struct freefunc1 : public exprtk::ifunction<T>
-{
+template <typename T, typename Functor, bool optimize> struct freefunc1 : public exprtk::ifunction<T> {
 	using exprtk::ifunction<T>::operator();
 
 	freefunc1()
-		: exprtk::ifunction<T>(1)
-	{
+		: exprtk::ifunction<T>(1) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
 	inline T operator()(const T& x) { return Functor::process(x); }
 };
 
-template <typename T> struct IntegrateFunction : public exprtk::ifunction<T>
-{
+template <typename T> struct IntegrateFunction : public exprtk::ifunction<T> {
 
 	using exprtk::ifunction<T>::operator();
 	virtual ~IntegrateFunction() { delete[] m_counters; }
@@ -77,16 +72,13 @@ template <typename T> struct IntegrateFunction : public exprtk::ifunction<T>
 		, m_max_counters(max_counters)
 		, m_nCounters(0)
 		, m_nCountersCalls(0)
-		, m_cc(0)
-	{
+		, m_cc(0) {
 		m_counters = new double[max_counters];
 		clearArray(m_counters, max_counters);
 	}
 
-	inline T operator()(const T& x)
-	{
-		if (*m_frame == 0)
-		{
+	inline T operator()(const T& x) {
+		if (*m_frame == 0) {
 			++m_nCountersCalls;
 			if (m_nCountersCalls > m_max_counters) { return 0; }
 			m_cc = m_nCounters;
@@ -94,8 +86,7 @@ template <typename T> struct IntegrateFunction : public exprtk::ifunction<T>
 		}
 
 		T res = 0;
-		if (m_cc < m_nCounters)
-		{
+		if (m_cc < m_nCounters) {
 			res = m_counters[m_cc];
 			m_counters[m_cc] += x;
 		}
@@ -112,8 +103,7 @@ template <typename T> struct IntegrateFunction : public exprtk::ifunction<T>
 	double* m_counters;
 };
 
-template <typename T> struct LastSampleFunction : public exprtk::ifunction<T>
-{
+template <typename T> struct LastSampleFunction : public exprtk::ifunction<T> {
 
 	using exprtk::ifunction<T>::operator();
 	virtual ~LastSampleFunction() { delete[] m_samples; }
@@ -121,27 +111,23 @@ template <typename T> struct LastSampleFunction : public exprtk::ifunction<T>
 	LastSampleFunction(unsigned int history_size)
 		: exprtk::ifunction<T>(1)
 		, m_history_size(history_size)
-		, m_pivot_last(history_size - 1)
-	{
+		, m_pivot_last(history_size - 1) {
 		m_samples = new T[history_size];
 		clearArray(m_samples, history_size);
 	}
 
-	inline T operator()(const T& x)
-	{
-		if (!std::isnan(x) && !std::isinf(x))
-		{
+	inline T operator()(const T& x) {
+		if (!std::isnan(x) && !std::isinf(x)) {
 			const int ix = (int)x;
 			if (ix >= 1 && ix <= m_history_size) { return m_samples[(ix + m_pivot_last) % m_history_size]; }
 		}
 		return 0;
 	}
-	void setLastSample(const T& sample)
-	{
+	void setLastSample(const T& sample) {
 		if (!std::isnan(sample) && !std::isinf(sample)) { m_samples[m_pivot_last] = sample; }
-		if (m_pivot_last == 0) { m_pivot_last = m_history_size - 1; }
-		else
-		{
+		if (m_pivot_last == 0) {
+			m_pivot_last = m_history_size - 1;
+		} else {
 			--m_pivot_last;
 		}
 	}
@@ -150,34 +136,27 @@ template <typename T> struct LastSampleFunction : public exprtk::ifunction<T>
 	T* m_samples;
 };
 
-template <typename T> struct WaveValueFunction : public exprtk::ifunction<T>
-{
+template <typename T> struct WaveValueFunction : public exprtk::ifunction<T> {
 	using exprtk::ifunction<T>::operator();
 
 	WaveValueFunction(const T* v, std::size_t s)
 		: exprtk::ifunction<T>(1)
 		, m_vec(v)
-		, m_size(s)
-	{
-	}
+		, m_size(s) {}
 
 	inline T operator()(const T& index) { return m_vec[(int)(positiveFraction(index) * m_size)]; }
 	const T* m_vec;
 	const std::size_t m_size;
 };
-template <typename T> struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
-{
+template <typename T> struct WaveValueFunctionInterpolate : public exprtk::ifunction<T> {
 	using exprtk::ifunction<T>::operator();
 
 	WaveValueFunctionInterpolate(const T* v, std::size_t s)
 		: exprtk::ifunction<T>(1)
 		, m_vec(v)
-		, m_size(s)
-	{
-	}
+		, m_size(s) {}
 
-	inline T operator()(const T& index)
-	{
+	inline T operator()(const T& index) {
 		const T x = positiveFraction(index) * m_size;
 		const int ix = (int)x;
 		const float xfrc = fraction(x);
@@ -216,31 +195,26 @@ static const unsigned int random_data[257] = {0xd76a33ec, 0x4a767724, 0xb34ebd08
 	0xca000bcf, 0x8a0fb13d, 0x81b957b0, 0xac627bfb, 0xc0fe47e5, 0xf3db0ad8, 0x1c605c7d, 0x5f579884, 0x63e079b5,
 	0x3d96f7cf, 0x3edd46e9, 0xc347c61e, 0x7b2b2a0e, 0x63dfcf51, 0x596781dd, 0x80304c4d, 0xa66f8b47};
 
-inline unsigned int rotateLeft(unsigned int x, const int b)
-{
-	if (b > -32 && b < 32 && b != 0)
-	{
-		if (b < 0) { x = (x >> (-b)) | (x << (32 + b)); }
-		else
-		{
+inline unsigned int rotateLeft(unsigned int x, const int b) {
+	if (b > -32 && b < 32 && b != 0) {
+		if (b < 0) {
+			x = (x >> (-b)) | (x << (32 + b));
+		} else {
 			x = (x << b) | (x >> (32 - b));
 		}
 	}
 	return x;
 }
 
-struct RandomVectorSeedFunction : public exprtk::ifunction<float>
-{
+struct RandomVectorSeedFunction : public exprtk::ifunction<float> {
 	using exprtk::ifunction<float>::operator();
 
 	RandomVectorSeedFunction()
-		: exprtk::ifunction<float>(2)
-	{
+		: exprtk::ifunction<float>(2) {
 		exprtk::disable_has_side_effects(*this);
 	}
 
-	static inline float randv(const float& index, int irseed)
-	{
+	static inline float randv(const float& index, int irseed) {
 		if (index < 0 || std::isnan(index) || std::isinf(index)) { return 0; }
 		const unsigned int xi = (unsigned int)index;
 		const unsigned int si = irseed % data_size;
@@ -252,11 +226,11 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 		return static_cast<int>(res) / (float)(1 << 31);
 	}
 
-	inline float operator()(const float& index, const float& seed)
-	{
+	inline float operator()(const float& index, const float& seed) {
 		int irseed;
-		if (seed < 0 || std::isnan(seed) || std::isinf(seed)) { irseed = 0; }
-		else
+		if (seed < 0 || std::isnan(seed) || std::isinf(seed)) {
+			irseed = 0;
+		} else
 			irseed = (int)seed;
 		return randv(index, irseed);
 	}
@@ -265,14 +239,12 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 };
 static RandomVectorSeedFunction randsv_func;
 
-struct RandomVectorFunction : public exprtk::ifunction<float>
-{
+struct RandomVectorFunction : public exprtk::ifunction<float> {
 	using exprtk::ifunction<float>::operator();
 
 	RandomVectorFunction(const unsigned int seed)
 		: exprtk::ifunction<float>(1)
-		, m_rseed(seed)
-	{
+		, m_rseed(seed) {
 		exprtk::disable_has_side_effects(*this);
 	}
 
@@ -281,35 +253,27 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 	const unsigned int m_rseed;
 };
 
-namespace SimpleRandom
-{
+namespace SimpleRandom {
 std::mt19937 generator(17); // mt19937 is a standard mersenne_twister_engine
 std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
-struct float_random_with_engine
-{
+struct float_random_with_engine {
 	static inline float process() { return dist(generator); }
 };
 } // namespace SimpleRandom
 
 static freefunc0<float, SimpleRandom::float_random_with_engine, false> simple_rand;
 
-class ExprFrontData
-{
+class ExprFrontData {
 public:
 	ExprFrontData(int last_func_samples)
 		: m_rand_vec(SimpleRandom::generator())
 		, m_integ_func(NULL)
-		, m_last_func(last_func_samples)
-	{
-	}
-	~ExprFrontData()
-	{
-		for (int i = 0; i < m_cyclics.size(); ++i)
-		{
+		, m_last_func(last_func_samples) {}
+	~ExprFrontData() {
+		for (int i = 0; i < m_cyclics.size(); ++i) {
 			delete m_cyclics[i];
 		}
-		for (int i = 0; i < m_cyclics_interp.size(); ++i)
-		{
+		for (int i = 0; i < m_cyclics_interp.size(); ++i) {
 			delete m_cyclics_interp[i];
 		}
 		if (m_integ_func) { delete m_integ_func; }
@@ -325,72 +289,60 @@ public:
 	LastSampleFunction<float> m_last_func;
 };
 
-struct sin_wave
-{
-	static inline float process(float x)
-	{
+struct sin_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
 		return sinf(x * F_2PI);
 	}
 };
 static freefunc1<float, sin_wave, true> sin_wave_func;
-struct square_wave
-{
-	static inline float process(float x)
-	{
+struct square_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
-		if (x >= 0.5f) { return -1.0f; }
-		else
-		{
+		if (x >= 0.5f) {
+			return -1.0f;
+		} else {
 			return 1.0f;
 		}
 	}
 };
 static freefunc1<float, square_wave, true> square_wave_func;
-struct triangle_wave
-{
-	static inline float process(float x)
-	{
+struct triangle_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
-		if (x < 0.25f) { return x * 4.0f; }
-		else
-		{
-			if (x < 0.75f) { return 2.0f - x * 4.0f; }
+		if (x < 0.25f) {
+			return x * 4.0f;
+		} else {
+			if (x < 0.75f) {
+				return 2.0f - x * 4.0f;
+			}
 
-			else
-			{
+			else {
 				return x * 4.0f - 4.0f;
 			}
 		}
 	}
 };
 static freefunc1<float, triangle_wave, true> triangle_wave_func;
-struct saw_wave
-{
-	static inline float process(float x)
-	{
+struct saw_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
 		return 2.0f * x - 1.0f;
 	}
 };
 static freefunc1<float, saw_wave, true> saw_wave_func;
-struct moogsaw_wave
-{
-	static inline float process(float x)
-	{
+struct moogsaw_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
 		if (x < 0.5f) { return -1.0f + x * 4.0f; }
 		return 1.0f - 2.0f * x;
 	}
 };
 static freefunc1<float, moogsaw_wave, true> moogsaw_wave_func;
-struct moog_wave
-{
-	static inline float process(float x)
-	{
+struct moog_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
-		if (x > 0.5f)
-		{
+		if (x > 0.5f) {
 			x = 1.0f - x;
 			return -1.0f + 4.0f * x * x;
 		}
@@ -398,42 +350,34 @@ struct moog_wave
 	}
 };
 static freefunc1<float, moog_wave, true> moog_wave_func;
-struct exp_wave
-{
-	static inline float process(float x)
-	{
+struct exp_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
 		if (x > 0.5f) { x = 1.0f - x; }
 		return -1.0f + 8.0f * x * x;
 	}
 };
 static freefunc1<float, exp_wave, true> exp_wave_func;
-struct exp2_wave
-{
-	static inline float process(float x)
-	{
+struct exp2_wave {
+	static inline float process(float x) {
 		x = positiveFraction(x);
 		if (x > 0.5f) { return -1.0f + 8.0f * (1.0f - x) * x; }
 		return -1.0f + 8.0f * x * x;
 	}
 };
 static freefunc1<float, exp2_wave, true> exp2_wave_func;
-struct harmonic_cent
-{
+struct harmonic_cent {
 	static inline float process(float x) { return powf(2, x / 1200); }
 };
 static freefunc1<float, harmonic_cent, true> harmonic_cent_func;
-struct harmonic_semitone
-{
+struct harmonic_semitone {
 	static inline float process(float x) { return powf(2, x / 12); }
 };
 static freefunc1<float, harmonic_semitone, true> harmonic_semitone_func;
 
-ExprFront::ExprFront(const char* expr, int last_func_samples)
-{
+ExprFront::ExprFront(const char* expr, int last_func_samples) {
 	m_valid = false;
-	try
-	{
+	try {
 		m_data = new ExprFrontData(last_func_samples);
 
 		m_data->m_expression_string = expr;
@@ -457,29 +401,17 @@ ExprFront::ExprFront(const char* expr, int last_func_samples)
 		m_data->m_symbol_table.add_function("randv", m_data->m_rand_vec);
 		m_data->m_symbol_table.add_function("randsv", randsv_func);
 		m_data->m_symbol_table.add_function("last", m_data->m_last_func);
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 }
-ExprFront::~ExprFront()
-{
-	try
-	{
+ExprFront::~ExprFront() {
+	try {
 		delete m_data;
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 }
 
-bool ExprFront::compile()
-{
+bool ExprFront::compile() {
 	m_valid = false;
-	try
-	{
+	try {
 		m_data->m_expression.register_symbol_table(m_data->m_symbol_table);
 		parser_t::settings_store sstore;
 		sstore.disable_all_logic_ops();
@@ -488,86 +420,52 @@ bool ExprFront::compile()
 		parser_t parser(sstore);
 
 		m_valid = parser.compile(m_data->m_expression_string, m_data->m_expression);
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 	return m_valid;
 }
-float ExprFront::evaluate()
-{
-	try
-	{
+float ExprFront::evaluate() {
+	try {
 		if (!m_valid) return 0;
 		float res = m_data->m_expression.value();
 		m_data->m_last_func.setLastSample(res);
 		return res;
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 	return 0;
 }
-bool ExprFront::add_variable(const char* name, float& ref)
-{
-	try
-	{
+bool ExprFront::add_variable(const char* name, float& ref) {
+	try {
 		return m_data->m_symbol_table.add_variable(name, ref);
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 	return false;
 }
 
-bool ExprFront::add_constant(const char* name, float ref)
-{
-	try
-	{
+bool ExprFront::add_constant(const char* name, float ref) {
+	try {
 		return m_data->m_symbol_table.add_constant(name, ref);
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 	return false;
 }
 
-bool ExprFront::add_cyclic_vector(const char* name, const float* data, size_t length, bool interp)
-{
-	try
-	{
-		if (interp)
-		{
+bool ExprFront::add_cyclic_vector(const char* name, const float* data, size_t length, bool interp) {
+	try {
+		if (interp) {
 			WaveValueFunctionInterpolate<float>* wvf = new WaveValueFunctionInterpolate<float>(data, length);
 			m_data->m_cyclics_interp.push_back(wvf);
 			return m_data->m_symbol_table.add_function(name, *wvf);
-		}
-		else
-		{
+		} else {
 			WaveValueFunction<float>* wvf = new WaveValueFunction<float>(data, length);
 			m_data->m_cyclics.push_back(wvf);
 			return m_data->m_symbol_table.add_function(name, *wvf);
 		}
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 	return false;
 }
-size_t find_occurances(const std::string& haystack, const char* const needle)
-{
+size_t find_occurances(const std::string& haystack, const char* const needle) {
 	size_t last_pos = 0;
 	size_t count = 0;
 	const size_t len = strlen(needle);
-	if (len > 0)
-	{
-		while (last_pos + len <= haystack.length())
-		{
+	if (len > 0) {
+		while (last_pos + len <= haystack.length()) {
 			last_pos = haystack.find(needle, last_pos);
 			if (last_pos == std::string::npos) break;
 			++count;
@@ -577,22 +475,14 @@ size_t find_occurances(const std::string& haystack, const char* const needle)
 	return count;
 }
 
-void ExprFront::setIntegrate(const unsigned int* const frameCounter, const unsigned int sample_rate)
-{
-	if (m_data->m_integ_func == NULL)
-	{
+void ExprFront::setIntegrate(const unsigned int* const frameCounter, const unsigned int sample_rate) {
+	if (m_data->m_integ_func == NULL) {
 		const unsigned int ointeg = find_occurances(m_data->m_expression_string, "integrate");
-		if (ointeg > 0)
-		{
+		if (ointeg > 0) {
 			m_data->m_integ_func = new IntegrateFunction<float>(frameCounter, sample_rate, ointeg);
-			try
-			{
+			try {
 				m_data->m_symbol_table.add_function("integrate", *m_data->m_integ_func);
-			}
-			catch (...)
-			{
-				WARN_EXPRTK;
-			}
+			} catch (...) { WARN_EXPRTK; }
 		}
 	}
 }
@@ -609,8 +499,7 @@ ExprSynth::ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSam
 	, m_sample_rate(sample_rate)
 	, m_pan1(pan1)
 	, m_pan2(pan2)
-	, m_rel_transition(rel_trans)
-{
+	, m_rel_transition(rel_trans) {
 	m_note_sample = 0;
 	m_note_rel_sample = 0;
 	m_note_rel_sec = 0;
@@ -635,16 +524,13 @@ ExprSynth::ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSam
 	init_expression_step2(m_exprO2);
 }
 
-ExprSynth::~ExprSynth()
-{
+ExprSynth::~ExprSynth() {
 	if (m_exprO1) { delete m_exprO1; }
 	if (m_exprO2) { delete m_exprO2; }
 }
 
-void ExprSynth::renderOutput(fpp_t frames, sampleFrame* buf)
-{
-	try
-	{
+void ExprSynth::renderOutput(fpp_t frames, sampleFrame* buf) {
+	try {
 		bool o1_valid = m_exprO1->isValid();
 		bool o2_valid = m_exprO2->isValid();
 		if (!o1_valid && !o2_valid) { return; }
@@ -660,10 +546,8 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame* buf)
 		LastSampleFunction<float>* last_func1 = &m_exprO1->getData()->m_last_func;
 		LastSampleFunction<float>* last_func2 = &m_exprO2->getData()->m_last_func;
 		if (is_released && m_note_rel_sample == 0) { m_note_rel_sample = m_note_sample; }
-		if (o1_valid && o2_valid)
-		{
-			for (fpp_t frame = 0; frame < frames; ++frame)
-			{
+		if (o1_valid && o2_valid) {
+			for (fpp_t frame = 0; frame < frames; ++frame) {
 				if (is_released && m_released < 1) { m_released = fmin(m_released + m_rel_inc, 1); }
 				o1 = o1_rawExpr->value();
 				o2 = o2_rawExpr->value();
@@ -676,18 +560,14 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame* buf)
 				if (is_released) { m_note_rel_sec = (m_note_sample - m_note_rel_sample) / (float)m_sample_rate; }
 				m_frequency += freq_inc;
 			}
-		}
-		else
-		{
+		} else {
 
-			if (o2_valid)
-			{
+			if (o2_valid) {
 				o1_rawExpr = o2_rawExpr;
 				last_func1 = last_func2;
 				pn1 = pn2;
 			}
-			for (fpp_t frame = 0; frame < frames; ++frame)
-			{
+			for (fpp_t frame = 0; frame < frames; ++frame) {
 				if (is_released && m_released < 1) { m_released = fmin(m_released + m_rel_inc, 1); }
 				o1 = o1_rawExpr->value();
 				last_func1->setLastSample(o1);
@@ -700,9 +580,5 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame* buf)
 			}
 		}
 		m_frequency = new_freq;
-	}
-	catch (...)
-	{
-		WARN_EXPRTK;
-	}
+	} catch (...) { WARN_EXPRTK; }
 }

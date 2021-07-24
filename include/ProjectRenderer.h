@@ -31,21 +31,12 @@
 #include "lmms_export.h"
 #include "lmmsconfig.h"
 
-class LMMS_EXPORT ProjectRenderer : public QThread
-{
+class LMMS_EXPORT ProjectRenderer : public QThread {
 	Q_OBJECT
 public:
-	enum ExportFileFormats : int
-	{
-		WaveFile,
-		FlacFile,
-		OggFile,
-		MP3File,
-		NumFileFormats
-	};
+	enum ExportFileFormats : int { WaveFile, FlacFile, OggFile, MP3File, NumFileFormats };
 
-	struct FileEncodeDevice
-	{
+	struct FileEncodeDevice {
 		bool isAvailable() const { return m_getDevInst != nullptr; }
 
 		ExportFileFormats m_fileFormat;

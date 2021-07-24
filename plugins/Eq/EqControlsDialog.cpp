@@ -42,8 +42,7 @@
 
 EqControlsDialog::EqControlsDialog(EqControls* controls)
 	: EffectControlDialog(controls)
-	, m_controls(controls)
-{
+	, m_controls(controls) {
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));
@@ -102,8 +101,7 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 
 	// Gain Fader for each Filter exepts the pass filter
 	int distance = 126;
-	for (int i = 1; i < m_parameterWidget->bandCount() - 1; i++)
-	{
+	for (int i = 1; i < m_parameterWidget->bandCount() - 1; i++) {
 		EqFader* gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, faderBg, faderLeds,
 			faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
 		gainFader->move(distance, 295);
@@ -116,15 +114,14 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 
 	// Control Button and Knobs for each Band
 	distance = 81;
-	for (int i = 0; i < m_parameterWidget->bandCount(); i++)
-	{
+	for (int i = 0; i < m_parameterWidget->bandCount(); i++) {
 		Knob* resKnob = new Knob(knobBright_26, this);
 		resKnob->move(distance, 440);
 		resKnob->setVolumeKnob(false);
 		resKnob->setModel(m_parameterWidget->getBandModels(i)->res);
-		if (i > 1 && i < 6) { resKnob->setHintText(tr("Bandwidth: "), tr(" Octave")); }
-		else
-		{
+		if (i > 1 && i < 6) {
+			resKnob->setHintText(tr("Bandwidth: "), tr(" Octave"));
+		} else {
 			resKnob->setHintText(tr("Resonance : "), "");
 		}
 
@@ -237,8 +234,7 @@ EqControlsDialog::EqControlsDialog(EqControls* controls)
 	hpBtnGrp->setModel(&m_controls->m_hpTypeModel, false);
 }
 
-void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent* event)
-{
+void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent* event) {
 	m_originalHeight = parentWidget()->height() == 283 ? m_originalHeight : parentWidget()->height();
 	parentWidget()->setFixedHeight(parentWidget()->height() == m_originalHeight ? 283 : m_originalHeight);
 	update();
@@ -246,8 +242,7 @@ void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent* event)
 
 EqBand* EqControlsDialog::setBand(int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain,
 	QColor color, QString name, float* peakL, float* peakR, BoolModel* hp12, BoolModel* hp24, BoolModel* hp48,
-	BoolModel* lp12, BoolModel* lp24, BoolModel* lp48)
-{
+	BoolModel* lp12, BoolModel* lp24, BoolModel* lp48) {
 	EqBand* filterModels = m_parameterWidget->getBandModels(index);
 	filterModels->active = active;
 	filterModels->freq = freq;

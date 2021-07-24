@@ -36,8 +36,7 @@
 
 struct pollfd;
 
-class MidiAlsaRaw : public QThread, public MidiClientRaw
-{
+class MidiAlsaRaw : public QThread, public MidiClientRaw {
 	Q_OBJECT
 public:
 	MidiAlsaRaw();
@@ -45,8 +44,7 @@ public:
 
 	static QString probeDevice();
 
-	inline static QString name()
-	{
+	inline static QString name() {
 		return QT_TRANSLATE_NOOP("MidiSetupWidget", "ALSA Raw-MIDI (Advanced Linux Sound Architecture)");
 	}
 

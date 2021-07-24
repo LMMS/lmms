@@ -37,8 +37,7 @@ GroupBox::GroupBox(const QString& _caption, QWidget* _parent)
 	: QWidget(_parent)
 	, BoolModelView(NULL, this)
 	, m_caption(_caption)
-	, m_titleBarHeight(11)
-{
+	, m_titleBarHeight(11) {
 	m_led = new PixmapButton(this, _caption);
 	m_led->setCheckable(true);
 	m_led->move(3, 0);
@@ -54,13 +53,11 @@ GroupBox::~GroupBox() { delete m_led; }
 
 void GroupBox::modelChanged() { m_led->setModel(model()); }
 
-void GroupBox::mousePressEvent(QMouseEvent* _me)
-{
+void GroupBox::mousePressEvent(QMouseEvent* _me) {
 	if (_me->y() > 1 && _me->y() < 13 && _me->button() == Qt::LeftButton) { model()->setValue(!model()->value()); }
 }
 
-void GroupBox::paintEvent(QPaintEvent* pe)
-{
+void GroupBox::paintEvent(QPaintEvent* pe) {
 	QPainter p(this);
 
 	// Draw background

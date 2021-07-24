@@ -32,8 +32,7 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class ToneStack : public Plugin
-{
+class ToneStack : public Plugin {
 private:
 	DSP::ToneStack tonestack;
 
@@ -53,8 +52,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class ToneStackLT : public Plugin
-{
+class ToneStackLT : public Plugin {
 private:
 	DSP::ToneStackLT tonestack;
 

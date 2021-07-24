@@ -28,16 +28,13 @@
 #ifndef _ONE_POLE_H_
 #define _ONE_POLE_H_
 
-namespace DSP
-{
+namespace DSP {
 
-class OnePoleLP
-{
+class OnePoleLP {
 public:
 	sample_t a0, b1, y1;
 
-	OnePoleLP(double d = 1.)
-	{
+	OnePoleLP(double d = 1.) {
 		set(d);
 		y1 = 0.;
 	}
@@ -46,49 +43,42 @@ public:
 
 	inline void set_f(double fc) { set(exp(-2 * M_PI * fc)); }
 
-	inline void set(double d)
-	{
+	inline void set(double d) {
 		a0 = (sample_t)d;
 		b1 = (sample_t)1. - d;
 	}
 
 	inline sample_t process(sample_t x) { return y1 = a0 * x + b1 * y1; }
 
-	inline void decay(double d)
-	{
+	inline void decay(double d) {
 		a0 *= d;
 		b1 = 1. - a0;
 	}
 
 	/* clear denormal numbers in history */
-	void flush_0()
-	{
+	void flush_0() {
 		if (is_denormal(y1)) y1 = 0;
 	}
 };
 
-class OnePoleHP
-{
+class OnePoleHP {
 public:
 	sample_t a0, a1, b1, x1, y1;
 
-	OnePoleHP(double d = 1.)
-	{
+	OnePoleHP(double d = 1.) {
 		set(d);
 		x1 = y1 = 0.;
 	}
 
 	void set_f(double f) { set(exp(-2 * M_PI * f)); }
 
-	inline void set(double d)
-	{
+	inline void set(double d) {
 		a0 = (sample_t)((1. + d) / 2.);
 		a1 = (sample_t)((1. + d) / -2.);
 		b1 = d;
 	}
 
-	inline sample_t process(sample_t x)
-	{
+	inline sample_t process(sample_t x) {
 		y1 = a0 * x + a1 * x1 + b1 * y1;
 		x1 = x;
 		return y1;
@@ -97,8 +87,7 @@ public:
 	void reset() { x1 = y1 = 0; }
 
 	/* clear denormal numbers in history */
-	void flush_0()
-	{
+	void flush_0() {
 		if (is_denormal(y1)) y1 = 0;
 	}
 };

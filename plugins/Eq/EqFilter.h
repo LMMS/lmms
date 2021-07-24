@@ -35,59 +35,46 @@
 /// upon parameter changes. The intention is to use this as a bass class, children override
 /// the calcCoefficents() function, providing the coefficents a1, a2, b0, b1, b2.
 ///
-class EqFilter
-{
+class EqFilter {
 public:
 	EqFilter()
 		: m_sampleRate(0)
 		, m_freq(0)
 		, m_res(0)
 		, m_gain(0)
-		, m_bw(0)
-	{
-	}
+		, m_bw(0) {}
 
-	virtual inline void setSampleRate(int sampleRate)
-	{
-		if (sampleRate != m_sampleRate)
-		{
+	virtual inline void setSampleRate(int sampleRate) {
+		if (sampleRate != m_sampleRate) {
 			m_sampleRate = sampleRate;
 			calcCoefficents();
 		}
 	}
 
-	virtual inline void setFrequency(float freq)
-	{
-		if (freq != m_freq)
-		{
+	virtual inline void setFrequency(float freq) {
+		if (freq != m_freq) {
 			m_freq = freq;
 			calcCoefficents();
 		}
 	}
 
-	virtual inline void setQ(float res)
-	{
-		if (res != m_res)
-		{
+	virtual inline void setQ(float res) {
+		if (res != m_res) {
 			m_res = res;
 			calcCoefficents();
 		}
 	}
 
-	virtual inline void setGain(float gain)
-	{
-		if (gain != m_gain)
-		{
+	virtual inline void setGain(float gain) {
+		if (gain != m_gain) {
 			m_gain = gain;
 			calcCoefficents();
 		}
 	}
 
-	virtual inline void setParameters(float sampleRate, float freq, float res, float gain)
-	{
+	virtual inline void setParameters(float sampleRate, float freq, float res, float gain) {
 		bool hasChanged = (sampleRate != m_sampleRate || freq != m_freq || res != m_res || gain != m_gain);
-		if (hasChanged)
-		{
+		if (hasChanged) {
 			m_sampleRate = sampleRate;
 			m_freq = freq;
 			m_res = res;
@@ -105,8 +92,7 @@ public:
 	/// \param frameProgress percentage of frame processed
 	/// \return
 	///
-	inline float update(float in, ch_cnt_t ch, float frameProgress)
-	{
+	inline float update(float in, ch_cnt_t ch, float frameProgress) {
 		float initailF = m_biQuadFrameInitial.update(in, ch);
 		float targetF = m_biQuadFrameTarget.update(in, ch);
 
@@ -122,8 +108,7 @@ protected:
 	///  Freq, Res and Gain
 	virtual void calcCoefficents() { setCoeffs(0, 0, 0, 0, 0); }
 
-	inline void setCoeffs(float a1, float a2, float b0, float b1, float b2)
-	{
+	inline void setCoeffs(float a1, float a2, float b0, float b1, float b2) {
 		m_biQuadFrameTarget.setCoeffs(a1, a2, b0, b1, b2);
 	}
 
@@ -140,11 +125,9 @@ protected:
 /// \brief The EqHp12Filter class
 /// A 2 pole High Pass Filter
 /// Coefficent calculations from http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
-class EqHp12Filter : public EqFilter
-{
+class EqHp12Filter : public EqFilter {
 public:
-	virtual void calcCoefficents()
-	{
+	virtual void calcCoefficents() {
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
@@ -180,11 +163,9 @@ public:
 /// A 2 pole low pass filter
 /// Coefficent calculations from http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
 ///
-class EqLp12Filter : public EqFilter
-{
+class EqLp12Filter : public EqFilter {
 public:
-	virtual void calcCoefficents()
-	{
+	virtual void calcCoefficents() {
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
@@ -220,11 +201,9 @@ public:
 /// A Peak Filter
 /// Coefficent calculations from http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
 ///
-class EqPeakFilter : public EqFilter
-{
+class EqPeakFilter : public EqFilter {
 public:
-	virtual void calcCoefficents()
-	{
+	virtual void calcCoefficents() {
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
 		float c = cosf(w0);
@@ -253,26 +232,21 @@ public:
 		setCoeffs(a1, a2, b0, b1, b2);
 	}
 
-	virtual inline void setParameters(float sampleRate, float freq, float bw, float gain)
-	{
+	virtual inline void setParameters(float sampleRate, float freq, float bw, float gain) {
 		bool hasChanged = false;
-		if (sampleRate != m_sampleRate)
-		{
+		if (sampleRate != m_sampleRate) {
 			m_sampleRate = sampleRate;
 			hasChanged = true;
 		}
-		if (freq != m_freq)
-		{
+		if (freq != m_freq) {
 			m_freq = freq;
 			hasChanged = true;
 		}
-		if (bw != m_bw)
-		{
+		if (bw != m_bw) {
 			m_bw = bw;
 			hasChanged = true;
 		}
-		if (gain != m_gain)
-		{
+		if (gain != m_gain) {
 			m_gain = gain;
 			hasChanged = true;
 		}
@@ -281,11 +255,9 @@ public:
 	}
 };
 
-class EqLowShelfFilter : public EqFilter
-{
+class EqLowShelfFilter : public EqFilter {
 public:
-	virtual void calcCoefficents()
-	{
+	virtual void calcCoefficents() {
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
@@ -318,11 +290,9 @@ public:
 	}
 };
 
-class EqHighShelfFilter : public EqFilter
-{
+class EqHighShelfFilter : public EqFilter {
 public:
-	virtual void calcCoefficents()
-	{
+	virtual void calcCoefficents() {
 
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
@@ -352,39 +322,30 @@ public:
 	}
 };
 
-class EqLinkwitzRiley : public StereoLinkwitzRiley
-{
+class EqLinkwitzRiley : public StereoLinkwitzRiley {
 public:
 	EqLinkwitzRiley()
 		: StereoLinkwitzRiley(44100)
 		, m_freq(0)
-		, m_sr(1)
-	{
-	}
+		, m_sr(1) {}
 
-	virtual inline void setSR(int sampleRate)
-	{
-		if (sampleRate != m_sr)
-		{
+	virtual inline void setSR(int sampleRate) {
+		if (sampleRate != m_sr) {
 			m_sr = sampleRate;
 			setSampleRate(sampleRate);
 			setLowpass(m_freq);
 		}
 	}
 
-	virtual inline void setFrequency(float freq)
-	{
-		if (freq != m_freq)
-		{
+	virtual inline void setFrequency(float freq) {
+		if (freq != m_freq) {
 			m_freq = freq;
 			setLowpass(m_freq);
 		}
 	}
 
-	virtual void processBuffer(sampleFrame* buf, const fpp_t frames)
-	{
-		for (fpp_t f = 0; f < frames; ++f)
-		{
+	virtual void processBuffer(sampleFrame* buf, const fpp_t frames) {
+		for (fpp_t f = 0; f < frames; ++f) {
 			buf[f][0] = update(buf[f][0], 0);
 			buf[f][1] = update(buf[f][1], 1);
 		}

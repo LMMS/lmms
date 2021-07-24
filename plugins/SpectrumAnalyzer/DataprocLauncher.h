@@ -30,14 +30,11 @@
 #include "LocklessRingBuffer.h"
 #include "SaProcessor.h"
 
-class DataprocLauncher : public QThread
-{
+class DataprocLauncher : public QThread {
 public:
 	explicit DataprocLauncher(SaProcessor& proc, LocklessRingBuffer<sampleFrame>& buffer)
 		: m_processor(&proc)
-		, m_inputBuffer(&buffer)
-	{
-	}
+		, m_inputBuffer(&buffer) {}
 
 private:
 	void run() override { m_processor->analyze(*m_inputBuffer); }

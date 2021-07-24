@@ -51,8 +51,7 @@ class Ladspa2LMMS;
 class LmmsCore;
 typedef LmmsCore Engine;
 
-class LMMS_EXPORT LmmsCore : public QObject
-{
+class LMMS_EXPORT LmmsCore : public QObject {
 	Q_OBJECT
 public:
 	static void init(bool renderOnly);
@@ -83,8 +82,7 @@ public:
 
 	static void updateFramesPerTick();
 
-	static inline LmmsCore* inst()
-	{
+	static inline LmmsCore* inst() {
 		if (s_instanceOfMe == NULL) { s_instanceOfMe = new LmmsCore(); }
 		return s_instanceOfMe;
 	}
@@ -98,8 +96,7 @@ signals:
 private:
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
-	template <class T> static inline void deleteHelper(T** ptr)
-	{
+	template <class T> static inline void deleteHelper(T** ptr) {
 		T* tmp = *ptr;
 		*ptr = NULL;
 		delete tmp;

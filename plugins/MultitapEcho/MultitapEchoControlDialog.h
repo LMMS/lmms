@@ -30,8 +30,7 @@
 
 class MultitapEchoControls;
 
-class MultitapEchoControlDialog : public EffectControlDialog
-{
+class MultitapEchoControlDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	MultitapEchoControlDialog(MultitapEchoControls* controls);

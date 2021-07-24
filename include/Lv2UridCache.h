@@ -33,8 +33,7 @@
 #include <cstdint>
 
 //! Cached URIDs for fast access (for use in real-time code)
-class Lv2UridCache
-{
+class Lv2UridCache {
 public:
 	enum class Id //!< ID for m_uridCache array
 	{
@@ -62,14 +61,8 @@ private:
 	uint32_t m_cache[static_cast<int>(Id::size)];
 };
 
-template <> struct Lv2UridCache::IdForType<float>
-{
-	static constexpr auto value = Id::atom_Float;
-};
-template <> struct Lv2UridCache::IdForType<std::int32_t>
-{
-	static constexpr auto value = Id::atom_Int;
-};
+template <> struct Lv2UridCache::IdForType<float> { static constexpr auto value = Id::atom_Float; };
+template <> struct Lv2UridCache::IdForType<std::int32_t> { static constexpr auto value = Id::atom_Int; };
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2URIDCACHE_H

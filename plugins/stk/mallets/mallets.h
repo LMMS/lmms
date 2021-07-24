@@ -37,15 +37,12 @@
 // As of Stk 4.4 all classes and types have been moved to the namespace "stk".
 // However in older versions this namespace does not exist, therefore declare it
 // so this plugin builds with all versions of Stk.
-namespace stk
-{
-};
+namespace stk {};
 using namespace stk;
 
 static const int MALLETS_PRESET_VERSION = 1;
 
-class malletsSynth
-{
+class malletsSynth {
 public:
 	// ModalBar
 	malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const StkFloat _control1, const StkFloat _control2,
@@ -62,18 +59,16 @@ public:
 		const StkFloat _control11, const int _control16, const StkFloat _control64, const StkFloat _control128,
 		const uint8_t _delay, const sample_rate_t _sample_rate);
 
-	inline ~malletsSynth()
-	{
+	inline ~malletsSynth() {
 		if (m_voice) { m_voice->noteOff(0.0); }
 		delete[] m_delay;
 		delete m_voice;
 	}
 
-	inline sample_t nextSampleLeft()
-	{
-		if (m_voice == NULL) { return (0.0f); }
-		else
-		{
+	inline sample_t nextSampleLeft() {
+		if (m_voice == NULL) {
+			return (0.0f);
+		} else {
 			StkFloat s = m_voice->tick();
 			m_delay[m_delayWrite] = s;
 			m_delayWrite++;
@@ -81,15 +76,13 @@ public:
 		}
 	}
 
-	inline sample_t nextSampleRight()
-	{
+	inline sample_t nextSampleRight() {
 		StkFloat s = m_delay[m_delayRead];
 		m_delayRead++;
 		return (s);
 	}
 
-	inline void setFrequency(const StkFloat _pitch)
-	{
+	inline void setFrequency(const StkFloat _pitch) {
 		if (m_voice) { m_voice->setFrequency(_pitch); }
 	}
 
@@ -106,8 +99,7 @@ protected:
 	uint8_t m_delayWrite;
 };
 
-class malletsInstrument : public Instrument
-{
+class malletsInstrument : public Instrument {
 	Q_OBJECT
 public:
 	malletsInstrument(InstrumentTrack* _instrument_track);
@@ -155,8 +147,7 @@ private:
 	friend class malletsInstrumentView;
 };
 
-class malletsInstrumentView : public InstrumentViewFixedSize
-{
+class malletsInstrumentView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	malletsInstrumentView(malletsInstrument* _instrument, QWidget* _parent);

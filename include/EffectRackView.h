@@ -38,8 +38,7 @@ class QVBoxLayout;
 class EffectView;
 class GroupBox;
 
-class EffectRackView : public QWidget, public ModelView
-{
+class EffectRackView : public QWidget, public ModelView {
 	Q_OBJECT
 public:
 	EffectRackView(EffectChain* model, QWidget* parent = NULL);

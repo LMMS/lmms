@@ -38,29 +38,22 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset)
 	, m_affinity(QThread::currentThread())
 	, m_playHandleBuffer(BufferManager::acquire())
 	, m_bufferReleased(true)
-	, m_usesBuffer(true)
-{
-}
+	, m_usesBuffer(true) {}
 
 PlayHandle::~PlayHandle() { BufferManager::release(m_playHandleBuffer); }
 
-void PlayHandle::doProcessing()
-{
-	if (m_usesBuffer)
-	{
+void PlayHandle::doProcessing() {
+	if (m_usesBuffer) {
 		m_bufferReleased = false;
 		BufferManager::clear(m_playHandleBuffer, Engine::mixer()->framesPerPeriod());
 		play(buffer());
-	}
-	else
-	{
+	} else {
 		play(NULL);
 	}
 }
 
 void PlayHandle::releaseBuffer() { m_bufferReleased = true; }
 
-sampleFrame* PlayHandle::buffer()
-{
+sampleFrame* PlayHandle::buffer() {
 	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame*>(m_playHandleBuffer);
 };

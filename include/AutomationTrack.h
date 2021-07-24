@@ -30,8 +30,7 @@
 #include "Track.h"
 #include "TrackView.h"
 
-class AutomationTrack : public Track
-{
+class AutomationTrack : public Track {
 	Q_OBJECT
 public:
 	AutomationTrack(TrackContainer* tc, bool _hidden = false);
@@ -52,8 +51,7 @@ private:
 	friend class AutomationTrackView;
 };
 
-class AutomationTrackView : public TrackView
-{
+class AutomationTrackView : public TrackView {
 public:
 	AutomationTrackView(AutomationTrack* at, TrackContainerView* tcv);
 	virtual ~AutomationTrackView() = default;

@@ -28,8 +28,7 @@
 
 #include <QWidget>
 
-class PositionLine : public QWidget
-{
+class PositionLine : public QWidget {
 	Q_OBJECT
 	Q_PROPERTY(bool tailGradient MEMBER m_hasTailGradient)
 	Q_PROPERTY(QColor lineColor MEMBER m_lineColor)

@@ -41,8 +41,7 @@ waveShaperControls::waveShaperControls(waveShaperEffect* _eff)
 	, m_inputModel(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Input gain"))
 	, m_outputModel(1.0f, 0.0f, 5.0f, 0.01f, this, tr("Output gain"))
 	, m_wavegraphModel(0.0f, 1.0f, 200, this)
-	, m_clipModel(false, this)
-{
+	, m_clipModel(false, this) {
 	connect(&m_wavegraphModel, SIGNAL(samplesChanged(int, int)), this, SLOT(samplesChanged(int, int)));
 
 	setDefaultShape();
@@ -50,8 +49,7 @@ waveShaperControls::waveShaperControls(waveShaperEffect* _eff)
 
 void waveShaperControls::samplesChanged(int _begin, int _end) { Engine::getSong()->setModified(); }
 
-void waveShaperControls::loadSettings(const QDomElement& _this)
-{
+void waveShaperControls::loadSettings(const QDomElement& _this) {
 	// load input, output knobs
 	m_inputModel.loadSettings(_this, "inputGain");
 	m_outputModel.loadSettings(_this, "outputGain");
@@ -67,8 +65,7 @@ void waveShaperControls::loadSettings(const QDomElement& _this)
 	delete[] dst;
 }
 
-void waveShaperControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void waveShaperControls::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	// save input, output knobs
 	m_inputModel.saveSettings(_doc, _this, "inputGain");
 	m_outputModel.saveSettings(_doc, _this, "outputGain");
@@ -81,11 +78,9 @@ void waveShaperControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	_this.setAttribute("waveShape", sampleString);
 }
 
-void waveShaperControls::setDefaultShape()
-{
+void waveShaperControls::setDefaultShape() {
 	float shp[200] = {};
-	for (int i = 0; i < 200; i++)
-	{
+	for (int i = 0; i < 200; i++) {
 		shp[i] = ((float)i + 1.0f) / 200.0f;
 	}
 
@@ -93,31 +88,25 @@ void waveShaperControls::setDefaultShape()
 	m_wavegraphModel.setSamples((float*)&shp);
 }
 
-void waveShaperControls::resetClicked()
-{
+void waveShaperControls::resetClicked() {
 	setDefaultShape();
 	Engine::getSong()->setModified();
 }
 
-void waveShaperControls::smoothClicked()
-{
+void waveShaperControls::smoothClicked() {
 	m_wavegraphModel.smoothNonCyclic();
 	Engine::getSong()->setModified();
 }
 
-void waveShaperControls::addOneClicked()
-{
-	for (int i = 0; i < 200; i++)
-	{
+void waveShaperControls::addOneClicked() {
+	for (int i = 0; i < 200; i++) {
 		m_wavegraphModel.setSampleAt(i, qBound(0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f));
 	}
 	Engine::getSong()->setModified();
 }
 
-void waveShaperControls::subOneClicked()
-{
-	for (int i = 0; i < 200; i++)
-	{
+void waveShaperControls::subOneClicked() {
+	for (int i = 0; i < 200; i++) {
 		m_wavegraphModel.setSampleAt(i, qBound(0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f));
 	}
 	Engine::getSong()->setModified();

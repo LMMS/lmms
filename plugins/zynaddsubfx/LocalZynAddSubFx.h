@@ -31,8 +31,7 @@
 class Master;
 class NulEngine;
 
-class LocalZynAddSubFx
-{
+class LocalZynAddSubFx {
 public:
 	LocalZynAddSubFx();
 	~LocalZynAddSubFx();

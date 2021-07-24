@@ -33,8 +33,7 @@ typedef QVector<LadspaControl*> control_list_t;
 
 class LadspaEffect;
 
-class LadspaControls : public EffectControls
-{
+class LadspaControls : public EffectControls {
 	Q_OBJECT
 public:
 	LadspaControls(LadspaEffect* _eff);

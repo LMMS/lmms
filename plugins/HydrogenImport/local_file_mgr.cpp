@@ -15,26 +15,20 @@
 /* New QtXml based methods */
 
 QString LocalFileMng::readXmlString(QDomNode node, const QString& nodeName, const QString& defaultValue,
-	bool bCanBeEmpty, bool bShouldExists, bool tinyXmlCompatMode)
-{
+	bool bCanBeEmpty, bool bShouldExists, bool tinyXmlCompatMode) {
 	QDomElement element = node.firstChildElement(nodeName);
 
-	if (!node.isNull() && !element.isNull())
-	{
-		if (!element.text().isEmpty()) { return element.text(); }
-		else
-		{
-			if (!bCanBeEmpty)
-			{
+	if (!node.isNull() && !element.isNull()) {
+		if (!element.text().isEmpty()) {
+			return element.text();
+		} else {
+			if (!bCanBeEmpty) {
 				//_WARNINGLOG( "Using default value in " + nodeName );
 			}
 			return defaultValue;
 		}
-	}
-	else
-	{
-		if (bShouldExists)
-		{
+	} else {
+		if (bShouldExists) {
 			//_WARNINGLOG( "'" + nodeName + "' node not found" );
 		}
 		return defaultValue;
@@ -42,27 +36,21 @@ QString LocalFileMng::readXmlString(QDomNode node, const QString& nodeName, cons
 }
 
 float LocalFileMng::readXmlFloat(QDomNode node, const QString& nodeName, float defaultValue, bool bCanBeEmpty,
-	bool bShouldExists, bool tinyXmlCompatMode)
-{
+	bool bShouldExists, bool tinyXmlCompatMode) {
 	QLocale c_locale = QLocale::c();
 	QDomElement element = node.firstChildElement(nodeName);
 
-	if (!node.isNull() && !element.isNull())
-	{
-		if (!element.text().isEmpty()) { return c_locale.toFloat(element.text()); }
-		else
-		{
-			if (!bCanBeEmpty)
-			{
+	if (!node.isNull() && !element.isNull()) {
+		if (!element.text().isEmpty()) {
+			return c_locale.toFloat(element.text());
+		} else {
+			if (!bCanBeEmpty) {
 				//_WARNINGLOG( "Using default value in " + nodeName );
 			}
 			return defaultValue;
 		}
-	}
-	else
-	{
-		if (bShouldExists)
-		{
+	} else {
+		if (bShouldExists) {
 			//_WARNINGLOG( "'" + nodeName + "' node not found" );
 		}
 		return defaultValue;
@@ -70,27 +58,21 @@ float LocalFileMng::readXmlFloat(QDomNode node, const QString& nodeName, float d
 }
 
 int LocalFileMng::readXmlInt(QDomNode node, const QString& nodeName, int defaultValue, bool bCanBeEmpty,
-	bool bShouldExists, bool tinyXmlCompatMode)
-{
+	bool bShouldExists, bool tinyXmlCompatMode) {
 	QLocale c_locale = QLocale::c();
 	QDomElement element = node.firstChildElement(nodeName);
 
-	if (!node.isNull() && !element.isNull())
-	{
-		if (!element.text().isEmpty()) { return c_locale.toInt(element.text()); }
-		else
-		{
-			if (!bCanBeEmpty)
-			{
+	if (!node.isNull() && !element.isNull()) {
+		if (!element.text().isEmpty()) {
+			return c_locale.toInt(element.text());
+		} else {
+			if (!bCanBeEmpty) {
 				//_WARNINGLOG( "Using default value in " + nodeName );
 			}
 			return defaultValue;
 		}
-	}
-	else
-	{
-		if (bShouldExists)
-		{
+	} else {
+		if (bShouldExists) {
 			//_WARNINGLOG( "'" + nodeName + "' node not found" );
 		}
 		return defaultValue;
@@ -98,30 +80,22 @@ int LocalFileMng::readXmlInt(QDomNode node, const QString& nodeName, int default
 }
 
 bool LocalFileMng::readXmlBool(
-	QDomNode node, const QString& nodeName, bool defaultValue, bool bShouldExists, bool tinyXmlCompatMode)
-{
+	QDomNode node, const QString& nodeName, bool defaultValue, bool bShouldExists, bool tinyXmlCompatMode) {
 	QDomElement element = node.firstChildElement(nodeName);
 
-	if (!node.isNull() && !element.isNull())
-	{
-		if (!element.text().isEmpty())
-		{
-			if (element.text() == "true") { return true; }
-			else
-			{
+	if (!node.isNull() && !element.isNull()) {
+		if (!element.text().isEmpty()) {
+			if (element.text() == "true") {
+				return true;
+			} else {
 				return false;
 			}
-		}
-		else
-		{
+		} else {
 			//_WARNINGLOG( "Using default value in " + nodeName );
 			return defaultValue;
 		}
-	}
-	else
-	{
-		if (bShouldExists)
-		{
+	} else {
+		if (bShouldExists) {
 			//_WARNINGLOG( "'" + nodeName + "' node not found" );
 		}
 		return defaultValue;
@@ -131,8 +105,7 @@ bool LocalFileMng::readXmlBool(
 /* Convert (in-place) an XML escape sequence into a literal byte,
  * rather than the character it actually refers to.
  */
-void LocalFileMng::convertFromTinyXMLString(QByteArray* str)
-{
+void LocalFileMng::convertFromTinyXMLString(QByteArray* str) {
 	/* When TinyXML encountered a non-ASCII character, it would
 	 * simply write the character as "&#xx;" -- where "xx" is
 	 * the hex character code.  However, this doesn't respect
@@ -157,10 +130,8 @@ void LocalFileMng::convertFromTinyXMLString(QByteArray* str)
 	int pos = 0;
 
 	pos = str->indexOf("&#x");
-	while (pos != -1)
-	{
-		if (isxdigit(str->at(pos + 3)) && isxdigit(str->at(pos + 4)) && (str->at(pos + 5) == ';'))
-		{
+	while (pos != -1) {
+		if (isxdigit(str->at(pos + 3)) && isxdigit(str->at(pos + 4)) && (str->at(pos + 5) == ';')) {
 			char w1 = str->at(pos + 3);
 			char w2 = str->at(pos + 4);
 
@@ -181,8 +152,7 @@ void LocalFileMng::convertFromTinyXMLString(QByteArray* str)
 	}
 }
 
-bool LocalFileMng::checkTinyXMLCompatMode(const QString& filename)
-{
+bool LocalFileMng::checkTinyXMLCompatMode(const QString& filename) {
 	/*
 		Check if filename was created with TinyXml or QtXml
 		TinyXML: return true
@@ -195,9 +165,9 @@ bool LocalFileMng::checkTinyXMLCompatMode(const QString& filename)
 
 	QString line = file.readLine();
 	file.close();
-	if (line.startsWith("<?xml")) { return false; }
-	else
-	{
+	if (line.startsWith("<?xml")) {
+		return false;
+	} else {
 		//_WARNINGLOG( QString("File '%1' is being read in "
 		//		    "TinyXML compatability mode")
 		//	    .arg(filename) );
@@ -205,8 +175,7 @@ bool LocalFileMng::checkTinyXMLCompatMode(const QString& filename)
 	}
 }
 
-QDomDocument LocalFileMng::openXmlDocument(const QString& filename)
-{
+QDomDocument LocalFileMng::openXmlDocument(const QString& filename) {
 	bool TinyXMLCompat = LocalFileMng::checkTinyXMLCompatMode(filename);
 
 	QDomDocument doc;
@@ -214,8 +183,7 @@ QDomDocument LocalFileMng::openXmlDocument(const QString& filename)
 
 	if (!file.open(QIODevice::ReadOnly)) return QDomDocument();
 
-	if (TinyXMLCompat)
-	{
+	if (TinyXMLCompat) {
 		QString enc = QTextCodec::codecForLocale()->name();
 		if (enc == QString("System")) { enc = "UTF-8"; }
 		QByteArray line;
@@ -223,23 +191,18 @@ QDomDocument LocalFileMng::openXmlDocument(const QString& filename)
 
 		//_INFOLOG( QString("Using '%1' encoding for TinyXML file").arg(enc) );
 
-		while (!file.atEnd())
-		{
+		while (!file.atEnd()) {
 			line = file.readLine();
 			LocalFileMng::convertFromTinyXMLString(&line);
 			buf += line;
 		}
 
-		if (!doc.setContent(buf))
-		{
+		if (!doc.setContent(buf)) {
 			file.close();
 			return QDomDocument();
 		}
-	}
-	else
-	{
-		if (!doc.setContent(&file))
-		{
+	} else {
+		if (!doc.setContent(&file)) {
 			file.close();
 			return QDomDocument();
 		}

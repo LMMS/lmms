@@ -36,8 +36,7 @@
 
 EffectRackView::EffectRackView(EffectChain* model, QWidget* parent)
 	: QWidget(parent)
-	, ModelView(NULL, this)
-{
+	, ModelView(NULL, this) {
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
 	mainLayout->setMargin(5);
 
@@ -71,24 +70,19 @@ EffectRackView::EffectRackView(EffectChain* model, QWidget* parent)
 
 EffectRackView::~EffectRackView() { clearViews(); }
 
-void EffectRackView::clearViews()
-{
-	while (m_effectViews.size())
-	{
+void EffectRackView::clearViews() {
+	while (m_effectViews.size()) {
 		EffectView* e = m_effectViews[m_effectViews.size() - 1];
 		m_effectViews.pop_back();
 		delete e;
 	}
 }
 
-void EffectRackView::moveUp(EffectView* view)
-{
+void EffectRackView::moveUp(EffectView* view) {
 	fxChain()->moveUp(view->effect());
-	if (view != m_effectViews.first())
-	{
+	if (view != m_effectViews.first()) {
 		int i = 0;
-		for (QVector<EffectView*>::Iterator it = m_effectViews.begin(); it != m_effectViews.end(); it++, i++)
-		{
+		for (QVector<EffectView*>::Iterator it = m_effectViews.begin(); it != m_effectViews.end(); it++, i++) {
 			if (*it == view) { break; }
 		}
 
@@ -101,17 +95,14 @@ void EffectRackView::moveUp(EffectView* view)
 	}
 }
 
-void EffectRackView::moveDown(EffectView* view)
-{
-	if (view != m_effectViews.last())
-	{
+void EffectRackView::moveDown(EffectView* view) {
+	if (view != m_effectViews.last()) {
 		// moving next effect up is the same
 		moveUp(*(std::find(m_effectViews.begin(), m_effectViews.end(), view) + 1));
 	}
 }
 
-void EffectRackView::deletePlugin(EffectView* view)
-{
+void EffectRackView::deletePlugin(EffectView* view) {
 	Effect* e = view->effect();
 	m_effectViews.erase(std::find(m_effectViews.begin(), m_effectViews.end(), view));
 	delete view;
@@ -120,24 +111,19 @@ void EffectRackView::deletePlugin(EffectView* view)
 	update();
 }
 
-void EffectRackView::update()
-{
+void EffectRackView::update() {
 	QWidget* w = m_scrollArea->widget();
 	QVector<bool> view_map(qMax<int>(fxChain()->m_effects.size(), m_effectViews.size()), false);
 
-	for (QVector<Effect*>::Iterator it = fxChain()->m_effects.begin(); it != fxChain()->m_effects.end(); ++it)
-	{
+	for (QVector<Effect*>::Iterator it = fxChain()->m_effects.begin(); it != fxChain()->m_effects.end(); ++it) {
 		int i = 0;
-		for (QVector<EffectView*>::Iterator vit = m_effectViews.begin(); vit != m_effectViews.end(); ++vit, ++i)
-		{
-			if ((*vit)->model() == *it)
-			{
+		for (QVector<EffectView*>::Iterator vit = m_effectViews.begin(); vit != m_effectViews.end(); ++vit, ++i) {
+			if ((*vit)->model() == *it) {
 				view_map[i] = true;
 				break;
 			}
 		}
-		if (i >= m_effectViews.size())
-		{
+		if (i >= m_effectViews.size()) {
 			EffectView* view = new EffectView(*it, w);
 			connect(view, SIGNAL(moveUp(EffectView*)), this, SLOT(moveUp(EffectView*)));
 			connect(view, SIGNAL(moveDown(EffectView*)), this, SLOT(moveDown(EffectView*)));
@@ -145,9 +131,9 @@ void EffectRackView::update()
 				view, SIGNAL(deletePlugin(EffectView*)), this, SLOT(deletePlugin(EffectView*)), Qt::QueuedConnection);
 			view->show();
 			m_effectViews.append(view);
-			if (i < view_map.size()) { view_map[i] = true; }
-			else
-			{
+			if (i < view_map.size()) {
+				view_map[i] = true;
+			} else {
 				view_map.append(true);
 			}
 		}
@@ -158,15 +144,11 @@ void EffectRackView::update()
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
 
-	for (QVector<EffectView*>::Iterator it = m_effectViews.begin(); it != m_effectViews.end(); i++)
-	{
-		if (i < view_map.size() && view_map[i] == false)
-		{
+	for (QVector<EffectView*>::Iterator it = m_effectViews.begin(); it != m_effectViews.end(); i++) {
+		if (i < view_map.size() && view_map[i] == false) {
 			delete m_effectViews[nView];
 			it = m_effectViews.erase(it);
-		}
-		else
-		{
+		} else {
 			(*it)->move(EffectViewMargin, m_lastY);
 			m_lastY += (*it)->height();
 			++nView;
@@ -179,8 +161,7 @@ void EffectRackView::update()
 	QWidget::update();
 }
 
-void EffectRackView::addEffect()
-{
+void EffectRackView::addEffect() {
 	EffectSelectDialog esd(this);
 	esd.exec();
 
@@ -192,10 +173,8 @@ void EffectRackView::addEffect()
 	update();
 
 	// Find the effectView, and show the controls
-	for (QVector<EffectView*>::Iterator vit = m_effectViews.begin(); vit != m_effectViews.end(); ++vit)
-	{
-		if ((*vit)->effect() == fx)
-		{
+	for (QVector<EffectView*>::Iterator vit = m_effectViews.begin(); vit != m_effectViews.end(); ++vit) {
+		if ((*vit)->effect() == fx) {
 			(*vit)->editControls();
 
 			break;
@@ -203,8 +182,7 @@ void EffectRackView::addEffect()
 	}
 }
 
-void EffectRackView::modelChanged()
-{
+void EffectRackView::modelChanged() {
 	// clearViews();
 	m_effectsGroupBox->setModel(&fxChain()->m_enabledModel);
 	connect(fxChain(), SIGNAL(aboutToClear()), this, SLOT(clearViews()));

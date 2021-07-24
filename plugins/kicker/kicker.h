@@ -39,8 +39,7 @@
 class kickerInstrumentView;
 class NotePlayHandle;
 
-class kickerInstrument : public Instrument
-{
+class kickerInstrument : public Instrument {
 	Q_OBJECT
 public:
 	kickerInstrument(InstrumentTrack* _instrument_track);
@@ -80,8 +79,7 @@ private:
 	friend class kickerInstrumentView;
 };
 
-class kickerInstrumentView : public InstrumentViewFixedSize
-{
+class kickerInstrumentView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	kickerInstrumentView(Instrument* _instrument, QWidget* _parent);

@@ -66,8 +66,7 @@ class PluginIssue;
 	* this class can not override virtuals of Instrument or EffectControls, so
 	  it will offer functions that must be called by virtuals in its child class
 */
-class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups
-{
+class LMMS_EXPORT Lv2ControlBase : public LinkedModelGroups {
 public:
 	static Plugin::PluginTypes check(const LilvPlugin* m_plugin, std::vector<PluginIssue>& issues);
 

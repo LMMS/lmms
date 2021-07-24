@@ -30,16 +30,14 @@
 
 #include "dsp/util.h"
 
-class HRTF : public Plugin
-{
+class HRTF : public Plugin {
 public:
 	int pan;
 	int n, h;
 
 	double x[32];
 
-	struct
-	{
+	struct {
 		double *a, *b;
 		double y[32];
 	} left, right;

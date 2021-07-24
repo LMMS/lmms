@@ -30,8 +30,7 @@
 
 class waveShaperControls;
 
-class waveShaperControlDialog : public EffectControlDialog
-{
+class waveShaperControlDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	waveShaperControlDialog(waveShaperControls* _controls);

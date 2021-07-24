@@ -30,8 +30,7 @@
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
 
-class AudioFileFlac : public AudioFileDevice
-{
+class AudioFileFlac : public AudioFileDevice {
 public:
 	AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file,
 		Mixer* mixer);
@@ -39,8 +38,7 @@ public:
 	virtual ~AudioFileFlac();
 
 	static AudioFileDevice* getInst(QString const& outputFilename, OutputSettings const& outputSettings,
-		ch_cnt_t const channels, Mixer* mixer, bool& successful)
-	{
+		ch_cnt_t const channels, Mixer* mixer, bool& successful) {
 		return new AudioFileFlac(outputSettings, channels, successful, outputFilename, mixer);
 	}
 

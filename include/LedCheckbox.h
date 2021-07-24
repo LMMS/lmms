@@ -29,17 +29,10 @@
 
 class QPixmap;
 
-class LMMS_EXPORT LedCheckBox : public AutomatableButton
-{
+class LMMS_EXPORT LedCheckBox : public AutomatableButton {
 	Q_OBJECT
 public:
-	enum LedColors
-	{
-		Yellow,
-		Green,
-		Red,
-		NumColors
-	};
+	enum LedColors { Yellow, Green, Red, NumColors };
 
 	LedCheckBox(const QString& _txt, QWidget* _parent, const QString& _name = QString(), LedColors _color = Yellow);
 	LedCheckBox(QWidget* _parent, const QString& _name = QString(), LedColors _color = Yellow);

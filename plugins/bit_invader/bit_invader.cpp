@@ -45,11 +45,10 @@
 static const int wavetableSize = 200;
 static const float defaultNormalizationFactor = 1.0f;
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "BitInvader",
-		QT_TRANSLATE_NOOP("PluginBrowser", "Customizable wavetable synthesizer"),
+Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor
+	= {STRINGIFY(PLUGIN_NAME), "BitInvader", QT_TRANSLATE_NOOP("PluginBrowser", "Customizable wavetable synthesizer"),
 		"Andreas Brandmaier <andreas/at/brandmaier/dot/de>", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"),
 		NULL, NULL};
 }
@@ -60,11 +59,9 @@ bSynth::bSynth(
 	, sample_realindex(0)
 	, nph(_nph)
 	, sample_rate(_sample_rate)
-	, interpolation(_interpolation)
-{
+	, interpolation(_interpolation) {
 	sample_shape = new float[wavetableSize];
-	for (int i = 0; i < wavetableSize; ++i)
-	{
+	for (int i = 0; i < wavetableSize; ++i) {
 		float buf = _shape[i] * _factor;
 
 		/* Double check that normalization has been performed correctly,
@@ -78,27 +75,24 @@ bSynth::bSynth(
 
 bSynth::~bSynth() { delete[] sample_shape; }
 
-sample_t bSynth::nextStringSample(float sample_length)
-{
+sample_t bSynth::nextStringSample(float sample_length) {
 	float sample_step = static_cast<float>(sample_length / (sample_rate / nph->frequency()));
 
 	// check overflow
-	while (sample_realindex >= sample_length)
-	{
+	while (sample_realindex >= sample_length) {
 		sample_realindex -= sample_length;
 	}
 
 	sample_t sample;
 
-	if (interpolation)
-	{
+	if (interpolation) {
 
 		// find position in shape
 		int a = static_cast<int>(sample_realindex);
 		int b;
-		if (a < (sample_length - 1)) { b = static_cast<int>(sample_realindex + 1); }
-		else
-		{
+		if (a < (sample_length - 1)) {
+			b = static_cast<int>(sample_realindex + 1);
+		} else {
 			b = 0;
 		}
 
@@ -106,9 +100,7 @@ sample_t bSynth::nextStringSample(float sample_length)
 		const float frac = fraction(sample_realindex);
 
 		sample = linearInterpolate(sample_shape[a], sample_shape[b], frac);
-	}
-	else
-	{
+	} else {
 		// No interpolation
 		sample_index = static_cast<int>(sample_realindex);
 		sample = sample_shape[sample_index];
@@ -133,8 +125,7 @@ bitInvader::bitInvader(InstrumentTrack* _instrument_track)
 	, m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length"))
 	, m_graph(-1.0f, 1.0f, wavetableSize, this)
 	, m_interpolation(false, this)
-	, m_normalize(false, this)
-{
+	, m_normalize(false, this) {
 	m_graph.setWaveToSine();
 	lengthChanged();
 
@@ -145,8 +136,7 @@ bitInvader::bitInvader(InstrumentTrack* _instrument_track)
 
 bitInvader::~bitInvader() {}
 
-void bitInvader::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void bitInvader::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 
 	// Save plugin version
 	_this.setAttribute("version", "0.1");
@@ -166,8 +156,7 @@ void bitInvader::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	m_normalize.saveSettings(_doc, _this, "normalize");
 }
 
-void bitInvader::loadSettings(const QDomElement& _this)
-{
+void bitInvader::loadSettings(const QDomElement& _this) {
 	// Clear wavetable before loading a new
 	m_graph.clear();
 
@@ -192,26 +181,22 @@ void bitInvader::loadSettings(const QDomElement& _this)
 	m_normalize.loadSettings(_this, "normalize");
 }
 
-void bitInvader::lengthChanged()
-{
+void bitInvader::lengthChanged() {
 	m_graph.setLength((int)m_sampleLength.value());
 
 	normalize();
 }
 
-void bitInvader::samplesChanged(int _begin, int _end)
-{
+void bitInvader::samplesChanged(int _begin, int _end) {
 	normalize();
 	// engine::getSongEditor()->setModified();
 }
 
-void bitInvader::normalize()
-{
+void bitInvader::normalize() {
 	// analyze
 	float max = std::numeric_limits<float>::epsilon();
 	const float* samples = m_graph.samples();
-	for (int i = 0; i < m_graph.length(); i++)
-	{
+	for (int i = 0; i < m_graph.length(); i++) {
 		const float f = fabsf(samples[i]);
 		if (f > max) { max = f; }
 	}
@@ -220,15 +205,13 @@ void bitInvader::normalize()
 
 QString bitInvader::nodeName() const { return (bitinvader_plugin_descriptor.name); }
 
-void bitInvader::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
-{
-	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL)
-	{
+void bitInvader::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer) {
+	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL) {
 
 		float factor;
-		if (!m_normalize.value()) { factor = defaultNormalizationFactor; }
-		else
-		{
+		if (!m_normalize.value()) {
+			factor = defaultNormalizationFactor;
+		} else {
 			factor = m_normalizeFactor;
 		}
 
@@ -240,11 +223,9 @@ void bitInvader::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
 	const f_cnt_t offset = _n->noteOffset();
 
 	bSynth* ps = static_cast<bSynth*>(_n->m_pluginData);
-	for (fpp_t frame = offset; frame < frames + offset; ++frame)
-	{
+	for (fpp_t frame = offset; frame < frames + offset; ++frame) {
 		const sample_t cur = ps->nextStringSample(m_graph.length());
-		for (ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl)
-		{
+		for (ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl) {
 			_working_buffer[frame][chnl] = cur;
 		}
 	}
@@ -259,8 +240,7 @@ void bitInvader::deleteNotePluginData(NotePlayHandle* _n) { delete static_cast<b
 PluginView* bitInvader::instantiateView(QWidget* _parent) { return (new bitInvaderView(this, _parent)); }
 
 bitInvaderView::bitInvaderView(Instrument* _instrument, QWidget* _parent)
-	: InstrumentViewFixedSize(_instrument, _parent)
-{
+	: InstrumentViewFixedSize(_instrument, _parent) {
 	setAutoFillBackground(true);
 	QPalette pal;
 
@@ -346,8 +326,7 @@ bitInvaderView::bitInvaderView(Instrument* _instrument, QWidget* _parent)
 	connect(m_normalizeToggle, SIGNAL(toggled(bool)), this, SLOT(normalizeToggled(bool)));
 }
 
-void bitInvaderView::modelChanged()
-{
+void bitInvaderView::modelChanged() {
 	bitInvader* b = castModel<bitInvader>();
 
 	m_graph->setModel(&b->m_graph);
@@ -356,72 +335,59 @@ void bitInvaderView::modelChanged()
 	m_normalizeToggle->setModel(&b->m_normalize);
 }
 
-void bitInvaderView::sinWaveClicked()
-{
+void bitInvaderView::sinWaveClicked() {
 	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSine();
 	Engine::getSong()->setModified();
 }
 
-void bitInvaderView::triangleWaveClicked()
-{
+void bitInvaderView::triangleWaveClicked() {
 	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToTriangle();
 	Engine::getSong()->setModified();
 }
 
-void bitInvaderView::sawWaveClicked()
-{
+void bitInvaderView::sawWaveClicked() {
 	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSaw();
 	Engine::getSong()->setModified();
 }
 
-void bitInvaderView::sqrWaveClicked()
-{
+void bitInvaderView::sqrWaveClicked() {
 	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToSquare();
 	Engine::getSong()->setModified();
 }
 
-void bitInvaderView::noiseWaveClicked()
-{
+void bitInvaderView::noiseWaveClicked() {
 	m_graph->model()->clearInvisible();
 	m_graph->model()->setWaveToNoise();
 	Engine::getSong()->setModified();
 }
 
-void bitInvaderView::usrWaveClicked()
-{
+void bitInvaderView::usrWaveClicked() {
 	QString fileName = m_graph->model()->setWaveToUser();
-	if (!fileName.isEmpty())
-	{
+	if (!fileName.isEmpty()) {
 		ToolTip::add(m_usrWaveBtn, fileName);
 		m_graph->model()->clearInvisible();
 		Engine::getSong()->setModified();
 	}
 }
 
-void bitInvaderView::smoothClicked()
-{
+void bitInvaderView::smoothClicked() {
 	m_graph->model()->smooth();
 	Engine::getSong()->setModified();
 }
 
-void bitInvaderView::interpolationToggled(bool value)
-{
+void bitInvaderView::interpolationToggled(bool value) {
 	m_graph->setGraphStyle(value ? Graph::LinearStyle : Graph::NearestStyle);
 	Engine::getSong()->setModified();
 }
 
 void bitInvaderView::normalizeToggled(bool value) { Engine::getSong()->setModified(); }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-	{
-		return (new bitInvader(static_cast<InstrumentTrack*>(m)));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*) { return (new bitInvader(static_cast<InstrumentTrack*>(m))); }
 }

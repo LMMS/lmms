@@ -33,12 +33,10 @@
 #include "TempoSyncKnobModel.h"
 #include "lmms_basics.h"
 
-class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
-{
+class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject {
 	Q_OBJECT
 public:
-	class LfoInstances
-	{
+	class LfoInstances {
 	public:
 		LfoInstances() {}
 
@@ -128,16 +126,7 @@ private:
 	bool m_bad_lfoShapeData;
 	SampleBuffer m_userWave;
 
-	enum LfoShapes
-	{
-		SineWave,
-		TriangleWave,
-		SawWave,
-		SquareWave,
-		UserDefinedWave,
-		RandomWave,
-		NumLfoShapes
-	};
+	enum LfoShapes { SineWave, TriangleWave, SawWave, SquareWave, UserDefinedWave, RandomWave, NumLfoShapes };
 
 	sample_t lfoShapeSample(fpp_t _frame_offset);
 	void updateLfoShapeData();

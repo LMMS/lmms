@@ -40,8 +40,7 @@ class Knob;
 class LedCheckBox;
 class TempoSyncKnob;
 
-class EffectView : public PluginView
-{
+class EffectView : public PluginView {
 	Q_OBJECT
 public:
 	EffectView(Effect* _model, QWidget* _parent);

@@ -36,9 +36,7 @@
 #endif
 
 PerfTime::PerfTime()
-	: m_real(-1)
-{
-}
+	: m_real(-1) {}
 
 clock_t PerfTime::real() const { return m_real; }
 
@@ -48,8 +46,7 @@ clock_t PerfTime::system() const { return m_system; }
 
 bool PerfTime::valid() const { return m_real != -1; }
 
-PerfTime PerfTime::now()
-{
+PerfTime PerfTime::now() {
 	PerfTime time;
 #ifdef USE_POSIX_TIME
 	tms t;
@@ -61,20 +58,17 @@ PerfTime PerfTime::now()
 	return time;
 }
 
-clock_t PerfTime::ticksPerSecond()
-{
+clock_t PerfTime::ticksPerSecond() {
 	static long clktck = 0;
 #ifdef USE_POSIX_TIME
-	if (!clktck)
-	{
+	if (!clktck) {
 		if ((clktck = sysconf(_SC_CLK_TCK)) < 0) { qWarning("PerfLog::end sysconf()"); }
 	}
 #endif
 	return clktck;
 }
 
-PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs)
-{
+PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs) {
 	PerfTime diff;
 	diff.m_real = lhs.m_real - rhs.m_real;
 	diff.m_user = lhs.m_user - rhs.m_user;
@@ -83,8 +77,7 @@ PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs)
 }
 
 PerfLogTimer::PerfLogTimer(const QString& what)
-	: name(what)
-{
+	: name(what) {
 	begin();
 }
 
@@ -92,8 +85,7 @@ PerfLogTimer::~PerfLogTimer() { end(); }
 
 void PerfLogTimer::begin() { begin_time = PerfTime::now(); }
 
-void PerfLogTimer::end()
-{
+void PerfLogTimer::end() {
 	if (!begin_time.valid()) { return; }
 
 	long clktck = PerfTime::ticksPerSecond();

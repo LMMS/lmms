@@ -31,8 +31,7 @@
 #include "dsp/RMS.h"
 #include "dsp/util.h"
 
-class Compress : public Plugin
-{
+class Compress : public Plugin {
 public:
 	double fs;
 	sample_t f;
@@ -48,8 +47,7 @@ public:
 	static PortInfo port_info[];
 
 	void init() {}
-	void activate()
-	{
+	void activate() {
 		rms.reset();
 
 		sum = 0;

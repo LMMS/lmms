@@ -54,8 +54,7 @@ const int CD_LFO_PHASE_CD_KNOB_X = CD_LFO_AMOUNT_CD_KNOB_X + CD_KNOB_X_SPACING;
 const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X + CD_KNOB_X_SPACING + 3;
 
 LfoControllerDialog::LfoControllerDialog(Controller* _model, QWidget* _parent)
-	: ControllerDialog(_model, _parent)
-{
+	: ControllerDialog(_model, _parent) {
 	QString title = tr("LFO");
 	title.append(" (");
 	title.append(_model->name());
@@ -176,19 +175,16 @@ LfoControllerDialog::LfoControllerDialog(Controller* _model, QWidget* _parent)
 
 LfoControllerDialog::~LfoControllerDialog() { m_userWaveBtn->disconnect(this); }
 
-void LfoControllerDialog::askUserDefWave()
-{
+void LfoControllerDialog::askUserDefWave() {
 	SampleBuffer* sampleBuffer = dynamic_cast<LfoController*>(this->model())->m_userDefSampleBuffer;
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
-	if (fileName.isEmpty() == false)
-	{
+	if (fileName.isEmpty() == false) {
 		// TODO:
 		ToolTip::add(m_userWaveBtn, sampleBuffer->audioFile());
 	}
 }
 
-void LfoControllerDialog::contextMenuEvent(QContextMenuEvent*)
-{
+void LfoControllerDialog::contextMenuEvent(QContextMenuEvent*) {
 	/*
 	QPointer<captionMenu> contextMenu = new captionMenu(
 						getEffect()->publicName() );
@@ -207,8 +203,7 @@ void LfoControllerDialog::contextMenuEvent(QContextMenuEvent*)
 	*/
 }
 
-void LfoControllerDialog::modelChanged()
-{
+void LfoControllerDialog::modelChanged() {
 	m_lfo = castModel<LfoController>();
 
 	m_baseKnob->setModel(&m_lfo->m_baseModel);

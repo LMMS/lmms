@@ -20,8 +20,7 @@
 #define METACUE "Cue Point"
 #define METAUNRECOGNIZED "Unrecognized"
 
-class Midifile_reader
-{
+class Midifile_reader {
 public:
 	void midifile();
 	int Mf_nomerge;	  /* 1 => continue'ed system exclusives are */

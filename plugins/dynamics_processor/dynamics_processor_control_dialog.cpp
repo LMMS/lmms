@@ -35,8 +35,7 @@
 #include "embed.h"
 
 dynProcControlDialog::dynProcControlDialog(dynProcControls* _controls)
-	: EffectControlDialog(_controls)
-{
+	: EffectControlDialog(_controls) {
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));

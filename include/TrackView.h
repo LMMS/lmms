@@ -48,8 +48,7 @@ const int TRACK_OP_WIDTH_COMPACT = 62;
 
 const int TCO_BORDER_WIDTH = 2;
 
-class TrackView : public QWidget, public ModelView, public JournallingObject
-{
+class TrackView : public QWidget, public ModelView, public JournallingObject {
 	Q_OBJECT
 public:
 	TrackView(Track* _track, TrackContainerView* tcv);
@@ -81,8 +80,7 @@ public slots:
 protected:
 	void modelChanged() override;
 
-	void saveSettings(QDomDocument& doc, QDomElement& element) override
-	{
+	void saveSettings(QDomDocument& doc, QDomElement& element) override {
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
@@ -100,12 +98,7 @@ protected:
 	void resizeEvent(QResizeEvent* re) override;
 
 private:
-	enum Actions
-	{
-		NoAction,
-		MoveTrack,
-		ResizeTrack
-	};
+	enum Actions { NoAction, MoveTrack, ResizeTrack };
 
 	Track* m_track;
 	TrackContainerView* m_trackContainerView;

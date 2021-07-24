@@ -38,8 +38,7 @@ Graph::Graph(QWidget* _parent, graphStyle _style, int _width, int _height)
 	,
 	/* TODO: size, background? */
 	ModelView(new graphModel(-1.0, 1.0, 128, NULL, true), this)
-	, m_graphStyle(_style)
-{
+	, m_graphStyle(_style) {
 	m_mouseDown = false;
 	m_graphColor = QColor(0xFF, 0xAA, 0x00);
 
@@ -84,8 +83,7 @@ void graph::loadSampleFromFile( const QString & _filename )
 }
 */
 
-void Graph::mouseMoveEvent(QMouseEvent* _me)
-{
+void Graph::mouseMoveEvent(QMouseEvent* _me) {
 	// get position
 	int x = _me->x();
 	int y = _me->y();
@@ -116,8 +114,7 @@ void Graph::mouseMoveEvent(QMouseEvent* _me)
 	drawLineAt(x, y, m_lastCursorX);
 
 	// update mouse
-	if (diff != 0)
-	{
+	if (diff != 0) {
 		m_lastCursorX = x;
 
 		QPoint pt = mapToGlobal(QPoint(x, y));
@@ -128,12 +125,9 @@ void Graph::mouseMoveEvent(QMouseEvent* _me)
 	//	skip = true;
 }
 
-void Graph::mousePressEvent(QMouseEvent* _me)
-{
-	if (_me->button() == Qt::LeftButton)
-	{
-		if (!(_me->modifiers() & Qt::ShiftModifier))
-		{
+void Graph::mousePressEvent(QMouseEvent* _me) {
+	if (_me->button() == Qt::LeftButton) {
+		if (!(_me->modifiers() & Qt::ShiftModifier)) {
 			// get position
 			int x = _me->x();
 			int y = _me->y();
@@ -144,9 +138,7 @@ void Graph::mousePressEvent(QMouseEvent* _me)
 			m_mouseDown = true;
 			setCursor(Qt::BlankCursor);
 			m_lastCursorX = x;
-		}
-		else
-		{
+		} else {
 			// when shift-clicking, draw a line from last position to current
 			// position
 			int x = _me->x();
@@ -161,8 +153,7 @@ void Graph::mousePressEvent(QMouseEvent* _me)
 	}
 }
 
-void Graph::drawLineAt(int _x, int _y, int _lastx)
-{
+void Graph::drawLineAt(int _x, int _y, int _lastx) {
 	float minVal = model()->minValue();
 	float maxVal = model()->maxValue();
 	if (width() <= 4) { return; }
@@ -183,16 +174,13 @@ void Graph::drawLineAt(int _x, int _y, int _lastx)
 	float lastval;
 	float val_begin, val_end;
 
-	if (_lastx > _x)
-	{
+	if (_lastx > _x) {
 		sample_begin = (int)((_x)*xscale);
 		sample_end = (int)ceil((_lastx + 1) * xscale);
 		lastval = model()->m_samples[(int)(sample_end - 1)];
 		val_begin = val;
 		val_end = lastval;
-	}
-	else
-	{
+	} else {
 		sample_begin = (int)(_lastx * xscale);
 		sample_end = (int)ceil((_x + 1) * xscale);
 		lastval = model()->m_samples[(int)(sample_begin)];
@@ -207,8 +195,7 @@ void Graph::drawLineAt(int _x, int _y, int _lastx)
 	float ystep = (val_end - val_begin) / linelen;
 
 	// draw a line
-	for (int i = 0; i < linelen; i++)
-	{
+	for (int i = 0; i < linelen; i++) {
 		model()->drawSampleAt(sample_begin + i, val_begin + ((i)*ystep));
 	}
 
@@ -217,8 +204,7 @@ void Graph::drawLineAt(int _x, int _y, int _lastx)
 	model()->samplesChanged(sample_begin, sample_end - 1);
 }
 
-void Graph::changeSampleAt(int _x, int _y)
-{
+void Graph::changeSampleAt(int _x, int _y) {
 	float minVal = model()->minValue();
 	float maxVal = model()->maxValue();
 
@@ -237,10 +223,8 @@ void Graph::changeSampleAt(int _x, int _y)
 	model()->setSampleAt((int)(_x * xscale), val);
 }
 
-void Graph::mouseReleaseEvent(QMouseEvent* _me)
-{
-	if (_me->button() == Qt::LeftButton)
-	{
+void Graph::mouseReleaseEvent(QMouseEvent* _me) {
+	if (_me->button() == Qt::LeftButton) {
 		// toggle mouse state
 		m_mouseDown = false;
 		setCursor(Qt::CrossCursor);
@@ -249,8 +233,7 @@ void Graph::mouseReleaseEvent(QMouseEvent* _me)
 	}
 }
 
-void Graph::paintEvent(QPaintEvent*)
-{
+void Graph::paintEvent(QPaintEvent*) {
 	QPainter p(this);
 
 	p.setPen(QPen(m_graphColor, 1));
@@ -267,13 +250,11 @@ void Graph::paintEvent(QPaintEvent*)
 	// Max index, more useful below
 	length--;
 
-	switch (m_graphStyle)
-	{
+	switch (m_graphStyle) {
 	case Graph::LinearStyle:
 		p.setRenderHints(QPainter::Antialiasing, true);
 
-		for (int i = 0; i < length; i++)
-		{
+		for (int i = 0; i < length; i++) {
 			// Needs to be rewritten
 			p.drawLine(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
 				2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
@@ -287,8 +268,7 @@ void Graph::paintEvent(QPaintEvent*)
 		break;
 
 	case Graph::NearestStyle:
-		for (int i = 0; i < length; i++)
-		{
+		for (int i = 0; i < length; i++) {
 			p.drawLine(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
 				2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale));
 			p.drawLine(2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
@@ -302,8 +282,7 @@ void Graph::paintEvent(QPaintEvent*)
 	case Graph::LinearNonCyclicStyle:
 		p.setRenderHints(QPainter::Antialiasing, true);
 
-		for (int i = 0; i < length; i++)
-		{
+		for (int i = 0; i < length; i++) {
 			// Needs to be rewritten
 			p.drawLine(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
 				2 + static_cast<int>((i + 1) * xscale), 2 + static_cast<int>(((*samps)[i + 1] - maxVal) * yscale));
@@ -315,8 +294,7 @@ void Graph::paintEvent(QPaintEvent*)
 		break;
 
 	case Graph::BarStyle:
-		for (int i = 0; i <= length; i++)
-		{
+		for (int i = 0; i <= length; i++) {
 			p.fillRect(2 + static_cast<int>(i * xscale), 2 + static_cast<int>(((*samps)[i] - maxVal) * yscale),
 				qMax(static_cast<int>(xscale) - 1, 1),
 				qMax(static_cast<int>((minVal - maxVal) * yscale) - static_cast<int>(((*samps)[i] - maxVal) * yscale),
@@ -336,8 +314,7 @@ void Graph::paintEvent(QPaintEvent*)
 	}
 
 	// draw Pointer
-	if (m_mouseDown)
-	{
+	if (m_mouseDown) {
 		QPoint cursor = mapFromGlobal(QCursor::pos());
 		p.setPen(QColor(0x70, 0x7C, 0x91));
 		p.drawLine(2, cursor.y(), width() - 2, cursor.y());
@@ -346,26 +323,22 @@ void Graph::paintEvent(QPaintEvent*)
 	p.drawPixmap(0, 0, m_foreground);
 }
 
-void Graph::dropEvent(QDropEvent* _de)
-{
+void Graph::dropEvent(QDropEvent* _de) {
 	QString type = StringPairDrag::decodeKey(_de);
 	QString value = StringPairDrag::decodeValue(_de);
 
-	if (type == "samplefile")
-	{
+	if (type == "samplefile") {
 		// TODO: call setWaveToUser
 		// loadSampleFromFile( value );
 		_de->accept();
 	}
 }
 
-void Graph::dragEnterEvent(QDragEnterEvent* _dee)
-{
+void Graph::dragEnterEvent(QDragEnterEvent* _dee) {
 	if (StringPairDrag::processDragEnterEvent(_dee, QString("samplefile")) == false) { _dee->ignore(); }
 }
 
-void Graph::modelChanged()
-{
+void Graph::modelChanged() {
 	graphModel* gModel = castModel<graphModel>();
 
 	QObject::connect(gModel, SIGNAL(samplesChanged(int, int)), this, SLOT(updateGraph(int, int)));
@@ -373,8 +346,7 @@ void Graph::modelChanged()
 	QObject::connect(gModel, SIGNAL(lengthChanged()), this, SLOT(updateGraph()));
 }
 
-void Graph::updateGraph(int _startPos, int _endPos)
-{
+void Graph::updateGraph(int _startPos, int _endPos) {
 	// Can optimize by only drawing changed position
 	update();
 }
@@ -387,22 +359,16 @@ graphModel::graphModel(float _min, float _max, int _length, ::Model* _parent, bo
 	, m_length(_length)
 	, m_minValue(_min)
 	, m_maxValue(_max)
-	, m_step(_step)
-{
-}
+	, m_step(_step) {}
 
-void graphModel::setRange(float _min, float _max)
-{
-	if (_min != m_minValue || _max != m_maxValue)
-	{
+void graphModel::setRange(float _min, float _max) {
+	if (_min != m_minValue || _max != m_maxValue) {
 		m_minValue = _min;
 		m_maxValue = _max;
 
-		if (!m_samples.isEmpty())
-		{
+		if (!m_samples.isEmpty()) {
 			// Trim existing values
-			for (int i = 0; i < length(); i++)
-			{
+			for (int i = 0; i < length(); i++) {
 				m_samples[i] = fmaxf(_min, fminf(m_samples[i], _max));
 			}
 		}
@@ -411,88 +377,71 @@ void graphModel::setRange(float _min, float _max)
 	}
 }
 
-void graphModel::setLength(int _length)
-{
-	if (_length != m_length)
-	{
+void graphModel::setLength(int _length) {
+	if (_length != m_length) {
 		m_length = _length;
 		if (m_samples.size() < m_length) { m_samples.resize(m_length); }
 		emit lengthChanged();
 	}
 }
 
-void graphModel::setSampleAt(int x, float val)
-{
+void graphModel::setSampleAt(int x, float val) {
 	drawSampleAt(x, val);
 	emit samplesChanged(x, x);
 }
 
-void graphModel::setSamples(const float* _samples)
-{
+void graphModel::setSamples(const float* _samples) {
 	std::copy(_samples, _samples + length(), m_samples.begin());
 
 	emit samplesChanged(0, length() - 1);
 }
 
-void graphModel::setWaveToSine()
-{
-	for (int i = 0; i < length(); i++)
-	{
+void graphModel::setWaveToSine() {
+	for (int i = 0; i < length(); i++) {
 		m_samples[i] = Oscillator::sinSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
 };
 
-void graphModel::setWaveToTriangle()
-{
-	for (int i = 0; i < length(); i++)
-	{
+void graphModel::setWaveToTriangle() {
+	for (int i = 0; i < length(); i++) {
 		m_samples[i] = Oscillator::triangleSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
 };
 
-void graphModel::setWaveToSaw()
-{
-	for (int i = 0; i < length(); i++)
-	{
+void graphModel::setWaveToSaw() {
+	for (int i = 0; i < length(); i++) {
 		m_samples[i] = Oscillator::sawSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
 };
 
-void graphModel::setWaveToSquare()
-{
-	for (int i = 0; i < length(); i++)
-	{
+void graphModel::setWaveToSquare() {
+	for (int i = 0; i < length(); i++) {
 		m_samples[i] = Oscillator::squareSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
 };
 
-void graphModel::setWaveToNoise()
-{
-	for (int i = 0; i < length(); i++)
-	{
+void graphModel::setWaveToNoise() {
+	for (int i = 0; i < length(); i++) {
 		m_samples[i] = Oscillator::noiseSample(i / static_cast<float>(length()));
 	}
 
 	emit samplesChanged(0, length() - 1);
 };
 
-QString graphModel::setWaveToUser()
-{
+QString graphModel::setWaveToUser() {
 	SampleBuffer* sampleBuffer = new SampleBuffer;
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
-	if (fileName.isEmpty() == false)
-	{
+	if (fileName.isEmpty() == false) {
 		sampleBuffer->dataReadLock();
-		for (int i = 0; i < length(); i++)
-		{
+		for (int i = 0; i < length(); i++) {
 			m_samples[i] = sampleBuffer->userWaveSample(i / static_cast<float>(length()));
 		}
 		sampleBuffer->dataUnlock();
@@ -504,15 +453,13 @@ QString graphModel::setWaveToUser()
 	return fileName;
 };
 
-void graphModel::smooth()
-{
+void graphModel::smooth() {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
 
 	// Smoothing
 	m_samples[0] = (temp[length() - 1] + (temp[0] * 2) + temp[1]) * 0.25f;
-	for (int i = 1; i < (length() - 1); i++)
-	{
+	for (int i = 1; i < (length() - 1); i++) {
 		m_samples[i] = (temp[i - 1] + (temp[i] * 2) + temp[i + 1]) * 0.25f;
 	}
 	m_samples[length() - 1] = (temp[length() - 2] + (temp[length() - 1] * 2) + temp[0]) * 0.25f;
@@ -520,15 +467,13 @@ void graphModel::smooth()
 	emit samplesChanged(0, length() - 1);
 }
 
-void graphModel::smoothNonCyclic()
-{
+void graphModel::smoothNonCyclic() {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
 
 	// Smoothing
 	// m_samples[0] = ( ( temp[0] * 3 ) + temp[1] ) * 0.25f;
-	for (int i = 1; i < (length() - 1); i++)
-	{
+	for (int i = 1; i < (length() - 1); i++) {
 		m_samples[i] = (temp[i - 1] + (temp[i] * 2) + temp[i + 1]) * 0.25f;
 	}
 	// m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 3 ) ) * 0.25f;
@@ -536,18 +481,15 @@ void graphModel::smoothNonCyclic()
 	emit samplesChanged(0, length() - 1);
 }
 
-void graphModel::convolve(const float* convolution, const int convolutionLength, const int centerOffset)
-{
+void graphModel::convolve(const float* convolution, const int convolutionLength, const int centerOffset) {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
 	const int graphLength = length();
 	float sum;
 	// make a cyclic convolution
-	for (int i = 0; i < graphLength; i++)
-	{
+	for (int i = 0; i < graphLength; i++) {
 		sum = 0;
-		for (int j = 0; j < convolutionLength; j++)
-		{
+		for (int j = 0; j < convolutionLength; j++) {
 			sum += convolution[j] * temp[(i + j) % graphLength];
 		}
 		m_samples[(i + centerOffset) % graphLength] = sum;
@@ -555,8 +497,7 @@ void graphModel::convolve(const float* convolution, const int convolutionLength,
 	emit samplesChanged(0, graphLength - 1);
 }
 
-void graphModel::normalize()
-{
+void graphModel::normalize() {
 	float max = 0.0001f;
 	float avg = 0.0f;
 
@@ -578,8 +519,7 @@ void graphModel::normalize()
 	if (max != 1.0f || avg != 0.0f) emit samplesChanged(0, length() - 1);
 }
 
-void graphModel::invert()
-{
+void graphModel::invert() {
 	const float range = m_maxValue - m_minValue;
 
 	for (int i = 0; i < length(); i++)
@@ -588,8 +528,7 @@ void graphModel::invert()
 	emit samplesChanged(0, length() - 1);
 }
 
-void graphModel::shiftPhase(int _deg)
-{
+void graphModel::shiftPhase(int _deg) {
 	// calculate offset in samples
 	const int offset = (_deg * length()) / 360; // multiply first because integers
 
@@ -597,8 +536,7 @@ void graphModel::shiftPhase(int _deg)
 	QVector<float> temp = m_samples;
 
 	// shift phase
-	for (int i = 0; i < length(); i++)
-	{
+	for (int i = 0; i < length(); i++) {
 		int o = (i + offset) % length();
 		while (o < 0)
 			o += length();
@@ -608,8 +546,7 @@ void graphModel::shiftPhase(int _deg)
 	emit samplesChanged(0, length() - 1);
 }
 
-void graphModel::clear()
-{
+void graphModel::clear() {
 	const int graph_length = length();
 	for (int i = 0; i < graph_length; i++)
 		m_samples[i] = 0;
@@ -617,8 +554,7 @@ void graphModel::clear()
 }
 
 // Clear any part of the graph that isn't displayed
-void graphModel::clearInvisible()
-{
+void graphModel::clearInvisible() {
 	const int graph_length = length();
 	const int full_graph_length = m_samples.size();
 	for (int i = graph_length; i < full_graph_length; i++)
@@ -626,8 +562,7 @@ void graphModel::clearInvisible()
 	emit samplesChanged(graph_length, full_graph_length - 1);
 }
 
-void graphModel::drawSampleAt(int x, float val)
-{
+void graphModel::drawSampleAt(int x, float val) {
 	// snap to the grid
 	val -= (m_step != 0.0) ? fmod(val, m_step) * m_step : 0;
 

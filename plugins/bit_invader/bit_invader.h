@@ -37,8 +37,7 @@
 class oscillator;
 class bitInvaderView;
 
-class bSynth
-{
+class bSynth {
 	MM_OPERATORS
 public:
 	bSynth(float* sample, NotePlayHandle* _nph, bool _interpolation, float factor, const sample_rate_t _sample_rate);
@@ -56,8 +55,7 @@ private:
 	bool interpolation;
 };
 
-class bitInvader : public Instrument
-{
+class bitInvader : public Instrument {
 	Q_OBJECT
 public:
 	bitInvader(InstrumentTrack* _instrument_track);
@@ -93,8 +91,7 @@ private:
 	friend class bitInvaderView;
 };
 
-class bitInvaderView : public InstrumentViewFixedSize
-{
+class bitInvaderView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	bitInvaderView(Instrument* _instrument, QWidget* _parent);

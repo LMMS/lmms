@@ -44,29 +44,24 @@
 
 template <ch_cnt_t CHANNELS = DEFAULT_CHANNELS> class BasicFilters;
 
-template <ch_cnt_t CHANNELS> class LinkwitzRiley
-{
+template <ch_cnt_t CHANNELS> class LinkwitzRiley {
 	MM_OPERATORS
 public:
-	LinkwitzRiley(float sampleRate)
-	{
+	LinkwitzRiley(float sampleRate) {
 		m_sampleRate = sampleRate;
 		clearHistory();
 	}
 	virtual ~LinkwitzRiley() {}
 
-	inline void clearHistory()
-	{
-		for (int i = 0; i < CHANNELS; ++i)
-		{
+	inline void clearHistory() {
+		for (int i = 0; i < CHANNELS; ++i) {
 			m_z1[i] = m_z2[i] = m_z3[i] = m_z4[i] = 0.0f;
 		}
 	}
 
 	inline void setSampleRate(float sampleRate) { m_sampleRate = sampleRate; }
 
-	inline void setCoeffs(float freq)
-	{
+	inline void setCoeffs(float freq) {
 		// wc
 		const double wc = D_2PI * freq;
 		const double wc2 = wc * wc;
@@ -93,24 +88,21 @@ public:
 		m_b4 = (m_k4 - 2.0 * sq_tmp1 + m_wc4 - 2.0 * sq_tmp2 + 4.0 * wc2 * k2) * m_a;
 	}
 
-	inline void setLowpass(float freq)
-	{
+	inline void setLowpass(float freq) {
 		setCoeffs(freq);
 		m_a0 = m_wc4 * m_a;
 		m_a1 = 4.0 * m_a0;
 		m_a2 = 6.0 * m_a0;
 	}
 
-	inline void setHighpass(float freq)
-	{
+	inline void setHighpass(float freq) {
 		setCoeffs(freq);
 		m_a0 = m_k4 * m_a;
 		m_a1 = -4.0 * m_a0;
 		m_a2 = 6.0 * m_a0;
 	}
 
-	inline float update(float in, ch_cnt_t ch)
-	{
+	inline float update(float in, ch_cnt_t ch) {
 		const double x = in - (m_z1[ch] * m_b1) - (m_z2[ch] * m_b2) - (m_z3[ch] * m_b3) - (m_z4[ch] * m_b4);
 		const double y = (m_a0 * x) + (m_z1[ch] * m_a1) + (m_z2[ch] * m_a2) + (m_z3[ch] * m_a1) + (m_z4[ch] * m_a0);
 		m_z4[ch] = m_z3[ch];
@@ -133,31 +125,26 @@ private:
 };
 typedef LinkwitzRiley<2> StereoLinkwitzRiley;
 
-template <ch_cnt_t CHANNELS> class BiQuad
-{
+template <ch_cnt_t CHANNELS> class BiQuad {
 	MM_OPERATORS
 public:
 	BiQuad() { clearHistory(); }
 	virtual ~BiQuad() {}
 
-	inline void setCoeffs(float a1, float a2, float b0, float b1, float b2)
-	{
+	inline void setCoeffs(float a1, float a2, float b0, float b1, float b2) {
 		m_a1 = a1;
 		m_a2 = a2;
 		m_b0 = b0;
 		m_b1 = b1;
 		m_b2 = b2;
 	}
-	inline void clearHistory()
-	{
-		for (int i = 0; i < CHANNELS; ++i)
-		{
+	inline void clearHistory() {
+		for (int i = 0; i < CHANNELS; ++i) {
 			m_z1[i] = 0.0f;
 			m_z2[i] = 0.0f;
 		}
 	}
-	inline float update(float in, ch_cnt_t ch)
-	{
+	inline float update(float in, ch_cnt_t ch) {
 		// biquad filter in transposed form
 		const float out = m_z1[ch] + m_b0 * in;
 		m_z1[ch] = m_b1 * in + m_z2[ch] - m_a1 * out;
@@ -173,29 +160,24 @@ private:
 };
 typedef BiQuad<2> StereoBiQuad;
 
-template <ch_cnt_t CHANNELS> class OnePole
-{
+template <ch_cnt_t CHANNELS> class OnePole {
 	MM_OPERATORS
 public:
-	OnePole()
-	{
+	OnePole() {
 		m_a0 = 1.0;
 		m_b1 = 0.0;
-		for (int i = 0; i < CHANNELS; ++i)
-		{
+		for (int i = 0; i < CHANNELS; ++i) {
 			m_z1[i] = 0.0;
 		}
 	}
 	virtual ~OnePole() {}
 
-	inline void setCoeffs(float a0, float b1)
-	{
+	inline void setCoeffs(float a0, float b1) {
 		m_a0 = a0;
 		m_b1 = b1;
 	}
 
-	inline float update(float s, ch_cnt_t ch)
-	{
+	inline float update(float s, ch_cnt_t ch) {
 		if (qAbs(s) < 1.0e-10f && qAbs(m_z1[ch]) < 1.0e-10f) return 0.0f;
 		return m_z1[ch] = s * m_a0 + m_z1[ch] * m_b1;
 	}
@@ -206,12 +188,10 @@ private:
 };
 typedef OnePole<2> StereoOnePole;
 
-template <ch_cnt_t CHANNELS> class BasicFilters
-{
+template <ch_cnt_t CHANNELS> class BasicFilters {
 	MM_OPERATORS
 public:
-	enum FilterTypes
-	{
+	enum FilterTypes {
 		LowPass,
 		HiPass,
 		BandPass_CSG,
@@ -241,11 +221,9 @@ public:
 
 	static inline float minQ() { return (0.01f); }
 
-	inline void setFilterType(const int _idx)
-	{
+	inline void setFilterType(const int _idx) {
 		m_doubleFilter = _idx == DoubleLowPass || _idx == DoubleMoog;
-		if (!m_doubleFilter)
-		{
+		if (!m_doubleFilter) {
 			m_type = static_cast<FilterTypes>(_idx);
 			return;
 		}
@@ -261,21 +239,18 @@ public:
 		: m_doubleFilter(false)
 		, m_sampleRate((float)_sample_rate)
 		, m_sampleRatio(1.0f / m_sampleRate)
-		, m_subFilter(NULL)
-	{
+		, m_subFilter(NULL) {
 		clearHistory();
 	}
 
 	inline ~BasicFilters() { delete m_subFilter; }
 
-	inline void clearHistory()
-	{
+	inline void clearHistory() {
 		// reset in/out history for biquads
 		m_biQuad.clearHistory();
 
 		// reset in/out history
-		for (ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl)
-		{
+		for (ch_cnt_t _chnl = 0; _chnl < CHANNELS; ++_chnl) {
 			// reset in/out history for moog-filter
 			m_y1[_chnl] = m_y2[_chnl] = m_y3[_chnl] = m_y4[_chnl] = m_oldx[_chnl] = m_oldy1[_chnl] = m_oldy2[_chnl]
 				= m_oldy3[_chnl] = 0.0f;
@@ -298,11 +273,9 @@ public:
 		}
 	}
 
-	inline sample_t update(sample_t _in0, ch_cnt_t _chnl)
-	{
+	inline sample_t update(sample_t _in0, ch_cnt_t _chnl) {
 		sample_t out;
-		switch (m_type)
-		{
+		switch (m_type) {
 		case Moog: {
 			sample_t x = _in0 - m_r * m_y4[_chnl];
 
@@ -326,8 +299,7 @@ public:
 		case Tripole: {
 			out = 0.0f;
 			float ip = 0.0f;
-			for (int i = 0; i < 4; ++i)
-			{
+			for (int i = 0; i < 4; ++i) {
 				ip += 0.25f;
 				sample_t x = linearInterpolate(m_last[_chnl], _in0, ip) - m_r * m_y3[_chnl];
 
@@ -406,8 +378,7 @@ public:
 
 		case Lowpass_RC12: {
 			sample_t lp, bp, hp, in;
-			for (int n = 4; n != 0; --n)
-			{
+			for (int n = 4; n != 0; --n) {
 				in = _in0 + m_rcbp0[_chnl] * m_rcq;
 				in = qBound(-1.0f, in, 1.0f);
 
@@ -430,8 +401,7 @@ public:
 		case Highpass_RC12:
 		case Bandpass_RC12: {
 			sample_t hp, bp, in;
-			for (int n = 4; n != 0; --n)
-			{
+			for (int n = 4; n != 0; --n) {
 				in = _in0 + m_rcbp0[_chnl] * m_rcq;
 				in = qBound(-1.0f, in, 1.0f);
 
@@ -450,8 +420,7 @@ public:
 
 		case Lowpass_RC24: {
 			sample_t lp, bp, hp, in;
-			for (int n = 4; n != 0; --n)
-			{
+			for (int n = 4; n != 0; --n) {
 				// first stage is as for the 12dB case...
 				in = _in0 + m_rcbp0[_chnl] * m_rcq;
 				in = qBound(-1.0f, in, 1.0f);
@@ -493,8 +462,7 @@ public:
 		case Highpass_RC24:
 		case Bandpass_RC24: {
 			sample_t hp, bp, in;
-			for (int n = 4; n != 0; --n)
-			{
+			for (int n = 4; n != 0; --n) {
 				// first stage is as for the 12dB case...
 				in = _in0 + m_rcbp0[_chnl] * m_rcq;
 				in = qBound(-1.0f, in, 1.0f);
@@ -529,16 +497,14 @@ public:
 
 		case Formantfilter:
 		case FastFormant: {
-			if (qAbs(_in0) < 1.0e-10f && qAbs(m_vflast[0][_chnl]) < 1.0e-10f)
-			{
+			if (qAbs(_in0) < 1.0e-10f && qAbs(m_vflast[0][_chnl]) < 1.0e-10f) {
 				return 0.0f;
 			} // performance hack - skip processing when the numbers get too small
 			sample_t hp, bp, in;
 
 			out = 0;
 			const int os = m_type == FastFormant ? 1 : 4; // no oversampling for fast formant
-			for (int o = 0; o < os; ++o)
-			{
+			for (int o = 0; o < os; ++o) {
 				// first formant
 				in = _in0 + m_vfbp[0][_chnl] * m_vfq;
 				in = qBound(-1.0f, in, 1.0f);
@@ -635,14 +601,12 @@ public:
 		return out;
 	}
 
-	inline void calcFilterCoeffs(float _freq, float _q)
-	{
+	inline void calcFilterCoeffs(float _freq, float _q) {
 		// temp coef vars
 		_q = qMax(_q, minQ());
 
 		if (m_type == Lowpass_RC12 || m_type == Bandpass_RC12 || m_type == Highpass_RC12 || m_type == Lowpass_RC24
-			|| m_type == Bandpass_RC24 || m_type == Highpass_RC24)
-		{
+			|| m_type == Bandpass_RC24 || m_type == Highpass_RC24) {
 			_freq = qBound(50.0f, _freq, 20000.0f);
 			const float sr = m_sampleRatio * 0.25f;
 			const float f = 1.0f / (_freq * F_2PI);
@@ -656,8 +620,7 @@ public:
 			return;
 		}
 
-		if (m_type == Formantfilter || m_type == FastFormant)
-		{
+		if (m_type == Formantfilter || m_type == FastFormant) {
 			_freq
 				= qBound(minFreq(), _freq, 20000.0f); // limit freq and q for not getting bad noise out of the filter...
 
@@ -690,8 +653,7 @@ public:
 			return;
 		}
 
-		if (m_type == Moog || m_type == DoubleMoog)
-		{
+		if (m_type == Moog || m_type == DoubleMoog) {
 			// [ 0 - 0.5 ]
 			const float f = qBound(minFreq(), _freq, 20000.0f) * m_sampleRatio;
 			// (Empirical tunning)
@@ -699,8 +661,7 @@ public:
 			m_k = 2.0f * m_p - 1;
 			m_r = _q * powf(F_E, (1 - m_p) * 1.386249f);
 
-			if (m_doubleFilter)
-			{
+			if (m_doubleFilter) {
 				m_subFilter->m_r = m_r;
 				m_subFilter->m_p = m_p;
 				m_subFilter->m_k = m_k;
@@ -708,8 +669,7 @@ public:
 			return;
 		}
 
-		if (m_type == Tripole)
-		{
+		if (m_type == Tripole) {
 			const float f = qBound(20.0f, _freq, 20000.0f) * m_sampleRatio * 0.25f;
 
 			m_p = (3.6f - 3.2f * f) * f;
@@ -719,8 +679,7 @@ public:
 			return;
 		}
 
-		if (m_type == Lowpass_SV || m_type == Bandpass_SV || m_type == Highpass_SV || m_type == Notch_SV)
-		{
+		if (m_type == Lowpass_SV || m_type == Bandpass_SV || m_type == Highpass_SV || m_type == Notch_SV) {
 			const float f = sinf(qMax(minFreq(), _freq) * m_sampleRatio * F_PI);
 			m_svf1 = qMin(f, 0.825f);
 			m_svf2 = qMin(f * 2.0f, 0.825f);
@@ -741,8 +700,7 @@ public:
 		const float a1 = -2.0f * tcos * a0;
 		const float a2 = (1.0f - alpha) * a0;
 
-		switch (m_type)
-		{
+		switch (m_type) {
 		case LowPass: {
 			const float b1 = (1.0f - tcos) * a0;
 			const float b0 = b1 * 0.5f;
@@ -776,8 +734,7 @@ public:
 		default: break;
 		}
 
-		if (m_doubleFilter)
-		{
+		if (m_doubleFilter) {
 			m_subFilter->m_biQuad.setCoeffs(m_biQuad.m_a1, m_biQuad.m_a2, m_biQuad.m_b0, m_biQuad.m_b1, m_biQuad.m_b2);
 		}
 	}

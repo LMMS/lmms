@@ -31,8 +31,7 @@
 #include "MemoryManager.h"
 #include "lmms_export.h"
 
-class LMMS_EXPORT ValueBuffer : public std::vector<float>
-{
+class LMMS_EXPORT ValueBuffer : public std::vector<float> {
 	MM_OPERATORS
 public:
 	ValueBuffer();

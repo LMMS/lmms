@@ -33,8 +33,7 @@
 #include "ValueBuffer.h"
 #include "lmms_math.h"
 
-class CrossoverEQEffect : public Effect
-{
+class CrossoverEQEffect : public Effect {
 public:
 	CrossoverEQEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~CrossoverEQEffect();

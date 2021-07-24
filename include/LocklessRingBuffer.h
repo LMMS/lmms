@@ -32,14 +32,12 @@
 #include "lmms_basics.h"
 
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ringbuffer
-template <class T> class LocklessRingBuffer
-{
+template <class T> class LocklessRingBuffer {
 	template <class _T> friend class LocklessRingBufferReader;
 
 public:
 	LocklessRingBuffer(std::size_t sz)
-		: m_buffer(sz)
-	{
+		: m_buffer(sz) {
 		m_buffer.touch(); // reserve storage space before realtime operation starts
 	}
 	~LocklessRingBuffer(){};
@@ -47,8 +45,7 @@ public:
 	std::size_t capacity() const { return m_buffer.maximum_eventual_write_space(); }
 	std::size_t free() const { return m_buffer.write_space(); }
 	void wakeAll() { m_notifier.wakeAll(); }
-	std::size_t write(const sampleFrame* src, std::size_t cnt, bool notify = false)
-	{
+	std::size_t write(const sampleFrame* src, std::size_t cnt, bool notify = false) {
 		std::size_t written = LocklessRingBuffer<T>::m_buffer.write(src, cnt);
 		// Let all waiting readers know new data are available.
 		if (notify) { LocklessRingBuffer<T>::m_notifier.wakeAll(); }
@@ -61,16 +58,14 @@ protected:
 };
 
 //! Wrapper for lockless ringbuffer reader
-template <class T> class LocklessRingBufferReader : public ringbuffer_reader_t<T>
-{
+template <class T> class LocklessRingBufferReader : public ringbuffer_reader_t<T> {
 public:
 	LocklessRingBufferReader(LocklessRingBuffer<T>& rb)
 		: ringbuffer_reader_t<T>(rb.m_buffer)
 		, m_notifier(&rb.m_notifier){};
 
 	bool empty() const { return !this->read_space(); }
-	void waitForData()
-	{
+	void waitForData() {
 		QMutex useless_lock;
 		useless_lock.lock();
 		m_notifier->wait(&useless_lock);

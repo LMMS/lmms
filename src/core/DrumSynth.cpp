@@ -66,8 +66,7 @@ float phi[1200];
 long wavewords, wavemode = 0;
 float mem_t = 1.0f, mem_o = 1.0f, mem_n = 1.0f, mem_b = 1.0f, mem_tune = 1.0f, mem_time = 1.0f;
 
-int DrumSynth::LongestEnv(void)
-{
+int DrumSynth::LongestEnv(void) {
 	long e, eon, p;
 	float l = 0.f;
 
@@ -87,8 +86,7 @@ int DrumSynth::LongestEnv(void)
 	return 2400 + (1200 * (int)(l / 1200));
 }
 
-float DrumSynth::LoudestEnv(void)
-{
+float DrumSynth::LoudestEnv(void) {
 	float loudest = 0.f;
 	int i = 0;
 
@@ -101,8 +99,7 @@ float DrumSynth::LoudestEnv(void)
 	return (loudest * loudest);
 }
 
-void DrumSynth::UpdateEnv(int e, long t)
-{
+void DrumSynth::UpdateEnv(int e, long t) {
 	float endEnv, dT;
 	// 0.2's added
 	envData[e][NEXTT] = envpts[e][0][(long)(envData[e][PNT] + 1.f)] * timestretch; // get next point
@@ -115,8 +112,7 @@ void DrumSynth::UpdateEnv(int e, long t)
 	envData[e][PNT] = envData[e][PNT] + 1.0f;
 }
 
-void DrumSynth::GetEnv(int env, const char* sec, const char* key, QString ini)
-{
+void DrumSynth::GetEnv(int env, const char* sec, const char* key, QString ini) {
 	char en[256], s[8];
 	int i = 0, o = 0, ep = 0;
 	GetPrivateProfileString(sec, key, "0,0 100,0", en, sizeof(en), ini);
@@ -125,21 +121,15 @@ void DrumSynth::GetEnv(int env, const char* sec, const char* key, QString ini)
 	en[255] = 0;
 	s[0] = 0;
 
-	while (en[i] != 0)
-	{
-		if (en[i] == ',')
-		{
+	while (en[i] != 0) {
+		if (en[i] == ',') {
 			if (sscanf(s, "%f", &envpts[env][0][ep]) == 0) envpts[env][0][ep] = 0.f;
 			o = 0;
-		}
-		else if (en[i] == ' ')
-		{
+		} else if (en[i] == ' ') {
 			if (sscanf(s, "%f", &envpts[env][1][ep]) == 0) envpts[env][1][ep] = 0.f;
 			o = 0;
 			ep++;
-		}
-		else
-		{
+		} else {
 			s[o] = en[i];
 			o++;
 			s[o] = 0;
@@ -152,12 +142,10 @@ void DrumSynth::GetEnv(int env, const char* sec, const char* key, QString ini)
 	envData[env][MAX] = envpts[env][0][ep];
 }
 
-float DrumSynth::waveform(float ph, int form)
-{
+float DrumSynth::waveform(float ph, int form) {
 	float w;
 
-	switch (form)
-	{
+	switch (form) {
 	case 0: w = (float)sin(fmod(ph, TwoPi)); break;									 // sine
 	case 1: w = (float)fabs(2.0f * (float)sin(fmod(0.5f * ph, TwoPi))) - 1.f; break; // sine^2
 	case 2:
@@ -177,8 +165,7 @@ float DrumSynth::waveform(float ph, int form)
 }
 
 int DrumSynth::GetPrivateProfileString(
-	const char* sec, const char* key, const char* def, char* buffer, int size, QString file)
-{
+	const char* sec, const char* key, const char* def, char* buffer, int size, QString file) {
 	stringstream is;
 	bool inSection = false;
 	char* line;
@@ -194,35 +181,26 @@ int DrumSynth::GetPrivateProfileString(
 	QByteArray dat = f.readAll().constData();
 	is.str(string(dat.constData(), dat.size()));
 
-	while (is.good())
-	{
-		if (!inSection)
-		{
+	while (is.good()) {
+		if (!inSection) {
 			is.ignore(numeric_limits<streamsize>::max(), '[');
 
-			if (!is.eof())
-			{
+			if (!is.eof()) {
 				is.getline(line, 200, ']');
 				if (strcasecmp(line, sec) == 0) { inSection = true; }
 			}
-		}
-		else if (!is.eof())
-		{
+		} else if (!is.eof()) {
 			is.getline(line, 200);
 			if (line[0] == '[') break;
 
 			k = strtok(line, " \t=");
 			b = strtok(NULL, "\n\r\0");
 
-			if (k != 0 && strcasecmp(k, key) == 0)
-			{
-				if (b == 0)
-				{
+			if (k != 0 && strcasecmp(k, key) == 0) {
+				if (b == 0) {
 					len = 0;
 					buffer[0] = 0;
-				}
-				else
-				{
+				} else {
 					k = (char*)(b + strlen(b) - 1);
 					while ((k >= b) && (*k == ' ' || *k == '\t'))
 						--k;
@@ -237,8 +215,7 @@ int DrumSynth::GetPrivateProfileString(
 		}
 	}
 
-	if (len == 0)
-	{
+	if (len == 0) {
 		len = strlen(def);
 		strncpy(buffer, def, size);
 	}
@@ -248,8 +225,7 @@ int DrumSynth::GetPrivateProfileString(
 	return len;
 }
 
-int DrumSynth::GetPrivateProfileInt(const char* sec, const char* key, int def, QString file)
-{
+int DrumSynth::GetPrivateProfileInt(const char* sec, const char* key, int def, QString file) {
 	char tmp[16];
 	int i = 0;
 
@@ -260,8 +236,7 @@ int DrumSynth::GetPrivateProfileInt(const char* sec, const char* key, int def, Q
 	return i;
 }
 
-float DrumSynth::GetPrivateProfileFloat(const char* sec, const char* key, float def, QString file)
-{
+float DrumSynth::GetPrivateProfileFloat(const char* sec, const char* key, float def, QString file) {
 	char tmp[16];
 	float f = 0.f;
 
@@ -277,8 +252,7 @@ float DrumSynth::GetPrivateProfileFloat(const char* sec, const char* key, float 
 //  an associative array or something once we have a datastructure to load in to.
 //  llama
 
-int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sample_rate_t Fs)
-{
+int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sample_rate_t Fs) {
 	// input file
 	char sec[32];
 	char ver[32];
@@ -328,8 +302,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	GetPrivateProfileString(sec, "Comment", "", comment, sizeof(comment), dsfile);
 	while ((comment[commentLen] != 0) && (commentLen < 254))
 		commentLen++;
-	if (commentLen == 0)
-	{
+	if (commentLen == 0) {
 		comment[0] = 32;
 		comment[1] = 0;
 		commentLen = 1;
@@ -364,14 +337,11 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	GetEnv(2, sec, "Envelope", dsfile);
 	NON = chkOn[1];
 	NL = (float)(sliLev[1] * sliLev[1]) * mem_n;
-	if (NT < 0)
-	{
+	if (NT < 0) {
 		a = 1.f + (NT / 105.f);
 		d = -NT / 105.f;
 		g = (1.f + 0.0005f * NT * NT) * NL;
-	}
-	else
-	{
+	} else {
 		a = 1.f;
 		b = -NT / 50.f;
 		c = (float)fabs((float)NT) / 100.f;
@@ -392,15 +362,13 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	if (fabs(F1) < 0.001f) F1 = 0.001f; // to prevent overtone ratio div0
 	F2 = MasterTune * TwoPi * GetPrivateProfileFloat(sec, "F2", 120.0, dsfile) / Fs;
 	TDroopRate = GetPrivateProfileFloat(sec, "Droop", 0.f, dsfile);
-	if (TDroopRate > 0.f)
-	{
+	if (TDroopRate > 0.f) {
 		TDroopRate = (float)powf(10.0f, (TDroopRate - 20.0f) / 30.0f);
 		TDroopRate = TDroopRate * -4.f / envData[1][MAX];
 		TDroop = 1;
 		F2 = F1 + ((F2 - F1) / (1.f - (float)exp(TDroopRate * envData[1][MAX])));
 		ddF = F1 - F2;
-	}
-	else
+	} else
 		ddF = F2 - F1;
 
 	Tphi = GetPrivateProfileFloat(sec, "Phase", 90.f, dsfile) / 57.29578f; // degrees>radians
@@ -425,13 +393,11 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	Ophi1 = Tphi;
 	Ophi2 = Tphi;
 	if (MainFilter == 0) MainFilter = GetPrivateProfileInt(sec, "Filter", 0, dsfile);
-	if ((GetPrivateProfileInt(sec, "Track1", 0, dsfile) == 1) && (TON == 1))
-	{
+	if ((GetPrivateProfileInt(sec, "Track1", 0, dsfile) == 1) && (TON == 1)) {
 		OF1Sync = 1;
 		OF1 = OF1 / F1;
 	}
-	if ((GetPrivateProfileInt(sec, "Track2", 0, dsfile) == 1) && (TON == 1))
-	{
+	if ((GetPrivateProfileInt(sec, "Track2", 0, dsfile) == 1) && (TON == 1)) {
 		OF2Sync = 1;
 		OF2 = OF2 / F1;
 	}
@@ -484,8 +450,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	clippoint = 32700;
 	DAtten = 1.0f;
 
-	if (DiON == 1)
-	{
+	if (DiON == 1) {
 		DAtten = DGain * (short)LoudestEnv();
 		if (DAtten > 32700) clippoint = 32700;
 		else
@@ -497,8 +462,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 	// prepare envelopes
 	randmax = 1.f / RAND_MAX;
 	randmax2 = 2.f * randmax;
-	for (i = 1; i < 8; i++)
-	{
+	for (i = 1; i < 8; i++) {
 		envData[i][NEXTT] = 0;
 		envData[i][PNT] = 0;
 	}
@@ -548,14 +512,12 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 
 	// generate
 	tpos = 0;
-	while (tpos < Length)
-	{
+	while (tpos < Length) {
 		tplus = tpos + 1199;
 
 		if (NON == 1) // noise
 		{
-			for (t = tpos; t <= tplus; t++)
-			{
+			for (t = tpos; t <= tplus; t++) {
 				if (t < envData[2][NEXTT]) envData[2][ENV] = envData[2][ENV] + envData[2][dENV];
 				else
 					UpdateEnv(2, t);
@@ -566,9 +528,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				DF[t - tpos] = TT * g * envData[2][ENV];
 			}
 			if (t >= envData[2][MAX]) NON = 0;
-		}
-		else
-		{
+		} else {
 			for (j = 0; j < 1200; j++)
 				DF[j] = 0.f;
 		}
@@ -576,18 +536,14 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 		if (TON == 1) // tone
 		{
 			TphiStart = Tphi;
-			if (TDroop == 1)
-			{
+			if (TDroop == 1) {
 				for (t = tpos; t <= tplus; t++)
 					phi[t - tpos] = F2 + (ddF * (float)exp(t * TDroopRate));
-			}
-			else
-			{
+			} else {
 				for (t = tpos; t <= tplus; t++)
 					phi[t - tpos] = F1 + (t / envData[1][MAX]) * ddF;
 			}
-			for (t = tpos; t <= tplus; t++)
-			{
+			for (t = tpos; t <= tplus; t++) {
 				totmp = t - tpos;
 				if (t < envData[1][NEXTT]) envData[1][ENV] = envData[1][ENV] + envData[1][dENV];
 				else
@@ -596,15 +552,13 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				DF[totmp] += TL * envData[1][ENV] * (float)sin(fmod(Tphi, TwoPi)); // overflow?
 			}
 			if (t >= envData[1][MAX]) TON = 0;
-		}
-		else
+		} else
 			for (j = 0; j < 1200; j++)
 				phi[j] = F2; // for overtone sync
 
 		if (BON == 1) // noise band 1
 		{
-			for (t = tpos; t <= tplus; t++)
-			{
+			for (t = tpos; t <= tplus; t++) {
 				if (t < envData[5][NEXTT]) envData[5][ENV] = envData[5][ENV] + envData[5][dENV];
 				else
 					UpdateEnv(5, t);
@@ -618,8 +572,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 
 		if (BON2 == 1) // noise band 2
 		{
-			for (t = tpos; t <= tplus; t++)
-			{
+			for (t = tpos; t <= tplus; t++) {
 				if (t < envData[6][NEXTT]) envData[6][ENV] = envData[6][ENV] + envData[6][dENV];
 				else
 					UpdateEnv(6, t);
@@ -631,33 +584,28 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 			if (t >= envData[6][MAX]) BON2 = 0;
 		}
 
-		for (t = tpos; t <= tplus; t++)
-		{
+		for (t = tpos; t <= tplus; t++) {
 			if (OON == 1) // overtones
 			{
 				if (t < envData[3][NEXTT]) envData[3][ENV] = envData[3][ENV] + envData[3][dENV];
-				else
-				{
+				else {
 					if (t >= envData[3][MAX]) // wait for OT2
 					{
 						envData[3][ENV] = 0;
 						envData[3][dENV] = 0;
 						envData[3][NEXTT] = 999999;
-					}
-					else
+					} else
 						UpdateEnv(3, t);
 				}
 				//
 				if (t < envData[4][NEXTT]) envData[4][ENV] = envData[4][ENV] + envData[4][dENV];
-				else
-				{
+				else {
 					if (t >= envData[4][MAX]) // wait for OT1
 					{
 						envData[4][ENV] = 0;
 						envData[4][dENV] = 0;
 						envData[4][NEXTT] = 999999;
-					}
-					else
+					} else
 						UpdateEnv(4, t);
 				}
 				//
@@ -669,8 +617,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				else
 					Ophi2 = Ophi2 + OF2;
 				Ot = 0.0f;
-				switch (OMode)
-				{
+				switch (OMode) {
 				case 0: // add
 					Ot = OBal1 * envData[3][ENV] * waveform(Ophi1, OW1);
 					Ot = OL * (Ot + OBal2 * envData[4][ENV] * waveform(Ophi2, OW2));
@@ -687,12 +634,10 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 					break;
 
 				case 3: // 808 Cymbal
-					for (j = 0; j < 6; j++)
-					{
+					for (j = 0; j < 6; j++) {
 						Oc[j][0] += 1.0f;
 
-						if (Oc[j][0] > Oc[j][1])
-						{
+						if (Oc[j][0] > Oc[j][1]) {
 							Oc[j][0] -= Oc[j][1];
 							Ot = OL * envData[3][ENV];
 						}
@@ -722,8 +667,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				MFout = MFfb * (MFout - MFin) + MFin;
 
 				DF[t - tpos] = DF[t - tpos] + (MFout - (HighPass * Ot));
-			}
-			else if (MainFilter == 2) // filter all
+			} else if (MainFilter == 2) // filter all
 			{
 				if (t < envData[7][NEXTT]) envData[7][ENV] = envData[7][ENV] + envData[7][dENV];
 				else
@@ -761,8 +705,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 				for (jj = DownStart; jj <= DownEnd; jj++)
 					DF[jj] = DownAve;
 			}
-		}
-		else
+		} else
 			for (j = 0; j < 1200; j++)
 				DF[j] *= DGain;
 
@@ -774,8 +717,7 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t*& wave, int channels, sa
 			else
 				wave[wavewords++] = (short)DF[j];
 
-			for (int c = 1; c < channels; c++)
-			{
+			for (int c = 1; c < channels; c++) {
 				wave[wavewords] = wave[wavewords - 1];
 				wavewords++;
 			}

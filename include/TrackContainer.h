@@ -35,16 +35,11 @@ class AutomationPattern;
 class InstrumentTrack;
 class TrackContainerView;
 
-class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
-{
+class LMMS_EXPORT TrackContainer : public Model, public JournallingObject {
 	Q_OBJECT
 public:
 	typedef QVector<Track*> TrackList;
-	enum TrackContainerTypes
-	{
-		BBContainer,
-		SongContainer
-	};
+	enum TrackContainerTypes { BBContainer, SongContainer };
 
 	TrackContainer();
 	virtual ~TrackContainer();

@@ -30,11 +30,9 @@
 #ifndef _DSP_R_12_AX_7_H_
 #define _DSP_R_12_AX_7_H_
 
-namespace r12AX7
-{
+namespace r12AX7 {
 
-enum
-{
+enum {
 	Zero = 566,
 	Samples = 1668,
 };

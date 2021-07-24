@@ -30,8 +30,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-class SideBarWidget : public QWidget
-{
+class SideBarWidget : public QWidget {
 	Q_OBJECT
 public:
 	SideBarWidget(const QString& _title, const QPixmap& _icon, QWidget* _parent);

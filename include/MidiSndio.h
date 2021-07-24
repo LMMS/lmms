@@ -36,8 +36,7 @@
 
 #include "MidiClient.h"
 
-class MidiSndio : public QThread, public MidiClientRaw
-{
+class MidiSndio : public QThread, public MidiClientRaw {
 	Q_OBJECT
 public:
 	MidiSndio(void);

@@ -73,8 +73,7 @@ EqControls::EqControls(EqEffect* effect)
 	, m_lpTypeModel(0, 0, 2, this, tr("Low-pass type"))
 	, m_hpTypeModel(0, 0, 2, this, tr("High-pass type"))
 	, m_analyseInModel(true, this, tr("Analyse IN"))
-	, m_analyseOutModel(true, this, tr("Analyse OUT"))
-{
+	, m_analyseOutModel(true, this, tr("Analyse OUT")) {
 	m_hpFeqModel.setScaleLogarithmic(true);
 	m_lowShelfFreqModel.setScaleLogarithmic(true);
 	m_para1FreqModel.setScaleLogarithmic(true);
@@ -104,8 +103,7 @@ EqControls::EqControls(EqEffect* effect)
 	m_inGainModel.setScaleLogarithmic(true);
 }
 
-void EqControls::loadSettings(const QDomElement& _this)
-{
+void EqControls::loadSettings(const QDomElement& _this) {
 	m_inGainModel.loadSettings(_this, "Inputgain");
 	m_outGainModel.loadSettings(_this, "Outputgain");
 	m_lowShelfGainModel.loadSettings(_this, "Lowshelfgain");
@@ -152,8 +150,7 @@ void EqControls::loadSettings(const QDomElement& _this)
 
 EffectControlDialog* EqControls::createView() { return new EqControlsDialog(this); }
 
-void EqControls::saveSettings(QDomDocument& doc, QDomElement& parent)
-{
+void EqControls::saveSettings(QDomDocument& doc, QDomElement& parent) {
 	m_inGainModel.saveSettings(doc, parent, "Inputgain");
 	m_outGainModel.saveSettings(doc, parent, "Outputgain");
 	m_lowShelfGainModel.saveSettings(doc, parent, "Lowshelfgain");

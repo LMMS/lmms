@@ -37,8 +37,7 @@
 
 struct pollfd;
 
-class MidiAlsaSeq : public QThread, public MidiClient
-{
+class MidiAlsaSeq : public QThread, public MidiClient {
 	Q_OBJECT
 public:
 	MidiAlsaSeq();
@@ -46,8 +45,7 @@ public:
 
 	static QString probeDevice();
 
-	inline static QString name()
-	{
+	inline static QString name() {
 		return QT_TRANSLATE_NOOP("MidiSetupWidget",
 			"ALSA-Sequencer (Advanced Linux Sound "
 			"Architecture)");
@@ -73,13 +71,11 @@ public:
 	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort(MidiPort* _port, const QString& _dest, bool _subscribe = true) override;
 	virtual void subscribeWritablePort(MidiPort* _port, const QString& _dest, bool _subscribe = true) override;
-	virtual void connectRPChanged(QObject* _receiver, const char* _member) override
-	{
+	virtual void connectRPChanged(QObject* _receiver, const char* _member) override {
 		connect(this, SIGNAL(readablePortsChanged()), _receiver, _member);
 	}
 
-	virtual void connectWPChanged(QObject* _receiver, const char* _member) override
-	{
+	virtual void connectWPChanged(QObject* _receiver, const char* _member) override {
 		connect(this, SIGNAL(writablePortsChanged()), _receiver, _member);
 	}
 
@@ -93,10 +89,8 @@ private:
 #ifdef LMMS_HAVE_ALSA
 	QMutex m_seqMutex;
 	snd_seq_t* m_seqHandle;
-	struct Ports
-	{
-		Ports()
-		{
+	struct Ports {
+		Ports() {
 			p[0] = -1;
 			p[1] = -1;
 		}

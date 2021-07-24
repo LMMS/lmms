@@ -33,8 +33,7 @@
 AutomatableSlider::AutomatableSlider(QWidget* _parent, const QString& _name)
 	: QSlider(_parent)
 	, IntModelView(new IntModel(0, 0, 0, NULL, _name, true), this)
-	, m_showStatus(false)
-{
+	, m_showStatus(false) {
 	setWindowTitle(_name);
 
 	connect(this, SIGNAL(valueChanged(int)), this, SLOT(changeValue(int)));
@@ -43,55 +42,45 @@ AutomatableSlider::AutomatableSlider(QWidget* _parent, const QString& _name)
 
 AutomatableSlider::~AutomatableSlider() {}
 
-void AutomatableSlider::contextMenuEvent(QContextMenuEvent* _me)
-{
+void AutomatableSlider::contextMenuEvent(QContextMenuEvent* _me) {
 	CaptionMenu contextMenu(model()->displayName());
 	addDefaultActions(&contextMenu);
 	contextMenu.exec(QCursor::pos());
 }
 
-void AutomatableSlider::mousePressEvent(QMouseEvent* _me)
-{
-	if (_me->button() == Qt::LeftButton && !(_me->modifiers() & Qt::ControlModifier))
-	{
+void AutomatableSlider::mousePressEvent(QMouseEvent* _me) {
+	if (_me->button() == Qt::LeftButton && !(_me->modifiers() & Qt::ControlModifier)) {
 		m_showStatus = true;
 		QSlider::mousePressEvent(_me);
-	}
-	else
-	{
+	} else {
 		IntModelView::mousePressEvent(_me);
 	}
 }
 
-void AutomatableSlider::mouseReleaseEvent(QMouseEvent* _me)
-{
+void AutomatableSlider::mouseReleaseEvent(QMouseEvent* _me) {
 	m_showStatus = false;
 	QSlider::mouseReleaseEvent(_me);
 }
 
-void AutomatableSlider::wheelEvent(QWheelEvent* _me)
-{
+void AutomatableSlider::wheelEvent(QWheelEvent* _me) {
 	bool old_status = m_showStatus;
 	m_showStatus = true;
 	QSlider::wheelEvent(_me);
 	m_showStatus = old_status;
 }
 
-void AutomatableSlider::modelChanged()
-{
+void AutomatableSlider::modelChanged() {
 	QSlider::setRange(model()->minValue(), model()->maxValue());
 	updateSlider();
 	connect(model(), SIGNAL(dataChanged()), this, SLOT(updateSlider()));
 }
 
-void AutomatableSlider::changeValue(int _value)
-{
+void AutomatableSlider::changeValue(int _value) {
 	model()->setValue(_value);
 	emit logicValueChanged(model()->value());
 }
 
-void AutomatableSlider::moveSlider(int _value)
-{
+void AutomatableSlider::moveSlider(int _value) {
 	model()->setValue(_value);
 	emit logicSliderMoved(model()->value());
 }

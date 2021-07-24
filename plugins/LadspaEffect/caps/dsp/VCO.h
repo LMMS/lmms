@@ -29,14 +29,12 @@
 #ifndef _DSP_VCO_H_
 #define _DSP_VCO_H_
 
-namespace DSP
-{
+namespace DSP {
 
 /* variable triangle to sawtooth generator. you can use two of these to
  * generate a square, but we prefer the integrated solution below.
  */
-class TriSaw
-{
+class TriSaw {
 public:
 	/* doubles for maximum stability */
 	double phase, inc;
@@ -44,8 +42,7 @@ public:
 	double tri, tri1, tri2;
 
 public:
-	TriSaw()
-	{
+	TriSaw() {
 		phase = 0;
 		tri = .5;
 	}
@@ -55,8 +52,7 @@ public:
 	inline void set_inc(double i) { inc = i; }
 
 	/* 0: triangle, 1: saw */
-	inline void set_saw(double t)
-	{
+	inline void set_saw(double t) {
 		tri = .5 + .5 * t;
 		tri1 = 2. / tri;
 		tri2 = 2. / (1 - tri);
@@ -65,8 +61,7 @@ public:
 	/* advance and return 1 sample.
 	 * many conditionals, but quicker than a solution based on fmod()
 	 */
-	inline float get()
-	{
+	inline float get() {
 		phase += inc;
 
 		/* the good thing is that tri is always > .5, which implies
@@ -80,8 +75,7 @@ public:
 };
 
 /* variable triangle to sawtooth to square generator */
-class TriSawSquare
-{
+class TriSawSquare {
 public:
 	/* doubles for maximum stability, using floats here increases
 	 * cycle need on my athlon */
@@ -98,8 +92,7 @@ public:
 public:
 	TriSawSquare() { reset(); }
 
-	void reset()
-	{
+	void reset() {
 		phase = 0;
 		sync = &phase;
 		sync_phase = 0;
@@ -110,8 +103,7 @@ public:
 
 	inline void set_inc(double i) { inc = i; }
 
-	inline void set_sync(TriSawSquare& tss, float p)
-	{
+	inline void set_sync(TriSawSquare& tss, float p) {
 		sync = &tss.phase;
 		sync_phase = p;
 	}
@@ -119,8 +111,7 @@ public:
 	/* t = 0: tri     - 1: saw,
 	 * s = 0: tri/saw - 1: square
 	 */
-	inline void set_saw_square(float t, float s)
-	{
+	inline void set_saw_square(float t, float s) {
 		tri = .5 + .5 * t;
 		square_i = 1 - s;
 
@@ -138,8 +129,7 @@ public:
 	 * many branching instructions but on this intel chip faster than
 	 * a version using floor() to keep the phase within [0..1].
 	 */
-	inline float get()
-	{
+	inline float get() {
 		phase += inc;
 
 		if (phase <= tri)
@@ -161,8 +151,7 @@ public:
 	}
 };
 
-class VCO2
-{
+class VCO2 {
 public:
 	TriSawSquare vco[2];
 	float blend, i_blend;
@@ -170,21 +159,18 @@ public:
 public:
 	VCO2() { set_blend(.5); }
 
-	void reset()
-	{
+	void reset() {
 		set_blend(.5);
 		vco[0].reset();
 		vco[1].reset();
 	}
 
-	void set_f(double f, double fs, double detune)
-	{
+	void set_f(double f, double fs, double detune) {
 		vco[0].set_f(f, fs);
 		vco[1].set_f(f * pow(2, detune / 12.), fs);
 	}
 
-	inline void set_blend(float b)
-	{
+	inline void set_blend(float b) {
 		blend = b;
 		i_blend = 1 - fabs(b);
 	}

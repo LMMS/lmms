@@ -38,8 +38,7 @@ FadeButton::FadeButton(
 	, m_releaseTimer()
 	, m_normalColor(_normal_color)
 	, m_activatedColor(_activated_color)
-	, m_holdColor(holdColor)
-{
+	, m_holdColor(holdColor) {
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setCursor(QCursor(embed::getIconPixmap("hand"), 3, 3));
 	setFocusPolicy(Qt::NoFocus);
@@ -50,27 +49,21 @@ FadeButton::~FadeButton() {}
 
 void FadeButton::setActiveColor(const QColor& activated_color) { m_activatedColor = activated_color; }
 
-void FadeButton::activate()
-{
+void FadeButton::activate() {
 	m_stateTimer.restart();
 	activeNotes++;
 	update();
 }
 
-void FadeButton::activateOnce()
-{
+void FadeButton::activateOnce() {
 	if (activeNotes == 0) { activate(); }
 }
 
-void FadeButton::noteEnd()
-{
-	if (activeNotes <= 0)
-	{
+void FadeButton::noteEnd() {
+	if (activeNotes <= 0) {
 		qWarning("noteEnd() triggered without a corresponding activate()!");
 		activeNotes = 0;
-	}
-	else
-	{
+	} else {
 		activeNotes--;
 	}
 
@@ -79,29 +72,21 @@ void FadeButton::noteEnd()
 	update();
 }
 
-void FadeButton::paintEvent(QPaintEvent* _pe)
-{
+void FadeButton::paintEvent(QPaintEvent* _pe) {
 	QColor col = m_normalColor;
 
-	if (m_stateTimer.isValid() && m_stateTimer.elapsed() < FadeDuration)
-	{
+	if (m_stateTimer.isValid() && m_stateTimer.elapsed() < FadeDuration) {
 		// The first part of the fade, when a note is triggered.
 		col = fadeToColor(m_activatedColor, m_holdColor, m_stateTimer, FadeDuration);
 		QTimer::singleShot(20, this, SLOT(update()));
-	}
-	else if (m_stateTimer.isValid() && m_stateTimer.elapsed() >= FadeDuration && activeNotes > 0)
-	{
+	} else if (m_stateTimer.isValid() && m_stateTimer.elapsed() >= FadeDuration && activeNotes > 0) {
 		// The fade is done, but at least one note is still held.
 		col = m_holdColor;
-	}
-	else if (m_releaseTimer.isValid() && m_releaseTimer.elapsed() < FadeDuration)
-	{
+	} else if (m_releaseTimer.isValid() && m_releaseTimer.elapsed() < FadeDuration) {
 		// Last note just ended. Fade to default color.
 		col = fadeToColor(m_holdColor, m_normalColor, m_releaseTimer, FadeDuration);
 		QTimer::singleShot(20, this, SLOT(update()));
-	}
-	else
-	{
+	} else {
 		// No fade, no notes. Set to default color.
 		col = m_normalColor;
 	}
@@ -119,8 +104,7 @@ void FadeButton::paintEvent(QPaintEvent* _pe)
 	p.drawLine(0, 0, w, 0);
 }
 
-QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QElapsedTimer timer, float duration)
-{
+QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QElapsedTimer timer, float duration) {
 	QColor col;
 
 	const float state = 1 - timer.elapsed() / duration;

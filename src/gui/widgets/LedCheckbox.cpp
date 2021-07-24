@@ -35,36 +35,30 @@ static const QString names[LedCheckBox::NumColors] = {"led_yellow", "led_green",
 
 LedCheckBox::LedCheckBox(const QString& _text, QWidget* _parent, const QString& _name, LedColors _color)
 	: AutomatableButton(_parent, _name)
-	, m_text(_text)
-{
+	, m_text(_text) {
 	initUi(_color);
 }
 
 LedCheckBox::LedCheckBox(QWidget* _parent, const QString& _name, LedColors _color)
-	: LedCheckBox(QString(), _parent, _name, _color)
-{
-}
+	: LedCheckBox(QString(), _parent, _name, _color) {}
 
-LedCheckBox::~LedCheckBox()
-{
+LedCheckBox::~LedCheckBox() {
 	delete m_ledOnPixmap;
 	delete m_ledOffPixmap;
 }
 
-void LedCheckBox::setText(const QString& s)
-{
+void LedCheckBox::setText(const QString& s) {
 	m_text = s;
 	onTextUpdated();
 }
 
-void LedCheckBox::paintEvent(QPaintEvent*)
-{
+void LedCheckBox::paintEvent(QPaintEvent*) {
 	QPainter p(this);
 	p.setFont(pointSize<7>(font()));
 
-	if (model()->value() == true) { p.drawPixmap(0, 0, *m_ledOnPixmap); }
-	else
-	{
+	if (model()->value() == true) {
+		p.drawPixmap(0, 0, *m_ledOnPixmap);
+	} else {
 		p.drawPixmap(0, 0, *m_ledOffPixmap);
 	}
 
@@ -74,8 +68,7 @@ void LedCheckBox::paintEvent(QPaintEvent*)
 	p.drawText(m_ledOffPixmap->width() + 3, 10, text());
 }
 
-void LedCheckBox::initUi(LedColors _color)
-{
+void LedCheckBox::initUi(LedColors _color) {
 	setCheckable(true);
 
 	if (_color >= NumColors || _color < Yellow) { _color = Yellow; }
@@ -86,8 +79,7 @@ void LedCheckBox::initUi(LedColors _color)
 	setText(m_text);
 }
 
-void LedCheckBox::onTextUpdated()
-{
+void LedCheckBox::onTextUpdated() {
 	setFixedSize(
 		m_ledOffPixmap->width() + 5 + horizontalAdvance(QFontMetrics(font()), text()), m_ledOffPixmap->height());
 }

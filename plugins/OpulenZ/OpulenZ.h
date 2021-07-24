@@ -40,8 +40,7 @@
 // The "normal" range for LMMS pitchbends
 #define DEFAULT_BEND_CENTS 100
 
-class OpulenzInstrument : public Instrument
-{
+class OpulenzInstrument : public Instrument {
 	Q_OBJECT
 public:
 	OpulenzInstrument(InstrumentTrack* _instrument_track);
@@ -134,8 +133,7 @@ private:
 	int RPNcoarse, RPNfine;
 };
 
-class OpulenzInstrumentView : public InstrumentViewFixedSize
-{
+class OpulenzInstrumentView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	OpulenzInstrumentView(Instrument* _instrument, QWidget* _parent);

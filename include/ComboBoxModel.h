@@ -32,15 +32,12 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
-class LMMS_EXPORT ComboBoxModel : public IntModel
-{
+class LMMS_EXPORT ComboBoxModel : public IntModel {
 	Q_OBJECT
 	MODEL_IS_VISITABLE
 public:
 	ComboBoxModel(Model* parent = NULL, const QString& displayName = QString(), bool isDefaultConstructed = false)
-		: IntModel(0, 0, 0, parent, displayName, isDefaultConstructed)
-	{
-	}
+		: IntModel(0, 0, 0, parent, displayName, isDefaultConstructed) {}
 
 	virtual ~ComboBoxModel() { clear(); }
 

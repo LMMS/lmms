@@ -18,14 +18,12 @@
 
 typedef unsigned long sp_frame;
 
-typedef struct sp_auxdata
-{
+typedef struct sp_auxdata {
 	size_t size;
 	void* ptr;
 } sp_auxdata;
 
-typedef struct sp_data
-{
+typedef struct sp_data {
 	SPFLOAT* out;
 	uint32_t sr;
 	int nchan;
@@ -35,8 +33,7 @@ typedef struct sp_data
 	uint32_t rand;
 } sp_data;
 
-typedef struct
-{
+typedef struct {
 	char state;
 	SPFLOAT val;
 } sp_param;
@@ -62,8 +59,7 @@ int sp_out(sp_data* sp, uint32_t chan, SPFLOAT val);
 uint32_t sp_rand(sp_data* sp);
 void sp_srand(sp_data* sp, uint32_t val);
 
-typedef struct
-{
+typedef struct {
 	SPFLOAT* utbl;
 	int16_t* BRLow;
 	int16_t* BRLowCpx;
@@ -78,8 +74,7 @@ void sp_fft_destroy(sp_fft* fft);
 #ifndef kiss_fft_scalar
 #define kiss_fft_scalar SPFLOAT
 #endif
-typedef struct
-{
+typedef struct {
 	kiss_fft_scalar r;
 	kiss_fft_scalar i;
 } kiss_fft_cpx;

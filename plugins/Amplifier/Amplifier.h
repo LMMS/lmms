@@ -30,8 +30,7 @@
 #include "Effect.h"
 #include "ValueBuffer.h"
 
-class AmplifierEffect : public Effect
-{
+class AmplifierEffect : public Effect {
 public:
 	AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~AmplifierEffect();

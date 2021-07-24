@@ -32,8 +32,7 @@
 #include "SaWaterfallView.h"
 
 //! Top-level widget holding the configuration GUI and spectrum displays
-class SaControlsDialog : public EffectControlDialog
-{
+class SaControlsDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	explicit SaControlsDialog(SaControls* controls, SaProcessor* processor);

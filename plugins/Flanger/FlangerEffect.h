@@ -31,8 +31,7 @@
 #include "Noise.h"
 #include "QuadratureLfo.h"
 
-class FlangerEffect : public Effect
-{
+class FlangerEffect : public Effect {
 public:
 	FlangerEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~FlangerEffect();

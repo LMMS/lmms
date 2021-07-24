@@ -39,8 +39,7 @@ class QPixmap;
 class QPushButton;
 class PixmapButton;
 
-class VstEffectControlDialog : public EffectControlDialog
-{
+class VstEffectControlDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	VstEffectControlDialog(VstEffectControls* _controls);

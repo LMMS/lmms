@@ -43,8 +43,7 @@ Oscilloscope::Oscilloscope(QWidget* _p)
 	, m_points(new QPointF[Engine::mixer()->framesPerPeriod()])
 	, m_active(false)
 	, m_normalColor(71, 253, 133)
-	, m_clippingColor(255, 64, 64)
-{
+	, m_clippingColor(255, 64, 64) {
 	setFixedSize(m_background.width(), m_background.height());
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setActive(ConfigManager::inst()->value("ui", "displaywaveform").toInt());
@@ -57,32 +56,25 @@ Oscilloscope::Oscilloscope(QWidget* _p)
 	ToolTip::add(this, tr("Oscilloscope"));
 }
 
-Oscilloscope::~Oscilloscope()
-{
+Oscilloscope::~Oscilloscope() {
 	delete[] m_buffer;
 	delete[] m_points;
 }
 
-void Oscilloscope::updateAudioBuffer(const surroundSampleFrame* buffer)
-{
-	if (!Engine::getSong()->isExporting())
-	{
+void Oscilloscope::updateAudioBuffer(const surroundSampleFrame* buffer) {
+	if (!Engine::getSong()->isExporting()) {
 		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 		memcpy(m_buffer, buffer, sizeof(surroundSampleFrame) * fpp);
 	}
 }
 
-void Oscilloscope::setActive(bool _active)
-{
+void Oscilloscope::setActive(bool _active) {
 	m_active = _active;
-	if (m_active)
-	{
+	if (m_active) {
 		connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
 		connect(Engine::mixer(), SIGNAL(nextAudioBuffer(const surroundSampleFrame*)), this,
 			SLOT(updateAudioBuffer(const surroundSampleFrame*)));
-	}
-	else
-	{
+	} else {
 		disconnect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(update()));
 		disconnect(Engine::mixer(), SIGNAL(nextAudioBuffer(const surroundSampleFrame*)), this,
 			SLOT(updateAudioBuffer(const surroundSampleFrame*)));
@@ -100,14 +92,12 @@ QColor const& Oscilloscope::clippingColor() const { return m_clippingColor; }
 
 void Oscilloscope::setClippingColor(QColor const& clippingColor) { m_clippingColor = clippingColor; }
 
-void Oscilloscope::paintEvent(QPaintEvent*)
-{
+void Oscilloscope::paintEvent(QPaintEvent*) {
 	QPainter p(this);
 
 	p.drawPixmap(0, 0, m_background);
 
-	if (m_active && !Engine::getSong()->isExporting())
-	{
+	if (m_active && !Engine::getSong()->isExporting()) {
 		Mixer const* mixer = Engine::mixer();
 
 		float master_output = mixer->masterGain();
@@ -129,35 +119,29 @@ void Oscilloscope::paintEvent(QPaintEvent*)
 		int x_base = 2;
 		const qreal y_base = height() / 2 - 0.5;
 
-		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
-		{
-			for (int frame = 0; frame < frames; ++frame)
-			{
+		for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch) {
+			for (int frame = 0; frame < frames; ++frame) {
 				sample_t const clippedSample = Mixer::clip(m_buffer[frame][ch]);
 				m_points[frame] = QPointF(
 					x_base + static_cast<qreal>(frame) * xd, y_base + (static_cast<qreal>(clippedSample) * half_h));
 			}
 			p.drawPolyline(m_points, frames);
 		}
-	}
-	else
-	{
+	} else {
 		p.setPen(QColor(192, 192, 192));
 		p.setFont(pointSize<7>(p.font()));
 		p.drawText(6, height() - 5, tr("Click to enable"));
 	}
 }
 
-void Oscilloscope::mousePressEvent(QMouseEvent* _me)
-{
+void Oscilloscope::mousePressEvent(QMouseEvent* _me) {
 	if (_me->button() == Qt::LeftButton) { setActive(!m_active); }
 }
 
-QColor const& Oscilloscope::determineLineColor(float level) const
-{
-	if (level <= 1.0f) { return normalColor(); }
-	else
-	{
+QColor const& Oscilloscope::determineLineColor(float level) const {
+	if (level <= 1.0f) {
+		return normalColor();
+	} else {
 		return clippingColor();
 	}
 }

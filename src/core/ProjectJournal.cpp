@@ -40,21 +40,16 @@ ProjectJournal::ProjectJournal()
 	: m_joIDs()
 	, m_undoCheckPoints()
 	, m_redoCheckPoints()
-	, m_journalling(false)
-{
-}
+	, m_journalling(false) {}
 
 ProjectJournal::~ProjectJournal() {}
 
-void ProjectJournal::undo()
-{
-	while (!m_undoCheckPoints.isEmpty())
-	{
+void ProjectJournal::undo() {
+	while (!m_undoCheckPoints.isEmpty()) {
 		CheckPoint c = m_undoCheckPoints.pop();
 		JournallingObject* jo = m_joIDs[c.joID];
 
-		if (jo)
-		{
+		if (jo) {
 			DataFile curState(DataFile::JournalData);
 			jo->saveState(curState, curState.content());
 			m_redoCheckPoints.push(CheckPoint(c.joID, curState));
@@ -69,15 +64,12 @@ void ProjectJournal::undo()
 	}
 }
 
-void ProjectJournal::redo()
-{
-	while (!m_redoCheckPoints.isEmpty())
-	{
+void ProjectJournal::redo() {
+	while (!m_redoCheckPoints.isEmpty()) {
 		CheckPoint c = m_redoCheckPoints.pop();
 		JournallingObject* jo = m_joIDs[c.joID];
 
-		if (jo)
-		{
+		if (jo) {
 			DataFile curState(DataFile::JournalData);
 			jo->saveState(curState, curState.content());
 			m_undoCheckPoints.push(CheckPoint(c.joID, curState));
@@ -96,25 +88,21 @@ bool ProjectJournal::canUndo() const { return !m_undoCheckPoints.isEmpty(); }
 
 bool ProjectJournal::canRedo() const { return !m_redoCheckPoints.isEmpty(); }
 
-void ProjectJournal::addJournalCheckPoint(JournallingObject* jo)
-{
-	if (isJournalling())
-	{
+void ProjectJournal::addJournalCheckPoint(JournallingObject* jo) {
+	if (isJournalling()) {
 		m_redoCheckPoints.clear();
 
 		DataFile dataFile(DataFile::JournalData);
 		jo->saveState(dataFile, dataFile.content());
 
 		m_undoCheckPoints.push(CheckPoint(jo->id(), dataFile));
-		if (m_undoCheckPoints.size() > MAX_UNDO_STATES)
-		{
+		if (m_undoCheckPoints.size() > MAX_UNDO_STATES) {
 			m_undoCheckPoints.remove(0, m_undoCheckPoints.size() - MAX_UNDO_STATES);
 		}
 	}
 }
 
-jo_id_t ProjectJournal::allocID(JournallingObject* _obj)
-{
+jo_id_t ProjectJournal::allocID(JournallingObject* _obj) {
 	jo_id_t id;
 	for (jo_id_t tid = rand(); m_joIDs.contains(id = tid % EO_ID_MSB | EO_ID_MSB); tid++) {}
 
@@ -123,38 +111,31 @@ jo_id_t ProjectJournal::allocID(JournallingObject* _obj)
 	return id;
 }
 
-void ProjectJournal::reallocID(const jo_id_t _id, JournallingObject* _obj)
-{
+void ProjectJournal::reallocID(const jo_id_t _id, JournallingObject* _obj) {
 	// printf("realloc %d %d\n", _id, _obj );
 	//	if( m_joIDs.contains( _id ) )
-	{
-		m_joIDs[_id] = _obj;
-	}
+	{ m_joIDs[_id] = _obj; }
 }
 
 jo_id_t ProjectJournal::idToSave(jo_id_t id) { return id & ~EO_ID_MSB; }
 
 jo_id_t ProjectJournal::idFromSave(jo_id_t id) { return id | EO_ID_MSB; }
 
-void ProjectJournal::clearJournal()
-{
+void ProjectJournal::clearJournal() {
 	m_undoCheckPoints.clear();
 	m_redoCheckPoints.clear();
 
-	for (JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end();)
-	{
-		if (it.value() == NULL) { it = m_joIDs.erase(it); }
-		else
-		{
+	for (JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end();) {
+		if (it.value() == NULL) {
+			it = m_joIDs.erase(it);
+		} else {
 			++it;
 		}
 	}
 }
 
-void ProjectJournal::stopAllJournalling()
-{
-	for (JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
-	{
+void ProjectJournal::stopAllJournalling() {
+	for (JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it) {
 		if (it.value() != NULL) { it.value()->setJournalling(false); }
 	}
 	setJournalling(false);

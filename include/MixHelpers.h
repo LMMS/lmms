@@ -28,8 +28,7 @@
 #include "lmms_basics.h"
 
 class ValueBuffer;
-namespace MixHelpers
-{
+namespace MixHelpers {
 
 bool isSilent(const sampleFrame* src, int frames);
 

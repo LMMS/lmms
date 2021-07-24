@@ -35,14 +35,7 @@
 #include "MemoryManager.h"
 #include "PixmapButton.h"
 
-enum SfxrWaves
-{
-	SQR_WAVE,
-	SAW_WAVE,
-	SINE_WAVE,
-	NOISE_WAVE,
-	WAVES_NUM
-};
+enum SfxrWaves { SQR_WAVE, SAW_WAVE, SINE_WAVE, NOISE_WAVE, WAVES_NUM };
 
 const int WAVEFORM_BASE_X = 20;
 const int WAVEFORM_BASE_Y = 15;
@@ -65,8 +58,7 @@ const int KNOB_BLOCK_SIZE_Y = 40;
 
 class sfxrInstrument;
 
-class SfxrSynth
-{
+class SfxrSynth {
 	MM_OPERATORS
 public:
 	SfxrSynth(const sfxrInstrument* s);
@@ -119,16 +111,12 @@ private:
 /**
  * @brief A class that simplify the constructor of FloatModel, with value [0,1]
  */
-class SfxrZeroToOneFloatModel : public FloatModel
-{
+class SfxrZeroToOneFloatModel : public FloatModel {
 public:
 	SfxrZeroToOneFloatModel(float val, Model* parent, const QString& displayName)
-		: FloatModel(val, 0.0, 1.0, 0.001, parent, displayName)
-	{
-	}
+		: FloatModel(val, 0.0, 1.0, 0.001, parent, displayName) {}
 	/* purpose: prevent the initial value of the model from being changed */
-	virtual void loadSettings(const QDomElement& element, const QString& name = QString("value"))
-	{
+	virtual void loadSettings(const QDomElement& element, const QString& name = QString("value")) {
 		float oldInitValue = initValue();
 		FloatModel::loadSettings(element, name);
 		float oldValue = value();
@@ -140,16 +128,12 @@ public:
 /**
  * @brief A class that simplify the constructor of FloatModel, with value [-1,1]
  */
-class SfxrNegPosOneFloatModel : public FloatModel
-{
+class SfxrNegPosOneFloatModel : public FloatModel {
 public:
 	SfxrNegPosOneFloatModel(float val, Model* parent, const QString& displayName)
-		: FloatModel(val, -1.0, 1.0, 0.001, parent, displayName)
-	{
-	}
+		: FloatModel(val, -1.0, 1.0, 0.001, parent, displayName) {}
 	/* purpose: prevent the initial value of the model from being changed */
-	virtual void loadSettings(const QDomElement& element, const QString& name = QString("value"))
-	{
+	virtual void loadSettings(const QDomElement& element, const QString& name = QString("value")) {
 		float oldInitValue = initValue();
 		FloatModel::loadSettings(element, name);
 		float oldValue = value();
@@ -158,8 +142,7 @@ public:
 	}
 };
 
-class sfxrInstrument : public Instrument
-{
+class sfxrInstrument : public Instrument {
 	Q_OBJECT
 public:
 	sfxrInstrument(InstrumentTrack* _instrument_track);
@@ -213,8 +196,7 @@ private:
 	friend class SfxrSynth;
 };
 
-class sfxrInstrumentView : public InstrumentViewFixedSize
-{
+class sfxrInstrumentView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	sfxrInstrumentView(Instrument* _instrument, QWidget* _parent);

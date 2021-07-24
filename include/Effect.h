@@ -36,8 +36,7 @@
 class EffectChain;
 class EffectControls;
 
-class LMMS_EXPORT Effect : public Plugin
-{
+class LMMS_EXPORT Effect : public Plugin {
 	MM_OPERATORS
 	Q_OBJECT
 public:
@@ -61,8 +60,7 @@ public:
 
 	inline bool isRunning() const { return m_running; }
 
-	inline void startRunning()
-	{
+	inline void startRunning() {
 		m_bufferCount = 0;
 		m_running = true;
 	}
@@ -71,8 +69,7 @@ public:
 
 	inline bool isEnabled() const { return m_enabledModel.value(); }
 
-	inline f_cnt_t timeout() const
-	{
+	inline f_cnt_t timeout() const {
 		const float samples = Engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
 		return 1 + (static_cast<int>(samples) / Engine::mixer()->framesPerPeriod());
 	}
@@ -81,8 +78,7 @@ public:
 
 	inline float dryLevel() const { return 1.0f - m_wetDryModel.value(); }
 
-	inline float gate() const
-	{
+	inline float gate() const {
 		const float level = m_gateModel.value();
 		return level * level * m_processors;
 	}
@@ -117,14 +113,12 @@ protected:
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
-	inline void sampleDown(const sampleFrame* _src_buf, sampleFrame* _dst_buf, sample_rate_t _dst_sr)
-	{
+	inline void sampleDown(const sampleFrame* _src_buf, sampleFrame* _dst_buf, sample_rate_t _dst_sr) {
 		resample(0, _src_buf, Engine::mixer()->processingSampleRate(), _dst_buf, _dst_sr,
 			Engine::mixer()->framesPerPeriod());
 	}
 
-	inline void sampleBack(const sampleFrame* _src_buf, sampleFrame* _dst_buf, sample_rate_t _src_sr)
-	{
+	inline void sampleBack(const sampleFrame* _src_buf, sampleFrame* _dst_buf, sample_rate_t _src_sr) {
 		resample(1, _src_buf, _src_sr, _dst_buf, Engine::mixer()->processingSampleRate(),
 			Engine::mixer()->framesPerPeriod() * _src_sr / Engine::mixer()->processingSampleRate());
 	}

@@ -31,15 +31,13 @@
 #include "AutomatableModelView.h"
 #include "LcdWidget.h"
 
-class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView
-{
+class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView {
 	Q_OBJECT
 public:
 	LcdFloatSpinBox(int numWhole, int numFrac, const QString& name = QString(), QWidget* parent = nullptr);
 	LcdFloatSpinBox(int numWhole, int numFrac, const QString& style, const QString& name, QWidget* parent = nullptr);
 
-	void modelChanged() override
-	{
+	void modelChanged() override {
 		ModelView::modelChanged();
 		update();
 	}

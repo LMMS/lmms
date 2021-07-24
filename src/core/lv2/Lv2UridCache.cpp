@@ -39,14 +39,12 @@
 #define LV2_BUF_SIZE__nominalBlockLength LV2_BUF_SIZE_PREFIX "nominalBlockLength"
 #endif
 
-uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
-{
+uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const {
 	Q_ASSERT(id != Id::size);
 	return m_cache[static_cast<std::size_t>(id)];
 }
 
-Lv2UridCache::Lv2UridCache(UridMap& mapper)
-{
+Lv2UridCache::Lv2UridCache(UridMap& mapper) {
 	const uint32_t noIdYet = 0;
 	std::fill_n(m_cache, static_cast<std::size_t>(Id::size), noIdYet);
 
@@ -62,8 +60,7 @@ Lv2UridCache::Lv2UridCache(UridMap& mapper)
 	init(Id::midi_MidiEvent, LV2_MIDI__MidiEvent);
 	init(Id::param_sampleRate, LV2_PARAMETERS__sampleRate);
 
-	for (uint32_t urid : m_cache)
-	{
+	for (uint32_t urid : m_cache) {
 		Q_ASSERT(urid != noIdYet);
 	}
 }

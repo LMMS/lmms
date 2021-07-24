@@ -64,8 +64,7 @@ SaControls::SaControls(Analyzer* effect)
 	, m_waterfallHeightModel(300.0f, 50.0f, 1000.0f, 50.0f, this, tr("Waterfall history size"))
 	, m_waterfallGammaModel(0.30f, 0.10f, 1.00f, 0.05f, this, tr("Waterfall gamma correction"))
 	, m_windowOverlapModel(2.0f, 1.0f, 4.0f, 1.0f, this, tr("FFT window overlap"))
-	, m_zeroPaddingModel(2.0f, 0.0f, 4.0f, 1.0f, this, tr("FFT zero padding"))
-{
+	, m_zeroPaddingModel(2.0f, 0.0f, 4.0f, 1.0f, this, tr("FFT zero padding")) {
 	// Frequency and amplitude ranges; order must match
 	// FREQUENCY_RANGES and AMPLITUDE_RANGES defined in SaControls.h
 	m_freqRangeModel.addItem(tr("Full (auto)"));
@@ -83,18 +82,12 @@ SaControls::SaControls(Analyzer* effect)
 
 	// FFT block size labels are generated automatically, based on
 	// FFT_BLOCK_SIZES vector defined in fft_helpers.h
-	for (unsigned int i = 0; i < FFT_BLOCK_SIZES.size(); i++)
-	{
-		if (i == 0)
-		{
+	for (unsigned int i = 0; i < FFT_BLOCK_SIZES.size(); i++) {
+		if (i == 0) {
 			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(High time res.)"));
-		}
-		else if (i == FFT_BLOCK_SIZES.size() - 1)
-		{
+		} else if (i == FFT_BLOCK_SIZES.size() - 1) {
 			m_blockSizeModel.addItem((std::to_string(FFT_BLOCK_SIZES[i]) + " ").c_str() + tr("(High freq. res.)"));
-		}
-		else
-		{
+		} else {
 			m_blockSizeModel.addItem(std::to_string(FFT_BLOCK_SIZES[i]).c_str());
 		}
 	}
@@ -126,8 +119,7 @@ SaControls::SaControls(Analyzer* effect)
 // Create the SaControlDialog widget which handles display of GUI elements.
 EffectControlDialog* SaControls::createView() { return new SaControlsDialog(this, m_effect->getProcessor()); }
 
-void SaControls::loadSettings(const QDomElement& _this)
-{
+void SaControls::loadSettings(const QDomElement& _this) {
 	m_waterfallModel.loadSettings(_this, "Waterfall");
 	m_smoothModel.loadSettings(_this, "Smooth");
 	m_stereoModel.loadSettings(_this, "Stereo");
@@ -149,8 +141,7 @@ void SaControls::loadSettings(const QDomElement& _this)
 	m_zeroPaddingModel.loadSettings(_this, "ZeroPadding");
 }
 
-void SaControls::saveSettings(QDomDocument& doc, QDomElement& parent)
-{
+void SaControls::saveSettings(QDomDocument& doc, QDomElement& parent) {
 	m_waterfallModel.saveSettings(doc, parent, "Waterfall");
 	m_smoothModel.saveSettings(doc, parent, "Smooth");
 	m_stereoModel.saveSettings(doc, parent, "Stereo");

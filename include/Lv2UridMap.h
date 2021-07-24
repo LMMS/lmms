@@ -38,8 +38,7 @@
 /**
  * Complete implementation of the Lv2 Urid Map extension
  */
-class UridMap
-{
+class UridMap {
 	std::unordered_map<std::string, LV2_URID> m_map;
 	std::vector<const char*> m_unMap;
 

@@ -44,15 +44,12 @@
 /* common stub for Descriptor makes it possible to delete() without special-
  * casing for every plugin class.
  */
-class DescriptorStub : public LADSPA_Descriptor
-{
+class DescriptorStub : public LADSPA_Descriptor {
 public:
 	DescriptorStub() { PortCount = 0; }
 
-	~DescriptorStub()
-	{
-		if (PortCount)
-		{
+	~DescriptorStub() {
+		if (PortCount) {
 			delete[] PortNames;
 			delete[] PortDescriptors;
 			delete[] PortRangeHints;
@@ -60,8 +57,7 @@ public:
 	}
 };
 
-inline void processor_specific_denormal_measures()
-{
+inline void processor_specific_denormal_measures() {
 #ifdef __SSE3__
 	/* this one works reliably on a 6600 Core2 */
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
@@ -73,8 +69,7 @@ inline void processor_specific_denormal_measures()
 #endif
 }
 
-template <class T> class Descriptor : public DescriptorStub
-{
+template <class T> class Descriptor : public DescriptorStub {
 public:
 	LADSPA_PortRangeHint* ranges;
 
@@ -82,8 +77,7 @@ public:
 	Descriptor() { setup(); }
 	void setup();
 
-	void autogen()
-	{
+	void autogen() {
 		PortCount = (sizeof(T::port_info) / sizeof(PortInfo));
 
 		/* unroll PortInfo members */
@@ -92,8 +86,7 @@ public:
 		ranges = new LADSPA_PortRangeHint[PortCount];
 
 		/* could also assign directly but const_cast is ugly. */
-		for (int i = 0; i < (int)PortCount; ++i)
-		{
+		for (int i = 0; i < (int)PortCount; ++i) {
 			names[i] = T::port_info[i].name;
 			desc[i] = T::port_info[i].descriptor;
 			ranges[i] = T::port_info[i].range;
@@ -114,8 +107,7 @@ public:
 		cleanup = _cleanup;
 	}
 
-	static LADSPA_Handle _instantiate(const struct _LADSPA_Descriptor* d, ulong fs)
-	{
+	static LADSPA_Handle _instantiate(const struct _LADSPA_Descriptor* d, ulong fs) {
 		T* plugin = new T();
 		int n = (int)d->PortCount;
 
@@ -137,8 +129,7 @@ public:
 
 	static void _connect_port(LADSPA_Handle h, ulong i, LADSPA_Data* p) { ((T*)h)->ports[i] = p; }
 
-	static void _activate(LADSPA_Handle h)
-	{
+	static void _activate(LADSPA_Handle h) {
 		T* plugin = (T*)h;
 
 		plugin->first_run = 1;
@@ -154,8 +145,7 @@ public:
 				 */
 	}
 
-	static void _run(LADSPA_Handle h, ulong n)
-	{
+	static void _run(LADSPA_Handle h, ulong n) {
 		T* plugin = (T*)h;
 
 		/* We don't reset the processor flags later, it's true. */
@@ -163,8 +153,7 @@ public:
 
 		/* If this is the first audio block after activation,
 		 * initialize the plugin from the current set of parameters. */
-		if (plugin->first_run)
-		{
+		if (plugin->first_run) {
 			plugin->activate();
 			plugin->first_run = 0;
 		}
@@ -173,8 +162,7 @@ public:
 		plugin->normal = -plugin->normal;
 	}
 
-	static void _run_adding(LADSPA_Handle h, ulong n)
-	{
+	static void _run_adding(LADSPA_Handle h, ulong n) {
 		T* plugin = (T*)h;
 
 		/* We don't reset the processor flags later, it's true. */
@@ -182,8 +170,7 @@ public:
 
 		/* If this is the first audio block after activation,
 		 * initialize the plugin from the current set of parameters. */
-		if (plugin->first_run)
-		{
+		if (plugin->first_run) {
 			plugin->activate();
 			plugin->first_run = 0;
 		}
@@ -192,15 +179,13 @@ public:
 		plugin->normal = -plugin->normal;
 	}
 
-	static void _set_run_adding_gain(LADSPA_Handle h, LADSPA_Data g)
-	{
+	static void _set_run_adding_gain(LADSPA_Handle h, LADSPA_Data g) {
 		T* plugin = (T*)h;
 
 		plugin->adding_gain = g;
 	}
 
-	static void _cleanup(LADSPA_Handle h)
-	{
+	static void _cleanup(LADSPA_Handle h) {
 		T* plugin = (T*)h;
 
 		delete[] plugin->ports;

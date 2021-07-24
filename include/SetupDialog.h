@@ -42,19 +42,11 @@ class QSlider;
 
 class TabBar;
 
-class SetupDialog : public QDialog
-{
+class SetupDialog : public QDialog {
 	Q_OBJECT
 
 public:
-	enum ConfigTabs
-	{
-		GeneralSettings,
-		PerformanceSettings,
-		AudioSettings,
-		MidiSettings,
-		PathsSettings
-	};
+	enum ConfigTabs { GeneralSettings, PerformanceSettings, AudioSettings, MidiSettings, PathsSettings };
 
 	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
 	virtual ~SetupDialog();

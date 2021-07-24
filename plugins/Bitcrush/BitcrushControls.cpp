@@ -41,8 +41,7 @@ BitcrushControls::BitcrushControls(BitcrushEffect* eff)
 	, m_stereoDiff(0.f, 0.f, 50.f, 0.1f, this, tr("Stereo difference"))
 	, m_levels(256.f, 1.f, 256.f, 0.01f, this, tr("Levels"))
 	, m_rateEnabled(true, this, tr("Rate enabled"))
-	, m_depthEnabled(true, this, tr("Depth enabled"))
-{
+	, m_depthEnabled(true, this, tr("Depth enabled")) {
 	m_rate.setStrictStepSize(true);
 	m_levels.setStrictStepSize(true);
 
@@ -51,8 +50,7 @@ BitcrushControls::BitcrushControls(BitcrushEffect* eff)
 
 BitcrushControls::~BitcrushControls() {}
 
-void BitcrushControls::saveSettings(QDomDocument& doc, QDomElement& elem)
-{
+void BitcrushControls::saveSettings(QDomDocument& doc, QDomElement& elem) {
 	m_inGain.saveSettings(doc, elem, "ingain");
 	m_inNoise.saveSettings(doc, elem, "innoise");
 	m_outGain.saveSettings(doc, elem, "outgain");
@@ -64,8 +62,7 @@ void BitcrushControls::saveSettings(QDomDocument& doc, QDomElement& elem)
 	m_depthEnabled.saveSettings(doc, elem, "depthon");
 }
 
-void BitcrushControls::loadSettings(const QDomElement& elem)
-{
+void BitcrushControls::loadSettings(const QDomElement& elem) {
 	m_inGain.loadSettings(elem, "ingain");
 	m_inNoise.loadSettings(elem, "innoise");
 	m_outGain.loadSettings(elem, "outgain");

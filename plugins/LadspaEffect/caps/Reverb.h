@@ -55,11 +55,9 @@
 #include "dsp/util.h"
 
 /* both reverbs use this */
-class Lattice : public DSP::Delay
-{
+class Lattice : public DSP::Delay {
 public:
-	inline sample_t process(sample_t x, double d)
-	{
+	inline sample_t process(sample_t x, double d) {
 		sample_t y = get();
 		x -= d * y;
 		put(x);
@@ -68,21 +66,18 @@ public:
 };
 
 /* helper for JVRev */
-class JVComb : public DSP::Delay
-{
+class JVComb : public DSP::Delay {
 public:
 	float c;
 
-	inline sample_t process(sample_t x)
-	{
+	inline sample_t process(sample_t x) {
 		x += c * get();
 		put(x);
 		return x;
 	}
 };
 
-class JVRev : public Plugin
-{
+class JVRev : public Plugin {
 public:
 	static int default_length[9];
 	sample_t t60;
@@ -113,8 +108,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class ModLattice
-{
+class ModLattice {
 public:
 	float n0, width;
 
@@ -122,21 +116,18 @@ public:
 	DSP::Sine lfo;
 	DSP::DelayTapA tap;
 
-	void init(int n, int w)
-	{
+	void init(int n, int w) {
 		n0 = n;
 		width = w;
 		delay.init(n + w);
 	}
 
-	void reset()
-	{
+	void reset() {
 		delay.reset();
 		tap.reset();
 	}
 
-	inline sample_t process(sample_t x, double d)
-	{
+	inline sample_t process(sample_t x, double d) {
 		/* TODO: try all-pass interpolation */
 		sample_t y = delay.get_at(n0 + width * lfo.get());
 		x += d * y;
@@ -145,21 +136,18 @@ public:
 	}
 };
 
-class PlateStub : public Plugin
-{
+class PlateStub : public Plugin {
 public:
 	sample_t f_lfo;
 
 	sample_t indiff1, indiff2, dediff1, dediff2;
 
-	struct
-	{
+	struct {
 		DSP::OnePoleLP bandwidth;
 		Lattice lattice[4];
 	} input;
 
-	struct
-	{
+	struct {
 		ModLattice mlattice[2];
 		Lattice lattice[2];
 		DSP::Delay delay[4];
@@ -169,18 +157,15 @@ public:
 
 public:
 	void init();
-	void activate()
-	{
+	void activate() {
 		input.bandwidth.reset();
 
-		for (int i = 0; i < 4; ++i)
-		{
+		for (int i = 0; i < 4; ++i) {
 			input.lattice[i].reset();
 			tank.delay[i].reset();
 		}
 
-		for (int i = 0; i < 2; ++i)
-		{
+		for (int i = 0; i < 2; ++i) {
 			tank.mlattice[i].reset();
 			tank.lattice[i].reset();
 			tank.damping[i].reset();
@@ -195,8 +180,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class Plate : public PlateStub
-{
+class Plate : public PlateStub {
 public:
 	template <sample_func_t F> void one_cycle(int frames);
 
@@ -210,8 +194,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class Plate2x2 : public PlateStub
-{
+class Plate2x2 : public PlateStub {
 public:
 	template <sample_func_t F> void one_cycle(int frames);
 

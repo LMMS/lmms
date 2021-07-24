@@ -35,20 +35,17 @@
 #include "embed.h"
 
 AutomationTrack::AutomationTrack(TrackContainer* tc, bool _hidden)
-	: Track(_hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc)
-{
+	: Track(_hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc) {
 	setName(tr("Automation track"));
 }
 
-bool AutomationTrack::play(const TimePos& time_start, const fpp_t _frames, const f_cnt_t _frame_base, int _tco_num)
-{
+bool AutomationTrack::play(const TimePos& time_start, const fpp_t _frames, const f_cnt_t _frame_base, int _tco_num) {
 	return false;
 }
 
 TrackView* AutomationTrack::createView(TrackContainerView* tcv) { return new AutomationTrackView(this, tcv); }
 
-TrackContentObject* AutomationTrack::createTCO(const TimePos& pos)
-{
+TrackContentObject* AutomationTrack::createTCO(const TimePos& pos) {
 	AutomationPattern* p = new AutomationPattern(this);
 	p->movePosition(pos);
 	return p;
@@ -56,15 +53,13 @@ TrackContentObject* AutomationTrack::createTCO(const TimePos& pos)
 
 void AutomationTrack::saveTrackSpecificSettings(QDomDocument& _doc, QDomElement& _this) {}
 
-void AutomationTrack::loadTrackSpecificSettings(const QDomElement& _this)
-{
+void AutomationTrack::loadTrackSpecificSettings(const QDomElement& _this) {
 	// just in case something somehow wrent wrong...
 	if (type() == HiddenAutomationTrack) { setMuted(false); }
 }
 
 AutomationTrackView::AutomationTrackView(AutomationTrack* _at, TrackContainerView* tcv)
-	: TrackView(_at, tcv)
-{
+	: TrackView(_at, tcv) {
 	setFixedHeight(32);
 	TrackLabelButton* tlb = new TrackLabelButton(this, getTrackSettingsWidget());
 	tlb->setIcon(embed::getIconPixmap("automation_track"));
@@ -73,21 +68,17 @@ AutomationTrackView::AutomationTrackView(AutomationTrack* _at, TrackContainerVie
 	setModel(_at);
 }
 
-void AutomationTrackView::dragEnterEvent(QDragEnterEvent* _dee)
-{
+void AutomationTrackView::dragEnterEvent(QDragEnterEvent* _dee) {
 	StringPairDrag::processDragEnterEvent(_dee, "automatable_model");
 }
 
-void AutomationTrackView::dropEvent(QDropEvent* _de)
-{
+void AutomationTrackView::dropEvent(QDropEvent* _de) {
 	QString type = StringPairDrag::decodeKey(_de);
 	QString val = StringPairDrag::decodeValue(_de);
-	if (type == "automatable_model")
-	{
+	if (type == "automatable_model") {
 		AutomatableModel* mod
 			= dynamic_cast<AutomatableModel*>(Engine::projectJournal()->journallingObject(val.toInt()));
-		if (mod != NULL)
-		{
+		if (mod != NULL) {
 			TimePos pos = TimePos(trackContainerView()->currentPosition()
 				+ (_de->pos().x() - getTrackContentWidget()->x()) * TimePos::ticksPerBar()
 					/ static_cast<int>(trackContainerView()->pixelsPerBar()))

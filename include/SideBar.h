@@ -32,8 +32,7 @@
 class QToolButton;
 class SideBarWidget;
 
-class SideBar : public QToolBar
-{
+class SideBar : public QToolBar {
 	Q_OBJECT
 public:
 	SideBar(Qt::Orientation _orientation, QWidget* _parent);

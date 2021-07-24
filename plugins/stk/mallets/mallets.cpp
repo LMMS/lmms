@@ -41,12 +41,11 @@
 #include "gui_templates.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Mallets",
-		QT_TRANSLATE_NOOP("PluginBrowser", "Tuneful things to bang on"), "Danny McRae <khjklujn/at/users.sf.net>",
-		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Mallets",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Tuneful things to bang on"), "Danny McRae <khjklujn/at/users.sf.net>", 0x0100,
+	Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 malletsInstrument::malletsInstrument(InstrumentTrack* _instrument_track)
@@ -72,8 +71,7 @@ malletsInstrument::malletsInstrument(InstrumentTrack* _instrument_track)
 	, m_versionModel(MALLETS_PRESET_VERSION, 0, MALLETS_PRESET_VERSION, this, "")
 	, m_isOldVersionModel(false, this, "")
 	, m_filesMissing(!QDir(ConfigManager::inst()->stkDir()).exists()
-		  || !QFileInfo(ConfigManager::inst()->stkDir() + "/sinewave.raw").exists())
-{
+		  || !QFileInfo(ConfigManager::inst()->stkDir() + "/sinewave.raw").exists()) {
 	// ModalBar
 	m_presetsModel.addItem(tr("Marimba"));
 	m_scalers.append(4.0);
@@ -111,8 +109,7 @@ malletsInstrument::malletsInstrument(InstrumentTrack* _instrument_track)
 
 malletsInstrument::~malletsInstrument() {}
 
-void malletsInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void malletsInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	// ModalBar
 	m_hardnessModel.saveSettings(_doc, _this, "hardness");
 	m_positionModel.saveSettings(_doc, _this, "position");
@@ -140,8 +137,7 @@ void malletsInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	m_isOldVersionModel.saveSettings(_doc, _this, "oldversion");
 }
 
-void malletsInstrument::loadSettings(const QDomElement& _this)
-{
+void malletsInstrument::loadSettings(const QDomElement& _this) {
 	m_versionModel.loadSettings(_this, "version");
 
 	// ModalBar
@@ -170,18 +166,15 @@ void malletsInstrument::loadSettings(const QDomElement& _this)
 	m_isOldVersionModel.loadSettings(_this, "oldversion");
 
 	// To maintain backward compatibility
-	if (!_this.hasAttribute("version"))
-	{
+	if (!_this.hasAttribute("version")) {
 		m_isOldVersionModel.setValue(true);
 		m_vibratoGainModel.setValue(0.0f);
-		if (m_presetsModel.value() == 1)
-		{
+		if (m_presetsModel.value() == 1) {
 			/* 	Earlier mallets used the stk internal
 			default of 0.2. 0.2 * 128.0 = 25.6 	*/
 			m_vibratoGainModel.setValue(25.6f);
 		}
-		if (m_presetsModel.value() != 1)
-		{
+		if (m_presetsModel.value() != 1) {
 			// Frequency actually worked for Vibraphone!
 			m_vibratoFreqModel.setValue(0.0f);
 		}
@@ -191,8 +184,7 @@ void malletsInstrument::loadSettings(const QDomElement& _this)
 			m_positionModel values over 64 is formatted to the
 			new knob by 128 - x	*/
 
-		switch (m_presetsModel.value())
-		{
+		switch (m_presetsModel.value()) {
 		case 0:
 			m_hardnessModel.setValue(55.0f);
 			m_positionModel.setValue(57.0f);
@@ -244,15 +236,13 @@ void malletsInstrument::loadSettings(const QDomElement& _this)
 
 QString malletsInstrument::nodeName() const { return (malletsstk_plugin_descriptor.name); }
 
-void malletsInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
-{
+void malletsInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer) {
 	if (m_filesMissing) { return; }
 
 	int p = m_presetsModel.value();
 
 	const float freq = _n->frequency();
-	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL)
-	{
+	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL) {
 		// If newer projects, adjust velocity to within stk's limits
 		float velocityAdjust = m_isOldVersionModel.value() ? 100.0 : 200.0;
 		const float vel = _n->getVolume() / velocityAdjust;
@@ -260,20 +250,15 @@ void malletsInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 		// critical section as STK is not thread-safe
 		static QMutex m;
 		m.lock();
-		if (p < 9)
-		{
+		if (p < 9) {
 			_n->m_pluginData = new malletsSynth(freq, vel, m_stickModel.value(), m_hardnessModel.value(),
 				m_positionModel.value(), m_vibratoGainModel.value(), m_vibratoFreqModel.value(), p,
 				(uint8_t)m_spreadModel.value(), Engine::mixer()->processingSampleRate());
-		}
-		else if (p == 9)
-		{
+		} else if (p == 9) {
 			_n->m_pluginData = new malletsSynth(freq, vel, p, m_lfoDepthModel.value(), m_modulatorModel.value(),
 				m_crossfadeModel.value(), m_lfoSpeedModel.value(), m_adsrModel.value(), (uint8_t)m_spreadModel.value(),
 				Engine::mixer()->processingSampleRate());
-		}
-		else
-		{
+		} else {
 			_n->m_pluginData = new malletsSynth(freq, vel, m_pressureModel.value(), m_motionModel.value(),
 				m_vibratoModel.value(), p - 10, m_strikeModel.value() * 128.0, m_velocityModel.value(),
 				(uint8_t)m_spreadModel.value(), Engine::mixer()->processingSampleRate());
@@ -290,13 +275,11 @@ void malletsInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 	p = ps->presetIndex();
 
 	sample_t add_scale = 0.0f;
-	if (p == 10 && m_isOldVersionModel.value() == true)
-	{
+	if (p == 10 && m_isOldVersionModel.value() == true) {
 		add_scale = static_cast<sample_t>(m_strikeModel.value()) * freq * 2.5f;
 	}
 
-	for (fpp_t frame = offset; frame < frames + offset; ++frame)
-	{
+	for (fpp_t frame = offset; frame < frames + offset; ++frame) {
 		_working_buffer[frame][0] = ps->nextSampleLeft() * (m_scalers[p] + add_scale);
 		_working_buffer[frame][1] = ps->nextSampleRight() * (m_scalers[p] + add_scale);
 	}
@@ -304,16 +287,14 @@ void malletsInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
 }
 
-void malletsInstrument::deleteNotePluginData(NotePlayHandle* _n)
-{
+void malletsInstrument::deleteNotePluginData(NotePlayHandle* _n) {
 	delete static_cast<malletsSynth*>(_n->m_pluginData);
 }
 
 PluginView* malletsInstrument::instantiateView(QWidget* _parent) { return (new malletsInstrumentView(this, _parent)); }
 
 malletsInstrumentView::malletsInstrumentView(malletsInstrument* _instrument, QWidget* _parent)
-	: InstrumentViewFixedSize(_instrument, _parent)
-{
+	: InstrumentViewFixedSize(_instrument, _parent) {
 	m_modalBarWidget = setupModalBarControls(this);
 	setWidgetBackground(m_modalBarWidget, "artwork");
 	m_modalBarWidget->move(0, 0);
@@ -340,8 +321,7 @@ malletsInstrumentView::malletsInstrumentView(malletsInstrument* _instrument, QWi
 	m_spreadKnob->setHintText(tr("Spread:"), "");
 
 	// try to inform user about missing Stk-installation
-	if (_instrument->m_filesMissing && gui != NULL)
-	{
+	if (_instrument->m_filesMissing && gui != NULL) {
 		QMessageBox::information(0, tr("Missing files"),
 			tr("Your Stk-installation seems to be "
 			   "incomplete. Please make sure "
@@ -352,16 +332,14 @@ malletsInstrumentView::malletsInstrumentView(malletsInstrument* _instrument, QWi
 
 malletsInstrumentView::~malletsInstrumentView() {}
 
-void malletsInstrumentView::setWidgetBackground(QWidget* _widget, const QString& _pic)
-{
+void malletsInstrumentView::setWidgetBackground(QWidget* _widget, const QString& _pic) {
 	_widget->setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(_widget->backgroundRole(), PLUGIN_NAME::getIconPixmap(_pic.toLatin1().constData()));
 	_widget->setPalette(pal);
 }
 
-QWidget* malletsInstrumentView::setupModalBarControls(QWidget* _parent)
-{
+QWidget* malletsInstrumentView::setupModalBarControls(QWidget* _parent) {
 	QWidget* widget = new QWidget(_parent);
 	widget->setFixedSize(250, 250);
 
@@ -393,8 +371,7 @@ QWidget* malletsInstrumentView::setupModalBarControls(QWidget* _parent)
 	return (widget);
 }
 
-QWidget* malletsInstrumentView::setupTubeBellControls(QWidget* _parent)
-{
+QWidget* malletsInstrumentView::setupTubeBellControls(QWidget* _parent) {
 	QWidget* widget = new QWidget(_parent);
 	widget->setFixedSize(250, 250);
 
@@ -426,8 +403,7 @@ QWidget* malletsInstrumentView::setupTubeBellControls(QWidget* _parent)
 	return (widget);
 }
 
-QWidget* malletsInstrumentView::setupBandedWGControls(QWidget* _parent)
-{
+QWidget* malletsInstrumentView::setupBandedWGControls(QWidget* _parent) {
 	// BandedWG
 	QWidget* widget = new QWidget(_parent);
 	widget->setFixedSize(250, 250);
@@ -458,8 +434,7 @@ QWidget* malletsInstrumentView::setupBandedWGControls(QWidget* _parent)
 	return (widget);
 }
 
-void malletsInstrumentView::modelChanged()
-{
+void malletsInstrumentView::modelChanged() {
 	malletsInstrument* inst = castModel<malletsInstrument>();
 	m_hardnessKnob->setModel(&inst->m_hardnessModel);
 	m_positionKnob->setModel(&inst->m_positionModel);
@@ -480,25 +455,19 @@ void malletsInstrumentView::modelChanged()
 	m_spreadKnob->setModel(&inst->m_spreadModel);
 }
 
-void malletsInstrumentView::changePreset()
-{
+void malletsInstrumentView::changePreset() {
 	malletsInstrument* inst = castModel<malletsInstrument>();
 	int _preset = inst->m_presetsModel.value();
 
-	if (_preset < 9)
-	{
+	if (_preset < 9) {
 		m_tubeBellWidget->hide();
 		m_bandedWGWidget->hide();
 		m_modalBarWidget->show();
-	}
-	else if (_preset == 9)
-	{
+	} else if (_preset == 9) {
 		m_modalBarWidget->hide();
 		m_bandedWGWidget->hide();
 		m_tubeBellWidget->show();
-	}
-	else
-	{
+	} else {
 		m_modalBarWidget->hide();
 		m_tubeBellWidget->hide();
 		m_bandedWGWidget->show();
@@ -509,10 +478,8 @@ void malletsInstrumentView::changePreset()
 malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const StkFloat _control1,
 	const StkFloat _control2, const StkFloat _control4, const StkFloat _control8, const StkFloat _control11,
 	const int _control16, const uint8_t _delay, const sample_rate_t _sample_rate)
-	: m_presetIndex(0)
-{
-	try
-	{
+	: m_presetIndex(0) {
+	try {
 		Stk::setSampleRate(_sample_rate);
 		Stk::setRawwavePath(QDir(ConfigManager::inst()->stkDir()).absolutePath().toLocal8Bit().constData());
 #ifndef LMMS_DEBUG
@@ -530,17 +497,12 @@ malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, cons
 		m_voice->controlChange(128, 128.0f);
 
 		m_voice->noteOn(_pitch, _velocity);
-	}
-	catch (...)
-	{
-		m_voice = NULL;
-	}
+	} catch (...) { m_voice = NULL; }
 
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
-	for (int i = 0; i < 256; i++)
-	{
+	for (int i = 0; i < 256; i++) {
 		m_delay[i] = 0.0;
 	}
 }
@@ -549,10 +511,8 @@ malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, cons
 malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const int _preset, const StkFloat _control1,
 	const StkFloat _control2, const StkFloat _control4, const StkFloat _control11, const StkFloat _control128,
 	const uint8_t _delay, const sample_rate_t _sample_rate)
-	: m_presetIndex(0)
-{
-	try
-	{
+	: m_presetIndex(0) {
+	try {
 		Stk::setSampleRate(_sample_rate);
 		Stk::setRawwavePath(QDir(ConfigManager::inst()->stkDir()).absolutePath().toLocal8Bit().constData());
 #ifndef LMMS_DEBUG
@@ -568,17 +528,12 @@ malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, cons
 		m_voice->controlChange(128, _control128);
 
 		m_voice->noteOn(_pitch, _velocity);
-	}
-	catch (...)
-	{
-		m_voice = NULL;
-	}
+	} catch (...) { m_voice = NULL; }
 
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
-	for (int i = 0; i < 256; i++)
-	{
+	for (int i = 0; i < 256; i++) {
 		m_delay[i] = 0.0;
 	}
 }
@@ -587,10 +542,8 @@ malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, cons
 malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, const StkFloat _control2,
 	const StkFloat _control4, const StkFloat _control11, const int _control16, const StkFloat _control64,
 	const StkFloat _control128, const uint8_t _delay, const sample_rate_t _sample_rate)
-	: m_presetIndex(0)
-{
-	try
-	{
+	: m_presetIndex(0) {
+	try {
 		Stk::setSampleRate(_sample_rate);
 		Stk::setRawwavePath(QDir(ConfigManager::inst()->stkDir()).absolutePath().toLocal8Bit().constData());
 #ifndef LMMS_DEBUG
@@ -608,27 +561,20 @@ malletsSynth::malletsSynth(const StkFloat _pitch, const StkFloat _velocity, cons
 		m_voice->controlChange(128, _control128);
 
 		m_voice->noteOn(_pitch, _velocity);
-	}
-	catch (...)
-	{
-		m_voice = NULL;
-	}
+	} catch (...) { m_voice = NULL; }
 
 	m_delay = new StkFloat[256];
 	m_delayRead = 0;
 	m_delayWrite = _delay;
-	for (int i = 0; i < 256; i++)
-	{
+	for (int i = 0; i < 256; i++) {
 		m_delay[i] = 0.0;
 	}
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-	{
-		return new malletsInstrument(static_cast<InstrumentTrack*>(m));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*) {
+	return new malletsInstrument(static_cast<InstrumentTrack*>(m));
+}
 }

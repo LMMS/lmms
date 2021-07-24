@@ -48,15 +48,13 @@ const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 const QString PORTABLE_MODE_FILE = "/portable_mode.txt";
 
-class LMMS_EXPORT ConfigManager : public QObject
-{
+class LMMS_EXPORT ConfigManager : public QObject {
 	Q_OBJECT
 
 	using UpgradeMethod = void (ConfigManager::*)();
 
 public:
-	static inline ConfigManager* inst()
-	{
+	static inline ConfigManager* inst() {
 		if (s_instanceOfMe == NULL) { s_instanceOfMe = new ConfigManager(); }
 		return s_instanceOfMe;
 	}

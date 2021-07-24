@@ -40,8 +40,7 @@
 #include "dsp/Roessler.h"
 #include "dsp/SVF.h"
 
-class SweepVFI : public Plugin
-{
+class SweepVFI : public Plugin {
 public:
 	double fs;
 
@@ -49,10 +48,7 @@ public:
 	sample_t f, Q;
 
 	/* needs to be a power of two */
-	enum
-	{
-		BLOCK_SIZE = 32
-	};
+	enum { BLOCK_SIZE = 32 };
 
 	DSP::StackedSVF<1, 2> svf;
 	DSP::Lorenz lorenz;
@@ -70,17 +66,13 @@ public:
 	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class SweepVFII : public Plugin
-{
+class SweepVFII : public Plugin {
 public:
 	/* svf parameters */
 	sample_t f, Q;
 
 	/* needs to be a power of two */
-	enum
-	{
-		BLOCK_SIZE = 32
-	};
+	enum { BLOCK_SIZE = 32 };
 
 	DSP::StackedSVF<1, 2> svf;
 	DSP::Lorenz lorenz1;
@@ -101,8 +93,7 @@ public:
 
 /* //////////////////////////////////////////////////////////////////////// */
 
-class AutoWah : public Plugin
-{
+class AutoWah : public Plugin {
 public:
 	double fs;
 
@@ -110,10 +101,7 @@ public:
 	sample_t f, Q;
 
 	/* needs to be a power of two */
-	enum
-	{
-		BLOCK_SIZE = 32
-	};
+	enum { BLOCK_SIZE = 32 };
 
 	DSP::StackedSVF<1, 2> svf;
 	DSP::RMS rms;

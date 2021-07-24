@@ -32,13 +32,11 @@
 #include "Effect.h"
 #include "EffectChain.h"
 
-namespace Ui
-{
+namespace Ui {
 class EffectSelectDialog;
 }
 
-class EffectSelectDialog : public QDialog
-{
+class EffectSelectDialog : public QDialog {
 	Q_OBJECT
 public:
 	EffectSelectDialog(QWidget* _parent);

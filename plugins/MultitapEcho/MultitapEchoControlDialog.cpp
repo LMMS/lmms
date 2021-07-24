@@ -38,8 +38,7 @@
 #include "embed.h"
 
 MultitapEchoControlDialog::MultitapEchoControlDialog(MultitapEchoControls* controls)
-	: EffectControlDialog(controls)
-{
+	: EffectControlDialog(controls) {
 	setAutoFillBackground(true);
 	QPalette pal;
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("artwork"));

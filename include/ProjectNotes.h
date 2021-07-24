@@ -35,8 +35,7 @@ class QComboBox;
 class QTextCharFormat;
 class QTextEdit;
 
-class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
-{
+class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject {
 	Q_OBJECT
 public:
 	ProjectNotes();

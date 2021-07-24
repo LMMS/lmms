@@ -28,11 +28,9 @@
 #ifndef _DSP_BI_QUAD_H_
 #define _DSP_BI_QUAD_H_
 
-namespace DSP
-{
+namespace DSP {
 
-class BiQuad
-{
+class BiQuad {
 public:
 	/* coefficients */
 	sample_t a[3], b[3];
@@ -41,40 +39,34 @@ public:
 	int h;
 	sample_t x[2], y[2];
 
-	BiQuad()
-	{
+	BiQuad() {
 		unity();
 		reset();
 	}
 
-	void unity()
-	{
+	void unity() {
 		a[0] = 1;
 		a[1] = a[2] = b[0] = b[1] = b[2] = 0;
 	}
 
-	void copy(BiQuad& bq)
-	{
+	void copy(BiQuad& bq) {
 		for (int i = 0; i < 3; ++i)
 			a[i] = bq.a[i], b[i] = bq.b[i];
 	}
 
-	void reset()
-	{
+	void reset() {
 		h = 0;
 
 		x[0] = x[1] = y[0] = y[1] = 0.;
 	}
 
 	/* denormal zapping */
-	void flush_0()
-	{
+	void flush_0() {
 		for (int i = 0; i < 2; ++i)
 			if (is_denormal(y[i])) y[i] = 0;
 	}
 
-	inline sample_t process(sample_t s)
-	{
+	inline sample_t process(sample_t s) {
 		register int z = h;
 
 		register sample_t r = s * a[0];
@@ -97,8 +89,7 @@ public:
 	/* Following are additional methods for using the biquad to filter an
 	 * upsampled signal with 0 padding -- some terms reduce to 0 in this
 	 * case */
-	inline sample_t process_0_1()
-	{
+	inline sample_t process_0_1() {
 		register int z = h;
 
 		register sample_t r = 0;
@@ -118,8 +109,7 @@ public:
 		return r;
 	}
 
-	inline sample_t process_0_2()
-	{
+	inline sample_t process_0_2() {
 		register int z = h;
 
 		register sample_t r = 0;
@@ -138,8 +128,7 @@ public:
 		return r;
 	}
 
-	inline sample_t process_0_3()
-	{
+	inline sample_t process_0_3() {
 		register int z = h;
 
 		register sample_t r = 0;

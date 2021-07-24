@@ -36,8 +36,7 @@
 
 class ExprFrontData;
 
-class ExprFront
-{
+class ExprFront {
 public:
 	typedef float (*ff1data_functor)(void*, float);
 	ExprFront(const char* expr, int last_func_samples);
@@ -58,18 +57,15 @@ private:
 	static const int max_float_integer_mask = (1 << (std::numeric_limits<float>::digits)) - 1;
 };
 
-class WaveSample
-{
+class WaveSample {
 public:
-	WaveSample(int length)
-	{
+	WaveSample(int length) {
 		m_length = length;
 		m_samples = new float[m_length];
 		for (int i = 0; i < m_length; ++i)
 			m_samples[i] = 0;
 	}
-	WaveSample(const graphModel* graph)
-	{
+	WaveSample(const graphModel* graph) {
 		m_length = graph->length();
 		m_samples = new float[m_length];
 		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
@@ -82,8 +78,7 @@ public:
 	bool m_interpolate;
 };
 
-class ExprSynth
-{
+class ExprSynth {
 	MM_OPERATORS
 public:
 	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2,
@@ -109,18 +104,15 @@ private:
 	float m_rel_inc;
 };
 
-inline float positiveFraction(float x)
-{
+inline float positiveFraction(float x) {
 	if (std::isnan(x) || std::isinf(x)) return 0;
 	if (x < 0) { x += static_cast<int>(1 - x); }
 	return x - static_cast<int>(x);
 }
 
-template <typename T> inline void clearArray(T* arr, unsigned int size)
-{
+template <typename T> inline void clearArray(T* arr, unsigned int size) {
 	const T* const arr_end = arr + size;
-	while (arr < arr_end)
-	{
+	while (arr < arr_end) {
 		*arr = 0;
 		++arr;
 	}

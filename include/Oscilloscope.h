@@ -30,8 +30,7 @@
 
 #include "lmms_basics.h"
 
-class Oscilloscope : public QWidget
-{
+class Oscilloscope : public QWidget {
 	Q_OBJECT
 public:
 	Q_PROPERTY(QColor normalColor READ normalColor WRITE setNormalColor)

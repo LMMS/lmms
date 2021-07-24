@@ -39,8 +39,7 @@ class QPainter;
 class SaProcessor;
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid
-class SaSpectrumView : public QWidget
-{
+class SaSpectrumView : public QWidget {
 	Q_OBJECT
 public:
 	explicit SaSpectrumView(SaControls* controls, SaProcessor* processor, QWidget* _parent = 0);

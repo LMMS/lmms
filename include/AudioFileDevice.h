@@ -31,8 +31,7 @@
 #include "AudioDevice.h"
 #include "OutputSettings.h"
 
-class AudioFileDevice : public AudioDevice
-{
+class AudioFileDevice : public AudioDevice {
 public:
 	AudioFileDevice(OutputSettings const& outputSettings, const ch_cnt_t _channels, const QString& _file, Mixer* mixer);
 	virtual ~AudioFileDevice();

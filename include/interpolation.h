@@ -34,8 +34,7 @@
 #include "lmms_constants.h"
 #include "lmms_math.h"
 
-inline float hermiteInterpolate(float x0, float x1, float x2, float x3, float frac_pos)
-{
+inline float hermiteInterpolate(float x0, float x1, float x2, float x3, float frac_pos) {
 	const float frsq = frac_pos * frac_pos;
 	const float frsq2 = 2 * frsq;
 	return (((x2 - x0) * 0.5f) * (frac_pos * (frsq + 1) - frsq2) + (frsq2 * frac_pos - 3 * frsq) * (x1 - x2)
@@ -61,8 +60,7 @@ inline float hermiteInterpolate(float x0, float x1, float x2, float x3, float fr
 */
 }
 
-inline float cubicInterpolate(float v0, float v1, float v2, float v3, float x)
-{
+inline float cubicInterpolate(float v0, float v1, float v2, float v3, float x) {
 	float frsq = x * x;
 	float frcu = frsq * v0;
 	float t1 = v3 + 3 * v1;
@@ -72,16 +70,14 @@ inline float cubicInterpolate(float v0, float v1, float v2, float v3, float x)
 		+ frsq * x * (t1 * (1.0f / 6.0f) - 0.5f * v2) + frsq * fastFmaf(0.5f, v2, -v1));
 }
 
-inline float cosinusInterpolate(float v0, float v1, float x)
-{
+inline float cosinusInterpolate(float v0, float v1, float x) {
 	const float f = (1.0f - cosf(x * F_PI)) * 0.5f;
 	return fastFmaf(f, v1 - v0, v0);
 }
 
 inline float linearInterpolate(float v0, float v1, float x) { return fastFmaf(x, v1 - v0, v0); }
 
-inline float optimalInterpolate(float v0, float v1, float x)
-{
+inline float optimalInterpolate(float v0, float v1, float x) {
 	const float z = x - 0.5f;
 	const float even = v1 + v0;
 	const float odd = v1 - v0;
@@ -94,8 +90,7 @@ inline float optimalInterpolate(float v0, float v1, float x)
 	return fastFmaf(fastFmaf(fastFmaf(c3, z, c2), z, c1), z, c0);
 }
 
-inline float optimal4pInterpolate(float v0, float v1, float v2, float v3, float x)
-{
+inline float optimal4pInterpolate(float v0, float v1, float v2, float v3, float x) {
 	const float z = x - 0.5f;
 	const float even1 = v2 + v1;
 	const float odd1 = v2 - v1;
@@ -110,8 +105,7 @@ inline float optimal4pInterpolate(float v0, float v1, float v2, float v3, float 
 	return fastFmaf(fastFmaf(fastFmaf(c3, z, c2), z, c1), z, c0);
 }
 
-inline float lagrangeInterpolate(float v0, float v1, float v2, float v3, float x)
-{
+inline float lagrangeInterpolate(float v0, float v1, float v2, float v3, float x) {
 	const float c0 = v1;
 	const float c1 = v2 - v0 * (1.0f / 3.0f) - v1 * 0.5f - v3 * (1.0f / 6.0f);
 	const float c2 = 0.5f * (v0 + v2) - v1;

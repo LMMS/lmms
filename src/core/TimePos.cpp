@@ -29,32 +29,23 @@
 
 TimeSig::TimeSig(int num, int denom)
 	: m_num(num)
-	, m_denom(denom)
-{
-}
+	, m_denom(denom) {}
 
 TimeSig::TimeSig(const MeterModel& model)
 	: m_num(model.getNumerator())
-	, m_denom(model.getDenominator())
-{
-}
+	, m_denom(model.getDenominator()) {}
 
 int TimeSig::numerator() const { return m_num; }
 
 int TimeSig::denominator() const { return m_denom; }
 
 TimePos::TimePos(const bar_t bar, const tick_t ticks)
-	: m_ticks(bar * s_ticksPerBar + ticks)
-{
-}
+	: m_ticks(bar * s_ticksPerBar + ticks) {}
 
 TimePos::TimePos(const tick_t ticks)
-	: m_ticks(ticks)
-{
-}
+	: m_ticks(ticks) {}
 
-TimePos TimePos::quantize(float bars) const
-{
+TimePos TimePos::quantize(float bars) const {
 	// The intervals we should snap to, our new position should be a factor of this
 	int interval = s_ticksPerBar * bars;
 	// The lower position we could snap to
@@ -72,14 +63,12 @@ TimePos TimePos::quantize(float bars) const
 
 TimePos TimePos::toAbsoluteBar() const { return getBar() * s_ticksPerBar; }
 
-TimePos& TimePos::operator+=(const TimePos& time)
-{
+TimePos& TimePos::operator+=(const TimePos& time) {
 	m_ticks += time.m_ticks;
 	return *this;
 }
 
-TimePos& TimePos::operator-=(const TimePos& time)
-{
+TimePos& TimePos::operator-=(const TimePos& time) {
 	m_ticks -= time.m_ticks;
 	return *this;
 }
@@ -94,8 +83,7 @@ tick_t TimePos::getTicks() const { return m_ticks; }
 
 TimePos::operator int() const { return m_ticks; }
 
-tick_t TimePos::ticksPerBeat(const TimeSig& sig) const
-{
+tick_t TimePos::ticksPerBeat(const TimeSig& sig) const {
 	// (number of ticks per bar) divided by (number of beats per bar)
 	return ticksPerBar(sig) / sig.numerator();
 }
@@ -106,19 +94,16 @@ tick_t TimePos::getBeatWithinBar(const TimeSig& sig) const { return getTickWithi
 
 tick_t TimePos::getTickWithinBeat(const TimeSig& sig) const { return getTickWithinBar(sig) % ticksPerBeat(sig); }
 
-f_cnt_t TimePos::frames(const float framesPerTick) const
-{
+f_cnt_t TimePos::frames(const float framesPerTick) const {
 	if (m_ticks >= 0) { return static_cast<f_cnt_t>(m_ticks * framesPerTick); }
 	return 0;
 }
 
-double TimePos::getTimeInMilliseconds(bpm_t beatsPerMinute) const
-{
+double TimePos::getTimeInMilliseconds(bpm_t beatsPerMinute) const {
 	return ticksToMilliseconds(getTicks(), beatsPerMinute);
 }
 
-TimePos TimePos::fromFrames(const f_cnt_t frames, const float framesPerTick)
-{
+TimePos TimePos::fromFrames(const f_cnt_t frames, const float framesPerTick) {
 	return TimePos(static_cast<int>(frames / framesPerTick));
 }
 
@@ -126,8 +111,7 @@ tick_t TimePos::ticksPerBar() { return s_ticksPerBar; }
 
 tick_t TimePos::ticksPerBar(const TimeSig& sig) { return DefaultTicksPerBar * sig.numerator() / sig.denominator(); }
 
-int TimePos::stepsPerBar()
-{
+int TimePos::stepsPerBar() {
 	int steps = ticksPerBar() / DefaultBeatsPerBar;
 	return qMax(1, steps);
 }
@@ -136,13 +120,11 @@ void TimePos::setTicksPerBar(tick_t tpb) { s_ticksPerBar = tpb; }
 
 TimePos TimePos::stepPosition(int step) { return step * ticksPerBar() / stepsPerBar(); }
 
-double TimePos::ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute)
-{
+double TimePos::ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute) {
 	return TimePos::ticksToMilliseconds(static_cast<double>(ticks), beatsPerMinute);
 }
 
-double TimePos::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute)
-{
+double TimePos::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute) {
 	// 60 * 1000 / 48 = 1250
 	return (ticks * 1250) / beatsPerMinute;
 }

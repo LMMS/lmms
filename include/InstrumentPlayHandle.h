@@ -30,27 +30,22 @@
 #include "PlayHandle.h"
 #include "lmms_export.h"
 
-class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
-{
+class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle {
 public:
 	InstrumentPlayHandle(Instrument* instrument, InstrumentTrack* instrumentTrack);
 
 	virtual ~InstrumentPlayHandle() {}
 
-	void play(sampleFrame* _working_buffer) override
-	{
+	void play(sampleFrame* _working_buffer) override {
 		// ensure that all our nph's have been processed first
 		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack(m_instrument->instrumentTrack(), true);
 
 		bool nphsLeft;
-		do
-		{
+		do {
 			nphsLeft = false;
-			for (const NotePlayHandle* constNotePlayHandle : nphv)
-			{
+			for (const NotePlayHandle* constNotePlayHandle : nphv) {
 				NotePlayHandle* notePlayHandle = const_cast<NotePlayHandle*>(constNotePlayHandle);
-				if (notePlayHandle->state() != ThreadableJob::ProcessingState::Done && !notePlayHandle->isFinished())
-				{
+				if (notePlayHandle->state() != ThreadableJob::ProcessingState::Done && !notePlayHandle->isFinished()) {
 					nphsLeft = true;
 					notePlayHandle->process();
 				}

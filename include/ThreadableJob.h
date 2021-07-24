@@ -29,21 +29,12 @@
 
 #include "lmms_basics.h"
 
-class ThreadableJob
-{
+class ThreadableJob {
 public:
-	enum class ProcessingState : int
-	{
-		Unstarted,
-		Queued,
-		InProgress,
-		Done
-	};
+	enum class ProcessingState : int { Unstarted, Queued, InProgress, Done };
 
 	ThreadableJob()
-		: m_state(ProcessingState::Unstarted)
-	{
-	}
+		: m_state(ProcessingState::Unstarted) {}
 
 	inline ProcessingState state() const { return m_state.load(); }
 
@@ -53,11 +44,9 @@ public:
 
 	inline void done() { m_state = ProcessingState::Done; }
 
-	void process()
-	{
+	void process() {
 		auto expected = ProcessingState::Queued;
-		if (m_state.compare_exchange_strong(expected, ProcessingState::InProgress))
-		{
+		if (m_state.compare_exchange_strong(expected, ProcessingState::InProgress)) {
 			doProcessing();
 			m_state = ProcessingState::Done;
 		}

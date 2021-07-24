@@ -29,8 +29,7 @@
 
 #include "Plugin.h"
 
-class LMMS_EXPORT ToolPlugin : public Plugin
-{
+class LMMS_EXPORT ToolPlugin : public Plugin {
 public:
 	ToolPlugin(const Descriptor* _descriptor, Model* _parent);
 	virtual ~ToolPlugin();

@@ -31,16 +31,13 @@
 
 class EffectControlDialog;
 
-class EffectControls : public JournallingObject, public Model
-{
+class EffectControls : public JournallingObject, public Model {
 public:
 	EffectControls(Effect* _eff)
 		: JournallingObject()
 		, Model(_eff)
 		, m_effect(_eff)
-		, m_viewVisible(false)
-	{
-	}
+		, m_viewVisible(false) {}
 
 	virtual ~EffectControls() {}
 

@@ -28,25 +28,20 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor
-		= {STRINGIFY(PLUGIN_NAME), "Amplifier", QT_TRANSLATE_NOOP("PluginBrowser", "A native amplifier plugin"),
-			"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"),
-			NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Amplifier",
+	QT_TRANSLATE_NOOP("PluginBrowser", "A native amplifier plugin"), "Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
+	0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 AmplifierEffect::AmplifierEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&amplifier_plugin_descriptor, parent, key)
-	, m_ampControls(this)
-{
-}
+	, m_ampControls(this) {}
 
 AmplifierEffect::~AmplifierEffect() {}
 
-bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
-{
+bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames) {
 	if (!isEnabled() || !isRunning()) { return (false); }
 
 	double outSum = 0.0;
@@ -58,20 +53,16 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	const ValueBuffer* leftBuf = m_ampControls.m_leftModel.valueBuffer();
 	const ValueBuffer* rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
-	for (fpp_t f = 0; f < frames; ++f)
-	{
+	for (fpp_t f = 0; f < frames; ++f) {
 		//		qDebug( "offset %d, value %f", f, m_ampControls.m_volumeModel.value( f ) );
 
 		sample_t s[2] = {buf[f][0], buf[f][1]};
 
 		// vol knob
-		if (volBuf)
-		{
+		if (volBuf) {
 			s[0] *= volBuf->value(f) * 0.01f;
 			s[1] *= volBuf->value(f) * 0.01f;
-		}
-		else
-		{
+		} else {
 			s[0] *= m_ampControls.m_volumeModel.value() * 0.01f;
 			s[1] *= m_ampControls.m_volumeModel.value() * 0.01f;
 		}
@@ -98,12 +89,10 @@ bool AmplifierEffect::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 	return isRunning();
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data)
-	{
-		return new AmplifierEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* parent, void* data) {
+	return new AmplifierEffect(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(data));
+}
 }

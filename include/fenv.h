@@ -7,8 +7,7 @@
 // Public domain polyfill for feenableexcept on OS X
 // http://www-personal.umich.edu/~williams/archive/computation/fe-handling-example.c
 
-inline int feenableexcept(unsigned int excepts)
-{
+inline int feenableexcept(unsigned int excepts) {
 	static fenv_t fenv;
 	unsigned int new_excepts = excepts & FE_ALL_EXCEPT;
 	// previous masks
@@ -24,8 +23,7 @@ inline int feenableexcept(unsigned int excepts)
 	return fesetenv(&fenv) ? -1 : old_excepts;
 }
 
-inline int fedisableexcept(unsigned int excepts)
-{
+inline int fedisableexcept(unsigned int excepts) {
 	static fenv_t fenv;
 	unsigned int new_excepts = excepts & FE_ALL_EXCEPT;
 	// all previous masks

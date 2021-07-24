@@ -73,11 +73,9 @@ typedef const char* Alg_attribute;
 
 // Alg_atoms is a symbol table of Alg_attributes and other
 // unique strings
-class Alg_atoms
-{
+class Alg_atoms {
 public:
-	Alg_atoms()
-	{
+	Alg_atoms() {
 		maxlen = len = 0;
 		atoms = NULL;
 	}
@@ -88,10 +86,8 @@ public:
 	// Alg_atom (which will now be freed). The advantage of this code is
 	// that Alg_atoms will not be reported as memory leaks by automation
 	// that doesn't know better. -RBD
-	virtual ~Alg_atoms()
-	{
-		for (int i = 0; i < len; i++)
-		{
+	virtual ~Alg_atoms() {
+		for (int i = 0; i < len; i++) {
 			delete atoms[i];
 		}
 		if (atoms) delete[] atoms;
@@ -116,16 +112,14 @@ extern Alg_atoms symbol_table;
 // an attribute/value pair. Since Alg_attribute names imply type,
 // we try to keep attributes and values packaged together as
 // Alg_parameter class
-typedef class Alg_parameter
-{
+typedef class Alg_parameter {
 public:
 	// This constructor guarantees that an Alg_parameter can be
 	// deleted safely without further initialization. It does not
 	// do anything useful, so it is expected that the creator will
 	// set attr and store a value in the appropriate union field.
 	Alg_attribute attr;
-	union
-	{
+	union {
 		double r;	   // real
 		const char* s; // string
 		long i;		   // integer
@@ -143,8 +137,7 @@ public:
 } * Alg_parameter_ptr;
 
 // a list of attribute/value pairs
-typedef class Alg_parameters
-{
+typedef class Alg_parameters {
 public:
 	class Alg_parameters* next;
 	Alg_parameter parm;
@@ -187,8 +180,7 @@ public:
 #define ALG_OTHER 9		  // any other value
 
 // abstract superclass of Alg_note and Alg_update:
-typedef class Alg_event
-{
+typedef class Alg_event {
 protected:
 	bool selected;
 	char type;						// 'e' event, 'n' note, 'u' update
@@ -291,8 +283,7 @@ public:
 	virtual ~Alg_event() {}
 } * Alg_event_ptr;
 
-typedef class Alg_note : public Alg_event
-{
+typedef class Alg_note : public Alg_event {
 public:
 	virtual ~Alg_note();
 	Alg_note(Alg_note*);		   // copy constructor
@@ -300,16 +291,14 @@ public:
 	float loud;					   // dynamic corresponding to MIDI velocity
 	double dur;					   // duration in seconds (normally to release point)
 	Alg_parameters_ptr parameters; // attribute/value pair list
-	Alg_note()
-	{
+	Alg_note() {
 		type = 'n';
 		parameters = NULL;
 	}
 	void show();
 } * Alg_note_ptr;
 
-typedef class Alg_update : public Alg_event
-{
+typedef class Alg_update : public Alg_event {
 public:
 	virtual ~Alg_update(){};
 	Alg_update(Alg_update*); // copy constructor
@@ -320,8 +309,7 @@ public:
 } * Alg_update_ptr;
 
 // a sequence of Alg_event objects
-typedef class Alg_events
-{
+typedef class Alg_events {
 private:
 	long maxlen;
 	void expand();
@@ -341,13 +329,11 @@ public:
 	// Alg_events instance is deleted while "in_use", an assertion will fail.
 	bool in_use;
 	virtual int length() { return len; }
-	Alg_event_ptr& operator[](int i)
-	{
+	Alg_event_ptr& operator[](int i) {
 		assert(i >= 0 && i < len);
 		return events[i];
 	}
-	Alg_events()
-	{
+	Alg_events() {
 		maxlen = len = 0;
 		events = NULL;
 		last_note_off = 0;
@@ -356,8 +342,7 @@ public:
 	// destructor deletes the events array, but not the
 	// events themselves
 	virtual ~Alg_events();
-	void set_events(Alg_event_ptr* e, long l, long m)
-	{
+	void set_events(Alg_event_ptr* e, long l, long m) {
 		if (events) delete[] events;
 		events = e;
 		len = l;
@@ -371,8 +356,7 @@ public:
 
 class Alg_track;
 
-typedef class Alg_event_list : public Alg_events
-{
+typedef class Alg_event_list : public Alg_events {
 protected:
 	char type; // 'e' Alg_event_list, 't' Alg_track, 's' Alg_seq
 	static const char* last_error_message;
@@ -406,8 +390,7 @@ public:
 	// by track with increasing indices. This operation is not
 	// particularly fast on an Alg_seq.
 	virtual Alg_event_ptr const& operator[](int i);
-	Alg_event_list()
-	{
+	Alg_event_list() {
 		sequence_number = 0;
 		beat_dur = 0.0;
 		real_dur = 0.0;
@@ -451,11 +434,9 @@ public:
 } * Alg_event_list_ptr, &Alg_event_list_ref;
 
 // Alg_beat is used to contruct a tempo map
-typedef class Alg_beat
-{
+typedef class Alg_beat {
 public:
-	Alg_beat(double t, double b)
-	{
+	Alg_beat(double t, double b) {
 		time = t;
 		beat = b;
 	}
@@ -465,8 +446,7 @@ public:
 } * Alg_beat_ptr;
 
 // Alg_beats is a list of Alg_beat objects used in Alg_seq
-typedef class Alg_beats
-{
+typedef class Alg_beats {
 private:
 	long maxlen;
 	void expand();
@@ -474,13 +454,11 @@ private:
 public:
 	long len;
 	Alg_beat_ptr beats;
-	Alg_beat& operator[](int i)
-	{
+	Alg_beat& operator[](int i) {
 		assert(i >= 0 && i < len);
 		return beats[i];
 	}
-	Alg_beats()
-	{
+	Alg_beats() {
 		maxlen = len = 0;
 		beats = NULL;
 		expand();
@@ -488,15 +466,13 @@ public:
 		beats[0].beat = 0;
 		len = 1;
 	}
-	~Alg_beats()
-	{
+	~Alg_beats() {
 		if (beats) delete[] beats;
 	}
 	void insert(long i, Alg_beat_ptr beat);
 } * Alg_beats_ptr;
 
-typedef class Alg_time_map
-{
+typedef class Alg_time_map {
 private:
 	int refcount;
 
@@ -504,8 +480,7 @@ public:
 	Alg_beats beats; // array of Alg_beat
 	double last_tempo;
 	bool last_tempo_flag;
-	Alg_time_map()
-	{
+	Alg_time_map() {
 		last_tempo = ALG_DEFAULT_BPM / 60.0; // note: this value ignored until
 											 // last_tempo_flag is set; nevertheless, the default
 											 // tempo is 100.
@@ -541,8 +516,7 @@ public:
 	// insert a span of beats. If start is at a tempo change, the
 	// tempo change takes effect before the inserted beats
 	void insert_beats(double start, double len);
-	void dereference()
-	{
+	void dereference() {
 		if (--refcount <= 0) delete this;
 	}
 	void reference() { refcount++; }
@@ -550,16 +524,14 @@ public:
 
 // Serial_buffer is an abstract class with common elements of
 //     Serial_read_buffer and Serial_write_buffer
-class Serial_buffer
-{
+class Serial_buffer {
 protected:
 	char* buffer;
 	char* ptr;
 	long len;
 
 public:
-	Serial_buffer()
-	{
+	Serial_buffer() {
 		buffer = NULL;
 		ptr = NULL;
 		len = 0;
@@ -570,8 +542,7 @@ public:
 	long get_len() { return len; }
 };
 
-typedef class Serial_read_buffer : public Serial_buffer
-{
+typedef class Serial_read_buffer : public Serial_buffer {
 public:
 	// note that a Serial_read_buffer is initialized for reading by
 	// setting buffer, but it is not the Serial_read_buffer's responsibility
@@ -582,8 +553,7 @@ public:
 //#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
 //#pragma warning(disable: 4311) // type cast pointer to long warning
 #endif
-	void get_pad()
-	{
+	void get_pad() {
 		while ((intptr_t)ptr & 7)
 			ptr++;
 	}
@@ -593,34 +563,29 @@ public:
 	// Prepare to read n bytes from buf. The caller must manage buf: it is
 	// valid until reading is finished, and it is caller's responsibility
 	// to free buf when it is no longer needed.
-	void init_for_read(void* buf, long n)
-	{
+	void init_for_read(void* buf, long n) {
 		buffer = (char*)buf;
 		ptr = (char*)buf;
 		len = n;
 	}
 	char get_char() { return *ptr++; }
 	void unget_chars(int n) { ptr -= n; } // undo n get_char() calls
-	long get_int32()
-	{
+	long get_int32() {
 		long i = *((long*)ptr);
 		ptr += 4;
 		return i;
 	}
-	float get_float()
-	{
+	float get_float() {
 		float f = *((float*)ptr);
 		ptr += 4;
 		return f;
 	}
-	double get_double()
-	{
+	double get_double() {
 		double d = *((double*)ptr);
 		ptr += sizeof(double);
 		return d;
 	}
-	const char* get_string()
-	{
+	const char* get_string() {
 		char* s = ptr;
 		char* fence = buffer + len;
 		assert(ptr < fence);
@@ -633,29 +598,25 @@ public:
 	void check_input_buffer(long needed) { assert(get_posn() + needed <= len); }
 } * Serial_read_buffer_ptr;
 
-typedef class Serial_write_buffer : public Serial_buffer
-{
+typedef class Serial_write_buffer : public Serial_buffer {
 public:
 	// Note: allegro.cpp declares one static instance of Serial_buffer to
 	// reduce large memory (re)allocations when serializing tracks for UNDO.
 	// This destructor will only run when the program exits, which will only
 	// add overhead to the exit process, but it will eliminate an incorrect
 	// report of memory leakage from automation that doesn't know better. -RBD
-	virtual ~Serial_write_buffer()
-	{
+	virtual ~Serial_write_buffer() {
 		if (buffer) delete[] buffer;
 	}
 	void init_for_write() { ptr = buffer; }
 	// store_long writes a long at a given offset
-	void store_long(long offset, long value)
-	{
+	void store_long(long offset, long value) {
 		assert(offset <= get_posn() - 4);
 		long* loc = (long*)(buffer + offset);
 		*loc = value;
 	}
 	void check_buffer(long needed);
-	void set_string(const char* s)
-	{
+	void set_string(const char* s) {
 		char* fence = buffer + len;
 		assert(ptr < fence);
 		(void)fence; // unused variable
@@ -674,18 +635,15 @@ public:
 #endif
 		pad();
 	}
-	void set_int32(long v)
-	{
+	void set_int32(long v) {
 		*((long*)ptr) = v;
 		ptr += 4;
 	}
-	void set_double(double v)
-	{
+	void set_double(double v) {
 		*((double*)ptr) = v;
 		ptr += 8;
 	}
-	void set_float(float v)
-	{
+	void set_float(float v) {
 		*((float*)ptr) = v;
 		ptr += 4;
 	}
@@ -694,16 +652,14 @@ public:
 //#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
 //#pragma warning(disable: 4311) // type cast pointer to long warning
 #endif
-	void pad()
-	{
+	void pad() {
 		while ((intptr_t)ptr & 7)
 			set_char(0);
 	}
 #if defined(_WIN32)
 //#pragma warning(default: 4311 546)
 #endif
-	void* to_heap(long* len)
-	{
+	void* to_heap(long* len) {
 		*len = get_posn();
 		char* newbuf = new char[*len];
 		memcpy(newbuf, buffer, *len);
@@ -713,8 +669,7 @@ public:
 
 typedef class Alg_seq* Alg_seq_ptr;
 
-typedef class Alg_track : public Alg_event_list
-{
+typedef class Alg_track : public Alg_event_list {
 protected:
 	Alg_time_map* time_map;
 	bool units_are_seconds;
@@ -732,13 +687,11 @@ protected:
 public:
 	void serialize_track();
 	void unserialize_track();
-	virtual Alg_event_ptr const& operator[](int i)
-	{
+	virtual Alg_event_ptr const& operator[](int i) {
 		assert(i >= 0 && i < len);
 		return events[i];
 	}
-	Alg_track()
-	{
+	Alg_track() {
 		units_are_seconds = false;
 		time_map = NULL;
 		set_time_map(NULL);
@@ -752,8 +705,7 @@ public:
 	Alg_track(Alg_track& track); // copy constructor, does not copy time_map
 	// copy constructor: event_list is copied, map is installed and referenced
 	Alg_track(Alg_event_list_ref event_list, Alg_time_map_ptr map, bool units_are_seconds);
-	virtual ~Alg_track()
-	{ // note: do not call set_time_map(NULL)!
+	virtual ~Alg_track() { // note: do not call set_time_map(NULL)!
 		if (time_map) time_map->dereference();
 		time_map = NULL;
 	}
@@ -902,20 +854,17 @@ public:
 // Alg_time_sig represents a single time signature;
 // although not recommended, time_signatures may have arbitrary
 // floating point values, e.g. 4.5 beats per measure
-typedef class Alg_time_sig
-{
+typedef class Alg_time_sig {
 public:
 	double beat; // when does this take effect?
 	double num;	 // what is the "numerator" (top number?)
 	double den;	 // what is the "denominator" (bottom number?)
-	Alg_time_sig(double b, double n, double d)
-	{
+	Alg_time_sig(double b, double n, double d) {
 		beat = b;
 		num = n;
 		den = d;
 	}
-	Alg_time_sig()
-	{
+	Alg_time_sig() {
 		beat = 0;
 		num = 0;
 		den = 0;
@@ -935,8 +884,7 @@ public:
 // If you insert a time_sig and one already exist near the same
 // beat, the old one is replaced, thus re-barring every measure
 // until the next time_sig.
-class Alg_time_sigs
-{
+class Alg_time_sigs {
 private:
 	long maxlen;
 	void expand(); // make more space
@@ -944,18 +892,15 @@ private:
 	Alg_time_sig_ptr time_sigs;
 
 public:
-	Alg_time_sigs()
-	{
+	Alg_time_sigs() {
 		maxlen = len = 0;
 		time_sigs = NULL;
 	}
-	Alg_time_sig& operator[](int i)
-	{ // fetch a time signature
+	Alg_time_sig& operator[](int i) { // fetch a time signature
 		assert(i >= 0 && i < len);
 		return time_sigs[i];
 	}
-	~Alg_time_sigs()
-	{
+	~Alg_time_sigs() {
 		if (time_sigs) delete[] time_sigs;
 	}
 	void show();
@@ -973,8 +918,7 @@ public:
 };
 
 // a sequence of Alg_events objects
-typedef class Alg_tracks
-{
+typedef class Alg_tracks {
 private:
 	long maxlen;
 	void expand();
@@ -983,14 +927,12 @@ private:
 
 public:
 	Alg_track_ptr* tracks; // tracks is array of pointers
-	Alg_track& operator[](int i)
-	{
+	Alg_track& operator[](int i) {
 		assert(i >= 0 && i < len);
 		return *tracks[i];
 	}
 	long length() { return len; }
-	Alg_tracks()
-	{
+	Alg_tracks() {
 		maxlen = len = 0;
 		tracks = NULL;
 	}
@@ -1002,8 +944,7 @@ public:
 	void set_in_use(bool flag); // handy to set in_use flag on all tracks
 } * Alg_tracks_ptr;
 
-typedef enum
-{
+typedef enum {
 	alg_no_error = 0,	   // no error reading Allegro or MIDI file
 	alg_error_open = -800, // could not open Allegro or MIDI file
 	alg_error_syntax	   // something found in the file that could not be parsed;
@@ -1014,8 +955,7 @@ typedef enum
 						   // message for the user)
 } Alg_error;
 
-typedef struct Alg_pending_event
-{
+typedef struct Alg_pending_event {
 	void* cookie;		// client-provided sequence identifier
 	Alg_events* events; // the array of events
 	long index;			// offset of this event
@@ -1024,8 +964,7 @@ typedef struct Alg_pending_event
 	double time;		// time for this event
 } * Alg_pending_event_ptr;
 
-typedef class Alg_iterator
-{
+typedef class Alg_iterator {
 private:
 	long maxlen;
 	void expand();
@@ -1048,8 +987,7 @@ public:
 	bool note_off_flag; // remembers if we are iterating over note-off
 						// events as well as note-on and update events
 	long length() { return len; }
-	Alg_iterator(Alg_seq_ptr s, bool note_off)
-	{
+	Alg_iterator(Alg_seq_ptr s, bool note_off) {
 		seq = s;
 		note_off_flag = note_off;
 		maxlen = len = 0;
@@ -1091,8 +1029,7 @@ public:
 // An Alg_seq is an array of Alg_events, each a sequence of Alg_event,
 // with a tempo map and a sequence of time signatures
 //
-typedef class Alg_seq : public Alg_track
-{
+typedef class Alg_seq : public Alg_track {
 protected:
 	Alg_iterator_ptr pending; // iterator used internally by Alg_seq methods
 	void serialize_seq();
@@ -1105,8 +1042,7 @@ public:
 	Alg_tracks track_list;		  // array of Alg_events
 	Alg_time_sigs time_sig;
 	int beat_x;
-	void basic_initialization()
-	{
+	void basic_initialization() {
 		error = alg_no_error;
 		units_are_seconds = true;
 		type = 's';

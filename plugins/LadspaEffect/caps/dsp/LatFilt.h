@@ -28,12 +28,10 @@
 #ifndef _DSP_LatFilt_H_
 #define _DSP_LatFilt_H_
 
-namespace DSP
-{
+namespace DSP {
 
 // ORDER is the highest power of s in the transfer function
-template <int ORDER> class LatFilt
-{
+template <int ORDER> class LatFilt {
 public:
 	double vcoef[ORDER + 1];
 	double kcoef[ORDER];
@@ -44,10 +42,8 @@ public:
 	double vf[ORDER + 1];
 	double kf[ORDER];
 
-	void reset()
-	{
-		for (int i = 0; i < ORDER; i++)
-		{
+	void reset() {
+		for (int i = 0; i < ORDER; i++) {
 			state[i] = 0; // zero state
 			vf[i] = 1;	  // reset fade factor
 			kf[i] = 1;
@@ -56,32 +52,27 @@ public:
 		y = 0;
 	}
 
-	void init(double fs)
-	{
+	void init(double fs) {
 		reset();
 		clearcoefs();
 	}
 
-	void clearcoefs()
-	{
-		for (int i = 0; i < ORDER; i++)
-		{
+	void clearcoefs() {
+		for (int i = 0; i < ORDER; i++) {
 			vcoef[i] = 0;
 			kcoef[i] = 0;
 		}
 		vcoef[ORDER] = 0;
 	}
 
-	sample_t process(sample_t s)
-	{
+	sample_t process(sample_t s) {
 		double tmp;
 
 		int i = ORDER - 1;
 		tmp = -kcoef[i] * state[i] + s;
 		y = vcoef[i + 1] * (state[i] + kcoef[i] * tmp);
 
-		for (i = ORDER - 2; i >= 0; i--)
-		{
+		for (i = ORDER - 2; i >= 0; i--) {
 			tmp = -kcoef[i] * state[i] + tmp;
 			state[i + 1] = kcoef[i] * tmp + state[i];
 			y = y + vcoef[i + 1] * state[i + 1];

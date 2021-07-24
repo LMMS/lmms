@@ -38,11 +38,9 @@
 
 class QLibrary;
 
-class LMMS_EXPORT PluginFactory
-{
+class LMMS_EXPORT PluginFactory {
 public:
-	struct PluginInfo
-	{
+	struct PluginInfo {
 		const QString name() const;
 		QFileInfo file;
 		std::shared_ptr<QLibrary> library = nullptr;
@@ -66,8 +64,7 @@ public:
 	const Plugin::DescriptorList descriptors() const;
 	const Plugin::DescriptorList descriptors(Plugin::PluginTypes type) const;
 
-	struct PluginInfoAndKey
-	{
+	struct PluginInfoAndKey {
 		PluginInfo info;
 		Plugin::Descriptor::SubPluginFeatures::Key key;
 		bool isNull() const { return info.isNull(); }

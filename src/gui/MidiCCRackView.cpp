@@ -40,8 +40,7 @@
 
 MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
 	: QWidget()
-	, m_track(track)
-{
+	, m_track(track) {
 	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 
@@ -83,8 +82,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
 	knobsGroupBoxLayout->addWidget(knobsScrollArea);
 
 	// Adds the controller knobs
-	for (int i = 0; i < MidiControllerCount; ++i)
-	{
+	for (int i = 0; i < MidiControllerCount; ++i) {
 		m_controllerKnob[i] = new Knob(knobBright_26);
 		m_controllerKnob[i]->setLabel(tr("CC %1").arg(i));
 		knobsAreaLayout->addWidget(m_controllerKnob[i], i / 4, i % 4);
@@ -95,8 +93,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
 	m_midiCCGroupBox->setModel(m_track->m_midiCCEnable.get());
 
 	// Set the model for each Knob
-	for (int i = 0; i < MidiControllerCount; ++i)
-	{
+	for (int i = 0; i < MidiControllerCount; ++i) {
 		m_controllerKnob[i]->setModel(m_track->m_midiCCModel[i].get());
 	}
 
@@ -107,10 +104,8 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack* track)
 	mainLayout->addWidget(m_midiCCGroupBox);
 }
 
-MidiCCRackView::~MidiCCRackView()
-{
-	if (parentWidget())
-	{
+MidiCCRackView::~MidiCCRackView() {
+	if (parentWidget()) {
 		parentWidget()->hide();
 		parentWidget()->deleteLater();
 	}

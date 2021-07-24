@@ -77,8 +77,7 @@ const int NUM_OSCS = 4;
 
 class WatsynInstrument;
 
-class WatsynObject
-{
+class WatsynObject {
 	MM_OPERATORS
 public:
 	WatsynObject(float* _A1wave, float* _A2wave, float* _B1wave, float* _B2wave, int _amod, int _bmod,
@@ -114,8 +113,7 @@ private:
 	float m_B2wave[WAVELEN];
 };
 
-class WatsynInstrument : public Instrument
-{
+class WatsynInstrument : public Instrument {
 	Q_OBJECT
 public:
 	WatsynInstrument(InstrumentTrack* _instrument_track);
@@ -157,8 +155,7 @@ private:
 	inline float rightCh(float _vol, float _pan) { return (_pan >= 0 ? 1.0 : 1.0 + (_pan / 100.0)) * _vol / 100.0; }
 
 	// memcpy utilizing libsamplerate (src) for sinc interpolation
-	inline void srccpy(float* _dst, float* _src)
-	{
+	inline void srccpy(float* _dst, float* _src) {
 		int err;
 		const int margin = 64;
 
@@ -266,8 +263,7 @@ private:
 	friend class WatsynView;
 };
 
-class WatsynView : public InstrumentViewFixedSize
-{
+class WatsynView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	WatsynView(Instrument* _instrument, QWidget* _parent);

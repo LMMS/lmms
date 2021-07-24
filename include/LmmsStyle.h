@@ -28,11 +28,9 @@
 
 #include <QProxyStyle>
 
-class LmmsStyle : public QProxyStyle
-{
+class LmmsStyle : public QProxyStyle {
 public:
-	enum ColorRole
-	{
+	enum ColorRole {
 		AutomationBarFill,
 		AutomationBarValue,
 		AutomationSelectedBarFill,

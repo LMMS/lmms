@@ -39,8 +39,7 @@
 class FxMixerView;
 class SendButtonIndicator;
 
-class FxLine : public QWidget
-{
+class FxLine : public QWidget {
 	Q_OBJECT
 public:
 	Q_PROPERTY(QBrush backgroundActive READ backgroundActive WRITE setBackgroundActive)

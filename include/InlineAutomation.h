@@ -29,35 +29,28 @@
 #include "AutomationPattern.h"
 #include "shared_object.h"
 
-class InlineAutomation : public FloatModel, public sharedObject
-{
+class InlineAutomation : public FloatModel, public sharedObject {
 public:
 	InlineAutomation()
 		: FloatModel()
 		, sharedObject()
-		, m_autoPattern(NULL)
-	{
-	}
+		, m_autoPattern(NULL) {}
 
-	virtual ~InlineAutomation()
-	{
+	virtual ~InlineAutomation() {
 		if (m_autoPattern) { delete m_autoPattern; }
 	}
 
 	virtual float defaultValue() const = 0;
 
-	bool hasAutomation() const
-	{
-		if (m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false)
-		{
+	bool hasAutomation() const {
+		if (m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false) {
 			// Prevent saving inline automation if there's just one node at the beginning of
 			// the pattern, which has a InValue equal to the value of model (which is going
 			// to be saved anyways) and no offset between the InValue and OutValue
 			AutomationPattern::timeMap::const_iterator firstNode = m_autoPattern->getTimeMap().begin();
 
 			if (isAtInitValue() && m_autoPattern->getTimeMap().size() == 1 && POS(firstNode) == 0
-				&& INVAL(firstNode) == value() && OFFSET(firstNode) == 0)
-			{
+				&& INVAL(firstNode) == value() && OFFSET(firstNode) == 0) {
 				return false;
 			}
 
@@ -67,10 +60,8 @@ public:
 		return false;
 	}
 
-	AutomationPattern* automationPattern()
-	{
-		if (m_autoPattern == NULL)
-		{
+	AutomationPattern* automationPattern() {
+		if (m_autoPattern == NULL) {
 			m_autoPattern = new AutomationPattern(NULL);
 			m_autoPattern->addObject(this);
 		}

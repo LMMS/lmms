@@ -32,8 +32,7 @@
 #include "SongEditor.h"
 #include "TrackContentObjectView.h"
 
-class AutomationPatternView : public TrackContentObjectView
-{
+class AutomationPatternView : public TrackContentObjectView {
 	Q_OBJECT
 
 public:

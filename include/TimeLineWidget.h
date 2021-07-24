@@ -35,8 +35,7 @@ class NStateButton;
 class TextFloat;
 class SongEditor;
 
-class TimeLineWidget : public QWidget, public JournallingObject
-{
+class TimeLineWidget : public QWidget, public JournallingObject {
 	Q_OBJECT
 public:
 	Q_PROPERTY(QColor barLineColor READ getBarLineColor WRITE setBarLineColor)
@@ -50,24 +49,11 @@ public:
 	Q_PROPERTY(
 		int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding)
 
-	enum AutoScrollStates
-	{
-		AutoScrollEnabled,
-		AutoScrollDisabled
-	};
+	enum AutoScrollStates { AutoScrollEnabled, AutoScrollDisabled };
 
-	enum LoopPointStates
-	{
-		LoopPointsDisabled,
-		LoopPointsEnabled
-	};
+	enum LoopPointStates { LoopPointsDisabled, LoopPointsEnabled };
 
-	enum BehaviourAtStopStates
-	{
-		BackToZero,
-		BackToStart,
-		KeepStopPosition
-	};
+	enum BehaviourAtStopStates { BackToZero, BackToStart, KeepStopPosition };
 
 	TimeLineWidget(
 		int xoff, int yoff, float ppb, Song::PlayPos& pos, const TimePos& begin, Song::PlayModes mode, QWidget* parent);
@@ -86,8 +72,7 @@ public:
 	inline void setInactiveLoopBrush(QBrush const& inactiveLoopBrush) { m_inactiveLoopBrush = inactiveLoopBrush; }
 
 	inline QColor const& getInactiveLoopInnerColor() const { return m_inactiveLoopInnerColor; }
-	inline void setInactiveLoopInnerColor(QColor const& inactiveLoopInnerColor)
-	{
+	inline void setInactiveLoopInnerColor(QColor const& inactiveLoopInnerColor) {
 		m_inactiveLoopInnerColor = inactiveLoopInnerColor;
 	}
 
@@ -98,14 +83,12 @@ public:
 	inline void setActiveLoopBrush(QBrush const& activeLoopBrush) { m_activeLoopBrush = activeLoopBrush; }
 
 	inline QColor const& getActiveLoopInnerColor() const { return m_activeLoopInnerColor; }
-	inline void setActiveLoopInnerColor(QColor const& activeLoopInnerColor)
-	{
+	inline void setActiveLoopInnerColor(QColor const& activeLoopInnerColor) {
 		m_activeLoopInnerColor = activeLoopInnerColor;
 	}
 
 	inline int const& getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
-	inline void setLoopRectangleVerticalPadding(int const& loopRectangleVerticalPadding)
-	{
+	inline void setLoopRectangleVerticalPadding(int const& loopRectangleVerticalPadding) {
 		m_loopRectangleVerticalPadding = loopRectangleVerticalPadding;
 	}
 
@@ -124,8 +107,7 @@ public:
 	inline void savePos(const TimePos& pos) { m_savedPos = pos; }
 	inline const TimePos& savedPos() const { return m_savedPos; }
 
-	inline void setPixelsPerBar(float ppb)
-	{
+	inline void setPixelsPerBar(float ppb) {
 		m_ppb = ppb;
 		update();
 	}
@@ -138,8 +120,7 @@ public:
 	void loadSettings(const QDomElement& _this) override;
 	inline QString nodeName() const override { return "timeline"; }
 
-	inline int markerX(const TimePos& _t) const
-	{
+	inline int markerX(const TimePos& _t) const {
 		return m_xOffset + static_cast<int>((_t - m_begin) * m_ppb / TimePos::ticksPerBar());
 	}
 
@@ -196,8 +177,7 @@ private:
 	TextFloat* m_hint;
 	int m_initalXSelect;
 
-	enum actions
-	{
+	enum actions {
 		NoAction,
 		MovePositionMarker,
 		MoveLoopBegin,

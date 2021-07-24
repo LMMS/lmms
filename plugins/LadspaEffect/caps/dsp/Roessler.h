@@ -28,19 +28,16 @@
 #ifndef _DSP_ROESSLER_H_
 #define _DSP_ROESSLER_H_
 
-namespace DSP
-{
+namespace DSP {
 
-class Roessler
-{
+class Roessler {
 public:
 	double x[2], y[2], z[2];
 	double h, a, b, c;
 	int I;
 
 public:
-	Roessler()
-	{
+	Roessler() {
 		h = 0.001;
 		a = .2;
 		b = .2;
@@ -50,8 +47,7 @@ public:
 	/* rate is normalized (0 .. 1) */
 	void set_rate(double r) { h = max(.000001, r * .096); }
 
-	void init(double _h = .001, double seed = .0)
-	{
+	void init(double _h = .001, double seed = .0) {
 		h = _h;
 
 		I = 0;
@@ -64,8 +60,7 @@ public:
 			get();
 	}
 
-	sample_t get()
-	{
+	sample_t get() {
 		int J = I ^ 1;
 
 		x[J] = x[I] + h * (-y[I] - z[I]);

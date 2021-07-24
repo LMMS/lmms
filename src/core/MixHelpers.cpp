@@ -31,35 +31,30 @@
 
 static bool s_NaNHandler;
 
-namespace MixHelpers
-{
+namespace MixHelpers {
 
 /*! \brief Function for applying MIXOP on all sample frames */
-template <typename MIXOP> static inline void run(sampleFrame* dst, const sampleFrame* src, int frames, const MIXOP& OP)
-{
-	for (int i = 0; i < frames; ++i)
-	{
+template <typename MIXOP>
+static inline void run(sampleFrame* dst, const sampleFrame* src, int frames, const MIXOP& OP) {
+	for (int i = 0; i < frames; ++i) {
 		OP(dst[i], src[i]);
 	}
 }
 
 /*! \brief Function for applying MIXOP on all sample frames - split source */
 template <typename MIXOP>
-static inline void run(sampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP)
-{
-	for (int i = 0; i < frames; ++i)
-	{
+static inline void run(
+	sampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, int frames, const MIXOP& OP) {
+	for (int i = 0; i < frames; ++i) {
 		const sampleFrame src = {srcLeft[i], srcRight[i]};
 		OP(dst[i], src);
 	}
 }
 
-bool isSilent(const sampleFrame* src, int frames)
-{
+bool isSilent(const sampleFrame* src, int frames) {
 	const float silenceThreshold = 0.0000001f;
 
-	for (int i = 0; i < frames; ++i)
-	{
+	for (int i = 0; i < frames; ++i) {
 		if (fabsf(src[i][0]) >= silenceThreshold || fabsf(src[i][1]) >= silenceThreshold) { return false; }
 	}
 
@@ -71,33 +66,25 @@ bool useNaNHandler() { return s_NaNHandler; }
 void setNaNHandler(bool use) { s_NaNHandler = use; }
 
 /*! \brief Function for sanitizing a buffer of infs/nans - returns true if those are found */
-bool sanitize(sampleFrame* src, int frames)
-{
+bool sanitize(sampleFrame* src, int frames) {
 	if (!useNaNHandler()) { return false; }
 
 	bool found = false;
-	for (int f = 0; f < frames; ++f)
-	{
-		for (int c = 0; c < 2; ++c)
-		{
-			if (isinf(src[f][c]) || isnan(src[f][c]))
-			{
+	for (int f = 0; f < frames; ++f) {
+		for (int c = 0; c < 2; ++c) {
+			if (isinf(src[f][c]) || isnan(src[f][c])) {
 #ifdef LMMS_DEBUG
 				printf("Bad data, clearing buffer. frame: ");
 				printf("%d: value %f\n", f, src[f][c]);
 #endif
-				for (int f = 0; f < frames; ++f)
-				{
-					for (int c = 0; c < 2; ++c)
-					{
+				for (int f = 0; f < frames; ++f) {
+					for (int c = 0; c < 2; ++c) {
 						src[f][c] = 0.0f;
 					}
 				}
 				found = true;
 				return found;
-			}
-			else
-			{
+			} else {
 				src[f][c] = qBound(-1000.0f, src[f][c], 1000.0f);
 			}
 		}
@@ -105,10 +92,8 @@ bool sanitize(sampleFrame* src, int frames)
 	return found;
 }
 
-struct AddOp
-{
-	void operator()(sampleFrame& dst, const sampleFrame& src) const
-	{
+struct AddOp {
+	void operator()(sampleFrame& dst, const sampleFrame& src) const {
 		dst[0] += src[0];
 		dst[1] += src[1];
 	}
@@ -116,15 +101,11 @@ struct AddOp
 
 void add(sampleFrame* dst, const sampleFrame* src, int frames) { run<>(dst, src, frames, AddOp()); }
 
-struct AddMultipliedOp
-{
+struct AddMultipliedOp {
 	AddMultipliedOp(float coeff)
-		: m_coeff(coeff)
-	{
-	}
+		: m_coeff(coeff) {}
 
-	void operator()(sampleFrame& dst, const sampleFrame& src) const
-	{
+	void operator()(sampleFrame& dst, const sampleFrame& src) const {
 		dst[0] += src[0] * m_coeff;
 		dst[1] += src[1] * m_coeff;
 	}
@@ -132,20 +113,15 @@ struct AddMultipliedOp
 	const float m_coeff;
 };
 
-void addMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames)
-{
+void addMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames) {
 	run<>(dst, src, frames, AddMultipliedOp(coeffSrc));
 }
 
-struct AddSwappedMultipliedOp
-{
+struct AddSwappedMultipliedOp {
 	AddSwappedMultipliedOp(float coeff)
-		: m_coeff(coeff)
-	{
-	}
+		: m_coeff(coeff) {}
 
-	void operator()(sampleFrame& dst, const sampleFrame& src) const
-	{
+	void operator()(sampleFrame& dst, const sampleFrame& src) const {
 		dst[0] += src[1] * m_coeff;
 		dst[1] += src[0] * m_coeff;
 	}
@@ -153,58 +129,47 @@ struct AddSwappedMultipliedOp
 	const float m_coeff;
 };
 
-void addSwappedMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames)
-{
+void addSwappedMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames) {
 	run<>(dst, src, frames, AddSwappedMultipliedOp(coeffSrc));
 }
 
 void addMultipliedByBuffer(
-	sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer* coeffSrcBuf, int frames)
-{
-	for (int f = 0; f < frames; ++f)
-	{
+	sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer* coeffSrcBuf, int frames) {
+	for (int f = 0; f < frames; ++f) {
 		dst[f][0] += src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
 		dst[f][1] += src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
 	}
 }
 
 void addMultipliedByBuffers(
-	sampleFrame* dst, const sampleFrame* src, ValueBuffer* coeffSrcBuf1, ValueBuffer* coeffSrcBuf2, int frames)
-{
-	for (int f = 0; f < frames; ++f)
-	{
+	sampleFrame* dst, const sampleFrame* src, ValueBuffer* coeffSrcBuf1, ValueBuffer* coeffSrcBuf2, int frames) {
+	for (int f = 0; f < frames; ++f) {
 		dst[f][0] += src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
 		dst[f][1] += src[f][1] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
 	}
 }
 
 void addSanitizedMultipliedByBuffer(
-	sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer* coeffSrcBuf, int frames)
-{
-	if (!useNaNHandler())
-	{
+	sampleFrame* dst, const sampleFrame* src, float coeffSrc, ValueBuffer* coeffSrcBuf, int frames) {
+	if (!useNaNHandler()) {
 		addMultipliedByBuffer(dst, src, coeffSrc, coeffSrcBuf, frames);
 		return;
 	}
 
-	for (int f = 0; f < frames; ++f)
-	{
+	for (int f = 0; f < frames; ++f) {
 		dst[f][0] += (isinf(src[f][0]) || isnan(src[f][0])) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
 		dst[f][1] += (isinf(src[f][1]) || isnan(src[f][1])) ? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
 	}
 }
 
 void addSanitizedMultipliedByBuffers(
-	sampleFrame* dst, const sampleFrame* src, ValueBuffer* coeffSrcBuf1, ValueBuffer* coeffSrcBuf2, int frames)
-{
-	if (!useNaNHandler())
-	{
+	sampleFrame* dst, const sampleFrame* src, ValueBuffer* coeffSrcBuf1, ValueBuffer* coeffSrcBuf2, int frames) {
+	if (!useNaNHandler()) {
 		addMultipliedByBuffers(dst, src, coeffSrcBuf1, coeffSrcBuf2, frames);
 		return;
 	}
 
-	for (int f = 0; f < frames; ++f)
-	{
+	for (int f = 0; f < frames; ++f) {
 		dst[f][0] += (isinf(src[f][0]) || isnan(src[f][0]))
 			? 0.0f
 			: src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
@@ -214,15 +179,11 @@ void addSanitizedMultipliedByBuffers(
 	}
 }
 
-struct AddSanitizedMultipliedOp
-{
+struct AddSanitizedMultipliedOp {
 	AddSanitizedMultipliedOp(float coeff)
-		: m_coeff(coeff)
-	{
-	}
+		: m_coeff(coeff) {}
 
-	void operator()(sampleFrame& dst, const sampleFrame& src) const
-	{
+	void operator()(sampleFrame& dst, const sampleFrame& src) const {
 		dst[0] += (isinf(src[0]) || isnan(src[0])) ? 0.0f : src[0] * m_coeff;
 		dst[1] += (isinf(src[1]) || isnan(src[1])) ? 0.0f : src[1] * m_coeff;
 	}
@@ -230,10 +191,8 @@ struct AddSanitizedMultipliedOp
 	const float m_coeff;
 };
 
-void addSanitizedMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames)
-{
-	if (!useNaNHandler())
-	{
+void addSanitizedMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffSrc, int frames) {
+	if (!useNaNHandler()) {
 		addMultiplied(dst, src, coeffSrc, frames);
 		return;
 	}
@@ -241,16 +200,13 @@ void addSanitizedMultiplied(sampleFrame* dst, const sampleFrame* src, float coef
 	run<>(dst, src, frames, AddSanitizedMultipliedOp(coeffSrc));
 }
 
-struct AddMultipliedStereoOp
-{
-	AddMultipliedStereoOp(float coeffLeft, float coeffRight)
-	{
+struct AddMultipliedStereoOp {
+	AddMultipliedStereoOp(float coeffLeft, float coeffRight) {
 		m_coeffs[0] = coeffLeft;
 		m_coeffs[1] = coeffRight;
 	}
 
-	void operator()(sampleFrame& dst, const sampleFrame& src) const
-	{
+	void operator()(sampleFrame& dst, const sampleFrame& src) const {
 		dst[0] += src[0] * m_coeffs[0];
 		dst[1] += src[1] * m_coeffs[1];
 	}
@@ -258,22 +214,19 @@ struct AddMultipliedStereoOp
 	float m_coeffs[2];
 };
 
-void addMultipliedStereo(sampleFrame* dst, const sampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames)
-{
+void addMultipliedStereo(
+	sampleFrame* dst, const sampleFrame* src, float coeffSrcLeft, float coeffSrcRight, int frames) {
 
 	run<>(dst, src, frames, AddMultipliedStereoOp(coeffSrcLeft, coeffSrcRight));
 }
 
-struct MultiplyAndAddMultipliedOp
-{
-	MultiplyAndAddMultipliedOp(float coeffDst, float coeffSrc)
-	{
+struct MultiplyAndAddMultipliedOp {
+	MultiplyAndAddMultipliedOp(float coeffDst, float coeffSrc) {
 		m_coeffs[0] = coeffDst;
 		m_coeffs[1] = coeffSrc;
 	}
 
-	void operator()(sampleFrame& dst, const sampleFrame& src) const
-	{
+	void operator()(sampleFrame& dst, const sampleFrame& src) const {
 		dst[0] = dst[0] * m_coeffs[0] + src[0] * m_coeffs[1];
 		dst[1] = dst[1] * m_coeffs[0] + src[1] * m_coeffs[1];
 	}
@@ -281,14 +234,12 @@ struct MultiplyAndAddMultipliedOp
 	float m_coeffs[2];
 };
 
-void multiplyAndAddMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffDst, float coeffSrc, int frames)
-{
+void multiplyAndAddMultiplied(sampleFrame* dst, const sampleFrame* src, float coeffDst, float coeffSrc, int frames) {
 	run<>(dst, src, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc));
 }
 
 void multiplyAndAddMultipliedJoined(
-	sampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames)
-{
+	sampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames) {
 	run<>(dst, srcLeft, srcRight, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc));
 }
 

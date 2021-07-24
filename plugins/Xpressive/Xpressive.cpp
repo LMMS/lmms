@@ -46,12 +46,11 @@
 #include "lmms_constants.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor
-		= {STRINGIFY(PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("PluginBrowser", "Mathematical expression parser"),
-			"Orr Dvori", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor
+	= {STRINGIFY(PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("PluginBrowser", "Mathematical expression parser"),
+		"Orr Dvori", 0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 /*
@@ -95,8 +94,7 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track)
 	, m_W1(GRAPH_LENGTH)
 	, m_W2(GRAPH_LENGTH)
 	, m_W3(GRAPH_LENGTH)
-	, m_exprValid(false, this)
-{
+	, m_exprValid(false, this) {
 	m_outputExpression[0]
 		= "sinew(integrate(f*(1+0.05sinew(12t))))*(2^(-(1.1+A2)*t)*(0.4+0.1(1+A3)+0.4sinew((2.5+2A1)t))^2)";
 	m_outputExpression[1] = "expw(integrate(f*atan(500t)*2/pi))*0.5+0.12";
@@ -104,8 +102,7 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track)
 
 Xpressive::~Xpressive() {}
 
-void Xpressive::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void Xpressive::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 
 	// Save plugin version
 	_this.setAttribute("version", "0.1");
@@ -137,8 +134,7 @@ void Xpressive::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	m_relTransition.saveSettings(_doc, _this, "RELTRANS");
 }
 
-void Xpressive::loadSettings(const QDomElement& _this)
-{
+void Xpressive::loadSettings(const QDomElement& _this) {
 
 	m_outputExpression[0] = _this.attribute("O1").toLatin1();
 	m_outputExpression[1] = _this.attribute("O2").toLatin1();
@@ -184,14 +180,12 @@ void Xpressive::loadSettings(const QDomElement& _this)
 
 QString Xpressive::nodeName() const { return (xpressive_plugin_descriptor.name); }
 
-void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer)
-{
+void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	m_A1 = m_parameterA1.value();
 	m_A2 = m_parameterA2.value();
 	m_A3 = m_parameterA3.value();
 
-	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == NULL)
-	{
+	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == NULL) {
 
 		ExprFront* exprO1 = new ExprFront(m_outputExpression[0].constData(),
 			Engine::mixer()->processingSampleRate()); // give the "last" function a whole second
@@ -231,11 +225,9 @@ void Xpressive::deleteNotePluginData(NotePlayHandle* nph) { delete static_cast<E
 
 PluginView* Xpressive::instantiateView(QWidget* parent) { return (new XpressiveView(this, parent)); }
 
-class XpressiveKnob : public Knob
-{
+class XpressiveKnob : public Knob {
 public:
-	void setStyle()
-	{
+	void setStyle() {
 		setFixedSize(29, 29);
 		setCenterPointX(14.5);
 		setCenterPointY(14.5);
@@ -245,13 +237,11 @@ public:
 		setLineWidth(3);
 	}
 	XpressiveKnob(QWidget* _parent, const QString& _name)
-		: Knob(knobStyled, _parent, _name)
-	{
+		: Knob(knobStyled, _parent, _name) {
 		setStyle();
 	}
 	XpressiveKnob(QWidget* _parent)
-		: Knob(knobStyled, _parent)
-	{
+		: Knob(knobStyled, _parent) {
 		setStyle();
 	}
 };
@@ -469,13 +459,11 @@ XpressiveView::XpressiveView(Instrument* _instrument, QWidget* _parent)
 
 XpressiveView::~XpressiveView() {}
 
-void XpressiveView::expressionChanged()
-{
+void XpressiveView::expressionChanged() {
 	Xpressive* e = castModel<Xpressive>();
 	QByteArray text = m_expressionEditor->toPlainText().toLatin1();
 
-	switch (m_selectedGraphGroup->model()->value())
-	{
+	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR: e->wavesExpression(0) = text; break;
 	case W2_EXPR: e->wavesExpression(1) = text; break;
 	case W3_EXPR: e->wavesExpression(2) = text; break;
@@ -484,8 +472,7 @@ void XpressiveView::expressionChanged()
 	}
 	if (m_wave_expr) m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && text.size() == 0);
 
-	if (text.size() > 0)
-	{
+	if (text.size() > 0) {
 		const unsigned int sample_rate = m_raw_graph->length();
 		ExprFront expr(text.constData(), sample_rate);
 		float t = 0;
@@ -493,8 +480,7 @@ void XpressiveView::expressionChanged()
 		unsigned int i;
 		expr.add_variable("t", t);
 
-		if (m_output_expr)
-		{
+		if (m_output_expr) {
 			expr.add_constant("f", f);
 			expr.add_constant("key", key);
 			expr.add_constant("rel", 0);
@@ -514,43 +500,35 @@ void XpressiveView::expressionChanged()
 
 		const bool parse_ok = expr.compile();
 
-		if (parse_ok)
-		{
+		if (parse_ok) {
 			e->exprValid().setValue(0);
 			const int length = m_raw_graph->length();
 			float* const samples = new float[length];
-			for (i = 0; i < length; i++)
-			{
+			for (i = 0; i < length; i++) {
 				t = i / (float)length;
 				samples[i] = expr.evaluate();
 				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0) samples[i] = 0;
 			}
 			m_raw_graph->setSamples(samples);
 			delete[] samples;
-			if (m_wave_expr) { smoothChanged(); }
-			else
-			{
+			if (m_wave_expr) {
+				smoothChanged();
+			} else {
 				Engine::getSong()->setModified();
 			}
-		}
-		else
-		{
+		} else {
 			e->exprValid().setValue(1);
 			if (m_output_expr) m_raw_graph->clear();
 		}
-	}
-	else
-	{
+	} else {
 		e->exprValid().setValue(0);
 		if (m_output_expr) m_raw_graph->clear();
 	}
 }
 
-void Xpressive::smooth(float smoothness, const graphModel* in, graphModel* out)
-{
+void Xpressive::smooth(float smoothness, const graphModel* in, graphModel* out) {
 	out->setSamples(in->samples());
-	if (smoothness > 0)
-	{
+	if (smoothness > 0) {
 		const int guass_size = (int)(smoothness * 5) | 1;
 		const int guass_center = guass_size / 2;
 		const float delta = smoothness;
@@ -559,13 +537,11 @@ void Xpressive::smooth(float smoothness, const graphModel* in, graphModel* out)
 		float sum = 0.0f;
 		float temp = 0.0f;
 		int i;
-		for (i = 0; i < guass_size; i++)
-		{
+		for (i = 0; i < guass_size; i++) {
 			temp = (i - guass_center) / delta;
 			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
 		}
-		for (i = 0; i < guass_size; i++)
-		{
+		for (i = 0; i < guass_size; i++) {
 			guassian[i] = guassian[i] / sum;
 		}
 		out->convolve(guassian, guass_size, guass_center);
@@ -573,20 +549,17 @@ void Xpressive::smooth(float smoothness, const graphModel* in, graphModel* out)
 	}
 }
 
-void XpressiveView::smoothChanged()
-{
+void XpressiveView::smoothChanged() {
 
 	Xpressive* e = castModel<Xpressive>();
 	float smoothness = 0;
-	switch (m_selectedGraphGroup->model()->value())
-	{
+	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR: smoothness = e->smoothW1().value(); break;
 	case W2_EXPR: smoothness = e->smoothW2().value(); break;
 	case W3_EXPR: smoothness = e->smoothW3().value(); break;
 	}
 	Xpressive::smooth(smoothness, m_raw_graph, m_graph->model());
-	switch (m_selectedGraphGroup->model()->value())
-	{
+	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR: e->W1().copyFrom(m_graph->model()); break;
 	case W2_EXPR: e->W2().copyFrom(m_graph->model()); break;
 	case W3_EXPR: e->W3().copyFrom(m_graph->model()); break;
@@ -595,12 +568,10 @@ void XpressiveView::smoothChanged()
 	m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && m_expressionEditor->toPlainText().size() == 0);
 }
 
-void XpressiveView::graphDrawn()
-{
+void XpressiveView::graphDrawn() {
 	m_raw_graph->setSamples(m_graph->model()->samples());
 	Xpressive* e = castModel<Xpressive>();
-	switch (m_selectedGraphGroup->model()->value())
-	{
+	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR: e->W1().copyFrom(m_graph->model()); break;
 	case W2_EXPR: e->W2().copyFrom(m_graph->model()); break;
 	case W3_EXPR: e->W3().copyFrom(m_graph->model()); break;
@@ -608,8 +579,7 @@ void XpressiveView::graphDrawn()
 	Engine::getSong()->setModified();
 }
 
-void XpressiveView::modelChanged()
-{
+void XpressiveView::modelChanged() {
 	Xpressive* b = castModel<Xpressive>();
 
 	m_expressionValidToggle->setModel(&b->exprValid());
@@ -625,13 +595,11 @@ void XpressiveView::modelChanged()
 	updateLayout();
 }
 
-void XpressiveView::updateLayout()
-{
+void XpressiveView::updateLayout() {
 	Xpressive* e = castModel<Xpressive>();
 	m_output_expr = false;
 	m_wave_expr = false;
-	switch (m_selectedGraphGroup->model()->value())
-	{
+	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		m_wave_expr = true;
 		m_graph->setModel(&e->graphW1(), true);
@@ -691,61 +659,53 @@ void XpressiveView::updateLayout()
 	}
 }
 
-void XpressiveView::sinWaveClicked()
-{
+void XpressiveView::sinWaveClicked() {
 	if (m_output_expr) m_expressionEditor->appendPlainText("sinew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("sinew(t)");
 	Engine::getSong()->setModified();
 }
 
-void XpressiveView::triangleWaveClicked()
-{
+void XpressiveView::triangleWaveClicked() {
 	if (m_output_expr) m_expressionEditor->appendPlainText("trianglew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("trianglew(t)");
 	Engine::getSong()->setModified();
 }
 
-void XpressiveView::sawWaveClicked()
-{
+void XpressiveView::sawWaveClicked() {
 	if (m_output_expr) m_expressionEditor->appendPlainText("saww(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("saww(t)");
 	Engine::getSong()->setModified();
 }
 
-void XpressiveView::sqrWaveClicked()
-{
+void XpressiveView::sqrWaveClicked() {
 	if (m_output_expr) m_expressionEditor->appendPlainText("squarew(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("squarew(t)");
 	Engine::getSong()->setModified();
 }
 
-void XpressiveView::noiseWaveClicked()
-{
+void XpressiveView::noiseWaveClicked() {
 	m_expressionEditor->appendPlainText("randsv(t*srate,0)");
 	Engine::getSong()->setModified();
 }
 
-void XpressiveView::moogSawWaveClicked()
-{
+void XpressiveView::moogSawWaveClicked() {
 	if (m_output_expr) m_expressionEditor->appendPlainText("moogsaww(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("moogsaww(t)");
 	Engine::getSong()->setModified();
 }
-void XpressiveView::expWaveClicked()
-{
+void XpressiveView::expWaveClicked() {
 	if (m_output_expr) m_expressionEditor->appendPlainText("expw(integrate(f))");
 	else
 		m_expressionEditor->appendPlainText("expw(t)");
 	Engine::getSong()->setModified();
 }
 
-void XpressiveView::usrWaveClicked()
-{
+void XpressiveView::usrWaveClicked() {
 	m_expressionEditor->setPlainText("");
 	QString fileName = m_raw_graph->setWaveToUser();
 	smoothChanged();
@@ -812,8 +772,7 @@ QString XpressiveHelpView::s_helpText
 	  "<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>";
 
 XpressiveHelpView::XpressiveHelpView()
-	: QTextEdit(s_helpText)
-{
+	: QTextEdit(s_helpText) {
 	setWindowTitle("Xpressive Help");
 	setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 	gui->mainWindow()->addWindowedWidget(this);
@@ -829,12 +788,8 @@ XpressiveHelpView::XpressiveHelpView()
 
 void XpressiveView::helpClicked() { XpressiveHelpView::getInstance()->show(); }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-	{
-		return (new Xpressive(static_cast<InstrumentTrack*>(m)));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*) { return (new Xpressive(static_cast<InstrumentTrack*>(m))); }
 }

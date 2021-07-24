@@ -21,20 +21,17 @@
 #include "plugin_export.h"
 
 #define MAX_LAYERS 4
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Hydrogen Import",
-		QT_TRANSLATE_NOOP("PluginBrowser", "Filter for importing Hydrogen files into LMMS"), "frank mather", 0x0100,
-		Plugin::ImportFilter, NULL, NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Hydrogen Import",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Filter for importing Hydrogen files into LMMS"), "frank mather", 0x0100,
+	Plugin::ImportFilter, NULL, NULL, NULL};
 }
 
 QString filename;
-class NoteKey
-{
+class NoteKey {
 public:
-	enum Key
-	{
+	enum Key {
 		C = 0,
 		Cs,
 		D,
@@ -49,94 +46,68 @@ public:
 		B,
 	};
 
-	static int stringToNoteKey(const QString& str)
-	{
+	static int stringToNoteKey(const QString& str) {
 		int m_key = NoteKey::C;
 
 		QString sKey = str.left(str.length() - 1);
 		QString sOct = str.mid(str.length() - 1, str.length());
 
-		if (sKey.endsWith("-"))
-		{
+		if (sKey.endsWith("-")) {
 			sKey.replace("-", "");
 			sOct.insert(0, "-");
 		}
 		int nOctave = sOct.toInt();
 
-		if (sKey == "C") { m_key = NoteKey::C; }
-		else if (sKey == "Cs")
-		{
+		if (sKey == "C") {
+			m_key = NoteKey::C;
+		} else if (sKey == "Cs") {
 			m_key = NoteKey::Cs;
-		}
-		else if (sKey == "D")
-		{
+		} else if (sKey == "D") {
 			m_key = NoteKey::D;
-		}
-		else if (sKey == "Ef")
-		{
+		} else if (sKey == "Ef") {
 			m_key = NoteKey::Ef;
-		}
-		else if (sKey == "E")
-		{
+		} else if (sKey == "E") {
 			m_key = NoteKey::E;
-		}
-		else if (sKey == "F")
-		{
+		} else if (sKey == "F") {
 			m_key = NoteKey::F;
-		}
-		else if (sKey == "Fs")
-		{
+		} else if (sKey == "Fs") {
 			m_key = NoteKey::Fs;
-		}
-		else if (sKey == "G")
-		{
+		} else if (sKey == "G") {
 			m_key = NoteKey::G;
-		}
-		else if (sKey == "Af")
-		{
+		} else if (sKey == "Af") {
 			m_key = NoteKey::Af;
-		}
-		else if (sKey == "A")
-		{
+		} else if (sKey == "A") {
 			m_key = NoteKey::A;
-		}
-		else if (sKey == "Bf")
-		{
+		} else if (sKey == "Bf") {
 			m_key = NoteKey::Bf;
-		}
-		else if (sKey == "B")
-		{
+		} else if (sKey == "B") {
 			m_key = NoteKey::B;
 		}
 		return m_key + (nOctave * 12) + 57;
 	}
 };
 HydrogenImport::HydrogenImport(const QString& _file)
-	: ImportFilter(_file, &hydrogenimport_plugin_descriptor)
-{
+	: ImportFilter(_file, &hydrogenimport_plugin_descriptor) {
 	filename = _file;
 }
 
 HydrogenImport::~HydrogenImport() {}
 Instrument* ins;
-bool HydrogenImport::readSong()
-{
+bool HydrogenImport::readSong() {
 	QHash<QString, InstrumentTrack*> drum_track;
 	QHash<QString, int> pattern_length;
 	QHash<QString, int> pattern_id;
 
 	Song* s = Engine::getSong();
 	int song_num_tracks = s->tracks().size();
-	if (QFile(filename).exists() == false)
-	{
+	if (QFile(filename).exists() == false) {
 		printf("Song file not found \n");
 		return false;
 	}
 	QDomDocument doc = LocalFileMng::openXmlDocument(filename);
 	QDomNodeList nodeList = doc.elementsByTagName("song");
 
-	if (nodeList.isEmpty())
-	{
+	if (nodeList.isEmpty()) {
 		printf("Error reading song: song node not found\n");
 		return false;
 	}
@@ -151,14 +122,12 @@ bool HydrogenImport::readSong()
 	QString sMode = LocalFileMng::readXmlString(songNode, "mode", "pattern");
 
 	QDomNode instrumentListNode = songNode.firstChildElement("instrumentList");
-	if ((!instrumentListNode.isNull()))
-	{
+	if ((!instrumentListNode.isNull())) {
 
 		int instrumentList_count = 0;
 		QDomNode instrumentNode;
 		instrumentNode = instrumentListNode.firstChildElement("instrument");
-		while (!instrumentNode.isNull())
-		{
+		while (!instrumentNode.isNull()) {
 			instrumentList_count++;
 			QString sId = LocalFileMng::readXmlString(instrumentNode, "id", "");		   // instrument id
 			QString sDrumkit = LocalFileMng::readXmlString(instrumentNode, "drumkit", ""); // drumkit
@@ -167,34 +136,30 @@ bool HydrogenImport::readSong()
 			float fPan_L = LocalFileMng::readXmlFloat(instrumentNode, "pan_L", 0.5);	   // pan L
 			float fPan_R = LocalFileMng::readXmlFloat(instrumentNode, "pan_R", 0.5);	   // pan R
 
-			if (sId.isEmpty())
-			{
+			if (sId.isEmpty()) {
 				printf("Empty ID for instrument. skipping \n");
 				instrumentNode = (QDomNode)instrumentNode.nextSiblingElement("instrument");
 				continue;
 			}
 			QDomNode filenameNode = instrumentNode.firstChildElement("filename");
 
-			if (!filenameNode.isNull()) { return false; }
-			else
-			{
+			if (!filenameNode.isNull()) {
+				return false;
+			} else {
 				unsigned nLayer = 0;
 				QDomNode instrumentComponentNode = instrumentNode.firstChildElement("instrumentComponent");
 				if (instrumentComponentNode.isNull()) { instrumentComponentNode = instrumentNode; }
 
 				QDomNode layerNode = instrumentComponentNode.firstChildElement("layer");
-				while (!layerNode.isNull())
-				{
-					if (nLayer >= MAX_LAYERS)
-					{
+				while (!layerNode.isNull()) {
+					if (nLayer >= MAX_LAYERS) {
 						printf("nLayer >= MAX_LAYERS\n");
 						break;
 					}
 					QString sFilename = LocalFileMng::readXmlString(layerNode, "filename", "");
 					QString sMode = LocalFileMng::readXmlString(layerNode, "smode", "forward");
 
-					if (nLayer == 0)
-					{
+					if (nLayer == 0) {
 						drum_track[sId]
 							= (InstrumentTrack*)Track::create(Track::InstrumentTrack, Engine::getBBTrackContainer());
 						drum_track[sId]->volumeModel()->setValue(fVolume * 100);
@@ -210,9 +175,7 @@ bool HydrogenImport::readSong()
 			instrumentNode = (QDomNode)instrumentNode.nextSiblingElement("instrument");
 		}
 		if (instrumentList_count == 0) { return false; }
-	}
-	else
-	{
+	} else {
 		return false;
 	}
 	QDomNode patterns = songNode.firstChildElement("patternList");
@@ -220,10 +183,8 @@ bool HydrogenImport::readSong()
 	int nbb = Engine::getBBTrackContainer()->numOfBBs();
 	QDomNode patternNode = patterns.firstChildElement("pattern");
 	int pn = 1;
-	while (!patternNode.isNull())
-	{
-		if (pn > 0)
-		{
+	while (!patternNode.isNull()) {
+		if (pn > 0) {
 			pattern_count++;
 			s->addBBTrack();
 			pn = 0;
@@ -237,11 +198,9 @@ bool HydrogenImport::readSong()
 		nSize = LocalFileMng::readXmlInt(patternNode, "size", nSize, false, false);
 		pattern_length[sName] = nSize;
 		QDomNode pNoteListNode = patternNode.firstChildElement("noteList");
-		if (!pNoteListNode.isNull())
-		{
+		if (!pNoteListNode.isNull()) {
 			QDomNode noteNode = pNoteListNode.firstChildElement("note");
-			while (!noteNode.isNull())
-			{
+			while (!noteNode.isNull()) {
 				int nPosition = LocalFileMng::readXmlInt(noteNode, "position", 0);
 				float fVelocity = LocalFileMng::readXmlFloat(noteNode, "velocity", 0.8f);
 				float fPan_L = LocalFileMng::readXmlFloat(noteNode, "pan_L", 0.5);
@@ -255,9 +214,9 @@ bool HydrogenImport::readSong()
 				Pattern* p = dynamic_cast<Pattern*>(drum_track[instrId]->getTCO(i));
 				Note n;
 				n.setPos(nPosition);
-				if ((nPosition + 48) <= nSize) { n.setLength(48); }
-				else
-				{
+				if ((nPosition + 48) <= nSize) {
+					n.setLength(48);
+				} else {
 					n.setLength(nSize - nPosition);
 				}
 				n.setVolume(fVelocity * 100);
@@ -274,12 +233,10 @@ bool HydrogenImport::readSong()
 	QDomNode patternSequenceNode = songNode.firstChildElement("patternSequence");
 	QDomNode groupNode = patternSequenceNode.firstChildElement("group");
 	int pos = 0;
-	while (!groupNode.isNull())
-	{
+	while (!groupNode.isNull()) {
 		int best_length = 0;
 		QDomNode patternId = groupNode.firstChildElement("patternID");
-		while (!patternId.isNull())
-		{
+		while (!patternId.isNull()) {
 			QString patId = patternId.firstChild().nodeValue();
 			patternId = (QDomNode)patternId.nextSiblingElement("patternID");
 
@@ -296,18 +253,15 @@ bool HydrogenImport::readSong()
 	if (pattern_count == 0) { return false; }
 	return true;
 }
-bool HydrogenImport::tryImport(TrackContainer* tc)
-{
+bool HydrogenImport::tryImport(TrackContainer* tc) {
 	if (openFile() == false) { return false; }
 	return readSong();
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* _data)
-	{
-		return new HydrogenImport(QString::fromUtf8(static_cast<const char*>(_data)));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* _data) {
+	return new HydrogenImport(QString::fromUtf8(static_cast<const char*>(_data)));
+}
 }

@@ -32,8 +32,7 @@
 
 class Piano;
 
-class PianoView : public QWidget, public ModelView
-{
+class PianoView : public QWidget, public ModelView {
 	Q_OBJECT
 public:
 	PianoView(QWidget* _parent);

@@ -39,8 +39,7 @@ class TextFloat;
 class TrackContentObject;
 class TrackView;
 
-class TrackContentObjectView : public selectableObject, public ModelView
-{
+class TrackContentObjectView : public selectableObject, public ModelView {
 	Q_OBJECT
 
 	// theming qproperties
@@ -121,15 +120,7 @@ public slots:
 	void useTrackColor();
 
 protected:
-	enum ContextMenuAction
-	{
-		Remove,
-		Cut,
-		Copy,
-		Paste,
-		Mute,
-		Merge
-	};
+	enum ContextMenuAction { Remove, Cut, Copy, Paste, Mute, Merge };
 
 	TrackView* m_trackView;
 	TimePos m_initialTCOPos;
@@ -147,8 +138,7 @@ protected:
 	void mousePressEvent(QMouseEvent* me) override;
 	void mouseMoveEvent(QMouseEvent* me) override;
 	void mouseReleaseEvent(QMouseEvent* me) override;
-	void resizeEvent(QResizeEvent* re) override
-	{
+	void resizeEvent(QResizeEvent* re) override {
 		m_needsUpdate = true;
 		selectableObject::resizeEvent(re);
 	}
@@ -167,17 +157,7 @@ protected slots:
 	void updatePosition();
 
 private:
-	enum Actions
-	{
-		NoAction,
-		Move,
-		MoveSelection,
-		Resize,
-		ResizeLeft,
-		Split,
-		CopySelection,
-		ToggleSelected
-	};
+	enum Actions { NoAction, Move, MoveSelection, Resize, ResizeLeft, Split, CopySelection, ToggleSelected };
 
 	static TextFloat* s_textFloat;
 
@@ -205,8 +185,7 @@ private:
 	bool m_cursorSetYet;
 
 	bool m_needsUpdate;
-	inline void setInitialPos(QPoint pos)
-	{
+	inline void setInitialPos(QPoint pos) {
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal(pos);
 		m_initialTCOPos = m_tco->startPosition();

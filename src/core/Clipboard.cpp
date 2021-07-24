@@ -30,14 +30,12 @@
 
 #include "JournallingObject.h"
 
-namespace Clipboard
-{
+namespace Clipboard {
 const QMimeData* getMimeData() { return QApplication::clipboard()->mimeData(QClipboard::Clipboard); }
 
 bool hasFormat(MimeType mT) { return getMimeData()->hasFormat(mimeType(mT)); }
 
-void copyString(const QString& str, MimeType mT)
-{
+void copyString(const QString& str, MimeType mT) {
 	QMimeData* content = new QMimeData;
 
 	content->setData(mimeType(mT), str.toUtf8());
@@ -46,8 +44,7 @@ void copyString(const QString& str, MimeType mT)
 
 QString getString(MimeType mT) { return QString(getMimeData()->data(mimeType(mT))); }
 
-void copyStringPair(const QString& key, const QString& value)
-{
+void copyStringPair(const QString& key, const QString& value) {
 	QString finalString = key + ":" + value;
 
 	QMimeData* content = new QMimeData;
@@ -55,13 +52,11 @@ void copyStringPair(const QString& key, const QString& value)
 	QApplication::clipboard()->setMimeData(content, QClipboard::Clipboard);
 }
 
-QString decodeKey(const QMimeData* mimeData)
-{
+QString decodeKey(const QMimeData* mimeData) {
 	return (QString::fromUtf8(mimeData->data(mimeType(MimeType::StringPair))).section(':', 0, 0));
 }
 
-QString decodeValue(const QMimeData* mimeData)
-{
+QString decodeValue(const QMimeData* mimeData) {
 	return (QString::fromUtf8(mimeData->data(mimeType(MimeType::StringPair))).section(':', 1, -1));
 }
 } // namespace Clipboard

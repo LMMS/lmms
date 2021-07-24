@@ -44,8 +44,7 @@ class MeterModel;
 
 	Example: 6/8 means 6 beats in a bar with each beat having a duration of one 8th-note.
 */
-class LMMS_EXPORT TimeSig
-{
+class LMMS_EXPORT TimeSig {
 public:
 	TimeSig(int num, int denom);
 	TimeSig(const MeterModel& model);
@@ -60,8 +59,7 @@ private:
 /**
 	Represents a position in time or length of a note or event, in ticks, beats, and bars
 */
-class LMMS_EXPORT TimePos
-{
+class LMMS_EXPORT TimePos {
 public:
 	TimePos(const bar_t bar, const tick_t ticks);
 	TimePos(const tick_t ticks = 0);

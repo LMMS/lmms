@@ -27,24 +27,20 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Stereo Matrix",
-		QT_TRANSLATE_NOOP("PluginBrowser", "Plugin for freely manipulating stereo output"),
-		"Paul Giblock <drfaygo/at/gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Stereo Matrix",
+	QT_TRANSLATE_NOOP("PluginBrowser", "Plugin for freely manipulating stereo output"),
+	"Paul Giblock <drfaygo/at/gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 }
 
 stereoMatrixEffect::stereoMatrixEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&stereomatrix_plugin_descriptor, _parent, _key)
-	, m_smControls(this)
-{
-}
+	, m_smControls(this) {}
 
 stereoMatrixEffect::~stereoMatrixEffect() {}
 
-bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
-{
+bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames) {
 
 	// This appears to be used for determining whether or not to continue processing
 	// audio with this effect
@@ -52,8 +48,7 @@ bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _fram
 
 	double out_sum = 0.0;
 
-	for (fpp_t f = 0; f < _frames; ++f)
-	{
+	for (fpp_t f = 0; f < _frames; ++f) {
 		const float d = dryLevel();
 		const float w = wetLevel();
 
@@ -76,12 +71,10 @@ bool stereoMatrixEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _fram
 	return (isRunning());
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
-	{
-		return (new stereoMatrixEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data)));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data) {
+	return (new stereoMatrixEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data)));
+}
 }

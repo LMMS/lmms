@@ -30,16 +30,14 @@
 
 class DelayControls;
 
-class DelayControlsDialog : public EffectControlDialog
-{
+class DelayControlsDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	DelayControlsDialog(DelayControls* controls);
 	virtual ~DelayControlsDialog() {}
 };
 
-class XyPad : public QWidget
-{
+class XyPad : public QWidget {
 	Q_OBJECT
 public:
 	XyPad(QWidget* parent = 0, FloatModel* xModel = 0, FloatModel* yModel = 0);

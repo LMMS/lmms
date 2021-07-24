@@ -28,22 +28,17 @@
 
 ModelView::ModelView(Model* model, QWidget* widget)
 	: m_widget(widget)
-	, m_model(model)
-{
-}
+	, m_model(model) {}
 
-ModelView::~ModelView()
-{
+ModelView::~ModelView() {
 	if (m_model != NULL && m_model->isDefaultConstructed()) { delete m_model; }
 }
 
-void ModelView::setModel(Model* model, bool isOldModelValid)
-{
-	if (isOldModelValid && m_model != NULL)
-	{
-		if (m_model->isDefaultConstructed()) { delete m_model; }
-		else
-		{
+void ModelView::setModel(Model* model, bool isOldModelValid) {
+	if (isOldModelValid && m_model != NULL) {
+		if (m_model->isDefaultConstructed()) {
+			delete m_model;
+		} else {
 			m_model->disconnect(widget());
 		}
 	}
@@ -61,10 +56,8 @@ void ModelView::setModel(Model* model, bool isOldModelValid)
 // "defaultConstructed", so the next call to setModel will delete it.
 void ModelView::unsetModel() { setModel(new Model(nullptr, QString(), true)); }
 
-void ModelView::doConnections()
-{
-	if (m_model != NULL)
-	{
+void ModelView::doConnections() {
+	if (m_model != NULL) {
 		QObject::connect(m_model, SIGNAL(dataChanged()), widget(), SLOT(update()));
 		QObject::connect(m_model, SIGNAL(propertiesChanged()), widget(), SLOT(update()));
 	}

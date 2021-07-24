@@ -14,8 +14,7 @@
 // Set denormal protection for this thread.
 // To be on the safe side, don't set the DAZ flag for SSE2 builds,
 // even if most SSE2 CPUs can handle it.
-void inline disable_denormals()
-{
+void inline disable_denormals() {
 #ifdef __SSE3__
 	/* DAZ flag */
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);

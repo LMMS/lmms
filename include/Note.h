@@ -35,8 +35,7 @@
 
 class DetuningHelper;
 
-enum Keys
-{
+enum Keys {
 	Key_C = 0,
 	Key_CIS = 1,
 	Key_DES = 1,
@@ -57,8 +56,7 @@ enum Keys
 	Key_H = 11
 };
 
-enum Octaves
-{
+enum Octaves {
 	Octave_0,
 	Octave_1,
 	Octave_2,
@@ -80,8 +78,7 @@ const int DefaultKey = DefaultOctave * KeysPerOctave + Key_A;
 
 const float MaxDetuning = 4 * 12.0f;
 
-class LMMS_EXPORT Note : public SerializingObject
-{
+class LMMS_EXPORT Note : public SerializingObject {
 public:
 	Note(const TimePos& length = TimePos(0), const TimePos& pos = TimePos(0), int key = DefaultKey,
 		volume_t volume = DefaultVolume, panning_t panning = DefaultPanning, DetuningHelper* detuning = NULL);
@@ -104,13 +101,12 @@ public:
 	void quantizeLength(const int qGrid);
 	void quantizePos(const int qGrid);
 
-	static inline bool lessThan(const Note* lhs, const Note* rhs)
-	{
+	static inline bool lessThan(const Note* lhs, const Note* rhs) {
 		// function to compare two notes - must be called explictly when
 		// using qSort
-		if ((int)(*lhs).pos() < (int)(*rhs).pos()) { return true; }
-		else if ((int)(*lhs).pos() > (int)(*rhs).pos())
-		{
+		if ((int)(*lhs).pos() < (int)(*rhs).pos()) {
+			return true;
+		} else if ((int)(*lhs).pos() > (int)(*rhs).pos()) {
 			return false;
 		}
 		return ((int)(*lhs).key() > (int)(*rhs).key());
@@ -126,8 +122,7 @@ public:
 
 	inline bool isPlaying() const { return m_isPlaying; }
 
-	inline TimePos endPos() const
-	{
+	inline TimePos endPos() const {
 		const int l = length();
 		return pos() + l;
 	}
@@ -136,8 +131,7 @@ public:
 
 	inline const TimePos& pos() const { return m_pos; }
 
-	inline TimePos pos(TimePos basePos) const
-	{
+	inline TimePos pos(TimePos basePos) const {
 		const int bp = basePos;
 		return m_pos - bp;
 	}
@@ -146,8 +140,7 @@ public:
 
 	inline volume_t getVolume() const { return m_volume; }
 
-	int midiVelocity(int midiBaseVelocity) const
-	{
+	int midiVelocity(int midiBaseVelocity) const {
 		return qMin(MidiMaxVelocity, getVolume() * midiBaseVelocity / DefaultVolume);
 	}
 

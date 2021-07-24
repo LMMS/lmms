@@ -38,8 +38,7 @@ class DropToolBar;
 ///
 /// Those editors include the Song Editor, the Automation Editor, B&B Editor,
 /// and the Piano Roll.
-class Editor : public QMainWindow
-{
+class Editor : public QMainWindow {
 	Q_OBJECT
 public:
 	void setPauseIcon(bool displayPauseIcon = true);
@@ -87,8 +86,7 @@ protected:
 };
 
 /// Small helper class: A QToolBar that accepts and exposes drop events as signals
-class DropToolBar : public QToolBar
-{
+class DropToolBar : public QToolBar {
 	Q_OBJECT
 public:
 	DropToolBar(QWidget* parent = 0);

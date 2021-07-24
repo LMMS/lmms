@@ -31,15 +31,13 @@
 
 class automatableButtonGroup;
 
-class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView
-{
+class LMMS_EXPORT AutomatableButton : public QPushButton, public BoolModelView {
 	Q_OBJECT
 public:
 	AutomatableButton(QWidget* _parent, const QString& _name = QString());
 	virtual ~AutomatableButton();
 
-	inline void setCheckable(bool _on)
-	{
+	inline void setCheckable(bool _on) {
 		QPushButton::setCheckable(_on);
 		model()->setJournalling(_on);
 	}
@@ -49,8 +47,7 @@ public:
 public slots:
 	virtual void update();
 	virtual void toggle();
-	virtual void setChecked(bool _on)
-	{
+	virtual void setChecked(bool _on) {
 		// QPushButton::setChecked is called in update-slot
 		model()->setValue(_on);
 	}
@@ -69,8 +66,7 @@ private:
 	using QPushButton::setChecked;
 };
 
-class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView
-{
+class LMMS_EXPORT automatableButtonGroup : public QWidget, public IntModelView {
 	Q_OBJECT
 public:
 	automatableButtonGroup(QWidget* _parent, const QString& _name = QString());

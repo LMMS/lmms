@@ -8,20 +8,17 @@
 #include "Engine.h"
 #include "Song.h"
 
-namespace PathUtil
-{
+namespace PathUtil {
 Base relativeBases[] = {Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
 	Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
 	Base::LocalDir};
 
-QString baseLocation(const Base base, bool* error /* = nullptr*/)
-{
+QString baseLocation(const Base base, bool* error /* = nullptr*/) {
 	// error is false unless something goes wrong
 	if (error) { *error = false; }
 
 	QString loc = "";
-	switch (base)
-	{
+	switch (base) {
 	case Base::ProjectDir: loc = ConfigManager::inst()->userProjectsDir(); break;
 	case Base::FactorySample: {
 		QDir fsd = QDir(ConfigManager::inst()->factorySamplesDir());
@@ -40,8 +37,7 @@ QString baseLocation(const Base base, bool* error /* = nullptr*/)
 	case Base::LocalDir: {
 		const Song* s = Engine::getSong();
 		QString projectPath;
-		if (s)
-		{
+		if (s) {
 			projectPath = s->projectFileName();
 			loc = QFileInfo(projectPath).path();
 		}
@@ -55,20 +51,16 @@ QString baseLocation(const Base base, bool* error /* = nullptr*/)
 	return QDir::cleanPath(loc) + "/";
 }
 
-QDir baseQDir(const Base base, bool* error /* = nullptr*/)
-{
-	if (base == Base::Absolute)
-	{
+QDir baseQDir(const Base base, bool* error /* = nullptr*/) {
+	if (base == Base::Absolute) {
 		if (error) { *error = false; }
 		return QDir::root();
 	}
 	return QDir(baseLocation(base, error));
 }
 
-QString basePrefix(const Base base)
-{
-	switch (base)
-	{
+QString basePrefix(const Base base) {
+	switch (base) {
 	case Base::ProjectDir: return QStringLiteral("userprojects:");
 	case Base::FactorySample: return QStringLiteral("factorysample:");
 	case Base::UserSample: return QStringLiteral("usersample:");
@@ -85,10 +77,8 @@ QString basePrefix(const Base base)
 	}
 }
 
-Base baseLookup(const QString& path)
-{
-	for (auto base : relativeBases)
-	{
+Base baseLookup(const QString& path) {
+	for (auto base : relativeBases) {
 		QString prefix = basePrefix(base);
 		if (path.startsWith(prefix)) { return base; }
 	}
@@ -99,8 +89,7 @@ QString stripPrefix(const QString& path) { return path.mid(basePrefix(baseLookup
 
 QString cleanName(const QString& path) { return stripPrefix(QFileInfo(path).baseName()); }
 
-QString oldRelativeUpgrade(const QString& input)
-{
+QString oldRelativeUpgrade(const QString& input) {
 	if (input.isEmpty()) { return input; }
 
 	// Start by assuming that the file is a user sample
@@ -120,12 +109,10 @@ QString oldRelativeUpgrade(const QString& input)
 	return basePrefix(assumedBase) + input;
 }
 
-QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
-{
+QString toAbsolute(const QString& input, bool* error /* = nullptr*/) {
 	// First, do no harm to absolute paths
 	QFileInfo inputFileInfo = QFileInfo(input);
-	if (inputFileInfo.isAbsolute())
-	{
+	if (inputFileInfo.isAbsolute()) {
 		if (error) { *error = false; }
 		return input;
 	}
@@ -136,8 +123,7 @@ QString toAbsolute(const QString& input, bool* error /* = nullptr*/)
 	return baseLocation(base, error) + upgraded.remove(0, basePrefix(base).length());
 }
 
-QString relativeOrAbsolute(const QString& input, const Base base)
-{
+QString relativeOrAbsolute(const QString& input, const Base base) {
 	if (input.isEmpty()) { return input; }
 	QString absolutePath = toAbsolute(input);
 	if (base == Base::Absolute) { return absolutePath; }
@@ -148,22 +134,19 @@ QString relativeOrAbsolute(const QString& input, const Base base)
 	return (relativePath.startsWith("..") || error) ? absolutePath : relativePath;
 }
 
-QString toShortestRelative(const QString& input, bool allowLocal /* = false*/)
-{
+QString toShortestRelative(const QString& input, bool allowLocal /* = false*/) {
 	QFileInfo inputFileInfo = QFileInfo(input);
 	QString absolutePath = inputFileInfo.isAbsolute() ? input : toAbsolute(input);
 
 	Base shortestBase = Base::Absolute;
 	QString shortestPath = relativeOrAbsolute(absolutePath, shortestBase);
-	for (auto base : relativeBases)
-	{
+	for (auto base : relativeBases) {
 		// Skip local paths when searching for the shortest relative if those
 		// are not allowed for that resource
 		if (base == Base::LocalDir && !allowLocal) { continue; }
 
 		QString otherPath = relativeOrAbsolute(absolutePath, base);
-		if (otherPath.length() < shortestPath.length())
-		{
+		if (otherPath.length() < shortestPath.length()) {
 			shortestBase = base;
 			shortestPath = otherPath;
 		}

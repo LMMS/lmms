@@ -60,13 +60,11 @@ class AutomatableModel;
 	are a bit like values to the sub plugins' keys (in terms of a key-value-
 	map).
 */
-class LMMS_EXPORT Plugin : public Model, public JournallingObject
-{
+class LMMS_EXPORT Plugin : public Model, public JournallingObject {
 	MM_OPERATORS
 	Q_OBJECT
 public:
-	enum PluginTypes
-	{
+	enum PluginTypes {
 		Instrument,	  // instrument being used in channel-track
 		Effect,		  // effect-plugin for effect-board
 		ImportFilter, // filter for importing a file
@@ -81,8 +79,7 @@ public:
 	//! Descriptor holds information about a plugin - every external plugin
 	//! has to instantiate such a Descriptor in an extern "C"-section so that
 	//! the plugin-loader is able to access information about the plugin
-	struct Descriptor
-	{
+	struct Descriptor {
 		const char* name;
 		const char* displayName;
 		const char* description;
@@ -92,8 +89,7 @@ public:
 		const PixmapLoader* logo;
 		const char* supportedFileTypes; //!< csv list of extensions
 
-		inline bool supportsFileType(const QString& extension) const
-		{
+		inline bool supportsFileType(const QString& extension) const {
 			return QString(supportedFileTypes).split(QChar(',')).contains(extension);
 		}
 
@@ -108,8 +104,7 @@ public:
 			returning some values (or modifying objects of other
 			classes).
 		 */
-		class LMMS_EXPORT SubPluginFeatures
-		{
+		class LMMS_EXPORT SubPluginFeatures {
 		public:
 			/**
 				Key reference a Plugin::Descriptor, and,
@@ -125,17 +120,14 @@ public:
 					SubPluginFeatures, which are like values
 					in a key-value map).
 			*/
-			struct Key
-			{
+			struct Key {
 				typedef QMap<QString, QString> AttributeMap;
 
 				inline Key(const Plugin::Descriptor* desc = NULL, const QString& name = QString(),
 					const AttributeMap& am = AttributeMap())
 					: desc(desc)
 					, name(name)
-					, attributes(am)
-				{
-				}
+					, attributes(am) {}
 
 				Key(const QDomElement& key);
 
@@ -167,9 +159,7 @@ public:
 			typedef QList<Key> KeyList;
 
 			SubPluginFeatures(Plugin::PluginTypes type)
-				: m_type(type)
-			{
-			}
+				: m_type(type) {}
 
 			virtual ~SubPluginFeatures() {}
 
@@ -191,8 +181,7 @@ public:
 
 			virtual QString description(const Key& k) const { return k.isValid() ? k.desc->description : QString(); }
 
-			virtual const PixmapLoader* logo(const Key& k) const
-			{
+			virtual const PixmapLoader* logo(const Key& k) const {
 				Q_ASSERT(k.desc);
 				return k.desc->logo;
 			}

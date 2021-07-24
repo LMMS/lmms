@@ -29,8 +29,7 @@
 #include "Effect.h"
 #include "waveshaper_controls.h"
 
-class waveShaperEffect : public Effect
-{
+class waveShaperEffect : public Effect {
 public:
 	waveShaperEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~waveShaperEffect();

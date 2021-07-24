@@ -33,8 +33,7 @@
 
 class CrossoverEQControls;
 
-class CrossoverEQControlDialog : public EffectControlDialog
-{
+class CrossoverEQControlDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	CrossoverEQControlDialog(CrossoverEQControls* controls);

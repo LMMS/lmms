@@ -35,8 +35,7 @@
 
 QPalette* LmmsStyle::s_palette = NULL;
 
-QLinearGradient getGradient(const QColor& _col, const QRectF& _rect)
-{
+QLinearGradient getGradient(const QColor& _col, const QRectF& _rect) {
 	QLinearGradient g(_rect.topLeft(), _rect.bottomLeft());
 
 	qreal hue = _col.hueF();
@@ -61,11 +60,9 @@ QLinearGradient getGradient(const QColor& _col, const QRectF& _rect)
 	return g;
 }
 
-QLinearGradient darken(const QLinearGradient& _gradient)
-{
+QLinearGradient darken(const QLinearGradient& _gradient) {
 	QGradientStops stops = _gradient.stops();
-	for (int i = 0; i < stops.size(); ++i)
-	{
+	for (int i = 0; i < stops.size(); ++i) {
 		QColor color = stops.at(i).second;
 		stops[i].second = color.lighter(133);
 	}
@@ -75,8 +72,7 @@ QLinearGradient darken(const QLinearGradient& _gradient)
 	return g;
 }
 
-void drawPath(QPainter* p, const QPainterPath& path, const QColor& col, const QColor& borderCol, bool dark = false)
-{
+void drawPath(QPainter* p, const QPainterPath& path, const QColor& col, const QColor& borderCol, bool dark = false) {
 	const QRectF pathRect = path.boundingRect();
 
 	const QLinearGradient baseGradient = getGradient(col, pathRect);
@@ -114,8 +110,7 @@ void drawPath(QPainter* p, const QPainterPath& path, const QColor& col, const QC
 }
 
 LmmsStyle::LmmsStyle()
-	: QProxyStyle()
-{
+	: QProxyStyle() {
 	QFile file("resources:style.css");
 	file.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(file.readAll());
@@ -125,8 +120,7 @@ LmmsStyle::LmmsStyle()
 	setBaseStyle(QStyleFactory::create("Fusion"));
 }
 
-QPalette LmmsStyle::standardPalette(void) const
-{
+QPalette LmmsStyle::standardPalette(void) const {
 	if (s_palette != NULL) { return *s_palette; }
 
 	QPalette pal = QProxyStyle::standardPalette();
@@ -135,14 +129,11 @@ QPalette LmmsStyle::standardPalette(void) const
 }
 
 void LmmsStyle::drawComplexControl(
-	ComplexControl control, const QStyleOptionComplex* option, QPainter* painter, const QWidget* widget) const
-{
+	ComplexControl control, const QStyleOptionComplex* option, QPainter* painter, const QWidget* widget) const {
 	// fix broken titlebar styling on win32
-	if (control == CC_TitleBar)
-	{
+	if (control == CC_TitleBar) {
 		const QStyleOptionTitleBar* titleBar = qstyleoption_cast<const QStyleOptionTitleBar*>(option);
-		if (titleBar)
-		{
+		if (titleBar) {
 			QStyleOptionTitleBar so(*titleBar);
 			so.palette = standardPalette();
 			so.palette.setColor(QPalette::HighlightedText,
@@ -151,9 +142,7 @@ void LmmsStyle::drawComplexControl(
 			QProxyStyle::drawComplexControl(control, &so, painter, widget);
 			return;
 		}
-	}
-	else if (control == CC_MdiControls)
-	{
+	} else if (control == CC_MdiControls) {
 		QStyleOptionComplex so(*option);
 		so.palette.setColor(QPalette::Button, QColor(223, 228, 236));
 		QProxyStyle::drawComplexControl(control, &so, painter, widget);
@@ -169,10 +158,8 @@ void LmmsStyle::drawComplexControl(
 }
 
 void LmmsStyle::drawPrimitive(
-	PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
-{
-	if (element == QStyle::PE_Frame || element == QStyle::PE_FrameLineEdit || element == QStyle::PE_PanelLineEdit)
-	{
+	PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const {
+	if (element == QStyle::PE_Frame || element == QStyle::PE_FrameLineEdit || element == QStyle::PE_PanelLineEdit) {
 		const QRect rect = option->rect;
 
 		QColor black = QColor(0, 0, 0);
@@ -257,17 +244,13 @@ void LmmsStyle::drawPrimitive(
 		points[2] = QPoint(rect.left() + 1, rect.bottom());
 		points[3] = QPoint(rect.right(), rect.top() + 1);
 		painter->drawPoints(points, 4);
-	}
-	else
-	{
+	} else {
 		QProxyStyle::drawPrimitive(element, option, painter, widget);
 	}
 }
 
-int LmmsStyle::pixelMetric(PixelMetric _metric, const QStyleOption* _option, const QWidget* _widget) const
-{
-	switch (_metric)
-	{
+int LmmsStyle::pixelMetric(PixelMetric _metric, const QStyleOption* _option, const QWidget* _widget) const {
+	switch (_metric) {
 	case QStyle::PM_ButtonMargin: return 3;
 
 	case QStyle::PM_ButtonIconSize: return 20;
@@ -282,8 +265,7 @@ int LmmsStyle::pixelMetric(PixelMetric _metric, const QStyleOption* _option, con
 	}
 }
 
-QImage LmmsStyle::colorizeXpm(const char* const* xpm, const QBrush& fill) const
-{
+QImage LmmsStyle::colorizeXpm(const char* const* xpm, const QBrush& fill) const {
 	QImage arrowXpm(xpm);
 	QImage arrow(arrowXpm.size(), QImage::Format_ARGB32);
 	QPainter arrowPainter(&arrow);
@@ -294,28 +276,19 @@ QImage LmmsStyle::colorizeXpm(const char* const* xpm, const QBrush& fill) const
 	return arrow;
 }
 
-void LmmsStyle::hoverColors(bool sunken, bool hover, bool active, QColor& color, QColor& blend) const
-{
-	if (active)
-	{
-		if (sunken)
-		{
+void LmmsStyle::hoverColors(bool sunken, bool hover, bool active, QColor& color, QColor& blend) const {
+	if (active) {
+		if (sunken) {
 			color = QColor(75, 75, 75);
 			blend = QColor(65, 65, 65);
-		}
-		else if (hover)
-		{
+		} else if (hover) {
 			color = QColor(100, 100, 100);
 			blend = QColor(75, 75, 75);
-		}
-		else
-		{
+		} else {
 			color = QColor(21, 21, 21);
 			blend = QColor(33, 33, 33);
 		}
-	}
-	else
-	{
+	} else {
 		color = QColor(21, 21, 21);
 		blend = QColor(33, 33, 33);
 	}

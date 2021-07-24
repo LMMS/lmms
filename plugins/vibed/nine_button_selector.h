@@ -27,8 +27,7 @@
 
 #include "PixmapButton.h"
 
-class nineButtonSelector : public QWidget, public IntModelView
-{
+class nineButtonSelector : public QWidget, public IntModelView {
 	Q_OBJECT
 
 public:

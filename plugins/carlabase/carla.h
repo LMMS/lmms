@@ -47,8 +47,7 @@ const NativePluginDescriptor* carla_get_native_rack_plugin();
 
 class QPushButton;
 
-class CARLABASE_EXPORT CarlaInstrument : public Instrument
-{
+class CARLABASE_EXPORT CarlaInstrument : public Instrument {
 	Q_OBJECT
 
 public:
@@ -99,8 +98,7 @@ private:
 	friend class CarlaInstrumentView;
 };
 
-class CarlaInstrumentView : public InstrumentViewFixedSize
-{
+class CarlaInstrumentView : public InstrumentViewFixedSize {
 	Q_OBJECT
 
 public:

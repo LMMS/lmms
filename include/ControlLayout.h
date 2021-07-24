@@ -88,8 +88,7 @@ class QString;
 	Features a search bar, as well as looking up widgets with string keys
 	Keys have to be provided in the widgets' objectNames
 */
-class ControlLayout : public QLayout
-{
+class ControlLayout : public QLayout {
 	Q_OBJECT
 
 public:

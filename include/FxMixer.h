@@ -36,8 +36,7 @@
 class FxRoute;
 typedef QVector<FxRoute*> FxRouteVector;
 
-class FxChannel : public ThreadableJob
-{
+class FxChannel : public ThreadableJob {
 public:
 	FxChannel(int idx, Model* _parent);
 	virtual ~FxChannel();
@@ -71,8 +70,7 @@ public:
 	bool requiresProcessing() const override { return true; }
 	void unmuteForSolo();
 
-	void setColor(QColor newColor)
-	{
+	void setColor(QColor newColor) {
 		m_color = newColor;
 		m_hasColor = true;
 	}
@@ -89,8 +87,7 @@ private:
 	void doProcessing() override;
 };
 
-class FxRoute : public QObject
-{
+class FxRoute : public QObject {
 	Q_OBJECT
 public:
 	FxRoute(FxChannel* from, FxChannel* to, float amount);
@@ -114,8 +111,7 @@ private:
 	FloatModel m_amount;
 };
 
-class LMMS_EXPORT FxMixer : public Model, public JournallingObject
-{
+class LMMS_EXPORT FxMixer : public Model, public JournallingObject {
 	Q_OBJECT
 public:
 	FxMixer();

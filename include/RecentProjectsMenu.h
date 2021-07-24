@@ -3,8 +3,7 @@
 
 #include <QMenu>
 
-class RecentProjectsMenu : public QMenu
-{
+class RecentProjectsMenu : public QMenu {
 	Q_OBJECT
 public:
 	RecentProjectsMenu(QWidget* parent = nullptr);

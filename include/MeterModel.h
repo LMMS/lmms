@@ -27,8 +27,7 @@
 
 #include "AutomatableModel.h"
 
-class MeterModel : public Model
-{
+class MeterModel : public Model {
 	Q_OBJECT
 	mapPropertyFromModel(int, getNumerator, setNumerator, m_numeratorModel);
 	mapPropertyFromModel(int, getDenominator, setDenominator, m_denominatorModel);

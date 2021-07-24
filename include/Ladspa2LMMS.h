@@ -30,8 +30,7 @@
 
 //! Class responsible for sorting found plugins (by LadspaManager)
 //! into categories
-class LMMS_EXPORT Ladspa2LMMS : public LadspaManager
-{
+class LMMS_EXPORT Ladspa2LMMS : public LadspaManager {
 public:
 	inline l_sortable_plugin_t getInstruments() { return (m_instruments); }
 

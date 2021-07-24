@@ -30,8 +30,7 @@
 
 #include "util.h"
 
-namespace DSP
-{
+namespace DSP {
 
 /* brute-force FIR filter with downsampling method (decimating).
  *
@@ -39,8 +38,7 @@ namespace DSP
  * kernel data set. IOW, the other FIR must be valid throughout the lifetime
  * of this instance.
  */
-class FIR
-{
+class FIR {
 public:
 	/* kernel length, history length - 1 */
 	int n, m;
@@ -52,33 +50,28 @@ public:
 	/* history index */
 	int h;
 
-	FIR(int N)
-	{
+	FIR(int N) {
 		c = 0;
 		init(N);
 	}
 
-	FIR(FIR& fir)
-	{
+	FIR(FIR& fir) {
 		c = fir.c;
 		init(fir.n);
 	}
 
-	FIR(int n, sample_t* kernel)
-	{
+	FIR(int n, sample_t* kernel) {
 		c = 0;
 		init(n);
 		memcpy(c, kernel, n * sizeof(*c));
 	}
 
-	~FIR()
-	{
+	~FIR() {
 		if (!borrowed_kernel) free(c);
 		free(x);
 	}
 
-	void init(int N)
-	{
+	void init(int N) {
 		n = N;
 
 		/* keeping history size a power of 2 makes it possible to wrap the
@@ -96,15 +89,13 @@ public:
 		reset();
 	}
 
-	void reset()
-	{
+	void reset() {
 		h = 0;
 		memset(x, 0, n * sizeof(sample_t));
 	}
 
 	/* TODO: write an SSE-enabled version */
-	inline sample_t process(sample_t s)
-	{
+	inline sample_t process(sample_t s) {
 		x[h] = s;
 
 		s *= c[0];
@@ -121,8 +112,7 @@ public:
 	 * OVER is the oversampling factor. just here for documentation, use
 	 * a FIRUpsampler instead.
 	 */
-	template <int Z, int OVER> inline sample_t upsample(sample_t s)
-	{
+	template <int Z, int OVER> inline sample_t upsample(sample_t s) {
 		x[h] = s;
 
 		s = 0;
@@ -139,8 +129,7 @@ public:
 	}
 
 	/* used in downsampling */
-	inline void store(sample_t s)
-	{
+	inline void store(sample_t s) {
 		x[h] = s;
 		h = (h + 1) & m;
 	}
@@ -154,8 +143,7 @@ public:
  * however, an initial test shows this to be a fraction *slower* than a
  * complete FIR for N = 32, OVER = 4.
  */
-class FIRUpsampler
-{
+class FIRUpsampler {
 public:
 	/* kernel length, history length - 1 */
 	int n, m;
@@ -169,27 +157,23 @@ public:
 	/* history index */
 	int h;
 
-	FIRUpsampler(int _n, int _over)
-	{
+	FIRUpsampler(int _n, int _over) {
 		c = x = 0;
 		init(_n, _over);
 	}
 
-	FIRUpsampler(FIR& fir, int _over)
-	{
+	FIRUpsampler(FIR& fir, int _over) {
 		c = x = 0;
 		init(fir.n, _over);
 		memcpy(c, fir.c, n * sizeof(sample_t));
 	}
 
-	~FIRUpsampler()
-	{
+	~FIRUpsampler() {
 		if (c) free(c);
 		if (x) free(x);
 	}
 
-	void init(int _n, int _over)
-	{
+	void init(int _n, int _over) {
 		/* oversampling ratio must be multiple of FIR kernel length */
 		// assert (_n % _over == 0);
 
@@ -209,15 +193,13 @@ public:
 		reset();
 	}
 
-	void reset()
-	{
+	void reset() {
 		h = 0;
 		memset(x, 0, (m + 1) * sizeof(sample_t));
 	}
 
 	/* upsample the given sample */
-	inline sample_t upsample(sample_t s)
-	{
+	inline sample_t upsample(sample_t s) {
 		x[h] = s;
 
 		s = 0;
@@ -232,8 +214,7 @@ public:
 
 	/* upsample a zero sample (interleaving), Z being the time, in samples,
 	 * since the last non-0 sample. */
-	inline sample_t pad(int Z)
-	{
+	inline sample_t pad(int Z) {
 		sample_t s = 0;
 
 		for (int z = h - 1; Z < n; --z, Z += over)

@@ -73,11 +73,9 @@
 #ifndef _DSP_SVF_H_
 #define _DSP_SVF_H_
 
-namespace DSP
-{
+namespace DSP {
 
-template <int OVERSAMPLE> class SVF
-{
+template <int OVERSAMPLE> class SVF {
 protected:
 	/* loop parameters */
 	sample_t f, q, qnorm;
@@ -88,23 +86,16 @@ protected:
 
 public:
 	/* the type of filtering to do. */
-	enum
-	{
-		Low = 0,
-		Band = 1,
-		High = 2
-	};
+	enum { Low = 0, Band = 1, High = 2 };
 
-	SVF()
-	{
+	SVF() {
 		set_out(Low);
 		set_f_Q(.1, .1);
 	}
 
 	void reset() { hi = band = lo = 0; }
 
-	void set_f_Q(double fc, double Q)
-	{
+	void set_f_Q(double fc, double Q) {
 		/* this is a very tight limit */
 		f = min(.25, 2 * sin(M_PI * fc / OVERSAMPLE));
 
@@ -113,8 +104,7 @@ public:
 		qnorm = sqrt(fabs(q) / 2. + .001);
 	}
 
-	void set_out(int o)
-	{
+	void set_out(int o) {
 		if (o == Low) out = &lo;
 		else if (o == Band)
 			out = &band;
@@ -122,18 +112,15 @@ public:
 			out = &hi;
 	}
 
-	void one_cycle(sample_t* s, int frames)
-	{
+	void one_cycle(sample_t* s, int frames) {
 		for (int i = 0; i < frames; ++i)
 			s[i] = process(s[i]);
 	}
 
-	sample_t process(sample_t x)
-	{
+	sample_t process(sample_t x) {
 		x = qnorm * x;
 
-		for (int pass = 0; pass < OVERSAMPLE; ++pass)
-		{
+		for (int pass = 0; pass < OVERSAMPLE; ++pass) {
 			hi = x - lo - q * band;
 			band += f * hi;
 			lo += f * band;
@@ -149,31 +136,26 @@ public:
 	}
 };
 
-template <int STACKED, int OVERSAMPLE> class StackedSVF
-{
+template <int STACKED, int OVERSAMPLE> class StackedSVF {
 public:
 	SVF<OVERSAMPLE> svf[STACKED];
 
-	void reset()
-	{
+	void reset() {
 		for (int i = 0; i < STACKED; ++i)
 			svf[i].reset();
 	}
 
-	void set_out(int out)
-	{
+	void set_out(int out) {
 		for (int i = 0; i < STACKED; ++i)
 			svf[i].set_out(out);
 	}
 
-	void set_f_Q(double f, double Q)
-	{
+	void set_f_Q(double f, double Q) {
 		for (int i = 0; i < STACKED; ++i)
 			svf[i].set_f_Q(f, Q);
 	}
 
-	sample_t process(sample_t x)
-	{
+	sample_t process(sample_t x) {
 		for (int i = 0; i < STACKED; ++i)
 			x = svf[i].process(x);
 

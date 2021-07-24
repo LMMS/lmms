@@ -49,8 +49,7 @@ const int DEFAULT_TRACK_HEIGHT = 32;
 char const* const FILENAME_FILTER = "[\\0000-\x1f\"*/:<>?\\\\|\x7f]";
 
 //! Base-class for all tracks
-class LMMS_EXPORT Track : public Model, public JournallingObject
-{
+class LMMS_EXPORT Track : public Model, public JournallingObject {
 	Q_OBJECT
 	MM_OPERATORS
 	mapPropertyFromModel(bool, isMuted, setMuted, m_mutedModel);
@@ -59,8 +58,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 public:
 	typedef QVector<TrackContentObject*> tcoVector;
 
-	enum TrackTypes
-	{
+	enum TrackTypes {
 		InstrumentTrack,
 		BBTrack,
 		SampleTrack,
@@ -137,8 +135,7 @@ public:
 	BoolModel* getMutedModel();
 
 public slots:
-	virtual void setName(const QString& newName)
-	{
+	virtual void setName(const QString& newName) {
 		m_name = newName;
 		emit nameChanged();
 	}

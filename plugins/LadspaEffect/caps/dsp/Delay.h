@@ -35,29 +35,24 @@
 #include "FPTruncateMode.h"
 #include "util.h"
 
-namespace DSP
-{
+namespace DSP {
 
-class Delay
-{
+class Delay {
 public:
 	int size;
 	sample_t* data;
 	int read, write;
 
-	Delay()
-	{
+	Delay() {
 		read = write = 0;
 		data = 0;
 	}
 
-	~Delay()
-	{
+	~Delay() {
 		if (data) free(data);
 	}
 
-	void init(int n)
-	{
+	void init(int n) {
 		size = next_power_of_2(n);
 		data = (sample_t*)calloc(sizeof(sample_t), size);
 		size -= 1;
@@ -68,28 +63,24 @@ public:
 
 	sample_t& operator[](int i) { return data[(write - i) & size]; }
 
-	inline void put(sample_t x)
-	{
+	inline void put(sample_t x) {
 		data[write] = x;
 		write = (write + 1) & size;
 	}
 
-	inline sample_t get()
-	{
+	inline sample_t get() {
 		sample_t x = data[read];
 		read = (read + 1) & size;
 		return x;
 	}
 
-	inline sample_t putget(sample_t x)
-	{
+	inline sample_t putget(sample_t x) {
 		put(x);
 		return get();
 	}
 
 	/* fractional lookup, linear interpolation */
-	inline sample_t get_at(float f)
-	{
+	inline sample_t get_at(float f) {
 		int n;
 		fistp(f, n); /* read: i = (int) f; relies on FPTruncateMode */
 		f -= n;
@@ -98,8 +89,7 @@ public:
 	}
 
 	/* fractional lookup, cubic interpolation */
-	inline sample_t get_cubic(float f)
-	{
+	inline sample_t get_cubic(float f) {
 		int n;
 		fistp(f, n); /* see FPTruncateMode */
 		f -= n;
@@ -120,8 +110,7 @@ public:
 
 /* allpass variant */
 
-class DelayTapA
-{
+class DelayTapA {
 public:
 	sample_t x1, y1;
 
@@ -129,8 +118,7 @@ public:
 
 	void reset() { x1 = y1 = 0; }
 
-	sample_t get(Delay& d, float f)
-	{
+	sample_t get(Delay& d, float f) {
 		int n;
 		fistp(f, n); /* read: n = (int) f; relies on FPTruncateMode */
 		f -= n;

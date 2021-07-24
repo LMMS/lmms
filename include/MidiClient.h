@@ -35,8 +35,7 @@
 class MidiPort;
 
 // base-class for all MIDI-clients
-class MidiClient
-{
+class MidiClient {
 public:
 	MidiClient();
 	virtual ~MidiClient();
@@ -85,8 +84,7 @@ protected:
 
 const uint32_t RAW_MIDI_PARSE_BUF_SIZE = 16;
 
-class MidiClientRaw : public MidiClient
-{
+class MidiClientRaw : public MidiClient {
 public:
 	MidiClientRaw();
 	virtual ~MidiClientRaw();
@@ -111,8 +109,7 @@ private:
 	static int eventLength(const unsigned char event);
 
 	// data being used for parsing
-	struct midiParserData
-	{
+	struct midiParserData {
 		uint8_t m_status;	   // identifies the type of event, that
 							   // is currently received ('Noteon',
 							   // 'Pitch Bend' etc).

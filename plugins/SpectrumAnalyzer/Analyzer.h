@@ -36,8 +36,7 @@
 #include "SaProcessor.h"
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
-class Analyzer : public Effect
-{
+class Analyzer : public Effect {
 public:
 	Analyzer(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~Analyzer();

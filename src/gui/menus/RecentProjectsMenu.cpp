@@ -10,16 +10,14 @@
 #include "embed.h"
 
 RecentProjectsMenu::RecentProjectsMenu(QWidget* parent)
-	: QMenu(tr("&Recently Opened Projects"), parent)
-{
+	: QMenu(tr("&Recently Opened Projects"), parent) {
 	setIcon(embed::getIconPixmap("project_open_recent"));
 
 	connect(this, SIGNAL(aboutToShow()), this, SLOT(fillMenu()));
 	connect(this, SIGNAL(triggered(QAction*)), this, SLOT(openProject(QAction*)));
 }
 
-void RecentProjectsMenu::fillMenu()
-{
+void RecentProjectsMenu::fillMenu() {
 	clear();
 	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
 
@@ -28,8 +26,7 @@ void RecentProjectsMenu::fillMenu()
 	//	The file history goes 50 deep but we only show the 15
 	//	most recent ones that we can open and omit .mpt files.
 	int shownInMenu = 0;
-	for (QString& fileName : rup)
-	{
+	for (QString& fileName : rup) {
 		QFileInfo recentFile(fileName);
 		if (!recentFile.exists() || fileName == ConfigManager::inst()->recoveryFile()) { continue; }
 
@@ -46,11 +43,9 @@ void RecentProjectsMenu::fillMenu()
 	}
 }
 
-void RecentProjectsMenu::openProject(QAction* _action)
-{
+void RecentProjectsMenu::openProject(QAction* _action) {
 	auto mainWindow = gui->mainWindow();
-	if (mainWindow->mayChangeProject(true))
-	{
+	if (mainWindow->mayChangeProject(true)) {
 		const QString f = _action->text().replace("&&", "&");
 		mainWindow->setCursor(Qt::WaitCursor);
 		Engine::getSong()->loadProject(f);

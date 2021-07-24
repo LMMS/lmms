@@ -32,8 +32,7 @@
 
 #include "lmms_basics.h"
 
-class CPULoadWidget : public QWidget
-{
+class CPULoadWidget : public QWidget {
 	Q_OBJECT
 public:
 	CPULoadWidget(QWidget* _parent);

@@ -39,33 +39,28 @@ class AutomationPattern;
 // Note: We use the default copy-assignment on the AutomationPattern constructor. It's
 // fine for now as we don't have dynamic allocated members, but if any are added we should
 // have an user-defined one to perform a deep-copy.
-class AutomationNode
-{
+class AutomationNode {
 public:
 	AutomationNode(); // Dummy constructor for the QMap
 	AutomationNode(AutomationPattern* pat, float value, int pos);
 	AutomationNode(AutomationPattern* pat, float inValue, float outValue, int pos);
 
-	AutomationNode& operator+=(float f)
-	{
+	AutomationNode& operator+=(float f) {
 		m_inValue += f;
 		m_outValue += f;
 		return *this;
 	}
-	AutomationNode& operator-=(float f)
-	{
+	AutomationNode& operator-=(float f) {
 		m_inValue -= f;
 		m_outValue -= f;
 		return *this;
 	}
-	AutomationNode& operator*=(float f)
-	{
+	AutomationNode& operator*=(float f) {
 		m_inValue *= f;
 		m_outValue *= f;
 		return *this;
 	}
-	AutomationNode& operator/=(float f)
-	{
+	AutomationNode& operator/=(float f) {
 		m_inValue /= f;
 		m_outValue /= f;
 		return *this;

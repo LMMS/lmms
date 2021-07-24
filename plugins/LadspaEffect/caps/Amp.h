@@ -40,15 +40,13 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class AmpStub : public Plugin
-{
+class AmpStub : public Plugin {
 public:
 	DSP::TwelveAX7_3 tube;
 
 	sample_t drive, i_drive;
 
-	struct
-	{
+	struct {
 		/* gain (remember current setting and fade to port setting in run) */
 		double g;
 		/* should also do this for temperature to remove another potential
@@ -59,8 +57,7 @@ public:
 	/* input is hipass-filtered first */
 	DSP::OnePoleHP dc_blocker;
 
-	enum
-	{
+	enum {
 		OVERSAMPLE = 8,
 		FIR_SIZE = 64,
 	};
@@ -71,9 +68,7 @@ public:
 
 	AmpStub()
 		: up(FIR_SIZE, OVERSAMPLE)
-		, down(FIR_SIZE, up.c)
-	{
-	}
+		, down(FIR_SIZE, up.c) {}
 
 	void init(bool adjust_downsampler = false);
 
@@ -82,8 +77,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class PreampIII : public AmpStub
-{
+class PreampIII : public AmpStub {
 public:
 	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
@@ -95,8 +89,7 @@ public:
 	sample_t adding_gain;
 
 	void init();
-	void activate()
-	{
+	void activate() {
 		current.g = 1;
 
 		filter.reset();
@@ -112,8 +105,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpIII : public AmpStub
-{
+class AmpIII : public AmpStub {
 public:
 	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
@@ -125,8 +117,7 @@ public:
 	sample_t adding_gain;
 
 	void init();
-	void activate()
-	{
+	void activate() {
 		current.g = 1;
 
 		up.reset();
@@ -142,13 +133,11 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-typedef struct
-{
+typedef struct {
 	float center, Q, adjust;
 } PreampBand;
 
-class ToneControls
-{
+class ToneControls {
 public:
 	sample_t eq_gain[4];
 	DSP::Eq<4> eq;
@@ -158,12 +147,9 @@ public:
 	void init(double _fs);
 	void activate(sample_t**);
 
-	inline void start_cycle(sample_t** ports, double one_over_n)
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			if (*ports[i] == eq_gain[i])
-			{
+	inline void start_cycle(sample_t** ports, double one_over_n) {
+		for (int i = 0; i < 4; ++i) {
+			if (*ports[i] == eq_gain[i]) {
 				eq.gf[i] = 1;
 				continue;
 			}
@@ -183,8 +169,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class PreampIV : public PreampIII
-{
+class PreampIV : public PreampIII {
 public:
 	ToneControls tone;
 
@@ -205,8 +190,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpIV : public AmpStub
-{
+class AmpIV : public AmpStub {
 public:
 	ToneControls tone;
 
@@ -218,8 +202,7 @@ public:
 	sample_t adding_gain;
 
 	void init();
-	void activate()
-	{
+	void activate() {
 		current.g = 1;
 
 		tone.activate(ports + 3);
@@ -236,8 +219,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpV : public AmpStub
-{
+class AmpV : public AmpStub {
 public:
 	template <sample_func_t F, int OVERSAMPLE> void one_cycle(int frames);
 
@@ -255,8 +237,7 @@ public:
 	sample_t adding_gain;
 
 	void init();
-	void activate()
-	{
+	void activate() {
 		current.g = 1;
 
 		for (int i = 0; i < 2; ++i)
@@ -279,8 +260,7 @@ public:
 
 /* /////////////////////////////////////////////////////////////////////// */
 
-class AmpVTS : public AmpStub
-{
+class AmpVTS : public AmpStub {
 public:
 	DSP::ToneStack tonestack;
 
@@ -298,8 +278,7 @@ public:
 	sample_t adding_gain;
 
 	void init();
-	void activate()
-	{
+	void activate() {
 		current.g = 1;
 
 		for (int i = 0; i < 2; ++i)

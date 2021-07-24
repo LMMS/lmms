@@ -31,8 +31,7 @@ class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
 
-class InstrumentSoundShaping : public Model, public JournallingObject
-{
+class InstrumentSoundShaping : public Model, public JournallingObject {
 	Q_OBJECT
 public:
 	InstrumentSoundShaping(InstrumentTrack* _instrument_track);
@@ -40,13 +39,7 @@ public:
 
 	void processAudioBuffer(sampleFrame* _ab, const fpp_t _frames, NotePlayHandle* _n);
 
-	enum Targets
-	{
-		Volume,
-		Cut,
-		Resonance,
-		NumTargets
-	};
+	enum Targets { Volume, Cut, Resonance, NumTargets };
 
 	f_cnt_t envFrames(const bool _only_vol = false) const;
 	f_cnt_t releaseFrames() const;

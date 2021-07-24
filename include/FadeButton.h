@@ -29,8 +29,7 @@
 #include <QColor>
 #include <QElapsedTimer>
 
-class FadeButton : public QAbstractButton
-{
+class FadeButton : public QAbstractButton {
 	Q_OBJECT
 public:
 	FadeButton(

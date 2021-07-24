@@ -28,8 +28,7 @@
 #include "Effect.h"
 #include "stereomatrix_controls.h"
 
-class stereoMatrixEffect : public Effect
-{
+class stereoMatrixEffect : public Effect {
 public:
 	stereoMatrixEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~stereoMatrixEffect();

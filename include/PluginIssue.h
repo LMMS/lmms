@@ -30,8 +30,7 @@
 
 //! Types of issues that can cause LMMS to not load a plugin
 //! LMMS Plugins should use this to indicate errors
-enum PluginIssueType
-{
+enum PluginIssueType {
 	// port flow & type
 	unknownPortFlow,
 	unknownPortType,
@@ -59,8 +58,7 @@ enum PluginIssueType
 };
 
 //! Issue type bundled with informational string
-class PluginIssue
-{
+class PluginIssue {
 	static const char* msgFor(const PluginIssueType& it);
 
 	PluginIssueType m_issueType;
@@ -69,9 +67,7 @@ class PluginIssue
 public:
 	PluginIssue(PluginIssueType it, std::string msg = std::string())
 		: m_issueType(it)
-		, m_info(msg)
-	{
-	}
+		, m_info(msg) {}
 	PluginIssueType type() const { return m_issueType; }
 	bool operator==(const PluginIssue& other) const;
 	bool operator<(const PluginIssue& other) const;

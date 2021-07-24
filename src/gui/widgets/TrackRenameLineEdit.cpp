@@ -30,20 +30,15 @@
 #include <QKeyEvent>
 
 TrackRenameLineEdit::TrackRenameLineEdit(QWidget* parent)
-	: QLineEdit(parent)
-{
-}
+	: QLineEdit(parent) {}
 
-void TrackRenameLineEdit::show()
-{
+void TrackRenameLineEdit::show() {
 	m_oldName = text();
 	QLineEdit::show();
 }
 
-void TrackRenameLineEdit::keyPressEvent(QKeyEvent* ke)
-{
-	if (ke->key() == Qt::Key_Escape)
-	{
+void TrackRenameLineEdit::keyPressEvent(QKeyEvent* ke) {
+	if (ke->key() == Qt::Key_Escape) {
 		setText(m_oldName);
 		hide();
 	}

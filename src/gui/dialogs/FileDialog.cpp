@@ -32,8 +32,7 @@
 #include "ConfigManager.h"
 
 FileDialog::FileDialog(QWidget* parent, const QString& caption, const QString& directory, const QString& filter)
-	: QFileDialog(parent, caption, directory, filter)
-{
+	: QFileDialog(parent, caption, directory, filter) {
 #if QT_VERSION > 0x050200
 	setOption(QFileDialog::DontUseCustomDirectoryIcons);
 #endif
@@ -62,8 +61,7 @@ FileDialog::FileDialog(QWidget* parent, const QString& caption, const QString& d
 }
 
 QString FileDialog::getExistingDirectory(
-	QWidget* parent, const QString& caption, const QString& directory, QFileDialog::Options options)
-{
+	QWidget* parent, const QString& caption, const QString& directory, QFileDialog::Options options) {
 	FileDialog dialog(parent, caption, directory, QString());
 	dialog.setFileMode(QFileDialog::Directory);
 	dialog.setOptions(dialog.options() | options);
@@ -72,20 +70,17 @@ QString FileDialog::getExistingDirectory(
 }
 
 QString FileDialog::getOpenFileName(
-	QWidget* parent, const QString& caption, const QString& directory, const QString& filter, QString* selectedFilter)
-{
+	QWidget* parent, const QString& caption, const QString& directory, const QString& filter, QString* selectedFilter) {
 	FileDialog dialog(parent, caption, directory, filter);
 	if (selectedFilter && !selectedFilter->isEmpty()) dialog.selectNameFilter(*selectedFilter);
-	if (dialog.exec() == QDialog::Accepted)
-	{
+	if (dialog.exec() == QDialog::Accepted) {
 		if (selectedFilter) *selectedFilter = dialog.selectedNameFilter();
 		return dialog.selectedFiles().value(0);
 	}
 	return QString();
 }
 
-void FileDialog::clearSelection()
-{
+void FileDialog::clearSelection() {
 	QListView* view = findChild<QListView*>();
 	Q_ASSERT(view);
 	view->clearSelection();

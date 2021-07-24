@@ -32,28 +32,24 @@
 PositionLine::PositionLine(QWidget* parent)
 	: QWidget(parent)
 	, m_hasTailGradient(false)
-	, m_lineColor(0, 0, 0, 0)
-{
+	, m_lineColor(0, 0, 0, 0) {
 	resize(8, height());
 
 	setAttribute(Qt::WA_NoSystemBackground, true);
 	setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
-void PositionLine::paintEvent(QPaintEvent* pe)
-{
+void PositionLine::paintEvent(QPaintEvent* pe) {
 	QPainter p(this);
 	QColor c = QColor(m_lineColor);
 
 	// If width is 1, we don't need a gradient
-	if (width() == 1)
-	{
+	if (width() == 1) {
 		c.setAlpha(153);
 		p.fillRect(rect(), c);
 	}
 	// If width > 1, we need the gradient
-	else
-	{
+	else {
 		// Create the gradient trail behind the line
 		QLinearGradient gradient(rect().bottomLeft(), rect().bottomRight());
 		qreal w = (width() - 1.0) / width();
@@ -61,13 +57,10 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 		// If gradient is enabled, we're in focus and we're playing, enable gradient
 		if (m_hasTailGradient && Engine::getSong()->isPlaying()
 			&& (Engine::getSong()->playMode() == Song::Mode_PlaySong
-				|| Engine::getSong()->playMode() == Song::Mode_PlayPattern))
-		{
+				|| Engine::getSong()->playMode() == Song::Mode_PlayPattern)) {
 			c.setAlpha(60);
 			gradient.setColorAt(w, c);
-		}
-		else
-		{
+		} else {
 			c.setAlpha(0);
 			gradient.setColorAt(w, c);
 		}
@@ -85,8 +78,7 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 
 // NOTE: the move() implementation fixes a bug where the position line would appear
 // in an unexpected location when positioned at the start of the track
-void PositionLine::zoomChange(double zoom)
-{
+void PositionLine::zoomChange(double zoom) {
 	int playHeadPos = x() + width() - 1;
 
 	resize(8.0 * zoom, height());

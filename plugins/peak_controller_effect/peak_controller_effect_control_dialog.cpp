@@ -34,8 +34,7 @@
 #include "peak_controller_effect_controls.h"
 
 PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(PeakControllerEffectControls* _controls)
-	: EffectControlDialog(_controls)
-{
+	: EffectControlDialog(_controls) {
 	setWindowIcon(embed::getIconPixmap("controller"));
 	setAutoFillBackground(true);
 	QPalette pal;

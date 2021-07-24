@@ -39,21 +39,14 @@
 struct ConnectPortVisitor;
 typedef struct LV2_Evbuf_Impl LV2_Evbuf;
 
-namespace Lv2Ports
-{
+namespace Lv2Ports {
 
 /*
 	port structs
 */
-enum class Flow
-{
-	Unknown,
-	Input,
-	Output
-};
+enum class Flow { Unknown, Input, Output };
 
-enum class Type
-{
+enum class Type {
 	Unknown,
 	Control,
 	Audio,
@@ -63,8 +56,7 @@ enum class Type
 
 //! Port visualization
 //! @note All Lv2 audio ports are float, this is only the visualisation
-enum class Vis
-{
+enum class Vis {
 	Generic,	 //!< nothing specific, a generic knob or slider shall be used
 	Integer,	 //!< counter
 	Enumeration, //!< selection from enumerated values
@@ -82,8 +74,7 @@ struct Cv;
 struct AtomSeq;
 struct Unknown;
 
-struct ConstVisitor
-{
+struct ConstVisitor {
 	virtual void visit(const Lv2Ports::ControlPortBase&) {}
 	virtual void visit(const Lv2Ports::Control&) {}
 	virtual void visit(const Lv2Ports::Audio&) {}
@@ -94,8 +85,7 @@ struct ConstVisitor
 	virtual ~ConstVisitor();
 };
 
-struct Visitor
-{
+struct Visitor {
 	virtual void visit(Lv2Ports::ControlPortBase&) {}
 	virtual void visit(Lv2Ports::Control&) {}
 	virtual void visit(Lv2Ports::Audio&) {}
@@ -106,8 +96,7 @@ struct Visitor
 	virtual ~Visitor();
 };
 
-struct Meta
-{
+struct Meta {
 	Type m_type = Type::Unknown;
 	Flow m_flow = Flow::Unknown;
 	Vis m_vis = Vis::Generic;
@@ -128,8 +117,7 @@ private:
 	bool m_sampleRate = false;
 };
 
-struct PortBase : public Meta
-{
+struct PortBase : public Meta {
 	const LilvPort* m_port = nullptr;
 	const LilvPlugin* m_plugin = nullptr;
 
@@ -142,14 +130,12 @@ struct PortBase : public Meta
 	virtual ~PortBase();
 };
 
-template <typename Derived, typename Base> struct VisitablePort : public Base
-{
+template <typename Derived, typename Base> struct VisitablePort : public Base {
 	void accept(Visitor& v) override { v.visit(static_cast<Derived&>(*this)); }
 	void accept(ConstVisitor& v) const override { v.visit(static_cast<const Derived&>(*this)); }
 };
 
-struct ControlPortBase : public VisitablePort<ControlPortBase, PortBase>
-{
+struct ControlPortBase : public VisitablePort<ControlPortBase, PortBase> {
 	//! LMMS models
 	//! Always up-to-date, except during runs
 	std::unique_ptr<class AutomatableModel> m_connectedModel;
@@ -160,24 +146,21 @@ struct ControlPortBase : public VisitablePort<ControlPortBase, PortBase>
 	std::vector<float> m_scalePointMap;
 };
 
-struct Control : public VisitablePort<Control, ControlPortBase>
-{
+struct Control : public VisitablePort<Control, ControlPortBase> {
 	//! Data location which Lv2 plugins see
 	//! Model values are being copied here every run
 	//! Between runs, this data is not up-to-date
 	float m_val;
 };
 
-struct Cv : public VisitablePort<Cv, ControlPortBase>
-{
+struct Cv : public VisitablePort<Cv, ControlPortBase> {
 	//! Data location which Lv2 plugins see
 	//! Model values are being copied here every run
 	//! Between runs, this data is not up-to-date
 	std::vector<float> m_buffer;
 };
 
-struct Audio : public VisitablePort<Audio, PortBase>
-{
+struct Audio : public VisitablePort<Audio, PortBase> {
 	Audio(std::size_t bufferSize, bool isSidechain);
 
 	//! Copy buffer passed by LMMS into our ports
@@ -204,53 +187,41 @@ private:
 	friend struct ::ConnectPortVisitor;
 };
 
-struct AtomSeq : public VisitablePort<AtomSeq, PortBase>
-{
-	enum FlagType
-	{
-		None = 0,
-		Midi = 1
-	};
+struct AtomSeq : public VisitablePort<AtomSeq, PortBase> {
+	enum FlagType { None = 0, Midi = 1 };
 	unsigned flags = FlagType::None;
 
-	struct Lv2EvbufDeleter
-	{
+	struct Lv2EvbufDeleter {
 		void operator()(LV2_Evbuf* n);
 	};
 	using AutoLv2Evbuf = std::unique_ptr<LV2_Evbuf, Lv2EvbufDeleter>;
 	AutoLv2Evbuf m_buf;
 };
 
-struct Unknown : public VisitablePort<Unknown, PortBase>
-{
-};
+struct Unknown : public VisitablePort<Unknown, PortBase> {};
 
 /*
 	port casts
 */
-template <class Target> struct DCastVisitor : public Visitor
-{
+template <class Target> struct DCastVisitor : public Visitor {
 	Target* m_result = nullptr;
 	void visit(Target& tar) { m_result = &tar; }
 };
 
-template <class Target> struct ConstDCastVisitor : public ConstVisitor
-{
+template <class Target> struct ConstDCastVisitor : public ConstVisitor {
 	const Target* m_result = nullptr;
 	void visit(const Target& tar) { m_result = &tar; }
 };
 
 //! If you don't want to use a whole visitor, you can use dcast
-template <class Target> Target* dcast(PortBase* base)
-{
+template <class Target> Target* dcast(PortBase* base) {
 	DCastVisitor<Target> vis;
 	base->accept(vis);
 	return vis.m_result;
 }
 
 //! const overload
-template <class Target> const Target* dcast(const PortBase* base)
-{
+template <class Target> const Target* dcast(const PortBase* base) {
 	ConstDCastVisitor<Target> vis;
 	base->accept(vis);
 	return vis.m_result;

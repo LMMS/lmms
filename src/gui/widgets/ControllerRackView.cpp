@@ -43,8 +43,7 @@
 
 ControllerRackView::ControllerRackView()
 	: QWidget()
-	, m_nextIndex(0)
-{
+	, m_nextIndex(0) {
 	setWindowIcon(embed::getIconPixmap("controller"));
 	setWindowTitle(tr("Controller Rack"));
 
@@ -90,19 +89,16 @@ ControllerRackView::ControllerRackView()
 
 ControllerRackView::~ControllerRackView() {}
 
-void ControllerRackView::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void ControllerRackView::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	MainWindow::saveWidgetState(this, _this);
 }
 
 void ControllerRackView::loadSettings(const QDomElement& _this) { MainWindow::restoreWidgetState(this, _this); }
 
-void ControllerRackView::deleteController(ControllerView* _view)
-{
+void ControllerRackView::deleteController(ControllerView* _view) {
 	Controller* c = _view->getController();
 
-	if (c->connectionCount() > 0)
-	{
+	if (c->connectionCount() > 0) {
 		QMessageBox msgBox;
 		msgBox.setIcon(QMessageBox::Question);
 		msgBox.setWindowTitle(tr("Confirm Delete"));
@@ -116,8 +112,7 @@ void ControllerRackView::deleteController(ControllerView* _view)
 	song->removeController(c);
 }
 
-void ControllerRackView::onControllerAdded(Controller* controller)
-{
+void ControllerRackView::onControllerAdded(Controller* controller) {
 	QWidget* scrollAreaWidget = m_scrollArea->widget();
 
 	ControllerView* controllerView = new ControllerView(controller, scrollAreaWidget);
@@ -131,23 +126,19 @@ void ControllerRackView::onControllerAdded(Controller* controller)
 	++m_nextIndex;
 }
 
-void ControllerRackView::onControllerRemoved(Controller* removedController)
-{
+void ControllerRackView::onControllerRemoved(Controller* removedController) {
 	ControllerView* viewOfRemovedController = 0;
 
 	QVector<ControllerView*>::const_iterator end = m_controllerViews.end();
-	for (QVector<ControllerView*>::const_iterator it = m_controllerViews.begin(); it != end; ++it)
-	{
+	for (QVector<ControllerView*>::const_iterator it = m_controllerViews.begin(); it != end; ++it) {
 		ControllerView* currentControllerView = *it;
-		if (currentControllerView->getController() == removedController)
-		{
+		if (currentControllerView->getController() == removedController) {
 			viewOfRemovedController = currentControllerView;
 			break;
 		}
 	}
 
-	if (viewOfRemovedController)
-	{
+	if (viewOfRemovedController) {
 		m_controllerViews.erase(std::find(m_controllerViews.begin(), m_controllerViews.end(), viewOfRemovedController));
 
 		delete viewOfRemovedController;
@@ -155,8 +146,7 @@ void ControllerRackView::onControllerRemoved(Controller* removedController)
 	}
 }
 
-void ControllerRackView::addController()
-{
+void ControllerRackView::addController() {
 	// TODO: Eventually let the user pick from available controller types
 
 	Engine::getSong()->addController(new LfoController(Engine::getSong()));
@@ -166,11 +156,10 @@ void ControllerRackView::addController()
 	setFocus();
 }
 
-void ControllerRackView::closeEvent(QCloseEvent* _ce)
-{
-	if (parentWidget()) { parentWidget()->hide(); }
-	else
-	{
+void ControllerRackView::closeEvent(QCloseEvent* _ce) {
+	if (parentWidget()) {
+		parentWidget()->hide();
+	} else {
 		hide();
 	}
 	_ce->ignore();

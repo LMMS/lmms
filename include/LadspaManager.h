@@ -56,18 +56,9 @@ calls using:
 
 as the plug-in key. */
 
-enum ladspaPluginType
-{
-	SOURCE,
-	TRANSFER,
-	VALID,
-	INVALID,
-	SINK,
-	OTHER
-};
+enum ladspaPluginType { SOURCE, TRANSFER, VALID, INVALID, SINK, OTHER };
 
-typedef struct ladspaManagerStorage
-{
+typedef struct ladspaManagerStorage {
 	LADSPA_Descriptor_Function descriptorFunction;
 	uint32_t index;
 	ladspaPluginType type;
@@ -75,8 +66,7 @@ typedef struct ladspaManagerStorage
 	uint16_t outputChannels;
 } ladspaManagerDescription;
 
-class LMMS_EXPORT LadspaManager
-{
+class LMMS_EXPORT LadspaManager {
 public:
 	LadspaManager();
 	virtual ~LadspaManager();

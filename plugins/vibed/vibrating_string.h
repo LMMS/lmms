@@ -29,27 +29,23 @@
 
 #include "lmms_basics.h"
 
-class vibratingString
-{
+class vibratingString {
 
 public:
 	vibratingString(float _pitch, float _pick, float _pickup, float* impluse, int _len, sample_rate_t _sample_rate,
 		int _oversample, float _randomize, float _string_loss, float _detune, bool _state);
 
-	inline ~vibratingString()
-	{
+	inline ~vibratingString() {
 		delete[] m_outsamp;
 		delete[] m_impulse;
 		vibratingString::freeDelayLine(m_fromBridge);
 		vibratingString::freeDelayLine(m_toBridge);
 	}
 
-	inline sample_t nextSample()
-	{
+	inline sample_t nextSample() {
 		sample_t ym0;
 		sample_t ypM;
-		for (int i = 0; i < m_oversample; i++)
-		{
+		for (int i = 0; i < m_oversample; i++) {
 			// Output at pickup position
 			m_outsamp[i] = fromBridgeAccess(m_fromBridge, m_pickupLoc);
 			m_outsamp[i] += toBridgeAccess(m_toBridge, m_pickupLoc);
@@ -70,8 +66,7 @@ public:
 	}
 
 private:
-	struct delayLine
-	{
+	struct delayLine {
 		sample_t* data;
 		int length;
 		sample_t* pointer;
@@ -98,41 +93,30 @@ private:
 	/* setDelayLine initializes the string with an impulse at the pick
 	 * position unless the impulse is longer than the string, in which
 	 * case the impulse gets truncated. */
-	inline void setDelayLine(delayLine* _dl, int _pick, const float* _values, int _len, float _scale, bool _state)
-	{
+	inline void setDelayLine(delayLine* _dl, int _pick, const float* _values, int _len, float _scale, bool _state) {
 		float r;
 		float offset;
 
-		if (!_state)
-		{
-			for (int i = 0; i < _pick; i++)
-			{
+		if (!_state) {
+			for (int i = 0; i < _pick; i++) {
 				r = static_cast<float>(rand()) / RAND_MAX;
 				offset = (m_randomize / 2.0f - m_randomize) * r;
 				_dl->data[i] = _scale * _values[_dl->length - i - 1] + offset;
 			}
-			for (int i = _pick; i < _dl->length; i++)
-			{
+			for (int i = _pick; i < _dl->length; i++) {
 				r = static_cast<float>(rand()) / RAND_MAX;
 				offset = (m_randomize / 2.0f - m_randomize) * r;
 				_dl->data[i] = _scale * _values[i - _pick] + offset;
 			}
-		}
-		else
-		{
-			if (_len + _pick > _dl->length)
-			{
-				for (int i = _pick; i < _dl->length; i++)
-				{
+		} else {
+			if (_len + _pick > _dl->length) {
+				for (int i = _pick; i < _dl->length; i++) {
 					r = static_cast<float>(rand()) / RAND_MAX;
 					offset = (m_randomize / 2.0f - m_randomize) * r;
 					_dl->data[i] = _scale * _values[i - _pick] + offset;
 				}
-			}
-			else
-			{
-				for (int i = 0; i < _len; i++)
-				{
+			} else {
+				for (int i = 0; i < _len; i++) {
 					r = static_cast<float>(rand()) / RAND_MAX;
 					offset = (m_randomize / 2.0f - m_randomize) * r;
 					_dl->data[i + _pick] = _scale * _values[i] + offset;
@@ -148,8 +132,7 @@ private:
 	 * wave travels one sample to the left), turning the previous
 	 * position into an "effective" x = L position for the next
 	 * iteration. */
-	inline void toBridgeUpdate(delayLine* _dl, sample_t _insamp)
-	{
+	inline void toBridgeUpdate(delayLine* _dl, sample_t _insamp) {
 		sample_t* ptr = _dl->pointer;
 		*ptr = _insamp * m_stringLoss;
 		++ptr;
@@ -163,8 +146,7 @@ private:
 	 * "effective" x = 0 position for the next iteration.  The
 	 * "bridge-reflected" sample from lower delay-line is then placed
 	 * into this position. */
-	inline void fromBridgeUpdate(delayLine* _dl, sample_t _insamp)
-	{
+	inline void fromBridgeUpdate(delayLine* _dl, sample_t _insamp) {
 		sample_t* ptr = _dl->pointer;
 		--ptr;
 		if (ptr < _dl->data) { ptr = _dl->end; }
@@ -175,15 +157,12 @@ private:
 	/* dlAccess(dl, position);
 	 * Returns sample "position" samples into delay-line's past.
 	 * Position "0" points to the most recently inserted sample. */
-	static inline sample_t dlAccess(delayLine* _dl, int _position)
-	{
+	static inline sample_t dlAccess(delayLine* _dl, int _position) {
 		sample_t* outpos = _dl->pointer + _position;
-		while (outpos < _dl->data)
-		{
+		while (outpos < _dl->data) {
 			outpos += _dl->length;
 		}
-		while (outpos > _dl->end)
-		{
+		while (outpos > _dl->end) {
 			outpos -= _dl->length;
 		}
 		return (*outpos);

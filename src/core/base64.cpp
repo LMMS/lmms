@@ -28,11 +28,9 @@
 #include <QBuffer>
 #include <QDataStream>
 
-namespace base64
-{
+namespace base64 {
 
-QVariant decode(const QString& _b64, QVariant::Type _force_type)
-{
+QVariant decode(const QString& _b64, QVariant::Type _force_type) {
 	char* dst = NULL;
 	int dsize = 0;
 	base64::decode(_b64, &dst, &dsize);
@@ -42,8 +40,7 @@ QVariant decode(const QString& _b64, QVariant::Type _force_type)
 	QDataStream in(&buf);
 	QVariant ret;
 	in >> ret;
-	if (_force_type != QVariant::Invalid && ret.type() != _force_type)
-	{
+	if (_force_type != QVariant::Invalid && ret.type() != _force_type) {
 		buf.reset();
 		in.setVersion(QDataStream::Qt_3_3);
 		in >> ret;

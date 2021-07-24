@@ -34,8 +34,7 @@ class QDomElement;
 
 class SerializingObjectHook;
 
-class LMMS_EXPORT SerializingObject
-{
+class LMMS_EXPORT SerializingObject {
 public:
 	SerializingObject();
 	virtual ~SerializingObject();
@@ -60,15 +59,11 @@ private:
 	SerializingObjectHook* m_hook;
 };
 
-class SerializingObjectHook
-{
+class SerializingObjectHook {
 public:
 	SerializingObjectHook()
-		: m_hookedIn(NULL)
-	{
-	}
-	virtual ~SerializingObjectHook()
-	{
+		: m_hookedIn(NULL) {}
+	virtual ~SerializingObjectHook() {
 		if (m_hookedIn != NULL) { m_hookedIn->setHook(NULL); }
 	}
 

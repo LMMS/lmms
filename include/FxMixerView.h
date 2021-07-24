@@ -41,12 +41,10 @@
 class QButtonGroup;
 class FxLine;
 
-class LMMS_EXPORT FxMixerView : public QWidget, public ModelView, public SerializingObjectHook
-{
+class LMMS_EXPORT FxMixerView : public QWidget, public ModelView, public SerializingObjectHook {
 	Q_OBJECT
 public:
-	class FxChannelView
-	{
+	class FxChannelView {
 	public:
 		FxChannelView(QWidget* _parent, FxMixerView* _mv, int _chIndex);
 

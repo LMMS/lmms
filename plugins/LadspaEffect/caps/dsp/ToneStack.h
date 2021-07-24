@@ -34,32 +34,25 @@
 #include "util.h"
 #include "windows.h"
 
-namespace DSP
-{
+namespace DSP {
 
-typedef struct
-{
+typedef struct {
 	double R1, R2, R3, R4;
 	double C1, C2, C3;
 } TSParameters;
 
 #define TS_N_PRESETS (sizeof(DSP::ToneStack::presets) / sizeof(DSP::TSParameters))
 
-class ToneStack
-{
+class ToneStack {
 private:
-	enum
-	{
-		Order = 3
-	};
+	enum { Order = 3 };
 
 	double c; // BT coef
 
 	double b1t, b1m, b1l, b1d, b2t, b2m2, b2m, b2l, b2lm, b2d, b3lm, b3m2, b3m, b3t, b3tm, b3tl, a0, a1d, a1m, a1l, a2m,
 		a2lm, a2m2, a2l, a2d, a3lm, a3m2, a3m, a3l, a3d; // intermediate calculations
 
-	struct
-	{
+	struct {
 		double b1;
 		double b2;
 		double b3;
@@ -80,8 +73,7 @@ public:
 	static TSParameters presets[]; /* in ../ToneStack.cc */
 	static int n_presets;
 
-	ToneStack()
-	{
+	ToneStack() {
 		model = -1;
 		setparams(presets[0]);
 	}
@@ -91,11 +83,9 @@ public:
 	void activate(sample_t** ports) { filter.reset(); }
 
 	/* pass in pointer to ports and relative index of first eq band control */
-	void start_cycle(sample_t** ports, int bassindex = 1)
-	{
+	void start_cycle(sample_t** ports, int bassindex = 1) {
 		int m = clamp<int>((int)*ports[0], 0, n_presets - 1);
-		if (m != model)
-		{
+		if (m != model) {
 			model = m;
 			setparams(presets[model]);
 			filter.reset();
@@ -103,8 +93,7 @@ public:
 		updatecoefs(ports + bassindex);
 	}
 
-	void setparams(TSParameters& p)
-	{
+	void setparams(TSParameters& p) {
 		double R1 = p.R1, R2 = p.R2, R3 = p.R3, R4 = p.R4;
 		double C1 = p.C1, C2 = p.C2, C3 = p.C3;
 
@@ -143,8 +132,7 @@ public:
 		filter.reset();
 	}
 
-	inline void updatecoefs(sample_t** ports)
-	{
+	inline void updatecoefs(sample_t** ports) {
 		/* range checks on input */
 		double b = clamp<double>(*ports[0], 0, 1);
 		double m = clamp<double>(*ports[1], 0, 1);
@@ -190,14 +178,9 @@ public:
 	extern double VS[NSTEPS][NSTEPS][NSTEPS][TSORDER+1]; //[bass][mid][treb][coefs]
  */
 
-class ToneStackLT
-{
+class ToneStackLT {
 private:
-	enum
-	{
-		Order = 3,
-		Steps = 25
-	};
+	enum { Order = 3, Steps = 25 };
 
 	// digital coefficients
 	double* kcoef;
@@ -213,8 +196,7 @@ public:
 
 	void setparams(double R1, double R2, double R3, double R4, double C1, double C2, double C3) {}
 
-	void updatecoefs(sample_t** ports)
-	{
+	void updatecoefs(sample_t** ports) {
 		double b = min(Steps - 1, max(*ports[0] * (Steps - 1), 0));
 		double m = min(Steps - 1, max(*ports[1] * (Steps - 1), 0));
 		double t = min(Steps - 1, max(*ports[2] * (Steps - 1), 0));

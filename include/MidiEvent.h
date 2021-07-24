@@ -31,14 +31,9 @@
 #include "panning_constants.h"
 #include "volume.h"
 
-class MidiEvent
-{
+class MidiEvent {
 public:
-	enum class Source
-	{
-		Internal,
-		External
-	};
+	enum class Source { Internal, External };
 
 	MidiEvent(MidiEventTypes type = MidiActiveSensing, int8_t channel = 0, int16_t param1 = 0, int16_t param2 = 0,
 		const void* sourcePort = nullptr, Source source = Source::External)
@@ -47,8 +42,7 @@ public:
 		, m_channel(channel)
 		, m_sysExData(NULL)
 		, m_sourcePort(sourcePort)
-		, m_source(source)
-	{
+		, m_source(source) {
 		m_data.m_param[0] = param1;
 		m_data.m_param[1] = param2;
 	}
@@ -59,8 +53,7 @@ public:
 		, m_channel(0)
 		, m_sysExData(sysExData)
 		, m_sourcePort(nullptr)
-		, m_source(source)
-	{
+		, m_source(source) {
 		m_data.m_sysExDataLen = dataLen;
 	}
 
@@ -71,9 +64,7 @@ public:
 		, m_data(other.m_data)
 		, m_sysExData(other.m_sysExData)
 		, m_sourcePort(other.m_sourcePort)
-		, m_source(other.m_source)
-	{
-	}
+		, m_source(other.m_source) {}
 
 	MidiEventTypes type() const { return m_type; }
 
@@ -99,8 +90,7 @@ public:
 
 	void setVelocity(int16_t velocity) { m_data.m_param[1] = velocity; }
 
-	panning_t panning() const
-	{
+	panning_t panning() const {
 		return (panning_t)(PanningLeft
 			+ ((float)(midiPanning() - MidiMinPanning)) / ((float)(MidiMaxPanning - MidiMinPanning))
 				* ((float)(PanningRight - PanningLeft)));
@@ -135,8 +125,7 @@ private:
 	MidiEventTypes m_type;		   // MIDI event type
 	MidiMetaEventType m_metaEvent; // Meta event (mostly unused)
 	int8_t m_channel;			   // MIDI channel
-	union
-	{
+	union {
 		int16_t m_param[2];		// first/second parameter (key/velocity)
 		uint8_t m_bytes[4];		// raw bytes
 		int32_t m_sysExDataLen; // len of m_sysExData

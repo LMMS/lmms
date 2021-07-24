@@ -5,8 +5,7 @@
 #include <QObject>
 #include <QtTest/QTest>
 
-class QTestSuite : public QObject
-{
+class QTestSuite : public QObject {
 	Q_OBJECT
 public:
 	explicit QTestSuite(QObject* parent = 0);

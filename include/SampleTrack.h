@@ -43,8 +43,7 @@ class SampleTrackWindow;
 class TrackLabelButton;
 class QLineEdit;
 
-class SampleTCO : public TrackContentObject
-{
+class SampleTCO : public TrackContentObject {
 	Q_OBJECT
 	mapPropertyFromModel(bool, isRecord, setRecord, m_recordModel);
 
@@ -92,8 +91,7 @@ signals:
 	void wasReversed();
 };
 
-class SampleTCOView : public TrackContentObjectView
-{
+class SampleTCOView : public TrackContentObjectView {
 	Q_OBJECT
 
 public:
@@ -119,8 +117,7 @@ private:
 	bool splitTCO(const TimePos pos) override;
 };
 
-class SampleTrack : public Track
-{
+class SampleTrack : public Track {
 	Q_OBJECT
 public:
 	SampleTrack(TrackContainer* tc);
@@ -142,8 +139,7 @@ public:
 
 	bool isPlaying() { return m_isPlaying; }
 
-	void setPlaying(bool playing)
-	{
+	void setPlaying(bool playing) {
 		if (m_isPlaying != playing) { emit playingChanged(); }
 		m_isPlaying = playing;
 	}
@@ -167,8 +163,7 @@ private:
 	friend class SampleTrackWindow;
 };
 
-class SampleTrackView : public TrackView
-{
+class SampleTrackView : public TrackView {
 	Q_OBJECT
 public:
 	SampleTrackView(SampleTrack* Track, TrackContainerView* tcv);
@@ -210,8 +205,7 @@ private:
 	friend class SampleTrackWindow;
 };
 
-class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
-{
+class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook {
 	Q_OBJECT
 public:
 	SampleTrackWindow(SampleTrackView* tv);

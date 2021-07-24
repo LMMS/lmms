@@ -36,21 +36,18 @@ Alg_atoms symbol_table;
 Serial_read_buffer Alg_track::ser_read_buf; // declare the static variables
 Serial_write_buffer Alg_track::ser_write_buf;
 
-bool within(double d1, double d2, double epsilon)
-{
+bool within(double d1, double d2, double epsilon) {
 	d1 -= d2;
 	return d1 < epsilon && d1 > -epsilon;
 }
 
-char* heapify(const char* s)
-{
+char* heapify(const char* s) {
 	char* h = new char[strlen(s) + 1];
 	strcpy(h, s);
 	return h;
 }
 
-void Alg_atoms::expand()
-{
+void Alg_atoms::expand() {
 	maxlen = (maxlen + 5);	 // extra growth for small sizes
 	maxlen += (maxlen >> 2); // add 25%
 	Alg_attribute* new_atoms = new Alg_attribute[maxlen];
@@ -66,8 +63,7 @@ void Alg_atoms::expand()
 // (a char) followed by the attribute name. This makes it
 // easy to retrieve the type or the name or both.
 //
-Alg_attribute Alg_atoms::insert_new(const char* name, char attr_type)
-{
+Alg_attribute Alg_atoms::insert_new(const char* name, char attr_type) {
 	if (len == maxlen) expand();
 	char* h = new char[strlen(name) + 2];
 	strcpy(h + 1, name);
@@ -76,37 +72,30 @@ Alg_attribute Alg_atoms::insert_new(const char* name, char attr_type)
 	return h;
 }
 
-Alg_attribute Alg_atoms::insert_attribute(Alg_attribute attr)
-{
+Alg_attribute Alg_atoms::insert_attribute(Alg_attribute attr) {
 	// should use hash algorithm
-	for (int i = 0; i < len; i++)
-	{
+	for (int i = 0; i < len; i++) {
 		if (STREQL(attr, atoms[i])) { return atoms[i]; }
 	}
 	return insert_new(attr + 1, attr[0]);
 }
 
-Alg_attribute Alg_atoms::insert_string(const char* name)
-{
+Alg_attribute Alg_atoms::insert_string(const char* name) {
 	char attr_type = name[strlen(name) - 1];
-	for (int i = 0; i < len; i++)
-	{
+	for (int i = 0; i < len; i++) {
 		if (attr_type == atoms[i][0] && STREQL(name, atoms[i] + 1)) { return atoms[i]; }
 	}
 	return insert_new(name, attr_type);
 }
 
-void Alg_parameter::copy(Alg_parameter_ptr parm)
-{
+void Alg_parameter::copy(Alg_parameter_ptr parm) {
 	*this = *parm; // copy all fields
 	// if the value is a string, copy the string
 	if (attr_type() == 's') { s = heapify(s); }
 }
 
-void Alg_parameter::show()
-{
-	switch (attr[0])
-	{
+void Alg_parameter::show() {
+	switch (attr[0]) {
 	case 'r': printf("%s:%g", attr_name(), r); break;
 	case 's': printf("%s:%s", attr_name(), s); break;
 	case 'i': printf("%s:%ld", attr_name(), i); break;
@@ -115,13 +104,11 @@ void Alg_parameter::show()
 	}
 }
 
-Alg_parameter::~Alg_parameter()
-{
+Alg_parameter::~Alg_parameter() {
 	if (attr_type() == 's' && s) { delete[] s; }
 }
 
-void Alg_parameters::insert_real(Alg_parameters** list, const char* name, double r)
-{
+void Alg_parameters::insert_real(Alg_parameters** list, const char* name, double r) {
 	Alg_parameters_ptr a = new Alg_parameters(*list);
 	*list = a;
 	a->parm.set_attr(symbol_table.insert_string(name));
@@ -129,8 +116,7 @@ void Alg_parameters::insert_real(Alg_parameters** list, const char* name, double
 	assert(a->parm.attr_type() == 'r');
 }
 
-void Alg_parameters::insert_string(Alg_parameters** list, const char* name, const char* s)
-{
+void Alg_parameters::insert_string(Alg_parameters** list, const char* name, const char* s) {
 	Alg_parameters_ptr a = new Alg_parameters(*list);
 	*list = a;
 	a->parm.set_attr(symbol_table.insert_string(name));
@@ -139,8 +125,7 @@ void Alg_parameters::insert_string(Alg_parameters** list, const char* name, cons
 	assert(a->parm.attr_type() == 's');
 }
 
-void Alg_parameters::insert_integer(Alg_parameters** list, const char* name, long i)
-{
+void Alg_parameters::insert_integer(Alg_parameters** list, const char* name, long i) {
 	Alg_parameters_ptr a = new Alg_parameters(*list);
 	*list = a;
 	a->parm.set_attr(symbol_table.insert_string(name));
@@ -148,8 +133,7 @@ void Alg_parameters::insert_integer(Alg_parameters** list, const char* name, lon
 	assert(a->parm.attr_type() == 'i');
 }
 
-void Alg_parameters::insert_logical(Alg_parameters** list, const char* name, bool l)
-{
+void Alg_parameters::insert_logical(Alg_parameters** list, const char* name, bool l) {
 	Alg_parameters_ptr a = new Alg_parameters(*list);
 	*list = a;
 	a->parm.set_attr(symbol_table.insert_string(name));
@@ -157,8 +141,7 @@ void Alg_parameters::insert_logical(Alg_parameters** list, const char* name, boo
 	assert(a->parm.attr_type() == 'l');
 }
 
-void Alg_parameters::insert_atom(Alg_parameters** list, const char* name, const char* s)
-{
+void Alg_parameters::insert_atom(Alg_parameters** list, const char* name, const char* s) {
 	Alg_parameters_ptr a = new Alg_parameters(*list);
 	*list = a;
 	a->parm.set_attr(symbol_table.insert_string(name));
@@ -166,12 +149,9 @@ void Alg_parameters::insert_atom(Alg_parameters** list, const char* name, const 
 	assert(a->parm.attr_type() == 'a');
 }
 
-Alg_parameters* Alg_parameters::remove_key(Alg_parameters** list, const char* name)
-{
-	while (*list)
-	{
-		if (STREQL((*list)->parm.attr_name(), name))
-		{
+Alg_parameters* Alg_parameters::remove_key(Alg_parameters** list, const char* name) {
+	while (*list) {
+		if (STREQL((*list)->parm.attr_name(), name)) {
 			Alg_parameters_ptr p = *list;
 			*list = p->next;
 			p->next = NULL;
@@ -182,21 +162,17 @@ Alg_parameters* Alg_parameters::remove_key(Alg_parameters** list, const char* na
 	return NULL;
 }
 
-Alg_parameter_ptr Alg_parameters::find(Alg_attribute attr)
-{
+Alg_parameter_ptr Alg_parameters::find(Alg_attribute attr) {
 	assert(attr);
 	Alg_parameters_ptr temp = this;
-	while (temp)
-	{
+	while (temp) {
 		if (temp->parm.attr == attr) { return &(temp->parm); }
 	}
 	return NULL;
 }
 
-int Alg_event::get_type_code()
-{
-	if (!is_note())
-	{
+int Alg_event::get_type_code() {
+	if (!is_note()) {
 		const char* attr = get_attribute();
 		if (STREQL(attr, "gater")) // volume change
 			return ALG_GATE;
@@ -224,29 +200,23 @@ int Alg_event::get_type_code()
 	return ALG_NOTE; // it is a note
 }
 
-void Alg_event::set_parameter(Alg_parameter_ptr new_parameter)
-{
+void Alg_event::set_parameter(Alg_parameter_ptr new_parameter) {
 	Alg_parameter_ptr parm;
-	if (is_note())
-	{
+	if (is_note()) {
 		Alg_note_ptr note = (Alg_note_ptr)this;
 		parm = note->parameters->find(new_parameter->attr);
-		if (!parm)
-		{
+		if (!parm) {
 			note->parameters = new Alg_parameters(note->parameters);
 			parm = &(note->parameters->parm);
 		}
-	}
-	else
-	{ // update
+	} else { // update
 		Alg_update_ptr update = (Alg_update_ptr)this;
 		parm = &(update->parameter);
 	}
 	parm->copy(new_parameter); // copy entire parameter
 }
 
-void Alg_event::set_string_value(const char* a, const char* value)
-{
+void Alg_event::set_string_value(const char* a, const char* value) {
 	assert(a); // must be non-null
 	Alg_attribute attr = symbol_table.insert_string(a);
 	assert(attr[0] == 's');
@@ -257,8 +227,7 @@ void Alg_event::set_string_value(const char* a, const char* value)
 	parm.s = NULL; // do this to prevent string from being freed
 }
 
-void Alg_event::set_real_value(const char* a, double value)
-{
+void Alg_event::set_real_value(const char* a, double value) {
 	assert(a); // must be non-null
 	// attr is like a, but it has the type code prefixed for
 	// fast lookup, and it is a unique string in symbol_table
@@ -272,8 +241,7 @@ void Alg_event::set_real_value(const char* a, double value)
 	// since type is 'r' we don't have to NULL the string
 }
 
-void Alg_event::set_logical_value(const char* a, bool value)
-{
+void Alg_event::set_logical_value(const char* a, bool value) {
 	assert(a); // must be non-null
 	Alg_attribute attr = symbol_table.insert_string(a);
 	assert(attr[0] == 'l');
@@ -284,8 +252,7 @@ void Alg_event::set_logical_value(const char* a, bool value)
 	// since type is 'l' we don't have to NULL the string
 }
 
-void Alg_event::set_integer_value(const char* a, long value)
-{
+void Alg_event::set_integer_value(const char* a, long value) {
 	assert(a); // must be non-null
 	Alg_attribute attr = symbol_table.insert_string(a);
 	assert(attr[0] == 'i');
@@ -296,8 +263,7 @@ void Alg_event::set_integer_value(const char* a, long value)
 	// since tpye is 'i' we don't have to NULL the string
 }
 
-void Alg_event::set_atom_value(const char* a, const char* value)
-{
+void Alg_event::set_atom_value(const char* a, const char* value) {
 	assert(a); // must be non-null
 	Alg_attribute attr = symbol_table.insert_string(a);
 	assert(attr[0] == 'a');
@@ -308,64 +274,55 @@ void Alg_event::set_atom_value(const char* a, const char* value)
 	/* since type is 'a' we don't have to null the string */
 }
 
-float Alg_event::get_pitch()
-{
+float Alg_event::get_pitch() {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	return note->pitch;
 }
 
-float Alg_event::get_loud()
-{
+float Alg_event::get_loud() {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	return note->loud;
 }
 
-double Alg_event::get_start_time()
-{
+double Alg_event::get_start_time() {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	return note->time;
 }
 
-double Alg_event::get_end_time()
-{
+double Alg_event::get_end_time() {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	return note->time + note->dur;
 }
 
-double Alg_event::get_duration()
-{
+double Alg_event::get_duration() {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	return note->dur;
 }
 
-void Alg_event::set_pitch(float p)
-{
+void Alg_event::set_pitch(float p) {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	note->pitch = p;
 }
 
-void Alg_event::set_loud(float l)
-{
+void Alg_event::set_loud(float l) {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	note->loud = l;
 }
 
-void Alg_event::set_duration(double d)
-{
+void Alg_event::set_duration(double d) {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	note->dur = d;
 }
 
-bool Alg_event::has_attribute(const char* a)
-{
+bool Alg_event::has_attribute(const char* a) {
 	assert(is_note());
 	assert(a); // must be non-null
 	Alg_note* note = (Alg_note*)this;
@@ -374,15 +331,13 @@ bool Alg_event::has_attribute(const char* a)
 	return parm != NULL;
 }
 
-char Alg_event::get_attribute_type(const char* a)
-{
+char Alg_event::get_attribute_type(const char* a) {
 	assert(is_note());
 	assert(a);
 	return a[strlen(a) - 1];
 }
 
-const char* Alg_event::get_string_value(const char* a, const char* value)
-{
+const char* Alg_event::get_string_value(const char* a, const char* value) {
 	assert(is_note());
 	assert(a); // must be non-null
 	Alg_note* note = (Alg_note*)this;
@@ -393,8 +348,7 @@ const char* Alg_event::get_string_value(const char* a, const char* value)
 	return value;
 }
 
-double Alg_event::get_real_value(const char* a, double value)
-{
+double Alg_event::get_real_value(const char* a, double value) {
 	assert(is_note());
 	assert(a);
 	Alg_note* note = (Alg_note*)this;
@@ -405,8 +359,7 @@ double Alg_event::get_real_value(const char* a, double value)
 	return value;
 }
 
-bool Alg_event::get_logical_value(const char* a, bool value)
-{
+bool Alg_event::get_logical_value(const char* a, bool value) {
 	assert(is_note());
 	assert(a);
 	Alg_note* note = (Alg_note*)this;
@@ -417,8 +370,7 @@ bool Alg_event::get_logical_value(const char* a, bool value)
 	return value;
 }
 
-long Alg_event::get_integer_value(const char* a, long value)
-{
+long Alg_event::get_integer_value(const char* a, long value) {
 	assert(is_note());
 	assert(a);
 	Alg_note* note = (Alg_note*)this;
@@ -429,8 +381,7 @@ long Alg_event::get_integer_value(const char* a, long value)
 	return value;
 }
 
-const char* Alg_event::get_atom_value(const char* a, const char* value)
-{
+const char* Alg_event::get_atom_value(const char* a, const char* value) {
 	assert(is_note());
 	assert(a);
 	Alg_note* note = (Alg_note*)this;
@@ -443,8 +394,7 @@ const char* Alg_event::get_atom_value(const char* a, const char* value)
 	return (value == NULL ? NULL : symbol_table.insert_string(value));
 }
 
-void Alg_event::delete_attribute(const char* a)
-{
+void Alg_event::delete_attribute(const char* a) {
 	assert(is_note());
 	Alg_note* note = (Alg_note*)this;
 	Alg_parameters::remove_key(&(note->parameters), a);
@@ -458,59 +408,51 @@ const char* Alg_event::get_attribute()
 	return update->parameter.attr_name();
 }
 
-char Alg_event::get_update_type()
-{
+char Alg_event::get_update_type() {
 	assert(is_update());
 	Alg_update* update = (Alg_update*)this;
 	return update->parameter.attr_type();
 }
 
-const char* Alg_event::get_string_value()
-{
+const char* Alg_event::get_string_value() {
 	assert(is_update());
 	Alg_update* update = (Alg_update*)this;
 	assert(get_update_type() == 's');
 	return update->parameter.s;
 }
 
-double Alg_event::get_real_value()
-{
+double Alg_event::get_real_value() {
 	assert(is_update());
 	Alg_update* update = (Alg_update*)this;
 	assert(get_update_type() == 'r');
 	return update->parameter.r;
 }
 
-bool Alg_event::get_logical_value()
-{
+bool Alg_event::get_logical_value() {
 	assert(is_update());
 	Alg_update* update = (Alg_update*)this;
 	assert(get_update_type() == 'l');
 	return update->parameter.l;
 }
 
-long Alg_event::get_integer_value()
-{
+long Alg_event::get_integer_value() {
 	assert(is_update());
 	Alg_update* update = (Alg_update*)this;
 	assert(get_update_type() == 'i');
 	return update->parameter.i;
 }
 
-const char* Alg_event::get_atom_value()
-{
+const char* Alg_event::get_atom_value() {
 	assert(is_update());
 	Alg_update* update = (Alg_update*)this;
 	assert(get_update_type() == 'a');
 	return update->parameter.a;
 }
 
-bool Alg_event::overlap(double t, double len, bool all)
-{
+bool Alg_event::overlap(double t, double len, bool all) {
 	// event starts within region
 	if (time >= t && time <= t + len - ALG_EPS) return true;
-	if (all && is_note())
-	{
+	if (all && is_note()) {
 		double dur = ((Alg_note_ptr)this)->dur;
 		// note overlaps with region
 		if (time < t && time + dur - ALG_EPS > t) return true;
@@ -519,38 +461,32 @@ bool Alg_event::overlap(double t, double len, bool all)
 	return false;
 }
 
-Alg_note::Alg_note(Alg_note_ptr note)
-{
+Alg_note::Alg_note(Alg_note_ptr note) {
 	*this = *note; // copy all fields
 	// parameters is now a shared pointer. We need to copy the
 	// parameters
 	Alg_parameters_ptr next_param_ptr = parameters;
-	while (next_param_ptr)
-	{
+	while (next_param_ptr) {
 		Alg_parameters_ptr new_params = new Alg_parameters(next_param_ptr->next);
 		new_params->parm.copy(&(next_param_ptr->parm)); // copy the attribute and value
 		next_param_ptr = new_params->next;
 	}
 }
 
-Alg_note::~Alg_note()
-{
-	while (parameters)
-	{
+Alg_note::~Alg_note() {
+	while (parameters) {
 		Alg_parameters_ptr to_delete = parameters;
 		parameters = parameters->next;
 		delete to_delete;
 	}
 }
 
-void Alg_note::show()
-{
+void Alg_note::show() {
 	printf("Alg_note: time %g, chan %ld, dur %g, key %ld, "
 		   "pitch %g, loud %g, attributes ",
 		time, chan, dur, key, pitch, loud);
 	Alg_parameters_ptr parms = parameters;
-	while (parms)
-	{
+	while (parms) {
 		parms->parm.show();
 		printf(" ");
 		parms = parms->next;
@@ -558,22 +494,19 @@ void Alg_note::show()
 	printf("\n");
 }
 
-Alg_update::Alg_update(Alg_update_ptr update)
-{
+Alg_update::Alg_update(Alg_update_ptr update) {
 	*this = *update; // copy all fields
 	// parameter requires careful copy to possibly duplicate string value:
 	this->parameter.copy(&(update->parameter));
 }
 
-void Alg_update::show()
-{
+void Alg_update::show() {
 	printf("Alg_update: ");
 	parameter.show();
 	printf("\n");
 }
 
-void Alg_events::expand()
-{
+void Alg_events::expand() {
 	maxlen = (maxlen + 5);	 // extra growth for small sizes
 	maxlen += (maxlen >> 2); // add 25%
 	Alg_event_ptr* new_events = new Alg_event_ptr[maxlen];
@@ -583,8 +516,7 @@ void Alg_events::expand()
 	events = new_events;
 }
 
-void Alg_events::insert(Alg_event_ptr event)
-{
+void Alg_events::insert(Alg_event_ptr event) {
 	if (maxlen <= len) { expand(); }
 	// Note: if the new event is the last one, the assignment
 	// events[i] = event; (below) will never execute, so just
@@ -594,10 +526,8 @@ void Alg_events::insert(Alg_event_ptr event)
 	events[len] = event;
 	len++;
 	// find insertion point: (this could be a binary search)
-	for (int i = 0; i < len; i++)
-	{
-		if (events[i]->time > event->time)
-		{
+	for (int i = 0; i < len; i++) {
+		if (events[i]->time > event->time) {
 			// insert event at i
 			memmove(&events[i + 1], &events[i], sizeof(Alg_event_ptr) * (len - i - 1));
 			events[i] = event;
@@ -606,8 +536,7 @@ void Alg_events::insert(Alg_event_ptr event)
 	}
 }
 
-Alg_event_ptr Alg_events::uninsert(long index)
-{
+Alg_event_ptr Alg_events::uninsert(long index) {
 	assert(0 <= index && index < len);
 	Alg_event_ptr event = events[index];
 	// printf("memmove: %x from %x (%d)\n", events + index, events + index + 1,
@@ -617,28 +546,24 @@ Alg_event_ptr Alg_events::uninsert(long index)
 	return event;
 }
 
-void Alg_events::append(Alg_event_ptr event)
-{
+void Alg_events::append(Alg_event_ptr event) {
 	if (maxlen <= len) { expand(); }
 	events[len++] = event;
 	// keep track of last note_off time
-	if (event->is_note())
-	{
+	if (event->is_note()) {
 		Alg_note_ptr note = (Alg_note_ptr)event;
 		double note_off = note->time + note->dur;
 		if (note_off > last_note_off) last_note_off = note_off;
 	}
 }
 
-Alg_events::~Alg_events()
-{
+Alg_events::~Alg_events() {
 	assert(!in_use);
 	// individual events are not deleted, only the array
 	if (events) { delete[] events; }
 }
 
-Alg_event_list::Alg_event_list(Alg_track* owner)
-{
+Alg_event_list::Alg_event_list(Alg_track* owner) {
 	events_owner = owner;
 	sequence_number = owner->sequence_number;
 	beat_dur = 0.0;
@@ -646,54 +571,43 @@ Alg_event_list::Alg_event_list(Alg_track* owner)
 	type = 'e';
 }
 
-Alg_event_ptr const& Alg_event_list::operator[](int i)
-{
+Alg_event_ptr const& Alg_event_list::operator[](int i) {
 	assert(i >= 0 && i < len);
 	return events[i];
 }
 
-Alg_event_list::~Alg_event_list()
-{
+Alg_event_list::~Alg_event_list() {
 	// note that the events contained in the list are not destroyed
 }
 
-void Alg_event_list::set_start_time(Alg_event* event, double t)
-{
+void Alg_event_list::set_start_time(Alg_event* event, double t) {
 	// For Alg_event_list, find the owner and do the update there
 	// For Alg_track, change the time and move the event to the right place
 	// For Alg_seq, find the track and do the update there
 
 	long index = 0, i;
 	Alg_track_ptr track_ptr = nullptr;
-	if (type == 'e')
-	{ // this is an Alg_event_list
+	if (type == 'e') { // this is an Alg_event_list
 		// make sure the owner has not changed its event set
 		assert(events_owner && sequence_number == events_owner->sequence_number);
 		// do the update on the owner
 		events_owner->set_start_time(event, t);
 		return;
-	}
-	else if (type == 't')
-	{ // this is an Alg_track
+	} else if (type == 't') { // this is an Alg_track
 		// find the event in the track
 		track_ptr = (Alg_track_ptr)this;
 		// this should be a binary search since events are in time order
 		// probably there should be member function to do the search
-		for (index = 0; index < length(); index++)
-		{
+		for (index = 0; index < length(); index++) {
 			if ((*track_ptr)[index] == event) goto found_event;
 		}
-	}
-	else
-	{ // type == 's', an Alg_seq
+	} else { // type == 's', an Alg_seq
 		Alg_seq_ptr seq = (Alg_seq_ptr)this;
-		for (i = 0; i < seq->tracks(); i++)
-		{
+		for (i = 0; i < seq->tracks(); i++) {
 			track_ptr = seq->track(i);
 			// if you implemented binary search, you could call it
 			// instead of this loop too.
-			for (index = 0; index < track_ptr->length(); index++)
-			{
+			for (index = 0; index < track_ptr->length(); index++) {
 				if ((*track_ptr)[index] == event) goto found_event;
 			}
 		}
@@ -708,8 +622,7 @@ found_event:
 	track_ptr->insert(event);
 }
 
-void Alg_beats::expand()
-{
+void Alg_beats::expand() {
 	maxlen = (maxlen + 5);	 // extra growth for small sizes
 	maxlen += (maxlen >> 2); // add 25%
 	Alg_beat_ptr new_beats = new Alg_beat[maxlen];
@@ -719,8 +632,7 @@ void Alg_beats::expand()
 	beats = new_beats;
 }
 
-void Alg_beats::insert(long i, Alg_beat_ptr beat)
-{
+void Alg_beats::insert(long i, Alg_beat_ptr beat) {
 	assert(i >= 0 && i <= len);
 	if (maxlen <= len) { expand(); }
 	memmove(&beats[i + 1], &beats[i], sizeof(Alg_beat) * (len - i));
@@ -728,82 +640,67 @@ void Alg_beats::insert(long i, Alg_beat_ptr beat)
 	len++;
 }
 
-Alg_time_map::Alg_time_map(Alg_time_map* map)
-{
+Alg_time_map::Alg_time_map(Alg_time_map* map) {
 	refcount = 0;
 	assert(map->beats[0].beat == 0 && map->beats[0].time == 0);
 	assert(map->beats.len > 0);
 	// new_beats[0] = map->beats[0];
 	// this is commented because
 	// both new_beats[0] and map->beats[0] should be (0, 0)
-	for (int i = 1; i < map->beats.len; i++)
-	{
+	for (int i = 1; i < map->beats.len; i++) {
 		beats.insert(i, &map->beats[i]);
 	}
 	last_tempo = map->last_tempo;
 	last_tempo_flag = map->last_tempo_flag;
 }
 
-void Alg_time_map::show()
-{
+void Alg_time_map::show() {
 	printf("Alg_time_map: ");
-	for (int i = 0; i < beats.len; i++)
-	{
+	for (int i = 0; i < beats.len; i++) {
 		Alg_beat& b = beats[i];
 		printf("(%g, %g) ", b.time, b.beat);
 	}
 	printf("last tempo: %g\n", last_tempo);
 }
 
-long Alg_time_map::locate_time(double time)
-{
+long Alg_time_map::locate_time(double time) {
 	int i = 0;
-	while ((i < beats.len) && (time > beats[i].time))
-	{
+	while ((i < beats.len) && (time > beats[i].time)) {
 		i++;
 	}
 	return i;
 }
 
-long Alg_time_map::locate_beat(double beat)
-{
+long Alg_time_map::locate_beat(double beat) {
 	int i = 0;
-	while ((i < beats.len) && (beat > beats[i].beat))
-	{
+	while ((i < beats.len) && (beat > beats[i].beat)) {
 		i++;
 	}
 	return i;
 }
 
-double Alg_time_map::beat_to_time(double beat)
-{
+double Alg_time_map::beat_to_time(double beat) {
 	Alg_beat_ptr mbi;
 	Alg_beat_ptr mbi1;
 	if (beat <= 0) { return beat; }
 	int i = locate_beat(beat);
 	// case 1: beat is between two time/beat pairs
-	if (0 < i && i < beats.len)
-	{
+	if (0 < i && i < beats.len) {
 		mbi = &beats[i - 1];
 		mbi1 = &beats[i];
 		// case 2: beat is beyond last time/beat pair
-	}
-	else if (i == beats.len)
-	{
-		if (last_tempo_flag) { return beats[i - 1].time + (beat - beats[i - 1].beat) / last_tempo; }
-		else if (i == 1)
-		{
+	} else if (i == beats.len) {
+		if (last_tempo_flag) {
+			return beats[i - 1].time + (beat - beats[i - 1].beat) / last_tempo;
+		} else if (i == 1) {
 			return beat * 60.0 / ALG_DEFAULT_BPM;
 			// so we use that as default allegro tempo too
-		}
-		else
-		{
+		} else {
 			mbi = &beats[i - 2];
 			mbi1 = &beats[i - 1];
 		}
 		// case 3: beat is at time 0
-	}
-	else /* if (i == 0) */
+	} else /* if (i == 0) */
 	{
 		return beats[0].time;
 	}
@@ -813,27 +710,21 @@ double Alg_time_map::beat_to_time(double beat)
 	return mbi->time + (beat - mbi->beat) * time_dif / beat_dif;
 }
 
-double Alg_time_map::time_to_beat(double time)
-{
+double Alg_time_map::time_to_beat(double time) {
 	Alg_beat_ptr mbi;
 	Alg_beat_ptr mbi1;
 	if (time <= 0.0) return time;
 	int i = locate_time(time);
-	if (i == beats.len)
-	{
-		if (last_tempo_flag) { return beats[i - 1].beat + (time - beats[i - 1].time) * last_tempo; }
-		else if (i == 1)
-		{
+	if (i == beats.len) {
+		if (last_tempo_flag) {
+			return beats[i - 1].beat + (time - beats[i - 1].time) * last_tempo;
+		} else if (i == 1) {
 			return time * (ALG_DEFAULT_BPM / 60.0);
-		}
-		else
-		{
+		} else {
 			mbi = &beats[i - 2];
 			mbi1 = &beats[i - 1];
 		}
-	}
-	else
-	{
+	} else {
 		mbi = &beats[i - 1];
 		mbi1 = &beats[i];
 	}
@@ -842,16 +733,12 @@ double Alg_time_map::time_to_beat(double time)
 	return mbi->beat + (time - mbi->time) * beat_dif / time_dif;
 }
 
-void Alg_time_map::insert_beat(double time, double beat)
-{
+void Alg_time_map::insert_beat(double time, double beat) {
 	int i = locate_time(time); // i is insertion point
-	if (i < beats.len && within(beats[i].time, time, 0.000001))
-	{
+	if (i < beats.len && within(beats[i].time, time, 0.000001)) {
 		// replace beat if time is already in the map
 		beats[i].beat = beat;
-	}
-	else
-	{
+	} else {
 		Alg_beat point;
 		point.beat = beat;
 		point.time = time;
@@ -862,15 +749,13 @@ void Alg_time_map::insert_beat(double time, double beat)
 	// if so, space beats by one microbeat as necessary
 	long j = i;
 	if (j == 0) j = 1; // do not adjust beats[0]
-	while (j < beats.len && beats[j - 1].beat + 0.000001 >= beats[j].beat)
-	{
+	while (j < beats.len && beats[j - 1].beat + 0.000001 >= beats[j].beat) {
 		beats[j].beat = beats[j - 1].beat + 0.000001;
 		j++;
 	}
 }
 
-bool Alg_time_map::insert_tempo(double tempo, double beat)
-{
+bool Alg_time_map::insert_tempo(double tempo, double beat) {
 	tempo = tempo / 60.0; // convert to beats per second
 	// change the tempo at the given beat until the next beat event
 	if (beat < 0) return false;
@@ -878,14 +763,11 @@ bool Alg_time_map::insert_tempo(double tempo, double beat)
 	long i = locate_time(time);
 	if (i >= beats.len || !within(beats[i].time, time, 0.000001)) { insert_beat(time, beat); }
 	// now i is index of beat where tempo will change
-	if (i == beats.len - 1)
-	{
+	if (i == beats.len - 1) {
 		last_tempo = tempo;
 		// printf("last_tempo to %g\n", last_tempo);
 		last_tempo_flag = true;
-	}
-	else
-	{ // adjust all future beats
+	} else { // adjust all future beats
 		// compute the difference in beats
 		double diff = beats[i + 1].beat - beats[i].beat;
 		// convert beat difference to seconds at new tempo
@@ -896,8 +778,7 @@ bool Alg_time_map::insert_tempo(double tempo, double beat)
 		diff = diff - old_diff;
 		// apply new_diff to score and beats
 		i++;
-		while (i < beats.len)
-		{
+		while (i < beats.len) {
 			beats[i].time = beats[i].time + diff;
 			i++;
 		}
@@ -905,8 +786,7 @@ bool Alg_time_map::insert_tempo(double tempo, double beat)
 	return true;
 }
 
-double Alg_time_map::get_tempo(double beat)
-{
+double Alg_time_map::get_tempo(double beat) {
 	Alg_beat_ptr mbi;
 	Alg_beat_ptr mbi1;
 	// if beat < 0, there is probably an error; return something nice anyway
@@ -917,21 +797,17 @@ double Alg_time_map::get_tempo(double beat)
 	// (Consider the case beat == 0.0)
 	if (i < beats.len && beat >= beats[i].beat) i++;
 	// case 1: beat is between two time/beat pairs
-	if (i < beats.len)
-	{
+	if (i < beats.len) {
 		mbi = &beats[i - 1];
 		mbi1 = &beats[i];
 		// case 2: beat is beyond last time/beat pair
-	}
-	else /* if (i == beats.len) */
+	} else /* if (i == beats.len) */
 	{
-		if (last_tempo_flag) { return last_tempo; }
-		else if (i == 1)
-		{
+		if (last_tempo_flag) {
+			return last_tempo;
+		} else if (i == 1) {
 			return ALG_DEFAULT_BPM / 60.0;
-		}
-		else
-		{
+		} else {
 			mbi = &beats[i - 2];
 			mbi1 = &beats[i - 1];
 		}
@@ -941,8 +817,7 @@ double Alg_time_map::get_tempo(double beat)
 	return beat_dif / time_dif;
 }
 
-bool Alg_time_map::set_tempo(double tempo, double start_beat, double end_beat)
-{
+bool Alg_time_map::set_tempo(double tempo, double start_beat, double end_beat) {
 	if (start_beat >= end_beat) return false;
 	// algorithm: insert a beat event if necessary at start_beat
 	// and at end_beat
@@ -952,8 +827,7 @@ bool Alg_time_map::set_tempo(double tempo, double start_beat, double end_beat)
 	insert_beat(beat_to_time(end_beat), end_beat);
 	long start_x = locate_beat(start_beat) + 1;
 	long stop_x = locate_beat(end_beat);
-	while (stop_x < beats.len)
-	{
+	while (stop_x < beats.len) {
 		beats[start_x] = beats[stop_x];
 		start_x++;
 		stop_x++;
@@ -962,8 +836,7 @@ bool Alg_time_map::set_tempo(double tempo, double start_beat, double end_beat)
 	return insert_tempo(tempo, start_beat);
 }
 
-bool Alg_time_map::stretch_region(double b0, double b1, double dur)
-{
+bool Alg_time_map::stretch_region(double b0, double b1, double dur) {
 	// find current duration
 	double t0 = beat_to_time(b0);
 	double t1 = beat_to_time(b1);
@@ -977,11 +850,9 @@ bool Alg_time_map::stretch_region(double b0, double b1, double dur)
 	long stop_x = locate_beat(b1);
 	double orig_time = beats[start_x].time;
 	double prev_time = orig_time;
-	for (int i = start_x + 1; i < beats.len; i++)
-	{
+	for (int i = start_x + 1; i < beats.len; i++) {
 		double delta = beats[i].time - orig_time;
-		if (i <= stop_x)
-		{ // change tempo to next Alg_beat
+		if (i <= stop_x) { // change tempo to next Alg_beat
 			delta *= scale;
 		}
 		orig_time = beats[i].time;
@@ -991,8 +862,7 @@ bool Alg_time_map::stretch_region(double b0, double b1, double dur)
 	return true;
 }
 
-void Alg_time_map::trim(double start, double end, bool units_are_seconds)
-{
+void Alg_time_map::trim(double start, double end, bool units_are_seconds) {
 	// extract the time map from start to end and shift to time zero
 	// start and end are time in seconds if units_are_seconds is true
 	int i = 0;		 // index into beats
@@ -1000,13 +870,10 @@ void Alg_time_map::trim(double start, double end, bool units_are_seconds)
 	int count = 1;
 	double initial_beat = start;
 	double final_beat = end;
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		initial_beat = time_to_beat(start);
 		final_beat = time_to_beat(end);
-	}
-	else
-	{
+	} else {
 		start = beat_to_time(initial_beat);
 		end = beat_to_time(final_beat);
 	}
@@ -1018,17 +885,13 @@ void Alg_time_map::trim(double start, double end, bool units_are_seconds)
 	// skip any beats at or near (start,initial_beat), using count
 	// to keep track of how many entries there are
 	start_index = i;
-	while (i < length() && beats[i].time < end)
-	{
-		if (beats[i].time - start > ALG_EPS && beats[i].beat - initial_beat > ALG_EPS)
-		{
+	while (i < length() && beats[i].time < end) {
+		if (beats[i].time - start > ALG_EPS && beats[i].beat - initial_beat > ALG_EPS) {
 			beats[i].time = beats[i].time - start;
 			beats[i].beat = beats[i].beat - initial_beat;
 			beats[i - start_index + 1] = beats[i];
 			count = count + 1;
-		}
-		else
-		{
+		} else {
 			start_index = start_index + 1;
 		}
 		i = i + 1;
@@ -1040,8 +903,7 @@ void Alg_time_map::trim(double start, double end, bool units_are_seconds)
 	// case 1: there is at least one breakpoint beyond end
 	//         => interpolate to put a breakpoint at end
 	// case 2: no more breakpoints => set last tempo data
-	if (i < length())
-	{
+	if (i < length()) {
 		// we know beats[i].time >= end, so case 1 applies
 		beats[i - start_index + 1].time = end - start;
 		beats[i - start_index + 1].beat = final_beat - initial_beat;
@@ -1051,8 +913,7 @@ void Alg_time_map::trim(double start, double end, bool units_are_seconds)
 	beats.len = count;
 }
 
-void Alg_time_map::cut(double start, double len, bool units_are_seconds)
-{
+void Alg_time_map::cut(double start, double len, bool units_are_seconds) {
 	// remove portion of time map from start to start + len,
 	// shifting the tail left by len. start and len are in whatever
 	// units the score is in. If you cut the time_map as well as cut
@@ -1063,21 +924,17 @@ void Alg_time_map::cut(double start, double len, bool units_are_seconds)
 	double final_beat = end;
 	int i = 0;
 
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		initial_beat = time_to_beat(start);
 		final_beat = time_to_beat(end);
-	}
-	else
-	{
+	} else {
 		start = beat_to_time(initial_beat);
 		end = beat_to_time(final_beat);
 		len = end - start;
 	}
 	double beat_len = final_beat - initial_beat;
 
-	while (i < length() && beats[i].time < start - ALG_EPS)
-	{
+	while (i < length() && beats[i].time < start - ALG_EPS) {
 		i = i + 1;
 	}
 
@@ -1086,15 +943,12 @@ void Alg_time_map::cut(double start, double len, bool units_are_seconds)
 
 	// now i is index into beats of the first breakpoint on or
 	// after start, insert (start, initial_beat) in map
-	if (i < length() && within(beats[i].time, start, ALG_EPS))
-	{
+	if (i < length() && within(beats[i].time, start, ALG_EPS)) {
 		// perterb time map slightly (within alg_eps) to place
 		// break point exactly at the start time
 		beats[i].time = start;
 		beats[i].beat = initial_beat;
-	}
-	else
-	{
+	} else {
 		Alg_beat point(start, initial_beat);
 		beats.insert(i, &point);
 	}
@@ -1106,8 +960,7 @@ void Alg_time_map::cut(double start, double len, bool units_are_seconds)
 		i++;
 	// now beats[i] is the next point to be included in beats
 	// but from i onward, we must shift by (-len, -beat_len)
-	while (i < length())
-	{
+	while (i < length()) {
 		Alg_beat& b = beats[i];
 		b.time = b.time - len;
 		b.beat = b.beat - beat_len;
@@ -1118,8 +971,7 @@ void Alg_time_map::cut(double start, double len, bool units_are_seconds)
 	beats.len = start_index;
 }
 
-void Alg_time_map::paste(double beat, Alg_track* tr)
-{
+void Alg_time_map::paste(double beat, Alg_track* tr) {
 	// insert a given time map at a given time and dur (in beats)
 	Alg_time_map_ptr from_map = tr->get_time_map();
 	// printf("time map paste\nfrom map\n");
@@ -1133,8 +985,7 @@ void Alg_time_map::paste(double beat, Alg_track* tr)
 	double tr_end_time = from_map->beat_to_time(dur);
 	// add offset to make room for insert
 	int i = locate_beat(beat);
-	while (i < length())
-	{
+	while (i < length()) {
 		beats[i].beat += dur;
 		beats[i].time += tr_end_time;
 		i++;
@@ -1149,8 +1000,7 @@ void Alg_time_map::paste(double beat, Alg_track* tr)
 	// printf("after ending point insert\n");
 	// show();
 	int j = from_map->locate_beat(dur);
-	for (i = 0; i < j; i++)
-	{
+	for (i = 0; i < j; i++) {
 		insert_beat(from[i].time + time, // shift by time
 			from[i].beat + beat);		 // and beat
 	}
@@ -1158,8 +1008,7 @@ void Alg_time_map::paste(double beat, Alg_track* tr)
 	show();
 }
 
-void Alg_time_map::insert_time(double start, double len)
-{
+void Alg_time_map::insert_time(double start, double len) {
 	// find time,beat pair that determines tempo at start
 	// compute beat offset = (delta beat / delta time) * len
 	// add len,beat offset to each following Alg_beat
@@ -1167,11 +1016,9 @@ void Alg_time_map::insert_time(double start, double len)
 	int i = locate_time(start);		 // start <= beats[i].time
 	if (beats[i].time == start) i++; // start < beats[i].time
 	// case 1: between beats
-	if (i > 0 && i < length())
-	{
+	if (i > 0 && i < length()) {
 		double beat_offset = len * (beats[i].beat - beats[i - 1].beat) / (beats[i].time - beats[i - 1].time);
-		while (i < length())
-		{
+		while (i < length()) {
 			beats[i].beat += beat_offset;
 			beats[i].time += len;
 			i++;
@@ -1181,15 +1028,12 @@ void Alg_time_map::insert_time(double start, double len)
 	  // show();
 }
 
-void Alg_time_map::insert_beats(double start, double len)
-{
+void Alg_time_map::insert_beats(double start, double len) {
 	int i = locate_beat(start); // start <= beats[i].beat
 	if (beats[i].beat == start) i++;
-	if (i > 0 && i < length())
-	{
+	if (i > 0 && i < length()) {
 		double time_offset = len * (beats[i].time - beats[i - 1].time) / (beats[i].beat - beats[i - 1].beat);
-		while (i < length())
-		{
+		while (i < length()) {
 			beats[i].time += time_offset;
 			beats[i].beat += len;
 			i++;
@@ -1199,51 +1043,44 @@ void Alg_time_map::insert_beats(double start, double len)
 	  // show();
 }
 
-Alg_track::Alg_track(Alg_time_map* map, bool seconds)
-{
+Alg_track::Alg_track(Alg_time_map* map, bool seconds) {
 	type = 't';
 	time_map = NULL;
 	units_are_seconds = seconds;
 	set_time_map(map);
 }
 
-Alg_event_ptr Alg_track::copy_event(Alg_event_ptr event)
-{
+Alg_event_ptr Alg_track::copy_event(Alg_event_ptr event) {
 	Alg_event* new_event;
-	if (event->is_note()) { new_event = new Alg_note((Alg_note_ptr)event); }
-	else
-	{ // update
+	if (event->is_note()) {
+		new_event = new Alg_note((Alg_note_ptr)event);
+	} else { // update
 		new_event = new Alg_update((Alg_update_ptr)event);
 	}
 	return new_event;
 }
 
-Alg_track::Alg_track(Alg_track& track)
-{
+Alg_track::Alg_track(Alg_track& track) {
 	type = 't';
 	time_map = NULL;
-	for (int i = 0; i < track.length(); i++)
-	{
+	for (int i = 0; i < track.length(); i++) {
 		append(copy_event(track.events[i]));
 	}
 	set_time_map(track.time_map);
 	units_are_seconds = track.units_are_seconds;
 }
 
-Alg_track::Alg_track(Alg_event_list_ref event_list, Alg_time_map_ptr map, bool units_are_seconds)
-{
+Alg_track::Alg_track(Alg_event_list_ref event_list, Alg_time_map_ptr map, bool units_are_seconds) {
 	type = 't';
 	time_map = NULL;
-	for (int i = 0; i < event_list.length(); i++)
-	{
+	for (int i = 0; i < event_list.length(); i++) {
 		append(copy_event(event_list[i]));
 	}
 	set_time_map(map);
 	this->units_are_seconds = units_are_seconds;
 }
 
-void Alg_track::serialize(void** buffer, long* bytes)
-{
+void Alg_track::serialize(void** buffer, long* bytes) {
 	// first determine whether this is a seq or a track.
 	// if it is a seq, then we will write the time map and a set of tracks
 	// if it is a track, we just write the track data and not the time map
@@ -1311,37 +1148,32 @@ void Alg_track::serialize(void** buffer, long* bytes)
 	*buffer = ser_write_buf.to_heap(bytes);
 }
 
-void Alg_seq::serialize(void** buffer, long* bytes)
-{
+void Alg_seq::serialize(void** buffer, long* bytes) {
 	assert(get_type() == 's');
 	ser_write_buf.init_for_write();
 	serialize_seq();
 	*buffer = ser_write_buf.to_heap(bytes);
 }
 
-void Serial_write_buffer::check_buffer(long needed)
-{
-	if (len < (ptr - buffer) + needed)
-	{							// do we need more space?
-		long new_len = len * 2; // exponential growth is important
+void Serial_write_buffer::check_buffer(long needed) {
+	if (len < (ptr - buffer) + needed) { // do we need more space?
+		long new_len = len * 2;			 // exponential growth is important
 		// initially, length is zero, so bump new_len to a starting value
 		if (new_len == 0) new_len = 1024;
 		// make sure new_len is as big as needed
 		if (needed > new_len) new_len = needed;
 		char* new_buffer = new char[new_len]; // allocate space
 		ptr = new_buffer + (ptr - buffer);	  // relocate ptr to new buffer
-		if (len > 0)
-		{									 // we had a buffer already
-			memcpy(new_buffer, buffer, len); // copy from old buffer
-			delete buffer;					 // free old buffer
+		if (len > 0) {						  // we had a buffer already
+			memcpy(new_buffer, buffer, len);  // copy from old buffer
+			delete buffer;					  // free old buffer
 		}
 		buffer = new_buffer; // update buffer information
 		len = new_len;
 	}
 }
 
-void Alg_seq::serialize_seq()
-{
+void Alg_seq::serialize_seq() {
 	int i; // loop counters
 	// we can easily compute how much buffer space we need until we
 	// get to tracks, so expand at least that much
@@ -1360,31 +1192,27 @@ void Alg_seq::serialize_seq()
 	ser_write_buf.set_double(time_map->last_tempo);
 	ser_write_buf.set_int32(time_map->last_tempo_flag);
 	ser_write_buf.set_int32(time_map->beats.len);
-	for (i = 0; i < time_map->beats.len; i++)
-	{
+	for (i = 0; i < time_map->beats.len; i++) {
 		ser_write_buf.set_double(time_map->beats[i].time);
 		ser_write_buf.set_double(time_map->beats[i].beat);
 	}
 	ser_write_buf.set_int32(time_sig.length());
 	ser_write_buf.pad();
-	for (i = 0; i < time_sig.length(); i++)
-	{
+	for (i = 0; i < time_sig.length(); i++) {
 		ser_write_buf.set_double(time_sig[i].beat);
 		ser_write_buf.set_double(time_sig[i].num);
 		ser_write_buf.set_double(time_sig[i].den);
 	}
 	ser_write_buf.set_int32(tracks());
 	ser_write_buf.pad();
-	for (i = 0; i < tracks(); i++)
-	{
+	for (i = 0; i < tracks(); i++) {
 		track(i)->serialize_track();
 	}
 	// do not include ALGS, include padding at end
 	ser_write_buf.store_long(length_offset, ser_write_buf.get_posn() - length_offset);
 }
 
-void Alg_track::serialize_track()
-{
+void Alg_track::serialize_track() {
 	// to simplify the code, copy from parameter addresses to locals
 	int j;
 	ser_write_buf.check_buffer(32);
@@ -1398,8 +1226,7 @@ void Alg_track::serialize_track()
 	ser_write_buf.set_double(beat_dur);
 	ser_write_buf.set_double(real_dur);
 	ser_write_buf.set_int32(len);
-	for (j = 0; j < len; j++)
-	{
+	for (j = 0; j < len; j++) {
 		ser_write_buf.check_buffer(24);
 		Alg_event* event = (*this)[j];
 		ser_write_buf.set_int32(event->get_selected());
@@ -1407,8 +1234,7 @@ void Alg_track::serialize_track()
 		ser_write_buf.set_int32(event->get_identifier());
 		ser_write_buf.set_int32(event->chan);
 		ser_write_buf.set_double(event->time);
-		if (event->is_note())
-		{
+		if (event->is_note()) {
 			ser_write_buf.check_buffer(20);
 			Alg_note* note = (Alg_note*)event;
 			ser_write_buf.set_float(note->pitch);
@@ -1418,16 +1244,13 @@ void Alg_track::serialize_track()
 			long parm_num = 0;
 			ser_write_buf.set_int32(0); // placeholder for no. parameters
 			Alg_parameters_ptr parms = note->parameters;
-			while (parms)
-			{
+			while (parms) {
 				serialize_parameter(&(parms->parm));
 				parms = parms->next;
 				parm_num++;
 			}
 			ser_write_buf.store_long(parm_num_offset, parm_num);
-		}
-		else
-		{
+		} else {
 			assert(event->is_update());
 			Alg_update* update = (Alg_update*)event;
 			serialize_parameter(&(update->parameter));
@@ -1439,16 +1262,14 @@ void Alg_track::serialize_track()
 	ser_write_buf.store_long(length_offset, ser_write_buf.get_posn() - length_offset);
 }
 
-void Alg_track::serialize_parameter(Alg_parameter* parm)
-{
+void Alg_track::serialize_parameter(Alg_parameter* parm) {
 	// add eight to account for name + zero end-of-string and the
 	// possibility of adding 7 padding bytes
 	long len = strlen(parm->attr_name()) + 8;
 	ser_write_buf.check_buffer(len);
 	ser_write_buf.set_string(parm->attr_name());
 	ser_write_buf.pad();
-	switch (parm->attr_type())
-	{
+	switch (parm->attr_type()) {
 	case 'r':
 		ser_write_buf.check_buffer(8);
 		ser_write_buf.set_double(parm->r);
@@ -1472,23 +1293,19 @@ void Alg_track::serialize_parameter(Alg_parameter* parm)
 	}
 }
 
-Alg_track* Alg_track::unserialize(void* buffer, long len)
-{
+Alg_track* Alg_track::unserialize(void* buffer, long len) {
 	assert(len > 8);
 	ser_read_buf.init_for_read(buffer, len);
 	bool alg = ser_read_buf.get_char() == 'A' && ser_read_buf.get_char() == 'L' && ser_read_buf.get_char() == 'G';
 	assert(alg);
 	(void)alg; // unused variable
 	char c = ser_read_buf.get_char();
-	if (c == 'S')
-	{
+	if (c == 'S') {
 		Alg_seq* seq = new Alg_seq;
 		ser_read_buf.unget_chars(4); // undo get_char() of A,L,G,S
 		seq->unserialize_seq();
 		return seq;
-	}
-	else
-	{
+	} else {
 		assert(c == 'T');
 		Alg_track* track = new Alg_track;
 		ser_read_buf.unget_chars(4); // undo get_char() of A,L,G,T
@@ -1502,8 +1319,7 @@ Alg_track* Alg_track::unserialize(void* buffer, long len)
 /* Note: this Alg_seq must have a default initialized Alg_time_map.
  * It will be filled in with data from the ser_read_buf buffer.
  */
-void Alg_seq::unserialize_seq()
-{
+void Alg_seq::unserialize_seq() {
 	ser_read_buf.check_input_buffer(48);
 	bool algs = (ser_read_buf.get_char() == 'A') && (ser_read_buf.get_char() == 'L') && (ser_read_buf.get_char() == 'G')
 		&& (ser_read_buf.get_char() == 'S');
@@ -1522,8 +1338,7 @@ void Alg_seq::unserialize_seq()
 	long beats = ser_read_buf.get_int32();
 	ser_read_buf.check_input_buffer(beats * 16 + 4);
 	int i;
-	for (i = 0; i < beats; i++)
-	{
+	for (i = 0; i < beats; i++) {
 		double time = ser_read_buf.get_double();
 		double beat = ser_read_buf.get_double();
 		time_map->insert_beat(time, beat);
@@ -1532,8 +1347,7 @@ void Alg_seq::unserialize_seq()
 	long time_sig_len = ser_read_buf.get_int32();
 	ser_read_buf.get_pad();
 	ser_read_buf.check_input_buffer(time_sig_len * 24 + 8);
-	for (i = 0; i < time_sig_len; i++)
-	{
+	for (i = 0; i < time_sig_len; i++) {
 		double beat = ser_read_buf.get_double();
 		double num = ser_read_buf.get_double();
 		double den = ser_read_buf.get_double();
@@ -1542,8 +1356,7 @@ void Alg_seq::unserialize_seq()
 	long tracks_num = ser_read_buf.get_int32();
 	ser_read_buf.get_pad();
 	add_track(tracks_num - 1); // create tracks_num tracks
-	for (i = 0; i < tracks_num; i++)
-	{
+	for (i = 0; i < tracks_num; i++) {
 		track(i)->unserialize_track();
 	}
 	// assume seq started at beginning of buffer. len measures
@@ -1552,8 +1365,7 @@ void Alg_seq::unserialize_seq()
 	assert(ser_read_buf.get_posn() == len + 4);
 }
 
-void Alg_track::unserialize_track()
-{
+void Alg_track::unserialize_track() {
 	ser_read_buf.check_input_buffer(32);
 	bool algt = (ser_read_buf.get_char() == 'A') && (ser_read_buf.get_char() == 'L') && (ser_read_buf.get_char() == 'G')
 		&& (ser_read_buf.get_char() == 'T');
@@ -1568,16 +1380,14 @@ void Alg_track::unserialize_track()
 	beat_dur = ser_read_buf.get_double();
 	real_dur = ser_read_buf.get_double();
 	int event_count = ser_read_buf.get_int32();
-	for (int i = 0; i < event_count; i++)
-	{
+	for (int i = 0; i < event_count; i++) {
 		ser_read_buf.check_input_buffer(24);
 		long selected = ser_read_buf.get_int32();
 		char type = (char)ser_read_buf.get_int32();
 		long key = ser_read_buf.get_int32();
 		long channel = ser_read_buf.get_int32();
 		double time = ser_read_buf.get_double();
-		if (type == 'n')
-		{
+		if (type == 'n') {
 			ser_read_buf.check_input_buffer(20);
 			float pitch = ser_read_buf.get_float();
 			float loud = ser_read_buf.get_float();
@@ -1589,16 +1399,13 @@ void Alg_track::unserialize_track()
 			// this builds a list of parameters in the correct order
 			// (although order shouldn't matter)
 			Alg_parameters_ptr* list = &note->parameters;
-			for (j = 0; j < param_num; j++)
-			{
+			for (j = 0; j < param_num; j++) {
 				*list = new Alg_parameters(NULL);
 				unserialize_parameter(&((*list)->parm));
 				list = &((*list)->next);
 			}
 			append(note);
-		}
-		else
-		{
+		} else {
 			assert(type == 'u');
 			Alg_update* update = create_update(time, channel, key);
 			update->set_selected(selected != 0);
@@ -1610,12 +1417,10 @@ void Alg_track::unserialize_track()
 	assert(offset + bytes == ser_read_buf.get_posn());
 }
 
-void Alg_track::unserialize_parameter(Alg_parameter_ptr parm_ptr)
-{
+void Alg_track::unserialize_parameter(Alg_parameter_ptr parm_ptr) {
 	Alg_attribute attr = ser_read_buf.get_string();
 	parm_ptr->attr = symbol_table.insert_string(attr);
-	switch (parm_ptr->attr_type())
-	{
+	switch (parm_ptr->attr_type()) {
 	case 'r':
 		ser_read_buf.check_input_buffer(8);
 		parm_ptr->r = ser_read_buf.get_double();
@@ -1635,16 +1440,12 @@ void Alg_track::unserialize_parameter(Alg_parameter_ptr parm_ptr)
 
 //#pragma warning(default: 4800)
 
-void Alg_track::set_time_map(Alg_time_map* map)
-{
+void Alg_track::set_time_map(Alg_time_map* map) {
 	if (time_map) time_map->dereference();
-	if (map == NULL)
-	{
+	if (map == NULL) {
 		time_map = new Alg_time_map(); // new default map
 		time_map->reference();
-	}
-	else
-	{
+	} else {
 		time_map = map;
 		time_map->reference();
 	}
@@ -1653,17 +1454,14 @@ void Alg_track::set_time_map(Alg_time_map* map)
 void Alg_track::convert_to_beats()
 // modify all times and durations in notes to beats
 {
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		units_are_seconds = false;
 		long i;
 
-		for (i = 0; i < length(); i++)
-		{
+		for (i = 0; i < length(); i++) {
 			Alg_event_ptr e = events[i];
 			double beat = time_map->time_to_beat(e->time);
-			if (e->is_note())
-			{
+			if (e->is_note()) {
 				Alg_note_ptr n = (Alg_note_ptr)e;
 				n->dur = time_map->time_to_beat(n->time + n->dur) - beat;
 			}
@@ -1675,17 +1473,14 @@ void Alg_track::convert_to_beats()
 void Alg_track::convert_to_seconds()
 // modify all times and durations in notes to seconds
 {
-	if (!units_are_seconds)
-	{
+	if (!units_are_seconds) {
 		last_note_off = time_map->beat_to_time(last_note_off);
 		units_are_seconds = true;
 		long i;
-		for (i = 0; i < length(); i++)
-		{
+		for (i = 0; i < length(); i++) {
 			Alg_event_ptr e = events[i];
 			double time = time_map->beat_to_time(e->time);
-			if (e->is_note())
-			{
+			if (e->is_note()) {
 				Alg_note_ptr n = (Alg_note_ptr)e;
 				n->dur = time_map->beat_to_time(n->time + n->dur) - time;
 			}
@@ -1694,23 +1489,19 @@ void Alg_track::convert_to_seconds()
 	}
 }
 
-void Alg_track::set_dur(double duration)
-{
+void Alg_track::set_dur(double duration) {
 	// set beat_dur and real_dur
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		set_real_dur(duration);
 		set_beat_dur(time_map->time_to_beat(duration));
-	}
-	else
-	{
+	} else {
 		set_beat_dur(duration);
 		set_real_dur(time_map->beat_to_time(duration));
 	}
 }
 
-Alg_note* Alg_track::create_note(double time, int channel, int identifier, float pitch, float loudness, double duration)
-{
+Alg_note* Alg_track::create_note(
+	double time, int channel, int identifier, float pitch, float loudness, double duration) {
 	Alg_note* note = new Alg_note();
 	note->time = time;
 	note->chan = channel;
@@ -1721,8 +1512,7 @@ Alg_note* Alg_track::create_note(double time, int channel, int identifier, float
 	return note;
 }
 
-Alg_update* Alg_track::create_update(double time, int channel, int identifier)
-{
+Alg_update* Alg_track::create_update(double time, int channel, int identifier) {
 	Alg_update* update = new Alg_update();
 	update->time = time;
 	update->chan = channel;
@@ -1730,40 +1520,31 @@ Alg_update* Alg_track::create_update(double time, int channel, int identifier)
 	return update;
 }
 
-Alg_track_ptr Alg_track::cut(double t, double len, bool all)
-{
+Alg_track_ptr Alg_track::cut(double t, double len, bool all) {
 	// since we are translating notes in time, do not copy or use old timemap
 	Alg_track_ptr track = new Alg_track();
 	track->units_are_seconds = units_are_seconds;
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		track->set_real_dur(len);
 		track->set_beat_dur(time_map->time_to_beat(t + len) - time_map->time_to_beat(t));
-	}
-	else
-	{
+	} else {
 		track->set_beat_dur(len);
 		track->set_real_dur(time_map->beat_to_time(t + len) - time_map->beat_to_time(t));
 	}
 	int i;
 	int new_len = 0;
 	int change = 0;
-	for (i = 0; i < length(); i++)
-	{
+	for (i = 0; i < length(); i++) {
 		Alg_event_ptr event = events[i];
-		if (event->overlap(t, len, all))
-		{
+		if (event->overlap(t, len, all)) {
 			event->time -= t;
 			track->append(event);
 			change = 1;
-		}
-		else
-		{ // if we're not cutting this event, move it to
+		} else { // if we're not cutting this event, move it to
 			// eliminate the gaps in events left by cut events
 			events[new_len] = event;
 			// adjust times of events after t + len
-			if (event->time > t + len - ALG_EPS)
-			{
+			if (event->time > t + len - ALG_EPS) {
 				event->time -= len;
 				change = 1;
 			}
@@ -1776,27 +1557,21 @@ Alg_track_ptr Alg_track::cut(double t, double len, bool all)
 	return track;
 }
 
-Alg_track_ptr Alg_track::copy(double t, double len, bool all)
-{
+Alg_track_ptr Alg_track::copy(double t, double len, bool all) {
 	// since we are translating notes in time, do not copy or use old timemap
 	Alg_track_ptr track = new Alg_track();
 	track->units_are_seconds = units_are_seconds;
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		track->set_real_dur(len);
 		track->set_beat_dur(time_map->time_to_beat(t + len) - time_map->time_to_beat(t));
-	}
-	else
-	{
+	} else {
 		track->set_beat_dur(len);
 		track->set_real_dur(time_map->beat_to_time(t + len) - time_map->beat_to_time(t));
 	}
 	int i;
-	for (i = 0; i < length(); i++)
-	{
+	for (i = 0; i < length(); i++) {
 		Alg_event_ptr event = events[i];
-		if (event->overlap(t, len, all))
-		{
+		if (event->overlap(t, len, all)) {
 			Alg_event_ptr new_event = copy_event(event);
 			new_event->time -= t;
 			track->append(new_event);
@@ -1805,19 +1580,15 @@ Alg_track_ptr Alg_track::copy(double t, double len, bool all)
 	return track;
 }
 
-void Alg_track::paste(double t, Alg_event_list* seq)
-{
+void Alg_track::paste(double t, Alg_event_list* seq) {
 	assert(get_type() == 't');
 	// seq can be an Alg_event_list, an Alg_track, or an Alg_seq
 	// if it is an Alg_event_list, units_are_seconds must match
 	bool prev_units_are_seconds;
-	if (seq->get_type() == 'e')
-	{
+	if (seq->get_type() == 'e') {
 		assert(seq->get_owner()->get_units_are_seconds() == units_are_seconds);
 		prev_units_are_seconds = seq->get_owner()->get_units_are_seconds();
-	}
-	else
-	{ // make it match
+	} else { // make it match
 		Alg_track_ptr tr = (Alg_track_ptr)seq;
 		prev_units_are_seconds = tr->get_units_are_seconds();
 		if (units_are_seconds) tr->convert_to_seconds();
@@ -1836,19 +1607,16 @@ void Alg_track::paste(double t, Alg_event_list* seq)
 	// order, but currently, only a true seq is allowed)
 
 	int i;
-	for (i = 0; i < length(); i++)
-	{
+	for (i = 0; i < length(); i++) {
 		if (events[i]->time > t - ALG_EPS) { events[i]->time += dur; }
 	}
-	for (i = 0; i < seq->length(); i++)
-	{
+	for (i = 0; i < seq->length(); i++) {
 		Alg_event* new_event = copy_event((*seq)[i]);
 		new_event->time += t;
 		insert(new_event);
 	}
 	// restore track units to what they were before
-	if (seq->get_type() != 'e')
-	{
+	if (seq->get_type() != 'e') {
 		Alg_track_ptr tr = (Alg_track_ptr)seq;
 		if (prev_units_are_seconds) tr->convert_to_seconds();
 		else
@@ -1856,15 +1624,13 @@ void Alg_track::paste(double t, Alg_event_list* seq)
 	}
 }
 
-void Alg_track::merge(double t, Alg_event_list_ptr seq)
-{
+void Alg_track::merge(double t, Alg_event_list_ptr seq) {
 	Alg_event_list_ref s = *seq;
-	for (int i = 0; i < s.length(); i++)
-	{
+	for (int i = 0; i < s.length(); i++) {
 		Alg_event* new_event;
-		if (s[i]->is_note()) { new_event = new Alg_note((Alg_note_ptr)s[i]); }
-		else
-		{
+		if (s[i]->is_note()) {
+			new_event = new Alg_note((Alg_note_ptr)s[i]);
+		} else {
 			new_event = new Alg_update((Alg_update_ptr)s[i]);
 		}
 		new_event->time += t;
@@ -1872,16 +1638,14 @@ void Alg_track::merge(double t, Alg_event_list_ptr seq)
 	}
 }
 
-void Alg_track::clear(double t, double len, bool all)
-{
+void Alg_track::clear(double t, double len, bool all) {
 	int i;
 	int move_to = 0;
-	for (i = 0; i < length(); i++)
-	{
+	for (i = 0; i < length(); i++) {
 		Alg_event_ptr event = events[i];
-		if (event->overlap(t, len, all)) { delete events[i]; }
-		else
-		{ // if we're not clearing this event, move it to
+		if (event->overlap(t, len, all)) {
+			delete events[i];
+		} else { // if we're not clearing this event, move it to
 			// eliminate the gaps in events left by cleared events
 			events[move_to] = event;
 			// adjust times of events after t + len. This test is based
@@ -1890,67 +1654,54 @@ void Alg_track::clear(double t, double len, bool all)
 			move_to++;
 		}
 	}
-	if (move_to != this->len)
-	{					   // we cleared at least one note
-		sequence_number++; // Alg_event_lists based on this track become invalid
+	if (move_to != this->len) { // we cleared at least one note
+		sequence_number++;		// Alg_event_lists based on this track become invalid
 	}
 	this->len = move_to; // adjust length since we removed events
 }
 
-void Alg_track::silence(double t, double len, bool all)
-{
+void Alg_track::silence(double t, double len, bool all) {
 	int i;
 	int move_to = 0;
-	for (i = 0; i < length(); i++)
-	{
+	for (i = 0; i < length(); i++) {
 		Alg_event_ptr event = events[i];
-		if (event->overlap(t, len, all)) { delete events[i]; }
-		else
-		{ // if we're not clearing this event, move it to
+		if (event->overlap(t, len, all)) {
+			delete events[i];
+		} else { // if we're not clearing this event, move it to
 			// eliminate the gaps in events left by cleared events
 			events[move_to] = event;
 			move_to++;
 		}
 	}
-	if (move_to != this->len)
-	{					   // we cleared at least one note
-		sequence_number++; // Alg_event_lists based on this track become invalid
+	if (move_to != this->len) { // we cleared at least one note
+		sequence_number++;		// Alg_event_lists based on this track become invalid
 	}
 	this->len = move_to; // adjust length since we removed events
 }
 
-void Alg_track::insert_silence(double t, double len)
-{
+void Alg_track::insert_silence(double t, double len) {
 	int i;
-	for (i = 0; i < length(); i++)
-	{
+	for (i = 0; i < length(); i++) {
 		Alg_event_ptr event = events[i];
 		if (event->time > t - ALG_EPS) event->time += len;
 	}
 }
 
-Alg_event_list* Alg_track::find(double t, double len, bool all, long channel_mask, long event_type_mask)
-{
+Alg_event_list* Alg_track::find(double t, double len, bool all, long channel_mask, long event_type_mask) {
 	int i;
 	Alg_event_list* list = new Alg_event_list(this);
-	if (units_are_seconds)
-	{ // t and len are seconds
+	if (units_are_seconds) { // t and len are seconds
 		list->set_real_dur(len);
 		list->set_beat_dur(get_time_map()->time_to_beat(t + len) - get_time_map()->time_to_beat(t));
-	}
-	else
-	{ // t and len are beats
+	} else { // t and len are beats
 		list->set_real_dur(get_time_map()->beat_to_time(t + len) - get_time_map()->beat_to_time(t));
 		list->set_beat_dur(len);
 	}
-	for (i = 0; i < length(); i++)
-	{
+	for (i = 0; i < length(); i++) {
 		Alg_event_ptr event = events[i];
-		if (event->overlap(t, len, all))
-		{
+		if (event->overlap(t, len, all)) {
 			if ((channel_mask == 0 || (event->chan < 32 && (channel_mask & (1 << event->chan))))
-				&& ((event_type_mask == 0 || (event_type_mask & (1 << event->get_type_code())))))
-			{
+				&& ((event_type_mask == 0 || (event_type_mask & (1 << event->get_type_code()))))) {
 				list->append(event);
 			}
 		}
@@ -1958,8 +1709,7 @@ Alg_event_list* Alg_track::find(double t, double len, bool all, long channel_mas
 	return list;
 }
 
-void Alg_time_sigs::expand()
-{
+void Alg_time_sigs::expand() {
 	assert(maxlen >= len);
 	maxlen = (maxlen + 5);	 // extra growth for small sizes
 	maxlen += (maxlen >> 2); // add 25%
@@ -1970,29 +1720,23 @@ void Alg_time_sigs::expand()
 	time_sigs = new_time_sigs;
 }
 
-void Alg_time_sigs::insert(double beat, double num, double den, bool force)
-{
+void Alg_time_sigs::insert(double beat, double num, double den, bool force) {
 	// find insertion point:
-	for (int i = 0; i < len; i++)
-	{
-		if (within(time_sigs[i].beat, beat, ALG_EPS))
-		{
+	for (int i = 0; i < len; i++) {
+		if (within(time_sigs[i].beat, beat, ALG_EPS)) {
 			// overwrite location i with new info
 			time_sigs[i].beat = beat;
 			time_sigs[i].num = num;
 			time_sigs[i].den = den;
 			return;
-		}
-		else if (time_sigs[i].beat > beat)
-		{
+		} else if (time_sigs[i].beat > beat) {
 			if ((i > 0 && // check if redundant with prev. time sig
 					time_sigs[i - 1].num == num && time_sigs[i - 1].den == den
 					&& within(fmod(beat - time_sigs[i - 1].beat, 4 * time_sigs[i - 1].num / time_sigs[i - 1].den), 0,
 						ALG_EPS))
 				||
 				// check if redundant with implied initial 4/4 time sig:
-				(i == 0 && num == 4 && den == 4 && within(fmod(beat, 4), 0, ALG_EPS)))
-			{
+				(i == 0 && num == 4 && den == 4 && within(fmod(beat, 4), 0, ALG_EPS))) {
 				if (!force) return; // redundant inserts can be ignored here
 			}
 			// make room for new event
@@ -2014,18 +1758,15 @@ void Alg_time_sigs::insert(double beat, double num, double den, bool force)
 	len++;
 }
 
-void Alg_time_sigs::show()
-{
+void Alg_time_sigs::show() {
 	printf("Alg_time_sig: ");
-	for (int i = 0; i < len; i++)
-	{
+	for (int i = 0; i < len; i++) {
 		printf("(%g: %g/%g) ", time_sigs[i].beat, time_sigs[i].num, time_sigs[i].den);
 	}
 	printf("\n");
 }
 
-int Alg_time_sigs::find_beat(double beat)
-{
+int Alg_time_sigs::find_beat(double beat) {
 	// index where you would insert a new time signature at beat
 	int i = 0;
 	while (i < len && time_sigs[i].beat < beat - ALG_EPS)
@@ -2033,21 +1774,18 @@ int Alg_time_sigs::find_beat(double beat)
 	return i;
 }
 
-double Alg_time_sigs::get_bar_len(double beat)
-{
+double Alg_time_sigs::get_bar_len(double beat) {
 	int i = find_beat(beat);
 	double num = 4.0;
 	double den = 4.0;
-	if (i != 0)
-	{
+	if (i != 0) {
 		num = time_sigs[i - 1].num;
 		den = time_sigs[i - 1].den;
 	}
 	return 4 * num / den;
 }
 
-void Alg_time_sigs::cut(double start, double end, double dur)
-{
+void Alg_time_sigs::cut(double start, double end, double dur) {
 	// remove time_sig's from start to end -- these must be
 	//   in beats (not seconds).
 	// The duration of the whole sequence is dur (beats).
@@ -2061,14 +1799,11 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 	// Case 1: beat coincides with a time sig at i. Time signature
 	// at beat means that there is a barline at beat, so when beat
 	// is shifted to start, the relative barline positions are preserved
-	if (len > 0 && within(end, time_sigs[i].beat, ALG_EPS))
-	{
+	if (len > 0 && within(end, time_sigs[i].beat, ALG_EPS)) {
 		// beat coincides with time signature change, so end is on a barline
 		/* do nothing */;
 		// Case 2: there is no time signature before end
-	}
-	else if (i == 0 && (len == 0 || time_sigs[0].beat > end))
-	{
+	} else if (i == 0 && (len == 0 || time_sigs[0].beat > end)) {
 		// If the next time signature does not fall on a barline,
 		// then end must not be on a barline, so there is a partial
 		// measure from end to the next barline. We need
@@ -2078,33 +1813,26 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 		// need to insert anything.
 		double measures = end / 4.0;
 		double imeasures = ROUND(measures);
-		if (!within(measures, imeasures, ALG_EPS))
-		{
+		if (!within(measures, imeasures, ALG_EPS)) {
 			// start is not on a barline, maybe add one here:
 			double bar_loc = (int(measures) + 1) * 4.0;
-			if (bar_loc < dur - ALG_EPS && (len == 0 || time_sigs[0].beat > bar_loc + ALG_EPS))
-			{
+			if (bar_loc < dur - ALG_EPS && (len == 0 || time_sigs[0].beat > bar_loc + ALG_EPS)) {
 				insert(bar_loc, 4, 4, true); // forced insert
 			}
 		}
 		// This case should never be true because if i == 0, either there
 		// are no time signatures before beat (Case 2),
 		// or there is one time signature at beat (Case 1)
-	}
-	else if (i == 0)
-	{
+	} else if (i == 0) {
 		/* do nothing (might be good to assert(false)) */;
 		// Case 3: i-1 must be the effective time sig position
-	}
-	else
-	{
+	} else {
 		// get the time signature in effect at end
 		Alg_time_sig& tsp = time_sigs[i - 1];
 		double beats_per_measure = (tsp.num * 4) / tsp.den;
 		double measures = (end - tsp.beat) / beats_per_measure;
 		int imeasures = ROUND(measures);
-		if (!within(measures, imeasures, ALG_EPS))
-		{
+		if (!within(measures, imeasures, ALG_EPS)) {
 			// end is not on a measure, so we need to insert a time sig
 			// to force a bar line at the first measure location after
 			// beat, if any
@@ -2114,12 +1842,9 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 			// force a barline to match the barline before the shift
 			// However, we should not insert a barline if there is a
 			// time signature earlier than the barline time
-			if (i < len /* time_sigs[i] is the last one */ && time_sigs[i].beat < bar_loc - ALG_EPS)
-			{
+			if (i < len /* time_sigs[i] is the last one */ && time_sigs[i].beat < bar_loc - ALG_EPS) {
 				/* do not insert because there's already a time signature */;
-			}
-			else if (bar_loc < dur - ALG_EPS)
-			{
+			} else if (bar_loc < dur - ALG_EPS) {
 				insert(bar_loc, tsp.num, tsp.den, true); // forced insert
 			}
 		}
@@ -2138,8 +1863,7 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 	// A time signature at start would go at index i, so the effective
 	// time signature prior to start is at i - 1. If i == 0, the default
 	// time signature is in effect prior to start.
-	if (i != 0)
-	{
+	if (i != 0) {
 		start_num = time_sigs[i - 1].num;
 		start_den = time_sigs[i - 1].den;
 	}
@@ -2147,16 +1871,14 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 	double end_num = 4.0; // default if no time signature specified
 	double end_den = 4.0;
 	int j = find_beat(end);
-	if (j != 0)
-	{
+	if (j != 0) {
 		end_num = time_sigs[j - 1].num;
 		end_den = time_sigs[j - 1].den;
 	}
 	// compare: If meter changes and there is no time signature at end,
 	// insert a time signature at end
 	if (end < dur - ALG_EPS && (start_num != end_num || start_den != end_den)
-		&& (j >= len || !within(time_sigs[j].beat, end, ALG_EPS)))
-	{
+		&& (j >= len || !within(time_sigs[j].beat, end, ALG_EPS))) {
 		insert(end, end_num, end_den, true);
 	}
 
@@ -2167,13 +1889,11 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 	int i0 = find_beat(start);
 	int i1 = i0;
 	// scan to end of cut region
-	while (i1 < len && time_sigs[i1].beat < end - ALG_EPS)
-	{
+	while (i1 < len && time_sigs[i1].beat < end - ALG_EPS) {
 		i1++;
 	}
 	// scan from end to len(time_sig)
-	while (i1 < len)
-	{
+	while (i1 < len) {
 		Alg_time_sig& ts = time_sigs[i1];
 		ts.beat -= (end - start);
 		time_sigs[i0] = ts;
@@ -2183,8 +1903,7 @@ void Alg_time_sigs::cut(double start, double end, double dur)
 	len = i1;
 }
 
-void Alg_time_sigs::trim(double start, double end)
-{
+void Alg_time_sigs::trim(double start, double end) {
 	// remove time_sig's not in [start, end), but retain
 	// barline positions relative to the notes. This means that
 	// if the meter (time signature) changes between start and
@@ -2210,15 +1929,12 @@ void Alg_time_sigs::trim(double start, double end)
 	// Case 1: beat coincides with a time sig at i. Time signature
 	// at beat means that there is a barline at beat, so when beat
 	// is shifted to 0, the relative barline positions are preserved
-	if (len > 0 && within(start, time_sigs[i].beat, ALG_EPS))
-	{
+	if (len > 0 && within(start, time_sigs[i].beat, ALG_EPS)) {
 		// beat coincides with time signature change, so offset must
 		// be a multiple of beats
 		/* do nothing */;
 		// Case 2: there is no time signature before start
-	}
-	else if (i == 0 && (len == 0 || time_sigs[0].beat > start))
-	{
+	} else if (i == 0 && (len == 0 || time_sigs[0].beat > start)) {
 		// If the next time signature does not fall on a barline,
 		// then start must not be on a barline, so there is a partial
 		// measure from start to the next barline. We need
@@ -2228,8 +1944,7 @@ void Alg_time_sigs::trim(double start, double end)
 		// need to insert anything.
 		double measures = start / 4.0;
 		double imeasures = ROUND(measures);
-		if (!within(measures, imeasures, ALG_EPS))
-		{
+		if (!within(measures, imeasures, ALG_EPS)) {
 			// start is not on a barline, maybe add one here:
 			double bar_loc = (int(measures) + 1) * 4.0;
 			if (len == 0 || time_sigs[1].beat > bar_loc + ALG_EPS) { insert(bar_loc, 4, 4, true); }
@@ -2237,21 +1952,16 @@ void Alg_time_sigs::trim(double start, double end)
 		// This case should never be true because if i == 0, either there
 		// are no time signatures before beat (Case 2),
 		// or there is one time signature at beat (Case 1)
-	}
-	else if (i == 0)
-	{
+	} else if (i == 0) {
 		/* do nothing (might be good to assert(false)) */;
 		// Case 3: i-1 must be the effective time sig position
-	}
-	else
-	{
+	} else {
 		i -= 1; // index the time signature in effect at start
 		Alg_time_sig& tsp = time_sigs[i];
 		double beats_per_measure = (tsp.num * 4) / tsp.den;
 		double measures = (start - tsp.beat) / beats_per_measure;
 		int imeasures = ROUND(measures);
-		if (!within(measures, imeasures, ALG_EPS))
-		{
+		if (!within(measures, imeasures, ALG_EPS)) {
 			// beat is not on a measure, so we need to insert a time sig
 			// to force a bar line at the first measure location after
 			// beat, if any
@@ -2288,15 +1998,13 @@ void Alg_time_sigs::trim(double start, double end)
 	//     (0 < i_in) && ((i_in < len && time_sig[i_in].beat > start + ALG_EPS) ||
 	//                    (i_in == len)))
 	//
-	if (0 < i_in && ((i_in < len && time_sigs[i_in].beat > start + ALG_EPS) || (i_in == len)))
-	{
+	if (0 < i_in && ((i_in < len && time_sigs[i_in].beat > start + ALG_EPS) || (i_in == len))) {
 		time_sigs[0] = time_sigs[i_in - 1];
 		time_sigs[0].beat = 0.0;
 		i_out = 1;
 	}
 	// copy from i_in to i_out as we scan time_sig array to end of cut region
-	while (i_in < len && time_sigs[i_in].beat < end - ALG_EPS)
-	{
+	while (i_in < len && time_sigs[i_in].beat < end - ALG_EPS) {
 		Alg_time_sig& ts = time_sigs[i_in];
 		ts.beat = ts.beat - start;
 		time_sigs[i_out] = ts;
@@ -2307,16 +2015,14 @@ void Alg_time_sigs::trim(double start, double end)
 #endif
 }
 
-void Alg_time_sigs::paste(double start, Alg_seq* seq)
-{
+void Alg_time_sigs::paste(double start, Alg_seq* seq) {
 	// printf("time_sig::insert before paste\n");
 	// show();
 	Alg_time_sigs& from = seq->time_sig;
 	// printf("time_sig::insert from\n");
 	// from.show();
 	// insert time signatures from seq into this time_sigs at start
-	if (len == 0 && from.len == 0)
-	{
+	if (len == 0 && from.len == 0) {
 		return; // default applies
 	}
 	int i = find_beat(start);
@@ -2339,23 +2045,19 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 	//  2) time_sig at splice is at i
 	//     for this, i < len && time_sig[i].beat ~= start
 	//  3) time_sig at splice is default 4/4
-	if (len > 0 && i > 0 && ((i < len && time_sigs[i].beat > start + ALG_EPS) || (i == len)))
-	{
+	if (len > 0 && i > 0 && ((i < len && time_sigs[i].beat > start + ALG_EPS) || (i == len))) {
 		// no time_signature at i
 		num_after_splice = time_sigs[i - 1].num;
 		den_after_splice = time_sigs[i - 1].den;
 		beat_after_splice = time_sigs[i - 1].beat;
 		num_before_splice = num_after_splice;
 		den_before_splice = den_after_splice;
-	}
-	else if (i < len && time_sigs[i].beat <= start + ALG_EPS)
-	{
+	} else if (i < len && time_sigs[i].beat <= start + ALG_EPS) {
 		// time_signature at i is at "start" beats
 		num_after_splice = time_sigs[i].num;
 		den_after_splice = time_sigs[i].den;
 		beat_after_splice = start;
-		if (i > 0)
-		{ // time signature before start is at i - 1
+		if (i > 0) { // time signature before start is at i - 1
 			num_before_splice = time_sigs[i - 1].num;
 			den_before_splice = time_sigs[i - 1].den;
 		}
@@ -2364,8 +2066,7 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 	// begin by adding duration to time_sig's at i and above
 	// move time signatures forward by duration of seq
 	double dur = seq->get_beat_dur();
-	while (i < len)
-	{
+	while (i < len) {
 		time_sigs[i].beat += dur;
 		i++;
 	}
@@ -2378,8 +2079,7 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 	double den_of_insert = 4.0;
 	double beat_of_insert = 0.0;
 	/* int first_from_index = 0; // where to start copying from  TODO: LMMS commented out unused variable */
-	if (from.length() > 0 && from[0].beat < ALG_EPS)
-	{
+	if (from.length() > 0 && from[0].beat < ALG_EPS) {
 		// there is an initial time signature in "from"
 		num_of_insert = from[0].num;
 		den_of_insert = from[0].den;
@@ -2388,8 +2088,7 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 		/* first_from_index = 1; TODO: LMMS commented out unused variable */
 	}
 	// compare time signatures to see if we need a change at start:
-	if (num_before_splice != num_of_insert || den_before_splice != den_of_insert)
-	{
+	if (num_before_splice != num_of_insert || den_before_splice != den_of_insert) {
 		// note that this will overwrite an existing time signature if
 		// it is within ALG_EPS of start -- this is correct because the
 		// existing time signature will already be recorded as
@@ -2399,8 +2098,7 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 	// printf("time_sig::insert after 4/4 at start\n");
 	// show();
 	// insert time signatures from seq offset by start
-	for (i = 0; i < from.length() && from[i].beat < dur - ALG_EPS; i++)
-	{
+	for (i = 0; i < from.length() && from[i].beat < dur - ALG_EPS; i++) {
 		num_of_insert = from[i].num; // keep latest time signature info
 		den_of_insert = from[i].den;
 		beat_of_insert = from[i].beat;
@@ -2411,8 +2109,7 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 	// now insert time signature at end of splice if necessary
 	// if the time signature changes, we need to insert a time signature
 	// immediately:
-	if (num_of_insert != num_after_splice && den_of_insert != den_after_splice)
-	{
+	if (num_of_insert != num_after_splice && den_of_insert != den_after_splice) {
 		insert(start + dur, num_after_splice, den_after_splice);
 		num_of_insert = num_after_splice;
 		den_of_insert = den_after_splice;
@@ -2448,8 +2145,7 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 	// if diff_in_measures is not (approximately) integer, we need to
 	// force a barline (time signature) after start + dur to maintain
 	// the relationship between barliness and notes
-	if (!within(diff_in_measures, ROUND(diff_in_measures), ALG_EPS))
-	{
+	if (!within(diff_in_measures, ROUND(diff_in_measures), ALG_EPS)) {
 		// recall that old_bar_loc is shifted by dur
 		insert(old_bar_loc, num_after_splice, den_after_splice);
 	}
@@ -2457,8 +2153,7 @@ void Alg_time_sigs::paste(double start, Alg_seq* seq)
 	// show();
 }
 
-void Alg_time_sigs::insert_beats(double start, double dur)
-{
+void Alg_time_sigs::insert_beats(double start, double dur) {
 	int i = find_beat(start);
 
 	// time_sigs[i] is after beat and needs to shift
@@ -2477,15 +2172,12 @@ void Alg_time_sigs::insert_beats(double start, double dur)
 	//  2) time_sig at splice is at i
 	//     for this, i < len && time_sig[i].beat ~= start
 	//  3) time_sig at splice is default 4/4
-	if (len > 0 && i > 0 && ((i < len && time_sigs[i].beat > start + ALG_EPS) || (i == len)))
-	{
+	if (len > 0 && i > 0 && ((i < len && time_sigs[i].beat > start + ALG_EPS) || (i == len))) {
 		// no time_signature at i
 		tsnum = time_sigs[i - 1].num;
 		tsden = time_sigs[i - 1].den;
 		tsbeat = time_sigs[i - 1].beat;
-	}
-	else if (i < len && time_sigs[i].beat <= start + ALG_EPS)
-	{
+	} else if (i < len && time_sigs[i].beat <= start + ALG_EPS) {
 		// time_signature at i is at "start" beats
 		tsnum = time_sigs[i].num;
 		tsden = time_sigs[i].den;
@@ -2495,8 +2187,7 @@ void Alg_time_sigs::insert_beats(double start, double dur)
 	// invariant: i is index of next time signature after start
 
 	// increase beat times from i to len - 1 by dur
-	for (int j = i; j < len; j++)
-	{
+	for (int j = i; j < len; j++) {
 		time_sigs[j].beat += dur;
 	}
 
@@ -2504,8 +2195,7 @@ void Alg_time_sigs::insert_beats(double start, double dur)
 	double beats_per_measure = (tsnum * 4) / tsden;
 	double measures = dur / beats_per_measure; // shift distance
 	int imeasures = ROUND(measures);
-	if (!within(measures, imeasures, ALG_EPS))
-	{
+	if (!within(measures, imeasures, ALG_EPS)) {
 		// shift is not a whole number of measures, so we may need to insert
 		// time signature after silence
 		// compute measures from time signature to next bar after time
@@ -2517,34 +2207,25 @@ void Alg_time_sigs::insert_beats(double start, double dur)
 		// there is a time signature change before bar, in which case we
 		// should not insert a new time signature
 		// The next time signature after start is at i if i < len
-		if (i < len && time_sigs[i].beat < bar_loc)
-		{ /* do not insert */
+		if (i < len && time_sigs[i].beat < bar_loc) { /* do not insert */
 			;
-		}
-		else
-		{
+		} else {
 			insert(bar_loc, tsnum, tsden);
 		}
 	}
 }
 
-double Alg_time_sigs::nearest_beat(double beat)
-{
+double Alg_time_sigs::nearest_beat(double beat) {
 	int i = find_beat(beat);
 	// i is where we would insert time signature at beat
 	// case 1: there is no time signature
-	if (i == 0 && len == 0)
-	{
+	if (i == 0 && len == 0) {
 		return ROUND(beat);
 		// case 2: beat falls approximately on time signature
-	}
-	else if (i < len && within(time_sigs[i].beat, beat, ALG_EPS))
-	{
+	} else if (i < len && within(time_sigs[i].beat, beat, ALG_EPS)) {
 		return time_sigs[i].beat;
 		// case 3: beat is after no time signature and before one
-	}
-	else if (i == 0)
-	{
+	} else if (i == 0) {
 		double trial_beat = ROUND(beat);
 		// it is possible that we rounded up past a time signature
 		if (trial_beat > time_sigs[0].beat - ALG_EPS) { return time_sigs[0].beat; }
@@ -2559,8 +2240,7 @@ double Alg_time_sigs::nearest_beat(double beat)
 
 Alg_tracks::~Alg_tracks() { reset(); }
 
-void Alg_tracks::expand_to(int new_max)
-{
+void Alg_tracks::expand_to(int new_max) {
 	maxlen = new_max;
 	Alg_track_ptr* new_tracks = new Alg_track_ptr[maxlen];
 	// now do copy
@@ -2569,15 +2249,13 @@ void Alg_tracks::expand_to(int new_max)
 	tracks = new_tracks;
 }
 
-void Alg_tracks::expand()
-{
+void Alg_tracks::expand() {
 	maxlen = (maxlen + 5);	 // extra growth for small sizes
 	maxlen += (maxlen >> 2); // add 25%
 	expand_to(maxlen);
 }
 
-void Alg_tracks::append(Alg_track_ptr track)
-{
+void Alg_tracks::append(Alg_track_ptr track) {
 	if (maxlen <= len) { expand(); }
 	tracks[len] = track;
 	len++;
@@ -2590,19 +2268,15 @@ void Alg_tracks::add_track(int track_num, Alg_time_map_ptr time_map, bool second
 // create tracks at len, len+1, ..., track_num.
 {
 	assert(track_num >= 0);
-	if (track_num == maxlen)
-	{
+	if (track_num == maxlen) {
 		// use eponential growth to insert tracks sequentially
 		expand();
-	}
-	else if (track_num > maxlen)
-	{
+	} else if (track_num > maxlen) {
 		// grow to exact size for random inserts
 		expand_to(track_num + 1);
 	}
 	if (track_num < len) return; // don't add if already there
-	while (len <= track_num)
-	{
+	while (len <= track_num) {
 		tracks[len] = new Alg_track(time_map, seconds);
 		// printf("allocated track at %d (%x, this %x) = %x\n", len,
 		//       &(tracks[len]), this, tracks[len]);
@@ -2610,12 +2284,10 @@ void Alg_tracks::add_track(int track_num, Alg_time_map_ptr time_map, bool second
 	}
 }
 
-void Alg_tracks::reset()
-{
+void Alg_tracks::reset() {
 	// all track events are incorporated into the seq,
 	// so all we need to delete are the arrays of pointers
-	for (int i = 0; i < len; i++)
-	{
+	for (int i = 0; i < len; i++) {
 		// printf("deleting track at %d (%x, this %x) = %x\n", i, &(tracks[i]),
 		//       this, tracks[i]);
 		delete tracks[i];
@@ -2626,16 +2298,13 @@ void Alg_tracks::reset()
 	maxlen = 0;
 }
 
-void Alg_tracks::set_in_use(bool flag)
-{
-	for (int i = 0; i < len; i++)
-	{
+void Alg_tracks::set_in_use(bool flag) {
+	for (int i = 0; i < len; i++) {
 		tracks[i]->in_use = flag;
 	}
 }
 
-void Alg_iterator::expand_to(int new_max)
-{
+void Alg_iterator::expand_to(int new_max) {
 	maxlen = new_max;
 	Alg_pending_event_ptr new_pending_events = new Alg_pending_event[maxlen];
 	// now do copy
@@ -2644,15 +2313,13 @@ void Alg_iterator::expand_to(int new_max)
 	pending_events = new_pending_events;
 }
 
-void Alg_iterator::expand()
-{
+void Alg_iterator::expand() {
 	maxlen = (maxlen + 5);	 // extra growth for small sizes
 	maxlen += (maxlen >> 2); // add 25%
 	expand_to(maxlen);
 }
 
-Alg_iterator::~Alg_iterator()
-{
+Alg_iterator::~Alg_iterator() {
 	if (pending_events) { delete[] pending_events; }
 }
 
@@ -2663,10 +2330,8 @@ Alg_iterator::~Alg_iterator()
 #define HEAP_PARENT(loc) ((((loc) + 1) / 2) - 1)
 #define FIRST_CHILD(loc) (((loc)*2) + 1)
 
-void Alg_iterator::show()
-{
-	for (int i = 0; i < len; i++)
-	{
+void Alg_iterator::show() {
+	for (int i = 0; i < len; i++) {
 		Alg_pending_event_ptr p = &(pending_events[i]);
 		printf("    %d: %p[%ld]@%g on %d\n", i, p->events, p->index, p->offset, p->note_on);
 	}
@@ -2690,8 +2355,7 @@ bool Alg_iterator::earlier(int i, int j)
 	return false;
 }
 
-void Alg_iterator::insert(Alg_events_ptr events, long index, bool note_on, void* cookie, double offset)
-{
+void Alg_iterator::insert(Alg_events_ptr events, long index, bool note_on, void* cookie, double offset) {
 	if (len == maxlen) expand();
 	pending_events[len].events = events;
 	pending_events[len].index = index;
@@ -2712,8 +2376,7 @@ void Alg_iterator::insert(Alg_events_ptr events, long index, bool note_on, void*
 	int loc_parent = HEAP_PARENT(loc);
 	len++;
 	// sift up:
-	while (loc > 0 && earlier(loc, loc_parent))
-	{
+	while (loc > 0 && earlier(loc, loc_parent)) {
 		// swap loc with loc_parent
 		Alg_pending_event temp = pending_events[loc];
 		pending_events[loc] = pending_events[loc_parent];
@@ -2724,8 +2387,7 @@ void Alg_iterator::insert(Alg_events_ptr events, long index, bool note_on, void*
 }
 
 bool Alg_iterator::remove_next(
-	Alg_events_ptr& events, long& index, bool& note_on, void*& cookie, double& offset, double& time)
-{
+	Alg_events_ptr& events, long& index, bool& note_on, void*& cookie, double& offset, double& time) {
 	if (len == 0) return false; // empty!
 	events = pending_events[0].events;
 	index = pending_events[0].index;
@@ -2739,22 +2401,17 @@ bool Alg_iterator::remove_next(
 	// sift down
 	long loc = 0;
 	long loc_child = FIRST_CHILD(loc);
-	while (loc_child < len)
-	{
-		if (loc_child + 1 < len)
-		{
+	while (loc_child < len) {
+		if (loc_child + 1 < len) {
 			if (earlier(loc_child + 1, loc_child)) { loc_child++; }
 		}
-		if (earlier(loc_child, loc))
-		{
+		if (earlier(loc_child, loc)) {
 			Alg_pending_event temp = pending_events[loc];
 			pending_events[loc] = pending_events[loc_child];
 			pending_events[loc_child] = temp;
 			loc = loc_child;
 			loc_child = FIRST_CHILD(loc);
-		}
-		else
-		{
+		} else {
 			loc_child = len;
 		}
 	}
@@ -2762,43 +2419,33 @@ bool Alg_iterator::remove_next(
 	return true;
 }
 
-Alg_seq::Alg_seq(const char* filename, bool smf, double* offset_ptr)
-{
+Alg_seq::Alg_seq(const char* filename, bool smf, double* offset_ptr) {
 	basic_initialization();
 	ifstream inf(filename, smf ? ios::binary | ios::in : ios::in);
-	if (inf.fail())
-	{
+	if (inf.fail()) {
 		error = alg_error_open;
 		return;
 	}
-	if (smf)
-	{
+	if (smf) {
 		error = alg_smf_read(inf, this);
 		if (offset_ptr) *offset_ptr = 0.0;
-	}
-	else
-	{
+	} else {
 		error = alg_read(inf, this, offset_ptr);
 	}
 	inf.close();
 }
 
-Alg_seq::Alg_seq(istream& file, bool smf, double* offset_ptr)
-{
+Alg_seq::Alg_seq(istream& file, bool smf, double* offset_ptr) {
 	basic_initialization();
-	if (smf)
-	{
+	if (smf) {
 		error = alg_smf_read(file, this);
 		if (offset_ptr) *offset_ptr = 0.0;
-	}
-	else
-	{
+	} else {
 		error = alg_read(file, this, offset_ptr);
 	}
 }
 
-void Alg_seq::seq_from_track(Alg_track_ref tr)
-{
+void Alg_seq::seq_from_track(Alg_track_ref tr) {
 	type = 's';
 	// copy everything
 	set_beat_dur(tr.get_beat_dur());
@@ -2807,65 +2454,54 @@ void Alg_seq::seq_from_track(Alg_track_ref tr)
 	set_time_map(new Alg_time_map(tr.get_time_map()));
 	units_are_seconds = tr.get_units_are_seconds();
 
-	if (tr.get_type() == 's')
-	{
+	if (tr.get_type() == 's') {
 		Alg_seq_ref s = *(tr.to_alg_seq());
 		channel_offset_per_track = s.channel_offset_per_track;
 		add_track(s.tracks() - 1);
 		// copy each track
-		for (int i = 0; i < tracks(); i++)
-		{
+		for (int i = 0; i < tracks(); i++) {
 			Alg_track_ref from_track = *(s.track(i));
 			Alg_track_ref to_track = *(track(i));
 			to_track.set_beat_dur(from_track.get_beat_dur());
 			to_track.set_real_dur(from_track.get_real_dur());
 			if (from_track.get_units_are_seconds()) to_track.convert_to_seconds();
-			for (int j = 0; j < from_track.length(); j++)
-			{
+			for (int j = 0; j < from_track.length(); j++) {
 				Alg_event_ptr event = copy_event(from_track[j]);
 				to_track.append(event);
 			}
 		}
-	}
-	else if (tr.get_type() == 't')
-	{
+	} else if (tr.get_type() == 't') {
 		add_track(0);
 		channel_offset_per_track = 0;
 		Alg_track_ptr to_track = track(0);
 		to_track->set_beat_dur(tr.get_beat_dur());
 		to_track->set_real_dur(tr.get_real_dur());
-		for (int j = 0; j < tr.length(); j++)
-		{
+		for (int j = 0; j < tr.length(); j++) {
 			Alg_event_ptr event = copy_event(tr[j]);
 			to_track->append(event);
 		}
-	}
-	else
-	{
+	} else {
 		assert(false); // expected track or sequence
 	}
 }
 
 int Alg_seq::tracks() { return track_list.length(); }
 
-Alg_track_ptr Alg_seq::track(int i)
-{
+Alg_track_ptr Alg_seq::track(int i) {
 	assert(0 <= i && i < track_list.length());
 	return &(track_list[i]);
 }
 
 //#pragma warning(disable: 4715) // ok not to return a value here
 
-Alg_event_ptr const& Alg_seq::operator[](int i)
-{
+Alg_event_ptr const& Alg_seq::operator[](int i) {
 	int ntracks = track_list.length();
 	int tr = 0;
-	while (tr < ntracks)
-	{
+	while (tr < ntracks) {
 		Alg_track* a_track = track(tr);
-		if (a_track && i < a_track->length()) { return (*a_track)[i]; }
-		else if (a_track)
-		{
+		if (a_track && i < a_track->length()) {
+			return (*a_track)[i];
+		} else if (a_track) {
 			i -= a_track->length();
 		}
 		tr++;
@@ -2875,11 +2511,9 @@ Alg_event_ptr const& Alg_seq::operator[](int i)
 }
 //#pragma warning(default: 4715)
 
-void Alg_seq::convert_to_beats()
-{
+void Alg_seq::convert_to_beats() {
 	if (!units_are_seconds) return;
-	for (int i = 0; i < tracks(); i++)
-	{
+	for (int i = 0; i < tracks(); i++) {
 		track(i)->convert_to_beats();
 	}
 	// note that the Alg_seq inherits units_are_seconds from an
@@ -2888,14 +2522,12 @@ void Alg_seq::convert_to_beats()
 	units_are_seconds = false;
 }
 
-void Alg_seq::convert_to_seconds()
-{
+void Alg_seq::convert_to_seconds() {
 	if (units_are_seconds) return;
 	// printf("convert_to_seconds, tracks %d\n", tracks());
 	// printf("last_tempo of seq: %g on map %x\n",
 	//       get_time_map()->last_tempo, get_time_map());
-	for (int i = 0; i < tracks(); i++)
-	{
+	for (int i = 0; i < tracks(); i++) {
 		// printf("last_tempo of track %d: %g on %x\n", i,
 		//       track(i)->get_time_map()->last_tempo,
 		//       track(i)->get_time_map());
@@ -2909,27 +2541,22 @@ void Alg_seq::convert_to_seconds()
 	units_are_seconds = true;
 }
 
-Alg_track_ptr Alg_seq::cut_from_track(int track_num, double start, double dur, bool all)
-{
+Alg_track_ptr Alg_seq::cut_from_track(int track_num, double start, double dur, bool all) {
 	assert(track_num >= 0 && track_num < tracks());
 	Alg_track_ptr tr = track(track_num);
 	return tr->cut(start, dur, all);
 }
 
-void Alg_seq::copy_time_sigs_to(Alg_seq* dest)
-{
+void Alg_seq::copy_time_sigs_to(Alg_seq* dest) {
 	// copy time signatures
-	for (int i = 0; i < time_sig.length(); i++)
-	{
+	for (int i = 0; i < time_sig.length(); i++) {
 		dest->time_sig.insert(time_sig[i].beat, time_sig[i].num, time_sig[i].den);
 	}
 }
 
-void Alg_seq::set_time_map(Alg_time_map* map)
-{
+void Alg_seq::set_time_map(Alg_time_map* map) {
 	Alg_track::set_time_map(map);
-	for (int i = 0; i < tracks(); i++)
-	{
+	for (int i = 0; i < tracks(); i++) {
 		track(i)->set_time_map(map);
 	}
 }
@@ -2952,8 +2579,7 @@ Alg_seq_ptr Alg_seq::cut(double start, double len, bool all)
 	result->units_are_seconds = units_are_seconds;
 	result->track_list.reset();
 
-	for (int i = 0; i < tracks(); i++)
-	{
+	for (int i = 0; i < tracks(); i++) {
 		Alg_track_ptr cut_track = cut_from_track(i, start, len, all);
 		result->track_list.append(cut_track);
 		// initially, result->last_note_off is zero. We want to know the
@@ -2971,8 +2597,7 @@ Alg_seq_ptr Alg_seq::cut(double start, double len, bool all)
 	double ts_end = start + len;
 	double ts_dur = dur;
 	double ts_last_note_off = start + result->last_note_off;
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		ts_start = time_map->time_to_beat(ts_start);
 		ts_end = time_map->time_to_beat(ts_end);
 		ts_last_note_off = time_map->time_to_beat(ts_last_note_off);
@@ -3004,30 +2629,24 @@ Alg_seq_ptr Alg_seq::cut(double start, double len, bool all)
 	return result;
 }
 
-void Alg_seq::insert_silence_in_track(int track_num, double t, double len)
-{
+void Alg_seq::insert_silence_in_track(int track_num, double t, double len) {
 	Alg_track_ptr tr = track(track_num);
 	tr->insert_silence(t, len);
 }
 
-void Alg_seq::insert_silence(double t, double len)
-{
-	for (int i = 0; i < tracks(); i++)
-	{
+void Alg_seq::insert_silence(double t, double len) {
+	for (int i = 0; i < tracks(); i++) {
 		insert_silence_in_track(i, t, len);
 	}
 	double t_beats = t;
 	double len_beats = len;
 	// insert into time_sig array; use time_sig_paste,
 	// which requires us to build a simple time_sig array
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		time_map->insert_time(t, len);
 		t_beats = time_map->time_to_beat(t);
 		len_beats = time_map->time_to_beat(t + len) - t_beats;
-	}
-	else
-	{
+	} else {
 		time_map->insert_beats(t_beats, len_beats);
 	}
 	time_sig.insert_beats(t_beats, len_beats);
@@ -3037,13 +2656,11 @@ void Alg_seq::insert_silence(double t, double len)
 	set_dur(t + len + MAX(get_dur() - t, 0.0));
 }
 
-Alg_track_ptr Alg_seq::copy_track(int track_num, double t, double len, bool all)
-{
+Alg_track_ptr Alg_seq::copy_track(int track_num, double t, double len, bool all) {
 	return track_list[track_num].copy(t, len, all);
 }
 
-Alg_seq* Alg_seq::copy(double start, double len, bool all)
-{
+Alg_seq* Alg_seq::copy(double start, double len, bool all) {
 	// fix parameters to fall within existing sequence
 	if (start > get_dur()) return NULL; // nothing to copy
 	if (start < 0) start = 0;			// can't copy before sequence starts
@@ -3058,8 +2675,7 @@ Alg_seq* Alg_seq::copy(double start, double len, bool all)
 	result->units_are_seconds = units_are_seconds;
 	result->track_list.reset();
 
-	for (int i = 0; i < tracks(); i++)
-	{
+	for (int i = 0; i < tracks(); i++) {
 		Alg_track_ptr copy = copy_track(i, start, len, all);
 		result->track_list.append(copy);
 		result->last_note_off = MAX(result->last_note_off, copy->last_note_off);
@@ -3074,8 +2690,7 @@ Alg_seq* Alg_seq::copy(double start, double len, bool all)
 	double ts_start = start;
 	double ts_end = start + len;
 	double ts_last_note_off = start + result->last_note_off;
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		ts_start = time_map->time_to_beat(ts_start);
 		ts_end = time_map->time_to_beat(ts_end);
 		ts_last_note_off = time_map->time_to_beat(ts_last_note_off);
@@ -3087,15 +2702,13 @@ Alg_seq* Alg_seq::copy(double start, double len, bool all)
 	return result;
 }
 
-void Alg_seq::paste(double start, Alg_seq* seq)
-{
+void Alg_seq::paste(double start, Alg_seq* seq) {
 	// Insert seq at time, opening up space for it.
 	// To manipulate time map, we need units as beats.
 	// Save original form so we can convert back if necessary.
 	bool units_should_be_seconds = units_are_seconds;
 	bool seq_units_should_be_seconds = seq->get_units_are_seconds();
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		start = time_map->time_to_beat(start);
 		convert_to_beats();
 	}
@@ -3103,15 +2716,13 @@ void Alg_seq::paste(double start, Alg_seq* seq)
 
 	// do a paste on each track
 	int i;
-	for (i = 0; i < seq->tracks(); i++)
-	{
+	for (i = 0; i < seq->tracks(); i++) {
 		if (i >= tracks()) { add_track(i); }
 		track(i)->paste(start, seq->track(i));
 	}
 	// make sure all tracks were opened up for an insert, even if
 	// there is nothing to insert
-	while (i < tracks())
-	{
+	while (i < tracks()) {
 		track(i)->insert_silence(start, seq->get_dur());
 		i++;
 	}
@@ -3125,42 +2736,35 @@ void Alg_seq::paste(double start, Alg_seq* seq)
 	if (seq_units_should_be_seconds) { seq->convert_to_seconds(); }
 }
 
-void Alg_seq::merge(double t, Alg_event_list_ptr seq)
-{
+void Alg_seq::merge(double t, Alg_event_list_ptr seq) {
 	// seq must be an Alg_seq:
 	assert(seq->get_type() == 's');
 	Alg_seq_ptr s = (Alg_seq_ptr)seq;
-	for (int i = 0; i < s->tracks(); i++)
-	{
+	for (int i = 0; i < s->tracks(); i++) {
 		if (tracks() <= i) add_track(i);
 		track(i)->merge(t, s->track(i));
 	}
 }
 
-void Alg_seq::silence_track(int track_num, double start, double len, bool all)
-{
+void Alg_seq::silence_track(int track_num, double start, double len, bool all) {
 	// remove events in [time, time + len) and close gap
 	Alg_track_ptr tr = track(track_num);
 	tr->silence(start, len, all);
 }
 
-void Alg_seq::silence(double t, double len, bool all)
-{
-	for (int i = 0; i < tracks(); i++)
-	{
+void Alg_seq::silence(double t, double len, bool all) {
+	for (int i = 0; i < tracks(); i++) {
 		silence_track(i, t, len, all);
 	}
 }
 
-void Alg_seq::clear_track(int track_num, double start, double len, bool all)
-{
+void Alg_seq::clear_track(int track_num, double start, double len, bool all) {
 	// remove events in [time, time + len) and close gap
 	Alg_track_ptr tr = track(track_num);
 	tr->clear(start, len, all);
 }
 
-void Alg_seq::clear(double start, double len, bool all)
-{
+void Alg_seq::clear(double start, double len, bool all) {
 	// Fix parameters to fall within existing sequence
 	double dur = get_dur();
 	if (start > dur) return;  // nothing to cut
@@ -3175,8 +2779,7 @@ void Alg_seq::clear(double start, double len, bool all)
 	double ts_start = start;
 	double ts_end = start + len;
 	double ts_dur = dur;
-	if (units_are_seconds)
-	{
+	if (units_are_seconds) {
 		ts_start = time_map->time_to_beat(ts_start);
 		ts_end = time_map->time_to_beat(ts_end);
 		ts_dur = time_map->time_to_beat(ts_dur);
@@ -3191,21 +2794,17 @@ void Alg_seq::clear(double start, double len, bool all)
 }
 
 Alg_event_list_ptr Alg_seq::find_in_track(
-	int track_num, double t, double len, bool all, long channel_mask, long event_type_mask)
-{
+	int track_num, double t, double len, bool all, long channel_mask, long event_type_mask) {
 	return track(track_num)->find(t, len, all, channel_mask, event_type_mask);
 }
 
-Alg_seq::~Alg_seq()
-{
+Alg_seq::~Alg_seq() {
 	int i, j;
 	// Tracks does not delete Alg_events elements
-	for (j = 0; j < track_list.length(); j++)
-	{
+	for (j = 0; j < track_list.length(); j++) {
 		Alg_track& notes = track_list[j];
 		// Alg_events does not delete notes
-		for (i = 0; i < notes.length(); i++)
-		{
+		for (i = 0; i < notes.length(); i++) {
 			Alg_event_ptr event = notes[i];
 			delete event;
 		}
@@ -3217,8 +2816,7 @@ long Alg_seq::seek_time(double time, int track_num)
 {
 	long i;
 	Alg_events& notes = track_list[track_num];
-	for (i = 0; i < notes.length(); i++)
-	{
+	for (i = 0; i < notes.length(); i++) {
 		if (notes[i]->time > time) { break; }
 	}
 	return i;
@@ -3239,16 +2837,14 @@ bool Alg_seq::insert_beat(double time, double beat)
 }
 
 // input is time, return value is time
-double Alg_seq::nearest_beat_time(double time, double* beat)
-{
+double Alg_seq::nearest_beat_time(double time, double* beat) {
 	double b = time_map->time_to_beat(time);
 	b = time_sig.nearest_beat(b);
 	if (beat) *beat = b;
 	return time_map->beat_to_time(b);
 }
 
-bool Alg_seq::stretch_region(double b0, double b1, double dur)
-{
+bool Alg_seq::stretch_region(double b0, double b1, double dur) {
 	bool units_should_be_seconds = units_are_seconds;
 	convert_to_beats();
 	bool result = time_map->stretch_region(b0, b1, dur);
@@ -3256,8 +2852,7 @@ bool Alg_seq::stretch_region(double b0, double b1, double dur)
 	return result;
 }
 
-bool Alg_seq::insert_tempo(double bpm, double beat)
-{
+bool Alg_seq::insert_tempo(double bpm, double beat) {
 	double bps = bpm / 60.0; // convert to beats per second
 	// change the tempo at the given beat until the next beat event
 	if (beat < 0) return false;
@@ -3266,13 +2861,10 @@ bool Alg_seq::insert_tempo(double bpm, double beat)
 	long i = time_map->locate_time(time);
 	if (i >= time_map->beats.len || !within(time_map->beats[i].time, time, 0.000001)) { insert_beat(time, beat); }
 	// now i is index of beat where tempo will change
-	if (i == time_map->beats.len - 1)
-	{
+	if (i == time_map->beats.len - 1) {
 		time_map->last_tempo = bps;
 		time_map->last_tempo_flag = true;
-	}
-	else
-	{ // adjust all future beats
+	} else { // adjust all future beats
 		// compute the difference in beats
 		double diff = time_map->beats[i + 1].beat - time_map->beats[i].beat;
 		// convert beat difference to seconds at new tempo
@@ -3282,8 +2874,7 @@ bool Alg_seq::insert_tempo(double bpm, double beat)
 		// compute difference too
 		diff = diff - old_diff;
 		// apply new_diff to score and beats
-		while (i < time_map->beats.len)
-		{
+		while (i < time_map->beats.len) {
 			time_map->beats[i].time = time_map->beats[i].time + diff;
 			i++;
 		}
@@ -3327,8 +2918,7 @@ double Alg_seq::get_bar_len(double beat) { return time_sig.get_bar_len(beat); }
 
 void Alg_seq::set_time_sig(double beat, double num, double den) { time_sig.insert(beat, num, den); }
 
-void Alg_seq::beat_to_measure(double beat, long* measure, double* m_beat, double* num, double* den)
-{
+void Alg_seq::beat_to_measure(double beat, long* measure, double* m_beat, double* num, double* den) {
 	// return [measure, beat, num, den]
 	double m = 0; // measure number
 	double bpm;
@@ -3341,10 +2931,8 @@ void Alg_seq::beat_to_measure(double beat, long* measure, double* m_beat, double
 
 	if (beat < 0) beat = 0; // negative measures treated as zero
 
-	for (tsx = 0; tsx < time_sig.length(); tsx++)
-	{
-		if (time_sig[tsx].beat <= beat)
-		{
+	for (tsx = 0; tsx < time_sig.length(); tsx++) {
+		if (time_sig[tsx].beat <= beat) {
 			// round m up to an integer (but allow for a small
 			// numerical inaccuracy)
 			m = m + (long)(0.99 + (time_sig[tsx].beat - prev_beat) / bpm);
@@ -3352,9 +2940,7 @@ void Alg_seq::beat_to_measure(double beat, long* measure, double* m_beat, double
 			prev_beat = time_sig[tsx].beat;
 			prev_num = time_sig[tsx].num;
 			prev_den = time_sig[tsx].den;
-		}
-		else
-		{
+		} else {
 			m = m + (beat - prev_beat) / bpm;
 			*measure = (long)m;
 			*m_beat = (m - *measure) * bpm;
@@ -3366,8 +2952,7 @@ void Alg_seq::beat_to_measure(double beat, long* measure, double* m_beat, double
 	// if we didn't return yet, compute after last time signature
 	Alg_time_sig initial(0, 4, 4);
 	Alg_time_sig& prev = initial;
-	if (tsx > 0)
-	{ // use last time signature
+	if (tsx > 0) { // use last time signature
 		prev = time_sig[time_sig.length() - 1];
 	}
 	bpm = prev.num * 4 / prev.den;
@@ -3386,13 +2971,11 @@ void Alg_seq::set_events(Alg_event_ptr *events, long len, long max)
 }
 */
 
-void Alg_iterator::begin_seq(Alg_seq_ptr s, void* cookie, double offset)
-{
+void Alg_iterator::begin_seq(Alg_seq_ptr s, void* cookie, double offset) {
 	// keep an array of indexes into tracks
 	// printf("new pending\n");
 	int i;
-	for (i = 0; i < s->track_list.length(); i++)
-	{
+	for (i = 0; i < s->track_list.length(); i++) {
 		if (s->track_list[i].length() > 0) { insert(&(s->track_list[i]), 0, true, cookie, offset); }
 	}
 }
@@ -3405,11 +2988,9 @@ Alg_event_ptr Alg_iterator::next(bool* note_on, void** cookie_ptr, double* offse
 	if (!remove_next(events_ptr, index, on, cookie, offset, when)) { return NULL; }
 	if (note_on) *note_on = on;
 	Alg_event_ptr event = (*events_ptr)[index];
-	if (on)
-	{
+	if (on) {
 		if (note_off_flag && event->is_note()
-			&& (end_time == 0 || (*events_ptr)[index]->get_end_time() + offset < end_time))
-		{
+			&& (end_time == 0 || (*events_ptr)[index]->get_end_time() + offset < end_time)) {
 			// this was a note-on, so insert pending note-off
 			insert(events_ptr, index, false, cookie, offset);
 		}
@@ -3418,8 +2999,7 @@ Alg_event_ptr Alg_iterator::next(bool* note_on, void** cookie_ptr, double* offse
 		if (index + 1 < events_ptr->length()
 			&& (end_time == 0 || // zero means ignore end time
 								 // stop iterating when end time is reached
-				(*events_ptr)[index + 1]->time + offset < end_time))
-		{
+				(*events_ptr)[index + 1]->time + offset < end_time)) {
 			insert(events_ptr, index + 1, true, cookie, offset);
 		}
 	}
@@ -3428,20 +3008,17 @@ Alg_event_ptr Alg_iterator::next(bool* note_on, void** cookie_ptr, double* offse
 	return event;
 }
 
-void Alg_iterator::request_note_off()
-{
+void Alg_iterator::request_note_off() {
 	assert(index >= 0 && index < events_ptr->length());
 	insert(events_ptr, index, false, cookie, offset);
 }
 
 void Alg_iterator::end() {}
 
-void Alg_seq::merge_tracks()
-{
+void Alg_seq::merge_tracks() {
 	long sum = 0;
 	long i;
-	for (i = 0; i < track_list.length(); i++)
-	{
+	for (i = 0; i < track_list.length(); i++) {
 		sum = sum + track(i)->length();
 	}
 	// preallocate array for efficiency:
@@ -3451,8 +3028,7 @@ void Alg_seq::merge_tracks()
 	long notes_index = 0;
 
 	Alg_event_ptr event;
-	while ((event = iterator.next()))
-	{
+	while ((event = iterator.next())) {
 		notes[notes_index++] = event;
 	}
 	track_list.reset(); // don't need them any more
@@ -3461,8 +3037,7 @@ void Alg_seq::merge_tracks()
 	iterator.end();
 }
 
-void Alg_seq::set_in_use(bool flag)
-{
+void Alg_seq::set_in_use(bool flag) {
 	Alg_track::set_in_use(flag);
 	track_list.set_in_use(flag);
 }

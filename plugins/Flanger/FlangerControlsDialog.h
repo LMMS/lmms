@@ -29,8 +29,7 @@
 
 class FlangerControls;
 
-class FlangerControlsDialog : public EffectControlDialog
-{
+class FlangerControlsDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	FlangerControlsDialog(FlangerControls* controls);

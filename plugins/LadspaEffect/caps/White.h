@@ -30,8 +30,7 @@
 
 #include "dsp/White.h"
 
-class White : public Plugin
-{
+class White : public Plugin {
 public:
 	sample_t gain;
 

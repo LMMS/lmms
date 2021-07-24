@@ -29,8 +29,7 @@
 #include "lmms_basics.h"
 #include "lmms_export.h"
 
-class LMMS_EXPORT BufferManager
-{
+class LMMS_EXPORT BufferManager {
 public:
 	static void init(fpp_t framesPerPeriod);
 	static sampleFrame* acquire();

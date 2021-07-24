@@ -36,15 +36,12 @@ LadspaControl::LadspaControl(Model* _parent, port_desc_t* _port, bool _link)
 	, m_linkEnabledModel(_link, this, tr("Link channels"))
 	, m_toggledModel(false, this, m_port->name)
 	, m_knobModel(0, 0, 0, 1, this, m_port->name)
-	, m_tempoSyncKnobModel(0, 0, 0, 1, m_port->max, this, m_port->name)
-{
-	if (m_link)
-	{
+	, m_tempoSyncKnobModel(0, 0, 0, 1, m_port->max, this, m_port->name) {
+	if (m_link) {
 		connect(&m_linkEnabledModel, SIGNAL(dataChanged()), this, SLOT(linkStateChanged()), Qt::DirectConnection);
 	}
 
-	switch (m_port->data_type)
-	{
+	switch (m_port->data_type) {
 	case TOGGLED:
 		m_toggledModel.setInitValue(static_cast<bool>(m_port->def));
 		connect(&m_toggledModel, SIGNAL(dataChanged()), this, SLOT(ledChanged()));
@@ -89,10 +86,8 @@ LadspaControl::LadspaControl(Model* _parent, port_desc_t* _port, bool _link)
 
 LadspaControl::~LadspaControl() {}
 
-LADSPA_Data LadspaControl::value()
-{
-	switch (m_port->data_type)
-	{
+LADSPA_Data LadspaControl::value() {
+	switch (m_port->data_type) {
 	case TOGGLED: return static_cast<LADSPA_Data>(m_toggledModel.value());
 	case INTEGER:
 	case ENUM:
@@ -104,10 +99,8 @@ LADSPA_Data LadspaControl::value()
 	return 0;
 }
 
-ValueBuffer* LadspaControl::valueBuffer()
-{
-	switch (m_port->data_type)
-	{
+ValueBuffer* LadspaControl::valueBuffer() {
+	switch (m_port->data_type) {
 	case TOGGLED:
 	case INTEGER:
 	case ENUM: return NULL;
@@ -119,10 +112,8 @@ ValueBuffer* LadspaControl::valueBuffer()
 	return NULL;
 }
 
-void LadspaControl::setValue(LADSPA_Data _value)
-{
-	switch (m_port->data_type)
-	{
+void LadspaControl::setValue(LADSPA_Data _value) {
+	switch (m_port->data_type) {
 	case TOGGLED: m_toggledModel.setValue(static_cast<bool>(_value)); break;
 	case INTEGER:
 	case ENUM: m_knobModel.setValue(static_cast<int>(_value)); break;
@@ -132,13 +123,11 @@ void LadspaControl::setValue(LADSPA_Data _value)
 	}
 }
 
-void LadspaControl::saveSettings(QDomDocument& doc, QDomElement& parent, const QString& name)
-{
+void LadspaControl::saveSettings(QDomDocument& doc, QDomElement& parent, const QString& name) {
 	QDomElement e = doc.createElement(name);
 
 	if (m_link) { m_linkEnabledModel.saveSettings(doc, e, "link"); }
-	switch (m_port->data_type)
-	{
+	switch (m_port->data_type) {
 	case TOGGLED: m_toggledModel.saveSettings(doc, e, "data"); break;
 	case INTEGER:
 	case ENUM:
@@ -150,19 +139,16 @@ void LadspaControl::saveSettings(QDomDocument& doc, QDomElement& parent, const Q
 	parent.appendChild(e);
 }
 
-void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
-{
+void LadspaControl::loadSettings(const QDomElement& parent, const QString& name) {
 	QString dataModelName = "data";
 	QString linkModelName = "link";
 	QDomElement e = parent.namedItem(name).toElement();
 
-	if (e.isNull())
-	{
+	if (e.isNull()) {
 		// the port exists in the current effect, but not in the
 		// savefile => it's a new port, so load the default value
 		if (m_link) m_linkEnabledModel.setValue(m_linkEnabledModel.initValue());
-		switch (m_port->data_type)
-		{
+		switch (m_port->data_type) {
 		case TOGGLED: m_toggledModel.setValue(m_toggledModel.initValue()); break;
 		case INTEGER:
 		case ENUM:
@@ -170,14 +156,11 @@ void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
 		case TIME: m_tempoSyncKnobModel.setValue(m_tempoSyncKnobModel.initValue()); break;
 		default: printf("LadspaControl::loadSettings BAD BAD BAD\n"); break;
 		}
-	}
-	else
-	{
+	} else {
 
 		// COMPAT < 1.0.0: detect old data format where there's either no dedicated sub
 		// element or there's a direct sub element with automation link information
-		if (e.isNull() || e.hasAttribute("id"))
-		{
+		if (e.isNull() || e.hasAttribute("id")) {
 			dataModelName = name;
 			linkModelName = name + "link";
 			e = parent;
@@ -185,8 +168,7 @@ void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
 
 		if (m_link) { m_linkEnabledModel.loadSettings(e, linkModelName); }
 
-		switch (m_port->data_type)
-		{
+		switch (m_port->data_type) {
 		case TOGGLED: m_toggledModel.loadSettings(e, dataModelName); break;
 		case INTEGER:
 		case ENUM:
@@ -197,10 +179,8 @@ void LadspaControl::loadSettings(const QDomElement& parent, const QString& name)
 	}
 }
 
-void LadspaControl::linkControls(LadspaControl* _control)
-{
-	switch (m_port->data_type)
-	{
+void LadspaControl::linkControls(LadspaControl* _control) {
+	switch (m_port->data_type) {
 	case TOGGLED: BoolModel::linkModels(&m_toggledModel, _control->toggledModel()); break;
 	case INTEGER:
 	case ENUM:
@@ -214,15 +194,12 @@ void LadspaControl::ledChanged() { emit changed(m_port->port_id, static_cast<LAD
 
 void LadspaControl::knobChanged() { emit changed(m_port->port_id, static_cast<LADSPA_Data>(m_knobModel.value())); }
 
-void LadspaControl::tempoKnobChanged()
-{
+void LadspaControl::tempoKnobChanged() {
 	emit changed(m_port->port_id, static_cast<LADSPA_Data>(m_tempoSyncKnobModel.value()));
 }
 
-void LadspaControl::unlinkControls(LadspaControl* _control)
-{
-	switch (m_port->data_type)
-	{
+void LadspaControl::unlinkControls(LadspaControl* _control) {
+	switch (m_port->data_type) {
 	case TOGGLED: BoolModel::unlinkModels(&m_toggledModel, _control->toggledModel()); break;
 	case INTEGER:
 	case ENUM:

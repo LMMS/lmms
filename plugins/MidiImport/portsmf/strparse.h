@@ -1,12 +1,10 @@
 // strparse.h -- header for String_parse class
 
-class String_parse
-{
+class String_parse {
 public:
 	int pos;
 	std::string* str;
-	void init(std::string* s)
-	{
+	void init(std::string* s) {
 		str = s;
 		pos = 0;
 	}

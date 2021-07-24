@@ -30,8 +30,7 @@
 #include "Engine.h"
 #include "stereoenhancer_controls.h"
 
-class stereoEnhancerEffect : public Effect
-{
+class stereoEnhancerEffect : public Effect {
 public:
 	stereoEnhancerEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* _key);
 	virtual ~stereoEnhancerEffect();

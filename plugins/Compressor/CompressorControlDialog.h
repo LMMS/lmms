@@ -57,8 +57,7 @@ constexpr float COMP_NOISE_FLOOR = 0.000001; // -120 dbFs
 
 class CompressorControls;
 
-class CompressorControlDialog : public EffectControlDialog
-{
+class CompressorControlDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	CompressorControlDialog(CompressorControls* controls);

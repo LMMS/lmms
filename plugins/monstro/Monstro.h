@@ -155,8 +155,7 @@ const float PW_MAX = 100.0f - PW_MIN;
 class MonstroInstrument;
 class MonstroView;
 
-class MonstroSynth
-{
+class MonstroSynth {
 	MM_OPERATORS
 public:
 	MonstroSynth(MonstroInstrument* _i, NotePlayHandle* _nph);
@@ -183,10 +182,8 @@ private:
 	// oscillator.h and bandlimitedwave.h so we save some cpu by only checking lower bound
 	inline float lowBoundCheck(float ph) { return ph < 0.0f ? ph - (static_cast<int>(ph) - 1.0f) : ph; }
 
-	inline sample_t oscillate(int _wave, const float _ph, float _wavelen)
-	{
-		switch (_wave)
-		{
+	inline sample_t oscillate(int _wave, const float _ph, float _wavelen) {
+		switch (_wave) {
 		case WAVE_SINE: return Oscillator::sinSample(_ph); break;
 		case WAVE_TRI:
 			// return Oscillator::triangleSample( _ph );
@@ -281,8 +278,7 @@ private:
 	std::vector<float> m_env[2];
 };
 
-class MonstroInstrument : public Instrument
-{
+class MonstroInstrument : public Instrument {
 	Q_OBJECT
 
 #define setwavemodel(name) \
@@ -535,8 +531,7 @@ private:
 	friend class MonstroView;
 };
 
-class MonstroView : public InstrumentViewFixedSize
-{
+class MonstroView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	MonstroView(Instrument* _instrument, QWidget* _parent);

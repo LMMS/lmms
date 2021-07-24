@@ -27,8 +27,7 @@
 #include "MemoryManager.h"
 #include "Multi_Buffer.h"
 
-class Gb_Apu_Buffer : public Gb_Apu
-{
+class Gb_Apu_Buffer : public Gb_Apu {
 	MM_OPERATORS
 public:
 	Gb_Apu_Buffer();

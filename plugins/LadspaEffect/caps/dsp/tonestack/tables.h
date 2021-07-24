@@ -28,8 +28,7 @@
 #ifndef _TS_TABLES_H_
 #define _TS_TABLES_H_
 
-namespace DSP
-{
+namespace DSP {
 
 extern double ToneStackKS[];
 extern double ToneStackVS[];

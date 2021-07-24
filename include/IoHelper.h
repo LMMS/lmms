@@ -29,8 +29,7 @@
 #ifdef _WIN32
 #include <windows.h>
 
-std::wstring toWString(const std::string& s)
-{
+std::wstring toWString(const std::string& s) {
 	std::wstring ret;
 	int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s.data(), s.length(), nullptr, 0);
 	if (len == 0) { return ret; }
@@ -50,8 +49,7 @@ std::wstring toWString(const std::string& s)
 #define F_OPEN_UTF8(a, b) fopen((a).data(), b)
 #endif
 
-int fileToDescriptor(FILE* f, bool closeFile = true)
-{
+int fileToDescriptor(FILE* f, bool closeFile = true) {
 	int fh;
 	if (f == NULL) { return -1; }
 

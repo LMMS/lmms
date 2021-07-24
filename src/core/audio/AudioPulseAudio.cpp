@@ -35,8 +35,7 @@
 #include "Mixer.h"
 #include "gui_templates.h"
 
-static void stream_write_callback(pa_stream* s, size_t length, void* userdata)
-{
+static void stream_write_callback(pa_stream* s, size_t length, void* userdata) {
 	static_cast<AudioPulseAudio*>(userdata)->streamWriteCallback(s, length);
 }
 
@@ -46,8 +45,7 @@ AudioPulseAudio::AudioPulseAudio(bool& _success_ful, Mixer* _mixer)
 		_mixer)
 	, m_s(NULL)
 	, m_quit(false)
-	, m_convertEndian(false)
-{
+	, m_convertEndian(false) {
 	_success_ful = false;
 
 	m_sampleSpec.format = PA_SAMPLE_S16LE;
@@ -59,32 +57,26 @@ AudioPulseAudio::AudioPulseAudio(bool& _success_ful, Mixer* _mixer)
 
 AudioPulseAudio::~AudioPulseAudio() { stopProcessing(); }
 
-QString AudioPulseAudio::probeDevice()
-{
+QString AudioPulseAudio::probeDevice() {
 	QString dev = ConfigManager::inst()->value("audiopa", "device");
-	if (dev.isEmpty())
-	{
+	if (dev.isEmpty()) {
 		if (getenv("AUDIODEV") != NULL) { return getenv("AUDIODEV"); }
 		return "default";
 	}
 	return dev;
 }
 
-void AudioPulseAudio::startProcessing()
-{
+void AudioPulseAudio::startProcessing() {
 	if (!isRunning()) { start(QThread::HighPriority); }
 }
 
-void AudioPulseAudio::stopProcessing()
-{
+void AudioPulseAudio::stopProcessing() {
 	m_quit = true;
 	stopProcessingThread(this);
 }
 
-void AudioPulseAudio::applyQualitySettings()
-{
-	if (hqAudio())
-	{
+void AudioPulseAudio::applyQualitySettings() {
+	if (hqAudio()) {
 		//		setSampleRate( engine::mixer()->processingSampleRate() );
 	}
 
@@ -92,10 +84,8 @@ void AudioPulseAudio::applyQualitySettings()
 }
 
 /* This routine is called whenever the stream state changes */
-static void stream_state_callback(pa_stream* s, void* userdata)
-{
-	switch (pa_stream_get_state(s))
-	{
+static void stream_state_callback(pa_stream* s, void* userdata) {
+	switch (pa_stream_get_state(s)) {
 	case PA_STREAM_CREATING:
 	case PA_STREAM_TERMINATED: break;
 
@@ -107,11 +97,9 @@ static void stream_state_callback(pa_stream* s, void* userdata)
 }
 
 /* This is called whenever the context status changes */
-static void context_state_callback(pa_context* c, void* userdata)
-{
+static void context_state_callback(pa_context* c, void* userdata) {
 	AudioPulseAudio* _this = static_cast<AudioPulseAudio*>(userdata);
-	switch (pa_context_get_state(c))
-	{
+	switch (pa_context_get_state(c)) {
 	case PA_CONTEXT_CONNECTING:
 	case PA_CONTEXT_AUTHORIZING:
 	case PA_CONTEXT_SETTING_NAME: break;
@@ -151,19 +139,16 @@ static void context_state_callback(pa_context* c, void* userdata)
 	}
 }
 
-void AudioPulseAudio::run()
-{
+void AudioPulseAudio::run() {
 	pa_mainloop* mainLoop = pa_mainloop_new();
-	if (!mainLoop)
-	{
+	if (!mainLoop) {
 		qCritical("pa_mainloop_new() failed.\n");
 		return;
 	}
 	pa_mainloop_api* mainloop_api = pa_mainloop_get_api(mainLoop);
 
 	pa_context* context = pa_context_new(mainloop_api, "lmms");
-	if (context == NULL)
-	{
+	if (context == NULL) {
 		qCritical("pa_context_new() failed.");
 		return;
 	}
@@ -174,23 +159,19 @@ void AudioPulseAudio::run()
 	// connect the context
 	pa_context_connect(context, NULL, (pa_context_flags)0, NULL);
 
-	while (!m_connectedSemaphore.tryAcquire())
-	{
+	while (!m_connectedSemaphore.tryAcquire()) {
 		pa_mainloop_iterate(mainLoop, 1, NULL);
 	}
 
 	// run the main loop
-	if (m_connected)
-	{
+	if (m_connected) {
 		int ret = 0;
 		m_quit = false;
 		while (m_quit == false && pa_mainloop_iterate(mainLoop, 1, &ret) >= 0) {}
 
 		pa_stream_disconnect(m_s);
 		pa_stream_unref(m_s);
-	}
-	else
-	{
+	} else {
 		const fpp_t fpp = mixer()->framesPerPeriod();
 		surroundSampleFrame* temp = new surroundSampleFrame[fpp];
 		while (getNextBuffer(temp)) {}
@@ -203,18 +184,15 @@ void AudioPulseAudio::run()
 	pa_mainloop_free(mainLoop);
 }
 
-void AudioPulseAudio::streamWriteCallback(pa_stream* s, size_t length)
-{
+void AudioPulseAudio::streamWriteCallback(pa_stream* s, size_t length) {
 	const fpp_t fpp = mixer()->framesPerPeriod();
 	surroundSampleFrame* temp = new surroundSampleFrame[fpp];
 	int_sample_t* pcmbuf = (int_sample_t*)pa_xmalloc(fpp * channels() * sizeof(int_sample_t));
 
 	size_t fd = 0;
-	while (fd < length / 4 && m_quit == false)
-	{
+	while (fd < length / 4 && m_quit == false) {
 		const fpp_t frames = getNextBuffer(temp);
-		if (!frames)
-		{
+		if (!frames) {
 			m_quit = true;
 			break;
 		}
@@ -227,18 +205,15 @@ void AudioPulseAudio::streamWriteCallback(pa_stream* s, size_t length)
 	delete[] temp;
 }
 
-void AudioPulseAudio::signalConnected(bool connected)
-{
-	if (!m_connected)
-	{
+void AudioPulseAudio::signalConnected(bool connected) {
+	if (!m_connected) {
 		m_connected = connected;
 		m_connectedSemaphore.release();
 	}
 }
 
 AudioPulseAudio::setupWidget::setupWidget(QWidget* _parent)
-	: AudioDeviceSetupWidget(AudioPulseAudio::name(), _parent)
-{
+	: AudioDeviceSetupWidget(AudioPulseAudio::name(), _parent) {
 	m_device = new QLineEdit(AudioPulseAudio::probeDevice(), this);
 	m_device->setGeometry(10, 20, 160, 20);
 
@@ -259,8 +234,7 @@ AudioPulseAudio::setupWidget::setupWidget(QWidget* _parent)
 
 AudioPulseAudio::setupWidget::~setupWidget() { delete m_channels->model(); }
 
-void AudioPulseAudio::setupWidget::saveSettings()
-{
+void AudioPulseAudio::setupWidget::saveSettings() {
 	ConfigManager::inst()->setValue("audiopa", "device", m_device->text());
 	ConfigManager::inst()->setValue("audiopa", "channels", QString::number(m_channels->value<int>()));
 }

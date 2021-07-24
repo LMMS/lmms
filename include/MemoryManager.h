@@ -32,11 +32,9 @@
 
 #include "lmms_export.h"
 
-class LMMS_EXPORT MemoryManager
-{
+class LMMS_EXPORT MemoryManager {
 public:
-	struct ThreadGuard
-	{
+	struct ThreadGuard {
 		ThreadGuard();
 		~ThreadGuard();
 	};
@@ -45,13 +43,9 @@ public:
 	static void free(void* ptr);
 };
 
-template <typename T> struct MmAllocator
-{
+template <typename T> struct MmAllocator {
 	typedef T value_type;
-	template <class U> struct rebind
-	{
-		typedef MmAllocator<U> other;
-	};
+	template <class U> struct rebind { typedef MmAllocator<U> other; };
 
 	T* allocate(std::size_t n) { return reinterpret_cast<T*>(MemoryManager::alloc(sizeof(T) * n)); }
 

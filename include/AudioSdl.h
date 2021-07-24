@@ -42,19 +42,16 @@
 
 class QLineEdit;
 
-class AudioSdl : public AudioDevice
-{
+class AudioSdl : public AudioDevice {
 public:
 	AudioSdl(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioSdl();
 
-	inline static QString name()
-	{
+	inline static QString name() {
 		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "SDL (Simple DirectMedia Layer)");
 	}
 
-	class setupWidget : public AudioDeviceSetupWidget
-	{
+	class setupWidget : public AudioDeviceSetupWidget {
 	public:
 		setupWidget(QWidget* _parent);
 		~setupWidget() override;

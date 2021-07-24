@@ -41,8 +41,7 @@ class NotePlayHandle;
 typedef QList<NotePlayHandle*> NotePlayHandleList;
 typedef QList<const NotePlayHandle*> ConstNotePlayHandleList;
 
-class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
-{
+class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note {
 	MM_OPERATORS
 public:
 	void* m_pluginData;
@@ -52,8 +51,7 @@ public:
 	fpp_t m_fadeInLength;
 
 	// specifies origin of NotePlayHandle
-	enum Origins
-	{
+	enum Origins {
 		OriginPattern,		/*! playback of a note from a pattern */
 		OriginMidiInput,	/*! playback of a MIDI note input event */
 		OriginNoteStacking, /*! created by note stacking instrument function */
@@ -144,8 +142,7 @@ public:
 	/*! Returns whether note has children */
 	bool isMasterNote() const { return m_subNotes.size() > 0 || m_hadChildren; }
 
-	void setMasterNote()
-	{
+	void setMasterNote() {
 		m_hadChildren = true;
 		setUsesBuffer(false);
 	}
@@ -190,8 +187,7 @@ public:
 	void setFrequencyUpdate() { m_frequencyNeedsUpdate = true; }
 
 private:
-	class BaseDetuning
-	{
+	class BaseDetuning {
 		MM_OPERATORS
 	public:
 		BaseDetuning(DetuningHelper* detuning);
@@ -249,8 +245,7 @@ private:
 const int INITIAL_NPH_CACHE = 256;
 const int NPH_CACHE_INCREMENT = 16;
 
-class NotePlayHandleManager
-{
+class NotePlayHandleManager {
 	MM_OPERATORS
 public:
 	static void init();

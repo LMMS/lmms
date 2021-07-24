@@ -52,8 +52,7 @@ GuiApplication* GuiApplication::s_instance = nullptr;
 
 GuiApplication* GuiApplication::instance() { return s_instance; }
 
-GuiApplication::GuiApplication()
-{
+GuiApplication::GuiApplication() {
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if (!ConfigManager::inst()->hasWorkingDir()
 		&& QMessageBox::question(NULL, tr("Working directory"),
@@ -62,8 +61,7 @@ GuiApplication::GuiApplication()
 				  "later via Edit -> Settings.")
 				   .arg(ConfigManager::inst()->workingDir()),
 			   QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)
-			== QMessageBox::Yes)
-	{
+			== QMessageBox::Yes) {
 		ConfigManager::inst()->createWorkingDir();
 	}
 	// Init style and palette
@@ -157,8 +155,7 @@ GuiApplication::GuiApplication()
 
 GuiApplication::~GuiApplication() { s_instance = nullptr; }
 
-void GuiApplication::displayInitProgress(const QString& msg)
-{
+void GuiApplication::displayInitProgress(const QString& msg) {
 	Q_ASSERT(m_loadingProgressLabel != nullptr);
 
 	m_loadingProgressLabel->setText(msg);
@@ -167,37 +164,24 @@ void GuiApplication::displayInitProgress(const QString& msg)
 	qApp->processEvents();
 }
 
-void GuiApplication::childDestroyed(QObject* obj)
-{
+void GuiApplication::childDestroyed(QObject* obj) {
 	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
-	if (obj == m_mainWindow) { m_mainWindow = nullptr; }
-	else if (obj == m_fxMixerView)
-	{
+	if (obj == m_mainWindow) {
+		m_mainWindow = nullptr;
+	} else if (obj == m_fxMixerView) {
 		m_fxMixerView = nullptr;
-	}
-	else if (obj == m_songEditor)
-	{
+	} else if (obj == m_songEditor) {
 		m_songEditor = nullptr;
-	}
-	else if (obj == m_automationEditor)
-	{
+	} else if (obj == m_automationEditor) {
 		m_automationEditor = nullptr;
-	}
-	else if (obj == m_bbEditor)
-	{
+	} else if (obj == m_bbEditor) {
 		m_bbEditor = nullptr;
-	}
-	else if (obj == m_pianoRoll)
-	{
+	} else if (obj == m_pianoRoll) {
 		m_pianoRoll = nullptr;
-	}
-	else if (obj == m_projectNotes)
-	{
+	} else if (obj == m_projectNotes) {
 		m_projectNotes = nullptr;
-	}
-	else if (obj == m_controllerRackView)
-	{
+	} else if (obj == m_controllerRackView) {
 		m_controllerRackView = nullptr;
 	}
 }
@@ -206,13 +190,11 @@ void GuiApplication::childDestroyed(QObject* obj)
 /*!
  * @brief Returns the Windows System font.
  */
-QFont GuiApplication::getWin32SystemFont()
-{
+QFont GuiApplication::getWin32SystemFont() {
 	NONCLIENTMETRICS metrics = {sizeof(NONCLIENTMETRICS)};
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &metrics, 0);
 	int pointSize = metrics.lfMessageFont.lfHeight;
-	if (pointSize < 0)
-	{
+	if (pointSize < 0) {
 		// height is in pixels, convert to points
 		HDC hDC = GetDC(NULL);
 		pointSize = MulDiv(abs(pointSize), 72, GetDeviceCaps(hDC, LOGPIXELSY));

@@ -31,8 +31,7 @@
 
 class FlangerEffect;
 
-class FlangerControls : public EffectControls
-{
+class FlangerControls : public EffectControls {
 	Q_OBJECT
 public:
 	FlangerControls(FlangerEffect* effect);

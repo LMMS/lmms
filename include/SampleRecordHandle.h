@@ -36,8 +36,7 @@ class SampleBuffer;
 class SampleTCO;
 class Track;
 
-class SampleRecordHandle : public PlayHandle
-{
+class SampleRecordHandle : public PlayHandle {
 public:
 	SampleRecordHandle(SampleTCO* tco);
 	virtual ~SampleRecordHandle();

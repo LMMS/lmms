@@ -84,13 +84,10 @@ TrackOperationsWidget::TrackOperationsWidget(TrackView* parent)
 	m_soloBtn->setInactiveGraphic(embed::getIconPixmap("led_off"));
 	m_soloBtn->setCheckable(true);
 
-	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
-	{
+	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt()) {
 		m_muteBtn->move(46, 0);
 		m_soloBtn->move(46, 16);
-	}
-	else
-	{
+	} else {
 		m_muteBtn->move(46, 8);
 		m_soloBtn->move(62, 8);
 	}
@@ -122,18 +119,14 @@ TrackOperationsWidget::~TrackOperationsWidget() {}
  *
  *  \param me The mouse event to respond to.
  */
-void TrackOperationsWidget::mousePressEvent(QMouseEvent* me)
-{
+void TrackOperationsWidget::mousePressEvent(QMouseEvent* me) {
 	if (me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier
-		&& m_trackView->getTrack()->type() != Track::BBTrack)
-	{
+		&& m_trackView->getTrack()->type() != Track::BBTrack) {
 		DataFile dataFile(DataFile::DragNDropData);
 		m_trackView->getTrack()->saveState(dataFile, dataFile.content());
 		new StringPairDrag(QString("track_%1").arg(m_trackView->getTrack()->type()), dataFile.toString(),
 			m_trackView->getTrackSettingsWidget()->grab(), this);
-	}
-	else if (me->button() == Qt::LeftButton)
-	{
+	} else if (me->button() == Qt::LeftButton) {
 		// track-widget (parent-widget) initiates track-move
 		me->ignore();
 	}
@@ -150,22 +143,20 @@ void TrackOperationsWidget::mousePressEvent(QMouseEvent* me)
  *  \todo Flesh this out a bit - is it correct?
  *  \param pe The paint event to respond to
  */
-void TrackOperationsWidget::paintEvent(QPaintEvent* pe)
-{
+void TrackOperationsWidget::paintEvent(QPaintEvent* pe) {
 	QPainter p(this);
 
 	p.fillRect(rect(), palette().brush(QPalette::Background));
 
-	if (m_trackView->getTrack()->useColor() && !m_trackView->getTrack()->getMutedModel()->value())
-	{
+	if (m_trackView->getTrack()->useColor() && !m_trackView->getTrack()->getMutedModel()->value()) {
 		QRect coloredRect(0, 0, 10, m_trackView->getTrack()->getHeight());
 
 		p.fillRect(coloredRect, m_trackView->getTrack()->color());
 	}
 
-	if (m_trackView->isMovingTrack() == false) { p.drawPixmap(2, 2, embed::getIconPixmap("track_op_grip")); }
-	else
-	{
+	if (m_trackView->isMovingTrack() == false) {
+		p.drawPixmap(2, 2, embed::getIconPixmap("track_op_grip"));
+	} else {
 		p.drawPixmap(2, 2, embed::getIconPixmap("track_op_grip_c"));
 	}
 }
@@ -173,8 +164,7 @@ void TrackOperationsWidget::paintEvent(QPaintEvent* pe)
 /*! \brief Clone this track
  *
  */
-void TrackOperationsWidget::cloneTrack()
-{
+void TrackOperationsWidget::cloneTrack() {
 	TrackContainerView* tcView = m_trackView->trackContainerView();
 
 	Track* newTrack = m_trackView->getTrack()->clone();
@@ -182,16 +172,14 @@ void TrackOperationsWidget::cloneTrack()
 
 	int index = tcView->trackViews().indexOf(m_trackView);
 	int i = tcView->trackViews().size();
-	while (i != index + 1)
-	{
+	while (i != index + 1) {
 		tcView->moveTrackView(newTrackView, i - 1);
 		i--;
 	}
 }
 
 /*! \brief Clear this track - clears all TCOs from the track */
-void TrackOperationsWidget::clearTrack()
-{
+void TrackOperationsWidget::clearTrack() {
 	Track* t = m_trackView->getTrack();
 	t->addJournalCheckPoint();
 	t->lock();
@@ -204,8 +192,7 @@ void TrackOperationsWidget::clearTrack()
  */
 void TrackOperationsWidget::removeTrack() { emit trackRemovalScheduled(m_trackView); }
 
-void TrackOperationsWidget::changeTrackColor()
-{
+void TrackOperationsWidget::changeTrackColor() {
 	QColor new_color
 		= ColorChooser(this).withPalette(ColorChooser::Palette::Track)->getColor(m_trackView->getTrack()->color());
 
@@ -217,15 +204,13 @@ void TrackOperationsWidget::changeTrackColor()
 	update();
 }
 
-void TrackOperationsWidget::resetTrackColor()
-{
+void TrackOperationsWidget::resetTrackColor() {
 	emit colorReset();
 	Engine::getSong()->setModified();
 	update();
 }
 
-void TrackOperationsWidget::randomTrackColor()
-{
+void TrackOperationsWidget::randomTrackColor() {
 	QColor buffer = ColorChooser::getPalette(ColorChooser::Palette::Track)[rand() % 48];
 
 	emit colorChanged(buffer);
@@ -233,8 +218,7 @@ void TrackOperationsWidget::randomTrackColor()
 	update();
 }
 
-void TrackOperationsWidget::useTrackColor()
-{
+void TrackOperationsWidget::useTrackColor() {
 	emit colorParented();
 	Engine::getSong()->setModified();
 }
@@ -247,29 +231,24 @@ void TrackOperationsWidget::useTrackColor()
  *  on all TCOs (same should be added for sample tracks when
  *  sampletrack recording is implemented)
  */
-void TrackOperationsWidget::updateMenu()
-{
+void TrackOperationsWidget::updateMenu() {
 	QMenu* toMenu = m_trackOps->menu();
 	toMenu->clear();
 	toMenu->addAction(embed::getIconPixmap("edit_copy", 16, 16), tr("Clone this track"), this, SLOT(cloneTrack()));
 	toMenu->addAction(embed::getIconPixmap("cancel", 16, 16), tr("Remove this track"), this, SLOT(removeTrack()));
 
-	if (!m_trackView->trackContainerView()->fixedTCOs())
-	{
+	if (!m_trackView->trackContainerView()->fixedTCOs()) {
 		toMenu->addAction(tr("Clear this track"), this, SLOT(clearTrack()));
 	}
-	if (QMenu* fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
-	{
+	if (QMenu* fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel"))) {
 		toMenu->addMenu(fxMenu);
 	}
 
-	if (InstrumentTrackView* trackView = dynamic_cast<InstrumentTrackView*>(m_trackView))
-	{
+	if (InstrumentTrackView* trackView = dynamic_cast<InstrumentTrackView*>(m_trackView)) {
 		toMenu->addSeparator();
 		toMenu->addMenu(trackView->midiMenu());
 	}
-	if (dynamic_cast<AutomationTrackView*>(m_trackView))
-	{
+	if (dynamic_cast<AutomationTrackView*>(m_trackView)) {
 		toMenu->addAction(tr("Turn all recording on"), this, SLOT(recordingOn()));
 		toMenu->addAction(tr("Turn all recording off"), this, SLOT(recordingOff()));
 	}
@@ -282,13 +261,10 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction(embed::getIconPixmap("colorize"), tr("Clear clip colors"), this, SLOT(useTrackColor()));
 }
 
-void TrackOperationsWidget::toggleRecording(bool on)
-{
+void TrackOperationsWidget::toggleRecording(bool on) {
 	AutomationTrackView* atv = dynamic_cast<AutomationTrackView*>(m_trackView);
-	if (atv)
-	{
-		for (TrackContentObject* tco : atv->getTrack()->getTCOs())
-		{
+	if (atv) {
+		for (TrackContentObject* tco : atv->getTrack()->getTCOs()) {
 			AutomationPattern* ap = dynamic_cast<AutomationPattern*>(tco);
 			if (ap) { ap->setRecording(on); }
 		}

@@ -38,8 +38,7 @@ class QVBoxLayout;
 class ControllerView;
 class Controller;
 
-class ControllerRackView : public QWidget, public SerializingObject
-{
+class ControllerRackView : public QWidget, public SerializingObject {
 	Q_OBJECT
 public:
 	ControllerRackView();

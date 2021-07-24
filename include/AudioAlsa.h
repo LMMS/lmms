@@ -37,21 +37,17 @@
 
 #include "AudioDevice.h"
 
-class AudioAlsa : public QThread, public AudioDevice
-{
+class AudioAlsa : public QThread, public AudioDevice {
 	Q_OBJECT
 public:
 	/**
 	 * @brief Contains the relevant information about available ALSA devices
 	 */
-	class DeviceInfo
-	{
+	class DeviceInfo {
 	public:
 		DeviceInfo(QString const& deviceName, QString const& deviceDescription)
 			: m_deviceName(deviceName)
-			, m_deviceDescription(deviceDescription)
-		{
-		}
+			, m_deviceDescription(deviceDescription) {}
 		~DeviceInfo() {}
 
 		QString const& getDeviceName() const { return m_deviceName; }
@@ -68,8 +64,7 @@ public:
 	AudioAlsa(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioAlsa();
 
-	inline static QString name()
-	{
+	inline static QString name() {
 		return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "ALSA (Advanced Linux Sound Architecture)");
 	}
 

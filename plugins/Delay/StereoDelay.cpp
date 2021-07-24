@@ -30,8 +30,7 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 
-StereoDelay::StereoDelay(int maxTime, int sampleRate)
-{
+StereoDelay::StereoDelay(int maxTime, int sampleRate) {
 	m_buffer = 0;
 	m_maxTime = maxTime;
 	m_maxLength = maxTime * sampleRate;
@@ -42,13 +41,11 @@ StereoDelay::StereoDelay(int maxTime, int sampleRate)
 	setSampleRate(sampleRate);
 }
 
-StereoDelay::~StereoDelay()
-{
+StereoDelay::~StereoDelay() {
 	if (m_buffer) { delete[] m_buffer; }
 }
 
-void StereoDelay::tick(sampleFrame& frame)
-{
+void StereoDelay::tick(sampleFrame& frame) {
 	m_writeIndex = (m_writeIndex + 1) % (int)m_maxLength;
 	int readIndex = m_writeIndex - m_length;
 	if (readIndex < 0) { readIndex += m_maxLength; }
@@ -60,14 +57,12 @@ void StereoDelay::tick(sampleFrame& frame)
 	frame[1] = rOut;
 }
 
-void StereoDelay::setSampleRate(int sampleRate)
-{
+void StereoDelay::setSampleRate(int sampleRate) {
 	if (m_buffer) { delete[] m_buffer; }
 
 	int bufferSize = (int)(sampleRate * m_maxTime);
 	m_buffer = new sampleFrame[bufferSize];
-	for (int i = 0; i < bufferSize; i++)
-	{
+	for (int i = 0; i < bufferSize; i++) {
 		m_buffer[i][0] = 0.0;
 		m_buffer[i][1] = 0.0;
 	}

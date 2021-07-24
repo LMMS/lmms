@@ -27,14 +27,12 @@
 
 #include <QPushButton>
 
-class TabButton : public QPushButton
-{
+class TabButton : public QPushButton {
 	Q_OBJECT
 public:
 	TabButton(const QString& _text, int _id, QWidget* _parent)
 		: QPushButton(_text, _parent)
-		, m_id(_id)
-	{
+		, m_id(_id) {
 		setCheckable(true);
 		connect(this, SIGNAL(clicked()), this, SLOT(slotClicked()));
 	}

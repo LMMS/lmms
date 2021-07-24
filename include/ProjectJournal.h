@@ -34,8 +34,7 @@
 class JournallingObject;
 
 //! @warning many parts of this class may be rewritten soon
-class ProjectJournal
-{
+class ProjectJournal {
 public:
 	static const int MAX_UNDO_STATES;
 
@@ -74,8 +73,7 @@ public:
 
 	void clearJournal();
 	void stopAllJournalling();
-	JournallingObject* journallingObject(const jo_id_t _id)
-	{
+	JournallingObject* journallingObject(const jo_id_t _id) {
 		if (m_joIDs.contains(_id)) { return m_joIDs[_id]; }
 		return NULL;
 	}
@@ -83,13 +81,10 @@ public:
 private:
 	typedef QHash<jo_id_t, JournallingObject*> JoIdMap;
 
-	struct CheckPoint
-	{
+	struct CheckPoint {
 		CheckPoint(jo_id_t initID = 0, const DataFile& initData = DataFile(DataFile::JournalData))
 			: joID(initID)
-			, data(initData)
-		{
-		}
+			, data(initData) {}
 		jo_id_t joID;
 		DataFile data;
 	};

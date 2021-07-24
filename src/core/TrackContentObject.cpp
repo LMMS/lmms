@@ -46,8 +46,7 @@ TrackContentObject::TrackContentObject(Track* track)
 	, m_mutedModel(false, this, tr("Mute"))
 	, m_selectViewOnCreate(false)
 	, m_color(128, 128, 128)
-	, m_useCustomClipColor(false)
-{
+	, m_useCustomClipColor(false) {
 	if (getTrack()) { getTrack()->addTCO(this); }
 	setJournalling(false);
 	movePosition(0);
@@ -60,8 +59,7 @@ TrackContentObject::TrackContentObject(Track* track)
  *  Destroys the given track content object.
  *
  */
-TrackContentObject::~TrackContentObject()
-{
+TrackContentObject::~TrackContentObject() {
 	emit destroyedTCO();
 
 	if (getTrack()) { getTrack()->removeTCO(this); }
@@ -74,11 +72,9 @@ TrackContentObject::~TrackContentObject()
  *
  * \param _pos The new position of the track content object.
  */
-void TrackContentObject::movePosition(const TimePos& pos)
-{
+void TrackContentObject::movePosition(const TimePos& pos) {
 	TimePos newPos = qMax(0, pos.getTicks());
-	if (m_startPosition != newPos)
-	{
+	if (m_startPosition != newPos) {
 		Engine::mixer()->requestChangeInModel();
 		m_startPosition = newPos;
 		Engine::mixer()->doneChangeInModel();
@@ -94,15 +90,13 @@ void TrackContentObject::movePosition(const TimePos& pos)
  *
  * \param _length The new length of the track content object.
  */
-void TrackContentObject::changeLength(const TimePos& length)
-{
+void TrackContentObject::changeLength(const TimePos& length) {
 	m_length = length;
 	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }
 
-bool TrackContentObject::comparePosition(const TrackContentObject* a, const TrackContentObject* b)
-{
+bool TrackContentObject::comparePosition(const TrackContentObject* a, const TrackContentObject* b) {
 	return a->startPosition() < b->startPosition();
 }
 
@@ -110,11 +104,9 @@ bool TrackContentObject::comparePosition(const TrackContentObject* a, const Trac
  *
  *  This method copies the state of a TCO to another TCO
  */
-void TrackContentObject::copyStateTo(TrackContentObject* src, TrackContentObject* dst)
-{
+void TrackContentObject::copyStateTo(TrackContentObject* src, TrackContentObject* dst) {
 	// If the node names match we copy the state
-	if (src->nodeName() == dst->nodeName())
-	{
+	if (src->nodeName() == dst->nodeName()) {
 		QDomDocument doc;
 		QDomElement parent = doc.createElement("StateCopy");
 		src->saveState(doc, parent);
@@ -136,8 +128,7 @@ void TrackContentObject::copyStateTo(TrackContentObject* src, TrackContentObject
  *
  * \param _je The journal entry to undo
  */
-void TrackContentObject::toggleMute()
-{
+void TrackContentObject::toggleMute() {
 	m_mutedModel.setValue(!m_mutedModel.value());
 	emit dataChanged();
 }
@@ -147,13 +138,11 @@ TimePos TrackContentObject::startTimeOffset() const { return m_startTimeOffset; 
 void TrackContentObject::setStartTimeOffset(const TimePos& startTimeOffset) { m_startTimeOffset = startTimeOffset; }
 
 // Update TCO color if it follows the track color
-void TrackContentObject::updateColor()
-{
+void TrackContentObject::updateColor() {
 	if (!m_useCustomClipColor) { emit trackColorChanged(); }
 }
 
-void TrackContentObject::useCustomClipColor(bool b)
-{
+void TrackContentObject::useCustomClipColor(bool b) {
 	m_useCustomClipColor = b;
 	updateColor();
 }

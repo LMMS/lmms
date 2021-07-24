@@ -37,30 +37,26 @@
 #include "ladspa_port_dialog.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "LADSPA Plugin Browser",
-		QT_TRANSLATE_NOOP("PluginBrowser", "List installed LADSPA plugins"),
-		"Danny McRae <khjklujn/at/users.sourceforge.net>", 0x0100, Plugin::Tool, new PluginPixmapLoader("logo"), NULL,
-		NULL};
+Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "LADSPA Plugin Browser",
+	QT_TRANSLATE_NOOP("PluginBrowser", "List installed LADSPA plugins"),
+	"Danny McRae <khjklujn/at/users.sourceforge.net>", 0x0100, Plugin::Tool, new PluginPixmapLoader("logo"), NULL,
+	NULL};
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data) { return new ladspaBrowser; }
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data) { return new ladspaBrowser; }
 }
 
 ladspaBrowser::ladspaBrowser()
-	: ToolPlugin(&ladspabrowser_plugin_descriptor, NULL)
-{
-}
+	: ToolPlugin(&ladspabrowser_plugin_descriptor, NULL) {}
 
 ladspaBrowser::~ladspaBrowser() {}
 
 QString ladspaBrowser::nodeName() const { return ladspabrowser_plugin_descriptor.name; }
 
 ladspaBrowserView::ladspaBrowserView(ToolPlugin* _tool)
-	: ToolPluginView(_tool)
-{
+	: ToolPluginView(_tool) {
 	QHBoxLayout* hlayout = new QHBoxLayout(this);
 	hlayout->setSpacing(0);
 	hlayout->setMargin(0);
@@ -94,8 +90,7 @@ ladspaBrowserView::ladspaBrowserView(ToolPlugin* _tool)
 	hlayout->addStretch();
 
 	hide();
-	if (parentWidget())
-	{
+	if (parentWidget()) {
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -108,8 +103,7 @@ ladspaBrowserView::ladspaBrowserView(ToolPlugin* _tool)
 
 ladspaBrowserView::~ladspaBrowserView() {}
 
-QWidget* ladspaBrowserView::createTab(QWidget* _parent, const QString& _txt, ladspaPluginType _type)
-{
+QWidget* ladspaBrowserView::createTab(QWidget* _parent, const QString& _txt, ladspaPluginType _type) {
 	QWidget* tab = new QWidget(_parent);
 	tab->setFixedSize(500, 400);
 	QVBoxLayout* layout = new QVBoxLayout(tab);
@@ -133,8 +127,7 @@ QWidget* ladspaBrowserView::createTab(QWidget* _parent, const QString& _txt, lad
 	return tab;
 }
 
-void ladspaBrowserView::showPorts(const ladspa_key_t& _key)
-{
+void ladspaBrowserView::showPorts(const ladspa_key_t& _key) {
 	ladspaPortDialog ports(_key);
 	ports.exec();
 }

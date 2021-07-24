@@ -35,8 +35,7 @@
 class QMouseEvent;
 
 // Widget that displays a spectrum waterfall (spectrogram) and time labels.
-class SaWaterfallView : public QWidget
-{
+class SaWaterfallView : public QWidget {
 	Q_OBJECT
 public:
 	explicit SaWaterfallView(SaControls* controls, SaProcessor* processor, QWidget* _parent = 0);

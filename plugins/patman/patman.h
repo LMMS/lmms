@@ -42,8 +42,7 @@ class PixmapButton;
 #define MODES_ENVELOPE (1 << 6)
 #define MODES_CLAMPED (1 << 7)
 
-class patmanInstrument : public Instrument
-{
+class patmanInstrument : public Instrument {
 	Q_OBJECT
 public:
 	patmanInstrument(InstrumentTrack* _track);
@@ -67,8 +66,7 @@ public slots:
 	void setFile(const QString& _patch_file, bool _rename = true);
 
 private:
-	typedef struct
-	{
+	typedef struct {
 		MM_OPERATORS
 		SampleBuffer::handleState* state;
 		bool tuned;
@@ -80,15 +78,7 @@ private:
 	BoolModel m_loopedModel;
 	BoolModel m_tunedModel;
 
-	enum LoadErrors
-	{
-		LoadOK,
-		LoadOpen,
-		LoadNotGUS,
-		LoadInstruments,
-		LoadLayers,
-		LoadIO
-	};
+	enum LoadErrors { LoadOK, LoadOpen, LoadNotGUS, LoadInstruments, LoadLayers, LoadIO };
 
 	LoadErrors loadPatch(const QString& _filename);
 	void unloadCurrentPatch(void);
@@ -101,8 +91,7 @@ signals:
 	void fileChanged(void);
 };
 
-class PatmanView : public InstrumentViewFixedSize
-{
+class PatmanView : public InstrumentViewFixedSize {
 	Q_OBJECT
 public:
 	PatmanView(Instrument* _instrument, QWidget* _parent);

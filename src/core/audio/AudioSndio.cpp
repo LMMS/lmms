@@ -50,20 +50,18 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 	: AudioDevice(qBound<ch_cnt_t>(DEFAULT_CHANNELS, ConfigManager::inst()->value("audiosndio", "channels").toInt(),
 					  SURROUND_CHANNELS),
 		_mixer)
-	, m_convertEndian(false)
-{
+	, m_convertEndian(false) {
 	_success_ful = false;
 
 	QString dev = ConfigManager::inst()->value("audiosndio", "device");
 
-	if (dev == "") { m_hdl = sio_open(NULL, SIO_PLAY, 0); }
-	else
-	{
+	if (dev == "") {
+		m_hdl = sio_open(NULL, SIO_PLAY, 0);
+	} else {
 		m_hdl = sio_open(dev.toLatin1().constData(), SIO_PLAY, 0);
 	}
 
-	if (m_hdl == NULL)
-	{
+	if (m_hdl == NULL) {
 		printf("sndio: failed opening audio-device\n");
 		return;
 	}
@@ -81,26 +79,22 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 
 	struct sio_par reqpar = m_par;
 
-	if (!sio_setpar(m_hdl, &m_par))
-	{
+	if (!sio_setpar(m_hdl, &m_par)) {
 		printf("sndio: sio_setpar failed\n");
 		return;
 	}
-	if (!sio_getpar(m_hdl, &m_par))
-	{
+	if (!sio_getpar(m_hdl, &m_par)) {
 		printf("sndio: sio_getpar failed\n");
 		return;
 	}
 
 	if (reqpar.pchan != m_par.pchan || reqpar.bits != m_par.bits || reqpar.le != m_par.le
-		|| (::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100) / reqpar.rate > 2)
-	{
+		|| (::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100) / reqpar.rate > 2) {
 		printf("sndio: returned params not as requested\n");
 		return;
 	}
 
-	if (!sio_start(m_hdl))
-	{
+	if (!sio_start(m_hdl)) {
 		printf("sndio: sio_start failed\n");
 		return;
 	}
@@ -108,27 +102,22 @@ AudioSndio::AudioSndio(bool& _success_ful, Mixer* _mixer)
 	_success_ful = true;
 }
 
-AudioSndio::~AudioSndio()
-{
+AudioSndio::~AudioSndio() {
 	stopProcessing();
-	if (m_hdl != NULL)
-	{
+	if (m_hdl != NULL) {
 		sio_close(m_hdl);
 		m_hdl = NULL;
 	}
 }
 
-void AudioSndio::startProcessing(void)
-{
+void AudioSndio::startProcessing(void) {
 	if (!isRunning()) { start(QThread::HighPriority); }
 }
 
 void AudioSndio::stopProcessing(void) { stopProcessingThread(this); }
 
-void AudioSndio::applyQualitySettings(void)
-{
-	if (hqAudio())
-	{
+void AudioSndio::applyQualitySettings(void) {
+	if (hqAudio()) {
 		setSampleRate(Engine::mixer()->processingSampleRate());
 
 		/* change sample rate to sampleRate() */
@@ -137,13 +126,11 @@ void AudioSndio::applyQualitySettings(void)
 	AudioDevice::applyQualitySettings();
 }
 
-void AudioSndio::run(void)
-{
+void AudioSndio::run(void) {
 	surroundSampleFrame* temp = new surroundSampleFrame[mixer()->framesPerPeriod()];
 	int_sample_t* outbuf = new int_sample_t[mixer()->framesPerPeriod() * channels()];
 
-	while (true)
-	{
+	while (true) {
 		const fpp_t frames = getNextBuffer(temp);
 		if (!frames) { break; }
 
@@ -156,8 +143,7 @@ void AudioSndio::run(void)
 }
 
 AudioSndio::setupWidget::setupWidget(QWidget* _parent)
-	: AudioDeviceSetupWidget(AudioSndio::name(), _parent)
-{
+	: AudioDeviceSetupWidget(AudioSndio::name(), _parent) {
 	m_device = new QLineEdit("", this);
 	m_device->setGeometry(10, 20, 160, 20);
 
@@ -178,8 +164,7 @@ AudioSndio::setupWidget::setupWidget(QWidget* _parent)
 
 AudioSndio::setupWidget::~setupWidget() {}
 
-void AudioSndio::setupWidget::saveSettings(void)
-{
+void AudioSndio::setupWidget::saveSettings(void) {
 	ConfigManager::inst()->setValue("audiosndio", "device", m_device->text());
 	ConfigManager::inst()->setValue("audiosndio", "channels", QString::number(m_channels->value<int>()));
 }

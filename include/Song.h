@@ -46,26 +46,16 @@ const bpm_t DefaultTempo = 140;
 const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerBar;
 
-class LMMS_EXPORT Song : public TrackContainer
-{
+class LMMS_EXPORT Song : public TrackContainer {
 	Q_OBJECT
 	mapPropertyFromModel(int, getTempo, setTempo, m_tempoModel);
 	mapPropertyFromModel(int, masterPitch, setMasterPitch, m_masterPitchModel);
 	mapPropertyFromModel(int, masterVolume, setMasterVolume, m_masterVolumeModel);
 
 public:
-	enum PlayModes
-	{
-		Mode_None,
-		Mode_PlaySong,
-		Mode_PlayBB,
-		Mode_PlayPattern,
-		Mode_PlayAutomationPattern,
-		Mode_Count
-	};
+	enum PlayModes { Mode_None, Mode_PlaySong, Mode_PlayBB, Mode_PlayPattern, Mode_PlayAutomationPattern, Mode_Count };
 
-	struct SaveOptions
-	{
+	struct SaveOptions {
 		/**
 		 * Should we discard MIDI ControllerConnections from project files?
 		 */
@@ -75,8 +65,7 @@ public:
 		 */
 		BoolModel saveAsProjectBundle{false};
 
-		void setDefaultOptions()
-		{
+		void setDefaultOptions() {
 			discardMIDIConnections.setValue(false);
 			saveAsProjectBundle.setValue(false);
 		}
@@ -87,15 +76,12 @@ public:
 	bool hasErrors();
 	QString errorSummary();
 
-	class PlayPos : public TimePos
-	{
+	class PlayPos : public TimePos {
 	public:
 		PlayPos(const int abs = 0)
 			: TimePos(abs)
 			, m_timeLine(NULL)
-			, m_currentFrame(0.0f)
-		{
-		}
+			, m_currentFrame(0.0f) {}
 		inline void setCurrentFrame(const float f) { m_currentFrame = f; }
 		inline float currentFrame() const { return m_currentFrame; }
 		inline void setJumped(const bool jumped) { m_jumped = jumped; }
@@ -115,26 +101,22 @@ public:
 
 	inline int getMilliseconds(PlayModes playMode) const { return m_elapsedMilliSeconds[playMode]; }
 
-	inline void setToTime(TimePos const& pos)
-	{
+	inline void setToTime(TimePos const& pos) {
 		m_elapsedMilliSeconds[m_playMode] = pos.getTimeInMilliseconds(getTempo());
 		m_playPos[m_playMode].setTicks(pos.getTicks());
 	}
 
-	inline void setToTime(TimePos const& pos, PlayModes playMode)
-	{
+	inline void setToTime(TimePos const& pos, PlayModes playMode) {
 		m_elapsedMilliSeconds[playMode] = pos.getTimeInMilliseconds(getTempo());
 		m_playPos[playMode].setTicks(pos.getTicks());
 	}
 
-	inline void setToTimeByTicks(tick_t ticks)
-	{
+	inline void setToTimeByTicks(tick_t ticks) {
 		m_elapsedMilliSeconds[m_playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		m_playPos[m_playMode].setTicks(ticks);
 	}
 
-	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode)
-	{
+	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode) {
 		m_elapsedMilliSeconds[playMode] = TimePos::ticksToMilliseconds(ticks, getTempo());
 		m_playPos[playMode].setTicks(ticks);
 	}
@@ -161,8 +143,7 @@ public:
 
 	inline bool isRecording() const { return m_recording; }
 
-	inline void setLoopRenderCount(int count)
-	{
+	inline void setLoopRenderCount(int count) {
 		if (count < 1) m_loopRenderCount = 1;
 		else
 			m_loopRenderCount = count;
@@ -206,8 +187,7 @@ public:
 
 	bool isLoadingProject() const { return m_loadingProject; }
 
-	void loadingCancelled()
-	{
+	void loadingCancelled() {
 		m_isCancelled = true;
 		Engine::mixer()->clearNewPlayHandles();
 	}
@@ -276,8 +256,7 @@ private:
 
 	inline tick_t currentTick() const { return m_playPos[m_playMode].getTicks(); }
 
-	inline f_cnt_t currentFrame() const
-	{
+	inline f_cnt_t currentFrame() const {
 		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + m_playPos[m_playMode].currentFrame();
 	}
 

@@ -33,8 +33,7 @@ class ComboBox;
 
 class BBTrackContainerView;
 
-class BBEditor : public Editor
-{
+class BBEditor : public Editor {
 	Q_OBJECT
 public:
 	BBEditor(BBTrackContainer* _tc);
@@ -56,8 +55,7 @@ private:
 	ComboBox* m_bbComboBox;
 };
 
-class BBTrackContainerView : public TrackContainerView
-{
+class BBTrackContainerView : public TrackContainerView {
 	Q_OBJECT
 public:
 	BBTrackContainerView(BBTrackContainer* tc);

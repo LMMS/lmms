@@ -29,8 +29,7 @@
 #ifndef _DSP_EQ_H_
 #define _DSP_EQ_H_
 
-namespace DSP
-{
+namespace DSP {
 
 /* A single bandpass as used by the Eq, expressed as a biquad. Like all
  * band-pass filters I know of, the filter works with a FIR coefficient of 0
@@ -38,8 +37,7 @@ namespace DSP
  *
  * This routine isn't used anywhere, just here for testing purposes.
  */
-template <class T> void _BP(double fc, double Q, T* ca, T* cb)
-{
+template <class T> void _BP(double fc, double Q, T* ca, T* cb) {
 	double theta = 2 * fc * M_PI;
 
 	double b = (Q - theta * .5) / (2 * Q + theta), a = (.5 - b) / 2, c = (.5 + b) * cos(theta);
@@ -53,8 +51,7 @@ template <class T> void _BP(double fc, double Q, T* ca, T* cb)
 	cb[2] = -2 * b;
 }
 
-template <int Bands, class eq_sample = float> class Eq
-{
+template <int Bands, class eq_sample = float> class Eq {
 public:
 	/* recursion coefficients, 3 per band */
 	eq_sample __attribute__((aligned)) a[Bands], b[Bands], c[Bands];
@@ -69,23 +66,19 @@ public:
 
 	eq_sample normal;
 
-	Eq()
-	{
+	Eq() {
 		h = 0;
 		normal = NOISE_FLOOR;
 	}
 
-	void reset()
-	{
-		for (int z = 0; z < 2; ++z)
-		{
+	void reset() {
+		for (int z = 0; z < 2; ++z) {
 			memset(y[z], 0, Bands * sizeof(eq_sample));
 			x[z] = 0;
 		}
 	}
 
-	void init(double fs, double Q)
-	{
+	void init(double fs, double Q) {
 		double f = 31.25;
 		int i = 0;
 
@@ -98,8 +91,7 @@ public:
 		reset();
 	}
 
-	void init_band(int i, double theta, double Q)
-	{
+	void init_band(int i, double theta, double Q) {
 		b[i] = (Q - theta * .5) / (2 * Q + theta);
 		a[i] = (.5 - b[i]) / 2;
 		c[i] = (.5 + b[i]) * cos(theta);
@@ -113,8 +105,7 @@ public:
 	/* per-band recursion:
 	 * 	y = 2 * (a * (x - x[-2]) + c * y[-1] - b * y[-2])
 	 */
-	eq_sample process(eq_sample s)
-	{
+	eq_sample process(eq_sample s) {
 		int z1 = h, z2 = h ^ 1;
 
 		eq_sample* y1 = y[z1];
@@ -123,8 +114,7 @@ public:
 		eq_sample x_x2 = s - x[z2];
 		eq_sample r = 0;
 
-		for (int i = 0; i < Bands; ++i)
-		{
+		for (int i = 0; i < Bands; ++i) {
 			y2[i] = normal + 2 * (a[i] * x_x2 + c[i] * y1[i] - b[i] * y2[i]);
 			r += gain[i] * y2[i];
 			gain[i] *= gf[i];
@@ -137,8 +127,7 @@ public:
 	}
 
 	/* zap denormals in history */
-	void flush_0()
-	{
+	void flush_0() {
 		for (int i = 0; i < Bands; ++i)
 			if (is_denormal(y[0][i])) y[0][i] = 0;
 	}

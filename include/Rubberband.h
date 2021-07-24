@@ -29,20 +29,16 @@
 #include <QRubberBand>
 #include <QtCore/QVector>
 
-class selectableObject : public QWidget
-{
+class selectableObject : public QWidget {
 	Q_OBJECT
 public:
 	selectableObject(QWidget* _parent)
 		: QWidget(_parent)
-		, m_selected(false)
-	{
-	}
+		, m_selected(false) {}
 
 	virtual ~selectableObject() {}
 
-	inline void setSelected(bool _selected)
-	{
+	inline void setSelected(bool _selected) {
 		m_selected = _selected;
 		update();
 	}
@@ -56,8 +52,7 @@ private:
 	bool m_selected;
 };
 
-class RubberBand : public QRubberBand
-{
+class RubberBand : public QRubberBand {
 public:
 	RubberBand(QWidget* _parent);
 	virtual ~RubberBand();

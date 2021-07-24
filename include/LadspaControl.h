@@ -34,8 +34,7 @@
 
 typedef struct PortDescription port_desc_t;
 
-class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
-{
+class LMMS_EXPORT LadspaControl : public Model, public JournallingObject {
 	Q_OBJECT
 public:
 	LadspaControl(Model* _parent, port_desc_t* _port, bool _link = false);
@@ -72,8 +71,7 @@ protected slots:
 	void linkStateChanged();
 
 protected:
-	void saveSettings(QDomDocument& doc, QDomElement& element) override
-	{
+	void saveSettings(QDomDocument& doc, QDomElement& element) override {
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}

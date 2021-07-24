@@ -29,13 +29,10 @@
 #include "Plugin.h"
 #include "PluginView.h"
 
-class DummyPlugin : public Plugin
-{
+class DummyPlugin : public Plugin {
 public:
 	DummyPlugin()
-		: Plugin(NULL, NULL)
-	{
-	}
+		: Plugin(NULL, NULL) {}
 
 	virtual ~DummyPlugin() {}
 

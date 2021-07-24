@@ -30,8 +30,7 @@
 
 class QLineEdit;
 
-class RenameDialog : public QDialog
-{
+class RenameDialog : public QDialog {
 	Q_OBJECT
 public:
 	RenameDialog(QString& _string);

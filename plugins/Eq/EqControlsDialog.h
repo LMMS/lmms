@@ -37,8 +37,7 @@ class EqControls;
 class EqBand;
 class EqParameterWidget;
 
-class EqControlsDialog : public EffectControlDialog
-{
+class EqControlsDialog : public EffectControlDialog {
 	Q_OBJECT
 public:
 	EqControlsDialog(EqControls* controls);

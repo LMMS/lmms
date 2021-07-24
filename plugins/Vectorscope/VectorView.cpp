@@ -44,8 +44,7 @@ VectorView::VectorView(
 	, m_zoomTimestamp(0)
 	, m_oldHQ(m_controls->m_highQualityModel.value())
 	, m_oldX(m_displaySize / 2)
-	, m_oldY(m_displaySize / 2)
-{
+	, m_oldY(m_displaySize / 2) {
 	setMinimumSize(200, 200);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -59,8 +58,7 @@ VectorView::VectorView(
 }
 
 // Compose and draw all the content; called by Qt.
-void VectorView::paintEvent(QPaintEvent* event)
-{
+void VectorView::paintEvent(QPaintEvent* event) {
 #ifdef VEC_DEBUG
 	unsigned int drawTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 #endif
@@ -92,11 +90,9 @@ void VectorView::paintEvent(QPaintEvent* event)
 	bool hq = m_controls->m_highQualityModel.value();
 
 	// Clear display buffer if quality setting was changed
-	if (hq != m_oldHQ)
-	{
+	if (hq != m_oldHQ) {
 		m_oldHQ = hq;
-		for (std::size_t i = 0; i < m_displayBuffer.size(); i++)
-		{
+		for (std::size_t i = 0; i < m_displayBuffer.size(); i++) {
 			m_displayBuffer.data()[i] = 0;
 		}
 	}
@@ -108,8 +104,7 @@ void VectorView::paintEvent(QPaintEvent* event)
 											  .count();
 	const unsigned int elapsed = currentTimestamp - m_persistTimestamp;
 	const unsigned int threshold = hq ? 10 : 50;
-	if (elapsed > threshold)
-	{
+	if (elapsed > threshold) {
 		m_persistTimestamp = currentTimestamp;
 		// Non-HQ mode uses half the resolution → use limited buffer space.
 		const std::size_t useableBuffer = hq ? m_displayBuffer.size() : m_displayBuffer.size() / 4;
@@ -121,8 +116,7 @@ void VectorView::paintEvent(QPaintEvent* event)
 		// Note that for simplicity and performance reasons, this implementation only dims all stored
 		// values by a given factor. A true simulation would also do the inverse of desaturation that
 		// occurs in high-intensity traces in HQ mode.
-		for (std::size_t i = 0; i < useableBuffer; i++)
-		{
+		for (std::size_t i = 0; i < useableBuffer; i++) {
 			m_displayBuffer.data()[i] *= persistPerFrame;
 		}
 	}
@@ -151,17 +145,14 @@ void VectorView::paintEvent(QPaintEvent* event)
 		((QRgb*)m_displayBuffer.data())[x + y * activeSize] = currentColor.rgb();
 	};
 
-	if (hq)
-	{
+	if (hq) {
 		// High quality mode: check distance between points and draw a line.
 		// The longer the line is, the dimmer, simulating real electron trace on luminescent screen.
-		for (std::size_t frame = 0; frame < frameCount; frame++)
-		{
+		for (std::size_t frame = 0; frame < frameCount; frame++) {
 			float inLeft = inBuffer[frame][0] * m_zoom;
 			float inRight = inBuffer[frame][1] * m_zoom;
 			// Scale left and right channel from (-1.0, 1.0) to display range
-			if (logScale)
-			{
+			if (logScale) {
 				// To better preserve shapes, the log scale is applied to the distance from origin,
 				// not the individual channels.
 				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
@@ -170,9 +161,7 @@ void VectorView::paintEvent(QPaintEvent* event)
 				const float angleSin = inRight / distance;
 				left = distanceLog * angleCos * (activeSize - 1) / 4;
 				right = distanceLog * angleSin * (activeSize - 1) / 4;
-			}
-			else
-			{
+			} else {
 				left = inLeft * (activeSize - 1) / 4;
 				right = inRight * (activeSize - 1) / 4;
 			}
@@ -199,8 +188,7 @@ void VectorView::paintEvent(QPaintEvent* event)
 			// Draw interpolated points between the old pixel and the new one
 			int newX = right - left + activeSize / 2.f;
 			int newY = activeSize - (right + left + activeSize / 2.f);
-			for (unsigned char i = 1; i < points; i++)
-			{
+			for (unsigned char i = 1; i < points; i++) {
 				x = saturate(((points - i) * m_oldX + i * newX) / points);
 				y = saturate(((points - i) * m_oldY + i * newY) / points);
 				updatePixel(x, y, addedColor);
@@ -208,26 +196,20 @@ void VectorView::paintEvent(QPaintEvent* event)
 			m_oldX = newX;
 			m_oldY = newY;
 		}
-	}
-	else
-	{
+	} else {
 		// To improve performance, non-HQ mode uses smaller display size and only
 		// one full-color pixel per sample.
-		for (std::size_t frame = 0; frame < frameCount; frame++)
-		{
+		for (std::size_t frame = 0; frame < frameCount; frame++) {
 			float inLeft = inBuffer[frame][0] * m_zoom;
 			float inRight = inBuffer[frame][1] * m_zoom;
-			if (logScale)
-			{
+			if (logScale) {
 				const float distance = sqrt(inLeft * inLeft + inRight * inRight);
 				const float distanceLog = log10(1 + 9 * std::abs(distance));
 				const float angleCos = inLeft / distance;
 				const float angleSin = inRight / distance;
 				left = distanceLog * angleCos * (activeSize - 1) / 4;
 				right = distanceLog * angleSin * (activeSize - 1) / 4;
-			}
-			else
-			{
+			} else {
 				left = inLeft * (activeSize - 1) / 4;
 				right = inRight * (activeSize - 1) / 4;
 			}
@@ -265,8 +247,7 @@ void VectorView::paintEvent(QPaintEvent* event)
 	painter.drawRoundedRect(1, 1, width() - 2, height() - 2, 2.f, 2.f);
 
 	// Draw zoom info if changed within last second (re-using timestamp acquired for dimming)
-	if (currentTimestamp - m_zoomTimestamp < 1000)
-	{
+	if (currentTimestamp - m_zoomTimestamp < 1000) {
 		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		painter.setFont(normalFont);
 		painter.drawText(displayWidth / 2 - 50, displayBottom - 20, 100, 16, Qt::AlignCenter,
@@ -285,23 +266,20 @@ void VectorView::paintEvent(QPaintEvent* event)
 }
 
 // Periodically trigger repaint and check if the widget is visible
-void VectorView::periodicUpdate()
-{
+void VectorView::periodicUpdate() {
 	m_visible = isVisible();
 	if (m_visible) { update(); }
 }
 
 // Allow to change color on double-click.
 // More of an Easter egg, to avoid cluttering the interface with non-essential functionality.
-void VectorView::mouseDoubleClickEvent(QMouseEvent* event)
-{
+void VectorView::mouseDoubleClickEvent(QMouseEvent* event) {
 	ColorChooser* colorDialog = new ColorChooser(m_controls->m_colorFG, this);
 	if (colorDialog->exec()) { m_controls->m_colorFG = colorDialog->currentColor(); }
 }
 
 // Change zoom level using the mouse wheel
-void VectorView::wheelEvent(QWheelEvent* event)
-{
+void VectorView::wheelEvent(QWheelEvent* event) {
 	// Go through integers to avoid accumulating errors
 	const unsigned short old_zoom = round(100 * m_zoom);
 	// Min-max bounds are 20 and 1000 %, step for 15°-increment mouse wheel is 20 %

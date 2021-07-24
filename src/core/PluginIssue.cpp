@@ -26,10 +26,8 @@
 
 #include <QDebug>
 
-const char* PluginIssue::msgFor(const PluginIssueType& it)
-{
-	switch (it)
-	{
+const char* PluginIssue::msgFor(const PluginIssueType& it) {
+	switch (it) {
 	case unknownPortFlow: return "unknown port flow for mandatory port";
 	case unknownPortType: return "unknown port type for mandatory port";
 	case tooManyInputChannels: return "too many audio input channels";
@@ -53,18 +51,15 @@ const char* PluginIssue::msgFor(const PluginIssueType& it)
 	return nullptr;
 }
 
-bool PluginIssue::operator==(const PluginIssue& other) const
-{
+bool PluginIssue::operator==(const PluginIssue& other) const {
 	return (m_issueType == other.m_issueType) && (m_info == other.m_info);
 }
 
-bool PluginIssue::operator<(const PluginIssue& other) const
-{
+bool PluginIssue::operator<(const PluginIssue& other) const {
 	return (m_issueType != other.m_issueType) ? m_issueType < other.m_issueType : m_info < other.m_info;
 }
 
-QDebug operator<<(QDebug stream, const PluginIssue& iss)
-{
+QDebug operator<<(QDebug stream, const PluginIssue& iss) {
 	stream << PluginIssue::msgFor(iss.m_issueType);
 	if (iss.m_info.length()) { stream.nospace() << ": " << iss.m_info.c_str(); }
 	return stream;

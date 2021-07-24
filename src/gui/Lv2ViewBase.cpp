@@ -48,22 +48,17 @@
 #include "gui_templates.h"
 
 Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum)
-	: LinkedModelGroupView(parent, ctrlBase, colNum)
-{
-	class SetupWidget : public Lv2Ports::ConstVisitor
-	{
+	: LinkedModelGroupView(parent, ctrlBase, colNum) {
+	class SetupWidget : public Lv2Ports::ConstVisitor {
 	public:
 		QWidget* m_par;				  // input
 		const LilvNode* m_commentUri; // input
 		Control* m_control = nullptr; // output
-		void visit(const Lv2Ports::Control& port) override
-		{
-			if (port.m_flow == Lv2Ports::Flow::Input)
-			{
+		void visit(const Lv2Ports::Control& port) override {
+			if (port.m_flow == Lv2Ports::Flow::Input) {
 				using PortVis = Lv2Ports::Vis;
 
-				switch (port.m_vis)
-				{
+				switch (port.m_vis) {
 				case PortVis::Generic: m_control = new KnobControl(m_par); break;
 				case PortVis::Integer: {
 					sample_rate_t sr = Engine::mixer()->processingSampleRate();
@@ -76,8 +71,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum)
 				m_control->setText(port.name());
 
 				AutoLilvNodes props(lilv_port_get_value(port.m_plugin, port.m_port, m_commentUri));
-				LILV_FOREACH(nodes, itr, props.get())
-				{
+				LILV_FOREACH(nodes, itr, props.get()) {
 					const LilvNode* nod = lilv_nodes_get(props.get(), itr);
 					m_control->topWidget()->setToolTip(lilv_node_as_string(nod));
 					break;
@@ -93,8 +87,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum)
 		setup.m_commentUri = commentUri.get();
 		port->accept(setup);
 
-		if (setup.m_control)
-		{
+		if (setup.m_control) {
 			addControl(setup.m_control, lilv_node_as_string(lilv_port_get_symbol(port->m_plugin, port->m_port)),
 				port->name().toUtf8().data(), false);
 		}
@@ -105,13 +98,11 @@ Lv2ViewProc::~Lv2ViewProc() {}
 
 AutoLilvNode Lv2ViewProc::uri(const char* uriStr) { return Engine::getLv2Manager()->uri(uriStr); }
 
-Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
-{
+Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase) {
 	QGridLayout* grid = new QGridLayout(meAsWidget);
 
 	QHBoxLayout* btnBox = new QHBoxLayout();
-	if (/* DISABLES CODE */ (false))
-	{
+	if (/* DISABLES CODE */ (false)) {
 		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"), meAsWidget);
 		btnBox->addWidget(m_reloadPluginButton, 0);
 	}
@@ -133,8 +124,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
 	// expression syntax tree, so the AutoLilvNode gets freed after the function
 	// has been called
 	AutoLilvNodes props(lilv_plugin_get_value(ctrlBase->getPlugin(), uri(LILV_NS_RDFS "comment").get()));
-	LILV_FOREACH(nodes, itr, props.get())
-	{
+	LILV_FOREACH(nodes, itr, props.get()) {
 		const LilvNode* node = lilv_nodes_get(props.get(), itr);
 		QLabel* infoLabel = new QLabel(lilv_node_as_string(node));
 		infoLabel->setWordWrap(true);
@@ -152,12 +142,9 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
 		break;
 	}
 
-	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton)
-	{
+	if (m_reloadPluginButton || m_toggleUIButton || m_helpButton) {
 		grid->addLayout(btnBox, Rows::ButtonRow, 0, 1, m_colNum);
-	}
-	else
-	{
+	} else {
 		delete btnBox;
 	}
 
@@ -165,31 +152,24 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase* ctrlBase)
 	grid->addWidget(m_procView, Rows::ProcRow, 0);
 }
 
-Lv2ViewBase::~Lv2ViewBase()
-{
+Lv2ViewBase::~Lv2ViewBase() {
 	// TODO: hide UI if required
 }
 
 void Lv2ViewBase::toggleUI() {}
 
-void Lv2ViewBase::toggleHelp(bool visible)
-{
-	if (m_helpWindow)
-	{
-		if (visible)
-		{
+void Lv2ViewBase::toggleHelp(bool visible) {
+	if (m_helpWindow) {
+		if (visible) {
 			m_helpWindow->show();
 			m_helpWindow->raise();
-		}
-		else
-		{
+		} else {
 			m_helpWindow->hide();
 		}
 	}
 }
 
-void Lv2ViewBase::modelChanged(Lv2ControlBase* ctrlBase)
-{
+void Lv2ViewBase::modelChanged(Lv2ControlBase* ctrlBase) {
 	// reconnect models
 	if (m_toggleUIButton) { m_toggleUIButton->setChecked(ctrlBase->hasGui()); }
 

@@ -11,8 +11,7 @@
 class FxLine;
 class FxMixerView;
 
-class SendButtonIndicator : public QLabel
-{
+class SendButtonIndicator : public QLabel {
 public:
 	SendButtonIndicator(QWidget* _parent, FxLine* _owner, FxMixerView* _mv);
 

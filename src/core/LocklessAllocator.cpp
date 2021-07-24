@@ -35,15 +35,13 @@
 
 static const size_t SIZEOF_SET = sizeof(int) * 8;
 
-static size_t align(size_t size, size_t alignment)
-{
+static size_t align(size_t size, size_t alignment) {
 	size_t misalignment = size % alignment;
 	if (misalignment) { size += alignment - misalignment; }
 	return size;
 }
 
-LocklessAllocator::LocklessAllocator(size_t nmemb, size_t size)
-{
+LocklessAllocator::LocklessAllocator(size_t nmemb, size_t size) {
 	m_capacity = align(nmemb, SIZEOF_SET);
 	m_elementSize = align(size, sizeof(void*));
 	m_pool = new char[m_capacity * m_elementSize];
@@ -56,11 +54,9 @@ LocklessAllocator::LocklessAllocator(size_t nmemb, size_t size)
 	m_startIndex = 0;
 }
 
-LocklessAllocator::~LocklessAllocator()
-{
+LocklessAllocator::~LocklessAllocator() {
 	int available = m_available;
-	if (available != m_capacity)
-	{
+	if (available != m_capacity) {
 		fprintf(stderr,
 			"LocklessAllocator: "
 			"Destroying with elements still allocated\n");
@@ -71,50 +67,40 @@ LocklessAllocator::~LocklessAllocator()
 }
 
 #ifdef LMMS_BUILD_WIN32
-static int ffs(int i)
-{
+static int ffs(int i) {
 	if (!i) { return 0; }
-	for (int j = 0;;)
-	{
+	for (int j = 0;;) {
 		if (i & 1 << j++) { return j; }
 	}
 }
 #endif
 
-void* LocklessAllocator::alloc()
-{
+void* LocklessAllocator::alloc() {
 	// Some of these CAS loops could probably use relaxed atomics, as discussed
 	// in http://en.cppreference.com/w/cpp/atomic/atomic/compare_exchange.
 	// Let's use sequentially-consistent ops to be safe for now.
 	int available = m_available.load();
-	do
-	{
-		if (!available)
-		{
+	do {
+		if (!available) {
 			fprintf(stderr, "LocklessAllocator: No free space\n");
 			return NULL;
 		}
 	} while (!m_available.compare_exchange_weak(available, available - 1));
 
 	const size_t startIndex = m_startIndex++ % m_freeStateSets;
-	for (size_t set = startIndex;; set = (set + 1) % m_freeStateSets)
-	{
-		for (int freeState = m_freeState[set]; freeState != -1;)
-		{
+	for (size_t set = startIndex;; set = (set + 1) % m_freeStateSets) {
+		for (int freeState = m_freeState[set]; freeState != -1;) {
 			int bit = ffs(~freeState) - 1;
-			if (m_freeState[set].compare_exchange_weak(freeState, freeState | 1 << bit))
-			{
+			if (m_freeState[set].compare_exchange_weak(freeState, freeState | 1 << bit)) {
 				return m_pool + (SIZEOF_SET * set + bit) * m_elementSize;
 			}
 		}
 	}
 }
 
-void LocklessAllocator::free(void* ptr)
-{
+void LocklessAllocator::free(void* ptr) {
 	ptrdiff_t diff = (char*)ptr - m_pool;
-	if (diff < 0 || diff % m_elementSize)
-	{
+	if (diff < 0 || diff % m_elementSize) {
 	invalid:
 		fprintf(stderr, "LocklessAllocator: Invalid pointer\n");
 		return;
@@ -125,8 +111,7 @@ void LocklessAllocator::free(void* ptr)
 	int bit = offset % SIZEOF_SET;
 	int mask = 1 << bit;
 	int prevState = m_freeState[set].fetch_and(~mask);
-	if (!(prevState & mask))
-	{
+	if (!(prevState & mask)) {
 		fprintf(stderr, "LocklessAllocator: Block not in use\n");
 		return;
 	}

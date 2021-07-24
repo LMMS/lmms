@@ -36,8 +36,7 @@
 
 MeterDialog::MeterDialog(QWidget* _parent, bool _simple)
 	: QWidget(_parent)
-	, ModelView(NULL, this)
-{
+	, ModelView(NULL, this) {
 	QVBoxLayout* vlayout = new QVBoxLayout(this);
 	vlayout->setSpacing(0);
 	vlayout->setMargin(0);
@@ -52,8 +51,7 @@ MeterDialog::MeterDialog(QWidget* _parent, bool _simple)
 
 	num_layout->addWidget(m_numerator);
 
-	if (!_simple)
-	{
+	if (!_simple) {
 		QLabel* num_label = new QLabel(tr("Meter Numerator"), num);
 		QFont f = num_label->font();
 		num_label->setFont(pointSize<7>(f));
@@ -73,8 +71,7 @@ MeterDialog::MeterDialog(QWidget* _parent, bool _simple)
 
 	den_layout->addWidget(m_denominator);
 
-	if (!_simple)
-	{
+	if (!_simple) {
 		QLabel* den_label = new QLabel(tr("Meter Denominator"), den);
 		QFont f = den_label->font();
 		den_label->setFont(pointSize<7>(f));
@@ -92,8 +89,7 @@ MeterDialog::MeterDialog(QWidget* _parent, bool _simple)
 
 MeterDialog::~MeterDialog() {}
 
-void MeterDialog::modelChanged()
-{
+void MeterDialog::modelChanged() {
 	MeterModel* mm = castModel<MeterModel>();
 	m_numerator->setModel(&mm->numeratorModel());
 	m_denominator->setModel(&mm->denominatorModel());

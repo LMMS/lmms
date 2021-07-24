@@ -1,5 +1,4 @@
-typedef struct
-{
+typedef struct {
 	int writePos;
 	int bufferSize;
 	int readPos;
@@ -12,8 +11,7 @@ typedef struct
 	SPFLOAT* buf;
 } sp_revsc_dl;
 
-typedef struct
-{
+typedef struct {
 	SPFLOAT feedback, lpfreq;
 	SPFLOAT iSampleRate, iPitchMod, iSkipInit;
 	SPFLOAT sampleRate;

@@ -27,8 +27,7 @@
 #include "ComboBoxModel.h"
 #include "QTestSuite.h"
 
-class AutomatableModelTest : QTestSuite
-{
+class AutomatableModelTest : QTestSuite {
 	Q_OBJECT
 
 	bool m1Changed, m2Changed;
@@ -41,8 +40,7 @@ private slots: // helper slots
 private slots: // tests
 	//! Test that upcast and exact casts work,
 	//! but no downcast or any other casts
-	void CastTests()
-	{
+	void CastTests() {
 		ComboBoxModel comboModel;
 		AutomatableModel* amPtr = &comboModel;
 		QVERIFY(nullptr == amPtr->dynamicCast<FloatModel>());		   // not a parent class
@@ -58,8 +56,7 @@ private slots: // tests
 		QVERIFY(nullptr == imPtr->dynamicCast<ComboBoxModel>());	 // child class
 	}
 
-	void LinkTests()
-	{
+	void LinkTests() {
 		BoolModel m1(false), m2(false);
 
 		QObject::connect(&m1, SIGNAL(dataChanged()), this, SLOT(onM1Changed()));

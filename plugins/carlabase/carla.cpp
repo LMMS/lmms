@@ -65,26 +65,22 @@ static bool host_is_offline(NativeHostHandle handle) { return handlePtr->handleI
 
 static const NativeTimeInfo* host_get_time_info(NativeHostHandle handle) { return handlePtr->handleGetTimeInfo(); }
 
-static bool host_write_midi_event(NativeHostHandle, const NativeMidiEvent*)
-{
+static bool host_write_midi_event(NativeHostHandle, const NativeMidiEvent*) {
 	return false; // unsupported?
 }
 
-static void host_ui_parameter_changed(NativeHostHandle handle, uint32_t index, float value)
-{
+static void host_ui_parameter_changed(NativeHostHandle handle, uint32_t index, float value) {
 	handlePtr->handleUiParameterChanged(index, value);
 }
 
-static void host_ui_custom_data_changed(NativeHostHandle handle, const char* key, const char* value)
-{
+static void host_ui_custom_data_changed(NativeHostHandle handle, const char* key, const char* value) {
 	// unused
 }
 
 static void host_ui_closed(NativeHostHandle handle) { handlePtr->handleUiClosed(); }
 
 static intptr_t host_dispatcher(
-	NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt)
-{
+	NativeHostHandle handle, NativeHostDispatcherOpcode opcode, int32_t index, intptr_t value, void* ptr, float opt) {
 	return handlePtr->handleDispatcher(opcode, index, value, ptr, opt);
 }
 
@@ -92,8 +88,7 @@ static intptr_t host_dispatcher(
 
 // -----------------------------------------------------------------------
 
-static const char* host_ui_open_file(NativeHostHandle, bool isDir, const char* title, const char* filter)
-{
+static const char* host_ui_open_file(NativeHostHandle, bool isDir, const char* title, const char* filter) {
 	static QByteArray retStr;
 	const QFileDialog::Options options(isDir ? QFileDialog::ShowDirsOnly : 0x0);
 
@@ -102,8 +97,7 @@ static const char* host_ui_open_file(NativeHostHandle, bool isDir, const char* t
 	return retStr.isEmpty() ? NULL : retStr.constData();
 }
 
-static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* title, const char* filter)
-{
+static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* title, const char* filter) {
 	static QByteArray retStr;
 	const QFileDialog::Options options(isDir ? QFileDialog::ShowDirsOnly : 0x0);
 
@@ -120,8 +114,7 @@ CarlaInstrument::CarlaInstrument(
 	, kIsPatchbay(isPatchbay)
 	, fHandle(NULL)
 	, fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin())
-	, fMidiEventCount(0)
-{
+	, fMidiEventCount(0) {
 	fHost.handle = this;
 	fHost.uiName = NULL;
 	fHost.uiParentId = 0;
@@ -164,19 +157,16 @@ CarlaInstrument::CarlaInstrument(
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
-CarlaInstrument::~CarlaInstrument()
-{
+CarlaInstrument::~CarlaInstrument() {
 	Engine::mixer()->removePlayHandlesOfTypes(
 		instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 
-	if (fHost.resourceDir != NULL)
-	{
+	if (fHost.resourceDir != NULL) {
 		std::free((char*)fHost.resourceDir);
 		fHost.resourceDir = NULL;
 	}
 
-	if (fHost.uiName != NULL)
-	{
+	if (fHost.uiName != NULL) {
 		std::free((char*)fHost.uiName);
 		fHost.uiName = NULL;
 	}
@@ -196,8 +186,7 @@ uint32_t CarlaInstrument::handleGetBufferSize() const { return Engine::mixer()->
 
 double CarlaInstrument::handleGetSampleRate() const { return Engine::mixer()->processingSampleRate(); }
 
-bool CarlaInstrument::handleIsOffline() const
-{
+bool CarlaInstrument::handleIsOffline() const {
 	return false; // TODO
 }
 
@@ -208,12 +197,10 @@ void CarlaInstrument::handleUiParameterChanged(const uint32_t /*index*/, const f
 void CarlaInstrument::handleUiClosed() { emit uiClosed(); }
 
 intptr_t CarlaInstrument::handleDispatcher(
-	const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float)
-{
+	const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float) {
 	intptr_t ret = 0;
 
-	switch (opcode)
-	{
+	switch (opcode) {
 	case NATIVE_HOST_OPCODE_UI_UNAVAILABLE: handleUiClosed(); break;
 	case NATIVE_HOST_OPCODE_HOST_IDLE: qApp->processEvents(); break;
 	default: break;
@@ -228,8 +215,7 @@ Instrument::Flags CarlaInstrument::flags() const { return IsSingleStreamed | IsM
 
 QString CarlaInstrument::nodeName() const { return descriptor()->name; }
 
-void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
-{
+void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent) {
 	if (fHandle == NULL || fDescriptor->get_state == NULL) return;
 
 	char* const state = fDescriptor->get_state(fHandle);
@@ -238,8 +224,7 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 
 	QDomDocument carlaDoc("carla");
 
-	if (carlaDoc.setContent(QString(state)))
-	{
+	if (carlaDoc.setContent(QString(state))) {
 		QDomNode n = doc.importNode(carlaDoc.documentElement(), true);
 		parent.appendChild(n);
 	}
@@ -247,8 +232,7 @@ void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 	std::free(state);
 }
 
-void CarlaInstrument::loadSettings(const QDomElement& elem)
-{
+void CarlaInstrument::loadSettings(const QDomElement& elem) {
 	if (fHandle == NULL || fDescriptor->set_state == NULL) return;
 
 	QDomDocument carlaDoc("carla");
@@ -257,14 +241,12 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 	fDescriptor->set_state(fHandle, carlaDoc.toString(0).toUtf8().constData());
 }
 
-void CarlaInstrument::play(sampleFrame* workingBuffer)
-{
+void CarlaInstrument::play(sampleFrame* workingBuffer) {
 	const uint bufsize = Engine::mixer()->framesPerPeriod();
 
 	std::memset(workingBuffer, 0, sizeof(sample_t) * bufsize * DEFAULT_CHANNELS);
 
-	if (fHandle == NULL)
-	{
+	if (fHandle == NULL) {
 		instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, NULL);
 		return;
 	}
@@ -301,8 +283,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
 		fMidiEventCount = 0;
 	}
 
-	for (uint i = 0; i < bufsize; ++i)
-	{
+	for (uint i = 0; i < bufsize; ++i) {
 		workingBuffer[i][0] = buf1[i];
 		workingBuffer[i][1] = buf2[i];
 	}
@@ -310,8 +291,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
 	instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, NULL);
 }
 
-bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset)
-{
+bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset) {
 	const QMutexLocker ml(&fMutex);
 
 	if (fMidiEventCount >= kMaxMidiEvents) return false;
@@ -322,17 +302,16 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_
 	nEvent.port = 0;
 	nEvent.time = offset;
 	std::size_t written = writeToByteSeq(event, nEvent.data, sizeof(NativeMidiEvent::data));
-	if (written) { nEvent.size = written; }
-	else
-	{
+	if (written) {
+		nEvent.size = written;
+	} else {
 		--fMidiEventCount;
 	}
 
 	return true;
 }
 
-PluginView* CarlaInstrument::instantiateView(QWidget* parent)
-{
+PluginView* CarlaInstrument::instantiateView(QWidget* parent) {
 // Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
 #ifndef CARLA_OS_MAC
 	if (QWidget* const window = parent->window())
@@ -351,8 +330,7 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 	return new CarlaInstrumentView(this, parent);
 }
 
-void CarlaInstrument::sampleRateChanged()
-{
+void CarlaInstrument::sampleRateChanged() {
 	fDescriptor->dispatcher(fHandle, NATIVE_PLUGIN_OPCODE_SAMPLE_RATE_CHANGED, 0, 0, nullptr, handleGetSampleRate());
 }
 
@@ -362,8 +340,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
 	: InstrumentViewFixedSize(instrument, parent)
 	, fHandle(instrument->fHandle)
 	, fDescriptor(instrument->fDescriptor)
-	, fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0)
-{
+	, fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0) {
 	setAutoFillBackground(true);
 
 	QPalette pal;
@@ -389,20 +366,16 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
 	connect(instrument, SIGNAL(uiClosed()), this, SLOT(uiClosed()));
 }
 
-CarlaInstrumentView::~CarlaInstrumentView()
-{
+CarlaInstrumentView::~CarlaInstrumentView() {
 	if (m_toggleUIButton->isChecked()) toggleUI(false);
 }
 
-void CarlaInstrumentView::toggleUI(bool visible)
-{
-	if (fHandle != NULL && fDescriptor->ui_show != NULL)
-	{
+void CarlaInstrumentView::toggleUI(bool visible) {
+	if (fHandle != NULL && fDescriptor->ui_show != NULL) {
 // TODO: remove when fixed upstream
 // change working path to location of carla.dll to avoid conflict with lmms
 #if defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
-		if (visible)
-		{
+		if (visible) {
 			QString backupDir = QDir::currentPath();
 			QDir::setCurrent(carla_get_library_folder());
 			fDescriptor->ui_show(fHandle, true);
@@ -418,8 +391,7 @@ void CarlaInstrumentView::uiClosed() { m_toggleUIButton->setChecked(false); }
 
 void CarlaInstrumentView::modelChanged() {}
 
-void CarlaInstrumentView::timerEvent(QTimerEvent* event)
-{
+void CarlaInstrumentView::timerEvent(QTimerEvent* event) {
 	if (event->timerId() == fTimerId) fDescriptor->ui_idle(fHandle);
 
 	InstrumentView::timerEvent(event);

@@ -38,8 +38,7 @@ TimeDisplayWidget::TimeDisplayWidget()
 	, m_spinBoxesLayout(this)
 	, m_majorLCD(4, this)
 	, m_minorLCD(2, this)
-	, m_milliSecondsLCD(3, this)
-{
+	, m_milliSecondsLCD(3, this) {
 	m_spinBoxesLayout.setSpacing(0);
 	m_spinBoxesLayout.setMargin(0);
 	m_spinBoxesLayout.addWidget(&m_majorLCD);
@@ -56,12 +55,10 @@ TimeDisplayWidget::TimeDisplayWidget()
 	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(updateTime()));
 }
 
-void TimeDisplayWidget::setDisplayMode(DisplayMode displayMode)
-{
+void TimeDisplayWidget::setDisplayMode(DisplayMode displayMode) {
 	m_displayMode = displayMode;
 
-	switch (m_displayMode)
-	{
+	switch (m_displayMode) {
 	case MinutesSeconds:
 		m_majorLCD.setLabel(tr("MIN"));
 		m_minorLCD.setLabel(tr("SEC"));
@@ -78,12 +75,10 @@ void TimeDisplayWidget::setDisplayMode(DisplayMode displayMode)
 	}
 }
 
-void TimeDisplayWidget::updateTime()
-{
+void TimeDisplayWidget::updateTime() {
 	Song* s = Engine::getSong();
 
-	switch (m_displayMode)
-	{
+	switch (m_displayMode) {
 	case MinutesSeconds:
 		int msec;
 		msec = s->getMilliseconds();
@@ -105,13 +100,11 @@ void TimeDisplayWidget::updateTime()
 	}
 }
 
-void TimeDisplayWidget::mousePressEvent(QMouseEvent* mouseEvent)
-{
-	if (mouseEvent->button() == Qt::LeftButton)
-	{
-		if (m_displayMode == MinutesSeconds) { setDisplayMode(BarsTicks); }
-		else
-		{
+void TimeDisplayWidget::mousePressEvent(QMouseEvent* mouseEvent) {
+	if (mouseEvent->button() == Qt::LeftButton) {
+		if (m_displayMode == MinutesSeconds) {
+			setDisplayMode(BarsTicks);
+		} else {
 			setDisplayMode(MinutesSeconds);
 		}
 	}

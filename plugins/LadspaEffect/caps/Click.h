@@ -31,8 +31,7 @@
 #include "dsp/OnePole.h"
 #include "dsp/util.h"
 
-class ClickStub : public Plugin
-{
+class ClickStub : public Plugin {
 public:
 	sample_t bpm;
 
@@ -51,8 +50,7 @@ public:
 
 	void init(float* _wave, int _N);
 
-	void activate()
-	{
+	void activate() {
 		played = 0;
 		period = 0;
 	}
@@ -62,22 +60,19 @@ public:
 	void run_adding(int n) { one_cycle<adding_func>(n); }
 };
 
-class Click : public ClickStub
-{
+class Click : public ClickStub {
 public:
 	void init();
 };
 
-class CEO : public ClickStub
-{
+class CEO : public ClickStub {
 public:
 	void init();
 
 	static PortInfo port_info[];
 };
 
-class Dirac : public ClickStub
-{
+class Dirac : public ClickStub {
 public:
 	void init();
 

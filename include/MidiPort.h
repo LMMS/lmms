@@ -40,8 +40,7 @@ class MidiEventProcessor;
 class MidiPortMenu;
 
 // class for abstraction of MIDI-port
-class MidiPort : public Model, public SerializingObject
-{
+class MidiPort : public Model, public SerializingObject {
 	Q_OBJECT
 	mapPropertyFromModel(int, inputChannel, setInputChannel, m_inputChannelModel);
 	mapPropertyFromModel(int, outputChannel, setOutputChannel, m_outputChannelModel);
@@ -58,8 +57,7 @@ class MidiPort : public Model, public SerializingObject
 public:
 	typedef QMap<QString, bool> Map;
 
-	enum Modes
-	{
+	enum Modes {
 		Disabled, // don't route any MIDI-events (default)
 		Input,	  // from MIDI-client to MIDI-event-processor
 		Output,	  // from MIDI-event-processor to MIDI-client
@@ -81,8 +79,7 @@ public:
 
 	bool isOutputEnabled() const { return mode() == Output || mode() == Duplex; }
 
-	int realOutputChannel() const
-	{
+	int realOutputChannel() const {
 		// There's a possibility of outputChannel being 0 ("--"), which is used to keep all
 		// midi channels when forwarding. In that case, realOutputChannel will return the
 		// default channel 1 (whose value is 0).

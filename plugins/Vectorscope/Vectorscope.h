@@ -29,8 +29,7 @@
 #include "VecControls.h"
 
 //! Top level class; handles LMMS interface and accumulates data for processing.
-class Vectorscope : public Effect
-{
+class Vectorscope : public Effect {
 public:
 	Vectorscope(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~Vectorscope(){};

@@ -1,5 +1,4 @@
-typedef struct
-{
+typedef struct {
 	SPFLOAT gg;
 	SPFLOAT outputs;
 	SPFLOAT inputs;

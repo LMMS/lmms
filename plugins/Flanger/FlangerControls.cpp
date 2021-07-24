@@ -46,8 +46,7 @@ FlangerControls::FlangerControls(FlangerEffect* effect)
 	connect(Engine::getSong(), SIGNAL(playbackStateChanged()), this, SLOT(changedPlaybackState()));
 }
 
-void FlangerControls::loadSettings(const QDomElement& _this)
-{
+void FlangerControls::loadSettings(const QDomElement& _this) {
 	m_delayTimeModel.loadSettings(_this, "DelayTimeSamples");
 	m_lfoFrequencyModel.loadSettings(_this, "LfoFrequency");
 	m_lfoAmountModel.loadSettings(_this, "LfoAmount");
@@ -57,8 +56,7 @@ void FlangerControls::loadSettings(const QDomElement& _this)
 	m_invertFeedbackModel.loadSettings(_this, "Invert");
 }
 
-void FlangerControls::saveSettings(QDomDocument& doc, QDomElement& parent)
-{
+void FlangerControls::saveSettings(QDomDocument& doc, QDomElement& parent) {
 	m_delayTimeModel.saveSettings(doc, parent, "DelayTimeSamples");
 	m_lfoFrequencyModel.saveSettings(doc, parent, "LfoFrequency");
 	m_lfoAmountModel.saveSettings(doc, parent, "LfoAmount");

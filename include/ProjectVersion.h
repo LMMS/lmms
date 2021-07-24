@@ -34,11 +34,9 @@
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
  */
-class ProjectVersion
-{
+class ProjectVersion {
 public:
-	enum CompareType : int
-	{
+	enum CompareType : int {
 		None = 0,
 		Major = 1,
 		Minor = 2,
@@ -57,8 +55,7 @@ public:
 	int getPatch() const { return m_patch; }
 	const QStringList& getLabels() const { return m_labels; }
 	CompareType getCompareType() const { return m_compareType; }
-	ProjectVersion setCompareType(CompareType compareType)
-	{
+	ProjectVersion setCompareType(CompareType compareType) {
 		m_compareType = compareType;
 		return *this;
 	}
@@ -78,28 +75,22 @@ private:
 /*
  * ProjectVersion v. ProjectVersion
  */
-inline bool operator<(const ProjectVersion& v1, const ProjectVersion& v2)
-{
+inline bool operator<(const ProjectVersion& v1, const ProjectVersion& v2) {
 	return ProjectVersion::compare(v1, v2) < 0;
 }
-inline bool operator>(const ProjectVersion& v1, const ProjectVersion& v2)
-{
+inline bool operator>(const ProjectVersion& v1, const ProjectVersion& v2) {
 	return ProjectVersion::compare(v1, v2) > 0;
 }
-inline bool operator<=(const ProjectVersion& v1, const ProjectVersion& v2)
-{
+inline bool operator<=(const ProjectVersion& v1, const ProjectVersion& v2) {
 	return ProjectVersion::compare(v1, v2) <= 0;
 }
-inline bool operator>=(const ProjectVersion& v1, const ProjectVersion& v2)
-{
+inline bool operator>=(const ProjectVersion& v1, const ProjectVersion& v2) {
 	return ProjectVersion::compare(v1, v2) >= 0;
 }
-inline bool operator==(const ProjectVersion& v1, const ProjectVersion& v2)
-{
+inline bool operator==(const ProjectVersion& v1, const ProjectVersion& v2) {
 	return ProjectVersion::compare(v1, v2) == 0;
 }
-inline bool operator!=(const ProjectVersion& v1, const ProjectVersion& v2)
-{
+inline bool operator!=(const ProjectVersion& v1, const ProjectVersion& v2) {
 	return ProjectVersion::compare(v1, v2) != 0;
 }
 

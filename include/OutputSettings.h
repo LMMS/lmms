@@ -28,32 +28,17 @@
 
 #include "lmms_basics.h"
 
-class OutputSettings
-{
+class OutputSettings {
 public:
-	enum BitDepth
-	{
-		Depth_16Bit,
-		Depth_24Bit,
-		Depth_32Bit,
-		NumDepths
-	};
+	enum BitDepth { Depth_16Bit, Depth_24Bit, Depth_32Bit, NumDepths };
 
-	enum StereoMode
-	{
-		StereoMode_Stereo,
-		StereoMode_JointStereo,
-		StereoMode_Mono
-	};
+	enum StereoMode { StereoMode_Stereo, StereoMode_JointStereo, StereoMode_Mono };
 
-	class BitRateSettings
-	{
+	class BitRateSettings {
 	public:
 		BitRateSettings(bitrate_t bitRate, bool isVariableBitRate)
 			: m_bitRate(bitRate)
-			, m_isVariableBitRate(isVariableBitRate)
-		{
-		}
+			, m_isVariableBitRate(isVariableBitRate) {}
 
 		bool isVariableBitRate() const { return m_isVariableBitRate; }
 		void setVariableBitrate(bool variableBitRate = true) { m_isVariableBitRate = variableBitRate; }
@@ -73,14 +58,10 @@ public:
 		, m_bitRateSettings(bitRateSettings)
 		, m_bitDepth(bitDepth)
 		, m_stereoMode(stereoMode)
-		, m_compressionLevel(0.5)
-	{
-	}
+		, m_compressionLevel(0.5) {}
 
 	OutputSettings(sample_rate_t sampleRate, BitRateSettings const& bitRateSettings, BitDepth bitDepth)
-		: OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode_Stereo)
-	{
-	}
+		: OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode_Stereo) {}
 
 	sample_rate_t getSampleRate() const { return m_sampleRate; }
 	void setSampleRate(sample_rate_t sampleRate) { m_sampleRate = sampleRate; }
@@ -95,8 +76,7 @@ public:
 	void setStereoMode(StereoMode stereoMode) { m_stereoMode = stereoMode; }
 
 	double getCompressionLevel() const { return m_compressionLevel; }
-	void setCompressionLevel(double level)
-	{
+	void setCompressionLevel(double level) {
 		// legal range is 0.0 to 1.0.
 		m_compressionLevel = level;
 	}

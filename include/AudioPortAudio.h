@@ -30,8 +30,7 @@
 #include "ComboBoxModel.h"
 #include "lmmsconfig.h"
 
-class AudioPortAudioSetupUtil : public QObject
-{
+class AudioPortAudioSetupUtil : public QObject {
 	Q_OBJECT
 public slots:
 	void updateBackends();
@@ -60,8 +59,7 @@ public:
 class ComboBox;
 class LcdSpinBox;
 
-class AudioPortAudio : public AudioDevice
-{
+class AudioPortAudio : public AudioDevice {
 public:
 	AudioPortAudio(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioPortAudio();
@@ -70,8 +68,7 @@ public:
 
 	int process_callback(const float* _inputBuffer, float* _outputBuffer, unsigned long _framesPerBuffer);
 
-	class setupWidget : public AudioDeviceSetupWidget
-	{
+	class setupWidget : public AudioDeviceSetupWidget {
 	public:
 		setupWidget(QWidget* _parent);
 		virtual ~setupWidget();
@@ -109,8 +106,7 @@ private:
 	typedef double PaTime;
 	typedef PaDeviceID PaDeviceIndex;
 
-	typedef struct PaStreamParameters
-	{
+	typedef struct PaStreamParameters {
 		PaDeviceIndex device;
 		int channelCount;
 		PaSampleFormat sampleFormat;

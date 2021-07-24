@@ -67,8 +67,7 @@ Track::Track(TrackTypes type, TrackContainer* tc)
 	, m_trackContentObjects()
 	, /*!< The track content objects (segments) */
 	m_color(0, 0, 0)
-	, m_hasColor(false)
-{
+	, m_hasColor(false) {
 	m_trackContainer->addTrack(this);
 	m_height = -1;
 }
@@ -83,13 +82,11 @@ Track::Track(TrackTypes type, TrackContainer* tc)
  *
  *  Finally step through this track's automation and forget all of them.
  */
-Track::~Track()
-{
+Track::~Track() {
 	lock();
 	emit destroyedTrack();
 
-	while (!m_trackContentObjects.isEmpty())
-	{
+	while (!m_trackContentObjects.isEmpty()) {
 		delete m_trackContentObjects.last();
 	}
 
@@ -102,14 +99,12 @@ Track::~Track()
  *  \param tt The type of track to create
  *  \param tc The track container to attach to
  */
-Track* Track::create(TrackTypes tt, TrackContainer* tc)
-{
+Track* Track::create(TrackTypes tt, TrackContainer* tc) {
 	Engine::mixer()->requestChangeInModel();
 
 	Track* t = NULL;
 
-	switch (tt)
-	{
+	switch (tt) {
 	case InstrumentTrack: t = new ::InstrumentTrack(tc); break;
 	case BBTrack: t = new ::BBTrack(tc); break;
 	case SampleTrack:
@@ -136,8 +131,7 @@ Track* Track::create(TrackTypes tt, TrackContainer* tc)
  *  \param element The QDomElement containing the type of track to create
  *  \param tc The track container to attach to
  */
-Track* Track::create(const QDomElement& element, TrackContainer* tc)
-{
+Track* Track::create(const QDomElement& element, TrackContainer* tc) {
 	Engine::mixer()->requestChangeInModel();
 
 	Track* t = create(static_cast<TrackTypes>(element.attribute("type").toInt()), tc);
@@ -151,8 +145,7 @@ Track* Track::create(const QDomElement& element, TrackContainer* tc)
 /*! \brief Clone a track from this track
  *
  */
-Track* Track::clone()
-{
+Track* Track::clone() {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement("clone");
 	saveState(doc, parent);
@@ -173,8 +166,7 @@ Track* Track::clone()
  *  \todo Does this accurately describe the parameters?  I think not!?
  *  \todo Save the track height
  */
-void Track::saveSettings(QDomDocument& doc, QDomElement& element)
-{
+void Track::saveSettings(QDomDocument& doc, QDomElement& element) {
 	if (!m_simpleSerializingMode) { element.setTagName("track"); }
 	element.setAttribute("type", type());
 	element.setAttribute("name", name());
@@ -193,15 +185,13 @@ void Track::saveSettings(QDomDocument& doc, QDomElement& element)
 	element.appendChild(tsDe);
 	saveTrackSpecificSettings(doc, tsDe);
 
-	if (m_simpleSerializingMode)
-	{
+	if (m_simpleSerializingMode) {
 		m_simpleSerializingMode = false;
 		return;
 	}
 
 	// now save settings of all TCO's
-	for (tcoVector::const_iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
-	{
+	for (tcoVector::const_iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it) {
 		(*it)->saveState(doc, element);
 	}
 }
@@ -218,10 +208,8 @@ void Track::saveSettings(QDomDocument& doc, QDomElement& element)
  *  \param element the QDomElement to load track settings from
  *  \todo Load the track height.
  */
-void Track::loadSettings(const QDomElement& element)
-{
-	if (element.attribute("type").toInt() != type())
-	{
+void Track::loadSettings(const QDomElement& element) {
+	if (element.attribute("type").toInt() != type()) {
 		qWarning("Current track-type does not match track-type of "
 				 "settings-node!\n");
 	}
@@ -235,19 +223,15 @@ void Track::loadSettings(const QDomElement& element)
 	// Older project files that didn't have this attribute will set the value to false (issue 5562)
 	m_mutedBeforeSolo = QVariant(element.attribute("mutedBeforeSolo", "0")).toBool();
 
-	if (element.hasAttribute("color"))
-	{
+	if (element.hasAttribute("color")) {
 		m_color.setNamedColor(element.attribute("color"));
 		m_hasColor = true;
 	}
 
-	if (m_simpleSerializingMode)
-	{
+	if (m_simpleSerializingMode) {
 		QDomNode node = element.firstChild();
-		while (!node.isNull())
-		{
-			if (node.isElement() && node.nodeName() == nodeName())
-			{
+		while (!node.isNull()) {
+			if (node.isElement() && node.nodeName() == nodeName()) {
 				loadTrackSpecificSettings(node.toElement());
 				break;
 			}
@@ -257,21 +241,18 @@ void Track::loadSettings(const QDomElement& element)
 		return;
 	}
 
-	while (!m_trackContentObjects.empty())
-	{
+	while (!m_trackContentObjects.empty()) {
 		delete m_trackContentObjects.front();
 		//		m_trackContentObjects.erase( m_trackContentObjects.begin() );
 	}
 
 	QDomNode node = element.firstChild();
-	while (!node.isNull())
-	{
-		if (node.isElement())
-		{
-			if (node.nodeName() == nodeName()) { loadTrackSpecificSettings(node.toElement()); }
-			else if (node.nodeName() != "muted" && node.nodeName() != "solo"
-				&& !node.toElement().attribute("metadata").toInt())
-			{
+	while (!node.isNull()) {
+		if (node.isElement()) {
+			if (node.nodeName() == nodeName()) {
+				loadTrackSpecificSettings(node.toElement());
+			} else if (node.nodeName() != "muted" && node.nodeName() != "solo"
+				&& !node.toElement().attribute("metadata").toInt()) {
 				TrackContentObject* tco = createTCO(TimePos(0));
 				tco->restoreState(node.toElement());
 			}
@@ -287,8 +268,7 @@ void Track::loadSettings(const QDomElement& element)
  *
  *  \param tco The TrackContentObject to attach to this track.
  */
-TrackContentObject* Track::addTCO(TrackContentObject* tco)
-{
+TrackContentObject* Track::addTCO(TrackContentObject* tco) {
 	m_trackContentObjects.push_back(tco);
 
 	emit trackContentObjectAdded(tco);
@@ -300,14 +280,11 @@ TrackContentObject* Track::addTCO(TrackContentObject* tco)
  *
  *  \param tco The TrackContentObject to remove from this track.
  */
-void Track::removeTCO(TrackContentObject* tco)
-{
+void Track::removeTCO(TrackContentObject* tco) {
 	tcoVector::iterator it = std::find(m_trackContentObjects.begin(), m_trackContentObjects.end(), tco);
-	if (it != m_trackContentObjects.end())
-	{
+	if (it != m_trackContentObjects.end()) {
 		m_trackContentObjects.erase(it);
-		if (Engine::getSong())
-		{
+		if (Engine::getSong()) {
 			Engine::getSong()->updateLength();
 			Engine::getSong()->setModified();
 		}
@@ -315,10 +292,8 @@ void Track::removeTCO(TrackContentObject* tco)
 }
 
 /*! \brief Remove all TCOs from this track */
-void Track::deleteTCOs()
-{
-	while (!m_trackContentObjects.isEmpty())
-	{
+void Track::deleteTCOs() {
+	while (!m_trackContentObjects.isEmpty()) {
 		delete m_trackContentObjects.first();
 	}
 }
@@ -341,8 +316,7 @@ int Track::numOfTCOs() { return m_trackContentObjects.size(); }
  *  \todo if we create a TCO here, should we somehow attach it to the
  *     track?
  */
-TrackContentObject* Track::getTCO(int tcoNum)
-{
+TrackContentObject* Track::getTCO(int tcoNum) {
 	if (tcoNum < m_trackContentObjects.size()) { return m_trackContentObjects[tcoNum]; }
 	printf("called Track::getTCO( %d ), "
 		   "but TCO %d doesn't exist\n",
@@ -355,12 +329,10 @@ TrackContentObject* Track::getTCO(int tcoNum)
  *  \param tco The TrackContentObject to search for.
  *  \return its number in our array.
  */
-int Track::getTCONum(const TrackContentObject* tco)
-{
+int Track::getTCONum(const TrackContentObject* tco) {
 	//	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
 	tcoVector::iterator it = std::find(m_trackContentObjects.begin(), m_trackContentObjects.end(), tco);
-	if (it != m_trackContentObjects.end())
-	{
+	if (it != m_trackContentObjects.end()) {
 		/*		if( getTCO( i ) == _tco )
 		{
 			return i;
@@ -382,14 +354,11 @@ int Track::getTCONum(const TrackContentObject* tco)
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
-void Track::getTCOsInRange(tcoVector& tcoV, const TimePos& start, const TimePos& end)
-{
-	for (TrackContentObject* tco : m_trackContentObjects)
-	{
+void Track::getTCOsInRange(tcoVector& tcoV, const TimePos& start, const TimePos& end) {
+	for (TrackContentObject* tco : m_trackContentObjects) {
 		int s = tco->startPosition();
 		int e = tco->endPosition();
-		if ((s <= end) && (e >= start))
-		{
+		if ((s <= end) && (e >= start)) {
 			// TCO is within given range
 			// Insert sorted by TCO's position
 			tcoV.insert(std::upper_bound(tcoV.begin(), tcoV.end(), tco, TrackContentObject::comparePosition), tco);
@@ -405,8 +374,7 @@ void Track::getTCOsInRange(tcoVector& tcoV, const TimePos& start, const TimePos&
  *  \param tcoNum1 The first TrackContentObject to swap.
  *  \param tcoNum2 The second TrackContentObject to swap.
  */
-void Track::swapPositionOfTCOs(int tcoNum1, int tcoNum2)
-{
+void Track::swapPositionOfTCOs(int tcoNum1, int tcoNum2) {
 	qSwap(m_trackContentObjects[tcoNum1], m_trackContentObjects[tcoNum2]);
 
 	const TimePos pos = m_trackContentObjects[tcoNum1]->startPosition();
@@ -415,10 +383,8 @@ void Track::swapPositionOfTCOs(int tcoNum1, int tcoNum2)
 	m_trackContentObjects[tcoNum2]->movePosition(pos);
 }
 
-void Track::createTCOsForBB(int bb)
-{
-	while (numOfTCOs() < bb + 1)
-	{
+void Track::createTCOsForBB(int bb) {
+	while (numOfTCOs() < bb + 1) {
 		TimePos position = TimePos(numOfTCOs(), 0);
 		TrackContentObject* tco = createTCO(position);
 		tco->changeLength(TimePos(1, 0));
@@ -432,12 +398,10 @@ void Track::createTCOsForBB(int bb)
  *    in ascending order by TCO time, once we hit a TCO that was earlier
  *    than the insert time, we could fall out of the loop early.
  */
-void Track::insertBar(const TimePos& pos)
-{
+void Track::insertBar(const TimePos& pos) {
 	// we'll increase the position of every TCO, positioned behind pos, by
 	// one bar
-	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
-	{
+	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it) {
 		if ((*it)->startPosition() >= pos) { (*it)->movePosition((*it)->startPosition() + TimePos::ticksPerBar()); }
 	}
 }
@@ -446,12 +410,10 @@ void Track::insertBar(const TimePos& pos)
  *
  *  \param pos The time at which we want to remove the bar.
  */
-void Track::removeBar(const TimePos& pos)
-{
+void Track::removeBar(const TimePos& pos) {
 	// we'll decrease the position of every TCO, positioned behind pos, by
 	// one bar
-	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
-	{
+	for (tcoVector::iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it) {
 		if ((*it)->startPosition() >= pos) { (*it)->movePosition((*it)->startPosition() - TimePos::ticksPerBar()); }
 	}
 }
@@ -462,12 +424,10 @@ void Track::removeBar(const TimePos& pos)
  *  keeping track of the latest time found in ticks.  Then we return
  *  that in bars by dividing by the number of ticks per bar.
  */
-bar_t Track::length() const
-{
+bar_t Track::length() const {
 	// find last end-position
 	tick_t last = 0;
-	for (tcoVector::const_iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it)
-	{
+	for (tcoVector::const_iterator it = m_trackContentObjects.begin(); it != m_trackContentObjects.end(); ++it) {
 		if (Engine::getSong()->isExporting() && (*it)->isMuted()) { continue; }
 
 		const tick_t cur = (*it)->endPosition();
@@ -483,17 +443,13 @@ bar_t Track::length() const
  *  is already soloed.  Then we have to save the mute state of all tracks,
  *  and set our mute state to on and all the others to off.
  */
-void Track::toggleSolo()
-{
+void Track::toggleSolo() {
 	const TrackContainer::TrackList& tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
-	for (TrackContainer::TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it)
-	{
-		if (*it != this)
-		{
-			if ((*it)->m_soloModel.value())
-			{
+	for (TrackContainer::TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it) {
+		if (*it != this) {
+			if ((*it)->m_soloModel.value()) {
 				soloBefore = true;
 				break;
 			}
@@ -504,22 +460,18 @@ void Track::toggleSolo()
 	// Should we use the new behavior of solo or the older/legacy one?
 	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
 
-	for (TrackContainer::TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it)
-	{
-		if (solo)
-		{
+	for (TrackContainer::TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it) {
+		if (solo) {
 			// save mute-state in case no track was solo before
 			if (!soloBefore) { (*it)->m_mutedBeforeSolo = (*it)->isMuted(); }
 			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
-			if (*it == this) { (*it)->setMuted(false); }
-			else if (soloLegacyBehavior || (*it)->type() != AutomationTrack)
-			{
+			if (*it == this) {
+				(*it)->setMuted(false);
+			} else if (soloLegacyBehavior || (*it)->type() != AutomationTrack) {
 				(*it)->setMuted(true);
 			}
 			if (*it != this) { (*it)->m_soloModel.setValue(false); }
-		}
-		else if (!soloBefore)
-		{
+		} else if (!soloBefore) {
 			// Unless we are on the sololegacybehavior mode, only restores the
 			// mute state if the track isn't an Automation Track
 			if (soloLegacyBehavior || (*it)->type() != AutomationTrack) { (*it)->setMuted((*it)->m_mutedBeforeSolo); }
@@ -527,20 +479,16 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::trackColorChanged(QColor& c)
-{
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
+void Track::trackColorChanged(QColor& c) {
+	for (int i = 0; i < numOfTCOs(); i++) {
 		m_trackContentObjects[i]->updateColor();
 	}
 	m_hasColor = true;
 	m_color = c;
 }
 
-void Track::trackColorReset()
-{
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
+void Track::trackColorReset() {
+	for (int i = 0; i < numOfTCOs(); i++) {
 		m_trackContentObjects[i]->updateColor();
 	}
 	m_hasColor = false;

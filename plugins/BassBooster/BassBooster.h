@@ -29,8 +29,7 @@
 #include "DspEffectLibrary.h"
 #include "Effect.h"
 
-class BassBoosterEffect : public Effect
-{
+class BassBoosterEffect : public Effect {
 public:
 	BassBoosterEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~BassBoosterEffect();

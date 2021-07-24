@@ -30,8 +30,7 @@
 #include "MicroTimer.h"
 #include "lmms_basics.h"
 
-class MixerProfiler
-{
+class MixerProfiler {
 public:
 	MixerProfiler();
 	~MixerProfiler();

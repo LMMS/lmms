@@ -26,10 +26,8 @@
 
 #include <QDomElement>
 
-void InlineAutomation::saveSettings(QDomDocument& _doc, QDomElement& _parent)
-{
-	if (hasAutomation())
-	{
+void InlineAutomation::saveSettings(QDomDocument& _doc, QDomElement& _parent) {
+	if (hasAutomation()) {
 		QDomElement ap = _doc.createElement(AutomationPattern::classNodeName());
 		QDomElement v = _doc.createElement(nodeName());
 		automationPattern()->saveSettings(_doc, v);
@@ -38,11 +36,9 @@ void InlineAutomation::saveSettings(QDomDocument& _doc, QDomElement& _parent)
 	}
 }
 
-void InlineAutomation::loadSettings(const QDomElement& _this)
-{
+void InlineAutomation::loadSettings(const QDomElement& _this) {
 	QDomNode node = _this.namedItem(AutomationPattern::classNodeName());
-	if (node.isElement())
-	{
+	if (node.isElement()) {
 		node = node.namedItem(nodeName());
 		if (node.isElement()) { automationPattern()->loadSettings(node.toElement()); }
 	}

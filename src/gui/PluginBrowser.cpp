@@ -40,8 +40,7 @@
 
 PluginBrowser::PluginBrowser(QWidget* _parent)
 	: SideBarWidget(
-		tr("Instrument Plugins"), embed::getIconPixmap("plugins").transformed(QTransform().rotate(90)), _parent)
-{
+		tr("Instrument Plugins"), embed::getIconPixmap("plugins").transformed(QTransform().rotate(90)), _parent) {
 	setWindowTitle(tr("Instrument browser"));
 	m_view = new QWidget(contentParent());
 	// m_view->setFrameShape( QFrame::NoFrame );
@@ -86,44 +85,37 @@ PluginBrowser::PluginBrowser(QWidget* _parent)
 	updateRootVisibilities();
 }
 
-void PluginBrowser::updateRootVisibility(int rootIndex)
-{
+void PluginBrowser::updateRootVisibility(int rootIndex) {
 	QTreeWidgetItem* root = m_descTree->topLevelItem(rootIndex);
 	root->setHidden(!root->childCount());
 }
 
-void PluginBrowser::updateRootVisibilities()
-{
+void PluginBrowser::updateRootVisibilities() {
 	int rootCount = m_descTree->topLevelItemCount();
-	for (int rootIndex = 0; rootIndex < rootCount; ++rootIndex)
-	{
+	for (int rootIndex = 0; rootIndex < rootCount; ++rootIndex) {
 		updateRootVisibility(rootIndex);
 	}
 }
 
-void PluginBrowser::onFilterChanged(const QString& filter)
-{
+void PluginBrowser::onFilterChanged(const QString& filter) {
 	int rootCount = m_descTree->topLevelItemCount();
-	for (int rootIndex = 0; rootIndex < rootCount; ++rootIndex)
-	{
+	for (int rootIndex = 0; rootIndex < rootCount; ++rootIndex) {
 		QTreeWidgetItem* root = m_descTree->topLevelItem(rootIndex);
 
 		int itemCount = root->childCount();
-		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
-		{
+		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex) {
 			QTreeWidgetItem* item = root->child(itemIndex);
 			PluginDescWidget* descWidget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
-			if (descWidget->name().contains(filter, Qt::CaseInsensitive)) { item->setHidden(false); }
-			else
-			{
+			if (descWidget->name().contains(filter, Qt::CaseInsensitive)) {
+				item->setHidden(false);
+			} else {
 				item->setHidden(true);
 			}
 		}
 	}
 }
 
-void PluginBrowser::addPlugins()
-{
+void PluginBrowser::addPlugins() {
 	// Add a root node to the plugin tree with the specified `label` and return it
 	const auto addRoot = [this](auto label) {
 		const auto root = new QTreeWidgetItem();
@@ -152,10 +144,8 @@ void PluginBrowser::addPlugins()
 	lmmsRoot->setExpanded(true);
 
 	// Add all of the descriptors to the tree
-	for (const auto desc : descs)
-	{
-		if (desc->subPluginFeatures)
-		{
+	for (const auto desc : descs) {
+		if (desc->subPluginFeatures) {
 			// Fetch and sort all subplugins for this plugin descriptor
 			auto subPluginKeys = Plugin::Descriptor::SubPluginFeatures::KeyList{};
 			desc->subPluginFeatures->listSubPluginKeys(desc, subPluginKeys);
@@ -165,13 +155,10 @@ void PluginBrowser::addPlugins()
 
 			// Create a root node for this plugin and add the subplugins under it
 			const auto root = addRoot(desc->displayName);
-			for (const auto& key : subPluginKeys)
-			{
+			for (const auto& key : subPluginKeys) {
 				addPlugin(key, root);
 			}
-		}
-		else
-		{
+		} else {
 			addPlugin(Plugin::Descriptor::SubPluginFeatures::Key(desc, desc->name), lmmsRoot);
 		}
 	}
@@ -181,8 +168,7 @@ PluginDescWidget::PluginDescWidget(const PluginKey& _pk, QWidget* _parent)
 	: QWidget(_parent)
 	, m_pluginKey(_pk)
 	, m_logo(_pk.logo()->pixmap())
-	, m_mouseOver(false)
-{
+	, m_mouseOver(false) {
 	setFixedHeight(DEFAULT_HEIGHT);
 	setMouseTracking(true);
 	setCursor(Qt::PointingHandCursor);
@@ -191,8 +177,7 @@ PluginDescWidget::PluginDescWidget(const PluginKey& _pk, QWidget* _parent)
 
 QString PluginDescWidget::name() const { return m_pluginKey.displayName(); }
 
-void PluginDescWidget::paintEvent(QPaintEvent*)
-{
+void PluginDescWidget::paintEvent(QPaintEvent*) {
 
 	QPainter p(this);
 
@@ -214,24 +199,20 @@ void PluginDescWidget::paintEvent(QPaintEvent*)
 	p.drawText(10 + logo_size.width(), 15, m_pluginKey.displayName());
 }
 
-void PluginDescWidget::enterEvent(QEvent* _e)
-{
+void PluginDescWidget::enterEvent(QEvent* _e) {
 	m_mouseOver = true;
 
 	QWidget::enterEvent(_e);
 }
 
-void PluginDescWidget::leaveEvent(QEvent* _e)
-{
+void PluginDescWidget::leaveEvent(QEvent* _e) {
 	m_mouseOver = false;
 
 	QWidget::leaveEvent(_e);
 }
 
-void PluginDescWidget::mousePressEvent(QMouseEvent* _me)
-{
-	if (_me->button() == Qt::LeftButton)
-	{
+void PluginDescWidget::mousePressEvent(QMouseEvent* _me) {
+	if (_me->button() == Qt::LeftButton) {
 		Engine::setDndPluginKey(&m_pluginKey);
 		new StringPairDrag("instrument", QString::fromUtf8(m_pluginKey.desc->name), m_logo, this);
 		leaveEvent(_me);

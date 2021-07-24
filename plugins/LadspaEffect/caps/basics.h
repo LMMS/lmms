@@ -85,8 +85,7 @@ typedef uint32_t uint32;
 typedef int64_t int64;
 typedef uint64_t uint64;
 
-typedef struct
-{
+typedef struct {
 	const char* name;
 	LADSPA_PortDescriptor descriptor;
 	LADSPA_PortRangeHint range;
@@ -110,8 +109,7 @@ template <class X, class Y> X max(X x, Y y) { return x > y ? x : (X)y; }
 
 #endif /* ! max */
 
-template <class T> T clamp(T value, T lower, T upper)
-{
+template <class T> T clamp(T value, T lower, T upper) {
 	if (value < lower) return lower;
 	if (value > upper) return upper;
 	return value;
@@ -120,15 +118,13 @@ template <class T> T clamp(T value, T lower, T upper)
 static inline float frandom() { return (float)rand() / (float)RAND_MAX; }
 
 /* NB: also true if 0  */
-inline bool is_denormal(float& f)
-{
+inline bool is_denormal(float& f) {
 	int32 i = *((int32*)&f);
 	return ((i & 0x7f800000) == 0);
 }
 
 /* todo: not sure if this double version is correct, actually ... */
-inline bool is_denormal(double& f)
-{
+inline bool is_denormal(double& f) {
 	int64 i = *((int64*)&f);
 	return ((i & 0x7fe0000000000000ll) == 0);
 }
@@ -143,8 +139,7 @@ inline bool is_denormal(double& f)
 
 #define CAPS "C* "
 
-class Plugin
-{
+class Plugin {
 public:
 	double fs;			/* sample rate */
 	double adding_gain; /* for run_adding() */
@@ -157,15 +152,13 @@ public:
 
 public:
 	/* get port value, mapping inf or nan to 0 */
-	inline sample_t getport_unclamped(int i)
-	{
+	inline sample_t getport_unclamped(int i) {
 		sample_t v = *ports[i];
 		return (isinf(v) || isnan(v)) ? 0 : v;
 	}
 
 	/* get port value and clamp to port range */
-	inline sample_t getport(int i)
-	{
+	inline sample_t getport(int i) {
 		LADSPA_PortRangeHint& r = ranges[i];
 		sample_t v = getport_unclamped(i);
 		return clamp(v, r.LowerBound, r.UpperBound);

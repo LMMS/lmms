@@ -43,8 +43,7 @@ dynProcControls::dynProcControls(dynProcEffect* _eff)
 	, m_attackModel(10.0f, 1.0f, 500.0f, 1.0f, this, tr("Attack time"))
 	, m_releaseModel(100.0f, 1.0f, 500.0f, 1.0f, this, tr("Release time"))
 	, m_wavegraphModel(0.0f, 1.0f, 200, this)
-	, m_stereomodeModel(0, 0, 2, this, tr("Stereo mode"))
-{
+	, m_stereomodeModel(0, 0, 2, this, tr("Stereo mode")) {
 	connect(&m_wavegraphModel, SIGNAL(samplesChanged(int, int)), this, SLOT(samplesChanged(int, int)));
 	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 
@@ -55,8 +54,7 @@ void dynProcControls::sampleRateChanged() { m_effect->m_needsUpdate = true; }
 
 void dynProcControls::samplesChanged(int _begin, int _end) { Engine::getSong()->setModified(); }
 
-void dynProcControls::loadSettings(const QDomElement& _this)
-{
+void dynProcControls::loadSettings(const QDomElement& _this) {
 	// load knobs, stereomode
 	m_inputModel.loadSettings(_this, "inputGain");
 	m_outputModel.loadSettings(_this, "outputGain");
@@ -73,8 +71,7 @@ void dynProcControls::loadSettings(const QDomElement& _this)
 	delete[] dst;
 }
 
-void dynProcControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void dynProcControls::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	// save input, output knobs
 	m_inputModel.saveSettings(_doc, _this, "inputGain");
 	m_outputModel.saveSettings(_doc, _this, "outputGain");
@@ -88,11 +85,9 @@ void dynProcControls::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	_this.setAttribute("waveShape", sampleString);
 }
 
-void dynProcControls::setDefaultShape()
-{
+void dynProcControls::setDefaultShape() {
 	float shp[200] = {};
-	for (int i = 0; i < 200; i++)
-	{
+	for (int i = 0; i < 200; i++) {
 		shp[i] = ((float)i + 1.0f) / 200.0f;
 	}
 
@@ -100,31 +95,25 @@ void dynProcControls::setDefaultShape()
 	m_wavegraphModel.setSamples((float*)&shp);
 }
 
-void dynProcControls::resetClicked()
-{
+void dynProcControls::resetClicked() {
 	setDefaultShape();
 	Engine::getSong()->setModified();
 }
 
-void dynProcControls::smoothClicked()
-{
+void dynProcControls::smoothClicked() {
 	m_wavegraphModel.smoothNonCyclic();
 	Engine::getSong()->setModified();
 }
 
-void dynProcControls::addOneClicked()
-{
-	for (int i = 0; i < 200; i++)
-	{
+void dynProcControls::addOneClicked() {
+	for (int i = 0; i < 200; i++) {
 		m_wavegraphModel.setSampleAt(i, qBound(0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f));
 	}
 	Engine::getSong()->setModified();
 }
 
-void dynProcControls::subOneClicked()
-{
-	for (int i = 0; i < 200; i++)
-	{
+void dynProcControls::subOneClicked() {
+	for (int i = 0; i < 200; i++) {
 		m_wavegraphModel.setSampleAt(i, qBound(0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f));
 	}
 	Engine::getSong()->setModified();

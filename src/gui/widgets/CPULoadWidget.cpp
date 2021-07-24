@@ -38,8 +38,7 @@ CPULoadWidget::CPULoadWidget(QWidget* _parent)
 	, m_background(embed::getIconPixmap("cpuload_bg"))
 	, m_leds(embed::getIconPixmap("cpuload_leds"))
 	, m_changed(true)
-	, m_updateTimer()
-{
+	, m_updateTimer() {
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setFixedSize(m_background.width(), m_background.height());
 
@@ -51,10 +50,8 @@ CPULoadWidget::CPULoadWidget(QWidget* _parent)
 
 CPULoadWidget::~CPULoadWidget() {}
 
-void CPULoadWidget::paintEvent(QPaintEvent*)
-{
-	if (m_changed == true)
-	{
+void CPULoadWidget::paintEvent(QPaintEvent*) {
+	if (m_changed == true) {
 		m_changed = false;
 
 		m_temp.fill(QColor(0, 0, 0, 0));
@@ -71,12 +68,10 @@ void CPULoadWidget::paintEvent(QPaintEvent*)
 	p.drawPixmap(0, 0, m_temp);
 }
 
-void CPULoadWidget::updateCpuLoad()
-{
+void CPULoadWidget::updateCpuLoad() {
 	// smooth load-values a bit
 	int new_load = (m_currentLoad + Engine::mixer()->cpuLoad()) / 2;
-	if (new_load != m_currentLoad)
-	{
+	if (new_load != m_currentLoad) {
 		m_currentLoad = new_load;
 		m_changed = true;
 		update();

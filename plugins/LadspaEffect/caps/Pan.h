@@ -32,23 +32,20 @@
 #include "dsp/Delay.h"
 #include "dsp/OnePole.h"
 
-class PanTap
-{
+class PanTap {
 public:
 	int t;
 	DSP::OnePoleLP damper;
 
 	sample_t get(DSP::Delay& delay) { return damper.process(delay[t]); }
 
-	void reset(double c)
-	{
+	void reset(double c) {
 		damper.set_f(c);
 		damper.reset();
 	}
 };
 
-class Pan : public Plugin
-{
+class Pan : public Plugin {
 public:
 	sample_t pan;
 
@@ -73,8 +70,7 @@ public:
 };
 
 /* stereo width reduction */
-class Narrower : public Plugin
-{
+class Narrower : public Plugin {
 public:
 	sample_t strength;
 

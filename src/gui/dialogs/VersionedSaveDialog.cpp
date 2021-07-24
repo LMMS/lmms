@@ -37,8 +37,7 @@
 
 VersionedSaveDialog::VersionedSaveDialog(QWidget* parent, QWidget* saveOptionsWidget, const QString& caption,
 	const QString& directory, const QString& filter)
-	: FileDialog(parent, caption, directory, filter)
-{
+	: FileDialog(parent, caption, directory, filter) {
 	setAcceptMode(QFileDialog::AcceptSave);
 	setFileMode(QFileDialog::AnyFile);
 
@@ -62,8 +61,7 @@ VersionedSaveDialog::VersionedSaveDialog(QWidget* parent, QWidget* saveOptionsWi
 	hLayout->addWidget(minusButton);
 	layout->addLayout(hLayout, 2, 1);
 
-	if (saveOptionsWidget)
-	{
+	if (saveOptionsWidget) {
 		auto groupBox = new QGroupBox(tr("Save Options"));
 		auto optionsLayout = new QGridLayout;
 
@@ -79,8 +77,7 @@ VersionedSaveDialog::VersionedSaveDialog(QWidget* parent, QWidget* saveOptionsWi
 	connect(minusButton, SIGNAL(clicked()), this, SLOT(decrementVersion()));
 }
 
-bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool increment)
-{
+bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool increment) {
 	static QRegExp regexp("[- ]\\d+(\\.\\w+)?$");
 
 	int idx = regexp.indexIn(fileName);
@@ -88,15 +85,12 @@ bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool incremen
 	int insertIndex = fileName.lastIndexOf('.');
 	if (insertIndex < idx + 1) insertIndex = fileName.size();
 
-	if (idx == -1)
-	{
+	if (idx == -1) {
 		// Can't decrement if there is no version number
 		if (increment == false) return false;
 		else
 			fileName.insert(insertIndex, "-01");
-	}
-	else
-	{
+	} else {
 		// Find current version number
 		QString number = fileName.mid(idx + 1, insertIndex - idx - 1);
 		bool ok;
@@ -114,8 +108,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString& fileName, bool incremen
 	return true;
 }
 
-void VersionedSaveDialog::incrementVersion()
-{
+void VersionedSaveDialog::incrementVersion() {
 	const QStringList& selected = selectedFiles();
 	if (selected.size() != 1) return;
 	QString file = selected[0];
@@ -124,8 +117,7 @@ void VersionedSaveDialog::incrementVersion()
 	selectFile(file);
 }
 
-void VersionedSaveDialog::decrementVersion()
-{
+void VersionedSaveDialog::decrementVersion() {
 	const QStringList& selected = selectedFiles();
 	if (selected.size() != 1) return;
 	QString file = selected[0];
@@ -134,11 +126,9 @@ void VersionedSaveDialog::decrementVersion()
 	selectFile(file);
 }
 
-bool VersionedSaveDialog::fileExistsQuery(QString FileName, QString WindowTitle)
-{
+bool VersionedSaveDialog::fileExistsQuery(QString FileName, QString WindowTitle) {
 	bool fileExists = false;
-	if (QFile(FileName).exists())
-	{
+	if (QFile(FileName).exists()) {
 		QMessageBox mb;
 		mb.setWindowTitle(WindowTitle);
 		mb.setText(FileName
@@ -152,8 +142,7 @@ bool VersionedSaveDialog::fileExistsQuery(QString FileName, QString WindowTitle)
 	return fileExists;
 }
 
-SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions& saveOptions)
-{
+SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions& saveOptions) {
 	auto* layout = new QVBoxLayout();
 
 	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);

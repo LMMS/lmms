@@ -80,8 +80,7 @@
 #endif
 
 #ifdef LMMS_DEBUG_FPE
-void signalHandler(int signum)
-{
+void signalHandler(int signum) {
 
 	// Get a back trace
 	void* array[10];
@@ -99,8 +98,7 @@ void signalHandler(int signum)
 }
 #endif
 
-static inline QString baseName(const QString& file)
-{
+static inline QString baseName(const QString& file) {
 	return QFileInfo(file).absolutePath() + "/" + QFileInfo(file).completeBaseName();
 }
 
@@ -111,23 +109,20 @@ extern "C" _CRTIMP errno_t __cdecl freopen_s(FILE** _File, const char* _Filename
 #endif
 
 // For qInstallMessageHandler
-void consoleMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
+void consoleMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg) {
 	QByteArray localMsg = msg.toLocal8Bit();
 	fprintf(stderr, "%s\n", localMsg.constData());
 }
 #endif
 
-inline void loadTranslation(const QString& tname, const QString& dir = ConfigManager::inst()->localeDir())
-{
+inline void loadTranslation(const QString& tname, const QString& dir = ConfigManager::inst()->localeDir()) {
 	QTranslator* t = new QTranslator(QCoreApplication::instance());
 	QString name = tname + ".qm";
 
 	if (t->load(name, dir)) { QCoreApplication::instance()->installTranslator(t); }
 }
 
-void printVersion(char* executableName)
-{
+void printVersion(char* executableName) {
 	printf("LMMS %s\n(%s %s, Qt %s, %s)\n\n"
 		   "Copyright (c) %s\n\n"
 		   "This program is free software; you can redistribute it and/or\n"
@@ -138,8 +133,7 @@ void printVersion(char* executableName)
 		LMMS_VERSION, PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION, LMMS_PROJECT_COPYRIGHT, executableName);
 }
 
-void printHelp()
-{
+void printHelp() {
 	printf("LMMS %s\n"
 		   "Copyright (c) %s\n\n"
 		   "Usage: lmms [global options...] [<action> [action parameters...]]\n\n"
@@ -200,24 +194,19 @@ void printHelp()
 		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT);
 }
 
-void fileCheck(QString& file)
-{
+void fileCheck(QString& file) {
 	QFileInfo fileToCheck(file);
 
-	if (!fileToCheck.size())
-	{
+	if (!fileToCheck.size()) {
 		printf("The file %s does not have any content.\n", file.toUtf8().constData());
 		exit(EXIT_FAILURE);
-	}
-	else if (fileToCheck.isDir())
-	{
+	} else if (fileToCheck.isDir()) {
 		printf("%s is a directory.\n", file.toUtf8().constData());
 		exit(EXIT_FAILURE);
 	}
 }
 
-int usageError(const QString& message)
-{
+int usageError(const QString& message) {
 	qCritical().noquote()
 		<< QString("\n%1.\n\nTry \"%2 --help\" for more information.\n\n").arg(message).arg(qApp->arguments()[0]);
 	return EXIT_FAILURE;
@@ -225,8 +214,7 @@ int usageError(const QString& message)
 
 int noInputFileError() { return usageError("No input file specified"); }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
@@ -247,8 +235,7 @@ int main(int argc, char** argv)
 	HANDLE hStdErr = GetStdHandle(STD_ERROR_HANDLE);
 	FILE *fIn, *fOut, *fErr;
 	// Enable console output if available
-	if (AttachConsole(ATTACH_PARENT_PROCESS))
-	{
+	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		if (!hStdIn) { freopen_s(&fIn, "CONIN$", "r", stdin); }
 		if (!hStdOut) { freopen_s(&fOut, "CONOUT$", "w", stdout); }
 		if (!hStdErr) { freopen_s(&fErr, "CONOUT$", "w", stderr); }
@@ -274,28 +261,19 @@ int main(int argc, char** argv)
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
-	for (int i = 1; i < argc; ++i)
-	{
+	for (int i = 1; i < argc; ++i) {
 		QString arg = argv[i];
 
 		if (arg == "--help" || arg == "-h" || arg == "--version" || arg == "-v" || arg == "render" || arg == "--render"
-			|| arg == "-r")
-		{
+			|| arg == "-r") {
 			coreOnly = true;
-		}
-		else if (arg == "rendertracks" || arg == "--rendertracks")
-		{
+		} else if (arg == "rendertracks" || arg == "--rendertracks") {
 			coreOnly = true;
 			renderTracks = true;
-		}
-		else if (arg == "--allowroot")
-		{
+		} else if (arg == "--allowroot") {
 			allowRoot = true;
-		}
-		else if (arg == "--geometry" || arg == "-geometry")
-		{
-			if (arg == "--geometry")
-			{
+		} else if (arg == "--geometry" || arg == "-geometry") {
+			if (arg == "--geometry") {
 				// Delete the first "-" so Qt recognize the option
 				strcpy(argv[i], "-geometry");
 			}
@@ -308,8 +286,7 @@ int main(int argc, char** argv)
 	}
 
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_HAIKU)
-	if ((getuid() == 0 || geteuid() == 0) && !allowRoot)
-	{
+	if ((getuid() == 0 || geteuid() == 0) && !allowRoot) {
 		printf("LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n");
 		return EXIT_FAILURE;
 	}
@@ -329,22 +306,16 @@ int main(int argc, char** argv)
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
 	// second of two command-line parsing stages
-	for (int i = 1; i < argc; ++i)
-	{
+	for (int i = 1; i < argc; ++i) {
 		QString arg = argv[i];
 
-		if (arg == "--version" || arg == "-v")
-		{
+		if (arg == "--version" || arg == "-v") {
 			printVersion(argv[0]);
 			return EXIT_SUCCESS;
-		}
-		else if (arg == "--help" || arg == "-h")
-		{
+		} else if (arg == "--help" || arg == "-h") {
 			printHelp();
 			return EXIT_SUCCESS;
-		}
-		else if (arg == "upgrade" || arg == "--upgrade" || arg == "-u")
-		{
+		} else if (arg == "upgrade" || arg == "--upgrade" || arg == "-u") {
 			++i;
 
 			if (i == argc) { return noInputFileError(); }
@@ -354,8 +325,7 @@ int main(int argc, char** argv)
 			if (argc > i + 1) // output file specified
 			{
 				dataFile.writeFile(QString::fromLocal8Bit(argv[i + 1]));
-			}
-			else // no output file specified; use stdout
+			} else // no output file specified; use stdout
 			{
 				QTextStream ts(stdout);
 				dataFile.write(ts);
@@ -363,9 +333,7 @@ int main(int argc, char** argv)
 			}
 
 			return EXIT_SUCCESS;
-		}
-		else if (arg == "makebundle")
-		{
+		} else if (arg == "makebundle") {
 			++i;
 
 			if (i == argc) { return noInputFileError(); }
@@ -377,21 +345,15 @@ int main(int argc, char** argv)
 				printf("Making bundle\n");
 				dataFile.writeFile(QString::fromLocal8Bit(argv[i + 1]), true);
 				return EXIT_SUCCESS;
-			}
-			else
-			{
+			} else {
 				return usageError("No project bundle name given");
 			}
-		}
-		else if (arg == "--allowroot")
-		{
+		} else if (arg == "--allowroot") {
 			// Ignore, processed earlier
 #ifdef LMMS_BUILD_WIN32
 			if (allowRoot) { printf("\nOption \"--allowroot\" will be ignored on this platform.\n\n"); }
 #endif
-		}
-		else if (arg == "dump" || arg == "--dump" || arg == "-d")
-		{
+		} else if (arg == "dump" || arg == "--dump" || arg == "-d") {
 			++i;
 
 			if (i == argc) { return noInputFileError(); }
@@ -402,9 +364,7 @@ int main(int argc, char** argv)
 			printf("%s\n", d.toUtf8().constData());
 
 			return EXIT_SUCCESS;
-		}
-		else if (arg == "compress" || arg == "--compress")
-		{
+		} else if (arg == "compress" || arg == "--compress") {
 			++i;
 
 			if (i == argc) { return noInputFileError(); }
@@ -415,162 +375,123 @@ int main(int argc, char** argv)
 			fwrite(d.constData(), sizeof(char), d.size(), stdout);
 
 			return EXIT_SUCCESS;
-		}
-		else if (arg == "render" || arg == "--render" || arg == "-r" || arg == "rendertracks"
-			|| arg == "--rendertracks")
-		{
+		} else if (arg == "render" || arg == "--render" || arg == "-r" || arg == "rendertracks"
+			|| arg == "--rendertracks") {
 			++i;
 
 			if (i == argc) { return noInputFileError(); }
 
 			fileToLoad = QString::fromLocal8Bit(argv[i]);
 			renderOut = fileToLoad;
-		}
-		else if (arg == "--loop" || arg == "-l")
-		{
+		} else if (arg == "--loop" || arg == "-l") {
 			renderLoop = true;
-		}
-		else if (arg == "--output" || arg == "-o")
-		{
+		} else if (arg == "--output" || arg == "-o") {
 			++i;
 
 			if (i == argc) { return usageError("No output file specified"); }
 
 			renderOut = QString::fromLocal8Bit(argv[i]);
-		}
-		else if (arg == "--format" || arg == "-f")
-		{
+		} else if (arg == "--format" || arg == "-f") {
 			++i;
 
 			if (i == argc) { return usageError("No output format specified"); }
 
 			const QString ext = QString(argv[i]);
 
-			if (ext == "wav") { eff = ProjectRenderer::WaveFile; }
+			if (ext == "wav") {
+				eff = ProjectRenderer::WaveFile;
+			}
 #ifdef LMMS_HAVE_OGGVORBIS
-			else if (ext == "ogg")
-			{
+			else if (ext == "ogg") {
 				eff = ProjectRenderer::OggFile;
 			}
 #endif
 #ifdef LMMS_HAVE_MP3LAME
-			else if (ext == "mp3")
-			{
+			else if (ext == "mp3") {
 				eff = ProjectRenderer::MP3File;
 			}
 #endif
-			else if (ext == "flac")
-			{
+			else if (ext == "flac") {
 				eff = ProjectRenderer::FlacFile;
-			}
-			else
-			{
+			} else {
 				return usageError(QString("Invalid output format %1").arg(argv[i]));
 			}
-		}
-		else if (arg == "--samplerate" || arg == "-s")
-		{
+		} else if (arg == "--samplerate" || arg == "-s") {
 			++i;
 
 			if (i == argc) { return usageError("No samplerate specified"); }
 
 			sample_rate_t sr = QString(argv[i]).toUInt();
-			if (sr >= 44100 && sr <= 192000) { os.setSampleRate(sr); }
-			else
-			{
+			if (sr >= 44100 && sr <= 192000) {
+				os.setSampleRate(sr);
+			} else {
 				return usageError(QString("Invalid samplerate %1").arg(argv[i]));
 			}
-		}
-		else if (arg == "--bitrate" || arg == "-b")
-		{
+		} else if (arg == "--bitrate" || arg == "-b") {
 			++i;
 
 			if (i == argc) { return usageError("No bitrate specified"); }
 
 			int br = QString(argv[i]).toUInt();
 
-			if (br >= 64 && br <= 384)
-			{
+			if (br >= 64 && br <= 384) {
 				OutputSettings::BitRateSettings bitRateSettings = os.getBitRateSettings();
 				bitRateSettings.setBitRate(br);
 				os.setBitRateSettings(bitRateSettings);
-			}
-			else
-			{
+			} else {
 				return usageError(QString("Invalid bitrate %1").arg(argv[i]));
 			}
-		}
-		else if (arg == "--mode" || arg == "-m")
-		{
+		} else if (arg == "--mode" || arg == "-m") {
 			++i;
 
 			if (i == argc) { return usageError("No stereo mode specified"); }
 
 			QString const mode(argv[i]);
 
-			if (mode == "s") { os.setStereoMode(OutputSettings::StereoMode_Stereo); }
-			else if (mode == "j")
-			{
+			if (mode == "s") {
+				os.setStereoMode(OutputSettings::StereoMode_Stereo);
+			} else if (mode == "j") {
 				os.setStereoMode(OutputSettings::StereoMode_JointStereo);
-			}
-			else if (mode == "m")
-			{
+			} else if (mode == "m") {
 				os.setStereoMode(OutputSettings::StereoMode_Mono);
-			}
-			else
-			{
+			} else {
 				return usageError(QString("Invalid stereo mode %1").arg(argv[i]));
 			}
-		}
-		else if (arg == "--float" || arg == "-a")
-		{
+		} else if (arg == "--float" || arg == "-a") {
 			os.setBitDepth(OutputSettings::Depth_32Bit);
-		}
-		else if (arg == "--interpolation" || arg == "-i")
-		{
+		} else if (arg == "--interpolation" || arg == "-i") {
 			++i;
 
 			if (i == argc) { return usageError("No interpolation method specified"); }
 
 			const QString ip = QString(argv[i]);
 
-			if (ip == "linear") { qs.interpolation = Mixer::qualitySettings::Interpolation_Linear; }
-			else if (ip == "sincfastest")
-			{
+			if (ip == "linear") {
+				qs.interpolation = Mixer::qualitySettings::Interpolation_Linear;
+			} else if (ip == "sincfastest") {
 				qs.interpolation = Mixer::qualitySettings::Interpolation_SincFastest;
-			}
-			else if (ip == "sincmedium")
-			{
+			} else if (ip == "sincmedium") {
 				qs.interpolation = Mixer::qualitySettings::Interpolation_SincMedium;
-			}
-			else if (ip == "sincbest")
-			{
+			} else if (ip == "sincbest") {
 				qs.interpolation = Mixer::qualitySettings::Interpolation_SincBest;
-			}
-			else
-			{
+			} else {
 				return usageError(QString("Invalid interpolation method %1").arg(argv[i]));
 			}
-		}
-		else if (arg == "--oversampling" || arg == "-x")
-		{
+		} else if (arg == "--oversampling" || arg == "-x") {
 			++i;
 
 			if (i == argc) { return usageError("No oversampling specified"); }
 
 			int o = QString(argv[i]).toUInt();
 
-			switch (o)
-			{
+			switch (o) {
 			case 1: qs.oversampling = Mixer::qualitySettings::Oversampling_None; break;
 			case 2: qs.oversampling = Mixer::qualitySettings::Oversampling_2x; break;
 			case 4: qs.oversampling = Mixer::qualitySettings::Oversampling_4x; break;
 			case 8: qs.oversampling = Mixer::qualitySettings::Oversampling_8x; break;
 			default: return usageError(QString("Invalid oversampling %1").arg(argv[i]));
 			}
-		}
-		else if (arg == "--import")
-		{
+		} else if (arg == "--import") {
 			++i;
 
 			if (i == argc) { return usageError("No file specified for importing"); }
@@ -578,39 +499,32 @@ int main(int argc, char** argv)
 			fileToImport = QString::fromLocal8Bit(argv[i]);
 
 			// exit after import? (only for debugging)
-			if (QString(argv[i + 1]) == "-e")
-			{
+			if (QString(argv[i + 1]) == "-e") {
 				exitAfterImport = true;
 				++i;
 			}
-		}
-		else if (arg == "--profile" || arg == "-p")
-		{
+		} else if (arg == "--profile" || arg == "-p") {
 			++i;
 
 			if (i == argc) { return usageError("No profile specified"); }
 
 			profilerOutputFile = QString::fromLocal8Bit(argv[i]);
-		}
-		else if (arg == "--config" || arg == "-c")
-		{
+		} else if (arg == "--config" || arg == "-c") {
 			++i;
 
 			if (i == argc) { return usageError("No configuration file specified"); }
 
 			configFile = QString::fromLocal8Bit(argv[i]);
-		}
-		else
-		{
+		} else {
 			if (argv[i][0] == '-') { return usageError(QString("Invalid option %1").arg(argv[i])); }
 			fileToLoad = QString::fromLocal8Bit(argv[i]);
 		}
 	}
 
 	// Test file argument before continuing
-	if (!fileToLoad.isEmpty()) { fileCheck(fileToLoad); }
-	else if (!fileToImport.isEmpty())
-	{
+	if (!fileToLoad.isEmpty()) {
+		fileCheck(fileToLoad);
+	} else if (!fileToImport.isEmpty()) {
 		fileCheck(fileToImport);
 	}
 
@@ -646,8 +560,7 @@ int main(int argc, char** argv)
 #endif
 
 #ifdef LMMS_BUILD_WIN32
-	if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
-	{
+	if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)) {
 		printf("Notice: could not set high priority.\n");
 	}
 #endif
@@ -664,15 +577,13 @@ int main(int argc, char** argv)
 
 	// if we have an output file for rendering, just render the song
 	// without starting the GUI
-	if (!renderOut.isEmpty())
-	{
+	if (!renderOut.isEmpty()) {
 		Engine::init(true);
 		destroyEngine = true;
 
 		printf("Loading project...\n");
 		Engine::getSong()->loadProject(fileToLoad);
-		if (Engine::getSong()->isEmpty())
-		{
+		if (Engine::getSong()->isEmpty()) {
 			printf("The project %s is empty, aborting!\n", fileToLoad.toUtf8().constData());
 			exit(EXIT_FAILURE);
 		}
@@ -696,13 +607,12 @@ int main(int argc, char** argv)
 		if (profilerOutputFile.isEmpty() == false) { Engine::mixer()->profiler().setOutputFile(profilerOutputFile); }
 
 		// start now!
-		if (renderTracks) { r->renderTracks(); }
-		else
-		{
+		if (renderTracks) {
+			r->renderTracks();
+		} else {
 			r->renderProject();
 		}
-	}
-	else // otherwise, start the GUI
+	} else // otherwise, start the GUI
 	{
 		new GuiApplication();
 
@@ -715,8 +625,7 @@ int main(int argc, char** argv)
 
 		bool recoveryFilePresent = QFileInfo(recoveryFile).exists() && QFileInfo(recoveryFile).isFile();
 		bool autoSaveEnabled = ConfigManager::inst()->value("ui", "enableautosave").toInt();
-		if (recoveryFilePresent)
-		{
+		if (recoveryFilePresent) {
 			QMessageBox mb;
 			mb.setWindowTitle(MainWindow::tr("Project recovery"));
 			mb.setText(QString("<html>"
@@ -769,13 +678,13 @@ int main(int argc, char** argv)
 			mb.setEscapeButton(exit);
 
 			mb.exec();
-			if (mb.clickedButton() == discard) { gui->mainWindow()->sessionCleanup(); }
-			else if (mb.clickedButton() == recover) // Recover
+			if (mb.clickedButton() == discard) {
+				gui->mainWindow()->sessionCleanup();
+			} else if (mb.clickedButton() == recover) // Recover
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession(MainWindow::SessionState::Recover);
-			}
-			else // Exit
+			} else // Exit
 			{
 				return EXIT_SUCCESS;
 			}
@@ -792,35 +701,29 @@ int main(int argc, char** argv)
 		QString queuedFile = static_cast<MainApplication*>(app)->queuedFile();
 		if (!queuedFile.isEmpty()) { fileToLoad = queuedFile; }
 
-		if (!fileToLoad.isEmpty())
-		{
-			if (fileToLoad == recoveryFile) { Engine::getSong()->createNewProjectFromTemplate(fileToLoad); }
-			else
-			{
+		if (!fileToLoad.isEmpty()) {
+			if (fileToLoad == recoveryFile) {
+				Engine::getSong()->createNewProjectFromTemplate(fileToLoad);
+			} else {
 				Engine::getSong()->loadProject(fileToLoad);
 			}
-		}
-		else if (!fileToImport.isEmpty())
-		{
+		} else if (!fileToImport.isEmpty()) {
 			ImportFilter::import(fileToImport, Engine::getSong());
 			if (exitAfterImport) { return EXIT_SUCCESS; }
 		}
 		// If enabled, open last project if there is one. Else, create
 		// a new one.
 		else if (ConfigManager::inst()->value("app", "openlastproject").toInt()
-			&& !ConfigManager::inst()->recentlyOpenedProjects().isEmpty() && !recoveryFilePresent)
-		{
+			&& !ConfigManager::inst()->recentlyOpenedProjects().isEmpty() && !recoveryFilePresent) {
 			QString f = ConfigManager::inst()->recentlyOpenedProjects().first();
 			QFileInfo recentFile(f);
 
-			if (recentFile.exists() && recentFile.suffix().toLower() != "mpt") { Engine::getSong()->loadProject(f); }
-			else
-			{
+			if (recentFile.exists() && recentFile.suffix().toLower() != "mpt") {
+				Engine::getSong()->loadProject(f);
+			} else {
 				Engine::getSong()->createNewProject();
 			}
-		}
-		else
-		{
+		} else {
 			Engine::getSong()->createNewProject();
 		}
 
@@ -841,8 +744,7 @@ int main(int argc, char** argv)
 #ifdef LMMS_BUILD_WIN32
 	// Cleanup console
 	HWND hConsole = GetConsoleWindow();
-	if (hConsole)
-	{
+	if (hConsole) {
 		SendMessage(hConsole, WM_CHAR, (WPARAM)VK_RETURN, (LPARAM)0);
 		FreeConsole();
 	}

@@ -46,16 +46,10 @@ class Song;
 class TextFloat;
 class TimeLineWidget;
 
-class SongEditor : public TrackContainerView
-{
+class SongEditor : public TrackContainerView {
 	Q_OBJECT
 public:
-	enum EditMode
-	{
-		DrawMode,
-		KnifeMode,
-		SelectMode
-	};
+	enum EditMode { DrawMode, KnifeMode, SelectMode };
 
 	SongEditor(Song* song);
 	~SongEditor();
@@ -161,8 +155,7 @@ signals:
 	void zoomingValueChanged(double);
 };
 
-class SongEditorWindow : public Editor
-{
+class SongEditorWindow : public Editor {
 	Q_OBJECT
 public:
 	SongEditorWindow(Song* song);

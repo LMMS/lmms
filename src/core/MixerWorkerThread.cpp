@@ -41,41 +41,34 @@ QWaitCondition* MixerWorkerThread::queueReadyWaitCond = NULL;
 QList<MixerWorkerThread*> MixerWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
-void MixerWorkerThread::JobQueue::reset(OperationMode _opMode)
-{
+void MixerWorkerThread::JobQueue::reset(OperationMode _opMode) {
 	m_writeIndex = 0;
 	m_itemsDone = 0;
 	m_opMode = _opMode;
 }
 
-void MixerWorkerThread::JobQueue::addJob(ThreadableJob* _job)
-{
-	if (_job->requiresProcessing())
-	{
+void MixerWorkerThread::JobQueue::addJob(ThreadableJob* _job) {
+	if (_job->requiresProcessing()) {
 		// update job state
 		_job->queue();
 		// actually queue the job via atomic operations
 		auto index = m_writeIndex++;
-		if (index < JOB_QUEUE_SIZE) { m_items[index] = _job; }
-		else
-		{
+		if (index < JOB_QUEUE_SIZE) {
+			m_items[index] = _job;
+		} else {
 			qWarning() << "Job queue is full!";
 			++m_itemsDone;
 		}
 	}
 }
 
-void MixerWorkerThread::JobQueue::run()
-{
+void MixerWorkerThread::JobQueue::run() {
 	bool processedJob = true;
-	while (processedJob && m_itemsDone < m_writeIndex)
-	{
+	while (processedJob && m_itemsDone < m_writeIndex) {
 		processedJob = false;
-		for (int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i)
-		{
+		for (int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i) {
 			ThreadableJob* job = m_items[i].exchange(nullptr);
-			if (job)
-			{
+			if (job) {
 				job->process();
 				processedJob = true;
 				++m_itemsDone;
@@ -86,10 +79,8 @@ void MixerWorkerThread::JobQueue::run()
 	}
 }
 
-void MixerWorkerThread::JobQueue::wait()
-{
-	while (m_itemsDone < m_writeIndex)
-	{
+void MixerWorkerThread::JobQueue::wait() {
+	while (m_itemsDone < m_writeIndex) {
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 		_mm_pause();
 #endif
@@ -100,8 +91,7 @@ void MixerWorkerThread::JobQueue::wait()
 
 MixerWorkerThread::MixerWorkerThread(Mixer* mixer)
 	: QThread(mixer)
-	, m_quit(false)
-{
+	, m_quit(false) {
 	// initialize global static data
 	if (queueReadyWaitCond == NULL) { queueReadyWaitCond = new QWaitCondition; }
 
@@ -115,14 +105,12 @@ MixerWorkerThread::MixerWorkerThread(Mixer* mixer)
 
 MixerWorkerThread::~MixerWorkerThread() { workerThreads.removeAll(this); }
 
-void MixerWorkerThread::quit()
-{
+void MixerWorkerThread::quit() {
 	m_quit = true;
 	resetJobQueue();
 }
 
-void MixerWorkerThread::startAndWaitForJobs()
-{
+void MixerWorkerThread::startAndWaitForJobs() {
 	queueReadyWaitCond->wakeAll();
 	// The last worker-thread is never started. Instead it's processed "inline"
 	// i.e. within the global Mixer thread. This way we can reduce latencies
@@ -131,15 +119,13 @@ void MixerWorkerThread::startAndWaitForJobs()
 	globalJobQueue.wait();
 }
 
-void MixerWorkerThread::run()
-{
+void MixerWorkerThread::run() {
 	MemoryManager::ThreadGuard mmThreadGuard;
 	Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;
-	while (m_quit == false)
-	{
+	while (m_quit == false) {
 		m.lock();
 		queueReadyWaitCond->wait(&m);
 		globalJobQueue.run();

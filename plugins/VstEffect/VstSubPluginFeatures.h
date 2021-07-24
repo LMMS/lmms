@@ -29,8 +29,7 @@
 
 #include "Effect.h"
 
-class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
-{
+class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures {
 public:
 	VstSubPluginFeatures(Plugin::PluginTypes _type);
 

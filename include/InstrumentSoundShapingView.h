@@ -38,8 +38,7 @@ class GroupBox;
 class Knob;
 class TabWidget;
 
-class InstrumentSoundShapingView : public QWidget, public ModelView
-{
+class InstrumentSoundShapingView : public QWidget, public ModelView {
 	Q_OBJECT
 public:
 	InstrumentSoundShapingView(QWidget* _parent);

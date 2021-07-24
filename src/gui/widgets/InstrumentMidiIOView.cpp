@@ -44,8 +44,7 @@ InstrumentMidiIOView::InstrumentMidiIOView(QWidget* parent)
 	: QWidget(parent)
 	, ModelView(NULL, this)
 	, m_rpBtn(NULL)
-	, m_wpBtn(NULL)
-{
+	, m_wpBtn(NULL) {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(5);
 	m_midiInputGroupBox = new GroupBox(tr("ENABLE MIDI INPUT"));
@@ -122,8 +121,7 @@ InstrumentMidiIOView::InstrumentMidiIOView(QWidget* parent)
 	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)), m_outputProgramSpinBox, SLOT(setEnabled(bool)));
 	connect(m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)), m_fixedOutputNoteSpinBox, SLOT(setEnabled(bool)));
 
-	if (!Engine::mixer()->midiClient()->isRaw())
-	{
+	if (!Engine::mixer()->midiClient()->isRaw()) {
 		m_rpBtn = new QToolButton;
 		m_rpBtn->setMinimumSize(32, 32);
 		m_rpBtn->setText(tr("MIDI devices to receive MIDI events from"));
@@ -170,8 +168,7 @@ InstrumentMidiIOView::InstrumentMidiIOView(QWidget* parent)
 
 InstrumentMidiIOView::~InstrumentMidiIOView() {}
 
-void InstrumentMidiIOView::modelChanged()
-{
+void InstrumentMidiIOView::modelChanged() {
 	MidiPort* mp = castModel<MidiPort>();
 
 	m_midiInputGroupBox->setModel(&mp->m_readableModel);
@@ -193,8 +190,7 @@ void InstrumentMidiIOView::modelChanged()
 }
 
 InstrumentMiscView::InstrumentMiscView(InstrumentTrack* it, QWidget* parent)
-	: QWidget(parent)
-{
+	: QWidget(parent) {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(5);
 	m_pitchGroupBox = new GroupBox(tr("MASTER PITCH"));

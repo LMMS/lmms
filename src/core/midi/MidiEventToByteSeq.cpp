@@ -28,27 +28,22 @@
 
 #include "MidiEvent.h"
 
-std::size_t writeToByteSeq(const MidiEvent& ev, uint8_t* data, std::size_t bufsize)
-{
+std::size_t writeToByteSeq(const MidiEvent& ev, uint8_t* data, std::size_t bufsize) {
 	Q_ASSERT(bufsize >= 3);
 
 	std::size_t size = 0;
 	data[0] = ev.type() | (ev.channel() & 0x0F);
 
-	switch (ev.type())
-	{
+	switch (ev.type()) {
 	case MidiNoteOn:
-		if (ev.velocity() > 0)
-		{
+		if (ev.velocity() > 0) {
 			if (ev.key() < 0 || ev.key() > MidiMaxKey) break;
 
 			data[1] = ev.key();
 			data[2] = ev.velocity();
 			size = 3;
 			break;
-		}
-		else
-		{
+		} else {
 			// Lv2 MIDI specs:
 			// "Note On messages with velocity 0 are not allowed.
 			// These messages are equivalent to Note Off in standard

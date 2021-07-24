@@ -33,15 +33,13 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class Clip : public Plugin
-{
+class Clip : public Plugin {
 public:
 	sample_t gain, gain_db;
 
 	sample_t threshold[2];
 
-	enum
-	{
+	enum {
 		OVERSAMPLE = 8,
 		FIR_SIZE = 64,
 	};
@@ -59,14 +57,11 @@ public:
 
 	Clip()
 		: up(FIR_SIZE, OVERSAMPLE)
-		, down(FIR_SIZE)
-	{
-	}
+		, down(FIR_SIZE) {}
 
 	void init();
 
-	void activate()
-	{
+	void activate() {
 		up.reset();
 		down.reset();
 		gain_db = *ports[1];

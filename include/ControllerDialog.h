@@ -32,8 +32,7 @@
 
 class Controller;
 
-class ControllerDialog : public QWidget, public ModelView
-{
+class ControllerDialog : public QWidget, public ModelView {
 	Q_OBJECT
 public:
 	ControllerDialog(Controller* _controller, QWidget* _parent);

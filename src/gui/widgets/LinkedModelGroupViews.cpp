@@ -38,8 +38,7 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent, LinkedModelGroup* mo
 	: QWidget(parent)
 	, m_model(model)
 	, m_colNum(colNum)
-	, m_layout(new ControlLayout(this))
-{
+	, m_layout(new ControlLayout(this)) {
 	// This is required to remove the focus of the line edit
 	// when e.g. another spin box is being clicked.
 	// Removing the focus is wanted because in many cases, the user wants to
@@ -49,20 +48,16 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent, LinkedModelGroup* mo
 
 LinkedModelGroupView::~LinkedModelGroupView() {}
 
-void LinkedModelGroupView::modelChanged(LinkedModelGroup* group)
-{
+void LinkedModelGroupView::modelChanged(LinkedModelGroup* group) {
 	// reconnect models
 	group->foreach_model([this](const std::string& str, const LinkedModelGroup::ModelInfo& minf) {
 		auto itr = m_widgets.find(str);
 		// in case there are new or deleted widgets, the subclass has already
 		// modified m_widgets, so this will go into the else case
-		if (itr == m_widgets.end())
-		{
+		if (itr == m_widgets.end()) {
 			// no widget? this can happen when the whole view is being destroyed
 			// (for some strange reasons)
-		}
-		else
-		{
+		} else {
 			itr->second->setModel(minf.m_model);
 		}
 	});
@@ -70,17 +65,15 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup* group)
 	m_model = group;
 }
 
-void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id, const std::string& display, bool removable)
-{
+void LinkedModelGroupView::addControl(
+	Control* ctrl, const std::string& id, const std::string& display, bool removable) {
 	int wdgNum = static_cast<int>(m_widgets.size());
-	if (ctrl)
-	{
+	if (ctrl) {
 		QWidget* box = new QWidget(this);
 		QHBoxLayout* boxLayout = new QHBoxLayout(box);
 		boxLayout->addWidget(ctrl->topWidget());
 
-		if (removable)
-		{
+		if (removable) {
 			QPushButton* removeBtn = new QPushButton;
 			removeBtn->setIcon(embed::getIconPixmap("discard"));
 			QObject::connect(
@@ -109,11 +102,9 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id, cons
 	if (isHidden()) { setHidden(false); }
 }
 
-void LinkedModelGroupView::removeControl(const QString& key)
-{
+void LinkedModelGroupView::removeControl(const QString& key) {
 	auto itr = m_widgets.find(key.toStdString());
-	if (itr != m_widgets.end())
-	{
+	if (itr != m_widgets.end()) {
 		QLayoutItem* item = m_layout->itemByString(key);
 		Q_ASSERT(!!item);
 		QWidget* wdg = item->widget();
@@ -136,8 +127,7 @@ void LinkedModelGroupView::removeFocusFromSearchBar() { m_layout->removeFocusFro
 	LinkedModelGroupsViewBase
 */
 
-void LinkedModelGroupsView::modelChanged(LinkedModelGroups* groups)
-{
+void LinkedModelGroupsView::modelChanged(LinkedModelGroups* groups) {
 	LinkedModelGroupView* groupView = getGroupView();
 	LinkedModelGroup* group0 = groups->getGroup(0);
 	if (group0 && groupView) { groupView->modelChanged(group0); }

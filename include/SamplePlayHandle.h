@@ -35,8 +35,7 @@ class SampleTCO;
 class Track;
 class AudioPort;
 
-class SamplePlayHandle : public PlayHandle
-{
+class SamplePlayHandle : public PlayHandle {
 public:
 	SamplePlayHandle(SampleBuffer* sampleBuffer, bool ownAudioPort = true);
 	SamplePlayHandle(const QString& sampleFile);

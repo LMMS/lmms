@@ -33,21 +33,19 @@
 #include "embed.h"
 #include "plugin_export.h"
 
-extern "C"
-{
+extern "C" {
 
-	Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "VST",
-		QT_TRANSLATE_NOOP("PluginBrowser", "plugin for using arbitrary VST effects inside LMMS."),
-		"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0200, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
-		new VstSubPluginFeatures(Plugin::Effect)};
+Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "VST",
+	QT_TRANSLATE_NOOP("PluginBrowser", "plugin for using arbitrary VST effects inside LMMS."),
+	"Tobias Doerffel <tobydox/at/users.sf.net>", 0x0200, Plugin::Effect, new PluginPixmapLoader("logo"), NULL,
+	new VstSubPluginFeatures(Plugin::Effect)};
 }
 
 VstEffect::VstEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _key)
 	: Effect(&vsteffect_plugin_descriptor, _parent, _key)
 	, m_pluginMutex()
 	, m_key(*_key)
-	, m_vstControls(this)
-{
+	, m_vstControls(this) {
 	if (!m_key.attributes["file"].isEmpty()) { openPlugin(m_key.attributes["file"]); }
 	setDisplayName(m_key.attributes["file"].section(".dll", 0, 0).isEmpty()
 			? m_key.name
@@ -56,12 +54,10 @@ VstEffect::VstEffect(Model* _parent, const Descriptor::SubPluginFeatures::Key* _
 
 VstEffect::~VstEffect() {}
 
-bool VstEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
-{
+bool VstEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames) {
 	if (!isEnabled() || !isRunning()) { return false; }
 
-	if (m_plugin)
-	{
+	if (m_plugin) {
 		const float d = dryLevel();
 #ifdef __GNUC__
 		sampleFrame buf[_frames];
@@ -69,21 +65,18 @@ bool VstEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 		sampleFrame* buf = new sampleFrame[_frames];
 #endif
 		memcpy(buf, _buf, sizeof(sampleFrame) * _frames);
-		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
-		{
+		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {
 			m_plugin->process(buf, buf);
 			m_pluginMutex.unlock();
 		}
 
 		double out_sum = 0.0;
 		const float w = wetLevel();
-		for (fpp_t f = 0; f < _frames; ++f)
-		{
+		for (fpp_t f = 0; f < _frames; ++f) {
 			_buf[f][0] = w * buf[f][0] + d * _buf[f][0];
 			_buf[f][1] = w * buf[f][1] + d * _buf[f][1];
 		}
-		for (fpp_t f = 0; f < _frames; ++f)
-		{
+		for (fpp_t f = 0; f < _frames; ++f) {
 			out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 		}
 #ifndef __GNUC__
@@ -95,11 +88,9 @@ bool VstEffect::processAudioBuffer(sampleFrame* _buf, const fpp_t _frames)
 	return isRunning();
 }
 
-void VstEffect::openPlugin(const QString& _plugin)
-{
+void VstEffect::openPlugin(const QString& _plugin) {
 	TextFloat* tf = NULL;
-	if (gui)
-	{
+	if (gui) {
 		tf = TextFloat::displayMessage(VstPlugin::tr("Loading plugin"),
 			VstPlugin::tr("Please wait while loading VST plugin..."), PLUGIN_NAME::getIconPixmap("logo", 24, 24), 0);
 	}
@@ -107,8 +98,7 @@ void VstEffect::openPlugin(const QString& _plugin)
 	QMutexLocker ml(&m_pluginMutex);
 	Q_UNUSED(ml);
 	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin(_plugin));
-	if (m_plugin->failed())
-	{
+	if (m_plugin->failed()) {
 		m_plugin.clear();
 		delete tf;
 		collectErrorForUI(VstPlugin::tr("The VST plugin %1 could not be loaded.").arg(_plugin));
@@ -120,12 +110,10 @@ void VstEffect::openPlugin(const QString& _plugin)
 	m_key.attributes["file"] = _plugin;
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data)
-	{
-		return new VstEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* _parent, void* _data) {
+	return new VstEffect(_parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data));
+}
 }

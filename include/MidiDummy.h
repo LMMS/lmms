@@ -27,21 +27,18 @@
 
 #include "MidiClient.h"
 
-class MidiDummy : public MidiClientRaw
-{
+class MidiDummy : public MidiClientRaw {
 public:
 	MidiDummy() {}
 	virtual ~MidiDummy() {}
 
 	inline static QString name() { return (QT_TRANSLATE_NOOP("MidiSetupWidget", "Dummy (no MIDI support)")); }
 
-	inline static QString probeDevice()
-	{
+	inline static QString probeDevice() {
 		return QString(); // no midi device name
 	}
 
-	inline static QString configSection()
-	{
+	inline static QString configSection() {
 		return QString(); // no configuration settings
 	}
 

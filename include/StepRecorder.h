@@ -33,8 +33,7 @@
 class PianoRoll;
 class StepRecorderWidget;
 
-class StepRecorder : public QObject
-{
+class StepRecorder : public QObject {
 	Q_OBJECT
 
 public:
@@ -54,8 +53,7 @@ public:
 
 	bool isRecording() const { return m_isRecording; }
 
-	QColor curStepNoteColor() const
-	{
+	QColor curStepNoteColor() const {
 		return QColor(245, 3, 139); // radiant pink
 	}
 
@@ -92,8 +90,7 @@ private:
 
 	Pattern* m_pattern;
 
-	class StepNote
-	{
+	class StepNote {
 	public:
 		StepNote(const Note& note)
 			: m_note(note)
@@ -101,8 +98,7 @@ private:
 
 		void setPressed() { m_pressed = true; }
 
-		void setReleased()
-		{
+		void setReleased() {
 			m_pressed = false;
 			releasedTimer.start();
 		}

@@ -41,13 +41,7 @@ const unsigned int FFT_BUFFER_SIZE = 2048;
 const std::vector<unsigned int> FFT_BLOCK_SIZES = {256, 512, 1024, 2048, 4096, 8192, 16384};
 
 // List of FFT window functions supported by precomputeWindow()
-enum FFT_WINDOWS
-{
-	RECTANGULAR = 0,
-	BLACKMAN_HARRIS,
-	HAMMING,
-	HANNING
-};
+enum FFT_WINDOWS { RECTANGULAR = 0, BLACKMAN_HARRIS, HAMMING, HANNING };
 
 /**	Returns biggest value from abs_spectrum[spec_size] array.
  *

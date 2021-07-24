@@ -35,14 +35,12 @@
 #include "dsp/util.h"
 #include "dsp/windows.h"
 
-class VCOs : public Plugin
-{
+class VCOs : public Plugin {
 public:
 	sample_t f, gain;
 
 	/* ok to just change these as you please, 4/32 works ok, sortof. */
-	enum
-	{
+	enum {
 		OVERSAMPLE = 8,
 		FIR_SIZE = 64,
 	};
@@ -58,13 +56,10 @@ public:
 	static PortInfo port_info[];
 
 	VCOs()
-		: down(FIR_SIZE)
-	{
-	}
+		: down(FIR_SIZE) {}
 
 	void init();
-	void activate()
-	{
+	void activate() {
 		gain = *ports[3];
 		down.reset();
 		vco.reset();
@@ -77,15 +72,13 @@ public:
 
 /* //////////////////////////////////////////////////////////////////////// */
 
-class VCOd : public Plugin
-{
+class VCOd : public Plugin {
 public:
 	double fs;
 	sample_t f, gain;
 
 	/* ok to just change these as you please, 4/32 works ok, sortof. */
-	enum
-	{
+	enum {
 		OVERSAMPLE = 8,
 		FIR_SIZE = 64,
 	};
@@ -101,13 +94,10 @@ public:
 	static PortInfo port_info[];
 
 	VCOd()
-		: down(FIR_SIZE)
-	{
-	}
+		: down(FIR_SIZE) {}
 
 	void init();
-	void activate()
-	{
+	void activate() {
 		gain = *ports[8];
 		down.reset();
 		vco.reset();

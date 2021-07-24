@@ -41,18 +41,16 @@
 
 MidiSndio::MidiSndio(void)
 	: MidiClientRaw()
-	, m_quit(false)
-{
+	, m_quit(false) {
 	QString dev = probeDevice();
 
-	if (dev == "") { m_hdl = mio_open(NULL, MIO_IN | MIO_OUT, 0); }
-	else
-	{
+	if (dev == "") {
+		m_hdl = mio_open(NULL, MIO_IN | MIO_OUT, 0);
+	} else {
 		m_hdl = mio_open(dev.toLatin1().constData(), MIO_IN | MIO_OUT, 0);
 	}
 
-	if (m_hdl == NULL)
-	{
+	if (m_hdl == NULL) {
 		printf("sndio: failed opening sndio midi device\n");
 		return;
 	}
@@ -60,18 +58,15 @@ MidiSndio::MidiSndio(void)
 	start(QThread::LowPriority);
 }
 
-MidiSndio::~MidiSndio()
-{
-	if (isRunning())
-	{
+MidiSndio::~MidiSndio() {
+	if (isRunning()) {
 		m_quit = true;
 		wait(1000);
 		terminate();
 	}
 }
 
-QString MidiSndio::probeDevice(void)
-{
+QString MidiSndio::probeDevice(void) {
 	QString dev = ConfigManager::inst()->value("MidiSndio", "device");
 
 	return dev;
@@ -79,23 +74,20 @@ QString MidiSndio::probeDevice(void)
 
 void MidiSndio::sendByte(const unsigned char c) { mio_write(m_hdl, &c, 1); }
 
-void MidiSndio::run(void)
-{
+void MidiSndio::run(void) {
 	struct pollfd pfd;
 	nfds_t nfds;
 	char buf[0x100], *p;
 	size_t n;
 	int ret;
-	while (m_quit == false && m_hdl)
-	{
+	while (m_quit == false && m_hdl) {
 		nfds = mio_pollfd(m_hdl, &pfd, POLLIN);
 		ret = poll(&pfd, nfds, 100);
 		if (ret < 0) break;
 		if (!ret || !(mio_revents(m_hdl, &pfd) & POLLIN)) continue;
 		n = mio_read(m_hdl, buf, sizeof(buf));
 		if (!n) { break; }
-		for (p = buf; n > 0; n--, p++)
-		{
+		for (p = buf; n > 0; n--, p++) {
 			parseData(*p);
 		}
 	}

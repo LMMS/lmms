@@ -37,8 +37,7 @@
 #include "gui_templates.h"
 
 /* callback functions for jack */
-static int JackMidiProcessCallback(jack_nframes_t nframes, void* arg)
-{
+static int JackMidiProcessCallback(jack_nframes_t nframes, void* arg) {
 	MidiJack* jmd = (MidiJack*)arg;
 
 	if (nframes <= 0) return (0);
@@ -49,8 +48,7 @@ static int JackMidiProcessCallback(jack_nframes_t nframes, void* arg)
 	return (0);
 }
 
-static void JackMidiShutdown(void* arg)
-{
+static void JackMidiShutdown(void* arg) {
 	//: When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)
 	QString msg_short = MidiJack::tr("JACK server down");
 	//: When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)
@@ -63,33 +61,27 @@ MidiJack::MidiJack()
 	, m_jackClient(nullptr)
 	, m_input_port(NULL)
 	, m_output_port(NULL)
-	, m_quit(false)
-{
+	, m_quit(false) {
 	// if jack is currently used for audio then we share the connection
 	// AudioJack creates and maintains the jack connection
 	// and also handles the callback, we pass it our address
 	// so that we can also process during the callback
 
 	m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev());
-	if (m_jackAudio)
-	{
+	if (m_jackAudio) {
 		// if a jack connection has been created for audio we use that
 		m_jackAudio->addMidiClient(this);
-	}
-	else
-	{
+	} else {
 		m_jackAudio = NULL;
 		m_jackClient = jack_client_open(probeDevice().toLatin1().data(), JackNoStartServer, NULL);
 
-		if (m_jackClient)
-		{
+		if (m_jackClient) {
 			jack_set_process_callback(m_jackClient, JackMidiProcessCallback, this);
 			jack_on_shutdown(m_jackClient, JackMidiShutdown, 0);
 		}
 	}
 
-	if (jackClient())
-	{
+	if (jackClient()) {
 		/* jack midi out not implemented
 		   JackMidiWrite and sendByte needs to be functional
 		   before enabling this
@@ -102,20 +94,16 @@ MidiJack::MidiJack()
 
 		m_input_port = jack_port_register(jackClient(), "MIDI in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
 
-		if (jack_activate(jackClient()) == 0)
-		{
+		if (jack_activate(jackClient()) == 0) {
 			// only start thread, if we have an active jack client.
 			start(QThread::LowPriority);
 		}
 	}
 }
 
-MidiJack::~MidiJack()
-{
-	if (jackClient())
-	{
-		if (m_jackAudio)
-		{
+MidiJack::~MidiJack() {
+	if (jackClient()) {
+		if (m_jackAudio) {
 			// remove ourselves first (atomically), so we will not get called again
 			m_jackAudio->removeMidiClient();
 		}
@@ -128,24 +116,21 @@ MidiJack::~MidiJack()
 		}
 		*/
 
-		if (m_jackClient)
-		{
+		if (m_jackClient) {
 			// an m_jackClient means we are handling the jack connection
 			if (jack_deactivate(m_jackClient) != 0) { printf("Failed to deactivate jack midi client\n"); }
 
 			if (jack_client_close(m_jackClient) != 0) { printf("Failed close jack midi client\n"); }
 		}
 	}
-	if (isRunning())
-	{
+	if (isRunning()) {
 		m_quit = true;
 		wait(1000);
 		terminate();
 	}
 }
 
-jack_client_t* MidiJack::jackClient()
-{
+jack_client_t* MidiJack::jackClient() {
 	if (m_jackAudio == NULL && m_jackClient == NULL) return NULL;
 
 	if (m_jackAudio == NULL && m_jackClient) return m_jackClient;
@@ -153,16 +138,14 @@ jack_client_t* MidiJack::jackClient()
 	return m_jackAudio->jackClient();
 }
 
-QString MidiJack::probeDevice()
-{
+QString MidiJack::probeDevice() {
 	QString jid = ConfigManager::inst()->value("midijack", "lmms");
 	if (jid.isEmpty()) { return "lmms"; }
 	return jid;
 }
 
 // we read data from jack
-void MidiJack::JackMidiRead(jack_nframes_t nframes)
-{
+void MidiJack::JackMidiRead(jack_nframes_t nframes) {
 	unsigned int i, b;
 	void* port_buf = jack_port_get_buffer(m_input_port, nframes);
 	jack_midi_event_t in_event;
@@ -170,12 +153,9 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 	jack_nframes_t event_count = jack_midi_get_event_count(port_buf);
 
 	int rval = jack_midi_event_get(&in_event, port_buf, 0);
-	if (rval == 0 /* 0 = success */)
-	{
-		for (i = 0; i < nframes; i++)
-		{
-			if ((in_event.time == i) && (event_index < event_count))
-			{
+	if (rval == 0 /* 0 = success */) {
+		for (i = 0; i < nframes; i++) {
+			if ((in_event.time == i) && (event_index < event_count)) {
 				// lmms is setup to parse bytes coming from a device
 				// parse it byte by byte as it expects
 				for (b = 0; b < in_event.size; b++)
@@ -193,21 +173,17 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
    once working the output port needs to be enabled in the constructor
  */
 
-void MidiJack::sendByte(const unsigned char c)
-{
+void MidiJack::sendByte(const unsigned char c) {
 	// m_midiDev.putChar( c );
 }
 
 // we write data to jack
-void MidiJack::JackMidiWrite(jack_nframes_t nframes)
-{
+void MidiJack::JackMidiWrite(jack_nframes_t nframes) {
 	// TODO: write midi data to jack port
 }
 
-void MidiJack::run()
-{
-	while (m_quit == false)
-	{
+void MidiJack::run() {
+	while (m_quit == false) {
 		// we sleep the thread to keep it alive
 		// midi processing is handled by jack server callbacks
 		sleep(1);

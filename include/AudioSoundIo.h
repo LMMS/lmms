@@ -41,8 +41,7 @@ class ComboBox;
 class LcdSpinBox;
 
 // Exists only to work around "Error: Meta object features not supported for nested classes"
-class AudioSoundIoSetupUtil : public QObject
-{
+class AudioSoundIoSetupUtil : public QObject {
 	Q_OBJECT
 public:
 	virtual ~AudioSoundIoSetupUtil();
@@ -53,16 +52,14 @@ public slots:
 	void reconnectSoundIo();
 };
 
-class AudioSoundIo : public AudioDevice
-{
+class AudioSoundIo : public AudioDevice {
 public:
 	AudioSoundIo(bool& _success_ful, Mixer* mixer);
 	virtual ~AudioSoundIo();
 
 	inline static QString name() { return QT_TRANSLATE_NOOP("AudioDeviceSetupWidget", "soundio"); }
 
-	class setupWidget : public AudioDeviceSetupWidget
-	{
+	class setupWidget : public AudioDeviceSetupWidget {
 	public:
 		setupWidget(QWidget* _parent);
 		virtual ~setupWidget();
@@ -82,8 +79,7 @@ public:
 
 		SoundIo* m_soundio;
 
-		struct DeviceId
-		{
+		struct DeviceId {
 			QString id;
 			bool is_raw;
 		};
@@ -115,20 +111,16 @@ private:
 	void errorCallback(int err);
 	void underflowCallback();
 
-	static void staticWriteCallback(SoundIoOutStream* outstream, int frame_count_min, int frame_count_max)
-	{
+	static void staticWriteCallback(SoundIoOutStream* outstream, int frame_count_min, int frame_count_max) {
 		return ((AudioSoundIo*)outstream->userdata)->writeCallback(frame_count_min, frame_count_max);
 	}
-	static void staticErrorCallback(SoundIoOutStream* outstream, int err)
-	{
+	static void staticErrorCallback(SoundIoOutStream* outstream, int err) {
 		return ((AudioSoundIo*)outstream->userdata)->errorCallback(err);
 	}
-	static void staticUnderflowCallback(SoundIoOutStream* outstream)
-	{
+	static void staticUnderflowCallback(SoundIoOutStream* outstream) {
 		return ((AudioSoundIo*)outstream->userdata)->underflowCallback();
 	}
-	static void staticOnBackendDisconnect(SoundIo* soundio, int err)
-	{
+	static void staticOnBackendDisconnect(SoundIo* soundio, int err) {
 		return ((AudioSoundIo*)soundio->userdata)->onBackendDisconnect(err);
 	}
 };

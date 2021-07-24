@@ -28,8 +28,7 @@
 
 ProjectVersion::ProjectVersion(QString version, CompareType c)
 	: m_version(version)
-	, m_compareType(c)
-{
+	, m_compareType(c) {
 	// Version numbers may have build data, prefixed with a '+',
 	// but this mustn't affect version precedence in comparisons
 	QString metadataStripped = version.split("+").first();
@@ -41,8 +40,7 @@ ProjectVersion::ProjectVersion(QString version, CompareType c)
 	// The obligatory segment consists of three identifiers: MAJOR.MINOR.PATCH
 	QStringList mainVersion = obligatorySegment.split(".");
 	// HACK: Pad invalid versions in order to prevent crashes
-	while (mainVersion.size() < 3)
-	{
+	while (mainVersion.size() < 3) {
 		mainVersion.append("0");
 	}
 	m_major = mainVersion.at(0).toInt();
@@ -54,8 +52,7 @@ ProjectVersion::ProjectVersion(QString version, CompareType c)
 
 	// HACK: Handle old (1.2.2 and earlier), non-standard versions of the form
 	// MAJOR.MINOR.PATCH.COMMITS, used for non-release builds from source.
-	if (mainVersion.size() >= 4 && m_major <= 1 && m_minor <= 2 && m_patch <= 2)
-	{
+	if (mainVersion.size() >= 4 && m_major <= 1 && m_minor <= 2 && m_patch <= 2) {
 		// Drop the standard version identifiers. erase(a, b) removes [a,b)
 		mainVersion.erase(mainVersion.begin(), mainVersion.begin() + 3);
 		// Prepend the remaining identifiers as prerelease versions
@@ -66,30 +63,24 @@ ProjectVersion::ProjectVersion(QString version, CompareType c)
 }
 
 ProjectVersion::ProjectVersion(const char* version, CompareType c)
-	: ProjectVersion(QString(version), c)
-{
-}
+	: ProjectVersion(QString(version), c) {}
 
 //! @param c Determines the number of identifiers to check when comparing
-int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c)
-{
+int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, CompareType c) {
 	// How many identifiers to compare before we consider the versions equal
 	const int limit = static_cast<int>(c);
 
 	// Use the value of limit to zero out identifiers we don't care about
 	int aMaj = 0, bMaj = 0, aMin = 0, bMin = 0, aPat = 0, bPat = 0;
-	if (limit >= 1)
-	{
+	if (limit >= 1) {
 		aMaj = a.getMajor();
 		bMaj = b.getMajor();
 	}
-	if (limit >= 2)
-	{
+	if (limit >= 2) {
 		aMin = a.getMinor();
 		bMin = b.getMinor();
 	}
-	if (limit >= 3)
-	{
+	if (limit >= 3) {
 		aPat = a.getPatch();
 		bPat = b.getPatch();
 	}
@@ -111,8 +102,7 @@ int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, Co
 	if (commonLabels == 0) { return bLabels.size() - aLabels.size(); }
 
 	// Otherwise, compare as many labels as we can
-	for (int i = 0; i < commonLabels; i++)
-	{
+	for (int i = 0; i < commonLabels; i++) {
 		const QString& labelA = aLabels.at(i);
 		const QString& labelB = bLabels.at(i);
 		// If both labels are the same, skip
@@ -136,7 +126,6 @@ int ProjectVersion::compare(const ProjectVersion& a, const ProjectVersion& b, Co
 	return aLabels.size() - bLabels.size();
 }
 
-int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
-{
+int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2) {
 	return compare(v1, v2, std::min(v1.getCompareType(), v2.getCompareType()));
 }

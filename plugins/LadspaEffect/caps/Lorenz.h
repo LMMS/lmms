@@ -30,8 +30,7 @@
 
 #include "dsp/Lorenz.h"
 
-class Lorenz : public Plugin
-{
+class Lorenz : public Plugin {
 public:
 	sample_t h, gain;
 

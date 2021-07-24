@@ -36,7 +36,8 @@
 #endif
 
 #if defined(LMMS_BUILD_WIN32)
-class MainApplication : public QApplication, public QAbstractNativeEventFilter
+class MainApplication : public QApplication,
+						public QAbstractNativeEventFilter
 #else
 class MainApplication : public QApplication
 #endif

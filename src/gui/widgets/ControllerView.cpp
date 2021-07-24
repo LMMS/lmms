@@ -47,8 +47,7 @@ ControllerView::ControllerView(Controller* _model, QWidget* _parent)
 	, ModelView(_model, this)
 	, m_subWindow(NULL)
 	, m_controllerDlg(NULL)
-	, m_show(true)
-{
+	, m_show(true) {
 	this->setFrameStyle(QFrame::StyledPanel);
 	this->setFrameShadow(QFrame::Raised);
 
@@ -90,45 +89,36 @@ ControllerView::ControllerView(Controller* _model, QWidget* _parent)
 	setModel(_model);
 }
 
-ControllerView::~ControllerView()
-{
+ControllerView::~ControllerView() {
 	if (m_subWindow) { delete m_subWindow; }
 }
 
-void ControllerView::editControls()
-{
-	if (m_show)
-	{
+void ControllerView::editControls() {
+	if (m_show) {
 		m_subWindow->show();
 		m_subWindow->raise();
 		m_show = false;
-	}
-	else
-	{
+	} else {
 		m_subWindow->hide();
 		m_show = true;
 	}
 }
 
-void ControllerView::closeControls()
-{
+void ControllerView::closeControls() {
 	m_subWindow->hide();
 	m_show = true;
 }
 
 void ControllerView::deleteController() { emit(deleteController(this)); }
 
-void ControllerView::renameController()
-{
+void ControllerView::renameController() {
 	bool ok;
 	Controller* c = castModel<Controller>();
 	QString new_name = QInputDialog::getText(
 		this, tr("Rename controller"), tr("Enter the new name for this controller"), QLineEdit::Normal, c->name(), &ok);
-	if (ok && !new_name.isEmpty())
-	{
+	if (ok && !new_name.isEmpty()) {
 		c->setName(new_name);
-		if (getController()->type() == Controller::LfoController)
-		{
+		if (getController()->type() == Controller::LfoController) {
 			m_controllerDlg->setWindowTitle(tr("LFO") + " (" + new_name + ")");
 		}
 		m_nameLabel->setText(new_name);
@@ -139,8 +129,7 @@ void ControllerView::mouseDoubleClickEvent(QMouseEvent* event) { renameControlle
 
 void ControllerView::modelChanged() {}
 
-void ControllerView::contextMenuEvent(QContextMenuEvent*)
-{
+void ControllerView::contextMenuEvent(QContextMenuEvent*) {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu(model()->displayName(), this);
 	contextMenu->addAction(
 		embed::getIconPixmap("cancel"), tr("&Remove this controller"), this, SLOT(deleteController()));

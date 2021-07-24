@@ -29,8 +29,7 @@
 
 #include "LadspaManager.h"
 
-class ladspaPortDialog : public QDialog
-{
+class ladspaPortDialog : public QDialog {
 	Q_OBJECT
 public:
 	ladspaPortDialog(const ladspa_key_t& _key);

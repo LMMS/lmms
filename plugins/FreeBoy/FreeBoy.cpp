@@ -46,14 +46,13 @@
 const blip_time_t FRAME_LENGTH = 70224;
 const long CLOCK_RATE = 4194304;
 
-extern "C"
-{
-	Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor
-		= {STRINGIFY(PLUGIN_NAME), "FreeBoy", QT_TRANSLATE_NOOP("PluginBrowser", "Emulation of GameBoy (TM) APU"),
+extern "C" {
+Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor
+	= {STRINGIFY(PLUGIN_NAME), "FreeBoy", QT_TRANSLATE_NOOP("PluginBrowser", "Emulation of GameBoy (TM) APU"),
 
-			"Attila Herman <attila589/at/gmail.com>"
-			"Csaba Hruska <csaba.hruska/at/gmail.com>",
-			0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL};
+		"Attila Herman <attila589/at/gmail.com>"
+		"Csaba Hruska <csaba.hruska/at/gmail.com>",
+		0x0100, Plugin::Instrument, new PluginPixmapLoader("logo"), NULL};
 }
 
 FreeBoyInstrument::FreeBoyInstrument(InstrumentTrack* _instrument_track)
@@ -102,14 +101,11 @@ FreeBoyInstrument::FreeBoyInstrument(InstrumentTrack* _instrument_track)
 	m_graphModel(0, 15, 32, this, false, 1)
 	,
 
-	m_time(0)
-{
-}
+	m_time(0) {}
 
 FreeBoyInstrument::~FreeBoyInstrument() {}
 
-void FreeBoyInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void FreeBoyInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	m_ch1SweepTimeModel.saveSettings(_doc, _this, "st");
 	m_ch1SweepDirModel.saveSettings(_doc, _this, "sd");
 	m_ch1SweepRtShiftModel.saveSettings(_doc, _this, "srs");
@@ -149,8 +145,7 @@ void FreeBoyInstrument::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	_this.setAttribute("sampleShape", sampleString);
 }
 
-void FreeBoyInstrument::loadSettings(const QDomElement& _this)
-{
+void FreeBoyInstrument::loadSettings(const QDomElement& _this) {
 	m_ch1SweepTimeModel.loadSettings(_this, "st");
 	m_ch1SweepDirModel.loadSettings(_this, "sd");
 	m_ch1SweepRtShiftModel.loadSettings(_this, "srs");
@@ -208,8 +203,7 @@ QString FreeBoyInstrument::nodeName() const { return (freeboy_plugin_descriptor.
 
 f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const { return f_cnt_t(1000); }
 
-void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer)
-{
+void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffer) {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 	const int samplerate = Engine::mixer()->processingSampleRate();
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -218,8 +212,7 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 	int data = 0;
 	int freq = _n->frequency();
 
-	if (tfp == 0)
-	{
+	if (tfp == 0) {
 		Gb_Apu_Buffer* papu = new Gb_Apu_Buffer();
 		papu->set_sample_rate(samplerate, CLOCK_RATE);
 
@@ -301,20 +294,17 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 
 	const float* wpm = m_graphModel.samples();
 
-	for (char i = 0; i < 16; i++)
-	{
+	for (char i = 0; i < 16; i++) {
 		data = (int)floor(wpm[i * 2]) << 4;
 		data += (int)floor(wpm[i * 2 + 1]);
 		papu->write_register(fakeClock(), 0xff30 + i, data);
 	}
 
-	if ((freq >= 65) && (freq <= 4000))
-	{
+	if ((freq >= 65) && (freq <= 4000)) {
 		int initflag = (tfp == 0) ? 128 : 0;
 		// Hz = 4194304 / ( ( 2048 - ( 11-bit-freq ) ) << 5 )
 		data = 2048 - ((4194304 / freq) >> 5);
-		if (tfp == 0)
-		{
+		if (tfp == 0) {
 			papu->write_register(fakeClock(), 0xff13, data & 0xff);
 			papu->write_register(fakeClock(), 0xff14, (data >> 8) | initflag);
 		}
@@ -324,19 +314,16 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 		papu->write_register(fakeClock(), 0xff1e, (data >> 8) | initflag);
 	}
 
-	if (tfp == 0)
-	{
+	if (tfp == 0) {
 		// PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
 		char sopt = 0;
 		char ropt = 1;
 		float fopt = 524288.0 / (ropt * pow(2.0, sopt + 1.0));
 		float f;
 		for (char s = 0; s < 16; s++)
-			for (char r = 0; r < 8; r++)
-			{
+			for (char r = 0; r < 8; r++) {
 				f = 524288.0 / (r * pow(2.0, s + 1.0));
-				if (fabs(freq - fopt) > fabs(freq - f))
-				{
+				if (fabs(freq - fopt) > fabs(freq - f)) {
 					fopt = f;
 					ropt = r;
 					sopt = s;
@@ -357,11 +344,9 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 	int framesleft = frames;
 	int datalen = 0;
 	blip_sample_t buf[buf_size * 2];
-	while (framesleft > 0)
-	{
+	while (framesleft > 0) {
 		int avail = papu->samples_avail();
-		if (avail <= 0)
-		{
+		if (avail <= 0) {
 			m_time = 0;
 			papu->end_frame(FRAME_LENGTH);
 			avail = papu->samples_avail();
@@ -371,10 +356,8 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 
 		long count = papu->read_samples(buf, datalen * 2) / 2;
 
-		for (fpp_t frame = 0; frame < count; ++frame)
-		{
-			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
-			{
+		for (fpp_t frame = 0; frame < count; ++frame) {
+			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch) {
 				sample_t s = float(buf[frame * 2 + ch]) / 32768.0;
 				_working_buffer[frames - framesleft + frame + offset][ch] = s;
 			}
@@ -384,19 +367,16 @@ void FreeBoyInstrument::playNote(NotePlayHandle* _n, sampleFrame* _working_buffe
 	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
 }
 
-void FreeBoyInstrument::deleteNotePluginData(NotePlayHandle* _n)
-{
+void FreeBoyInstrument::deleteNotePluginData(NotePlayHandle* _n) {
 	delete static_cast<Gb_Apu_Buffer*>(_n->m_pluginData);
 }
 
 PluginView* FreeBoyInstrument::instantiateView(QWidget* _parent) { return (new FreeBoyInstrumentView(this, _parent)); }
 
-class FreeBoyKnob : public Knob
-{
+class FreeBoyKnob : public Knob {
 public:
 	FreeBoyKnob(QWidget* _parent)
-		: Knob(knobStyled, _parent)
-	{
+		: Knob(knobStyled, _parent) {
 		setFixedSize(30, 30);
 		setCenterPointX(15.0);
 		setCenterPointY(15.0);
@@ -409,8 +389,7 @@ public:
 };
 
 FreeBoyInstrumentView::FreeBoyInstrumentView(Instrument* _instrument, QWidget* _parent)
-	: InstrumentViewFixedSize(_instrument, _parent)
-{
+	: InstrumentViewFixedSize(_instrument, _parent) {
 
 	setAutoFillBackground(true);
 	QPalette pal;
@@ -598,8 +577,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView(Instrument* _instrument, QWidget* _
 
 FreeBoyInstrumentView::~FreeBoyInstrumentView() {}
 
-void FreeBoyInstrumentView::modelChanged()
-{
+void FreeBoyInstrumentView::modelChanged() {
 	FreeBoyInstrument* p = castModel<FreeBoyInstrument>();
 
 	m_ch1SweepTimeKnob->setModel(&p->m_ch1SweepTimeModel);
@@ -638,12 +616,10 @@ void FreeBoyInstrumentView::modelChanged()
 	m_graph->setModel(&p->m_graphModel);
 }
 
-extern "C"
-{
+extern "C" {
 
-	// necessary for getting instance out of shared lib
-	PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
-	{
-		return (new FreeBoyInstrument(static_cast<InstrumentTrack*>(m)));
-	}
+// necessary for getting instance out of shared lib
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*) {
+	return (new FreeBoyInstrument(static_cast<InstrumentTrack*>(m)));
+}
 }

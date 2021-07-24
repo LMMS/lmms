@@ -36,19 +36,11 @@
 class QPixmap;
 class TextFloat;
 
-enum knobTypes
-{
-	knobDark_28,
-	knobBright_26,
-	knobSmall_17,
-	knobVintage_32,
-	knobStyled
-};
+enum knobTypes { knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled };
 
 void convertPixmapToGrayScale(QPixmap& pixMap);
 
-class LMMS_EXPORT Knob : public QWidget, public FloatModelView
-{
+class LMMS_EXPORT Knob : public QWidget, public FloatModelView {
 	Q_OBJECT
 	Q_ENUMS(knobTypes)
 
@@ -85,8 +77,7 @@ public:
 	Knob(const Knob& other) = delete;
 
 	// TODO: remove
-	inline void setHintText(const QString& _txt_before, const QString& _txt_after)
-	{
+	inline void setHintText(const QString& _txt_before, const QString& _txt_after) {
 		setDescription(_txt_before);
 		setUnit(_txt_after);
 	}
@@ -156,8 +147,7 @@ private:
 	void setPosition(const QPoint& _p);
 	bool updateAngle();
 
-	int angleFromValue(float value, float minValue, float maxValue, float totalAngle) const
-	{
+	int angleFromValue(float value, float minValue, float maxValue, float totalAngle) const {
 		return static_cast<int>((value - 0.5 * (minValue + maxValue)) / (maxValue - minValue) * m_totalAngle) % 360;
 	}
 

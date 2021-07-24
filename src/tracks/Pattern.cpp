@@ -51,8 +51,7 @@ Pattern::Pattern(InstrumentTrack* _instrument_track)
 	: TrackContentObject(_instrument_track)
 	, m_instrumentTrack(_instrument_track)
 	, m_patternType(BeatPattern)
-	, m_steps(TimePos::stepsPerBar())
-{
+	, m_steps(TimePos::stepsPerBar()) {
 	if (_instrument_track->trackContainer() == Engine::getBBTrackContainer()) { resizeToFirstTrack(); }
 	init();
 	setAutoResize(true);
@@ -62,16 +61,13 @@ Pattern::Pattern(const Pattern& other)
 	: TrackContentObject(other.m_instrumentTrack)
 	, m_instrumentTrack(other.m_instrumentTrack)
 	, m_patternType(other.m_patternType)
-	, m_steps(other.m_steps)
-{
-	for (NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it)
-	{
+	, m_steps(other.m_steps) {
+	for (NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it) {
 		m_notes.push_back(new Note(**it));
 	}
 
 	init();
-	switch (getTrack()->trackContainer()->type())
-	{
+	switch (getTrack()->trackContainer()->type()) {
 	case TrackContainer::BBContainer: setAutoResize(true); break;
 
 	case TrackContainer::SongContainer:
@@ -80,28 +76,22 @@ Pattern::Pattern(const Pattern& other)
 	}
 }
 
-Pattern::~Pattern()
-{
+Pattern::~Pattern() {
 	emit destroyedPattern(this);
 
-	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it)
-	{
+	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		delete *it;
 	}
 
 	m_notes.clear();
 }
 
-void Pattern::resizeToFirstTrack()
-{
+void Pattern::resizeToFirstTrack() {
 	// Resize this track to be the same as existing tracks in the BB
 	const TrackContainer::TrackList& tracks = m_instrumentTrack->trackContainer()->tracks();
-	for (unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
-	{
-		if (tracks.at(trackID)->type() == Track::InstrumentTrack)
-		{
-			if (tracks.at(trackID) != m_instrumentTrack)
-			{
+	for (unsigned int trackID = 0; trackID < tracks.size(); ++trackID) {
+		if (tracks.at(trackID)->type() == Track::InstrumentTrack) {
+			if (tracks.at(trackID) != m_instrumentTrack) {
 				unsigned int currentTCO = m_instrumentTrack->getTCOs().indexOf(this);
 				m_steps = static_cast<Pattern*>(tracks.at(trackID)->getTCO(currentTCO))->m_steps;
 			}
@@ -110,8 +100,7 @@ void Pattern::resizeToFirstTrack()
 	}
 }
 
-void Pattern::init()
-{
+void Pattern::init() {
 	connect(Engine::getSong(), SIGNAL(timeSignatureChanged(int, int)), this, SLOT(changeTimeSignature()));
 	saveJournallingState(false);
 
@@ -119,10 +108,8 @@ void Pattern::init()
 	restoreJournallingState();
 }
 
-void Pattern::updateLength()
-{
-	if (m_patternType == BeatPattern)
-	{
+void Pattern::updateLength() {
+	if (m_patternType == BeatPattern) {
 		changeLength(beatPatternLength());
 		updateBBTrack();
 		return;
@@ -130,20 +117,17 @@ void Pattern::updateLength()
 
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it)
-	{
+	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		if ((*it)->length() > 0) { max_length = qMax<tick_t>(max_length, (*it)->endPos()); }
 	}
 	changeLength(TimePos(max_length).nextFullBar() * TimePos::ticksPerBar());
 	updateBBTrack();
 }
 
-TimePos Pattern::beatPatternLength() const
-{
+TimePos Pattern::beatPatternLength() const {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it)
-	{
+	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		if ((*it)->length() < 0) { max_length = qMax<tick_t>(max_length, (*it)->pos() + 1); }
 	}
 
@@ -152,8 +136,7 @@ TimePos Pattern::beatPatternLength() const
 	return TimePos(max_length).nextFullBar() * TimePos::ticksPerBar();
 }
 
-Note* Pattern::addNote(const Note& _new_note, const bool _quant_pos)
-{
+Note* Pattern::addNote(const Note& _new_note, const bool _quant_pos) {
 	Note* new_note = new Note(_new_note);
 	if (_quant_pos && gui->pianoRoll()) { new_note->quantizePos(gui->pianoRoll()->quantization()); }
 
@@ -169,14 +152,11 @@ Note* Pattern::addNote(const Note& _new_note, const bool _quant_pos)
 	return new_note;
 }
 
-void Pattern::removeNote(Note* _note_to_del)
-{
+void Pattern::removeNote(Note* _note_to_del) {
 	instrumentTrack()->lock();
 	NoteVector::Iterator it = m_notes.begin();
-	while (it != m_notes.end())
-	{
-		if (*it == _note_to_del)
-		{
+	while (it != m_notes.end()) {
+		if (*it == _note_to_del) {
 			delete *it;
 			m_notes.erase(it);
 			break;
@@ -193,26 +173,21 @@ void Pattern::removeNote(Note* _note_to_del)
 
 // returns a pointer to the note at specified step, or NULL if note doesn't exist
 
-Note* Pattern::noteAtStep(int _step)
-{
-	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it)
-	{
+Note* Pattern::noteAtStep(int _step) {
+	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		if ((*it)->pos() == TimePos::stepPosition(_step) && (*it)->length() < 0) { return *it; }
 	}
 	return NULL;
 }
 
-void Pattern::rearrangeAllNotes()
-{
+void Pattern::rearrangeAllNotes() {
 	// sort notes by start time
 	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
 }
 
-void Pattern::clearNotes()
-{
+void Pattern::clearNotes() {
 	instrumentTrack()->lock();
-	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it)
-	{
+	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		delete *it;
 	}
 	m_notes.clear();
@@ -222,33 +197,27 @@ void Pattern::clearNotes()
 	emit dataChanged();
 }
 
-Note* Pattern::addStepNote(int step)
-{
+Note* Pattern::addStepNote(int step) {
 	return addNote(Note(TimePos(-DefaultTicksPerBar), TimePos::stepPosition(step)), false);
 }
 
-void Pattern::setStep(int step, bool enabled)
-{
-	if (enabled)
-	{
+void Pattern::setStep(int step, bool enabled) {
+	if (enabled) {
 		if (!noteAtStep(step)) { addStepNote(step); }
 		return;
 	}
 
-	while (Note* note = noteAtStep(step))
-	{
+	while (Note* note = noteAtStep(step)) {
 		removeNote(note);
 	}
 }
 
-void Pattern::splitNotes(NoteVector notes, TimePos pos)
-{
+void Pattern::splitNotes(NoteVector notes, TimePos pos) {
 	if (notes.empty()) { return; }
 
 	addJournalCheckPoint();
 
-	for (int i = 0; i < notes.size(); ++i)
-	{
+	for (int i = 0; i < notes.size(); ++i) {
 		Note* note = notes.at(i);
 
 		int leftLength = pos.getTicks() - note->pos();
@@ -269,18 +238,14 @@ void Pattern::splitNotes(NoteVector notes, TimePos pos)
 	}
 }
 
-void Pattern::setType(PatternTypes _new_pattern_type)
-{
+void Pattern::setType(PatternTypes _new_pattern_type) {
 	if (_new_pattern_type == BeatPattern || _new_pattern_type == MelodyPattern) { m_patternType = _new_pattern_type; }
 }
 
-void Pattern::checkType()
-{
+void Pattern::checkType() {
 	NoteVector::Iterator it = m_notes.begin();
-	while (it != m_notes.end())
-	{
-		if ((*it)->length() > 0)
-		{
+	while (it != m_notes.end()) {
+		if ((*it)->length() > 0) {
 			setType(MelodyPattern);
 			return;
 		}
@@ -289,8 +254,7 @@ void Pattern::checkType()
 	setType(BeatPattern);
 }
 
-void Pattern::saveSettings(QDomDocument& _doc, QDomElement& _this)
-{
+void Pattern::saveSettings(QDomDocument& _doc, QDomElement& _this) {
 	_this.setAttribute("type", m_patternType);
 	_this.setAttribute("name", name());
 
@@ -298,31 +262,25 @@ void Pattern::saveSettings(QDomDocument& _doc, QDomElement& _this)
 	// as the target of copied/dragged pattern is always an existing
 	// pattern, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
-	if (_this.parentNode().nodeName() == "clipboard" || _this.parentNode().nodeName() == "dnddata")
-	{
+	if (_this.parentNode().nodeName() == "clipboard" || _this.parentNode().nodeName() == "dnddata") {
 		_this.setAttribute("pos", -1);
-	}
-	else
-	{
+	} else {
 		_this.setAttribute("pos", startPosition());
 	}
 	_this.setAttribute("muted", isMuted());
 	_this.setAttribute("steps", m_steps);
 
 	// now save settings of all notes
-	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it)
-	{
+	for (NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		(*it)->saveState(_doc, _this);
 	}
 }
 
-void Pattern::loadSettings(const QDomElement& _this)
-{
+void Pattern::loadSettings(const QDomElement& _this) {
 	m_patternType = static_cast<PatternTypes>(_this.attribute("type").toInt());
 	setName(_this.attribute("name"));
 
-	if (_this.hasAttribute("color"))
-	{
+	if (_this.hasAttribute("color")) {
 		useCustomClipColor(true);
 		setColor(_this.attribute("color"));
 	}
@@ -333,10 +291,8 @@ void Pattern::loadSettings(const QDomElement& _this)
 	clearNotes();
 
 	QDomNode node = _this.firstChild();
-	while (!node.isNull())
-	{
-		if (node.isElement() && !node.toElement().attribute("metadata").toInt())
-		{
+	while (!node.isNull()) {
+		if (node.isElement() && !node.toElement().attribute("metadata").toInt()) {
 			Note* n = new Note;
 			n->restoreState(node.toElement());
 			m_notes.push_back(n);
@@ -357,35 +313,29 @@ Pattern* Pattern::previousPattern() const { return adjacentPatternByOffset(-1); 
 
 Pattern* Pattern::nextPattern() const { return adjacentPatternByOffset(1); }
 
-Pattern* Pattern::adjacentPatternByOffset(int offset) const
-{
+Pattern* Pattern::adjacentPatternByOffset(int offset) const {
 	QVector<TrackContentObject*> tcos = m_instrumentTrack->getTCOs();
 	int tcoNum = m_instrumentTrack->getTCONum(this);
 	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, NULL));
 }
 
-void Pattern::clear()
-{
+void Pattern::clear() {
 	addJournalCheckPoint();
 	clearNotes();
 }
 
-void Pattern::addSteps()
-{
+void Pattern::addSteps() {
 	m_steps += TimePos::stepsPerBar();
 	updateLength();
 	emit dataChanged();
 }
 
-void Pattern::cloneSteps()
-{
+void Pattern::cloneSteps() {
 	int oldLength = m_steps;
 	m_steps *= 2; // cloning doubles the track
-	for (int i = 0; i < oldLength; ++i)
-	{
+	for (int i = 0; i < oldLength; ++i) {
 		Note* toCopy = noteAtStep(i);
-		if (toCopy)
-		{
+		if (toCopy) {
 			setStep(oldLength + i, true);
 			Note* newNote = noteAtStep(oldLength + i);
 			newNote->setKey(toCopy->key());
@@ -398,13 +348,10 @@ void Pattern::cloneSteps()
 	emit dataChanged();
 }
 
-void Pattern::removeSteps()
-{
+void Pattern::removeSteps() {
 	int n = TimePos::stepsPerBar();
-	if (n < m_steps)
-	{
-		for (int i = m_steps - n; i < m_steps; ++i)
-		{
+	if (n < m_steps) {
+		for (int i = m_steps - n; i < m_steps; ++i) {
 			setStep(i, false);
 		}
 		m_steps -= n;
@@ -415,32 +362,25 @@ void Pattern::removeSteps()
 
 TrackContentObjectView* Pattern::createView(TrackView* _tv) { return new PatternView(this, _tv); }
 
-void Pattern::updateBBTrack()
-{
-	if (getTrack()->trackContainer() == Engine::getBBTrackContainer())
-	{
+void Pattern::updateBBTrack() {
+	if (getTrack()->trackContainer() == Engine::getBBTrackContainer()) {
 		Engine::getBBTrackContainer()->updateBBTrack(this);
 	}
 
 	if (gui && gui->pianoRoll() && gui->pianoRoll()->currentPattern() == this) { gui->pianoRoll()->update(); }
 }
 
-bool Pattern::empty()
-{
-	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it)
-	{
+bool Pattern::empty() {
+	for (NoteVector::ConstIterator it = m_notes.begin(); it != m_notes.end(); ++it) {
 		if ((*it)->length() != 0) { return false; }
 	}
 	return true;
 }
 
-void Pattern::changeTimeSignature()
-{
+void Pattern::changeTimeSignature() {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
-	for (NoteVector::ConstIterator cit = m_notes.begin(); cit != m_notes.end(); ++cit)
-	{
-		if ((*cit)->length() < 0 && (*cit)->pos() > last_pos)
-		{
+	for (NoteVector::ConstIterator cit = m_notes.begin(); cit != m_notes.end(); ++cit) {
+		if ((*cit)->length() < 0 && (*cit)->pos() > last_pos) {
 			last_pos = (*cit)->pos() + TimePos::ticksPerBar() / TimePos::stepsPerBar();
 		}
 	}
@@ -456,8 +396,7 @@ PatternView::PatternView(Pattern* pattern, TrackView* parent)
 	, m_noteFillColor(255, 255, 255, 220)
 	, m_noteBorderColor(255, 255, 255, 220)
 	, m_mutedNoteFillColor(100, 100, 100, 220)
-	, m_mutedNoteBorderColor(100, 100, 100, 220)
-{
+	, m_mutedNoteBorderColor(100, 100, 100, 220) {
 	connect(gui->pianoRoll(), SIGNAL(currentPatternChanged()), this, SLOT(update()));
 
 	if (s_stepBtnOn0 == NULL) { s_stepBtnOn0 = new QPixmap(embed::getIconPixmap("step_btn_on_0")); }
@@ -475,23 +414,20 @@ PatternView::PatternView(Pattern* pattern, TrackView* parent)
 
 Pattern* PatternView::getPattern() { return m_pat; }
 
-void PatternView::update()
-{
+void PatternView::update() {
 	ToolTip::add(this, m_pat->name());
 
 	TrackContentObjectView::update();
 }
 
-void PatternView::openInPianoRoll()
-{
+void PatternView::openInPianoRoll() {
 	gui->pianoRoll()->setCurrentPattern(m_pat);
 	gui->pianoRoll()->parentWidget()->show();
 	gui->pianoRoll()->show();
 	gui->pianoRoll()->setFocus();
 }
 
-void PatternView::setGhostInPianoRoll()
-{
+void PatternView::setGhostInPianoRoll() {
 	gui->pianoRoll()->setGhostPattern(m_pat);
 	gui->pianoRoll()->parentWidget()->show();
 	gui->pianoRoll()->show();
@@ -500,16 +436,14 @@ void PatternView::setGhostInPianoRoll()
 
 void PatternView::resetName() { m_pat->setName(""); }
 
-void PatternView::changeName()
-{
+void PatternView::changeName() {
 	QString s = m_pat->name();
 	RenameDialog rename_dlg(s);
 	rename_dlg.exec();
 	m_pat->setName(s);
 }
 
-void PatternView::constructContextMenu(QMenu* _cm)
-{
+void PatternView::constructContextMenu(QMenu* _cm) {
 	QAction* a = new QAction(embed::getIconPixmap("piano"), tr("Open in piano-roll"), _cm);
 	_cm->insertAction(_cm->actions()[0], a);
 	connect(a, SIGNAL(triggered(bool)), this, SLOT(openInPianoRoll()));
@@ -527,8 +461,7 @@ void PatternView::constructContextMenu(QMenu* _cm)
 	_cm->addAction(embed::getIconPixmap("reload"), tr("Reset name"), this, SLOT(resetName()));
 	_cm->addAction(embed::getIconPixmap("edit_rename"), tr("Change name"), this, SLOT(changeName()));
 
-	if (m_pat->type() == Pattern::BeatPattern)
-	{
+	if (m_pat->type() == Pattern::BeatPattern) {
 		_cm->addSeparator();
 
 		_cm->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"), m_pat, SLOT(addSteps()));
@@ -537,8 +470,7 @@ void PatternView::constructContextMenu(QMenu* _cm)
 	}
 }
 
-void PatternView::mousePressEvent(QMouseEvent* _me)
-{
+void PatternView::mousePressEvent(QMouseEvent* _me) {
 	if (_me->button() == Qt::LeftButton && m_pat->m_patternType == Pattern::BeatPattern
 		&& (fixedTCOs() || pixelsPerBar() >= 96) && _me->y() > height() - s_stepBtnOff->height())
 
@@ -555,16 +487,16 @@ void PatternView::mousePressEvent(QMouseEvent* _me)
 		//	debugging to ensure we get the correct step...
 		//		qDebug( "Step (%f) %d", tmp, step );
 
-		if (step >= m_pat->m_steps)
-		{
+		if (step >= m_pat->m_steps) {
 			qDebug("Something went wrong in pattern.cpp: step %d doesn't exist in pattern!", step);
 			return;
 		}
 
 		Note* n = m_pat->noteAtStep(step);
 
-		if (n == NULL) { m_pat->addStepNote(step); }
-		else // note at step found
+		if (n == NULL) {
+			m_pat->addStepNote(step);
+		} else // note at step found
 		{
 			m_pat->addJournalCheckPoint();
 			m_pat->setStep(step, false);
@@ -574,8 +506,7 @@ void PatternView::mousePressEvent(QMouseEvent* _me)
 		update();
 
 		if (gui->pianoRoll()->currentPattern() == m_pat) { gui->pianoRoll()->update(); }
-	}
-	else
+	} else
 
 	// if not in beat/bassline -mode, let parent class handle the event
 
@@ -584,21 +515,17 @@ void PatternView::mousePressEvent(QMouseEvent* _me)
 	}
 }
 
-void PatternView::mouseDoubleClickEvent(QMouseEvent* _me)
-{
-	if (_me->button() != Qt::LeftButton)
-	{
+void PatternView::mouseDoubleClickEvent(QMouseEvent* _me) {
+	if (_me->button() != Qt::LeftButton) {
 		_me->ignore();
 		return;
 	}
 	if (m_pat->m_patternType == Pattern::MelodyPattern || !fixedTCOs()) { openInPianoRoll(); }
 }
 
-void PatternView::wheelEvent(QWheelEvent* we)
-{
+void PatternView::wheelEvent(QWheelEvent* we) {
 	if (m_pat->m_patternType == Pattern::BeatPattern && (fixedTCOs() || pixelsPerBar() >= 96)
-		&& position(we).y() > height() - s_stepBtnOff->height())
-	{
+		&& position(we).y() > height() - s_stepBtnOff->height()) {
 		//	get the step number that was wheeled on and
 		//	do calculations in floats to prevent rounding errors...
 		float tmp = ((float(position(we).x()) - TCO_BORDER_WIDTH) * float(m_pat->m_steps))
@@ -609,18 +536,16 @@ void PatternView::wheelEvent(QWheelEvent* we)
 		if (step >= m_pat->m_steps) { return; }
 
 		Note* n = m_pat->noteAtStep(step);
-		if (!n && we->angleDelta().y() > 0)
-		{
+		if (!n && we->angleDelta().y() > 0) {
 			n = m_pat->addStepNote(step);
 			n->setVolume(0);
 		}
-		if (n != NULL)
-		{
+		if (n != NULL) {
 			int vol = n->getVolume();
 
-			if (we->angleDelta().y() > 0) { n->setVolume(qMin(100, vol + 5)); }
-			else
-			{
+			if (we->angleDelta().y() > 0) {
+				n->setVolume(qMin(100, vol + 5));
+			} else {
 				n->setVolume(qMax(0, vol - 5));
 			}
 
@@ -629,21 +554,17 @@ void PatternView::wheelEvent(QWheelEvent* we)
 			if (gui->pianoRoll()->currentPattern() == m_pat) { gui->pianoRoll()->update(); }
 		}
 		we->accept();
-	}
-	else
-	{
+	} else {
 		TrackContentObjectView::wheelEvent(we);
 	}
 }
 
 static int computeNoteRange(int minKey, int maxKey) { return (maxKey - minKey) + 1; }
 
-void PatternView::paintEvent(QPaintEvent*)
-{
+void PatternView::paintEvent(QPaintEvent*) {
 	QPainter painter(this);
 
-	if (!needsUpdate())
-	{
+	if (!needsUpdate()) {
 		painter.drawPixmap(0, 0, m_paintPixmap);
 		return;
 	}
@@ -659,13 +580,10 @@ void PatternView::paintEvent(QPaintEvent*)
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 
-	if (beatPattern)
-	{
+	if (beatPattern) {
 		// Do not paint BBTCOs how we paint pattern TCOs
 		c = BBPatternBackground();
-	}
-	else
-	{
+	} else {
 		c = getColorForDisplay(painter.background().color());
 	}
 
@@ -677,9 +595,9 @@ void PatternView::paintEvent(QPaintEvent*)
 	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
 	p.fillRect(rect(), QColor(0, 0, 0));
 
-	if (gradient()) { p.fillRect(rect(), lingrad); }
-	else
-	{
+	if (gradient()) {
+		p.fillRect(rect(), lingrad);
+	} else {
 		p.fillRect(rect(), c);
 	}
 
@@ -691,8 +609,7 @@ void PatternView::paintEvent(QPaintEvent*)
 	// TODO Warning! This might cause problems if TrackContentObjectView::paintTextLabel changes
 	int textBoxHeight = 0;
 	const int textTop = TCO_BORDER_WIDTH + 1;
-	if (drawTextBox)
-	{
+	if (drawTextBox) {
 		QFont labelFont = this->font();
 		labelFont.setHintingPreference(QFont::PreferFullHinting);
 
@@ -712,15 +629,13 @@ void PatternView::paintEvent(QPaintEvent*)
 
 	// melody pattern paint event
 	NoteVector const& noteCollection = m_pat->m_notes;
-	if (m_pat->m_patternType == Pattern::MelodyPattern && !noteCollection.empty())
-	{
+	if (m_pat->m_patternType == Pattern::MelodyPattern && !noteCollection.empty()) {
 		// Compute the minimum and maximum key in the pattern
 		// so that we know how much there is to draw.
 		int maxKey = std::numeric_limits<int>::min();
 		int minKey = std::numeric_limits<int>::max();
 
-		for (Note const* note : noteCollection)
-		{
+		for (Note const* note : noteCollection) {
 			int const key = note->key();
 			maxKey = qMax(maxKey, key);
 			minKey = qMin(minKey, key);
@@ -730,13 +645,11 @@ void PatternView::paintEvent(QPaintEvent*)
 		int const minimalNoteRange = 12; // Always paint at least one octave
 		int const actualNoteRange = computeNoteRange(minKey, maxKey);
 
-		if (actualNoteRange < minimalNoteRange)
-		{
+		if (actualNoteRange < minimalNoteRange) {
 			int missingNumberOfNotes = minimalNoteRange - actualNoteRange;
 			minKey = std::max(0, minKey - missingNumberOfNotes / 2);
 			maxKey = maxKey + missingNumberOfNotes / 2;
-			if (missingNumberOfNotes % 2 == 1)
-			{
+			if (missingNumberOfNotes % 2 == 1) {
 				// Put more range at the top to bias drawing towards the bottom
 				++maxKey;
 			}
@@ -751,11 +664,10 @@ void PatternView::paintEvent(QPaintEvent*)
 		int widgetHeight = height();
 		int fullyAtTopAtLimit = MINIMAL_TRACK_HEIGHT;
 		int fullyBelowAtLimit = 4 * fullyAtTopAtLimit;
-		if (widgetHeight <= fullyBelowAtLimit)
-		{
-			if (widgetHeight <= fullyAtTopAtLimit) { distanceToTop = 0; }
-			else
-			{
+		if (widgetHeight <= fullyBelowAtLimit) {
+			if (widgetHeight <= fullyAtTopAtLimit) {
+				distanceToTop = 0;
+			} else {
 				float const a = 1. / (fullyAtTopAtLimit - fullyBelowAtLimit);
 				float const b = -float(fullyBelowAtLimit) / (fullyAtTopAtLimit - fullyBelowAtLimit);
 				float const scale = a * widgetHeight + b;
@@ -777,9 +689,9 @@ void PatternView::paintEvent(QPaintEvent*)
 			= muted ? getMutedNoteBorderColor() : (m_pat->hasColor() ? c.lighter(200) : getNoteBorderColor());
 
 		bool const drawAsLines = height() < 64;
-		if (drawAsLines) { p.setPen(noteFillColor); }
-		else
-		{
+		if (drawAsLines) {
+			p.setPen(noteFillColor);
+		} else {
 			p.setPen(noteBorderColor);
 			p.setRenderHint(QPainter::Antialiasing);
 		}
@@ -793,8 +705,7 @@ void PatternView::paintEvent(QPaintEvent*)
 		float const noteHeight = 1. / adjustedNoteRange;
 
 		// scan through all the notes and draw them on the pattern
-		for (Note const* currentNote : noteCollection)
-		{
+		for (Note const* currentNote : noteCollection) {
 			// Map to 0, 1, 2, ...
 			int mappedNoteKey = currentNote->key() - minKey;
 			int invertedMappedNoteKey = adjustedNoteRange - mappedNoteKey - 1;
@@ -805,13 +716,10 @@ void PatternView::paintEvent(QPaintEvent*)
 			float const noteStartY = invertedMappedNoteKey * noteHeight;
 
 			QRectF noteRectF(noteStartX, noteStartY, noteLength, noteHeight);
-			if (drawAsLines)
-			{
+			if (drawAsLines) {
 				p.drawLine(QPointF(noteStartX, noteStartY + 0.5 * noteHeight),
 					QPointF(noteStartX + noteLength, noteStartY + 0.5 * noteHeight));
-			}
-			else
-			{
+			} else {
 				p.fillRect(noteRectF, noteFillColor);
 				p.drawRect(noteRectF);
 			}
@@ -821,8 +729,7 @@ void PatternView::paintEvent(QPaintEvent*)
 	}
 
 	// beat pattern paint event
-	else if (beatPattern && (fixedTCOs() || pixelsPerBar >= 96))
-	{
+	else if (beatPattern && (fixedTCOs() || pixelsPerBar >= 96)) {
 		QPixmap stepon0;
 		QPixmap stepon200;
 		QPixmap stepoff;
@@ -848,28 +755,22 @@ void PatternView::paintEvent(QPaintEvent*)
 			const int x = TCO_BORDER_WIDTH + static_cast<int>(it * w / steps);
 			const int y = height() - s_stepBtnOff->height() - 1;
 
-			if (n)
-			{
+			if (n) {
 				const int vol = n->getVolume();
 				p.drawPixmap(x, y, stepoffl);
 				p.drawPixmap(x, y, stepon0);
 				p.setOpacity(sqrt(vol / 200.0));
 				p.drawPixmap(x, y, stepon200);
 				p.setOpacity(1);
-			}
-			else if ((it / 4) % 2)
-			{
+			} else if ((it / 4) % 2) {
 				p.drawPixmap(x, y, stepoffl);
-			}
-			else
-			{
+			} else {
 				p.drawPixmap(x, y, stepoff);
 			}
 		} // end for loop
 
 		// draw a transparent rectangle over muted patterns
-		if (muted)
-		{
+		if (muted) {
 			p.setBrush(mutedBackgroundColor());
 			p.setOpacity(0.5);
 			p.drawRect(0, 0, width(), height());
@@ -880,8 +781,7 @@ void PatternView::paintEvent(QPaintEvent*)
 	const int lineSize = 3;
 	p.setPen(c.darker(200));
 
-	for (bar_t t = 1; t < m_pat->length().getBar(); ++t)
-	{
+	for (bar_t t = 1; t < m_pat->length().getBar(); ++t) {
 		p.drawLine(x_base + static_cast<int>(pixelsPerBar * t) - 1, TCO_BORDER_WIDTH,
 			x_base + static_cast<int>(pixelsPerBar * t) - 1, TCO_BORDER_WIDTH + lineSize);
 		p.drawLine(x_base + static_cast<int>(pixelsPerBar * t) - 1, rect().bottom() - (lineSize + TCO_BORDER_WIDTH),
@@ -891,8 +791,7 @@ void PatternView::paintEvent(QPaintEvent*)
 	// pattern name
 	if (drawTextBox) { paintTextLabel(m_pat->name(), p); }
 
-	if (!(fixedTCOs() && beatPattern))
-	{
+	if (!(fixedTCOs() && beatPattern)) {
 		// inner border
 		p.setPen(c.lighter(current ? 160 : 130));
 		p.drawRect(1, 1, rect().right() - TCO_BORDER_WIDTH, rect().bottom() - TCO_BORDER_WIDTH);
@@ -903,8 +802,7 @@ void PatternView::paintEvent(QPaintEvent*)
 	}
 
 	// draw the 'muted' pixmap only if the pattern was manually muted
-	if (m_pat->isMuted())
-	{
+	if (m_pat->isMuted()) {
 		const int spacing = TCO_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap(spacing, height() - (size + spacing), embed::getIconPixmap("muted", size, size));

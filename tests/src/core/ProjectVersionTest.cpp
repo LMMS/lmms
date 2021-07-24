@@ -26,12 +26,10 @@
 
 #include "QTestSuite.h"
 
-class ProjectVersionTest : QTestSuite
-{
+class ProjectVersionTest : QTestSuite {
 	Q_OBJECT
 private slots:
-	void ProjectVersionComparisonTests()
-	{
+	void ProjectVersionComparisonTests() {
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Minor) > "1.0.3");
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Major) < "2.1.0");
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Release) > "0.2.1");

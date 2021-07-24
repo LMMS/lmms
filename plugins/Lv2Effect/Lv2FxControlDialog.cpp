@@ -33,18 +33,14 @@
 
 Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls* controls)
 	: EffectControlDialog(controls)
-	, Lv2ViewBase(this, controls)
-{
-	if (m_reloadPluginButton)
-	{
+	, Lv2ViewBase(this, controls) {
+	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked, this, [this]() { lv2Controls()->reloadPlugin(); });
 	}
-	if (m_toggleUIButton)
-	{
+	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, &QPushButton::toggled, this, [this]() { toggleUI(); });
 	}
-	if (m_helpButton)
-	{
+	if (m_helpButton) {
 		connect(m_helpButton, &QPushButton::toggled, this, [this](bool visible) { toggleHelp(visible); });
 	}
 	// for Effects, modelChanged only goes to the top EffectView

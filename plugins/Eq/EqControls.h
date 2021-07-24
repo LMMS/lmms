@@ -30,8 +30,7 @@
 
 class EqEffect;
 
-class EqControls : public EffectControls
-{
+class EqControls : public EffectControls {
 	Q_OBJECT
 public:
 	explicit EqControls(EqEffect* effect);

@@ -60,8 +60,7 @@ CompressorControls::CompressorControls(CompressorEffect* effect)
 	, m_tiltModel(0.0f, -6.0f, 6.0f, 0.0001f, this, tr("Tilt"))
 	, m_tiltFreqModel(150.0f, 20.0f, 20000.0f, 0.1f, this, tr("Tilt Frequency"))
 	, m_stereoLinkModel(1.0f, 0.0f, 4.0f, this, tr("Stereo Link"))
-	, m_mixModel(100.0f, 0.f, 100.0f, 0.01f, this, tr("Mix"))
-{
+	, m_mixModel(100.0f, 0.f, 100.0f, 0.01f, this, tr("Mix")) {
 	m_ratioModel.setScaleLogarithmic(true);
 	m_holdModel.setScaleLogarithmic(true);
 	m_attackModel.setScaleLogarithmic(true);
@@ -75,8 +74,7 @@ CompressorControls::CompressorControls(CompressorEffect* effect)
 	m_rangeModel.setScaleLogarithmic(true);
 }
 
-void CompressorControls::saveSettings(QDomDocument& doc, QDomElement& _this)
-{
+void CompressorControls::saveSettings(QDomDocument& doc, QDomElement& _this) {
 	m_thresholdModel.saveSettings(doc, _this, "threshold");
 	m_ratioModel.saveSettings(doc, _this, "ratio");
 	m_attackModel.saveSettings(doc, _this, "attack");
@@ -107,8 +105,7 @@ void CompressorControls::saveSettings(QDomDocument& doc, QDomElement& _this)
 	m_mixModel.saveSettings(doc, _this, "mix");
 }
 
-void CompressorControls::loadSettings(const QDomElement& _this)
-{
+void CompressorControls::loadSettings(const QDomElement& _this) {
 	m_thresholdModel.loadSettings(_this, "threshold");
 	m_ratioModel.loadSettings(_this, "ratio");
 	m_attackModel.loadSettings(_this, "attack");

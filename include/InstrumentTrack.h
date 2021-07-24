@@ -64,8 +64,7 @@ class TrackLabelButton;
 class LedCheckBox;
 class QLabel;
 
-class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
-{
+class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor {
 	Q_OBJECT
 	MM_OPERATORS
 	mapPropertyFromModel(int, getVolume, setVolume, m_volumeModel);
@@ -107,8 +106,7 @@ public:
 	int masterKey(int _midi_key) const;
 
 	// translate pitch to midi-pitch [0,16383]
-	int midiPitch() const
-	{
+	int midiPitch() const {
 		return static_cast<int>(
 			((m_pitchModel.value() + m_pitchModel.range() / 2) * MidiMaxPitchBend) / m_pitchModel.range());
 	}
@@ -239,8 +237,7 @@ private:
 	friend class MidiCCRackView;
 };
 
-class InstrumentTrackView : public TrackView
-{
+class InstrumentTrackView : public TrackView {
 	Q_OBJECT
 public:
 	InstrumentTrackView(InstrumentTrack* _it, TrackContainerView* tc);
@@ -301,8 +298,7 @@ private:
 	friend class InstrumentTrackWindow;
 };
 
-class InstrumentTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
-{
+class InstrumentTrackWindow : public QWidget, public ModelView, public SerializingObjectHook {
 	Q_OBJECT
 public:
 	InstrumentTrackWindow(InstrumentTrackView* _tv);

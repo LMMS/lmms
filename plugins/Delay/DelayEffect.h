@@ -31,8 +31,7 @@
 #include "StereoDelay.h"
 #include "ValueBuffer.h"
 
-class DelayEffect : public Effect
-{
+class DelayEffect : public Effect {
 public:
 	DelayEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~DelayEffect();

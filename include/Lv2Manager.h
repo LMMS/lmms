@@ -72,8 +72,7 @@
 */
 
 //! Class to keep track of all LV2 plugins
-class Lv2Manager
-{
+class Lv2Manager {
 public:
 	void initPlugins();
 
@@ -83,21 +82,16 @@ public:
 	AutoLilvNode uri(const char* uriStr);
 
 	//! Class representing info for one plugin
-	struct Lv2Info
-	{
+	struct Lv2Info {
 	public:
 		//! use only for std::map internals
 		Lv2Info()
-			: m_plugin(nullptr)
-		{
-		}
+			: m_plugin(nullptr) {}
 		//! ctor used inside Lv2Manager
 		Lv2Info(const LilvPlugin* plug, Plugin::PluginTypes type, bool valid)
 			: m_plugin(plug)
 			, m_type(type)
-			, m_valid(valid)
-		{
-		}
+			, m_valid(valid) {}
 		Lv2Info(Lv2Info&& other) = default;
 		Lv2Info& operator=(Lv2Info&& other) = default;
 
@@ -122,8 +116,7 @@ public:
 	Iterator end() { return m_lv2InfoMap.end(); }
 
 	//! strcmp based key comparator for std::set and std::map
-	struct CmpStr
-	{
+	struct CmpStr {
 		bool operator()(char const* a, char const* b) const;
 	};
 

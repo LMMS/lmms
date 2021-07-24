@@ -29,15 +29,13 @@
 #include "ReverbSCControls.h"
 #include "ValueBuffer.h"
 
-extern "C"
-{
+extern "C" {
 #include "base.h"
 #include "dcblock.h"
 #include "revsc.h"
 }
 
-class ReverbSCEffect : public Effect
-{
+class ReverbSCEffect : public Effect {
 public:
 	ReverbSCEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
 	virtual ~ReverbSCEffect();

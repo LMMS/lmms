@@ -61,8 +61,7 @@ TrackContentWidget::TrackContentWidget(TrackView* parent)
 	, m_darkerColor(Qt::SolidPattern)
 	, m_lighterColor(Qt::SolidPattern)
 	, m_gridColor(Qt::SolidPattern)
-	, m_embossColor(Qt::SolidPattern)
-{
+	, m_embossColor(Qt::SolidPattern) {
 	setAcceptDrops(true);
 
 	connect(parent->trackContainerView(), SIGNAL(positionChanged(const TimePos&)), this,
@@ -79,8 +78,7 @@ TrackContentWidget::TrackContentWidget(TrackView* parent)
  */
 TrackContentWidget::~TrackContentWidget() {}
 
-void TrackContentWidget::updateBackground()
-{
+void TrackContentWidget::updateBackground() {
 	const TrackContainerView* tcv = m_trackView->trackContainerView();
 
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
@@ -97,14 +95,12 @@ void TrackContentWidget::updateBackground()
 	// draw lines
 	// vertical lines
 	pmp.setPen(QPen(gridColor(), 1));
-	for (float x = 0; x < w * 2; x += ppb)
-	{
+	for (float x = 0; x < w * 2; x += ppb) {
 		pmp.drawLine(QLineF(x, 0.0, x, h));
 	}
 
 	pmp.setPen(QPen(embossColor(), 1));
-	for (float x = 1.0; x < w * 2; x += ppb)
-	{
+	for (float x = 1.0; x < w * 2; x += ppb) {
 		pmp.drawLine(QLineF(x, 0.0, x, h));
 	}
 
@@ -125,8 +121,7 @@ void TrackContentWidget::updateBackground()
  *
  * \param tcov The trackContentObjectView to add.
  */
-void TrackContentWidget::addTCOView(TrackContentObjectView* tcov)
-{
+void TrackContentWidget::addTCOView(TrackContentObjectView* tcov) {
 	TrackContentObject* tco = tcov->getTrackContentObject();
 
 	m_tcoViews.push_back(tcov);
@@ -142,11 +137,9 @@ void TrackContentWidget::addTCOView(TrackContentObjectView* tcov)
  *
  * \param tcov The trackContentObjectView to add.
  */
-void TrackContentWidget::removeTCOView(TrackContentObjectView* tcov)
-{
+void TrackContentWidget::removeTCOView(TrackContentObjectView* tcov) {
 	tcoViewVector::iterator it = std::find(m_tcoViews.begin(), m_tcoViews.end(), tcov);
-	if (it != m_tcoViews.end())
-	{
+	if (it != m_tcoViews.end()) {
 		m_tcoViews.erase(it);
 		Engine::getSong()->setModified();
 	}
@@ -155,10 +148,8 @@ void TrackContentWidget::removeTCOView(TrackContentObjectView* tcov)
 /*! \brief Update ourselves by updating all the tCOViews attached.
  *
  */
-void TrackContentWidget::update()
-{
-	for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it)
-	{
+void TrackContentWidget::update() {
+	for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it) {
 		(*it)->setFixedHeight(height() - 1);
 		(*it)->update();
 	}
@@ -171,30 +162,23 @@ void TrackContentWidget::update()
  *
  * \param newPos The MIDI time to move to.
  */
-void TrackContentWidget::changePosition(const TimePos& newPos)
-{
-	if (m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView())
-	{
+void TrackContentWidget::changePosition(const TimePos& newPos) {
+	if (m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView()) {
 		const int curBB = Engine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled(false);
 
 		// first show TCO for current BB...
-		for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it)
-		{
-			if ((*it)->getTrackContentObject()->startPosition().getBar() == curBB)
-			{
+		for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it) {
+			if ((*it)->getTrackContentObject()->startPosition().getBar() == curBB) {
 				(*it)->move(0, (*it)->y());
 				(*it)->raise();
 				(*it)->show();
-			}
-			else
-			{
+			} else {
 				(*it)->lower();
 			}
 		}
 		// ...then hide others to avoid flickering
-		for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it)
-		{
+		for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it) {
 			if ((*it)->getTrackContentObject()->startPosition().getBar() != curBB) { (*it)->hide(); }
 		}
 		setUpdatesEnabled(true);
@@ -209,8 +193,7 @@ void TrackContentWidget::changePosition(const TimePos& newPos)
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 
 	setUpdatesEnabled(false);
-	for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it)
-	{
+	for (tcoViewVector::iterator it = m_tcoViews.begin(); it != m_tcoViews.end(); ++it) {
 		TrackContentObjectView* tcov = *it;
 		TrackContentObject* tco = tcov->getTrackContentObject();
 
@@ -218,13 +201,10 @@ void TrackContentWidget::changePosition(const TimePos& newPos)
 
 		const int ts = tco->startPosition();
 		const int te = tco->endPosition() - 3;
-		if ((ts >= begin && ts <= end) || (te >= begin && te <= end) || (ts <= begin && te >= end))
-		{
+		if ((ts >= begin && ts <= end) || (te >= begin && te <= end) || (ts <= begin && te >= end)) {
 			tcov->move(static_cast<int>((ts - begin) * ppb / TimePos::ticksPerBar()), tcov->y());
 			if (!tcov->isVisible()) { tcov->show(); }
-		}
-		else
-		{
+		} else {
 			tcov->move(-tcov->width() - 10, tcov->y());
 		}
 	}
@@ -238,8 +218,7 @@ void TrackContentWidget::changePosition(const TimePos& newPos)
  *
  * \param mouseX the mouse's current X position in pixels.
  */
-TimePos TrackContentWidget::getPosition(int mouseX)
-{
+TimePos TrackContentWidget::getPosition(int mouseX) {
 	TrackContainerView* tv = m_trackView->trackContainerView();
 	return TimePos(tv->currentPosition() + mouseX * TimePos::ticksPerBar() / static_cast<int>(tv->pixelsPerBar()));
 }
@@ -248,12 +227,11 @@ TimePos TrackContentWidget::getPosition(int mouseX)
  *
  * \param dee the Drag Enter Event to respond to
  */
-void TrackContentWidget::dragEnterEvent(QDragEnterEvent* dee)
-{
+void TrackContentWidget::dragEnterEvent(QDragEnterEvent* dee) {
 	TimePos tcoPos = getPosition(dee->pos().x());
-	if (canPasteSelection(tcoPos, dee) == false) { dee->ignore(); }
-	else
-	{
+	if (canPasteSelection(tcoPos, dee) == false) {
+		dee->ignore();
+	} else {
 		StringPairDrag::processDragEnterEvent(dee, "tco_" + QString::number(getTrack()->type()));
 	}
 }
@@ -263,8 +241,7 @@ void TrackContentWidget::dragEnterEvent(QDragEnterEvent* dee)
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QDropEvent* de)
-{
+bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QDropEvent* de) {
 	const QMimeData* mimeData = de->mimeData();
 
 	// If the source of the DropEvent is the current instance of LMMS we don't allow pasting in the same bar
@@ -273,8 +250,7 @@ bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QDropEvent* de)
 }
 
 // Overloaded method to make it possible to call this method without a Drag&Drop event
-bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QMimeData* md, bool allowSameBar)
-{
+bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QMimeData* md, bool allowSameBar) {
 	// For decodeKey() and decodeValue()
 	using namespace Clipboard;
 
@@ -283,8 +259,7 @@ bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QMimeData* md, 
 	QString value = decodeValue(md);
 
 	// We can only paste into tracks of the same type
-	if (type != ("tco_" + QString::number(t->type())) || m_trackView->trackContainerView()->fixedTCOs() == true)
-	{
+	if (type != ("tco_" + QString::number(t->type())) || m_trackView->trackContainerView()->fixedTCOs() == true) {
 		return false;
 	}
 
@@ -308,8 +283,7 @@ bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QMimeData* md, 
 	// Don't paste if we're on the same bar and allowSameBar is false
 	auto sourceTrackContainerId = metadata.attributeNode("trackContainerId").value().toUInt();
 	if (!allowSameBar && sourceTrackContainerId == t->trackContainer()->id() && tcoPos == grabbedTCOBar
-		&& currentTrackIndex == initialTrackIndex)
-	{
+		&& currentTrackIndex == initialTrackIndex) {
 		return false;
 	}
 
@@ -318,8 +292,7 @@ bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QMimeData* md, 
 	QDomNodeList tcoNodes = tcoParent.childNodes();
 
 	// Determine if all the TCOs will land on a valid track
-	for (int i = 0; i < tcoNodes.length(); i++)
-	{
+	for (int i = 0; i < tcoNodes.length(); i++) {
 		QDomElement tcoElement = tcoNodes.item(i).toElement();
 		int trackIndex = tcoElement.attributeNode("trackIndex").value().toInt();
 		int finalTrackIndex = trackIndex + currentTrackIndex - initialTrackIndex;
@@ -341,8 +314,7 @@ bool TrackContentWidget::canPasteSelection(TimePos tcoPos, const QMimeData* md, 
  * \param tcoPos the position of the TCO slot being pasted on
  * \param de the DropEvent generated
  */
-bool TrackContentWidget::pasteSelection(TimePos tcoPos, QDropEvent* de)
-{
+bool TrackContentWidget::pasteSelection(TimePos tcoPos, QDropEvent* de) {
 	const QMimeData* mimeData = de->mimeData();
 
 	if (canPasteSelection(tcoPos, de) == false) { return false; }
@@ -352,8 +324,7 @@ bool TrackContentWidget::pasteSelection(TimePos tcoPos, QDropEvent* de)
 }
 
 // Overloaded method so we can call it without a Drag&Drop event
-bool TrackContentWidget::pasteSelection(TimePos tcoPos, const QMimeData* md, bool skipSafetyCheck)
-{
+bool TrackContentWidget::pasteSelection(TimePos tcoPos, const QMimeData* md, bool skipSafetyCheck) {
 	// For decodeKey() and decodeValue()
 	using namespace Clipboard;
 
@@ -387,8 +358,7 @@ bool TrackContentWidget::pasteSelection(TimePos tcoPos, const QMimeData* md, boo
 
 	// Unselect the old group
 	const QVector<selectableObject*> so = m_trackView->trackContainerView()->selectedObjects();
-	for (QVector<selectableObject*>::const_iterator it = so.begin(); it != so.end(); ++it)
-	{
+	for (QVector<selectableObject*>::const_iterator it = so.begin(); it != so.end(); ++it) {
 		(*it)->setSelected(false);
 	}
 
@@ -405,8 +375,7 @@ bool TrackContentWidget::pasteSelection(TimePos tcoPos, const QMimeData* md, boo
 
 	// Get the leftmost TCO and fix the offset if it reaches below bar 0
 	TimePos leftmostPos = grabbedTCOPos;
-	for (int i = 0; i < tcoNodes.length(); ++i)
-	{
+	for (int i = 0; i < tcoNodes.length(); ++i) {
 		QDomElement outerTCOElement = tcoNodes.item(i).toElement();
 		QDomElement tcoElement = outerTCOElement.firstChildElement();
 
@@ -417,8 +386,7 @@ bool TrackContentWidget::pasteSelection(TimePos tcoPos, const QMimeData* md, boo
 	// Fix offset if it sets the left most TCO to a negative position
 	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
 
-	for (int i = 0; i < tcoNodes.length(); i++)
-	{
+	for (int i = 0; i < tcoNodes.length(); i++) {
 		QDomElement outerTCOElement = tcoNodes.item(i).toElement();
 		QDomElement tcoElement = outerTCOElement.firstChildElement();
 
@@ -447,8 +415,7 @@ bool TrackContentWidget::pasteSelection(TimePos tcoPos, const QMimeData* md, boo
  *
  * \param de the Drop Event to respond to
  */
-void TrackContentWidget::dropEvent(QDropEvent* de)
-{
+void TrackContentWidget::dropEvent(QDropEvent* de) {
 	TimePos tcoPos = TimePos(getPosition(de->pos().x()));
 	if (pasteSelection(tcoPos, de) == true) { de->accept(); }
 }
@@ -457,27 +424,24 @@ void TrackContentWidget::dropEvent(QDropEvent* de)
  *
  * \param me the mouse press event to respond to
  */
-void TrackContentWidget::mousePressEvent(QMouseEvent* me)
-{
+void TrackContentWidget::mousePressEvent(QMouseEvent* me) {
 	// Enable box select if control is held when clicking an empty space
 	// (If we had clicked a TCO it would have intercepted the mouse event)
-	if (me->modifiers() & Qt::ControlModifier)
-	{
+	if (me->modifiers() & Qt::ControlModifier) {
 		gui->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
 	}
 	// Forward event to allow box select if the editor supports it and is in that mode
-	if (m_trackView->trackContainerView()->allowRubberband() == true) { QWidget::mousePressEvent(me); }
+	if (m_trackView->trackContainerView()->allowRubberband() == true) {
+		QWidget::mousePressEvent(me);
+	}
 	// Forward shift clicks so tracks can be resized
-	else if (me->modifiers() & Qt::ShiftModifier)
-	{
+	else if (me->modifiers() & Qt::ShiftModifier) {
 		QWidget::mousePressEvent(me);
 	}
 	// For an unmodified click, create a new TCO
-	else if (me->button() == Qt::LeftButton && !m_trackView->trackContainerView()->fixedTCOs())
-	{
+	else if (me->button() == Qt::LeftButton && !m_trackView->trackContainerView()->fixedTCOs()) {
 		QVector<selectableObject*> so = m_trackView->trackContainerView()->rubberBand()->selectedObjects();
-		for (int i = 0; i < so.count(); ++i)
-		{
+		for (int i = 0; i < so.count(); ++i) {
 			so.at(i)->setSelected(false);
 		}
 		getTrack()->addJournalCheckPoint();
@@ -486,8 +450,7 @@ void TrackContentWidget::mousePressEvent(QMouseEvent* me)
 	}
 }
 
-void TrackContentWidget::mouseReleaseEvent(QMouseEvent* me)
-{
+void TrackContentWidget::mouseReleaseEvent(QMouseEvent* me) {
 	gui->songEditor()->syncEditMode();
 	QWidget::mouseReleaseEvent(me);
 }
@@ -496,15 +459,13 @@ void TrackContentWidget::mouseReleaseEvent(QMouseEvent* me)
  *
  * \param pe the Paint Event to respond to
  */
-void TrackContentWidget::paintEvent(QPaintEvent* pe)
-{
+void TrackContentWidget::paintEvent(QPaintEvent* pe) {
 	// Assume even-pixels-per-bar. Makes sense, should be like this anyways
 	const TrackContainerView* tcv = m_trackView->trackContainerView();
 	int ppb = static_cast<int>(tcv->pixelsPerBar());
 	QPainter p(this);
 	// Don't draw background on BB-Editor
-	if (m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView())
-	{
+	if (m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView()) {
 		p.drawTiledPixmap(rect(), m_background, QPoint(tcv->currentPosition().getBar() * ppb, 0));
 	}
 }
@@ -513,8 +474,7 @@ void TrackContentWidget::paintEvent(QPaintEvent* pe)
  *
  * \param resizeEvent the resize event to pass to base class
  */
-void TrackContentWidget::resizeEvent(QResizeEvent* resizeEvent)
-{
+void TrackContentWidget::resizeEvent(QResizeEvent* resizeEvent) {
 	// Update backgroud
 	updateBackground();
 	// Force redraw
@@ -530,15 +490,13 @@ Track* TrackContentWidget::getTrack() { return m_trackView->getTrack(); }
  *
  * \param posStart the starting position of the Widget (from getPosition())
  */
-TimePos TrackContentWidget::endPosition(const TimePos& posStart)
-{
+TimePos TrackContentWidget::endPosition(const TimePos& posStart) {
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	const int w = width();
 	return posStart + static_cast<int>(w * TimePos::ticksPerBar() / ppb);
 }
 
-void TrackContentWidget::contextMenuEvent(QContextMenuEvent* cme)
-{
+void TrackContentWidget::contextMenuEvent(QContextMenuEvent* cme) {
 	// For hasFormat(), MimeType enum class and getMimeData()
 	using namespace Clipboard;
 
@@ -557,13 +515,11 @@ void TrackContentWidget::contextMenuEvent(QContextMenuEvent* cme)
 	contextMenu.exec(QCursor::pos());
 }
 
-void TrackContentWidget::contextMenuAction(QContextMenuEvent* cme, ContextMenuAction action)
-{
+void TrackContentWidget::contextMenuAction(QContextMenuEvent* cme, ContextMenuAction action) {
 	// For getMimeData()
 	using namespace Clipboard;
 
-	switch (action)
-	{
+	switch (action) {
 	case Paste:
 		// Paste the selection on the TimePos of the context menu event
 		TimePos tcoPos = getPosition(cme->x());

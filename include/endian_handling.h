@@ -33,8 +33,7 @@ inline bool isLittleEndian() { return (QSysInfo::ByteOrder == QSysInfo::LittleEn
 
 inline int16_t swap16IfBE(int16_t i) { return (isLittleEndian() ? i : ((i & 0xFF) << 8) | ((i >> 8) & 0xFF)); }
 
-inline int32_t swap32IfBE(int32_t i)
-{
+inline int32_t swap32IfBE(int32_t i) {
 	return (isLittleEndian()
 			? i
 			: ((i & 0xff000000) >> 24) | ((i & 0x00ff0000) >> 8) | ((i & 0x0000ff00) << 8) | ((i & 0x000000ff) << 24));
