@@ -149,7 +149,7 @@ void MultitapEchoControls::lpSamplesChanged( int begin, int end )
 	const float * samples = m_lpGraph.samples();
 	for( int i = begin; i <= end; ++i )
 	{
-		m_effect->m_lpFreq[i] = 20.0f * exp10( samples[i] );
+		m_effect->m_lpFreq[i] = 20.0f * std::pow(10.f, samples[i] );
 	}
 	m_effect->updateFilters( begin, end );
 }

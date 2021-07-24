@@ -33,10 +33,6 @@
 
 #include <cmath>
 
-#ifndef exp10
-#define exp10(x) std::pow( 10.0, x )
-#endif
-
 #ifdef __INTEL_COMPILER
 
 static inline float absFraction( const float _x )
@@ -263,7 +259,7 @@ static inline float safeDbfsToAmp( float dbfs )
 {
 	return std::isinf( dbfs )
 		? 0.0f
-		: exp10( dbfs * 0.05f );
+		: std::pow(10.f, dbfs * 0.05f );
 }
 
 
@@ -281,7 +277,7 @@ static inline float ampToDbfs( float amp )
 //! @return Linear amplitude
 static inline float dbfsToAmp( float dbfs )
 {
-	return exp10( dbfs * 0.05f );
+	return std::pow(10.f, dbfs * 0.05f );
 }
 
 
