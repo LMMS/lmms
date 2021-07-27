@@ -135,6 +135,8 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
 	void mouseMoveEvent( QMouseEvent * _me ) override;
+	void enterEvent( QEvent * _e) override;
+	void leaveEvent( QEvent * _e) override;
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _me ) override;
 	void wheelEvent( QWheelEvent * _me ) override;

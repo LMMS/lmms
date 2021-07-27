@@ -95,6 +95,7 @@ void Knob::initUi( const QString & _name )
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
 	setFocusPolicy( Qt::ClickFocus );
+	setMouseTracking( true );
 
 	// This is a workaround to enable style sheets for knobs which are not styled knobs.
 	//
@@ -614,6 +615,27 @@ void Knob::mouseMoveEvent( QMouseEvent * _me )
 		m_lastMousePos = _me->pos();
 	}
 	s_textFloat->setText( displayValue() );
+}
+
+
+
+
+void Knob::enterEvent( QEvent * _e)
+{
+	s_textFloat->setText( displayValue() );
+	s_textFloat->moveGlobal( this,
+			QPoint( width() + 2, 0 ) );
+	QTimer::singleShot(350, [=](){ s_textFloat->show(); });
+}
+
+
+
+
+void Knob::leaveEvent( QEvent * _e)
+{
+	// hide immediately, ensure quick moves won't leave floating text
+	s_textFloat->hide();
+	QTimer::singleShot(350, [=](){ s_textFloat->hide(); });
 }
 
 
