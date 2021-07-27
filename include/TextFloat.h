@@ -47,6 +47,9 @@ public:
 
 	void setVisibilityTimeOut( int _msecs );
 
+	void delayedShow(int _msecs);
+	void hide();
+
 
 	static TextFloat * displayMessage( const QString & _msg,
 						int _timeout = 2000,
@@ -77,6 +80,7 @@ private:
 	QString m_text;
 	QPixmap m_pixmap;
 
+	bool m_delayedShow;
 };
 
 #endif

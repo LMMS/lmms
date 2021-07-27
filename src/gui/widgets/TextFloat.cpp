@@ -85,6 +85,26 @@ void TextFloat::setVisibilityTimeOut( int _msecs )
 
 
 
+void TextFloat::delayedShow(int _msecs)
+{
+	m_delayedShow = true;
+	QTimer::singleShot(_msecs, [&](){
+		if(m_delayedShow) show();
+	});
+}
+
+
+
+
+void TextFloat::hide()
+{
+	m_delayedShow = false;
+	QWidget::hide();
+}
+
+
+
+
 TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
 					QWidget * _parent, int _add_y_margin )
 {

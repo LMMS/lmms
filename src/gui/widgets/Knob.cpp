@@ -625,7 +625,7 @@ void Knob::enterEvent( QEvent * _e)
 	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this,
 			QPoint( width() + 2, 0 ) );
-	QTimer::singleShot(350, [=](){ s_textFloat->show(); });
+	s_textFloat->delayedShow(300);
 }
 
 
@@ -633,9 +633,7 @@ void Knob::enterEvent( QEvent * _e)
 
 void Knob::leaveEvent( QEvent * _e)
 {
-	// hide immediately, ensure quick moves won't leave floating text
 	s_textFloat->hide();
-	QTimer::singleShot(350, [=](){ s_textFloat->hide(); });
 }
 
 
