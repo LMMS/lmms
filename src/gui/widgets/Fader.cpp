@@ -177,6 +177,23 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 
 
 
+void Fader::enterEvent( QEvent *ev )
+{
+		updateTextFloat();
+		s_textFloat->delayedShow(300);
+}
+
+
+
+
+void Fader::leaveEvent( QEvent *ev )
+{
+	s_textFloat->hide();
+}
+
+
+
+
 void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 {
 	if( mouseEvent->button() == Qt::LeftButton &&

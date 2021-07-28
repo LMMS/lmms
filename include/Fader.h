@@ -114,6 +114,8 @@ private:
 	void mousePressEvent( QMouseEvent *ev ) override;
 	void mouseDoubleClickEvent( QMouseEvent* mouseEvent ) override;
 	void mouseMoveEvent( QMouseEvent *ev ) override;
+	void enterEvent( QEvent *ev) override;
+	void leaveEvent( QEvent *ev) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
 	void wheelEvent( QWheelEvent *ev ) override;
 	void paintEvent( QPaintEvent *ev ) override;
