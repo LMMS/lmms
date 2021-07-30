@@ -476,7 +476,12 @@ void MainWindow::finalize()
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
+    m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
+    m_metronomeSettingsMenu = new MetronomeSettingsMenu(3);
+    connect(m_metronomeSettingsMenu, &MetronomeSettingsMenu::optionChanged, this, &MainWindow::onMetronomeSettingsChanged);
+    connect(m_metronomeSettingsMenu, &MetronomeSettingsMenu::volumeChanged, this, &MainWindow::onMetronomeVolumeChanged);
+    connect(m_metronomeToggle, SIGNAL(rightMouseButtonReleased()), this, SLOT(onShowMetronomeSettings()));
+	m_metronomeSettingsMenu->propagateInitialSettings();
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -1241,7 +1246,25 @@ void MainWindow::onToggleMetronome()
 	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
 }
 
+void MainWindow::onShowMetronomeSettings(){
+    m_metronomeSettingsMenu->move(m_metronomeSettingsMenu->parentWidget()->mapFromGlobal(QCursor::pos()) - QPoint(5,5)); // + offset, so cursor doesn't lay on the widget's edges
+    m_metronomeSettingsMenu->show();
+}
 
+void MainWindow::onMetronomeSettingsChanged(std::pair<QString, QString> recentChange)
+{
+    Mixer * mixer = Engine::mixer();
+
+    if (recentChange.first.compare("Rythm") == 0)
+        mixer->setMetronomeRythm( recentChange.second );
+}
+
+void MainWindow::onMetronomeVolumeChanged(float current_volume)
+{
+    Mixer * mixer = Engine::mixer();
+
+    mixer->setMetronomeVolume( current_volume );
+}
 
 
 void MainWindow::toggleControllerRack()

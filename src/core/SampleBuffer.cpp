@@ -719,7 +719,7 @@ bool SampleBuffer::play(
 	bool isBackwards = state->isBackwards();
 
 	const double freqFactor = (double) freq / (double) m_frequency *
-		m_sampleRate / Engine::mixer()->processingSampleRate();
+        m_sampleRate / Engine::mixer()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>(
@@ -752,7 +752,7 @@ bool SampleBuffer::play(
 		playFrame = getPingPongIndex(playFrame, loopStartFrame, loopEndFrame);
 	}
 
-	f_cnt_t fragmentSize = (f_cnt_t)(frames * freqFactor) + MARGIN[state->interpolationMode()];
+    f_cnt_t fragmentSize = (f_cnt_t)(frames * freqFactor) + MARGIN[state->interpolationMode()];
 
 	sampleFrame * tmp = nullptr;
 
@@ -859,7 +859,7 @@ bool SampleBuffer::play(
 
 	for (fpp_t i = 0; i < frames; ++i)
 	{
-		ab[i][0] *= m_amplification;
+        ab[i][0] *= m_amplification;
 		ab[i][1] *= m_amplification;
 	}
 

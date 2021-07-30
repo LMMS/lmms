@@ -112,6 +112,8 @@ SET(LMMS_SRCS
 	gui/widgets/TrackOperationsWidget.cpp
 	gui/widgets/TrackRenameLineEdit.cpp
 	gui/widgets/StepRecorderWidget.cpp
+	gui/widgets/MetronomeSettingsMenu.cpp
+
 
 	PARENT_SCOPE
 )

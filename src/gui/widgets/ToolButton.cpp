@@ -21,7 +21,6 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
 #include "ToolButton.h"
 #include "ToolTip.h"
@@ -40,4 +39,12 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	}
 	ToolTip::add( this, _tooltip );
 	setIcon( _pixmap );
+}
+
+void ToolButton::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton) {
+        emit rightMouseButtonReleased();
+    }
+    QToolButton::mouseReleaseEvent(event);
 }

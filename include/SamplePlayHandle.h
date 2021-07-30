@@ -39,8 +39,8 @@ class AudioPort;
 class SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
-	SamplePlayHandle( const QString& sampleFile );
+    SamplePlayHandle(SampleBuffer* sampleBuffer, bool ownAudioPort = true, float sample_volume = 1);
+    SamplePlayHandle( const QString& sampleFile, float sample_volume = 1);
 	SamplePlayHandle( SampleTCO* tco );
 	virtual ~SamplePlayHandle();
 
@@ -48,7 +48,6 @@ public:
 	{
 		return true;
 	}
-
 
 	void play( sampleFrame * buffer ) override;
 	bool isFinished() const override;
@@ -80,7 +79,7 @@ private:
 	SampleBuffer * m_sampleBuffer;
 	bool m_doneMayReturnTrue;
 
-	f_cnt_t m_frame;
+    f_cnt_t m_frame;
 	SampleBuffer::handleState m_state;
 
 	const bool m_ownAudioPort;

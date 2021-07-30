@@ -178,7 +178,7 @@ public:
 				bool _needs_fifo,
 				bool startNow );
 	void storeAudioDevice();
-	void restoreAudioDevice();
+    void restoreAudioDevice();
 	inline AudioDevice * audioDev()
 	{
 		return m_audioDev;
@@ -310,6 +310,8 @@ public:
 
 	void changeQuality(const struct qualitySettings & qs);
 
+    void setMetronomeVolume(float volume);
+    void setMetronomeRythm(QString rythm);
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
@@ -365,7 +367,8 @@ private:
 
 	void swapBuffers();
 
-	void handleMetronome();
+    void handleMetronome();
+    void arrangeMetronomTicks(std::vector<bool> pattern, tick_t cur_tick);
 
 	void clearInternal();
 
@@ -422,6 +425,8 @@ private:
 	MixerProfiler m_profiler;
 
 	bool m_metronomeActive;
+    float m_metronomeVolume;
+    QString m_metronomeRythm;
 
 	bool m_clearSignal;
 
