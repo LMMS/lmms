@@ -58,12 +58,11 @@
 #include "ConfigManager.h"
 
 
-#ifndef _PATH_DEV_DSP
+static const QString PATH_DEV_DSP =
 #if defined(__NetBSD__) || defined(__OpenBSD__)
-#define _PATH_DEV_DSP  "/dev/audio"
+"/dev/audio";
 #else
-#define _PATH_DEV_DSP  "/dev/dsp"
-#endif
+"/dev/dsp";
 #endif
 
 
@@ -210,7 +209,7 @@ QString AudioOss::probeDevice()
 		}
 		else
 		{
-			dev = _PATH_DEV_DSP;		// default device
+			dev = PATH_DEV_DSP;		// default device
 		}
 	}
 
@@ -220,10 +219,10 @@ QString AudioOss::probeDevice()
 		int instance = -1;
 		while( 1 )
 		{
-			dev = _PATH_DEV_DSP + QString::number( ++instance );
+			dev = PATH_DEV_DSP + QString::number( ++instance );
 			if( !QFileInfo( dev ).exists() )
 			{
-				dev = _PATH_DEV_DSP;
+				dev = PATH_DEV_DSP;
 				break;
 			}
 			if( QFileInfo( dev ).isWritable() )
