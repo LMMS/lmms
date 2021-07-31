@@ -42,10 +42,6 @@
 
 using namespace std;
 
-#define WORD  __u16
-#define DWORD __u32
-#define WAVE_FORMAT_PCM			0x0001
-
 // const int     Fs    =  44100;
 const float   TwoPi =  6.2831853f;
 const int     MAX   =  0;
