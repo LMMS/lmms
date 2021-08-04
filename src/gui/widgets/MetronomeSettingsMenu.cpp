@@ -51,7 +51,6 @@ ToolButton* MetronomeSettingsMenu::getMenuButton(QWidget * _parent)
 	metronome_button->setCheckable(true);
 
 	ToolTip::add( metronome_button, tr( "Metronome, right mousebutton to specifiy its settings." ) );
-    //metronome_button->setChecked(Engine::mixer()->isMetronomeActive());
     return metronome_button;
 }
 
@@ -60,11 +59,10 @@ void MetronomeSettingsMenu::propagateInitialSettings()
     int initialVolume = 80; // % of slider range
     QString initialRythm = "1/4";
 
-
-    for (std::vector<std::pair<QString,QPushButton*> >::iterator rythm_option = m_optionElements.rythm.begin(); 
+    for (std::vector<std::pair<QString,QPushButton*> >::iterator rythm_option = m_optionElements.rythm.begin();
          rythm_option != m_optionElements.rythm.end(); rythm_option++)
     {
-        if (initialRythm.compare((*rythm_option).first) == 0)        
+        if (initialRythm.compare((*rythm_option).first) == 0)
             emit (*rythm_option).second->released();
     }
 
@@ -98,7 +96,6 @@ QVBoxLayout* MetronomeSettingsMenu::makeGeneralMenuSection(QString title, std::v
     sectionLayout->addWidget(makeGroupTitle(title));
     for (std::vector<QString>::iterator element = elements.begin(); element != elements.end(); element ++)
     {
-        // turn options into QPushButtons
         QPushButton * option = new QPushButton(*element);
         option->setFlat(true);
         option->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
