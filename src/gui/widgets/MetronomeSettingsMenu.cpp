@@ -35,7 +35,6 @@ MetronomeSettingsMenu::MetronomeSettingsMenu(short optionsPerLine, QWidget *pare
     m_maxMenuRowElements = 3;
     m_groupNameFont.setWeight(QFont::ExtraBold);
     setWindowFlags(Qt::CustomizeWindowHint); // turns off all windows flags, hence no icons nor frame
-
     m_generalMenuLayout = new QVBoxLayout();
     m_generalMenuLayout->addLayout(makeVolumeControlSection("Volume"));
     m_generalMenuLayout->addLayout(makeGeneralMenuSection("Rythm", std::vector<QString>{"1/1", "1/2", "1/4", "1/8", "1/16"}));
@@ -49,7 +48,6 @@ ToolButton* MetronomeSettingsMenu::getMenuButton(QWidget * _parent)
                                                   this, nullptr,
                                                   _parent);
 	metronome_button->setCheckable(true);
-
 	ToolTip::add( metronome_button, tr( "Metronome, right mousebutton to specifiy its settings." ) );
     return metronome_button;
 }
@@ -135,9 +133,7 @@ void MetronomeSettingsMenu::handleOptionUpdates()
         {
             (*rythm_option).second->setIcon(QIcon());
         }
-
     }
-
     hide();
     emit optionChanged(std::make_pair("Rythm", option_str));
 }
