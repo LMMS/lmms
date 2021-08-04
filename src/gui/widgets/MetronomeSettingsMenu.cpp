@@ -98,12 +98,14 @@ QVBoxLayout* MetronomeSettingsMenu::makeGeneralMenuSection(QString title, std::v
     sectionLayout->addWidget(makeGroupTitle(title));
     for (std::vector<QString>::iterator element = elements.begin(); element != elements.end(); element ++)
     {
+        // turn options into QPushButtons
         QPushButton * option = new QPushButton(*element);
         option->setFlat(true);
         option->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
         m_optionElements.rythm.push_back(std::make_pair(*element, option));
         connect(option, SIGNAL(released()), this, SLOT(handleOptionUpdates()));
         rowLayout->addWidget(option);
+
         // add a new row if necessary
         if (m_optionElements.rythm.size() % m_maxMenuRowElements == 0)
         {
@@ -123,7 +125,7 @@ void MetronomeSettingsMenu::handleVolumeUpdates(int volume)
 void MetronomeSettingsMenu::handleOptionUpdates()
 {
     QObject* option = sender();
-    QString titleStr, option_str;
+    QString option_str;
     for (std::vector<std::pair<QString,QPushButton*> >::iterator rythm_option = m_optionElements.rythm.begin();
          rythm_option != m_optionElements.rythm.end(); rythm_option ++)
     {
