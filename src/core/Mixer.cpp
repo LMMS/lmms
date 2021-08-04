@@ -501,7 +501,6 @@ void Mixer::handleMetronome()
 
 	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
 	tick_t ticksPerBar = TimePos::ticksPerBar();
-	int numerator = song->getTimeSigModel().getNumerator();
 
 	if (ticks == lastMetroTicks)
 	{
@@ -510,9 +509,7 @@ void Mixer::handleMetronome()
 
 	// specify frequency of high and low tick sound
 	highTickFrequency = ticksPerBar;
-    if(m_metronomeRythm.compare("1/1") == 0)
-		lowTickFrequency = highTickFrequency; // gets never called
-	else if(m_metronomeRythm.compare("1/2") == 0)
+	if(m_metronomeRythm.compare("1/2") == 0)
 		lowTickFrequency = ticksPerBar / 2;
 	else if(m_metronomeRythm.compare("1/4") == 0)
 		lowTickFrequency = ticksPerBar / 4;
@@ -520,6 +517,8 @@ void Mixer::handleMetronome()
 		lowTickFrequency = ticksPerBar / 8;
 	else if(m_metronomeRythm.compare("1/16") == 0)
 		lowTickFrequency = ticksPerBar / 16;
+	else
+		lowTickFrequency = highTickFrequency; // default or 1/1
 
 	// eventually add tick sound
 	if (ticks % highTickFrequency == 0)

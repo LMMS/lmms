@@ -470,16 +470,19 @@ void MainWindow::finalize()
 							SLOT( onExportProject() ),
 								m_toolBar );
 
+	/*
 	m_metronomeToggle = new ToolButton(
 				embed::getIconPixmap( "metronome" ),
 				tr( "Metronome" ),
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-    m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
+    m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());*/
     m_metronomeSettingsMenu = new MetronomeSettingsMenu(3);
+	m_metronomeToggle = m_metronomeSettingsMenu->getMenuButton(m_toolBar);
     connect(m_metronomeSettingsMenu, &MetronomeSettingsMenu::optionChanged, this, &MainWindow::onMetronomeSettingsChanged);
     connect(m_metronomeSettingsMenu, &MetronomeSettingsMenu::volumeChanged, this, &MainWindow::onMetronomeVolumeChanged);
+	connect(m_metronomeToggle, SIGNAL(clicked()), this, SLOT( onToggleMetronome()));
     connect(m_metronomeToggle, SIGNAL(rightMouseButtonReleased()), this, SLOT(onShowMetronomeSettings()));
 	m_metronomeSettingsMenu->propagateInitialSettings();
 

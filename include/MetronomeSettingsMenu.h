@@ -10,10 +10,13 @@
 #include <QMouseEvent>
 #include <QFont>
 
+#include "ToolButton.h"
+#include "AutomatableSlider.h"
+
 
 struct OptionElements{
         std::vector<std::pair<QString, QPushButton*> > rythm;
-        QSlider* volume;
+        AutomatableSlider* volume;
 };
 
 /**
@@ -28,6 +31,7 @@ class MetronomeSettingsMenu : public QWidget
 
 public:
     MetronomeSettingsMenu(short optionsPerLine, QWidget *parent = nullptr);
+    ToolButton* getMenuButton(QWidget * _parent=nullptr);
     void propagateInitialSettings();
 
 private:
