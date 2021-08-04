@@ -98,7 +98,6 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_lcd->setMarginWidth( 1 );
 	
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
-	setToolTip( name );
 
 	m_renameLineEdit = new QLineEdit();
 	m_renameLineEdit->setText( name );
@@ -265,7 +264,6 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 void FxLine::renameChannel()
 {
 	m_inRename = true;
-	setToolTip( "" );
 	m_renameLineEdit->setReadOnly( false );
 	m_lcd->hide();
 	m_renameLineEdit->setFixedWidth( 135 );
@@ -294,7 +292,6 @@ void FxLine::renameFinished()
 		Engine::getSong()->setModified();
 	}
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
-	setToolTip( name );
 }
 
 

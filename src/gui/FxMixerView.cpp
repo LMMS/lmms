@@ -362,7 +362,6 @@ void FxMixerView::updateFxLine(int index)
 	// does current channel send to this channel?
 	int selIndex = m_currentFxLine->channelIndex();
 	FxLine * thisLine = m_fxChannelViews[index]->m_fxLine;
-	thisLine->setToolTip( Engine::fxMixer()->effectChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if( sendModel == NULL )
