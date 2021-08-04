@@ -576,7 +576,6 @@ void Mixer::clearInternal()
 		{
 			m_playHandlesToRemove.push_back(ph);
 		}
-
 	}
 }
 
