@@ -104,7 +104,6 @@ QVBoxLayout* MetronomeSettingsMenu::makeGeneralMenuSection(QString title, std::v
         m_optionElements.rythm.push_back(std::make_pair(*element, option));
         connect(option, SIGNAL(released()), this, SLOT(handleOptionUpdates()));
         rowLayout->addWidget(option);
-
         // add a new row if necessary
         if (m_optionElements.rythm.size() % m_maxMenuRowElements == 0)
         {
