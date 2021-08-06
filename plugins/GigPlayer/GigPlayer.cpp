@@ -69,7 +69,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"gig",
-	NULL
+	NULL,
 } ;
 
 }

@@ -90,7 +90,7 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 };
 
 }

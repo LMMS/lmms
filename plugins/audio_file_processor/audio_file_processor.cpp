@@ -65,7 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
-	NULL
+	NULL,
 } ;
 
 }

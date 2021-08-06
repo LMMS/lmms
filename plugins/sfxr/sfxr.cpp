@@ -68,7 +68,7 @@ Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }

@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL
+	NULL,
 } ;
 
 }

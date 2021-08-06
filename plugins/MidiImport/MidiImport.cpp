@@ -72,7 +72,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 	Plugin::ImportFilter,
 	NULL,
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }

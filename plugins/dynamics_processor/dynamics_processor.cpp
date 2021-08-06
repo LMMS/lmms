@@ -45,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }
