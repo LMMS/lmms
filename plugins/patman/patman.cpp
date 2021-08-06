@@ -62,7 +62,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"pat",
-	NULL
+	NULL,
 } ;
 
 

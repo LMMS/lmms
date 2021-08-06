@@ -40,7 +40,7 @@ Plugin::Descriptor VSTBASE_EXPORT vstbase_plugin_descriptor =
 	0x0100,
 	Plugin::Library,
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }

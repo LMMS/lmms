@@ -41,7 +41,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 

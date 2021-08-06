@@ -79,7 +79,7 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"dll",
-	NULL
+	NULL,
 } ;
 
 }

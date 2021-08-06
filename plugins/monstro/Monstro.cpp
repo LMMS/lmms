@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }
