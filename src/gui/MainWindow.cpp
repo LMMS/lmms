@@ -1258,8 +1258,8 @@ void MainWindow::onMetronomeSettingsChanged(std::pair<QString, QString> recentCh
 {
     Mixer * mixer = Engine::mixer();
 
-    if (recentChange.first.compare("Rythm") == 0)
-        mixer->setMetronomeRythm( recentChange.second );
+    if (recentChange.first.compare("Rhythm") == 0)
+        mixer->setMetronomeRhythm( recentChange.second );
 }
 
 void MainWindow::onMetronomeVolumeChanged(float current_volume)

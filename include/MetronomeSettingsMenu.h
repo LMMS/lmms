@@ -15,7 +15,7 @@
 
 
 struct OptionElements{
-        std::vector<std::pair<QString, QPushButton*> > rythm;
+        std::vector<std::pair<QString, QPushButton*> > rhythm;
         AutomatableSlider* volume;
 };
 

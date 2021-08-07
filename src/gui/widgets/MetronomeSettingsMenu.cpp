@@ -37,7 +37,7 @@ MetronomeSettingsMenu::MetronomeSettingsMenu(short optionsPerLine, QWidget *pare
     setWindowFlags(Qt::CustomizeWindowHint); // turns off all windows flags, hence no icons nor frame
     m_generalMenuLayout = new QVBoxLayout();
     m_generalMenuLayout->addLayout(makeVolumeControlSection("Volume"));
-    m_generalMenuLayout->addLayout(makeGeneralMenuSection("Rythm", std::vector<QString>{"1/1", "1/2", "1/4", "1/8", "1/16"}));
+    m_generalMenuLayout->addLayout(makeGeneralMenuSection("Rhythm", std::vector<QString>{"1/1", "1/2", "1/4", "1/8", "1/16"}));
     this->setLayout(m_generalMenuLayout);
 }
 
@@ -55,13 +55,13 @@ ToolButton* MetronomeSettingsMenu::getMenuButton(QWidget * _parent)
 void MetronomeSettingsMenu::propagateInitialSettings()
 {
     int initialVolume = 80; // % of slider range
-    QString initialRythm = "1/4";
+    QString initialRhythm = "1/4";
 
-    for (std::vector<std::pair<QString,QPushButton*> >::iterator rythm_option = m_optionElements.rythm.begin();
-         rythm_option != m_optionElements.rythm.end(); rythm_option++)
+    for (std::vector<std::pair<QString,QPushButton*> >::iterator rhythm_option = m_optionElements.rhythm.begin();
+         rhythm_option != m_optionElements.rhythm.end(); rhythm_option++)
     {
-        if (initialRythm.compare((*rythm_option).first) == 0)
-            emit (*rythm_option).second->released();
+        if (initialRhythm.compare((*rhythm_option).first) == 0)
+            emit (*rhythm_option).second->released();
     }
 
     m_optionElements.volume->setValue(initialVolume);
@@ -97,12 +97,12 @@ QVBoxLayout* MetronomeSettingsMenu::makeGeneralMenuSection(QString title, std::v
         QPushButton * option = new QPushButton(*element);
         option->setFlat(true);
         option->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-        m_optionElements.rythm.push_back(std::make_pair(*element, option));
+        m_optionElements.rhythm.push_back(std::make_pair(*element, option));
         connect(option, SIGNAL(released()), this, SLOT(handleOptionUpdates()));
         rowLayout->addWidget(option);
 
         // add a new row if necessary
-        if (m_optionElements.rythm.size() % m_maxMenuRowElements == 0)
+        if (m_optionElements.rhythm.size() % m_maxMenuRowElements == 0)
         {
             sectionLayout->addLayout(rowLayout);
             rowLayout = new QHBoxLayout();
@@ -121,21 +121,21 @@ void MetronomeSettingsMenu::handleOptionUpdates()
 {
     QObject* option = sender();
     QString option_str;
-    for (std::vector<std::pair<QString,QPushButton*> >::iterator rythm_option = m_optionElements.rythm.begin();
-         rythm_option != m_optionElements.rythm.end(); rythm_option ++)
+    for (std::vector<std::pair<QString,QPushButton*> >::iterator rhythm_option = m_optionElements.rhythm.begin();
+         rhythm_option != m_optionElements.rhythm.end(); rhythm_option ++)
     {
-        if ((*rythm_option).second == option)
+        if ((*rhythm_option).second == option)
         {
-            option_str = (*rythm_option).first;
-            (*rythm_option).second->setIcon(embed::getIconPixmap( "autoscroll_on" ));
+            option_str = (*rhythm_option).first;
+            (*rhythm_option).second->setIcon(embed::getIconPixmap( "autoscroll_on" ));
         }
         else // remove possible previouse user coice icon
         {
-            (*rythm_option).second->setIcon(QIcon());
+            (*rhythm_option).second->setIcon(QIcon());
         }
     }
     hide();
-    emit optionChanged(std::make_pair("Rythm", option_str));
+    emit optionChanged(std::make_pair("Rhythm", option_str));
 }
 
 void MetronomeSettingsMenu::leaveEvent(QEvent *event)

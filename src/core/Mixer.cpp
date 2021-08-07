@@ -466,9 +466,9 @@ void Mixer::setMetronomeVolume(float volume)
 
 
 
-void Mixer::setMetronomeRythm(QString rythm)
+void Mixer::setMetronomeRhythm(QString rhythm)
 {
-    m_metronomeRythm = rythm;
+    m_metronomeRhythm = rhythm;
 }
 
 
@@ -509,13 +509,13 @@ void Mixer::handleMetronome()
 
 	// specify frequency of high and low tick sound
 	highTickFrequency = ticksPerBar;
-	if(m_metronomeRythm.compare("1/2") == 0)
+	if(m_metronomeRhythm.compare("1/2") == 0)
 		lowTickFrequency = ticksPerBar / 2;
-	else if(m_metronomeRythm.compare("1/4") == 0)
+	else if(m_metronomeRhythm.compare("1/4") == 0)
 		lowTickFrequency = ticksPerBar / 4;
-	else if(m_metronomeRythm.compare("1/8") == 0)
+	else if(m_metronomeRhythm.compare("1/8") == 0)
 		lowTickFrequency = ticksPerBar / 8;
-	else if(m_metronomeRythm.compare("1/16") == 0)
+	else if(m_metronomeRhythm.compare("1/16") == 0)
 		lowTickFrequency = ticksPerBar / 16;
 	else
 		lowTickFrequency = highTickFrequency; // default or 1/1

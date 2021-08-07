@@ -311,7 +311,7 @@ public:
 	void changeQuality(const struct qualitySettings & qs);
 
     void setMetronomeVolume(float volume);
-    void setMetronomeRythm(QString rythm);
+    void setMetronomeRhythm(QString rhythm);
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
@@ -426,7 +426,7 @@ private:
 
 	bool m_metronomeActive;
     float m_metronomeVolume;
-    QString m_metronomeRythm;
+    QString m_metronomeRhythm;
 
 	bool m_clearSignal;
 
