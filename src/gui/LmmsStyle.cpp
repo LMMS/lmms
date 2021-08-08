@@ -149,6 +149,21 @@ QPalette LmmsStyle::standardPalette( void ) const
 }
 
 
+
+int LmmsStyle::styleHint(StyleHint hint, const QStyleOption* option,
+						const QWidget* widget, QStyleHintReturn* returnData) const
+{
+	// Make tool tips 100% transparent if they are disabled (does not affect TextFloat)
+	if (hint == QStyle::SH_ToolTipLabel_Opacity && m_disableToolTips)
+	{
+		return 0;
+	}
+
+	return QProxyStyle::styleHint(hint, option, widget, returnData);
+}
+
+
+
 void LmmsStyle::drawComplexControl( ComplexControl control,
 					const QStyleOptionComplex * option,
 					QPainter *painter,

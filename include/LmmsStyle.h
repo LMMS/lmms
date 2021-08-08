@@ -83,12 +83,20 @@ public:
 					const QStyleOption * option = 0,
 					const QWidget * widget = 0 ) const override;
 
+	virtual int styleHint(StyleHint hint,
+					const QStyleOption* option,
+					const QWidget* widget,
+					QStyleHintReturn* returnData) const override;
+
 	static QPalette * s_palette;
+
+	inline void disableToolTips(bool b) { m_disableToolTips = b; }
 
 private:
 	QImage colorizeXpm( const char * const * xpm, const QBrush& fill ) const;
 	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
 	QColor m_colors[ LmmsStyle::NumColorRoles ];
+	bool m_disableToolTips = false;
 
 };
 

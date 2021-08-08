@@ -79,6 +79,8 @@ GuiApplication::GuiApplication()
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 
+	lmmsstyle->disableToolTips(ConfigManager::inst()->value("tooltips", "disabled").toInt());
+
 	LmmsPalette* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
 	QPalette* lpal = new QPalette(lmmspal->palette());
 

@@ -27,15 +27,15 @@
 #define TOOLTIP_H
 
 #include <qstring.h>
+#include <QWidget>
 
 #include "lmms_export.h"
-
-class QWidget;
 
 
 struct ToolTip
 {
-	static void LMMS_EXPORT add( QWidget * _w, const QString & _txt );
+	//! Deprecated dummy class (tool tip visibility is controlled by LmmsStyle)
+	inline static void LMMS_EXPORT add(QWidget* w, const QString& txt) { w->setToolTip(txt); }
 } ;
 
 
