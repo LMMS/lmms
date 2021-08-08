@@ -153,7 +153,9 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusDepth.setInitValue(settingVal);
 #endif
 
-	// When loading a project or sf2 preview, do not load the default soundfont
+	// FIXME: there's no good way to tell if we're loading a preset or an empty instrument
+	// We rely on instantiate() to load the default soundfont for new instruments,
+	// but we don't need that when loading a project/preset/preview
 	loadFile(Engine::getSong()->isLoadingProject() or instrumentTrack()->isPreviewMode()
 				? ""
 				: ConfigManager::inst()->sf2File());
@@ -1189,6 +1191,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new sf2Instrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 
 }
