@@ -295,16 +295,24 @@ ENDIF(WANT_CARLA)
 
 # check for SDL2
 IF(WANT_SDL)
+	# Don't look for SDL2main
 	SET(SDL2_BUILDING_LIBRARY TRUE)
-	FIND_PACKAGE(SDL2)
+
+	# Search for SDL2 using config mode first, then fall back to module mode.
+	# This allows us to use SDL2's own CMake configuration files if available.
+	FIND_PACKAGE(SDL2 CONFIG QUIET)
+	IF(NOT TARGET SDL2::SDL2)
+		FIND_PACKAGE(SDL2 MODULE)
+	ENDIF()
+
 	IF(SDL2_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
 		SET(LMMS_HAVE_SDL2 TRUE)
 		SET(STATUS_SDL "OK, using SDL2")
+		SET(SDL2_LIBRARY "SDL2::SDL2")
 		SET(SDL_INCLUDE_DIR "")
 		SET(SDL_LIBRARY "")
 	ELSE()
-		SET(SDL2_INCLUDE_DIR "")
 		SET(SDL2_LIBRARY "")
 	ENDIF()
 ENDIF()
