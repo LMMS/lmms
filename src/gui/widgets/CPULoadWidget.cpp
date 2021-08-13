@@ -26,10 +26,10 @@
 
 #include <QPainter>
 
+#include "AudioEngine.h"
 #include "CPULoadWidget.h"
 #include "embed.h"
 #include "Engine.h"
-#include "Mixer.h"
 
 
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :

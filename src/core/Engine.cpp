@@ -24,12 +24,12 @@
 
 
 #include "Engine.h"
+#include "AudioEngine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
 #include "Lv2Manager.h"
-#include "Mixer.h"
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"

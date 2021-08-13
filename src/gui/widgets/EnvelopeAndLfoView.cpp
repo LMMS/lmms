@@ -33,7 +33,7 @@
 #include "gui_templates.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "DataFile.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"

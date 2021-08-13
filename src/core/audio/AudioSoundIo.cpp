@@ -34,7 +34,7 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "ComboBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _mixer ) :
 	AudioDevice( qBound<ch_cnt_t>(

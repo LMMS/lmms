@@ -23,12 +23,16 @@
  */
 
 #include "SamplePlayHandle.h"
+#include "AudioEngine.h"
 #include "AudioPort.h"
 #include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+<<<<<<< HEAD
 #include "lmms_constants.h"
 #include "Mixer.h"
+=======
+>>>>>>> ae12ac581 (Rename Mixer.h header to AudioEngine.h)
 #include "SampleTCO.h"
 
 

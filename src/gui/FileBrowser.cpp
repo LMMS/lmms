@@ -37,6 +37,7 @@
 #include <QStringList>
 
 #include "FileBrowser.h"
+#include "AudioEngine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -48,7 +49,6 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"

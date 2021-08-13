@@ -35,6 +35,7 @@
 #include <QTimeLine>
 
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
@@ -45,7 +46,6 @@
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
-#include "Mixer.h"
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
 #include "TextFloat.h"

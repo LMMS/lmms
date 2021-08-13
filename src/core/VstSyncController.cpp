@@ -25,9 +25,9 @@
 
 #include <QDebug>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "VstSyncController.h"
 #include "RemotePlugin.h"
 

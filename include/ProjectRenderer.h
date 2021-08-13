@@ -27,7 +27,7 @@
 
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "OutputSettings.h"
 
 #include "lmms_export.h"

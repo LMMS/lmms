@@ -30,7 +30,7 @@
 
 #include "BufferManager.h"
 #include "RemotePlugin.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 
 #include <QDebug>

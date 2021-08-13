@@ -44,7 +44,7 @@
 #include "FxMixer.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "SampleTrack.h"

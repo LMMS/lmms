@@ -32,7 +32,7 @@
 
 #include "BufferManager.h"
 #include "Engine.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "fftw3.h"
 #include "fft_helpers.h"

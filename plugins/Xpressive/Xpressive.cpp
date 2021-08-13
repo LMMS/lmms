@@ -26,6 +26,7 @@
 
 #include <QDomElement>
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Graph.h"
 #include "GuiApplication.h"
@@ -33,7 +34,6 @@
 #include "Knob.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"

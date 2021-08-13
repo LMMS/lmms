@@ -26,12 +26,12 @@
 
 #include "Watsyn.h"
 #include "base64.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
-#include "Mixer.h"
 #include "interpolation.h"
 
 #include "embed.h"

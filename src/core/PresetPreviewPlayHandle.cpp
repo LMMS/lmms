@@ -25,10 +25,10 @@
 #include <QFileInfo>
 
 #include "PresetPreviewPlayHandle.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"

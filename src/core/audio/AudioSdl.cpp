@@ -29,10 +29,10 @@
 #include <QLabel>
 #include <QLineEdit>
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
-#include "Mixer.h"
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),

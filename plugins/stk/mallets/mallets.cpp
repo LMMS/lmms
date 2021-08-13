@@ -33,12 +33,12 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 
 #include "embed.h"
 #include "plugin_export.h"

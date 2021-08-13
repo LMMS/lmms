@@ -50,14 +50,18 @@
 #endif
 
 
+#include "AudioEngine.h"
 #include "base64.h"
 #include "ConfigManager.h"
 #include "DrumSynth.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+<<<<<<< HEAD
 #include "lmms_constants.h"
 #include "Mixer.h"
+=======
+>>>>>>> ae12ac581 (Rename Mixer.h header to AudioEngine.h)
 #include "PathUtil.h"
 
 #include "FileDialog.h"

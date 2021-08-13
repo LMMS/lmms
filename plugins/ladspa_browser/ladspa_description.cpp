@@ -31,9 +31,9 @@
 #include <QVBoxLayout>
 
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
-#include "Mixer.h"
 
 
 

@@ -24,10 +24,10 @@
 
 
 #include "SampleRecordHandle.h"
+#include "AudioEngine.h"
 #include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "SampleBuffer.h"
 #include "SampleTrack.h"
 #include "debug.h"

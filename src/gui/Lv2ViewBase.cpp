@@ -33,6 +33,7 @@
 #include <QHBoxLayout>
 #include <lilv/lilv.h>
 
+#include "AudioEngine.h"
 #include "Controls.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -44,7 +45,6 @@
 #include "Lv2Proc.h"
 #include "Lv2Ports.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "SubWindow.h"
 
 

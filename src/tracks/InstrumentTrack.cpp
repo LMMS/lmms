@@ -37,6 +37,7 @@
 #include <QPainter>
 
 #include "FileDialog.h"
+#include "AudioEngine.h"
 #include "AutomationPattern.h"
 #include "BBTrack.h"
 #include "CaptionMenu.h"
@@ -67,7 +68,6 @@
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
-#include "Mixer.h"
 #include "MixHelpers.h"
 #include "Pattern.h"
 #include "PluginFactory.h"

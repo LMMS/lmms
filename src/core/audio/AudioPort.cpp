@@ -24,10 +24,10 @@
 
 #include "AudioPort.h"
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "EffectChain.h"
 #include "FxMixer.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
 

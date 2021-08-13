@@ -30,9 +30,9 @@
 #ifdef LMMS_HAVE_ALSA
 
 #include "endian_handling.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "gui_templates.h"
 
 

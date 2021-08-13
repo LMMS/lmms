@@ -36,7 +36,7 @@
 #include <string>
 #include <vorbis/vorbisenc.h>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 
 AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,

@@ -1,5 +1,5 @@
 /*
- * Mixer.h - device-independent audio engine for LMMS
+ * AudioEngine.h - device-independent audio engine for LMMS
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

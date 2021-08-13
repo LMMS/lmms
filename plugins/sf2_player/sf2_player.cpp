@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QDomDocument>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "ConfigManager.h"
@@ -37,7 +38,6 @@
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"

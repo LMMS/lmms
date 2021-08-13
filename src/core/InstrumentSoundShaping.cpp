@@ -26,13 +26,13 @@
 #include <QDomElement>
 
 #include "InstrumentSoundShaping.h"
+#include "AudioEngine.h"
 #include "BasicFilters.h"
 #include "embed.h"
 #include "Engine.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;

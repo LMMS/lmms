@@ -33,10 +33,10 @@
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "BBTrack.h"
 #include "DataFile.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"

@@ -32,7 +32,7 @@
 
 #include <string.h>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 
 class DummyInstrument : public Instrument

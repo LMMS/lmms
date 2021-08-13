@@ -29,7 +29,7 @@
 
 #include "AudioFileFlac.h"
 #include "endian_handling.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, AudioEngine* mixer):
 	AudioFileDevice(outputSettings,channels,file,mixer),

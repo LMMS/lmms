@@ -31,9 +31,9 @@
 
 
 #include "Engine.h"
+#include "AudioEngine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"

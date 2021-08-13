@@ -34,12 +34,16 @@
 #include <QString>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "Controller.h"
 #include "Keymap.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
+<<<<<<< HEAD
 #include "Mixer.h"
 #include "Scale.h"
+=======
+>>>>>>> ae12ac581 (Rename Mixer.h header to AudioEngine.h)
 #include "VstSyncController.h"
 
 

@@ -33,7 +33,7 @@
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "gui_templates.h"
 

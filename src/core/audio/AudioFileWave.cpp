@@ -25,7 +25,7 @@
 
 #include "AudioFileWave.h"
 #include "endian_handling.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 #include <QFile>
 #include <QDebug>

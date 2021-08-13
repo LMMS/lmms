@@ -29,11 +29,11 @@
 #include <QCompleter>
 #include <QMessageBox>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MainWindow.h"
 
 /* callback functions for jack */

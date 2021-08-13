@@ -31,6 +31,10 @@
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
+<<<<<<< HEAD
+=======
+#include "AudioEngine.h"
+>>>>>>> ae12ac581 (Rename Mixer.h header to AudioEngine.h)
 #include "Song.h"
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :

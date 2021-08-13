@@ -25,13 +25,13 @@
 #include <QDomElement>
 
 #include "Nes.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "Mixer.h"
 #include "Oscillator.h"
 
 #include "embed.h"

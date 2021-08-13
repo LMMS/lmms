@@ -40,6 +40,7 @@ float frnd(float range)
 #include <QDomElement>
 
 #include "sfxr.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
@@ -49,7 +50,6 @@ float frnd(float range)
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
-#include "Mixer.h"
 
 #include "embed.h"
 

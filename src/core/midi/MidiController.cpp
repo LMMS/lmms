@@ -27,7 +27,7 @@
 #include <QObject>
 
 #include "Song.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "MidiClient.h"
 #include "MidiController.h"
 

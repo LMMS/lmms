@@ -27,9 +27,9 @@
 #include <QObject>
 
 
-#include "Song.h"
-#include "Mixer.h"
 #include "LfoController.h"
+#include "AudioEngine.h"
+#include "Song.h"
 
 
 LfoController::LfoController( Model * _parent ) :

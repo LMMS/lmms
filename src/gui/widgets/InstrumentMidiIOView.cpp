@@ -29,13 +29,13 @@
 
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
-#include "Mixer.h"
 #include "InstrumentTrack.h"
 #include "LedCheckbox.h"
 

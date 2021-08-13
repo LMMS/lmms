@@ -34,7 +34,7 @@ class QString;
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "Engine.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 #define MAXLEN 11
 #define MIPMAPSIZE 2 << ( MAXLEN + 1 )

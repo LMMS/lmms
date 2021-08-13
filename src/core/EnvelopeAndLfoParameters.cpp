@@ -25,8 +25,8 @@
 #include <QDomElement>
 
 #include "EnvelopeAndLfoParameters.h"
+#include "AudioEngine.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "Oscillator.h"
 
 

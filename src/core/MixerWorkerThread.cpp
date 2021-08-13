@@ -29,8 +29,8 @@
 #include <QWaitCondition>
 
 #include "denormals.h"
+#include "AudioEngine.h"
 #include "ThreadableJob.h"
-#include "Mixer.h"
 
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 #include <xmmintrin.h>

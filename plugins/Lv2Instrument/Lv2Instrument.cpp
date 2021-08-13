@@ -27,11 +27,11 @@
 #include <QDebug>
 #include <QDragEnterEvent>
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Lv2SubPluginFeatures.h"
-#include "Mixer.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
 

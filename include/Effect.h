@@ -28,7 +28,7 @@
 
 #include "Plugin.h"
 #include "Engine.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
 #include "MemoryManager.h"

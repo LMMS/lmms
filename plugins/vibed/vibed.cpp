@@ -26,9 +26,9 @@
 #include <QMap>
 
 #include "vibed.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "ToolTip.h"
 #include "base64.h"

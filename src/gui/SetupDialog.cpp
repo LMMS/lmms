@@ -32,6 +32,7 @@
 #include <QScrollArea>
 
 #include "AudioDeviceSetupWidget.h"
+#include "AudioEngine.h"
 #include "debug.h"
 #include "embed.h"
 #include "Engine.h"
@@ -39,7 +40,6 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
-#include "Mixer.h"
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
 #include "TabBar.h"

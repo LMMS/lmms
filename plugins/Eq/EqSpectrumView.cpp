@@ -22,11 +22,11 @@
 
 #include "EqSpectrumView.h"
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),

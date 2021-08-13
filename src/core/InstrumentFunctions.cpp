@@ -25,10 +25,10 @@
 #include <QDomElement>
 
 #include "InstrumentFunctions.h"
+#include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 
 

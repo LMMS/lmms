@@ -40,6 +40,7 @@
 
 #include <string>
 
+#include "AudioEngine.h"
 #include "BufferManager.h"
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -50,7 +51,6 @@
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"

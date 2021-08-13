@@ -49,7 +49,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "ComboBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _mixer ) :

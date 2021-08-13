@@ -24,9 +24,9 @@
 
 #include <QDomElement>
 
+#include "AudioEngine.h"
 #include "BufferManager.h"
 #include "FxMixer.h"
-#include "Mixer.h"
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
 #include "Song.h"

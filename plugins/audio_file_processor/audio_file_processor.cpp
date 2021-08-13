@@ -32,13 +32,13 @@
 
 #include <samplerate.h>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "interpolation.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "Song.h"

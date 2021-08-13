@@ -26,13 +26,13 @@
 #include <QDomElement>
 
 #include "bit_invader.h"
+#include "AudioEngine.h"
 #include "base64.h"
 #include "Engine.h"
 #include "Graph.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"

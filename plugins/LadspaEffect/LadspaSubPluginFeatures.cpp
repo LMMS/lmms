@@ -30,10 +30,10 @@
 
 #include "LadspaSubPluginFeatures.h"
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
-#include "Mixer.h"
 
 
 LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :

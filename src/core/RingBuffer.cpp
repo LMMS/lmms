@@ -24,8 +24,8 @@
  */
 
 #include "RingBuffer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MixHelpers.h"
 
  

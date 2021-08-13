@@ -37,7 +37,7 @@
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "MidiJack.h"
 
 

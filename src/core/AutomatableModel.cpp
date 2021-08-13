@@ -26,10 +26,10 @@
 
 #include "lmms_math.h"
 
+#include "AudioEngine.h"
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
 #include "LocaleHelper.h"
-#include "Mixer.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 

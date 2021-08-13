@@ -27,8 +27,8 @@
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
+#include "AudioEngine.h"
 #include "MicroTimer.h"
-#include "Mixer.h"
 
 
 class AudioDummy : public QThread, public AudioDevice

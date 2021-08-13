@@ -25,7 +25,7 @@
 
 #include "vibrating_string.h"
 #include "interpolation.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 
 

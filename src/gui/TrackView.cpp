@@ -34,11 +34,11 @@
 #include <QtGlobal>
 
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "Mixer.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"

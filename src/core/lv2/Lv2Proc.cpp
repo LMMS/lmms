@@ -33,6 +33,7 @@
 #include <QDebug>
 #include <QtGlobal>
 
+#include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "Engine.h"
@@ -41,7 +42,6 @@
 #include "Lv2Ports.h"
 #include "Lv2Evbuf.h"
 #include "MidiEventToByteSeq.h"
-#include "Mixer.h"
 
 
 

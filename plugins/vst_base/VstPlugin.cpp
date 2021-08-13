@@ -50,11 +50,11 @@
 #	include <QLayout>
 #endif
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "PathUtil.h"
 #include "Song.h"
 #include "FileDialog.h"

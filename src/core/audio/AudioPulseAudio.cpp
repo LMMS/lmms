@@ -31,7 +31,7 @@
 
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "gui_templates.h"
 #include "Engine.h"
 

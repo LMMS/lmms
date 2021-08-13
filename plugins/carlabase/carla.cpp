@@ -24,6 +24,7 @@
 
 #include "carla.h"
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Song.h"
 #include "GuiApplication.h"
@@ -31,7 +32,6 @@
 #include "InstrumentTrack.h"
 #include "MidiEventToByteSeq.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "Song.h"
 #include "gui_templates.h"
 

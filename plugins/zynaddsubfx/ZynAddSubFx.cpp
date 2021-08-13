@@ -45,7 +45,7 @@
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "Clipboard.h"
 
