@@ -1,5 +1,5 @@
 /*
- * MixerProfiler.h - class for profiling performance of Mixer
+ * MixerProfiler.h - class for profiling performance of AudioEngine
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

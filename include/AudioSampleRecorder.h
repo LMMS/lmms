@@ -38,7 +38,7 @@ class AudioSampleRecorder : public AudioDevice
 {
 public:
 	AudioSampleRecorder( const ch_cnt_t _channels, bool & _success_ful,
-							Mixer* mixer );
+							AudioEngine* mixer );
 	virtual ~AudioSampleRecorder();
 
 	f_cnt_t framesRecorded() const;

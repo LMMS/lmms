@@ -52,7 +52,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "Mixer.h"
 
 
-AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
+AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _mixer ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
@@ -169,7 +169,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
 
-	// TODO: debug Mixer::pushInputFrames()
+	// TODO: debug AudioEngine::pushInputFrames()
 	//m_supportsCapture = true;
 
 	_success_ful = true;
@@ -297,7 +297,7 @@ int AudioPortAudio::process_callback(
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
 				( _outputBuffer + frame * channels() )[chnl] =
-						Mixer::clip( m_outBuf[frame][chnl] *
+						AudioEngine::clip( m_outBuf[frame][chnl] *
 						master_gain );
 			}
 		}

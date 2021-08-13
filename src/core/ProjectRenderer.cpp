@@ -77,7 +77,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 
 
 
-ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings,
+ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
 					const OutputSettings & outputSettings,
 					ExportFileFormats exportFileFormat,
 					const QString & outputFilename ) :

@@ -36,7 +36,7 @@ AudioFileMP3::AudioFileMP3(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
 				bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
+				AudioEngine* mixer ) :
 	AudioFileDevice( outputSettings, channels, file, mixer )
 {
 	successful = true;

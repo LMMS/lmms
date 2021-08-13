@@ -129,7 +129,7 @@ private:
 	FloatModel * m_panningModel;
 	BoolModel * m_mutedModel;
 
-	friend class Mixer;
+	friend class AudioEngine;
 	friend class MixerWorkerThread;
 
 } ;

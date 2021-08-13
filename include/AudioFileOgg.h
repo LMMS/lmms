@@ -42,13 +42,13 @@ public:
 			const ch_cnt_t _channels,
 			bool & _success_ful,
 			const QString & _file,
-			Mixer* mixer );
+			AudioEngine* mixer );
 	virtual ~AudioFileOgg();
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
 					  const ch_cnt_t channels,
-					  Mixer* mixer,
+					  AudioEngine* mixer,
 					  bool & successful )
 	{
 		return new AudioFileOgg( outputSettings, channels, successful,

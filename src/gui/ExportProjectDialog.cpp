@@ -154,10 +154,10 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	Mixer::qualitySettings qs =
-			Mixer::qualitySettings(
-					static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
-					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
+	AudioEngine::qualitySettings qs =
+			AudioEngine::qualitySettings(
+					static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
+					static_cast<AudioEngine::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
 	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
 	const bitrate_t bitrates[6] = { 64, 128, 160, 192, 256, 320 };

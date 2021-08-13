@@ -32,7 +32,7 @@
 
 
 RenderManager::RenderManager(
-		const Mixer::qualitySettings & qualitySettings,
+		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath) :

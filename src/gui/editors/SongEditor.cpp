@@ -329,9 +329,9 @@ QString SongEditor::getSnapSizeString() const
 
 void SongEditor::setHighQuality( bool hq )
 {
-	Engine::mixer()->changeQuality( Mixer::qualitySettings(
-			hq ? Mixer::qualitySettings::Mode_HighQuality :
-				Mixer::qualitySettings::Mode_Draft ) );
+	Engine::mixer()->changeQuality( AudioEngine::qualitySettings(
+			hq ? AudioEngine::qualitySettings::Mode_HighQuality :
+				AudioEngine::qualitySettings::Mode_Draft ) );
 }
 
 

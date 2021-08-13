@@ -34,7 +34,7 @@
 AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
 				const ch_cnt_t channels, bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
+				AudioEngine* mixer ) :
 	AudioFileDevice( outputSettings, channels, file, mixer ),
 	m_sf( NULL )
 {

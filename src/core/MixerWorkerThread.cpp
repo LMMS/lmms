@@ -110,7 +110,7 @@ void MixerWorkerThread::JobQueue::wait()
 
 // implementation of worker threads
 
-MixerWorkerThread::MixerWorkerThread( Mixer* mixer ) :
+MixerWorkerThread::MixerWorkerThread( AudioEngine* mixer ) :
 	QThread( mixer ),
 	m_quit( false )
 {

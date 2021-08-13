@@ -56,7 +56,7 @@ public:
 	} ;
 
 
-	ProjectRenderer( const Mixer::qualitySettings & _qs,
+	ProjectRenderer( const AudioEngine::qualitySettings & _qs,
 				const OutputSettings & _os,
 				ExportFileFormats _file_format,
 				const QString & _out_file );
@@ -89,7 +89,7 @@ private:
 	void run() override;
 
 	AudioFileDevice * m_fileDev;
-	Mixer::qualitySettings m_qualitySettings;
+	AudioEngine::qualitySettings m_qualitySettings;
 
 	volatile int m_progress;
 	volatile bool m_abort;

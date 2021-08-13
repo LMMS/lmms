@@ -31,15 +31,15 @@
 #include "lmms_basics.h"
 
 
+class AudioEngine;
 class AudioPort;
-class Mixer;
 class QThread;
 
 
 class AudioDevice
 {
 public:
-	AudioDevice( const ch_cnt_t _channels, Mixer* mixer );
+	AudioDevice( const ch_cnt_t _channels, AudioEngine* mixer );
 	virtual ~AudioDevice();
 
 	inline void lock()
@@ -126,7 +126,7 @@ protected:
 		m_sampleRate = _new_sr;
 	}
 
-	Mixer* mixer()
+	AudioEngine* mixer()
 	{
 		return m_mixer;
 	}
@@ -143,7 +143,7 @@ protected:
 private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	Mixer* m_mixer;
+	AudioEngine* m_mixer;
 	bool m_inProcess;
 
 	QMutex m_devMutex;

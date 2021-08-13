@@ -38,7 +38,7 @@
 #include "Oscillator.h"
 
 float LmmsCore::s_framesPerTick;
-Mixer* LmmsCore::s_mixer = NULL;
+AudioEngine* LmmsCore::s_mixer = NULL;
 FxMixer * LmmsCore::s_fxMixer = NULL;
 BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
@@ -64,7 +64,7 @@ void LmmsCore::init( bool renderOnly )
 
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new Mixer( renderOnly );
+	s_mixer = new AudioEngine( renderOnly );
 	s_song = new Song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;

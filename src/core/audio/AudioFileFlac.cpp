@@ -31,7 +31,7 @@
 #include "endian_handling.h"
 #include "Mixer.h"
 
-AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, Mixer* mixer):
+AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, AudioEngine* mixer):
 	AudioFileDevice(outputSettings,channels,file,mixer),
 	m_sf(nullptr)
 {

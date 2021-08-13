@@ -34,7 +34,7 @@
 #include "gui_templates.h"
 #include "Mixer.h"
 
-AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
+AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] )
 {

@@ -1299,7 +1299,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
-					Mixer::clip(m_data[f+frameCnt][ch]) *
+					AudioEngine::clip(m_data[f+frameCnt][ch]) *
 						OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}

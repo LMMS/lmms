@@ -37,7 +37,7 @@ public:
 			ch_cnt_t const channels,
 			bool& successful,
 			QString const& file,
-			Mixer* mixer
+			AudioEngine* mixer
 	);
 
 	virtual ~AudioFileFlac();
@@ -45,7 +45,7 @@ public:
 	static AudioFileDevice* getInst(QString const& outputFilename,
 			OutputSettings const& outputSettings,
 			ch_cnt_t const channels,
-			Mixer* mixer,
+			AudioEngine* mixer,
 			bool& successful)
 	{
 		return new AudioFileFlac(

@@ -362,7 +362,7 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new MainApplication( argc, argv );
 
-	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
+	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
@@ -628,19 +628,19 @@ int main( int argc, char * * argv )
 
 			if( ip == "linear" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_Linear;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_Linear;
 			}
 			else if( ip == "sincfastest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincFastest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincFastest;
 			}
 			else if( ip == "sincmedium" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincMedium;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincMedium;
 			}
 			else if( ip == "sincbest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincBest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincBest;
 			}
 			else
 			{
@@ -662,16 +662,16 @@ int main( int argc, char * * argv )
 			switch( o )
 			{
 				case 1:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_None;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_None;
 		break;
 				case 2:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_2x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_2x;
 		break;
 				case 4:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_4x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_4x;
 		break;
 				case 8:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_8x;
 		break;
 				default:
 				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );

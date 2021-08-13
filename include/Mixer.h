@@ -1,5 +1,5 @@
 /*
- * Mixer.h - audio-device-independent mixer for LMMS
+ * Mixer.h - device-independent audio engine for LMMS
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_H
-#define MIXER_H
+#ifndef AUDIO_ENGINE_H
+#define AUDIO_ENGINE_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
@@ -61,7 +61,7 @@ const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 class MixerWorkerThread;
 
 
-class LMMS_EXPORT Mixer : public QObject
+class LMMS_EXPORT AudioEngine : public QObject
 {
 	Q_OBJECT
 public:
@@ -328,13 +328,13 @@ private:
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( Mixer * mixer, Fifo * fifo );
+		fifoWriter( AudioEngine * mixer, Fifo * fifo );
 
 		void finish();
 
 
 	private:
-		Mixer * m_mixer;
+		AudioEngine * m_mixer;
 		Fifo * m_fifo;
 		volatile bool m_writing;
 
@@ -345,8 +345,8 @@ private:
 	} ;
 
 
-	Mixer( bool renderOnly );
-	virtual ~Mixer();
+	AudioEngine( bool renderOnly );
+	virtual ~AudioEngine();
 
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
@@ -435,6 +435,5 @@ private:
 	friend class ProjectRenderer;
 
 } ;
-
 
 #endif

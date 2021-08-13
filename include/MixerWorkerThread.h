@@ -29,8 +29,8 @@
 
 #include <atomic>
 
+class AudioEngine;
 class QWaitCondition;
-class Mixer;
 class ThreadableJob;
 
 class MixerWorkerThread : public QThread
@@ -73,7 +73,7 @@ public:
 	} ;
 
 
-	MixerWorkerThread( Mixer* mixer );
+	MixerWorkerThread( AudioEngine* mixer );
 	virtual ~MixerWorkerThread();
 
 	virtual void quit();

@@ -576,7 +576,7 @@ void MainWindow::finalize()
 	// look whether mixer failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
 	// or the audio device is set to invalid one
-	else if( Engine::mixer()->audioDevStartFailed() || !Mixer::isAudioDevNameValid(
+	else if( Engine::mixer()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
 		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
@@ -1257,7 +1257,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Mixer * mixer = Engine::mixer();
+	AudioEngine * mixer = Engine::mixer();
 
 	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
 }

@@ -42,7 +42,7 @@
 
 
 
-AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
+AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _mixer ) :
 	AudioDevice( qBound<int>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),

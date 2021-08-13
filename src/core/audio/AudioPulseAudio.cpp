@@ -44,7 +44,7 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 
 
-AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
+AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _mixer ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),

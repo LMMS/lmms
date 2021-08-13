@@ -34,10 +34,10 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
+class AudioEngine;
 class BBTrackContainer;
 class FxMixer;
 class ProjectJournal;
-class Mixer;
 class Song;
 class Ladspa2LMMS;
 
@@ -62,7 +62,7 @@ public:
 	static void destroy();
 
 	// core
-	static Mixer *mixer()
+	static AudioEngine *mixer()
 	{
 		return s_mixer;
 	}
@@ -140,7 +140,7 @@ private:
 	static float s_framesPerTick;
 
 	// core
-	static Mixer *s_mixer;
+	static AudioEngine *s_mixer;
 	static FxMixer * s_fxMixer;
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;

@@ -31,7 +31,7 @@
 
 
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, Mixer*  _mixer ) :
+AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _mixer ) :
 	m_supportsCapture( false ),
 	m_sampleRate( _mixer->processingSampleRate() ),
 	m_channels( _channels ),
@@ -222,7 +222,7 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				temp = static_cast<int_sample_t>( Mixer::clip( _ab[frame][chnl] * _master_gain ) * OUTPUT_SAMPLE_MULTIPLIER );
+				temp = static_cast<int_sample_t>( AudioEngine::clip( _ab[frame][chnl] * _master_gain ) * OUTPUT_SAMPLE_MULTIPLIER );
 				
 				( _output_buffer + frame * channels() )[chnl] =
 						( temp & 0x00ff ) << 8 |
@@ -238,7 +238,7 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 			{
 				( _output_buffer + frame * channels() )[chnl] =
 						static_cast<int_sample_t>(
-						Mixer::clip( _ab[frame][chnl] *
+						AudioEngine::clip( _ab[frame][chnl] *
 						_master_gain ) *
 						OUTPUT_SAMPLE_MULTIPLIER );
 			}

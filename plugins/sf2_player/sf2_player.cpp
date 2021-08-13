@@ -579,7 +579,7 @@ void sf2Instrument::updateSampleRate()
 
 	m_synthMutex.lock();
 	if( Engine::mixer()->currentQualitySettings().interpolation >=
-			Mixer::qualitySettings::Interpolation_SincFastest )
+			AudioEngine::qualitySettings::Interpolation_SincFastest )
 	{
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
 	}

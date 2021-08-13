@@ -42,13 +42,13 @@ public:
 			const ch_cnt_t _channels,
 			bool & successful,
 			const QString & _file,
-			Mixer* mixer );
+			AudioEngine* mixer );
 	virtual ~AudioFileMP3();
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
 					  const ch_cnt_t channels,
-					  Mixer* mixer,
+					  AudioEngine* mixer,
 					  bool & successful )
 	{
 		return new AudioFileMP3( outputSettings, channels, successful,

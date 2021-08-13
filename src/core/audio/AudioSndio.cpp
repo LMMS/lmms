@@ -48,7 +48,7 @@
 
 
 
-AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
+AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _mixer) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
