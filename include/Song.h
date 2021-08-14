@@ -311,7 +311,7 @@ public:
 	void loadingCancelled()
 	{
 		m_isCancelled = true;
-		Engine::mixer()->clearNewPlayHandles();
+		Engine::audioEngine()->clearNewPlayHandles();
 	}
 
 	bool isCancelled()

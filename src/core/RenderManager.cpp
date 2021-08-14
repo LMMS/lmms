@@ -37,18 +37,18 @@ RenderManager::RenderManager(
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
-	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
+	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
 	m_outputSettings(outputSettings),
 	m_format(fmt),
 	m_outputPath(outputPath)
 {
-	Engine::mixer()->storeAudioDevice();
+	Engine::audioEngine()->storeAudioDevice();
 }
 
 RenderManager::~RenderManager()
 {
-	Engine::mixer()->restoreAudioDevice();  // Also deletes audio dev.
-	Engine::mixer()->changeQuality( m_oldQualitySettings );
+	Engine::audioEngine()->restoreAudioDevice();  // Also deletes audio dev.
+	Engine::audioEngine()->changeQuality( m_oldQualitySettings );
 }
 
 void RenderManager::abortProcessing()

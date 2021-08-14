@@ -261,7 +261,7 @@ void AudioOss::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
 		unsigned int value = sampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )

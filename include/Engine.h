@@ -62,7 +62,7 @@ public:
 	static void destroy();
 
 	// core
-	static AudioEngine *mixer()
+	static AudioEngine *audioEngine()
 	{
 		return s_mixer;
 	}

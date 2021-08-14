@@ -117,7 +117,7 @@ float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t fram
 
 	if( n->isReleased() == false )
 	{
-		envReleaseBegin += Engine::mixer()->framesPerPeriod();
+		envReleaseBegin += Engine::audioEngine()->framesPerPeriod();
 	}
 
 	float level;
@@ -160,7 +160,7 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 		if( n->m_filter == nullptr )
 		{
-			n->m_filter = std::make_unique<BasicFilters<>>( Engine::mixer()->processingSampleRate() );
+			n->m_filter = std::make_unique<BasicFilters<>>( Engine::audioEngine()->processingSampleRate() );
 		}
 		n->m_filter->setFilterType( m_filterModel.value() );
 

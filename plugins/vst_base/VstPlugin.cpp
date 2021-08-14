@@ -154,7 +154,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -308,7 +308,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::mixer()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->processingSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }

@@ -114,7 +114,7 @@ void AudioPulseAudio::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-//		setSampleRate( engine::mixer()->processingSampleRate() );
+//		setSampleRate( engine::audioEngine()->processingSampleRate() );
 
 	}
 
@@ -175,8 +175,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::mixer()->framesPerPeriod() ) /
-													(double)_this->sampleRate();
+			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,

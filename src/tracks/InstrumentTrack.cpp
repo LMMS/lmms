@@ -89,7 +89,7 @@ const int PIANO_HEIGHT		= 80;
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	Track( Track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_track" ), Engine::mixer()->midiClient(),
+	m_midiPort( tr( "unnamed_track" ), Engine::audioEngine()->midiClient(),
 								this, this ),
 	m_notes(),
 	m_sustainPedalPressed( false ),
@@ -387,7 +387,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 								NULL, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
-					if( ! Engine::mixer()->addPlayHandle( nph ) )
+					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = NULL;
 					}
@@ -401,7 +401,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 			{
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
-				Engine::mixer()->requestChangeInModel();
+				Engine::audioEngine()->requestChangeInModel();
 				m_notes[event.key()]->noteOff( offset );
 				if (isSustainPedalPressed() &&
 					m_notes[event.key()]->origin() ==
@@ -410,7 +410,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 					m_sustainedNotes << m_notes[event.key()];
 				}
 				m_notes[event.key()] = NULL;
-				Engine::mixer()->doneChangeInModel();
+				Engine::audioEngine()->doneChangeInModel();
 			}
 			eventHandled = true;
 			break;
@@ -574,7 +574,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	}
 	m_midiNotesMutex.unlock();
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
 
@@ -583,8 +583,8 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	{
 		flags |= PlayHandle::TypeInstrumentPlayHandle;
 	}
-	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->removePlayHandlesOfTypes( this, flags );
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -662,13 +662,13 @@ void InstrumentTrack::setName( const QString & _new_name )
 
 void InstrumentTrack::updateBaseNote()
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
 		( *it )->setFrequencyUpdate();
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -819,7 +819,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 			}
 
-			Engine::mixer()->addPlayHandle( notePlayHandle );
+			Engine::audioEngine()->addPlayHandle( notePlayHandle );
 			played_a_note = true;
 			++nit;
 		}
@@ -1096,14 +1096,14 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	}
 
 	const QString &device = ConfigManager::inst()->value("midi", "midiautoassign");
-	if ( Engine::mixer()->midiClient()->isRaw() && device != "none" )
+	if ( Engine::audioEngine()->midiClient()->isRaw() && device != "none" )
 	{
 		m_midiPort.setReadable( assign );
 		return;
 	}
 
 	// Check if the device exists
-	if ( Engine::mixer()->midiClient()->readablePorts().indexOf(device) >= 0 )
+	if ( Engine::audioEngine()->midiClient()->readablePorts().indexOf(device) >= 0 )
 	{
 		m_midiPort.subscribeReadablePort(device, assign);
 		m_hasAutoMidiDev = assign;
@@ -1170,7 +1170,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
-	if( !Engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
 		_it->m_midiPort.m_readablePortsMenu = new MidiPortMenu(
 							MidiPort::Input );

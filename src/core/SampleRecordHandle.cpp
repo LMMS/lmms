@@ -68,8 +68,8 @@ SampleRecordHandle::~SampleRecordHandle()
 
 void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
-	const sampleFrame * recbuf = Engine::mixer()->inputBuffer();
-	const f_cnt_t frames = Engine::mixer()->inputBufferFrames();
+	const sampleFrame * recbuf = Engine::audioEngine()->inputBuffer();
+	const f_cnt_t frames = Engine::audioEngine()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
@@ -120,8 +120,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	assert( data != NULL );
 
 	// now copy all buffers into big buffer
-	for( bufferList::const_iterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
+	for( bufferList::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it )
 	{
 		memcpy( data_ptr, ( *it ).first, ( *it ).second *
 							sizeof( sampleFrame ) );
@@ -129,15 +128,14 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	}
 	// create according sample-buffer out of big buffer
 	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf)->setSampleRate( Engine::mixer()->inputSampleRate() );
+	( *sampleBuf)->setSampleRate( Engine::audioEngine()->inputSampleRate() );
 	delete[] data;
 }
 
 
 
 
-void SampleRecordHandle::writeBuffer( const sampleFrame * _ab,
-					const f_cnt_t _frames )
+void SampleRecordHandle::writeBuffer( const sampleFrame * _ab, const f_cnt_t _frames )
 {
 	sampleFrame * buf = new sampleFrame[_frames];
 	for( f_cnt_t frame = 0; frame < _frames; ++frame )

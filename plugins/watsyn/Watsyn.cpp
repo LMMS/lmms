@@ -338,8 +338,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 				&B1_wave[0],
 				&B2_wave[0],
 				m_amod.value(), m_bmod.value(),
-				Engine::mixer()->processingSampleRate(), _n,
-				Engine::mixer()->framesPerPeriod(), this );
+				Engine::audioEngine()->processingSampleRate(), _n,
+				Engine::audioEngine()->framesPerPeriod(), this );
 
 		_n->m_pluginData = w;
 	}
@@ -365,7 +365,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 
 	// if sample-exact is enabled, use sample-exact calculations...
 	// disabled pending proper implementation of sample-exactness
-/*	if( engine::mixer()->currentQualitySettings().sampleExactControllers )
+/*	if( engine::audioEngine()->currentQualitySettings().sampleExactControllers )
 	{
 		for( fpp_t f=0; f < frames; f++ )
 		{

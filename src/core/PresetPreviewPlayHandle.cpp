@@ -122,10 +122,10 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 	s_previewTC->lockData();
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	s_previewTC->setPreviewNote( nullptr );
 	s_previewTC->previewInstrumentTrack()->silenceAllNotes();
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	const bool j = Engine::projectJournal()->isJournalling();
 	Engine::projectJournal()->setJournalling( false );
@@ -170,7 +170,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	s_previewTC->previewInstrumentTrack()->
 				midiPort()->setMode( MidiPort::Disabled );
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	// create note-play-handle for it
 	m_previewNote = NotePlayHandleManager::acquire(
 			s_previewTC->previewInstrumentTrack(), 0,
@@ -181,9 +181,9 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 	s_previewTC->setPreviewNote( m_previewNote );
 
-	Engine::mixer()->addPlayHandle( m_previewNote );
+	Engine::audioEngine()->addPlayHandle( m_previewNote );
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	s_previewTC->unlockData();
 	Engine::projectJournal()->setJournalling( j );
 }
@@ -193,13 +193,13 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	// not muted by other preset-preview-handle?
 	if (s_previewTC->testAndSetPreviewNote(m_previewNote, nullptr))
 	{
 		m_previewNote->noteOff();
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -208,7 +208,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 void PresetPreviewPlayHandle::play( sampleFrame * _working_buffer )
 {
 	// Do nothing; the preview instrument is played by m_previewNote, which
-	// has been added to the mixer
+	// has been added to the audio engine
 }
 
 

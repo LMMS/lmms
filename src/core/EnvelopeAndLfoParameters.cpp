@@ -47,8 +47,7 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 	for( LfoList::Iterator it = m_lfos.begin();
 							it != m_lfos.end(); ++it )
 	{
-		( *it )->m_lfoFrame +=
-				Engine::mixer()->framesPerPeriod();
+		( *it )->m_lfoFrame += Engine::audioEngine()->framesPerPeriod();
 		( *it )->m_bad_lfoShapeData = true;
 	}
 }
@@ -158,12 +157,12 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	connect( &m_x100Model, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ), Qt::DirectConnection );
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleVars() ) );
 
 
 	m_lfoShapeData =
-		new sample_t[Engine::mixer()->framesPerPeriod()];
+		new sample_t[Engine::audioEngine()->framesPerPeriod()];
 
 	updateSampleVars();
 }
@@ -243,7 +242,7 @@ inline sample_t EnvelopeAndLfoParameters::lfoShapeSample( fpp_t _frame_offset )
 
 void EnvelopeAndLfoParameters::updateLfoShapeData()
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	for( fpp_t offset = 0; offset < frames; ++offset )
 	{
 		m_lfoShapeData[offset] = lfoShapeSample( offset );
@@ -399,7 +398,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	QMutexLocker m(&m_paramMutex);
 
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				Engine::mixer()->processingSampleRate();
+				Engine::audioEngine()->processingSampleRate();
 
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
@@ -501,7 +500,7 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 
 
 	const float frames_per_lfo_oscillation = SECS_PER_LFO_OSCILLATION *
-				Engine::mixer()->processingSampleRate();
+				Engine::audioEngine()->processingSampleRate();
 	m_lfoPredelayFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *
 				expKnobVal( m_lfoPredelayModel.value() ) );
 	m_lfoAttackFrames = static_cast<f_cnt_t>( frames_per_lfo_oscillation *

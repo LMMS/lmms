@@ -103,8 +103,8 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = Engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
-		return 1 + ( static_cast<int>( samples ) / Engine::mixer()->framesPerPeriod() );
+		const float samples = Engine::audioEngine()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		return 1 + ( static_cast<int>( samples ) / Engine::audioEngine()->framesPerPeriod() );
 	}
 
 	inline float wetLevel() const
@@ -179,9 +179,9 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::mixer()->processingSampleRate(),
+				Engine::audioEngine()->processingSampleRate(),
 					_dst_buf, _dst_sr,
-					Engine::mixer()->framesPerPeriod() );
+					Engine::audioEngine()->framesPerPeriod() );
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
@@ -189,9 +189,9 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::mixer()->processingSampleRate(),
-			Engine::mixer()->framesPerPeriod() * _src_sr /
-				Engine::mixer()->processingSampleRate() );
+				Engine::audioEngine()->processingSampleRate(),
+			Engine::audioEngine()->framesPerPeriod() * _src_sr /
+				Engine::audioEngine()->processingSampleRate() );
 	}
 	void reinitSRC();
 

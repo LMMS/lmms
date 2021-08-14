@@ -305,7 +305,7 @@ int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
 	const auto baseFreq = instrumentTrack()->baseFreq();
 	const float freq_factor = baseFreq / _n->frequency() *
-			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
+			Engine::audioEngine()->processingSampleRate() / Engine::audioEngine()->baseSampleRate();
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }

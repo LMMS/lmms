@@ -181,7 +181,7 @@ void OscillatorObject::updateDetuningLeft()
 {
 	m_detuningLeft = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineLeftModel.value() ) / 1200.0f )
-				/ Engine::mixer()->processingSampleRate();
+				/ Engine::audioEngine()->processingSampleRate();
 }
 
 
@@ -191,7 +191,7 @@ void OscillatorObject::updateDetuningRight()
 {
 	m_detuningRight = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineRightModel.value() ) / 1200.0f )
-				/ Engine::mixer()->processingSampleRate();
+				/ Engine::audioEngine()->processingSampleRate();
 }
 
 
@@ -228,7 +228,7 @@ TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 
 	}
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateAllDetuning() ) );
 }
 

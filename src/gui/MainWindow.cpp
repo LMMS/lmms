@@ -477,7 +477,7 @@ void MainWindow::finalize()
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
+	m_metronomeToggle->setChecked(Engine::audioEngine()->isMetronomeActive());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -573,10 +573,10 @@ void MainWindow::finalize()
 		SetupDialog sd;
 		sd.exec();
 	}
-	// look whether mixer failed to start the audio device selected by the
+	// look whether the audio engine failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
 	// or the audio device is set to invalid one
-	else if( Engine::mixer()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
+	else if( Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
 		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
@@ -1257,9 +1257,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	AudioEngine * mixer = Engine::mixer();
-
-	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
+	Engine::audioEngine()->setMetronomeActive( m_metronomeToggle->isChecked() );
 }
 
 

@@ -192,9 +192,9 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// if the note offset falls over to next period, then don't start playback yet
-	if( offset() >= Engine::mixer()->framesPerPeriod() )
+	if( offset() >= Engine::audioEngine()->framesPerPeriod() )
 	{
-		setOffset( offset() - Engine::mixer()->framesPerPeriod() );
+		setOffset( offset() - Engine::audioEngine()->framesPerPeriod() );
 		return;
 	}
 
@@ -242,8 +242,8 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	// number of frames that can be played this period
 	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0
-		? Engine::mixer()->framesPerPeriod() - offset()
-		: Engine::mixer()->framesPerPeriod();
+		? Engine::audioEngine()->framesPerPeriod() - offset()
+		: Engine::audioEngine()->framesPerPeriod();
 
 	// check if we start release during this period
 	if( m_released == false &&
@@ -278,7 +278,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		// are inserted by arpAndChordsTabWidget::processNote()
 		if( ! m_subNotes.isEmpty() )
 		{
-			m_releaseFramesToDo = m_releaseFramesDone + 2 * Engine::mixer()->framesPerPeriod();
+			m_releaseFramesToDo = m_releaseFramesDone + 2 * Engine::audioEngine()->framesPerPeriod();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -331,7 +331,7 @@ f_cnt_t NotePlayHandle::framesLeft() const
 {
 	if( instrumentTrack()->isSustainPedalPressed() )
 	{
-		return 4*Engine::mixer()->framesPerPeriod();
+		return 4 * Engine::audioEngine()->framesPerPeriod();
 	}
 	else if( m_released && actualReleaseFramesToDo() == 0 )
 	{
@@ -351,9 +351,9 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
 	if( m_totalFramesPlayed == 0 )
 	{
-		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() - offset() );
+		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset() );
 	}
-	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() );
+	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() );
 }
 
 
@@ -456,7 +456,7 @@ void NotePlayHandle::mute()
 
 int NotePlayHandle::index() const
 {
-	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	int idx = 0;
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
@@ -479,7 +479,7 @@ int NotePlayHandle::index() const
 
 ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentTrack * _it, bool _all_ph )
 {
-	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )

@@ -278,10 +278,9 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const sampleFrame * _in_buf,
-						sampleFrame * _out_buf )
+bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	if( m_failed || !isRunning() )
 	{
@@ -431,9 +430,7 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = ( m_inputCount+m_outputCount ) *
-				Engine::mixer()->framesPerPeriod() *
-							sizeof( float );
+	const size_t s = ( m_inputCount+m_outputCount ) * Engine::audioEngine()->framesPerPeriod() * sizeof( float );
 	if( m_shm != NULL )
 	{
 #ifdef USE_QT_SHMEM
@@ -510,12 +507,12 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->processingSampleRate() );
+			reply_message.addInt( Engine::audioEngine()->processingSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->framesPerPeriod() );
+			reply_message.addInt( Engine::audioEngine()->framesPerPeriod() );
 			break;
 
 		case IdChangeInputCount:

@@ -288,7 +288,7 @@ public slots:
 	void sampleRateChanged();
 
 private:
-	static sample_rate_t mixerSampleRate();
+	static sample_rate_t audioEngineSampleRate();
 
 	void update(bool keepSettings = false);
 

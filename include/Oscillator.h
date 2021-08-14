@@ -185,7 +185,8 @@ public:
 		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					control.f1 + 1 :
 					0;
-		control.band = waveTableBandFromFreq(m_freq * m_detuning_div_samplerate * Engine::mixer()->processingSampleRate());
+		control.band = waveTableBandFromFreq(
+			m_freq * m_detuning_div_samplerate * Engine::audioEngine()->processingSampleRate());
 		return control;
 	}
 

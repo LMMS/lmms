@@ -87,11 +87,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= Engine::mixer()->processingSampleRate();
+				min *= Engine::audioEngine()->processingSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= Engine::mixer()->processingSampleRate();
+				max *= Engine::audioEngine()->processingSampleRate();
 			}
 		}
 

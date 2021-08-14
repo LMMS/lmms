@@ -72,7 +72,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 						break;
 					case PortVis::Integer:
 					{
-						sample_rate_t sr = Engine::mixer()->processingSampleRate();
+						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
 						m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
 													m_par);
 						break;

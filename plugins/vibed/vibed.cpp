@@ -276,7 +276,7 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
-				Engine::mixer()->processingSampleRate(),
+				Engine::audioEngine()->processingSampleRate(),
 						__sampleLength );
 		
 		for( int i = 0; i < 9; ++i )

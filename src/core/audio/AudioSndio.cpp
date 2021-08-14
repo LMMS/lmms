@@ -150,7 +150,7 @@ void AudioSndio::applyQualitySettings( void )
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
 		/* change sample rate to sampleRate() */
 	}

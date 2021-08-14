@@ -650,7 +650,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 	if (newPPH != nullptr)
 	{
-		if (Engine::mixer()->addPlayHandle(newPPH))
+		if (Engine::audioEngine()->addPlayHandle(newPPH))
 		{
 			m_previewPlayHandle = newPPH;
 		}
@@ -666,7 +666,7 @@ void FileBrowserTreeWidget::stopPreview()
 	QMutexLocker previewLocker(&m_pphMutex);
 	if (m_previewPlayHandle != nullptr)
 	{
-		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
+		Engine::audioEngine()->removePlayHandle(m_previewPlayHandle);
 		m_previewPlayHandle = nullptr;
 	}
 }
@@ -751,7 +751,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
@@ -791,7 +791,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -857,10 +857,10 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 		Track::create(Track::SampleTrack, Engine::getSong()));
 
 	// Add the sample clip to the track
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	SampleTCO* clip = static_cast<SampleTCO*>(sampleTrack->createTCO(0));
 	clip->setSampleFile(item->fullName());
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	return true;
 }
 

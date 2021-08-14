@@ -154,8 +154,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 	for( l_sortable_plugin_t::const_iterator it = plugins.begin();
 						it != plugins.end(); ++it )
 	{
-		if( lm->getDescription( ( *it ).second )->inputChannels <= 
-				  Engine::mixer()->audioDev()->channels() )
+		if( lm->getDescription( ( *it ).second )->inputChannels <= Engine::audioEngine()->audioDev()->channels() )
 		{
 			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
 		}

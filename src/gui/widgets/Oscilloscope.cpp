@@ -41,7 +41,7 @@
 Oscilloscope::Oscilloscope( QWidget * _p ) :
 	QWidget( _p ),
 	m_background( embed::getIconPixmap( "output_graph" ) ),
-	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
+	m_points( new QPointF[Engine::audioEngine()->framesPerPeriod()] ),
 	m_active( false ),
 	m_normalColor(71, 253, 133),
 	m_clippingColor(255, 64, 64)
@@ -50,7 +50,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
 	BufferManager::clear( m_buffer, frames );
@@ -75,7 +75,7 @@ void Oscilloscope::updateAudioBuffer( const surroundSampleFrame * buffer )
 {
 	if( !Engine::getSong()->isExporting() )
 	{
-		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+		const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 		memcpy( m_buffer, buffer, sizeof( surroundSampleFrame ) * fpp );
 	}
 }
@@ -91,7 +91,7 @@ void Oscilloscope::setActive( bool _active )
 		connect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		connect( Engine::mixer(),
+		connect( Engine::audioEngine(),
 			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
 			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 	}
@@ -100,7 +100,7 @@ void Oscilloscope::setActive( bool _active )
 		disconnect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		disconnect( Engine::mixer(),
+		disconnect( Engine::audioEngine(),
 			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
 			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 		// we have to update (remove last waves),
@@ -139,7 +139,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 
 	if( m_active && !Engine::getSong()->isExporting() )
 	{
-		AudioEngine const * mixer = Engine::mixer();
+		AudioEngine const * mixer = Engine::audioEngine();
 
 		float master_output = mixer->masterGain();
 

@@ -329,7 +329,7 @@ QString SongEditor::getSnapSizeString() const
 
 void SongEditor::setHighQuality( bool hq )
 {
-	Engine::mixer()->changeQuality( AudioEngine::qualitySettings(
+	Engine::audioEngine()->changeQuality( AudioEngine::qualitySettings(
 			hq ? AudioEngine::qualitySettings::Mode_HighQuality :
 				AudioEngine::qualitySettings::Mode_Draft ) );
 }
@@ -657,7 +657,7 @@ void SongEditor::setMasterVolume( int new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	Engine::mixer()->setMasterGain( new_val / 100.0f );
+	Engine::audioEngine()->setMasterGain( new_val / 100.0f );
 }
 
 
@@ -910,7 +910,7 @@ ComboBoxModel *SongEditor::snappingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::mixer()->audioDev()->supportsCapture(), false),
+	Editor(Engine::audioEngine()->audioDev()->supportsCapture(), false),
 	m_editor(new SongEditor(song)),
 	m_crtlAction( NULL ),
 	m_snapSizeLabel( new QLabel( m_toolBar ) )

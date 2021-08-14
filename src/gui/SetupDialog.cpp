@@ -536,7 +536,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QString audioDevName = ConfigManager::inst()->value("mixer", "audiodev");
 	if (m_audioInterfaces->findText(audioDevName) < 0)
 	{
-		audioDevName = Engine::mixer()->audioDevName();
+		audioDevName = Engine::audioEngine()->audioDevName();
 		ConfigManager::inst()->setValue("mixer", "audiodev", audioDevName);
 	}
 	m_audioInterfaces->
@@ -681,7 +681,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QString midiDevName = ConfigManager::inst()->value("mixer", "mididev");
 	if (m_midiInterfaces->findText(midiDevName) < 0)
 	{
-		midiDevName = Engine::mixer()->midiClientName();
+		midiDevName = Engine::audioEngine()->midiClientName();
 		ConfigManager::inst()->setValue("mixer", "mididev", midiDevName);
 	}
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
@@ -699,9 +699,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
 	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
 	m_assignableMidiDevices->addItem("none");
-	if ( !Engine::mixer()->midiClient()->isRaw() )
+	if ( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
-		m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
+		m_assignableMidiDevices->addItems(Engine::audioEngine()->midiClient()->readablePorts());
 	}
 	else
 	{
@@ -1199,7 +1199,7 @@ void SetupDialog::setBufferSize(int value)
 
 	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
 	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
-		1000.0f * m_bufferSize / Engine::mixer()->processingSampleRate(), 0, 'f', 1));
+		1000.0f * m_bufferSize / Engine::audioEngine()->processingSampleRate(), 0, 'f', 1));
 }
 
 
