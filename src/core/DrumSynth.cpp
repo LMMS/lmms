@@ -29,7 +29,7 @@
 #include <sstream>
 #include <cstring>
 
-#include <math.h>     //sin(), exp(), etc.
+#include <cmath>     //sin(), exp(), etc.
 
 #include <QFile>
 
