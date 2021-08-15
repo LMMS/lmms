@@ -113,7 +113,6 @@ private:
 	static QList<AudioEngineWorkerThread *> workerThreads;
 
 	volatile bool m_quit;
-
 } ;
 
 

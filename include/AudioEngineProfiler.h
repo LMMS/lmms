@@ -55,7 +55,6 @@ private:
 	MicroTimer m_periodTimer;
 	int m_cpuLoad;
 	QFile m_outputFile;
-
 };
 
 #endif

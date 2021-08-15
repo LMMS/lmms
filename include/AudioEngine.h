@@ -341,7 +341,6 @@ private:
 		void run() override;
 
 		void write( surroundSampleFrame * buffer );
-
 	} ;
 
 
@@ -433,7 +432,6 @@ private:
 	friend class LmmsCore;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
-
 } ;
 
 #endif

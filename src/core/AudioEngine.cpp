@@ -536,7 +536,6 @@ void AudioEngine::clearInternal()
 		{
 			m_playHandlesToRemove.push_back(ph);
 		}
-
 	}
 }
 
