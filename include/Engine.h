@@ -64,7 +64,7 @@ public:
 	// core
 	static AudioEngine *audioEngine()
 	{
-		return s_mixer;
+		return s_audioEngine;
 	}
 
 	static FxMixer * fxMixer()
@@ -140,7 +140,7 @@ private:
 	static float s_framesPerTick;
 
 	// core
-	static AudioEngine *s_mixer;
+	static AudioEngine *s_audioEngine;
 	static FxMixer * s_fxMixer;
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;

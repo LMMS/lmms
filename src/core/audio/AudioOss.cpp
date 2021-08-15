@@ -68,11 +68,11 @@
 
 
 
-AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _mixer ) :
+AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_convertEndian( false )
 {
 	_success_ful = false;

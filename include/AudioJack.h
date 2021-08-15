@@ -51,7 +51,7 @@ class AudioJack : public QObject, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioJack( bool & _success_ful, AudioEngine* mixer );
+	AudioJack( bool & _success_ful, AudioEngine* audioEngine );
 	virtual ~AudioJack();
 
 	// this is to allow the jack midi connection to use the same jack client connection

@@ -34,8 +34,8 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 
-AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _mixer ) :
-	AudioDevice( DEFAULT_CHANNELS, _mixer ),
+AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
+	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
 	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
 {
 	_success_ful = false;

@@ -110,8 +110,8 @@ void MixerWorkerThread::JobQueue::wait()
 
 // implementation of worker threads
 
-MixerWorkerThread::MixerWorkerThread( AudioEngine* mixer ) :
-	QThread( mixer ),
+MixerWorkerThread::MixerWorkerThread( AudioEngine* audioEngine ) :
+	QThread( audioEngine ),
 	m_quit( false )
 {
 	// initialize global static data

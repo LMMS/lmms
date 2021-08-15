@@ -52,11 +52,11 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "AudioEngine.h"
 
 
-AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _mixer ) :
+AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),

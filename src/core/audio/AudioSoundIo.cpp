@@ -36,11 +36,11 @@
 #include "ComboBox.h"
 #include "AudioEngine.h"
 
-AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _mixer ) :
+AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer )
+		SURROUND_CHANNELS ), _audioEngine )
 {
 	outSuccessful = false;
 	m_soundio = NULL;

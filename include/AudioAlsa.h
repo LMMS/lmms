@@ -66,7 +66,7 @@ public:
 	typedef std::vector<DeviceInfo> DeviceInfoCollection;
 
 public:
-	AudioAlsa( bool & _success_ful, AudioEngine* mixer );
+	AudioAlsa( bool & _success_ful, AudioEngine* audioEngine );
 	virtual ~AudioAlsa();
 
 	inline static QString name()

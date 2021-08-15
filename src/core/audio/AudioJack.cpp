@@ -42,11 +42,11 @@
 
 
 
-AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _mixer ) :
+AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<int>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_client( NULL ),
 	m_active( false ),
 	m_midiClient( NULL ),

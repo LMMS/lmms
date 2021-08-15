@@ -35,8 +35,8 @@ class AudioDummy : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioDummy( bool & _success_ful, AudioEngine* mixer ) :
-		AudioDevice( DEFAULT_CHANNELS, mixer )
+	AudioDummy( bool & _success_ful, AudioEngine* audioEngine ) :
+		AudioDevice( DEFAULT_CHANNELS, audioEngine )
 	{
 		_success_ful = true;
 	}

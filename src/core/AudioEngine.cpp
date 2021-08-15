@@ -694,7 +694,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 {
 	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
-	// which were created in a thread different than mixer thread
+	// which were created in a thread different than the audio engine thread
 	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
 		ph->audioPort()->removePlayHandle(ph);
@@ -1224,8 +1224,8 @@ MidiClient * AudioEngine::tryMidiClients()
 
 
 
-AudioEngine::fifoWriter::fifoWriter( AudioEngine* mixer, Fifo * fifo ) :
-	m_mixer( mixer ),
+AudioEngine::fifoWriter::fifoWriter( AudioEngine* audioEngine, Fifo * fifo ) :
+	m_audioEngine( audioEngine ),
 	m_fifo( fifo ),
 	m_writing( true )
 {
@@ -1258,11 +1258,11 @@ void AudioEngine::fifoWriter::run()
 #endif
 #endif
 
-	const fpp_t frames = m_mixer->framesPerPeriod();
+	const fpp_t frames = m_audioEngine->framesPerPeriod();
 	while( m_writing )
 	{
 		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
-		const surroundSampleFrame * b = m_mixer->renderNextBuffer();
+		const surroundSampleFrame * b = m_audioEngine->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
 		write( buffer );
 	}
@@ -1277,14 +1277,14 @@ void AudioEngine::fifoWriter::run()
 
 void AudioEngine::fifoWriter::write( surroundSampleFrame * buffer )
 {
-	m_mixer->m_waitChangesMutex.lock();
-	m_mixer->m_waitingForWrite = true;
-	m_mixer->m_waitChangesMutex.unlock();
-	m_mixer->runChangesInModel();
+	m_audioEngine->m_waitChangesMutex.lock();
+	m_audioEngine->m_waitingForWrite = true;
+	m_audioEngine->m_waitChangesMutex.unlock();
+	m_audioEngine->runChangesInModel();
 
 	m_fifo->write( buffer );
 
-	m_mixer->m_doChangesMutex.lock();
-	m_mixer->m_waitingForWrite = false;
-	m_mixer->m_doChangesMutex.unlock();
+	m_audioEngine->m_doChangesMutex.lock();
+	m_audioEngine->m_waitingForWrite = false;
+	m_audioEngine->m_doChangesMutex.unlock();
 }

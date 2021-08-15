@@ -139,12 +139,12 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 
 	if( m_active && !Engine::getSong()->isExporting() )
 	{
-		AudioEngine const * mixer = Engine::audioEngine();
+		AudioEngine const * audioEngine = Engine::audioEngine();
 
-		float master_output = mixer->masterGain();
+		float master_output = audioEngine->masterGain();
 
-		const fpp_t frames = mixer->framesPerPeriod();
-		AudioEngine::StereoSample peakValues = mixer->getPeakValues(m_buffer, frames);
+		const fpp_t frames = audioEngine->framesPerPeriod();
+		AudioEngine::StereoSample peakValues = audioEngine->getPeakValues(m_buffer, frames);
 		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
 		// Set the color of the line according to the maximum level

@@ -36,11 +36,11 @@
 #include "gui_templates.h"
 
 
-AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _mixer ) :
+AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioalsa", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),

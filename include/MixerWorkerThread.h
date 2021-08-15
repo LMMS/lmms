@@ -73,7 +73,7 @@ public:
 	} ;
 
 
-	MixerWorkerThread( AudioEngine* mixer );
+	MixerWorkerThread( AudioEngine* audioEngine );
 	virtual ~MixerWorkerThread();
 
 	virtual void quit();

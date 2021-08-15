@@ -31,11 +31,11 @@
 
 
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _mixer ) :
+AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
 	m_supportsCapture( false ),
-	m_sampleRate( _mixer->processingSampleRate() ),
+	m_sampleRate( _audioEngine->processingSampleRate() ),
 	m_channels( _channels ),
-	m_mixer( _mixer ),
+	m_audioEngine( _audioEngine ),
 	m_buffer( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
 {
 	int error;

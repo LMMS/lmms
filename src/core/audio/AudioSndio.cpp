@@ -48,11 +48,11 @@
 
 
 
-AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _mixer) :
+AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_convertEndian ( false )
 {
 	_success_ful = false;

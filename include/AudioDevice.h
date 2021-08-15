@@ -39,7 +39,7 @@ class QThread;
 class AudioDevice
 {
 public:
-	AudioDevice( const ch_cnt_t _channels, AudioEngine* mixer );
+	AudioDevice( const ch_cnt_t _channels, AudioEngine* audioEngine );
 	virtual ~AudioDevice();
 
 	inline void lock()
@@ -128,7 +128,7 @@ protected:
 
 	AudioEngine* audioEngine()
 	{
-		return m_mixer;
+		return m_audioEngine;
 	}
 
 	bool hqAudio() const;
@@ -143,7 +143,7 @@ protected:
 private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	AudioEngine* m_mixer;
+	AudioEngine* m_audioEngine;
 	bool m_inProcess;
 
 	QMutex m_devMutex;

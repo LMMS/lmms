@@ -328,13 +328,13 @@ private:
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( AudioEngine * mixer, Fifo * fifo );
+		fifoWriter( AudioEngine * audioEngine, Fifo * fifo );
 
 		void finish();
 
 
 	private:
-		AudioEngine * m_mixer;
+		AudioEngine * m_audioEngine;
 		Fifo * m_fifo;
 		volatile bool m_writing;
 

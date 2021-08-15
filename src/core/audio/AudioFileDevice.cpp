@@ -33,8 +33,8 @@
 AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 					const ch_cnt_t _channels,
 					const QString & _file,
-					AudioEngine*  _mixer ) :
-	AudioDevice( _channels, _mixer ),
+					AudioEngine*  _audioEngine ) :
+	AudioDevice( _channels, _audioEngine ),
 	m_outputFile( _file ),
 	m_outputSettings(outputSettings)
 {
