@@ -59,12 +59,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _mixer ) :
 		SURROUND_CHANNELS ), _mixer ),
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
-	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
+	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
 
-	m_outBufSize = mixer()->framesPerPeriod();
+	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -111,12 +111,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _mixer ) :
 		return;
 	}
 
-	double inLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
-	double outLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
+	double inLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
+	double outLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
 
 	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
 	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
-	const int samples = mixer()->framesPerPeriod();
+	const int samples = audioEngine()->framesPerPeriod();
 	
 	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
@@ -230,7 +230,7 @@ void AudioPortAudio::applyQualitySettings()
 	{
 
 		setSampleRate( Engine::audioEngine()->processingSampleRate() );
-		int samples = mixer()->framesPerPeriod();
+		int samples = audioEngine()->framesPerPeriod();
 
 		PaError err = Pa_OpenStream(
 			&m_paStream,
@@ -261,8 +261,7 @@ int AudioPortAudio::process_callback(
 {
 	if( supportsCapture() )
 	{
-		mixer()->pushInputFrames( (sampleFrame*)_inputBuffer,
-												_framesPerBuffer );
+		audioEngine()->pushInputFrames( (sampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
 	if( m_stopped )
@@ -290,7 +289,7 @@ int AudioPortAudio::process_callback(
 		const int min_len = qMin( (int)_framesPerBuffer,
 			m_outBufSize - m_outBufPos );
 
-		float master_gain = mixer()->masterGain();
+		float master_gain = audioEngine()->masterGain();
 
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{

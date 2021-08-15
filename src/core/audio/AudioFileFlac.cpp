@@ -47,7 +47,7 @@ bool AudioFileFlac::startEncoding()
 {
 	m_sfinfo.samplerate=sampleRate();
 	m_sfinfo.channels=channels();
-	m_sfinfo.frames = mixer()->framesPerPeriod();
+	m_sfinfo.frames = audioEngine()->framesPerPeriod();
 	m_sfinfo.sections=1;
 	m_sfinfo.seekable=0;
 

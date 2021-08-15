@@ -36,7 +36,7 @@
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),
-	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] )
+	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
 {
 	_success_ful = false;
 
@@ -44,7 +44,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _mixer ) :
 	m_currentBufferFramesCount = 0;
 	m_currentBufferFramePos = 0;
 #else
-	m_convertedBufSize = mixer()->framesPerPeriod() * channels()
+	m_convertedBufSize = audioEngine()->framesPerPeriod() * channels()
 						* sizeof( int_sample_t );
 	m_convertedBufPos = 0;
 	m_convertedBuf = new Uint8[m_convertedBufSize];
@@ -67,7 +67,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _mixer ) :
 						// to convert the buffers
 #endif
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = qMax( 1024, mixer()->framesPerPeriod()*2 );
+	m_audioHandle.samples = qMax( 1024, audioEngine()->framesPerPeriod()*2 );
 
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
@@ -258,7 +258,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 										  m_currentBufferFramesCount
 										- m_currentBufferFramePos );
 
-		const float gain = mixer()->masterGain();
+		const float gain = audioEngine()->masterGain();
 		for (uint f = 0; f < min_frames_count; f++)
 		{
 			(m_outBuf + m_currentBufferFramePos)[f][0] *= gain;
@@ -289,7 +289,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 						* sizeof( int_sample_t );
 
 			convertToS16( m_outBuf, frames,
-						mixer()->masterGain(),
+						audioEngine()->masterGain(),
 						(int_sample_t *)m_convertedBuf,
 						m_outConvertEndian );
 		}
@@ -316,7 +316,7 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 	sampleFrame *samples_buffer = (sampleFrame *) _buf;
 	fpp_t frames = _len / sizeof ( sampleFrame );
 
-	mixer()->pushInputFrames (samples_buffer, frames);
+	audioEngine()->pushInputFrames (samples_buffer, frames);
 }
 
 #endif

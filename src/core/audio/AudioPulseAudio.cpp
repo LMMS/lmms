@@ -244,7 +244,7 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = mixer()->framesPerPeriod();
+		const fpp_t fpp = audioEngine()->framesPerPeriod();
 		surroundSampleFrame * temp = new surroundSampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
@@ -263,7 +263,7 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = mixer()->framesPerPeriod();
+	const fpp_t fpp = audioEngine()->framesPerPeriod();
 	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
 	int_sample_t* pcmbuf = (int_sample_t *)pa_xmalloc( fpp * channels() * sizeof(int_sample_t) );
 
@@ -277,7 +277,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 			break;
 		}
 		int bytes = convertToS16( temp, frames,
-						mixer()->masterGain(),
+						audioEngine()->masterGain(),
 						pcmbuf,
 						m_convertEndian );
 		if( bytes > 0 )

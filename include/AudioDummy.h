@@ -94,17 +94,17 @@ private:
 		while( true )
 		{
 			timer.reset();
-			const surroundSampleFrame* b = mixer()->nextBuffer();
+			const surroundSampleFrame* b = audioEngine()->nextBuffer();
 			if( !b )
 			{
 				break;
 			}
-			if( mixer()->hasFifoWriter() )
+			if( audioEngine()->hasFifoWriter() )
 			{
 				delete[] b;
 			}
 
-			const int microseconds = static_cast<int>( mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed() );
+			const int microseconds = static_cast<int>( audioEngine()->framesPerPeriod() * 1000000.0f / audioEngine()->processingSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
 			{
 				usleep( microseconds );

@@ -80,7 +80,7 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _mixer) :
 	m_par.bits = 16;
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = mixer()->framesPerPeriod();
+	m_par.round = audioEngine()->framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
 	if ( (isLittleEndian() && (m_par.le == 0)) ||
@@ -161,10 +161,8 @@ void AudioSndio::applyQualitySettings( void )
 
 void AudioSndio::run( void )
 {
-	surroundSampleFrame * temp =
-	    new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-	    new int_sample_t[mixer()->framesPerPeriod() * channels()];
+	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 
 	while( true )
 	{
@@ -175,7 +173,7 @@ void AudioSndio::run( void )
 		}
 
 		uint bytes = convertToS16( temp, frames,
-		    mixer()->masterGain(), outbuf, m_convertEndian );
+		    audioEngine()->masterGain(), outbuf, m_convertEndian );
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;

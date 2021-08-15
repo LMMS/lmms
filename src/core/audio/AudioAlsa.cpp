@@ -296,14 +296,11 @@ void AudioAlsa::applyQualitySettings()
 
 void AudioAlsa::run()
 {
-	surroundSampleFrame * temp =
-		new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-			new int_sample_t[mixer()->framesPerPeriod() *
-								channels()];
+	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 	int_sample_t * pcmbuf = new int_sample_t[m_periodSize * channels()];
 
-	int outbuf_size = mixer()->framesPerPeriod() * channels();
+	int outbuf_size = audioEngine()->framesPerPeriod() * channels();
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
@@ -328,7 +325,7 @@ void AudioAlsa::run()
 				outbuf_size = frames * channels();
 
 				convertToS16( temp, frames,
-						mixer()->masterGain(),
+						audioEngine()->masterGain(),
 						outbuf,
 						m_convertEndian );
 			}
@@ -429,7 +426,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 						sampleRate(), 0 ) ) < 0 )
 	{
 		if( ( err = snd_pcm_hw_params_set_rate( m_handle, m_hwParams,
-				mixer()->baseSampleRate(), 0 ) ) < 0 )
+				audioEngine()->baseSampleRate(), 0 ) ) < 0 )
 		{
 			printf( "Could not set sample rate: %s\n",
 							snd_strerror( err ) );
@@ -437,7 +434,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 		}
 	}
 
-	m_periodSize = mixer()->framesPerPeriod();
+	m_periodSize = audioEngine()->framesPerPeriod();
 	m_bufferSize = m_periodSize * 8;
 	dir = 0;
 	err = snd_pcm_hw_params_set_period_size_near( m_handle, m_hwParams,

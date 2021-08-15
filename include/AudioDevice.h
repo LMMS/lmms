@@ -1,5 +1,5 @@
 /*
- * AudioDevice.h - base-class for audio-devices, used by LMMS-mixer
+ * AudioDevice.h - base-class for audio-devices, used by LMMS audio engine
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -126,7 +126,7 @@ protected:
 		m_sampleRate = _new_sr;
 	}
 
-	AudioEngine* mixer()
+	AudioEngine* audioEngine()
 	{
 		return m_mixer;
 	}

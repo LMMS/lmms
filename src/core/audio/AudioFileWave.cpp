@@ -56,7 +56,7 @@ bool AudioFileWave::startEncoding()
 {
 	m_si.samplerate = sampleRate();
 	m_si.channels = channels();
-	m_si.frames = mixer()->framesPerPeriod();
+	m_si.frames = audioEngine()->framesPerPeriod();
 	m_si.sections = 1;
 	m_si.seekable = 0;
 
