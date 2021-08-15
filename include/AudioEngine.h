@@ -424,7 +424,7 @@ private:
 	QMutex m_changesMutex;
 	QMutex m_doChangesMutex;
 	QMutex m_waitChangesMutex;
-	QWaitCondition m_changesMixerCondition;
+	QWaitCondition m_changesAudioEngineCondition;
 	QWaitCondition m_changesRequestCondition;
 
 	bool m_waitingForWrite;

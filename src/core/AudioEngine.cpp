@@ -808,7 +808,7 @@ void AudioEngine::doneChangeInModel()
 	if( !moreChanges )
 	{
 		m_changesSignal = false;
-		m_changesMixerCondition.wakeOne();
+		m_changesAudioEngineCondition.wakeOne();
 	}
 	m_doChangesMutex.unlock();
 }
@@ -824,7 +824,7 @@ void AudioEngine::runChangesInModel()
 		// allow changes in the model from other threads ...
 		m_changesRequestCondition.wakeOne();
 		// ... and wait until they are done
-		m_changesMixerCondition.wait( &m_waitChangesMutex );
+		m_changesAudioEngineCondition.wait( &m_waitChangesMutex );
 		m_waitChangesMutex.unlock();
 	}
 }
