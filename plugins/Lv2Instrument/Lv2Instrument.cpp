@@ -80,7 +80,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 #endif
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);
-		connect(Engine::audioEngine(), &Mixer::sampleRateChanged,
+		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
 			this, [this](){Lv2ControlBase::reloadPlugin();});
 
 		// now we need a play-handle which cares for calling play()
