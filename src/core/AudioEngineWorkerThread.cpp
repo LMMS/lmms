@@ -1,5 +1,5 @@
 /*
- * MixerWorkerThread.cpp - implementation of MixerWorkerThread
+ * AudioEngineWorkerThread.cpp - implementation of AudioEngineWorkerThread
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "MixerWorkerThread.h"
+#include "AudioEngineWorkerThread.h"
 
 #include <QDebug>
 #include <QMutex>
@@ -36,12 +36,12 @@
 #include <xmmintrin.h>
 #endif
 
-MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
-QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;
-QList<MixerWorkerThread *> MixerWorkerThread::workerThreads;
+AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
+QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = NULL;
+QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
 
 // implementation of internal JobQueue
-void MixerWorkerThread::JobQueue::reset( OperationMode _opMode )
+void AudioEngineWorkerThread::JobQueue::reset( OperationMode _opMode )
 {
 	m_writeIndex = 0;
 	m_itemsDone = 0;
@@ -51,7 +51,7 @@ void MixerWorkerThread::JobQueue::reset( OperationMode _opMode )
 
 
 
-void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
+void AudioEngineWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 {
 	if( _job->requiresProcessing() )
 	{
@@ -70,7 +70,7 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 
 
 
-void MixerWorkerThread::JobQueue::run()
+void AudioEngineWorkerThread::JobQueue::run()
 {
 	bool processedJob = true;
 	while (processedJob && m_itemsDone < m_writeIndex)
@@ -94,7 +94,7 @@ void MixerWorkerThread::JobQueue::run()
 
 
 
-void MixerWorkerThread::JobQueue::wait()
+void AudioEngineWorkerThread::JobQueue::wait()
 {
 	while (m_itemsDone < m_writeIndex)
 	{
@@ -110,7 +110,7 @@ void MixerWorkerThread::JobQueue::wait()
 
 // implementation of worker threads
 
-MixerWorkerThread::MixerWorkerThread( AudioEngine* audioEngine ) :
+AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	QThread( audioEngine ),
 	m_quit( false )
 {
@@ -122,7 +122,7 @@ MixerWorkerThread::MixerWorkerThread( AudioEngine* audioEngine ) :
 
 	// keep track of all instantiated worker threads - this is used for
 	// processing the last worker thread "inline", see comments in
-	// MixerWorkerThread::startAndWaitForJobs() for details
+	// AudioEngineWorkerThread::startAndWaitForJobs() for details
 	workerThreads << this;
 
 	resetJobQueue();
@@ -131,7 +131,7 @@ MixerWorkerThread::MixerWorkerThread( AudioEngine* audioEngine ) :
 
 
 
-MixerWorkerThread::~MixerWorkerThread()
+AudioEngineWorkerThread::~AudioEngineWorkerThread()
 {
 	workerThreads.removeAll( this );
 }
@@ -139,7 +139,7 @@ MixerWorkerThread::~MixerWorkerThread()
 
 
 
-void MixerWorkerThread::quit()
+void AudioEngineWorkerThread::quit()
 {
 	m_quit = true;
 	resetJobQueue();
@@ -148,7 +148,7 @@ void MixerWorkerThread::quit()
 
 
 
-void MixerWorkerThread::startAndWaitForJobs()
+void AudioEngineWorkerThread::startAndWaitForJobs()
 {
 	queueReadyWaitCond->wakeAll();
 	// The last worker-thread is never started. Instead it's processed "inline"
@@ -161,7 +161,7 @@ void MixerWorkerThread::startAndWaitForJobs()
 
 
 
-void MixerWorkerThread::run()
+void AudioEngineWorkerThread::run()
 {
 	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();

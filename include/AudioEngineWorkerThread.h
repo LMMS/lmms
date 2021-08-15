@@ -1,5 +1,5 @@
 /*
- * MixerWorkerThread.h - declaration of class MixerWorkerThread
+ * AudioEngineWorkerThread.h - declaration of class AudioEngineWorkerThread
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -33,7 +33,7 @@ class AudioEngine;
 class QWaitCondition;
 class ThreadableJob;
 
-class MixerWorkerThread : public QThread
+class AudioEngineWorkerThread : public QThread
 {
 	Q_OBJECT
 public:
@@ -73,8 +73,8 @@ public:
 	} ;
 
 
-	MixerWorkerThread( AudioEngine* audioEngine );
-	virtual ~MixerWorkerThread();
+	AudioEngineWorkerThread( AudioEngine* audioEngine );
+	virtual ~AudioEngineWorkerThread();
 
 	virtual void quit();
 
@@ -110,7 +110,7 @@ private:
 
 	static JobQueue globalJobQueue;
 	static QWaitCondition * queueReadyWaitCond;
-	static QList<MixerWorkerThread *> workerThreads;
+	static QList<AudioEngineWorkerThread *> workerThreads;
 
 	volatile bool m_quit;
 

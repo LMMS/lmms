@@ -28,9 +28,9 @@
 
 #include "lmmsconfig.h"
 
+#include "AudioEngineWorkerThread.h"
 #include "AudioPort.h"
 #include "FxMixer.h"
-#include "MixerWorkerThread.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
@@ -145,7 +145,7 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 
 	for( int i = 0; i < m_numWorkers+1; ++i )
 	{
-		MixerWorkerThread * wt = new MixerWorkerThread( this );
+		AudioEngineWorkerThread * wt = new AudioEngineWorkerThread( this );
 		if( i < m_numWorkers )
 		{
 			wt->start( QThread::TimeCriticalPriority );
@@ -166,7 +166,7 @@ AudioEngine::~AudioEngine()
 		m_workers[w]->quit();
 	}
 
-	MixerWorkerThread::startAndWaitForJobs();
+	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
@@ -387,8 +387,8 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	}
 
 	// STAGE 1: run and render all play handles
-	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
-	MixerWorkerThread::startAndWaitForJobs();
+	AudioEngineWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
+	AudioEngineWorkerThread::startAndWaitForJobs();
 
 	// removed all play handles which are done
 	for( PlayHandleList::Iterator it = m_playHandles.begin();
@@ -417,8 +417,8 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	}
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	MixerWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
-	MixerWorkerThread::startAndWaitForJobs();
+	AudioEngineWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
+	AudioEngineWorkerThread::startAndWaitForJobs();
 
 
 	// STAGE 3: do master mix in FX mixer

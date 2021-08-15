@@ -130,7 +130,7 @@ private:
 	BoolModel * m_mutedModel;
 
 	friend class AudioEngine;
-	friend class MixerWorkerThread;
+	friend class AudioEngineWorkerThread;
 
 } ;
 

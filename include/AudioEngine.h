@@ -58,7 +58,7 @@ const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 #include "PlayHandle.h"
 
 
-class MixerWorkerThread;
+class AudioEngineWorkerThread;
 
 
 class LMMS_EXPORT AudioEngine : public QObject
@@ -384,7 +384,7 @@ private:
 	surroundSampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
-	QVector<MixerWorkerThread *> m_workers;
+	QVector<AudioEngineWorkerThread *> m_workers;
 	int m_numWorkers;
 
 	// playhandle stuff
@@ -431,7 +431,7 @@ private:
 	bool m_waitingForWrite;
 
 	friend class LmmsCore;
-	friend class MixerWorkerThread;
+	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
 
 } ;
