@@ -69,7 +69,6 @@ public:
 		std::atomic_int m_writeIndex;
 		std::atomic_int m_itemsDone;
 		OperationMode m_opMode;
-
 	} ;
 
 
