@@ -36,7 +36,7 @@
 #include "LocklessList.h"
 #include "Note.h"
 #include "FifoBuffer.h"
-#include "MixerProfiler.h"
+#include "AudioEngineProfiler.h"
 
 
 class AudioDevice;
@@ -223,7 +223,7 @@ public:
 	}
 
 
-	MixerProfiler& profiler()
+	AudioEngineProfiler& profiler()
 	{
 		return m_profiler;
 	}
@@ -414,7 +414,7 @@ private:
 	Fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
-	MixerProfiler m_profiler;
+	AudioEngineProfiler m_profiler;
 
 	bool m_metronomeActive;
 

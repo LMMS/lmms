@@ -1,5 +1,5 @@
 /*
- * MixerProfiler.cpp - class for profiling performance of Mixer
+ * AudioEngineProfiler.h - class for profiling performance of AudioEngine
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,42 +22,40 @@
  *
  */
 
-#include "MixerProfiler.h"
+#ifndef MIXER_PROFILER_H
+#define MIXER_PROFILER_H
 
+#include <QFile>
 
-MixerProfiler::MixerProfiler() :
-	m_periodTimer(),
-	m_cpuLoad( 0 ),
-	m_outputFile()
+#include "lmms_basics.h"
+#include "MicroTimer.h"
+
+class AudioEngineProfiler
 {
-}
+public:
+	AudioEngineProfiler();
+	~AudioEngineProfiler();
 
-
-
-MixerProfiler::~MixerProfiler()
-{
-}
-
-
-void MixerProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
-{
-	int periodElapsed = m_periodTimer.elapsed();
-
-	const float newCpuLoad = periodElapsed / 10000.0f * sampleRate / framesPerPeriod;
-    m_cpuLoad = qBound<int>( 0, ( newCpuLoad * 0.1f + m_cpuLoad * 0.9f ), 100 );
-
-	if( m_outputFile.isOpen() )
+	void startPeriod()
 	{
-		m_outputFile.write( QString( "%1\n" ).arg( periodElapsed ).toLatin1() );
+		m_periodTimer.reset();
 	}
-}
+
+	void finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod );
+
+	int cpuLoad() const
+	{
+		return m_cpuLoad;
+	}
+
+	void setOutputFile( const QString& outputFile );
 
 
+private:
+	MicroTimer m_periodTimer;
+	int m_cpuLoad;
+	QFile m_outputFile;
 
-void MixerProfiler::setOutputFile( const QString& outputFile )
-{
-	m_outputFile.close();
-	m_outputFile.setFileName( outputFile );
-	m_outputFile.open( QFile::WriteOnly | QFile::Truncate );
-}
+};
 
+#endif
