@@ -302,6 +302,7 @@ IF(WANT_SDL)
 	# This allows us to use SDL2's own CMake configuration files if available.
 	FIND_PACKAGE(SDL2 CONFIG QUIET)
 	IF(NOT TARGET SDL2::SDL2)
+		UNSET(SDL2_FOUND)
 		FIND_PACKAGE(SDL2 MODULE)
 	ENDIF()
 
