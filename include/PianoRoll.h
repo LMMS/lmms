@@ -229,6 +229,7 @@ protected slots:
 
 signals:
 	void currentPatternChanged();
+	void editModeChanged(int);
 	void ghostPatternSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
@@ -242,8 +243,7 @@ private:
 		ActionResizeNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea,
-		ActionKnife
+		ActionResizeNoteEditArea
 	};
 
 	enum NoteEditMode
@@ -307,7 +307,6 @@ private:
 	void pauseChordNotes(int key);
 
 	void setKnifeAction();
-	void cancelKnifeAction();
 
 	void updateScrollbars();
 	void updatePositionLineHeight();
@@ -411,7 +410,7 @@ private:
 
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
-	EditModes m_knifeMode; // mode they where in before entering knife mode
+	EditModes m_lastEditMode; // last non-temporary edit mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 

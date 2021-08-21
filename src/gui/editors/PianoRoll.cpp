@@ -1370,10 +1370,10 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			break;
 
 		case Qt::Key_Escape:
-			// On the Knife mode, ESC cancels it
-			if (m_editMode == ModeEditKnife)
+			// ESC cancels temporary edit modes
+			if (m_editMode != m_lastEditMode)
 			{
-				cancelKnifeAction();
+				setEditMode(m_lastEditMode);
 			}
 			else
 			{
@@ -1436,7 +1436,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 			// (<S-C-drag> is shortcut for sticky note resize)
 			if ( !( ke->modifiers() & Qt::ShiftModifier ) && isActiveWindow() )
 			{
-				m_ctrlMode = m_editMode;
 				m_editMode = ModeSelect;
 				setCursor( Qt::ArrowCursor );
 				ke->accept();
@@ -1581,7 +1580,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
+	if( m_editMode == ModeEditDetuning && me->button() == Qt::LeftButton && noteUnderMouse() )
 	{
 		static QPointer<AutomationPattern> detuningPattern = nullptr;
 		if (detuningPattern.data() != nullptr)
@@ -1602,7 +1601,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 	// if holding control, go to selection mode unless shift is also pressed
 	if( me->modifiers() & Qt::ControlModifier && m_editMode != ModeSelect )
 	{
-		m_ctrlMode = m_editMode;
 		m_editMode = ModeSelect;
 		setCursor( Qt::ArrowCursor );
 		update();
@@ -2088,21 +2086,7 @@ void PianoRoll::pauseChordNotes(int key)
 
 void PianoRoll::setKnifeAction()
 {
-	if (m_editMode != ModeEditKnife)
-	{
-		m_knifeMode = m_editMode;
 		m_editMode = ModeEditKnife;
-		m_action = ActionKnife;
-		setCursor(Qt::ArrowCursor);
-		update();
-	}
-}
-
-void PianoRoll::cancelKnifeAction()
-{
-	m_editMode = m_knifeMode;
-	m_action = ActionNone;
-	update();
 }
 
 
@@ -2205,10 +2189,10 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	s_textFloat->hide();
 
-	// Quit knife mode if we pressed and released the right mouse button
-	if (m_editMode == ModeEditKnife && me->button() == Qt::RightButton)
+	// Quit temporary edit mode if we pressed and released the right mouse button
+	if (m_editMode != m_lastEditMode && me->button() == Qt::RightButton)
 	{
-		cancelKnifeAction();
+		setEditMode(m_lastEditMode);
 	}
 
 	if( me->button() & Qt::LeftButton )
@@ -2269,11 +2253,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 	}
 
 	m_currentNote = NULL;
-
-	if (m_action != ActionKnife)
-	{
-		m_action = ActionNone;
-	}
+	m_action = ActionNone;
 
 	if( m_editMode == ModeDraw )
 	{
@@ -3485,7 +3465,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 		// -- Knife tool (draw cut line)
-		if (m_action == ActionKnife)
+		if (m_editMode == ModeEditKnife)
 		{
 			auto xCoordOfTick = [this](int tick) {
 				return m_whiteKeyWidth + (
@@ -3844,12 +3824,9 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 			m_pattern->instrumentTrack()->pianoModel()->setKeyState( i, false );
 		}
 	}
-	if (m_editMode == ModeEditKnife) {
-		m_editMode = m_knifeMode;
-		m_action = ActionNone;
-	} else {
-		m_editMode = m_ctrlMode;
-	}
+	m_editMode = m_ctrlMode;
+	m_action = ActionNone;
+
 	update();
 }
 
@@ -4103,6 +4080,15 @@ void PianoRoll::verScrolled( int new_pos )
 void PianoRoll::setEditMode(int mode)
 {
 	m_ctrlMode = m_editMode = (EditModes) mode;
+
+	// Remember edit modes that are non-temporary
+	if (m_editMode == ModeDraw || m_editMode == ModeErase || m_editMode == ModeSelect)
+	{
+		m_lastEditMode = m_editMode;
+		emit editModeChanged(mode);
+	}
+
+	update();
 }
 
 
