@@ -306,8 +306,6 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
-	void setKnifeAction();
-
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -537,7 +535,6 @@ private:
 
 	PianoRoll* m_editor;
 
-	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;

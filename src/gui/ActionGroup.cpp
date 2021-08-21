@@ -46,6 +46,14 @@ QAction* ActionGroup::addAction(const QIcon& icon, const QString& text)
 	return addAction(new QAction(icon, text, this));
 }
 
+void ActionGroup::setChecked(const int index)
+{
+	if (0 <= index && index < actions().length())
+	{
+		actions().at(index)->setChecked(true);
+	}
+}
+
 void ActionGroup::actionTriggered_(QAction* action)
 {
 	Q_ASSERT(action != 0);

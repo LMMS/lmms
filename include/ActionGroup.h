@@ -47,11 +47,11 @@ signals:
 	/// This signal is emitted when the action at the given index is triggered.
 	void triggered(int index);
 
+public slots:
+	void setChecked(const int index);
+
 private slots:
 	void actionTriggered_(QAction* action);
-
-private:
-	QList<QAction*> m_actions;
 };
 
 #endif

@@ -53,6 +53,7 @@
 #include "BBTrackContainer.h"
 #include "Clipboard.h"
 #include "ComboBox.h"
+#include "ComboButton.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "debug.h"
@@ -2084,10 +2085,6 @@ void PianoRoll::pauseChordNotes(int key)
 	}
 }
 
-void PianoRoll::setKnifeAction()
-{
-		m_editMode = ModeEditKnife;
-}
 
 
 
@@ -4665,14 +4662,16 @@ PianoRollWindow::PianoRollWindow() :
 	m_toggleStepRecordingAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano, one step at the time" ) );
 	m_stopAction->setToolTip( tr( "Stop playing of current pattern (Space)" ) );
 
-	DropToolBar *notesActionsToolBar = addDropToolBarToTop( tr( "Edit actions" ) );
+	// Edit modes
+	DropToolBar* editModeToolBar = addDropToolBarToTop(tr("Edit modes"));
 
 	// init edit-buttons at the top
 	ActionGroup* editModeGroup = new ActionGroup( this );
 	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
 	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
-	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
+	QAction* pitchBendAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Pitch bend"));
+	QAction* knifeAction =  editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife"));
 
 	drawAction->setChecked( true );
 
@@ -4680,56 +4679,46 @@ PianoRollWindow::PianoRollWindow() :
 	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
 	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
 	pitchBendAction->setShortcut( Qt::SHIFT | Qt::Key_T );
+	knifeAction->setShortcut(Qt::SHIFT | Qt::Key_K);
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
+	connect(m_editor, SIGNAL(editModeChanged(int)), editModeGroup, SLOT(setChecked(int)));
+
+	// Add first edit modes to toolbar
+	editModeToolBar->addActions({drawAction, eraseAction, selectAction});
+
+	// Add temporary edit modes to a combo button
+	ComboButton* editModeButton = new ComboButton(m_toolBar, true);
+	editModeButton->addActions({pitchBendAction, knifeAction});
+	editModeToolBar->addWidget(editModeButton);
+
+	// Note actions (instatly applied)
+	DropToolBar* notesActionsToolBar = addDropToolBarToTop(tr("Note actions"));
 
 	// Quantize combo button
-	QToolButton* quantizeButton = new QToolButton(notesActionsToolBar);
-	QMenu* quantizeButtonMenu = new QMenu(quantizeButton);
+	ComboButton* quantizeButton = new ComboButton(m_toolBar);
+	notesActionsToolBar->addWidget(quantizeButton);
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
-	QAction* quantizePosAction = new QAction(tr("Quantize positions"), this);
-	QAction* quantizeLengthAction = new QAction(tr("Quantize lengths"), this);
+	QAction* quantizeAction = quantizeButton->addAction("quantize", tr("Quantize"));
+	QAction* quantizePosAction = quantizeButton->addAction("quantize_pos", tr("Quantize positions"));
+	QAction* quantizeLengthAction = quantizeButton->addAction("quantize_len", tr("Quantize lengths"));
 
 	connect(quantizeAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(); });
 	connect(quantizePosAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizePos); });
 	connect(quantizeLengthAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizeLength); });
 
-	quantizeButton->setPopupMode(QToolButton::MenuButtonPopup);
-	quantizeButton->setDefaultAction(quantizeAction);
-	quantizeButton->setMenu(quantizeButtonMenu);
-	quantizeButtonMenu->addAction(quantizePosAction);
-	quantizeButtonMenu->addAction(quantizeLengthAction);
-
-	notesActionsToolBar->addAction( drawAction );
-	notesActionsToolBar->addAction( eraseAction );
-	notesActionsToolBar->addAction( selectAction );
-	notesActionsToolBar->addAction( pitchBendAction );
-	notesActionsToolBar->addSeparator();
-	notesActionsToolBar->addWidget(quantizeButton);
-
 	// -- File actions
 	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
 
-	// -- File ToolButton
-	m_fileToolsButton = new QToolButton(m_toolBar);
-	m_fileToolsButton->setIcon(embed::getIconPixmap("file"));
-	m_fileToolsButton->setPopupMode(QToolButton::InstantPopup);
+	// Import / export combo button
+	ComboButton* fileToolsButton = new ComboButton(m_toolBar);
+	fileActionsToolBar->addWidget(fileToolsButton);
 
-	// Import / export
-	QAction* importAction = new QAction(embed::getIconPixmap("project_import"),
-		tr("Import pattern"), m_fileToolsButton);
-
-	QAction* exportAction = new QAction(embed::getIconPixmap("project_export"),
-		tr("Export pattern"), m_fileToolsButton);
-
-	m_fileToolsButton->addAction(importAction);
-	m_fileToolsButton->addAction(exportAction);
-	fileActionsToolBar->addWidget(m_fileToolsButton);
+	QAction* importAction = fileToolsButton->addAction("project_import", tr("Import pattern"));
+	QAction* exportAction = fileToolsButton->addAction("project_export", tr("Export pattern"));
 
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importPattern()));
 	connect(exportAction, SIGNAL(triggered()), this, SLOT(exportPattern()));
-	// -- End File actions
 
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
@@ -4760,20 +4749,13 @@ PianoRollWindow::PianoRollWindow() :
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
 	// -- Note modifier tools
-	QToolButton * noteToolsButton = new QToolButton(m_toolBar);
-	noteToolsButton->setIcon(embed::getIconPixmap("tool"));
-	noteToolsButton->setPopupMode(QToolButton::InstantPopup);
+	ComboButton* noteToolsButton = new ComboButton(m_toolBar);
 
 	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
 				tr("Glue"), noteToolsButton);
 	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
 	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
 
-	QAction * knifeAction = new QAction(embed::getIconPixmap("edit_knife"),
-				tr("Knife"), noteToolsButton);
-	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
-	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
-        
 	QAction* fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
 	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
@@ -4789,7 +4771,6 @@ PianoRollWindow::PianoRollWindow() :
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
 
 	noteToolsButton->addAction(glueAction);
-	noteToolsButton->addAction(knifeAction);
 	noteToolsButton->addAction(fillAction);
 	noteToolsButton->addAction(cutOverlapsAction);
 	noteToolsButton->addAction(minLengthAction);
@@ -4923,14 +4904,12 @@ void PianoRollWindow::setCurrentPattern( Pattern* pattern )
 	if ( pattern )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
-		m_fileToolsButton->setEnabled(true);
 		connect( pattern->instrumentTrack(), SIGNAL( nameChanged() ), this, SLOT( updateAfterPatternChange()) );
 		connect( pattern, SIGNAL( dataChanged() ), this, SLOT( updateAfterPatternChange() ) );
 	}
 	else
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
-		m_fileToolsButton->setEnabled(false);
 	}
 }
 
@@ -5096,12 +5075,10 @@ void PianoRollWindow::patternRenamed()
 	if ( currentPattern() )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( currentPattern()->name() ) );
-		m_fileToolsButton->setEnabled(true);
 	}
 	else
 	{
 		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
-		m_fileToolsButton->setEnabled(false);
 	}
 }
 
@@ -5118,6 +5095,8 @@ void PianoRollWindow::ghostPatternSet( bool state )
 
 void PianoRollWindow::exportPattern()
 {
+	if (!m_editor->hasValidPattern()) { return; }
+
 	FileDialog exportDialog(this, tr("Export pattern"), "",
 		tr("XML pattern file (*.xpt *.xptz)"));
 
@@ -5151,6 +5130,8 @@ void PianoRollWindow::exportPattern()
 
 void PianoRollWindow::importPattern()
 {
+	if (!m_editor->hasValidPattern()) { return; }
+
 	// Overwrite confirmation.
 	if (!m_editor->m_pattern->empty() &&
 		QMessageBox::warning(
