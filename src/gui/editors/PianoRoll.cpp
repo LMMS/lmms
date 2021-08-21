@@ -4707,6 +4707,26 @@ PianoRollWindow::PianoRollWindow() :
 	connect(quantizePosAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizePos); });
 	connect(quantizeLengthAction, &QAction::triggered, [this](){ m_editor->quantizeNotes(PianoRoll::QuantizeLength); });
 
+	// -- Note modifier tools
+	ComboButton* noteToolsButton = new ComboButton(m_toolBar);
+	notesActionsToolBar->addWidget(noteToolsButton);
+
+	QAction * glueAction = noteToolsButton->addAction("glue", tr("Glue"));
+	QAction* fillAction = noteToolsButton->addAction("fill", tr("Fill"));
+	QAction* cutOverlapsAction = noteToolsButton->addAction("cut_overlaps", tr("Cut overlaps"));
+	QAction* minLengthAction = noteToolsButton->addAction("min_length", tr("Min length as last"));
+	QAction* maxLengthAction = noteToolsButton->addAction("max_length", tr("Max length as last"));
+
+	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
+	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
+	cutOverlapsAction->setShortcut(Qt::SHIFT | Qt::Key_C);
+
+	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
+	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
+	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
+	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
+	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
+
 	// -- File actions
 	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
 
@@ -4747,36 +4767,6 @@ PianoRollWindow::PianoRollWindow() :
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
-
-	// -- Note modifier tools
-	ComboButton* noteToolsButton = new ComboButton(m_toolBar);
-
-	QAction * glueAction = new QAction(embed::getIconPixmap("glue"),
-				tr("Glue"), noteToolsButton);
-	connect(glueAction, SIGNAL(triggered()), m_editor, SLOT(glueNotes()));
-	glueAction->setShortcut( Qt::SHIFT | Qt::Key_G );
-
-	QAction* fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
-	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
-	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);
-
-	QAction* cutOverlapsAction = new QAction(embed::getIconPixmap("cut_overlaps"), tr("Cut overlaps"), noteToolsButton);
-	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
-	cutOverlapsAction->setShortcut(Qt::SHIFT | Qt::Key_C);
-
-	QAction* minLengthAction = new QAction(embed::getIconPixmap("min_length"), tr("Min length as last"), noteToolsButton);
-	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
-
-	QAction* maxLengthAction = new QAction(embed::getIconPixmap("max_length"), tr("Max length as last"), noteToolsButton);
-	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
-
-	noteToolsButton->addAction(glueAction);
-	noteToolsButton->addAction(fillAction);
-	noteToolsButton->addAction(cutOverlapsAction);
-	noteToolsButton->addAction(minLengthAction);
-	noteToolsButton->addAction(maxLengthAction);
-
-	notesActionsToolBar->addWidget(noteToolsButton);
 
 	addToolBarBreak();
 
