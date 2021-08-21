@@ -241,9 +241,12 @@ private:
 		ActionNone,
 		ActionMoveNote,
 		ActionResizeNote,
+		ActionEraseNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea
+		ActionResizeNoteEditArea,
+		ActionDetune,
+		ActionKnife
 	};
 
 	enum NoteEditMode
@@ -409,8 +412,7 @@ private:
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 	EditModes m_lastEditMode; // last non-temporary edit mode
-
-	bool m_mouseDownRight; //true if right click is being held down
+	Actions m_midButtonAction = ActionDetune; // action that will be set by middle mouse button
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;

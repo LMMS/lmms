@@ -178,7 +178,6 @@ PianoRoll::PianoRoll() :
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
 	m_ctrlMode( ModeDraw ),
-	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_stepRecorderWidget(this, DEFAULT_PR_PPB, PR_TOP_MARGIN, PR_BOTTOM_MARGIN + m_notesEditHeight, WHITE_KEY_WIDTH, 0),
 	m_stepRecorder(*this, m_stepRecorderWidget),
@@ -1561,44 +1560,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	// -- Knife
-	if (m_editMode == ModeEditKnife && me->button() == Qt::LeftButton)
-	{
-		NoteVector n;
-		Note* note = noteUnderMouse();
-
-		if (note)
-		{
-			n.append(note);
-
-			updateKnifePos(me);
-
-			// Call splitNotes for the note
-			m_pattern->splitNotes(n, TimePos(m_knifeTickPos));
-		}
-
-		update();
-		return;
-	}
-
-	if( m_editMode == ModeEditDetuning && me->button() == Qt::LeftButton && noteUnderMouse() )
-	{
-		static QPointer<AutomationPattern> detuningPattern = nullptr;
-		if (detuningPattern.data() != nullptr)
-		{
-			detuningPattern->disconnect(this);
-		}
-		Note* n = noteUnderMouse();
-		if (n->detuning() == nullptr)
-		{
-			n->createDetuning();
-		}
-		detuningPattern = n->detuning()->automationPattern();
-		connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
-		gui->automationEditor()->open(detuningPattern);
-		return;
-	}
-
 	// if holding control, go to selection mode unless shift is also pressed
 	if( me->modifiers() & Qt::ControlModifier && m_editMode != ModeSelect )
 	{
@@ -1633,6 +1594,31 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 		if (x > m_whiteKeyWidth)
 		{
+			if (!edit_note)
+			{
+				if (me->button() == Qt::LeftButton)
+				{
+					if (m_editMode == ModeEditKnife)
+					{
+						m_action = ActionKnife;
+						return;
+					}
+
+					else if( m_editMode == ModeEditDetuning)
+					{
+						m_action = ActionDetune;
+						return;
+					}
+				}
+				else if (me->button() == Qt::MidButton)
+				{
+					m_action = m_midButtonAction;
+					updateKnifePos(me);
+					update();
+					return;
+				}
+			}
+
 			// set, move or resize note
 
 			x -= m_whiteKeyWidth;
@@ -1859,7 +1845,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					m_editMode == ModeErase )
 			{
 				// erase single note
-				m_mouseDownRight = true;
+				m_action = ActionEraseNote;
 				if( it != notes.begin()-1 )
 				{
 					m_pattern->addJournalCheckPoint();
@@ -2182,20 +2168,52 @@ void PianoRoll::computeSelectedNotes(bool shift)
 
 void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 {
-	bool mustRepaint = false;
-
 	s_textFloat->hide();
 
 	// Quit temporary edit mode if we pressed and released the right mouse button
-	if (m_editMode != m_lastEditMode && me->button() == Qt::RightButton)
+	if (m_editMode != m_lastEditMode && me->button() & (Qt::RightButton|Qt::MidButton))
 	{
 		setEditMode(m_lastEditMode);
 	}
 
-	if( me->button() & Qt::LeftButton )
+	else if (m_action == ActionDetune)
 	{
-		mustRepaint = true;
+		Note* n = noteUnderMouse();
+		if (n)
+		{
+			static QPointer<AutomationPattern> detuningPattern = nullptr;
+			if (detuningPattern.data() != nullptr)
+			{
+				detuningPattern->disconnect(this);
+			}
+			if (n->detuning() == nullptr)
+			{
+				n->createDetuning();
+			}
+			detuningPattern = n->detuning()->automationPattern();
+			connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
+			gui->automationEditor()->open(detuningPattern);
+		}
+	}
 
+	else if (m_action == ActionKnife)
+	{
+		NoteVector n;
+		Note* note = noteUnderMouse();
+
+		if (note)
+		{
+			n.append(note);
+
+			updateKnifePos(me);
+
+			// Call splitNotes for the note
+			m_pattern->splitNotes(n, TimePos(m_knifeTickPos));
+		}
+	}
+
+	else if( me->button() & Qt::LeftButton )
+	{
 		if( m_action == ActionSelectNotes && m_editMode == ModeSelect )
 		{
 			// select the notes within the selection rectangle and
@@ -2221,12 +2239,6 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 				clearSelectedNotes();
 			}
 		}
-	}
-
-	if( me->button() & Qt::RightButton )
-	{
-		m_mouseDownRight = false;
-		mustRepaint = true;
 	}
 
 	if( hasValidPattern() )
@@ -2257,10 +2269,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		setCursor( Qt::ArrowCursor );
 	}
 
-	if( mustRepaint )
-	{
-		repaint();
-	}
+	update();
 }
 
 
@@ -2308,7 +2317,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 
 	// Update Knife position if we are on knife mode
-	if (m_editMode == ModeEditKnife)
+	if (m_editMode == ModeEditKnife || m_action == ActionKnife)
 	{
 		updateKnifePos(me);
 	}
@@ -2542,8 +2551,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				--m_selectedKeys;
 			}
 		}
-		else if( ( m_editMode == ModeDraw && me->buttons() & Qt::RightButton )
-				|| ( m_editMode == ModeErase && me->buttons() ) )
+		else if (m_action == ActionEraseNote)
 		{
 			// holding down right-click to delete notes or holding down
 			// any key if in erase mode
@@ -3462,7 +3470,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 		// -- Knife tool (draw cut line)
-		if (m_editMode == ModeEditKnife)
+		if (m_editMode == ModeEditKnife || m_action == ActionKnife)
 		{
 			auto xCoordOfTick = [this](int tick) {
 				return m_whiteKeyWidth + (
@@ -3602,13 +3610,21 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	auto getCursorPixmap = [&]() -> const QPixmap&
 	{
-		switch (m_editMode)
+		switch (m_action)
 		{
-			case ModeDraw: return drawPixmap;
-			case ModeErase: return erasePixmap;
-			case ModeSelect: return selectPixmap;
-			case ModeEditDetuning: return detunePixmap;
-			case ModeEditKnife: return knifePixmap;
+			case ActionEraseNote: return erasePixmap;
+			case ActionSelectNotes: return selectPixmap;
+			case ActionDetune: return detunePixmap;
+			case ActionKnife: return knifePixmap;
+			default:
+			switch (m_editMode)
+			{
+				case ModeDraw: return drawPixmap;
+				case ModeErase: return erasePixmap;
+				case ModeSelect: return selectPixmap;
+				case ModeEditDetuning: return detunePixmap;
+				case ModeEditKnife: return knifePixmap;
+			}
 		}
 	};
 
@@ -4078,11 +4094,20 @@ void PianoRoll::setEditMode(int mode)
 {
 	m_ctrlMode = m_editMode = (EditModes) mode;
 
-	// Remember edit modes that are non-temporary
-	if (m_editMode == ModeDraw || m_editMode == ModeErase || m_editMode == ModeSelect)
+	switch (m_editMode)
 	{
-		m_lastEditMode = m_editMode;
-		emit editModeChanged(mode);
+		case ModeDraw:
+		case ModeErase:
+		case ModeSelect:
+		{
+			// Remember edit modes that are non-temporary
+			m_lastEditMode = m_editMode;
+			emit editModeChanged(mode);
+			break;
+		}
+		// Remember action of last temporary edit mode
+		case ModeEditDetuning: m_midButtonAction = ActionDetune; break;
+		case ModeEditKnife: m_midButtonAction = ActionKnife; break;
 	}
 
 	update();
