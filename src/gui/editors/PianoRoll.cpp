@@ -1541,7 +1541,7 @@ int PianoRoll::keyAreaBottom() const
 
 void PianoRoll::mousePressEvent(QMouseEvent * me )
 {
-	m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
+	//m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
 
 	EditModes mode = m_editMode;
 	bool left = me->button() == Qt::LeftButton;
@@ -1551,6 +1551,11 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		mode = m_quickEditMode;
 		left = true;
 		update();
+	}
+
+	if (m_editMode == ModeDraw && me->modifiers() & Qt::ShiftModifier)
+	{
+		mode = ModeStamp;
 	}
 
 	if( ! hasValidPattern() )
@@ -1663,7 +1668,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				return;
 			}
 			// left button??
-			else if( left && (mode == ModeDraw || mode == ModeBulldozer))
+			else if( left && (mode == ModeDraw || mode == ModeBulldozer || mode == ModeStamp))
 			{
 				// whether this action creates new note(s) or not
 				bool is_new_note = false;
@@ -1678,42 +1683,75 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 					// then set new note
 
-					// clear selection and select this new note
-					clearSelectedNotes();
-
 					// +32 to quanitize the note correctly when placing notes with
 					// the mouse.  We do this here instead of in note.quantized
 					// because live notes should still be quantized at the half.
 					TimePos note_pos( pos_ticks - ( quantization() / 2 ) );
 					TimePos note_len( newNoteLen() );
 
-					Note new_note( note_len, note_pos, key_num );
-					new_note.setSelected( true );
-					new_note.setPanning( m_lastNotePanning );
-					new_note.setVolume( m_lastNoteVolume );
-					created_new_note = m_pattern->addNote( new_note );
-
-					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
-
-					if( ! chord.isEmpty() )
+					if (mode == ModeStamp && isSelection())
 					{
-						// if a chord is selected, create following notes in chord
-						// or arpeggio mode
-						const bool arpeggio = me->modifiers() & Qt::ShiftModifier;
-						for( int i = 1; i < chord.size(); i++ )
+						auto selection = getSelectedNotes();
+						TimePos startOfSelection = selection.first()->pos();
+						int bottomLeftKey = selection.first()->key();
+						for (Note* note: selection)
 						{
-							if( arpeggio )
+							if (note->pos() > startOfSelection) { break; }
+							bottomLeftKey = std::min(note->key(), bottomLeftKey);
+						}
+						clearSelectedNotes();
+						for (Note* note: selection)
+						{
+							Note noteCopy = *note;
+							noteCopy.setPos(note->pos() - startOfSelection + note_pos);
+							noteCopy.setKey(note->key() - bottomLeftKey + key_num);
+							noteCopy.setSelected(true);
+
+							// need it for test play to work properly
+							if (!created_new_note && note->key() == bottomLeftKey)
 							{
-								note_pos += note_len;
+								created_new_note = m_pattern->addNote(noteCopy, false);
 							}
-							Note new_note( note_len, note_pos, key_num + chord[i] );
-							new_note.setSelected( true );
-							new_note.setPanning( m_lastNotePanning );
-							new_note.setVolume( m_lastNoteVolume );
-							m_pattern->addNote( new_note );
+							else
+							{
+								m_pattern->addNote(noteCopy, false);
+							}
 						}
 					}
+					else
+					{
+						// clear selection and select this new note
+						clearSelectedNotes();
+
+						Note new_note( note_len, note_pos, key_num );
+						new_note.setSelected( true );
+						new_note.setPanning( m_lastNotePanning );
+						new_note.setVolume( m_lastNoteVolume );
+						created_new_note = m_pattern->addNote( new_note );
+
+						const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
+							.getChordByName( m_chordModel.currentText() );
+
+						if( ! chord.isEmpty() )
+						{
+							// if a chord is selected, create following notes in chord
+							// or arpeggio mode
+							const bool arpeggio = me->modifiers() & Qt::ShiftModifier;
+							for( int i = 1; i < chord.size(); i++ )
+							{
+								if( arpeggio )
+								{
+									note_pos += note_len;
+								}
+								Note new_note( note_len, note_pos, key_num + chord[i] );
+								new_note.setSelected( true );
+								new_note.setPanning( m_lastNotePanning );
+								new_note.setVolume( m_lastNoteVolume );
+								m_pattern->addNote( new_note );
+							}
+						}
+					}
+
 
 					// reset it so that it can be used for
 					// ops (move, resize) after this
@@ -1846,7 +1884,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					setCursor( Qt::SizeAllCursor );
 
 					// if they're holding shift, copy all selected notes
-					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
+					if( ! is_new_note && mode == ModeStamp )
 					{
 						for (Note *note: selectedNotes)
 						{
@@ -2383,7 +2421,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			// handle moving notes and resizing them
 			bool replay_note = key_num != m_lastKey && isMoving;
 
-			if( replay_note || ( isMoving && ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
+			if( replay_note )
 			{
 				pauseTestNotes();
 			}
@@ -2396,7 +2434,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				me->modifiers() & Qt::ControlModifier
 			);
 
-			if( replay_note && isMoving && ! ( ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
+			if( replay_note )
 			{
 				pauseTestNotes( false );
 			}
@@ -2508,7 +2546,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			m_pattern->dataChanged();
 		}
 
-		else if( me->buttons() == Qt::NoButton && (m_editMode == ModeDraw || m_editMode == ModeBulldozer) )
+		else if( me->buttons() == Qt::NoButton && (m_editMode == ModeDraw || m_editMode == ModeBulldozer || m_editMode == ModeStamp) )
 		{
 			// set move- or resize-cursor
 
@@ -2828,7 +2866,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 		{
 			// Quick resize is only enabled on Nudge mode, since resizing the note
 			// while in Snap mode breaks the calculation of the note offset
-			if (shift && ! m_startedWithShift && m_gridMode == gridNudge)
+			/*if (shift && ! m_startedWithShift && m_gridMode == gridNudge)
 			{
 				// quick resize, toggled by holding shift after starting a note move, but not before
 				int ticks_new = note->oldLength().getTicks() + noteOffset;
@@ -2839,7 +2877,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 				note->setLength( TimePos( ticks_new ) );
 				m_lenOfNewNotes = note->length();
 			}
-			else
+			else*/
 			{
 				// moving note
 
@@ -3667,6 +3705,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	static const QPixmap detunePixmap = embed::getIconPixmap("automation");
 	static const QPixmap knifePixmap = embed::getIconPixmap("edit_knife");
 	static const QPixmap bulldozerPixmap = embed::getIconPixmap("edit_bulldozer");
+	static const QPixmap stampPixmap = embed::getIconPixmap("edit_stamp");
 
 	auto getCursorPixmap = [&]() -> const QPixmap&
 	{
@@ -3687,6 +3726,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				case ModeEditDetuning: return detunePixmap;
 				case ModeEditKnife: return knifePixmap;
 				case ModeBulldozer: return bulldozerPixmap;
+				case ModeStamp: return stampPixmap;
 			}
 		}
 	};
@@ -4758,6 +4798,7 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* pitchBendAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Pitch bend"));
 	QAction* knifeAction =  editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife"));
 	QAction* bulldozerAction =  editModeGroup->addAction(embed::getIconPixmap("edit_bulldozer"), tr("Bulldozer"));
+	QAction* stampAction =  editModeGroup->addAction(embed::getIconPixmap("edit_stamp"), tr("Stamp"));
 
 	drawAction->setChecked( true );
 
@@ -4776,7 +4817,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// Add temporary edit modes to a combo button
 	ComboButton* editModeButton = new ComboButton(m_toolBar, true);
-	editModeButton->addActions({pitchBendAction, knifeAction, bulldozerAction});
+	editModeButton->addActions({pitchBendAction, knifeAction, bulldozerAction, stampAction});
 	editModeToolBar->addWidget(editModeButton);
 
 	// Note actions (instatly applied)

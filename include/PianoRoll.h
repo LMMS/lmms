@@ -100,7 +100,8 @@ public:
 		ModeSelect,
 		ModeEditDetuning,
 		ModeEditKnife,
-		ModeBulldozer
+		ModeBulldozer,
+		ModeStamp
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -431,7 +432,7 @@ private:
 	void clearSelectedNotes();
 
 	// did we start a mouseclick with shift pressed
-	bool m_startedWithShift;
+	//bool m_startedWithShift;
 
 	// Variable that holds the position in ticks for the knife action
 	int m_knifeTickPos;
