@@ -99,7 +99,8 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
-		ModeEditKnife
+		ModeEditKnife,
+		ModeBulldozer
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -241,6 +242,8 @@ private:
 		ActionNone,
 		ActionMoveNote,
 		ActionResizeNote,
+		ActionBulldozerMove,
+		ActionBulldozerResize,
 		ActionEraseNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
@@ -409,10 +412,10 @@ private:
 	int m_startKey; // first key when drawing
 	int m_lastKey;
 
-	EditModes m_editMode;
-	EditModes m_ctrlMode; // mode they were in before they hit ctrl
-	EditModes m_lastEditMode; // last non-temporary edit mode
-	Actions m_midButtonAction = ActionDetune; // action that will be set by middle mouse button
+	EditModes m_editMode = ModeDraw;
+	EditModes m_ctrlMode = m_editMode; // mode they were in before they hit ctrl
+	EditModes m_fixedEditMode = m_editMode; // edit mode to switch to when esc is pressed
+	EditModes m_quickEditMode = ModeEditDetuning; // edit mode activated by middle mouse button
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
