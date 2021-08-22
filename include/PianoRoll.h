@@ -432,6 +432,8 @@ private:
 
 	// Variable that holds the position in ticks for the knife action
 	int m_knifeTickPos;
+	// Length of knife chop
+	int m_knifeChopTicks;
 	void updateKnifePos(QMouseEvent* me);
 
 	friend class PianoRollWindow;

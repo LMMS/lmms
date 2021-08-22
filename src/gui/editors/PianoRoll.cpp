@@ -1424,12 +1424,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		}
 
 		case Qt::Key_Control:
-			// Ctrl will not enter selection mode if we are
-			// in Knife mode, but unquantize it
-			if (m_editMode == ModeEditKnife)
-			{
-				break;
-			}
 			// Enter selection mode if:
 			// -> this window is active
 			// -> shift is not pressed
@@ -1468,10 +1462,6 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 	switch( ke->key() )
 	{
 		case Qt::Key_Control:
-			if (m_editMode == ModeEditKnife)
-			{
-				break;
-			}
 			computeSelectedNotes( ke->modifiers() & Qt::ShiftModifier);
 			m_editMode = m_ctrlMode;
 			update();
@@ -2203,12 +2193,20 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 		if (note)
 		{
-			n.append(note);
+			if (!note->selected())
+			{
+				clearSelectedNotes();
+				note->setSelected(true);
+			}
 
 			updateKnifePos(me);
 
-			// Call splitNotes for the note
-			m_pattern->splitNotes(n, TimePos(m_knifeTickPos));
+			int step = m_knifeChopTicks > 0 ? m_knifeChopTicks : m_pattern->length().getTicks();
+			for (int tick = m_knifeTickPos; tick < m_pattern->length(); tick += step)
+			{
+				// Call splitNotes for the note
+				m_pattern->splitNotes(getSelectedNotes(), TimePos(tick));
+			}
 		}
 	}
 
@@ -2705,13 +2703,23 @@ void PianoRoll::updateKnifePos(QMouseEvent* me)
 	int mouseViewportPos = me->x() - m_whiteKeyWidth;
 	int mouseTickPos = mouseViewportPos / (m_ppb / TimePos::ticksPerBar()) + m_currentPosition;
 
-	// If ctrl is not pressed, quantize the position
-	if (!(me->modifiers() & Qt::ControlModifier))
+	// If alt is not pressed, quantize the position
+	if (!(me->modifiers() & Qt::AltModifier))
 	{
 		mouseTickPos = floor(mouseTickPos / quantization()) * quantization();
 	}
 
 	m_knifeTickPos = mouseTickPos;
+	m_knifeChopTicks = 0;
+
+	if (me->modifiers() & Qt::ShiftModifier)
+	{
+		Note* note = noteUnderMouse();
+		if (note)
+		{
+			m_knifeChopTicks = mouseTickPos - note->pos();
+		}
+	}
 }
 
 
@@ -3476,21 +3484,39 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				return m_whiteKeyWidth + (
 					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
 			};
+
 			Note* n = noteUnderMouse();
 			if (n)
 			{
 				const int key = n->key() - m_startKey + 1;
+
 				int y = y_base - key * m_keyLineHeight;
+				int y2 = y + m_keyLineHeight;
+				int maxStep = n->endPos();
+
+				if (n->selected())
+				{
+					y = keyAreaTop();
+					y2 = keyAreaBottom() - 1;
+					maxStep = m_pattern->length().getTicks();
+				}
 
 				int x = xCoordOfTick(m_knifeTickPos);
 
 				if (x > xCoordOfTick(n->pos()) &&
 					x < xCoordOfTick(n->pos() + n->length()))
 				{
-					p.setPen(QPen(m_knifeCutLineColor, 1));
-					p.drawLine(x, y, x, y + m_keyLineHeight);
-
-					setCursor(Qt::BlankCursor);
+					for (int tick = m_knifeTickPos; tick < maxStep; tick += m_knifeChopTicks)
+					{
+						x = xCoordOfTick(tick);
+						// only draw until right side of screen
+						if (x >= noteEditRight()) { break; }
+						p.setPen(QPen(m_knifeCutLineColor, 1));
+						p.drawLine(x, y, x, y2);
+						// only one iteration if not chop-mode
+						if (m_knifeChopTicks <= 0) { break; }
+					}
+					//setCursor(Qt::BlankCursor);
 				}
 				else
 				{
