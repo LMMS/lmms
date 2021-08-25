@@ -334,7 +334,6 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 	const QString fullName = withResources
 		? nameWithExtension(bundleDir + "/" + fInfo.fileName())
 		: nameWithExtension(filename);
-	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
 
 	using gui::SongEditor;
@@ -380,7 +379,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		}
 	}
 
-	QSaveFile outfile (fullNameTemp);
+	QSaveFile outfile (fullName);
 
 	if (!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
@@ -419,28 +418,16 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		return false;
 	}
 
-	// make sure the file has been written correctly
-	if( QFileInfo( outfile.fileName() ).size() > 0 )
-	{
-		if( ConfigManager::inst()->value( "app", "disablebackup" ).toInt() )
-		{
-			// remove current file
-			QFile::remove( fullName );
-		}
-		else
-		{
-			// remove old backup file
-			QFile::remove( fullNameBak );
-			// move current file to backup file
-			QFile::rename( fullName, fullNameBak );
-		}
-		// move temporary file to current file
-		QFile::rename( fullNameTemp, fullName );
 
-		return true;
+	// remove old backup file
+	QFile::remove(fullNameBak);
+	if(!ConfigManager::inst()->value( "app", "disablebackup" ).toInt())
+	{
+		// move current file to backup file
+		QFile::copy(fullName, fullNameBak);
 	}
 
-	return false;
+	return true;
 }
 
 
