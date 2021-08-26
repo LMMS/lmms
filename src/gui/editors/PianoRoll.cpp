@@ -2951,9 +2951,6 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 	off_ticks -= m_mouseDownTick - m_currentPosition;
 	off_key -= m_mouseDownKey - m_startKey;
 
-	// get note-vector of current pattern
-	const NoteVector & notes = m_pattern->notes();
-
 	if (m_action == ActionMoveNote || m_action == ActionBulldozerMove)
 	{
 		// Calculate the offset for either Nudge or Snap modes
