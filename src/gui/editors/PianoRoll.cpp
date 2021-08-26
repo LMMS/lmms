@@ -1369,9 +1369,9 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 
 		case Qt::Key_Escape:
 			// ESC cancels temporary edit modes
-			if (m_editMode != m_fixedEditMode)
+			if (m_editMode != ModeDraw)
 			{
-				setEditMode(m_fixedEditMode);
+				setEditMode(ModeDraw);
 			}
 			else
 			{
@@ -1541,35 +1541,41 @@ int PianoRoll::keyAreaBottom() const
 
 void PianoRoll::mousePressEvent(QMouseEvent * me )
 {
+	if (!hasValidPattern()) { return; }
+
 	//m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
 
 	EditModes mode = m_editMode;
 	bool left = me->button() == Qt::LeftButton;
 
-	if (me->button() == Qt::MidButton)
+	// if holding control, go to selection mode unless shift is also pressed
+	if(left && me->modifiers() & Qt::ControlModifier && mode != ModeSelect )
+	{
+		m_editMode = mode = ModeSelect;
+		setCursor( Qt::ArrowCursor );
+		update();
+	}
+
+	else if (left && mode == ModeDraw && me->modifiers() & Qt::ShiftModifier)
+	{
+		mode = ModeStamp;
+	}
+
+	else if (mode == ModeDraw && me->button() == Qt::RightButton)
+	{
+		mode = ModeErase;
+		left = true;
+		update();
+	}
+
+	else if (me->button() == Qt::MidButton)
 	{
 		mode = m_quickEditMode;
 		left = true;
 		update();
 	}
 
-	if (m_editMode == ModeDraw && me->modifiers() & Qt::ShiftModifier)
-	{
-		mode = ModeStamp;
-	}
 
-	if( ! hasValidPattern() )
-	{
-		return;
-	}
-
-	// if holding control, go to selection mode unless shift is also pressed
-	if( me->modifiers() & Qt::ControlModifier && mode != ModeSelect )
-	{
-		m_editMode = mode = ModeSelect;
-		setCursor( Qt::ArrowCursor );
-		update();
-	}
 
 	// keep track of the point where the user clicked down
 	if( left )
@@ -1610,6 +1616,51 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					{
 						m_action = ActionDetune;
 						return;
+					}
+					else if (mode == ModeStrum)
+					{
+						m_currentNote = noteUnderMouse();
+						if (!m_currentNote) { return; }
+
+						m_pattern->addJournalCheckPoint();
+
+						if (!m_currentNote->selected())
+						{
+							clearSelectedNotes();
+						}
+
+						auto selection = getSelectedNotes();
+
+						// Select all note on same tick
+						if (selection.empty())
+						{
+							for (Note* note: m_pattern->notes())
+							{
+								if (note->pos() == m_currentNote->pos())
+								{
+									note->setSelected(true);
+									selection.push_back(note);
+								}
+								else if (note->pos() > m_currentNote->pos())
+								{
+									break;
+								}
+							}
+						}
+
+						// As long as all notes have same position
+						m_action = ActionStrum;
+
+						int firstPos = selection.first()->pos();
+						for (Note* n: selection)
+						{
+							n->setOldPos(n->pos());
+							if (n->pos() != firstPos)
+							{
+								// If notes are spread, resize
+								m_action = ActionStrumResize;
+							}
+						}
 					}
 				}
 			}
@@ -1678,6 +1729,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				// there's no note??
 				if( it == notes.begin()-1 )
 				{
+					if (mode == ModeBulldozer) { return; }
+
 					is_new_note = true;
 					m_pattern->addJournalCheckPoint();
 
@@ -1693,32 +1746,38 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					{
 						auto selection = getSelectedNotes();
 						TimePos startOfSelection = selection.first()->pos();
+
 						int bottomLeftKey = selection.first()->key();
 						for (Note* note: selection)
 						{
 							if (note->pos() > startOfSelection) { break; }
 							bottomLeftKey = std::min(note->key(), bottomLeftKey);
 						}
+
 						clearSelectedNotes();
+
+						int firstNotePos = Note::quantized(note_pos, quantization());
+						bool quantizeOnAdd = !(me->modifiers() & Qt::AltModifier);
+
 						for (Note* note: selection)
 						{
 							Note noteCopy = *note;
-							noteCopy.setPos(note->pos() - startOfSelection + note_pos);
+							noteCopy.setPos(note->pos() - startOfSelection + firstNotePos);
 							noteCopy.setKey(note->key() - bottomLeftKey + key_num);
 							noteCopy.setSelected(true);
 
-							// need it for test play to work properly
 							if (!created_new_note && note->key() == bottomLeftKey)
 							{
-								created_new_note = m_pattern->addNote(noteCopy, false);
+								// need it for test play to work properly
+								created_new_note = m_pattern->addNote(noteCopy, quantizeOnAdd);
 							}
 							else
 							{
-								m_pattern->addNote(noteCopy, false);
+								m_pattern->addNote(noteCopy, quantizeOnAdd);
 							}
 						}
 					}
-					else
+					else if (mode == ModeStamp || mode == ModeDraw)
 					{
 						// clear selection and select this new note
 						clearSelectedNotes();
@@ -1736,13 +1795,13 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 						{
 							// if a chord is selected, create following notes in chord
 							// or arpeggio mode
-							const bool arpeggio = me->modifiers() & Qt::ShiftModifier;
+							//const bool arpeggio = me->modifiers() & Qt::ShiftModifier;
 							for( int i = 1; i < chord.size(); i++ )
 							{
-								if( arpeggio )
+								/*if( arpeggio )
 								{
 									note_pos += note_len;
-								}
+								}*/
 								Note new_note( note_len, note_pos, key_num + chord[i] );
 								new_note.setSelected( true );
 								new_note.setPanning( m_lastNotePanning );
@@ -1783,26 +1842,30 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				}
 
 				auto selectedNotes = getSelectedNotes();
-
 				m_moveBoundaryLeft = selectedNotes.first()->pos().getTicks();
 				m_moveBoundaryRight = selectedNotes.first()->endPos();
 				m_moveBoundaryBottom = selectedNotes.first()->key();
 				m_moveBoundaryTop = m_moveBoundaryBottom;
 
 				//Figure out the bounding box of all the selected notes
-				for (Note *note: selectedNotes)
+				// or ALL in bulldozer mode, since it affects posterior notes
+				for (Note *note: mode == ModeBulldozer ? m_pattern->notes() : selectedNotes)
 				{
 					// remember note starting positions
+
 					note->setOldKey( note->key() );
 					note->setOldPos( note->pos() );
 					note->setOldLength( note->length() );
+					note->setOldSelected(note->selected());
 
-					m_moveBoundaryLeft = qMin(note->pos().getTicks(), (tick_t) m_moveBoundaryLeft);
-					m_moveBoundaryRight = qMax((int) note->endPos(), m_moveBoundaryRight);
-					m_moveBoundaryBottom = qMin(note->key(), m_moveBoundaryBottom);
-					m_moveBoundaryTop = qMax(note->key(), m_moveBoundaryTop);
+					if (note->selected())
+					{
+						m_moveBoundaryLeft = qMin(note->pos().getTicks(), (tick_t) m_moveBoundaryLeft);
+						m_moveBoundaryRight = qMax((int) note->endPos(), m_moveBoundaryRight);
+						m_moveBoundaryBottom = qMin(note->key(), m_moveBoundaryBottom);
+						m_moveBoundaryTop = qMax(note->key(), m_moveBoundaryTop);
+					}
 				}
-
 
 				// clicked at the "tail" of the note?
 				if( pos_ticks * m_ppb / TimePos::ticksPerBar() >
@@ -1816,13 +1879,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					if (mode == ModeBulldozer)
 					{
 						m_action = ActionBulldozerResize;
-						for (Note* note: m_pattern->notes())
-						{
-							// remember note starting positions of ALL notes
-							note->setOldKey( note->key() );
-							note->setOldPos( note->pos() );
-							note->setOldLength( note->length() );
-						}
 					}
 
 					//Calculate the minimum length we should allow when resizing
@@ -1852,18 +1908,19 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 						m_pattern->addJournalCheckPoint();
 					}
 
-					if (mode == ModeBulldozer && clickedOnUnselected)
+					if (mode == ModeBulldozer)
 					{
+						m_action = ActionBulldozerMove;
+
+						int bulldozerLine = clickedOnUnselected
+								? m_currentNote->pos()
+								: selectedNotes.lastEndPos();
+
 						for (Note* note: m_pattern->notes())
 						{
-							if (note->pos() >= m_currentNote->pos())
+							if (note->pos() >= bulldozerLine)
 							{
 								note->setSelected(true);
-
-								// remember note starting positions
-								note->setOldKey( note->key() );
-								note->setOldPos( note->pos() );
-								note->setOldLength( note->length() );
 
 								m_moveBoundaryLeft = qMin(note->pos().getTicks(), (tick_t) m_moveBoundaryLeft);
 								m_moveBoundaryRight = qMax((int) note->endPos(), m_moveBoundaryRight);
@@ -1871,7 +1928,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 								m_moveBoundaryTop = qMax(note->key(), m_moveBoundaryTop);
 							}
 						}
-						m_action = ActionBulldozerMove;
+
 						selectedNotes = getSelectedNotes();
 					}
 					else
@@ -1884,7 +1941,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					setCursor( Qt::SizeAllCursor );
 
 					// if they're holding shift, copy all selected notes
-					if( ! is_new_note && mode == ModeStamp )
+					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
 					{
 						for (Note *note: selectedNotes)
 						{
@@ -1907,9 +1964,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 				Engine::getSong()->setModified();
 			}
-			else if( ( me->buttons() == Qt::RightButton &&
-							mode == ModeDraw ) ||
-					mode == ModeErase )
+			else if( left && mode == ModeErase )
 			{
 				// erase single note
 				m_action = ActionEraseNote;
@@ -2237,9 +2292,9 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 	s_textFloat->hide();
 
 	// Quit temporary edit mode if we pressed and released the right mouse button
-	if (m_editMode != m_fixedEditMode && me->button() & (Qt::RightButton|Qt::MidButton))
+	if (m_editMode != ModeDraw && me->button() & Qt::RightButton)
 	{
-		setEditMode(m_fixedEditMode);
+		setEditMode(ModeDraw);
 	}
 
 	else if (m_action == ActionDetune)
@@ -2293,7 +2348,18 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		computeSelectedNotes(
 				me->modifiers() & Qt::ShiftModifier );
 	}
-	else if( m_action == ActionMoveNote || m_action == ActionBulldozerMove)
+
+	else if (m_action == ActionBulldozerMove)
+	{
+		// restore selection to prior state
+		for (Note* n: m_pattern->notes())
+		{
+			n->setSelected(n->oldSelected());
+		}
+	}
+
+
+	if( m_action == ActionMoveNote || m_action == ActionBulldozerMove || m_action == ActionStrum)
 	{
 		// we moved one or more notes so they have to be
 		// moved properly according to new starting-
@@ -2302,8 +2368,10 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	}
 
-	if( ((m_action == ActionMoveNote || m_action == ActionResizeNote || m_action == ActionBulldozerResize)
-		 && selectionCount() == 1) || m_action == ActionBulldozerMove)
+	if( (m_action == ActionMoveNote || m_action == ActionResizeNote
+		  || m_action == ActionBulldozerResize || m_action == ActionStrum
+		  || m_action == ActionBulldozerMove)
+		 && selectionCount() == 1)
 	{
 		// if we only moved one note, deselect it so we can
 		// edit the notes in the note edit area
@@ -2414,7 +2482,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		x -= m_whiteKeyWidth;
 
 		bool isMoving = m_action == ActionMoveNote || m_action == ActionBulldozerMove;
-		bool isResizing = m_action == ActionResizeNote || m_action == ActionBulldozerResize;
+		bool isResizing = m_action == ActionResizeNote || m_action == ActionBulldozerResize || m_action == ActionStrumResize;
 
 		if( isMoving || isResizing )
 		{
@@ -2546,7 +2614,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			m_pattern->dataChanged();
 		}
 
-		else if( me->buttons() == Qt::NoButton && (m_editMode == ModeDraw || m_editMode == ModeBulldozer || m_editMode == ModeStamp) )
+		else if( me->buttons() == Qt::NoButton && (m_editMode == ModeDraw || m_editMode == ModeBulldozer
+												|| m_editMode == ModeStamp || m_editMode == ModeStrum) )
 		{
 			// set move- or resize-cursor
 
@@ -2588,8 +2657,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				// cursor at the "tail" of the note?
 				bool atTail = note->length() > 0 && x > noteRightX -
 							RESIZE_AREA_WIDTH;
-				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
-													Qt::SizeAllCursor;
+				Qt::CursorShape cursorShape = atTail || m_editMode == ModeStrum
+													? Qt::SizeHorCursor
+													: Qt::SizeAllCursor;
 				setCursor( cursorShape );
 			}
 			else
@@ -2671,6 +2741,78 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					++it;
 				}
 			}
+		}
+		else if (m_action == ActionStrum)
+		{
+			int ticksOffset = (me->x() - m_moveStartX) * TimePos::ticksPerBar() / m_ppb;
+			ticksOffset -= m_mouseDownTick - m_currentPosition;
+			//ticksOffset = std::max(0, ticksOffset);
+
+			// TODO grid snap
+
+			// Grid nudge: if they're not holding alt, quantize the offset
+			if (!(me->modifiers() & Qt::AltModifier))
+			{
+				ticksOffset = floor(ticksOffset / quantization()) * quantization();
+			}
+
+			// if mouse is above note, strum up
+			const bool strumFromBottom = me->y() < m_moveStartY;
+
+			auto selection = getSelectedNotes();
+
+			// count number of steps (unique keys) in chord and
+			// in what place the dragged note is
+			int stepOfDraggedNote = 0;
+
+			int previousKey = -1;
+			int stepsFromTop = -1;
+			for (Note* note: selection)
+			{
+				if (note->key() != previousKey)
+				{
+					previousKey = note->key();
+					stepsFromTop++;
+				}
+				if (m_currentNote->key() == note->key())
+				{
+					stepOfDraggedNote = stepsFromTop;
+				}
+			}
+
+			int bottomStep = stepsFromTop;
+
+			previousKey = -1;
+			stepsFromTop = -1;
+			for (Note* note: selection)
+			{
+				if (note->key() != previousKey)
+				{
+					previousKey = note->key();
+					stepsFromTop++;
+				}
+				if ((strumFromBottom || stepOfDraggedNote == 0) && stepOfDraggedNote != bottomStep)
+				{
+					note->setPos(note->oldPos() +
+						(ticksOffset * (bottomStep - stepsFromTop) / (bottomStep - stepOfDraggedNote)));
+				}
+				else if ((!strumFromBottom || stepOfDraggedNote == bottomStep) && stepOfDraggedNote != 0)
+				{
+					note->setPos(note->oldPos() + (ticksOffset * stepsFromTop / stepOfDraggedNote));
+				}
+				else
+				{
+						// dragging a single note
+						//note->setPos(note->oldPos() + ticksOffset);
+				}
+
+			}
+
+			m_pattern->updateLength();
+			m_pattern->dataChanged();
+			Engine::getSong()->setModified();
+
+
 		}
 		else if (me->buttons() == Qt::NoButton && m_editMode != ModeDraw && m_editMode != ModeEditKnife)
 		{
@@ -2890,7 +3032,7 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			}
 		}
 	}
-	else if (m_action == ActionResizeNote || m_action == ActionBulldozerResize)
+	else if (m_action == ActionResizeNote || m_action == ActionBulldozerResize || m_action == ActionStrumResize)
 	{
 		// When resizing notes:
 		// If shift is not pressed, resize the selected notes but do not rearrange them
@@ -2906,50 +3048,84 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 
 		auto selectedNotes = getSelectedNotes();
 
-		if ((m_action == ActionResizeNote && shift) || m_action == ActionBulldozerResize)
+		if ((m_action == ActionResizeNote && shift) || m_action == ActionBulldozerResize || m_action == ActionStrumResize)
 		{
 			// Algorithm:
 			// Relative to the starting point of the left-most selected note,
 			//   all selected note start-points and *endpoints* (not length) should be scaled by a calculated factor.
 			// This factor is such that the endpoint of the note whose handle is being dragged should lie under the cursor.
 			// first, determine the start-point of the left-most selected note:
-			int stretchStartTick = -1;
-			for (const Note *note : selectedNotes)
-			{
-				if (stretchStartTick < 0 || note->oldPos().getTicks() < stretchStartTick)
-				{
-					stretchStartTick = note->oldPos().getTicks();
-				}
-			}
-			// determine the ending tick of the right-most selected note
-			const Note *posteriorNote = nullptr;
-			for (const Note *note : selectedNotes)
-			{
-				if (posteriorNote == nullptr ||
-					note->oldPos().getTicks() + note->oldLength().getTicks() >
-					posteriorNote->oldPos().getTicks() + posteriorNote->oldLength().getTicks())
-				{
-					posteriorNote = note;
-				}
-			}
-			int posteriorEndTick = posteriorNote->pos().getTicks() + posteriorNote->length().getTicks();
+			int stretchStartTick = selectedNotes.first()->oldPos();
+
 			// end-point of the note whose handle is being dragged:
 			int stretchEndTick = m_currentNote->oldPos().getTicks() + m_currentNote->oldLength().getTicks();
+
+			// strum drags the start of note
+			if (m_action == ActionStrumResize)
+			{
+				stretchEndTick = m_currentNote->oldPos();
+				if (stretchStartTick == stretchEndTick)
+				{
+					return;
+				}
+			}
+
 			// Calculate factor by which to scale the start-point and end-point of all selected notes
 			float scaleFactor = (float)(stretchEndTick - stretchStartTick + off_ticks) / qMax(1, stretchEndTick - stretchStartTick);
-			scaleFactor = qMax(0.0f, scaleFactor);
+
+			if (m_action != ActionStrumResize)
+			{
+				scaleFactor = qMax(0.0f, scaleFactor);
+			}
+
+			// Get last tick of selection
+			TimePos posteriorTick = selectedNotes.first()->oldPos() + selectedNotes.first()->oldLength();
+			for (Note* note: selectedNotes)
+			{
+				posteriorTick = std::max(posteriorTick.getTicks(), note->oldPos() + note->oldLength());
+			}
+
+			TimePos posteriorDelta = stretchStartTick + scaleFactor * (posteriorTick - stretchStartTick) - posteriorTick;
 
 			// process all selected notes & determine how much the endpoint of the right-most note was shifted
-			int posteriorDeltaThisFrame = 0;
-			for (Note *note : selectedNotes)
+			for (Note *note : m_action == ActionBulldozerResize ? m_pattern->notes() : selectedNotes)
 			{
-				// scale relative start and end positions by scaleFactor
-				int newStart = stretchStartTick + scaleFactor *
-					(note->oldPos().getTicks() - stretchStartTick);
-				int newEnd = stretchStartTick + scaleFactor *
-					(note->oldPos().getTicks()+note->oldLength().getTicks() - stretchStartTick);
+				int newStart = note->oldPos();
+				int newEnd = note->oldPos() + note->oldLength();
+
+				// Note ends before selection, do nothing
+				if (newEnd < stretchStartTick)
+				{
+					continue;
+				}
+
+				// Note starts after selection, move whole note 1:1
+				if (posteriorTick <= note->oldPos())
+				{
+					note->setPos(note->oldPos() + posteriorDelta);
+					continue;
+				}
+
+				// Note starts inside selection, scale start pos
+				if (stretchStartTick <= note->oldPos() && (shift || note->selected()))
+				{
+					newStart = stretchStartTick + scaleFactor * (newStart - stretchStartTick);
+				}
+
+				// Note ends inside selection, scale end pos
+				if (newEnd <= posteriorTick && (shift || note->selected() || newEnd == posteriorTick))
+				{
+					newEnd = stretchStartTick + scaleFactor * (newEnd - stretchStartTick);
+				}
+				// Note ends after selection, move end pos 1:1
+				else if (shift)
+				{
+					newEnd = newEnd + posteriorDelta;
+				}
+
 				// if  not holding alt, quantize the offsets
-				if (!alt)
+				// Strum and Bulldozer does not quantize the offsets of notes in between... TODO?
+				if (!alt && m_action == ActionResizeNote)
 				{
 					// quantize start time
 					int oldStart = note->oldPos().getTicks();
@@ -2962,28 +3138,19 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 					endDiff = floor(endDiff / quantization()) * quantization();
 					newEnd = oldEnd + endDiff;
 				}
-				int newLength = qMax(1, newEnd-newStart);
-				if (note == posteriorNote)
-				{
-					posteriorDeltaThisFrame = (newStart+newLength) -
-						(note->pos().getTicks() + note->length().getTicks());
-				}
-				note->setLength( TimePos(newLength) );
-				note->setPos( TimePos(newStart) );
 
-				m_lenOfNewNotes = note->length();
-			}
-			if (m_action == ActionBulldozerResize)
-			{
-				TimePos posteriorDelta = posteriorNote->endPos() - (posteriorNote->oldPos() + posteriorNote->oldLength());
-				// reposition posterior notes
-				for (Note *note : notes)
+				// if we scaled bulldozer line left of note, it should remain untouched
+				if (newEnd-newStart < 1 && !note->selected() && m_action == ActionBulldozerResize && !shift)
 				{
-					if (!note->selected() && note->oldPos() >= stretchStartTick)
-					{
-						note->setPos(note->oldPos() + posteriorDelta);
-					}
+					note->setLength(note->oldLength());
 				}
+				// Strum does not change note length
+				else if (m_action != ActionStrumResize)
+				{
+					note->setLength(newEnd-newStart);
+				}
+
+				note->setPos( TimePos(newStart) );
 			}
 		}
 		else
@@ -3005,12 +3172,11 @@ void PianoRoll::dragNotes(int x, int y, bool alt, bool shift, bool ctrl)
 			{
 				int newLength = qMax(minLength, note->oldLength() + off_ticks);
 				note->setLength(TimePos(newLength));
-
-				m_lenOfNewNotes = note->length();
 			}
 		}
 	}
 
+	m_lenOfNewNotes = m_currentNote->length();
 	m_pattern->updateLength();
 	m_pattern->dataChanged();
 	Engine::getSong()->setModified();
@@ -3569,7 +3735,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				{
 					y = keyAreaTop();
 					y2 = keyAreaBottom() - 1;
-					maxStep = m_pattern->length().getTicks();
+					maxStep = getSelectedNotes().lastEndPos();
 				}
 
 				int x = xCoordOfTick(m_knifeTickPos);
@@ -3600,6 +3766,44 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 		// -- End knife tool
+
+		if (m_action == ActionBulldozerResize  || m_action == ActionBulldozerMove)
+		{
+			auto xCoordOfTick = [this](int tick) {
+				return m_whiteKeyWidth + (
+					(tick - m_currentPosition) * m_ppb / TimePos::ticksPerBar());
+			};
+
+
+			int y = keyAreaTop();
+			int y2 = keyAreaBottom() - 1;
+
+			auto selectedNotes = getSelectedNotes();
+
+			// left line
+			if (QGuiApplication::keyboardModifiers() & Qt::ShiftModifier  || m_action == ActionBulldozerMove)
+			{
+				int x = xCoordOfTick(selectedNotes.first()->pos());
+				if (x < noteEditRight() && x >= noteEditLeft())
+				{
+					p.setPen(QPen(m_knifeCutLineColor, 1));
+					p.drawLine(x, y, x, y2);
+				}
+			}
+
+			// right line
+			if (m_action == ActionBulldozerResize)
+			{
+				int x = xCoordOfTick(selectedNotes.lastEndPos());
+				if (x < noteEditRight() && x>= noteEditLeft())
+				{
+					p.setPen(QPen(m_knifeCutLineColor, 1));
+					p.drawLine(x, y, x, y2);
+				}
+			}
+
+
+		}
 
 		//draw current step recording notes
 		for( const Note *note : m_stepRecorder.getCurStepNotes() )
@@ -3706,6 +3910,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	static const QPixmap knifePixmap = embed::getIconPixmap("edit_knife");
 	static const QPixmap bulldozerPixmap = embed::getIconPixmap("edit_bulldozer");
 	static const QPixmap stampPixmap = embed::getIconPixmap("edit_stamp");
+	static const QPixmap strumPixmap = embed::getIconPixmap("edit_strum");
 
 	auto getCursorPixmap = [&]() -> const QPixmap&
 	{
@@ -3717,16 +3922,20 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case ActionKnife: return knifePixmap;
 			case ActionBulldozerMove:
 			case ActionBulldozerResize: return bulldozerPixmap;
+			case ActionStrum:
+			case ActionStrumResize: return strumPixmap;
 			default:
 			switch (m_editMode)
 			{
-				case ModeDraw: return drawPixmap;
+				//case ModeDraw: return drawPixmap;
 				case ModeErase: return erasePixmap;
 				case ModeSelect: return selectPixmap;
 				case ModeEditDetuning: return detunePixmap;
 				case ModeEditKnife: return knifePixmap;
 				case ModeBulldozer: return bulldozerPixmap;
 				case ModeStamp: return stampPixmap;
+				case ModeStrum: return strumPixmap;
+				default: return drawPixmap;
 			}
 		}
 	};
@@ -4196,22 +4405,19 @@ void PianoRoll::verScrolled( int new_pos )
 void PianoRoll::setEditMode(int mode)
 {
 	m_ctrlMode = m_editMode = (EditModes) mode;
-
-	if (m_editMode == ModeDraw || m_editMode == ModeErase || m_editMode == ModeSelect)
-	{
-		// Remember non-temporary edit mode so we can switch back to it later
-		m_fixedEditMode = m_editMode;
-		// Update gui
-		emit editModeChanged(mode);
-	}
-	else
-	{
-		// Remember temporary edit mode and use it for mid click
-		m_quickEditMode = m_editMode;
-	}
-
+	emit editModeChanged(mode); // Update gui
 	update();
 }
+
+
+
+
+void PianoRoll::setQuickEditMode(int mode)
+{
+	m_quickEditMode = (EditModes) mode;
+}
+
+
 
 
 
@@ -4799,6 +5005,7 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* knifeAction =  editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife"));
 	QAction* bulldozerAction =  editModeGroup->addAction(embed::getIconPixmap("edit_bulldozer"), tr("Bulldozer"));
 	QAction* stampAction =  editModeGroup->addAction(embed::getIconPixmap("edit_stamp"), tr("Stamp"));
+	QAction* strumAction =  editModeGroup->addAction(embed::getIconPixmap("edit_strum"), tr("Strum"));
 
 	drawAction->setChecked( true );
 
@@ -4810,6 +5017,7 @@ PianoRollWindow::PianoRollWindow() :
 	bulldozerAction->setShortcut(Qt::SHIFT | Qt::Key_B);
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
+	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setQuickEditMode( int ) ) );
 	connect(m_editor, SIGNAL(editModeChanged(int)), editModeGroup, SLOT(setChecked(int)));
 
 	// Add first edit modes to toolbar
@@ -4817,7 +5025,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// Add temporary edit modes to a combo button
 	ComboButton* editModeButton = new ComboButton(m_toolBar, true);
-	editModeButton->addActions({pitchBendAction, knifeAction, bulldozerAction, stampAction});
+	editModeButton->addActions({pitchBendAction, knifeAction, bulldozerAction, stampAction, strumAction});
 	editModeToolBar->addWidget(editModeButton);
 
 	// Note actions (instatly applied)

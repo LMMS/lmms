@@ -232,3 +232,21 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
 		&& length().getTicks() != 0;
 }
+
+
+
+
+TimePos NoteVector::lastEndPos()
+{
+	tick_t last = 0;
+
+	for (Note* note: *this)
+	{
+		if (note->length() > 0)
+		{
+			last = std::max(last, note->endPos().getTicks());
+		}
+	}
+
+	return last;
+}

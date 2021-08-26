@@ -101,7 +101,8 @@ public:
 		ModeEditDetuning,
 		ModeEditKnife,
 		ModeBulldozer,
-		ModeStamp
+		ModeStamp,
+		ModeStrum
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -195,6 +196,7 @@ protected slots:
 	void verScrolled( int new_pos );
 
 	void setEditMode(int mode);
+	void setQuickEditMode(int mode);
 
 	void copySelectedNotes();
 	void cutSelectedNotes();
@@ -250,7 +252,9 @@ private:
 		ActionChangeNoteProperty,
 		ActionResizeNoteEditArea,
 		ActionDetune,
-		ActionKnife
+		ActionKnife,
+		ActionStrum,
+		ActionStrumResize
 	};
 
 	enum NoteEditMode
@@ -415,7 +419,6 @@ private:
 
 	EditModes m_editMode = ModeDraw;
 	EditModes m_ctrlMode = m_editMode; // mode they were in before they hit ctrl
-	EditModes m_fixedEditMode = m_editMode; // edit mode to switch to when esc is pressed
 	EditModes m_quickEditMode = ModeEditDetuning; // edit mode activated by middle mouse button
 
 	TimeLineWidget * m_timeLine;
