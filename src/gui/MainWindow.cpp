@@ -264,6 +264,7 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
+	m_metronomeSettingsMenu->close();
 	for( PluginView *view : m_tools )
 	{
 		delete view->model();
@@ -470,14 +471,6 @@ void MainWindow::finalize()
 							SLOT( onExportProject() ),
 								m_toolBar );
 
-	/*
-	m_metronomeToggle = new ToolButton(
-				embed::getIconPixmap( "metronome" ),
-				tr( "Metronome" ),
-				this, SLOT( onToggleMetronome() ),
-							m_toolBar );
-	m_metronomeToggle->setCheckable(true);
-    m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());*/
     m_metronomeSettingsMenu = new MetronomeSettingsMenu(3);
 	m_metronomeToggle = m_metronomeSettingsMenu->getMenuButton(m_toolBar);
     connect(m_metronomeSettingsMenu, &MetronomeSettingsMenu::optionChanged, this, &MainWindow::onMetronomeSettingsChanged);
@@ -1249,9 +1242,11 @@ void MainWindow::onToggleMetronome()
 	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
 }
 
-void MainWindow::onShowMetronomeSettings(){
-    m_metronomeSettingsMenu->move(m_metronomeSettingsMenu->parentWidget()->mapFromGlobal(QCursor::pos()) - QPoint(5,5)); // + offset, so cursor doesn't lay on the widget's edges
+void MainWindow::onShowMetronomeSettings()
+{
+	m_metronomeSettingsMenu->move(pos() + m_metronomeToggle->pos() - QPoint(5,5)); // menu can only be opened upon its menu icon
     m_metronomeSettingsMenu->show();
+	m_metronomeSettingsMenu->raise();
 }
 
 void MainWindow::onMetronomeSettingsChanged(std::pair<QString, QString> recentChange)
