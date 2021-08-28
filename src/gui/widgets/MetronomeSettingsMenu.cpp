@@ -36,6 +36,7 @@ MetronomeSettingsMenu::MetronomeSettingsMenu(short optionsPerLine, QWidget *pare
     m_groupNameFont.setWeight(QFont::ExtraBold);
     setWindowFlags(Qt::CustomizeWindowHint); // turns off all windows flags, hence no icons nor frame
     m_generalMenuLayout = new QVBoxLayout();
+    m_generalMenuLayout->addWidget(new QLabel("Metronome settings"));
     m_generalMenuLayout->addLayout(makeVolumeControlSection("Volume"));
     m_generalMenuLayout->addLayout(makeGeneralMenuSection("Rhythm", std::vector<QString>{"1/1", "1/2", "1/4", "1/8", "1/16"}));
     this->setLayout(m_generalMenuLayout);

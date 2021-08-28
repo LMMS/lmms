@@ -264,6 +264,7 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
+	m_metronomeSettingsMenu->close();
 	for( PluginView *view : m_tools )
 	{
 		delete view->model();
@@ -1250,8 +1251,10 @@ void MainWindow::onToggleMetronome()
 }
 
 void MainWindow::onShowMetronomeSettings(){
-    m_metronomeSettingsMenu->move(m_metronomeSettingsMenu->parentWidget()->mapFromGlobal(QCursor::pos()) - QPoint(5,5)); // + offset, so cursor doesn't lay on the widget's edges
+    
+	m_metronomeSettingsMenu->move(pos()+m_metronomeToggle->pos() - QPoint(5,5)); // menu can only be opened upon its menu icon
     m_metronomeSettingsMenu->show();
+	m_metronomeSettingsMenu->raise();
 }
 
 void MainWindow::onMetronomeSettingsChanged(std::pair<QString, QString> recentChange)
