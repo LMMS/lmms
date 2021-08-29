@@ -407,11 +407,17 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 
 	if (!outfile.commit())
 	{
+		if (gui)
+		{
+			QMessageBox::critical(NULL,
+				SongEditor::tr("Could not write file"),
+				SongEditor::tr("An unknown error has occured and the file "
+						"could not be saved."));
+		}
 
-		showError(SongEditor::tr("Could not write file"),
-			SongEditor::tr("An unknown error has occured and the file could not be saved."));
 		return false;
 	}
+
 
 	// remove old backup file
 	QFile::remove(fullNameBak);
