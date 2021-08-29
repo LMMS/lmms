@@ -413,20 +413,20 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		return false;
 	}
 
-	if( ConfigManager::inst()->value( "app", "disablebackup" ).toInt() )
+	if (ConfigManager::inst()->value("app", "disablebackup" ).toInt())
 	{
 		// remove current file
-		QFile::remove( fullName );
+		QFile::remove(fullName);
 	}
 	else
 	{
 		// remove old backup file
-		QFile::remove( fullNameBak );
+		QFile::remove(fullNameBak);
 		// move current file to backup file
-		QFile::rename( fullName, fullNameBak );
+		QFile::rename(fullName, fullNameBak);
 	}
 	// move temporary file to current file
-	QFile::rename( fullNameTemp, fullName );
+	QFile::rename(fullNameTemp, fullName);
 
 	return true;
 }
