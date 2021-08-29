@@ -419,28 +419,22 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		return false;
 	}
 
-	// make sure the file has been written correctly
-	if( QFileInfo( outfile.fileName() ).size() > 0 )
+	if( ConfigManager::inst()->value( "app", "disablebackup" ).toInt() )
 	{
-		if( ConfigManager::inst()->value( "app", "disablebackup" ).toInt() )
-		{
-			// remove current file
-			QFile::remove( fullName );
-		}
-		else
-		{
-			// remove old backup file
-			QFile::remove( fullNameBak );
-			// move current file to backup file
-			QFile::rename( fullName, fullNameBak );
-		}
-		// move temporary file to current file
-		QFile::rename( fullNameTemp, fullName );
-
-		return true;
+		// remove current file
+		QFile::remove( fullName );
 	}
+	else
+	{
+		// remove old backup file
+		QFile::remove( fullNameBak );
+		// move current file to backup file
+		QFile::rename( fullName, fullNameBak );
+	}
+	// move temporary file to current file
+	QFile::rename( fullNameTemp, fullName );
 
-	return false;
+	return true;
 }
 
 
