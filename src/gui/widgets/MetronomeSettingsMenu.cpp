@@ -30,7 +30,7 @@
 #include "ToolTip.h"
 
 MetronomeSettingsMenu::MetronomeSettingsMenu(short optionsPerLine, QWidget *parent)
-    :QWidget(parent), m_maxMenuRowElements(optionsPerLine)
+    :QMenu(parent), m_maxMenuRowElements(optionsPerLine)
 {
     m_maxMenuRowElements = 3;
     m_groupNameFont.setWeight(QFont::ExtraBold);
@@ -128,11 +128,11 @@ void MetronomeSettingsMenu::handleOptionUpdates()
         if ((*rhythm_option).second == option)
         {
             option_str = (*rhythm_option).first;
-            (*rhythm_option).second->setIcon(embed::getIconPixmap( "autoscroll_on" ));
+            (*rhythm_option).second->setStyleSheet("border: 2px solid green; border-radius: 6px; padding-right: 10px; padding-left: 10px;");//setIcon(embed::getIconPixmap( "autoscroll_on" ));
         }
         else // remove possible previouse user coice icon
         {
-            (*rhythm_option).second->setIcon(QIcon());
+            (*rhythm_option).second->setStyleSheet("border: 0px;");//setIcon(QIcon());
         }
     }
     hide();

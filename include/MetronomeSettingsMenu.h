@@ -1,7 +1,7 @@
 #ifndef METRONOMESETTINGSMENU_H
 #define METRONOMESETTINGSMENU_H
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
@@ -25,7 +25,7 @@ struct OptionElements{
  * The widget that is created here is opened via RMB on the metronome, it is intended to gather all
  * possible metronome features (e.g. volume control, speed, sound) 
  */
-class MetronomeSettingsMenu : public QWidget
+class MetronomeSettingsMenu : public QMenu //public QWidget
 {
     Q_OBJECT
 
