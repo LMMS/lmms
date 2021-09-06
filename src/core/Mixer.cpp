@@ -63,7 +63,6 @@
 
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
-
 static thread_local bool s_renderingThread;
 
 
@@ -85,8 +84,9 @@ Mixer::Mixer( bool renderOnly ) :
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
 	m_audioDevStartFailed( false ),
-	m_profiler(),
 	m_metronomeActive(false),
+	m_prevMetronomeStates({-1, 0, 0}),
+	m_profiler(),
 	m_clearSignal( false ),
 	m_changesSignal( false ),
 	m_changes( 0 ),
@@ -457,8 +457,6 @@ void Mixer::swapBuffers()
 
 void Mixer::handleMetronome()
 {
-	static tick_t lastMetroTicks = -1;
-
 	Song * song = Engine::getSong();
 	Song::PlayModes currentPlayMode = song->playMode();
 
@@ -479,24 +477,33 @@ void Mixer::handleMetronome()
 	}
 
 	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
-	tick_t ticksPerBar = TimePos::ticksPerBar();
-	int numerator = song->getTimeSigModel().getNumerator();
-
-	if (ticks == lastMetroTicks)
+	if (ticks == m_prevMetronomeStates.ticks)
 	{
 		return;
 	}
 
-	if (ticks % (ticksPerBar / 1) == 0)
+	/* Metronome sound generation - explanation:
+	 * The reason why this is not a permanently exact (e.g. modulo) operation, is that on high metronome frequency or 
+	 * suffering under system load, ".getTicks()" may or especially may not return a +1-increment and hence the modulo is
+	 * not guaranteed to react as expected, thus the sound gets skipped. The solution below plays the sound either on the 
+	 * exact tick-slot or at the very next possible point in time.
+	 */
+	int numerator = song->getTimeSigModel().getNumerator();
+	tick_t ticksPerBar = TimePos::ticksPerBar();
+	tick_t curHighTickDivider = ticks / (ticksPerBar / 1);
+	tick_t curLowTickDivider = ticks / (ticksPerBar / numerator);
+	if (int(curHighTickDivider) > m_prevMetronomeStates.highTickDivider) 
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
 	}
-	else if (ticks % (ticksPerBar / numerator) == 0)
+	else if (int(curLowTickDivider) > m_prevMetronomeStates.lowTickDivider)
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
 	}
 
-	lastMetroTicks = ticks;
+	m_prevMetronomeStates.ticks = ticks;
+	m_prevMetronomeStates.highTickDivider = curHighTickDivider;
+	m_prevMetronomeStates.lowTickDivider = curLowTickDivider;
 }
 
 

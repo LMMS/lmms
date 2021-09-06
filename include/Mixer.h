@@ -388,11 +388,11 @@ private:
 	surroundSampleFrame * m_outputBufferRead;
 	surroundSampleFrame * m_outputBufferWrite;
 
-	// worker thread stuff
+	// worker thread
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
 
-	// playhandle stuff
+	// playhandle
 	PlayHandleList m_playHandles;
 	// place where new playhandles are added temporarily
 	LocklessList<PlayHandle *> m_newPlayHandles;
@@ -404,24 +404,31 @@ private:
 
 	bool m_isProcessing;
 
-	// audio device stuff
+	// audio device
 	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
 	bool m_audioDevStartFailed;
 
-	// MIDI device stuff
+	// Metronome
+	bool m_metronomeActive;
+	struct {
+		tick_t ticks; // tick counter, holds the precise information where in the track we currently are
+		tick_t highTickDivider; // identifies when a next high frequency tick sound should be played
+		tick_t lowTickDivider; // identifies when a next low frequency tick sound should be played
+	} m_prevMetronomeStates;
+
+
+	// MIDI device
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
 
-	// FIFO stuff
+	// FIFO
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
 	MixerProfiler m_profiler;
-
-	bool m_metronomeActive;
 
 	bool m_clearSignal;
 
