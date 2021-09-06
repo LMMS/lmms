@@ -85,7 +85,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_oldAudioDev( NULL ),
 	m_audioDevStartFailed( false ),
 	m_metronomeActive(false),
-	m_prevMetronomeStates({-1, 0, 0}),
+	m_prevMetronomeStates({-1, -1, -1}),
 	m_profiler(),
 	m_clearSignal( false ),
 	m_changesSignal( false ),
