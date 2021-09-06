@@ -568,7 +568,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 		{
 			samplestoloopend = loopEnd - sample.sample->GetPos();
 			readsamples = sample.sample->Read( &buffer[totalreadsamples * sample.sample->FrameSize],
-					min( samplestoread, samplestoloopend ) );
+					std::min( samplestoread, samplestoloopend ) );
 			samplestoread -= readsamples;
 			totalreadsamples += readsamples;
 

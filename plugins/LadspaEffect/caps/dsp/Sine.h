@@ -71,7 +71,7 @@ class Sine
 		/* advance and return 1 sample */
 		inline double get()
 			{
-				register double s = b * y[z]; 
+				double s = b * y[z]; 
 				z ^= 1;
 				s -= y[z];
 				return y[z] = s;

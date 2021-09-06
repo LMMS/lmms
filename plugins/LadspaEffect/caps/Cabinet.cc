@@ -120,7 +120,7 @@ CabinetI::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register cabinet_float out = s[i] + normal;
+		cabinet_float out = s[i] + normal;
 		
 		x[h] = out;
 		
@@ -239,7 +239,7 @@ CabinetII::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register cabinet_float out = s[i] + normal;
+		cabinet_float out = s[i] + normal;
 		
 		x[h] = out;
 		

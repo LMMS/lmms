@@ -274,6 +274,7 @@ void FileBrowser::addItems(const QString & path )
 	// try to add all directories from file system alphabetically into the tree
 	QDir cdir( path );
 	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
+	files.sort(Qt::CaseInsensitive);
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
 	{
@@ -570,11 +571,11 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
 	// Forward the event
+	QTreeWidgetItem * i = itemAt(me->pos());
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
 
-	QTreeWidgetItem * i = itemAt(me->pos());
 	if (i)
 	{
 		// TODO: Restrict to visible selection
@@ -775,15 +776,11 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 		}
 
-		case FileItem::LoadAsPreset:
-		{
-			DataFile dataFile( f->fullName() );
-			InstrumentTrack::removeMidiPortNode( dataFile );
-			it->setSimpleSerializing();
-			it->loadSettings( dataFile.content().toElement() );
+		case FileItem::LoadAsPreset: {
+			DataFile dataFile(f->fullName());
+			it->replaceInstrument(dataFile);
 			break;
 		}
-
 		case FileItem::ImportAsProject:
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
@@ -1081,8 +1078,13 @@ bool Directory::addItems(const QString & path )
 		}
 	}
 
+	// sorts the path alphabetically instead of just appending to the bottom (see "orphans")
+	if (added_something)
+		sortChildren(0, Qt::AscendingOrder);
+
 	QList<QTreeWidgetItem*> items;
 	files = thisDir.entryList( QDir::Files, QDir::Name );
+	files.sort(Qt::CaseInsensitive);
 	for( QStringList::const_iterator it = files.constBegin();
 						it != files.constEnd(); ++it )
 	{

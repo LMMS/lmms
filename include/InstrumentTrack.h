@@ -174,7 +174,19 @@ public:
 		return &m_baseNoteModel;
 	}
 
+	IntModel *firstKeyModel()
+	{
+		return &m_firstKeyModel;
+	}
+
+	IntModel *lastKeyModel()
+	{
+		return &m_lastKeyModel;
+	}
+
 	int baseNote() const;
+	int firstKey() const;
+	int lastKey() const;
 
 	Piano *pianoModel()
 	{
@@ -220,6 +232,8 @@ public:
 	{
 		return m_previewMode;
 	}
+	
+	void replaceInstrument(DataFile dataFile);
 
 	void autoAssignMidiDevice( bool );
 
@@ -265,10 +279,12 @@ private:
 
 	bool m_previewMode;
 
+	IntModel m_baseNoteModel;	//!< The "A4" or "440 Hz" key (default 69)
+	IntModel m_firstKeyModel;	//!< First key the instrument reacts to
+	IntModel m_lastKeyModel;	//!< Last key the instrument reacts to
+
 	bool m_hasAutoMidiDev;
 	static InstrumentTrack *s_autoAssignedTrack;
-
-	IntModel m_baseNoteModel;
 
 	NotePlayHandleList m_processHandles;
 
@@ -281,7 +297,6 @@ private:
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
-
 
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
