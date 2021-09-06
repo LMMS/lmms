@@ -169,6 +169,9 @@ void printHelp()
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
 		"                                        is specified\n"
+		"  makebundle <in> [out]                 Make a project bundle from the project\n"
+		"                                        file <in> saving the resulting bundle\n"
+		"                                        as <out>\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
@@ -252,10 +255,11 @@ int main( int argc, char * * argv )
 {
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
+	// FE_UNDERFLOW is disabled for the time being
 	feenableexcept( FE_INVALID   |
 			FE_DIVBYZERO |
-			FE_OVERFLOW  |
-			FE_UNDERFLOW);
+			FE_OVERFLOW  /*|
+			FE_UNDERFLOW*/);
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
@@ -401,6 +405,28 @@ int main( int argc, char * * argv )
 			}
 
 			return EXIT_SUCCESS;
+		}
+		else if (arg == "makebundle")
+		{
+			++i;
+
+			if (i == argc)
+			{
+				return noInputFileError();
+			}
+
+			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
+
+			if (argc > i+1) // Project bundle file name given
+			{
+				printf("Making bundle\n");
+				dataFile.writeFile(QString::fromLocal8Bit(argv[i+1]), true);
+				return EXIT_SUCCESS;
+			}
+			else
+			{
+				return usageError("No project bundle name given");
+			}
 		}
 		else if( arg == "--allowroot" )
 		{

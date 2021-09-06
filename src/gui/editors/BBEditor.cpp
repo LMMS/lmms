@@ -326,11 +326,15 @@ void BBTrackContainerView::clonePattern()
 
 	BBTrack *bbt = BBTrack::findBBTrack(cur_bb);
 
-	// Clone the track
-	Track *newTrack = bbt->clone();
+	if( bbt )
+	{
+		// Clone the track
+		Track *newTrack = bbt->clone();
+		bbtc->setCurrentBB( static_cast<BBTrack *>( newTrack )->index() );
 
-	// Track still have the TCOs which is undesirable in this case, clear the track
-	newTrack->lock();
-	newTrack->deleteTCOs();
-	newTrack->unlock();
+		// Track still have the TCOs which is undesirable in this case, clear the track
+		newTrack->lock();
+		newTrack->deleteTCOs();
+		newTrack->unlock();
+	}
 }

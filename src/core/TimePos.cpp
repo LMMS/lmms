@@ -72,7 +72,12 @@ TimePos TimePos::quantize(float bars) const
 	//Offset from the lower position
 	int offset = m_ticks % interval;
 	//1 if we should snap up, 0 if we shouldn't
-	int snapUp = offset / (interval / 2);
+	// Ternary expression is making sure that the snap happens in the direction to
+	// the right even if m_ticks is negative and the offset is exactly half-way
+	// More details on issue #5840 and PR #5847
+	int snapUp = ((2 * offset) == -interval)
+		? 0
+		: (2 * offset) / interval;
 
 	return (lowPos + snapUp) * interval;
 }

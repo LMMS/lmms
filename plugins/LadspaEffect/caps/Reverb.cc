@@ -267,8 +267,8 @@ PlateStub::process (sample_t x, sample_t decay, sample_t * _xl, sample_t * _xr)
 	x = input.lattice[3].process (x, indiff2);
 
 	/* summation point */
-	register sample_t xl = x + decay * tank.delay[3].get();
-	register sample_t xr = x + decay * tank.delay[1].get();
+	sample_t xl = x + decay * tank.delay[3].get();
+	sample_t xr = x + decay * tank.delay[1].get();
 
 	/* lh */
 	xl = tank.mlattice[0].process (xl, dediff1);
