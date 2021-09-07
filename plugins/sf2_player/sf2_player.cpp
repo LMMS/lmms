@@ -156,9 +156,10 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// FIXME: there's no good way to tell if we're loading a preset or an empty instrument
 	// We rely on instantiate() to load the default soundfont for new instruments,
 	// but we don't need that when loading a project/preset/preview
-	loadFile(Engine::getSong()->isLoadingProject() or instrumentTrack()->isPreviewMode()
-				? ""
-				: ConfigManager::inst()->sf2File());
+	if (!Engine::getSong()->isLoadingProject() && !instrumentTrack()->isPreviewMode())
+	{
+		loadFile(ConfigManager::inst()->sf2File());
+	}
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
