@@ -69,8 +69,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_mode( mode ),
 	m_savedPos( -1 ),
 	m_hint( NULL ),
-	m_action( NoAction ),
-	m_moveXOff( 0 )
+	m_action( NoAction )
 {
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerBar;
@@ -343,7 +342,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	// Shift + Ctrl modifier is reserved for fine adjustment of Shift actions
 	// TODO: Let MMB be bound
 	
-	if (event->x() < m_xOffset) { return; }
+	if (event->x() < m_xOffset || m_action != NoAction) { return; }
 	
 	// Choose an action based on input event and user's bindings
 	else if (button == Qt::LeftButton)
@@ -354,11 +353,6 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		else
 		{
 			m_action = MovePositionMarker;
-			if (event->x() - m_xOffset < s_posMarkerPixmap->width())
-			{
-				m_moveXOff = event->x() - m_xOffset;
-			}
-			else { m_moveXOff = s_posMarkerPixmap->width() / 2; }
 		}
 	}
 	else if (button == Qt::RightButton)
@@ -369,9 +363,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	}
 	
 	// Calculate the clicked position as a TimePos, several actions need this
-	m_moveXOff = s_posMarkerPixmap->width() / 2;
-	const auto ticksPerPixel = TimePos::ticksPerBar() / m_ppb;
-	const TimePos t = m_begin + static_cast<int>(qMax(event->x() - m_xOffset - m_moveXOff, 0) * ticksPerPixel);
+	const TimePos t = getPositionFromX(event->x());
 	
 	// Translate MoveLoopClosest into left or right based on distance
 	if (m_action == MoveLoopClosest)
@@ -380,19 +372,6 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		if (t < loopMid) { m_action = MoveLoopBegin; }
 		else { m_action = MoveLoopEnd; }
 	}
-	// If we're moving loop markers or dragging loop markers, update them
-	if (m_action == MoveLoopBegin){ m_loopPos[0] = t; }
-	else if (m_action == MoveLoopEnd){ m_loopPos[1] = t; }
-	else if (m_action == DragLoop)
-	{
-		const bool quant = !(mods == (Qt::ControlModifier | Qt::ShiftModifier));
-		
-		m_loopPos[0] = quant ? t.quantize(m_snapSize) : t;
-		m_loopPos[1] = m_loopPos[0] + (quant ? m_snapSize : 1);
-	}
-	
-	// Ensure that the loops beginning and end are stored in the right place
-	if (m_loopPos[0] > m_loopPos[1]) { qSwap(m_loopPos[0], m_loopPos[1]); }
 	
 	// Set initial position for actions that need it
 	if (m_action == SelectSongTCO || m_action == DragLoop)
@@ -417,7 +396,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
-	const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
+	const TimePos t = getPositionFromX(event->x());
 	// Fine adjust when both ctrl and shift are held, hide ctrl+shift hint
 	bool unquantized = event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
 	if (unquantized)
@@ -446,23 +425,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopEnd:
 		{
 			const int i = m_action == MoveLoopBegin ? 0 : 1;
-			if (unquantized) { m_loopPos[i] = t; }
-			else { m_loopPos[i] = t.quantize(m_snapSize); }
-			// Catch begin == end
-			if (m_loopPos[0] == m_loopPos[1])
-			{
-				// Note, swap 1 and 0 below and the behavior "skips" the other
-				// marking instead of pushing it.
-				if (m_action == MoveLoopBegin) 
-				{
-					m_loopPos[0] -= TimePos::ticksPerBar();
-				}
-				else
-				{
-					m_loopPos[1] += TimePos::ticksPerBar();
-				}
-			}
-			update();
+			setLoopPoint(i, event->x(), unquantized);
 			break;
 		}
 		case DragLoop:
@@ -492,4 +455,39 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	// Required when m_action == DragLoop, not harmful otherwise
 	if (m_loopPos[0] > m_loopPos[1]) { qSwap(m_loopPos[0], m_loopPos[1]); }
 	m_action = NoAction;
+}
+
+
+
+
+TimePos TimeLineWidget::getPositionFromX(const int x) const
+{
+	return m_begin + std::max(x - m_xOffset - s_posMarkerPixmap->width() / 2, 0) * TimePos::ticksPerBar() / m_ppb;
+}
+
+
+
+
+void TimeLineWidget::setLoopPoint(bool end, int x, bool unquantized)
+{
+	// Move the specified loop point
+	int i = end ? 1 : 0;
+	TimePos pos = getPositionFromX(x);
+	m_loopPos[i] = unquantized ? pos : pos.quantize(m_snapSize);
+
+	// Length of quantization step
+	TimePos oneSnap = TimePos::ticksPerBar() * m_snapSize;
+	if (m_loopPos[1] == 0)
+	{
+		// End may not be at bar 0
+		m_loopPos[1] = oneSnap;
+	}
+	if (m_loopPos[0] >= m_loopPos[1])
+	{
+		// End moved before start - move start one step back
+		if (end) { m_loopPos[0] = std::max(0, m_loopPos[1] - oneSnap); }
+		// Start moved past end - move end one step forward
+		else { m_loopPos[1] = m_loopPos[0] + oneSnap; }
+	}
+	update();
 }

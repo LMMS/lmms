@@ -194,6 +194,9 @@ protected:
 
 
 private:
+	TimePos getPositionFromX(const int x) const;
+	void setLoopPoint(bool end, int x, bool unquantized=false);
+
 	static QPixmap * s_posMarkerPixmap;
 
 	QColor m_inactiveLoopColor;
@@ -241,8 +244,6 @@ private:
 		DragLoop,
 		SelectSongTCO,
 	} m_action;
-
-	int m_moveXOff;
 
 
 signals:
