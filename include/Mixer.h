@@ -415,8 +415,8 @@ private:
 	bool m_metronomeActive;
 	struct {
 		tick_t ticks; // tick counter, holds the precise information where in the track we currently are
-		tick_t highTickDivider; // identifies when a next high frequency tick sound should be played
-		tick_t lowTickDivider; // identifies when a next low frequency tick sound should be played
+		float highTickDivider; // identifies when a next high frequency tick sound should be played
+		float lowTickDivider;  // identifies when a next low frequency tick sound should be played
 	} m_prevMetronomeStates;
 
 

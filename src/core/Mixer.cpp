@@ -487,22 +487,31 @@ void Mixer::handleMetronome()
 	/* Metronome sound generation - explanation:
 	 * The reason why this is not a permanently exact (e.g. modulo) operation, is that on high metronome frequency or 
 	 * suffering under system load, ".getTicks()" may or especially may not return a +1-increment and hence the modulo is
-	 * not guaranteed to react as expected, thus the sound gets skipped. The solution below plays the sound either on the 
+	 * not guaranteed to react as expected, eventually the sound gets skipped. The solution below plays the sound either on the 
 	 * exact tick-slot or at the very next possible point in time.
 	 */
 	int numerator = song->getTimeSigModel().getNumerator();
-	tick_t ticksPerBar = TimePos::ticksPerBar();
-	tick_t curHighTickDivider = ticks / (ticksPerBar / 1);
-	tick_t curLowTickDivider = ticks / (ticksPerBar / numerator);
-	if (int(curHighTickDivider) > m_prevMetronomeStates.highTickDivider) 
+	float ticksPerBar = TimePos::ticksPerBar();
+	float curHighTickDivider = ticks / (ticksPerBar / 1);
+	float curLowTickDivider = ticks / (ticksPerBar / numerator);
+	float highDifference = int(curHighTickDivider) - m_prevMetronomeStates.highTickDivider;
+	float lowDifference = int(curLowTickDivider) - m_prevMetronomeStates.lowTickDivider;
+
+	/* tickDivider is a value where its integer part shows the current bar position and the fractional part can be considered as
+	 * as the percentual position within that bar scope. The related case separation works as follows:
+	 * > 0 filters cases when going back in time (moving the play slider) and thus the last tickDivider would be taken out of context
+	 * < 1 would accept only subsequent tick points in time, but 0.5 filters additionally skipping forward in time
+	 * == 0 is a special case for the very first possible tick in a song
+	 */
+	if ( (highDifference> 0 &&  highDifference < 0.5) || ticks == 0) 
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
 	}
-	else if (int(curLowTickDivider) > m_prevMetronomeStates.lowTickDivider)
+	else if (lowDifference> 0 &&  lowDifference < 1)
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
 	}
-
+	
 	m_prevMetronomeStates.ticks = ticks;
 	m_prevMetronomeStates.highTickDivider = curHighTickDivider;
 	m_prevMetronomeStates.lowTickDivider = curLowTickDivider;
