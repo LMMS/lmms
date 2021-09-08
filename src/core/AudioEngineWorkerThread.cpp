@@ -32,7 +32,7 @@
 #include "AudioEngine.h"
 #include "ThreadableJob.h"
 
-#if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
+#if __SSE__
 #include <xmmintrin.h>
 #endif
 
@@ -98,7 +98,7 @@ void AudioEngineWorkerThread::JobQueue::wait()
 {
 	while (m_itemsDone < m_writeIndex)
 	{
-#if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
+#ifdef __SSE__
 		_mm_pause();
 #endif
 	}
