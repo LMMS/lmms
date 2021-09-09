@@ -119,11 +119,11 @@ constexpr ch_cnt_t SURROUND_CHANNELS =
 				2;
 #endif
 
-
+constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
-#define LADSPA_PATH_SEPERATOR ';'
+';';
 #else
-#define LADSPA_PATH_SEPERATOR ':'
+':';
 #endif
 
 
@@ -137,10 +137,11 @@ constexpr size_t LMMS_ALIGN_SIZE{16};
 #define STR(PN)	#PN
 
 // Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
+constexpr const char* UI_CTRL_KEY =
 #ifdef LMMS_BUILD_APPLE
-# define UI_CTRL_KEY "⌘"
+"⌘";
 #else
-# define UI_CTRL_KEY "Ctrl"
+"Ctrl";
 #endif
 
 #endif
