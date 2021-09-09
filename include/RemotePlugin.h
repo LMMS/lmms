@@ -92,6 +92,7 @@ typedef int32_t key_t;
 #include <QtCore/QMutex>
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
+#include <QtCore/QString>
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
@@ -1443,8 +1444,14 @@ void RemotePluginClient::doProcessing()
 
 
 
-#endif
+#else
 
-#define QSTR_TO_STDSTR(s)	std::string( s.toUtf8().constData() )
+
+LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
+{
+	return qstr.toStdString();
+}
+
+#endif
 
 #endif
