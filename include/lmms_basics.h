@@ -109,9 +109,9 @@ inline bool typeInfo<float>::isEqual( float x, float y )
 
 
 
-const ch_cnt_t DEFAULT_CHANNELS = 2;
+constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
-const ch_cnt_t SURROUND_CHANNELS =
+constexpr ch_cnt_t SURROUND_CHANNELS =
 #define LMMS_DISABLE_SURROUND
 #ifndef LMMS_DISABLE_SURROUND
 				4;
