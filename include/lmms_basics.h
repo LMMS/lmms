@@ -130,7 +130,7 @@ const ch_cnt_t SURROUND_CHANNELS =
 
 using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
 using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
-#define ALIGN_SIZE 16
+constexpr size_t LMMS_ALIGN_SIZE{16};
 
 
 #define STRINGIFY(s) STR(s)
