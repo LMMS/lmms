@@ -76,7 +76,7 @@ SampleBuffer::SampleBuffer() :
 	m_loopEndFrame(0),
 	m_amplification(1.0f),
 	m_reversed(false),
-	m_frequency(BaseFreq),
+	m_frequency(DefaultBaseFreq),
 	m_sampleRate(audioEngineSampleRate())
 {
 

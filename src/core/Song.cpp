@@ -1537,10 +1537,10 @@ void Song::setScale(unsigned int index, std::shared_ptr<Scale> newScale)
 {
 	if (index >= MaxScaleCount) {index = 0;}
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	std::atomic_store(&m_scales[index], newScale);
 	emit scaleListChanged(index);
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -1548,8 +1548,8 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 {
 	if (index >= MaxKeymapCount) {index = 0;}
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	std::atomic_store(&m_keymaps[index], newMap);
 	emit keymapListChanged(index);
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
