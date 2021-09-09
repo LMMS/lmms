@@ -177,7 +177,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	this->setLayout(microtunerLayout);
 
 	// Add to the main window and setup fixed size etc.
-	QMdiSubWindow *subWin = gui->mainWindow()->addWindowedWidget(this);
+	QMdiSubWindow *subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 
 	subWin->setAttribute(Qt::WA_DeleteOnClose, false);
 	subWin->setMinimumWidth(300);

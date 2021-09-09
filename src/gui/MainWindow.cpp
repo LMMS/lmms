@@ -1125,7 +1125,7 @@ void MainWindow::toggleFxMixerWin()
 
 void MainWindow::toggleMicrotunerWin()
 {
-	toggleWindow( gui->getMicrotunerConfig() );
+	toggleWindow( getGUI()->getMicrotunerConfig() );
 }
 
 
