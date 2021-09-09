@@ -211,25 +211,3 @@ void InstrumentMidiIOView::modelChanged()
 	}
 }
 
-
-
-InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
-	QWidget( parent )
-{
-	QVBoxLayout* layout = new QVBoxLayout( this );
-	layout->setMargin( 5 );
-	m_pitchGroupBox = new GroupBox( tr ( "MASTER PITCH" ) );
-	layout->addWidget( m_pitchGroupBox );
-	QHBoxLayout* masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
-	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
-	QLabel *tlabel = new QLabel(tr( "Enables the use of master pitch" ) );
-	tlabel->setFont( pointSize<8>( tlabel->font() ) );
-	m_pitchGroupBox->setModel( &it->m_useMasterPitchModel );
-	masterPitchLayout->addWidget( tlabel );
-	layout->addStretch();
-}
-
-InstrumentMiscView::~InstrumentMiscView()
-{
-
-}

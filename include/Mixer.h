@@ -55,11 +55,6 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
 
-const float BaseFreq = 440.0f;
-const Keys BaseKey = Key_A;
-const Octaves BaseOctave = DefaultOctave;
-
-
 #include "PlayHandle.h"
 
 

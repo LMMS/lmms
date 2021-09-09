@@ -56,6 +56,7 @@
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "lmms_constants.h"
 #include "Mixer.h"
 #include "PathUtil.h"
 
@@ -75,7 +76,7 @@ SampleBuffer::SampleBuffer() :
 	m_loopEndFrame(0),
 	m_amplification(1.0f),
 	m_reversed(false),
-	m_frequency(BaseFreq),
+	m_frequency(DefaultBaseFreq),
 	m_sampleRate(mixerSampleRate())
 {
 
@@ -718,6 +719,9 @@ bool SampleBuffer::play(
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool isBackwards = state->isBackwards();
 
+	// The SampleBuffer can play a given sample with increased or decreased pitch. However, only
+	// samples that contain a tone that matches the default base note frequency of 440 Hz will
+	// produce the exact requested pitch in [Hz].
 	const double freqFactor = (double) freq / (double) m_frequency *
 		m_sampleRate / Engine::mixer()->processingSampleRate();
 

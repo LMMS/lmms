@@ -58,6 +58,7 @@
 #include "Instrument.h"
 #include "InstrumentFunctionViews.h"
 #include "InstrumentMidiIOView.h"
+#include "InstrumentMiscView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
@@ -109,8 +110,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_soundShaping( this ),
 	m_arpeggio( this ),
 	m_noteStacking( this ),
-	m_piano(this)
-//	m_microtuner(this)
+	m_piano(this),
+	m_microtuner()
 {
 	m_pitchModel.setCenterValue( 0 );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -151,22 +152,92 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 }
 
 
+
+bool InstrumentTrack::keyRangeImport() const
+{
+	return m_microtuner.enabled() && m_microtuner.keyRangeImport();
+}
+
+
+/** \brief Check if there is a valid mapping for the given key and it is within defined of range.
+ */
+bool InstrumentTrack::isKeyMapped(int key) const
+{
+	if (key < firstKey() || key > lastKey()) {return false;}
+	if (!m_microtuner.enabled()) {return true;}
+
+	Song *song = Engine::getSong();
+	if (!song) {return false;}
+
+	return song->getKeymap(m_microtuner.currentKeymap())->getDegree(key) != -1;
+}
+
+
+/** \brief Return first mapped key, based on currently selected keymap or user selection.
+ *	\return Number ranging from 0 to NumKeys -1
+ */
+int InstrumentTrack::firstKey() const
+{
+	if (keyRangeImport())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getFirstKey();
+	}
+	else
+	{
+		return m_firstKeyModel.value();
+	}
+}
+
+
+/** \brief Return last mapped key, based on currently selected keymap or user selection.
+ *	\return Number ranging from 0 to NumKeys -1
+ */
+int InstrumentTrack::lastKey() const
+{
+	if (keyRangeImport())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getLastKey();
+	}
+	else
+	{
+		return m_lastKeyModel.value();
+	}
+}
+
+
+/** \brief Return base key number, based on currently selected keymap or user selection.
+ *	\return Number ranging from 0 to NumKeys -1
+ */
 int InstrumentTrack::baseNote() const
 {
 	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
 
-	return m_baseNoteModel.value() - mp;
+	if (keyRangeImport())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getBaseKey() - mp;
+	}
+	else
+	{
+		return m_baseNoteModel.value() - mp;
+	}
 }
 
-int InstrumentTrack::firstKey() const
+
+/** \brief Return frequency assigned to the base key, based on currently selected keymap.
+ *	\return Frequency in Hz
+ */
+float InstrumentTrack::baseFreq() const
 {
-	return m_firstKeyModel.value();
+	if (m_microtuner.enabled())
+	{
+		return Engine::getSong()->getKeymap(m_microtuner.currentKeymap())->getBaseFreq();
+	}
+	else
+	{
+		return DefaultBaseFreq;
+	}
 }
 
-int InstrumentTrack::lastKey() const
-{
-	return m_lastKeyModel.value();
-}
 
 
 InstrumentTrack::~InstrumentTrack()
@@ -790,6 +861,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_firstKeyModel.saveSettings(doc, thisElement, "firstkey");
 	m_lastKeyModel.saveSettings(doc, thisElement, "lastkey");
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
+	m_microtuner.saveSettings(doc, thisElement);
 
 	// Save MIDI CC stuff
 	m_midiCCEnable->saveSettings(doc, thisElement, "enablecc");
@@ -856,6 +928,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_firstKeyModel.loadSettings(thisElement, "firstkey");
 	m_lastKeyModel.loadSettings(thisElement, "lastkey");
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
+	m_microtuner.loadSettings(thisElement);
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
@@ -1669,12 +1742,26 @@ void InstrumentTrackWindow::modelChanged()
 		m_pitchRangeLabel->hide();
 	}
 
+	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::IsMidiBased))
+	{
+		m_miscView->microtunerGroupBox()->hide();
+		m_track->m_microtuner.enabledModel()->setValue(false);
+	}
+	else
+	{
+		m_miscView->microtunerGroupBox()->show();
+	}
+
 	m_ssView->setModel( &m_track->m_soundShaping );
 	m_noteStackingView->setModel( &m_track->m_noteStacking );
 	m_arpeggioView->setModel( &m_track->m_arpeggio );
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
 	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
+	m_miscView->microtunerGroupBox()->setModel(m_track->m_microtuner.enabledModel());
+	m_miscView->scaleCombo()->setModel(m_track->m_microtuner.scaleModel());
+	m_miscView->keymapCombo()->setModel(m_track->m_microtuner.keymapModel());
+	m_miscView->rangeImportCheckbox()->setModel(m_track->m_microtuner.keyRangeImportModel());
 	updateName();
 }
 
