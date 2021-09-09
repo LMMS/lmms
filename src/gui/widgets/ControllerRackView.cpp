@@ -139,6 +139,38 @@ void ControllerRackView::deleteController( ControllerView * _view )
 }
 
 
+void ControllerRackView::moveUp( ControllerView* view )
+{
+	if( view != m_controllerViews.first() )
+	{
+		int i = 0;
+		for( QVector<ControllerView *>::Iterator it = m_controllerViews.begin();
+					it != m_controllerViews.end(); it++, i++ )
+		{
+			if( *it == view )
+			{
+				break;
+			}
+		}
+
+		ControllerView * temp = m_controllerViews[ i - 1 ];
+
+		m_controllerViews[i - 1] = view;
+		m_controllerViews[i] = temp;
+
+		m_scrollAreaLayout->removeWidget( view );
+		m_scrollAreaLayout->insertWidget( i - 1, view );
+	}
+}
+
+void ControllerRackView::moveDown( ControllerView* view )
+{
+	if( view != m_controllerViews.last() )
+	{
+		// moving next effect up is the same
+		moveUp( *( std::find( m_controllerViews.begin(), m_controllerViews.end(), view ) + 1 ) );
+	}
+}
 
 
 void ControllerRackView::onControllerAdded( Controller * controller )
@@ -147,6 +179,10 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
 
+	connect( controllerView, SIGNAL( moveUp( ControllerView * ) ),
+		 this, SLOT( moveUp( ControllerView * ) ), Qt::QueuedConnection );
+	connect( controllerView, SIGNAL( moveDown( ControllerView * ) ),
+		 this, SLOT( moveDown( ControllerView * ) ), Qt::QueuedConnection );
 	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ),
 		 this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
 

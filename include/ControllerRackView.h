@@ -58,6 +58,8 @@ public:
 
 public slots:
 	void deleteController( ControllerView * _view );
+	void moveUp( ControllerView * _view );
+	void moveDown( ControllerView * _view );
 	void onControllerAdded( Controller * );
 	void onControllerRemoved( Controller * );
 

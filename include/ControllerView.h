@@ -59,11 +59,15 @@ public:
 
 public slots:
 	void editControls();
+	void moveUp();
+	void moveDown();
 	void deleteController();
 	void closeControls();
 	void renameController();
 
 signals:
+	void moveUp( ControllerView * _plugin );
+	void moveDown( ControllerView * _plugin );
 	void deleteController( ControllerView * _view );
 
 

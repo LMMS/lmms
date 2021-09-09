@@ -132,6 +132,15 @@ void ControllerView::closeControls()
 	m_show = true;
 }
 
+void ControllerView::moveUp()
+{
+	emit moveUp( this );
+}
+
+void ControllerView::moveDown()
+{
+	emit moveDown( this );
+}
 
 void ControllerView::deleteController()
 {
@@ -174,6 +183,13 @@ void ControllerView::modelChanged()
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
+	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
+						tr( "Move &up" ),
+						this, SLOT( moveUp() ) );
+	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
+						tr( "Move &down" ),
+						this, SLOT( moveDown() ) );
+	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this controller" ),
 						this, SLOT( deleteController() ) );
