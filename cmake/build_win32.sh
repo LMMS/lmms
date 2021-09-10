@@ -31,7 +31,7 @@ fi
 export PATH=$MINGW/bin:$PATH
 export CXXFLAGS="$CFLAGS"
 if [ "$ARCH" == "32" ]; then
-	export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5 -mfpmath=sse"
+	export CFLAGS="-march=pentium4 -mtune=generic -mpreferred-stack-boundary=5 -mfpmath=sse"
 fi
 
 CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
