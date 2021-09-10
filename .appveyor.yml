@@ -9,7 +9,7 @@ environment:
     - compiler: msvc
 install:
   - cd C:\Tools\vcpkg
-  - git pull
+  - git pull --quiet origin 2021.05.12
   - .\bootstrap-vcpkg.bat
   - cd %APPVEYOR_BUILD_FOLDER%
   - vcpkg install --triplet %PLATFORM%-windows --recurse fftw3 libsamplerate libsndfile lilv lv2 sdl2
@@ -28,4 +28,4 @@ artifacts:
   - path: 'build\lmms-*.exe'
     name: Installer
 cache:
-  - c:/tools/vcpkg/installed
+  - c:/tools/vcpkg/installed -> .appveyor.yml
