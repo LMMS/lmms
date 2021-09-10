@@ -48,13 +48,19 @@ std::wstring toWString(const std::string& s)
 
 #ifdef LMMS_BUILD_WIN32
 #include <io.h>
-#define F_OPEN_UTF8(a, b) _wfopen(toWString(a).data(), L##b)
 #else
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#define F_OPEN_UTF8(a, b) fopen((a).data(), b)
 #endif
+
+FILE* F_OPEN_UTF8(std::string const& fname, const char* mode){
+#ifdef LMMS_BUILD_WIN32
+	return _wfopen(toWString(fname).data(), toWString(mode).data());
+#else
+	return fopen(fname.data(), mode);
+#endif
+}
 
 int fileToDescriptor(FILE* f, bool closeFile = true)
 {
