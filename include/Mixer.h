@@ -413,12 +413,7 @@ private:
 
 	// Metronome
 	bool m_metronomeActive;
-	struct {
-		tick_t ticks; // tick counter, holds the precise information where in the track we currently are
-		float highTickDivider; // identifies when a next high frequency tick sound should be played
-		float lowTickDivider;  // identifies when a next low frequency tick sound should be played
-	} m_prevMetronomeStates;
-
+	std::pair<tick_t, tick_t> m_prevMetronomeStates; // .first: number of ticks from last play sound, .second: number of ticks from last call
 
 	// MIDI device
 	MidiClient * m_midiClient;

@@ -85,7 +85,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_oldAudioDev( NULL ),
 	m_audioDevStartFailed( false ),
 	m_metronomeActive(false),
-	m_prevMetronomeStates({-1, -1, -1}),
+	m_prevMetronomeStates(std::pair<tick_t, tick_t>(100, 0)),
 	m_profiler(),
 	m_clearSignal( false ),
 	m_changesSignal( false ),
@@ -455,7 +455,7 @@ void Mixer::swapBuffers()
 }
 
 
-
+#include <iostream>
 
 void Mixer::handleMetronome()
 {
@@ -479,42 +479,41 @@ void Mixer::handleMetronome()
 	}
 
 	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
-	if (ticks == m_prevMetronomeStates.ticks)
+	if (ticks == m_prevMetronomeStates.second)
 	{
 		return;
 	}
 
 	/* Metronome sound generation - explanation:
-	 * The reason why this is not a permanently exact (e.g. modulo) operation, is that on high metronome frequency or 
-	 * suffering under system load, ".getTicks()" may or especially may not return a +1-increment and hence the modulo is
-	 * not guaranteed to react as expected, eventually the sound gets skipped. The solution below plays the sound either on the 
-	 * exact tick-slot or at the very next possible point in time.
-	 */
-	int numerator = song->getTimeSigModel().getNumerator();
-	float ticksPerBar = TimePos::ticksPerBar();
-	float curHighTickDivider = ticks / (ticksPerBar / 1);
-	float curLowTickDivider = ticks / (ticksPerBar / numerator);
-	float highDifference = int(curHighTickDivider) - m_prevMetronomeStates.highTickDivider;
-	float lowDifference = int(curLowTickDivider) - m_prevMetronomeStates.lowTickDivider;
+	 * The modulo operation below figures out the exact point in time when a sound should be played. As this operation
+	 * relies on ".getTicks()" we have to add a certain tick tolerance, since it is not guaranted that between each call
+	 * the tick gets a +1-increment and thus the exact point in time can be missed.*/	
 
-	/* tickDivider is a value where its integer part shows the current bar position and the fractional part can be considered as
-	 * as the percentual position within that bar scope. The related case separation works as follows:
-	 * > 0 filters cases when going back in time (moving the play slider) and thus the last tickDivider would be taken out of context
-	 * < 1 would accept only subsequent tick points in time, but 0.5 filters additionally skipping forward in time
-	 * == 0 is a special case for the very first possible tick in a song
-	 */
-	if ( (highDifference> 0 &&  highDifference < 0.5) || ticks == 0) 
+	// increase this parameter if with complex projects or poor HW resources the metronome rings out of rythm
+	int nToleranceTicks = 5;
+	// LMMS allows abrupt jumps in song positions (e.g. song-loops, when marker was put of that loop), this iscached below
+	bool noDoubleTick = m_prevMetronomeStates.first > nToleranceTicks;
+	// identify which sound should be played below
+	bool highTickEvent = ticks % int(TimePos::ticksPerBar() / 1) <= nToleranceTicks;
+	bool lowTickEvent = ticks % int(TimePos::ticksPerBar() / song->getTimeSigModel().getNumerator()) <= nToleranceTicks;
+
+	// handle sound-'state'-machine
+	if (highTickEvent && noDoubleTick)
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
+		m_prevMetronomeStates.first = 0;
 	}
-	else if (lowDifference> 0 &&  lowDifference < 1)
+	else if (lowTickEvent && noDoubleTick)
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
+		m_prevMetronomeStates.first = 0;
 	}
-	
-	m_prevMetronomeStates.ticks = ticks;
-	m_prevMetronomeStates.highTickDivider = curHighTickDivider;
-	m_prevMetronomeStates.lowTickDivider = curLowTickDivider;
+	else
+	{
+		m_prevMetronomeStates.first += 1;
+	}
+
+	m_prevMetronomeStates.second = ticks;
 }
 
 
