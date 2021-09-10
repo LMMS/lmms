@@ -455,7 +455,7 @@ void Mixer::swapBuffers()
 }
 
 
-#include <iostream>
+
 
 void Mixer::handleMetronome()
 {
