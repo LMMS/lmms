@@ -148,7 +148,7 @@ void printVersion( char *executableName )
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION,
+		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION,
 		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
