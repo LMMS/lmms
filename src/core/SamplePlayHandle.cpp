@@ -33,28 +33,29 @@
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
+SamplePlayHandle::SamplePlayHandle(SampleBuffer* sampleBuffer , bool ownAudioPort, float sample_volume) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
 	m_ownAudioPort( ownAudioPort ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
+    m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
+    m_sampleBuffer->setAmplification(sample_volume);
 	if (ownAudioPort)
 	{
 		setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
-	}
+    }
 }
 
 
 
 
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle( new SampleBuffer( sampleFile ) , true)
+SamplePlayHandle::SamplePlayHandle(const QString& sampleFile , float sample_volume) :
+    SamplePlayHandle( new SampleBuffer( sampleFile ) , true, sample_volume)
 {
 	sharedObject::unref( m_sampleBuffer );
 }

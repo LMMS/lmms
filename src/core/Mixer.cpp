@@ -87,6 +87,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_audioDevStartFailed( false ),
 	m_profiler(),
 	m_metronomeActive(false),
+    m_metronomeVolume(1.0),
 	m_clearSignal( false ),
 	m_changesSignal( false ),
 	m_changes( 0 ),
@@ -457,9 +458,27 @@ void Mixer::swapBuffers()
 
 
 
+void Mixer::setMetronomeVolume(float volume)
+{
+    m_metronomeVolume = volume;
+}
+
+
+
+
+void Mixer::setMetronomeRhythm(QString rhythm)
+{
+    m_metronomeRhythm = rhythm;
+}
+
+
+
+
 void Mixer::handleMetronome()
 {
-	static tick_t lastMetroTicks = -1;
+    static tick_t lastMetroTicks = -1;
+	tick_t lowTickFrequency;
+	tick_t highTickFrequency;
 
 	Song * song = Engine::getSong();
 	Song::PlayModes currentPlayMode = song->playMode();
@@ -482,23 +501,44 @@ void Mixer::handleMetronome()
 
 	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
 	tick_t ticksPerBar = TimePos::ticksPerBar();
-	int numerator = song->getTimeSigModel().getNumerator();
 
 	if (ticks == lastMetroTicks)
 	{
 		return;
 	}
 
-	if (ticks % (ticksPerBar / 1) == 0)
-	{
-		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
-	}
-	else if (ticks % (ticksPerBar / numerator) == 0)
-	{
-		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
-	}
+	// specify frequency of high and low tick sound
+	highTickFrequency = ticksPerBar;
+	if(m_metronomeRhythm.compare("1/2") == 0)
+		lowTickFrequency = ticksPerBar / 2;
+	else if(m_metronomeRhythm.compare("1/4") == 0)
+		lowTickFrequency = ticksPerBar / 4;
+	else if(m_metronomeRhythm.compare("1/8") == 0)
+		lowTickFrequency = ticksPerBar / 8;
+	else if(m_metronomeRhythm.compare("1/16") == 0)
+		lowTickFrequency = ticksPerBar / 16;
+	else
+		lowTickFrequency = highTickFrequency; // default or 1/1
+
+	// eventually add tick sound
+	if (ticks % highTickFrequency == 0)
+		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg", m_metronomeVolume));
+	else if (ticks % lowTickFrequency == 0)
+		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg", m_metronomeVolume));
 
 	lastMetroTicks = ticks;
+}
+
+void Mixer::arrangeMetronomTicks(std::vector<bool> pattern, tick_t curTick)
+{
+    SamplePlayHandle* high_tick_sound = new SamplePlayHandle("misc/metronome02.ogg", m_metronomeVolume);
+    SamplePlayHandle* low_tick_sound = new SamplePlayHandle("misc/metronome01.ogg", m_metronomeVolume);    
+
+    if (pattern.at(curTick))
+        addPlayHandle(high_tick_sound);
+    else 
+        addPlayHandle(low_tick_sound);
+    
 }
 
 
@@ -536,7 +576,6 @@ void Mixer::clearInternal()
 		{
 			m_playHandlesToRemove.push_back(ph);
 		}
-
 	}
 }
 

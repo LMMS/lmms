@@ -26,6 +26,7 @@
 #ifndef TOOL_BUTTON_H
 #define TOOL_BUTTON_H
 
+#include <QMouseEvent>
 #include <QToolButton>
 #include <QColor>
 
@@ -43,6 +44,15 @@ public:
 	{ }
 
 	virtual ~ToolButton() = default;
+
+private:
+	/**
+	 * @brief extends the functionality to react on user RMB clicks
+	 */
+    void mouseReleaseEvent(QMouseEvent *event);
+
+signals:
+    void rightMouseButtonReleased();
 
 } ;
 

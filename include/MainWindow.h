@@ -32,6 +32,7 @@
 
 #include "ConfigManager.h"
 #include "SubWindow.h"
+#include "MetronomeSettingsMenu.h"
 
 class QAction;
 class QDomElement;
@@ -224,6 +225,7 @@ private:
 	QMenu * m_viewMenu;
 
 	ToolButton * m_metronomeToggle;
+    MetronomeSettingsMenu * m_metronomeSettingsMenu;
 
 	SessionState m_session;
 	
@@ -235,6 +237,9 @@ private slots:
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
+    void onShowMetronomeSettings();
+    void onMetronomeSettingsChanged(std::pair<QString, QString>);
+    void onMetronomeVolumeChanged(float);
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
