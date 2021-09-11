@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_WORKER_THREAD_H
-#define MIXER_WORKER_THREAD_H
+#ifndef AUDIO_ENGINE_WORKER_THREAD_H
+#define AUDIO_ENGINE_WORKER_THREAD_H
 
 #include <QtCore/QThread>
 

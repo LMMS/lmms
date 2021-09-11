@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_PROFILER_H
-#define MIXER_PROFILER_H
+#ifndef AUDIO_ENGINE_PROFILER_H
+#define AUDIO_ENGINE_PROFILER_H
 
 #include <QFile>
 

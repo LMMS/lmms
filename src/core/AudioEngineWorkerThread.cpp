@@ -115,9 +115,7 @@ AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	m_quit( false )
 {
 	// initialize global static data
-	if( queueReadyWaitCond == NULL )
-	{
-		queueReadyWaitCond = new QWaitCondition;
+	if( queueReadyWaitCond == NULL ) { queueReadyWaitCond = new QWaitCondition;
 	}
 
 	// keep track of all instantiated worker threads - this is used for
@@ -152,7 +150,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 {
 	queueReadyWaitCond->wakeAll();
 	// The last worker-thread is never started. Instead it's processed "inline"
-	// i.e. within the global Mixer thread. This way we can reduce latencies
+	// i.e. within the global AudioEngine thread. This way we can reduce latencies
 	// that otherwise would be caused by synchronizing with another thread.
 	globalJobQueue.run();
 	globalJobQueue.wait();
