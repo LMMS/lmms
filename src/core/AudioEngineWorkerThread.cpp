@@ -115,7 +115,9 @@ AudioEngineWorkerThread::AudioEngineWorkerThread( AudioEngine* audioEngine ) :
 	m_quit( false )
 {
 	// initialize global static data
-	if( queueReadyWaitCond == NULL ) { queueReadyWaitCond = new QWaitCondition;
+	if( queueReadyWaitCond == NULL )
+	{
+		queueReadyWaitCond = new QWaitCondition;
 	}
 
 	// keep track of all instantiated worker threads - this is used for
