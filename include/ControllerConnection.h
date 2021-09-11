@@ -112,7 +112,7 @@ protected:
 	static ControllerConnectionVector s_connections;
 
 signals:
-	// The value changed while the mixer isn't running (i.e: MIDI CC)
+	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
 	friend class ControllerConnectionDialog;

@@ -31,9 +31,9 @@
 
 
 #include "Engine.h"
+#include "AudioEngine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -143,7 +143,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	}
 	
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 					this, SLOT( updateAllDetuning() ) );	
 }
 
@@ -622,10 +622,10 @@ void OscillatorObject::updateDetuning()
 {
 	m_detuningLeft = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				+ (float)m_detuneModel.value() * CENT ) /
-				Engine::mixer()->processingSampleRate();
+				Engine::audioEngine()->processingSampleRate();
 	m_detuningRight = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				- (float)m_detuneModel.value() * CENT ) /
-				Engine::mixer()->processingSampleRate();
+				Engine::audioEngine()->processingSampleRate();
 }
 
 

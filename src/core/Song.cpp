@@ -106,7 +106,7 @@ Song::Song() :
 			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
 
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
@@ -135,8 +135,7 @@ Song::~Song()
 
 void Song::masterVolumeChanged()
 {
-	Engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
-								100.0f );
+	Engine::audioEngine()->setMasterGain( m_masterVolumeModel.value() / 100.0f );
 }
 
 
@@ -144,9 +143,9 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
-	PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
@@ -158,7 +157,7 @@ void Song::setTempo()
 			nph->unlock();
 		}
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	Engine::updateFramesPerTick();
 
@@ -272,7 +271,7 @@ void Song::processNextBuffer()
 	}
 
 	const auto framesPerTick = Engine::framesPerTick();
-	const auto framesPerPeriod = Engine::mixer()->framesPerPeriod();
+	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 
 	f_cnt_t frameOffsetInPeriod = 0;
 
@@ -640,7 +639,7 @@ void Song::stop()
 	}
 
 	// To avoid race conditions with the processing threads
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_paused = false;
@@ -688,7 +687,7 @@ void Song::stop()
 		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active
-	Engine::mixer()->clear();
+	Engine::audioEngine()->clear();
 
 	// Moves the control of the models that were processed on the last frame
 	// back to their controllers.
@@ -701,7 +700,7 @@ void Song::stop()
 
 	m_playMode = Mode_None;
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	emit stopped();
 	emit playbackStateChanged();
@@ -865,7 +864,7 @@ void Song::clearProject()
 	}
 
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	if( gui && gui->getBBEditor() )
 	{
@@ -909,7 +908,7 @@ void Song::clearProject()
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	if( gui && gui->getProjectNotes() )
 	{
@@ -1066,7 +1065,7 @@ void Song::loadProject( const QString & fileName )
 
 	clearErrors();
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
@@ -1187,7 +1186,7 @@ void Song::loadProject( const QString & fileName )
 	AutomationPattern::resolveAllIDs();
 
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	ConfigManager::inst()->addRecentlyOpenedProject( fileName );
 
@@ -1538,10 +1537,10 @@ void Song::setScale(unsigned int index, std::shared_ptr<Scale> newScale)
 {
 	if (index >= MaxScaleCount) {index = 0;}
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	std::atomic_store(&m_scales[index], newScale);
 	emit scaleListChanged(index);
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -1549,8 +1548,8 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 {
 	if (index >= MaxKeymapCount) {index = 0;}
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	std::atomic_store(&m_keymaps[index], newMap);
 	emit keymapListChanged(index);
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }

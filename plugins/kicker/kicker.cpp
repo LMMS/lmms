@@ -28,10 +28,10 @@
 #include <QPainter>
 
 #include "kicker.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "KickerOsc.h"
 
@@ -166,8 +166,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 {
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	const float decfr = m_decayModel.value() *
-		Engine::mixer()->processingSampleRate() / 1000.0f;
+	const float decfr = m_decayModel.value() * Engine::audioEngine()->processingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if ( tfp == 0 )
@@ -191,7 +190,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
-	so->update( _working_buffer + offset, frames, Engine::mixer()->processingSampleRate() );
+	so->update( _working_buffer + offset, frames, Engine::audioEngine()->processingSampleRate() );
 
 	if( _n->isReleased() )
 	{

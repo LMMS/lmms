@@ -34,11 +34,11 @@
 #include <QString>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "Controller.h"
 #include "Keymap.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
-#include "Mixer.h"
 #include "Scale.h"
 #include "VstSyncController.h"
 
@@ -307,7 +307,7 @@ public:
 	void loadingCancelled()
 	{
 		m_isCancelled = true;
-		Engine::mixer()->clearNewPlayHandles();
+		Engine::audioEngine()->clearNewPlayHandles();
 	}
 
 	bool isCancelled()

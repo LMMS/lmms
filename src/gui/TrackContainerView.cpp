@@ -33,10 +33,10 @@
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "BBTrack.h"
 #include "DataFile.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -268,9 +268,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	delete t;
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
