@@ -35,7 +35,7 @@
 template<typename T>
 constexpr int32_t CCONST(T a, T b, T c, T d)
 {
-	static_assert(std::is_convertible<T,int32_t>::value);
+	static_assert(std::is_convertible<T,int32_t>::value, "int32 compatibility required.");
 	return (
 		static_cast<int32_t>(a) << 24 |
 		static_cast<int32_t>(b) << 16 |
