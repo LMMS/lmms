@@ -33,10 +33,10 @@
 #include "sid.h"
 
 #include "SidInstrument.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
@@ -233,7 +233,7 @@ QString SidInstrument::nodeName() const
 
 f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
-	const float samplerate = Engine::mixer()->processingSampleRate();
+	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
 	for( int i = 0 ; i < 3 ; ++i )
 	{
@@ -308,7 +308,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
-	const int samplerate = Engine::mixer()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->processingSampleRate();
 
 	if ( tfp == 0 )
 	{

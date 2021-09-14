@@ -52,7 +52,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	Effect(&compressor_plugin_descriptor, parent, key),
 	m_compressorControls(this)
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 	m_yL[0] = m_yL[1] = COMP_NOISE_FLOOR;
 
@@ -86,7 +86,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 	connect(&m_compressorControls.m_kneeModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
 	connect(&m_compressorControls.m_autoMakeupModel, SIGNAL(dataChanged()), this, SLOT(calcAutoMakeup()), Qt::DirectConnection);
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(changeSampleRate()));
 	changeSampleRate();
 }
 
@@ -614,7 +614,7 @@ inline void CompressorEffect::calcTiltFilter(sample_t inputSample, sample_t &out
 
 void CompressorEffect::changeSampleRate()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 	m_coeffPrecalc = COMP_LOG / (m_sampleRate * 0.001f);
 

@@ -92,9 +92,9 @@ void TrackContentObject::movePosition( const TimePos & pos )
 	TimePos newPos = qMax(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_startPosition = newPos;
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 		Engine::getSong()->updateLength();
 		emit positionChanged();
 	}

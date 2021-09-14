@@ -50,13 +50,14 @@
 #endif
 
 
+#include "AudioEngine.h"
 #include "base64.h"
 #include "ConfigManager.h"
 #include "DrumSynth.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "Mixer.h"
+#include "lmms_constants.h"
 #include "PathUtil.h"
 
 #include "FileDialog.h"
@@ -75,11 +76,11 @@ SampleBuffer::SampleBuffer() :
 	m_loopEndFrame(0),
 	m_amplification(1.0f),
 	m_reversed(false),
-	m_frequency(BaseFreq),
-	m_sampleRate(mixerSampleRate())
+	m_frequency(DefaultBaseFreq),
+	m_sampleRate(audioEngineSampleRate())
 {
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 	update();
 }
 
@@ -225,9 +226,9 @@ void SampleBuffer::sampleRateChanged()
 	update(true);
 }
 
-sample_rate_t SampleBuffer::mixerSampleRate()
+sample_rate_t SampleBuffer::audioEngineSampleRate()
 {
-	return Engine::mixer()->processingSampleRate();
+	return Engine::audioEngine()->processingSampleRate();
 }
 
 
@@ -236,7 +237,7 @@ void SampleBuffer::update(bool keepSettings)
 	const bool lock = (m_data != nullptr);
 	if (lock)
 	{
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_varLock.lockForWrite();
 		MM_FREE(m_data);
 	}
@@ -265,7 +266,7 @@ void SampleBuffer::update(bool keepSettings)
 		int_sample_t * buf = nullptr;
 		sample_t * fbuf = nullptr;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = mixerSampleRate();
+		sample_rate_t samplerate = audioEngineSampleRate();
 		m_frames = 0;
 
 		const QFileInfo fileInfo(file);
@@ -349,7 +350,7 @@ void SampleBuffer::update(bool keepSettings)
 	if (lock)
 	{
 		m_varLock.unlock();
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 	}
 
 	emit sampleUpdated();
@@ -432,11 +433,11 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 {
 	const sample_rate_t oldRate = m_sampleRate;
 	// do samplerate-conversion to our default-samplerate
-	if (srcSR != mixerSampleRate())
+	if (srcSR != audioEngineSampleRate())
 	{
-		SampleBuffer * resampled = resample(srcSR, mixerSampleRate());
+		SampleBuffer * resampled = resample(srcSR, audioEngineSampleRate());
 
-		m_sampleRate = mixerSampleRate();
+		m_sampleRate = audioEngineSampleRate();
 		MM_FREE(m_data);
 		m_frames = resampled->frames();
 		m_data = MM_ALLOC(sampleFrame, m_frames);
@@ -450,15 +451,15 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = m_frames;
 	}
-	else if (oldRate != mixerSampleRate())
+	else if (oldRate != audioEngineSampleRate())
 	{
-		auto oldRateToNewRateRatio = static_cast<float>(mixerSampleRate()) / oldRate;
+		auto oldRateToNewRateRatio = static_cast<float>(audioEngineSampleRate()) / oldRate;
 
 		m_startFrame = qBound(0, f_cnt_t(m_startFrame * oldRateToNewRateRatio), m_frames);
 		m_endFrame = qBound(m_startFrame, f_cnt_t(m_endFrame * oldRateToNewRateRatio), m_frames);
 		m_loopStartFrame = qBound(0, f_cnt_t(m_loopStartFrame * oldRateToNewRateRatio), m_frames);
 		m_loopEndFrame = qBound(m_loopStartFrame, f_cnt_t(m_loopEndFrame * oldRateToNewRateRatio), m_frames);
-		m_sampleRate = mixerSampleRate();
+		m_sampleRate = audioEngineSampleRate();
 	}
 }
 
@@ -718,8 +719,11 @@ bool SampleBuffer::play(
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool isBackwards = state->isBackwards();
 
+	// The SampleBuffer can play a given sample with increased or decreased pitch. However, only
+	// samples that contain a tone that matches the default base note frequency of 440 Hz will
+	// produce the exact requested pitch in [Hz].
 	const double freqFactor = (double) freq / (double) m_frequency *
-		m_sampleRate / Engine::mixer()->processingSampleRate();
+		m_sampleRate / Engine::audioEngine()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>(
@@ -1268,7 +1272,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search(flacEnc, true);
 	FLAC__stream_encoder_set_do_mid_side_stereo(flacEnc, true);*/
 	FLAC__stream_encoder_set_sample_rate(flacEnc,
-		Engine::mixer()->sampleRate());
+		Engine::audioEngine()->sampleRate());
 
 	QBuffer baWriter;
 	baWriter.open(QBuffer::WriteOnly);
@@ -1295,7 +1299,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
-					Mixer::clip(m_data[f+frameCnt][ch]) *
+					AudioEngine::clip(m_data[f+frameCnt][ch]) *
 						OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
@@ -1550,12 +1554,12 @@ void SampleBuffer::setAmplification(float a)
 
 void SampleBuffer::setReversed(bool on)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	m_varLock.lockForWrite();
 	if (m_reversed != on) { std::reverse(m_data, m_data + m_frames); }
 	m_reversed = on;
 	m_varLock.unlock();
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	emit sampleUpdated();
 }
 

@@ -33,7 +33,7 @@
 #include "gui_templates.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "DataFile.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -425,7 +425,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
 
 	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
-				Engine::mixer()->baseSampleRate() / 10;
+				Engine::audioEngine()->baseSampleRate() / 10;
 
 	const float lfo_gray_amount = 1.0f - fabsf( m_lfoAmountKnob->value<float>() );
 	p.setPen( QPen( QColor( static_cast<int>( 96 * lfo_gray_amount ),

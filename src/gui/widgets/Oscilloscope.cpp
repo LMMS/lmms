@@ -30,7 +30,7 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
@@ -41,7 +41,7 @@
 Oscilloscope::Oscilloscope( QWidget * _p ) :
 	QWidget( _p ),
 	m_background( embed::getIconPixmap( "output_graph" ) ),
-	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
+	m_points( new QPointF[Engine::audioEngine()->framesPerPeriod()] ),
 	m_active( false ),
 	m_normalColor(71, 253, 133),
 	m_clippingColor(255, 64, 64)
@@ -50,7 +50,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
 	BufferManager::clear( m_buffer, frames );
@@ -75,7 +75,7 @@ void Oscilloscope::updateAudioBuffer( const surroundSampleFrame * buffer )
 {
 	if( !Engine::getSong()->isExporting() )
 	{
-		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+		const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 		memcpy( m_buffer, buffer, sizeof( surroundSampleFrame ) * fpp );
 	}
 }
@@ -91,7 +91,7 @@ void Oscilloscope::setActive( bool _active )
 		connect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		connect( Engine::mixer(),
+		connect( Engine::audioEngine(),
 			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
 			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 	}
@@ -100,7 +100,7 @@ void Oscilloscope::setActive( bool _active )
 		disconnect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		disconnect( Engine::mixer(),
+		disconnect( Engine::audioEngine(),
 			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
 			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 		// we have to update (remove last waves),
@@ -139,12 +139,12 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 
 	if( m_active && !Engine::getSong()->isExporting() )
 	{
-		Mixer const * mixer = Engine::mixer();
+		AudioEngine const * audioEngine = Engine::audioEngine();
 
-		float master_output = mixer->masterGain();
+		float master_output = audioEngine->masterGain();
 
-		const fpp_t frames = mixer->framesPerPeriod();
-		Mixer::StereoSample peakValues = mixer->getPeakValues(m_buffer, frames);
+		const fpp_t frames = audioEngine->framesPerPeriod();
+		AudioEngine::StereoSample peakValues = audioEngine->getPeakValues(m_buffer, frames);
 		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
 		// Set the color of the line according to the maximum level
@@ -164,7 +164,7 @@ void Oscilloscope::paintEvent( QPaintEvent * )
 		{
 			for( int frame = 0; frame < frames; ++frame )
 			{
-				sample_t const clippedSample = Mixer::clip(m_buffer[frame][ch]);
+				sample_t const clippedSample = AudioEngine::clip(m_buffer[frame][ch]);
 				m_points[frame] = QPointF(
 					x_base + static_cast<qreal>(frame) * xd,
 					y_base + ( static_cast<qreal>(clippedSample) * half_h ) );

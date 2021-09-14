@@ -23,11 +23,12 @@
  */
 
 #include "SamplePlayHandle.h"
+#include "AudioEngine.h"
 #include "AudioPort.h"
 #include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
+#include "lmms_constants.h"
 #include "SampleTCO.h"
 
 
@@ -85,7 +86,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 void SamplePlayHandle::play( sampleFrame * buffer )
 {
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
@@ -110,10 +111,11 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 /*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
-		if( ! m_sampleBuffer->play( workingBuffer, &m_state, frames,
-								BaseFreq ) )
+		// SamplePlayHandle always plays the sample at its original pitch;
+		// it is used only for previews, SampleTracks and the metronome.
+		if (!m_sampleBuffer->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
-			memset( workingBuffer, 0, frames * sizeof( sampleFrame ) );
+			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
 		}
 	}
 
@@ -141,7 +143,8 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate() );
+	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) *
+			( Engine::audioEngine()->processingSampleRate() / m_sampleBuffer->sampleRate() );
 }
 
 

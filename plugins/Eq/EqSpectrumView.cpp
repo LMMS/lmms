@@ -22,11 +22,11 @@
 
 #include "EqSpectrumView.h"
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),
@@ -93,7 +93,7 @@ void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 			return;
 		}
 
-		m_sampleRate = Engine::mixer()->processingSampleRate();
+		m_sampleRate = Engine::audioEngine()->processingSampleRate();
 		const int LOWEST_FREQ = 0;
 		const int HIGHEST_FREQ = m_sampleRate / 2;
 

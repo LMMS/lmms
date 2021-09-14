@@ -31,7 +31,7 @@
 
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "gui_templates.h"
 #include "Engine.h"
 
@@ -44,11 +44,11 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 
 
-AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
+AudioPulseAudio::AudioPulseAudio( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiopa", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_s( NULL ),
 	m_quit( false ),
 	m_convertEndian( false )
@@ -114,7 +114,7 @@ void AudioPulseAudio::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-//		setSampleRate( engine::mixer()->processingSampleRate() );
+//		setSampleRate( engine::audioEngine()->processingSampleRate() );
 
 	}
 
@@ -175,8 +175,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::mixer()->framesPerPeriod() ) /
-													(double)_this->sampleRate();
+			double latency = (double)( Engine::audioEngine()->framesPerPeriod() ) / (double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
@@ -245,7 +244,7 @@ void AudioPulseAudio::run()
 	}
 	else
 	{
-		const fpp_t fpp = mixer()->framesPerPeriod();
+		const fpp_t fpp = audioEngine()->framesPerPeriod();
 		surroundSampleFrame * temp = new surroundSampleFrame[fpp];
 		while( getNextBuffer( temp ) )
 		{
@@ -264,7 +263,7 @@ void AudioPulseAudio::run()
 
 void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
-	const fpp_t fpp = mixer()->framesPerPeriod();
+	const fpp_t fpp = audioEngine()->framesPerPeriod();
 	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
 	int_sample_t* pcmbuf = (int_sample_t *)pa_xmalloc( fpp * channels() * sizeof(int_sample_t) );
 
@@ -278,7 +277,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 			break;
 		}
 		int bytes = convertToS16( temp, frames,
-						mixer()->masterGain(),
+						audioEngine()->masterGain(),
 						pcmbuf,
 						m_convertEndian );
 		if( bytes > 0 )

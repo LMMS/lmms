@@ -40,7 +40,7 @@ Lv2FxControls::Lv2FxControls(class Lv2Effect *effect, const QString& uri) :
 {
 	if (isValid())
 	{
-		connect(Engine::mixer(), &Mixer::sampleRateChanged,
+		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
 			this, [this](){Lv2ControlBase::reloadPlugin();});
 	}
 }
