@@ -182,7 +182,8 @@ void ControllerView::modelChanged()
 
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
+	Controller * c = castModel<Controller>();
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( c->name(), this );
 	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );
