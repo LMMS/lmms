@@ -36,9 +36,11 @@
 #include "DataFile.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "Pattern.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
+#include "Track.h"
 #include "TrackContainerView.h"
 #include "TrackContentObjectView.h"
 #include "TrackView.h"
@@ -310,8 +312,8 @@ void TrackContentWidget::dragEnterEvent( QDragEnterEvent * dee )
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, "tco_" +
-						QString::number( getTrack()->type() ) );
+		StringPairDrag::processDragEnterEvent(dee, "patternfile,tco_" +
+						QString::number(getTrack()->type()));
 	}
 }
 
@@ -343,6 +345,12 @@ bool TrackContentWidget::canPasteSelection( TimePos tcoPos, const QMimeData* md 
 	Track * t = getTrack();
 	QString type = decodeKey( md );
 	QString value = decodeValue( md );
+
+	// Allow pattern files to be dropped on InstrumentTrack's
+	if (type == "patternfile" && t->type() == Track::TrackTypes::InstrumentTrack)
+	{
+		return true;
+	}
 
 	// We can only paste into tracks of the same type
 	if( type != ( "tco_" + QString::number( t->type() ) ) ||
@@ -532,6 +540,56 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 void TrackContentWidget::dropEvent( QDropEvent * de )
 {
 	TimePos tcoPos = TimePos( getPosition( de->pos().x() ) );
+
+	// Import pattern
+	using namespace Clipboard;
+
+	const QMimeData *mimeData = de->mimeData();
+	const QString type = decodeKey(mimeData);
+	const QString value = decodeValue(mimeData);
+	Track *track = getTrack();
+	TrackContainer *trackContainer = track->trackContainer();
+
+	if (type == "patternfile")
+	{
+		// Load pattern settings from file
+		DataFile dataFile(value);
+
+		if (dataFile.head().isNull())
+		{
+			// Loading failed, a message should have prompted.
+			return;
+		}
+
+		// Make undo possible
+		track->addJournalCheckPoint();
+
+		Pattern *pat = nullptr;
+		if (trackContainer->type() == TrackContainer::TrackContainerTypes::SongContainer)
+		{
+			// Song editor
+			tcoPos = tcoPos.quantize(gui->songEditor()->m_editor->getSnapSize());
+			pat = (Pattern *) track->createTCO(tcoPos);
+			pat->loadSettings(dataFile.content());
+			pat->movePosition(tcoPos);
+		}
+		else if (trackContainer->type() == TrackContainer::TrackContainerTypes::BBContainer)
+		{
+			// BB editor
+			pat = (Pattern *) track->getTCO(0);
+			pat->loadSettings(dataFile.content());
+			pat->movePosition(0);
+		}
+		else
+		{
+			return;
+		}
+
+		de->accept();
+		return;
+	}
+	// End import pattern
+
 	if( pasteSelection( tcoPos, de ) == true )
 	{
 		de->accept();
