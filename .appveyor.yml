@@ -9,7 +9,7 @@ environment:
     - compiler: msvc
 install:
   - cd C:\Tools\vcpkg
-  - git pull
+  - git pull --quiet
   - .\bootstrap-vcpkg.bat
   - cd %APPVEYOR_BUILD_FOLDER%
   - vcpkg install --triplet %PLATFORM%-windows --recurse fftw3 libsamplerate libsndfile lilv lv2 sdl2
