@@ -252,9 +252,14 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 	}
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Set channel color" ), this, SLOT( changeColor() ) );
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Remove channel color" ), this, SLOT( resetColor() ) );
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Pick random channel color" ), this, SLOT( randomColor() ) );
+
+	QMenu colorMenu(tr("Color"), this);
+	colorMenu.setIcon(embed::getIconPixmap("colorize"));
+	colorMenu.addAction(tr("Change"), this, SLOT(changeColor()));
+	colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
+	colorMenu.addAction(tr("Pick random" ), this, SLOT(randomColor()));
+	contextMenu->addMenu(&colorMenu);
+
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
