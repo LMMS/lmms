@@ -182,14 +182,6 @@ void TrackContentObject::setStartTimeOffset( const TimePos &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
-// Update TCO color if it follows the track color
-void TrackContentObject::updateColor()
-{
-	if( ! m_useCustomClipColor )
-	{
-		emit trackColorChanged();
-	}
-}
 
 
 void TrackContentObject::useCustomClipColor( bool b )

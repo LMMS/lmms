@@ -102,12 +102,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 
-	connect( &m_trackOperationsWidget, SIGNAL( colorChanged( QColor & ) ),
-			m_track, SLOT( trackColorChanged( QColor & ) ) );
-
-	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
-			m_track, SLOT( trackColorReset() ) );
-
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
 					m_track->m_trackContentObjects.begin();

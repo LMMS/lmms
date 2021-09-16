@@ -112,6 +112,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
 
+	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
 }
 
 
@@ -276,33 +277,40 @@ void TrackOperationsWidget::changeTrackColor()
 	if( ! new_color.isValid() )
 	{ return; }
 
-	emit colorChanged( new_color );
-
+	auto track = m_trackView->getTrack();
+	track->addJournalCheckPoint();
+	track->changeColor(new_color);
 	Engine::getSong()->setModified();
-	update();
 }
 
 void TrackOperationsWidget::resetTrackColor()
 {
-	emit colorReset();
+	auto track = m_trackView->getTrack();
+	track->addJournalCheckPoint();
+	track->resetColor();
 	Engine::getSong()->setModified();
-	update();
 }
 
 void TrackOperationsWidget::randomTrackColor()
 {
 	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
-
-	emit colorChanged( buffer );
+	auto track = m_trackView->getTrack();
+	track->addJournalCheckPoint();
+	track->changeColor(buffer);
 	Engine::getSong()->setModified();
-	update();
 }
 
-void TrackOperationsWidget::useTrackColor()
+void TrackOperationsWidget::resetTCOColors()
 {
-	emit colorParented();
-	Engine::getSong()->setModified();
+	auto track = m_trackView->getTrack();
+	track->addJournalCheckPoint();
+	for (auto tco: track->getTCOs())
+	{
+		tco->useCustomClipColor(false);
+	}
 }
+
+
 
 
 /*! \brief Update the trackOperationsWidget context menu
@@ -345,15 +353,15 @@ void TrackOperationsWidget::updateMenu()
 	}
 
 	toMenu->addSeparator();
-	toMenu->addAction( embed::getIconPixmap( "colorize" ),
-						tr( "Change color" ), this, SLOT( changeTrackColor() ) );
-	toMenu->addAction( embed::getIconPixmap( "colorize" ),
-						tr( "Reset color to default" ), this, SLOT( resetTrackColor() ) );
-	toMenu->addAction( embed::getIconPixmap( "colorize" ),
-						tr( "Set random color" ), this, SLOT( randomTrackColor() ) );
-	toMenu->addSeparator();
-	toMenu->addAction( embed::getIconPixmap( "colorize" ),
-						tr( "Clear clip colors" ), this, SLOT( useTrackColor() ) );
+
+	QMenu* colorMenu = new QMenu(tr("Track color"), this);
+	colorMenu->setIcon(embed::getIconPixmap("colorize"));
+	colorMenu->addAction(tr("Change"), this, SLOT(changeTrackColor()));
+	colorMenu->addAction(tr("Reset"), this, SLOT(resetTrackColor()));
+	colorMenu->addAction(tr("Pick random"), this, SLOT(randomTrackColor()));
+	colorMenu->addSeparator();
+	colorMenu->addAction(tr("Reset clip colors"), this, SLOT(resetTCOColors()));
+	toMenu->addMenu(colorMenu);
 }
 
 

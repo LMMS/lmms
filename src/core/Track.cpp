@@ -270,8 +270,12 @@ void Track::loadSettings( const QDomElement & element )
 
 	if( element.hasAttribute( "color" ) )
 	{
-		m_color.setNamedColor( element.attribute( "color" ) );
-		m_hasColor = true;
+		QColor newColor = QColor(element.attribute("color"));
+		changeColor(newColor);
+	}
+	else
+	{
+		resetColor();
 	}
 
 	if( m_simpleSerializingMode )
@@ -647,23 +651,17 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::trackColorChanged( QColor & c )
+void Track::changeColor( QColor & c )
 {
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
-		m_trackContentObjects[i]->updateColor();
-	}
 	m_hasColor = true;
 	m_color = c;
+	emit colorChanged();
 }
 
-void Track::trackColorReset()
+void Track::resetColor()
 {
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
-		m_trackContentObjects[i]->updateColor();
-	}
 	m_hasColor = false;
+	emit colorChanged();
 }
 
 

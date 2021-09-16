@@ -135,8 +135,6 @@ public:
 	TimePos startTimeOffset() const;
 	void setStartTimeOffset( const TimePos &startTimeOffset );
 
-	void updateColor();
-
 	// Will copy the state of a TCO to another TCO
 	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
 
@@ -149,7 +147,6 @@ signals:
 	void positionChanged();
 	void destroyedTCO();
 	void colorChanged();
-	void trackColorChanged();
 
 
 private:

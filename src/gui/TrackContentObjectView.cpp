@@ -125,8 +125,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
 	connect(m_tco, SIGNAL(colorChanged()), this, SLOT(update()));
-	connect( m_tco, SIGNAL( trackColorChanged() ), this, SLOT( update() ) );
-	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
+	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(updateTrackColor()));
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
 	updateLength();
