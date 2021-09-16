@@ -194,8 +194,9 @@ void TrackContentObject::updateColor()
 
 void TrackContentObject::useCustomClipColor( bool b )
 {
+	if (b == m_useCustomClipColor) { return; }
 	m_useCustomClipColor = b;
-	updateColor();
+	emit colorChanged();
 }
 
 

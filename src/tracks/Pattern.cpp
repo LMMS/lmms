@@ -422,6 +422,10 @@ void Pattern::loadSettings( const QDomElement & _this )
 		useCustomClipColor( true );
 		setColor( _this.attribute( "color" ) );
 	}
+	else
+	{
+		useCustomClipColor(false);
+	}
 	
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{

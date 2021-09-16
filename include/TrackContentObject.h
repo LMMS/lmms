@@ -148,6 +148,7 @@ signals:
 	void lengthChanged();
 	void positionChanged();
 	void destroyedTCO();
+	void colorChanged();
 	void trackColorChanged();
 
 

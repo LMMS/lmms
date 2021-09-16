@@ -45,7 +45,7 @@ public slots:
 
 
 protected:
-	void contextMenuEvent( QContextMenuEvent * _cme ) override;
+	void constructContextMenu(QMenu* cm) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;

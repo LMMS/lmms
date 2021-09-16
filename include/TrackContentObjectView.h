@@ -126,8 +126,10 @@ public slots:
 	void remove();
 	void update() override;
 
-	void changeClipColor();
-	void useTrackColor();
+	void selectColor();
+	void randomColor();
+	void resetColor();
+	void updateTrackColor();
 
 protected:
 	enum ContextMenuAction
@@ -231,6 +233,7 @@ private:
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	TimePos draggedTCOPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
+	void setColor(const QColor color);
 	//! Return true iff TCO could be split. Currently only implemented for samples
 	virtual bool splitTCO( const TimePos pos ){ return false; };
 	void updateCursor(QMouseEvent * me);
