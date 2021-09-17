@@ -42,7 +42,7 @@
 #include "MidiClient.h"
 #include "AudioJack.h"
 
-constexpr size_t JACK_MIDI_BUFFER_MAX{64}; /* events */
+constexpr size_t JACK_MIDI_BUFFER_MAX = 64; /* events */
 
 class QLineEdit;
 
