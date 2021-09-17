@@ -426,6 +426,7 @@ void FxLine::changeColor()
 	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
 	if(!new_color.isValid()) { return; }
 	channel->setColor (new_color);
+	Engine::getSong()->setModified();
 	update();
 }
 
@@ -434,6 +435,7 @@ void FxLine::changeColor()
 void FxLine::resetColor()
 {
 	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = false;
+	Engine::getSong()->setModified();
 	update();
 }
 
@@ -443,5 +445,6 @@ void FxLine::randomColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	Engine::getSong()->setModified();
 	update();
 }

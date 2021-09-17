@@ -308,6 +308,7 @@ void TrackOperationsWidget::resetTCOColors()
 	{
 		tco->useCustomClipColor(false);
 	}
+	Engine::getSong()->setModified();
 }
 
 
