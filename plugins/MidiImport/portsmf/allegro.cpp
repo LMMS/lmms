@@ -2880,8 +2880,7 @@ Alg_event_ptr const &Alg_seq::operator[](int i)
         }
         tr++;
     }
-    assert(false); // out of bounds
-    return nullptr;
+	throw std::out_of_range{"Alg_seq::operator[] - Index out of range."};
 }
 //#pragma warning(default: 4715)
 
