@@ -1539,9 +1539,24 @@ int PianoRoll::keyAreaBottom() const
 
 
 
+void PianoRoll::contextMenuEvent(QContextMenuEvent *cme)
+{
+	// Silently drop context menu events, except if ctrl is held,
+	// in that case the event will be propagated to parent
+	cme->setAccepted(!(cme->modifiers() & Qt::ControlModifier));
+}
+
+
+
+
 void PianoRoll::mousePressEvent(QMouseEvent * me )
 {
 	if (!hasValidPattern()) { return; }
+
+	if (!(me->button() == Qt::RightButton && me->modifiers() & Qt::ControlModifier))
+	{
+		me->accept();
+	}
 
 	//m_startedWithShift = me->modifiers() & Qt::ShiftModifier;
 
@@ -1570,12 +1585,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	else if (me->button() == Qt::MidButton)
 	{
-		mode = m_quickEditMode;
+		mode = ModeErase;
 		left = true;
 		update();
 	}
-
-
 
 	// keep track of the point where the user clicked down
 	if( left )
@@ -4995,14 +5008,14 @@ PianoRollWindow::PianoRollWindow() :
 
 	// init edit-buttons at the top
 	ActionGroup* editModeGroup = new ActionGroup( this );
-	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
-	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
-	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
+	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw (Shift+D)" ) );
+	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase" ) );
+	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select" ) );
 	QAction* pitchBendAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Pitch bend"));
 	QAction* knifeAction =  editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife"));
 	QAction* bulldozerAction =  editModeGroup->addAction(embed::getIconPixmap("edit_bulldozer"), tr("Bulldozer"));
-	QAction* stampAction =  editModeGroup->addAction(embed::getIconPixmap("edit_stamp"), tr("Stamp"));
-	QAction* strumAction =  editModeGroup->addAction(embed::getIconPixmap("edit_strum"), tr("Strum"));
+	/*QAction* stampAction =*/ editModeGroup->addAction(embed::getIconPixmap("edit_stamp"), tr("Stamp"));
+	QAction* strumAction = editModeGroup->addAction(embed::getIconPixmap("edit_strum"), tr("Strum"));
 
 	drawAction->setChecked( true );
 
@@ -5017,13 +5030,20 @@ PianoRollWindow::PianoRollWindow() :
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setQuickEditMode( int ) ) );
 	connect(m_editor, SIGNAL(editModeChanged(int)), editModeGroup, SLOT(setChecked(int)));
 
-	// Add first edit modes to toolbar
-	editModeToolBar->addActions({drawAction, eraseAction, selectAction});
-
-	// Add temporary edit modes to a combo button
+	// Add first edit mode to toolbar
+	editModeToolBar->addAction(drawAction);
+	// Add the rest to a combo button
 	ComboButton* editModeButton = new ComboButton(m_toolBar, true);
-	editModeButton->addActions({pitchBendAction, knifeAction, bulldozerAction, stampAction, strumAction});
+	editModeButton->addActions(editModeGroup->actions().mid(1));
 	editModeToolBar->addWidget(editModeButton);
+
+	m_editModeSelector = new HexMenu(m_editor);
+	m_editModeSelector->addAction(strumAction);
+	m_editModeSelector->addAction(drawAction);
+	m_editModeSelector->addAction(knifeAction);
+	m_editModeSelector->addAction(pitchBendAction);
+	m_editModeSelector->addAction(eraseAction);
+	m_editModeSelector->addAction(bulldozerAction);
 
 	// Note actions (instatly applied)
 	DropToolBar* notesActionsToolBar = addDropToolBarToTop(tr("Note actions"));
@@ -5059,6 +5079,10 @@ PianoRollWindow::PianoRollWindow() :
 	connect(cutOverlapsAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(false); });
 	connect(minLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(false); });
 	connect(maxLengthAction, &QAction::triggered, [this](){ m_editor->constrainNoteLengths(true); });
+
+	QMenu* subMenu = new QMenu(this);
+	subMenu->addActions(noteToolsButton->actions());
+	m_editModeSelector->addMenu(subMenu);
 
 	// -- File actions
 	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
@@ -5503,6 +5527,22 @@ void PianoRollWindow::focusInEvent( QFocusEvent * event )
 	// when the window is given focus, also give focus to the actual piano roll
 	m_editor->setFocus( event->reason() );
 }
+
+
+
+
+void PianoRollWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+	QPoint pos {event->x() - m_editor->x() - m_editModeSelector->width() / 2,
+				event->y() - m_editor->y() - m_editModeSelector->height() / 2};
+	m_editModeSelector->move(pos);
+	m_editModeSelector->show();
+	m_editModeSelector->setFocus();
+	m_editModeSelector->grabMouse();
+}
+
+
+
 
 void PianoRollWindow::stopStepRecording()
 {

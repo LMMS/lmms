@@ -32,6 +32,7 @@
 #include <QInputDialog>
 
 #include "Editor.h"
+#include "HexMenu.h"
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "Note.h"
@@ -162,6 +163,7 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
+	void contextMenuEvent(QContextMenuEvent* cme) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void resizeEvent( QResizeEvent * re ) override;
 	void wheelEvent( QWheelEvent * we ) override;
@@ -531,6 +533,8 @@ public:
 signals:
 	void currentPatternChanged();
 
+protected slots:
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private slots:
 	void updateAfterPatternChange();
@@ -545,6 +549,7 @@ private:
 	void updateStepRecordingIcon();
 
 	PianoRoll* m_editor;
+	HexMenu* m_editModeSelector;
 
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
@@ -555,7 +560,6 @@ private:
 	ComboBox * m_chordComboBox;
 	ComboBox* m_snapComboBox;
 	QPushButton * m_clearGhostButton;
-
 };
 
 
