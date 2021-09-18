@@ -125,7 +125,12 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
 	connect(m_tco, SIGNAL(colorChanged()), this, SLOT(update()));
-	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(updateTrackColor()));
+
+	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
+	{
+		// redraw if TCO uses track color
+		if (m_tco && !m_tco->usesCustomClipColor()) { update(); }
+	});
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
 	updateLength();
@@ -356,15 +361,6 @@ void TrackContentObjectView::resetColor()
 	setColor(QColor());
 }
 
-
-
-void TrackContentObjectView::updateTrackColor()
-{
-	if (!m_tco->usesCustomClipColor())
-	{
-		update();
-	}
-}
 
 
 

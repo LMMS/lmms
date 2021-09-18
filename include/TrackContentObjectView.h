@@ -129,7 +129,6 @@ public slots:
 	void selectColor();
 	void randomColor();
 	void resetColor();
-	void updateTrackColor();
 
 protected:
 	enum ContextMenuAction
