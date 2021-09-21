@@ -4,15 +4,15 @@
 #ifndef DENORMALS_H
 #define DENORMALS_H
 
+#ifdef __SSE__
 #include <immintrin.h>
 #include <fxsrintrin.h>
 
-#ifdef __SSE__
 // Intel® 64 and IA-32 Architectures Software Developer’s Manual,
 // Volume 1: Basic Architecture,
 // 11.6.3 Checking for the DAZ Flag in the MXCSR Register
 int inline can_we_daz() {
-  unsigned char buffer[512] __attribute__ ((aligned(16))) = {0};
+  alignas(16) unsigned char buffer[512] = {0};
   #ifdef LMMS_HOST_X86
   _fxsave(buffer);
   #endif
@@ -21,7 +21,7 @@ int inline can_we_daz() {
   #endif
   // Bit 6 of the MXCSR_MASK, i.e. in the lowest byte,
   // tells if we can use the DAZ flag.
-  return( (buffer[28] & (1 << 6)) != 0);
+  return ((buffer[28] & (1 << 6)) != 0);
 }
 #endif
 
@@ -29,7 +29,7 @@ int inline can_we_daz() {
 void inline disable_denormals() {
 #ifdef __SSE__
   /* Setting DAZ might freeze systems not supporting it */
-  if(can_we_daz()) {
+  if (can_we_daz()) {
     _MM_SET_DENORMALS_ZERO_MODE( _MM_DENORMALS_ZERO_ON );
   }
   /* FTZ flag */
