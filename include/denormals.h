@@ -5,20 +5,22 @@
 #define DENORMALS_H
 
 #ifdef __SSE__
+#if defined(_MSC_VER)
 #include <immintrin.h>
-#include <fxsrintrin.h>
+#elif defined(__GNUC__)
+#include <x86intrin.h>
+#endif
 
 // Intel® 64 and IA-32 Architectures Software Developer’s Manual,
 // Volume 1: Basic Architecture,
 // 11.6.3 Checking for the DAZ Flag in the MXCSR Register
 int inline can_we_daz() {
   alignas(16) unsigned char buffer[512] = {0};
-  #ifdef LMMS_HOST_X86
+#if defined(LMMS_HOST_X86)
   _fxsave(buffer);
-  #endif
-  #ifdef LMMS_HOST_X86_64
+#elif defined(LMMS_HOST_X86_64)
   _fxsave64(buffer);
-  #endif
+#endif
   // Bit 6 of the MXCSR_MASK, i.e. in the lowest byte,
   // tells if we can use the DAZ flag.
   return ((buffer[28] & (1 << 6)) != 0);
