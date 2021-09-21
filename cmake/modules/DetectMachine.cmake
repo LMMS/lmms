@@ -70,6 +70,7 @@ IF(WIN32)
 		unset(MSVC_VER)
 	else()
 		# Cross-compiled
+		# TODO: Handle Windows ARM64 targets
 		IF(WIN64)
 			SET(IS_X86_64 TRUE)
 			SET(LMMS_BUILD_WIN64 TRUE)
