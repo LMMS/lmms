@@ -124,8 +124,13 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
-	connect( m_tco, SIGNAL( trackColorChanged() ), this, SLOT( update() ) );
-	connect( m_trackView->getTrackOperationsWidget(), SIGNAL( colorParented() ), this, SLOT( useTrackColor() ) );
+	connect(m_tco, SIGNAL(colorChanged()), this, SLOT(update()));
+
+	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
+	{
+		// redraw if TCO uses track color
+		if (!m_tco->usesCustomClipColor()) { update(); }
+	});
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
 	updateLength();
@@ -333,25 +338,73 @@ void TrackContentObjectView::updatePosition()
 
 
 
-void TrackContentObjectView::changeClipColor()
+void TrackContentObjectView::selectColor()
 {
 	// Get a color from the user
 	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
-	if( ! new_color.isValid() )
-	{ return; }
-
-	// Use that color
-	m_tco->setColor( new_color );
-	m_tco->useCustomClipColor( true );
-	update();
+	if (new_color.isValid()) { setColor(&new_color); }
 }
 
 
 
-void TrackContentObjectView::useTrackColor()
+
+void TrackContentObjectView::randomizeColor()
 {
-	m_tco->useCustomClipColor( false );
-	update();
+	setColor(&ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+}
+
+
+
+
+void TrackContentObjectView::resetColor()
+{
+	setColor(nullptr);
+}
+
+
+
+
+/*! \brief Change color of all selected TCOs
+ *
+ *  \param color The new QColor. Pass nullptr to use the Track's color.
+ */
+void TrackContentObjectView::setColor(const QColor* color)
+{
+	std::set<Track*> journaledTracks;
+
+	auto selectedTCOs = getClickedTCOs();
+	for (auto tcov: selectedTCOs)
+	{
+		auto tco = tcov->getTrackContentObject();
+		auto track = tco->getTrack();
+
+		// TODO journal whole Song or group of TCOs instead of one journal entry for each track
+
+		// If only one TCO changed, store that in the journal
+		if (selectedTCOs.length() == 1)
+		{
+			tco->addJournalCheckPoint();
+		}
+		// If multiple TCOs changed, store whole Track in the journal
+		// Check if track has been journaled already by trying to add it to the set
+		else if (journaledTracks.insert(track).second)
+		{
+			track->addJournalCheckPoint();
+		}
+
+		if (color)
+		{
+			tco->useCustomClipColor(true);
+			tco->setColor(*color);
+		}
+		else
+		{
+			tco->useCustomClipColor(false);
+		}
+		tcov->update();
+	}
+
+	Engine::getSong()->setModified();
 }
 
 
@@ -1050,10 +1103,12 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	contextMenu.addSeparator();
 
-	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
-	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
+	QMenu colorMenu (tr("Clip color"), this);
+	colorMenu.setIcon(embed::getIconPixmap("colorize"));
+	colorMenu.addAction(tr("Change"), this, SLOT(selectColor()));
+	colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
+	colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));
+	contextMenu.addMenu(&colorMenu);
 
 	constructContextMenu( &contextMenu );
 
