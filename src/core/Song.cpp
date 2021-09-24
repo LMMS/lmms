@@ -94,7 +94,8 @@ Song::Song() :
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
-	m_loopRenderRemaining(1)
+	m_loopRenderRemaining(1),
+	m_oldAutomatedValues()
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
@@ -105,7 +106,7 @@ Song::Song() :
 			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
 
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
@@ -115,6 +116,9 @@ Song::Song() :
 
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
+
+	for (int i = 0; i < MaxScaleCount; i++) {m_scales[i] = std::make_shared<Scale>();}
+	for (int i = 0; i < MaxKeymapCount; i++) {m_keymaps[i] = std::make_shared<Keymap>();}
 }
 
 
@@ -131,8 +135,7 @@ Song::~Song()
 
 void Song::masterVolumeChanged()
 {
-	Engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
-								100.0f );
+	Engine::audioEngine()->setMasterGain( m_masterVolumeModel.value() / 100.0f );
 }
 
 
@@ -140,9 +143,9 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
-	PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
@@ -154,7 +157,7 @@ void Song::setTempo()
 			nph->unlock();
 		}
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	Engine::updateFramesPerTick();
 
@@ -268,7 +271,7 @@ void Song::processNextBuffer()
 	}
 
 	const auto framesPerTick = Engine::framesPerTick();
-	const auto framesPerPeriod = Engine::mixer()->framesPerPeriod();
+	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 
 	f_cnt_t frameOffsetInPeriod = 0;
 
@@ -404,12 +407,28 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		}
 	}
 
+	// Checks if an automated model stopped being automated by automation patterns
+	// so we can move the control back to any connected controller again
+	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+	{
+		AutomatableModel * am = it.key();
+		if (am->controllerConnection() && !values.contains(am))
+		{
+			am->setUseControllerValue(true);
+		}
+	}
+	m_oldAutomatedValues = values;
+
 	// Apply values
 	for (auto it = values.begin(); it != values.end(); it++)
 	{
 		if (! recordedModels.contains(it.key()))
 		{
 			it.key()->setAutomatedValue(it.value());
+		}
+		else if (!it.key()->useControllerValue())
+		{
+			it.key()->setUseControllerValue(true);
 		}
 	}
 }
@@ -619,6 +638,9 @@ void Song::stop()
 		return;
 	}
 
+	// To avoid race conditions with the processing threads
+	Engine::audioEngine()->requestChangeInModel();
+
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_paused = false;
 	m_recording = true;
@@ -665,9 +687,20 @@ void Song::stop()
 		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active
-	Engine::mixer()->clear();
+	Engine::audioEngine()->clear();
+
+	// Moves the control of the models that were processed on the last frame
+	// back to their controllers.
+	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
+	{
+		AutomatableModel * am = it.key();
+		am->setUseControllerValue(true);
+	}
+	m_oldAutomatedValues.clear();
 
 	m_playMode = Mode_None;
+
+	Engine::audioEngine()->doneChangeInModel();
 
 	emit stopped();
 	emit playbackStateChanged();
@@ -831,7 +864,7 @@ void Song::clearProject()
 	}
 
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	if( gui && gui->getBBEditor() )
 	{
@@ -866,13 +899,16 @@ void Song::clearProject()
 	m_masterPitchModel.reset();
 	m_timeSigModel.reset();
 
+	// Clear the m_oldAutomatedValues AutomatedValueMap
+	m_oldAutomatedValues.clear();
+
 	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
 	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
 									clear();
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	if( gui && gui->getProjectNotes() )
 	{
@@ -983,9 +1019,37 @@ void Song::loadProject( const QString & fileName )
 	setProjectFileName(fileName);
 
 	DataFile dataFile( m_fileName );
+
+	bool cantLoadProject = false;
 	// if file could not be opened, head-node is null and we create
 	// new project
 	if( dataFile.head().isNull() )
+	{
+		cantLoadProject = true;
+	}
+	else
+	{
+		// We check if plugins contain local paths to prevent malicious code being
+		// added to project bundles and loaded with "local:" paths
+		if (dataFile.hasLocalPlugins())
+		{
+			cantLoadProject = true;
+
+			if (gui)
+			{
+				QMessageBox::critical(NULL, tr("Aborting project load"),
+					tr("Project file contains local paths to plugins, which could be used to "
+						"run malicious code."));
+			}
+			else
+			{
+				QTextStream(stderr) << tr("Can't load project: "
+					"Project file contains local paths to plugins.") << endl;
+			}
+		}
+	}
+
+	if (cantLoadProject)
 	{
 		if( m_loadOnLaunch )
 		{
@@ -1001,7 +1065,7 @@ void Song::loadProject( const QString & fileName )
 
 	clearErrors();
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
@@ -1070,6 +1134,14 @@ void Song::loadProject( const QString & fileName )
 			{
 				restoreControllerStates( node.toElement() );
 			}
+			else if (node.nodeName() == "scales")
+			{
+				restoreScaleStates(node.toElement());
+			}
+			else if (node.nodeName() == "keymaps")
+			{
+				restoreKeymapStates(node.toElement());
+			}
 			else if( gui )
 			{
 				if( node.nodeName() == gui->getControllerRackView()->nodeName() )
@@ -1114,7 +1186,7 @@ void Song::loadProject( const QString & fileName )
 	AutomationPattern::resolveAllIDs();
 
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	ConfigManager::inst()->addRecentlyOpenedProject( fileName );
 
@@ -1152,8 +1224,8 @@ void Song::loadProject( const QString & fileName )
 }
 
 
-// only save current song as _filename and do nothing else
-bool Song::saveProjectFile( const QString & filename )
+// only save current song as filename and do nothing else
+bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
 	DataFile dataFile( DataFile::SongProject );
 	m_savingProject = true;
@@ -1178,9 +1250,12 @@ bool Song::saveProjectFile( const QString & filename )
 
 	saveControllerStates( dataFile, dataFile.content() );
 
+	saveScaleStates(dataFile, dataFile.content());
+	saveKeymapStates(dataFile, dataFile.content());
+
 	m_savingProject = false;
 
-	return dataFile.writeFile( filename );
+	return dataFile.writeFile(filename, withResources);
 }
 
 
@@ -1188,46 +1263,34 @@ bool Song::saveProjectFile( const QString & filename )
 // Save the current song
 bool Song::guiSaveProject()
 {
-	DataFile dataFile( DataFile::SongProject );
-	QString fileNameWithExtension = dataFile.nameWithExtension( m_fileName );
-	setProjectFileName(fileNameWithExtension);
-
-	bool const saveResult = saveProjectFile( m_fileName );
-
-	if( saveResult )
-	{
-		setModified(false);
-	}
-
-	return saveResult;
+	return guiSaveProjectAs(m_fileName);
 }
 
 
 
 
 // Save the current song with the given filename
-bool Song::guiSaveProjectAs( const QString & _file_name )
+bool Song::guiSaveProjectAs(const QString & filename)
 {
-	QString o = m_oldFileName;
-	m_oldFileName = m_fileName;
-	setProjectFileName(_file_name);
+	DataFile dataFile(DataFile::SongProject);
+	QString fileNameWithExtension = dataFile.nameWithExtension(filename);
 
-	bool saveResult = guiSaveProject();
-	// After saving as, restore default save options.
+	bool withResources = m_saveOptions.saveAsProjectBundle.value();
+
+	bool const saveResult = saveProjectFile(fileNameWithExtension, withResources);
+
+	// After saving, restore default save options.
 	m_saveOptions.setDefaultOptions();
 
-	if(!saveResult)
+	// If we saved a bundle, we keep the project on the original
+	// file and still keep it as modified
+	if (saveResult && !withResources)
 	{
-		// Saving failed. Restore old filenames.
-		setProjectFileName(m_oldFileName);
-		m_oldFileName = o;
-
-		return false;
+		setModified(false);
+		setProjectFileName(fileNameWithExtension);
 	}
 
-	m_oldFileName = m_fileName;
-
-	return true;
+	return saveResult;
 }
 
 
@@ -1277,6 +1340,56 @@ void Song::removeAllControllers()
 	m_controllers.clear();
 }
 
+
+
+void Song::saveScaleStates(QDomDocument &doc, QDomElement &element)
+{
+	QDomElement scalesNode = doc.createElement("scales");
+	element.appendChild(scalesNode);
+
+	for (int i = 0; i < MaxScaleCount; i++)
+	{
+		m_scales[i]->saveState(doc, scalesNode);
+	}
+}
+
+
+void Song::restoreScaleStates(const QDomElement &element)
+{
+	QDomNode node = element.firstChild();
+
+	for (int i = 0; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
+	{
+		m_scales[i]->restoreState(node.toElement());
+		node = node.nextSibling();
+	}
+	emit scaleListChanged(-1);
+}
+
+
+void Song::saveKeymapStates(QDomDocument &doc, QDomElement &element)
+{
+	QDomElement keymapsNode = doc.createElement("keymaps");
+	element.appendChild(keymapsNode);
+
+	for (int i = 0; i < MaxKeymapCount; i++)
+	{
+		m_keymaps[i]->saveState(doc, keymapsNode);
+	}
+}
+
+
+void Song::restoreKeymapStates(const QDomElement &element)
+{
+	QDomNode node = element.firstChild();
+
+	for (int i = 0; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
+	{
+		m_keymaps[i]->restoreState(node.toElement());
+		node = node.nextSibling();
+	}
+	emit keymapListChanged(-1);
+}
 
 
 void Song::exportProjectMidi(QString const & exportFileName) const
@@ -1401,4 +1514,42 @@ QString Song::errorSummary()
 
 bool Song::isSavingProject() const {
 	return m_savingProject;
+}
+
+
+std::shared_ptr<const Scale> Song::getScale(unsigned int index) const
+{
+	if (index >= MaxScaleCount) {index = 0;}
+
+	return std::atomic_load(&m_scales[index]);
+}
+
+
+std::shared_ptr<const Keymap> Song::getKeymap(unsigned int index) const
+{
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	return std::atomic_load(&m_keymaps[index]);
+}
+
+
+void Song::setScale(unsigned int index, std::shared_ptr<Scale> newScale)
+{
+	if (index >= MaxScaleCount) {index = 0;}
+
+	Engine::audioEngine()->requestChangeInModel();
+	std::atomic_store(&m_scales[index], newScale);
+	emit scaleListChanged(index);
+	Engine::audioEngine()->doneChangeInModel();
+}
+
+
+void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
+{
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	Engine::audioEngine()->requestChangeInModel();
+	std::atomic_store(&m_keymaps[index], newMap);
+	emit keymapListChanged(index);
+	Engine::audioEngine()->doneChangeInModel();
 }

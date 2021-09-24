@@ -24,20 +24,21 @@
 
 
 #include "Engine.h"
+#include "AudioEngine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "FxMixer.h"
 #include "Ladspa2LMMS.h"
 #include "Lv2Manager.h"
-#include "Mixer.h"
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include "Oscillator.h"
 
 float LmmsCore::s_framesPerTick;
-Mixer* LmmsCore::s_mixer = NULL;
+AudioEngine* LmmsCore::s_audioEngine = NULL;
 FxMixer * LmmsCore::s_fxMixer = NULL;
 BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
@@ -58,10 +59,12 @@ void LmmsCore::init( bool renderOnly )
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
+	//initilize oscillators
+	Oscillator::waveTableInit();
 
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new Mixer( renderOnly );
+	s_audioEngine = new AudioEngine( renderOnly );
 	s_song = new Song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
@@ -75,12 +78,12 @@ void LmmsCore::init( bool renderOnly )
 	s_projectJournal->setJournalling( true );
 
 	emit engine->initProgress(tr("Opening audio and midi devices"));
-	s_mixer->initDevices();
+	s_audioEngine->initDevices();
 
 	PresetPreviewPlayHandle::init();
 
-	emit engine->initProgress(tr("Launching mixer threads"));
-	s_mixer->startProcessing();
+	emit engine->initProgress(tr("Launching audio engine threads"));
+	s_audioEngine->startProcessing();
 }
 
 
@@ -89,7 +92,7 @@ void LmmsCore::init( bool renderOnly )
 void LmmsCore::destroy()
 {
 	s_projectJournal->stopAllJournalling();
-	s_mixer->stopProcessing();
+	s_audioEngine->stopProcessing();
 
 	PresetPreviewPlayHandle::cleanup();
 
@@ -98,7 +101,7 @@ void LmmsCore::destroy()
 	deleteHelper( &s_bbTrackContainer );
 
 	deleteHelper( &s_fxMixer );
-	deleteHelper( &s_mixer );
+	deleteHelper( &s_audioEngine );
 
 #ifdef LMMS_HAVE_LV2
 	deleteHelper( &s_lv2Manager );
@@ -111,6 +114,10 @@ void LmmsCore::destroy()
 	deleteHelper( &s_song );
 
 	delete ConfigManager::inst();
+
+	// The oscillator FFT plans remain throughout the application lifecycle
+	// due to being expensive to create, and being used whenever a userwave form is changed
+	Oscillator::destroyFFTPlans();
 }
 
 
@@ -136,8 +143,7 @@ float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 
 void LmmsCore::updateFramesPerTick()
 {
-	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerBar / s_song->getTempo();
+	s_framesPerTick = s_audioEngine->processingSampleRate() * 60.0f * 4 / DefaultTicksPerBar / s_song->getTempo();
 }
 
 

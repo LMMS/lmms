@@ -36,15 +36,15 @@
 #include <string>
 #include <vorbis/vorbisenc.h>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 
 AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
 				bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer )
+				AudioEngine* audioEngine ) :
+	AudioFileDevice( outputSettings, channels, file, audioEngine )
 {
 	m_ok = successful = outputFileOpened() && startEncoding();
 }

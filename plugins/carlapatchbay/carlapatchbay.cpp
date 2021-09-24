@@ -42,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
     Plugin::Instrument,
     new PluginPixmapLoader( "logo" ),
     NULL,
-    NULL
+    NULL,
 } ;
 
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)

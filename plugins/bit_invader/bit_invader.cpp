@@ -26,13 +26,13 @@
 #include <QDomElement>
 
 #include "bit_invader.h"
+#include "AudioEngine.h"
 #include "base64.h"
 #include "Engine.h"
 #include "Graph.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -45,6 +45,7 @@
 #include "plugin_export.h"
 
 static const int wavetableSize = 200;
+static const float defaultNormalizationFactor = 1.0f;
 
 extern "C"
 {
@@ -60,7 +61,7 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }
@@ -77,7 +78,17 @@ bSynth::bSynth( float * _shape, NotePlayHandle * _nph, bool _interpolation,
 	sample_shape = new float[wavetableSize];
 	for (int i=0; i < wavetableSize; ++i)
 	{
-		sample_shape[i] = _shape[i] * _factor;
+		float buf = _shape[i] * _factor;
+
+		/* Double check that normalization has been performed correctly,
+		i.e., the absolute value of all samples is <= 1.0 if _factor
+		is different to the default normalization factor. If there is
+		a value > 1.0, clip the sample to 1.0 to limit the range. */
+		if ((_factor != defaultNormalizationFactor) && (fabsf(buf) > 1.0f))
+		{
+			buf = (buf < 0) ? -1.0f : 1.0f;
+		}
+		sample_shape[i] = buf;
 	}
 }
 
@@ -140,22 +151,19 @@ sample_t bSynth::nextStringSample( float sample_length )
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength(128, 4, wavetableSize, 1, this, tr("Sample length")),
+	m_sampleLength(wavetableSize, 4, wavetableSize, 1, this, tr("Sample length")),
 	m_graph(-1.0f, 1.0f, wavetableSize, this),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
 {
-
-	lengthChanged();
-
 	m_graph.setWaveToSine();
+	lengthChanged();
 
 	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
 			this, SLOT( lengthChanged( ) ), Qt::DirectConnection );
 
 	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
-
 }
 
 
@@ -276,7 +284,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 		float factor;
 		if( !m_normalize.value() )
 		{
-			factor = 1.0f;
+			factor = defaultNormalizationFactor;
 		}
 		else
 		{
@@ -287,7 +295,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 					const_cast<float*>( m_graph.samples() ),
 					_n,
 					m_interpolation.value(), factor,
-				Engine::mixer()->processingSampleRate() );
+				Engine::audioEngine()->processingSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();

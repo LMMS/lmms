@@ -169,6 +169,9 @@ void printHelp()
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
 		"                                        is specified\n"
+		"  makebundle <in> [out]                 Make a project bundle from the project\n"
+		"                                        file <in> saving the resulting bundle\n"
+		"                                        as <out>\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
@@ -359,7 +362,7 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new MainApplication( argc, argv );
 
-	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
+	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
@@ -402,6 +405,28 @@ int main( int argc, char * * argv )
 			}
 
 			return EXIT_SUCCESS;
+		}
+		else if (arg == "makebundle")
+		{
+			++i;
+
+			if (i == argc)
+			{
+				return noInputFileError();
+			}
+
+			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
+
+			if (argc > i+1) // Project bundle file name given
+			{
+				printf("Making bundle\n");
+				dataFile.writeFile(QString::fromLocal8Bit(argv[i+1]), true);
+				return EXIT_SUCCESS;
+			}
+			else
+			{
+				return usageError("No project bundle name given");
+			}
 		}
 		else if( arg == "--allowroot" )
 		{
@@ -603,19 +628,19 @@ int main( int argc, char * * argv )
 
 			if( ip == "linear" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_Linear;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_Linear;
 			}
 			else if( ip == "sincfastest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincFastest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincFastest;
 			}
 			else if( ip == "sincmedium" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincMedium;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincMedium;
 			}
 			else if( ip == "sincbest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincBest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincBest;
 			}
 			else
 			{
@@ -637,16 +662,16 @@ int main( int argc, char * * argv )
 			switch( o )
 			{
 				case 1:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_None;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_None;
 		break;
 				case 2:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_2x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_2x;
 		break;
 				case 4:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_4x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_4x;
 		break;
 				case 8:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_8x;
 		break;
 				default:
 				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
@@ -815,7 +840,7 @@ int main( int argc, char * * argv )
 
 		if( profilerOutputFile.isEmpty() == false )
 		{
-			Engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+			Engine::audioEngine()->profiler().setOutputFile( profilerOutputFile );
 		}
 
 		// start now!

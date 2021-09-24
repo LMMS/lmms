@@ -25,13 +25,13 @@
 #include <QDomElement>
 
 #include "Nes.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "Mixer.h"
 #include "Oscillator.h"
 
 #include "embed.h"
@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }
@@ -560,7 +560,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
 	{	
-		NesObject * nes = new NesObject( this, Engine::mixer()->processingSampleRate(), n );
+		NesObject * nes = new NesObject( this, Engine::audioEngine()->processingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
 	

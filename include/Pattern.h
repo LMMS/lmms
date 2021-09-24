@@ -26,14 +26,10 @@
 #ifndef PATTERN_H
 #define PATTERN_H
 
-#include <QtCore/QVector>
-#include <QWidget>
-#include <QDialog>
-#include <QPixmap>
 #include <QStaticText>
 
-
 #include "Note.h"
+#include "PatternView.h"
 #include "TrackContentObjectView.h"
 
 
@@ -75,6 +71,9 @@ public:
 
 	Note * addStepNote( int step );
 	void setStep( int step, bool enabled );
+
+	// Split the list of notes on the given position
+	void splitNotes(NoteVector notes, TimePos pos);
 
 	// pattern-type stuff
 	inline PatternTypes type() const
@@ -145,72 +144,6 @@ private:
 
 signals:
 	void destroyedPattern( Pattern* );
-
-} ;
-
-
-
-class PatternView : public TrackContentObjectView
-{
-	Q_OBJECT
-
-public:
-	PatternView( Pattern* pattern, TrackView* parent );
-	virtual ~PatternView() = default;
-
-	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
-	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
-	Q_PROPERTY(QColor mutedNoteFillColor READ getMutedNoteFillColor WRITE setMutedNoteFillColor)
-	Q_PROPERTY(QColor mutedNoteBorderColor READ getMutedNoteBorderColor WRITE setMutedNoteBorderColor)
-
-	QColor const & getNoteFillColor() const { return m_noteFillColor; }
-	void setNoteFillColor(QColor const & color) { m_noteFillColor = color; }
-
-	QColor const & getNoteBorderColor() const { return m_noteBorderColor; }
-	void setNoteBorderColor(QColor const & color) { m_noteBorderColor = color; }
-
-	QColor const & getMutedNoteFillColor() const { return m_mutedNoteFillColor; }
-	void setMutedNoteFillColor(QColor const & color) { m_mutedNoteFillColor = color; }
-
-	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
-	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
-
-public slots:
-	Pattern* getPattern();
-	void update() override;
-
-
-protected slots:
-	void openInPianoRoll();
-	void setGhostInPianoRoll();
-
-	void resetName();
-	void changeName();
-
-
-protected:
-	void constructContextMenu( QMenu * ) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
-	void paintEvent( QPaintEvent * pe ) override;
-	void wheelEvent( QWheelEvent * _we ) override;
-
-
-private:
-	static QPixmap * s_stepBtnOn0;
-	static QPixmap * s_stepBtnOn200;
-	static QPixmap * s_stepBtnOff;
-	static QPixmap * s_stepBtnOffLight;
-
-	Pattern* m_pat;
-	QPixmap m_paintPixmap;
-
-	QColor m_noteFillColor;
-	QColor m_noteBorderColor;
-	QColor m_mutedNoteFillColor;
-	QColor m_mutedNoteBorderColor;
-
-	QStaticText m_staticTextName;
 } ;
 
 

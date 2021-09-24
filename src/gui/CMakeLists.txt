@@ -6,8 +6,11 @@ SET(LMMS_SRCS
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
 	gui/AutomationPatternView.cpp
+	gui/AutomationTrackView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
+	gui/BBTCOView.cpp
+	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
@@ -25,10 +28,14 @@ SET(LMMS_SRCS
 	gui/MidiCCRackView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
+	gui/PatternView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
+	gui/SampleTCOView.cpp
+	gui/SampleTrackView.cpp
+	gui/SampleTrackWindow.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
@@ -71,16 +78,19 @@ SET(LMMS_SRCS
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
+	gui/widgets/InstrumentMiscView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LadspaControlView.cpp
+	gui/widgets/LcdFloatSpinBox.cpp
 	gui/widgets/LcdSpinBox.cpp
 	gui/widgets/LcdWidget.cpp
 	gui/widgets/LedCheckbox.cpp
 	gui/widgets/ControlLayout.cpp
 	gui/widgets/LinkedModelGroupViews.cpp
 	gui/widgets/MeterDialog.cpp
+	gui/widgets/MicrotunerConfig.cpp
 	gui/widgets/MidiPortMenu.cpp
 	gui/widgets/NStateButton.cpp
 	gui/widgets/Oscilloscope.cpp

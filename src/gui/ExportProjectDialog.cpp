@@ -92,7 +92,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			QVariant(i/static_cast<double>(MAX_LEVEL))
 		);
 	}
-	compLevelCB->setCurrentIndex(MAX_LEVEL/2);
+	compLevelCB->setCurrentIndex(5);
 #ifndef LMMS_HAVE_SF_COMPLEVEL
 	// Disable this widget; the setting would be ignored by the renderer.
 	compressionWidget->setVisible(false);
@@ -142,11 +142,11 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 	switch (index)
 	{
 	case 0:
-		return OutputSettings::StereoMode_Stereo;
-	case 1:
-		return OutputSettings::StereoMode_JointStereo;
-	case 2:
 		return OutputSettings::StereoMode_Mono;
+	case 1:
+		return OutputSettings::StereoMode_Stereo;
+	case 2:
+		return OutputSettings::StereoMode_JointStereo;
 	default:
 		return OutputSettings::StereoMode_Stereo;
 	}
@@ -154,10 +154,10 @@ OutputSettings::StereoMode mapToStereoMode(int index)
 
 void ExportProjectDialog::startExport()
 {
-	Mixer::qualitySettings qs =
-			Mixer::qualitySettings(
-					static_cast<Mixer::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
-					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
+	AudioEngine::qualitySettings qs =
+			AudioEngine::qualitySettings(
+					static_cast<AudioEngine::qualitySettings::Interpolation>(interpolationCB->currentIndex()),
+					static_cast<AudioEngine::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
 	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
 	const bitrate_t bitrates[6] = { 64, 128, 160, 192, 256, 320 };

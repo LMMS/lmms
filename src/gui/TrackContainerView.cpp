@@ -33,10 +33,10 @@
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "BBTrack.h"
 #include "DataFile.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -268,9 +268,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	delete t;
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -303,6 +303,14 @@ const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 bool TrackContainerView::allowRubberband() const
 {
 	return( false );
+}
+
+
+
+
+bool TrackContainerView::knifeMode() const
+{
+	return false;
 }
 
 
@@ -374,7 +382,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile" 
+	else if( type == "samplefile" || type == "pluginpresetfile"
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{

@@ -26,6 +26,7 @@
 #ifndef SAMPLE_BUFFER_H
 #define SAMPLE_BUFFER_H
 
+#include <memory>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
 
@@ -36,6 +37,7 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "shared_object.h"
+#include "OscillatorConstants.h"
 #include "MemoryManager.h"
 
 
@@ -273,6 +275,9 @@ public:
 	}
 
 
+	std::unique_ptr<OscillatorConstants::waveform_t> m_userAntiAliasWaveTable;
+
+
 public slots:
 	void setAudioFile(const QString & audioFile);
 	void loadFromBase64(const QString & data);
@@ -283,7 +288,7 @@ public slots:
 	void sampleRateChanged();
 
 private:
-	static sample_rate_t mixerSampleRate();
+	static sample_rate_t audioEngineSampleRate();
 
 	void update(bool keepSettings = false);
 

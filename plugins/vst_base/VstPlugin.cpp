@@ -50,11 +50,11 @@
 #	include <QLayout>
 #endif
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "PathUtil.h"
 #include "Song.h"
 #include "FileDialog.h"
@@ -154,7 +154,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -308,7 +308,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::mixer()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->processingSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }

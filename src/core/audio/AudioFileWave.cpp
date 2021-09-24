@@ -25,7 +25,7 @@
 
 #include "AudioFileWave.h"
 #include "endian_handling.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 #include <QFile>
 #include <QDebug>
@@ -34,8 +34,8 @@
 AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
 				const ch_cnt_t channels, bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer ),
+				AudioEngine* audioEngine ) :
+	AudioFileDevice( outputSettings, channels, file, audioEngine ),
 	m_sf( NULL )
 {
 	successful = outputFileOpened() && startEncoding();
@@ -56,7 +56,7 @@ bool AudioFileWave::startEncoding()
 {
 	m_si.samplerate = sampleRate();
 	m_si.channels = channels();
-	m_si.frames = mixer()->framesPerPeriod();
+	m_si.frames = audioEngine()->framesPerPeriod();
 	m_si.sections = 1;
 	m_si.seekable = 0;
 

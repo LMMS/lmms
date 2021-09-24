@@ -45,7 +45,7 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 	m_terminate(false),
 	m_inBlockSize(FFT_BLOCK_SIZES[0]),
 	m_fftBlockSize(FFT_BLOCK_SIZES[0]),
-	m_sampleRate(Engine::mixer()->processingSampleRate()),
+	m_sampleRate(Engine::audioEngine()->processingSampleRate()),
 	m_framesFilledUp(0),
 	m_spectrumActive(false),
 	m_waterfallActive(false),
@@ -158,7 +158,7 @@ void SaProcessor::analyze(LocklessRingBuffer<sampleFrame> &ring_buffer)
 				#endif
 
 				// update sample rate
-				m_sampleRate = Engine::mixer()->processingSampleRate();
+				m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 				// apply FFT window
 				for (unsigned int i = 0; i < m_inBlockSize; i++)

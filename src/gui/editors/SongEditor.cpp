@@ -35,6 +35,7 @@
 #include <QTimeLine>
 
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
@@ -45,7 +46,6 @@
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
-#include "Mixer.h"
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
 #include "TextFloat.h"
@@ -54,7 +54,7 @@
 #include "ToolTip.h"
 #include "Track.h"
 
-const QVector<double> SongEditor::m_zoomLevels =
+const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 SongEditor::SongEditor( Song * song ) :
@@ -99,8 +99,8 @@ SongEditor::SongEditor( Song * song ) :
 	
 	connect( m_song, SIGNAL( playbackStateChanged() ),
 			 m_positionLine, SLOT( update() ) );
-	connect( this, SIGNAL( zoomingValueChanged( double ) ),
-			 m_positionLine, SLOT( zoomChange( double ) ) );
+	connect( this, SIGNAL( zoomingValueChanged( float ) ),
+			 m_positionLine, SLOT( zoomChange( float ) ) );
 
 
 	// add some essential widgets to global tool-bar
@@ -329,9 +329,9 @@ QString SongEditor::getSnapSizeString() const
 
 void SongEditor::setHighQuality( bool hq )
 {
-	Engine::mixer()->changeQuality( Mixer::qualitySettings(
-			hq ? Mixer::qualitySettings::Mode_HighQuality :
-				Mixer::qualitySettings::Mode_Draft ) );
+	Engine::audioEngine()->changeQuality( AudioEngine::qualitySettings(
+			hq ? AudioEngine::qualitySettings::Mode_HighQuality :
+				AudioEngine::qualitySettings::Mode_Draft ) );
 }
 
 
@@ -447,6 +447,11 @@ void SongEditor::setEditMode( EditMode mode )
 void SongEditor::setEditModeDraw()
 {
 	setEditMode(DrawMode);
+}
+
+void SongEditor::setEditModeKnife()
+{
+	setEditMode(KnifeMode);
 }
 
 void SongEditor::setEditModeSelect()
@@ -652,7 +657,7 @@ void SongEditor::setMasterVolume( int new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	Engine::mixer()->setMasterGain( new_val / 100.0f );
+	Engine::audioEngine()->setMasterGain( new_val / 100.0f );
 }
 
 
@@ -860,6 +865,14 @@ bool SongEditor::allowRubberband() const
 
 
 
+bool SongEditor::knifeMode() const
+{
+	return m_mode == KnifeMode;
+}
+
+
+
+
 int SongEditor::trackIndexFromSelectionPoint(int yPos)
 {
 	const TrackView * tv = trackViewAt(yPos - m_timeLine->height());
@@ -897,7 +910,7 @@ ComboBoxModel *SongEditor::snappingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::mixer()->audioDev()->supportsCapture(), false),
+	Editor(Engine::audioEngine()->audioDev()->supportsCapture(), false),
 	m_editor(new SongEditor(song)),
 	m_crtlAction( NULL ),
 	m_snapSizeLabel( new QLabel( m_toolBar ) )
@@ -944,13 +957,16 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	m_editModeGroup = new ActionGroup(this);
 	m_drawModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
+	m_knifeModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_knife"), tr("Knife mode (split sample clips)"));
 	m_selectModeAction = m_editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
 	m_drawModeAction->setChecked(true);
 
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
+	connect(m_knifeModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeKnife()));
 	connect(m_selectModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));
 
 	editActionsToolBar->addAction( m_drawModeAction );
+	editActionsToolBar->addAction( m_knifeModeAction );
 	editActionsToolBar->addAction( m_selectModeAction );
 
 	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
@@ -1026,6 +1042,13 @@ void SongEditorWindow::updateSnapLabel(){
 		m_snappingComboBox->setToolTip(tr("Clip snapping size"));
 		m_snapSizeLabel->clear();
 	}
+}
+
+
+
+
+void SongEditorWindow::syncEditMode(){
+	m_editModeGroup->checkedAction()->trigger();
 }
 
 
@@ -1107,32 +1130,4 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
 	m_editor->scrolled(0);
-}
-
-
-
-
-void SongEditorWindow::keyPressEvent( QKeyEvent *ke )
-{
-	if( ke->key() == Qt::Key_Control )
-	{
-		m_crtlAction = m_editModeGroup->checkedAction();
-		m_selectModeAction->setChecked( true );
-		m_selectModeAction->trigger();
-	}
-}
-
-
-
-
-void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
-{
-	if( ke->key() == Qt::Key_Control )
-	{
-		if( m_crtlAction )
-		{
-			m_crtlAction->setChecked( true );
-			m_crtlAction->trigger();
-		}
-	}
 }

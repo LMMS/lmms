@@ -32,7 +32,7 @@
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "gui_templates.h"
 
@@ -68,11 +68,11 @@
 
 
 
-AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
+AudioOss::AudioOss( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -100,7 +100,7 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 
 	int frag_spec;
 	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
-		mixer()->framesPerPeriod() * channels() *
+		audioEngine()->framesPerPeriod() * channels() *
 							BYTES_PER_INT_SAMPLE;
 		++frag_spec )
 	{
@@ -172,7 +172,7 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	}
 	if( value != sampleRate() )
 	{
-		value = mixer()->baseSampleRate();
+		value = audioEngine()->baseSampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 		{
 			perror( "SNDCTL_DSP_SPEED" );
@@ -261,7 +261,7 @@ void AudioOss::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
 		unsigned int value = sampleRate();
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
@@ -272,7 +272,7 @@ void AudioOss::applyQualitySettings()
 		}
 		if( value != sampleRate() )
 		{
-			value = mixer()->baseSampleRate();
+			value = audioEngine()->baseSampleRate();
 			if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 			{
 				perror( "SNDCTL_DSP_SPEED" );
@@ -291,11 +291,8 @@ void AudioOss::applyQualitySettings()
 
 void AudioOss::run()
 {
-	surroundSampleFrame * temp =
-		new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-			new int_sample_t[mixer()->framesPerPeriod() *
-								channels()];
+	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 
 	while( true )
 	{
@@ -305,9 +302,7 @@ void AudioOss::run()
 			break;
 		}
 
-		int bytes = convertToS16( temp, frames,
-				mixer()->masterGain(), outbuf,
-							m_convertEndian );
+		int bytes = convertToS16( temp, frames, audioEngine()->masterGain(), outbuf, m_convertEndian );
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;

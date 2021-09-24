@@ -47,6 +47,7 @@ class QPixmap;
 class QScrollBar;
 class QString;
 class QMenu;
+class QToolButton;
 
 class ComboBox;
 class NotePlayHandle;
@@ -70,6 +71,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor textColorLight MEMBER m_textColorLight)
 	Q_PROPERTY(QColor textShadow MEMBER m_textShadow)
 	Q_PROPERTY(QColor markedSemitoneColor MEMBER m_markedSemitoneColor)
+	Q_PROPERTY(QColor knifeCutLine MEMBER m_knifeCutLineColor)
 	Q_PROPERTY(int noteOpacity MEMBER m_noteOpacity)
 	Q_PROPERTY(bool noteBorders MEMBER m_noteBorders)
 	Q_PROPERTY(int ghostNoteOpacity MEMBER m_ghostNoteOpacity)
@@ -84,10 +86,12 @@ class PianoRoll : public QWidget
 	Q_PROPERTY(QColor whiteKeyActiveTextColor MEMBER m_whiteKeyActiveTextColor)
 	Q_PROPERTY(QColor whiteKeyActiveTextShadow MEMBER m_whiteKeyActiveTextShadow)
 	Q_PROPERTY(QBrush whiteKeyActiveBackground MEMBER m_whiteKeyActiveBackground)
+	Q_PROPERTY(QBrush whiteKeyDisabledBackground MEMBER m_whiteKeyDisabledBackground)
 	/* black key properties */
 	Q_PROPERTY(int blackKeyWidth MEMBER m_blackKeyWidth)
 	Q_PROPERTY(QBrush blackKeyInactiveBackground MEMBER m_blackKeyInactiveBackground)
 	Q_PROPERTY(QBrush blackKeyActiveBackground MEMBER m_blackKeyActiveBackground)
+	Q_PROPERTY(QBrush blackKeyDisabledBackground MEMBER m_blackKeyDisabledBackground)
 public:
 	enum EditModes
 	{
@@ -95,6 +99,7 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
+		ModeEditKnife
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -140,6 +145,13 @@ public:
 	int quantization() const;
 
 protected:
+	enum QuantizeActions
+	{
+		QuantizeBoth,
+		QuantizePos,
+		QuantizeLength
+	};
+
 	void keyPressEvent( QKeyEvent * ke ) override;
 	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void leaveEvent( QEvent * e ) override;
@@ -196,7 +208,7 @@ protected slots:
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes();
+	void quantizeNotes(QuantizeActions mode = QuantizeBoth);
 
 	void updateSemiToneMarkerMenu();
 
@@ -210,6 +222,10 @@ protected slots:
 	void showGhostNotes(bool state);
 	void pasteGhostNotes();
 	void glueNotes();
+	void fitNoteLengths(bool fill);
+	void constrainNoteLengths(bool constrainMax);
+
+	void changeSnapMode();
 
 
 signals:
@@ -227,7 +243,8 @@ private:
 		ActionResizeNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea
+		ActionResizeNoteEditArea,
+		ActionKnife
 	};
 
 	enum NoteEditMode
@@ -252,6 +269,13 @@ private:
 		PR_WHITE_KEY_SMALL,
 		PR_WHITE_KEY_BIG,
 		PR_BLACK_KEY
+	};
+
+	enum GridMode
+	{
+		gridNudge,
+		gridSnap
+	//	gridFree
 	};
 
 	PositionLine * m_positionLine;
@@ -283,6 +307,9 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
+	void setKnifeAction();
+	void cancelKnifeAction();
+
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -295,7 +322,7 @@ private:
 	int noteEditRight() const;
 	int noteEditLeft() const;
 
-	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
+	void dragNotes(int x, int y, bool alt, bool shift, bool ctrl);
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
@@ -305,6 +332,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
+	static QPixmap* s_toolKnife;
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -317,9 +345,10 @@ private:
 	ComboBoxModel m_keyModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
+	ComboBoxModel m_snapModel;
 
-	static const QVector<double> m_zoomLevels;
-	static const QVector<double> m_zoomYLevels;
+	static const QVector<float> m_zoomLevels;
+	static const QVector<float> m_zoomYLevels;
 
 	Pattern* m_pattern;
 	NoteVector m_ghostNotes;
@@ -340,6 +369,7 @@ private:
 	Note * m_currentNote;
 	Actions m_action;
 	NoteEditMode m_noteEditMode;
+	GridMode m_gridMode;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -372,7 +402,6 @@ private:
 	int m_pianoKeysVisible;
 
 	int m_keyLineHeight;
-	int m_octaveHeight;
 	int m_whiteKeySmallHeight;
 	int m_whiteKeyBigHeight;
 	int m_blackKeyHeight;
@@ -391,6 +420,7 @@ private:
 
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
+	EditModes m_knifeMode; // mode they where in before entering knife mode
 
 	bool m_mouseDownRight; //true if right click is being held down
 
@@ -409,6 +439,10 @@ private:
 
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
+
+	// Variable that holds the position in ticks for the knife action
+	int m_knifeTickPos;
+	void updateKnifePos(QMouseEvent* me);
 
 	friend class PianoRollWindow;
 
@@ -430,6 +464,7 @@ private:
 	QColor m_textColorLight;
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
+	QColor m_knifeCutLineColor;
 	int m_noteOpacity;
 	int m_ghostNoteOpacity;
 	bool m_noteBorders;
@@ -443,10 +478,12 @@ private:
 	QColor m_whiteKeyInactiveTextColor;
 	QColor m_whiteKeyInactiveTextShadow;
 	QBrush m_whiteKeyInactiveBackground;
+	QBrush m_whiteKeyDisabledBackground;
 	/* black key properties */
 	int m_blackKeyWidth;
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
+	QBrush m_blackKeyDisabledBackground;
 
 signals:
 	void positionChanged( const TimePos & );
@@ -498,6 +535,8 @@ signals:
 
 private slots:
 	void updateAfterPatternChange();
+	void exportPattern();
+	void importPattern();
 
 private:
 	void patternRenamed();
@@ -507,6 +546,7 @@ private:
 
 	PianoRoll* m_editor;
 
+	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
@@ -514,6 +554,7 @@ private:
 	ComboBox * m_keyComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
+	ComboBox* m_snapComboBox;
 
 };
 

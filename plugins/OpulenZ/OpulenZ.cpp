@@ -35,10 +35,10 @@
 
 #include "OpulenZ.h"
 #include "Instrument.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 
 #include <QDomDocument>
 #include <QFile>
@@ -75,7 +75,7 @@ Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
         Plugin::Instrument,
         new PluginPixmapLoader( "logo" ),
         "sbi",
-        NULL
+        NULL,
 };
 
 // necessary for getting instance out of shared lib
@@ -139,7 +139,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -158,7 +158,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
-	frameCount = Engine::mixer()->framesPerPeriod();
+	frameCount = Engine::audioEngine()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
 	// Some kind of sane defaults
@@ -168,7 +168,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 
 	tuneEqual(69, 440);
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
 	// This one's for testing...
@@ -213,14 +213,14 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( vib_depth_mdl );
 	MOD_CON( trem_depth_mdl );
 
-	// Connect the plugin to the mixer...
+	// Connect the plugin to the audio engine...
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 OpulenzInstrument::~OpulenzInstrument() {
 	delete theEmulator;
-	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::TypeNotePlayHandle
 				| PlayHandle::TypeInstrumentPlayHandle );
 	delete [] renderbuffer;
@@ -230,7 +230,7 @@ OpulenzInstrument::~OpulenzInstrument() {
 void OpulenzInstrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(Engine::audioEngine()->processingSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();
@@ -300,8 +300,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
 
 	switch(event.type()) {
         case MidiNoteOn:
-		// to get us in line with MIDI(?)
-		key = event.key() +12;
+		key = event.key();
 		vel = event.velocity();
 
 		voice = popVoice();
@@ -316,7 +315,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
 		}
                 break;
         case MidiNoteOff:
-                key = event.key() +12;
+                key = event.key();
                 for(voice=0; voice<OPL2_VOICES; ++voice) {
                         if( voiceNote[voice] == key ) {
                                 theEmulator->write(0xA0+voice, fnums[key] & 0xff);
@@ -328,7 +327,7 @@ bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const TimePos& 
 		velocities[key] = 0;
                 break;
         case MidiKeyPressure:
-                key = event.key() +12;
+                key = event.key();
                 vel = event.velocity();
 		if( velocities[key] != 0) {
 			velocities[key] = vel;
