@@ -30,6 +30,7 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Microtuner.h"
 #include "Midi.h"
 #include "MidiCCRackView.h"
 #include "MidiEventProcessor.h"
@@ -184,13 +185,21 @@ public:
 		return &m_lastKeyModel;
 	}
 
-	int baseNote() const;
+	bool keyRangeImport() const;
+	bool isKeyMapped(int key) const;
 	int firstKey() const;
 	int lastKey() const;
+	int baseNote() const;
+	float baseFreq() const;
 
 	Piano *pianoModel()
 	{
 		return &m_piano;
+	}
+
+	Microtuner *microtuner()
+	{
+		return &m_microtuner;
 	}
 
 	bool isArpeggioEnabled() const
@@ -304,6 +313,8 @@ private:
 	InstrumentFunctionNoteStacking m_noteStacking;
 
 	Piano m_piano;
+
+	Microtuner m_microtuner;
 
 	std::unique_ptr<BoolModel> m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];

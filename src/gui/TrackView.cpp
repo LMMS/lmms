@@ -34,11 +34,11 @@
 #include <QtGlobal>
 
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "Mixer.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
@@ -101,12 +101,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
-
-	connect( &m_trackOperationsWidget, SIGNAL( colorChanged( QColor & ) ),
-			m_track, SLOT( trackColorChanged( QColor & ) ) );
-
-	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
-			m_track, SLOT( trackColorReset() ) );
 
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
@@ -243,9 +237,9 @@ void TrackView::dropEvent( QDropEvent * de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 		de->accept();
 	}
 }

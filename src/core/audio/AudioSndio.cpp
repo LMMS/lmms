@@ -33,7 +33,7 @@
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "gui_templates.h"
 
@@ -48,11 +48,11 @@
 
 
 
-AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
+AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_convertEndian ( false )
 {
 	_success_ful = false;
@@ -80,7 +80,7 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	m_par.bits = 16;
 	m_par.le = SIO_LE_NATIVE;
 	m_par.rate = sampleRate();
-	m_par.round = mixer()->framesPerPeriod();
+	m_par.round = audioEngine()->framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
 	if ( (isLittleEndian() && (m_par.le == 0)) ||
@@ -150,7 +150,7 @@ void AudioSndio::applyQualitySettings( void )
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
 		/* change sample rate to sampleRate() */
 	}
@@ -161,10 +161,8 @@ void AudioSndio::applyQualitySettings( void )
 
 void AudioSndio::run( void )
 {
-	surroundSampleFrame * temp =
-	    new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-	    new int_sample_t[mixer()->framesPerPeriod() * channels()];
+	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 
 	while( true )
 	{
@@ -175,7 +173,7 @@ void AudioSndio::run( void )
 		}
 
 		uint bytes = convertToS16( temp, frames,
-		    mixer()->masterGain(), outbuf, m_convertEndian );
+		    audioEngine()->masterGain(), outbuf, m_convertEndian );
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;

@@ -49,22 +49,22 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "ComboBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 
-AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
+AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
+		SURROUND_CHANNELS ), _audioEngine ),
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
-	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
+	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
 	m_outBufPos( 0 )
 {
 	_success_ful = false;
 
-	m_outBufSize = mixer()->framesPerPeriod();
+	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	PaError err = Pa_Initialize();
 	
@@ -111,12 +111,12 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 		return;
 	}
 
-	double inLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
-	double outLatency = 0;//(double)mixer()->framesPerPeriod() / (double)sampleRate();
+	double inLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
+	double outLatency = 0;//(double)audioEngine()->framesPerPeriod() / (double)sampleRate();
 
 	//inLatency = Pa_GetDeviceInfo( inDevIdx )->defaultLowInputLatency;
 	//outLatency = Pa_GetDeviceInfo( outDevIdx )->defaultLowOutputLatency;
-	const int samples = mixer()->framesPerPeriod();
+	const int samples = audioEngine()->framesPerPeriod();
 	
 	// Configure output parameters.
 	m_outputParameters.device = outDevIdx;
@@ -169,7 +169,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
 
-	// TODO: debug Mixer::pushInputFrames()
+	// TODO: debug AudioEngine::pushInputFrames()
 	//m_supportsCapture = true;
 
 	_success_ful = true;
@@ -229,8 +229,8 @@ void AudioPortAudio::applyQualitySettings()
 	if( hqAudio() )
 	{
 
-		setSampleRate( Engine::mixer()->processingSampleRate() );
-		int samples = mixer()->framesPerPeriod();
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
+		int samples = audioEngine()->framesPerPeriod();
 
 		PaError err = Pa_OpenStream(
 			&m_paStream,
@@ -261,8 +261,7 @@ int AudioPortAudio::process_callback(
 {
 	if( supportsCapture() )
 	{
-		mixer()->pushInputFrames( (sampleFrame*)_inputBuffer,
-												_framesPerBuffer );
+		audioEngine()->pushInputFrames( (sampleFrame*)_inputBuffer, _framesPerBuffer );
 	}
 
 	if( m_stopped )
@@ -290,14 +289,14 @@ int AudioPortAudio::process_callback(
 		const int min_len = qMin( (int)_framesPerBuffer,
 			m_outBufSize - m_outBufPos );
 
-		float master_gain = mixer()->masterGain();
+		float master_gain = audioEngine()->masterGain();
 
 		for( fpp_t frame = 0; frame < min_len; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
 				( _outputBuffer + frame * channels() )[chnl] =
-						Mixer::clip( m_outBuf[frame][chnl] *
+						AudioEngine::clip( m_outBuf[frame][chnl] *
 						master_gain );
 			}
 		}

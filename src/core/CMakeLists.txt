@@ -1,6 +1,9 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
 
+	core/AudioEngine.cpp
+	core/AudioEngineProfiler.cpp
+	core/AudioEngineWorkerThread.cpp
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
 	core/AutomationNode.cpp
@@ -29,6 +32,7 @@ set(LMMS_SRCS
 	core/InstrumentPlayHandle.cpp
 	core/InstrumentSoundShaping.cpp
 	core/JournallingObject.cpp
+	core/Keymap.cpp
 	core/Ladspa2LMMS.cpp
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
@@ -39,9 +43,7 @@ set(LMMS_SRCS
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
-	core/Mixer.cpp
-	core/MixerProfiler.cpp
-	core/MixerWorkerThread.cpp
+	core/Microtuner.cpp
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
@@ -67,6 +69,7 @@ set(LMMS_SRCS
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
 	core/SampleTCO.cpp
+	core/Scale.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp

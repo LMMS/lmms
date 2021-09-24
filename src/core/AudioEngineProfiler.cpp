@@ -1,5 +1,5 @@
 /*
- * MixerProfiler.cpp - class for profiling performance of Mixer
+ * AudioEngineProfiler.cpp - class for profiling performance of AudioEngine
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,10 +22,10 @@
  *
  */
 
-#include "MixerProfiler.h"
+#include "AudioEngineProfiler.h"
 
 
-MixerProfiler::MixerProfiler() :
+AudioEngineProfiler::AudioEngineProfiler() :
 	m_periodTimer(),
 	m_cpuLoad( 0 ),
 	m_outputFile()
@@ -34,12 +34,12 @@ MixerProfiler::MixerProfiler() :
 
 
 
-MixerProfiler::~MixerProfiler()
+AudioEngineProfiler::~AudioEngineProfiler()
 {
 }
 
 
-void MixerProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
+void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
 {
 	int periodElapsed = m_periodTimer.elapsed();
 
@@ -54,7 +54,7 @@ void MixerProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPerio
 
 
 
-void MixerProfiler::setOutputFile( const QString& outputFile )
+void AudioEngineProfiler::setOutputFile( const QString& outputFile )
 {
 	m_outputFile.close();
 	m_outputFile.setFileName( outputFile );

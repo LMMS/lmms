@@ -42,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 };
 
 }
@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &crossovereq_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
 	m_lp1( m_sampleRate ),
 	m_lp2( m_sampleRate ),
 	m_lp3( m_sampleRate ),
@@ -60,9 +60,9 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp1 = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
-	m_tmp2 = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
-	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
+	m_tmp1 = MM_ALLOC( sampleFrame, Engine::audioEngine()->framesPerPeriod() );
+	m_tmp2 = MM_ALLOC( sampleFrame, Engine::audioEngine()->framesPerPeriod() );
+	m_work = MM_ALLOC( sampleFrame, Engine::audioEngine()->framesPerPeriod() );
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()
@@ -74,7 +74,7 @@ CrossoverEQEffect::~CrossoverEQEffect()
 
 void CrossoverEQEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
 	m_lp1.setSampleRate( m_sampleRate );
 	m_lp2.setSampleRate( m_sampleRate );
 	m_lp3.setSampleRate( m_sampleRate );

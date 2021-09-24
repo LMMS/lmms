@@ -449,6 +449,9 @@ PianoRoll::PianoRoll() :
 		this, SLOT(changeSnapMode()));
 
 	m_stepRecorder.initialize();
+
+	// trigger a redraw if keymap definitions change (different keys may become disabled)
+	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
 
@@ -905,6 +908,9 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	connect(m_pattern->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_pattern->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(m_pattern->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
+	connect(m_pattern->instrumentTrack()->microtuner()->keyRangeImportModel(), SIGNAL(dataChanged()),
+		this, SLOT(update()));
 
 	update();
 	emit currentPatternChanged();
@@ -3162,8 +3168,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			const int key,
 			const int yb)
 		{
-			const bool mapped = m_pattern->instrumentTrack()->firstKeyModel()->value() <= key &&
-				m_pattern->instrumentTrack()->lastKeyModel()->value() >= key;
+			const bool mapped = m_pattern->instrumentTrack()->isKeyMapped(key);
 			const bool pressed = m_pattern->instrumentTrack()->pianoModel()->isKeyPressed(key);
 			const int keyCode = key % KeysPerOctave;
 			const int yt = yb - gridCorrection(key);

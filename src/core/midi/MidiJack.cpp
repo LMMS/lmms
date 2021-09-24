@@ -29,11 +29,11 @@
 #include <QCompleter>
 #include <QMessageBox>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MainWindow.h"
 
 /* callback functions for jack */
@@ -71,7 +71,7 @@ MidiJack::MidiJack() :
 	// and also handles the callback, we pass it our address
 	// so that we can also process during the callback
 
-	m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev());
+	m_jackAudio = dynamic_cast<AudioJack*>(Engine::audioEngine()->audioDev());
 	if( m_jackAudio )
 	{
 		// if a jack connection has been created for audio we use that

@@ -44,7 +44,7 @@
 #include "FxMixer.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "SampleTrack.h"
@@ -593,8 +593,8 @@ void FxMixerView::updateFaders()
 	FxMixer * m = Engine::fxMixer();
 
 	// apply master gain
-	m->effectChannel(0)->m_peakLeft *= Engine::mixer()->masterGain();
-	m->effectChannel(0)->m_peakRight *= Engine::mixer()->masterGain();
+	m->effectChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
+	m->effectChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
 
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{

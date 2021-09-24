@@ -29,12 +29,12 @@
 #include <QScrollArea>
 #include <QMessageBox>
 
+#include "AudioEngine.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "MidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
-#include "Mixer.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"
@@ -70,7 +70,7 @@ public:
 		{
 			m_detectedMidiChannel = event.channel() + 1;
 			m_detectedMidiController = event.controllerNumber() + 1;
-			m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
+			m_detectedMidiPort = Engine::audioEngine()->midiClient()->sourcePortName( event );
 
 			emit valueChanged();
 		}
@@ -165,7 +165,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if( !Engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
 		m_readablePorts = new MidiPortMenu( MidiPort::Input );
 		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),

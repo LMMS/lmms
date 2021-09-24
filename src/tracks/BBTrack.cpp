@@ -56,7 +56,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 
 BBTrack::~BBTrack()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( this,
+	Engine::audioEngine()->removePlayHandlesOfTypes( this,
 					PlayHandle::TypeNotePlayHandle
 					| PlayHandle::TypeInstrumentPlayHandle
 					| PlayHandle::TypeSamplePlayHandle );

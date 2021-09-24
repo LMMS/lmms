@@ -100,9 +100,9 @@ SampleTCO::~SampleTCO()
 	{
 		sampletrack->updateTcos();
 	}
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -125,9 +125,9 @@ const QString & SampleTCO::sampleFile() const
 
 void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	m_sampleBuffer = sb;
 	updateLength();
 
@@ -172,7 +172,7 @@ void SampleTCO::toggleRecord()
 
 void SampleTCO::playbackPositionChanged()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
 	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
 	st->setPlayingTcos( false );
 }
@@ -298,6 +298,10 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	{
 		useCustomClipColor( true );
 		setColor( _this.attribute( "color" ) );
+	}
+	else
+	{
+		useCustomClipColor(false);
 	}
 
 	if(_this.hasAttribute("reversed"))

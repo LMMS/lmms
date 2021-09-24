@@ -24,14 +24,15 @@
  */
 
 #include "NotePlayHandle.h"
+
+#include "lmms_constants.h"
+#include "AudioEngine.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "Mixer.h"
 #include "Song.h"
-
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
@@ -188,9 +189,9 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	// if the note offset falls over to next period, then don't start playback yet
-	if( offset() >= Engine::mixer()->framesPerPeriod() )
+	if( offset() >= Engine::audioEngine()->framesPerPeriod() )
 	{
-		setOffset( offset() - Engine::mixer()->framesPerPeriod() );
+		setOffset( offset() - Engine::audioEngine()->framesPerPeriod() );
 		return;
 	}
 
@@ -238,8 +239,8 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 
 	// number of frames that can be played this period
 	f_cnt_t framesThisPeriod = m_totalFramesPlayed == 0
-		? Engine::mixer()->framesPerPeriod() - offset()
-		: Engine::mixer()->framesPerPeriod();
+		? Engine::audioEngine()->framesPerPeriod() - offset()
+		: Engine::audioEngine()->framesPerPeriod();
 
 	// check if we start release during this period
 	if( m_released == false &&
@@ -274,7 +275,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		// are inserted by arpAndChordsTabWidget::processNote()
 		if( ! m_subNotes.isEmpty() )
 		{
-			m_releaseFramesToDo = m_releaseFramesDone + 2 * Engine::mixer()->framesPerPeriod();
+			m_releaseFramesToDo = m_releaseFramesDone + 2 * Engine::audioEngine()->framesPerPeriod();
 		}
 		// look whether we have frames left to be done before release
 		if( m_framesBeforeRelease )
@@ -327,7 +328,7 @@ f_cnt_t NotePlayHandle::framesLeft() const
 {
 	if( instrumentTrack()->isSustainPedalPressed() )
 	{
-		return 4*Engine::mixer()->framesPerPeriod();
+		return 4 * Engine::audioEngine()->framesPerPeriod();
 	}
 	else if( m_released && actualReleaseFramesToDo() == 0 )
 	{
@@ -347,9 +348,9 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 {
 	if( m_totalFramesPlayed == 0 )
 	{
-		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() - offset() );
+		return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() - offset() );
 	}
-	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::mixer()->framesPerPeriod() );
+	return (fpp_t) qMin<f_cnt_t>( framesLeft(), Engine::audioEngine()->framesPerPeriod() );
 }
 
 
@@ -452,7 +453,7 @@ void NotePlayHandle::mute()
 
 int NotePlayHandle::index() const
 {
-	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	int idx = 0;
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
@@ -475,7 +476,7 @@ int NotePlayHandle::index() const
 
 ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentTrack * _it, bool _all_ph )
 {
-	const PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
@@ -516,19 +517,38 @@ bool NotePlayHandle::operator==( const NotePlayHandle & _nph ) const
 
 void NotePlayHandle::updateFrequency()
 {
-	int mp = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
-	const float pitch =
-		( key() -
-				m_instrumentTrack->baseNoteModel()->value() +
-				mp +
-				m_baseDetuning->value() )
-												 / 12.0f;
-	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
-	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
+	int masterPitch = m_instrumentTrack->m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
+	int baseNote = m_instrumentTrack->baseNoteModel()->value();
+	float detune = m_baseDetuning->value();
+	float instrumentPitch = m_instrumentTrack->pitchModel()->value();
 
-	for( NotePlayHandleList::Iterator it = m_subNotes.begin(); it != m_subNotes.end(); ++it )
+	if (m_instrumentTrack->m_microtuner.enabled())
 	{
-		( *it )->updateFrequency();
+		// custom key mapping and scale: get frequency from the microtuner
+		const float detuneMaster = detune + masterPitch;
+
+		if (m_instrumentTrack->isKeyMapped(key()))
+		{
+			const auto frequency = m_instrumentTrack->m_microtuner.keyToFreq(key(), baseNote);
+			m_frequency = frequency * powf(2.f, (detuneMaster + instrumentPitch / 100) / 12.f);
+			m_unpitchedFrequency = frequency * powf(2.f, detuneMaster / 12.f);
+		}
+		else
+		{
+			m_frequency = m_unpitchedFrequency = 0;
+		}
+	}
+	else
+	{
+		// default key mapping and 12-TET frequency computation with default 440 Hz base note frequency
+		const float pitch = (key() - baseNote + masterPitch + detune) / 12.0f;
+		m_frequency = DefaultBaseFreq * powf(2.0f, pitch + instrumentPitch / (100 * 12.0f));
+		m_unpitchedFrequency = DefaultBaseFreq * powf(2.0f, pitch);
+	}
+
+	for (auto it : m_subNotes)
+	{
+		it->updateFrequency();
 	}
 }
 

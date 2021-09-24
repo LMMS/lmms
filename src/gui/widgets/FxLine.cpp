@@ -252,9 +252,14 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 	}
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Set channel color" ), this, SLOT( changeColor() ) );
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Remove channel color" ), this, SLOT( resetColor() ) );
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Pick random channel color" ), this, SLOT( randomColor() ) );
+
+	QMenu colorMenu(tr("Color"), this);
+	colorMenu.setIcon(embed::getIconPixmap("colorize"));
+	colorMenu.addAction(tr("Change"), this, SLOT(selectColor()));
+	colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
+	colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));
+	contextMenu->addMenu(&colorMenu);
+
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
@@ -415,12 +420,13 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 
 
 // Ask user for a color, and set it as the mixer line color
-void FxLine::changeColor()
+void FxLine::selectColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
 	if(!new_color.isValid()) { return; }
 	channel->setColor (new_color);
+	Engine::getSong()->setModified();
 	update();
 }
 
@@ -429,14 +435,16 @@ void FxLine::changeColor()
 void FxLine::resetColor()
 {
 	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = false;
+	Engine::getSong()->setModified();
 	update();
 }
 
 
 // Pick a random color from the mixer palette and set it as our color
-void FxLine::randomColor()
+void FxLine::randomizeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	Engine::getSong()->setModified();
 	update();
 }

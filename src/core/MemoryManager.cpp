@@ -53,7 +53,7 @@ MemoryManager::ThreadGuard::ThreadGuard()
 MemoryManager::ThreadGuard::~ThreadGuard()
 {
 	if (--thread_guard_depth == 0) {
-		rpmalloc_thread_finalize();
+		rpmalloc_thread_finalize(true);
 	}
 }
 

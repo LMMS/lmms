@@ -32,7 +32,7 @@
 
 #include <string.h>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 
 
 class DummyInstrument : public Instrument
@@ -50,7 +50,7 @@ public:
 	void playNote( NotePlayHandle *, sampleFrame * buffer ) override
 	{
 		memset( buffer, 0, sizeof( sampleFrame ) *
-			Engine::mixer()->framesPerPeriod() );
+			Engine::audioEngine()->framesPerPeriod() );
 	}
 
 	void saveSettings( QDomDocument &, QDomElement & ) override

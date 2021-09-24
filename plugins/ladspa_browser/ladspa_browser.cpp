@@ -56,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 	Plugin::Tool,
 	new PluginPixmapLoader("logo"),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 

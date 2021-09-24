@@ -33,7 +33,7 @@
 #include "base64.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL
+	NULL,
 } ;
 
 }
@@ -224,7 +224,7 @@ QString FreeBoyInstrument::nodeName() const
 
 /*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 {
-	const float samplerate = Engine::mixer()->processingSampleRate();
+	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
 	for( int i = 0 ; i < 3 ; ++i )
 	{
@@ -246,7 +246,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
-	const int samplerate = Engine::mixer()->processingSampleRate();
+	const int samplerate = Engine::audioEngine()->processingSampleRate();
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 

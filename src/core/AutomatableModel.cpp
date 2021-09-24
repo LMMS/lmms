@@ -26,10 +26,10 @@
 
 #include "lmms_math.h"
 
+#include "AudioEngine.h"
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
 #include "LocaleHelper.h"
-#include "Mixer.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 
@@ -51,7 +51,7 @@ AutomatableModel::AutomatableModel(
 	m_setValueDepth( 0 ),
 	m_hasStrictStepSize( false ),
 	m_controllerConnection( NULL ),
-	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
+	m_valueBuffer( static_cast<int>( Engine::audioEngine()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
 	m_hasSampleExactData(false),
 	m_useControllerValue(true)

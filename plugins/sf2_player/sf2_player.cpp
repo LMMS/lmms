@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QDomDocument>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "ConfigManager.h"
@@ -37,7 +38,6 @@
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
@@ -63,7 +63,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"sf2,sf3",
-	NULL
+	NULL,
 } ;
 
 }
@@ -125,7 +125,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 #endif
 	m_settings = new_fluid_settings();
 
-	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
+	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::audioEngine()->framesPerPeriod() );
 
 	// This sets up m_synth and updates reverb/chorus/gain
 	reloadSynth();
@@ -164,7 +164,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
 
 	// Gain
 	connect( &m_gain, SIGNAL( dataChanged() ), this, SLOT( updateGain() ) );
@@ -184,14 +184,14 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 
 
 sf2Instrument::~sf2Instrument()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::TypeNotePlayHandle
 				| PlayHandle::TypeInstrumentPlayHandle );
 	freeFont();
@@ -543,7 +543,7 @@ void sf2Instrument::reloadSynth()
 	double tempRate;
 
 	// Set & get, returns the true sample rate
-	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::mixer()->processingSampleRate() );
+	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->processingSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
@@ -575,8 +575,8 @@ void sf2Instrument::reloadSynth()
 	}
 
 	m_synthMutex.lock();
-	if( Engine::mixer()->currentQualitySettings().interpolation >=
-			Mixer::qualitySettings::Interpolation_SincFastest )
+	if( Engine::audioEngine()->currentQualitySettings().interpolation >=
+			AudioEngine::qualitySettings::Interpolation_SincFastest )
 	{
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
 	}
@@ -585,7 +585,7 @@ void sf2Instrument::reloadSynth()
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
 	}
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() )
+	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() )
 	{
 		m_synthMutex.lock();
 		if( m_srcState != NULL )
@@ -593,7 +593,7 @@ void sf2Instrument::reloadSynth()
 			src_delete( m_srcState );
 		}
 		int error;
-		m_srcState = src_new( Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
+		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
 		if( m_srcState == NULL || error )
 		{
 			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
@@ -725,7 +725,7 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
@@ -814,10 +814,10 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
-	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() &&
+	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() &&
 							m_srcState != NULL )
 	{
-		const fpp_t f = frames * m_internalSampleRate / Engine::mixer()->processingSampleRate();
+		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->processingSampleRate();
 #ifdef __GNUC__
 		sampleFrame tmp[f];
 #else

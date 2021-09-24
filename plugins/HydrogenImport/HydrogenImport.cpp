@@ -36,7 +36,7 @@ Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 	Plugin::ImportFilter,
 	NULL,
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }

@@ -24,6 +24,7 @@
 
 #include "carla.h"
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Song.h"
 #include "GuiApplication.h"
@@ -31,7 +32,6 @@
 #include "InstrumentTrack.h"
 #include "MidiEventToByteSeq.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "Song.h"
 #include "gui_templates.h"
 
@@ -189,7 +189,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
     // we need a play-handle which cares for calling play()
     InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
-    Engine::mixer()->addPlayHandle( iph );
+    Engine::audioEngine()->addPlayHandle( iph );
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
     // text filter completion
@@ -209,12 +209,12 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     }
 #endif
 
-    connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
+    connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
 CarlaInstrument::~CarlaInstrument()
 {
-    Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 
     if (fHost.resourceDir != NULL)
     {
@@ -248,12 +248,12 @@ CarlaInstrument::~CarlaInstrument()
 
 uint32_t CarlaInstrument::handleGetBufferSize() const
 {
-    return Engine::mixer()->framesPerPeriod();
+    return Engine::audioEngine()->framesPerPeriod();
 }
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return Engine::mixer()->processingSampleRate();
+    return Engine::audioEngine()->processingSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const
@@ -496,7 +496,7 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 
 void CarlaInstrument::play(sampleFrame* workingBuffer)
 {
-    const uint bufsize = Engine::mixer()->framesPerPeriod();
+    const uint bufsize = Engine::audioEngine()->framesPerPeriod();
 
     std::memset(workingBuffer, 0, sizeof(sample_t)*bufsize*DEFAULT_CHANNELS);
 

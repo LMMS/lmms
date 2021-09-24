@@ -40,15 +40,16 @@ float frnd(float range)
 #include <QDomElement>
 
 #include "sfxr.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "lmms_constants.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "MidiEvent.h"
-#include "Mixer.h"
 
 #include "embed.h"
 
@@ -68,7 +69,7 @@ Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }
@@ -454,7 +455,7 @@ QString sfxrInstrument::nodeName() const
 
 void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	float currentSampleRate = Engine::mixer()->processingSampleRate();
+	float currentSampleRate = Engine::audioEngine()->processingSampleRate();
 
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
     const f_cnt_t offset = _n->noteOffset();
@@ -469,7 +470,8 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 		return;
 	}
 
-	int32_t pitchedFrameNum = (_n->frequency()/BaseFreq)*frameNum;
+	const auto baseFreq = instrumentTrack()->baseFreq();
+	int32_t pitchedFrameNum = (_n->frequency() / baseFreq) * frameNum;
 
 	pitchedFrameNum /= ( currentSampleRate / 44100 );
 

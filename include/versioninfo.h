@@ -16,6 +16,22 @@
 #define MACHINE "x86_64"
 #endif
 
+#ifdef LMMS_HOST_ARM32
+#define MACHINE "arm32"
+#endif
+
+#ifdef LMMS_HOST_ARM64
+#define MACHINE "arm64"
+#endif
+
+#ifdef LMMS_HOST_RISCV32
+#define MACHINE "riscv32"
+#endif
+
+#ifdef LMMS_HOST_RISCV64
+#define MACHINE "riscv64"
+#endif
+
 #ifndef MACHINE
 #define MACHINE "unknown processor"
 #endif
