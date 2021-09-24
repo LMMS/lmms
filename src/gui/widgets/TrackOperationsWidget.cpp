@@ -269,7 +269,7 @@ void TrackOperationsWidget::removeTrack()
 	}
 }
 
-void TrackOperationsWidget::changeTrackColor()
+void TrackOperationsWidget::selectTrackColor()
 {
 	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )-> \
 		getColor( m_trackView->getTrack()->color() );
@@ -279,7 +279,7 @@ void TrackOperationsWidget::changeTrackColor()
 
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	track->changeColor(new_color);
+	track->setColor(new_color);
 	Engine::getSong()->setModified();
 }
 
@@ -291,12 +291,12 @@ void TrackOperationsWidget::resetTrackColor()
 	Engine::getSong()->setModified();
 }
 
-void TrackOperationsWidget::randomTrackColor()
+void TrackOperationsWidget::randomizeTrackColor()
 {
 	QColor buffer = ColorChooser::getPalette( ColorChooser::Palette::Track )[ rand() % 48 ];
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	track->changeColor(buffer);
+	track->setColor(buffer);
 	Engine::getSong()->setModified();
 }
 
@@ -355,14 +355,13 @@ void TrackOperationsWidget::updateMenu()
 
 	toMenu->addSeparator();
 
-	QMenu* colorMenu = new QMenu(tr("Track color"), this);
+	QMenu* colorMenu = toMenu->addMenu(tr("Track color"));
 	colorMenu->setIcon(embed::getIconPixmap("colorize"));
-	colorMenu->addAction(tr("Change"), this, SLOT(changeTrackColor()));
+	colorMenu->addAction(tr("Change"), this, SLOT(selectTrackColor()));
 	colorMenu->addAction(tr("Reset"), this, SLOT(resetTrackColor()));
-	colorMenu->addAction(tr("Pick random"), this, SLOT(randomTrackColor()));
+	colorMenu->addAction(tr("Pick random"), this, SLOT(randomizeTrackColor()));
 	colorMenu->addSeparator();
 	colorMenu->addAction(tr("Reset clip colors"), this, SLOT(resetTCOColors()));
-	toMenu->addMenu(colorMenu);
 }
 
 

@@ -129,7 +129,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
 	{
 		// redraw if TCO uses track color
-		if (m_tco && !m_tco->usesCustomClipColor()) { update(); }
+		if (!m_tco->usesCustomClipColor()) { update(); }
 	});
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
@@ -342,15 +342,15 @@ void TrackContentObjectView::selectColor()
 {
 	// Get a color from the user
 	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
-	if (new_color.isValid()) { setColor(new_color); }
+	if (new_color.isValid()) { setColor(&new_color); }
 }
 
 
 
 
-void TrackContentObjectView::randomColor()
+void TrackContentObjectView::randomizeColor()
 {
-	setColor(ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	setColor(&ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
 }
 
 
@@ -358,7 +358,7 @@ void TrackContentObjectView::randomColor()
 
 void TrackContentObjectView::resetColor()
 {
-	setColor(QColor());
+	setColor(nullptr);
 }
 
 
@@ -366,9 +366,9 @@ void TrackContentObjectView::resetColor()
 
 /*! \brief Change color of all selected TCOs
  *
- *  \param color The new QColor. Pass an invalid color to use the Track's color.
+ *  \param color The new QColor. Pass nullptr to use the Track's color.
  */
-void TrackContentObjectView::setColor(const QColor color)
+void TrackContentObjectView::setColor(const QColor* color)
 {
 	std::set<Track*> journaledTracks;
 
@@ -392,10 +392,10 @@ void TrackContentObjectView::setColor(const QColor color)
 			track->addJournalCheckPoint();
 		}
 
-		if (color.isValid())
+		if (color)
 		{
 			tco->useCustomClipColor(true);
-			tco->setColor(color);
+			tco->setColor(*color);
 		}
 		else
 		{
@@ -1107,7 +1107,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 	colorMenu.setIcon(embed::getIconPixmap("colorize"));
 	colorMenu.addAction(tr("Change"), this, SLOT(selectColor()));
 	colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
-	colorMenu.addAction(tr("Pick random"), this, SLOT(randomColor()));
+	colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));
 	contextMenu.addMenu(&colorMenu);
 
 	constructContextMenu( &contextMenu );

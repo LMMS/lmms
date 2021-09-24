@@ -271,7 +271,7 @@ void Track::loadSettings( const QDomElement & element )
 	if( element.hasAttribute( "color" ) )
 	{
 		QColor newColor = QColor(element.attribute("color"));
-		changeColor(newColor);
+		setColor(newColor);
 	}
 	else
 	{
@@ -651,7 +651,7 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::changeColor( QColor & c )
+void Track::setColor(const QColor& c)
 {
 	m_hasColor = true;
 	m_color = c;

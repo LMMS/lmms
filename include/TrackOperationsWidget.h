@@ -50,8 +50,8 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
-	void changeTrackColor();
-	void randomTrackColor();
+	void selectTrackColor();
+	void randomizeTrackColor();
 	void resetTrackColor();
 	void resetTCOColors();
 	void toggleRecording(bool on);

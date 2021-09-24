@@ -127,7 +127,7 @@ public slots:
 	void update() override;
 
 	void selectColor();
-	void randomColor();
+	void randomizeColor();
 	void resetColor();
 
 protected:
@@ -232,7 +232,7 @@ private:
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
 	TimePos draggedTCOPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
-	void setColor(const QColor color);
+	void setColor(const QColor* color);
 	//! Return true iff TCO could be split. Currently only implemented for samples
 	virtual bool splitTCO( const TimePos pos ){ return false; };
 	void updateCursor(QMouseEvent * me);

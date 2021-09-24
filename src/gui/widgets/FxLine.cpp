@@ -255,9 +255,9 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 
 	QMenu colorMenu(tr("Color"), this);
 	colorMenu.setIcon(embed::getIconPixmap("colorize"));
-	colorMenu.addAction(tr("Change"), this, SLOT(changeColor()));
+	colorMenu.addAction(tr("Change"), this, SLOT(selectColor()));
 	colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
-	colorMenu.addAction(tr("Pick random" ), this, SLOT(randomColor()));
+	colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));
 	contextMenu->addMenu(&colorMenu);
 
 	contextMenu->exec( QCursor::pos() );
@@ -420,7 +420,7 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 
 
 // Ask user for a color, and set it as the mixer line color
-void FxLine::changeColor()
+void FxLine::selectColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
@@ -441,7 +441,7 @@ void FxLine::resetColor()
 
 
 // Pick a random color from the mixer palette and set it as our color
-void FxLine::randomColor()
+void FxLine::randomizeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);

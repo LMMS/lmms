@@ -198,7 +198,7 @@ public slots:
 
 	void toggleSolo();
 
-	void changeColor( QColor & c );
+	void setColor(const QColor& c);
 	void resetColor();
 
 private:
