@@ -128,7 +128,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
 
 	// This sets up m_synth and updates reverb/chorus/gain
-	updateSampleRate();
+	reloadSynth();
 
 #if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Get the default values from the setting
@@ -164,7 +164,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
 
 	// Gain
 	connect( &m_gain, SIGNAL( dataChanged() ), this, SLOT( updateGain() ) );
@@ -538,7 +538,7 @@ void  sf2Instrument::updateChorus()
 
 
 
-void sf2Instrument::updateSampleRate()
+void sf2Instrument::reloadSynth()
 {
 	double tempRate;
 
@@ -596,7 +596,7 @@ void sf2Instrument::updateSampleRate()
 		m_srcState = src_new( Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
 		if( m_srcState == NULL || error )
 		{
-			qCritical( "error while creating libsamplerate data structure in Sf2Instrument::updateSampleRate()" );
+			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
 		}
 		m_synthMutex.unlock();
 	}
