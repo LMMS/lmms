@@ -62,6 +62,7 @@ SET(LMMS_SRCS
 	gui/widgets/AutomatableSlider.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
+	gui/widgets/ComboButton.cpp
 	gui/widgets/ControllerRackView.cpp
 	gui/widgets/ControllerView.cpp
 	gui/widgets/Controls.cpp
@@ -76,6 +77,7 @@ SET(LMMS_SRCS
 	gui/widgets/FxLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
+	gui/widgets/HexMenu.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
 	gui/widgets/InstrumentMiscView.cpp

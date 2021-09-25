@@ -32,6 +32,7 @@
 #include <QInputDialog>
 
 #include "Editor.h"
+#include "HexMenu.h"
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "Note.h"
@@ -99,7 +100,10 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
-		ModeEditKnife
+		ModeEditKnife,
+		ModeBulldozer,
+		ModeStamp,
+		ModeStrum
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -159,6 +163,7 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * me ) override;
 	void mouseReleaseEvent( QMouseEvent * me ) override;
 	void mouseMoveEvent( QMouseEvent * me ) override;
+	void contextMenuEvent(QContextMenuEvent* cme) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void resizeEvent( QResizeEvent * re ) override;
 	void wheelEvent( QWheelEvent * we ) override;
@@ -193,6 +198,7 @@ protected slots:
 	void verScrolled( int new_pos );
 
 	void setEditMode(int mode);
+	void setQuickEditMode(int mode);
 
 	void copySelectedNotes();
 	void cutSelectedNotes();
@@ -229,6 +235,7 @@ protected slots:
 
 signals:
 	void currentPatternChanged();
+	void editModeChanged(int);
 	void ghostPatternSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
@@ -240,10 +247,16 @@ private:
 		ActionNone,
 		ActionMoveNote,
 		ActionResizeNote,
+		ActionBulldozerMove,
+		ActionBulldozerResize,
+		ActionEraseNote,
 		ActionSelectNotes,
 		ActionChangeNoteProperty,
 		ActionResizeNoteEditArea,
-		ActionKnife
+		ActionDetune,
+		ActionKnife,
+		ActionStrum,
+		ActionStrumResize
 	};
 
 	enum NoteEditMode
@@ -306,9 +319,6 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
-	void setKnifeAction();
-	void cancelKnifeAction();
-
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -325,13 +335,6 @@ private:
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
-
-	static QPixmap * s_toolDraw;
-	static QPixmap * s_toolErase;
-	static QPixmap * s_toolSelect;
-	static QPixmap * s_toolMove;
-	static QPixmap * s_toolOpen;
-	static QPixmap* s_toolKnife;
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -416,11 +419,9 @@ private:
 	int m_startKey; // first key when drawing
 	int m_lastKey;
 
-	EditModes m_editMode;
-	EditModes m_ctrlMode; // mode they were in before they hit ctrl
-	EditModes m_knifeMode; // mode they where in before entering knife mode
-
-	bool m_mouseDownRight; //true if right click is being held down
+	EditModes m_editMode = ModeDraw;
+	EditModes m_ctrlMode = m_editMode; // mode they were in before they hit ctrl
+	EditModes m_quickEditMode = ModeEditDetuning; // edit mode activated by middle mouse button
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
@@ -436,10 +437,12 @@ private:
 	void clearSelectedNotes();
 
 	// did we start a mouseclick with shift pressed
-	bool m_startedWithShift;
+	//bool m_startedWithShift;
 
 	// Variable that holds the position in ticks for the knife action
 	int m_knifeTickPos;
+	// Length of knife chop
+	int m_knifeChopTicks;
 	void updateKnifePos(QMouseEvent* me);
 
 	friend class PianoRollWindow;
@@ -530,6 +533,8 @@ public:
 signals:
 	void currentPatternChanged();
 
+protected slots:
+	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private slots:
 	void updateAfterPatternChange();
@@ -544,8 +549,8 @@ private:
 	void updateStepRecordingIcon();
 
 	PianoRoll* m_editor;
+	HexMenu* m_editModeSelector;
 
-	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;
 	ComboBox * m_quantizeComboBox;
@@ -555,7 +560,6 @@ private:
 	ComboBox * m_chordComboBox;
 	ComboBox* m_snapComboBox;
 	QPushButton * m_clearGhostButton;
-
 };
 
 

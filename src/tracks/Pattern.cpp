@@ -148,19 +148,7 @@ void Pattern::updateLength()
 		return;
 	}
 
-	tick_t max_length = TimePos::ticksPerBar();
-
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
-	{
-		if( ( *it )->length() > 0 )
-		{
-			max_length = qMax<tick_t>( max_length,
-							( *it )->endPos() );
-		}
-	}
-	changeLength( TimePos( max_length ).nextFullBar() *
-						TimePos::ticksPerBar() );
+	changeLength(m_notes.lastEndPos().nextFullBar() * TimePos::ticksPerBar());
 	updateBBTrack();
 }
 

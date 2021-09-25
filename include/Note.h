@@ -104,6 +104,10 @@ public:
 	{
 		m_oldLength = oldLength;
 	}
+	inline void setOldSelected(const bool selected)
+	{
+		m_oldSelected = selected;
+	}
 	inline void setIsPlaying( const bool isPlaying )
 	{
 		m_isPlaying = isPlaying;
@@ -151,6 +155,11 @@ public:
 	inline TimePos oldLength() const
 	{
 		return m_oldLength;
+	}
+
+	inline bool oldSelected() const
+	{
+		return m_oldSelected;
 	}
 
 	inline bool isPlaying() const
@@ -233,6 +242,7 @@ private:
 	int m_oldKey;
 	TimePos m_oldPos;
 	TimePos m_oldLength;
+	bool m_oldSelected;
 	bool m_isPlaying;
 
 	int m_key;
@@ -244,7 +254,13 @@ private:
 };
 
 
-typedef QVector<Note *> NoteVector;
+class NoteVector : public QVector<Note*>
+{
+public:
+	using QVector::QVector;
+
+	TimePos lastEndPos();
+};
 
 
 #endif
