@@ -91,6 +91,7 @@ QMutex sf2Instrument::s_fontsMutex;
 sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sf2player_plugin_descriptor ),
 	m_srcState( NULL ),
+	m_synth(nullptr),
 	m_font( NULL ),
 	m_fontId( 0 ),
 	m_filename( "" ),
@@ -126,9 +127,8 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::audioEngine()->framesPerPeriod() );
 
-	// This is just our starting instance of synth.  It is recreated
-	// everytime we load a new soundfont.
-	m_synth = new_fluid_synth( m_settings );
+	// This sets up m_synth and updates reverb/chorus/gain
+	reloadSynth();
 
 #if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Get the default values from the setting
@@ -153,19 +153,18 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusDepth.setInitValue(settingVal);
 #endif
 
-	loadFile( ConfigManager::inst()->sf2File() );
-
-	updateSampleRate();
-	updateReverbOn();
-	updateReverb();
-	updateChorusOn();
-	updateChorus();
-	updateGain();
+	// FIXME: there's no good way to tell if we're loading a preset or an empty instrument
+	// We rely on instantiate() to load the default soundfont for new instruments,
+	// but we don't need that when loading a project/preset/preview
+	if (!Engine::getSong()->isLoadingProject() && !instrumentTrack()->isPreviewMode())
+	{
+		loadFile(ConfigManager::inst()->sf2File());
+	}
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
 
 	// Gain
 	connect( &m_gain, SIGNAL( dataChanged() ), this, SLOT( updateGain() ) );
@@ -251,8 +250,6 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
 	m_chorusDepth.loadSettings( _this, "chorusDepth" );
 
-	updatePatch();
-	updateGain();
 }
 
 
@@ -263,11 +260,6 @@ void sf2Instrument::loadFile( const QString & _file )
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
 		openFile( _file, false );
-		updatePatch();
-
-		// for some reason we've to call that, otherwise preview of a
-		// soundfont for the first time fails
-		updateSampleRate();
 	}
 
 	// setting the first bank and patch number that is found
@@ -439,6 +431,8 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	{
 		instrumentTrack()->setName( PathUtil::cleanName( _sf2File ) );
 	}
+
+	updatePatch();
 }
 
 
@@ -544,7 +538,7 @@ void  sf2Instrument::updateChorus()
 
 
 
-void sf2Instrument::updateSampleRate()
+void sf2Instrument::reloadSynth()
 {
 	double tempRate;
 
@@ -572,7 +566,10 @@ void sf2Instrument::updateSampleRate()
 	{
 		// Recreate synth with no soundfonts
 		m_synthMutex.lock();
-		delete_fluid_synth( m_synth );
+		if (m_synth != nullptr)
+		{
+			delete_fluid_synth(m_synth);
+		}
 		m_synth = new_fluid_synth( m_settings );
 		m_synthMutex.unlock();
 	}
@@ -599,7 +596,7 @@ void sf2Instrument::updateSampleRate()
 		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
 		if( m_srcState == NULL || error )
 		{
-			qCritical( "error while creating libsamplerate data structure in Sf2Instrument::updateSampleRate()" );
+			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
 		}
 		m_synthMutex.unlock();
 	}
@@ -1195,6 +1192,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new sf2Instrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 
 }
