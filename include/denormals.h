@@ -5,9 +5,8 @@
 #define DENORMALS_H
 
 #ifdef __SSE__
-#if defined(_MSC_VER)
 #include <immintrin.h>
-#elif defined(__GNUC__)
+#ifdef __GNUC__
 #include <x86intrin.h>
 #endif
 
