@@ -1,7 +1,8 @@
 /*
- * quadraturelfo.cpp - defination of QuadratureLfo class.
+ * AutomationTrackView.h - declaration of class AutomationTrackView
  *
- * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,17 +23,22 @@
  *
  */
 
-#include "QuadratureLfo.h"
+#ifndef AUTOMATION_TRACK_VIEW_H
+#define AUTOMATION_TRACK_VIEW_H
 
-QuadratureLfo::QuadratureLfo( int sampleRate )
+#include "AutomationTrack.h"
+#include "TrackView.h"
+
+
+class AutomationTrackView : public TrackView
 {
-	setSampleRate(sampleRate);
-}
+public:
+	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
+	virtual ~AutomationTrackView() = default;
 
-void QuadratureLfo::tick( float *s, float *c )
-{
-	*s = sinf( m_phase );
-	*c = cosf( m_phase );
-	m_phase += m_increment;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
+} ;
 
-}
+
+#endif

@@ -25,6 +25,7 @@
 #ifndef SONG_H
 #define SONG_H
 
+#include <memory>
 #include <utility>
 
 #include <QtCore/QSharedMemory>
@@ -33,9 +34,12 @@
 #include <QString>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "Controller.h"
+#include "Keymap.h"
+#include "lmms_constants.h"
 #include "MeterModel.h"
-#include "Mixer.h"
+#include "Scale.h"
 #include "VstSyncController.h"
 
 
@@ -72,9 +76,14 @@ public:
 		 * Should we discard MIDI ControllerConnections from project files?
 		 */
 		BoolModel discardMIDIConnections{false};
+		/**
+		 * Should we save the project as a project bundle? (with resources)
+		 */
+		BoolModel saveAsProjectBundle{false};
 
 		void setDefaultOptions() {
 			discardMIDIConnections.setValue(false);
+			saveAsProjectBundle.setValue(false);
 		}
 	};
 
@@ -282,8 +291,8 @@ public:
 	void createNewProjectFromTemplate( const QString & templ );
 	void loadProject( const QString & filename );
 	bool guiSaveProject();
-	bool guiSaveProjectAs( const QString & filename );
-	bool saveProjectFile( const QString & filename );
+	bool guiSaveProjectAs(const QString & filename);
+	bool saveProjectFile(const QString & filename, bool withResources = false);
 
 	const QString & projectFileName() const
 	{
@@ -298,7 +307,7 @@ public:
 	void loadingCancelled()
 	{
 		m_isCancelled = true;
-		Engine::mixer()->clearNewPlayHandles();
+		Engine::audioEngine()->clearNewPlayHandles();
 	}
 
 	bool isCancelled()
@@ -344,6 +353,11 @@ public:
 	}
 
 	bool isSavingProject() const;
+
+	std::shared_ptr<const Scale> getScale(unsigned int index) const;
+	std::shared_ptr<const Keymap> getKeymap(unsigned int index) const;
+	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
+	void setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap);
 
 public slots:
 	void playSong();
@@ -411,6 +425,12 @@ private:
 
 	void removeAllControllers();
 
+	void saveScaleStates(QDomDocument &doc, QDomElement &element);
+	void restoreScaleStates(const QDomElement &element);
+
+	void saveKeymapStates(QDomDocument &doc, QDomElement &element);
+	void restoreKeymapStates(const QDomElement &element);
+
 	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
 
 	void setModified(bool value);
@@ -470,6 +490,11 @@ private:
 	TimePos m_exportSongEnd;
 	TimePos m_exportEffectiveLength;
 
+	std::shared_ptr<Scale> m_scales[MaxScaleCount];
+	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
+
+	AutomatedValueMap m_oldAutomatedValues;
+
 	friend class LmmsCore;
 	friend class SongEditor;
 	friend class mainWindow;
@@ -488,6 +513,8 @@ signals:
 	void stopped();
 	void modified();
 	void projectFileNameChanged();
+	void scaleListChanged(int index);
+	void keymapListChanged(int index);
 } ;
 
 

@@ -34,7 +34,7 @@
 #include "ControllerConnection.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "SpaProc.h" // TODO: remove from here -> use proper class cascading
 #include "SpaSubPluginFeatures.h"
 #include "StringPairDrag.h" // DnD TODO: move to SpaViewBase?
@@ -77,19 +77,19 @@ SpaInstrument::SpaInstrument(InstrumentTrack *instrumentTrackArg,
 	{
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()));
-		connect(Engine::mixer(), SIGNAL(sampleRateChanged()),
+		connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()),
 			this, SLOT(reloadPlugin())); // TODO: refactor to SpaControlBase?
 
 		// now we need a play-handle which cares for calling play()
 		InstrumentPlayHandle *iph =
 			new InstrumentPlayHandle(this, instrumentTrackArg);
-		Engine::mixer()->addPlayHandle(iph);
+		Engine::audioEngine()->addPlayHandle(iph);
 	}
 }
 
 SpaInstrument::~SpaInstrument()
 {
-	Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(),
+	Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(),
 		PlayHandle::TypeNotePlayHandle |
 						  PlayHandle::TypeInstrumentPlayHandle);
 }
@@ -152,7 +152,7 @@ void SpaInstrument::play(sampleFrame *buf)
 {	
 	copyModelsFromLmms();
 
-	fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	run(static_cast<unsigned>(fpp));
 

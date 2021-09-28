@@ -24,10 +24,10 @@
 
 #include "AudioPort.h"
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "EffectChain.h"
 #include "FxMixer.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
 
@@ -45,7 +45,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 	m_panningModel( panningModel ),
 	m_mutedModel( mutedModel )
 {
-	Engine::mixer()->addAudioPort( this );
+	Engine::audioEngine()->addAudioPort( this );
 	setExtOutputEnabled( true );
 }
 
@@ -55,7 +55,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
-	Engine::mixer()->removeAudioPort( this );
+	Engine::audioEngine()->removeAudioPort( this );
 	BufferManager::release( m_portBuffer );
 }
 
@@ -69,11 +69,11 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 		m_extOutputEnabled = _enabled;
 		if( m_extOutputEnabled )
 		{
-			Engine::mixer()->audioDev()->registerPort( this );
+			Engine::audioEngine()->audioDev()->registerPort( this );
 		}
 		else
 		{
-			Engine::mixer()->audioDev()->unregisterPort( this );
+			Engine::audioEngine()->audioDev()->unregisterPort( this );
 		}
 	}
 }
@@ -84,7 +84,7 @@ void AudioPort::setExtOutputEnabled( bool _enabled )
 void AudioPort::setName( const QString & _name )
 {
 	m_name = _name;
-	Engine::mixer()->audioDev()->renamePort( this );
+	Engine::audioEngine()->audioDev()->renamePort( this );
 }
 
 
@@ -94,7 +94,7 @@ bool AudioPort::processEffects()
 {
 	if( m_effects )
 	{
-		bool more = m_effects->processAudioBuffer( m_portBuffer, Engine::mixer()->framesPerPeriod(), m_bufferUsage );
+		bool more = m_effects->processAudioBuffer( m_portBuffer, Engine::audioEngine()->framesPerPeriod(), m_bufferUsage );
 		return more;
 	}
 	return false;
@@ -108,7 +108,7 @@ void AudioPort::doProcessing()
 		return;
 	}
 
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	// clear the buffer
 	BufferManager::clear( m_portBuffer, fpp );

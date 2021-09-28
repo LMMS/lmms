@@ -13,14 +13,14 @@
 #include "AutomatableModel.h"
 #include "Engine.h"
 #include "MidiEvent.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "SpaOscModel.h"
 #include "TimePos.h"
 
 SpaProc::SpaProc(Model *parent, const spa::descriptor* desc, DataFile::Types settingsType) :
 	LinkedModelGroup(parent),
 	m_spaDescriptor(desc),
-	m_ports(Engine::mixer()->framesPerPeriod()),
+	m_ports(Engine::audioEngine()->framesPerPeriod()),
 //	writeOscInUse(ATOMIC_FLAG_INIT), // not MSVC-compatible, workaround below
 	m_settingsType(settingsType),
 	m_midiInputBuf(m_maxMidiInputEvents),
@@ -112,8 +112,8 @@ void SpaProc::loadFile(const QString &file, bool user)
 void SpaProc::reloadPlugin()
 {
 	// refresh ports that are only read on restore
-	m_ports.samplerate = Engine::mixer()->processingSampleRate();
-	int16_t fpp = Engine::mixer()->framesPerPeriod();
+	m_ports.samplerate = Engine::audioEngine()->processingSampleRate();
+	int16_t fpp = Engine::audioEngine()->framesPerPeriod();
 	assert(fpp >= 0);
 	m_ports.buffersize = static_cast<unsigned>(fpp);
 
@@ -271,7 +271,7 @@ void SpaProc::shutdownPlugin()
 	// clear all port data (object is just raw memory after dtor call)...
 	m_ports.~LmmsPorts();
 	// ... so we can reuse it - C++ is just awesome
-	new (&m_ports) LmmsPorts(Engine::mixer()->framesPerPeriod());
+	new (&m_ports) LmmsPorts(Engine::audioEngine()->framesPerPeriod());
 }
 
 struct LmmsVisitor final : public virtual spa::audio::visitor
@@ -425,7 +425,7 @@ void SpaProc::initPlugin()
 //		m_pluginMutex.unlock();
 	}
 
-	m_ports.samplerate = Engine::mixer()->processingSampleRate();
+	m_ports.samplerate = Engine::audioEngine()->processingSampleRate();
 	spa::simple_vec<spa::simple_str> portNames =
 		m_spaDescriptor->port_names();
 	for (const spa::simple_str &portname : portNames)

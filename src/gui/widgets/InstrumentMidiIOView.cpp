@@ -29,13 +29,13 @@
 
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "embed.h"
 #include "GroupBox.h"
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
-#include "Mixer.h"
 #include "InstrumentTrack.h"
 #include "LedCheckbox.h"
 
@@ -127,7 +127,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 		m_fixedOutputNoteSpinBox, SLOT( setEnabled( bool ) ) );
 
-	if( !Engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
 		m_rpBtn = new QToolButton;
 		m_rpBtn->setMinimumSize( 32, 32 );
@@ -211,25 +211,3 @@ void InstrumentMidiIOView::modelChanged()
 	}
 }
 
-
-
-InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
-	QWidget( parent )
-{
-	QVBoxLayout* layout = new QVBoxLayout( this );
-	layout->setMargin( 5 );
-	m_pitchGroupBox = new GroupBox( tr ( "MASTER PITCH" ) );
-	layout->addWidget( m_pitchGroupBox );
-	QHBoxLayout* masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
-	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
-	QLabel *tlabel = new QLabel(tr( "Enables the use of master pitch" ) );
-	tlabel->setFont( pointSize<8>( tlabel->font() ) );
-	m_pitchGroupBox->setModel( &it->m_useMasterPitchModel );
-	masterPitchLayout->addWidget( tlabel );
-	layout->addStretch();
-}
-
-InstrumentMiscView::~InstrumentMiscView()
-{
-
-}

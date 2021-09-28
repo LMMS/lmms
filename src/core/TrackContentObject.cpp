@@ -92,9 +92,9 @@ void TrackContentObject::movePosition( const TimePos & pos )
 	TimePos newPos = qMax(0, pos.getTicks());
 	if (m_startPosition != newPos)
 	{
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_startPosition = newPos;
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 		Engine::getSong()->updateLength();
 		emit positionChanged();
 	}
@@ -182,20 +182,13 @@ void TrackContentObject::setStartTimeOffset( const TimePos &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
-// Update TCO color if it follows the track color
-void TrackContentObject::updateColor()
-{
-	if( ! m_useCustomClipColor )
-	{
-		emit trackColorChanged();
-	}
-}
 
 
 void TrackContentObject::useCustomClipColor( bool b )
 {
+	if (b == m_useCustomClipColor) { return; }
 	m_useCustomClipColor = b;
-	updateColor();
+	emit colorChanged();
 }
 
 

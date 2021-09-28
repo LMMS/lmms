@@ -52,7 +52,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 } ;
 
 }
@@ -1006,9 +1006,9 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateSampleRate
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
 
-	m_fpp = Engine::mixer()->framesPerPeriod();
+	m_fpp = Engine::audioEngine()->framesPerPeriod();
 
 	updateSamplerate();
 	updateVolume1();
@@ -1419,7 +1419,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = Engine::mixer()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->processingSampleRate();
 	
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;

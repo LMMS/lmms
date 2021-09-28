@@ -37,6 +37,7 @@
 #include <QStringList>
 
 #include "FileBrowser.h"
+#include "AudioEngine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -48,7 +49,6 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
@@ -571,11 +571,11 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
 	// Forward the event
+	QTreeWidgetItem * i = itemAt(me->pos());
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
 
-	QTreeWidgetItem * i = itemAt(me->pos());
 	if (i)
 	{
 		// TODO: Restrict to visible selection
@@ -650,7 +650,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 	if (newPPH != nullptr)
 	{
-		if (Engine::mixer()->addPlayHandle(newPPH))
+		if (Engine::audioEngine()->addPlayHandle(newPPH))
 		{
 			m_previewPlayHandle = newPPH;
 		}
@@ -666,7 +666,7 @@ void FileBrowserTreeWidget::stopPreview()
 	QMutexLocker previewLocker(&m_pphMutex);
 	if (m_previewPlayHandle != nullptr)
 	{
-		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
+		Engine::audioEngine()->removePlayHandle(m_previewPlayHandle);
 		m_previewPlayHandle = nullptr;
 	}
 }
@@ -751,7 +751,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
@@ -776,15 +776,11 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 		}
 
-		case FileItem::LoadAsPreset:
-		{
-			DataFile dataFile( f->fullName() );
-			InstrumentTrack::removeMidiPortNode( dataFile );
-			it->setSimpleSerializing();
-			it->loadSettings( dataFile.content().toElement() );
+		case FileItem::LoadAsPreset: {
+			DataFile dataFile(f->fullName());
+			it->replaceInstrument(dataFile);
 			break;
 		}
-
 		case FileItem::ImportAsProject:
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
@@ -795,7 +791,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -861,10 +857,10 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 		Track::create(Track::SampleTrack, Engine::getSong()));
 
 	// Add the sample clip to the track
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	SampleTCO* clip = static_cast<SampleTCO*>(sampleTrack->createTCO(0));
 	clip->setSampleFile(item->fullName());
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	return true;
 }
 

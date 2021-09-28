@@ -24,15 +24,8 @@
  *
  */
 
-#include <QMap>
-#include "AutomationTrack.h"
+#include "AutomationTrackView.h"
 #include "AutomationPattern.h"
-#include "Engine.h"
-#include "embed.h"
-#include "ProjectJournal.h"
-#include "StringPairDrag.h"
-#include "TrackContainerView.h"
-#include "TrackLabelButton.h"
 
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
@@ -84,69 +77,3 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		setMuted( false );
 	}
 }
-
-
-
-
-
-AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
-	TrackView( _at, tcv )
-{
-	setFixedHeight( 32 );
-	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
-	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
-	tlb->move( 3, 1 );
-	tlb->show();
-	setModel( _at );
-}
-
-void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
-{
-	puts("ATW:dragEnter");
-	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
-}
-
-
-
-
-void AutomationTrackView::dropEvent( QDropEvent * _de )
-{
-	QString type = StringPairDrag::decodeKey( _de );
-	QString val = StringPairDrag::decodeValue( _de );
-	// qDebug() << "DROP: type/val:" << type << ", " << val;
-
-	if( type == "automatable_model" )
-	{
-
-		AutomatableModel * mod = Engine::getAutomatableModel(val,
-			_de->mimeData()->hasFormat( "application/x-osc-stringpair"));
-
-		if( mod )
-		{
-			TimePos pos = TimePos( trackContainerView()->
-							currentPosition() +
-				( _de->pos().x() -
-					getTrackContentWidget()->x() ) *
-						TimePos::ticksPerBar() /
-		static_cast<int>( trackContainerView()->pixelsPerBar() ) )
-				.toAbsoluteBar();
-
-			if( pos.getTicks() < 0 )
-			{
-				pos.setTicks( 0 );
-			}
-
-			TrackContentObject * tco = getTrack()->createTCO( pos );
-			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
-			pat->addObject( mod );
-		}
-
-		// tell the source app that the drop did succeed
-		_de->acceptProposedAction();
-	}
-
-	update();
-}
-
-

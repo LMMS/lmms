@@ -37,7 +37,7 @@ SpaFxControls::SpaFxControls(class SpaEffect *effect, const QString& uniqueName)
 {
 	if (isValid())
 	{
-		connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this,
+		connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
 			SLOT(reloadPlugin()));
 	}
 }

@@ -29,6 +29,7 @@
 #include <QDomElement>
 class QMimeData;
 
+class QMimeData;
 
 namespace Clipboard
 {

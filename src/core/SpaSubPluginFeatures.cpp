@@ -38,7 +38,6 @@
 #include "AudioDevice.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "PluginFactory.h"
 #include "SpaManager.h"
 #include "embed.h"

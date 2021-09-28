@@ -26,6 +26,7 @@
 
 #include <QDomElement>
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Graph.h"
 #include "GuiApplication.h"
@@ -33,7 +34,6 @@
 #include "Knob.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -204,14 +204,14 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 
 	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == NULL) {
 
-		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData(),Engine::mixer()->processingSampleRate());//give the "last" function a whole second
-		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData(),Engine::mixer()->processingSampleRate());
+		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData(),Engine::audioEngine()->processingSampleRate());//give the "last" function a whole second
+		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData(),Engine::audioEngine()->processingSampleRate());
 
 		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
 			//add the constants and the variables to the expression.
 			e->add_constant("key", nph->key());//the key that was pressed.
 			e->add_constant("bnote", nph->instrumentTrack()->baseNote()); // the base note
-			e->add_constant("srate", Engine::mixer()->processingSampleRate());// sample rate of the mixer
+			e->add_constant("srate", Engine::audioEngine()->processingSampleRate());// sample rate of the audio engine
 			e->add_constant("v", nph->getVolume() / 255.0); //volume of the note.
 			e->add_constant("tempo", Engine::getSong()->getTempo());//tempo of the song.
 			e->add_variable("A1", m_A1);//A1,A2,A3: general purpose input controls.
@@ -225,7 +225,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 		m_W2.setInterpolate(m_interpolateW2.value());
 		m_W3.setInterpolate(m_interpolateW3.value());
 		nph->m_pluginData = new ExprSynth(&m_W1, &m_W2, &m_W3, exprO1, exprO2, nph,
-				Engine::mixer()->processingSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
+				Engine::audioEngine()->processingSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
 	}
 
 
@@ -824,8 +824,8 @@ QString XpressiveHelpView::s_helpText=
 "<h4>Available variables:</h4><br>"
 "<b>t</b> - Time in seconds.<br>"
 "<b>f</b> - Note's pitched frequency. Available only in the output expressions.<br>"
-"<b>key</b> - Note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. Available only in the output expressions.<br>"
-"<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
+"<b>key</b> - Note's keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.<br>"
+"<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 "<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
 "<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"

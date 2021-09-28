@@ -70,7 +70,7 @@ public:
 
 	inline bool validPattern() const
 	{
-		return m_pattern != nullptr && m_pattern->hasAutomation();
+		return m_pattern != nullptr;
 	}
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
@@ -98,6 +98,7 @@ protected:
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
 	void mousePressEvent(QMouseEvent * mouseEvent) override;
+	void mouseDoubleClickEvent(QMouseEvent * mouseEvent) override;
 	void mouseReleaseEvent(QMouseEvent * mouseEvent) override;
 	void mouseMoveEvent(QMouseEvent * mouseEvent) override;
 	void paintEvent(QPaintEvent * pe) override;
@@ -112,6 +113,7 @@ protected:
 	timeMap::iterator getNodeAt(int x, int y, bool outValue = false, int r = 5);
 
 	void drawLine( int x0, float y0, int x1, float y1 );
+	bool fineTuneValue(timeMap::iterator node, bool editingOutValue);
 
 protected slots:
 	void play();
@@ -172,7 +174,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<double> m_zoomXLevels;
+	static const QVector<float> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 

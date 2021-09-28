@@ -1,7 +1,7 @@
 /*
- * MixerProfiler.h - class for profiling performance of Mixer
+ * BBTCOView.h
  *
- * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,41 +21,46 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+ 
 
-#ifndef MIXER_PROFILER_H
-#define MIXER_PROFILER_H
+#ifndef BB_TCO_VIEW_H
+#define BB_TCO_VIEW_H
 
-#include <QFile>
+#include "BBTCO.h"
 
-#include "lmms_basics.h"
-#include "MicroTimer.h"
+#include <QStaticText>
 
-class MixerProfiler
+
+class BBTCOView : public TrackContentObjectView
 {
+	Q_OBJECT
 public:
-	MixerProfiler();
-	~MixerProfiler();
+	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
+	virtual ~BBTCOView() = default;
 
-	void startPeriod()
-	{
-		m_periodTimer.reset();
-	}
 
-	void finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod );
+public slots:
+	void update() override;
 
-	int cpuLoad() const
-	{
-		return m_cpuLoad;
-	}
+protected slots:
+	void openInBBEditor();
+	void resetName();
+	void changeName();
 
-	void setOutputFile( const QString& outputFile );
+
+protected:
+	void paintEvent( QPaintEvent * pe ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void constructContextMenu( QMenu * ) override;
 
 
 private:
-	MicroTimer m_periodTimer;
-	int m_cpuLoad;
-	QFile m_outputFile;
+	BBTCO * m_bbTCO;
+	QPixmap m_paintPixmap;
+	
+	QStaticText m_staticTextName;
+} ;
 
-};
+
 
 #endif

@@ -77,11 +77,11 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 
 
 
-ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings,
+ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySettings,
 					const OutputSettings & outputSettings,
 					ExportFileFormats exportFileFormat,
 					const QString & outputFilename ) :
-	QThread( Engine::mixer() ),
+	QThread( Engine::audioEngine() ),
 	m_fileDev( NULL ),
 	m_qualitySettings( qualitySettings ),
 	m_progress( 0 ),
@@ -95,7 +95,7 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 
 		m_fileDev = audioEncoderFactory(
 					outputFilename, outputSettings, DEFAULT_CHANNELS,
-					Engine::mixer(), successful );
+					Engine::audioEngine(), successful );
 		if( !successful )
 		{
 			delete m_fileDev;
@@ -149,10 +149,9 @@ void ProjectRenderer::startProcessing()
 
 	if( isReady() )
 	{
-		// Have to do mixer stuff with GUI-thread affinity in order to
+		// Have to do audio engine stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
-		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false, false );
+		Engine::audioEngine()->setAudioDevice( m_fileDev, m_qualitySettings, false, false );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -182,12 +181,12 @@ void ProjectRenderer::run()
 
 	Engine::getSong()->startExport();
 	// Skip first empty buffer.
-	Engine::mixer()->nextBuffer();
+	Engine::audioEngine()->nextBuffer();
 
 	m_progress = 0;
 
 	// Now start processing
-	Engine::mixer()->startProcessing(false);
+	Engine::audioEngine()->startProcessing(false);
 
 	// Continually track and emit progress percentage to listeners.
 	while (!Engine::getSong()->isExportDone() && !m_abort)
@@ -201,8 +200,8 @@ void ProjectRenderer::run()
 		}
 	}
 
-	// Notify mixer of the end of processing.
-	Engine::mixer()->stopProcessing();
+	// Notify the audio engine of the end of processing.
+	Engine::audioEngine()->stopProcessing();
 
 	Engine::getSong()->stopExport();
 

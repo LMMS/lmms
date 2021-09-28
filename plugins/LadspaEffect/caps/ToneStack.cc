@@ -82,7 +82,7 @@ ToneStack::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i) 
 	{
-		register sample_t a = s[i];
+		sample_t a = s[i];
 		a = tonestack.process (a + normal);
 		F (d, i, a, adding_gain);
 	}
@@ -146,7 +146,7 @@ ToneStackLT::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i) 
 	{
-		register sample_t a = s[i];
+		sample_t a = s[i];
 		a = tonestack.process (a + normal);
 		F (d, i, a, adding_gain);
 	}

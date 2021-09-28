@@ -26,9 +26,9 @@
 #include <QMap>
 
 #include "vibed.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "ToolTip.h"
 #include "base64.h"
@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
-	NULL
+	NULL,
 };
 
 }
@@ -276,7 +276,7 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
-				Engine::mixer()->processingSampleRate(),
+				Engine::audioEngine()->processingSampleRate(),
 						__sampleLength );
 		
 		for( int i = 0; i < 9; ++i )
