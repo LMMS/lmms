@@ -29,17 +29,17 @@
 #include "Engine.h"
 #include "MemoryManager.h"
 
-static fpp_t framesPerPeriod;
+fpp_t BufferManager::framesPerPeriod;
 
-void BufferManager::init( fpp_t framesPerPeriod )
+void BufferManager::init( fpp_t fpp )
 {
-	::framesPerPeriod = framesPerPeriod;
+	BufferManager::framesPerPeriod = fpp;
 }
 
 
 sampleFrame * BufferManager::acquire()
 {
-	return MM_ALLOC<sampleFrame>( ::framesPerPeriod );
+	return MM_ALLOC<sampleFrame>( BufferManager::framesPerPeriod );
 }
 
 void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
