@@ -24,6 +24,13 @@
 
 #include "InstrumentTrackView.h"
 
+#include <QAction>
+#include <QApplication>
+#include <QDragEnterEvent>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QMenu>
+
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "ControllerConnectionDialog.h"
@@ -39,13 +46,6 @@
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
 #include "TrackLabelButton.h"
-
-#include <QAction>
-#include <QApplication>
-#include <QDragEnterEvent>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QMenu>
 
 
 InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :

@@ -25,10 +25,10 @@
 #ifndef INSTRUMENT_TRACK_WINDOW_H
 #define INSTRUMENT_TRACK_WINDOW_H
 
+#include <QWidget>
+
 #include "ModelView.h"
 #include "SerializingObject.h"
-
-#include <QWidget>
 
 
 class EffectRackView;

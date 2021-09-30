@@ -24,6 +24,14 @@
 
 #include "InstrumentTrackWindow.h"
 
+#include <QDir>
+#include <QDropEvent>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMdiSubWindow>
+#include <QMenu>
+#include <QVBoxLayout>
+
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -57,14 +65,6 @@
 #include "ToolTip.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
-
-#include <QDir>
-#include <QDropEvent>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QMdiSubWindow>
-#include <QMenu>
-#include <QVBoxLayout>
 
 
 const int INSTRUMENT_WIDTH	= 254;
