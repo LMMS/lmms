@@ -24,61 +24,19 @@
  */
 #include "InstrumentTrack.h"
 
-#include <QDir>
-#include <QApplication>
-#include <QCloseEvent>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
-#include <QMdiArea>
-#include <QMenu>
-#include <QMessageBox>
-#include <QMdiSubWindow>
-#include <QPainter>
-
-#include "FileDialog.h"
 #include "AudioEngine.h"
 #include "AutomationPattern.h"
 #include "BBTrack.h"
-#include "CaptionMenu.h"
-#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
-#include "EffectChain.h"
-#include "EffectRackView.h"
-#include "embed.h"
-#include "FileBrowser.h"
-#include "FxLineLcdSpinBox.h"
 #include "FxMixer.h"
-#include "FxMixerView.h"
-#include "GuiApplication.h"
-#include "InstrumentSoundShapingView.h"
 #include "InstrumentTrackView.h"
-#include "FadeButton.h"
-#include "gui_templates.h"
 #include "Instrument.h"
-#include "InstrumentFunctionViews.h"
-#include "InstrumentMidiIOView.h"
-#include "InstrumentMiscView.h"
-#include "Knob.h"
-#include "LcdSpinBox.h"
-#include "LedCheckbox.h"
-#include "LeftRightNav.h"
-#include "lmms_constants.h"
-#include "MainWindow.h"
 #include "MidiClient.h"
-#include "MidiPortMenu.h"
 #include "MixHelpers.h"
 #include "Pattern.h"
-#include "PluginFactory.h"
-#include "PluginView.h"
-#include "SamplePlayHandle.h"
 #include "Song.h"
-#include "StringPairDrag.h"
-#include "TrackContainerView.h"
-#include "TrackLabelButton.h"
-#include "MidiCCRackView.h"
 
 
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
