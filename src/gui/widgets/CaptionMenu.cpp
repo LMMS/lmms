@@ -27,6 +27,8 @@
 #include "embed.h"
 
 
+namespace lmms::gui
+{
 
 
 CaptionMenu::CaptionMenu( const QString & _title, QWidget * _parent ) :
@@ -42,3 +44,6 @@ CaptionMenu::CaptionMenu( const QString & _title, QWidget * _parent ) :
 CaptionMenu::~CaptionMenu()
 {
 }
+
+
+} // namespace lmms::gui

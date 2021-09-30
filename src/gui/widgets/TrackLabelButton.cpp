@@ -38,7 +38,8 @@
 #include "Song.h"
 #include "TrackRenameLineEdit.h"
 
-
+namespace lmms::gui
+{
 
 TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
@@ -240,3 +241,6 @@ QString TrackLabelButton::elideName( const QString &name )
 	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextWidth );
 	return elidedName;
 }
+
+
+} // namespace lmms::gui

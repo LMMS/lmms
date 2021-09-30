@@ -37,6 +37,9 @@
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
 
+namespace lmms
+{
+
 float LmmsCore::s_framesPerTick;
 AudioEngine* LmmsCore::s_audioEngine = nullptr;
 FxMixer * LmmsCore::s_fxMixer = nullptr;
@@ -167,3 +170,5 @@ void *LmmsCore::pickDndPluginKey()
 
 
 LmmsCore * LmmsCore::s_instanceOfMe = nullptr;
+
+} // namespace lmms

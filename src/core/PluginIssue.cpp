@@ -26,6 +26,10 @@
 
 #include "PluginIssue.h"
 
+namespace lmms
+{
+
+
 const char *PluginIssue::msgFor(const PluginIssueType &it)
 {
 	switch (it)
@@ -91,11 +95,12 @@ bool PluginIssue::operator<(const PluginIssue &other) const
 }
 
 
+} // namespace lmms
 
 
-QDebug operator<<(QDebug stream, const PluginIssue &iss)
+QDebug operator<<(QDebug stream, const lmms::PluginIssue &iss)
 {
-	stream << PluginIssue::msgFor(iss.m_issueType);
+	stream << lmms::PluginIssue::msgFor(iss.m_issueType);
 	if (iss.m_info.length())
 	{
 		stream.nospace() << ": " << iss.m_info.c_str();

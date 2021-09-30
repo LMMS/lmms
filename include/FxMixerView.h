@@ -39,6 +39,12 @@
 #include "EffectRackView.h"
 
 class QButtonGroup;
+
+
+namespace lmms::gui
+{
+
+
 class FxLine;
 
 class LMMS_EXPORT FxMixerView : public QWidget, public ModelView,
@@ -132,5 +138,8 @@ private:
 	
 	friend class FxChannelView;
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

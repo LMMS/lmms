@@ -30,6 +30,10 @@
 
 #include "lmms_export.h"
 
+namespace lmms::gui
+{
+
+
 class LMMS_EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
@@ -49,5 +53,8 @@ public:
 									QString *selectedFilter = 0);
 	void clearSelection();
 };
+
+
+} // namespace lmms::gui
 
 #endif // FILEDIALOG_HPP

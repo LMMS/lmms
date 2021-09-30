@@ -27,6 +27,10 @@
 #include <QDomElement>
 
 
+namespace lmms
+{
+
+
 Keymap::Keymap() :
 	m_description(tr("empty")),
 	m_firstKey(0),
@@ -147,3 +151,6 @@ void Keymap::loadSettings(const QDomElement &element)
 		node = node.nextSibling();
 	}
 }
+
+
+} // namespace lmms

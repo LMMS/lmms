@@ -34,11 +34,21 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 class TimePos;
 class TrackContainer;
-class TrackContainerView;
 class TrackContentObject;
+
+
+namespace gui
+{
+
 class TrackView;
+class TrackContainerView;
+
+}
 
 
 /*! The minimum track height in pixels
@@ -93,7 +103,7 @@ public:
 						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
 
 
-	virtual TrackView * createView( TrackContainerView * view ) = 0;
+	virtual gui::TrackView* createView( gui::TrackContainerView* view ) = 0;
 	virtual TrackContentObject * createTCO( const TimePos & pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
@@ -222,7 +232,7 @@ private:
 	QColor m_color;
 	bool m_hasColor;
 
-	friend class TrackView;
+	friend class gui::TrackView;
 
 
 signals:
@@ -234,5 +244,6 @@ signals:
 } ;
 
 
+} // namespace lmms
 
 #endif

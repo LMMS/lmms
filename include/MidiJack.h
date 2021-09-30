@@ -42,9 +42,13 @@
 #include "MidiClient.h"
 #include "AudioJack.h"
 
+class QLineEdit;
+
+namespace lmms
+{
+
 constexpr size_t JACK_MIDI_BUFFER_MAX = 64; /* events */
 
-class QLineEdit;
 
 class MidiJack : public QThread, public MidiClientRaw
 {
@@ -94,6 +98,9 @@ private:
 	volatile bool m_quit;
 
 };
+
+
+} // namesapce lmms
 
 #endif // LMMS_HAVE_JACK
 

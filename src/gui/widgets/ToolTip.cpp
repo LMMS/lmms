@@ -28,6 +28,8 @@
 #include "ToolTip.h"
 #include "ConfigManager.h"
 
+namespace lmms::gui
+{
 
 void ToolTip::add( QWidget * _w, const QString & _txt )
 {
@@ -38,3 +40,4 @@ void ToolTip::add( QWidget * _w, const QString & _txt )
 }
 
 
+} // namespace lmms::gui

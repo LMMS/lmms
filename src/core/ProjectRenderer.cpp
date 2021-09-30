@@ -38,6 +38,10 @@
 #include "sched.h"
 #endif
 
+namespace lmms
+{
+
+
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
@@ -250,3 +254,4 @@ void ProjectRenderer::updateConsoleProgress()
 }
 
 
+} // namespace lmms

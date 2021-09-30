@@ -31,6 +31,9 @@
 
 #include "lmms_export.h"
 
+namespace lmms::gui
+{
+
 class LMMS_EXPORT LcdWidget : public QWidget
 {
 	Q_OBJECT
@@ -111,5 +114,7 @@ private:
 	void initUi( const QString& name, const QString &style ); //!< to be called by ctors
 
 };
+
+} // namespace lmms::gui
 
 #endif

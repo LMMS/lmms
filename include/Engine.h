@@ -34,6 +34,9 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
 class AudioEngine;
 class BBTrackContainer;
 class FxMixer;
@@ -158,6 +161,8 @@ private:
 	friend class GuiApplication;
 };
 
+
+} // namespace lmms
 
 #endif
 

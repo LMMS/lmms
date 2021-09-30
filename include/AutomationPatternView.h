@@ -33,6 +33,9 @@
 #include "TrackContentObjectView.h"
 
 
+namespace lmms::gui
+{
+
 class AutomationPatternView : public TrackContentObjectView
 {
 	Q_OBJECT
@@ -75,5 +78,7 @@ private:
 	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;
 
+
+} // lmms::gui
 
 #endif

@@ -27,6 +27,10 @@
 #include <QKeyEvent>
 #include <QVector>
 
+namespace lmms::gui
+{
+
+
 class ColorChooser: public QColorDialog
 {
 public:
@@ -57,3 +61,6 @@ private:
 	//! Generate a nice palette, with adjustable value
 	static QVector<QColor> nicePalette (int);
 };
+
+
+} // namespace lmms::gui

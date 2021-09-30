@@ -28,6 +28,9 @@
 
 #include <atomic>
 
+namespace lmms
+{
+
 class sharedObject
 {
 public:
@@ -81,5 +84,8 @@ public:
 private:
 	std::atomic_int m_referenceCount;
 } ;
+
+
+} // namespace lmms
 
 #endif

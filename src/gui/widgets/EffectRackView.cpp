@@ -34,6 +34,9 @@
 #include "GroupBox.h"
 
 
+namespace lmms::gui
+{
+
 EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this )
@@ -263,4 +266,4 @@ void EffectRackView::modelChanged()
 
 
 
-
+} // namespace lmms::gui

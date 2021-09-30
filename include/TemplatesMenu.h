@@ -4,6 +4,11 @@
 #include <QDir>
 #include <QMenu>
 
+
+namespace lmms::gui
+{
+
+
 class TemplatesMenu : public QMenu
 {
 	Q_OBJECT
@@ -17,5 +22,8 @@ private slots:
 	void addTemplatesFromDir( const QDir& dir );
 
 };
+
+
+} // namespace lmms::gui
 
 #endif // TEMPLATESMENU_H

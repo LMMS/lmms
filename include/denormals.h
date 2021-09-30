@@ -12,6 +12,8 @@
 #include <pmmintrin.h>
 #endif
 
+namespace lmms
+{
 
 // Set denormal protection for this thread. 
 // To be on the safe side, don't set the DAZ flag for SSE2 builds, 
@@ -27,6 +29,9 @@ void inline disable_denormals() {
 	_MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
 #endif
 }
+
+
+} // namespace lmms
 
 #endif
 

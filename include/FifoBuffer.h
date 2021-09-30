@@ -28,6 +28,10 @@
 #include <QtCore/QSemaphore>
 
 
+namespace lmms
+{
+
+
 template<typename T>
 class FifoBuffer
 {
@@ -87,5 +91,7 @@ private:
 	T * m_buffer;
 } ;
 
+
+} // namespace lmms
 
 #endif

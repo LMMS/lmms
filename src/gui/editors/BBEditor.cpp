@@ -39,6 +39,8 @@
 
 #include "Pattern.h"
 
+namespace lmms::gui
+{
 
 
 BBEditor::BBEditor( BBTrackContainer* tc ) :
@@ -338,3 +340,6 @@ void BBTrackContainerView::clonePattern()
 		newTrack->unlock();
 	}
 }
+
+
+} // namespace lmms::gui

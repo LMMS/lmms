@@ -72,10 +72,17 @@
 #include "FileDialog.h"
 
 
+namespace lmms
+{
+
+
 using std::move;
 
 typedef AutomationPattern::timeMap timeMap;
 
+
+namespace gui
+{
 
 // some constants...
 const int INITIAL_PIANOROLL_WIDTH = 970;
@@ -5337,3 +5344,8 @@ void PianoRollWindow::updateStepRecordingIcon()
 		m_toggleStepRecordingAction->setIcon(embed::getIconPixmap("record_step_off"));
 	}
 }
+
+
+} // namespace gui
+
+} // namespace lmms

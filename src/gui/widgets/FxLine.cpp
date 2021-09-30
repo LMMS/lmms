@@ -35,6 +35,10 @@
 #include "GuiApplication.h"
 #include "Song.h"
 
+namespace lmms::gui
+{
+
+
 bool FxLine::eventFilter( QObject *dist, QEvent *event )
 {
 	// If we are in a rename, capture the enter/return events and handle them
@@ -448,3 +452,6 @@ void FxLine::randomizeColor()
 	Engine::getSong()->setModified();
 	update();
 }
+
+
+} // namespace lmms::gui

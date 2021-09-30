@@ -32,6 +32,9 @@
 #include <QWidget>
 
 
+namespace lmms::gui
+{
+
 /**
 	@file LinkedModelGroupViews.h
 	See Lv2ViewBase.h for example usage
@@ -103,5 +106,7 @@ private:
 	virtual LinkedModelGroupView* getGroupView() = 0;
 };
 
+
+} // namespace lmms::gui
 
 #endif // LINKEDMODELGROUPVIEWS_H

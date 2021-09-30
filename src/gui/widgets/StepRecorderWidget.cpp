@@ -24,6 +24,9 @@
 #include "TextFloat.h"
 #include "embed.h"
 
+namespace lmms::gui
+{
+
 StepRecorderWidget::StepRecorderWidget(
 		QWidget * parent,
 		const int ppb,
@@ -166,3 +169,5 @@ void StepRecorderWidget::updateBoundaries()
 	//(no need to change top and left as they are static)
 }
 
+
+} // namespace lmms::gui

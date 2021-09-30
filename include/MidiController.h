@@ -33,6 +33,9 @@
 #include "MidiPort.h"
 
 
+namespace lmms
+{
+
 class MidiPort;
 
 
@@ -61,7 +64,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	gui::ControllerDialog* createDialog( QWidget * _parent ) override;
 	void updateName();
 
 
@@ -81,5 +84,7 @@ protected:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

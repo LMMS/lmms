@@ -29,6 +29,8 @@
 #include "ExportProjectDialog.h"
 #include "GuiApplication.h"
 
+namespace lmms
+{
 
 AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 					const ch_cnt_t _channels,
@@ -87,3 +89,4 @@ int AudioFileDevice::writeData( const void* data, int len )
 	return -1;
 }
 
+} // namespace lmms

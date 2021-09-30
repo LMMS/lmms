@@ -30,6 +30,9 @@
 #include <QRubberBand>
 #include <QtCore/QVector>
 
+namespace lmms::gui
+{
+
 
 class selectableObject : public QWidget
 {
@@ -89,6 +92,8 @@ private:
 
 };
 
+
+} // namespace lmms::gui
 
 #endif
 

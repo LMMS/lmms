@@ -44,6 +44,9 @@
 #include "MainWindow.h"
 #include "Song.h"
 
+namespace lmms::gui
+{
+
 
 MicrotunerConfig::MicrotunerConfig() :
 	QWidget(),
@@ -645,3 +648,6 @@ void MicrotunerConfig::closeEvent(QCloseEvent *ce)
 	else {hide();}
 	ce->ignore();
 }
+
+
+} // namespace lmms::gui

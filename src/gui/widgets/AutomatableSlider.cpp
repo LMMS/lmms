@@ -31,6 +31,8 @@
 #include "MainWindow.h"
 
 
+namespace lmms::gui
+{
 
 
 AutomatableSlider::AutomatableSlider( QWidget * _parent,
@@ -141,5 +143,5 @@ void AutomatableSlider::updateSlider()
 
 
 
-
+} // namespace lmms::gui
 

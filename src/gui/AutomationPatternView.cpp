@@ -41,6 +41,9 @@
 #include "Engine.h"
 
 
+namespace lmms::gui
+{
+
 QPixmap * AutomationPatternView::s_pat_rec = nullptr;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
@@ -508,3 +511,6 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 
 	m_pat->generateTangents();
 }
+
+
+} // namespace lmms::gui

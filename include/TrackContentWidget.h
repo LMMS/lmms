@@ -33,8 +33,15 @@
 
 class QMimeData;
 
+namespace lmms
+{
+
 class Track;
 class TrackContentObjectView;
+
+namespace gui
+{
+
 class TrackView;
 
 
@@ -139,5 +146,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

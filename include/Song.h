@@ -42,10 +42,16 @@
 #include "Scale.h"
 #include "VstSyncController.h"
 
+namespace lmms
+{
 
 class AutomationTrack;
 class Pattern;
+
+namespace gui
+{
 class TimeLineWidget;
+}
 
 
 const bpm_t MinTempo = 10;
@@ -117,7 +123,7 @@ public:
 		{
 			return m_jumped;
 		}
-		TimeLineWidget * m_timeLine;
+		gui::TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
@@ -517,5 +523,7 @@ signals:
 	void keymapListChanged(int index);
 } ;
 
+
+} // namespace lmms
 
 #endif

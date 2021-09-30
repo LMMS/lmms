@@ -35,6 +35,10 @@
 #include "MemoryManager.h"
 
 class QReadWriteLock;
+
+namespace lmms
+{
+
 class InstrumentTrack;
 class NotePlayHandle;
 
@@ -358,5 +362,7 @@ private:
 	static int s_size;
 };
 
+
+} // namespace lmms
 
 #endif

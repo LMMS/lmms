@@ -43,6 +43,9 @@
 #include "ToolTip.h"
 
 
+namespace lmms::gui
+{
+
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
@@ -237,3 +240,5 @@ void EffectView::modelChanged()
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
 	m_gate->setModel( &effect()->m_gateModel );
 }
+
+} // namespace lmms::gui

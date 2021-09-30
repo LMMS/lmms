@@ -30,15 +30,23 @@
 #include "lmms_basics.h"
 #include "Pattern.h"
 
+namespace lmms
+{
+
+
+
+namespace gui
+{
 class PianoRoll;
 class StepRecorderWidget;
+} // namespace gui
 
 class StepRecorder : public QObject
 {
 	Q_OBJECT
 
 	public:
-	StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget);
+	StepRecorder(gui::PianoRoll& pianoRoll, gui::StepRecorderWidget& stepRecorderWidget);
 
 	void initialize();
 	void start(const TimePos& currentPosition,const TimePos& stepLength);
@@ -80,8 +88,8 @@ class StepRecorder : public QObject
 
 	bool allCurStepNotesReleased();
 
-	PianoRoll& m_pianoRoll;
-	StepRecorderWidget& m_stepRecorderWidget;
+	gui::PianoRoll& m_pianoRoll;
+	gui::StepRecorderWidget& m_stepRecorderWidget;
 
 	bool m_isRecording = false;
 	TimePos m_curStepStartPos = 0;
@@ -139,5 +147,8 @@ class StepRecorder : public QObject
 
 	bool m_isStepInProgress = false;
 };
+
+
+} // namespace lmms
 
 #endif //STEP_RECORDER_H

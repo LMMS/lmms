@@ -42,6 +42,10 @@
 #include "MainWindow.h"
 #include "TextFloat.h"
 
+namespace lmms
+{
+
+
 TrackContainer::TrackContainer() :
 	Model( nullptr ),
 	JournallingObject(),
@@ -331,3 +335,5 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 	return valueMap;
 };
 
+
+} // namespace lmms

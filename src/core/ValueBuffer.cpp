@@ -2,6 +2,10 @@
 
 #include "interpolation.h"
 
+namespace lmms
+{
+
+
 ValueBuffer::ValueBuffer()
 {}
 
@@ -41,3 +45,6 @@ void ValueBuffer::interpolate(float start, float end_)
 		return linearInterpolate( start, end_, i++ / length());
 	});
 }
+
+
+} // namespace lmms

@@ -52,6 +52,10 @@
 #include "BBTrackContainer.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+namespace lmms::gui
+{
+
+
 FxMixerView::FxMixerView() :
 	QWidget(),
 	ModelView( nullptr, this ),
@@ -624,3 +628,6 @@ void FxMixerView::updateFaders()
 		}
 	}
 }
+
+
+} // namesapce lmms::gui

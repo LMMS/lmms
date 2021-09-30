@@ -33,6 +33,10 @@
 #include "lmms_export.h"
 
 
+namespace lmms::gui
+{
+
+
 class TabButton;
 
 
@@ -84,5 +88,7 @@ signals:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

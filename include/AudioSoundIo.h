@@ -37,8 +37,14 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
+namespace lmms
+{
+
+namespace gui
+{
 class ComboBox;
 class LcdSpinBox;
+}
 
 // Exists only to work around "Error: Meta object features not supported for nested classes"
 class AudioSoundIoSetupUtil : public QObject
@@ -133,6 +139,9 @@ private:
 	}
 
 };
+
+
+} // namespace lmms
 
 #endif
 

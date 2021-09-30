@@ -35,6 +35,10 @@
 #include "PianoRoll.h"
 #include "RenameDialog.h"
 
+namespace lmms::gui
+{
+
+
 PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	TrackContentObjectView( pattern, parent ),
 	m_pat( pattern ),
@@ -613,3 +617,6 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
+
+
+} // namespace lmms::gui

@@ -37,6 +37,8 @@
 #include "MainWindow.h"
 
 
+namespace lmms::gui
+{
 
 LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
@@ -175,3 +177,4 @@ void LcdSpinBox::enterValue()
 	}
 }
 
+} // namespace lmms::gui

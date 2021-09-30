@@ -38,7 +38,14 @@ class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
+namespace lmms
+{
+
 class ConfigManager;
+
+namespace gui
+{
+
 class PluginView;
 class ToolButton;
 
@@ -247,5 +254,10 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

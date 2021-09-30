@@ -34,6 +34,9 @@
 #include "TrackContentObject.h"
 
 
+namespace lmms
+{
+
 class AutomationTrack;
 class TimePos;
 
@@ -152,7 +155,7 @@ public:
 	static const QString classNodeName() { return "automationpattern"; }
 	QString nodeName() const override { return classNodeName(); }
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	gui::TrackContentObjectView * createView( gui::TrackView * _tv ) override;
 
 
 	static bool isAutomated( const AutomatableModel * _m );
@@ -241,5 +244,8 @@ inline int POS(AutomationPattern::TimemapIterator it)
 {
 	return it.key();
 }
+
+
+} // namespace lmms
 
 #endif

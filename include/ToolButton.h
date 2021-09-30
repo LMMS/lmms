@@ -29,6 +29,8 @@
 #include <QToolButton>
 #include <QColor>
 
+namespace lmms::gui
+{
 
 class ToolButton : public QToolButton
 {
@@ -45,6 +47,8 @@ public:
 	virtual ~ToolButton() = default;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif
 

@@ -33,9 +33,19 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
-class ControllerDialog;
+namespace lmms
+{
+
 class Controller;
 class ControllerConnection;
+
+namespace gui
+{
+
+class ControllerDialog;
+
+} // namespace gui
+
 
 typedef QVector<Controller *> ControllerVector;
 
@@ -132,7 +142,7 @@ public:
 	bool hasModel( const Model * m ) const;
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	virtual gui::ControllerDialog * createDialog( QWidget * _parent );
 
 	virtual void setName( const QString & _new_name )
 	{
@@ -169,9 +179,12 @@ signals:
 	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerDialog;
+	friend class gui::ControllerDialog;
 
 } ;
+
+
+} // namespace lmms
 
 #endif
 

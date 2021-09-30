@@ -41,8 +41,22 @@
 #include "TrackView.h"
 
 
+namespace lmms
+{
+
+
 class Instrument;
 class DataFile;
+
+namespace gui
+{
+
+class InstrumentTrackView;
+class InstrumentTrackWindow;
+class InstrumentMiscView;
+class MidiCCRackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
@@ -113,7 +127,7 @@ public:
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
 	// create new view for me
-	TrackView * createView( TrackContainerView* tcv ) override;
+	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
 
 	// create new track-content-object = pattern
 	TrackContentObject* createTCO(const TimePos & pos) override;
@@ -296,12 +310,16 @@ private:
 	std::unique_ptr<BoolModel> m_midiCCEnable;
 	std::unique_ptr<FloatModel> m_midiCCModel[MidiControllerCount];
 
-	friend class InstrumentTrackView;
-	friend class InstrumentTrackWindow;
+	friend class gui::InstrumentTrackView;
+	friend class gui::InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class InstrumentMiscView;
-	friend class MidiCCRackView;
+	friend class gui::InstrumentMiscView;
+	friend class gui::MidiCCRackView;
 
 } ;
+
+
+
+} // namespace lmms
 
 #endif

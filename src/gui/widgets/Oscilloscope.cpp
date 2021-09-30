@@ -37,6 +37,9 @@
 #include "embed.h"
 #include "BufferManager.h"
 
+namespace lmms::gui
+{
+
 
 Oscilloscope::Oscilloscope( QWidget * _p ) :
 	QWidget( _p ),
@@ -205,4 +208,4 @@ QColor const & Oscilloscope::determineLineColor(float level) const
 }
 
 
-
+} // namespace lmms::gui

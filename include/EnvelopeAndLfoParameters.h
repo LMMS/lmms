@@ -33,6 +33,8 @@
 #include "TempoSyncKnobModel.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
@@ -182,5 +184,7 @@ private:
 	friend class EnvelopeAndLfoView;
 
 } ;
+
+} // namespace lmms
 
 #endif

@@ -36,6 +36,9 @@
 
 #include <cmath>
 
+namespace lmms
+{
+
 int AutomationPattern::s_quantization = 1;
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
 const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
@@ -869,11 +872,11 @@ const QString AutomationPattern::name() const
 
 
 
-TrackContentObjectView * AutomationPattern::createView( TrackView * _tv )
+gui::TrackContentObjectView * AutomationPattern::createView( gui::TrackView * _tv )
 {
 	QMutexLocker m(&m_patternMutex);
 
-	return new AutomationPatternView( this, _tv );
+	return new gui::AutomationPatternView( this, _tv );
 }
 
 
@@ -1182,3 +1185,5 @@ void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate
 		it++;
 	}
 }
+
+} // namespace lmms

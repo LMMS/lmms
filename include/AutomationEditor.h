@@ -42,8 +42,16 @@ class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class ComboBox;
+namespace lmms
+{
 class NotePlayHandle;
+}
+
+namespace lmms::gui
+{
+
+
+class ComboBox;
 class TimeLineWidget;
 
 
@@ -294,5 +302,7 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+
+} // namespace lmms::gui
 
 #endif

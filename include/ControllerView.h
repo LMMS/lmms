@@ -36,6 +36,10 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
+namespace lmms::gui
+{
+
+
 class LedCheckBox;
 
 
@@ -80,5 +84,8 @@ private:
 	bool m_show;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

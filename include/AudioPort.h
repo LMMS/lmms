@@ -33,6 +33,9 @@
 #include "MemoryManager.h"
 #include "PlayHandle.h"
 
+namespace lmms
+{
+
 class EffectChain;
 class FloatModel;
 class BoolModel;
@@ -134,5 +137,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif

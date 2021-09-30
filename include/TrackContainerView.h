@@ -39,9 +39,29 @@
 
 class QVBoxLayout;
 
+namespace lmms
+{
+
 class InstrumentTrack;
 class TrackContainer;
 
+class InstrumentLoaderThread : public QThread
+{
+Q_OBJECT
+public:
+	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
+		QString name = "" );
+
+	void run() override;
+
+private:
+	InstrumentTrack *m_it;
+	QString m_name;
+	QThread *m_containerThread;
+};
+
+namespace gui
+{
 
 class TrackContainerView : public QWidget, public ModelView,
 						public JournallingObject,
@@ -191,19 +211,9 @@ signals:
 
 } ;
 
-class InstrumentLoaderThread : public QThread
-{
-	Q_OBJECT
-public:
-	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
-							QString name = "" );
 
-	void run() override;
+} // namespace gui
 
-private:
-	InstrumentTrack *m_it;
-	QString m_name;
-	QThread *m_containerThread;
-};
+} // namespace lmms
 
 #endif

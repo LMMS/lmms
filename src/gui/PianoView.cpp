@@ -57,6 +57,10 @@
 #include "MainWindow.h"
 
 
+namespace lmms::gui
+{
+
+
 /*! The scale of C Major - white keys only.
  */
 Keys WhiteKeys[] =
@@ -983,5 +987,5 @@ void PianoView::paintEvent( QPaintEvent * )
 }
 
 
-
+} // namespace lmms::gui
 

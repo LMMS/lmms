@@ -64,6 +64,9 @@
 #include "ToolTip.h"
 
 
+namespace lmms::gui
+{
+
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
 QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
@@ -2110,3 +2113,6 @@ void AutomationEditorWindow::updateWindowTitle()
 
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_pattern->name() ) );
 }
+
+
+} // namespace lmms::gui

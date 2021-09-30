@@ -36,6 +36,9 @@
 #include "Lv2Basics.h"
 #include "Lv2Manager.h"
 
+namespace lmms
+{
+
 
 const LilvPlugin *Lv2SubPluginFeatures::getPlugin(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k)
@@ -179,6 +182,9 @@ void Lv2SubPluginFeatures::listSubPluginKeys(const Plugin::Descriptor *desc,
 		}
 	}
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

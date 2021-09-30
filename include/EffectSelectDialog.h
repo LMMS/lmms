@@ -35,6 +35,9 @@
 
 namespace Ui { class EffectSelectDialog; }
 
+namespace lmms::gui
+{
+
 
 class EffectSelectDialog : public QDialog
 {
@@ -65,6 +68,8 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 
 #endif

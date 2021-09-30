@@ -30,6 +30,9 @@
 
 class QAction;
 
+namespace lmms
+{
+
 class LMMS_EXPORT TempoSyncKnobModel : public FloatModel
 {
 	Q_OBJECT
@@ -101,5 +104,7 @@ private:
 	friend class TempoSyncKnob;
 
 } ;
+
+} // namespace lmms
 
 #endif

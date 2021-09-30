@@ -36,6 +36,10 @@
 #include "Song.h"
 
 
+namespace lmms::gui
+{
+
+
 
 TempoSyncKnob::TempoSyncKnob( knobTypes _knob_num, QWidget * _parent,
 						const QString & _name ) :
@@ -307,4 +311,4 @@ void TempoSyncKnob::showCustom()
 
 
 
-
+} // namespace lmms::gui

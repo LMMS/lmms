@@ -61,6 +61,10 @@
 
 #include "BufferManager.h"
 
+namespace lmms
+{
+
+
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
 
@@ -1287,3 +1291,5 @@ void AudioEngine::fifoWriter::write( surroundSampleFrame * buffer )
 	m_audioEngine->m_waitingForWrite = false;
 	m_audioEngine->m_doChangesMutex.unlock();
 }
+
+} // namespace lmms

@@ -28,6 +28,9 @@
 
 #include <QPushButton>
 
+namespace lmms::gui
+{
+
 
 class TabButton : public QPushButton
 {
@@ -62,5 +65,8 @@ private:
 	int m_id;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

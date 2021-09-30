@@ -33,6 +33,9 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
 
 SampleTrack::SampleTrack(TrackContainer* tc) :
 	Track(Track::SampleTrack, tc),
@@ -242,3 +245,6 @@ void SampleTrack::updateEffectChannel()
 {
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 }
+
+
+} // namespace lmms

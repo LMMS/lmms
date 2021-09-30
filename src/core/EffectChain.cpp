@@ -32,6 +32,9 @@
 #include "MixHelpers.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 EffectChain::EffectChain( Model * _parent ) :
 	Model( _parent ),
@@ -241,3 +244,6 @@ void EffectChain::clear()
 
 	m_enabledModel.setValue( false );
 }
+
+
+} // namespace lmms

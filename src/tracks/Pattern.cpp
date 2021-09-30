@@ -33,10 +33,14 @@
 #include <limits>
 
 
-QPixmap * PatternView::s_stepBtnOn0 = nullptr;
-QPixmap * PatternView::s_stepBtnOn200 = nullptr;
-QPixmap * PatternView::s_stepBtnOff = nullptr;
-QPixmap * PatternView::s_stepBtnOffLight = nullptr;
+namespace lmms
+{
+
+
+QPixmap* gui::PatternView::s_stepBtnOn0 = nullptr;
+QPixmap* gui::PatternView::s_stepBtnOn200 = nullptr;
+QPixmap* gui::PatternView::s_stepBtnOff = nullptr;
+QPixmap* gui::PatternView::s_stepBtnOffLight = nullptr;
 
 
 
@@ -609,3 +613,6 @@ void Pattern::changeTimeSignature()
 				last_pos.getBar() * TimePos::stepsPerBar() );
 	updateLength();
 }
+
+
+} // namespace lmms

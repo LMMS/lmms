@@ -27,6 +27,9 @@
 #include "AutomationPattern.h"
 
 
+namespace lmms
+{
+
 // Dummy constructor for the QMap
 AutomationNode::AutomationNode() :
 	m_pattern(nullptr),
@@ -107,3 +110,5 @@ void AutomationNode::resetOutValue()
 	// the tangents
 	setOutValue(m_inValue);
 }
+
+} // namespace lmms

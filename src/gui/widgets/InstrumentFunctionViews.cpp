@@ -34,6 +34,9 @@
 #include "TempoSyncKnob.h"
 
 
+namespace lmms::gui
+{
+
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this ),
@@ -200,4 +203,4 @@ void InstrumentFunctionArpeggioView::modelChanged()
 
 
 
-
+} // namespace lmms::gui

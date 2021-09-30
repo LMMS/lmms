@@ -40,6 +40,9 @@
 #include "ControllerView.h"
 #include "LfoController.h"
 
+namespace lmms::gui
+{
+
 
 ControllerRackView::ControllerRackView( ) :
 	QWidget(),
@@ -214,3 +217,5 @@ void ControllerRackView::closeEvent( QCloseEvent * _ce )
 	_ce->ignore();
  }
 
+
+} // namespace lmms::gui

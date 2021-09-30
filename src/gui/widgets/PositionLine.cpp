@@ -30,6 +30,9 @@
 #include "Song.h"
 
 
+namespace lmms::gui
+{
+
 PositionLine::PositionLine(QWidget* parent) :
 	QWidget(parent),
 	m_hasTailGradient(false),
@@ -96,3 +99,6 @@ void PositionLine::zoomChange(float zoom)
 
 	update();
 }
+
+
+} // namespace lmms::gui

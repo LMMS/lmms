@@ -35,8 +35,11 @@
 
 
 class QComboBox;
-class LcdSpinBox;
 
+namespace lmms::gui
+{
+
+class LcdSpinBox;
 
 class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
 {
@@ -58,6 +61,8 @@ private:
 	int m_selectedDevice;
 	AudioAlsa::DeviceInfoCollection m_deviceInfos;
 };
+
+} // namespace lmms::gui
 
 #endif
 

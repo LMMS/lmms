@@ -41,6 +41,8 @@
 #include "MidiJack.h"
 
 
+namespace lmms
+{
 
 AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<int>(
@@ -465,13 +467,13 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
+	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiojack",
 							"channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
@@ -499,6 +501,6 @@ void AudioJack::setupWidget::saveSettings()
 
 
 
-
+} // namespace lmms
 
 #endif

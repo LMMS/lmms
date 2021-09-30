@@ -29,6 +29,10 @@
 #include "GuiApplication.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
+
 void FxLineLcdSpinBox::setTrackView(TrackView * tv)
 {
 	m_tv = tv;
@@ -64,3 +68,6 @@ void FxLineLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)
 	addDefaultActions(contextMenu);
 	contextMenu->exec(QCursor::pos());
 }
+
+
+} // namespace lmms::gui

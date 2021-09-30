@@ -37,6 +37,8 @@
 
 #include "AudioDevice.h"
 
+namespace lmms
+{
 
 class AudioAlsa : public QThread, public AudioDevice
 {
@@ -101,6 +103,8 @@ private:
 	bool m_convertEndian;
 
 } ;
+
+} // namespace lmms
 
 #endif
 

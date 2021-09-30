@@ -30,6 +30,9 @@
 
 #include "ModelView.h"
 
+namespace lmms::gui
+{
+
 class LcdSpinBox;
 
 
@@ -48,5 +51,7 @@ private:
 	LcdSpinBox * m_denominator;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif

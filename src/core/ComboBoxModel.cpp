@@ -25,6 +25,9 @@
 #include "ComboBoxModel.h"
 #include "embed.h"
 
+namespace lmms
+{
+
 using std::unique_ptr;
 using std::move;
 
@@ -68,6 +71,6 @@ int ComboBoxModel::findText( const QString& txt ) const
 }
 
 
-
+} // namespace lmms
 
 

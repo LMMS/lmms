@@ -36,6 +36,10 @@
 #include "Song.h"
 #include "ToolTip.h"
 
+namespace lmms::gui
+{
+
+
 BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	TrackContentObjectView( _tco, _tv ),
 	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) ),
@@ -189,3 +193,6 @@ void BBTCOView::update()
 
 	TrackContentObjectView::update();
 }
+
+
+} // namespace lmms::gui

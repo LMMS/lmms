@@ -42,6 +42,8 @@
 #include <sys/un.h>
 #endif
 
+namespace lmms
+{
 
 // simple helper thread monitoring our RemotePlugin - if process terminates
 // unexpectedly invalidate plugin so LMMS doesn't lock up
@@ -549,3 +551,6 @@ bool RemotePlugin::processMessage( const message & _m )
 
 	return true;
 }
+
+
+} // namespace lmms

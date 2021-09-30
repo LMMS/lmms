@@ -32,6 +32,9 @@
 
 #include <iterator>
 
+namespace lmms
+{
+
 PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),
 		m_offset(offset),
@@ -73,3 +76,5 @@ sampleFrame* PlayHandle::buffer()
 {
 	return m_bufferReleased ? nullptr : reinterpret_cast<sampleFrame*>(m_playHandleBuffer);
 };
+
+} // namespace lmms

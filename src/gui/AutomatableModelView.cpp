@@ -39,6 +39,9 @@
 #include "AutomationEditor.h"
 
 
+namespace lmms
+{
+
 static float floatFromClipboard(bool* ok=nullptr);
 
 AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
@@ -304,3 +307,5 @@ static float floatFromClipboard(bool* ok)
 	return getString( MimeType::Default ).toFloat(ok);
 }
 
+
+} // namespace lmms

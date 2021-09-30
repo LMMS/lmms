@@ -34,6 +34,10 @@
 #include "StringPairDrag.h"
 #include "ToolTip.h"
 
+namespace lmms::gui
+{
+
+
 SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	TrackContentObjectView( _tco, _tv ),
 	m_tco( _tco ),
@@ -351,3 +355,6 @@ bool SampleTCOView::splitTCO( const TimePos pos )
 	}
 	else { return false; }
 }
+
+
+} // namespace lmms::gui

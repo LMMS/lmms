@@ -29,6 +29,10 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT BufferManager
 {
 public:
@@ -44,8 +48,10 @@ public:
 	static void release( sampleFrame * buf );
 
 private:
-
 	static fpp_t framesPerPeriod;
 };
+
+
+} // namespace lmms
 
 #endif

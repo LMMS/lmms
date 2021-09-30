@@ -34,6 +34,10 @@
 
 #include <QColor>
 
+namespace lmms
+{
+
+
 class FxRoute;
 typedef QVector<FxRoute *> FxRouteVector;
 
@@ -220,5 +224,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

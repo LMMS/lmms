@@ -46,7 +46,35 @@
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
+namespace lmms
+{
+
 using namespace std;
+
+
+InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack *it, QString name ) :
+	QThread( parent ),
+	m_it( it ),
+	m_name( name )
+{
+	m_containerThread = thread();
+}
+
+
+
+
+void InstrumentLoaderThread::run()
+{
+	Instrument *i = m_it->loadInstrument(m_name, nullptr,
+										 true /*always DnD*/);
+	QObject *parent = i->parent();
+	i->setParent( 0 );
+	i->moveToThread( m_containerThread );
+	i->setParent( parent );
+}
+
+namespace gui
+{
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
@@ -482,25 +510,7 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 }
 
 
+} // namespace gui
 
 
-InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack *it, QString name ) :
-	QThread( parent ),
-	m_it( it ),
-	m_name( name )
-{
-	m_containerThread = thread();
-}
-
-
-
-
-void InstrumentLoaderThread::run()
-{
-	Instrument *i = m_it->loadInstrument(m_name, nullptr,
-				true /*always DnD*/);
-	QObject *parent = i->parent();
-	i->setParent( 0 );
-	i->moveToThread( m_containerThread );
-	i->setParent( parent );
-}
+} // namespace lmms

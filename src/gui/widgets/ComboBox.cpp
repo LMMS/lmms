@@ -37,6 +37,8 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
 
 QPixmap * ComboBox::s_background = nullptr;
 QPixmap * ComboBox::s_arrow = nullptr;
@@ -250,6 +252,6 @@ void ComboBox::setItem( QAction* item )
 }
 
 
-
+} // namespace lmms::gui
 
 

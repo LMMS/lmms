@@ -44,6 +44,9 @@
 class QPainter;
 class QRect;
 
+namespace lmms
+{
+
 // values for buffer margins, used for various libsamplerate interpolation modes
 // the array positions correspond to the converter_type parameter values in libsamplerate
 // if there appears problems with playback on some interpolation mode, then the value for that mode
@@ -351,5 +354,6 @@ signals:
 
 } ;
 
+} // namespace lmms
 
 #endif

@@ -46,6 +46,9 @@
 #include "embed.h"
 
 
+namespace lmms
+{
+
 class AutoDetectMidiController : public MidiController
 {
 public:
@@ -122,6 +125,8 @@ private:
 
 
 
+namespace gui
+{
 
 ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
 		const AutomatableModel * _target_model ) :
@@ -441,5 +446,6 @@ void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
 
 
 
+} // namespace gui
 
-
+} // namespace lmms

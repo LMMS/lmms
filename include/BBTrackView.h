@@ -32,6 +32,9 @@
 #include "TrackView.h"
 
 
+namespace lmms::gui
+{
+
 class BBTrackView : public TrackView
 {
 	Q_OBJECT
@@ -57,5 +60,7 @@ private:
 } ;
 
 
+
+} // namespace lmms::gui
 
 #endif

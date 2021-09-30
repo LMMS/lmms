@@ -36,6 +36,11 @@
 #include "lmms_basics.h"
 #include "PluginIssue.h"
 
+
+namespace lmms
+{
+
+
 struct ConnectPortVisitor;
 typedef struct LV2_Evbuf_Impl LV2_Evbuf;
 
@@ -260,6 +265,9 @@ const Target* dcast(const PortBase* base)
 }
 
 } // namespace Lv2Ports
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2PORTS_H

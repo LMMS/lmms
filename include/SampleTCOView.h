@@ -30,6 +30,10 @@
 #include "SampleTCO.h"
 #include "TrackContentObjectView.h"
 
+namespace lmms::gui
+{
+
+
 class SampleTCOView : public TrackContentObjectView
 {
 	Q_OBJECT
@@ -61,5 +65,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 #endif

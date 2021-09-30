@@ -29,6 +29,9 @@
 #include "ControlLayout.h"
 #include "LinkedModelGroups.h"
 
+namespace lmms::gui
+{
+
 
 /*
 	LinkedModelGroupViewBase
@@ -171,3 +174,4 @@ void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 }
 
 
+} // namespace lmms::gui

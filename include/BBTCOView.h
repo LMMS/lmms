@@ -31,6 +31,9 @@
 #include <QStaticText>
 
 
+namespace lmms::gui
+{
+
 class BBTCOView : public TrackContentObjectView
 {
 	Q_OBJECT
@@ -62,5 +65,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 #endif

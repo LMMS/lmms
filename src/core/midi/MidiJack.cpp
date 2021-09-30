@@ -36,6 +36,9 @@
 #include "Engine.h"
 #include "MainWindow.h"
 
+namespace lmms
+{
+
 /* callback functions for jack */
 static int JackMidiProcessCallback(jack_nframes_t nframes, void *arg)
 {
@@ -228,5 +231,7 @@ void MidiJack::run()
 		sleep(1);
 	}
 }
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_JACK

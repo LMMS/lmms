@@ -29,8 +29,16 @@
 
 #include "TrackView.h"
 
-class Knob;
+namespace lmms
+{
+
 class SampleTrack;
+
+
+namespace gui
+{
+
+class Knob;
 class SampleTrackWindow;
 class TrackLabelButton;
 
@@ -98,5 +106,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

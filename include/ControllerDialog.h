@@ -30,8 +30,13 @@
 
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class Controller;
 
+namespace gui
+{
 
 class ControllerDialog : public QWidget, public ModelView
 {
@@ -50,5 +55,10 @@ protected:
 	void closeEvent( QCloseEvent * _ce ) override;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

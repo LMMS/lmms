@@ -44,6 +44,9 @@
 #include "TrackView.h"
 
 
+namespace lmms::gui
+{
+
 /*! Alternate between a darker and a lighter background color every 4 bars
  */
 const int BARS_PER_GROUP = 4;
@@ -724,3 +727,6 @@ void TrackContentWidget::setGridColor( const QBrush & c )
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
+
+
+} // namespace lmms::gui

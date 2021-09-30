@@ -33,6 +33,8 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT ComboBoxModel : public IntModel
 {
@@ -92,5 +94,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif

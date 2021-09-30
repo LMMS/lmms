@@ -26,6 +26,9 @@
 #ifndef AUTOMATION_NODE_H
 #define AUTOMATION_NODE_H
 
+namespace lmms
+{
+
 class AutomationPattern;
 
 
@@ -151,5 +154,6 @@ private:
 	float m_outTangent;
 };
 
+} // namespace lmms
 
 #endif

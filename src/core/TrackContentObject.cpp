@@ -33,6 +33,9 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
 /*! \brief Create a new TrackContentObject
  *
  *  Creates a new track content object for the given track.
@@ -197,3 +200,4 @@ bool TrackContentObject::hasColor()
 	return usesCustomClipColor() || getTrack()->useColor();
 }
 
+} // namespace lmms

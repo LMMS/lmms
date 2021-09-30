@@ -30,6 +30,12 @@
 #include "EffectControlDialog.h"
 
 
+namespace lmms
+{
+
+namespace gui
+{
+
 class DummyEffectControlDialog : public EffectControlDialog
 {
 public:
@@ -40,6 +46,7 @@ public:
 
 } ;
 
+}
 
 class DummyEffectControls : public EffectControls
 {
@@ -71,9 +78,9 @@ public:
 		return "DummyControls";
 	}
 
-	EffectControlDialog * createView() override
+	gui::EffectControlDialog * createView() override
 	{
-		return new DummyEffectControlDialog( this );
+		return new gui::DummyEffectControlDialog( this );
 	}
 } ;
 
@@ -139,5 +146,7 @@ private:
 	}
 } ;
 
+
+} // namespace lmms
 
 #endif

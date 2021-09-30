@@ -28,6 +28,10 @@
 #include <ctime>
 #include <QtCore/QString>
 
+namespace lmms
+{
+
+
 /// \brief CPU time point
 ///
 /// Represents a point in CPU time (not wall-clock time) intended for measuring
@@ -69,5 +73,8 @@ class PerfLogTimer
 	QString name;
 	PerfTime begin_time;
 };
+
+
+} // namespace lmms
 
 #endif

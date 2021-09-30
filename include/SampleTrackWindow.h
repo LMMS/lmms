@@ -32,7 +32,10 @@
 
 #include "EffectRackView.h"
 #include "SampleTrack.h"
- 
+
+namespace lmms::gui
+{
+
 
 class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
 {
@@ -87,6 +90,9 @@ private:
 	EffectRackView * m_effectRack;
 } ;
 
+
+
+} // namespace lmms::gui
 
 
 #endif

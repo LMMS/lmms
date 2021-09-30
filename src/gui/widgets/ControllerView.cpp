@@ -43,6 +43,9 @@
 #include "MainWindow.h"
 #include "ToolTip.h"
 
+namespace lmms::gui
+{
+
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QFrame( _parent ),
@@ -182,3 +185,6 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
+
+
+} // namespace lmms::gui

@@ -30,9 +30,9 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 
-
-namespace base64
+namespace lmms::base64
 {
+
 	inline void encode( const char * _data, const int _size,
 								QString & _dst )
 	{
@@ -51,6 +51,6 @@ namespace base64
 	QVariant decode( const QString & _b64,
 			QVariant::Type _force_type = QVariant::Invalid );
 
-}
+} // namespace lmms::base64
 
 #endif

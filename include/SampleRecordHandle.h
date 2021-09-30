@@ -32,6 +32,10 @@
 #include "PlayHandle.h"
 #include "TimePos.h"
 
+namespace lmms
+{
+
+
 class BBTrack;
 class SampleBuffer;
 class SampleTCO;
@@ -68,5 +72,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

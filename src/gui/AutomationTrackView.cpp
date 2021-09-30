@@ -32,7 +32,10 @@
  #include "StringPairDrag.h"
  #include "TrackContainerView.h"
  #include "TrackLabelButton.h"
- 
+
+
+namespace lmms::gui
+{
 
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
 	TrackView( _at, tcv )
@@ -86,3 +89,6 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 
 	update();
 }
+
+
+} // namespace lmms::gui

@@ -33,6 +33,10 @@
 
 class QPixmap;
 class QToolBar;
+
+namespace lmms::gui
+{
+
 class NStateButton;
 class TextFloat;
 class SongEditor;
@@ -249,5 +253,8 @@ signals:
 
 } ;
 
+
+
+} // namespace lmms::gui
 
 #endif

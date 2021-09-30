@@ -30,6 +30,8 @@
 
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
 
 class automatableButtonGroup;
 
@@ -105,5 +107,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 #endif

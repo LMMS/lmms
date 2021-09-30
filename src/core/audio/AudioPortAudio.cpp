@@ -51,6 +51,9 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "ComboBox.h"
 #include "AudioEngine.h"
 
+namespace lmms
+{
+
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
@@ -496,6 +499,8 @@ void AudioPortAudio::setupWidget::show()
 
 	AudioDeviceSetupWidget::show();
 }
+
+} // namespace lmms
 
 
 #endif

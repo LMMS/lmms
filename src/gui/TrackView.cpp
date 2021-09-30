@@ -47,6 +47,9 @@
 #include "TrackContentObjectView.h"
 
 
+namespace lmms::gui
+{
+
 /*! \brief Create a new track View.
  *
  *  The track View is handles the actual display of the track, including
@@ -450,3 +453,6 @@ void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
 	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
 }
+
+
+} // namespace lmms::gui

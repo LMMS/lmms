@@ -62,6 +62,8 @@
 
 #include "FileDialog.h"
 
+namespace lmms
+{
 
 SampleBuffer::SampleBuffer() :
 	m_userAntiAliasWaveTable(nullptr),
@@ -1588,3 +1590,5 @@ SampleBuffer::handleState::~handleState()
 {
 	src_delete(m_resamplingData);
 }
+
+} // namespace lmms

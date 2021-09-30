@@ -37,6 +37,10 @@
 #endif
 
 
+namespace lmms
+{
+
+
 typedef int32_t bar_t;
 typedef int32_t tick_t;
 typedef uint8_t volume_t;
@@ -144,5 +148,8 @@ constexpr const char* UI_CTRL_KEY =
 #else
 "Ctrl";
 #endif
+
+
+} // namespace lmms
 
 #endif

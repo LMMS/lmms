@@ -29,6 +29,9 @@
 #include "ToolTip.h"
 
 
+namespace lmms::gui
+{
+
 
 NStateButton::NStateButton( QWidget * _parent ) :
 	ToolButton( _parent ),
@@ -93,3 +96,6 @@ void NStateButton::mousePressEvent( QMouseEvent * _me )
 	}
 	ToolButton::mousePressEvent( _me );
 }
+
+
+} // namespace lmms::gui

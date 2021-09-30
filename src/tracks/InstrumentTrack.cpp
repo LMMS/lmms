@@ -37,6 +37,9 @@
 #include "Pattern.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	Track( Track::InstrumentTrack, tc ),
@@ -688,7 +691,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	const float frames_per_tick = Engine::framesPerTick();
 
 	tcoVector tcos;
-	::BBTrack * bb_track = nullptr;
+	class BBTrack* bb_track = nullptr;
 	if( _tco_num >= 0 )
 	{
 		TrackContentObject * tco = getTCO( _tco_num );
@@ -793,9 +796,9 @@ TrackContentObject* InstrumentTrack::createTCO(const TimePos & pos)
 
 
 
-TrackView * InstrumentTrack::createView( TrackContainerView* tcv )
+gui::TrackView* InstrumentTrack::createView( gui::TrackContainerView* tcv )
 {
-	return new InstrumentTrackView( this, tcv );
+	return new gui::InstrumentTrackView( this, tcv );
 }
 
 
@@ -1062,3 +1065,5 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	}
 }
 
+
+} // namespace lmms

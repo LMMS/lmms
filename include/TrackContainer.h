@@ -31,10 +31,18 @@
 #include "Track.h"
 #include "JournallingObject.h"
 
+namespace lmms
+{
 
 class AutomationPattern;
 class InstrumentTrack;
+
+namespace gui
+{
+
 class TrackContainerView;
+
+}
 
 
 class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
@@ -109,10 +117,11 @@ private:
 	TrackContainerTypes m_TrackContainerType;
 
 
-	friend class TrackContainerView;
+	friend class gui::TrackContainerView;
 	friend class Track;
 
 } ;
 
+} // namespace lmms
 
 #endif

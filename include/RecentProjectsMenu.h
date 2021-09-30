@@ -3,6 +3,10 @@
 
 #include <QMenu>
 
+namespace lmms::gui
+{
+
+
 class RecentProjectsMenu : public QMenu
 {
 	Q_OBJECT
@@ -13,5 +17,8 @@ private slots:
 	void fillMenu();
 	void openProject(QAction * _action );
 };
+
+
+} // namespace lmms::gui
 
 #endif // RECENTPROJECTSMENU_H

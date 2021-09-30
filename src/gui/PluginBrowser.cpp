@@ -38,6 +38,9 @@
 #include "StringPairDrag.h"
 #include "PluginFactory.h"
 
+namespace lmms::gui
+{
+
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	SideBarWidget( tr( "Instrument Plugins" ),
@@ -286,9 +289,4 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
-
-
-
-
-
-
+} // namespace lmms::gui

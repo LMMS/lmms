@@ -31,7 +31,7 @@
 #include "lmms_basics.h"
 
 
-namespace DspEffectLibrary
+namespace lmms::DspEffectLibrary
 {
 
 	template<typename T>
@@ -329,7 +329,7 @@ namespace DspEffectLibrary
 
 	} ;
 
-} ;
+} // namespace lmms::DspEffectLibaray
 
 
 #endif

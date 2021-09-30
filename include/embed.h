@@ -32,6 +32,9 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 namespace embed
 {
 
@@ -136,5 +139,6 @@ public:
 #endif
 
 
+} // namespace lmms
 
 #endif

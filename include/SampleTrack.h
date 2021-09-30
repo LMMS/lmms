@@ -35,6 +35,10 @@
 #include "Track.h"
 
 
+namespace lmms
+{
+
+
 class SampleTrack : public Track
 {
 	Q_OBJECT
@@ -101,5 +105,6 @@ private:
 } ;
 
 
+} // namespace lmms
 
 #endif

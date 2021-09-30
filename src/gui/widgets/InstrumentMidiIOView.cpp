@@ -39,6 +39,9 @@
 #include "InstrumentTrack.h"
 #include "LedCheckbox.h"
 
+namespace lmms::gui
+{
+
 
 InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	QWidget( parent ),
@@ -211,3 +214,5 @@ void InstrumentMidiIOView::modelChanged()
 	}
 }
 
+
+} // namespace lmms::gui

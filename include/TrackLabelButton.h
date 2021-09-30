@@ -29,6 +29,9 @@
 #include <QToolButton>
 #include <QLineEdit>
 
+namespace lmms::gui
+{
+
 class TrackView;
 
 class TrackRenameLineEdit;
@@ -66,5 +69,8 @@ private:
 	QString elideName( const QString &name );
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

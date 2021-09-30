@@ -33,6 +33,9 @@
 
 #include "SerializingObject.h"
 
+namespace lmms
+{
+
 class Interval : public SerializingObject
 {
 public:
@@ -83,5 +86,8 @@ private:
 	std::vector<Interval> m_intervals;      //!< a series of ratios that define the scale
 
 };
+
+
+} // namespace lmms
 
 #endif

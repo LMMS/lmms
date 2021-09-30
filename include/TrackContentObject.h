@@ -31,10 +31,19 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 class Track;
-class TrackContentObjectView;
 class TrackContainer;
+
+namespace gui
+{
+
 class TrackView;
+class TrackContentObjectView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT TrackContentObject : public Model, public JournallingObject
@@ -117,7 +126,7 @@ public:
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
-	virtual TrackContentObjectView * createView( TrackView * tv ) = 0;
+	virtual gui::TrackContentObjectView * createView( gui::TrackView * tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -177,5 +186,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

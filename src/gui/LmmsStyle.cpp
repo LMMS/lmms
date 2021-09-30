@@ -34,6 +34,11 @@
 
 #include "LmmsStyle.h"
 
+
+namespace lmms::gui
+{
+
+
 QPalette * LmmsStyle::s_palette = nullptr;
 
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
@@ -369,3 +374,6 @@ void LmmsStyle::hoverColors( bool sunken, bool hover, bool active, QColor& color
 		blend = QColor( 33, 33, 33 );
 	}
 }
+
+
+} // namespace lmms::gui

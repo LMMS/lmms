@@ -59,6 +59,9 @@
 #include "PeakController.h"
 
 
+namespace lmms
+{
+
 tick_t TimePos::s_ticksPerBar = DefaultTicksPerBar;
 
 
@@ -185,7 +188,7 @@ void Song::setTimeSignature()
 
 void Song::savePos()
 {
-	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
+	gui::TimeLineWidget* tl = m_playPos[m_playMode].m_timeLine;
 
 	if( tl != nullptr )
 	{
@@ -637,6 +640,8 @@ void Song::stop()
 	{
 		return;
 	}
+
+	using gui::TimeLineWidget;
 
 	// To avoid race conditions with the processing threads
 	Engine::audioEngine()->requestChangeInModel();
@@ -1553,3 +1558,6 @@ void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
 	emit keymapListChanged(index);
 	Engine::audioEngine()->doneChangeInModel();
 }
+
+
+} // namespace lmms

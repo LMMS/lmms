@@ -41,6 +41,10 @@
 struct pollfd;
 
 
+namespace lmms
+{
+
+
 class MidiAlsaSeq : public QThread, public MidiClient
 {
 	Q_OBJECT
@@ -148,7 +152,10 @@ signals:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA
 
 #endif
 

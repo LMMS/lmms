@@ -33,6 +33,10 @@
 #include "debug.h"
 
 
+namespace lmms
+{
+
+
 SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
@@ -149,4 +153,4 @@ void SampleRecordHandle::writeBuffer( const sampleFrame * _ab, const f_cnt_t _fr
 }
 
 
-
+} // namespace lmms

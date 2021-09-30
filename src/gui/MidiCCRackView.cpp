@@ -39,6 +39,9 @@
 #include "MainWindow.h"
 #include "Track.h"
 
+namespace lmms::gui
+{
+
 
 MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	QWidget(),
@@ -131,3 +134,6 @@ void MidiCCRackView::saveSettings(QDomDocument & doc, QDomElement & parent)
 void MidiCCRackView::loadSettings(const QDomElement &)
 {
 }
+
+
+} // namespace lmms::gui

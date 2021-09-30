@@ -31,6 +31,10 @@
 
 class QLineEdit;
 
+namespace lmms::gui
+{
+
+
 class MidiSetupWidget : public TabWidget
 {
 	Q_OBJECT
@@ -53,5 +57,8 @@ private:
 	QLineEdit *m_device;
 
 };
+
+
+} // namespace lmms::gui
 
 #endif

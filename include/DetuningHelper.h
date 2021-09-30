@@ -29,6 +29,9 @@
 #include "InlineAutomation.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 class DetuningHelper : public InlineAutomation
 {
 	Q_OBJECT
@@ -60,5 +63,7 @@ public:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

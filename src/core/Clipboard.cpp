@@ -30,8 +30,9 @@
 #include "JournallingObject.h"
 
 
-namespace Clipboard
+namespace lmms::Clipboard
 {
+
 	const QMimeData * getMimeData()
 	{
 		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
@@ -91,4 +92,6 @@ namespace Clipboard
 	{
 		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
 	}
-}
+
+
+} // namespace lmms::Clipboard

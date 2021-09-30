@@ -35,6 +35,10 @@
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
 
+
+namespace lmms
+{
+
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
 		public:													\
@@ -501,6 +505,9 @@ public:
 } ;
 
 typedef QMap<AutomatableModel*, float> AutomatedValueMap;
+
+
+} // namespace lmms
 
 #endif
 

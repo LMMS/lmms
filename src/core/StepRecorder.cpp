@@ -25,12 +25,17 @@
 #include <QPainter>
 
 #include <climits>
+
+namespace lmms
+{
+
+
 using std::min;
 using std::max;
 
 const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70;
 
-StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
+StepRecorder::StepRecorder(gui::PianoRoll& pianoRoll, gui::StepRecorderWidget& stepRecorderWidget):
 	m_pianoRoll(pianoRoll),
 	m_stepRecorderWidget(stepRecorderWidget),
 	m_pattern(nullptr)
@@ -365,3 +370,5 @@ StepRecorder::StepNote* StepRecorder::findCurStepNote(const int key)
 
 	return nullptr;
 }
+
+} // namespace lmms

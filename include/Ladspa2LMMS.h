@@ -30,6 +30,9 @@
 #include "LadspaManager.h"
 
 
+namespace lmms
+{
+
 //! Class responsible for sorting found plugins (by LadspaManager)
 //! into categories
 class LMMS_EXPORT Ladspa2LMMS : public LadspaManager
@@ -76,5 +79,8 @@ private:
 	friend class LmmsCore;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

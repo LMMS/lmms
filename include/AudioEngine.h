@@ -40,6 +40,9 @@
 #include "PlayHandle.h"
 
 
+namespace lmms
+{
+
 class AudioDevice;
 class MidiClient;
 class AudioPort;
@@ -434,5 +437,7 @@ private:
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
 } ;
+
+} // namespace lmms
 
 #endif

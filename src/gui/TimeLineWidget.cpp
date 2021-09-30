@@ -39,6 +39,9 @@
 #include "TextFloat.h"
 #include "SongEditor.h"
 
+namespace lmms::gui
+{
+
 
 QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
 
@@ -435,3 +438,6 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
 	m_action = NoAction;
 }
+
+
+} // namespace lmms::gui

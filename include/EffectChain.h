@@ -30,6 +30,9 @@
 #include "SerializingObject.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
+
 class Effect;
 
 
@@ -72,6 +75,8 @@ signals:
 	void aboutToClear();
 
 } ;
+
+} // namespace lmms
 
 #endif
 

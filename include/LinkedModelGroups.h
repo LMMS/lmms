@@ -33,6 +33,9 @@
 #include "Model.h"
 
 
+namespace lmms
+{
+
 /**
 	@file LinkedModelGroups.h
 	See Lv2ControlBase.h and Lv2Proc.h for example usage
@@ -171,5 +174,7 @@ public:
 	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
 };
 
+
+} // namespace lmms
 
 #endif // LINKEDMODELGROUPS_H

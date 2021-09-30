@@ -33,6 +33,10 @@
 #include "TrackContentObjectView.h"
 
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
 
 
@@ -138,8 +142,8 @@ private:
 
 	Pattern * adjacentPatternByOffset(int offset) const;
 
-	friend class PatternView;
-	friend class BBTrackContainerView;
+	friend class gui::PatternView;
+	friend class gui::BBTrackContainerView;
 
 
 signals:
@@ -147,5 +151,6 @@ signals:
 } ;
 
 
+} // namespace lmms
 
 #endif

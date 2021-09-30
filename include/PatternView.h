@@ -28,9 +28,16 @@
 #include "Pattern.h"
 #include "TrackContentObjectView.h"
 
+namespace lmms
+{
+
 class Pattern;
- 
- 
+
+
+namespace gui
+{
+
+
 class PatternView : public TrackContentObjectView
 {
 	Q_OBJECT
@@ -95,7 +102,10 @@ private:
 	
 	bool m_legacySEBB;
 } ;
- 
- 
+
+
+} // namespace gui
+
+} // namespace lmms
  
  #endif

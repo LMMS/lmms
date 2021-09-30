@@ -33,6 +33,10 @@
 
 #ifdef LMMS_HAVE_ALSA
 
+
+namespace lmms
+{
+
 const int EventPollTimeOut = 250;
 
 
@@ -695,5 +699,7 @@ void MidiAlsaSeq::updatePortList()
 }
 
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA

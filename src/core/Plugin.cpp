@@ -37,6 +37,9 @@
 #include "AutomatableModel.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 static PixmapLoader dummyLoader;
 
@@ -266,9 +269,9 @@ void Plugin::collectErrorForUI( QString errMsg )
 
 
 
-PluginView * Plugin::createView( QWidget * parent )
+gui::PluginView * Plugin::createView( QWidget * parent )
 {
-	PluginView * pv = instantiateView( parent );
+	gui::PluginView * pv = instantiateView( parent );
 	if( pv != nullptr )
 	{
 		pv->setModel( this );
@@ -313,3 +316,4 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 
 
 
+} // namespace lmms

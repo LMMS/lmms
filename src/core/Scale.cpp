@@ -26,6 +26,9 @@
 
 #include <QDomElement>
 
+namespace lmms
+{
+
 
 Interval::Interval(float cents) :
 	m_numerator(0),
@@ -120,3 +123,6 @@ void Scale::loadSettings(const QDomElement &element)
 		node = node.nextSibling();
 	}
 }
+
+
+} // namespace lmms

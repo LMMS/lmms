@@ -36,9 +36,16 @@
 class QMenu;
 class QContextMenuEvent;
 
+namespace lmms
+{
+
 class DataFile;
-class TextFloat;
 class TrackContentObject;
+
+namespace gui
+{
+
+class TextFloat;
 class TrackView;
 
 
@@ -238,5 +245,9 @@ private:
 	void updateCursor(QMouseEvent * me);
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

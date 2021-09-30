@@ -37,13 +37,18 @@
 
 class QLineEdit;
 
-class FileItem;
+namespace lmms
+{
+
 class InstrumentTrack;
-class FileBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
 
+namespace gui
+{
 
+class FileItem;
+class FileBrowserTreeWidget;
 
 class FileBrowser : public SideBarWidget
 {
@@ -280,5 +285,9 @@ private:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

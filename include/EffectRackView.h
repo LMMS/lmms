@@ -35,6 +35,9 @@
 class QScrollArea;
 class QVBoxLayout;
 
+namespace lmms::gui
+{
+
 class EffectView;
 class GroupBox;
 
@@ -82,5 +85,7 @@ private:
 	int m_lastY;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif

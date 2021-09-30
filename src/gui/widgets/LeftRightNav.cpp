@@ -27,6 +27,9 @@
 #include "ToolTip.h"
 #include "embed.h"
 
+namespace lmms::gui
+{
+
 
 LeftRightNav::LeftRightNav(QWidget *parent)
  : QWidget(parent),
@@ -89,3 +92,5 @@ void LeftRightNav::setShortcuts(const QKeySequence &leftShortcut, const QKeySequ
 	ToolTip::add(&m_leftBtn, tr("Previous (%1)").arg(leftShortcut.toString()));
 	ToolTip::add(&m_rightBtn, tr("Next (%1)").arg(rightShortcut.toString()));
 }
+
+} // namespace lmms::gui

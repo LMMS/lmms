@@ -80,6 +80,10 @@ class QLayoutItem;
 class QRect;
 class QString;
 
+
+namespace lmms::gui
+{
+
 /**
 	Layout for controls (models)
 
@@ -132,5 +136,7 @@ private:
 	//! name of search bar, must be ASCII sorted before any alpha numerics
 	static constexpr const char* s_searchBarName = "!!searchBar!!";
 };
+
+} // namespace lmms::gui
 
 #endif // CONTROLLAYOUT_H

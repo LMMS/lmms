@@ -32,6 +32,10 @@
 
 #include "lmms_export.h"
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
@@ -95,5 +99,8 @@ private:
 	volatile bool m_abort;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -30,6 +30,9 @@
 #include "GuiApplication.h"
 #include "TrackLabelButton.h"
 
+namespace lmms::gui
+{
+
 BBTrackView::BBTrackView( BBTrack * _bbt, TrackContainerView* tcv ) :
 	TrackView( _bbt, tcv ),
 	m_bbTrack( _bbt )
@@ -74,3 +77,6 @@ void BBTrackView::clickedTrackLabel()
 	getGUI()->getBBEditor()->parentWidget()->show();
 	getGUI()->getBBEditor()->setFocus( Qt::ActiveWindowFocusReason );
 }
+
+
+} // namespace lmms::gui

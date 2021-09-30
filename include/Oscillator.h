@@ -41,6 +41,10 @@
 #include "OscillatorConstants.h"
 #include "SampleBuffer.h"
 
+namespace lmms
+{
+
+
 class IntModel;
 
 
@@ -310,5 +314,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

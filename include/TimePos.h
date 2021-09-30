@@ -32,6 +32,9 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
 // note: a bar was erroneously called "tact" in older versions of LMMS
 const int DefaultTicksPerBar = 192;
 const int DefaultStepsPerBar = 16;
@@ -113,5 +116,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

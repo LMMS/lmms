@@ -29,6 +29,9 @@
 #include "Engine.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 fpp_t BufferManager::framesPerPeriod;
 
 void BufferManager::init( fpp_t fpp )
@@ -61,3 +64,4 @@ void BufferManager::release( sampleFrame * buf )
 	MM_FREE( buf );
 }
 
+} // namespace lmms

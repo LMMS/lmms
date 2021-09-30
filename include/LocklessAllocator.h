@@ -28,6 +28,11 @@
 #include <atomic>
 #include <stddef.h>
 
+
+namespace lmms
+{
+
+
 class LocklessAllocator
 {
 public:
@@ -78,5 +83,7 @@ public:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

@@ -32,6 +32,10 @@
 #include "OutputSettings.h"
 
 
+namespace lmms
+{
+
+
 class RenderManager : public QObject
 {
 	Q_OBJECT
@@ -77,5 +81,8 @@ private:
 	QVector<Track*> m_tracksToRender;
 	QVector<Track*> m_unmuted;
 } ;
+
+
+} // namespace lmms
 
 #endif

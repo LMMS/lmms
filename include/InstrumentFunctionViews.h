@@ -30,15 +30,22 @@
 #include <QWidget>
 
 class QLabel;
-class ComboBox;
-class GroupBox;
-class Knob;
-class TempoSyncKnob;
+
+namespace lmms
+{
 
 class InstrumentFunctionArpeggio;
 class InstrumentFunctionNoteStacking;
 
+}
 
+namespace lmms::gui
+{
+
+class ComboBox;
+class GroupBox;
+class Knob;
+class TempoSyncKnob;
 
 class InstrumentFunctionNoteStackingView : public QWidget, public ModelView
 {
@@ -90,5 +97,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

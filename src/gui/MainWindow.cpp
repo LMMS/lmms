@@ -77,6 +77,9 @@
 #include "lmmsversion.h"
 
 
+namespace lmms::gui
+{
+
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
 void disableAutoKeyAccelerators(QWidget* mainWindow)
@@ -1723,3 +1726,6 @@ void MainWindow::onProjectFileNameChanged()
 {
 	this->resetWindowTitle();
 }
+
+
+} // namespace lmms::gui

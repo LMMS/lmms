@@ -29,6 +29,11 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 
+
+namespace lmms::gui
+{
+
+
 MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & configSection,
 	const QString & devName, QWidget * parent) :
 	TabWidget(TabWidget::tr("Settings for %1").arg(tr(caption.toUtf8())), parent),
@@ -64,3 +69,6 @@ void MidiSetupWidget::show()
 	parentWidget()->setVisible(visible);
 	QWidget::setVisible(visible);
 }
+
+
+} // namespace lmms::gui

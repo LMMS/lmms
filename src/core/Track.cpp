@@ -42,6 +42,9 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
 /*! \brief Create a new (empty) track object
  *
  *  The track object is the whole track, linking its contents, its
@@ -670,3 +673,4 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
+} // namespace lmms

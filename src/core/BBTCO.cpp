@@ -29,7 +29,9 @@
  #include "BBTrack.h"
  #include "BBTrackContainer.h"
  #include "Engine.h"
- 
+
+namespace lmms
+{
 
 BBTCO::BBTCO( Track * _track ) :
 	TrackContentObject( _track )
@@ -108,7 +110,9 @@ int BBTCO::bbTrackIndex()
 
 
 
-TrackContentObjectView * BBTCO::createView( TrackView * _tv )
+gui::TrackContentObjectView * BBTCO::createView( gui::TrackView * _tv )
 {
-	return new BBTCOView( this, _tv );
+	return new gui::BBTCOView( this, _tv );
 }
+
+} // namespace lmms

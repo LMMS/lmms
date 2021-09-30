@@ -30,6 +30,10 @@
 #ifdef LMMS_HAVE_ALSA
 
 
+namespace lmms
+{
+
+
 MidiAlsaRaw::MidiAlsaRaw() :
 	MidiClientRaw(),
 	m_inputp( &m_input ),
@@ -170,5 +174,7 @@ void MidiAlsaRaw::run()
 
 }
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA

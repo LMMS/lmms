@@ -40,6 +40,10 @@
 #include "gui_templates.h"
 
 
+namespace lmms
+{
+
+
 MidiSndio::MidiSndio( void ) :
 	MidiClientRaw(),
 	m_quit( false )
@@ -116,5 +120,8 @@ void MidiSndio::run( void )
 		}
 	}
 }
+
+
+} // namespace lmms
 
 #endif	/* LMMS_HAVE_SNDIO */

@@ -31,6 +31,10 @@
 #include "BBTrack.h"
 
 
+namespace lmms
+{
+
+
 RenderManager::RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
@@ -201,3 +205,6 @@ void RenderManager::updateConsoleProgress()
 		}
 	}
 }
+
+
+} // namespace lmms

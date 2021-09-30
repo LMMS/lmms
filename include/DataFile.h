@@ -36,6 +36,9 @@
 
 class QTextStream;
 
+namespace lmms
+{
+
 class LMMS_EXPORT DataFile : public QDomDocument
 {
 	MM_OPERATORS
@@ -152,5 +155,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

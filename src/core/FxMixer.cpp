@@ -36,6 +36,10 @@
 #include "BBTrackContainer.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+namespace lmms
+{
+
+
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
@@ -827,3 +831,6 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 		m_fxChannels[index]->m_name = tr( "FX %1" ).arg( index );
 	}
 }
+
+
+} // namespace lmms

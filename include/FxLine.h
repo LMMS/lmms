@@ -37,6 +37,9 @@
 #include "SendButtonIndicator.h"
 
 
+namespace lmms::gui
+{
+
 
 class FxMixerView;
 class SendButtonIndicator;
@@ -115,5 +118,7 @@ private slots:
 	void moveChannelRight();
 };
 
+
+} // namespace lmms::gui
 
 #endif // FXLINE_H

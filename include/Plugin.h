@@ -36,9 +36,18 @@
 
 class QWidget;
 
-class PixmapLoader;
-class PluginView;
+namespace lmms
+{
+
 class AutomatableModel;
+class PixmapLoader;
+
+namespace gui
+{
+
+class PluginView;
+
+}
 
 /**
 	Abstract representation of a plugin
@@ -287,11 +296,11 @@ public:
 	static Plugin * instantiate(const QString& pluginName, Model * parent, void *data);
 
 	//! Create a view for the model
-	PluginView * createView( QWidget * parent );
+	gui::PluginView * createView( QWidget * parent );
 
 protected:
 	//! Create a view for the model
-	virtual PluginView* instantiateView( QWidget * ) = 0;
+	virtual gui::PluginView* instantiateView( QWidget * ) = 0;
 	void collectErrorForUI( QString errMsg );
 
 
@@ -305,5 +314,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

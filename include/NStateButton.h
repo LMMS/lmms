@@ -32,6 +32,9 @@
 
 #include "ToolButton.h"
 
+namespace lmms::gui
+{
+
 
 class NStateButton : public ToolButton
 {
@@ -71,5 +74,8 @@ private:
 	int m_curState;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

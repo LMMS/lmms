@@ -54,6 +54,10 @@
 #include "ToolTip.h"
 #include "Track.h"
 
+namespace lmms::gui
+{
+
+
 const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
@@ -1131,3 +1135,6 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
 	m_editor->scrolled(0);
 }
+
+
+} // namespace lmms::gui

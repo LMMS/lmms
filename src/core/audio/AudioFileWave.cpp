@@ -30,6 +30,8 @@
 #include <QFile>
 #include <QDebug>
 
+namespace lmms
+{
 
 AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
 				const ch_cnt_t channels, bool & successful,
@@ -138,3 +140,4 @@ void AudioFileWave::finishEncoding()
 	}
 }
 
+} // namespace lmms

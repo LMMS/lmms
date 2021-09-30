@@ -29,6 +29,9 @@
 #include <QWidget>
 #include <QtCore/QMap>
 
+namespace lmms::gui
+{
+
 const int TEXT_TAB_HEIGHT = 14;
 const int GRAPHIC_TAB_HEIGHT = 17;
 
@@ -105,5 +108,8 @@ private:
 	QColor m_tabBackground; // The TabWidget's background color.
 	QColor m_tabBorder;     // The TabWidget's borders color.
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

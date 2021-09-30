@@ -2,6 +2,10 @@
 
 #include "FxMixer.h"
 
+namespace lmms::gui
+{
+
+
 QPixmap * SendButtonIndicator::s_qpmOff = nullptr;
 QPixmap * SendButtonIndicator::s_qpmOn = nullptr;
 
@@ -59,3 +63,6 @@ void SendButtonIndicator::updateLightStatus()
 {
 	setPixmap( getSendModel() == nullptr ? *s_qpmOff : *s_qpmOn );
 }
+
+
+} // namespace lmms::gui

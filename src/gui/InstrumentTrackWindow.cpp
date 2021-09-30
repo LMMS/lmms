@@ -67,6 +67,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
@@ -671,3 +675,5 @@ void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 }
 
+
+} // namespace lmms::gui

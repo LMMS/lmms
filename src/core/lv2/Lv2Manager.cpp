@@ -46,6 +46,8 @@
 #include "PluginIssue.h"
 
 
+namespace lmms
+{
 
 
 const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
@@ -260,6 +262,6 @@ bool Lv2Manager::isSubclassOf(const LilvPluginClass* clvss, const char* uriStr)
 }
 
 
-
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

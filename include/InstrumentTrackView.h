@@ -31,6 +31,10 @@
 #include "MidiCCRackView.h"
 
 
+namespace lmms::gui
+{
+
+
 class InstrumentTrackWindow;
 class Knob;
 class TrackContainerView;
@@ -114,5 +118,7 @@ private:
 	friend class InstrumentTrackWindow;
 } ;
 
-#endif
 
+} // namespace lmms::gui
+
+#endif

@@ -34,6 +34,9 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 
+namespace lmms
+{
+
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;
 const float RES_MULTIPLIER = 2.0f;
@@ -377,4 +380,4 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 
 
 
-
+} // namespace lmms

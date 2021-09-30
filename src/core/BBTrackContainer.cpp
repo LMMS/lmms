@@ -28,7 +28,8 @@
 #include "Engine.h"
 #include "Song.h"
 
-
+namespace lmms
+{
 
 BBTrackContainer::BBTrackContainer() :
 	TrackContainer(),
@@ -255,3 +256,4 @@ AutomatedValueMap BBTrackContainer::automatedValuesAt(TimePos time, int tcoNum) 
 	return TrackContainer::automatedValuesAt(time + (TimePos::ticksPerBar() * tcoNum), tcoNum);
 }
 
+} // namespace lmms

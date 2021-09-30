@@ -28,7 +28,10 @@
 #include "SampleBuffer.h"
 #include "SampleTrack.h"
 #include "TrackContentObject.h"
- 
+
+namespace lmms
+{
+
 
 class SampleTCO : public TrackContentObject
 {
@@ -88,5 +91,6 @@ signals:
 } ;
 
 
+} // namespace lmms
 
 #endif

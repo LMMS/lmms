@@ -44,6 +44,9 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent) :
 	FloatModelView(new FloatModel(0, 0, 0, 0, nullptr, name, true), this),
@@ -242,3 +245,6 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2, height() - 1, m_label);
 	}
 }
+
+
+} // namespace lmms::gui

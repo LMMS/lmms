@@ -37,9 +37,17 @@
 #include "lmms_export.h"
 #include "Lv2Basics.h"
 
+
+namespace lmms
+{
+
+
 class Lv2Proc;
 class Lv2ControlBase;
 
+
+namespace gui
+{
 
 //! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
 class Lv2ViewProc : public LinkedModelGroupView
@@ -93,6 +101,10 @@ private:
 	class LedCheckBox *m_multiChannelLink;
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2VIEWBASE_H

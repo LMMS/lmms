@@ -29,6 +29,10 @@
 #include "Effect.h"
 #include "peak_controller_effect_controls.h"
 
+namespace lmms
+{
+
+
 class PeakController;
 
 class PeakControllerEffect : public Effect
@@ -77,5 +81,8 @@ private:
 	friend class PeakControllerEffectControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

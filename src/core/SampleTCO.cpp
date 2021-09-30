@@ -29,6 +29,11 @@
 #include "SampleTCOView.h"
 #include "TimeLineWidget.h"
 
+
+namespace lmms
+{
+
+
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
@@ -318,3 +323,6 @@ TrackContentObjectView * SampleTCO::createView( TrackView * _tv )
 {
 	return new SampleTCOView( this, _tv );
 }
+
+
+} // namespace lmms

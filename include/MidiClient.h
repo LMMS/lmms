@@ -33,6 +33,8 @@
 #include "MidiEventProcessor.h"
 #include "TabWidget.h"
 
+namespace lmms
+{
 
 class MidiPort;
 
@@ -167,6 +169,7 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif
 

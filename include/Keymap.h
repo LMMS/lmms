@@ -32,6 +32,9 @@
 #include "Note.h"
 #include "SerializingObject.h"
 
+namespace lmms
+{
+
 class Keymap : public QObject, public SerializingObject
 {
 	Q_OBJECT
@@ -75,5 +78,7 @@ private:
 	int m_baseKey;                  //!< key which is assigned the reference "base note"
 	float m_baseFreq;               //!< frequency of the base note (usually A4 @440 Hz)
 };
+
+} // namespace lmms
 
 #endif

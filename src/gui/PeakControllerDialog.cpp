@@ -39,6 +39,9 @@
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 
+namespace lmms::gui
+{
+
 
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
@@ -94,3 +97,4 @@ void PeakControllerDialog::modelChanged()
 }
 
 
+} // namespace lmms::gui

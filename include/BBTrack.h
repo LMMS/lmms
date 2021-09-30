@@ -33,8 +33,18 @@
 #include "BBTCOView.h"
 #include "Track.h"
 
-class TrackLabelButton;
+namespace lmms
+{
+
 class TrackContainer;
+
+namespace gui
+{
+
+class TrackLabelButton;
+class BBTrackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT BBTrack : public Track
@@ -46,7 +56,7 @@ public:
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
-	TrackView * createView( TrackContainerView* tcv ) override;
+	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
 	TrackContentObject* createTCO(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -87,9 +97,11 @@ private:
 	typedef QMap<BBTrack *, int> infoMap;
 	static infoMap s_infoMap;
 
-	friend class BBTrackView;
+	friend class gui::BBTrackView;
 } ;
 
 
+
+} // namespace lmms
 
 #endif

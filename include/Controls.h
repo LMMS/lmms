@@ -35,8 +35,14 @@
 
 class QString;
 class QWidget;
+
+namespace lmms
+{
+
 class AutomatableModel;
 
+namespace gui
+{
 
 /**
 	These classes provide
@@ -130,5 +136,9 @@ public:
 	~CheckControl() override;
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // CONTROLS_H

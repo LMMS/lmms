@@ -33,6 +33,11 @@
 #include "SerializingObject.h"
 #include "TimePos.h"
 
+
+namespace lmms
+{
+
+
 class DetuningHelper;
 
 
@@ -246,5 +251,7 @@ private:
 
 typedef QVector<Note *> NoteVector;
 
+
+} // namespace lmms
 
 #endif

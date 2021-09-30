@@ -42,6 +42,8 @@
 
 class QLineEdit;
 
+namespace lmms
+{
 
 class AudioSdl : public AudioDevice
 {
@@ -56,7 +58,7 @@ public:
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -108,6 +110,9 @@ private:
 #endif
 
 } ;
+
+
+} // namespace lmms
 
 #endif
 

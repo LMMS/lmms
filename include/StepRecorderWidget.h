@@ -29,6 +29,9 @@
 #include <QColor>
 #include <QPainter>
 
+namespace lmms::gui
+{
+
 class StepRecorderWidget : public QWidget
 {
 	Q_OBJECT
@@ -90,5 +93,7 @@ private:
 signals:
 	void positionChanged(const TimePos & t);
 } ;
+
+} // namespace lmms::gui
 
 #endif //STEP_RECOREDER_WIDGET_H

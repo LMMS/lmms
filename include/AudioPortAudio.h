@@ -30,6 +30,9 @@
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
+
 class AudioPortAudioSetupUtil : public QObject
 {
 	Q_OBJECT
@@ -59,9 +62,11 @@ public:
 #	define PORTAUDIO_V18
 #endif
 
-
+namespace gui
+{
 class ComboBox;
 class LcdSpinBox;
+} // namespace gui
 
 
 class AudioPortAudio : public AudioDevice
@@ -81,7 +86,7 @@ public:
 		unsigned long _framesPerBuffer );
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -91,8 +96,8 @@ public:
 		virtual void show();
 
 	private:
-		ComboBox * m_backend;
-		ComboBox * m_device;
+		gui::ComboBox * m_backend;
+		gui::ComboBox * m_device;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;
@@ -149,6 +154,8 @@ private:
 	bool m_stopped;
 
 } ;
+
+} // namespace lmms
 
 #endif
 

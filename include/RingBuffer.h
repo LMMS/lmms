@@ -32,6 +32,11 @@
 #include "lmms_math.h"
 #include "MemoryManager.h"
 
+
+namespace lmms
+{
+
+
 /** \brief A basic LMMS ring buffer for single-thread use. For thread and realtime safe alternative see LocklessRingBuffer.
 */
 class LMMS_EXPORT RingBuffer : public QObject
@@ -216,4 +221,8 @@ private:
 	volatile unsigned int m_position;
 
 };
+
+
+} // namespace lmms
+
 #endif

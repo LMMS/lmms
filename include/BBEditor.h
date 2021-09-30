@@ -30,10 +30,15 @@
 #include "Editor.h"
 #include "TrackContainerView.h"
 
+namespace lmms
+{
 
 class BBTrackContainer;
-class ComboBox;
 
+namespace gui
+{
+
+class ComboBox;
 class BBTrackContainerView;
 
 class BBEditor : public Editor
@@ -98,5 +103,10 @@ private:
 	void makeSteps( bool clone );
 };
 
+
+} // namespace gui
+
+
+} // namespace lmms
 
 #endif

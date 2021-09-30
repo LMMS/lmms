@@ -33,6 +33,9 @@
 #include "TempoSyncKnobModel.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 class EffectChain;
 class EffectControls;
 
@@ -170,7 +173,7 @@ protected:
 	*/
 	void checkGate( double _out_sum );
 
-	PluginView * instantiateView( QWidget * ) override;
+	gui::PluginView* instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
@@ -230,5 +233,7 @@ private:
 typedef Effect::Descriptor::SubPluginFeatures::Key EffectKey;
 typedef Effect::Descriptor::SubPluginFeatures::KeyList EffectKeyList;
 
+
+} // namespace lmms
 
 #endif

@@ -31,6 +31,9 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
 
 TextFloat::TextFloat() :
 	QWidget( getGUI()->mainWindow(), Qt::ToolTip ),
@@ -199,4 +202,4 @@ void TextFloat::updateSize()
 
 
 
-
+} // namespace lmms::gui

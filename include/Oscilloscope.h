@@ -31,6 +31,9 @@
 
 #include "lmms_basics.h"
 
+namespace lmms::gui
+{
+
 
 class Oscilloscope : public QWidget
 {
@@ -72,5 +75,8 @@ private:
 	QColor m_normalColor;
 	QColor m_clippingColor;
 } ;
+
+
+} // namespace lmms::gui
 
 #endif // OSCILLOSCOPE_H

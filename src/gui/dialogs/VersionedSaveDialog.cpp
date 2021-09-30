@@ -36,6 +36,10 @@
 #include "LedCheckbox.h"
 
 
+namespace lmms::gui
+{
+
+
 VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 										  QWidget *saveOptionsWidget,
 										  const QString &caption,
@@ -191,3 +195,6 @@ SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 
 	setLayout(layout);
 }
+
+
+} // namespace lmms::gui

@@ -31,10 +31,19 @@
 #include "TempoSyncKnobModel.h"
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
 
 class InstrumentTrack;
 class NotePlayHandle;
 
+namespace gui
+{
+
+class InstrumentFunctionNoteStackingView;
+class InstrumentFunctionArpeggioView;
+
+}
 
 
 class InstrumentFunctionNoteStacking : public Model, public JournallingObject
@@ -207,9 +216,11 @@ private:
 
 
 	friend class InstrumentTrack;
-	friend class InstrumentFunctionArpeggioView;
+	friend class gui::InstrumentFunctionArpeggioView;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

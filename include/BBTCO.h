@@ -28,6 +28,8 @@
 
 #include "TrackContentObjectView.h"
 
+namespace lmms
+{
 
 class BBTCO : public TrackContentObject
 {
@@ -44,12 +46,13 @@ public:
 
 	int bbTrackIndex();
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	gui::TrackContentObjectView * createView( gui::TrackView * _tv ) override;
 
 private:
 	friend class BBTCOView;
 } ;
 
 
+} // namespace lmms
 
 #endif

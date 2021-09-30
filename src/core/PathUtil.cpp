@@ -8,7 +8,7 @@
 #include "Engine.h"
 #include "Song.h"
 
-namespace PathUtil
+namespace lmms::PathUtil
 {
 	Base relativeBases[] = { Base::ProjectDir, Base::FactorySample, Base::UserSample, Base::UserVST, Base::Preset,
 		Base::UserLADSPA, Base::DefaultLADSPA, Base::UserSoundfont, Base::DefaultSoundfont, Base::UserGIG, Base::DefaultGIG,
@@ -188,4 +188,5 @@ namespace PathUtil
 		}
 		return basePrefix(shortestBase) + relativeOrAbsolute(absolutePath, shortestBase);
 	}
-}
+
+} // namespace lmms::PathUtil

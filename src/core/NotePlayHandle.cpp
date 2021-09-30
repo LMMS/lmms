@@ -34,6 +34,9 @@
 #include "Instrument.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
 {
@@ -664,3 +667,6 @@ void NotePlayHandleManager::free()
 {
 	MM_FREE(s_available);
 }
+
+
+} // namespace lmms

@@ -36,8 +36,16 @@ class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
 
-class ControllerView;
+
+namespace lmms
+{
+
 class Controller;
+
+namespace gui
+{
+
+class ControllerView;
 
 
 class ControllerRackView : public QWidget, public SerializingObject
@@ -79,5 +87,9 @@ private:
 	// Needed so that the StretchItem always stays at the last position.
 	int m_nextIndex;
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

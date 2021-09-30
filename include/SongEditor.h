@@ -38,12 +38,20 @@
 class QLabel;
 class QScrollBar;
 
+namespace lmms
+{
+
+class Song;
+class ComboBoxModel;
+
+namespace gui
+{
+
+
 class AutomatableSlider;
 class ComboBox;
-class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
-class Song;
 class TextFloat;
 class TimeLineWidget;
 
@@ -216,5 +224,10 @@ private:
 	QAction* m_insertBarAction;
 	QAction* m_removeBarAction;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

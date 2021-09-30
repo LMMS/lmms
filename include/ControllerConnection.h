@@ -37,7 +37,15 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
+namespace lmms
+{
+
 class ControllerConnection;
+
+namespace gui
+{
+class ControllerConnectionDialog;
+}
 
 typedef QVector<ControllerConnection *> ControllerConnectionVector;
 
@@ -115,8 +123,11 @@ signals:
 	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerConnectionDialog;
+	friend class gui::ControllerConnectionDialog;
 };
+
+
+} // namespace lmms
 
 #endif
 

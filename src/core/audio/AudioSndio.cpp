@@ -47,6 +47,8 @@
 #include "ConfigManager.h"
 
 
+namespace lmms
+{
 
 AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 	AudioDevice( qBound<ch_cnt_t>(
@@ -195,13 +197,13 @@ AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
+	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiosndio",
 	    "channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
@@ -223,5 +225,7 @@ void AudioSndio::setupWidget::saveSettings( void )
 	    QString::number( m_channels->value<int>() ) );
 }
 
+
+} // namespace lmms
 
 #endif	/* LMMS_HAVE_SNDIO */

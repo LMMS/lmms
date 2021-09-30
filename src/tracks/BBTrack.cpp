@@ -31,7 +31,8 @@
 #include "BBTrackView.h"
 #include "Song.h"
 
-
+namespace lmms
+{
 
 BBTrack::infoMap BBTrack::s_infoMap;
 
@@ -126,9 +127,9 @@ bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackView * BBTrack::createView( TrackContainerView* tcv )
+gui::TrackView * BBTrack::createView( gui::TrackContainerView* tcv )
 {
-	return new BBTrackView( this, tcv );
+	return new gui::BBTrackView( this, tcv );
 }
 
 
@@ -241,3 +242,5 @@ void BBTrack::swapBBTracks( Track * _track1, Track * _track2 )
 		Engine::getBBTrackContainer()->setCurrentBB( s_infoMap[t1] );
 	}
 }
+
+} // namespace lmms

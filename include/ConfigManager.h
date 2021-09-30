@@ -37,6 +37,10 @@
 #include "lmms_export.h"
 
 
+namespace lmms
+{
+
+
 class LmmsCore;
 
 const QString PROJECTS_PATH = "projects/";
@@ -305,4 +309,8 @@ private:
 
 	friend class LmmsCore;
 };
+
+
+} // namespace lmms
+
 #endif

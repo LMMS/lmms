@@ -32,6 +32,11 @@
 #include <QtGlobal>
 #include <cstdint>
 
+
+namespace lmms
+{
+
+
 //! Cached URIDs for fast access (for use in real-time code)
 class Lv2UridCache
 {
@@ -65,6 +70,9 @@ private:
 
 template<> struct Lv2UridCache::IdForType<float> { static constexpr auto value = Id::atom_Float; };
 template<> struct Lv2UridCache::IdForType<std::int32_t> { static constexpr auto value = Id::atom_Int; };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2URIDCACHE_H

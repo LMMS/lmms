@@ -50,6 +50,10 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
+
+namespace lmms::gui
+{
+
 TextFloat * Knob::s_textFloat = nullptr;
 
 
@@ -866,3 +870,6 @@ void convertPixmapToGrayScale(QPixmap& pixMap)
 	}
 	pixMap.convertFromImage(temp);
 }
+
+
+} // namespace lmms::gui

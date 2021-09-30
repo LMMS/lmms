@@ -48,6 +48,9 @@
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
 /*! \brief Create a new trackOperationsWidget
  *
  * The trackOperationsWidget is the grip and the mute button of a track.
@@ -392,3 +395,5 @@ void TrackOperationsWidget::recordingOff()
 	toggleRecording( false );
 }
 
+
+} // namespace lmms::gui

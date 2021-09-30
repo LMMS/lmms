@@ -35,6 +35,10 @@
 #include "Plugin.h"
 #include "embed.h"
 
+namespace lmms
+{
+
+
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
 #else
@@ -252,3 +256,6 @@ const QString PluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }
+
+
+} // namespace lmms

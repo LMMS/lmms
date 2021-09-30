@@ -101,6 +101,10 @@ typedef int32_t key_t;
 
 #endif
 
+namespace lmms
+{
+
+
 #ifdef SYNC_WITH_SHM_FIFO
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
@@ -1452,6 +1456,9 @@ LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
 	return qstr.toStdString();
 }
 
-#endif
+#endif // BUILD_REMOTE_PLUGIN_CLIENT
+
+
+} // namespace lmms
 
 #endif

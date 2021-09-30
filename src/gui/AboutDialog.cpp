@@ -29,6 +29,8 @@
 #include "versioninfo.h"
 
 
+namespace lmms::gui
+{
 
 AboutDialog::AboutDialog(QWidget* parent) :
 	QDialog(parent),
@@ -58,3 +60,5 @@ AboutDialog::AboutDialog(QWidget* parent) :
 
 	involvedLabel->setPlainText( embed::getText( "CONTRIBUTORS" ) );
 }
+
+} // namespace lmms::gui

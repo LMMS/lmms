@@ -49,10 +49,20 @@ class QString;
 class QMenu;
 class QToolButton;
 
-class ComboBox;
+namespace lmms
+{
+
+
 class NotePlayHandle;
 class Pattern;
+
+
+namespace gui
+{
+
+class ComboBox;
 class TimeLineWidget;
+
 
 class PianoRoll : public QWidget
 {
@@ -558,5 +568,9 @@ private:
 
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

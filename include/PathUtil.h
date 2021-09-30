@@ -5,7 +5,7 @@
 
 #include <QDir>
 
-namespace PathUtil
+namespace lmms::PathUtil
 {
 	enum class Base { Absolute, ProjectDir, FactorySample, UserSample, UserVST, Preset,
 		UserLADSPA, DefaultLADSPA, UserSoundfont, DefaultSoundfont, UserGIG, DefaultGIG,
@@ -44,6 +44,6 @@ namespace PathUtil
 	//! Defaults to an absolute path if all bases fail.
 	QString LMMS_EXPORT toShortestRelative(const QString & input, bool allowLocal = false);
 
-}
+} // namespace lmms::PathUtil
 
 #endif

@@ -28,6 +28,10 @@
 #include <QDebug>
 #include <string>
 
+
+namespace lmms
+{
+
 //! Types of issues that can cause LMMS to not load a plugin
 //! LMMS Plugins should use this to indicate errors
 enum PluginIssueType
@@ -77,6 +81,10 @@ public:
 	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
 };
 
-QDebug operator<<(QDebug stream, const PluginIssue& iss);
+
+} // namespace lmms
+
+QDebug operator<<(QDebug stream, const lmms::PluginIssue& iss);
+
 
 #endif // PLUGINISSUE_H
