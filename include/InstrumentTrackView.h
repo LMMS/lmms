@@ -112,7 +112,6 @@ private:
 	}
 
 	friend class InstrumentTrackWindow;
-
 } ;
 
 #endif

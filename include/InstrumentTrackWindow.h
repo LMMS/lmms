@@ -155,7 +155,6 @@ private:
 
 	friend class InstrumentView;
 	friend class InstrumentTrackView;
-
 } ;
 
 #endif
