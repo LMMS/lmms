@@ -55,6 +55,7 @@
 #include "InstrumentTrackWindow.h"
 #include "MicrotunerConfig.h"
 #include "PianoRoll.h"
+#include "PianoView.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
