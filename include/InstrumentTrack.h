@@ -27,12 +27,10 @@
 #define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
-#include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "Microtuner.h"
 #include "Midi.h"
-#include "MidiCCRackView.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -44,28 +42,8 @@
 #include "TrackView.h"
 
 
-
-class QLineEdit;
-class InstrumentFunctionArpeggioView;
-class InstrumentFunctionNoteStackingView;
-class EffectRackView;
-class InstrumentSoundShapingView;
-class FadeButton;
 class Instrument;
-class InstrumentTrackWindow;
-class InstrumentMidiIOView;
-class InstrumentMiscView;
-class Knob;
-class FxLineLcdSpinBox;
-class LcdSpinBox;
-class LeftRightNav;
-class midiPortMenu;
 class DataFile;
-class PluginView;
-class TabWidget;
-class TrackLabelButton;
-class LedCheckBox;
-class QLabel;
 
 
 class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
