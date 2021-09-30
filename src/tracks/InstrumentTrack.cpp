@@ -1,6 +1,5 @@
 /*
- * InstrumentTrack.cpp - implementation of instrument-track-class
- *                        (window + data-structures)
+ * InstrumentTrack.cpp - implementation of InstrumentTrack class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -1063,7 +1062,3 @@ void InstrumentTrack::autoAssignMidiDevice(bool assign)
 	}
 }
 
-
-
-
-#include "InstrumentTrack.moc"
