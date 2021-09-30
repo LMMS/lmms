@@ -74,14 +74,14 @@ class SerializingObjectHook
 {
 public:
 	SerializingObjectHook() :
-		m_hookedIn( NULL )
+		m_hookedIn( nullptr )
 	{
 	}
 	virtual ~SerializingObjectHook()
 	{
-		if( m_hookedIn != NULL )
+		if( m_hookedIn != nullptr )
 		{
-			m_hookedIn->setHook( NULL );
+			m_hookedIn->setHook( nullptr );
 		}
 	}
 

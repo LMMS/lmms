@@ -64,7 +64,7 @@ public:
 
 	bool isReady() const
 	{
-		return m_fileDev != NULL;
+		return m_fileDev != nullptr;
 	}
 
 	static ExportFileFormats getFileFormatFromExtension(

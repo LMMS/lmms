@@ -67,7 +67,7 @@ void RecentProjectsMenu::fillMenu()
 
 void RecentProjectsMenu::openProject(QAction * _action )
 {
-	auto mainWindow = gui->mainWindow();
+	auto mainWindow = getGUI()->mainWindow();
 	if (mainWindow->mayChangeProject(true))
 	{
 		const QString f = _action->text().replace("&&", "&");

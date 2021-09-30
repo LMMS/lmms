@@ -213,7 +213,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( gui->mainWindow(), m );
+	ControllerConnectionDialog d( getGUI()->mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{
@@ -251,7 +251,7 @@ void AutomatableModelViewSlots::removeConnection()
 	if( m->controllerConnection() )
 	{
 		delete m->controllerConnection();
-		m->setControllerConnection( NULL );
+		m->setControllerConnection( nullptr );
 	}
 }
 
@@ -260,7 +260,7 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
-	gui->automationEditor()->open(
+	getGUI()->automationEditor()->open(
 				AutomationPattern::globalAutomationPattern(m_amv->modelUntyped())
 	);
 }

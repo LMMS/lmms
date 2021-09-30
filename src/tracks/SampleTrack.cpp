@@ -67,7 +67,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 	bool played_a_note = false;	// will be return variable
 
 	tcoVector tcos;
-	::BBTrack * bb_track = NULL;
+	::BBTrack * bb_track = nullptr;
 	if( _tco_num >= 0 )
 	{
 		if (_start > getTCO(_tco_num)->length())

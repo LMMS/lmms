@@ -41,9 +41,9 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioalsa", "channels" ).toInt(),
 		SURROUND_CHANNELS ), _audioEngine ),
-	m_handle( NULL ),
-	m_hwParams( NULL ),
-	m_swParams( NULL ),
+	m_handle( nullptr ),
+	m_hwParams( nullptr ),
+	m_swParams( nullptr ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -107,17 +107,17 @@ AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 AudioAlsa::~AudioAlsa()
 {
 	stopProcessing();
-	if( m_handle != NULL )
+	if( m_handle != nullptr )
 	{
 		snd_pcm_close( m_handle );
 	}
 
-	if( m_hwParams != NULL )
+	if( m_hwParams != nullptr )
 	{
 		snd_pcm_hw_params_free( m_hwParams );
 	}
 
-	if( m_swParams != NULL )
+	if( m_swParams != nullptr )
 	{
 		snd_pcm_sw_params_free( m_swParams );
 	}
@@ -131,7 +131,7 @@ QString AudioAlsa::probeDevice()
 	QString dev = ConfigManager::inst()->value( "audioalsa", "device" );
 	if( dev == "" )
 	{
-		if( getenv( "AUDIODEV" ) != NULL )
+		if( getenv( "AUDIODEV" ) != nullptr )
 		{
 			return getenv( "AUDIODEV" );
 		}
@@ -171,7 +171,7 @@ AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
 	}
 
 	char** n = hints;
-	while (*n != NULL)
+	while (*n != nullptr)
 	{
 		char *name = snd_device_name_get_hint(*n, "NAME");
 		char *description = snd_device_name_get_hint(*n, "DESC");
@@ -257,7 +257,7 @@ void AudioAlsa::applyQualitySettings()
 	{
 		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
-		if( m_handle != NULL )
+		if( m_handle != nullptr )
 		{
 			snd_pcm_close( m_handle );
 		}

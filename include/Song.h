@@ -97,7 +97,7 @@ public:
 	public:
 		PlayPos( const int abs = 0 ) :
 			TimePos( abs ),
-			m_timeLine( NULL ),
+			m_timeLine( nullptr ),
 			m_currentFrame( 0.0f )
 		{
 		}

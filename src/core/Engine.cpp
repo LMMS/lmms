@@ -38,15 +38,15 @@
 #include "Oscillator.h"
 
 float LmmsCore::s_framesPerTick;
-AudioEngine* LmmsCore::s_audioEngine = NULL;
-FxMixer * LmmsCore::s_fxMixer = NULL;
-BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
-Song * LmmsCore::s_song = NULL;
-ProjectJournal * LmmsCore::s_projectJournal = NULL;
+AudioEngine* LmmsCore::s_audioEngine = nullptr;
+FxMixer * LmmsCore::s_fxMixer = nullptr;
+BBTrackContainer * LmmsCore::s_bbTrackContainer = nullptr;
+Song * LmmsCore::s_song = nullptr;
+ProjectJournal * LmmsCore::s_projectJournal = nullptr;
 #ifdef LMMS_HAVE_LV2
 Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
 #endif
-Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+Ladspa2LMMS * LmmsCore::s_ladspaManager = nullptr;
 void* LmmsCore::s_dndPluginKey = nullptr;
 
 
@@ -166,4 +166,4 @@ void *LmmsCore::pickDndPluginKey()
 
 
 
-LmmsCore * LmmsCore::s_instanceOfMe = NULL;
+LmmsCore * LmmsCore::s_instanceOfMe = nullptr;

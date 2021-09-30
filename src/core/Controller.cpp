@@ -183,14 +183,14 @@ void Controller::resetFrameCounter()
 
 Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 {
-	static Controller * dummy = NULL;
-	Controller * c = NULL;
+	static Controller * dummy = nullptr;
+	Controller * c = nullptr;
 
 	switch( _ct )
 	{
 		case Controller::DummyController:
 			if (!dummy)
-				dummy = new Controller( DummyController, NULL,
+				dummy = new Controller( DummyController, nullptr,
 								QString() );
 			c = dummy;
 			break;
@@ -231,7 +231,7 @@ Controller * Controller::create( const QDomElement & _this, Model * _parent )
 										_parent );
 	}
 
-	if( c != NULL )
+	if( c != nullptr )
 	{
 		c->restoreState( _this );
 	}
@@ -246,7 +246,7 @@ bool Controller::hasModel( const Model * m ) const
 	for (QObject * c : children())
 	{
 		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
-		if( am != NULL )
+		if( am != nullptr )
 		{
 			if( am == m )
 			{
@@ -254,7 +254,7 @@ bool Controller::hasModel( const Model * m ) const
 			}
 
 			ControllerConnection * cc = am->controllerConnection();
-			if( cc != NULL && cc->getController()->hasModel( m ) )
+			if( cc != nullptr && cc->getController()->hasModel( m ) )
 			{
 				return true;
 			}

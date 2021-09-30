@@ -42,9 +42,9 @@
 
 InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	QWidget( parent ),
-	ModelView( NULL, this ),
-	m_rpBtn( NULL ),
-	m_wpBtn( NULL )
+	ModelView( nullptr, this ),
+	m_rpBtn( nullptr ),
+	m_wpBtn( nullptr )
 {
 	QVBoxLayout* layout = new QVBoxLayout( this );
 	layout->setMargin( 5 );

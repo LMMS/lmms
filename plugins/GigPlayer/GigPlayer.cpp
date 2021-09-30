@@ -69,7 +69,7 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"gig",
-	NULL,
+	nullptr,
 } ;
 
 }
@@ -79,8 +79,8 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
-	m_instance( NULL ),
-	m_instrument( NULL ),
+	m_instance( nullptr ),
+	m_instrument( nullptr ),
 	m_filename( "" ),
 	m_bankNum( 0, 0, 999, this, tr( "Bank" ) ),
 	m_patchNum( 0, 0, 127, this, tr( "Patch" ) ),
@@ -165,7 +165,7 @@ AutomatableModel * GigInstrument::childModel( const QString & _modelName )
 
 	qCritical() << "requested unknown model " << _modelName;
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -184,15 +184,15 @@ void GigInstrument::freeInstance()
 	QMutexLocker synthLock( &m_synthMutex );
 	QMutexLocker notesLock( &m_notesMutex );
 
-	if( m_instance != NULL )
+	if( m_instance != nullptr )
 	{
 		delete m_instance;
-		m_instance = NULL;
+		m_instance = nullptr;
 
 		// If we're changing instruments, we got to make sure that we
 		// remove all pointers to the old samples and don't try accessing
 		// that instrument again
-		m_instrument = NULL;
+		m_instrument = nullptr;
 		m_notes.clear();
 	}
 }
@@ -217,7 +217,7 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 		}
 		catch( ... )
 		{
-			m_instance = NULL;
+			m_instance = nullptr;
 			m_filename = "";
 		}
 	}
@@ -249,7 +249,7 @@ QString GigInstrument::getCurrentPatchName()
 {
 	QMutexLocker locker( &m_synthMutex );
 
-	if( m_instance == NULL )
+	if( m_instance == nullptr )
 	{
 		return "";
 	}
@@ -259,7 +259,7 @@ QString GigInstrument::getCurrentPatchName()
 
 	gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
 
-	while( pInstrument != NULL )
+	while( pInstrument != nullptr )
 	{
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
@@ -330,7 +330,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	m_synthMutex.lock();
 	m_notesMutex.lock();
 
-	if( m_instance == NULL || m_instrument == NULL )
+	if( m_instance == nullptr || m_instrument == nullptr )
 	{
 		m_synthMutex.unlock();
 		m_notesMutex.unlock();
@@ -379,7 +379,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Delete if the ADSR for a sample is complete for normal
 			// notes, or if a release sample, then if we've reached
 			// the end of the sample
-			if( sample->sample == NULL || sample->adsr.done() ||
+			if( sample->sample == nullptr || sample->adsr.done() ||
 				( it->isRelease == true &&
 				  sample->pos >= sample->sample->SamplesTotal - 1 ) )
 			{
@@ -417,7 +417,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		for( QList<GigSample>::iterator sample = it->samples.begin();
 				sample != it->samples.end(); ++sample )
 		{
-			if( sample->sample == NULL || sample->region == NULL )
+			if( sample->sample == nullptr || sample->region == nullptr )
 			{
 				continue;
 			}
@@ -504,7 +504,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		_working_buffer[i][1] *= m_gain.value();
 	}
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 }
 
 
@@ -512,7 +512,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples )
 {
-	if( sampleData == NULL || samples < 1 )
+	if( sampleData == nullptr || samples < 1 )
 	{
 		return;
 	}
@@ -523,7 +523,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	f_cnt_t loopStart = 0;
 	f_cnt_t loopLength = 0;
 
-	if( sample.region->pSampleLoops != NULL )
+	if( sample.region->pSampleLoops != nullptr )
 	{
 		for( uint32_t i = 0; i < sample.region->SampleLoops; ++i )
 		{
@@ -733,7 +733,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 
 	gig::Region* pRegion = m_instrument->GetFirstRegion();
 
-	while( pRegion != NULL )
+	while( pRegion != nullptr )
 	{
 		Dimension dim = getDimensions( pRegion, gignote.velocity, wantReleaseSample );
 		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
@@ -750,7 +750,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			gignote.release = dim.release;
 		}
 
-		if( pSample != NULL && pSample->SamplesTotal != 0 )
+		if( pSample != nullptr && pSample->SamplesTotal != 0 )
 		{
 			int keyLow = pRegion->KeyRange.low;
 			int keyHigh = pRegion->KeyRange.high;
@@ -791,7 +791,7 @@ Dimension GigInstrument::getDimensions( gig::Region * pRegion, int velocity, boo
 {
 	Dimension dim;
 
-	if( pRegion == NULL )
+	if( pRegion == nullptr )
 	{
 		return dim;
 	}
@@ -873,11 +873,11 @@ void GigInstrument::getInstrument()
 
 	QMutexLocker locker( &m_synthMutex );
 
-	if( m_instance != NULL )
+	if( m_instance != nullptr )
 	{
 		gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
 
-		while( pInstrument != NULL )
+		while( pInstrument != nullptr )
 		{
 			int iBank = pInstrument->MIDIBank;
 			int iProg = pInstrument->MIDIProgram;
@@ -1049,7 +1049,7 @@ void GigInstrumentView::showFileDialog()
 {
 	GigInstrument * k = castModel<GigInstrument>();
 
-	FileDialog ofd( NULL, tr( "Open GIG file" ) );
+	FileDialog ofd( nullptr, tr( "Open GIG file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
@@ -1101,10 +1101,10 @@ void GigInstrumentView::showPatchDialog()
 GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 		float attenuation, int interpolation, float desiredFreq )
 	: sample( pSample ), region( pDimRegion ), attenuation( attenuation ),
-	  pos( 0 ), interpolation( interpolation ), srcState( NULL ),
+	  pos( 0 ), interpolation( interpolation ), srcState( nullptr ),
 	  sampleFreq( 0 ), freqFactor( 1 )
 {
-	if( sample != NULL && region != NULL )
+	if( sample != nullptr && region != nullptr )
 	{
 		// Note: we don't create the libsamplerate object here since we always
 		// also call the copy constructor when appending to the end of the
@@ -1134,7 +1134,7 @@ GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 
 GigSample::~GigSample()
 {
-	if( srcState != NULL )
+	if( srcState != nullptr )
 	{
 		src_delete( srcState );
 	}
@@ -1146,7 +1146,7 @@ GigSample::~GigSample()
 GigSample::GigSample( const GigSample& g )
 	: sample( g.sample ), region( g.region ), attenuation( g.attenuation ),
 	  adsr( g.adsr ), pos( g.pos ), interpolation( g.interpolation ),
-	  srcState( NULL ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
+	  srcState( nullptr ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
 {
 	// On the copy, we want to create the object
 	updateSampleRate();
@@ -1163,11 +1163,11 @@ GigSample& GigSample::operator=( const GigSample& g )
 	adsr = g.adsr;
 	pos = g.pos;
 	interpolation = g.interpolation;
-	srcState = NULL;
+	srcState = nullptr;
 	sampleFreq = g.sampleFreq;
 	freqFactor = g.freqFactor;
 
-	if( g.srcState != NULL )
+	if( g.srcState != nullptr )
 	{
 		updateSampleRate();
 	}
@@ -1180,7 +1180,7 @@ GigSample& GigSample::operator=( const GigSample& g )
 
 void GigSample::updateSampleRate()
 {
-	if( srcState != NULL )
+	if( srcState != nullptr )
 	{
 		src_delete( srcState );
 	}
@@ -1188,7 +1188,7 @@ void GigSample::updateSampleRate()
 	int error = 0;
 	srcState = src_new( interpolation, DEFAULT_CHANNELS, &error );
 
-	if( srcState == NULL || error != 0 )
+	if( srcState == nullptr || error != 0 )
 	{
 		qCritical( "error while creating libsamplerate data structure in GigSample" );
 	}
@@ -1200,7 +1200,7 @@ void GigSample::updateSampleRate()
 bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
-	if( srcState == NULL )
+	if( srcState == nullptr )
 	{
 		return false;
 	}
@@ -1264,7 +1264,7 @@ ADSR::ADSR( gig::DimensionRegion * region, int sampleRate )
 	  attackPosition( 0 ), attackLength( 0 ), decayLength( 0 ),
 	  releasePosition( 0 ), releaseLength( 0 )
 {
-	if( region != NULL )
+	if( region != nullptr )
 	{
 		// Parameters from GIG file
 		preattack = 1.0 * region->EG1PreAttack / 1000; // EG1PreAttack is 0-1000 permille

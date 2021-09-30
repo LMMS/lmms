@@ -63,7 +63,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"sf2,sf3",
-	NULL,
+	nullptr,
 } ;
 
 }
@@ -90,9 +90,9 @@ QMutex sf2Instrument::s_fontsMutex;
 
 sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sf2player_plugin_descriptor ),
-	m_srcState( NULL ),
+	m_srcState( nullptr ),
 	m_synth(nullptr),
-	m_font( NULL ),
+	m_font( nullptr ),
 	m_fontId( 0 ),
 	m_filename( "" ),
 	m_lastMidiPitch( -1 ),
@@ -120,7 +120,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 #if QT_VERSION_CHECK(FLUIDSYNTH_VERSION_MAJOR, FLUIDSYNTH_VERSION_MINOR, FLUIDSYNTH_VERSION_MICRO) >= QT_VERSION_CHECK(1,1,9)
 	// Deactivate all audio drivers in fluidsynth
-	const char *none[] = { NULL };
+	const char *none[] = { nullptr };
 	fluid_audio_driver_register( none );
 #endif
 	m_settings = new_fluid_settings();
@@ -197,7 +197,7 @@ sf2Instrument::~sf2Instrument()
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
-	if( m_srcState != NULL )
+	if( m_srcState != nullptr )
 	{
 		src_delete( m_srcState );
 	}
@@ -314,7 +314,7 @@ AutomatableModel * sf2Instrument::childModel( const QString & _modelName )
 		return &m_patchNum;
 	}
 	qCritical() << "requested unknown model " << _modelName;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -331,7 +331,7 @@ void sf2Instrument::freeFont()
 {
 	m_synthMutex.lock();
 
-	if ( m_font != NULL )
+	if ( m_font != nullptr )
 	{
 		s_fontsMutex.lock();
 		--(m_font->refCount);
@@ -354,7 +354,7 @@ void sf2Instrument::freeFont()
 		}
 		s_fontsMutex.unlock();
 
-		m_font = NULL;
+		m_font = nullptr;
 	}
 	m_synthMutex.unlock();
 }
@@ -588,13 +588,13 @@ void sf2Instrument::reloadSynth()
 	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() )
 	{
 		m_synthMutex.lock();
-		if( m_srcState != NULL )
+		if( m_srcState != nullptr )
 		{
 			src_delete( m_srcState );
 		}
 		int error;
 		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
-		if( m_srcState == NULL || error )
+		if( m_srcState == nullptr || error )
 		{
 			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
 		}
@@ -641,7 +641,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
 		pluginData->lastVelocity = _n->midiVelocity( baseVelocity );
-		pluginData->fluidVoice = NULL;
+		pluginData->fluidVoice = nullptr;
 		pluginData->isNew = true;
 		pluginData->offset = _n->offset();
 		pluginData->noteOffSent = false;
@@ -749,7 +749,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	if( m_playingNotes.isEmpty() )
 	{
 		renderFrames( frames, _working_buffer );
-		instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+		instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 		return;
 	}
 
@@ -807,7 +807,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	{
 		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
 	}
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 }
 
 
@@ -815,7 +815,7 @@ void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
 	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() &&
-							m_srcState != NULL )
+							m_srcState != nullptr )
 	{
 		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->processingSampleRate();
 #ifdef __GNUC__
@@ -1135,7 +1135,7 @@ void sf2InstrumentView::showFileDialog()
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 
-	FileDialog ofd( NULL, tr( "Open SoundFont file" ) );
+	FileDialog ofd( nullptr, tr( "Open SoundFont file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;

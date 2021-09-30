@@ -130,7 +130,7 @@ public:
 			{
 				typedef QMap<QString, QString> AttributeMap;
 
-				inline Key( const Plugin::Descriptor * desc = NULL,
+				inline Key( const Plugin::Descriptor * desc = nullptr,
 						const QString & name = QString(),
 						const AttributeMap & am = AttributeMap()
 					)

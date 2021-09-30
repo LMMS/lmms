@@ -47,7 +47,8 @@ public:
 			Dynamic	// jobs can be added while processing queue
 		} ;
 
-#define JOB_QUEUE_SIZE 8192
+		static constexpr size_t JOB_QUEUE_SIZE = 8192;
+
 		JobQueue() :
 			m_items(),
 			m_writeIndex( 0 ),

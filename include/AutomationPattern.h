@@ -53,6 +53,8 @@ public:
 	typedef QMap<int, AutomationNode> timeMap;
 	typedef QVector<QPointer<AutomatableModel>> objectVector;
 
+	using TimemapIterator = timeMap::const_iterator;
+
 	AutomationPattern( AutomationTrack * _auto_track );
 	AutomationPattern( const AutomationPattern & _pat_to_copy );
 	virtual ~AutomationPattern() = default;
@@ -207,5 +209,37 @@ private:
 
 } ;
 
+//Short-hand functions to access node values in an automation pattern;
+// replacement for CPP macros with the same purpose; could be refactored
+// further in the future.
+inline float INVAL(AutomationPattern::TimemapIterator it)
+{
+	return it->getInValue();
+}
+
+inline float OUTVAL(AutomationPattern::TimemapIterator it)
+{
+	return it->getOutValue();
+}
+
+inline float OFFSET(AutomationPattern::TimemapIterator it)
+{
+	return it->getValueOffset();
+}
+
+inline float INTAN(AutomationPattern::TimemapIterator it)
+{
+	return it->getInTangent();
+}
+
+inline float OUTTAN(AutomationPattern::TimemapIterator it)
+{
+	return it->getOutTangent();
+}
+
+inline int POS(AutomationPattern::TimemapIterator it)
+{
+	return it.key();
+}
 
 #endif

@@ -53,7 +53,7 @@ static inline QString ensureTrailingSlash(const QString & s )
 }
 
 
-ConfigManager * ConfigManager::s_instanceOfMe = NULL;
+ConfigManager * ConfigManager::s_instanceOfMe = nullptr;
 
 
 ConfigManager::ConfigManager() :
@@ -493,9 +493,9 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
-		else if(gui)
+		else if(getGUI() != nullptr)
 		{
-			QMessageBox::warning(NULL, MainWindow::tr("Configuration file"),
+			QMessageBox::warning(nullptr, MainWindow::tr("Configuration file"),
 									MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
 													arg(errorLine).
 													arg(errorCol).
@@ -622,9 +622,9 @@ void ConfigManager::saveConfigFile()
 					"the directory containing the "
 					"file and try again!"
 						).arg(m_lmmsRcFile);
-		if(gui)
+		if(getGUI() != nullptr)
 		{
-			QMessageBox::critical(NULL, title, message,
+			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,
 						QMessageBox::NoButton);
 		}

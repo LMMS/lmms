@@ -110,7 +110,7 @@ vibratingString::delayLine * vibratingString::initDelayLine( int _len,
 	}
 	else
 	{
-		dl->data = NULL;
+		dl->data = nullptr;
 	}
 
 	dl->pointer = dl->data;

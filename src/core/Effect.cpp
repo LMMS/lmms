@@ -37,7 +37,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Plugin( _desc, _parent, _key ),
-	m_parent( NULL ),
+	m_parent( nullptr ),
 	m_processors( 1 ),
 	m_okay( true ),
 	m_noRun( false ),
@@ -49,7 +49,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
 	m_autoQuitDisabled( false )
 {
-	m_srcState[0] = m_srcState[1] = NULL;
+	m_srcState[0] = m_srcState[1] = nullptr;
 	reinitSRC();
 	
 	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
@@ -65,7 +65,7 @@ Effect::~Effect()
 {
 	for( int i = 0; i < 2; ++i )
 	{
-		if( m_srcState[i] != NULL )
+		if( m_srcState[i] != nullptr )
 		{
 			src_delete( m_srcState[i] );
 		}
@@ -118,7 +118,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 {
 	Plugin * p = Plugin::instantiateWithKey( pluginName, _parent, _key );
 	// check whether instantiated plugin is an effect
-	if( dynamic_cast<Effect *>( p ) != NULL )
+	if( dynamic_cast<Effect *>( p ) != nullptr )
 	{
 		// everything ok, so return pointer
 		Effect * effect = dynamic_cast<Effect *>( p );
@@ -129,7 +129,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 	// not quite... so delete plugin and leave it up to the caller to instantiate a DummyEffect
 	delete p;
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -174,7 +174,7 @@ void Effect::reinitSRC()
 {
 	for( int i = 0; i < 2; ++i )
 	{
-		if( m_srcState[i] != NULL )
+		if( m_srcState[i] != nullptr )
 		{
 			src_delete( m_srcState[i] );
 		}
@@ -182,7 +182,7 @@ void Effect::reinitSRC()
 		if( ( m_srcState[i] = src_new(
 			Engine::audioEngine()->currentQualitySettings().
 							libsrcInterpolation(),
-					DEFAULT_CHANNELS, &error ) ) == NULL )
+					DEFAULT_CHANNELS, &error ) ) == nullptr )
 		{
 			qFatal( "Error: src_new() failed in effect.cpp!\n" );
 		}
@@ -197,7 +197,7 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 				sampleFrame * _dst_buf, sample_rate_t _dst_sr,
 								f_cnt_t _frames )
 {
-	if( m_srcState[_i] == NULL )
+	if( m_srcState[_i] == nullptr )
 	{
 		return;
 	}

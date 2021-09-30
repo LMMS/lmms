@@ -43,7 +43,7 @@
 #include "TextFloat.h"
 
 TrackContainer::TrackContainer() :
-	Model( NULL ),
+	Model( nullptr ),
 	JournallingObject(),
 	m_tracksMutex(),
 	m_tracks()
@@ -86,16 +86,16 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		clearAllTracks();
 	}
 
-	static QProgressDialog * pd = NULL;
-	bool was_null = ( pd == NULL );
-	if( !journalRestore && gui != nullptr )
+	static QProgressDialog * pd = nullptr;
+	bool was_null = ( pd == nullptr );
+	if( !journalRestore && getGUI() != nullptr )
 	{
-		if( pd == NULL )
+		if( pd == nullptr )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						Engine::getSong()->getLoadingTrackCount(),
-						gui->mainWindow() );
+						getGUI()->mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -105,14 +105,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		if( pd != NULL )
+		if( pd != nullptr )
 		{
 			pd->setValue( pd->value() + 1 );
 			QCoreApplication::instance()->processEvents(
 						QEventLoop::AllEvents, 100 );
 			if( pd->wasCanceled() )
 			{
-				if ( gui )
+				if ( getGUI() != nullptr )
 				{
 					TextFloat::displayMessage( tr( "Loading cancelled" ),
 					tr( "Project loading was cancelled." ),
@@ -130,7 +130,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 			QString trackName = node.toElement().hasAttribute( "name" ) ?
 						node.toElement().attribute( "name" ) :
 						node.firstChild().toElement().attribute( "name" );
-			if( pd != NULL )
+			if( pd != nullptr )
 			{
 				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
 						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
@@ -140,12 +140,12 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		node = node.nextSibling();
 	}
 
-	if( pd != NULL )
+	if( pd != nullptr )
 	{
 		if( was_null )
 		{
 			delete pd;
-			pd = NULL;
+			pd = nullptr;
 		}
 	}
 }

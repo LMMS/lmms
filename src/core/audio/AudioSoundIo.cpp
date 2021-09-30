@@ -43,9 +43,9 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 		SURROUND_CHANNELS ), _audioEngine )
 {
 	outSuccessful = false;
-	m_soundio = NULL;
-	m_outstream = NULL;
-	m_outBuf = NULL;
+	m_soundio = nullptr;
+	m_outstream = nullptr;
+	m_outBuf = nullptr;
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
@@ -206,7 +206,7 @@ AudioSoundIo::~AudioSoundIo()
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 
@@ -261,7 +261,7 @@ void AudioSoundIo::stopProcessing()
 	if (m_outBuf)
 	{
 		delete[] m_outBuf;
-		m_outBuf = NULL;
+		m_outBuf = nullptr;
 	}
 }
 
@@ -503,7 +503,7 @@ AudioSoundIo::setupWidget::~setupWidget()
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 

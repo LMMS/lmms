@@ -41,10 +41,10 @@ AboutDialog::AboutDialog(QWidget* parent) :
 
 	versionLabel->setText( versionLabel->text().
 					arg( LMMS_VERSION ).
-					arg( PLATFORM ).
-					arg( MACHINE ).
+					arg( LMMS_BUILDCONF_PLATFORM ).
+					arg( LMMS_BUILDCONF_MACHINE ).
 					arg( QT_VERSION_STR ).
-					arg( COMPILER_VERSION ) );
+					arg( LMMS_BUILDCONF_COMPILER_VERSION ) );
 	versionLabel->setTextInteractionFlags(
 					versionLabel->textInteractionFlags() |
 					Qt::TextSelectableByMouse );

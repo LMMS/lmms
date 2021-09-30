@@ -38,7 +38,7 @@ SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
 	m_framesRecorded( 0 ),
 	m_minLength( tco->length() ),
 	m_track( tco->getTrack() ),
-	m_bbTrack( NULL ),
+	m_bbTrack( nullptr ),
 	m_tco( tco )
 {
 }
@@ -117,7 +117,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	sampleFrame * data_ptr = data;
 
 
-	assert( data != NULL );
+	assert( data != nullptr );
 
 	// now copy all buffers into big buffer
 	for( bufferList::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it )

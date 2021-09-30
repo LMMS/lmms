@@ -67,7 +67,7 @@ public:
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
 	virtual ~NotePlayHandle();
@@ -344,7 +344,7 @@ public:
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
 					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
 	static void release( NotePlayHandle * nph );

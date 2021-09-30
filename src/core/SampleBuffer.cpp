@@ -108,7 +108,7 @@ SampleBuffer::SampleBuffer(const sampleFrame * data, const f_cnt_t frames)
 {
 	if (frames > 0)
 	{
-		m_origData = MM_ALLOC(sampleFrame, frames);
+		m_origData = MM_ALLOC<sampleFrame>( frames);
 		memcpy(m_origData, data, frames * BYTES_PER_FRAME);
 		m_origFrames = frames;
 		update();
@@ -123,7 +123,7 @@ SampleBuffer::SampleBuffer(const f_cnt_t frames)
 {
 	if (frames > 0)
 	{
-		m_origData = MM_ALLOC(sampleFrame, frames);
+		m_origData = MM_ALLOC<sampleFrame>( frames);
 		memset(m_origData, 0, frames * BYTES_PER_FRAME);
 		m_origFrames = frames;
 		update();
@@ -139,9 +139,9 @@ SampleBuffer::SampleBuffer(const SampleBuffer& orig)
 
 	m_audioFile = orig.m_audioFile;
 	m_origFrames = orig.m_origFrames;
-	m_origData = (m_origFrames > 0) ? MM_ALLOC(sampleFrame, m_origFrames) : nullptr;
+	m_origData = (m_origFrames > 0) ? MM_ALLOC<sampleFrame>( m_origFrames) : nullptr;
 	m_frames = orig.m_frames;
-	m_data = (m_frames > 0) ? MM_ALLOC(sampleFrame, m_frames) : nullptr;
+	m_data = (m_frames > 0) ? MM_ALLOC<sampleFrame>( m_frames) : nullptr;
 	m_startFrame = orig.m_startFrame;
 	m_endFrame = orig.m_endFrame;
 	m_loopStartFrame = orig.m_loopStartFrame;
@@ -251,7 +251,7 @@ void SampleBuffer::update(bool keepSettings)
 	{
 		// TODO: reverse- and amplification-property is not covered
 		// by following code...
-		m_data = MM_ALLOC(sampleFrame, m_origFrames);
+		m_data = MM_ALLOC<sampleFrame>( m_origFrames);
 		memcpy(m_data, m_origData, m_origFrames * BYTES_PER_FRAME);
 		if (keepSettings == false)
 		{
@@ -325,7 +325,7 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
-			m_data = MM_ALLOC(sampleFrame, 1);
+			m_data = MM_ALLOC<sampleFrame>( 1);
 			memset(m_data, 0, sizeof(*m_data));
 			m_frames = 1;
 			m_loopStartFrame = m_startFrame = 0;
@@ -340,7 +340,7 @@ void SampleBuffer::update(bool keepSettings)
 	{
 		// neither an audio-file nor a buffer to copy from, so create
 		// buffer containing one sample-frame
-		m_data = MM_ALLOC(sampleFrame, 1);
+		m_data = MM_ALLOC<sampleFrame>( 1);
 		memset(m_data, 0, sizeof(*m_data));
 		m_frames = 1;
 		m_loopStartFrame = m_startFrame = 0;
@@ -368,7 +368,7 @@ void SampleBuffer::update(bool keepSettings)
 		QString message = tr("Audio files are limited to %1 MB "
 				"in size and %2 minutes of playing time"
 				).arg(fileSizeMax).arg(sampleLengthMax);
-		if (gui)
+		if (getGUI() != nullptr)
 		{
 			QMessageBox::information(nullptr,
 				title, message,	QMessageBox::Ok);
@@ -389,7 +389,7 @@ void SampleBuffer::convertIntToFloat(
 {
 	// following code transforms int-samples into float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-	m_data = MM_ALLOC(sampleFrame, frames);
+	m_data = MM_ALLOC<sampleFrame>( frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
 	// if reversing is on, we also reverse when scaling
@@ -412,7 +412,7 @@ void SampleBuffer::directFloatWrite(
 )
 {
 
-	m_data = MM_ALLOC(sampleFrame, frames);
+	m_data = MM_ALLOC<sampleFrame>( frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
 	// if reversing is on, we also reverse when scaling
@@ -440,7 +440,7 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 		m_sampleRate = audioEngineSampleRate();
 		MM_FREE(m_data);
 		m_frames = resampled->frames();
-		m_data = MM_ALLOC(sampleFrame, m_frames);
+		m_data = MM_ALLOC<sampleFrame>( m_frames);
 		memcpy(m_data, resampled->data(), m_frames * sizeof(sampleFrame));
 		delete resampled;
 	}
@@ -906,7 +906,7 @@ sampleFrame * SampleBuffer::getSampleFragment(
 		}
 	}
 
-	*tmp = MM_ALLOC(sampleFrame, frames);
+	*tmp = MM_ALLOC<sampleFrame>( frames);
 
 	if (loopMode == LoopOff)
 	{
@@ -1506,14 +1506,14 @@ void SampleBuffer::loadFromBase64(const QString & data)
 
 	m_origFrames = origData.size() / sizeof(sampleFrame);
 	MM_FREE(m_origData);
-	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, origData.data(), origData.size());
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
 	m_origFrames = dsize / sizeof(sampleFrame);
 	MM_FREE(m_origData);
-	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, dst, dsize);
 
 #endif

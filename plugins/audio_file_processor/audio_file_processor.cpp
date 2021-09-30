@@ -65,7 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
-	NULL,
+	nullptr,
 } ;
 
 }
@@ -446,14 +446,14 @@ void audioFileProcessor::pointChanged( void )
 
 
 
-QPixmap * AudioFileProcessorView::s_artwork = NULL;
+QPixmap * AudioFileProcessorView::s_artwork = nullptr;
 
 
 AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	if( s_artwork == NULL )
+	if( s_artwork == nullptr )
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
@@ -1148,7 +1148,7 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cn
 		case start:
 			break;
 	}
-	if( a_knob == NULL )
+	if( a_knob == nullptr )
 	{
 		return;
 	}

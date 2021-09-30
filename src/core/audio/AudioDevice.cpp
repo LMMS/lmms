@@ -41,7 +41,7 @@ AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine )
 	int error;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
-				SURROUND_CHANNELS, &error ) ) == NULL )
+				SURROUND_CHANNELS, &error ) ) == nullptr )
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
 	}
@@ -151,7 +151,7 @@ void AudioDevice::applyQualitySettings()
 	int error;
 	if( ( m_srcState = src_new(
 		audioEngine()->currentQualitySettings().libsrcInterpolation(),
-				SURROUND_CHANNELS, &error ) ) == NULL )
+				SURROUND_CHANNELS, &error ) ) == nullptr )
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
 	}
@@ -187,7 +187,7 @@ fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 {
-	if( m_srcState == NULL )
+	if( m_srcState == nullptr )
 	{
 		return _frames;
 	}
@@ -253,7 +253,7 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 {
 
-	assert( _outbuf != NULL );
+	assert( _outbuf != nullptr );
 
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }

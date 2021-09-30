@@ -89,8 +89,8 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 };
 
 }
@@ -790,7 +790,7 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	process( _working_buffer, frames );
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 //	release_frame = 0; //removed for issue # 1432
 }
 
@@ -801,7 +801,7 @@ void lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
 	//printf("GONE\n");
 	if( m_playingNote == _n )
 	{
-		m_playingNote = NULL;
+		m_playingNote = nullptr;
 	}
 }
 

@@ -177,7 +177,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		m_helpButton->setCheckable(true);
 		btnBox->addWidget(m_helpButton);
 
-		m_helpWindow = gui->mainWindow()->addWindowedWidget(infoLabel);
+		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
 		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
 									QSizePolicy::Expanding);
 		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);

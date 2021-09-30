@@ -151,7 +151,7 @@ QString MidiController::nodeName() const
 
 ControllerDialog * MidiController::createDialog( QWidget * _parent )
 {
-	return NULL;
+	return nullptr;
 }
 
 

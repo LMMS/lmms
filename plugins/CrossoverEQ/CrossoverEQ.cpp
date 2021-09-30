@@ -41,8 +41,8 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 };
 
 }
@@ -60,9 +60,9 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp1 = MM_ALLOC( sampleFrame, Engine::audioEngine()->framesPerPeriod() );
-	m_tmp2 = MM_ALLOC( sampleFrame, Engine::audioEngine()->framesPerPeriod() );
-	m_work = MM_ALLOC( sampleFrame, Engine::audioEngine()->framesPerPeriod() );
+	m_tmp1 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_tmp2 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_work = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()

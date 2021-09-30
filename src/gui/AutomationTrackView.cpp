@@ -63,7 +63,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
-		if( mod != NULL )
+		if( mod != nullptr )
 		{
 			TimePos pos = TimePos( trackContainerView()->
 							currentPosition() +

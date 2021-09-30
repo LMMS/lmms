@@ -44,7 +44,7 @@ InstrumentView::~InstrumentView()
 {
 	if( instrumentTrackWindow() )
 	{
-		instrumentTrackWindow()->m_instrumentView = NULL;
+		instrumentTrackWindow()->m_instrumentView = nullptr;
 	}
 }
 
@@ -53,7 +53,7 @@ InstrumentView::~InstrumentView()
 
 void InstrumentView::setModel( Model * _model, bool )
 {
-	if( dynamic_cast<Instrument *>( _model ) != NULL )
+	if( dynamic_cast<Instrument *>( _model ) != nullptr )
 	{
 		ModelView::setModel( _model );
 		instrumentTrackWindow()->setWindowIcon( model()->logo()->pixmap() );

@@ -148,7 +148,7 @@ void printVersion( char *executableName )
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION,
+		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION,
 		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
@@ -793,7 +793,7 @@ int main( int argc, char * * argv )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}
-	if ( sigaction( SIGPIPE, &sa, NULL ) )
+	if ( sigaction( SIGPIPE, &sa, nullptr ) )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}
@@ -928,12 +928,12 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
-				gui->mainWindow()->sessionCleanup();
+				getGUI()->mainWindow()->sessionCleanup();
 			}
 			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
-				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
+				getGUI()->mainWindow()->setSession( MainWindow::SessionState::Recover );
 			}
 			else // Exit
 			{
@@ -945,10 +945,10 @@ int main( int argc, char * * argv )
 
 		// [Settel] workaround: showMaximized() doesn't work with
 		// FVWM2 unless the window is already visible -> show() first
-		gui->mainWindow()->show();
+		getGUI()->mainWindow()->show();
 		if( fullscreen )
 		{
-			gui->mainWindow()->showMaximized();
+			getGUI()->mainWindow()->showMaximized();
 		}
 
 		// Handle macOS-style FileOpen QEvents
@@ -1008,7 +1008,7 @@ int main( int argc, char * * argv )
 		// instances of LMMS.
 		if( autoSaveEnabled )
 		{
-			gui->mainWindow()->autoSaveTimerReset();
+			getGUI()->mainWindow()->autoSaveTimerReset();
 		}
 	}
 

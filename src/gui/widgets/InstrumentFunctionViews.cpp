@@ -36,7 +36,7 @@
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
@@ -90,7 +90,7 @@ void InstrumentFunctionNoteStackingView::modelChanged()
 
 InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent ) :
 	QWidget( parent ),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	m_a( arp ),
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),

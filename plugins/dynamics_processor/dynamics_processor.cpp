@@ -44,8 +44,8 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -77,12 +77,12 @@ dynProcEffect::~dynProcEffect()
 
 inline void dynProcEffect::calcAttack()
 {
-	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
+	m_attCoeff = std::pow(10.f, ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
 }
 
 inline void dynProcEffect::calcRelease()
 {
-	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
+	m_relCoeff = std::pow(10.f, ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / Engine::audioEngine()->processingSampleRate() );
 }
 
 

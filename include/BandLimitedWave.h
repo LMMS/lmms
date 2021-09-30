@@ -36,12 +36,12 @@ class QString;
 #include "Engine.h"
 #include "AudioEngine.h"
 
-#define MAXLEN 11
-#define MIPMAPSIZE 2 << ( MAXLEN + 1 )
-#define MIPMAPSIZE3 3 << ( MAXLEN + 1 )
-#define MAXTBL 23
-#define MINTLEN 2 << 0
-#define MAXTLEN 3 << MAXLEN
+constexpr int MAXLEN = 11;
+constexpr int MIPMAPSIZE = 2 << ( MAXLEN + 1 );
+constexpr int MIPMAPSIZE3 = 3 << ( MAXLEN + 1 );
+constexpr int MAXTBL = 23;
+constexpr int MINTLEN = 2 << 0;
+constexpr int MAXTLEN = 3 << MAXLEN;
 
 // table for table sizes
 const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,

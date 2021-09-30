@@ -37,6 +37,7 @@
 #include "Note.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
+#include "PlayHandle.h"
 
 
 class AudioDevice;
@@ -283,7 +284,7 @@ public:
 
 	inline bool hasFifoWriter() const
 	{
-		return m_fifoWriter != NULL;
+		return m_fifoWriter != nullptr;
 	}
 
 	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );

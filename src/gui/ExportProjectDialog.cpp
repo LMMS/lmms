@@ -120,7 +120,7 @@ void ExportProjectDialog::accept()
 	m_renderManager.reset(nullptr);
 	QDialog::accept();
 
-	gui->mainWindow()->resetWindowTitle();
+	getGUI()->mainWindow()->resetWindowTitle();
 }
 
 
@@ -197,7 +197,7 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL( finished() ),
 			this, SLOT( accept() ) ) ;
 	connect( m_renderManager.get(), SIGNAL( finished() ),
-			gui->mainWindow(), SLOT( resetWindowTitle() ) );
+			getGUI()->mainWindow(), SLOT( resetWindowTitle() ) );
 
 	if ( m_multiExport )
 	{
@@ -293,6 +293,6 @@ void ExportProjectDialog::startBtnClicked()
 
 void ExportProjectDialog::updateTitleBar( int _prog )
 {
-	gui->mainWindow()->setWindowTitle(
+	getGUI()->mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
 }

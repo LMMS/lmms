@@ -77,7 +77,7 @@ void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
 	sampleFrame * data_ptr = data;
 
 
-	assert( data != NULL );
+	assert( data != nullptr );
 
 	// now copy all buffers into big buffer
 	for( BufferList::ConstIterator it = m_buffers.begin();

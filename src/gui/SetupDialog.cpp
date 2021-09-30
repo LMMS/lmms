@@ -80,7 +80,7 @@ inline void labelWidget(QWidget * w, const QString & txt)
 	title->setFont(pointSize<12>(f));
 
 
-	assert(dynamic_cast<QBoxLayout *>(w->layout()) != NULL);
+	assert(dynamic_cast<QBoxLayout *>(w->layout()) != nullptr);
 
 	dynamic_cast<QBoxLayout *>(w->layout())->addSpacing(5);
 	dynamic_cast<QBoxLayout *>(w->layout())->addWidget(title);

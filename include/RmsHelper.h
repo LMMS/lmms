@@ -32,7 +32,7 @@ class RmsHelper
 {
 public:
 	RmsHelper( int size ) :
-		m_buffer( NULL )
+		m_buffer( nullptr )
 	{
 		setSize( size );
 	}
