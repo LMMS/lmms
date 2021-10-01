@@ -26,6 +26,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <cstddef>
 #include <limits>
 
 #include "lmmsconfig.h"
@@ -130,7 +131,7 @@ constexpr char LADSPA_PATH_SEPERATOR =
 
 using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
 using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
-constexpr size_t LMMS_ALIGN_SIZE = 16;
+constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 
 #define STRINGIFY(s) STR(s)
