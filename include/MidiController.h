@@ -38,6 +38,11 @@ namespace lmms
 
 class MidiPort;
 
+namespace gui
+{
+class ControllerConnectionDialog;
+}
+
 
 class MidiController : public Controller, public MidiEventProcessor
 {
@@ -79,7 +84,7 @@ protected:
 	float m_lastValue;
 	float m_previousValue;
 
-	friend class ControllerConnectionDialog;
+	friend class gui::ControllerConnectionDialog;
 	friend class AutoDetectMidiController;
 
 } ;

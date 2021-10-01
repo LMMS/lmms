@@ -45,6 +45,8 @@ namespace gui
 {
 
 class MidiPortMenu;
+class ControllerConnectionDialog;
+class InstrumentMidiIOView;
 
 }
 
@@ -173,8 +175,8 @@ private:
 	Map m_writablePorts;
 
 
-	friend class ControllerConnectionDialog;
-	friend class InstrumentMidiIOView;
+	friend class gui::ControllerConnectionDialog;
+	friend class gui::InstrumentMidiIOView;
 
 
 signals:

@@ -39,6 +39,12 @@ namespace lmms
 
 class InstrumentTrack;
 
+namespace gui
+{
+class PatternView;
+class BBTrackContainerView;
+}
+
 
 class LMMS_EXPORT Pattern : public TrackContentObject
 {
@@ -106,7 +112,7 @@ public:
 	bool empty();
 
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	gui::TrackContentObjectView * createView( gui::TrackView * _tv ) override;
 
 
 	using Model::dataChanged;

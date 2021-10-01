@@ -51,7 +51,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 					this, SLOT( updateLength() ) );
 
 	//care about positionmarker
-	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
+	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
 	if( timeLine )
 	{
 		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
@@ -319,9 +319,9 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 
 
 
-TrackContentObjectView * SampleTCO::createView( TrackView * _tv )
+gui::TrackContentObjectView* SampleTCO::createView( gui::TrackView* _tv )
 {
-	return new SampleTCOView( this, _tv );
+	return new gui::SampleTCOView( this, _tv );
 }
 
 

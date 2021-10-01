@@ -1124,7 +1124,7 @@ void SampleBuffer::visualize(
 
 QString SampleBuffer::openAudioFile() const
 {
-	FileDialog ofd(nullptr, tr("Open audio file"));
+	gui::FileDialog ofd(nullptr, tr("Open audio file"));
 
 	QString dir;
 	if (!m_audioFile.isEmpty())
@@ -1147,7 +1147,7 @@ QString SampleBuffer::openAudioFile() const
 	}
 	// change dir to position of previously opened file
 	ofd.setDirectory(dir);
-	ofd.setFileMode(FileDialog::ExistingFiles);
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
 
 	// set filters
 	QStringList types;

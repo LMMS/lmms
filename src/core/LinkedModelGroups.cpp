@@ -24,8 +24,6 @@
 
 #include "LinkedModelGroups.h"
 
-#include <QDomDocument>
-#include <QDomElement>
 
 #include "AutomatableModel.h"
 

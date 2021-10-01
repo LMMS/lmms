@@ -34,6 +34,8 @@
 #include "LedCheckbox.h"
 #include "embed.h"
 
+namespace lmms::gui
+{
 
 PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 				PeakControllerEffectControls * _controls ) :
@@ -103,3 +105,5 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setLayout( mainLayout );
 }
 
+
+} // namespace lmms::gui

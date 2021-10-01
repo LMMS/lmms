@@ -62,7 +62,7 @@ public:
 	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	gui::TrackContentObjectView* createView( gui::TrackView* _tv ) override;
 
 
 	bool isPlaying() const;

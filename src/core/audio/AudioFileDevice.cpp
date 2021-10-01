@@ -40,6 +40,8 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 	m_outputFile( _file ),
 	m_outputSettings(outputSettings)
 {
+	using gui::ExportProjectDialog;
+
 	setSampleRate( outputSettings.getSampleRate() );
 
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )

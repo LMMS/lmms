@@ -40,6 +40,11 @@ namespace lmms
 class AutomationTrack;
 class TimePos;
 
+namespace gui
+{
+class AutomationPatternView;
+} // namespace gui
+
 
 
 class LMMS_EXPORT AutomationPattern : public TrackContentObject
@@ -207,7 +212,7 @@ private:
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
 
-	friend class AutomationPatternView;
+	friend class gui::AutomationPatternView;
 	friend class AutomationNode;
 
 } ;

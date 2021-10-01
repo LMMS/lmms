@@ -30,6 +30,9 @@
 #include <memory>
 #include <vector>
 
+#include <QDomDocument>
+#include <QDomElement>
+
 #include "Model.h"
 
 

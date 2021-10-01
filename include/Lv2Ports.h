@@ -205,7 +205,7 @@ private:
 	bool m_sidechain;
 
 	// the only case when data of m_buffer may be referenced:
-	friend struct ::ConnectPortVisitor;
+	friend struct lmms::ConnectPortVisitor;
 };
 
 struct AtomSeq : public VisitablePort<AtomSeq, PortBase>

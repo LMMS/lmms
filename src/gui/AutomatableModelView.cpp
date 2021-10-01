@@ -44,7 +44,7 @@ namespace lmms
 
 static float floatFromClipboard(bool* ok=nullptr);
 
-AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
+AutomatableModelView::AutomatableModelView( Model* model, QWidget* _this ) :
 	ModelView( model, _this ),
 	m_conversionFactor( 1.0 )
 {
@@ -174,7 +174,7 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
 	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
 	{
-		new StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
+		new gui::StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();
 	}
 	else if( event->button() == Qt::MidButton )
@@ -216,7 +216,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( getGUI()->mainWindow(), m );
+	gui::ControllerConnectionDialog d( getGUI()->mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{

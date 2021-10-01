@@ -554,9 +554,9 @@ void Pattern::removeSteps()
 
 
 
-TrackContentObjectView * Pattern::createView( TrackView * _tv )
+gui::TrackContentObjectView * Pattern::createView( gui::TrackView * _tv )
 {
-	return new PatternView( this, _tv );
+	return new gui::PatternView( this, _tv );
 }
 
 

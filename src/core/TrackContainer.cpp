@@ -118,7 +118,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 			{
 				if ( getGUI() != nullptr )
 				{
-					TextFloat::displayMessage( tr( "Loading cancelled" ),
+					gui::TextFloat::displayMessage( tr( "Loading cancelled" ),
 					tr( "Project loading was cancelled." ),
 					embed::getIconPixmap( "project_file", 24, 24 ),
 					2000 );

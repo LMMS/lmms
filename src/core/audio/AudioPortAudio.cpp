@@ -411,6 +411,8 @@ void AudioPortAudioSetupUtil::updateChannels()
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
+	using gui::ComboBox;
+
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
 

@@ -148,7 +148,7 @@ void TrackContentObject::copyStateTo( TrackContentObject *src, TrackContentObjec
 		dst->movePosition( pos );
 
 		AutomationPattern::resolveAllIDs();
-		GuiApplication::instance()->automationEditor()->m_editor->updateAfterPatternChange();
+		getGUI()->automationEditor()->m_editor->updateAfterPatternChange();
 	}
 }
 
