@@ -101,6 +101,10 @@ typedef int32_t key_t;
 
 #endif // BUILD_REMOTE_PLUGIN_CLIENT
 
+#if defined(COMPILE_REMOTE_PLUGIN_BASE) && !defined(BUILD_REMOTE_PLUGIN_CLIENT)
+#include <QtCore/QCoreApplication>
+#endif // COMPILE_REMOTE_PLUGIN_BASE && not BUILD_REMOTE_PLUGIN_CLIENT
+
 namespace lmms
 {
 
@@ -1014,11 +1018,6 @@ private:
 
 
 #ifdef COMPILE_REMOTE_PLUGIN_BASE
-
-#ifndef BUILD_REMOTE_PLUGIN_CLIENT
-#include <QtCore/QCoreApplication>
-#endif // not BUILD_REMOTE_PLUGIN_CLIENT
-
 
 #ifdef SYNC_WITH_SHM_FIFO
 RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :
