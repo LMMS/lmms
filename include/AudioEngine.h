@@ -46,6 +46,7 @@ namespace lmms
 class AudioDevice;
 class MidiClient;
 class AudioPort;
+class AudioEngineWorkerThread;
 
 
 const fpp_t MINIMUM_BUFFER_SIZE = 32;
@@ -59,10 +60,6 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
 
-#include "PlayHandle.h"
-
-
-class AudioEngineWorkerThread;
 
 
 class LMMS_EXPORT AudioEngine : public QObject
