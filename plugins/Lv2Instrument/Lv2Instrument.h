@@ -37,8 +37,6 @@
 // currently only MIDI works
 #define LV2_INSTRUMENT_USE_MIDI
 
-class QPushButton;
-
 
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
