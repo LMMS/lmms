@@ -36,6 +36,7 @@
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"
+#include "PluginFactory.h"
 
 namespace lmms
 {
@@ -187,7 +188,6 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 
-#include "PluginFactory.h"
 Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 				const Descriptor::SubPluginFeatures::Key *key,
 				bool keyFromDnd)
