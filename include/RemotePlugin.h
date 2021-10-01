@@ -43,11 +43,11 @@
 
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
-#endif
+#endif // LMMS_HAVE_PROCESS_H
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QSystemSemaphore>
-#endif
+#endif // not (LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 
 
 #ifdef LMMS_HAVE_SYS_SHM_H
@@ -55,7 +55,7 @@
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
-#endif
+#endif // LMMS_HAVE_UNISTD_H
 #else
 #define USE_QT_SHMEM
 
@@ -64,17 +64,17 @@
 
 #if !defined(LMMS_HAVE_SYS_TYPES_H) || defined(LMMS_BUILD_WIN32)
 typedef int32_t key_t;
-#endif
-#endif
+#endif // (not LMMS_HAVE_SYS_TYPES_H) || LMMS_BUILD_WIN32
+#endif // LMMS_HAVE_SYS_SHM_H
 
 
 #ifdef LMMS_HAVE_LOCALE_H
 #include <locale.h>
-#endif
+#endif // LMMS_HAVE_LOCALE_H
 
 #ifdef LMMS_HAVE_PTHREAD_H
 #include <pthread.h>
-#endif
+#endif // LMMS_HAVE_PTHREAD_H
 
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
@@ -85,7 +85,7 @@ typedef int32_t key_t;
 #ifndef SYNC_WITH_SHM_FIFO
 #include <sys/socket.h>
 #include <sys/un.h>
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
 #else
 #include "lmms_export.h"
@@ -97,9 +97,9 @@ typedef int32_t key_t;
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
 #include <unistd.h>
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
-#endif
+#endif // BUILD_REMOTE_PLUGIN_CLIENT
 
 namespace lmms
 {
@@ -141,7 +141,7 @@ public:
 		m_shmObj(),
 #else
 		m_shmID( -1 ),
-#endif
+#endif // USE_QT_SHMEM
 		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
@@ -161,7 +161,7 @@ public:
 		{
 		}
 		m_data = (shmData *) shmat( m_shmID, 0, 0 );
-#endif
+#endif // USE_QT_SHMEM
 		assert( m_data != nullptr );
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
@@ -184,7 +184,7 @@ public:
 		m_shmObj( QString::number( _shm_key ) ),
 #else
 		m_shmID( shmget( _shm_key, 0, 0 ) ),
-#endif
+#endif // USE_QT_SHMEM
 		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
@@ -200,7 +200,7 @@ public:
 		{
 			m_data = (shmData *) shmat( m_shmID, 0, 0 );
 		}
-#endif
+#endif // USE_QT_SHMEM
 		assert( m_data != nullptr );
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
@@ -214,11 +214,11 @@ public:
 		{
 #ifndef USE_QT_SHMEM
 			shmctl( m_shmID, IPC_RMID, nullptr );
-#endif
+#endif // not USE_QT_SHMEM
 		}
 #ifndef USE_QT_SHMEM
 		shmdt( m_data );
-#endif
+#endif // not USE_QT_SHMEM
 	}
 
 	inline bool isInvalid() const
@@ -355,7 +355,7 @@ private:
 			unlock();
 #ifndef LMMS_BUILD_WIN32
 			usleep( 5 );
-#endif
+#endif // not LMMS_BUILD_WIN32
 			lock();
 		}
 		fastMemCpy( _buf, m_data->data + m_data->startPtr, _len );
@@ -391,7 +391,7 @@ private:
 			unlock();
 #ifndef LMMS_BUILD_WIN32
 			usleep( 5 );
-#endif
+#endif // not LMMS_BUILD_WIN32
 			lock();
 		}
 		fastMemCpy( m_data->data + m_data->endPtr, _buf, _len );
@@ -406,14 +406,14 @@ private:
 	QSharedMemory m_shmObj;
 #else
 	int m_shmID;
-#endif
+#endif // USE_QT_SHMEM
 	shmData * m_data;
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;
 	std::atomic_int m_lockDepth;
 
 } ;
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 
 
@@ -504,7 +504,7 @@ public:
 		{
 			return QString::fromStdString( getString( _p ) );
 		}
-#endif
+#endif // BUILD_REMOTE_PLUGIN_CLIENT
 
 		inline int getInt( int _p = 0 ) const
 		{
@@ -534,7 +534,7 @@ public:
 	RemotePluginBase( shmFifo * _in, shmFifo * _out );
 #else
 	RemotePluginBase();
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 	virtual ~RemotePluginBase();
 
 #ifdef SYNC_WITH_SHM_FIFO
@@ -545,7 +545,7 @@ public:
 		m_in = in;
 		m_out = out;
 	}
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 	int sendMessage( const message & _m );
 	message receiveMessage();
@@ -556,7 +556,7 @@ public:
 		return m_in->isInvalid() || m_out->isInvalid();
 #else
 		return m_invalid;
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 	}
 
 	message waitForMessage( const message & _m,
@@ -604,7 +604,7 @@ public:
 		writeInt( len );
 		write( _s.c_str(), len );
 	}
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 	inline bool messagesLeft()
@@ -621,7 +621,7 @@ public:
 			qWarning( "Unexpected poll error." );
 		}
 		return pollin.revents & POLLIN;
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 	}
 
 	inline void fetchAndProcessAllMessages()
@@ -636,7 +636,7 @@ public:
 	{
 		return waitDepthCounter() > 0;
 	}
-#endif
+#endif // not BUILD_REMOTE_PLUGIN_CLIENT
 
 	virtual bool processMessage( const message & _m ) = 0;
 
@@ -652,7 +652,7 @@ protected:
 	{
 		return m_out;
 	}
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 	inline void invalidate()
 	{
@@ -662,13 +662,13 @@ protected:
 		m_in->messageSent();
 #else
 		m_invalid = true;
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 	}
 
 
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_socket;
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
 
 private:
@@ -678,7 +678,7 @@ private:
 		static int waitDepth = 0;
 		return waitDepth;
 	}
-#endif
+#endif // not BUILD_REMOTE_PLUGIN_CLIENT
 
 #ifdef SYNC_WITH_SHM_FIFO
 	shmFifo * m_in;
@@ -741,7 +741,7 @@ private:
 
 	pthread_mutex_t m_receiveMutex;
 	pthread_mutex_t m_sendMutex;
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 } ;
 
@@ -792,7 +792,7 @@ public:
 		return true;
 #else
 		return m_process.state() != QProcess::NotRunning;
-#endif
+#endif // DEBUG_REMOTE_PLUGIN
 	}
 
 	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
@@ -882,7 +882,7 @@ private:
 	QSharedMemory m_shmObj;
 #else
 	int m_shmID;
-#endif
+#endif // USE_QT_SHMEM
 	size_t m_shmSize;
 	float * m_shm;
 
@@ -892,7 +892,7 @@ private:
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;
 	QString m_socketFile;
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
 	friend class ProcessWatcher;
 
@@ -902,7 +902,7 @@ private slots:
 	void processErrored(QProcess::ProcessError err );
 } ;
 
-#endif
+#endif // not BUILD_REMOTE_PLUGIN_CLIENT
 
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
@@ -914,11 +914,11 @@ public:
 	RemotePluginClient( key_t _shm_in, key_t _shm_out );
 #else
 	RemotePluginClient( const char * socketPath );
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 	virtual ~RemotePluginClient();
 #ifdef USE_QT_SHMEM
 	VstSyncData * getQtVSTshm();
-#endif
+#endif // USE_QT_SHMEM
 	virtual bool processMessage( const message & _m );
 
 	virtual void process( const sampleFrame * _in_buf,
@@ -1007,7 +1007,7 @@ private:
 
 } ;
 
-#endif
+#endif // BUILD_REMOTE_PLUGIN_CLIENT
 
 
 
@@ -1017,7 +1017,7 @@ private:
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
 #include <QtCore/QCoreApplication>
-#endif
+#endif // not BUILD_REMOTE_PLUGIN_CLIENT
 
 
 #ifdef SYNC_WITH_SHM_FIFO
@@ -1028,17 +1028,17 @@ RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :
 RemotePluginBase::RemotePluginBase() :
 	m_socket( -1 ),
 	m_invalid( false )
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 {
 #ifdef LMMS_HAVE_LOCALE_H
 	// make sure, we're using common ways to print/scan
 	// floats to/from strings (',' vs. '.' for decimal point etc.)
 	setlocale( LC_NUMERIC, "C" );
-#endif
+#endif // LMMS_HAVE_LOCALE_H
 #ifndef SYNC_WITH_SHM_FIFO
 	pthread_mutex_init( &m_receiveMutex, nullptr );
 	pthread_mutex_init( &m_sendMutex, nullptr );
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 }
 
 
@@ -1052,7 +1052,7 @@ RemotePluginBase::~RemotePluginBase()
 #else
 	pthread_mutex_destroy( &m_receiveMutex );
 	pthread_mutex_destroy( &m_sendMutex );
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 }
 
 
@@ -1083,7 +1083,7 @@ int RemotePluginBase::sendMessage( const message & _m )
 		j += 4 + _m.data[i].size();
 	}
 	pthread_mutex_unlock( &m_sendMutex );
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 	return j;
 }
@@ -1114,7 +1114,7 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 		m.data.push_back( readString() );
 	}
 	pthread_mutex_unlock( &m_receiveMutex );
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 	return m;
 }
 
@@ -1152,7 +1152,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 	};
 
 	WaitDepthCounter wdc( waitDepthCounter(), _busy_waiting );
-#endif
+#endif // not BUILD_REMOTE_PLUGIN_CLIENT
 	while( !isInvalid() )
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
@@ -1162,7 +1162,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 				QEventLoop::ExcludeUserInputEvents, 50 );
 			continue;
 		}
-#endif
+#endif // not BUILD_REMOTE_PLUGIN_CLIENT
 		message m = receiveMessage();
 		processMessage( m );
 		if( m.id == _wm.id )
@@ -1179,7 +1179,7 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 }
 
 
-#endif
+#endif // COMPILE_REMOTE_PLUGIN_BASE
 
 
 
@@ -1198,7 +1198,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 #ifdef USE_QT_SHMEM
 	m_shmObj(),
 	m_shmQtID( "/usr/bin/lmms" ),
-#endif
+#endif // USE_QT_SHMEM
 	m_vstSyncData( nullptr ),
 	m_shm( nullptr ),
 	m_inputCount( 0 ),
@@ -1228,7 +1228,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	{
 		fprintf( stderr, "Could not connect to local server.\n" );
 	}
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
 #ifdef USE_QT_SHMEM
 	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
@@ -1275,7 +1275,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 			}
 		}
 	}
-#endif
+#endif // USE_QT_SHMEM
 
 	// if attaching shared memory fails
 	sendMessage( IdSampleRateInformation );
@@ -1295,19 +1295,19 @@ RemotePluginClient::~RemotePluginClient()
 {
 #ifdef USE_QT_SHMEM
 	m_shmQtID.detach();
-#endif
+#endif // USE_QT_SHMEM
 	sendMessage( IdQuit );
 
 #ifndef USE_QT_SHMEM
 	shmdt( m_shm );
-#endif
+#endif // not USE_QT_SHMEM
 
 #ifndef SYNC_WITH_SHM_FIFO
 	if ( close( m_socket ) == -1)
 	{
 		fprintf( stderr, "Error freeing resources.\n" );
 	}
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 }
 
 
@@ -1317,7 +1317,7 @@ VstSyncData * RemotePluginClient::getQtVSTshm()
 {
 	return m_vstSyncData;
 }
-#endif
+#endif // USE_QT_SHMEM
 
 
 
@@ -1426,7 +1426,7 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 	{
 		m_shm = (float *) shmat( shm_id, 0, 0 );
 	}
-#endif
+#endif // USE_QT_SHMEM
 }
 
 
@@ -1461,4 +1461,4 @@ LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
 
 } // namespace lmms
 
-#endif
+#endif // REMOTE_PLUGIN_H
