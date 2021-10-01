@@ -95,9 +95,6 @@ bool PluginIssue::operator<(const PluginIssue &other) const
 }
 
 
-} // namespace lmms
-
-
 QDebug operator<<(QDebug stream, const lmms::PluginIssue &iss)
 {
 	stream << lmms::PluginIssue::msgFor(iss.m_issueType);
@@ -107,5 +104,8 @@ QDebug operator<<(QDebug stream, const lmms::PluginIssue &iss)
 	}
 	return stream;
 }
+
+} // namespace lmms
+
 
 
