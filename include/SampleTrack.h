@@ -48,7 +48,7 @@ public:
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
-	TrackView * createView( TrackContainerView* tcv ) override;
+	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
 	TrackContentObject* createTCO(const TimePos & pos) override;
 
 
