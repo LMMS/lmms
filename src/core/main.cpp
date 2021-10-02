@@ -125,7 +125,7 @@ void consoleMessageHandler(QtMsgType type,
 
 
 inline void loadTranslation( const QString & tname,
-	const QString & dir = ConfigManager::inst()->localeDir() )
+	const QString & dir = lmms::ConfigManager::inst()->localeDir() )
 {
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
@@ -253,6 +253,8 @@ int noInputFileError()
 
 int main( int argc, char * * argv )
 {
+	using namespace lmms;
+
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
@@ -855,6 +857,8 @@ int main( int argc, char * * argv )
 	}
 	else // otherwise, start the GUI
 	{
+		using namespace lmms::gui;
+
 		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or

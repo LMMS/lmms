@@ -37,13 +37,12 @@ namespace lmms
 {
 
 class Track;
-class TrackContentObjectView;
 
 namespace gui
 {
 
 class TrackView;
-
+class TrackContentObjectView;
 
 class TrackContentWidget : public QWidget, public JournallingObject
 {
@@ -62,8 +61,8 @@ public:
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
 
-	void addTCOView( TrackContentObjectView * tcov );
-	void removeTCOView( TrackContentObjectView * tcov );
+	void addTCOView( TrackContentObjectView* tcov );
+	void removeTCOView( TrackContentObjectView* tcov );
 	void removeTCOView( int tcoNum )
 	{
 		if( tcoNum >= 0 && tcoNum < m_tcoViews.size() )

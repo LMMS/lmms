@@ -35,6 +35,13 @@ namespace lmms
 
 class Effect;
 
+namespace gui
+{
+
+class EffectRackView;
+
+} // namespace gui
+
 
 class LMMS_EXPORT EffectChain : public Model, public SerializingObject
 {
@@ -68,7 +75,7 @@ private:
 	BoolModel m_enabledModel;
 
 
-	friend class EffectRackView;
+	friend class gui::EffectRackView;
 
 
 signals:

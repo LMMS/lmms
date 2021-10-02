@@ -50,7 +50,11 @@ class Pattern;
 
 namespace gui
 {
+
 class TimeLineWidget;
+class SongEditor;
+class ControllerRackView;
+
 }
 
 
@@ -502,9 +506,8 @@ private:
 	AutomatedValueMap m_oldAutomatedValues;
 
 	friend class LmmsCore;
-	friend class SongEditor;
-	friend class mainWindow;
-	friend class ControllerRackView;
+	friend class gui::SongEditor;
+	friend class gui::ControllerRackView;
 
 signals:
 	void projectLoaded();

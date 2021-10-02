@@ -32,7 +32,7 @@
 class QMenu;
 class QMouseEvent;
 
-namespace lmms
+namespace lmms::gui
 {
 
 class LMMS_EXPORT AutomatableModelView : public ModelView
@@ -135,7 +135,7 @@ using FloatModelView = TypedModelView<FloatModel>;
 using IntModelView = TypedModelView<IntModel>;
 using BoolModelView = TypedModelView<BoolModel>;
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif
 

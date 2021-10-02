@@ -39,6 +39,13 @@ namespace lmms
 class EffectChain;
 class EffectControls;
 
+namespace gui
+{
+
+class EffectView;
+
+} // namespace gui
+
 
 class LMMS_EXPORT Effect : public Plugin
 {
@@ -224,7 +231,7 @@ private:
 	SRC_STATE * m_srcState[2];
 
 
-	friend class EffectView;
+	friend class gui::EffectView;
 	friend class EffectChain;
 
 } ;

@@ -32,6 +32,7 @@
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "Knob.h"
+#include "AutomatableModelView.h"
 
 
 namespace lmms::gui

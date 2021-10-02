@@ -158,7 +158,7 @@ private:
 	FloatModel m_chordRangeModel;
 
 
-	friend class InstrumentFunctionNoteStackingView;
+	friend class gui::InstrumentFunctionNoteStackingView;
 
 } ;
 

@@ -33,6 +33,11 @@
 namespace lmms
 {
 
+namespace gui
+{
+class BBEditor;
+} // namespace gui
+
 class LMMS_EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
@@ -77,7 +82,7 @@ private:
 	ComboBoxModel m_bbComboBoxModel;
 
 
-	friend class BBEditor;
+	friend class gui::BBEditor;
 
 } ;
 

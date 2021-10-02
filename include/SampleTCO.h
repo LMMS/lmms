@@ -32,6 +32,13 @@
 namespace lmms
 {
 
+namespace gui
+{
+
+class SampleTCOView;
+
+} // namespace gui
+
 
 class SampleTCO : public TrackContentObject
 {
@@ -82,7 +89,7 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
-	friend class SampleTCOView;
+	friend class gui::SampleTCOView;
 
 
 signals:

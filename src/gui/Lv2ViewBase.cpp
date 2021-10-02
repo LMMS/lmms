@@ -31,6 +31,7 @@
 #include <QMdiSubWindow>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <lilv/lilv.h>
 
 #include "AudioEngine.h"

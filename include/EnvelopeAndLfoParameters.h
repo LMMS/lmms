@@ -36,6 +36,13 @@
 namespace lmms
 {
 
+namespace gui
+{
+
+class EnvelopeAndLfoView;
+
+}
+
 class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
 	Q_OBJECT
@@ -181,7 +188,7 @@ private:
 	void updateLfoShapeData();
 
 
-	friend class EnvelopeAndLfoView;
+	friend class gui::EnvelopeAndLfoView;
 
 } ;
 

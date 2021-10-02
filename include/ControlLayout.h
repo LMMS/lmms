@@ -76,9 +76,11 @@
 #include <QLayout>
 #include <QMultiMap>
 #include <QStyle>
+
 class QLayoutItem;
 class QRect;
 class QString;
+class QLineEdit;
 
 
 namespace lmms::gui
@@ -132,7 +134,7 @@ private:
 	// relevant dimension is width, as later, heightForWidth() will be called
 	// 400 looks good and is ~4 knobs in a row
 	constexpr const static int m_minWidth = 400;
-	class QLineEdit* m_searchBar;
+	QLineEdit* m_searchBar;
 	//! name of search bar, must be ASCII sorted before any alpha numerics
 	static constexpr const char* s_searchBarName = "!!searchBar!!";
 };

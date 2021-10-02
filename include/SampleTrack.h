@@ -38,6 +38,14 @@
 namespace lmms
 {
 
+namespace gui
+{
+
+class SampleTrackView;
+class SampleTrackWindow;
+
+} // namespace gui
+
 
 class SampleTrack : public Track
 {
@@ -99,8 +107,8 @@ private:
 
 
 
-	friend class SampleTrackView;
-	friend class SampleTrackWindow;
+	friend class gui::SampleTrackView;
+	friend class gui::SampleTrackWindow;
 
 } ;
 

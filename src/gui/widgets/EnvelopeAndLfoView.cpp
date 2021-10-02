@@ -43,12 +43,15 @@
 #include "ToolTip.h"
 #include "Track.h"
 
-namespace lmms::gui
+namespace lmms
 {
-
 
 extern const float SECS_PER_ENV_SEGMENT;
 extern const float SECS_PER_LFO_OSCILLATION;
+
+
+namespace gui
+{
 
 
 const int ENV_GRAPH_X = 6;
@@ -532,4 +535,6 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 
 
 
-} // namespace lmms::gui
+} // namespace gui
+
+} // namespace lmms
