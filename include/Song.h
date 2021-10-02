@@ -505,7 +505,7 @@ private:
 
 	AutomatedValueMap m_oldAutomatedValues;
 
-	friend class LmmsCore;
+	friend class Engine;
 	friend class gui::SongEditor;
 	friend class gui::ControllerRackView;
 

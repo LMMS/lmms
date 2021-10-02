@@ -430,7 +430,7 @@ private:
 
 	bool m_waitingForWrite;
 
-	friend class LmmsCore;
+	friend class Engine;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
 } ;
