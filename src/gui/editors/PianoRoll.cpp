@@ -76,8 +76,6 @@ namespace lmms
 {
 
 
-using std::move;
-
 typedef AutomationPattern::timeMap timeMap;
 
 
@@ -378,12 +376,12 @@ PianoRoll::PianoRoll() :
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
 		auto loader = std::make_unique<PixmapLoader>( "note_" + pixmaps[i] );
-		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ), ::move(loader) );
+		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ), std::move(loader) );
 	}
 	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
 	{
 		auto loader = std::make_unique<PixmapLoader>( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
-		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), ::move(loader) );
+		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), std::move(loader) );
 	}
 	m_noteLenModel.setValue( 0 );
 
