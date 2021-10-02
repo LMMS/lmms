@@ -109,15 +109,14 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	if( renderOnly == false )
 	{
 		m_framesPerPeriod = 
-			( fpp_t ) ConfigManager::inst()->
-				value( "mixer", "framesperaudiobuffer" ).toInt();
+			( fpp_t ) ConfigManager::inst()->value( "audioengine", "framesperaudiobuffer" ).toInt();
 
 		// if the value read from user configuration is not set or
 		// lower than the minimum allowed, use the default value and
 		// save it to the configuration
 		if( m_framesPerPeriod < MINIMUM_BUFFER_SIZE )
 		{
-			ConfigManager::inst()->setValue( "mixer",
+			ConfigManager::inst()->setValue( "audioengine",
 						"framesperaudiobuffer",
 						QString::number( DEFAULT_BUFFER_SIZE ) );
 
@@ -256,8 +255,7 @@ void AudioEngine::stopProcessing()
 
 sample_rate_t AudioEngine::baseSampleRate() const
 {
-	sample_rate_t sr =
-		ConfigManager::inst()->value( "mixer", "samplerate" ).toInt();
+	sample_rate_t sr = ConfigManager::inst()->value( "audioengine", "samplerate" ).toInt();
 	if( sr < 44100 )
 	{
 		sr = 44100;
@@ -956,7 +954,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 {
 	bool success_ful = false;
 	AudioDevice * dev = nullptr;
-	QString dev_name = ConfigManager::inst()->value( "mixer", "audiodev" );
+	QString dev_name = ConfigManager::inst()->value( "audioengine", "audiodev" );
 	if( !isAudioDevNameValid( dev_name ) )
 	{
 		dev_name = "";
@@ -1102,8 +1100,7 @@ AudioDevice * AudioEngine::tryAudioDevices()
 
 MidiClient * AudioEngine::tryMidiClients()
 {
-	QString client_name = ConfigManager::inst()->value( "mixer",
-								"mididev" );
+	QString client_name = ConfigManager::inst()->value( "audioengine", "mididev" );
 	if( !isMidiDevNameValid( client_name ) )
 	{
 		client_name = "";

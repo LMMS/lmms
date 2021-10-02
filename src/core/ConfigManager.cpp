@@ -40,7 +40,9 @@
 
 // Vector with all the upgrade methods
 const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
-	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91
+	&ConfigManager::upgrade_1_1_90,
+	&ConfigManager::upgrade_1_1_91,
+	&ConfigManager::upgrade_1_2_2,
 };
 
 static inline QString ensureTrailingSlash(const QString & s )
@@ -119,16 +121,46 @@ void ConfigManager::upgrade_1_1_90()
 	}
 }
 
-	
 void ConfigManager::upgrade_1_1_91()
 {
 	// rename displaydbv to displaydbfs
-	if (!value("app", "displaydbv").isNull()) {
+	if (!value("app", "displaydbv").isNull())
+	{
 		setValue("app", "displaydbfs", value("app", "displaydbv"));
 		deleteValue("app", "displaydbv");
 	}
 }
 
+void ConfigManager::upgrade_1_2_2()
+{
+	// Rename mixer to audioengine
+	if (!value("mixer", "audiodev").isNull())
+	{
+		setValue("audioengine", "audiodev", value("mixer", "audiodev"));
+		deleteValue("mixer", "audiodev");
+	}
+	if (!value("mixer", "mididev").isNull())
+	{
+		setValue("audioengine", "mididev", value("mixer", "mididev"));
+		deleteValue("mixer", "mididev");
+	}
+	if (!value("mixer", "framesperaudiobuffer").isNull())
+	{
+		setValue("audioengine", "framesperaudiobuffer", value("mixer", "audiodev"));
+		deleteValue("mixer", "framesperaudiobuffer");
+	}
+	if (!value("mixer", "hqaudio").isNull())
+	{
+		setValue("audioengine", "hqaudio", value("mixer", "hqaudio"));
+		deleteValue("mixer", "hqaudio");
+	}
+	if (!value("mixer", "samplerate").isNull())
+	{
+		setValue("audioengine", "samplerate", value("mixer", "samplerate"));
+		deleteValue("mixer", "samplerate");
+	}
+	m_settings.remove("mixer");
+}
 
 void ConfigManager::upgrade()
 {

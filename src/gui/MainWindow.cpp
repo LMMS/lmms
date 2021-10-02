@@ -579,7 +579,7 @@ void MainWindow::finalize()
 	// user and is using AudioDummy as a fallback
 	// or the audio device is set to invalid one
 	else if( Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
-		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
+		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
