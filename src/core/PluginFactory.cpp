@@ -35,6 +35,12 @@
 #include "Plugin.h"
 #include "embed.h"
 
+// QT qHash specialization, needs to be in global namespace
+qint64 qHash(const QFileInfo& fi)
+{
+	return qHash(fi.absoluteFilePath());
+}
+
 namespace lmms
 {
 
@@ -44,11 +50,6 @@ namespace lmms
 #else
 	QStringList nameFilters("lib*.so");
 #endif
-
-qint64 qHash(const QFileInfo& fi)
-{
-	return qHash(fi.absoluteFilePath());
-}
 
 std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 
