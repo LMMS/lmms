@@ -48,6 +48,7 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"

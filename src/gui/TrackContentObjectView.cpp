@@ -39,6 +39,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
+#include "InstrumentTrackView.h"
 #include "Note.h"
 #include "Pattern.h"
 #include "SampleTrack.h"

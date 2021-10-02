@@ -39,7 +39,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "InstrumentTrack.h"
+#include "InstrumentTrackView.h"
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"

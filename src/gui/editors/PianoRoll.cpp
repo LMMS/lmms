@@ -64,6 +64,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "Pattern.h"
+#include "PianoView.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
