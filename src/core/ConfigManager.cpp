@@ -40,9 +40,8 @@
 
 // Vector with all the upgrade methods
 const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
-	&ConfigManager::upgrade_1_1_90,
-	&ConfigManager::upgrade_1_1_91,
-	&ConfigManager::upgrade_1_2_2,
+	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91,
+	&ConfigManager::upgrade_1_2_2
 };
 
 static inline QString ensureTrailingSlash(const QString & s )
