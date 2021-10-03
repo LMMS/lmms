@@ -132,7 +132,8 @@ void ConfigManager::upgrade_1_1_91()
 
 void ConfigManager::upgrade_1_2_2()
 {
-	// Rename mixer to audioengine
+	// Since mixer has been renamed to audioengine, we need to transfer the
+	// attributes from the old element to the new one
 	std::vector<QString> attrs = {
 		"audiodev", "mididev", "framesperaudiobuffer", "hqaudio", "samplerate"
 	};
