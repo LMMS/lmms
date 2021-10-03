@@ -329,64 +329,18 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent*)
 
 void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 {
-	// TODO: Read these from a config
-	auto leftCtrlAction = SelectSongTCO;
-	auto rightCtrlAction = MoveLoopClosest;
-	auto leftShiftAction = MoveLoopBegin;
-	auto rightShiftAction = MoveLoopEnd;
 	auto button = event->button();
 	auto mods = event->modifiers();
-	
-	// Unmodified LMB is reserved for playhead, unmodified RMB for context menu
-	// Shift or Ctrl modified press behavior is bound by the user
-	// Shift + Ctrl modifier is reserved for fine adjustment of Shift actions
-	// TODO: Let MMB be bound
-	
-	if (event->x() < m_xOffset || m_action != NoAction) { return; }
-	
-	// Choose an action based on input event and user's bindings
-	else if (button == Qt::LeftButton)
-	{
-		if (mods & Qt::ShiftModifier){ m_action = leftShiftAction; }
-		else if (mods == Qt::ControlModifier){ m_action = leftCtrlAction; }
-		// Handles moving playhead
-		else
-		{
-			m_action = MovePositionMarker;
-		}
-	}
-	else if (button == Qt::RightButton)
-	{
-		if (mods & Qt::ShiftModifier){ m_action = rightShiftAction; }
-		else if (mods == Qt::ControlModifier){ m_action = rightCtrlAction; }
-		else { contextMenuEvent(nullptr); }
-	}
-	
-	// Calculate the clicked position as a TimePos, several actions need this
-	const TimePos t = getPositionFromX(event->x());
-	
-	// Translate MoveLoopClosest into left or right based on distance
-	if (m_action == MoveLoopClosest)
-	{
-		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1]) / 2;
-		if (t < loopMid) { m_action = MoveLoopBegin; }
-		else { m_action = MoveLoopEnd; }
-	}
-	
-	// Set initial position for actions that need it
-	if (m_action == SelectSongTCO || m_action == DragLoop)
-	{
-		m_initalXSelect = event->x();
-	}
 
-	// Notify the user if they can disable quantization
-	if (m_action != MovePositionMarker && m_action != NoAction)
-	{
-		delete m_hint;
-		m_hint = TextFloat::displayMessage(tr("Hint"),
-			tr("Hold <%1> and <Shift> to disable quantization.").arg(UI_CTRL_KEY),
-			embed::getIconPixmap("hint"), 0);
-	}
+	if (event->x() < m_xOffset || m_action != NoAction) { return; }
+	// Handles moving playhead
+	else if (button == Qt::LeftButton && mods == Qt::NoModifier) { m_action = MovePositionMarker; }
+	// Wait for drag or release
+	else { m_action = Thresholded; }
+
+	// Set initial position for actions that need it
+	m_initalXSelect = event->x();
+
 	mouseMoveEvent(event);
 }
 
@@ -403,6 +357,20 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	{
 		delete m_hint;
 		m_hint = nullptr;
+	}
+
+	// Change action when mouse exceeds drag threshold
+	static const int dragThreshold = 5;
+	if (m_action == Thresholded && abs(event->x() - m_initalXSelect) > dragThreshold)
+	{
+		chooseMouseAction(event);
+	}
+
+	// Translate MoveLoopClosest into left or right based on distance
+	if (m_action == MoveLoopClosest)
+	{
+		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1]) / 2;
+		m_action = t < loopMid ? MoveLoopBegin : MoveLoopEnd;
 	}
 
 	switch (m_action)
@@ -451,10 +419,93 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = NULL;
-	if (m_action == SelectSongTCO) { emit selectionFinished(); }
+
+	// Change action if mouse has not moved
+	if (m_action == Thresholded) { chooseMouseAction(event); }
+
+	mouseMoveEvent(event);
+
+	switch (m_action)
+	{
+		case SelectSongTCO:
+			emit selectionFinished();
+			break;
+
+		case ShowContextMenu:
+			contextMenuEvent(nullptr);
+			break;
+
+		default:
+			break;
+	}
+
 	// Required when m_action == DragLoop, not harmful otherwise
 	if (m_loopPos[0] > m_loopPos[1]) { qSwap(m_loopPos[0], m_loopPos[1]); }
 	m_action = NoAction;
+}
+
+
+
+
+void TimeLineWidget::chooseMouseAction(QMouseEvent* event)
+{
+	auto buttons = event->button() | event->buttons(); // include released button
+	auto mods = event->modifiers();
+	auto type = event->type();
+
+	// TODO: Read these from a config
+	auto leftCtrlAction = SelectSongTCO;
+	auto rightCtrlAction = MoveLoopClosest;
+	auto leftShiftAction = MoveLoopBegin;
+	auto rightShiftAction = MoveLoopEnd;
+
+	// Unmodified LMB is reserved for playhead, unmodified RMB for context menu
+	// Shift or Ctrl modified press behavior is bound by the user
+	// Shift + Ctrl modifier is reserved for fine adjustment of Shift actions
+	// TODO: Let MMB be bound
+
+	m_action = NoAction;
+
+	// If mouse has moved past threshold
+	if (type == QEvent::MouseMove)
+	{
+		if (buttons & Qt::LeftButton)
+		{
+			if (mods & Qt::ShiftModifier) { m_action = leftShiftAction; }
+			else if (mods & Qt::ControlModifier) { m_action = leftCtrlAction; }
+		}
+		else if (buttons & Qt::RightButton)
+		{
+			if (mods & Qt::ShiftModifier) { m_action = rightShiftAction; }
+			else if (mods & Qt::ControlModifier) { m_action = rightCtrlAction; }
+		}
+	}
+	// If mouse has not moved
+	else if (type == QEvent::MouseButtonRelease)
+	{
+		if (buttons & Qt::LeftButton)
+		{
+			if (mods & Qt::ShiftModifier) { m_action = leftShiftAction; }
+		}
+		else if (buttons & Qt::RightButton)
+		{
+			if (mods & Qt::ShiftModifier) { m_action = rightShiftAction; }
+			else if (mods & Qt::ControlModifier) { m_action = rightCtrlAction; }
+			else { m_action = ShowContextMenu; }
+		}
+	}
+
+	// Notify the user if they can disable quantization
+	bool unquantizable = m_action == MoveLoopBegin || m_action == MoveLoopEnd
+						|| m_action == MoveLoopClosest || m_action == DragLoop;
+	bool unquantized = mods == (Qt::ControlModifier | Qt::ShiftModifier);
+	if (unquantizable && !unquantized && type == QEvent::MouseMove)
+	{
+		delete m_hint;
+		m_hint = TextFloat::displayMessage(tr("Hint"),
+			tr("Hold <%1> and <Shift> to disable quantization.").arg(UI_CTRL_KEY),
+			embed::getIconPixmap("hint"), 0);
+	}
 }
 
 

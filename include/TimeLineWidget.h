@@ -194,6 +194,7 @@ protected:
 
 
 private:
+	void chooseMouseAction(QMouseEvent* event);
 	TimePos getPositionFromX(const int x) const;
 	void setLoopPoint(bool end, int x, bool unquantized=false);
 
@@ -237,12 +238,14 @@ private:
 	enum actions
 	{
 		NoAction,
+		Thresholded,
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
 		MoveLoopClosest,
 		DragLoop,
 		SelectSongTCO,
+		ShowContextMenu
 	} m_action;
 
 
