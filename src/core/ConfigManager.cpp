@@ -133,31 +133,19 @@ void ConfigManager::upgrade_1_1_91()
 void ConfigManager::upgrade_1_2_2()
 {
 	// Rename mixer to audioengine
-	if (!value("mixer", "audiodev").isNull())
+	std::vector<QString> attrs = {
+		"audiodev", "mididev", "framesperaudiobuffer", "hqaudio", "samplerate"
+	};
+
+	for (auto attr : attrs)
 	{
-		setValue("audioengine", "audiodev", value("mixer", "audiodev"));
-		deleteValue("mixer", "audiodev");
+		if (!value("mixer", attr).isNull())
+		{
+			setValue("audioengine", attr, value("mixer", attr));
+			deleteValue("mixer", attr);
+		}
 	}
-	if (!value("mixer", "mididev").isNull())
-	{
-		setValue("audioengine", "mididev", value("mixer", "mididev"));
-		deleteValue("mixer", "mididev");
-	}
-	if (!value("mixer", "framesperaudiobuffer").isNull())
-	{
-		setValue("audioengine", "framesperaudiobuffer", value("mixer", "audiodev"));
-		deleteValue("mixer", "framesperaudiobuffer");
-	}
-	if (!value("mixer", "hqaudio").isNull())
-	{
-		setValue("audioengine", "hqaudio", value("mixer", "hqaudio"));
-		deleteValue("mixer", "hqaudio");
-	}
-	if (!value("mixer", "samplerate").isNull())
-	{
-		setValue("audioengine", "samplerate", value("mixer", "samplerate"));
-		deleteValue("mixer", "samplerate");
-	}
+
 	m_settings.remove("mixer");
 }
 
