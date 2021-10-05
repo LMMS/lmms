@@ -312,6 +312,17 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 void TimeLineWidget::contextMenuEvent(QContextMenuEvent*)
 {
 	QMenu contextMenu(tr("Timeline"), this);
+
+	// TODO: Shortcut hints should be read from a config
+
+	QAction setStartPoint(tr("Loop start (shift + left click)"), this);
+	connect(&setStartPoint, &QAction::triggered, this, [this](){
+		setLoopPoint(0, m_initalXSelect);
+	});
+	QAction setEndPoint(tr("Loop end (shift + right click)"), this);
+	connect(&setEndPoint, &QAction::triggered, this, [this](){
+		setLoopPoint(1, m_initalXSelect);
+	});
 	QAction selectLoopPoints(tr("Select between loop points"), this);
 	connect(&selectLoopPoints, &QAction::triggered, this, [this](){
 		emit regionSelectedFromPixels(
@@ -320,6 +331,8 @@ void TimeLineWidget::contextMenuEvent(QContextMenuEvent*)
 		);
 		emit selectionFinished();
 	});
+	contextMenu.addAction(&setStartPoint);
+	contextMenu.addAction(&setEndPoint);
 	contextMenu.addAction(&selectLoopPoints);
 	contextMenu.exec(QCursor::pos());
 }
@@ -455,7 +468,7 @@ void TimeLineWidget::chooseMouseAction(QMouseEvent* event)
 
 	// TODO: Read these from a config
 	auto leftCtrlAction = SelectSongTCO;
-	auto rightCtrlAction = MoveLoopClosest;
+	auto rightCtrlAction = NoAction;
 	auto leftShiftAction = MoveLoopBegin;
 	auto rightShiftAction = MoveLoopEnd;
 
