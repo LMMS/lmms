@@ -217,8 +217,6 @@ protected slots:
 
 	void hidePattern( Pattern* pattern );
 
-	void selectRegionFromPixels( int xStart, int xEnd );
-
 	void clearGhostPattern();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
@@ -275,6 +273,14 @@ private:
 		gridNudge,
 		gridSnap
 	//	gridFree
+	};
+
+	enum SelectionMode
+	{
+		SelectionReplace,
+		SelectionAdd,
+		SelectionSubtract,
+		SelectionInvert
 	};
 
 	PositionLine * m_positionLine;
@@ -432,7 +438,7 @@ private:
 	Note * noteUnderMouse();
 
 	// turn a selection rectangle into selected notes
-	void computeSelectedNotes( bool shift );
+	void computeSelectedNotes(SelectionMode mode=SelectionReplace);
 	void clearSelectedNotes();
 
 	// did we start a mouseclick with shift pressed
@@ -482,6 +488,9 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
+
+private slots:
+	void selectRegionFromPixels(int xStart, int xEnd, SelectionMode mode=SelectionReplace);
 
 signals:
 	void positionChanged( const TimePos & );
