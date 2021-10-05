@@ -22,7 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "PatternView.h"
 
 #include <QApplication>
@@ -186,7 +186,6 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 		m_pat->m_patternType == Pattern::BeatPattern &&
 		displayBB && _me->y() > height() - s_stepBtnOff->height() )
-		
 
 	// when mouse button is pressed in beat/bassline -mode
 
@@ -333,7 +332,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = getGUI()->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
-	
+
 	if( beatPattern )
 	{
 		// Do not paint BBTCOs how we paint pattern TCOs

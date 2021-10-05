@@ -58,10 +58,10 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 	ToolTip::add(this, m_pat->name());
 	setStyle( QApplication::style() );
-	
+
 	if( s_pat_rec == nullptr ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
 							"pat_rec" ) ); }
-							
+
 	update();
 }
 
@@ -273,14 +273,13 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	{
 		p.fillRect( rect(), c );
 	}
-	
+
+	// pixels per bar
 	const float ppb = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
 				/ (float) m_pat->timeMapLength().getBar() :
 								pixelsPerBar();
 
-	const int x_base = TCO_BORDER_WIDTH;
-	
 	const float min = m_pat->firstObject()->minValue<float>();
 	const float max = m_pat->firstObject()->maxValue<float>();
 
@@ -293,7 +292,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lin2grad( 0, min, 0, max );
 	QColor col;
-	
+
 	col = !muted ? painter.pen().brush().color() : mutedColor();
 
 	lin2grad.setColorAt( 1, col.lighter( 150 ) );
@@ -307,7 +306,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	{
 		if( it+1 == m_pat->getTimeMap().end() )
 		{
-			const float x1 = x_base + POS(it) * ppTick;
+			const float x1 = POS(it) * ppTick;
 			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 			// We are drawing the space after the last node, so we use the outValue
@@ -341,20 +340,20 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		}
 
 		QPainterPath path;
-		QPointF origin = QPointF(x_base + POS(it) * ppTick, 0.0f);
+		QPointF origin = QPointF(POS(it) * ppTick, 0.0f);
 		path.moveTo( origin );
-		path.moveTo(QPointF(x_base + POS(it) * ppTick,values[0]));
+		path.moveTo(QPointF(POS(it) * ppTick,values[0]));
 		float x;
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
-			x = x_base + i * ppTick;
+			x = i * ppTick;
 			if( x > ( width() - TCO_BORDER_WIDTH ) ) break;
 			float value = values[i - POS(it)];
 			path.lineTo( QPointF( x, value ) );
 
 		}
-		path.lineTo(x_base + (POS(it + 1)) * ppTick, nextValue);
-		path.lineTo(x_base + (POS(it + 1)) * ppTick, 0.0f);
+		path.lineTo((POS(it + 1)) * ppTick, nextValue);
+		path.lineTo((POS(it + 1)) * ppTick, 0.0f);
 		path.lineTo( origin );
 
 		if( gradient() )
@@ -370,37 +369,39 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	p.setRenderHints( QPainter::Antialiasing, false );
 	p.resetTransform();
-	
+
 	// bar lines
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for( bar_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t )
+	for (bar_t b = 1; b < width() - TCO_BORDER_WIDTH; ++b)
 	{
-		const int tx = x_base + static_cast<int>( ppb * t ) - 2;
-		p.drawLine( tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize );
-		p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
-					tx, rect().bottom() - TCO_BORDER_WIDTH );
+		const int bx = TCO_BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
+
+		//top line
+		p.drawLine(bx, TCO_BORDER_WIDTH, bx, TCO_BORDER_WIDTH + lineSize);
+
+		//bottom line
+		p.drawLine(bx, rect().bottom() - (lineSize + TCO_BORDER_WIDTH), bx, rect().bottom() - TCO_BORDER_WIDTH);
 	}
 
 	// recording icon for when recording automation
 	if( m_pat->isRecording() )
 	{
-		p.drawPixmap( 1, rect().bottom() - s_pat_rec->height(),
-		 	*s_pat_rec );
+		p.drawPixmap( 1, rect().bottom() - s_pat_rec->height(), *s_pat_rec );
 	}
-	
+
 	// pattern name
 	paintTextLabel(m_pat->name(), p);
-	
+
 	// inner border
 	p.setPen( c.lighter( current ? 160 : 130 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
-		
-	// outer border	
+
+	// outer border
 	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );	
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_pat->isMuted() )
