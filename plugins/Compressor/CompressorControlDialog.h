@@ -38,6 +38,8 @@
 #include "MainWindow.h"
 #include "PixmapButton.h"
 
+namespace lmms
+{
 
 constexpr int COMP_MILLI_PER_PIXEL = 6;
 constexpr int MIN_COMP_SCREEN_X = 800;
@@ -59,6 +61,11 @@ constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
 
 
 class CompressorControls;
+
+
+namespace gui
+{
+
 
 class CompressorControlDialog : public EffectControlDialog
 {
@@ -214,5 +221,11 @@ private:
 
 	friend class CompressorControls;
 } ;
+
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

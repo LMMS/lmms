@@ -33,6 +33,10 @@
 #include "RmsHelper.h"
 
 
+namespace lmms
+{
+
+
 constexpr float COMP_LOG = -2.2;
 
 class CompressorEffect : public Effect
@@ -147,7 +151,10 @@ private:
 	bool m_redrawThreshold = true;
 
 	friend class CompressorControls;
-	friend class CompressorControlDialog;
+	friend class gui::CompressorControlDialog;
 } ;
+
+
+} // namespace lmms
 
 #endif
