@@ -44,6 +44,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 static const int wavetableSize = 200;
 static const float defaultNormalizationFactor = 1.0f;
 
@@ -327,15 +331,16 @@ void bitInvader::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * bitInvader::instantiateView( QWidget * _parent )
+gui::PluginView * bitInvader::instantiateView( QWidget * _parent )
 {
-	return( new bitInvaderView( this, _parent ) );
+	return( new gui::bitInvaderView( this, _parent ) );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 bitInvaderView::bitInvaderView( Instrument * _instrument,
@@ -573,6 +578,7 @@ void bitInvaderView::normalizeToggled( bool value )
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -586,3 +592,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
+
+
+} // namespace lmms

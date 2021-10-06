@@ -35,8 +35,16 @@
 #include "LedCheckbox.h"
 #include "MemoryManager.h"
 
-class oscillator;
+namespace lmms
+{
+
+
+namespace gui
+{
 class bitInvaderView;
+}
+
+
 
 class bSynth
 {
@@ -84,7 +92,7 @@ public:
 		return( 64 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView * instantiateView( QWidget * _parent );
 
 protected slots:
 	void lengthChanged();
@@ -102,10 +110,12 @@ private:
 	
 	float m_normalizeFactor;
 	
-	friend class bitInvaderView;
+	friend class gui::bitInvaderView;
 } ;
 
 
+namespace gui
+{
 
 class bitInvaderView : public InstrumentViewFixedSize
 {
@@ -152,5 +162,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif
