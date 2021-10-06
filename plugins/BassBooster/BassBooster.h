@@ -30,6 +30,8 @@
 #include "DspEffectLibrary.h"
 #include "BassBoosterControls.h"
 
+namespace lmms
+{
 
 class BassBoosterEffect : public Effect
 {
@@ -59,5 +61,8 @@ private:
 	friend class BassBoosterControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

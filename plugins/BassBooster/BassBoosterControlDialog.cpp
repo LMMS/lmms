@@ -29,6 +29,9 @@
 #include "embed.h"
 
 
+namespace lmms::gui
+{
+
 
 BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* controls ) :
 	EffectControlDialog( controls )
@@ -66,3 +69,6 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	tl->addLayout( l );
 	setLayout( tl );
 }
+
+
+} // namespace lmms::gui
