@@ -29,6 +29,10 @@
 #include "EffectControls.h"
 #include "BitcrushControlDialog.h"
 
+namespace lmms
+{
+
+
 class BitcrushEffect;
 
 class BitcrushControls : public EffectControls
@@ -50,9 +54,9 @@ public:
 		return( 9 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog * createView()
 	{
-		return( new BitcrushControlDialog( this ) );
+		return( new gui::BitcrushControlDialog( this ) );
 	}
 
 private slots:
@@ -75,8 +79,11 @@ private:
 	BoolModel m_rateEnabled;
 	BoolModel m_depthEnabled;
 	
-	friend class BitcrushControlDialog;
+	friend class gui::BitcrushControlDialog;
 	friend class BitcrushEffect;
 };
+
+
+} // namespace lmms
 
 #endif
