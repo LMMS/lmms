@@ -38,6 +38,19 @@
 #include "ComboBox.h"
 
 
+namespace lmms
+{
+
+namespace gui
+{
+class PluginView;
+class InstrumentViewFixedSize;
+class Knob;
+class PixmapButton;
+class ComboBox;
+class AudioFileProcessorView;
+}
+
 class audioFileProcessor : public Instrument
 {
 	Q_OBJECT
@@ -64,7 +77,7 @@ public:
 		return 128;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 public slots:
@@ -102,16 +115,18 @@ private:
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
 
-	friend class AudioFileProcessorView;
+	friend class gui::AudioFileProcessorView;
 
 } ;
 
 
+namespace gui
+{
 
 class AudioFileProcessorWaveView;
 
 
-class AudioFileProcessorView : public InstrumentViewFixedSize
+class AudioFileProcessorView : public gui::InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
@@ -141,7 +156,7 @@ private:
 	Knob * m_endKnob;
 	Knob * m_loopKnob;
 
-	PixmapButton * m_openAudioFileButton;
+	gui::PixmapButton * m_openAudioFileButton;
 	PixmapButton * m_reverseButton;
 	automatableButtonGroup * m_loopGroup;
 	PixmapButton * m_stutterButton;
@@ -172,7 +187,7 @@ public:
 		loop
 	} ;
 
-	class knob : public ::Knob
+	class knob : public Knob
 	{
 		const AudioFileProcessorWaveView * m_waveView;
 		const Knob * m_relatedKnob;
@@ -180,7 +195,7 @@ public:
 
 	public:
 		knob( QWidget * _parent ) :
-			::Knob( knobBright_26, _parent ),
+			Knob( knobBright_26, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
@@ -285,6 +300,8 @@ private:
 } ;
 
 
+} // namespace gui
 
+} // namespace lmms
 
 #endif

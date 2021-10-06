@@ -49,6 +49,11 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -314,9 +319,9 @@ int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 
 
 
-PluginView * audioFileProcessor::instantiateView( QWidget * _parent )
+gui::PluginView* audioFileProcessor::instantiateView( QWidget * _parent )
 {
-	return new AudioFileProcessorView( this, _parent );
+	return new gui::AudioFileProcessorView( this, _parent );
 }
 
 
@@ -444,6 +449,8 @@ void audioFileProcessor::pointChanged( void )
 
 
 
+namespace gui
+{
 
 
 QPixmap * AudioFileProcessorView::s_artwork = nullptr;
@@ -1244,7 +1251,7 @@ float AudioFileProcessorWaveView::knob::getValue( const QPoint & _p )
 	const double dec_fact = ! m_waveView ? 1 :
 		double( m_waveView->m_to - m_waveView->m_from )
 			/ m_waveView->m_sampleBuffer.frames();
-	const float inc = ::Knob::getValue( _p ) * dec_fact;
+	const float inc = Knob::getValue( _p ) * dec_fact;
 
 	return inc;
 }
@@ -1275,6 +1282,7 @@ bool AudioFileProcessorWaveView::knob::checkBound( double _v ) const
 }
 
 
+} // namespace gui
 
 
 
@@ -1290,3 +1298,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * model, void *)
 
 
 }
+
+
+} // namespace lmms
