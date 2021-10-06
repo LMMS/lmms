@@ -30,10 +30,17 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 class BoolModel;
 class FloatModel;
 
 class EqControls;
+
+namespace gui
+{
+
 class EqBand;
 class EqParameterWidget;
 
@@ -58,5 +65,10 @@ private:
 
 	int m_originalHeight;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // EQCONTROLSDIALOG_H

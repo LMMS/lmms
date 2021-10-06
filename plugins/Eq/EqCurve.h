@@ -31,6 +31,9 @@
 #include "lmms_math.h"
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
+
 
 enum{
 	highpass=1,
@@ -136,5 +139,8 @@ private:
 	float m_pixelsPerUnitHeight;
 	float m_scale;
 };
+
+
+} // namespace lmms::gui
 
 #endif // EQCURVE_H

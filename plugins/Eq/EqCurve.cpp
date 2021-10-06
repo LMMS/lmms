@@ -27,6 +27,10 @@
 #include "embed.h"
 #include "lmms_math.h"
 
+namespace lmms::gui
+{
+
+
 EqHandle::EqHandle( int num, int x, int y ):
 	m_numb( num ),
 	m_width( x ),
@@ -809,3 +813,6 @@ void EqCurve::setModelChanged( bool mc )
 {
 	m_modelChanged = mc;
 }
+
+
+} // namespace lmms::gui

@@ -33,6 +33,9 @@
 #include "EqControls.h"
 #include "lmms_math.h"
 
+namespace lmms::gui
+{
+
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	QWidget( parent ),
@@ -240,3 +243,6 @@ EqBand::EqBand() :
 	peakR( 0 )
 {
 }
+
+
+} // namespace lmms::gui

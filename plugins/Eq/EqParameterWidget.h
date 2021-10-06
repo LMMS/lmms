@@ -33,7 +33,14 @@
 #include "EqCurve.h"
 #include "TextFloat.h"
 
+namespace lmms
+{
+
 class EqControls;
+
+
+namespace gui
+{
 
 class EqBand
 {
@@ -92,4 +99,10 @@ private slots:
 	void updateModels();
 	void updateHandle();
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // EQPARAMETERWIDGET_H

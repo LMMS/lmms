@@ -31,6 +31,9 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 
+namespace lmms
+{
+
 
 const int MAX_BANDS = 2048;
 class EqAnalyser
@@ -65,7 +68,8 @@ private:
 };
 
 
-
+namespace gui
+{
 
 class EqSpectrumView : public QWidget
 {
@@ -98,4 +102,10 @@ private:
 
 	float bandToFreq ( int index );
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // EQSPECTRUMVIEW_H

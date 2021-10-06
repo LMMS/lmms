@@ -42,6 +42,9 @@
 #include "EqParameterWidget.h"
 #include "EqSpectrumView.h"
 
+namespace lmms::gui
+{
+
 
 EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	EffectControlDialog( controls ),
@@ -238,3 +241,6 @@ EqBand* EqControlsDialog::setBand(int index, BoolModel* active, FloatModel* freq
 	filterModels->lp48 = lp48;
 	return filterModels;
 }
+
+
+} // namespace lmms::gui
