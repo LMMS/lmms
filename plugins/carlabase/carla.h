@@ -63,7 +63,15 @@
 class QPushButton;
 class QComboBox;
 
+
+namespace lmms
+{
+
+namespace gui
+{
 class CarlaParamsView;
+class CarlaInstrumentView;
+}
 
 class CarlaParamFloatModel : public FloatModel
 {
@@ -158,9 +166,79 @@ private:
 
 // -------------------------------------------------------------------
 
+class CARLABASE_EXPORT CarlaInstrument : public Instrument
+{
+    Q_OBJECT
+
+public:
+    static const uint32_t kMaxMidiEvents = 512;
+
+    CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay);
+    virtual ~CarlaInstrument();
+
+    // Carla NativeHostDescriptor functions
+    uint32_t handleGetBufferSize() const;
+    double handleGetSampleRate() const;
+    bool handleIsOffline() const;
+    const NativeTimeInfo* handleGetTimeInfo() const;
+    void handleUiParameterChanged(const uint32_t index, const float value) const;
+    void handleUiClosed();
+    intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
+
+    // LMMS functions
+    virtual Flags flags() const;
+    virtual QString nodeName() const;
+    virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
+    virtual void loadSettings(const QDomElement& elem);
+    virtual void play(sampleFrame* workingBuffer);
+    virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset);
+    virtual gui::PluginView* instantiateView(QWidget* parent);
+
+signals:
+    void uiClosed();
+    void paramsUpdated();
+
+private slots:
+    void sampleRateChanged();
+    void refreshParams(bool init = false);
+    void clearParamModels();
+    void paramModelChanged(uint32_t index);
+    void updateParamModel(uint32_t index);
+
+private:
+    const bool kIsPatchbay;
+
+    NativePluginHandle fHandle;
+    NativeHostDescriptor fHost;
+    const NativePluginDescriptor* fDescriptor;
+
+    uint32_t        fMidiEventCount;
+    NativeMidiEvent fMidiEvents[kMaxMidiEvents];
+    NativeTimeInfo  fTimeInfo;
+
+    // this is only needed because note-offs are being sent during play
+    QMutex fMutex;
+
+    uint8_t m_paramGroupCount;
+    QList<CarlaParamFloatModel*> m_paramModels;
+    QDomElement m_settingsElem;
+
+    QCompleter* m_paramsCompleter;
+    QStringListModel* m_completerModel;
+
+    friend class gui::CarlaInstrumentView;
+    friend class gui::CarlaParamsView;
+};
+
+
+// -------------------------------------------------------------------
+
+namespace gui
+{
+
 class CarlaParamsSubWindow : public SubWindow
 {
-	Q_OBJECT
+Q_OBJECT
 
 signals:
 	void uiClosed();
@@ -208,73 +286,6 @@ private:
 	bool resizing = false;
 	bool mousePress = false;
 };
-
-// -------------------------------------------------------------------
-
-class CARLABASE_EXPORT CarlaInstrument : public Instrument
-{
-    Q_OBJECT
-
-public:
-    static const uint32_t kMaxMidiEvents = 512;
-
-    CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay);
-    virtual ~CarlaInstrument();
-
-    // Carla NativeHostDescriptor functions
-    uint32_t handleGetBufferSize() const;
-    double handleGetSampleRate() const;
-    bool handleIsOffline() const;
-    const NativeTimeInfo* handleGetTimeInfo() const;
-    void handleUiParameterChanged(const uint32_t index, const float value) const;
-    void handleUiClosed();
-    intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
-
-    // LMMS functions
-    virtual Flags flags() const;
-    virtual QString nodeName() const;
-    virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
-    virtual void loadSettings(const QDomElement& elem);
-    virtual void play(sampleFrame* workingBuffer);
-    virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset);
-    virtual PluginView* instantiateView(QWidget* parent);
-
-signals:
-    void uiClosed();
-    void paramsUpdated();
-
-private slots:
-    void sampleRateChanged();
-    void refreshParams(bool init = false);
-    void clearParamModels();
-    void paramModelChanged(uint32_t index);
-    void updateParamModel(uint32_t index);
-
-private:
-    const bool kIsPatchbay;
-
-    NativePluginHandle fHandle;
-    NativeHostDescriptor fHost;
-    const NativePluginDescriptor* fDescriptor;
-
-    uint32_t        fMidiEventCount;
-    NativeMidiEvent fMidiEvents[kMaxMidiEvents];
-    NativeTimeInfo  fTimeInfo;
-
-    // this is only needed because note-offs are being sent during play
-    QMutex fMutex;
-
-    uint8_t m_paramGroupCount;
-    QList<CarlaParamFloatModel*> m_paramModels;
-    QDomElement m_settingsElem;
-
-    QCompleter* m_paramsCompleter;
-    QStringListModel* m_completerModel;
-
-    friend class CarlaInstrumentView;
-    friend class CarlaParamsView;
-};
-
 
 // -------------------------------------------------------------------
 
@@ -361,5 +372,10 @@ private:
 	QComboBox* m_groupFilterCombo;
 	QStringListModel* m_groupFilterModel;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

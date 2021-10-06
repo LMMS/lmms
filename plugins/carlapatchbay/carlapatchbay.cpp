@@ -28,6 +28,10 @@
 #include "plugin_export.h"
 #include "InstrumentTrack.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -51,3 +55,6 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 }
 
 }
+
+
+} // namespace lmms

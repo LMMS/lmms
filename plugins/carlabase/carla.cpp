@@ -56,6 +56,9 @@
 
 #include "embed.h"
 
+namespace lmms
+{
+
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
 
@@ -142,6 +145,7 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 }
 
 // -----------------------------------------------------------------------
+
 
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
     : Instrument(instrumentTrack, descriptor),
@@ -573,7 +577,7 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_
     return true;
 }
 
-PluginView* CarlaInstrument::instantiateView(QWidget* parent)
+gui::PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 {
 // Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
 #ifndef CARLA_OS_MAC
@@ -590,7 +594,7 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
     //fHost.uiName = strdup(parent->windowTitle().toUtf8().constData());
     fHost.uiName = strdup(kIsPatchbay ? "CarlaPatchbay-LMMS" : "CarlaRack-LMMS");
 
-    return new CarlaInstrumentView(this, parent);
+    return new gui::CarlaInstrumentView(this, parent);
 }
 
 void CarlaInstrument::sampleRateChanged()
@@ -599,6 +603,9 @@ void CarlaInstrument::sampleRateChanged()
 }
 
 // -------------------------------------------------------------------
+
+namespace gui
+{
 
 CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent)
     : InstrumentViewFixedSize(instrument, parent),
@@ -1109,3 +1116,8 @@ void CarlaParamsView::clearKnobs()
 	m_curOutColumn = 0;
 	m_curOutRow = 0;
 }
+
+
+} // namespace gui
+
+} // namespace lmms
