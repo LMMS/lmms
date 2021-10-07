@@ -217,6 +217,8 @@ protected slots:
 
 	void hidePattern( Pattern* pattern );
 
+	void selectRegionFromPixels( int xStart, int xEnd );
+
 	void clearGhostPattern();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
@@ -488,9 +490,6 @@ private:
 	QBrush m_blackKeyActiveBackground;
 	QBrush m_blackKeyInactiveBackground;
 	QBrush m_blackKeyDisabledBackground;
-
-private slots:
-	void selectRegionFromPixels(int xStart, int xEnd, SelectionMode mode=SelectionReplace);
 
 signals:
 	void positionChanged( const TimePos & );

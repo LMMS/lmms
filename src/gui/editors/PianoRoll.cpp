@@ -927,7 +927,7 @@ void PianoRoll::hidePattern( Pattern* pattern )
 	}
 }
 
-void PianoRoll::selectRegionFromPixels(int xStart, int xEnd, SelectionMode mode)
+void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 {
 
 	xStart -= m_whiteKeyWidth;
@@ -960,7 +960,7 @@ void PianoRoll::selectRegionFromPixels(int xStart, int xEnd, SelectionMode mode)
 		--m_selectedKeys;
 	}
 
-	computeSelectedNotes(mode);
+	computeSelectedNotes(SelectionReplace);
 }
 
 
@@ -2053,7 +2053,11 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 			mode = clickedNote->selected() ? SelectionAdd : SelectionSubtract;
 		}
 
-		selectRegionFromPixels(me->x(), me->x(), mode);
+		m_selectStartTick = (me->x() - m_whiteKeyWidth) * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
+		m_selectedTick = 1;
+		m_selectStartKey = 0;
+		m_selectedKeys = NumKeys;
+		computeSelectedNotes(mode);
 	}
 	else
 	{
