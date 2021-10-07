@@ -41,8 +41,17 @@
 class QPixmap;
 class QPushButton;
 
-class PixmapButton;
+namespace lmms
+{
+
 class VstPlugin;
+
+namespace gui
+{
+class PixmapButton;
+class VestigeInstrumentView;
+class manageVestigeInstrumentView;
+} // namespace gui
 
 
 class vestigeInstrument : public Instrument
@@ -68,7 +77,7 @@ public:
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 protected slots:
 	void setParameter( Model * action );
@@ -90,11 +99,14 @@ private:
 	int paramCount;
 
 
-	friend class VestigeInstrumentView;
-	friend class manageVestigeInstrumentView;
+	friend class gui::VestigeInstrumentView;
+	friend class gui::manageVestigeInstrumentView;
 
 } ;
 
+
+namespace gui
+{
 
 class manageVestigeInstrumentView : public InstrumentViewFixedSize
 {
@@ -184,5 +196,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

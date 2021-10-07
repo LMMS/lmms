@@ -63,6 +63,8 @@
 
 #include "embed.h"
 
+namespace lmms
+{
 
 
 extern "C"
@@ -83,6 +85,9 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 } ;
 
 }
+
+namespace gui
+{
 
 
 class vstSubWin : public SubWindow
@@ -109,6 +114,9 @@ public:
 };
 
 
+} // namespace gui
+
+
 class VstInstrumentPlugin : public VstPlugin
 {
 public:
@@ -121,7 +129,7 @@ public:
 			return;
 		}
 		if ( embedMethod() != "none" ) {
-			m_pluginSubWindow.reset(new vstSubWin( getGUI()->mainWindow()->workspace() ));
+			m_pluginSubWindow.reset(new gui::vstSubWin( getGUI()->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
 			m_pluginSubWindow->setWidget(pluginWidget());
 		} else {
@@ -139,10 +147,6 @@ public:
 private:
 	std::unique_ptr<QMdiSubWindow> m_pluginSubWindow;
 };
-
-
-QPixmap * VestigeInstrumentView::s_artwork = nullptr;
-QPixmap * manageVestigeInstrumentView::s_artwork = nullptr;
 
 
 vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
@@ -347,10 +351,10 @@ void vestigeInstrument::loadFile( const QString & _file )
 		closePlugin();
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
-	TextFloat * tf = nullptr;
+	gui::TextFloat * tf = nullptr;
 	if( getGUI() != nullptr )
 	{
-		tf = TextFloat::displayMessage(
+		tf = gui::TextFloat::displayMessage(
 				tr( "Loading plugin" ),
 				tr( "Please wait while loading the VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -474,13 +478,17 @@ void vestigeInstrument::closePlugin( void )
 
 
 
-PluginView * vestigeInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* vestigeInstrument::instantiateView( QWidget * _parent )
 {
-	return new VestigeInstrumentView( this, _parent );
+	return new gui::VestigeInstrumentView( this, _parent );
 }
 
 
+namespace gui
+{
 
+QPixmap * VestigeInstrumentView::s_artwork = nullptr;
+QPixmap * manageVestigeInstrumentView::s_artwork = nullptr;
 
 
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
@@ -1227,6 +1235,7 @@ void manageVestigeInstrumentView::paintEvent( QPaintEvent * )
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -1240,3 +1249,6 @@ Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
+
+
+} // namespace lmms
