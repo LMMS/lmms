@@ -36,7 +36,16 @@
 
 class QMouseEvent;
 class QPainter;
+
+namespace lmms
+{
+
+
 class SaProcessor;
+
+namespace gui
+{
+
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid
 class SaSpectrumView : public QWidget
@@ -127,5 +136,11 @@ private:
 		float m_draw_avg;
 	#endif
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // SASPECTRUMVIEW_H
 

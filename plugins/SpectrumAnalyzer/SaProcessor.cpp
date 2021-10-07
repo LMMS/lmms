@@ -39,6 +39,9 @@
 #include "lmms_math.h"
 #include "LocklessRingBuffer.h"
 
+namespace lmms
+{
+
 
 SaProcessor::SaProcessor(const SaControls *controls) :
 	m_controls(controls),
@@ -690,3 +693,5 @@ float SaProcessor::yPixelToAmp(float y, unsigned int height) const
 	}
 }
 
+
+} // namespace lmms

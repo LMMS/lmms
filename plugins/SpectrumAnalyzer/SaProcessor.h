@@ -35,6 +35,9 @@
 #include "fft_helpers.h"
 #include "SaControls.h"
 
+namespace lmms
+{
+
 template<class T>
 class LocklessRingBuffer;
 
@@ -156,5 +159,9 @@ private:
 		float m_max_execution;
 	#endif
 };
+
+
+} // namespace lmms
+
 #endif // SAPROCESSOR_H
 

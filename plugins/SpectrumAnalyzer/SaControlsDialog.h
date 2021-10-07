@@ -32,6 +32,10 @@
 #include "SaWaterfallView.h"
 
 
+namespace lmms::gui
+{
+
+
 //! Top-level widget holding the configuration GUI and spectrum displays
 class SaControlsDialog : public EffectControlDialog
 {
@@ -53,5 +57,8 @@ private:
 	SaSpectrumView *m_spectrum;
 	SaWaterfallView *m_waterfall;
 };
+
+
+} // namespace lmms::gui
 
 #endif // SACONTROLSDIALOG_H

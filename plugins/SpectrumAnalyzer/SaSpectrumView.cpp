@@ -41,6 +41,9 @@
 	#include <chrono>
 #endif
 
+namespace lmms::gui
+{
+
 
 SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
@@ -811,3 +814,5 @@ void SaSpectrumView::resizeEvent(QResizeEvent *event)
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 }
 
+
+} // namespace lmms::gui

@@ -35,6 +35,9 @@
 #include "SaControls.h"
 #include "SaProcessor.h"
 
+namespace lmms
+{
+
 
 //! Top level class; handles LMMS interface and feeds data to the data processor.
 class Analyzer : public Effect
@@ -70,6 +73,9 @@ private:
 		float m_max_execution;
 	#endif
 };
+
+
+} // namespace lmms
 
 #endif // ANALYZER_H
 
