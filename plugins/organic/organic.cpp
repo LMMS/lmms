@@ -43,6 +43,9 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C"
 {
@@ -63,7 +66,6 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 
 }
 
-QPixmap * organicInstrumentView::s_artwork = nullptr;
 float * organicInstrument::s_harmonics = nullptr;
 
 /***********************************************************************
@@ -394,12 +396,14 @@ int organicInstrument::intRand( int min, int max )
 }
 
 
-PluginView * organicInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* organicInstrument::instantiateView( QWidget * _parent )
 {
-	return( new organicInstrumentView( this, _parent ) );
+	return( new gui::organicInstrumentView( this, _parent ) );
 }
 
 
+namespace gui
+{
 
 
 class organicKnob : public Knob
@@ -413,6 +417,7 @@ public:
 };
 
 
+QPixmap * organicInstrumentView::s_artwork = nullptr;
 
 
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
@@ -559,6 +564,7 @@ void organicInstrumentView::updateKnobHint()
 }
 
 
+} // namespace gui
 
 
 OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
@@ -629,8 +635,6 @@ void OscillatorObject::updateDetuning()
 }
 
 
-
-
 extern "C"
 {
 
@@ -654,5 +658,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
  */
 
 
-
-
+} // namespace lmms
