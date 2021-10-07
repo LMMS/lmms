@@ -56,6 +56,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -704,9 +708,9 @@ void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * GigInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* GigInstrument::instantiateView( QWidget * _parent )
 {
-	return new GigInstrumentView( this, _parent );
+	return new gui::GigInstrumentView( this, _parent );
 }
 
 
@@ -908,6 +912,9 @@ void GigInstrument::updateSampleRate()
 
 
 
+namespace gui
+{
+
 
 class gigKnob : public Knob
 {
@@ -1095,6 +1102,7 @@ void GigInstrumentView::showPatchDialog()
 }
 
 
+} // namespace gui
 
 
 // Store information related to playing a sample from the GIG file
@@ -1397,3 +1405,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 }
+
+
+} // namespace lmms
