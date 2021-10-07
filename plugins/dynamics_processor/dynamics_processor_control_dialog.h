@@ -28,9 +28,15 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 
 class dynProcControls;
 
+
+namespace gui
+{
 
 class dynProcControlDialog : public EffectControlDialog
 {
@@ -45,5 +51,10 @@ public:
 private:
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

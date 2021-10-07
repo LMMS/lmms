@@ -31,6 +31,10 @@
 #include "Knob.h"
 #include "Graph.h"
 
+namespace lmms
+{
+
+
 class dynProcEffect;
 
 
@@ -64,9 +68,9 @@ public:
 		return( 6 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog * createView()
 	{
-		return( new dynProcControlDialog( this ) );
+		return( new gui::dynProcControlDialog( this ) );
 	}
 
 
@@ -90,9 +94,12 @@ private:
 	graphModel m_wavegraphModel;
 	IntModel m_stereomodeModel;
 
-	friend class dynProcControlDialog;
+	friend class gui::dynProcControlDialog;
 	friend class dynProcEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

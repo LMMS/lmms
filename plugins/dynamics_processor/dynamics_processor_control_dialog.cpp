@@ -34,6 +34,9 @@
 #include "ToolTip.h"
 #include "LedCheckbox.h"
 
+namespace lmms::gui
+{
+
 
 dynProcControlDialog::dynProcControlDialog(
 					dynProcControls * _controls ) :
@@ -153,3 +156,5 @@ dynProcControlDialog::dynProcControlDialog(
 			_controls, SLOT( subOneClicked() ) );
 }
 
+
+} // namespace lmms::gui

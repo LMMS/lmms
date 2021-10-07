@@ -31,6 +31,9 @@
 #include "dynamics_processor_controls.h"
 #include "RmsHelper.h"
 
+namespace lmms
+{
+
 
 class dynProcEffect : public Effect
 {
@@ -67,7 +70,6 @@ private:
 } ;
 
 
-
-
+} // namespace lmms
 
 #endif
