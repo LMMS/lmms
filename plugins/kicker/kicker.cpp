@@ -38,6 +38,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -218,12 +222,14 @@ void kickerInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * kickerInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* kickerInstrument::instantiateView( QWidget * _parent )
 {
-	return new kickerInstrumentView( this, _parent );
+	return new gui::kickerInstrumentView( this, _parent );
 }
 
 
+namespace gui
+{
 
 
 class kickerKnob : public Knob
@@ -359,7 +365,7 @@ void kickerInstrumentView::modelChanged()
 }
 
 
-
+} // namespace gui
 
 
 extern "C"
@@ -375,5 +381,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
-
-
+} // namespace lmms

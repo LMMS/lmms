@@ -35,11 +35,18 @@
 #include "TempoSyncKnob.h"
 
 
+namespace lmms
+{
+
 #define KICKER_PRESET_VERSION 1
 
 
-class kickerInstrumentView;
 class NotePlayHandle;
+
+namespace gui
+{
+class kickerInstrumentView;
+}
 
 
 class kickerInstrument : public Instrument
@@ -68,7 +75,7 @@ public:
 		return( 512 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 
 private:
@@ -88,10 +95,13 @@ private:
 
 	IntModel m_versionModel;
 
-	friend class kickerInstrumentView;
+	friend class gui::kickerInstrumentView;
 
 } ;
 
+
+namespace gui
+{
 
 
 class kickerInstrumentView : public InstrumentViewFixedSize
@@ -121,5 +131,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif
