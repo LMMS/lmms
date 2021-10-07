@@ -43,6 +43,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -376,12 +380,14 @@ void malletsInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * malletsInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* malletsInstrument::instantiateView( QWidget * _parent )
 {
-	return( new malletsInstrumentView( this, _parent ) );
+	return( new gui::malletsInstrumentView( this, _parent ) );
 }
 
 
+namespace gui
+{
 
 
 malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
@@ -604,6 +610,8 @@ void malletsInstrumentView::changePreset()
 }
 
 
+} // namespace gui
+
 
 // ModalBar
 malletsSynth::malletsSynth( const StkFloat _pitch,
@@ -769,6 +777,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
-
-
-
+} // namespace lmms

@@ -40,9 +40,21 @@
 // However in older versions this namespace does not exist, therefore declare it
 // so this plugin builds with all versions of Stk.
 namespace stk { } ;
+
+namespace lmms
+{
+
+
 using namespace stk;
 
 static const int MALLETS_PRESET_VERSION = 1;
+
+
+namespace gui
+{
+class malletsInstrumentView;
+} // namespace gui
+
 
 class malletsSynth
 {
@@ -160,7 +172,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private:
@@ -193,9 +205,12 @@ private:
 	bool m_filesMissing;
 
 
-	friend class malletsInstrumentView;
+	friend class gui::malletsInstrumentView;
 
 } ;
+
+namespace gui
+{
 
 
 class malletsInstrumentView: public InstrumentViewFixedSize
@@ -241,5 +256,10 @@ private:
 	ComboBox * m_presetsCombo;
 	Knob * m_spreadKnob;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
