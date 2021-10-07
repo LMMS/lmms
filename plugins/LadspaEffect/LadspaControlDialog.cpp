@@ -34,6 +34,8 @@
 #include "LadspaControlView.h"
 #include "LedCheckbox.h"
 
+namespace lmms::gui
+{
 
 
 LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
@@ -144,5 +146,4 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 }
 
 
-
-
+} // namespace lmms::gui
