@@ -42,6 +42,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -403,9 +407,9 @@ void TripleOscillator::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * TripleOscillator::instantiateView( QWidget * _parent )
+gui::PluginView* TripleOscillator::instantiateView( QWidget * _parent )
 {
-	return new TripleOscillatorView( this, _parent );
+	return new gui::TripleOscillatorView( this, _parent );
 }
 
 
@@ -421,6 +425,9 @@ void TripleOscillator::updateAllDetuning()
 }
 
 
+
+namespace gui
+{
 
 
 class TripleOscKnob : public Knob
@@ -749,6 +756,7 @@ void TripleOscillatorView::modelChanged()
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -764,4 +772,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* model, void * )
 
 
 
-
+} // namespace lmms
