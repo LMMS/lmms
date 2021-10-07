@@ -31,6 +31,9 @@
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
 
+namespace lmms
+{
+
 
 const int BUFFER_SIZE = 50*1024;
 typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
@@ -60,7 +63,7 @@ public:
 	MidiExport();
 	~MidiExport();
 
-	virtual PluginView *instantiateView(QWidget *)
+	virtual gui::PluginView* instantiateView(QWidget *)
 	{
 		return nullptr;
 	}
@@ -82,5 +85,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

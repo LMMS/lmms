@@ -52,6 +52,10 @@
 
 #include "portsmf/allegro.h"
 
+namespace lmms
+{
+
+
 #define makeID(_c0, _c1, _c2, _c3) \
 		( 0 | \
 		( ( _c0 ) | ( ( _c1 ) << 8 ) | ( ( _c2 ) << 16 ) | ( ( _c3 ) << 24 ) ) )
@@ -656,3 +660,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms
