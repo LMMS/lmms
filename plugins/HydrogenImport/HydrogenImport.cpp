@@ -22,6 +22,11 @@
 #include "plugin_export.h"
 
 #define MAX_LAYERS 4
+
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -357,3 +362,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms

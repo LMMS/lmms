@@ -7,6 +7,9 @@
 
 #include "ImportFilter.h"
 
+namespace lmms
+{
+
 
 class HydrogenImport : public ImportFilter
 {
@@ -16,12 +19,16 @@ public:
 
 	virtual ~HydrogenImport();
 
-	virtual PluginView * instantiateView( QWidget * )
+	virtual gui::PluginView* instantiateView( QWidget * )
 	{
 		return( nullptr );
 	}
 private:
 	virtual bool tryImport( TrackContainer* tc );
 };
+
+
+} // namespace lmms
+
 #endif
 

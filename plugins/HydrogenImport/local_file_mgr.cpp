@@ -13,6 +13,9 @@
 #include <algorithm>
 #include "LocalFileMng.h"
 
+namespace lmms
+{
+
 
 /* New QtXml based methods */
 
@@ -232,3 +235,5 @@ QDomDocument LocalFileMng::openXmlDocument( const QString& filename )
 	return doc;
 }
 
+
+} // namespace lmms
