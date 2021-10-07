@@ -40,10 +40,20 @@
 #include "NotePlayHandle.h"
 #include <QMutex>
 
+namespace lmms
+{
+
+
 static const int NUM_FILTERS = 2;
 
-class lb302SynthView;
 class NotePlayHandle;
+
+
+namespace gui
+{
+class lb302SynthView;
+}
+
 
 class lb302FilterKnobState
 {
@@ -162,7 +172,7 @@ public:
 		return 0; //4048;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 private:
 	void processNote( NotePlayHandle * n );
@@ -248,12 +258,16 @@ private:
 
 	int process(sampleFrame *outbuf, const int size);
 
-	friend class lb302SynthView;
+	friend class gui::lb302SynthView;
 
 	NotePlayHandle * m_playingNote;
 	NotePlayHandleList m_notes;
 	QMutex m_notesMutex;
 } ;
+
+
+namespace gui
+{
 
 
 class lb302SynthView : public InstrumentViewFixedSize
@@ -282,5 +296,10 @@ private:
 	LedCheckBox * m_db24Toggle;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
