@@ -39,14 +39,22 @@
 #include "fluidsynthshims.h"
 #include "MemoryManager.h"
 
-class sf2InstrumentView;
+class QLabel;
+
+namespace lmms
+{
+
+
+struct SF2PluginData;
 class sf2Font;
 class NotePlayHandle;
 
+namespace gui
+{
+class sf2InstrumentView;
 class patchesDialog;
-class QLabel;
+} // namespace gui
 
-struct SF2PluginData;
 
 class sf2Instrument : public Instrument
 {
@@ -84,7 +92,7 @@ public:
 		return IsSingleStreamed;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 	
 	QString getCurrentPatchName();
 
@@ -134,8 +142,8 @@ private:
 	int m_lastMidiPitchRange;
 	int m_channel;
 
-	LcdSpinBoxModel m_bankNum;
-	LcdSpinBoxModel m_patchNum;
+	gui::LcdSpinBoxModel m_bankNum;
+	gui::LcdSpinBoxModel m_patchNum;
 
 	FloatModel m_gain;
 
@@ -160,7 +168,7 @@ private:
 	void noteOff( SF2PluginData * n );
 	void renderFrames( f_cnt_t frames, sampleFrame * buf );
 
-	friend class sf2InstrumentView;
+	friend class gui::sf2InstrumentView;
 
 signals:
 	void fileLoading();
@@ -185,6 +193,9 @@ public:
 	int refCount;
 };
 
+
+namespace gui
+{
 
 
 class sf2InstrumentView : public InstrumentViewFixedSize
@@ -232,5 +243,8 @@ protected slots:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

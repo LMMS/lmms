@@ -28,6 +28,9 @@
 #include <QHeaderView>
 //#include <QFileInfo>
 
+namespace lmms::gui
+{
+
 
 // Custom list-view item (as for numerical sort purposes...)
 class patchItem : public QTreeWidgetItem
@@ -377,4 +380,4 @@ void patchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 }
 
 
-
+} // namespace lmms::gui

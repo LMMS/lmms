@@ -33,6 +33,9 @@
 #include <QWidget>
 #include <QLabel>
 
+namespace lmms::gui
+{
+
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
 
@@ -90,6 +93,8 @@ private:
 	QLabel *m_patchLabel;
 };
 
+
+} // namespace lmms::gui
 
 #endif
 
