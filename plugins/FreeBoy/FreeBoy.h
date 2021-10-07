@@ -33,9 +33,19 @@
 #include "Graph.h"
 #include "Gb_Apu.h"
 
-class FreeBoyInstrumentView;
+namespace lmms
+{
+
+
 class NotePlayHandle;
+
+
+namespace gui
+{
 class PixmapButton;
+class FreeBoyInstrumentView;
+}
+
 
 class FreeBoyInstrument : public Instrument
 {
@@ -57,7 +67,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 
 /*public slots:
@@ -107,8 +117,12 @@ private:
 	blip_time_t m_time;
 	blip_time_t fakeClock() { return m_time += 4; }
 
-	friend class FreeBoyInstrumentView;
+	friend class gui::FreeBoyInstrumentView;
 } ;
+
+
+namespace gui
+{
 
 
 class FreeBoyInstrumentView : public InstrumentViewFixedSize
@@ -161,5 +175,9 @@ private:
 	void updateKnobToolTip();*/
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
