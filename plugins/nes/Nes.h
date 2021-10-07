@@ -37,6 +37,10 @@
 #include "MemoryManager.h"
 
 
+namespace lmms
+{
+
+
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new Knob( knobStyled, this ); 				\
 	name ->move( x, y );								\
@@ -80,6 +84,12 @@ const int MIN_WLEN = 4;
 
 
 class NesInstrument;
+
+namespace gui
+{
+class NesInstrumentView;
+} // namespace gui
+
 
 class NesObject
 {
@@ -220,7 +230,7 @@ public:
 		return( 8 );
 	}
 	
-	virtual PluginView * instantiateView( QWidget * parent );
+	virtual gui::PluginView* instantiateView( QWidget * parent );
 	
 public slots:
 	void updateFreq1();
@@ -290,8 +300,12 @@ private:
 	
 	
 	friend class NesObject;
-	friend class NesInstrumentView;
+	friend class gui::NesInstrumentView;
 };
+
+
+namespace gui
+{
 
 
 class NesInstrumentView : public InstrumentViewFixedSize
@@ -361,5 +375,10 @@ private:
 	
 	static QPixmap *	s_artwork;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
