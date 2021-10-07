@@ -66,6 +66,14 @@
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
 	ToolTip::add( name, ttip );
 
+namespace lmms
+{
+
+
+namespace gui
+{
+
+
 // UI constants
 const int O1ROW = 22;
 const int O2ROW = 22 + 39;
@@ -107,6 +115,9 @@ const int MATROW6 = 22 + 39*5;
 
 const int OPVIEW = 0;
 const int MATVIEW = 1;
+
+
+} // namespace gui
 
 // waveform enumerators
 const int WAVE_SINE = 0;
@@ -154,7 +165,11 @@ const float PW_MIN = 0.25f;
 const float PW_MAX = 100.0f - PW_MIN;
 
 class MonstroInstrument;
+
+namespace gui
+{
 class MonstroView;
+}
 
 
 class MonstroSynth
@@ -355,7 +370,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 public slots:
 	void updateVolume1();
@@ -564,9 +579,14 @@ private:
 	FloatModel	m_sub3lfo2;
 
 	friend class MonstroSynth;
-	friend class MonstroView;
+	friend class gui::MonstroView;
 
 };
+
+
+namespace gui
+{
+
 
 class MonstroView : public InstrumentViewFixedSize
 {
@@ -718,5 +738,9 @@ private:
 
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
