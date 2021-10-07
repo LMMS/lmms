@@ -28,6 +28,9 @@
 #include "LocklessRingBuffer.h"
 #include "VecControls.h"
 
+namespace lmms
+{
+
 
 //! Top level class; handles LMMS interface and accumulates data for processing.
 class Vectorscope : public Effect
@@ -47,6 +50,9 @@ private:
 	const unsigned int m_maxBufferSize = 4096;
 	LocklessRingBuffer<sampleFrame> m_inputBuffer;
 };
+
+
+} // namespace lmms
 
 #endif // VECTORSCOPE_H
 

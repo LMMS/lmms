@@ -36,6 +36,9 @@
 #include "Vectorscope.h"
 #include "VectorView.h"
 
+namespace lmms::gui
+{
+
 
 // The entire GUI layout is built here.
 VecControlsDialog::VecControlsDialog(VecControls *controls) :
@@ -92,3 +95,6 @@ QSize VecControlsDialog::sizeHint() const
 {
 	return QSize(275, 300);
 }
+
+
+} // namespace lmms::gui
