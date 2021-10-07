@@ -31,6 +31,10 @@
 #include "Engine.h"
 #include "stereoenhancer_controls.h"
 
+namespace lmms
+{
+
+
 class stereoEnhancerEffect : public Effect
 {
 public:
@@ -60,5 +64,6 @@ private:
 } ;
 
 
+} // namespace lmms
 
 #endif

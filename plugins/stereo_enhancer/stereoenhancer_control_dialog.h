@@ -27,8 +27,14 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 class stereoEnhancerControls;
 
+
+namespace gui
+{
 
 class stereoEnhancerControlDialog : public EffectControlDialog
 {
@@ -41,5 +47,8 @@ public:
 
 };
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

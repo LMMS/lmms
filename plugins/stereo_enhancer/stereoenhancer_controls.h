@@ -29,6 +29,10 @@
 #include "stereoenhancer_control_dialog.h"
 #include "Knob.h"
 
+namespace lmms
+{
+
+
 class stereoEnhancerEffect;
 
 class stereoEnhancerControls : public EffectControls
@@ -52,9 +56,9 @@ public:
 		return( 1 );
 	}
 	
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new stereoEnhancerControlDialog( this );
+		return new gui::stereoEnhancerControlDialog( this );
 	}
 
 
@@ -66,9 +70,11 @@ private:
 	stereoEnhancerEffect * m_effect;
 	FloatModel m_widthModel;
 	
-	friend class stereoEnhancerControlDialog;
+	friend class gui::stereoEnhancerControlDialog;
 
 } ;
 
+
+} // namespace lmms
 
 #endif /*_STEREO_ENHANCER_CONTROLS_H*/

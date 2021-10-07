@@ -30,6 +30,9 @@
 #include "stereoenhancer_controls.h"
 
 
+namespace lmms::gui
+{
+
 
 stereoEnhancerControlDialog::stereoEnhancerControlDialog(
 	stereoEnhancerControls * _controls ) :
@@ -47,3 +50,5 @@ stereoEnhancerControlDialog::stereoEnhancerControlDialog(
 	this->setLayout(l);
 }
 
+
+} // namespace lmms::gui

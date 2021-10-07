@@ -28,6 +28,9 @@
 #include "stereoenhancer_controls.h"
 #include "stereo_enhancer.h"
 
+namespace lmms
+{
+
 
 stereoEnhancerControls::stereoEnhancerControls( stereoEnhancerEffect * _eff ) :
 		EffectControls( _eff ),
@@ -64,6 +67,4 @@ void stereoEnhancerControls::saveSettings( QDomDocument & _doc,
 }
 
 
-
-
-
+} // namespace lmms
