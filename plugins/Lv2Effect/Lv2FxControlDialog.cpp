@@ -31,6 +31,9 @@
 #include "Lv2Effect.h"
 #include "Lv2FxControls.h"
 
+namespace lmms::gui
+{
+
 
 Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 	EffectControlDialog(controls),
@@ -70,3 +73,4 @@ void Lv2FxControlDialog::modelChanged()
 }
 
 
+} // namespace lmms::gui
