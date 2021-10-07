@@ -32,7 +32,14 @@
 #include "AutomatableModel.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
+namespace gui
+{
 class PixmapButton;
+class PatmanView;
+} // namespace gui
 
 
 #define MODES_16BIT	( 1 << 0 )
@@ -69,7 +76,7 @@ public:
 		return( 128 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 
 public slots:
@@ -107,13 +114,16 @@ private:
 	void selectSample( NotePlayHandle * _n );
 
 
-	friend class PatmanView;
+	friend class gui::PatmanView;
 
 signals:
 	void fileChanged( void );
 
 } ;
 
+
+namespace gui
+{
 
 
 class PatmanView : public InstrumentViewFixedSize
@@ -148,5 +158,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif
