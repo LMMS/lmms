@@ -36,6 +36,9 @@
 #include "Ladspa2LMMS.h"
 
 
+namespace lmms::gui
+{
+
 
 ladspaDescription::ladspaDescription( QWidget * _parent,
 						ladspaPluginType _type ) :
@@ -215,6 +218,4 @@ void ladspaDescription::onDoubleClicked( QListWidgetItem * _item )
 }
 
 
-
-
-
+} // namespace lmms::gui

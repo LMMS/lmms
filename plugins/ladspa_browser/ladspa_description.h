@@ -35,6 +35,9 @@
 class QListWidgetItem;
 class QScrollArea;
 
+namespace lmms::gui
+{
+
 
 class ladspaDescription : public QWidget
 {
@@ -64,6 +67,6 @@ private slots:
 } ;
 
 
-
+} // namespace lmms::gui
 
 #endif

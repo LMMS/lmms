@@ -33,6 +33,9 @@
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 
+namespace lmms::gui
+{
+
 
 ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 {
@@ -170,6 +173,4 @@ ladspaPortDialog::~ladspaPortDialog()
 }
 
 
-
-
-
+} // namespace lmms::gui

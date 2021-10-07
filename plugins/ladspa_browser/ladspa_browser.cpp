@@ -41,6 +41,9 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C"
 {
@@ -93,7 +96,8 @@ QString ladspaBrowser::nodeName() const
 
 
 
-
+namespace gui
+{
 
 
 ladspaBrowserView::ladspaBrowserView( ToolPlugin * _tool ) :
@@ -206,6 +210,6 @@ void ladspaBrowserView::showPorts( const ladspa_key_t & _key )
 }
 
 
+} // namespace gui
 
-
-
+} // namespace lmms
