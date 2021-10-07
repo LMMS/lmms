@@ -37,7 +37,8 @@
 
 #include "vstbase_export.h"
 
-class vstSubWin;
+namespace lmms
+{
 
 
 class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
@@ -173,5 +174,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

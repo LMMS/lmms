@@ -28,6 +28,10 @@
 #include "embed.h"
 #include "vstbase_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -46,3 +50,4 @@ Plugin::Descriptor VSTBASE_EXPORT vstbase_plugin_descriptor =
 }
 
 
+} // namespace lmms

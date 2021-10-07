@@ -109,6 +109,11 @@ struct ERect
 #include <sys/shm.h>
 #endif
 
+
+namespace lmms
+{
+
+
 using namespace std;
 
 static VstHostLanguages hlang = LanguageEnglish;
@@ -2283,3 +2288,5 @@ int main( int _argc, char * * _argv )
 
 }
 
+
+} // namespace lmms
