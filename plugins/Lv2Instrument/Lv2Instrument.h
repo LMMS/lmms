@@ -37,6 +37,33 @@
 // currently only MIDI works
 #define LV2_INSTRUMENT_USE_MIDI
 
+namespace lmms
+{
+
+class Lv2Instrument;
+
+namespace gui
+{
+
+
+class Lv2InsView : public InstrumentView, public Lv2ViewBase
+{
+Q_OBJECT
+public:
+	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
+
+protected:
+	void dragEnterEvent(QDragEnterEvent *_dee) override;
+	void dropEvent(QDropEvent *_de) override;
+
+private:
+	void modelChanged() override;
+};
+
+
+} // namespace gui
+
+
 
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
@@ -81,7 +108,7 @@ public:
 		return IsSingleStreamed;
 #endif
 	}
-	PluginView *instantiateView(QWidget *parent) override;
+	gui::PluginView* instantiateView(QWidget *parent) override;
 
 private slots:
 	void updatePitchRange();
@@ -95,23 +122,10 @@ private:
 	int m_runningNotes[NumKeys];
 #endif
 
-	friend class Lv2InsView;
+	friend class gui::Lv2InsView;
 };
 
 
-class Lv2InsView : public InstrumentView, public Lv2ViewBase
-{
-	Q_OBJECT
-public:
-	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
-
-protected:
-	void dragEnterEvent(QDragEnterEvent *_dee) override;
-	void dropEvent(QDropEvent *_de) override;
-
-private:
-	void modelChanged() override;
-};
-
+} // namespace lmms
 
 #endif // LV2_INSTRUMENT_H
