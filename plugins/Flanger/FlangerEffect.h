@@ -32,6 +32,9 @@
 #include "MonoDelay.h"
 #include "Noise.h"
 
+namespace lmms
+{
+
 
 class FlangerEffect : public Effect
 {
@@ -54,5 +57,8 @@ private:
 	Noise* m_noise;
 
 };
+
+
+} // namespace lmms
 
 #endif // FLANGEREFFECT_H
