@@ -30,6 +30,10 @@
 #include "Knob.h"
 
 
+namespace lmms
+{
+
+
 class ReverbSCEffect;
 
 class ReverbSCControls : public EffectControls
@@ -53,9 +57,9 @@ public:
 		return 4;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new ReverbSCControlDialog( this );
+		return new gui::ReverbSCControlDialog( this );
 	}
 
 
@@ -70,9 +74,12 @@ private:
 	FloatModel m_colorModel;
 	FloatModel m_outputGainModel;
 
-	friend class ReverbSCControlDialog;
+	friend class gui::ReverbSCControlDialog;
 	friend class ReverbSCEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif
