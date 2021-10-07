@@ -36,6 +36,9 @@
 #include "LedCheckbox.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 
 enum SfxrWaves
 {
@@ -66,6 +69,10 @@ const int KNOB_BLOCK_SIZE_Y = 40;
 
 class sfxrInstrument;
 
+namespace gui
+{
+class sfxrInstrumentView;
+}
 
 
 class SfxrSynth
@@ -180,7 +187,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 	void resetModels();
 
@@ -217,10 +224,13 @@ private:
 
 	IntModel m_waveFormModel;
 
-	friend class sfxrInstrumentView;
+	friend class gui::sfxrInstrumentView;
 	friend class SfxrSynth;
 };
 
+
+namespace gui
+{
 
 
 class sfxrInstrumentView : public InstrumentViewFixedSize
@@ -300,5 +310,8 @@ private:
 };
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif
