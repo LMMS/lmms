@@ -44,6 +44,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 #define C64_PAL_CYCLES_PER_SEC  985248
 
 #define NUMSIDREGS 0x19
@@ -454,12 +458,15 @@ void SidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * SidInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* SidInstrument::instantiateView( QWidget * _parent )
 {
-	return( new SidInstrumentView( this, _parent ) );
+	return( new gui::SidInstrumentView( this, _parent ) );
 }
 
 
+
+namespace gui
+{
 
 
 class sidKnob : public Knob
@@ -787,7 +794,7 @@ void SidInstrumentView::modelChanged()
 }
 
 
-
+} // namespace gui
 
 
 extern "C"
@@ -803,5 +810,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
-
+} // namespace lmms
