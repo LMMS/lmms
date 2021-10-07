@@ -33,6 +33,10 @@
 #include "lmms_math.h"
 #include "BasicFilters.h"
 
+namespace lmms
+{
+
+
 class MultitapEchoEffect : public Effect
 {
 public:
@@ -74,5 +78,7 @@ private:
 
 };
 
+
+} // namespace lmms
 
 #endif
