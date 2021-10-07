@@ -28,6 +28,9 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 
+namespace lmms
+{
+
 
 vibratingString::vibratingString(	float _pitch, 
 					float _pick,
@@ -156,3 +159,5 @@ void vibratingString::resample( float *_src, f_cnt_t _src_frames,
 	}
 }
 
+
+} // namespace lmms

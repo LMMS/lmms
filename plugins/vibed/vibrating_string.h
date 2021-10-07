@@ -29,6 +29,10 @@
 
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+
 class vibratingString
 {
 
@@ -267,5 +271,8 @@ private:
 	}
 
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -24,6 +24,9 @@
 
 #include "string_container.h"
 
+namespace lmms
+{
+
 
 stringContainer::stringContainer(const float _pitch, 
 				const sample_rate_t _sample_rate,
@@ -100,3 +103,6 @@ void stringContainer::addString(int _harm,
 						_state ) );
 	m_exists[_id] = true;
 }
+
+
+} // namespace lmms

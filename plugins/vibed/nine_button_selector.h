@@ -27,6 +27,9 @@
 
 #include "PixmapButton.h"
 
+namespace lmms::gui
+{
+
 
 class nineButtonSelector: public QWidget , public IntModelView
 {
@@ -89,5 +92,8 @@ private:
 } ;
 
 typedef IntModel nineButtonSelectorModel;
+
+
+} // namespace lmms::gui
 
 #endif

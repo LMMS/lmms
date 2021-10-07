@@ -41,6 +41,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -67,7 +71,7 @@ vibed::vibed( InstrumentTrack * _instrumentTrack ) :
 
 	FloatModel * knob;
 	BoolModel * led;
-	nineButtonSelectorModel * harmonic;
+	gui::nineButtonSelectorModel * harmonic;
 	graphModel * graphTmp;
 
 	for( int harm = 0; harm < 9; harm++ )
@@ -112,7 +116,7 @@ vibed::vibed( InstrumentTrack * _instrumentTrack ) :
 				tr( "String %1" ).arg( harm+1 )  );
 		m_powerButtons.append( led );
 
-		harmonic = new nineButtonSelectorModel( 2, 0, 8, this );
+		harmonic = new gui::nineButtonSelectorModel( 2, 0, 8, this );
 		m_harmonics.append( harmonic );
 
 		graphTmp = new graphModel( -1.0, 1.0, __sampleLength, this );
@@ -338,13 +342,15 @@ void vibed::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * vibed::instantiateView( QWidget * _parent )
+gui::PluginView* vibed::instantiateView( QWidget * _parent )
 {
-	return( new vibedView( this, _parent ) );
+	return( new gui::vibedView( this, _parent ) );
 }
 
 
 
+namespace gui
+{
 
 
 vibedView::vibedView( Instrument * _instrument,
@@ -677,6 +683,8 @@ void vibedView::contextMenuEvent( QContextMenuEvent * )
 }
 
 
+} // namespace gui
+
 extern "C"
 {
 
@@ -690,4 +698,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
+} // namespace lmms

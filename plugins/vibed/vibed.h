@@ -32,8 +32,16 @@
 #include "LedCheckbox.h"
 #include "nine_button_selector.h"
 
-class vibedView;
+namespace lmms
+{
+
+
 class NotePlayHandle;
+
+namespace gui
+{
+class vibedView;
+}
 
 class vibed : public Instrument
 {
@@ -58,7 +66,7 @@ public:
 	}
 
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private:
@@ -73,13 +81,16 @@ private:
 	QList<BoolModel*> m_powerButtons;
 	QList<graphModel*> m_graphs;
 	QList<BoolModel*> m_impulses;
-	QList<nineButtonSelectorModel*> m_harmonics;
+	QList<gui::nineButtonSelectorModel*> m_harmonics;
 
 	static const int __sampleLength = 128;
 
-	friend class vibedView;
+	friend class gui::vibedView;
 } ;
 
+
+namespace gui
+{
 
 
 class vibedView : public InstrumentViewFixedSize
@@ -137,5 +148,10 @@ private:
 
 
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
