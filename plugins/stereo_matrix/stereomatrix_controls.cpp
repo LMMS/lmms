@@ -28,6 +28,9 @@
 #include "stereomatrix_controls.h"
 #include "stereo_matrix.h"
 
+namespace lmms
+{
+
 
 stereoMatrixControls::stereoMatrixControls( stereoMatrixEffect * _eff ) :
 		EffectControls( _eff ),
@@ -81,3 +84,6 @@ void stereoMatrixControls::saveSettings( QDomDocument & _doc,
 	m_rlModel.saveSettings( _doc, _this, "r-l" );
 	m_rrModel.saveSettings( _doc, _this, "r-r" );
 }
+
+
+} // namespace lmms

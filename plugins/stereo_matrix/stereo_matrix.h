@@ -29,6 +29,10 @@
 #include "Effect.h"
 #include "stereomatrix_controls.h"
 
+namespace lmms
+{
+
+
 class stereoMatrixEffect : public Effect
 {
 public:
@@ -38,7 +42,7 @@ public:
 	virtual bool processAudioBuffer( sampleFrame * _buf,
 		                                          const fpp_t _frames );
 
-	virtual EffectControls * controls()
+	virtual EffectControls* controls()
 	{
 		return( &m_smControls );
 	}
@@ -51,5 +55,6 @@ private:
 } ;
 
 
+} // namespace lmms
 
 #endif
