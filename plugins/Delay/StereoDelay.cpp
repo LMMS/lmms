@@ -28,6 +28,9 @@
 #include "interpolation.h"
 #include "lmms_math.h"
 
+namespace lmms
+{
+
 
 StereoDelay::StereoDelay( int maxTime, int sampleRate )
 {
@@ -90,7 +93,4 @@ void StereoDelay::setSampleRate( int sampleRate )
 }
 
 
-
-
-
-
+} // namespace lmms

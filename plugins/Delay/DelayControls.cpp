@@ -29,6 +29,9 @@
 #include "Engine.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 DelayControls::DelayControls( DelayEffect* effect ):
 	EffectControls( effect ),
 	m_effect ( effect ),
@@ -73,3 +76,6 @@ void DelayControls::changeSampleRate()
 {
 	m_effect->changeSampleRate();
 }
+
+
+} // namespace lmms

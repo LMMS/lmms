@@ -31,6 +31,10 @@
 #include "StereoDelay.h"
 #include "ValueBuffer.h"
 
+namespace lmms
+{
+
+
 class DelayEffect : public Effect
 {
 public:
@@ -50,5 +54,8 @@ private:
 	float m_outGain;
 	float m_currentLength;
 };
+
+
+} // namespace lmms
 
 #endif // DELAYEFFECT_H
