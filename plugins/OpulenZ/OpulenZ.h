@@ -33,6 +33,10 @@
 #include "Knob.h"
 #include "PixmapButton.h"
 
+namespace lmms
+{
+
+
 // This one is a flag, MIDI notes take 7 low bits
 #define OPL2_VOICE_FREE 128
 #define OPL2_NO_VOICE 255
@@ -49,7 +53,7 @@ public:
 	virtual ~OpulenzInstrument();
 
 	virtual QString nodeName() const;
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 	virtual Flags flags() const
 	{
@@ -141,6 +145,9 @@ private:
 };
 
 
+namespace gui
+{
+
 
 class OpulenzInstrumentView : public InstrumentViewFixedSize
 {
@@ -199,5 +206,10 @@ public:
 	QString knobHintHelper(float n);
 
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

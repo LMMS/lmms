@@ -61,6 +61,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -391,9 +395,9 @@ QString OpulenzInstrument::nodeName() const
         return( opulenz_plugin_descriptor.name );
 }
 
-PluginView * OpulenzInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 {
-        return( new OpulenzInstrumentView( this, _parent ) );
+        return( new gui::OpulenzInstrumentView( this, _parent ) );
 }
 
 
@@ -676,7 +680,8 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 
 
-
+namespace gui
+{
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
@@ -873,4 +878,6 @@ void OpulenzInstrumentView::modelChanged()
 }
 
 
+} // namespace gui
 
+} // namespace lmms
