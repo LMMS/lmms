@@ -33,6 +33,10 @@
 #include "Engine.h"
 #include "Song.h"
 
+namespace lmms
+{
+
+
 DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	EffectControls( effect ),
 	m_effect( effect ),
@@ -157,6 +161,4 @@ void DualFilterControls::saveSettings( QDomDocument& _doc, QDomElement& _this )
 }
 
 
-
-
-
+} // namespace lmms

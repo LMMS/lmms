@@ -31,6 +31,10 @@
 #include "DualFilterControls.h"
 #include "BasicFilters.h"
 
+namespace lmms
+{
+
+
 class DualFilterEffect : public Effect
 {
 public:
@@ -61,5 +65,8 @@ private:
 	friend class DualFilterControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif
