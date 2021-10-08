@@ -33,6 +33,9 @@
 #include "Instrument.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 
 class ExprFrontData;
 
@@ -141,5 +144,6 @@ inline void clearArray(T* arr,unsigned int size)
 }
 
 
+} // namespace lmms
 
 #endif

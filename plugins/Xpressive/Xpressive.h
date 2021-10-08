@@ -37,6 +37,10 @@
 
 #include "ExprSynth.h"
 
+namespace lmms
+{
+
+
 class oscillator;
 class XpressiveView;
 
@@ -71,7 +75,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual PluginView* instantiateView( QWidget * parent );
+	gui::PluginView* instantiateView( QWidget * parent ) override;
 
 	graphModel& graphO1() { return m_graphO1; }
 	graphModel& graphO2() { return m_graphO2; }
@@ -137,6 +141,9 @@ private:
 	BoolModel m_exprValid;
 	
 } ;
+
+namespace gui
+{
 
 
 class XpressiveView : public InstrumentViewFixedSize
@@ -217,5 +224,10 @@ private:
 	XpressiveHelpView();
 	static QString s_helpText;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

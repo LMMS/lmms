@@ -50,6 +50,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C" {
 
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
@@ -244,9 +248,42 @@ void Xpressive::deleteNotePluginData(NotePlayHandle* nph) {
 	delete static_cast<ExprSynth *>(nph->m_pluginData);
 }
 
-PluginView * Xpressive::instantiateView(QWidget* parent) {
-	return (new XpressiveView(this, parent));
+gui::PluginView* Xpressive::instantiateView(QWidget* parent) {
+	return (new gui::XpressiveView(this, parent));
 }
+
+
+void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
+{
+	out->setSamples(in->samples());
+	if (smoothness>0)
+	{
+		const int guass_size = (int)(smoothness * 5) | 1;
+		const int guass_center = guass_size/2;
+		const float delta = smoothness;
+		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);
+		float * const guassian = new float [guass_size];
+		float sum = 0.0f;
+		float temp = 0.0f;
+		int i;
+		for (i = 0; i < guass_size; i++ )
+		{
+			temp = (i - guass_center) / delta;
+			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
+		}
+		for (i = 0; i < guass_size; i++ )
+		{
+			guassian[i] = guassian[i] / sum;
+		}
+		out->convolve(guassian, guass_size, guass_center);
+		delete [] guassian;
+	}
+}
+
+
+namespace gui
+{
+
 
 class XpressiveKnob: public Knob {
 public:
@@ -261,11 +298,11 @@ public:
 		setLineWidth(3);
 	}
 	XpressiveKnob(QWidget * _parent, const QString & _name) :
-			Knob(knobStyled, _parent,_name) {
+		Knob(knobStyled, _parent,_name) {
 		setStyle();
 	}
 	XpressiveKnob(QWidget * _parent) :
-			Knob(knobStyled, _parent) {
+		Knob(knobStyled, _parent) {
 		setStyle();
 	}
 
@@ -302,7 +339,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_graph->setEnabled(false);
 
 	ToolTip::add(m_graph, tr("Draw your own waveform here "
-			"by dragging your mouse on this graph."));
+							 "by dragging your mouse on this graph."));
 
 	pal = QPalette();
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
@@ -395,24 +432,24 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	m_triangleWaveBtn->move(4 + 14, ROW_WAVEBTN);
 	m_triangleWaveBtn->setActiveGraphic(
-			embed::getIconPixmap("triangle_wave_active"));
+		embed::getIconPixmap("triangle_wave_active"));
 	m_triangleWaveBtn->setInactiveGraphic(
-			embed::getIconPixmap("triangle_wave_inactive"));
+		embed::getIconPixmap("triangle_wave_inactive"));
 	ToolTip::add(m_triangleWaveBtn, tr("Triangle wave"));
 
 	m_sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	m_sqrWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN);
 	m_sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
 	m_sqrWaveBtn->setInactiveGraphic(
-			embed::getIconPixmap("square_wave_inactive"));
+		embed::getIconPixmap("square_wave_inactive"));
 	ToolTip::add(m_sqrWaveBtn, tr("Square wave"));
 
 	m_whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise"));
 	m_whiteNoiseWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN);
 	m_whiteNoiseWaveBtn->setActiveGraphic(
-			embed::getIconPixmap("white_noise_wave_active"));
+		embed::getIconPixmap("white_noise_wave_active"));
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
-			embed::getIconPixmap("white_noise_wave_inactive"));
+		embed::getIconPixmap("white_noise_wave_inactive"));
 	ToolTip::add(m_whiteNoiseWaveBtn, tr("White noise"));
 
 
@@ -421,7 +458,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_waveInterpolate->move(2, 230);
 
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
-			LedCheckBox::Red);
+											  LedCheckBox::Red);
 	m_expressionValidToggle->move(168, EXPR_TEXT_Y+EXPR_TEXT_H-2);
 	m_expressionValidToggle->setEnabled( false );
 
@@ -502,6 +539,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	updateLayout();
 }
 
+
 XpressiveView::~XpressiveView()
 {
 }
@@ -512,21 +550,21 @@ void XpressiveView::expressionChanged() {
 	QByteArray text = m_expressionEditor->toPlainText().toLatin1();
 
 	switch (m_selectedGraphGroup->model()->value()) {
-	case W1_EXPR:
-		e->wavesExpression(0) = text;
-		break;
-	case W2_EXPR:
-		e->wavesExpression(1) = text;
-		break;
-	case W3_EXPR:
-		e->wavesExpression(2) = text;
-		break;
-	case O1_EXPR:
-		e->outputExpression(0) = text;
-		break;
-	case O2_EXPR:
-		e->outputExpression(1) = text;
-		break;
+		case W1_EXPR:
+			e->wavesExpression(0) = text;
+			break;
+		case W2_EXPR:
+			e->wavesExpression(1) = text;
+			break;
+		case W3_EXPR:
+			e->wavesExpression(2) = text;
+			break;
+		case O1_EXPR:
+			e->outputExpression(0) = text;
+			break;
+		case O2_EXPR:
+			e->outputExpression(1) = text;
+			break;
 	}
 	if (m_wave_expr)
 		m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && text.size() == 0);
@@ -596,35 +634,6 @@ void XpressiveView::expressionChanged() {
 			m_raw_graph->clear();
 	}
 }
-
-void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
-{
-	out->setSamples(in->samples());
-	if (smoothness>0)
-	{
-		const int guass_size = (int)(smoothness * 5) | 1;
-		const int guass_center = guass_size/2;
-		const float delta = smoothness;
-		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);
-		float * const guassian = new float [guass_size];
-		float sum = 0.0f;
-		float temp = 0.0f;
-		int i;
-		for (i = 0; i < guass_size; i++ )
-		{
-			temp = (i - guass_center) / delta;
-			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
-		}
-		for (i = 0; i < guass_size; i++ )
-		{
-			guassian[i] = guassian[i] / sum;
-		}
-		out->convolve(guassian, guass_size, guass_center);
-		delete [] guassian;
-	}
-}
-
-
 
 void XpressiveView::smoothChanged()
 {
@@ -889,6 +898,9 @@ void XpressiveView::helpClicked() {
 
 }
 
+
+} // namespace gui
+
 extern "C" {
 
 // necessary for getting instance out of shared lib
@@ -899,5 +911,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *m, void *) {
 }
 
 
-
-
+} // namespace lmms
