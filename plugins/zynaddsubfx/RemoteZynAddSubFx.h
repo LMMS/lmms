@@ -27,11 +27,18 @@
 
 #include "RemotePlugin.h"
 
+namespace lmms
+{
+
+
 enum ZasfRemoteMessageIDs
 {
-	IdZasfPresetDirectory = IdUserBase,
+	IdZasfPresetDirectory = RemoteMessageIDs::IdUserBase,
 	IdZasfLmmsWorkingDirectory,
 	IdZasfSetPitchWheelBendRange
 } ;
+
+
+} // namespace lmms
 
 #endif

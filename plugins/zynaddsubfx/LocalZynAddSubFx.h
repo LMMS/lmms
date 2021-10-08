@@ -31,6 +31,10 @@
 class Master;
 class NulEngine;
 
+namespace lmms
+{
+
+
 class LocalZynAddSubFx
 {
 public:
@@ -72,5 +76,8 @@ protected:
 	NulEngine* m_ioEngine;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

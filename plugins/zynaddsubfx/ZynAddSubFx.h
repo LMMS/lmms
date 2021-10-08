@@ -37,12 +37,19 @@
 
 class QPushButton;
 
+namespace lmms
+{
+
+
 class LocalZynAddSubFx;
-class ZynAddSubFxView;
 class NotePlayHandle;
+
+namespace gui
+{
 class Knob;
 class LedCheckBox;
-
+class ZynAddSubFxView;
+}
 
 class ZynAddSubFxRemotePlugin : public RemotePlugin
 {
@@ -85,7 +92,7 @@ public:
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private slots:
@@ -122,7 +129,7 @@ private:
 
 	QMap<int, bool> m_modifiedControllers;
 
-	friend class ZynAddSubFxView;
+	friend class gui::ZynAddSubFxView;
 
 
 signals:
@@ -130,6 +137,9 @@ signals:
 
 } ;
 
+
+namespace gui
+{
 
 
 class ZynAddSubFxView : public InstrumentViewFixedSize
@@ -164,5 +174,9 @@ private slots:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
