@@ -30,6 +30,8 @@
 #include "Effect.h"
 #include "waveshaper_controls.h"
 
+namespace lmms
+{
 
 
 class waveShaperEffect : public Effect
@@ -56,7 +58,7 @@ private:
 } ;
 
 
-
+} // namespace lmms
 
 
 #endif

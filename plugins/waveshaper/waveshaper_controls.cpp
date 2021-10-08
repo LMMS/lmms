@@ -33,6 +33,9 @@
 #include "Engine.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 #define onedB 1.1220184543019633f
 
@@ -143,5 +146,4 @@ void waveShaperControls::subOneClicked()
 }
 
 
-
-
+} // namespace lmms

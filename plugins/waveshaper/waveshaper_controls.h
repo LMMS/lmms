@@ -31,6 +31,10 @@
 #include "Knob.h"
 #include "Graph.h"
 
+namespace lmms
+{
+
+
 class waveShaperEffect;
 
 
@@ -57,9 +61,9 @@ public:
 		return( 4 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return( new waveShaperControlDialog( this ) );
+		return( new gui::waveShaperControlDialog( this ) );
 	}
 
 
@@ -79,9 +83,12 @@ private:
 	graphModel m_wavegraphModel;
 	BoolModel  m_clipModel;
 
-	friend class waveShaperControlDialog;
+	friend class gui::waveShaperControlDialog;
 	friend class waveShaperEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif
