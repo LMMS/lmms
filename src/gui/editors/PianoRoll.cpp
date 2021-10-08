@@ -4718,12 +4718,14 @@ Note * PianoRoll::noteUnderMouse()
 	// loop through whole note-vector...
 	for( Note* const& note : m_pattern->notes() )
 	{
+		// treat drum notes as 4 ticks wide
+		TimePos endPos = note->length() > 0 ? note->endPos() : TimePos(note->pos() + 4);
 		// and check whether the cursor is over an
 		// existing note
 		if( pos_ticks >= note->pos()
-				&& pos_ticks <= note->endPos()
+				&& pos_ticks <= endPos
 				&& note->key() == key_num
-				&& note->length() > 0 )
+				&& note->length() != 0)
 		{
 			return note;
 		}
