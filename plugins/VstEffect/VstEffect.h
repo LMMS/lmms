@@ -32,7 +32,12 @@
 #include "VstEffectControlDialog.h"
 #include "VstEffectControls.h"
 
+namespace lmms
+{
+
+
 class VstPlugin;
+
 
 class VstEffect : public Effect
 {
@@ -67,11 +72,12 @@ private:
 
 
 	friend class VstEffectControls;
-	friend class VstEffectControlDialog;
-	friend class manageVSTEffectView;
+	friend class gui::VstEffectControlDialog;
+	friend class gui::manageVSTEffectView;
 
 } ;
 
 
+} // namespace lmms
 
 #endif

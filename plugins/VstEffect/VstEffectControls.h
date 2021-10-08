@@ -39,8 +39,16 @@
 #include <QPainter>
 #include <QObject>
 
+namespace lmms
+{
+
 
 class VstEffect;
+
+namespace gui
+{
+class manageVSTEffectView;
+}
 
 
 class VstEffectControls : public EffectControls
@@ -59,7 +67,7 @@ public:
 
 	virtual int controlCount();
 
-	virtual EffectControlDialog * createView();
+	virtual gui::EffectControlDialog* createView();
 
 
 protected slots:
@@ -90,13 +98,15 @@ private:
 	int lastPosInMenu;
 //	QLabel * m_presetLabel;
 
-	friend class VstEffectControlDialog;
-	friend class manageVSTEffectView;
+	friend class gui::VstEffectControlDialog;
+	friend class gui::manageVSTEffectView;
 
 	bool m_vstGuiVisible;
 } ;
 
 
+namespace gui
+{
 
 
 class manageVSTEffectView : public QObject
@@ -134,5 +144,9 @@ private:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

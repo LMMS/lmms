@@ -33,11 +33,17 @@
 #include <QLabel>
 #include <QSharedPointer>
 
-
-class VstEffectControls;
-class PixmapButton;
 class QPixmap;
 class QPushButton;
+
+namespace lmms
+{
+
+class VstEffectControls;
+
+namespace gui
+{
+
 class PixmapButton;
 
 
@@ -69,5 +75,10 @@ private:
 public slots:
 	void togglePluginUI( bool checked );
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif
