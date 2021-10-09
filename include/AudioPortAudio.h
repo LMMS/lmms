@@ -30,6 +30,26 @@
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
+
+
+class AudioPortAudioSetupUtil : public QObject
+{
+Q_OBJECT
+public slots:
+	void updateBackends();
+	void updateDevices();
+	void updateChannels();
+
+public:
+	ComboBoxModel m_backendModel;
+	ComboBoxModel m_deviceModel;
+};
+
+
+}
+
 #ifdef LMMS_HAVE_PORTAUDIO
 
 #include <portaudio.h>
@@ -47,19 +67,6 @@
 
 namespace lmms
 {
-
-class AudioPortAudioSetupUtil : public QObject
-{
-	Q_OBJECT
-public slots:
-	void updateBackends();
-	void updateDevices();
-	void updateChannels();
-
-public:
-	ComboBoxModel m_backendModel;
-	ComboBoxModel m_deviceModel;
-} ;
 
 
 namespace gui
@@ -158,6 +165,6 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_PORTAUDIO
 
 #endif

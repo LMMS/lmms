@@ -27,6 +27,10 @@
 #include "AudioPortAudio.h"
 
 #ifndef LMMS_HAVE_PORTAUDIO
+namespace lmms
+{
+
+
 void AudioPortAudioSetupUtil::updateBackends()
 {
 }
@@ -38,6 +42,9 @@ void AudioPortAudioSetupUtil::updateDevices()
 void AudioPortAudioSetupUtil::updateChannels()
 {
 }
+
+
+} // namespace lmms
 #endif
 
 #ifdef LMMS_HAVE_PORTAUDIO
