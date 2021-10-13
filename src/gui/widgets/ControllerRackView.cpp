@@ -30,6 +30,7 @@
 #include <QScrollArea>
 #include <QMdiArea>
 #include <QMessageBox>
+#include <QAction>
 
 #include "Song.h"
 #include "embed.h"
@@ -167,7 +168,7 @@ void ControllerRackView::moveDown( ControllerView* view )
 {
 	if( view != m_controllerViews.last() )
 	{
-		// moving next effect up is the same
+		// moving next controller up is the same
 		moveUp( *( std::find( m_controllerViews.begin(), m_controllerViews.end(), view ) + 1 ) );
 	}
 }
@@ -185,6 +186,18 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 		 this, SLOT( moveDown( ControllerView * ) ), Qt::QueuedConnection );
 	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ),
 		 this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
+
+	QAction* moveUpAction = new QAction( controllerView );
+	moveUpAction->setShortcut( Qt::Key_Up | Qt::AltModifier );
+	moveUpAction->setShortcutContext( Qt::WidgetShortcut );
+	connect( moveUpAction, SIGNAL( triggered() ), controllerView, SLOT( moveUp( ) ) );
+	controllerView->addAction( moveUpAction );
+
+	QAction* moveDownAction = new QAction( controllerView );
+	moveDownAction->setShortcut( Qt::Key_Down | Qt::AltModifier );
+	moveDownAction->setShortcutContext( Qt::WidgetShortcut );
+	connect( moveDownAction, SIGNAL( triggered() ), controllerView, SLOT( moveDown( ) ) );
+	controllerView->addAction( moveDownAction );
 
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );

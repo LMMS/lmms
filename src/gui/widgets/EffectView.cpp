@@ -50,6 +50,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView( nullptr )
 {
 	setFixedSize( EffectView::DEFAULT_WIDTH, 60 );
+	this->setFocusPolicy( Qt::StrongFocus );
 
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
