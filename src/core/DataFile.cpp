@@ -444,7 +444,17 @@ bool DataFile::copyResources(const QString& resourcesDir)
 				{
 					// Get absolute path to resource
 					bool error;
-					QString resPath = PathUtil::toAbsolute(el.attribute(*res), &error);
+                    auto attribute = el.attribute(*res);
+
+                    // Skip empty resources. In some cases, there might be an
+                    // alternative way of actually representing the data (e.g. data element for SampleTCO)
+                    if (attribute.isEmpty())
+                    {
+                        ++res;
+                        continue;
+                    }
+
+					QString resPath = PathUtil::toAbsolute(attribute, &error);
 					// If we are running without the project loaded (from CLI), "local:" base
 					// prefixes aren't converted, so we need to convert it ourselves
 					if (error)
