@@ -34,6 +34,7 @@ class ComboBox;
 class GroupBox;
 class InstrumentTrack;
 class LedCheckBox;
+class QLabel;
 
 
 class InstrumentMiscView : public QWidget
@@ -45,6 +46,8 @@ public:
 	GroupBox *pitchGroupBox() {return m_pitchGroupBox;}
 	GroupBox *microtunerGroupBox() {return m_microtunerGroupBox;}
 
+	QLabel *microtunerNotSupportedLabel() {return m_microtunerNotSupportedLabel;}
+
 	ComboBox *scaleCombo() {return m_scaleCombo;}
 	ComboBox *keymapCombo() {return m_keymapCombo;}
 
@@ -53,6 +56,8 @@ public:
 private:
 	GroupBox *m_pitchGroupBox;
 	GroupBox *m_microtunerGroupBox;
+
+	QLabel *m_microtunerNotSupportedLabel;
 
 	ComboBox *m_scaleCombo;
 	ComboBox *m_keymapCombo;

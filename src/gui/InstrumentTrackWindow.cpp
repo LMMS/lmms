@@ -361,11 +361,13 @@ void InstrumentTrackWindow::modelChanged()
 
 	if (m_track->instrument() && m_track->instrument()->flags().testFlag(Instrument::IsMidiBased))
 	{
+		m_miscView->microtunerNotSupportedLabel()->show();
 		m_miscView->microtunerGroupBox()->hide();
 		m_track->m_microtuner.enabledModel()->setValue(false);
 	}
 	else
 	{
+		m_miscView->microtunerNotSupportedLabel()->hide();
 		m_miscView->microtunerGroupBox()->show();
 	}
 

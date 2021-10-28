@@ -47,8 +47,8 @@
 
 MicrotunerConfig::MicrotunerConfig() :
 	QWidget(),
-	m_scaleComboModel(nullptr, tr("Selected scale")),
-	m_keymapComboModel(nullptr, tr("Selected keymap")),
+	m_scaleComboModel(nullptr, tr("Selected scale slot")),
+	m_keymapComboModel(nullptr, tr("Selected keymap slot")),
 	m_firstKeyModel(0, 0, NumKeys - 1, nullptr, tr("First key")),
 	m_lastKeyModel(NumKeys - 1, 0, NumKeys - 1, nullptr, tr("Last key")),
 	m_middleKeyModel(DefaultMiddleKey, 0, NumKeys - 1, nullptr, tr("Middle key")),
@@ -56,7 +56,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_baseFreqModel(DefaultBaseFreq, 0.1f, 9999.999f, 0.001f, nullptr, tr("Base note frequency"))
 {
 	setWindowIcon(embed::getIconPixmap("microtuner"));
-	setWindowTitle(tr("Microtuner"));
+	setWindowTitle(tr("Microtuner Configuration"));
 
 	// Organize into 2 main columns: scales and keymaps
 	QGridLayout *microtunerLayout = new QGridLayout();
@@ -65,7 +65,7 @@ MicrotunerConfig::MicrotunerConfig() :
 	// ----------------------------------
 	// Scale sub-column
 	//
-	QLabel *scaleLabel = new QLabel(tr("Scale:"));
+	QLabel *scaleLabel = new QLabel(tr("Scale slot to edit:"));
 	microtunerLayout->addWidget(scaleLabel, 0, 0, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxScaleCount; i++)
@@ -83,6 +83,8 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	QPushButton *loadScaleButton = new QPushButton(tr("Load"));
 	QPushButton *saveScaleButton = new QPushButton(tr("Save"));
+	loadScaleButton->setToolTip(tr("Load scale definition from a file."));
+	saveScaleButton->setToolTip(tr("Save scale definition to a file."));
 	microtunerLayout->addWidget(loadScaleButton, 3, 0, 1, 1);
 	microtunerLayout->addWidget(saveScaleButton, 3, 1, 1, 1);
 	connect(loadScaleButton, &QPushButton::clicked, [=] {loadScaleFromFile();});
@@ -93,14 +95,15 @@ MicrotunerConfig::MicrotunerConfig() :
 	m_scaleTextEdit->setToolTip(tr("Enter intervals on separate lines. Numbers containing a decimal point are treated as cents.\nOther inputs are treated as integer ratios and must be in the form of \'a/b\' or \'a\'.\nUnity (0.0 cents or ratio 1/1) is always present as a hidden first value; do not enter it manually."));
 	microtunerLayout->addWidget(m_scaleTextEdit, 4, 0, 2, 2);
 
-	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale"));
+	QPushButton *applyScaleButton = new QPushButton(tr("Apply scale changes"));
+	applyScaleButton->setToolTip(tr("Verify and apply changes made to the selected scale. To use the scale, set it as active in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyScaleButton, 6, 0, 1, 2);
 	connect(applyScaleButton, &QPushButton::clicked, [=] {applyScale();});
 
 	// ----------------------------------
 	// Mapping sub-column
 	//
-	QLabel *keymapLabel = new QLabel(tr("Keymap:"));
+	QLabel *keymapLabel = new QLabel(tr("Keymap slot to edit:"));
 	microtunerLayout->addWidget(keymapLabel, 0, 2, 1, 2, Qt::AlignBottom);
 
 	for (unsigned int i = 0; i < MaxKeymapCount; i++)
@@ -118,6 +121,8 @@ MicrotunerConfig::MicrotunerConfig() :
 
 	QPushButton *loadKeymapButton = new QPushButton(tr("Load"));
 	QPushButton *saveKeymapButton = new QPushButton(tr("Save"));
+	loadKeymapButton->setToolTip(tr("Load key mapping definition from a file."));
+	saveKeymapButton->setToolTip(tr("Save key mapping definition to a file."));
 	microtunerLayout->addWidget(loadKeymapButton, 3, 2, 1, 1);
 	microtunerLayout->addWidget(saveKeymapButton, 3, 3, 1, 1);
 	connect(loadKeymapButton, &QPushButton::clicked, [=] {loadKeymapFromFile();});
@@ -162,7 +167,8 @@ MicrotunerConfig::MicrotunerConfig() :
 	baseFreqSpin->setToolTip(tr("Base note frequency"));
 	keymapRangeLayout->addWidget(baseFreqSpin, 1, 1, 1, 2);
 
-	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap"));
+	QPushButton *applyKeymapButton = new QPushButton(tr("Apply keymap changes"));
+	applyKeymapButton->setToolTip(tr("Verify and apply changes made to the selected key mapping. To use the mapping, set it as active in the settings of a supported instrument."));
 	microtunerLayout->addWidget(applyKeymapButton, 6, 2, 1, 2);
 	connect(applyKeymapButton, &QPushButton::clicked, [=] {applyKeymap();});
 
