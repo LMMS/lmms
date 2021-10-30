@@ -77,15 +77,15 @@ SaProcessor::SaProcessor(const SaControls *controls) :
 
 SaProcessor::~SaProcessor()
 {
-	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
-	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
-	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
-	if (m_spectrumR != NULL) {fftwf_free(m_spectrumR);}
+	if (m_fftPlanL != nullptr) {fftwf_destroy_plan(m_fftPlanL);}
+	if (m_fftPlanR != nullptr) {fftwf_destroy_plan(m_fftPlanR);}
+	if (m_spectrumL != nullptr) {fftwf_free(m_spectrumL);}
+	if (m_spectrumR != nullptr) {fftwf_free(m_spectrumR);}
 
-	m_fftPlanL = NULL;
-	m_fftPlanR = NULL;
-	m_spectrumL = NULL;
-	m_spectrumR = NULL;
+	m_fftPlanL = nullptr;
+	m_fftPlanR = nullptr;
+	m_spectrumL = nullptr;
+	m_spectrumR = nullptr;
 }
 
 
@@ -396,10 +396,10 @@ void SaProcessor::reallocateBuffers()
 	QMutexLocker data_lock(&m_dataAccess);
 
 	// destroy old FFT plan and free the result buffer
-	if (m_fftPlanL != NULL) {fftwf_destroy_plan(m_fftPlanL);}
-	if (m_fftPlanR != NULL) {fftwf_destroy_plan(m_fftPlanR);}
-	if (m_spectrumL != NULL) {fftwf_free(m_spectrumL);}
-	if (m_spectrumR != NULL) {fftwf_free(m_spectrumR);}
+	if (m_fftPlanL != nullptr) {fftwf_destroy_plan(m_fftPlanL);}
+	if (m_fftPlanR != nullptr) {fftwf_destroy_plan(m_fftPlanR);}
+	if (m_spectrumL != nullptr) {fftwf_free(m_spectrumL);}
+	if (m_spectrumR != nullptr) {fftwf_free(m_spectrumR);}
 
 	// allocate new space, create new plan and resize containers
 	m_fftWindow.resize(new_in_size, 1.0);
@@ -413,7 +413,7 @@ void SaProcessor::reallocateBuffers()
 	m_fftPlanL = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferL.data(), m_spectrumL, FFTW_MEASURE);
 	m_fftPlanR = fftwf_plan_dft_r2c_1d(new_fft_size, m_filteredBufferR.data(), m_spectrumR, FFTW_MEASURE);
 
-	if (m_fftPlanL == NULL || m_fftPlanR == NULL)
+	if (m_fftPlanL == nullptr || m_fftPlanR == nullptr)
 	{
 		#ifdef SA_DEBUG
 			std::cerr << "Analyzer: failed to create new FFT plan!" << std::endl;

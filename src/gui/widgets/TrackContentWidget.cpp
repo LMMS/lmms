@@ -199,7 +199,7 @@ void TrackContentWidget::update()
  */
 void TrackContentWidget::changePosition( const TimePos & newPos )
 {
-	if( m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView() )
+	if( m_trackView->trackContainerView() == getGUI()->getBBEditor()->trackContainerView() )
 	{
 		const int curBB = Engine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled( false );
@@ -473,7 +473,7 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
 	// onto their final position.
 
-	float snapSize = gui->songEditor()->m_editor->getSnapSize();
+	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	// All patterns should be offset the same amount as the grabbed pattern
 	TimePos offset = TimePos(tcoPos - grabbedTCOPos);
 	// Users expect clips to "fall" backwards, so bias the offset
@@ -507,7 +507,7 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 		// The new position is the old position plus the offset.
 		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
 		// If we land on ourselves, offset by one snap
-		TimePos shift = TimePos::ticksPerBar() * gui->songEditor()->m_editor->getSnapSize();
+		TimePos shift = TimePos::ticksPerBar() * getGUI()->songEditor()->m_editor->getSnapSize();
 		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
 
 		TrackContentObject * tco = t->createTCO( pos );
@@ -550,7 +550,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 	// Enable box select if control is held when clicking an empty space
 	// (If we had clicked a TCO it would have intercepted the mouse event)
 	if( me->modifiers() & Qt::ControlModifier ){
-		gui->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
+		getGUI()->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
 	}
 	// Forward event to allow box select if the editor supports it and is in that mode
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
@@ -583,7 +583,7 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 
 void TrackContentWidget::mouseReleaseEvent( QMouseEvent * me )
 {
-	gui->songEditor()->syncEditMode();
+	getGUI()->songEditor()->syncEditMode();
 	QWidget::mouseReleaseEvent(me);
 }
 
@@ -601,7 +601,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 	QPainter p( this );
 	// Don't draw background on BB-Editor
-	if( m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView() )
+	if( m_trackView->trackContainerView() != getGUI()->getBBEditor()->trackContainerView() )
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getBar() * ppb, 0 ) );

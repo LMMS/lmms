@@ -59,7 +59,7 @@ void PlayHandle::doProcessing()
 	}
 	else
 	{
-		play( NULL );
+		play( nullptr );
 	}
 }
 

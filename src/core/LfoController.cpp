@@ -102,7 +102,7 @@ void LfoController::updateValueBuffer()
 
 	for( float& f : m_valueBuffer )
 	{
-		const float currentSample = m_sampleFunction != NULL
+		const float currentSample = m_sampleFunction != nullptr
 			? m_sampleFunction( phase )
 			: m_userDefSampleBuffer->userWaveSample( phase );
 
@@ -170,7 +170,7 @@ void LfoController::updateSampleFunction()
 			m_sampleFunction = &Oscillator::noiseSample;
 			break;
 		case Oscillator::UserDefinedWave:
-			m_sampleFunction = NULL;
+			m_sampleFunction = nullptr;
 			/*TODO: If C++11 is allowed, should change the type of
 			 m_sampleFunction be std::function<sample_t(const float)>
 			 and use the line below:

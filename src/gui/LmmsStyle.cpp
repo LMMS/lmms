@@ -34,7 +34,7 @@
 
 #include "LmmsStyle.h"
 
-QPalette * LmmsStyle::s_palette = NULL;
+QPalette * LmmsStyle::s_palette = nullptr;
 
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 {
@@ -131,7 +131,7 @@ LmmsStyle::LmmsStyle() :
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
 
-	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
+	if( s_palette != nullptr ) { qApp->setPalette( *s_palette ); }
 
 	setBaseStyle( QStyleFactory::create( "Fusion" ) );
 }
@@ -141,7 +141,7 @@ LmmsStyle::LmmsStyle() :
 
 QPalette LmmsStyle::standardPalette( void ) const
 {
-	if( s_palette != NULL) { return * s_palette; }
+	if( s_palette != nullptr) { return * s_palette; }
 
 	QPalette pal = QProxyStyle::standardPalette();
 

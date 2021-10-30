@@ -23,8 +23,8 @@
  */
 
 
-#ifndef _OSCILLOSCOPE
-#define _OSCILLOSCOPE
+#ifndef OSCILLOSCOPE_H
+#define OSCILLOSCOPE_H
 
 #include <QWidget>
 #include <QPixmap>
@@ -73,4 +73,4 @@ private:
 	QColor m_clippingColor;
 } ;
 
-#endif
+#endif // OSCILLOSCOPE_H

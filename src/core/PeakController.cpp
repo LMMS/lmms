@@ -65,7 +65,7 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL )
+	if( m_peakEffect != nullptr && m_peakEffect->effectChain() != nullptr )
 	{
 		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}
@@ -128,7 +128,7 @@ void PeakController::handleDestroyedEffect( )
 	// possible race condition...
 	//printf("disconnecting effect\n");
 	disconnect( m_peakEffect );
-	m_peakEffect = NULL;
+	m_peakEffect = nullptr;
 	//deleteLater();
 	delete this;
 }
@@ -235,7 +235,7 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 

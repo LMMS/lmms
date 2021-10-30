@@ -39,8 +39,8 @@ Plugin::Descriptor VSTBASE_EXPORT vstbase_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
 	Plugin::Library,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }

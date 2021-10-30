@@ -61,14 +61,14 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 
 	if (dev == "")
 	{
-		m_hdl = sio_open( NULL, SIO_PLAY, 0 );
+		m_hdl = sio_open( nullptr, SIO_PLAY, 0 );
 	}
 	else
 	{
 		m_hdl = sio_open( dev.toLatin1().constData(), SIO_PLAY, 0 );
 	}
 
-	if( m_hdl == NULL )
+	if( m_hdl == nullptr )
 	{
 		printf( "sndio: failed opening audio-device\n" );
 		return;
@@ -123,10 +123,10 @@ AudioSndio::AudioSndio(bool & _success_ful, AudioEngine * _audioEngine) :
 AudioSndio::~AudioSndio()
 {
 	stopProcessing();
-	if (m_hdl != NULL)
+	if (m_hdl != nullptr)
 	{
 		sio_close( m_hdl );
-		m_hdl = NULL;
+		m_hdl = nullptr;
 	}
 }
 

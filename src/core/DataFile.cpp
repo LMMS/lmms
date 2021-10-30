@@ -137,9 +137,9 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( gui )
+		if( getGUI() != nullptr )
 		{
-			QMessageBox::critical( NULL,
+			QMessageBox::critical( nullptr,
 				SongEditor::tr( "Could not open file" ),
 				SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
@@ -209,7 +209,7 @@ bool DataFile::validate( QString extension )
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
 				( (extension == "xiz" || extension == "xmz") &&
-					! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
+					! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
 #ifdef LMMS_HAVE_LV2
@@ -291,7 +291,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 {
 	// Small lambda function for displaying errors
 	auto showError = [this](QString title, QString body){
-		if (gui)
+		if (getGUI() != nullptr)
 		{
 			QMessageBox mb;
 			mb.setWindowTitle(title);
@@ -1006,7 +1006,7 @@ void DataFile::upgrade_0_4_0_beta1()
 					m["plugin"] = sl.value( 0 );
 					m["file"] = sl.value( 1 );
 				}
-				EffectKey key( NULL, name, m );
+				EffectKey key( nullptr, name, m );
 				el.appendChild( key.saveXML( *this ) );
 			}
 		}
@@ -1816,9 +1816,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( gui )
+			if( getGUI() != nullptr )
 			{
-				QMessageBox::critical( NULL,
+				QMessageBox::critical( nullptr,
 					SongEditor::tr( "Error in file" ),
 					SongEditor::tr( "The file %1 seems to contain "
 							"errors and therefore can't be "
@@ -1857,7 +1857,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
-		 && gui != nullptr && root.attribute("type") == "song"
+		 && getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?
 				SongEditor::tr("template") : SongEditor::tr("project");

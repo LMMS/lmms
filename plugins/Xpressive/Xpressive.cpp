@@ -55,7 +55,7 @@ extern "C" {
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
 	PLUGIN_NAME), "Xpressive", QT_TRANSLATE_NOOP("PluginBrowser",
 	"Mathematical expression parser"), "Orr Dvori", 0x0100,
-	Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL };
+	Plugin::Instrument, new PluginPixmapLoader("logo"), nullptr, nullptr };
 
 }
 
@@ -202,7 +202,7 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
 
-	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == NULL) {
+	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == nullptr) {
 
 		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData(),Engine::audioEngine()->processingSampleRate());//give the "last" function a whole second
 		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData(),Engine::audioEngine()->processingSampleRate());
@@ -315,37 +315,37 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	PixmapButton * m_o2Btn;
 	PixmapButton * m_helpBtn;
 
-	m_w1Btn = new PixmapButton(this, NULL);
+	m_w1Btn = new PixmapButton(this, nullptr);
 	m_w1Btn->move(3, ROW_BTN);
 	m_w1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w1_active"));
 	m_w1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w1_inactive"));
 	ToolTip::add(m_w1Btn, tr("Select oscillator W1"));
 
-	m_w2Btn = new PixmapButton(this, NULL);
+	m_w2Btn = new PixmapButton(this, nullptr);
 	m_w2Btn->move(26, ROW_BTN);
 	m_w2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w2_active"));
 	m_w2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w2_inactive"));
 	ToolTip::add(m_w2Btn, tr("Select oscillator W2"));
 
-	m_w3Btn = new PixmapButton(this, NULL);
+	m_w3Btn = new PixmapButton(this, nullptr);
 	m_w3Btn->move(49, ROW_BTN);
 	m_w3Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w3_active"));
 	m_w3Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w3_inactive"));
 	ToolTip::add(m_w3Btn, tr("Select oscillator W3"));
 
-	m_o1Btn = new PixmapButton(this, NULL);
+	m_o1Btn = new PixmapButton(this, nullptr);
 	m_o1Btn->move(79, ROW_BTN);
 	m_o1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o1_active"));
 	m_o1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o1_inactive"));
 	ToolTip::add(m_o1Btn, tr("Select output O1"));
 
-	m_o2Btn = new PixmapButton(this, NULL);
+	m_o2Btn = new PixmapButton(this, nullptr);
 	m_o2Btn->move(101, ROW_BTN);
 	m_o2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o2_active"));
 	m_o2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o2_inactive"));
 	ToolTip::add(m_o2Btn, tr("Select output O2"));
 
-	m_helpBtn = new PixmapButton(this, NULL);
+	m_helpBtn = new PixmapButton(this, nullptr);
 	m_helpBtn->move(133, ROW_BTN);
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
@@ -873,7 +873,7 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
 	setWindowTitle ( "Xpressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
-	gui->mainWindow()->addWindowedWidget( this );
+	getGUI()->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	parentWidget()->setFixedSize( 300, 500);

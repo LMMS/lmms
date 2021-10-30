@@ -68,8 +68,8 @@ Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -301,7 +301,7 @@ void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 		//ssample*=2.0f*sound_vol;
 		ssample*=0.025f;
 
-		if(buffer!=NULL)
+		if(buffer!=nullptr)
 		{
 			if(ssample>1.0f) ssample=1.0f;
 			if(ssample<-1.0f) ssample=-1.0f;
@@ -459,7 +459,7 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
     const f_cnt_t offset = _n->noteOffset();
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 		_n->m_pluginData = new SfxrSynth( this );
 	}
@@ -603,7 +603,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	srand(time(NULL));
+	srand(time(nullptr));
 	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );

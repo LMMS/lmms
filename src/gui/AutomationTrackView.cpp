@@ -63,7 +63,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 		AutomatableModel * mod = Engine::getAutomatableModel(val,
 			_de->mimeData()->hasFormat( "application/x-osc-stringpair"));
 
-		if( mod )
+		if( mod != nullptr )
 		{
 			TimePos pos = TimePos( trackContainerView()->
 							currentPosition() +

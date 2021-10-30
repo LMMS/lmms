@@ -66,7 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"xiz",
-	NULL,
+	nullptr,
 } ;
 
 }
@@ -110,8 +110,8 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 									InstrumentTrack * _instrumentTrack ) :
 	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
 	m_hasGUI( false ),
-	m_plugin( NULL ),
-	m_remotePlugin( NULL ),
+	m_plugin( nullptr ),
+	m_remotePlugin( nullptr ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
 	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter frequency" ) ),
 	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter resonance" ) ),
@@ -161,8 +161,8 @@ ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 	m_pluginMutex.lock();
 	delete m_plugin;
 	delete m_remotePlugin;
-	m_plugin = NULL;
-	m_remotePlugin = NULL;
+	m_plugin = nullptr;
+	m_remotePlugin = nullptr;
 	m_pluginMutex.unlock();
 }
 
@@ -338,14 +338,14 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 	if (!m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0)) {return;}
 	if( m_remotePlugin )
 	{
-		m_remotePlugin->process( NULL, _buf );
+		m_remotePlugin->process( nullptr, _buf );
 	}
 	else
 	{
 		m_plugin->processAudio( _buf );
 	}
 	m_pluginMutex.unlock();
-	instrumentTrack()->processAudioBuffer( _buf, Engine::audioEngine()->framesPerPeriod(), NULL );
+	instrumentTrack()->processAudioBuffer( _buf, Engine::audioEngine()->framesPerPeriod(), nullptr );
 }
 
 
@@ -436,8 +436,8 @@ void ZynAddSubFxInstrument::initPlugin()
 	m_pluginMutex.lock();
 	delete m_plugin;
 	delete m_remotePlugin;
-	m_plugin = NULL;
-	m_remotePlugin = NULL;
+	m_plugin = nullptr;
+	m_remotePlugin = nullptr;
 
 	if( m_hasGUI )
 	{

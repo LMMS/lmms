@@ -85,6 +85,7 @@ private:
 	QLabel* m_loadingProgressLabel;
 };
 
-#define gui GuiApplication::instance()
+// Short-hand function
+LMMS_EXPORT GuiApplication* getGUI();
 
 #endif // GUIAPPLICATION_H

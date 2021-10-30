@@ -57,14 +57,14 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }
 
-QPixmap * organicInstrumentView::s_artwork = NULL;
-float * organicInstrument::s_harmonics = NULL;
+QPixmap * organicInstrumentView::s_artwork = nullptr;
+float * organicInstrument::s_harmonics = nullptr;
 
 /***********************************************************************
 *
@@ -114,7 +114,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	m_osc[6]->m_harmonic = log2f( 5.0f );	// .
 	m_osc[7]->m_harmonic = log2f( 6.0f );	// .*/
 	
-	if( s_harmonics == NULL )
+	if( s_harmonics == nullptr )
 	{
 		s_harmonics = new float[ NUM_HARMONICS ];
 		s_harmonics[0] = log2f( 0.5f );
@@ -230,7 +230,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	
-	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 		Oscillator * oscs_l[NUM_OSCILLATORS];
 		Oscillator * oscs_r[NUM_OSCILLATORS];
@@ -418,7 +418,7 @@ public:
 organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
-	m_oscKnobs( NULL )
+	m_oscKnobs( nullptr )
 {
 	organicInstrument * oi = castModel<organicInstrument>();
 
@@ -455,7 +455,7 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 					oi, SLOT( randomiseSettings() ) );
 
 
-	if( s_artwork == NULL )
+	if( s_artwork == nullptr )
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
@@ -484,7 +484,7 @@ void organicInstrumentView::modelChanged()
 	m_fx1Knob->setModel( &oi->m_fx1Model );
 	m_volKnob->setModel( &oi->m_volModel );
 
-	if( m_oscKnobs != NULL ) 
+	if( m_oscKnobs != nullptr )
 	{
 		delete[] m_oscKnobs;
 	}

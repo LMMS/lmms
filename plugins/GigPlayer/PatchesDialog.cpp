@@ -66,7 +66,7 @@ PatchesDialog::PatchesDialog( QWidget * pParent, Qt::WindowFlags wflags )
 	// Setup UI struct...
 	setupUi( this );
 
-	m_pSynth = NULL;
+	m_pSynth = nullptr;
 	m_iChan  = 0;
 	m_iBank  = 0;
 	m_iProg  = 0;
@@ -130,7 +130,7 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 	setWindowTitle( chanName + " - GIG patches" );
 
 	// set m_pSynth to NULL so we don't trigger any progChanged events
-	m_pSynth = NULL;
+	m_pSynth = nullptr;
 
 	// Load bank list from actual synth stack...
 	m_bankListView->setSortingEnabled( false );
@@ -142,7 +142,7 @@ void PatchesDialog::setup( GigInstance * pSynth, int iChan,
 
 
 	//fluid_preset_t preset;
-	QTreeWidgetItem * pBankItem = NULL;
+	QTreeWidgetItem * pBankItem = nullptr;
 
 	// Currently just use zero as the only bank
 	int iBankDefault = -1;
@@ -215,8 +215,8 @@ bool PatchesDialog::validateForm()
 {
 	bool bValid = true;
 
-	bValid = bValid && ( m_bankListView->currentItem() != NULL );
-	bValid = bValid && ( m_progListView->currentItem() != NULL );
+	bValid = bValid && ( m_bankListView->currentItem() != nullptr );
+	bValid = bValid && ( m_progListView->currentItem() != nullptr );
 
 	return bValid;
 }
@@ -227,7 +227,7 @@ bool PatchesDialog::validateForm()
 // Realize a bank-program selection preset.
 void PatchesDialog::setBankProg( int iBank, int iProg )
 {
-	if( m_pSynth == NULL )
+	if( m_pSynth == nullptr )
 	{
 		return;
 	}
@@ -295,7 +295,7 @@ QTreeWidgetItem * PatchesDialog::findBankItem( int iBank )
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -317,7 +317,7 @@ QTreeWidgetItem *PatchesDialog::findProgItem( int iProg )
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -327,14 +327,14 @@ QTreeWidgetItem *PatchesDialog::findProgItem( int iProg )
 // Bank change slot.
 void PatchesDialog::bankChanged()
 {
-	if( m_pSynth == NULL )
+	if( m_pSynth == nullptr )
 	{
 		return;
 	}
 
 	QTreeWidgetItem * pBankItem = m_bankListView->currentItem();
 
-	if( pBankItem == NULL )
+	if( pBankItem == nullptr )
 	{
 		return;
 	}
@@ -344,7 +344,7 @@ void PatchesDialog::bankChanged()
 	// Clear up the program listview.
 	m_progListView->setSortingEnabled( false );
 	m_progListView->clear();
-	QTreeWidgetItem * pProgItem = NULL;
+	QTreeWidgetItem * pProgItem = nullptr;
 
 	gig::Instrument * pInstrument = m_pSynth->gig.GetFirstInstrument();
 
@@ -386,7 +386,7 @@ void PatchesDialog::bankChanged()
 // Program change slot.
 void PatchesDialog::progChanged( QTreeWidgetItem * curr, QTreeWidgetItem * prev )
 {
-	if( m_pSynth == NULL || curr == NULL )
+	if( m_pSynth == nullptr || curr == nullptr )
 	{
 		return;
 	}

@@ -39,7 +39,7 @@ void BufferManager::init( fpp_t framesPerPeriod )
 
 sampleFrame * BufferManager::acquire()
 {
-	return MM_ALLOC( sampleFrame, ::framesPerPeriod );
+	return MM_ALLOC<sampleFrame>( ::framesPerPeriod );
 }
 
 void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )

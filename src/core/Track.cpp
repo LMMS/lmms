@@ -107,7 +107,7 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 {
 	Engine::audioEngine()->requestChangeInModel();
 
-	Track * t = NULL;
+	Track * t = nullptr;
 
 	switch( tt )
 	{
@@ -150,7 +150,7 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 	Track * t = create(
 		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
 									tc );
-	if( t != NULL )
+	if( t != nullptr )
 	{
 		t->restoreState( element );
 	}

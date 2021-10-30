@@ -48,6 +48,7 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
@@ -626,7 +627,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 	else if (
 		(ext == "xiz" || ext == "xmz" || ext == "sf2" || ext == "sf3" ||
 		 ext == "gig" || ext == "pat")
-		&& !pluginFactory->pluginSupportingExtension(ext).isNull())
+		&& !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
 		const bool isPlugin = file->handling() == FileItem::LoadByPlugin;
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
@@ -755,7 +756,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( gui->mainWindow()->mayChangeProject(true) )
+			if( getGUI()->mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -769,7 +770,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 				!i->descriptor()->supportsFileType( e ) )
 			{
 				PluginFactory::PluginInfoAndKey piakn =
-					pluginFactory->pluginSupportingExtension(e);
+					getPluginFactory()->pluginSupportingExtension(e);
 				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
@@ -886,7 +887,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			gui->mainWindow()->workspace()->
+			getGUI()->mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
@@ -1228,7 +1229,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
 	}
-	else if( (ext == "xiz" || ext == "xmz" ) && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+	else if( (ext == "xiz" || ext == "xmz" ) && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
@@ -1262,7 +1263,7 @@ void FileItem::determineFileType( void )
 	}
 
 	if( m_handling == NotSupported &&
-		!ext.isEmpty() && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+		!ext.isEmpty() && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_handling = LoadByPlugin;
 		// classify as sample if not classified by anything yet but can

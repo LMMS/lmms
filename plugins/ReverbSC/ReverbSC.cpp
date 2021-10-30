@@ -40,8 +40,8 @@ Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 	0x0123,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 } ;
 
 }

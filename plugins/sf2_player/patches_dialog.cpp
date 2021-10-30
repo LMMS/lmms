@@ -65,7 +65,7 @@ patchesDialog::patchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	// Setup UI struct...
 	setupUi( this );
 
-	m_pSynth = NULL;
+	m_pSynth = nullptr;
 	m_iChan  = 0;
 	m_iBank  = 0;
 	m_iProg  = 0;
@@ -128,7 +128,7 @@ void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	setWindowTitle( _chanName + " - Soundfont patches" );
 
 	// set m_pSynth to NULL so we don't trigger any progChanged events
-	m_pSynth = NULL;
+	m_pSynth = nullptr;
 
 	// Load bank list from actual synth stack...
 	m_bankListView->setSortingEnabled(false);
@@ -139,7 +139,7 @@ void patchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 	m_iChan  = iChan;
 
 
-	QTreeWidgetItem *pBankItem = NULL;
+	QTreeWidgetItem *pBankItem = nullptr;
 	// For all soundfonts (in reversed stack order) fill the available banks...
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
 	for (int i = 0; i < cSoundFonts; i++) {
@@ -209,8 +209,8 @@ bool patchesDialog::validateForm()
 {
 	bool bValid = true;
 
-	bValid = bValid && (m_bankListView->currentItem() != NULL);
-	bValid = bValid && (m_progListView->currentItem() != NULL);
+	bValid = bValid && (m_bankListView->currentItem() != nullptr);
+	bValid = bValid && (m_progListView->currentItem() != nullptr);
 
 	return bValid;
 }
@@ -219,7 +219,7 @@ bool patchesDialog::validateForm()
 // Realize a bank-program selection preset.
 void patchesDialog::setBankProg ( int iBank, int iProg )
 {
-	if (m_pSynth == NULL)
+	if (m_pSynth == nullptr)
 		return;
 
 	// just select the synth's program preset...
@@ -278,7 +278,7 @@ QTreeWidgetItem *patchesDialog::findBankItem ( int iBank )
 	if (iter.hasNext())
 		return iter.next();
 	else
-		return NULL;
+		return nullptr;
 }
 
 
@@ -293,7 +293,7 @@ QTreeWidgetItem *patchesDialog::findProgItem ( int iProg )
 	if (iter.hasNext())
 		return iter.next();
 	else
-		return NULL;
+		return nullptr;
 }
 
 
@@ -301,11 +301,11 @@ QTreeWidgetItem *patchesDialog::findProgItem ( int iProg )
 // Bank change slot.
 void patchesDialog::bankChanged (void)
 {
-	if (m_pSynth == NULL)
+	if (m_pSynth == nullptr)
 		return;
 
 	QTreeWidgetItem *pBankItem = m_bankListView->currentItem();
-	if (pBankItem == NULL)
+	if (pBankItem == nullptr)
 		return;
 
 	int iBankSelected = pBankItem->text(0).toInt();
@@ -313,7 +313,7 @@ void patchesDialog::bankChanged (void)
 	// Clear up the program listview.
 	m_progListView->setSortingEnabled(false);
 	m_progListView->clear();
-	QTreeWidgetItem *pProgItem = NULL;
+	QTreeWidgetItem *pProgItem = nullptr;
 	// For all soundfonts (in reversed stack order) fill the available programs...
 	int cSoundFonts = ::fluid_synth_sfcount(m_pSynth);
 	for (int i = 0; i < cSoundFonts && !pProgItem; i++) {
@@ -358,7 +358,7 @@ void patchesDialog::bankChanged (void)
 // Program change slot.
 void patchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _prev)
 {
-	if (m_pSynth == NULL || _curr == NULL)
+	if (m_pSynth == nullptr || _curr == nullptr)
 		return;
 
 	// Which preview state...

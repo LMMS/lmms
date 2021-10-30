@@ -121,7 +121,7 @@ public:
 
 	static inline LmmsCore * inst()
 	{
-		if( s_instanceOfMe == NULL )
+		if( s_instanceOfMe == nullptr )
 		{
 			s_instanceOfMe = new LmmsCore();
 		}
@@ -147,7 +147,7 @@ private:
 	static inline void deleteHelper( T * * ptr )
 	{
 		T * tmp = *ptr;
-		*ptr = NULL;
+		*ptr = nullptr;
 		delete tmp;
 	}
 

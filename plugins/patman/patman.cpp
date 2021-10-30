@@ -62,7 +62,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"pat",
-	NULL,
+	nullptr,
 } ;
 
 
@@ -395,7 +395,7 @@ void patmanInstrument::selectSample( NotePlayHandle * _n )
 	const float freq = _n->frequency();
 
 	float min_dist = HUGE_VALF;
-	SampleBuffer* sample = NULL;
+	SampleBuffer* sample = nullptr;
 
 	for( QVector<SampleBuffer *>::iterator it = m_patchSamples.begin(); it != m_patchSamples.end(); ++it )
 	{
@@ -418,7 +418,7 @@ void patmanInstrument::selectSample( NotePlayHandle * _n )
 	}
 	else
 	{
-		hdata->sample = new SampleBuffer( NULL, 0 );
+		hdata->sample = new SampleBuffer( nullptr, 0 );
 	}
 	hdata->state = new SampleBuffer::handleState( _n->hasDetuningInfo() );
 
@@ -444,7 +444,7 @@ PluginView * patmanInstrument::instantiateView( QWidget * _parent )
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent ),
-	m_pi( NULL )
+	m_pi( nullptr )
 {
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -453,7 +453,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 	setPalette( pal );
 
 
-	m_openFileButton = new PixmapButton( this, NULL );
+	m_openFileButton = new PixmapButton( this, nullptr );
 	m_openFileButton->setObjectName( "openFileButton" );
 	m_openFileButton->setCursor( QCursor( Qt::PointingHandCursor ) );
 	m_openFileButton->move( 227, 86 );
@@ -502,7 +502,7 @@ PatmanView::~PatmanView()
 
 void PatmanView::openFile( void )
 {
-	FileDialog ofd( NULL, tr( "Open patch file" ) );
+	FileDialog ofd( nullptr, tr( "Open patch file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;

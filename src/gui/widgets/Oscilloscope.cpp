@@ -88,7 +88,7 @@ void Oscilloscope::setActive( bool _active )
 	m_active = _active;
 	if( m_active )
 	{
-		connect( gui->mainWindow(),
+		connect( getGUI()->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		connect( Engine::audioEngine(),
@@ -97,7 +97,7 @@ void Oscilloscope::setActive( bool _active )
 	}
 	else
 	{
-		disconnect( gui->mainWindow(),
+		disconnect( getGUI()->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		disconnect( Engine::audioEngine(),

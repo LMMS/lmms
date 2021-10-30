@@ -57,7 +57,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioportaudio", "channels" ).toInt(),
 		SURROUND_CHANNELS ), _audioEngine ),
-	m_paStream( NULL ),
+	m_paStream( nullptr ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
 	m_outBufPos( 0 )
@@ -123,19 +123,19 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 	m_outputParameters.channelCount = channels();
 	m_outputParameters.sampleFormat = paFloat32; // 32 bit floating point output
 	m_outputParameters.suggestedLatency = outLatency;
-	m_outputParameters.hostApiSpecificStreamInfo = NULL;
+	m_outputParameters.hostApiSpecificStreamInfo = nullptr;
 	
 	// Configure input parameters.
 	m_inputParameters.device = inDevIdx;
 	m_inputParameters.channelCount = DEFAULT_CHANNELS;
 	m_inputParameters.sampleFormat = paFloat32; // 32 bit floating point input
 	m_inputParameters.suggestedLatency = inLatency;
-	m_inputParameters.hostApiSpecificStreamInfo = NULL;
+	m_inputParameters.hostApiSpecificStreamInfo = nullptr;
 	
 	// Open an audio I/O stream. 
 	err = Pa_OpenStream(
 			&m_paStream,
-			supportsCapture() ? &m_inputParameters : NULL,	// The input parameter
+			supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
 			&m_outputParameters,	// The outputparameter
 			sampleRate(),
 			samples,
@@ -151,7 +151,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine 
 		setSampleRate( 48000 );
 		err = Pa_OpenStream(
 				&m_paStream,
-				supportsCapture() ? &m_inputParameters : NULL,	// The input parameter
+				supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
 				&m_outputParameters,	// The outputparameter
 				sampleRate(),
 				samples,
@@ -234,7 +234,7 @@ void AudioPortAudio::applyQualitySettings()
 
 		PaError err = Pa_OpenStream(
 			&m_paStream,
-			supportsCapture() ? &m_inputParameters : NULL,	// The input parameter
+			supportsCapture() ? &m_inputParameters : nullptr,	// The input parameter
 			&m_outputParameters,	// The outputparameter
 			sampleRate(),
 			samples,

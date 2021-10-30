@@ -53,7 +53,7 @@ BBTrackView::BBTrackView( BBTrack * _bbt, TrackContainerView* tcv ) :
 
 BBTrackView::~BBTrackView()
 {
-	gui->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
+	getGUI()->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
 }
 
 
@@ -61,7 +61,7 @@ BBTrackView::~BBTrackView()
 
 bool BBTrackView::close()
 {
-	gui->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
+	getGUI()->getBBEditor()->removeBBView( BBTrack::s_infoMap[m_bbTrack] );
 	return TrackView::close();
 }
 
@@ -71,6 +71,6 @@ bool BBTrackView::close()
 void BBTrackView::clickedTrackLabel()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
-	gui->getBBEditor()->parentWidget()->show();
-	gui->getBBEditor()->setFocus( Qt::ActiveWindowFocusReason );
+	getGUI()->getBBEditor()->parentWidget()->show();
+	getGUI()->getBBEditor()->setFocus( Qt::ActiveWindowFocusReason );
 }

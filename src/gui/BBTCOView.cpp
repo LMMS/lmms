@@ -162,7 +162,7 @@ void BBTCOView::openInBBEditor()
 {
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
 
-	gui->mainWindow()->toggleBBEditorWin( true );
+	getGUI()->mainWindow()->toggleBBEditorWin( true );
 }
 
 

@@ -64,6 +64,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "Pattern.h"
+#include "PianoView.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
@@ -113,14 +114,14 @@ const int NUM_TRIPLET_LENGTHS = 5;
 
 
 
-QPixmap * PianoRoll::s_toolDraw = NULL;
-QPixmap * PianoRoll::s_toolErase = NULL;
-QPixmap * PianoRoll::s_toolSelect = NULL;
-QPixmap * PianoRoll::s_toolMove = NULL;
-QPixmap * PianoRoll::s_toolOpen = NULL;
+QPixmap * PianoRoll::s_toolDraw = nullptr;
+QPixmap * PianoRoll::s_toolErase = nullptr;
+QPixmap * PianoRoll::s_toolSelect = nullptr;
+QPixmap * PianoRoll::s_toolMove = nullptr;
+QPixmap * PianoRoll::s_toolOpen = nullptr;
 QPixmap* PianoRoll::s_toolKnife = nullptr;
 
-TextFloat * PianoRoll::s_textFloat = NULL;
+TextFloat * PianoRoll::s_textFloat = nullptr;
 
 static QString s_noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 
@@ -149,18 +150,18 @@ const QVector<float> PianoRoll::m_zoomYLevels =
 
 PianoRoll::PianoRoll() :
 	m_nemStr( QVector<QString>() ),
-	m_noteEditMenu( NULL ),
-	m_semiToneMarkerMenu( NULL ),
+	m_noteEditMenu( nullptr ),
+	m_semiToneMarkerMenu( nullptr ),
 	m_zoomingModel(),
 	m_zoomingYModel(),
 	m_quantizeModel(),
 	m_noteLenModel(),
 	m_scaleModel(),
 	m_chordModel(),
-	m_pattern( NULL ),
+	m_pattern( nullptr ),
 	m_currentPosition(),
 	m_recording( false ),
-	m_currentNote( NULL ),
+	m_currentNote( nullptr ),
 	m_action( ActionNone ),
 	m_noteEditMode( NoteEditVolume ),
 	m_moveBoundaryLeft( 0 ),
@@ -255,23 +256,23 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu->addAction( copyAllNotesAction );
 
 	// init pixmaps
-	if( s_toolDraw == NULL )
+	if( s_toolDraw == nullptr )
 	{
 		s_toolDraw = new QPixmap( embed::getIconPixmap( "edit_draw" ) );
 	}
-	if( s_toolErase == NULL )
+	if( s_toolErase == nullptr )
 	{
 		s_toolErase= new QPixmap( embed::getIconPixmap( "edit_erase" ) );
 	}
-	if( s_toolSelect == NULL )
+	if( s_toolSelect == nullptr )
 	{
 		s_toolSelect = new QPixmap( embed::getIconPixmap( "edit_select" ) );
 	}
-	if( s_toolMove == NULL )
+	if( s_toolMove == nullptr )
 	{
 		s_toolMove = new QPixmap( embed::getIconPixmap( "edit_move" ) );
 	}
-	if( s_toolOpen == NULL )
+	if( s_toolOpen == nullptr )
 	{
 		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
 	}
@@ -281,7 +282,7 @@ PianoRoll::PianoRoll() :
 	}
 
 	// init text-float
-	if( s_textFloat == NULL )
+	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new TextFloat;
 	}
@@ -782,7 +783,7 @@ void PianoRoll::fitNoteLengths(bool fill)
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
 
@@ -808,7 +809,7 @@ void PianoRoll::constrainNoteLengths(bool constrainMax)
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
 
@@ -850,7 +851,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	if( Engine::getSong()->isPlaying() &&
 		Engine::getSong()->playMode() == Song::Mode_PlayPattern )
 	{
-		Engine::getSong()->playPattern( NULL );
+		Engine::getSong()->playPattern( nullptr );
 	}
 
 	if(m_stepRecorder.isRecording())
@@ -861,7 +862,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	// set new data
 	m_pattern = newPattern;
 	m_currentPosition = 0;
-	m_currentNote = NULL;
+	m_currentNote = nullptr;
 	m_startKey = INITIAL_START_KEY;
 
 	m_stepRecorder.setCurrentPattern(newPattern);
@@ -897,7 +898,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of start-notes and so on...)
-	resizeEvent( NULL );
+	resizeEvent( nullptr );
 
 	// make sure to always get informed about the pattern being destroyed
 	connect( m_pattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( hidePattern( Pattern* ) ) );
@@ -922,7 +923,7 @@ void PianoRoll::hidePattern( Pattern* pattern )
 {
 	if( m_pattern == pattern )
 	{
-		setCurrentPattern( NULL );
+		setCurrentPattern( nullptr );
 	}
 }
 
@@ -1170,7 +1171,7 @@ void PianoRoll::removeSelection()
 
 void PianoRoll::clearSelectedNotes()
 {
-	if( m_pattern != NULL )
+	if( m_pattern != nullptr )
 	{
 		for( Note *note : m_pattern->notes() )
 		{
@@ -1200,7 +1201,7 @@ void PianoRoll::shiftSemiTone(NoteVector notes, int amount)
 	m_pattern->dataChanged();
 	//We modified the song
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 }
 
 
@@ -1231,7 +1232,7 @@ void PianoRoll::shiftPos(NoteVector notes, int amount)
 	m_pattern->dataChanged();
 	// we modified the song
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 }
 
 
@@ -1361,7 +1362,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 					{
 						Pattern * p = direction > 0 ? m_pattern->nextPattern()
 										: m_pattern->previousPattern();
-						if(p != NULL)
+						if(p != nullptr)
 						{
 							setCurrentPattern(p);
 						}
@@ -1636,7 +1637,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		}
 		detuningPattern = n->detuning()->automationPattern();
 		connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
-		gui->automationEditor()->open(detuningPattern);
+		getGUI()->automationEditor()->open(detuningPattern);
 		return;
 	}
 
@@ -1735,7 +1736,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				// whether this action creates new note(s) or not
 				bool is_new_note = false;
 
-				Note * created_new_note = NULL;
+				Note * created_new_note = nullptr;
 				// did it reach end of vector because
 				// there's no note??
 				if( it == notes.begin()-1 )
@@ -1886,7 +1887,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 							// added new notes, so must update engine, song, etc
 							Engine::getSong()->setModified();
 							update();
-							gui->songEditor()->update();
+							getGUI()->songEditor()->update();
 						}
 					}
 
@@ -2007,7 +2008,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		// make sure we're on a note
 		if( nv.size() > 0 )
 		{
-			const Note * closest = NULL;
+			const Note * closest = nullptr;
 			int closest_dist = 9999999;
 			// if we caught multiple notes and we're not editing a
 			// selection, find the closest...
@@ -2309,7 +2310,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		pauseChordNotes(m_lastKey);
 	}
 
-	m_currentNote = NULL;
+	m_currentNote = nullptr;
 
 	if (m_action != ActionKnife)
 	{
@@ -2759,7 +2760,7 @@ void PianoRoll::updateKnifePos(QMouseEvent* me)
 {
 	// Calculate the TimePos from the mouse
 	int mouseViewportPos = me->x() - m_whiteKeyWidth;
-	int mouseTickPos = mouseViewportPos / (m_ppb / TimePos::ticksPerBar()) + m_currentPosition;
+	int mouseTickPos = mouseViewportPos * TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
 	// If ctrl is not pressed, quantize the position
 	if (!(me->modifiers() & Qt::ControlModifier))
@@ -3644,7 +3645,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	currentKeyCol.setAlpha( 64 );
 
 	// horizontal line for the key under the cursor
-	if(hasValidPattern() && gui->pianoRoll()->hasFocus())
+	if(hasValidPattern() && getGUI()->pianoRoll()->hasFocus())
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
 		p.fillRect( 10, keyAreaBottom() + 3 - m_keyLineHeight *
@@ -3656,9 +3657,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.fillRect( QRect( 0, keyAreaBottom(),
 					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), editAreaCol );
 
-	if (gui->pianoRoll()->hasFocus())
+	if (getGUI()->pianoRoll()->hasFocus())
 	{
-		const QPixmap * cursor = NULL;
+		const QPixmap * cursor = nullptr;
 		// draw current edit-mode-icon below the cursor
 		switch( m_editMode )
 		{
@@ -3682,7 +3683,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			case ModeEditKnife: cursor = s_toolKnife; break;
 		}
 		QPoint mousePosition = mapFromGlobal( QCursor::pos() );
-		if( cursor != NULL && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
+		if( cursor != nullptr && mousePosition.y() > keyAreaTop() && mousePosition.x() > noteEditLeft())
 		{
 			p.drawPixmap( mousePosition + QPoint( 8, 8 ), *cursor );
 		}
@@ -4361,7 +4362,7 @@ void PianoRoll::cutSelectedNotes()
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 }
 
 
@@ -4411,7 +4412,7 @@ void PianoRoll::pasteNotes()
 		// least one note...
 		Engine::getSong()->setModified();
 		update();
-		gui->songEditor()->update();
+		getGUI()->songEditor()->update();
 	}
 }
 
@@ -4432,7 +4433,7 @@ bool PianoRoll::deleteSelectedNotes()
 
 	Engine::getSong()->setModified();
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	return true;
 }
 
@@ -4623,7 +4624,7 @@ void PianoRoll::quantizeNotes(QuantizeActions mode)
 	}
 
 	update();
-	gui->songEditor()->update();
+	getGUI()->songEditor()->update();
 	Engine::getSong()->setModified();
 }
 
@@ -4662,7 +4663,7 @@ TimePos PianoRoll::newNoteLen() const
 
 bool PianoRoll::mouseOverNote()
 {
-	return hasValidPattern() && noteUnderMouse() != NULL;
+	return hasValidPattern() && noteUnderMouse() != nullptr;
 }
 
 
@@ -4677,7 +4678,7 @@ Note * PianoRoll::noteUnderMouse()
 		|| pos.y() < PR_TOP_MARGIN
 		|| pos.y() > keyAreaBottom() )
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int key_num = getKey( pos.y() );
@@ -4698,7 +4699,7 @@ Note * PianoRoll::noteUnderMouse()
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void PianoRoll::changeSnapMode()
@@ -5006,7 +5007,7 @@ PianoRollWindow::PianoRollWindow() :
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
-	setCurrentPattern( NULL );
+	setCurrentPattern( nullptr );
 
 	// Connections
 	connect( m_editor, SIGNAL( currentPatternChanged() ), this, SIGNAL( currentPatternChanged() ) );
@@ -5270,7 +5271,7 @@ void PianoRollWindow::importPattern()
 	// Overwrite confirmation.
 	if (!m_editor->m_pattern->empty() &&
 		QMessageBox::warning(
-			NULL,
+			nullptr,
 			tr("Import pattern."),
 			tr("You are about to import a pattern, this will "
 				"overwrite your current pattern. Do you want to "

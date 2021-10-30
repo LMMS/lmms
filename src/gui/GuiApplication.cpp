@@ -58,12 +58,16 @@ GuiApplication* GuiApplication::instance()
 	return s_instance;
 }
 
+GuiApplication* getGUI()
+{
+	return GuiApplication::instance();
+}
 
 GuiApplication::GuiApplication()
 {
 	// prompt the user to create the LMMS working directory (e.g. ~/Documents/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
-		QMessageBox::question( NULL,
+		QMessageBox::question( nullptr,
 				tr( "Working directory" ),
 				tr( "The LMMS working directory %1 does not "
 				"exist. Create it now? You can change the directory "
@@ -185,7 +189,7 @@ void GuiApplication::displayInitProgress(const QString &msg)
 
 void GuiApplication::childDestroyed(QObject *obj)
 {
-	// when any object that can be reached via gui->mainWindow(), gui->fxMixerView(), etc
+	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->fxMixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
 	if (obj == m_mainWindow)
 	{
@@ -237,9 +241,9 @@ QFont GuiApplication::getWin32SystemFont()
 	if ( pointSize < 0 )
 	{
 		// height is in pixels, convert to points
-		HDC hDC = GetDC( NULL );
+		HDC hDC = GetDC( nullptr );
 		pointSize = MulDiv( abs( pointSize ), 72, GetDeviceCaps( hDC, LOGPIXELSY ) );
-		ReleaseDC( NULL, hDC );
+		ReleaseDC( nullptr, hDC );
 	}
 
 	return QFont( QString::fromUtf8( metrics.lfMessageFont.lfFaceName ), pointSize );

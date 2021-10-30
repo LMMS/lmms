@@ -257,7 +257,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
 	float offset =  m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
+	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 

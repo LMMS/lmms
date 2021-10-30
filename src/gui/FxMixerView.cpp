@@ -54,7 +54,7 @@
 
 FxMixerView::FxMixerView() :
 	QWidget(),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	SerializingObjectHook()
 {
 	FxMixer * m = Engine::fxMixer();
@@ -149,12 +149,12 @@ FxMixerView::FxMixerView() :
 	updateGeometry();
 
 	// timer for updating faders
-	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
+	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateFaders() ) );
 
 
 	// add ourself to workspace
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
@@ -365,7 +365,7 @@ void FxMixerView::updateFxLine(int index)
 	thisLine->setToolTip( Engine::fxMixer()->effectChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
-	if( sendModel == NULL )
+	if( sendModel == nullptr )
 	{
 		// does not send, hide send knob
 		thisLine->m_sendKnob->setVisible(false);
