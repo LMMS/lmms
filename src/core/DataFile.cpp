@@ -1762,7 +1762,7 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::size_t max = std::min((std::size_t)m_fileVersion, UPGRADE_METHODS.size());
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
 	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
