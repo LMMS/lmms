@@ -139,7 +139,8 @@ void ConfigManager::upgrade()
 	}
 
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_configVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_configVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();

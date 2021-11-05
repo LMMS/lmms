@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QDragEnterEvent>
+#include <QPushButton>
 #include <QTemporaryFile>
 #include <spa/audio.h>
 
