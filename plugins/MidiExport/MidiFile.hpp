@@ -245,7 +245,7 @@ class MIDITrack
 		event.channel = channel;
 
 		event.type = Event::TEMPO;
-		event.time=time;
+		event.time = time;
 		event.tempo = tempo;
 
 		addEvent(event);
