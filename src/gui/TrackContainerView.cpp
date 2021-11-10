@@ -398,12 +398,21 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "presetfile" )
 	{
-		DataFile dataFile( value );
+		//Saving mute/solo/muteBeforeSolo states before replacing preset
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-								m_tc ) );
+								Track::create( Track::InstrumentTrack,
+								m_tc));
+
+		bool oldMute = it->isMuted();
+		bool oldSolo = it->isSolo();
+		bool oldMutedBeforeSolo = it->getMutedBeforeSolo();
+
+		DataFile dataFile(value);
 		it->setSimpleSerializing();
-		it->loadSettings( dataFile.content().toElement() );
+		it->loadSettings(dataFile.content().toElement());
+		it->setMuted(oldMute);
+		it->setSolo(oldSolo);
+		it->setMutedBeforeSolo(oldMutedBeforeSolo);
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}

@@ -561,8 +561,16 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	}
 	else if( type == "presetfile" )
 	{
+		//Saving mute/solo/muteBeforeSolo states before replacing preset
+		bool oldMute = m_track->isMuted();
+		bool oldSolo = m_track->isSolo();
+		bool oldMutedBeforeSolo = m_track->getMutedBeforeSolo();
+		
 		DataFile dataFile(value);
 		m_track->replaceInstrument(dataFile);
+		m_track->setMuted(oldMute);
+		m_track->setSolo(oldSolo);
+		m_track->setMutedBeforeSolo(oldMutedBeforeSolo);
 		event->accept();
 		setFocus();
 	}

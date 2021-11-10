@@ -188,6 +188,8 @@ public:
 	}
 	
 	BoolModel* getMutedModel();
+	bool getMutedBeforeSolo();
+	void setMutedBeforeSolo(bool val);
 
 public slots:
 	virtual void setName( const QString & newName )
@@ -209,9 +211,10 @@ private:
 
 protected:
 	BoolModel m_mutedModel;
-private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
+
+private:
 
 	bool m_simpleSerializingMode;
 

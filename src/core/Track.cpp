@@ -669,4 +669,11 @@ BoolModel *Track::getMutedModel()
 {
 	return &m_mutedModel;
 }
-
+bool Track::getMutedBeforeSolo()
+{
+	return m_mutedBeforeSolo;
+}
+void Track::setMutedBeforeSolo(bool val)
+{
+	m_mutedBeforeSolo = val;
+}
