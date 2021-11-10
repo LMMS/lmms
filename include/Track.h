@@ -215,7 +215,6 @@ protected:
 	bool m_mutedBeforeSolo;
 
 private:
-
 	bool m_simpleSerializingMode;
 
 	tcoVector m_trackContentObjects;
@@ -233,7 +232,6 @@ signals:
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
 	void colorChanged();
-
 } ;
 
 
