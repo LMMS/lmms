@@ -35,6 +35,7 @@
 #include "CaptionMenu.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "ScrollCounter.h"
 
 
 
@@ -46,6 +47,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
+	ScrollCounter::registerWidget(this);
 }
 
 
@@ -59,6 +61,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, co
 	m_lastMousePos(),
 	m_displayOffset( 0 )
 {
+	ScrollCounter::registerWidget(this);
 }
 
 void LcdSpinBox::update()
@@ -145,7 +148,7 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	model()->setInitValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
+	model()->setInitValue(model()->value() + ScrollCounter::getStepsY() * model()->step<int>());
 	emit manualChange();
 }
 

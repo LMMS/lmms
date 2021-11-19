@@ -34,6 +34,7 @@
 #include "InstrumentTrack.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "ScrollCounter.h"
 
 PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	TrackContentObjectView( pattern, parent ),
@@ -75,6 +76,8 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	update();
 
 	setStyle( QApplication::style() );
+
+	ScrollCounter::registerWidget(this);
 }
 
 
@@ -255,7 +258,7 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 void PatternView::wheelEvent(QWheelEvent * we)
 {
 	if(m_pat->m_patternType == Pattern::BeatPattern &&
-				(fixedTCOs() || pixelsPerBar() >= 96) &&
+				(fixedTCOs() || (pixelsPerBar() >= 96 && m_legacySEBB)) &&
 				position(we).y() > height() - s_stepBtnOff->height())
 	{
 //	get the step number that was wheeled on and
@@ -271,23 +274,16 @@ void PatternView::wheelEvent(QWheelEvent * we)
 		}
 
 		Note * n = m_pat->noteAtStep( step );
-		if(!n && we->angleDelta().y() > 0)
+		int volInc = ScrollCounter::getStepsY(24);
+		if (!n && volInc > 0)
 		{
 			n = m_pat->addStepNote( step );
 			n->setVolume( 0 );
 		}
-		if( n != nullptr )
+		if (n != nullptr && volInc != 0)
 		{
-			int vol = n->getVolume();
-
-			if(we->angleDelta().y() > 0)
-			{
-				n->setVolume( qMin( 100, vol + 5 ) );
-			}
-			else
-			{
-				n->setVolume( qMax( 0, vol - 5 ) );
-			}
+			// Change volume by 5% per mousewheel step
+			n->setVolume(std::max(0, n->getVolume() + volInc));
 
 			Engine::getSong()->setModified();
 			update();

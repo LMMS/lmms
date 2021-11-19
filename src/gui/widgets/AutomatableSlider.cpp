@@ -29,6 +29,7 @@
 
 #include "CaptionMenu.h"
 #include "MainWindow.h"
+#include "ScrollCounter.h"
 
 
 
@@ -45,6 +46,8 @@ AutomatableSlider::AutomatableSlider( QWidget * _parent,
 					this, SLOT( changeValue( int ) ) );
 	connect( this, SIGNAL( sliderMoved( int ) ),
 					this, SLOT( moveSlider( int ) ) );
+
+	ScrollCounter::registerWidget(this);
 }
 
 
@@ -97,7 +100,7 @@ void AutomatableSlider::wheelEvent( QWheelEvent * _me )
 {
 	bool old_status = m_showStatus;
 	m_showStatus = true;
-	QSlider::wheelEvent( _me );
+	model()->incValue(ScrollCounter::getStepsY());
 	m_showStatus = old_status;
 }
 

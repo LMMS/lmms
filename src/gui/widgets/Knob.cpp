@@ -46,6 +46,7 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
+#include "ScrollCounter.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
@@ -70,6 +71,7 @@ Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	m_knobNum( _knob_num )
 {
 	initUi( _name );
+	ScrollCounter::registerWidget(this);
 }
 
 Knob::Knob( QWidget * _parent, const QString & _name ) :
@@ -689,10 +691,19 @@ void Knob::paintEvent( QPaintEvent * _me )
 void Knob::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	const float stepMult = model()->range() / 2000 / model()->step<float>();
-	const int inc = ((we->angleDelta().y() > 0 ) ? 1 : -1) * ((stepMult < 1 ) ? 1 : stepMult);
-	model()->incValue( inc );
+	if (!model()) { return; }
 
+	// angleDelta of a standard mousewheel "tick"
+	static const int wheelTick = 120;
+
+	// Maximum scroll distance from start to end
+	static const float maxAngle = 200 * wheelTick;
+
+	// Scroll at most one tick to move the model one step
+	const float modelSteps = model()->range() / model()->step<float>();
+	const float anglePerStep = std::min<float>(maxAngle / modelSteps, wheelTick);
+
+	model()->incValue(ScrollCounter::getStepsY(anglePerStep));
 
 	s_textFloat->setText( displayValue() );
 	s_textFloat->moveGlobal( this, QPoint( width() + 2, 0 ) );

@@ -38,6 +38,7 @@ SET(LMMS_SRCS
 	gui/SampleTCOView.cpp
 	gui/SampleTrackView.cpp
 	gui/SampleTrackWindow.cpp
+	gui/ScrollCounter.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp

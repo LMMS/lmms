@@ -36,6 +36,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "ScrollCounter.h"
 
 
 QPixmap * ComboBox::s_background = nullptr;
@@ -76,6 +77,8 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 
 	setWindowTitle( _name );
 	doConnections();
+
+	ScrollCounter::registerWidget(this);
 }
 
 
@@ -232,7 +235,7 @@ void ComboBox::wheelEvent( QWheelEvent* event )
 {
 	if( model() )
 	{
-		model()->setInitValue(model()->value() + ((event->angleDelta().y() < 0) ? 1 : -1));
+		model()->setInitValue(model()->value() + ScrollCounter::getStepsY());
 		update();
 		event->accept();
 	}

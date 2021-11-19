@@ -48,6 +48,7 @@
 #include "MeterDialog.h"
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
+#include "ScrollCounter.h"
 #include "TextFloat.h"
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
@@ -102,6 +103,7 @@ SongEditor::SongEditor( Song * song ) :
 	connect( this, SIGNAL( zoomingValueChanged( float ) ),
 			 m_positionLine, SLOT( zoomChange( float ) ) );
 
+	ScrollCounter::registerWidget(this);
 
 	// add some essential widgets to global tool-bar
 	QWidget * tb = getGUI()->mainWindow()->toolBar();
@@ -530,31 +532,21 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
+	// One wheel step = 4 bars in 100% zoom (or always scroll at least one bar)
+	float scrollPerBar = std::min<float>(120, pixelsPerBar() / DEFAULT_PIXELS_PER_BAR * 30);
+
 	if( we->modifiers() & Qt::ControlModifier )
 	{
-		int z = m_zoomingModel->value();
-
-		if(we->angleDelta().y() > 0)
-		{
-			z++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			z--;
-		}
-		z = qBound( 0, z, m_zoomingModel->size() - 1 );
-
 
 		int x = position(we).x() - m_trackHeadWidth;
 		// bar based on the mouse x-position where the scroll wheel was used
 		int bar = x / pixelsPerBar();
-		// what would be the bar in the new zoom level on the very same mouse x
-		int newBar = x / DEFAULT_PIXELS_PER_BAR / m_zoomLevels[z];
+		// update combobox with zooming-factor
+		m_zoomingModel->setValue(m_zoomingModel->value() + ScrollCounter::getStepsY());
+		// the bar in the new zoom level on the very same mouse x
+		int newBar = x / pixelsPerBar();
 		// scroll so the bar "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + bar - newBar);
-
-		// update combobox with zooming-factor
-		m_zoomingModel->setValue( z );
 
 		// update timeline
 		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
@@ -562,17 +554,13 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
+	else if (we->angleDelta().x())
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() /30);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ScrollCounter::getStepsX(scrollPerBar));
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() / 30);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ScrollCounter::getStepsY(scrollPerBar));
 	}
 	else
 	{

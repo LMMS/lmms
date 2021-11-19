@@ -57,6 +57,7 @@
 #include "MainWindow.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
+#include "ScrollCounter.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
@@ -165,6 +166,8 @@ AutomationEditor::AutomationEditor() :
 	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( verScrolled( int ) ) );
+
+	ScrollCounter::registerWidget(this);
 
 	// init pixmaps
 	if (s_toolDraw == nullptr)
@@ -1417,74 +1420,35 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 	we->accept();
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		int y = m_zoomingYModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			y++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			y--;
-		}
-		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y );
+		m_zoomingYModel.setValue(m_zoomingYModel.value() + ScrollCounter::getStepsY());
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
-		int q = m_quantizeModel.value();
-		if((we->angleDelta().x() + we->angleDelta().y()) > 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q--;
-		}
-		else if((we->angleDelta().x() + we->angleDelta().y()) < 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q++;
-		}
-		q = qBound( 0, q, m_quantizeModel.size() - 1 );
-		m_quantizeModel.setValue( q );
+		// Qt swaps x/y scroll when holding alt
+		m_quantizeModel.setValue(m_quantizeModel.value() + ScrollCounter::getStepsX());
 		update();
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
-		int x = m_zoomingXModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			x++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			x--;
-		}
-		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
-
 		int mouseX = (position( we ).x() - VALUES_WIDTH)* TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = mouseX / m_ppb;
-		// what would be the ticks in the new zoom level on the very same mouse x
-		int newTicks = mouseX / (DEFAULT_PPB * m_zoomXLevels[x]);
 
+		m_zoomingXModel.setValue(m_zoomingXModel.value() + ScrollCounter::getStepsY());
+
+		// ticks in the new zoom level on the very same mouse x
+		int newTicks = mouseX / m_ppb;
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
-
-
-		m_zoomingXModel.setValue( x );
-	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
-	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() * 2 / 15);
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() * 2 / 15);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ScrollCounter::getStepsY(15) * 2);
 	}
 	else
 	{
-		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-							(we->angleDelta().x() + we->angleDelta().y()) / 30);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ScrollCounter::getStepsX(15) * 2);
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - ScrollCounter::getStepsY(30));
 	}
 }
 

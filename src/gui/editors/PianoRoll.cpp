@@ -65,6 +65,7 @@
 #include "MainWindow.h"
 #include "Pattern.h"
 #include "PianoView.h"
+#include "ScrollCounter.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
@@ -331,6 +332,8 @@ PianoRoll::PianoRoll() :
 	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
 						SLOT( verScrolled( int ) ) );
+
+	ScrollCounter::registerWidget(this);
 
 	// setup zooming-stuff
 	for( float const & zoomLevel : m_zoomLevels )
@@ -3734,11 +3737,16 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 void PianoRoll::wheelEvent(QWheelEvent * we )
 {
 	we->accept();
+
+	bool altPressed = we->modifiers() & Qt::AltModifier;
+
 	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
-	if(position(we).x() > noteEditLeft() && position(we).x() < noteEditRight()
-	&& position(we).y() > noteEditTop() && position(we).y() < noteEditBottom())
+	if (position(we).x() < noteEditRight()
+	&& position(we).y() > noteEditTop() && position(we).y() < noteEditBottom()
+	&& ((we->modifiers() == Qt::NoModifier && we->angleDelta().y()) || altPressed))
 	{
 		if (!hasValidPattern()) {return;}
+
 		// get values for going through notes
 		int pixel_range = 8;
 		int x = position(we).x() - m_whiteKeyWidth;
@@ -3747,12 +3755,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		int ticks_end = ( x + pixel_range / 2 ) *
 					TimePos::ticksPerBar() / m_ppb + m_currentPosition;
 
-		// When alt is pressed we only edit the note under the cursor
-		bool altPressed = we->modifiers() & Qt::AltModifier;
 		// go through notes to figure out which one we want to change
 		NoteVector nv;
 		for ( Note * i : m_pattern->notes() )
 		{
+			// When alt is pressed we only edit the note under the cursor
 			if( i->withinRange( ticks_start, ticks_end ) || ( i->selected() && !altPressed ) )
 			{
 				nv += i;
@@ -3760,7 +3767,9 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 		if( nv.size() > 0 )
 		{
-			const int step = we->angleDelta().y() > 0 ? 1 : -1;
+			// Qt swaps x/y scroll when holding alt
+			const int step = altPressed ? ScrollCounter::getStepsX() : ScrollCounter::getStepsY();
+
 			if( m_noteEditMode == NoteEditVolume )
 			{
 				for ( Note * n : nv )
@@ -3807,71 +3816,33 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	else
 	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
-		int q = m_quantizeModel.value();
-		if((we->angleDelta().x() + we->angleDelta().y()) > 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q--;
-		}
-		else if((we->angleDelta().x() + we->angleDelta().y()) < 0) // alt + scroll becomes horizontal scroll on KDE
-		{
-			q++;
-		}
-		q = qBound( 0, q, m_quantizeModel.size() - 1 );
-		m_quantizeModel.setValue( q );
+		// Qt swaps x/y scroll when holding alt
+		m_quantizeModel.setValue(m_quantizeModel.value() + ScrollCounter::getStepsX());
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
 	{
-		int l = m_noteLenModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			l--;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			l++;
-		}
-		l = qBound( 0, l, m_noteLenModel.size() - 1 );
-		m_noteLenModel.setValue( l );
+		m_noteLenModel.setValue(m_noteLenModel.value() + ScrollCounter::getStepsY());
 	}
 	else if( we->modifiers() & Qt::ControlModifier )
 	{
-		int z = m_zoomingModel.value();
-		if(we->angleDelta().y() > 0)
-		{
-			z++;
-		}
-		else if(we->angleDelta().y() < 0)
-		{
-			z--;
-		}
-		z = qBound( 0, z, m_zoomingModel.size() - 1 );
-
 		int x = (position(we).x() - m_whiteKeyWidth) * TimePos::ticksPerBar();
 		// ticks based on the mouse x-position where the scroll wheel was used
 		int ticks = x / m_ppb;
-		// what would be the ticks in the new zoom level on the very same mouse x
-		int newTicks = x / (DEFAULT_PR_PPB * m_zoomLevels[z]);
+		// update combobox with zooming-factor
+		m_zoomingModel.setValue(m_zoomingModel.value() + ScrollCounter::getStepsY());
+		// ticks in the new zoom level
+		int newTicks = x / m_ppb;
 		// scroll so the tick "selected" by the mouse x doesn't move on the screen
 		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
-		// update combobox with zooming-factor
-		m_zoomingModel.setValue( z );
-	}
-
-	// FIXME: Reconsider if determining orientation is necessary in Qt6.
-	else if(abs(we->angleDelta().x()) > abs(we->angleDelta().y())) // scrolling is horizontal
-	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().x() * 2 / 15);
 	}
 	else if(we->modifiers() & Qt::ShiftModifier)
 	{
-		m_leftRightScroll->setValue(m_leftRightScroll->value() -
-							we->angleDelta().y() * 2 / 15);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ScrollCounter::getStepsY(8));
 	}
 	else
 	{
-		m_topBottomScroll->setValue(m_topBottomScroll->value() -
-							we->angleDelta().y() / 30);
+		m_leftRightScroll->setValue(m_leftRightScroll->value() - ScrollCounter::getStepsX(8));
+		m_topBottomScroll->setValue(m_topBottomScroll->value() - ScrollCounter::getStepsY(30));
 	}
 }
 

@@ -474,10 +474,12 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 	// bb-editor etc.) because they might want to use it for zooming
 	// or scrolling left/right if a modifier-key is pressed, otherwise
 	// they do not accept it and we pass it up to QScrollArea
-	m_trackContainerView->wheelEvent( _we );
+	QApplication::sendEvent(m_trackContainerView, _we);
 	if( !_we->isAccepted() )
 	{
 		QScrollArea::wheelEvent( _we );
+		// Don't let it propagate up to MDI area
+		_we->accept();
 	}
 }
 

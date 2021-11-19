@@ -34,6 +34,7 @@
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
+#include "ScrollCounter.h"
 
 TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 					 bool resizable) :
@@ -48,7 +49,6 @@ TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 	m_tabBackground( 0, 0, 0 ),
 	m_tabBorder( 0, 0, 0 )
 {
-
 	// Create taller tabbar when it's to display artwork tabs
 	m_tabbarHeight = usePixmap ? GRAPHIC_TAB_HEIGHT : TEXT_TAB_HEIGHT;
 
@@ -62,6 +62,7 @@ TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 	pal.setColor( QPalette::Background, bg_color );
 	setPalette( pal );
 
+	ScrollCounter::registerWidget(this);
 }
 
 void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, int idx )
@@ -295,7 +296,7 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 	}
 
 	we->accept();
-	int dir = (we->angleDelta().y() < 0) ? 1 : -1;
+	int dir = 0 - ScrollCounter::getStepsX() - ScrollCounter::getStepsY();
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{

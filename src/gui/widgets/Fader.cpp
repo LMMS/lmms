@@ -56,6 +56,7 @@
 #include "ConfigManager.h"
 #include "TextFloat.h"
 #include "MainWindow.h"
+#include "ScrollCounter.h"
 
 
 TextFloat * Fader::s_textFloat = nullptr;
@@ -103,6 +104,8 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	init(_model, _name);
 
 	m_conversionFactor = 100.0;
+
+	ScrollCounter::registerWidget(this);
 }
 
 
@@ -251,15 +254,20 @@ void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 void Fader::wheelEvent ( QWheelEvent *ev )
 {
 	ev->accept();
+	if (!model()) { return; }
 
-	if (ev->angleDelta().y() > 0)
-	{
-		model()->incValue( 1 );
-	}
-	else
-	{
-		model()->incValue( -1 );
-	}
+	// angleDelta of a standard mousewheel "tick"
+	static const int wheelTick = 120;
+
+	// Maximum scroll distance from start to end
+	static const float maxDelta = 200 * wheelTick;
+
+	// Scroll at most one tick to move the model one step
+	const float modelSteps = model()->range() / model()->step<float>();
+	const float deltaPerStep = std::min<float>(maxDelta / modelSteps, wheelTick);
+
+	model()->incValue(ScrollCounter::getStepsY(deltaPerStep));
+
 	updateTextFloat();
 	s_textFloat->setVisibilityTimeOut( 1000 );
 }

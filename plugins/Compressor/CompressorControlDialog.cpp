@@ -35,6 +35,7 @@
 #include "gui_templates.h"
 #include "interpolation.h"
 #include "MainWindow.h"
+#include "ScrollCounter.h"
 #include "ToolTip.h"
 
 CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
@@ -303,6 +304,8 @@ CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	connect(&m_controls->m_stereoLinkModel, SIGNAL(dataChanged()), this, SLOT(stereoLinkChanged()));
 	connect(&m_controls->m_lookaheadModel, SIGNAL(dataChanged()), this, SLOT(lookaheadChanged()));
 	connect(&m_controls->m_limiterModel, SIGNAL(dataChanged()), this, SLOT(limiterChanged()));
+
+	ScrollCounter::registerWidget(this);
 
 	m_timeElapsed.start();
 
@@ -641,7 +644,7 @@ void CompressorControlDialog::resizeEvent(QResizeEvent *event)
 void CompressorControlDialog::wheelEvent(QWheelEvent * event)
 {
 	const float temp = m_dbRange;
-	const float dbRangeNew = m_dbRange - copysignf(COMP_GRID_SPACING, event->angleDelta().y());
+	const float dbRangeNew = m_dbRange - COMP_GRID_SPACING * ScrollCounter::getStepsY();
 	m_dbRange = round(qBound(COMP_GRID_SPACING, dbRangeNew, COMP_GRID_MAX) / COMP_GRID_SPACING) * COMP_GRID_SPACING;
 
 	// Only reset view if the scolling had an effect

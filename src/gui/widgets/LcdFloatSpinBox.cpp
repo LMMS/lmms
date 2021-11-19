@@ -43,6 +43,7 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "ScrollCounter.h"
 
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent) :
@@ -181,7 +182,7 @@ void LcdFloatSpinBox::wheelEvent(QWheelEvent *event)
 	else { m_intStep = false; }
 
 	event->accept();
-	model()->setValue(model()->value() + ((event->angleDelta().y() > 0) ? 1 : -1) * getStep());
+	model()->setValue(model()->value() + ScrollCounter::getStepsY() * getStep());
 	emit manualChange();
 }
 
