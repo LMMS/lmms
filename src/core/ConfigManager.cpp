@@ -40,7 +40,8 @@
 
 // Vector with all the upgrade methods
 const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
-	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91
+	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91,
+	&ConfigManager::upgrade_1_2_2
 };
 
 static inline QString ensureTrailingSlash(const QString & s )
@@ -119,16 +120,35 @@ void ConfigManager::upgrade_1_1_90()
 	}
 }
 
-	
 void ConfigManager::upgrade_1_1_91()
 {
 	// rename displaydbv to displaydbfs
-	if (!value("app", "displaydbv").isNull()) {
+	if (!value("app", "displaydbv").isNull())
+	{
 		setValue("app", "displaydbfs", value("app", "displaydbv"));
 		deleteValue("app", "displaydbv");
 	}
 }
 
+void ConfigManager::upgrade_1_2_2()
+{
+	// Since mixer has been renamed to audioengine, we need to transfer the
+	// attributes from the old element to the new one
+	std::vector<QString> attrs = {
+		"audiodev", "mididev", "framesperaudiobuffer", "hqaudio", "samplerate"
+	};
+
+	for (auto attr : attrs)
+	{
+		if (!value("mixer", attr).isNull())
+		{
+			setValue("audioengine", attr, value("mixer", attr));
+			deleteValue("mixer", attr);
+		}
+	}
+
+	m_settings.remove("mixer");
+}
 
 void ConfigManager::upgrade()
 {

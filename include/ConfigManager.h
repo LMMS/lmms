@@ -274,6 +274,7 @@ private:
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
+	void upgrade_1_2_2();
 	void upgrade();
 
 	// List of all upgrade methods
