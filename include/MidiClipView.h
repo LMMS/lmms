@@ -83,7 +83,7 @@ private:
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
-	MidiClip* m_clp;
+	MidiClip* m_clip;
 	QPixmap m_paintPixmap;
 
 	QColor m_noteFillColor;
