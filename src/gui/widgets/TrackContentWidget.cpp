@@ -132,12 +132,12 @@ void TrackContentWidget::updateBackground()
 
 
 
-/*! \brief Adds a trackContentObjectView to this widget.
+/*! \brief Adds a ClipView to this widget.
  *
- *  Adds a(nother) trackContentObjectView to our list of views.  We also
+ *  Adds a(nother) ClipView to our list of views.  We also
  *  check that our position is up-to-date.
  *
- * \param clipv The trackContentObjectView to add.
+ * \param clipv The ClipView to add.
  */
 void TrackContentWidget::addClipView( ClipView * clipv )
 {
@@ -153,11 +153,11 @@ void TrackContentWidget::addClipView( ClipView * clipv )
 
 
 
-/*! \brief Removes the given trackContentObjectView to this widget.
+/*! \brief Removes the given ClipView to this widget.
  *
- *  Removes the given trackContentObjectView from our list of views.
+ *  Removes the given ClipView from our list of views.
  *
- * \param clipv The trackContentObjectView to add.
+ * \param clipv The ClipView to add.
  */
 void TrackContentWidget::removeClipView( ClipView * clipv )
 {

@@ -35,7 +35,7 @@
 
 /*! \brief Create a new Clip
  *
- *  Creates a new track content object for the given track.
+ *  Creates a new clip for the given track.
  *
  * \param _track The track that will contain the new object
  */
@@ -64,7 +64,7 @@ Clip::Clip( Track * track ) :
 
 /*! \brief Destroy a Clip
  *
- *  Destroys the given track content object.
+ *  Destroys the given clip.
  *
  */
 Clip::~Clip()
@@ -82,10 +82,10 @@ Clip::~Clip()
 
 /*! \brief Move this Clip's position in time
  *
- *  If the track content object has moved, update its position.  We
+ *  If the clip has moved, update its position.  We
  *  also add a journal entry for undo and update the display.
  *
- * \param _pos The new position of the track content object.
+ * \param _pos The new position of the clip.
  */
 void Clip::movePosition( const TimePos & pos )
 {
@@ -105,10 +105,10 @@ void Clip::movePosition( const TimePos & pos )
 
 /*! \brief Change the length of this Clip
  *
- *  If the track content object's length has changed, update it.  We
+ *  If the clip's length has changed, update it.  We
  *  also add a journal entry for undo and update the display.
  *
- * \param _length The new length of the track content object.
+ * \param _length The new length of the clip.
  */
 void Clip::changeLength( const TimePos & length )
 {
@@ -154,8 +154,8 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 
 /*! \brief Mutes this Clip
  *
- *  Restore the previous state of this track content object.  This will
- *  restore the position or the length of the track content object
+ *  Restore the previous state of this clip. This will
+ *  restore the position or the length of the clip
  *  depending on what was changed.
  *
  * \param _je The journal entry to undo

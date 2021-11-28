@@ -103,9 +103,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 
 	// create views for already existing clips
-	for( Track::clipVector::iterator it =
-					m_track->m_trackContentObjects.begin();
-			it != m_track->m_trackContentObjects.end(); ++it )
+	for( Track::clipVector::iterator it = m_track->m_clips.begin(); it != m_track->m_clips.end(); ++it )
 	{
 		createClipView( *it );
 	}

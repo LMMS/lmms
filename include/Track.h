@@ -121,7 +121,7 @@ public:
 
 	const clipVector & getClips() const
 	{
-		return m_trackContentObjects;
+		return m_clips;
 	}
 	void getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end );
@@ -226,7 +226,7 @@ private:
 
 	bool m_simpleSerializingMode;
 
-	clipVector m_trackContentObjects;
+	clipVector m_clips;
 
 	QMutex m_processingLock;
 	
