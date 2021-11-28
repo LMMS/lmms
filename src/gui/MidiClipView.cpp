@@ -22,7 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "MidiClipView.h"
 
 #include <QApplication>
@@ -330,7 +330,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	QColor c;
 	bool const muted = m_clp->getTrack()->isMuted() || m_clp->isMuted();
-	bool current = getGUI()->pianoRoll()->currentMidiClip() == m_clp;
+	bool current = getGUI()->pianoRoll()->currentPattern() == m_clp;
 	bool beatClip = m_clp->m_clipType == MidiClip::BeatClip;
 
 	if( beatClip )

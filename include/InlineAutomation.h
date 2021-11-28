@@ -37,7 +37,6 @@ public:
 		FloatModel(),
 		sharedObject(),
 		m_autoClip( nullptr )
-		m_autoClip( NULL )
 	{
 	}
 

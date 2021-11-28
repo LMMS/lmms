@@ -1367,8 +1367,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 					// switch to editing a clip adjacent to this one in the song editor
 					if (hasValidMidiClip())
 					{
-						Clip * c = direction > 0 ? m_clip->nextPattern()
-										: m_clip->previousPattern();
+						MidiClip * c = direction > 0 ? m_clip->nextMidiClip()
+										: m_clip->previousMidiClip();
 						if(c != nullptr)
 						{
 							setCurrentMidiClip(c);
@@ -5014,7 +5014,7 @@ PianoRollWindow::PianoRollWindow() :
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
-	setCurrentPattern( nullptr );
+	setCurrentMidiClip( nullptr );
 
 	// Connections
 	connect( m_editor, SIGNAL( currentMidiClipChanged() ), this, SIGNAL( currentMidiClipChanged() ) );

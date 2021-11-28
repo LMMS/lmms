@@ -26,7 +26,7 @@
 #ifndef AUTOMATION_NODE_H
 #define AUTOMATION_NODE_H
 
-class AutomationPattern;
+class AutomationClip;
 
 
 // Note: We use the default copy-assignment on the AutomationClip constructor. It's

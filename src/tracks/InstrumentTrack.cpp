@@ -33,8 +33,8 @@
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "MidiClient.h"
-#include "MixHelpers.h"
 #include "MidiClip.h"
+#include "MixHelpers.h"
 #include "Song.h"
 
 
@@ -725,7 +725,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// everything which is not a clip won't be played
 		// A clip playing in the Piano Roll window will always play
 		if(c == nullptr ||
-			(Engine::getSong()->playMode() != Song::Mode_PlayPattern
+			(Engine::getSong()->playMode() != Song::Mode_PlayClip
 			&& (*it)->isMuted()))
 		{
 			continue;

@@ -39,7 +39,7 @@
 #include "embed.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
-#include "MidiClip.h"
+#include "InstrumentTrackView.h"
 #include "Note.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -122,14 +122,14 @@ ClipView::ClipView( Clip * clip,
 	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
 	connect( m_clip, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
-	connect( m_tco, SIGNAL( destroyedClip() ), this, SLOT( close() ) );
+	connect( m_clip, SIGNAL( destroyedClip() ), this, SLOT( close() ) );
 	setModel( m_clip );
 	connect(m_clip, SIGNAL(colorChanged()), this, SLOT(update()));
 
 	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
 	{
 		// redraw if TCO uses track color
-		if (!m_tco->usesCustomClipColor()) { update(); }
+		if (!m_clip->usesCustomClipColor()) { update(); }
 	});
 
 	m_trackView->getTrackContentWidget()->addClipView( this );

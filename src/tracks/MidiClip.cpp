@@ -33,10 +33,10 @@
 #include <limits>
 
 
-QPixmap * MidiClip::s_stepBtnOn0 = nullptr;
-QPixmap * MidiClip::s_stepBtnOn200 = nullptr;
-QPixmap * MidiClip::s_stepBtnOff = nullptr;
-QPixmap * MidiClip::s_stepBtnOffLight = nullptr;
+QPixmap * MidiClipView::s_stepBtnOn0 = nullptr;
+QPixmap * MidiClipView::s_stepBtnOn200 = nullptr;
+QPixmap * MidiClipView::s_stepBtnOff = nullptr;
+QPixmap * MidiClipView::s_stepBtnOffLight = nullptr;
 
 
 

@@ -102,7 +102,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 
-	// create views for already existing TCOs
+	// create views for already existing clips
 	for( Track::clipVector::iterator it =
 					m_track->m_trackContentObjects.begin();
 			it != m_track->m_trackContentObjects.end(); ++it )
