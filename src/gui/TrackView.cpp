@@ -89,7 +89,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	connect( m_track,
-		SIGNAL( trackContentObjectAdded( Clip * ) ),
+		SIGNAL( clipAdded( Clip * ) ),
 			this, SLOT( createClipView( Clip * ) ),
 			Qt::QueuedConnection );
 
