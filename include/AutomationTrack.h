@@ -46,7 +46,7 @@ public:
 	}
 
 	TrackView * createView( TrackContainerView* ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	Clip* createClip(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;

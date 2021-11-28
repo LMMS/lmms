@@ -34,14 +34,14 @@
 
 class BBTrack;
 class SampleBuffer;
-class SampleTCO;
+class SampleClip;
 class Track;
 
 
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	SampleRecordHandle( SampleTCO* tco );
+	SampleRecordHandle( SampleClip* tco );
 	virtual ~SampleRecordHandle();
 
 	void play( sampleFrame * _working_buffer ) override;
@@ -64,7 +64,7 @@ private:
 
 	Track * m_track;
 	BBTrack * m_bbTrack;
-	SampleTCO * m_tco;
+	SampleClip * m_tco;
 
 } ;
 

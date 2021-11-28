@@ -34,7 +34,7 @@
 class QMimeData;
 
 class Track;
-class TrackContentObjectView;
+class ClipView;
 class TrackView;
 
 
@@ -55,13 +55,13 @@ public:
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
 
-	void addTCOView( TrackContentObjectView * tcov );
-	void removeTCOView( TrackContentObjectView * tcov );
-	void removeTCOView( int tcoNum )
+	void addClipView( ClipView * tcov );
+	void removeClipView( ClipView * tcov );
+	void removeClipView( int tcoNum )
 	{
 		if( tcoNum >= 0 && tcoNum < m_tcoViews.size() )
 		{
-			removeTCOView( m_tcoViews[tcoNum] );
+			removeClipView( m_tcoViews[tcoNum] );
 		}
 	}
 
@@ -126,7 +126,7 @@ private:
 
 	TrackView * m_trackView;
 
-	typedef QVector<TrackContentObjectView *> tcoViewVector;
+	typedef QVector<ClipView *> tcoViewVector;
 	tcoViewVector m_tcoViews;
 
 	QPixmap m_background;

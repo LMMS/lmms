@@ -116,7 +116,7 @@ public:
 	TrackView * createView( TrackContainerView* tcv ) override;
 
 	// create new track-content-object = pattern
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	Clip* createClip(const TimePos & pos) override;
 
 
 	// called by track

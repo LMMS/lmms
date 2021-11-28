@@ -31,7 +31,7 @@
 #include <QtCore/QPointer>
 
 #include "AutomationNode.h"
-#include "TrackContentObject.h"
+#include "Clip.h"
 
 
 class AutomationTrack;
@@ -39,7 +39,7 @@ class TimePos;
 
 
 
-class LMMS_EXPORT AutomationPattern : public TrackContentObject
+class LMMS_EXPORT AutomationPattern : public Clip
 {
 	Q_OBJECT
 public:
@@ -152,7 +152,7 @@ public:
 	static const QString classNodeName() { return "automationpattern"; }
 	QString nodeName() const override { return classNodeName(); }
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	ClipView * createView( TrackView * _tv ) override;
 
 
 	static bool isAutomated( const AutomatableModel * _m );

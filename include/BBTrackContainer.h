@@ -57,9 +57,9 @@ public:
 
 	void swapBB(int bb1, int bb2);
 
-	void updateBBTrack(TrackContentObject * tco);
+	void updateBBTrack(Clip * tco);
 	void fixIncorrectPositions();
-	void createTCOsForBB(int bb);
+	void createClipsForBB(int bb);
 
 	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum) const override;
 

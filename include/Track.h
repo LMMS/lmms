@@ -37,7 +37,7 @@
 class TimePos;
 class TrackContainer;
 class TrackContainerView;
-class TrackContentObject;
+class Clip;
 class TrackView;
 
 
@@ -60,7 +60,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<TrackContentObject *> tcoVector;
+	typedef QVector<Clip *> tcoVector;
 
 	enum TrackTypes
 	{
@@ -94,7 +94,7 @@ public:
 
 
 	virtual TrackView * createView( TrackContainerView * view ) = 0;
-	virtual TrackContentObject * createTCO( const TimePos & pos ) = 0;
+	virtual Clip * createClip( const TimePos & pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
 						QDomElement & parent ) = 0;
@@ -109,25 +109,25 @@ public:
 		m_simpleSerializingMode = true;
 	}
 
-	// -- for usage by TrackContentObject only ---------------
-	TrackContentObject * addTCO( TrackContentObject * tco );
-	void removeTCO( TrackContentObject * tco );
+	// -- for usage by Clip only ---------------
+	Clip * addClip( Clip * tco );
+	void removeClip( Clip * tco );
 	// -------------------------------------------------------
-	void deleteTCOs();
+	void deleteClips();
 
-	int numOfTCOs();
-	TrackContentObject * getTCO( int tcoNum );
-	int getTCONum(const TrackContentObject* tco );
+	int numOfClips();
+	Clip * getClip( int tcoNum );
+	int getClipNum(const Clip* tco );
 
-	const tcoVector & getTCOs() const
+	const tcoVector & getClips() const
 	{
 		return m_trackContentObjects;
 	}
-	void getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+	void getClipsInRange( tcoVector & tcoV, const TimePos & start,
 							const TimePos & end );
-	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
+	void swapPositionOfClips( int tcoNum1, int tcoNum2 );
 
-	void createTCOsForBB( int bb );
+	void createClipsForBB( int bb );
 
 
 	void insertBar( const TimePos & pos );
@@ -239,7 +239,7 @@ private:
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void trackContentObjectAdded( TrackContentObject * );
+	void clipAdded( Clip * );
 	void colorChanged();
 } ;
 

@@ -1,5 +1,5 @@
 /*
- * TrackContentObjectView.h - declaration of TrackContentObjectView class
+ * ClipView.h - declaration of ClipView class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -30,7 +30,7 @@
 
 #include "ModelView.h"
 #include "Rubberband.h"
-#include "TrackContentObject.h"
+#include "Clip.h"
 
 
 class QMenu;
@@ -38,11 +38,11 @@ class QContextMenuEvent;
 
 class DataFile;
 class TextFloat;
-class TrackContentObject;
+class Clip;
 class TrackView;
 
 
-class TrackContentObjectView : public selectableObject, public ModelView
+class ClipView : public selectableObject, public ModelView
 {
 	Q_OBJECT
 
@@ -61,12 +61,12 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QSize mouseHotspotKnife MEMBER m_mouseHotspotKnife )
 
 public:
-	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
-	virtual ~TrackContentObjectView();
+	ClipView( Clip * tco, TrackView * tv );
+	virtual ~ClipView();
 
-	bool fixedTCOs();
+	bool fixedClips();
 
-	inline TrackContentObject * getTrackContentObject()
+	inline Clip * getClip()
 	{
 		return m_tco;
 	}
@@ -98,23 +98,23 @@ public:
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
 
-	// Method to get a QVector of TCOs to be affected by a context menu action
-	QVector<TrackContentObjectView *> getClickedTCOs();
+	// Method to get a QVector of Clips to be affected by a context menu action
+	QVector<ClipView *> getClickedClips();
 
-	// Methods to remove, copy, cut, paste and mute a QVector of TCO views
-	void copy( QVector<TrackContentObjectView *> tcovs );
-	void cut( QVector<TrackContentObjectView *> tcovs );
+	// Methods to remove, copy, cut, paste and mute a QVector of Clip views
+	void copy( QVector<ClipView *> tcovs );
+	void cut( QVector<ClipView *> tcovs );
 	void paste();
 	// remove and toggleMute are static because they don't depend
-	// being called from a particular TCO view, but can be called anywhere as long
-	// as a valid TCO view list is given, while copy/cut require an instance for
+	// being called from a particular Clip view, but can be called anywhere as long
+	// as a valid Clip view list is given, while copy/cut require an instance for
 	// some metadata to be written to the clipboard.
-	static void remove( QVector<TrackContentObjectView *> tcovs );
-	static void toggleMute( QVector<TrackContentObjectView *> tcovs );
-	static void mergeTCOs(QVector<TrackContentObjectView*> tcovs);
+	static void remove( QVector<ClipView *> tcovs );
+	static void toggleMute( QVector<ClipView *> tcovs );
+	static void mergeClips(QVector<ClipView*> tcovs);
 
 	// Returns true if selection can be merged and false if not
-	static bool canMergeSelection(QVector<TrackContentObjectView*> tcovs);
+	static bool canMergeSelection(QVector<ClipView*> tcovs);
 
 	QColor getColorForDisplay( QColor );
 
@@ -142,8 +142,8 @@ protected:
 	};
 
 	TrackView * m_trackView;
-	TimePos m_initialTCOPos;
-	TimePos m_initialTCOEnd;
+	TimePos m_initialClipPos;
+	TimePos m_initialClipEnd;
 
 	bool m_marker = false;
 	int m_markerPos = 0;
@@ -171,7 +171,7 @@ protected:
 	float pixelsPerBar();
 
 
-	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
+	DataFile createClipDataFiles(const QVector<ClipView *> & tcos) const;
 
 	virtual void paintTextLabel(QString const & text, QPainter & painter);
 
@@ -196,7 +196,7 @@ private:
 
 	static TextFloat * s_textFloat;
 
-	TrackContentObject * m_tco;
+	Clip * m_tco;
 	Actions m_action;
 	QPoint m_initialMousePos;
 	QPoint m_initialMouseGlobalPos;
@@ -224,17 +224,17 @@ private:
 	{
 		m_initialMousePos = pos;
 		m_initialMouseGlobalPos = mapToGlobal( pos );
-		m_initialTCOPos = m_tco->startPosition();
-		m_initialTCOEnd = m_initialTCOPos + m_tco->length();
+		m_initialClipPos = m_tco->startPosition();
+		m_initialClipEnd = m_initialClipPos + m_tco->length();
 	}
 	void setInitialOffsets();
 
 	bool mouseMovedDistance( QMouseEvent * me, int distance );
-	TimePos draggedTCOPos( QMouseEvent * me );
+	TimePos draggedClipPos( QMouseEvent * me );
 	int knifeMarkerPos( QMouseEvent * me );
 	void setColor(const QColor* color);
-	//! Return true iff TCO could be split. Currently only implemented for samples
-	virtual bool splitTCO( const TimePos pos ){ return false; };
+	//! Return true if the clip could be split. Currently only implemented for samples
+	virtual bool splitClip( const TimePos pos ){ return false; };
 	void updateCursor(QMouseEvent * me);
 } ;
 

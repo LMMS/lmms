@@ -1,5 +1,5 @@
 /*
- * SampleTCOView.h
+ * SampleClipView.h
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,21 +22,21 @@
  *
  */
 
-#ifndef SAMPLE_TCO_VIEW_H
-#define SAMPLE_TCO_VIEW_H
+#ifndef SAMPLE_CLIP_VIEW_H
+#define SAMPLE_CLIP_VIEW_H
 
-#include "SampleTCOView.h"
+#include "SampleClipView.h"
 
-#include "SampleTCO.h"
-#include "TrackContentObjectView.h"
+#include "SampleClip.h"
+#include "ClipView.h"
 
-class SampleTCOView : public TrackContentObjectView
+class SampleClipView : public ClipView
 {
 	Q_OBJECT
 
 public:
-	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
-	virtual ~SampleTCOView() = default;
+	SampleClipView( SampleClip * _tco, TrackView * _tv );
+	virtual ~SampleClipView() = default;
 
 public slots:
 	void updateSample();
@@ -55,9 +55,9 @@ protected:
 
 
 private:
-	SampleTCO * m_tco;
+	SampleClip * m_tco;
 	QPixmap m_paintPixmap;
-	bool splitTCO( const TimePos pos ) override;
+	bool splitClip( const TimePos pos ) override;
 } ;
 
 
