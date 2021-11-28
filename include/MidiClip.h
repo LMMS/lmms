@@ -1,6 +1,6 @@
 /*
  * MidiClip.h - declaration of class MidiClip, which contains all information
- *             about a clip
+ *              about a clip
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
