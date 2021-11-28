@@ -407,7 +407,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		}
 	}
 
-	// Checks if an automated model stopped being automated by automation patterns
+	// Checks if an automated model stopped being automated by automation clip
 	// so we can move the control back to any connected controller again
 	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
