@@ -280,8 +280,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 				/ (float) m_clip->timeMapLength().getBar() :
 								pixelsPerBar();
 
-	const float min = m_pat->firstObject()->minValue<float>();
-	const float max = m_pat->firstObject()->maxValue<float>();
+	const float min = m_clip->firstObject()->minValue<float>();
+	const float max = m_clip->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * CLIP_BORDER_WIDTH ) / y_scale;

@@ -733,7 +733,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		TimePos cur_start = _start;
 		if( _clip_num < 0 )
 		{
-			cur_start -= p->startPosition();
+			cur_start -= c->startPosition();
 		}
 
 		// get all notes from the given clip...
@@ -768,7 +768,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				// then set song-global offset of clip in order to
 				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
+				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
 			}
 
 			Engine::audioEngine()->addPlayHandle( notePlayHandle );

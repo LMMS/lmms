@@ -53,10 +53,6 @@ constexpr float F_E_R = (float) LD_E_R;
 constexpr unsigned int MaxScaleCount = 10;  //!< number of scales per project
 constexpr unsigned int MaxKeymapCount = 10; //!< number of keyboard mappings per project
 
-// Microtuner
-constexpr unsigned int MaxScaleCount = 10;  //!< number of scales per project
-constexpr unsigned int MaxKeymapCount = 10; //!< number of keyboard mappings per project
-
 // Frequency ranges (in Hz).
 // Arbitrary low limit for logarithmic frequency scale; >1 Hz.
 constexpr int LOWEST_LOG_FREQ = 5;

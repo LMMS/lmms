@@ -1132,11 +1132,6 @@ void MainWindow::toggleMicrotunerWin()
 
 
 
-void MainWindow::toggleMicrotunerWin()
-{
-	toggleWindow( getGUI()->getMicrotunerConfig() );
-}
-
 
 void MainWindow::updateViewMenu()
 {

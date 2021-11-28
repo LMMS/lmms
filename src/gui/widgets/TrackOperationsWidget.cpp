@@ -300,13 +300,13 @@ void TrackOperationsWidget::randomizeTrackColor()
 	Engine::getSong()->setModified();
 }
 
-void TrackOperationsWidget::resetTCOColors()
+void TrackOperationsWidget::resetClipColors()
 {
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	for (auto tco: track->getTCOs())
+	for (auto clip: track->getClips())
 	{
-		tco->useCustomClipColor(false);
+		clip->useCustomClipColor(false);
 	}
 	Engine::getSong()->setModified();
 }
@@ -361,7 +361,7 @@ void TrackOperationsWidget::updateMenu()
 	colorMenu->addAction(tr("Reset"), this, SLOT(resetTrackColor()));
 	colorMenu->addAction(tr("Pick random"), this, SLOT(randomizeTrackColor()));
 	colorMenu->addSeparator();
-	colorMenu->addAction(tr("Reset clip colors"), this, SLOT(resetTCOColors()));
+	colorMenu->addAction(tr("Reset clip colors"), this, SLOT(resetClipColors()));
 }
 
 

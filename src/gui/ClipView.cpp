@@ -40,6 +40,7 @@
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
+#include "MidiClip.h"
 #include "Note.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -65,12 +66,11 @@ const int RESIZE_GRIP_WIDTH = 4;
 TextFloat * ClipView::s_textFloat = nullptr;
 
 
-/*! \brief Create a new trackContentObjectView
+/*! \brief Create a new ClipView
  *
- *  Creates a new track content object view for the given
- *  track content object in the given track view.
+ *  Creates a new clip view for the given clip in the given track view.
  *
- * \param _clip The track content object to be displayed
+ * \param _clip The clip to be displayed
  * \param _tv  The track view that will contain the new object
  */
 ClipView::ClipView( Clip * clip,
@@ -128,7 +128,7 @@ ClipView::ClipView( Clip * clip,
 
 	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
 	{
-		// redraw if TCO uses track color
+		// redraw if clip uses track color
 		if (!m_clip->usesCustomClipColor()) { update(); }
 	});
 
@@ -860,7 +860,7 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 		{
-			ClipView* tcov =
+			ClipView* clipv =
 				dynamic_cast<ClipView *>( *it );
 			if( clipv == nullptr ) { continue; }
 			clips.push_back( clipv->m_clip );

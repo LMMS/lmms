@@ -339,7 +339,7 @@ Clip * Track::addClip( Clip * clip )
 {
 	m_trackContentObjects.push_back( clip );
 
-	emit trackContentObjectAdded( clip );
+	emit clipAdded( clip );
 
 	return clip;		// just for convenience
 }
