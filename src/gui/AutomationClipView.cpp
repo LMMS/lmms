@@ -41,7 +41,7 @@
 #include "Engine.h"
 
 
-QPixmap * AutomationClipView::s_pat_rec = nullptr;
+QPixmap * AutomationClipView::s_clip_rec = nullptr;
 
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
@@ -59,8 +59,8 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 	ToolTip::add(this, m_clip->name());
 	setStyle( QApplication::style() );
 
-	if( s_pat_rec == nullptr ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
-							"pat_rec" ) ); }
+	if( s_clip_rec == nullptr ) { s_clip_rec = new QPixmap( embed::getIconPixmap(
+							"clip_rec" ) ); }
 
 	update();
 }
@@ -388,7 +388,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	// recording icon for when recording automation
 	if( m_clip->isRecording() )
 	{
-		p.drawPixmap( 1, rect().bottom() - s_pat_rec->height(), *s_pat_rec );
+		p.drawPixmap( 1, rect().bottom() - s_clip_rec->height(), *s_clip_rec );
 	}
 
 	// clip name

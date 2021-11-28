@@ -56,7 +56,7 @@ public:
 	using TimemapIterator = timeMap::const_iterator;
 
 	AutomationClip( AutomationTrack * _auto_track );
-	AutomationClip( const AutomationClip & _pat_to_copy );
+	AutomationClip( const AutomationClip & _clip_to_copy );
 	virtual ~AutomationClip() = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
@@ -209,7 +209,7 @@ private:
 
 } ;
 
-//Short-hand functions to access node values in an automation pattern;
+//Short-hand functions to access node values in an automation clip;
 // replacement for CPP macros with the same purpose; could be refactored
 // further in the future.
 inline float INVAL(AutomationClip::TimemapIterator it)

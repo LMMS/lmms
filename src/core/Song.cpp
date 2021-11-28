@@ -288,7 +288,7 @@ void Song::processNextBuffer()
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
 			getPlayPos().setCurrentFrame(frameOffsetInTick);
 
-			// If we are playing a BB track, or a pattern with no loop enabled,
+			// If we are playing a BB track, or a clip with no loop enabled,
 			// loop back to the beginning when we reach the end
 			if (m_playMode == Mode_PlayBB)
 			{

@@ -109,7 +109,7 @@ void StepRecorder::noteReleased(const Note & n)
 			m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS);
 		}
 
-		//check if all note are released, apply notes to pattern(or dimiss if length is zero) and prepare to record next step
+		//check if all note are released, apply notes to clips (or dimiss if length is zero) and prepare to record next step
 		if(allCurStepNotesReleased())
 		{
 			if(m_curStepLength > 0)

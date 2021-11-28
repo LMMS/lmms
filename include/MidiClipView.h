@@ -22,8 +22,8 @@
  *
  */
  
-#ifndef PATTERN_VIEW_H
-#define PATTERN_VIEW_H
+#ifndef MIDI_CLIP_VIEW_H
+#define MIDI_CLIP_VIEW_H
  
 #include "MidiClip.h"
 #include "ClipView.h"

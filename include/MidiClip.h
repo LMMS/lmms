@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PATTERN_H
-#define PATTERN_H
+#ifndef MIDI_CLIP_H
+#define MIDI_CLIP_H
 
 #include <QStaticText>
 

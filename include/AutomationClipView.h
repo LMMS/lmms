@@ -39,7 +39,7 @@ class AutomationClipView : public ClipView
 
 
 public:
-	AutomationClipView( AutomationClip * _pat, TrackView * _parent );
+	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
 	virtual ~AutomationClipView();
 
 public slots:
@@ -70,7 +70,7 @@ private:
 	
 	QStaticText m_staticTextName;
 	
-	static QPixmap * s_pat_rec;
+	static QPixmap * s_clip_rec;
 
 	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;

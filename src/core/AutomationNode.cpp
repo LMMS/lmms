@@ -38,8 +38,8 @@ AutomationNode::AutomationNode() :
 {
 }
 
-AutomationNode::AutomationNode(AutomationClip* pat, float value, int pos) :
-	m_clip(pat),
+AutomationNode::AutomationNode(AutomationClip* clip, float value, int pos) :
+	m_clip(clip),
 	m_pos(pos),
 	m_inValue(value),
 	m_outValue(value),
@@ -48,8 +48,8 @@ AutomationNode::AutomationNode(AutomationClip* pat, float value, int pos) :
 {
 }
 
-AutomationNode::AutomationNode(AutomationClip* pat, float inValue, float outValue, int pos) :
-	m_clip(pat),
+AutomationNode::AutomationNode(AutomationClip* clip, float inValue, float outValue, int pos) :
+	m_clip(clip),
 	m_pos(pos),
 	m_inValue(inValue),
 	m_outValue(outValue),

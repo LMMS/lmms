@@ -73,20 +73,20 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 
 
 
-AutomationClip::AutomationClip( const AutomationClip & _pat_to_copy ) :
-	Clip( _pat_to_copy.m_autoTrack ),
+AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
+	Clip( _clip_to_copy.m_autoTrack ),
 	m_clipMutex(QMutex::Recursive),
-	m_autoTrack( _pat_to_copy.m_autoTrack ),
-	m_objects( _pat_to_copy.m_objects ),
-	m_tension( _pat_to_copy.m_tension ),
-	m_progressionType( _pat_to_copy.m_progressionType )
+	m_autoTrack( _clip_to_copy.m_autoTrack ),
+	m_objects( _clip_to_copy.m_objects ),
+	m_tension( _clip_to_copy.m_tension ),
+	m_progressionType( _clip_to_copy.m_progressionType )
 {
 	// Locks the mutex of the copied AutomationClip to make sure it
 	// doesn't change while it's being copied
-	QMutexLocker m(&_pat_to_copy.m_clipMutex);
+	QMutexLocker m(&_clip_to_copy.m_clipMutex);
 
-	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
-				it != _pat_to_copy.m_timeMap.end(); ++it )
+	for( timeMap::const_iterator it = _clip_to_copy.m_timeMap.begin();
+				it != _clip_to_copy.m_timeMap.end(); ++it )
 	{
 		// Copies the automation node (in/out values and in/out tangents)
 		m_timeMap[POS(it)] = it.value();

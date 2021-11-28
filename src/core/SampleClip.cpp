@@ -140,7 +140,7 @@ void SampleClip::setSampleFile( const QString & _sf )
 {
 	int length;
 	if ( _sf.isEmpty() )
-	{	//When creating an empty sample pattern make it a bar long
+	{	//When creating an empty sample clip make it a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		length = DefaultTicksPerBar * ( nom / den );
