@@ -711,7 +711,7 @@ TrackContainerView QLabel
 
 /* Clips */
 
-/* common pattern colors */
+/* common clip colors */
 ClipView   {
 	qproperty-mutedColor: rgba(255,255,255,100);
 	qproperty-mutedBackgroundColor: #373d48;
@@ -728,7 +728,7 @@ ClipView   {
 	font-size: 11px;
 }
 
-/* instrument pattern */
+/* instrument clip */
 MidiClipView {
 	background-color: #21A14F;
 	color: rgba(255,255,255,220);
@@ -739,19 +739,19 @@ MidiClipView {
 	qproperty-mutedNoteBorderColor: rgb(55, 61, 72);
 }
 
-/* sample track pattern */
+/* sample track clip */
 SampleClipView {
 	background-color: rgba(42,51,59,255);
 	color: #FF8F05;
 }
 
-/* automation pattern */
+/* automation clip */
 AutomationClipView {
 	background-color: #663DE1;
 	color: rgba(255,255,255,90);
 }
 
-/* bb-pattern */
+/* bb-clip */
 BBClipView {
 	background-color: #20BDB2; /* default colour for bb-tracks */
 }
