@@ -519,7 +519,7 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
 <context>
     <name>AutomationPattern</name>
     <message>
-        <location filename="../../src/core/AutomationPattern.cpp" line="866"/>
+        <location filename="../../src/core/AutomationClip.cpp" line="866"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation>&lt;%1&gt;を押しながらコントロールをドラッグしてください</translation>
     </message>
@@ -527,52 +527,52 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="173"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>オートメーション エディターで開く</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="181"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>クリア</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="184"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>名前をリセット</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="187"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>名前を変更</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="190"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>録音をセット/クリア</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="193"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>左右反転</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="196"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>上下反転</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="201"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1 個の接続</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="209"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>&quot;%1&quot; を切断</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="448"/>
+        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="448"/>
         <source>Model is already connected to this pattern.</source>
         <translation>モデルは、すでにこのパターンに接続されています。</translation>
     </message>
@@ -651,17 +651,17 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
 <context>
     <name>BBTCOView</name>
     <message>
-        <location filename="../../src/gui/BBTCOView.cpp" line="53"/>
+        <location filename="../../src/gui/BBClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>ビート+ベースライン エディターで開く</translation>
     </message>
     <message>
-        <location filename="../../src/gui/BBTCOView.cpp" line="60"/>
+        <location filename="../../src/gui/BBClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>名前をリセット</translation>
     </message>
     <message>
-        <location filename="../../src/gui/BBTCOView.cpp" line="63"/>
+        <location filename="../../src/gui/BBClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>名前を変更</translation>
     </message>
@@ -9572,42 +9572,42 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 <context>
     <name>PatternView</name>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="143"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="143"/>
         <source>Open in piano-roll</source>
         <translation>ピアノロールで開く</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="149"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="149"/>
         <source>Set as ghost in piano-roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="158"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="158"/>
         <source>Clear all notes</source>
         <translation>すべてのノートをクリア</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="161"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="161"/>
         <source>Reset name</source>
         <translation>名前をリセット</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="164"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="164"/>
         <source>Change name</source>
         <translation>名前を変更</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="172"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="172"/>
         <source>Add steps</source>
         <translation>ステップを追加</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="174"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="174"/>
         <source>Remove steps</source>
         <translation>ステップを削除</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="176"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="176"/>
         <source>Clone Steps</source>
         <translation>ステップを複製</translation>
     </message>
@@ -12028,67 +12028,67 @@ You can disable these checks to get a faster scanning time (at your own risk).</
 <context>
     <name>SampleTCOView</name>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="60"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="60"/>
         <source>Double-click to open sample</source>
         <translation>ダブルクリックしてサンプルを開く</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="84"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="84"/>
         <source>Delete (middle mousebutton)</source>
         <translation>削除 (マウス中ボタン)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="85"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="85"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="93"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="93"/>
         <source>Cut</source>
         <translation>切り取り</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="94"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="94"/>
         <source>Cut selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="101"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="101"/>
         <source>Copy</source>
         <translation>コピー</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="102"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="102"/>
         <source>Copy selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="107"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="107"/>
         <source>Paste</source>
         <translation>貼り付け</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="115"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="115"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>ミュート/ミュート解除 (&lt;%1&gt; + 中ボタンクリック）</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="116"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="116"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="125"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="125"/>
         <source>Reverse sample</source>
         <translation>サンプルを反転する</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="133"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="133"/>
         <source>Set clip color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="135"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="135"/>
         <source>Use track color</source>
         <translation type="unfinished"/>
     </message>
@@ -13330,7 +13330,7 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>TrackContentObject</name>
     <message>
-        <location filename="../../src/core/TrackContentObject.cpp" line="47"/>
+        <location filename="../../src/core/Clip.cpp" line="47"/>
         <source>Mute</source>
         <translation>ミュート</translation>
     </message>
@@ -13338,93 +13338,93 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>TrackContentObjectView</name>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="647"/>
+        <location filename="../../src/gui/ClipView.cpp" line="647"/>
         <source>Current position</source>
         <translation>現在位置</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="655"/>
+        <location filename="../../src/gui/ClipView.cpp" line="655"/>
         <source>Current length</source>
         <translation>現在の長さ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="656"/>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="908"/>
+        <location filename="../../src/gui/ClipView.cpp" line="656"/>
+        <location filename="../../src/gui/ClipView.cpp" line="908"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 から %5:%6)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="675"/>
+        <location filename="../../src/gui/ClipView.cpp" line="675"/>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation>コピーするには&lt;%1&gt;を押しながらドラッグしてください。</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="676"/>
+        <location filename="../../src/gui/ClipView.cpp" line="676"/>
         <source>Press &lt;%1&gt; for free resizing.</source>
         <translation>フリーズ解除には&lt;%1&gt;を押してください。</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="677"/>
+        <location filename="../../src/gui/ClipView.cpp" line="677"/>
         <source>Hint</source>
         <translation>ヒント</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1007"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1007"/>
         <source>Delete (middle mousebutton)</source>
         <translation>削除 (マウス中ボタン)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1008"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1008"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1016"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1016"/>
         <source>Cut</source>
         <translation>切り取り</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1017"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1017"/>
         <source>Cut selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1024"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1024"/>
         <source>Merge Selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1033"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1033"/>
         <source>Copy</source>
         <translation>コピー</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1034"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1034"/>
         <source>Copy selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1039"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1039"/>
         <source>Paste</source>
         <translation>貼り付け</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1047"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1047"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>ミュート/ミュート解除 (&lt;%1&gt; + 中ボタンクリック）</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1048"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1048"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1054"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1054"/>
         <source>Set clip color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1056"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1056"/>
         <source>Use track color</source>
         <translation type="unfinished"/>
     </message>

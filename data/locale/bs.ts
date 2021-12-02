@@ -605,7 +605,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPattern</name>
     <message>
-        <location filename="src/core/AutomationPattern.cpp" line="598"/>
+        <location filename="src/core/AutomationClip.cpp" line="598"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation type="unfinished"/>
     </message>
@@ -613,57 +613,57 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="57"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="57"/>
         <source>double-click to open this pattern in automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="179"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="179"/>
         <source>Open in Automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="187"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="187"/>
         <source>Clear</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="190"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="190"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="193"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="193"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="196"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="196"/>
         <source>Set/clear record</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="199"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="199"/>
         <source>Flip Vertically (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="202"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="202"/>
         <source>Flip Horizontally (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="207"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="207"/>
         <source>%1 Connections</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="215"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="215"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="449"/>
+        <location filename="src/gui/AutomationMidiClipView.cpp" line="449"/>
         <source>Model is already connected to this pattern.</source>
         <translation type="unfinished"/>
     </message>
@@ -6573,42 +6573,42 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 <context>
     <name>PatternView</name>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="730"/>
+        <location filename="src/tracks/MidiClip.cpp" line="730"/>
         <source>use mouse wheel to set velocity of a step</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="735"/>
+        <location filename="src/tracks/MidiClip.cpp" line="735"/>
         <source>double-click to open in Piano Roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="777"/>
+        <location filename="src/tracks/MidiClip.cpp" line="777"/>
         <source>Open in piano-roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="786"/>
+        <location filename="src/tracks/MidiClip.cpp" line="786"/>
         <source>Clear all notes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="789"/>
+        <location filename="src/tracks/MidiClip.cpp" line="789"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="792"/>
+        <location filename="src/tracks/MidiClip.cpp" line="792"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="800"/>
+        <location filename="src/tracks/MidiClip.cpp" line="800"/>
         <source>Add steps</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="802"/>
+        <location filename="src/tracks/MidiClip.cpp" line="802"/>
         <source>Remove steps</source>
         <translation type="unfinished"/>
     </message>
