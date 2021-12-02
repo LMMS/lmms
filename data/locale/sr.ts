@@ -502,14 +502,14 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationPattern</name>
+    <name>AutomationClip</name>
     <message>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>AutomationPatternView</name>
+    <name>AutomationClipView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
         <translation type="unfinished"/>
@@ -614,7 +614,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBTCOView</name>
+    <name>BBClipView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
         <translation type="unfinished"/>
@@ -5184,7 +5184,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PatternView</name>
+    <name>MidiClipView</name>
     <message>
         <source>Open in piano-roll</source>
         <translation type="unfinished"/>
@@ -5837,7 +5837,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleTCOView</name>
+    <name>SampleClipView</name>
     <message>
         <source>double-click to select sample</source>
         <translation type="unfinished"/>
@@ -6630,14 +6630,14 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObject</name>
+    <name>Clip</name>
     <message>
         <source>Mute</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>TrackContentObjectView</name>
+    <name>ClipView</name>
     <message>
         <source>Current position</source>
         <translation type="unfinished"/>

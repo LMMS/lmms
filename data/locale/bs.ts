@@ -603,7 +603,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationPattern</name>
+    <name>AutomationClip</name>
     <message>
         <location filename="src/core/AutomationClip.cpp" line="598"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
@@ -611,7 +611,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AutomationPatternView</name>
+    <name>AutomationClipView</name>
     <message>
         <location filename="src/gui/AutomationClipView.cpp" line="57"/>
         <source>double-click to open this pattern in automation editor</source>
@@ -740,7 +740,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBTCOView</name>
+    <name>BBClipView</name>
     <message>
         <location filename="src/tracks/BBTrack.cpp" line="185"/>
         <source>Open in Beat+Bassline-Editor</source>
@@ -6571,7 +6571,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PatternView</name>
+    <name>MidiClipView</name>
     <message>
         <location filename="src/tracks/MidiClip.cpp" line="730"/>
         <source>use mouse wheel to set velocity of a step</source>
@@ -7385,7 +7385,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleTCOView</name>
+    <name>SampleClipView</name>
     <message>
         <location filename="src/tracks/SampleTrack.cpp" line="235"/>
         <source>double-click to select sample</source>
@@ -8335,7 +8335,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObject</name>
+    <name>Clip</name>
     <message>
         <location filename="src/core/Track.cpp" line="106"/>
         <source>Mute</source>
@@ -8343,7 +8343,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObjectView</name>
+    <name>ClipView</name>
     <message>
         <location filename="src/core/Track.cpp" line="696"/>
         <source>Current position</source>

@@ -519,7 +519,7 @@ LMMS를 다른 언어로 번역하고 싶다거나 기존 번역을 개선하고
     </message>
 </context>
 <context>
-    <name>AutomationPattern</name>
+    <name>AutomationClip</name>
     <message>
         <location filename="../../src/core/AutomationClip.cpp" line="866"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
@@ -527,7 +527,7 @@ LMMS를 다른 언어로 번역하고 싶다거나 기존 번역을 개선하고
     </message>
 </context>
 <context>
-    <name>AutomationPatternView</name>
+    <name>AutomationClipView</name>
     <message>
         <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
@@ -651,7 +651,7 @@ LMMS를 다른 언어로 번역하고 싶다거나 기존 번역을 개선하고
     </message>
 </context>
 <context>
-    <name>BBTCOView</name>
+    <name>BBClipView</name>
     <message>
         <location filename="../../src/gui/BBClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
@@ -9572,7 +9572,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>PatternView</name>
+    <name>MidiClipView</name>
     <message>
         <location filename="../../src/gui/MidiClipView.cpp" line="143"/>
         <source>Open in piano-roll</source>
@@ -12028,7 +12028,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
 </context>
 <context>
-    <name>SampleTCOView</name>
+    <name>SampleClipView</name>
     <message>
         <location filename="../../src/gui/SampleClipView.cpp" line="60"/>
         <source>Double-click to open sample</source>
@@ -13328,7 +13328,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObject</name>
+    <name>Clip</name>
     <message>
         <location filename="../../src/core/Clip.cpp" line="47"/>
         <source>Mute</source>
@@ -13336,7 +13336,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObjectView</name>
+    <name>ClipView</name>
     <message>
         <location filename="../../src/gui/ClipView.cpp" line="647"/>
         <source>Current position</source>
