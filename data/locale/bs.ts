@@ -613,57 +613,57 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="57"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="57"/>
         <source>double-click to open this pattern in automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="179"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="179"/>
         <source>Open in Automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="187"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="187"/>
         <source>Clear</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="190"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="190"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="193"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="193"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="196"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="196"/>
         <source>Set/clear record</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="199"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="199"/>
         <source>Flip Vertically (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="202"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="202"/>
         <source>Flip Horizontally (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="207"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="207"/>
         <source>%1 Connections</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="215"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="215"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationMidiClipView.cpp" line="449"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="449"/>
         <source>Model is already connected to this pattern.</source>
         <translation type="unfinished"/>
     </message>

@@ -529,52 +529,52 @@ LMMS를 다른 언어로 번역하고 싶다거나 기존 번역을 개선하고
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="173"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>오토메이션 편집기에서 열기</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="181"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>지우기</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="184"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>이름 초기화</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="187"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>이름 바꾸기</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="190"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>녹음 설정/해제</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="193"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>상하 반전</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="196"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>좌우 반전</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="201"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1개의 연결</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="209"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>&quot;%1&quot; 연결 해제</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="448"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
         <source>Model is already connected to this pattern.</source>
         <translation>대상이 이미 패턴과 연결되어 있습니다.</translation>
     </message>

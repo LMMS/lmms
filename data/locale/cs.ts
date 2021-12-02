@@ -526,52 +526,52 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="173"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>Otevřít v Editoru automatizace</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="181"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>Vyčistit</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="184"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>Obnovit výchozí jméno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="187"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>Změnit jméno</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="190"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>Zapnout/Vypnout záznam</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="193"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>Převrátit vertikálně (viditelné)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="196"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>Převrátit horizontálně (viditelné)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="201"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1 Připojení</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="209"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>Odpojit &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="448"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
         <source>Model is already connected to this pattern.</source>
         <translation>Model je již k tomuto záznamu připojen.</translation>
     </message>

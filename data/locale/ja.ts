@@ -527,52 +527,52 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="173"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>オートメーション エディターで開く</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="181"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>クリア</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="184"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>名前をリセット</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="187"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>名前を変更</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="190"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>録音をセット/クリア</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="193"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>左右反転</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="196"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>上下反転</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="201"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1 個の接続</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="209"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>&quot;%1&quot; を切断</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="448"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
         <source>Model is already connected to this pattern.</source>
         <translation>モデルは、すでにこのパターンに接続されています。</translation>
     </message>

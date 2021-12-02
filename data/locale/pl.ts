@@ -531,52 +531,52 @@ Radek Słowik</translation>
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="173"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>Otwórz w Edytorze Automatyki</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="181"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>Wyczyść</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="184"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>Zresetuj nazwę</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="187"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>Zmień nazwę</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="190"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>Ustaw/wyczyść nagranie</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="193"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>Odwróć w pionie (widoczne)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="196"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>Odwróć w poziomie (widoczne)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="201"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1 Połączenia</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="209"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>Rozłącz &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationMidiClipView.cpp" line="448"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
         <source>Model is already connected to this pattern.</source>
         <translation>Model jest już podłączony do tego wzorca.</translation>
     </message>
