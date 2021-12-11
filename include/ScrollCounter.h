@@ -28,8 +28,10 @@
 #include <QObject>
 #include <QPoint>
 
+#include "lmms_export.h"
 
-class ScrollCounter: public QObject
+
+class LMMS_EXPORT ScrollCounter: public QObject
 {
 public:
 	static int getStepsX(float stepSize = 120);
