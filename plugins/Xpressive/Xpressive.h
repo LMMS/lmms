@@ -26,14 +26,11 @@
 #ifndef XPRESSIVE_H
 #define XPRESSIVE_H
 
-#include <QPlainTextEdit>
+
 
 #include "Graph.h"
 #include "Instrument.h"
-#include "InstrumentView.h"
-#include "Knob.h"
-#include "LedCheckbox.h"
-#include "PixmapButton.h"
+
 
 #include "ExprSynth.h"
 
@@ -49,6 +46,7 @@ const int	NUM_EXPRS = 5;
 
 
 class ExprFront;
+
 class SubWindow;
 
 
@@ -139,83 +137,5 @@ private:
 } ;
 
 
-class XpressiveView : public InstrumentViewFixedSize
-{
-	Q_OBJECT
-public:
-	XpressiveView( Instrument* _instrument,
-					QWidget* _parent );
-
-	virtual ~XpressiveView();
-protected:
-
-
-protected slots:
-	void updateLayout();
-
-	void sinWaveClicked();
-	void triangleWaveClicked();
-	void sqrWaveClicked();
-	void sawWaveClicked();
-	void noiseWaveClicked();
-	void moogSawWaveClicked();
-	void expWaveClicked();
-	void usrWaveClicked();
-	void helpClicked();
-	void expressionChanged( );
-	void smoothChanged( );
-	void graphDrawn( );
-
-private:
-	virtual void modelChanged();
-
-	Knob *m_generalPurposeKnob[3];
-	Knob *m_panningKnob[2];
-	Knob *m_relKnob;
-	Knob *m_smoothKnob;
-	QPlainTextEdit * m_expressionEditor;
-
-	automatableButtonGroup *m_selectedGraphGroup;
-	PixmapButton *m_w1Btn;
-	PixmapButton *m_w2Btn;
-	PixmapButton *m_w3Btn;
-	PixmapButton *m_o1Btn;
-	PixmapButton *m_o2Btn;
-	PixmapButton *m_sinWaveBtn;
-	PixmapButton *m_triangleWaveBtn;
-	PixmapButton *m_sqrWaveBtn;
-	PixmapButton *m_sawWaveBtn;
-	PixmapButton *m_whiteNoiseWaveBtn;
-	PixmapButton *m_usrWaveBtn;
-	PixmapButton *m_moogWaveBtn;
-	PixmapButton *m_expWaveBtn;
-
-	static QPixmap *s_artwork;
-
-	Graph *m_graph;
-	graphModel *m_raw_graph;
-	LedCheckBox *m_expressionValidToggle;
-	LedCheckBox *m_waveInterpolate;
-	bool m_output_expr;
-	bool m_wave_expr;
-} ;
-
-class XpressiveHelpView: public QTextEdit
-{
-	Q_OBJECT
-public:
-	static XpressiveHelpView* getInstance()
-	{
-		static XpressiveHelpView instance;
-		return &instance;
-	}
-	static void finalize()
-	{
-	}
-
-private:
-	XpressiveHelpView();
-	static QString s_helpText;
-};
 
 #endif

@@ -658,7 +658,9 @@ void PianoView::focusOutEvent( QFocusEvent * )
 		!(parentWidget()->parentWidget()->
 				focusWidget()->inherits( "QLineEdit" ) ||
 		parentWidget()->parentWidget()->
-				focusWidget()->inherits( "QPlainTextEdit" ) ))
+                focusWidget()->inherits( "QPlainTextEdit" )||
+          parentWidget()->parentWidget()->
+                  focusWidget()->inherits( "QTextEdit" ) ))
 	{
 		// then reclaim keyboard focus!
 		setFocus();

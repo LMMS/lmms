@@ -23,6 +23,7 @@
  */
 
 #include "Xpressive.h"
+#include "XpressiveView.h"
 
 #include <QDomElement>
 
@@ -427,9 +428,13 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_expressionValidToggle->move(168, EXPR_TEXT_Y+EXPR_TEXT_H-2);
 	m_expressionValidToggle->setEnabled( false );
 
-	m_expressionEditor = new QPlainTextEdit(this);
+    m_expressionEditor = new QTextEdit(this);
+    m_expressionEditor->setAcceptRichText(false);
 	m_expressionEditor->move(3, EXPR_TEXT_Y);
 	m_expressionEditor->resize(180, EXPR_TEXT_H);
+    m_expressionEditor->setReadOnly(false);
+
+    m_highlighter = new Highlighter(m_expressionEditor->document());
 
 	m_generalPurposeKnob[0] = new XpressiveKnob(this,"A1");
 	m_generalPurposeKnob[0]->setHintText(tr("General purpose 1:"), "");
@@ -467,6 +472,15 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_smoothKnob->setLineWidth(3);
 	m_smoothKnob->setHintText(tr("Smoothness"), "");
 	m_smoothKnob->move(66, EXPR_TEXT_Y + EXPR_TEXT_H + 4);
+
+    m_smoothOverlay=new QWidget(this);
+    m_smoothOverlay->setGeometry(66,198,67,25);
+    m_smoothOverlay->setAutoFillBackground(true);
+    QPalette overlayPalette= m_smoothOverlay->palette();
+    overlayPalette.setColor(QPalette::Window, 0x1e2122);
+    m_smoothOverlay->setPalette(overlayPalette);
+
+
 
 	connect(m_generalPurposeKnob[0], SIGNAL(sliderMoved(float)), this,
 			SLOT(expressionChanged()));
@@ -707,11 +721,13 @@ void XpressiveView::updateLayout() {
 		m_raw_graph=&(e->rawgraphW1());
 		m_expressionEditor->setPlainText(e->wavesExpression(0));
 		m_smoothKnob->setModel(&e->smoothW1());
+        m_smoothOverlay->hide();
 		m_graph->setEnabled((e->smoothW1().value() == 0 && e->wavesExpression(0).size() == 0));
 		m_waveInterpolate->setModel(&e->interpolateW1());
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
 		m_waveInterpolate->show();
+
 		break;
 	case W2_EXPR:
 		m_wave_expr=true;
@@ -719,6 +735,7 @@ void XpressiveView::updateLayout() {
 		m_raw_graph=&(e->rawgraphW2());
 		m_expressionEditor->setPlainText(e->wavesExpression(1));
 		m_smoothKnob->setModel(&e->smoothW2());
+        m_smoothOverlay->hide();
 		m_graph->setEnabled((e->smoothW2().value() == 0 && e->wavesExpression(1).size() == 0));
 		m_waveInterpolate->setModel(&e->interpolateW2());
 		m_smoothKnob->show();
@@ -731,6 +748,7 @@ void XpressiveView::updateLayout() {
 		m_raw_graph=&(e->rawgraphW3());
 		m_expressionEditor->setPlainText(e->wavesExpression(2));
 		m_smoothKnob->setModel(&e->smoothW3());
+        m_smoothOverlay->hide();
 		m_graph->setEnabled((e->smoothW3().value() == 0 && e->wavesExpression(2).size() == 0));
 		m_waveInterpolate->setModel(&e->interpolateW3());
 		m_smoothKnob->show();
@@ -743,6 +761,7 @@ void XpressiveView::updateLayout() {
 		m_raw_graph=&(e->graphO1());
 		m_expressionEditor->setPlainText(e->outputExpression(0));
 		m_smoothKnob->hide();
+        m_smoothOverlay->show();
 		m_graph->setEnabled(false);
 		m_usrWaveBtn->hide();
 		m_waveInterpolate->hide();
@@ -753,6 +772,7 @@ void XpressiveView::updateLayout() {
 		m_raw_graph=&(e->graphO2());
 		m_expressionEditor->setPlainText(e->outputExpression(1));
 		m_smoothKnob->hide();
+        m_smoothOverlay->show();
 		m_graph->setEnabled(false);
 		m_usrWaveBtn->hide();
 		m_waveInterpolate->hide();
@@ -762,55 +782,55 @@ void XpressiveView::updateLayout() {
 
 void XpressiveView::sinWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("sinew(integrate(f))");
+        m_expressionEditor->append("sinew(integrate(f))");
 	else
-		m_expressionEditor->appendPlainText("sinew(t)");
+        m_expressionEditor->append("sinew(t)");
 	Engine::getSong()->setModified();
 }
 
 void XpressiveView::triangleWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("trianglew(integrate(f))");
+        m_expressionEditor->append("trianglew(integrate(f))");
 	else
-		m_expressionEditor->appendPlainText("trianglew(t)");
+        m_expressionEditor->append("trianglew(t)");
 	Engine::getSong()->setModified();
 }
 
 void XpressiveView::sawWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("saww(integrate(f))");
+        m_expressionEditor->append("saww(integrate(f))");
 	else
-		m_expressionEditor->appendPlainText("saww(t)");
+        m_expressionEditor->append("saww(t)");
 	Engine::getSong()->setModified();
 }
 
 void XpressiveView::sqrWaveClicked() {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("squarew(integrate(f))");
+        m_expressionEditor->append("squarew(integrate(f))");
 	else
-		m_expressionEditor->appendPlainText("squarew(t)");
+        m_expressionEditor->append("squarew(t)");
 	Engine::getSong()->setModified();
 }
 
 void XpressiveView::noiseWaveClicked() {
-	m_expressionEditor->appendPlainText("randsv(t*srate,0)");
+    m_expressionEditor->append("randsv(t*srate,0)");
 	Engine::getSong()->setModified();
 }
 
 void XpressiveView::moogSawWaveClicked()
 {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("moogsaww(integrate(f))");
+        m_expressionEditor->append("moogsaww(integrate(f))");
 	else
-		m_expressionEditor->appendPlainText("moogsaww(t)");
+        m_expressionEditor->append("moogsaww(t)");
 	Engine::getSong()->setModified();
 }
 void XpressiveView::expWaveClicked()
 {
 	if (m_output_expr)
-		m_expressionEditor->appendPlainText("expw(integrate(f))");
+        m_expressionEditor->append("expw(integrate(f))");
 	else
-		m_expressionEditor->appendPlainText("expw(t)");
+        m_expressionEditor->append("expw(t)");
 	Engine::getSong()->setModified();
 }
 
@@ -850,12 +870,17 @@ QString XpressiveHelpView::s_helpText=
 "If you use notes with automated frequency, you should use:<br>"
 "sinew(integrate(f)) instead of sinew(t*f)<br>"
 "<b>randv(x)</b> - A random vector. Each cell is reference by an integer index in the range [0,2^31]<br>"
-"Each evaluation of an expression results in different random vector.<br>"
-"Although, it remains consistent in the lifetime of a single wave.<br>"
+"Each note playback of an expression results in different random vector.<br>"
+"Although, it remains consistent in the lifetime of a single note playback.<br>"
 "If you want a single random values you can use randv(0),randv(1)... <br>"
-"and every reference to randv(a) will give you the same value."
-"If you want a random wave you can use randv(t*srate).<br>"
+"and every reference to randv(a) will give you the same value (for the current note playback). <br>"
+"To make it more clear, if you use the randv function in your O1 or O2 formula, each time you activate the formula for a single note, "
+"a different random vector will be generated. So if you play a full song that uses Xpressive synth, and use the randv "
+"function in O1 or O2 output formula, each playback of the song will never be the same. <br>"
+"But as the formula used to generate each time frame (sample) of the wave for the current note, "
+"the randv vector remains the same for each sample generated."
 "Each random value is in the range [-1,1).<br>"
+"If you want a random wave you can use randv(t*srate).<br>"
 "<b>randsv(x,seed)</b> - works exactly like randv(x),<br>"
 "except that it lets you to select the seed manualy,<br>"
 "if you want to try different random values and make it consistent in each evaluation.<br>"
@@ -867,7 +892,8 @@ QString XpressiveHelpView::s_helpText=
 "<b>abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, "
 "hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
 "avg, sgn, mod, etc. are also available.</b><br>"
-"<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>"
+"<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | AND OR XOR NAND are also available.</b><br>"
+"<b>Ternary operator is also available:  (cond?result_if_true:result_if_false)</b><br>"
 "<b>Amplitude Modulation</b> - W1( integrate(f) )*( 1 + W2( integrate(f) ) )<br>"
 "<b>Ring Modulation</b> - W1( integrate(f) )*W2( integrate(f) )<br>"
 "<b>Mix Modulation</b> - 0.5*( W1( integrate(f) )+W2( integrate(f) ) )<br>"
@@ -894,6 +920,102 @@ void XpressiveView::helpClicked() {
 	XpressiveHelpView::getInstance()->show();
 
 }
+
+Highlighter::Highlighter(QTextDocument *parent)
+    : QSyntaxHighlighter(parent)
+{
+    HighlightingRule rule;
+
+    keywordClass1Format.setForeground(Qt::darkBlue);
+    keywordClass1Format.setFontWeight(QFont::Bold);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(sin|cos|tan|cot|asin|acos|atan|atan2|sinh|cosh|tanh|asinh|acosh|atanh|"
+                                  "sinc|exp|log|log2|log10|logn|pow|sqrt|min|max|abs|floor|ceil|round|trunc|frac|clamp)\\b"));
+    rule.format = keywordClass1Format;
+    highlightingRules.append(rule);
+
+    keywordClass2Format.setForeground(Qt::darkMagenta);
+    keywordClass2Format.setFontWeight(QFont::Bold);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(A1|A2|A3|pi|e|t|f|rel|trel|srate|v|tempo|seed)\\b"));
+    rule.format = keywordClass2Format;
+    highlightingRules.append(rule);
+
+    keywordClass3Format.setForeground(Qt::darkYellow);
+    keywordClass3Format.setFontWeight(QFont::Bold);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(cent|semitone|randv|randsv|integrate|last|W1|W2|W3|sinew|trianglew|squarew|expw|saww)\\b"));
+    rule.format = keywordClass3Format;
+    highlightingRules.append(rule);
+
+    keywordClass4Format.setForeground(QBrush(0xff98f0));
+    keywordClass4Format.setFontWeight(QFont::Bold);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(AND|OR|XOR|NAND)\\b|\\+|\\*|\\||\\&|\\^|\\%|\\/|\\<|\\>|\\:|\\?|\\-"));
+    rule.format = keywordClass4Format;
+    highlightingRules.append(rule);
+
+
+    numericFormat.setForeground(Qt::green);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(\\d+\\.\\d+|\\d+(\\.\\d+)?[eE][+-]?\\d+|\\d+)"));
+    rule.format = numericFormat;
+    highlightingRules.append(rule);
+
+    badFormat.setForeground(Qt::red);
+    badFormat.setFontItalic(true);
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])t\\*f\\b|(?<![A-Za-z])f\\*t\\b"));
+    rule.format = badFormat;
+    highlightingRules.append(rule);
+
+
+
+}
+
+void Highlighter::highlightBlock(const QString &text)
+{
+    for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
+        QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
+        while (matchIterator.hasNext()) {
+            QRegularExpressionMatch match = matchIterator.next();
+            setFormat(match.capturedStart(), match.capturedLength(), rule.format);
+        }
+    }
+    int depth = 0;
+    int from = 0;
+    QTextCharFormat pcolors[5]= {QTextCharFormat(),QTextCharFormat(),QTextCharFormat(),QTextCharFormat(),QTextCharFormat()};
+    pcolors[0].setForeground(QBrush(0xe07d00));
+    pcolors[1].setForeground(QBrush(0xb1e1d0));
+    pcolors[2].setForeground(QBrush(0x00e0e0));
+    pcolors[3].setForeground(QBrush(0x7000e0));
+    pcolors[4].setForeground(QBrush(0xe00056));
+    QRegularExpression regex_braces = QRegularExpression(QStringLiteral("(\\()|(\\))"));
+
+
+    while (from<text.length())
+    {
+        int usedDepth;
+        int nextbraces = text.indexOf(
+                    regex_braces, from);
+
+        if (nextbraces == -1)
+        {
+            break;
+        }
+        if (text.at(nextbraces) == ')' )
+        {
+            usedDepth=--depth;
+            if (depth<0)
+            {
+                break;
+            }
+        }
+        else
+        {
+            usedDepth=depth++;
+        }
+
+        setFormat(nextbraces, 1, pcolors[(usedDepth)%5]);
+        from = nextbraces + 1;
+    }
+
+ }
+
 
 extern "C" {
 
