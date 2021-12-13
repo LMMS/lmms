@@ -109,8 +109,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->addWidget( m_outputProgramSpinBox );
 
 	m_fixedOutputNoteSpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
-	m_fixedOutputNoteSpinBox->setDisplayOffset( 1 );
-	m_fixedOutputNoteSpinBox->addTextForValue( 0, "---" );
+	m_fixedOutputNoteSpinBox->addTextForValue( -1, "---" );
 	/*: This string must be be short, its width must be less than
 	 *  width of LCD spin-box of three digits */
 	m_fixedOutputNoteSpinBox->setLabel( tr( "NOTE" ) );
