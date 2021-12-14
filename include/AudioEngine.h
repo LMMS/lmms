@@ -1,5 +1,5 @@
 /*
- * Mixer.h - audio-device-independent mixer for LMMS
+ * AudioEngine.h - device-independent audio engine for LMMS
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MIXER_H
-#define MIXER_H
+#ifndef AUDIO_ENGINE_H
+#define AUDIO_ENGINE_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
@@ -36,7 +36,8 @@
 #include "LocklessList.h"
 #include "Note.h"
 #include "FifoBuffer.h"
-#include "MixerProfiler.h"
+#include "AudioEngineProfiler.h"
+#include "PlayHandle.h"
 
 
 class AudioDevice;
@@ -55,18 +56,13 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
 
-const float BaseFreq = 440.0f;
-const Keys BaseKey = Key_A;
-const Octaves BaseOctave = DefaultOctave;
-
-
 #include "PlayHandle.h"
 
 
-class MixerWorkerThread;
+class AudioEngineWorkerThread;
 
 
-class LMMS_EXPORT Mixer : public QObject
+class LMMS_EXPORT AudioEngine : public QObject
 {
 	Q_OBJECT
 public:
@@ -228,7 +224,7 @@ public:
 	}
 
 
-	MixerProfiler& profiler()
+	AudioEngineProfiler& profiler()
 	{
 		return m_profiler;
 	}
@@ -288,7 +284,7 @@ public:
 
 	inline bool hasFifoWriter() const
 	{
-		return m_fifoWriter != NULL;
+		return m_fifoWriter != nullptr;
 	}
 
 	void pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames );
@@ -333,25 +329,24 @@ private:
 	class fifoWriter : public QThread
 	{
 	public:
-		fifoWriter( Mixer * mixer, Fifo * fifo );
+		fifoWriter( AudioEngine * audioEngine, Fifo * fifo );
 
 		void finish();
 
 
 	private:
-		Mixer * m_mixer;
+		AudioEngine * m_audioEngine;
 		Fifo * m_fifo;
 		volatile bool m_writing;
 
 		void run() override;
 
 		void write( surroundSampleFrame * buffer );
-
 	} ;
 
 
-	Mixer( bool renderOnly );
-	virtual ~Mixer();
+	AudioEngine( bool renderOnly );
+	virtual ~AudioEngine();
 
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
@@ -389,7 +384,7 @@ private:
 	surroundSampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
-	QVector<MixerWorkerThread *> m_workers;
+	QVector<AudioEngineWorkerThread *> m_workers;
 	int m_numWorkers;
 
 	// playhandle stuff
@@ -419,7 +414,7 @@ private:
 	Fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
-	MixerProfiler m_profiler;
+	AudioEngineProfiler m_profiler;
 
 	bool m_metronomeActive;
 
@@ -430,16 +425,14 @@ private:
 	QMutex m_changesMutex;
 	QMutex m_doChangesMutex;
 	QMutex m_waitChangesMutex;
-	QWaitCondition m_changesMixerCondition;
+	QWaitCondition m_changesAudioEngineCondition;
 	QWaitCondition m_changesRequestCondition;
 
 	bool m_waitingForWrite;
 
 	friend class LmmsCore;
-	friend class MixerWorkerThread;
+	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
-
 } ;
-
 
 #endif

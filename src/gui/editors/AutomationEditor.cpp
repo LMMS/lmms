@@ -71,7 +71,7 @@ QPixmap * AutomationEditor::s_toolMove = nullptr;
 QPixmap * AutomationEditor::s_toolYFlip = nullptr;
 QPixmap * AutomationEditor::s_toolXFlip = nullptr;
 
-const QVector<double> AutomationEditor::m_zoomXLevels =
+const QVector<float> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 
@@ -279,7 +279,7 @@ void AutomationEditor::update()
 	// Note detuning?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
-		gui->pianoRoll()->update();
+		getGUI()->pianoRoll()->update();
 	}
 }
 
@@ -1529,7 +1529,7 @@ void AutomationEditor::play()
 		if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
 		{
 			Engine::getSong()->stop();
-			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( getGUI()->pianoRoll()->currentPattern() );
 		}
 		else if( Engine::getSong()->isStopped() == false )
 		{
@@ -1537,7 +1537,7 @@ void AutomationEditor::play()
 		}
 		else
 		{
-			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
+			Engine::getSong()->playPattern( getGUI()->pianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )

@@ -70,7 +70,7 @@ public:
 
 	inline bool validPattern() const
 	{
-		return m_pattern != nullptr && m_pattern->hasAutomation();
+		return m_pattern != nullptr;
 	}
 
 	void saveSettings(QDomDocument & doc, QDomElement & parent) override;
@@ -174,7 +174,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<double> m_zoomXLevels;
+	static const QVector<float> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 

@@ -31,9 +31,9 @@
 #include <QVBoxLayout>
 
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
-#include "Mixer.h"
 
 
 
@@ -74,7 +74,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 	{
 		if( _type != VALID || 
 			manager->getDescription( ( *it ).second )->inputChannels
-				<= Engine::mixer()->audioDev()->channels() )
+				<= Engine::audioEngine()->audioDev()->channels() )
 		{ 
 			pluginNames.push_back( ( *it ).first );
 			m_pluginKeys.push_back( ( *it ).second );

@@ -137,7 +137,7 @@ public:
 
 	bool hasValidPattern() const
 	{
-		return m_pattern != NULL;
+		return m_pattern != nullptr;
 	}
 
 	Song::PlayModes desiredPlayModeForAccompany() const;
@@ -346,8 +346,8 @@ private:
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
 
-	static const QVector<double> m_zoomLevels;
-	static const QVector<double> m_zoomYLevels;
+	static const QVector<float> m_zoomLevels;
+	static const QVector<float> m_zoomYLevels;
 
 	Pattern* m_pattern;
 	NoteVector m_ghostNotes;

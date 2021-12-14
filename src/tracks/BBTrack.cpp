@@ -56,7 +56,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 
 BBTrack::~BBTrack()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( this,
+	Engine::audioEngine()->removePlayHandlesOfTypes( this,
 					PlayHandle::TypeNotePlayHandle
 					| PlayHandle::TypeInstrumentPlayHandle
 					| PlayHandle::TypeSamplePlayHandle );
@@ -223,7 +223,7 @@ BBTrack * BBTrack::findBBTrack( int _bb_num )
 			return it.key();
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -233,7 +233,7 @@ void BBTrack::swapBBTracks( Track * _track1, Track * _track2 )
 {
 	BBTrack * t1 = dynamic_cast<BBTrack *>( _track1 );
 	BBTrack * t2 = dynamic_cast<BBTrack *>( _track2 );
-	if( t1 != NULL && t2 != NULL )
+	if( t1 != nullptr && t2 != nullptr )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
 		Engine::getBBTrackContainer()->swapBB( s_infoMap[t1],

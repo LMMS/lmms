@@ -28,7 +28,6 @@
 #include <QDomElement>
 
 #include "AutomatableModel.h"
-#include "stdshims.h"
 
 
 

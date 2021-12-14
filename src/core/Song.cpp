@@ -89,7 +89,7 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_patternToPlay( NULL ),
+	m_patternToPlay( nullptr ),
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
@@ -106,7 +106,7 @@ Song::Song() :
 			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
 
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
@@ -116,6 +116,9 @@ Song::Song() :
 
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
+
+	for (int i = 0; i < MaxScaleCount; i++) {m_scales[i] = std::make_shared<Scale>();}
+	for (int i = 0; i < MaxKeymapCount; i++) {m_keymaps[i] = std::make_shared<Keymap>();}
 }
 
 
@@ -132,8 +135,7 @@ Song::~Song()
 
 void Song::masterVolumeChanged()
 {
-	Engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
-								100.0f );
+	Engine::audioEngine()->setMasterGain( m_masterVolumeModel.value() / 100.0f );
 }
 
 
@@ -141,9 +143,9 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
-	PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
@@ -155,7 +157,7 @@ void Song::setTempo()
 			nph->unlock();
 		}
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	Engine::updateFramesPerTick();
 
@@ -185,7 +187,7 @@ void Song::savePos()
 {
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 
-	if( tl != NULL )
+	if( tl != nullptr )
 	{
 		tl->savePos( m_playPos[m_playMode] );
 	}
@@ -269,7 +271,7 @@ void Song::processNextBuffer()
 	}
 
 	const auto framesPerTick = Engine::framesPerTick();
-	const auto framesPerPeriod = Engine::mixer()->framesPerPeriod();
+	const auto framesPerPeriod = Engine::audioEngine()->framesPerPeriod();
 
 	f_cnt_t frameOffsetInPeriod = 0;
 
@@ -547,7 +549,7 @@ void Song::playPattern( const Pattern* patternToPlay, bool loop )
 	m_patternToPlay = patternToPlay;
 	m_loopPattern = loop;
 
-	if( m_patternToPlay != NULL )
+	if( m_patternToPlay != nullptr )
 	{
 		m_playMode = Mode_PlayPattern;
 		m_playing = true;
@@ -637,7 +639,7 @@ void Song::stop()
 	}
 
 	// To avoid race conditions with the processing threads
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
 	m_paused = false;
@@ -685,7 +687,7 @@ void Song::stop()
 		/ (double) Engine::framesPerTick() );
 
 	// remove all note-play-handles that are active
-	Engine::mixer()->clear();
+	Engine::audioEngine()->clear();
 
 	// Moves the control of the models that were processed on the last frame
 	// back to their controllers.
@@ -698,7 +700,7 @@ void Song::stop()
 
 	m_playMode = Mode_None;
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	emit stopped();
 	emit playbackStateChanged();
@@ -862,19 +864,19 @@ void Song::clearProject()
 	}
 
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
-	if( gui && gui->getBBEditor() )
+	if( getGUI() != nullptr && getGUI()->getBBEditor() )
 	{
-		gui->getBBEditor()->trackContainerView()->clearAllTracks();
+		getGUI()->getBBEditor()->trackContainerView()->clearAllTracks();
 	}
-	if( gui && gui->songEditor() )
+	if( getGUI() != nullptr && getGUI()->songEditor() )
 	{
-		gui->songEditor()->m_editor->clearAllTracks();
+		getGUI()->songEditor()->m_editor->clearAllTracks();
 	}
-	if( gui && gui->fxMixerView() )
+	if( getGUI() != nullptr && getGUI()->fxMixerView() )
 	{
-		gui->fxMixerView()->clear();
+		getGUI()->fxMixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
@@ -882,14 +884,14 @@ void Song::clearProject()
 
 	Engine::fxMixer()->clear();
 
-	if( gui && gui->automationEditor() )
+	if( getGUI() != nullptr && getGUI()->automationEditor() )
 	{
-		gui->automationEditor()->setCurrentPattern( NULL );
+		getGUI()->automationEditor()->setCurrentPattern( nullptr );
 	}
 
-	if( gui && gui->pianoRoll() )
+	if( getGUI() != nullptr && getGUI()->pianoRoll() )
 	{
-		gui->pianoRoll()->reset();
+		getGUI()->pianoRoll()->reset();
 	}
 
 	m_tempoModel.reset();
@@ -906,11 +908,11 @@ void Song::clearProject()
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
-	if( gui && gui->getProjectNotes() )
+	if( getGUI() != nullptr && getGUI()->getProjectNotes() )
 	{
-		gui->getProjectNotes()->clear();
+		getGUI()->getProjectNotes()->clear();
 	}
 
 	removeAllControllers();
@@ -1033,9 +1035,9 @@ void Song::loadProject( const QString & fileName )
 		{
 			cantLoadProject = true;
 
-			if (gui)
+			if (getGUI() != nullptr)
 			{
-				QMessageBox::critical(NULL, tr("Aborting project load"),
+				QMessageBox::critical(nullptr, tr("Aborting project load"),
 					tr("Project file contains local paths to plugins, which could be used to "
 						"run malicious code."));
 			}
@@ -1063,7 +1065,7 @@ void Song::loadProject( const QString & fileName )
 
 	clearErrors();
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
@@ -1091,10 +1093,10 @@ void Song::loadProject( const QString & fileName )
 	if( !node.isNull() )
 	{
 		Engine::fxMixer()->restoreState( node.toElement() );
-		if( gui )
+		if( getGUI() != nullptr )
 		{
 			// refresh FxMixerView
-			gui->fxMixerView()->refreshDisplay();
+			getGUI()->fxMixerView()->refreshDisplay();
 		}
 	}
 
@@ -1132,23 +1134,31 @@ void Song::loadProject( const QString & fileName )
 			{
 				restoreControllerStates( node.toElement() );
 			}
-			else if( gui )
+			else if (node.nodeName() == "scales")
 			{
-				if( node.nodeName() == gui->getControllerRackView()->nodeName() )
+				restoreScaleStates(node.toElement());
+			}
+			else if (node.nodeName() == "keymaps")
+			{
+				restoreKeymapStates(node.toElement());
+			}
+			else if( getGUI() != nullptr )
+			{
+				if( node.nodeName() == getGUI()->getControllerRackView()->nodeName() )
 				{
-					gui->getControllerRackView()->restoreState( node.toElement() );
+					getGUI()->getControllerRackView()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == gui->pianoRoll()->nodeName() )
+				else if( node.nodeName() == getGUI()->pianoRoll()->nodeName() )
 				{
-					gui->pianoRoll()->restoreState( node.toElement() );
+					getGUI()->pianoRoll()->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == gui->automationEditor()->m_editor->nodeName() )
+				else if( node.nodeName() == getGUI()->automationEditor()->m_editor->nodeName() )
 				{
-					gui->automationEditor()->m_editor->restoreState( node.toElement() );
+					getGUI()->automationEditor()->m_editor->restoreState( node.toElement() );
 				}
-				else if( node.nodeName() == gui->getProjectNotes()->nodeName() )
+				else if( node.nodeName() == getGUI()->getProjectNotes()->nodeName() )
 				{
-					 gui->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
+					 getGUI()->getProjectNotes()->SerializingObject::restoreState( node.toElement() );
 				}
 				else if( node.nodeName() == m_playPos[Mode_PlaySong].m_timeLine->nodeName() )
 				{
@@ -1176,7 +1186,7 @@ void Song::loadProject( const QString & fileName )
 	AutomationPattern::resolveAllIDs();
 
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	ConfigManager::inst()->addRecentlyOpenedProject( fileName );
 
@@ -1193,9 +1203,9 @@ void Song::loadProject( const QString & fileName )
 
 	if ( hasErrors())
 	{
-		if ( gui )
+		if ( getGUI() != nullptr )
 		{
-			QMessageBox::warning( NULL, tr("LMMS Error report"), errorSummary(),
+			QMessageBox::warning( nullptr, tr("LMMS Error report"), errorSummary(),
 							QMessageBox::Ok );
 		}
 		else
@@ -1229,16 +1239,19 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
-	if( gui )
+	if( getGUI() != nullptr )
 	{
-		gui->getControllerRackView()->saveState( dataFile, dataFile.content() );
-		gui->pianoRoll()->saveState( dataFile, dataFile.content() );
-		gui->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
-		gui->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
+		getGUI()->getControllerRackView()->saveState( dataFile, dataFile.content() );
+		getGUI()->pianoRoll()->saveState( dataFile, dataFile.content() );
+		getGUI()->automationEditor()->m_editor->saveState( dataFile, dataFile.content() );
+		getGUI()->getProjectNotes()->SerializingObject::saveState( dataFile, dataFile.content() );
 		m_playPos[Mode_PlaySong].m_timeLine->saveState( dataFile, dataFile.content() );
 	}
 
 	saveControllerStates( dataFile, dataFile.content() );
+
+	saveScaleStates(dataFile, dataFile.content());
+	saveKeymapStates(dataFile, dataFile.content());
 
 	m_savingProject = false;
 
@@ -1327,6 +1340,56 @@ void Song::removeAllControllers()
 	m_controllers.clear();
 }
 
+
+
+void Song::saveScaleStates(QDomDocument &doc, QDomElement &element)
+{
+	QDomElement scalesNode = doc.createElement("scales");
+	element.appendChild(scalesNode);
+
+	for (int i = 0; i < MaxScaleCount; i++)
+	{
+		m_scales[i]->saveState(doc, scalesNode);
+	}
+}
+
+
+void Song::restoreScaleStates(const QDomElement &element)
+{
+	QDomNode node = element.firstChild();
+
+	for (int i = 0; i < MaxScaleCount && !node.isNull() && !isCancelled(); i++)
+	{
+		m_scales[i]->restoreState(node.toElement());
+		node = node.nextSibling();
+	}
+	emit scaleListChanged(-1);
+}
+
+
+void Song::saveKeymapStates(QDomDocument &doc, QDomElement &element)
+{
+	QDomElement keymapsNode = doc.createElement("keymaps");
+	element.appendChild(keymapsNode);
+
+	for (int i = 0; i < MaxKeymapCount; i++)
+	{
+		m_keymaps[i]->saveState(doc, keymapsNode);
+	}
+}
+
+
+void Song::restoreKeymapStates(const QDomElement &element)
+{
+	QDomNode node = element.firstChild();
+
+	for (int i = 0; i < MaxKeymapCount && !node.isNull() && !isCancelled(); i++)
+	{
+		m_keymaps[i]->restoreState(node.toElement());
+		node = node.nextSibling();
+	}
+	emit keymapListChanged(-1);
+}
 
 
 void Song::exportProjectMidi(QString const & exportFileName) const
@@ -1451,4 +1514,42 @@ QString Song::errorSummary()
 
 bool Song::isSavingProject() const {
 	return m_savingProject;
+}
+
+
+std::shared_ptr<const Scale> Song::getScale(unsigned int index) const
+{
+	if (index >= MaxScaleCount) {index = 0;}
+
+	return std::atomic_load(&m_scales[index]);
+}
+
+
+std::shared_ptr<const Keymap> Song::getKeymap(unsigned int index) const
+{
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	return std::atomic_load(&m_keymaps[index]);
+}
+
+
+void Song::setScale(unsigned int index, std::shared_ptr<Scale> newScale)
+{
+	if (index >= MaxScaleCount) {index = 0;}
+
+	Engine::audioEngine()->requestChangeInModel();
+	std::atomic_store(&m_scales[index], newScale);
+	emit scaleListChanged(index);
+	Engine::audioEngine()->doneChangeInModel();
+}
+
+
+void Song::setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap)
+{
+	if (index >= MaxKeymapCount) {index = 0;}
+
+	Engine::audioEngine()->requestChangeInModel();
+	std::atomic_store(&m_keymaps[index], newMap);
+	emit keymapListChanged(index);
+	Engine::audioEngine()->doneChangeInModel();
 }

@@ -54,7 +54,7 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 
 SampleTrack::~SampleTrack()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
 }
 
 
@@ -67,7 +67,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 	bool played_a_note = false;	// will be return variable
 
 	tcoVector tcos;
-	::BBTrack * bb_track = NULL;
+	::BBTrack * bb_track = nullptr;
 	if( _tco_num >= 0 )
 	{
 		if (_start > getTCO(_tco_num)->length())
@@ -147,8 +147,8 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 				handle = smpHandle;
 			}
 			handle->setOffset( _offset );
-			// send it to the mixer
-			Engine::mixer()->addPlayHandle( handle );
+			// send it to the audio engine
+			Engine::audioEngine()->addPlayHandle( handle );
 			played_a_note = true;
 		}
 	}
@@ -218,7 +218,7 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 void SampleTrack::updateTcos()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
 	setPlayingTcos( false );
 }
 

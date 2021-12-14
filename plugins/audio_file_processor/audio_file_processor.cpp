@@ -32,13 +32,13 @@
 
 #include <samplerate.h>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "interpolation.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
 #include "Song.h"
@@ -65,7 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
-	NULL
+	nullptr,
 } ;
 
 }
@@ -303,8 +303,9 @@ QString audioFileProcessor::nodeName( void ) const
 
 int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
-	const float freq_factor = BaseFreq / _n->frequency() *
-			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
+	const auto baseFreq = instrumentTrack()->baseFreq();
+	const float freq_factor = baseFreq / _n->frequency() *
+			Engine::audioEngine()->processingSampleRate() / Engine::audioEngine()->baseSampleRate();
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
@@ -445,14 +446,14 @@ void audioFileProcessor::pointChanged( void )
 
 
 
-QPixmap * AudioFileProcessorView::s_artwork = NULL;
+QPixmap * AudioFileProcessorView::s_artwork = nullptr;
 
 
 AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	if( s_artwork == NULL )
+	if( s_artwork == nullptr )
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
@@ -1147,7 +1148,7 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cn
 		case start:
 			break;
 	}
-	if( a_knob == NULL )
+	if( a_knob == nullptr )
 	{
 		return;
 	}

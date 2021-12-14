@@ -37,6 +37,7 @@
 #include <QStringList>
 
 #include "FileBrowser.h"
+#include "AudioEngine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
@@ -47,8 +48,8 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
@@ -571,11 +572,11 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
 	// Forward the event
+	QTreeWidgetItem * i = itemAt(me->pos());
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
 
-	QTreeWidgetItem * i = itemAt(me->pos());
 	if (i)
 	{
 		// TODO: Restrict to visible selection
@@ -626,7 +627,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 	else if (
 		(ext == "xiz" || ext == "sf2" || ext == "sf3" ||
 		 ext == "gig" || ext == "pat")
-		&& !pluginFactory->pluginSupportingExtension(ext).isNull())
+		&& !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
 		const bool isPlugin = file->handling() == FileItem::LoadByPlugin;
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
@@ -650,7 +651,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 	if (newPPH != nullptr)
 	{
-		if (Engine::mixer()->addPlayHandle(newPPH))
+		if (Engine::audioEngine()->addPlayHandle(newPPH))
 		{
 			m_previewPlayHandle = newPPH;
 		}
@@ -666,7 +667,7 @@ void FileBrowserTreeWidget::stopPreview()
 	QMutexLocker previewLocker(&m_pphMutex);
 	if (m_previewPlayHandle != nullptr)
 	{
-		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
+		Engine::audioEngine()->removePlayHandle(m_previewPlayHandle);
 		m_previewPlayHandle = nullptr;
 	}
 }
@@ -751,11 +752,11 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( gui->mainWindow()->mayChangeProject(true) )
+			if( getGUI()->mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -769,22 +770,18 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 				!i->descriptor()->supportsFileType( e ) )
 			{
 				PluginFactory::PluginInfoAndKey piakn =
-					pluginFactory->pluginSupportingExtension(e);
+					getPluginFactory()->pluginSupportingExtension(e);
 				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
 			break;
 		}
 
-		case FileItem::LoadAsPreset:
-		{
-			DataFile dataFile( f->fullName() );
-			InstrumentTrack::removeMidiPortNode( dataFile );
-			it->setSimpleSerializing();
-			it->loadSettings( dataFile.content().toElement() );
+		case FileItem::LoadAsPreset: {
+			DataFile dataFile(f->fullName());
+			it->replaceInstrument(dataFile);
 			break;
 		}
-
 		case FileItem::ImportAsProject:
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
@@ -795,7 +792,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -861,10 +858,10 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 		Track::create(Track::SampleTrack, Engine::getSong()));
 
 	// Add the sample clip to the track
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	SampleTCO* clip = static_cast<SampleTCO*>(sampleTrack->createTCO(0));
 	clip->setSampleFile(item->fullName());
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	return true;
 }
 
@@ -890,7 +887,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			gui->mainWindow()->workspace()->
+			getGUI()->mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
@@ -1232,7 +1229,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
 	}
-	else if( ext == "xiz" && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
@@ -1266,7 +1263,7 @@ void FileItem::determineFileType( void )
 	}
 
 	if( m_handling == NotSupported &&
-		!ext.isEmpty() && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+		!ext.isEmpty() && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_handling = LoadByPlugin;
 		// classify as sample if not classified by anything yet but can

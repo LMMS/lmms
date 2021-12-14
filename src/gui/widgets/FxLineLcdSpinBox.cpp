@@ -36,11 +36,11 @@ void FxLineLcdSpinBox::setTrackView(TrackView * tv)
 
 void FxLineLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
 {
-	gui->fxMixerView()->setCurrentFxLine(model()->value());
+	getGUI()->fxMixerView()->setCurrentFxLine(model()->value());
 
-	gui->fxMixerView()->parentWidget()->show();
-	gui->fxMixerView()->show();// show fxMixer window
-	gui->fxMixerView()->setFocus();// set focus to fxMixer window
+	getGUI()->fxMixerView()->parentWidget()->show();
+	getGUI()->fxMixerView()->show();// show fxMixer window
+	getGUI()->fxMixerView()->setFocus();// set focus to fxMixer window
 	//engine::getFxMixerView()->raise();
 }
 

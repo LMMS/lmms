@@ -41,8 +41,8 @@ Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
     CARLA_VERSION_HEX,
     Plugin::Instrument,
     new PluginPixmapLoader( "logo" ),
-    NULL,
-    NULL
+    nullptr,
+    nullptr,
 } ;
 
 PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)

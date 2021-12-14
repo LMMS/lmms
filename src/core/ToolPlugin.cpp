@@ -43,7 +43,7 @@ ToolPlugin::~ToolPlugin()
 
 ToolPlugin * ToolPlugin::instantiate( const QString & _plugin_name, Model * _parent )
 {
-	Plugin * p = Plugin::instantiate( _plugin_name, _parent, NULL );
+	Plugin * p = Plugin::instantiate( _plugin_name, _parent, nullptr );
 	// check whether instantiated plugin is a tool
 	if( p->type() == Plugin::Tool )
 	{
@@ -53,6 +53,6 @@ ToolPlugin * ToolPlugin::instantiate( const QString & _plugin_name, Model * _par
 
 	// not quite... so delete plugin
 	delete p;
-	return NULL;
+	return nullptr;
 }
 

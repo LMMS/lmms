@@ -87,12 +87,15 @@ void BBTCO::loadSettings( const QDomElement & element )
 	}
 	
 	// for colors saved before 1.3
-	else
+	else if(element.hasAttribute("color"))
 	{
-		if( element.hasAttribute( "color" ) )
-		{ setColor( QColor( element.attribute( "color" ).toUInt() ) ); }
+		setColor(QColor(element.attribute("color").toUInt()));
 		
 		// usestyle attribute is no longer used
+	}
+	else
+	{
+		useCustomClipColor(false);
 	}
 }
 

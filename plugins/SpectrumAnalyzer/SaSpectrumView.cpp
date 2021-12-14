@@ -52,7 +52,7 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayBufferL.resize(m_processor->binCount(), 0);
 	m_displayBufferR.resize(m_processor->binCount(), 0);
@@ -398,8 +398,8 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 // Draw background, grid and associated frequency and amplitude labels.
 void SaSpectrumView::drawGrid(QPainter &painter)
 {
-	std::vector<std::pair<int, std::string>> *freqTics = NULL;
-	std::vector<std::pair<float, std::string>> *ampTics = NULL;
+	std::vector<std::pair<int, std::string>> *freqTics = nullptr;
+	std::vector<std::pair<float, std::string>> *ampTics = nullptr;
 	float pos = 0;
 	float label_width = 24;
 	float label_height = 15;

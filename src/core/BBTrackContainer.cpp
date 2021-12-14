@@ -151,7 +151,7 @@ void BBTrackContainer::swapBB(int bb1, int bb2)
 void BBTrackContainer::updateBBTrack(TrackContentObject * tco)
 {
 	BBTrack * t = BBTrack::findBBTrack(tco->startPosition() / DefaultTicksPerBar);
-	if (t != NULL)
+	if (t != nullptr)
 	{
 		t->dataChanged();
 	}

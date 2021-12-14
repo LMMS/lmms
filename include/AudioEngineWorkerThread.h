@@ -1,5 +1,5 @@
 /*
- * MixerWorkerThread.h - declaration of class MixerWorkerThread
+ * AudioEngineWorkerThread.h - declaration of class AudioEngineWorkerThread
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,18 +22,18 @@
  *
  */
 
-#ifndef MIXER_WORKER_THREAD_H
-#define MIXER_WORKER_THREAD_H
+#ifndef AUDIO_ENGINE_WORKER_THREAD_H
+#define AUDIO_ENGINE_WORKER_THREAD_H
 
 #include <QtCore/QThread>
 
 #include <atomic>
 
+class AudioEngine;
 class QWaitCondition;
-class Mixer;
 class ThreadableJob;
 
-class MixerWorkerThread : public QThread
+class AudioEngineWorkerThread : public QThread
 {
 	Q_OBJECT
 public:
@@ -47,7 +47,8 @@ public:
 			Dynamic	// jobs can be added while processing queue
 		} ;
 
-#define JOB_QUEUE_SIZE 8192
+		static constexpr size_t JOB_QUEUE_SIZE = 8192;
+
 		JobQueue() :
 			m_items(),
 			m_writeIndex( 0 ),
@@ -69,12 +70,11 @@ public:
 		std::atomic_int m_writeIndex;
 		std::atomic_int m_itemsDone;
 		OperationMode m_opMode;
-
 	} ;
 
 
-	MixerWorkerThread( Mixer* mixer );
-	virtual ~MixerWorkerThread();
+	AudioEngineWorkerThread( AudioEngine* audioEngine );
+	virtual ~AudioEngineWorkerThread();
 
 	virtual void quit();
 
@@ -110,10 +110,9 @@ private:
 
 	static JobQueue globalJobQueue;
 	static QWaitCondition * queueReadyWaitCond;
-	static QList<MixerWorkerThread *> workerThreads;
+	static QList<AudioEngineWorkerThread *> workerThreads;
 
 	volatile bool m_quit;
-
 } ;
 
 

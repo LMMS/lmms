@@ -84,7 +84,7 @@ class DummyEffect : public Effect
 	Q_OBJECT
 public:
 	DummyEffect( Model * _parent, const QDomElement& originalPluginData ) :
-		Effect( NULL, _parent, NULL ),
+		Effect( nullptr, _parent, nullptr ),
 		m_controls( this ),
 		m_originalPluginData( originalPluginData )
 	{

@@ -2,8 +2,8 @@
 
 #include "FxMixer.h"
 
-QPixmap * SendButtonIndicator::s_qpmOff = NULL;
-QPixmap * SendButtonIndicator::s_qpmOn = NULL;
+QPixmap * SendButtonIndicator::s_qpmOff = nullptr;
+QPixmap * SendButtonIndicator::s_qpmOn = nullptr;
 
 SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
 										   FxMixerView * _mv) :
@@ -33,7 +33,7 @@ void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 	int from = m_mv->currentFxLine()->channelIndex();
 	int to = m_parent->channelIndex();
 	FloatModel * sendModel = mix->channelSendModel(from, to);
-	if( sendModel == NULL )
+	if( sendModel == nullptr )
 	{
 		// not sending. create a mixer send.
 		mix->createChannelSend( from, to );
@@ -57,5 +57,5 @@ FloatModel * SendButtonIndicator::getSendModel()
 
 void SendButtonIndicator::updateLightStatus()
 {
-	setPixmap( getSendModel() == NULL ? *s_qpmOff : *s_qpmOn );
+	setPixmap( getSendModel() == nullptr ? *s_qpmOff : *s_qpmOn );
 }
