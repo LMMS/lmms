@@ -182,9 +182,9 @@ PianoRoll {
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: #064d79;
-	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteColor: #1e1e1e;
 	qproperty-ghostNoteTextColor: #ffffff;
-	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteOpacity: 60;
 	qproperty-ghostNoteBorders: false;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
@@ -193,13 +193,16 @@ PianoRoll {
 	qproperty-whiteKeyWidth: 64;
 	qproperty-whiteKeyActiveTextColor: #000;
 	qproperty-whiteKeyActiveTextShadow: #fff;
-	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3ac467, stop:1 #3dd671);
 	qproperty-whiteKeyInactiveTextColor: #000;
 	qproperty-whiteKeyInactiveTextShadow: #fff;
-	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eeeeee, stop:1 #ffffff);
+	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #d6d6d6, stop:1 #e3e3e3);
+	qproperty-whiteKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #a0a0a0, stop:1 #b0b0b0);
 	qproperty-blackKeyWidth: 48;
-	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
-	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #333, stop:1 #000);
+	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3ac467, stop:1 #3dd671);
+	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #262626, stop:1 #313131);
+	qproperty-blackKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #606060, stop:1 #505050);
+
 	/* Grid colors */
 	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2d6b45;
@@ -738,8 +741,8 @@ PatternView {
 
 /* sample track pattern */
 SampleTCOView {
-	background-color: #DE7C05;
-	color: #FFE8CD;
+	background-color: rgba(42,51,59,255);
+	color: #FF8F05;
 }
 
 /* automation pattern */

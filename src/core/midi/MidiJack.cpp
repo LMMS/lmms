@@ -188,7 +188,7 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 	{
 		for(i=0; i<nframes; i++)
 		{
-			if((in_event.time == i) && (event_index < event_count))
+			while((in_event.time == i) && (event_index < event_count))
 			{
 				// lmms is setup to parse bytes coming from a device
 				// parse it byte by byte as it expects

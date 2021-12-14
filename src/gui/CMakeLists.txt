@@ -6,8 +6,11 @@ SET(LMMS_SRCS
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
 	gui/AutomationPatternView.cpp
+	gui/AutomationTrackView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
+	gui/BBTCOView.cpp
+	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
@@ -25,10 +28,14 @@ SET(LMMS_SRCS
 	gui/MidiCCRackView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
+	gui/PatternView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
+	gui/SampleTCOView.cpp
+	gui/SampleTrackView.cpp
+	gui/SampleTrackWindow.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp

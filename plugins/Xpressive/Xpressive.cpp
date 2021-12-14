@@ -849,9 +849,11 @@ QString XpressiveHelpView::s_helpText=
 "<b>t</b> - Time in seconds.<br>"
 "<b>f</b> - Note's pitched frequency. Available only in the output expressions.<br>"
 #if ENABLE_CUSTOM_KEY_MAPPING
-"<b>key</b> - Note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. Available only in the output expressions.<br>"
-"<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
+"<b>key</b> - Note's keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.<br>"
+"<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
 #endif
+"<b>key</b> - Note's keyboard key. 0 denotes C-1, 60 denotes C4, 127 denotes G9. Available only in the output expressions.<br>"
+"<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 "<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
 "<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
