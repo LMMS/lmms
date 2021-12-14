@@ -11,6 +11,8 @@
 #include "PixmapButton.h"
 #include "Graph.h"
 
+#ifndef QT_NO_SYNTAXHIGHLIGHTER
+
 class Highlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
@@ -34,12 +36,12 @@ private:
     QTextCharFormat keywordClass2Format;
     QTextCharFormat keywordClass3Format;
     QTextCharFormat keywordClass4Format;
-    QTextCharFormat keywordClass5Format;
     QTextCharFormat numericFormat;
     QTextCharFormat badFormat;
 
 
 };
+#endif
 
 class XpressiveView : public InstrumentViewFixedSize
 {
@@ -92,7 +94,9 @@ private:
 	PixmapButton *m_moogWaveBtn;
 	PixmapButton *m_expWaveBtn;
     QWidget *m_smoothOverlay;
+#ifndef QT_NO_SYNTAXHIGHLIGHTER
     Highlighter *m_highlighter;
+#endif
 
 	static QPixmap *s_artwork;
 

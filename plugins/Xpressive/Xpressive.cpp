@@ -433,8 +433,9 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_expressionEditor->move(3, EXPR_TEXT_Y);
 	m_expressionEditor->resize(180, EXPR_TEXT_H);
     m_expressionEditor->setReadOnly(false);
-
+#ifndef QT_NO_SYNTAXHIGHLIGHTER
     m_highlighter = new Highlighter(m_expressionEditor->document());
+#endif
 
 	m_generalPurposeKnob[0] = new XpressiveKnob(this,"A1");
 	m_generalPurposeKnob[0]->setHintText(tr("General purpose 1:"), "");
@@ -923,6 +924,7 @@ void XpressiveView::helpClicked() {
 
 }
 
+#ifndef QT_NO_SYNTAXHIGHLIGHTER
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
@@ -1016,7 +1018,8 @@ void Highlighter::highlightBlock(const QString &text)
         from = nextbraces + 1;
     }
 
- }
+}
+#endif
 
 
 extern "C" {
