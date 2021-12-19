@@ -990,13 +990,13 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 	//Replacing an instrument shouldn't change the solo/mute state.
 	bool oldMute = isMuted();
 	bool oldSolo = isSolo();
-	bool oldMutedBeforeSolo = m_mutedBeforeSolo;
+	bool oldMutedBeforeSolo = isMutedBeforeSolo();
 
 	loadSettings(dataFile.content().toElement());
 	
 	setMuted(oldMute);
 	setSolo(oldSolo);
-	m_mutedBeforeSolo = oldMutedBeforeSolo;
+	setMutedBeforeSolo(oldMutedBeforeSolo);
 	
 	m_effectChannelModel.setValue(effectChannel);
 	Engine::getSong()->setModified();
