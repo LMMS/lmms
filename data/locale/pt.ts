@@ -397,7 +397,7 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1228"/>
-        <source>Please open an automation pattern with the context menu of a control!</source>
+        <source>Please open an automation clip with the context menu of a control!</source>
         <translation>Por favor, abra o sequenciador de automação com o menu de contexto do controle!</translation>
     </message>
 </context>
@@ -405,12 +405,12 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     <name>AutomationEditorWindow</name>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1835"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation>Tocar/Parar padrão atual (Espaço)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1837"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation>Parar de tocar a sequência atual (Espaço)</translation>
     </message>
     <message>
@@ -501,7 +501,7 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1990"/>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2107"/>
-        <source>Automation Editor - no pattern</source>
+        <source>Automation Editor - no clip</source>
         <translation>Editor de Automação - sem padrão</translation>
     </message>
     <message>
@@ -512,7 +512,7 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2048"/>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation>O modelo já está conectado para este padrão.</translation>
     </message>
 </context>
@@ -573,7 +573,7 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     </message>
     <message>
         <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation>O modelo já está conectado para este padrão.</translation>
     </message>
 </context>
@@ -619,7 +619,7 @@ Se você estiver interessado em traduzir LMMS para outro idioma ou quer melhorar
     </message>
     <message>
         <location filename="../../src/gui/editors/BBEditor.cpp" line="91"/>
-        <source>Clone beat/bassline pattern</source>
+        <source>Clone beat/bassline clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -9868,7 +9868,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="3603"/>
-        <source>Please open a pattern by double-clicking on it!</source>
+        <source>Please open a clip by double-clicking on it!</source>
         <translation>Por favor abra um a sequência com um duplo clique sobre ela!</translation>
     </message>
     <message>
@@ -9882,7 +9882,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     <name>PianoRollWindow</name>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4714"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation>Tocar/Parar padrão atual (Espaço)</translation>
     </message>
     <message>
@@ -9902,7 +9902,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4718"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation>Parar de tocar a sequência atual (Espaço)</translation>
     </message>
     <message>
@@ -9952,13 +9952,13 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4773"/>
-        <source>Import pattern</source>
+        <source>Import clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4776"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5232"/>
-        <source>Export pattern</source>
+        <source>Export clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -10075,7 +10075,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5043"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5214"/>
-        <source>Piano-Roll - no pattern</source>
+        <source>Piano-Roll - no clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -10091,32 +10091,32 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5254"/>
-        <source>Pattern saved to %1</source>
+        <source>MidiClip saved to %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5269"/>
-        <source>Import pattern.</source>
+        <source>Import clip.</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5270"/>
-        <source>You are about to import a pattern, this will overwrite your current pattern. Do you want to continue?</source>
+        <source>You are about to import a clip, this will overwrite your current clip. Do you want to continue?</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5279"/>
-        <source>Open pattern</source>
+        <source>Open clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5299"/>
-        <source>Import pattern success</source>
+        <source>Import clip success</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5300"/>
-        <source>Imported pattern %1!</source>
+        <source>Imported clip %1!</source>
         <translation type="unfinished"/>
     </message>
 </context>

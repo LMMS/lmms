@@ -410,7 +410,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditor</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="1282"/>
-        <source>Please open an automation pattern with the context menu of a control!</source>
+        <source>Please open an automation clip with the context menu of a control!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -428,7 +428,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditorWindow</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2020"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -438,7 +438,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2026"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -588,7 +588,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2293"/>
-        <source>Automation Editor - no pattern</source>
+        <source>Automation Editor - no clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -598,7 +598,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2350"/>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -664,7 +664,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/AutomationClipView.cpp" line="449"/>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -6834,7 +6834,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3035"/>
-        <source>Please open a pattern by double-clicking on it!</source>
+        <source>Please open a clip by double-clicking on it!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6848,7 +6848,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PianoRollWindow</name>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3970"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6863,7 +6863,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3973"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -7008,7 +7008,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="4246"/>
-        <source>Piano-Roll - no pattern</source>
+        <source>Piano-Roll - no clip</source>
         <translation type="unfinished"/>
     </message>
 </context>
