@@ -608,7 +608,7 @@ PianoView {
 
 /* font sizes for text buttons */
 
-FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
+MixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
