@@ -38,7 +38,7 @@
 
 
 
-class FxMixerView;
+class MixerView;
 class SendButtonIndicator;
 
 class FxLine : public QWidget
@@ -50,7 +50,7 @@ public:
 	Q_PROPERTY( QColor strokeOuterInactive READ strokeOuterInactive WRITE setStrokeOuterInactive )
 	Q_PROPERTY( QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive )
 	Q_PROPERTY( QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive )
-	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
+	FxLine( QWidget * _parent, MixerView * _mv, int _channelIndex);
 	~FxLine();
 
 	void paintEvent( QPaintEvent * ) override;
@@ -87,7 +87,7 @@ private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
 
-	FxMixerView * m_mv;
+	MixerView * m_mv;
 	LcdWidget* m_lcd;
 	int m_channelIndex;
 	QBrush m_backgroundActive;

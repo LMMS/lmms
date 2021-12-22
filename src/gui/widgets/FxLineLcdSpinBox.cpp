@@ -25,7 +25,7 @@
 #include "FxLineLcdSpinBox.h"
 
 #include "CaptionMenu.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "TrackView.h"
 
@@ -36,12 +36,12 @@ void FxLineLcdSpinBox::setTrackView(TrackView * tv)
 
 void FxLineLcdSpinBox::mouseDoubleClickEvent(QMouseEvent* event)
 {
-	getGUI()->fxMixerView()->setCurrentFxLine(model()->value());
+	getGUI()->MixerView()->setCurrentFxLine(model()->value());
 
-	getGUI()->fxMixerView()->parentWidget()->show();
-	getGUI()->fxMixerView()->show();// show fxMixer window
-	getGUI()->fxMixerView()->setFocus();// set focus to fxMixer window
-	//engine::getFxMixerView()->raise();
+	getGUI()->MixerView()->parentWidget()->show();
+	getGUI()->MixerView()->show();// show Mixer window
+	getGUI()->MixerView()->setFocus();// set focus to Mixer window
+	//engine::getMixerView()->raise();
 }
 
 void FxLineLcdSpinBox::contextMenuEvent(QContextMenuEvent* event)

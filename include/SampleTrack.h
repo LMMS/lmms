@@ -29,7 +29,7 @@
 
 #include "AudioPort.h"
 #include "FadeButton.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "SampleTCO.h"
 #include "SampleTrackView.h"
 #include "Track.h"

@@ -1,5 +1,5 @@
 /*
- * FxMixer.h - effect-mixer for LMMS
+ * Mixer.h - effect-mixer for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FX_MIXER_H
-#define FX_MIXER_H
+#ifndef MIXER_H
+#define MIXER_H
 
 #include "Model.h"
 #include "EffectChain.h"
@@ -134,12 +134,12 @@ class FxRoute : public QObject
 };
 
 
-class LMMS_EXPORT FxMixer : public Model, public JournallingObject
+class LMMS_EXPORT Mixer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	FxMixer();
-	virtual ~FxMixer();
+	Mixer();
+	virtual ~Mixer();
 
 	void mixToChannel( const sampleFrame * _buf, fx_ch_t _ch );
 
@@ -151,7 +151,7 @@ public:
 
 	QString nodeName() const override
 	{
-		return "fxmixer";
+		return "mixer";
 	}
 
 	FxChannel * effectChannel( int _ch )
@@ -178,11 +178,11 @@ public:
 	// toChannel. NULL if there is no send.
 	FloatModel * channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel);
 
-	// add a new channel to the Fx Mixer.
+	// add a new channel to the mixer.
 	// returns the index of the channel that was just added
 	int createChannel();
 
-	// delete a channel from the FX mixer.
+	// delete a channel from the mixer.
 	void deleteChannel(int index);
 
 	// delete all the mixer channels except master and remove all effects

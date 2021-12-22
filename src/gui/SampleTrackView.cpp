@@ -28,7 +28,7 @@
 
 #include "embed.h"
 #include "Engine.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
@@ -119,7 +119,7 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
 
-	FxChannel *fxChannel = Engine::fxMixer()->effectChannel(channelIndex);
+	FxChannel *fxChannel = Engine::Mixer()->effectChannel(channelIndex);
 
 	// If title allows interpolation, pass channel index and name
 	if (title.contains("%2"))
@@ -132,9 +132,9 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 	fxMenu->addAction(newFxLabel, this, SLOT(createFxLine()));
 	fxMenu->addSeparator();
 
-	for (int i = 0; i < Engine::fxMixer()->numChannels(); ++i)
+	for (int i = 0; i < Engine::Mixer()->numChannels(); ++i)
 	{
-		FxChannel * currentChannel = Engine::fxMixer()->effectChannel(i);
+		FxChannel * currentChannel = Engine::Mixer()->effectChannel(i);
 
 		if (currentChannel != fxChannel)
 		{
@@ -210,8 +210,8 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 /*! \brief Create and assign a new FX Channel for this track */
 void SampleTrackView::createFxLine()
 {
-	int channelIndex = getGUI()->fxMixerView()->addNewChannel();
-	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
+	int channelIndex = getGUI()->MixerView()->addNewChannel();
+	auto channel = Engine::Mixer()->effectChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
 	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
@@ -227,5 +227,5 @@ void SampleTrackView::assignFxLine(int channelIndex)
 {
 	model()->effectChannelModel()->setValue(channelIndex);
 
-	getGUI()->fxMixerView()->setCurrentFxLine(channelIndex);
+	getGUI()->MixerView()->setCurrentFxLine(channelIndex);
 }

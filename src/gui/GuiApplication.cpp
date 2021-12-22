@@ -33,7 +33,7 @@
 #include "BBEditor.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MicrotunerConfig.h"
@@ -138,8 +138,8 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_fxMixerView = new FxMixerView;
-	connect(m_fxMixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	m_MixerView = new MixerView;
+	connect(m_MixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
@@ -189,15 +189,15 @@ void GuiApplication::displayInitProgress(const QString &msg)
 
 void GuiApplication::childDestroyed(QObject *obj)
 {
-	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->fxMixerView(), etc
+	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->MixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
 	if (obj == m_mainWindow)
 	{
 		m_mainWindow = nullptr;
 	}
-	else if (obj == m_fxMixerView)
+	else if (obj == m_MixerView)
 	{
-		m_fxMixerView = nullptr;
+		m_MixerView = nullptr;
 	}
 	else if (obj == m_songEditor)
 	{

@@ -6,16 +6,16 @@
 #include <QPixmap>
 
 #include "FxLine.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 
 class FxLine;
-class FxMixerView;
+class MixerView;
 
 class SendButtonIndicator : public QLabel 
 {
 public:
 	SendButtonIndicator( QWidget * _parent, FxLine * _owner,
-						 FxMixerView * _mv);
+						 MixerView * _mv);
 
 	void mousePressEvent( QMouseEvent * e ) override;
 	void updateLightStatus();
@@ -23,7 +23,7 @@ public:
 private:
 
 	FxLine * m_parent;
-	FxMixerView * m_mv;
+	MixerView * m_mv;
 	static QPixmap * s_qpmOn;
 	static QPixmap * s_qpmOff;
 

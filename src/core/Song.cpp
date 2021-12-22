@@ -44,8 +44,8 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "FxMixer.h"
-#include "FxMixerView.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
@@ -874,15 +874,15 @@ void Song::clearProject()
 	{
 		getGUI()->songEditor()->m_editor->clearAllTracks();
 	}
-	if( getGUI() != nullptr && getGUI()->fxMixerView() )
+	if( getGUI() != nullptr && getGUI()->MixerView() )
 	{
-		getGUI()->fxMixerView()->clear();
+		getGUI()->MixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	Engine::fxMixer()->clear();
+	Engine::Mixer()->clear();
 
 	if( getGUI() != nullptr && getGUI()->automationEditor() )
 	{
@@ -1089,14 +1089,14 @@ void Song::loadProject( const QString & fileName )
 	PeakController::initGetControllerBySetting();
 
 	// Load mixer first to be able to set the correct range for FX channels
-	node = dataFile.content().firstChildElement( Engine::fxMixer()->nodeName() );
+	node = dataFile.content().firstChildElement( Engine::Mixer()->nodeName() );
 	if( !node.isNull() )
 	{
-		Engine::fxMixer()->restoreState( node.toElement() );
+		Engine::Mixer()->restoreState( node.toElement() );
 		if( getGUI() != nullptr )
 		{
-			// refresh FxMixerView
-			getGUI()->fxMixerView()->refreshDisplay();
+			// refresh MixerView
+			getGUI()->MixerView()->refreshDisplay();
 		}
 	}
 
@@ -1238,7 +1238,7 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
-	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
+	Engine::Mixer()->saveState( dataFile, dataFile.content() );
 	if( getGUI() != nullptr )
 	{
 		getGUI()->getControllerRackView()->saveState( dataFile, dataFile.content() );

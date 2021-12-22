@@ -41,7 +41,7 @@
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "FxLineLcdSpinBox.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "Instrument.h"

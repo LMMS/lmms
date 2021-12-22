@@ -26,7 +26,7 @@
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "EffectChain.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Engine.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
@@ -222,7 +222,7 @@ void AudioPort::doProcessing()
 	const bool me = processEffects();
 	if( me || m_bufferUsage )
 	{
-		Engine::fxMixer()->mixToChannel( m_portBuffer, m_nextFxChannel ); 	// send output to fx mixer
+		Engine::Mixer()->mixToChannel( m_portBuffer, m_nextFxChannel ); 	// send output to mixer
 																			// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}

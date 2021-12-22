@@ -1,5 +1,5 @@
 /*
- * FxMixerView.h - effect-mixer-view for LMMS
+ * MixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FX_MIXER_VIEW_H
-#define FX_MIXER_VIEW_H
+#ifndef MIXER_VIEW_H
+#define MIXER_VIEW_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -41,7 +41,7 @@
 class QButtonGroup;
 class FxLine;
 
-class LMMS_EXPORT FxMixerView : public QWidget, public ModelView,
+class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
@@ -49,7 +49,7 @@ public:
 	class FxChannelView
 	{
 	public:
-		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+		FxChannelView(QWidget * _parent, MixerView * _mv, int _chIndex );
 
 		void setChannelIndex( int index );
 
@@ -61,8 +61,8 @@ public:
 	};
 
 
-	FxMixerView();
-	virtual ~FxMixerView();
+	MixerView();
+	virtual ~MixerView();
 
 	void keyPressEvent(QKeyEvent * e) override;
 
@@ -102,7 +102,7 @@ public:
 
 	void renameChannel(int index);
 
-	// make sure the display syncs up with the fx mixer.
+	// make sure the display syncs up with the mixer.
 	// useful for loading projects
 	void refreshDisplay();
 
