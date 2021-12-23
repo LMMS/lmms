@@ -198,8 +198,8 @@ public slots:
 
 	void toggleSolo();
 
-	void trackColorChanged( QColor & c );
-	void trackColorReset();
+	void setColor(const QColor& c);
+	void resetColor();
 
 private:
 	TrackContainer* m_trackContainer;
@@ -229,6 +229,7 @@ signals:
 	void destroyedTrack();
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
+	void colorChanged();
 
 } ;
 

@@ -34,7 +34,7 @@ class FxLineLcdSpinBox : public LcdSpinBox
 {
 	Q_OBJECT
 public:
-	FxLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = NULL) :
+	FxLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = nullptr) :
 		LcdSpinBox(numDigits, parent, name), m_tv(tv)
 	{}
 	virtual ~FxLineLcdSpinBox() {}

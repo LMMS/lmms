@@ -54,9 +54,9 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	"Hyunjin Song <tteu.ingog/at/gmail.com>",
 	0x0100,
 	Plugin::ExportFilter,
-	NULL,
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
+	nullptr,
 } ;
 
 }

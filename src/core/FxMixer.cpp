@@ -24,10 +24,10 @@
 
 #include <QDomElement>
 
+#include "AudioEngine.h"
+#include "AudioEngineWorkerThread.h"
 #include "BufferManager.h"
 #include "FxMixer.h"
-#include "Mixer.h"
-#include "MixerWorkerThread.h"
 #include "MixHelpers.h"
 #include "Song.h"
 
@@ -39,7 +39,7 @@
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
-	m_amount( amount, 0, 1, 0.001, NULL,
+	m_amount( amount, 0, 1, 0.001, nullptr,
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) )
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
@@ -60,12 +60,12 @@ void FxRoute::updateName()
 
 
 FxChannel::FxChannel( int idx, Model * _parent ) :
-	m_fxChain( NULL ),
+	m_fxChain( nullptr ),
 	m_hasInput( false ),
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( new sampleFrame[Engine::mixer()->framesPerPeriod()] ),
+	m_buffer( new sampleFrame[Engine::audioEngine()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
 	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
@@ -76,7 +76,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_hasColor( false ),
 	m_dependenciesMet(0)
 {
-	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
+	BufferManager::clear( m_buffer, Engine::audioEngine()->framesPerPeriod() );
 }
 
 
@@ -105,7 +105,7 @@ void FxChannel::incrementDeps()
 	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
-		MixerWorkerThread::addJob( this );
+		AudioEngineWorkerThread::addJob( this );
 	}
 }
 
@@ -119,7 +119,7 @@ void FxChannel::unmuteForSolo()
 
 void FxChannel::doProcessing()
 {
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	if( m_muted == false )
 	{
@@ -173,7 +173,7 @@ void FxChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		Mixer::StereoSample peakSamples = Engine::mixer()->getPeakValues(m_buffer, fpp);
+		AudioEngine::StereoSample peakSamples = Engine::audioEngine()->getPeakValues(m_buffer, fpp);
 		m_peakLeft = qMax( m_peakLeft, peakSamples.left * v );
 		m_peakRight = qMax( m_peakRight, peakSamples.right * v );
 	}
@@ -189,7 +189,7 @@ void FxChannel::doProcessing()
 
 
 FxMixer::FxMixer() :
-	Model( NULL ),
+	Model( nullptr ),
 	JournallingObject(),
 	m_fxChannels()
 {
@@ -283,7 +283,7 @@ void FxMixer::toggledSolo()
 void FxMixer::deleteChannel( int index )
 {
 	// channel deletion is performed between mixer rounds
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
@@ -365,7 +365,7 @@ void FxMixer::deleteChannel( int index )
 		}
 	}
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -467,9 +467,9 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 {
 	if( from == to )
 	{
-		return NULL;
+		return nullptr;
 	}
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	FxRoute * route = new FxRoute( from, to, amount );
 
 	// add us to from's sends
@@ -480,7 +480,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 
 	// add us to fxmixer's list
 	Engine::fxMixer()->m_fxRoutes.append( route );
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	return route;
 }
@@ -507,7 +507,7 @@ void FxMixer::deleteChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel )
 
 void FxMixer::deleteChannelSend( FxRoute * route )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	// remove us from from's sends
 	route->sender()->m_sends.remove( route->sender()->m_sends.indexOf( route ) );
 	// remove us from to's receives
@@ -515,7 +515,7 @@ void FxMixer::deleteChannelSend( FxRoute * route )
 	// remove us from fxmixer's list
 	Engine::fxMixer()->m_fxRoutes.remove( Engine::fxMixer()->m_fxRoutes.indexOf( route ) );
 	delete route;
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -562,7 +562,7 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 {
 	if( fromChannel == toChannel )
 	{
-		return NULL;
+		return nullptr;
 	}
 	const FxChannel * from = m_fxChannels[fromChannel];
 	const FxChannel * to = m_fxChannels[toChannel];
@@ -575,7 +575,7 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -585,7 +585,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
-		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, Engine::mixer()->framesPerPeriod() );
+		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, Engine::audioEngine()->framesPerPeriod() );
 		m_fxChannels[_ch]->m_hasInput = true;
 		m_fxChannels[_ch]->m_lock.unlock();
 	}
@@ -597,14 +597,14 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 void FxMixer::prepareMasterMix()
 {
 	BufferManager::clear( m_fxChannels[0]->m_buffer,
-					Engine::mixer()->framesPerPeriod() );
+					Engine::audioEngine()->framesPerPeriod() );
 }
 
 
 
 void FxMixer::masterMix( sampleFrame * _buf )
 {
-	const int fpp = Engine::mixer()->framesPerPeriod();
+	const int fpp = Engine::audioEngine()->framesPerPeriod();
 
 	// add the channels that have no dependencies (no incoming senders, ie.
 	// no receives) to the jobqueue. The channels that have receives get
@@ -613,7 +613,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	// also instantly add all muted channels as they don't need to care
 	// about their senders, and can just increment the deps of their
 	// recipients right away.
-	MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
+	AudioEngineWorkerThread::resetJobQueue( AudioEngineWorkerThread::JobQueue::Dynamic );
 	for( FxChannel * ch : m_fxChannels )
 	{
 		ch->m_muted = ch->m_muteModel.value();
@@ -625,7 +625,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		else if( ch->m_receives.size() == 0 )
 		{
 			ch->m_queued = true;
-			MixerWorkerThread::addJob( ch );
+			AudioEngineWorkerThread::addJob( ch );
 		}
 	}
 	while (m_fxChannels[0]->state() != ThreadableJob::ProcessingState::Done)
@@ -645,7 +645,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		{
 			break;
 		}
-		MixerWorkerThread::startAndWaitForJobs();
+		AudioEngineWorkerThread::startAndWaitForJobs();
 	}
 
 	// handle sample-exact data in master volume fader
@@ -670,7 +670,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	for( int i = 0; i < numChannels(); ++i)
 	{
 		BufferManager::clear( m_fxChannels[i]->m_buffer,
-				Engine::mixer()->framesPerPeriod() );
+				Engine::audioEngine()->framesPerPeriod() );
 		m_fxChannels[i]->reset();
 		m_fxChannels[i]->m_queued = false;
 		// also reset hasInput

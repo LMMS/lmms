@@ -137,7 +137,7 @@ public:
 
 	bool hasValidPattern() const
 	{
-		return m_pattern != NULL;
+		return m_pattern != nullptr;
 	}
 
 	Song::PlayModes desiredPlayModeForAccompany() const;

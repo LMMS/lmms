@@ -63,80 +63,23 @@ void SampleTCOView::updateSample()
 
 
 
-void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
+void SampleTCOView::constructContextMenu(QMenu* cm)
 {
-	// Depending on whether we right-clicked a selection or an individual TCO we will have
-	// different labels for the actions.
-	bool individualTCO = getClickedTCOs().size() <= 1;
+	cm->addSeparator();
 
-	if( _cme->modifiers() )
-	{
-		return;
-	}
-
-	QMenu contextMenu( this );
-
-	if( fixedTCOs() == false )
-	{
-		contextMenu.addAction(
-			embed::getIconPixmap( "cancel" ),
-			individualTCO
-				? tr("Delete (middle mousebutton)")
-				: tr("Delete selection (middle mousebutton)"),
-			[this](){ contextMenuAction( Remove ); } );
-
-		contextMenu.addSeparator();
-
-		contextMenu.addAction(
-			embed::getIconPixmap( "edit_cut" ),
-			individualTCO
-				? tr("Cut")
-				: tr("Cut selection"),
-			[this](){ contextMenuAction( Cut ); } );
-	}
-
-	contextMenu.addAction(
-		embed::getIconPixmap( "edit_copy" ),
-		individualTCO
-			? tr("Copy")
-			: tr("Copy selection"),
-		[this](){ contextMenuAction( Copy ); } );
-
-	contextMenu.addAction(
-		embed::getIconPixmap( "edit_paste" ),
-		tr( "Paste" ),
-		[this](){ contextMenuAction( Paste ); } );
-
-	contextMenu.addSeparator();
-
-	contextMenu.addAction(
-		embed::getIconPixmap( "muted" ),
-		(individualTCO
-			? tr("Mute/unmute (<%1> + middle click)")
-			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
-		[this](){ contextMenuAction( Mute ); } );
 
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
 
-	contextMenu.addAction(
+	cm->addAction(
 		embed::getIconPixmap("flip_x"),
 		tr("Reverse sample"),
 		this,
 		SLOT(reverseSample())
 	);
 
-	contextMenu.addSeparator();
 
-	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Set clip color" ), this, SLOT( changeClipColor() ) );
-	contextMenu.addAction( embed::getIconPixmap( "colorize" ),
-			tr( "Use track color" ), this, SLOT( useTrackColor() ) );
-
-	constructContextMenu( &contextMenu );
-
-	contextMenu.exec( QCursor::pos() );
 }
 
 
@@ -314,7 +257,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
 	float offset =  m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
-	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
+	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 

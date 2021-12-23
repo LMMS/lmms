@@ -153,7 +153,7 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 	if (m_mouseMoving)
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if (gui->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
+		if (getGUI()->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
 		if (dy > 1 || dy < -1)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());

@@ -33,10 +33,10 @@
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "BBTrack.h"
 #include "DataFile.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
@@ -50,7 +50,7 @@ using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	JournallingObject(),
 	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
@@ -268,9 +268,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	delete t;
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -294,7 +294,7 @@ const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 			return( *it );
 		}
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 
@@ -390,7 +390,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		PluginFactory::PluginInfoAndKey piakn =
-			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
@@ -415,7 +415,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 	else if( type == "projectfile")
 	{
-		if( gui->mainWindow()->mayChangeProject(true) )
+		if( getGUI()->mainWindow()->mayChangeProject(true) )
 		{
 			Engine::getSong()->loadProject( value );
 		}

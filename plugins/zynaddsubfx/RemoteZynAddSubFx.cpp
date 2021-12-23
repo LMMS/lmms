@@ -62,8 +62,8 @@ public:
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
-		pthread_mutex_init( &m_guiMutex, NULL );
-		pthread_create( &m_messageThreadHandle, NULL, messageLoop, this );
+		pthread_mutex_init( &m_guiMutex, nullptr );
+		pthread_create( &m_messageThreadHandle, nullptr, messageLoop, this );
 	}
 
 	virtual ~RemoteZynAddSubFx()
@@ -153,7 +153,7 @@ public:
 
 		_this->messageLoop();
 
-		return NULL;
+		return nullptr;
 	}
 
 	void guiLoop();
@@ -174,7 +174,7 @@ private:
 void RemoteZynAddSubFx::guiLoop()
 {
 	int exitProgram = 0;
-	MasterUI * ui = NULL;
+	MasterUI * ui = nullptr;
 
 	while( !m_guiExit )
 	{

@@ -35,6 +35,7 @@
 #include <QTimeLine>
 
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
@@ -45,7 +46,6 @@
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
-#include "Mixer.h"
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
 #include "TextFloat.h"
@@ -104,37 +104,37 @@ SongEditor::SongEditor( Song * song ) :
 
 
 	// add some essential widgets to global tool-bar
-	QWidget * tb = gui->mainWindow()->toolBar();
+	QWidget * tb = getGUI()->mainWindow()->toolBar();
 
-	gui->mainWindow()->addSpacingToToolBar( 40 );
+	getGUI()->mainWindow()->addSpacingToToolBar( 40 );
 
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
 	ToolTip::add( m_tempoSpinBox, tr( "Tempo in BPM" ) );
 
-	int tempoSpinBoxCol = gui->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
+	int tempoSpinBoxCol = getGUI()->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
 #if 0
 	toolButton * hq_btn = new toolButton( embed::getIconPixmap( "hq_mode" ),
 						tr( "High quality mode" ),
-						NULL, NULL, tb );
+						nullptr, nullptr, tb );
 	hq_btn->setCheckable( true );
 	connect( hq_btn, SIGNAL( toggled( bool ) ),
 			this, SLOT( setHighQuality( bool ) ) );
 	hq_btn->setFixedWidth( 42 );
-	gui->mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
+	getGUI()->mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
 
-	gui->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
+	getGUI()->mainWindow()->addWidgetToToolBar( new TimeDisplayWidget, 1, tempoSpinBoxCol );
 
-	gui->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
 	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &m_song->m_timeSigModel );
-	gui->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
+	getGUI()->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
 
-	gui->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
 
 	QLabel * master_vol_lbl = new QLabel( tb );
@@ -163,11 +163,11 @@ SongEditor::SongEditor( Song * song ) :
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
 	m_mvsStatus->setPixmap( embed::getIconPixmap( "master_volume" ) );
 
-	gui->mainWindow()->addWidgetToToolBar( master_vol_lbl );
-	gui->mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
+	getGUI()->mainWindow()->addWidgetToToolBar( master_vol_lbl );
+	getGUI()->mainWindow()->addWidgetToToolBar( m_masterVolumeSlider );
 
 
-	gui->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
 
 	QLabel * master_pitch_lbl = new QLabel( tb );
@@ -195,10 +195,10 @@ SongEditor::SongEditor( Song * song ) :
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
 	m_mpsStatus->setPixmap( embed::getIconPixmap( "master_pitch" ) );
 
-	gui->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
-	gui->mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
+	getGUI()->mainWindow()->addWidgetToToolBar( master_pitch_lbl );
+	getGUI()->mainWindow()->addWidgetToToolBar( m_masterPitchSlider );
 
-	gui->mainWindow()->addSpacingToToolBar( 10 );
+	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
 	// create widget for oscilloscope- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
@@ -212,7 +212,7 @@ SongEditor::SongEditor( Song * song ) :
 	vcw_layout->addWidget( new CPULoadWidget( vc_w ) );
 	vcw_layout->addStretch();
 
-	gui->mainWindow()->addWidgetToToolBar( vc_w );
+	getGUI()->mainWindow()->addWidgetToToolBar( vc_w );
 
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 0, m_timeLine );
 
@@ -329,9 +329,9 @@ QString SongEditor::getSnapSizeString() const
 
 void SongEditor::setHighQuality( bool hq )
 {
-	Engine::mixer()->changeQuality( Mixer::qualitySettings(
-			hq ? Mixer::qualitySettings::Mode_HighQuality :
-				Mixer::qualitySettings::Mode_Draft ) );
+	Engine::audioEngine()->changeQuality( AudioEngine::qualitySettings(
+			hq ? AudioEngine::qualitySettings::Mode_HighQuality :
+				AudioEngine::qualitySettings::Mode_Draft ) );
 }
 
 
@@ -657,7 +657,7 @@ void SongEditor::setMasterVolume( int new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	Engine::mixer()->setMasterGain( new_val / 100.0f );
+	Engine::audioEngine()->setMasterGain( new_val / 100.0f );
 }
 
 
@@ -751,7 +751,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 	{
 		// do smooth scroll animation using QTimeLine
 		QTimeLine *t = scrollBar->findChild<QTimeLine *>();
-		if( t == NULL )
+		if( t == nullptr )
 		{
 			t = new QTimeLine( 600, scrollBar );
 			t->setFrameRange( scrollBar->value(), newVal );
@@ -910,9 +910,9 @@ ComboBoxModel *SongEditor::snappingModel() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::mixer()->audioDev()->supportsCapture(), false),
+	Editor(Engine::audioEngine()->audioDev()->supportsCapture(), false),
 	m_editor(new SongEditor(song)),
-	m_crtlAction( NULL ),
+	m_crtlAction( nullptr ),
 	m_snapSizeLabel( new QLabel( m_toolBar ) )
 {
 	setWindowTitle( tr( "Song-Editor" ) );
@@ -1103,7 +1103,7 @@ void SongEditorWindow::recordAccompany()
 void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
-	gui->pianoRoll()->stopRecording();
+	getGUI()->pianoRoll()->stopRecording();
 }
 
 
@@ -1126,7 +1126,7 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	// make sure to bring us to front as the song editor is the central
 	// widget in a song and when just opening a song in order to listen to
 	// it, it's very annyoing to manually bring up the song editor each time
-	gui->mainWindow()->workspace()->setActiveSubWindow(
+	getGUI()->mainWindow()->workspace()->setActiveSubWindow(
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
 	m_editor->scrolled(0);

@@ -71,7 +71,7 @@ class PixmapLoader
 {
 public:
 	PixmapLoader( const PixmapLoader * _ref ) :
-		m_name( _ref != NULL ? _ref->m_name : QString() ),
+		m_name( _ref != nullptr ? _ref->m_name : QString() ),
 		m_xpm( _ref->m_xpm )
 	{
 	}

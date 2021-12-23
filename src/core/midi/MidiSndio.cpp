@@ -48,14 +48,14 @@ MidiSndio::MidiSndio( void ) :
 
 	if (dev == "")
 	{
-		m_hdl = mio_open( NULL, MIO_IN | MIO_OUT, 0 );
+		m_hdl = mio_open( nullptr, MIO_IN | MIO_OUT, 0 );
 	}
 	else
 	{
 		m_hdl = mio_open( dev.toLatin1().constData(), MIO_IN | MIO_OUT, 0 );
 	}
 
-	if( m_hdl == NULL )
+	if( m_hdl == nullptr )
 	{
 		printf( "sndio: failed opening sndio midi device\n" );
 		return;

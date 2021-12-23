@@ -33,10 +33,10 @@
 #include <limits>
 
 
-QPixmap * PatternView::s_stepBtnOn0 = NULL;
-QPixmap * PatternView::s_stepBtnOn200 = NULL;
-QPixmap * PatternView::s_stepBtnOff = NULL;
-QPixmap * PatternView::s_stepBtnOffLight = NULL;
+QPixmap * PatternView::s_stepBtnOn0 = nullptr;
+QPixmap * PatternView::s_stepBtnOn200 = nullptr;
+QPixmap * PatternView::s_stepBtnOff = nullptr;
+QPixmap * PatternView::s_stepBtnOffLight = nullptr;
 
 
 
@@ -196,9 +196,9 @@ TimePos Pattern::beatPatternLength() const
 Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 {
 	Note * new_note = new Note( _new_note );
-	if( _quant_pos && gui->pianoRoll() )
+	if( _quant_pos && getGUI()->pianoRoll() )
 	{
-		new_note->quantizePos( gui->pianoRoll()->quantization() );
+		new_note->quantizePos( getGUI()->pianoRoll()->quantization() );
 	}
 
 	instrumentTrack()->lock();
@@ -252,7 +252,7 @@ Note * Pattern::noteAtStep( int _step )
 			return *it;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -422,6 +422,10 @@ void Pattern::loadSettings( const QDomElement & _this )
 		useCustomClipColor( true );
 		setColor( _this.attribute( "color" ) );
 	}
+	else
+	{
+		useCustomClipColor(false);
+	}
 	
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
@@ -482,7 +486,7 @@ Pattern * Pattern::adjacentPatternByOffset(int offset) const
 {
 	QVector<TrackContentObject *> tcos = m_instrumentTrack->getTCOs();
 	int tcoNum = m_instrumentTrack->getTCONum(this);
-	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, NULL));
+	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, nullptr));
 }
 
 
@@ -561,9 +565,11 @@ void Pattern::updateBBTrack()
 		Engine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
-	if( gui && gui->pianoRoll() && gui->pianoRoll()->currentPattern() == this )
+	if( getGUI() != nullptr
+		&& getGUI()->pianoRoll()
+		&& getGUI()->pianoRoll()->currentPattern() == this )
 	{
-		gui->pianoRoll()->update();
+		getGUI()->pianoRoll()->update();
 	}
 }
 

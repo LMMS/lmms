@@ -51,8 +51,11 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
-#include "InstrumentTrack.h"
+#include "InstrumentTrackView.h"
+#include "InstrumentTrackWindow.h"
+#include "MicrotunerConfig.h"
 #include "PianoRoll.h"
+#include "PianoView.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
@@ -92,10 +95,10 @@ void disableAutoKeyAccelerators(QWidget* mainWindow)
 
 
 MainWindow::MainWindow() :
-	m_workspace( NULL ),
-	m_toolsMenu( NULL ),
+	m_workspace( nullptr ),
+	m_toolsMenu( nullptr ),
 	m_autoSaveTimer( this ),
-	m_viewMenu( NULL ),
+	m_viewMenu( nullptr ),
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
@@ -272,9 +275,9 @@ MainWindow::~MainWindow()
 	// TODO: Close tools
 	// dependencies are such that the editors must be destroyed BEFORE Song is deletect in Engine::destroy
 	//   see issue #2015 on github
-	delete gui->automationEditor();
-	delete gui->pianoRoll();
-	delete gui->songEditor();
+	delete getGUI()->automationEditor();
+	delete getGUI()->pianoRoll();
+	delete getGUI()->songEditor();
 	// destroy engine which will do further cleanups etc.
 	Engine::destroy();
 }
@@ -389,10 +392,10 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
-	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
+	for( const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
-		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
+		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/nullptr )
 						   ->createView(this) );
 	}
 	if( !m_toolsMenu->isEmpty() )
@@ -476,7 +479,7 @@ void MainWindow::finalize()
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
+	m_metronomeToggle->setChecked(Engine::audioEngine()->isMetronomeActive());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -546,6 +549,14 @@ void MainWindow::finalize()
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::CTRL + Qt::Key_7 );
 
+	ToolButton * microtuner_window = new ToolButton(
+					embed::getIconPixmap( "microtuner" ),
+					tr( "Microtuner configuration" ) +
+								" (Ctrl+8)",
+					this, SLOT( toggleMicrotunerWin() ),
+								m_toolBar );
+	microtuner_window->setShortcut( Qt::CTRL + Qt::Key_8 );
+
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -553,6 +564,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
+	m_toolBarLayout->addWidget( microtuner_window, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -563,11 +575,11 @@ void MainWindow::finalize()
 		SetupDialog sd;
 		sd.exec();
 	}
-	// look whether mixer failed to start the audio device selected by the
+	// look whether the audio engine failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
 	// or the audio device is set to invalid one
-	else if( Engine::mixer()->audioDevStartFailed() || !Mixer::isAudioDevNameValid(
-		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
+	else if( Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
+		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
@@ -576,10 +588,10 @@ void MainWindow::finalize()
 
 	// Add editor subwindows
 	for (QWidget* widget :  std::list<QWidget*>{
-			gui->automationEditor(),
-			gui->getBBEditor(),
-			gui->pianoRoll(),
-			gui->songEditor()
+			getGUI()->automationEditor(),
+			getGUI()->getBBEditor(),
+			getGUI()->pianoRoll(),
+			getGUI()->songEditor()
 	})
 	{
 		QMdiSubWindow* window = addWindowedWidget(widget);
@@ -588,13 +600,13 @@ void MainWindow::finalize()
 		window->resize(widget->sizeHint());
 	}
 
-	gui->automationEditor()->parentWidget()->hide();
-	gui->getBBEditor()->parentWidget()->move( 610, 5 );
-	gui->getBBEditor()->parentWidget()->hide();
-	gui->pianoRoll()->parentWidget()->move(5, 5);
-	gui->pianoRoll()->parentWidget()->hide();
-	gui->songEditor()->parentWidget()->move(5, 5);
-	gui->songEditor()->parentWidget()->show();
+	getGUI()->automationEditor()->parentWidget()->hide();
+	getGUI()->getBBEditor()->parentWidget()->move( 610, 5 );
+	getGUI()->getBBEditor()->parentWidget()->hide();
+	getGUI()->pianoRoll()->parentWidget()->move(5, 5);
+	getGUI()->pianoRoll()->parentWidget()->hide();
+	getGUI()->songEditor()->parentWidget()->move(5, 5);
+	getGUI()->songEditor()->parentWidget()->show();
 
 	// reset window title every time we change the state of a subwindow to show the correct title
 	for( const QMdiSubWindow * subWindow : workspace()->subWindowList() )
@@ -735,7 +747,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
 	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
-	if( _w->parentWidget() != NULL &&
+	if( _w->parentWidget() != nullptr &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 	{
 		_w = _w->parentWidget();
@@ -772,7 +784,7 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 	{
 		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
-		if ( _w->parentWidget() != NULL &&
+		if ( _w->parentWidget() != nullptr &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 		{
 			_w = _w->parentWidget();
@@ -1043,10 +1055,10 @@ void MainWindow::refocus()
 {
 	QList<QWidget*> editors;
 	editors
-		<< gui->songEditor()->parentWidget()
-		<< gui->getBBEditor()->parentWidget()
-		<< gui->pianoRoll()->parentWidget()
-		<< gui->automationEditor()->parentWidget();
+		<< getGUI()->songEditor()->parentWidget()
+		<< getGUI()->getBBEditor()->parentWidget()
+		<< getGUI()->pianoRoll()->parentWidget()
+		<< getGUI()->automationEditor()->parentWidget();
 
 	bool found = false;
 	QList<QWidget*>::Iterator editor;
@@ -1068,7 +1080,7 @@ void MainWindow::refocus()
 
 void MainWindow::toggleBBEditorWin( bool forceShow )
 {
-	toggleWindow( gui->getBBEditor(), forceShow );
+	toggleWindow( getGUI()->getBBEditor(), forceShow );
 }
 
 
@@ -1076,7 +1088,7 @@ void MainWindow::toggleBBEditorWin( bool forceShow )
 
 void MainWindow::toggleSongEditorWin()
 {
-	toggleWindow( gui->songEditor() );
+	toggleWindow( getGUI()->songEditor() );
 }
 
 
@@ -1084,7 +1096,7 @@ void MainWindow::toggleSongEditorWin()
 
 void MainWindow::toggleProjectNotesWin()
 {
-	toggleWindow( gui->getProjectNotes() );
+	toggleWindow( getGUI()->getProjectNotes() );
 }
 
 
@@ -1092,7 +1104,7 @@ void MainWindow::toggleProjectNotesWin()
 
 void MainWindow::togglePianoRollWin()
 {
-	toggleWindow( gui->pianoRoll() );
+	toggleWindow( getGUI()->pianoRoll() );
 }
 
 
@@ -1100,7 +1112,7 @@ void MainWindow::togglePianoRollWin()
 
 void MainWindow::toggleAutomationEditorWin()
 {
-	toggleWindow( gui->automationEditor() );
+	toggleWindow( getGUI()->automationEditor() );
 }
 
 
@@ -1108,7 +1120,14 @@ void MainWindow::toggleAutomationEditorWin()
 
 void MainWindow::toggleFxMixerWin()
 {
-	toggleWindow( gui->fxMixerView() );
+	toggleWindow( getGUI()->fxMixerView() );
+}
+
+
+
+void MainWindow::toggleMicrotunerWin()
+{
+	toggleWindow( getGUI()->getMicrotunerConfig() );
 }
 
 
@@ -1146,6 +1165,10 @@ void MainWindow::updateViewMenu()
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
 			      tr( "Project Notes" ) + "\tCtrl+7",
 			      this, SLOT( toggleProjectNotesWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "microtuner" ),
+			      tr( "Microtuner" ) + "\tCtrl+8",
+			      this, SLOT( toggleMicrotunerWin() )
 		);
 
 	m_viewMenu->addSeparator();
@@ -1236,9 +1259,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Mixer * mixer = Engine::mixer();
-
-	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
+	Engine::audioEngine()->setMetronomeActive( m_metronomeToggle->isChecked() );
 }
 
 
@@ -1246,7 +1267,7 @@ void MainWindow::onToggleMetronome()
 
 void MainWindow::toggleControllerRack()
 {
-	toggleWindow( gui->getControllerRackView() );
+	toggleWindow( getGUI()->getControllerRackView() );
 }
 
 
@@ -1254,29 +1275,29 @@ void MainWindow::toggleControllerRack()
 
 void MainWindow::updatePlayPauseIcons()
 {
-	gui->songEditor()->setPauseIcon( false );
-	gui->automationEditor()->setPauseIcon( false );
-	gui->getBBEditor()->setPauseIcon( false );
-	gui->pianoRoll()->setPauseIcon( false );
+	getGUI()->songEditor()->setPauseIcon( false );
+	getGUI()->automationEditor()->setPauseIcon( false );
+	getGUI()->getBBEditor()->setPauseIcon( false );
+	getGUI()->pianoRoll()->setPauseIcon( false );
 
 	if( Engine::getSong()->isPlaying() )
 	{
 		switch( Engine::getSong()->playMode() )
 		{
 			case Song::Mode_PlaySong:
-				gui->songEditor()->setPauseIcon( true );
+				getGUI()->songEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayAutomationPattern:
-				gui->automationEditor()->setPauseIcon( true );
+				getGUI()->automationEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayBB:
-				gui->getBBEditor()->setPauseIcon( true );
+				getGUI()->getBBEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayPattern:
-				gui->pianoRoll()->setPauseIcon( true );
+				getGUI()->pianoRoll()->setPauseIcon( true );
 				break;
 
 			default:
@@ -1501,7 +1522,7 @@ void MainWindow::exportProject(bool multiExport)
 {
 	QString const & projectFileName = Engine::getSong()->projectFileName();
 
-	FileDialog efd( gui->mainWindow() );
+	FileDialog efd( getGUI()->mainWindow() );
 
 	if ( multiExport )
 	{
@@ -1576,7 +1597,7 @@ void MainWindow::exportProject(bool multiExport)
 			}
 		}
 
-		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
+		ExportProjectDialog epd( exportFileName, getGUI()->mainWindow(), multiExport );
 		epd.exec();
 	}
 }
@@ -1659,7 +1680,7 @@ void MainWindow::onSongStopped()
 
 	if( tl )
 	{
-		SongEditorWindow* songEditor = gui->songEditor();
+		SongEditorWindow* songEditor = getGUI()->songEditor();
 		switch( tl->behaviourAtStop() )
 		{
 			case TimeLineWidget::BackToZero:

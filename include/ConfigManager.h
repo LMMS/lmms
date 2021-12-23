@@ -60,7 +60,7 @@ class LMMS_EXPORT ConfigManager : public QObject
 public:
 	static inline ConfigManager * inst()
 	{
-		if(s_instanceOfMe == NULL )
+		if(s_instanceOfMe == nullptr )
 		{
 			s_instanceOfMe = new ConfigManager();
 		}
@@ -274,6 +274,7 @@ private:
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
+	void upgrade_1_2_2();
 	void upgrade();
 
 	// List of all upgrade methods

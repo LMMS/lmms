@@ -1,5 +1,5 @@
 /*
- * MixerProfiler.h - class for profiling performance of Mixer
+ * AudioEngineProfiler.h - class for profiling performance of AudioEngine
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,19 +22,19 @@
  *
  */
 
-#ifndef MIXER_PROFILER_H
-#define MIXER_PROFILER_H
+#ifndef AUDIO_ENGINE_PROFILER_H
+#define AUDIO_ENGINE_PROFILER_H
 
 #include <QFile>
 
 #include "lmms_basics.h"
 #include "MicroTimer.h"
 
-class MixerProfiler
+class AudioEngineProfiler
 {
 public:
-	MixerProfiler();
-	~MixerProfiler();
+	AudioEngineProfiler();
+	~AudioEngineProfiler();
 
 	void startPeriod()
 	{
@@ -55,7 +55,6 @@ private:
 	MicroTimer m_periodTimer;
 	int m_cpuLoad;
 	QFile m_outputFile;
-
 };
 
 #endif

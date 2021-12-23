@@ -33,6 +33,7 @@
 #include <QHBoxLayout>
 #include <lilv/lilv.h>
 
+#include "AudioEngine.h"
 #include "Controls.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -44,7 +45,6 @@
 #include "Lv2Proc.h"
 #include "Lv2Ports.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "SubWindow.h"
 
 
@@ -72,7 +72,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 						break;
 					case PortVis::Integer:
 					{
-						sample_rate_t sr = Engine::mixer()->processingSampleRate();
+						sample_rate_t sr = Engine::audioEngine()->processingSampleRate();
 						m_control = new LcdControl((port.max(sr) <= 9.0f) ? 1 : 2,
 													m_par);
 						break;
@@ -177,7 +177,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 		m_helpButton->setCheckable(true);
 		btnBox->addWidget(m_helpButton);
 
-		m_helpWindow = gui->mainWindow()->addWindowedWidget(infoLabel);
+		m_helpWindow = getGUI()->mainWindow()->addWindowedWidget(infoLabel);
 		m_helpWindow->setSizePolicy(QSizePolicy::Minimum,
 									QSizePolicy::Expanding);
 		m_helpWindow->setAttribute(Qt::WA_DeleteOnClose, false);

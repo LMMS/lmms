@@ -69,7 +69,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_0_99           ,   &DataFile::upgrade_1_1_0,
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
-	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange
+	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
+	&DataFile::upgrade_defaultTripleOscillatorHQ
 };
 
 // Vector of all versions that have upgrade routines.
@@ -136,9 +137,9 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( gui )
+		if( getGUI() != nullptr )
 		{
-			QMessageBox::critical( NULL,
+			QMessageBox::critical( nullptr,
 				SongEditor::tr( "Could not open file" ),
 				SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
@@ -207,7 +208,7 @@ bool DataFile::validate( QString extension )
 	case Type::UnknownType:
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
-				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
+				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
 #ifdef LMMS_HAVE_LV2
@@ -289,7 +290,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 {
 	// Small lambda function for displaying errors
 	auto showError = [this](QString title, QString body){
-		if (gui)
+		if (getGUI() != nullptr)
 		{
 			QMessageBox mb;
 			mb.setWindowTitle(title);
@@ -1004,7 +1005,7 @@ void DataFile::upgrade_0_4_0_beta1()
 					m["plugin"] = sl.value( 0 );
 					m["file"] = sl.value( 1 );
 				}
-				EffectKey key( NULL, name, m );
+				EffectKey key( nullptr, name, m );
 				el.appendChild( key.saveXML( *this ) );
 			}
 		}
@@ -1736,10 +1737,33 @@ void DataFile::upgrade_extendedNoteRange()
 }
 
 
+/** \brief TripleOscillator switched to using high-quality, alias-free oscillators by default
+ *
+ * Older projects were made without this feature and would sound differently if loaded
+ * with the new default setting. This upgrade routine preserves their old behavior.
+ */
+void DataFile::upgrade_defaultTripleOscillatorHQ()
+{
+	QDomNodeList tripleoscillators = elementsByTagName("tripleoscillator");
+	for (int i = 0; !tripleoscillators.item(i).isNull(); i++)
+	{
+		for (int j = 1; j <= 3; j++)
+		{
+			// Only set the attribute if it does not exist (default template has it but reports as 1.2.0)
+			if (tripleoscillators.item(i).toElement().attribute("useWaveTable" + QString::number(j)) == "")
+			{
+				tripleoscillators.item(i).toElement().setAttribute("useWaveTable" + QString::number(j), 0);
+			}
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
@@ -1792,9 +1816,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( gui )
+			if( getGUI() != nullptr )
 			{
-				QMessageBox::critical( NULL,
+				QMessageBox::critical( nullptr,
 					SongEditor::tr( "Error in file" ),
 					SongEditor::tr( "The file %1 seems to contain "
 							"errors and therefore can't be "
@@ -1833,7 +1857,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
-		 && gui != nullptr && root.attribute("type") == "song"
+		 && getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?
 				SongEditor::tr("template") : SongEditor::tr("project");

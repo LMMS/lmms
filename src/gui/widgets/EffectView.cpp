@@ -46,8 +46,8 @@
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
-	m_subWindow( NULL ),
-	m_controlView( NULL )
+	m_subWindow( nullptr ),
+	m_controlView( nullptr )
 {
 	setFixedSize( EffectView::DEFAULT_WIDTH, 60 );
 
@@ -96,7 +96,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
-			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
+			m_subWindow = getGUI()->mainWindow()->addWindowedWidget( m_controlView );
 
 			if ( !m_controlView->isResizable() )
 			{
