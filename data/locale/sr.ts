@@ -2215,7 +2215,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
         <source>Master</source>
         <translation type="unfinished"/>
@@ -2226,9 +2226,9 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <source>FX-Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3692,11 +3692,11 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3901,7 +3901,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>

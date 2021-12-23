@@ -5398,64 +5398,64 @@ Please make sure you have write permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="704"/>
+        <location filename="../../src/core/Mixer.cpp" line="704"/>
         <source>Master</source>
         <translation>마스터</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="704"/>
-        <location filename="../../src/core/FxMixer.cpp" line="825"/>
-        <location filename="../../src/core/FxMixer.cpp" line="827"/>
+        <location filename="../../src/core/Mixer.cpp" line="704"/>
+        <location filename="../../src/core/Mixer.cpp" line="825"/>
+        <location filename="../../src/core/Mixer.cpp" line="827"/>
         <source>FX %1</source>
         <translation>FX %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="705"/>
+        <location filename="../../src/core/Mixer.cpp" line="705"/>
         <source>Volume</source>
         <translation>음량</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="706"/>
+        <location filename="../../src/core/Mixer.cpp" line="706"/>
         <source>Mute</source>
         <translation>음소거</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="707"/>
+        <location filename="../../src/core/Mixer.cpp" line="707"/>
         <source>Solo</source>
         <translation>독주</translation>
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="70"/>
-        <source>FX-Mixer</source>
+        <location filename="../../src/gui/MixerView.cpp" line="70"/>
+        <source>Mixer</source>
         <translation>FX-믹서</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="289"/>
+        <location filename="../../src/gui/MixerView.cpp" line="289"/>
         <source>FX Fader %1</source>
         <translation>FX 페이더 %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="298"/>
+        <location filename="../../src/gui/MixerView.cpp" line="298"/>
         <source>Mute</source>
         <translation>음소거</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="306"/>
+        <location filename="../../src/gui/MixerView.cpp" line="306"/>
         <source>Mute this FX channel</source>
         <translation>이 채널 음소거</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="308"/>
+        <location filename="../../src/gui/MixerView.cpp" line="308"/>
         <source>Solo</source>
         <translation>독주</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="318"/>
+        <location filename="../../src/gui/MixerView.cpp" line="318"/>
         <source>Solo FX channel</source>
         <translation>이 채널 독주</translation>
     </message>
@@ -5463,8 +5463,8 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>FxRoute</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="43"/>
-        <location filename="../../src/core/FxMixer.cpp" line="58"/>
+        <location filename="../../src/core/Mixer.cpp" line="43"/>
+        <location filename="../../src/core/Mixer.cpp" line="58"/>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation>채널 %1에서 채널 %2(으)로 보낼 양</translation>
     </message>
@@ -7465,7 +7465,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="528"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1139"/>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>FX 믹서</translation>
     </message>
     <message>

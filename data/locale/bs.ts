@@ -2742,49 +2742,49 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
-        <location filename="src/core/FxMixer.cpp" line="655"/>
+        <location filename="src/core/Mixer.cpp" line="655"/>
         <source>Master</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/core/FxMixer.cpp" line="655"/>
-        <location filename="src/core/FxMixer.cpp" line="779"/>
-        <location filename="src/core/FxMixer.cpp" line="781"/>
+        <location filename="src/core/Mixer.cpp" line="655"/>
+        <location filename="src/core/Mixer.cpp" line="779"/>
+        <location filename="src/core/Mixer.cpp" line="781"/>
         <source>FX %1</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="66"/>
-        <source>FX-Mixer</source>
+        <location filename="src/gui/MixerView.cpp" line="66"/>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="276"/>
+        <location filename="src/gui/MixerView.cpp" line="276"/>
         <source>FX Fader %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="281"/>
+        <location filename="src/gui/MixerView.cpp" line="281"/>
         <source>Mute</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="289"/>
+        <location filename="src/gui/MixerView.cpp" line="289"/>
         <source>Mute this FX channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="291"/>
+        <location filename="src/gui/MixerView.cpp" line="291"/>
         <source>Solo</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="301"/>
+        <location filename="src/gui/MixerView.cpp" line="301"/>
         <source>Solo FX channel</source>
         <translation type="unfinished"/>
     </message>
@@ -2802,8 +2802,8 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 <context>
     <name>FxRoute</name>
     <message>
-        <location filename="src/core/FxMixer.cpp" line="41"/>
-        <location filename="src/core/FxMixer.cpp" line="56"/>
+        <location filename="src/core/Mixer.cpp" line="41"/>
+        <location filename="src/core/Mixer.cpp" line="56"/>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation type="unfinished"/>
     </message>
@@ -4780,12 +4780,12 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <location filename="src/gui/MainWindow.cpp" line="526"/>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/gui/MainWindow.cpp" line="531"/>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -4911,7 +4911,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <location filename="src/gui/MainWindow.cpp" line="1184"/>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>

@@ -5395,64 +5395,64 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="704"/>
+        <location filename="../../src/core/Mixer.cpp" line="704"/>
         <source>Master</source>
         <translation>Hlavní</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="704"/>
-        <location filename="../../src/core/FxMixer.cpp" line="825"/>
-        <location filename="../../src/core/FxMixer.cpp" line="827"/>
+        <location filename="../../src/core/Mixer.cpp" line="704"/>
+        <location filename="../../src/core/Mixer.cpp" line="825"/>
+        <location filename="../../src/core/Mixer.cpp" line="827"/>
         <source>FX %1</source>
         <translation>Efekt %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="705"/>
+        <location filename="../../src/core/Mixer.cpp" line="705"/>
         <source>Volume</source>
         <translation>Hlasitost</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="706"/>
+        <location filename="../../src/core/Mixer.cpp" line="706"/>
         <source>Mute</source>
         <translation>Ztlumit</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="707"/>
+        <location filename="../../src/core/Mixer.cpp" line="707"/>
         <source>Solo</source>
         <translation>Sólo</translation>
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="70"/>
-        <source>FX-Mixer</source>
+        <location filename="../../src/gui/MixerView.cpp" line="70"/>
+        <source>Mixer</source>
         <translation>Efektový mixážní panel</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="289"/>
+        <location filename="../../src/gui/MixerView.cpp" line="289"/>
         <source>FX Fader %1</source>
         <translation>Efektový fader %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="298"/>
+        <location filename="../../src/gui/MixerView.cpp" line="298"/>
         <source>Mute</source>
         <translation>Ztlumit</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="306"/>
+        <location filename="../../src/gui/MixerView.cpp" line="306"/>
         <source>Mute this FX channel</source>
         <translation>Ztlumit tento efektový kanál</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="308"/>
+        <location filename="../../src/gui/MixerView.cpp" line="308"/>
         <source>Solo</source>
         <translation>Sólo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="318"/>
+        <location filename="../../src/gui/MixerView.cpp" line="318"/>
         <source>Solo FX channel</source>
         <translation>Sólovat efektový kanál</translation>
     </message>
@@ -5460,8 +5460,8 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
 <context>
     <name>FxRoute</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="43"/>
-        <location filename="../../src/core/FxMixer.cpp" line="58"/>
+        <location filename="../../src/core/Mixer.cpp" line="43"/>
+        <location filename="../../src/core/Mixer.cpp" line="58"/>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation>Množství k odeslání z kanálu %1 do kanálu %2</translation>
     </message>
@@ -7462,7 +7462,7 @@ Ujistěte se prosím, zda máte povolen zápis do souboru a do složky obsahují
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="528"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1139"/>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Efektový mixážní panel</translation>
     </message>
     <message>

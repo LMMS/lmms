@@ -68,7 +68,7 @@
         <object id="948063" />
       </automationpattern>
     </track>
-    <fxmixer width="865" x="5" y="310" maximized="0" height="278" visible="1" minimized="0" >
+    <mixer width="865" x="5" y="310" maximized="0" height="278" visible="1" minimized="0" >
       <fxchannel num="0" muted="0" volume="1" name="Master" >
         <fxchain numofeffects="0" enabled="0" />
       </fxchannel>
@@ -264,7 +264,7 @@
       <fxchannel num="64" muted="0" volume="1" name="FX 64" >
         <fxchain numofeffects="0" enabled="0" />
       </fxchannel>
-    </fxmixer>
+    </mixer>
     <controllerrackview width="258" x="880" y="310" maximized="0" height="278" visible="1" minimized="0" />
     <pianoroll width="840" x="-11" y="0" maximized="0" height="480" visible="0" minimized="0" />
     <automationeditor width="740" x="0" y="0" maximized="0" height="480" visible="0" minimized="0" />
