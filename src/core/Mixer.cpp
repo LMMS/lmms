@@ -513,7 +513,7 @@ void Mixer::deleteChannelSend( FxRoute * route )
 	// remove us from to's receives
 	route->receiver()->m_receives.remove( route->receiver()->m_receives.indexOf( route ) );
 	// remove us from mixer's list
-	Engine::mixer()->m_fxRoutes.remove( Engine:mixer()->m_fxRoutes.indexOf( route ) );
+	Engine::mixer()->m_fxRoutes.remove( Engine::mixer()->m_fxRoutes.indexOf( route ) );
 	delete route;
 	Engine::audioEngine()->doneChangeInModel();
 }
