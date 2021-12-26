@@ -189,7 +189,7 @@ void GuiApplication::displayInitProgress(const QString &msg)
 
 void GuiApplication::childDestroyed(QObject *obj)
 {
-	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->MixerView(), etc
+	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->mixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
 	if (obj == m_mainWindow)
 	{

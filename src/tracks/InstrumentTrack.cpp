@@ -71,7 +71,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_firstKeyModel.setInitValue(0);
 	m_lastKeyModel.setInitValue(NumKeys - 1);
 
-	m_effectChannelModel.setRange( 0, Engine::Mixer()->numChannels()-1, 1);
+	m_effectChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -871,7 +871,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
-	m_effectChannelModel.setRange( 0, Engine::Mixer()->numChannels()-1 );
+	m_effectChannelModel.setRange( 0, Engine::mixer()->numChannels()-1 );
 	if ( !m_previewMode )
 	{
 		m_effectChannelModel.loadSettings( thisElement, "fxch" );

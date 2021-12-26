@@ -367,7 +367,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	swapBuffers();
 
 	// prepare master mix (clear internal buffers etc.)
-	Mixer * mixer = Engine::Mixer();
+	Mixer * mixer = Engine::mixer();
 	mixer->prepareMasterMix();
 
 	handleMetronome();

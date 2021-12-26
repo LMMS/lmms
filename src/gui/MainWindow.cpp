@@ -1120,7 +1120,7 @@ void MainWindow::toggleAutomationEditorWin()
 
 void MainWindow::toggleMixerWin()
 {
-	toggleWindow( getGUI()->MixerView() );
+	toggleWindow( getGUI()->mixerView() );
 }
 
 

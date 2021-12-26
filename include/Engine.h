@@ -67,7 +67,7 @@ public:
 		return s_audioEngine;
 	}
 
-	static Mixer * Mixer()
+	static Mixer * mixer()
 	{
 		return s_Mixer;
 	}

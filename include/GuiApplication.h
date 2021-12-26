@@ -55,7 +55,7 @@ public:
 #endif
 
 	MainWindow* mainWindow() { return m_mainWindow; }
-	MixerView* MixerView() { return m_MixerView; }
+	MixerView* mixerView() { return m_MixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
 	BBEditor* getBBEditor() { return m_bbEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
