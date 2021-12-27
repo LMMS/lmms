@@ -138,8 +138,8 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_MixerView = new MixerView;
-	connect(m_MixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	m_mixerView = new mixerView;
+	connect(m_mixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
@@ -195,9 +195,9 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_mainWindow = nullptr;
 	}
-	else if (obj == m_MixerView)
+	else if (obj == m_mixerView)
 	{
-		m_MixerView = nullptr;
+		m_mixerView = nullptr;
 	}
 	else if (obj == m_songEditor)
 	{

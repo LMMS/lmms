@@ -55,7 +55,7 @@ public:
 #endif
 
 	MainWindow* mainWindow() { return m_mainWindow; }
-	MixerView* mixerView() { return m_MixerView; }
+	MixerView* mixerView() { return m_mixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
 	BBEditor* getBBEditor() { return m_bbEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
@@ -74,7 +74,7 @@ private:
 	static GuiApplication* s_instance;
 
 	MainWindow* m_mainWindow;
-	MixerView* m_MixerView;
+	MixerView* m_mixerView;
 	SongEditorWindow* m_songEditor;
 	AutomationEditorWindow* m_automationEditor;
 	BBEditor* m_bbEditor;
