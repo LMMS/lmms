@@ -153,7 +153,7 @@ void TrackContentWidget::addClipView( ClipView * clipv )
 
 
 
-/*! \brief Removes the given ClipView to this widget.
+/*! \brief Removes the given ClipView from this widget.
  *
  *  Removes the given ClipView from our list of views.
  *
@@ -174,7 +174,7 @@ void TrackContentWidget::removeClipView( ClipView * clipv )
 
 
 
-/*! \brief Update ourselves by updating all the tCOViews attached.
+/*! \brief Update ourselves by updating all the ClipViews attached.
  *
  */
 void TrackContentWidget::update()
