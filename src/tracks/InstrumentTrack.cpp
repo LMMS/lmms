@@ -986,7 +986,17 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
 	setSimpleSerializing();
+	
+	//Replacing an instrument shouldn't change the solo/mute state.
+	bool oldMute = isMuted();
+	bool oldSolo = isSolo();
+	bool oldMutedBeforeSolo = isMutedBeforeSolo();
+
 	loadSettings(dataFile.content().toElement());
+	
+	setMuted(oldMute);
+	setSolo(oldSolo);
+	setMutedBeforeSolo(oldMutedBeforeSolo);
 	
 	m_effectChannelModel.setValue(effectChannel);
 	Engine::getSong()->setModified();
