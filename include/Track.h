@@ -186,6 +186,11 @@ public:
 	{
 		return m_hasColor;
 	}
+
+	bool isMutedBeforeSolo() const
+	{
+		return m_mutedBeforeSolo;
+	}
 	
 	BoolModel* getMutedModel();
 
@@ -194,6 +199,11 @@ public slots:
 	{
 		m_name = newName;
 		emit nameChanged();
+	}
+
+	void setMutedBeforeSolo(const bool muted)
+	{
+		m_mutedBeforeSolo = muted;
 	}
 
 	void toggleSolo();
@@ -209,6 +219,7 @@ private:
 
 protected:
 	BoolModel m_mutedModel;
+
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
@@ -230,7 +241,6 @@ signals:
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
 	void colorChanged();
-
 } ;
 
 

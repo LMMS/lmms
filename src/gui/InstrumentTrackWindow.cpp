@@ -387,20 +387,20 @@ void InstrumentTrackWindow::modelChanged()
 
 void InstrumentTrackWindow::saveSettingsBtnClicked()
 {
-	FileDialog sfd( this, tr( "Save preset" ), "", tr( "XML preset file (*.xpf)" ) );
+	FileDialog sfd(this, tr("Save preset"), "", tr("XML preset file (*.xpf)"));
 
 	QString presetRoot = ConfigManager::inst()->userPresetsDir();
-	if( !QDir( presetRoot ).exists() )
+	if(!QDir(presetRoot).exists())
 	{
-		QDir().mkdir( presetRoot );
+		QDir().mkdir(presetRoot);
 	}
-	if( !QDir( presetRoot + m_track->instrumentName() ).exists() )
+	if(!QDir(presetRoot + m_track->instrumentName()).exists())
 	{
-		QDir( presetRoot ).mkdir( m_track->instrumentName() );
+		QDir(presetRoot).mkdir(m_track->instrumentName());
 	}
 
-	sfd.setAcceptMode( FileDialog::AcceptSave );
-	sfd.setDirectory( presetRoot + m_track->instrumentName() );
+	sfd.setAcceptMode(FileDialog::AcceptSave);
+	sfd.setDirectory(presetRoot + m_track->instrumentName());
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
 	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
@@ -410,11 +410,17 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty() )
 	{
-		DataFile dataFile( DataFile::InstrumentTrackSettings );
+		DataFile dataFile(DataFile::InstrumentTrackSettings);
+		QDomElement& content(dataFile.content());
+
 		m_track->setSimpleSerializing();
-		m_track->saveSettings( dataFile, dataFile.content() );
+		m_track->saveSettings(dataFile, content);
+		//We don't want to save muted & solo settings when we're saving a preset
+		content.setAttribute("muted", 0);
+		content.setAttribute("solo", 0);
+		content.setAttribute("mutedBeforeSolo", 0);
 		QString f = sfd.selectedFiles()[0];
-		dataFile.writeFile( f );
+		dataFile.writeFile(f);
 	}
 }
 
