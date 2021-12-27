@@ -71,6 +71,7 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ
+	&DataFile::upgrade_mixerRename
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1758,6 +1759,17 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 	}
 }
 
+/*
+* This function aims to change the NodeNames of old project savings.
+*/
+void DataFile::upgrade_mixerRename()
+{
+	QDomNodeList fxmixer = elementsByTagName("fxmixer");
+	for(int i=0; !fxmixer.item(i).isNull(); ++i)
+	{
+		fxmixer.item(i).setTagName("mixer");
+	}
+}
 
 void DataFile::upgrade()
 {
