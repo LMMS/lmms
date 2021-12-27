@@ -66,7 +66,7 @@ void LmmsCore::init( bool renderOnly )
 	s_projectJournal = new ProjectJournal;
 	s_audioEngine = new AudioEngine( renderOnly );
 	s_song = new Song;
-	s_mixer = new mixer;
+	s_mixer = new Mixer;
 	s_bbTrackContainer = new BBTrackContainer;
 
 #ifdef LMMS_HAVE_LV2
