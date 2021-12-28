@@ -1766,11 +1766,9 @@ void DataFile::upgrade_mixerRename()
 {
 	QDomNodeList fxmixer = elementsByTagName("fxmixer");
 
-	for(int i=0; !fxmixer.item(i).isNull(); ++i)
+	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
 	{
-		QDomNode tag = fxmixer.at(i);
-	    QDomElement mixer = tag.toElement();  
-	    mixer.setTagName("mixer");
+		fxmixer.item(i).toElement().setTagName("mixer");
 	}
 }
 
