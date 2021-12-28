@@ -440,7 +440,7 @@ void Mixer::moveChannelRight( int index )
 
 
 
-FxRoute * Mixer::createChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel,
+FxRoute * Mixer::createChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel,
 								float amount )
 {
 //	qDebug( "requested: %d to %d", fromChannel, toChannel );
@@ -487,7 +487,7 @@ FxRoute * Mixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 
 
 // delete the connection made by createChannelSend
-void Mixer::deleteChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel )
+void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 {
 	// delete the send
 	FxChannel * from = m_fxChannels[fromChannel];
@@ -519,7 +519,7 @@ void Mixer::deleteChannelSend( FxRoute * route )
 }
 
 
-bool Mixer::isInfiniteLoop( fx_ch_t sendFrom, fx_ch_t sendTo )
+bool Mixer::isInfiniteLoop( mix_ch_t sendFrom, mix_ch_t sendTo )
 {
 	if( sendFrom == sendTo ) return true;
 	FxChannel * from = m_fxChannels[sendFrom];
@@ -558,7 +558,7 @@ bool Mixer::checkInfiniteLoop( FxChannel * from, FxChannel * to )
 
 
 // how much does fromChannel send its output to the input of toChannel?
-FloatModel * Mixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
+FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 {
 	if( fromChannel == toChannel )
 	{
@@ -580,7 +580,7 @@ FloatModel * Mixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 
 
 
-void Mixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
+void Mixer::mixToChannel( const sampleFrame * _buf, mix_ch_t _ch )
 {
 	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
@@ -694,7 +694,7 @@ void Mixer::clear()
 
 
 
-void Mixer::clearChannel(fx_ch_t index)
+void Mixer::clearChannel(mix_ch_t index)
 {
 	FxChannel * ch = m_fxChannels[index];
 	ch->m_fxChain.clear();

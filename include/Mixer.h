@@ -100,12 +100,12 @@ class FxRoute : public QObject
 		FxRoute( FxChannel * from, FxChannel * to, float amount );
 		virtual ~FxRoute();
 		
-	fx_ch_t senderIndex() const
+	mix_ch_t senderIndex() const
 	{
 		return m_from->m_channelIndex;
 	}
 	
-	fx_ch_t receiverIndex() const
+	mix_ch_t receiverIndex() const
 	{
 		return m_to->m_channelIndex;
 	}
@@ -141,7 +141,7 @@ public:
 	Mixer();
 	virtual ~Mixer();
 
-	void mixToChannel( const sampleFrame * _buf, fx_ch_t _ch );
+	void mixToChannel( const sampleFrame * _buf, mix_ch_t _ch );
 
 	void prepareMasterMix();
 	void masterMix( sampleFrame * _buf );
@@ -161,22 +161,22 @@ public:
 
 	// make the output of channel fromChannel go to the input of channel toChannel
 	// it is safe to call even if the send already exists
-	FxRoute * createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
+	FxRoute * createChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel,
 						   float amount = 1.0f);
 	FxRoute * createRoute( FxChannel * from, FxChannel * to, float amount );
 
 	// delete the connection made by createChannelSend
-	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
+	void deleteChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel);
 	void deleteChannelSend( FxRoute * route );
 
 	// determine if adding a send from sendFrom to
 	// sendTo would result in an infinite mixer loop.
-	bool isInfiniteLoop(fx_ch_t fromChannel, fx_ch_t toChannel);
+	bool isInfiniteLoop(mix_ch_t fromChannel, mix_ch_t toChannel);
 	bool checkInfiniteLoop( FxChannel * from, FxChannel * to );
 
 	// return the FloatModel of fromChannel sending its output to the input of
 	// toChannel. NULL if there is no send.
-	FloatModel * channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel);
+	FloatModel * channelSendModel(mix_ch_t fromChannel, mix_ch_t toChannel);
 
 	// add a new channel to the mixer.
 	// returns the index of the channel that was just added
@@ -193,7 +193,7 @@ public:
 	void moveChannelRight(int index);
 
 	// reset a channel's name, fx, sends, etc
-	void clearChannel(fx_ch_t channelIndex);
+	void clearChannel(mix_ch_t channelIndex);
 
 	// rename channels when moving etc. if they still have their original name
 	void validateChannelName( int index, int oldIndex );
@@ -202,7 +202,7 @@ public:
 	void activateSolo();
 	void deactivateSolo();
 
-	inline fx_ch_t numChannels() const
+	inline mix_ch_t numChannels() const
 	{
 		return m_fxChannels.size();
 	}

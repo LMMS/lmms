@@ -73,7 +73,7 @@ public:
 
 	// next effect-channel after this audio-port
 	// (-1 = none  0 = master)
-	inline fx_ch_t nextFxChannel() const
+	inline mix_ch_t nextFxChannel() const
 	{
 		return m_nextFxChannel;
 	}
@@ -83,7 +83,7 @@ public:
 		return m_effects.get();
 	}
 
-	void setNextFxChannel( const fx_ch_t _chnl )
+	void setNextFxChannel( const mix_ch_t _chnl )
 	{
 		m_nextFxChannel = _chnl;
 	}
@@ -116,7 +116,7 @@ private:
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;
-	fx_ch_t m_nextFxChannel;
+	mix_ch_t m_nextFxChannel;
 
 	QString m_name;
 
