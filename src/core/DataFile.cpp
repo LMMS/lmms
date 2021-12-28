@@ -1760,14 +1760,17 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 }
 
 /*
-* This function aims to change the NodeNames of old project savings.
+* This function aims to change the nodeNames of old project savings.
 */
 void DataFile::upgrade_mixerRename()
 {
 	QDomNodeList fxmixer = elementsByTagName("fxmixer");
+
 	for(int i=0; !fxmixer.item(i).isNull(); ++i)
 	{
-		fxmixer.item(i).setTagName("mixer");
+		QDomNode tag = fxmixer.at(i);
+	    QDomElement mixer = tag.toElement();  
+	    mixer.setTagName("mixer");
 	}
 }
 
