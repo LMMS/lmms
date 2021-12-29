@@ -190,7 +190,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setColumnStretch(5, 1);
 
 
-	// setup spinbox for selecting FX-channel
+	// setup spinbox for selecting Mixer-channel
 	m_effectChannelNumber = new FxLineLcdSpinBox( 2, nullptr, tr( "FX channel" ), m_itv );
 
 	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );

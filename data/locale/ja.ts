@@ -5391,7 +5391,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -5444,7 +5444,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="306"/>
-        <source>Mute this FX channel</source>
+        <source>Mute this mixer channel</source>
         <translation>このFXチャンネルをミュート</translation>
     </message>
     <message>
@@ -5454,7 +5454,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="318"/>
-        <source>Solo FX channel</source>
+        <source>Solo mixer channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -6621,7 +6621,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="106"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FXチャンネル</translation>
     </message>
     <message>
@@ -6773,7 +6773,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1488"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FXチャンネル</translation>
     </message>
     <message>
@@ -12107,7 +12107,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="41"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FXチャンネル</translation>
     </message>
     <message>
@@ -12194,7 +12194,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FXチャンネル</translation>
     </message>
     <message>
@@ -13498,7 +13498,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation>新規FXチャンネルにアサインする</translation>
     </message>
     <message>

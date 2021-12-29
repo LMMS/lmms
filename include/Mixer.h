@@ -37,11 +37,11 @@
 class FxRoute;
 typedef QVector<FxRoute *> FxRouteVector;
 
-class FxChannel : public ThreadableJob
+class MixerChannel : public ThreadableJob
 {
 	public:
-		FxChannel( int idx, Model * _parent );
-		virtual ~FxChannel();
+		MixerChannel( int idx, Model * _parent );
+		virtual ~MixerChannel();
 
 		EffectChain m_fxChain;
 
@@ -97,7 +97,7 @@ class FxRoute : public QObject
 {
 	Q_OBJECT
 	public:		
-		FxRoute( FxChannel * from, FxChannel * to, float amount );
+		FxRoute( MixerChannel * from, MixerChannel * to, float amount );
 		virtual ~FxRoute();
 		
 	mix_ch_t senderIndex() const
@@ -115,12 +115,12 @@ class FxRoute : public QObject
 		return &m_amount;
 	}
 	
-	FxChannel * sender() const
+	MixerChannel * sender() const
 	{
 		return m_from;
 	}
 	
-	FxChannel * receiver() const
+	MixerChannel * receiver() const
 	{
 		return m_to;
 	}
@@ -128,8 +128,8 @@ class FxRoute : public QObject
 	void updateName();
 		
 	private:
-		FxChannel * m_from;
-		FxChannel * m_to;
+		MixerChannel * m_from;
+		MixerChannel * m_to;
 		FloatModel m_amount;
 };
 
@@ -154,16 +154,16 @@ public:
 		return "mixer";
 	}
 
-	FxChannel * effectChannel( int _ch )
+	MixerChannel * effectChannel( int _ch )
 	{
-		return m_fxChannels[_ch];
+		return m_mixerChannels[_ch];
 	}
 
 	// make the output of channel fromChannel go to the input of channel toChannel
 	// it is safe to call even if the send already exists
 	FxRoute * createChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel,
 						   float amount = 1.0f);
-	FxRoute * createRoute( FxChannel * from, FxChannel * to, float amount );
+	FxRoute * createRoute( MixerChannel * from, MixerChannel * to, float amount );
 
 	// delete the connection made by createChannelSend
 	void deleteChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel);
@@ -172,7 +172,7 @@ public:
 	// determine if adding a send from sendFrom to
 	// sendTo would result in an infinite mixer loop.
 	bool isInfiniteLoop(mix_ch_t fromChannel, mix_ch_t toChannel);
-	bool checkInfiniteLoop( FxChannel * from, FxChannel * to );
+	bool checkInfiniteLoop( MixerChannel * from, MixerChannel * to );
 
 	// return the FloatModel of fromChannel sending its output to the input of
 	// toChannel. NULL if there is no send.
@@ -204,14 +204,14 @@ public:
 
 	inline mix_ch_t numChannels() const
 	{
-		return m_fxChannels.size();
+		return m_mixerChannels.size();
 	}
 
 	FxRouteVector m_fxRoutes;
 
 private:
-	// the fx channels in the mixer. index 0 is always master.
-	QVector<FxChannel *> m_fxChannels;
+	// the mixer channels in the mixer. index 0 is always master.
+	QVector<MixerChannel *> m_mixerChannels;
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);

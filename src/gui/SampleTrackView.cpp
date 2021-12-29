@@ -119,12 +119,12 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
 
-	FxChannel *fxChannel = Engine::mixer()->effectChannel(channelIndex);
+	MixerChannel *mixerChannel = Engine::mixer()->effectChannel(channelIndex);
 
 	// If title allows interpolation, pass channel index and name
 	if (title.contains("%2"))
 	{
-		title = title.arg(channelIndex).arg(fxChannel->m_name);
+		title = title.arg(channelIndex).arg(mixerChannel->m_name);
 	}
 
 	QMenu *fxMenu = new QMenu(title);
@@ -134,9 +134,9 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
 	{
-		FxChannel * currentChannel = Engine::mixer()->effectChannel(i);
+		MixerChannel * currentChannel = Engine::mixer()->effectChannel(i);
 
-		if (currentChannel != fxChannel)
+		if (currentChannel != mixerChannel)
 		{
 			const auto index = currentChannel->m_channelIndex;
 			QString label = tr("FX %1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
@@ -207,7 +207,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 
 
-/*! \brief Create and assign a new FX Channel for this track */
+/*! \brief Create and assign a new mixer Channel for this track */
 void SampleTrackView::createFxLine()
 {
 	int channelIndex = getGUI()->mixerView()->addNewChannel();
@@ -222,7 +222,7 @@ void SampleTrackView::createFxLine()
 
 
 
-/*! \brief Assign a specific FX Channel for this track */
+/*! \brief Assign a specific mixer Channel for this track */
 void SampleTrackView::assignFxLine(int channelIndex)
 {
 	model()->effectChannelModel()->setValue(channelIndex);

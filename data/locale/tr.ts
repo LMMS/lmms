@@ -5675,7 +5675,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation>Yeni FX Kanalı</translation>
     </message>
 </context>
@@ -5728,7 +5728,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="306"/>
-        <source>Mute this FX channel</source>
+        <source>Mute this mixer channel</source>
         <translation>Bu FX kanalını sessize al</translation>
     </message>
     <message>
@@ -5738,7 +5738,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="318"/>
-        <source>Solo FX channel</source>
+        <source>Solo mixer channel</source>
         <translation>Solo FX kanalı</translation>
     </message>
 </context>
@@ -6905,7 +6905,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="106"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX kanalı</translation>
     </message>
     <message>
@@ -7057,7 +7057,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1488"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX kanalı</translation>
     </message>
     <message>
@@ -12403,7 +12403,7 @@ Daha hızlı bir tarama süresi elde etmek için bu kontrolleri devre dışı b�
     </message>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="41"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX kanalı</translation>
     </message>
     <message>
@@ -12490,7 +12490,7 @@ Daha hızlı bir tarama süresi elde etmek için bu kontrolleri devre dışı b�
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX kanalı</translation>
     </message>
     <message>
@@ -13794,7 +13794,7 @@ Lütfen dosyayı ve dosyayı içeren dizini okuma iznine sahip olduğunuzdan emi
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation>Yeni FX Kanalına atayın</translation>
     </message>
     <message>

@@ -5391,7 +5391,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation>Saluran FX Baru</translation>
     </message>
 </context>
@@ -5444,7 +5444,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="306"/>
-        <source>Mute this FX channel</source>
+        <source>Mute this mixer channel</source>
         <translation>Bisukan saluran FX ini</translation>
     </message>
     <message>
@@ -5454,7 +5454,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="318"/>
-        <source>Solo FX channel</source>
+        <source>Solo mixer channel</source>
         <translation>Saluran FX Solo</translation>
     </message>
 </context>
@@ -6623,7 +6623,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="106"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Saluran FX</translation>
     </message>
     <message>
@@ -6776,7 +6776,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1488"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Saluran FX</translation>
     </message>
     <message>
@@ -12113,7 +12113,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="41"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Saluran FX</translation>
     </message>
     <message>
@@ -12200,7 +12200,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Saluran FX</translation>
     </message>
     <message>
@@ -13504,7 +13504,7 @@ Pastikan anda memiliki izin baca untuk berkas ini dan direktori yang mengandung 
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation>Tetapkan ke Saluran FX baru</translation>
     </message>
     <message>

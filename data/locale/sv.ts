@@ -5673,7 +5673,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
     <message>
         <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation>Ny FX-kanal</translation>
     </message>
 </context>
@@ -5726,7 +5726,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="306"/>
-        <source>Mute this FX channel</source>
+        <source>Mute this mixer channel</source>
         <translation>Tysta denna FX-kanal</translation>
     </message>
     <message>
@@ -5736,7 +5736,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="318"/>
-        <source>Solo FX channel</source>
+        <source>Solo mixer channel</source>
         <translation>Solo FX-kanal</translation>
     </message>
 </context>
@@ -6903,7 +6903,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="106"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX-kanal</translation>
     </message>
     <message>
@@ -7055,7 +7055,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1488"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX-kanal</translation>
     </message>
     <message>
@@ -12401,7 +12401,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="41"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX-kanal</translation>
     </message>
     <message>
@@ -12488,7 +12488,7 @@ Du kan inaktivera dessa kontroller för att få en snabbare skanningstid (på eg
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>FX-kanal</translation>
     </message>
     <message>
@@ -13792,7 +13792,7 @@ Se till att du har läsrättigheter för filen och mappen som innehåller filen 
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation>Koppla till ny FX-kanal</translation>
     </message>
     <message>

@@ -2184,12 +2184,12 @@ Please make sure you have write-permission to the file and the directory contain
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>The FX channel receives input from one or more instrument tracks.
- It in turn can be routed to multiple other FX channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
+        <source>The mixer channel receives input from one or more instrument tracks.
+ It in turn can be routed to multiple other mixer channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
 
-In order to route the channel to another channel, select the FX channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
+In order to route the channel to another channel, select the mixer channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
 
-You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
+You can remove and move mixer channels in the context menu, which is accessed by right-clicking the mixer channel.
 </source>
         <translation type="unfinished"/>
     </message>
@@ -2240,7 +2240,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Mute this FX channel</source>
+        <source>Mute this mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -2248,7 +2248,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Solo FX channel</source>
+        <source>Solo mixer channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -3163,7 +3163,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3277,7 +3277,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6730,7 +6730,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -7758,7 +7758,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation type="unfinished"/>
     </message>
 </context>

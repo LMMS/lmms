@@ -91,21 +91,21 @@ MixerView::MixerView() :
 	m_racksWidget->setLayout( m_racksLayout );
 
 	// add master channel
-	m_fxChannelViews.resize( m->numChannels() );
-	m_fxChannelViews[0] = new FxChannelView( this, this, 0 );
+	m_mixerChannelViews.resize( m->numChannels() );
+	m_mixerChannelViews[0] = new MixerChannelView( this, this, 0 );
 
-	m_racksLayout->addWidget( m_fxChannelViews[0]->m_rackView );
+	m_racksLayout->addWidget( m_mixerChannelViews[0]->m_rackView );
 
-	FxChannelView * masterView = m_fxChannelViews[0];
+	MixerChannelView * masterView = m_mixerChannelViews[0];
 	ml->addWidget( masterView->m_fxLine, 0, Qt::AlignTop );
 
 	QSize fxLineSize = masterView->m_fxLine->size();
 
 	// add mixer channels
-	for( int i = 1; i < m_fxChannelViews.size(); ++i )
+	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
 	{
-		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
-		chLayout->addWidget( m_fxChannelViews[i]->m_fxLine );
+		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
+		chLayout->addWidget( m_mixerChannelViews[i]->m_fxLine );
 	}
 
 	// add the scrolling section to the main layout
@@ -140,10 +140,10 @@ MixerView::MixerView() :
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
-	// add the stacked layout for the effect racks of fx channels
+	// add the stacked layout for the effect racks of mixer channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
 
-	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
+	setCurrentFxLine( m_mixerChannelViews[0]->m_fxLine );
 
 	setLayout( ml );
 	updateGeometry();
@@ -170,9 +170,9 @@ MixerView::MixerView() :
 
 MixerView::~MixerView()
 {
-	for (int i=0; i<m_fxChannelViews.size(); i++)
+	for (int i=0; i<m_mixerChannelViews.size(); i++)
 	{
-		delete m_fxChannelViews.at(i);
+		delete m_mixerChannelViews.at(i);
 	}
 }
 
@@ -184,10 +184,10 @@ int MixerView::addNewChannel()
 	Mixer * mix = Engine::mixer();
 
 	int newChannelIndex = mix->createChannel();
-	m_fxChannelViews.push_back(new FxChannelView(m_channelAreaWidget, this,
+	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this,
 												 newChannelIndex));
-	chLayout->addWidget( m_fxChannelViews[newChannelIndex]->m_fxLine );
-	m_racksLayout->addWidget( m_fxChannelViews[newChannelIndex]->m_rackView );
+	chLayout->addWidget( m_mixerChannelViews[newChannelIndex]->m_fxLine );
+	m_racksLayout->addWidget( m_mixerChannelViews[newChannelIndex]->m_rackView );
 
 	updateFxLine(newChannelIndex);
 
@@ -200,33 +200,33 @@ int MixerView::addNewChannel()
 void MixerView::refreshDisplay()
 {
 	// delete all views and re-add them
-	for( int i = 1; i<m_fxChannelViews.size(); ++i )
+	for( int i = 1; i<m_mixerChannelViews.size(); ++i )
 	{
-		chLayout->removeWidget(m_fxChannelViews[i]->m_fxLine);
-		m_racksLayout->removeWidget( m_fxChannelViews[i]->m_rackView );
-		delete m_fxChannelViews[i]->m_fader;
-		delete m_fxChannelViews[i]->m_muteBtn;
-		delete m_fxChannelViews[i]->m_soloBtn;
-		delete m_fxChannelViews[i]->m_fxLine;
-		delete m_fxChannelViews[i]->m_rackView;
-		delete m_fxChannelViews[i];
+		chLayout->removeWidget(m_mixerChannelViews[i]->m_fxLine);
+		m_racksLayout->removeWidget( m_mixerChannelViews[i]->m_rackView );
+		delete m_mixerChannelViews[i]->m_fader;
+		delete m_mixerChannelViews[i]->m_muteBtn;
+		delete m_mixerChannelViews[i]->m_soloBtn;
+		delete m_mixerChannelViews[i]->m_fxLine;
+		delete m_mixerChannelViews[i]->m_rackView;
+		delete m_mixerChannelViews[i];
 	}
 	m_channelAreaWidget->adjustSize();
 
 	// re-add the views
-	m_fxChannelViews.resize(Engine::mixer()->numChannels());
-	for( int i = 1; i < m_fxChannelViews.size(); ++i )
+	m_mixerChannelViews.resize(Engine::mixer()->numChannels());
+	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
 	{
-		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
-		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
-		m_racksLayout->addWidget( m_fxChannelViews[i]->m_rackView );
+		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
+		chLayout->addWidget(m_mixerChannelViews[i]->m_fxLine);
+		m_racksLayout->addWidget( m_mixerChannelViews[i]->m_rackView );
 	}
 
 	// set selected fx line to 0
 	setCurrentFxLine( 0 );
 
 	// update all fx lines
-	for( int i = 0; i < m_fxChannelViews.size(); ++i )
+	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
 	{
 		updateFxLine( i );
 	}
@@ -251,13 +251,13 @@ void MixerView::updateMaxChannelSelector()
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				inst->effectChannelModel()->setRange(0,
-					m_fxChannelViews.size()-1,1);
+					m_mixerChannelViews.size()-1,1);
 			}
 			else if( trackList[i]->type() == Track::SampleTrack )
 			{
 				SampleTrack * strk = (SampleTrack *) trackList[i];
 				strk->effectChannelModel()->setRange(0,
-					m_fxChannelViews.size()-1,1);
+					m_mixerChannelViews.size()-1,1);
 			}
 		}
 	}
@@ -278,14 +278,14 @@ void MixerView::loadSettings( const QDomElement & _this )
 }
 
 
-MixerView::FxChannelView::FxChannelView(QWidget * _parent, MixerView * _mv,
+MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv,
 										  int channelIndex )
 {
 	m_fxLine = new FxLine(_parent, _mv, channelIndex);
 
-	FxChannel *fxChannel = Engine::mixer()->effectChannel(channelIndex);
+	MixerChannel *mixerChannel = Engine::mixer()->effectChannel(channelIndex);
 
-	m_fader = new Fader( &fxChannel->m_volumeModel,
+	m_fader = new Fader( &mixerChannel->m_volumeModel,
 					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
 	m_fader->setLevelsDisplayedInDBFS();
 	m_fader->setMinPeak(dbfsToAmp(-42));
@@ -296,41 +296,41 @@ MixerView::FxChannelView::FxChannelView(QWidget * _parent, MixerView * _mv,
 					m_fader->height()-5 );
 
 	m_muteBtn = new PixmapButton( m_fxLine, tr( "Mute" ) );
-	m_muteBtn->setModel( &fxChannel->m_muteModel );
+	m_muteBtn->setModel( &mixerChannel->m_muteModel );
 	m_muteBtn->setActiveGraphic(
 				embed::getIconPixmap( "led_off" ) );
 	m_muteBtn->setInactiveGraphic(
 				embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( true );
 	m_muteBtn->move( 9,  m_fader->y()-11);
-	ToolTip::add( m_muteBtn, tr( "Mute this FX channel" ) );
+	ToolTip::add( m_muteBtn, tr( "Mute this mixer channel" ) );
 
 	m_soloBtn = new PixmapButton( m_fxLine, tr( "Solo" ) );
-	m_soloBtn->setModel( &fxChannel->m_soloModel );
+	m_soloBtn->setModel( &mixerChannel->m_soloModel );
 	m_soloBtn->setActiveGraphic(
 				embed::getIconPixmap( "led_red" ) );
 	m_soloBtn->setInactiveGraphic(
 				embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
-	connect(&fxChannel->m_soloModel, SIGNAL( dataChanged() ),
+	connect(&mixerChannel->m_soloModel, SIGNAL( dataChanged() ),
 			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
-	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
+	ToolTip::add( m_soloBtn, tr( "Solo mixer channel" ) );
 
 	// Create EffectRack for the channel
-	m_rackView = new EffectRackView( &fxChannel->m_fxChain, _mv->m_racksWidget );
+	m_rackView = new EffectRackView( &mixerChannel->m_fxChain, _mv->m_racksWidget );
 	m_rackView->setFixedSize( EffectRackView::DEFAULT_WIDTH, FxLine::FxLineHeight );
 }
 
 
-void MixerView::FxChannelView::setChannelIndex( int index )
+void MixerView::MixerChannelView::setChannelIndex( int index )
 {
-	FxChannel* fxChannel = Engine::mixer()->effectChannel( index );
+	MixerChannel* mixerChannel = Engine::mixer()->effectChannel( index );
 
-	m_fader->setModel( &fxChannel->m_volumeModel );
-	m_muteBtn->setModel( &fxChannel->m_muteModel );
-	m_soloBtn->setModel( &fxChannel->m_soloModel );
-	m_rackView->setModel( &fxChannel->m_fxChain );
+	m_fader->setModel( &mixerChannel->m_volumeModel );
+	m_muteBtn->setModel( &mixerChannel->m_muteModel );
+	m_soloBtn->setModel( &mixerChannel->m_soloModel );
+	m_rackView->setModel( &mixerChannel->m_fxChain );
 }
 
 
@@ -345,10 +345,10 @@ void MixerView::setCurrentFxLine( FxLine * _line )
 {
 	// select
 	m_currentFxLine = _line;
-	m_racksLayout->setCurrentWidget( m_fxChannelViews[ _line->channelIndex() ]->m_rackView );
+	m_racksLayout->setCurrentWidget( m_mixerChannelViews[ _line->channelIndex() ]->m_rackView );
 
 	// set up send knob
-	for(int i = 0; i < m_fxChannelViews.size(); ++i)
+	for(int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
 		updateFxLine(i);
 	}
@@ -361,7 +361,7 @@ void MixerView::updateFxLine(int index)
 
 	// does current channel send to this channel?
 	int selIndex = m_currentFxLine->channelIndex();
-	FxLine * thisLine = m_fxChannelViews[index]->m_fxLine;
+	FxLine * thisLine = m_mixerChannelViews[index]->m_fxLine;
 	thisLine->setToolTip( Engine::mixer()->effectChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
@@ -400,29 +400,29 @@ void MixerView::deleteChannel(int index)
 	Engine::mixer()->deleteChannel(index);
 
 	// delete the view
-	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
-	m_racksLayout->removeWidget( m_fxChannelViews[index]->m_rackView );
-	delete m_fxChannelViews[index]->m_fader;
-	delete m_fxChannelViews[index]->m_muteBtn;
-	delete m_fxChannelViews[index]->m_soloBtn;
+	chLayout->removeWidget(m_mixerChannelViews[index]->m_fxLine);
+	m_racksLayout->removeWidget( m_mixerChannelViews[index]->m_rackView );
+	delete m_mixerChannelViews[index]->m_fader;
+	delete m_mixerChannelViews[index]->m_muteBtn;
+	delete m_mixerChannelViews[index]->m_soloBtn;
 	// delete fxLine later to prevent a crash when deleting from context menu
-	m_fxChannelViews[index]->m_fxLine->hide();
-	m_fxChannelViews[index]->m_fxLine->deleteLater();
-	delete m_fxChannelViews[index]->m_rackView;
-	delete m_fxChannelViews[index];
+	m_mixerChannelViews[index]->m_fxLine->hide();
+	m_mixerChannelViews[index]->m_fxLine->deleteLater();
+	delete m_mixerChannelViews[index]->m_rackView;
+	delete m_mixerChannelViews[index];
 	m_channelAreaWidget->adjustSize();
 
 	// make sure every channel knows what index it is
-	for(int i=index + 1; i<m_fxChannelViews.size(); ++i)
+	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
 	{
-		m_fxChannelViews[i]->m_fxLine->setChannelIndex(i-1);
+		m_mixerChannelViews[i]->m_fxLine->setChannelIndex(i-1);
 	}
-	m_fxChannelViews.remove(index);
+	m_mixerChannelViews.remove(index);
 
 	// select the next channel
-	if( selLine >= m_fxChannelViews.size() )
+	if( selLine >= m_mixerChannelViews.size() )
 	{
-		selLine = m_fxChannelViews.size()-1;
+		selLine = m_mixerChannelViews.size()-1;
 	}
 	setCurrentFxLine(selLine);
 
@@ -437,7 +437,7 @@ void MixerView::deleteUnusedChannels()
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::getBBTrackContainer()->tracks();
 
-	std::vector<bool> inUse(m_fxChannelViews.size(), false);
+	std::vector<bool> inUse(m_mixerChannelViews.size(), false);
 
 	//Populate inUse by checking the destination channel for every track
 	for (Track* t: tracks)
@@ -459,7 +459,7 @@ void MixerView::deleteUnusedChannels()
 	}
 
 	//Check all channels except master, delete those with no incoming sends
-	for(int i = m_fxChannelViews.size()-1; i > 0; --i)
+	for(int i = m_mixerChannelViews.size()-1; i > 0; --i)
 	{
 		if (!inUse[i] && Engine::mixer()->effectChannel(i)->m_receives.isEmpty())
 		{ deleteChannel(i); }
@@ -471,7 +471,7 @@ void MixerView::deleteUnusedChannels()
 void MixerView::moveChannelLeft(int index, int focusIndex)
 {
 	// can't move master or first channel left or last channel right
-	if( index <= 1 || index >= m_fxChannelViews.size() ) return;
+	if( index <= 1 || index >= m_mixerChannelViews.size() ) return;
 
 	Mixer *m = Engine::mixer();
 
@@ -479,8 +479,8 @@ void MixerView::moveChannelLeft(int index, int focusIndex)
 	m->moveChannelLeft( index );
 
 	// Update widgets models
-	m_fxChannelViews[index]->setChannelIndex( index );
-	m_fxChannelViews[index - 1]->setChannelIndex( index - 1 );
+	m_mixerChannelViews[index]->setChannelIndex( index );
+	m_mixerChannelViews[index - 1]->setChannelIndex( index - 1 );
 
 	// Focus on new position
 	setCurrentFxLine( focusIndex );
@@ -503,7 +503,7 @@ void MixerView::moveChannelRight(int index)
 
 void MixerView::renameChannel(int index)
 {
-	m_fxChannelViews[index]->m_fxLine->renameChannel();
+	m_mixerChannelViews[index]->m_fxLine->renameChannel();
 }
 
 
@@ -570,9 +570,9 @@ void MixerView::closeEvent( QCloseEvent * _ce )
 
 void MixerView::setCurrentFxLine( int _line )
 {
-	if( _line >= 0 && _line < m_fxChannelViews.size() )
+	if( _line >= 0 && _line < m_mixerChannelViews.size() )
 	{
-		setCurrentFxLine( m_fxChannelViews[_line]->m_fxLine );
+		setCurrentFxLine( m_mixerChannelViews[_line]->m_fxLine );
 	}
 }
 
@@ -596,31 +596,31 @@ void MixerView::updateFaders()
 	m->effectChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
 	m->effectChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
 
-	for( int i = 0; i < m_fxChannelViews.size(); ++i )
+	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
 	{
-		const float opl = m_fxChannelViews[i]->m_fader->getPeak_L();
-		const float opr = m_fxChannelViews[i]->m_fader->getPeak_R();
+		const float opl = m_mixerChannelViews[i]->m_fader->getPeak_L();
+		const float opr = m_mixerChannelViews[i]->m_fader->getPeak_R();
 		const float fallOff = 1.25;
 		if( m->effectChannel(i)->m_peakLeft >= opl/fallOff )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
+			m_mixerChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
 			// Set to -1 so later we'll know if this value has been refreshed yet.
 			m->effectChannel(i)->m_peakLeft = -1;
 		}
 		else if( m->effectChannel(i)->m_peakLeft != -1 )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
+			m_mixerChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
 		if( m->effectChannel(i)->m_peakRight >= opr/fallOff )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
+			m_mixerChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
 			// Set to -1 so later we'll know if this value has been refreshed yet.
 			m->effectChannel(i)->m_peakRight = -1;
 		}
 		else if( m->effectChannel(i)->m_peakRight != -1 )
 		{
-			m_fxChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
+			m_mixerChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}
 	}
 }

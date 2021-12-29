@@ -5674,7 +5674,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation>Nouveau canal d&apos;effet</translation>
     </message>
 </context>
@@ -5727,7 +5727,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="306"/>
-        <source>Mute this FX channel</source>
+        <source>Mute this mixer channel</source>
         <translation>Mettre ce canal d&apos;effet en sourdine</translation>
     </message>
     <message>
@@ -5737,7 +5737,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="318"/>
-        <source>Solo FX channel</source>
+        <source>Solo mixer channel</source>
         <translation>Mettre ce canal d&apos;effet en solo</translation>
     </message>
 </context>
@@ -6904,7 +6904,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="106"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Canal d&apos;effet</translation>
     </message>
     <message>
@@ -7056,7 +7056,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1488"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Canal d&apos;effet</translation>
     </message>
     <message>
@@ -12399,7 +12399,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="41"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Canal d&apos;effet</translation>
     </message>
     <message>
@@ -12486,7 +12486,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Canal d&apos;effet</translation>
     </message>
     <message>
@@ -13790,7 +13790,7 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation>Assigner à un nouveau canal d&apos;effet</translation>
     </message>
     <message>

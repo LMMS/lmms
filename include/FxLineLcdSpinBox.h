@@ -1,5 +1,5 @@
 /*
- * FxLineLcdSpinBox.h - a specialization of LcdSpnBox for setting FX channels
+ * FxLineLcdSpinBox.h - a specialization of LcdSpnBox for setting mixer channels
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

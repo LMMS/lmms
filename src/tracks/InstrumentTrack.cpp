@@ -653,7 +653,7 @@ void InstrumentTrack::updatePitchRange()
 
 void InstrumentTrack::updateEffectChannel()
 {
-	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
+	m_audioPort.setNextMixerChannel( m_effectChannelModel.value() );
 }
 
 
@@ -981,7 +981,7 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 void InstrumentTrack::replaceInstrument(DataFile dataFile)
 {
-	// loadSettings clears the FX channel, so we save it here and set it back later
+	// loadSettings clears the mixer channel, so we save it here and set it back later
 	int effectChannel = effectChannelModel()->value();
 
 	InstrumentTrack::removeMidiPortNode(dataFile);

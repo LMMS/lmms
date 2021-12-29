@@ -188,21 +188,21 @@
       </automationpattern>
     </track>
     <mixer maximized="0" height="332" visible="1" minimized="0" x="1" y="463" width="530">
-      <fxchannel muted="0" num="0" name="Master" volume="1" soloed="0">
+      <mixerchannel muted="0" num="0" name="Master" volume="1" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>
-      </fxchannel>
-      <fxchannel muted="0" num="1" name="Drum" volume="1" soloed="0">
-        <fxchain enabled="0" numofeffects="0"/>
-        <send amount="1" channel="0"/>
-      </fxchannel>
-      <fxchannel muted="0" num="2" name="Bass" volume="1" soloed="0">
+      </mixerchannel>
+      <mixerchannel muted="0" num="1" name="Drum" volume="1" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>
         <send amount="1" channel="0"/>
-      </fxchannel>
-      <fxchannel muted="0" num="3" name="Lead" volume="1" soloed="0">
+      </mixerchannel>
+      <mixerchannel muted="0" num="2" name="Bass" volume="1" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>
         <send amount="1" channel="0"/>
-      </fxchannel>
+      </mixerchannel>
+      <mixerchannel muted="0" num="3" name="Lead" volume="1" soloed="0">
+        <fxchain enabled="0" numofeffects="0"/>
+        <send amount="1" channel="0"/>
+      </mixerchannel>
     </mixer>
     <ControllerRackView maximized="0" height="300" visible="0" minimized="0" x="880" y="310" width="400"/>
     <pianoroll maximized="0" height="480" visible="0" minimized="0" x="1" y="120" width="640"/>

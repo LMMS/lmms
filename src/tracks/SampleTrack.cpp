@@ -240,5 +240,5 @@ void SampleTrack::setPlayingTcos( bool isPlaying )
 
 void SampleTrack::updateEffectChannel()
 {
-	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
+	m_audioPort.setNextMixerChannel( m_effectChannelModel.value() );
 }

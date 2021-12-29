@@ -46,10 +46,10 @@ class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	class FxChannelView
+	class MixerChannelView
 	{
 	public:
-		FxChannelView(QWidget * _parent, MixerView * _mv, int _chIndex );
+		MixerChannelView(QWidget * _parent, MixerView * _mv, int _chIndex );
 
 		void setChannelIndex( int index );
 
@@ -74,9 +74,9 @@ public:
 		return m_currentFxLine;
 	}
 
-	inline FxChannelView * channelView(int index)
+	inline MixerChannelView * channelView(int index)
 	{
-		return m_fxChannelViews[index];
+		return m_mixerChannelViews[index];
 	}
 
 
@@ -89,7 +89,7 @@ public:
 	// display the send button and knob correctly
 	void updateFxLine(int index);
 
-	// notify the view that an fx channel was deleted
+	// notify the view that an mixer channel was deleted
 	void deleteChannel(int index);
 
 	// delete all unused channels
@@ -118,7 +118,7 @@ private slots:
 
 private:
 
-	QVector<FxChannelView *> m_fxChannelViews;
+	QVector<MixerChannelView *> m_mixerChannelViews;
 
 	FxLine * m_currentFxLine;
 
@@ -130,7 +130,7 @@ private:
 
 	void updateMaxChannelSelector();
 	
-	friend class FxChannelView;
+	friend class MixerChannelView;
 } ;
 
 #endif
