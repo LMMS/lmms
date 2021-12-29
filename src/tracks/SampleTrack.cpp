@@ -186,7 +186,7 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
-	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
+	m_effectChannelModel.saveSettings( _doc, _this, "mixch" );
 }
 
 
@@ -210,7 +210,7 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
 	m_effectChannelModel.setRange( 0, Engine::mixer()->numChannels() - 1 );
-	m_effectChannelModel.loadSettings( _this, "fxch" );
+	m_effectChannelModel.loadSettings( _this, "mixch" );
 }
 
 

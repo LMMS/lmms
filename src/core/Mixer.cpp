@@ -733,22 +733,22 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		MixerChannel * ch = m_mixerChannels[i];
 
-		QDomElement fxch = _doc.createElement( QString( "mixerchannel" ) );
-		_this.appendChild( fxch );
+		QDomElement mixch = _doc.createElement( QString( "mixerchannel" ) );
+		_this.appendChild( mixch );
 
-		ch->m_fxChain.saveState( _doc, fxch );
-		ch->m_volumeModel.saveSettings( _doc, fxch, "volume" );
-		ch->m_muteModel.saveSettings( _doc, fxch, "muted" );
-		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
-		fxch.setAttribute( "num", i );
-		fxch.setAttribute( "name", ch->m_name );
-		if( ch->m_hasColor ) fxch.setAttribute( "color", ch->m_color.name() );
+		ch->m_fxChain.saveState( _doc, mixch );
+		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
+		ch->m_muteModel.saveSettings( _doc, mixch, "muted" );
+		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
+		mixch.setAttribute( "num", i );
+		mixch.setAttribute( "name", ch->m_name );
+		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
 		{
 			QDomElement sendsDom = _doc.createElement( QString( "send" ) );
-			fxch.appendChild( sendsDom );
+			mixch.appendChild( sendsDom );
 
 			sendsDom.setAttribute( "channel", ch->m_sends[si]->receiverIndex() );
 			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
@@ -776,29 +776,29 @@ void Mixer::loadSettings( const QDomElement & _this )
 
 	while( ! node.isNull() )
 	{
-		QDomElement fxch = node.toElement();
+		QDomElement mixch = node.toElement();
 
 		// index of the channel we are about to load
-		int num = fxch.attribute( "num" ).toInt();
+		int num = mixch.attribute( "num" ).toInt();
 
 		// allocate enough channels
 		allocateChannelsTo( num );
 
-		m_mixerChannels[num]->m_volumeModel.loadSettings( fxch, "volume" );
-		m_mixerChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
-		m_mixerChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
-		m_mixerChannels[num]->m_name = fxch.attribute( "name" );
-		if( fxch.hasAttribute( "color" ) )
+		m_mixerChannels[num]->m_volumeModel.loadSettings( mixch, "volume" );
+		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
+		m_mixerChannels[num]->m_soloModel.loadSettings( mixch, "soloed" );
+		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
+		if( mixch.hasAttribute( "color" ) )
 		{
 			m_mixerChannels[num]->m_hasColor = true;
-			m_mixerChannels[num]->m_color.setNamedColor( fxch.attribute( "color" ) );
+			m_mixerChannels[num]->m_color.setNamedColor( mixch.attribute( "color" ) );
 		}
 
-		m_mixerChannels[num]->m_fxChain.restoreState( fxch.firstChildElement(
+		m_mixerChannels[num]->m_fxChain.restoreState( mixch.firstChildElement(
 			m_mixerChannels[num]->m_fxChain.nodeName() ) );
 
 		// mixer sends
-		QDomNodeList chData = fxch.childNodes();
+		QDomNodeList chData = mixch.childNodes();
 		for( unsigned int i=0; i<chData.length(); ++i )
 		{
 			QDomElement chDataItem = chData.at(i).toElement();

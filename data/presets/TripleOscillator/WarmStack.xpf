@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Warm Stack" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="69" vol="45">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="69" vol="45">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="10" coarse0="0" coarse1="0" coarse2="0" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="-10" pan0="0" modalgo3="0" pan1="0" stphdetun0="4" pan2="0" stphdetun1="0" wavetype0="1" stphdetun2="0" wavetype1="0" wavetype2="2" vol0="25" vol1="25" phoffset0="40" phoffset1="0" vol2="30"/>
       </instrument>
