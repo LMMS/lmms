@@ -913,7 +913,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
 
 	connect(m_pattern, SIGNAL(dataChanged()), this, SLOT(update()));
-	connect(m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT(update()));
+	connect(m_pattern->instrumentTrack()->pianoModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_pattern->instrumentTrack()->firstKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_pattern->instrumentTrack()->lastKeyModel(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect(m_pattern->instrumentTrack()->microtuner()->keymapModel(), SIGNAL(dataChanged()), this, SLOT(update()));
