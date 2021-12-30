@@ -168,7 +168,7 @@ protected:
 	int getKey( int y ) const;
 	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
-					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
+					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName, bool drawEndmark );
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes() const;
@@ -467,6 +467,8 @@ private:
 	int m_ghostNoteOpacity;
 	bool m_noteBorders;
 	bool m_ghostNoteBorders;
+	bool m_noteEndmark;
+	bool m_ghostNoteEndmark;
 	QColor m_backgroundShade;
 	/* white key properties */
 	int m_whiteKeyWidth;

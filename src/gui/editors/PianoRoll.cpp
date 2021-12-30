@@ -209,6 +209,8 @@ PianoRoll::PianoRoll() :
 	m_ghostNoteOpacity( 255 ),
 	m_noteBorders( true ),
 	m_ghostNoteBorders( true ),
+	m_noteEndmark( true ),
+	m_ghostNoteEndmark ( false ),
 	m_backgroundShade( 0, 0, 0 ),
 	m_whiteKeyWidth(WHITE_KEY_WIDTH),
 	m_blackKeyWidth(BLACK_KEY_WIDTH)
@@ -970,7 +972,7 @@ void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 
 void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 				int width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
-				const QColor & selCol, const int noteOpc, const bool borders, bool drawNoteName )
+				const QColor & selCol, const int noteOpc, const bool borders, bool drawNoteName, bool drawEndmark )
 {
 	++x;
 	++y;
@@ -1068,7 +1070,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 	// draw the note endmark, to hint the user to resize
 	p.setBrush( col );
-	if( width > 2 )
+	if( drawEndmark && width > 2 )
 	{
 		const int endmarkWidth = 3 - borderWidth;
 		p.drawRect( x + noteWidth - endmarkWidth, y, endmarkWidth, noteHeight );
@@ -3433,7 +3435,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					drawNoteRect(
 						p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 						note, m_ghostNoteColor, m_ghostNoteTextColor, m_selectedNoteColor,
-						m_ghostNoteOpacity, m_ghostNoteBorders, drawNoteNames);
+						m_ghostNoteOpacity, m_ghostNoteBorders, drawNoteNames, m_ghostNoteEndmark);
 				}
 
 			}
@@ -3471,7 +3473,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 					note, m_noteColor, m_noteTextColor, m_selectedNoteColor,
-					m_noteOpacity, m_noteBorders, drawNoteNames);
+					m_noteOpacity, m_noteBorders, drawNoteNames, m_noteEndmark);
 			}
 
 			// draw note editing stuff
@@ -3592,7 +3594,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawNoteRect(
 					p, x + m_whiteKeyWidth, noteYPos(note->key()), note_width,
 					note, m_stepRecorder.curStepNoteColor(), m_noteTextColor, m_selectedNoteColor,
-					m_noteOpacity, m_noteBorders, drawNoteNames);
+					m_noteOpacity, m_noteBorders, drawNoteNames, m_noteEndmark);
 			}
 		}
 
