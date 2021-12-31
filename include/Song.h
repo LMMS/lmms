@@ -364,7 +364,7 @@ public slots:
 	void record();
 	void playAndRecord();
 	void playBB();
-	void playMidiClip( const MidiClip * clipToPlay, bool loop = true );
+	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -473,8 +473,8 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	bar_t m_length;
 
-	const MidiClip* m_clipToPlay;
-	bool m_loopClip;
+	const MidiClip* m_midiClipToPlay;
+	bool m_loopMidiClip;
 
 	double m_elapsedMilliSeconds[Mode_Count];
 	tick_t m_elapsedTicks;

@@ -5258,7 +5258,7 @@ void PianoRollWindow::exportMidiClip()
 		exportDialog.setDefaultSuffix(suffix);
 
 		const QString fullPath = exportDialog.selectedFiles()[0];
-		DataFile dataFile(DataFile::NoteClip);
+		DataFile dataFile(DataFile::MidiClip);
 		m_editor->m_midiClip->saveSettings(dataFile, dataFile.content());
 
 		if (dataFile.writeFile(fullPath))

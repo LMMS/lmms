@@ -89,8 +89,8 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_clipToPlay( nullptr ),
-	m_loopClip( false ),
+	m_midiClipToPlay( nullptr ),
+	m_loopMidiClip( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
@@ -228,10 +228,10 @@ void Song::processNextBuffer()
 			break;
 
 		case Mode_PlayMidiClip:
-			if (m_clipToPlay)
+			if (m_midiClipToPlay)
 			{
-				clipNum = m_clipToPlay->getTrack()->getClipNum(m_clipToPlay);
-				trackList.push_back(m_clipToPlay->getTrack());
+				clipNum = m_midiClipToPlay->getTrack()->getClipNum(m_midiClipToPlay);
+				trackList.push_back(m_midiClipToPlay->getTrack());
 			}
 			break;
 
@@ -294,9 +294,9 @@ void Song::processNextBuffer()
 			{
 				enforceLoop(TimePos{0}, TimePos{Engine::getBBTrackContainer()->lengthOfCurrentBB(), 0});
 			}
-			else if (m_playMode == Mode_PlayMidiClip && m_loopClip && !loopEnabled)
+			else if (m_playMode == Mode_PlayMidiClip && m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_clipToPlay->length());
+				enforceLoop(TimePos{0}, m_midiClipToPlay->length());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -539,17 +539,17 @@ void Song::playBB()
 
 
 
-void Song::playMidiClip( const MidiClip* clipToPlay, bool loop )
+void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 {
 	if( isStopped() == false )
 	{
 		stop();
 	}
 
-	m_clipToPlay = clipToPlay;
-	m_loopClip = loop;
+	m_midiClipToPlay = midiClipToPlay;
+	m_loopMidiClip = loop;
 
-	if( m_clipToPlay != nullptr )
+	if( m_midiClipToPlay != nullptr )
 	{
 		m_playMode = Mode_PlayMidiClip;
 		m_playing = true;
