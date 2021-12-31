@@ -532,7 +532,7 @@ DataFile ClipView::createClipDataFiles(
 	Track * t = m_trackView->getTrack();
 	TrackContainer * tc = t->trackContainer();
 	DataFile dataFile( DataFile::DragNDropData );
-	QDomElement clipParent = dataFile.createElement( "clips" );
+	QDomElement clipParent = dataFile.createElement( "tcos" ); //TODO: rename to "clips"
 
 	typedef QVector<ClipView *> clipViewVector;
 	for( clipViewVector::const_iterator it = clipViews.begin();
@@ -541,7 +541,7 @@ DataFile ClipView::createClipDataFiles(
 		// Insert into the dom under the "clips" element
 		Track* clipTrack = ( *it )->m_trackView->getTrack();
 		int trackIndex = tc->tracks().indexOf( clipTrack );
-		QDomElement clipElement = dataFile.createElement( "clip" );
+		QDomElement clipElement = dataFile.createElement( "tco" ); //TODO: rename to "clip"
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", clipTrack->type() );
 		clipElement.setAttribute( "trackName", clipTrack->name() );
