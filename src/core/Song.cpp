@@ -89,7 +89,7 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_clipToPlay( nullptr ),
+	m_midiClipToPlay( nullptr ),
 	m_loopClip( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
@@ -228,9 +228,9 @@ void Song::processNextBuffer()
 			break;
 
 		case Mode_PlayClip:
-			if (m_clipToPlay)
+			if (m_midiClipToPlay)
 			{
-				clipNum = m_clipToPlay->getTrack()->getClipNum(m_clipToPlay);
+				clipNum = m_midiClipToPlay->getTrack()->getClipNum(m_midiClipToPlay);
 				trackList.push_back(m_clipToPlay->getTrack());
 			}
 			break;
@@ -288,7 +288,7 @@ void Song::processNextBuffer()
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
 			getPlayPos().setCurrentFrame(frameOffsetInTick);
 
-			// If we are playing a BB track, or a clip with no loop enabled,
+			// If we are playing a BB track, or a MIDI clip with no loop enabled,
 			// loop back to the beginning when we reach the end
 			if (m_playMode == Mode_PlayBB)
 			{

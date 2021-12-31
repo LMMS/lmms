@@ -1,5 +1,5 @@
 /*
- * MidiClipView.cpp - implementation of class clip which holds notes
+ * MidiClipView.cpp - implementation of class MidiClipView which displays notes
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>

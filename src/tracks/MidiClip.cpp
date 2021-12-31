@@ -386,7 +386,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.setAttribute( "color", color().name() );
 	}
 	// as the target of copied/dragged clip is always an existing
-	// clip, we must not store actual position, instead we store -1
+	// MIDI clip, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
 	if( _this.parentNode().nodeName() == "clipboard" ||
 			_this.parentNode().nodeName() == "dnddata" )

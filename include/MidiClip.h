@@ -91,7 +91,8 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "clip";
+		//TODO: rename to "midiClip"
+		return "pattern";
 	}
 
 	inline InstrumentTrack * instrumentTrack() const

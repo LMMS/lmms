@@ -722,8 +722,8 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
 	{
 		MidiClip* c = dynamic_cast<MidiClip*>( *it );
-		// everything which is not a clip won't be played
-		// A clip playing in the Piano Roll window will always play
+		// everything which is not a MIDI clip won't be played
+		// A MIDI clip playing in the Piano Roll window will always play
 		if(c == nullptr ||
 			(Engine::getSong()->playMode() != Song::Mode_PlayClip
 			&& (*it)->isMuted()))
