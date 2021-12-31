@@ -1526,7 +1526,7 @@ void AutomationEditor::play()
 
 	if( !m_clip->getTrack() )
 	{
-		if( Engine::getSong()->playMode() != Song::Mode_PlayClip )
+		if( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip )
 		{
 			Engine::getSong()->stop();
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );

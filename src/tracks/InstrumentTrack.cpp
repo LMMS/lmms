@@ -214,7 +214,7 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayClip &&
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip &&
 				n && n->isBbTrackMuted() ) || ! m_instrument )
 	{
 		return;
@@ -725,7 +725,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// everything which is not a MIDI clip won't be played
 		// A MIDI clip playing in the Piano Roll window will always play
 		if(c == nullptr ||
-			(Engine::getSong()->playMode() != Song::Mode_PlayClip
+			(Engine::getSong()->playMode() != Song::Mode_PlayMidiClip
 			&& (*it)->isMuted()))
 		{
 			continue;

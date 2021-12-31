@@ -292,9 +292,9 @@ PianoRoll::PianoRoll() :
 	// add time-line
 	m_timeLine = new TimeLineWidget(m_whiteKeyWidth, 0, m_ppb,
 					Engine::getSong()->getPlayPos(
-						Song::Mode_PlayClip ),
+						Song::Mode_PlayMidiClip ),
 						m_currentPosition,
-						Song::Mode_PlayClip, this );
+						Song::Mode_PlayMidiClip, this );
 	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
 		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
@@ -850,7 +850,7 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 
 	// force the song-editor to stop playing if it played clip before
 	if( Engine::getSong()->isPlaying() &&
-		Engine::getSong()->playMode() == Song::Mode_PlayClip )
+		Engine::getSong()->playMode() == Song::Mode_PlayMidiClip )
 	{
 		Engine::getSong()->playMidiClip( nullptr );
 	}
@@ -3730,7 +3730,7 @@ void PianoRoll::resizeEvent(QResizeEvent* re)
 {
 	updatePositionLineHeight();
 	updateScrollbars();
-	Engine::getSong()->getPlayPos(Song::Mode_PlayClip)
+	Engine::getSong()->getPlayPos(Song::Mode_PlayMidiClip)
 		.m_timeLine->setFixedWidth(width());
 	update();
 }
@@ -3961,7 +3961,7 @@ void PianoRoll::play()
 		return;
 	}
 
-	if( Engine::getSong()->playMode() != Song::Mode_PlayClip )
+	if( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip )
 	{
 		Engine::getSong()->playMidiClip( m_clip );
 	}
@@ -4039,7 +4039,7 @@ bool PianoRoll::toggleStepRecording()
 			{
 				m_stepRecorder.start(
 					Engine::getSong()->getPlayPos(
-						Song::Mode_PlayClip), newNoteLen());
+						Song::Mode_PlayMidiClip), newNoteLen());
 			}
 		}
 	}
@@ -4067,7 +4067,7 @@ void PianoRoll::startRecordNote(const Note & n )
 		if( m_recording &&
 			Engine::getSong()->isPlaying() &&
 			(Engine::getSong()->playMode() == desiredPlayModeForAccompany() ||
-			Engine::getSong()->playMode() == Song::Mode_PlayClip ))
+			Engine::getSong()->playMode() == Song::Mode_PlayMidiClip ))
 		{
 			TimePos sub;
 			if( Engine::getSong()->playMode() == Song::Mode_PlaySong )
@@ -4101,7 +4101,7 @@ void PianoRoll::finishRecordNote(const Note & n )
 				( Engine::getSong()->playMode() ==
 						desiredPlayModeForAccompany() ||
 					Engine::getSong()->playMode() ==
-						Song::Mode_PlayClip ) )
+						Song::Mode_PlayMidiClip ) )
 		{
 			for( QList<Note>::Iterator it = m_recordingNotes.begin();
 						it != m_recordingNotes.end(); ++it )
@@ -4469,7 +4469,7 @@ void PianoRoll::autoScroll( const TimePos & t )
 void PianoRoll::updatePosition( const TimePos & t )
 {
 	if( ( Engine::getSong()->isPlaying()
-			&& Engine::getSong()->playMode() == Song::Mode_PlayClip
+			&& Engine::getSong()->playMode() == Song::Mode_PlayMidiClip
 			&& m_timeLine->autoScroll() == TimeLineWidget::AutoScrollEnabled
 		) || m_scrollBack )
 	{
@@ -4506,7 +4506,7 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 	Song * s = Engine::getSong();
 
 	if( m_recording && hasValidMidiClip() &&
-					s->playMode() != Song::Mode_PlayClip )
+					s->playMode() != Song::Mode_PlayMidiClip )
 	{
 		TimePos pos = t;
 		if( s->playMode() != Song::Mode_PlayBB )
@@ -4515,7 +4515,7 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 		}
 		if( (int) pos > 0 )
 		{
-			s->getPlayPos( Song::Mode_PlayClip ).setTicks( pos );
+			s->getPlayPos( Song::Mode_PlayMidiClip ).setTicks( pos );
 			autoScroll( pos );
 		}
 	}

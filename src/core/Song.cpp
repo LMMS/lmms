@@ -89,7 +89,7 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_midiClipToPlay( nullptr ),
+	m_clipToPlay( nullptr ),
 	m_loopClip( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
@@ -227,10 +227,10 @@ void Song::processNextBuffer()
 			}
 			break;
 
-		case Mode_PlayClip:
-			if (m_midiClipToPlay)
+		case Mode_PlayMidiClip:
+			if (m_clipToPlay)
 			{
-				clipNum = m_midiClipToPlay->getTrack()->getClipNum(m_midiClipToPlay);
+				clipNum = m_clipToPlay->getTrack()->getClipNum(m_clipToPlay);
 				trackList.push_back(m_clipToPlay->getTrack());
 			}
 			break;
@@ -294,7 +294,7 @@ void Song::processNextBuffer()
 			{
 				enforceLoop(TimePos{0}, TimePos{Engine::getBBTrackContainer()->lengthOfCurrentBB(), 0});
 			}
-			else if (m_playMode == Mode_PlayClip && m_loopClip && !loopEnabled)
+			else if (m_playMode == Mode_PlayMidiClip && m_loopClip && !loopEnabled)
 			{
 				enforceLoop(TimePos{0}, m_clipToPlay->length());
 			}
@@ -551,7 +551,7 @@ void Song::playMidiClip( const MidiClip* clipToPlay, bool loop )
 
 	if( m_clipToPlay != nullptr )
 	{
-		m_playMode = Mode_PlayClip;
+		m_playMode = Mode_PlayMidiClip;
 		m_playing = true;
 		m_paused = false;
 	}
