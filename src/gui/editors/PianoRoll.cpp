@@ -1222,6 +1222,11 @@ void PianoRoll::shiftPos(int amount) //Shift notes pos by amount
 void PianoRoll::shiftPos(NoteVector notes, int amount)
 {
 	m_pattern->addJournalCheckPoint();
+
+	if (notes.isEmpty()) {
+		return;
+	}
+
 	auto leftMostPos = notes.first()->pos();
 	//Limit leftwards shifts to prevent moving left of pattern start
 	auto shiftAmount = (leftMostPos > -amount) ? amount : -leftMostPos;
