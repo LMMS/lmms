@@ -55,7 +55,7 @@ public:
 	// specifies origin of NotePlayHandle
 	enum Origins
 	{
-		OriginMidiClip,		/*! playback of a note from a clip */
+		OriginMidiClip,		/*! playback of a note from a MIDI clip */
 		OriginMidiInput,	/*! playback of a MIDI note input event */
 		OriginNoteStacking,	/*! created by note stacking instrument function */
 		OriginArpeggio,		/*! created by arpeggio instrument function */
@@ -249,7 +249,7 @@ public:
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
-	/*! Set song-global offset (relative to containing clip) in order to properly perform the note detuning */
+	/*! Set song-global offset (relative to containing MIDI clip) in order to properly perform the note detuning */
 	void setSongGlobalParentOffset( const TimePos& offset )
 	{
 		m_songGlobalParentOffset = offset;

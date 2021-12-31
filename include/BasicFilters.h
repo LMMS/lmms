@@ -812,7 +812,7 @@ public:
 		_freq = qBound( minFreq(), _freq, 20000.0f );
 		const float omega = F_2PI * _freq * m_sampleRatio;
 		const float tsin = sinf( omega ) * 0.5f;
-		const float clips = cosf( omega );
+		const float tcos = cosf( omega );
 
 		const float alpha = tsin / _q;
 

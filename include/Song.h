@@ -66,7 +66,7 @@ public:
 		Mode_None,
 		Mode_PlaySong,
 		Mode_PlayBB,
-		Mode_PlayClip,
+		Mode_PlayMidiClip,
 		Mode_PlayAutomationClip,
 		Mode_Count
 	} ;
