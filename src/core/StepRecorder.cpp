@@ -33,7 +33,7 @@ const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70;
 StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
 	m_pianoRoll(pianoRoll),
 	m_stepRecorderWidget(stepRecorderWidget),
-	m_clip(nullptr)
+	m_midiClip(nullptr)
 {
 	m_stepRecorderWidget.hide();
 }
@@ -226,16 +226,16 @@ void StepRecorder::stepBackwards()
 
 void StepRecorder::applyStep()
 {
-	m_clip->addJournalCheckPoint();
+	m_midiClip->addJournalCheckPoint();
 
 	for (const StepNote* stepNote : m_curStepNotes)
 	{
-		m_clip->addNote(stepNote->m_note, false);
+		m_midiClip->addNote(stepNote->m_note, false);
 	}
 
-	m_clip->rearrangeAllNotes();
-	m_clip->updateLength();
-	m_clip->dataChanged();
+	m_midiClip->rearrangeAllNotes();
+	m_midiClip->updateLength();
+	m_midiClip->dataChanged();
 	Engine::getSong()->setModified();
 
 	prepareNewStep();
@@ -269,12 +269,12 @@ void StepRecorder::prepareNewStep()
 
 void StepRecorder::setCurrentMidiClip( MidiClip* newMidiClip )
 {
-	if(m_clip != nullptr && m_clip != newMidiClip)
+	if(m_midiClip != nullptr && m_midiClip != newMidiClip)
 	{
 		dismissStep();
 	}
 
-	m_clip = newMidiClip;
+	m_midiClip = newMidiClip;
 }
 
 void StepRecorder::removeNotesReleasedForTooLong()

@@ -93,7 +93,7 @@ class StepRecorder : public QObject
 
 	QTimer m_updateReleasedTimer;
 
-	MidiClip* m_clip;
+	MidiClip* m_midiClip;
 
 	class StepNote
 	{
