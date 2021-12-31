@@ -682,7 +682,7 @@ ClipView   {
 	font-size: 11px;
 }
 
-/* instrument clip */
+/* MIDI (instrument) clip */
 MidiClipView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
