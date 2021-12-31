@@ -538,7 +538,7 @@ DataFile ClipView::createClipDataFiles(
 	for( clipViewVector::const_iterator it = clipViews.begin();
 			it != clipViews.end(); ++it )
 	{
-		// Insert into the dom under the "clips" element
+		// Insert into the dom under the "tcos" element (TODO: rename element to "clips")
 		Track* clipTrack = ( *it )->m_trackView->getTrack();
 		int trackIndex = tc->tracks().indexOf( clipTrack );
 		QDomElement clipElement = dataFile.createElement( "tco" ); //TODO: rename to "clip"
