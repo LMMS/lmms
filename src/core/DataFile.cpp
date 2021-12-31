@@ -200,7 +200,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NoteClip:
+	case Type::MidiClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
