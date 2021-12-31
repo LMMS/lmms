@@ -111,7 +111,7 @@ public:
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
 	void setCurrentMidiClip( MidiClip* newMidiClip );
-	void setGhostClip( MidiClip* newMidiClip );
+	void setGhostMidiClip( MidiClip* newMidiClip );
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
 
@@ -132,12 +132,12 @@ public:
 
 	const MidiClip* currentMidiClip() const
 	{
-		return m_clip;
+		return m_midiClip;
 	}
 
 	bool hasValidMidiClip() const
 	{
-		return m_clip != nullptr;
+		return m_midiClip != nullptr;
 	}
 
 	Song::PlayModes desiredPlayModeForAccompany() const;
@@ -349,7 +349,7 @@ private:
 	static const QVector<float> m_zoomLevels;
 	static const QVector<float> m_zoomYLevels;
 
-	MidiClip* m_clip;
+	MidiClip* m_midiClip;
 	NoteVector m_ghostNotes;
 
 	inline const NoteVector & ghostNotes() const
@@ -498,7 +498,7 @@ public:
 
 	const MidiClip* currentMidiClip() const;
 	void setCurrentMidiClip( MidiClip* clip );
-	void setGhostClip( MidiClip* clip );
+	void setGhostMidiClip( MidiClip* clip );
 
 	int quantization() const;
 

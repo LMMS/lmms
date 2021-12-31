@@ -112,7 +112,7 @@ void MidiClipView::openInPianoRoll()
 
 void MidiClipView::setGhostInPianoRoll()
 {
-	getGUI()->pianoRoll()->setGhostClip( m_clip );
+	getGUI()->pianoRoll()->setGhostMidiClip( m_clip );
 	getGUI()->pianoRoll()->parentWidget()->show();
 	getGUI()->pianoRoll()->show();
 	getGUI()->pianoRoll()->setFocus();
