@@ -95,7 +95,7 @@ DataFile::typeDescStruct
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NoteClip, "pattern" }
+	{ DataFile::MidiClip, "pattern" }
 } ;
 
 
