@@ -10090,7 +10090,7 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5254"/>
-        <source>MidiClip saved to %1</source>
+        <source>Clip saved to %1</source>
         <translation type="unfinished"/>
     </message>
     <message>

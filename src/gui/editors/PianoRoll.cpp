@@ -5264,7 +5264,7 @@ void PianoRollWindow::exportMidiClip()
 		if (dataFile.writeFile(fullPath))
 		{
 			TextFloat::displayMessage(tr("Export clip success"),
-				tr("MidiClip saved to %1").arg(fullPath),
+				tr("Clip saved to %1").arg(fullPath),
 				embed::getIconPixmap("project_export"), 4000);
 		}
 	}

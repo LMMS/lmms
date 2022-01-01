@@ -10383,7 +10383,7 @@ LMMS ile ilgili belgeler için lütfen http://lmms.sf.net/wiki adresini ziyaret 
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5254"/>
-        <source>MidiClip saved to %1</source>
+        <source>Clip saved to %1</source>
         <translation>Desen %1&apos;e kaydedildi</translation>
     </message>
     <message>

@@ -10096,7 +10096,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5254"/>
-        <source>MidiClip saved to %1</source>
+        <source>Clip saved to %1</source>
         <translation>Pattern mentve a(z) %1 fájlba.</translation>
     </message>
     <message>
