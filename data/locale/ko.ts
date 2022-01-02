@@ -5461,7 +5461,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="43"/>
         <location filename="../../src/core/Mixer.cpp" line="58"/>

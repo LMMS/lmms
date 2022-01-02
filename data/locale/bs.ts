@@ -2800,7 +2800,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
         <location filename="src/core/Mixer.cpp" line="41"/>
         <location filename="src/core/Mixer.cpp" line="56"/>

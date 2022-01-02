@@ -36,7 +36,7 @@
 #include "BBTrackContainer.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
-FxRoute::FxRoute( MixerChannel * from, MixerChannel * to, float amount ) :
+MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
 	m_amount( amount, 0, 1, 0.001, nullptr,
@@ -47,12 +47,12 @@ FxRoute::FxRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 }
 
 
-FxRoute::~FxRoute()
+MixerRoute::~MixerRoute()
 {
 }
 
 
-void FxRoute::updateName()
+void MixerRoute::updateName()
 {
 	m_amount.setDisplayName(
 			tr( "Amount to send from channel %1 to channel %2" ).arg( m_from->m_channelIndex ).arg( m_to->m_channelIndex ) );
@@ -90,7 +90,7 @@ MixerChannel::~MixerChannel()
 
 inline void MixerChannel::processed()
 {
-	for( const FxRoute * receiverRoute : m_sends )
+	for( const MixerRoute * receiverRoute : m_sends )
 	{
 		if( receiverRoute->receiver()->m_muted == false )
 		{
@@ -123,7 +123,7 @@ void MixerChannel::doProcessing()
 
 	if( m_muted == false )
 	{
-		for( FxRoute * senderRoute : m_receives )
+		for( MixerRoute * senderRoute : m_receives )
 		{
 			MixerChannel * sender = senderRoute->sender();
 			FloatModel * sendModel = senderRoute->amount();
@@ -202,9 +202,9 @@ Mixer::Mixer() :
 
 Mixer::~Mixer()
 {
-	while( ! m_fxRoutes.isEmpty() )
+	while( ! m_mixerRoutes.isEmpty() )
 	{
-		deleteChannelSend( m_fxRoutes.first() );
+		deleteChannelSend( m_mixerRoutes.first() );
 	}
 	while( m_mixerChannels.size() )
 	{
@@ -355,11 +355,11 @@ void Mixer::deleteChannel( int index )
 		m_mixerChannels[i]->m_channelIndex = i;
 
 		// now check all routes and update names of the send models
-		for( FxRoute * r : m_mixerChannels[i]->m_sends )
+		for( MixerRoute * r : m_mixerChannels[i]->m_sends )
 		{
 			r->updateName();
 		}
-		for( FxRoute * r : m_mixerChannels[i]->m_receives )
+		for( MixerRoute * r : m_mixerChannels[i]->m_receives )
 		{
 			r->updateName();
 		}
@@ -440,7 +440,7 @@ void Mixer::moveChannelRight( int index )
 
 
 
-FxRoute * Mixer::createChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel,
+MixerRoute * Mixer::createChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel,
 								float amount )
 {
 //	qDebug( "requested: %d to %d", fromChannel, toChannel );
@@ -463,14 +463,14 @@ FxRoute * Mixer::createChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel,
 }
 
 
-FxRoute * Mixer::createRoute( MixerChannel * from, MixerChannel * to, float amount )
+MixerRoute * Mixer::createRoute( MixerChannel * from, MixerChannel * to, float amount )
 {
 	if( from == to )
 	{
 		return nullptr;
 	}
 	Engine::audioEngine()->requestChangeInModel();
-	FxRoute * route = new FxRoute( from, to, amount );
+	MixerRoute * route = new MixerRoute( from, to, amount );
 
 	// add us to from's sends
 	from->m_sends.append( route );
@@ -479,7 +479,7 @@ FxRoute * Mixer::createRoute( MixerChannel * from, MixerChannel * to, float amou
 	to->m_receives.append( route );
 
 	// add us to mixer's list
-	Engine::mixer()->m_fxRoutes.append( route );
+	Engine::mixer()->m_mixerRoutes.append( route );
 	Engine::audioEngine()->doneChangeInModel();
 
 	return route;
@@ -505,7 +505,7 @@ void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 }
 
 
-void Mixer::deleteChannelSend( FxRoute * route )
+void Mixer::deleteChannelSend( MixerRoute * route )
 {
 	Engine::audioEngine()->requestChangeInModel();
 	// remove us from from's sends
@@ -513,7 +513,7 @@ void Mixer::deleteChannelSend( FxRoute * route )
 	// remove us from to's receives
 	route->receiver()->m_receives.remove( route->receiver()->m_receives.indexOf( route ) );
 	// remove us from mixer's list
-	Engine::mixer()->m_fxRoutes.remove( Engine::mixer()->m_fxRoutes.indexOf( route ) );
+	Engine::mixer()->m_mixerRoutes.remove( Engine::mixer()->m_mixerRoutes.indexOf( route ) );
 	delete route;
 	Engine::audioEngine()->doneChangeInModel();
 }
@@ -567,7 +567,7 @@ FloatModel * Mixer::channelSendModel( mix_ch_t fromChannel, mix_ch_t toChannel )
 	const MixerChannel * from = m_mixerChannels[fromChannel];
 	const MixerChannel * to = m_mixerChannels[toChannel];
 
-	for( FxRoute * route : from->m_sends )
+	for( MixerRoute * route : from->m_sends )
 	{
 		if( route->receiver() == to )
 		{
@@ -806,8 +806,8 @@ void Mixer::loadSettings( const QDomElement & _this )
 			{
 				int sendTo = chDataItem.attribute( "channel" ).toInt();
 				allocateChannelsTo( sendTo ) ;
-				FxRoute * fxr = createChannelSend( num, sendTo, 1.0f );
-				if( fxr ) fxr->amount()->loadSettings( chDataItem, "amount" );
+				MixerRoute * mxr = createChannelSend( num, sendTo, 1.0f );
+				if( mxr ) mxr->amount()->loadSettings( chDataItem, "amount" );
 			}
 		}
 

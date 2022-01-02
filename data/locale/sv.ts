@@ -5741,7 +5741,7 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="43"/>
         <location filename="../../src/core/Mixer.cpp" line="58"/>

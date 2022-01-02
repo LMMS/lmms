@@ -2253,7 +2253,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation type="unfinished"/>

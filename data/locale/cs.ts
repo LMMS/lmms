@@ -5458,7 +5458,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
         <location filename="../../src/core/Mixer.cpp" line="43"/>
         <location filename="../../src/core/Mixer.cpp" line="58"/>

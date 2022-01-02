@@ -34,8 +34,8 @@
 
 #include <QColor>
 
-class FxRoute;
-typedef QVector<FxRoute *> FxRouteVector;
+class MixerRoute;
+typedef QVector<MixerRoute *> MixerRouteVector;
 
 class MixerChannel : public ThreadableJob
 {
@@ -64,10 +64,10 @@ class MixerChannel : public ThreadableJob
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
 
 		// pointers to other channels that this one sends to
-		FxRouteVector m_sends;
+		MixerRouteVector m_sends;
 
 		// pointers to other channels that send to this one
-		FxRouteVector m_receives;
+		MixerRouteVector m_receives;
 
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
@@ -93,12 +93,12 @@ class MixerChannel : public ThreadableJob
 };
 
 
-class FxRoute : public QObject
+class MixerRoute : public QObject
 {
 	Q_OBJECT
 	public:		
-		FxRoute( MixerChannel * from, MixerChannel * to, float amount );
-		virtual ~FxRoute();
+		MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
+		virtual ~MixerRoute();
 		
 	mix_ch_t senderIndex() const
 	{
@@ -161,13 +161,13 @@ public:
 
 	// make the output of channel fromChannel go to the input of channel toChannel
 	// it is safe to call even if the send already exists
-	FxRoute * createChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel,
+	MixerRoute * createChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel,
 						   float amount = 1.0f);
-	FxRoute * createRoute( MixerChannel * from, MixerChannel * to, float amount );
+	MixerRoute * createRoute( MixerChannel * from, MixerChannel * to, float amount );
 
 	// delete the connection made by createChannelSend
 	void deleteChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel);
-	void deleteChannelSend( FxRoute * route );
+	void deleteChannelSend( MixerRoute * route );
 
 	// determine if adding a send from sendFrom to
 	// sendTo would result in an infinite mixer loop.
@@ -207,7 +207,7 @@ public:
 		return m_mixerChannels.size();
 	}
 
-	FxRouteVector m_fxRoutes;
+	MixerRouteVector m_mixerRoutes;
 
 private:
 	// the mixer channels in the mixer. index 0 is always master.
