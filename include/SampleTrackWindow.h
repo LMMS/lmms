@@ -26,7 +26,7 @@
 #ifndef SAMPLE_TRACK_WINDOW_H
 #define SAMPLE_TRACK_WINDOW_H
 
-#include "FxLineLcdSpinBox.h"
+#include "MixerLineLcdSpinBox.h"
 
 #include <QLineEdit>
 
@@ -82,7 +82,7 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	FxLineLcdSpinBox * m_effectChannelNumber;
+	MixerLineLcdSpinBox * m_effectChannelNumber;
 
 	EffectRackView * m_effectRack;
 } ;

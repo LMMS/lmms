@@ -5617,62 +5617,62 @@ Se till att du har skrivbehörighet till filen och mappen som innehåller filen 
     </message>
 </context>
 <context>
-    <name>FxLine</name>
+    <name>MixerLine</name>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="86"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="86"/>
         <source>Channel send amount</source>
         <translation>Kanalsändningsbelopp</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="242"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="242"/>
         <source>Move &amp;left</source>
         <translation>Flytta &amp;vänster</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="243"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="243"/>
         <source>Move &amp;right</source>
         <translation>Flytta &amp;höger</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="245"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="245"/>
         <source>Rename &amp;channel</source>
         <translation>Byt namn på &amp;kanal</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="250"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="250"/>
         <source>R&amp;emove channel</source>
         <translation>T&amp;a bort kanal</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="253"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="253"/>
         <source>Remove &amp;unused channels</source>
         <translation>Ta bort &amp;oanvända kanaler</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="255"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="255"/>
         <source>Set channel color</source>
         <translation>Ställ in kanalfärg</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="256"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="256"/>
         <source>Remove channel color</source>
         <translation>Ta bort kanalfärg</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="257"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="257"/>
         <source>Pick random channel color</source>
         <translation>Välj slumpmässig kanalfärg</translation>
     </message>
 </context>
 <context>
-    <name>FxLineLcdSpinBox</name>
+    <name>MixerLineLcdSpinBox</name>
     <message>
-        <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
         <source>Assign to:</source>
         <translation>Tilldela till:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
         <source>New mixer Channel</source>
         <translation>Ny FX-kanal</translation>
     </message>

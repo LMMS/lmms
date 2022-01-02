@@ -39,7 +39,7 @@
 #include "EffectRackView.h"
 
 class QButtonGroup;
-class FxLine;
+class MixerLine;
 
 class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
@@ -53,7 +53,7 @@ public:
 
 		void setChannelIndex( int index );
 
-		FxLine * m_fxLine;
+		MixerLine * m_mixerLine;
 		PixmapButton * m_muteBtn;
 		PixmapButton * m_soloBtn;
 		Fader * m_fader;
@@ -69,9 +69,9 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	inline FxLine * currentFxLine()
+	inline MixerLine * currentMixerLine()
 	{
-		return m_currentFxLine;
+		return m_currentMixerLine;
 	}
 
 	inline MixerChannelView * channelView(int index)
@@ -80,14 +80,14 @@ public:
 	}
 
 
-	void setCurrentFxLine( FxLine * _line );
-	void setCurrentFxLine( int _line );
+	void setCurrentMixerLine( MixerLine * _line );
+	void setCurrentMixerLine( int _line );
 
 	void clear();
 
 
 	// display the send button and knob correctly
-	void updateFxLine(int index);
+	void updateMixerLine(int index);
 
 	// notify the view that an mixer channel was deleted
 	void deleteChannel(int index);
@@ -120,7 +120,7 @@ private:
 
 	QVector<MixerChannelView *> m_mixerChannelViews;
 
-	FxLine * m_currentFxLine;
+	MixerLine * m_currentMixerLine;
 
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;

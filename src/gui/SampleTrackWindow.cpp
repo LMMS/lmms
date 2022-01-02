@@ -114,7 +114,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox(2, nullptr, tr("FX channel"), m_stv);
+	m_effectChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("FX channel"), m_stv);
 
 	basicControlsLayout->addWidget(m_effectChannelNumber, 0, 3);
 	basicControlsLayout->setAlignment(m_effectChannelNumber, widgetAlignment);

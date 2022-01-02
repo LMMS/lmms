@@ -129,7 +129,7 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu(title);
 
-	fxMenu->addAction(newFxLabel, this, SLOT(createFxLine()));
+	fxMenu->addAction(newFxLabel, this, SLOT(createMixerLine()));
 	fxMenu->addSeparator();
 
 	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
@@ -141,7 +141,7 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 			const auto index = currentChannel->m_channelIndex;
 			QString label = tr("FX %1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
 			fxMenu->addAction(label, [this, index](){
-				assignFxLine(index);
+				assignMixerLine(index);
 			});
 		}
 	}
@@ -208,7 +208,7 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 
 
 /*! \brief Create and assign a new mixer Channel for this track */
-void SampleTrackView::createFxLine()
+void SampleTrackView::createMixerLine()
 {
 	int channelIndex = getGUI()->mixerView()->addNewChannel();
 	auto channel = Engine::mixer()->effectChannel(channelIndex);
@@ -216,16 +216,16 @@ void SampleTrackView::createFxLine()
 	channel->m_name = getTrack()->name();
 	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
-	assignFxLine(channelIndex);
+	assignMixerLine(channelIndex);
 }
 
 
 
 
 /*! \brief Assign a specific mixer Channel for this track */
-void SampleTrackView::assignFxLine(int channelIndex)
+void SampleTrackView::assignMixerLine(int channelIndex)
 {
 	model()->effectChannelModel()->setValue(channelIndex);
 
-	getGUI()->mixerView()->setCurrentFxLine(channelIndex);
+	getGUI()->mixerView()->setCurrentMixerLine(channelIndex);
 }

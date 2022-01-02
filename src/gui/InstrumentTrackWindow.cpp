@@ -40,7 +40,7 @@
 #include "Engine.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
-#include "FxLineLcdSpinBox.h"
+#include "MixerLineLcdSpinBox.h"
 #include "Mixer.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
@@ -191,7 +191,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox( 2, nullptr, tr( "FX channel" ), m_itv );
+	m_effectChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "FX channel" ), m_itv );
 
 	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_effectChannelNumber, widgetAlignment );

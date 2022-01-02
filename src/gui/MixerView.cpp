@@ -40,7 +40,7 @@
 
 #include "MixerView.h"
 #include "Knob.h"
-#include "FxLine.h"
+#include "MixerLine.h"
 #include "Mixer.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -97,15 +97,15 @@ MixerView::MixerView() :
 	m_racksLayout->addWidget( m_mixerChannelViews[0]->m_rackView );
 
 	MixerChannelView * masterView = m_mixerChannelViews[0];
-	ml->addWidget( masterView->m_fxLine, 0, Qt::AlignTop );
+	ml->addWidget( masterView->m_mixerLine, 0, Qt::AlignTop );
 
-	QSize fxLineSize = masterView->m_fxLine->size();
+	QSize mixerLineSize = masterView->m_mixerLine->size();
 
 	// add mixer channels
 	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
-		chLayout->addWidget( m_mixerChannelViews[i]->m_fxLine );
+		chLayout->addWidget( m_mixerChannelViews[i]->m_mixerLine );
 	}
 
 	// add the scrolling section to the main layout
@@ -127,15 +127,15 @@ MixerView::MixerView() :
 	channelArea->setWidget( m_channelAreaWidget );
 	channelArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	channelArea->setFrameStyle( QFrame::NoFrame );
-	channelArea->setMinimumWidth( fxLineSize.width() * 6 );
-	channelArea->setFixedHeight( fxLineSize.height() +
+	channelArea->setMinimumWidth( mixerLineSize.width() * 6 );
+	channelArea->setFixedHeight( mixerLineSize.height() +
 			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new effect channel button
 	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
-	newChannelBtn->setFixedSize( fxLineSize );
+	newChannelBtn->setFixedSize( mixerLineSize );
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
@@ -143,7 +143,7 @@ MixerView::MixerView() :
 	// add the stacked layout for the effect racks of mixer channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
 
-	setCurrentFxLine( m_mixerChannelViews[0]->m_fxLine );
+	setCurrentMixerLine( m_mixerChannelViews[0]->m_mixerLine );
 
 	setLayout( ml );
 	updateGeometry();
@@ -186,10 +186,10 @@ int MixerView::addNewChannel()
 	int newChannelIndex = mix->createChannel();
 	m_mixerChannelViews.push_back(new MixerChannelView(m_channelAreaWidget, this,
 												 newChannelIndex));
-	chLayout->addWidget( m_mixerChannelViews[newChannelIndex]->m_fxLine );
+	chLayout->addWidget( m_mixerChannelViews[newChannelIndex]->m_mixerLine );
 	m_racksLayout->addWidget( m_mixerChannelViews[newChannelIndex]->m_rackView );
 
-	updateFxLine(newChannelIndex);
+	updateMixerLine(newChannelIndex);
 
 	updateMaxChannelSelector();
 
@@ -202,12 +202,12 @@ void MixerView::refreshDisplay()
 	// delete all views and re-add them
 	for( int i = 1; i<m_mixerChannelViews.size(); ++i )
 	{
-		chLayout->removeWidget(m_mixerChannelViews[i]->m_fxLine);
+		chLayout->removeWidget(m_mixerChannelViews[i]->m_mixerLine);
 		m_racksLayout->removeWidget( m_mixerChannelViews[i]->m_rackView );
 		delete m_mixerChannelViews[i]->m_fader;
 		delete m_mixerChannelViews[i]->m_muteBtn;
 		delete m_mixerChannelViews[i]->m_soloBtn;
-		delete m_mixerChannelViews[i]->m_fxLine;
+		delete m_mixerChannelViews[i]->m_mixerLine;
 		delete m_mixerChannelViews[i]->m_rackView;
 		delete m_mixerChannelViews[i];
 	}
@@ -218,17 +218,17 @@ void MixerView::refreshDisplay()
 	for( int i = 1; i < m_mixerChannelViews.size(); ++i )
 	{
 		m_mixerChannelViews[i] = new MixerChannelView(m_channelAreaWidget, this, i);
-		chLayout->addWidget(m_mixerChannelViews[i]->m_fxLine);
+		chLayout->addWidget(m_mixerChannelViews[i]->m_mixerLine);
 		m_racksLayout->addWidget( m_mixerChannelViews[i]->m_rackView );
 	}
 
-	// set selected fx line to 0
-	setCurrentFxLine( 0 );
+	// set selected mixer line to 0
+	setCurrentMixerLine( 0 );
 
-	// update all fx lines
+	// update all mixer lines
 	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
 	{
-		updateFxLine( i );
+		updateMixerLine( i );
 	}
 
 	updateMaxChannelSelector();
@@ -281,21 +281,21 @@ void MixerView::loadSettings( const QDomElement & _this )
 MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv,
 										  int channelIndex )
 {
-	m_fxLine = new FxLine(_parent, _mv, channelIndex);
+	m_mixerLine = new MixerLine(_parent, _mv, channelIndex);
 
 	MixerChannel *mixerChannel = Engine::mixer()->effectChannel(channelIndex);
 
 	m_fader = new Fader( &mixerChannel->m_volumeModel,
-					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
+					tr( "FX Fader %1" ).arg( channelIndex ), m_mixerLine );
 	m_fader->setLevelsDisplayedInDBFS();
 	m_fader->setMinPeak(dbfsToAmp(-42));
 	m_fader->setMaxPeak(dbfsToAmp(9));
 
 	m_fader->move( 16-m_fader->width()/2,
-					m_fxLine->height()-
+					m_mixerLine->height()-
 					m_fader->height()-5 );
 
-	m_muteBtn = new PixmapButton( m_fxLine, tr( "Mute" ) );
+	m_muteBtn = new PixmapButton( m_mixerLine, tr( "Mute" ) );
 	m_muteBtn->setModel( &mixerChannel->m_muteModel );
 	m_muteBtn->setActiveGraphic(
 				embed::getIconPixmap( "led_off" ) );
@@ -305,7 +305,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 	m_muteBtn->move( 9,  m_fader->y()-11);
 	ToolTip::add( m_muteBtn, tr( "Mute this mixer channel" ) );
 
-	m_soloBtn = new PixmapButton( m_fxLine, tr( "Solo" ) );
+	m_soloBtn = new PixmapButton( m_mixerLine, tr( "Solo" ) );
 	m_soloBtn->setModel( &mixerChannel->m_soloModel );
 	m_soloBtn->setActiveGraphic(
 				embed::getIconPixmap( "led_red" ) );
@@ -319,7 +319,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &mixerChannel->m_fxChain, _mv->m_racksWidget );
-	m_rackView->setFixedSize( EffectRackView::DEFAULT_WIDTH, FxLine::FxLineHeight );
+	m_rackView->setFixedSize( EffectRackView::DEFAULT_WIDTH, MixerLine::MixerLineHeight );
 }
 
 
@@ -341,27 +341,27 @@ void MixerView::toggledSolo()
 
 
 
-void MixerView::setCurrentFxLine( FxLine * _line )
+void MixerView::setCurrentMixerLine( MixerLine * _line )
 {
 	// select
-	m_currentFxLine = _line;
+	m_currentMixerLine = _line;
 	m_racksLayout->setCurrentWidget( m_mixerChannelViews[ _line->channelIndex() ]->m_rackView );
 
 	// set up send knob
 	for(int i = 0; i < m_mixerChannelViews.size(); ++i)
 	{
-		updateFxLine(i);
+		updateMixerLine(i);
 	}
 }
 
 
-void MixerView::updateFxLine(int index)
+void MixerView::updateMixerLine(int index)
 {
 	Mixer * mix = Engine::mixer();
 
 	// does current channel send to this channel?
-	int selIndex = m_currentFxLine->channelIndex();
-	FxLine * thisLine = m_mixerChannelViews[index]->m_fxLine;
+	int selIndex = m_currentMixerLine->channelIndex();
+	MixerLine * thisLine = m_mixerChannelViews[index]->m_mixerLine;
 	thisLine->setToolTip( Engine::mixer()->effectChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
@@ -390,7 +390,7 @@ void MixerView::deleteChannel(int index)
 	if( index == 0 ) return;
 
 	// remember selected line
-	int selLine = m_currentFxLine->channelIndex();
+	int selLine = m_currentMixerLine->channelIndex();
 
 	// in case the deleted channel is soloed or the remaining
 	// channels will be left in a muted state
@@ -400,14 +400,14 @@ void MixerView::deleteChannel(int index)
 	Engine::mixer()->deleteChannel(index);
 
 	// delete the view
-	chLayout->removeWidget(m_mixerChannelViews[index]->m_fxLine);
+	chLayout->removeWidget(m_mixerChannelViews[index]->m_mixerLine);
 	m_racksLayout->removeWidget( m_mixerChannelViews[index]->m_rackView );
 	delete m_mixerChannelViews[index]->m_fader;
 	delete m_mixerChannelViews[index]->m_muteBtn;
 	delete m_mixerChannelViews[index]->m_soloBtn;
-	// delete fxLine later to prevent a crash when deleting from context menu
-	m_mixerChannelViews[index]->m_fxLine->hide();
-	m_mixerChannelViews[index]->m_fxLine->deleteLater();
+	// delete mixerLine later to prevent a crash when deleting from context menu
+	m_mixerChannelViews[index]->m_mixerLine->hide();
+	m_mixerChannelViews[index]->m_mixerLine->deleteLater();
 	delete m_mixerChannelViews[index]->m_rackView;
 	delete m_mixerChannelViews[index];
 	m_channelAreaWidget->adjustSize();
@@ -415,7 +415,7 @@ void MixerView::deleteChannel(int index)
 	// make sure every channel knows what index it is
 	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
 	{
-		m_mixerChannelViews[i]->m_fxLine->setChannelIndex(i-1);
+		m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i-1);
 	}
 	m_mixerChannelViews.remove(index);
 
@@ -424,7 +424,7 @@ void MixerView::deleteChannel(int index)
 	{
 		selLine = m_mixerChannelViews.size()-1;
 	}
-	setCurrentFxLine(selLine);
+	setCurrentMixerLine(selLine);
 
 	updateMaxChannelSelector();
 }
@@ -483,7 +483,7 @@ void MixerView::moveChannelLeft(int index, int focusIndex)
 	m_mixerChannelViews[index - 1]->setChannelIndex( index - 1 );
 
 	// Focus on new position
-	setCurrentFxLine( focusIndex );
+	setCurrentMixerLine( focusIndex );
 }
 
 
@@ -503,7 +503,7 @@ void MixerView::moveChannelRight(int index)
 
 void MixerView::renameChannel(int index)
 {
-	m_mixerChannelViews[index]->m_fxLine->renameChannel();
+	m_mixerChannelViews[index]->m_mixerLine->renameChannel();
 }
 
 
@@ -513,28 +513,28 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 	switch(e->key())
 	{
 		case Qt::Key_Delete:
-			deleteChannel(m_currentFxLine->channelIndex());
+			deleteChannel(m_currentMixerLine->channelIndex());
 			break;
 		case Qt::Key_Left:
 			if( e->modifiers() & Qt::AltModifier )
 			{
-				moveChannelLeft( m_currentFxLine->channelIndex() );
+				moveChannelLeft( m_currentMixerLine->channelIndex() );
 			}
 			else
 			{
 				// select channel to the left
-				setCurrentFxLine( m_currentFxLine->channelIndex()-1 );
+				setCurrentMixerLine( m_currentMixerLine->channelIndex()-1 );
 			}
 			break;
 		case Qt::Key_Right:
 			if( e->modifiers() & Qt::AltModifier )
 			{
-				moveChannelRight( m_currentFxLine->channelIndex() );
+				moveChannelRight( m_currentMixerLine->channelIndex() );
 			}
 			else
 			{
 				// select channel to the right
-				setCurrentFxLine( m_currentFxLine->channelIndex()+1 );
+				setCurrentMixerLine( m_currentMixerLine->channelIndex()+1 );
 			}
 			break;
 		case Qt::Key_Insert:
@@ -546,7 +546,7 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
 		case Qt::Key_F2:
-			renameChannel( m_currentFxLine->channelIndex() );
+			renameChannel( m_currentMixerLine->channelIndex() );
 			break;
 	}
 }
@@ -568,11 +568,11 @@ void MixerView::closeEvent( QCloseEvent * _ce )
 
 
 
-void MixerView::setCurrentFxLine( int _line )
+void MixerView::setCurrentMixerLine( int _line )
 {
 	if( _line >= 0 && _line < m_mixerChannelViews.size() )
 	{
-		setCurrentFxLine( m_mixerChannelViews[_line]->m_fxLine );
+		setCurrentMixerLine( m_mixerChannelViews[_line]->m_mixerLine );
 	}
 }
 

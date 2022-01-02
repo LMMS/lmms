@@ -77,8 +77,8 @@ protected:
 	void dropEvent(QDropEvent *de) override;
 
 private slots:
-	void assignFxLine( int channelIndex );
-	void createFxLine();
+	void assignMixerLine( int channelIndex );
+	void createMixerLine();
 
 
 private:

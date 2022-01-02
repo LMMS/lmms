@@ -82,8 +82,8 @@ private slots:
 	void midiOutSelected();
 	void midiConfigChanged();
 
-	void assignFxLine( int channelIndex );
-	void createFxLine();
+	void assignMixerLine( int channelIndex );
+	void createMixerLine();
 
 	void handleConfigChange(QString cls, QString attr, QString value);
 

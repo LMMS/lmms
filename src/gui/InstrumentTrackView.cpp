@@ -36,7 +36,7 @@
 #include "ControllerConnectionDialog.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "FxLineLcdSpinBox.h"
+#include "MixerLineLcdSpinBox.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
@@ -220,7 +220,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 
 
 /*! \brief Create and assign a new mixer Channel for this track */
-void InstrumentTrackView::createFxLine()
+void InstrumentTrackView::createMixerLine()
 {
 	int channelIndex = getGUI()->mixerView()->addNewChannel();
 	auto channel = Engine::mixer()->effectChannel(channelIndex);
@@ -228,18 +228,18 @@ void InstrumentTrackView::createFxLine()
 	channel->m_name = getTrack()->name();
 	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
-	assignFxLine(channelIndex);
+	assignMixerLine(channelIndex);
 }
 
 
 
 
 /*! \brief Assign a specific mixer Channel for this track */
-void InstrumentTrackView::assignFxLine(int channelIndex)
+void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
 	model()->effectChannelModel()->setValue( channelIndex );
 
-	getGUI()->mixerView()->setCurrentFxLine( channelIndex );
+	getGUI()->mixerView()->setCurrentMixerLine( channelIndex );
 }
 
 
@@ -364,7 +364,7 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 	QMenu *fxMenu = new QMenu( title );
 
-	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
+	fxMenu->addAction( newFxLabel, this, SLOT( createMixerLine() ) );
 	fxMenu->addSeparator();
 
 	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
@@ -376,7 +376,7 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 			auto index = currentChannel->m_channelIndex;
 			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
 			fxMenu->addAction(label, [this, index](){
-				assignFxLine(index);
+				assignMixerLine(index);
 			});
 		}
 	}

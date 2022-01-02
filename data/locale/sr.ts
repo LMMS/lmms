@@ -2178,7 +2178,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FxLine</name>
+    <name>MixerLine</name>
     <message>
         <source>Channel send amount</source>
         <translation type="unfinished"/>
@@ -7752,7 +7752,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>fxLineLcdSpinBox</name>
+    <name>mixerLineLcdSpinBox</name>
     <message>
         <source>Assign to:</source>
         <translation type="unfinished"/>
