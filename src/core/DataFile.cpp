@@ -71,7 +71,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
 	&DataFile::upgrade_defaultTripleOscillatorHQ,
-	&DataFile::upgrade_mixerRename      ,	&DataFile::upgrade_mixerChannelRename
+	&DataFile::upgrade_mixerRename      ,	&DataFile::upgrade_mixerChannelRename,
+	&DataFile::upgrade_mixchRename
 };
 
 // Vector of all versions that have upgrade routines.
@@ -1760,7 +1761,7 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 }
 
 
-// This function aims to change the nodeName <fxmixer> of old project savings to <mixer>
+// This method aims to change the nodeName <fxmixer> of old project savings to <mixer>
 void DataFile::upgrade_mixerRename()
 {
 	QDomNodeList fxmixer = elementsByTagName("fxmixer");
@@ -1771,7 +1772,7 @@ void DataFile::upgrade_mixerRename()
 	}
 }
 
-// This function aims to change the nodename <fxchannel> of old savings to <mixerchannel>
+// This method aims to change the nodename <fxchannel> of old savings to <mixerchannel>
 void DataFile::upgrade_mixerChannelRename()
 {
 	QDomNodeList fxchannel = elementsByTagName("fxchannel");
@@ -1779,6 +1780,21 @@ void DataFile::upgrade_mixerChannelRename()
 	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
 	{
 		fxchannel.item(i).toElement().setTagName("mixerchannel");
+	}
+}
+
+// This method will change the attribute fxch of element <instrumenttrack> to mixch of old savings
+void DataFile::upgrade_mixchRename()
+{
+	QDomNodeList fxch = elementsByTagName("instrumenttrack");
+
+	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	{
+		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		{
+			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
+			fxch.item(i).toElement().removeAttribute("fxch");
+		}
 	}
 }
 
