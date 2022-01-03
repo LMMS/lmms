@@ -543,7 +543,7 @@ ExprFront::ExprFront(const char * expr, int last_func_samples)
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
 	
-		m_data->m_symbol_table.add_constant("e", F_E);
+        //m_data->m_symbol_table.add_constant("e", F_E); // use exp function instead...
 
 		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
 	
@@ -587,7 +587,7 @@ bool ExprFront::compile()
 		m_data->m_expression.register_symbol_table(m_data->m_symbol_table);
 		parser_t::settings_store sstore;
 		sstore.disable_all_logic_ops();
-		sstore.disable_all_assignment_ops();
+        //sstore.disable_all_assignment_ops();
 		sstore.disable_all_control_structures();
 		parser_t parser(sstore);
 	

@@ -98,16 +98,22 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track) :
 	m_interpolateW1(false, this),
 	m_interpolateW2(false, this),
 	m_interpolateW3(false, this),
-	m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("Panning 1")),
-	m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("Panning 2")),
+    m_panning1( 0.2, -1.0f, 1.0f, 0.01f, this, tr("Panning 1")),
+    m_panning2(-0.2, -1.0f, 1.0f, 0.01f, this, tr("Panning 2")),
 	m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("Rel trans")),
 	m_W1(GRAPH_LENGTH),
 	m_W2(GRAPH_LENGTH),
 	m_W3(GRAPH_LENGTH),
-	m_exprValid(false, this)
+    m_exprValid(false, this),
+    m_previous_frequency(0),
+    m_nph_of_previous(NULL)
 {
-	m_outputExpression[0]="sinew(integrate(f*(1+0.05sinew(12t))))*(2^(-(1.1+A2)*t)*(0.4+0.1(1+A3)+0.4sinew((2.5+2A1)t))^2)";
-	m_outputExpression[1]="expw(integrate(f*atan(500t)*2/pi))*0.5+0.12";
+    m_outputExpression[0]="sinew(integrate(f*(1+0.05saww(12t))))*(2^(-(1.1+A2)*t)*(0.4+0.1(1+A3)+0.4trianglew((2.5+2A1)t))^2)";
+    m_outputExpression[1]="var glitch :=prev+clamp(0,t/0.4,1)*(f-prev); trianglew(expw(integrate(glitch*atan(500t)*2/pi))*0.5)";
+    //m_wavesExpression[0]="floor(t*10)/9-0.5";
+    //m_wavesExpression[1]="floor(t*3)/2-0.12*exp((t*7)%1)";
+    //m_wavesExpression[2]="0.2((1+floor(t*5))*sin(((t*2)%1)*7))";
+
 }
 
 Xpressive::~Xpressive() {
@@ -203,20 +209,38 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
 
-	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == nullptr) {
+    if (/*nph->totalFramesPlayed() == 0 ||*/ nph->m_pluginData == nullptr) {
+        nph->m_pluginData = (void*)1;
 
 		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData(),Engine::audioEngine()->processingSampleRate());//give the "last" function a whole second
 		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData(),Engine::audioEngine()->processingSampleRate());
+        float previous_frequency;
+        if (m_previous_frequency == 0)
+        {
+            previous_frequency=nph->frequency();
+            m_nph_of_previous = nph;
+            m_previous_frequency = previous_frequency;
+        }
+        else
+        {
+            previous_frequency = m_previous_frequency;
+            m_nph_of_previous = nph;
+            m_previous_frequency = nph->frequency();
+        }
 
-		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
+        auto init_expression_step1 = [this, nph,previous_frequency](ExprFront* e) { //lambda function to init exprO1 and exprO2
 			//add the constants and the variables to the expression.
 			#if ENABLE_CUSTOM_KEY_MAPPING //removed because changes in the microtonal tuner.
 			e->add_constant("key", nph->key());//the key that was pressed.
 			e->add_constant("bnote", nph->instrumentTrack()->baseNote()); // the base note
 			#endif
+
+
+            e->add_constant("prev", previous_frequency);//frequency of previous note
 			e->add_constant("srate", Engine::audioEngine()->processingSampleRate());// sample rate of the audio engine
 			e->add_constant("v", nph->getVolume() / 255.0); //volume of the note.
 			e->add_constant("tempo", Engine::getSong()->getTempo());//tempo of the song.
+
 			e->add_variable("A1", m_A1);//A1,A2,A3: general purpose input controls.
 			e->add_variable("A2", m_A2);
 			e->add_variable("A3", m_A3);
@@ -244,6 +268,10 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 }
 
 void Xpressive::deleteNotePluginData(NotePlayHandle* nph) {
+    if (nph == m_nph_of_previous)
+    {
+        m_nph_of_previous = NULL;
+    }
 	delete static_cast<ExprSynth *>(nph->m_pluginData);
 }
 
@@ -560,6 +588,7 @@ void XpressiveView::expressionChanged() {
 		if (m_output_expr)
 		{
 			expr.add_constant("f", f);
+            expr.add_constant("prev", f);
 			#if ENABLE_CUSTOM_KEY_MAPPING //removed because changes in the microtonal tuner.
 			expr.add_constant("key", key);
 			expr.add_constant("bnote",e->instrumentTrack()->baseNote());
@@ -615,6 +644,7 @@ void XpressiveView::expressionChanged() {
 			m_raw_graph->clear();
 	}
 }
+
 
 void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 {
@@ -857,6 +887,8 @@ QString XpressiveHelpView::s_helpText=
 "<b>bnote</b> - Base note. By default it is 69 which means A4, unless you change it.<br>"
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 "<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
+"<b>prev</b> - Frequency of the previous note. Can be used for creating portamento effect (Note slide/glitch).<br>"
+"The classical use case is using \"prev+clamp(0,t/TIME,1)*(f-prev)\" as your frequency (TIME is the number of seconds of the glitch).<br>"
 "<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
 "<b>rel</b> - Gives 0.0 while the key is held, and 1.0 after the key release. Available only in the output expressions.<br>"
 "<b>trel</b> - Time after release. While the note is held, it gives 0.0. Afterwards, it starts counting seconds.<br>"
@@ -939,19 +971,19 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     keywordClass2Format.setForeground(Qt::darkMagenta);
     keywordClass2Format.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(A1|A2|A3|pi|e|t|f|rel|trel|srate|v|tempo|seed)\\b"));
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(A1|A2|A3|pi|t|f|rel|trel|srate|v|tempo|seed)\\b"));
     rule.format = keywordClass2Format;
     highlightingRules.append(rule);
 
     keywordClass3Format.setForeground(Qt::darkYellow);
     keywordClass3Format.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(cent|semitone|randv|randsv|integrate|last|W1|W2|W3|sinew|trianglew|squarew|expw|saww)\\b"));
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(prev|cent|semitone|randv|randsv|integrate|last|W1|W2|W3|sinew|trianglew|squarew|expw|saww)\\b"));
     rule.format = keywordClass3Format;
     highlightingRules.append(rule);
 
     keywordClass4Format.setForeground(QBrush(0xff98f0));
     keywordClass4Format.setFontWeight(QFont::Bold);
-    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(AND|OR|XOR|NAND)\\b|\\+|\\*|\\||\\&|\\^|\\%|\\/|\\<|\\>|\\:|\\?|\\-"));
+    rule.pattern = QRegularExpression(QStringLiteral("(?<![A-Za-z])(var|AND|OR|XOR|NAND)\\b|\\+|\\*|\\||\\&|\\^|\\%|\\/|\\<|\\>|\\:|\\?|\\-"));
     rule.format = keywordClass4Format;
     highlightingRules.append(rule);
 
