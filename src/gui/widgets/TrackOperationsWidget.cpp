@@ -337,7 +337,7 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
 	}
-	if (QMenu *fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
+	if (QMenu *fxMenu = m_trackView->createFxMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
 		toMenu->addMenu(fxMenu);
 	}

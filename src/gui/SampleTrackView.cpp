@@ -139,7 +139,7 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 		if (currentChannel != mixerChannel)
 		{
 			const auto index = currentChannel->m_channelIndex;
-			QString label = tr("FX %1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
+			QString label = tr("%1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
 			fxMenu->addAction(label, [this, index](){
 				assignMixerLine(index);
 			});

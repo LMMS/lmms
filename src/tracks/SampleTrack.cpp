@@ -38,7 +38,7 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	Track(Track::SampleTrack, tc),
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
-	m_effectChannelModel(0, 0, 0, this, tr("FX channel")),
+	m_effectChannelModel(0, 0, 0, this, tr("Mixer channel")),
 	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
