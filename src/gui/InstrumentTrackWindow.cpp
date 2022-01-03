@@ -191,12 +191,12 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_effectChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "FX channel" ), m_itv );
+	m_effectChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "Mixer channel" ), m_itv );
 
 	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_effectChannelNumber, widgetAlignment );
 
-	label = new QLabel( tr( "FX" ), this );
+	label = new QLabel( tr( "CHANNEL" ), this );
 	label->setStyleSheet( labelStyleSheet );
 	basicControlsLayout->addWidget( label, 1, 6);
 	basicControlsLayout->setAlignment( label, labelAlignment );

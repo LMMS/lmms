@@ -56,7 +56,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
-	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
+	m_effectChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
 	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
 	m_instrument( nullptr ),
 	m_soundShaping( this ),
