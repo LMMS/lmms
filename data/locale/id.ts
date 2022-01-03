@@ -5406,7 +5406,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
         <location filename="../../src/core/Mixer.cpp" line="704"/>
         <location filename="../../src/core/Mixer.cpp" line="825"/>
         <location filename="../../src/core/Mixer.cpp" line="827"/>
-        <source>FX %1</source>
+        <source>Channel %1</source>
         <translation>FX %1</translation>
     </message>
     <message>
@@ -5434,7 +5434,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="289"/>
-        <source>FX Fader %1</source>
+        <source>Fader %1</source>
         <translation>FX Pemudar %1</translation>
     </message>
     <message>
@@ -6703,7 +6703,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1355"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
 </context>
@@ -6781,7 +6781,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1493"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>FX</translation>
     </message>
     <message>
@@ -12157,7 +12157,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackView.cpp" line="142"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
 </context>
@@ -13499,7 +13499,7 @@ Pastikan anda memiliki izin baca untuk berkas ini dan direktori yang mengandung 
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
     <message>

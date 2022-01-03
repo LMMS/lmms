@@ -2752,7 +2752,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <location filename="src/core/Mixer.cpp" line="655"/>
         <location filename="src/core/Mixer.cpp" line="779"/>
         <location filename="src/core/Mixer.cpp" line="781"/>
-        <source>FX %1</source>
+        <source>Channel %1</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -2765,7 +2765,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
     <message>
         <location filename="src/gui/MixerView.cpp" line="276"/>
-        <source>FX Fader %1</source>
+        <source>Fader %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -4015,7 +4015,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     </message>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1200"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -4099,7 +4099,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1387"/>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1442"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -8446,7 +8446,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <location filename="src/core/Track.cpp" line="1831"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
     <message>

@@ -2221,7 +2221,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX %1</source>
+        <source>Channel %1</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -2232,7 +2232,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX Fader %1</source>
+        <source>Fader %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3226,7 +3226,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -3289,7 +3289,7 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6718,7 +6718,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
     <message>

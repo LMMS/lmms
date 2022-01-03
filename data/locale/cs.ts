@@ -5405,7 +5405,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
         <location filename="../../src/core/Mixer.cpp" line="704"/>
         <location filename="../../src/core/Mixer.cpp" line="825"/>
         <location filename="../../src/core/Mixer.cpp" line="827"/>
-        <source>FX %1</source>
+        <source>Channel %1</source>
         <translation>Efekt %1</translation>
     </message>
     <message>
@@ -5433,7 +5433,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="289"/>
-        <source>FX Fader %1</source>
+        <source>Fader %1</source>
         <translation>Efektový fader %1</translation>
     </message>
     <message>
@@ -6699,7 +6699,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1355"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>Efekt %1: %2</translation>
     </message>
 </context>
@@ -6777,7 +6777,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1493"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>EFEKT</translation>
     </message>
     <message>
@@ -12152,7 +12152,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackView.cpp" line="142"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>Efekt %1: %2</translation>
     </message>
 </context>
@@ -12200,7 +12200,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="122"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>EFEKT</translation>
     </message>
 </context>
@@ -13494,7 +13494,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>Efekt %1: %2</translation>
     </message>
     <message>

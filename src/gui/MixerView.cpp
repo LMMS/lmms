@@ -286,7 +286,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 	MixerChannel *mixerChannel = Engine::mixer()->effectChannel(channelIndex);
 
 	m_fader = new Fader( &mixerChannel->m_volumeModel,
-					tr( "FX Fader %1" ).arg( channelIndex ), m_mixerLine );
+					tr( "Fader %1" ).arg( channelIndex ), m_mixerLine );
 	m_fader->setLevelsDisplayedInDBFS();
 	m_fader->setMinPeak(dbfsToAmp(-42));
 	m_fader->setMaxPeak(dbfsToAmp(9));

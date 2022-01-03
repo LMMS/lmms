@@ -5690,7 +5690,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
         <location filename="../../src/core/Mixer.cpp" line="704"/>
         <location filename="../../src/core/Mixer.cpp" line="825"/>
         <location filename="../../src/core/Mixer.cpp" line="827"/>
-        <source>FX %1</source>
+        <source>Channel %1</source>
         <translation>FX %1</translation>
     </message>
     <message>
@@ -5718,7 +5718,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="289"/>
-        <source>FX Fader %1</source>
+        <source>Fader %1</source>
         <translation>FX Fader %1</translation>
     </message>
     <message>
@@ -6984,7 +6984,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1355"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
 </context>
@@ -7062,7 +7062,7 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1493"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>FX</translation>
     </message>
     <message>
@@ -12447,7 +12447,7 @@ Daha hızlı bir tarama süresi elde etmek için bu kontrolleri devre dışı b�
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackView.cpp" line="142"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
 </context>
@@ -12495,7 +12495,7 @@ Daha hızlı bir tarama süresi elde etmek için bu kontrolleri devre dışı b�
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="122"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>FX</translation>
     </message>
 </context>
@@ -13789,7 +13789,7 @@ Lütfen dosyayı ve dosyayı içeren dizini okuma iznine sahip olduğunuzdan emi
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
     <message>

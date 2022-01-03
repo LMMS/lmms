@@ -50,7 +50,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	ToolTip::add( this, tr( "LFO Controller" ) );
 
 	QLabel * l = new QLabel( this );
-	l->setText( "Use FX's controls" );
+	l->setText( "Use Mixer's controls" );
 	l->move(10, 10);
 
 	setModel( _model );

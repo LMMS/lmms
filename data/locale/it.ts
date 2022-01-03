@@ -5410,7 +5410,7 @@ Si prega di controllare i permessi di scrittura sul file e la cartella che lo co
         <location filename="../../src/core/Mixer.cpp" line="704"/>
         <location filename="../../src/core/Mixer.cpp" line="825"/>
         <location filename="../../src/core/Mixer.cpp" line="827"/>
-        <source>FX %1</source>
+        <source>Channel %1</source>
         <translation>FX %1</translation>
     </message>
     <message>
@@ -5438,7 +5438,7 @@ Si prega di controllare i permessi di scrittura sul file e la cartella che lo co
     </message>
     <message>
         <location filename="../../src/gui/MixerView.cpp" line="289"/>
-        <source>FX Fader %1</source>
+        <source>Fader %1</source>
         <translation>Volume FX %1</translation>
     </message>
     <message>
@@ -6704,7 +6704,7 @@ Si prega di controllare i permessi di scrittura sul file e la cartella che lo co
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1355"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
 </context>
@@ -6782,7 +6782,7 @@ Si prega di controllare i permessi di scrittura sul file e la cartella che lo co
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1493"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>FX</translation>
     </message>
     <message>
@@ -12167,7 +12167,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackView.cpp" line="142"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
 </context>
@@ -12215,7 +12215,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="122"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>FX</translation>
     </message>
 </context>
@@ -13509,7 +13509,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
     <message>

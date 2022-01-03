@@ -114,12 +114,12 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 
 
 	// setup spinbox for selecting Mixer-channel
-	m_effectChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("FX channel"), m_stv);
+	m_effectChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
 	basicControlsLayout->addWidget(m_effectChannelNumber, 0, 3);
 	basicControlsLayout->setAlignment(m_effectChannelNumber, widgetAlignment);
 
-	label = new QLabel(tr("FX"), this);
+	label = new QLabel(tr("CHANNEL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 3);
 	basicControlsLayout->setAlignment(label, labelAlignment);
