@@ -58,7 +58,7 @@ public:
 	}
 
 
-	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
+	QMenu * createMixerMenu( QString title, QString newMixerLabel ) override;
 
 
 public slots:

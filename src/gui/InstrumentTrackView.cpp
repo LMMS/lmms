@@ -349,8 +349,8 @@ void InstrumentTrackView::midiConfigChanged()
 
 
 
-//FIXME: This is identical to SampleTrackView::createFxMenu
-QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
+//FIXME: This is identical to SampleTrackView::createMixerMenu
+QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
 
@@ -362,10 +362,10 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 		title = title.arg( channelIndex ).arg( mixerChannel->m_name );
 	}
 
-	QMenu *fxMenu = new QMenu( title );
+	QMenu *mixerMenu = new QMenu( title );
 
-	fxMenu->addAction( newFxLabel, this, SLOT( createMixerLine() ) );
-	fxMenu->addSeparator();
+	mixerMenu->addAction( newMixerLabel, this, SLOT( createMixerLine() ) );
+	mixerMenu->addSeparator();
 
 	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
 	{
@@ -375,12 +375,12 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 		{
 			auto index = currentChannel->m_channelIndex;
 			QString label = tr( "%1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-			fxMenu->addAction(label, [this, index](){
+			mixerMenu->addAction(label, [this, index](){
 				assignMixerLine(index);
 			});
 		}
 	}
 
-	return fxMenu;
+	return mixerMenu;
 }
 
