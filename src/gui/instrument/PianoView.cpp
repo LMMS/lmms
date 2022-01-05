@@ -155,6 +155,21 @@ PianoView::PianoView(QWidget *parent) :
 	connect(Engine::getSong(), SIGNAL(keymapListChanged(int)), this, SLOT(update()));
 }
 
+
+/*! \brief list of note strings
+ */
+const QString PianoView::noteStrings[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+
+
+/*! \brief return a note string (e.g. "C4") based on the key number
+ *  \param key The midi key number
+ */
+QString PianoView::getNoteStringByKey(int key)
+{
+	return noteStrings[key % 12] + QString::number(static_cast<int>(FirstOctave + key / KeysPerOctave));
+}
+
+
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
  *
  *  \param _k The keyboard scan code of the key being pressed.
@@ -405,33 +420,59 @@ void PianoView::pianoScrolled(int new_pos)
 }
 
 
-
-
-/*! \brief Handle a context menu selection on the piano display view
+/*! \brief Handle a context menu selection on the piano view
  *
  *  \param me the ContextMenuEvent to handle.
  *  \todo Is this right, or does this create the context menu?
  */
 void PianoView::contextMenuEvent(QContextMenuEvent *me)
 {
-	if (me->pos().y() > PIANO_BASE || m_piano == nullptr ||
+	if (m_piano == nullptr ||
 		m_piano->instrumentTrack()->keyRangeImport())
 	{
 		QWidget::contextMenuEvent(me);
 		return;
 	}
 
-	// check which control element is closest to the mouse and open the appropriate menu
 	QString title;
-	IntModel *noteModel = getNearestMarker(getKeyFromMouse(me->pos()), &title);
+	int key_num = getKeyFromMouse(me->pos());
 
-	CaptionMenu contextMenu(title);
-	AutomatableModelView amv(noteModel, &contextMenu);
-	amv.addDefaultActions(&contextMenu);
-	contextMenu.exec(QCursor::pos());
+	if (me->pos().y() > PIANO_BASE)
+	{
+		// context menu for the key area
+		m_lastContextMenuKey = key_num;
+
+		title = QString("Key %1 [%2]").arg(getNoteStringByKey(key_num)).arg(key_num);
+
+		CaptionMenu contextMenu(title);
+		QAction *actionBase = contextMenu.addAction(tr( "Set &base note" ),
+								this, SLOT( setBaseNote() ) );
+		contextMenu.addSeparator();
+
+		QAction *actionFirst = contextMenu.addAction(tr( "Set &first key" ),
+								this, SLOT( setFirstKey() ) );
+		QAction *actionLast = contextMenu.addAction(tr( "Set &last key" ),
+								this, SLOT( setLastKey() ) );
+		contextMenu.addAction(tr( "Set single key" ),
+								this, SLOT( setSingleKey() ) );
+
+		actionFirst->setEnabled(key_num != m_piano->instrumentTrack()->firstKeyModel()->value());
+		actionLast->setEnabled(key_num != m_piano->instrumentTrack()->lastKeyModel()->value());
+		actionBase->setEnabled(key_num != m_piano->instrumentTrack()->baseNoteModel()->value());
+
+		contextMenu.exec(QCursor::pos());
+	}
+	else
+	{
+		// context menu for the black stripe above the keys containing the first/last/base markers
+		IntModel *noteModel = getNearestMarker(key_num, &title);
+		CaptionMenu contextMenu(title);
+		AutomatableModelView amv(noteModel, &contextMenu);
+		amv.addDefaultActions(&contextMenu);
+
+		contextMenu.exec(QCursor::pos());
+	}
 }
-
-
 
 
 // handler for mouse-click-event
@@ -491,8 +532,7 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 			}
 			else
 			{
-				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
-				if (m_movedNoteModel == m_piano->instrumentTrack()->baseNoteModel()) { emit baseNoteChanged(); }	// TODO: not actually used by anything?
+				setMarkerKeyValue(m_movedNoteModel,key_num);
 			}
 		}
 		else
@@ -503,6 +543,39 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 		// and let the user see that he pressed a key... :)
 		update();
 	}
+}
+
+
+void PianoView::setMarkerKeyValue(IntModel *noteModel, int key_num)
+{
+	noteModel->setValue(static_cast<float>(key_num));
+	if (noteModel == m_piano->instrumentTrack()->baseNoteModel()) { emit baseNoteChanged(); }	// TODO: not actually used by anything?
+}
+
+
+void PianoView::setBaseNote()
+{
+	setMarkerKeyValue(m_piano->instrumentTrack()->baseNoteModel(), m_lastContextMenuKey);
+	update();
+}
+
+void PianoView::setFirstKey()
+{
+	setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey);
+	update();
+}
+
+void PianoView::setLastKey()
+{
+	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey);
+	update();
+}
+
+void PianoView::setSingleKey()
+{
+	setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey);
+	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey);
+	update();
 }
 
 
@@ -599,7 +672,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 			else if (m_movedNoteModel != nullptr)
 			{
 				// upper section, move the base / first / last note marker
-				m_movedNoteModel->setInitValue(static_cast<float>(key_num));
+				setMarkerKeyValue(m_movedNoteModel,key_num);
 			}
 		}
 		// and let the user see that he pressed a key... :)
@@ -869,17 +942,25 @@ void PianoView::paintEvent( QPaintEvent * )
 		const int last_key = m_piano->instrumentTrack()->lastKeyModel()->value();
 		QColor marker_color = QApplication::palette().color(QPalette::Active, QPalette::BrightText);
 
-		// - prepare triangle shapes for start / end markers
+		// - prepare triangle shapes for start/end/base markers
+
+		// arrow pointing right
 		QPainterPath first_marker(QPoint(getKeyX(first_key) + 1, 1));
 		first_marker.lineTo(getKeyX(first_key) + 1, PIANO_BASE);
 		first_marker.lineTo(getKeyX(first_key) + PIANO_BASE / 2 + 1, PIANO_BASE / 2);
 
+		// arrow pointing left
 		QPainterPath last_marker(QPoint(getKeyX(last_key) + getKeyWidth(last_key), 1));
 		last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key), PIANO_BASE);
 		last_marker.lineTo(getKeyX(last_key) + getKeyWidth(last_key) - PIANO_BASE / 2, PIANO_BASE / 2);
 
+		// arrow pointing down
+		QPainterPath base_marker(QPoint(getKeyX(base_key)+1, 1));
+		base_marker.lineTo(getKeyX(base_key) + getKeyWidth(base_key) + 1, 1);
+		base_marker.lineTo(getKeyX(base_key) + getKeyWidth(base_key) / 2 + 1, PIANO_BASE);
+
 		// - fill all markers
-		p.fillRect(QRect(getKeyX(base_key), 1, getKeyWidth(base_key) - 1, PIANO_BASE - 2), marker_color);
+		p.fillPath(base_marker, marker_color);
 		p.fillPath(first_marker, marker_color);
 		p.fillPath(last_marker, marker_color);
 	}
