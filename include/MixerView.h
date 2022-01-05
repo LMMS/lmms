@@ -89,7 +89,7 @@ public:
 	// display the send button and knob correctly
 	void updateMixerLine(int index);
 
-	// notify the view that an mixer channel was deleted
+	// notify the view that a mixer channel was deleted
 	void deleteChannel(int index);
 
 	// delete all unused channels
