@@ -295,33 +295,33 @@ void Mixer::deleteChannel( int index )
 		if( t->type() == Track::InstrumentTrack )
 		{
 			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
-			int val = inst->effectChannelModel()->value(0);
+			int val = inst->mixerChannelModel()->value(0);
 			if( val == index )
 			{
-				// we are deleting this track's fx send
+				// we are deleting this track's channel send
 				// send to master
-				inst->effectChannelModel()->setValue(0);
+				inst->mixerChannelModel()->setValue(0);
 			}
 			else if( val > index )
 			{
 				// subtract 1 to make up for the missing channel
-				inst->effectChannelModel()->setValue(val-1);
+				inst->mixerChannelModel()->setValue(val-1);
 			}
 		}
 		else if( t->type() == Track::SampleTrack )
 		{
 			SampleTrack* strk = dynamic_cast<SampleTrack *>( t );
-			int val = strk->effectChannelModel()->value(0);
+			int val = strk->mixerChannelModel()->value(0);
 			if( val == index )
 			{
-				// we are deleting this track's fx send
+				// we are deleting this track's channel send
 				// send to master
-				strk->effectChannelModel()->setValue(0);
+				strk->mixerChannelModel()->setValue(0);
 			}
 			else if( val > index )
 			{
 				// subtract 1 to make up for the missing channel
-				strk->effectChannelModel()->setValue(val-1);
+				strk->mixerChannelModel()->setValue(val-1);
 			}
 		}
 	}
@@ -397,27 +397,27 @@ void Mixer::moveChannelLeft( int index )
 			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
-				int val = inst->effectChannelModel()->value(0);
+				int val = inst->mixerChannelModel()->value(0);
 				if( val == a )
 				{
-					inst->effectChannelModel()->setValue(b);
+					inst->mixerChannelModel()->setValue(b);
 				}
 				else if( val == b )
 				{
-					inst->effectChannelModel()->setValue(a);
+					inst->mixerChannelModel()->setValue(a);
 				}
 			}
 			else if( trackList[i]->type() == Track::SampleTrack )
 			{
 				SampleTrack * strk = (SampleTrack *) trackList[i];
-				int val = strk->effectChannelModel()->value(0);
+				int val = strk->mixerChannelModel()->value(0);
 				if( val == a )
 				{
-					strk->effectChannelModel()->setValue(b);
+					strk->mixerChannelModel()->setValue(b);
 				}
 				else if( val == b )
 				{
-					strk->effectChannelModel()->setValue(a);
+					strk->mixerChannelModel()->setValue(a);
 				}
 			}
 		}

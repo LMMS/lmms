@@ -223,7 +223,7 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 void InstrumentTrackView::createMixerLine()
 {
 	int channelIndex = getGUI()->mixerView()->addNewChannel();
-	auto channel = Engine::mixer()->effectChannel(channelIndex);
+	auto channel = Engine::mixer()->mixerChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
 	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
@@ -237,7 +237,7 @@ void InstrumentTrackView::createMixerLine()
 /*! \brief Assign a specific mixer Channel for this track */
 void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
-	model()->effectChannelModel()->setValue( channelIndex );
+	model()->mixerChannelModel()->setValue( channelIndex );
 
 	getGUI()->mixerView()->setCurrentMixerLine( channelIndex );
 }
@@ -352,9 +352,9 @@ void InstrumentTrackView::midiConfigChanged()
 //FIXME: This is identical to SampleTrackView::createMixerMenu
 QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabel)
 {
-	int channelIndex = model()->effectChannelModel()->value();
+	int channelIndex = model()->mixerChannelModel()->value();
 
-	MixerChannel *mixerChannel = Engine::mixer()->effectChannel( channelIndex );
+	MixerChannel *mixerChannel = Engine::mixer()->mixerChannel( channelIndex );
 
 	// If title allows interpolation, pass channel index and name
 	if ( title.contains( "%2" ) )
@@ -369,7 +369,7 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 
 	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
 	{
-		MixerChannel * currentChannel = Engine::mixer()->effectChannel( i );
+		MixerChannel * currentChannel = Engine::mixer()->mixerChannel( i );
 
 		if ( currentChannel != mixerChannel )
 		{

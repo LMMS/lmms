@@ -132,7 +132,7 @@ MixerView::MixerView() :
 			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
-	// show the add new effect channel button
+	// show the add new mixer channel button
 	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( mixerLineSize );
@@ -250,13 +250,13 @@ void MixerView::updateMaxChannelSelector()
 			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
-				inst->effectChannelModel()->setRange(0,
+				inst->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
 			else if( trackList[i]->type() == Track::SampleTrack )
 			{
 				SampleTrack * strk = (SampleTrack *) trackList[i];
-				strk->effectChannelModel()->setRange(0,
+				strk->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
 		}
@@ -283,7 +283,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 {
 	m_mixerLine = new MixerLine(_parent, _mv, channelIndex);
 
-	MixerChannel *mixerChannel = Engine::mixer()->effectChannel(channelIndex);
+	MixerChannel *mixerChannel = Engine::mixer()->mixerChannel(channelIndex);
 
 	m_fader = new Fader( &mixerChannel->m_volumeModel,
 					tr( "Fader %1" ).arg( channelIndex ), m_mixerLine );
@@ -325,7 +325,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 
 void MixerView::MixerChannelView::setChannelIndex( int index )
 {
-	MixerChannel* mixerChannel = Engine::mixer()->effectChannel( index );
+	MixerChannel* mixerChannel = Engine::mixer()->mixerChannel( index );
 
 	m_fader->setModel( &mixerChannel->m_volumeModel );
 	m_muteBtn->setModel( &mixerChannel->m_muteModel );
@@ -362,7 +362,7 @@ void MixerView::updateMixerLine(int index)
 	// does current channel send to this channel?
 	int selIndex = m_currentMixerLine->channelIndex();
 	MixerLine * thisLine = m_mixerChannelViews[index]->m_mixerLine;
-	thisLine->setToolTip( Engine::mixer()->effectChannel( index )->m_name );
+	thisLine->setToolTip( Engine::mixer()->mixerChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if( sendModel == nullptr )
@@ -448,12 +448,12 @@ void MixerView::deleteUnusedChannels()
 		if (t->type() == Track::InstrumentTrack)
 		{
 			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>(t);
-			channel = inst->effectChannelModel()->value();
+			channel = inst->mixerChannelModel()->value();
 		}
 		else if (t->type() == Track::SampleTrack)
 		{
 			SampleTrack *strack = dynamic_cast<SampleTrack *>(t);
-			channel = strack->effectChannelModel()->value();
+			channel = strack->mixerChannelModel()->value();
 		}
 		inUse[channel] = true;
 	}
@@ -461,7 +461,7 @@ void MixerView::deleteUnusedChannels()
 	//Check all channels except master, delete those with no incoming sends
 	for(int i = m_mixerChannelViews.size()-1; i > 0; --i)
 	{
-		if (!inUse[i] && Engine::mixer()->effectChannel(i)->m_receives.isEmpty())
+		if (!inUse[i] && Engine::mixer()->mixerChannel(i)->m_receives.isEmpty())
 		{ deleteChannel(i); }
 	}
 }
@@ -593,32 +593,32 @@ void MixerView::updateFaders()
 	Mixer * m = Engine::mixer();
 
 	// apply master gain
-	m->effectChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
-	m->effectChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
+	m->mixerChannel(0)->m_peakLeft *= Engine::audioEngine()->masterGain();
+	m->mixerChannel(0)->m_peakRight *= Engine::audioEngine()->masterGain();
 
 	for( int i = 0; i < m_mixerChannelViews.size(); ++i )
 	{
 		const float opl = m_mixerChannelViews[i]->m_fader->getPeak_L();
 		const float opr = m_mixerChannelViews[i]->m_fader->getPeak_R();
 		const float fallOff = 1.25;
-		if( m->effectChannel(i)->m_peakLeft >= opl/fallOff )
+		if( m->mixerChannel(i)->m_peakLeft >= opl/fallOff )
 		{
-			m_mixerChannelViews[i]->m_fader->setPeak_L( m->effectChannel(i)->m_peakLeft );
+			m_mixerChannelViews[i]->m_fader->setPeak_L( m->mixerChannel(i)->m_peakLeft );
 			// Set to -1 so later we'll know if this value has been refreshed yet.
-			m->effectChannel(i)->m_peakLeft = -1;
+			m->mixerChannel(i)->m_peakLeft = -1;
 		}
-		else if( m->effectChannel(i)->m_peakLeft != -1 )
+		else if( m->mixerChannel(i)->m_peakLeft != -1 )
 		{
 			m_mixerChannelViews[i]->m_fader->setPeak_L( opl/fallOff );
 		}
 
-		if( m->effectChannel(i)->m_peakRight >= opr/fallOff )
+		if( m->mixerChannel(i)->m_peakRight >= opr/fallOff )
 		{
-			m_mixerChannelViews[i]->m_fader->setPeak_R( m->effectChannel(i)->m_peakRight );
+			m_mixerChannelViews[i]->m_fader->setPeak_R( m->mixerChannel(i)->m_peakRight );
 			// Set to -1 so later we'll know if this value has been refreshed yet.
-			m->effectChannel(i)->m_peakRight = -1;
+			m->mixerChannel(i)->m_peakRight = -1;
 		}
-		else if( m->effectChannel(i)->m_peakRight != -1 )
+		else if( m->mixerChannel(i)->m_peakRight != -1 )
 		{
 			m_mixerChannelViews[i]->m_fader->setPeak_R( opr/fallOff );
 		}

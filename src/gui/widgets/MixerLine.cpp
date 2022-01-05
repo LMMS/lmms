@@ -97,7 +97,7 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	m_lcd->move( 4, 58 );
 	m_lcd->setMarginWidth( 1 );
 	
-	QString name = Engine::mixer()->effectChannel( m_channelIndex )->m_name;
+	QString name = Engine::mixer()->mixerChannel( m_channelIndex )->m_name;
 	setToolTip( name );
 
 	m_renameLineEdit = new QLineEdit();
@@ -122,7 +122,7 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	proxyWidget->setPos( 8, 145 );
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
-	connect( &Engine::mixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
 	
 }
 
@@ -150,7 +150,7 @@ void MixerLine::setChannelIndex( int index )
 
 void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
-	auto channel = Engine::mixer()->effectChannel( m_channelIndex );
+	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
 	bool muted = channel->m_muteModel.value();
 	QString name = channel->m_name;
 	QString elidedName = elideName( name );
@@ -236,7 +236,7 @@ void MixerLine::mouseDoubleClickEvent( QMouseEvent * )
 
 void MixerLine::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::mixer()->effectChannel( m_channelIndex )->m_name, this );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::mixer()->mixerChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
@@ -274,7 +274,7 @@ void MixerLine::renameChannel()
 	m_renameLineEdit->setReadOnly( false );
 	m_lcd->hide();
 	m_renameLineEdit->setFixedWidth( 135 );
-	m_renameLineEdit->setText( Engine::mixer()->effectChannel( m_channelIndex )->m_name );
+	m_renameLineEdit->setText( Engine::mixer()->mixerChannel( m_channelIndex )->m_name );
 	m_view->setFocus();
 	m_renameLineEdit->selectAll();
 	m_renameLineEdit->setFocus();
@@ -292,13 +292,13 @@ void MixerLine::renameFinished()
 	m_lcd->show();
 	QString newName = m_renameLineEdit->text();
 	setFocus();
-	if( !newName.isEmpty() && Engine::mixer()->effectChannel( m_channelIndex )->m_name != newName )
+	if( !newName.isEmpty() && Engine::mixer()->mixerChannel( m_channelIndex )->m_name != newName )
 	{
-		Engine::mixer()->effectChannel( m_channelIndex )->m_name = newName;
+		Engine::mixer()->mixerChannel( m_channelIndex )->m_name = newName;
 		m_renameLineEdit->setText( elideName( newName ) );
 		Engine::getSong()->setModified();
 	}
-	QString name = Engine::mixer()->effectChannel( m_channelIndex )->m_name;
+	QString name = Engine::mixer()->mixerChannel( m_channelIndex )->m_name;
 	setToolTip( name );
 }
 
@@ -422,7 +422,7 @@ void MixerLine::setStrokeInnerInactive( const QColor & c )
 // Ask user for a color, and set it as the mixer line color
 void MixerLine::selectColor()
 {
-	auto channel = Engine::mixer()->effectChannel( m_channelIndex );
+	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
 	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
 	if(!new_color.isValid()) { return; }
 	channel->setColor (new_color);
@@ -434,7 +434,7 @@ void MixerLine::selectColor()
 // Disable the usage of color on this mixer line
 void MixerLine::resetColor()
 {
-	Engine::mixer()->effectChannel( m_channelIndex )->m_hasColor = false;
+	Engine::mixer()->mixerChannel( m_channelIndex )->m_hasColor = false;
 	Engine::getSong()->setModified();
 	update();
 }
@@ -443,7 +443,7 @@ void MixerLine::resetColor()
 // Pick a random color from the mixer palette and set it as our color
 void MixerLine::randomizeColor()
 {
-	auto channel = Engine::mixer()->effectChannel( m_channelIndex );
+	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
 	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
 	Engine::getSong()->setModified();
 	update();

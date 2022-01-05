@@ -71,7 +71,7 @@ public:
 	void setExtOutputEnabled( bool _enabled );
 
 
-	// next effect-channel after this audio-port
+	// next mixer-channel after this audio-port
 	// (-1 = none  0 = master)
 	inline mix_ch_t nextMixerChannel() const
 	{

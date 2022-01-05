@@ -38,15 +38,15 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 	Track(Track::SampleTrack, tc),
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
-	m_effectChannelModel(0, 0, 0, this, tr("Mixer channel")),
+	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
 	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
 	setName(tr("Sample track"));
 	m_panningModel.setCenterValue(DefaultPanning);
-	m_effectChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
+	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
 
-	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()));
+	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()));
 }
 
 
@@ -186,7 +186,7 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
-	m_effectChannelModel.saveSettings( _doc, _this, "mixch" );
+	m_mixerChannelModel.saveSettings( _doc, _this, "mixch" );
 }
 
 
@@ -209,8 +209,8 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
-	m_effectChannelModel.setRange( 0, Engine::mixer()->numChannels() - 1 );
-	m_effectChannelModel.loadSettings( _this, "mixch" );
+	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels() - 1 );
+	m_mixerChannelModel.loadSettings( _this, "mixch" );
 }
 
 
@@ -238,7 +238,7 @@ void SampleTrack::setPlayingTcos( bool isPlaying )
 
 
 
-void SampleTrack::updateEffectChannel()
+void SampleTrack::updateMixerChannel()
 {
-	m_audioPort.setNextMixerChannel( m_effectChannelModel.value() );
+	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
 }

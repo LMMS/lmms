@@ -154,7 +154,7 @@ public:
 		return "mixer";
 	}
 
-	MixerChannel * effectChannel( int _ch )
+	MixerChannel * mixerChannel( int _ch )
 	{
 		return m_mixerChannels[_ch];
 	}

@@ -82,7 +82,7 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	MixerLineLcdSpinBox * m_effectChannelNumber;
+	MixerLineLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;
 } ;

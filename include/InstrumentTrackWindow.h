@@ -135,7 +135,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	MixerLineLcdSpinBox * m_effectChannelNumber;
+	MixerLineLcdSpinBox * m_mixerChannelNumber;
 
 
 

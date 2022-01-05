@@ -52,9 +52,9 @@ public:
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
-	inline IntModel * effectChannelModel()
+	inline IntModel * mixerChannelModel()
 	{
-		return &m_effectChannelModel;
+		return &m_mixerChannelModel;
 	}
 
 	inline AudioPort * audioPort()
@@ -84,12 +84,12 @@ signals:
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
-	void updateEffectChannel();
+	void updateMixerChannel();
 
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
-	IntModel m_effectChannelModel;
+	IntModel m_mixerChannelModel;
 	AudioPort m_audioPort;
 	bool m_isPlaying;
 
