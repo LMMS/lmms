@@ -123,7 +123,6 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
-	
 }
 
 

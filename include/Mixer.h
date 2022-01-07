@@ -217,7 +217,6 @@ private:
 	void allocateChannelsTo(int num);
 
 	int m_lastSoloed;
-
 } ;
 
 

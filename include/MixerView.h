@@ -117,7 +117,6 @@ private slots:
 	void toggledSolo();
 
 private:
-
 	QVector<MixerChannelView *> m_mixerChannelViews;
 
 	MixerLine * m_currentMixerLine;

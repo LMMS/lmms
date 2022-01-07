@@ -47,7 +47,6 @@ protected:
 
 private:
 	TrackView * m_tv;
-
 };
 
 #endif
