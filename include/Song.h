@@ -59,6 +59,7 @@ class LMMS_EXPORT Song : public TrackContainer
 	Q_OBJECT
 	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
+	mapPropertyFromModel(int, masterPitchRange, setMasterPitchRange, m_masterPitchRangeModel);
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
 public:
 	enum PlayModes
@@ -389,6 +390,7 @@ private slots:
 	void setTimeSignature();
 
 	void masterVolumeChanged();
+	void masterPitchRangeChanged();
 
 	void savePos();
 
@@ -444,6 +446,7 @@ private:
 	int m_oldTicksPerBar;
 	IntModel m_masterVolumeModel;
 	IntModel m_masterPitchModel;
+	IntModel m_masterPitchRangeModel;
 
 	ControllerVector m_controllers;
 

@@ -67,6 +67,7 @@ private slots:
 	void changeValue( int _value );
 	void moveSlider( int _value );
 	void updateSlider();
+	void updateSliderRange();
 
 } ;
 

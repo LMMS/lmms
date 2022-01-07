@@ -200,6 +200,14 @@ SongEditor::SongEditor( Song * song ) :
 
 	getGUI()->mainWindow()->addSpacingToToolBar( 10 );
 
+	m_masterPitchRangeBox = new LcdSpinBox(2, tb, tr("RANGE"));
+	m_masterPitchRangeBox->setModel(&m_song->m_masterPitchRangeModel);
+	m_masterPitchRangeBox->setLabel(tr("RANGE"));
+	ToolTip::add(m_masterPitchRangeBox, tr("Master pitch range"));
+
+	getGUI()->mainWindow()->addWidgetToToolBar(m_masterPitchRangeBox);
+	getGUI()->mainWindow()->addSpacingToToolBar(10);
+
 	// create widget for oscilloscope- and cpu-load-widget
 	QWidget * vc_w = new QWidget( tb );
 	QVBoxLayout * vcw_layout = new QVBoxLayout( vc_w );
