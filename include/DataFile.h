@@ -123,8 +123,6 @@ private:
 	void upgrade_extendedNoteRange();
 	void upgrade_defaultTripleOscillatorHQ();
 	void upgrade_mixerRename();
-	void upgrade_mixerChannelRename();
-	void upgrade_mixchRename();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;
