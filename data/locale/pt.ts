@@ -10086,7 +10086,7 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5253"/>
-        <source>Export pattern success</source>
+        <source>Export clip success</source>
         <translation type="unfinished"/>
     </message>
     <message>

@@ -10085,7 +10085,7 @@ Sie haben keine Standard-Soundfont im Einstellungsdialog (Bearbeiten-&gt;Einstel
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5253"/>
-        <source>Export pattern success</source>
+        <source>Export clip success</source>
         <translation type="unfinished"/>
     </message>
     <message>
