@@ -1,5 +1,5 @@
 /*
- * FxMixer.h - effect-mixer for LMMS
+ * Mixer.h - effect-mixer for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FX_MIXER_H
-#define FX_MIXER_H
+#ifndef MIXER_H
+#define MIXER_H
 
 #include "Model.h"
 #include "EffectChain.h"
@@ -34,14 +34,14 @@
 
 #include <QColor>
 
-class FxRoute;
-typedef QVector<FxRoute *> FxRouteVector;
+class MixerRoute;
+typedef QVector<MixerRoute *> MixerRouteVector;
 
-class FxChannel : public ThreadableJob
+class MixerChannel : public ThreadableJob
 {
 	public:
-		FxChannel( int idx, Model * _parent );
-		virtual ~FxChannel();
+		MixerChannel( int idx, Model * _parent );
+		virtual ~MixerChannel();
 
 		EffectChain m_fxChain;
 
@@ -64,10 +64,10 @@ class FxChannel : public ThreadableJob
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
 
 		// pointers to other channels that this one sends to
-		FxRouteVector m_sends;
+		MixerRouteVector m_sends;
 
 		// pointers to other channels that send to this one
-		FxRouteVector m_receives;
+		MixerRouteVector m_receives;
 
 		bool requiresProcessing() const override { return true; }
 		void unmuteForSolo();
@@ -93,19 +93,19 @@ class FxChannel : public ThreadableJob
 };
 
 
-class FxRoute : public QObject
+class MixerRoute : public QObject
 {
 	Q_OBJECT
 	public:		
-		FxRoute( FxChannel * from, FxChannel * to, float amount );
-		virtual ~FxRoute();
+		MixerRoute( MixerChannel * from, MixerChannel * to, float amount );
+		virtual ~MixerRoute();
 		
-	fx_ch_t senderIndex() const
+	mix_ch_t senderIndex() const
 	{
 		return m_from->m_channelIndex;
 	}
 	
-	fx_ch_t receiverIndex() const
+	mix_ch_t receiverIndex() const
 	{
 		return m_to->m_channelIndex;
 	}
@@ -115,12 +115,12 @@ class FxRoute : public QObject
 		return &m_amount;
 	}
 	
-	FxChannel * sender() const
+	MixerChannel * sender() const
 	{
 		return m_from;
 	}
 	
-	FxChannel * receiver() const
+	MixerChannel * receiver() const
 	{
 		return m_to;
 	}
@@ -128,20 +128,20 @@ class FxRoute : public QObject
 	void updateName();
 		
 	private:
-		FxChannel * m_from;
-		FxChannel * m_to;
+		MixerChannel * m_from;
+		MixerChannel * m_to;
 		FloatModel m_amount;
 };
 
 
-class LMMS_EXPORT FxMixer : public Model, public JournallingObject
+class LMMS_EXPORT Mixer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	FxMixer();
-	virtual ~FxMixer();
+	Mixer();
+	virtual ~Mixer();
 
-	void mixToChannel( const sampleFrame * _buf, fx_ch_t _ch );
+	void mixToChannel( const sampleFrame * _buf, mix_ch_t _ch );
 
 	void prepareMasterMix();
 	void masterMix( sampleFrame * _buf );
@@ -151,38 +151,38 @@ public:
 
 	QString nodeName() const override
 	{
-		return "fxmixer";
+		return "mixer";
 	}
 
-	FxChannel * effectChannel( int _ch )
+	MixerChannel * mixerChannel( int _ch )
 	{
-		return m_fxChannels[_ch];
+		return m_mixerChannels[_ch];
 	}
 
 	// make the output of channel fromChannel go to the input of channel toChannel
 	// it is safe to call even if the send already exists
-	FxRoute * createChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel,
+	MixerRoute * createChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel,
 						   float amount = 1.0f);
-	FxRoute * createRoute( FxChannel * from, FxChannel * to, float amount );
+	MixerRoute * createRoute( MixerChannel * from, MixerChannel * to, float amount );
 
 	// delete the connection made by createChannelSend
-	void deleteChannelSend(fx_ch_t fromChannel, fx_ch_t toChannel);
-	void deleteChannelSend( FxRoute * route );
+	void deleteChannelSend(mix_ch_t fromChannel, mix_ch_t toChannel);
+	void deleteChannelSend( MixerRoute * route );
 
 	// determine if adding a send from sendFrom to
 	// sendTo would result in an infinite mixer loop.
-	bool isInfiniteLoop(fx_ch_t fromChannel, fx_ch_t toChannel);
-	bool checkInfiniteLoop( FxChannel * from, FxChannel * to );
+	bool isInfiniteLoop(mix_ch_t fromChannel, mix_ch_t toChannel);
+	bool checkInfiniteLoop( MixerChannel * from, MixerChannel * to );
 
 	// return the FloatModel of fromChannel sending its output to the input of
 	// toChannel. NULL if there is no send.
-	FloatModel * channelSendModel(fx_ch_t fromChannel, fx_ch_t toChannel);
+	FloatModel * channelSendModel(mix_ch_t fromChannel, mix_ch_t toChannel);
 
-	// add a new channel to the Fx Mixer.
+	// add a new channel to the mixer.
 	// returns the index of the channel that was just added
 	int createChannel();
 
-	// delete a channel from the FX mixer.
+	// delete a channel from the mixer.
 	void deleteChannel(int index);
 
 	// delete all the mixer channels except master and remove all effects
@@ -193,7 +193,7 @@ public:
 	void moveChannelRight(int index);
 
 	// reset a channel's name, fx, sends, etc
-	void clearChannel(fx_ch_t channelIndex);
+	void clearChannel(mix_ch_t channelIndex);
 
 	// rename channels when moving etc. if they still have their original name
 	void validateChannelName( int index, int oldIndex );
@@ -202,22 +202,21 @@ public:
 	void activateSolo();
 	void deactivateSolo();
 
-	inline fx_ch_t numChannels() const
+	inline mix_ch_t numChannels() const
 	{
-		return m_fxChannels.size();
+		return m_mixerChannels.size();
 	}
 
-	FxRouteVector m_fxRoutes;
+	MixerRouteVector m_mixerRoutes;
 
 private:
-	// the fx channels in the mixer. index 0 is always master.
-	QVector<FxChannel *> m_fxChannels;
+	// the mixer channels in the mixer. index 0 is always master.
+	QVector<MixerChannel *> m_mixerChannels;
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
 
 	int m_lastSoloed;
-
 } ;
 
 

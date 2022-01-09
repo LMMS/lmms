@@ -271,7 +271,7 @@ void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
 	{
 		QDomElement note = nn.toElement();
 		if (note.attribute("len", "0") == "0") continue;
-		// TODO interpret pan="0" fxch="0" pitchrange="1"
+		// TODO interpret pan="0" mixch="0" pitchrange="1"
 		MidiNote mnote;
 		mnote.pitch = qMax(0, qMin(127, note.attribute("key", "0").toInt() + base_pitch));
 		 // Map from LMMS volume to MIDI velocity

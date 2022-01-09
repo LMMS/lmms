@@ -168,10 +168,10 @@ void TrackView::update()
 /*! \brief Create a menu for assigning/creating channels for this track.
  *
  */
-QMenu * TrackView::createFxMenu(QString title, QString newFxLabel)
+QMenu * TrackView::createMixerMenu(QString title, QString newMixerLabel)
 {
 	Q_UNUSED(title)
-	Q_UNUSED(newFxLabel)
+	Q_UNUSED(newMixerLabel)
 	return nullptr;
 }
 

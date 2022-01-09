@@ -29,7 +29,7 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "MidiClient.h"
@@ -56,7 +56,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
-	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
+	m_mixerChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
 	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
 	m_instrument( nullptr ),
 	m_soundShaping( this ),
@@ -71,7 +71,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_firstKeyModel.setInitValue(0);
 	m_lastKeyModel.setInitValue(NumKeys - 1);
 
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -100,7 +100,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
-	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
+	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
 }
 
 
@@ -651,9 +651,9 @@ void InstrumentTrack::updatePitchRange()
 
 
 
-void InstrumentTrack::updateEffectChannel()
+void InstrumentTrack::updateMixerChannel()
 {
-	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
+	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
 }
 
 
@@ -808,7 +808,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_pitchModel.saveSettings( doc, thisElement, "pitch" );
 	m_pitchRangeModel.saveSettings( doc, thisElement, "pitchrange" );
 
-	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
+	m_mixerChannelModel.saveSettings( doc, thisElement, "mixch" );
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
 	m_firstKeyModel.saveSettings(doc, thisElement, "firstkey");
 	m_lastKeyModel.saveSettings(doc, thisElement, "lastkey");
@@ -871,10 +871,10 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
+	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1 );
 	if ( !m_previewMode )
 	{
-		m_effectChannelModel.loadSettings( thisElement, "fxch" );
+		m_mixerChannelModel.loadSettings( thisElement, "mixch" );
 	}
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_firstKeyModel.loadSettings(thisElement, "firstkey");
@@ -981,8 +981,8 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 void InstrumentTrack::replaceInstrument(DataFile dataFile)
 {
-	// loadSettings clears the FX channel, so we save it here and set it back later
-	int effectChannel = effectChannelModel()->value();
+	// loadSettings clears the mixer channel, so we save it here and set it back later
+	int mixerChannel = mixerChannelModel()->value();
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
 	setSimpleSerializing();
@@ -998,7 +998,7 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 	setSolo(oldSolo);
 	setMutedBeforeSolo(oldMutedBeforeSolo);
 	
-	m_effectChannelModel.setValue(effectChannel);
+	m_mixerChannelModel.setValue(mixerChannel);
 	Engine::getSong()->setModified();
 }
 

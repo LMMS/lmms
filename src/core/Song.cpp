@@ -44,8 +44,8 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "FxMixer.h"
-#include "FxMixerView.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
@@ -874,15 +874,15 @@ void Song::clearProject()
 	{
 		getGUI()->songEditor()->m_editor->clearAllTracks();
 	}
-	if( getGUI() != nullptr && getGUI()->fxMixerView() )
+	if( getGUI() != nullptr && getGUI()->mixerView() )
 	{
-		getGUI()->fxMixerView()->clear();
+		getGUI()->mixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	Engine::fxMixer()->clear();
+	Engine::mixer()->clear();
 
 	if( getGUI() != nullptr && getGUI()->automationEditor() )
 	{
@@ -1088,15 +1088,15 @@ void Song::loadProject( const QString & fileName )
 	//Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
 
-	// Load mixer first to be able to set the correct range for FX channels
-	node = dataFile.content().firstChildElement( Engine::fxMixer()->nodeName() );
+	// Load mixer first to be able to set the correct range for mixer channels
+	node = dataFile.content().firstChildElement( Engine::mixer()->nodeName() );
 	if( !node.isNull() )
 	{
-		Engine::fxMixer()->restoreState( node.toElement() );
+		Engine::mixer()->restoreState( node.toElement() );
 		if( getGUI() != nullptr )
 		{
-			// refresh FxMixerView
-			getGUI()->fxMixerView()->refreshDisplay();
+			// refresh MixerView
+			getGUI()->mixerView()->refreshDisplay();
 		}
 	}
 
@@ -1238,7 +1238,7 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
-	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
+	Engine::mixer()->saveState( dataFile, dataFile.content() );
 	if( getGUI() != nullptr )
 	{
 		getGUI()->getControllerRackView()->saveState( dataFile, dataFile.content() );

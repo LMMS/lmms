@@ -207,9 +207,9 @@ public:
 		return &m_pitchRangeModel;
 	}
 
-	IntModel * effectChannelModel()
+	IntModel * mixerChannelModel()
 	{
-		return &m_effectChannelModel;
+		return &m_mixerChannelModel;
 	}
 
 	void setPreviewMode( const bool );
@@ -245,7 +245,7 @@ protected slots:
 	void updateBaseNote();
 	void updatePitch();
 	void updatePitchRange();
-	void updateEffectChannel();
+	void updateMixerChannel();
 
 
 private:
@@ -281,7 +281,7 @@ private:
 
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
-	IntModel m_effectChannelModel;
+	IntModel m_mixerChannelModel;
 	BoolModel m_useMasterPitchModel;
 
 	Instrument * m_instrument;

@@ -337,9 +337,9 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
 	}
-	if (QMenu *fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
+	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
-		toMenu->addMenu(fxMenu);
+		toMenu->addMenu(mixerMenu);
 	}
 
 	if (InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>(m_trackView))

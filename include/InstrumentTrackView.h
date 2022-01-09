@@ -64,7 +64,7 @@ public:
 	}
 
 	// Create a menu for assigning/creating channels for this track
-	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
+	QMenu * createMixerMenu( QString title, QString newMixerLabel ) override;
 
 
 protected:
@@ -82,8 +82,8 @@ private slots:
 	void midiOutSelected();
 	void midiConfigChanged();
 
-	void assignFxLine( int channelIndex );
-	void createFxLine();
+	void assignMixerLine( int channelIndex );
+	void createMixerLine();
 
 	void handleConfigChange(QString cls, QString attr, QString value);
 

@@ -26,7 +26,7 @@
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "EffectChain.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Engine.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
@@ -38,7 +38,7 @@ AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 	m_bufferUsage( false ),
 	m_portBuffer( BufferManager::acquire() ),
 	m_extOutputEnabled( false ),
-	m_nextFxChannel( 0 ),
+	m_nextMixerChannel( 0 ),
 	m_name( "unnamed port" ),
 	m_effects( _has_effect_chain ? new EffectChain( nullptr ) : nullptr ),
 	m_volumeModel( volumeModel ),
@@ -222,7 +222,7 @@ void AudioPort::doProcessing()
 	const bool me = processEffects();
 	if( me || m_bufferUsage )
 	{
-		Engine::fxMixer()->mixToChannel( m_portBuffer, m_nextFxChannel ); 	// send output to fx mixer
+		Engine::mixer()->mixToChannel( m_portBuffer, m_nextMixerChannel ); 	// send output to mixer
 																			// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}

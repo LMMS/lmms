@@ -30,7 +30,7 @@
 
 #include "AudioEngineWorkerThread.h"
 #include "AudioPort.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
@@ -367,8 +367,8 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	swapBuffers();
 
 	// prepare master mix (clear internal buffers etc.)
-	FxMixer * fxMixer = Engine::fxMixer();
-	fxMixer->prepareMasterMix();
+	Mixer * mixer = Engine::mixer();
+	mixer->prepareMasterMix();
 
 	handleMetronome();
 
@@ -419,8 +419,8 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 
-	// STAGE 3: do master mix in FX mixer
-	fxMixer->masterMix(m_outputBufferWrite);
+	// STAGE 3: do master mix in mixer
+	mixer->masterMix(m_outputBufferWrite);
 
 
 	emit nextAudioBuffer(m_outputBufferRead);
