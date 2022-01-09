@@ -10078,7 +10078,7 @@ Vennligst gå til http://lmms.sf.net/wiki for dokumentasjon om LMMS.</translatio
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5233"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5280"/>
-        <source>XML pattern file (*.xpt *.xptz)</source>
+        <source>XML clip file (*.xpt *.xptz)</source>
         <translation type="unfinished"/>
     </message>
     <message>
