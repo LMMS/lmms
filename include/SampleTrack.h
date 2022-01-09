@@ -30,8 +30,6 @@
 #include "AudioPort.h"
 #include "FadeButton.h"
 #include "Mixer.h"
-#include "SampleTCO.h"
-#include "Mixer.h"
 #include "SampleClip.h"
 #include "SampleTrackView.h"
 #include "Track.h"
@@ -84,9 +82,6 @@ signals:
 	void playingChanged();
 
 public slots:
-	void updateTcos();
-	void setPlayingTcos( bool isPlaying );
-	void updateMixerChannel();
 	void updateClips();
 	void setPlayingClips( bool isPlaying );
 	void updateMixerChannel();
