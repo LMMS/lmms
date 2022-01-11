@@ -1632,19 +1632,19 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
 	{
-		static QPointer<AutomationClip> detuningPattern = nullptr;
-		if (detuningPattern.data() != nullptr)
+		static QPointer<AutomationClip> detuningClip = nullptr;
+		if (detuningClip.data() != nullptr)
 		{
-			detuningPattern->disconnect(this);
+			detuningClip->disconnect(this);
 		}
 		Note* n = noteUnderMouse();
 		if (n->detuning() == nullptr)
 		{
 			n->createDetuning();
 		}
-		detuningPattern = n->detuning()->automationClip();
-		connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
-		getGUI()->automationEditor()->open(detuningPattern);
+		detuningClip = n->detuning()->automationClip();
+		connect(detuningClip.data(), SIGNAL(dataChanged()), this, SLOT(update()));
+		getGUI()->automationEditor()->open(detuningClip);
 		return;
 	}
 

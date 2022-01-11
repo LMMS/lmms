@@ -587,20 +587,20 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	const int textLeft = CLIP_BORDER_WIDTH + 3;
 
 	QFontMetrics fontMetrics(labelFont);
-	QString elidedPatternName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
+	QString elidedClipName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
 
-	if (elidedPatternName.length() < 2)
+	if (elidedClipName.length() < 2)
 	{
-		elidedPatternName = text.trimmed();
+		elidedClipName = text.trimmed();
 	}
 
 	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
 	int const finalTextTop = textTop + fontMetrics.ascent();
 	painter.setPen(textShadowColor());
-	painter.drawText( textLeft + 1, finalTextTop + 1, elidedPatternName );
+	painter.drawText( textLeft + 1, finalTextTop + 1, elidedClipName );
 	painter.setPen( textColor() );
-	painter.drawText( textLeft, finalTextTop, elidedPatternName );
+	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
 /*! \brief Handle a mouse press on this ClipView.
