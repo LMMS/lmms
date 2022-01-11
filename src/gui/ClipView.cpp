@@ -481,7 +481,7 @@ void ClipView::dropEvent( QDropEvent * de )
 	// Copy state into existing clip
 	DataFile dataFile( value.toUtf8() );
 	TimePos pos = m_clip->startPosition();
-	QDomElement clips = dataFile.content().firstChildElement( "clips" );
+	QDomElement clips = dataFile.content().firstChildElement( "tcos" ); //TODO: rename "tcos" to "clips"
 	m_clip->restoreState( clips.firstChildElement().firstChildElement() );
 	m_clip->movePosition( pos );
 	AutomationClip::resolveAllIDs();
