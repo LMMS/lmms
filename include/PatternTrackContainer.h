@@ -1,5 +1,5 @@
 /*
- * BBTrackContainer.h - model-component of BB-Editor
+ * PatternTrackContainer.h - model-component of Pattern Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,20 +23,20 @@
  */
 
 
-#ifndef BB_TRACK_CONTAINER_H
-#define BB_TRACK_CONTAINER_H
+#ifndef PATTERN_TRACK_CONTAINER_H
+#define PATTERN_TRACK_CONTAINER_H
 
 #include "TrackContainer.h"
 #include "ComboBoxModel.h"
 
 
-class LMMS_EXPORT BBTrackContainer : public TrackContainer
+class LMMS_EXPORT PatternTrackContainer : public TrackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
+	mapPropertyFromModel(int,currentPattern,setCurrentPattern,m_patternComboBoxModel);
 public:
-	BBTrackContainer();
-	virtual ~BBTrackContainer();
+	PatternTrackContainer();
+	virtual ~PatternTrackContainer();
 
 	virtual bool play(TimePos start, const fpp_t frames, const f_cnt_t frameBase, int clipNum = -1);
 
@@ -44,22 +44,22 @@ public:
 
 	inline QString nodeName() const override
 	{
-		return "bbtrackcontainer";
+		return "bbtrackcontainer"; // TODO rename to patterntrackcontainer
 	}
 
-	bar_t lengthOfBB(int bb) const;
-	inline bar_t lengthOfCurrentBB()
+	bar_t lengthOfPattern(int pattern) const;
+	inline bar_t lengthOfCurrentPattern()
 	{
-		return lengthOfBB(currentBB());
+		return lengthOfPattern(currentPattern());
 	}
-	int numOfBBs() const;
-	void removeBB(int bb);
+	int numOfPatterns() const;
+	void removePattern(int pattern);
 
-	void swapBB(int bb1, int bb2);
+	void swapPattern(int pattern1, int pattern2);
 
-	void updateBBTrack(Clip * clip);
+	void updatePatternTrack(Clip * clip);
 	void fixIncorrectPositions();
-	void createClipsForBB(int bb);
+	void createClipsForPattern(int pattern);
 
 	AutomatedValueMap automatedValuesAt(TimePos time, int clipNum) const override;
 
@@ -67,14 +67,14 @@ public slots:
 	void play();
 	void stop();
 	void updateComboBox();
-	void currentBBChanged();
+	void currentPatternChanged();
 
 
 private:
-	ComboBoxModel m_bbComboBoxModel;
+	ComboBoxModel m_patternComboBoxModel;
 
 
-	friend class BBEditor;
+	friend class PatternEditor;
 
 } ;
 

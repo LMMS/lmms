@@ -25,9 +25,9 @@
 
 #include "MidiClip.h"
 
-#include "BBTrackContainer.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
+#include "PatternTrackContainer.h"
 #include "PianoRoll.h"
 
 #include <limits>
@@ -43,11 +43,11 @@ QPixmap * MidiClipView::s_stepBtnOffLight = nullptr;
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( BeatClip ),
+	m_clipType( PatternClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
 	if( _instrument_track->trackContainer()
-					== Engine::getBBTrackContainer() )
+					== Engine::getPatternTrackContainer() )
 	{
 		resizeToFirstTrack();
 	}
@@ -72,7 +72,7 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	init();
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::BBContainer:
+		case TrackContainer::PatternContainer:
 			setAutoResize( true );
 			break;
 
@@ -103,7 +103,7 @@ MidiClip::~MidiClip()
 
 void MidiClip::resizeToFirstTrack()
 {
-	// Resize this track to be the same as existing tracks in the BB
+	// Resize this track to be the same as existing tracks in the pattern
 	const TrackContainer::TrackList & tracks =
 		m_instrumentTrack->trackContainer()->tracks();
 	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
@@ -141,10 +141,10 @@ void MidiClip::init()
 
 void MidiClip::updateLength()
 {
-	if( m_clipType == BeatClip )
+	if( m_clipType == PatternClip )
 	{
-		changeLength( beatClipLength() );
-		updateBBTrack();
+		changeLength( patternClipLength() );
+		updatePatternTrack();
 		return;
 	}
 
@@ -161,13 +161,13 @@ void MidiClip::updateLength()
 	}
 	changeLength( TimePos( max_length ).nextFullBar() *
 						TimePos::ticksPerBar() );
-	updateBBTrack();
+	updatePatternTrack();
 }
 
 
 
 
-TimePos MidiClip::beatClipLength() const
+TimePos MidiClip::patternClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
@@ -348,7 +348,7 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 void MidiClip::setType( MidiClipTypes _new_clip_type )
 {
-	if( _new_clip_type == BeatClip ||
+	if( _new_clip_type == PatternClip ||
 				_new_clip_type == MelodyClip )
 	{
 		m_clipType = _new_clip_type;
@@ -370,7 +370,7 @@ void MidiClip::checkType()
 		}
 		++it;
 	}
-	setType( BeatClip );
+	setType( PatternClip );
 }
 
 
@@ -558,11 +558,11 @@ ClipView * MidiClip::createView( TrackView * _tv )
 
 
 
-void MidiClip::updateBBTrack()
+void MidiClip::updatePatternTrack()
 {
-	if( getTrack()->trackContainer() == Engine::getBBTrackContainer() )
+	if( getTrack()->trackContainer() == Engine::getPatternTrackContainer() )
 	{
-		Engine::getBBTrackContainer()->updateBBTrack( this );
+		Engine::getPatternTrackContainer()->updatePatternTrack( this );
 	}
 
 	if( getGUI() != nullptr

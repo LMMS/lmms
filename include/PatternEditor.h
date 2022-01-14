@@ -1,5 +1,5 @@
 /*
- * BBEditor.h - view-component of BB-Editor
+ * PatternEditor.h - view-component of Pattern Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,60 +23,60 @@
  */
 
 
-#ifndef BB_EDITOR_H
-#define BB_EDITOR_H
+#ifndef PATTERN_EDITOR_H
+#define PATTERN_EDITOR_H
 
 
 #include "Editor.h"
 #include "TrackContainerView.h"
 
 
-class BBTrackContainer;
+class PatternTrackContainer;
 class ComboBox;
 
-class BBTrackContainerView;
+class PatternTrackContainerView;
 
-class BBEditor : public Editor
+class PatternEditor : public Editor
 {
 	Q_OBJECT
 public:
-	BBEditor( BBTrackContainer * _tc );
-	~BBEditor();
+	PatternEditor( PatternTrackContainer * _tc );
+	~PatternEditor();
 
 	QSize sizeHint() const override;
 
-	const BBTrackContainerView* trackContainerView() const {
+	const PatternTrackContainerView* trackContainerView() const {
 		return m_trackContainerView;
 	}
-	BBTrackContainerView* trackContainerView() {
+	PatternTrackContainerView* trackContainerView() {
 		return m_trackContainerView;
 	}
 
-	void removeBBView( int bb );
+	void removePatternView(int pattern);
 
 public slots:
 	void play() override;
 	void stop() override;
 
 private:
-	BBTrackContainerView* m_trackContainerView;
-	ComboBox * m_bbComboBox;
+	PatternTrackContainerView* m_trackContainerView;
+	ComboBox * m_patternComboBox;
 } ;
 
 
 
-class BBTrackContainerView : public TrackContainerView
+class PatternTrackContainerView : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	BBTrackContainerView(BBTrackContainer* tc);
+	PatternTrackContainerView(PatternTrackContainer* tc);
 
 	bool fixedClips() const override
 	{
 		return true;
 	}
 
-	void removeBBView(int bb);
+	void removePatternView(int pattern);
 
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
@@ -94,7 +94,7 @@ protected slots:
 	void updatePosition();
 
 private:
-	BBTrackContainer * m_bbtc;
+	PatternTrackContainer * m_ptc;
 	void makeSteps( bool clone );
 };
 

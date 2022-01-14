@@ -50,7 +50,6 @@
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
-#include "BBTrackContainer.h"
 #include "Clipboard.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
@@ -64,6 +63,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
+#include "PatternTrackContainer.h"
 #include "PianoView.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
@@ -313,7 +313,7 @@ PianoRoll::PianoRoll() :
 			this,
 			SLOT( updatePositionAccompany( const TimePos & ) ) );
 	// TODO
-/*	connect( engine::getSong()->getPlayPos( Song::Mode_PlayBB ).m_timeLine,
+/*	connect( engine::getSong()->getPlayPos( Song::Mode_PlayPattern ).m_timeLine,
 				SIGNAL( positionChanged( const TimePos & ) ),
 			this,
 			SLOT( updatePositionAccompany( const TimePos & ) ) );*/
@@ -1852,7 +1852,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					m_minResizeLen = quantization();
 					for (Note *note : selectedNotes)
 					{
-						//Notes from the BB editor can have a negative length, so
+						//Notes from the pattern editor can have a negative length, so
 						//change their length to the displayed one before resizing
 						if (note->oldLength() <= 0) { note->setOldLength(4); }
 						//Let the note be sized down by quantized increments, stopping
@@ -3944,9 +3944,9 @@ QList<int> PianoRoll::getAllOctavesForKey( int keyToMirror ) const
 Song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
 {
 	if( m_midiClip->getTrack()->trackContainer() ==
-					Engine::getBBTrackContainer() )
+					Engine::getPatternTrackContainer() )
 	{
-		return Song::Mode_PlayBB;
+		return Song::Mode_PlayPattern;
 	}
 	return Song::Mode_PlaySong;
 }
@@ -4014,7 +4014,7 @@ void PianoRoll::recordAccompany()
 	}
 	else
 	{
-		Engine::getSong()->playBB();
+		Engine::getSong()->playPattern();
 	}
 }
 
@@ -4509,7 +4509,7 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 					s->playMode() != Song::Mode_PlayMidiClip )
 	{
 		TimePos pos = t;
-		if( s->playMode() != Song::Mode_PlayBB )
+		if( s->playMode() != Song::Mode_PlayPattern )
 		{
 			pos -= m_midiClip->startPosition();
 		}
@@ -4726,7 +4726,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	m_playAction->setToolTip(tr( "Play/pause current clip (Space)" ) );
 	m_recordAction->setToolTip(tr( "Record notes from MIDI-device/channel-piano" ) );
-	m_recordAccompanyAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ) );
+	m_recordAccompanyAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano while playing song or pattern track" ) );
 	m_toggleStepRecordingAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano, one step at the time" ) );
 	m_stopAction->setToolTip( tr( "Stop playing of current clip (Space)" ) );
 

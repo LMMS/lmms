@@ -927,15 +927,15 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// Set up buttons
 	m_playAction->setToolTip(tr("Play song (Space)"));
 	m_recordAction->setToolTip(tr("Record samples from Audio-device"));
-	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
+	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or pattern track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
 
-	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),
-									 tr("Add beat/bassline"), this);
+	m_addPatternTrackAction = new QAction(embed::getIconPixmap("add_pattern_track"),
+									 tr("Add pattern-track"), this);
 
 	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
 										 tr("Add sample-track"), this);
@@ -943,11 +943,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
 											 tr("Add automation-track"), this);
 
-	connect(m_addBBTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addBBTrack()));
+	connect(m_addPatternTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addPatternTrack()));
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
-	trackActionsToolBar->addAction( m_addBBTrackAction );
+	trackActionsToolBar->addAction( m_addPatternTrackAction );
 	trackActionsToolBar->addAction( m_addSampleTrackAction );
 	trackActionsToolBar->addAction( m_addAutomationTrackAction );
 

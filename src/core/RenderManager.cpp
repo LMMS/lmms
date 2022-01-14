@@ -26,9 +26,11 @@
 #include <QDir>
 
 #include "RenderManager.h"
+
+#include "PatternTrack.h"
+#include "PatternTrackContainer.h"
 #include "Song.h"
-#include "BBTrackContainer.h"
-#include "BBTrack.h"
+
 
 
 RenderManager::RenderManager(
@@ -110,7 +112,7 @@ void RenderManager::renderTracks()
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::getBBTrackContainer()->tracks();
+	const TrackContainer::TrackList t2 = Engine::getPatternTrackContainer()->tracks();
 	for( auto it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);

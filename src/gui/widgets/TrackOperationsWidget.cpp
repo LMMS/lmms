@@ -131,7 +131,7 @@ TrackOperationsWidget::~TrackOperationsWidget()
 /*! \brief Respond to trackOperationsWidget mouse events
  *
  *  If it's the left mouse button, and Ctrl is held down, and we're
- *  not a Beat+Bassline Editor track, then start a new drag event to
+ *  not a Pattern Editor track, then start a new drag event to
  *  copy this track.
  *
  *  Otherwise, ignore all other events.
@@ -142,7 +142,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
 	if( me->button() == Qt::LeftButton &&
 		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::BBTrack )
+			m_trackView->getTrack()->type() != Track::PatternTrack )
 	{
 		DataFile dataFile( DataFile::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
@@ -163,7 +163,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 
 /*! \brief Repaint the trackOperationsWidget
  *
- *  If we're not moving, and in the Beat+Bassline Editor, then turn
+ *  If we're not moving, and in the Pattern Editor, then turn
  *  automation on or off depending on its previous state and show
  *  ourselves.
  *

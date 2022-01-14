@@ -27,7 +27,7 @@
 
 #include <QDomElement>
 
-#include "BBTrack.h"
+#include "PatternTrack.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
 #include "Song.h"
@@ -67,7 +67,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 	bool played_a_note = false; // will be return variable
 
 	clipVector clips;
-	::BBTrack * bb_track = nullptr;
+	::PatternTrack * pattern_track = nullptr;
 	if( _clip_num >= 0 )
 	{
 		if (_start > getClip(_clip_num)->length())
@@ -79,9 +79,9 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			return false;
 		}
 		clips.push_back( getClip( _clip_num ) );
-		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		if (trackContainer() == (TrackContainer*)Engine::getPatternTrackContainer())
 		{
-			bb_track = BBTrack::findBBTrack( _clip_num );
+			pattern_track = PatternTrack::findPatternTrack( _clip_num );
 			setPlaying(true);
 		}
 	}
@@ -143,7 +143,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
-				smpHandle->setBBTrack( bb_track );
+				smpHandle->setPatternTrack( pattern_track );
 				handle = smpHandle;
 			}
 			handle->setOffset( _offset );

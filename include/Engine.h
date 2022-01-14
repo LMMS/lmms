@@ -35,8 +35,8 @@
 #include "lmms_basics.h"
 
 class AudioEngine;
-class BBTrackContainer;
 class Mixer;
+class PatternTrackContainer;
 class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
@@ -77,9 +77,9 @@ public:
 		return s_song;
 	}
 
-	static BBTrackContainer * getBBTrackContainer()
+	static PatternTrackContainer * getPatternTrackContainer()
 	{
-		return s_bbTrackContainer;
+		return s_patternTrackContainer;
 	}
 
 	static ProjectJournal * projectJournal()
@@ -143,7 +143,7 @@ private:
 	static AudioEngine *s_audioEngine;
 	static Mixer * s_mixer;
 	static Song * s_song;
-	static BBTrackContainer * s_bbTrackContainer;
+	static PatternTrackContainer * s_patternTrackContainer;
 	static ProjectJournal * s_projectJournal;
 
 #ifdef LMMS_HAVE_LV2

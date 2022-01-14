@@ -1,5 +1,5 @@
 /*
- * BBTrackView.h
+ * PatternTrackView.h
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,27 +23,27 @@
  */
 
 
-#ifndef BB_TRACK_VIEW_H
-#define BB_TRACK_VIEW_H
+#ifndef PATTERN_TRACK_VIEW_H
+#define PATTERN_TRACK_VIEW_H
 
 #include <QtCore/QObject>
 
-#include "BBTrack.h"
+#include "PatternTrack.h"
 #include "TrackView.h"
 
 
-class BBTrackView : public TrackView
+class PatternTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	BBTrackView( BBTrack* bbt, TrackContainerView* tcv );
-	virtual ~BBTrackView();
+	PatternTrackView( PatternTrack* pt, TrackContainerView* tcv );
+	virtual ~PatternTrackView();
 
 	bool close() override;
 
-	const BBTrack * getBBTrack() const
+	const PatternTrack * getPatternTrack() const
 	{
-		return( m_bbTrack );
+		return( m_patternTrack );
 	}
 
 
@@ -52,7 +52,7 @@ public slots:
 
 
 private:
-	BBTrack * m_bbTrack;
+	PatternTrack * m_patternTrack;
 	TrackLabelButton * m_trackLabel;
 } ;
 

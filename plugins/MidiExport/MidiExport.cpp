@@ -34,10 +34,10 @@
 
 #include "lmms_math.h"
 #include "TrackContainer.h"
-#include "BBTrack.h"
 #include "DataFile.h"
 #include "InstrumentTrack.h"
 #include "LocaleHelper.h"
+#include "PatternTrack.h"
 
 #include "plugin_export.h"
 
@@ -76,7 +76,7 @@ MidiExport::~MidiExport()
 
 
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
-			const TrackContainer::TrackList &tracks_BB,
+			const TrackContainer::TrackList &patternTracks,
 			int tempo, int masterPitch, const QString &filename)
 {
 	QFile f(filename);
@@ -84,7 +84,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	QDataStream midiout(&f);
 
 	InstrumentTrack* instTrack;
-	BBTrack* bbTrack;
+	PatternTrack* patternTrack;
 	QDomElement element;
 
 
@@ -93,7 +93,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	uint32_t size;
 
 	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
-	for (const Track* track : tracks_BB) if (track->type() == Track::InstrumentTrack) nTracks++;
+	for (const Track* track : patternTracks) if (track->type() == Track::InstrumentTrack) nTracks++;
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
@@ -145,22 +145,22 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				}
 
 			}
-			ProcessBBNotes(midiClip, INT_MAX);
+			ProcessPatternNotes(midiClip, INT_MAX);
 			writeMidiClipToTrack(mtrack, midiClip);
 			size = mtrack.writeToBuffer(buffer);
 			midiout.writeRawData((char *)buffer, size);
 		}
 
-		if (track->type() == Track::BBTrack)
+		if (track->type() == Track::PatternTrack)
 		{
-			bbTrack = dynamic_cast<BBTrack *>(track);
-			element = bbTrack->saveState(dataFile, dataFile.content());
+			patternTrack = dynamic_cast<PatternTrack *>(track);
+			element = patternTrack->saveState(dataFile, dataFile.content());
 
 			std::vector<std::pair<int,int>> plist;
 			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
 
-				if (n.nodeName() == "bbclip")
+				if (n.nodeName() == "bbclip")  // TODO rename to patternclip
 				{
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
@@ -174,8 +174,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		}
 	} // for each track
 
-	// midi tracks in BB tracks
-	for (Track* track : tracks_BB)
+	// midi tracks in pattern tracks
+	for (Track* track : patternTracks)
 	{
 		DataFile dataFile(DataFile::SongProject);
 		MTrack mtrack;
@@ -215,21 +215,21 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				MidiNoteVector nv, midiClip;
 				writeMidiClip(midiClip, n, base_pitch, base_volume, 0);
 
-				// workaround for nested BBClips
+				// workaround for nested PatternClips
 				int pos = 0;
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
 				for (auto it = plist.begin(); it != plist.end(); ++it)
 				{
 					while (!st.empty() && st.back().second <= it->first)
 					{
-						writeBBClip(midiClip, nv, len, st.back().first, pos, st.back().second);
+						writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 						pos = st.back().second;
 						st.pop_back();
 					}
 
 					if (!st.empty() && st.back().second <= it->second)
 					{
-						writeBBClip(midiClip, nv, len, st.back().first, pos, it->first);
+						writePatternClip(midiClip, nv, len, st.back().first, pos, it->first);
 						pos = it->first;
 						while (!st.empty() && st.back().second <= it->second)
 						{
@@ -243,12 +243,12 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 				while (!st.empty())
 				{
-					writeBBClip(midiClip, nv, len, st.back().first, pos, st.back().second);
+					writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 					pos = st.back().second;
 					st.pop_back();
 				}
 
-				ProcessBBNotes(nv, pos);
+				ProcessPatternNotes(nv, pos);
 				writeMidiClipToTrack(mtrack, nv);
 				++itr;
 			}
@@ -294,7 +294,7 @@ void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
 
 
 
-void MidiExport::writeBBClip(MidiNoteVector &src, MidiNoteVector &dst,
+void MidiExport::writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end)
 {
 	if (start >= end) { return; }
@@ -318,7 +318,7 @@ void MidiExport::writeBBClip(MidiNoteVector &src, MidiNoteVector &dst,
 
 
 
-void MidiExport::ProcessBBNotes(MidiNoteVector &nv, int cutPos)
+void MidiExport::ProcessPatternNotes(MidiNoteVector &nv, int cutPos)
 {
 	std::sort(nv.begin(), nv.end());
 	int cur = INT_MAX, next = INT_MAX;

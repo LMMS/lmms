@@ -46,7 +46,6 @@
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
-#include "BBTrackContainer.h"
 #include "ComboBox.h"
 #include "debug.h"
 #include "DeprecationHelper.h"
@@ -55,6 +54,7 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "PatternTrackContainer.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "SongEditor.h"
@@ -1508,10 +1508,10 @@ float AutomationEditor::getLevel(int y )
 
 
 
-inline bool AutomationEditor::inBBEditor()
+inline bool AutomationEditor::inPatternEditor()
 {
 	return( validClip() &&
-				m_clip->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
+				m_clip->getTrack()->trackContainer() == Engine::getPatternTrackContainer() );
 }
 
 
@@ -1540,9 +1540,9 @@ void AutomationEditor::play()
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 	}
-	else if( inBBEditor() )
+	else if( inPatternEditor() )
 	{
-		Engine::getBBTrackContainer()->play();
+		Engine::getPatternTrackContainer()->play();
 	}
 	else
 	{
@@ -1566,9 +1566,9 @@ void AutomationEditor::stop()
 	{
 		return;
 	}
-	if( m_clip->getTrack() && inBBEditor() )
+	if( m_clip->getTrack() && inPatternEditor() )
 	{
-		Engine::getBBTrackContainer()->stop();
+		Engine::getPatternTrackContainer()->stop();
 	}
 	else
 	{

@@ -47,9 +47,9 @@
 #include "AudioEngine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "PatternTrackContainer.h"
 #include "SampleTrack.h"
 #include "Song.h"
-#include "BBTrackContainer.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 MixerView::MixerView() :
@@ -239,9 +239,9 @@ void MixerView::refreshDisplay()
 void MixerView::updateMaxChannelSelector()
 {
 	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
-	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList patternTrackList = Engine::getPatternTrackContainer()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTrackList, patternTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
 		TrackContainer::TrackList trackList = trackLists[tl];
@@ -435,7 +435,7 @@ void MixerView::deleteUnusedChannels()
 {
 	TrackContainer::TrackList tracks;
 	tracks += Engine::getSong()->tracks();
-	tracks += Engine::getBBTrackContainer()->tracks();
+	tracks += Engine::getPatternTrackContainer()->tracks();
 
 	std::vector<bool> inUse(m_mixerChannelViews.size(), false);
 

@@ -218,7 +218,7 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
-	bool inBBEditor();
+	bool inPatternEditor();
 
 	QColor m_barLineColor;
 	QColor m_beatLineColor;

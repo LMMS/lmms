@@ -65,7 +65,7 @@ public:
 	{
 		Mode_None,
 		Mode_PlaySong,
-		Mode_PlayBB,
+		Mode_PlayPattern,
 		Mode_PlayMidiClip,
 		Mode_PlayAutomationClip,
 		Mode_Count
@@ -363,7 +363,7 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playBB();
+	void playPattern();
 	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
@@ -376,7 +376,7 @@ public slots:
 
 	void clearProject();
 
-	void addBBTrack();
+	void addPatternTrack();
 
 
 private slots:

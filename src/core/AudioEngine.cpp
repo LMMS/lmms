@@ -465,7 +465,7 @@ void AudioEngine::handleMetronome()
 	bool metronomeSupported =
 		currentPlayMode == Song::Mode_PlayMidiClip
 		|| currentPlayMode == Song::Mode_PlaySong
-		|| currentPlayMode == Song::Mode_PlayBB;
+		|| currentPlayMode == Song::Mode_PlayPattern;
 
 	if (!metronomeSupported || !m_metronomeActive || song->isExporting())
 	{

@@ -42,7 +42,7 @@ class LMMS_EXPORT MidiClip : public Clip
 public:
 	enum MidiClipTypes
 	{
-		BeatClip,
+		PatternClip,
 		MelodyClip
 	} ;
 
@@ -110,7 +110,7 @@ public:
 
 
 protected:
-	void updateBBTrack();
+	void updatePatternTrack();
 
 
 protected slots:
@@ -122,7 +122,7 @@ protected slots:
 
 
 private:
-	TimePos beatClipLength() const;
+	TimePos patternClipLength() const;
 
 	void setType( MidiClipTypes _new_clip_type );
 	void checkType();
@@ -140,7 +140,7 @@ private:
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
 	friend class MidiClipView;
-	friend class BBTrackContainerView;
+	friend class PatternTrackContainerView;
 
 
 signals:

@@ -1,5 +1,5 @@
 /*
- * BBTrack.h - class BBTrack, a wrapper for using bbEditor
+ * PatternTrack.h - class PatternTrack, a wrapper for using patternEditor
  *              (which is a singleton-class) as track
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -24,25 +24,25 @@
  */
 
 
-#ifndef BB_TRACK_H
-#define BB_TRACK_H
+#ifndef PATTERN_TRACK_H
+#define PATTERN_TRACK_H
 
 
 #include <QtCore/QMap>
 
-#include "BBClipView.h"
+#include "PatternClipView.h"
 #include "Track.h"
 
 class TrackLabelButton;
 class TrackContainer;
 
 
-class LMMS_EXPORT BBTrack : public Track
+class LMMS_EXPORT PatternTrack : public Track
 {
 	Q_OBJECT
 public:
-	BBTrack( TrackContainer* tc );
-	virtual ~BBTrack();
+	PatternTrack( TrackContainer* tc );
+	virtual ~PatternTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
@@ -53,8 +53,8 @@ public:
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
-	static BBTrack * findBBTrack( int _bb_num );
-	static void swapBBTracks( Track * _track1, Track * _track2 );
+	static PatternTrack * findPatternTrack( int _pattern_num );
+	static void swapPatternTracks( Track * _track1, Track * _track2 );
 
 	int index()
 	{
@@ -77,17 +77,17 @@ public:
 protected:
 	inline QString nodeName() const override
 	{
-		return( "bbtrack" );
+		return( "bbtrack" ); //TODO rename to patterntrack
 	}
 
 
 private:
 	QList<Track *> m_disabledTracks;
 
-	typedef QMap<BBTrack *, int> infoMap;
+	typedef QMap<PatternTrack *, int> infoMap;
 	static infoMap s_infoMap;
 
-	friend class BBTrackView;
+	friend class PatternTrackView;
 } ;
 
 

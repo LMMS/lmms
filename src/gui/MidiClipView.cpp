@@ -43,7 +43,7 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	m_noteBorderColor(255, 255, 255, 220),
 	m_mutedNoteFillColor(100, 100, 100, 220),
 	m_mutedNoteBorderColor(100, 100, 100, 220),
-	m_legacySEBB(ConfigManager::inst()->value("ui","legacysebb","0").toInt())
+	m_legacySEPattern(ConfigManager::inst()->value("ui","legacysebb","0").toInt())  // TODO rename bb to pattern
 {
 	connect( getGUI()->pianoRoll(), SIGNAL( currentMidiClipChanged() ),
 			this, SLOT( update() ) );
@@ -164,7 +164,7 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
 
-	if ( m_clip->type() == MidiClip::BeatClip )
+	if ( m_clip->type() == MidiClip::PatternClip )
 	{
 		_cm->addSeparator();
 
@@ -182,12 +182,12 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
-	bool displayBB = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEBB);
+	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if( _me->button() == Qt::LeftButton &&
-		m_clip->m_clipType == MidiClip::BeatClip &&
-		displayBB && _me->y() > height() - s_stepBtnOff->height() )
+		m_clip->m_clipType == MidiClip::PatternClip &&
+		displayPattern && _me->y() > height() - s_stepBtnOff->height() )
 
-	// when mouse button is pressed in beat/bassline -mode
+	// when mouse button is pressed in pattern mode
 
 	{
 //	get the step number that was clicked on and
@@ -228,7 +228,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 
-	// if not in beat/bassline -mode, let parent class handle the event
+	// if not in pattern mode, let parent class handle the event
 
 	{
 		ClipView::mousePressEvent( _me );
@@ -253,7 +253,7 @@ void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 void MidiClipView::wheelEvent(QWheelEvent * we)
 {
-	if(m_clip->m_clipType == MidiClip::BeatClip &&
+	if(m_clip->m_clipType == MidiClip::PatternClip &&
 				(fixedClips() || pixelsPerBar() >= 96) &&
 				position(we).y() > height() - s_stepBtnOff->height())
 	{
@@ -331,12 +331,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	QColor c;
 	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool current = getGUI()->pianoRoll()->currentMidiClip() == m_clip;
-	bool beatClip = m_clip->m_clipType == MidiClip::BeatClip;
+	bool patternClip = m_clip->m_clipType == MidiClip::PatternClip;
 
-	if( beatClip )
+	if( patternClip )
 	{
-		// Do not paint BBClips how we paint MidiClips
-		c = BBClipBackground();
+		// Do not paint PatternClips how we paint MidiClips
+		c = patternClipBackground();
 	}
 	else
 	{
@@ -345,8 +345,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	lingrad.setColorAt( beatClip ? 0 : 1, c.darker( 300 ) );
-	lingrad.setColorAt( beatClip ? 1 : 0, c );
+	lingrad.setColorAt( patternClip ? 0 : 1, c.darker( 300 ) );
+	lingrad.setColorAt( patternClip ? 1 : 0, c );
 
 	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
@@ -363,7 +363,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
 	bool const drawName = !m_clip->name().isEmpty();
-	bool const drawTextBox = !beatClip && drawName;
+	bool const drawTextBox = !patternClip && drawName;
 
 	// TODO Warning! This might cause problems if ClipView::paintTextLabel changes
 	int textBoxHeight = 0;
@@ -388,7 +388,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	const int x_base = CLIP_BORDER_WIDTH;
 
-	bool displayBB = fixedClips() || (pixelsPerBar >= 96 && m_legacySEBB);
+	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
 	// melody clip paint event
 	NoteVector const & noteCollection = m_clip->m_notes;
 	if( m_clip->m_clipType == MidiClip::MelodyClip && !noteCollection.empty() )
@@ -504,8 +504,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		p.restore();
 	}
-	// beat clip paint event
-	else if( beatClip &&	displayBB )
+	// pattern clip paint event
+	else if( patternClip &&	displayPattern )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
@@ -515,7 +515,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 					m_clip->m_steps );
 		const int w = width() - 2 * CLIP_BORDER_WIDTH;
 
-		// scale step graphics to fit the beat clip length
+		// scale step graphics to fit the pattern clip length
 		stepon0 = s_stepBtnOn0->scaled( w / steps,
 					      s_stepBtnOn0->height(),
 					      Qt::IgnoreAspectRatio,
@@ -533,7 +533,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat clip
+		for( int it = 0; it < steps; it++ )	// go through all the steps in the pattern clip
 		{
 			Note * n = m_clip->noteAtStep( it );
 
@@ -590,7 +590,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		paintTextLabel(m_clip->name(), p);
 	}
 
-	if( !( fixedClips() && beatClip ) )
+	if( !( fixedClips() && patternClip ) )
 	{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );

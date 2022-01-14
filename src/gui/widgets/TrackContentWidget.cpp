@@ -30,12 +30,12 @@
 #include <QPainter>
 
 #include "AutomationClip.h"
-#include "BBEditor.h"
-#include "BBTrackContainer.h"
 #include "Clipboard.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "GuiApplication.h"
+#include "PatternEditor.h"
+#include "PatternTrackContainer.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
@@ -199,17 +199,17 @@ void TrackContentWidget::update()
  */
 void TrackContentWidget::changePosition( const TimePos & newPos )
 {
-	if( m_trackView->trackContainerView() == getGUI()->getBBEditor()->trackContainerView() )
+	if( m_trackView->trackContainerView() == getGUI()->getPatternEditor()->trackContainerView() )
 	{
-		const int curBB = Engine::getBBTrackContainer()->currentBB();
+		const int curPattern = Engine::getPatternTrackContainer()->currentPattern();
 		setUpdatesEnabled( false );
 
-		// first show Clip for current BB...
+		// first show clip for current pattern...
 		for( clipViewVector::iterator it = m_clipViews.begin();
 						it != m_clipViews.end(); ++it )
 		{
 		if( ( *it )->getClip()->
-						startPosition().getBar() == curBB )
+						startPosition().getBar() == curPattern )
 			{
 				( *it )->move( 0, ( *it )->y() );
 				( *it )->raise();
@@ -225,7 +225,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 					it != m_clipViews.end(); ++it )
 		{
 			if( ( *it )->getClip()->
-						startPosition().getBar() != curBB )
+						startPosition().getBar() != curPattern )
 			{
 				( *it )->hide();
 			}
@@ -600,8 +600,8 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 	QPainter p( this );
-	// Don't draw background on BB-Editor
-	if( m_trackView->trackContainerView() != getGUI()->getBBEditor()->trackContainerView() )
+	// Don't draw background on Pattern Editor
+	if( m_trackView->trackContainerView() != getGUI()->getPatternEditor()->trackContainerView() )
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getBar() * ppb, 0 ) );

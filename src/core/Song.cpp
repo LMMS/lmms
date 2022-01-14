@@ -36,9 +36,6 @@
 
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
-#include "BBEditor.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
@@ -51,6 +48,9 @@
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
 #include "MidiClip.h"
+#include "PatternEditor.h"
+#include "PatternTrack.h"
+#include "PatternTrackContainer.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
@@ -219,11 +219,11 @@ void Song::processNextBuffer()
 			trackList = tracks();
 			break;
 
-		case Mode_PlayBB:
-			if (Engine::getBBTrackContainer()->numOfBBs() > 0)
+		case Mode_PlayPattern:
+			if (Engine::getPatternTrackContainer()->numOfPatterns() > 0)
 			{
-				clipNum = Engine::getBBTrackContainer()->currentBB();
-				trackList.push_back(BBTrack::findBBTrack(clipNum));
+				clipNum = Engine::getPatternTrackContainer()->currentPattern();
+				trackList.push_back(PatternTrack::findPatternTrack(clipNum));
 			}
 			break;
 
@@ -288,11 +288,11 @@ void Song::processNextBuffer()
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
 			getPlayPos().setCurrentFrame(frameOffsetInTick);
 
-			// If we are playing a BB track, or a MIDI clip with no loop enabled,
+			// If we are playing a pattern track, or a MIDI clip with no loop enabled,
 			// loop back to the beginning when we reach the end
-			if (m_playMode == Mode_PlayBB)
+			if (m_playMode == Mode_PlayPattern)
 			{
-				enforceLoop(TimePos{0}, TimePos{Engine::getBBTrackContainer()->lengthOfCurrentBB(), 0});
+				enforceLoop(TimePos{0}, TimePos{Engine::getPatternTrackContainer()->lengthOfCurrentPattern(), 0});
 			}
 			else if (m_playMode == Mode_PlayMidiClip && m_loopMidiClip && !loopEnabled)
 			{
@@ -368,14 +368,14 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	{
 	case Mode_PlaySong:
 		break;
-	case Mode_PlayBB:
+	case Mode_PlayPattern:
 	{
 		Q_ASSERT(tracklist.size() == 1);
-		Q_ASSERT(tracklist.at(0)->type() == Track::BBTrack);
-		auto bbTrack = dynamic_cast<BBTrack*>(tracklist.at(0));
-		auto bbContainer = Engine::getBBTrackContainer();
-		container = bbContainer;
-		clipNum = bbTrack->index();
+		Q_ASSERT(tracklist.at(0)->type() == Track::PatternTrack);
+		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
+		auto patternContainer = Engine::getPatternTrackContainer();
+		container = patternContainer;
+		clipNum = patternTrack->index();
 	}
 		break;
 	default:
@@ -518,14 +518,14 @@ void Song::playAndRecord()
 
 
 
-void Song::playBB()
+void Song::playPattern()
 {
 	if( isStopped() == false )
 	{
 		stop();
 	}
 
-	m_playMode = Mode_PlayBB;
+	m_playMode = Mode_PlayPattern;
 	m_playing = true;
 	m_paused = false;
 
@@ -802,10 +802,10 @@ void Song::removeBar()
 
 
 
-void Song::addBBTrack()
+void Song::addPatternTrack()
 {
-	Track * t = Track::create( Track::BBTrack, this );
-	Engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<BBTrack *>( t )->index() );
+	Track * t = Track::create( Track::PatternTrack, this );
+	Engine::getPatternTrackContainer()->setCurrentPattern( dynamic_cast<PatternTrack *>( t )->index() );
 }
 
 
@@ -866,9 +866,9 @@ void Song::clearProject()
 
 	Engine::audioEngine()->requestChangeInModel();
 
-	if( getGUI() != nullptr && getGUI()->getBBEditor() )
+	if( getGUI() != nullptr && getGUI()->getPatternEditor() )
 	{
-		getGUI()->getBBEditor()->trackContainerView()->clearAllTracks();
+		getGUI()->getPatternEditor()->trackContainerView()->clearAllTracks();
 	}
 	if( getGUI() != nullptr && getGUI()->songEditor() )
 	{
@@ -879,7 +879,7 @@ void Song::clearProject()
 		getGUI()->mixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
-	Engine::getBBTrackContainer()->clearAllTracks();
+	Engine::getPatternTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
 	Engine::mixer()->clear();
@@ -963,11 +963,11 @@ void Song::createNewProject()
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	t = Track::create( Track::InstrumentTrack,
-						Engine::getBBTrackContainer() );
+						Engine::getPatternTrackContainer() );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 						"kicker" );
 	Track::create( Track::SampleTrack, this );
-	Track::create( Track::BBTrack, this );
+	Track::create( Track::PatternTrack, this );
 	Track::create( Track::AutomationTrack, this );
 
 	m_tempoModel.setInitValue( DefaultTempo );
@@ -979,7 +979,7 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 
-	Engine::getBBTrackContainer()->updateAfterTrackAdd();
+	Engine::getPatternTrackContainer()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
 
@@ -1112,9 +1112,9 @@ void Song::loadProject( const QString & fileName )
 			if( nd.isElement() && nd.nodeName() == "track" )
 			{
 				++m_nLoadingTrack;
-				if( nd.toElement().attribute("type").toInt() == Track::BBTrack )
+				if( nd.toElement().attribute("type").toInt() == Track::PatternTrack )
 				{
-					n += nd.toElement().elementsByTagName("bbtrack").at(0)
+					n += nd.toElement().elementsByTagName("bbtrack").at(0) // TODO rename to patterntrack
 						.toElement().firstChildElement().childNodes().count();
 				}
 				nd=nd.nextSibling();
@@ -1169,9 +1169,8 @@ void Song::loadProject( const QString & fileName )
 		node = node.nextSibling();
 	}
 
-	// quirk for fixing projects with broken positions of Clips inside
-	// BB-tracks
-	Engine::getBBTrackContainer()->fixIncorrectPositions();
+	// quirk for fixing projects with broken positions of Clips inside pattern tracks
+	Engine::getPatternTrackContainer()->fixIncorrectPositions();
 
 	// Connect controller links to their controllers
 	// now that everything is loaded
@@ -1396,12 +1395,12 @@ void Song::exportProjectMidi(QString const & exportFileName) const
 {
 	// instantiate midi export plugin
 	TrackContainer::TrackList const & tracks = this->tracks();
-	TrackContainer::TrackList const & tracks_BB = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList const & patternTracks = Engine::getPatternTrackContainer()->tracks();
 
 	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
 	if (exf)
 	{
-		exf->tryExport(tracks, tracks_BB, getTempo(), m_masterPitchModel.value(), exportFileName);
+		exf->tryExport(tracks, patternTracks, getTempo(), m_masterPitchModel.value(), exportFileName);
 	}
 	else
 	{

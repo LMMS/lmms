@@ -32,8 +32,8 @@
 #include "Song.h"
 
 #include "InstrumentTrack.h"
+#include "PatternTrackContainer.h"
 #include "SampleTrack.h"
-#include "BBTrackContainer.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
@@ -288,7 +288,7 @@ void Mixer::deleteChannel( int index )
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
 	tracks += Engine::getSong()->tracks();
-	tracks += Engine::getBBTrackContainer()->tracks();
+	tracks += Engine::getPatternTrackContainer()->tracks();
 
 	for( Track* t : tracks )
 	{
@@ -386,9 +386,9 @@ void Mixer::moveChannelLeft( int index )
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
-	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList patternTrackList = Engine::getPatternTrackContainer()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTrackList, patternTrackList};
 	for(int tl=0; tl<2; ++tl)
 	{
 		TrackContainer::TrackList trackList = trackLists[tl];

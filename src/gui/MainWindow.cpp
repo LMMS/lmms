@@ -41,7 +41,6 @@
 #include "AboutDialog.h"
 #include "AudioDummy.h"
 #include "AutomationEditor.h"
-#include "BBEditor.h"
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
@@ -54,6 +53,7 @@
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
 #include "MicrotunerConfig.h"
+#include "PatternEditor.h"
 #include "PianoRoll.h"
 #include "PianoView.h"
 #include "PluginBrowser.h"
@@ -500,13 +500,13 @@ void MainWindow::finalize()
 	song_editor_window->setShortcut( Qt::CTRL + Qt::Key_1 );
 
 
-	ToolButton * bb_editor_window = new ToolButton(
-					embed::getIconPixmap( "bb_track_btn" ),
-					tr( "Beat+Bassline Editor" ) +
+	ToolButton * pattern_editor_window = new ToolButton(
+					embed::getIconPixmap( "pattern_track_btn" ),
+					tr( "Pattern Editor" ) +
 									" (Ctrl+2)",
-					this, SLOT( toggleBBEditorWin() ),
+					this, SLOT( togglePatternEditorWin() ),
 								m_toolBar );
-	bb_editor_window->setShortcut( Qt::CTRL + Qt::Key_2 );
+	pattern_editor_window->setShortcut( Qt::CTRL + Qt::Key_2 );
 
 
 	ToolButton * piano_roll_window = new ToolButton(
@@ -558,7 +558,7 @@ void MainWindow::finalize()
 	microtuner_window->setShortcut( Qt::CTRL + Qt::Key_8 );
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
-	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
+	m_toolBarLayout->addWidget( pattern_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
 	m_toolBarLayout->addWidget( mixer_window, 1, 5 );
@@ -589,7 +589,7 @@ void MainWindow::finalize()
 	// Add editor subwindows
 	for (QWidget* widget :  std::list<QWidget*>{
 			getGUI()->automationEditor(),
-			getGUI()->getBBEditor(),
+			getGUI()->getPatternEditor(),
 			getGUI()->pianoRoll(),
 			getGUI()->songEditor()
 	})
@@ -601,8 +601,8 @@ void MainWindow::finalize()
 	}
 
 	getGUI()->automationEditor()->parentWidget()->hide();
-	getGUI()->getBBEditor()->parentWidget()->move( 610, 5 );
-	getGUI()->getBBEditor()->parentWidget()->hide();
+	getGUI()->getPatternEditor()->parentWidget()->move( 610, 5 );
+	getGUI()->getPatternEditor()->parentWidget()->hide();
 	getGUI()->pianoRoll()->parentWidget()->move(5, 5);
 	getGUI()->pianoRoll()->parentWidget()->hide();
 	getGUI()->songEditor()->parentWidget()->move(5, 5);
@@ -1056,7 +1056,7 @@ void MainWindow::refocus()
 	QList<QWidget*> editors;
 	editors
 		<< getGUI()->songEditor()->parentWidget()
-		<< getGUI()->getBBEditor()->parentWidget()
+		<< getGUI()->getPatternEditor()->parentWidget()
 		<< getGUI()->pianoRoll()->parentWidget()
 		<< getGUI()->automationEditor()->parentWidget();
 
@@ -1078,9 +1078,9 @@ void MainWindow::refocus()
 
 
 
-void MainWindow::toggleBBEditorWin( bool forceShow )
+void MainWindow::togglePatternEditorWin( bool forceShow )
 {
-	toggleWindow( getGUI()->getBBEditor(), forceShow );
+	toggleWindow( getGUI()->getPatternEditor(), forceShow );
 }
 
 
@@ -1143,9 +1143,9 @@ void MainWindow::updateViewMenu()
 			      tr( "Song Editor" ) + "\tCtrl+1",
 			      this, SLOT( toggleSongEditorWin() )
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "bb_track" ),
-					tr( "Beat+Bassline Editor" ) + "\tCtrl+2",
-					this, SLOT( toggleBBEditorWin() )
+	m_viewMenu->addAction(embed::getIconPixmap( "pattern_track" ),
+					tr( "Pattern Editor" ) + "\tCtrl+2",
+					this, SLOT( togglePatternEditorWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),
 			      tr( "Piano Roll" ) + "\tCtrl+3",
@@ -1279,7 +1279,7 @@ void MainWindow::updatePlayPauseIcons()
 {
 	getGUI()->songEditor()->setPauseIcon( false );
 	getGUI()->automationEditor()->setPauseIcon( false );
-	getGUI()->getBBEditor()->setPauseIcon( false );
+	getGUI()->getPatternEditor()->setPauseIcon( false );
 	getGUI()->pianoRoll()->setPauseIcon( false );
 
 	if( Engine::getSong()->isPlaying() )
@@ -1294,8 +1294,8 @@ void MainWindow::updatePlayPauseIcons()
 				getGUI()->automationEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayBB:
-				getGUI()->getBBEditor()->setPauseIcon( true );
+			case Song::Mode_PlayPattern:
+				getGUI()->getPatternEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayMidiClip:

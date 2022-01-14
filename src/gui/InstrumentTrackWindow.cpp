@@ -650,7 +650,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		newView->m_tlb->setChecked(true);
 		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos);
 
-		// scroll the SongEditor/BB-editor to make sure the new trackview label is visible
+		// scroll the SongEditor/PatternEditor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
 
 		// get the instrument window to refresh

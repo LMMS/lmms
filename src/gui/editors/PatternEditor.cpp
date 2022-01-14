@@ -1,5 +1,5 @@
 /*
- * BBEditor.cpp - basic main-window for editing of beats and basslines
+ * PatternEditor.cpp - basic main-window for editing pattern clips
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,18 +22,18 @@
  *
  */
 
-#include "BBEditor.h"
+#include "PatternEditor.h"
 
 #include <QAction>
 #include <QKeyEvent>
 #include <QLayout>
 
 #include "ComboBox.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
 #include "DataFile.h"
 #include "embed.h"
 #include "MainWindow.h"
+#include "PatternTrack.h"
+#include "PatternTrackContainer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -41,12 +41,12 @@
 
 
 
-BBEditor::BBEditor( BBTrackContainer* tc ) :
+PatternEditor::PatternEditor( PatternTrackContainer* tc ) :
 	Editor(false),
-	m_trackContainerView( new BBTrackContainerView(tc) )
+	m_trackContainerView( new PatternTrackContainerView(tc) )
 {
-	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
-	setWindowTitle( tr( "Beat+Bassline Editor" ) );
+	setWindowIcon( embed::getIconPixmap( "pattern_track_btn" ) );
+	setWindowTitle( tr( "Pattern Editor" ) );
 	setCentralWidget(m_trackContainerView);
 
 	setAcceptDrops(true);
@@ -68,27 +68,27 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	}
 
 
-	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
-	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
+	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ));
+	m_stopAction->setToolTip(tr( "Stop playback of current pattern (Space)" ));
 
 
-	// Beat selector
-	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
+	// Pattern selector
+	DropToolBar *patternSelectionToolBar = addDropToolBarToTop(tr("Pattern selector"));
 
-	m_bbComboBox = new ComboBox( m_toolBar );
-	m_bbComboBox->setFixedSize( 200, ComboBox::DEFAULT_HEIGHT );
-	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
+	m_patternComboBox = new ComboBox( m_toolBar );
+	m_patternComboBox->setFixedSize( 200, ComboBox::DEFAULT_HEIGHT );
+	m_patternComboBox->setModel( &tc->m_patternComboBoxModel );
 
-	beatSelectionToolBar->addWidget( m_bbComboBox );
+	patternSelectionToolBar->addWidget( m_patternComboBox );
 
 
 	// Track actions
 	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
 
 
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
-						 Engine::getSong(), SLOT(addBBTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_bb_track_clip"), tr("Clone beat/bassline clip"),
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_pattern_track"), tr("New pattern"),
+						 Engine::getSong(), SLOT(addPatternTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"),
 						 m_trackContainerView, SLOT(cloneClip()));
 	trackAndStepActionsToolBar->addAction(
 				embed::getIconPixmap("add_sample_track"),
@@ -110,44 +110,44 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	trackAndStepActionsToolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
 						  m_trackContainerView, SLOT( cloneSteps() ) );
 
-	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
+	connect( &tc->m_patternComboBoxModel, SIGNAL( dataChanged() ),
 			m_trackContainerView, SLOT( updatePosition() ) );
 
 
 	QAction* viewNext = new QAction(this);
-	connect(viewNext, SIGNAL(triggered()), m_bbComboBox, SLOT(selectNext()));
+	connect(viewNext, SIGNAL(triggered()), m_patternComboBox, SLOT(selectNext()));
 	viewNext->setShortcut(Qt::Key_Plus);
 	addAction(viewNext);
 
 	QAction* viewPrevious = new QAction(this);
-	connect(viewPrevious, SIGNAL(triggered()), m_bbComboBox, SLOT(selectPrevious()));
+	connect(viewPrevious, SIGNAL(triggered()), m_patternComboBox, SLOT(selectPrevious()));
 	viewPrevious->setShortcut(Qt::Key_Minus);
 	addAction(viewPrevious);
 }
 
 
-BBEditor::~BBEditor()
+PatternEditor::~PatternEditor()
 {
 }
 
 
-QSize BBEditor::sizeHint() const
+QSize PatternEditor::sizeHint() const
 {
 	return {minimumWidth()+10, 300};
 }
 
 
-void BBEditor::removeBBView( int bb )
+void PatternEditor::removePatternView(int pattern)
 {
-	m_trackContainerView->removeBBView(bb);
+	m_trackContainerView->removePatternView(pattern);
 }
 
 
-void BBEditor::play()
+void PatternEditor::play()
 {
-	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
+	if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
 	{
-		Engine::getSong()->playBB();
+		Engine::getSong()->playPattern();
 	}
 	else
 	{
@@ -156,7 +156,7 @@ void BBEditor::play()
 }
 
 
-void BBEditor::stop()
+void PatternEditor::stop()
 {
 	Engine::getSong()->stop();
 }
@@ -164,9 +164,9 @@ void BBEditor::stop()
 
 
 
-BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc) :
+PatternTrackContainerView::PatternTrackContainerView(PatternTrackContainer* tc) :
 	TrackContainerView(tc),
-	m_bbtc(tc)
+	m_ptc(tc)
 {
 	setModel( tc );
 }
@@ -174,12 +174,12 @@ BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc) :
 
 
 
-void BBTrackContainerView::addSteps()
+void PatternTrackContainerView::addSteps()
 {
 	makeSteps( false );
 }
 
-void BBTrackContainerView::cloneSteps()
+void PatternTrackContainerView::cloneSteps()
 {
 	makeSteps( true );
 }
@@ -187,7 +187,7 @@ void BBTrackContainerView::cloneSteps()
 
 
 
-void BBTrackContainerView::removeSteps()
+void PatternTrackContainerView::removeSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -196,7 +196,7 @@ void BBTrackContainerView::removeSteps()
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_bbtc->currentBB() ) );
+			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ptc->currentPattern() ) );
 			p->removeSteps();
 		}
 	}
@@ -205,7 +205,7 @@ void BBTrackContainerView::removeSteps()
 
 
 
-void BBTrackContainerView::addSampleTrack()
+void PatternTrackContainerView::addSampleTrack()
 {
 	(void) Track::create( Track::SampleTrack, model() );
 }
@@ -213,7 +213,7 @@ void BBTrackContainerView::addSampleTrack()
 
 
 
-void BBTrackContainerView::addAutomationTrack()
+void PatternTrackContainerView::addAutomationTrack()
 {
 	(void) Track::create( Track::AutomationTrack, model() );
 }
@@ -221,22 +221,22 @@ void BBTrackContainerView::addAutomationTrack()
 
 
 
-void BBTrackContainerView::removeBBView(int bb)
+void PatternTrackContainerView::removePatternView(int pattern)
 {
 	for( TrackView* view : trackViews() )
 	{
-		view->getTrackContentWidget()->removeClipView( bb );
+		view->getTrackContentWidget()->removeClipView(pattern);
 	}
 }
 
 
 
-void BBTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
+void PatternTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
-void BBTrackContainerView::loadSettings(const QDomElement& element)
+void PatternTrackContainerView::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
 }
@@ -244,7 +244,7 @@ void BBTrackContainerView::loadSettings(const QDomElement& element)
 
 
 
-void BBTrackContainerView::dropEvent(QDropEvent* de)
+void PatternTrackContainerView::dropEvent(QDropEvent* de)
 {
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
@@ -254,26 +254,26 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 		DataFile dataFile( value.toUtf8() );
 		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
 
-		// Ensure BB Clips exist
-		bool hasValidBBClips = false;
-		if (t->getClips().size() == m_bbtc->numOfBBs())
+		// Ensure pattern clips exist
+		bool hasValidPatternClips = false;
+		if (t->getClips().size() == m_ptc->numOfPatterns())
 		{
-			hasValidBBClips = true;
+			hasValidPatternClips = true;
 			for (int i = 0; i < t->getClips().size(); ++i)
 			{
 				if (t->getClips()[i]->startPosition() != TimePos(i, 0))
 				{
-					hasValidBBClips = false;
+					hasValidPatternClips = false;
 					break;
 				}
 			}
 		}
-		if (!hasValidBBClips)
+		if (!hasValidPatternClips)
 		{
 			t->deleteClips();
-			t->createClipsForBB(m_bbtc->numOfBBs() - 1);
+			t->createClipsForPattern(m_ptc->numOfPatterns() - 1);
 		}
-		m_bbtc->updateAfterTrackAdd();
+		m_ptc->updateAfterTrackAdd();
 
 		de->accept();
 	}
@@ -286,7 +286,7 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 
 
 
-void BBTrackContainerView::updatePosition()
+void PatternTrackContainerView::updatePosition()
 {
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
@@ -295,7 +295,7 @@ void BBTrackContainerView::updatePosition()
 
 
 
-void BBTrackContainerView::makeSteps( bool clone )
+void PatternTrackContainerView::makeSteps( bool clone )
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -304,7 +304,7 @@ void BBTrackContainerView::makeSteps( bool clone )
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_bbtc->currentBB() ) );
+			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ptc->currentPattern() ) );
 			if( clone )
 			{
 				p->cloneSteps();
@@ -316,21 +316,21 @@ void BBTrackContainerView::makeSteps( bool clone )
 	}
 }
 
-// Creates a clone of the current BB track with the same clip, but no Clips in the song editor
+// Creates a clone of the current pattern track with the same clip, but no Clips in the song editor
 // TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
-void BBTrackContainerView::cloneClip()
+void PatternTrackContainerView::cloneClip()
 {
-	// Get the current BBTrack id
-	BBTrackContainer *bbtc = static_cast<BBTrackContainer*>(model());
-	const int cur_bb = bbtc->currentBB();
+	// Get the current PatternTrack id
+	PatternTrackContainer *ptc = static_cast<PatternTrackContainer*>(model());
+	const int currentPattern = ptc->currentPattern();
 
-	BBTrack *bbt = BBTrack::findBBTrack(cur_bb);
+	PatternTrack *pt = PatternTrack::findPatternTrack(currentPattern);
 
-	if( bbt )
+	if( pt )
 	{
 		// Clone the track
-		Track *newTrack = bbt->clone();
-		bbtc->setCurrentBB( static_cast<BBTrack *>( newTrack )->index() );
+		Track *newTrack = pt->clone();
+		ptc->setCurrentPattern( static_cast<PatternTrack *>( newTrack )->index() );
 
 		// Track still have the clips which is undesirable in this case, clear the track
 		newTrack->lock();
