@@ -30,7 +30,7 @@
 #include "AudioPort.h"
 #include "FadeButton.h"
 #include "Mixer.h"
-#include "SampleTCO.h"
+#include "SampleClip.h"
 #include "SampleTrackView.h"
 #include "Track.h"
 
@@ -43,9 +43,9 @@ public:
 	virtual ~SampleTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	Clip* createClip(const TimePos & pos) override;
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -82,8 +82,8 @@ signals:
 	void playingChanged();
 
 public slots:
-	void updateTcos();
-	void setPlayingTcos( bool isPlaying );
+	void updateClips();
+	void setPlayingClips( bool isPlaying );
 	void updateMixerChannel();
 
 private:

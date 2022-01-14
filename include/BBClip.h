@@ -1,5 +1,5 @@
 /*
- * BBTCO.h
+ * BBClip.h
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,31 +23,31 @@
  */
  
 
-#ifndef BB_TCO_H
-#define BB_TCO_H
+#ifndef BB_CLIP_H
+#define BB_CLIP_H
 
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 
-class BBTCO : public TrackContentObject
+class BBClip : public Clip
 {
 public:
-	BBTCO( Track * _track );
-	virtual ~BBTCO() = default;
+	BBClip( Track * _track );
+	virtual ~BBClip() = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return( "bbtco" );
+		return( "bbclip" );
 	}
 
 	int bbTrackIndex();
 
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	ClipView * createView( TrackView * _tv ) override;
 
 private:
-	friend class BBTCOView;
+	friend class BBClipView;
 } ;
 
 

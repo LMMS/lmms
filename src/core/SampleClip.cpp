@@ -1,5 +1,5 @@
 /*
- * SampleTCO.cpp
+ * SampleClip.cpp
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,15 +22,15 @@
  *
  */
  
-#include "SampleTCO.h"
+#include "SampleClip.h"
 
 #include <QDomElement>
 
-#include "SampleTCOView.h"
+#include "SampleClipView.h"
 #include "TimeLineWidget.h"
 
-SampleTCO::SampleTCO( Track * _track ) :
-	TrackContentObject( _track ),
+SampleClip::SampleClip( Track * _track ) :
+	Clip( _track ),
 	m_sampleBuffer( new SampleBuffer ),
 	m_isPlaying( false )
 {
@@ -39,7 +39,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
-	// change length of this TCO
+	// change length of this Clip
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength() ), Qt::DirectConnection );
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
@@ -57,13 +57,13 @@ SampleTCO::SampleTCO( Track * _track ) :
 	//care about loops
 	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ),
 			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
-	//care about mute TCOs
+	//care about mute Clips
 	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute track
 	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
 			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
-	//care about TCO position
-	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
+	//care about Clip position
+	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackClips() ) );
 
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -77,13 +77,13 @@ SampleTCO::SampleTCO( Track * _track ) :
 			setAutoResize( false );
 			break;
 	}
-	updateTrackTcos();
+	updateTrackClips();
 }
 
-SampleTCO::SampleTCO(const SampleTCO& orig) :
-	SampleTCO(orig.getTrack())
+SampleClip::SampleClip(const SampleClip& orig) :
+	SampleClip(orig.getTrack())
 {
-	// TODO: This creates a new SampleBuffer for the new TCO, eating up memory
+	// TODO: This creates a new SampleBuffer for the new Clip, eating up memory
 	// & eventually causing performance issues. Letting tracks share buffers
 	// when they're identical would fix this, but isn't possible right now.
 	*m_sampleBuffer = *orig.m_sampleBuffer;
@@ -93,12 +93,12 @@ SampleTCO::SampleTCO(const SampleTCO& orig) :
 
 
 
-SampleTCO::~SampleTCO()
+SampleClip::~SampleClip()
 {
 	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
 	if ( sampletrack )
 	{
-		sampletrack->updateTcos();
+		sampletrack->updateClips();
 	}
 	Engine::audioEngine()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
@@ -108,22 +108,22 @@ SampleTCO::~SampleTCO()
 
 
 
-void SampleTCO::changeLength( const TimePos & _length )
+void SampleClip::changeLength( const TimePos & _length )
 {
-	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), 1 ) );
+	Clip::changeLength( qMax( static_cast<int>( _length ), 1 ) );
 }
 
 
 
 
-const QString & SampleTCO::sampleFile() const
+const QString & SampleClip::sampleFile() const
 {
 	return m_sampleBuffer->audioFile();
 }
 
 
 
-void SampleTCO::setSampleBuffer( SampleBuffer* sb )
+void SampleClip::setSampleBuffer( SampleBuffer* sb )
 {
 	Engine::audioEngine()->requestChangeInModel();
 	sharedObject::unref( m_sampleBuffer );
@@ -136,11 +136,11 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 
 
 
-void SampleTCO::setSampleFile( const QString & _sf )
+void SampleClip::setSampleFile( const QString & _sf )
 {
 	int length;
 	if ( _sf.isEmpty() )
-	{	//When creating an empty sample pattern make it a bar long
+	{	//When creating an empty sample clip make it a bar long
 		float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 		float den = Engine::getSong()->getTimeSigModel().getDenominator();
 		length = DefaultTicksPerBar * ( nom / den );
@@ -161,7 +161,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 
 
 
-void SampleTCO::toggleRecord()
+void SampleClip::toggleRecord()
 {
 	m_recordModel.setValue( !m_recordModel.value() );
 	emit dataChanged();
@@ -170,29 +170,29 @@ void SampleTCO::toggleRecord()
 
 
 
-void SampleTCO::playbackPositionChanged()
+void SampleClip::playbackPositionChanged()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
 	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
-	st->setPlayingTcos( false );
+	st->setPlayingClips( false );
 }
 
 
 
 
-void SampleTCO::updateTrackTcos()
+void SampleClip::updateTrackClips()
 {
 	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
 	if( sampletrack)
 	{
-		sampletrack->updateTcos();
+		sampletrack->updateClips();
 	}
 }
 
 
 
 
-bool SampleTCO::isPlaying() const
+bool SampleClip::isPlaying() const
 {
 	return m_isPlaying;
 }
@@ -200,7 +200,7 @@ bool SampleTCO::isPlaying() const
 
 
 
-void SampleTCO::setIsPlaying(bool isPlaying)
+void SampleClip::setIsPlaying(bool isPlaying)
 {
 	m_isPlaying = isPlaying;
 }
@@ -208,7 +208,7 @@ void SampleTCO::setIsPlaying(bool isPlaying)
 
 
 
-void SampleTCO::updateLength()
+void SampleClip::updateLength()
 {
 	emit sampleChanged();
 }
@@ -216,7 +216,7 @@ void SampleTCO::updateLength()
 
 
 
-TimePos SampleTCO::sampleLength() const
+TimePos SampleClip::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
@@ -224,7 +224,7 @@ TimePos SampleTCO::sampleLength() const
 
 
 
-void SampleTCO::setSampleStartFrame(f_cnt_t startFrame)
+void SampleClip::setSampleStartFrame(f_cnt_t startFrame)
 {
 	m_sampleBuffer->setStartFrame( startFrame );
 }
@@ -232,7 +232,7 @@ void SampleTCO::setSampleStartFrame(f_cnt_t startFrame)
 
 
 
-void SampleTCO::setSamplePlayLength(f_cnt_t length)
+void SampleClip::setSamplePlayLength(f_cnt_t length)
 {
 	m_sampleBuffer->setEndFrame( length );
 }
@@ -240,7 +240,7 @@ void SampleTCO::setSamplePlayLength(f_cnt_t length)
 
 
 
-void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if( _this.parentNode().nodeName() == "clipboard" )
 	{
@@ -275,7 +275,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void SampleTCO::loadSettings( const QDomElement & _this )
+void SampleClip::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
@@ -307,14 +307,14 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	if(_this.hasAttribute("reversed"))
 	{
 		m_sampleBuffer->setReversed(true);
-		emit wasReversed(); // tell SampleTCOView to update the view
+		emit wasReversed(); // tell SampleClipView to update the view
 	}
 }
 
 
 
 
-TrackContentObjectView * SampleTCO::createView( TrackView * _tv )
+ClipView * SampleClip::createView( TrackView * _tv )
 {
-	return new SampleTCOView( this, _tv );
+	return new SampleClipView( this, _tv );
 }

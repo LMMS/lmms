@@ -54,7 +54,7 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 // QMap with the DOM elements that access file resources
 const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
-{ "sampletco", {"src"} },
+{ "sampleclip", {"src"} },
 { "audiofileprocessor", {"src"} },
 };
 
@@ -95,7 +95,7 @@ DataFile::typeDescStruct
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NotePattern, "pattern" }
+	{ DataFile::MidiClip, "pattern" }
 } ;
 
 
@@ -200,7 +200,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NotePattern:
+	case Type::MidiClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
@@ -915,7 +915,7 @@ void DataFile::upgrade_0_4_0_20080409()
 {
 	// Upgrade to version 0.4.0-20080409 from some version greater than or equal to 0.4.0-20080129
 	QStringList s;
-	s << "note" << "pattern" << "bbtco" << "sampletco" << "time";
+	s << "note" << "pattern" << "bbclip" << "sampleclip" << "time";
 	for( QStringList::iterator it = s.begin(); it < s.end(); ++it )
 	{
 		QDomNodeList list = elementsByTagName( *it );
@@ -1625,7 +1625,7 @@ void DataFile::upgrade_noHiddenClipNames()
 
 		QDomNodeList instClips = track.elementsByTagName("pattern");
 		QDomNodeList autoClips = track.elementsByTagName("automationpattern");
-		QDomNodeList bbClips = track.elementsByTagName("bbtco");
+		QDomNodeList bbClips = track.elementsByTagName("bbclip");
 
 		clearDefaultNames(instClips, trackName);
 		clearDefaultNames(autoClips, trackName);

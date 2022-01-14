@@ -1,5 +1,5 @@
 /*
- * AutomationPattern.cpp - implementation of class AutomationPattern which
+ * AutomationClip.cpp - implementation of class AutomationClip which
  *                         holds dynamic values
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -24,10 +24,10 @@
  *
  */
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 
 #include "AutomationNode.h"
-#include "AutomationPatternView.h"
+#include "AutomationClipView.h"
 #include "AutomationTrack.h"
 #include "BBTrackContainer.h"
 #include "LocaleHelper.h"
@@ -36,14 +36,14 @@
 
 #include <cmath>
 
-int AutomationPattern::s_quantization = 1;
-const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
-const float AutomationPattern::DEFAULT_MAX_VALUE = 1;
+int AutomationClip::s_quantization = 1;
+const float AutomationClip::DEFAULT_MIN_VALUE = 0;
+const float AutomationClip::DEFAULT_MAX_VALUE = 1;
 
 
-AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
-	TrackContentObject( _auto_track ),
-	m_patternMutex(QMutex::Recursive),
+AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
+	Clip( _auto_track ),
+	m_clipMutex(QMutex::Recursive),
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
@@ -73,25 +73,25 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 
 
 
-AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
-	TrackContentObject( _pat_to_copy.m_autoTrack ),
-	m_patternMutex(QMutex::Recursive),
-	m_autoTrack( _pat_to_copy.m_autoTrack ),
-	m_objects( _pat_to_copy.m_objects ),
-	m_tension( _pat_to_copy.m_tension ),
-	m_progressionType( _pat_to_copy.m_progressionType )
+AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
+	Clip( _clip_to_copy.m_autoTrack ),
+	m_clipMutex(QMutex::Recursive),
+	m_autoTrack( _clip_to_copy.m_autoTrack ),
+	m_objects( _clip_to_copy.m_objects ),
+	m_tension( _clip_to_copy.m_tension ),
+	m_progressionType( _clip_to_copy.m_progressionType )
 {
-	// Locks the mutex of the copied AutomationPattern to make sure it
+	// Locks the mutex of the copied AutomationClip to make sure it
 	// doesn't change while it's being copied
-	QMutexLocker m(&_pat_to_copy.m_patternMutex);
+	QMutexLocker m(&_clip_to_copy.m_clipMutex);
 
-	for( timeMap::const_iterator it = _pat_to_copy.m_timeMap.begin();
-				it != _pat_to_copy.m_timeMap.end(); ++it )
+	for( timeMap::const_iterator it = _clip_to_copy.m_timeMap.begin();
+				it != _clip_to_copy.m_timeMap.end(); ++it )
 	{
 		// Copies the automation node (in/out values and in/out tangents)
 		m_timeMap[POS(it)] = it.value();
-		// Sets the node's pattern to this one
-		m_timeMap[POS(it)].setPattern(this);
+		// Sets the node's clip to this one
+		m_timeMap[POS(it)].setClip(this);
 	}
 	if (!getTrack()){ return; }
 	switch( getTrack()->trackContainer()->type() )
@@ -108,9 +108,9 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	}
 }
 
-bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
+bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	if( _search_dup && m_objects.contains(_obj) )
 	{
@@ -138,10 +138,10 @@ bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 
 
 
-void AutomationPattern::setProgressionType(
+void AutomationClip::setProgressionType(
 					ProgressionTypes _new_progression_type )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	if ( _new_progression_type == DiscreteProgression ||
 		_new_progression_type == LinearProgression ||
@@ -155,9 +155,9 @@ void AutomationPattern::setProgressionType(
 
 
 
-void AutomationPattern::setTension( QString _new_tension )
+void AutomationClip::setTension( QString _new_tension )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	bool ok;
 	float nt = LocaleHelper::toFloat(_new_tension, & ok);
@@ -171,9 +171,9 @@ void AutomationPattern::setTension( QString _new_tension )
 
 
 
-const AutomatableModel * AutomationPattern::firstObject() const
+const AutomatableModel * AutomationClip::firstObject() const
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	AutomatableModel* model;
 	if (!m_objects.isEmpty() && (model = m_objects.first()) != nullptr)
@@ -185,9 +185,9 @@ const AutomatableModel * AutomationPattern::firstObject() const
 	return &fm;
 }
 
-const AutomationPattern::objectVector& AutomationPattern::objects() const
+const AutomationClip::objectVector& AutomationClip::objects() const
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	return m_objects;
 }
@@ -195,9 +195,9 @@ const AutomationPattern::objectVector& AutomationPattern::objects() const
 
 
 
-TimePos AutomationPattern::timeMapLength() const
+TimePos AutomationClip::timeMapLength() const
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	TimePos one_bar = TimePos(1, 0);
 	if (m_timeMap.isEmpty()) { return one_bar; }
@@ -205,7 +205,7 @@ TimePos AutomationPattern::timeMapLength() const
 	timeMap::const_iterator it = m_timeMap.end();
 	tick_t last_tick = static_cast<tick_t>(POS(it - 1));
 	// if last_tick is 0 (single item at tick 0)
-	// return length as a whole bar to prevent disappearing TCO
+	// return length as a whole bar to prevent disappearing Clip
 	if (last_tick == 0) { return one_bar; }
 
 	return TimePos(last_tick);
@@ -214,7 +214,7 @@ TimePos AutomationPattern::timeMapLength() const
 
 
 
-void AutomationPattern::updateLength()
+void AutomationClip::updateLength()
 {
 	// Do not resize down in case user manually extended up
 	changeLength(qMax(length(), timeMapLength()));
@@ -232,14 +232,14 @@ void AutomationPattern::updateLength()
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
  * @return TimePos of the recently added automation node
  */
-TimePos AutomationPattern::putValue(
+TimePos AutomationClip::putValue(
 	const TimePos & time,
 	const float value,
 	const bool quantPos,
 	const bool ignoreSurroundingPoints
 )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	cleanObjects();
 
@@ -286,7 +286,7 @@ TimePos AutomationPattern::putValue(
  * @param Boolean True to ignore unquantized surrounding nodes (defaults to true)
  * @return TimePos of the recently added automation node
  */
-TimePos AutomationPattern::putValues(
+TimePos AutomationClip::putValues(
 	const TimePos & time,
 	const float inValue,
 	const float outValue,
@@ -294,7 +294,7 @@ TimePos AutomationPattern::putValues(
 	const bool ignoreSurroundingPoints
 )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	cleanObjects();
 
@@ -331,9 +331,9 @@ TimePos AutomationPattern::putValues(
 
 
 
-void AutomationPattern::removeNode(const TimePos & time)
+void AutomationClip::removeNode(const TimePos & time)
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	cleanObjects();
 
@@ -358,7 +358,7 @@ void AutomationPattern::removeNode(const TimePos & time)
  * @param Int first tick of the range
  * @param Int second tick of the range
  */
-void AutomationPattern::removeNodes(const int tick0, const int tick1)
+void AutomationClip::removeNodes(const int tick0, const int tick1)
 {
 	if (tick0 == tick1)
 	{
@@ -393,7 +393,7 @@ void AutomationPattern::removeNodes(const int tick0, const int tick1)
  * @param Int first tick of the range
  * @param Int second tick of the range
  */
-void AutomationPattern::resetNodes(const int tick0, const int tick1)
+void AutomationClip::resetNodes(const int tick0, const int tick1)
 {
 	if (tick0 == tick1)
 	{
@@ -414,9 +414,9 @@ void AutomationPattern::resetNodes(const int tick0, const int tick1)
 
 
 
-void AutomationPattern::recordValue(TimePos time, float value)
+void AutomationClip::recordValue(TimePos time, float value)
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	if( value != m_lastRecordedValue )
 	{
@@ -442,14 +442,14 @@ void AutomationPattern::recordValue(TimePos time, float value)
  * @param Boolean. True to ignore unquantized surrounding nodes
  * @return TimePos with current time of the dragged value
  */
-TimePos AutomationPattern::setDragValue(
+TimePos AutomationClip::setDragValue(
 	const TimePos & time,
 	const float value,
 	const bool quantPos,
 	const bool controlKey
 )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	if (m_dragging == false)
 	{
@@ -495,9 +495,9 @@ TimePos AutomationPattern::setDragValue(
 /**
  * @brief After the point is dragged, this function is called to apply the change.
  */
-void AutomationPattern::applyDragValue()
+void AutomationClip::applyDragValue()
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	m_dragging = false;
 }
@@ -505,9 +505,9 @@ void AutomationPattern::applyDragValue()
 
 
 
-float AutomationPattern::valueAt( const TimePos & _time ) const
+float AutomationClip::valueAt( const TimePos & _time ) const
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	if( m_timeMap.isEmpty() )
 	{
@@ -544,9 +544,9 @@ float AutomationPattern::valueAt( const TimePos & _time ) const
 
 // This method will get the value at an offset from a node, so we use the outValue of
 // that node and the inValue of the next node for the calculations.
-float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
+float AutomationClip::valueAt( timeMap::const_iterator v, int offset ) const
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	// We never use it with offset 0, but doesn't hurt to return a correct
 	// value if we do
@@ -591,9 +591,9 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 
 
-float *AutomationPattern::valuesAfter( const TimePos & _time ) const
+float *AutomationClip::valuesAfter( const TimePos & _time ) const
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	timeMap::const_iterator v = m_timeMap.lowerBound(_time);
 	if( v == m_timeMap.end() || (v+1) == m_timeMap.end() )
@@ -615,9 +615,9 @@ float *AutomationPattern::valuesAfter( const TimePos & _time ) const
 
 
 
-void AutomationPattern::flipY(int min, int max)
+void AutomationClip::flipY(int min, int max)
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	bool changedTimeMap = false;
 
@@ -645,7 +645,7 @@ void AutomationPattern::flipY(int min, int max)
 
 
 
-void AutomationPattern::flipY()
+void AutomationClip::flipY()
 {
 	flipY(getMin(), getMax());
 }
@@ -653,16 +653,16 @@ void AutomationPattern::flipY()
 
 
 
-void AutomationPattern::flipX(int length)
+void AutomationClip::flipX(int length)
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	timeMap::const_iterator it = m_timeMap.lowerBound(0);
 
 	if (it == m_timeMap.end()) { return; }
 
 	// Temporary map where we will store the flipped version
-	// of our pattern
+	// of our clip
 	timeMap tempMap;
 
 	float tempValue = 0;
@@ -672,7 +672,7 @@ void AutomationPattern::flipX(int length)
 	float realLength = m_timeMap.lastKey();
 
 	// If we have a positive length, we want to flip the area covered by that
-	// length, even if it goes beyond the pattern. A negative length means that
+	// length, even if it goes beyond the clip. A negative length means that
 	// we just want to flip the nodes we have
 	if (length >= 0 && length != realLength)
 	{
@@ -752,9 +752,9 @@ void AutomationPattern::flipX(int length)
 
 
 
-void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	_this.setAttribute( "pos", startPosition() );
 	_this.setAttribute( "len", length() );
@@ -794,9 +794,9 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void AutomationPattern::loadSettings( const QDomElement & _this )
+void AutomationClip::loadSettings( const QDomElement & _this )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	clear();
 
@@ -851,13 +851,13 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 
 
 
-const QString AutomationPattern::name() const
+const QString AutomationClip::name() const
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
-	if( !TrackContentObject::name().isEmpty() )
+	if( !Clip::name().isEmpty() )
 	{
-		return TrackContentObject::name();
+		return Clip::name();
 	}
 	if( !m_objects.isEmpty() && m_objects.first() != nullptr )
 	{
@@ -869,18 +869,18 @@ const QString AutomationPattern::name() const
 
 
 
-TrackContentObjectView * AutomationPattern::createView( TrackView * _tv )
+ClipView * AutomationClip::createView( TrackView * _tv )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
-	return new AutomationPatternView( this, _tv );
+	return new AutomationClipView( this, _tv );
 }
 
 
 
 
 
-bool AutomationPattern::isAutomated( const AutomatableModel * _m )
+bool AutomationClip::isAutomated( const AutomatableModel * _m )
 {
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
@@ -892,10 +892,10 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 		if( ( *it )->type() == Track::AutomationTrack ||
 			( *it )->type() == Track::HiddenAutomationTrack )
 		{
-			const Track::tcoVector & v = ( *it )->getTCOs();
-			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			const Track::clipVector & v = ( *it )->getClips();
+			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 			{
-				const AutomationPattern * a = dynamic_cast<const AutomationPattern *>( *j );
+				const AutomationClip * a = dynamic_cast<const AutomationClip *>( *j );
 				if( a && a->hasAutomation() )
 				{
 					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
@@ -914,12 +914,12 @@ bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 
 
 /**
- * @brief returns a list of all the automation patterns that are connected to a specific model
+ * @brief returns a list of all the automation clips that are connected to a specific model
  * @param _m the model we want to look for
  */
-QVector<AutomationPattern *> AutomationPattern::patternsForModel( const AutomatableModel * _m )
+QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel * _m )
 {
-	QVector<AutomationPattern *> patterns;
+	QVector<AutomationClip *> clips;
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
 	l += Engine::getBBTrackContainer()->tracks();
@@ -932,17 +932,17 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 		if( ( *it )->type() == Track::AutomationTrack ||
 			( *it )->type() == Track::HiddenAutomationTrack )
 		{
-			// get patterns in those tracks....
-			const Track::tcoVector & v = ( *it )->getTCOs();
-			// go through all the patterns...
-			for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+			// get clips in those tracks....
+			const Track::clipVector & v = ( *it )->getClips();
+			// go through all the clips...
+			for( Track::clipVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 			{
-				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
-				// check that the pattern has automation
+				AutomationClip * a = dynamic_cast<AutomationClip *>( *j );
+				// check that the clip has automation
 				if( a && a->hasAutomation() )
 				{
-					// now check is the pattern is connected to the model we want by going through all the connections
-					// of the pattern
+					// now check is the clip is connected to the model we want by going through all the connections
+					// of the clip
 					bool has_object = false;
 					for( objectVector::const_iterator k = a->m_objects.begin(); k != a->m_objects.end(); ++k )
 					{
@@ -951,25 +951,25 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 							has_object = true;
 						}
 					}
-					// if the patterns is connected to the model, add it to the list
-					if( has_object ) { patterns += a; }
+					// if the clips is connected to the model, add it to the list
+					if( has_object ) { clips += a; }
 				}
 			}
 		}
 	}
-	return patterns;
+	return clips;
 }
 
 
 
-AutomationPattern * AutomationPattern::globalAutomationPattern(
+AutomationClip * AutomationClip::globalAutomationClip(
 							AutomatableModel * _m )
 {
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
-	Track::tcoVector v = t->getTCOs();
-	for( Track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
+	Track::clipVector v = t->getClips();
+	for( Track::clipVector::const_iterator j = v.begin(); j != v.end(); ++j )
 	{
-		AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
+		AutomationClip * a = dynamic_cast<AutomationClip *>( *j );
 		if( a )
 		{
 			for( objectVector::const_iterator k = a->m_objects.begin();
@@ -983,7 +983,7 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 		}
 	}
 
-	AutomationPattern * a = new AutomationPattern( t );
+	AutomationClip * a = new AutomationClip( t );
 	a->addObject( _m, false );
 	return a;
 }
@@ -991,7 +991,7 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 
 
 
-void AutomationPattern::resolveAllIDs()
+void AutomationClip::resolveAllIDs()
 {
 	TrackContainer::TrackList l = Engine::getSong()->tracks() +
 				Engine::getBBTrackContainer()->tracks();
@@ -1002,11 +1002,11 @@ void AutomationPattern::resolveAllIDs()
 		if( ( *it )->type() == Track::AutomationTrack ||
 			 ( *it )->type() == Track::HiddenAutomationTrack )
 		{
-			Track::tcoVector v = ( *it )->getTCOs();
-			for( Track::tcoVector::iterator j = v.begin();
+			Track::clipVector v = ( *it )->getClips();
+			for( Track::clipVector::iterator j = v.begin();
 							j != v.end(); ++j )
 			{
-				AutomationPattern * a = dynamic_cast<AutomationPattern *>( *j );
+				AutomationClip * a = dynamic_cast<AutomationClip *>( *j );
 				if( a )
 				{
 					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
@@ -1050,9 +1050,9 @@ void AutomationPattern::resolveAllIDs()
 
 
 
-void AutomationPattern::clear()
+void AutomationClip::clear()
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	m_timeMap.clear();
 
@@ -1062,14 +1062,14 @@ void AutomationPattern::clear()
 
 
 
-void AutomationPattern::objectDestroyed( jo_id_t _id )
+void AutomationClip::objectDestroyed( jo_id_t _id )
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	// TODO: distict between temporary removal (e.g. LADSPA controls
 	// when switching samplerate) and real deletions because in the latter
 	// case we had to remove ourselves if we're the global automation
-	// pattern of the destroyed object
+	// clip of the destroyed object
 	m_idsToResolve += _id;
 
 	for( objectVector::Iterator objIt = m_objects.begin();
@@ -1090,9 +1090,9 @@ void AutomationPattern::objectDestroyed( jo_id_t _id )
 
 
 
-void AutomationPattern::cleanObjects()
+void AutomationClip::cleanObjects()
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	for( objectVector::iterator it = m_objects.begin(); it != m_objects.end(); )
 	{
@@ -1110,7 +1110,7 @@ void AutomationPattern::cleanObjects()
 
 
 
-void AutomationPattern::generateTangents()
+void AutomationClip::generateTangents()
 {
 	generateTangents(m_timeMap.begin(), m_timeMap.size());
 }
@@ -1122,9 +1122,9 @@ void AutomationPattern::generateTangents()
 // of the node (in case we have discrete value jumps in the middle of a curve).
 // If the inValue and outValue of a node are the same, consequently the inTangent and
 // outTangent values of the node will be the same too.
-void AutomationPattern::generateTangents(timeMap::iterator it, int numToGenerate)
+void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 {
-	QMutexLocker m(&m_patternMutex);
+	QMutexLocker m(&m_clipMutex);
 
 	if( m_timeMap.size() < 2 && numToGenerate > 0 )
 	{

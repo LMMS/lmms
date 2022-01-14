@@ -1,5 +1,5 @@
 /*
- * Pattern.cpp - implementation of class pattern which holds notes
+ * MidiClip.cpp - implementation of class MidiClip, which holds notes
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
@@ -23,7 +23,7 @@
  *
  */
 
-#include "Pattern.h"
+#include "MidiClip.h"
 
 #include "BBTrackContainer.h"
 #include "GuiApplication.h"
@@ -33,17 +33,17 @@
 #include <limits>
 
 
-QPixmap * PatternView::s_stepBtnOn0 = nullptr;
-QPixmap * PatternView::s_stepBtnOn200 = nullptr;
-QPixmap * PatternView::s_stepBtnOff = nullptr;
-QPixmap * PatternView::s_stepBtnOffLight = nullptr;
+QPixmap * MidiClipView::s_stepBtnOn0 = nullptr;
+QPixmap * MidiClipView::s_stepBtnOn200 = nullptr;
+QPixmap * MidiClipView::s_stepBtnOff = nullptr;
+QPixmap * MidiClipView::s_stepBtnOffLight = nullptr;
 
 
 
-Pattern::Pattern( InstrumentTrack * _instrument_track ) :
-	TrackContentObject( _instrument_track ),
+MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
+	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_patternType( BeatPattern ),
+	m_clipType( BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
 	if( _instrument_track->trackContainer()
@@ -58,10 +58,10 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 
 
 
-Pattern::Pattern( const Pattern& other ) :
-	TrackContentObject( other.m_instrumentTrack ),
+MidiClip::MidiClip( const MidiClip& other ) :
+	Clip( other.m_instrumentTrack ),
 	m_instrumentTrack( other.m_instrumentTrack ),
-	m_patternType( other.m_patternType ),
+	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
 {
 	for( NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it )
@@ -85,9 +85,9 @@ Pattern::Pattern( const Pattern& other ) :
 }
 
 
-Pattern::~Pattern()
+MidiClip::~MidiClip()
 {
-	emit destroyedPattern( this );
+	emit destroyedMidiClip( this );
 
 	for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -101,7 +101,7 @@ Pattern::~Pattern()
 
 
 
-void Pattern::resizeToFirstTrack()
+void MidiClip::resizeToFirstTrack()
 {
 	// Resize this track to be the same as existing tracks in the BB
 	const TrackContainer::TrackList & tracks =
@@ -112,10 +112,10 @@ void Pattern::resizeToFirstTrack()
 		{
 			if(tracks.at(trackID) != m_instrumentTrack)
 			{
-				unsigned int currentTCO = m_instrumentTrack->
-					getTCOs().indexOf(this);
-				m_steps = static_cast<Pattern *>
-					(tracks.at(trackID)->getTCO(currentTCO))
+				unsigned int currentClip = m_instrumentTrack->
+					getClips().indexOf(this);
+				m_steps = static_cast<MidiClip *>
+					(tracks.at(trackID)->getClip(currentClip))
 					->m_steps;
 			}
 			break;
@@ -126,7 +126,7 @@ void Pattern::resizeToFirstTrack()
 
 
 
-void Pattern::init()
+void MidiClip::init()
 {
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 				this, SLOT( changeTimeSignature() ) );
@@ -139,11 +139,11 @@ void Pattern::init()
 
 
 
-void Pattern::updateLength()
+void MidiClip::updateLength()
 {
-	if( m_patternType == BeatPattern )
+	if( m_clipType == BeatClip )
 	{
-		changeLength( beatPatternLength() );
+		changeLength( beatClipLength() );
 		updateBBTrack();
 		return;
 	}
@@ -167,7 +167,7 @@ void Pattern::updateLength()
 
 
 
-TimePos Pattern::beatPatternLength() const
+TimePos MidiClip::beatClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
@@ -193,7 +193,7 @@ TimePos Pattern::beatPatternLength() const
 
 
 
-Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
+Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 {
 	Note * new_note = new Note( _new_note );
 	if( _quant_pos && getGUI()->pianoRoll() )
@@ -216,7 +216,7 @@ Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 
 
 
-void Pattern::removeNote( Note * _note_to_del )
+void MidiClip::removeNote( Note * _note_to_del )
 {
 	instrumentTrack()->lock();
 	NoteVector::Iterator it = m_notes.begin();
@@ -241,7 +241,7 @@ void Pattern::removeNote( Note * _note_to_del )
 
 // returns a pointer to the note at specified step, or NULL if note doesn't exist
 
-Note * Pattern::noteAtStep( int _step )
+Note * MidiClip::noteAtStep( int _step )
 {
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
@@ -257,7 +257,7 @@ Note * Pattern::noteAtStep( int _step )
 
 
 
-void Pattern::rearrangeAllNotes()
+void MidiClip::rearrangeAllNotes()
 {
 	// sort notes by start time
 	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
@@ -265,7 +265,7 @@ void Pattern::rearrangeAllNotes()
 
 
 
-void Pattern::clearNotes()
+void MidiClip::clearNotes()
 {
 	instrumentTrack()->lock();
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
@@ -283,7 +283,7 @@ void Pattern::clearNotes()
 
 
 
-Note * Pattern::addStepNote( int step )
+Note * MidiClip::addStepNote( int step )
 {
 	return addNote( Note( TimePos( -DefaultTicksPerBar ),
 				TimePos::stepPosition( step ) ), false );
@@ -292,7 +292,7 @@ Note * Pattern::addStepNote( int step )
 
 
 
-void Pattern::setStep( int step, bool enabled )
+void MidiClip::setStep( int step, bool enabled )
 {
 	if( enabled )
 	{
@@ -312,7 +312,7 @@ void Pattern::setStep( int step, bool enabled )
 
 
 
-void Pattern::splitNotes(NoteVector notes, TimePos pos)
+void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 {
 	if (notes.empty()) { return; }
 
@@ -346,47 +346,47 @@ void Pattern::splitNotes(NoteVector notes, TimePos pos)
 
 
 
-void Pattern::setType( PatternTypes _new_pattern_type )
+void MidiClip::setType( MidiClipTypes _new_clip_type )
 {
-	if( _new_pattern_type == BeatPattern ||
-				_new_pattern_type == MelodyPattern )
+	if( _new_clip_type == BeatClip ||
+				_new_clip_type == MelodyClip )
 	{
-		m_patternType = _new_pattern_type;
+		m_clipType = _new_clip_type;
 	}
 }
 
 
 
 
-void Pattern::checkType()
+void MidiClip::checkType()
 {
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
 		if( ( *it )->length() > 0 )
 		{
-			setType( MelodyPattern );
+			setType( MelodyClip );
 			return;
 		}
 		++it;
 	}
-	setType( BeatPattern );
+	setType( BeatClip );
 }
 
 
 
 
-void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "type", m_patternType );
+	_this.setAttribute( "type", m_clipType );
 	_this.setAttribute( "name", name() );
 	
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
 	}
-	// as the target of copied/dragged pattern is always an existing
-	// pattern, we must not store actual position, instead we store -1
+	// as the target of copied/dragged MIDI clip is always an existing
+	// MIDI clip, we must not store actual position, instead we store -1
 	// which tells loadSettings() not to mess around with position
 	if( _this.parentNode().nodeName() == "clipboard" ||
 			_this.parentNode().nodeName() == "dnddata" )
@@ -411,9 +411,9 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void Pattern::loadSettings( const QDomElement & _this )
+void MidiClip::loadSettings( const QDomElement & _this )
 {
-	m_patternType = static_cast<PatternTypes>( _this.attribute( "type"
+	m_clipType = static_cast<MidiClipTypes>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
 	
@@ -466,33 +466,33 @@ void Pattern::loadSettings( const QDomElement & _this )
 
 
 
-Pattern *  Pattern::previousPattern() const
+MidiClip *  MidiClip::previousMidiClip() const
 {
-	return adjacentPatternByOffset(-1);
+	return adjacentMidiClipByOffset(-1);
 }
 
 
 
 
-Pattern *  Pattern::nextPattern() const
+MidiClip *  MidiClip::nextMidiClip() const
 {
-	return adjacentPatternByOffset(1);
+	return adjacentMidiClipByOffset(1);
 }
 
 
 
 
-Pattern * Pattern::adjacentPatternByOffset(int offset) const
+MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	QVector<TrackContentObject *> tcos = m_instrumentTrack->getTCOs();
-	int tcoNum = m_instrumentTrack->getTCONum(this);
-	return dynamic_cast<Pattern*>(tcos.value(tcoNum + offset, nullptr));
+	QVector<Clip *> clips = m_instrumentTrack->getClips();
+	int clipNum = m_instrumentTrack->getClipNum(this);
+	return dynamic_cast<MidiClip*>(clips.value(clipNum + offset, nullptr));
 }
 
 
 
 
-void Pattern::clear()
+void MidiClip::clear()
 {
 	addJournalCheckPoint();
 	clearNotes();
@@ -501,14 +501,14 @@ void Pattern::clear()
 
 
 
-void Pattern::addSteps()
+void MidiClip::addSteps()
 {
 	m_steps += TimePos::stepsPerBar();
 	updateLength();
 	emit dataChanged();
 }
 
-void Pattern::cloneSteps()
+void MidiClip::cloneSteps()
 {
 	int oldLength = m_steps;
 	m_steps *= 2; // cloning doubles the track
@@ -532,7 +532,7 @@ void Pattern::cloneSteps()
 
 
 
-void Pattern::removeSteps()
+void MidiClip::removeSteps()
 {
 	int n = TimePos::stepsPerBar();
 	if( n < m_steps )
@@ -550,15 +550,15 @@ void Pattern::removeSteps()
 
 
 
-TrackContentObjectView * Pattern::createView( TrackView * _tv )
+ClipView * MidiClip::createView( TrackView * _tv )
 {
-	return new PatternView( this, _tv );
+	return new MidiClipView( this, _tv );
 }
 
 
 
 
-void Pattern::updateBBTrack()
+void MidiClip::updateBBTrack()
 {
 	if( getTrack()->trackContainer() == Engine::getBBTrackContainer() )
 	{
@@ -567,7 +567,7 @@ void Pattern::updateBBTrack()
 
 	if( getGUI() != nullptr
 		&& getGUI()->pianoRoll()
-		&& getGUI()->pianoRoll()->currentPattern() == this )
+		&& getGUI()->pianoRoll()->currentMidiClip() == this )
 	{
 		getGUI()->pianoRoll()->update();
 	}
@@ -576,7 +576,7 @@ void Pattern::updateBBTrack()
 
 
 
-bool Pattern::empty()
+bool MidiClip::empty()
 {
 	for( NoteVector::ConstIterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -592,7 +592,7 @@ bool Pattern::empty()
 
 
 
-void Pattern::changeTimeSignature()
+void MidiClip::changeTimeSignature()
 {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
 	for( NoteVector::ConstIterator cit = m_notes.begin();
