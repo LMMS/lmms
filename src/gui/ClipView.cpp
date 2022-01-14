@@ -481,7 +481,7 @@ void ClipView::dropEvent( QDropEvent * de )
 	// Copy state into existing clip
 	DataFile dataFile( value.toUtf8() );
 	TimePos pos = m_clip->startPosition();
-	QDomElement clips = dataFile.content().firstChildElement( "tcos" ); //TODO: rename "tcos" to "clips"
+	QDomElement clips = dataFile.content().firstChildElement("clips");
 	m_clip->restoreState( clips.firstChildElement().firstChildElement() );
 	m_clip->movePosition( pos );
 	AutomationClip::resolveAllIDs();
@@ -532,16 +532,16 @@ DataFile ClipView::createClipDataFiles(
 	Track * t = m_trackView->getTrack();
 	TrackContainer * tc = t->trackContainer();
 	DataFile dataFile( DataFile::DragNDropData );
-	QDomElement clipParent = dataFile.createElement( "tcos" ); //TODO: rename to "clips"
+	QDomElement clipParent = dataFile.createElement("clips");
 
 	typedef QVector<ClipView *> clipViewVector;
 	for( clipViewVector::const_iterator it = clipViews.begin();
 			it != clipViews.end(); ++it )
 	{
-		// Insert into the dom under the "tcos" element (TODO: rename element to "clips")
+		// Insert into the dom under the "clips" element
 		Track* clipTrack = ( *it )->m_trackView->getTrack();
 		int trackIndex = tc->tracks().indexOf( clipTrack );
-		QDomElement clipElement = dataFile.createElement( "tco" ); //TODO: rename to "clip"
+		QDomElement clipElement = dataFile.createElement("clip");
 		clipElement.setAttribute( "trackIndex", trackIndex );
 		clipElement.setAttribute( "trackType", clipTrack->type() );
 		clipElement.setAttribute( "trackName", clipTrack->name() );
