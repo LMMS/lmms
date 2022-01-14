@@ -181,13 +181,13 @@ vestigeInstrument::~vestigeInstrument()
 
 void vestigeInstrument::loadSettings( const QDomElement & _this )
 {
-	QString plugin = _this.attribute( "plugin" );
+	QString plugin = QFileInfo( _this.attribute( "plugin" ) ).fileName();
 	if( plugin.isEmpty() )
 	{
 		return;
 	}
 
-	loadFile( plugin );
+	loadFile( ConfigManager::inst()->vstDir() + plugin );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
@@ -263,7 +263,7 @@ void vestigeInstrument::reloadPlugin()
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	_this.setAttribute( "plugin", m_pluginDLL );
+	_this.setAttribute( "plugin", QFileInfo( m_pluginDLL ).fileName() );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
 	{
