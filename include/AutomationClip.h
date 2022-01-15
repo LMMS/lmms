@@ -149,7 +149,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	static const QString classNodeName() { return "automationclip"; }
+	static const QString classNodeName() { return "automationpattern"; }
 	QString nodeName() const override { return classNodeName(); }
 
 	ClipView * createView( TrackView * _tv ) override;
