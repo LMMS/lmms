@@ -48,7 +48,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "sampleclip";
+		return "sampletco";
 	}
 
 	SampleBuffer* sampleBuffer()

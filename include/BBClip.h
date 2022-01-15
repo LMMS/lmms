@@ -39,7 +39,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return( "bbclip" );
+		return( "bbtco" );
 	}
 
 	int bbTrackIndex();
