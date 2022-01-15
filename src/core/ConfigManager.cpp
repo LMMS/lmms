@@ -86,19 +86,30 @@ ConfigManager::ConfigManager() :
 			m_workingDir = QDir::home().absolutePath() + "/lmms/";
 		}
 
+		// Determine RC file location to use if not in development
 		if (!m_isDevelopment)
 		{
-			// Try the legacy RC file location first
-			m_lmmsRcFile = QDir::home().absolutePath() + "/.lmmsrc.xml";
+			QString cfgDir = QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation).at(0);
+			QString newRcLocation = cfgDir + "/lmmsrc.xml";
+			QString legacyRcLocation = QDir::home().absolutePath() + "/.lmmsrc.xml";
 
-			// If the RC file is not found, try the new location
-			if (!QFileInfo(m_lmmsRcFile).exists())
+			if (QFileInfo(newRcLocation).exists())
 			{
-				QString cfgDir = QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation).at(0);
+				// Use the new RC file location if the file is found there
+				m_lmmsRcFile = newRcLocation;
+			}
+			else if (QFileInfo(legacyRcLocation).exists())
+			{
+				// Use the legacy RC file location if the file is found there
+				m_lmmsRcFile = legacyRcLocation;
+			}
+			else
+			{
+				// Otherwise, create the file at the new location
 				QDir dir;
 
 				dir.mkpath(cfgDir);
-				m_lmmsRcFile = cfgDir + "/lmmsrc.xml";
+				m_lmmsRcFile = newRcLocation;
 			}
 		}
 	}
