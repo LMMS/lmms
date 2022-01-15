@@ -74,7 +74,9 @@ private:
 	int getKeyWidth(int key_num) const;
 	int getKeyHeight(int key_num) const;
 	IntModel *getNearestMarker(int key, QString* title = nullptr);
-	void setMarkerKeyValue(IntModel *noteModel, int key_num);
+	bool setMarkerKeyValue(IntModel *noteModel, int key_num, bool ignoreConstraints = false);
+	bool firstMarkerAllowed(int key_num);
+	bool lastMarkerAllowed(int key_num);
 
 	static QPixmap * s_whiteKeyPm;
 	static QPixmap * s_blackKeyPm;
@@ -90,7 +92,6 @@ private:
 	int m_lastKey;					//!< previously pressed key
 	IntModel *m_movedNoteModel;		//!< note marker which is being moved
 	int m_lastContextMenuKey;		//!< previous key selected by the context menu
-
 
 private slots:
 	void pianoScrolled( int _new_pos );
