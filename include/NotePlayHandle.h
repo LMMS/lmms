@@ -305,6 +305,7 @@ private:
 											// release of note
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
+	bool m_pendingRelease;
 	bool m_releaseStarted;
 	bool m_hasMidiNote;
 	bool m_hasParent;						// indicates whether note has parent

@@ -62,6 +62,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_releaseFramesDone( 0 ),
 	m_subNotes(),
 	m_released( false ),
+	m_pendingRelease( false ),
 	m_releaseStarted( false ),
 	m_hasMidiNote( false ),
 	m_hasParent( parent != nullptr  ),
@@ -193,6 +194,11 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	{
 		setOffset( offset() - Engine::audioEngine()->framesPerPeriod() );
 		return;
+	}
+
+	if (m_pendingRelease)
+	{
+		noteOff();
 	}
 
 	lock();
@@ -366,6 +372,15 @@ bool NotePlayHandle::isFromTrack( const Track * _track ) const
 
 void NotePlayHandle::noteOff( const f_cnt_t _s )
 {
+	// if a noteOff() arrives before first play() is called, there will be no sound at all
+	// so, store the 'intent' of noteOff to be called again after first play
+	if (m_totalFramesPlayed <= 0)
+	{
+		m_pendingRelease = true;
+		return;
+	}
+	m_pendingRelease = false;
+
 	if( m_released )
 	{
 		return;
