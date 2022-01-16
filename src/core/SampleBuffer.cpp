@@ -247,7 +247,14 @@ void SampleBuffer::update(bool keepSettings)
 	const int fileSizeMax = 300; // MB
 	const int sampleLengthMax = 90; // Minutes
 
-	bool fileLoadError = false;
+	enum FileLoadError
+	{
+		None,
+		TooLarge,
+		Invalid
+	};
+	FileLoadError fileLoadError = None;
+
 	if (m_audioFile.isEmpty() && m_origData != nullptr && m_origFrames > 0)
 	{
 		// TODO: reverse- and amplification-property is not covered
@@ -273,7 +280,7 @@ void SampleBuffer::update(bool keepSettings)
 		const QFileInfo fileInfo(file);
 		if (fileInfo.size() > fileSizeMax * 1024 * 1024)
 		{
-			fileLoadError = true;
+			fileLoadError = TooLarge;
 		}
 		else
 		{
@@ -288,14 +295,18 @@ void SampleBuffer::update(bool keepSettings)
 				int rate = sfInfo.samplerate;
 				if (frames / rate > sampleLengthMax * 60)
 				{
-					fileLoadError = true;
+					fileLoadError = TooLarge;
 				}
 				sf_close(sndFile);
+			}
+			else if (sndFile == NULL)
+			{
+				fileLoadError = Invalid;
 			}
 			f.close();
 		}
 
-		if (!fileLoadError)
+		if (fileLoadError == None)
 		{
 #ifdef LMMS_HAVE_OGGVORBIS
 			// workaround for a bug in libsndfile or our libsndfile decoder
@@ -322,7 +333,7 @@ void SampleBuffer::update(bool keepSettings)
 			}
 		}
 
-		if (m_frames == 0 || fileLoadError)  // if still no frames, bail
+		if (m_frames == 0 || fileLoadError != None)  // if still no frames, bail
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
@@ -363,16 +374,31 @@ void SampleBuffer::update(bool keepSettings)
 	}
 	Oscillator::generateAntiAliasUserWaveTable(this);
 
-	if (fileLoadError)
+	if (fileLoadError != None)
 	{
 		QString title = tr("Fail to open file");
-		QString message = tr("Audio files are limited to %1 MB "
-				"in size and %2 minutes of playing time"
-				).arg(fileSizeMax).arg(sampleLengthMax);
-		if (gui::getGUI() != nullptr)
+		QString message;
+
+		switch (fileLoadError)
 		{
-			QMessageBox::information(nullptr,
-				title, message,	QMessageBox::Ok);
+			case None:
+				// present just to avoid a compiler warning
+				break;
+
+			case TooLarge:
+				message = tr("Audio files are limited to %1 MB "
+					"in size and %2 minutes of playing time"
+					).arg(fileSizeMax).arg(sampleLengthMax);
+				break;
+
+			case Invalid:
+				message = tr("Invalid audio file");
+				break;
+		}
+
+		if (getGUI() != nullptr)
+		{
+			QMessageBox::information(nullptr, title, message,	QMessageBox::Ok);
 		}
 		else
 		{
