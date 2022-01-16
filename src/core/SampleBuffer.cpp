@@ -279,7 +279,11 @@ void SampleBuffer::update(bool keepSettings)
 		m_frames = 0;
 
 		const QFileInfo fileInfo(file);
-		if (fileInfo.size() > fileSizeMax * 1024 * 1024)
+		if (!fileInfo.isReadable())
+		{
+			fileLoadError = ReadPermissionDenied;
+		}
+		else if (fileInfo.size() > fileSizeMax * 1024 * 1024)
 		{
 			fileLoadError = TooLarge;
 		}
@@ -287,16 +291,11 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// Use QFile to handle unicode file names on Windows
 			QFile f(file);
-			QFileInfo fileInfo(f);
 			SNDFILE * sndFile = NULL;
 			SF_INFO sfInfo;
 			sfInfo.format = 0;
 
-			if (!fileInfo.isReadable())
-			{
-				fileLoadError = ReadPermissionDenied;
-			}
-			else if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
+			if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
 			{
 				f_cnt_t frames = sfInfo.frames;
 				int rate = sfInfo.samplerate;
