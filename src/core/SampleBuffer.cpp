@@ -379,6 +379,8 @@ void SampleBuffer::update(bool keepSettings)
 		QString title = tr("Fail to open file");
 		QString message;
 
+		m_audioFile = "";
+
 		switch (fileLoadError)
 		{
 			case None:
