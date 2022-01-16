@@ -286,7 +286,7 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// Use QFile to handle unicode file names on Windows
 			QFile f(file);
-			SNDFILE * sndFile;
+			SNDFILE * sndFile = NULL;
 			SF_INFO sfInfo;
 			sfInfo.format = 0;
 			if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
