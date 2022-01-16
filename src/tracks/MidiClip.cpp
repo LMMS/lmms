@@ -43,7 +43,7 @@ QPixmap * MidiClipView::s_stepBtnOffLight = nullptr;
 MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	Clip( _instrument_track ),
 	m_instrumentTrack( _instrument_track ),
-	m_clipType( PatternClip ),
+	m_clipType( BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
 	if( _instrument_track->trackContainer()
@@ -141,9 +141,9 @@ void MidiClip::init()
 
 void MidiClip::updateLength()
 {
-	if( m_clipType == PatternClip )
+	if( m_clipType == BeatClip )
 	{
-		changeLength( patternClipLength() );
+		changeLength( beatClipLength() );
 		updatePatternTrack();
 		return;
 	}
@@ -167,7 +167,7 @@ void MidiClip::updateLength()
 
 
 
-TimePos MidiClip::patternClipLength() const
+TimePos MidiClip::beatClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
@@ -348,7 +348,7 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 void MidiClip::setType( MidiClipTypes _new_clip_type )
 {
-	if( _new_clip_type == PatternClip ||
+	if( _new_clip_type == BeatClip ||
 				_new_clip_type == MelodyClip )
 	{
 		m_clipType = _new_clip_type;
@@ -370,7 +370,7 @@ void MidiClip::checkType()
 		}
 		++it;
 	}
-	setType( PatternClip );
+	setType( BeatClip );
 }
 
 

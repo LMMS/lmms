@@ -1,5 +1,5 @@
 /*
- * PatternClip.cpp - implementation of class patternClip
+ * PatternClip.cpp - implementation of class PatternClip
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
