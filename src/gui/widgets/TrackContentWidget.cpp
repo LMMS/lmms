@@ -377,7 +377,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	}
 
 	// Extract the clip data
-	QDomElement clipParent = dataFile.content().firstChildElement( "tcos" ); //TODO: rename "tcos" to "clips"
+	QDomElement clipParent = dataFile.content().firstChildElement("clips");
 	QDomNodeList clipNodes = clipParent.childNodes();
 
 	// Determine if all the Clips will land on a valid track
@@ -444,7 +444,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	DataFile dataFile( value.toUtf8() );
 
 	// Extract the clip data
-	QDomElement clipParent = dataFile.content().firstChildElement( "tcos" ); //TODO: rename "tcos" to "clips"
+	QDomElement clipParent = dataFile.content().firstChildElement("clips");
 	QDomNodeList clipNodes = clipParent.childNodes();
 
 	// Extract the track index that was originally clicked
