@@ -147,9 +147,9 @@ void SampleClip::setSampleFile(const QString & sf)
 {
 	int length = 0;
 
-	if (!_sf.isEmpty())
+	if (!sf.isEmpty())
 	{
-		m_sampleBuffer->setAudioFile(_sf);
+		m_sampleBuffer->setAudioFile(sf);
 		length = sampleLength();
 	}
 
