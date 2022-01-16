@@ -4055,6 +4055,13 @@ void PianoRoll::stop()
 	Engine::getSong()->stop();
 	m_recording = false;
 	m_scrollBack = ( m_timeLine->autoScroll() == TimeLineWidget::AutoScrollEnabled );
+
+	// remove the shouldSkip flag from all current notes
+	auto notes = m_midiClip->notes();
+	for (auto it = notes.begin(); it != notes.end(); it++)
+	{
+		((Note*) *it)->skipNextPlay(false);
+	}
 }
 
 
@@ -4112,7 +4119,12 @@ void PianoRoll::finishRecordNote(const Note & n )
 							it->key(), it->getVolume(),
 							it->getPanning() );
 					n1.quantizeLength( quantization() );
-					m_midiClip->addNote( n1 );
+					auto addedNote = m_midiClip->addNote( n1 );
+
+					// tell the instrument track to skip this note in the next play
+					// in order to avoid duplicated sounds (see #6277)
+					addedNote->skipNextPlay();
+
 					update();
 					m_recordingNotes.erase( it );
 					break;
@@ -4838,7 +4850,7 @@ PianoRollWindow::PianoRollWindow() :
 				tr("Knife"), noteToolsButton);
 	connect(knifeAction, &QAction::triggered, m_editor, &PianoRoll::setKnifeAction);
 	knifeAction->setShortcut( Qt::SHIFT | Qt::Key_K );
-        
+
 	QAction* fillAction = new QAction(embed::getIconPixmap("fill"), tr("Fill"), noteToolsButton);
 	connect(fillAction, &QAction::triggered, [this](){ m_editor->fitNoteLengths(true); });
 	fillAction->setShortcut(Qt::SHIFT | Qt::Key_F);

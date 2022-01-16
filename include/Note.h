@@ -104,11 +104,16 @@ public:
 	{
 		m_oldLength = oldLength;
 	}
+
 	inline void setIsPlaying( const bool isPlaying )
 	{
 		m_isPlaying = isPlaying;
 	}
 
+	inline void skipNextPlay(const bool skip = true)
+	{
+		m_shouldSkip = skip;
+	}
 
 	void setLength( const TimePos & length );
 	void setPos( const TimePos & pos );
@@ -156,6 +161,11 @@ public:
 	inline bool isPlaying() const
 	{
 		return m_isPlaying;
+	}
+
+	inline bool shouldSkip()
+	{
+		return m_shouldSkip;
 	}
 
 	inline TimePos endPos() const
@@ -234,6 +244,7 @@ private:
 	TimePos m_oldPos;
 	TimePos m_oldLength;
 	bool m_isPlaying;
+	bool m_shouldSkip = false;
 
 	int m_key;
 	volume_t m_volume;
