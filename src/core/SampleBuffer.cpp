@@ -250,6 +250,7 @@ void SampleBuffer::update(bool keepSettings)
 	enum FileLoadError
 	{
 		None,
+		ReadPermissionDenied,
 		TooLarge,
 		Invalid
 	};
@@ -286,10 +287,16 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// Use QFile to handle unicode file names on Windows
 			QFile f(file);
+			QFileInfo fileInfo(f);
 			SNDFILE * sndFile = NULL;
 			SF_INFO sfInfo;
 			sfInfo.format = 0;
-			if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
+
+			if (!fileInfo.isReadable())
+			{
+				fileLoadError = ReadPermissionDenied;
+			}
+			else if (f.open(QIODevice::ReadOnly) && (sndFile = sf_open_fd(f.handle(), SFM_READ, &sfInfo, false)))
 			{
 				f_cnt_t frames = sfInfo.frames;
 				int rate = sfInfo.samplerate;
@@ -385,6 +392,10 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			case None:
 				// present just to avoid a compiler warning
+				break;
+
+			case ReadPermissionDenied:
+				message = tr("Read permission denied");
 				break;
 
 			case TooLarge:
