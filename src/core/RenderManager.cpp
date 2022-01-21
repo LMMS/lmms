@@ -27,8 +27,8 @@
 
 #include "RenderManager.h"
 
+#include "PatternStore.h"
 #include "PatternTrack.h"
-#include "PatternTrackContainer.h"
 #include "Song.h"
 
 
@@ -112,7 +112,7 @@ void RenderManager::renderTracks()
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::getPatternTrackContainer()->tracks();
+	const TrackContainer::TrackList t2 = Engine::getPatternStore()->tracks();
 	for( auto it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);

@@ -35,7 +35,7 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "PatternEditor.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
@@ -199,9 +199,9 @@ void TrackContentWidget::update()
  */
 void TrackContentWidget::changePosition( const TimePos & newPos )
 {
-	if( m_trackView->trackContainerView() == getGUI()->getPatternEditor()->trackContainerView() )
+	if (m_trackView->trackContainerView() == getGUI()->getPatternEditor()->patternStoreView())
 	{
-		const int curPattern = Engine::getPatternTrackContainer()->currentPattern();
+		const int curPattern = Engine::getPatternStore()->currentPattern();
 		setUpdatesEnabled( false );
 
 		// first show clip for current pattern...
@@ -601,7 +601,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 	QPainter p( this );
 	// Don't draw background on Pattern Editor
-	if( m_trackView->trackContainerView() != getGUI()->getPatternEditor()->trackContainerView() )
+	if (m_trackView->trackContainerView() != getGUI()->getPatternEditor()->patternStoreView())
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getBar() * ppb, 0 ) );

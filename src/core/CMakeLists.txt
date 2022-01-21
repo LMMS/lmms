@@ -50,7 +50,7 @@ set(LMMS_SRCS
 	core/Oscillator.cpp
 	core/PathUtil.cpp
 	core/PatternClip.cpp
-	core/PatternTrackContainer.cpp
+	core/PatternStore.cpp
 	core/PeakController.cpp
 	core/PerfLog.cpp
 	core/Piano.cpp

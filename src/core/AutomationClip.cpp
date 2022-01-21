@@ -30,7 +30,7 @@
 #include "AutomationClipView.h"
 #include "AutomationTrack.h"
 #include "LocaleHelper.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 
@@ -884,7 +884,7 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 {
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
-	l += Engine::getPatternTrackContainer()->tracks();
+	l += Engine::getPatternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
@@ -922,7 +922,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 	QVector<AutomationClip *> clips;
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
-	l += Engine::getPatternTrackContainer()->tracks();
+	l += Engine::getPatternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
@@ -994,7 +994,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 void AutomationClip::resolveAllIDs()
 {
 	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-				Engine::getPatternTrackContainer()->tracks();
+				Engine::getPatternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 	for( TrackContainer::TrackList::iterator it = l.begin();
 							it != l.end(); ++it )

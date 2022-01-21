@@ -27,7 +27,7 @@
 #include <QMenu>
 #include <QPainter>
 
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "PatternTrackView.h"
 #include "Song.h"
 
@@ -43,12 +43,12 @@ PatternTrack::PatternTrack( TrackContainer* tc ) :
 	s_infoMap[this] = patternNum;
 
 	setName( tr( "Pattern track %1" ).arg( patternNum ) );
-	Engine::getPatternTrackContainer()->createClipsForPattern( patternNum );
-	Engine::getPatternTrackContainer()->setCurrentPattern( patternNum );
-	Engine::getPatternTrackContainer()->updateComboBox();
+	Engine::getPatternStore()->createClipsForPattern(patternNum);
+	Engine::getPatternStore()->setCurrentPattern(patternNum);
+	Engine::getPatternStore()->updateComboBox();
 
 	connect( this, SIGNAL( nameChanged() ),
-		Engine::getPatternTrackContainer(), SLOT( updateComboBox() ) );
+		Engine::getPatternStore(), SLOT(updateComboBox()));
 }
 
 
@@ -62,7 +62,7 @@ PatternTrack::~PatternTrack()
 					| PlayHandle::TypeSamplePlayHandle );
 
 	const int pattern = s_infoMap[this];
-	Engine::getPatternTrackContainer()->removePattern( pattern );
+	Engine::getPatternStore()->removePattern(pattern);
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
@@ -73,10 +73,9 @@ PatternTrack::~PatternTrack()
 	}
 	s_infoMap.remove( this );
 
-	// remove us from TC so patternTrackContainer::numOfPatterns() returns a smaller
-	// value and thus combobox-updating in patternTrackContainer works well
+	// remove us from the Song and update the pattern selection combobox to reflect the change
 	trackContainer()->removeTrack( this );
-	Engine::getPatternTrackContainer()->updateComboBox();
+	Engine::getPatternStore()->updateComboBox();
 }
 
 
@@ -93,7 +92,7 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	if( _clip_num >= 0 )
 	{
-		return Engine::getPatternTrackContainer()->play( _start, _frames, _offset, s_infoMap[this] );
+		return Engine::getPatternStore()->play(_start, _frames, _offset, s_infoMap[this]);
 	}
 
 	clipVector clips;
@@ -118,7 +117,7 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	if( _start - lastPosition < lastLen )
 	{
-		return Engine::getPatternTrackContainer()->play( _start - lastPosition, _frames, _offset, s_infoMap[this] );
+		return Engine::getPatternStore()->play(_start - lastPosition, _frames, _offset, s_infoMap[this]);
 	}
 	return false;
 }
@@ -154,8 +153,7 @@ void PatternTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
-		( (JournallingObject *)( Engine::getPatternTrackContainer() ) )->
-						saveState( _doc, _this );
+		Engine::getPatternStore()->saveState(_doc, _this);
 	}
 	if( _this.parentNode().parentNode().nodeName() == "clone" )
 	{
@@ -178,7 +176,7 @@ void PatternTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		const int src = _this.attribute( "clonebbt" ).toInt(); // TODO rename bb to pattern
 		const int dst = s_infoMap[this];
 		TrackContainer::TrackList tl =
-					Engine::getPatternTrackContainer()->tracks();
+					Engine::getPatternStore()->tracks();
 		// copy clips of all tracks from source pattern (at bar "src") to destination
 		// clips (which are created if they do not exist yet)
 		for( TrackContainer::TrackList::iterator it = tl.begin();
@@ -196,8 +194,7 @@ void PatternTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					TrackContainer::classNodeName() );
 		if( node.isElement() )
 		{
-			( (JournallingObject *)Engine::getPatternTrackContainer() )->
-					restoreState( node.toElement() );
+			Engine::getPatternStore()->restoreState(node.toElement());
 		}
 	}
 /*	doesn't work yet because PatternTrack-ctor also sets current pattern so if
@@ -236,8 +233,7 @@ void PatternTrack::swapPatternTracks( Track * _track1, Track * _track2 )
 	if( t1 != nullptr && t2 != nullptr )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
-		Engine::getPatternTrackContainer()->swapPattern( s_infoMap[t1],
-								s_infoMap[t2] );
-		Engine::getPatternTrackContainer()->setCurrentPattern( s_infoMap[t1] );
+		Engine::getPatternStore()->swapPattern(s_infoMap[t1], s_infoMap[t2]);
+		Engine::getPatternStore()->setCurrentPattern(s_infoMap[t1]);
 	}
 }

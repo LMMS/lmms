@@ -34,6 +34,7 @@
 #include "MidiClient.h"
 #include "MidiClip.h"
 #include "MixHelpers.h"
+#include "PatternStore.h"
 #include "PatternTrack.h"
 #include "Song.h"
 
@@ -693,7 +694,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	{
 		Clip * clip = getClip( _clip_num );
 		clips.push_back( clip );
-		if (trackContainer() == (TrackContainer*)Engine::getPatternTrackContainer())
+		if (trackContainer() == Engine::getPatternStore())
 		{
 			pattern_track = PatternTrack::findPatternTrack( _clip_num );
 		}

@@ -32,7 +32,7 @@
 #include "Song.h"
 
 #include "InstrumentTrack.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "SampleTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
@@ -288,7 +288,7 @@ void Mixer::deleteChannel( int index )
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
 	tracks += Engine::getSong()->tracks();
-	tracks += Engine::getPatternTrackContainer()->tracks();
+	tracks += Engine::getPatternStore()->tracks();
 
 	for( Track* t : tracks )
 	{
@@ -386,7 +386,7 @@ void Mixer::moveChannelLeft( int index )
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternTrackList = Engine::getPatternTrackContainer()->tracks();
+	TrackContainer::TrackList patternTrackList = Engine::getPatternStore()->tracks();
 
 	TrackContainer::TrackList trackLists[] = {songTrackList, patternTrackList};
 	for(int tl=0; tl<2; ++tl)

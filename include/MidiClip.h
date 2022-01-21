@@ -140,7 +140,7 @@ private:
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
 	friend class MidiClipView;
-	friend class PatternTrackContainerView;
+	friend class PatternStoreView;
 
 
 signals:

@@ -32,7 +32,7 @@
 #include "InstrumentTrack.h"
 #include "MidiClip.h"
 #include "PatternTrack.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "TrackContainer.h"
 
 #include "Engine.h"
@@ -160,9 +160,9 @@ private slots:
 	void testPatternTrack()
 	{
 		auto song = Engine::getSong();
-		auto patternContainer = Engine::getPatternTrackContainer();
+		auto patternStore = Engine::getPatternStore();
 		PatternTrack patternTrack(song);
-		Track* automationTrack = Track::create(Track::AutomationTrack, patternContainer);
+		Track* automationTrack = Track::create(Track::AutomationTrack, patternStore);
 
 		QVERIFY(automationTrack->numOfClips());
 		AutomationClip* c1 = dynamic_cast<AutomationClip*>(automationTrack->getClip(0));
@@ -175,15 +175,15 @@ private slots:
 		c1->putValue(10, 1.0, false);
 		c1->addObject(&model);
 
-		QCOMPARE(patternContainer->automatedValuesAt( 0, patternTrack.index())[&model], 0.0f);
-		QCOMPARE(patternContainer->automatedValuesAt( 5, patternTrack.index())[&model], 0.5f);
-		QCOMPARE(patternContainer->automatedValuesAt(10, patternTrack.index())[&model], 1.0f);
-		QCOMPARE(patternContainer->automatedValuesAt(50, patternTrack.index())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.index())[&model], 0.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.index())[&model], 0.5f);
+		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.index())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.index())[&model], 1.0f);
 
 		PatternTrack patternTrack2(song);
 
-		QCOMPARE(patternContainer->automatedValuesAt(5, patternTrack.index())[&model], 0.5f);
-		QVERIFY(! patternContainer->automatedValuesAt(5, patternTrack2.index()).size());
+		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.index())[&model], 0.5f);
+		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.index()).size());
 
 		PatternClip clip(&patternTrack);
 		clip.changeLength(TimePos::ticksPerBar() * 2);

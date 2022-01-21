@@ -27,6 +27,7 @@
 
 #include <QDomElement>
 
+#include "PatternStore.h"
 #include "PatternTrack.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
@@ -79,7 +80,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			return false;
 		}
 		clips.push_back( getClip( _clip_num ) );
-		if (trackContainer() == (TrackContainer*)Engine::getPatternTrackContainer())
+		if (trackContainer() == Engine::getPatternStore())
 		{
 			pattern_track = PatternTrack::findPatternTrack( _clip_num );
 			setPlaying(true);

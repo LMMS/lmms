@@ -49,8 +49,8 @@
 #include "NotePlayHandle.h"
 #include "MidiClip.h"
 #include "PatternEditor.h"
+#include "PatternStore.h"
 #include "PatternTrack.h"
-#include "PatternTrackContainer.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
@@ -220,9 +220,9 @@ void Song::processNextBuffer()
 			break;
 
 		case Mode_PlayPattern:
-			if (Engine::getPatternTrackContainer()->numOfPatterns() > 0)
+			if (Engine::getPatternStore()->numOfPatterns() > 0)
 			{
-				clipNum = Engine::getPatternTrackContainer()->currentPattern();
+				clipNum = Engine::getPatternStore()->currentPattern();
 				trackList.push_back(PatternTrack::findPatternTrack(clipNum));
 			}
 			break;
@@ -292,7 +292,7 @@ void Song::processNextBuffer()
 			// loop back to the beginning when we reach the end
 			if (m_playMode == Mode_PlayPattern)
 			{
-				enforceLoop(TimePos{0}, TimePos{Engine::getPatternTrackContainer()->lengthOfCurrentPattern(), 0});
+				enforceLoop(TimePos{0}, TimePos{Engine::getPatternStore()->lengthOfCurrentPattern(), 0});
 			}
 			else if (m_playMode == Mode_PlayMidiClip && m_loopMidiClip && !loopEnabled)
 			{
@@ -373,8 +373,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		Q_ASSERT(tracklist.size() == 1);
 		Q_ASSERT(tracklist.at(0)->type() == Track::PatternTrack);
 		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
-		auto patternContainer = Engine::getPatternTrackContainer();
-		container = patternContainer;
+		container = Engine::getPatternStore();
 		clipNum = patternTrack->index();
 	}
 		break;
@@ -805,7 +804,7 @@ void Song::removeBar()
 void Song::addPatternTrack()
 {
 	Track * t = Track::create( Track::PatternTrack, this );
-	Engine::getPatternTrackContainer()->setCurrentPattern( dynamic_cast<PatternTrack *>( t )->index() );
+	Engine::getPatternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->index());
 }
 
 
@@ -868,7 +867,7 @@ void Song::clearProject()
 
 	if( getGUI() != nullptr && getGUI()->getPatternEditor() )
 	{
-		getGUI()->getPatternEditor()->trackContainerView()->clearAllTracks();
+		getGUI()->getPatternEditor()->patternStoreView()->clearAllTracks();
 	}
 	if( getGUI() != nullptr && getGUI()->songEditor() )
 	{
@@ -879,7 +878,7 @@ void Song::clearProject()
 		getGUI()->mixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
-	Engine::getPatternTrackContainer()->clearAllTracks();
+	Engine::getPatternStore()->clearAllTracks();
 	clearAllTracks();
 
 	Engine::mixer()->clear();
@@ -963,7 +962,7 @@ void Song::createNewProject()
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	t = Track::create( Track::InstrumentTrack,
-						Engine::getPatternTrackContainer() );
+						Engine::getPatternStore() );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 						"kicker" );
 	Track::create( Track::SampleTrack, this );
@@ -979,7 +978,7 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 
-	Engine::getPatternTrackContainer()->updateAfterTrackAdd();
+	Engine::getPatternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
 
@@ -1170,7 +1169,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	// quirk for fixing projects with broken positions of Clips inside pattern tracks
-	Engine::getPatternTrackContainer()->fixIncorrectPositions();
+	Engine::getPatternStore()->fixIncorrectPositions();
 
 	// Connect controller links to their controllers
 	// now that everything is loaded
@@ -1395,12 +1394,12 @@ void Song::exportProjectMidi(QString const & exportFileName) const
 {
 	// instantiate midi export plugin
 	TrackContainer::TrackList const & tracks = this->tracks();
-	TrackContainer::TrackList const & patternTracks = Engine::getPatternTrackContainer()->tracks();
+	TrackContainer::TrackList const & patternStoreTracks = Engine::getPatternStore()->tracks();
 
 	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
 	if (exf)
 	{
-		exf->tryExport(tracks, patternTracks, getTempo(), m_masterPitchModel.value(), exportFileName);
+		exf->tryExport(tracks, patternStoreTracks, getTempo(), m_masterPitchModel.value(), exportFileName);
 	}
 	else
 	{

@@ -36,8 +36,8 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "PatternStore.h"
 #include "PatternTrack.h"
-#include "PatternTrackContainer.h"
 #include "SampleTrack.h"
 #include "Song.h"
 
@@ -122,10 +122,9 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
-	if( tc == Engine::getPatternTrackContainer() && t )
+	if (tc == Engine::getPatternStore() && t)
 	{
-		t->createClipsForPattern( Engine::getPatternTrackContainer()->numOfPatterns()
-									- 1 );
+		t->createClipsForPattern(Engine::getPatternStore()->numOfPatterns()	- 1);
 	}
 
 	tc->updateAfterTrackAdd();

@@ -36,7 +36,7 @@
 
 class AudioEngine;
 class Mixer;
-class PatternTrackContainer;
+class PatternStore;
 class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
@@ -77,9 +77,9 @@ public:
 		return s_song;
 	}
 
-	static PatternTrackContainer * getPatternTrackContainer()
+	static PatternStore * getPatternStore()
 	{
-		return s_patternTrackContainer;
+		return s_patternStore;
 	}
 
 	static ProjectJournal * projectJournal()
@@ -143,7 +143,7 @@ private:
 	static AudioEngine *s_audioEngine;
 	static Mixer * s_mixer;
 	static Song * s_song;
-	static PatternTrackContainer * s_patternTrackContainer;
+	static PatternStore * s_patternStore;
 	static ProjectJournal * s_projectJournal;
 
 #ifdef LMMS_HAVE_LV2

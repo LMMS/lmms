@@ -1,5 +1,5 @@
 /*
- * PatternTrackContainer.h - model-component of Pattern Editor
+ * PatternStore.h - model-component of Pattern Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,20 +23,20 @@
  */
 
 
-#ifndef PATTERN_TRACK_CONTAINER_H
-#define PATTERN_TRACK_CONTAINER_H
+#ifndef PATTERN_STORE_H
+#define PATTERN_STORE_H
 
 #include "TrackContainer.h"
 #include "ComboBoxModel.h"
 
 
-class LMMS_EXPORT PatternTrackContainer : public TrackContainer
+class LMMS_EXPORT PatternStore : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,currentPattern,setCurrentPattern,m_patternComboBoxModel);
 public:
-	PatternTrackContainer();
-	virtual ~PatternTrackContainer();
+	PatternStore();
+	virtual ~PatternStore();
 
 	virtual bool play(TimePos start, const fpp_t frames, const f_cnt_t frameBase, int clipNum = -1);
 
@@ -44,7 +44,7 @@ public:
 
 	inline QString nodeName() const override
 	{
-		return "bbtrackcontainer"; // TODO rename to patterntrackcontainer
+		return "bbtrackcontainer"; // TODO rename to patternstore
 	}
 
 	bar_t lengthOfPattern(int pattern) const;

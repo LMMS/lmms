@@ -63,7 +63,7 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MidiClip.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "PianoView.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
@@ -3943,8 +3943,7 @@ QList<int> PianoRoll::getAllOctavesForKey( int keyToMirror ) const
 
 Song::PlayModes PianoRoll::desiredPlayModeForAccompany() const
 {
-	if( m_midiClip->getTrack()->trackContainer() ==
-					Engine::getPatternTrackContainer() )
+	if (m_midiClip->getTrack()->trackContainer() ==	Engine::getPatternStore())
 	{
 		return Song::Mode_PlayPattern;
 	}

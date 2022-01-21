@@ -54,7 +54,7 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "SongEditor.h"
@@ -1510,8 +1510,7 @@ float AutomationEditor::getLevel(int y )
 
 inline bool AutomationEditor::inPatternEditor()
 {
-	return( validClip() &&
-				m_clip->getTrack()->trackContainer() == Engine::getPatternTrackContainer() );
+	return (validClip() && m_clip->getTrack()->trackContainer() == Engine::getPatternStore());
 }
 
 
@@ -1542,7 +1541,7 @@ void AutomationEditor::play()
 	}
 	else if( inPatternEditor() )
 	{
-		Engine::getPatternTrackContainer()->play();
+		Engine::getPatternStore()->play();
 	}
 	else
 	{
@@ -1568,7 +1567,7 @@ void AutomationEditor::stop()
 	}
 	if( m_clip->getTrack() && inPatternEditor() )
 	{
-		Engine::getPatternTrackContainer()->stop();
+		Engine::getPatternStore()->stop();
 	}
 	else
 	{

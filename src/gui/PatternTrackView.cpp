@@ -27,7 +27,7 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "PatternEditor.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "TrackLabelButton.h"
 
 PatternTrackView::PatternTrackView( PatternTrack * pt, TrackContainerView* tcv ) :
@@ -53,7 +53,7 @@ PatternTrackView::PatternTrackView( PatternTrack * pt, TrackContainerView* tcv )
 
 PatternTrackView::~PatternTrackView()
 {
-	getGUI()->getPatternEditor()->removePatternView( PatternTrack::s_infoMap[m_patternTrack] );
+	getGUI()->getPatternEditor()->patternStoreView()->removeViewsForPattern(PatternTrack::s_infoMap[m_patternTrack]);
 }
 
 
@@ -61,7 +61,7 @@ PatternTrackView::~PatternTrackView()
 
 bool PatternTrackView::close()
 {
-	getGUI()->getPatternEditor()->removePatternView( PatternTrack::s_infoMap[m_patternTrack] );
+	getGUI()->getPatternEditor()->patternStoreView()->removeViewsForPattern(PatternTrack::s_infoMap[m_patternTrack]);
 	return TrackView::close();
 }
 
@@ -70,7 +70,7 @@ bool PatternTrackView::close()
 
 void PatternTrackView::clickedTrackLabel()
 {
-	Engine::getPatternTrackContainer()->setCurrentPattern( m_patternTrack->index() );
+	Engine::getPatternStore()->setCurrentPattern(m_patternTrack->index());
 	getGUI()->getPatternEditor()->parentWidget()->show();
 	getGUI()->getPatternEditor()->setFocus( Qt::ActiveWindowFocusReason );
 }

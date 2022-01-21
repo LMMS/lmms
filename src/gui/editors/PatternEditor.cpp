@@ -32,8 +32,8 @@
 #include "DataFile.h"
 #include "embed.h"
 #include "MainWindow.h"
+#include "PatternStore.h"
 #include "PatternTrack.h"
-#include "PatternTrackContainer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 
@@ -41,18 +41,18 @@
 
 
 
-PatternEditor::PatternEditor( PatternTrackContainer* tc ) :
+PatternEditor::PatternEditor(PatternStore* ps) :
 	Editor(false),
-	m_trackContainerView( new PatternTrackContainerView(tc) )
+	m_patternStoreView(new PatternStoreView(ps))
 {
 	setWindowIcon( embed::getIconPixmap( "pattern_track_btn" ) );
 	setWindowTitle( tr( "Pattern Editor" ) );
-	setCentralWidget(m_trackContainerView);
+	setCentralWidget(m_patternStoreView);
 
 	setAcceptDrops(true);
 	m_toolBar->setAcceptDrops(true);
-	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_trackContainerView, SLOT(dragEnterEvent(QDragEnterEvent*)));
-	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_trackContainerView, SLOT(dropEvent(QDropEvent*)));
+	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_patternStoreView, SLOT(dragEnterEvent(QDragEnterEvent*)));
+	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_patternStoreView, SLOT(dropEvent(QDropEvent*)));
 
 	// TODO: Use style sheet
 	if( ConfigManager::inst()->value( "ui",
@@ -77,7 +77,7 @@ PatternEditor::PatternEditor( PatternTrackContainer* tc ) :
 
 	m_patternComboBox = new ComboBox( m_toolBar );
 	m_patternComboBox->setFixedSize( 200, ComboBox::DEFAULT_HEIGHT );
-	m_patternComboBox->setModel( &tc->m_patternComboBoxModel );
+	m_patternComboBox->setModel(&ps->m_patternComboBoxModel);
 
 	patternSelectionToolBar->addWidget( m_patternComboBox );
 
@@ -89,13 +89,13 @@ PatternEditor::PatternEditor( PatternTrackContainer* tc ) :
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_pattern_track"), tr("New pattern"),
 						 Engine::getSong(), SLOT(addPatternTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"),
-						 m_trackContainerView, SLOT(cloneClip()));
+						 m_patternStoreView, SLOT(cloneClip()));
 	trackAndStepActionsToolBar->addAction(
 				embed::getIconPixmap("add_sample_track"),
-				tr("Add sample-track"), m_trackContainerView,
+				tr("Add sample-track"), m_patternStoreView,
 				SLOT(addSampleTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
-						 m_trackContainerView, SLOT(addAutomationTrack()));
+						 m_patternStoreView, SLOT(addAutomationTrack()));
 
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -104,14 +104,14 @@ PatternEditor::PatternEditor( PatternTrackContainer* tc ) :
 
 	// Step actions
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
-						 m_trackContainerView, SLOT(removeSteps()));
+						 m_patternStoreView, SLOT(removeSteps()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
-						 m_trackContainerView, SLOT( addSteps()));
+						 m_patternStoreView, SLOT(addSteps()));
 	trackAndStepActionsToolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
-						  m_trackContainerView, SLOT( cloneSteps() ) );
+						  m_patternStoreView, SLOT(cloneSteps()));
 
-	connect( &tc->m_patternComboBoxModel, SIGNAL( dataChanged() ),
-			m_trackContainerView, SLOT( updatePosition() ) );
+	connect(&ps->m_patternComboBoxModel, SIGNAL(dataChanged()),
+			m_patternStoreView, SLOT(updatePosition()));
 
 
 	QAction* viewNext = new QAction(this);
@@ -137,12 +137,6 @@ QSize PatternEditor::sizeHint() const
 }
 
 
-void PatternEditor::removePatternView(int pattern)
-{
-	m_trackContainerView->removePatternView(pattern);
-}
-
-
 void PatternEditor::play()
 {
 	if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
@@ -164,22 +158,22 @@ void PatternEditor::stop()
 
 
 
-PatternTrackContainerView::PatternTrackContainerView(PatternTrackContainer* tc) :
-	TrackContainerView(tc),
-	m_ptc(tc)
+PatternStoreView::PatternStoreView(PatternStore* ps) :
+	TrackContainerView(ps),
+	m_ps(ps)
 {
-	setModel( tc );
+	setModel(ps);
 }
 
 
 
 
-void PatternTrackContainerView::addSteps()
+void PatternStoreView::addSteps()
 {
 	makeSteps( false );
 }
 
-void PatternTrackContainerView::cloneSteps()
+void PatternStoreView::cloneSteps()
 {
 	makeSteps( true );
 }
@@ -187,7 +181,7 @@ void PatternTrackContainerView::cloneSteps()
 
 
 
-void PatternTrackContainerView::removeSteps()
+void PatternStoreView::removeSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -196,7 +190,7 @@ void PatternTrackContainerView::removeSteps()
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ptc->currentPattern() ) );
+			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ps->currentPattern() ) );
 			p->removeSteps();
 		}
 	}
@@ -205,7 +199,7 @@ void PatternTrackContainerView::removeSteps()
 
 
 
-void PatternTrackContainerView::addSampleTrack()
+void PatternStoreView::addSampleTrack()
 {
 	(void) Track::create( Track::SampleTrack, model() );
 }
@@ -213,7 +207,7 @@ void PatternTrackContainerView::addSampleTrack()
 
 
 
-void PatternTrackContainerView::addAutomationTrack()
+void PatternStoreView::addAutomationTrack()
 {
 	(void) Track::create( Track::AutomationTrack, model() );
 }
@@ -221,7 +215,7 @@ void PatternTrackContainerView::addAutomationTrack()
 
 
 
-void PatternTrackContainerView::removePatternView(int pattern)
+void PatternStoreView::removeViewsForPattern(int pattern)
 {
 	for( TrackView* view : trackViews() )
 	{
@@ -231,12 +225,12 @@ void PatternTrackContainerView::removePatternView(int pattern)
 
 
 
-void PatternTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
+void PatternStoreView::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
-void PatternTrackContainerView::loadSettings(const QDomElement& element)
+void PatternStoreView::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
 }
@@ -244,7 +238,7 @@ void PatternTrackContainerView::loadSettings(const QDomElement& element)
 
 
 
-void PatternTrackContainerView::dropEvent(QDropEvent* de)
+void PatternStoreView::dropEvent(QDropEvent* de)
 {
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
@@ -256,7 +250,7 @@ void PatternTrackContainerView::dropEvent(QDropEvent* de)
 
 		// Ensure pattern clips exist
 		bool hasValidPatternClips = false;
-		if (t->getClips().size() == m_ptc->numOfPatterns())
+		if (t->getClips().size() == m_ps->numOfPatterns())
 		{
 			hasValidPatternClips = true;
 			for (int i = 0; i < t->getClips().size(); ++i)
@@ -271,9 +265,9 @@ void PatternTrackContainerView::dropEvent(QDropEvent* de)
 		if (!hasValidPatternClips)
 		{
 			t->deleteClips();
-			t->createClipsForPattern(m_ptc->numOfPatterns() - 1);
+			t->createClipsForPattern(m_ps->numOfPatterns() - 1);
 		}
-		m_ptc->updateAfterTrackAdd();
+		m_ps->updateAfterTrackAdd();
 
 		de->accept();
 	}
@@ -286,7 +280,7 @@ void PatternTrackContainerView::dropEvent(QDropEvent* de)
 
 
 
-void PatternTrackContainerView::updatePosition()
+void PatternStoreView::updatePosition()
 {
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
@@ -295,7 +289,7 @@ void PatternTrackContainerView::updatePosition()
 
 
 
-void PatternTrackContainerView::makeSteps( bool clone )
+void PatternStoreView::makeSteps( bool clone )
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -304,7 +298,7 @@ void PatternTrackContainerView::makeSteps( bool clone )
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ptc->currentPattern() ) );
+			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ps->currentPattern() ) );
 			if( clone )
 			{
 				p->cloneSteps();
@@ -318,11 +312,11 @@ void PatternTrackContainerView::makeSteps( bool clone )
 
 // Creates a clone of the current pattern track with the same clip, but no Clips in the song editor
 // TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
-void PatternTrackContainerView::cloneClip()
+void PatternStoreView::cloneClip()
 {
 	// Get the current PatternTrack id
-	PatternTrackContainer *ptc = static_cast<PatternTrackContainer*>(model());
-	const int currentPattern = ptc->currentPattern();
+	PatternStore* ps = static_cast<PatternStore*>(model());
+	const int currentPattern = ps->currentPattern();
 
 	PatternTrack *pt = PatternTrack::findPatternTrack(currentPattern);
 
@@ -330,7 +324,7 @@ void PatternTrackContainerView::cloneClip()
 	{
 		// Clone the track
 		Track *newTrack = pt->clone();
-		ptc->setCurrentPattern( static_cast<PatternTrack *>( newTrack )->index() );
+		ps->setCurrentPattern(static_cast<PatternTrack*>(newTrack)->index());
 
 		// Track still have the clips which is undesirable in this case, clear the track
 		newTrack->lock();

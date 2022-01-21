@@ -1,5 +1,5 @@
 /*
- * PatternTrackContainer.cpp - model-component of Pattern Editor
+ * PatternStore.cpp - model-component of Pattern Editor
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,7 +23,7 @@
  */
 
 
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 
 #include "Engine.h"
 #include "PatternTrack.h"
@@ -31,7 +31,7 @@
 
 
 
-PatternTrackContainer::PatternTrackContainer() :
+PatternStore::PatternStore() :
 	TrackContainer(),
 	m_patternComboBoxModel(this)
 {
@@ -47,14 +47,14 @@ PatternTrackContainer::PatternTrackContainer() :
 
 
 
-PatternTrackContainer::~PatternTrackContainer()
+PatternStore::~PatternStore()
 {
 }
 
 
 
 
-bool PatternTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum)
+bool PatternStore::play(TimePos start, fpp_t frames, f_cnt_t offset, int clipNum)
 {
 	bool notePlayed = false;
 
@@ -80,7 +80,7 @@ bool PatternTrackContainer::play(TimePos start, fpp_t frames, f_cnt_t offset, in
 
 
 
-void PatternTrackContainer::updateAfterTrackAdd()
+void PatternStore::updateAfterTrackAdd()
 {
 	if (numOfPatterns() == 0 && !Engine::getSong()->isLoadingProject())
 	{
@@ -91,7 +91,7 @@ void PatternTrackContainer::updateAfterTrackAdd()
 
 
 
-bar_t PatternTrackContainer::lengthOfPattern(int pattern) const
+bar_t PatternStore::lengthOfPattern(int pattern) const
 {
 	TimePos maxLength = TimePos::ticksPerBar();
 
@@ -111,7 +111,7 @@ bar_t PatternTrackContainer::lengthOfPattern(int pattern) const
 
 
 
-int PatternTrackContainer::numOfPatterns() const
+int PatternStore::numOfPatterns() const
 {
 	return Engine::getSong()->countTracks(Track::PatternTrack);
 }
@@ -119,7 +119,7 @@ int PatternTrackContainer::numOfPatterns() const
 
 
 
-void PatternTrackContainer::removePattern(int pattern)
+void PatternStore::removePattern(int pattern)
 {
 	TrackList tl = tracks();
 	for (Track * t : tl)
@@ -136,7 +136,7 @@ void PatternTrackContainer::removePattern(int pattern)
 
 
 
-void PatternTrackContainer::swapPattern(int pattern1, int pattern2)
+void PatternStore::swapPattern(int pattern1, int pattern2)
 {
 	TrackList tl = tracks();
 	for (Track * t : tl)
@@ -149,7 +149,7 @@ void PatternTrackContainer::swapPattern(int pattern1, int pattern2)
 
 
 
-void PatternTrackContainer::updatePatternTrack(Clip * clip)
+void PatternStore::updatePatternTrack(Clip* clip)
 {
 	PatternTrack * t = PatternTrack::findPatternTrack(clip->startPosition() / DefaultTicksPerBar);
 	if (t != nullptr)
@@ -161,7 +161,7 @@ void PatternTrackContainer::updatePatternTrack(Clip * clip)
 
 
 
-void PatternTrackContainer::fixIncorrectPositions()
+void PatternStore::fixIncorrectPositions()
 {
 	TrackList tl = tracks();
 	for (Track * t : tl)
@@ -176,7 +176,7 @@ void PatternTrackContainer::fixIncorrectPositions()
 
 
 
-void PatternTrackContainer::play()
+void PatternStore::play()
 {
 	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
 	{
@@ -191,7 +191,7 @@ void PatternTrackContainer::play()
 
 
 
-void PatternTrackContainer::stop()
+void PatternStore::stop()
 {
 	Engine::getSong()->stop();
 }
@@ -199,7 +199,7 @@ void PatternTrackContainer::stop()
 
 
 
-void PatternTrackContainer::updateComboBox()
+void PatternStore::updateComboBox()
 {
 	const int curPattern = currentPattern();
 
@@ -216,7 +216,7 @@ void PatternTrackContainer::updateComboBox()
 
 
 
-void PatternTrackContainer::currentPatternChanged()
+void PatternStore::currentPatternChanged()
 {
 	// now update all track-labels (the current one has to become white, the others gray)
 	TrackList tl = Engine::getSong()->tracks();
@@ -232,7 +232,7 @@ void PatternTrackContainer::currentPatternChanged()
 
 
 
-void PatternTrackContainer::createClipsForPattern(int pattern)
+void PatternStore::createClipsForPattern(int pattern)
 {
 	TrackList tl = tracks();
 	for (Track * t : tl)
@@ -241,7 +241,7 @@ void PatternTrackContainer::createClipsForPattern(int pattern)
 	}
 }
 
-AutomatedValueMap PatternTrackContainer::automatedValuesAt(TimePos time, int clipNum) const
+AutomatedValueMap PatternStore::automatedValuesAt(TimePos time, int clipNum) const
 {
 	Q_ASSERT(clipNum >= 0);
 	Q_ASSERT(time.getTicks() >= 0);

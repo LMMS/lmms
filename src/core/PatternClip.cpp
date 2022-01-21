@@ -27,15 +27,16 @@
  #include <QDomElement>
  
  #include "Engine.h"
+ #include "PatternStore.h"
  #include "PatternTrack.h"
- #include "PatternTrackContainer.h"
+
 
  
 
 PatternClip::PatternClip( Track * _track ) :
 	Clip( _track )
 {
-	bar_t t = Engine::getPatternTrackContainer()->lengthOfPattern( patternTrackIndex() );
+	bar_t t = Engine::getPatternStore()->lengthOfPattern(patternTrackIndex());
 	if( t > 0 )
 	{
 		saveJournallingState( false );

@@ -27,7 +27,7 @@
 
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 
 #include <limits>
@@ -46,8 +46,7 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	m_clipType( BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
-	if( _instrument_track->trackContainer()
-					== Engine::getPatternTrackContainer() )
+	if (_instrument_track->trackContainer()	== Engine::getPatternStore())
 	{
 		resizeToFirstTrack();
 	}
@@ -560,9 +559,9 @@ ClipView * MidiClip::createView( TrackView * _tv )
 
 void MidiClip::updatePatternTrack()
 {
-	if( getTrack()->trackContainer() == Engine::getPatternTrackContainer() )
+	if (getTrack()->trackContainer() == Engine::getPatternStore())
 	{
-		Engine::getPatternTrackContainer()->updatePatternTrack( this );
+		Engine::getPatternStore()->updatePatternTrack(this);
 	}
 
 	if( getGUI() != nullptr

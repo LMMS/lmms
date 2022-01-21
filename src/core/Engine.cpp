@@ -29,7 +29,7 @@
 #include "Mixer.h"
 #include "Ladspa2LMMS.h"
 #include "Lv2Manager.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
@@ -40,7 +40,7 @@
 float LmmsCore::s_framesPerTick;
 AudioEngine* LmmsCore::s_audioEngine = nullptr;
 Mixer * LmmsCore::s_mixer = nullptr;
-PatternTrackContainer * LmmsCore::s_patternTrackContainer = nullptr;
+PatternStore * LmmsCore::s_patternStore = nullptr;
 Song * LmmsCore::s_song = nullptr;
 ProjectJournal * LmmsCore::s_projectJournal = nullptr;
 #ifdef LMMS_HAVE_LV2
@@ -67,7 +67,7 @@ void LmmsCore::init( bool renderOnly )
 	s_audioEngine = new AudioEngine( renderOnly );
 	s_song = new Song;
 	s_mixer = new Mixer;
-	s_patternTrackContainer = new PatternTrackContainer;
+	s_patternStore = new PatternStore;
 
 #ifdef LMMS_HAVE_LV2
 	s_lv2Manager = new Lv2Manager;
@@ -98,7 +98,7 @@ void LmmsCore::destroy()
 
 	s_song->clearProject();
 
-	deleteHelper( &s_patternTrackContainer );
+	deleteHelper( &s_patternStore );
 
 	deleteHelper( &s_mixer );
 	deleteHelper( &s_audioEngine );

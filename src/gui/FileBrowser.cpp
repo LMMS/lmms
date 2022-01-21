@@ -49,7 +49,7 @@
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
-#include "PatternTrackContainer.h"
+#include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
@@ -815,8 +815,8 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	else if( f->handling() != FileItem::NotSupported )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-					Engine::getPatternTrackContainer() ) );
+			Track::create(Track::InstrumentTrack, Engine::getPatternStore())
+		);
 		handleFile( f, it );
 	}
 }
@@ -841,7 +841,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 {
 	// Get the correct TrackContainer. Ternary doesn't compile here
 	TrackContainer* tc = Engine::getSong();
-	if (!songEditor) { tc = Engine::getPatternTrackContainer(); }
+	if (!songEditor) { tc = Engine::getPatternStore(); }
 	openInNewInstrumentTrack(tc, item);
 }
 

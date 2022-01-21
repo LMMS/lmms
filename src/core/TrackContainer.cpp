@@ -34,8 +34,8 @@
 #include "embed.h"
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
+#include "PatternStore.h"
 #include "PatternTrack.h"
-#include "PatternTrackContainer.h"
 #include "Song.h"
 
 #include "GuiApplication.h"
@@ -309,13 +309,13 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		else if (auto* pattern = dynamic_cast<PatternClip *>(clip))
 		{
 			auto patIndex = dynamic_cast<class PatternTrack*>(pattern->getTrack())->index();
-			auto patContainer = Engine::getPatternTrackContainer();
+			auto patStore = Engine::getPatternStore();
 
 			TimePos patTime = time - clip->startPosition();
 			patTime = std::min(patTime, clip->length());
-			patTime = patTime % (patContainer->lengthOfPattern(patIndex) * TimePos::ticksPerBar());
+			patTime = patTime % (patStore->lengthOfPattern(patIndex) * TimePos::ticksPerBar());
 
-			auto patValues = patContainer->automatedValuesAt(patTime, patIndex);
+			auto patValues = patStore->automatedValuesAt(patTime, patIndex);
 			for (auto it=patValues.begin(); it != patValues.end(); it++)
 			{
 				// override old values, pattern track with the highest index takes precedence

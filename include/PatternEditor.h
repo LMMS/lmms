@@ -31,52 +31,50 @@
 #include "TrackContainerView.h"
 
 
-class PatternTrackContainer;
+class PatternStore;
 class ComboBox;
 
-class PatternTrackContainerView;
+class PatternStoreView;
 
 class PatternEditor : public Editor
 {
 	Q_OBJECT
 public:
-	PatternEditor( PatternTrackContainer * _tc );
+	PatternEditor(PatternStore* ps);
 	~PatternEditor();
 
 	QSize sizeHint() const override;
 
-	const PatternTrackContainerView* trackContainerView() const {
-		return m_trackContainerView;
+	const PatternStoreView* patternStoreView() const {
+		return m_patternStoreView;
 	}
-	PatternTrackContainerView* trackContainerView() {
-		return m_trackContainerView;
+	PatternStoreView* patternStoreView() {
+		return m_patternStoreView;
 	}
-
-	void removePatternView(int pattern);
 
 public slots:
 	void play() override;
 	void stop() override;
 
 private:
-	PatternTrackContainerView* m_trackContainerView;
+	PatternStoreView* m_patternStoreView;
 	ComboBox * m_patternComboBox;
 } ;
 
 
 
-class PatternTrackContainerView : public TrackContainerView
+class PatternStoreView : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	PatternTrackContainerView(PatternTrackContainer* tc);
+	PatternStoreView(PatternStore* ps);
 
 	bool fixedClips() const override
 	{
 		return true;
 	}
 
-	void removePatternView(int pattern);
+	void removeViewsForPattern(int pattern);
 
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
@@ -94,7 +92,7 @@ protected slots:
 	void updatePosition();
 
 private:
-	PatternTrackContainer * m_ptc;
+	PatternStore* m_ps;
 	void makeSteps( bool clone );
 };
 

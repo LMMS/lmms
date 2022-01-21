@@ -14,8 +14,8 @@
 #include "InstrumentTrack.h"
 #include "Note.h"
 #include "MidiClip.h"
+#include "PatternStore.h"
 #include "PatternTrack.h"
-#include "PatternTrackContainer.h"
 #include "Track.h"
 #include "Instrument.h"
 
@@ -223,7 +223,9 @@ bool HydrogenImport::readSong()
 
 					if ( nLayer == 0 ) 
 					{
-						drum_track[sId] = ( InstrumentTrack * ) Track::create( Track::InstrumentTrack,Engine::getPatternTrackContainer() );
+						drum_track[sId] = static_cast<InstrumentTrack*>(
+							Track::create(Track::InstrumentTrack, Engine::getPatternStore())
+						);
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
 						ins = drum_track[sId]->loadInstrument( "audiofileprocessor" );
@@ -247,7 +249,7 @@ bool HydrogenImport::readSong()
 	}
 	QDomNode patterns = songNode.firstChildElement( "patternList" );
 	int pattern_count = 0;
-	int existing_patterns = Engine::getPatternTrackContainer()->numOfPatterns();
+	int existing_patterns = Engine::getPatternStore()->numOfPatterns();
 	QDomNode patternNode =  patterns.firstChildElement( "pattern" );
 	int pn = 1;
 	while (  !patternNode.isNull()  ) 
