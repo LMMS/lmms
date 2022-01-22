@@ -696,7 +696,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		clips.push_back( clip );
 		if (trackContainer() == Engine::getPatternStore())
 		{
-			pattern_track = PatternTrack::findPatternTrack( _clip_num );
+			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 		}
 	}
 	else
@@ -763,7 +763,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				cur_note->length().frames( frames_per_tick );
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
-			notePlayHandle->setPatternTrack( pattern_track );
+			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )
 			{

@@ -500,13 +500,12 @@ void MainWindow::finalize()
 	song_editor_window->setShortcut( Qt::CTRL + Qt::Key_1 );
 
 
-	ToolButton * pattern_editor_window = new ToolButton(
-					embed::getIconPixmap( "pattern_track_btn" ),
-					tr( "Pattern Editor" ) +
-									" (Ctrl+2)",
-					this, SLOT( togglePatternEditorWin() ),
-								m_toolBar );
-	pattern_editor_window->setShortcut( Qt::CTRL + Qt::Key_2 );
+	ToolButton* pattern_editor_window = new ToolButton(
+					embed::getIconPixmap("pattern_track_btn"),
+					tr("Pattern Editor") + " (Ctrl+2)",
+					this, SLOT(togglePatternEditorWin()),
+					m_toolBar);
+	pattern_editor_window->setShortcut(Qt::CTRL + Qt::Key_2);
 
 
 	ToolButton * piano_roll_window = new ToolButton(
@@ -601,7 +600,7 @@ void MainWindow::finalize()
 	}
 
 	getGUI()->automationEditor()->parentWidget()->hide();
-	getGUI()->getPatternEditor()->parentWidget()->move( 610, 5 );
+	getGUI()->getPatternEditor()->parentWidget()->move(610, 5);
 	getGUI()->getPatternEditor()->parentWidget()->hide();
 	getGUI()->pianoRoll()->parentWidget()->move(5, 5);
 	getGUI()->pianoRoll()->parentWidget()->hide();
@@ -1143,9 +1142,9 @@ void MainWindow::updateViewMenu()
 			      tr( "Song Editor" ) + "\tCtrl+1",
 			      this, SLOT( toggleSongEditorWin() )
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "pattern_track" ),
-					tr( "Pattern Editor" ) + "\tCtrl+2",
-					this, SLOT( togglePatternEditorWin() )
+	m_viewMenu->addAction(embed::getIconPixmap("pattern_track"),
+					tr("Pattern Editor") + "\tCtrl+2",
+					this, SLOT(togglePatternEditorWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),
 			      tr( "Piano Roll" ) + "\tCtrl+3",

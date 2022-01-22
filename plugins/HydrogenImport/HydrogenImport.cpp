@@ -317,7 +317,7 @@ bool HydrogenImport::readSong()
 			patternId = ( QDomNode ) patternId.nextSiblingElement( "patternID" );
 
 			int i = pattern_id[patId]+song_num_tracks;
-			Track *t = ( PatternTrack * ) s->tracks().at( i );
+			Track* t = s->tracks().at(i);
 			t->createClip(pos);
 
 			if ( pattern_length[patId] > best_length ) 

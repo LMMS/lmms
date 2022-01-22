@@ -238,7 +238,7 @@ public:
 	}
 
 	/*! Sets attached pattern track */
-	void setPatternTrack( Track* t )
+	void setPatternTrack(Track* t)
 	{
 		m_patternTrack = t;
 	}

@@ -1539,7 +1539,7 @@ void AutomationEditor::play()
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 	}
-	else if( inPatternEditor() )
+	else if (inPatternEditor())
 	{
 		Engine::getPatternStore()->play();
 	}
@@ -1565,7 +1565,7 @@ void AutomationEditor::stop()
 	{
 		return;
 	}
-	if( m_clip->getTrack() && inPatternEditor() )
+	if (m_clip->getTrack() && inPatternEditor())
 	{
 		Engine::getPatternStore()->stop();
 	}

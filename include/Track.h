@@ -127,7 +127,7 @@ public:
 							const TimePos & end );
 	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
-	void createClipsForPattern( int pattern );
+	void createClipsForPattern(int pattern);
 
 
 	void insertBar( const TimePos & pos );

@@ -1,5 +1,5 @@
 /*
- * PatternTrack.h - class PatternTrack, a wrapper for using patternEditor
+ * PatternTrack.h - class PatternTrack, a wrapper for using PatternEditor
  *              (which is a singleton-class) as track
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -41,7 +41,7 @@ class LMMS_EXPORT PatternTrack : public Track
 {
 	Q_OBJECT
 public:
-	PatternTrack( TrackContainer* tc );
+	PatternTrack(TrackContainer* tc);
 	virtual ~PatternTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
@@ -53,8 +53,8 @@ public:
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
-	static PatternTrack * findPatternTrack( int _pattern_num );
-	static void swapPatternTracks( Track * _track1, Track * _track2 );
+	static PatternTrack* findPatternTrack(int pattern_num);
+	static void swapPatternTracks(Track* track1, Track* track2);
 
 	int index()
 	{
@@ -84,7 +84,7 @@ protected:
 private:
 	QList<Track *> m_disabledTracks;
 
-	typedef QMap<PatternTrack *, int> infoMap;
+	typedef QMap<PatternTrack*, int> infoMap;
 	static infoMap s_infoMap;
 
 	friend class PatternTrackView;

@@ -35,7 +35,7 @@ class PatternClipView : public ClipView
 {
 	Q_OBJECT
 public:
-	PatternClipView( Clip * _clip, TrackView * _tv );
+	PatternClipView(Clip* clip, TrackView* tv);
 	virtual ~PatternClipView() = default;
 
 
@@ -55,7 +55,7 @@ protected:
 
 
 private:
-	PatternClip * m_patternClip;
+	PatternClip* m_patternClip;
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;

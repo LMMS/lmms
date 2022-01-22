@@ -82,7 +82,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		clips.push_back( getClip( _clip_num ) );
 		if (trackContainer() == Engine::getPatternStore())
 		{
-			pattern_track = PatternTrack::findPatternTrack( _clip_num );
+			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 			setPlaying(true);
 		}
 	}
@@ -144,7 +144,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
-				smpHandle->setPatternTrack( pattern_track );
+				smpHandle->setPatternTrack(pattern_track);
 				handle = smpHandle;
 			}
 			handle->setOffset( _offset );

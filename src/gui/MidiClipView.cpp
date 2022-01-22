@@ -43,7 +43,8 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	m_noteBorderColor(255, 255, 255, 220),
 	m_mutedNoteFillColor(100, 100, 100, 220),
 	m_mutedNoteBorderColor(100, 100, 100, 220),
-	m_legacySEPattern(ConfigManager::inst()->value("ui","legacysebb","0").toInt())  // TODO rename bb to pattern
+	// TODO if this option is ever added to the GUI, rename it to legacysepattern
+	m_legacySEPattern(ConfigManager::inst()->value("ui", "legacysebb", "0").toInt())
 {
 	connect( getGUI()->pianoRoll(), SIGNAL( currentMidiClipChanged() ),
 			this, SLOT( update() ) );
@@ -504,8 +505,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 		p.restore();
 	}
-	// pattern clip paint event
-	else if( beatClip &&	displayPattern )
+	// beat clip paint event
+	else if (beatClip && displayPattern)
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
@@ -515,7 +516,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 					m_clip->m_steps );
 		const int w = width() - 2 * CLIP_BORDER_WIDTH;
 
-		// scale step graphics to fit the pattern clip length
+		// scale step graphics to fit the beat clip length
 		stepon0 = s_stepBtnOn0->scaled( w / steps,
 					      s_stepBtnOn0->height(),
 					      Qt::IgnoreAspectRatio,
@@ -533,7 +534,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the pattern clip
+		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat clip
 		{
 			Note * n = m_clip->noteAtStep( it );
 

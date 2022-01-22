@@ -58,7 +58,7 @@ public slots:
 
 private:
 	PatternStoreView* m_patternStoreView;
-	ComboBox * m_patternComboBox;
+	ComboBox* m_patternComboBox;
 } ;
 
 

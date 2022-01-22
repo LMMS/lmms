@@ -36,9 +36,9 @@
 #include "Song.h"
 #include "ToolTip.h"
 
-PatternClipView::PatternClipView( Clip * _clip, TrackView * _tv ) :
+PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
-	m_patternClip( dynamic_cast<PatternClip *>( _clip ) ),
+	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
 	m_paintPixmap()
 {
 	connect( _clip->getTrack(), SIGNAL( dataChanged() ), 
@@ -47,10 +47,10 @@ PatternClipView::PatternClipView( Clip * _clip, TrackView * _tv ) :
 	setStyle( QApplication::style() );
 }
 
-void PatternClipView::constructContextMenu( QMenu * _cm )
+void PatternClipView::constructContextMenu(QMenu* _cm)
 {
-	QAction * a = new QAction( embed::getIconPixmap( "pattern_track" ),
-					tr( "Open in Pattern Editor" ),
+	QAction* a = new QAction(embed::getIconPixmap("pattern_track"),
+					tr("Open in Pattern Editor"),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
@@ -67,7 +67,7 @@ void PatternClipView::constructContextMenu( QMenu * _cm )
 
 
 
-void PatternClipView::mouseDoubleClickEvent( QMouseEvent * )
+void PatternClipView::mouseDoubleClickEvent(QMouseEvent*)
 {
 	openInPatternEditor();
 }
@@ -75,7 +75,7 @@ void PatternClipView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void PatternClipView::paintEvent( QPaintEvent * )
+void PatternClipView::paintEvent(QPaintEvent*)
 {
 	QPainter painter( this );
 
@@ -117,7 +117,7 @@ void PatternClipView::paintEvent( QPaintEvent * )
 	p.setPen( c.darker( 200 ) );
 
 	bar_t t = Engine::getPatternStore()->lengthOfPattern(m_patternClip->patternTrackIndex());
-	if( m_patternClip->length() > TimePos::ticksPerBar() && t > 0 )
+	if (m_patternClip->length() > TimePos::ticksPerBar() && t > 0)
 	{
 		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
@@ -142,7 +142,7 @@ void PatternClipView::paintEvent( QPaintEvent * )
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
 	// draw the 'muted' pixmap only if the clip was manualy muted
-	if( m_patternClip->isMuted() )
+	if (m_patternClip->isMuted())
 	{
 		const int spacing = CLIP_BORDER_WIDTH;
 		const int size = 14;
@@ -162,7 +162,7 @@ void PatternClipView::openInPatternEditor()
 {
 	Engine::getPatternStore()->setCurrentPattern(m_patternClip->patternTrackIndex());
 
-	getGUI()->mainWindow()->togglePatternEditorWin( true );
+	getGUI()->mainWindow()->togglePatternEditorWin(true);
 }
 
 
@@ -178,7 +178,7 @@ void PatternClipView::changeName()
 	QString s = m_patternClip->name();
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
-	m_patternClip->setName( s );
+	m_patternClip->setName(s);
 }
 
 

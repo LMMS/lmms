@@ -36,13 +36,13 @@
 PatternTrack::infoMap PatternTrack::s_infoMap;
 
 
-PatternTrack::PatternTrack( TrackContainer* tc ) :
-	Track( Track::PatternTrack, tc )
+PatternTrack::PatternTrack(TrackContainer* tc) :
+	Track(Track::PatternTrack, tc)
 {
 	int patternNum = s_infoMap.size();
 	s_infoMap[this] = patternNum;
 
-	setName( tr( "Pattern track %1" ).arg( patternNum ) );
+	setName(tr("Pattern %1").arg(patternNum));
 	Engine::getPatternStore()->createClipsForPattern(patternNum);
 	Engine::getPatternStore()->setCurrentPattern(patternNum);
 	Engine::getPatternStore()->updateComboBox();
@@ -66,7 +66,7 @@ PatternTrack::~PatternTrack()
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
-		if( it.value() > pattern )
+		if (it.value() > pattern)
 		{
 			--it.value();
 		}
@@ -125,9 +125,9 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackView * PatternTrack::createView( TrackContainerView* tcv )
+TrackView* PatternTrack::createView(TrackContainerView* tcv)
 {
-	return new PatternTrackView( this, tcv );
+	return new PatternTrackView(this, tcv);
 }
 
 
@@ -143,8 +143,7 @@ Clip* PatternTrack::createClip(const TimePos & pos)
 
 
 
-void PatternTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this)
 {
 //	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	_this.setAttribute( "current", s_infoMap[this] ==
@@ -153,7 +152,7 @@ void PatternTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
-		Engine::getPatternStore()->saveState(_doc, _this);
+		Engine::getPatternStore()->saveState(doc, _this);
 	}
 	if( _this.parentNode().parentNode().nodeName() == "clone" )
 	{
@@ -164,7 +163,7 @@ void PatternTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 
 
 
-void PatternTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 {
 /*	if( _this.attribute( "icon" ) != "" )
 	{
@@ -210,12 +209,12 @@ void PatternTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 // return pointer to PatternTrack specified by pattern_num
-PatternTrack * PatternTrack::findPatternTrack(int pattern_num)
+PatternTrack* PatternTrack::findPatternTrack(int pattern_num)
 {
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
-		if( it.value() == pattern_num )
+		if (it.value() == pattern_num)
 		{
 			return it.key();
 		}
@@ -226,10 +225,10 @@ PatternTrack * PatternTrack::findPatternTrack(int pattern_num)
 
 
 
-void PatternTrack::swapPatternTracks( Track * _track1, Track * _track2 )
+void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 {
-	PatternTrack * t1 = dynamic_cast<PatternTrack *>( _track1 );
-	PatternTrack * t2 = dynamic_cast<PatternTrack *>( _track2 );
+	PatternTrack* t1 = dynamic_cast<PatternTrack*>(track1);
+	PatternTrack* t2 = dynamic_cast<PatternTrack*>(track2);
 	if( t1 != nullptr && t2 != nullptr )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );

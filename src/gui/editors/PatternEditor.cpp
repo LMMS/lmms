@@ -1,5 +1,5 @@
 /*
- * PatternEditor.cpp - basic main-window for editing pattern clips
+ * PatternEditor.cpp - basic main-window for editing patterns
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -45,8 +45,8 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	Editor(false),
 	m_patternStoreView(new PatternStoreView(ps))
 {
-	setWindowIcon( embed::getIconPixmap( "pattern_track_btn" ) );
-	setWindowTitle( tr( "Pattern Editor" ) );
+	setWindowIcon( embed::getIconPixmap("pattern_track_btn"));
+	setWindowTitle(tr("Pattern Editor"));
 	setCentralWidget(m_patternStoreView);
 
 	setAcceptDrops(true);
@@ -68,8 +68,8 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	}
 
 
-	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ));
-	m_stopAction->setToolTip(tr( "Stop playback of current pattern (Space)" ));
+	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
+	m_stopAction->setToolTip(tr("Stop playback of current pattern (Space)"));
 
 
 	// Pattern selector
@@ -139,7 +139,7 @@ QSize PatternEditor::sizeHint() const
 
 void PatternEditor::play()
 {
-	if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
+	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
 	{
 		Engine::getSong()->playPattern();
 	}
@@ -190,7 +190,7 @@ void PatternStoreView::removeSteps()
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ps->currentPattern() ) );
+			MidiClip* p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
 			p->removeSteps();
 		}
 	}
@@ -298,7 +298,7 @@ void PatternStoreView::makeSteps( bool clone )
 	{
 		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			MidiClip* p = static_cast<MidiClip *>( ( *it )->getClip( m_ps->currentPattern() ) );
+			MidiClip* p = static_cast<MidiClip*>((*it)->getClip(m_ps->currentPattern()));
 			if( clone )
 			{
 				p->cloneSteps();
@@ -318,12 +318,12 @@ void PatternStoreView::cloneClip()
 	PatternStore* ps = static_cast<PatternStore*>(model());
 	const int currentPattern = ps->currentPattern();
 
-	PatternTrack *pt = PatternTrack::findPatternTrack(currentPattern);
+	PatternTrack* pt = PatternTrack::findPatternTrack(currentPattern);
 
-	if( pt )
+	if (pt)
 	{
 		// Clone the track
-		Track *newTrack = pt->clone();
+		Track* newTrack = pt->clone();
 		ps->setCurrentPattern(static_cast<PatternTrack*>(newTrack)->index());
 
 		// Track still have the clips which is undesirable in this case, clear the track

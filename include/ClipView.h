@@ -91,7 +91,7 @@ public:
 	void setTextColor( const QColor & c );
 	void setTextBackgroundColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
-	void setPatternClipBackground( const QColor & c );
+	void setPatternClipBackground(const QColor& c);
 	void setGradient( const bool & b );
 
 	// access needsUpdate member variable

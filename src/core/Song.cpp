@@ -803,7 +803,7 @@ void Song::removeBar()
 
 void Song::addPatternTrack()
 {
-	Track * t = Track::create( Track::PatternTrack, this );
+	Track * t = Track::create(Track::PatternTrack, this);
 	Engine::getPatternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->index());
 }
 
@@ -961,8 +961,7 @@ void Song::createNewProject()
 	t = Track::create( Track::InstrumentTrack, this );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
-	t = Track::create( Track::InstrumentTrack,
-						Engine::getPatternStore() );
+	t = Track::create(Track::InstrumentTrack, Engine::getPatternStore());
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 						"kicker" );
 	Track::create( Track::SampleTrack, this );
@@ -1111,7 +1110,7 @@ void Song::loadProject( const QString & fileName )
 			if( nd.isElement() && nd.nodeName() == "track" )
 			{
 				++m_nLoadingTrack;
-				if( nd.toElement().attribute("type").toInt() == Track::PatternTrack )
+				if (nd.toElement().attribute("type").toInt() == Track::PatternTrack)
 				{
 					n += nd.toElement().elementsByTagName("bbtrack").at(0) // TODO rename to patterntrack
 						.toElement().firstChildElement().childNodes().count();

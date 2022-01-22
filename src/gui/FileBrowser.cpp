@@ -521,9 +521,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		contextMenu.addAction( songEditorHeader );
 		contextMenu.addActions( getContextActions(file, true) );
 
-		QAction* patternEditorHeader = new QAction( tr("Pattern Editor"), nullptr );
+		QAction* patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
 		patternEditorHeader->setDisabled(true);
-		contextMenu.addAction( patternEditorHeader );
+		contextMenu.addAction(patternEditorHeader);
 		contextMenu.addActions( getContextActions(file, false) );
 
 		// We should only show the menu if it contains items

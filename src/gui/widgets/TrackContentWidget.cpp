@@ -208,8 +208,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		for( clipViewVector::iterator it = m_clipViews.begin();
 						it != m_clipViews.end(); ++it )
 		{
-		if( ( *it )->getClip()->
-						startPosition().getBar() == curPattern )
+		if ((*it)->getClip()->startPosition().getBar() == curPattern)
 			{
 				( *it )->move( 0, ( *it )->y() );
 				( *it )->raise();
@@ -224,8 +223,7 @@ void TrackContentWidget::changePosition( const TimePos & newPos )
 		for( clipViewVector::iterator it = m_clipViews.begin();
 					it != m_clipViews.end(); ++it )
 		{
-			if( ( *it )->getClip()->
-						startPosition().getBar() != curPattern )
+			if ((*it)->getClip()->startPosition().getBar() != curPattern)
 			{
 				( *it )->hide();
 			}

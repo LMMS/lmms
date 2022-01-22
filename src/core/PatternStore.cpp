@@ -207,7 +207,7 @@ void PatternStore::updateComboBox()
 
 	for (int i = 0; i < numOfPatterns(); ++i)
 	{
-		PatternTrack * pt = PatternTrack::findPatternTrack(i);
+		PatternTrack* pt = PatternTrack::findPatternTrack(i);
 		m_patternComboBoxModel.addItem(pt->name());
 	}
 	setCurrentPattern(curPattern);

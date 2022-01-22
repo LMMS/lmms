@@ -30,10 +30,34 @@
 #include "ComboBoxModel.h"
 
 
+/*
+ * PatternStore is the backend of Pattern Editor:
+ *
+ * +----------------------------------+
+ * | PatternStore (TrackContainer)    |
+ * |                                  |
+ * | +------------------------------+ |
+ * | | Track 1   [Clip A]  [Clip B] | |
+ * | +------------------------------+ |
+ * |                                  |
+ * | +------------------------------+ |
+ * | | Track 2   [Clip C]  [Clip D] | |
+ * | +------------------------------+ |
+ * +---------------------------------+
+ *
+ * Pattern Editor displays one pattern at a time, but they all belong to the same PatternStore.
+ * A "pattern" is not an object, it's just a word we use to describe a column of clips.
+ * In the illustration above, Clip A and Clip C would be "Pattern 1".
+ *
+ * Do not confuse the Tracks in the PatternStore with PatternTracks.
+ * PatternTracks are used in the Song Editor to reference a pattern.
+ * They do not contain any MIDI data.
+ */
+
 class LMMS_EXPORT PatternStore : public TrackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,currentPattern,setCurrentPattern,m_patternComboBoxModel);
+	mapPropertyFromModel(int, currentPattern, setCurrentPattern, m_patternComboBoxModel);
 public:
 	PatternStore();
 	virtual ~PatternStore();
@@ -55,9 +79,9 @@ public:
 	int numOfPatterns() const;
 	void removePattern(int pattern);
 
-	void swapPattern(int pattern1, int pattern2);
+	void swapPattern(int p1, int p2);
 
-	void updatePatternTrack(Clip * clip);
+	void updatePatternTrack(Clip* clip);
 	void fixIncorrectPositions();
 	void createClipsForPattern(int pattern);
 

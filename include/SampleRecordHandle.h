@@ -63,7 +63,7 @@ private:
 	TimePos m_minLength;
 
 	Track * m_track;
-	PatternTrack * m_patternTrack;
+	PatternTrack* m_patternTrack;
 	SampleClip * m_clip;
 
 } ;

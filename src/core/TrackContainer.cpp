@@ -306,7 +306,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 				valueMap[model] = value;
 			}
 		}
-		else if (auto* pattern = dynamic_cast<PatternClip *>(clip))
+		else if (auto* pattern = dynamic_cast<PatternClip*>(clip))
 		{
 			auto patIndex = dynamic_cast<class PatternTrack*>(pattern->getTrack())->index();
 			auto patStore = Engine::getPatternStore();

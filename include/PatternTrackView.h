@@ -36,14 +36,14 @@ class PatternTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	PatternTrackView( PatternTrack* pt, TrackContainerView* tcv );
+	PatternTrackView(PatternTrack* pt, TrackContainerView* tcv);
 	virtual ~PatternTrackView();
 
 	bool close() override;
 
-	const PatternTrack * getPatternTrack() const
+	const PatternTrack* getPatternTrack() const
 	{
-		return( m_patternTrack );
+		return (m_patternTrack);
 	}
 
 
@@ -52,7 +52,7 @@ public slots:
 
 
 private:
-	PatternTrack * m_patternTrack;
+	PatternTrack* m_patternTrack;
 	TrackLabelButton * m_trackLabel;
 } ;
 

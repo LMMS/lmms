@@ -65,9 +65,9 @@ public:
 		m_doneMayReturnTrue = _enable;
 	}
 
-	void setPatternTrack( PatternTrack * _pattern_track )
+	void setPatternTrack(PatternTrack* pt)
 	{
-		m_patternTrack = _pattern_track;
+		m_patternTrack = pt;
 	}
 
 	void setVolumeModel( FloatModel * _model )
@@ -89,7 +89,7 @@ private:
 	FloatModel * m_volumeModel;
 	Track * m_track;
 
-	PatternTrack * m_patternTrack;
+	PatternTrack* m_patternTrack;
 
 } ;
 

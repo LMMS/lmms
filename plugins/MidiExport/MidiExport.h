@@ -75,7 +75,7 @@ private:
 	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
 	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
-	void ProcessPatternNotes(MidiNoteVector &nv, int cutPos);
+	void processPatternNotes(MidiNoteVector &nv, int cutPos);
 
 	void error();
 

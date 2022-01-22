@@ -31,10 +31,8 @@
  #include "PatternTrack.h"
 
 
- 
-
-PatternClip::PatternClip( Track * _track ) :
-	Clip( _track )
+PatternClip::PatternClip(Track* track) :
+	Clip(track)
 {
 	bar_t t = Engine::getPatternStore()->lengthOfPattern(patternTrackIndex());
 	if( t > 0 )
@@ -46,7 +44,7 @@ PatternClip::PatternClip( Track * _track ) :
 	setAutoResize( false );
 }
 
-void PatternClip::saveSettings( QDomDocument & doc, QDomElement & element )
+void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	element.setAttribute( "name", name() );
 	if( element.parentNode().nodeName() == "clipboard" )
@@ -68,7 +66,7 @@ void PatternClip::saveSettings( QDomDocument & doc, QDomElement & element )
 
 
 
-void PatternClip::loadSettings( const QDomElement & element )
+void PatternClip::loadSettings(const QDomElement& element)
 {
 	setName( element.attribute( "name" ) );
 	if( element.attribute( "pos" ).toInt() >= 0 )
@@ -105,12 +103,12 @@ void PatternClip::loadSettings( const QDomElement & element )
 
 int PatternClip::patternTrackIndex()
 {
-	return dynamic_cast<PatternTrack *>( getTrack() )->index();
+	return dynamic_cast<PatternTrack*>(getTrack())->index();
 }
 
 
 
-ClipView * PatternClip::createView( TrackView * _tv )
+ClipView* PatternClip::createView(TrackView* tv)
 {
-	return new PatternClipView( this, _tv );
+	return new PatternClipView(this, tv);
 }

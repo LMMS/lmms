@@ -32,7 +32,7 @@
 class PatternClip : public Clip
 {
 public:
-	PatternClip( Track * _track );
+	PatternClip(Track* track);
 	virtual ~PatternClip() = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;

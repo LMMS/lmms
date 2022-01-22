@@ -106,7 +106,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	}
 
 	if( !( m_track && m_track->isMuted() )
-				&& !( m_patternTrack && m_patternTrack->isMuted() ) )
+				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
 /*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,

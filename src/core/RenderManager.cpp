@@ -32,7 +32,6 @@
 #include "Song.h"
 
 
-
 RenderManager::RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,

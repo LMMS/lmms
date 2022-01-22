@@ -73,13 +73,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 
 /*! \brief Destroy this track
  *
- *  If the track container is a pattern container, step through
- *  its list of tracks and remove us.
- *
- *  Then delete the Clip's contents, remove this track from
- *  the track container.
- *
- *  Finally step through this track's automation and forget all of them.
+ *  Delete the clips and remove this track from the track container.
  */
 Track::~Track()
 {
@@ -216,8 +210,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
-	// let actual track (InstrumentTrack, patternTrack, sampleTrack etc.) save
-	// its settings
+	// let actual track (InstrumentTrack, PatternTrack, SampleTrack etc.) save its settings
 	element.appendChild( tsDe );
 	saveTrackSpecificSettings( doc, tsDe );
 
@@ -490,7 +483,7 @@ void Track::swapPositionOfClips( int clipNum1, int clipNum2 )
 
 
 
-void Track::createClipsForPattern( int pattern )
+void Track::createClipsForPattern(int pattern)
 {
 	while( numOfClips() < pattern + 1 )
 	{

@@ -4508,7 +4508,7 @@ void PianoRoll::updatePositionAccompany( const TimePos & t )
 					s->playMode() != Song::Mode_PlayMidiClip )
 	{
 		TimePos pos = t;
-		if( s->playMode() != Song::Mode_PlayPattern )
+		if (s->playMode() != Song::Mode_PlayPattern)
 		{
 			pos -= m_midiClip->startPosition();
 		}
