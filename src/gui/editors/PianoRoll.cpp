@@ -4590,7 +4590,6 @@ int PianoRoll::quantization() const
 	return DefaultTicksPerBar / Quantizations[m_quantizeModel.value() - 1];
 }
 
-øøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøø
 int returnStrum(int st)//input > read value from comboBox Q. Output size of strum
 {
 int strumSize = 0;
