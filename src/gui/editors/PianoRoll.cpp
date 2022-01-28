@@ -4590,6 +4590,94 @@ int PianoRoll::quantization() const
 	return DefaultTicksPerBar / Quantizations[m_quantizeModel.value() - 1];
 }
 
+øøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøøø
+int returnStrum(int st)//input > read value from comboBox Q. Output size of strum
+{
+int strumSize = 0;
+	switch (st)
+	{   
+	//------sys-notes------------
+	case 1:
+        strumSize = 196;//Wholenote
+	break;
+        case 2:
+        strumSize = 98; //halfnote
+	break;
+        case 3:
+        strumSize = 48; //quoter
+	break;
+        case 4:
+        strumSize = 24; // 1/8
+	break;
+        case 5:
+        strumSize = 12; //1/16
+	break;
+        case 6:
+        strumSize = 6; //1/32
+	break;
+        case 7:
+        strumSize = 3; //1/64
+	break;
+	//---------triplets------------
+        case 8:
+        strumSize = 64; //1/2
+	break;
+        case 9:
+        strumSize = 32; //1/4
+	break;
+        case 10:
+        strumSize = 16; //1/8
+	break;
+        case 11:
+        strumSize = 8; //1/16
+	break;
+        case 12:
+        strumSize = 4; //1/32
+	break;
+        default:
+        strumSize = 1; //1/192 //smallest tick-value Availble if option 0 #notelock# is chosen
+	break;
+    }
+    return strumSize;
+}
+
+void PianoRoll::strumNotesDn() //down-top
+//Method for chord-strumming.
+//The strum-distance is the chosen Q-value
+{
+  if( ! hasValidPattern() )
+  {
+     return;
+  }
+  int notesInChord = 0; //initializations
+  int index = 0;
+  m_pattern->addJournalCheckPoint();
+  NoteVector notes = getSelectedNotes();//NoteVector of class QVector
+  notesInChord = notes.count();//how many notes are in this chord
+  index = m_quantizeModel.value();	//uses UserSet Q-Value in combobox
+  									//This value is position, so it need to be qualified
+									//to real piano/roll values
+  int strumSz = returnStrum(index); //size of note movement 
+  int strum = strumSz;//keep orr. value of selected strumming
+  bool firstDone = false;//first note should not be moved
+  for( Note* n : notes ) //for each selected
+  {
+    n = notes.at(notesInChord-1);//Use QVector-method .at
+    notesInChord-=1;
+    if( firstDone ){
+        n->setPos( n->pos() + strumSz );
+        strumSz += strum; }
+    firstDone = true;
+        if (notesInChord<=1) continue;      
+  }    
+m_pattern->rearrangeAllNotes();
+m_pattern->updateLength();
+m_pattern->dataChanged();
+update();//Project is changed. Update
+gui->songEditor()->update();
+Engine::getSong()->setModified();
+notes.clear();//delete content -if not repeated strums on same selection fails
+}
 
 void PianoRoll::quantizeNotes(QuantizeActions mode)
 {
@@ -4745,9 +4833,10 @@ PianoRollWindow::PianoRollWindow() :
 	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
 	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
 	pitchBendAction->setShortcut( Qt::SHIFT | Qt::Key_T );
-
-	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
-
+	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );		
+	QAction* strumNotesDnAction = new QAction(embed::getIconPixmap( "strumDwn" ), tr( "Strum Selected by Q-value" ), this );
+	connect( strumNotesDnAction, SIGNAL( triggered() ), m_editor, SLOT( strumNotesDn() ) );
+		
 	// Quantize combo button
 	QToolButton* quantizeButton = new QToolButton(notesActionsToolBar);
 	QMenu* quantizeButtonMenu = new QMenu(quantizeButton);
@@ -4771,7 +4860,8 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
-	notesActionsToolBar->addWidget(quantizeButton);
+	notesActionsToolBar->addWidget( quantizeButton );
+	notesActionsToolBar->addAction( strumNotesDnAction );
 
 	// -- File actions
 	DropToolBar* fileActionsToolBar = addDropToolBarToTop(tr("File actions"));
