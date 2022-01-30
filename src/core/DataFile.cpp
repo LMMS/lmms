@@ -1673,7 +1673,8 @@ void DataFile::upgrade_extendedNoteRange()
 			instrument.attribute("name") == "vestige" ||
 			instrument.attribute("name") == "lv2instrument" ||
 			instrument.attribute("name") == "carlapatchbay" ||
-			instrument.attribute("name") == "carlarack";
+			instrument.attribute("name") == "carlarack" ||
+			instrument.attribute("name") == "spainstrument";
 	};
 
 	if (!elementsByTagName("song").item(0).isNull())
