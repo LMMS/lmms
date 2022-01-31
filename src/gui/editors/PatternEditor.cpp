@@ -310,7 +310,7 @@ void PatternStoreView::makeSteps( bool clone )
 	}
 }
 
-// Creates a clone of the current pattern track with the same clip, but no Clips in the song editor
+// Creates a clone of the current pattern track with the same content, but no clips in the song editor
 // TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
 void PatternStoreView::cloneClip()
 {
