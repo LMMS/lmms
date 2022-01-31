@@ -540,6 +540,8 @@ private slots:
 private:
 	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
+	void showEvent(QShowEvent* se) override;
+
 	void stopStepRecording();
 	void updateStepRecordingIcon();
 

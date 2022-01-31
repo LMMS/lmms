@@ -5209,10 +5209,54 @@ bool PianoRollWindow::hasFocus() const
 
 
 
+void PianoRollWindow::showEvent(QShowEvent *se)
+{
+	// Create an initial clip when opening Piano Roll in an empty project
+	if (!m_editor->hasValidMidiClip())
+	{
+		Track* firstTrack = nullptr;
+		for (Track* track: Engine::getSong()->tracks())
+		{
+			if (track->type() == Track::InstrumentTrack)
+			{
+				if (!firstTrack) { firstTrack = track; }
+
+				// Don't create a new clip if the track has clips
+				if (track->numOfClips() != 0)
+				{
+					TextFloat::displayMessage(tr("No active clip"),
+						tr("Please open a clip by double clicking on it in the Song Editor."),
+						embed::getIconPixmap("error"), 5000);
+					parentWidget()->hide();
+					return;
+				}
+			}
+		}
+
+		if (firstTrack)
+		{
+			MidiClip* midiClip = new MidiClip(dynamic_cast<InstrumentTrack*>(firstTrack));
+			m_editor->setCurrentMidiClip(midiClip);
+		}
+		else
+		{
+			TextFloat::displayMessage(tr("No instruments"),
+				tr("Please add an instrument by dragging it from the sidebar to the Song Editor."),
+				embed::getIconPixmap("error"), 5000);
+			parentWidget()->hide();
+		}
+	}
+}
+
+
 void PianoRollWindow::updateAfterMidiClipChange()
 {
 	clipRenamed();
 	updateStepRecordingIcon(); //MIDI clip change turn step recording OFF - update icon accordingly
+	if (!m_editor->hasValidMidiClip())
+	{
+		parentWidget()->hide();
+	}
 }
 
 void PianoRollWindow::clipRenamed()
