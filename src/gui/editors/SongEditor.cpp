@@ -1025,14 +1025,14 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
 
-    // In case our current audio device does not support capture,
-    // disable the record buttons.
-    if(!Engine::audioEngine()->audioDev()->supportsCapture()) {
-        for(auto &recordAction : {m_recordAccompanyAction, m_recordAction}) {
-            recordAction->setEnabled(false);
-            recordAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));
-        }
-    }
+	// In case our current audio device does not support capture,
+	// disable the record buttons.
+	if(!Engine::audioEngine()->audioDev()->supportsCapture()) {
+		for(auto &recordAction : {m_recordAccompanyAction, m_recordAction}) {
+			recordAction->setEnabled(false);
+			recordAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));
+		}
+	}
 }
 
 QSize SongEditorWindow::sizeHint() const

@@ -108,11 +108,11 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
 					// In case we are recoding, "play" the whole TCO.
 					if(sClip->isRecord()) {
-                        samplePlayLength = clipFrameLength;
-                    }
+						samplePlayLength = clipFrameLength;
+					}
 
-                    //we only play within the sampleBuffer limits
-                    //Ignore that in case of recoding.
+					//we only play within the sampleBuffer limits
+					//Ignore that in case of recoding.
 					if(sampleStart < sampleBufferLength || sClip->isRecord ())
 					{
 						sClip->setSampleStartFrame(sampleStart);

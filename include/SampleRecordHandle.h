@@ -65,7 +65,7 @@ private:
 	Track * m_track;
 	BBTrack * m_bbTrack;
 	SampleClip * m_clip;
-	
+
 	// The offset from the start of m_track that the record has
 	// started from.
 	TimePos m_startRecordTimeOffset;
