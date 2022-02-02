@@ -244,7 +244,7 @@ public:
 	}
 
 	/*! Process note detuning automation */
-	void processTimePos( const TimePos& time );
+	void processTimePos(const TimePos& time, float pvalue);
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );

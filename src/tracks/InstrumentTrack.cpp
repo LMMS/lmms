@@ -335,9 +335,10 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 						NotePlayHandleManager::acquire(
 								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
-								Note( TimePos(), TimePos(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
+								Note(TimePos(), Engine::getSong()->getPlayPos(Engine::getSong()->playMode()),
+										event.key(), event.volume(midiPort()->baseVelocity())),
 								nullptr, event.channel(),
-								NotePlayHandle::OriginMidiInput );
+								NotePlayHandle::OriginMidiInput);
 					m_notes[event.key()] = nph;
 					if( ! Engine::audioEngine()->addPlayHandle( nph ) )
 					{
@@ -708,7 +709,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
-		( *it )->processTimePos( _start );
+		(*it)->processTimePos(_start, m_pitchModel.value());
 	}
 
 	if ( tcos.size() == 0 )

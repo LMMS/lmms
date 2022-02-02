@@ -79,7 +79,7 @@ const int DefaultMiddleKey = Octave_4 * KeysPerOctave + Key_C;
 const int DefaultBaseKey = Octave_4 * KeysPerOctave + Key_A;
 const float DefaultBaseFreq = 440.f;
 
-const float MaxDetuning = 4 * 12.0f;
+const float MaxDetuning = 5 * 12.0f;
 
 
 
