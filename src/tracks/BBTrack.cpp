@@ -43,7 +43,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 	s_infoMap[this] = bbNum;
 
 	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
-	Engine::getBBTrackContainer()->createTCOsForBB( bbNum );
+	Engine::getBBTrackContainer()->createClipsForBB( bbNum );
 	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	Engine::getBBTrackContainer()->updateComboBox();
 
@@ -82,31 +82,31 @@ BBTrack::~BBTrack()
 
 
 
-// play _frames frames of given TCO within starting with _start
+// play _frames frames of given Clip within starting with _start
 bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
-					const f_cnt_t _offset, int _tco_num )
+					const f_cnt_t _offset, int _clip_num )
 {
 	if( isMuted() )
 	{
 		return false;
 	}
 
-	if( _tco_num >= 0 )
+	if( _clip_num >= 0 )
 	{
 		return Engine::getBBTrackContainer()->play( _start, _frames, _offset, s_infoMap[this] );
 	}
 
-	tcoVector tcos;
-	getTCOsInRange( tcos, _start, _start + static_cast<int>( _frames / Engine::framesPerTick() ) );
+	clipVector clips;
+	getClipsInRange( clips, _start, _start + static_cast<int>( _frames / Engine::framesPerTick() ) );
 
-	if( tcos.size() == 0 )
+	if( clips.size() == 0 )
 	{
 		return false;
 	}
 
 	TimePos lastPosition;
 	TimePos lastLen;
-	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
+	for( clipVector::iterator it = clips.begin(); it != clips.end(); ++it )
 	{
 		if( !( *it )->isMuted() &&
 				( *it )->startPosition() >= lastPosition )
@@ -134,11 +134,11 @@ TrackView * BBTrack::createView( TrackContainerView* tcv )
 
 
 
-TrackContentObject* BBTrack::createTCO(const TimePos & pos)
+Clip* BBTrack::createClip(const TimePos & pos)
 {
-	BBTCO* bbtco = new BBTCO(this);
-	bbtco->movePosition(pos);
-	return bbtco;
+	BBClip* bbclip = new BBClip(this);
+	bbclip->movePosition(pos);
+	return bbclip;
 }
 
 
@@ -179,13 +179,13 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		const int dst = s_infoMap[this];
 		TrackContainer::TrackList tl =
 					Engine::getBBTrackContainer()->tracks();
-		// copy TCOs of all tracks from source BB (at bar "src") to destination
-		// TCOs (which are created if they do not exist yet)
+		// copy Clips of all tracks from source BB (at bar "src") to destination
+		// Clips (which are created if they do not exist yet)
 		for( TrackContainer::TrackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
-			TrackContentObject::copyStateTo( ( *it )->getTCO( src ),
-				( *it )->getTCO( dst ) );
+			Clip::copyStateTo( ( *it )->getClip( src ),
+				( *it )->getClip( dst ) );
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );

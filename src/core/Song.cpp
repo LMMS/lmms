@@ -44,13 +44,13 @@
 #include "ControllerConnection.h"
 #include "embed.h"
 #include "EnvelopeAndLfoParameters.h"
-#include "FxMixer.h"
-#include "FxMixerView.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
 #include "NotePlayHandle.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
@@ -89,8 +89,8 @@ Song::Song() :
 	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
-	m_patternToPlay( nullptr ),
-	m_loopPattern( false ),
+	m_midiClipToPlay( nullptr ),
+	m_loopMidiClip( false ),
 	m_elapsedTicks( 0 ),
 	m_elapsedBars( 0 ),
 	m_loopRenderCount(1),
@@ -227,11 +227,11 @@ void Song::processNextBuffer()
 			}
 			break;
 
-		case Mode_PlayPattern:
-			if (m_patternToPlay)
+		case Mode_PlayMidiClip:
+			if (m_midiClipToPlay)
 			{
-				clipNum = m_patternToPlay->getTrack()->getTCONum(m_patternToPlay);
-				trackList.push_back(m_patternToPlay->getTrack());
+				clipNum = m_midiClipToPlay->getTrack()->getClipNum(m_midiClipToPlay);
+				trackList.push_back(m_midiClipToPlay->getTrack());
 			}
 			break;
 
@@ -288,15 +288,15 @@ void Song::processNextBuffer()
 			frameOffsetInTick -= elapsedTicks * framesPerTick;
 			getPlayPos().setCurrentFrame(frameOffsetInTick);
 
-			// If we are playing a BB track, or a pattern with no loop enabled,
+			// If we are playing a BB track, or a MIDI clip with no loop enabled,
 			// loop back to the beginning when we reach the end
 			if (m_playMode == Mode_PlayBB)
 			{
 				enforceLoop(TimePos{0}, TimePos{Engine::getBBTrackContainer()->lengthOfCurrentBB(), 0});
 			}
-			else if (m_playMode == Mode_PlayPattern && m_loopPattern && !loopEnabled)
+			else if (m_playMode == Mode_PlayMidiClip && m_loopMidiClip && !loopEnabled)
 			{
-				enforceLoop(TimePos{0}, m_patternToPlay->length());
+				enforceLoop(TimePos{0}, m_midiClipToPlay->length());
 			}
 
 			// Handle loop points, and inform VST plugins of the loop status
@@ -362,7 +362,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 	QSet<const AutomatableModel*> recordedModels;
 
 	TrackContainer* container = this;
-	int tcoNum = -1;
+	int clipNum = -1;
 
 	switch (m_playMode)
 	{
@@ -375,28 +375,28 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		auto bbTrack = dynamic_cast<BBTrack*>(tracklist.at(0));
 		auto bbContainer = Engine::getBBTrackContainer();
 		container = bbContainer;
-		tcoNum = bbTrack->index();
+		clipNum = bbTrack->index();
 	}
 		break;
 	default:
 		return;
 	}
 
-	values = container->automatedValuesAt(timeStart, tcoNum);
+	values = container->automatedValuesAt(timeStart, clipNum);
 	TrackList tracks = container->tracks();
 
-	Track::tcoVector tcos;
+	Track::clipVector clips;
 	for (Track* track : tracks)
 	{
 		if (track->type() == Track::AutomationTrack) {
-			track->getTCOsInRange(tcos, 0, timeStart);
+			track->getClipsInRange(clips, 0, timeStart);
 		}
 	}
 
 	// Process recording
-	for (TrackContentObject* tco : tcos)
+	for (Clip* clip : clips)
 	{
-		auto p = dynamic_cast<AutomationPattern *>(tco);
+		auto p = dynamic_cast<AutomationClip *>(clip);
 		TimePos relTime = timeStart - p->startPosition();
 		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
@@ -407,7 +407,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		}
 	}
 
-	// Checks if an automated model stopped being automated by automation patterns
+	// Checks if an automated model stopped being automated by automation clip
 	// so we can move the control back to any connected controller again
 	for (auto it = m_oldAutomatedValues.begin(); it != m_oldAutomatedValues.end(); it++)
 	{
@@ -539,19 +539,19 @@ void Song::playBB()
 
 
 
-void Song::playPattern( const Pattern* patternToPlay, bool loop )
+void Song::playMidiClip( const MidiClip* midiClipToPlay, bool loop )
 {
 	if( isStopped() == false )
 	{
 		stop();
 	}
 
-	m_patternToPlay = patternToPlay;
-	m_loopPattern = loop;
+	m_midiClipToPlay = midiClipToPlay;
+	m_loopMidiClip = loop;
 
-	if( m_patternToPlay != nullptr )
+	if( m_midiClipToPlay != nullptr )
 	{
-		m_playMode = Mode_PlayPattern;
+		m_playMode = Mode_PlayMidiClip;
 		m_playing = true;
 		m_paused = false;
 	}
@@ -835,15 +835,15 @@ bpm_t Song::getTempo()
 
 
 
-AutomationPattern * Song::tempoAutomationPattern()
+AutomationClip * Song::tempoAutomationClip()
 {
-	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
+	return AutomationClip::globalAutomationClip( &m_tempoModel );
 }
 
 
-AutomatedValueMap Song::automatedValuesAt(TimePos time, int tcoNum) const
+AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 {
-	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, tcoNum);
+	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, clipNum);
 }
 
 
@@ -874,19 +874,19 @@ void Song::clearProject()
 	{
 		getGUI()->songEditor()->m_editor->clearAllTracks();
 	}
-	if( getGUI() != nullptr && getGUI()->fxMixerView() )
+	if( getGUI() != nullptr && getGUI()->mixerView() )
 	{
-		getGUI()->fxMixerView()->clear();
+		getGUI()->mixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	Engine::fxMixer()->clear();
+	Engine::mixer()->clear();
 
 	if( getGUI() != nullptr && getGUI()->automationEditor() )
 	{
-		getGUI()->automationEditor()->setCurrentPattern( nullptr );
+		getGUI()->automationEditor()->setCurrentClip( nullptr );
 	}
 
 	if( getGUI() != nullptr && getGUI()->pianoRoll() )
@@ -902,10 +902,10 @@ void Song::clearProject()
 	// Clear the m_oldAutomatedValues AutomatedValueMap
 	m_oldAutomatedValues.clear();
 
-	AutomationPattern::globalAutomationPattern( &m_tempoModel )->clear();
-	AutomationPattern::globalAutomationPattern( &m_masterVolumeModel )->
+	AutomationClip::globalAutomationClip( &m_tempoModel )->clear();
+	AutomationClip::globalAutomationClip( &m_masterVolumeModel )->
 									clear();
-	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
+	AutomationClip::globalAutomationClip( &m_masterPitchModel )->
 									clear();
 
 	Engine::audioEngine()->doneChangeInModel();
@@ -1088,15 +1088,15 @@ void Song::loadProject( const QString & fileName )
 	//Backward compatibility for LMMS <= 0.4.15
 	PeakController::initGetControllerBySetting();
 
-	// Load mixer first to be able to set the correct range for FX channels
-	node = dataFile.content().firstChildElement( Engine::fxMixer()->nodeName() );
+	// Load mixer first to be able to set the correct range for mixer channels
+	node = dataFile.content().firstChildElement( Engine::mixer()->nodeName() );
 	if( !node.isNull() )
 	{
-		Engine::fxMixer()->restoreState( node.toElement() );
+		Engine::mixer()->restoreState( node.toElement() );
 		if( getGUI() != nullptr )
 		{
-			// refresh FxMixerView
-			getGUI()->fxMixerView()->refreshDisplay();
+			// refresh MixerView
+			getGUI()->mixerView()->refreshDisplay();
 		}
 	}
 
@@ -1169,7 +1169,7 @@ void Song::loadProject( const QString & fileName )
 		node = node.nextSibling();
 	}
 
-	// quirk for fixing projects with broken positions of TCOs inside
+	// quirk for fixing projects with broken positions of Clips inside
 	// BB-tracks
 	Engine::getBBTrackContainer()->fixIncorrectPositions();
 
@@ -1183,7 +1183,7 @@ void Song::loadProject( const QString & fileName )
 		m_controllers.end());
 
 	// resolve all IDs so that autoModels are automated
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 
 
 	Engine::audioEngine()->doneChangeInModel();
@@ -1238,7 +1238,7 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
-	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
+	Engine::mixer()->saveState( dataFile, dataFile.content() );
 	if( getGUI() != nullptr )
 	{
 		getGUI()->getControllerRackView()->saveState( dataFile, dataFile.content() );

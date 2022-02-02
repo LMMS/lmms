@@ -1,5 +1,5 @@
 /*
- * FxLine.h - FX line widget
+ * MixerLine.h - Mixer line widget
  *
  * Copyright (c) 2009 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef FX_LINE_H
-#define FX_LINE_H
+#ifndef MIXER_LINE_H
+#define MIXER_LINE_H
 
 #include <QColorDialog>
 #include <QGraphicsView>
@@ -38,10 +38,10 @@
 
 
 
-class FxMixerView;
+class MixerView;
 class SendButtonIndicator;
 
-class FxLine : public QWidget
+class MixerLine : public QWidget
 {
 	Q_OBJECT
 public:
@@ -50,8 +50,8 @@ public:
 	Q_PROPERTY( QColor strokeOuterInactive READ strokeOuterInactive WRITE setStrokeOuterInactive )
 	Q_PROPERTY( QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive )
 	Q_PROPERTY( QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive )
-	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
-	~FxLine();
+	MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex);
+	~MixerLine();
 
 	void paintEvent( QPaintEvent * ) override;
 	void mousePressEvent( QMouseEvent * ) override;
@@ -79,15 +79,15 @@ public:
 	QColor strokeInnerInactive() const;
 	void setStrokeInnerInactive( const QColor & c );
 
-	static const int FxLineHeight;
+	static const int MixerLineHeight;
 
 	bool eventFilter (QObject *dist, QEvent *event) override;
 
 private:
-	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
+	void drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
 
-	FxMixerView * m_mv;
+	MixerView * m_mv;
 	LcdWidget* m_lcd;
 	int m_channelIndex;
 	QBrush m_backgroundActive;
@@ -116,4 +116,4 @@ private slots:
 };
 
 
-#endif // FXLINE_H
+#endif // MIXERLINE_H

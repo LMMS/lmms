@@ -45,11 +45,11 @@ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 	qreal saturation = _col.saturationF();
 
 	QColor c = _col;
-	c.setHsvF( hue, 0.42 * saturation, 0.98 * value ); // TODO: pattern: 1.08
+	c.setHsvF( hue, 0.42 * saturation, 0.98 * value ); // TODO: MIDI clip: 1.08
 	g.setColorAt( 0, c );
-	c.setHsvF( hue, 0.58 * saturation, 0.95 * value ); // TODO: pattern: 1.05
+	c.setHsvF( hue, 0.58 * saturation, 0.95 * value ); // TODO: MIDI clip: 1.05
 	g.setColorAt( 0.25, c );
-	c.setHsvF( hue, 0.70 * saturation, 0.93 * value ); // TODO: pattern: 1.03
+	c.setHsvF( hue, 0.70 * saturation, 0.93 * value ); // TODO: MIDI clip: 1.03
 	g.setColorAt( 0.5, c );
 
 	c.setHsvF( hue, 0.95 * saturation, 0.9 * value );

@@ -1,5 +1,5 @@
 /*
- * SampleTCOView.cpp
+ * SampleClipView.cpp
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,7 +22,7 @@
  *
  */
  
-#include "SampleTCOView.h"
+#include "SampleClipView.h"
 
 #include <QMenu>
 #include <QPainter>
@@ -34,43 +34,42 @@
 #include "StringPairDrag.h"
 #include "ToolTip.h"
 
-SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
-	TrackContentObjectView( _tco, _tv ),
-	m_tco( _tco ),
+SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
+	ClipView( _clip, _tv ),
+	m_clip( _clip ),
 	m_paintPixmap()
 {
 	// update UI and tooltip
 	updateSample();
 
-	// track future changes of SampleTCO
-	connect(m_tco, SIGNAL(sampleChanged()), this, SLOT(updateSample()));
+	// track future changes of SampleClip
+	connect(m_clip, SIGNAL(sampleChanged()), this, SLOT(updateSample()));
 
-	connect(m_tco, SIGNAL(wasReversed()), this, SLOT(update()));
+	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
 }
 
-void SampleTCOView::updateSample()
+void SampleClipView::updateSample()
 {
 	update();
 	// set tooltip to filename so that user can see what sample this
-	// sample-tco contains
-	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
-					PathUtil::toAbsolute(m_tco->m_sampleBuffer->audioFile()) :
+	// sample-clip contains
+	ToolTip::add( this, ( m_clip->m_sampleBuffer->audioFile() != "" ) ?
+					PathUtil::toAbsolute(m_clip->m_sampleBuffer->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }
 
 
 
 
-void SampleTCOView::constructContextMenu(QMenu* cm)
+void SampleClipView::constructContextMenu(QMenu* cm)
 {
 	cm->addSeparator();
 
-
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
-						m_tco, SLOT( toggleRecord() ) );*/
+						m_clip, SLOT( toggleRecord() ) );*/
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),
@@ -85,12 +84,12 @@ void SampleTCOView::constructContextMenu(QMenu* cm)
 
 
 
-void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
+void SampleClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( StringPairDrag::processDragEnterEvent( _dee,
 					"samplefile,sampledata" ) == false )
 	{
-		TrackContentObjectView::dragEnterEvent( _dee );
+		ClipView::dragEnterEvent( _dee );
 	}
 }
 
@@ -99,85 +98,85 @@ void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 
 
 
-void SampleTCOView::dropEvent( QDropEvent * _de )
+void SampleClipView::dropEvent( QDropEvent * _de )
 {
 	if( StringPairDrag::decodeKey( _de ) == "samplefile" )
 	{
-		m_tco->setSampleFile( StringPairDrag::decodeValue( _de ) );
+		m_clip->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_tco->m_sampleBuffer->loadFromBase64(
+		m_clip->m_sampleBuffer->loadFromBase64(
 					StringPairDrag::decodeValue( _de ) );
-		m_tco->updateLength();
+		m_clip->updateLength();
 		update();
 		_de->accept();
 		Engine::getSong()->setModified();
 	}
 	else
 	{
-		TrackContentObjectView::dropEvent( _de );
+		ClipView::dropEvent( _de );
 	}
 }
 
 
 
 
-void SampleTCOView::mousePressEvent( QMouseEvent * _me )
+void SampleClipView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 		_me->modifiers() & Qt::ControlModifier &&
 		_me->modifiers() & Qt::ShiftModifier )
 	{
-		m_tco->toggleRecord();
+		m_clip->toggleRecord();
 	}
 	else
 	{
 		if( _me->button() == Qt::MiddleButton && _me->modifiers() == Qt::ControlModifier )
 		{
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
-			if( sTco )
+			SampleClip * sClip = dynamic_cast<SampleClip*>( getClip() );
+			if( sClip )
 			{
-				sTco->updateTrackTcos();
+				sClip->updateTrackClips();
 			}
 		}
-		TrackContentObjectView::mousePressEvent( _me );
+		ClipView::mousePressEvent( _me );
 	}
 }
 
 
 
 
-void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
+void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 {
 	if( _me->button() == Qt::MiddleButton && !_me->modifiers() )
 	{
-		SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
-		if( sTco )
+		SampleClip * sClip = dynamic_cast<SampleClip*>( getClip() );
+		if( sClip )
 		{
-			sTco->playbackPositionChanged();
+			sClip->playbackPositionChanged();
 		}
 	}
-	TrackContentObjectView::mouseReleaseEvent( _me );
+	ClipView::mouseReleaseEvent( _me );
 }
 
 
 
 
-void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
+void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = m_tco->m_sampleBuffer->openAudioFile();
+	QString af = m_clip->m_sampleBuffer->openAudioFile();
 
 	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if ( af == m_tco->m_sampleBuffer->audioFile() )
+	else if ( af == m_clip->m_sampleBuffer->audioFile() )
 	{	//Instead of reloading the existing file, just reset the size
-		int length = (int) ( m_tco->m_sampleBuffer->frames() / Engine::framesPerTick() );
-		m_tco->changeLength(length);
+		int length = (int) ( m_clip->m_sampleBuffer->frames() / Engine::framesPerTick() );
+		m_clip->changeLength(length);
 	}
 	else
 	{	//Otherwise load the new file as ususal
-		m_tco->setSampleFile( af );
+		m_clip->setSampleFile( af );
 		Engine::getSong()->setModified();
 	}
 }
@@ -185,7 +184,7 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void SampleTCOView::paintEvent( QPaintEvent * pe )
+void SampleClipView::paintEvent( QPaintEvent * pe )
 {
 	QPainter painter( this );
 
@@ -204,7 +203,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	QPainter p( &m_paintPixmap );
 
-	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
+	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
 	bool selected = isSelected();
 
 	QLinearGradient lingrad(0, 0, 0, height());
@@ -215,7 +214,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
-	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
@@ -227,13 +226,13 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.fillRect( rect(), c );
 	}
 
-	auto tcoColor = m_tco->hasColor()
-			? (m_tco->usesCustomClipColor()
-				? m_tco->color()
-				: m_tco->getTrack()->color())
+	auto clipColor = m_clip->hasColor()
+			? (m_clip->usesCustomClipColor()
+				? m_clip->color()
+				: m_clip->getTrack()->color())
 			: painter.pen().brush().color();
 
-	p.setPen(tcoColor);
+	p.setPen(clipColor);
 
 	if (muted)
 	{
@@ -246,22 +245,22 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.setPen(p.pen().brush().color().darker(150));
 	}
 
-	const int spacing = TCO_BORDER_WIDTH + 1;
-	const float ppb = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_tco->length().getBar() :
+	const int spacing = CLIP_BORDER_WIDTH + 1;
+	const float ppb = fixedClips() ?
+			( parentWidget()->width() - 2 * CLIP_BORDER_WIDTH )
+					/ (float) m_clip->length().getBar() :
 								pixelsPerBar();
 
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerBar = DefaultTicksPerBar * nom / den;
 
-	float offset =  m_tco->startTimeOffset() / ticksPerBar * pixelsPerBar();
+	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( offset, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
+			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
+	m_clip->m_sampleBuffer->visualize( p, r, pe->rect() );
 
-	QString name = PathUtil::cleanName(m_tco->m_sampleBuffer->audioFile());
+	QString name = PathUtil::cleanName(m_clip->m_sampleBuffer->audioFile());
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
@@ -269,17 +268,17 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 135 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-		rect().bottom() - TCO_BORDER_WIDTH );
+	p.drawRect( 1, 1, rect().right() - CLIP_BORDER_WIDTH,
+		rect().bottom() - CLIP_BORDER_WIDTH );
 
 	// outer border
 	p.setPen( c.darker( 200 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
-	// draw the 'muted' pixmap only if the pattern was manualy muted
-	if( m_tco->isMuted() )
+	// draw the 'muted' pixmap only if the clip was manualy muted
+	if( m_clip->isMuted() )
 	{
-		const int spacing = TCO_BORDER_WIDTH;
+		const int spacing = CLIP_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
@@ -291,7 +290,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	}
 	// recording sample tracks is not possible at the moment
 
-	/* if( m_tco->isRecord() )
+	/* if( m_clip->isRecord() )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 
@@ -312,9 +311,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 
 
-void SampleTCOView::reverseSample()
+void SampleClipView::reverseSample()
 {
-	m_tco->sampleBuffer()->setReversed(!m_tco->sampleBuffer()->reversed());
+	m_clip->sampleBuffer()->setReversed(!m_clip->sampleBuffer()->reversed());
 	Engine::getSong()->setModified();
 	update();
 }
@@ -322,31 +321,31 @@ void SampleTCOView::reverseSample()
 
 
 
-//! Split this TCO.
+//! Split this Clip.
 /*! \param pos the position of the split, relative to the start of the clip */
-bool SampleTCOView::splitTCO( const TimePos pos )
+bool SampleClipView::splitClip( const TimePos pos )
 {
 	setMarkerEnabled( false );
 
-	const TimePos splitPos = m_initialTCOPos + pos;
+	const TimePos splitPos = m_initialClipPos + pos;
 
-	//Don't split if we slid off the TCO or if we're on the clip's start/end
+	//Don't split if we slid off the Clip or if we're on the clip's start/end
 	//Cutting at exactly the start/end position would create a zero length
 	//clip (bad), and a clip the same length as the original one (pointless).
-	if ( splitPos > m_initialTCOPos && splitPos < m_initialTCOEnd )
+	if ( splitPos > m_initialClipPos && splitPos < m_initialClipEnd )
 	{
-		m_tco->getTrack()->addJournalCheckPoint();
-		m_tco->getTrack()->saveJournallingState( false );
+		m_clip->getTrack()->addJournalCheckPoint();
+		m_clip->getTrack()->saveJournallingState( false );
 
-		SampleTCO * rightTCO = new SampleTCO ( *m_tco );
+		SampleClip * rightClip = new SampleClip ( *m_clip );
 
-		m_tco->changeLength( splitPos - m_initialTCOPos );
+		m_clip->changeLength( splitPos - m_initialClipPos );
 
-		rightTCO->movePosition( splitPos );
-		rightTCO->changeLength( m_initialTCOEnd - splitPos );
-		rightTCO->setStartTimeOffset( m_tco->startTimeOffset() - m_tco->length() );
+		rightClip->movePosition( splitPos );
+		rightClip->changeLength( m_initialClipEnd - splitPos );
+		rightClip->setStartTimeOffset( m_clip->startTimeOffset() - m_clip->length() );
 
-		m_tco->getTrack()->restoreJournallingState();
+		m_clip->getTrack()->restoreJournallingState();
 		return true;
 	}
 	else { return false; }

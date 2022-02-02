@@ -1,5 +1,5 @@
 /*
- * TrackContentObjectView.cpp - implementation of TrackContentObjectView class
+ * ClipView.cpp - implementation of ClipView class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 #include <set>
 
@@ -30,7 +30,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "Clipboard.h"
 #include "ColorChooser.h"
 #include "ComboBoxModel.h"
@@ -40,8 +40,8 @@
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
+#include "MidiClip.h"
 #include "Note.h"
-#include "Pattern.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "SongEditor.h"
@@ -63,25 +63,24 @@ const int RESIZE_GRIP_WIDTH = 4;
  * beside the cursor as you move or resize elements of a track about.
  * This pointer keeps track of it, as you only ever need one at a time.
  */
-TextFloat * TrackContentObjectView::s_textFloat = nullptr;
+TextFloat * ClipView::s_textFloat = nullptr;
 
 
-/*! \brief Create a new trackContentObjectView
+/*! \brief Create a new ClipView
  *
- *  Creates a new track content object view for the given
- *  track content object in the given track view.
+ *  Creates a new clip view for the given clip in the given track view.
  *
- * \param _tco The track content object to be displayed
+ * \param _clip The clip to be displayed
  * \param _tv  The track view that will contain the new object
  */
-TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
+ClipView::ClipView( Clip * clip,
 							TrackView * tv ) :
 	selectableObject( tv->getTrackContentWidget() ),
 	ModelView( nullptr, this ),
 	m_trackView( tv ),
-	m_initialTCOPos( TimePos(0) ),
-	m_initialTCOEnd( TimePos(0) ),
-	m_tco( tco ),
+	m_initialClipPos( TimePos(0) ),
+	m_initialClipEnd( TimePos(0) ),
+	m_clip( clip ),
 	m_action( NoAction ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
@@ -92,7 +91,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
-	m_BBPatternBackground( 0, 0, 0 ),
+	m_BBClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_mouseHotspotKnife( 0, 0 ),
@@ -118,22 +117,22 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAcceptDrops( true );
 	setMouseTracking( true );
 
-	connect( m_tco, SIGNAL( lengthChanged() ),
+	connect( m_clip, SIGNAL( lengthChanged() ),
 			this, SLOT( updateLength() ) );
 	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
-	connect( m_tco, SIGNAL( positionChanged() ),
+	connect( m_clip, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
-	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
-	setModel( m_tco );
-	connect(m_tco, SIGNAL(colorChanged()), this, SLOT(update()));
+	connect( m_clip, SIGNAL( destroyedClip() ), this, SLOT( close() ) );
+	setModel( m_clip );
+	connect(m_clip, SIGNAL(colorChanged()), this, SLOT(update()));
 
 	connect(m_trackView->getTrack(), &Track::colorChanged, this, [this]
 	{
-		// redraw if TCO uses track color
-		if (!m_tco->usesCustomClipColor()) { update(); }
+		// redraw if clip uses track color
+		if (!m_clip->usesCustomClipColor()) { update(); }
 	});
 
-	m_trackView->getTrackContentWidget()->addTCOView( this );
+	m_trackView->getTrackContentWidget()->addClipView( this );
 	updateLength();
 	updatePosition();
 }
@@ -141,12 +140,12 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 
 
 
-/*! \brief Destroy a trackContentObjectView
+/*! \brief Destroy a ClipView
  *
- *  Destroys the given track content object view.
+ *  Destroys the given ClipView.
  *
  */
-TrackContentObjectView::~TrackContentObjectView()
+ClipView::~ClipView()
 {
 	delete m_hint;
 	// we have to give our track-container the focus because otherwise the
@@ -157,14 +156,14 @@ TrackContentObjectView::~TrackContentObjectView()
 }
 
 
-/*! \brief Update a TrackContentObjectView
+/*! \brief Update a ClipView
  *
- *  TCO's get drawn only when needed,
- *  and when a TCO is updated,
+ *  Clip's get drawn only when needed,
+ *  and when a Clip is updated,
  *  it needs to be redrawn.
  *
  */
-void TrackContentObjectView::update()
+void ClipView::update()
 {
 	if( !m_cursorSetYet )
 	{
@@ -174,7 +173,7 @@ void TrackContentObjectView::update()
 		m_cursorSetYet = true;
 	}
 
-	if( fixedTCOs() )
+	if( fixedClips() )
 	{
 		updateLength();
 	}
@@ -184,136 +183,135 @@ void TrackContentObjectView::update()
 
 
 
-/*! \brief Does this trackContentObjectView have a fixed TCO?
+/*! \brief Does this ClipView have a fixed Clip?
  *
  *  Returns whether the containing trackView has fixed
- *  TCOs.
+ *  Clips.
  *
- * \todo What the hell is a TCO here - track content object?  And in
- *  what circumstance are they fixed?
+ * \todo In what circumstance are they fixed?
  */
-bool TrackContentObjectView::fixedTCOs()
+bool ClipView::fixedClips()
 {
-	return m_trackView->trackContainerView()->fixedTCOs();
+	return m_trackView->trackContainerView()->fixedClips();
 }
 
 
 
-// qproperty access functions, to be inherited & used by TCOviews
+// qproperty access functions, to be inherited & used by Clipviews
 //! \brief CSS theming qproperty access method
-QColor TrackContentObjectView::mutedColor() const
+QColor ClipView::mutedColor() const
 { return m_mutedColor; }
 
-QColor TrackContentObjectView::mutedBackgroundColor() const
+QColor ClipView::mutedBackgroundColor() const
 { return m_mutedBackgroundColor; }
 
-QColor TrackContentObjectView::selectedColor() const
+QColor ClipView::selectedColor() const
 { return m_selectedColor; }
 
-QColor TrackContentObjectView::textColor() const
+QColor ClipView::textColor() const
 { return m_textColor; }
 
-QColor TrackContentObjectView::textBackgroundColor() const
+QColor ClipView::textBackgroundColor() const
 {
 	return m_textBackgroundColor;
 }
 
-QColor TrackContentObjectView::textShadowColor() const
+QColor ClipView::textShadowColor() const
 { return m_textShadowColor; }
 
-QColor TrackContentObjectView::BBPatternBackground() const
-{ return m_BBPatternBackground; }
+QColor ClipView::BBClipBackground() const
+{ return m_BBClipBackground; }
 
-bool TrackContentObjectView::gradient() const
+bool ClipView::gradient() const
 { return m_gradient; }
 
 //! \brief CSS theming qproperty access method
-void TrackContentObjectView::setMutedColor( const QColor & c )
+void ClipView::setMutedColor( const QColor & c )
 { m_mutedColor = QColor( c ); }
 
-void TrackContentObjectView::setMutedBackgroundColor( const QColor & c )
+void ClipView::setMutedBackgroundColor( const QColor & c )
 { m_mutedBackgroundColor = QColor( c ); }
 
-void TrackContentObjectView::setSelectedColor( const QColor & c )
+void ClipView::setSelectedColor( const QColor & c )
 { m_selectedColor = QColor( c ); }
 
-void TrackContentObjectView::setTextColor( const QColor & c )
+void ClipView::setTextColor( const QColor & c )
 { m_textColor = QColor( c ); }
 
-void TrackContentObjectView::setTextBackgroundColor( const QColor & c )
+void ClipView::setTextBackgroundColor( const QColor & c )
 {
 	m_textBackgroundColor = c;
 }
 
-void TrackContentObjectView::setTextShadowColor( const QColor & c )
+void ClipView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
 
-void TrackContentObjectView::setBBPatternBackground( const QColor & c )
-{ m_BBPatternBackground = QColor( c ); }
+void ClipView::setBBClipBackground( const QColor & c )
+{ m_BBClipBackground = QColor( c ); }
 
-void TrackContentObjectView::setGradient( const bool & b )
+void ClipView::setGradient( const bool & b )
 { m_gradient = b; }
 
 // access needsUpdate member variable
-bool TrackContentObjectView::needsUpdate()
+bool ClipView::needsUpdate()
 { return m_needsUpdate; }
-void TrackContentObjectView::setNeedsUpdate( bool b )
+void ClipView::setNeedsUpdate( bool b )
 { m_needsUpdate = b; }
 
-/*! \brief Close a trackContentObjectView
+/*! \brief Close a ClipView
  *
- *  Closes a track content object view by asking the track
+ *  Closes a ClipView by asking the track
  *  view to remove us and then asking the QWidget to close us.
  *
  * \return Boolean state of whether the QWidget was able to close.
  */
-bool TrackContentObjectView::close()
+bool ClipView::close()
 {
-	m_trackView->getTrackContentWidget()->removeTCOView( this );
+	m_trackView->getTrackContentWidget()->removeClipView( this );
 	return QWidget::close();
 }
 
 
 
 
-/*! \brief Removes a trackContentObjectView from its track view.
+/*! \brief Removes a ClipView from its track view.
  *
  *  Like the close() method, this asks the track view to remove this
- *  track content object view.  However, the track content object is
+ *  ClipView.  However, the clip is
  *  scheduled for later deletion rather than closed immediately.
  *
  */
-void TrackContentObjectView::remove()
+void ClipView::remove()
 {
 	m_trackView->getTrack()->addJournalCheckPoint();
 
 	// delete ourself
 	close();
-	m_tco->deleteLater();
+	m_clip->deleteLater();
 }
 
 
 
 
-/*! \brief Updates a trackContentObjectView's length
+/*! \brief Updates a ClipView's length
  *
- *  If this track content object view has a fixed TCO, then we must
+ *  If this ClipView has a fixed Clip, then we must
  *  keep the width of our parent.  Otherwise, calculate our width from
- *  the track content object's length in pixels adding in the border.
+ *  the clip's length in pixels adding in the border.
  *
  */
-void TrackContentObjectView::updateLength()
+void ClipView::updateLength()
 {
-	if( fixedTCOs() )
+	if( fixedClips() )
 	{
 		setFixedWidth( parentWidget()->width() );
 	}
 	else
 	{
 		setFixedWidth(
-		static_cast<int>( m_tco->length() * pixelsPerBar() /
+		static_cast<int>( m_clip->length() * pixelsPerBar() /
 					TimePos::ticksPerBar() ) + 1 /*+
-						TCO_BORDER_WIDTH * 2-1*/ );
+						CLIP_BORDER_WIDTH * 2-1*/ );
 	}
 	m_trackView->trackContainerView()->update();
 }
@@ -321,17 +319,17 @@ void TrackContentObjectView::updateLength()
 
 
 
-/*! \brief Updates a trackContentObjectView's position.
+/*! \brief Updates a ClipView's position.
  *
  *  Ask our track view to change our position.  Then make sure that the
  *  track view is updated in case this position has changed the track
  *  view's length.
  *
  */
-void TrackContentObjectView::updatePosition()
+void ClipView::updatePosition()
 {
 	m_trackView->getTrackContentWidget()->changePosition();
-	// moving a TCO can result in change of song-length etc.,
+	// moving a Clip can result in change of song-length etc.,
 	// therefore we update the track-container
 	m_trackView->trackContainerView()->update();
 }
@@ -339,17 +337,17 @@ void TrackContentObjectView::updatePosition()
 
 
 
-void TrackContentObjectView::selectColor()
+void ClipView::selectColor()
 {
 	// Get a color from the user
-	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_tco->color() );
+	QColor new_color = ColorChooser( this ).withPalette( ColorChooser::Palette::Track )->getColor( m_clip->color() );
 	if (new_color.isValid()) { setColor(&new_color); }
 }
 
 
 
 
-void TrackContentObjectView::randomizeColor()
+void ClipView::randomizeColor()
 {
 	setColor(&ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
 }
@@ -357,7 +355,7 @@ void TrackContentObjectView::randomizeColor()
 
 
 
-void TrackContentObjectView::resetColor()
+void ClipView::resetColor()
 {
 	setColor(nullptr);
 }
@@ -365,28 +363,28 @@ void TrackContentObjectView::resetColor()
 
 
 
-/*! \brief Change color of all selected TCOs
+/*! \brief Change color of all selected clips
  *
  *  \param color The new QColor. Pass nullptr to use the Track's color.
  */
-void TrackContentObjectView::setColor(const QColor* color)
+void ClipView::setColor(const QColor* color)
 {
 	std::set<Track*> journaledTracks;
 
-	auto selectedTCOs = getClickedTCOs();
-	for (auto tcov: selectedTCOs)
+	auto selectedClips = getClickedClips();
+	for (auto clipv: selectedClips)
 	{
-		auto tco = tcov->getTrackContentObject();
-		auto track = tco->getTrack();
+		auto clip = clipv->getClip();
+		auto track = clip->getTrack();
 
-		// TODO journal whole Song or group of TCOs instead of one journal entry for each track
+		// TODO journal whole Song or group of clips instead of one journal entry for each track
 
-		// If only one TCO changed, store that in the journal
-		if (selectedTCOs.length() == 1)
+		// If only one clip changed, store that in the journal
+		if (selectedClips.length() == 1)
 		{
-			tco->addJournalCheckPoint();
+			clip->addJournalCheckPoint();
 		}
-		// If multiple TCOs changed, store whole Track in the journal
+		// If multiple clips changed, store whole Track in the journal
 		// Check if track has been journaled already by trying to add it to the set
 		else if (journaledTracks.insert(track).second)
 		{
@@ -395,14 +393,14 @@ void TrackContentObjectView::setColor(const QColor* color)
 
 		if (color)
 		{
-			tco->useCustomClipColor(true);
-			tco->setColor(*color);
+			clip->useCustomClipColor(true);
+			clip->setColor(*color);
 		}
 		else
 		{
-			tco->useCustomClipColor(false);
+			clip->useCustomClipColor(false);
 		}
-		tcov->update();
+		clipv->update();
 	}
 
 	Engine::getSong()->setModified();
@@ -412,7 +410,7 @@ void TrackContentObjectView::setColor(const QColor* color)
 
 
 
-/*! \brief Change the trackContentObjectView's display when something
+/*! \brief Change the ClipView's display when something
  *  being dragged enters it.
  *
  *  We need to notify Qt to change our display if something being
@@ -420,41 +418,41 @@ void TrackContentObjectView::setColor(const QColor* color)
  *
  * \param dee The QDragEnterEvent to watch.
  */
-void TrackContentObjectView::dragEnterEvent( QDragEnterEvent * dee )
+void ClipView::dragEnterEvent( QDragEnterEvent * dee )
 {
 	TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-	TimePos tcoPos = TimePos( m_tco->startPosition() );
+	TimePos clipPos = TimePos( m_clip->startPosition() );
 
-	if( tcw->canPasteSelection( tcoPos, dee ) == false )
+	if( tcw->canPasteSelection( clipPos, dee ) == false )
 	{
 		dee->ignore();
 	}
 	else
 	{
-		StringPairDrag::processDragEnterEvent( dee, "tco_" +
-					QString::number( m_tco->getTrack()->type() ) );
+		StringPairDrag::processDragEnterEvent( dee, "clip_" +
+					QString::number( m_clip->getTrack()->type() ) );
 	}
 }
 
 
 
 
-/*! \brief Handle something being dropped on this trackContentObjectView.
+/*! \brief Handle something being dropped on this ClipObjectView.
  *
- *  When something has been dropped on this trackContentObjectView, and
- *  it's a track content object, then use an instance of our dataFile reader
- *  to take the xml of the track content object and turn it into something
+ *  When something has been dropped on this ClipView, and
+ *  it's a clip, then use an instance of our dataFile reader
+ *  to take the xml of the clip and turn it into something
  *  we can write over our current state.
  *
  * \param de The QDropEvent to handle.
  */
-void TrackContentObjectView::dropEvent( QDropEvent * de )
+void ClipView::dropEvent( QDropEvent * de )
 {
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
 
 	// Track must be the same type to paste into
-	if( type != ( "tco_" + QString::number( m_tco->getTrack()->type() ) ) )
+	if( type != ( "clip_" + QString::number( m_clip->getTrack()->type() ) ) )
 	{
 		return;
 	}
@@ -463,30 +461,30 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		TrackContentWidget * tcw = getTrackView()->getTrackContentWidget();
-		TimePos tcoPos = TimePos( m_tco->startPosition() );
+		TimePos clipPos = TimePos( m_clip->startPosition() );
 
-		if( tcw->pasteSelection( tcoPos, de ) == true )
+		if( tcw->pasteSelection( clipPos, de ) == true )
 		{
 			de->accept();
 		}
 		return;
 	}
 
-	// Don't allow pasting a tco into itself.
+	// Don't allow pasting a clip into itself.
 	QObject* qwSource = de->source();
 	if( qwSource != nullptr &&
-	    dynamic_cast<TrackContentObjectView *>( qwSource ) == this )
+	    dynamic_cast<ClipView *>( qwSource ) == this )
 	{
 		return;
 	}
 
-	// Copy state into existing tco
+	// Copy state into existing clip
 	DataFile dataFile( value.toUtf8() );
-	TimePos pos = m_tco->startPosition();
-	QDomElement tcos = dataFile.content().firstChildElement( "tcos" );
-	m_tco->restoreState( tcos.firstChildElement().firstChildElement() );
-	m_tco->movePosition( pos );
-	AutomationPattern::resolveAllIDs();
+	TimePos pos = m_clip->startPosition();
+	QDomElement clips = dataFile.content().firstChildElement("clips");
+	m_clip->restoreState( clips.firstChildElement().firstChildElement() );
+	m_clip->movePosition( pos );
+	AutomationClip::resolveAllIDs();
 	de->accept();
 }
 
@@ -497,18 +495,18 @@ void TrackContentObjectView::dropEvent( QDropEvent * de )
  *
  * @param me The QMouseEvent that is triggering the cursor change
  */
-void TrackContentObjectView::updateCursor(QMouseEvent * me)
+void ClipView::updateCursor(QMouseEvent * me)
 {
-	SampleTCO * sTco = dynamic_cast<SampleTCO*>(m_tco);
+	SampleClip * sClip = dynamic_cast<SampleClip*>(m_clip);
 
 	// If we are at the edges, use the resize cursor
-	if ((me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize())
-		|| (me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize()))
+	if ((me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_clip->getAutoResize())
+		|| (me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sClip && !m_clip->getAutoResize()))
 	{
 		setCursor(Qt::SizeHorCursor);
 	}
 	// If we are in the middle on knife mode, use the knife cursor
-	else if (sTco && m_trackView->trackContainerView()->knifeMode())
+	else if (sClip && m_trackView->trackContainerView()->knifeMode())
 	{
 		setCursor(m_cursorKnife);
 	}
@@ -519,39 +517,39 @@ void TrackContentObjectView::updateCursor(QMouseEvent * me)
 
 
 
-/*! \brief Create a DataFile suitable for copying multiple trackContentObjects.
+/*! \brief Create a DataFile suitable for copying multiple clips.
  *
- *	trackContentObjects in the vector are written to the "tcos" node in the
- *  DataFile.  The trackContentObjectView's initial mouse position is written
+ *	Clips in the vector are written to the "clips" node in the
+ *  DataFile.  The ClipView's initial mouse position is written
  *  to the "initialMouseX" node in the DataFile.  When dropped on a track,
- *  this is used to create copies of the TCOs.
+ *  this is used to create copies of the Clips.
  *
- * \param tcos The trackContectObjects to save in a DataFile
+ * \param clips The trackContectObjects to save in a DataFile
  */
-DataFile TrackContentObjectView::createTCODataFiles(
-    				const QVector<TrackContentObjectView *> & tcoViews) const
+DataFile ClipView::createClipDataFiles(
+    				const QVector<ClipView *> & clipViews) const
 {
 	Track * t = m_trackView->getTrack();
 	TrackContainer * tc = t->trackContainer();
 	DataFile dataFile( DataFile::DragNDropData );
-	QDomElement tcoParent = dataFile.createElement( "tcos" );
+	QDomElement clipParent = dataFile.createElement("clips");
 
-	typedef QVector<TrackContentObjectView *> tcoViewVector;
-	for( tcoViewVector::const_iterator it = tcoViews.begin();
-			it != tcoViews.end(); ++it )
+	typedef QVector<ClipView *> clipViewVector;
+	for( clipViewVector::const_iterator it = clipViews.begin();
+			it != clipViews.end(); ++it )
 	{
-		// Insert into the dom under the "tcos" element
-		Track* tcoTrack = ( *it )->m_trackView->getTrack();
-		int trackIndex = tc->tracks().indexOf( tcoTrack );
-		QDomElement tcoElement = dataFile.createElement( "tco" );
-		tcoElement.setAttribute( "trackIndex", trackIndex );
-		tcoElement.setAttribute( "trackType", tcoTrack->type() );
-		tcoElement.setAttribute( "trackName", tcoTrack->name() );
-		( *it )->m_tco->saveState( dataFile, tcoElement );
-		tcoParent.appendChild( tcoElement );
+		// Insert into the dom under the "clips" element
+		Track* clipTrack = ( *it )->m_trackView->getTrack();
+		int trackIndex = tc->tracks().indexOf( clipTrack );
+		QDomElement clipElement = dataFile.createElement("clip");
+		clipElement.setAttribute( "trackIndex", trackIndex );
+		clipElement.setAttribute( "trackType", clipTrack->type() );
+		clipElement.setAttribute( "trackName", clipTrack->name() );
+		( *it )->m_clip->saveState( dataFile, clipElement );
+		clipParent.appendChild( clipElement );
 	}
 
-	dataFile.content().appendChild( tcoParent );
+	dataFile.content().appendChild( clipParent );
 
 	// Add extra metadata needed for calculations later
 	int initialTrackIndex = tc->tracks().indexOf( t );
@@ -564,15 +562,15 @@ DataFile TrackContentObjectView::createTCODataFiles(
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );
 	metadata.setAttribute( "trackContainerId", tc->id() );
-	// grabbedTCOPos is the pos of the bar containing the TCO we grabbed
-	metadata.setAttribute( "grabbedTCOPos", m_tco->startPosition() );
+	// grabbedClipPos is the pos of the bar containing the Clip we grabbed
+	metadata.setAttribute( "grabbedClipPos", m_clip->startPosition() );
 
 	dataFile.content().appendChild( metadata );
 
 	return dataFile;
 }
 
-void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & painter)
+void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 {
 	if (text.trimmed() == "")
 	{
@@ -585,29 +583,29 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 	labelFont.setHintingPreference( QFont::PreferFullHinting );
 	painter.setFont( labelFont );
 
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 3;
+	const int textTop = CLIP_BORDER_WIDTH + 1;
+	const int textLeft = CLIP_BORDER_WIDTH + 3;
 
 	QFontMetrics fontMetrics(labelFont);
-	QString elidedPatternName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
+	QString elidedClipName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
 
-	if (elidedPatternName.length() < 2)
+	if (elidedClipName.length() < 2)
 	{
-		elidedPatternName = text.trimmed();
+		elidedClipName = text.trimmed();
 	}
 
 	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
 	int const finalTextTop = textTop + fontMetrics.ascent();
 	painter.setPen(textShadowColor());
-	painter.drawText( textLeft + 1, finalTextTop + 1, elidedPatternName );
+	painter.drawText( textLeft + 1, finalTextTop + 1, elidedClipName );
 	painter.setPen( textColor() );
-	painter.drawText( textLeft, finalTextTop, elidedPatternName );
+	painter.drawText( textLeft, finalTextTop, elidedClipName );
 }
 
-/*! \brief Handle a mouse press on this trackContentObjectView.
+/*! \brief Handle a mouse press on this ClipView.
  *
- *  Handles the various ways in which a trackContentObjectView can be
+ *  Handles the various ways in which a ClipView can be
  *  used with a click of a mouse button.
  *
  *  * If our container supports rubber band selection then handle
@@ -615,27 +613,27 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  *  * or if shift-left button, add this object to the selection
  *  * or if ctrl-left button, start a drag-copy event
  *  * or if just plain left button, resize if we're resizeable
- *  * or if ctrl-middle button, mute the track content object
- *  * or if middle button, maybe delete the track content object.
+ *  * or if ctrl-middle button, mute the clip
+ *  * or if middle button, maybe delete the clip.
  *
  * \param me The QMouseEvent to handle.
  */
-void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
+void ClipView::mousePressEvent( QMouseEvent * me )
 {
 	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
-	// to avoid the overhead of calling getClickedTCOs when it's not used
+	// to avoid the overhead of calling getClickedClips when it's not used
 	auto active = me->button() == Qt::LeftButton
-		? QVector<TrackContentObjectView *>()
-		: getClickedTCOs();
+		? QVector<ClipView *>()
+		: getClickedClips();
 
 	setInitialPos( me->pos() );
 	setInitialOffsets();
-	if( !fixedTCOs() && me->button() == Qt::LeftButton )
+	if( !fixedClips() && me->button() == Qt::LeftButton )
 	{
-		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
 		const bool knifeMode = m_trackView->trackContainerView()->knifeMode();
 
-		if ( me->modifiers() & Qt::ControlModifier && !(sTco && knifeMode) )
+		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
 		{
 			if( isSelected() )
 			{
@@ -654,20 +652,20 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 			else
 			{
-				getGUI()->songEditor()->m_editor->selectAllTcos( false );
-				m_tco->addJournalCheckPoint();
+				getGUI()->songEditor()->m_editor->selectAllClips( false );
+				m_clip->addJournalCheckPoint();
 
 				// Move, Resize and ResizeLeft
-				// Split action doesn't disable TCO journalling
+				// Split action doesn't disable Clip journalling
 				if (m_action == Move || m_action == Resize || m_action == ResizeLeft)
 				{
-					m_tco->setJournalling(false);
+					m_clip->setJournalling(false);
 				}
 
 				setInitialPos( me->pos() );
 				setInitialOffsets();
 
-				if( m_tco->getAutoResize() )
+				if( m_clip->getAutoResize() )
 				{	// Always move clips that can't be manually resized
 					m_action = Move;
 					setCursor( Qt::SizeAllCursor );
@@ -677,12 +675,12 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					m_action = Resize;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( me->x() < RESIZE_GRIP_WIDTH && sTco )
+				else if( me->x() < RESIZE_GRIP_WIDTH && sClip )
 				{
 					m_action = ResizeLeft;
 					setCursor( Qt::SizeHorCursor );
 				}
-				else if( sTco && knifeMode )
+				else if( sClip && knifeMode )
 				{
 					m_action = Split;
 					setCursor( m_cursorKnife );
@@ -700,26 +698,26 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				{
 					s_textFloat->setTitle( tr( "Current position" ) );
 					s_textFloat->setText( QString( "%1:%2" ).
-						arg( m_tco->startPosition().getBar() + 1 ).
-						arg( m_tco->startPosition().getTicks() %
+						arg( m_clip->startPosition().getBar() + 1 ).
+						arg( m_clip->startPosition().getTicks() %
 								TimePos::ticksPerBar() ) );
 				}
 				else if( m_action == Resize || m_action == ResizeLeft )
 				{
 					s_textFloat->setTitle( tr( "Current length" ) );
 					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
-							arg( m_tco->length().getBar() ).
-							arg( m_tco->length().getTicks() %
+							arg( m_clip->length().getBar() ).
+							arg( m_clip->length().getTicks() %
 									TimePos::ticksPerBar() ).
-							arg( m_tco->startPosition().getBar() + 1 ).
-							arg( m_tco->startPosition().getTicks() %
+							arg( m_clip->startPosition().getBar() + 1 ).
+							arg( m_clip->startPosition().getTicks() %
 									TimePos::ticksPerBar() ).
-							arg( m_tco->endPosition().getBar() + 1 ).
-							arg( m_tco->endPosition().getTicks() %
+							arg( m_clip->endPosition().getBar() + 1 ).
+							arg( m_clip->endPosition().getTicks() %
 									TimePos::ticksPerBar() ) );
 				}
 				// s_textFloat->reparent( this );
-				// setup text-float as if TCO was already moved/resized
+				// setup text-float as if Clip was already moved/resized
 				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 				if ( m_action != Split) { s_textFloat->show(); }
 			}
@@ -738,15 +736,15 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		{
 			toggleMute( active );
 		}
-		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
+		else if( me->modifiers() & Qt::ShiftModifier && !fixedClips() )
 		{
 			remove( active );
 		}
 		if (m_action == Split)
 		{
 			m_action = NoAction;
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-			if (sTco)
+			SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
+			if (sClip)
 			{
 				setMarkerEnabled( false );
 				update();
@@ -759,7 +757,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		{
 			toggleMute( active );
 		}
-		else if( !fixedTCOs() )
+		else if( !fixedClips() )
 		{
 			remove( active );
 		}
@@ -769,9 +767,9 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse movement (drag) on this trackContentObjectView.
+/*! \brief Handle a mouse movement (drag) on this ClipView.
  *
- *  Handles the various ways in which a trackContentObjectView can be
+ *  Handles the various ways in which a ClipView can be
  *  used with a mouse drag.
  *
  *  * If in move mode, move ourselves in the track,
@@ -782,47 +780,47 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
  * \param me The QMouseEvent to handle.
  * \todo what does the final else case do here?
  */
-void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
+void ClipView::mouseMoveEvent( QMouseEvent * me )
 {
 	if( m_action == CopySelection || m_action == ToggleSelected )
 	{
 		if( mouseMovedDistance( me, 2 ) == true )
 		{
-			QVector<TrackContentObjectView *> tcoViews;
+			QVector<ClipView *> clipViews;
 			if( m_action == CopySelection )
 			{
-				// Collect all selected TCOs
+				// Collect all selected Clips
 				QVector<selectableObject *> so =
 					m_trackView->trackContainerView()->selectedObjects();
 				for( auto it = so.begin(); it != so.end(); ++it )
 				{
-					TrackContentObjectView * tcov =
-						dynamic_cast<TrackContentObjectView *>( *it );
-					if( tcov != nullptr )
+					ClipView * clipv =
+						dynamic_cast<ClipView *>( *it );
+					if( clipv != nullptr )
 					{
-						tcoViews.push_back( tcov );
+						clipViews.push_back( clipv );
 					}
 				}
 			}
 			else
 			{
-				getGUI()->songEditor()->m_editor->selectAllTcos( false );
-				tcoViews.push_back( this );
+				getGUI()->songEditor()->m_editor->selectAllClips( false );
+				clipViews.push_back( this );
 			}
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
 			m_action = NoAction;
 
-			// Write the TCOs to the DataFile for copying
-			DataFile dataFile = createTCODataFiles( tcoViews );
+			// Write the Clips to the DataFile for copying
+			DataFile dataFile = createClipDataFiles( clipViews );
 
 			// TODO -- thumbnail for all selected
 			QPixmap thumbnail = grab().scaled(
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
-			new StringPairDrag( QString( "tco_%1" ).arg(
-								m_tco->getTrack()->type() ),
+			new StringPairDrag( QString( "clip_%1" ).arg(
+								m_clip->getTrack()->type() ),
 								dataFile.toString(), thumbnail, this );
 		}
 	}
@@ -836,10 +834,10 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	if( m_action == Move )
 	{
-		TimePos newPos = draggedTCOPos( me );
+		TimePos newPos = draggedClipPos( me );
 
-		m_tco->movePosition(newPos);
-		newPos = m_tco->startPosition(); // Get the real position the TCO was dragged to for the label
+		m_clip->movePosition(newPos);
+		newPos = m_clip->startPosition(); // Get the real position the Clip was dragged to for the label
 		m_trackView->getTrackContentWidget()->changePosition();
 		s_textFloat->setText( QString( "%1:%2" ).
 				arg( newPos.getBar() + 1 ).
@@ -849,32 +847,32 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == MoveSelection )
 	{
-		// 1: Find the position we want to move the grabbed TCO to
-		TimePos newPos = draggedTCOPos( me );
+		// 1: Find the position we want to move the grabbed Clip to
+		TimePos newPos = draggedClipPos( me );
 
-		// 2: Handle moving the other selected TCOs the same distance
+		// 2: Handle moving the other selected Clips the same distance
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
-		QVector<TrackContentObject *> tcos; // List of selected clips
+		QVector<Clip *> clips; // List of selected clips
 		int leftmost = 0; // Leftmost clip's offset from grabbed clip
-		// Populate tcos, find leftmost
+		// Populate clips, find leftmost
 		for( QVector<selectableObject *>::iterator it = so.begin();
 							it != so.end(); ++it )
 		{
-			TrackContentObjectView * tcov =
-				dynamic_cast<TrackContentObjectView *>( *it );
-			if( tcov == nullptr ) { continue; }
-			tcos.push_back( tcov->m_tco );
+			ClipView* clipv =
+				dynamic_cast<ClipView *>( *it );
+			if( clipv == nullptr ) { continue; }
+			clips.push_back( clipv->m_clip );
 			int index = std::distance( so.begin(), it );
 			leftmost = std::min(leftmost, m_initialOffsets[index].getTicks());
 		}
 		// Make sure the leftmost clip doesn't get moved to a negative position
 		if ( newPos.getTicks() + leftmost < 0 ) { newPos = -leftmost; }
 
-		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
-							it != tcos.end(); ++it )
+		for( QVector<Clip *>::iterator it = clips.begin();
+							it != clips.end(); ++it )
 		{
-			int index = std::distance( tcos.begin(), it );
+			int index = std::distance( clips.begin(), it );
 			( *it )->movePosition( newPos + m_initialOffsets[index] );
 		}
 	}
@@ -895,30 +893,30 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				// even if the user switches to snapping later
 				setInitialPos( m_initialMousePos );
 				// Don't resize to less than 1 tick
-				m_tco->changeLength( qMax<int>( 1, l ) );
+				m_clip->changeLength( qMax<int>( 1, l ) );
 			}
 			else if ( me->modifiers() & Qt::ShiftModifier )
 			{	// If shift is held, quantize clip's end position
-				TimePos end = TimePos( m_initialTCOPos + l ).quantize( snapSize );
+				TimePos end = TimePos( m_initialClipPos + l ).quantize( snapSize );
 				// The end position has to be after the clip's start
-				TimePos min = m_initialTCOPos.quantize( snapSize );
-				if ( min <= m_initialTCOPos ) min += snapLength;
-				m_tco->changeLength( qMax<int>(min - m_initialTCOPos, end - m_initialTCOPos) );
+				TimePos min = m_initialClipPos.quantize( snapSize );
+				if ( min <= m_initialClipPos ) min += snapLength;
+				m_clip->changeLength( qMax<int>(min - m_initialClipPos, end - m_initialClipPos) );
 			}
 			else
 			{	// Otherwise, resize in fixed increments
-				TimePos initialLength = m_initialTCOEnd - m_initialTCOPos;
+				TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 				TimePos offset = TimePos( l - initialLength ).quantize( snapSize );
 				// Don't resize to less than 1 tick
 				TimePos min = TimePos( initialLength % snapLength );
 				if (min < 1) min += snapLength;
-				m_tco->changeLength( qMax<int>( min, initialLength + offset) );
+				m_clip->changeLength( qMax<int>( min, initialLength + offset) );
 			}
 		}
 		else
 		{
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-			if( sTco )
+			SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
+			if( sClip )
 			{
 				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 
@@ -931,50 +929,50 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 					// even if the user switches to snapping later
 					setInitialPos( m_initialMousePos );
 					//Don't resize to less than 1 tick
-					t = qMin<int>( m_initialTCOEnd - 1, t);
+					t = qMin<int>( m_initialClipEnd - 1, t);
 				}
 				else if( me->modifiers() & Qt::ShiftModifier )
 				{	// If shift is held, quantize clip's start position
 					// Don't let the start position move past the end position
-					TimePos max = m_initialTCOEnd.quantize( snapSize );
-					if ( max >= m_initialTCOEnd ) max -= snapLength;
+					TimePos max = m_initialClipEnd.quantize( snapSize );
+					if ( max >= m_initialClipEnd ) max -= snapLength;
 					t = qMin<int>( max, t.quantize( snapSize ) );
 				}
 				else
 				{	// Otherwise, resize in fixed increments
 					// Don't resize to less than 1 tick
-					TimePos initialLength = m_initialTCOEnd - m_initialTCOPos;
+					TimePos initialLength = m_initialClipEnd - m_initialClipPos;
 					TimePos minLength = TimePos( initialLength % snapLength );
 					if (minLength < 1) minLength += snapLength;
-					TimePos offset = TimePos(t - m_initialTCOPos).quantize( snapSize );
-					t = qMin<int>( m_initialTCOEnd - minLength, m_initialTCOPos + offset );
+					TimePos offset = TimePos(t - m_initialClipPos).quantize( snapSize );
+					t = qMin<int>( m_initialClipEnd - minLength, m_initialClipPos + offset );
 				}
 
-				TimePos oldPos = m_tco->startPosition();
-				if( m_tco->length() + ( oldPos - t ) >= 1 )
+				TimePos oldPos = m_clip->startPosition();
+				if( m_clip->length() + ( oldPos - t ) >= 1 )
 				{
-					m_tco->movePosition( t );
-					m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
-					sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
+					m_clip->movePosition( t );
+					m_clip->changeLength( m_clip->length() + ( oldPos - t ) );
+					sClip->setStartTimeOffset( sClip->startTimeOffset() + ( oldPos - t ) );
 				}
 			}
 		}
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
-				arg( m_tco->length().getBar() ).
-				arg( m_tco->length().getTicks() %
+				arg( m_clip->length().getBar() ).
+				arg( m_clip->length().getTicks() %
 						TimePos::ticksPerBar() ).
-				arg( m_tco->startPosition().getBar() + 1 ).
-				arg( m_tco->startPosition().getTicks() %
+				arg( m_clip->startPosition().getBar() + 1 ).
+				arg( m_clip->startPosition().getTicks() %
 						TimePos::ticksPerBar() ).
-				arg( m_tco->endPosition().getBar() + 1 ).
-				arg( m_tco->endPosition().getTicks() %
+				arg( m_clip->endPosition().getBar() + 1 ).
+				arg( m_clip->endPosition().getTicks() %
 						TimePos::ticksPerBar() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
 	else if( m_action == Split )
 	{
-		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-		if (sTco) {
+		SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
+		if (sClip) {
 			setCursor( m_cursorKnife );
 			setMarkerPos( knifeMarkerPos( me ) );
 		}
@@ -987,14 +985,14 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 
 
 
-/*! \brief Handle a mouse release on this trackContentObjectView.
+/*! \brief Handle a mouse release on this ClipView.
  *
  *  If we're in move or resize mode, journal the change as appropriate.
  *  Then tidy up.
  *
  * \param me The QMouseEvent to handle.
  */
-void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
+void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
 	// If the CopySelection was chosen as the action due to mouse movement,
 	// it will have been cleared.  At this point Toggle is the desired action.
@@ -1007,14 +1005,14 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	}
 	else if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
 	{
-		// TODO: Fix m_tco->setJournalling() consistency
-		m_tco->setJournalling( true );
+		// TODO: Fix m_clip->setJournalling() consistency
+		m_clip->setJournalling( true );
 	}
 	else if( m_action == Split )
 	{
 		const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 		const TimePos relPos = me->pos().x() * TimePos::ticksPerBar() / ppb;
-		splitTCO(unquantizedModHeld(me) ?
+		splitClip(unquantizedModHeld(me) ?
 			relPos :
 			quantizeSplitPos(relPos, me->modifiers() & Qt::ShiftModifier)
 		);
@@ -1031,20 +1029,20 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 
 
 
-/*! \brief Set up the context menu for this trackContentObjectView.
+/*! \brief Set up the context menu for this ClipView.
  *
  *  Set up the various context menu events that can apply to a
- *  track content object view.
+ *  ClipView.
  *
  * \param cme The QContextMenuEvent to add the actions to.
  */
-void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
+void ClipView::contextMenuEvent( QContextMenuEvent * cme )
 {
-	QVector<TrackContentObjectView*> selectedTCOs = getClickedTCOs();
+	QVector<ClipView*> selectedClips = getClickedClips();
 
-	// Depending on whether we right-clicked a selection or an individual TCO we will have
+	// Depending on whether we right-clicked a selection or an individual Clip we will have
 	// different labels for the actions.
-	bool individualTCO = selectedTCOs.size() <= 1;
+	bool individualClip = selectedClips.size() <= 1;
 
 	if( cme->modifiers() )
 	{
@@ -1053,11 +1051,11 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	QMenu contextMenu( this );
 
-	if( fixedTCOs() == false )
+	if( fixedClips() == false )
 	{
 		contextMenu.addAction(
 			embed::getIconPixmap( "cancel" ),
-			individualTCO
+			individualClip
 				? tr("Delete (middle mousebutton)")
 				: tr("Delete selection (middle mousebutton)"),
 			[this](){ contextMenuAction( Remove ); } );
@@ -1066,12 +1064,12 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 		contextMenu.addAction(
 			embed::getIconPixmap( "edit_cut" ),
-			individualTCO
+			individualClip
 				? tr("Cut")
 				: tr("Cut selection"),
 			[this](){ contextMenuAction( Cut ); } );
 
-		if (canMergeSelection(selectedTCOs))
+		if (canMergeSelection(selectedClips))
 		{
 			contextMenu.addAction(
 				embed::getIconPixmap("edit_merge"),
@@ -1083,7 +1081,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	contextMenu.addAction(
 		embed::getIconPixmap( "edit_copy" ),
-		individualTCO
+		individualClip
 			? tr("Copy")
 			: tr("Copy selection"),
 		[this](){ contextMenuAction( Copy ); } );
@@ -1097,7 +1095,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 
 	contextMenu.addAction(
 		embed::getIconPixmap( "muted" ),
-		(individualTCO
+		(individualClip
 			? tr("Mute/unmute (<%1> + middle click)")
 			: tr("Mute/unmute selection (<%1> + middle click)")).arg(UI_CTRL_KEY),
 		[this](){ contextMenuAction( Mute ); } );
@@ -1116,10 +1114,10 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 	contextMenu.exec( QCursor::pos() );
 }
 
-// This method processes the actions from the context menu of the TCO View.
-void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
+// This method processes the actions from the context menu of the Clip View.
+void ClipView::contextMenuAction( ContextMenuAction action )
 {
-	QVector<TrackContentObjectView *> active = getClickedTCOs();
+	QVector<ClipView *> active = getClickedClips();
 	// active will be later used for the remove, copy, cut or toggleMute methods
 
 	switch( action )
@@ -1140,116 +1138,116 @@ void TrackContentObjectView::contextMenuAction( ContextMenuAction action )
 			toggleMute( active );
 			break;
 		case Merge:
-			mergeTCOs(active);
+			mergeClips(active);
 			break;
 	}
 }
 
-QVector<TrackContentObjectView *> TrackContentObjectView::getClickedTCOs()
+QVector<ClipView *> ClipView::getClickedClips()
 {
 	// Get a list of selected selectableObjects
 	QVector<selectableObject *> sos = getGUI()->songEditor()->m_editor->selectedObjects();
 
-	// Convert to a list of selected TCOVs
-	QVector<TrackContentObjectView *> selection;
+	// Convert to a list of selected ClipVs
+	QVector<ClipView *> selection;
 	selection.reserve( sos.size() );
 	for( auto so: sos )
 	{
-		TrackContentObjectView *tcov = dynamic_cast<TrackContentObjectView *> ( so );
-		if( tcov != nullptr )
+		ClipView *clipv = dynamic_cast<ClipView *> ( so );
+		if( clipv != nullptr )
 		{
-			selection.append( tcov );
+			selection.append( clipv );
 		}
 	}
 
 	// If we clicked part of the selection, affect all selected clips. Otherwise affect the clip we clicked
 	return selection.contains(this)
 		? selection
-		: QVector<TrackContentObjectView *>( 1, this );
+		: QVector<ClipView *>( 1, this );
 }
 
-void TrackContentObjectView::remove( QVector<TrackContentObjectView *> tcovs )
+void ClipView::remove( QVector<ClipView *> clipvs )
 {
-	for( auto tcov: tcovs )
+	for( auto clipv: clipvs )
 	{
 		// No need to check if it's nullptr because we check when building the QVector
-		tcov->remove();
+		clipv->remove();
 	}
 }
 
-void TrackContentObjectView::copy( QVector<TrackContentObjectView *> tcovs )
+void ClipView::copy( QVector<ClipView *> clipvs )
 {
 	// For copyStringPair()
 	using namespace Clipboard;
 
-	// Write the TCOs to a DataFile for copying
-	DataFile dataFile = createTCODataFiles( tcovs );
+	// Write the Clips to a DataFile for copying
+	DataFile dataFile = createClipDataFiles( clipvs );
 
-	// Copy the TCO type as a key and the TCO data file to the clipboard
-	copyStringPair( QString( "tco_%1" ).arg( m_tco->getTrack()->type() ),
+	// Copy the Clip type as a key and the Clip data file to the clipboard
+	copyStringPair( QString( "clip_%1" ).arg( m_clip->getTrack()->type() ),
 		dataFile.toString() );
 }
 
-void TrackContentObjectView::cut( QVector<TrackContentObjectView *> tcovs )
+void ClipView::cut( QVector<ClipView *> clipvs )
 {
-	// Copy the selected TCOs
-	copy( tcovs );
+	// Copy the selected Clips
+	copy( clipvs );
 
-	// Now that the TCOs are copied we can delete them, since we are cutting
-	remove( tcovs );
+	// Now that the Clips are copied we can delete them, since we are cutting
+	remove( clipvs );
 }
 
-void TrackContentObjectView::paste()
+void ClipView::paste()
 {
 	// For getMimeData()
 	using namespace Clipboard;
 
 	// If possible, paste the selection on the TimePos of the selected Track and remove it
-	TimePos tcoPos = TimePos( m_tco->startPosition() );
+	TimePos clipPos = TimePos( m_clip->startPosition() );
 
 	TrackContentWidget *tcw = getTrackView()->getTrackContentWidget();
 
-	if( tcw->pasteSelection( tcoPos, getMimeData() ) )
+	if( tcw->pasteSelection( clipPos, getMimeData() ) )
 	{
-		// If we succeed on the paste we delete the TCO we pasted on
+		// If we succeed on the paste we delete the Clip we pasted on
 		remove();
 	}
 }
 
-void TrackContentObjectView::toggleMute( QVector<TrackContentObjectView *> tcovs )
+void ClipView::toggleMute( QVector<ClipView *> clipvs )
 {
-	for( auto tcov: tcovs )
+	for( auto clipv: clipvs )
 	{
-		// No need to check for nullptr because we check while building the tcovs QVector
-		tcov->getTrackContentObject()->toggleMute();
+		// No need to check for nullptr because we check while building the clipvs QVector
+		clipv->getClip()->toggleMute();
 	}
 }
 
-bool TrackContentObjectView::canMergeSelection(QVector<TrackContentObjectView*> tcovs)
+bool ClipView::canMergeSelection(QVector<ClipView*> clipvs)
 {
-	// Can't merge a single TCO
-	if (tcovs.size() < 2) { return false; }
+	// Can't merge a single Clip
+	if (clipvs.size() < 2) { return false; }
 
-	// We check if the owner of the first TCO is an Instrument Track
-	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(tcovs.at(0)->getTrackView());
+	// We check if the owner of the first Clip is an Instrument Track
+	bool isInstrumentTrack = dynamic_cast<InstrumentTrackView*>(clipvs.at(0)->getTrackView());
 
-	// Then we create a set with all the TCOs owners
+	// Then we create a set with all the Clips owners
 	std::set<TrackView*> ownerTracks;
-	for (auto tcov: tcovs) { ownerTracks.insert(tcov->getTrackView()); }
+	for (auto clipv: clipvs) { ownerTracks.insert(clipv->getTrackView()); }
 
 	// Can merge if there's only one owner track and it's an Instrument Track
 	return isInstrumentTrack && ownerTracks.size() == 1;
 }
 
-void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
+void ClipView::mergeClips(QVector<ClipView*> clipvs)
 {
-	// Get the track that we are merging TCOs in
+	// Get the track that we are merging Clips in
 	InstrumentTrack* track =
-		dynamic_cast<InstrumentTrack*>(tcovs.at(0)->getTrackView()->getTrack());
+		dynamic_cast<InstrumentTrack*>(clipvs.at(0)->getTrackView()->getTrack());
 
 	if (!track)
 	{
-		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeTCOs()");
+		qWarning("Warning: Couldn't retrieve InstrumentTrack in mergeClips()");
 		return;
 	}
 
@@ -1257,62 +1255,62 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
 	track->addJournalCheckPoint();
 	track->saveJournallingState(false);
 
-	// Find the earliest position of all the selected TCOVs
-	const auto earliestTCOV = std::min_element(tcovs.constBegin(), tcovs.constEnd(),
-		[](TrackContentObjectView* a, TrackContentObjectView* b)
+	// Find the earliest position of all the selected ClipVs
+	const auto earliestClipV = std::min_element(clipvs.constBegin(), clipvs.constEnd(),
+		[](ClipView* a, ClipView* b)
 		{
-			return a->getTrackContentObject()->startPosition() <
-				b->getTrackContentObject()->startPosition();
+			return a->getClip()->startPosition() <
+				b->getClip()->startPosition();
 		}
 	);
 
-	const TimePos earliestPos = (*earliestTCOV)->getTrackContentObject()->startPosition();
+	const TimePos earliestPos = (*earliestClipV)->getClip()->startPosition();
 
-	// Create a pattern where all notes will be added
-	Pattern* newPattern = dynamic_cast<Pattern*>(track->createTCO(earliestPos));
-	if (!newPattern)
+	// Create a clip where all notes will be added
+	MidiClip* newMidiClip = dynamic_cast<MidiClip*>(track->createClip(earliestPos));
+	if (!newMidiClip)
 	{
-		qWarning("Warning: Failed to convert TCO to Pattern on mergeTCOs");
+		qWarning("Warning: Failed to convert Clip to MidiClip on mergeClips");
 		return;
 	}
 
-	newPattern->saveJournallingState(false);
+	newMidiClip->saveJournallingState(false);
 
-	// Add the notes and remove the TCOs that are being merged
-	for (auto tcov: tcovs)
+	// Add the notes and remove the Clips that are being merged
+	for (auto clipv: clipvs)
 	{
-		// Convert TCOV to PatternView
-		PatternView* pView = dynamic_cast<PatternView*>(tcov);
+		// Convert ClipV to MidiClipView
+		MidiClipView* mcView = dynamic_cast<MidiClipView*>(clipv);
 
-		if (!pView)
+		if (!mcView)
 		{
-			qWarning("Warning: Non-pattern TCO on InstrumentTrack");
+			qWarning("Warning: Non-MidiClip Clip on InstrumentTrack");
 			continue;
 		}
 
-		NoteVector currentTCONotes = pView->getPattern()->notes();
-		TimePos pViewPos = pView->getPattern()->startPosition();
+		NoteVector currentClipNotes = mcView->getMidiClip()->notes();
+		TimePos mcViewPos = mcView->getMidiClip()->startPosition();
 
-		for (Note* note: currentTCONotes)
+		for (Note* note: currentClipNotes)
 		{
-			Note* newNote = newPattern->addNote(*note, false);
+			Note* newNote = newMidiClip->addNote(*note, false);
 			TimePos originalNotePos = newNote->pos();
-			newNote->setPos(originalNotePos + (pViewPos - earliestPos));
+			newNote->setPos(originalNotePos + (mcViewPos - earliestPos));
 		}
 
 		// We disable the journalling system before removing, so the
 		// removal doesn't get added to the undo/redo history
-		tcov->getTrackContentObject()->saveJournallingState(false);
-		// No need to check for nullptr because we check while building the tcovs QVector
-		tcov->remove();
+		clipv->getClip()->saveJournallingState(false);
+		// No need to check for nullptr because we check while building the clipvs QVector
+		clipv->remove();
 	}
 
-	// Update length since we might have moved notes beyond the end of the pattern length
-	newPattern->updateLength();
+	// Update length since we might have moved notes beyond the end of the MidiClip length
+	newMidiClip->updateLength();
 	// Rearrange notes because we might have moved them
-	newPattern->rearrangeAllNotes();
+	newMidiClip->rearrangeAllNotes();
 	// Restore journalling states now that the operation is finished
-	newPattern->restoreJournallingState();
+	newMidiClip->restoreJournallingState();
 	track->restoreJournallingState();
 	// Update song
 	Engine::getSong()->setModified();
@@ -1322,31 +1320,31 @@ void TrackContentObjectView::mergeTCOs(QVector<TrackContentObjectView*> tcovs)
 
 
 
-/*! \brief How many pixels a bar takes for this trackContentObjectView.
+/*! \brief How many pixels a bar takes for this ClipView.
  *
  * \return the number of pixels per bar.
  */
-float TrackContentObjectView::pixelsPerBar()
+float ClipView::pixelsPerBar()
 {
 	return m_trackView->trackContainerView()->pixelsPerBar();
 }
 
 
 /*! \brief Save the offsets between all selected tracks and a clicked track */
-void TrackContentObjectView::setInitialOffsets()
+void ClipView::setInitialOffsets()
 {
 	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
 	QVector<TimePos> offsets;
 	for( QVector<selectableObject *>::iterator it = so.begin();
 						it != so.end(); ++it )
 	{
-		TrackContentObjectView * tcov =
-			dynamic_cast<TrackContentObjectView *>( *it );
-		if( tcov == nullptr )
+		ClipView * clipv =
+			dynamic_cast<ClipView *>( *it );
+		if( clipv == nullptr )
 		{
 			continue;
 		}
-		offsets.push_back( tcov->m_tco->startPosition() - m_initialTCOPos );
+		offsets.push_back( clipv->m_clip->startPosition() - m_initialClipPos );
 	}
 
 	m_initialOffsets = offsets;
@@ -1360,7 +1358,7 @@ void TrackContentObjectView::setInitialOffsets()
  * \param _me The QMouseEvent.
  * \param distance The threshold distance that the mouse has moved to return true.
  */
-bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * me, int distance )
+bool ClipView::mouseMovedDistance( QMouseEvent * me, int distance )
 {
 	QPoint dPos = mapToGlobal( me->pos() ) - m_initialMouseGlobalPos;
 	const int pixelsMoved = dPos.manhattanLength();
@@ -1370,7 +1368,7 @@ bool TrackContentObjectView::mouseMovedDistance( QMouseEvent * me, int distance 
 
 
 
-bool TrackContentObjectView::unquantizedModHeld( QMouseEvent * me )
+bool ClipView::unquantizedModHeld( QMouseEvent * me )
 {
 	return me->modifiers() & Qt::ControlModifier || me->modifiers() & Qt::AltModifier;
 }
@@ -1378,19 +1376,19 @@ bool TrackContentObjectView::unquantizedModHeld( QMouseEvent * me )
 
 
 
-/*! \brief Calculate the new position of a dragged TCO from a mouse event
+/*! \brief Calculate the new position of a dragged Clip from a mouse event
  *
  *
  * \param me The QMouseEvent
  */
-TimePos TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
+TimePos ClipView::draggedClipPos( QMouseEvent * me )
 {
 	//Pixels per bar
 	const float ppb = m_trackView->trackContainerView()->pixelsPerBar();
 	// The pixel distance that the mouse has moved
 	const int mouseOff = mapToGlobal(me->pos()).x() - m_initialMouseGlobalPos.x();
-	TimePos newPos = m_initialTCOPos + mouseOff * TimePos::ticksPerBar() / ppb;
-	TimePos offset = newPos - m_initialTCOPos;
+	TimePos newPos = m_initialClipPos + mouseOff * TimePos::ticksPerBar() / ppb;
+	TimePos offset = newPos - m_initialClipPos;
 	// If the user is holding alt, or pressed ctrl after beginning the drag, don't quantize
 	if ( me->button() != Qt::NoButton || unquantizedModHeld(me) )
 	{	// We want to preserve this adjusted offset,  even if the user switches to snapping
@@ -1401,22 +1399,23 @@ TimePos TrackContentObjectView::draggedTCOPos( QMouseEvent * me )
 		// or end position, whichever is closest to the actual position
 		TimePos startQ = newPos.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
 		// Find start position that gives snapped clip end position
-		TimePos endQ = ( newPos + m_tco->length() );
+		TimePos endQ = ( newPos + m_clip->length() );
 		endQ = endQ.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
-		endQ = endQ - m_tco->length();
+		endQ = endQ - m_clip->length();
+
 		// Select the position closest to actual position
 		if ( abs(newPos - startQ) < abs(newPos - endQ) ) newPos = startQ;
 		else newPos = endQ;
 	}
 	else
 	{	// Otherwise, quantize moved distance (preserves user offsets)
-		newPos = m_initialTCOPos + offset.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
+		newPos = m_initialClipPos + offset.quantize( getGUI()->songEditor()->m_editor->getSnapSize() );
 	}
 	return newPos;
 }
 
 
-int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
+int ClipView::knifeMarkerPos( QMouseEvent * me )
 {
 	//Position relative to start of clip
 	const int markerPos = me->pos().x();
@@ -1438,64 +1437,64 @@ int TrackContentObjectView::knifeMarkerPos( QMouseEvent * me )
 
 
 
-TimePos TrackContentObjectView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
+TimePos ClipView::quantizeSplitPos( TimePos midiPos, bool shiftMode )
 {
 	const float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	if ( shiftMode )
 	{	//If shift is held we quantize the length of the new left clip...
 		const TimePos leftPos = midiPos.quantize( snapSize );
 		//...or right clip...
-		const TimePos rightOff = m_tco->length() - midiPos;
-		const TimePos rightPos = m_tco->length() - rightOff.quantize( snapSize );
+		const TimePos rightOff = m_clip->length() - midiPos;
+		const TimePos rightPos = m_clip->length() - rightOff.quantize( snapSize );
 		//...whichever gives a position closer to the cursor
 		if ( abs(leftPos - midiPos) < abs(rightPos - midiPos) ) { return leftPos; }
 		else { return rightPos; }
 	}
 	else
 	{
-		return TimePos(midiPos + m_initialTCOPos).quantize( snapSize ) - m_initialTCOPos;
+		return TimePos(midiPos + m_initialClipPos).quantize( snapSize ) - m_initialClipPos;
 	}
 }
 
 
 
 
-// Return the color that the TCO's background should be
-QColor TrackContentObjectView::getColorForDisplay( QColor defaultColor )
+// Return the color that the Clip's background should be
+QColor ClipView::getColorForDisplay( QColor defaultColor )
 {
-	// Get the pure TCO color
-	auto tcoColor = m_tco->hasColor()
-					? m_tco->usesCustomClipColor()
-						? m_tco->color()
-						: m_tco->getTrack()->color()
+	// Get the pure Clip color
+	auto clipColor = m_clip->hasColor()
+					? m_clip->usesCustomClipColor()
+						? m_clip->color()
+						: m_clip->getTrack()->color()
 					: defaultColor;
 
 	// Set variables
 	QColor c, mutedCustomColor;
-	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-	mutedCustomColor = tcoColor;
+	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
+	mutedCustomColor = clipColor;
 	mutedCustomColor.setHsv( mutedCustomColor.hsvHue(), mutedCustomColor.hsvSaturation() / 4, mutedCustomColor.value() );
 
 	// Change the pure color by state: selected, muted, colored, normal
 	if( isSelected() )
 	{
-		c = m_tco->hasColor()
+		c = m_clip->hasColor()
 			? ( muted
 				? mutedCustomColor.darker( 350 )
-				: tcoColor.darker( 150 ) )
+				: clipColor.darker( 150 ) )
 			: selectedColor();
 	}
 	else
 	{
 		if( muted )
 		{
-			c = m_tco->hasColor()
+			c = m_clip->hasColor()
 				? mutedCustomColor.darker( 250 )
 				: mutedBackgroundColor();
 		}
 		else
 		{
-			c = tcoColor;
+			c = clipColor;
 		}
 	}
 
