@@ -577,7 +577,7 @@ void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 	{
 		QString txt = _dee->mimeData()->data(
 						mimeType( MimeType::StringPair ) );
-		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
+		if( txt.section( ':', 0, 0 ) == QString( "clip_%1" ).arg(
 							Track::SampleTrack ) )
 		{
 			_dee->acceptProposedAction();
@@ -630,7 +630,7 @@ void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 		newWaveView();
 		return;
 	}
-	else if( type == QString( "tco_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		castModel<audioFileProcessor>()->setAudioFile( dataFile.content().firstChild().toElement().attribute( "src" ) );

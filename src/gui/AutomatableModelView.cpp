@@ -27,7 +27,7 @@
 #include <QMouseEvent>
 
 #include "AutomatableModelView.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
@@ -261,7 +261,7 @@ void AutomatableModelViewSlots::removeConnection()
 void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
 	getGUI()->automationEditor()->open(
-				AutomationPattern::globalAutomationPattern(m_amv->modelUntyped())
+				AutomationClip::globalAutomationClip(m_amv->modelUntyped())
 	);
 }
 
@@ -269,7 +269,7 @@ void AutomatableModelViewSlots::editSongGlobalAutomation()
 
 void AutomatableModelViewSlots::removeSongGlobalAutomation()
 {
-	delete AutomationPattern::globalAutomationPattern( m_amv->modelUntyped() );
+	delete AutomationClip::globalAutomationClip( m_amv->modelUntyped() );
 }
 
 

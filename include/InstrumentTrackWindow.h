@@ -32,7 +32,7 @@
 
 
 class EffectRackView;
-class FxLineLcdSpinBox;
+class MixerLineLcdSpinBox;
 class InstrumentFunctionArpeggioView;
 class InstrumentFunctionNoteStackingView;
 class InstrumentMidiIOView;
@@ -135,7 +135,7 @@ private:
 	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
-	FxLineLcdSpinBox * m_effectChannelNumber;
+	MixerLineLcdSpinBox * m_mixerChannelNumber;
 
 
 

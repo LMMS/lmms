@@ -33,13 +33,13 @@
 #include "debug.h"
 
 
-SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , TimePos startRecordTimeOffset) :
+SampleRecordHandle::SampleRecordHandle(SampleClip* clip , TimePos startRecordTimeOffset) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
-	m_minLength( tco->length() ),
-	m_track( tco->getTrack() ),
+	m_minLength( clip->length() ),
+	m_track( clip->getTrack() ),
 	m_bbTrack( nullptr ),
-	m_tco(tco),
+	m_clip(clip),
 	m_startRecordTimeOffset{startRecordTimeOffset}
 {
 }
@@ -53,9 +53,9 @@ SampleRecordHandle::~SampleRecordHandle()
 	{
 		SampleBuffer* sb;
 		createSampleBuffer( &sb );
-		m_tco->setSampleBuffer( sb );
+		m_clip->setSampleBuffer( sb );
 
-		m_tco->setStartTimeOffset(m_startRecordTimeOffset);
+		m_clip->setStartTimeOffset(m_startRecordTimeOffset);
 	}
 	
 	while( !m_buffers.empty() )
@@ -63,7 +63,7 @@ SampleRecordHandle::~SampleRecordHandle()
 		delete[] m_buffers.front().first;
 		m_buffers.erase( m_buffers.begin() );
 	}
-	m_tco->setRecord( false );
+	m_clip->setRecord( false );
 }
 
 
@@ -79,7 +79,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	TimePos len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
 	{
-//		m_tco->changeLength( len );
+//		m_clip->changeLength( len );
 		m_minLength = len;
 	}
 }

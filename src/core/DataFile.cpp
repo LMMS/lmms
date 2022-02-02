@@ -70,7 +70,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
-	&DataFile::upgrade_defaultTripleOscillatorHQ
+	&DataFile::upgrade_defaultTripleOscillatorHQ,
+	&DataFile::upgrade_mixerRename
 };
 
 // Vector of all versions that have upgrade routines.
@@ -94,7 +95,7 @@ DataFile::typeDescStruct
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NotePattern, "pattern" }
+	{ DataFile::MidiClip, "pattern" }
 } ;
 
 
@@ -199,7 +200,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NotePattern:
+	case Type::MidiClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
@@ -1769,10 +1770,41 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 }
 
 
+// Remove FX prefix from mixer and related nodes
+void DataFile::upgrade_mixerRename()
+{
+	// Change nodename <fxmixer> to <mixer>
+	QDomNodeList fxmixer = elementsByTagName("fxmixer");
+	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
+	{
+		fxmixer.item(i).toElement().setTagName("mixer");
+	}
+
+	// Change nodename <fxchannel> to <mixerchannel>
+	QDomNodeList fxchannel = elementsByTagName("fxchannel");
+	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
+	{
+		fxchannel.item(i).toElement().setTagName("mixerchannel");
+	}
+
+	// Change the attribute fxch of element <instrumenttrack> to mixch
+	QDomNodeList fxch = elementsByTagName("instrumenttrack");
+	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	{
+		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		{
+			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
+			fxch.item(i).toElement().removeAttribute("fxch");
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
