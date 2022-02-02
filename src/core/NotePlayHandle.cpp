@@ -563,7 +563,7 @@ void NotePlayHandle::processTimePos(const TimePos& time, float pvalue)
 	{
 		if (GuiApplication::instance()->pianoRoll()->isRecording() && m_origin == Origin::OriginMidiInput)
 		{
-			detuning()->automationPattern()->recordValue(time - songGlobalParentOffset() - pos(), pvalue / 100);
+			detuning()->automationClip()->recordValue(time - songGlobalParentOffset() - pos(), pvalue / 100);
 		}
 		else
 		{
