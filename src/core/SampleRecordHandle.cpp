@@ -33,7 +33,7 @@
 #include "debug.h"
 
 
-SampleRecordHandle::SampleRecordHandle(SampleClip* clip , TimePos startRecordTimeOffset) :
+SampleRecordHandle::SampleRecordHandle(SampleClip* clip, TimePos startRecordTimeOffset) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
 	m_minLength( clip->length() ),

@@ -68,7 +68,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 	cm->addSeparator();
 
 
-	cm->addAction(embed::getIconPixmap( "record" ),
+	cm->addAction(embed::getIconPixmap("record"),
                           tr("Set/clear record"),
                           m_clip, SLOT(toggleRecord()));
 
@@ -291,7 +291,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	}
 	// recording sample tracks is not possible at the moment
 
-	if(m_clip->isRecord())
+	if (m_clip->isRecord())
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 

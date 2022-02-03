@@ -95,8 +95,8 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
 			if( _start >= sClip->startPosition() && _start < sClip->endPosition() )
 			{
-				if(!sClip->isPlaying() && (_start >= (sClip->startPosition() + sClip->startTimeOffset())
-										  || sClip->isRecord()))
+				if (!sClip->isPlaying() && (_start >= (sClip->startPosition() + sClip->startTimeOffset())
+											|| sClip->isRecord()))
 				{
 					auto bufferFramesPerTick = Engine::framesPerTick (sClip->sampleBuffer ()->sampleRate ());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
@@ -107,18 +107,18 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
 
 					// In case we are recoding, "play" the whole TCO.
-					if(sClip->isRecord()) {
+					if (sClip->isRecord()) {
 						samplePlayLength = clipFrameLength;
 					}
 
 					//we only play within the sampleBuffer limits
 					//Ignore that in case of recoding.
-					if(sampleStart < sampleBufferLength || sClip->isRecord ())
+					if (sampleStart < sampleBufferLength || sClip->isRecord())
 					{
-						sClip->setSampleStartFrame(sampleStart);
-						sClip->setSamplePlayLength(samplePlayLength);
-						clips.push_back(sClip);
-						sClip->setIsPlaying(true);
+						sClip->setSampleStartFrame( sampleStart );
+						sClip->setSamplePlayLength( samplePlayLength );
+						clips.push_back( sClip );
+						sClip->setIsPlaying( true );
 						nowPlaying = true;
 					}
 				}
@@ -138,7 +138,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		if( !st->isMuted() )
 		{
 			PlayHandle* handle;
-			if(st->isRecord())
+			if( st->isRecord() )
 			{
 				if( !Engine::getSong()->isRecording() )
 				{

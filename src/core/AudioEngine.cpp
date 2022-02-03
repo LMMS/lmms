@@ -352,7 +352,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 
 		if( it != m_playHandles.end() )
 		{
-			if((*it)->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
+			if ((*it)->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -400,7 +400,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		}
 		if( ( *it )->isFinished() )
 		{
-			if((*it)->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
+			if ((*it)->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -753,7 +753,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
-			if (( *it )->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
+			if ((*it)->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );

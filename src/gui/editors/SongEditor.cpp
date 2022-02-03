@@ -1028,7 +1028,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// In case our current audio device does not support capture,
 	// disable the record buttons.
 	if(!Engine::audioEngine()->audioDev()->supportsCapture()) {
-		for(auto &recordAction : {m_recordAccompanyAction, m_recordAction}) {
+		for (auto &recordAction : {m_recordAccompanyAction, m_recordAction}) {
 			recordAction->setEnabled(false);
 			recordAction->setToolTip(tr("Recording is unavailable: try connecting an input device or switching backend"));
 		}
