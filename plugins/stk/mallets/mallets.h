@@ -92,7 +92,7 @@ public:
 
 	inline sample_t nextSampleLeft()
 	{
-		if( m_voice == NULL )
+		if( m_voice == nullptr )
 		{
 			return( 0.0f );
 		}
@@ -120,8 +120,19 @@ public:
 		}
 	}
 
+	inline int presetIndex()
+	{
+		return m_presetIndex;
+	}
+
+	inline void setPresetIndex(int presetIndex)
+	{
+		m_presetIndex = presetIndex;
+	}
+
 
 protected:
+	int m_presetIndex;
 	Instrmnt * m_voice;
 
 	StkFloat * m_delay;

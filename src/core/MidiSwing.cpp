@@ -38,13 +38,13 @@ MidiSwing::~MidiSwing()
 
 static int applyMidiSwing(int posInEight);
 
-int MidiSwing::isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset,
-					Note * n, Pattern * p)
+int MidiSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t offset,
+					Note * n, MidiClip* c)
 {
-	return isInTick(curStart, n, p);
+	return isInTick(curStart, n, c);
 }
 
-int MidiSwing::isInTick(MidiTime * curStart, Note * n, Pattern * p)
+int MidiSwing::isInTick(TimePos * curStart, Note * n, MidiClip* c)
 {
 
 	// Where are we in the beat

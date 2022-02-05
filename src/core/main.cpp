@@ -59,6 +59,7 @@
 
 #include "MainApplication.h"
 #include "ConfigManager.h"
+#include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
 #include "Engine.h"
@@ -129,9 +130,10 @@ inline void loadTranslation( const QString & tname,
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
 
-	t->load( name, dir );
-
-	QCoreApplication::instance()->installTranslator( t );
+	if (t->load(name, dir))
+	{
+		QCoreApplication::instance()->installTranslator(t);
+	}
 }
 
 
@@ -146,7 +148,7 @@ void printVersion( char *executableName )
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION,
+		LMMS_BUILDCONF_PLATFORM, LMMS_BUILDCONF_MACHINE, QT_VERSION_STR, LMMS_BUILDCONF_COMPILER_VERSION,
 		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
@@ -161,11 +163,15 @@ void printHelp()
 		"Actions:\n"
 		"  <no action> [options...] [<project>]  Start LMMS in normal GUI mode\n"
 		"  dump <in>                             Dump XML of compressed file <in>\n"
+		"  compress <in>                         Compress file <in>\n"
 		"  render <project> [options...]         Render given project file\n"
 		"  rendertracks <project> [options...]   Render each track to a different file\n"
 		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
 		"                                        Standard out is used if no output file\n"
 		"                                        is specified\n"
+		"  makebundle <in> [out]                 Make a project bundle from the project\n"
+		"                                        file <in> saving the resulting bundle\n"
+		"                                        as <out>\n"
 		"\nGlobal options:\n"
 		"      --allowroot                Bypass root user startup check (use with\n"
 		"          caution).\n"
@@ -249,10 +255,11 @@ int main( int argc, char * * argv )
 {
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
+	// FE_UNDERFLOW is disabled for the time being
 	feenableexcept( FE_INVALID   |
 			FE_DIVBYZERO |
-			FE_OVERFLOW  |
-			FE_UNDERFLOW);
+			FE_OVERFLOW  /*|
+			FE_UNDERFLOW*/);
 
 	// Install the trap handler
 	// register signal SIGFPE and signal handler
@@ -355,7 +362,7 @@ int main( int argc, char * * argv )
 			new QCoreApplication( argc, argv ) :
 					new MainApplication( argc, argv );
 
-	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
+	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
@@ -399,6 +406,28 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
+		else if (arg == "makebundle")
+		{
+			++i;
+
+			if (i == argc)
+			{
+				return noInputFileError();
+			}
+
+			DataFile dataFile(QString::fromLocal8Bit(argv[i]));
+
+			if (argc > i+1) // Project bundle file name given
+			{
+				printf("Making bundle\n");
+				dataFile.writeFile(QString::fromLocal8Bit(argv[i+1]), true);
+				return EXIT_SUCCESS;
+			}
+			else
+			{
+				return usageError("No project bundle name given");
+			}
+		}
 		else if( arg == "--allowroot" )
 		{
 			// Ignore, processed earlier
@@ -424,6 +453,22 @@ int main( int argc, char * * argv )
 			f.open( QIODevice::ReadOnly );
 			QString d = qUncompress( f.readAll() );
 			printf( "%s\n", d.toUtf8().constData() );
+
+			return EXIT_SUCCESS;
+		}
+		else if( arg == "compress" || arg == "--compress" )
+		{
+			++i;
+
+			if( i == argc )
+			{
+				return noInputFileError();
+			}
+
+			QFile f( QString::fromLocal8Bit( argv[i] ) );
+			f.open( QIODevice::ReadOnly );
+			QByteArray d = qCompress( f.readAll() ) ;
+			fwrite( d.constData(), sizeof(char), d.size(), stdout );
 
 			return EXIT_SUCCESS;
 		}
@@ -583,19 +628,19 @@ int main( int argc, char * * argv )
 
 			if( ip == "linear" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_Linear;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_Linear;
 			}
 			else if( ip == "sincfastest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincFastest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincFastest;
 			}
 			else if( ip == "sincmedium" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincMedium;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincMedium;
 			}
 			else if( ip == "sincbest" )
 			{
-		qs.interpolation = Mixer::qualitySettings::Interpolation_SincBest;
+		qs.interpolation = AudioEngine::qualitySettings::Interpolation_SincBest;
 			}
 			else
 			{
@@ -617,16 +662,16 @@ int main( int argc, char * * argv )
 			switch( o )
 			{
 				case 1:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_None;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_None;
 		break;
 				case 2:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_2x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_2x;
 		break;
 				case 4:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_4x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_4x;
 		break;
 				case 8:
-		qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
+		qs.oversampling = AudioEngine::qualitySettings::Oversampling_8x;
 		break;
 				default:
 				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
@@ -706,18 +751,16 @@ int main( int argc, char * * argv )
 		pos = QLocale::system().name().left( 2 );
 	}
 
-#ifdef LMMS_BUILD_WIN32
-#undef QT_TRANSLATIONS_DIR
-#define QT_TRANSLATIONS_DIR ConfigManager::inst()->localeDir()
-#endif
-
-#ifdef QT_TRANSLATIONS_DIR
-	// load translation for Qt-widgets/-dialogs
-	loadTranslation( QString( "qt_" ) + pos,
-					QString( QT_TRANSLATIONS_DIR ) );
-#endif
 	// load actual translation for LMMS
 	loadTranslation( pos );
+
+	// load translation for Qt-widgets/-dialogs
+#ifdef QT_TRANSLATIONS_DIR
+	// load from the original path first
+	loadTranslation(QString("qt_") + pos, QT_TRANSLATIONS_DIR);
+#endif
+	// override it with bundled/custom one, if exists
+	loadTranslation(QString("qt_") + pos, ConfigManager::inst()->localeDir());
 
 
 	// try to set realtime priority
@@ -750,7 +793,7 @@ int main( int argc, char * * argv )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}
-	if ( sigaction( SIGPIPE, &sa, NULL ) )
+	if ( sigaction( SIGPIPE, &sa, nullptr ) )
 	{
 		fprintf( stderr, "Signal initialization failed.\n" );
 	}
@@ -797,7 +840,7 @@ int main( int argc, char * * argv )
 
 		if( profilerOutputFile.isEmpty() == false )
 		{
-			Engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+			Engine::audioEngine()->profiler().setOutputFile( profilerOutputFile );
 		}
 
 		// start now!
@@ -885,16 +928,16 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
-				gui->mainWindow()->sessionCleanup();
+				getGUI()->mainWindow()->sessionCleanup();
 			}
 			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
-				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
+				getGUI()->mainWindow()->setSession( MainWindow::SessionState::Recover );
 			}
 			else // Exit
 			{
-				return 0;
+				return EXIT_SUCCESS;
 			}
 		}
 
@@ -902,10 +945,10 @@ int main( int argc, char * * argv )
 
 		// [Settel] workaround: showMaximized() doesn't work with
 		// FVWM2 unless the window is already visible -> show() first
-		gui->mainWindow()->show();
+		getGUI()->mainWindow()->show();
 		if( fullscreen )
 		{
-			gui->mainWindow()->showMaximized();
+			getGUI()->mainWindow()->showMaximized();
 		}
 
 		// Handle macOS-style FileOpen QEvents
@@ -965,7 +1008,7 @@ int main( int argc, char * * argv )
 		// instances of LMMS.
 		if( autoSaveEnabled )
 		{
-			gui->mainWindow()->autoSaveTimerReset();
+			getGUI()->mainWindow()->autoSaveTimerReset();
 		}
 	}
 
@@ -992,6 +1035,9 @@ int main( int argc, char * * argv )
 		FreeConsole();
 	}
 #endif
+
+
+	NotePlayHandleManager::free();
 
 	return ret;
 }

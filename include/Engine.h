@@ -30,14 +30,14 @@
 #include <QtCore/QObject>
 
 
+#include "lmmsconfig.h"
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
+class AudioEngine;
 class BBTrackContainer;
-class DummyTrackContainer;
-class FxMixer;
-class ProjectJournal;
 class Mixer;
+class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
 
@@ -62,14 +62,14 @@ public:
 	static void destroy();
 
 	// core
-	static Mixer *mixer()
+	static AudioEngine *audioEngine()
 	{
-		return s_mixer;
+		return s_audioEngine;
 	}
 
-	static FxMixer * fxMixer()
+	static Mixer * mixer()
 	{
-		return s_fxMixer;
+		return s_mixer;
 	}
 
 	static Song * getSong()
@@ -87,14 +87,18 @@ public:
 		return s_projectJournal;
 	}
 
+	static bool ignorePluginBlacklist();
+
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager * getLv2Manager()
+	{
+		return s_lv2Manager;
+	}
+#endif
+
 	static Ladspa2LMMS * getLADSPAManager()
 	{
 		return s_ladspaManager;
-	}
-
-	static DummyTrackContainer * dummyTrackContainer()
-	{
-		return s_dummyTC;
 	}
 
 	static float framesPerTick()
@@ -108,7 +112,7 @@ public:
 
 	static inline LmmsCore * inst()
 	{
-		if( s_instanceOfMe == NULL )
+		if( s_instanceOfMe == nullptr )
 		{
 			s_instanceOfMe = new LmmsCore();
 		}
@@ -129,20 +133,22 @@ private:
 	static inline void deleteHelper( T * * ptr )
 	{
 		T * tmp = *ptr;
-		*ptr = NULL;
+		*ptr = nullptr;
 		delete tmp;
 	}
 
 	static float s_framesPerTick;
 
 	// core
-	static Mixer *s_mixer;
-	static FxMixer * s_fxMixer;
+	static AudioEngine *s_audioEngine;
+	static Mixer * s_mixer;
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;
-	static DummyTrackContainer * s_dummyTC;
 
+#ifdef LMMS_HAVE_LV2
+	static class Lv2Manager* s_lv2Manager;
+#endif
 	static Ladspa2LMMS * s_ladspaManager;
 	static void* s_dndPluginKey;
 

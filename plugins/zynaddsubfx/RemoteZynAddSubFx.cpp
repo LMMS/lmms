@@ -29,16 +29,17 @@
 
 #include <queue>
 
+#include <FL/x.H>
+#undef CursorShape // is, by mistake, not undefed in FL
+
 #define BUILD_REMOTE_PLUGIN_CLIENT
-#include "Note.h"
+
 #include "RemotePlugin.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 
 #include "zynaddsubfx/src/Nio/Nio.h"
 #include "zynaddsubfx/src/UI/MasterUI.h"
-
-#include <FL/x.H>
 
 
 class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx
@@ -61,8 +62,8 @@ public:
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
-		pthread_mutex_init( &m_guiMutex, NULL );
-		pthread_create( &m_messageThreadHandle, NULL, messageLoop, this );
+		pthread_mutex_init( &m_guiMutex, nullptr );
+		pthread_create( &m_messageThreadHandle, nullptr, messageLoop, this );
 	}
 
 	virtual ~RemoteZynAddSubFx()
@@ -152,7 +153,7 @@ public:
 
 		_this->messageLoop();
 
-		return NULL;
+		return nullptr;
 	}
 
 	void guiLoop();
@@ -173,7 +174,7 @@ private:
 void RemoteZynAddSubFx::guiLoop()
 {
 	int exitProgram = 0;
-	MasterUI * ui = NULL;
+	MasterUI * ui = nullptr;
 
 	while( !m_guiExit )
 	{

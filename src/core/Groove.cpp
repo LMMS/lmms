@@ -1,12 +1,12 @@
-
+#include <QDomElement>
 #include <QObject>
 #include <QLabel>
 
 #include "Groove.h"
 #include "lmms_basics.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "Song.h"
 
 Groove::Groove(QObject *parent) :
@@ -18,8 +18,8 @@ Groove::Groove(QObject *parent) :
  * Default groove is no groove. Not even a wiggle.
  * @return 0 or -1
  */
-int Groove::isInTick(MidiTime * curStart, fpp_t frames, f_cnt_t offset,
-						Note * n, Pattern * p) {
+int Groove::isInTick(TimePos * curStart, fpp_t frames, f_cnt_t offset,
+						Note * n, MidiClip* c) {
 
 	return n->pos().getTicks() == curStart->getTicks() ? 0 : -1;
 }

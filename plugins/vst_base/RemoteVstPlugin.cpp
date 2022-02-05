@@ -70,6 +70,8 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <string>
+#include <cstring>
 
 #include <aeffectx.h>
 
@@ -118,9 +120,9 @@ static bool HEADLESS = false;
 
 class RemoteVstPlugin;
 
-RemoteVstPlugin * __plugin = NULL;
+RemoteVstPlugin * __plugin = nullptr;
 
-HWND __MessageHwnd = NULL;
+HWND __MessageHwnd = nullptr;
 DWORD __processingThreadId = 0;
 
 
@@ -133,7 +135,7 @@ std::string GetErrorAsString(DWORD errorMessageID)
 
 	LPSTR messageBuffer = nullptr;
 	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-								 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+								 nullptr, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, nullptr);
 
 	std::string message(messageBuffer, size);
 
@@ -172,7 +174,7 @@ public:
 	{
 		SuspendPlugin suspend( this );
 		pluginDispatch( effSetSampleRate, 0, 0,
-						NULL, (float) sampleRate() );
+						nullptr, (float) sampleRate() );
 	}
 
 	// set given buffer-size for plugin
@@ -222,6 +224,10 @@ public:
 
 	// determine name of current program
 	const char * programName();
+
+	void getParameterDisplays();
+
+	void getParameterLabels();
 
 	// send name of current program back to host
 	void sendCurrentProgramName();
@@ -371,7 +377,7 @@ private:
 	bool load( const std::string & _plugin_file );
 
 	int pluginDispatch( int cmd, int param1 = 0, int param2 = 0,
-					void * p = NULL, float f = 0 )
+					void * p = nullptr, float f = 0 )
 	{
 		if( m_plugin )
 		{
@@ -438,9 +444,9 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	RemotePluginClient( socketPath ),
 #endif
-	m_libInst( NULL ),
-	m_plugin( NULL ),
-	m_window( NULL ),
+	m_libInst( nullptr ),
+	m_plugin( nullptr ),
+	m_window( nullptr ),
 	m_windowID( 0 ),
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
@@ -449,16 +455,16 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_processing( false ),
 	m_messageList(),
 	m_shouldGiveIdle( false ),
-	m_inputs( NULL ),
-	m_outputs( NULL ),
+	m_inputs( nullptr ),
+	m_outputs( nullptr ),
 	m_shmValid( false ),
 	m_midiEvents(),
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 ),
 	m_currentProgram( -1 ),
-	m_in( NULL ),
+	m_in( nullptr ),
 	m_shmID( -1 ),
-	m_vstSyncData( NULL )
+	m_vstSyncData( nullptr )
 {
 	__plugin = this;
 
@@ -486,7 +492,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 #else
 	m_vstSyncData = RemotePluginClient::getQtVSTshm();
 #endif
-	if( m_vstSyncData == NULL )
+	if( m_vstSyncData == nullptr )
 	{
 		fprintf(stderr, "RemoteVstPlugin.cpp: "
 			"Failed to initialize shared memory for VST synchronization.\n"
@@ -535,18 +541,18 @@ RemoteVstPlugin::~RemoteVstPlugin()
 		{
 			perror( "~RemoteVstPlugin::shmdt" );
 		}
-		if( m_vstSyncData != NULL )
+		if( m_vstSyncData != nullptr )
 		{
 			delete m_vstSyncData;
-			m_vstSyncData = NULL;
+			m_vstSyncData = nullptr;
 		}
 	}
 #endif
 
-	if( m_libInst != NULL )
+	if( m_libInst != nullptr )
 	{
 		FreeLibrary( m_libInst );
-		m_libInst = NULL;
+		m_libInst = nullptr;
 	}
 
 	delete[] m_inputs;
@@ -660,6 +666,14 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			//sendMessage( IdVstSetParameter );
 			break;
 
+		case IdVstParameterDisplays:
+			getParameterDisplays();
+			break;
+
+		case IdVstParameterLabels:
+			getParameterLabels();
+			break;
+
 
 		case IdVstIdleUpdate:
 		{
@@ -752,8 +766,8 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
-	HMODULE hInst = GetModuleHandle( NULL );
-	if( hInst == NULL )
+	HMODULE hInst = GetModuleHandle( nullptr );
+	if( hInst == nullptr )
 	{
 		debugMessage( "initEditor(): can't get module handle\n" );
 		return;
@@ -769,8 +783,8 @@ void RemoteVstPlugin::initEditor()
 
 	m_window = CreateWindowEx( WS_EX_APPWINDOW, "LVSL", pluginName(),
 		dwStyle,
-		0, 0, 10, 10, NULL, NULL, hInst, NULL );
-	if( m_window == NULL )
+		0, 0, 10, 10, nullptr, nullptr, hInst, nullptr );
+	if( m_window == nullptr )
 	{
 		debugMessage( "initEditor(): cannot create editor window\n" );
 		return;
@@ -825,7 +839,7 @@ void RemoteVstPlugin::hideEditor() {
 
 void RemoteVstPlugin::destroyEditor()
 {
-	if( m_window == NULL )
+	if( m_window == nullptr )
 	{
 		return;
 	}
@@ -833,7 +847,7 @@ void RemoteVstPlugin::destroyEditor()
 	pluginDispatch( effEditClose );
 	// Destroying the window takes some time in Wine 1.8.5
 	DestroyWindow( m_window );
-	m_window = NULL;
+	m_window = nullptr;
 }
 
 
@@ -841,7 +855,7 @@ void RemoteVstPlugin::destroyEditor()
 
 bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
-	if( ( m_libInst = LoadLibraryW( toWString(_plugin_file).c_str() ) ) == NULL )
+	if( ( m_libInst = LoadLibraryW( toWString(_plugin_file).c_str() ) ) == nullptr )
 	{
 		DWORD error = GetLastError();
 		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );
@@ -852,24 +866,24 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 						( audioMasterCallback );
 	mainEntryPointer mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "VSTPluginMain" );
-	if( mainEntry == NULL )
+	if( mainEntry == nullptr )
 	{
 		mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "VstPluginMain" );
 	}
-	if( mainEntry == NULL )
+	if( mainEntry == nullptr )
 	{
 		mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "main" );
 	}
-	if( mainEntry == NULL )
+	if( mainEntry == nullptr )
 	{
 		debugMessage( "could not find entry point\n" );
 		return false;
 	}
 
 	m_plugin = mainEntry( hostCallback );
-	if( m_plugin == NULL )
+	if( m_plugin == nullptr )
 	{
 		debugMessage( "mainEntry procedure returned NULL\n" );
 		return false;
@@ -1068,6 +1082,49 @@ const char * RemoteVstPlugin::programName()
 
 
 
+// join the ParameterDisplays (stringified values without units) and send them to host
+void RemoteVstPlugin::getParameterDisplays()
+{
+	std::string paramDisplays;
+	static char buf[9]; // buffer for getting string
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
+		pluginDispatch( effGetParamDisplay, i, 0, buf );
+		buf[8] = 0;
+
+		// each field shaped like: [length:number][content:string]
+		paramDisplays += '0' + strlen(buf); // add length descriptor (length is up to 8)
+		paramDisplays += buf;
+	}
+
+	sendMessage( message( IdVstParameterDisplays ).addString( paramDisplays.c_str() ) );
+}
+
+
+
+// join the ParameterLabels (units) and send them to host
+void RemoteVstPlugin::getParameterLabels()
+{
+	std::string paramLabels;
+	static char buf[9]; // buffer for getting string
+	for (int i=0; i< m_plugin->numParams; ++i)
+	{
+		memset( buf, 0, sizeof( buf ) ); // fill with '\0' because got string may not to be ended with '\0'
+		pluginDispatch( effGetParamLabel, i, 0, buf );
+		buf[8] = 0;
+
+		// each field shaped like: [length:number][content:string]
+		paramLabels += '0' + strlen(buf); // add length descriptor (length is up to 8)
+		paramLabels += buf;
+	}
+
+	sendMessage( message( IdVstParameterLabels ).addString( paramLabels.c_str() ) );
+}
+
+
+
+
 void RemoteVstPlugin::sendCurrentProgramName()
 {
 	char presName[64];
@@ -1085,7 +1142,7 @@ void RemoteVstPlugin::getParameterDump()
 
 	for( int i = 0; i < m_plugin->numParams; ++i )
 	{
-		char paramName[32];
+		char paramName[256];
 		memset( paramName, 0, sizeof( paramName ) );
 		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
@@ -1124,7 +1181,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 {
 	if( m_plugin->flags & 32 )
 	{
-		void * chunk = NULL;
+		void * chunk = nullptr;
 		const int len = pluginDispatch( 23, 0, 0, &chunk );
 		if( len > 0 )
 		{
@@ -1255,7 +1312,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	unsigned int chunk_size = 0;
 	sBank * pBank = ( sBank* ) new char[ sizeof( sBank ) ];
 	char progName[ 128 ] = { 0 };
-	char* data = NULL;
+	char* data = nullptr;
 	const bool chunky = ( m_plugin->flags & ( 1 << 5 ) ) != 0;
 	bool isPreset = _file.substr( _file.find_last_of( "." ) + 1 )  == "fxp";
 	int presNameLen = _file.find_last_of( "/" ) + _file.find_last_of( "\\" ) + 2;
@@ -1299,7 +1356,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
 	pBank->numPrograms = endian_swap( uIntToFile );
 
-	FILE * stream = F_OPEN_UTF8( _file, "w" );
+	FILE * stream = F_OPEN_UTF8( _file, "wb" );
 	if (!stream)
 	{
 		fprintf( stderr,
@@ -1353,11 +1410,11 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 
 void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 {
-	void * chunk = NULL;
+	void * chunk = nullptr;
 	unsigned int * pLen = new unsigned int[ 1 ];
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
-	FILE * stream = F_OPEN_UTF8( _file, "r" );
+	FILE * stream = F_OPEN_UTF8( _file, "rb" );
 	if (!stream)
 	{
 		fprintf( stderr,
@@ -1509,8 +1566,8 @@ int RemoteVstPlugin::updateInOutCount()
 	delete[] m_inputs;
 	delete[] m_outputs;
 
-	m_inputs = NULL;
-	m_outputs = NULL;
+	m_inputs = nullptr;
+	m_outputs = nullptr;
 
 	setInputOutputCount( inputCount(), outputCount() );
 
@@ -1560,7 +1617,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 #endif
 
 	// workaround for early callbacks by some plugins
-	if( __plugin && __plugin->m_plugin == NULL )
+	if( __plugin && __plugin->m_plugin == nullptr )
 	{
 		__plugin->m_plugin = _effect;
 	}
@@ -2017,8 +2074,8 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 
 bool RemoteVstPlugin::setupMessageWindow()
 {
-	HMODULE hInst = GetModuleHandle( NULL );
-	if( hInst == NULL )
+	HMODULE hInst = GetModuleHandle( nullptr );
+	if( hInst == nullptr )
 	{
 		__plugin->debugMessage( "setupMessageWindow(): can't get "
 							"module handle\n" );
@@ -2026,10 +2083,10 @@ bool RemoteVstPlugin::setupMessageWindow()
 	}
 
 	__MessageHwnd = CreateWindowEx( 0, "LVSL", "dummy",
-						0, 0, 0, 0, 0, NULL, NULL,
-								hInst, NULL );
+						0, 0, 0, 0, 0, nullptr, nullptr,
+								hInst, nullptr );
 	// install GUI update timer
-	SetTimer( __MessageHwnd, 1000, 50, NULL );
+	SetTimer( __MessageHwnd, 1000, 50, nullptr );
 
 	return true;
 }
@@ -2040,7 +2097,7 @@ bool RemoteVstPlugin::setupMessageWindow()
 DWORD WINAPI RemoteVstPlugin::guiEventLoop()
 {
 	MSG msg;
-	while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
+	while( GetMessage( &msg, nullptr, 0, 0 ) > 0 )
 	{
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
@@ -2131,8 +2188,8 @@ int main( int _argc, char * * _argv )
 	}
 #endif
 
-	HMODULE hInst = GetModuleHandle( NULL );
-	if( hInst == NULL )
+	HMODULE hInst = GetModuleHandle( nullptr );
+	if( hInst == nullptr )
 	{
 		return -1;
 	}
@@ -2143,10 +2200,10 @@ int main( int _argc, char * * _argv )
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInst;
-	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wc.hbrBackground = NULL;
-	wc.lpszMenuName = NULL;
+	wc.hIcon = LoadIcon( nullptr, IDI_APPLICATION );
+	wc.hCursor = LoadCursor( nullptr, IDC_ARROW );
+	wc.hbrBackground = nullptr;
+	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = "LVSL";
 
 	if( !RegisterClass( &wc ) )
@@ -2208,8 +2265,8 @@ int main( int _argc, char * * _argv )
 		{
 			return -1;
 		}
-		if( CreateThread( NULL, 0, RemoteVstPlugin::processingThread,
-						__plugin, 0, NULL ) == NULL )
+		if( CreateThread( nullptr, 0, RemoteVstPlugin::processingThread,
+						__plugin, 0, nullptr ) == nullptr )
 		{
 			__plugin->debugMessage( "could not create "
 							"processingThread\n" );

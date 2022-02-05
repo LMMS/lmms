@@ -29,15 +29,18 @@
 #include <QApplication>
 #include <QLayout>
 #include <QMdiArea>
+#include <QScrollBar>
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "BBTrack.h"
+#include "DataFile.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
+#include "InstrumentTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "GuiApplication.h"
@@ -47,7 +50,7 @@ using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	JournallingObject(),
 	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
@@ -122,9 +125,9 @@ TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
-	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
+	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
 				_tv->getTrackContentWidget(),
-				SLOT( changePosition( const MidiTime & ) ) );
+				SLOT( changePosition( const TimePos & ) ) );
 	realignTracks();
 	return( _tv );
 }
@@ -265,9 +268,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	delete t;
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -291,7 +294,7 @@ const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 			return( *it );
 		}
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 
@@ -300,6 +303,14 @@ const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 bool TrackContainerView::allowRubberband() const
 {
 	return( false );
+}
+
+
+
+
+bool TrackContainerView::knifeMode() const
+{
+	return false;
 }
 
 
@@ -371,7 +382,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile" 
+	else if( type == "samplefile" || type == "pluginpresetfile"
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{
@@ -379,7 +390,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		PluginFactory::PluginInfoAndKey piakn =
-			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
@@ -404,7 +415,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 	else if( type == "projectfile")
 	{
-		if( gui->mainWindow()->mayChangeProject(true) )
+		if( getGUI()->mainWindow()->mayChangeProject(true) )
 		{
 			Engine::getSong()->loadProject( value );
 		}

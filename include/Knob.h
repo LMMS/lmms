@@ -26,8 +26,11 @@
 #ifndef KNOB_H
 #define KNOB_H
 
+#include <memory>
+#include <QPixmap>
 #include <QWidget>
 #include <QtCore/QPoint>
+#include <QTextDocument>
 
 #include "AutomatableModelView.h"
 
@@ -41,6 +44,7 @@ enum knobTypes
 } ;
 
 
+void convertPixmapToGrayScale(QPixmap &pixMap);
 
 class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
@@ -58,8 +62,12 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	// Unfortunately, the gradient syntax doesn't create our gradient
 	// correctly so we need to do this:
 	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
-	Q_PROPERTY(QColor lineColor READ lineColor WRITE setlineColor)
-	Q_PROPERTY(QColor arcColor READ arcColor WRITE setarcColor)
+
+	Q_PROPERTY(QColor lineActiveColor MEMBER m_lineActiveColor)
+	Q_PROPERTY(QColor lineInactiveColor MEMBER m_lineInactiveColor)
+	Q_PROPERTY(QColor arcActiveColor MEMBER m_arcActiveColor)
+	Q_PROPERTY(QColor arcInactiveColor MEMBER m_arcInactiveColor)
+
 	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
@@ -71,10 +79,9 @@ class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
 
 public:
-	Knob( knobTypes _knob_num, QWidget * _parent = NULL, const QString & _name = QString() );
-	Knob( QWidget * _parent = NULL, const QString & _name = QString() ); //!< default ctor
+	Knob( knobTypes _knob_num, QWidget * _parent = nullptr, const QString & _name = QString() );
+	Knob( QWidget * _parent = nullptr, const QString & _name = QString() ); //!< default ctor
 	Knob( const Knob& other ) = delete;
-	virtual ~Knob();
 
 	// TODO: remove
 	inline void setHintText( const QString & _txt_before,
@@ -84,6 +91,7 @@ public:
 		setUnit( _txt_after );
 	}
 	void setLabel( const QString & txt );
+	void setHtmlLabel( const QString &htmltxt );
 
 	void setTotalAngle( float angle );
 
@@ -108,10 +116,6 @@ public:
 
 	QColor outerColor() const;
 	void setOuterColor( const QColor & c );
-	QColor lineColor() const;
-	void setlineColor( const QColor & c );
-	QColor arcColor() const;
-	void setarcColor( const QColor & c );
 	
 	QColor textColor() const;
 	void setTextColor( const QColor & c );
@@ -134,6 +138,7 @@ protected:
 	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _me ) override;
 	void wheelEvent( QWheelEvent * _me ) override;
+	void changeEvent(QEvent * ev) override;
 
 	virtual float getValue( const QPoint & _p );
 
@@ -143,7 +148,7 @@ private slots:
 	void toggleScale();
 
 private:
-	QString displayValue() const;
+	virtual QString displayValue() const;
 
 	void doConnections() override;
 
@@ -168,13 +173,14 @@ private:
 	static TextFloat * s_textFloat;
 
 	QString m_label;
+	bool m_isHtmlLabel;
+	QTextDocument* m_tdRenderer;
 
-	QPixmap * m_knobPixmap;
+	std::unique_ptr<QPixmap> m_knobPixmap;
 	BoolModel m_volumeKnob;
 	FloatModel m_volumeRatio;
 
-	QPoint m_mouseOffset;
-	QPoint m_origMousePos;
+	QPoint m_lastMousePos; //!< mouse position in last mouseMoveEvent
 	float m_leftOver;
 	bool m_buttonPressed;
 
@@ -188,8 +194,11 @@ private:
 	float m_outerRadius;
 	float m_lineWidth;
 	QColor m_outerColor;
-	QColor m_lineColor; //!< unused yet
-	QColor m_arcColor; //!< unused yet
+
+	QColor m_lineActiveColor;
+	QColor m_lineInactiveColor;
+	QColor m_arcActiveColor;
+	QColor m_arcInactiveColor;
 	
 	QColor m_textColor;
 

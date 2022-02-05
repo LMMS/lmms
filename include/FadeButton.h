@@ -26,9 +26,9 @@
 #ifndef FADE_BUTTON_H
 #define FADE_BUTTON_H
 
-#include <QtCore/QTime>
 #include <QAbstractButton>
 #include <QColor>
+#include <QElapsedTimer>
 
 
 class FadeButton : public QAbstractButton
@@ -46,17 +46,17 @@ public:
 
 public slots:
 	void activate();
+	void activateOnce();
 	void noteEnd();
 
 
 protected:
-	void customEvent( QEvent * ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private:
-	QTime m_stateTimer;
-	QTime m_releaseTimer;
+	QElapsedTimer m_stateTimer;
+	QElapsedTimer m_releaseTimer;
 
 	// the default color of the widget
 	QColor m_normalColor;
@@ -66,8 +66,7 @@ private:
 	QColor m_holdColor;
 	int activeNotes;
 
-	void signalUpdate();
-	QColor fadeToColor(QColor, QColor, QTime, float);
+	QColor fadeToColor(QColor, QColor, QElapsedTimer, float);
 
 } ;
 

@@ -8,11 +8,18 @@
 
 #cmakedefine LMMS_HOST_X86
 #cmakedefine LMMS_HOST_X86_64
+#cmakedefine LMMS_HOST_ARM32
+#cmakedefine LMMS_HOST_ARM64
+#cmakedefine LMMS_HOST_RISCV32
+#cmakedefine LMMS_HOST_RISCV64
 
 #cmakedefine LMMS_HAVE_ALSA
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
 #cmakedefine LMMS_HAVE_JACK
+#cmakedefine LMMS_HAVE_JACK_PRENAME
 #cmakedefine LMMS_HAVE_WEAKJACK
+#cmakedefine LMMS_HAVE_LV2
+#cmakedefine LMMS_HAVE_SUIL
 #cmakedefine LMMS_HAVE_MP3LAME
 #cmakedefine LMMS_HAVE_OGGVORBIS
 #cmakedefine LMMS_HAVE_OSS

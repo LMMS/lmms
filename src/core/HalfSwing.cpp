@@ -29,9 +29,9 @@
 #include "Groove.h"
 #include "HalfSwing.h"
 #include "lmms_basics.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "Song.h"
 
 #include "stdio.h"
@@ -69,8 +69,8 @@ void HalfSwing::update()
 }
 
 
-int HalfSwing::isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset,
-					Note * n, Pattern * p)
+int HalfSwing::isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t offset,
+					Note * n, MidiClip* c)
 {
 	// TODO why is this wrong on boot how do we set it once not every loop
 	if (m_framesPerTick == 0)

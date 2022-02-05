@@ -22,6 +22,7 @@
  *
  */
 
+#include "audio_file_processor.h"
 
 #include <QPainter>
 #include <QBitmap>
@@ -31,18 +32,19 @@
 
 #include <samplerate.h>
 
-#include "audio_file_processor.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "Engine.h"
-#include "Song.h"
-#include "InstrumentTrack.h"
-#include "Mixer.h"
-#include "NotePlayHandle.h"
-#include "interpolation.h"
-#include "gui_templates.h"
-#include "ToolTip.h"
-#include "StringPairDrag.h"
 #include "DataFile.h"
+#include "Engine.h"
+#include "gui_templates.h"
+#include "InstrumentTrack.h"
+#include "interpolation.h"
+#include "NotePlayHandle.h"
+#include "PathUtil.h"
+#include "Song.h"
+#include "StringPairDrag.h"
+#include "ToolTip.h"
+#include "Clipboard.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -54,7 +56,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"AudioFileProcessor",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Simple sampler with various settings for "
 				"using samples (e.g. drums) in an "
 				"instrument-track" ),
@@ -63,7 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"wav,ogg,ds,spx,au,voc,aif,aiff,flac,raw",
-	NULL
+	nullptr,
 } ;
 
 }
@@ -86,24 +88,24 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_nextPlayBackwards( false )
 {
 	connect( &m_reverseModel, SIGNAL( dataChanged() ),
-				this, SLOT( reverseModelChanged() ) );
+				this, SLOT( reverseModelChanged() ), Qt::DirectConnection );
 	connect( &m_ampModel, SIGNAL( dataChanged() ),
-				this, SLOT( ampModelChanged() ) );
+				this, SLOT( ampModelChanged() ), Qt::DirectConnection );
 	connect( &m_startPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( startPointChanged() ) );
+				this, SLOT( startPointChanged() ), Qt::DirectConnection );
 	connect( &m_endPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( endPointChanged() ) );
+				this, SLOT( endPointChanged() ), Qt::DirectConnection );
 	connect( &m_loopPointModel, SIGNAL( dataChanged() ),
-				this, SLOT( loopPointChanged() ) );
+				this, SLOT( loopPointChanged() ), Qt::DirectConnection );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
-	    		this, SLOT( stutterModelChanged() ) );
-	    		
+				this, SLOT( stutterModelChanged() ), Qt::DirectConnection );
+
 //interpolation modes
 	m_interpolationModel.addItem( tr( "None" ) );
 	m_interpolationModel.addItem( tr( "Linear" ) );
 	m_interpolationModel.addItem( tr( "Sinc" ) );
 	m_interpolationModel.setValue( 1 );
-	
+
 	pointChanged();
 }
 
@@ -237,7 +239,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	{
 		setAudioFile( _this.attribute( "src" ), false );
 
-		QString absolutePath = m_sampleBuffer.tryToMakeAbsolute( m_sampleBuffer.audioFile() );
+		QString absolutePath = PathUtil::toAbsolute( m_sampleBuffer.audioFile() );
 		if ( !QFileInfo( absolutePath ).exists() )
 		{
 			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
@@ -253,17 +255,16 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	m_loopModel.loadSettings( _this, "looped" );
 	m_ampModel.loadSettings( _this, "amp" );
 	m_endPointModel.loadSettings( _this, "eframe" );
+	m_startPointModel.loadSettings( _this, "sframe" );
 
 	// compat code for not having a separate loopback point
-	if( _this.hasAttribute( "lframe" ) )
+	if (_this.hasAttribute("lframe") || !(_this.firstChildElement("lframe").isNull()))
 	{
 		m_loopPointModel.loadSettings( _this, "lframe" );
-		m_startPointModel.loadSettings( _this, "sframe" );
 	}
 	else
 	{
 		m_loopPointModel.loadSettings( _this, "sframe" );
-		m_startPointModel.setValue( m_loopPointModel.value() );
 	}
 
 	m_reverseModel.loadSettings( _this, "reversed" );
@@ -302,8 +303,9 @@ QString audioFileProcessor::nodeName( void ) const
 
 int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
-	const float freq_factor = BaseFreq / _n->frequency() *
-			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
+	const auto baseFreq = instrumentTrack()->baseFreq();
+	const float freq_factor = baseFreq / _n->frequency() *
+			Engine::audioEngine()->processingSampleRate() / Engine::audioEngine()->baseSampleRate();
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
@@ -330,7 +332,7 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 				m_sampleBuffer.audioFile().isEmpty() ) )
 	{
 		// then set it to new one
-		instrumentTrack()->setName( QFileInfo( _audio_file).fileName() );
+		instrumentTrack()->setName( PathUtil::cleanName( _audio_file ) );
 	}
 	// else we don't touch the track-name, because the user named it self
 
@@ -364,7 +366,7 @@ void audioFileProcessor::stutterModelChanged()
 }
 
 
-void audioFileProcessor::startPointChanged( void ) 
+void audioFileProcessor::startPointChanged( void )
 {
 	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
@@ -391,7 +393,7 @@ void audioFileProcessor::startPointChanged( void )
 	{
 		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
 	}
-	
+
 	pointChanged();
 
 }
@@ -444,14 +446,14 @@ void audioFileProcessor::pointChanged( void )
 
 
 
-QPixmap * AudioFileProcessorView::s_artwork = NULL;
+QPixmap * AudioFileProcessorView::s_artwork = nullptr;
 
 
 AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-	if( s_artwork == NULL )
+	if( s_artwork == nullptr )
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
@@ -541,7 +543,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 // interpolation selector
 	m_interpBox = new ComboBox( this );
-	m_interpBox->setGeometry( 142, 62, 82, 22 );
+	m_interpBox->setGeometry( 142, 62, 82, ComboBox::DEFAULT_HEIGHT );
 	m_interpBox->setFont( pointSize<8>( m_interpBox->font() ) );
 
 // wavegraph
@@ -568,11 +570,14 @@ AudioFileProcessorView::~AudioFileProcessorView()
 
 void AudioFileProcessorView::dragEnterEvent( QDragEnterEvent * _dee )
 {
-	if( _dee->mimeData()->hasFormat( StringPairDrag::mimeType() ) )
+	// For mimeType() and MimeType enum class
+	using namespace Clipboard;
+
+	if( _dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
 	{
 		QString txt = _dee->mimeData()->data(
-						StringPairDrag::mimeType() );
-		if( txt.section( ':', 0, 0 ) == QString( "tco_%1" ).arg(
+						mimeType( MimeType::StringPair ) );
+		if( txt.section( ':', 0, 0 ) == QString( "clip_%1" ).arg(
 							Track::SampleTrack ) )
 		{
 			_dee->acceptProposedAction();
@@ -625,7 +630,7 @@ void AudioFileProcessorView::dropEvent( QDropEvent * _de )
 		newWaveView();
 		return;
 	}
-	else if( type == QString( "tco_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		castModel<audioFileProcessor>()->setAudioFile( dataFile.content().firstChild().toElement().attribute( "src" ) );
@@ -867,7 +872,7 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 
 void AudioFileProcessorWaveView::wheelEvent( QWheelEvent * _we )
 {
-	zoom( _we->delta() > 0 );
+	zoom( _we->angleDelta().y() > 0 );
 	update();
 }
 
@@ -1143,7 +1148,7 @@ void AudioFileProcessorWaveView::slideSamplePointByFrames( knobType _point, f_cn
 		case start:
 			break;
 	}
-	if( a_knob == NULL )
+	if( a_knob == nullptr )
 	{
 		return;
 	}
@@ -1285,7 +1290,3 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * model, void *)
 
 
 }
-
-
-
-

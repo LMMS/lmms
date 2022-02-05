@@ -25,7 +25,8 @@
 #ifndef INLINE_AUTOMATION_H
 #define INLINE_AUTOMATION_H
 
-#include "AutomationPattern.h"
+#include "AutomationNode.h"
+#include "AutomationClip.h"
 #include "shared_object.h"
 
 
@@ -35,15 +36,15 @@ public:
 	InlineAutomation() :
 		FloatModel(),
 		sharedObject(),
-		m_autoPattern( NULL )
+		m_autoClip( nullptr )
 	{
 	}
 
 	virtual ~InlineAutomation()
 	{
-		if( m_autoPattern )
+		if( m_autoClip )
 		{
-			delete m_autoPattern;
+			delete m_autoClip;
 		}
 	}
 
@@ -51,14 +52,19 @@ public:
 
 	bool hasAutomation() const
 	{
-		if( m_autoPattern != NULL && m_autoPattern->getTimeMap().isEmpty() == false )
+		if( m_autoClip != nullptr && m_autoClip->getTimeMap().isEmpty() == false )
 		{
-			// prevent saving inline automation if there's just one value which equals value
-			// of model which is going to be saved anyways
-			if( isAtInitValue() &&
-				m_autoPattern->getTimeMap().size() == 1 &&
-				m_autoPattern->getTimeMap().keys().first() == 0 &&
-				m_autoPattern->getTimeMap().values().first() == value() )
+			// Prevent saving inline automation if there's just one node at the beginning of
+			// the clip, which has a InValue equal to the value of model (which is going
+			// to be saved anyways) and no offset between the InValue and OutValue
+			AutomationClip::timeMap::const_iterator firstNode =
+				m_autoClip->getTimeMap().begin();
+
+			if (isAtInitValue()
+				&& m_autoClip->getTimeMap().size() == 1
+				&& POS(firstNode) == 0
+				&& INVAL(firstNode) == value()
+				&& OFFSET(firstNode) == 0)
 			{
 				return false;
 			}
@@ -69,14 +75,14 @@ public:
 		return false;
 	}
 
-	AutomationPattern * automationPattern()
+	AutomationClip * automationClip()
 	{
-		if( m_autoPattern == NULL )
+		if( m_autoClip == nullptr )
 		{
-			m_autoPattern = new AutomationPattern( NULL );
-			m_autoPattern->addObject( this );
+			m_autoClip = new AutomationClip( nullptr );
+			m_autoClip->addObject( this );
 		}
-		return m_autoPattern;
+		return m_autoClip;
 	}
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
@@ -84,7 +90,7 @@ public:
 
 
 private:
-	AutomationPattern * m_autoPattern;
+	AutomationClip * m_autoClip;
 
 } ;
 

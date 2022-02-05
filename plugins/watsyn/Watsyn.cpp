@@ -26,12 +26,12 @@
 
 #include "Watsyn.h"
 #include "base64.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
-#include "Mixer.h"
 #include "interpolation.h"
 
 #include "embed.h"
@@ -44,14 +44,14 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Watsyn",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"4-oscillator modulatable wavetable synth" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -102,9 +102,9 @@ WatsynObject::~WatsynObject()
 
 void WatsynObject::renderOutput( fpp_t _frames )
 {
-	if( m_abuf == NULL )
+	if( m_abuf == nullptr )
 		m_abuf = new sampleFrame[m_fpp];
-	if( m_bbuf == NULL )
+	if( m_bbuf == nullptr )
 		m_bbuf = new sampleFrame[m_fpp];
 
 	for( fpp_t frame = 0; frame < _frames; frame++ )
@@ -330,7 +330,7 @@ WatsynInstrument::~WatsynInstrument()
 void WatsynInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 		WatsynObject * w = new WatsynObject(
 				&A1_wave[0],
@@ -338,8 +338,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 				&B1_wave[0],
 				&B2_wave[0],
 				m_amod.value(), m_bmod.value(),
-				Engine::mixer()->processingSampleRate(), _n,
-				Engine::mixer()->framesPerPeriod(), this );
+				Engine::audioEngine()->processingSampleRate(), _n,
+				Engine::audioEngine()->framesPerPeriod(), this );
 
 		_n->m_pluginData = w;
 	}
@@ -365,7 +365,7 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 
 	// if sample-exact is enabled, use sample-exact calculations...
 	// disabled pending proper implementation of sample-exactness
-/*	if( engine::mixer()->currentQualitySettings().sampleExactControllers )
+/*	if( engine::audioEngine()->currentQualitySettings().sampleExactControllers )
 	{
 		for( fpp_t f=0; f < frames; f++ )
 		{
@@ -722,25 +722,25 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 // button groups next.
 // graph select buttons
-	PixmapButton * a1_selectButton = new PixmapButton( this, NULL );
+	PixmapButton * a1_selectButton = new PixmapButton( this, nullptr );
 	a1_selectButton -> move( 4, 121 );
 	a1_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "a1_active" ) );
 	a1_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "a1_inactive" ) );
 	ToolTip::add( a1_selectButton, tr( "Select oscillator A1") );
 
-	PixmapButton * a2_selectButton = new PixmapButton( this, NULL );
+	PixmapButton * a2_selectButton = new PixmapButton( this, nullptr );
 	a2_selectButton -> move( 44, 121 );
 	a2_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "a2_active" ) );
 	a2_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "a2_inactive" ) );
 	ToolTip::add( a2_selectButton, tr( "Select oscillator A2") );
 
-	PixmapButton * b1_selectButton = new PixmapButton( this, NULL );
+	PixmapButton * b1_selectButton = new PixmapButton( this, nullptr );
 	b1_selectButton -> move( 84, 121 );
 	b1_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "b1_active" ) );
 	b1_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "b1_inactive" ) );
 	ToolTip::add( b1_selectButton, tr( "Select oscillator B1") );
 
-	PixmapButton * b2_selectButton = new PixmapButton( this, NULL );
+	PixmapButton * b2_selectButton = new PixmapButton( this, nullptr );
 	b2_selectButton -> move( 124, 121 );
 	b2_selectButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "b2_active" ) );
 	b2_selectButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "b2_inactive" ) );
@@ -755,25 +755,25 @@ WatsynView::WatsynView( Instrument * _instrument,
 	m_selectedGraphGroup -> setModel( &w -> m_selectedGraph);
 
 // A-modulation button group
-	PixmapButton * amod_mixButton = new PixmapButton( this, NULL );
+	PixmapButton * amod_mixButton = new PixmapButton( this, nullptr );
 	amod_mixButton -> move( 4, 50 );
 	amod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "amix_active" ) );
 	amod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "amix_inactive" ) );
 	ToolTip::add( amod_mixButton, tr( "Mix output of A2 to A1" ) );
 
-	PixmapButton * amod_amButton = new PixmapButton( this, NULL );
+	PixmapButton * amod_amButton = new PixmapButton( this, nullptr );
 	amod_amButton -> move( 4, 66 );
 	amod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_active" ) );
 	amod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "aam_inactive" ) );
 	ToolTip::add( amod_amButton, tr( "Modulate amplitude of A1 by output of A2" ) );
 
-	PixmapButton * amod_rmButton = new PixmapButton( this, NULL );
+	PixmapButton * amod_rmButton = new PixmapButton( this, nullptr );
 	amod_rmButton -> move( 4, 82 );
 	amod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_active" ) );
 	amod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "arm_inactive" ) );
 	ToolTip::add( amod_rmButton, tr( "Ring modulate A1 and A2" ) );
 
-	PixmapButton * amod_pmButton = new PixmapButton( this, NULL );
+	PixmapButton * amod_pmButton = new PixmapButton( this, nullptr );
 	amod_pmButton -> move( 4, 98 );
 	amod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_active" ) );
 	amod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "apm_inactive" ) );
@@ -786,25 +786,25 @@ WatsynView::WatsynView( Instrument * _instrument,
 	m_aModGroup -> addButton( amod_pmButton );
 
 // B-modulation button group
-	PixmapButton * bmod_mixButton = new PixmapButton( this, NULL );
+	PixmapButton * bmod_mixButton = new PixmapButton( this, nullptr );
 	bmod_mixButton -> move( 44, 50 );
 	bmod_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bmix_active" ) );
 	bmod_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bmix_inactive" ) );
 	ToolTip::add( bmod_mixButton, tr( "Mix output of B2 to B1" ) );
 
-	PixmapButton * bmod_amButton = new PixmapButton( this, NULL );
+	PixmapButton * bmod_amButton = new PixmapButton( this, nullptr );
 	bmod_amButton -> move( 44, 66 );
 	bmod_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_active" ) );
 	bmod_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bam_inactive" ) );
 	ToolTip::add( bmod_amButton, tr( "Modulate amplitude of B1 by output of B2" ) );
 
-	PixmapButton * bmod_rmButton = new PixmapButton( this, NULL );
+	PixmapButton * bmod_rmButton = new PixmapButton( this, nullptr );
 	bmod_rmButton -> move( 44, 82 );
 	bmod_rmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_active" ) );
 	bmod_rmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "brm_inactive" ) );
 	ToolTip::add( bmod_rmButton, tr( "Ring modulate B1 and B2" ) );
 
-	PixmapButton * bmod_pmButton = new PixmapButton( this, NULL );
+	PixmapButton * bmod_pmButton = new PixmapButton( this, nullptr );
 	bmod_pmButton -> move( 44, 98 );
 	bmod_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_active" ) );
 	bmod_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bpm_inactive" ) );

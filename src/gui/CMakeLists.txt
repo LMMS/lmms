@@ -5,37 +5,51 @@ SET(LMMS_SRCS
 	gui/AudioAlsaSetupWidget.cpp
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
-	gui/AutomationPatternView.cpp
+	gui/AutomationClipView.cpp
+	gui/AutomationTrackView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
+	gui/BBClipView.cpp
+	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
 	gui/ExportProjectDialog.cpp
 	gui/FileBrowser.cpp
-	gui/FxMixerView.cpp
+	gui/MixerView.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
+	gui/InstrumentTrackView.cpp
+	gui/InstrumentTrackWindow.cpp
 	gui/LfoControllerDialog.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
+	gui/Lv2ViewBase.cpp
 	gui/MainApplication.cpp
 	gui/MainWindow.cpp
+	gui/MidiCCRackView.cpp
+	gui/MidiClipView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
+	gui/SampleClipView.cpp
+	gui/SampleTrackView.cpp
+	gui/SampleTrackWindow.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
+	gui/ClipView.cpp
+	gui/TrackView.cpp
 
 	gui/dialogs/FileDialog.cpp
 	gui/dialogs/VersionedSaveDialog.cpp
+	gui/dialogs/ColorChooser.cpp
 
 	gui/editors/AutomationEditor.cpp
 	gui/editors/BBEditor.cpp
@@ -52,30 +66,39 @@ SET(LMMS_SRCS
 	gui/widgets/ComboBox.cpp
 	gui/widgets/ControllerRackView.cpp
 	gui/widgets/ControllerView.cpp
+	gui/widgets/Controls.cpp
 	gui/widgets/CPULoadWidget.cpp
+	gui/widgets/CustomTextKnob.cpp
 	gui/widgets/EffectRackView.cpp
 	gui/widgets/EffectView.cpp
 	gui/widgets/EnvelopeAndLfoView.cpp
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
-	gui/widgets/FxLine.cpp
-	gui/widgets/FxLineLcdSpinBox.cpp
+	gui/widgets/MixerLine.cpp
+	gui/widgets/MixerLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GrooveView.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
+	gui/widgets/InstrumentMiscView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp
 	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LadspaControlView.cpp
+	gui/widgets/LcdFloatSpinBox.cpp
 	gui/widgets/LcdSpinBox.cpp
 	gui/widgets/LcdWidget.cpp
 	gui/widgets/LedCheckbox.cpp
+	gui/widgets/ControlLayout.cpp
+	gui/widgets/LinkedModelGroupViews.cpp
 	gui/widgets/MeterDialog.cpp
+	gui/widgets/MicrotunerConfig.cpp
 	gui/widgets/MidiPortMenu.cpp
 	gui/widgets/NStateButton.cpp
+	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
+	gui/widgets/PositionLine.cpp
 	gui/widgets/ProjectNotes.cpp
 	gui/widgets/RenameDialog.cpp
 	gui/widgets/Rubberband.cpp
@@ -90,8 +113,9 @@ SET(LMMS_SRCS
 	gui/widgets/ToolButton.cpp
 	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
+	gui/widgets/TrackContentWidget.cpp
+	gui/widgets/TrackOperationsWidget.cpp
 	gui/widgets/TrackRenameLineEdit.cpp
-	gui/widgets/VisualizationWidget.cpp
 	gui/widgets/StepRecorderWidget.cpp
 
 	PARENT_SCOPE

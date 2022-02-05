@@ -46,19 +46,16 @@
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
-#	ifndef NOMINMAX
-#		define NOMINMAX
-#	endif
-
 #	include <windows.h>
 #	include <QLayout>
 #endif
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "GuiApplication.h"
 #include "LocaleHelper.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "PathUtil.h"
 #include "Song.h"
 #include "FileDialog.h"
 
@@ -121,19 +118,14 @@ private:
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	m_plugin( _plugin ),
+	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( gui
+	m_embedMethod( (getGUI() != nullptr)
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
 	m_currentProgram()
 {
-	if( QDir::isRelativePath( m_plugin ) )
-	{
-		m_plugin = ConfigManager::inst()->vstDir()  + m_plugin;
-	}
-
 	setSplittedChannels( true );
 
 	PE::MachineType machineType;
@@ -162,7 +154,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -251,7 +243,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	if ( m_embedMethod != "none" )
 	{
-		if( pluginWidget() != NULL )
+		if( pluginWidget() != nullptr )
 		{
 			_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
 		}
@@ -316,7 +308,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::mixer()->processingSampleRate() ) );
+			addInt( Engine::audioEngine()->processingSampleRate() ) );
 	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }
@@ -394,13 +386,13 @@ bool VstPlugin::processMessage( const message & _m )
 			// so this is legal despite MSDN's warning
 			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
 					GWLP_HWNDPARENT,
-					(LONG_PTR) gui->mainWindow()->winId() );
+					(LONG_PTR) getGUI()->mainWindow()->winId() );
 #endif
 
 #ifdef LMMS_BUILD_LINUX
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
-					gui->mainWindow()->winId() );
+					getGUI()->mainWindow()->winId() );
 #endif
 		}
 		break;
@@ -436,6 +428,14 @@ bool VstPlugin::processMessage( const message & _m )
 
 		case IdVstProgramNames:
 			m_allProgramNames = _m.getQString();
+			break;
+
+		case IdVstParameterLabels:
+			m_allParameterLabels = _m.getQString();
+			break;
+
+		case IdVstParameterDisplays:
+			m_allParameterDisplays = _m.getQString();
 			break;
 
 		case IdVstPluginUniqueID:
@@ -478,7 +478,7 @@ QWidget *VstPlugin::editor()
 void VstPlugin::openPreset( )
 {
 
-	FileDialog ofd( NULL, tr( "Open Preset" ), "",
+	FileDialog ofd( nullptr, tr( "Open Preset" ), "",
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted &&
@@ -531,12 +531,34 @@ void VstPlugin::loadProgramNames()
 
 
 
+void VstPlugin::loadParameterLabels()
+{
+	lock();
+	sendMessage( message( IdVstParameterLabels ) );
+	waitForMessage( IdVstParameterLabels, true );
+	unlock();
+}
+
+
+
+
+void VstPlugin::loadParameterDisplays()
+{
+	lock();
+	sendMessage( message( IdVstParameterDisplays ) );
+	waitForMessage( IdVstParameterDisplays, true );
+	unlock();
+}
+
+
+
+
 void VstPlugin::savePreset( )
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
-	presName.replace(tr("\""), tr("'")); // QFileDialog unable to handle double quotes properly
+	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	FileDialog sfd( NULL, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
+	FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 
 	if( p_name != "" ) // remember last directory
@@ -722,7 +744,7 @@ void VstPlugin::createUI( QWidget * parent )
 		SetWindowLong(pluginHandle, GWL_STYLE, style);
 		SetParent(pluginHandle, targetHandle);
 
-		DWORD threadId = GetWindowThreadProcessId(pluginHandle, NULL);
+		DWORD threadId = GetWindowThreadProcessId(pluginHandle, nullptr);
 		DWORD currentThreadId = GetCurrentThreadId();
 		AttachThreadInput(currentThreadId, threadId, true);
 
@@ -774,7 +796,3 @@ QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
 }
-
-
-
-

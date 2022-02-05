@@ -410,7 +410,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditor</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="1282"/>
-        <source>Please open an automation pattern with the context menu of a control!</source>
+        <source>Please open an automation clip with the context menu of a control!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -428,7 +428,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditorWindow</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2020"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -438,7 +438,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2026"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -588,7 +588,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2293"/>
-        <source>Automation Editor - no pattern</source>
+        <source>Automation Editor - no clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -598,73 +598,73 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2350"/>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>AutomationPattern</name>
+    <name>AutomationClip</name>
     <message>
-        <location filename="src/core/AutomationPattern.cpp" line="598"/>
+        <location filename="src/core/AutomationClip.cpp" line="598"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>AutomationPatternView</name>
+    <name>AutomationClipView</name>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="57"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="57"/>
         <source>double-click to open this pattern in automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="179"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="179"/>
         <source>Open in Automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="187"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="187"/>
         <source>Clear</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="190"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="190"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="193"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="193"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="196"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="196"/>
         <source>Set/clear record</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="199"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="199"/>
         <source>Flip Vertically (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="202"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="202"/>
         <source>Flip Horizontally (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="207"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="207"/>
         <source>%1 Connections</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="215"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="215"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="449"/>
-        <source>Model is already connected to this pattern.</source>
+        <location filename="src/gui/AutomationClipView.cpp" line="449"/>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -740,7 +740,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBTCOView</name>
+    <name>BBClipView</name>
     <message>
         <location filename="src/tracks/BBTrack.cpp" line="185"/>
         <source>Open in Beat+Bassline-Editor</source>
@@ -2698,112 +2698,112 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
 </context>
 <context>
-    <name>FxLine</name>
+    <name>MixerLine</name>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="71"/>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="71"/>
         <source>Channel send amount</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="85"/>
-        <source>The FX channel receives input from one or more instrument tracks.
- It in turn can be routed to multiple other FX channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
+        <location filename="src/gui/widgets/MixerLine.cpp" line="85"/>
+        <source>The Mixer channel receives input from one or more instrument tracks.
+ It in turn can be routed to multiple other mixer channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
 
-In order to route the channel to another channel, select the FX channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
+In order to route the channel to another channel, select the mixer channel and click on the &quot;send&quot; button on the channel you want to send to. The knob under the send button controls the level of signal that is sent to the channel.
 
-You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
+You can remove and move mixer channels in the context menu, which is accessed by right-clicking the mixer channel.
 </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="213"/>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="213"/>
         <source>Move &amp;left</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="214"/>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="214"/>
         <source>Move &amp;right</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="216"/>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="216"/>
         <source>Rename &amp;channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="221"/>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="221"/>
         <source>R&amp;emove channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="226"/>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="226"/>
         <source>Remove &amp;unused channels</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
-        <location filename="src/core/FxMixer.cpp" line="655"/>
+        <location filename="src/core/Mixer.cpp" line="655"/>
         <source>Master</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/core/FxMixer.cpp" line="655"/>
-        <location filename="src/core/FxMixer.cpp" line="779"/>
-        <location filename="src/core/FxMixer.cpp" line="781"/>
-        <source>FX %1</source>
+        <location filename="src/core/Mixer.cpp" line="655"/>
+        <location filename="src/core/Mixer.cpp" line="779"/>
+        <location filename="src/core/Mixer.cpp" line="781"/>
+        <source>Channel %1</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="66"/>
-        <source>FX-Mixer</source>
+        <location filename="src/gui/MixerView.cpp" line="66"/>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="276"/>
-        <source>FX Fader %1</source>
+        <location filename="src/gui/MixerView.cpp" line="276"/>
+        <source>Fader %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="281"/>
+        <location filename="src/gui/MixerView.cpp" line="281"/>
         <source>Mute</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="289"/>
-        <source>Mute this FX channel</source>
+        <location filename="src/gui/MixerView.cpp" line="289"/>
+        <source>Mute this mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="291"/>
+        <location filename="src/gui/MixerView.cpp" line="291"/>
         <source>Solo</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/FxMixerView.cpp" line="301"/>
-        <source>Solo FX channel</source>
+        <location filename="src/gui/MixerView.cpp" line="301"/>
+        <source>Solo mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="241"/>
-        <source>Rename FX channel</source>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="241"/>
+        <source>Rename mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/FxLine.cpp" line="242"/>
-        <source>Enter the new name for this FX channel</source>
+        <location filename="src/gui/widgets/MixerLine.cpp" line="242"/>
+        <source>Enter the new name for this mixer channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
-        <location filename="src/core/FxMixer.cpp" line="41"/>
-        <location filename="src/core/FxMixer.cpp" line="56"/>
+        <location filename="src/core/Mixer.cpp" line="41"/>
+        <location filename="src/core/Mixer.cpp" line="56"/>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation type="unfinished"/>
     </message>
@@ -3957,7 +3957,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="116"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -4015,7 +4015,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1200"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -4093,13 +4093,13 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1382"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1387"/>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1442"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -4780,12 +4780,12 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <location filename="src/gui/MainWindow.cpp" line="526"/>
-        <source>Show/hide FX Mixer</source>
+        <source>Show/hide Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/gui/MainWindow.cpp" line="531"/>
-        <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
+        <source>Click here to show or hide the Mixer. The Mixer is a very powerful tool for managing effects for your song. You can insert effects into different mixer-channels.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -4911,7 +4911,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <location filename="src/gui/MainWindow.cpp" line="1184"/>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6571,44 +6571,44 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PatternView</name>
+    <name>MidiClipView</name>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="730"/>
+        <location filename="src/tracks/MidiClip.cpp" line="730"/>
         <source>use mouse wheel to set velocity of a step</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="735"/>
+        <location filename="src/tracks/MidiClip.cpp" line="735"/>
         <source>double-click to open in Piano Roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="777"/>
+        <location filename="src/tracks/MidiClip.cpp" line="777"/>
         <source>Open in piano-roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="786"/>
+        <location filename="src/tracks/MidiClip.cpp" line="786"/>
         <source>Clear all notes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="789"/>
+        <location filename="src/tracks/MidiClip.cpp" line="789"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="792"/>
+        <location filename="src/tracks/MidiClip.cpp" line="792"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="800"/>
+        <location filename="src/tracks/MidiClip.cpp" line="800"/>
         <source>Add steps</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="802"/>
+        <location filename="src/tracks/MidiClip.cpp" line="802"/>
         <source>Remove steps</source>
         <translation type="unfinished"/>
     </message>
@@ -6834,7 +6834,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3035"/>
-        <source>Please open a pattern by double-clicking on it!</source>
+        <source>Please open a clip by double-clicking on it!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6848,7 +6848,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PianoRollWindow</name>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3970"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6863,7 +6863,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3973"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -7008,7 +7008,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="4246"/>
-        <source>Piano-Roll - no pattern</source>
+        <source>Piano-Roll - no clip</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -7385,7 +7385,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleTCOView</name>
+    <name>SampleClipView</name>
     <message>
         <location filename="src/tracks/SampleTrack.cpp" line="235"/>
         <source>double-click to select sample</source>
@@ -8335,7 +8335,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObject</name>
+    <name>Clip</name>
     <message>
         <location filename="src/core/Track.cpp" line="106"/>
         <source>Mute</source>
@@ -8343,7 +8343,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObjectView</name>
+    <name>ClipView</name>
     <message>
         <location filename="src/core/Track.cpp" line="696"/>
         <source>Current position</source>
@@ -8446,12 +8446,12 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <location filename="src/core/Track.cpp" line="1831"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/core/Track.cpp" line="1831"/>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -9759,7 +9759,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>fxLineLcdSpinBox</name>
+    <name>MixerLineLcdSpinBox</name>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1246"/>
         <source>Assign to:</source>
@@ -9767,7 +9767,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <location filename="src/tracks/InstrumentTrack.cpp" line="1246"/>
-        <source>New FX Channel</source>
+        <source>New mixer Channel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -10913,7 +10913,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>FreeBoyInstrument</name>
+    <name>papuInstrument</name>
     <message>
         <location filename="plugins/papu/papu_instrument.cpp" line="65"/>
         <source>Sweep time</source>
@@ -11036,7 +11036,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>FreeBoyInstrumentView</name>
+    <name>papuInstrumentView</name>
     <message>
         <location filename="plugins/papu/papu_instrument.cpp" line="459"/>
         <source>Sweep Time:</source>

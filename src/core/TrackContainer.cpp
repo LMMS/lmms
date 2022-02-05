@@ -29,7 +29,7 @@
 #include <QDomElement>
 #include <QWriteLocker>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -43,7 +43,7 @@
 #include "TextFloat.h"
 
 TrackContainer::TrackContainer() :
-	Model( NULL ),
+	Model( nullptr ),
 	JournallingObject(),
 	m_tracksMutex(),
 	m_tracks()
@@ -86,16 +86,16 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		clearAllTracks();
 	}
 
-	static QProgressDialog * pd = NULL;
-	bool was_null = ( pd == NULL );
-	if( !journalRestore && gui != nullptr )
+	static QProgressDialog * pd = nullptr;
+	bool was_null = ( pd == nullptr );
+	if( !journalRestore && getGUI() != nullptr )
 	{
-		if( pd == NULL )
+		if( pd == nullptr )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						Engine::getSong()->getLoadingTrackCount(),
-						gui->mainWindow() );
+						getGUI()->mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -105,14 +105,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	while( !node.isNull() )
 	{
-		if( pd != NULL )
+		if( pd != nullptr )
 		{
 			pd->setValue( pd->value() + 1 );
 			QCoreApplication::instance()->processEvents(
 						QEventLoop::AllEvents, 100 );
 			if( pd->wasCanceled() )
 			{
-				if ( gui )
+				if ( getGUI() != nullptr )
 				{
 					TextFloat::displayMessage( tr( "Loading cancelled" ),
 					tr( "Project loading was cancelled." ),
@@ -130,7 +130,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 			QString trackName = node.toElement().hasAttribute( "name" ) ?
 						node.toElement().attribute( "name" ) :
 						node.firstChild().toElement().attribute( "name" );
-			if( pd != NULL )
+			if( pd != nullptr )
 			{
 				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
 						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
@@ -140,12 +140,12 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		node = node.nextSibling();
 	}
 
-	if( pd != NULL )
+	if( pd != nullptr )
 	{
 		if( was_null )
 		{
 			delete pd;
-			pd = NULL;
+			pd = nullptr;
 		}
 	}
 }
@@ -238,7 +238,7 @@ bool TrackContainer::isEmpty() const
 	for( TrackList::const_iterator it = m_tracks.begin();
 						it != m_tracks.end(); ++it )
 	{
-		if( !( *it )->getTCOs().isEmpty() )
+		if( !( *it )->getClips().isEmpty() )
 		{
 			return false;
 		}
@@ -248,15 +248,15 @@ bool TrackContainer::isEmpty() const
 
 
 
-AutomatedValueMap TrackContainer::automatedValuesAt(MidiTime time, int tcoNum) const
+AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int clipNum) const
 {
-	return automatedValuesFromTracks(tracks(), time, tcoNum);
+	return automatedValuesFromTracks(tracks(), time, clipNum);
 }
 
 
-AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, MidiTime time, int tcoNum)
+AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int clipNum)
 {
-	Track::tcoVector tcos;
+	Track::clipVector clips;
 
 	for (Track* track: tracks)
 	{
@@ -269,11 +269,11 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		case Track::AutomationTrack:
 		case Track::HiddenAutomationTrack:
 		case Track::BBTrack:
-			if (tcoNum < 0) {
-				track->getTCOsInRange(tcos, 0, time);
+			if (clipNum < 0) {
+				track->getClipsInRange(clips, 0, time);
 			} else {
-				Q_ASSERT(track->numOfTCOs() > tcoNum);
-				tcos << track->getTCO(tcoNum);
+				Q_ASSERT(track->numOfClips() > clipNum);
+				clips << track->getClip(clipNum);
 			}
 		default:
 			break;
@@ -282,20 +282,20 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 
 	AutomatedValueMap valueMap;
 
-	Q_ASSERT(std::is_sorted(tcos.begin(), tcos.end(), TrackContentObject::comparePosition));
+	Q_ASSERT(std::is_sorted(clips.begin(), clips.end(), Clip::comparePosition));
 
-	for(TrackContentObject* tco : tcos)
+	for(Clip* clip : clips)
 	{
-		if (tco->isMuted() || tco->startPosition() > time) {
+		if (clip->isMuted() || clip->startPosition() > time) {
 			continue;
 		}
 
-		if (auto* p = dynamic_cast<AutomationPattern *>(tco))
+		if (auto* p = dynamic_cast<AutomationClip *>(clip))
 		{
 			if (! p->hasAutomation()) {
 				continue;
 			}
-			MidiTime relTime = time - p->startPosition();
+			TimePos relTime = time - p->startPosition();
 			if (! p->getAutoResize()) {
 				relTime = qMin(relTime, p->length());
 			}
@@ -306,14 +306,14 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 				valueMap[model] = value;
 			}
 		}
-		else if (auto* bb = dynamic_cast<BBTCO *>(tco))
+		else if (auto* bb = dynamic_cast<BBClip *>(clip))
 		{
 			auto bbIndex = dynamic_cast<class BBTrack*>(bb->getTrack())->index();
 			auto bbContainer = Engine::getBBTrackContainer();
 
-			MidiTime bbTime = time - tco->startPosition();
-			bbTime = std::min(bbTime, tco->length());
-			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * MidiTime::ticksPerBar());
+			TimePos bbTime = time - clip->startPosition();
+			bbTime = std::min(bbTime, clip->length());
+			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * TimePos::ticksPerBar());
 
 			auto bbValues = bbContainer->automatedValuesAt(bbTime, bbIndex);
 			for (auto it=bbValues.begin(); it != bbValues.end(); it++)
@@ -330,17 +330,4 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 
 	return valueMap;
 };
-
-
-
-DummyTrackContainer::DummyTrackContainer() :
-	TrackContainer(),
-	m_dummyInstrumentTrack( NULL )
-{
-	setJournalling( false );
-	m_dummyInstrumentTrack = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-							this ) );
-	m_dummyInstrumentTrack->setJournalling( false );
-}
 

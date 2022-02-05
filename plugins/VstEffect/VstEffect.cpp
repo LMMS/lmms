@@ -41,13 +41,13 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VST",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
+	nullptr,
 	new VstSubPluginFeatures( Plugin::Effect )
 } ;
 
@@ -126,8 +126,8 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	TextFloat * tf = NULL;
-	if( gui )
+	TextFloat * tf = nullptr;
+	if( getGUI() != nullptr )
 	{
 		tf = TextFloat::displayMessage(
 			VstPlugin::tr( "Loading plugin" ),

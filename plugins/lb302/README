@@ -15,7 +15,7 @@ BUG:
   to be caused by 'unexhausted buffers' That is, the problem manifests
   itself to a greater degree when the user "buffer size" configuration
   is increased to over 1024 frames or so.  The problem is much less
-  noticable when the buffer size is set to 64 frames.
+  noticeable when the buffer size is set to 64 frames.
 
 BUG:
   The synth does not make accomodations for sampling rates other than
@@ -27,8 +27,8 @@ BUG:
   without also using LB302, so I do not know if the problem is actually 
   in the Bass Synth. I have gotten the backtraces a few times:
     ...
-    mixer::renderNextBuffer()
-    mixer::nextAudioBuffer()
+    audioEngine::renderNextBuffer()
+    audioEngine::nextAudioBuffer()
     QOBject::activate_signal()
     ??()
 

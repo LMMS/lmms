@@ -25,13 +25,13 @@
 #include <QDomElement>
 
 #include "Nes.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "Mixer.h"
 #include "Oscillator.h"
 
 #include "embed.h"
@@ -44,14 +44,14 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Nescaline",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"A NES-like synthesizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -537,9 +537,9 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	m_masterVol( 1.0f, 0.0f, 2.0f, 0.01f, this, tr( "Master volume" ) ),
 	m_vibrato( 0.0f, 0.0f, 15.0f, 1.0f, this, tr( "Vibrato" ) )
 {
-	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ) );
-	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ) );
-	connect( &m_ch3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ) );
+	connect( &m_ch1Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq1() ), Qt::DirectConnection );
+	connect( &m_ch2Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq2() ), Qt::DirectConnection );
+	connect( &m_ch3Crs, SIGNAL( dataChanged() ), this, SLOT( updateFreq3() ), Qt::DirectConnection );
 	
 	updateFreq1();
 	updateFreq2();
@@ -558,9 +558,9 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
-	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
+	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr )
 	{	
-		NesObject * nes = new NesObject( this, Engine::mixer()->processingSampleRate(), n );
+		NesObject * nes = new NesObject( this, Engine::audioEngine()->processingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
 	
@@ -727,7 +727,7 @@ void NesInstrument::updateFreq3()
 
 
 
-QPixmap * NesInstrumentView::s_artwork = NULL;
+QPixmap * NesInstrumentView::s_artwork = nullptr;
 
 
 NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent ) :
@@ -736,7 +736,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	if( s_artwork == NULL )
+	if( s_artwork == nullptr )
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	}

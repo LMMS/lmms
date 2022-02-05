@@ -6,9 +6,9 @@
 #include "AutomatableSlider.h"
 #include "Groove.h"
 #include "lmms_basics.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 
 /**
  * A groove that mimics Hydrogen drum machine's swing feature
@@ -23,7 +23,7 @@ public:
 
 	void init();
 
-	int isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset, Note * n, Pattern * p);
+	int isInTick(TimePos * curStart, const fpp_t frames, const f_cnt_t offset, Note * n, MidiClip* c);
 
 	inline virtual QString nodeName() const
 	{

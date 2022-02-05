@@ -39,7 +39,7 @@ ModelView::ModelView( Model* model, QWidget* widget ) :
 
 ModelView::~ModelView()
 {
-	if( m_model != NULL && m_model->isDefaultConstructed() )
+	if( m_model != nullptr && m_model->isDefaultConstructed() )
 	{
 		delete m_model;
 	}
@@ -50,7 +50,7 @@ ModelView::~ModelView()
 
 void ModelView::setModel( Model* model, bool isOldModelValid )
 {
-	if( isOldModelValid && m_model != NULL )
+	if( isOldModelValid && m_model != nullptr )
 	{
 		if( m_model->isDefaultConstructed() )
 		{
@@ -74,9 +74,19 @@ void ModelView::setModel( Model* model, bool isOldModelValid )
 
 
 
+// Unsets the current model by setting a dummy empty model. The dummy model is marked as
+// "defaultConstructed", so the next call to setModel will delete it.
+void ModelView::unsetModel()
+{
+	setModel(new Model(nullptr, QString(), true));
+}
+
+
+
+
 void ModelView::doConnections()
 {
-	if( m_model != NULL )
+	if( m_model != nullptr )
 	{
 		QObject::connect( m_model, SIGNAL( dataChanged() ), widget(), SLOT( update() ) );
 		QObject::connect( m_model, SIGNAL( propertiesChanged() ), widget(), SLOT( update() ) );

@@ -64,26 +64,4 @@ private:
 	LcdSpinBox* m_baseVelocitySpinBox;
 };
 
-class InstrumentMiscView : public QWidget
-{
-	Q_OBJECT
-public:
-	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
-	~InstrumentMiscView();
-
-	GroupBox * pitchGroupBox()
-	{
-		return m_pitchGroupBox;
-	}
-
-	GroupBox * grooveGroupBox()
-	{
-		return m_grooveGroupBox;
-	}
-
-private:
-	GroupBox * m_pitchGroupBox;
-	GroupBox * m_grooveGroupBox;
-};
-
 #endif

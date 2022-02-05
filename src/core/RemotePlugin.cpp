@@ -30,7 +30,7 @@
 
 #include "BufferManager.h"
 #include "RemotePlugin.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 
 #include <QDebug>
@@ -92,7 +92,7 @@ RemotePlugin::RemotePlugin() :
 	m_shmID( 0 ),
 #endif
 	m_shmSize( 0 ),
-	m_shm( NULL ),
+	m_shm( nullptr ),
 	m_inputCount( DEFAULT_CHANNELS ),
 	m_outputCount( DEFAULT_CHANNELS )
 {
@@ -102,14 +102,14 @@ RemotePlugin::RemotePlugin() :
 
 	m_socketFile = QDir::tempPath() + QDir::separator() +
 						QUuid::createUuid().toString();
-	const char * path = m_socketFile.toUtf8().constData();
-	size_t length = strlen( path );
+	auto path = m_socketFile.toUtf8();
+	size_t length = path.length();
 	if ( length >= sizeof sa.sun_path )
 	{
 		length = sizeof sa.sun_path - 1;
 		qWarning( "Socket path too long." );
 	}
-	memcpy( sa.sun_path, path, length );
+	memcpy(sa.sun_path, path.constData(), length );
 	sa.sun_path[length] = '\0';
 
 	m_server = socket( PF_LOCAL, SOCK_STREAM, 0 );
@@ -117,7 +117,7 @@ RemotePlugin::RemotePlugin() :
 	{
 		qWarning( "Unable to start the server." );
 	}
-	remove( path );
+	remove(path.constData());
 	int ret = bind( m_server, (struct sockaddr *) &sa, sizeof sa );
 	if ( ret == -1 || listen( m_server, 1 ) == -1 )
 	{
@@ -161,7 +161,7 @@ RemotePlugin::~RemotePlugin()
 
 #ifndef USE_QT_SHMEM
 		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
+		shmctl( m_shmID, IPC_RMID, nullptr );
 #endif
 	}
 
@@ -256,7 +256,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 			break;
 
 		default:
-			m_socket = accept( m_server, NULL, NULL );
+			m_socket = accept( m_server, nullptr, nullptr );
 			if ( m_socket == -1 )
 			{
 				qWarning( "Unexpected socket error." );
@@ -278,21 +278,20 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 
 
-bool RemotePlugin::process( const sampleFrame * _in_buf,
-						sampleFrame * _out_buf )
+bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	if( m_failed || !isRunning() )
 	{
-		if( _out_buf != NULL )
+		if( _out_buf != nullptr )
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
 		return false;
 	}
 
-	if( m_shm == NULL )
+	if( m_shm == nullptr )
 	{
 		// m_shm being zero means we didn't initialize everything so
 		// far so process one message each time (and hope we get
@@ -304,7 +303,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 			fetchAndProcessAllMessages();
 			unlock();
 		}
-		if( _out_buf != NULL )
+		if( _out_buf != nullptr )
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
@@ -315,7 +314,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 
 	ch_cnt_t inputs = qMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
 
-	if( _in_buf != NULL && inputs > 0 )
+	if( _in_buf != nullptr && inputs > 0 )
 	{
 		if( m_splitChannels )
 		{
@@ -348,7 +347,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 	lock();
 	sendMessage( IdStartProcessing );
 
-	if( m_failed || _out_buf == NULL || m_outputCount == 0 )
+	if( m_failed || _out_buf == nullptr || m_outputCount == 0 )
 	{
 		unlock();
 		return false;
@@ -431,16 +430,14 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = ( m_inputCount+m_outputCount ) *
-				Engine::mixer()->framesPerPeriod() *
-							sizeof( float );
-	if( m_shm != NULL )
+	const size_t s = ( m_inputCount+m_outputCount ) * Engine::audioEngine()->framesPerPeriod() * sizeof( float );
+	if( m_shm != nullptr )
 	{
 #ifdef USE_QT_SHMEM
 		m_shmObj.detach();
 #else
 		shmdt( m_shm );
-		shmctl( m_shmID, IPC_RMID, NULL );
+		shmctl( m_shmID, IPC_RMID, nullptr );
 #endif
 	}
 
@@ -510,12 +507,12 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->processingSampleRate() );
+			reply_message.addInt( Engine::audioEngine()->processingSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->framesPerPeriod() );
+			reply_message.addInt( Engine::audioEngine()->framesPerPeriod() );
 			break;
 
 		case IdChangeInputCount:

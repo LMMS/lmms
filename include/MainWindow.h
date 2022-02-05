@@ -61,7 +61,7 @@ public:
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
-	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
+	LMMS_EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags = QFlag(0));
 
 
 	///
@@ -125,19 +125,11 @@ public:
 
 	void clearKeyModifiers();
 
-	bool isCtrlPressed()
-	{
-		return m_keyMods.m_ctrl;
-	}
-
+	// TODO Remove this function, since m_shift can get stuck down.
+	// [[deprecated]]
 	bool isShiftPressed()
 	{
 		return m_keyMods.m_shift;
-	}
-
-	bool isAltPressed()
-	{
-		return m_keyMods.m_alt;
 	}
 
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
@@ -160,9 +152,11 @@ public slots:
 	void toggleBBEditorWin( bool forceShow = false );
 	void toggleSongEditorWin();
 	void toggleProjectNotesWin();
-	void toggleFxMixerWin();
+	void toggleMicrotunerWin();
+	void toggleMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void toggleFullscreen();
 
 	void updatePlayPauseIcons();
 
@@ -232,6 +226,8 @@ private:
 	ToolButton * m_metronomeToggle;
 
 	SessionState m_session;
+	
+	bool maximized;
 
 private slots:
 	void browseHelp();

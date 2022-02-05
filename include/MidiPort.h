@@ -31,7 +31,7 @@
 #include <QtCore/QMap>
 
 #include "Midi.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "AutomatableModel.h"
 
 
@@ -71,7 +71,7 @@ public:
 	MidiPort( const QString& name,
 			MidiClient* client,
 			MidiEventProcessor* eventProcessor,
-			Model* parent = NULL,
+			Model* parent = nullptr,
 			Mode mode = Disabled );
 	virtual ~MidiPort();
 
@@ -96,11 +96,14 @@ public:
 
 	int realOutputChannel() const
 	{
-		return outputChannel() - 1;
+		// There's a possibility of outputChannel being 0 ("--"), which is used to keep all
+		// midi channels when forwarding. In that case, realOutputChannel will return the
+		// default channel 1 (whose value is 0).
+		return outputChannel() ? outputChannel() - 1 : 0;
 	}
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
-	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
+	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 
 
 	void saveSettings( QDomDocument& doc, QDomElement& thisElement ) override;

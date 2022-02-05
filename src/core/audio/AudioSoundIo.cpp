@@ -34,22 +34,23 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "ComboBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
-AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
+AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer )
+		SURROUND_CHANNELS ), _audioEngine )
 {
 	outSuccessful = false;
-	m_soundio = NULL;
-	m_outstream = NULL;
-	m_outBuf = NULL;
+	m_soundio = nullptr;
+	m_outstream = nullptr;
+	m_outBuf = nullptr;
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
 	m_stopped = true;
+	m_outstreamStarted = false;
 
 	m_soundio = soundio_create();
 	if (!m_soundio)
@@ -167,7 +168,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)mixer()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -196,43 +197,71 @@ void AudioSoundIo::onBackendDisconnect(int err)
 AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
+	
+	if (m_outstream)
+	{
+		soundio_outstream_destroy(m_outstream);
+	}
+	
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 
 void AudioSoundIo::startProcessing()
 {
+	int err;
+	
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
-	m_outBufSize = mixer()->framesPerPeriod();
+	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
+	if (! m_outstreamStarted)
+	{
+		if ((err = soundio_outstream_start(m_outstream)))
+		{
+			fprintf(stderr, 
+				"AudioSoundIo::startProcessing() :: soundio unable to start stream: %s\n", 
+				soundio_strerror(err));
+		} else {
+			m_outstreamStarted = true;
+		}
+	}
+
 	m_stopped = false;
-	int err;
-	if ((err = soundio_outstream_start(m_outstream)))
+
+	if ((err = soundio_outstream_pause(m_outstream, false)))
 	{
 		m_stopped = true;
-		fprintf(stderr, "soundio unable to start stream: %s\n", soundio_strerror(err));
+		fprintf(stderr, 
+			"AudioSoundIo::startProcessing() :: resuming result error: %s\n", 
+			soundio_strerror(err));
 	}
 }
 
 void AudioSoundIo::stopProcessing()
 {
+	int err;
+	
 	m_stopped = true;
 	if (m_outstream)
 	{
-		soundio_outstream_destroy(m_outstream);
-		m_outstream = NULL;
+		if ((err = soundio_outstream_pause(m_outstream, true)))
+		{
+			fprintf(stderr, 
+				"AudioSoundIo::stopProcessing() :: pausing result error: %s\n",
+				soundio_strerror(err));
+		}
 	}
 
 	if (m_outBuf)
 	{
 		delete[] m_outBuf;
-		m_outBuf = NULL;
+		m_outBuf = nullptr;
 	}
 }
 
@@ -254,7 +283,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	int bytesPerSample = m_outstream->bytes_per_sample;
 	int err;
 
-	const float gain = mixer()->masterGain();
+	const float gain = audioEngine()->masterGain();
 
 	int framesLeft = frameCountMax;
 
@@ -474,7 +503,7 @@ AudioSoundIo::setupWidget::~setupWidget()
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 

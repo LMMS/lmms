@@ -28,10 +28,12 @@
 #define SONG_EDITOR_H
 
 #include <QVector>
+#include <QLinearGradient>
 
 #include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
+#include "PositionLine.h"
 
 class QLabel;
 class QScrollBar;
@@ -45,16 +47,6 @@ class Song;
 class TextFloat;
 class TimeLineWidget;
 
-class positionLine : public QWidget
-{
-public:
-	positionLine( QWidget * parent );
-
-private:
-	void paintEvent( QPaintEvent * pe ) override;
-
-} ;
-
 
 class SongEditor : public TrackContainerView
 {
@@ -63,6 +55,7 @@ public:
 	enum EditMode
 	{
 		DrawMode,
+		KnifeMode,
 		SelectMode
 	};
 
@@ -85,12 +78,13 @@ public slots:
 
 	void setEditMode( EditMode mode );
 	void setEditModeDraw();
+	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const MidiTime & t );
+	void updatePosition( const TimePos & t );
 	void updatePositionLine();
-	void selectAllTcos( bool select );
+	void selectAllClips( bool select );
 
 protected:
 	void closeEvent( QCloseEvent * ce ) override;
@@ -120,6 +114,7 @@ private:
 	void wheelEvent( QWheelEvent * we ) override;
 
 	bool allowRubberband() const override;
+	bool knifeMode() const override;
 
 	int trackIndexFromSelectionPoint(int yPos);
 	int indexOfTrackView(const TrackView* tv);
@@ -140,13 +135,13 @@ private:
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
 
-	positionLine * m_positionLine;
+	PositionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
 	ComboBoxModel* m_snappingModel;
 	bool m_proportionalSnap;
 
-	static const QVector<double> m_zoomLevels;
+	static const QVector<float> m_zoomLevels;
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
@@ -158,12 +153,15 @@ private:
 	QPoint m_scrollPos;
 	QPoint m_mousePos;
 	int m_rubberBandStartTrackview;
-	MidiTime m_rubberbandStartMidipos;
+	TimePos m_rubberbandStartTimePos;
 	int m_currentZoomingValue;
 	int m_trackHeadWidth;
 	bool m_selectRegion;
 
 	friend class SongEditorWindow;
+
+signals:
+	void zoomingValueChanged( float );
 } ;
 
 
@@ -178,6 +176,7 @@ public:
 	QSize sizeHint() const override;
 
 	SongEditor* m_editor;
+	void syncEditMode();
 
 protected:
 	void resizeEvent( QResizeEvent * event ) override;
@@ -199,9 +198,6 @@ signals:
 	void resized();
 
 private:
-	void keyPressEvent( QKeyEvent * ke ) override;
-	void keyReleaseEvent( QKeyEvent * ke ) override;
-
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
@@ -209,12 +205,16 @@ private:
 
 	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
+	QAction* m_knifeModeAction;
 	QAction* m_selectModeAction;
 	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_snappingComboBox;
 	QLabel* m_snapSizeLabel;
+
+	QAction* m_insertBarAction;
+	QAction* m_removeBarAction;
 };
 
 #endif

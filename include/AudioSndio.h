@@ -44,12 +44,12 @@ class AudioSndio : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioSndio( bool & _success_ful, Mixer * _mixer );
+	AudioSndio( bool & _success_ful, AudioEngine * _audioEngine );
 	virtual ~AudioSndio();
 
 	inline static QString name( void )
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "sndio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
 	}
 
 	class setupWidget : public AudioDeviceSetupWidget

@@ -36,19 +36,19 @@ ControllerConnectionVector ControllerConnection::s_connections;
 
 
 
-ControllerConnection::ControllerConnection( Controller * _controller ) :
-	m_controller( NULL ),
+ControllerConnection::ControllerConnection(Controller * _controller) :
+	m_controller( nullptr ),
 	m_controllerId( -1 ),
-	m_ownsController( false )
+	m_ownsController(false)
 {
-	if( _controller != NULL )
+	if( _controller != nullptr )
 	{
 		setController( _controller );
 	}
 	else
 	{
 		m_controller = Controller::create( Controller::DummyController,
-									NULL );
+									nullptr );
 	}
 	s_connections.append( this );
 }
@@ -57,7 +57,7 @@ ControllerConnection::ControllerConnection( Controller * _controller ) :
 
 
 ControllerConnection::ControllerConnection( int _controllerId ) :
-	m_controller( Controller::create( Controller::DummyController, NULL ) ),
+	m_controller( Controller::create( Controller::DummyController, nullptr ) ),
 	m_controllerId( _controllerId ),
 	m_ownsController( false )
 {
@@ -95,7 +95,7 @@ void ControllerConnection::setController( Controller * _controller )
 	if( m_ownsController && m_controller )
 	{
 		delete m_controller;
-		m_controller = NULL;
+		m_controller = nullptr;
 	}
 
 	if( m_controller && m_controller->type() != Controller::DummyController )
@@ -105,7 +105,7 @@ void ControllerConnection::setController( Controller * _controller )
 
 	if( !_controller )
 	{
-		m_controller = Controller::create( Controller::DummyController, NULL );
+		m_controller = Controller::create( Controller::DummyController, nullptr );
 	}
 	else
 	{
@@ -121,7 +121,7 @@ void ControllerConnection::setController( Controller * _controller )
 	}
 
 	m_ownsController =
-			( _controller->type() == Controller::MidiController );
+		(_controller->type() == Controller::MidiController);
 
 	// If we don't own the controller, allow deletion of controller
 	// to delete the connection
@@ -220,7 +220,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 		}
 		else
 		{
-			m_controller = Controller::create( Controller::DummyController, NULL );
+			m_controller = Controller::create( Controller::DummyController, nullptr );
 		}
 	}
 }

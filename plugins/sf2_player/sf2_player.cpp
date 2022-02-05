@@ -23,21 +23,23 @@
  *
  */
 
+#include "sf2_player.h"
+
 #include <QDebug>
 #include <QLayout>
 #include <QLabel>
 #include <QDomDocument>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "FileDialog.h"
-#include "sf2_player.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
-#include "Mixer.h"
-#include "NotePlayHandle.h"
 #include "Knob.h"
+#include "NotePlayHandle.h"
+#include "PathUtil.h"
 #include "SampleBuffer.h"
 #include "Song.h"
 
@@ -55,13 +57,13 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Player for SoundFont files" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"sf2,sf3",
-	NULL
+	nullptr,
 } ;
 
 }
@@ -88,8 +90,9 @@ QMutex sf2Instrument::s_fontsMutex;
 
 sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sf2player_plugin_descriptor ),
-	m_srcState( NULL ),
-	m_font( NULL ),
+	m_srcState( nullptr ),
+	m_synth(nullptr),
+	m_font( nullptr ),
 	m_fontId( 0 ),
 	m_filename( "" ),
 	m_lastMidiPitch( -1 ),
@@ -117,16 +120,15 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 
 #if QT_VERSION_CHECK(FLUIDSYNTH_VERSION_MAJOR, FLUIDSYNTH_VERSION_MINOR, FLUIDSYNTH_VERSION_MICRO) >= QT_VERSION_CHECK(1,1,9)
 	// Deactivate all audio drivers in fluidsynth
-	const char *none[] = { NULL };
+	const char *none[] = { nullptr };
 	fluid_audio_driver_register( none );
 #endif
 	m_settings = new_fluid_settings();
 
-	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
+	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::audioEngine()->framesPerPeriod() );
 
-	// This is just our starting instance of synth.  It is recreated
-	// everytime we load a new soundfont.
-	m_synth = new_fluid_synth( m_settings );
+	// This sets up m_synth and updates reverb/chorus/gain
+	reloadSynth();
 
 #if FLUIDSYNTH_VERSION_MAJOR >= 2
 	// Get the default values from the setting
@@ -151,19 +153,18 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusDepth.setInitValue(settingVal);
 #endif
 
-	loadFile( ConfigManager::inst()->sf2File() );
-
-	updateSampleRate();
-	updateReverbOn();
-	updateReverb();
-	updateChorusOn();
-	updateChorus();
-	updateGain();
+	// FIXME: there's no good way to tell if we're loading a preset or an empty instrument
+	// We rely on instantiate() to load the default soundfont for new instruments,
+	// but we don't need that when loading a project/preset/preview
+	if (!Engine::getSong()->isLoadingProject() && !instrumentTrack()->isPreviewMode())
+	{
+		loadFile(ConfigManager::inst()->sf2File());
+	}
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(reloadSynth()));
 
 	// Gain
 	connect( &m_gain, SIGNAL( dataChanged() ), this, SLOT( updateGain() ) );
@@ -183,20 +184,20 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 
 
 sf2Instrument::~sf2Instrument()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::TypeNotePlayHandle
 				| PlayHandle::TypeInstrumentPlayHandle );
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
-	if( m_srcState != NULL )
+	if( m_srcState != nullptr )
 	{
 		src_delete( m_srcState );
 	}
@@ -249,8 +250,6 @@ void sf2Instrument::loadSettings( const QDomElement & _this )
 	m_chorusSpeed.loadSettings( _this, "chorusSpeed" );
 	m_chorusDepth.loadSettings( _this, "chorusDepth" );
 
-	updatePatch();
-	updateGain();
 }
 
 
@@ -261,11 +260,6 @@ void sf2Instrument::loadFile( const QString & _file )
 	if( !_file.isEmpty() && QFileInfo( _file ).exists() )
 	{
 		openFile( _file, false );
-		updatePatch();
-
-		// for some reason we've to call that, otherwise preview of a
-		// soundfont for the first time fails
-		updateSampleRate();
 	}
 
 	// setting the first bank and patch number that is found
@@ -320,7 +314,7 @@ AutomatableModel * sf2Instrument::childModel( const QString & _modelName )
 		return &m_patchNum;
 	}
 	qCritical() << "requested unknown model " << _modelName;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -337,7 +331,7 @@ void sf2Instrument::freeFont()
 {
 	m_synthMutex.lock();
 
-	if ( m_font != NULL )
+	if ( m_font != nullptr )
 	{
 		s_fontsMutex.lock();
 		--(m_font->refCount);
@@ -360,7 +354,7 @@ void sf2Instrument::freeFont()
 		}
 		s_fontsMutex.unlock();
 
-		m_font = NULL;
+		m_font = nullptr;
 	}
 	m_synthMutex.unlock();
 }
@@ -372,8 +366,8 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	emit fileLoading();
 
 	// Used for loading file
-	char * sf2Ascii = qstrdup( qPrintable( SampleBuffer::tryToMakeAbsolute( _sf2File ) ) );
-	QString relativePath = SampleBuffer::tryToMakeRelative( _sf2File );
+	char * sf2Ascii = qstrdup( qPrintable( PathUtil::toAbsolute( _sf2File ) ) );
+	QString relativePath = PathUtil::toShortestRelative( _sf2File );
 
 	// free reference to soundfont if one is selected
 	freeFont();
@@ -396,18 +390,24 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 	// Add to map, if doesn't exist.
 	else
 	{
-		m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, true );
+		bool loaded = false;
+		if( fluid_is_soundfont( sf2Ascii ) )
+		{
+			m_fontId = fluid_synth_sfload( m_synth, sf2Ascii, true );
 
-		if( fluid_synth_sfcount( m_synth ) > 0 )
-		{
-			// Grab this sf from the top of the stack and add to list
-			m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
-			s_fonts.insert( relativePath, m_font );
+			if( fluid_synth_sfcount( m_synth ) > 0 )
+			{
+				// Grab this sf from the top of the stack and add to list
+				m_font = new sf2Font( fluid_synth_get_sfont( m_synth, 0 ) );
+				s_fonts.insert( relativePath, m_font );
+				loaded = true;
+			}
 		}
-		else
+
+		if(!loaded)
 		{
-			collectErrorForUI( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).arg( QFileInfo( _sf2File ).baseName() ) );
-			// TODO: Why is the filename missing when the file does not exist?
+			collectErrorForUI( sf2Instrument::tr( "A soundfont %1 could not be loaded." ).
+				arg( QFileInfo( _sf2File ).baseName() ) );
 		}
 	}
 
@@ -429,8 +429,10 @@ void sf2Instrument::openFile( const QString & _sf2File, bool updateTrackName )
 
 	if( updateTrackName || instrumentTrack()->displayName() == displayName() )
 	{
-		instrumentTrack()->setName( QFileInfo( _sf2File ).baseName() );
+		instrumentTrack()->setName( PathUtil::cleanName( _sf2File ) );
 	}
+
+	updatePatch();
 }
 
 
@@ -536,12 +538,12 @@ void  sf2Instrument::updateChorus()
 
 
 
-void sf2Instrument::updateSampleRate()
+void sf2Instrument::reloadSynth()
 {
 	double tempRate;
 
 	// Set & get, returns the true sample rate
-	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::mixer()->processingSampleRate() );
+	fluid_settings_setnum( m_settings, (char *) "synth.sample-rate", Engine::audioEngine()->processingSampleRate() );
 	fluid_settings_getnum( m_settings, (char *) "synth.sample-rate", &tempRate );
 	m_internalSampleRate = static_cast<int>( tempRate );
 
@@ -564,14 +566,17 @@ void sf2Instrument::updateSampleRate()
 	{
 		// Recreate synth with no soundfonts
 		m_synthMutex.lock();
-		delete_fluid_synth( m_synth );
+		if (m_synth != nullptr)
+		{
+			delete_fluid_synth(m_synth);
+		}
 		m_synth = new_fluid_synth( m_settings );
 		m_synthMutex.unlock();
 	}
 
 	m_synthMutex.lock();
-	if( Engine::mixer()->currentQualitySettings().interpolation >=
-			Mixer::qualitySettings::Interpolation_SincFastest )
+	if( Engine::audioEngine()->currentQualitySettings().interpolation >=
+			AudioEngine::qualitySettings::Interpolation_SincFastest )
 	{
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_7THORDER );
 	}
@@ -580,18 +585,18 @@ void sf2Instrument::updateSampleRate()
 		fluid_synth_set_interp_method( m_synth, -1, FLUID_INTERP_DEFAULT );
 	}
 	m_synthMutex.unlock();
-	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() )
+	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() )
 	{
 		m_synthMutex.lock();
-		if( m_srcState != NULL )
+		if( m_srcState != nullptr )
 		{
 			src_delete( m_srcState );
 		}
 		int error;
-		m_srcState = src_new( Engine::mixer()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
-		if( m_srcState == NULL || error )
+		m_srcState = src_new( Engine::audioEngine()->currentQualitySettings().libsrcInterpolation(), DEFAULT_CHANNELS, &error );
+		if( m_srcState == nullptr || error )
 		{
-			qCritical( "error while creating libsamplerate data structure in Sf2Instrument::updateSampleRate()" );
+			qCritical("error while creating libsamplerate data structure in Sf2Instrument::reloadSynth()");
 		}
 		m_synthMutex.unlock();
 	}
@@ -636,7 +641,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
 		pluginData->lastVelocity = _n->midiVelocity( baseVelocity );
-		pluginData->fluidVoice = NULL;
+		pluginData->fluidVoice = nullptr;
 		pluginData->isNew = true;
 		pluginData->offset = _n->offset();
 		pluginData->noteOffSent = false;
@@ -720,7 +725,7 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 
 void sf2Instrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	// set midi pitch for this period
 	const int currentMidiPitch = instrumentTrack()->midiPitch();
@@ -744,7 +749,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	if( m_playingNotes.isEmpty() )
 	{
 		renderFrames( frames, _working_buffer );
-		instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+		instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 		return;
 	}
 
@@ -802,17 +807,17 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	{
 		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
 	}
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 }
 
 
 void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
-	if( m_internalSampleRate < Engine::mixer()->processingSampleRate() &&
-							m_srcState != NULL )
+	if( m_internalSampleRate < Engine::audioEngine()->processingSampleRate() &&
+							m_srcState != nullptr )
 	{
-		const fpp_t f = frames * m_internalSampleRate / Engine::mixer()->processingSampleRate();
+		const fpp_t f = frames * m_internalSampleRate / Engine::audioEngine()->processingSampleRate();
 #ifdef __GNUC__
 		sampleFrame tmp[f];
 #else
@@ -1130,7 +1135,7 @@ void sf2InstrumentView::showFileDialog()
 {
 	sf2Instrument * k = castModel<sf2Instrument>();
 
-	FileDialog ofd( NULL, tr( "Open SoundFont file" ) );
+	FileDialog ofd( nullptr, tr( "Open SoundFont file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
@@ -1139,7 +1144,7 @@ void sf2InstrumentView::showFileDialog()
 
 	if( k->m_filename != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
+		QString f = PathUtil::toAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -1187,6 +1192,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
 	return new sf2Instrument( static_cast<InstrumentTrack *>( m ) );
 }
-
 
 }

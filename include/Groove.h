@@ -30,9 +30,9 @@
 #include <QWidget>
 
 #include "lmms_basics.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "SerializingObject.h"
 
 class Groove : public QObject, public SerializingObject
@@ -55,8 +55,8 @@ public:
 	 * returns 0 to play now on the tick, -1 to not play at all and the new offset
 	 *         that the note should be shifted if it is to be played later in this tick.
 	 */
-	virtual int isInTick(MidiTime * curStart, fpp_t frames, f_cnt_t offset,
-						Note * n, Pattern * p);
+	virtual int isInTick(TimePos * curStart, fpp_t frames, f_cnt_t offset,
+						Note * n, MidiClip* c);
 	int amount() const {return m_amount;}
 
 	virtual void saveSettings(QDomDocument & doc, QDomElement & element);

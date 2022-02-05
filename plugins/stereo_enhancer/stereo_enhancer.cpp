@@ -35,14 +35,14 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"StereoEnhancer Effect",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Plugin for enhancing stereo separation of a stereo input file" ),
 	"Lou Herard <lherard/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }

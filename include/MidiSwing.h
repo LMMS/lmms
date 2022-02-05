@@ -5,9 +5,9 @@
 
 #include "Groove.h"
 #include "lmms_basics.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 
 /*
  * A swing groove that adjusts by whole ticks.
@@ -22,8 +22,8 @@ public:
 	~MidiSwing();
 
 	// TODO why declaring this should it not come from super class?
-	int isInTick(MidiTime * cur_start, const fpp_t frames, const f_cnt_t offset, Note * n, Pattern * p);
-	int isInTick(MidiTime * curStart, Note * n, Pattern * p);
+	int isInTick(TimePos * cur_start, const fpp_t frames, const f_cnt_t offset, Note * n, MidiClip* c);
+	int isInTick(TimePos * curStart, Note * n, MidiClip* c);
 
 	inline virtual QString nodeName() const
 	{

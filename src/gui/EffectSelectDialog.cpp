@@ -39,7 +39,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	ui( new Ui::EffectSelectDialog ),
 	m_sourceModel(),
 	m_model(),
-	m_descriptionWidget( NULL )
+	m_descriptionWidget( nullptr )
 {
 	ui->setupUi( this );
 
@@ -49,7 +49,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 
 	EffectKeyList subPluginEffectKeys;
 
-	for (const Plugin::Descriptor* desc: pluginFactory->descriptors(Plugin::Effect))
+	for (const Plugin::Descriptor* desc: getPluginFactory()->descriptors(Plugin::Effect))
 	{
 		if( desc->subPluginFeatures )
 		{
@@ -174,7 +174,7 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 										const QModelIndex & )
 {
 	delete m_descriptionWidget;
-	m_descriptionWidget = NULL;
+	m_descriptionWidget = nullptr;
 
 	if( m_model.mapToSource( _idx ).row() < 0 )
 	{
@@ -234,7 +234,7 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 		{
 			QLabel *label = new QLabel(m_descriptionWidget);
 			QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
-			labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate( "pluginBrowser", descriptor.description ) + "</p>";
+			labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate( "PluginBrowser", descriptor.description ) + "</p>";
 			labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
 
 			label->setText(labelText);

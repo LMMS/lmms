@@ -40,11 +40,23 @@ QMdiArea {
 	background-color: #111314;
 }
 
+FileBrowser QCheckBox
+{
+	font-size: 10px;
+	color: white;
+}
+
+Knob {
+	qproperty-lineInactiveColor: rgb(120, 120, 120);
+	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
+}
+
 AutomationEditor {
 	color: #ffffff;
 	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
-	qproperty-vertexColor: #6749C2;
+	qproperty-nodeInValueColor: rgba(103, 73, 194, 150);
+	qproperty-nodeOutValueColor: rgba(125, 40, 40, 150);
 	qproperty-crossColor: rgba(215, 210, 254, 150);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
@@ -61,7 +73,6 @@ QLineEdit {
 	border-radius: 4px;
 	border: 1px;
 	background: #101213;
-	color: #d1d8e4;
 }
 
 QLineEdit:read-only {
@@ -75,6 +86,13 @@ QLineEdit:focus {
 	border: 1px solid #0bd556;
 }
 
+/* Set color and selection background color for various inputs.
+   SpinBoxes are used in QInputDialogs */
+
+QTextEdit, QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+	color: #d1d8e4;
+	selection-background-color: #17793b;
+}
 
 QToolTip {
 	border-radius: 4px;
@@ -150,6 +168,11 @@ QMenu::indicator:selected {
 	background-color: #101213;
 }
 
+PositionLine {
+	qproperty-tailGradient: true;
+	qproperty-lineColor: rgb(255, 255, 255);
+}
+
 PianoRoll {
 	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 10);
@@ -159,12 +182,27 @@ PianoRoll {
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: #064d79;
-	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteColor: #1e1e1e;
 	qproperty-ghostNoteTextColor: #ffffff;
-	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteOpacity: 60;
 	qproperty-ghostNoteBorders: false;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
+	qproperty-knifeCutLine: rgba(255, 0, 0, 255);
+	/* Piano keys */
+	qproperty-whiteKeyWidth: 64;
+	qproperty-whiteKeyActiveTextColor: #000;
+	qproperty-whiteKeyActiveTextShadow: #fff;
+	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3ac467, stop:1 #3dd671);
+	qproperty-whiteKeyInactiveTextColor: #000;
+	qproperty-whiteKeyInactiveTextShadow: #fff;
+	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #d6d6d6, stop:1 #e3e3e3);
+	qproperty-whiteKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #a0a0a0, stop:1 #b0b0b0);
+	qproperty-blackKeyWidth: 48;
+	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3ac467, stop:1 #3dd671);
+	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #262626, stop:1 #313131);
+	qproperty-blackKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #606060, stop:1 #505050);
+
 	/* Grid colors */
 	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2d6b45;
@@ -191,11 +229,10 @@ GroupBox {
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-VisualizationWidget  {
+Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
-	qproperty-warningColor: rgb(255, 192, 64);
 	qproperty-clippingColor: rgb(255, 64, 64);
 }
 
@@ -271,6 +308,12 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 	border: none;
 }
 
+EffectRackView QScrollBar::handle:vertical:disabled  {
+	background: #3f4750;
+	border: none;
+	border-radius: 4px;
+}
+
 /* arrow buttons */
 
 QScrollBar::add-line, QScrollBar::sub-line {
@@ -323,6 +366,8 @@ QScrollBar::left-arrow:horizontal:disabled { background-image: url(resources:sba
 QScrollBar::right-arrow:horizontal:disabled { background-image: url(resources:sbarrow_right_d.png);}
 QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up_d.png);}
 QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down_d.png);}
+EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up.png);}
+EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down.png);}
 
 /* background for song editor and bb-editor */
 
@@ -448,7 +493,7 @@ QToolBar::separator {
 
 /* all tool buttons */
 
-QToolButton {
+QToolButton, QToolButton::menu-button {
 	margin: 1px;
 	padding: 2px 2px 2px 2px;
 	border-top: 1px solid #778394;
@@ -478,6 +523,22 @@ QToolButton:checked {
 	border-bottom: 1px solid #4a515e;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
 	background-image: url(resources:shadow_p.png);
+}
+
+/* buttons with combined menu */
+
+QToolButton[popupMode="1"] {
+	margin-right: 13px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+QToolButton::menu-button {
+	subcontrol-origin: margin;
+	width: 13px;
+	padding: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 /* track label buttons - the part that contains the icon and track title */
@@ -586,11 +647,11 @@ PianoView {
 
 /* font sizes for text buttons */
 
-FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
+MixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
-FxLine {
+MixerLine {
 	background: #14161A;
 	color: #d1d8e4;
 	qproperty-backgroundActive: #3B424A;
@@ -648,24 +709,27 @@ TrackContainerView QLabel
 	background: none;
 }
 
-/* Patterns */
+/* Clips */
 
-/* common pattern colors */
-TrackContentObjectView   {
+/* common clip colors */
+ClipView   {
 	qproperty-mutedColor: rgba(255,255,255,100);
 	qproperty-mutedBackgroundColor: #373d48;
 	qproperty-selectedColor: #006B65;
-	qproperty-BBPatternBackground: #373d48;
+	qproperty-BBClipBackground: #373d48;
 	qproperty-textColor: #fff;
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgba(0,0,0,200);
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
-	
+	/* finger tip offset of cursor */
+	qproperty-mouseHotspotHand: 7px 2px;
+	qproperty-mouseHotspotKnife: 0px 0px;
+
 	font-size: 11px;
 }
 
-/* instrument pattern */
-PatternView {
+/* MIDI (instrument) clip */
+MidiClipView {
 	background-color: #21A14F;
 	color: rgba(255,255,255,220);
 
@@ -675,20 +739,20 @@ PatternView {
 	qproperty-mutedNoteBorderColor: rgb(55, 61, 72);
 }
 
-/* sample track pattern */
-SampleTCOView {
-	background-color: #DE7C05;
-	color: #FFE8CD;
+/* sample track clip */
+SampleClipView {
+	background-color: rgba(42,51,59,255);
+	color: #FF8F05;
 }
 
-/* automation pattern */
-AutomationPatternView {
+/* automation clip */
+AutomationClipView {
 	background-color: #663DE1;
 	color: rgba(255,255,255,90);
 }
 
-/* bb-pattern */
-BBTCOView {
+/* bb-clip */
+BBClipView {
 	background-color: #20BDB2; /* default colour for bb-tracks */
 }
 
@@ -917,6 +981,26 @@ NesInstrumentView Knob {
 	qproperty-innerRadius: 8.0;
 	qproperty-centerPointX: 14.5;
 	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+CompressorControlDialog {
+	qproperty-inVolAreaColor: rgba(209, 216, 228, 17);
+	qproperty-inVolColor: rgba(209, 216, 228, 100);
+	qproperty-outVolAreaColor: rgba(209, 216, 228, 30);
+	qproperty-outVolColor: rgba(209, 216, 228, 240);
+	qproperty-gainReductionColor: rgba(180, 100, 100, 210);
+	qproperty-kneeColor: rgba(39, 171, 95, 255);
+	qproperty-kneeColor2: rgba(9, 171, 160, 255);
+	qproperty-threshColor: rgba(39, 171, 95, 100);
+	qproperty-textColor: rgba(209, 216, 228, 50);
+	qproperty-graphColor: rgba(209, 216, 228, 50);
+	qproperty-resetColor: rgba(200, 100, 15, 200);
+}
+
+CompressorControlDialog Knob {
+	color: #2fcc71;
+	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
 }
 

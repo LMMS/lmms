@@ -41,14 +41,14 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Peak Controller",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Plugin for controlling knobs with sound peaks" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -66,7 +66,7 @@ PeakControllerEffect::PeakControllerEffect(
 	m_effectId( rand() ),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
-	m_autoController( NULL )
+	m_autoController( nullptr )
 {
 	m_autoController = new PeakController( Engine::getSong(), this );
 	if( !Engine::getSong()->isLoadingProject() && !PresetPreviewPlayHandle::isPreviewing() )

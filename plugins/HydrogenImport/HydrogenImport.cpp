@@ -13,7 +13,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "Track.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
@@ -29,14 +29,14 @@ Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Hydrogen Import",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing Hydrogen files into LMMS" ),
 	"frank mather",
 	0x0100,
 	Plugin::ImportFilter,
-	NULL,
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -122,7 +122,9 @@ public:
 		else if ( sKey == "B" ) {
 			m_key = NoteKey::B;
 		} 
-        return m_key + (nOctave*12)+57;
+
+        // Hydrogen records MIDI notes from C-1 to B5, and exports them as a number ranging from -3 to 3
+        return m_key + ((nOctave + 3) * 12);
 	}
 
 };
@@ -202,13 +204,19 @@ bool HydrogenImport::readSong()
 			else 
 			{
 				unsigned nLayer = 0;
-				QDomNode layerNode = instrumentNode.firstChildElement( "layer" );
+				QDomNode instrumentComponentNode = instrumentNode.firstChildElement("instrumentComponent");
+				if (instrumentComponentNode.isNull())
+				{
+					instrumentComponentNode = instrumentNode;
+				}
+
+				QDomNode layerNode = instrumentComponentNode.firstChildElement( "layer" );
 				while (  ! layerNode.isNull()  ) 
 				{
 					if ( nLayer >= MAX_LAYERS ) 
 					{
-						printf( "nLayer >= MAX_LAYERS" );
-						continue;
+						printf("nLayer >= MAX_LAYERS\n");
+						break;
 					}
 					QString sFilename = LocalFileMng::readXmlString( layerNode, "filename", "" );
 					QString sMode = LocalFileMng::readXmlString( layerNode, "smode", "forward" );
@@ -272,7 +280,7 @@ bool HydrogenImport::readSong()
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
 				int i = pattern_count - 1 + nbb;
 				pattern_id[sName] = pattern_count - 1;
-				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getTCO( i ) );
+				MidiClip*p = dynamic_cast<MidiClip*>( drum_track[instrId]->getClip( i ) );
 				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
@@ -293,7 +301,7 @@ bool HydrogenImport::readSong()
 		}
 		patternNode = ( QDomNode ) patternNode.nextSiblingElement( "pattern" );
 	}
-	// Pattern sequence
+	// MidiClip sequence
 	QDomNode patternSequenceNode = songNode.firstChildElement( "patternSequence" );
 	QDomNode groupNode = patternSequenceNode.firstChildElement( "group" );
 	int pos = 0;
@@ -308,10 +316,8 @@ bool HydrogenImport::readSong()
 
 			int i = pattern_id[patId]+song_num_tracks;
 			Track *t = ( BBTrack * ) s->tracks().at( i );
- 			TrackContentObject *tco = t->createTCO( pos );      
-			tco->movePosition( pos );
+			t->createClip(pos);
 
-			
 			if ( pattern_length[patId] > best_length ) 
 			{
 				best_length = pattern_length[patId];

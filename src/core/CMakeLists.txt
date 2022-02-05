@@ -1,9 +1,15 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
+
+	core/AudioEngine.cpp
+	core/AudioEngineProfiler.cpp
+	core/AudioEngineWorkerThread.cpp
 	core/AutomatableModel.cpp
-	core/AutomationPattern.cpp
+	core/AutomationClip.cpp
+	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
+	core/BBClip.cpp
 	core/BBTrackContainer.cpp
 	core/BufferManager.cpp
 	core/Clipboard.cpp
@@ -18,7 +24,7 @@ set(LMMS_SRCS
 	core/Engine.cpp
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
-	core/FxMixer.cpp
+	core/Mixer.cpp
 	core/Groove.cpp
 	core/GrooveExperiments.cpp
 	core/GrooveFactory.cpp
@@ -31,25 +37,26 @@ set(LMMS_SRCS
 	core/InstrumentPlayHandle.cpp
 	core/InstrumentSoundShaping.cpp
 	core/JournallingObject.cpp
+	core/Keymap.cpp
 	core/Ladspa2LMMS.cpp
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
+	core/LinkedModelGroups.cpp
 	core/LocklessAllocator.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
 	core/MidiSwing.cpp
 	core/MicroTimer.cpp
-	core/Mixer.cpp
-	core/MixerProfiler.cpp
-	core/MixerWorkerThread.cpp
+	core/Microtuner.cpp
 	core/MixHelpers.cpp
 	core/Model.cpp
 	core/ModelVisitor.cpp
 	core/Note.cpp
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
+	core/PathUtil.cpp
 	core/PeakController.cpp
 	core/PerfLog.cpp
 	core/Piano.cpp
@@ -65,14 +72,18 @@ set(LMMS_SRCS
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
 	core/SampleBuffer.cpp
+	core/SampleClip.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
+	core/Scale.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
 	core/TempoSyncKnobModel.cpp
+	core/TimePos.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp
@@ -94,16 +105,28 @@ set(LMMS_SRCS
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
 
+	core/lv2/Lv2Basics.cpp
+	core/lv2/Lv2ControlBase.cpp
+	core/lv2/Lv2Evbuf.cpp
+	core/lv2/Lv2Features.cpp
+	core/lv2/Lv2Ports.cpp
+	core/lv2/Lv2Proc.cpp
+	core/lv2/Lv2Manager.cpp
+	core/lv2/Lv2Options.cpp
+	core/lv2/Lv2SubPluginFeatures.cpp
+	core/lv2/Lv2UridCache.cpp
+	core/lv2/Lv2UridMap.cpp
+
 	core/midi/MidiAlsaRaw.cpp
 	core/midi/MidiAlsaSeq.cpp
 	core/midi/MidiClient.cpp
 	core/midi/MidiController.cpp
+	core/midi/MidiEventToByteSeq.cpp
 	core/midi/MidiJack.cpp
 	core/midi/MidiOss.cpp
 	core/midi/MidiSndio.cpp
 	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
-	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
 	PARENT_SCOPE

@@ -33,7 +33,7 @@
 #include "gui_templates.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "DataFile.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -75,21 +75,21 @@ const int LFO_SHAPES_X = LFO_GRAPH_X;//PREDELAY_KNOB_X;
 const int LFO_SHAPES_Y = LFO_GRAPH_Y + 50;
 
 
-QPixmap * EnvelopeAndLfoView::s_envGraph = NULL;
-QPixmap * EnvelopeAndLfoView::s_lfoGraph = NULL;
+QPixmap * EnvelopeAndLfoView::s_envGraph = nullptr;
+QPixmap * EnvelopeAndLfoView::s_lfoGraph = nullptr;
 
 
 
 EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	QWidget( _parent ),
-	ModelView( NULL, this ),
-	m_params( NULL )
+	ModelView( nullptr, this ),
+	m_params( nullptr )
 {
-	if( s_envGraph == NULL )
+	if( s_envGraph == nullptr )
 	{
 		s_envGraph = new QPixmap( embed::getIconPixmap( "envelope_graph" ) );
 	}
-	if( s_lfoGraph == NULL )
+	if( s_lfoGraph == nullptr )
 	{
 		s_lfoGraph = new QPixmap( embed::getIconPixmap( "lfo_graph" ) );
 	}
@@ -162,35 +162,35 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoAmountKnob->setHintText( tr( "Modulation amount:" ), "" );
 
 
-	PixmapButton * sin_lfo_btn = new PixmapButton( this, NULL );
+	PixmapButton * sin_lfo_btn = new PixmapButton( this, nullptr );
 	sin_lfo_btn->move( LFO_SHAPES_X, LFO_SHAPES_Y );
 	sin_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"sin_wave_active" ) );
 	sin_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"sin_wave_inactive" ) );
 
-	PixmapButton * triangle_lfo_btn = new PixmapButton( this, NULL );
+	PixmapButton * triangle_lfo_btn = new PixmapButton( this, nullptr );
 	triangle_lfo_btn->move( LFO_SHAPES_X+15, LFO_SHAPES_Y );
 	triangle_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"triangle_wave_active" ) );
 	triangle_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"triangle_wave_inactive" ) );
 
-	PixmapButton * saw_lfo_btn = new PixmapButton( this, NULL );
+	PixmapButton * saw_lfo_btn = new PixmapButton( this, nullptr );
 	saw_lfo_btn->move( LFO_SHAPES_X+30, LFO_SHAPES_Y );
 	saw_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 							"saw_wave_active" ) );
 	saw_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 							"saw_wave_inactive" ) );
 
-	PixmapButton * sqr_lfo_btn = new PixmapButton( this, NULL );
+	PixmapButton * sqr_lfo_btn = new PixmapButton( this, nullptr );
 	sqr_lfo_btn->move( LFO_SHAPES_X+45, LFO_SHAPES_Y );
 	sqr_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"square_wave_active" ) );
 	sqr_lfo_btn->setInactiveGraphic( embed::getIconPixmap(
 						"square_wave_inactive" ) );
 
-	m_userLfoBtn = new PixmapButton( this, NULL );
+	m_userLfoBtn = new PixmapButton( this, nullptr );
 	m_userLfoBtn->move( LFO_SHAPES_X+75, LFO_SHAPES_Y );
 	m_userLfoBtn->setActiveGraphic( embed::getIconPixmap(
 							"usr_wave_active" ) );
@@ -200,7 +200,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
 				this, SLOT( lfoUserWaveChanged() ) );
 
-	PixmapButton * random_lfo_btn = new PixmapButton( this, NULL );
+	PixmapButton * random_lfo_btn = new PixmapButton( this, nullptr );
 	random_lfo_btn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
 	random_lfo_btn->setActiveGraphic( embed::getIconPixmap(
 						"random_wave_active" ) );
@@ -305,7 +305,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
-					QString( "samplefile,tco_%1" ).arg(
+					QString( "samplefile,clip_%1" ).arg(
 							Track::SampleTrack ) );
 }
 
@@ -325,7 +325,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		_de->accept();
 		update();
 	}
-	else if( type == QString( "tco_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		m_params->m_userWave.setAudioFile( dataFile.content().
@@ -425,7 +425,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 	int graph_y_base = LFO_GRAPH_Y + 3 + LFO_GRAPH_H / 2;
 
 	const float frames_for_graph = SECS_PER_LFO_OSCILLATION *
-				Engine::mixer()->baseSampleRate() / 10;
+				Engine::audioEngine()->baseSampleRate() / 10;
 
 	const float lfo_gray_amount = 1.0f - fabsf( m_lfoAmountKnob->value<float>() );
 	p.setPen( QPen( QColor( static_cast<int>( 96 * lfo_gray_amount ),

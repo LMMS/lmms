@@ -3,7 +3,7 @@ set(LMMS_SRCS
 	tracks/AutomationTrack.cpp
 	tracks/BBTrack.cpp
 	tracks/InstrumentTrack.cpp
-	tracks/Pattern.cpp
+	tracks/MidiClip.cpp
 	tracks/SampleTrack.cpp
 
 	PARENT_SCOPE

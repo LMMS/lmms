@@ -29,27 +29,26 @@
 #include "Song.h"
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
-#include "stdshims.h"
 
 
 RenderManager::RenderManager(
-		const Mixer::qualitySettings & qualitySettings,
+		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
-	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
+	m_oldQualitySettings( Engine::audioEngine()->currentQualitySettings() ),
 	m_outputSettings(outputSettings),
 	m_format(fmt),
 	m_outputPath(outputPath)
 {
-	Engine::mixer()->storeAudioDevice();
+	Engine::audioEngine()->storeAudioDevice();
 }
 
 RenderManager::~RenderManager()
 {
-	Engine::mixer()->restoreAudioDevice();  // Also deletes audio dev.
-	Engine::mixer()->changeQuality( m_oldQualitySettings );
+	Engine::audioEngine()->restoreAudioDevice();  // Also deletes audio dev.
+	Engine::audioEngine()->changeQuality( m_oldQualitySettings );
 }
 
 void RenderManager::abortProcessing()
@@ -80,9 +79,9 @@ void RenderManager::renderNextTrack()
 		m_tracksToRender.pop_back();
 
 		// mute everything but the track we are about to render
-		for( auto it = m_unmuted.begin(); it != m_unmuted.end(); ++it )
+		for (auto track : m_unmuted)
 		{
-			(*it)->setMuted( (*it) != renderTrack );
+			track->setMuted(track != renderTrack);
 		}
 
 		// for multi-render, prefix each output file with a different number
@@ -140,7 +139,7 @@ void RenderManager::renderProject()
 
 void RenderManager::render(QString outputPath)
 {
-	m_activeRenderer = make_unique<ProjectRenderer>(
+	m_activeRenderer = std::make_unique<ProjectRenderer>(
 			m_qualitySettings,
 			m_outputSettings,
 			m_format,
@@ -182,7 +181,7 @@ QString RenderManager::pathForTrack(const Track *track, int num)
 {
 	QString extension = ProjectRenderer::getFileExtensionFromFormat( m_format );
 	QString name = track->name();
-	name = name.remove(QRegExp("[^a-zA-Z]"));
+	name = name.remove(QRegExp(FILENAME_FILTER));
 	name = QString( "%1_%2%3" ).arg( num ).arg( name ).arg( extension );
 	return QDir(m_outputPath).filePath(name);
 }

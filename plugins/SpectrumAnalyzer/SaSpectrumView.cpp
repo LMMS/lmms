@@ -39,7 +39,6 @@
 
 #ifdef SA_DEBUG
 	#include <chrono>
-	#include <iostream>
 #endif
 
 
@@ -48,12 +47,18 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_controls(controls),
 	m_processor(processor),
 	m_freezeRequest(false),
-	m_frozen(false)
+	m_frozen(false),
+	m_cachedRangeMin(-1),
+	m_cachedRangeMax(-1),
+	m_cachedLogX(true),
+	m_cachedDisplayWidth(0),
+	m_cachedBinCount(0),
+	m_cachedSampleRate(0)
 {
 	setMinimumSize(360, 170);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayBufferL.resize(m_processor->binCount(), 0);
 	m_displayBufferR.resize(m_processor->binCount(), 0);
@@ -68,7 +73,14 @@ SaSpectrumView::SaSpectrumView(SaControls *controls, SaProcessor *processor, QWi
 	m_logAmpTics = makeLogAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 	m_linearAmpTics = makeLinearAmpTics(m_processor->getAmpRangeMin(), m_processor->getAmpRangeMax());
 
-	m_cursor = QPoint(0, 0);
+	m_cursor = QPointF(0, 0);
+
+	// Initialize the size of bin → pixel X position LUT to the maximum allowed number of bins + 1.
+	m_cachedBinToX.resize(FFT_BLOCK_SIZES.back() / 2 + 2);
+
+	#ifdef SA_DEBUG
+		m_execution_avg = m_path_avg = m_draw_avg = 0;
+	#endif
 }
 
 
@@ -134,12 +146,20 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 							2.0, 2.0);
 
 	#ifdef SA_DEBUG
-		// display what FPS would be achieved if spectrum display ran in a loop
+		// display performance measurements if enabled
 		total_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - total_time;
+		m_execution_avg = 0.95 * m_execution_avg + 0.05 * total_time / 1000000.0;
 		painter.setPen(QPen(m_controls->m_colorLabels, 1,
 							Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -100, 70, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Max FPS: " + std::to_string(1000000000.0 / total_time)).c_str()));
+		painter.drawText(m_displayRight -150, 10, 130, 16, Qt::AlignLeft,
+						 QString("Exec avg.: ").append(std::to_string(m_execution_avg).substr(0, 5).c_str()).append(" ms"));
+		painter.drawText(m_displayRight -150, 30, 130, 16, Qt::AlignLeft,
+						 QString("Buff. upd. avg: ").append(std::to_string(m_refresh_avg).substr(0, 5).c_str()).append(" ms"));
+		painter.drawText(m_displayRight -150, 50, 130, 16, Qt::AlignLeft,
+						 QString("Path build avg: ").append(std::to_string(m_path_avg).substr(0, 5).c_str()).append(" ms"));
+		painter.drawText(m_displayRight -150, 70, 130, 16, Qt::AlignLeft,
+						 QString("Path draw avg: ").append(std::to_string(m_draw_avg).substr(0, 5).c_str()).append(" ms"));
+
 	#endif
 }
 
@@ -148,22 +168,14 @@ void SaSpectrumView::paintEvent(QPaintEvent *event)
 void SaSpectrumView::drawSpectrum(QPainter &painter)
 {
 	#ifdef SA_DEBUG
-		int path_time = 0, draw_time = 0;
+		int draw_time = 0;
 	#endif
 
 	// draw the graph only if there is any input, averaging residue or peaks
-	QMutexLocker lock(&m_processor->m_dataAccess);
-	if (m_decaySum > 0 || notEmpty(m_processor->m_normSpectrumL) || notEmpty(m_processor->m_normSpectrumR))
+	if (m_decaySum > 0 || m_processor->spectrumNotEmpty())
 	{
-		lock.unlock();
-		#ifdef SA_DEBUG
-			path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-		#endif
 		// update data buffers and reconstruct paths
 		refreshPaths();
-		#ifdef SA_DEBUG
-			path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - path_time;
-		#endif
 
 		// draw stored paths
 		#ifdef SA_DEBUG
@@ -199,17 +211,10 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 			draw_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - draw_time;
 		#endif
 	}
-	else
-	{
-		lock.unlock();
-	}
 
 	#ifdef SA_DEBUG
-		// display measurement results
-		painter.drawText(m_displayRight -100, 90, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Path ms: " + std::to_string(path_time / 1000000.0)).c_str()));
-		painter.drawText(m_displayRight -100, 110, 100, 16, Qt::AlignLeft,
-						 QString(std::string("Draw ms: " + std::to_string(draw_time / 1000000.0)).c_str()));
+		// save performance measurement result
+		m_draw_avg = 0.95 * m_draw_avg + 0.05 * draw_time / 1000000.0;
 	#endif
 }
 
@@ -218,9 +223,9 @@ void SaSpectrumView::drawSpectrum(QPainter &painter)
 // and build QPainter paths.
 void SaSpectrumView::refreshPaths()
 {
-	// Lock is required for the entire function, mainly to prevent block size
-	// changes from causing reallocation of data structures mid-way.
-	QMutexLocker lock(&m_processor->m_dataAccess);
+	// Reallocation lock is required for the entire function, to keep display
+	// buffer size consistent with block size.
+	QMutexLocker reloc_lock(&m_processor->m_reallocationAccess);
 
 	// check if bin count changed and reallocate display buffers accordingly
 	if (m_processor->binCount() != m_displayBufferL.size())
@@ -240,8 +245,8 @@ void SaSpectrumView::refreshPaths()
 		int refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
 	m_decaySum = 0;
-	updateBuffers(m_processor->m_normSpectrumL.data(), m_displayBufferL.data(), m_peakBufferL.data());
-	updateBuffers(m_processor->m_normSpectrumR.data(), m_displayBufferR.data(), m_peakBufferR.data());
+	updateBuffers(m_processor->getSpectrumL(), m_displayBufferL.data(), m_peakBufferL.data());
+	updateBuffers(m_processor->getSpectrumR(), m_displayBufferR.data(), m_peakBufferR.data());
 	#ifdef SA_DEBUG
 		refresh_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - refresh_time;
 	#endif
@@ -254,41 +259,43 @@ void SaSpectrumView::refreshPaths()
 	}
 
 	#ifdef SA_DEBUG
-		int make_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		int path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	#endif
 	// Use updated display buffers to prepare new paths for QPainter.
 	// This is the second slowest action (first is the subsequent drawing); use
 	// the resolution parameter to balance display quality and performance.
-	m_pathL = makePath(m_displayBufferL, 1.5);
+	m_pathL = makePath(m_displayBufferL, m_controls->m_spectrumResolutionModel.value());
 	if (m_controls->m_stereoModel.value())
 	{
-		m_pathR = makePath(m_displayBufferR, 1.5);
+		m_pathR = makePath(m_displayBufferR, m_controls->m_spectrumResolutionModel.value());
 	}
 	if (m_controls->m_peakHoldModel.value() || m_controls->m_refFreezeModel.value())
 	{
-		m_pathPeakL = makePath(m_peakBufferL, 0.25);
+		m_pathPeakL = makePath(m_peakBufferL, m_controls->m_envelopeResolutionModel.value());
 		if (m_controls->m_stereoModel.value())
 		{
-			m_pathPeakR = makePath(m_peakBufferR, 0.25);
+			m_pathPeakR = makePath(m_peakBufferR, m_controls->m_envelopeResolutionModel.value());
 		}
 	}
 	#ifdef SA_DEBUG
-		make_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - make_time;
+		path_time = std::chrono::high_resolution_clock::now().time_since_epoch().count() - path_time;
 	#endif
 
 	#ifdef SA_DEBUG
-		// print measurement results
-		std::cout << "Buffer update ms: " << std::to_string(refresh_time / 1000000.0) << ", ";
-		std::cout << "Path-make ms: " << std::to_string(make_time / 1000000.0) << std::endl;
+		// save performance measurement results
+		m_refresh_avg = 0.95 * m_refresh_avg + 0.05 * refresh_time / 1000000.0;
+		m_path_avg = .95f * m_path_avg + .05f * path_time / 1000000.f;
 	#endif
 }
 
 
 // Update display buffers: add new data, update average and peaks / reference.
 // Output the sum of all displayed values -- draw only if it is non-zero.
-// NOTE: The calling function is responsible for acquiring SaProcessor data
-// access lock!
-void SaSpectrumView::updateBuffers(float *spectrum, float *displayBuffer, float *peakBuffer)
+// NOTE: The calling function is responsible for acquiring SaProcessor
+// reallocation access lock! Data access lock is not needed: the final result
+// buffer is updated very quickly and the worst case is that one frame will be
+// part new, part old. At reasonable frame rate, such difference is invisible..
+void SaSpectrumView::updateBuffers(const float *spectrum, float *displayBuffer, float *peakBuffer)
 {
 	for (int n = 0; n < m_processor->binCount(); n++)
 	{
@@ -297,7 +304,8 @@ void SaSpectrumView::updateBuffers(float *spectrum, float *displayBuffer, float 
 		{
 			if (m_controls->m_smoothModel.value())
 			{
-				displayBuffer[n] = spectrum[n] * m_smoothFactor + displayBuffer[n] * (1 - m_smoothFactor);
+				const float smoothFactor = m_controls->m_averagingWeightModel.value();
+				displayBuffer[n] = spectrum[n] * smoothFactor + displayBuffer[n] * (1 - smoothFactor);
 			}
 			else
 			{
@@ -319,7 +327,7 @@ void SaSpectrumView::updateBuffers(float *spectrum, float *displayBuffer, float 
 			}
 			else if (!m_controls->m_refFreezeModel.value())
 			{
-				peakBuffer[n] = peakBuffer[n] * m_peakDecayFactor;
+				peakBuffer[n] = peakBuffer[n] * m_controls->m_peakDecayFactorModel.value();
 			}
 		}
 		else if (!m_controls->m_refFreezeModel.value() && !m_controls->m_peakHoldModel.value())
@@ -349,10 +357,31 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 	// Bins falling to interval [x_start, x_next) contribute to a single point.
 	float max = m_displayBottom;
 	float x_start = -1;		// lower bound of currently constructed point
+
+	// Speed up bin → x position translation by building a LUT cache.
+	// Update the cache only when range or display width are changed.
+	float rangeMin = m_processor->getFreqRangeMin(m_controls->m_logXModel.value());
+	float rangeMax = m_processor->getFreqRangeMax();
+	if (rangeMin != m_cachedRangeMin || rangeMax != m_cachedRangeMax || m_displayWidth != m_cachedDisplayWidth ||
+		m_controls->m_logXModel.value() != m_cachedLogX || m_processor->binCount() + 1 != m_cachedBinCount ||
+		m_processor->getSampleRate() != m_cachedSampleRate)
+	{
+		m_cachedRangeMin = rangeMin;
+		m_cachedRangeMax = rangeMax;
+		m_cachedDisplayWidth = m_displayWidth;
+		m_cachedLogX = m_controls->m_logXModel.value();
+		m_cachedBinCount = m_processor->binCount() + 1;
+		m_cachedSampleRate = m_processor->getSampleRate();
+		for (unsigned int n = 0; n < m_cachedBinCount; n++)
+		{
+			m_cachedBinToX[n] = freqToXPixel(binToFreq(n), m_displayWidth);
+		}
+	}
+
 	for (unsigned int n = 0; n < m_processor->binCount(); n++)
 	{
-		float x = freqToXPixel(binToFreq(n), m_displayWidth);
-		float x_next = freqToXPixel(binToFreq(n + 1), m_displayWidth);
+		float x = m_cachedBinToX[n];
+		float x_next = m_cachedBinToX[n + 1];
 		float y = ampToYPixel(displayBuffer[n], m_displayBottom);
 
 		// consider making a point only if x falls within display bounds
@@ -399,8 +428,8 @@ QPainterPath SaSpectrumView::makePath(std::vector<float> &displayBuffer, float r
 // Draw background, grid and associated frequency and amplitude labels.
 void SaSpectrumView::drawGrid(QPainter &painter)
 {
-	std::vector<std::pair<int, std::string>> *freqTics = NULL;
-	std::vector<std::pair<float, std::string>> *ampTics = NULL;
+	std::vector<std::pair<int, std::string>> *freqTics = nullptr;
+	std::vector<std::pair<float, std::string>> *ampTics = nullptr;
 	float pos = 0;
 	float label_width = 24;
 	float label_height = 15;
@@ -539,38 +568,52 @@ void SaSpectrumView::drawGrid(QPainter &painter)
 // Draw cursor and its coordinates if it is within display bounds.
 void SaSpectrumView::drawCursor(QPainter &painter)
 {
-	if(		m_cursor.x() >= m_displayLeft
+	if (	m_cursor.x() >= m_displayLeft
 		&&	m_cursor.x() <= m_displayRight
 		&&	m_cursor.y() >= m_displayTop
 		&&	m_cursor.y() <= m_displayBottom)
 	{
 		// cursor lines
 		painter.setPen(QPen(m_controls->m_colorGrid.lighter(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawLine(m_cursor.x(), m_displayTop, m_cursor.x(), m_displayBottom);
-		painter.drawLine(m_displayLeft, m_cursor.y(), m_displayRight, m_cursor.y());
+		painter.drawLine(QPointF(m_cursor.x(), m_displayTop), QPointF(m_cursor.x(), m_displayBottom));
+		painter.drawLine(QPointF(m_displayLeft, m_cursor.y()), QPointF(m_displayRight, m_cursor.y()));
 
-		// coordinates
+		// coordinates: background box
+		QFontMetrics fontMetrics = painter.fontMetrics();
+		unsigned int const box_left = 5;
+		unsigned int const box_top = 5;
+		unsigned int const box_margin = 3;
+		unsigned int const box_height = 2*(fontMetrics.size(Qt::TextSingleLine, "0 HzdBFS").height() + box_margin);
+		unsigned int const box_width = fontMetrics.size(Qt::TextSingleLine, "-99.9 dBFS").width() + 2*box_margin;
 		painter.setPen(QPen(m_controls->m_colorLabels.darker(), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
-		painter.drawText(m_displayRight -60, 5, 100, 16, Qt::AlignLeft, "Cursor");
+		painter.fillRect(m_displayLeft + box_left, m_displayTop + box_top,
+						 box_width, box_height, QColor(0, 0, 0, 64));
 
+		// coordinates: text
+		painter.setPen(QPen(m_controls->m_colorLabels, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin));
 		QString tmps;
+
 		// frequency
 		int xFreq = (int)m_processor->xPixelToFreq(m_cursor.x() - m_displayLeft, m_displayWidth);
-		tmps = QString(std::string(std::to_string(xFreq) + " Hz").c_str());
-		painter.drawText(m_displayRight -60, 18, 100, 16, Qt::AlignLeft, tmps);
+		tmps = QString("%1 Hz").arg(xFreq);
+		painter.drawText(m_displayLeft + box_left + box_margin,
+						 m_displayTop + box_top + box_margin,
+						 box_width, box_height / 2, Qt::AlignLeft, tmps);
 
 		// amplitude
 		float yAmp = m_processor->yPixelToAmp(m_cursor.y(), m_displayBottom);
 		if (m_controls->m_logYModel.value())
 		{
-			tmps = QString(std::string(std::to_string(yAmp).substr(0, 5) + " dB").c_str());
+			tmps = QString(std::to_string(yAmp).substr(0, 5).c_str()).append(" dBFS");
 		}
 		else
 		{
 			// add 0.0005 to get proper rounding to 3 decimal places
-			tmps = QString(std::string(std::to_string(0.0005f + yAmp)).substr(0, 5).c_str());
+			tmps = QString(std::to_string(0.0005f + yAmp).substr(0, 5).c_str());
 		}
-		painter.drawText(m_displayRight -60, 30, 100, 16, Qt::AlignLeft, tmps);
+		painter.drawText(m_displayLeft + box_left + box_margin,
+						 m_displayTop + box_top + box_height / 2,
+						 box_width, box_height / 2, Qt::AlignLeft, tmps);
 	}
 }
 
@@ -774,14 +817,18 @@ void SaSpectrumView::periodicUpdate()
 
 
 // Handle mouse input: set new cursor position.
+// For some reason (a bug?), localPos() only returns integers. As a workaround
+// the fractional part is taken from windowPos() (which works correctly).
 void SaSpectrumView::mouseMoveEvent(QMouseEvent *event)
 {
-	m_cursor = event->pos();
+	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
+						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
 }
 
 void SaSpectrumView::mousePressEvent(QMouseEvent *event)
 {
-	m_cursor = event->pos();
+	m_cursor = QPointF(	event->localPos().x() - (event->windowPos().x() - (long)event->windowPos().x()),
+						event->localPos().y() - (event->windowPos().y() - (long)event->windowPos().y()));
 }
 
 

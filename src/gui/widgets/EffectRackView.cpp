@@ -36,7 +36,7 @@
 
 EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	QWidget( parent ),
-	ModelView( NULL, this )
+	ModelView( nullptr, this )
 {
 	QVBoxLayout* mainLayout = new QVBoxLayout( this );
 	mainLayout->setMargin( 5 );
@@ -211,7 +211,7 @@ void EffectRackView::update()
 		}
 	}
 
-	w->setFixedSize( 210 + 2*EffectViewMargin, m_lastY );
+	w->setFixedSize( EffectView::DEFAULT_WIDTH + 2*EffectViewMargin, m_lastY);
 
 	QWidget::update();
 }

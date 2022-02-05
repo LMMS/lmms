@@ -26,6 +26,7 @@
 #ifndef BB_EDITOR_H
 #define BB_EDITOR_H
 
+
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -70,7 +71,7 @@ class BBTrackContainerView : public TrackContainerView
 public:
 	BBTrackContainerView(BBTrackContainer* tc);
 
-	bool fixedTCOs() const override
+	bool fixedClips() const override
 	{
 		return true;
 	}
@@ -86,6 +87,7 @@ public slots:
 	void removeSteps();
 	void addSampleTrack();
 	void addAutomationTrack();
+	void cloneClip();
 
 protected slots:
 	void dropEvent(QDropEvent * de ) override;

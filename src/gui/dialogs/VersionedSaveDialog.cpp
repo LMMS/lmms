@@ -31,6 +31,7 @@
 #include <QGroupBox>
 #include <QLabel>
 
+#include "DeprecationHelper.h"
 #include "VersionedSaveDialog.h"
 #include "LedCheckbox.h"
 
@@ -50,8 +51,8 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	plusButton->setToolTip( tr( "Increment version number" ) );
 	QPushButton *minusButton( new QPushButton( "-", this ) );
 	minusButton->setToolTip( tr( "Decrement version number" ) );
-	plusButton->setFixedWidth( plusButton->fontMetrics().width( "+" ) + 30 );
-	minusButton->setFixedWidth( minusButton->fontMetrics().width( "+" ) + 30 );
+	plusButton->setFixedWidth(horizontalAdvance(plusButton->fontMetrics(), "+") + 30);
+	minusButton->setFixedWidth(horizontalAdvance(minusButton->fontMetrics(), "+") + 30);
 
 	// Add buttons to grid layout. For doing this, remove the lineEdit and
 	// replace it with a HBox containing lineEdit and the buttons.
@@ -180,7 +181,13 @@ SaveOptionsWidget::SaveOptionsWidget(Song::SaveOptions &saveOptions) {
 	m_discardMIDIConnectionsCheckbox = new LedCheckBox(nullptr);
 	m_discardMIDIConnectionsCheckbox->setText(tr("Discard MIDI connections"));
 	m_discardMIDIConnectionsCheckbox->setModel(&saveOptions.discardMIDIConnections);
+
+	m_saveAsProjectBundleCheckbox = new LedCheckBox(nullptr);
+	m_saveAsProjectBundleCheckbox->setText(tr("Save As Project Bundle (with resources)"));
+	m_saveAsProjectBundleCheckbox->setModel(&saveOptions.saveAsProjectBundle);
+
 	layout->addWidget(m_discardMIDIConnectionsCheckbox);
+	layout->addWidget(m_saveAsProjectBundleCheckbox);
 
 	setLayout(layout);
 }

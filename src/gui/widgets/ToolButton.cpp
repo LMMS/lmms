@@ -34,7 +34,7 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 {
 	setAutoFillBackground( false );
 
-	if( _receiver != NULL && _slot != NULL )
+	if( _receiver != nullptr && _slot != nullptr )
 	{
 		connect( this, SIGNAL( clicked() ), _receiver, _slot );
 	}

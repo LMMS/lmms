@@ -36,13 +36,13 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Crossover Equalizer",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A 4-band Crossover Equalizer" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A 4-band Crossover Equalizer" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 };
 
 }
@@ -51,7 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
 	Effect( &crossovereq_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
 	m_lp1( m_sampleRate ),
 	m_lp2( m_sampleRate ),
 	m_lp3( m_sampleRate ),
@@ -60,9 +60,9 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp1 = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
-	m_tmp2 = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
-	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
+	m_tmp1 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_tmp2 = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
+	m_work = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() );
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()
@@ -74,7 +74,7 @@ CrossoverEQEffect::~CrossoverEQEffect()
 
 void CrossoverEQEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
 	m_lp1.setSampleRate( m_sampleRate );
 	m_lp2.setSampleRate( m_sampleRate );
 	m_lp3.setSampleRate( m_sampleRate );
@@ -191,12 +191,12 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	double outSum = 0.0;
 	for( int f = 0; f < frames; ++f )
 	{
-		outSum = buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 	
-	checkGate( outSum );
+	checkGate( outSum / frames );
 	
 	return isRunning();
 }

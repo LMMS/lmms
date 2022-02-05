@@ -45,12 +45,12 @@ class AudioPulseAudio : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioPulseAudio( bool & _success_ful, Mixer* mixer );
+	AudioPulseAudio( bool & _success_ful, AudioEngine* audioEngine );
 	virtual ~AudioPulseAudio();
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "PulseAudio" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "PulseAudio" );
 	}
 
 	static QString probeDevice();

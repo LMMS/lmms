@@ -42,7 +42,7 @@ public:
 				bool usePixmap = false, bool resizable = false );
 	virtual ~TabWidget() = default;
 
-	void addTab( QWidget * w, const QString & name, const char *pixmap = NULL, int idx = -1 );
+	void addTab( QWidget * w, const QString & name, const char *pixmap = nullptr, int idx = -1 );
 
 	void setActiveTab( int idx );
 

@@ -29,19 +29,19 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
-#include "MidiTime.h"
 #include "PlayHandle.h"
+#include "TimePos.h"
 
 class BBTrack;
 class SampleBuffer;
-class SampleTCO;
+class SampleClip;
 class Track;
 
 
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	SampleRecordHandle( SampleTCO* tco );
+	SampleRecordHandle( SampleClip* clip );
 	virtual ~SampleRecordHandle();
 
 	void play( sampleFrame * _working_buffer ) override;
@@ -60,11 +60,11 @@ private:
 	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
-	MidiTime m_minLength;
+	TimePos m_minLength;
 
 	Track * m_track;
 	BBTrack * m_bbTrack;
-	SampleTCO * m_tco;
+	SampleClip * m_clip;
 
 } ;
 

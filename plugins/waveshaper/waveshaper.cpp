@@ -38,14 +38,14 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Waveshaper Effect",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for waveshaping" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -140,10 +140,10 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		s[0] *= *outputPtr;
 		s[1] *= *outputPtr;
 
-		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
 		_buf[f][0] = d * _buf[f][0] + w * s[0];
 		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		out_sum += _buf[f][0] * _buf[f][0] + _buf[f][1] * _buf[f][1];
 
 		outputPtr += outputInc;
 		inputPtr += inputInc;

@@ -32,13 +32,11 @@
 #include "ComboBoxModel.h"
 #include "AutomatableModelView.h"
 
-
-
 class LMMS_EXPORT ComboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	ComboBox( QWidget* parent = NULL, const QString& name = QString() );
+	ComboBox( QWidget* parent = nullptr, const QString& name = QString() );
 	virtual ~ComboBox();
 
 	ComboBoxModel* model()
@@ -50,6 +48,8 @@ public:
 	{
 		return castModel<ComboBoxModel>();
 	}
+
+	static constexpr int DEFAULT_HEIGHT = 22;
 
 public slots:
 	void selectNext();

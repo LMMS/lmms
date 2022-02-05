@@ -239,10 +239,15 @@ class MIDITrack
 		addEvent(event);
 	}
 	
-	inline void addTempo(uint8_t tempo, uint32_t time)
+	inline void addTempo(uint32_t tempo, uint32_t time)
 	{
-		Event event; event.channel = channel;
-		event.type = Event::TEMPO; event.time=time; event.tempo = tempo;
+		Event event;
+		event.channel = channel;
+
+		event.type = Event::TEMPO;
+		event.time = time;
+		event.tempo = tempo;
+
 		addEvent(event);
 	}
 	

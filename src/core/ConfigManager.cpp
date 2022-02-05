@@ -38,6 +38,12 @@
 #include "lmmsversion.h"
 
 
+// Vector with all the upgrade methods
+const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
+	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91,
+	&ConfigManager::upgrade_1_2_2
+};
+
 static inline QString ensureTrailingSlash(const QString & s )
 {
 	if(! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\'))
@@ -48,70 +54,37 @@ static inline QString ensureTrailingSlash(const QString & s )
 }
 
 
-ConfigManager * ConfigManager::s_instanceOfMe = NULL;
+ConfigManager * ConfigManager::s_instanceOfMe = nullptr;
 
 
 ConfigManager::ConfigManager() :
-	m_workingDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/"),
-	m_dataDir("data:/"),
-	m_vstDir(m_workingDir + "vst/"),
-	m_sf2Dir(m_workingDir + SF2_PATH),
-	m_gigDir(m_workingDir + GIG_PATH),
-	m_themeDir(defaultThemeDir()),
-	m_lmmsRcFile(QDir::home().absolutePath() +"/.lmmsrc.xml"),
-	m_version(defaultVersion())
+	m_version(defaultVersion()),
+	m_configVersion( UPGRADE_METHODS.size() )
 {
-	// Detect < 1.2.0 working directory as a courtesy
-	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
-                m_workingDir = QDir::home().absolutePath() + "/lmms/";
-
-	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
+	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
+	{
+		initPortableWorkingDir();
+	}
+	else
+	{
+		initInstalledWorkingDir();
+	}
+	m_dataDir = "data:/";
+	m_vstDir = m_workingDir + "vst/";
+	m_sf2Dir = m_workingDir + SF2_PATH;
+	m_gigDir = m_workingDir + GIG_PATH;
+	m_themeDir = defaultThemeDir();
+	if (!qgetenv("LMMS_DATA_DIR").isEmpty())
+	{
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
-
-	// If we're in development (lmms is not installed) let's get the source and
-	// binary directories by reading the CMake Cache
-	QDir appPath = qApp->applicationDirPath();
-	// If in tests, get parent directory
-	if (appPath.dirName() == "tests") {
-		appPath.cdUp();
 	}
-	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
-	if (cmakeCache.exists()) {
-		cmakeCache.open(QFile::ReadOnly);
-		QTextStream stream(&cmakeCache);
-
-		// Find the lines containing something like lmms_SOURCE_DIR:static=<dir>
-		// and lmms_BINARY_DIR:static=<dir>
-		int done = 0;
-		while(! stream.atEnd())
-		{
-			QString line = stream.readLine();
-
-			if (line.startsWith("lmms_SOURCE_DIR:")) {
-				QString srcDir = line.section('=', -1).trimmed();
-				QDir::addSearchPath("data", srcDir + "/data/");
-				done++;
-			}
-			if (line.startsWith("lmms_BINARY_DIR:")) {
-				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
-											 ".lmmsrc.xml";
-				done++;
-			}
-			if (done == 2)
-			{
-				break;
-			}
-		}
-
-		cmakeCache.close();
-	}
+	initDevelopmentWorkingDir();
 
 #ifdef LMMS_BUILD_WIN32
 	QDir::addSearchPath("data", qApp->applicationDirPath() + "/data/");
 #else
 	QDir::addSearchPath("data", qApp->applicationDirPath().section('/', 0, -2) + "/share/lmms/");
 #endif
-
 
 }
 
@@ -147,16 +120,35 @@ void ConfigManager::upgrade_1_1_90()
 	}
 }
 
-	
 void ConfigManager::upgrade_1_1_91()
-{		
+{
 	// rename displaydbv to displaydbfs
-	if (!value("app", "displaydbv").isNull()) {
+	if (!value("app", "displaydbv").isNull())
+	{
 		setValue("app", "displaydbfs", value("app", "displaydbv"));
 		deleteValue("app", "displaydbv");
 	}
 }
 
+void ConfigManager::upgrade_1_2_2()
+{
+	// Since mixer has been renamed to audioengine, we need to transfer the
+	// attributes from the old element to the new one
+	std::vector<QString> attrs = {
+		"audiodev", "mididev", "framesperaudiobuffer", "hqaudio", "samplerate"
+	};
+
+	for (auto attr : attrs)
+	{
+		if (!value("mixer", attr).isNull())
+		{
+			setValue("audioengine", attr, value("mixer", attr));
+			deleteValue("mixer", attr);
+		}
+	}
+
+	m_settings.remove("mixer");
+}
 
 void ConfigManager::upgrade()
 {
@@ -166,17 +158,16 @@ void ConfigManager::upgrade()
 		return;
 	}
 
+	// Runs all necessary upgrade methods
+	std::size_t max = std::min(static_cast<std::size_t>(m_configVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
+		[this](UpgradeMethod um)
+		{
+			(this->*um)();
+		}
+	);
+	
 	ProjectVersion createdWith = m_version;
-	
-	if (createdWith.setCompareType(ProjectVersion::Build) < "1.1.90")
-	{
-		upgrade_1_1_90();
-	}
-	
-	if (createdWith.setCompareType(ProjectVersion::Build) < "1.1.91")
-	{
-		upgrade_1_1_91();
-	}
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
 	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
@@ -186,6 +177,7 @@ void ConfigManager::upgrade()
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
+	m_configVersion = UPGRADE_METHODS.size();
 }
 
 QString ConfigManager::defaultVersion() const
@@ -193,7 +185,7 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
-QStringList ConfigManager::availabeVstEmbedMethods()
+QStringList ConfigManager::availableVstEmbedMethods()
 {
 	QStringList methods;
 	methods.append("none");
@@ -215,7 +207,7 @@ QStringList ConfigManager::availabeVstEmbedMethods()
 
 QString ConfigManager::vstEmbedMethod() const
 {
-	QStringList methods = availabeVstEmbedMethods();
+	QStringList methods = availableVstEmbedMethods();
 	QString defaultMethod = *(methods.end() - 1);
 	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
 	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
@@ -435,9 +427,21 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 
 			QDomNode node = root.firstChild();
 
-			// Cache the config version for upgrade()
+			// Cache LMMS version
 			if (!root.attribute("version").isNull()) {
 				m_version = root.attribute("version");
+			}
+
+			// Get the version of the configuration file (for upgrade purposes)
+			if( root.attribute("configversion").isNull() )
+			{
+				m_configVersion = legacyConfigVersion(); // No configversion attribute found
+			}
+			else
+			{
+				bool success;
+				m_configVersion = root.attribute("configversion").toUInt(&success);
+				if( !success ) qWarning("Config Version conversion failure.");
 			}
 
 			// create the settings-map out of the DOM
@@ -510,9 +514,9 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
-		else if(gui)
+		else if(getGUI() != nullptr)
 		{
-			QMessageBox::warning(NULL, MainWindow::tr("Configuration file"),
+			QMessageBox::warning(nullptr, MainWindow::tr("Configuration file"),
 									MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
 													arg(errorLine).
 													arg(errorCol).
@@ -545,17 +549,16 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 	{
 #if defined(LMMS_BUILD_WIN32)
 		m_stkDir = m_dataDir + "stk/rawwaves/";
-#elif defined(LMMS_BUILD_APPLE)
-		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
-		if ( qApp->applicationDirPath().startsWith("/tmp/") )
+		// Look for bundled raw waves first
+		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		// Try system installations if not exists
+		if (!QDir(m_stkDir).exists())
 		{
-			// Assume AppImage bundle
-			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+			m_stkDir = "/usr/local/share/stk/rawwaves/";
 		}
-		else
+		if (!QDir(m_stkDir).exists())
 		{
-			// Fallback to system provided location
 			m_stkDir = "/usr/share/stk/rawwaves/";
 		}
 #endif
@@ -600,6 +603,7 @@ void ConfigManager::saveConfigFile()
 
 	QDomElement lmms_config = doc.createElement("lmms");
 	lmms_config.setAttribute("version", m_version);
+	lmms_config.setAttribute("configversion", m_configVersion);
 	doc.appendChild(lmms_config);
 
 	for(settingsMap::iterator it = m_settings.begin();
@@ -639,9 +643,9 @@ void ConfigManager::saveConfigFile()
 					"the directory containing the "
 					"file and try again!"
 						).arg(m_lmmsRcFile);
-		if(gui)
+		if(getGUI() != nullptr)
 		{
-			QMessageBox::critical(NULL, title, message,
+			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,
 						QMessageBox::NoButton);
 		}
@@ -650,4 +654,83 @@ void ConfigManager::saveConfigFile()
 
 	outfile.write(xml.toUtf8());
 	outfile.close();
+}
+
+void ConfigManager::initPortableWorkingDir()
+{
+	QString applicationPath = qApp->applicationDirPath();
+	m_workingDir = applicationPath + "/lmms-workspace/";
+	m_lmmsRcFile = applicationPath + "/.lmmsrc.xml";
+}
+
+void ConfigManager::initInstalledWorkingDir()
+{
+	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
+	m_lmmsRcFile = QDir::home().absolutePath() +"/.lmmsrc.xml";
+	// Detect < 1.2.0 working directory as a courtesy
+	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
+		m_workingDir = QDir::home().absolutePath() + "/lmms/";
+}
+
+void ConfigManager::initDevelopmentWorkingDir()
+{
+	// If we're in development (lmms is not installed) let's get the source and
+	// binary directories by reading the CMake Cache
+	QDir appPath = qApp->applicationDirPath();
+	// If in tests, get parent directory
+	if (appPath.dirName() == "tests") {
+		appPath.cdUp();
+	}
+	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
+	if (cmakeCache.exists()) {
+		cmakeCache.open(QFile::ReadOnly);
+		QTextStream stream(&cmakeCache);
+
+		// Find the lines containing something like lmms_SOURCE_DIR:static=<dir>
+		// and lmms_BINARY_DIR:static=<dir>
+		int done = 0;
+		while(! stream.atEnd())
+		{
+			QString line = stream.readLine();
+
+			if (line.startsWith("lmms_SOURCE_DIR:")) {
+				QString srcDir = line.section('=', -1).trimmed();
+				QDir::addSearchPath("data", srcDir + "/data/");
+				done++;
+			}
+			if (line.startsWith("lmms_BINARY_DIR:")) {
+				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
+							   ".lmmsrc.xml";
+				done++;
+			}
+			if (done == 2)
+			{
+				break;
+			}
+		}
+
+		cmakeCache.close();
+	}
+}
+
+// If configversion is not present, we will convert the LMMS version to the appropriate
+// configuration file version for backwards compatibility.
+unsigned int ConfigManager::legacyConfigVersion()
+{
+	ProjectVersion createdWith = m_version;
+
+	createdWith.setCompareType(ProjectVersion::Build);
+
+	if( createdWith < "1.1.90" )
+	{
+		return 0;
+	}
+	else if( createdWith < "1.1.91" )
+	{
+		return 1;
+	}
+	else
+	{
+		return 2;
+	}
 }

@@ -30,6 +30,7 @@ SET(LMMS_PLUGIN_LIST
 	carlabase
 	carlapatchbay
 	carlarack
+	Compressor
 	CrossoverEQ
 	Delay
 	DualFilter
@@ -39,6 +40,8 @@ SET(LMMS_PLUGIN_LIST
 	HydrogenImport
 	ladspa_browser
 	LadspaEffect
+	Lv2Effect
+	Lv2Instrument
 	lb302
 	MidiImport
 	MidiExport
@@ -54,7 +57,7 @@ SET(LMMS_PLUGIN_LIST
 	ReverbSC
 	sf2_player
 	sfxr
-	sid
+	Sid
 	SpectrumAnalyzer
 	stereo_enhancer
 	stereo_matrix
@@ -64,6 +67,7 @@ SET(LMMS_PLUGIN_LIST
 	VstEffect
 	watsyn
 	waveshaper
+	Vectorscope
 	vibed
 	Xpressive
 	zynaddsubfx

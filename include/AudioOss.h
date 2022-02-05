@@ -43,12 +43,12 @@ class AudioOss : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioOss( bool & _success_ful, Mixer* mixer );
+	AudioOss( bool & _success_ful, AudioEngine* audioEngine );
 	virtual ~AudioOss();
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "OSS (Open Sound System)" );
+		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "OSS (Open Sound System)" );
 	}
 
 	static QString probeDevice();

@@ -49,10 +49,13 @@ public:
 	void * m_pluginData;
 	std::unique_ptr<BasicFilters<>> m_filter;
 
+	// length of the declicking fade in
+	fpp_t m_fadeInLength;
+
 	// specifies origin of NotePlayHandle
 	enum Origins
 	{
-		OriginPattern,		/*! playback of a note from a pattern */
+		OriginMidiClip,		/*! playback of a note from a MIDI clip */
 		OriginMidiInput,	/*! playback of a MIDI note input event */
 		OriginNoteStacking,	/*! created by note stacking instrument function */
 		OriginArpeggio,		/*! created by arpeggio instrument function */
@@ -64,9 +67,9 @@ public:
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					Origin origin = OriginPattern );
+					Origin origin = OriginMidiClip );
 	virtual ~NotePlayHandle();
 
 	void * operator new ( size_t size, void * p )
@@ -122,7 +125,7 @@ public:
 	/*! Returns whether the play handle plays on a certain track */
 	bool isFromTrack( const Track* _track ) const override;
 
-	/*! Releases the note (and plays release frames */
+	/*! Releases the note (and plays release frames) */
 	void noteOff( const f_cnt_t offset = 0 );
 
 	/*! Returns number of frames to be played until the note is going to be released */
@@ -241,19 +244,19 @@ public:
 	}
 
 	/*! Process note detuning automation */
-	void processMidiTime( const MidiTime& time );
+	void processTimePos( const TimePos& time );
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
-	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
-	void setSongGlobalParentOffset( const MidiTime& offset )
+	/*! Set song-global offset (relative to containing MIDI clip) in order to properly perform the note detuning */
+	void setSongGlobalParentOffset( const TimePos& offset )
 	{
 		m_songGlobalParentOffset = offset;
 	}
 
 	/*! Returns song-global offset */
-	const MidiTime& songGlobalParentOffset() const
+	const TimePos& songGlobalParentOffset() const
 	{
 		return m_songGlobalParentOffset;
 	}
@@ -320,7 +323,7 @@ private:
 	float m_unpitchedFrequency;
 
 	BaseDetuning* m_baseDetuning;
-	MidiTime m_songGlobalParentOffset;
+	TimePos m_songGlobalParentOffset;
 
 	int m_midiChannel;
 	Origin m_origin;
@@ -341,11 +344,12 @@ public:
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
+					NotePlayHandle::Origin origin = NotePlayHandle::OriginMidiClip );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
+	static void free();
 
 private:
 	static NotePlayHandle ** s_available;

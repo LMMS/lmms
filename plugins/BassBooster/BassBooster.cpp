@@ -34,13 +34,13 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"BassBooster",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Boost your bass the fast and simple way" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Boost your bass the fast and simple way" ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -100,13 +100,13 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		//float gain = gainBuffer ? gainBuffer[f] : gain;
 		m_bbFX.leftFX().setGain( gain );
 		m_bbFX.rightFX().setGain( gain);
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 
 		sample_t s[2] = { buf[f][0], buf[f][1] };
 		m_bbFX.nextSample( s[0], s[1] );
 
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
 	checkGate( outSum / frames );
@@ -117,7 +117,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 
 inline void BassBoosterEffect::changeFrequency()
 {
-	const sample_t fac = Engine::mixer()->processingSampleRate() / 44100.0f;
+	const sample_t fac = Engine::audioEngine()->processingSampleRate() / 44100.0f;
 
 	m_bbFX.leftFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
 	m_bbFX.rightFX().setFrequency( m_bbControls.m_freqModel.value() * fac );

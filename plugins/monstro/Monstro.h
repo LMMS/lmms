@@ -39,7 +39,6 @@
 #include "Oscillator.h"
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
-#include "stdshims.h"
 
 //
 //	UI Macros
@@ -60,7 +59,7 @@
 	name ->setFixedSize( 20, 20 );
 
 #define maketinyled( name, x, y, ttip ) \
-	name = new PixmapButton( view, NULL ); 	\
+	name = new PixmapButton( view, nullptr ); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
@@ -310,35 +309,35 @@ class MonstroInstrument : public Instrument
 	Q_OBJECT
 
 #define setwavemodel( name ) 												\
-		name .addItem( tr( "Sine wave" ), make_unique<PluginPixmapLoader>( "sin" ) );		\
-		name .addItem( tr( "Bandlimited Triangle wave" ), make_unique<PluginPixmapLoader>( "tri" ) );	\
-		name .addItem( tr( "Bandlimited Saw wave" ), make_unique<PluginPixmapLoader>( "saw" ) );			\
-		name .addItem( tr( "Bandlimited Ramp wave" ), make_unique<PluginPixmapLoader>( "ramp" ) );		\
-		name .addItem( tr( "Bandlimited Square wave" ), make_unique<PluginPixmapLoader>( "sqr" ) );		\
-		name .addItem( tr( "Bandlimited Moog saw wave" ), make_unique<PluginPixmapLoader>( "moog" ) );	\
-		name .addItem( tr( "Soft square wave" ), make_unique<PluginPixmapLoader>( "sqrsoft" ) );		\
-		name .addItem( tr( "Absolute sine wave" ), make_unique<PluginPixmapLoader>( "sinabs" ) );		\
-		name .addItem( tr( "Exponential wave" ), make_unique<PluginPixmapLoader>( "exp" ) );	\
-		name .addItem( tr( "White noise" ), make_unique<PluginPixmapLoader>( "noise" ) );	\
-		name .addItem( tr( "Digital Triangle wave" ), make_unique<PluginPixmapLoader>( "tri" ) );	\
-		name .addItem( tr( "Digital Saw wave" ), make_unique<PluginPixmapLoader>( "saw" ) );			\
-		name .addItem( tr( "Digital Ramp wave" ), make_unique<PluginPixmapLoader>( "ramp" ) );		\
-		name .addItem( tr( "Digital Square wave" ), make_unique<PluginPixmapLoader>( "sqr" ) );		\
-		name .addItem( tr( "Digital Moog saw wave" ), make_unique<PluginPixmapLoader>( "moog" ) );
+		name .addItem( tr( "Sine wave" ), std::make_unique<PluginPixmapLoader>( "sin" ) );		\
+		name .addItem( tr( "Bandlimited Triangle wave" ), std::make_unique<PluginPixmapLoader>( "tri" ) );	\
+		name .addItem( tr( "Bandlimited Saw wave" ), std::make_unique<PluginPixmapLoader>( "saw" ) );			\
+		name .addItem( tr( "Bandlimited Ramp wave" ), std::make_unique<PluginPixmapLoader>( "ramp" ) );		\
+		name .addItem( tr( "Bandlimited Square wave" ), std::make_unique<PluginPixmapLoader>( "sqr" ) );		\
+		name .addItem( tr( "Bandlimited Moog saw wave" ), std::make_unique<PluginPixmapLoader>( "moog" ) );	\
+		name .addItem( tr( "Soft square wave" ), std::make_unique<PluginPixmapLoader>( "sqrsoft" ) );		\
+		name .addItem( tr( "Absolute sine wave" ), std::make_unique<PluginPixmapLoader>( "sinabs" ) );		\
+		name .addItem( tr( "Exponential wave" ), std::make_unique<PluginPixmapLoader>( "exp" ) );	\
+		name .addItem( tr( "White noise" ), std::make_unique<PluginPixmapLoader>( "noise" ) );	\
+		name .addItem( tr( "Digital Triangle wave" ), std::make_unique<PluginPixmapLoader>( "tri" ) );	\
+		name .addItem( tr( "Digital Saw wave" ), std::make_unique<PluginPixmapLoader>( "saw" ) );			\
+		name .addItem( tr( "Digital Ramp wave" ), std::make_unique<PluginPixmapLoader>( "ramp" ) );		\
+		name .addItem( tr( "Digital Square wave" ), std::make_unique<PluginPixmapLoader>( "sqr" ) );		\
+		name .addItem( tr( "Digital Moog saw wave" ), std::make_unique<PluginPixmapLoader>( "moog" ) );
 
 
 #define setlfowavemodel( name ) 												\
-		name .addItem( tr( "Sine wave" ), make_unique<PluginPixmapLoader>( "sin" ) );		\
-		name .addItem( tr( "Triangle wave" ), make_unique<PluginPixmapLoader>( "tri" ) );	\
-		name .addItem( tr( "Saw wave" ), make_unique<PluginPixmapLoader>( "saw" ) );			\
-		name .addItem( tr( "Ramp wave" ), make_unique<PluginPixmapLoader>( "ramp" ) );		\
-		name .addItem( tr( "Square wave" ), make_unique<PluginPixmapLoader>( "sqr" ) );		\
-		name .addItem( tr( "Moog saw wave" ), make_unique<PluginPixmapLoader>( "moog" ) );	\
-		name .addItem( tr( "Soft square wave" ), make_unique<PluginPixmapLoader>( "sqrsoft" ) );		\
-		name .addItem( tr( "Abs. sine wave" ), make_unique<PluginPixmapLoader>( "sinabs" ) );		\
-		name .addItem( tr( "Exponential wave" ), make_unique<PluginPixmapLoader>( "exp" ) );	\
-		name .addItem( tr( "Random" ), make_unique<PluginPixmapLoader>( "rand" ) );	\
-		name .addItem( tr( "Random smooth" ), make_unique<PluginPixmapLoader>( "rand" ) );
+		name .addItem( tr( "Sine wave" ), std::make_unique<PluginPixmapLoader>( "sin" ) );		\
+		name .addItem( tr( "Triangle wave" ), std::make_unique<PluginPixmapLoader>( "tri" ) );	\
+		name .addItem( tr( "Saw wave" ), std::make_unique<PluginPixmapLoader>( "saw" ) );			\
+		name .addItem( tr( "Ramp wave" ), std::make_unique<PluginPixmapLoader>( "ramp" ) );		\
+		name .addItem( tr( "Square wave" ), std::make_unique<PluginPixmapLoader>( "sqr" ) );		\
+		name .addItem( tr( "Moog saw wave" ), std::make_unique<PluginPixmapLoader>( "moog" ) );	\
+		name .addItem( tr( "Soft square wave" ), std::make_unique<PluginPixmapLoader>( "sqrsoft" ) );		\
+		name .addItem( tr( "Abs. sine wave" ), std::make_unique<PluginPixmapLoader>( "sinabs" ) );		\
+		name .addItem( tr( "Exponential wave" ), std::make_unique<PluginPixmapLoader>( "exp" ) );	\
+		name .addItem( tr( "Random" ), std::make_unique<PluginPixmapLoader>( "rand" ) );	\
+		name .addItem( tr( "Random smooth" ), std::make_unique<PluginPixmapLoader>( "rand" ) );
 
 public:
 	MonstroInstrument( InstrumentTrack * _instrument_track );

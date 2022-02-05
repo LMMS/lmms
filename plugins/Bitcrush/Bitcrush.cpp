@@ -41,13 +41,13 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Bitcrush",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "An oversampling bitcrusher" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "An oversampling bitcrusher" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 };
 
 }
@@ -55,10 +55,10 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
 	Effect( &bitcrush_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( Engine::audioEngine()->processingSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() * OS_RATE );
+	m_buffer = MM_ALLOC<sampleFrame>( Engine::audioEngine()->framesPerPeriod() * OS_RATE );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 	
@@ -79,7 +79,7 @@ BitcrushEffect::~BitcrushEffect()
 
 void BitcrushEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = Engine::audioEngine()->processingSampleRate();
 	m_filter.setSampleRate( m_sampleRate );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
