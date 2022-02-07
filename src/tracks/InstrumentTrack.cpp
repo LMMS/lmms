@@ -29,12 +29,14 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
 #include "MidiClient.h"
 #include "MidiClip.h"
 #include "MixHelpers.h"
+#include "PianoRoll.h"
 #include "Song.h"
 
 
@@ -66,6 +68,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_microtuner()
 {
 	m_pitchModel.setCenterValue( 0 );
+	m_pitchModel.setStrictStepSize(true);
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
 	m_firstKeyModel.setInitValue(0);
@@ -709,7 +712,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
-		(*it)->processTimePos(_start, m_pitchModel.value());
+		(*it)->processTimePos(_start, m_pitchModel.value(), GuiApplication::instance()->pianoRoll()->isRecording());
 	}
 
 	if ( clips.size() == 0 )

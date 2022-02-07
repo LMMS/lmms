@@ -29,11 +29,9 @@
 #include "AudioEngine.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"
-#include "GuiApplication.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "PianoRoll.h"
 #include "Song.h"
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
@@ -557,22 +555,21 @@ void NotePlayHandle::updateFrequency()
 
 
 
-void NotePlayHandle::processTimePos(const TimePos& time, float pvalue)
+void NotePlayHandle::processTimePos(const TimePos& time, float pitchValue, bool isRecording)
 {
-	if (detuning() && time >= songGlobalParentOffset() + pos())
+	if (!detuning() || time < songGlobalParentOffset() + pos()) { return; }
+
+	if (isRecording && m_origin == Origin::OriginMidiInput)
 	{
-		if (GuiApplication::instance()->pianoRoll()->isRecording() && m_origin == Origin::OriginMidiInput)
+		detuning()->automationClip()->recordValue(time - songGlobalParentOffset() - pos(), pitchValue / 100);
+	}
+	else
+	{
+		const float v = detuning()->automationClip()->valueAt(time - songGlobalParentOffset() - pos());
+		if (!typeInfo<float>::isEqual(v, m_baseDetuning->value()))
 		{
-			detuning()->automationClip()->recordValue(time - songGlobalParentOffset() - pos(), pvalue / 100);
-		}
-		else
-		{
-			const float v = detuning()->automationClip()->valueAt(time - songGlobalParentOffset() - pos());
-			if (!typeInfo<float>::isEqual(v, m_baseDetuning->value()))
-			{
-				m_baseDetuning->setValue(v);
-				updateFrequency();
-			}
+			m_baseDetuning->setValue(v);
+			updateFrequency();
 		}
 	}
 }
