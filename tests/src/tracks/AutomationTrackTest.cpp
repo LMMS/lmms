@@ -175,15 +175,15 @@ private slots:
 		c1->putValue(10, 1.0, false);
 		c1->addObject(&model);
 
-		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.index())[&model], 0.0f);
-		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.index())[&model], 0.5f);
-		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.index())[&model], 1.0f);
-		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.index())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.patternIndex())[&model], 0.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.patternIndex())[&model], 0.5f);
+		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.patternIndex())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.patternIndex())[&model], 1.0f);
 
 		PatternTrack patternTrack2(song);
 
-		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.index())[&model], 0.5f);
-		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.index()).size());
+		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.patternIndex())[&model], 0.5f);
+		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.patternIndex()).size());
 
 		PatternClip clip(&patternTrack);
 		clip.changeLength(TimePos::ticksPerBar() * 2);

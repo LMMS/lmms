@@ -374,7 +374,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		Q_ASSERT(tracklist.at(0)->type() == Track::PatternTrack);
 		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
 		container = Engine::getPatternStore();
-		clipNum = patternTrack->index();
+		clipNum = patternTrack->patternIndex();
 	}
 		break;
 	default:
@@ -804,7 +804,7 @@ void Song::removeBar()
 void Song::addPatternTrack()
 {
 	Track * t = Track::create(Track::PatternTrack, this);
-	Engine::getPatternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->index());
+	Engine::getPatternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->patternIndex());
 }
 
 

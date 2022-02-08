@@ -34,7 +34,7 @@
 PatternClip::PatternClip(Track* track) :
 	Clip(track)
 {
-	bar_t t = Engine::getPatternStore()->lengthOfPattern(patternTrackIndex());
+	bar_t t = Engine::getPatternStore()->lengthOfPattern(patternIndex());
 	if( t > 0 )
 	{
 		saveJournallingState( false );
@@ -101,9 +101,9 @@ void PatternClip::loadSettings(const QDomElement& element)
 
 
 
-int PatternClip::patternTrackIndex()
+int PatternClip::patternIndex()
 {
-	return dynamic_cast<PatternTrack*>(getTrack())->index();
+	return dynamic_cast<PatternTrack*>(getTrack())->patternIndex();
 }
 
 

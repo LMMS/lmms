@@ -135,9 +135,9 @@ TrackView* PatternTrack::createView(TrackContainerView* tcv)
 
 Clip* PatternTrack::createClip(const TimePos & pos)
 {
-	PatternClip* pattern = new PatternClip(this);
-	pattern->movePosition(pos);
-	return pattern;
+	PatternClip* pc = new PatternClip(this);
+	pc->movePosition(pos);
+	return pc;
 }
 
 
@@ -170,7 +170,7 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}*/
 
-	if( _this.hasAttribute( "clonebbt" ) )
+	if( _this.hasAttribute( "clonebbt" ) )  // TODO rename bb to pattern
 	{
 		const int src = _this.attribute( "clonebbt" ).toInt(); // TODO rename bb to pattern
 		const int dst = s_infoMap[this];

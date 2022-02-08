@@ -69,7 +69,7 @@ bool PatternTrackView::close()
 
 void PatternTrackView::clickedTrackLabel()
 {
-	Engine::getPatternStore()->setCurrentPattern(m_patternTrack->index());
+	Engine::getPatternStore()->setCurrentPattern(m_patternTrack->patternIndex());
 	getGUI()->getPatternEditor()->parentWidget()->show();
 	getGUI()->getPatternEditor()->setFocus(Qt::ActiveWindowFocusReason);
 }

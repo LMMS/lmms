@@ -116,7 +116,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	bar_t t = Engine::getPatternStore()->lengthOfPattern(m_patternClip->patternTrackIndex());
+	bar_t t = Engine::getPatternStore()->lengthOfPattern(m_patternClip->patternIndex());
 	if (m_patternClip->length() > TimePos::ticksPerBar() && t > 0)
 	{
 		for( int x = static_cast<int>( t * pixelsPerBar() );
@@ -160,7 +160,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 
 void PatternClipView::openInPatternEditor()
 {
-	Engine::getPatternStore()->setCurrentPattern(m_patternClip->patternTrackIndex());
+	Engine::getPatternStore()->setCurrentPattern(m_patternClip->patternIndex());
 
 	getGUI()->mainWindow()->togglePatternEditorWin(true);
 }

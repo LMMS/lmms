@@ -29,6 +29,10 @@
 #include "ClipView.h"
 
 
+/*! \brief Dummy clip for PatternTracks
+ *
+ *  Only used in the Song (Editor). See PatternStore.h for more info.
+*/
 class PatternClip : public Clip
 {
 public:
@@ -39,10 +43,10 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return( "bbtco" );
+		return( "bbtco" ); // TODO rename to patternclip
 	}
 
-	int patternTrackIndex();
+	int patternIndex();
 
 	ClipView * createView( TrackView * _tv ) override;
 

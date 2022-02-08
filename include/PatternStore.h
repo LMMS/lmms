@@ -43,17 +43,16 @@
  * | +------------------------------+ |
  * | | Track 2   [Clip C]  [Clip D] | |
  * | +------------------------------+ |
- * +---------------------------------+
+ * +----------------------------------+
  *
  * Pattern Editor displays one pattern at a time, but they all belong to the same PatternStore.
  * A "pattern" is not an object, it's just a word we use to describe a column of clips.
  * In the illustration above, Clip A and Clip C would be "Pattern 1".
  *
- * Do not confuse the Tracks in the PatternStore with PatternTracks.
- * PatternTracks are used in the Song Editor to reference a pattern.
- * They do not contain any MIDI data.
+ * Do not confuse tracks and clips in the PatternStore with PatternTracks and PatternClips.
+ * - PatternTracks are used in the Song Editor. Each one reference a "pattern" in the PatternStore.
+ * - PatternClips are stored inside PatternTracks. They are just empty placeholders.
  */
-
 class LMMS_EXPORT PatternStore : public TrackContainer
 {
 	Q_OBJECT

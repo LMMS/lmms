@@ -37,6 +37,7 @@ class TrackLabelButton;
 class TrackContainer;
 
 
+/*! Track type used in the Song (Editor) to reference a pattern in the PatternStore */
 class LMMS_EXPORT PatternTrack : public Track
 {
 	Q_OBJECT
@@ -56,7 +57,7 @@ public:
 	static PatternTrack* findPatternTrack(int pattern_num);
 	static void swapPatternTracks(Track* track1, Track* track2);
 
-	int index()
+	int patternIndex()
 	{
 		return s_infoMap[this];
 	}

@@ -324,7 +324,7 @@ void PatternStoreView::cloneClip()
 	{
 		// Clone the track
 		Track* newTrack = pt->clone();
-		ps->setCurrentPattern(static_cast<PatternTrack*>(newTrack)->index());
+		ps->setCurrentPattern(static_cast<PatternTrack*>(newTrack)->patternIndex());
 
 		// Track still have the clips which is undesirable in this case, clear the track
 		newTrack->lock();
