@@ -455,7 +455,7 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 								this, SLOT( setFirstKey() ) );
 		QAction *actionLast = contextMenu.addAction(tr( "Set &last key" ),
 								this, SLOT( setLastKey() ) );
-		contextMenu.addAction(tr( "Set single key" ),
+		contextMenu.addAction(tr( "Set &single key" ),
 								this, SLOT( setSingleKey() ) );
 
 		actionFirst->setEnabled(key_num != m_piano->instrumentTrack()->firstKeyModel()->value() && firstMarkerAllowed(key_num));
@@ -593,7 +593,6 @@ void PianoView::setSingleKey()
 	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey, true);
 	update();
 }
-
 
 
 // handler for mouse-release-event
