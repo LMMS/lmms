@@ -844,6 +844,11 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 {
 	if( hasValidMidiClip() )
 	{
+		m_midiClip->instrumentTrack()->pianoModel()->disconnect(this);
+		m_midiClip->instrumentTrack()->firstKeyModel()->disconnect(this);
+		m_midiClip->instrumentTrack()->lastKeyModel()->disconnect(this);
+		m_midiClip->instrumentTrack()->microtuner()->keymapModel()->disconnect(this);
+		m_midiClip->instrumentTrack()->microtuner()->keyRangeImportModel()->disconnect(this);
 		m_midiClip->instrumentTrack()->disconnect( this );
 		m_midiClip->disconnect(this);
 	}
