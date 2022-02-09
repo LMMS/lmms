@@ -153,7 +153,7 @@ public slots:
 	void toggleSongEditorWin();
 	void toggleProjectNotesWin();
 	void toggleMicrotunerWin();
-	void toggleFxMixerWin();
+	void toggleMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
 	void toggleFullscreen();

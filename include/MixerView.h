@@ -1,5 +1,5 @@
 /*
- * FxMixerView.h - effect-mixer-view for LMMS
+ * MixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef FX_MIXER_VIEW_H
-#define FX_MIXER_VIEW_H
+#ifndef MIXER_VIEW_H
+#define MIXER_VIEW_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -39,21 +39,21 @@
 #include "EffectRackView.h"
 
 class QButtonGroup;
-class FxLine;
+class MixerLine;
 
-class LMMS_EXPORT FxMixerView : public QWidget, public ModelView,
+class LMMS_EXPORT MixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
 public:
-	class FxChannelView
+	class MixerChannelView
 	{
 	public:
-		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+		MixerChannelView(QWidget * _parent, MixerView * _mv, int _chIndex );
 
 		void setChannelIndex( int index );
 
-		FxLine * m_fxLine;
+		MixerLine * m_mixerLine;
 		PixmapButton * m_muteBtn;
 		PixmapButton * m_soloBtn;
 		Fader * m_fader;
@@ -61,35 +61,35 @@ public:
 	};
 
 
-	FxMixerView();
-	virtual ~FxMixerView();
+	MixerView();
+	virtual ~MixerView();
 
 	void keyPressEvent(QKeyEvent * e) override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	inline FxLine * currentFxLine()
+	inline MixerLine * currentMixerLine()
 	{
-		return m_currentFxLine;
+		return m_currentMixerLine;
 	}
 
-	inline FxChannelView * channelView(int index)
+	inline MixerChannelView * channelView(int index)
 	{
-		return m_fxChannelViews[index];
+		return m_mixerChannelViews[index];
 	}
 
 
-	void setCurrentFxLine( FxLine * _line );
-	void setCurrentFxLine( int _line );
+	void setCurrentMixerLine( MixerLine * _line );
+	void setCurrentMixerLine( int _line );
 
 	void clear();
 
 
 	// display the send button and knob correctly
-	void updateFxLine(int index);
+	void updateMixerLine(int index);
 
-	// notify the view that an fx channel was deleted
+	// notify the view that a mixer channel was deleted
 	void deleteChannel(int index);
 
 	// delete all unused channels
@@ -102,7 +102,7 @@ public:
 
 	void renameChannel(int index);
 
-	// make sure the display syncs up with the fx mixer.
+	// make sure the display syncs up with the mixer.
 	// useful for loading projects
 	void refreshDisplay();
 
@@ -117,10 +117,9 @@ private slots:
 	void toggledSolo();
 
 private:
+	QVector<MixerChannelView *> m_mixerChannelViews;
 
-	QVector<FxChannelView *> m_fxChannelViews;
-
-	FxLine * m_currentFxLine;
+	MixerLine * m_currentMixerLine;
 
 	QScrollArea * channelArea;
 	QHBoxLayout * chLayout;
@@ -130,7 +129,7 @@ private:
 
 	void updateMaxChannelSelector();
 	
-	friend class FxChannelView;
+	friend class MixerChannelView;
 } ;
 
 #endif

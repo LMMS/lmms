@@ -211,9 +211,9 @@ void Note::createDetuning()
 	if( m_detuning == nullptr )
 	{
 		m_detuning = new DetuningHelper;
-		(void) m_detuning->automationPattern();
+		(void) m_detuning->automationClip();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
-		m_detuning->automationPattern()->setProgressionType( AutomationPattern::LinearProgression );
+		m_detuning->automationClip()->setProgressionType( AutomationClip::LinearProgression );
 	}
 }
 

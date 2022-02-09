@@ -1,5 +1,5 @@
 /*
- * AutomationPatternView.h - declaration of class AutomationPatternView
+ * AutomationClipView.h - declaration of class AutomationClipView
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,28 +22,28 @@
  *
  */
 
-#ifndef AUTOMATION_PATTERN_VIEW_H
-#define AUTOMATION_PATTERN_VIEW_H
+#ifndef AUTOMATION_CLIP_VIEW_H
+#define AUTOMATION_CLIP_VIEW_H
 
 #include <QStaticText>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "Song.h"
 #include "SongEditor.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 
-class AutomationPatternView : public TrackContentObjectView
+class AutomationClipView : public ClipView
 {
 	Q_OBJECT
 
 
 public:
-	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
-	virtual ~AutomationPatternView();
+	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
+	virtual ~AutomationClipView();
 
 public slots:
-	/// Opens this view's pattern in the global automation editor
+	/// Opens this view's clip in the global automation editor
 	void openInAutomationEditor();
 	void update() override;
 
@@ -65,12 +65,12 @@ protected:
 
 
 private:
-	AutomationPattern * m_pat;
+	AutomationClip * m_clip;
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
 	
-	static QPixmap * s_pat_rec;
+	static QPixmap * s_clip_rec;
 
 	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;
