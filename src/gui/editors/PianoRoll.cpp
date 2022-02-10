@@ -4594,13 +4594,13 @@ void PianoRoll::strumNotesDn() //down-top
 //Method for chord-strumming.
 //The strum-distance is the chosen Q-value
 {
-  if( ! hasValidPattern() )
+  if(! hasValidMidiClip())
   {
      return;
   }
   int notesInChord = 0; //initializations
   int index = 0;
-  m_pattern->addJournalCheckPoint();
+  m_midiClip->addJournalCheckPoint();
   NoteVector notes = getSelectedNotes();//NoteVector of class QVector
   notesInChord = notes.count();//how many notes are in this chord
   index = m_quantizeModel.value();	//uses UserSet Q-Value in combobox
@@ -4609,19 +4609,19 @@ void PianoRoll::strumNotesDn() //down-top
   int strumSz = quantization(); //size of note movement	determined by users chosen Q-value in dropdown
   int strum = strumSz;//keep orr. value of selected strumming
   bool firstDone = false;//first note should not be moved
-  for( Note* n : notes ) //for each selected
+  for(Note* n : notes) //for each selected
   {
     n = notes.at(notesInChord-1);//Use QVector-method .at
     notesInChord-=1;
-    if( firstDone ){
+    if(firstDone){
         n->setPos( n->pos() + strumSz );
         strumSz += strum; }
     firstDone = true;
         if (notesInChord<=1) continue;      
   }    
-m_pattern->rearrangeAllNotes();
-m_pattern->updateLength();
-m_pattern->dataChanged();
+m_midiClip->rearrangeAllNotes();
+m_midiClip->updateLength();
+m_midiClip->dataChanged();
 update();//Project is changed. Update
 gui->songEditor()->update();
 Engine::getSong()->setModified();
