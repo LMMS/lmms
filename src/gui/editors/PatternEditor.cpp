@@ -41,122 +41,6 @@
 
 
 
-PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
-	Editor(false),
-	m_editor(new PatternEditor(ps))
-{
-	setWindowIcon( embed::getIconPixmap("pattern_track_btn"));
-	setWindowTitle(tr("Pattern Editor"));
-	setCentralWidget(m_editor);
-
-	setAcceptDrops(true);
-	m_toolBar->setAcceptDrops(true);
-	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_editor, SLOT(dragEnterEvent(QDragEnterEvent*)));
-	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_editor, SLOT(dropEvent(QDropEvent*)));
-
-	// TODO: Use style sheet
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
-	{
-		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-			     + 2 * CLIP_BORDER_WIDTH + 384 );
-	}
-	else
-	{
-		setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
-			     + 2 * CLIP_BORDER_WIDTH + 384 );
-	}
-
-
-	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
-	m_stopAction->setToolTip(tr("Stop playback of current pattern (Space)"));
-
-
-	// Pattern selector
-	DropToolBar *patternSelectionToolBar = addDropToolBarToTop(tr("Pattern selector"));
-
-	m_patternComboBox = new ComboBox( m_toolBar );
-	m_patternComboBox->setFixedSize( 200, ComboBox::DEFAULT_HEIGHT );
-	m_patternComboBox->setModel(&ps->m_patternComboBoxModel);
-
-	patternSelectionToolBar->addWidget( m_patternComboBox );
-
-
-	// Track actions
-	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
-
-
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_pattern_track"), tr("New pattern"),
-						 Engine::getSong(), SLOT(addPatternTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"),
-						 m_editor, SLOT(cloneClip()));
-	trackAndStepActionsToolBar->addAction(
-				embed::getIconPixmap("add_sample_track"),
-				tr("Add sample-track"), m_editor,
-				SLOT(addSampleTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
-						 m_editor, SLOT(addAutomationTrack()));
-
-	QWidget* stretch = new QWidget(m_toolBar);
-	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	trackAndStepActionsToolBar->addWidget(stretch);
-
-
-	// Step actions
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
-						 m_editor, SLOT(removeSteps()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
-						 m_editor, SLOT(addSteps()));
-	trackAndStepActionsToolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
-						  m_editor, SLOT(cloneSteps()));
-
-	connect(&ps->m_patternComboBoxModel, SIGNAL(dataChanged()),
-			m_editor, SLOT(updatePosition()));
-
-
-	QAction* viewNext = new QAction(this);
-	connect(viewNext, SIGNAL(triggered()), m_patternComboBox, SLOT(selectNext()));
-	viewNext->setShortcut(Qt::Key_Plus);
-	addAction(viewNext);
-
-	QAction* viewPrevious = new QAction(this);
-	connect(viewPrevious, SIGNAL(triggered()), m_patternComboBox, SLOT(selectPrevious()));
-	viewPrevious->setShortcut(Qt::Key_Minus);
-	addAction(viewPrevious);
-}
-
-
-PatternEditorWindow::~PatternEditorWindow()
-{
-}
-
-
-QSize PatternEditorWindow::sizeHint() const
-{
-	return {minimumWidth()+10, 300};
-}
-
-
-void PatternEditorWindow::play()
-{
-	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
-	{
-		Engine::getSong()->playPattern();
-	}
-	else
-	{
-		Engine::getSong()->togglePause();
-	}
-}
-
-
-void PatternEditorWindow::stop()
-{
-	Engine::getSong()->stop();
-}
-
-
-
 
 PatternEditor::PatternEditor(PatternStore* ps) :
 	TrackContainerView(ps),
@@ -331,4 +215,115 @@ void PatternEditor::cloneClip()
 		newTrack->deleteClips();
 		newTrack->unlock();
 	}
+}
+
+
+
+
+PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
+	Editor(false),
+	m_editor(new PatternEditor(ps))
+{
+	setWindowIcon(embed::getIconPixmap("pattern_track_btn"));
+	setWindowTitle(tr("Pattern Editor"));
+	setCentralWidget(m_editor);
+
+	setAcceptDrops(true);
+	m_toolBar->setAcceptDrops(true);
+	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_editor, SLOT(dragEnterEvent(QDragEnterEvent*)));
+	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_editor, SLOT(dropEvent(QDropEvent*)));
+
+	// TODO: Use style sheet
+	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
+	{
+		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * CLIP_BORDER_WIDTH + 384);
+	}
+	else
+	{
+		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * CLIP_BORDER_WIDTH + 384);
+	}
+
+	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
+	m_stopAction->setToolTip(tr("Stop playback of current pattern (Space)"));
+
+
+	// Pattern selector
+	DropToolBar* patternSelectionToolBar = addDropToolBarToTop(tr("Pattern selector"));
+
+	m_patternComboBox = new ComboBox(m_toolBar);
+	m_patternComboBox->setFixedSize(200, ComboBox::DEFAULT_HEIGHT);
+	m_patternComboBox->setModel(&ps->m_patternComboBoxModel);
+
+	patternSelectionToolBar->addWidget(m_patternComboBox);
+
+
+	// Track actions
+	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
+
+
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_pattern_track"), tr("New pattern"),
+						Engine::getSong(), SLOT(addPatternTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"),
+						m_editor, SLOT(cloneClip()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_sample_track"),	tr("Add sample-track"),
+						m_editor, SLOT(addSampleTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
+						m_editor, SLOT(addAutomationTrack()));
+
+	QWidget* stretch = new QWidget(m_toolBar);
+	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	trackAndStepActionsToolBar->addWidget(stretch);
+
+
+	// Step actions
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
+						m_editor, SLOT(removeSteps()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
+						m_editor, SLOT(addSteps()));
+	trackAndStepActionsToolBar->addAction( embed::getIconPixmap("step_btn_duplicate"), tr("Clone Steps"),
+						m_editor, SLOT(cloneSteps()));
+
+	connect(&ps->m_patternComboBoxModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(updatePosition()));
+
+
+	QAction* viewNext = new QAction(this);
+	connect(viewNext, SIGNAL(triggered()), m_patternComboBox, SLOT(selectNext()));
+	viewNext->setShortcut(Qt::Key_Plus);
+	addAction(viewNext);
+
+	QAction* viewPrevious = new QAction(this);
+	connect(viewPrevious, SIGNAL(triggered()), m_patternComboBox, SLOT(selectPrevious()));
+	viewPrevious->setShortcut(Qt::Key_Minus);
+	addAction(viewPrevious);
+}
+
+
+PatternEditorWindow::~PatternEditorWindow()
+{
+}
+
+
+QSize PatternEditorWindow::sizeHint() const
+{
+	return {minimumWidth() + 10, 300};
+}
+
+
+void PatternEditorWindow::play()
+{
+	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
+	{
+		Engine::getSong()->playPattern();
+	}
+	else
+	{
+		Engine::getSong()->togglePause();
+	}
+}
+
+
+void PatternEditorWindow::stop()
+{
+	Engine::getSong()->stop();
 }

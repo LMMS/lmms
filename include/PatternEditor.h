@@ -34,28 +34,6 @@
 class PatternStore;
 class ComboBox;
 
-class PatternEditor;
-
-class PatternEditorWindow : public Editor
-{
-	Q_OBJECT
-public:
-	PatternEditorWindow(PatternStore* ps);
-	~PatternEditorWindow();
-
-	QSize sizeHint() const override;
-
-	PatternEditor* m_editor;
-
-public slots:
-	void play() override;
-	void stop() override;
-
-private:
-	ComboBox* m_patternComboBox;
-} ;
-
-
 
 class PatternEditor : public TrackContainerView
 {
@@ -90,5 +68,26 @@ private:
 	void makeSteps( bool clone );
 };
 
+
+
+
+class PatternEditorWindow : public Editor
+{
+	Q_OBJECT
+public:
+	PatternEditorWindow(PatternStore* ps);
+	~PatternEditorWindow();
+
+	QSize sizeHint() const override;
+
+	PatternEditor* m_editor;
+
+public slots:
+	void play() override;
+	void stop() override;
+
+private:
+	ComboBox* m_patternComboBox;
+};
 
 #endif
