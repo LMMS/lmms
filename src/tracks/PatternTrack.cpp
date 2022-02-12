@@ -43,12 +43,12 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 	s_infoMap[this] = patternNum;
 
 	setName(tr("Pattern %1").arg(patternNum));
-	Engine::getPatternStore()->createClipsForPattern(patternNum);
-	Engine::getPatternStore()->setCurrentPattern(patternNum);
-	Engine::getPatternStore()->updateComboBox();
+	Engine::patternStore()->createClipsForPattern(patternNum);
+	Engine::patternStore()->setCurrentPattern(patternNum);
+	Engine::patternStore()->updateComboBox();
 
 	connect( this, SIGNAL( nameChanged() ),
-		Engine::getPatternStore(), SLOT(updateComboBox()));
+		Engine::patternStore(), SLOT(updateComboBox()));
 }
 
 
@@ -62,7 +62,7 @@ PatternTrack::~PatternTrack()
 					| PlayHandle::TypeSamplePlayHandle );
 
 	const int pattern = s_infoMap[this];
-	Engine::getPatternStore()->removePattern(pattern);
+	Engine::patternStore()->removePattern(pattern);
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
@@ -75,7 +75,7 @@ PatternTrack::~PatternTrack()
 
 	// remove us from the Song and update the pattern selection combobox to reflect the change
 	trackContainer()->removeTrack( this );
-	Engine::getPatternStore()->updateComboBox();
+	Engine::patternStore()->updateComboBox();
 }
 
 
@@ -92,7 +92,7 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	if( _clip_num >= 0 )
 	{
-		return Engine::getPatternStore()->play(_start, _frames, _offset, s_infoMap[this]);
+		return Engine::patternStore()->play(_start, _frames, _offset, s_infoMap[this]);
 	}
 
 	clipVector clips;
@@ -117,7 +117,7 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	if( _start - lastPosition < lastLen )
 	{
-		return Engine::getPatternStore()->play(_start - lastPosition, _frames, _offset, s_infoMap[this]);
+		return Engine::patternStore()->play(_start - lastPosition, _frames, _offset, s_infoMap[this]);
 	}
 	return false;
 }
@@ -152,7 +152,7 @@ void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _th
 			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
-		Engine::getPatternStore()->saveState(doc, _this);
+		Engine::patternStore()->saveState(doc, _this);
 	}
 	if( _this.parentNode().parentNode().nodeName() == "clone" )
 	{
@@ -175,7 +175,7 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 		const int src = _this.attribute( "clonebbt" ).toInt(); // TODO rename bb to pattern
 		const int dst = s_infoMap[this];
 		TrackContainer::TrackList tl =
-					Engine::getPatternStore()->tracks();
+					Engine::patternStore()->tracks();
 		// copy clips of all tracks from source pattern (at bar "src") to destination
 		// clips (which are created if they do not exist yet)
 		for( TrackContainer::TrackList::iterator it = tl.begin();
@@ -193,7 +193,7 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 					TrackContainer::classNodeName() );
 		if( node.isElement() )
 		{
-			Engine::getPatternStore()->restoreState(node.toElement());
+			Engine::patternStore()->restoreState(node.toElement());
 		}
 	}
 /*	doesn't work yet because PatternTrack-ctor also sets current pattern so if
@@ -232,7 +232,7 @@ void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 	if( t1 != nullptr && t2 != nullptr )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
-		Engine::getPatternStore()->swapPattern(s_infoMap[t1], s_infoMap[t2]);
-		Engine::getPatternStore()->setCurrentPattern(s_infoMap[t1]);
+		Engine::patternStore()->swapPattern(s_infoMap[t1], s_infoMap[t2]);
+		Engine::patternStore()->setCurrentPattern(s_infoMap[t1]);
 	}
 }

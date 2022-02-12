@@ -46,7 +46,7 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	m_clipType( BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
-	if (_instrument_track->trackContainer()	== Engine::getPatternStore())
+	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
 	}
@@ -559,9 +559,9 @@ ClipView * MidiClip::createView( TrackView * _tv )
 
 void MidiClip::updatePatternTrack()
 {
-	if (getTrack()->trackContainer() == Engine::getPatternStore())
+	if (getTrack()->trackContainer() == Engine::patternStore())
 	{
-		Engine::getPatternStore()->updatePatternTrack(this);
+		Engine::patternStore()->updatePatternTrack(this);
 	}
 
 	if( getGUI() != nullptr

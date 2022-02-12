@@ -108,16 +108,16 @@ public:
 
 	using Model::dataChanged;
 
-
-protected:
-	void updatePatternTrack();
-
-
-protected slots:
+public slots:
 	void addSteps();
 	void cloneSteps();
 	void removeSteps();
 	void clear();
+
+protected:
+	void updatePatternTrack();
+
+protected slots:
 	void changeTimeSignature();
 
 
@@ -140,7 +140,6 @@ private:
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
 	friend class MidiClipView;
-	friend class PatternStoreView;
 
 
 signals:

@@ -224,7 +224,7 @@ bool HydrogenImport::readSong()
 					if ( nLayer == 0 ) 
 					{
 						drum_track[sId] = static_cast<InstrumentTrack*>(
-							Track::create(Track::InstrumentTrack, Engine::getPatternStore())
+							Track::create(Track::InstrumentTrack, Engine::patternStore())
 						);
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
@@ -249,7 +249,7 @@ bool HydrogenImport::readSong()
 	}
 	QDomNode patterns = songNode.firstChildElement( "patternList" );
 	int pattern_count = 0;
-	int existing_patterns = Engine::getPatternStore()->numOfPatterns();
+	int existing_patterns = Engine::patternStore()->numOfPatterns();
 	QDomNode patternNode =  patterns.firstChildElement( "pattern" );
 	int pn = 1;
 	while (  !patternNode.isNull()  ) 

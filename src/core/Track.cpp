@@ -116,9 +116,9 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
-	if (tc == Engine::getPatternStore() && t)
+	if (tc == Engine::patternStore() && t)
 	{
-		t->createClipsForPattern(Engine::getPatternStore()->numOfPatterns() - 1);
+		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
 	}
 
 	tc->updateAfterTrackAdd();

@@ -34,40 +34,34 @@
 class PatternStore;
 class ComboBox;
 
-class PatternStoreView;
+class PatternEditor;
 
-class PatternEditor : public Editor
+class PatternEditorWindow : public Editor
 {
 	Q_OBJECT
 public:
-	PatternEditor(PatternStore* ps);
-	~PatternEditor();
+	PatternEditorWindow(PatternStore* ps);
+	~PatternEditorWindow();
 
 	QSize sizeHint() const override;
 
-	const PatternStoreView* patternStoreView() const {
-		return m_patternStoreView;
-	}
-	PatternStoreView* patternStoreView() {
-		return m_patternStoreView;
-	}
+	PatternEditor* m_editor;
 
 public slots:
 	void play() override;
 	void stop() override;
 
 private:
-	PatternStoreView* m_patternStoreView;
 	ComboBox* m_patternComboBox;
 } ;
 
 
 
-class PatternStoreView : public TrackContainerView
+class PatternEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	PatternStoreView(PatternStore* ps);
+	PatternEditor(PatternStore* ps);
 
 	bool fixedClips() const override
 	{

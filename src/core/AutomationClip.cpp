@@ -884,7 +884,7 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 {
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
-	l += Engine::getPatternStore()->tracks();
+	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
@@ -922,7 +922,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 	QVector<AutomationClip *> clips;
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
-	l += Engine::getPatternStore()->tracks();
+	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
@@ -994,7 +994,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 void AutomationClip::resolveAllIDs()
 {
 	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-				Engine::getPatternStore()->tracks();
+				Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 	for( TrackContainer::TrackList::iterator it = l.begin();
 							it != l.end(); ++it )

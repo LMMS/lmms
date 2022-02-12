@@ -154,7 +154,7 @@ GuiApplication::GuiApplication()
 	connect(m_microtunerConfig, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing pattern editor"));
-	m_patternEditor = new PatternEditor(Engine::getPatternStore());
+	m_patternEditor = new PatternEditorWindow(Engine::patternStore());
 	connect(m_patternEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing piano roll"));

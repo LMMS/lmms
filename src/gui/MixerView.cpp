@@ -239,7 +239,7 @@ void MixerView::refreshDisplay()
 void MixerView::updateMaxChannelSelector()
 {
 	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternStoreTracks = Engine::getPatternStore()->tracks();
+	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
 
 	TrackContainer::TrackList trackLists[] = {songTracks, patternStoreTracks};
 	for(int tl=0; tl<2; ++tl)
@@ -435,7 +435,7 @@ void MixerView::deleteUnusedChannels()
 {
 	TrackContainer::TrackList tracks;
 	tracks += Engine::getSong()->tracks();
-	tracks += Engine::getPatternStore()->tracks();
+	tracks += Engine::patternStore()->tracks();
 
 	std::vector<bool> inUse(m_mixerChannelViews.size(), false);
 

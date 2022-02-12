@@ -41,18 +41,18 @@
 
 
 
-PatternEditor::PatternEditor(PatternStore* ps) :
+PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	Editor(false),
-	m_patternStoreView(new PatternStoreView(ps))
+	m_editor(new PatternEditor(ps))
 {
 	setWindowIcon( embed::getIconPixmap("pattern_track_btn"));
 	setWindowTitle(tr("Pattern Editor"));
-	setCentralWidget(m_patternStoreView);
+	setCentralWidget(m_editor);
 
 	setAcceptDrops(true);
 	m_toolBar->setAcceptDrops(true);
-	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_patternStoreView, SLOT(dragEnterEvent(QDragEnterEvent*)));
-	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_patternStoreView, SLOT(dropEvent(QDropEvent*)));
+	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_editor, SLOT(dragEnterEvent(QDragEnterEvent*)));
+	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_editor, SLOT(dropEvent(QDropEvent*)));
 
 	// TODO: Use style sheet
 	if( ConfigManager::inst()->value( "ui",
@@ -89,13 +89,13 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_pattern_track"), tr("New pattern"),
 						 Engine::getSong(), SLOT(addPatternTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("clone_pattern_track_clip"), tr("Clone pattern"),
-						 m_patternStoreView, SLOT(cloneClip()));
+						 m_editor, SLOT(cloneClip()));
 	trackAndStepActionsToolBar->addAction(
 				embed::getIconPixmap("add_sample_track"),
-				tr("Add sample-track"), m_patternStoreView,
+				tr("Add sample-track"), m_editor,
 				SLOT(addSampleTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
-						 m_patternStoreView, SLOT(addAutomationTrack()));
+						 m_editor, SLOT(addAutomationTrack()));
 
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -104,14 +104,14 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 
 	// Step actions
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
-						 m_patternStoreView, SLOT(removeSteps()));
+						 m_editor, SLOT(removeSteps()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
-						 m_patternStoreView, SLOT(addSteps()));
+						 m_editor, SLOT(addSteps()));
 	trackAndStepActionsToolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
-						  m_patternStoreView, SLOT(cloneSteps()));
+						  m_editor, SLOT(cloneSteps()));
 
 	connect(&ps->m_patternComboBoxModel, SIGNAL(dataChanged()),
-			m_patternStoreView, SLOT(updatePosition()));
+			m_editor, SLOT(updatePosition()));
 
 
 	QAction* viewNext = new QAction(this);
@@ -126,18 +126,18 @@ PatternEditor::PatternEditor(PatternStore* ps) :
 }
 
 
-PatternEditor::~PatternEditor()
+PatternEditorWindow::~PatternEditorWindow()
 {
 }
 
 
-QSize PatternEditor::sizeHint() const
+QSize PatternEditorWindow::sizeHint() const
 {
 	return {minimumWidth()+10, 300};
 }
 
 
-void PatternEditor::play()
+void PatternEditorWindow::play()
 {
 	if (Engine::getSong()->playMode() != Song::Mode_PlayPattern)
 	{
@@ -150,7 +150,7 @@ void PatternEditor::play()
 }
 
 
-void PatternEditor::stop()
+void PatternEditorWindow::stop()
 {
 	Engine::getSong()->stop();
 }
@@ -158,7 +158,7 @@ void PatternEditor::stop()
 
 
 
-PatternStoreView::PatternStoreView(PatternStore* ps) :
+PatternEditor::PatternEditor(PatternStore* ps) :
 	TrackContainerView(ps),
 	m_ps(ps)
 {
@@ -168,12 +168,12 @@ PatternStoreView::PatternStoreView(PatternStore* ps) :
 
 
 
-void PatternStoreView::addSteps()
+void PatternEditor::addSteps()
 {
 	makeSteps( false );
 }
 
-void PatternStoreView::cloneSteps()
+void PatternEditor::cloneSteps()
 {
 	makeSteps( true );
 }
@@ -181,7 +181,7 @@ void PatternStoreView::cloneSteps()
 
 
 
-void PatternStoreView::removeSteps()
+void PatternEditor::removeSteps()
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -199,7 +199,7 @@ void PatternStoreView::removeSteps()
 
 
 
-void PatternStoreView::addSampleTrack()
+void PatternEditor::addSampleTrack()
 {
 	(void) Track::create( Track::SampleTrack, model() );
 }
@@ -207,7 +207,7 @@ void PatternStoreView::addSampleTrack()
 
 
 
-void PatternStoreView::addAutomationTrack()
+void PatternEditor::addAutomationTrack()
 {
 	(void) Track::create( Track::AutomationTrack, model() );
 }
@@ -215,7 +215,7 @@ void PatternStoreView::addAutomationTrack()
 
 
 
-void PatternStoreView::removeViewsForPattern(int pattern)
+void PatternEditor::removeViewsForPattern(int pattern)
 {
 	for( TrackView* view : trackViews() )
 	{
@@ -225,12 +225,12 @@ void PatternStoreView::removeViewsForPattern(int pattern)
 
 
 
-void PatternStoreView::saveSettings(QDomDocument& doc, QDomElement& element)
+void PatternEditor::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
-void PatternStoreView::loadSettings(const QDomElement& element)
+void PatternEditor::loadSettings(const QDomElement& element)
 {
 	MainWindow::restoreWidgetState(parentWidget(), element);
 }
@@ -238,7 +238,7 @@ void PatternStoreView::loadSettings(const QDomElement& element)
 
 
 
-void PatternStoreView::dropEvent(QDropEvent* de)
+void PatternEditor::dropEvent(QDropEvent* de)
 {
 	QString type = StringPairDrag::decodeKey( de );
 	QString value = StringPairDrag::decodeValue( de );
@@ -280,7 +280,7 @@ void PatternStoreView::dropEvent(QDropEvent* de)
 
 
 
-void PatternStoreView::updatePosition()
+void PatternEditor::updatePosition()
 {
 	//realignTracks();
 	emit positionChanged( m_currentPosition );
@@ -289,7 +289,7 @@ void PatternStoreView::updatePosition()
 
 
 
-void PatternStoreView::makeSteps( bool clone )
+void PatternEditor::makeSteps( bool clone )
 {
 	TrackContainer::TrackList tl = model()->tracks();
 
@@ -312,7 +312,7 @@ void PatternStoreView::makeSteps( bool clone )
 
 // Creates a clone of the current pattern track with the same content, but no clips in the song editor
 // TODO: Avoid repeated code from cloneTrack and clearTrack in TrackOperationsWidget somehow
-void PatternStoreView::cloneClip()
+void PatternEditor::cloneClip()
 {
 	// Get the current PatternTrack id
 	PatternStore* ps = static_cast<PatternStore*>(model());

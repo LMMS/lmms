@@ -309,7 +309,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		else if (auto* pattern = dynamic_cast<PatternClip*>(clip))
 		{
 			auto patIndex = dynamic_cast<class PatternTrack*>(pattern->getTrack())->patternIndex();
-			auto patStore = Engine::getPatternStore();
+			auto patStore = Engine::patternStore();
 
 			TimePos patTime = time - clip->startPosition();
 			patTime = std::min(patTime, clip->length());

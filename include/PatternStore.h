@@ -97,7 +97,8 @@ private:
 	ComboBoxModel m_patternComboBoxModel;
 
 
-	friend class PatternEditor;
+	// Where the pattern selection combo box is
+	friend class PatternEditorWindow;
 
 } ;
 

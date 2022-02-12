@@ -37,7 +37,7 @@ class ControllerRackView;
 class MixerView;
 class MainWindow;
 class MicrotunerConfig;
-class PatternEditor;
+class PatternEditorWindow;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
@@ -57,7 +57,7 @@ public:
 	MainWindow* mainWindow() { return m_mainWindow; }
 	MixerView* mixerView() { return m_mixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
-	PatternEditor* getPatternEditor() { return m_patternEditor; }
+	PatternEditorWindow* patternEditor() { return m_patternEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
 	ProjectNotes* getProjectNotes() { return m_projectNotes; }
 	MicrotunerConfig* getMicrotunerConfig() { return m_microtunerConfig; }
@@ -77,7 +77,7 @@ private:
 	MixerView* m_mixerView;
 	SongEditorWindow* m_songEditor;
 	AutomationEditorWindow* m_automationEditor;
-	PatternEditor* m_patternEditor;
+	PatternEditorWindow* m_patternEditor;
 	PianoRollWindow* m_pianoRoll;
 	ProjectNotes* m_projectNotes;
 	MicrotunerConfig* m_microtunerConfig;

@@ -111,7 +111,7 @@ void RenderManager::renderTracks()
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::getPatternStore()->tracks();
+	const TrackContainer::TrackList t2 = Engine::patternStore()->tracks();
 	for( auto it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);

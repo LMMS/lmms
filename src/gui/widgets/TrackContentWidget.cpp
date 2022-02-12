@@ -199,9 +199,9 @@ void TrackContentWidget::update()
  */
 void TrackContentWidget::changePosition( const TimePos & newPos )
 {
-	if (m_trackView->trackContainerView() == getGUI()->getPatternEditor()->patternStoreView())
+	if (m_trackView->trackContainerView() == getGUI()->patternEditor()->m_editor)
 	{
-		const int curPattern = Engine::getPatternStore()->currentPattern();
+		const int curPattern = Engine::patternStore()->currentPattern();
 		setUpdatesEnabled( false );
 
 		// first show clip for current pattern...
@@ -599,7 +599,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 	QPainter p( this );
 	// Don't draw background on Pattern Editor
-	if (m_trackView->trackContainerView() != getGUI()->getPatternEditor()->patternStoreView())
+	if (m_trackView->trackContainerView() != getGUI()->patternEditor()->m_editor)
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getBar() * ppb, 0 ) );

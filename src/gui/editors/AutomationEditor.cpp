@@ -1510,7 +1510,7 @@ float AutomationEditor::getLevel(int y )
 
 inline bool AutomationEditor::inPatternEditor()
 {
-	return (validClip() && m_clip->getTrack()->trackContainer() == Engine::getPatternStore());
+	return (validClip() && m_clip->getTrack()->trackContainer() == Engine::patternStore());
 }
 
 
@@ -1541,7 +1541,7 @@ void AutomationEditor::play()
 	}
 	else if (inPatternEditor())
 	{
-		Engine::getPatternStore()->play();
+		Engine::patternStore()->play();
 	}
 	else
 	{
@@ -1567,7 +1567,7 @@ void AutomationEditor::stop()
 	}
 	if (m_clip->getTrack() && inPatternEditor())
 	{
-		Engine::getPatternStore()->stop();
+		Engine::patternStore()->stop();
 	}
 	else
 	{

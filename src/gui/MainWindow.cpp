@@ -588,7 +588,7 @@ void MainWindow::finalize()
 	// Add editor subwindows
 	for (QWidget* widget :  std::list<QWidget*>{
 			getGUI()->automationEditor(),
-			getGUI()->getPatternEditor(),
+			getGUI()->patternEditor(),
 			getGUI()->pianoRoll(),
 			getGUI()->songEditor()
 	})
@@ -600,8 +600,8 @@ void MainWindow::finalize()
 	}
 
 	getGUI()->automationEditor()->parentWidget()->hide();
-	getGUI()->getPatternEditor()->parentWidget()->move(610, 5);
-	getGUI()->getPatternEditor()->parentWidget()->hide();
+	getGUI()->patternEditor()->parentWidget()->move(610, 5);
+	getGUI()->patternEditor()->parentWidget()->hide();
 	getGUI()->pianoRoll()->parentWidget()->move(5, 5);
 	getGUI()->pianoRoll()->parentWidget()->hide();
 	getGUI()->songEditor()->parentWidget()->move(5, 5);
@@ -1055,7 +1055,7 @@ void MainWindow::refocus()
 	QList<QWidget*> editors;
 	editors
 		<< getGUI()->songEditor()->parentWidget()
-		<< getGUI()->getPatternEditor()->parentWidget()
+		<< getGUI()->patternEditor()->parentWidget()
 		<< getGUI()->pianoRoll()->parentWidget()
 		<< getGUI()->automationEditor()->parentWidget();
 
@@ -1079,7 +1079,7 @@ void MainWindow::refocus()
 
 void MainWindow::togglePatternEditorWin( bool forceShow )
 {
-	toggleWindow( getGUI()->getPatternEditor(), forceShow );
+	toggleWindow( getGUI()->patternEditor(), forceShow );
 }
 
 
@@ -1278,7 +1278,7 @@ void MainWindow::updatePlayPauseIcons()
 {
 	getGUI()->songEditor()->setPauseIcon( false );
 	getGUI()->automationEditor()->setPauseIcon( false );
-	getGUI()->getPatternEditor()->setPauseIcon( false );
+	getGUI()->patternEditor()->setPauseIcon( false );
 	getGUI()->pianoRoll()->setPauseIcon( false );
 
 	if( Engine::getSong()->isPlaying() )
@@ -1294,7 +1294,7 @@ void MainWindow::updatePlayPauseIcons()
 				break;
 
 			case Song::Mode_PlayPattern:
-				getGUI()->getPatternEditor()->setPauseIcon( true );
+				getGUI()->patternEditor()->setPauseIcon( true );
 				break;
 
 			case Song::Mode_PlayMidiClip:

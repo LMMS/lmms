@@ -34,7 +34,7 @@
 PatternClip::PatternClip(Track* track) :
 	Clip(track)
 {
-	bar_t t = Engine::getPatternStore()->lengthOfPattern(patternIndex());
+	bar_t t = Engine::patternStore()->lengthOfPattern(patternIndex());
 	if( t > 0 )
 	{
 		saveJournallingState( false );

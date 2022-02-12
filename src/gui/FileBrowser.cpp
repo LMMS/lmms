@@ -815,7 +815,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	else if( f->handling() != FileItem::NotSupported )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-			Track::create(Track::InstrumentTrack, Engine::getPatternStore())
+			Track::create(Track::InstrumentTrack, Engine::patternStore())
 		);
 		handleFile( f, it );
 	}
@@ -841,7 +841,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 {
 	// Get the correct TrackContainer. Ternary doesn't compile here
 	TrackContainer* tc = Engine::getSong();
-	if (!songEditor) { tc = Engine::getPatternStore(); }
+	if (!songEditor) { tc = Engine::patternStore(); }
 	openInNewInstrumentTrack(tc, item);
 }
 

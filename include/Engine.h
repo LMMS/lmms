@@ -77,7 +77,7 @@ public:
 		return s_song;
 	}
 
-	static PatternStore * getPatternStore()
+	static PatternStore * patternStore()
 	{
 		return s_patternStore;
 	}

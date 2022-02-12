@@ -52,7 +52,7 @@ PatternTrackView::PatternTrackView(PatternTrack* pt, TrackContainerView* tcv) :
 
 PatternTrackView::~PatternTrackView()
 {
-	getGUI()->getPatternEditor()->patternStoreView()->removeViewsForPattern(PatternTrack::s_infoMap[m_patternTrack]);
+	getGUI()->patternEditor()->m_editor->removeViewsForPattern(PatternTrack::s_infoMap[m_patternTrack]);
 }
 
 
@@ -60,7 +60,7 @@ PatternTrackView::~PatternTrackView()
 
 bool PatternTrackView::close()
 {
-	getGUI()->getPatternEditor()->patternStoreView()->removeViewsForPattern(PatternTrack::s_infoMap[m_patternTrack]);
+	getGUI()->patternEditor()->m_editor->removeViewsForPattern(PatternTrack::s_infoMap[m_patternTrack]);
 	return TrackView::close();
 }
 
@@ -69,7 +69,7 @@ bool PatternTrackView::close()
 
 void PatternTrackView::clickedTrackLabel()
 {
-	Engine::getPatternStore()->setCurrentPattern(m_patternTrack->patternIndex());
-	getGUI()->getPatternEditor()->parentWidget()->show();
-	getGUI()->getPatternEditor()->setFocus(Qt::ActiveWindowFocusReason);
+	Engine::patternStore()->setCurrentPattern(m_patternTrack->patternIndex());
+	getGUI()->patternEditor()->parentWidget()->show();
+	getGUI()->patternEditor()->setFocus(Qt::ActiveWindowFocusReason);
 }

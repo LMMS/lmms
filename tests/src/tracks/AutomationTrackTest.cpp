@@ -160,7 +160,7 @@ private slots:
 	void testPatternTrack()
 	{
 		auto song = Engine::getSong();
-		auto patternStore = Engine::getPatternStore();
+		auto patternStore = Engine::patternStore();
 		PatternTrack patternTrack(song);
 		Track* automationTrack = Track::create(Track::AutomationTrack, patternStore);
 

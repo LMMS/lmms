@@ -220,9 +220,9 @@ void Song::processNextBuffer()
 			break;
 
 		case Mode_PlayPattern:
-			if (Engine::getPatternStore()->numOfPatterns() > 0)
+			if (Engine::patternStore()->numOfPatterns() > 0)
 			{
-				clipNum = Engine::getPatternStore()->currentPattern();
+				clipNum = Engine::patternStore()->currentPattern();
 				trackList.push_back(PatternTrack::findPatternTrack(clipNum));
 			}
 			break;
@@ -292,7 +292,7 @@ void Song::processNextBuffer()
 			// loop back to the beginning when we reach the end
 			if (m_playMode == Mode_PlayPattern)
 			{
-				enforceLoop(TimePos{0}, TimePos{Engine::getPatternStore()->lengthOfCurrentPattern(), 0});
+				enforceLoop(TimePos{0}, TimePos{Engine::patternStore()->lengthOfCurrentPattern(), 0});
 			}
 			else if (m_playMode == Mode_PlayMidiClip && m_loopMidiClip && !loopEnabled)
 			{
@@ -373,7 +373,7 @@ void Song::processAutomations(const TrackList &tracklist, TimePos timeStart, fpp
 		Q_ASSERT(tracklist.size() == 1);
 		Q_ASSERT(tracklist.at(0)->type() == Track::PatternTrack);
 		auto patternTrack = dynamic_cast<PatternTrack*>(tracklist.at(0));
-		container = Engine::getPatternStore();
+		container = Engine::patternStore();
 		clipNum = patternTrack->patternIndex();
 	}
 		break;
@@ -804,7 +804,7 @@ void Song::removeBar()
 void Song::addPatternTrack()
 {
 	Track * t = Track::create(Track::PatternTrack, this);
-	Engine::getPatternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->patternIndex());
+	Engine::patternStore()->setCurrentPattern(dynamic_cast<PatternTrack*>(t)->patternIndex());
 }
 
 
@@ -865,9 +865,9 @@ void Song::clearProject()
 
 	Engine::audioEngine()->requestChangeInModel();
 
-	if( getGUI() != nullptr && getGUI()->getPatternEditor() )
+	if( getGUI() != nullptr && getGUI()->patternEditor() )
 	{
-		getGUI()->getPatternEditor()->patternStoreView()->clearAllTracks();
+		getGUI()->patternEditor()->m_editor->clearAllTracks();
 	}
 	if( getGUI() != nullptr && getGUI()->songEditor() )
 	{
@@ -878,7 +878,7 @@ void Song::clearProject()
 		getGUI()->mixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
-	Engine::getPatternStore()->clearAllTracks();
+	Engine::patternStore()->clearAllTracks();
 	clearAllTracks();
 
 	Engine::mixer()->clear();
@@ -961,7 +961,7 @@ void Song::createNewProject()
 	t = Track::create( Track::InstrumentTrack, this );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
-	t = Track::create(Track::InstrumentTrack, Engine::getPatternStore());
+	t = Track::create(Track::InstrumentTrack, Engine::patternStore());
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 						"kicker" );
 	Track::create( Track::SampleTrack, this );
@@ -977,7 +977,7 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 
-	Engine::getPatternStore()->updateAfterTrackAdd();
+	Engine::patternStore()->updateAfterTrackAdd();
 
 	Engine::projectJournal()->setJournalling( true );
 
@@ -1168,7 +1168,7 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	// quirk for fixing projects with broken positions of Clips inside pattern tracks
-	Engine::getPatternStore()->fixIncorrectPositions();
+	Engine::patternStore()->fixIncorrectPositions();
 
 	// Connect controller links to their controllers
 	// now that everything is loaded
@@ -1393,7 +1393,7 @@ void Song::exportProjectMidi(QString const & exportFileName) const
 {
 	// instantiate midi export plugin
 	TrackContainer::TrackList const & tracks = this->tracks();
-	TrackContainer::TrackList const & patternStoreTracks = Engine::getPatternStore()->tracks();
+	TrackContainer::TrackList const & patternStoreTracks = Engine::patternStore()->tracks();
 
 	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
 	if (exf)
