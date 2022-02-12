@@ -45,9 +45,11 @@
  * | +------------------------------+ |
  * +----------------------------------+
  *
- * Pattern Editor displays one pattern at a time, but they all belong to the same PatternStore.
- * A "pattern" is not an object, it's just a word we use to describe a column of clips.
- * In the illustration above, Clip A and Clip C would be "Pattern 1".
+ * There is only one PatternStore which holds all patterns, and it's very similar to the Song Editor.
+ * Think of it as a table - tracks are rows, bars are columns and clips are cells.
+ * With this logic a "pattern" is a column, i.e. all clips on the same bar.
+ * In the Pattern Editor you can select which pattern (column) you want to see, using the combo box at the top.
+ * In the illustration above, Clip A and Clip C start on bar 1, thus they are "Pattern 1".
  *
  * Do not confuse tracks and clips in the PatternStore with PatternTracks and PatternClips.
  * - PatternTracks are used in the Song Editor. Each one reference a "pattern" in the PatternStore.

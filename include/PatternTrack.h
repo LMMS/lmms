@@ -1,6 +1,5 @@
 /*
- * PatternTrack.h - class PatternTrack, a wrapper for using PatternEditor
- *              (which is a singleton-class) as track
+ * PatternTrack.h - a track representing a pattern in the PatternStore
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

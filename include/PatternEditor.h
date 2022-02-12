@@ -1,5 +1,5 @@
 /*
- * PatternEditor.h - view-component of Pattern Editor
+ * PatternEditor.h - basic main-window for editing patterns
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 

@@ -1,5 +1,5 @@
 /*
- * PatternTrack.cpp - implementation of class PatternTrack
+ * PatternTrack.cpp - a track representing a pattern in the PatternStore
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
