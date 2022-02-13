@@ -324,6 +324,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// 128 CC + Pitch Bend
 	smfMidiCC ccs[MIDI_CC_COUNT];
 
+	// channel to CC object for program changes
+	std::unordered_map<long, smfMidiCC> pcs;
+
 	// channels can be set out of 256 range
 	// using unordered_map should fix most invalid loads and crashes while loading
 	std::unordered_map<long, smfMidiChannel> chs;
@@ -472,8 +475,12 @@ bool MidiImport::readSMF( TrackContainer* tc )
 					long prog = evt->get_integer_value();
 					if( ch->isSF2 )
 					{
-						ch->it_inst->childModel( "bank" )->setValue( 0 );
-						ch->it_inst->childModel( "patch" )->setValue( prog );
+						auto& pc = pcs[evt->chan];
+						AutomatableModel* objModel = ch->it_inst->childModel("patch");
+						if (pc.at == nullptr) {
+							pc.create(tc, trackName + " > " + objModel->displayName());
+						}
+						pc.putValue(time, objModel, prog);
 					}
 					else {
 						const QString num = QString::number( prog );
