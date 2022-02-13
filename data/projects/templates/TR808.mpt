@@ -20,7 +20,7 @@
           <fxchain numofeffects="0" enabled="0"/>
         </instrumenttrack>
       </track>
-      <track type="1" muted="0" name="Beat/Bassline 0" solo="0">
+      <track type="1" muted="0" name="Pattern 0" solo="0">
         <bbtrack>
           <trackcontainer visible="1" width="580" height="300" type="bbtrackcontainer" x="610" y="5" maximized="0" minimized="0">
             <track type="0" muted="0" name="Clave.ds" solo="0">

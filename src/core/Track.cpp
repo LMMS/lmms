@@ -33,11 +33,11 @@
 
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
 #include "SampleTrack.h"
 #include "Song.h"
 
@@ -47,7 +47,7 @@
  *  The track object is the whole track, linking its contents, its
  *  automation, name, type, and so forth.
  *
- * \param type The type of track (Song Editor or Beat+Bassline Editor)
+ * \param type The type of track (Song Editor or Pattern Editor)
  * \param tc The track Container object to encapsulate in this track.
  *
  * \todo check the definitions of all the properties - are they OK?
@@ -73,13 +73,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 
 /*! \brief Destroy this track
  *
- *  If the track container is a Beat+Bassline container, step through
- *  its list of tracks and remove us.
- *
- *  Then delete the Clip's contents, remove this track from
- *  the track container.
- *
- *  Finally step through this track's automation and forget all of them.
+ *  Delete the clips and remove this track from the track container.
  */
 Track::~Track()
 {
@@ -112,7 +106,7 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 	switch( tt )
 	{
 		case InstrumentTrack: t = new ::InstrumentTrack( tc ); break;
-		case BBTrack: t = new ::BBTrack( tc ); break;
+		case PatternTrack: t = new ::PatternTrack( tc ); break;
 		case SampleTrack: t = new ::SampleTrack( tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
@@ -122,10 +116,9 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
-	if( tc == Engine::getBBTrackContainer() && t )
+	if (tc == Engine::patternStore() && t)
 	{
-		t->createClipsForBB( Engine::getBBTrackContainer()->numOfBBs()
-									- 1 );
+		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
 	}
 
 	tc->updateAfterTrackAdd();
@@ -217,8 +210,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
-	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
-	// its settings
+	// let actual track (InstrumentTrack, PatternTrack, SampleTrack etc.) save its settings
 	element.appendChild( tsDe );
 	saveTrackSpecificSettings( doc, tsDe );
 
@@ -491,9 +483,9 @@ void Track::swapPositionOfClips( int clipNum1, int clipNum2 )
 
 
 
-void Track::createClipsForBB( int bb )
+void Track::createClipsForPattern(int pattern)
 {
-	while( numOfClips() < bb + 1 )
+	while( numOfClips() < pattern + 1 )
 	{
 		TimePos position = TimePos( numOfClips(), 0 );
 		Clip * clip = createClip( position );

@@ -1,5 +1,5 @@
 /*
- * BBClip.cpp - implementation of class bbClip
+ * PatternClip.cpp - implementation of class PatternClip
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,19 +22,19 @@
  *
  */
  
- #include "BBClip.h"
+ #include "PatternClip.h"
  
  #include <QDomElement>
  
- #include "BBTrack.h"
- #include "BBTrackContainer.h"
  #include "Engine.h"
- 
+ #include "PatternStore.h"
+ #include "PatternTrack.h"
 
-BBClip::BBClip( Track * _track ) :
-	Clip( _track )
+
+PatternClip::PatternClip(Track* track) :
+	Clip(track)
 {
-	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
+	bar_t t = Engine::patternStore()->lengthOfPattern(patternIndex());
 	if( t > 0 )
 	{
 		saveJournallingState( false );
@@ -44,7 +44,7 @@ BBClip::BBClip( Track * _track ) :
 	setAutoResize( false );
 }
 
-void BBClip::saveSettings( QDomDocument & doc, QDomElement & element )
+void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	element.setAttribute( "name", name() );
 	if( element.parentNode().nodeName() == "clipboard" )
@@ -66,7 +66,7 @@ void BBClip::saveSettings( QDomDocument & doc, QDomElement & element )
 
 
 
-void BBClip::loadSettings( const QDomElement & element )
+void PatternClip::loadSettings(const QDomElement& element)
 {
 	setName( element.attribute( "name" ) );
 	if( element.attribute( "pos" ).toInt() >= 0 )
@@ -101,14 +101,14 @@ void BBClip::loadSettings( const QDomElement & element )
 
 
 
-int BBClip::bbTrackIndex()
+int PatternClip::patternIndex()
 {
-	return dynamic_cast<BBTrack *>( getTrack() )->index();
+	return dynamic_cast<PatternTrack*>(getTrack())->patternIndex();
 }
 
 
 
-ClipView * BBClip::createView( TrackView * _tv )
+ClipView* PatternClip::createView(TrackView* tv)
 {
-	return new BBClipView( this, _tv );
+	return new PatternClipView(this, tv);
 }

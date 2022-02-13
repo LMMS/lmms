@@ -1,5 +1,5 @@
 /*
- * BBClipView.cpp
+ * PatternClipView.cpp
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,23 +22,23 @@
  *
  */
 
-#include "BBClipView.h"
+#include "PatternClipView.h"
 
 #include <QMenu>
 #include <QPainter>
 
-#include "BBEditor.h"
-#include "BBTrackContainer.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "PatternEditor.h"
+#include "PatternStore.h"
 #include "RenameDialog.h"
 #include "Song.h"
 #include "ToolTip.h"
 
-BBClipView::BBClipView( Clip * _clip, TrackView * _tv ) :
+PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
-	m_bbClip( dynamic_cast<BBClip *>( _clip ) ),
+	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
 	m_paintPixmap()
 {
 	connect( _clip->getTrack(), SIGNAL( dataChanged() ), 
@@ -47,14 +47,14 @@ BBClipView::BBClipView( Clip * _clip, TrackView * _tv ) :
 	setStyle( QApplication::style() );
 }
 
-void BBClipView::constructContextMenu( QMenu * _cm )
+void PatternClipView::constructContextMenu(QMenu* _cm)
 {
-	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
-					tr( "Open in Beat+Bassline-Editor" ),
+	QAction* a = new QAction(embed::getIconPixmap("pattern_track"),
+					tr("Open in Pattern Editor"),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
-			this, SLOT( openInBBEditor() ) );
+			this, SLOT( openInPatternEditor() ) );
 	_cm->insertSeparator( _cm->actions()[1] );
 	_cm->addSeparator();
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
@@ -67,15 +67,15 @@ void BBClipView::constructContextMenu( QMenu * _cm )
 
 
 
-void BBClipView::mouseDoubleClickEvent( QMouseEvent * )
+void PatternClipView::mouseDoubleClickEvent(QMouseEvent*)
 {
-	openInBBEditor();
+	openInPatternEditor();
 }
 
 
 
 
-void BBClipView::paintEvent( QPaintEvent * )
+void PatternClipView::paintEvent(QPaintEvent*)
 {
 	QPainter painter( this );
 
@@ -116,8 +116,8 @@ void BBClipView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbClip->bbTrackIndex() );
-	if( m_bbClip->length() > TimePos::ticksPerBar() && t > 0 )
+	bar_t t = Engine::patternStore()->lengthOfPattern(m_patternClip->patternIndex());
+	if (m_patternClip->length() > TimePos::ticksPerBar() && t > 0)
 	{
 		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
@@ -130,7 +130,7 @@ void BBClipView::paintEvent( QPaintEvent * )
 	}
 
 	// clip name
-	paintTextLabel(m_bbClip->name(), p);
+	paintTextLabel(m_patternClip->name(), p);
 
 	// inner border
 	p.setPen( c.lighter( 130 ) );
@@ -142,7 +142,7 @@ void BBClipView::paintEvent( QPaintEvent * )
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
 	// draw the 'muted' pixmap only if the clip was manualy muted
-	if( m_bbClip->isMuted() )
+	if (m_patternClip->isMuted())
 	{
 		const int spacing = CLIP_BORDER_WIDTH;
 		const int size = 14;
@@ -158,34 +158,34 @@ void BBClipView::paintEvent( QPaintEvent * )
 
 
 
-void BBClipView::openInBBEditor()
+void PatternClipView::openInPatternEditor()
 {
-	Engine::getBBTrackContainer()->setCurrentBB( m_bbClip->bbTrackIndex() );
+	Engine::patternStore()->setCurrentPattern(m_patternClip->patternIndex());
 
-	getGUI()->mainWindow()->toggleBBEditorWin( true );
+	getGUI()->mainWindow()->togglePatternEditorWin(true);
 }
 
 
 
 
-void BBClipView::resetName() { m_bbClip->setName(""); }
+void PatternClipView::resetName() { m_patternClip->setName(""); }
 
 
 
 
-void BBClipView::changeName()
+void PatternClipView::changeName()
 {
-	QString s = m_bbClip->name();
+	QString s = m_patternClip->name();
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
-	m_bbClip->setName( s );
+	m_patternClip->setName(s);
 }
 
 
 
-void BBClipView::update()
+void PatternClipView::update()
 {
-	ToolTip::add(this, m_bbClip->name());
+	ToolTip::add(this, m_patternClip->name());
 
 	ClipView::update();
 }

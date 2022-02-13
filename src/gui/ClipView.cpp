@@ -91,7 +91,7 @@ ClipView::ClipView( Clip * clip,
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
-	m_BBClipBackground( 0, 0, 0 ),
+	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_mouseHotspotKnife( 0, 0 ),
@@ -219,8 +219,8 @@ QColor ClipView::textBackgroundColor() const
 QColor ClipView::textShadowColor() const
 { return m_textShadowColor; }
 
-QColor ClipView::BBClipBackground() const
-{ return m_BBClipBackground; }
+QColor ClipView::patternClipBackground() const
+{ return m_patternClipBackground; }
 
 bool ClipView::gradient() const
 { return m_gradient; }
@@ -246,8 +246,8 @@ void ClipView::setTextBackgroundColor( const QColor & c )
 void ClipView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
 
-void ClipView::setBBClipBackground( const QColor & c )
-{ m_BBClipBackground = QColor( c ); }
+void ClipView::setPatternClipBackground( const QColor & c )
+{ m_patternClipBackground = QColor( c ); }
 
 void ClipView::setGradient( const bool & b )
 { m_gradient = b; }

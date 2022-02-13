@@ -1,5 +1,5 @@
 /*
- * BBClip.h
+ * PatternClipView.h
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,31 +23,42 @@
  */
  
 
-#ifndef BB_CLIP_H
-#define BB_CLIP_H
+#ifndef PATTERN_CLIP_VIEW_H
+#define PATTERN_CLIP_VIEW_H
 
-#include "ClipView.h"
+#include "PatternClip.h"
+
+#include <QStaticText>
 
 
-class BBClip : public Clip
+class PatternClipView : public ClipView
 {
+	Q_OBJECT
 public:
-	BBClip( Track * _track );
-	virtual ~BBClip() = default;
+	PatternClipView(Clip* clip, TrackView* tv);
+	virtual ~PatternClipView() = default;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-	inline QString nodeName() const override
-	{
-		return( "bbtco" );
-	}
 
-	int bbTrackIndex();
+public slots:
+	void update() override;
 
-	ClipView * createView( TrackView * _tv ) override;
+protected slots:
+	void openInPatternEditor();
+	void resetName();
+	void changeName();
+
+
+protected:
+	void paintEvent( QPaintEvent * pe ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void constructContextMenu( QMenu * ) override;
+
 
 private:
-	friend class BBClipView;
+	PatternClip* m_patternClip;
+	QPixmap m_paintPixmap;
+	
+	QStaticText m_staticTextName;
 } ;
 
 

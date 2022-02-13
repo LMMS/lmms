@@ -93,7 +93,7 @@ private:
 
 	QStaticText m_staticTextName;
 	
-	bool m_legacySEBB;
+	bool m_legacySEPattern;
 } ;
  
  

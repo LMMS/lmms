@@ -1,5 +1,5 @@
 /*
- * BBTrack.cpp - implementation of class BBTrack
+ * PatternTrack.cpp - a track representing a pattern in the PatternStore
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -21,69 +21,68 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#include "BBTrack.h"
+#include "PatternTrack.h"
 
 #include <QDomElement>
 #include <QMenu>
 #include <QPainter>
 
-#include "BBTrackContainer.h"
-#include "BBTrackView.h"
+#include "PatternStore.h"
+#include "PatternTrackView.h"
 #include "Song.h"
 
 
 
-BBTrack::infoMap BBTrack::s_infoMap;
+PatternTrack::infoMap PatternTrack::s_infoMap;
 
 
-BBTrack::BBTrack( TrackContainer* tc ) :
-	Track( Track::BBTrack, tc )
+PatternTrack::PatternTrack(TrackContainer* tc) :
+	Track(Track::PatternTrack, tc)
 {
-	int bbNum = s_infoMap.size();
-	s_infoMap[this] = bbNum;
+	int patternNum = s_infoMap.size();
+	s_infoMap[this] = patternNum;
 
-	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
-	Engine::getBBTrackContainer()->createClipsForBB( bbNum );
-	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
-	Engine::getBBTrackContainer()->updateComboBox();
+	setName(tr("Pattern %1").arg(patternNum));
+	Engine::patternStore()->createClipsForPattern(patternNum);
+	Engine::patternStore()->setCurrentPattern(patternNum);
+	Engine::patternStore()->updateComboBox();
 
 	connect( this, SIGNAL( nameChanged() ),
-		Engine::getBBTrackContainer(), SLOT( updateComboBox() ) );
+		Engine::patternStore(), SLOT(updateComboBox()));
 }
 
 
 
 
-BBTrack::~BBTrack()
+PatternTrack::~PatternTrack()
 {
 	Engine::audioEngine()->removePlayHandlesOfTypes( this,
 					PlayHandle::TypeNotePlayHandle
 					| PlayHandle::TypeInstrumentPlayHandle
 					| PlayHandle::TypeSamplePlayHandle );
 
-	const int bb = s_infoMap[this];
-	Engine::getBBTrackContainer()->removeBB( bb );
+	const int pattern = s_infoMap[this];
+	Engine::patternStore()->removePattern(pattern);
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
-		if( it.value() > bb )
+		if (it.value() > pattern)
 		{
 			--it.value();
 		}
 	}
 	s_infoMap.remove( this );
 
-	// remove us from TC so bbTrackContainer::numOfBBs() returns a smaller
-	// value and thus combobox-updating in bbTrackContainer works well
+	// remove us from the Song and update the pattern selection combobox to reflect the change
 	trackContainer()->removeTrack( this );
-	Engine::getBBTrackContainer()->updateComboBox();
+	Engine::patternStore()->updateComboBox();
 }
 
 
 
 
 // play _frames frames of given Clip within starting with _start
-bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
+bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _clip_num )
 {
 	if( isMuted() )
@@ -93,7 +92,7 @@ bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	if( _clip_num >= 0 )
 	{
-		return Engine::getBBTrackContainer()->play( _start, _frames, _offset, s_infoMap[this] );
+		return Engine::patternStore()->play(_start, _frames, _offset, s_infoMap[this]);
 	}
 
 	clipVector clips;
@@ -118,7 +117,7 @@ bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	if( _start - lastPosition < lastLen )
 	{
-		return Engine::getBBTrackContainer()->play( _start - lastPosition, _frames, _offset, s_infoMap[this] );
+		return Engine::patternStore()->play(_start - lastPosition, _frames, _offset, s_infoMap[this]);
 	}
 	return false;
 }
@@ -126,61 +125,59 @@ bool BBTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackView * BBTrack::createView( TrackContainerView* tcv )
+TrackView* PatternTrack::createView(TrackContainerView* tcv)
 {
-	return new BBTrackView( this, tcv );
+	return new PatternTrackView(this, tcv);
 }
 
 
 
 
-Clip* BBTrack::createClip(const TimePos & pos)
+Clip* PatternTrack::createClip(const TimePos & pos)
 {
-	BBClip* bbclip = new BBClip(this);
-	bbclip->movePosition(pos);
-	return bbclip;
+	PatternClip* pc = new PatternClip(this);
+	pc->movePosition(pos);
+	return pc;
 }
 
 
 
 
-void BBTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _this)
 {
 //	_this.setAttribute( "icon", m_trackLabel->pixmapFile() );
 /*	_this.setAttribute( "current", s_infoMap[this] ==
-					engine::getBBEditor()->currentBB() );*/
+					engine::getPatternEditor()->currentPattern() );*/
 	if( s_infoMap[this] == 0 &&
 			_this.parentNode().parentNode().nodeName() != "clone" &&
 			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
-		( (JournallingObject *)( Engine::getBBTrackContainer() ) )->
-						saveState( _doc, _this );
+		Engine::patternStore()->saveState(doc, _this);
 	}
 	if( _this.parentNode().parentNode().nodeName() == "clone" )
 	{
-		_this.setAttribute( "clonebbt", s_infoMap[this] );
+		_this.setAttribute( "clonebbt", s_infoMap[this] );  // TODO rename bb to pattern
 	}
 }
 
 
 
 
-void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
+void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 {
 /*	if( _this.attribute( "icon" ) != "" )
 	{
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}*/
 
-	if( _this.hasAttribute( "clonebbt" ) )
+	if( _this.hasAttribute( "clonebbt" ) )  // TODO rename bb to pattern
 	{
-		const int src = _this.attribute( "clonebbt" ).toInt();
+		const int src = _this.attribute( "clonebbt" ).toInt(); // TODO rename bb to pattern
 		const int dst = s_infoMap[this];
 		TrackContainer::TrackList tl =
-					Engine::getBBTrackContainer()->tracks();
-		// copy Clips of all tracks from source BB (at bar "src") to destination
-		// Clips (which are created if they do not exist yet)
+					Engine::patternStore()->tracks();
+		// copy clips of all tracks from source pattern (at bar "src") to destination
+		// clips (which are created if they do not exist yet)
 		for( TrackContainer::TrackList::iterator it = tl.begin();
 							it != tl.end(); ++it )
 		{
@@ -196,29 +193,28 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 					TrackContainer::classNodeName() );
 		if( node.isElement() )
 		{
-			( (JournallingObject *)Engine::getBBTrackContainer() )->
-					restoreState( node.toElement() );
+			Engine::patternStore()->restoreState(node.toElement());
 		}
 	}
-/*	doesn't work yet because BBTrack-ctor also sets current bb so if
-	bb-tracks are created after this function is called, this doesn't
+/*	doesn't work yet because PatternTrack-ctor also sets current pattern so if
+	pattern tracks are created after this function is called, this doesn't
 	help at all....
 	if( _this.attribute( "current" ).toInt() )
 	{
-		engine::getBBEditor()->setCurrentBB( s_infoMap[this] );
+		engine::getPatternEditor()->setCurrentPattern( s_infoMap[this] );
 	}*/
 }
 
 
 
 
-// return pointer to BBTrack specified by _bb_num
-BBTrack * BBTrack::findBBTrack( int _bb_num )
+// return pointer to PatternTrack specified by pattern_num
+PatternTrack* PatternTrack::findPatternTrack(int pattern_num)
 {
 	for( infoMap::iterator it = s_infoMap.begin(); it != s_infoMap.end();
 									++it )
 	{
-		if( it.value() == _bb_num )
+		if (it.value() == pattern_num)
 		{
 			return it.key();
 		}
@@ -229,15 +225,14 @@ BBTrack * BBTrack::findBBTrack( int _bb_num )
 
 
 
-void BBTrack::swapBBTracks( Track * _track1, Track * _track2 )
+void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 {
-	BBTrack * t1 = dynamic_cast<BBTrack *>( _track1 );
-	BBTrack * t2 = dynamic_cast<BBTrack *>( _track2 );
+	PatternTrack* t1 = dynamic_cast<PatternTrack*>(track1);
+	PatternTrack* t2 = dynamic_cast<PatternTrack*>(track2);
 	if( t1 != nullptr && t2 != nullptr )
 	{
 		qSwap( s_infoMap[t1], s_infoMap[t2] );
-		Engine::getBBTrackContainer()->swapBB( s_infoMap[t1],
-								s_infoMap[t2] );
-		Engine::getBBTrackContainer()->setCurrentBB( s_infoMap[t1] );
+		Engine::patternStore()->swapPattern(s_infoMap[t1], s_infoMap[t2]);
+		Engine::patternStore()->setCurrentPattern(s_infoMap[t1]);
 	}
 }
