@@ -161,8 +161,9 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
  */
 Track* Track::clone()
 {
+	// Save track to temporary XML and load it to create a new identical track
 	QDomDocument doc;
-	QDomElement parent = doc.createElement("clone");
+	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
 	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
 

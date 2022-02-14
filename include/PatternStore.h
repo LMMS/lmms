@@ -69,7 +69,7 @@ public:
 
 	inline QString nodeName() const override
 	{
-		return "bbtrackcontainer"; // TODO rename to patternstore
+		return "patternstore";
 	}
 
 	bar_t lengthOfPattern(int pattern) const;

@@ -149,14 +149,15 @@ void PatternTrack::saveTrackSpecificSettings(QDomDocument& doc, QDomElement& _th
 /*	_this.setAttribute( "current", s_infoMap[this] ==
 					engine::getPatternEditor()->currentPattern() );*/
 	if( s_infoMap[this] == 0 &&
-			_this.parentNode().parentNode().nodeName() != "clone" &&
+			_this.parentNode().parentNode().nodeName() != "clonedtrack" &&
 			_this.parentNode().parentNode().nodeName() != "journaldata" )
 	{
 		Engine::patternStore()->saveState(doc, _this);
 	}
-	if( _this.parentNode().parentNode().nodeName() == "clone" )
+	// If we are creating drag-n-drop data for Track::clone() only save pattern ID, not pattern content
+	if (_this.parentNode().parentNode().nodeName() == "clonedtrack")
 	{
-		_this.setAttribute( "clonebbt", s_infoMap[this] );  // TODO rename bb to pattern
+		_this.setAttribute("sourcepattern", s_infoMap[this]);
 	}
 }
 
@@ -170,9 +171,11 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 		m_trackLabel->setPixmapFile( _this.attribute( "icon" ) );
 	}*/
 
-	if( _this.hasAttribute( "clonebbt" ) )  // TODO rename bb to pattern
+	// If data was created by Track::clone(), do not add any tracks to the pattern(-editor)
+	// instead create a new copy of the clip on each track
+	if (_this.hasAttribute("sourcepattern"))
 	{
-		const int src = _this.attribute( "clonebbt" ).toInt(); // TODO rename bb to pattern
+		const int src = _this.attribute("sourcepattern").toInt();
 		const int dst = s_infoMap[this];
 		TrackContainer::TrackList tl =
 					Engine::patternStore()->tracks();

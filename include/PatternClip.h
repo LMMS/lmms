@@ -43,7 +43,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return( "bbtco" ); // TODO rename to patternclip
+		return "patternclip";
 	}
 
 	int patternIndex();
