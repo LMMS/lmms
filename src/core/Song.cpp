@@ -1112,7 +1112,7 @@ void Song::loadProject( const QString & fileName )
 				++m_nLoadingTrack;
 				if (nd.toElement().attribute("type").toInt() == Track::PatternTrack)
 				{
-					n += nd.toElement().elementsByTagName("bbtrack").at(0) // TODO rename to patterntrack
+					n += nd.toElement().elementsByTagName("patterntrack").at(0)
 						.toElement().firstChildElement().childNodes().count();
 				}
 				nd=nd.nextSibling();

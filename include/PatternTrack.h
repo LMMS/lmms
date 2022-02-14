@@ -77,7 +77,7 @@ public:
 protected:
 	inline QString nodeName() const override
 	{
-		return( "bbtrack" ); //TODO rename to patterntrack
+		return "patterntrack";
 	}
 
 

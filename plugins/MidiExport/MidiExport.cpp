@@ -138,7 +138,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					base_volume = LocaleHelper::toDouble(it.attribute("volume", "100"))/100.0;
 				}
 
-				if (n.nodeName() == "pattern") //TODO: rename to "midiClip"
+				if (n.nodeName() == "midiclip")
 				{
 					base_time = n.toElement().attribute("pos", "0").toInt();
 					writeMidiClip(midiClip, n, base_pitch, base_volume, base_time);
@@ -160,7 +160,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
 
-				if (n.nodeName() == "bbclip")  // TODO rename to patternclip
+				if (n.nodeName() == "patternclip")
 				{
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
@@ -211,7 +211,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				base_volume = LocaleHelper::toDouble(it.attribute("volume", "100")) / 100.0;
 			}
 
-			if (n.nodeName() == "pattern") //TODO: rename to "midiClip"
+			if (n.nodeName() == "midiclip")
 			{
 				std::vector<std::pair<int,int>> &plist = *itr;
 
