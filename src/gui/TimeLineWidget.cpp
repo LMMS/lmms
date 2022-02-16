@@ -62,6 +62,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_xOffset( xoff ),
 	m_posMarkerX( 0 ),
 	m_ppb( ppb ),
+	m_snapSize( 1.0 ),
 	m_pos( pos ),
 	m_begin( begin ),
 	m_mode( mode ),
@@ -403,7 +404,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			}
 			else
 			{
-				m_loopPos[i] = t.quantize(1.0);
+				m_loopPos[i] = t.quantize(m_snapSize);
 			}
 			// Catch begin == end
 			if( m_loopPos[0] == m_loopPos[1] )
