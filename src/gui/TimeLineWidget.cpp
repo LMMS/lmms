@@ -413,11 +413,11 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 				// marking instead of pushing it.
 				if( m_action == MoveLoopBegin ) 
 				{
-					m_loopPos[0] -= TimePos::ticksPerBar();
+					m_loopPos[0] -= m_snapSize * TimePos::ticksPerBar();
 				}
 				else
 				{
-					m_loopPos[1] += TimePos::ticksPerBar();
+					m_loopPos[1] += m_snapSize * TimePos::ticksPerBar();
 				}
 			}
 			update();
