@@ -468,7 +468,6 @@ void SongEditor::setEditModeSelect()
 void SongEditor::toggleProportionalSnap()
 {
 	m_proportionalSnap = !m_proportionalSnap;
-	m_timeLine->updateSnapSize(getSnapSize());
 }
 
 
@@ -1020,6 +1019,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_setProportionalSnapAction->setChecked(false);
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), this, SLOT(updateSnapLabel()) );
+	connect(m_setProportionalSnapAction, &QAction::triggered,
+		[=]() { m_editor->m_timeLine->updateSnapSize(m_editor->getSnapSize()); });
 
 	snapToolBar->addWidget( snap_lbl );
 	snapToolBar->addWidget( m_snappingComboBox );
