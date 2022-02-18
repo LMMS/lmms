@@ -344,7 +344,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		{
 			m_action = MoveLoopBegin;
 		}
-		else if( t > loopMid )
+		else
 		{
 			m_action = MoveLoopEnd;
 		}
