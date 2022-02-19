@@ -23,7 +23,7 @@ TemplatesMenu::TemplatesMenu(QWidget *parent) :
 
 void TemplatesMenu::createNewProjectFromTemplate(QAction * _action)
 {
-	if( gui->mainWindow()->mayChangeProject(true) )
+	if( getGUI()->mainWindow()->mayChangeProject(true) )
 	{
 		const QString& templateFilePath = _action->data().toString();
 		Engine::getSong()->createNewProjectFromTemplate(templateFilePath);

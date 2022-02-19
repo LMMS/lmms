@@ -28,6 +28,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
+#include <memory>
 #include "lmmsconfig.h"
 
 #include "ConfigManager.h"
@@ -94,9 +95,14 @@ void PluginFactory::setupSearchPaths()
 PluginFactory* PluginFactory::instance()
 {
 	if (s_instance == nullptr)
-		s_instance.reset(new PluginFactory());
+		s_instance = std::make_unique<PluginFactory>();
 
 	return s_instance.get();
+}
+
+PluginFactory* getPluginFactory()
+{
+	return PluginFactory::instance();
 }
 
 const Plugin::DescriptorList PluginFactory::descriptors() const

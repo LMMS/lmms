@@ -24,7 +24,7 @@
 
 
 #include "MeterModel.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 
 
 MeterModel::MeterModel( ::Model * _parent ) :
@@ -53,8 +53,8 @@ void MeterModel::reset()
 	m_numeratorModel.setValue( 4 );
 	m_denominatorModel.setValue( 4 );
 
-	AutomationPattern::globalAutomationPattern( &m_numeratorModel )->clear();
-	AutomationPattern::globalAutomationPattern( &m_denominatorModel )->clear();
+	AutomationClip::globalAutomationClip( &m_numeratorModel )->clear();
+	AutomationClip::globalAutomationClip( &m_denominatorModel )->clear();
 }
 
 

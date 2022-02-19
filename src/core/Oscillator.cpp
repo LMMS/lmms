@@ -32,7 +32,7 @@
 
 #include "BufferManager.h"
 #include "Engine.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "fftw3.h"
 #include "fft_helpers.h"
@@ -76,7 +76,7 @@ Oscillator::Oscillator(const IntModel *wave_shape_model,
 
 void Oscillator::update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl, bool modulator)
 {
-	if (m_freq >= Engine::mixer()->processingSampleRate() / 2)
+	if (m_freq >= Engine::audioEngine()->processingSampleRate() / 2)
 	{
 		BufferManager::clear(ab, frames);
 		return;
@@ -180,7 +180,7 @@ void Oscillator::generateFromFFT(int bands, sample_t* table)
 
 void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
 {
-	if (sampleBuffer->m_userAntiAliasWaveTable == NULL) {return;}
+	if (sampleBuffer->m_userAntiAliasWaveTable == nullptr) {return;}
 
 	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
@@ -553,7 +553,7 @@ inline bool Oscillator::syncOk( float _osc_coeff )
 float Oscillator::syncInit( sampleFrame * _ab, const fpp_t _frames,
 						const ch_cnt_t _chnl )
 {
-	if( m_subOsc != NULL )
+	if( m_subOsc != nullptr )
 	{
 		m_subOsc->update( _ab, _frames, _chnl );
 	}
@@ -673,8 +673,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 	m_subOsc->update( _ab, _frames, _chnl, true );
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning_div_samplerate;
-	const float sampleRateCorrection = 44100.0f /
-				Engine::mixer()->processingSampleRate();
+	const float sampleRateCorrection = 44100.0f / Engine::audioEngine()->processingSampleRate();
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
@@ -690,7 +689,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 template<>
 inline sample_t Oscillator::getSample<Oscillator::SineWave>(const float sample)
 {
-	const float current_freq = m_freq * m_detuning_div_samplerate * Engine::mixer()->processingSampleRate();
+	const float current_freq = m_freq * m_detuning_div_samplerate * Engine::audioEngine()->processingSampleRate();
 
 	if (!m_useWaveTable || current_freq < OscillatorConstants::MAX_FREQ)
 	{

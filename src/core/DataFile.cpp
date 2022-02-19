@@ -45,6 +45,7 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "Track.h"
 #include "PathUtil.h"
 
 #include "lmmsversion.h"
@@ -54,7 +55,7 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 // QMap with the DOM elements that access file resources
 const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
-{ "sampletco", {"src"} },
+{ "sampleclip", {"src"} },
 { "audiofileprocessor", {"src"} },
 };
 
@@ -70,7 +71,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
-	&DataFile::upgrade_defaultTripleOscillatorHQ
+	&DataFile::upgrade_defaultTripleOscillatorHQ,
+	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -94,7 +96,7 @@ DataFile::typeDescStruct
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NotePattern, "pattern" }
+	{ DataFile::MidiClip, "midiclip" }
 } ;
 
 
@@ -137,9 +139,9 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( gui )
+		if( getGUI() != nullptr )
 		{
-			QMessageBox::critical( NULL,
+			QMessageBox::critical( nullptr,
 				SongEditor::tr( "Could not open file" ),
 				SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
@@ -199,7 +201,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NotePattern:
+	case Type::MidiClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
@@ -208,7 +210,7 @@ bool DataFile::validate( QString extension )
 	case Type::UnknownType:
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
-				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
+				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
 #ifdef LMMS_HAVE_LV2
@@ -290,7 +292,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 {
 	// Small lambda function for displaying errors
 	auto showError = [this](QString title, QString body){
-		if (gui)
+		if (getGUI() != nullptr)
 		{
 			QMessageBox mb;
 			mb.setWindowTitle(title);
@@ -1005,7 +1007,7 @@ void DataFile::upgrade_0_4_0_beta1()
 					m["plugin"] = sl.value( 0 );
 					m["file"] = sl.value( 1 );
 				}
-				EffectKey key( NULL, name, m );
+				EffectKey key( nullptr, name, m );
 				el.appendChild( key.saveXML( *this ) );
 			}
 		}
@@ -1759,10 +1761,75 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 }
 
 
+// Remove FX prefix from mixer and related nodes
+void DataFile::upgrade_mixerRename()
+{
+	// Change nodename <fxmixer> to <mixer>
+	QDomNodeList fxmixer = elementsByTagName("fxmixer");
+	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
+	{
+		fxmixer.item(i).toElement().setTagName("mixer");
+	}
+
+	// Change nodename <fxchannel> to <mixerchannel>
+	QDomNodeList fxchannel = elementsByTagName("fxchannel");
+	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
+	{
+		fxchannel.item(i).toElement().setTagName("mixerchannel");
+	}
+
+	// Change the attribute fxch of element <instrumenttrack> to mixch
+	QDomNodeList fxch = elementsByTagName("instrumenttrack");
+	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	{
+		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		{
+			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
+			fxch.item(i).toElement().removeAttribute("fxch");
+		}
+	}
+}
+
+
+// Rename BB to pattern and TCO to clip
+void DataFile::upgrade_bbTcoRename()
+{
+	std::vector<std::pair<const char *, const char *>> names {
+		{"automationpattern", "automationclip"},
+		{"bbtco", "patternclip"},
+		{"pattern", "midiclip"},
+		{"sampletco", "sampleclip"},
+		{"bbtrack", "patterntrack"},
+		{"bbtrackcontainer", "patternstore"},
+	};
+	// Replace names of XML tags
+	for (auto name : names)
+	{
+		QDomNodeList elements = elementsByTagName(name.first);
+		for (int i = 0; !elements.item(i).isNull(); ++i)
+		{
+			elements.item(i).toElement().setTagName(name.second);
+		}
+	}
+	// Replace "Beat/Bassline" with "Pattern" in track names
+	QDomNodeList elements = elementsByTagName("track");
+	for (int i = 0; !elements.item(i).isNull(); ++i)
+	{
+		auto e = elements.item(i).toElement();
+		static_assert(Track::PatternTrack == 1, "Must be type=1 for backwards compatibility");
+		if (e.attribute("type").toInt() == Track::PatternTrack)
+		{
+			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
@@ -1815,9 +1882,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( gui )
+			if( getGUI() != nullptr )
 			{
-				QMessageBox::critical( NULL,
+				QMessageBox::critical( nullptr,
 					SongEditor::tr( "Error in file" ),
 					SongEditor::tr( "The file %1 seems to contain "
 							"errors and therefore can't be "
@@ -1856,7 +1923,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
-		 && gui != nullptr && root.attribute("type") == "song"
+		 && getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?
 				SongEditor::tr("template") : SongEditor::tr("project");

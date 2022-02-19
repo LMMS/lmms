@@ -142,7 +142,7 @@ ValueBuffer * LadspaControl::valueBuffer()
 		case TOGGLED:
 		case INTEGER:
 		case ENUM:
-			return NULL;
+			return nullptr;
 		case FLOATING:
 			return m_knobModel.valueBuffer();
 		case TIME:
@@ -152,7 +152,7 @@ ValueBuffer * LadspaControl::valueBuffer()
 			break;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 

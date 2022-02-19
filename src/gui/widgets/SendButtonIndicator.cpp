@@ -1,12 +1,12 @@
 #include "SendButtonIndicator.h"
 
-#include "FxMixer.h"
+#include "Mixer.h"
 
-QPixmap * SendButtonIndicator::s_qpmOff = NULL;
-QPixmap * SendButtonIndicator::s_qpmOn = NULL;
+QPixmap * SendButtonIndicator::s_qpmOff = nullptr;
+QPixmap * SendButtonIndicator::s_qpmOn = nullptr;
 
-SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
-										   FxMixerView * _mv) :
+SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, MixerLine * _owner,
+										   MixerView * _mv) :
 	QLabel( _parent ),
 	m_parent( _owner ),
 	m_mv( _mv )
@@ -21,7 +21,7 @@ SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
 		s_qpmOn = new QPixmap( embed::getIconPixmap( "mixer_send_on", 29, 20 ) );
 	}
 	
-	// don't do any initializing yet, because the FxMixerView and FxLine
+	// don't do any initializing yet, because the MixerView and MixerLine
 	// that were passed to this constructor are not done with their constructors
 	// yet.
 	setPixmap( *s_qpmOff );
@@ -29,11 +29,11 @@ SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
 
 void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 {
-	FxMixer * mix = Engine::fxMixer();
-	int from = m_mv->currentFxLine()->channelIndex();
+	Mixer * mix = Engine::mixer();
+	int from = m_mv->currentMixerLine()->channelIndex();
 	int to = m_parent->channelIndex();
 	FloatModel * sendModel = mix->channelSendModel(from, to);
-	if( sendModel == NULL )
+	if( sendModel == nullptr )
 	{
 		// not sending. create a mixer send.
 		mix->createChannelSend( from, to );
@@ -44,18 +44,18 @@ void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 		mix->deleteChannelSend( from, to );
 	}
 
-	m_mv->updateFxLine(m_parent->channelIndex());
+	m_mv->updateMixerLine(m_parent->channelIndex());
 	updateLightStatus();
 }
 
 FloatModel * SendButtonIndicator::getSendModel()
 {
-	FxMixer * mix = Engine::fxMixer();
+	Mixer * mix = Engine::mixer();
 	return mix->channelSendModel(
-		m_mv->currentFxLine()->channelIndex(), m_parent->channelIndex());
+		m_mv->currentMixerLine()->channelIndex(), m_parent->channelIndex());
 }
 
 void SendButtonIndicator::updateLightStatus()
 {
-	setPixmap( getSendModel() == NULL ? *s_qpmOff : *s_qpmOn );
+	setPixmap( getSendModel() == nullptr ? *s_qpmOff : *s_qpmOn );
 }

@@ -35,12 +35,12 @@
 class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
-	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, NULL ) {}
+	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, nullptr ) {}
 	virtual ~ExportFilter() {}
 
 
 	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracksBB,
+				const TrackContainer::TrackList &patternTracks,
 				int tempo, int masterPitch, const QString &filename ) = 0;
 protected:
 

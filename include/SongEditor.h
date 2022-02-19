@@ -84,7 +84,7 @@ public slots:
 
 	void updatePosition( const TimePos & t );
 	void updatePositionLine();
-	void selectAllTcos( bool select );
+	void selectAllClips( bool select );
 
 protected:
 	void closeEvent( QCloseEvent * ce ) override;
@@ -198,7 +198,7 @@ signals:
 	void resized();
 
 private:
-	QAction* m_addBBTrackAction;
+	QAction* m_addPatternTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 	QAction* m_setProportionalSnapAction;

@@ -27,7 +27,7 @@
 #include <QMouseEvent>
 
 #include "AutomatableModelView.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "embed.h"
@@ -213,7 +213,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( gui->mainWindow(), m );
+	ControllerConnectionDialog d( getGUI()->mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{
@@ -251,7 +251,7 @@ void AutomatableModelViewSlots::removeConnection()
 	if( m->controllerConnection() )
 	{
 		delete m->controllerConnection();
-		m->setControllerConnection( NULL );
+		m->setControllerConnection( nullptr );
 	}
 }
 
@@ -260,8 +260,8 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
-	gui->automationEditor()->open(
-				AutomationPattern::globalAutomationPattern(m_amv->modelUntyped())
+	getGUI()->automationEditor()->open(
+				AutomationClip::globalAutomationClip(m_amv->modelUntyped())
 	);
 }
 
@@ -269,7 +269,7 @@ void AutomatableModelViewSlots::editSongGlobalAutomation()
 
 void AutomatableModelViewSlots::removeSongGlobalAutomation()
 {
-	delete AutomationPattern::globalAutomationPattern( m_amv->modelUntyped() );
+	delete AutomationClip::globalAutomationClip( m_amv->modelUntyped() );
 }
 
 

@@ -34,17 +34,17 @@
 #include <QtGlobal>
 
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "Mixer.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
 #include "Track.h"
 #include "TrackContainerView.h"
-#include "TrackContentObjectView.h"
+#include "ClipView.h"
 
 
 /*! \brief Create a new track View.
@@ -58,7 +58,7 @@
  */
 TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	QWidget( tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
-	ModelView( NULL, this ),            /*!< The model view of this track */
+	ModelView( nullptr, this ),            /*!< The model view of this track */
 	m_track( track ),                  /*!< The track we're displaying */
 	m_trackContainerView( tcv ),       /*!< The track Container View we're displayed in */
 	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */
@@ -81,7 +81,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	layout->addWidget( &m_trackContentWidget, 1 );
 	setFixedHeight( m_track->getHeight() );
 
-	resizeEvent( NULL );
+	resizeEvent( nullptr );
 
 	setAcceptDrops( true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
@@ -89,8 +89,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	connect( m_track,
-		SIGNAL( trackContentObjectAdded( TrackContentObject * ) ),
-			this, SLOT( createTCOView( TrackContentObject * ) ),
+		SIGNAL( clipAdded( Clip * ) ),
+			this, SLOT( createClipView( Clip * ) ),
 			Qt::QueuedConnection );
 
 	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
@@ -102,18 +102,10 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
 
-	connect( &m_trackOperationsWidget, SIGNAL( colorChanged( QColor & ) ),
-			m_track, SLOT( trackColorChanged( QColor & ) ) );
-
-	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
-			m_track, SLOT( trackColorReset() ) );
-
-	// create views for already existing TCOs
-	for( Track::tcoVector::iterator it =
-					m_track->m_trackContentObjects.begin();
-			it != m_track->m_trackContentObjects.end(); ++it )
+	// create views for already existing clips
+	for( Track::clipVector::iterator it = m_track->m_clips.begin(); it != m_track->m_clips.end(); ++it )
 	{
-		createTCOView( *it );
+		createClipView( *it );
 	}
 
 	m_trackContainerView->addTrackView( this );
@@ -161,7 +153,7 @@ void TrackView::resizeEvent( QResizeEvent * re )
 void TrackView::update()
 {
 	m_trackContentWidget.update();
-	if( !m_trackContainerView->fixedTCOs() )
+	if( !m_trackContainerView->fixedClips() )
 	{
 		m_trackContentWidget.changePosition();
 	}
@@ -174,11 +166,11 @@ void TrackView::update()
 /*! \brief Create a menu for assigning/creating channels for this track.
  *
  */
-QMenu * TrackView::createFxMenu(QString title, QString newFxLabel)
+QMenu * TrackView::createMixerMenu(QString title, QString newMixerLabel)
 {
 	Q_UNUSED(title)
-	Q_UNUSED(newFxLabel)
-	return NULL;
+	Q_UNUSED(newMixerLabel)
+	return nullptr;
 }
 
 
@@ -202,7 +194,7 @@ bool TrackView::close()
 void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
-	Q_ASSERT( m_track != NULL );
+	Q_ASSERT( m_track != nullptr );
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
@@ -243,9 +235,9 @@ void TrackView::dropEvent( QDropEvent * de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 		de->accept();
 	}
 }
@@ -362,7 +354,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 		//	qDebug( "y position %d", yPos );
 
 		// a track-widget not equal to ourself?
-		if( trackAtY != NULL && trackAtY != this )
+		if( trackAtY != nullptr && trackAtY != this )
 		{
 			// then move us up/down there!
 			if( me->y() < 0 )
@@ -397,7 +389,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 void TrackView::mouseReleaseEvent( QMouseEvent * me )
 {
 	m_action = NoAction;
-	while( QApplication::overrideCursor() != NULL )
+	while( QApplication::overrideCursor() != nullptr )
 	{
 		QApplication::restoreOverrideCursor();
 	}
@@ -424,19 +416,19 @@ void TrackView::paintEvent( QPaintEvent * pe )
 
 
 
-/*! \brief Create a TrackContentObject View in this track View.
+/*! \brief Create a Clip View in this track View.
  *
- *  \param tco the TrackContentObject to create the view for.
+ *  \param clip the Clip to create the view for.
  *  \todo is this a good description for what this method does?
  */
-void TrackView::createTCOView( TrackContentObject * tco )
+void TrackView::createClipView( Clip * clip )
 {
-	TrackContentObjectView * tv = tco->createView( this );
-	if( tco->getSelectViewOnCreate() == true )
+	ClipView * tv = clip->createView( this );
+	if( clip->getSelectViewOnCreate() == true )
 	{
 		tv->setSelected( true );
 	}
-	tco->selectViewOnCreate( false );
+	clip->selectViewOnCreate( false );
 }
 
 

@@ -149,10 +149,11 @@ public slots:
 	void aboutLMMS();
 	void help();
 	void toggleAutomationEditorWin();
-	void toggleBBEditorWin( bool forceShow = false );
+	void togglePatternEditorWin(bool forceShow = false);
 	void toggleSongEditorWin();
 	void toggleProjectNotesWin();
-	void toggleFxMixerWin();
+	void toggleMicrotunerWin();
+	void toggleMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
 	void toggleFullscreen();

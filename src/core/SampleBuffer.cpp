@@ -50,13 +50,14 @@
 #endif
 
 
+#include "AudioEngine.h"
 #include "base64.h"
 #include "ConfigManager.h"
 #include "DrumSynth.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "Mixer.h"
+#include "lmms_constants.h"
 #include "PathUtil.h"
 
 #include "FileDialog.h"
@@ -75,11 +76,11 @@ SampleBuffer::SampleBuffer() :
 	m_loopEndFrame(0),
 	m_amplification(1.0f),
 	m_reversed(false),
-	m_frequency(BaseFreq),
-	m_sampleRate(mixerSampleRate())
+	m_frequency(DefaultBaseFreq),
+	m_sampleRate(audioEngineSampleRate())
 {
 
-	connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
+	connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 	update();
 }
 
@@ -107,7 +108,7 @@ SampleBuffer::SampleBuffer(const sampleFrame * data, const f_cnt_t frames)
 {
 	if (frames > 0)
 	{
-		m_origData = MM_ALLOC(sampleFrame, frames);
+		m_origData = MM_ALLOC<sampleFrame>( frames);
 		memcpy(m_origData, data, frames * BYTES_PER_FRAME);
 		m_origFrames = frames;
 		update();
@@ -122,7 +123,7 @@ SampleBuffer::SampleBuffer(const f_cnt_t frames)
 {
 	if (frames > 0)
 	{
-		m_origData = MM_ALLOC(sampleFrame, frames);
+		m_origData = MM_ALLOC<sampleFrame>( frames);
 		memset(m_origData, 0, frames * BYTES_PER_FRAME);
 		m_origFrames = frames;
 		update();
@@ -138,9 +139,9 @@ SampleBuffer::SampleBuffer(const SampleBuffer& orig)
 
 	m_audioFile = orig.m_audioFile;
 	m_origFrames = orig.m_origFrames;
-	m_origData = (m_origFrames > 0) ? MM_ALLOC(sampleFrame, m_origFrames) : nullptr;
+	m_origData = (m_origFrames > 0) ? MM_ALLOC<sampleFrame>( m_origFrames) : nullptr;
 	m_frames = orig.m_frames;
-	m_data = (m_frames > 0) ? MM_ALLOC(sampleFrame, m_frames) : nullptr;
+	m_data = (m_frames > 0) ? MM_ALLOC<sampleFrame>( m_frames) : nullptr;
 	m_startFrame = orig.m_startFrame;
 	m_endFrame = orig.m_endFrame;
 	m_loopStartFrame = orig.m_loopStartFrame;
@@ -225,9 +226,9 @@ void SampleBuffer::sampleRateChanged()
 	update(true);
 }
 
-sample_rate_t SampleBuffer::mixerSampleRate()
+sample_rate_t SampleBuffer::audioEngineSampleRate()
 {
-	return Engine::mixer()->processingSampleRate();
+	return Engine::audioEngine()->processingSampleRate();
 }
 
 
@@ -236,7 +237,7 @@ void SampleBuffer::update(bool keepSettings)
 	const bool lock = (m_data != nullptr);
 	if (lock)
 	{
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_varLock.lockForWrite();
 		MM_FREE(m_data);
 	}
@@ -250,7 +251,7 @@ void SampleBuffer::update(bool keepSettings)
 	{
 		// TODO: reverse- and amplification-property is not covered
 		// by following code...
-		m_data = MM_ALLOC(sampleFrame, m_origFrames);
+		m_data = MM_ALLOC<sampleFrame>( m_origFrames);
 		memcpy(m_data, m_origData, m_origFrames * BYTES_PER_FRAME);
 		if (keepSettings == false)
 		{
@@ -265,7 +266,7 @@ void SampleBuffer::update(bool keepSettings)
 		int_sample_t * buf = nullptr;
 		sample_t * fbuf = nullptr;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = mixerSampleRate();
+		sample_rate_t samplerate = audioEngineSampleRate();
 		m_frames = 0;
 
 		const QFileInfo fileInfo(file);
@@ -324,7 +325,7 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
-			m_data = MM_ALLOC(sampleFrame, 1);
+			m_data = MM_ALLOC<sampleFrame>( 1);
 			memset(m_data, 0, sizeof(*m_data));
 			m_frames = 1;
 			m_loopStartFrame = m_startFrame = 0;
@@ -339,7 +340,7 @@ void SampleBuffer::update(bool keepSettings)
 	{
 		// neither an audio-file nor a buffer to copy from, so create
 		// buffer containing one sample-frame
-		m_data = MM_ALLOC(sampleFrame, 1);
+		m_data = MM_ALLOC<sampleFrame>( 1);
 		memset(m_data, 0, sizeof(*m_data));
 		m_frames = 1;
 		m_loopStartFrame = m_startFrame = 0;
@@ -349,7 +350,7 @@ void SampleBuffer::update(bool keepSettings)
 	if (lock)
 	{
 		m_varLock.unlock();
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 	}
 
 	emit sampleUpdated();
@@ -367,7 +368,7 @@ void SampleBuffer::update(bool keepSettings)
 		QString message = tr("Audio files are limited to %1 MB "
 				"in size and %2 minutes of playing time"
 				).arg(fileSizeMax).arg(sampleLengthMax);
-		if (gui)
+		if (getGUI() != nullptr)
 		{
 			QMessageBox::information(nullptr,
 				title, message,	QMessageBox::Ok);
@@ -388,7 +389,7 @@ void SampleBuffer::convertIntToFloat(
 {
 	// following code transforms int-samples into float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-	m_data = MM_ALLOC(sampleFrame, frames);
+	m_data = MM_ALLOC<sampleFrame>( frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
 	// if reversing is on, we also reverse when scaling
@@ -411,7 +412,7 @@ void SampleBuffer::directFloatWrite(
 )
 {
 
-	m_data = MM_ALLOC(sampleFrame, frames);
+	m_data = MM_ALLOC<sampleFrame>( frames);
 	const int ch = (channels > 1) ? 1 : 0;
 
 	// if reversing is on, we also reverse when scaling
@@ -432,14 +433,14 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 {
 	const sample_rate_t oldRate = m_sampleRate;
 	// do samplerate-conversion to our default-samplerate
-	if (srcSR != mixerSampleRate())
+	if (srcSR != audioEngineSampleRate())
 	{
-		SampleBuffer * resampled = resample(srcSR, mixerSampleRate());
+		SampleBuffer * resampled = resample(srcSR, audioEngineSampleRate());
 
-		m_sampleRate = mixerSampleRate();
+		m_sampleRate = audioEngineSampleRate();
 		MM_FREE(m_data);
 		m_frames = resampled->frames();
-		m_data = MM_ALLOC(sampleFrame, m_frames);
+		m_data = MM_ALLOC<sampleFrame>( m_frames);
 		memcpy(m_data, resampled->data(), m_frames * sizeof(sampleFrame));
 		delete resampled;
 	}
@@ -450,15 +451,15 @@ void SampleBuffer::normalizeSampleRate(const sample_rate_t srcSR, bool keepSetti
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = m_frames;
 	}
-	else if (oldRate != mixerSampleRate())
+	else if (oldRate != audioEngineSampleRate())
 	{
-		auto oldRateToNewRateRatio = static_cast<float>(mixerSampleRate()) / oldRate;
+		auto oldRateToNewRateRatio = static_cast<float>(audioEngineSampleRate()) / oldRate;
 
 		m_startFrame = qBound(0, f_cnt_t(m_startFrame * oldRateToNewRateRatio), m_frames);
 		m_endFrame = qBound(m_startFrame, f_cnt_t(m_endFrame * oldRateToNewRateRatio), m_frames);
 		m_loopStartFrame = qBound(0, f_cnt_t(m_loopStartFrame * oldRateToNewRateRatio), m_frames);
 		m_loopEndFrame = qBound(m_loopStartFrame, f_cnt_t(m_loopEndFrame * oldRateToNewRateRatio), m_frames);
-		m_sampleRate = mixerSampleRate();
+		m_sampleRate = audioEngineSampleRate();
 	}
 }
 
@@ -719,8 +720,11 @@ bool SampleBuffer::play(
 	// variable for determining if we should currently be playing backwards in a ping-pong loop
 	bool isBackwards = state->isBackwards();
 
+	// The SampleBuffer can play a given sample with increased or decreased pitch. However, only
+	// samples that contain a tone that matches the default base note frequency of 440 Hz will
+	// produce the exact requested pitch in [Hz].
 	const double freqFactor = (double) freq / (double) m_frequency *
-		m_sampleRate / Engine::mixer()->processingSampleRate();
+		m_sampleRate / Engine::audioEngine()->processingSampleRate();
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>(
@@ -903,7 +907,7 @@ sampleFrame * SampleBuffer::getSampleFragment(
 		}
 	}
 
-	*tmp = MM_ALLOC(sampleFrame, frames);
+	*tmp = MM_ALLOC<sampleFrame>( frames);
 
 	if (loopMode == LoopOff)
 	{
@@ -1269,7 +1273,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 /*	FLAC__stream_encoder_set_do_exhaustive_model_search(flacEnc, true);
 	FLAC__stream_encoder_set_do_mid_side_stereo(flacEnc, true);*/
 	FLAC__stream_encoder_set_sample_rate(flacEnc,
-		Engine::mixer()->sampleRate());
+		Engine::audioEngine()->sampleRate());
 
 	QBuffer baWriter;
 	baWriter.open(QBuffer::WriteOnly);
@@ -1296,7 +1300,7 @@ QString & SampleBuffer::toBase64(QString & dst) const
 			for (ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch)
 			{
 				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
-					Mixer::clip(m_data[f+frameCnt][ch]) *
+					AudioEngine::clip(m_data[f+frameCnt][ch]) *
 						OUTPUT_SAMPLE_MULTIPLIER);
 			}
 		}
@@ -1503,14 +1507,14 @@ void SampleBuffer::loadFromBase64(const QString & data)
 
 	m_origFrames = origData.size() / sizeof(sampleFrame);
 	MM_FREE(m_origData);
-	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, origData.data(), origData.size());
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
 	m_origFrames = dsize / sizeof(sampleFrame);
 	MM_FREE(m_origData);
-	m_origData = MM_ALLOC(sampleFrame, m_origFrames);
+	m_origData = MM_ALLOC<sampleFrame>( m_origFrames);
 	memcpy(m_origData, dst, dsize);
 
 #endif
@@ -1551,12 +1555,12 @@ void SampleBuffer::setAmplification(float a)
 
 void SampleBuffer::setReversed(bool on)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	m_varLock.lockForWrite();
 	if (m_reversed != on) { std::reverse(m_data, m_data + m_frames); }
 	m_reversed = on;
 	m_varLock.unlock();
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	emit sampleUpdated();
 }
 

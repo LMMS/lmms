@@ -24,12 +24,12 @@
 
 
 #include "Engine.h"
-#include "BBTrackContainer.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Ladspa2LMMS.h"
 #include "Lv2Manager.h"
-#include "Mixer.h"
+#include "PatternStore.h"
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
@@ -38,15 +38,15 @@
 #include "Oscillator.h"
 
 float LmmsCore::s_framesPerTick;
-Mixer* LmmsCore::s_mixer = NULL;
-FxMixer * LmmsCore::s_fxMixer = NULL;
-BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
-Song * LmmsCore::s_song = NULL;
-ProjectJournal * LmmsCore::s_projectJournal = NULL;
+AudioEngine* LmmsCore::s_audioEngine = nullptr;
+Mixer * LmmsCore::s_mixer = nullptr;
+PatternStore * LmmsCore::s_patternStore = nullptr;
+Song * LmmsCore::s_song = nullptr;
+ProjectJournal * LmmsCore::s_projectJournal = nullptr;
 #ifdef LMMS_HAVE_LV2
 Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
 #endif
-Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+Ladspa2LMMS * LmmsCore::s_ladspaManager = nullptr;
 void* LmmsCore::s_dndPluginKey = nullptr;
 
 
@@ -64,10 +64,10 @@ void LmmsCore::init( bool renderOnly )
 
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new Mixer( renderOnly );
+	s_audioEngine = new AudioEngine( renderOnly );
 	s_song = new Song;
-	s_fxMixer = new FxMixer;
-	s_bbTrackContainer = new BBTrackContainer;
+	s_mixer = new Mixer;
+	s_patternStore = new PatternStore;
 
 #ifdef LMMS_HAVE_LV2
 	s_lv2Manager = new Lv2Manager;
@@ -78,12 +78,12 @@ void LmmsCore::init( bool renderOnly )
 	s_projectJournal->setJournalling( true );
 
 	emit engine->initProgress(tr("Opening audio and midi devices"));
-	s_mixer->initDevices();
+	s_audioEngine->initDevices();
 
 	PresetPreviewPlayHandle::init();
 
-	emit engine->initProgress(tr("Launching mixer threads"));
-	s_mixer->startProcessing();
+	emit engine->initProgress(tr("Launching audio engine threads"));
+	s_audioEngine->startProcessing();
 }
 
 
@@ -92,16 +92,16 @@ void LmmsCore::init( bool renderOnly )
 void LmmsCore::destroy()
 {
 	s_projectJournal->stopAllJournalling();
-	s_mixer->stopProcessing();
+	s_audioEngine->stopProcessing();
 
 	PresetPreviewPlayHandle::cleanup();
 
 	s_song->clearProject();
 
-	deleteHelper( &s_bbTrackContainer );
+	deleteHelper( &s_patternStore );
 
-	deleteHelper( &s_fxMixer );
 	deleteHelper( &s_mixer );
+	deleteHelper( &s_audioEngine );
 
 #ifdef LMMS_HAVE_LV2
 	deleteHelper( &s_lv2Manager );
@@ -143,8 +143,7 @@ float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 
 void LmmsCore::updateFramesPerTick()
 {
-	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
-				DefaultTicksPerBar / s_song->getTempo();
+	s_framesPerTick = s_audioEngine->processingSampleRate() * 60.0f * 4 / DefaultTicksPerBar / s_song->getTempo();
 }
 
 
@@ -167,4 +166,4 @@ void *LmmsCore::pickDndPluginKey()
 
 
 
-LmmsCore * LmmsCore::s_instanceOfMe = NULL;
+LmmsCore * LmmsCore::s_instanceOfMe = nullptr;

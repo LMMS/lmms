@@ -40,7 +40,7 @@
 
 LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, parent, name ),
-	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	IntModelView( new IntModel( 0, 0, 0, nullptr, name, true ), this ),
 	m_remainder( 0.f ),
 	m_mouseMoving( false ),
 	m_lastMousePos(),
@@ -53,7 +53,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 
 LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
 	LcdWidget( numDigits, style, parent, name ),
-	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
+	IntModelView( new IntModel( 0, 0, 0, nullptr, name, true ), this ),
 	m_remainder( 0.f ),
 	m_mouseMoving( false ),
 	m_lastMousePos(),
@@ -120,7 +120,7 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 				model()->value() + m_remainder - fdy / 2.f * model()->step<int>();
 			float floatValRounded = roundf( floatValNotRounded );
 			m_remainder = floatValNotRounded - floatValRounded;
-			model()->setInitValue( floatValRounded );
+			model()->setValue( floatValRounded );
 			emit manualChange();
 			m_lastMousePos = event->globalPos();
 		}
@@ -145,7 +145,7 @@ void LcdSpinBox::mouseReleaseEvent(QMouseEvent*)
 void LcdSpinBox::wheelEvent(QWheelEvent * we)
 {
 	we->accept();
-	model()->setInitValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
+	model()->setValue(model()->value() + ((we->angleDelta().y() > 0) ? 1 : -1) * model()->step<int>());
 	emit manualChange();
 }
 

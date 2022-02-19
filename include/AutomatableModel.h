@@ -120,7 +120,7 @@ public:
 	bool isAutomated() const;
 	bool isAutomatedOrControlled() const
 	{
-		return isAutomated() || m_controllerConnection != NULL;
+		return isAutomated() || m_controllerConnection != nullptr;
 	}
 
 	ControllerConnection* controllerConnection() const
@@ -326,7 +326,7 @@ protected:
 						const float min = 0,
 						const float max = 0,
 						const float step = 0,
-						Model* parent = NULL,
+						Model* parent = nullptr,
 						const QString& displayName = QString(),
 						bool defaultConstructed = false );
 	//! returns a value which is in range between min() and
@@ -457,7 +457,7 @@ class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float>
 	MODEL_IS_VISITABLE
 public:
 	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
-				Model * parent = NULL,
+				Model * parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
 		TypedAutomatableModel( val, min, max, step, parent, displayName, defaultConstructed )
@@ -475,7 +475,7 @@ class LMMS_EXPORT IntModel : public TypedAutomatableModel<int>
 	MODEL_IS_VISITABLE
 public:
 	IntModel( int val = 0, int min = 0, int max = 0,
-				Model* parent = NULL,
+				Model* parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
 		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed )
@@ -491,7 +491,7 @@ class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
 	MODEL_IS_VISITABLE
 public:
 	BoolModel( const bool val = false,
-				Model* parent = NULL,
+				Model* parent = nullptr,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
 		TypedAutomatableModel( val, false, true, 1, parent, displayName, defaultConstructed )

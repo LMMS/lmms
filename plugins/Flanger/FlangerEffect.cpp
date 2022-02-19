@@ -40,8 +40,8 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 
@@ -51,9 +51,9 @@ FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPlugin
 	Effect( &flanger_plugin_descriptor, parent, key ),
 	m_flangerControls( this )
 {
-	m_lfo = new QuadratureLfo( Engine::mixer()->processingSampleRate() );
-	m_lDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
-	m_rDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
+	m_lfo = new QuadratureLfo( Engine::audioEngine()->processingSampleRate() );
+	m_lDelay = new MonoDelay( 1, Engine::audioEngine()->processingSampleRate() );
+	m_rDelay = new MonoDelay( 1, Engine::audioEngine()->processingSampleRate() );
 	m_noise = new Noise;
 }
 
@@ -92,9 +92,9 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
+	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::audioEngine()->processingSampleRate();
 	const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
-	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
+	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::audioEngine()->processingSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
 	m_lfo->setOffset( m_flangerControls.m_lfoPhaseModel.value() / 180 * D_PI );
@@ -135,9 +135,9 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 void FlangerEffect::changeSampleRate()
 {
-	m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_lDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_rDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
+	m_lfo->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+	m_lDelay->setSampleRate( Engine::audioEngine()->processingSampleRate() );
+	m_rDelay->setSampleRate( Engine::audioEngine()->processingSampleRate() );
 }
 
 

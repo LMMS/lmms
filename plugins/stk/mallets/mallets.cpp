@@ -33,12 +33,12 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -56,8 +56,8 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -288,7 +288,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	int p = m_presetsModel.value();
 	
 	const float freq = _n->frequency();
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 		// If newer projects, adjust velocity to within stk's limits
 		float velocityAdjust =
@@ -309,7 +309,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_vibratoFreqModel.value(),
 						p,
 						(uint8_t) m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate() );
+				Engine::audioEngine()->processingSampleRate() );
 		}
 		else if( p == 9 )
 		{
@@ -322,7 +322,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate() );
+				Engine::audioEngine()->processingSampleRate() );
 		}
 		else
 		{
@@ -335,7 +335,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_strikeModel.value() * 128.0,
 						m_velocityModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate() );
+				Engine::audioEngine()->processingSampleRate() );
 		}
 		m.unlock();
 		static_cast<malletsSynth *>(_n->m_pluginData)->setPresetIndex(p);
@@ -415,7 +415,7 @@ malletsInstrumentView::malletsInstrumentView( malletsInstrument * _instrument,
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
 	// try to inform user about missing Stk-installation
-	if( _instrument->m_filesMissing && gui != NULL )
+	if( _instrument->m_filesMissing && getGUI() != nullptr )
 	{
 		QMessageBox::information( 0, tr( "Missing files" ),
 				tr( "Your Stk-installation seems to be "
@@ -641,7 +641,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	}
 	catch( ... )
 	{
-		m_voice = NULL;
+		m_voice = nullptr;
 	}
 	
 	m_delay = new StkFloat[256];
@@ -690,7 +690,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	}
 	catch( ... )
 	{
-		m_voice = NULL;
+		m_voice = nullptr;
 	}
 	
 	m_delay = new StkFloat[256];
@@ -741,7 +741,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	}
 	catch( ... )
 	{
-		m_voice = NULL;
+		m_voice = nullptr;
 	}
 	
 	m_delay = new StkFloat[256];

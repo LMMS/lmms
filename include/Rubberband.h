@@ -45,9 +45,10 @@ public:
 	{
 	}
 
-	inline void setSelected( bool _selected )
+	inline void setSelected(bool selected)
 	{
-		m_selected = _selected;
+		if (m_selected == selected) { return; }
+		m_selected = selected;
 		update();
 	}
 

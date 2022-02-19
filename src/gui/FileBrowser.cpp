@@ -37,7 +37,7 @@
 #include <QStringList>
 
 #include "FileBrowser.h"
-#include "BBTrackContainer.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "embed.h"
@@ -47,8 +47,9 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
@@ -449,7 +450,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// When enter is pressed, add the selected item...
 	if (insert)
 	{
-		// ...to the song editor by default, or to the BB editor if ctrl is held
+		// ...to the song editor by default, or to the pattern editor if ctrl is held
 		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
 		// If shift is held, we send the item to a new sample track...
 		bool sampleTrack = ke->modifiers() & Qt::ShiftModifier;
@@ -520,9 +521,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		contextMenu.addAction( songEditorHeader );
 		contextMenu.addActions( getContextActions(file, true) );
 
-		QAction* bbEditorHeader = new QAction( tr("BB Editor"), nullptr );
-		bbEditorHeader->setDisabled(true);
-		contextMenu.addAction( bbEditorHeader );
+		QAction* patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
+		patternEditorHeader->setDisabled(true);
+		contextMenu.addAction(patternEditorHeader);
 		contextMenu.addActions( getContextActions(file, false) );
 
 		// We should only show the menu if it contains items
@@ -626,7 +627,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 	else if (
 		(ext == "xiz" || ext == "sf2" || ext == "sf3" ||
 		 ext == "gig" || ext == "pat")
-		&& !pluginFactory->pluginSupportingExtension(ext).isNull())
+		&& !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
 		const bool isPlugin = file->handling() == FileItem::LoadByPlugin;
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
@@ -650,7 +651,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 	if (newPPH != nullptr)
 	{
-		if (Engine::mixer()->addPlayHandle(newPPH))
+		if (Engine::audioEngine()->addPlayHandle(newPPH))
 		{
 			m_previewPlayHandle = newPPH;
 		}
@@ -666,7 +667,7 @@ void FileBrowserTreeWidget::stopPreview()
 	QMutexLocker previewLocker(&m_pphMutex);
 	if (m_previewPlayHandle != nullptr)
 	{
-		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
+		Engine::audioEngine()->removePlayHandle(m_previewPlayHandle);
 		m_previewPlayHandle = nullptr;
 	}
 }
@@ -751,11 +752,11 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( gui->mainWindow()->mayChangeProject(true) )
+			if( getGUI()->mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -769,7 +770,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 				!i->descriptor()->supportsFileType( e ) )
 			{
 				PluginFactory::PluginInfoAndKey piakn =
-					pluginFactory->pluginSupportingExtension(e);
+					getPluginFactory()->pluginSupportingExtension(e);
 				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
@@ -791,7 +792,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -814,8 +815,8 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	else if( f->handling() != FileItem::NotSupported )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-					Engine::getBBTrackContainer() ) );
+			Track::create(Track::InstrumentTrack, Engine::patternStore())
+		);
 		handleFile( f, it );
 	}
 }
@@ -840,7 +841,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 {
 	// Get the correct TrackContainer. Ternary doesn't compile here
 	TrackContainer* tc = Engine::getSong();
-	if (!songEditor) { tc = Engine::getBBTrackContainer(); }
+	if (!songEditor) { tc = Engine::patternStore(); }
 	openInNewInstrumentTrack(tc, item);
 }
 
@@ -857,10 +858,10 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 		Track::create(Track::SampleTrack, Engine::getSong()));
 
 	// Add the sample clip to the track
-	Engine::mixer()->requestChangeInModel();
-	SampleTCO* clip = static_cast<SampleTCO*>(sampleTrack->createTCO(0));
+	Engine::audioEngine()->requestChangeInModel();
+	SampleClip* clip = static_cast<SampleClip*>(sampleTrack->createClip(0));
 	clip->setSampleFile(item->fullName());
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	return true;
 }
 
@@ -886,7 +887,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			gui->mainWindow()->workspace()->
+			getGUI()->mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
@@ -1228,7 +1229,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
 	}
-	else if( ext == "xiz" && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
@@ -1262,7 +1263,7 @@ void FileItem::determineFileType( void )
 	}
 
 	if( m_handling == NotSupported &&
-		!ext.isEmpty() && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+		!ext.isEmpty() && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_handling = LoadByPlugin;
 		// classify as sample if not classified by anything yet but can

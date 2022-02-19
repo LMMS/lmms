@@ -25,7 +25,7 @@
  
  #include "AutomationTrackView.h"
  
- #include "AutomationPattern.h"
+ #include "AutomationClip.h"
  #include "embed.h"
  #include "Engine.h"
  #include "ProjectJournal.h"
@@ -63,7 +63,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
 					journallingObject( val.toInt() ) );
-		if( mod != NULL )
+		if( mod != nullptr )
 		{
 			TimePos pos = TimePos( trackContainerView()->
 							currentPosition() +
@@ -78,9 +78,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			TrackContentObject * tco = getTrack()->createTCO( pos );
-			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
-			pat->addObject( mod );
+			Clip * clip = getTrack()->createClip( pos );
+			AutomationClip * autoClip = dynamic_cast<AutomationClip *>( clip );
+			autoClip->addObject( mod );
 		}
 	}
 

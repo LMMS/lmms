@@ -37,9 +37,6 @@
 #include <QFile>
 #include <QSettings>
 
-#ifdef LMMS_BUILD_WIN32
-#define powf pow
-#endif
 
 #ifdef _MSC_VER
 // not #if LMMS_BUILD_WIN32 because we have strncasecmp in mingw
