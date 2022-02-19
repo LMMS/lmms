@@ -33,14 +33,14 @@
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
-#include "BBTrack.h"
+#include "AudioEngine.h"
 #include "DataFile.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "GuiApplication.h"
@@ -50,7 +50,7 @@ using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
-	ModelView( NULL, this ),
+	ModelView( nullptr, this ),
 	JournallingObject(),
 	SerializingObjectHook(),
 	m_currentPosition( 0, 0 ),
@@ -165,7 +165,7 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	int indexFrom = m_trackViews.indexOf( trackView );
 	if ( indexFrom == indexTo ) { return; }
 
-	BBTrack::swapBBTracks( trackView->getTrack(),
+	PatternTrack::swapPatternTracks( trackView->getTrack(),
 			m_trackViews[indexTo]->getTrack() );
 
 	m_scrollLayout->removeWidget( trackView );
@@ -268,9 +268,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	delete t;
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -294,7 +294,7 @@ const TrackView * TrackContainerView::trackViewAt( const int _y ) const
 			return( *it );
 		}
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 
@@ -390,7 +390,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		PluginFactory::PluginInfoAndKey piakn =
-			pluginFactory->pluginSupportingExtension(FileItem::extension(value));
+			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
@@ -415,7 +415,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 
 	else if( type == "projectfile")
 	{
-		if( gui->mainWindow()->mayChangeProject(true) )
+		if( getGUI()->mainWindow()->mayChangeProject(true) )
 		{
 			Engine::getSong()->loadProject( value );
 		}
@@ -471,7 +471,7 @@ TrackContainerView::scrollArea::~scrollArea()
 void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 {
 	// always pass wheel-event to parent-widget (song-editor
-	// bb-editor etc.) because they might want to use it for zooming
+	// pattern-editor etc.) because they might want to use it for zooming
 	// or scrolling left/right if a modifier-key is pressed, otherwise
 	// they do not accept it and we pass it up to QScrollArea
 	m_trackContainerView->wheelEvent( _we );

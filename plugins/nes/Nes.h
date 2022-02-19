@@ -45,7 +45,7 @@
 	name ->setFixedSize( 29, 29 );
 
 #define makenesled( name, x, y, ttip ) \
-	name = new PixmapButton( this, NULL ); 	\
+	name = new PixmapButton( this, nullptr ); 	\
 	name -> setCheckable( true );			\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_on" ) ); \
@@ -53,7 +53,7 @@
 	ToolTip::add( name, ttip );
 
 #define makedcled( name, x, y, ttip, active ) \
-	PixmapButton * name = new PixmapButton( this, NULL ); 	\
+	PixmapButton * name = new PixmapButton( this, nullptr ); 	\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( active ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesdc_off" ) ); \

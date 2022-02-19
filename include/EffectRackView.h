@@ -43,7 +43,7 @@ class EffectRackView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EffectRackView( EffectChain* model, QWidget* parent = NULL );
+	EffectRackView( EffectChain* model, QWidget* parent = nullptr );
 	virtual ~EffectRackView();
 
 	static constexpr int DEFAULT_WIDTH = 245;

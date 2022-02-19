@@ -28,7 +28,7 @@
 
 #include "Note.h"
 #include "lmms_basics.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 
 class PianoRoll;
 class StepRecorderWidget;
@@ -47,7 +47,7 @@ class StepRecorder : public QObject
 	void noteReleased(const Note & n);
 	bool keyPressEvent(QKeyEvent* ke);
 	bool mousePressEvent(QMouseEvent* ke);
-	void setCurrentPattern(Pattern* newPattern);
+	void setCurrentMidiClip(MidiClip* newMidiClip);
 	void setStepsLength(const TimePos& newLength);
 
 	QVector<Note*> getCurStepNotes();
@@ -93,7 +93,7 @@ class StepRecorder : public QObject
 
 	QTimer m_updateReleasedTimer;
 
-	Pattern* m_pattern;
+	MidiClip* m_midiClip;
 
 	class StepNote
 	{
@@ -133,7 +133,7 @@ class StepRecorder : public QObject
 		QElapsedTimer releasedTimer;
 	} ;
 
-	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)
+	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the clip)
 
 	StepNote* findCurStepNote(const int key);
 

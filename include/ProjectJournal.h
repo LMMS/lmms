@@ -74,7 +74,7 @@ public:
 	// restoring a journalling object later
 	void freeID( const jo_id_t _id )
 	{
-		reallocID( _id, NULL );
+		reallocID( _id, nullptr );
 	}
 
 	//! hack, not used when saving a file
@@ -90,7 +90,7 @@ public:
 		{
 			return m_joIDs[_id];
 		}
-		return NULL;
+		return nullptr;
 	}
 
 

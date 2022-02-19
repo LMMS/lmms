@@ -25,9 +25,9 @@
 
 #include <QDebug>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "VstSyncController.h"
 #include "RemotePlugin.h"
 
@@ -42,13 +42,13 @@
 
 
 VstSyncController::VstSyncController() :
-	m_syncData( NULL ),
+	m_syncData( nullptr ),
 	m_shmID( -1 ),
 	m_shm( "/usr/bin/lmms" )
 {
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
-		connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
 #ifdef USE_QT_SHMEM
 		if ( m_shm.create( sizeof( VstSyncData ) ) )
@@ -87,7 +87,7 @@ VstSyncController::VstSyncController() :
 		qWarning( "VST sync support disabled in your configuration" );
 	}
 
-	if( m_syncData == NULL )
+	if( m_syncData == nullptr )
 	{
 		m_syncData = new VstSyncData;
 		m_syncData->hasSHM = false;
@@ -98,7 +98,7 @@ VstSyncController::VstSyncController() :
 	}
 
 	m_syncData->isPlaying = false;
-	m_syncData->m_bufferSize = Engine::mixer()->framesPerPeriod();
+	m_syncData->m_bufferSize = Engine::audioEngine()->framesPerPeriod();
 	m_syncData->timeSigNumer = 4;
 	m_syncData->timeSigDenom = 4;
 
@@ -124,7 +124,7 @@ VstSyncController::~VstSyncController()
 #else
 		if( shmdt( m_syncData ) != -1 )
 		{
-			shmctl( m_shmID, IPC_RMID, NULL );
+			shmctl( m_shmID, IPC_RMID, nullptr );
 		}
 		else
 		{
@@ -170,7 +170,7 @@ void VstSyncController::startCycle( int startTick, int endTick )
 
 void VstSyncController::update()
 {
-	m_syncData->m_bufferSize = Engine::mixer()->framesPerPeriod();
+	m_syncData->m_bufferSize = Engine::audioEngine()->framesPerPeriod();
 
 #ifdef VST_SNC_LATENCY
 	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );
@@ -181,7 +181,7 @@ void VstSyncController::update()
 
 void VstSyncController::updateSampleRate()
 {
-	m_syncData->m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_syncData->m_sampleRate = Engine::audioEngine()->processingSampleRate();
 
 #ifdef VST_SNC_LATENCY
 	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );

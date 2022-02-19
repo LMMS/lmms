@@ -24,6 +24,7 @@
 
 #include "carla.h"
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Song.h"
 #include "GuiApplication.h"
@@ -31,7 +32,6 @@
 #include "InstrumentTrack.h"
 #include "MidiEventToByteSeq.h"
 #include "MainWindow.h"
-#include "Mixer.h"
 #include "Song.h"
 #include "gui_templates.h"
 
@@ -126,9 +126,9 @@ static const char* host_ui_open_file(NativeHostHandle, bool isDir, const char* t
     static QByteArray retStr;
     const QFileDialog::Options options(isDir ? QFileDialog::ShowDirsOnly : 0x0);
 
-    retStr = QFileDialog::getOpenFileName(QApplication::activeWindow(), title, "", filter, NULL, options).toUtf8();
+    retStr = QFileDialog::getOpenFileName(QApplication::activeWindow(), title, "", filter, nullptr, options).toUtf8();
 
-    return retStr.isEmpty() ? NULL : retStr.constData();
+    return retStr.isEmpty() ? nullptr : retStr.constData();
 }
 
 static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* title, const char* filter)
@@ -136,9 +136,9 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
     static QByteArray retStr;
     const QFileDialog::Options options(isDir ? QFileDialog::ShowDirsOnly : 0x0);
 
-    retStr = QFileDialog::getSaveFileName(QApplication::activeWindow(), title, "", filter, NULL, options).toUtf8();
+    retStr = QFileDialog::getSaveFileName(QApplication::activeWindow(), title, "", filter, nullptr, options).toUtf8();
 
-    return retStr.isEmpty() ? NULL : retStr.constData();
+    return retStr.isEmpty() ? nullptr : retStr.constData();
 }
 
 // -----------------------------------------------------------------------
@@ -146,13 +146,13 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
     : Instrument(instrumentTrack, descriptor),
       kIsPatchbay(isPatchbay),
-      fHandle(NULL),
+      fHandle(nullptr),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
       fMidiEventCount(0),
       m_paramModels()
 {
     fHost.handle      = this;
-    fHost.uiName      = NULL;
+    fHost.uiName      = nullptr;
     fHost.uiParentId  = 0;
 
     // carla/resources contains PyQt scripts required for launch
@@ -182,14 +182,14 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     fTimeInfo.bbt.valid = true; // always valid
 
     fHandle = fDescriptor->instantiate(&fHost);
-    Q_ASSERT(fHandle != NULL);
+    Q_ASSERT(fHandle != nullptr);
 
-    if (fHandle != NULL && fDescriptor->activate != NULL)
+    if (fHandle != nullptr && fDescriptor->activate != nullptr)
         fDescriptor->activate(fHandle);
 
     // we need a play-handle which cares for calling play()
     InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
-    Engine::mixer()->addPlayHandle( iph );
+    Engine::audioEngine()->addPlayHandle( iph );
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
     // text filter completion
@@ -209,35 +209,35 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     }
 #endif
 
-    connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
+    connect(Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
 CarlaInstrument::~CarlaInstrument()
 {
-    Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
+    Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 
-    if (fHost.resourceDir != NULL)
+    if (fHost.resourceDir != nullptr)
     {
         std::free((char*)fHost.resourceDir);
-        fHost.resourceDir = NULL;
+        fHost.resourceDir = nullptr;
     }
 
-    if (fHost.uiName != NULL)
+    if (fHost.uiName != nullptr)
     {
         std::free((char*)fHost.uiName);
-        fHost.uiName = NULL;
+        fHost.uiName = nullptr;
     }
 
-    if (fHandle == NULL)
+    if (fHandle == nullptr)
         return;
 
-    if (fDescriptor->deactivate != NULL)
+    if (fDescriptor->deactivate != nullptr)
         fDescriptor->deactivate(fHandle);
 
-    if (fDescriptor->cleanup != NULL)
+    if (fDescriptor->cleanup != nullptr)
         fDescriptor->cleanup(fHandle);
 
-    fHandle = NULL;
+    fHandle = nullptr;
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
     clearParamModels();
@@ -248,12 +248,12 @@ CarlaInstrument::~CarlaInstrument()
 
 uint32_t CarlaInstrument::handleGetBufferSize() const
 {
-    return Engine::mixer()->framesPerPeriod();
+    return Engine::audioEngine()->framesPerPeriod();
 }
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return Engine::mixer()->processingSampleRate();
+    return Engine::audioEngine()->processingSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const
@@ -349,12 +349,12 @@ QString CarlaInstrument::nodeName() const
 
 void CarlaInstrument::saveSettings(QDomDocument& doc, QDomElement& parent)
 {
-    if (fHandle == NULL || fDescriptor->get_state == NULL)
+    if (fHandle == nullptr || fDescriptor->get_state == nullptr)
         return;
 
     char* const state = fDescriptor->get_state(fHandle);
 
-    if (state == NULL)
+    if (state == nullptr)
         return;
 
     QDomDocument carlaDoc("carla");
@@ -479,7 +479,7 @@ void CarlaInstrument::updateParamModel(uint32_t index)
 
 void CarlaInstrument::loadSettings(const QDomElement& elem)
 {
-    if (fHandle == NULL || fDescriptor->set_state == NULL)
+    if (fHandle == nullptr || fDescriptor->set_state == nullptr)
         return;
 
     QDomDocument carlaDoc("carla");
@@ -496,13 +496,13 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 
 void CarlaInstrument::play(sampleFrame* workingBuffer)
 {
-    const uint bufsize = Engine::mixer()->framesPerPeriod();
+    const uint bufsize = Engine::audioEngine()->framesPerPeriod();
 
     std::memset(workingBuffer, 0, sizeof(sample_t)*bufsize*DEFAULT_CHANNELS);
 
-    if (fHandle == NULL)
+    if (fHandle == nullptr)
     {
-        instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, NULL);
+        instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
         return;
     }
 
@@ -551,7 +551,7 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
         workingBuffer[i][1] = buf2[i];
     }
 
-    instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, NULL);
+    instrumentTrack()->processAudioBuffer(workingBuffer, bufsize, nullptr);
 }
 
 bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_cnt_t offset)
@@ -604,7 +604,7 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     : InstrumentViewFixedSize(instrument, parent),
       fHandle(instrument->fHandle),
       fDescriptor(instrument->fDescriptor),
-      fTimerId(fHandle != NULL && fDescriptor->ui_idle != NULL ? startTimer(30) : 0),
+      fTimerId(fHandle != nullptr && fDescriptor->ui_idle != nullptr ? startTimer(30) : 0),
       m_carlaInstrument(instrument),
       m_parent(parent),
       m_paramsSubWindow(nullptr),
@@ -671,7 +671,7 @@ CarlaInstrumentView::~CarlaInstrumentView()
 
 void CarlaInstrumentView::toggleUI(bool visible)
 {
-    if (fHandle != NULL && fDescriptor->ui_show != NULL) {
+    if (fHandle != nullptr && fDescriptor->ui_show != nullptr) {
 // TODO: remove when fixed upstream
 // change working path to location of carla.dll to avoid conflict with lmms
 #if defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
@@ -846,9 +846,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	verticalLayout->addWidget(splitter);
 
 	// -- Sub window
-	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(gui->mainWindow()->workspace()->viewport(), Qt::SubWindow |
+	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(), Qt::SubWindow |
 		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-	m_carlaInstrumentView->m_paramsSubWindow = gui->mainWindow()->workspace()->addSubWindow(win);
+	m_carlaInstrumentView->m_paramsSubWindow = getGUI()->mainWindow()->workspace()->addSubWindow(win);
 	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(
 		QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	m_carlaInstrumentView->m_paramsSubWindow->setMinimumHeight(200);

@@ -30,7 +30,7 @@
 
 
 #include "Song.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "LfoController.h"
@@ -47,7 +47,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 					const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
-	m_valueBuffer( Engine::mixer()->framesPerPeriod() ),
+	m_valueBuffer( Engine::audioEngine()->framesPerPeriod() ),
 	m_bufferLastUpdated( -1 ),
 	m_connectionCount( 0 ),
 	m_type( _type )
@@ -140,7 +140,7 @@ void Controller::updateValueBuffer()
 // Get position in frames
 unsigned int Controller::runningFrames()
 {
-	return s_periods * Engine::mixer()->framesPerPeriod();
+	return s_periods * Engine::audioEngine()->framesPerPeriod();
 }
 
 
@@ -148,7 +148,7 @@ unsigned int Controller::runningFrames()
 // Get position in seconds
 float Controller::runningTime()
 {
-	return runningFrames() / Engine::mixer()->processingSampleRate();
+	return runningFrames() / Engine::audioEngine()->processingSampleRate();
 }
 
 
@@ -183,14 +183,14 @@ void Controller::resetFrameCounter()
 
 Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 {
-	static Controller * dummy = NULL;
-	Controller * c = NULL;
+	static Controller * dummy = nullptr;
+	Controller * c = nullptr;
 
 	switch( _ct )
 	{
 		case Controller::DummyController:
 			if (!dummy)
-				dummy = new Controller( DummyController, NULL,
+				dummy = new Controller( DummyController, nullptr,
 								QString() );
 			c = dummy;
 			break;
@@ -231,7 +231,7 @@ Controller * Controller::create( const QDomElement & _this, Model * _parent )
 										_parent );
 	}
 
-	if( c != NULL )
+	if( c != nullptr )
 	{
 		c->restoreState( _this );
 	}
@@ -246,7 +246,7 @@ bool Controller::hasModel( const Model * m ) const
 	for (QObject * c : children())
 	{
 		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
-		if( am != NULL )
+		if( am != nullptr )
 		{
 			if( am == m )
 			{
@@ -254,7 +254,7 @@ bool Controller::hasModel( const Model * m ) const
 			}
 
 			ControllerConnection * cc = am->controllerConnection();
-			if( cc != NULL && cc->getController()->hasModel( m ) )
+			if( cc != nullptr && cc->getController()->hasModel( m ) )
 			{
 				return true;
 			}

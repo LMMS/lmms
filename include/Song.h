@@ -25,6 +25,7 @@
 #ifndef SONG_H
 #define SONG_H
 
+#include <memory>
 #include <utility>
 
 #include <QtCore/QSharedMemory>
@@ -33,14 +34,17 @@
 #include <QString>
 
 #include "TrackContainer.h"
+#include "AudioEngine.h"
 #include "Controller.h"
+#include "Keymap.h"
+#include "lmms_constants.h"
 #include "MeterModel.h"
-#include "Mixer.h"
+#include "Scale.h"
 #include "VstSyncController.h"
 
 
 class AutomationTrack;
-class Pattern;
+class MidiClip;
 class TimeLineWidget;
 
 
@@ -61,9 +65,9 @@ public:
 	{
 		Mode_None,
 		Mode_PlaySong,
-		Mode_PlayBB,
 		Mode_PlayPattern,
-		Mode_PlayAutomationPattern,
+		Mode_PlayMidiClip,
+		Mode_PlayAutomationClip,
 		Mode_Count
 	} ;
 
@@ -93,7 +97,7 @@ public:
 	public:
 		PlayPos( const int abs = 0 ) :
 			TimePos( abs ),
-			m_timeLine( NULL ),
+			m_timeLine( nullptr ),
 			m_currentFrame( 0.0f )
 		{
 		}
@@ -272,7 +276,7 @@ public:
 
 
 	bpm_t getTempo();
-	AutomationPattern * tempoAutomationPattern() override;
+	AutomationClip * tempoAutomationClip() override;
 
 	AutomationTrack * globalAutomationTrack()
 	{
@@ -280,7 +284,7 @@ public:
 	}
 
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
-	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const override;
+	AutomatedValueMap automatedValuesAt(TimePos time, int clipNum = -1) const override;
 
 	// file management
 	void createNewProject();
@@ -303,7 +307,7 @@ public:
 	void loadingCancelled()
 	{
 		m_isCancelled = true;
-		Engine::mixer()->clearNewPlayHandles();
+		Engine::audioEngine()->clearNewPlayHandles();
 	}
 
 	bool isCancelled()
@@ -321,7 +325,7 @@ public:
 		return "song";
 	}
 
-	virtual bool fixedTCOs() const
+	virtual bool fixedClips() const
 	{
 		return false;
 	}
@@ -350,12 +354,17 @@ public:
 
 	bool isSavingProject() const;
 
+	std::shared_ptr<const Scale> getScale(unsigned int index) const;
+	std::shared_ptr<const Keymap> getKeymap(unsigned int index) const;
+	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
+	void setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap);
+
 public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playBB();
-	void playPattern( const Pattern * patternToPlay, bool loop = true );
+	void playPattern();
+	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -367,7 +376,7 @@ public slots:
 
 	void clearProject();
 
-	void addBBTrack();
+	void addPatternTrack();
 
 
 private slots:
@@ -416,6 +425,12 @@ private:
 
 	void removeAllControllers();
 
+	void saveScaleStates(QDomDocument &doc, QDomElement &element);
+	void restoreScaleStates(const QDomElement &element);
+
+	void saveKeymapStates(QDomDocument &doc, QDomElement &element);
+	void restoreKeymapStates(const QDomElement &element);
+
 	void processAutomations(const TrackList& tracks, TimePos timeStart, fpp_t frames);
 
 	void setModified(bool value);
@@ -458,8 +473,8 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	bar_t m_length;
 
-	const Pattern* m_patternToPlay;
-	bool m_loopPattern;
+	const MidiClip* m_midiClipToPlay;
+	bool m_loopMidiClip;
 
 	double m_elapsedMilliSeconds[Mode_Count];
 	tick_t m_elapsedTicks;
@@ -474,6 +489,9 @@ private:
 	TimePos m_exportLoopEnd;
 	TimePos m_exportSongEnd;
 	TimePos m_exportEffectiveLength;
+
+	std::shared_ptr<Scale> m_scales[MaxScaleCount];
+	std::shared_ptr<Keymap> m_keymaps[MaxKeymapCount];
 
 	AutomatedValueMap m_oldAutomatedValues;
 
@@ -495,6 +513,8 @@ signals:
 	void stopped();
 	void modified();
 	void projectFileNameChanged();
+	void scaleListChanged(int index);
+	void keymapListChanged(int index);
 } ;
 
 

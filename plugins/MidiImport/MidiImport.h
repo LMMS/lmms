@@ -42,7 +42,7 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * )
 	{
-		return( NULL );
+		return( nullptr );
 	}
 
 

@@ -26,13 +26,13 @@
 #include <QDomElement>
 
 #include "bit_invader.h"
+#include "AudioEngine.h"
 #include "base64.h"
 #include "Engine.h"
 #include "Graph.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -60,8 +60,8 @@ Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -278,7 +278,7 @@ QString bitInvader::nodeName() const
 void bitInvader::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 	
 		float factor;
@@ -295,7 +295,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 					const_cast<float*>( m_graph.samples() ),
 					_n,
 					m_interpolation.value(), factor,
-				Engine::mixer()->processingSampleRate() );
+				Engine::audioEngine()->processingSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
