@@ -28,8 +28,8 @@
 #include <memory>
 #include <utility>
 
-#include <QtCore/QSharedMemory>
-#include <QtCore/QVector>
+#include <QSharedMemory>
+#include <QVector>
 #include <QHash>
 #include <QString>
 

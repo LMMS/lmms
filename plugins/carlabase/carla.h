@@ -36,7 +36,7 @@
 #include <QLineEdit>
 #include <QScrollArea>
 #include <QStringListModel>
-#include <QtCore/QMutex>
+#include <QMutex>
 
 // carla/source/includes
 #include "carlabase_export.h"

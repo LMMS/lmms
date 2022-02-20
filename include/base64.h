@@ -26,9 +26,9 @@
 #ifndef _BASE64_H
 #define _BASE64_H
 
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
+#include <QByteArray>
+#include <QString>
+#include <QVariant>
 
 
 namespace base64

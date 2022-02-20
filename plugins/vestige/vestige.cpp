@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #include "VstPlugin.h"
 

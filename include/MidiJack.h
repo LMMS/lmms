@@ -35,9 +35,9 @@
 #include "weak_libjack.h"
 #endif
 
-#include <QtCore/QThread>
+#include <QThread>
 #include <QMutex>
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "MidiClient.h"
 #include "AudioJack.h"

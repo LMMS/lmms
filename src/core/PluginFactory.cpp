@@ -24,10 +24,10 @@
 
 #include "PluginFactory.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+#include <QLibrary>
 #include <memory>
 #include "lmmsconfig.h"
 

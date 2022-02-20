@@ -24,7 +24,7 @@
  */
 
 
-#include <QtCore/QVarLengthArray>
+#include <QVarLengthArray>
 #include <QMessageBox>
 
 #include "LadspaEffect.h"

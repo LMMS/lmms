@@ -26,8 +26,8 @@
 
 #include "communication.h"
 
-#include <QtCore/QtEndian>
-#include <QtCore/QDebug>
+#include <QtEndian>
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QLocale>

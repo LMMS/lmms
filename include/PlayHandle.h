@@ -25,8 +25,8 @@
 #ifndef PLAY_HANDLE_H
 #define PLAY_HANDLE_H
 
-#include <QtCore/QList>
-#include <QtCore/QMutex>
+#include <QList>
+#include <QMutex>
 
 #include "lmms_export.h"
 

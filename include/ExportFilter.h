@@ -26,7 +26,7 @@
 #ifndef EXPORT_FILTER_H
 #define EXPORT_FILTER_H
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "TrackContainer.h"
 #include "Plugin.h"

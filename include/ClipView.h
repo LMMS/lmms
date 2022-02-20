@@ -26,7 +26,7 @@
 #define TRACK_CONTENT_OBJECT_VIEW_H
 
 
-#include <QtCore/QVector>
+#include <QVector>
 
 #include "ModelView.h"
 #include "Rubberband.h"

@@ -45,8 +45,8 @@
 #include <process.h>
 #endif
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QSystemSemaphore>
+#include <QtGlobal>
+#include <QSystemSemaphore>
 #endif
 
 
@@ -59,8 +59,8 @@
 #else
 #define USE_QT_SHMEM
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QSharedMemory>
+#include <QtGlobal>
+#include <QSharedMemory>
 
 #if !defined(LMMS_HAVE_SYS_TYPES_H) || defined(LMMS_BUILD_WIN32)
 typedef int32_t key_t;
@@ -89,10 +89,10 @@ typedef int32_t key_t;
 
 #else
 #include "lmms_export.h"
-#include <QtCore/QMutex>
-#include <QtCore/QProcess>
-#include <QtCore/QThread>
-#include <QtCore/QString>
+#include <QMutex>
+#include <QProcess>
+#include <QThread>
+#include <QString>
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
@@ -1012,7 +1012,7 @@ private:
 #ifdef COMPILE_REMOTE_PLUGIN_BASE
 
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
-#include <QtCore/QCoreApplication>
+#include <QCoreApplication>
 #endif
 
 

@@ -26,7 +26,7 @@
 #ifndef TAB_BAR_H
 #define TAB_BAR_H
 
-#include <QtCore/QMap>
+#include <QMap>
 #include <QLayout>
 #include <QWidget>
 

@@ -25,8 +25,8 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QSharedPointer>
+#include <QMutex>
+#include <QSharedPointer>
 
 #include "Effect.h"
 #include "VstEffectControlDialog.h"

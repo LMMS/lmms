@@ -26,7 +26,7 @@
 #ifndef TRACK_CONTAINER_VIEW_H
 #define TRACK_CONTAINER_VIEW_H
 
-#include <QtCore/QVector>
+#include <QVector>
 #include <QScrollArea>
 #include <QWidget>
 #include <QThread>

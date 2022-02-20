@@ -25,9 +25,9 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include <QtCore/QStringList>
-#include <QtCore/QMap>
-#include <QtXml/QDomDocument>
+#include <QStringList>
+#include <QMap>
+#include <QDomDocument>
 
 #include "JournallingObject.h"
 #include "Model.h"

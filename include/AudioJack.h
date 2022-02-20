@@ -35,9 +35,9 @@
 #endif
 
 #include <atomic>
-#include <QtCore/QVector>
-#include <QtCore/QList>
-#include <QtCore/QMap>
+#include <QVector>
+#include <QList>
+#include <QMap>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"

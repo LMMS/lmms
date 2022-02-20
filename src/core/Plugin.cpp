@@ -25,9 +25,9 @@
 #include "Plugin.h"
 
 #include <QtGlobal>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QDebug>
+#include <QDir>
+#include <QLibrary>
 #include <QMessageBox>
 
 #include "embed.h"

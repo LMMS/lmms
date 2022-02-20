@@ -25,7 +25,7 @@
 #ifndef GUIAPPLICATION_H
 #define GUIAPPLICATION_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"

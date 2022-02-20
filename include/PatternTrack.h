@@ -27,7 +27,7 @@
 #define PATTERN_TRACK_H
 
 
-#include <QtCore/QMap>
+#include <QMap>
 
 #include "PatternClipView.h"
 #include "Track.h"

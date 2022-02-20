@@ -27,7 +27,7 @@
 #include "BufferManager.h"
 #include "Engine.h"
 
-#include <QtCore/QThread>
+#include <QThread>
 #include <QDebug>
 
 #include <iterator>
