@@ -2374,7 +2374,7 @@ void RemoteVstPlugin::guiEventLoop()
 	while(true)
 	{
 		//if (XQLength(m_display) > 0)
-		if (XPending(m_display) > 0)
+		if (m_display && XPending(m_display) > 0)
 		{
 			XNextEvent(m_display, &e);
 		
