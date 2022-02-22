@@ -31,7 +31,7 @@
 #include <QLineEdit>
 
 #ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 #include <poll.h>

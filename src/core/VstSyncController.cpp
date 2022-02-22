@@ -32,9 +32,9 @@
 #include "RemotePlugin.h"
 
 #ifndef USE_QT_SHMEM
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>

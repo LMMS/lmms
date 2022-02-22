@@ -4,7 +4,7 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QTextStream>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "LocalFileMng.h"
 #include "HydrogenImport.h"

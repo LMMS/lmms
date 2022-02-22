@@ -45,7 +45,7 @@
 #define __USE_XOPEN
 #endif
 
-#include <math.h>
+#include <cmath>
 #include <utility>
 
 #include "AutomationEditor.h"

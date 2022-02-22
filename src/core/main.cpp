@@ -55,7 +55,7 @@
 #include <unistd.h>
 #endif
 
-#include <signal.h>
+#include <csignal>
 
 #include "MainApplication.h"
 #include "ConfigManager.h"

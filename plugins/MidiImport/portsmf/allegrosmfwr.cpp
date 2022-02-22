@@ -1,9 +1,9 @@
 // allegrosmfwr.cpp -- Allegro Standard Midi File Write
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
+#include <cerrno>
 #include <string>
 #include <iostream>
 #include <fstream>

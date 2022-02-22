@@ -41,7 +41,7 @@
 #include <unistd.h>
 #endif
 #ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 #include "ConfigManager.h"

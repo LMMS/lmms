@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <sys/stat.h>
-#include <ctype.h>
+#include <cctype>
 
 #include <QDir>
 #include <QApplication>

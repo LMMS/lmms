@@ -24,7 +24,7 @@
  */
 
 #include <cstdlib>
-#include <time.h>
+#include <ctime>
 
 #define rnd(n) (rand()%(n+1))
 

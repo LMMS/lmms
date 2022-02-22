@@ -27,7 +27,7 @@
 
 #include <string>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <cstdlib>
 #include <random>
 
