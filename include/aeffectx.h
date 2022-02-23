@@ -29,7 +29,7 @@
 #include <stdint.h>
 
 // Calling convention
-#ifndef NATIVE_LINUX_VST
+#ifdef _WIN32
 #define VST_CALL_CONV __cdecl
 #else
 #define VST_CALL_CONV 

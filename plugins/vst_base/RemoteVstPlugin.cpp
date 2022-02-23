@@ -156,7 +156,7 @@ DWORD __processingThreadId = 0;
 pthread_t __processingThreadId = 0;
 #endif
 
-#ifndef NATIVE_LINUX_VST
+#ifdef _WIN32
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
 std::string GetErrorAsString(DWORD errorMessageID)
 {
