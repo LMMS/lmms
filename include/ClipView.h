@@ -61,6 +61,8 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QSize mouseHotspotKnife MEMBER m_mouseHotspotKnife )
 
 public:
+	const static int BORDER_WIDTH = 2;
+
 	ClipView( Clip * clip, TrackView * tv );
 	virtual ~ClipView();
 

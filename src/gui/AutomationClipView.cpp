@@ -276,7 +276,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 	// pixels per bar
 	const float ppb = fixedClips() ?
-			( parentWidget()->width() - 2 * CLIP_BORDER_WIDTH )
+			( parentWidget()->width() - 2 * BORDER_WIDTH )
 				/ (float) m_clip->timeMapLength().getBar() :
 								pixelsPerBar();
 
@@ -284,10 +284,10 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	const float max = m_clip->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
-	const float h = ( height() - 2 * CLIP_BORDER_WIDTH ) / y_scale;
+	const float h = ( height() - 2 * BORDER_WIDTH ) / y_scale;
 	const float ppTick  = ppb / TimePos::ticksPerBar();
 
-	p.translate( 0.0f, max * height() / y_scale - CLIP_BORDER_WIDTH );
+	p.translate( 0.0f, max * height() / y_scale - BORDER_WIDTH );
 	p.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
@@ -307,8 +307,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		if( it+1 == m_clip->getTimeMap().end() )
 		{
 			const float x1 = POS(it) * ppTick;
-			const float x2 = (float)( width() - CLIP_BORDER_WIDTH );
-			if( x1 > ( width() - CLIP_BORDER_WIDTH ) ) break;
+			const float x2 = (float)( width() - BORDER_WIDTH );
+			if( x1 > ( width() - BORDER_WIDTH ) ) break;
 			// We are drawing the space after the last node, so we use the outValue
 			if( gradient() )
 			{
@@ -347,7 +347,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
 			x = i * ppTick;
-			if( x > ( width() - CLIP_BORDER_WIDTH ) ) break;
+			if( x > ( width() - BORDER_WIDTH ) ) break;
 			float value = values[i - POS(it)];
 			path.lineTo( QPointF( x, value ) );
 
@@ -374,15 +374,15 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for (bar_t b = 1; b < width() - CLIP_BORDER_WIDTH; ++b)
+	for (bar_t b = 1; b < width() - BORDER_WIDTH; ++b)
 	{
-		const int bx = CLIP_BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
+		const int bx = BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
 
 		//top line
-		p.drawLine(bx, CLIP_BORDER_WIDTH, bx, CLIP_BORDER_WIDTH + lineSize);
+		p.drawLine(bx, BORDER_WIDTH, bx, BORDER_WIDTH + lineSize);
 
 		//bottom line
-		p.drawLine(bx, rect().bottom() - (lineSize + CLIP_BORDER_WIDTH), bx, rect().bottom() - CLIP_BORDER_WIDTH);
+		p.drawLine(bx, rect().bottom() - (lineSize + BORDER_WIDTH), bx, rect().bottom() - BORDER_WIDTH);
 	}
 
 	// recording icon for when recording automation
@@ -396,8 +396,8 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 
 	// inner border
 	p.setPen( c.lighter( current ? 160 : 130 ) );
-	p.drawRect( 1, 1, rect().right() - CLIP_BORDER_WIDTH,
-		rect().bottom() - CLIP_BORDER_WIDTH );
+	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
 	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
@@ -406,7 +406,7 @@ void AutomationClipView::paintEvent( QPaintEvent * )
 	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_clip->isMuted() )
 	{
-		const int spacing = CLIP_BORDER_WIDTH;
+		const int spacing = BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );

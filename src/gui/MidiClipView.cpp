@@ -193,8 +193,8 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 	{
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_me->x()) - CLIP_BORDER_WIDTH ) *
-				float( m_clip -> m_steps ) ) / float(width() - CLIP_BORDER_WIDTH*2);
+		float tmp = ( ( float(_me->x()) - BORDER_WIDTH ) *
+				float( m_clip -> m_steps ) ) / float(width() - BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
@@ -260,8 +260,8 @@ void MidiClipView::wheelEvent(QWheelEvent * we)
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - CLIP_BORDER_WIDTH) *
-				float(m_clip -> m_steps)) / float(width() - CLIP_BORDER_WIDTH*2);
+		float tmp = ((float(position(we).x()) - BORDER_WIDTH) *
+				float(m_clip -> m_steps)) / float(width() - BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
@@ -368,7 +368,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	// TODO Warning! This might cause problems if ClipView::paintTextLabel changes
 	int textBoxHeight = 0;
-	const int textTop = CLIP_BORDER_WIDTH + 1;
+	const int textTop = BORDER_WIDTH + 1;
 	if (drawTextBox)
 	{
 		QFont labelFont = this->font();
@@ -379,15 +379,15 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	}
 
 	// Compute pixels per bar
-	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * CLIP_BORDER_WIDTH
-						: width() - CLIP_BORDER_WIDTH;
+	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * BORDER_WIDTH
+						: width() - BORDER_WIDTH;
 	const float pixelsPerBar = baseWidth / (float) m_clip->length().getBar();
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
 	const float barLength = 1. / m_clip->length().getBar();
 	const float tickLength = barLength / TimePos::ticksPerBar();
 
-	const int x_base = CLIP_BORDER_WIDTH;
+	const int x_base = BORDER_WIDTH;
 
 	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
 	// melody clip paint event
@@ -514,7 +514,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
 					m_clip->m_steps );
-		const int w = width() - 2 * CLIP_BORDER_WIDTH;
+		const int w = width() - 2 * BORDER_WIDTH;
 
 		// scale step graphics to fit the beat clip length
 		stepon0 = s_stepBtnOn0->scaled( w / steps,
@@ -539,7 +539,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 			Note * n = m_clip->noteAtStep( it );
 
 			// figure out x and y coordinates for step graphic
-			const int x = CLIP_BORDER_WIDTH + static_cast<int>( it * w / steps );
+			const int x = BORDER_WIDTH + static_cast<int>( it * w / steps );
 			const int y = height() - s_stepBtnOff->height() - 1;
 
 			if( n )
@@ -577,12 +577,12 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	for( bar_t t = 1; t < m_clip->length().getBar(); ++t )
 	{
 		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				CLIP_BORDER_WIDTH, x_base + static_cast<int>(
-						pixelsPerBar * t ) - 1, CLIP_BORDER_WIDTH + lineSize );
+				BORDER_WIDTH, x_base + static_cast<int>(
+						pixelsPerBar * t ) - 1, BORDER_WIDTH + lineSize );
 		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				rect().bottom() - ( lineSize + CLIP_BORDER_WIDTH ),
+				rect().bottom() - ( lineSize + BORDER_WIDTH ),
 				x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				rect().bottom() - CLIP_BORDER_WIDTH );
+				rect().bottom() - BORDER_WIDTH );
 	}
 
 	// clip name
@@ -595,8 +595,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );
-		p.drawRect( 1, 1, rect().right() - CLIP_BORDER_WIDTH,
-			rect().bottom() - CLIP_BORDER_WIDTH );
+		p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+			rect().bottom() - BORDER_WIDTH );
 
 		// outer border
 		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
@@ -606,7 +606,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 	// draw the 'muted' pixmap only if the clip was manually muted
 	if( m_clip->isMuted() )
 	{
-		const int spacing = CLIP_BORDER_WIDTH;
+		const int spacing = BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );

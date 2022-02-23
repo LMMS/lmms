@@ -50,8 +50,6 @@ const int TRACK_OP_WIDTH = 78;
 const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 96;
 const int TRACK_OP_WIDTH_COMPACT = 62;
 
-const int CLIP_BORDER_WIDTH = 2;
-
 
 class TrackView : public QWidget, public ModelView, public JournallingObject
 {

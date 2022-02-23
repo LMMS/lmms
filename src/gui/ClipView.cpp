@@ -311,7 +311,7 @@ void ClipView::updateLength()
 		setFixedWidth(
 		static_cast<int>( m_clip->length() * pixelsPerBar() /
 					TimePos::ticksPerBar() ) + 1 /*+
-						CLIP_BORDER_WIDTH * 2-1*/ );
+						BORDER_WIDTH * 2-1*/ );
 	}
 	m_trackView->trackContainerView()->update();
 }
@@ -583,8 +583,8 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	labelFont.setHintingPreference( QFont::PreferFullHinting );
 	painter.setFont( labelFont );
 
-	const int textTop = CLIP_BORDER_WIDTH + 1;
-	const int textLeft = CLIP_BORDER_WIDTH + 3;
+	const int textTop = BORDER_WIDTH + 1;
+	const int textLeft = BORDER_WIDTH + 3;
 
 	QFontMetrics fontMetrics(labelFont);
 	QString elidedClipName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);

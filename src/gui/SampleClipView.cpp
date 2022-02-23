@@ -245,9 +245,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 		p.setPen(p.pen().brush().color().darker(150));
 	}
 
-	const int spacing = CLIP_BORDER_WIDTH + 1;
+	const int spacing = BORDER_WIDTH + 1;
 	const float ppb = fixedClips() ?
-			( parentWidget()->width() - 2 * CLIP_BORDER_WIDTH )
+			( parentWidget()->width() - 2 * BORDER_WIDTH )
 					/ (float) m_clip->length().getBar() :
 								pixelsPerBar();
 
@@ -268,8 +268,8 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 135 ) );
-	p.drawRect( 1, 1, rect().right() - CLIP_BORDER_WIDTH,
-		rect().bottom() - CLIP_BORDER_WIDTH );
+	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
 	p.setPen( c.darker( 200 ) );
@@ -278,7 +278,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	// draw the 'muted' pixmap only if the clip was manualy muted
 	if( m_clip->isMuted() )
 	{
-		const int spacing = CLIP_BORDER_WIDTH;
+		const int spacing = BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
