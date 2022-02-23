@@ -10,10 +10,6 @@ CHECK_CXX_DEFINE(IS_WIN "_WIN32")
 CHECK_CXX_DEFINE(IS_WIN64 "_WIN64")
 CHECK_CXX_DEFINE(IS_MINGW "__MINGW32__")
 
-#if(NOT IS_WIN)
-#	message(FATAL_ERROR "Toolchain used does not target windows.")
-#ENDIF()
-
 if(IS_WIN64 OR CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BITNESS 64)
 else()
@@ -38,9 +34,7 @@ add_executable(${EXE_NAME} WIN32
 if(IS_WIN)
     target_link_libraries(${EXE_NAME} ole32)
 else()
-    target_link_libraries(${EXE_NAME} pthread)
-    target_link_libraries(${EXE_NAME} dl)
-    target_link_libraries(${EXE_NAME} X11)
+    target_link_libraries(${EXE_NAME} pthread dl X11)
 ENDIF()
 
 target_include_directories(${EXE_NAME}
