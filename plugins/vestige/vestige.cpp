@@ -78,7 +78,11 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
+#ifdef LMMS_BUILD_LINUX
+	"dll,so",
+#else
 	"dll",
+#endif
 	NULL
 } ;
 

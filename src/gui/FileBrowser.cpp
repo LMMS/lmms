@@ -1250,7 +1250,11 @@ void FileItem::determineFileType( void )
 		m_type = MidiFile;
 		m_handling = ImportAsProject;
 	}
-	else if( ext == "dll" )
+	else if( ext == "dll"
+#ifdef LMMS_BUILD_LINUX
+		|| ext == "so" 
+#endif
+	)
 	{
 		m_type = VstPluginFile;
 		m_handling = LoadByPlugin;
