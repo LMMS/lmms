@@ -2324,9 +2324,7 @@ void * RemoteVstPlugin::processingThread(void * _param)
 	if (m.id == IdQuit)
 		_this->queueMessage( m );
 
-	int *result = (int*) malloc(sizeof(int));
-	*result = 0;
-	pthread_exit(result);
+	return nullptr;
 #endif
 }
 
