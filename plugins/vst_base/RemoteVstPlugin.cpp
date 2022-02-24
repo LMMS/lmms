@@ -83,7 +83,7 @@
 #undef FontChange
 #undef None
 #undef Status
-#undef Unsorte
+#undef Unsorted
 #endif
 
 #ifdef USE_MINGW_THREADS_REPLACEMENT
@@ -662,7 +662,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			return true;
 
 		case IdIsUIVisible:
-#ifndef NATIVE_LINUX_VST			
+#ifndef NATIVE_LINUX_VST
 			bool visible = m_window && IsWindowVisible( m_window );
 #else
 			bool visible = m_window && m_x11WindowVisible;
@@ -674,7 +674,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 	}
 	else if (EMBED && _m.id == IdShowUI)
 	{
-#ifndef NATIVE_LINUX_VST		
+#ifndef NATIVE_LINUX_VST
 		ShowWindow( m_window, SW_SHOWNORMAL );
 		UpdateWindow( m_window );
 #endif
@@ -975,10 +975,10 @@ void RemoteVstPlugin::showEditor() {
 void RemoteVstPlugin::hideEditor() {
 	if( !EMBED && !HEADLESS && m_window )
 	{
-#ifndef NATIVE_LINUX_VST		
+#ifndef NATIVE_LINUX_VST
 		ShowWindow( m_window, SW_HIDE );
 #else
-		if (m_x11WindowVisible) 
+		if (m_x11WindowVisible)
 		{
 			XUnmapWindow(m_display, m_window);
 			XFlush(m_display);
@@ -1000,7 +1000,7 @@ void RemoteVstPlugin::destroyEditor()
 
 	pluginDispatch( effEditClose );
 	// Destroying the window takes some time in Wine 1.8.5
-#ifndef NATIVE_LINUX_VST	
+#ifndef NATIVE_LINUX_VST
 	DestroyWindow( m_window );
 #else
 	if (m_display)
@@ -1058,7 +1058,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		debugMessage( "could not find entry point\n" );
 		return false;
 	}
-	
+
 	m_plugin = mainEntry( hostCallback );
 	if( m_plugin == NULL )
 	{
@@ -2551,7 +2551,7 @@ int main( int _argc, char * * _argv )
 #ifdef NATIVE_LINUX_VST
 	if (EMBED)
 	{
-		cerr << "Native linux VST works only without embeding." << endl;
+		cerr << "Native linux VST works only without embedding." << endl;
 	}
 #endif
 	
