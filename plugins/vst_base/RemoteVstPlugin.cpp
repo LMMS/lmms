@@ -58,8 +58,8 @@
 
 #endif
 
-#define USE_WS_PREFIX
 #ifndef NATIVE_LINUX_VST
+#define USE_WS_PREFIX
 #include <windows.h>
 #else
 #include <dlfcn.h>
@@ -370,7 +370,9 @@ public:
 
 	void idle();
 	void processUIThreadMessages();
+#ifdef NATIVE_LINUX_VST
 	void sendX11Idle();
+#endif
 
 #ifndef NATIVE_LINUX_VST
 	static DWORD WINAPI processingThread( LPVOID _param );
@@ -999,8 +1001,8 @@ void RemoteVstPlugin::destroyEditor()
 	}
 
 	pluginDispatch( effEditClose );
-	// Destroying the window takes some time in Wine 1.8.5
 #ifndef NATIVE_LINUX_VST
+	// Destroying the window takes some time in Wine 1.8.5
 	DestroyWindow( m_window );
 #else
 	if (m_display)
@@ -2313,8 +2315,8 @@ void * RemoteVstPlugin::processingThread(void * _param)
 		}
 	}
 
-#ifndef NATIVE_LINUX_VST
 	// notify GUI thread about shutdown
+#ifndef NATIVE_LINUX_VST
 	PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
 
 	return 0;
