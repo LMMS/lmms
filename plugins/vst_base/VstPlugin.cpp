@@ -198,9 +198,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 VstPlugin::~VstPlugin()
 {
-#ifdef NATIVE_LINUX_VST
-	RemotePlugin::setQuit();
-#endif
 	delete m_pluginWidget;
 }
 

@@ -825,16 +825,6 @@ public:
 		unlock();
 	}
 
-#ifndef NATIVE_LINUX_VST
-	void setQuit()
-	{
-
-		lock();
-		sendMessage( IdQuit );
-		unlock();
-	}
-#endif
-
 	int isUIVisible()
 	{
 		lock();
