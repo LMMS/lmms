@@ -37,21 +37,21 @@
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "MidiJack.h"
 
 
 
-AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
+AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<int>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiojack", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer ),
-	m_client( NULL ),
+		SURROUND_CHANNELS ), _audioEngine ),
+	m_client( nullptr ),
 	m_active( false ),
-	m_midiClient( NULL ),
+	m_midiClient( nullptr ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
-	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
+	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
@@ -80,7 +80,7 @@ AudioJack::~AudioJack()
 	}
 #endif
 
-	if( m_client != NULL )
+	if( m_client != nullptr )
 	{
 		if( m_active )
 		{
@@ -103,7 +103,7 @@ void AudioJack::restartAfterZombified()
 	{
 		m_active = false;
 		startProcessing();
-		QMessageBox::information( gui->mainWindow(),
+		QMessageBox::information( getGUI()->mainWindow(),
 			tr( "JACK client restarted" ),
 			tr( "LMMS was kicked by JACK for some reason. "
 				"Therefore the JACK backend of LMMS has been "
@@ -112,7 +112,7 @@ void AudioJack::restartAfterZombified()
 	}
 	else
 	{
-		QMessageBox::information( gui->mainWindow(),
+		QMessageBox::information( getGUI()->mainWindow(),
 			tr( "JACK server down" ),
 			tr( "The JACK server seems to have been shutdown "
 				"and starting a new instance failed. "
@@ -126,8 +126,8 @@ void AudioJack::restartAfterZombified()
 
 AudioJack* AudioJack::addMidiClient(MidiJack *midiClient)
 {
-	if( m_client == NULL )
-		return NULL;
+	if( m_client == nullptr )
+		return nullptr;
 
 	m_midiClient = midiClient;
 
@@ -143,12 +143,12 @@ bool AudioJack::initJackClient()
 		clientName = "lmms";
 	}
 
-	const char * serverName = NULL;
+	const char * serverName = nullptr;
 	jack_status_t status;
 	m_client = jack_client_open( clientName.toLatin1().constData(),
 						JackNullOption, &status,
 								serverName );
-	if( m_client == NULL )
+	if( m_client == nullptr )
 	{
 		printf( "jack_client_open() failed, status 0x%2.0x\n", status );
 		if( status & JackServerFailed )
@@ -187,7 +187,7 @@ bool AudioJack::initJackClient()
 						name.toLatin1().constData(),
 						JACK_DEFAULT_AUDIO_TYPE,
 						JackPortIsOutput, 0 ) );
-		if( m_outputPorts.back() == NULL )
+		if( m_outputPorts.back() == nullptr )
 		{
 			printf( "no more JACK-ports available!\n" );
 			return false;
@@ -202,7 +202,7 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
-	if( m_active || m_client == NULL )
+	if( m_active || m_client == nullptr )
 	{
 		m_stopped = false;
 		return;
@@ -218,14 +218,14 @@ void AudioJack::startProcessing()
 
 
 	// try to sync JACK's and LMMS's buffer-size
-//	jack_set_buffer_size( m_client, mixer()->framesPerPeriod() );
+//	jack_set_buffer_size( m_client, audioEngine()->framesPerPeriod() );
 
 
 
-	const char * * ports = jack_get_ports( m_client, NULL, NULL,
+	const char * * ports = jack_get_ports( m_client, nullptr, nullptr,
 						JackPortIsPhysical |
 						JackPortIsInput );
-	if( ports == NULL )
+	if( ports == nullptr )
 	{
 		printf( "no physical playback ports. you'll have to do "
 			"connections at your own!\n" );
@@ -264,7 +264,7 @@ void AudioJack::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
 		if( jack_get_sample_rate( m_client ) != sampleRate() )
 		{
@@ -306,7 +306,7 @@ void AudioJack::unregisterPort( AudioPort * _port )
 	{
 		for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 		{
-			if( m_portMap[_port].ports[ch] != NULL )
+			if( m_portMap[_port].ports[ch] != nullptr )
 			{
 				jack_port_unregister( m_client,
 						m_portMap[_port].ports[ch] );
@@ -363,13 +363,13 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
-	const int frames = qMin<int>( _nframes, mixer()->framesPerPeriod() );
+	const int frames = qMin<int>( _nframes, audioEngine()->framesPerPeriod() );
 	for( JackPortMap::iterator it = m_portMap.begin();
 						it != m_portMap.end(); ++it )
 	{
 		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
 		{
-			if( it.value().ports[ch] == NULL )
+			if( it.value().ports[ch] == nullptr )
 			{
 				continue;
 			}
@@ -392,7 +392,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 						_nframes,
 						m_framesToDoInCurBuf -
 							m_framesDoneInCurBuf );
-		const float gain = mixer()->masterGain();
+		const float gain = audioEngine()->masterGain();
 		for( int c = 0; c < channels(); ++c )
 		{
 			jack_default_audio_sample_t * o = m_tempOutBufs[c];
@@ -442,7 +442,7 @@ int AudioJack::staticProcessCallback( jack_nframes_t _nframes, void * _udata )
 void AudioJack::shutdownCallback( void * _udata )
 {
 	AudioJack * _this = static_cast<AudioJack *>( _udata );
-	_this->m_client = NULL;
+	_this->m_client = nullptr;
 	_this->zombified();
 }
 

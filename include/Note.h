@@ -91,7 +91,7 @@ public:
 		int key = DefaultKey,
 		volume_t volume = DefaultVolume,
 		panning_t panning = DefaultPanning,
-		DetuningHelper * detuning = NULL );
+		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
 	virtual ~Note();
 

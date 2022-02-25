@@ -42,8 +42,8 @@ class AudioPort : public ThreadableJob
 	MM_OPERATORS
 public:
 	AudioPort( const QString & _name, bool _has_effect_chain = true,
-		FloatModel * volumeModel = NULL, FloatModel * panningModel = NULL,
-		BoolModel * mutedModel = NULL );
+		FloatModel * volumeModel = nullptr, FloatModel * panningModel = nullptr,
+		BoolModel * mutedModel = nullptr );
 	virtual ~AudioPort();
 
 	inline sampleFrame * buffer()
@@ -71,11 +71,11 @@ public:
 	void setExtOutputEnabled( bool _enabled );
 
 
-	// next effect-channel after this audio-port
+	// next mixer-channel after this audio-port
 	// (-1 = none  0 = master)
-	inline fx_ch_t nextFxChannel() const
+	inline mix_ch_t nextMixerChannel() const
 	{
-		return m_nextFxChannel;
+		return m_nextMixerChannel;
 	}
 
 	inline EffectChain * effects()
@@ -83,9 +83,9 @@ public:
 		return m_effects.get();
 	}
 
-	void setNextFxChannel( const fx_ch_t _chnl )
+	void setNextMixerChannel( const mix_ch_t _chnl )
 	{
-		m_nextFxChannel = _chnl;
+		m_nextMixerChannel = _chnl;
 	}
 
 
@@ -116,7 +116,7 @@ private:
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;
-	fx_ch_t m_nextFxChannel;
+	mix_ch_t m_nextMixerChannel;
 
 	QString m_name;
 
@@ -129,8 +129,8 @@ private:
 	FloatModel * m_panningModel;
 	BoolModel * m_mutedModel;
 
-	friend class Mixer;
-	friend class MixerWorkerThread;
+	friend class AudioEngine;
+	friend class AudioEngineWorkerThread;
 
 } ;
 

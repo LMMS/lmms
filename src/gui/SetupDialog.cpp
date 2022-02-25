@@ -32,6 +32,7 @@
 #include <QScrollArea>
 
 #include "AudioDeviceSetupWidget.h"
+#include "AudioEngine.h"
 #include "debug.h"
 #include "embed.h"
 #include "Engine.h"
@@ -39,7 +40,6 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "MidiSetupWidget.h"
-#include "Mixer.h"
 #include "ProjectJournal.h"
 #include "SetupDialog.h"
 #include "TabBar.h"
@@ -80,7 +80,7 @@ inline void labelWidget(QWidget * w, const QString & txt)
 	title->setFont(pointSize<12>(f));
 
 
-	assert(dynamic_cast<QBoxLayout *>(w->layout()) != NULL);
+	assert(dynamic_cast<QBoxLayout *>(w->layout()) != nullptr);
 
 	dynamic_cast<QBoxLayout *>(w->layout())->addSpacing(5);
 	dynamic_cast<QBoxLayout *>(w->layout())->addWidget(title);
@@ -141,9 +141,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_NaNHandler(ConfigManager::inst()->value(
 			"app", "nanhandler", "1").toInt()),
 	m_hqAudioDev(ConfigManager::inst()->value(
-			"mixer", "hqaudio").toInt()),
+			"audioengine", "hqaudio").toInt()),
 	m_bufferSize(ConfigManager::inst()->value(
-			"mixer", "framesperaudiobuffer").toInt()),
+			"audioengine", "framesperaudiobuffer").toInt()),
 	m_workingDir(QDir::toNativeSeparators(ConfigManager::inst()->workingDir())),
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
@@ -533,11 +533,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	}
 
 	// If no preferred audio device is saved, save the current one.
-	QString audioDevName = ConfigManager::inst()->value("mixer", "audiodev");
+	QString audioDevName = ConfigManager::inst()->value("audioengine", "audiodev");
 	if (m_audioInterfaces->findText(audioDevName) < 0)
 	{
-		audioDevName = Engine::mixer()->audioDevName();
-		ConfigManager::inst()->setValue("mixer", "audiodev", audioDevName);
+		audioDevName = Engine::audioEngine()->audioDevName();
+		ConfigManager::inst()->setValue("audioengine", "audiodev", audioDevName);
 	}
 	m_audioInterfaces->
 		setCurrentIndex(m_audioInterfaces->findText(audioDevName));
@@ -678,11 +678,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		m_midiInterfaces->addItem(it.key());
 	}
 
-	QString midiDevName = ConfigManager::inst()->value("mixer", "mididev");
+	QString midiDevName = ConfigManager::inst()->value("audioengine", "mididev");
 	if (m_midiInterfaces->findText(midiDevName) < 0)
 	{
-		midiDevName = Engine::mixer()->midiClientName();
-		ConfigManager::inst()->setValue("mixer", "mididev", midiDevName);
+		midiDevName = Engine::audioEngine()->midiClientName();
+		ConfigManager::inst()->setValue("audioengine", "mididev", midiDevName);
 	}
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
@@ -699,9 +699,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_assignableMidiDevices = new QComboBox(midiAutoAssign_tw);
 	m_assignableMidiDevices->setGeometry(10, 20, 240, 28);
 	m_assignableMidiDevices->addItem("none");
-	if ( !Engine::mixer()->midiClient()->isRaw() )
+	if ( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
-		m_assignableMidiDevices->addItems(Engine::mixer()->midiClient()->readablePorts());
+		m_assignableMidiDevices->addItems(Engine::audioEngine()->midiClient()->readablePorts());
 	}
 	else
 	{
@@ -950,15 +950,15 @@ void SetupDialog::accept()
 					QString::number(m_syncVSTPlugins));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",
 					QString::number(m_disableAutoQuit));
-	ConfigManager::inst()->setValue("mixer", "audiodev",
+	ConfigManager::inst()->setValue("audioengine", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("app", "nanhandler",
 					QString::number(m_NaNHandler));
-	ConfigManager::inst()->setValue("mixer", "hqaudio",
+	ConfigManager::inst()->setValue("audioengine", "hqaudio",
 					QString::number(m_hqAudioDev));
-	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
+	ConfigManager::inst()->setValue("audioengine", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
-	ConfigManager::inst()->setValue("mixer", "mididev",
+	ConfigManager::inst()->setValue("audioengine", "mididev",
 					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("midi", "midiautoassign",
 					m_assignableMidiDevices->currentText());
@@ -1199,7 +1199,7 @@ void SetupDialog::setBufferSize(int value)
 
 	m_bufferSize = value * BUFFERSIZE_RESOLUTION;
 	m_bufferSizeLbl->setText(tr("Frames: %1\nLatency: %2 ms").arg(m_bufferSize).arg(
-		1000.0f * m_bufferSize / Engine::mixer()->processingSampleRate(), 0, 'f', 1));
+		1000.0f * m_bufferSize / Engine::audioEngine()->processingSampleRate(), 0, 'f', 1));
 }
 
 

@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 project(RemoteVstPlugin 
 	LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 include(CheckCXXPreprocessor)
 include(CheckCXXSourceCompiles)
@@ -59,7 +59,7 @@ if(WIN32)
 endif()
 
 if(IS_MINGW)
-	SET(CMAKE_REQUIRED_FLAGS "-std=c++14")
+	SET(CMAKE_REQUIRED_FLAGS "-std=c++17")
 
 	CHECK_CXX_SOURCE_COMPILES("
 	#include <mutex>

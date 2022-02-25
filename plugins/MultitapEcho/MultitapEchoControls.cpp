@@ -48,7 +48,7 @@ MultitapEchoControls::MultitapEchoControls( MultitapEchoEffect * eff ) :
 	connect( &m_lpGraph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( lpSamplesChanged( int, int ) ) );
 
 	connect( &m_steps, SIGNAL( dataChanged() ), this, SLOT( lengthChanged() ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 
 	setDefaultAmpShape();
 	setDefaultLpShape();
@@ -149,7 +149,7 @@ void MultitapEchoControls::lpSamplesChanged( int begin, int end )
 	const float * samples = m_lpGraph.samples();
 	for( int i = begin; i <= end; ++i )
 	{
-		m_effect->m_lpFreq[i] = 20.0f * exp10( samples[i] );
+		m_effect->m_lpFreq[i] = 20.0f * std::pow(10.f, samples[i] );
 	}
 	m_effect->updateFilters( begin, end );
 }
@@ -174,7 +174,7 @@ void MultitapEchoControls::lengthChanged()
 
 void MultitapEchoControls::sampleRateChanged()
 {
-	m_effect->m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_effect->m_sampleRate = Engine::audioEngine()->processingSampleRate();
 	m_effect->m_sampleRatio = 1.0f / m_effect->m_sampleRate;
 	m_effect->updateFilters( 0, 19 );
 }

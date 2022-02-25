@@ -34,18 +34,18 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "ComboBox.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
-AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
+AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audiosoundio", "channels" ).toInt(),
-		SURROUND_CHANNELS ), _mixer )
+		SURROUND_CHANNELS ), _audioEngine )
 {
 	outSuccessful = false;
-	m_soundio = NULL;
-	m_outstream = NULL;
-	m_outBuf = NULL;
+	m_soundio = nullptr;
+	m_outstream = nullptr;
+	m_outBuf = nullptr;
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
@@ -168,7 +168,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	}
 
 	m_outstream->name = "LMMS";
-	m_outstream->software_latency = (double)mixer()->framesPerPeriod() / (double)currentSampleRate;
+	m_outstream->software_latency = (double)audioEngine()->framesPerPeriod() / (double)currentSampleRate;
 	m_outstream->userdata = this;
 	m_outstream->write_callback = staticWriteCallback;
 	m_outstream->error_callback = staticErrorCallback;
@@ -206,7 +206,7 @@ AudioSoundIo::~AudioSoundIo()
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 
@@ -216,7 +216,7 @@ void AudioSoundIo::startProcessing()
 	
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
-	m_outBufSize = mixer()->framesPerPeriod();
+	m_outBufSize = audioEngine()->framesPerPeriod();
 
 	m_outBuf = new surroundSampleFrame[m_outBufSize];
 
@@ -261,7 +261,7 @@ void AudioSoundIo::stopProcessing()
 	if (m_outBuf)
 	{
 		delete[] m_outBuf;
-		m_outBuf = NULL;
+		m_outBuf = nullptr;
 	}
 }
 
@@ -283,7 +283,7 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	int bytesPerSample = m_outstream->bytes_per_sample;
 	int err;
 
-	const float gain = mixer()->masterGain();
+	const float gain = audioEngine()->masterGain();
 
 	int framesLeft = frameCountMax;
 
@@ -503,7 +503,7 @@ AudioSoundIo::setupWidget::~setupWidget()
 	if (m_soundio)
 	{
 		soundio_destroy(m_soundio);
-		m_soundio = NULL;
+		m_soundio = nullptr;
 	}
 }
 

@@ -23,12 +23,13 @@
  */
 
 #include "SamplePlayHandle.h"
+#include "AudioEngine.h"
 #include "AudioPort.h"
-#include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
-#include "SampleTCO.h"
+#include "lmms_constants.h"
+#include "PatternTrack.h"
+#include "SampleClip.h"
 
 
 
@@ -40,8 +41,8 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPo
 	m_ownAudioPort( ownAudioPort ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
+	m_track( nullptr ),
+	m_patternTrack( nullptr )
 {
 	if (ownAudioPort)
 	{
@@ -61,11 +62,11 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	SamplePlayHandle( tco->sampleBuffer() , false)
+SamplePlayHandle::SamplePlayHandle( SampleClip* clip ) :
+	SamplePlayHandle( clip->sampleBuffer() , false)
 {
-	m_track = tco->getTrack();
-	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
+	m_track = clip->getTrack();
+	setAudioPort( ( (SampleTrack *)clip->getTrack() )->audioPort() );
 }
 
 
@@ -85,7 +86,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 void SamplePlayHandle::play( sampleFrame * buffer )
 {
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
@@ -105,15 +106,16 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	}
 
 	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
 /*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
-		if( ! m_sampleBuffer->play( workingBuffer, &m_state, frames,
-								BaseFreq ) )
+		// SamplePlayHandle always plays the sample at its original pitch;
+		// it is used only for previews, SampleTracks and the metronome.
+		if (!m_sampleBuffer->play(workingBuffer, &m_state, frames, DefaultBaseFreq))
 		{
-			memset( workingBuffer, 0, frames * sizeof( sampleFrame ) );
+			memset(workingBuffer, 0, frames * sizeof(sampleFrame));
 		}
 	}
 
@@ -133,7 +135,7 @@ bool SamplePlayHandle::isFinished() const
 
 bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 {
-	return m_track == _track || m_bbTrack == _track;
+	return m_track == _track || m_patternTrack == _track;
 }
 
 
@@ -141,7 +143,8 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate() );
+	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) *
+			( Engine::audioEngine()->processingSampleRate() / m_sampleBuffer->sampleRate() );
 }
 
 

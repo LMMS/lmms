@@ -55,8 +55,8 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 
 	auto hint = new QLabel( tr( "Drag an instrument "
-					"into either the Song-Editor, the "
-					"Beat+Bassline Editor or into an "
+					"into either the Song Editor, the "
+					"Pattern Editor or into an "
 					"existing instrument track." ),
 								m_view );
 	hint->setWordWrap( true );
@@ -156,7 +156,7 @@ void PluginBrowser::addPlugins()
 	m_descTree->clear();
 
 	// Fetch and sort all instrument plugin descriptors
-	auto descs = pluginFactory->descriptors(Plugin::Instrument);
+	auto descs = getPluginFactory()->descriptors(Plugin::Instrument);
 	std::sort(descs.begin(), descs.end(),
 		[](auto d1, auto d2)
 		{

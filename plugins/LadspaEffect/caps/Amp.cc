@@ -109,7 +109,7 @@ AmpIII::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register sample_t a = s[i];
+		sample_t a = s[i];
 
 		a = g * tube.transfer (a * temp);
 		a = filter.process (a + normal);
@@ -226,7 +226,7 @@ AmpIV::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register sample_t a = s[i] + normal;
+		sample_t a = s[i] + normal;
 
 		a = g * tube.transfer (a * temp);
 		a = tone.process (a);
@@ -382,8 +382,8 @@ AmpV::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register sample_t a = s[i];
-		register sample_t v = 3 - supply;
+		sample_t a = s[i];
+		sample_t v = 3 - supply;
 		/* alternative curve: v = v * v * .1 + .1; */
 		v = v * v * .06 + .46;
 
@@ -535,8 +535,8 @@ AmpVTS::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register double a = s[i];
-		register double v = 3 - supply;
+		double a = s[i];
+		double v = 3 - supply;
 		v = v * v * .06 + .46;
 
 		a = tube.transfer (a);

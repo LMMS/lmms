@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Jupiter" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="81" vol="50">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="81" vol="50">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="80" userwavefile0="" finer0="0" userwavefile1="" finer1="13" userwavefile2="" finer2="0" coarse0="0" coarse1="0" coarse2="12" finel0="0" finel1="-16" modalgo1="2" modalgo2="0" finel2="0" pan0="0" modalgo3="0" pan1="0" stphdetun0="121" pan2="0" stphdetun1="259" wavetype0="2" stphdetun2="92" wavetype1="2" wavetype2="3" vol0="25" vol1="25" phoffset0="0" phoffset1="266" vol2="63"/>
       </instrument>

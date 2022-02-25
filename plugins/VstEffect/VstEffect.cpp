@@ -47,7 +47,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 	0x0200,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
+	nullptr,
 	new VstSubPluginFeatures( Plugin::Effect )
 } ;
 
@@ -126,8 +126,8 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	TextFloat * tf = NULL;
-	if( gui )
+	TextFloat * tf = nullptr;
+	if( getGUI() != nullptr )
 	{
 		tf = TextFloat::displayMessage(
 			VstPlugin::tr( "Loading plugin" ),

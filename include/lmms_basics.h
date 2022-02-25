@@ -26,6 +26,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <cstddef>
 #include <limits>
 
 #include "lmmsconfig.h"
@@ -52,7 +53,7 @@ typedef int32_t f_cnt_t;			// standard frame-count
 typedef uint8_t ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
 typedef uint16_t bpm_t;			// tempo (MIN_BPM to MAX_BPM)
 typedef uint16_t bitrate_t;		// bitrate in kbps
-typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
+typedef uint16_t mix_ch_t;			// Mixer-channel (0 to MAX_CHANNEL)
 
 typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 
@@ -109,9 +110,9 @@ inline bool typeInfo<float>::isEqual( float x, float y )
 
 
 
-const ch_cnt_t DEFAULT_CHANNELS = 2;
+constexpr ch_cnt_t DEFAULT_CHANNELS = 2;
 
-const ch_cnt_t SURROUND_CHANNELS =
+constexpr ch_cnt_t SURROUND_CHANNELS =
 #define LMMS_DISABLE_SURROUND
 #ifndef LMMS_DISABLE_SURROUND
 				4;
@@ -119,28 +120,29 @@ const ch_cnt_t SURROUND_CHANNELS =
 				2;
 #endif
 
-
+constexpr char LADSPA_PATH_SEPERATOR =
 #ifdef LMMS_BUILD_WIN32
-#define LADSPA_PATH_SEPERATOR ';'
+';';
 #else
-#define LADSPA_PATH_SEPERATOR ':'
+':';
 #endif
 
 
 
 using         sampleFrame = std::array<sample_t,  DEFAULT_CHANNELS>;
 using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
-#define ALIGN_SIZE 16
+constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN
 
 // Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
+constexpr const char* UI_CTRL_KEY =
 #ifdef LMMS_BUILD_APPLE
-# define UI_CTRL_KEY "⌘"
+"⌘";
 #else
-# define UI_CTRL_KEY "Ctrl"
+"Ctrl";
 #endif
 
 #endif

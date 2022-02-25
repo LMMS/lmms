@@ -29,12 +29,12 @@
 #include <QScrollArea>
 #include <QMessageBox>
 
+#include "AudioEngine.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "MidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
-#include "Mixer.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"
@@ -70,7 +70,7 @@ public:
 		{
 			m_detectedMidiChannel = event.channel() + 1;
 			m_detectedMidiController = event.controllerNumber() + 1;
-			m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
+			m_detectedMidiPort = Engine::audioEngine()->midiClient()->sourcePortName( event );
 
 			emit valueChanged();
 		}
@@ -126,11 +126,11 @@ private:
 ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
 		const AutomatableModel * _target_model ) :
 	QDialog( _parent ),
-	m_readablePorts( NULL ),
+	m_readablePorts( nullptr ),
 	m_midiAutoDetect( false ),
-	m_controller( NULL ),
+	m_controller( nullptr ),
 	m_targetModel( _target_model ),
-	m_midiController( NULL )
+	m_midiController( nullptr )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
 	setWindowTitle( tr( "Connection Settings" ) );
@@ -165,7 +165,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
-	if( !Engine::mixer()->midiClient()->isRaw() )
+	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
 		m_readablePorts = new MidiPortMenu( MidiPort::Input );
 		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
@@ -239,7 +239,7 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	// Crazy MIDI View stuff
 	
 	// TODO, handle by making this a model for the Dialog "view"
-	ControllerConnection * cc = NULL;
+	ControllerConnection * cc = nullptr;
 	if( m_targetModel )
 	{
 		cc = m_targetModel->controllerConnection();
