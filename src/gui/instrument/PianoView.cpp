@@ -43,8 +43,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QVBoxLayout>
-#include <QtWidgets>
-#include <QtGui>
 
 #include "AutomatableModelView.h"
 #include "PianoView.h"
@@ -447,16 +445,16 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 		title = QString("Key %1 [%2]").arg(getNoteStringByKey(key_num)).arg(key_num);
 
 		CaptionMenu contextMenu(title);
-		QAction *actionBase = contextMenu.addAction(tr( "Set &base note" ),
-								this, SLOT( setBaseNote() ) );
+		QAction *actionBase = contextMenu.addAction(tr("Set &base note"),
+								this, SLOT(setBaseNote()));
 		contextMenu.addSeparator();
 
-		QAction *actionFirst = contextMenu.addAction(tr( "Set &first key" ),
-								this, SLOT( setFirstKey() ) );
-		QAction *actionLast = contextMenu.addAction(tr( "Set &last key" ),
-								this, SLOT( setLastKey() ) );
+		QAction *actionFirst = contextMenu.addAction(tr("Set &first key"),
+								this, SLOT(setFirstKey()));
+		QAction *actionLast = contextMenu.addAction(tr("Set &last key"),
+								this, SLOT(setLastKey()));
 		contextMenu.addAction(tr( "Set &single key" ),
-								this, SLOT( setSingleKey() ) );
+								this, SLOT(setSingleKey()));
 
 		actionFirst->setEnabled(key_num != m_piano->instrumentTrack()->firstKeyModel()->value() && firstMarkerAllowed(key_num));
 		actionLast->setEnabled(key_num != m_piano->instrumentTrack()->lastKeyModel()->value() && lastMarkerAllowed(key_num));
@@ -555,7 +553,6 @@ bool PianoView::setMarkerKeyValue(IntModel *noteModel, int key_num, bool ignoreC
 		if (m_piano->instrumentTrack()->lastKeyModel() == noteModel && !lastMarkerAllowed(key_num)) return false;
 	}
 	noteModel->setValue(static_cast<float>(key_num));
-	if (noteModel == m_piano->instrumentTrack()->baseNoteModel()) { emit baseNoteChanged(); }	// TODO: not actually used by anything?
 	return true;
 }
 
@@ -573,17 +570,16 @@ bool PianoView::lastMarkerAllowed(int key_num)
 void PianoView::setBaseNote()
 {
 	setMarkerKeyValue(m_piano->instrumentTrack()->baseNoteModel(), m_lastContextMenuKey);
-	update();
 }
 
 void PianoView::setFirstKey()
 {
-	if (setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey)) update();
+	setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey);
 }
 
 void PianoView::setLastKey()
 {
-	if (setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey)) update();
+	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey);
 }
 
 

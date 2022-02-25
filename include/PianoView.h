@@ -30,7 +30,6 @@
 
 #include "AutomatableModel.h"
 #include "ModelView.h"
-#include "ModelView.h"
 
 namespace lmms
 {
