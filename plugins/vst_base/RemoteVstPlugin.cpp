@@ -917,7 +917,9 @@ void RemoteVstPlugin::initEditor()
 	Atom prop_atom, val_atom;
 	
 	if (m_display == nullptr)
+	{
 		m_display = XOpenDisplay(nullptr);
+	}
 	m_window = XCreateSimpleWindow(m_display, DefaultRootWindow(m_display), 0, 0, 400, 400, 0, 0, 0);
 	
 	m_wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", false);
@@ -1006,7 +1008,9 @@ void RemoteVstPlugin::destroyEditor()
 	m_window = nullptr;
 #else
 	if (m_display)
+	{
 		XCloseDisplay(m_display);
+	}
 	m_display = nullptr;
 	m_window = 0;
 #endif
@@ -2322,7 +2326,9 @@ void * RemoteVstPlugin::processingThread(void * _param)
 	return 0;
 #else
 	if (m.id == IdQuit)
+	{
 		_this->queueMessage( m );
+	}
 
 	return nullptr;
 #endif
@@ -2380,15 +2386,21 @@ void RemoteVstPlugin::guiEventLoop()
 			XNextEvent(m_display, &e);
 		
 			if (e.type == ClientMessage && e.xclient.data.l[0] == m_wmDeleteMessage)
+			{
 				hideEditor();
+			}
 		}
 
 		// needed by zynaAddsubfx ui
 		if (__plugin->isInitialized())
+		{
 			__plugin->idle();
+		}
 		
 		if(__plugin->isInitialized() && !__plugin->isProcessing() )
+		{
 			__plugin->processUIThreadMessages();
+		}
 		
 		nanosleep(&tim, &tim2);
 		
