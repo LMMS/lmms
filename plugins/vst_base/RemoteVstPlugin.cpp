@@ -449,9 +449,9 @@ private:
 
 	AEffect * m_plugin;
 #ifndef NATIVE_LINUX_VST
-	HWND m_window;
+	HWND m_window = nullptr;
 #else
-	Window m_window = NULL;
+	Window m_window = 0;
 	Display* m_display = NULL;
 	Atom m_wmDeleteMessage;
 	bool m_x11WindowVisible = false;
@@ -513,7 +513,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 #endif
 	m_libInst( nullptr ),
 	m_plugin( nullptr ),
-	m_window( nullptr ),
 	m_windowID( 0 ),
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
@@ -995,7 +994,7 @@ void RemoteVstPlugin::hideEditor() {
 
 void RemoteVstPlugin::destroyEditor()
 {
-	if( m_window == nullptr )
+	if( !m_window )
 	{
 		return;
 	}
@@ -1004,12 +1003,13 @@ void RemoteVstPlugin::destroyEditor()
 #ifndef NATIVE_LINUX_VST
 	// Destroying the window takes some time in Wine 1.8.5
 	DestroyWindow( m_window );
+	m_window = nullptr;
 #else
 	if (m_display)
 		XCloseDisplay(m_display);
 	m_display = NULL;
+	m_window = 0;
 #endif
-	m_window = nullptr;
 }
 
 
