@@ -444,7 +444,7 @@ private:
 #ifndef NATIVE_LINUX_VST
 	HINSTANCE m_libInst;
 #else
-	void* m_libInst = NULL;
+	void* m_libInst = nullptr;
 #endif
 
 	AEffect * m_plugin;
@@ -452,7 +452,7 @@ private:
 	HWND m_window = nullptr;
 #else
 	Window m_window = 0;
-	Display* m_display = NULL;
+	Display* m_display = nullptr;
 	Atom m_wmDeleteMessage;
 	bool m_x11WindowVisible = false;
 #endif
@@ -916,8 +916,8 @@ void RemoteVstPlugin::initEditor()
 	XEvent e;
 	Atom prop_atom, val_atom;
 	
-	if (m_display == NULL)
-		m_display = XOpenDisplay(NULL);
+	if (m_display == nullptr)
+		m_display = XOpenDisplay(nullptr);
 	m_window = XCreateSimpleWindow(m_display, DefaultRootWindow(m_display), 0, 0, 400, 400, 0, 0, 0);
 	
 	m_wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", false);
@@ -1007,7 +1007,7 @@ void RemoteVstPlugin::destroyEditor()
 #else
 	if (m_display)
 		XCloseDisplay(m_display);
-	m_display = NULL;
+	m_display = nullptr;
 	m_window = 0;
 #endif
 }
@@ -1026,7 +1026,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	}
 #else
 	m_libInst = dlopen(_plugin_file.c_str(), RTLD_LAZY);
-	if ( m_libInst == NULL) {
+	if ( m_libInst == nullptr) {
 		debugMessage( std::string("LoadLibrary failed: ") + dlerror() );
 		return false;
 	}
@@ -1049,9 +1049,9 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	}
 #else
 	mainEntryPointer mainEntry = (mainEntryPointer) dlsym(m_libInst, "VSTPluginMain");
-	if( mainEntry == NULL )
+	if( mainEntry == nullptr )
 		mainEntry = (mainEntryPointer) dlsym(m_libInst, "VstPluginMain");
-	if( mainEntry == NULL )
+	if( mainEntry == nullptr )
 		mainEntry = (mainEntryPointer) dlsym(m_libInst, "main");
 #endif
 
@@ -1064,7 +1064,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	m_plugin = mainEntry( hostCallback );
 	if( m_plugin == nullptr )
 	{
-		debugMessage( "mainEntry procedure returned NULL\n" );
+		debugMessage( "mainEntry procedure returned nullptr\n" );
 		return false;
 	}
 
@@ -1850,7 +1850,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// items may require extensive conversions
 
 			// Shared memory was initialised? - see song.cpp
-			//assert( __plugin->m_vstSyncData != NULL );
+			//assert( __plugin->m_vstSyncData != nullptr );
 
 			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
 			_timeInfo.samplePos = __plugin->m_currentSamplePos;
@@ -2575,7 +2575,7 @@ int main( int _argc, char * * _argv )
 						__plugin, 0, nullptr ) == nullptr )
 #else
 		int err = 0;
-		err = pthread_create(&__processingThreadId, NULL, &RemoteVstPlugin::processingThread, __plugin);
+		err = pthread_create(&__processingThreadId, nullptr, &RemoteVstPlugin::processingThread, __plugin);
 		if (err != 0)
 #endif
 		{
@@ -2586,7 +2586,7 @@ int main( int _argc, char * * _argv )
 
 		__plugin->guiEventLoop();
 #ifdef NATIVE_LINUX_VST
-		pthread_join(__processingThreadId, NULL);
+		pthread_join(__processingThreadId, nullptr);
 #endif
 	}
 
