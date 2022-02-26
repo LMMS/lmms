@@ -10,6 +10,9 @@
  * 		Copyright (c) 2004 Torben Hohn
  *	 	Copyright (c) 2002 Kjetil S. Matheussen
  *
+ * X11 code partly taken from https://github.com/ekenberg/vstminihost:
+ *      Copyright (c) 2012 Johan Ekenberg
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -911,8 +914,6 @@ void RemoteVstPlugin::initEditor()
 #endif
 
 #else
-	// native linux support
-	// inspired by https://github.com/ekenberg/vstminihost
 	XEvent e;
 	Atom prop_atom, val_atom;
 	
@@ -2391,7 +2392,7 @@ void RemoteVstPlugin::guiEventLoop()
 			}
 		}
 
-		// needed by zynaAddsubfx ui
+		// needed by ZynAddSubFX UI
 		if (__plugin->isInitialized())
 		{
 			__plugin->idle();
