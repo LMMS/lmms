@@ -27,16 +27,15 @@
 #include <QAction>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLayout>
 #include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QPainter>
 #include <QScrollBar>
 #include <QTimeLine>
 
+#include "ActionGroup.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "AutomatableSlider.h"
+#include "ClipView.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
@@ -48,11 +47,13 @@
 #include "MeterDialog.h"
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
+#include "PositionLine.h"
+#include "SubWindow.h"
 #include "TextFloat.h"
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
-#include "Track.h"
+#include "TrackView.h"
 
 const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };

@@ -28,12 +28,9 @@
 #ifndef SFXR_H
 #define SFXR_H
 
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
-#include "Graph.h"
-#include "PixmapButton.h"
-#include "LedCheckbox.h"
 #include "MemoryManager.h"
 
 
@@ -64,6 +61,9 @@ const int KNOB_BLOCK_SIZE_Y = 40;
 
 
 
+class automatableButtonGroup;
+class Knob;
+class PixmapButton;
 class sfxrInstrument;
 
 

@@ -26,18 +26,15 @@
 #ifndef MIXER_LINE_H
 #define MIXER_LINE_H
 
-#include <QColorDialog>
-#include <QGraphicsView>
-#include <QLineEdit>
 #include <QWidget>
 
-#include "ColorChooser.h"
-#include "Knob.h"
-#include "LcdWidget.h"
-#include "SendButtonIndicator.h"
 
 
 
+class QGraphicsView;
+class QLineEdit;
+class Knob;
+class LcdWidget;
 class MixerView;
 class SendButtonIndicator;
 

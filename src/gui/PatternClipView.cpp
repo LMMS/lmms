@@ -24,16 +24,16 @@
 
 #include "PatternClipView.h"
 
+#include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "gui_templates.h"
+#include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "PatternEditor.h"
+#include "PatternClip.h"
 #include "PatternStore.h"
 #include "RenameDialog.h"
-#include "Song.h"
 #include "ToolTip.h"
 
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :

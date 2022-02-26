@@ -1,16 +1,11 @@
-#include <cstdlib>
-#include <cassert>
 #include <sys/stat.h>
 #include <cctype>
 
-#include <QDir>
-#include <QApplication>
-#include <QVector>
 #include <QDomDocument>
+#include <QFile>
 #include <QLocale>
 #include <QTextCodec>
 
-#include <algorithm>
 #include "LocalFileMng.h"
 
 

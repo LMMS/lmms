@@ -19,12 +19,14 @@
  */
 
 #include "StepRecorder.h"
+
+#include <QKeyEvent>
+
+#include "MidiClip.h"
 #include "StepRecorderWidget.h"
 #include "PianoRoll.h"
 
-#include <QPainter>
 
-#include <climits>
 using std::min;
 using std::max;
 

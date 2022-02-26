@@ -71,7 +71,6 @@
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
 #include "Song.h"
-#include "SetupDialog.h"
 
 #ifdef LMMS_DEBUG_FPE
 #include <fenv.h> // For feenableexcept

@@ -24,12 +24,12 @@
  */
 
 
-#include <QLayout>
 
 #include "waveshaper_control_dialog.h"
 #include "waveshaper_controls.h"
 #include "embed.h"
 #include "Graph.h"
+#include "Knob.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
 #include "LedCheckbox.h"

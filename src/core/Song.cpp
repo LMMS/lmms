@@ -27,25 +27,23 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
-#include <QFileInfo>
 #include <QMessageBox>
 
 #include <algorithm>
 #include <cmath>
-#include <functional>
 
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
-#include "embed.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
 #include "InstrumentTrack.h"
+#include "Keymap.h"
 #include "NotePlayHandle.h"
 #include "MidiClip.h"
 #include "PatternEditor.h"
@@ -54,6 +52,7 @@
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "Scale.h"
 #include "SongEditor.h"
 #include "TimeLineWidget.h"
 #include "PeakController.h"

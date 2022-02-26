@@ -28,7 +28,6 @@
 #include <memory>
 #include <QString>
 #include <QMutex>
-#include <QMutexLocker>
 
 #include "MemoryManager.h"
 #include "PlayHandle.h"

@@ -26,11 +26,10 @@
 #define _VST_PLUGIN_H
 
 #include <QMap>
-#include <QMutex>
 #include <QPointer>
+#include <QSize>
 #include <QString>
 #include <QTimer>
-#include <QWidget>
 
 #include "JournallingObject.h"
 #include "RemotePlugin.h"

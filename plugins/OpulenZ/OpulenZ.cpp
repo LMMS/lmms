@@ -40,7 +40,6 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
-#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
@@ -55,7 +54,6 @@
 #include "debug.h"
 
 #include "Knob.h"
-#include "LcdSpinBox.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
 

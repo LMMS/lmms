@@ -28,9 +28,7 @@
 #include "Engine.h"
 
 #include <QThread>
-#include <QDebug>
 
-#include <iterator>
 
 PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),

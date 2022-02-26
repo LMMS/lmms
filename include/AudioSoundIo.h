@@ -25,10 +25,8 @@
 #ifndef AUDIO_SOUNDIO_H
 #define AUDIO_SOUNDIO_H
 
-#include <QObject>
 
 #include "lmmsconfig.h"
-#include "ComboBoxModel.h"
 
 #ifdef LMMS_HAVE_SOUNDIO
 

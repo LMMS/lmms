@@ -25,16 +25,14 @@
 
 #include <QDebug>
 
+#include "VstSyncController.h"
+
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "VstSyncController.h"
 #include "RemotePlugin.h"
 
 #ifndef USE_QT_SHMEM
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>

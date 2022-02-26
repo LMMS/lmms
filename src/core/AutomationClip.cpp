@@ -30,6 +30,7 @@
 #include "AutomationClipView.h"
 #include "AutomationTrack.h"
 #include "LocaleHelper.h"
+#include "Note.h"
 #include "PatternStore.h"
 #include "ProjectJournal.h"
 #include "Song.h"

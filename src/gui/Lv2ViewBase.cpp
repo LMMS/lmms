@@ -27,10 +27,9 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <QGridLayout>
-#include <QGroupBox>
-#include <QMdiSubWindow>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <lilv/lilv.h>
 #include <lv2/lv2plug.in/ns/ext/port-props/port-props.h>
 
@@ -40,7 +39,6 @@
 #include "GuiApplication.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "LedCheckbox.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Manager.h"
 #include "Lv2Proc.h"

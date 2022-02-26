@@ -38,6 +38,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "LedCheckbox.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -65,7 +66,6 @@
 #define LB_DEBUG
 
 #ifdef LB_DEBUG
-#include <cassert>
 #endif
 
 //

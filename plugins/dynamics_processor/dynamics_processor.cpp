@@ -27,6 +27,7 @@
 #include "dynamics_processor.h"
 #include "lmms_math.h"
 #include "interpolation.h"
+#include "RmsHelper.h"
 
 #include "embed.h"
 #include "plugin_export.h"

@@ -22,8 +22,6 @@
  *
  */
 
-#include <QComboBox>
-#include <QLineEdit>
 
 #include "AudioAlsa.h"
 
@@ -33,7 +31,6 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "gui_templates.h"
 
 
 AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :

@@ -25,15 +25,18 @@
 
 #include "MidiClipView.h"
 
+#include <cmath>
 #include <QApplication>
 #include <QMenu>
+#include <QPainter>
 
 #include "ConfigManager.h"
 #include "DeprecationHelper.h"
 #include "GuiApplication.h"
-#include "InstrumentTrack.h"
+#include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "ToolTip.h"
 
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),

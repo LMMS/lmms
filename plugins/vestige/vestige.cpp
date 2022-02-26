@@ -31,18 +31,18 @@
 #include <memory>
 
 #include <QDropEvent>
-#include <QMessageBox>
+#include <QGridLayout>
 #include <QPainter>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QMdiArea>
 #include <QMenu>
 #include <QDomElement>
 
-#include <string>
 
 #include "AudioEngine.h"
-#include "BufferManager.h"
 #include "ConfigManager.h"
+#include "CustomTextKnob.h"
 #include "Engine.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
@@ -53,9 +53,9 @@
 #include "MainWindow.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
-#include "SampleBuffer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "SubWindow.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
 #include "Clipboard.h"

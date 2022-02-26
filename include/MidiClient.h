@@ -30,11 +30,11 @@
 
 
 #include "MidiEvent.h"
-#include "MidiEventProcessor.h"
-#include "TabWidget.h"
 
 
 class MidiPort;
+class QObject;
+class TimePos;
 
 
 // base-class for all MIDI-clients

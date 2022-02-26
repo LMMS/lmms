@@ -30,10 +30,7 @@
 #include "InstrumentView.h"
 #include "Graph.h"
 #include "AutomatableModel.h"
-#include "AutomatableButton.h"
 #include "TempoSyncKnob.h"
-#include "NotePlayHandle.h"
-#include "PixmapButton.h"
 #include <samplerate.h>
 #include "MemoryManager.h"
 
@@ -77,6 +74,8 @@ const int	B1_OSC = 2;
 const int	B2_OSC = 3;
 const int	NUM_OSCS = 4;
 
+class automatableButtonGroup;
+class PixmapButton;
 class WatsynInstrument;
 
 class WatsynObject

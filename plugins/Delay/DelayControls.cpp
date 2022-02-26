@@ -27,7 +27,6 @@
 #include "DelayControls.h"
 #include "DelayEffect.h"
 #include "Engine.h"
-#include "Song.h"
 
 DelayControls::DelayControls( DelayEffect* effect ):
 	EffectControls( effect ),

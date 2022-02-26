@@ -29,8 +29,6 @@
 
 #include "Effect.h"
 #include "BitcrushControls.h"
-#include "ValueBuffer.h"
-#include "lmms_math.h"
 #include "BasicFilters.h"
 
 class BitcrushEffect : public Effect

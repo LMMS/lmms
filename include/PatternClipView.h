@@ -26,9 +26,12 @@
 #ifndef PATTERN_CLIP_VIEW_H
 #define PATTERN_CLIP_VIEW_H
 
-#include "PatternClip.h"
 
 #include <QStaticText>
+
+#include "ClipView.h"
+
+class PatternClip;
 
 
 class PatternClipView : public ClipView

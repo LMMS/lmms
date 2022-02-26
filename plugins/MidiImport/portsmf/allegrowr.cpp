@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <cerrno>
+#include <errno.h>
 #include <string>
 #include "memory.h"
 using namespace std;

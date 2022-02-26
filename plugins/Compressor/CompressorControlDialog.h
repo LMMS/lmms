@@ -26,17 +26,10 @@
 #define COMPRESSOR_CONTROL_DIALOG_H
 
 #include <QBasicTimer>
-#include <QLabel>
-#include <QMouseEvent>
+#include <QElapsedTimer>
 #include <QPainter>
-#include <QTime>
 
-#include "../Eq/EqFader.h"
 #include "EffectControlDialog.h"
-#include "GuiApplication.h"
-#include "Knob.h"
-#include "MainWindow.h"
-#include "PixmapButton.h"
 
 
 constexpr int COMP_MILLI_PER_PIXEL = 6;
@@ -58,7 +51,12 @@ constexpr float COMP_NOISE_FLOOR = 0.000001;// -120 dbFs
 
 
 
+class automatableButtonGroup;
 class CompressorControls;
+class EqFader;
+class Knob;
+class PixmapButton;
+class QLabel;
 
 class CompressorControlDialog : public EffectControlDialog
 {

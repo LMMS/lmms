@@ -26,7 +26,9 @@
 
 #include <QDomElement>
 
+#include "SampleBuffer.h"
 #include "SampleClipView.h"
+#include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
 SampleClip::SampleClip( Track * _track ) :

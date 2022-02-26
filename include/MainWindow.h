@@ -31,7 +31,6 @@
 #include <QMainWindow>
 
 #include "ConfigManager.h"
-#include "SubWindow.h"
 
 class QAction;
 class QDomElement;
@@ -40,6 +39,7 @@ class QMdiArea;
 
 class ConfigManager;
 class PluginView;
+class SubWindow;
 class ToolButton;
 
 

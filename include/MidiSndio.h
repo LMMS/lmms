@@ -31,9 +31,7 @@
 #ifdef LMMS_HAVE_SNDIO
 
 #include <QThread>
-#include <QFile>
 
-#include <sndio.h>
 
 #include "MidiClient.h"
 

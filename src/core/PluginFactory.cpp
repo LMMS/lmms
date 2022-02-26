@@ -33,7 +33,6 @@
 
 #include "ConfigManager.h"
 #include "Plugin.h"
-#include "embed.h"
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");

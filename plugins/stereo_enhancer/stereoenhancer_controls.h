@@ -27,7 +27,6 @@
 
 #include "EffectControls.h"
 #include "stereoenhancer_control_dialog.h"
-#include "Knob.h"
 
 class stereoEnhancerEffect;
 

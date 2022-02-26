@@ -34,7 +34,6 @@
 
 #include "lmms_basics.h"
 #include "LocklessList.h"
-#include "Note.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"

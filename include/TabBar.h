@@ -26,8 +26,8 @@
 #ifndef TAB_BAR_H
 #define TAB_BAR_H
 
+#include <QBoxLayout>
 #include <QMap>
-#include <QLayout>
 #include <QWidget>
 
 #include "lmms_export.h"

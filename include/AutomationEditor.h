@@ -26,7 +26,6 @@
 #ifndef AUTOMATION_EDITOR_H
 #define AUTOMATION_EDITOR_H
 
-#include <QVector>
 #include <QWidget>
 
 #include "Editor.h"
@@ -36,13 +35,13 @@
 #include "TimePos.h"
 #include "AutomationClip.h"
 #include "ComboBoxModel.h"
-#include "Knob.h"
 
 class QPainter;
 class QPixmap;
 class QScrollBar;
 
 class ComboBox;
+class Knob;
 class NotePlayHandle;
 class TimeLineWidget;
 

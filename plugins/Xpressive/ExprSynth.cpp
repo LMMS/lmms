@@ -28,10 +28,8 @@
 #include <string>
 #include <vector>
 #include <cmath>
-#include <cstdlib>
 #include <random>
 
-#include "Xpressive.h"
 
 #include "interpolation.h"
 #include "lmms_math.h"

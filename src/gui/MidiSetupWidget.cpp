@@ -24,6 +24,7 @@
 
 #include "MidiSetupWidget.h"
 
+#include <QLabel>
 #include <QLineEdit>
 
 #include "ConfigManager.h"

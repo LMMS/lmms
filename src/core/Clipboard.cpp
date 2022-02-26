@@ -27,7 +27,6 @@
 #include <QMimeData>
 
 #include "Clipboard.h"
-#include "JournallingObject.h"
 
 
 namespace Clipboard

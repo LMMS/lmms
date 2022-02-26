@@ -25,8 +25,6 @@
 #include "PatternEditor.h"
 
 #include <QAction>
-#include <QKeyEvent>
-#include <QLayout>
 
 #include "ClipView.h"
 #include "ComboBox.h"
@@ -37,6 +35,7 @@
 #include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackView.h"
 
 #include "MidiClip.h"
 

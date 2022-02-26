@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_ALSA
 #include <alsa/asoundlib.h>
 
+#include <QMap>
 #include <QMutex>
 #include <QThread>
 #include <QTimer>

@@ -48,7 +48,6 @@ public:
 
 #include <portaudio.h>
 
-#include <QSemaphore>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"

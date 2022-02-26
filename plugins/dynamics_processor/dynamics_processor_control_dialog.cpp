@@ -24,15 +24,14 @@
  */
 
 
-#include <QLayout>
 
 #include "dynamics_processor_control_dialog.h"
 #include "dynamics_processor_controls.h"
 #include "embed.h"
 #include "Graph.h"
+#include "Knob.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
-#include "LedCheckbox.h"
 
 
 dynProcControlDialog::dynProcControlDialog(

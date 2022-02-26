@@ -28,9 +28,7 @@
 
 #include "Effect.h"
 #include "MultitapEchoControls.h"
-#include "ValueBuffer.h"
 #include "RingBuffer.h"
-#include "lmms_math.h"
 #include "BasicFilters.h"
 
 class MultitapEchoEffect : public Effect

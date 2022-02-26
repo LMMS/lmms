@@ -44,11 +44,9 @@ float frnd(float range)
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "lmms_constants.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
-#include "Song.h"
 #include "MidiEvent.h"
 
 #include "embed.h"

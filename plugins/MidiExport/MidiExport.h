@@ -31,6 +31,8 @@
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
 
+class QDomNode;
+
 
 const int BUFFER_SIZE = 50*1024;
 typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
@@ -70,7 +72,7 @@ public:
 				int tempo, int masterPitch, const QString &filename);
 	
 private:
-	void writeMidiClip(MidiNoteVector &midiClip, QDomNode n,
+	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time);
 	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
 	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,

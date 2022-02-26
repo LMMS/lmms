@@ -24,12 +24,14 @@
  
 #include "SampleClipView.h"
 
+#include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
 #include "embed.h"
-#include "gui_templates.h"
 #include "PathUtil.h"
+#include "SampleBuffer.h"
+#include "SampleClip.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"

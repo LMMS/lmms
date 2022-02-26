@@ -34,7 +34,6 @@
 
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
 #include "StringPairDrag.h"
 #include "PluginFactory.h"
 
