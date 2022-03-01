@@ -36,8 +36,6 @@
 #include "Engine.h"
 #include "gui_templates.h"
 
-#ifdef LMMS_HAVE_UNISTD_H
-#endif
 #ifdef LMMS_HAVE_STDLIB_H
 #include <cstdlib>
 #endif

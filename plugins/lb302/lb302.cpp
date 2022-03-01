@@ -65,9 +65,6 @@
 
 #define LB_DEBUG
 
-#ifdef LB_DEBUG
-#endif
-
 //
 // Old config
 //

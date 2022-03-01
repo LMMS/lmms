@@ -34,9 +34,6 @@
 #include "AudioFileMP3.h"
 #include "AudioFileFlac.h"
 
-#ifdef LMMS_HAVE_SCHED_H
-#endif
-
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
