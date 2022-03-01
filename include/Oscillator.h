@@ -30,7 +30,7 @@
 #include <fftw3.h>
 
 #ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 #include "Engine.h"

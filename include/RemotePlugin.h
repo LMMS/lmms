@@ -69,7 +69,7 @@ typedef int32_t key_t;
 
 
 #ifdef LMMS_HAVE_LOCALE_H
-#include <locale.h>
+#include <clocale>
 #endif
 
 #ifdef LMMS_HAVE_PTHREAD_H
