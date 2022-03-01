@@ -28,10 +28,7 @@
 
 #include <cassert>
 #include <fftw3.h>
-
-#ifdef LMMS_HAVE_STDLIB_H
 #include <cstdlib>
-#endif
 
 #include "Engine.h"
 #include "lmms_constants.h"

@@ -27,6 +27,7 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
+#include <cstdlib>
 #include <QLabel>
 #include <QLineEdit>
 
@@ -35,10 +36,6 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "gui_templates.h"
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <cstdlib>
-#endif
 
 #include "ConfigManager.h"
 

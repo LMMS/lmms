@@ -27,13 +27,8 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-
-#ifdef LMMS_HAVE_STDLIB_H
 #include <cstdlib>
-#endif
-
 #include <sndio.h>
-
 #include <poll.h>
 
 #include "ConfigManager.h"
