@@ -24,12 +24,12 @@
 
 
 #include <QHBoxLayout>
-#include <Knob.h>
 #include <QVBoxLayout>
 
 #include "BassBoosterControlDialog.h"
 #include "BassBoosterControls.h"
 #include "embed.h"
+#include "Knob.h"
 
 
 

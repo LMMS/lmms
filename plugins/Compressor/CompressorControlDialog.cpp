@@ -25,7 +25,6 @@
 #include "Compressor.h"
 #include "CompressorControlDialog.h"
 #include "CompressorControls.h"
-#include "embed.h"
 
 #include <QLabel>
 #include <QPainter>

@@ -23,9 +23,9 @@
  *
  */
 
-#include <QDebug>
-
 #include "VstSyncController.h"
+
+#include <QDebug>
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
