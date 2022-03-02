@@ -34,7 +34,6 @@
 #include "Knob.h"
 #include "LedCheckbox.h"
 #include "NotePlayHandle.h"
-#include "Oscillator.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
 #include "Song.h"

@@ -28,6 +28,7 @@
 #include "GuiApplication.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
+#include "PatternTrack.h"
 #include "TrackLabelButton.h"
 
 PatternTrackView::PatternTrackView(PatternTrack* pt, TrackContainerView* tcv) :

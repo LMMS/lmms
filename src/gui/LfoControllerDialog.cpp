@@ -23,16 +23,8 @@
  *
  */
 
-#include <QLabel>
-#include <QPushButton>
-#include <QMdiArea>
-#include <QPainter>
 
-#include "CaptionMenu.h"
-#include "gui_templates.h"
 #include "embed.h"
-#include "LedCheckbox.h"
-#include "MainWindow.h"
 #include "ToolTip.h"
 
 
@@ -244,6 +236,9 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 	/*
 	QPointer<captionMenu> contextMenu = new captionMenu(
 						getEffect()->publicName() );
+		// ^ if this ever gets activated again:
+		//   a47a36c86e4473af862df58d2b59f6cb8620b9ee says that publicName
+		//   should be replaced by Model::displayName
 	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
 						tr( "Move &up" ),
 						this, SLOT( moveUp() ) );

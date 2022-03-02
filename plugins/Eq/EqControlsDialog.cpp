@@ -25,15 +25,11 @@
 
 #include "EqControlsDialog.h"
 
-#include <QGraphicsView>
-#include <QLayout>
 #include <QWidget>
 
 #include "AutomatableButton.h"
 #include "embed.h"
-#include "Engine.h"
 #include "Knob.h"
-#include "Fader.h"
 #include "LedCheckbox.h"
 #include "PixmapButton.h"
 

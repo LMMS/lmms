@@ -26,11 +26,9 @@
 #ifndef MIDI_CLIP_H
 #define MIDI_CLIP_H
 
-#include <QStaticText>
 
+#include "Clip.h"
 #include "Note.h"
-#include "MidiClipView.h"
-#include "ClipView.h"
 
 
 class InstrumentTrack;

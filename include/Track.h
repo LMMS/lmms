@@ -26,7 +26,7 @@
 #define TRACK_H
 
 
-#include <QtCore/QVector>
+#include <QVector>
 #include <QColor>
 
 #include "AutomatableModel.h"

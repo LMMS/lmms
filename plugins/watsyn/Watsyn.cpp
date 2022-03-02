@@ -29,6 +29,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "PixmapButton.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"

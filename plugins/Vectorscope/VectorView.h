@@ -23,14 +23,11 @@
 #ifndef VECTORVIEW_H
 #define VECTORVIEW_H
 
-#include <QMouseEvent>
-#include <QWheelEvent>
 #include <QWidget>
 
-#include "Knob.h"
-#include "LedCheckbox.h"
 #include "LocklessRingBuffer.h"
-#include "VecControls.h"
+
+class VecControls;
 
 //#define VEC_DEBUG
 

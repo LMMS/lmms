@@ -24,6 +24,7 @@
 
 #include "Scale.h"
 
+#include <cmath>
 #include <QDomElement>
 
 

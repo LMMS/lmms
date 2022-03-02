@@ -24,16 +24,15 @@
  */
 
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QProgressDialog>
 #include <QDomElement>
 #include <QWriteLocker>
 
 #include "AutomationClip.h"
-#include "AutomationTrack.h"
 #include "embed.h"
 #include "TrackContainer.h"
-#include "InstrumentTrack.h"
+#include "PatternClip.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
 #include "Song.h"

@@ -32,8 +32,8 @@
 
 #include "lmms_export.h"
 #include "MemoryManager.h"
-#include "ProjectVersion.h"
 
+class ProjectVersion;
 class QTextStream;
 
 class LMMS_EXPORT DataFile : public QDomDocument

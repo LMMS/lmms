@@ -1,13 +1,10 @@
 #ifndef SENDBUTTONINDICATOR_H
 #define SENDBUTTONINDICATOR_H
 
-#include <QDebug>
 #include <QLabel>
-#include <QPixmap>
 
-#include "MixerLine.h"
-#include "MixerView.h"
 
+class FloatModel;
 class MixerLine;
 class MixerView;
 

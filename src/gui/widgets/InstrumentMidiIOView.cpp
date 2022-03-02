@@ -22,10 +22,10 @@
  *
  */
 
-#include <QMenu>
 #include <QToolButton>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QLayout>
+#include <QVBoxLayout>
 
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"
@@ -36,8 +36,6 @@
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
-#include "InstrumentTrack.h"
-#include "LedCheckbox.h"
 
 
 InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :

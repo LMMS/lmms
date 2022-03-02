@@ -29,6 +29,7 @@
 
 #include "Track.h"
 
+#include <QDomElement>
 #include <QVariant>
 
 #include "AutomationClip.h"

@@ -26,12 +26,11 @@
 
 #ifdef LMMS_HAVE_JACK
 
-#include <QCompleter>
 #include <QMessageBox>
 
 #include "AudioEngine.h"
+#include "AudioJack.h"
 #include "ConfigManager.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Engine.h"
 #include "MainWindow.h"

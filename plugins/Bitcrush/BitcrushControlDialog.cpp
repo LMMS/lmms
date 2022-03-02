@@ -24,12 +24,11 @@
  */
 
 
-#include <QLayout>
 #include <QLabel>
 
+#include "embed.h"
 #include "BitcrushControlDialog.h"
 #include "BitcrushControls.h"
-#include "embed.h"
 #include "ToolTip.h"
 #include "LedCheckbox.h"
 #include "Knob.h"

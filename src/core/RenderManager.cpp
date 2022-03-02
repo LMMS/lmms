@@ -22,13 +22,11 @@
  *
  */
 
-#include <QDebug>
 #include <QDir>
 
 #include "RenderManager.h"
 
 #include "PatternStore.h"
-#include "PatternTrack.h"
 #include "Song.h"
 
 

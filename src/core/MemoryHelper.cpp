@@ -21,7 +21,7 @@
  *
  */
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "lmms_basics.h"
 #include "MemoryHelper.h"

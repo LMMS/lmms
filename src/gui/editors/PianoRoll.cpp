@@ -26,26 +26,26 @@
 
 #include "PianoRoll.h"
 
+#include <QtMath>
 #include <QApplication>
-#include <QClipboard>
+#include <QHBoxLayout>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLayout>
 #include <QMargins>
-#include <QMdiArea>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
+#include <QPushButton>
 #include <QScrollBar>
 #include <QStyleOption>
-#include <QtMath>
 #include <QToolButton>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
 
-#include <math.h>
+#include <cmath>
 #include <utility>
 
 #include "AutomationEditor.h"
@@ -65,6 +65,7 @@
 #include "MidiClip.h"
 #include "PatternStore.h"
 #include "PianoView.h"
+#include "PositionLine.h"
 #include "SongEditor.h"
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"

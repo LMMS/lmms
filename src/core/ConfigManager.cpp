@@ -28,7 +28,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QStandardPaths>
-#include <QtCore/QTextStream>
+#include <QTextStream>
 
 #include "ConfigManager.h"
 #include "MainWindow.h"

@@ -24,16 +24,16 @@
 
 #include "PatternClipView.h"
 
+#include <QApplication>
 #include <QMenu>
 #include <QPainter>
 
-#include "gui_templates.h"
+#include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "PatternEditor.h"
+#include "PatternClip.h"
 #include "PatternStore.h"
 #include "RenameDialog.h"
-#include "Song.h"
 #include "ToolTip.h"
 
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
@@ -123,9 +123,9 @@ void PatternClipView::paintEvent(QPaintEvent*)
 								x < width() - 2;
 			x += static_cast<int>( t * pixelsPerBar() ) )
 		{
-			p.drawLine( x, CLIP_BORDER_WIDTH, x, CLIP_BORDER_WIDTH + lineSize );
-			p.drawLine( x, rect().bottom() - ( CLIP_BORDER_WIDTH + lineSize ),
-			 	x, rect().bottom() - CLIP_BORDER_WIDTH );
+			p.drawLine( x, BORDER_WIDTH, x, BORDER_WIDTH + lineSize );
+			p.drawLine( x, rect().bottom() - ( BORDER_WIDTH + lineSize ),
+			 	x, rect().bottom() - BORDER_WIDTH );
 		}
 	}
 
@@ -134,8 +134,8 @@ void PatternClipView::paintEvent(QPaintEvent*)
 
 	// inner border
 	p.setPen( c.lighter( 130 ) );
-	p.drawRect( 1, 1, rect().right() - CLIP_BORDER_WIDTH,
-		rect().bottom() - CLIP_BORDER_WIDTH );	
+	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+		rect().bottom() - BORDER_WIDTH );	
 
 	// outer border
 	p.setPen( c.darker( 300 ) );
@@ -144,7 +144,7 @@ void PatternClipView::paintEvent(QPaintEvent*)
 	// draw the 'muted' pixmap only if the clip was manualy muted
 	if (m_patternClip->isMuted())
 	{
-		const int spacing = CLIP_BORDER_WIDTH;
+		const int spacing = BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );

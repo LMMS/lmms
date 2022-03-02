@@ -25,7 +25,8 @@
 #ifndef MIDI_CLIP_VIEW_H
 #define MIDI_CLIP_VIEW_H
  
-#include "MidiClip.h"
+#include <QStaticText>
+
 #include "ClipView.h"
 
 class MidiClip;

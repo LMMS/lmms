@@ -26,9 +26,8 @@
 #define AUDIO_PORT_H
 
 #include <memory>
-#include <QtCore/QString>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <QString>
+#include <QMutex>
 
 #include "MemoryManager.h"
 #include "PlayHandle.h"

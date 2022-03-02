@@ -26,8 +26,7 @@
 #ifndef PATTERN_CLIP_H
 #define PATTERN_CLIP_H
 
-#include "ClipView.h"
-
+#include "Clip.h"
 
 /*! \brief Dummy clip for PatternTracks
  *

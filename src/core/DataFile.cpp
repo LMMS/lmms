@@ -26,7 +26,7 @@
 
 #include "DataFile.h"
 
-#include <math.h>
+#include <cmath>
 #include <map>
 
 #include <QDebug>

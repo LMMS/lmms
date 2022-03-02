@@ -26,10 +26,11 @@
 #ifndef PATTERN_TRACK_VIEW_H
 #define PATTERN_TRACK_VIEW_H
 
-#include <QtCore/QObject>
 
-#include "PatternTrack.h"
 #include "TrackView.h"
+
+class PatternTrack;
+class TrackLabelButton;
 
 
 class PatternTrackView : public TrackView

@@ -26,25 +26,22 @@
 #define SONG_H
 
 #include <memory>
-#include <utility>
 
-#include <QtCore/QSharedMemory>
-#include <QtCore/QVector>
 #include <QHash>
 #include <QString>
 
 #include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "Controller.h"
-#include "Keymap.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
-#include "Scale.h"
 #include "VstSyncController.h"
 
 
 class AutomationTrack;
+class Keymap;
 class MidiClip;
+class Scale;
 class TimeLineWidget;
 
 
