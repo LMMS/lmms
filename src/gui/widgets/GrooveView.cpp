@@ -1,3 +1,8 @@
+#include "GrooveView.h"
+
+#include <QComboBox>
+#include <QLabel>
+#include <QVBoxLayout>
 
 #include "embed.h"
 #include "Engine.h"
@@ -6,11 +11,11 @@
 #include "GuiApplication.h"
 
 #include "Groove.h"
-#include "GrooveView.h"
 #include "HydrogenSwing.h"
 #include "HalfSwing.h"
 #include "GrooveExperiments.h"
 #include "MidiSwing.h"
+
 
 GrooveView::GrooveView(QWidget * parent) :
 	QWidget(parent)
