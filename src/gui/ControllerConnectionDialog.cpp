@@ -23,10 +23,9 @@
  *
  */
 
-#include <QLayout>
+#include <QHBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QScrollArea>
 #include <QMessageBox>
 
 #include "AudioEngine.h"
@@ -40,9 +39,9 @@
 #include "ComboBox.h"
 #include "GroupBox.h"
 #include "Song.h"
+#include "TabWidget.h"
 #include "ToolButton.h"
 
-#include "gui_templates.h"
 #include "embed.h"
 
 

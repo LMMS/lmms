@@ -1,6 +1,5 @@
 /*
- * BBTrack.h - class BBTrack, a wrapper for using bbEditor
- *              (which is a singleton-class) as track
+ * PatternTrack.h - a track representing a pattern in the PatternStore
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -24,39 +23,39 @@
  */
 
 
-#ifndef BB_TRACK_H
-#define BB_TRACK_H
+#ifndef PATTERN_TRACK_H
+#define PATTERN_TRACK_H
 
 
-#include <QtCore/QMap>
+#include <QMap>
 
-#include "BBTCOView.h"
 #include "Track.h"
 
 class TrackLabelButton;
 class TrackContainer;
 
 
-class LMMS_EXPORT BBTrack : public Track
+/*! Track type used in the Song (Editor) to reference a pattern in the PatternStore */
+class LMMS_EXPORT PatternTrack : public Track
 {
 	Q_OBJECT
 public:
-	BBTrack( TrackContainer* tc );
-	virtual ~BBTrack();
+	PatternTrack(TrackContainer* tc);
+	virtual ~PatternTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	TrackView * createView( TrackContainerView* tcv ) override;
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	Clip* createClip(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 
-	static BBTrack * findBBTrack( int _bb_num );
-	static void swapBBTracks( Track * _track1, Track * _track2 );
+	static PatternTrack* findPatternTrack(int pattern_num);
+	static void swapPatternTracks(Track* track1, Track* track2);
 
-	int index()
+	int patternIndex()
 	{
 		return s_infoMap[this];
 	}
@@ -77,17 +76,17 @@ public:
 protected:
 	inline QString nodeName() const override
 	{
-		return( "bbtrack" );
+		return "patterntrack";
 	}
 
 
 private:
 	QList<Track *> m_disabledTracks;
 
-	typedef QMap<BBTrack *, int> infoMap;
+	typedef QMap<PatternTrack*, int> infoMap;
 	static infoMap s_infoMap;
 
-	friend class BBTrackView;
+	friend class PatternTrackView;
 } ;
 
 

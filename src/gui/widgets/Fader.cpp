@@ -55,7 +55,6 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "TextFloat.h"
-#include "MainWindow.h"
 
 
 TextFloat * Fader::s_textFloat = nullptr;

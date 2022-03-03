@@ -1,7 +1,7 @@
 /*
- * BBTCOView.h
+ * AutomationClipView.h - declaration of class AutomationClipView
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,46 +21,58 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#ifndef BB_TCO_VIEW_H
-#define BB_TCO_VIEW_H
-
-#include "BBTCO.h"
+#ifndef AUTOMATION_CLIP_VIEW_H
+#define AUTOMATION_CLIP_VIEW_H
 
 #include <QStaticText>
 
+#include "ClipView.h"
 
-class BBTCOView : public TrackContentObjectView
+class AutomationClip;
+
+
+class AutomationClipView : public ClipView
 {
 	Q_OBJECT
-public:
-	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
-	virtual ~BBTCOView() = default;
 
+
+public:
+	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
+	virtual ~AutomationClipView();
 
 public slots:
+	/// Opens this view's clip in the global automation editor
+	void openInAutomationEditor();
 	void update() override;
 
+
 protected slots:
-	void openInBBEditor();
 	void resetName();
 	void changeName();
-
+	void disconnectObject( QAction * _a );
+	void toggleRecording();
+	void flipY();
+	void flipX();
 
 protected:
-	void paintEvent( QPaintEvent * pe ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
 	void constructContextMenu( QMenu * ) override;
+	void mouseDoubleClickEvent(QMouseEvent * me ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
 
 
 private:
-	BBTCO * m_bbTCO;
+	AutomationClip * m_clip;
 	QPixmap m_paintPixmap;
 	
 	QStaticText m_staticTextName;
-} ;
+	
+	static QPixmap * s_clip_rec;
 
+	void scaleTimemapToFit( float oldMin, float oldMax );
+} ;
 
 
 #endif

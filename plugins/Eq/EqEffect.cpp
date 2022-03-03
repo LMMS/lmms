@@ -25,8 +25,6 @@
 #include "EqEffect.h"
 
 #include "Engine.h"
-#include "EqFader.h"
-#include "interpolation.h"
 #include "lmms_math.h"
 
 #include "embed.h"

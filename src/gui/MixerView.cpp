@@ -22,15 +22,8 @@
  *
  */
 
-#include <QtGlobal>
-#include <QDebug>
 
-#include <QButtonGroup>
-#include <QInputDialog>
 #include <QLayout>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
@@ -45,11 +38,12 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "AudioEngine.h"
-#include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "PatternStore.h"
 #include "SampleTrack.h"
+#include "SendButtonIndicator.h"
 #include "Song.h"
-#include "BBTrackContainer.h"
+#include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 MixerView::MixerView() :
@@ -238,10 +232,10 @@ void MixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void MixerView::updateMaxChannelSelector()
 {
-	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
-	TrackContainer::TrackList bbTrackList = Engine::getBBTrackContainer()->tracks();
+	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
+	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTrackList, bbTrackList};
+	TrackContainer::TrackList trackLists[] = {songTracks, patternStoreTracks};
 	for(int tl=0; tl<2; ++tl)
 	{
 		TrackContainer::TrackList trackList = trackLists[tl];
@@ -435,7 +429,7 @@ void MixerView::deleteUnusedChannels()
 {
 	TrackContainer::TrackList tracks;
 	tracks += Engine::getSong()->tracks();
-	tracks += Engine::getBBTrackContainer()->tracks();
+	tracks += Engine::patternStore()->tracks();
 
 	std::vector<bool> inUse(m_mixerChannelViews.size(), false);
 

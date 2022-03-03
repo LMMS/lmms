@@ -1,5 +1,5 @@
 /*
- * SampleTCO.h
+ * SampleClip.h
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,24 +22,24 @@
  *
  */
  
-#ifndef SAMPLE_TCO_H
-#define SAMPLE_TCO_H
+#ifndef SAMPLE_CLIP_H
+#define SAMPLE_CLIP_H
 
-#include "SampleBuffer.h"
-#include "SampleTrack.h"
-#include "TrackContentObject.h"
- 
+#include "Clip.h"
 
-class SampleTCO : public TrackContentObject
+class SampleBuffer;
+
+
+class SampleClip : public Clip
 {
 	Q_OBJECT
 	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
-	SampleTCO( Track * _track );
-	SampleTCO( const SampleTCO& orig );
-	virtual ~SampleTCO();
+	SampleClip( Track * _track );
+	SampleClip( const SampleClip& orig );
+	virtual ~SampleClip();
 
-	SampleTCO& operator=( const SampleTCO& that ) = delete;
+	SampleClip& operator=( const SampleClip& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
 	const QString & sampleFile() const;
@@ -48,7 +48,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return "sampletco";
+		return "sampleclip";
 	}
 
 	SampleBuffer* sampleBuffer()
@@ -59,7 +59,7 @@ public:
 	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
-	TrackContentObjectView * createView( TrackView * _tv ) override;
+	ClipView * createView( TrackView * _tv ) override;
 
 
 	bool isPlaying() const;
@@ -71,7 +71,7 @@ public slots:
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
-	void updateTrackTcos();
+	void updateTrackClips();
 
 
 private:
@@ -79,7 +79,7 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
-	friend class SampleTCOView;
+	friend class SampleClipView;
 
 
 signals:

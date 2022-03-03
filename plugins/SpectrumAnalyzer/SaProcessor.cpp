@@ -36,8 +36,10 @@
 #endif
 #include <QMutexLocker>
 
-#include "lmms_math.h"
+#include "fft_helpers.h"
+#include "lmms_constants.h"
 #include "LocklessRingBuffer.h"
+#include "SaControls.h"
 
 
 SaProcessor::SaProcessor(const SaControls *controls) :

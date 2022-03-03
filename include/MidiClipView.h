@@ -1,5 +1,5 @@
 /*
- * PatternView.h
+ * MidiClipView.h
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,22 +22,23 @@
  *
  */
  
-#ifndef PATTERN_VIEW_H
-#define PATTERN_VIEW_H
+#ifndef MIDI_CLIP_VIEW_H
+#define MIDI_CLIP_VIEW_H
  
-#include "Pattern.h"
-#include "TrackContentObjectView.h"
+#include <QStaticText>
 
-class Pattern;
+#include "ClipView.h"
+
+class MidiClip;
  
  
-class PatternView : public TrackContentObjectView
+class MidiClipView : public ClipView
 {
 	Q_OBJECT
 
 public:
-	PatternView( Pattern* pattern, TrackView* parent );
- 	virtual ~PatternView() = default;
+	MidiClipView( MidiClip* clip, TrackView* parent );
+ 	virtual ~MidiClipView() = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
@@ -57,7 +58,7 @@ public:
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
-	Pattern* getPattern();
+	MidiClip* getMidiClip();
 	void update() override;
 
 
@@ -83,7 +84,7 @@ private:
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
-	Pattern* m_pat;
+	MidiClip* m_clip;
 	QPixmap m_paintPixmap;
 
 	QColor m_noteFillColor;
@@ -93,7 +94,7 @@ private:
 
 	QStaticText m_staticTextName;
 	
-	bool m_legacySEBB;
+	bool m_legacySEPattern;
 } ;
  
  

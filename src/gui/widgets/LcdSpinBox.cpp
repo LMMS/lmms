@@ -24,17 +24,11 @@
  */
 
 #include <cmath>
-#include <QApplication>
-#include <QLabel>
 #include <QMouseEvent>
-#include <QPainter>
-#include <QStyleOptionFrameV2>
 #include <QInputDialog>
 
 #include "LcdSpinBox.h"
 #include "CaptionMenu.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 
 
 

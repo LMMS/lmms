@@ -25,8 +25,6 @@
 
 #include <QDomElement>
 #include <QTimer>
-#include <QApplication>
-#include <QLayout>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolBar>
@@ -37,7 +35,6 @@
 #include "NStateButton.h"
 #include "GuiApplication.h"
 #include "TextFloat.h"
-#include "SongEditor.h"
 
 
 QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
@@ -330,7 +327,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	}
 	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) )
 	{
-		m_action = SelectSongTCO;
+		m_action = SelectSongClip;
 		m_initalXSelect = event->x();
 	}
 	else if( event->button() == Qt::RightButton )
@@ -422,7 +419,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			update();
 			break;
 		}
-	case SelectSongTCO:
+	case SelectSongClip:
 			emit regionSelectedFromPixels( m_initalXSelect , event->x() );
 		break;
 
@@ -438,6 +435,6 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = nullptr;
-	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
+	if ( m_action == SelectSongClip ) { emit selectionFinished(); }
 	m_action = NoAction;
 }

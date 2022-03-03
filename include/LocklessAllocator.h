@@ -26,7 +26,7 @@
 #define LOCKLESS_ALLOCATOR_H
 
 #include <atomic>
-#include <stddef.h>
+#include <cstddef>
 
 class LocklessAllocator
 {

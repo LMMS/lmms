@@ -23,7 +23,6 @@
  */
 
 
-#include <QDomDocument>
 #include <QDir>
 #include <QApplication>
 #include <QFile>
@@ -37,9 +36,9 @@
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
 #include "AutomationTrack.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ConfigManager.h"
-#include "Pattern.h"
+#include "MidiClip.h"
 #include "Instrument.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
@@ -47,7 +46,6 @@
 #include "debug.h"
 #include "Song.h"
 
-#include "embed.h"
 #include "plugin_export.h"
 
 #include "portsmf/allegro.h"
@@ -159,7 +157,7 @@ public:
 	{ }
 	
 	AutomationTrack * at;
-	AutomationPattern * ap;
+	AutomationClip * ap;
 	TimePos lastPos;
 	
 	smfMidiCC & create( TrackContainer* tc, QString tn )
@@ -192,8 +190,8 @@ public:
 		if( !ap || time > lastPos + DefaultTicksPerBar )
 		{
 			TimePos pPos = TimePos( time.getBar(), 0 );
-			ap = dynamic_cast<AutomationPattern*>(
-				at->createTCO(pPos));
+			ap = dynamic_cast<AutomationClip*>(
+				at->createClip(pPos));
 			ap->addObject( objModel );
 		}
 
@@ -221,7 +219,7 @@ public:
 	{ }
 	
 	InstrumentTrack * it;
-	Pattern* p;
+	MidiClip* p;
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
@@ -259,7 +257,7 @@ public:
 			it->pitchRangeModel()->setInitValue( 2 );
 
 			// Create a default pattern
-			p = dynamic_cast<Pattern*>(it->createTCO(0));
+			p = dynamic_cast<MidiClip*>(it->createClip(0));
 		}
 		return this;
 	}
@@ -269,30 +267,30 @@ public:
 	{
 		if (!p)
 		{
-			p = dynamic_cast<Pattern*>(it->createTCO(0));
+			p = dynamic_cast<MidiClip*>(it->createClip(0));
 		}
 		p->addNote(n, false);
 		hasNotes = true;
 	}
 
-	void splitPatterns()
+	void splitMidiClips()
 	{
-		Pattern * newPattern = nullptr;
+		MidiClip * newMidiClip = nullptr;
 		TimePos lastEnd(0);
 
 		p->rearrangeAllNotes();
 		for (auto n : p->notes())
 		{
-			if (!newPattern || n->pos() > lastEnd + DefaultTicksPerBar)
+			if (!newMidiClip || n->pos() > lastEnd + DefaultTicksPerBar)
 			{
 				TimePos pPos = TimePos(n->pos().getBar(), 0);
-				newPattern = dynamic_cast<Pattern*>(it->createTCO(pPos));
+				newMidiClip = dynamic_cast<MidiClip*>(it->createClip(pPos));
 			}
 			lastEnd = n->pos() + n->length();
 
 			Note newNote(*n);
-			newNote.setPos(n->pos(newPattern->startPosition()));
-			newPattern->addNote(newNote, false);
+			newNote.setPos(n->pos(newMidiClip->startPosition()));
+			newMidiClip->addNote(newNote, false);
 		}
 
 		delete p;
@@ -336,12 +334,12 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	AutomationTrack * dt = dynamic_cast<AutomationTrack*>(
 		Track::create(Track::AutomationTrack, Engine::getSong()));
 	dt->setName(tr("MIDI Time Signature Denominator"));
-	AutomationPattern * timeSigNumeratorPat =
-		new AutomationPattern(nt);
+	AutomationClip * timeSigNumeratorPat =
+		new AutomationClip(nt);
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
 	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
-	AutomationPattern * timeSigDenominatorPat =
-		new AutomationPattern(dt);
+	AutomationClip * timeSigDenominatorPat =
+		new AutomationClip(dt);
 	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
 	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 	
@@ -364,7 +362,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setValue( 2 );
 
 	// Tempo stuff
-	AutomationPattern * tap = tc->tempoAutomationPattern();
+	AutomationClip * tap = tc->tempoAutomationClip();
 	if( tap )
 	{
 		tap->clear();
@@ -565,7 +563,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	{
 		if (c.second.hasNotes)
 		{
-			c.second.splitPatterns();
+			c.second.splitMidiClips();
 		}
 		else if (c.second.it)
 		{

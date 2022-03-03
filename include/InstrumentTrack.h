@@ -35,10 +35,8 @@
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
 #include "Piano.h"
-#include "Pitch.h"
 #include "Plugin.h"
 #include "Track.h"
-#include "TrackView.h"
 
 
 class Instrument;
@@ -111,12 +109,12 @@ public:
 
 	// play everything in given frame-range - creates note-play-handles
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 ) override;
+						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	// create new view for me
 	TrackView * createView( TrackContainerView* tcv ) override;
 
-	// create new track-content-object = pattern
-	TrackContentObject* createTCO(const TimePos & pos) override;
+	// create new track-content-object = clip
+	Clip* createClip(const TimePos & pos) override;
 
 
 	// called by track

@@ -25,16 +25,15 @@
 #ifndef AUDIO_ENGINE_H
 #define AUDIO_ENGINE_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
-#include <QtCore/QWaitCondition>
+#include <QMutex>
+#include <QThread>
+#include <QVector>
+#include <QWaitCondition>
 #include <samplerate.h>
 
 
 #include "lmms_basics.h"
 #include "LocklessList.h"
-#include "Note.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"
@@ -54,9 +53,6 @@ const int BYTES_PER_FRAME = sizeof( sampleFrame );
 const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
-
-
-#include "PlayHandle.h"
 
 
 class AudioEngineWorkerThread;

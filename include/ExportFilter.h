@@ -26,7 +26,7 @@
 #ifndef EXPORT_FILTER_H
 #define EXPORT_FILTER_H
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "TrackContainer.h"
 #include "Plugin.h"
@@ -40,7 +40,7 @@ public:
 
 
 	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracksBB,
+				const TrackContainer::TrackList &patternTracks,
 				int tempo, int masterPitch, const QString &filename ) = 0;
 protected:
 

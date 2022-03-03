@@ -1,6 +1,6 @@
 /*
  * TrackContainer.h - base-class for all track-containers like Song-Editor,
- *                    BB-Editor...
+ *                    Pattern Editor...
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -26,13 +26,13 @@
 #ifndef TRACK_CONTAINER_H
 #define TRACK_CONTAINER_H
 
-#include <QtCore/QReadWriteLock>
+#include <QReadWriteLock>
 
 #include "Track.h"
 #include "JournallingObject.h"
 
 
-class AutomationPattern;
+class AutomationClip;
 class InstrumentTrack;
 class TrackContainerView;
 
@@ -44,7 +44,7 @@ public:
 	typedef QVector<Track *> TrackList;
 	enum TrackContainerTypes
 	{
-		BBContainer,
+		PatternContainer,
 		SongContainer
 	} ;
 
@@ -56,7 +56,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 
 
-	virtual AutomationPattern * tempoAutomationPattern()
+	virtual AutomationClip * tempoAutomationClip()
 	{
 		return nullptr;
 	}
@@ -93,13 +93,13 @@ public:
 		return m_TrackContainerType;
 	}
 
-	virtual AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const;
+	virtual AutomatedValueMap automatedValuesAt(TimePos time, int clipNum = -1) const;
 
 signals:
 	void trackAdded( Track * _track );
 
 protected:
-	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int tcoNum = -1);
+	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);
 
 	mutable QReadWriteLock m_tracksMutex;
 

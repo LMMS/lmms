@@ -1,5 +1,5 @@
 /*
- * AutomationPatternView.cpp - implementation of view for AutomationPattern
+ * AutomationClipView.cpp - implementation of view for AutomationClip
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -21,8 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#include "AutomationPatternView.h"
+#include "AutomationClipView.h"
 
+#include <QApplication>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -31,36 +32,36 @@
 #include "AutomationEditor.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "ProjectJournal.h"
 #include "RenameDialog.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
+#include "Track.h"
 
 #include "Engine.h"
 
 
-QPixmap * AutomationPatternView::s_pat_rec = nullptr;
+QPixmap * AutomationClipView::s_clip_rec = nullptr;
 
-AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
+AutomationClipView::AutomationClipView( AutomationClip * _clip,
 						TrackView * _parent ) :
-	TrackContentObjectView( _pattern, _parent ),
-	m_pat( _pattern ),
+	ClipView( _clip, _parent ),
+	m_clip( _clip ),
 	m_paintPixmap()
 {
-	connect( m_pat, SIGNAL( dataChanged() ),
+	connect( m_clip, SIGNAL( dataChanged() ),
 			this, SLOT( update() ) );
-	connect( getGUI()->automationEditor(), SIGNAL( currentPatternChanged() ),
+	connect( getGUI()->automationEditor(), SIGNAL( currentClipChanged() ),
 			this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
-	ToolTip::add(this, m_pat->name());
+	ToolTip::add(this, m_clip->name());
 	setStyle( QApplication::style() );
 
-	if( s_pat_rec == nullptr ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
-							"pat_rec" ) ); }
+	if( s_clip_rec == nullptr ) { s_clip_rec = new QPixmap( embed::getIconPixmap(
+							"clip_rec" ) ); }
 
 	update();
 }
@@ -68,71 +69,71 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 
 
-AutomationPatternView::~AutomationPatternView()
+AutomationClipView::~AutomationClipView()
 {
 }
 
 
 
 
-void AutomationPatternView::openInAutomationEditor()
+void AutomationClipView::openInAutomationEditor()
 {
 	if(getGUI() != nullptr)
-		getGUI()->automationEditor()->open(m_pat);
+		getGUI()->automationEditor()->open(m_clip);
 }
 
 
-void AutomationPatternView::update()
+void AutomationClipView::update()
 {
-	ToolTip::add(this, m_pat->name());
+	ToolTip::add(this, m_clip->name());
 
-	TrackContentObjectView::update();
-}
-
-
-
-void AutomationPatternView::resetName()
-{
-	m_pat->setName( QString() );
+	ClipView::update();
 }
 
 
 
-
-void AutomationPatternView::changeName()
+void AutomationClipView::resetName()
 {
-	QString s = m_pat->name();
+	m_clip->setName( QString() );
+}
+
+
+
+
+void AutomationClipView::changeName()
+{
+	QString s = m_clip->name();
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
-	m_pat->setName( s );
+	m_clip->setName( s );
 	update();
 }
 
 
 
 
-void AutomationPatternView::disconnectObject( QAction * _a )
+void AutomationClipView::disconnectObject( QAction * _a )
 {
 	JournallingObject * j = Engine::projectJournal()->
 				journallingObject( _a->data().toInt() );
 	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
-		float oldMin = m_pat->getMin();
-		float oldMax = m_pat->getMax();
+		float oldMin = m_clip->getMin();
+		float oldMax = m_clip->getMax();
 
-		m_pat->m_objects.erase( std::find( m_pat->m_objects.begin(),
-					m_pat->m_objects.end(),
+		m_clip->m_objects.erase( std::find( m_clip->m_objects.begin(),
+					m_clip->m_objects.end(),
 				dynamic_cast<AutomatableModel *>( j ) ) );
 		update();
 
 		//If automation editor is opened, update its display after disconnection
 		if( getGUI()->automationEditor() )
 		{
-			getGUI()->automationEditor()->m_editor->updateAfterPatternChange();
+			getGUI()->automationEditor()->m_editor->updateAfterClipChange();
 		}
 
-		//if there is no more connection connected to the AutomationPattern
-		if( m_pat->m_objects.size() == 0 )
+		//if there is no more connection connected to the AutomationClip
+		if( m_clip->m_objects.size() == 0 )
 		{
 			//scale the points to fit the new min. and max. value
 			this->scaleTimemapToFit( oldMin, oldMax );
@@ -141,34 +142,34 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 }
 
 
-void AutomationPatternView::toggleRecording()
+void AutomationClipView::toggleRecording()
 {
-	m_pat->setRecording( ! m_pat->isRecording() );
+	m_clip->setRecording( ! m_clip->isRecording() );
 	update();
 }
 
 
 
 
-void AutomationPatternView::flipY()
+void AutomationClipView::flipY()
 {
-	m_pat->flipY( m_pat->getMin(), m_pat->getMax() );
+	m_clip->flipY( m_clip->getMin(), m_clip->getMax() );
 	update();
 }
 
 
 
 
-void AutomationPatternView::flipX()
+void AutomationClipView::flipX()
 {
-	m_pat->flipX( m_pat->length() );
+	m_clip->flipX( m_clip->length() );
 	update();
 }
 
 
 
 
-void AutomationPatternView::constructContextMenu( QMenu * _cm )
+void AutomationClipView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
 				tr( "Open in Automation editor" ), _cm );
@@ -179,7 +180,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
-			tr( "Clear" ), m_pat, SLOT( clear() ) );
+			tr( "Clear" ), m_clip, SLOT( clear() ) );
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
@@ -196,14 +197,14 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT( flipX() ) );
-	if( !m_pat->m_objects.isEmpty() )
+	if( !m_clip->m_objects.isEmpty() )
 	{
 		_cm->addSeparator();
 		QMenu * m = new QMenu( tr( "%1 Connections" ).
-				arg( m_pat->m_objects.count() ), _cm );
-		for( AutomationPattern::objectVector::iterator it =
-						m_pat->m_objects.begin();
-					it != m_pat->m_objects.end(); ++it )
+				arg( m_clip->m_objects.count() ), _cm );
+		for( AutomationClip::objectVector::iterator it =
+						m_clip->m_objects.begin();
+					it != m_clip->m_objects.end(); ++it )
 		{
 			if( *it )
 			{
@@ -222,7 +223,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 
 
 
-void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * me )
+void AutomationClipView::mouseDoubleClickEvent( QMouseEvent * me )
 {
 	if(me->button() != Qt::LeftButton)
 	{
@@ -235,7 +236,7 @@ void AutomationPatternView::mouseDoubleClickEvent( QMouseEvent * me )
 
 
 
-void AutomationPatternView::paintEvent( QPaintEvent * )
+void AutomationClipView::paintEvent( QPaintEvent * )
 {
 	QPainter painter( this );
 
@@ -256,13 +257,13 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c = getColorForDisplay( painter.background().color() );
-	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
-	bool current = getGUI()->automationEditor()->currentPattern() == m_pat;
+	bool muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
+	bool current = getGUI()->automationEditor()->currentClip() == m_clip;
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
-	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
@@ -275,19 +276,19 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 
 	// pixels per bar
-	const float ppb = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-				/ (float) m_pat->timeMapLength().getBar() :
+	const float ppb = fixedClips() ?
+			( parentWidget()->width() - 2 * BORDER_WIDTH )
+				/ (float) m_clip->timeMapLength().getBar() :
 								pixelsPerBar();
 
-	const float min = m_pat->firstObject()->minValue<float>();
-	const float max = m_pat->firstObject()->maxValue<float>();
+	const float min = m_clip->firstObject()->minValue<float>();
+	const float max = m_clip->firstObject()->maxValue<float>();
 
 	const float y_scale = max - min;
-	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
+	const float h = ( height() - 2 * BORDER_WIDTH ) / y_scale;
 	const float ppTick  = ppb / TimePos::ticksPerBar();
 
-	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
+	p.translate( 0.0f, max * height() / y_scale - BORDER_WIDTH );
 	p.scale( 1.0f, -h );
 
 	QLinearGradient lin2grad( 0, min, 0, max );
@@ -300,15 +301,15 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	lin2grad.setColorAt( 0, col.darker( 150 ) );
 
 	p.setRenderHints( QPainter::Antialiasing, true );
-	for( AutomationPattern::timeMap::const_iterator it =
-						m_pat->getTimeMap().begin();
-					it != m_pat->getTimeMap().end(); ++it )
+	for( AutomationClip::timeMap::const_iterator it =
+						m_clip->getTimeMap().begin();
+					it != m_clip->getTimeMap().end(); ++it )
 	{
-		if( it+1 == m_pat->getTimeMap().end() )
+		if( it+1 == m_clip->getTimeMap().end() )
 		{
 			const float x1 = POS(it) * ppTick;
-			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
-			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
+			const float x2 = (float)( width() - BORDER_WIDTH );
+			if( x1 > ( width() - BORDER_WIDTH ) ) break;
 			// We are drawing the space after the last node, so we use the outValue
 			if( gradient() )
 			{
@@ -321,7 +322,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 			break;
 		}
 
-		float *values = m_pat->valuesAfter(POS(it));
+		float *values = m_clip->valuesAfter(POS(it));
 
 		// We are creating a path to draw a polygon representing the values between two
 		// nodes. When we have two nodes with discrete progression, we will basically have
@@ -330,7 +331,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		// the value of the end of the shape between the two nodes will be the inValue of
 		// the next node.
 		float nextValue;
-		if( m_pat->progressionType() == AutomationPattern::DiscreteProgression )
+		if( m_clip->progressionType() == AutomationClip::DiscreteProgression )
 		{
 			nextValue = OUTVAL(it);
 		}
@@ -347,7 +348,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		for (int i = POS(it) + 1; i < POS(it + 1); i++)
 		{
 			x = i * ppTick;
-			if( x > ( width() - TCO_BORDER_WIDTH ) ) break;
+			if( x > ( width() - BORDER_WIDTH ) ) break;
 			float value = values[i - POS(it)];
 			path.lineTo( QPointF( x, value ) );
 
@@ -374,39 +375,39 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for (bar_t b = 1; b < width() - TCO_BORDER_WIDTH; ++b)
+	for (bar_t b = 1; b < width() - BORDER_WIDTH; ++b)
 	{
-		const int bx = TCO_BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
+		const int bx = BORDER_WIDTH + static_cast<int>(ppb * b) - 2;
 
 		//top line
-		p.drawLine(bx, TCO_BORDER_WIDTH, bx, TCO_BORDER_WIDTH + lineSize);
+		p.drawLine(bx, BORDER_WIDTH, bx, BORDER_WIDTH + lineSize);
 
 		//bottom line
-		p.drawLine(bx, rect().bottom() - (lineSize + TCO_BORDER_WIDTH), bx, rect().bottom() - TCO_BORDER_WIDTH);
+		p.drawLine(bx, rect().bottom() - (lineSize + BORDER_WIDTH), bx, rect().bottom() - BORDER_WIDTH);
 	}
 
 	// recording icon for when recording automation
-	if( m_pat->isRecording() )
+	if( m_clip->isRecording() )
 	{
-		p.drawPixmap( 1, rect().bottom() - s_pat_rec->height(), *s_pat_rec );
+		p.drawPixmap( 1, rect().bottom() - s_clip_rec->height(), *s_clip_rec );
 	}
 
-	// pattern name
-	paintTextLabel(m_pat->name(), p);
+	// clip name
+	paintTextLabel(m_clip->name(), p);
 
 	// inner border
 	p.setPen( c.lighter( current ? 160 : 130 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-		rect().bottom() - TCO_BORDER_WIDTH );
+	p.drawRect( 1, 1, rect().right() - BORDER_WIDTH,
+		rect().bottom() - BORDER_WIDTH );
 
 	// outer border
 	p.setPen( current? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 
-	// draw the 'muted' pixmap only if the pattern was manualy muted
-	if( m_pat->isMuted() )
+	// draw the 'muted' pixmap only if the clip was manualy muted
+	if( m_clip->isMuted() )
 	{
-		const int spacing = TCO_BORDER_WIDTH;
+		const int spacing = BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
@@ -420,19 +421,19 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 
 
-void AutomationPatternView::dragEnterEvent( QDragEnterEvent * _dee )
+void AutomationClipView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 	if( !_dee->isAccepted() )
 	{
-		TrackContentObjectView::dragEnterEvent( _dee );
+		ClipView::dragEnterEvent( _dee );
 	}
 }
 
 
 
 
-void AutomationPatternView::dropEvent( QDropEvent * _de )
+void AutomationClipView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString val = StringPairDrag::decodeValue( _de );
@@ -443,12 +444,12 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 					journallingObject( val.toInt() ) );
 		if( mod != nullptr )
 		{
-			bool added = m_pat->addObject( mod );
+			bool added = m_clip->addObject( mod );
 			if ( !added )
 			{
 				TextFloat::displayMessage( mod->displayName(),
 							   tr( "Model is already connected "
-							   "to this pattern." ),
+							   "to this clip." ),
 							   embed::getIconPixmap( "automation" ),
 							   2000 );
 			}
@@ -456,14 +457,14 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 		update();
 
 		if( getGUI()->automationEditor() &&
-			getGUI()->automationEditor()->currentPattern() == m_pat )
+			getGUI()->automationEditor()->currentClip() == m_clip )
 		{
-			getGUI()->automationEditor()->setCurrentPattern( m_pat );
+			getGUI()->automationEditor()->setCurrentClip( m_clip );
 		}
 	}
 	else
 	{
-		TrackContentObjectView::dropEvent( _de );
+		ClipView::dropEvent( _de );
 	}
 }
 
@@ -473,10 +474,10 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 /**
  * @brief Preserves the auto points over different scale
  */
-void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
+void AutomationClipView::scaleTimemapToFit( float oldMin, float oldMax )
 {
-	float newMin = m_pat->getMin();
-	float newMax = m_pat->getMax();
+	float newMin = m_clip->getMin();
+	float newMax = m_clip->getMax();
 
 	if( oldMin == newMin && oldMax == newMax )
 	{
@@ -487,8 +488,8 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 	// only the inValue is being considered and the outValue is being reset to the inValue (so discrete jumps
 	// are discarded). Possibly later we will want discrete jumps to be maintained so we will need to upgrade
 	// the logic to account for them.
-	for( AutomationPattern::timeMap::iterator it = m_pat->m_timeMap.begin();
-		it != m_pat->m_timeMap.end(); ++it )
+	for( AutomationClip::timeMap::iterator it = m_clip->m_timeMap.begin();
+		it != m_clip->m_timeMap.end(); ++it )
 	{
 		// If the values are out of the previous range, fix them so they are
 		// between oldMin and oldMax.
@@ -506,5 +507,5 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 		it.value().setOutValue(INVAL(it));
 	}
 
-	m_pat->generateTangents();
+	m_clip->generateTangents();
 }

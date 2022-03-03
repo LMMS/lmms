@@ -1,5 +1,5 @@
 /*
- * BBTCO.cpp - implementation of class bbTCO
+ * PatternClip.cpp - implementation of class PatternClip
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,19 +22,20 @@
  *
  */
  
- #include "BBTCO.h"
+#include "PatternClip.h"
  
- #include <QDomElement>
+#include <QDomElement>
  
- #include "BBTrack.h"
- #include "BBTrackContainer.h"
- #include "Engine.h"
- 
+#include "Engine.h"
+#include "PatternClipView.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
 
-BBTCO::BBTCO( Track * _track ) :
-	TrackContentObject( _track )
+
+PatternClip::PatternClip(Track* track) :
+	Clip(track)
 {
-	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
+	bar_t t = Engine::patternStore()->lengthOfPattern(patternIndex());
 	if( t > 0 )
 	{
 		saveJournallingState( false );
@@ -44,7 +45,7 @@ BBTCO::BBTCO( Track * _track ) :
 	setAutoResize( false );
 }
 
-void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
+void PatternClip::saveSettings(QDomDocument& doc, QDomElement& element)
 {
 	element.setAttribute( "name", name() );
 	if( element.parentNode().nodeName() == "clipboard" )
@@ -66,7 +67,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 
 
 
-void BBTCO::loadSettings( const QDomElement & element )
+void PatternClip::loadSettings(const QDomElement& element)
 {
 	setName( element.attribute( "name" ) );
 	if( element.attribute( "pos" ).toInt() >= 0 )
@@ -101,14 +102,14 @@ void BBTCO::loadSettings( const QDomElement & element )
 
 
 
-int BBTCO::bbTrackIndex()
+int PatternClip::patternIndex()
 {
-	return dynamic_cast<BBTrack *>( getTrack() )->index();
+	return dynamic_cast<PatternTrack*>(getTrack())->patternIndex();
 }
 
 
 
-TrackContentObjectView * BBTCO::createView( TrackView * _tv )
+ClipView* PatternClip::createView(TrackView* tv)
 {
-	return new BBTCOView( this, _tv );
+	return new PatternClipView(this, tv);
 }

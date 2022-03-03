@@ -1,6 +1,6 @@
 /*
  * TrackContainer.cpp - implementation of base class for all trackcontainers
- *                      like Song-Editor, BB-Editor...
+ *                      like Song-Editor, Pattern Editor...
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -24,18 +24,17 @@
  */
 
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QProgressDialog>
 #include <QDomElement>
 #include <QWriteLocker>
 
-#include "AutomationPattern.h"
-#include "AutomationTrack.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
+#include "AutomationClip.h"
 #include "embed.h"
 #include "TrackContainer.h"
-#include "InstrumentTrack.h"
+#include "PatternClip.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
 #include "Song.h"
 
 #include "GuiApplication.h"
@@ -238,7 +237,7 @@ bool TrackContainer::isEmpty() const
 	for( TrackList::const_iterator it = m_tracks.begin();
 						it != m_tracks.end(); ++it )
 	{
-		if( !( *it )->getTCOs().isEmpty() )
+		if( !( *it )->getClips().isEmpty() )
 		{
 			return false;
 		}
@@ -248,15 +247,15 @@ bool TrackContainer::isEmpty() const
 
 
 
-AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int tcoNum) const
+AutomatedValueMap TrackContainer::automatedValuesAt(TimePos time, int clipNum) const
 {
-	return automatedValuesFromTracks(tracks(), time, tcoNum);
+	return automatedValuesFromTracks(tracks(), time, clipNum);
 }
 
 
-AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int tcoNum)
+AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, TimePos time, int clipNum)
 {
-	Track::tcoVector tcos;
+	Track::clipVector clips;
 
 	for (Track* track: tracks)
 	{
@@ -268,12 +267,12 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		{
 		case Track::AutomationTrack:
 		case Track::HiddenAutomationTrack:
-		case Track::BBTrack:
-			if (tcoNum < 0) {
-				track->getTCOsInRange(tcos, 0, time);
+		case Track::PatternTrack:
+			if (clipNum < 0) {
+				track->getClipsInRange(clips, 0, time);
 			} else {
-				Q_ASSERT(track->numOfTCOs() > tcoNum);
-				tcos << track->getTCO(tcoNum);
+				Q_ASSERT(track->numOfClips() > clipNum);
+				clips << track->getClip(clipNum);
 			}
 		default:
 			break;
@@ -282,15 +281,15 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 
 	AutomatedValueMap valueMap;
 
-	Q_ASSERT(std::is_sorted(tcos.begin(), tcos.end(), TrackContentObject::comparePosition));
+	Q_ASSERT(std::is_sorted(clips.begin(), clips.end(), Clip::comparePosition));
 
-	for(TrackContentObject* tco : tcos)
+	for(Clip* clip : clips)
 	{
-		if (tco->isMuted() || tco->startPosition() > time) {
+		if (clip->isMuted() || clip->startPosition() > time) {
 			continue;
 		}
 
-		if (auto* p = dynamic_cast<AutomationPattern *>(tco))
+		if (auto* p = dynamic_cast<AutomationClip *>(clip))
 		{
 			if (! p->hasAutomation()) {
 				continue;
@@ -306,19 +305,19 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 				valueMap[model] = value;
 			}
 		}
-		else if (auto* bb = dynamic_cast<BBTCO *>(tco))
+		else if (auto* pattern = dynamic_cast<PatternClip*>(clip))
 		{
-			auto bbIndex = dynamic_cast<class BBTrack*>(bb->getTrack())->index();
-			auto bbContainer = Engine::getBBTrackContainer();
+			auto patIndex = dynamic_cast<class PatternTrack*>(pattern->getTrack())->patternIndex();
+			auto patStore = Engine::patternStore();
 
-			TimePos bbTime = time - tco->startPosition();
-			bbTime = std::min(bbTime, tco->length());
-			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * TimePos::ticksPerBar());
+			TimePos patTime = time - clip->startPosition();
+			patTime = std::min(patTime, clip->length());
+			patTime = patTime % (patStore->lengthOfPattern(patIndex) * TimePos::ticksPerBar());
 
-			auto bbValues = bbContainer->automatedValuesAt(bbTime, bbIndex);
-			for (auto it=bbValues.begin(); it != bbValues.end(); it++)
+			auto patValues = patStore->automatedValuesAt(patTime, patIndex);
+			for (auto it=patValues.begin(); it != patValues.end(); it++)
 			{
-				// override old values, bb track with the highest index takes precedence
+				// override old values, pattern track with the highest index takes precedence
 				valueMap[it.key()] = it.value();
 			}
 		}

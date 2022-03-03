@@ -29,11 +29,12 @@
 
 #include <QWidget>
 
-#include "EffectControls.h"
-#include "EqCurve.h"
-#include "TextFloat.h"
 
+class BoolModel;
 class EqControls;
+class EqCurve;
+class EqHandle;
+class FloatModel;
 
 class EqBand
 {

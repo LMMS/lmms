@@ -26,7 +26,7 @@
 #ifndef IMPORT_FILTER_H
 #define IMPORT_FILTER_H
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "Plugin.h"
 

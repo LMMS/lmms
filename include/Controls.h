@@ -26,7 +26,6 @@
 #define CONTROLS_H
 
 
-#include "Model.h"
 
 // headers only required for covariance
 #include "AutomatableModel.h"

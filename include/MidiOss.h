@@ -29,8 +29,8 @@
 
 #ifdef LMMS_HAVE_OSS
 
-#include <QtCore/QThread>
-#include <QtCore/QFile>
+#include <QThread>
+#include <QFile>
 
 #include "MidiClient.h"
 

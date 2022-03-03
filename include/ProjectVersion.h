@@ -27,8 +27,8 @@
 #ifndef PROJECT_VERSION_H
 #define PROJECT_VERSION_H
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
+#include <QString>
+#include <QStringList>
 
 #include <limits>
 

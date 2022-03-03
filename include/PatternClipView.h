@@ -1,7 +1,7 @@
 /*
- * SampleTCOView.h
+ * PatternClipView.h
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,43 +21,47 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+ 
 
-#ifndef SAMPLE_TCO_VIEW_H
-#define SAMPLE_TCO_VIEW_H
+#ifndef PATTERN_CLIP_VIEW_H
+#define PATTERN_CLIP_VIEW_H
 
-#include "SampleTCOView.h"
 
-#include "SampleTCO.h"
-#include "TrackContentObjectView.h"
+#include <QStaticText>
 
-class SampleTCOView : public TrackContentObjectView
+#include "ClipView.h"
+
+class PatternClip;
+
+
+class PatternClipView : public ClipView
 {
 	Q_OBJECT
-
 public:
-	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
-	virtual ~SampleTCOView() = default;
+	PatternClipView(Clip* clip, TrackView* tv);
+	virtual ~PatternClipView() = default;
+
 
 public slots:
-	void updateSample();
-	void reverseSample();
+	void update() override;
 
+protected slots:
+	void openInPatternEditor();
+	void resetName();
+	void changeName();
 
 
 protected:
-	void constructContextMenu(QMenu* cm) override;
-	void mousePressEvent( QMouseEvent * _me ) override;
-	void mouseReleaseEvent( QMouseEvent * _me ) override;
-	void dragEnterEvent( QDragEnterEvent * _dee ) override;
-	void dropEvent( QDropEvent * _de ) override;
-	void mouseDoubleClickEvent( QMouseEvent * ) override;
-	void paintEvent( QPaintEvent * ) override;
+	void paintEvent( QPaintEvent * pe ) override;
+	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
+	void constructContextMenu( QMenu * ) override;
 
 
 private:
-	SampleTCO * m_tco;
+	PatternClip* m_patternClip;
 	QPixmap m_paintPixmap;
-	bool splitTCO( const TimePos pos ) override;
+	
+	QStaticText m_staticTextName;
 } ;
 
 

@@ -1,5 +1,5 @@
 /*
- * TrackConteintObject.h - declaration of TrackContentObject class
+ * TrackConteintObject.h - declaration of Clip class
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -28,24 +28,23 @@
 #include <QColor>
 
 #include "AutomatableModel.h"
-#include "lmms_basics.h"
 
 
 class Track;
-class TrackContentObjectView;
+class ClipView;
 class TrackContainer;
 class TrackView;
 
 
-class LMMS_EXPORT TrackContentObject : public Model, public JournallingObject
+class LMMS_EXPORT Clip : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	TrackContentObject( Track * track );
-	virtual ~TrackContentObject();
+	Clip( Track * track );
+	virtual ~Clip();
 
 	inline Track * getTrack() const
 	{
@@ -117,7 +116,7 @@ public:
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
-	virtual TrackContentObjectView * createView( TrackView * tv ) = 0;
+	virtual ClipView * createView( TrackView * tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -130,13 +129,13 @@ public:
 	}
 
 	/// Returns true if and only if a->startPosition() < b->startPosition()
-	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
+	static bool comparePosition(const Clip* a, const Clip* b);
 
 	TimePos startTimeOffset() const;
 	void setStartTimeOffset( const TimePos &startTimeOffset );
 
-	// Will copy the state of a TCO to another TCO
-	static void copyStateTo( TrackContentObject *src, TrackContentObject *dst );
+	// Will copy the state of a clip to another clip
+	static void copyStateTo( Clip *src, Clip *dst );
 
 public slots:
 	void toggleMute();
@@ -145,7 +144,7 @@ public slots:
 signals:
 	void lengthChanged();
 	void positionChanged();
-	void destroyedTCO();
+	void destroyedClip();
 	void colorChanged();
 
 
@@ -173,7 +172,7 @@ private:
 	QColor m_color;
 	bool m_useCustomClipColor;
 
-	friend class TrackContentObjectView;
+	friend class ClipView;
 
 } ;
 

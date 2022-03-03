@@ -333,7 +333,7 @@ QScrollBar::right-arrow:horizontal:disabled { background-image: url(resources:sb
 QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up_d.png);}
 QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down_d.png);}
 
-/* background for song editor and bb-editor */
+/* background for song editor and pattern editor */
 
 TrackContainerView QFrame{
 	background-color: #49515b;
@@ -663,14 +663,14 @@ TrackContainerView QLabel
 	background: none;
 }
 
-/* Patterns */
+/* Clips */
 
-/* common pattern colors */
-TrackContentObjectView   {
+/* common clip colors */
+ClipView   {
 	qproperty-mutedColor: rgb( 128, 128, 128 );
 	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
 	qproperty-selectedColor: rgb( 0, 125, 255 );
-	qproperty-BBPatternBackground: rgb( 80, 80, 80 );
+	qproperty-patternClipBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
@@ -682,8 +682,8 @@ TrackContentObjectView   {
 	font-size: 11px;
 }
 
-/* instrument pattern */
-PatternView {
+/* MIDI (instrument) clip */
+MidiClipView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
 
@@ -693,21 +693,21 @@ PatternView {
 	qproperty-mutedNoteBorderColor: rgb( 80, 80, 80 );
 }
 
-/* sample track pattern */
-SampleTCOView {
+/* sample track clip */
+SampleClipView {
 	background-color: rgba(42,51,59,255);
 	color: #FF8F05;
 }
 
-/* automation pattern */
-AutomationPatternView {
+/* automation clip */
+AutomationClipView {
 	background-color: #99afff;
 	color: rgb( 204, 215, 255 );
 }
 
-/* bb-pattern */
-BBTCOView {
-	background-color: rgb( 128, 182, 175 ); /* default colour for bb-tracks */
+/* pattern clip */
+PatternClipView {
+	background-color: rgb( 128, 182, 175 ); /* default colour for pattern tracks */
 }
 
 /* Subwindows in MDI-Area */

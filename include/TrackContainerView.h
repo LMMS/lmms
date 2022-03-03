@@ -26,7 +26,7 @@
 #ifndef TRACK_CONTAINER_VIEW_H
 #define TRACK_CONTAINER_VIEW_H
 
-#include <QtCore/QVector>
+#include <QVector>
 #include <QScrollArea>
 #include <QWidget>
 #include <QThread>
@@ -34,13 +34,15 @@
 #include "JournallingObject.h"
 #include "ModelView.h"
 #include "Rubberband.h"
-#include "TrackView.h"
+#include "TimePos.h"
 
 
 class QVBoxLayout;
 
 class InstrumentTrack;
+class Track;
 class TrackContainer;
+class TrackView;
 
 
 class TrackContainerView : public QWidget, public ModelView,
@@ -65,7 +67,7 @@ public:
 		return m_currentPosition;
 	}
 
-	virtual bool fixedTCOs() const
+	virtual bool fixedClips() const
 	{
 		return false;
 	}

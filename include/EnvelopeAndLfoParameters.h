@@ -25,7 +25,7 @@
 #ifndef ENVELOPE_AND_LFO_PARAMETERS_H
 #define ENVELOPE_AND_LFO_PARAMETERS_H
 
-#include <QtCore/QVector>
+#include <QVector>
 
 #include "JournallingObject.h"
 #include "AutomatableModel.h"

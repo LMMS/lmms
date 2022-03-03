@@ -23,10 +23,7 @@
  */
 
 #include "StereoDelay.h"
-#include <cstdlib>
 #include "lmms_basics.h"
-#include "interpolation.h"
-#include "lmms_math.h"
 
 
 StereoDelay::StereoDelay( int maxTime, int sampleRate )

@@ -44,6 +44,7 @@
 #include <QPainterPath>
 #include <QVBoxLayout>
 
+#include "AutomatableModelView.h"
 #include "PianoView.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
@@ -51,10 +52,8 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "Knob.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "MainWindow.h"
 
 
 /*! The scale of C Major - white keys only.

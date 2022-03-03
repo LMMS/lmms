@@ -30,9 +30,6 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
-#include "AutomatableButton.h"
-#include "TempoSyncKnob.h"
-#include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "MemoryManager.h"
 
@@ -79,6 +76,7 @@ const float NES_MIXING_ALL = 1.0 / ( NES_MIXING_12 + NES_MIXING_34 ); // constan
 const int MIN_WLEN = 4;
 
 
+class Knob;
 class NesInstrument;
 
 class NesObject

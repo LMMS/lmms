@@ -24,11 +24,9 @@
 #ifndef EQEFFECT_H
 #define EQEFFECT_H
 
-#include "BasicFilters.h"
 #include "Effect.h"
 #include "EqControls.h"
 #include "EqFilter.h"
-#include "lmms_math.h"
 
 
 

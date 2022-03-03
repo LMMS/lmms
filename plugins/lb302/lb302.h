@@ -35,14 +35,15 @@
 #include "DspEffectLibrary.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "LedCheckbox.h"
-#include "Knob.h"
 #include "NotePlayHandle.h"
 #include <QMutex>
 
 static const int NUM_FILTERS = 2;
 
+class automatableButtonGroup;
+class Knob;
 class lb302SynthView;
+class LedCheckBox;
 class NotePlayHandle;
 
 class lb302FilterKnobState

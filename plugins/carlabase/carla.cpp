@@ -26,22 +26,23 @@
 
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "Song.h"
 #include "GuiApplication.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "Knob.h"
 #include "MidiEventToByteSeq.h"
 #include "MainWindow.h"
-#include "Song.h"
 #include "gui_templates.h"
+#include "Song.h"
 
 #include <QApplication>
 #include <QComboBox>
+#include <QCompleter>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMdiArea>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSizePolicy>
@@ -49,6 +50,7 @@
 #include <QSplitter>
 #include <QString>
 #include <QStringList>
+#include <QStringListModel>
 #include <QTimerEvent>
 #include <QVBoxLayout>
 

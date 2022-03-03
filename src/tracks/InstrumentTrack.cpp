@@ -24,17 +24,20 @@
 #include "InstrumentTrack.h"
 
 #include "AudioEngine.h"
-#include "AutomationPattern.h"
-#include "BBTrack.h"
+#include "AutomationClip.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
+#include "Keymap.h"
 #include "MidiClient.h"
+#include "MidiClip.h"
 #include "MixHelpers.h"
-#include "Pattern.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
+#include "Pitch.h"
 #include "Song.h"
 
 
@@ -214,8 +217,8 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayPattern &&
-				n && n->isBbTrackMuted() ) || ! m_instrument )
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip &&
+				n && n->isPatternTrackMuted() ) || ! m_instrument )
 	{
 		return;
 	}
@@ -679,7 +682,7 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 
 
 bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
-							const f_cnt_t _offset, int _tco_num )
+							const f_cnt_t _offset, int _clip_num )
 {
 	if( ! m_instrument || ! tryLock() )
 	{
@@ -687,20 +690,20 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 	const float frames_per_tick = Engine::framesPerTick();
 
-	tcoVector tcos;
-	::BBTrack * bb_track = nullptr;
-	if( _tco_num >= 0 )
+	clipVector clips;
+	::PatternTrack * pattern_track = nullptr;
+	if( _clip_num >= 0 )
 	{
-		TrackContentObject * tco = getTCO( _tco_num );
-		tcos.push_back( tco );
-		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		Clip * clip = getClip( _clip_num );
+		clips.push_back( clip );
+		if (trackContainer() == Engine::patternStore())
 		{
-			bb_track = BBTrack::findBBTrack( _tco_num );
+			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 		}
 	}
 	else
 	{
-		getTCOsInRange( tcos, _start, _start + static_cast<int>(
+		getClipsInRange( clips, _start, _start + static_cast<int>(
 					_frames / frames_per_tick ) );
 	}
 
@@ -711,7 +714,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		( *it )->processTimePos( _start );
 	}
 
-	if ( tcos.size() == 0 )
+	if ( clips.size() == 0 )
 	{
 		unlock();
 		return false;
@@ -719,25 +722,25 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	bool played_a_note = false;	// will be return variable
 
-	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
+	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
 	{
-		Pattern* p = dynamic_cast<Pattern*>( *it );
-		// everything which is not a pattern won't be played
-		// A pattern playing in the Piano Roll window will always play
-		if(p == nullptr ||
-			(Engine::getSong()->playMode() != Song::Mode_PlayPattern
+		MidiClip* c = dynamic_cast<MidiClip*>( *it );
+		// everything which is not a MIDI clip won't be played
+		// A MIDI clip playing in the Piano Roll window will always play
+		if(c == nullptr ||
+			(Engine::getSong()->playMode() != Song::Mode_PlayMidiClip
 			&& (*it)->isMuted()))
 		{
 			continue;
 		}
 		TimePos cur_start = _start;
-		if( _tco_num < 0 )
+		if( _clip_num < 0 )
 		{
-			cur_start -= p->startPosition();
+			cur_start -= c->startPosition();
 		}
 
-		// get all notes from the given pattern...
-		const NoteVector & notes = p->notes();
+		// get all notes from the given clip...
+		const NoteVector & notes = c->notes();
 		// ...and set our index to zero
 		NoteVector::ConstIterator nit = notes.begin();
 
@@ -762,13 +765,13 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				cur_note->length().frames( frames_per_tick );
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
-			notePlayHandle->setBBTrack( bb_track );
+			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
-			if( _tco_num < 0 )
+			if( _clip_num < 0 )
 			{
-				// then set song-global offset of pattern in order to
+				// then set song-global offset of clip in order to
 				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
+				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
 			}
 
 			Engine::audioEngine()->addPlayHandle( notePlayHandle );
@@ -783,9 +786,9 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackContentObject* InstrumentTrack::createTCO(const TimePos & pos)
+Clip* InstrumentTrack::createClip(const TimePos & pos)
 {
-	Pattern* p = new Pattern(this);
+	MidiClip* p = new MidiClip(this);
 	p->movePosition(pos);
 	return p;
 }
@@ -943,7 +946,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if(AutomationPattern::classNodeName() != node.nodeName() &&
+			else if(AutomationClip::classNodeName() != node.nodeName() &&
 					ControllerConnection::classNodeName() != node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ))
 			{

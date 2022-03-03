@@ -28,7 +28,6 @@
 
 #include "EffectControls.h"
 #include "peak_controller_effect_control_dialog.h"
-#include "Knob.h"
 
 class PeakControllerEffect;
 

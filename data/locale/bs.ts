@@ -410,7 +410,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditor</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="1282"/>
-        <source>Please open an automation pattern with the context menu of a control!</source>
+        <source>Please open an automation clip with the context menu of a control!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -428,7 +428,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <name>AutomationEditorWindow</name>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2020"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -438,7 +438,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2026"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -588,7 +588,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2293"/>
-        <source>Automation Editor - no pattern</source>
+        <source>Automation Editor - no clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -598,73 +598,73 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <location filename="src/gui/editors/AutomationEditor.cpp" line="2350"/>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>AutomationPattern</name>
+    <name>AutomationClip</name>
     <message>
-        <location filename="src/core/AutomationPattern.cpp" line="598"/>
+        <location filename="src/core/AutomationClip.cpp" line="598"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>AutomationPatternView</name>
+    <name>AutomationClipView</name>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="57"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="57"/>
         <source>double-click to open this pattern in automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="179"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="179"/>
         <source>Open in Automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="187"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="187"/>
         <source>Clear</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="190"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="190"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="193"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="193"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="196"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="196"/>
         <source>Set/clear record</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="199"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="199"/>
         <source>Flip Vertically (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="202"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="202"/>
         <source>Flip Horizontally (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="207"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="207"/>
         <source>%1 Connections</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="215"/>
+        <location filename="src/gui/AutomationClipView.cpp" line="215"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationPatternView.cpp" line="449"/>
-        <source>Model is already connected to this pattern.</source>
+        <location filename="src/gui/AutomationClipView.cpp" line="449"/>
+        <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -740,7 +740,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBTCOView</name>
+    <name>BBClipView</name>
     <message>
         <location filename="src/tracks/BBTrack.cpp" line="185"/>
         <source>Open in Beat+Bassline-Editor</source>
@@ -6571,44 +6571,44 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
 </context>
 <context>
-    <name>PatternView</name>
+    <name>MidiClipView</name>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="730"/>
+        <location filename="src/tracks/MidiClip.cpp" line="730"/>
         <source>use mouse wheel to set velocity of a step</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="735"/>
+        <location filename="src/tracks/MidiClip.cpp" line="735"/>
         <source>double-click to open in Piano Roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="777"/>
+        <location filename="src/tracks/MidiClip.cpp" line="777"/>
         <source>Open in piano-roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="786"/>
+        <location filename="src/tracks/MidiClip.cpp" line="786"/>
         <source>Clear all notes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="789"/>
+        <location filename="src/tracks/MidiClip.cpp" line="789"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="792"/>
+        <location filename="src/tracks/MidiClip.cpp" line="792"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="800"/>
+        <location filename="src/tracks/MidiClip.cpp" line="800"/>
         <source>Add steps</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/Pattern.cpp" line="802"/>
+        <location filename="src/tracks/MidiClip.cpp" line="802"/>
         <source>Remove steps</source>
         <translation type="unfinished"/>
     </message>
@@ -6834,7 +6834,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3035"/>
-        <source>Please open a pattern by double-clicking on it!</source>
+        <source>Please open a clip by double-clicking on it!</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6848,7 +6848,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PianoRollWindow</name>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3970"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -6863,7 +6863,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="3973"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -7008,7 +7008,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <location filename="src/gui/editors/PianoRoll.cpp" line="4246"/>
-        <source>Piano-Roll - no pattern</source>
+        <source>Piano-Roll - no clip</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -7385,7 +7385,7 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
-    <name>SampleTCOView</name>
+    <name>SampleClipView</name>
     <message>
         <location filename="src/tracks/SampleTrack.cpp" line="235"/>
         <source>double-click to select sample</source>
@@ -8335,7 +8335,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObject</name>
+    <name>Clip</name>
     <message>
         <location filename="src/core/Track.cpp" line="106"/>
         <source>Mute</source>
@@ -8343,7 +8343,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>TrackContentObjectView</name>
+    <name>ClipView</name>
     <message>
         <location filename="src/core/Track.cpp" line="696"/>
         <source>Current position</source>

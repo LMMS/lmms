@@ -25,14 +25,22 @@
 #include "SampleTrackWindow.h"
 
 #include <QCloseEvent>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
+#include <QVBoxLayout>
 
+#include "EffectRackView.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "MixerLineLcdSpinBox.h"
+#include "SampleTrackView.h"
 #include "Song.h"
+#include "SubWindow.h"
 #include "TabWidget.h"
 #include "TrackLabelButton.h"
  
