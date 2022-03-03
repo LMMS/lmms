@@ -41,8 +41,9 @@
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
 #include "MidiClip.h"
+#include "MidiClipView.h"
 #include "Note.h"
-#include "SampleTrack.h"
+#include "SampleClip.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
@@ -91,7 +92,7 @@ ClipView::ClipView( Clip * clip,
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
-	m_BBClipBackground( 0, 0, 0 ),
+	m_patternClipBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_mouseHotspotHand( 0, 0 ),
 	m_mouseHotspotKnife( 0, 0 ),
@@ -219,8 +220,8 @@ QColor ClipView::textBackgroundColor() const
 QColor ClipView::textShadowColor() const
 { return m_textShadowColor; }
 
-QColor ClipView::BBClipBackground() const
-{ return m_BBClipBackground; }
+QColor ClipView::patternClipBackground() const
+{ return m_patternClipBackground; }
 
 bool ClipView::gradient() const
 { return m_gradient; }
@@ -246,8 +247,8 @@ void ClipView::setTextBackgroundColor( const QColor & c )
 void ClipView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
 
-void ClipView::setBBClipBackground( const QColor & c )
-{ m_BBClipBackground = QColor( c ); }
+void ClipView::setPatternClipBackground( const QColor & c )
+{ m_patternClipBackground = QColor( c ); }
 
 void ClipView::setGradient( const bool & b )
 { m_gradient = b; }
@@ -311,7 +312,7 @@ void ClipView::updateLength()
 		setFixedWidth(
 		static_cast<int>( m_clip->length() * pixelsPerBar() /
 					TimePos::ticksPerBar() ) + 1 /*+
-						CLIP_BORDER_WIDTH * 2-1*/ );
+						BORDER_WIDTH * 2-1*/ );
 	}
 	m_trackView->trackContainerView()->update();
 }
@@ -583,8 +584,8 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
 	labelFont.setHintingPreference( QFont::PreferFullHinting );
 	painter.setFont( labelFont );
 
-	const int textTop = CLIP_BORDER_WIDTH + 1;
-	const int textLeft = CLIP_BORDER_WIDTH + 3;
+	const int textTop = BORDER_WIDTH + 1;
+	const int textLeft = BORDER_WIDTH + 3;
 
 	QFontMetrics fontMetrics(labelFont);
 	QString elidedClipName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);

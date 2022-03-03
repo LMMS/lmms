@@ -30,11 +30,15 @@
 #include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
-#include "Instrument.h"
 #include "MemoryManager.h"
 
-
+class automatableButtonGroup;
 class ExprFrontData;
+class Knob;
+class LedCheckBox;
+class NotePlayHandle;
+class PixmapButton;
+
 
 class ExprFront
 {

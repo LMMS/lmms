@@ -27,7 +27,9 @@
 #include <QFile>
 #include <QGridLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRegExp>
 #include <QTextStream>
@@ -37,12 +39,16 @@
 #include "Engine.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
-#include "Knob.h"
+#include "Keymap.h"
+#include "LcdFloatSpinBox.h"
 #include "LcdSpinBox.h"
 #include "lmms_constants.h"
 #include "lmmsversion.h"
 #include "MainWindow.h"
+#include "Note.h"
+#include "Scale.h"
 #include "Song.h"
+#include "SubWindow.h"
 
 
 MicrotunerConfig::MicrotunerConfig() :

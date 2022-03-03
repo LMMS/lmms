@@ -29,8 +29,9 @@
 #include "AutomationNode.h"
 #include "AutomationClipView.h"
 #include "AutomationTrack.h"
-#include "BBTrackContainer.h"
 #include "LocaleHelper.h"
+#include "Note.h"
+#include "PatternStore.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 
@@ -57,7 +58,7 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	{
 		switch( getTrack()->trackContainer()->type() )
 		{
-			case TrackContainer::BBContainer:
+			case TrackContainer::PatternContainer:
 				setAutoResize( true );
 				break;
 
@@ -96,7 +97,7 @@ AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	if (!getTrack()){ return; }
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::BBContainer:
+		case TrackContainer::PatternContainer:
 			setAutoResize( true );
 			break;
 
@@ -884,7 +885,7 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 {
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
+	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
@@ -922,7 +923,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 	QVector<AutomationClip *> clips;
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
+	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
@@ -994,7 +995,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 void AutomationClip::resolveAllIDs()
 {
 	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-				Engine::getBBTrackContainer()->tracks();
+				Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 	for( TrackContainer::TrackList::iterator it = l.begin();
 							it != l.end(); ++it )

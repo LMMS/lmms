@@ -25,16 +25,19 @@
 
 #include "AudioEngine.h"
 #include "AutomationClip.h"
-#include "BBTrack.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
+#include "Keymap.h"
 #include "MidiClient.h"
 #include "MidiClip.h"
 #include "MixHelpers.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
+#include "Pitch.h"
 #include "Song.h"
 
 
@@ -223,7 +226,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 {
 	// we must not play the sound if this InstrumentTrack is muted...
 	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip &&
-				n && n->isBbTrackMuted() ) || ! m_instrument )
+				n && n->isPatternTrackMuted() ) || ! m_instrument )
 	{
 		return;
 	}
@@ -696,14 +699,14 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	const float frames_per_tick = Engine::framesPerTick();
 
 	clipVector clips;
-	::BBTrack * bb_track = nullptr;
+	::PatternTrack * pattern_track = nullptr;
 	if( _clip_num >= 0 )
 	{
 		Clip * clip = getClip( _clip_num );
 		clips.push_back( clip );
-		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		if (trackContainer() == Engine::patternStore())
 		{
-			bb_track = BBTrack::findBBTrack( _clip_num );
+			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 		}
 	}
 	else
@@ -787,7 +790,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 					cur_note->length().frames( frames_per_tick );
 
 				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, groove_offset, note_frames, *cur_note );
-				notePlayHandle->setBBTrack( bb_track );
+				notePlayHandle->setPatternTrack(pattern_track);
 				// are we playing global song?
 				if( _clip_num < 0 )
 				{

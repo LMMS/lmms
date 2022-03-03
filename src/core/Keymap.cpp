@@ -26,6 +26,8 @@
 
 #include <QDomElement>
 
+#include "Note.h"
+
 
 Keymap::Keymap() :
 	m_description(tr("empty")),

@@ -23,8 +23,6 @@
  */
 
 #include "MonoDelay.h"
-#include "interpolation.h"
-#include "lmms_math.h"
 #include "string.h"
 
 MonoDelay::MonoDelay( int maxTime , int sampleRate )

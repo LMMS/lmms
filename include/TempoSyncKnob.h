@@ -27,7 +27,7 @@
 #define TEMPO_SYNC_KNOB_H
 
 #include <QPixmap>
-#include <QtCore/QPointer>
+#include <QPointer>
 
 #include "Knob.h"
 #include "TempoSyncKnobModel.h"

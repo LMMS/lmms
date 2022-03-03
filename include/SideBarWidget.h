@@ -28,7 +28,8 @@
 #include <QPixmap>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QPushButton>
+
+class QPushButton;
 
 
 class SideBarWidget : public QWidget

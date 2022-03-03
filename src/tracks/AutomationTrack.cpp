@@ -24,6 +24,8 @@
  *
  */
 
+#include "AutomationTrack.h"
+
 #include "AutomationTrackView.h"
 #include "AutomationClip.h"
 

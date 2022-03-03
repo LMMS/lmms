@@ -27,16 +27,17 @@
 #ifndef BIT_INVADER_H
 #define BIT_INVADER_H
 
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
-#include "Knob.h"
-#include "PixmapButton.h"
-#include "LedCheckbox.h"
 #include "MemoryManager.h"
 
 class oscillator;
 class bitInvaderView;
+class Knob;
+class LedCheckBox;
+class PixmapButton;
 
 class bSynth
 {

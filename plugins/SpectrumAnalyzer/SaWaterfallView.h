@@ -26,13 +26,13 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <QPainter>
 #include <QWidget>
 
-#include "SaControls.h"
-#include "SaProcessor.h"
 
+class EffectControlDialog;
 class QMouseEvent;
+class SaControls;
+class SaProcessor;
 
 // Widget that displays a spectrum waterfall (spectrogram) and time labels.
 class SaWaterfallView : public QWidget

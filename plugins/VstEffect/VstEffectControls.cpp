@@ -22,15 +22,24 @@
  *
  */
 
+#include <QAction>
 #include <QDomElement>
+#include <QGridLayout>
+#include <QMenu>
+#include <QPushButton>
+#include <QScrollArea>
 
+#include "embed.h"
+#include "CustomTextKnob.h"
 #include "VstEffectControls.h"
+#include "VstEffectControlDialog.h"
 #include "VstEffect.h"
+#include "VstPlugin.h"
 
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "GuiApplication.h"
-#include <QMdiArea>
+#include "SubWindow.h"
 #include <QApplication>
 
 

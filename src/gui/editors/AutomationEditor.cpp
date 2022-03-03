@@ -30,10 +30,9 @@
 #include <cmath>
 
 #include <QApplication>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLayout>
-#include <QMdiArea>
 #include <QPainter>
 #include <QPainterPath>
 #include <QScrollBar>
@@ -46,7 +45,6 @@
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
-#include "BBTrackContainer.h"
 #include "ComboBox.h"
 #include "debug.h"
 #include "DeprecationHelper.h"
@@ -54,10 +52,11 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
+#include "Knob.h"
 #include "MainWindow.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
@@ -1508,10 +1507,9 @@ float AutomationEditor::getLevel(int y )
 
 
 
-inline bool AutomationEditor::inBBEditor()
+inline bool AutomationEditor::inPatternEditor()
 {
-	return( validClip() &&
-				m_clip->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
+	return (validClip() && m_clip->getTrack()->trackContainer() == Engine::patternStore());
 }
 
 
@@ -1540,9 +1538,9 @@ void AutomationEditor::play()
 			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 	}
-	else if( inBBEditor() )
+	else if (inPatternEditor())
 	{
-		Engine::getBBTrackContainer()->play();
+		Engine::patternStore()->play();
 	}
 	else
 	{
@@ -1566,9 +1564,9 @@ void AutomationEditor::stop()
 	{
 		return;
 	}
-	if( m_clip->getTrack() && inBBEditor() )
+	if (m_clip->getTrack() && inPatternEditor())
 	{
-		Engine::getBBTrackContainer()->stop();
+		Engine::patternStore()->stop();
 	}
 	else
 	{

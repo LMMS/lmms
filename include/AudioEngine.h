@@ -25,16 +25,15 @@
 #ifndef AUDIO_ENGINE_H
 #define AUDIO_ENGINE_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QThread>
-#include <QtCore/QVector>
-#include <QtCore/QWaitCondition>
+#include <QMutex>
+#include <QThread>
+#include <QVector>
+#include <QWaitCondition>
 #include <samplerate.h>
 
 
 #include "lmms_basics.h"
 #include "LocklessList.h"
-#include "Note.h"
 #include "FifoBuffer.h"
 #include "AudioEngineProfiler.h"
 #include "PlayHandle.h"

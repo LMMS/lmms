@@ -31,6 +31,7 @@
 #include "ColorChooser.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "VecControls.h"
 
 
 VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :

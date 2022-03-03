@@ -29,7 +29,6 @@
 #include <QObject>
 #include <QString>
 
-#include "Note.h"
 #include "SerializingObject.h"
 
 class Keymap : public QObject, public SerializingObject

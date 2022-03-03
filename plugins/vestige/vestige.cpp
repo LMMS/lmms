@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #include "VstPlugin.h"
 
@@ -31,18 +31,18 @@
 #include <memory>
 
 #include <QDropEvent>
-#include <QMessageBox>
+#include <QGridLayout>
 #include <QPainter>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QMdiArea>
 #include <QMenu>
 #include <QDomElement>
 
-#include <string>
 
 #include "AudioEngine.h"
-#include "BufferManager.h"
 #include "ConfigManager.h"
+#include "CustomTextKnob.h"
 #include "Engine.h"
 #include "FileDialog.h"
 #include "GuiApplication.h"
@@ -53,9 +53,9 @@
 #include "MainWindow.h"
 #include "PathUtil.h"
 #include "PixmapButton.h"
-#include "SampleBuffer.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "SubWindow.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
 #include "Clipboard.h"
@@ -78,7 +78,11 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
+#ifdef LMMS_BUILD_LINUX
+	"dll,so",
+#else
 	"dll",
+#endif
 	nullptr,
 } ;
 
@@ -682,6 +686,9 @@ void VestigeInstrumentView::openPlugin()
 	QStringList types;
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
+#ifdef LMMS_BUILD_LINUX
+		<< tr( "SO-files (*.so)" )
+#endif
 		;
 	ofd.setNameFilters( types );
 

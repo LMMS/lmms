@@ -24,7 +24,6 @@
  */
 
 #include <QDomElement>
-#include <QObject>
 
 
 #include "LfoController.h"

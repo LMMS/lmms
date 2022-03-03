@@ -27,22 +27,20 @@
 #ifndef SONG_EDITOR_H
 #define SONG_EDITOR_H
 
-#include <QVector>
-#include <QLinearGradient>
 
-#include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
-#include "PositionLine.h"
 
 class QLabel;
 class QScrollBar;
 
+class ActionGroup;
 class AutomatableSlider;
 class ComboBox;
 class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
+class PositionLine;
 class Song;
 class TextFloat;
 class TimeLineWidget;
@@ -198,7 +196,7 @@ signals:
 	void resized();
 
 private:
-	QAction* m_addBBTrackAction;
+	QAction* m_addPatternTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 	QAction* m_setProportionalSnapAction;

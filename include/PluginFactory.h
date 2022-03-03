@@ -28,11 +28,10 @@
 #include <memory>
 #include <string>
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QHash>
-#include <QtCore/QList>
-#include <QtCore/QString>
-#include <QtCore/QVector>
+#include <QFileInfo>
+#include <QList>
+#include <QString>
+#include <QVector>
 
 #include "lmms_export.h"
 #include "Plugin.h"

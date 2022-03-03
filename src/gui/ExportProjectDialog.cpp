@@ -23,9 +23,7 @@
  */
 
 #include <QFileInfo>
-#include <QDir>
 #include <QMessageBox>
-#include <QDebug>
 
 #include "ExportProjectDialog.h"
 #include "Song.h"

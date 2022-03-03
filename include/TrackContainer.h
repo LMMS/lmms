@@ -1,6 +1,6 @@
 /*
  * TrackContainer.h - base-class for all track-containers like Song-Editor,
- *                    BB-Editor...
+ *                    Pattern Editor...
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -26,7 +26,7 @@
 #ifndef TRACK_CONTAINER_H
 #define TRACK_CONTAINER_H
 
-#include <QtCore/QReadWriteLock>
+#include <QReadWriteLock>
 
 #include "Track.h"
 #include "JournallingObject.h"
@@ -44,7 +44,7 @@ public:
 	typedef QVector<Track *> TrackList;
 	enum TrackContainerTypes
 	{
-		BBContainer,
+		PatternContainer,
 		SongContainer
 	} ;
 

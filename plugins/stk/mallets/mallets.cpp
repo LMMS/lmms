@@ -27,6 +27,7 @@
 #include "mallets.h"
 
 #include <QDir>
+#include <QDomElement>
 #include <QMessageBox>
 
 #include "BandedWG.h"

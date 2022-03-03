@@ -28,7 +28,7 @@ Features
 ---------
 
 * Song-Editor for composing songs
-* A Beat+Bassline-Editor for creating beats and basslines
+* Pattern-Editor for creating beats and patterns
 * An easy-to-use Piano-Roll for editing patterns and melodies
 * A Mixer with unlimited mixer channels and arbitrary number of effects
 * Many powerful instrument and effect-plugins out of the box

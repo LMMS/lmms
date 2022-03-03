@@ -24,6 +24,7 @@
  */
 
 
+#include <QApplication>
 #include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -38,20 +39,20 @@
 
 #include "FileBrowser.h"
 #include "AudioEngine.h"
-#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
+#include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
+#include "SampleClip.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
@@ -450,7 +451,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// When enter is pressed, add the selected item...
 	if (insert)
 	{
-		// ...to the song editor by default, or to the BB editor if ctrl is held
+		// ...to the song editor by default, or to the pattern editor if ctrl is held
 		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
 		// If shift is held, we send the item to a new sample track...
 		bool sampleTrack = ke->modifiers() & Qt::ShiftModifier;
@@ -521,9 +522,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		contextMenu.addAction( songEditorHeader );
 		contextMenu.addActions( getContextActions(file, true) );
 
-		QAction* bbEditorHeader = new QAction( tr("BB Editor"), nullptr );
-		bbEditorHeader->setDisabled(true);
-		contextMenu.addAction( bbEditorHeader );
+		QAction* patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
+		patternEditorHeader->setDisabled(true);
+		contextMenu.addAction(patternEditorHeader);
 		contextMenu.addActions( getContextActions(file, false) );
 
 		// We should only show the menu if it contains items
@@ -815,8 +816,8 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	else if( f->handling() != FileItem::NotSupported )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-					Engine::getBBTrackContainer() ) );
+			Track::create(Track::InstrumentTrack, Engine::patternStore())
+		);
 		handleFile( f, it );
 	}
 }
@@ -841,7 +842,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 {
 	// Get the correct TrackContainer. Ternary doesn't compile here
 	TrackContainer* tc = Engine::getSong();
-	if (!songEditor) { tc = Engine::getBBTrackContainer(); }
+	if (!songEditor) { tc = Engine::patternStore(); }
 	openInNewInstrumentTrack(tc, item);
 }
 
@@ -1247,7 +1248,11 @@ void FileItem::determineFileType( void )
 		m_type = MidiFile;
 		m_handling = ImportAsProject;
 	}
-	else if( ext == "dll" )
+	else if( ext == "dll"
+#ifdef LMMS_BUILD_LINUX
+		|| ext == "so" 
+#endif
+	)
 	{
 		m_type = VstPluginFile;
 		m_handling = LoadByPlugin;

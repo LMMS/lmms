@@ -27,21 +27,20 @@
 #ifndef SF2_PLAYER_H
 #define SF2_PLAYER_H
 
+#include <fluidsynth/types.h>
 #include <QMutex>
 #include <samplerate.h>
 
 #include "Instrument.h"
-#include "PixmapButton.h"
 #include "InstrumentView.h"
-#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckbox.h"
-#include "fluidsynthshims.h"
 #include "MemoryManager.h"
 
 class sf2InstrumentView;
 class sf2Font;
+class Knob;
 class NotePlayHandle;
+class PixmapButton;
 
 class patchesDialog;
 class QLabel;

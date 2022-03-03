@@ -1,6 +1,6 @@
 /*
  * TrackContainer.cpp - implementation of base class for all trackcontainers
- *                      like Song-Editor, BB-Editor...
+ *                      like Song-Editor, Pattern Editor...
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -24,18 +24,17 @@
  */
 
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QProgressDialog>
 #include <QDomElement>
 #include <QWriteLocker>
 
 #include "AutomationClip.h"
-#include "AutomationTrack.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
 #include "embed.h"
 #include "TrackContainer.h"
-#include "InstrumentTrack.h"
+#include "PatternClip.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
 #include "Song.h"
 
 #include "GuiApplication.h"
@@ -268,7 +267,7 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 		{
 		case Track::AutomationTrack:
 		case Track::HiddenAutomationTrack:
-		case Track::BBTrack:
+		case Track::PatternTrack:
 			if (clipNum < 0) {
 				track->getClipsInRange(clips, 0, time);
 			} else {
@@ -306,19 +305,19 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 				valueMap[model] = value;
 			}
 		}
-		else if (auto* bb = dynamic_cast<BBClip *>(clip))
+		else if (auto* pattern = dynamic_cast<PatternClip*>(clip))
 		{
-			auto bbIndex = dynamic_cast<class BBTrack*>(bb->getTrack())->index();
-			auto bbContainer = Engine::getBBTrackContainer();
+			auto patIndex = dynamic_cast<class PatternTrack*>(pattern->getTrack())->patternIndex();
+			auto patStore = Engine::patternStore();
 
-			TimePos bbTime = time - clip->startPosition();
-			bbTime = std::min(bbTime, clip->length());
-			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * TimePos::ticksPerBar());
+			TimePos patTime = time - clip->startPosition();
+			patTime = std::min(patTime, clip->length());
+			patTime = patTime % (patStore->lengthOfPattern(patIndex) * TimePos::ticksPerBar());
 
-			auto bbValues = bbContainer->automatedValuesAt(bbTime, bbIndex);
-			for (auto it=bbValues.begin(); it != bbValues.end(); it++)
+			auto patValues = patStore->automatedValuesAt(patTime, patIndex);
+			for (auto it=patValues.begin(); it != patValues.end(); it++)
 			{
-				// override old values, bb track with the highest index takes precedence
+				// override old values, pattern track with the highest index takes precedence
 				valueMap[it.key()] = it.value();
 			}
 		}

@@ -23,7 +23,8 @@
  */
 
 
-#include <QToolTip>
+
+#include <QWidget>
 
 #include "ToolTip.h"
 #include "ConfigManager.h"

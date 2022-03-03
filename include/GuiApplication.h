@@ -25,7 +25,7 @@
 #ifndef GUIAPPLICATION_H
 #define GUIAPPLICATION_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "lmms_export.h"
 #include "lmmsconfig.h"
@@ -33,12 +33,12 @@
 class QLabel;
 
 class AutomationEditorWindow;
-class BBEditor;
 class ControllerRackView;
 class GrooveView;
 class MixerView;
 class MainWindow;
 class MicrotunerConfig;
+class PatternEditorWindow;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
@@ -59,7 +59,7 @@ public:
 	GrooveView* grooveView() { return m_grooveView; }
 	MixerView* mixerView() { return m_mixerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
-	BBEditor* getBBEditor() { return m_bbEditor; }
+	PatternEditorWindow* patternEditor() { return m_patternEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
 	ProjectNotes* getProjectNotes() { return m_projectNotes; }
 	MicrotunerConfig* getMicrotunerConfig() { return m_microtunerConfig; }
@@ -80,7 +80,7 @@ private:
 	MixerView* m_mixerView;
 	SongEditorWindow* m_songEditor;
 	AutomationEditorWindow* m_automationEditor;
-	BBEditor* m_bbEditor;
+	PatternEditorWindow* m_patternEditor;
 	PianoRollWindow* m_pianoRoll;
 	ProjectNotes* m_projectNotes;
 	MicrotunerConfig* m_microtunerConfig;
