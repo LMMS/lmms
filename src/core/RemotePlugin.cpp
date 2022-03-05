@@ -33,6 +33,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 

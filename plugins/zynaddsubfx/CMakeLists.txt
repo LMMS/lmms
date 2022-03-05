@@ -160,10 +160,14 @@ ENDIF(WIN32)
 # Use libraries in non-standard directories (e.g., another version of Qt)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp "${WINRC}")
+ADD_SUBDIRECTORY(../../src/common common)
+
+ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp ${LMMS_COMMON_SRCS} "${WINRC}")
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
 # Needed to deploy dependencies of RemoteZynAddSubFx
 SET_PROPERTY(GLOBAL APPEND PROPERTY PLUGINS_BUILT "RemoteZynAddSubFx")
+
+TARGET_COMPILE_DEFINITIONS(RemoteZynAddSubFx PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 IF(LMMS_BUILD_WIN32)
 	SET_TARGET_PROPERTIES(RemoteZynAddSubFx PROPERTIES LINK_FLAGS "${LINK_FLAGS} -mwindows")
