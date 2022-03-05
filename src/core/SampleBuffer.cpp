@@ -305,7 +305,7 @@ void SampleBuffer::update(bool keepSettings)
 				}
 				sf_close(sndFile);
 			}
-			else if (sndFile == NULL)
+			else if (sndFile == nullptr)
 			{
 				fileLoadError = Invalid;
 			}
