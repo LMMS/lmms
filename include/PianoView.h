@@ -73,7 +73,7 @@ private:
 	int getKeyWidth(int key_num) const;
 	int getKeyHeight(int key_num) const;
 	IntModel *getNearestMarker(int key);
-	bool setMarkerKeyValue(IntModel *noteModel, int key_num, bool ignoreConstraints = false);
+	void setMarkerKeyValue(IntModel *noteModel, int key_num);
 	bool firstMarkerAllowed(int key_num);
 	bool lastMarkerAllowed(int key_num);
 

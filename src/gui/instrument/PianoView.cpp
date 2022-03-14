@@ -453,7 +453,7 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 								this, SLOT(setFirstKey()));
 		QAction *actionLast = contextMenu.addAction(tr("Set &last key"),
 								this, SLOT(setLastKey()));
-		contextMenu.addAction(tr( "Set &single key" ),
+		contextMenu.addAction(tr("Set &single key" ),
 								this, SLOT(setSingleKey()));
 
 		actionFirst->setEnabled(key_num != m_piano->instrumentTrack()->firstKeyModel()->value() && firstMarkerAllowed(key_num));
@@ -545,15 +545,21 @@ void PianoView::mousePressEvent(QMouseEvent *me)
 	}
 }
 
-bool PianoView::setMarkerKeyValue(IntModel *noteModel, int key_num, bool ignoreConstraints)
+void PianoView::setMarkerKeyValue(IntModel *noteModel, int key_num)
 {
-	if (!ignoreConstraints)
+	auto firstModel = m_piano->instrumentTrack()->firstKeyModel();
+	auto lastModel = m_piano->instrumentTrack()->lastKeyModel();
+
+	if (noteModel == firstModel && lastModel->value() < key_num)
 	{
-		if (m_piano->instrumentTrack()->firstKeyModel() == noteModel && !firstMarkerAllowed(key_num)) return false;
-		if (m_piano->instrumentTrack()->lastKeyModel() == noteModel && !lastMarkerAllowed(key_num)) return false;
+		lastModel->setValue(key_num);
 	}
+	else if (noteModel == lastModel && firstModel->value() > key_num)
+	{
+		firstModel->setValue(key_num);
+	}
+
 	noteModel->setValue(static_cast<float>(key_num));
-	return true;
 }
 
 bool PianoView::firstMarkerAllowed(int key_num)
@@ -585,9 +591,8 @@ void PianoView::setLastKey()
 
 void PianoView::setSingleKey()
 {
-	setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey, true);
-	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey, true);
-	update();
+	setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey);
+	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey);
 }
 
 
