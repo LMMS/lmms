@@ -72,7 +72,7 @@ private:
 	int getKeyX( int _key_num ) const;
 	int getKeyWidth(int key_num) const;
 	int getKeyHeight(int key_num) const;
-	IntModel *getNearestMarker(int key, QString* title = nullptr);
+	IntModel *getNearestMarker(int key);
 	bool setMarkerKeyValue(IntModel *noteModel, int key_num, bool ignoreConstraints = false);
 	bool firstMarkerAllowed(int key_num);
 	bool lastMarkerAllowed(int key_num);

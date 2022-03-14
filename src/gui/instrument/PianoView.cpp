@@ -465,8 +465,8 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 	else
 	{
 		// context menu for the black stripe above the keys containing the first/last/base markers
-		IntModel *noteModel = getNearestMarker(key_num, &title);
-		CaptionMenu contextMenu(title);
+		IntModel *noteModel = getNearestMarker(key_num);
+		CaptionMenu contextMenu(noteModel->displayName());
 		AutomatableModelView amv(noteModel, &contextMenu);
 		amv.addDefaultActions(&contextMenu);
 
@@ -893,25 +893,22 @@ int PianoView::getKeyHeight(int key_num) const
 
 /*! \brief Return model and title of the marker closest to the given key
  */
-IntModel* PianoView::getNearestMarker(int key, QString* title)
+IntModel* PianoView::getNearestMarker(int key)
 {
 	const int base = m_piano->instrumentTrack()->baseNote();
 	const int first = m_piano->instrumentTrack()->firstKey();
 	const int last = m_piano->instrumentTrack()->lastKey();
 
 	if (abs(key - base) < abs(key - first) && abs(key - base) < abs(key - last))
-	{
-		if (title) {*title = tr("Base note");}
+	{		
 		return m_piano->instrumentTrack()->baseNoteModel();
 	}
 	else if (abs(key - first) < abs(key - last))
-	{
-		if (title) {*title = tr("First note");}
+	{		
 		return m_piano->instrumentTrack()->firstKeyModel();
 	}
 	else
-	{
-		if (title) {*title = tr("Last note");}
+	{		
 		return m_piano->instrumentTrack()->lastKeyModel();
 	}
 }
