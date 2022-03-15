@@ -27,6 +27,7 @@
 #ifndef LMMS_STYLE_H
 #define LMMS_STYLE_H
 
+#include <QFileSystemWatcher>
 #include <QProxyStyle>
 
 
@@ -90,6 +91,7 @@ private:
 	void hoverColors( bool sunken, bool hover, bool active, QColor& color, QColor& blend ) const;
 	QColor m_colors[ LmmsStyle::NumColorRoles ];
 
+	QFileSystemWatcher m_styleReloader;
 };
 
 #endif
