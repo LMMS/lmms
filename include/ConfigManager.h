@@ -273,9 +273,9 @@ private:
 
 	void checkDevelopment();
 
-	//Methods to determine the location of the working directory and RC file
-	void initPortableDirs();
-	void initInstalledDirs();
+	//Methods to determine the paths to the working directory and the RC file
+	void initPortablePaths();
+	void initInstalledPaths();
 
 	// List of all upgrade methods
 	static const std::vector<UpgradeMethod> UPGRADE_METHODS;

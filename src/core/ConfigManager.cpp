@@ -68,11 +68,11 @@ ConfigManager::ConfigManager() :
 
 	if (QFileInfo::exists(qApp->applicationDirPath() + PORTABLE_MODE_FILE))
 	{
-		initPortableDirs();
+		initPortablePaths();
 	}
 	else
 	{
-		initInstalledDirs();
+		initInstalledPaths();
 	}
 
 	m_dataDir = "data:/";
@@ -689,7 +689,7 @@ void ConfigManager::checkDevelopment()
 	}
 }
 
-void ConfigManager::initPortableDirs()
+void ConfigManager::initPortablePaths()
 {
 	QString applicationPath = qApp->applicationDirPath();
 	m_workingDir = applicationPath + "/lmms-workspace/";
@@ -700,7 +700,7 @@ void ConfigManager::initPortableDirs()
 	}
 }
 
-void ConfigManager::initInstalledDirs()
+void ConfigManager::initInstalledPaths()
 {
 	m_workingDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/lmms/";
 
