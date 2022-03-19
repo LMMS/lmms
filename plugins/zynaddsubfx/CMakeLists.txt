@@ -160,7 +160,7 @@ ENDIF(WIN32)
 # Use libraries in non-standard directories (e.g., another version of Qt)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-ADD_SUBDIRECTORY(../../src/common common)
+ADD_SUBDIRECTORY("${LMMS_SOURCE_DIR}/src/common" common)
 
 ADD_EXECUTABLE(RemoteZynAddSubFx RemoteZynAddSubFx.cpp ${LMMS_COMMON_SRCS} "${WINRC}")
 INSTALL(TARGETS RemoteZynAddSubFx RUNTIME DESTINATION "${PLUGIN_DIR}")
