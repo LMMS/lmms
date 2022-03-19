@@ -32,7 +32,7 @@
 #include "peak_controller_effect_control_dialog.h"
 #include "peak_controller_effect_controls.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "embed.h"
 
 
