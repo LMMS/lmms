@@ -30,7 +30,7 @@
 #include "BitcrushControlDialog.h"
 #include "BitcrushControls.h"
 #include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 
 BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :

@@ -1,5 +1,5 @@
 /*
- * LedCheckbox.cpp - class LedCheckBox, an improved QCheckBox
+ * LedCheckBox.cpp - class LedCheckBox, an improved QCheckBox
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -26,7 +26,7 @@
 #include <QFontMetrics>
 #include <QPainter>
 
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "DeprecationHelper.h"
 #include "embed.h"
 #include "gui_templates.h"
