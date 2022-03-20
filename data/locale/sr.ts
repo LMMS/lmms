@@ -6389,7 +6389,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SpectrumAnalyzerControlDialog</name>
+    <name>SaControlsDialog</name>
     <message>
         <source>Linear spectrum</source>
         <translation type="unfinished"/>
@@ -6400,7 +6400,7 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
-    <name>SpectrumAnalyzerControls</name>
+    <name>SaControls</name>
     <message>
         <source>Linear spectrum</source>
         <translation type="unfinished"/>
@@ -7505,7 +7505,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>audioFileProcessor</name>
+    <name>AudioFileProcessor</name>
     <message>
         <source>Amplify</source>
         <translation type="unfinished"/>
@@ -7556,14 +7556,14 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>bitInvader</name>
+    <name>BitInvader</name>
     <message>
         <source>Samplelength</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>bitInvaderView</name>
+    <name>BitInvaderView</name>
     <message>
         <source>Sample Length</source>
         <translation type="unfinished"/>
@@ -7638,7 +7638,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>dynProcControlDialog</name>
+    <name>DynProcControlDialog</name>
     <message>
         <source>INPUT</source>
         <translation type="unfinished"/>
@@ -7729,7 +7729,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>dynProcControls</name>
+    <name>DynProcControls</name>
     <message>
         <source>Input gain</source>
         <translation type="unfinished"/>
@@ -7770,7 +7770,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>kickerInstrument</name>
+    <name>KickerInstrument</name>
     <message>
         <source>Start frequency</source>
         <translation type="unfinished"/>
@@ -7821,7 +7821,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>kickerInstrumentView</name>
+    <name>KickerInstrumentView</name>
     <message>
         <source>Start frequency:</source>
         <translation type="unfinished"/>
@@ -7864,7 +7864,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>ladspaBrowserView</name>
+    <name>LadspaBrowserView</name>
     <message>
         <source>Available Effects</source>
         <translation type="unfinished"/>
@@ -7907,7 +7907,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>ladspaDescription</name>
+    <name>LadspaDescription</name>
     <message>
         <source>Plugins</source>
         <translation type="unfinished"/>
@@ -7918,7 +7918,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>ladspaPortDialog</name>
+    <name>LadspaPortDialog</name>
     <message>
         <source>Ports</source>
         <translation type="unfinished"/>
@@ -7985,7 +7985,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>lb302Synth</name>
+    <name>Lb302Synth</name>
     <message>
         <source>VCF Cutoff Frequency</source>
         <translation type="unfinished"/>
@@ -8032,7 +8032,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>lb302SynthView</name>
+    <name>Lb302SynthView</name>
     <message>
         <source>Cutoff Freq:</source>
         <translation type="unfinished"/>
@@ -8155,7 +8155,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>malletsInstrument</name>
+    <name>MalletsInstrument</name>
     <message>
         <source>Hardness</source>
         <translation type="unfinished"/>
@@ -8274,7 +8274,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>malletsInstrumentView</name>
+    <name>MalletsInstrumentView</name>
     <message>
         <source>Instrument</source>
         <translation type="unfinished"/>
@@ -8393,7 +8393,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>manageVSTEffectView</name>
+    <name>ManageVSTEffectView</name>
     <message>
         <source> - VST parameter control</source>
         <translation type="unfinished"/>
@@ -8424,7 +8424,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>manageVestigeInstrumentView</name>
+    <name>ManageVestigeInstrumentView</name>
     <message>
         <source> - VST plugin control</source>
         <translation type="unfinished"/>
@@ -8455,7 +8455,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>opl2instrument</name>
+    <name>OpulenzInstrument</name>
     <message>
         <source>Patch</source>
         <translation type="unfinished"/>
@@ -8574,7 +8574,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>opl2instrumentView</name>
+    <name>OpulenzInstrumentView</name>
     <message>
         <source>Attack</source>
         <translation type="unfinished"/>
@@ -8593,7 +8593,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>organicInstrument</name>
+    <name>OrganicInstrument</name>
     <message>
         <source>Distortion</source>
         <translation type="unfinished"/>
@@ -8604,7 +8604,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>organicInstrumentView</name>
+    <name>OrganicInstrumentView</name>
     <message>
         <source>Distortion:</source>
         <translation type="unfinished"/>
@@ -8655,7 +8655,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation type="unfinished"/>
@@ -8750,7 +8750,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation type="unfinished"/>
@@ -8921,7 +8921,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>patchesDialog</name>
+    <name>PatchesDialog</name>
     <message>
         <source>Qsynth: Channel Preset</source>
         <translation type="unfinished"/>
@@ -8956,7 +8956,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>pluginBrowser</name>
+    <name>PluginBrowser</name>
     <message>
         <source>no description</source>
         <translation type="unfinished"/>
@@ -9136,7 +9136,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sf2Instrument</name>
+    <name>Sf2Instrument</name>
     <message>
         <source>Bank</source>
         <translation type="unfinished"/>
@@ -9195,7 +9195,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sf2InstrumentView</name>
+    <name>Sf2InstrumentView</name>
     <message>
         <source>Open other SoundFont file</source>
         <translation type="unfinished"/>
@@ -9270,14 +9270,14 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sfxrInstrument</name>
+    <name>SfxrInstrument</name>
     <message>
         <source>Wave Form</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>sidInstrument</name>
+    <name>SidInstrument</name>
     <message>
         <source>Cutoff</source>
         <translation type="unfinished"/>
@@ -9304,7 +9304,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>sidInstrumentView</name>
+    <name>SidInstrumentView</name>
     <message>
         <source>Volume:</source>
         <translation type="unfinished"/>
@@ -9439,7 +9439,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>stereoEnhancerControlDialog</name>
+    <name>StereoEnhancerControlDialog</name>
     <message>
         <source>WIDE</source>
         <translation type="unfinished"/>
@@ -9450,14 +9450,14 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>stereoEnhancerControls</name>
+    <name>StereoEnhancerControls</name>
     <message>
         <source>Width</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>stereoMatrixControlDialog</name>
+    <name>StereoMatrixControlDialog</name>
     <message>
         <source>Left to Left Vol:</source>
         <translation type="unfinished"/>
@@ -9476,7 +9476,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>stereoMatrixControls</name>
+    <name>StereoMatrixControls</name>
     <message>
         <source>Left to Left</source>
         <translation type="unfinished"/>
@@ -9495,7 +9495,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>vestigeInstrument</name>
+    <name>VestigeInstrument</name>
     <message>
         <source>Loading plugin</source>
         <translation type="unfinished"/>
@@ -9506,7 +9506,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>vibed</name>
+    <name>Vibed</name>
     <message>
         <source>String %1 volume</source>
         <translation type="unfinished"/>
@@ -9549,7 +9549,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>vibedView</name>
+    <name>VibedView</name>
     <message>
         <source>Volume:</source>
         <translation type="unfinished"/>
@@ -9740,7 +9740,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>voiceObject</name>
+    <name>VoiceObject</name>
     <message>
         <source>Voice %1 pulse width</source>
         <translation type="unfinished"/>
@@ -9787,7 +9787,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>waveShaperControlDialog</name>
+    <name>WaveShaperControlDialog</name>
     <message>
         <source>INPUT</source>
         <translation type="unfinished"/>
@@ -9846,7 +9846,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
 </context>
 <context>
-    <name>waveShaperControls</name>
+    <name>WaveShaperControls</name>
     <message>
         <source>Input gain</source>
         <translation type="unfinished"/>
