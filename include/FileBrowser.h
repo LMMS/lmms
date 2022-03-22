@@ -37,6 +37,7 @@
 
 class QLineEdit;
 
+class TreeItem;
 class FileItem;
 class InstrumentTrack;
 class FileBrowserTreeWidget;
@@ -57,41 +58,49 @@ public:
 		@param filter Filter as used in QDir::match
 		@param recurse *to be documented*
 	*/
-	FileBrowser( const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false, bool recurse = false,
-			const QString& userDir = "",
-			const QString& factoryDir = "");
-
+	FileBrowser(const QString& title, const QPixmap& pm, QWidget* parent);
 	virtual ~FileBrowser() = default;
+
+	void enableBackupFilter();
+	void enableHiddenFiles() { m_hiddenCheckBox->setVisible(true); }
+	void enableRecursiveSearch() { m_recursiveSearch = true; }
+	void enableUnknownFiles() { m_unknownCheckBox->setVisible(true); }
+
+	void setDirectory(const QString& dir);
+	void setDirectories(const QFileInfoList& dirList);
+	void setUserFactoryDir(const QString& userDir, const QString& factoryDir);
 
 private slots:
 	void reloadTree( void );
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
-	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
+	bool filterItems(TreeItem* parentDir = nullptr, bool search = true);
 	void giveFocusToFilter();
+	void onItemExpand(QTreeWidgetItem* item);
+	void onSearch(const QString& filter);
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
+	void showEvent(QShowEvent* se) override;
 
-	void addItems( const QString & path );
+	FileBrowserTreeWidget* m_tree;
 
-	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
+	QLineEdit* m_searchBox;
+	QCheckBox* m_userCheckBox;
+	QCheckBox* m_factoryCheckBox;
+	QCheckBox* m_backupCheckBox;
+	QCheckBox* m_hiddenCheckBox;
+	QCheckBox* m_unknownCheckBox;
 
-	QLineEdit * m_filterEdit;
-
-	QString m_directories; //!< Directories to search, split with '*'
-	QString m_filter; //!< Filter as used in QDir::match()
-
-	bool m_dirsAsItems;
-	bool m_recurse;
-
-	void addContentCheckBox();
-	QCheckBox* m_showUserContent = nullptr;
-	QCheckBox* m_showFactoryContent = nullptr;
+	//! Directories to display as toplevel items ("My computer" style)
+	QStringList m_toplevelDirectories;
+	//! Base path to user data
 	QString m_userDir;
+	//! Base path to factory data
 	QString m_factoryDir;
+
+	QList<QString> m_expandedDirsPriorToSearch;
+	bool m_isSearching = false;
+	bool m_recursiveSearch = false;
 } ;
 
 
@@ -145,75 +154,73 @@ private slots:
 	void openInNewInstrumentTrack( FileItem* item, bool songEditor );
 	bool openInNewSampleTrack( FileItem* item );
 	void sendToActiveInstrumentTrack( FileItem* item );
-	void updateDirectory( QTreeWidgetItem * item );
 	void openContainingFolder( FileItem* item );
 
 } ;
 
 
 
-
-class Directory : public QTreeWidgetItem
+//! \brief Base class for tree items that can be sorted
+class TreeItem : public QTreeWidgetItem
 {
 public:
-	Directory( const QString & filename, const QString & path,
-						const QString & filter );
+	TreeItem(const QString& name) : QTreeWidgetItem(QStringList(name), UserType) {}
 
-	void update( void );
+	virtual bool isDirectory() const { return false; }
+	virtual bool isFactory() const { return false; }
+	virtual bool isHidden() const { return m_hidden; } //!< If hidden on the filesystem
+	virtual bool isUser() const { return false; }
 
-	inline QString fullName( QString path = QString() )
-	{
-		if( path.isEmpty() )
-		{
-			path = m_directories[0];
-		}
-		if( ! path.isEmpty() )
-		{
-			path += QDir::separator();
-		}
-		return( QDir::cleanPath( path + text( 0 ) ) +
-							QDir::separator() );
-	}
+	static bool lessThan(const TreeItem* first, const TreeItem* second);
 
-	inline void addDirectory( const QString & dir )
-	{
-		m_directories.push_back( dir );
-	}
+protected:
+	bool m_hidden = false;
+};
 
+
+
+
+class Directory : public TreeItem
+{
+public:
+	Directory(const QString& name, const QString& userPath, const QString& factoryPath);
+
+	//! Read directory and add its content as child items
+	void addDirectoryContent();
+
+	//! Read directory and return a list of TreeItems
+	std::vector<TreeItem*> getDirectoryContent();
+
+	bool isDirectory() const override { return true; }
+	bool isFactory() const override { return !m_factoryPath.isEmpty(); }
+	bool isUser() const override { return !m_userPath.isEmpty(); }
+
+	//! Return best path (user path takes precidence)
+	QString path(bool user = true, bool factory = true) const;
+
+	void updateIcon(bool user = true, bool factory = true);
 
 private:
 	void initPixmaps( void );
-
-	bool addItems( const QString & path );
-
 
 	static QPixmap * s_folderPixmap;
 	static QPixmap * s_folderOpenedPixmap;
 	static QPixmap * s_folderLockedPixmap;
 
-	//! Directories that lead here
-	//! Initially, this is just set to the current path of a directory
-	//! If, however, you have e.g. 'TripleOscillator/xyz' in two of the
-	//! file browser's search directories 'a' and 'b', this will have two
-	//! entries 'a/TripleOscillator' and 'b/TripleOscillator'
-	//! and 'xyz' in the tree widget
-	QStringList m_directories;
-	//! Filter as used in QDir::match()
-	QString m_filter;
-
-	int m_dirCount;
-
-} ;
+	QString m_userPath;
+	QString m_factoryPath;
+};
 
 
 
 
-class FileItem : public QTreeWidgetItem
+class FileItem : public TreeItem
 {
 public:
 	enum FileTypes
 	{
 		ProjectFile,
+		ProjectBackupFile,
 		PresetFile,
 		SampleFile,
 		SoundFontFile,
@@ -234,13 +241,13 @@ public:
 	} ;
 
 
-	FileItem( QTreeWidget * parent, const QString & name,
-							const QString & path );
-	FileItem( const QString & name, const QString & path );
+	FileItem(const QString& name, const QString& path, bool fromFactory = false);
+	FileItem(const QString& path) : FileItem(path, path) {}
 
+	// TODO rename to path()
 	QString fullName() const
 	{
-		return QFileInfo(m_path, text(0)).absoluteFilePath();
+		return m_path;
 	}
 
 	inline FileTypes type( void ) const
@@ -253,6 +260,10 @@ public:
 		return( m_handling );
 	}
 
+	bool isUser() const override { return !m_factory; }
+	bool isFactory() const override { return m_factory; }
+
+	//! True if file may be loaded as a track
 	inline bool isTrack( void ) const
 	{
 		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
@@ -274,6 +285,7 @@ private:
 	static QPixmap * s_midiFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
 
+	bool m_factory;
 	QString m_path;
 	FileTypes m_type;
 	FileHandling m_handling;
