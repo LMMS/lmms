@@ -22,6 +22,8 @@ FOREACH( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 	SET("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 ENDFOREACH()
 
+ADD_SUBDIRECTORY("${LMMS_SOURCE_DIR}/src/common" common)
+
 if(NOT IS_WIN)
 set(EXE_NAME NativeLinuxRemoteVstPlugin${BITNESS})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
@@ -30,6 +32,7 @@ set(EXE_NAME RemoteVstPlugin${BITNESS})
 endif()
 add_executable(${EXE_NAME} WIN32
 	../RemoteVstPlugin.cpp
+	${LMMS_COMMON_SRCS}
 )
 if(IS_WIN)
     target_link_libraries(${EXE_NAME} ole32)
@@ -43,6 +46,8 @@ target_include_directories(${EXE_NAME}
 		"${LMMS_SOURCE_DIR}/include"
 		"${LMMS_BINARY_DIR}"
 )
+
+target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 # Workaround for missing WinMain
 if(MSVC)

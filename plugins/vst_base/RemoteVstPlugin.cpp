@@ -33,9 +33,7 @@
 
 #include "lmmsconfig.h"
 
-#define BUILD_REMOTE_PLUGIN_CLIENT
-
-#include "RemotePlugin.h"
+#include "RemotePluginClient.h"
 
 #ifdef LMMS_HAVE_FCNTL_H
 #include <fcntl.h>
