@@ -147,7 +147,7 @@ bool FileBrowser::filterItems(TreeItem* parentDir, bool search)
 	int numChildren = parentDir ? parentDir->childCount() : m_tree->topLevelItemCount();
 	bool showUser = m_userCheckBox->isChecked();
 	bool showFactory = m_factoryCheckBox->isChecked();
-	QStringList searchTerms = m_searchBox->text().split(" ", Qt::KeepEmptyParts);
+	QStringList searchTerms = m_searchBox->text().split(" ", QString::KeepEmptyParts);
 	QString previousFileName;
 
 	// Lambda to check if a string contains all words from a list
