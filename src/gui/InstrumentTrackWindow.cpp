@@ -55,7 +55,7 @@
 #include "InstrumentTrackView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "LeftRightNav.h"
 #include "MainWindow.h"
 #include "PianoView.h"

@@ -31,7 +31,7 @@
 
 #include "DeprecationHelper.h"
 #include "VersionedSaveDialog.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 
 VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
