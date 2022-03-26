@@ -26,11 +26,9 @@
 #ifndef MIDI_CLIP_H
 #define MIDI_CLIP_H
 
-#include <QStaticText>
 
+#include "Clip.h"
 #include "Note.h"
-#include "MidiClipView.h"
-#include "ClipView.h"
 
 
 class InstrumentTrack;
@@ -91,8 +89,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		//TODO: rename to "midiClip"
-		return "pattern";
+		return "midiclip";
 	}
 
 	inline InstrumentTrack * instrumentTrack() const
@@ -108,16 +105,16 @@ public:
 
 	using Model::dataChanged;
 
-
-protected:
-	void updateBBTrack();
-
-
-protected slots:
+public slots:
 	void addSteps();
 	void cloneSteps();
 	void removeSteps();
 	void clear();
+
+protected:
+	void updatePatternTrack();
+
+protected slots:
 	void changeTimeSignature();
 
 
@@ -140,7 +137,6 @@ private:
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
 	friend class MidiClipView;
-	friend class BBTrackContainerView;
 
 
 signals:

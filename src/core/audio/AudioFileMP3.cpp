@@ -27,7 +27,6 @@
 
 #ifdef LMMS_HAVE_MP3LAME
 
-#include "AudioEngine.h"
 
 #include <cassert>
 

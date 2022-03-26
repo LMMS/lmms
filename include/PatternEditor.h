@@ -1,5 +1,5 @@
 /*
- * BBEditor.h - view-component of BB-Editor
+ * PatternEditor.h - basic main-window for editing patterns
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
@@ -23,60 +23,30 @@
  */
 
 
-#ifndef BB_EDITOR_H
-#define BB_EDITOR_H
+#ifndef PATTERN_EDITOR_H
+#define PATTERN_EDITOR_H
 
 
 #include "Editor.h"
 #include "TrackContainerView.h"
 
 
-class BBTrackContainer;
+class PatternStore;
 class ComboBox;
 
-class BBTrackContainerView;
 
-class BBEditor : public Editor
+class PatternEditor : public TrackContainerView
 {
 	Q_OBJECT
 public:
-	BBEditor( BBTrackContainer * _tc );
-	~BBEditor();
-
-	QSize sizeHint() const override;
-
-	const BBTrackContainerView* trackContainerView() const {
-		return m_trackContainerView;
-	}
-	BBTrackContainerView* trackContainerView() {
-		return m_trackContainerView;
-	}
-
-	void removeBBView( int bb );
-
-public slots:
-	void play() override;
-	void stop() override;
-
-private:
-	BBTrackContainerView* m_trackContainerView;
-	ComboBox * m_bbComboBox;
-} ;
-
-
-
-class BBTrackContainerView : public TrackContainerView
-{
-	Q_OBJECT
-public:
-	BBTrackContainerView(BBTrackContainer* tc);
+	PatternEditor(PatternStore* ps);
 
 	bool fixedClips() const override
 	{
 		return true;
 	}
 
-	void removeBBView(int bb);
+	void removeViewsForPattern(int pattern);
 
 	void saveSettings(QDomDocument& doc, QDomElement& element) override;
 	void loadSettings(const QDomElement& element) override;
@@ -94,9 +64,30 @@ protected slots:
 	void updatePosition();
 
 private:
-	BBTrackContainer * m_bbtc;
+	PatternStore* m_ps;
 	void makeSteps( bool clone );
 };
 
+
+
+
+class PatternEditorWindow : public Editor
+{
+	Q_OBJECT
+public:
+	PatternEditorWindow(PatternStore* ps);
+	~PatternEditorWindow();
+
+	QSize sizeHint() const override;
+
+	PatternEditor* m_editor;
+
+public slots:
+	void play() override;
+	void stop() override;
+
+private:
+	ComboBox* m_patternComboBox;
+};
 
 #endif

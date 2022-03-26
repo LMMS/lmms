@@ -1,5 +1,5 @@
 /*
- * BBClip.h
+ * PatternTrackView.h
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -21,33 +21,40 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
-
-#ifndef BB_CLIP_H
-#define BB_CLIP_H
-
-#include "ClipView.h"
 
 
-class BBClip : public Clip
+#ifndef PATTERN_TRACK_VIEW_H
+#define PATTERN_TRACK_VIEW_H
+
+
+#include "TrackView.h"
+
+class PatternTrack;
+class TrackLabelButton;
+
+
+class PatternTrackView : public TrackView
 {
+	Q_OBJECT
 public:
-	BBClip( Track * _track );
-	virtual ~BBClip() = default;
+	PatternTrackView(PatternTrack* pt, TrackContainerView* tcv);
+	virtual ~PatternTrackView();
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
-	void loadSettings( const QDomElement & _this ) override;
-	inline QString nodeName() const override
+	bool close() override;
+
+	const PatternTrack* getPatternTrack() const
 	{
-		return( "bbtco" );
+		return (m_patternTrack);
 	}
 
-	int bbTrackIndex();
 
-	ClipView * createView( TrackView * _tv ) override;
+public slots:
+	void clickedTrackLabel();
+
 
 private:
-	friend class BBClipView;
+	PatternTrack* m_patternTrack;
+	TrackLabelButton * m_trackLabel;
 } ;
 
 

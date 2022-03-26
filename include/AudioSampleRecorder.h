@@ -26,8 +26,8 @@
 #ifndef AUDIO_SAMPLE_RECORDER_H
 #define AUDIO_SAMPLE_RECORDER_H
 
-#include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QList>
+#include <QPair>
 
 #include "AudioDevice.h"
 

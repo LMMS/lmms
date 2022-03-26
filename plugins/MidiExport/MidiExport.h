@@ -31,6 +31,8 @@
 #include "ExportFilter.h"
 #include "MidiFile.hpp"
 
+class QDomNode;
+
 
 const int BUFFER_SIZE = 50*1024;
 typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
@@ -66,16 +68,16 @@ public:
 	}
 
 	virtual bool tryExport(const TrackContainer::TrackList &tracks,
-				const TrackContainer::TrackList &tracks_BB,
+				const TrackContainer::TrackList &patternTracks,
 				int tempo, int masterPitch, const QString &filename);
 	
 private:
-	void writeMidiClip(MidiNoteVector &midiClip, QDomNode n,
+	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time);
 	void writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv);
-	void writeBBClip(MidiNoteVector &src, MidiNoteVector &dst,
+	void writePatternClip(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
-	void ProcessBBNotes(MidiNoteVector &nv, int cutPos);
+	void processPatternNotes(MidiNoteVector &nv, int cutPos);
 
 	void error();
 

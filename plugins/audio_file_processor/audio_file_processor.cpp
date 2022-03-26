@@ -25,22 +25,21 @@
 #include "audio_file_processor.h"
 
 #include <QPainter>
-#include <QBitmap>
-#include <QDomDocument>
 #include <QFileInfo>
 #include <QDropEvent>
 
 #include <samplerate.h>
 
 #include "AudioEngine.h"
+#include "ComboBox.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "interpolation.h"
 #include "NotePlayHandle.h"
 #include "PathUtil.h"
+#include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"

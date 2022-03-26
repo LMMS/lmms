@@ -25,11 +25,10 @@
 
 #include "SampleRecordHandle.h"
 #include "AudioEngine.h"
-#include "BBTrack.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
+#include "PatternTrack.h"
 #include "SampleBuffer.h"
-#include "SampleTrack.h"
+#include "SampleClip.h"
 #include "debug.h"
 
 
@@ -38,7 +37,7 @@ SampleRecordHandle::SampleRecordHandle(SampleClip* clip, TimePos startRecordTime
 	m_framesRecorded( 0 ),
 	m_minLength( clip->length() ),
 	m_track( clip->getTrack() ),
-	m_bbTrack( nullptr ),
+	m_patternTrack( nullptr ),
 	m_clip(clip),
 	m_startRecordTimeOffset{startRecordTimeOffset}
 {
@@ -97,7 +96,7 @@ bool SampleRecordHandle::isFinished() const
 
 bool SampleRecordHandle::isFromTrack( const Track * _track ) const
 {
-	return( m_track == _track || m_bbTrack == _track );
+	return (m_track == _track || m_patternTrack == _track);
 }
 
 

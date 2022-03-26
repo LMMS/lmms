@@ -23,6 +23,8 @@
  */
 
 
+#include <QHBoxLayout>
+
 #include "LeftRightNav.h"
 #include "ToolTip.h"
 #include "embed.h"

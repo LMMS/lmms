@@ -27,8 +27,6 @@
 #include "endian_handling.h"
 #include "AudioEngine.h"
 
-#include <QFile>
-#include <QDebug>
 
 
 AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,

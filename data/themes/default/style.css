@@ -369,7 +369,7 @@ QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarr
 EffectRackView QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up.png);}
 EffectRackView QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down.png);}
 
-/* background for song editor and bb-editor */
+/* background for song editor and pattern editor */
 
 TrackContainerView QFrame {
 	background-color: #262b30;
@@ -716,7 +716,7 @@ ClipView   {
 	qproperty-mutedColor: rgba(255,255,255,100);
 	qproperty-mutedBackgroundColor: #373d48;
 	qproperty-selectedColor: #006B65;
-	qproperty-BBClipBackground: #373d48;
+	qproperty-patternClipBackground: #373d48;
 	qproperty-textColor: #fff;
 	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgba(0,0,0,200);
@@ -751,9 +751,9 @@ AutomationClipView {
 	color: rgba(255,255,255,90);
 }
 
-/* bb-clip */
-BBClipView {
-	background-color: #20BDB2; /* default colour for bb-tracks */
+/* pattern clip */
+PatternClipView {
+	background-color: #20BDB2; /* default colour for pattern tracks */
 }
 
 /* Subwindows in MDI-Area */

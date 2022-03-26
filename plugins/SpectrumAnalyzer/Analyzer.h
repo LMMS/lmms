@@ -27,7 +27,6 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
-#include <QWaitCondition>
 
 #include "DataprocLauncher.h"
 #include "Effect.h"

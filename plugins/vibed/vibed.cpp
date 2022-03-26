@@ -22,18 +22,21 @@
  *
  */
 
-#include <QDomDocument>
-#include <QMap>
+
+#include <QDomElement>
 
 #include "vibed.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "Graph.h"
 #include "InstrumentTrack.h"
+#include "Knob.h"
+#include "LedCheckbox.h"
 #include "NotePlayHandle.h"
+#include "PixmapButton.h"
 #include "ToolTip.h"
 #include "base64.h"
 #include "CaptionMenu.h"
-#include "Oscillator.h"
 #include "string_container.h"
 #include "volume.h"
 #include "Song.h"

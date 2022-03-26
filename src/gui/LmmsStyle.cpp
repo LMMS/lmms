@@ -26,7 +26,6 @@
 
 #include <QFile>
 #include <QApplication>
-#include <QFrame>
 #include <QPainter>
 #include <QPainterPath>
 #include <QStyleFactory>
@@ -115,7 +114,7 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
 	p->setOpacity(0.5);
 
-	// highlight (bb)
+	// highlight (pattern)
 	if (dark)
 		p->strokePath(path, QPen(borderCol.lighter(133), 2));
 	else

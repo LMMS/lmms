@@ -25,8 +25,12 @@
 
 #include "patches_dialog.h"
 
+#include <fluidsynth.h>
 #include <QHeaderView>
 //#include <QFileInfo>
+#include <QLabel>
+
+#include "fluidsynthshims.h"
 
 
 // Custom list-view item (as for numerical sort purposes...)

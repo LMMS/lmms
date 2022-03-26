@@ -27,8 +27,8 @@
 #ifndef AUTOMATION_CLIP_H
 #define AUTOMATION_CLIP_H
 
-#include <QtCore/QMap>
-#include <QtCore/QPointer>
+#include <QMap>
+#include <QPointer>
 
 #include "AutomationNode.h"
 #include "Clip.h"
@@ -149,7 +149,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 
-	static const QString classNodeName() { return "automationpattern"; }
+	static const QString classNodeName() { return "automationclip"; }
 	QString nodeName() const override { return classNodeName(); }
 
 	ClipView * createView( TrackView * _tv ) override;

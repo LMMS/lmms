@@ -1,7 +1,7 @@
 #ifndef QTESTSUITE_H
 #define QTESTSUITE_H
 
-#include <QtTest/QTest>
+#include <QTest>
 #include <QObject>
 #include <QList>
 

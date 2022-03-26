@@ -30,18 +30,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <lilv/lilv.h>
-#include <lv2.h>
 #include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
 #include <lv2/lv2plug.in/ns/ext/options/options.h>
 #include <QDebug>
-#include <QDir>
-#include <QLibrary>
 #include <QElapsedTimer>
 
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
-#include "PluginFactory.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Options.h"
 #include "PluginIssue.h"

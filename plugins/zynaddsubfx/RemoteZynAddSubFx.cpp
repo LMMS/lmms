@@ -29,12 +29,9 @@
 
 #include <queue>
 
-#include <FL/x.H>
 #undef CursorShape // is, by mistake, not undefed in FL
 
-#define BUILD_REMOTE_PLUGIN_CLIENT
-
-#include "RemotePlugin.h"
+#include "RemotePluginClient.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 

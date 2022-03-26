@@ -25,7 +25,6 @@
 
 
 #include "Plugin.h"
-#include "embed.h"
 #include "vstbase_export.h"
 
 extern "C"

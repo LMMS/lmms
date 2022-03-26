@@ -25,13 +25,8 @@
 #ifndef SAMPLE_TRACK_H
 #define SAMPLE_TRACK_H
 
-#include <QLayout>
 
 #include "AudioPort.h"
-#include "FadeButton.h"
-#include "Mixer.h"
-#include "SampleClip.h"
-#include "SampleTrackView.h"
 #include "Track.h"
 
 

@@ -26,25 +26,22 @@
 #define SONG_H
 
 #include <memory>
-#include <utility>
 
-#include <QtCore/QSharedMemory>
-#include <QtCore/QVector>
 #include <QHash>
 #include <QString>
 
 #include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "Controller.h"
-#include "Keymap.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
-#include "Scale.h"
 #include "VstSyncController.h"
 
 
 class AutomationTrack;
+class Keymap;
 class MidiClip;
+class Scale;
 class TimeLineWidget;
 
 
@@ -65,7 +62,7 @@ public:
 	{
 		Mode_None,
 		Mode_PlaySong,
-		Mode_PlayBB,
+		Mode_PlayPattern,
 		Mode_PlayMidiClip,
 		Mode_PlayAutomationClip,
 		Mode_Count
@@ -363,7 +360,7 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playBB();
+	void playPattern();
 	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
@@ -376,7 +373,7 @@ public slots:
 
 	void clearProject();
 
-	void addBBTrack();
+	void addPatternTrack();
 
 
 private slots:

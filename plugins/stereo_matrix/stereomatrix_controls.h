@@ -27,7 +27,6 @@
 
 #include "EffectControls.h"
 #include "stereomatrix_control_dialog.h"
-#include "Knob.h"
 
 class stereoMatrixEffect;
 

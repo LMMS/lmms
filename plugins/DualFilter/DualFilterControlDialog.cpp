@@ -23,11 +23,10 @@
  *
  */
 
-#include <QLayout>
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"
-#include "embed.h"
+#include "Knob.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"
 #include "ToolTip.h"

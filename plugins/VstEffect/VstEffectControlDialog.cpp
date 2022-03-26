@@ -23,20 +23,17 @@
  */
 
 #include <QLayout>
-#include <QMdiArea>
 #include <QMenu>
 #include <QPushButton>
 
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
+#include "VstPlugin.h"
 
-#include "ConfigManager.h"
 #include "PixmapButton.h"
 #include "embed.h"
 #include "ToolTip.h"
 
-#include <QObject>
-#include <QPainter>
 #include "gui_templates.h"
 #include <QToolBar>
 #include <QLabel>

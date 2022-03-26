@@ -10,10 +10,6 @@ CHECK_CXX_DEFINE(IS_WIN "_WIN32")
 CHECK_CXX_DEFINE(IS_WIN64 "_WIN64")
 CHECK_CXX_DEFINE(IS_MINGW "__MINGW32__")
 
-if(NOT IS_WIN)
-	message(FATAL_ERROR "Toolchain used does not target windows.")
-ENDIF()
-
 if(IS_WIN64 OR CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BITNESS 64)
 else()
@@ -26,12 +22,23 @@ FOREACH( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 	SET("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 ENDFOREACH()
 
+ADD_SUBDIRECTORY("${LMMS_SOURCE_DIR}/src/common" common)
+
+if(NOT IS_WIN)
+set(EXE_NAME NativeLinuxRemoteVstPlugin${BITNESS})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
+else()
 set(EXE_NAME RemoteVstPlugin${BITNESS})
+endif()
 add_executable(${EXE_NAME} WIN32
 	../RemoteVstPlugin.cpp
+	${LMMS_COMMON_SRCS}
 )
-
-target_link_libraries(${EXE_NAME} ole32)
+if(IS_WIN)
+    target_link_libraries(${EXE_NAME} ole32)
+else()
+    target_link_libraries(${EXE_NAME} pthread dl X11)
+ENDIF()
 
 target_include_directories(${EXE_NAME}
 	PRIVATE 
@@ -39,6 +46,8 @@ target_include_directories(${EXE_NAME}
 		"${LMMS_SOURCE_DIR}/include"
 		"${LMMS_BINARY_DIR}"
 )
+
+target_compile_definitions(${EXE_NAME} PRIVATE BUILD_REMOTE_PLUGIN_CLIENT)
 
 # Workaround for missing WinMain
 if(MSVC)

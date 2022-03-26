@@ -28,8 +28,9 @@
 #include <QDropEvent>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QMdiSubWindow>
+#include <QLineEdit>
 #include <QMenu>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 #include "ComboBox.h"
@@ -40,8 +41,8 @@
 #include "Engine.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
+#include "GroupBox.h"
 #include "MixerLineLcdSpinBox.h"
-#include "Mixer.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "Instrument.h"
@@ -52,6 +53,7 @@
 #include "InstrumentSoundShapingView.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "LeftRightNav.h"
@@ -61,6 +63,7 @@
 #include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "SubWindow.h"
 #include "TabWidget.h"
 #include "ToolTip.h"
 #include "TrackContainerView.h"
@@ -650,7 +653,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		newView->m_tlb->setChecked(true);
 		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos);
 
-		// scroll the SongEditor/BB-editor to make sure the new trackview label is visible
+		// scroll the SongEditor/PatternEditor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
 
 		// get the instrument window to refresh

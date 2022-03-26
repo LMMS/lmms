@@ -33,8 +33,10 @@
 #include <QPainter>
 #include <QString>
 
+#include "fft_helpers.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "SaControls.h"
 #include "SaProcessor.h"
 
 #ifdef SA_DEBUG

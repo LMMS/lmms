@@ -28,7 +28,6 @@
 
 #include "EffectControls.h"
 #include "MultitapEchoControlDialog.h"
-#include "Knob.h"
 #include "Graph.h"
 
 

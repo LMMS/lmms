@@ -26,20 +26,17 @@
 #define _VST_EFFECT_CONTROLS_H
 
 #include "EffectControls.h"
-#include "VstEffectControlDialog.h"
 
-#include <QMenu>
-#include "embed.h"
-#include <QPushButton>
 
-#include <QMdiSubWindow>
-#include <QScrollArea>
-#include "CustomTextKnob.h"
-#include <QLayout>
-#include <QPainter>
 #include <QObject>
 
 
+class CustomTextKnob;
+class QGridLayout;
+class QPaintEvent;
+class QPushButton;
+class QMdiSubWindow;
+class QScrollArea;
 class VstEffect;
 
 
