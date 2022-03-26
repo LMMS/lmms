@@ -32,7 +32,7 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "AudioEngine.h"
 #include "DataFile.h"
 #include "Oscillator.h"

@@ -29,7 +29,7 @@
 #include "CrossoverEQControls.h"
 #include "embed.h"
 #include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 #include "Fader.h"
 

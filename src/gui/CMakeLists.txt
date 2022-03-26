@@ -88,7 +88,7 @@ SET(LMMS_SRCS
 	gui/widgets/LcdFloatSpinBox.cpp
 	gui/widgets/LcdSpinBox.cpp
 	gui/widgets/LcdWidget.cpp
-	gui/widgets/LedCheckbox.cpp
+	gui/widgets/LedCheckBox.cpp
 	gui/widgets/ControlLayout.cpp
 	gui/widgets/LinkedModelGroupViews.cpp
 	gui/widgets/MeterDialog.cpp
