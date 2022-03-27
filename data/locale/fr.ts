@@ -10578,8 +10578,8 @@ Raison : &quot;%2&quot;</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="86"/>
-        <source>Incomplete monophonic imitation tb303</source>
-        <translation>Imitation incomplète de TB303 monophonique</translation>
+        <source>Incomplete monophonic imitation TB-303</source>
+        <translation>Imitation incomplète de TB-303 monophonique</translation>
     </message>
     <message>
         <location filename="../../plugins/Lv2Effect/Lv2Effect.cpp" line="45"/>
