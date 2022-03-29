@@ -59,6 +59,7 @@ SET(LMMS_PLUGIN_LIST
 	sfxr
 	Sid
 	SpectrumAnalyzer
+	StereoControl
 	stereo_enhancer
 	stereo_matrix
 	stk
