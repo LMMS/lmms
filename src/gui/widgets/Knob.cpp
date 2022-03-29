@@ -171,6 +171,8 @@ void Knob::setLabel( const QString & txt )
 		setFixedSize(qMax<int>( m_knobPixmap->width(),
 					horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)),
 						m_knobPixmap->height() + 10);
+		move(x() - ( qMax<int>( m_knobPixmap->width(),
+							 horizontalAdvance(QFontMetrics(pointSizeF(font(), 6.5)), m_label)) - m_knobPixmap->width()) / 2, y());
 	}
 
 	update();

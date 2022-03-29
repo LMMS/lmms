@@ -44,7 +44,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	setFixedSize( 300, 208 );
 
 	TempoSyncKnob* sampleDelayKnob = new TempoSyncKnob( knobBright_26, this );
-	sampleDelayKnob->move( 10,14 );
+	sampleDelayKnob->move( 11,14 );
 	sampleDelayKnob->setVolumeKnob( false );
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
 	sampleDelayKnob->setLabel( tr( "DELAY" ) );
