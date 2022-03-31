@@ -94,10 +94,6 @@ private:
 
 private slots:
 	void pianoScrolled( int _new_pos );
-	void setBaseNote();
-	void setFirstKey();
-	void setLastKey();
-	void setSingleKey();
 
 signals:
 	void keyPressed( int );

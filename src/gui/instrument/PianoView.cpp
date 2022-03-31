@@ -445,16 +445,20 @@ void PianoView::contextMenuEvent(QContextMenuEvent *me)
 		title = QString("Key %1 [%2]").arg(getNoteStringByKey(key_num)).arg(key_num);
 
 		CaptionMenu contextMenu(title);
-		QAction *actionBase = contextMenu.addAction(tr("Set &base note"),
-								this, SLOT(setBaseNote()));
+		QAction *actionBase = contextMenu.addAction(tr("Set &base note"), this,
+			[this, key_num]() { setMarkerKeyValue(m_piano->instrumentTrack()->baseNoteModel(), key_num); });
+
 		contextMenu.addSeparator();
 
-		QAction *actionFirst = contextMenu.addAction(tr("Set &first key"),
-								this, SLOT(setFirstKey()));
-		QAction *actionLast = contextMenu.addAction(tr("Set &last key"),
-								this, SLOT(setLastKey()));
-		contextMenu.addAction(tr("Set &single key" ),
-								this, SLOT(setSingleKey()));
+		QAction *actionFirst = contextMenu.addAction(tr("Set &first key"), this,
+			[this, key_num]() { setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), key_num); });
+		QAction *actionLast = contextMenu.addAction(tr("Set &last key"), this,
+			[this, key_num]() { setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), key_num); });
+		contextMenu.addAction(tr("Set &single key" ), this,
+			[this, key_num]() {
+				setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), key_num);
+				setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), key_num);
+			});
 
 		actionFirst->setEnabled(key_num != m_piano->instrumentTrack()->firstKeyModel()->value() && firstMarkerAllowed(key_num));
 		actionLast->setEnabled(key_num != m_piano->instrumentTrack()->lastKeyModel()->value() && lastMarkerAllowed(key_num));
@@ -573,27 +577,6 @@ bool PianoView::lastMarkerAllowed(int key_num)
 }
 
 
-void PianoView::setBaseNote()
-{
-	setMarkerKeyValue(m_piano->instrumentTrack()->baseNoteModel(), m_lastContextMenuKey);
-}
-
-void PianoView::setFirstKey()
-{
-	setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey);
-}
-
-void PianoView::setLastKey()
-{
-	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey);
-}
-
-
-void PianoView::setSingleKey()
-{
-	setMarkerKeyValue(m_piano->instrumentTrack()->firstKeyModel(), m_lastContextMenuKey);
-	setMarkerKeyValue(m_piano->instrumentTrack()->lastKeyModel(), m_lastContextMenuKey);
-}
 
 
 // handler for mouse-release-event
