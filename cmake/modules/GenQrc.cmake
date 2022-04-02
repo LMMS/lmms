@@ -49,6 +49,13 @@ function(add_gen_qrc RCC_OUT QRC_NAME)
 	)
 
 	# Add the command to compile the QRC file
+	# Note: we can't use `qt5_add_resources` or `AUTORCC` here; we have to add
+	# the command ourselves instead. This is in order to handle dependencies
+	# correctly: the QRC file is generated at build time, so the dependencies
+	# of the compiled file can't be automatically determined at configure time.
+	# Additionally, `qt5_add_resources` adds unnecessary dependencies for
+	# generated QRC files, which can cause dependency cycles with some
+	# generators. See issue #6177.
 	add_custom_command(
 		OUTPUT "${CPP_FILE}"
 		COMMAND Qt5::rcc
