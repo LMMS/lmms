@@ -151,52 +151,52 @@ Als u interesse heeft om LMMS naar een andere taal te vertalen, of als u de best
 <context>
     <name>AudioFileProcessorView</name>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="470"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="470"/>
         <source>Open sample</source>
         <translation>Sample openen</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="479"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="479"/>
         <source>Reverse sample</source>
         <translation>Sample omdraaien</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="490"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="490"/>
         <source>Disable loop</source>
         <translation>Herhalen uitschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="500"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="500"/>
         <source>Enable loop</source>
         <translation>Herhalen inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="509"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="509"/>
         <source>Enable ping-pong loop</source>
         <translation>Ping-pong herhalen inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="524"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="524"/>
         <source>Continue sample playback across notes</source>
         <translation>Doorgaan met afspelen van sample tussen noten</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="529"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="529"/>
         <source>Amplify:</source>
         <translation>Versterken:</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="533"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="533"/>
         <source>Start point:</source>
         <translation>Beginpunt:</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="537"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="537"/>
         <source>End point:</source>
         <translation>Eindpunt:</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="541"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="541"/>
         <source>Loopback point:</source>
         <translation>Herhaalpunt:</translation>
     </message>
@@ -204,7 +204,7 @@ Als u interesse heeft om LMMS naar een andere taal te vertalen, of als u de best
 <context>
     <name>AudioFileProcessorWaveView</name>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="986"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="986"/>
         <source>Sample length:</source>
         <translation>Sample-lengte:</translation>
     </message>
@@ -880,144 +880,144 @@ Als u interesse heeft om LMMS naar een andere taal te vertalen, of als u de best
 <context>
     <name>CarlaAboutW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="14"/>
         <source>About Carla</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="24"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="24"/>
         <source>About</source>
         <translation>Over</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="30"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="30"/>
         <source>About text here</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="102"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="102"/>
         <source>Extended licensing here</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="113"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="113"/>
         <source>Artwork</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="144"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="144"/>
         <source>Using KDE Oxygen icon set, designed by Oxygen Team.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="230"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="230"/>
         <source>Contains some knobs, backgrounds and other small artwork from Calf Studio Gear, OpenAV and OpenOctave projects.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="465"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="465"/>
         <source>VST is a trademark of Steinberg Media Technologies GmbH.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="579"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="579"/>
         <source>Special thanks to António Saraiva for a few extra icons and artwork!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="589"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="589"/>
         <source>The LV2 logo has been designed by Thorsten Wilms, based on a concept from Peter Shorthose.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="605"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="605"/>
         <source>MIDI Keyboard designed by Thorsten Wilms.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="647"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="647"/>
         <source>Carla, Carla-Control and Patchbay icons designed by DoosC.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="671"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="671"/>
         <source>Features</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="677"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="677"/>
         <source>AU/AudioUnit:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="697"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="697"/>
         <source>LADSPA:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="716"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="774"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="806"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="825"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="929"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="942"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="1015"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="1022"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="716"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="774"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="806"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="825"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="929"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="942"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1015"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1022"/>
         <source>TextLabel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="742"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="742"/>
         <source>VST2:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="755"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="755"/>
         <source>DSSI:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="787"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="787"/>
         <source>LV2:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="916"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="916"/>
         <source>VST3:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="956"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="956"/>
         <source>OSC</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="962"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="962"/>
         <source>Host URLs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="982"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="982"/>
         <source>Valid commands:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="992"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="992"/>
         <source>valid osc commands here</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="1005"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1005"/>
         <source>Example:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="1072"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1072"/>
         <source>License</source>
         <translation>Licentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about.ui" line="1081"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about.ui" line="1081"/>
         <source>                    GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991
 
@@ -1302,50 +1302,50 @@ POSSIBILITY OF SUCH DAMAGES.
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="67"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="67"/>
         <source>OSC Bridge Version</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="69"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="69"/>
         <source>Plugin Version</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="71"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="71"/>
         <source>&lt;br&gt;Version %1&lt;br&gt;Carla is a fully-featured audio plugin host%2.&lt;br&gt;&lt;br&gt;Copyright (C) 2011-2019 falkTX&lt;br&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="100"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="101"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="100"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="101"/>
         <source>(Engine not running)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="123"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="123"/>
         <source>Everything! (Including LRDF)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="124"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="124"/>
         <source>Everything! (Including CustomData/Chunks)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="125"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="125"/>
         <source>About 110&amp;#37; complete (using custom extensions)&lt;br/&gt;Implemented Feature/Extensions:&lt;ul&gt;&lt;li&gt;http://lv2plug.in/ns/ext/atom&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/buf-size&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/data-access&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/event&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/instance-access&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/log&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/midi&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/options&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/parameters&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/port-props&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/presets&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/resize-port&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/state&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/time&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/uri-map&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/urid&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/ext/worker&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/extensions/ui&lt;/li&gt;&lt;li&gt;http://lv2plug.in/ns/extensions/units&lt;/li&gt;&lt;li&gt;http://home.gna.org/lv2dynparam/rtmempool/v1&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/external-ui&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/programs&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/props&lt;/li&gt;&lt;li&gt;http://kxstudio.sf.net/ns/lv2ext/rtmempool&lt;/li&gt;&lt;li&gt;http://ll-plugins.nongnu.org/lv2/ext/midimap&lt;/li&gt;&lt;li&gt;http://ll-plugins.nongnu.org/lv2/ext/miditype&lt;/li&gt;&lt;/ul&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="161"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="162"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="171"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="161"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="162"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="171"/>
         <source>Using Juce host</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="164"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="164"/>
         <source>About 85% complete (missing vst bank/presets and some minor stuff)</source>
         <translation type="unfinished"/>
     </message>
@@ -1353,516 +1353,516 @@ POSSIBILITY OF SUCH DAMAGES.
 <context>
     <name>CarlaHostW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="14"/>
         <source>MainWindow</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="40"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="40"/>
         <source>Rack</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="144"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="144"/>
         <source>Patchbay</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="179"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="179"/>
         <source>Logs</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="214"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="214"/>
         <source>Loading...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="249"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="249"/>
         <source>Buffer Size:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="272"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="272"/>
         <source>Sample Rate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="295"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="295"/>
         <source>? Xruns</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="324"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="324"/>
         <source>DSP Load: %p%</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="344"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="344"/>
         <source>&amp;File</source>
         <translation>&amp;Bestand</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="357"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="357"/>
         <source>&amp;Engine</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="367"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="367"/>
         <source>&amp;Plugin</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="371"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="371"/>
         <source>Macros (all plugins)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="395"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="395"/>
         <source>&amp;Canvas</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="399"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="399"/>
         <source>Zoom</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="418"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="418"/>
         <source>&amp;Settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="429"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="429"/>
         <source>&amp;Help</source>
         <translation>&amp;Help</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="444"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="444"/>
         <source>toolBar</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="540"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="540"/>
         <source>Disk</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="564"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1190"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="564"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1190"/>
         <source>Home</source>
         <translation>Home</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="613"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="613"/>
         <source>Transport</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="619"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="619"/>
         <source>Playback Controls</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="681"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="681"/>
         <source>Time Information</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="689"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="689"/>
         <source>Frame:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="704"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="704"/>
         <source>000&apos;000&apos;000</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="731"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="731"/>
         <source>Time:</source>
         <translation>Tijd:</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="746"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="746"/>
         <source>00:00:00</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="773"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="773"/>
         <source>BBT:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="788"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="788"/>
         <source>000|00|0000</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="816"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="816"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="822"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="822"/>
         <source> BPM</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="838"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="838"/>
         <source>Use JACK Transport</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="845"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="845"/>
         <source>Use Ableton Link</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="955"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="955"/>
         <source>&amp;New</source>
         <translation>&amp;Nieuw</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="958"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="958"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="967"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="967"/>
         <source>&amp;Open...</source>
         <translation>&amp;Openen...</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="970"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="973"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="970"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="973"/>
         <source>Open...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="976"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="976"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="985"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="985"/>
         <source>&amp;Save</source>
         <translation>Op&amp;slaan</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="988"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="988"/>
         <source>Ctrl+S</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="997"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="997"/>
         <source>Save &amp;As...</source>
         <translation>Opslaan &amp;als...</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1000"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1003"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1000"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1003"/>
         <source>Save As...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1006"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1006"/>
         <source>Ctrl+Shift+S</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1015"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1015"/>
         <source>&amp;Quit</source>
         <translation>&amp;Afsluiten</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1018"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1018"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1027"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1027"/>
         <source>&amp;Start</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1030"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1030"/>
         <source>F5</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1039"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1039"/>
         <source>St&amp;op</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1042"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1042"/>
         <source>F6</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1051"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1051"/>
         <source>&amp;Add Plugin...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1054"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1054"/>
         <source>Ctrl+A</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1063"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1063"/>
         <source>&amp;Remove All</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1068"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1068"/>
         <source>Enable</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1073"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1073"/>
         <source>Disable</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1078"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1078"/>
         <source>0% Wet (Bypass)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1083"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1083"/>
         <source>100% Wet</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1088"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1088"/>
         <source>0% Volume (Mute)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1093"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1093"/>
         <source>100% Volume</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1098"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1098"/>
         <source>Center Balance</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1110"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1110"/>
         <source>&amp;Play</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1113"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1113"/>
         <source>Ctrl+Shift+P</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1122"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1122"/>
         <source>&amp;Stop</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1125"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1125"/>
         <source>Ctrl+Shift+X</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1134"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1134"/>
         <source>&amp;Backwards</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1137"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1137"/>
         <source>Ctrl+Shift+B</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1146"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1146"/>
         <source>&amp;Forwards</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1149"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1149"/>
         <source>Ctrl+Shift+F</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1158"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1158"/>
         <source>&amp;Arrange</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1161"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1161"/>
         <source>Ctrl+G</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1170"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1324"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1170"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1324"/>
         <source>&amp;Refresh</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1173"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1173"/>
         <source>Ctrl+R</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1178"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1178"/>
         <source>Save &amp;Image...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1187"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1187"/>
         <source>Auto-Fit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1199"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1199"/>
         <source>Zoom In</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1202"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1202"/>
         <source>Ctrl++</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1211"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1211"/>
         <source>Zoom Out</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1214"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1214"/>
         <source>Ctrl+-</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1223"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1223"/>
         <source>Zoom 100%</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1226"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1226"/>
         <source>Ctrl+1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1234"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1234"/>
         <source>Show &amp;Toolbar</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1243"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1243"/>
         <source>&amp;Configure Carla</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1248"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1248"/>
         <source>&amp;About</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1253"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1253"/>
         <source>About &amp;JUCE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1258"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1258"/>
         <source>About &amp;Qt</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1266"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1266"/>
         <source>Show Canvas &amp;Meters</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1274"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1274"/>
         <source>Show Canvas &amp;Keyboard</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1282"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1282"/>
         <source>Show Internal</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1290"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1290"/>
         <source>Show External</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1298"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1298"/>
         <source>Show Time Panel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1306"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1306"/>
         <source>Show &amp;Side Panel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1315"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1315"/>
         <source>&amp;Connect...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1329"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1329"/>
         <source>Compact Slots</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1334"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1334"/>
         <source>Expand Slots</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1339"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1339"/>
         <source>Perform secret 1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1344"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1344"/>
         <source>Perform secret 2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1349"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1349"/>
         <source>Perform secret 3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1354"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1354"/>
         <source>Perform secret 4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1359"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1359"/>
         <source>Perform secret 5</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1368"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1368"/>
         <source>Add &amp;JACK Application...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1377"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1377"/>
         <source>&amp;Configure driver...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1386"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1386"/>
         <source>Panic</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_host.ui" line="1391"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_host.ui" line="1391"/>
         <source>Open custom driver panel...</source>
         <translation type="unfinished"/>
     </message>
@@ -1870,56 +1870,56 @@ POSSIBILITY OF SUCH DAMAGES.
 <context>
     <name>CarlaHostWindow</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="313"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="313"/>
         <source>Export as...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="703"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="721"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1716"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1722"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="703"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="721"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1716"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1722"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="704"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="704"/>
         <source>Failed to load project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="721"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="721"/>
         <source>Failed to save project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1335"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1335"/>
         <source>Quit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1336"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1336"/>
         <source>Are you sure you want to quit Carla?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1717"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1717"/>
         <source>Could not connect to Audio backend '%1', possible reasons:
 %2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1723"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1723"/>
         <source>Could not connect to Audio backend &apos;%1&apos;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1740"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1740"/>
         <source>Warning</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_host.cpp" line="1741"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_host.cpp" line="1741"/>
         <source>There are still some plugins loaded, you need to remove them to stop the engine.
 Do you want to do this now?</source>
         <translation type="unfinished"/>
@@ -1928,7 +1928,7 @@ Do you want to do this now?</source>
 <context>
     <name>CarlaInstrumentView</name>
     <message>
-        <location filename="../../plugins/carlabase/carla.cpp" line="420"/>
+        <location filename="../../plugins/CarlaBase/Carla.cpp" line="420"/>
         <source>Show GUI</source>
         <translation>GUI weergeven</translation>
     </message>
@@ -1936,635 +1936,635 @@ Do you want to do this now?</source>
 <context>
     <name>CarlaSettingsW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="20"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="20"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="71"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="71"/>
         <source>main</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="76"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="76"/>
         <source>canvas</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="81"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="81"/>
         <source>engine</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="86"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="86"/>
         <source>osc</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="91"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="91"/>
         <source>file-paths</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="96"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="96"/>
         <source>plugin-paths</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="101"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="101"/>
         <source>wine</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="106"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="106"/>
         <source>experimental</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="111"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="111"/>
         <source>Widget</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="116"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2675"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="116"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2675"/>
         <source>Main</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="134"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2722"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="134"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2722"/>
         <source>Canvas</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="152"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2762"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="152"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2762"/>
         <source>Engine</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="194"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="194"/>
         <source>File Paths</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="212"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="212"/>
         <source>Plugin Paths</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="230"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="230"/>
         <source>Wine</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="248"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="504"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="248"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="504"/>
         <source>Experimental</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="284"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="284"/>
         <source>&lt;b&gt;Main&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="331"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="331"/>
         <source>Paths</source>
         <translation>Paden</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="339"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="339"/>
         <source>Default project folder:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="377"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="377"/>
         <source>Interface</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="383"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="383"/>
         <source>Interface refresh interval:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="393"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1023"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="393"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1023"/>
         <source> ms</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="425"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="425"/>
         <source>Show console output in Logs tab (needs engine restart)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="432"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="432"/>
         <source>Show a confirmation dialog before quitting</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="442"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="580"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="442"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="580"/>
         <source>Theme</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="448"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="448"/>
         <source>Use Carla &quot;PRO&quot; theme (needs restart)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="458"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="458"/>
         <source>Color scheme:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="472"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="472"/>
         <source>Black</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="477"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="477"/>
         <source>System</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="510"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="510"/>
         <source>Enable experimental features</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="542"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="542"/>
         <source>&lt;b&gt;Canvas&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="612"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="612"/>
         <source>Bezier Lines</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="622"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="622"/>
         <source>Theme:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="658"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="658"/>
         <source>Size:</source>
         <translation>Grootte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="669"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="669"/>
         <source>775x600</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="674"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="674"/>
         <source>1550x1200</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="679"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="679"/>
         <source>3100x2400</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="684"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="684"/>
         <source>4650x3600</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="689"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="689"/>
         <source>6200x4800</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="713"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="713"/>
         <source>Options</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="719"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="719"/>
         <source>Auto-hide groups with no ports</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="726"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="726"/>
         <source>Auto-select items on hover</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="733"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="733"/>
         <source>Basic eye-candy (group shadows)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="743"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="743"/>
         <source>Render Hints</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="749"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="749"/>
         <source>Anti-Aliasing</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="759"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="759"/>
         <source>Full canvas repaints (slower, but prevents drawing issues)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="791"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="791"/>
         <source>&lt;b&gt;Engine&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="829"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1224"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="829"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1224"/>
         <source>Core</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="858"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="858"/>
         <source>Single Client</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="863"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="863"/>
         <source>Multiple Clients</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="868"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="892"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="868"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="892"/>
         <source>Continuous Rack</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="873"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="897"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="873"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="897"/>
         <source>Patchbay</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="909"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="909"/>
         <source>Audio driver:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="919"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="919"/>
         <source>Process mode:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="929"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="942"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1373"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1444"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="929"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="942"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1373"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1444"/>
         <source>Maximum number of parameters to allow in the built-in &apos;Edit&apos; dialog</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="932"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="932"/>
         <source>Max Parameters:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="952"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="952"/>
         <source>...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="991"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="991"/>
         <source>Reset Xrun counter after project load</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1001"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1001"/>
         <source>Plugin UIs</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1007"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1020"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1007"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1020"/>
         <source>How much time to wait for OSC GUIs to ping back the host</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1010"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1010"/>
         <source>UI Bridge Timeout:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1049"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1049"/>
         <source>Use OSC-GUI bridges when possible, this way separating the UI from DSP code</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1052"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1052"/>
         <source>Use UI bridges instead of direct handling when possible</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1059"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1059"/>
         <source>Make plugin UIs always-on-top</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1066"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1066"/>
         <source>Make plugin UIs appear on top of Carla (needs restart)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1073"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1073"/>
         <source>NOTE: Plugin-bridge UIs cannot be managed by Carla on macOS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1133"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1582"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1133"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1582"/>
         <source>Restart the engine to load the new settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1177"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1177"/>
         <source>&lt;b&gt;OSC&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1230"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1230"/>
         <source>Enable OSC</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1266"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1266"/>
         <source>Enable TCP port</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1275"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1408"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1275"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1408"/>
         <source>Use specific port:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1319"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1319"/>
         <source>Overridden by CARLA_OSC_TCP_PORT env var</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1386"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1457"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1386"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1457"/>
         <source>Use randomly assigned port</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1399"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1399"/>
         <source>Enable UDP port</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1504"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1504"/>
         <source>Overridden by CARLA_OSC_UDP_PORT env var</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1641"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1641"/>
         <source>DSSI UIs require OSC UDP port enabled</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1690"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1690"/>
         <source>&lt;b&gt;File Paths&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1749"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1749"/>
         <source>Audio</source>
         <translation>Audio</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1754"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1754"/>
         <source>MIDI</source>
         <translation>MIDI</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1781"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1781"/>
         <source>Used for the &quot;audiofile&quot; plugin</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1798"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1798"/>
         <source>Used for the &quot;midifile&quot; plugin</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1861"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2185"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1861"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2185"/>
         <source>Add...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1872"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2196"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1872"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2196"/>
         <source>Remove</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1899"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2223"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1899"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2223"/>
         <source>Change...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1936"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1936"/>
         <source>&lt;b&gt;Plugin Paths&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="1995"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="1995"/>
         <source>LADSPA</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2000"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2000"/>
         <source>DSSI</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2005"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2005"/>
         <source>LV2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2010"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2010"/>
         <source>VST2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2015"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2015"/>
         <source>VST3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2020"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2020"/>
         <source>SF2/3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2025"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2025"/>
         <source>SFZ</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2120"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2120"/>
         <source>Restart Carla to find new plugins</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2260"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2260"/>
         <source>&lt;b&gt;Wine&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2307"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2307"/>
         <source>Executable</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2313"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2313"/>
         <source>Path to &apos;wine&apos; binary:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2329"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2329"/>
         <source>Prefix</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2335"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2335"/>
         <source>Auto-detect Wine prefix based on plugin filename</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2342"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2342"/>
         <source>Fallback:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2355"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2355"/>
         <source>Note: WINEPREFIX env var is preferred over this fallback</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2368"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2368"/>
         <source>Realtime Priority</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2413"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2413"/>
         <source>Base priority:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2423"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2423"/>
         <source>WineServer priority:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2509"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2509"/>
         <source>These options are not available for Carla as plugin</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2566"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2566"/>
         <source>&lt;b&gt;Experimental&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2653"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2653"/>
         <source>Experimental options! Likely to be unstable!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2681"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2681"/>
         <source>Enable plugin bridges</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2691"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2691"/>
         <source>Enable Wine bridges</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2698"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2698"/>
         <source>Enable jack applications</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2705"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2705"/>
         <source>Export single plugins to LV2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2712"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2712"/>
         <source>Load Carla backend in global namespace (NOT RECOMMENDED)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2728"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2728"/>
         <source>Fancy eye-candy (fade-in/out groups, glow connections)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2735"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2735"/>
         <source>Use OpenGL for rendering (needs restart)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2745"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2745"/>
         <source>High Quality Anti-Aliasing (OpenGL only)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2752"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2752"/>
         <source>Render Ardour-style &quot;Inline Displays&quot;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2768"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2768"/>
         <source>Force mono plugins as stereo by running 2 instances at the same time.
 This mode is not available for VST plugins.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2772"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2772"/>
         <source>Force mono plugins as stereo</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2779"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2779"/>
         <source>Prevent plugins from doing bad stuff (needs restart)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2789"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2789"/>
         <source>Whenever possible, run the plugins in bridge mode.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings.ui" line="2792"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings.ui" line="2792"/>
         <source>Run plugins in bridge mode when possible</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_settings.cpp" line="1457"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_settings.cpp" line="1547"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_settings.cpp" line="1626"/>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_settings.cpp" line="1671"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1457"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1547"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1626"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_settings.cpp" line="1671"/>
         <source>Add Path</source>
         <translation type="unfinished"/>
     </message>
@@ -3164,12 +3164,12 @@ This mode is not available for VST plugins.</source>
     <message>
         <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="127"/>
         <source>Confirm Delete</source>
-        <translation>Verwijderen bevestigen</translation>
+        <translation>Verwijderen beVestigen</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="128"/>
         <source>Confirm delete? There are existing connection(s) associated with this controller. There is no way to undo.</source>
-        <translation>Verwijderen bevestigen? Er zijn bestaande verbindingen geassocieerd met deze controller. Er is geen manier om dit ongedaan te maken.</translation>
+        <translation>Verwijderen beVestigen? Er zijn bestaande verbindingen geassocieerd met deze controller. Er is geen manier om dit ongedaan te maken.</translation>
     </message>
 </context>
 <context>
@@ -3387,178 +3387,178 @@ This mode is not available for VST plugins.</source>
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="14"/>
         <source>Add JACK Application</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="20"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="20"/>
         <source>Note: Features not implemented yet are greyed out</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="27"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="27"/>
         <source>Application</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="49"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="49"/>
         <source>Name:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="85"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="85"/>
         <source>Application:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="104"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="104"/>
         <source>From template</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="117"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="117"/>
         <source>Custom</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="137"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="137"/>
         <source>Template:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="167"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="167"/>
         <source>Command:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="187"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="187"/>
         <source>Setup</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="224"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="224"/>
         <source>Session Manager:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="238"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="238"/>
         <source>None</source>
         <translation>Geen</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="277"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="277"/>
         <source>Audio inputs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="339"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="339"/>
         <source>MIDI inputs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="391"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="391"/>
         <source>Audio outputs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="440"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="440"/>
         <source>MIDI outputs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="470"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="470"/>
         <source>Take control of main application window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="480"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="480"/>
         <source>Workarounds</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="486"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="486"/>
         <source>Wait for external application start (Advanced, for Debug only)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="496"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="496"/>
         <source>Capture only the first X11 Window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="532"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="532"/>
         <source>Use previous client output buffer as input for the next client</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="539"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="539"/>
         <source>Simulate 16 JACK MIDI outputs, with MIDI channel as port index</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_add_jack.ui" line="583"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_add_jack.ui" line="583"/>
         <source>Error here</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="14"/>
         <source>Carla Control - Connect</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="20"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="20"/>
         <source>Remote setup</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="26"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="26"/>
         <source>UDP Port:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="36"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="36"/>
         <source>Remote host:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="66"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="66"/>
         <source>TCP Port:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="114"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="114"/>
         <source>Reported host</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="142"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="142"/>
         <source>Automatic</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="171"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="171"/>
         <source>Custom:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_osc_connect.ui" line="220"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_osc_connect.ui" line="220"/>
         <source>In some networks (like USB connections), the remote system cannot reach the local network. You can specify here which hostname or IP to make the remote Carla connect to.
 If you are unsure, leave it as &apos;Automatic&apos;.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/inputdialog_value.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/inputdialog_value.ui" line="14"/>
         <source>Set value</source>
         <translation>Waarde instellen</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/inputdialog_value.ui" line="20"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/inputdialog_value.ui" line="20"/>
         <source>TextLabel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/inputdialog_value.ui" line="30"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/inputdialog_value.ui" line="30"/>
         <source>Scale Points</source>
         <translation type="unfinished"/>
     </message>
@@ -3566,37 +3566,37 @@ If you are unsure, leave it as &apos;Automatic&apos;.</source>
 <context>
     <name>DriverSettingsW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings_driver.ui" line="20"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="20"/>
         <source>Driver Settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings_driver.ui" line="79"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="79"/>
         <source>Device:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings_driver.ui" line="95"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="95"/>
         <source>Buffer size:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings_driver.ui" line="114"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="114"/>
         <source>Sample rate:</source>
         <translation>Samplerate:</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings_driver.ui" line="141"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="141"/>
         <source>Triple buffer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings_driver.ui" line="187"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="187"/>
         <source>Show Driver Control Panel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_settings_driver.ui" line="249"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_settings_driver.ui" line="249"/>
         <source>Restart the engine to load the new settings</source>
         <translation type="unfinished"/>
     </message>
@@ -6641,7 +6641,7 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="145"/>
-        <location filename="../../plugins/vestige/vestige.cpp" line="335"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="335"/>
         <source>Default preset</source>
         <translation>Standaard preset</translation>
     </message>
@@ -6835,17 +6835,17 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
 <context>
     <name>JackApplicationW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_database.cpp" line="356"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_database.cpp" line="356"/>
         <source>NSM applications cannot use abstract or absolute paths</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_database.cpp" line="358"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_database.cpp" line="358"/>
         <source>NSM applications cannot use CLI arguments</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_database.cpp" line="360"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_database.cpp" line="360"/>
         <source>You need to save the current Carla project before NSM can be used</source>
         <translation type="unfinished"/>
     </message>
@@ -6853,22 +6853,22 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
 <context>
     <name>JuceAboutW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about_juce.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="14"/>
         <source>About JUCE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about_juce.ui" line="61"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="61"/>
         <source>&lt;b&gt;About JUCE&lt;/b&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about_juce.ui" line="84"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="84"/>
         <source>This program uses JUCE version 3.x.x.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_about_juce.ui" line="107"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_about_juce.ui" line="107"/>
         <source>JUCE (Jules' Utility Class Extensions) is an all-encompassing C++ class library for developing cross-platform software.
 
 It contains pretty much everything you're likely to need to create most applications, and is particularly well-suited for building highly-customised GUIs, and for handling graphics and sound.
@@ -6880,7 +6880,7 @@ Copyright (C) 2017 ROLI Ltd.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/source/frontend/carla_widgets.cpp" line="217"/>
+        <location filename="../../plugins/CarlaBase/carla/source/frontend/carla_widgets.cpp" line="217"/>
         <source>This program uses JUCE version %1.</source>
         <translation type="unfinished"/>
     </message>
@@ -7798,234 +7798,234 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>MidiPatternW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="14"/>
         <source>MIDI Pattern</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="39"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="39"/>
         <source>Time Signature:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="56"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="259"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="339"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="56"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="259"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="339"/>
         <source>1/4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="61"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="61"/>
         <source>2/4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="66"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="66"/>
         <source>3/4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="71"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="71"/>
         <source>4/4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="76"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="76"/>
         <source>5/4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="81"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="81"/>
         <source>6/4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="105"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="105"/>
         <source>Measures:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="119"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="274"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="354"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="119"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="274"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="354"/>
         <source>1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="124"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="124"/>
         <source>2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="129"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="129"/>
         <source>3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="134"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="134"/>
         <source>4</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="139"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="139"/>
         <source>5</source>
         <translation>5</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="144"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="144"/>
         <source>6</source>
         <translation>6</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="149"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="149"/>
         <source>7</source>
         <translation>7</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="154"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="154"/>
         <source>8</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="159"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="159"/>
         <source>9</source>
         <translation>9</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="164"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="164"/>
         <source>10</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="169"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="169"/>
         <source>11</source>
         <translation>11</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="174"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="174"/>
         <source>12</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="179"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="179"/>
         <source>13</source>
         <translation>13</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="184"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="184"/>
         <source>14</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="189"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="189"/>
         <source>15</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="194"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="194"/>
         <source>16</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="218"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="218"/>
         <source>Default Length:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="229"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="309"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="229"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="309"/>
         <source>1/16</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="234"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="314"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="234"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="314"/>
         <source>1/15</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="239"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="319"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="239"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="319"/>
         <source>1/12</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="244"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="324"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="244"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="324"/>
         <source>1/9</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="249"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="329"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="249"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="329"/>
         <source>1/8</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="254"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="334"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="254"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="334"/>
         <source>1/6</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="264"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="344"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="264"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="344"/>
         <source>1/3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="269"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="349"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="269"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="349"/>
         <source>1/2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="298"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="298"/>
         <source>Quantize:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="411"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="411"/>
         <source>&amp;File</source>
         <translation>&amp;Bestand</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="417"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="417"/>
         <source>&amp;Edit</source>
         <translation>&amp;Bewerken</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="429"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="429"/>
         <source>&amp;Quit</source>
         <translation>&amp;Afsluiten</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="437"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="437"/>
         <source>&amp;Insert Mode</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="440"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="440"/>
         <source>F</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="448"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="448"/>
         <source>&amp;Velocity Mode</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="451"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="451"/>
         <source>D</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="456"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="456"/>
         <source>Select All</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/midipattern.ui" line="459"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/midipattern.ui" line="459"/>
         <source>A</source>
         <translation type="unfinished"/>
     </message>
@@ -8099,595 +8099,595 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>MonstroInstrument</name>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="832"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="832"/>
         <source>Osc 1 volume</source>
         <translation>Osc 1 volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="833"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="833"/>
         <source>Osc 1 panning</source>
         <translation>Osc 1 balans</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="834"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="834"/>
         <source>Osc 1 coarse detune</source>
         <translation>Osc 1 grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="835"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="835"/>
         <source>Osc 1 fine detune left</source>
         <translation>Osc 1 fijn ontstemmen links</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="836"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="836"/>
         <source>Osc 1 fine detune right</source>
         <translation>Osc 1 fijn ontstemmen rechts</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="837"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="837"/>
         <source>Osc 1 stereo phase offset</source>
         <translation>Osc 1 stereo-faseverschuiving</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="838"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="838"/>
         <source>Osc 1 pulse width</source>
         <translation>Osc 1 pulsbreedte</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="839"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="839"/>
         <source>Osc 1 sync send on rise</source>
         <translation>Osc 1 synchronisatie bij stijging</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="840"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="840"/>
         <source>Osc 1 sync send on fall</source>
         <translation>Osc 1 synchronisatie bij daling</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="842"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="842"/>
         <source>Osc 2 volume</source>
         <translation>Osc 2 volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="843"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="843"/>
         <source>Osc 2 panning</source>
         <translation>Osc 2 balans</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="844"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="844"/>
         <source>Osc 2 coarse detune</source>
         <translation>Osc 2 grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="845"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="845"/>
         <source>Osc 2 fine detune left</source>
         <translation>Osc 2 fijn ontstemmen links</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="846"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="846"/>
         <source>Osc 2 fine detune right</source>
         <translation>Osc 2 fijn ontstemmen rechts</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="847"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="847"/>
         <source>Osc 2 stereo phase offset</source>
         <translation>Osc 2 stereo-faseverschuiving</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="848"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="848"/>
         <source>Osc 2 waveform</source>
         <translation>Osc 2  golfvorm</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="849"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="849"/>
         <source>Osc 2 sync hard</source>
         <translation>Osc 2 sync hard</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="850"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="850"/>
         <source>Osc 2 sync reverse</source>
         <translation>Osc 2 sync omgekeerd</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="852"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="852"/>
         <source>Osc 3 volume</source>
         <translation>Osc 3 volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="853"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="853"/>
         <source>Osc 3 panning</source>
         <translation>Osc 3 balans</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="854"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="854"/>
         <source>Osc 3 coarse detune</source>
         <translation>Osc 3 grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="855"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="855"/>
         <source>Osc 3 Stereo phase offset</source>
         <translation>Osc 3 stereo-faseverschuiving</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="856"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="856"/>
         <source>Osc 3 sub-oscillator mix</source>
         <translation>Osc 3 sub-oscillator mix</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="857"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="857"/>
         <source>Osc 3 waveform 1</source>
         <translation>Osc 3 golfvorm 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="858"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="858"/>
         <source>Osc 3 waveform 2</source>
         <translation>Osc 3 golfvorm 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="859"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="859"/>
         <source>Osc 3 sync hard</source>
         <translation>Osc 3 sync hard</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="860"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="860"/>
         <source>Osc 3 Sync reverse</source>
         <translation>Osc 3 sync omgekeerd</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="862"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="862"/>
         <source>LFO 1 waveform</source>
         <translation>LFO 1 golfvorm</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="863"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="863"/>
         <source>LFO 1 attack</source>
         <translation>LFO 1 attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="864"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="864"/>
         <source>LFO 1 rate</source>
         <translation>LFO 1 ratio</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="865"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="865"/>
         <source>LFO 1 phase</source>
         <translation>LFO 1 fase</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="867"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="867"/>
         <source>LFO 2 waveform</source>
         <translation>LFO 2 golfvorm</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="868"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="868"/>
         <source>LFO 2 attack</source>
         <translation>LFO 2 attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="869"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="869"/>
         <source>LFO 2 rate</source>
         <translation>LFO 2 ratio</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="870"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="870"/>
         <source>LFO 2 phase</source>
         <translation>LFO 2 fase</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="872"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="872"/>
         <source>Env 1 pre-delay</source>
         <translation>Env 1 pre-delay</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="873"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="873"/>
         <source>Env 1 attack</source>
         <translation>Env 1 attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="874"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="874"/>
         <source>Env 1 hold</source>
         <translation>Env 1 hold</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="875"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="875"/>
         <source>Env 1 decay</source>
         <translation>Env 1 decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="876"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="876"/>
         <source>Env 1 sustain</source>
         <translation>Env 1 sustain</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="877"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="877"/>
         <source>Env 1 release</source>
         <translation>Env 1 release</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="878"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="878"/>
         <source>Env 1 slope</source>
         <translation>Env 1 slope</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="880"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="880"/>
         <source>Env 2 pre-delay</source>
         <translation>Env 2 pre-delay</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="881"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="881"/>
         <source>Env 2 attack</source>
         <translation>Env 2 attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="882"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="882"/>
         <source>Env 2 hold</source>
         <translation>Env 2 hold</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="883"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="883"/>
         <source>Env 2 decay</source>
         <translation>Env 2 decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="884"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="884"/>
         <source>Env 2 sustain</source>
         <translation>Env 2 sustain</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="885"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="885"/>
         <source>Env 2 release</source>
         <translation>Env 2 release</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="886"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="886"/>
         <source>Env 2 slope</source>
         <translation>Env 2 slope</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="888"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="888"/>
         <source>Osc 2+3 modulation</source>
         <translation>Osc 2+3 modulatie</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="890"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="890"/>
         <source>Selected view</source>
         <translation>Geselecteerde weergave</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="892"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="892"/>
         <source>Osc 1 - Vol env 1</source>
         <translation>Osc 1 - Vol env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="893"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="893"/>
         <source>Osc 1 - Vol env 2</source>
         <translation>Osc 1 - Vol env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="894"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="894"/>
         <source>Osc 1 - Vol LFO 1</source>
         <translation>Osc 1 - Vol LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="895"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="895"/>
         <source>Osc 1 - Vol LFO 2</source>
         <translation>Osc 1 - Vol LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="897"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="897"/>
         <source>Osc 2 - Vol env 1</source>
         <translation>Osc 2 - Vol env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="898"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="898"/>
         <source>Osc 2 - Vol env 2</source>
         <translation>Osc 2 - Vol env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="899"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="899"/>
         <source>Osc 2 - Vol LFO 1</source>
         <translation>Osc 2 - Vol LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="900"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="900"/>
         <source>Osc 2 - Vol LFO 2</source>
         <translation>Osc 2 - Vol LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="902"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="902"/>
         <source>Osc 3 - Vol env 1</source>
         <translation>Osc 3 - Vol env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="903"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="903"/>
         <source>Osc 3 - Vol env 2</source>
         <translation>Osc 3 - Vol env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="904"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="904"/>
         <source>Osc 3 - Vol LFO 1</source>
         <translation>Osc 3 - Vol LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="905"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="905"/>
         <source>Osc 3 - Vol LFO 2</source>
         <translation>Osc 3 - Vol LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="907"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="907"/>
         <source>Osc 1 - Phs env 1</source>
         <translation>Osc 1 - Fase env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="908"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="908"/>
         <source>Osc 1 - Phs env 2</source>
         <translation>Osc 1 - Fase env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="909"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="909"/>
         <source>Osc 1 - Phs LFO 1</source>
         <translation>Osc 1 - Fase LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="910"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="910"/>
         <source>Osc 1 - Phs LFO 2</source>
         <translation>Osc 1 - Fase LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="912"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="912"/>
         <source>Osc 2 - Phs env 1</source>
         <translation>Osc 2 - Fase env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="913"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="913"/>
         <source>Osc 2 - Phs env 2</source>
         <translation>Osc 2 - Fase env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="914"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="914"/>
         <source>Osc 2 - Phs LFO 1</source>
         <translation>Osc 2 - Fase LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="915"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="915"/>
         <source>Osc 2 - Phs LFO 2</source>
         <translation>Osc 2 - Fase LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="917"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="917"/>
         <source>Osc 3 - Phs env 1</source>
         <translation>Osc 3 - Fase env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="918"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="918"/>
         <source>Osc 3 - Phs env 2</source>
         <translation>Osc 3 - Fase env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="919"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="919"/>
         <source>Osc 3 - Phs LFO 1</source>
         <translation>Osc 3 - Fase LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="920"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="920"/>
         <source>Osc 3 - Phs LFO 2</source>
         <translation>Osc 3 - Fase LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="922"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="922"/>
         <source>Osc 1 - Pit env 1</source>
         <translation>Osc 1 - Toonh env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="923"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="923"/>
         <source>Osc 1 - Pit env 2</source>
         <translation>Osc 1 - Toonh env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="924"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="924"/>
         <source>Osc 1 - Pit LFO 1</source>
         <translation>Osc 1 - Toonh LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="925"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="925"/>
         <source>Osc 1 - Pit LFO 2</source>
         <translation>Osc 1 - Toonh LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="927"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="927"/>
         <source>Osc 2 - Pit env 1</source>
         <translation>Osc 2 - Toonh env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="928"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="928"/>
         <source>Osc 2 - Pit env 2</source>
         <translation>Osc 2 - Toonh env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="929"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="929"/>
         <source>Osc 2 - Pit LFO 1</source>
         <translation>Osc 2 - Toonh LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="930"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="930"/>
         <source>Osc 2 - Pit LFO 2</source>
         <translation>Osc 2 - Toonh LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="932"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="932"/>
         <source>Osc 3 - Pit env 1</source>
         <translation>Osc 3 - Toonh env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="933"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="933"/>
         <source>Osc 3 - Pit env 2</source>
         <translation>Osc 3 - Toonh env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="934"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="934"/>
         <source>Osc 3 - Pit LFO 1</source>
         <translation>Osc 3 - Toonh LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="935"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="935"/>
         <source>Osc 3 - Pit LFO 2</source>
         <translation>Osc 3 - Toonh LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="937"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="937"/>
         <source>Osc 1 - PW env 1</source>
         <translation>Osc 1 - PB env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="938"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="938"/>
         <source>Osc 1 - PW env 2</source>
         <translation>Osc 1 - PB env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="939"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="939"/>
         <source>Osc 1 - PW LFO 1</source>
         <translation>Osc 1 - PB LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="940"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="940"/>
         <source>Osc 1 - PW LFO 2</source>
         <translation>Osc 1 - PB LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="942"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="942"/>
         <source>Osc 3 - Sub env 1</source>
         <translation>Osc 3 - Sub env 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="943"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="943"/>
         <source>Osc 3 - Sub env 2</source>
         <translation>Osc 3 - Sub env 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="944"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="944"/>
         <source>Osc 3 - Sub LFO 1</source>
         <translation>Osc 3 - Sub LFO 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="945"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="945"/>
         <source>Osc 3 - Sub LFO 2</source>
         <translation>Osc 3 - Sub LFO 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="312"/>
-        <location filename="../../plugins/monstro/Monstro.h" line="330"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="312"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="330"/>
         <source>Sine wave</source>
         <translation>Sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="313"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="313"/>
         <source>Bandlimited Triangle wave</source>
         <translation>Bandgelimiteerde driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="314"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="314"/>
         <source>Bandlimited Saw wave</source>
         <translation>Bandgelimiteerde zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="315"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="315"/>
         <source>Bandlimited Ramp wave</source>
         <translation>Bandgelimiteerde hellingsgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="316"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="316"/>
         <source>Bandlimited Square wave</source>
         <translation>Bandgelimiteerde blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="317"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="317"/>
         <source>Bandlimited Moog saw wave</source>
         <translation>Bandgelimiteerde moog-zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="318"/>
-        <location filename="../../plugins/monstro/Monstro.h" line="336"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="318"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="336"/>
         <source>Soft square wave</source>
         <translation>Zachte blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="319"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="319"/>
         <source>Absolute sine wave</source>
         <translation>Absolute sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="320"/>
-        <location filename="../../plugins/monstro/Monstro.h" line="338"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="320"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="338"/>
         <source>Exponential wave</source>
         <translation>Exponentiële golf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="321"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="321"/>
         <source>White noise</source>
         <translation>Witte ruis</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="322"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="322"/>
         <source>Digital Triangle wave</source>
         <translation>Digitale driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="323"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="323"/>
         <source>Digital Saw wave</source>
         <translation>Digitale zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="324"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="324"/>
         <source>Digital Ramp wave</source>
         <translation>Digitale hellingsgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="325"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="325"/>
         <source>Digital Square wave</source>
         <translation>Digitale blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="326"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="326"/>
         <source>Digital Moog saw wave</source>
         <translation>Digitale moog-zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="331"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="331"/>
         <source>Triangle wave</source>
         <translation>Driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="332"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="332"/>
         <source>Saw wave</source>
         <translation>Zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="333"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="333"/>
         <source>Ramp wave</source>
         <translation>Hellingsgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="334"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="334"/>
         <source>Square wave</source>
         <translation>Blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="335"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="335"/>
         <source>Moog saw wave</source>
         <translation>Moog-zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="337"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="337"/>
         <source>Abs. sine wave</source>
         <translation>Abs. sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="339"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="339"/>
         <source>Random</source>
         <translation>Willekeurig</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.h" line="340"/>
+        <location filename="../../plugins/Monstro/Monstro.h" line="340"/>
         <source>Random smooth</source>
         <translation>Willekeurig glad</translation>
     </message>
@@ -8695,240 +8695,240 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>MonstroView</name>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1468"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1468"/>
         <source>Operators view</source>
         <translation>Operatorweergave</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1474"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1474"/>
         <source>Matrix view</source>
         <translation>Matrixweergave</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1644"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1657"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1673"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1644"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1657"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1673"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1645"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1658"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1674"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1645"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1658"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1674"/>
         <source>Panning</source>
         <translation>Balans</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1646"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1659"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1675"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1646"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1659"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1675"/>
         <source>Coarse detune</source>
         <translation>Grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1646"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1659"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1675"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1646"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1659"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1675"/>
         <source> semitones</source>
         <translation>semitonen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1647"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1660"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1647"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1660"/>
         <source>Fine tune left</source>
         <translation>Fijn stemmen links</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1647"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1648"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1660"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1661"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1647"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1648"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1660"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1661"/>
         <source> cents</source>
         <translation>cents</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1648"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1661"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1648"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1661"/>
         <source>Fine tune right</source>
         <translation>Fijn stemmen rechts</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1649"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1662"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1676"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1649"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1662"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1676"/>
         <source>Stereo phase offset</source>
         <translation>Stereo-faseverschuiving</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1649"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1662"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1676"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1698"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1706"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1649"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1662"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1676"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1698"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1706"/>
         <source> deg</source>
         <translation>graden</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1650"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1650"/>
         <source>Pulse width</source>
         <translation>Pulsbreedte</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1654"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1654"/>
         <source>Send sync on pulse rise</source>
         <translation>Sync verzenden bij pulsstijging</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1655"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1655"/>
         <source>Send sync on pulse fall</source>
         <translation>Sync verzenden bij pulsdaling</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1670"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1670"/>
         <source>Hard sync oscillator 2</source>
         <translation>Oscillator 2 hard-syncen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1671"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1671"/>
         <source>Reverse sync oscillator 2</source>
         <translation>Oscillator 2 omgekeerd syncen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1677"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1677"/>
         <source>Sub-osc mix</source>
         <translation>Sub-osc mix</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1689"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1689"/>
         <source>Hard sync oscillator 3</source>
         <translation>Oscillator 3 hard-syncen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1690"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1690"/>
         <source>Reverse sync oscillator 3</source>
         <translation>Oscillator 3 omgekeerd syncen</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1696"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1704"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1709"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1717"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1696"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1704"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1709"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1717"/>
         <source>Attack</source>
         <translation>Attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1697"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1705"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1697"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1705"/>
         <source>Rate</source>
         <translation>Ratio</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1698"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1706"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1698"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1706"/>
         <source>Phase</source>
         <translation>Fase</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1708"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1716"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1708"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1716"/>
         <source>Pre-delay</source>
         <translation>Pre-delay</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1710"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1718"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1710"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1718"/>
         <source>Hold</source>
         <translation>Hold</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1711"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1719"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1711"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1719"/>
         <source>Decay</source>
         <translation>Decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1712"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1720"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1712"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1720"/>
         <source>Sustain</source>
         <translation>Sustain</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1713"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1721"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1713"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1721"/>
         <source>Release</source>
         <translation>Release</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1714"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1722"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1714"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1722"/>
         <source>Slope</source>
         <translation>Slope</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1729"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1729"/>
         <source>Mix osc 2 with osc 3</source>
         <translation>Osc 2 mengen met osc 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1735"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1735"/>
         <source>Modulate amplitude of osc 3 by osc 2</source>
         <translation>Amplitude van osc 3 moduleren met osc 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1741"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1741"/>
         <source>Modulate frequency of osc 3 by osc 2</source>
         <translation>Frequentie van osc 3 moduleren met osc 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1747"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1747"/>
         <source>Modulate phase of osc 3 by osc 2</source>
         <translation>Fase van osc 3 mengen met osc 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1768"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1769"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1770"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1771"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1773"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1774"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1775"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1776"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1778"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1779"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1780"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1781"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1783"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1784"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1785"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1786"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1788"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1789"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1790"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1791"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1793"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1794"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1795"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1796"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1798"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1799"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1800"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1801"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1803"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1804"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1805"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1806"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1808"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1809"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1810"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1811"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1813"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1814"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1815"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1816"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1818"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1819"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1820"/>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="1821"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1768"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1769"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1770"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1771"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1773"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1774"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1775"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1776"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1778"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1779"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1780"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1781"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1783"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1784"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1785"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1786"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1788"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1789"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1790"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1791"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1793"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1794"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1795"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1796"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1798"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1799"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1800"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1801"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1803"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1804"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1805"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1806"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1808"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1809"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1810"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1811"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1813"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1814"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1815"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1816"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1818"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1819"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1820"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="1821"/>
         <source>Modulation amount</source>
         <translation>Hoeveelheid modulatie</translation>
     </message>
@@ -8979,102 +8979,102 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>NesInstrument</name>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="489"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="489"/>
         <source>Channel 1 coarse detune</source>
         <translation>Kanaal 1 grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="490"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="490"/>
         <source>Channel 1 volume</source>
         <translation>Volume kanaal 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="494"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="494"/>
         <source>Channel 1 envelope length</source>
         <translation>Kanaal 1 envelope-lengte</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="496"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="496"/>
         <source>Channel 1 duty cycle</source>
         <translation>Kanaal 1 inschakeltijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="499"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="499"/>
         <source>Channel 1 sweep amount</source>
         <translation>Kanaal 1 hoeveelheid sweep</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="500"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="500"/>
         <source>Channel 1 sweep rate</source>
         <translation>Kanaal 1 sweep-ratio</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="503"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="503"/>
         <source>Channel 2 Coarse detune</source>
         <translation>Kanaal 2 grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="504"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="504"/>
         <source>Channel 2 Volume</source>
         <translation>Volume kanaal 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="508"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="508"/>
         <source>Channel 2 envelope length</source>
         <translation>Kanaal 2 envelope-lengte</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="510"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="510"/>
         <source>Channel 2 duty cycle</source>
         <translation>Kanaal 2 inschakeltijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="513"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="513"/>
         <source>Channel 2 sweep amount</source>
         <translation>Kanaal 2 hoeveelheid sweep</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="514"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="514"/>
         <source>Channel 2 sweep rate</source>
         <translation>Kanaal 2 sweep-ratio</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="518"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="518"/>
         <source>Channel 3 coarse detune</source>
         <translation>Kanaal 3 grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="519"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="519"/>
         <source>Channel 3 volume</source>
         <translation>Volume kanaal 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="523"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="523"/>
         <source>Channel 4 volume</source>
         <translation>Volume kanaal 4</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="527"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="527"/>
         <source>Channel 4 envelope length</source>
         <translation>Kanaal 4 envelope-lengte</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="531"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="531"/>
         <source>Channel 4 noise frequency</source>
         <translation>Kanaal 4 ruisfrequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="533"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="533"/>
         <source>Channel 4 noise frequency sweep</source>
         <translation>Kanaal 4 ruisfrequentie-sweep</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="537"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="537"/>
         <source>Master volume</source>
         <translation>Master-volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="538"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="538"/>
         <source>Vibrato</source>
         <translation>Vibrato</translation>
     </message>
@@ -9082,155 +9082,155 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>NesInstrumentView</name>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="762"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="793"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="824"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="829"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="762"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="793"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="824"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="829"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="763"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="794"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="825"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="763"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="794"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="825"/>
         <source>Coarse detune</source>
         <translation>Grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="764"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="795"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="831"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="764"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="795"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="831"/>
         <source>Envelope length</source>
         <translation>Envelope-lengte</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="766"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="766"/>
         <source>Enable channel 1</source>
         <translation>Kanaal 1 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="767"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="767"/>
         <source>Enable envelope 1</source>
         <translation>Envelope 1 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="768"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="768"/>
         <source>Enable envelope 1 loop</source>
         <translation>Envelope 1 herhalen inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="770"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="770"/>
         <source>Enable sweep 1</source>
         <translation>Sweep 1 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="771"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="802"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="771"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="802"/>
         <source>Sweep amount</source>
         <translation>Hoeveelheid sweep</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="772"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="803"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="772"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="803"/>
         <source>Sweep rate</source>
         <translation>Sweep-ratio</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="775"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="806"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="775"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="806"/>
         <source>12.5% Duty cycle</source>
         <translation>12.5 % inschakeltijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="777"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="808"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="777"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="808"/>
         <source>25% Duty cycle</source>
         <translation>25 % inschakeltijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="779"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="810"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="779"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="810"/>
         <source>50% Duty cycle</source>
         <translation>50 % inschakeltijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="781"/>
-        <location filename="../../plugins/nes/Nes.cpp" line="812"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="781"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="812"/>
         <source>75% Duty cycle</source>
         <translation>75 % inschakeltijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="797"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="797"/>
         <source>Enable channel 2</source>
         <translation>Kanaal 2 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="798"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="798"/>
         <source>Enable envelope 2</source>
         <translation>Envelope 2 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="799"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="799"/>
         <source>Enable envelope 2 loop</source>
         <translation>Envelope 2 herhalen inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="801"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="801"/>
         <source>Enable sweep 2</source>
         <translation>Sweep 2 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="823"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="823"/>
         <source>Enable channel 3</source>
         <translation>Kanaal 3 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="830"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="830"/>
         <source>Noise Frequency</source>
         <translation>Ruisfrequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="832"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="832"/>
         <source>Frequency sweep</source>
         <translation>Frequentie-sweep</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="834"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="834"/>
         <source>Enable channel 4</source>
         <translation>Kanaal 4 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="835"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="835"/>
         <source>Enable envelope 4</source>
         <translation>Envelope 4 inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="836"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="836"/>
         <source>Enable envelope 4 loop</source>
         <translation>Envelope 4 herhalen inschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="838"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="838"/>
         <source>Quantize noise frequency when using note frequency</source>
         <translation>Ruisfrequentie kwantiseren wanneer nootfrequentie gebruikt wordt</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="840"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="840"/>
         <source>Use note frequency for noise</source>
         <translation>Nootfrequentie gebruiken voor ruis</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="841"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="841"/>
         <source>Noise mode</source>
         <translation>Ruismodus</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="845"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="845"/>
         <source>Master volume</source>
         <translation>Master-volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="846"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="846"/>
         <source>Vibrato</source>
         <translation>Vibrato</translation>
     </message>
@@ -9413,60 +9413,60 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>OscillatorObject</name>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="568"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="568"/>
         <source>Osc %1 waveform</source>
         <translation>Osc %1 golfvorm</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="570"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="570"/>
         <source>Osc %1 harmonic</source>
         <translation>Osc %1 harmonisch</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="572"/>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="70"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="572"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="70"/>
         <source>Osc %1 volume</source>
         <translation>Osc %1 volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="574"/>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="72"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="574"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="72"/>
         <source>Osc %1 panning</source>
         <translation>Balans osc %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="576"/>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="77"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="576"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="77"/>
         <source>Osc %1 fine detuning left</source>
         <translation>Osc %1 fijn ontstemmen links</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="75"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="75"/>
         <source>Osc %1 coarse detuning</source>
         <translation>Osc %1 grof ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="79"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="79"/>
         <source>Osc %1 fine detuning right</source>
         <translation>Osc %1 fijn ontstemmen rechts</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="81"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="81"/>
         <source>Osc %1 phase-offset</source>
         <translation>Osc %1 faseverschuiving</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="83"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="83"/>
         <source>Osc %1 stereo phase-detuning</source>
         <translation>Osc %1 stereo-fase-ontstemming</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="86"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="86"/>
         <source>Osc %1 wave shape</source>
         <translation>Osc %1 golfvorm</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="89"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="89"/>
         <source>Modulation type %1</source>
         <translation>Modulatietype %1</translation>
     </message>
@@ -9530,42 +9530,42 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>PatmanView</name>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="466"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="466"/>
         <source>Open patch</source>
         <translation>Patch openen</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="468"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="468"/>
         <source>Loop</source>
         <translation>Herhalen</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="476"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="476"/>
         <source>Loop mode</source>
         <translation>Herhaalmodus</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="478"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="478"/>
         <source>Tune</source>
         <translation>Stemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="486"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="486"/>
         <source>Tune mode</source>
         <translation>Stem-modus</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="488"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="488"/>
         <source>No file selected</source>
         <translation>Geen bestand geselecteerd</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="505"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="505"/>
         <source>Open patch file</source>
         <translation>Patchbestand openen</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="509"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="509"/>
         <source>Patch-Files (*.pat)</source>
         <translation>Patch-bestanden (*.pat)</translation>
     </message>
@@ -9647,72 +9647,72 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>PeakControllerEffectControlDialog</name>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="50"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="50"/>
         <source>BASE</source>
         <translation>BASIS</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="52"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="52"/>
         <source>Base:</source>
         <translation>Basis:</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="55"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="55"/>
         <source>AMNT</source>
         <translation>HVHD</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="57"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="57"/>
         <source>Modulation amount:</source>
         <translation>Hoeveelheid basis:</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="60"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="60"/>
         <source>MULT</source>
         <translation>VERM</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="62"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="62"/>
         <source>Amount multiplicator:</source>
         <translation>Hoeveelheid-vermenigvuldiger:</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="65"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="65"/>
         <source>ATCK</source>
         <translation>ATCK</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="67"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="67"/>
         <source>Attack:</source>
         <translation>Attack:</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="70"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="70"/>
         <source>DCAY</source>
         <translation>DCAY</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="72"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="72"/>
         <source>Release:</source>
         <translation>Release:</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="75"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="75"/>
         <source>TRSH</source>
         <translation>TRSH</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="77"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="77"/>
         <source>Treshold:</source>
         <translation>Treshold:</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="79"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="79"/>
         <source>Mute output</source>
         <translation>Uitvoer dempen</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_control_dialog.cpp" line="82"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControlDialog.cpp" line="82"/>
         <source>Absolute value</source>
         <translation>Absolute waarde</translation>
     </message>
@@ -9720,42 +9720,42 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
 <context>
     <name>PeakControllerEffectControls</name>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="39"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="39"/>
         <source>Base value</source>
         <translation>Basiswaarde</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="40"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="40"/>
         <source>Modulation amount</source>
         <translation>Hoeveelheid modulatie</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="41"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="41"/>
         <source>Attack</source>
         <translation>Attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="42"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="42"/>
         <source>Release</source>
         <translation>Release</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="43"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="43"/>
         <source>Treshold</source>
         <translation>Treshold</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="44"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="44"/>
         <source>Mute output</source>
         <translation>Uitvoer dempen</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="45"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="45"/>
         <source>Absolute value</source>
         <translation>Absolute waarde</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect_controls.cpp" line="46"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffectControls.cpp" line="46"/>
         <source>Amount multiplicator</source>
         <translation>Hoeveelheid-vermenigvuldiger</translation>
     </message>
@@ -10192,7 +10192,7 @@ Reden: &quot;%2&quot;</translation>
         <translation>Een ingebouwde versterker-plugin</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="59"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="59"/>
         <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
         <translation>Simpele sampler met verschillende instellingen voor het gebruik van samples (bijvoorbeeld drums) in een instrument-track</translation>
     </message>
@@ -10202,7 +10202,7 @@ Reden: &quot;%2&quot;</translation>
         <translation>Versterk uw bas snel en eenvoudig</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="57"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="57"/>
         <source>Customizable wavetable synthesizer</source>
         <translation>Aanpasbare wavetable-synthesizer</translation>
     </message>
@@ -10212,12 +10212,12 @@ Reden: &quot;%2&quot;</translation>
         <translation>Een oversampling-bitcrusher</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlapatchbay/carlapatchbay.cpp" line="38"/>
+        <location filename="../../plugins/CarlaPatchbay/CarlaPatchbay.cpp" line="38"/>
         <source>Carla Patchbay Instrument</source>
         <translation>Carla Patchbay instrument</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlarack/carlarack.cpp" line="38"/>
+        <location filename="../../plugins/CarlaRack/CarlaRack.cpp" line="38"/>
         <source>Carla Rack Instrument</source>
         <translation>Carla Rack instrument</translation>
     </message>
@@ -10242,7 +10242,7 @@ Reden: &quot;%2&quot;</translation>
         <translation>Een dual-filter-plugin</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor.cpp" line="41"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessor.cpp" line="41"/>
         <source>plugin for processing dynamics in a flexible way</source>
         <translation>plugin voor het verwerken van dynamieken op een flexibele manier</translation>
     </message>
@@ -10272,12 +10272,12 @@ Reden: &quot;%2&quot;</translation>
         <translation>Filter voor importeren van Hydrogen-bestanden in LMMS</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="48"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="48"/>
         <source>Versatile drum synthesizer</source>
         <translation>Veelzijdige drum-synthesizer</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="52"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="52"/>
         <source>List installed LADSPA plugins</source>
         <translation>Geïnstalleerde LADSPA-plugins oplijsten</translation>
     </message>
@@ -10287,7 +10287,7 @@ Reden: &quot;%2&quot;</translation>
         <translation>plugin voor het gebruik van arbitraire LADSPA-effecten binnen LMMS.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="86"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="86"/>
         <source>Incomplete monophonic imitation TB-303</source>
         <translation>Onvoltooide monofonische limitering TB-303</translation>
     </message>
@@ -10312,7 +10312,7 @@ Reden: &quot;%2&quot;</translation>
         <translation>Filter, om MIDI-bestanden in LMMS te importeren</translation>
     </message>
     <message>
-        <location filename="../../plugins/monstro/Monstro.cpp" line="48"/>
+        <location filename="../../plugins/Monstro/Monstro.cpp" line="48"/>
         <source>Monstrous 3-oscillator synth with modulation matrix</source>
         <translation>Monsterlijke 3-oscillator synth met modulatiematrix</translation>
     </message>
@@ -10322,7 +10322,7 @@ Reden: &quot;%2&quot;</translation>
         <translation>Een multitap-echo-delay-plugin</translation>
     </message>
     <message>
-        <location filename="../../plugins/nes/Nes.cpp" line="47"/>
+        <location filename="../../plugins/Nes/Nes.cpp" line="47"/>
         <source>A NES-like synthesizer</source>
         <translation>Een NES-achtige synthesizer</translation>
     </message>
@@ -10332,17 +10332,17 @@ Reden: &quot;%2&quot;</translation>
         <translation>2-operator FM-synth</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="54"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="54"/>
         <source>Additive Synthesizer for organ-like sounds</source>
         <translation>Additive Synthesizer voor orgelachtige geluiden</translation>
     </message>
     <message>
-        <location filename="../../plugins/patman/patman.cpp" line="58"/>
+        <location filename="../../plugins/Patman/Patman.cpp" line="58"/>
         <source>GUS-compatible patch instrument</source>
         <translation>GUS-compatibel patch-instrument</translation>
     </message>
     <message>
-        <location filename="../../plugins/peak_controller_effect/peak_controller_effect.cpp" line="44"/>
+        <location filename="../../plugins/PeakControllerEffect/PeakControllerEffect.cpp" line="44"/>
         <source>Plugin for controlling knobs with sound peaks</source>
         <translation>Plugin voor het bedienen van knoppen met geluidspieken</translation>
     </message>
@@ -10352,12 +10352,12 @@ Reden: &quot;%2&quot;</translation>
         <translation>Reverb-algoritme door Sean Costello</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="60"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="60"/>
         <source>Player for SoundFont files</source>
         <translation>Speler voor SoundFont-bestanden</translation>
     </message>
     <message>
-        <location filename="../../plugins/sfxr/sfxr.cpp" line="64"/>
+        <location filename="../../plugins/Sfxr/Sfxr.cpp" line="64"/>
         <source>LMMS port of sfxr</source>
         <translation>LMMS port van sfxr</translation>
     </message>
@@ -10374,22 +10374,22 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
         <translation>Een grafische spectrum-analyzer.</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_enhancer/stereo_enhancer.cpp" line="38"/>
+        <location filename="../../plugins/StereoEnhancer/StereoEnhancer.cpp" line="38"/>
         <source>Plugin for enhancing stereo separation of a stereo input file</source>
         <translation>Plugin voor het verbeteren van stereo-scheiding van een stereo-invoerbestand.</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereo_matrix.cpp" line="38"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrix.cpp" line="38"/>
         <source>Plugin for freely manipulating stereo output</source>
         <translation>Plugin voor het vrij manipuleren voor stereo-uitoer</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="53"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="53"/>
         <source>Tuneful things to bang on</source>
         <translation>Welluidende zaken om te knallen</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="52"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="52"/>
         <source>Three powerful oscillators you can modulate in several ways</source>
         <translation>Drie krachtige oscillators die u op verschillende manieren kunt moduleren</translation>
     </message>
@@ -10399,12 +10399,12 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="75"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="75"/>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
         <translation>VST-Host voor gebruik van VST(i)-plugins binnen LMMS</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="51"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="51"/>
         <source>Vibrating string modeler</source>
         <translation>Modeler voor trillende snaren</translation>
     </message>
@@ -10414,12 +10414,12 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
         <translation>plugin voor het gebruik van arbitraire VST-effecten binnen LMMS.</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="47"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="47"/>
         <source>4-oscillator modulatable wavetable synth</source>
         <translation>4-oscillator moduleerbare wavetable-synth</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper.cpp" line="41"/>
+        <location filename="../../plugins/WaveShaper/WaveShaper.cpp" line="41"/>
         <source>plugin for waveshaping</source>
         <translation>plugin voor golfvorming</translation>
     </message>
@@ -10429,7 +10429,7 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
         <translation>Wiskundige uitdrukking-verwerker</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="62"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="62"/>
         <source>Embedded ZynAddSubFX</source>
         <translation>Ingebedde ZynAddSubFX</translation>
     </message>
@@ -10437,292 +10437,292 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
 <context>
     <name>PluginDatabaseW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="14"/>
         <source>Carla - Add New</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="32"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="32"/>
         <source>Format</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="38"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="38"/>
         <source>Internal</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="45"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="45"/>
         <source>LADSPA</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="52"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="52"/>
         <source>DSSI</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="59"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="59"/>
         <source>LV2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="66"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="66"/>
         <source>VST2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="73"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="73"/>
         <source>VST3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="80"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="80"/>
         <source>AU</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="87"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="87"/>
         <source>Sound Kits</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="116"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="116"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="122"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="122"/>
         <source>Effects</source>
         <translation>Effecten</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="129"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="129"/>
         <source>Instruments</source>
         <translation>Instrumenten</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="136"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="136"/>
         <source>MIDI Plugins</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="143"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="143"/>
         <source>Other/Misc</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="172"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="172"/>
         <source>Architecture</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="178"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="178"/>
         <source>Native</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="185"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="185"/>
         <source>Bridged</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="192"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="192"/>
         <source>Bridged (Wine)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="251"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="251"/>
         <source>Requirements</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="258"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="258"/>
         <source>With Custom GUI </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="265"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="265"/>
         <source>With CV Ports</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="272"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="272"/>
         <source>Real-time safe only</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="279"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="279"/>
         <source>Stereo only</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="286"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="286"/>
         <source>With Inline Display</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="293"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="293"/>
         <source>Favorites only</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="306"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="306"/>
         <source>(Number of Plugins go here)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="329"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="329"/>
         <source>&amp;Add Plugin</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="340"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="340"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="362"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="362"/>
         <source>Refresh</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="373"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="373"/>
         <source>Reset filters</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="409"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="436"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="453"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="603"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="610"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="617"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="624"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="631"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="638"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="645"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="652"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="659"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="666"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="673"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="680"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="687"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="409"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="436"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="453"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="603"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="610"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="617"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="624"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="631"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="638"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="645"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="652"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="659"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="666"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="673"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="680"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="687"/>
         <source>TextLabel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="416"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="416"/>
         <source>Format:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="426"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="426"/>
         <source>Architecture:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="443"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="443"/>
         <source>Type:</source>
         <translation>Soort:</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="473"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="473"/>
         <source>MIDI Ins:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="483"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="483"/>
         <source>Audio Ins:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="493"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="493"/>
         <source>CV Outs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="503"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="503"/>
         <source>MIDI Outs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="513"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="513"/>
         <source>Parameter Ins:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="523"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="523"/>
         <source>Parameter Outs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="533"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="533"/>
         <source>Audio Outs:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="543"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="543"/>
         <source>CV Ins:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="553"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="553"/>
         <source>UniqueID:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="563"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="563"/>
         <source>Has Inline Display:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="573"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="573"/>
         <source>Has Custom GUI:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="583"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="583"/>
         <source>Is Synth:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="593"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="593"/>
         <source>Is Bridged:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="700"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="700"/>
         <source>Information</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="804"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="804"/>
         <source>Name</source>
         <translation>Naam</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="809"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="809"/>
         <source>Label/URI</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="814"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="814"/>
         <source>Maker</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="819"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="819"/>
         <source>Binary/Filename</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="827"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="827"/>
         <source>Focus Text Search</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_database.ui" line="830"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_database.ui" line="830"/>
         <source>Ctrl+F</source>
         <translation type="unfinished"/>
     </message>
@@ -10730,185 +10730,185 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
 <context>
     <name>PluginEdit</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="14"/>
         <source>Plugin Editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="27"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="27"/>
         <source>Edit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="33"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="33"/>
         <source>Control</source>
         <translation>Bediening</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="54"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="54"/>
         <source>MIDI Control Channel:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="67"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="67"/>
         <source>N</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="128"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="128"/>
         <source>Output dry/wet (100%)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="150"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="150"/>
         <source>Output volume (100%)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="203"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="203"/>
         <source>Balance Left (0%)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="225"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="266"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="225"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="266"/>
         <source>Balance Right (0%)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="282"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="282"/>
         <source>Use Balance</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="292"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="292"/>
         <source>Use Panning</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="325"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="325"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="331"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="331"/>
         <source>Use Chunks</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="357"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="357"/>
         <source>    Audio:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="364"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="364"/>
         <source>Fixed-Size Buffer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="371"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="371"/>
         <source>Force Stereo (needs reload)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="397"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="397"/>
         <source>    MIDI:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="404"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="404"/>
         <source>Map Program Changes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="411"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="411"/>
         <source>Send Bank/Program Changes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="418"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="418"/>
         <source>Send Control Changes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="425"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="425"/>
         <source>Send Channel Pressure</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="432"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="432"/>
         <source>Send Note Aftertouch</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="439"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="439"/>
         <source>Send Pitchbend</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="446"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="446"/>
         <source>Send All Sound/Notes Off</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="474"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="474"/>
         <source>
 Plugin Name
 </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="554"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="554"/>
         <source>Program:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="609"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="609"/>
         <source>MIDI Program:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="633"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="633"/>
         <source>Save State</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="647"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="647"/>
         <source>Load State</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="684"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="684"/>
         <source>Information</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="708"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="708"/>
         <source>Label/URI:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="718"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="718"/>
         <source>Name:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="792"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="792"/>
         <source>Type:</source>
         <translation>Soort:</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="802"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="802"/>
         <source>Maker:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="812"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="812"/>
         <source>Copyright:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_edit.ui" line="822"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_edit.ui" line="822"/>
         <source>Unique ID:</source>
         <translation type="unfinished"/>
     </message>
@@ -10929,17 +10929,17 @@ Plugin Name
 <context>
     <name>PluginParameter</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_parameter.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_parameter.ui" line="14"/>
         <source>Form</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_parameter.ui" line="23"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_parameter.ui" line="23"/>
         <source>Parameter Name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_parameter.ui" line="46"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_parameter.ui" line="46"/>
         <source>...</source>
         <translation type="unfinished"/>
     </message>
@@ -10947,148 +10947,148 @@ Plugin Name
 <context>
     <name>PluginRefreshW</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="14"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="14"/>
         <source>Carla - Refresh</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="38"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="38"/>
         <source>Search for new...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="49"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="49"/>
         <source>LADSPA</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="56"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="56"/>
         <source>DSSI</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="63"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="63"/>
         <source>LV2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="70"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="70"/>
         <source>VST2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="77"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="77"/>
         <source>VST3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="84"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="84"/>
         <source>AU</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="104"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="104"/>
         <source>SF2/3</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="111"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="111"/>
         <source>SFZ</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="161"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="161"/>
         <source>Native</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="168"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="168"/>
         <source>POSIX 32bit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="175"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="175"/>
         <source>POSIX 64bit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="182"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="182"/>
         <source>Windows 32bit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="189"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="189"/>
         <source>Windows 64bit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="232"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="232"/>
         <source>Available tools:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="282"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="282"/>
         <source>python3-rdflib (LADSPA-RDF support)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="289"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="289"/>
         <source>carla-discovery-win64</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="296"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="296"/>
         <source>carla-discovery-native</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="341"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="341"/>
         <source>carla-discovery-posix32</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="386"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="386"/>
         <source>carla-discovery-posix64</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="393"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="393"/>
         <source>carla-discovery-win32</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="416"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="416"/>
         <source>Options:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="428"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="428"/>
         <source>Carla will run small processing checks when scanning the plugins (to make sure they won't crash).
 You can disable these checks to get a faster scanning time (at your own risk).</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="432"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="432"/>
         <source>Run processing checks while scanning</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="502"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="502"/>
         <source>Press &apos;Scan&apos; to begin the search</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="509"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="509"/>
         <source>Scan</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="520"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="520"/>
         <source>&gt;&gt; Skip</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_refresh.ui" line="527"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_refresh.ui" line="527"/>
         <source>Close</source>
         <translation>Sluiten</translation>
     </message>
@@ -11096,69 +11096,69 @@ You can disable these checks to get a faster scanning time (at your own risk).</
 <context>
     <name>PluginWidget</name>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="17"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_classic.ui" line="17"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_compact.ui" line="17"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_default.ui" line="17"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_presets.ui" line="17"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="17"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_classic.ui" line="17"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_compact.ui" line="17"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_default.ui" line="17"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_presets.ui" line="17"/>
         <source>Frame</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="64"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="64"/>
         <source>Enable</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="74"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="74"/>
         <source>On/Off</source>
         <translation>Aan/uit</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="147"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_compact.ui" line="227"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_default.ui" line="232"/>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_presets.ui" line="229"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="147"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_compact.ui" line="227"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_default.ui" line="232"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_presets.ui" line="229"/>
         <source>PluginName</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="178"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="178"/>
         <source>MIDI</source>
         <translation>MIDI</translation>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="223"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="223"/>
         <source>AUDIO IN</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="250"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="250"/>
         <source>AUDIO OUT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="306"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="306"/>
         <source>GUI</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="316"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="316"/>
         <source>Edit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_calf.ui" line="326"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_calf.ui" line="326"/>
         <source>Remove</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_classic.ui" line="164"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_classic.ui" line="164"/>
         <source>Plugin Name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../plugins/carlabase/carla/resources/ui/carla_plugin_presets.ui" line="266"/>
+        <location filename="../../plugins/CarlaBase/carla/resources/ui/carla_plugin_presets.ui" line="266"/>
         <source>Preset:</source>
         <translation type="unfinished"/>
     </message>
@@ -11356,7 +11356,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     <name>QWidget</name>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="74"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="134"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="134"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="64"/>
         <location filename="../../plugins/VstEffect/VstSubPluginFeatures.cpp" line="46"/>
         <source>Name: </source>
@@ -11369,28 +11369,28 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="86"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="144"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="144"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="75"/>
         <source>Maker: </source>
         <translation>Maker:</translation>
     </message>
     <message>
         <location filename="../../src/core/lv2/Lv2SubPluginFeatures.cpp" line="104"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="159"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="159"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="90"/>
         <source>Copyright: </source>
         <translation>Auteursrecht:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="169"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="169"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="100"/>
         <source>Requires Real Time: </source>
         <translation>Vereist realtime:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="171"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="178"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="185"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="171"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="178"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="185"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="102"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="108"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="114"/>
@@ -11398,9 +11398,9 @@ You can disable these checks to get a faster scanning time (at your own risk).</
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="172"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="179"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="186"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="172"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="179"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="186"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="103"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="109"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="115"/>
@@ -11408,25 +11408,25 @@ You can disable these checks to get a faster scanning time (at your own risk).</
         <translation>Nee</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="176"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="176"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="106"/>
         <source>Real Time Capable: </source>
         <translation>Realtime-capabel:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="183"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="183"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="112"/>
         <source>In Place Broken: </source>
         <translation>Defect op zijn plaats:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="190"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="190"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="118"/>
         <source>Channels In: </source>
         <translation>Invoerkanalen:</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="195"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="195"/>
         <location filename="../../plugins/LadspaEffect/LadspaSubPluginFeatures.cpp" line="122"/>
         <source>Channels Out: </source>
         <translation>Uitvoerkanalen:</translation>
@@ -13537,144 +13537,144 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="444"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="444"/>
         <source>Modulate phase of oscillator 1 by oscillator 2</source>
         <translation>Fase van oscillator 1 moduleren met oscillator 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="452"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="452"/>
         <source>Modulate amplitude of oscillator 1 by oscillator 2</source>
         <translation>Amplitude van oscillator 1 moduleren met oscillator 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="460"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="460"/>
         <source>Mix output of oscillators 1 &amp; 2</source>
         <translation>Uitvoer van oscillator 1 en 2 mixen</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="468"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="468"/>
         <source>Synchronize oscillator 1 with oscillator 2</source>
         <translation>Oscillator 1 synchroniseren met oscillator 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="477"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="477"/>
         <source>Modulate frequency of oscillator 1 by oscillator 2</source>
         <translation>Frequentie van oscillator 1 moduleren met oscillator 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="494"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="494"/>
         <source>Modulate phase of oscillator 2 by oscillator 3</source>
         <translation>Fase van oscillator 2 moduleren met oscillator 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="502"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="502"/>
         <source>Modulate amplitude of oscillator 2 by oscillator 3</source>
         <translation>Amplitude van oscillator 2 moduleren met oscillator 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="510"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="510"/>
         <source>Mix output of oscillators 2 &amp; 3</source>
         <translation>Uitvoer van oscillator 2 en 3 mixen</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="518"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="518"/>
         <source>Synchronize oscillator 2 with oscillator 3</source>
         <translation>Oscillator 2 synchroniseren met oscillator 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="526"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="526"/>
         <source>Modulate frequency of oscillator 2 by oscillator 3</source>
         <translation>Frequentie van oscillator 2 moduleren met oscillator 3</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="546"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="546"/>
         <source>Osc %1 volume:</source>
         <translation>Osc %1 volume:</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="552"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="552"/>
         <source>Osc %1 panning:</source>
         <translation>Balans osc %1:</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="557"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="557"/>
         <source>Osc %1 coarse detuning:</source>
         <translation>Osc %1 grof ontstemmen:</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="558"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="558"/>
         <source>semitones</source>
         <translation>semitonen</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="563"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="563"/>
         <source>Osc %1 fine detuning left:</source>
         <translation>Osc %1 fijn ontstemmen links:</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="565"/>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="572"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="565"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="572"/>
         <source>cents</source>
         <translation>cent</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="570"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="570"/>
         <source>Osc %1 fine detuning right:</source>
         <translation>Osc %1 fijn ontstemmen rechts:</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="577"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="577"/>
         <source>Osc %1 phase-offset:</source>
         <translation>Osc %1 faseverschuiving:</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="579"/>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="586"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="579"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="586"/>
         <source>degrees</source>
         <translation>graden</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="584"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="584"/>
         <source>Osc %1 stereo phase-detuning:</source>
         <translation>Osc %1 stereo-fase-ontstemming:</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="597"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="597"/>
         <source>Sine wave</source>
         <translation>Sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="607"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="607"/>
         <source>Triangle wave</source>
         <translation>Driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="616"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="616"/>
         <source>Saw wave</source>
         <translation>Zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="625"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="625"/>
         <source>Square wave</source>
         <translation>Blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="635"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="635"/>
         <source>Moog-like saw wave</source>
         <translation>Moog-achtige zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="644"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="644"/>
         <source>Exponential wave</source>
         <translation>Exponentiële golf</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="653"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="653"/>
         <source>White noise</source>
         <translation>Witte ruis</translation>
     </message>
     <message>
-        <location filename="../../plugins/triple_oscillator/TripleOscillator.cpp" line="661"/>
+        <location filename="../../plugins/TripleOscillator/TripleOscillator.cpp" line="661"/>
         <source>User-defined wave</source>
         <translation>Aangepaste golf</translation>
     </message>
@@ -13761,73 +13761,73 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
 <context>
     <name>VestigeInstrumentView</name>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="507"/>
-        <location filename="../../plugins/vestige/vestige.cpp" line="679"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="507"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="679"/>
         <source>Open VST plugin</source>
         <translation>VST-plugin openen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="519"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="519"/>
         <source>Control VST plugin from LMMS host</source>
         <translation>VST-plugin vanuit LMMS-host bedienen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="532"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="532"/>
         <source>Open VST plugin preset</source>
         <translation>VST-plugin-preset openen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="545"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="545"/>
         <source>Previous (-)</source>
         <translation>Vorige (-)</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="560"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="560"/>
         <source>Save preset</source>
         <translation>Preset opslaan</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="573"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="573"/>
         <source>Next (+)</source>
         <translation>Volgende (+)</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="591"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="591"/>
         <source>Show/hide GUI</source>
         <translation>GUI weergeven/verbergen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="598"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="598"/>
         <source>Turn off all notes</source>
         <translation>Alle noten uitschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="683"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="683"/>
         <source>DLL-files (*.dll)</source>
         <translation>DLL-bestanden (*.dll)</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="684"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="684"/>
         <source>EXE-files (*.exe)</source>
         <translation>EXE-bestanden (*.exe)</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="888"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="888"/>
         <source>No VST plugin loaded</source>
         <translation>Geen VST-plugin geladen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="896"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="896"/>
         <source>Preset</source>
         <translation>Preset</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="904"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="904"/>
         <source>by </source>
         <translation>door</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="913"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="913"/>
         <source> - VST plugin control</source>
         <translation>- VST-pluginbediening</translation>
     </message>
@@ -13879,49 +13879,49 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
 <context>
     <name>VstPlugin</name>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="366"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="366"/>
         <location filename="../../plugins/VstEffect/VstEffect.cpp" line="144"/>
         <source>The VST plugin %1 could not be loaded.</source>
         <translation>VST-plugin %1 kon niet geladen worden.</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="481"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="481"/>
         <source>Open Preset</source>
         <translation>Preset openen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="482"/>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="562"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="482"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="562"/>
         <source>Vst Plugin Preset (*.fxp *.fxb)</source>
         <translation>Vst-plugin preset (*.fxp *.fxb)</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="558"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="558"/>
         <source>: default</source>
         <translation>: standaard</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="561"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="561"/>
         <source>Save Preset</source>
         <translation>Preset opslaan</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="561"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="561"/>
         <source>.fxp</source>
         <translation>.fxp</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="577"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="577"/>
         <source>.FXP</source>
         <translation>.FXP</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="577"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="577"/>
         <source>.FXB</source>
         <translation>.FXB</translation>
     </message>
     <message>
-        <location filename="../../plugins/vst_base/VstPlugin.cpp" line="578"/>
+        <location filename="../../plugins/VstBase/VstPlugin.cpp" line="578"/>
         <source>.fxb</source>
         <translation>.fxb</translation>
     </message>
@@ -13939,147 +13939,147 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
 <context>
     <name>WatsynInstrument</name>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="234"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="234"/>
         <source>Volume A1</source>
         <translation>Volume A1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="235"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="235"/>
         <source>Volume A2</source>
         <translation>Volume A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="236"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="236"/>
         <source>Volume B1</source>
         <translation>Volume B1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="237"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="237"/>
         <source>Volume B2</source>
         <translation>Volume B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="239"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="239"/>
         <source>Panning A1</source>
         <translation>Balans A1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="240"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="240"/>
         <source>Panning A2</source>
         <translation>Balans A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="241"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="241"/>
         <source>Panning B1</source>
         <translation>Balans B1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="242"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="242"/>
         <source>Panning B2</source>
         <translation>Balans B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="244"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="244"/>
         <source>Freq. multiplier A1</source>
         <translation>Frequentieverm. A1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="245"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="245"/>
         <source>Freq. multiplier A2</source>
         <translation>Frequentieverm. A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="246"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="246"/>
         <source>Freq. multiplier B1</source>
         <translation>Frequentieverm. B1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="247"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="247"/>
         <source>Freq. multiplier B2</source>
         <translation>Frequentieverm. B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="249"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="249"/>
         <source>Left detune A1</source>
         <translation>Links ontstemmen A1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="250"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="250"/>
         <source>Left detune A2</source>
         <translation>Links ontstemmen A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="251"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="251"/>
         <source>Left detune B1</source>
         <translation>Links ontstemmen B1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="252"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="252"/>
         <source>Left detune B2</source>
         <translation>Links ontstemmen B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="254"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="254"/>
         <source>Right detune A1</source>
         <translation>Rechts ontstemmen A1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="255"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="255"/>
         <source>Right detune A2</source>
         <translation>Rechts ontstemmen A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="256"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="256"/>
         <source>Right detune B1</source>
         <translation>Rechts ontstemmen B1</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="257"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="257"/>
         <source>Right detune B2</source>
         <translation>Rechts ontstemmen B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="264"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="264"/>
         <source>A-B Mix</source>
         <translation>A-B mix</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="265"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="265"/>
         <source>A-B Mix envelope amount</source>
         <translation>A-B mix hoeveelheid envelope</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="267"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="267"/>
         <source>A-B Mix envelope attack</source>
         <translation>A-B mix envelope attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="268"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="268"/>
         <source>A-B Mix envelope hold</source>
         <translation>A-B mix envelope hold</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="269"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="269"/>
         <source>A-B Mix envelope decay</source>
         <translation>A-B mix envelope decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="271"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="271"/>
         <source>A1-B2 Crosstalk</source>
         <translation>A1-B2 overspraak</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="273"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="273"/>
         <source>A2-A1 modulation</source>
         <translation>A2-A1 modulatie</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="274"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="274"/>
         <source>B2-B1 modulation</source>
         <translation>B2-B1 modulatie</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="276"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="276"/>
         <source>Selected graph</source>
         <translation>Geselecteerde grafiek</translation>
     </message>
@@ -14087,224 +14087,224 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
 <context>
     <name>WatsynView</name>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="679"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="680"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="681"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="682"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="679"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="680"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="681"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="682"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="684"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="685"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="686"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="687"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="684"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="685"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="686"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="687"/>
         <source>Panning</source>
         <translation>Balans</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="689"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="690"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="691"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="692"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="689"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="690"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="691"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="692"/>
         <source>Freq. multiplier</source>
         <translation>Freq. vermenigvuldiger</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="694"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="695"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="696"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="697"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="694"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="695"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="696"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="697"/>
         <source>Left detune</source>
         <translation>Links ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="694"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="695"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="696"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="697"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="699"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="700"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="701"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="702"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="694"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="695"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="696"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="697"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="699"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="700"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="701"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="702"/>
         <source> cents</source>
         <translation>cent</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="699"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="700"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="701"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="702"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="699"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="700"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="701"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="702"/>
         <source>Right detune</source>
         <translation>Rechts ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="704"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="704"/>
         <source>A-B Mix</source>
         <translation>A-B mix</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="706"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="706"/>
         <source>Mix envelope amount</source>
         <translation>Mix hoeveelheid envelope</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="708"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="708"/>
         <source>Mix envelope attack</source>
         <translation>Mix envelope attack</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="709"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="709"/>
         <source>Mix envelope hold</source>
         <translation>Mix envelope hold</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="710"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="710"/>
         <source>Mix envelope decay</source>
         <translation>Mix envelope decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="712"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="712"/>
         <source>Crosstalk</source>
         <translation>Overspraak</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="729"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="729"/>
         <source>Select oscillator A1</source>
         <translation>Oscillator A1 selecteren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="735"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="735"/>
         <source>Select oscillator A2</source>
         <translation>Oscillator A2 selecteren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="741"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="741"/>
         <source>Select oscillator B1</source>
         <translation>Oscillator B1 selecteren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="747"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="747"/>
         <source>Select oscillator B2</source>
         <translation>Oscillator B2 selecteren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="762"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="762"/>
         <source>Mix output of A2 to A1</source>
         <translation>Uitvoer van A2 naar A1 mixen</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="768"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="768"/>
         <source>Modulate amplitude of A1 by output of A2</source>
         <translation>Amplitude van A1 moduleren met uitvoer van A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="774"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="774"/>
         <source>Ring modulate A1 and A2</source>
         <translation>A1 en A2 ring-moduleren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="780"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="780"/>
         <source>Modulate phase of A1 by output of A2</source>
         <translation>Fase van A1 moduleren met uitvoer van A2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="793"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="793"/>
         <source>Mix output of B2 to B1</source>
         <translation>Uitvoer van B2 naar B1 mixen</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="799"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="799"/>
         <source>Modulate amplitude of B1 by output of B2</source>
         <translation>Amplitude van B1 moduleren met uitvoer van B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="805"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="805"/>
         <source>Ring modulate B1 and B2</source>
         <translation>B1 en B2 ring-moduleren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="811"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="811"/>
         <source>Modulate phase of B1 by output of B2</source>
         <translation>Fase van B1 moduleren met uitvoer van B2</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="828"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="836"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="844"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="852"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="828"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="836"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="844"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="852"/>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
         <translation>Teken uw eigen golfvorm hier door uw muis op deze grafiek te slepen.</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="859"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="859"/>
         <source>Load waveform</source>
         <translation>Golfvorm laden</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="863"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="863"/>
         <source>Load a waveform from a sample file</source>
         <translation>Een golfvorm van een sample-bestand laden</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="865"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="865"/>
         <source>Phase left</source>
         <translation>Fase links</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="869"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="869"/>
         <source>Shift phase by -15 degrees</source>
         <translation>Fase met -15 graden verschuiven</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="871"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="871"/>
         <source>Phase right</source>
         <translation>Fase rechts</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="875"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="875"/>
         <source>Shift phase by +15 degrees</source>
         <translation>Fase met +15 graden verschuiven</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="877"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="881"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="877"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="881"/>
         <source>Normalize</source>
         <translation>Normaliseren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="884"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="888"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="884"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="888"/>
         <source>Invert</source>
         <translation>Inverteren</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="890"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="894"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="890"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="894"/>
         <source>Smooth</source>
         <translation>Glad</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="898"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="902"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="898"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="902"/>
         <source>Sine wave</source>
         <translation>Sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="904"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="908"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="910"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="904"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="908"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="910"/>
         <source>Triangle wave</source>
         <translation>Driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="914"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="914"/>
         <source>Saw wave</source>
         <translation>Zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="916"/>
-        <location filename="../../plugins/watsyn/Watsyn.cpp" line="920"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="916"/>
+        <location filename="../../plugins/Watsyn/Watsyn.cpp" line="920"/>
         <source>Square wave</source>
         <translation>Blokgolf</translation>
     </message>
@@ -14496,42 +14496,42 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
 <context>
     <name>ZynAddSubFxInstrument</name>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="115"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="115"/>
         <source>Portamento</source>
         <translation>Portamento</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="116"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="116"/>
         <source>Filter frequency</source>
         <translation>Filter-frequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="117"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="117"/>
         <source>Filter resonance</source>
         <translation>Filter-resonantie</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="118"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="118"/>
         <source>Bandwidth</source>
         <translation>Bandbreedte</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="119"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="119"/>
         <source>FM gain</source>
         <translation>FM-versterking</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="120"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="120"/>
         <source>Resonance center frequency</source>
         <translation>Resonantie centerfrequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="121"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="121"/>
         <source>Resonance bandwidth</source>
         <translation>Resonantie bandbreedte</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="122"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="122"/>
         <source>Forward MIDI control change events</source>
         <translation>MIDI control change events doorsturen</translation>
     </message>
@@ -14539,343 +14539,343 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
 <context>
     <name>ZynAddSubFxView</name>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="515"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="515"/>
         <source>Portamento:</source>
         <translation>Portamento:</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="516"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="516"/>
         <source>PORT</source>
         <translation>POORT</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="519"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="519"/>
         <source>Filter frequency:</source>
         <translation>Filter-frequentie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="520"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="520"/>
         <source>FREQ</source>
         <translation>FREQ</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="523"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="523"/>
         <source>Filter resonance:</source>
         <translation>Filter-resonantie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="524"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="524"/>
         <source>RES</source>
         <translation>RES</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="527"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="527"/>
         <source>Bandwidth:</source>
         <translation>Bandbreedte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="528"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="528"/>
         <source>BW</source>
         <translation>BW</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="531"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="531"/>
         <source>FM gain:</source>
         <translation>FM-versterking:</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="532"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="532"/>
         <source>FM GAIN</source>
         <translation>FM GAIN</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="535"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="535"/>
         <source>Resonance center frequency:</source>
         <translation>Resonantie centerfrequentie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="536"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="536"/>
         <source>RES CF</source>
         <translation>RES CF</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="539"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="539"/>
         <source>Resonance bandwidth:</source>
         <translation>Resonantie bandbreedte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="540"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="540"/>
         <source>RES BW</source>
         <translation>RES BW</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="542"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="542"/>
         <source>Forward MIDI control changes</source>
         <translation>MIDI control changes doorsturen</translation>
     </message>
     <message>
-        <location filename="../../plugins/zynaddsubfx/ZynAddSubFx.cpp" line="544"/>
+        <location filename="../../plugins/ZynAddSubFx/ZynAddSubFx.cpp" line="544"/>
         <source>Show GUI</source>
         <translation>GUI weergeven</translation>
     </message>
 </context>
 <context>
-    <name>audioFileProcessor</name>
+    <name>AudioFileProcessor</name>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="79"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="79"/>
         <source>Amplify</source>
         <translation>Versterken</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="80"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="80"/>
         <source>Start of sample</source>
         <translation>Begin van sample</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="81"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="81"/>
         <source>End of sample</source>
         <translation>Einde van sample</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="82"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="82"/>
         <source>Loopback point</source>
         <translation>Herhaalpunt</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="83"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="83"/>
         <source>Reverse sample</source>
         <translation>Sample omdraaien</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="84"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="84"/>
         <source>Loop mode</source>
         <translation>Herhaalmodus</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="85"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="85"/>
         <source>Stutter</source>
         <translation>Stutter</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="86"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="86"/>
         <source>Interpolation mode</source>
         <translation>Interpolatiemodus</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="104"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="104"/>
         <source>None</source>
         <translation>Geen</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="105"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="105"/>
         <source>Linear</source>
         <translation>Lineair</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="106"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="106"/>
         <source>Sinc</source>
         <translation>Sinc</translation>
     </message>
     <message>
-        <location filename="../../plugins/audio_file_processor/audio_file_processor.cpp" line="245"/>
+        <location filename="../../plugins/AudioFileProcessor/AudioFileProcessor.cpp" line="245"/>
         <source>Sample not found: %1</source>
         <translation>Sample niet gevonden: %1</translation>
     </message>
 </context>
 <context>
-    <name>bitInvader</name>
+    <name>BitInvader</name>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="154"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="154"/>
         <source>Sample length</source>
         <translation>Sample-lengte:</translation>
     </message>
 </context>
 <context>
-    <name>bitInvaderView</name>
+    <name>BitInvaderView</name>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="354"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="354"/>
         <source>Sample length</source>
         <translation>Sample-lengte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="361"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="361"/>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
         <translation>Teken uw eigen golfvorm hier door uw muis op deze grafiek te slepen.</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="372"/>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="379"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="372"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="379"/>
         <source>Sine wave</source>
         <translation>Sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="381"/>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="388"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="381"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="388"/>
         <source>Triangle wave</source>
         <translation>Driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="390"/>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="397"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="390"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="397"/>
         <source>Saw wave</source>
         <translation>Zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="399"/>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="406"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="399"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="406"/>
         <source>Square wave</source>
         <translation>Blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="409"/>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="416"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="409"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="416"/>
         <source>White noise</source>
         <translation>Witte ruis</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="418"/>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="425"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="418"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="425"/>
         <source>User-defined wave</source>
         <translation>Aangepaste golf</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="427"/>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="434"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="427"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="434"/>
         <source>Smooth waveform</source>
         <translation>Golfvorm zacht maken</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="438"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="438"/>
         <source>Interpolation</source>
         <translation>Interpolatie</translation>
     </message>
     <message>
-        <location filename="../../plugins/bit_invader/bit_invader.cpp" line="443"/>
+        <location filename="../../plugins/BitInvader/BitInvader.cpp" line="443"/>
         <source>Normalize</source>
         <translation>Normaliseren</translation>
     </message>
 </context>
 <context>
-    <name>dynProcControlDialog</name>
+    <name>DynProcControlDialog</name>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="65"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="65"/>
         <source>INPUT</source>
         <translation>INVOER</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="66"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="66"/>
         <source>Input gain:</source>
         <translation>Invoer-gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="73"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="73"/>
         <source>OUTPUT</source>
         <translation>UITVOER</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="74"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="74"/>
         <source>Output gain:</source>
         <translation>Uitvoer-gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="79"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="79"/>
         <source>ATTACK</source>
         <translation>ATTACK</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="80"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="80"/>
         <source>Peak attack time:</source>
         <translation>Piek-attack-tijd:</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="85"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="85"/>
         <source>RELEASE</source>
         <translation>RELEASE</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="86"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="86"/>
         <source>Peak release time:</source>
         <translation>Piek-release-tijd:</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="90"/>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="95"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="90"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="95"/>
         <source>Reset wavegraph</source>
         <translation>Golfvorm herstellen</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="97"/>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="102"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="97"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="102"/>
         <source>Smooth wavegraph</source>
         <translation>Golfvorm zacht maken</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="104"/>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="109"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="104"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="109"/>
         <source>Increase wavegraph amplitude by 1 dB</source>
         <translation>Golfgrafiek-amplitude verhogen met 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="111"/>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="116"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="111"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="116"/>
         <source>Decrease wavegraph amplitude by 1 dB</source>
         <translation>Golfgrafiek-amplitude verlagen met 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="119"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="119"/>
         <source>Stereo mode: maximum</source>
         <translation>Stereomodus: maximum</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="124"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="124"/>
         <source>Process based on the maximum of both stereo channels</source>
         <translation>Verwerking gebaseerd op het maximum van beide stereokanalen</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="126"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="126"/>
         <source>Stereo mode: average</source>
         <translation>Stereomodus: gemiddeld</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="131"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="131"/>
         <source>Process based on the average of both stereo channels</source>
         <translation>Verwerking gebaseerd op het gemiddelde van beide stereokanalen</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="133"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="133"/>
         <source>Stereo mode: unlinked</source>
         <translation>Stereomodus: niet-gekoppeld</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_control_dialog.cpp" line="138"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControlDialog.cpp" line="138"/>
         <source>Process each stereo channel independently</source>
         <translation>Elk stereokanaal onafhankelijk verwerken</translation>
     </message>
 </context>
 <context>
-    <name>dynProcControls</name>
+    <name>DynProcControls</name>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_controls.cpp" line="42"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="42"/>
         <source>Input gain</source>
         <translation>Invoer-gain</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_controls.cpp" line="43"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="43"/>
         <source>Output gain</source>
         <translation>Uitvoer-gain</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_controls.cpp" line="44"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="44"/>
         <source>Attack time</source>
         <translation>Attack-tijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_controls.cpp" line="45"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="45"/>
         <source>Release time</source>
         <translation>Release-tijd</translation>
     </message>
     <message>
-        <location filename="../../plugins/dynamics_processor/dynamics_processor_controls.cpp" line="47"/>
+        <location filename="../../plugins/DynamicsProcessor/DynamicsProcessorControls.cpp" line="47"/>
         <source>Stereo mode</source>
         <translation>Stereomodus</translation>
     </message>
@@ -14889,766 +14889,766 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
 </context>
 <context>
-    <name>kickerInstrument</name>
+    <name>KickerInstrument</name>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="63"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="63"/>
         <source>Start frequency</source>
         <translation>Beginfrequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="64"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="64"/>
         <source>End frequency</source>
         <translation>Eindfrequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="65"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="65"/>
         <source>Length</source>
         <translation>Lengte</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="66"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="66"/>
         <source>Start distortion</source>
         <translation>Beginvervorming</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="67"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="67"/>
         <source>End distortion</source>
         <translation>Eindvervorming</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="68"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="68"/>
         <source>Gain</source>
         <translation>Gain</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="69"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="69"/>
         <source>Envelope slope</source>
         <translation>Envelope-helling</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="70"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="70"/>
         <source>Noise</source>
         <translation>Ruis</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="71"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="71"/>
         <source>Click</source>
         <translation>Klik</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="72"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="72"/>
         <source>Frequency slope</source>
         <translation>Frequentie-helling</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="73"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="73"/>
         <source>Start from note</source>
         <translation>Starten vanaf noot</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="74"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="74"/>
         <source>End to note</source>
         <translation>Stoppen naar noot</translation>
     </message>
 </context>
 <context>
-    <name>kickerInstrumentView</name>
+    <name>KickerInstrumentView</name>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="284"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="284"/>
         <source>Start frequency:</source>
         <translation>Beginfrequentie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="288"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="288"/>
         <source>End frequency:</source>
         <translation>Eindfrequentie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="292"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="292"/>
         <source>Frequency slope:</source>
         <translation>Frequentie-helling:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="296"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="296"/>
         <source>Gain:</source>
         <translation>Gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="300"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="300"/>
         <source>Envelope length:</source>
         <translation>Envelope-lengte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="304"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="304"/>
         <source>Envelope slope:</source>
         <translation>Envelope-helling:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="308"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="308"/>
         <source>Click:</source>
         <translation>Klik:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="312"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="312"/>
         <source>Noise:</source>
         <translation>Ruis:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="316"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="316"/>
         <source>Start distortion:</source>
         <translation>Beginvervorming:</translation>
     </message>
     <message>
-        <location filename="../../plugins/kicker/kicker.cpp" line="320"/>
+        <location filename="../../plugins/Kicker/Kicker.cpp" line="320"/>
         <source>End distortion:</source>
         <translation>Eindvervorming:</translation>
     </message>
 </context>
 <context>
-    <name>ladspaBrowserView</name>
+    <name>LadspaBrowserView</name>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="113"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="121"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="113"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="121"/>
         <source>Available Effects</source>
         <translation>Beschikbare effecten</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="114"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="124"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="114"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="124"/>
         <source>Unavailable Effects</source>
         <translation>Niet-beschikbare effecten</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="116"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="128"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="116"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="128"/>
         <source>Instruments</source>
         <translation>Instrumenten</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="117"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="132"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="117"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="132"/>
         <source>Analysis Tools</source>
         <translation>Analysegereedschappen</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="118"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="135"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="118"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="135"/>
         <source>Don&apos;t know</source>
         <translation>Onbekend</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_browser.cpp" line="181"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaBrowser.cpp" line="181"/>
         <source>Type:</source>
         <translation>Soort:</translation>
     </message>
 </context>
 <context>
-    <name>ladspaDescription</name>
+    <name>LadspaDescription</name>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="84"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="84"/>
         <source>Plugins</source>
         <translation>Plugins</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_description.cpp" line="93"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaDescription.cpp" line="93"/>
         <source>Description</source>
         <translation>Beschrijving</translation>
     </message>
 </context>
 <context>
-    <name>ladspaPortDialog</name>
+    <name>LadspaPortDialog</name>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="42"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="42"/>
         <source>Ports</source>
         <translation>Poorten</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="54"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="54"/>
         <source>Name</source>
         <translation>Naam</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="55"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="55"/>
         <source>Rate</source>
         <translation>Ratio</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="56"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="56"/>
         <source>Direction</source>
         <translation>Richting</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="57"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="57"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="58"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="58"/>
         <source>Min &lt; Default &lt; Max</source>
         <translation>Min &lt; standaard &lt; max</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="59"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="59"/>
         <source>Logarithmic</source>
         <translation>Logaritmisch</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="60"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="60"/>
         <source>SR Dependent</source>
         <translation>SR-afhankelijk</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="75"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="75"/>
         <source>Audio</source>
         <translation>Audio</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="75"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="75"/>
         <source>Control</source>
         <translation>Bediening</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="77"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="77"/>
         <source>Input</source>
         <translation>Invoer</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="77"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="77"/>
         <source>Output</source>
         <translation>Uitvoer</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="79"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="79"/>
         <source>Toggled</source>
         <translation>Gewisseld</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="79"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="79"/>
         <source>Integer</source>
         <translation>Integer</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="79"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="79"/>
         <source>Float</source>
         <translation>Float</translation>
     </message>
     <message>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="149"/>
-        <location filename="../../plugins/ladspa_browser/ladspa_port_dialog.cpp" line="155"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="149"/>
+        <location filename="../../plugins/LadspaBrowser/LadspaPortDialog.cpp" line="155"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
 </context>
 <context>
-    <name>lb302Synth</name>
+    <name>Lb302Synth</name>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="279"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="279"/>
         <source>VCF Cutoff Frequency</source>
         <translation>VCF cutoff-frequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="280"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="280"/>
         <source>VCF Resonance</source>
         <translation>VCF resonantie</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="281"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="281"/>
         <source>VCF Envelope Mod</source>
         <translation>VCF envelope-mod</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="282"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="282"/>
         <source>VCF Envelope Decay</source>
         <translation>VCF envelope-decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="283"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="283"/>
         <source>Distortion</source>
         <translation>Vervorming</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="284"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="284"/>
         <source>Waveform</source>
         <translation>Golfvorm</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="285"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="285"/>
         <source>Slide Decay</source>
         <translation>Slide-decay</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="286"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="286"/>
         <source>Slide</source>
         <translation>Slide</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="287"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="287"/>
         <source>Accent</source>
         <translation>Accent</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="288"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="288"/>
         <source>Dead</source>
         <translation>Dead</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="289"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="289"/>
         <source>24dB/oct Filter</source>
         <translation>24dB/oct-filter</translation>
     </message>
 </context>
 <context>
-    <name>lb302SynthView</name>
+    <name>Lb302SynthView</name>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="821"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="821"/>
         <source>Cutoff Freq:</source>
         <translation>Cutoff-freq:</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="826"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="826"/>
         <source>Resonance:</source>
         <translation>Resonantie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="831"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="831"/>
         <source>Env Mod:</source>
         <translation>Env-mod:</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="836"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="836"/>
         <source>Decay:</source>
         <translation>Decay:</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="852"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="852"/>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
         <translation>303-es-que, 24dB/octave, 3 pole filter</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="857"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="857"/>
         <source>Slide Decay:</source>
         <translation>Slide-decay:</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="862"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="862"/>
         <source>DIST:</source>
         <translation>DIST:</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="870"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="870"/>
         <source>Saw wave</source>
         <translation>Zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="877"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="877"/>
         <source>Click here for a saw-wave.</source>
         <translation>Klik hier voor een zaagtandgolf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="880"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="880"/>
         <source>Triangle wave</source>
         <translation>Driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="887"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="887"/>
         <source>Click here for a triangle-wave.</source>
         <translation>Klik hier voor een driehoeksgolf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="889"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="889"/>
         <source>Square wave</source>
         <translation>Blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="896"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="896"/>
         <source>Click here for a square-wave.</source>
         <translation>Klik hier voor een blokgolf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="899"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="899"/>
         <source>Rounded square wave</source>
         <translation>Afgeronde blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="906"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="906"/>
         <source>Click here for a square-wave with a rounded end.</source>
         <translation>Klik hier voor een blokgolf met afgerond einde.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="909"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="909"/>
         <source>Moog wave</source>
         <translation>Moog-golf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="916"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="916"/>
         <source>Click here for a moog-like wave.</source>
         <translation>Klik hier voor een moog-achtige golf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="918"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="918"/>
         <source>Sine wave</source>
         <translation>Sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="925"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="925"/>
         <source>Click for a sine-wave.</source>
         <translation>Klikken voor sinusgolf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="928"/>
-        <location filename="../../plugins/lb302/lb302.cpp" line="939"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="928"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="939"/>
         <source>White noise wave</source>
         <translation>Witte-ruisgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="935"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="935"/>
         <source>Click here for an exponential wave.</source>
         <translation>Klik hier voor een exponentiële golf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="946"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="946"/>
         <source>Click here for white-noise.</source>
         <translation>Klik hier voor witte ruis.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="949"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="949"/>
         <source>Bandlimited saw wave</source>
         <translation>Bandgelimiteerde zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="956"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="956"/>
         <source>Click here for bandlimited saw wave.</source>
         <translation>Klik hier voor een bandgelimiteerde zaagtandgolf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="959"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="959"/>
         <source>Bandlimited square wave</source>
         <translation>Bandgelimiteerde blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="966"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="966"/>
         <source>Click here for bandlimited square wave.</source>
         <translation>Klik hier voor een bandgelimiteerde blokgolf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="969"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="969"/>
         <source>Bandlimited triangle wave</source>
         <translation>Bandgelimiteerde driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="976"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="976"/>
         <source>Click here for bandlimited triangle wave.</source>
         <translation>Klik hier voor een bandgelimiteerde driehoeksgolf.</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="979"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="979"/>
         <source>Bandlimited moog saw wave</source>
         <translation>Bandgelimiteerde moog-zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/lb302/lb302.cpp" line="986"/>
+        <location filename="../../plugins/Lb302/Lb302.cpp" line="986"/>
         <source>Click here for bandlimited moog saw wave.</source>
         <translation>Klik hier voor een bandgelimiteerde moog-zaagtandgolf.</translation>
     </message>
 </context>
 <context>
-    <name>malletsInstrument</name>
+    <name>MalletsInstrument</name>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="68"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="68"/>
         <source>Hardness</source>
         <translation>Hardheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="69"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="69"/>
         <source>Position</source>
         <translation>Positie</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="70"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="70"/>
         <source>Vibrato gain</source>
         <translation>Vibrato-gain</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="71"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="71"/>
         <source>Vibrato frequency</source>
         <translation>Vibrato-frequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="72"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="72"/>
         <source>Stick mix</source>
         <translation>Stick-mix</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="73"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="73"/>
         <source>Modulator</source>
         <translation>Modulator</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="74"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="74"/>
         <source>Crossfade</source>
         <translation>Crossfade</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="75"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="75"/>
         <source>LFO speed</source>
         <translation>LFO-snelheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="76"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="76"/>
         <source>LFO depth</source>
         <translation>LFO-diepte</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="77"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="77"/>
         <source>ADSR</source>
         <translation>ADSR</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="78"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="78"/>
         <source>Pressure</source>
         <translation>Druk</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="79"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="79"/>
         <source>Motion</source>
         <translation>Beweging</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="81"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="81"/>
         <source>Speed</source>
         <translation>Snelheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="82"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="82"/>
         <source>Bowed</source>
         <translation>Gebogen</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="84"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="84"/>
         <source>Spread</source>
         <translation>Spreiding</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="91"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="91"/>
         <source>Marimba</source>
         <translation>Marimba</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="93"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="93"/>
         <source>Vibraphone</source>
         <translation>Vibraphone</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="95"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="95"/>
         <source>Agogo</source>
         <translation>Agogo</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="97"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="97"/>
         <source>Wood 1</source>
         <translation>Hout 1</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="99"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="99"/>
         <source>Reso</source>
         <translation>Reso</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="101"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="101"/>
         <source>Wood 2</source>
         <translation>Hout 2</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="103"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="103"/>
         <source>Beats</source>
         <translation>Beats</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="105"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="105"/>
         <source>Two fixed</source>
         <translation>Two Fixed</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="107"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="107"/>
         <source>Clump</source>
         <translation>Clump</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="111"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="111"/>
         <source>Tubular bells</source>
         <translation>Tubular bells</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="115"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="115"/>
         <source>Uniform bar</source>
         <translation>Uniforme balk</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="117"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="117"/>
         <source>Tuned bar</source>
         <translation>Gestemde balk</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="119"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="119"/>
         <source>Glass</source>
         <translation>Glas</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="121"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="121"/>
         <source>Tibetan bowl</source>
         <translation>Tibetaanse kom</translation>
     </message>
 </context>
 <context>
-    <name>malletsInstrumentView</name>
+    <name>MalletsInstrumentView</name>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="405"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="405"/>
         <source>Instrument</source>
         <translation>Instrument</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="413"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="413"/>
         <source>Spread</source>
         <translation>Spreiding</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="415"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="415"/>
         <source>Spread:</source>
         <translation>Spreiding:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="420"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="420"/>
         <source>Missing files</source>
         <translation>Ontbrekende bestanden</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="421"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="421"/>
         <source>Your Stk-installation seems to be incomplete. Please make sure the full Stk-package is installed!</source>
         <translation>Uw Stk-installatie lijkt onvolledig te zijn. Verzeker u ervan dat het volledige Stk-pakket geïnstalleerd is</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="455"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="455"/>
         <source>Hardness</source>
         <translation>Hardheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="457"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="457"/>
         <source>Hardness:</source>
         <translation>Hardheid:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="460"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="460"/>
         <source>Position</source>
         <translation>Positie</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="462"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="462"/>
         <source>Position:</source>
         <translation>Positie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="465"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="465"/>
         <source>Vibrato gain</source>
         <translation>Vibrato-gain</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="467"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="467"/>
         <source>Vibrato gain:</source>
         <translation>Vibrato-gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="470"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="470"/>
         <source>Vibrato frequency</source>
         <translation>Vibrato-frequentie</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="472"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="472"/>
         <source>Vibrato frequency:</source>
         <translation>Vibrato-frequentie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="475"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="475"/>
         <source>Stick mix</source>
         <translation>Stick-mix</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="477"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="477"/>
         <source>Stick mix:</source>
         <translation>Stick-mix:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="491"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="491"/>
         <source>Modulator</source>
         <translation>Modulator</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="493"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="493"/>
         <source>Modulator:</source>
         <translation>Modulator:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="496"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="496"/>
         <source>Crossfade</source>
         <translation>Crossfade</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="498"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="498"/>
         <source>Crossfade:</source>
         <translation>Crossfade:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="501"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="501"/>
         <source>LFO speed</source>
         <translation>LFO-snelheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="503"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="503"/>
         <source>LFO speed:</source>
         <translation>LFO-snelheid:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="506"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="506"/>
         <source>LFO depth</source>
         <translation>LFO-diepte</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="508"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="508"/>
         <source>LFO depth:</source>
         <translation>LFO-diepte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="511"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="511"/>
         <source>ADSR</source>
         <translation>ADSR</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="513"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="513"/>
         <source>ADSR:</source>
         <translation>ADSR:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="531"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="531"/>
         <source>Pressure</source>
         <translation>Druk</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="533"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="533"/>
         <source>Pressure:</source>
         <translation>Druk:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="541"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="541"/>
         <source>Speed</source>
         <translation>Snelheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/stk/mallets/mallets.cpp" line="543"/>
+        <location filename="../../plugins/Stk/Mallets/Mallets.cpp" line="543"/>
         <source>Speed:</source>
         <translation>Snelheid:</translation>
     </message>
 </context>
 <context>
-    <name>manageVSTEffectView</name>
+    <name>ManageVSTEffectView</name>
     <message>
         <location filename="../../plugins/VstEffect/VstEffectControls.cpp" line="316"/>
         <source> - VST parameter control</source>
@@ -15672,542 +15672,542 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
 </context>
 <context>
-    <name>manageVestigeInstrumentView</name>
+    <name>ManageVestigeInstrumentView</name>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="937"/>
-        <location filename="../../plugins/vestige/vestige.cpp" line="1226"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="937"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="1226"/>
         <source> - VST plugin control</source>
         <translation>- VST-pluginbediening</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="946"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="946"/>
         <source>VST Sync</source>
         <translation>VST sync</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="952"/>
-        <location filename="../../plugins/vestige/vestige.cpp" line="1075"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="952"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="1075"/>
         <source>Automated</source>
         <translation>Geautomatiseerd</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="959"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="959"/>
         <source>    Close    </source>
         <translation>Sluiten</translation>
     </message>
 </context>
 <context>
-    <name>organicInstrument</name>
+    <name>OrganicInstrument</name>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="81"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="81"/>
         <source>Distortion</source>
         <translation>Vervorming</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="82"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="82"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
 </context>
 <context>
-    <name>organicInstrumentView</name>
+    <name>OrganicInstrumentView</name>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="435"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="435"/>
         <source>Distortion:</source>
         <translation>Vervorming:</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="443"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="443"/>
         <source>Volume:</source>
         <translation>Volume:</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="447"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="447"/>
         <source>Randomise</source>
         <translation>Willekeuring maken</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="510"/>
-        <location filename="../../plugins/organic/organic.cpp" line="556"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="510"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="556"/>
         <source>Osc %1 waveform:</source>
         <translation>Osc %1 golfvorm:</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="517"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="517"/>
         <source>Osc %1 volume:</source>
         <translation>Osc %1 volume:</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="523"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="523"/>
         <source>Osc %1 panning:</source>
         <translation>Balans osc %1:</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="529"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="529"/>
         <source>Osc %1 stereo detuning</source>
         <translation>Osc %1 stereo-ontstemming</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="531"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="531"/>
         <source>cents</source>
         <translation>cent</translation>
     </message>
     <message>
-        <location filename="../../plugins/organic/organic.cpp" line="554"/>
+        <location filename="../../plugins/Organic/Organic.cpp" line="554"/>
         <source>Osc %1 harmonic:</source>
         <translation>Osc %1 harmonisch:</translation>
     </message>
 </context>
 <context>
-    <name>patchesDialog</name>
+    <name>PatchesDialog</name>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="39"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="39"/>
         <source>Qsynth: Channel Preset</source>
         <translation>Qsynth: kanaal-preset</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="67"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="67"/>
         <source>Bank selector</source>
         <translation>Bank-selector</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="92"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="92"/>
         <source>Bank</source>
         <translation>Bank</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="98"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="98"/>
         <source>Program selector</source>
         <translation>Program-selector</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="123"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="123"/>
         <source>Patch</source>
         <translation>Patch</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="128"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="128"/>
         <source>Name</source>
         <translation>Naam</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="173"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="173"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/patches_dialog.ui" line="192"/>
+        <location filename="../../plugins/Sf2Player/PatchesDialog.ui" line="192"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
 </context>
 <context>
-    <name>sf2Instrument</name>
+    <name>Sf2Instrument</name>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="100"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="100"/>
         <source>Bank</source>
         <translation>Bank</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="101"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="101"/>
         <source>Patch</source>
         <translation>Patch</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="102"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="102"/>
         <source>Gain</source>
         <translation>Gain</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="103"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="103"/>
         <source>Reverb</source>
         <translation>Reverb</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="104"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="104"/>
         <source>Reverb room size</source>
         <translation>Reverb kamergrootte</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="105"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="105"/>
         <source>Reverb damping</source>
         <translation>Reverb demping</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="106"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="106"/>
         <source>Reverb width</source>
         <translation>Reverb-breedte</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="107"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="107"/>
         <source>Reverb level</source>
         <translation>Reverb niveau</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="108"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="108"/>
         <source>Chorus</source>
         <translation>Chorus</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="109"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="109"/>
         <source>Chorus voices</source>
         <translation>Chorus stemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="110"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="110"/>
         <source>Chorus level</source>
         <translation>Chorus niveau</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="111"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="111"/>
         <source>Chorus speed</source>
         <translation>Chorus snelheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="112"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="112"/>
         <source>Chorus depth</source>
         <translation>Chorus diepte</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="417"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="417"/>
         <source>A soundfont %1 could not be loaded.</source>
         <translation>Een soundfont &amp;1 kon niet geladen worden.</translation>
     </message>
 </context>
 <context>
-    <name>sf2InstrumentView</name>
+    <name>Sf2InstrumentView</name>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="924"/>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1141"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="924"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1141"/>
         <source>Open SoundFont file</source>
         <translation>SoundFont-bestand openen</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="936"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="936"/>
         <source>Choose patch</source>
         <translation>Patch kiezen</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="971"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="971"/>
         <source>Gain:</source>
         <translation>Gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="984"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="984"/>
         <source>Apply reverb (if supported)</source>
         <translation>Reverb toepassen (indien ondersteund)</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="988"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="988"/>
         <source>Room size:</source>
         <translation>Kamergrootte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="992"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="992"/>
         <source>Damping:</source>
         <translation>Demping:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="996"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="996"/>
         <source>Width:</source>
         <translation>Breedte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1000"/>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1027"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1000"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1027"/>
         <source>Level:</source>
         <translation>Niveau:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1020"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1020"/>
         <source>Apply chorus (if supported)</source>
         <translation>Chorus toepassen (indien ondersteund)</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1023"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1023"/>
         <source>Voices:</source>
         <translation>Stemmen:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1031"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1031"/>
         <source>Speed:</source>
         <translation>Snelheid:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1035"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1035"/>
         <source>Depth:</source>
         <translation>Diepte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/sf2_player/sf2_player.cpp" line="1145"/>
+        <location filename="../../plugins/Sf2Player/Sf2Player.cpp" line="1145"/>
         <source>SoundFont Files (*.sf2 *.sf3)</source>
         <translation>SoundFont-bestanden (*.sf2 *.sf3)</translation>
     </message>
 </context>
 <context>
-    <name>sfxrInstrument</name>
+    <name>SfxrInstrument</name>
     <message>
-        <location filename="../../plugins/sfxr/sfxr.cpp" line="356"/>
+        <location filename="../../plugins/Sfxr/Sfxr.cpp" line="356"/>
         <source>Wave</source>
         <translation>Golf</translation>
     </message>
 </context>
 <context>
-    <name>stereoEnhancerControlDialog</name>
+    <name>StereoEnhancerControlDialog</name>
     <message>
-        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="42"/>
+        <location filename="../../plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="42"/>
         <source>WIDTH</source>
         <translation>BREEDTE</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_enhancer/stereoenhancer_control_dialog.cpp" line="43"/>
+        <location filename="../../plugins/StereoEnhancer/StereoEnhancerControlDialog.cpp" line="43"/>
         <source>Width:</source>
         <translation>Breedte:</translation>
     </message>
 </context>
 <context>
-    <name>stereoEnhancerControls</name>
+    <name>StereoEnhancerControls</name>
     <message>
-        <location filename="../../plugins/stereo_enhancer/stereoenhancer_controls.cpp" line="35"/>
+        <location filename="../../plugins/StereoEnhancer/StereoEnhancerControls.cpp" line="35"/>
         <source>Width</source>
         <translation>Breedte</translation>
     </message>
 </context>
 <context>
-    <name>stereoMatrixControlDialog</name>
+    <name>StereoMatrixControlDialog</name>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_control_dialog.cpp" line="52"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControlDialog.cpp" line="52"/>
         <source>Left to Left Vol:</source>
         <translation>Links naar links vol:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_control_dialog.cpp" line="57"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControlDialog.cpp" line="57"/>
         <source>Left to Right Vol:</source>
         <translation>Links naar rechts vol:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_control_dialog.cpp" line="62"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControlDialog.cpp" line="62"/>
         <source>Right to Left Vol:</source>
         <translation>Rechts naar links vol:</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_control_dialog.cpp" line="67"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControlDialog.cpp" line="67"/>
         <source>Right to Right Vol:</source>
         <translation>Rechts naar rechts vol:</translation>
     </message>
 </context>
 <context>
-    <name>stereoMatrixControls</name>
+    <name>StereoMatrixControls</name>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_controls.cpp" line="35"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControls.cpp" line="35"/>
         <source>Left to Left</source>
         <translation>Links naar links</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_controls.cpp" line="36"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControls.cpp" line="36"/>
         <source>Left to Right</source>
         <translation>Links naar rechts</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_controls.cpp" line="37"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControls.cpp" line="37"/>
         <source>Right to Left</source>
         <translation>Rechts naar links</translation>
     </message>
     <message>
-        <location filename="../../plugins/stereo_matrix/stereomatrix_controls.cpp" line="38"/>
+        <location filename="../../plugins/StereoMatrix/StereoMatrixControls.cpp" line="38"/>
         <source>Right to Right</source>
         <translation>Rechts naar rechts</translation>
     </message>
 </context>
 <context>
-    <name>vestigeInstrument</name>
+    <name>VestigeInstrument</name>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="354"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="354"/>
         <source>Loading plugin</source>
         <translation>Plugin laden</translation>
     </message>
     <message>
-        <location filename="../../plugins/vestige/vestige.cpp" line="355"/>
+        <location filename="../../plugins/Vestige/Vestige.cpp" line="355"/>
         <source>Please wait while loading the VST plugin...</source>
         <translation>Even geduld, de VST-plugin wordt geladen...</translation>
     </message>
 </context>
 <context>
-    <name>vibed</name>
+    <name>Vibed</name>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="76"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="76"/>
         <source>String %1 volume</source>
         <translation>Snaar %1 volume</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="80"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="80"/>
         <source>String %1 stiffness</source>
         <translation>Snaar %1 hardheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="84"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="84"/>
         <source>Pick %1 position</source>
         <translation>Aanslag %1 positie</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="88"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="88"/>
         <source>Pickup %1 position</source>
         <translation>Pickup %1 positie</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="92"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="92"/>
         <source>String %1 panning</source>
         <translation>String %1 balans</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="96"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="96"/>
         <source>String %1 detune</source>
         <translation>String %1 ontstemmen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="100"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="100"/>
         <source>String %1 fuzziness</source>
         <translation>String %1 zachtheid</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="104"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="104"/>
         <source>String %1 length</source>
         <translation>String %1 lengte</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="108"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="108"/>
         <source>Impulse %1</source>
         <translation>Impuls %1</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="112"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="112"/>
         <source>String %1</source>
         <translation>String %1</translation>
     </message>
 </context>
 <context>
-    <name>vibedView</name>
+    <name>VibedView</name>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="363"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="363"/>
         <source>String volume:</source>
         <translation>String volume:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="367"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="367"/>
         <source>String stiffness:</source>
         <translation>Hardheid snaar:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="373"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="373"/>
         <source>Pick position:</source>
         <translation>Aanslagpositie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="377"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="377"/>
         <source>Pickup position:</source>
         <translation>Pickup-positie:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="382"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="382"/>
         <source>String panning:</source>
         <translation>String balans:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="386"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="386"/>
         <source>String detune:</source>
         <translation>String ontstemmen:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="390"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="390"/>
         <source>String fuzziness:</source>
         <translation>String zachtheid:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="395"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="395"/>
         <source>String length:</source>
         <translation>String lengte:</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="401"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="401"/>
         <source>Impulse</source>
         <translation>Impuls</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="426"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="426"/>
         <source>Octave</source>
         <translation>Octaaf</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="453"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="453"/>
         <source>Impulse Editor</source>
         <translation>Impuls-editor</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="459"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="459"/>
         <source>Enable waveform</source>
         <translation>Golfvorm activeren</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="462"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="462"/>
         <source>Enable/disable string</source>
         <translation>String in-/uitschakelen</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="466"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="466"/>
         <source>String</source>
         <translation>Snaar</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="473"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="480"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="473"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="480"/>
         <source>Sine wave</source>
         <translation>Sinusgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="485"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="492"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="485"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="492"/>
         <source>Triangle wave</source>
         <translation>Driehoeksgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="497"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="504"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="497"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="504"/>
         <source>Saw wave</source>
         <translation>Zaagtandgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="509"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="516"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="509"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="516"/>
         <source>Square wave</source>
         <translation>Blokgolf</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="521"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="528"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="521"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="528"/>
         <source>White noise</source>
         <translation>Witte ruis</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="533"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="540"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="533"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="540"/>
         <source>User-defined wave</source>
         <translation>Aangepaste golf</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="545"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="553"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="545"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="553"/>
         <source>Smooth waveform</source>
         <translation>Golfvorm zacht maken</translation>
     </message>
     <message>
-        <location filename="../../plugins/vibed/vibed.cpp" line="557"/>
-        <location filename="../../plugins/vibed/vibed.cpp" line="565"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="557"/>
+        <location filename="../../plugins/Vibed/Vibed.cpp" line="565"/>
         <source>Normalize waveform</source>
         <translation>Golfvorm normaliseren</translation>
     </message>
 </context>
 <context>
-    <name>voiceObject</name>
+    <name>VoiceObject</name>
     <message>
         <location filename="../../plugins/Sid/SidInstrument.cpp" line="95"/>
         <source>Voice %1 pulse width</source>
@@ -16265,71 +16265,71 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
 </context>
 <context>
-    <name>waveShaperControlDialog</name>
+    <name>WaveShaperControlDialog</name>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="65"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="65"/>
         <source>INPUT</source>
         <translation>INVOER</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="66"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="66"/>
         <source>Input gain:</source>
         <translation>Invoer-gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="73"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="73"/>
         <source>OUTPUT</source>
         <translation>UITVOER</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="74"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="74"/>
         <source>Output gain:</source>
         <translation>Uitvoer-gain:</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="76"/>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="81"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="76"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="81"/>
         <source>Reset wavegraph</source>
         <translation>Golfvorm herstellen</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="83"/>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="88"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="83"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="88"/>
         <source>Smooth wavegraph</source>
         <translation>Golfvorm zacht maken</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="90"/>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="95"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="90"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="95"/>
         <source>Increase wavegraph amplitude by 1 dB</source>
         <translation>Golfgrafiek-amplitude verhogen met 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="97"/>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="102"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="97"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="102"/>
         <source>Decrease wavegraph amplitude by 1 dB</source>
         <translation>Golfgrafiek-amplitude verlagen met 1 dB</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="105"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="105"/>
         <source>Clip input</source>
         <translation>Invoer clippen</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_control_dialog.cpp" line="108"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControlDialog.cpp" line="108"/>
         <source>Clip input signal to 0 dB</source>
         <translation>Invoersignaal clippen naar 0 dB</translation>
     </message>
 </context>
 <context>
-    <name>waveShaperControls</name>
+    <name>WaveShaperControls</name>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_controls.cpp" line="42"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControls.cpp" line="42"/>
         <source>Input gain</source>
         <translation>Invoer-gain</translation>
     </message>
     <message>
-        <location filename="../../plugins/waveshaper/waveshaper_controls.cpp" line="43"/>
+        <location filename="../../plugins/WaveShaper/WaveShaperControls.cpp" line="43"/>
         <source>Output gain</source>
         <translation>Uitvoer-gain</translation>
     </message>

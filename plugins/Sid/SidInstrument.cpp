@@ -88,7 +88,7 @@ Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 
 }
 
-voiceObject::voiceObject( Model * _parent, int _idx ) :
+VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 	Model( _parent ),
 	m_pulseWidthModel( 2048.0f, 0.0f, 4095.0f, 1.0f, this,
 					tr( "Voice %1 pulse width" ).arg( _idx+1 ) ),
@@ -113,7 +113,7 @@ voiceObject::voiceObject( Model * _parent, int _idx ) :
 }
 
 
-voiceObject::~voiceObject()
+VoiceObject::~VoiceObject()
 {
 }
 
@@ -132,7 +132,7 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 {
 	for( int i = 0; i < 3; ++i )
 	{
-		m_voice[i] = new voiceObject( this, i );
+		m_voice[i] = new VoiceObject( this, i );
 	}
 }
 
@@ -372,10 +372,10 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 		switch( m_voice[i]->m_waveFormModel.value() )
 		{	
 			default: break;
-			case voiceObject::NoiseWave:	data8 += 128; break;
-			case voiceObject::SquareWave:	data8 += 64; break;
-			case voiceObject::SawWave:		data8 += 32; break;
-			case voiceObject::TriangleWave:	data8 += 16; break;
+			case VoiceObject::NoiseWave:	data8 += 128; break;
+			case VoiceObject::SquareWave:	data8 += 64; break;
+			case VoiceObject::SawWave:		data8 += 32; break;
+			case VoiceObject::TriangleWave:	data8 += 16; break;
 		}
 		sidreg[base+4] = data8&0x00FF;
 		// ad
