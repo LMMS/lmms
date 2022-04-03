@@ -1,6 +1,6 @@
 /*
  * lb302.cpp - implementation of class lb302 which is a bass synth attempting
- *             to emulate the Roland TB303 bass synth
+ *             to emulate the Roland TB-303 bass synth
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  *
@@ -8,7 +8,7 @@
  *
  * lb302FilterIIR2 is based on the gsyn filter code by Andy Sloane.
  *
- * lb302Filter3Pole is based on the TB303 instrument written by
+ * lb302Filter3Pole is based on the TB-303 instrument written by
  *   Josep M Comajuncosas for the CSounds library
  *
  * This program is free software; you can redistribute it and/or
@@ -81,7 +81,7 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 	STRINGIFY( PLUGIN_NAME ),
 	"LB302",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
-			"Incomplete monophonic imitation tb303" ),
+			"Incomplete monophonic imitation TB-303" ),
 	"Paul Giblock <pgib/at/users.sf.net>",
 	0x0100,
 	Plugin::Instrument,

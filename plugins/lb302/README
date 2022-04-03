@@ -56,7 +56,7 @@ TODO:
   in order to apply the built-in exponential decay.
 
 TODO:
-  The original TB303's square wave is not 50% duty cycle.  The peaks are
+  The original TB-303's square wave is not 50% duty cycle.  The peaks are
   supposed to slope down slightly.  It would be nice to be able to 
   configure this.  In fact, each waveform could have a parameter knob to
   change some aspect of the wave.  See lb302.cpp:643 for more info.

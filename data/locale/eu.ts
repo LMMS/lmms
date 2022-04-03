@@ -10563,7 +10563,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="86"/>
-        <source>Incomplete monophonic imitation tb303</source>
+        <source>Incomplete monophonic imitation TB-303</source>
         <translation type="unfinished"/>
     </message>
     <message>

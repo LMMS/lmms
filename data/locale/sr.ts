@@ -8962,7 +8962,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Incomplete monophonic imitation tb303</source>
+        <source>Incomplete monophonic imitation TB-303</source>
         <translation type="unfinished"/>
     </message>
     <message>

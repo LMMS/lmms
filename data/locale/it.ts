@@ -10299,8 +10299,8 @@ Motivo: &quot;%2&quot;</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="86"/>
-        <source>Incomplete monophonic imitation tb303</source>
-        <translation>Imitazione monofonica del tb303 incompleta</translation>
+        <source>Incomplete monophonic imitation TB-303</source>
+        <translation>Imitazione monofonica del TB-303 incompleta</translation>
     </message>
     <message>
         <location filename="../../plugins/Lv2Effect/Lv2Effect.cpp" line="45"/>
