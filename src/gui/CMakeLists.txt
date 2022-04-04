@@ -14,7 +14,6 @@ SET(LMMS_SRCS
 	gui/embed.cpp
 	gui/ExportProjectDialog.cpp
 	gui/FileBrowser.cpp
-	gui/MixerView.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
 	gui/InstrumentTrackView.cpp
@@ -52,9 +51,12 @@ SET(LMMS_SRCS
 	gui/dialogs/ColorChooser.cpp
 
 	gui/editors/AutomationEditor.cpp
+	gui/editors/ControllerRackView.cpp
 	gui/editors/Editor.cpp
+	gui/editors/MixerView.cpp
 	gui/editors/PatternEditor.cpp
 	gui/editors/PianoRoll.cpp
+	gui/editors/ProjectNotes.cpp
 	gui/editors/SongEditor.cpp
 
 	gui/menus/RecentProjectsMenu.cpp
@@ -64,7 +66,6 @@ SET(LMMS_SRCS
 	gui/widgets/AutomatableSlider.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
-	gui/widgets/ControllerRackView.cpp
 	gui/widgets/ControllerView.cpp
 	gui/widgets/Controls.cpp
 	gui/widgets/CPULoadWidget.cpp
@@ -98,7 +99,6 @@ SET(LMMS_SRCS
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
 	gui/widgets/PositionLine.cpp
-	gui/widgets/ProjectNotes.cpp
 	gui/widgets/RenameDialog.cpp
 	gui/widgets/Rubberband.cpp
 	gui/widgets/SendButtonIndicator.cpp
