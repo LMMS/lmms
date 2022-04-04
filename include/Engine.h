@@ -33,6 +33,7 @@
 #include "lmmsconfig.h"
 #include "lmms_export.h"
 #include "lmms_basics.h"
+#include "SampleCache.h"
 
 class AudioEngine;
 class Mixer;
@@ -143,6 +144,7 @@ private:
 	static AudioEngine *s_audioEngine;
 	static Mixer * s_mixer;
 	static Song * s_song;
+	static SampleCache * s_sampleCache;
 	static PatternStore * s_patternStore;
 	static ProjectJournal * s_projectJournal;
 

@@ -33,6 +33,7 @@
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
+#include "SampleCache.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
@@ -41,6 +42,7 @@ float LmmsCore::s_framesPerTick;
 AudioEngine* LmmsCore::s_audioEngine = nullptr;
 Mixer * LmmsCore::s_mixer = nullptr;
 PatternStore * LmmsCore::s_patternStore = nullptr;
+SampleCache * LmmsCore::s_sampleCache = nullptr;
 Song * LmmsCore::s_song = nullptr;
 ProjectJournal * LmmsCore::s_projectJournal = nullptr;
 #ifdef LMMS_HAVE_LV2
@@ -65,6 +67,7 @@ void LmmsCore::init( bool renderOnly )
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
 	s_audioEngine = new AudioEngine( renderOnly );
+	s_sampleCache = new SampleCache;
 	s_song = new Song;
 	s_mixer = new Mixer;
 	s_patternStore = new PatternStore;
