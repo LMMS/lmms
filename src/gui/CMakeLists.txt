@@ -1,18 +1,14 @@
 SET(LMMS_SRCS
 	${LMMS_SRCS}
-	gui/AboutDialog.cpp
 	gui/ActionGroup.cpp
 	gui/AudioAlsaSetupWidget.cpp
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
 	gui/AutomationClipView.cpp
 	gui/AutomationTrackView.cpp
-	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
 	gui/EffectControlDialog.cpp
-	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
-	gui/ExportProjectDialog.cpp
 	gui/FileBrowser.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
@@ -37,7 +33,6 @@ SET(LMMS_SRCS
 	gui/SampleClipView.cpp
 	gui/SampleTrackView.cpp
 	gui/SampleTrackWindow.cpp
-	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
@@ -46,9 +41,15 @@ SET(LMMS_SRCS
 	gui/ClipView.cpp
 	gui/TrackView.cpp
 
-	gui/dialogs/FileDialog.cpp
-	gui/dialogs/VersionedSaveDialog.cpp
+	gui/dialogs/AboutDialog.cpp
 	gui/dialogs/ColorChooser.cpp
+	gui/dialogs/ControllerConnectionDialog.cpp
+	gui/dialogs/EffectSelectDialog.cpp
+	gui/dialogs/ExportProjectDialog.cpp
+	gui/dialogs/FileDialog.cpp
+	gui/dialogs/RenameDialog.cpp
+	gui/dialogs/SetupDialog.cpp
+	gui/dialogs/VersionedSaveDialog.cpp
 
 	gui/editors/AutomationEditor.cpp
 	gui/editors/ControllerRackView.cpp
@@ -99,7 +100,6 @@ SET(LMMS_SRCS
 	gui/widgets/Oscilloscope.cpp
 	gui/widgets/PixmapButton.cpp
 	gui/widgets/PositionLine.cpp
-	gui/widgets/RenameDialog.cpp
 	gui/widgets/Rubberband.cpp
 	gui/widgets/SendButtonIndicator.cpp
 	gui/widgets/SideBar.cpp
@@ -124,8 +124,7 @@ set(LMMS_UIS
 	${LMMS_UIS}
 	gui/dialogs/about_dialog.ui
 	gui/dialogs/export_project.ui
-
-	gui/Forms/EffectSelectDialog.ui
+	gui/dialogs/EffectSelectDialog.ui
 
 	PARENT_SCOPE
 )
