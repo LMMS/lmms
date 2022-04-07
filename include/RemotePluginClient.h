@@ -27,6 +27,15 @@
 
 #include "RemotePluginBase.h"
 
+#ifndef LMMS_BUILD_WIN32
+#	include <condition_variable>
+#	include <mutex>
+#	include <thread>
+
+#	include <sys/signal.h>
+#	include <unistd.h>
+#endif
+
 class RemotePluginClient : public RemotePluginBase
 {
 public:
@@ -125,6 +134,43 @@ private:
 	sample_rate_t m_sampleRate;
 	fpp_t m_bufferSize;
 } ;
+
+class PollParentThread
+{
+public:
+	PollParentThread() :
+		m_stop{false},
+		m_thread{
+			[this] {
+				auto lock = std::unique_lock{m_mutex};
+				while (!m_cv.wait_for(lock, std::chrono::milliseconds(500), [this] { return m_stop; }))
+				{
+					if (getppid() == 1)
+					{
+						kill(getpid(), SIGHUP);
+						break;
+					}
+				}
+			}
+		}
+	{ }
+
+	~PollParentThread()
+	{
+		{
+			const auto lock = std::unique_lock{m_mutex};
+			m_stop = true;
+		}
+		m_cv.notify_all();
+		m_thread.join();
+	}
+
+private:
+	bool m_stop;
+	std::mutex m_mutex;
+	std::condition_variable m_cv;
+	std::thread m_thread;
+};
 
 #ifdef SYNC_WITH_SHM_FIFO
 RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :

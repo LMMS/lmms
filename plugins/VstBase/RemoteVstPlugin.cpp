@@ -2473,6 +2473,11 @@ int main( int _argc, char * * _argv )
 		fprintf( stderr, "not enough arguments\n" );
 		return -1;
 	}
+
+#ifndef LMMS_BUILD_WIN32
+	PollParentThread pollParentThread;
+#endif
+
 #ifndef NATIVE_LINUX_VST
 	OleInitialize(nullptr);
 #else
