@@ -220,9 +220,9 @@ QString LfoController::nodeName() const
 
 
 
-ControllerDialog * LfoController::createDialog( QWidget * _parent )
+ControllerWindow * LfoController::createDialog( QWidget * _parent )
 {
-	return new LfoControllerDialog( this, _parent );
+	return new LfoControllerWindow( this, _parent );
 }
 
 

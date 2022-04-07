@@ -34,7 +34,7 @@
 #include "ControllerView.h"
 
 #include "CaptionMenu.h"
-#include "ControllerDialog.h"
+#include "ControllerWindow.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"

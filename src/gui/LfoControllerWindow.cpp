@@ -1,5 +1,5 @@
 /*
- * LfoControllerDialog.cpp - per-controller-specific view for changing a
+ * LfoControllerWindow.cpp - per-controller-specific view for changing a
  *                           controller's settings
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
@@ -47,8 +47,8 @@ const int CD_LFO_AMOUNT_CD_KNOB_X = CD_LFO_SPEED_CD_KNOB_X+CD_KNOB_X_SPACING;
 const int CD_LFO_PHASE_CD_KNOB_X = CD_LFO_AMOUNT_CD_KNOB_X+CD_KNOB_X_SPACING;
 const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X+CD_KNOB_X_SPACING+3;
 
-LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent ) :
-	ControllerDialog( _model, _parent )
+LfoControllerWindow::LfoControllerWindow( Controller * _model, QWidget * _parent ) :
+	ControllerWindow( _model, _parent )
 {
 	QString title = tr( "LFO" );
 	title.append( " (" );
@@ -210,14 +210,14 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 
 
 
-LfoControllerDialog::~LfoControllerDialog()
+LfoControllerWindow::~LfoControllerWindow()
 {
 	m_userWaveBtn->disconnect( this );
 }
 
 
 
-void LfoControllerDialog::askUserDefWave()
+void LfoControllerWindow::askUserDefWave()
 {
 	SampleBuffer * sampleBuffer = dynamic_cast<LfoController*>(this->model())->
 									m_userDefSampleBuffer;
@@ -231,7 +231,7 @@ void LfoControllerDialog::askUserDefWave()
 
 
 
-void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
+void LfoControllerWindow::contextMenuEvent( QContextMenuEvent * )
 {
 	/*
 	QPointer<captionMenu> contextMenu = new captionMenu(
@@ -256,7 +256,7 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 
 
 
-void LfoControllerDialog::modelChanged()
+void LfoControllerWindow::modelChanged()
 {
 	m_lfo = castModel<LfoController>();
 

@@ -26,7 +26,7 @@
 #define PEAK_CONTROLLER_H
 
 #include "Controller.h"
-#include "ControllerDialog.h"
+#include "ControllerWindow.h"
 
 class QWidget;
 
@@ -56,7 +56,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	ControllerWindow * createDialog( QWidget * _parent ) override;
 	void handleDestroyedEffect( );
 	void updateCoeffs();
 
@@ -66,7 +66,7 @@ protected:
 
 	PeakControllerEffect * m_peakEffect;
 
-	friend class PeakControllerDialog;
+	friend class PeakControllerWindow;
 
 private:
 	float m_currentSample;
@@ -82,12 +82,12 @@ private:
 
 
 
-class PeakControllerDialog : public ControllerDialog
+class PeakControllerWindow : public ControllerWindow
 {
 	Q_OBJECT
 public:
-	PeakControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~PeakControllerDialog();
+	PeakControllerWindow( Controller * _controller, QWidget * _parent );
+	virtual ~PeakControllerWindow();
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;

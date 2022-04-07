@@ -30,7 +30,7 @@
 #include "Model.h"
 #include "AutomatableModel.h"
 #include "Controller.h"
-#include "ControllerDialog.h"
+#include "ControllerWindow.h"
 #include "TempoSyncKnobModel.h"
 #include "Oscillator.h"
 
@@ -55,7 +55,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	ControllerWindow * createDialog( QWidget * _parent ) override;
 
 
 protected:
@@ -83,18 +83,18 @@ protected slots:
 	void updateSampleFunction();
 	void updateDuration();
 
-	friend class LfoControllerDialog;
+	friend class LfoControllerWindow;
 
 } ;
 
 
 
-class LfoControllerDialog : public ControllerDialog
+class LfoControllerWindow : public ControllerWindow
 {
 	Q_OBJECT
 public:
-	LfoControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~LfoControllerDialog();
+	LfoControllerWindow( Controller * _controller, QWidget * _parent );
+	virtual ~LfoControllerWindow();
 
 
 protected:

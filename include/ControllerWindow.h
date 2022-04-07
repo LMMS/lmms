@@ -1,8 +1,8 @@
 /*
- * ControllerDialog.cpp - per-controller-specific view for changing a
- *                        controller's settings
+ * ControllerWindow.h - per-controller-specific view for changing a
+ *                      controller's settings
  *
- * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
+ * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,33 +23,32 @@
  *
  */
 
-#include <QCloseEvent>
+#ifndef CONTROLLER_WINDOW_H
+#define CONTROLLER_WINDOW_H
 
-#include "ControllerDialog.h"
-#include "Controller.h"
+#include <QWidget>
+
+#include "ModelView.h"
+
+class Controller;
 
 
-ControllerDialog::ControllerDialog( Controller * _controller,
-							QWidget * _parent ) :
-	QWidget( _parent ),
-	ModelView( _controller, this )
+class ControllerWindow : public QWidget, public ModelView
 {
-}
+    Q_OBJECT
+public:
+	ControllerWindow( Controller * _controller, QWidget * _parent );
+
+	virtual ~ControllerWindow();
 
 
-
-ControllerDialog::~ControllerDialog()
-{
-}
+signals:
+	void closed();
 
 
+protected:
+	void closeEvent( QCloseEvent * _ce ) override;
 
-void ControllerDialog::closeEvent( QCloseEvent * _ce )
-{
-	_ce->ignore();
-	emit closed();
-}
+} ;
 
-
-
-
+#endif

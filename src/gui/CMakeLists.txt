@@ -6,7 +6,7 @@ SET(LMMS_SRCS
 	gui/AutomatableModelView.cpp
 	gui/AutomationClipView.cpp
 	gui/AutomationTrackView.cpp
-	gui/ControllerDialog.cpp
+	gui/ControllerWindow.cpp
 	gui/EffectControlDialog.cpp
 	gui/embed.cpp
 	gui/FileBrowser.cpp
@@ -14,7 +14,7 @@ SET(LMMS_SRCS
 	gui/InstrumentView.cpp
 	gui/InstrumentTrackView.cpp
 	gui/InstrumentTrackWindow.cpp
-	gui/LfoControllerDialog.cpp
+	gui/LfoControllerWindow.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
 	gui/Lv2ViewBase.cpp
@@ -26,7 +26,7 @@ SET(LMMS_SRCS
 	gui/ModelView.cpp
 	gui/PatternClipView.cpp
 	gui/PatternTrackView.cpp
-	gui/PeakControllerDialog.cpp
+	gui/PeakControllerWindow.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp

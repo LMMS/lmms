@@ -75,7 +75,7 @@ protected:
 
 private:
 	QMdiSubWindow * m_subWindow;
-	ControllerDialog * m_controllerDlg;
+	ControllerWindow * m_controllerDlg;
 	QLabel * m_nameLabel;
 	bool m_show;
 

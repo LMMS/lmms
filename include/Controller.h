@@ -33,7 +33,7 @@
 #include "JournallingObject.h"
 #include "ValueBuffer.h"
 
-class ControllerDialog;
+class ControllerWindow;
 class Controller;
 class ControllerConnection;
 
@@ -132,7 +132,7 @@ public:
 	bool hasModel( const Model * m ) const;
 
 public slots:
-	virtual ControllerDialog * createDialog( QWidget * _parent );
+	virtual ControllerWindow * createDialog( QWidget * _parent );
 
 	virtual void setName( const QString & _new_name )
 	{
@@ -169,7 +169,7 @@ signals:
 	// The value changed while the audio engine isn't running (i.e: MIDI CC)
 	void valueChanged();
 
-	friend class ControllerDialog;
+	friend class ControllerWindow;
 
 } ;
 

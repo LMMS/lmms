@@ -1,5 +1,5 @@
 /*
- * PeakControllerDialog.cpp - per-controller-specific view for changing a
+ * PeakControllerWindow.cpp - per-controller-specific view for changing a
  * controller's settings
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
@@ -34,8 +34,8 @@
 #include "PeakController.h"
 
 
-PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
-	ControllerDialog( _model, _parent )
+PeakControllerWindow::PeakControllerWindow( Controller * _model, QWidget * _parent ) :
+	ControllerWindow( _model, _parent )
 {
 	setWindowTitle( tr( "PEAK" ) );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
@@ -53,7 +53,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 
 
 
-PeakControllerDialog::~PeakControllerDialog()
+PeakControllerWindow::~PeakControllerWindow()
 {
 }
 
@@ -68,21 +68,21 @@ void effectView::closeEffects()
 */
 
 
-void PeakControllerDialog::contextMenuEvent( QContextMenuEvent * )
+void PeakControllerWindow::contextMenuEvent( QContextMenuEvent * )
 {
 }
 
 
 
 
-void PeakControllerDialog::paintEvent( QPaintEvent * )
+void PeakControllerWindow::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 }
 
 
 
-void PeakControllerDialog::modelChanged()
+void PeakControllerWindow::modelChanged()
 {
 	m_peakController = castModel<PeakController>();
 }

@@ -61,7 +61,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	ControllerWindow * createDialog( QWidget * _parent ) override;
 	void updateName();
 
 
