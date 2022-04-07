@@ -135,6 +135,7 @@ private:
 	fpp_t m_bufferSize;
 } ;
 
+#ifndef LMMS_BUILD_WIN32
 class PollParentThread
 {
 public:
@@ -171,6 +172,7 @@ private:
 	std::condition_variable m_cv;
 	std::thread m_thread;
 };
+#endif
 
 #ifdef SYNC_WITH_SHM_FIFO
 RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
