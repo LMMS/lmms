@@ -32,7 +32,7 @@
 #	include <mutex>
 #	include <thread>
 
-#	include <sys/signal.h>
+#	include <signal.h>
 #	include <unistd.h>
 #endif
 
