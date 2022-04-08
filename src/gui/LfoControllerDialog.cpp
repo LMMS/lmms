@@ -25,7 +25,6 @@
 
 
 #include "embed.h"
-#include "ToolTip.h"
 
 
 #include "LfoController.h"
@@ -84,7 +83,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 						"sin_wave_active" ) );
 	sin_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
-	ToolTip::add( sin_wave_btn,
+	sin_wave_btn->setToolTip(
 			tr( "Sine wave" ) );
 
 	PixmapButton * triangle_wave_btn =
@@ -94,7 +93,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	triangle_wave_btn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
-	ToolTip::add( triangle_wave_btn,
+	triangle_wave_btn->setToolTip(
 			tr( "Triangle wave" ) );
 
 	PixmapButton * saw_wave_btn = new PixmapButton( this, nullptr );
@@ -103,7 +102,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 						"saw_wave_active" ) );
 	saw_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
-	ToolTip::add( saw_wave_btn,
+	saw_wave_btn->setToolTip(
 			tr( "Saw wave" ) );
 
 	PixmapButton * sqr_wave_btn = new PixmapButton( this, nullptr );
@@ -112,7 +111,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 					"square_wave_active" ) );
 	sqr_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
-	ToolTip::add( sqr_wave_btn,
+	sqr_wave_btn->setToolTip(
 			tr( "Square wave" ) );
 
 	PixmapButton * moog_saw_wave_btn =
@@ -122,7 +121,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	moog_saw_wave_btn->setInactiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
-	ToolTip::add( moog_saw_wave_btn,
+	moog_saw_wave_btn->setToolTip(
 			tr( "Moog saw wave" ) );
 
 	PixmapButton * exp_wave_btn = new PixmapButton( this, nullptr );
@@ -131,7 +130,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 						"exp_wave_active" ) );
 	exp_wave_btn->setInactiveGraphic( embed::getIconPixmap(
 						"exp_wave_inactive" ) );
-	ToolTip::add( exp_wave_btn,
+	exp_wave_btn->setToolTip(
 			tr( "Exponential wave" ) );
 
 	PixmapButton * white_noise_btn = new PixmapButton( this, nullptr );
@@ -140,7 +139,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	white_noise_btn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
-	ToolTip::add( white_noise_btn,
+	white_noise_btn->setToolTip(
 				tr( "White noise" ) );
 
 	m_userWaveBtn = new PixmapButton( this, nullptr );
@@ -152,7 +151,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	connect( m_userWaveBtn,
 					SIGNAL( doubleClicked() ),
 			this, SLOT( askUserDefWave() ) );
-	ToolTip::add( m_userWaveBtn,
+	m_userWaveBtn->setToolTip(
 				tr( "User-defined shape.\nDouble click to pick a file." ) );
 	
 	m_waveBtnGrp = new automatableButtonGroup( this );
@@ -172,7 +171,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 						"lfo_x1_active" ) );
 	x1->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x1_inactive" ) );
-	ToolTip::add( x1,
+	x1->setToolTip(
 				tr( "Mutliply modulation frequency by 1" ));
 
 	PixmapButton * x100 = new PixmapButton( this, nullptr );
@@ -181,7 +180,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 						"lfo_x100_active" ) );
 	x100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x100_inactive" ) );
-	ToolTip::add( x100,
+	x100->setToolTip(
 				tr( "Mutliply modulation frequency by 100" ));
 
 	PixmapButton * d100 = new PixmapButton( this, nullptr );
@@ -190,7 +189,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 						"lfo_d100_active" ) );
 	d100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_d100_inactive" ) );
-	ToolTip::add( d100,
+	d100->setToolTip(
 				tr( "Divide modulation frequency by 100" ));
 
 	m_multiplierBtnGrp = new automatableButtonGroup( this );
@@ -225,7 +224,7 @@ void LfoControllerDialog::askUserDefWave()
 	if( fileName.isEmpty() == false )
 	{
 		// TODO:
-		ToolTip::add( m_userWaveBtn, sampleBuffer->audioFile() );
+		m_userWaveBtn->setToolTip(sampleBuffer->audioFile());
 	}
 }
 

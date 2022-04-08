@@ -60,7 +60,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "ToolTip.h"
 
 
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
@@ -1878,7 +1877,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 	m_tensionKnob->setModel(m_editor->m_tensionModel);
-	ToolTip::add(m_tensionKnob, tr("Tension value for spline"));
+	m_tensionKnob->setToolTip(tr("Tension value for spline"));
 
 	connect(m_cubicHermiteAction, SIGNAL(toggled(bool)), m_tensionKnob, SLOT(setEnabled(bool)));
 

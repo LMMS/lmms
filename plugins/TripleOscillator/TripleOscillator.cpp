@@ -37,7 +37,6 @@
 #include "Oscillator.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
-#include "ToolTip.h"
 
 #include "embed.h"
 #include "plugin_export.h"
@@ -147,7 +146,7 @@ void OscillatorObject::oscUserDefWaveDblClick()
 	if( af != "" )
 	{
 		// TODO:
-		//ToolTip::add( m_usrWaveBtn, m_sampleBuffer->audioFile() );
+		//m_usrWaveBtn->setToolTip(m_sampleBuffer->audioFile());
 	}
 }
 
@@ -459,7 +458,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 								"pm_active" ) );
 	pm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"pm_inactive" ) );
-	ToolTip::add( pm_osc1_btn, tr( "Modulate phase of oscillator 1 by oscillator 2" ) );
+	pm_osc1_btn->setToolTip(tr("Modulate phase of oscillator 1 by oscillator 2"));
 
 	PixmapButton * am_osc1_btn = new PixmapButton( this, nullptr );
 	am_osc1_btn->move( mod_x + 35, mod1_y );
@@ -467,7 +466,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 								"am_active" ) );
 	am_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"am_inactive" ) );
-	ToolTip::add( am_osc1_btn, tr( "Modulate amplitude of oscillator 1 by oscillator 2" ) );
+	am_osc1_btn->setToolTip(tr("Modulate amplitude of oscillator 1 by oscillator 2"));
 
 	PixmapButton * mix_osc1_btn = new PixmapButton( this, nullptr );
 	mix_osc1_btn->move( mod_x + 70, mod1_y );
@@ -475,7 +474,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"mix_active" ) );
 	mix_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_inactive" ) );
-	ToolTip::add( mix_osc1_btn, tr( "Mix output of oscillators 1 & 2" ) );
+	mix_osc1_btn->setToolTip(tr("Mix output of oscillators 1 & 2"));
 
 	PixmapButton * sync_osc1_btn = new PixmapButton( this, nullptr );
 	sync_osc1_btn->move( mod_x + 105, mod1_y );
@@ -483,7 +482,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"sync_active" ) );
 	sync_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_inactive" ) );
-	ToolTip::add( sync_osc1_btn, tr( "Synchronize oscillator 1 with "
+	sync_osc1_btn->setToolTip(tr("Synchronize oscillator 1 with "
 							"oscillator 2" ) );
 
 	PixmapButton * fm_osc1_btn = new PixmapButton( this, nullptr );
@@ -492,7 +491,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 								"fm_active" ) );
 	fm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
-	ToolTip::add( fm_osc1_btn, tr( "Modulate frequency of oscillator 1 by oscillator 2" ) );
+	fm_osc1_btn->setToolTip(tr("Modulate frequency of oscillator 1 by oscillator 2"));
 
 	m_mod1BtnGrp = new automatableButtonGroup( this );
 	m_mod1BtnGrp->addButton( pm_osc1_btn );
@@ -509,7 +508,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 								"pm_active" ) );
 	pm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"pm_inactive" ) );
-	ToolTip::add( pm_osc2_btn, tr( "Modulate phase of oscillator 2 by oscillator 3" ) );
+	pm_osc2_btn->setToolTip(tr("Modulate phase of oscillator 2 by oscillator 3"));
 
 	PixmapButton * am_osc2_btn = new PixmapButton( this, nullptr );
 	am_osc2_btn->move( mod_x + 35, mod2_y );
@@ -517,7 +516,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 								"am_active" ) );
 	am_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"am_inactive" ) );
-	ToolTip::add( am_osc2_btn, tr( "Modulate amplitude of oscillator 2 by oscillator 3" ) );
+	am_osc2_btn->setToolTip(tr("Modulate amplitude of oscillator 2 by oscillator 3"));
 
 	PixmapButton * mix_osc2_btn = new PixmapButton( this, nullptr );
 	mix_osc2_btn->move( mod_x + 70, mod2_y );
@@ -525,7 +524,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"mix_active" ) );
 	mix_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"mix_inactive" ) );
-	ToolTip::add( mix_osc2_btn, tr("Mix output of oscillators 2 & 3" ) );
+	mix_osc2_btn->setToolTip(tr("Mix output of oscillators 2 & 3"));
 
 	PixmapButton * sync_osc2_btn = new PixmapButton( this, nullptr );
 	sync_osc2_btn->move( mod_x + 105, mod2_y );
@@ -533,7 +532,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"sync_active" ) );
 	sync_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sync_inactive" ) );
-	ToolTip::add( sync_osc2_btn, tr( "Synchronize oscillator 2 with oscillator 3" ) );
+	sync_osc2_btn->setToolTip(tr("Synchronize oscillator 2 with oscillator 3"));
 
 	PixmapButton * fm_osc2_btn = new PixmapButton( this, nullptr );
 	fm_osc2_btn->move( mod_x + 140, mod2_y );
@@ -541,7 +540,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 								"fm_active" ) );
 	fm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
-	ToolTip::add( fm_osc2_btn, tr( "Modulate frequency of oscillator 2 by oscillator 3" ) );
+	fm_osc2_btn->setToolTip(tr("Modulate frequency of oscillator 2 by oscillator 3"));
 
 	m_mod2BtnGrp = new automatableButtonGroup( this );
 
@@ -611,7 +610,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"sin_shape_active" ) );
 		sin_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"sin_shape_inactive" ) );
-		ToolTip::add( sin_wave_btn,
+		sin_wave_btn->setToolTip(
 				tr( "Sine wave" ) );
 
 		PixmapButton * triangle_wave_btn =
@@ -621,7 +620,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "triangle_shape_active" ) );
 		triangle_wave_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "triangle_shape_inactive" ) );
-		ToolTip::add( triangle_wave_btn,
+		triangle_wave_btn->setToolTip(
 				tr( "Triangle wave") );
 
 		PixmapButton * saw_wave_btn = new PixmapButton( this, nullptr );
@@ -630,7 +629,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"saw_shape_active" ) );
 		saw_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"saw_shape_inactive" ) );
-		ToolTip::add( saw_wave_btn,
+		saw_wave_btn->setToolTip(
 				tr( "Saw wave" ) );
 
 		PixmapButton * sqr_wave_btn = new PixmapButton( this, nullptr );
@@ -639,7 +638,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 						"square_shape_active" ) );
 		sqr_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"square_shape_inactive" ) );
-		ToolTip::add( sqr_wave_btn,
+		sqr_wave_btn->setToolTip(
 				tr( "Square wave" ) );
 
 		PixmapButton * moog_saw_wave_btn =
@@ -649,7 +648,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "moog_saw_shape_active" ) );
 		moog_saw_wave_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "moog_saw_shape_inactive" ) );
-		ToolTip::add( moog_saw_wave_btn,
+		moog_saw_wave_btn->setToolTip(
 				tr( "Moog-like saw wave" ) );
 
 		PixmapButton * exp_wave_btn = new PixmapButton( this, nullptr );
@@ -658,7 +657,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"exp_shape_active" ) );
 		exp_wave_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"exp_shape_inactive" ) );
-		ToolTip::add( exp_wave_btn,
+		exp_wave_btn->setToolTip(
 				tr( "Exponential wave" ) );
 
 		PixmapButton * white_noise_btn = new PixmapButton( this, nullptr );
@@ -667,7 +666,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "white_noise_shape_active" ) );
 		white_noise_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "white_noise_shape_inactive" ) );
-		ToolTip::add( white_noise_btn,
+		white_noise_btn->setToolTip(
 				tr( "White noise" ) );
 
 		PixmapButton * uwb = new PixmapButton( this, nullptr );
@@ -676,7 +675,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							"usr_shape_active" ) );
 		uwb->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"usr_shape_inactive" ) );
-		ToolTip::add( uwb, tr( "User-defined wave" ) );
+		uwb->setToolTip(tr("User-defined wave"));
 
 		PixmapButton * uwt = new PixmapButton( this, nullptr );
 		uwt->move( 110, btn_y );
@@ -685,7 +684,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		uwt->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"wavetable_inactive" ) );
 		uwt->setCheckable(true);
-		ToolTip::add( uwt, tr( "Use alias-free wavetable oscillators." ) );
+		uwt->setToolTip(tr("Use alias-free wavetable oscillators."));
 
 		automatableButtonGroup * wsbg =
 			new automatableButtonGroup( this );

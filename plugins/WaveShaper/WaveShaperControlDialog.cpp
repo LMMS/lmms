@@ -31,7 +31,6 @@
 #include "Graph.h"
 #include "Knob.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "LedCheckBox.h"
 
 
@@ -78,34 +77,34 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 	resetButton -> resize( 13, 46 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
-	ToolTip::add( resetButton, tr( "Reset wavegraph" ) );
+	resetButton->setToolTip(tr("Reset wavegraph"));
 
 	PixmapButton * smoothButton = new PixmapButton( this, tr("Smooth wavegraph") );
 	smoothButton -> move( 162, 237 );
 	smoothButton -> resize( 13, 46 );
 	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
 	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
-	ToolTip::add( smoothButton, tr( "Smooth wavegraph" ) );
+	smoothButton->setToolTip(tr("Smooth wavegraph"));
 
 	PixmapButton * addOneButton = new PixmapButton( this, tr("Increase wavegraph amplitude by 1 dB") );
 	addOneButton -> move( 131, 221 );
 	addOneButton -> resize( 13, 29 );
 	addOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_active" ) );
 	addOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_inactive" ) );
-	ToolTip::add( addOneButton, tr( "Increase wavegraph amplitude by 1 dB" ) );
+	addOneButton->setToolTip(tr("Increase wavegraph amplitude by 1 dB"));
 
 	PixmapButton * subOneButton = new PixmapButton( this, tr("Decrease wavegraph amplitude by 1 dB") );
 	subOneButton -> move( 131, 237 );
 	subOneButton -> resize( 13, 29 );
 	subOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_active" ) );
 	subOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_inactive" ) );
-	ToolTip::add( subOneButton, tr( "Decrease wavegraph amplitude by 1 dB" ) );
+	subOneButton->setToolTip(tr("Decrease wavegraph amplitude by 1 dB"));
 
 	LedCheckBox * clipInputToggle = new LedCheckBox( "Clip input", this,
 							tr( "Clip input" ), LedCheckBox::Green );
 	clipInputToggle -> move( 131, 252 );
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
-	ToolTip::add( clipInputToggle, tr( "Clip input signal to 0 dB" ) );
+	clipInputToggle->setToolTip(tr("Clip input signal to 0 dB"));
 
 	connect( resetButton, SIGNAL (clicked () ),
 			_controls, SLOT ( resetClicked() ) );

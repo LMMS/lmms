@@ -40,7 +40,6 @@
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
 #include "Clipboard.h"
 
 #include "embed.h"
@@ -463,7 +462,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 							"select_file" ) );
 	connect( m_openFileButton, SIGNAL( clicked() ),
 				this, SLOT( openFile() ) );
-	ToolTip::add( m_openFileButton, tr( "Open patch" ) );
+	m_openFileButton->setToolTip(tr("Open patch"));
 
 	m_loopButton = new PixmapButton( this, tr( "Loop" ) );
 	m_loopButton->setObjectName("loopButton");
@@ -473,7 +472,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 								"loop_on" ) );
 	m_loopButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"loop_off" ) );
-	ToolTip::add( m_loopButton, tr( "Loop mode" ) );
+	m_loopButton->setToolTip(tr("Loop mode"));
 
 	m_tuneButton = new PixmapButton( this, tr( "Tune" ) );
 	m_tuneButton->setObjectName("tuneButton");
@@ -483,7 +482,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 								"tune_on" ) );
 	m_tuneButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"tune_off" ) );
-	ToolTip::add( m_tuneButton, tr( "Tune mode" ) );
+	m_tuneButton->setToolTip(tr("Tune mode"));
 
 	m_displayFilename = tr( "No file selected" );
 

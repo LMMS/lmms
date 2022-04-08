@@ -34,7 +34,6 @@
 #include "LedCheckBox.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "base64.h"
 #include "CaptionMenu.h"
 #include "StringContainer.h"
@@ -400,7 +399,7 @@ VibedView::VibedView( Instrument * _instrument,
 
 	m_impulse = new LedCheckBox( "", this );
 	m_impulse->move( 23, 94 );
-	ToolTip::add( m_impulse,
+	m_impulse->setToolTip(
 			tr( "Impulse" ) );
 
 	m_harmonic = new NineButtonSelector(
@@ -461,7 +460,7 @@ VibedView::VibedView( Instrument * _instrument,
 
 	m_power = new LedCheckBox( "", this, tr( "Enable waveform" ) );
 	m_power->move( 212, 130 );
-	ToolTip::add( m_power,
+	m_power->setToolTip(
 			tr( "Enable/disable string" ) );
 
 	
@@ -479,7 +478,7 @@ VibedView::VibedView( Instrument * _instrument,
 				"sin_wave_active" ) );
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"sin_wave_inactive" ) );
-	ToolTip::add( m_sinWaveBtn,
+	m_sinWaveBtn->setToolTip(
 				tr( "Sine wave" ) );
 	connect( m_sinWaveBtn, SIGNAL (clicked () ),
 			this, SLOT ( sinWaveClicked() ) );
@@ -491,7 +490,7 @@ VibedView::VibedView( Instrument * _instrument,
 			embed::getIconPixmap( "triangle_wave_active" ) );
 	m_triangleWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "triangle_wave_inactive" ) );
-	ToolTip::add( m_triangleWaveBtn,
+	m_triangleWaveBtn->setToolTip(
 			tr( "Triangle wave" ) );
 	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( triangleWaveClicked( ) ) );
@@ -503,7 +502,7 @@ VibedView::VibedView( Instrument * _instrument,
 				"saw_wave_active" ) );
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"saw_wave_inactive" ) );
-	ToolTip::add( m_sawWaveBtn,
+	m_sawWaveBtn->setToolTip(
 				tr( "Saw wave" ) );
 	connect( m_sawWaveBtn, SIGNAL (clicked () ),
 			this, SLOT ( sawWaveClicked() ) );
@@ -515,7 +514,7 @@ VibedView::VibedView( Instrument * _instrument,
 				"square_wave_active" ) );
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"square_wave_inactive" ) );
-	ToolTip::add( m_sqrWaveBtn,
+	m_sqrWaveBtn->setToolTip(
 			tr( "Square wave" ) );
 	connect( m_sqrWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( sqrWaveClicked() ) );
@@ -527,7 +526,7 @@ VibedView::VibedView( Instrument * _instrument,
 			embed::getIconPixmap( "white_noise_wave_active" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_inactive" ) );
-	ToolTip::add( m_whiteNoiseWaveBtn,
+	m_whiteNoiseWaveBtn->setToolTip(
 			tr( "White noise" ) );
 	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( noiseWaveClicked() ) );
@@ -539,7 +538,7 @@ VibedView::VibedView( Instrument * _instrument,
 				"usr_wave_active" ) );
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"usr_wave_inactive" ) );
-	ToolTip::add( m_usrWaveBtn,
+	m_usrWaveBtn->setToolTip(
 			tr( "User-defined wave" ) );
 	connect( m_usrWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( usrWaveClicked() ) );
@@ -552,7 +551,7 @@ VibedView::VibedView( Instrument * _instrument,
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"smooth_inactive" ) );
 	m_smoothBtn->setChecked( false );
-	ToolTip::add( m_smoothBtn,
+	m_smoothBtn->setToolTip(
 			tr( "Smooth waveform" ) );
 	connect( m_smoothBtn, SIGNAL ( clicked () ),
 			this, SLOT ( smoothClicked() ) );
@@ -564,7 +563,7 @@ VibedView::VibedView( Instrument * _instrument,
 	m_normalizeBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"normalize_inactive" ) );
 	m_normalizeBtn->setChecked( false );
-	ToolTip::add( m_normalizeBtn,
+	m_normalizeBtn->setToolTip(
 			tr( "Normalize waveform" ) );
 
 	connect( m_normalizeBtn, SIGNAL ( clicked () ),
@@ -648,7 +647,7 @@ void VibedView::noiseWaveClicked()
 void VibedView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
-	ToolTip::add( m_usrWaveBtn, fileName );
+	m_usrWaveBtn->setToolTip(fileName);
 	Engine::getSong()->setModified();
 }
 

@@ -35,7 +35,6 @@
 #include "LedCheckBox.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "Song.h"
 #include "interpolation.h"
 
@@ -357,7 +356,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 	m_graph->setAutoFillBackground( true );
 	m_graph->setGraphColor( QColor( 255, 255, 255 ) );
 
-	ToolTip::add( m_graph, tr ( "Draw your own waveform here "
+	m_graph->setToolTip(tr("Draw your own waveform here "
 				"by dragging your mouse on this graph."
 	));
 
@@ -374,7 +373,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 						"sin_wave_active" ) );
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
-	ToolTip::add( m_sinWaveBtn,
+	m_sinWaveBtn->setToolTip(
 			tr( "Sine wave" ) );
 
 	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
@@ -383,7 +382,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	m_triangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
-	ToolTip::add( m_triangleWaveBtn,
+	m_triangleWaveBtn->setToolTip(
 			tr( "Triangle wave" ) );
 
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
@@ -392,7 +391,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 						"saw_wave_active" ) );
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
-	ToolTip::add( m_sawWaveBtn,
+	m_sawWaveBtn->setToolTip(
 			tr( "Saw wave" ) );
 
 	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
@@ -401,7 +400,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 					"square_wave_active" ) );
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
-	ToolTip::add( m_sqrWaveBtn,
+	m_sqrWaveBtn->setToolTip(
 			tr( "Square wave" ) );
 
 	m_whiteNoiseWaveBtn = new PixmapButton( this,
@@ -411,7 +410,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
-	ToolTip::add( m_whiteNoiseWaveBtn,
+	m_whiteNoiseWaveBtn->setToolTip(
 			tr( "White noise" ) );
 
 	m_usrWaveBtn = new PixmapButton( this, tr( "User-defined wave" ) );
@@ -420,7 +419,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 						"usr_wave_active" ) );
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
-	ToolTip::add( m_usrWaveBtn,
+	m_usrWaveBtn->setToolTip(
 			tr( "User-defined wave" ) );
 
 	m_smoothBtn = new PixmapButton( this, tr( "Smooth waveform" ) );
@@ -429,7 +428,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 						"smooth_active" ) );
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_inactive" ) );
-	ToolTip::add( m_smoothBtn,
+	m_smoothBtn->setToolTip(
 			tr( "Smooth waveform" ) );
 
 
@@ -539,7 +538,7 @@ void BitInvaderView::usrWaveClicked()
 	QString fileName = m_graph->model()->setWaveToUser();
 	if (!fileName.isEmpty())
 	{
-		ToolTip::add(m_usrWaveBtn, fileName);
+		m_usrWaveBtn->setToolTip(fileName);
 		m_graph->model()->clearInvisible();
 		Engine::getSong()->setModified();
 	}

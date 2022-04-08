@@ -110,7 +110,6 @@ SET(LMMS_SRCS
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
 	gui/widgets/ToolButton.cpp
-	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
 	gui/widgets/TrackContentWidget.cpp
 	gui/widgets/TrackOperationsWidget.cpp

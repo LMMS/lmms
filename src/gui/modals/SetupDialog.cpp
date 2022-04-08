@@ -43,7 +43,6 @@
 #include "SetupDialog.h"
 #include "TabBar.h"
 #include "TabButton.h"
-#include "ToolTip.h"
 
 
 // Platform-specific audio-interface classes.
@@ -589,7 +588,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	bufferSize_reset_btn->setGeometry(320, 40, 28, 28);
 	connect(bufferSize_reset_btn, SIGNAL(clicked()),
 			this, SLOT(resetBufferSize()));
-	ToolTip::add(bufferSize_reset_btn,
+	bufferSize_reset_btn->setToolTip(
 			tr("Reset to default value"));
 
 

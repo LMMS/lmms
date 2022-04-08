@@ -47,14 +47,14 @@
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesled_off" ) ); \
-	ToolTip::add( name, ttip );
+	name->setToolTip(ttip);
 
 #define makedcled( name, x, y, ttip, active ) \
 	PixmapButton * name = new PixmapButton( this, nullptr ); 	\
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( active ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesdc_off" ) ); \
-	ToolTip::add( name, ttip );
+	name->setToolTip(ttip);
 
 const float NES_SIMPLE_FILTER = 1.0 / 20.0; // simulate nes analog audio output
 const float NFB = 895000.0f;

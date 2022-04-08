@@ -32,7 +32,6 @@
 #include "interpolation.h"
 #include "Knob.h"
 #include "Oscillator.h"
-#include "ToolTip.h"
 
 #include "embed.h"
 #include "plugin_export.h"

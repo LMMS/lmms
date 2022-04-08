@@ -34,7 +34,6 @@
 #include "PatternClip.h"
 #include "PatternStore.h"
 #include "RenameDialog.h"
-#include "ToolTip.h"
 
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
@@ -185,7 +184,7 @@ void PatternClipView::changeName()
 
 void PatternClipView::update()
 {
-	ToolTip::add(this, m_patternClip->name());
+	setToolTip(m_patternClip->name());
 
 	ClipView::update();
 }

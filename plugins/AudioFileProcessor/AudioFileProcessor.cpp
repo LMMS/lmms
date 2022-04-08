@@ -42,7 +42,6 @@
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
 #include "Clipboard.h"
 
 #include "embed.h"
@@ -467,7 +466,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"select_file" ) );
 	connect( m_openAudioFileButton, SIGNAL( clicked() ),
 					this, SLOT( openAudioFile() ) );
-	ToolTip::add( m_openAudioFileButton, tr( "Open sample" ) );
+	m_openAudioFileButton->setToolTip(tr("Open sample"));
 
 	m_reverseButton = new PixmapButton( this );
 	m_reverseButton->setCheckable( true );
@@ -476,7 +475,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"reverse_on" ) );
 	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_off" ) );
-	ToolTip::add( m_reverseButton, tr( "Reverse sample" ) );
+	m_reverseButton->setToolTip(tr("Reverse sample"));
 
 // loop button group
 
@@ -487,7 +486,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"loop_off_on" ) );
 	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_off_off" ) );
-	ToolTip::add( m_loopOffButton, tr( "Disable loop" ) );
+	m_loopOffButton->setToolTip(tr("Disable loop"));
 
 
 	PixmapButton * m_loopOnButton = new PixmapButton( this );
@@ -497,7 +496,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"loop_on_on" ) );
 	m_loopOnButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_on_off" ) );
-	ToolTip::add( m_loopOnButton, tr( "Enable loop" ) );
+	m_loopOnButton->setToolTip(tr("Enable loop"));
 
 	PixmapButton * m_loopPingPongButton = new PixmapButton( this );
 	m_loopPingPongButton->setCheckable( true );
@@ -506,7 +505,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"loop_pingpong_on" ) );
 	m_loopPingPongButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_pingpong_off" ) );
-	ToolTip::add( m_loopPingPongButton, tr( "Enable ping-pong loop" ) );
+	m_loopPingPongButton->setToolTip(tr("Enable ping-pong loop"));
 
 	m_loopGroup = new automatableButtonGroup( this );
 	m_loopGroup->addButton( m_loopOffButton );
@@ -520,7 +519,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 								"stutter_on" ) );
 	m_stutterButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"stutter_off" ) );
-	ToolTip::add( m_stutterButton,
+	m_stutterButton->setToolTip(
 		tr( "Continue sample playback across notes" ) );
 
 	m_ampKnob = new Knob( knobBright_26, this );

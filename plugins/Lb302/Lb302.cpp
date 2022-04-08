@@ -42,7 +42,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "BandLimitedWave.h"
 
 #include "embed.h"
@@ -845,7 +844,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 
 	m_db24Toggle = new LedCheckBox( "", this );
 	m_db24Toggle->move( 10, 150);
-	ToolTip::add( m_db24Toggle,
+	m_db24Toggle->setToolTip(
 			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 
 
@@ -870,7 +869,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 						"saw_wave_active" ) );
 	sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
-	ToolTip::add( sawWaveBtn,
+	sawWaveBtn->setToolTip(
 			tr( "Click here for a saw-wave." ) );
 
 	PixmapButton * triangleWaveBtn =
@@ -880,7 +879,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	triangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
-	ToolTip::add( triangleWaveBtn,
+	triangleWaveBtn->setToolTip(
 			tr( "Click here for a triangle-wave." ) );
 
 	PixmapButton * sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
@@ -889,7 +888,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 					"square_wave_active" ) );
 	sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
-	ToolTip::add( sqrWaveBtn,
+	sqrWaveBtn->setToolTip(
 			tr( "Click here for a square-wave." ) );
 
 	PixmapButton * roundSqrWaveBtn =
@@ -899,7 +898,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 					"round_square_wave_active" ) );
 	roundSqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"round_square_wave_inactive" ) );
-	ToolTip::add( roundSqrWaveBtn,
+	roundSqrWaveBtn->setToolTip(
 			tr( "Click here for a square-wave with a rounded end." ) );
 
 	PixmapButton * moogWaveBtn =
@@ -909,7 +908,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	moogWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
-	ToolTip::add( moogWaveBtn,
+	moogWaveBtn->setToolTip(
 			tr( "Click here for a moog-like wave." ) );
 
 	PixmapButton * sinWaveBtn = new PixmapButton( this, tr( "Sine wave" ) );
@@ -918,7 +917,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 						"sin_wave_active" ) );
 	sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
-	ToolTip::add( sinWaveBtn,
+	sinWaveBtn->setToolTip(
 			tr( "Click for a sine-wave." ) );
 
 	PixmapButton * exponentialWaveBtn =
@@ -928,7 +927,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "exp_wave_active" ) );
 	exponentialWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "exp_wave_inactive" ) );
-	ToolTip::add( exponentialWaveBtn,
+	exponentialWaveBtn->setToolTip(
 			tr( "Click here for an exponential wave." ) );
 
 
@@ -939,7 +938,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	whiteNoiseWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
-	ToolTip::add( whiteNoiseWaveBtn,
+	whiteNoiseWaveBtn->setToolTip(
 			tr( "Click here for white-noise." ) );
 
 	PixmapButton * blSawWaveBtn =
@@ -949,7 +948,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "saw_wave_active" ) );
 	blSawWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "saw_wave_inactive" ) );
-	ToolTip::add( blSawWaveBtn,
+	blSawWaveBtn->setToolTip(
 			tr( "Click here for bandlimited saw wave." ) );
 
 	PixmapButton * blSquareWaveBtn =
@@ -959,7 +958,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "square_wave_active" ) );
 	blSquareWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "square_wave_inactive" ) );
-	ToolTip::add( blSquareWaveBtn,
+	blSquareWaveBtn->setToolTip(
 			tr( "Click here for bandlimited square wave." ) );
 
 	PixmapButton * blTriangleWaveBtn =
@@ -969,7 +968,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	blTriangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
-	ToolTip::add( blTriangleWaveBtn,
+	blTriangleWaveBtn->setToolTip(
 			tr( "Click here for bandlimited triangle wave." ) );
 
 	PixmapButton * blMoogWaveBtn =
@@ -979,7 +978,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	blMoogWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
-	ToolTip::add( blMoogWaveBtn,
+	blMoogWaveBtn->setToolTip(
 			tr( "Click here for bandlimited moog saw wave." ) );
 
 

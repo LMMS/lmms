@@ -31,7 +31,6 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "gui_templates.h"
-#include "ToolTip.h"
 #include "lmms_math.h"
 #include "interpolation.h"
 
@@ -1466,13 +1465,13 @@ MonstroView::MonstroView( Instrument * _instrument,
 	m_opViewButton -> move( 0,0 );
 	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
 	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
-	ToolTip::add( m_opViewButton, tr( "Operators view" ) );
+	m_opViewButton->setToolTip(tr("Operators view"));
 
 	PixmapButton * m_matViewButton = new PixmapButton( this, nullptr );
 	m_matViewButton -> move( 125,0 );
 	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
-	ToolTip::add( m_matViewButton, tr( "Matrix view" ) );
+	m_matViewButton->setToolTip(tr("Matrix view"));
 
 	m_selectedViewGroup = new automatableButtonGroup( this );
 	m_selectedViewGroup -> addButton( m_opViewButton );
@@ -1727,25 +1726,25 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	m_mixButton -> move( 225, 185 );
 	m_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
 	m_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
-	ToolTip::add( m_mixButton, tr( "Mix osc 2 with osc 3" ) );
+	m_mixButton->setToolTip(tr("Mix osc 2 with osc 3"));
 
 	PixmapButton * m_amButton = new PixmapButton( view, nullptr );
 	m_amButton -> move( 225, 185 + 15 );
 	m_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
 	m_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
-	ToolTip::add( m_amButton, tr( "Modulate amplitude of osc 3 by osc 2" ) );
+	m_amButton->setToolTip(tr("Modulate amplitude of osc 3 by osc 2"));
 
 	PixmapButton * m_fmButton = new PixmapButton( view, nullptr );
 	m_fmButton -> move( 225, 185 + 15*2 );
 	m_fmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
 	m_fmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_inactive" ) );
-	ToolTip::add( m_fmButton, tr( "Modulate frequency of osc 3 by osc 2" ) );
+	m_fmButton->setToolTip(tr("Modulate frequency of osc 3 by osc 2"));
 
 	PixmapButton * m_pmButton = new PixmapButton( view, nullptr );
 	m_pmButton -> move( 225, 185 + 15*3 );
 	m_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );
-	ToolTip::add( m_pmButton, tr( "Modulate phase of osc 3 by osc 2" ) );
+	m_pmButton->setToolTip(tr("Modulate phase of osc 3 by osc 2"));
 
 	m_o23ModGroup = new automatableButtonGroup( view );
 	m_o23ModGroup-> addButton( m_mixButton );
