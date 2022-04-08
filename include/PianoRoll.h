@@ -165,11 +165,14 @@ protected:
 	void focusOutEvent( QFocusEvent * ) override;
 	void focusInEvent( QFocusEvent * ) override;
 
+	int getTick(int x) const;
 	int getKey( int y ) const;
+	int xCoordOfTick(int tick) const;
+	int yCoordOfKey(int key) const;
+
 	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
-	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes() const;
 	void selectNotesOnKey();
@@ -369,10 +372,10 @@ private:
 	NoteEditMode m_noteEditMode;
 	GridMode m_gridMode;
 
-	int m_selectStartTick;
-	int m_selectedTick;
-	int m_selectStartKey;
-	int m_selectedKeys;
+	int m_selectStartTick = 0; //!< Tick where mouse pressed down
+	int m_selectEndTick = 0;
+	int m_selectStartKey = 0; //!< Key where mouse pressed down
+	int m_selectEndKey = 0;
 
 	// boundary box around all selected notes when dragging
 	int m_moveBoundaryLeft;
