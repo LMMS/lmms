@@ -937,8 +937,6 @@ void PianoRoll::hideMidiClip( MidiClip* clip )
 
 void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 {
-	if (xStart > xEnd) { qSwap(xStart, xEnd); }
-
 	m_action = ActionSelectNotes;
 	m_selectStartTick = getTick(xStart);
 	m_selectEndTick = getTick(xEnd);
