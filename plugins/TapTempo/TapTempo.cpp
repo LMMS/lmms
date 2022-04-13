@@ -34,7 +34,6 @@
 
 extern "C"
 {
-
 Plugin::Descriptor PLUGIN_EXPORT taptempo_plugin_descriptor =
 {
 		STRINGIFY( PLUGIN_NAME ),
@@ -54,7 +53,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model *, void *)
 {
 	return new TapTempo;
 }
-
 }
 
 TapTempo::TapTempo() : 
@@ -70,7 +68,6 @@ QString TapTempo::nodeName() const
 TapTempoView::TapTempoView(ToolPlugin * _tool) :
 	ToolPluginView(_tool), m_bpmAverage(0), m_numTaps(0), m_keyDown(false)
 {
-
 	setFixedSize(250, 250);
 	m_bpmButton = new QPushButton;
 	m_bpmButton->setText("0");
@@ -97,7 +94,6 @@ TapTempoView::TapTempoView(ToolPlugin * _tool) :
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		parentWidget()->setWindowFlags(flags);
 	}
-
 }
 
 void TapTempoView::onBpmClick()

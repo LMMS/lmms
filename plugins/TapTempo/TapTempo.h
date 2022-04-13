@@ -42,8 +42,8 @@ public:
 	
 	void onBpmClick();
 	
-	virtual void keyPressEvent(QKeyEvent *) override;
-	virtual void keyReleaseEvent(QKeyEvent *) override;
+	void keyPressEvent(QKeyEvent *) override;
+	void keyReleaseEvent(QKeyEvent *) override;
 
 private:
 	QTime m_previousTime;
