@@ -705,15 +705,15 @@ void SidInstrumentView::updateKnobToolTip()
 	SidInstrument * k = castModel<SidInstrument>();
 	for( int i = 0; i < 3; ++i )
 	{
-		 m_voiceKnobs[i].m_sustKnob->setToolTip(
+		m_voiceKnobs[i].m_sustKnob->setToolTip(
 				QString::number( (int)k->m_voice[i]->m_sustainModel.value() ) );
-		 m_voiceKnobs[i].m_crsKnob->setToolTip(
+		m_voiceKnobs[i].m_crsKnob->setToolTip(
 				QString::number( (int)k->m_voice[i]->m_coarseModel.value() ) +
 				" semitones" );
 	}
-	 m_volKnob->setToolTip(
+	m_volKnob->setToolTip(
 					QString::number( (int)k->m_volumeModel.value() ) );
-	 m_resKnob->setToolTip(
+	m_resKnob->setToolTip(
 					QString::number( (int)k->m_filterResonanceModel.value() ) );
 }
 
