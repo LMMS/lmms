@@ -104,9 +104,7 @@ SongEditor::SongEditor( Song * song ) :
 			 
 	// ensure loop markers snap to correct size
 	connect(m_snappingModel, &ComboBoxModel::dataChanged,
-		[=]() { m_timeLine->updateSnapSize(getSnapSize()); });
-	connect(m_zoomingModel, &ComboBoxModel::dataChanged,
-		[=]() { m_timeLine->updateSnapSize(getSnapSize()); });
+		[this]() { m_timeLine->setSnapSize(getSnapSize()); });
 
 
 	// add some essential widgets to global tool-bar
@@ -468,6 +466,7 @@ void SongEditor::setEditModeSelect()
 void SongEditor::toggleProportionalSnap()
 {
 	m_proportionalSnap = !m_proportionalSnap;
+	m_timeLine->setSnapSize(getSnapSize());
 }
 
 
@@ -846,6 +845,7 @@ void SongEditor::zoomingChanged()
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
+	m_timeLine->setSnapSize(getSnapSize());
 	
 	emit zoomingValueChanged( m_zoomLevels[m_zoomingModel->value()] );
 }
@@ -1019,8 +1019,6 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_setProportionalSnapAction->setChecked(false);
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), this, SLOT(updateSnapLabel()) );
-	connect(m_setProportionalSnapAction, &QAction::triggered,
-		[=]() { m_editor->m_timeLine->updateSnapSize(m_editor->getSnapSize()); });
 
 	snapToolBar->addWidget( snap_lbl );
 	snapToolBar->addWidget( m_snappingComboBox );

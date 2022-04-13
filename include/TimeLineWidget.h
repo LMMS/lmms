@@ -180,7 +180,7 @@ public slots:
 	{
 		updatePosition( TimePos() );
 	}
-	void updateSnapSize( const float snapSize )
+	void setSnapSize( const float snapSize )
 	{
 		m_snapSize = snapSize;
 	}
