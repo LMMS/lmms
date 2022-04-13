@@ -102,7 +102,8 @@ SongEditor::SongEditor( Song * song ) :
 	connect( this, SIGNAL( zoomingValueChanged( float ) ),
 			 m_positionLine, SLOT( zoomChange( float ) ) );
 			 
-	// ensure loop markers snap to correct size
+	// Ensure loop markers snap to same increments as clips. Zoom & proportional
+	// snap changes are handled in zoomingChanged() and toggleProportionalSnap()
 	connect(m_snappingModel, &ComboBoxModel::dataChanged,
 		[this]() { m_timeLine->setSnapSize(getSnapSize()); });
 
