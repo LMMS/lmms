@@ -24,13 +24,16 @@
  *
  */
 
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QFont>
-
 #include "TapTempo.h"
-#include "plugin_export.h"
+
+#include <cmath>
+
+#include <QFont>
+#include <QLabel>
+#include <QVBoxLayout>
+
 #include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -68,7 +71,7 @@ QString TapTempo::nodeName() const
 TapTempoView::TapTempoView(ToolPlugin * _tool) :
 	ToolPluginView(_tool), m_bpmAverage(0), m_numTaps(0), m_keyDown(false)
 {
-	setFixedSize(250, 250);
+	setFixedSize(200, 200);
 	m_bpmButton = new QPushButton;
 	m_bpmButton->setText("0");
 	m_bpmButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -81,7 +84,7 @@ TapTempoView::TapTempoView(ToolPlugin * _tool) :
 	layout->setAlignment(Qt::AlignCenter);
 	layout->addWidget(m_bpmButton, Qt::AlignCenter);
 	
-	connect(m_bpmButton, &QPushButton::clicked, this, &TapTempoView::onBpmClick);
+	connect(m_bpmButton, &QPushButton::pressed, this, &TapTempoView::onBpmClick);
 
 	hide();
 	if(parentWidget())
@@ -101,14 +104,13 @@ void TapTempoView::onBpmClick()
 	++m_numTaps;
 	if (m_numTaps == 1)
 	{
-		m_previousTime = QTime::currentTime();
+		m_previousTime = std::chrono::steady_clock::now();
 	}
 	else if (m_numTaps >= 2)
 	{
-		QTime currentTime = QTime::currentTime();
-		double period = m_previousTime.msecsTo(currentTime) / 1000.0;
+		auto currentTime = std::chrono::steady_clock::now();
+		auto period = std::chrono::duration_cast<std::chrono::duration<double>>(currentTime - m_previousTime).count();
 
-		// Reset after 2 seconds
 		if (period > 2.0) 
 		{
 			m_bpmAverage = 0;
@@ -117,9 +119,8 @@ void TapTempoView::onBpmClick()
 			return;
 		}
 
-		double recentBpmAverage = 60.0/period;
-		m_bpmAverage += (recentBpmAverage - m_bpmAverage)/(m_numTaps - 1);
-		m_bpmButton->setText(QString::number(m_bpmAverage));
+		m_bpmAverage += (60.0/period - m_bpmAverage)/(m_numTaps - 1);
+		m_bpmButton->setText(QString::number(std::round(m_bpmAverage)));
 		m_previousTime = currentTime;
 	}
 }
@@ -127,7 +128,8 @@ void TapTempoView::onBpmClick()
 void TapTempoView::keyPressEvent(QKeyEvent * event) 
 {
 	QWidget::keyPressEvent(event);
-	if (!m_keyDown) {
+	if (!m_keyDown) 
+	{
 		onBpmClick();
 		m_keyDown = true;
 	}

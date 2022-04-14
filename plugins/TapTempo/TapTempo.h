@@ -27,9 +27,9 @@
 #ifndef TAPTEMPO_H
 #define TAPTEMPO_H
 
+#include <chrono>
+
 #include <QPushButton>
-#include <QVector>
-#include <QTime>
 
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
@@ -46,9 +46,9 @@ public:
 	void keyReleaseEvent(QKeyEvent *) override;
 
 private:
-	QTime m_previousTime;
+	std::chrono::time_point<std::chrono::steady_clock> m_previousTime;
 	QPushButton * m_bpmButton;
-	int m_bpmAverage;
+	double m_bpmAverage;
 	int m_numTaps;
 	bool m_keyDown;
 };
