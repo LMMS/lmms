@@ -142,9 +142,11 @@ public:
 	PollParentThread() :
 		m_stop{false},
 		m_thread{
-			[this] {
+			[this]
+			{
+				using namespace std::literals::chrono_literals;
 				auto lock = std::unique_lock{m_mutex};
-				while (!m_cv.wait_for(lock, std::chrono::milliseconds(500), [this] { return m_stop; }))
+				while (!m_cv.wait_for(lock, 500ms, [this] { return m_stop; }))
 				{
 					if (getppid() == 1)
 					{

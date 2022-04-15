@@ -268,7 +268,7 @@ int main( int _argc, char * * _argv )
 	}
 
 #ifndef LMMS_BUILD_WIN32
-	PollParentThread pollParentThread;
+	const auto pollParentThread = PollParentThread{};
 #endif
 
 #ifdef LMMS_BUILD_WIN32

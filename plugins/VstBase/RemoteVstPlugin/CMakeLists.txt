@@ -35,9 +35,9 @@ add_executable(${EXE_NAME} WIN32
 	${LMMS_COMMON_SRCS}
 )
 if(IS_WIN)
-    target_link_libraries(${EXE_NAME} ole32)
+	target_link_libraries(${EXE_NAME} ole32)
 else()
-    target_link_libraries(${EXE_NAME} dl X11)
+	target_link_libraries(${EXE_NAME} dl X11)
 endif()
 if(NOT WIN32)
 	target_link_libraries(${EXE_NAME} pthread)

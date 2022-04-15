@@ -53,13 +53,17 @@ namespace {
 
 HANDLE getRemotePluginJob()
 {
-	static const auto job = [] {
+	static const auto job = []
+	{
 		const auto job = CreateJobObject(nullptr, nullptr);
+
 		auto limitInfo = JOBOBJECT_EXTENDED_LIMIT_INFORMATION{};
 		limitInfo.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 		SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limitInfo, sizeof(limitInfo));
+
 		return job;
 	}();
+
 	return job;
 }
 
@@ -96,7 +100,8 @@ void ProcessWatcher::run()
 			// the process itself, we can use QProcess::waitForFinished() with a
 			// zero timeout, but that too is insufficient as it fails if the
 			// process has already finished. Therefore, we check both.
-			if (!process.waitForFinished(0) && process.state() == QProcess::Running) {
+			if (!process.waitForFinished(0) && process.state() == QProcess::Running)
+			{
 				AssignProcessToJobObject(getRemotePluginJob(), processHandle);
 			}
 			CloseHandle(processHandle);
