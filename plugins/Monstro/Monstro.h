@@ -64,7 +64,7 @@ class ComboBox;
 	name -> move( x, y );					\
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
-	ToolTip::add( name, ttip );
+	name->setToolTip(ttip);
 
 // UI constants
 const int O1ROW = 22;

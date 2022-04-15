@@ -43,7 +43,6 @@
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
 #include "Track.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
@@ -58,7 +57,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent )          /*!< The parent track view */
 {
-	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
+	setToolTip(tr("Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	QMenu * toMenu = new QMenu( this );
@@ -73,7 +72,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackOps->move( 12, 1 );
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
-	ToolTip::add( m_trackOps, tr( "Actions" ) );
+	m_trackOps->setToolTip(tr("Actions"));
 
 
 	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
@@ -99,10 +98,10 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	}
 
 	m_muteBtn->show();
-	ToolTip::add( m_muteBtn, tr( "Mute" ) );
+	m_muteBtn->setToolTip(tr("Mute"));
 
 	m_soloBtn->show();
-	ToolTip::add( m_soloBtn, tr( "Solo" ) );
+	m_soloBtn->setToolTip(tr("Solo"));
 
 	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
 			m_trackView->trackContainerView(),

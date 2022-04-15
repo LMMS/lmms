@@ -44,7 +44,6 @@
 #include "fluidsynthshims.h"
 
 #include "PatchesDialog.h"
-#include "ToolTip.h"
 #include "LcdSpinBox.h"
 
 #include "embed.h"
@@ -918,7 +917,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open SoundFont file" ) );
+	m_fileDialogButton->setToolTip(tr("Open SoundFont file"));
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -930,7 +929,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
+	m_patchDialogButton->setToolTip(tr("Choose patch"));
 
 
 	// LCDs
@@ -978,7 +977,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbButton->move( 14, 180 );
 	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_on" ) );
 	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_off" ) );
-	ToolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
+	m_reverbButton->setToolTip(tr("Apply reverb (if supported)"));
 
 
 	m_reverbRoomSizeKnob = new Sf2Knob( this );
@@ -1014,7 +1013,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->move( 14, 226 );
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
-	ToolTip::add( m_chorusButton, tr( "Apply chorus (if supported)" ) );
+	m_chorusButton->setToolTip(tr("Apply chorus (if supported)"));
 
 	m_chorusNumKnob = new Sf2Knob( this );
 	m_chorusNumKnob->setHintText( tr("Voices:"), "" );

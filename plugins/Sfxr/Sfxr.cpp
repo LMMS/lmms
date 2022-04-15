@@ -46,7 +46,6 @@ float frnd(float range)
 #include "Knob.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "MidiEvent.h"
 
 #include "embed.h"
@@ -572,7 +571,7 @@ public:
 	_knob = new SfxrKnob( this ); \
 	_knob->setHintText( tr( _name ":" ), "" ); \
 	_knob->move( _x, _y ); \
-	ToolTip::add( _knob, tr( _name ) );
+	_knob->setToolTip(tr(_name));
 
 
 
@@ -582,7 +581,7 @@ public:
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( embed::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( embed::getIconPixmap( _resName "_inactive" ) );\
-	ToolTip::add( _button, tr( _name ) );
+	_button->setToolTip(tr(_name));
 
 
 
@@ -592,7 +591,7 @@ public:
 	_button->move( _x, _y );\
 	_button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_active" ) );\
 	_button->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( _resName "_inactive" ) );\
-	ToolTip::add( _button, tr( _name ) );
+	_button->setToolTip(tr(_name));
 
 
 

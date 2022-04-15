@@ -57,7 +57,6 @@
 #include "StringPairDrag.h"
 #include "SubWindow.h"
 #include "TextFloat.h"
-#include "ToolTip.h"
 #include "Clipboard.h"
 
 
@@ -508,7 +507,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"select_file" ) );
 	connect( m_openPluginButton, SIGNAL( clicked() ), this,
 						SLOT( openPlugin() ) );
-	ToolTip::add( m_openPluginButton, tr( "Open VST plugin" ) );
+	m_openPluginButton->setToolTip(tr("Open VST plugin"));
 
 	m_managePluginButton = new PixmapButton( this, "" );
 	m_managePluginButton->setCheckable( false );
@@ -520,7 +519,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"controls" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
-	ToolTip::add( m_managePluginButton, tr( "Control VST plugin from LMMS host" ) );
+	m_managePluginButton->setToolTip(tr("Control VST plugin from LMMS host"));
 
 
 	m_openPresetButton = new PixmapButton( this, "" );
@@ -533,7 +532,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"project_open", 20, 20 ) );
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
-	ToolTip::add( m_openPresetButton, tr( "Open VST plugin preset" ) );
+	m_openPresetButton->setToolTip(tr("Open VST plugin preset"));
 
 
 	m_rolLPresetButton = new PixmapButton( this, "" );
@@ -546,7 +545,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
-	ToolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
+	m_rolLPresetButton->setToolTip(tr("Previous (-)"));
 
 	m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
@@ -561,7 +560,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"project_save", 20, 20  ) );
 	connect( m_savePresetButton, SIGNAL( clicked() ), this,
 						SLOT( savePreset() ) );
-	ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
+	m_savePresetButton->setToolTip(tr("Save preset"));
 
 
 	m_rolRPresetButton = new PixmapButton( this, "" );
@@ -574,7 +573,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
-	ToolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
+	m_rolRPresetButton->setToolTip(tr("Next (+)"));
 
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 

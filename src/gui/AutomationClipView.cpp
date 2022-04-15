@@ -36,7 +36,6 @@
 #include "RenameDialog.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
-#include "ToolTip.h"
 #include "Track.h"
 
 #include "Engine.h"
@@ -57,7 +56,7 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
-	ToolTip::add(this, m_clip->name());
+	setToolTip(m_clip->name());
 	setStyle( QApplication::style() );
 
 	if( s_clip_rec == nullptr ) { s_clip_rec = new QPixmap( embed::getIconPixmap(
@@ -85,7 +84,7 @@ void AutomationClipView::openInAutomationEditor()
 
 void AutomationClipView::update()
 {
-	ToolTip::add(this, m_clip->name());
+	setToolTip(m_clip->name());
 
 	ClipView::update();
 }
