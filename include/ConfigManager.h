@@ -28,11 +28,11 @@
 
 #include "lmmsconfig.h"
 
-#include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
-#include <QtCore/QObject>
+#include <QMap>
+#include <QPair>
+#include <QStringList>
+#include <QVector>
+#include <QObject>
 
 #include "lmms_export.h"
 
@@ -278,6 +278,7 @@ private:
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();
+	void upgrade_1_2_2();
 	void upgrade();
 
 	// List of all upgrade methods

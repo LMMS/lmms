@@ -31,7 +31,8 @@
 
 #include <alsa/asoundlib.h>
 
-#include <QtCore/QThread>
+#include <QMap>
+#include <QThread>
 
 #include "MidiClient.h"
 

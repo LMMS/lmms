@@ -22,12 +22,11 @@
  *
  */
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "DelayControls.h"
 #include "DelayEffect.h"
 #include "Engine.h"
-#include "Song.h"
 
 namespace lmms
 {

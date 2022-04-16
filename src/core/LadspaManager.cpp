@@ -29,7 +29,7 @@
 #include <QDir>
 #include <QLibrary>
 
-#include <math.h>
+#include <cmath>
 
 #include "ConfigManager.h"
 #include "LadspaManager.h"
@@ -116,7 +116,7 @@ LadspaManager::LadspaManager()
 
 LadspaManager::~LadspaManager()
 {
-	for( ladspaManagerMapType::iterator it = m_ladspaManagerMap.begin();
+	for( LadspaManagerMapType::iterator it = m_ladspaManagerMap.begin();
 					it != m_ladspaManagerMap.end(); ++it )
 	{
 		delete it.value();
@@ -126,7 +126,7 @@ LadspaManager::~LadspaManager()
 
 
 
-ladspaManagerDescription * LadspaManager::getDescription(
+LadspaManagerDescription * LadspaManager::getDescription(
 						const ladspa_key_t & _plugin )
 {
 	if( m_ladspaManagerMap.contains( _plugin ) )
@@ -158,8 +158,8 @@ void LadspaManager::addPlugins(
 			continue;
 		}
 
-		ladspaManagerDescription * plugIn = 
-				new ladspaManagerDescription;
+		LadspaManagerDescription * plugIn = 
+				new LadspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
 		plugIn->index = pluginIndex;
 		plugIn->inputChannels = getPluginInputs( descriptor );

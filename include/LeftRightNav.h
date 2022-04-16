@@ -27,7 +27,6 @@
 
 #include "PixmapButton.h"
 
-#include <QLayout>
 
 namespace lmms::gui
 {

@@ -33,12 +33,12 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "ControllerConnectionDialog.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "FxLineLcdSpinBox.h"
-#include "FxMixer.h"
-#include "FxMixerView.h"
+#include "Knob.h"
+#include "MidiCCRackView.h"
+#include "Mixer.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
@@ -223,27 +223,27 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 
 
 
-/*! \brief Create and assign a new FX Channel for this track */
-void InstrumentTrackView::createFxLine()
+/*! \brief Create and assign a new mixer Channel for this track */
+void InstrumentTrackView::createMixerLine()
 {
-	int channelIndex = getGUI()->fxMixerView()->addNewChannel();
-	auto channel = Engine::fxMixer()->effectChannel(channelIndex);
+	int channelIndex = getGUI()->mixerView()->addNewChannel();
+	auto channel = Engine::mixer()->mixerChannel(channelIndex);
 
 	channel->m_name = getTrack()->name();
 	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
 
-	assignFxLine(channelIndex);
+	assignMixerLine(channelIndex);
 }
 
 
 
 
-/*! \brief Assign a specific FX Channel for this track */
-void InstrumentTrackView::assignFxLine(int channelIndex)
+/*! \brief Assign a specific mixer Channel for this track */
+void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
-	model()->effectChannelModel()->setValue( channelIndex );
+	model()->mixerChannelModel()->setValue( channelIndex );
 
-	getGUI()->fxMixerView()->setCurrentFxLine( channelIndex );
+	getGUI()->mixerView()->setCurrentMixerLine( channelIndex );
 }
 
 
@@ -353,39 +353,39 @@ void InstrumentTrackView::midiConfigChanged()
 
 
 
-//FIXME: This is identical to SampleTrackView::createFxMenu
-QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
+//FIXME: This is identical to SampleTrackView::createMixerMenu
+QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabel)
 {
-	int channelIndex = model()->effectChannelModel()->value();
+	int channelIndex = model()->mixerChannelModel()->value();
 
-	FxChannel *fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+	MixerChannel *mixerChannel = Engine::mixer()->mixerChannel( channelIndex );
 
 	// If title allows interpolation, pass channel index and name
 	if ( title.contains( "%2" ) )
 	{
-		title = title.arg( channelIndex ).arg( fxChannel->m_name );
+		title = title.arg( channelIndex ).arg( mixerChannel->m_name );
 	}
 
-	QMenu *fxMenu = new QMenu( title );
+	QMenu *mixerMenu = new QMenu( title );
 
-	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
-	fxMenu->addSeparator();
+	mixerMenu->addAction( newMixerLabel, this, SLOT( createMixerLine() ) );
+	mixerMenu->addSeparator();
 
-	for (int i = 0; i < Engine::fxMixer()->numChannels(); ++i)
+	for (int i = 0; i < Engine::mixer()->numChannels(); ++i)
 	{
-		FxChannel * currentChannel = Engine::fxMixer()->effectChannel( i );
+		MixerChannel * currentChannel = Engine::mixer()->mixerChannel( i );
 
-		if ( currentChannel != fxChannel )
+		if ( currentChannel != mixerChannel )
 		{
 			auto index = currentChannel->m_channelIndex;
-			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-			fxMenu->addAction(label, [this, index](){
-				assignFxLine(index);
+			QString label = tr( "%1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
+			mixerMenu->addAction(label, [this, index](){
+				assignMixerLine(index);
 			});
 		}
 	}
 
-	return fxMenu;
+	return mixerMenu;
 }
 
 

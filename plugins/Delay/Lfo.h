@@ -25,7 +25,8 @@
 #ifndef LFO_H
 #define LFO_H
 
-#include "lmms_math.h"
+#include "lmms_constants.h"
+
 
 namespace lmms
 {

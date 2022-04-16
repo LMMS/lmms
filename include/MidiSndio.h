@@ -30,12 +30,12 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QtCore/QThread>
-#include <QtCore/QFile>
-
-#include <sndio.h>
+#include <QThread>
 
 #include "MidiClient.h"
+
+
+struct mio_hdl;
 
 namespace lmms
 {
@@ -66,7 +66,7 @@ protected:
 	void run(void) override;
 
 private:
-	struct mio_hdl *m_hdl;
+	mio_hdl *m_hdl;
 	volatile bool m_quit;
 } ;
 

@@ -27,10 +27,8 @@
 #include "BufferManager.h"
 #include "Engine.h"
 
-#include <QtCore/QThread>
-#include <QDebug>
+#include <QThread>
 
-#include <iterator>
 
 namespace lmms
 {

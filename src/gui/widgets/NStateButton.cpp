@@ -26,7 +26,6 @@
 #include <QMouseEvent>
 
 #include "NStateButton.h"
-#include "ToolTip.h"
 
 
 namespace lmms::gui
@@ -78,7 +77,7 @@ void NStateButton::changeState( int _n )
 			( m_states[m_curState].second != "" ) ?
 				m_states[m_curState].second :
 					m_generalToolTip;
-		ToolTip::add( this, _tooltip );
+		setToolTip(_tooltip);
 
 		setIcon( m_states[m_curState].first );
 

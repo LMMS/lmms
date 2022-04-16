@@ -29,7 +29,6 @@
 #include "Engine.h"
 #include "Lv2Effect.h"
 #include "Lv2FxControlDialog.h"
-#include "Lv2Proc.h"
 
 namespace lmms
 {

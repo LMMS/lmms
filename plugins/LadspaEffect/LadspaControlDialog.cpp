@@ -26,13 +26,16 @@
 
 #include <cmath>
 
+#include <QHBoxLayout>
 #include <QGroupBox>
-#include <QLayout>
+#include <QVBoxLayout>
 
-#include "LadspaEffect.h"
+#include "LadspaBase.h"
+#include "LadspaControl.h"
+#include "LadspaControls.h"
 #include "LadspaControlDialog.h"
 #include "LadspaControlView.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 namespace lmms::gui
 {

@@ -25,16 +25,15 @@
 #ifndef MICROTUNER_CONFIG_H
 #define MICROTUNER_CONFIG_H
 
-#include <QCloseEvent>
-#include <QLineEdit>
-#include <QMainWindow>
-#include <QPlainTextEdit>
+
+#include <QWidget>
 
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
-#include "LcdFloatSpinBox.h"
-#include "LcdSpinBox.h"
 #include "SerializingObject.h"
+
+class QLineEdit;
+class QPlainTextEdit;
 
 namespace lmms::gui
 {

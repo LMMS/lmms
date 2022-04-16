@@ -30,7 +30,6 @@
 #include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
-#include "Instrument.h"
 #include "MemoryManager.h"
 
 namespace lmms
@@ -38,6 +37,16 @@ namespace lmms
 
 
 class ExprFrontData;
+class NotePlayHandle;
+
+namespace gui
+{
+class automatableButtonGroup;
+class Knob;
+class LedCheckBox;
+class PixmapButton;
+}
+
 
 class ExprFront
 {

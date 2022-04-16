@@ -30,7 +30,11 @@
 #include <type_traits>
 
 // Calling convention
+#ifdef _WIN32
 #define VST_CALL_CONV __cdecl
+#else
+#define VST_CALL_CONV 
+#endif
 
 namespace lmms
 {

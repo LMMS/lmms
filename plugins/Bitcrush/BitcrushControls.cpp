@@ -28,7 +28,6 @@
 
 #include "BitcrushControls.h"
 #include "Bitcrush.h"
-#include "lmms_math.h"
 
 namespace lmms
 {

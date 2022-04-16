@@ -31,7 +31,6 @@
 #include "DualFilter.h"
 #include "embed.h"
 #include "Engine.h"
-#include "Song.h"
 
 namespace lmms
 {

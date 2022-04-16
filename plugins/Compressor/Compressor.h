@@ -29,8 +29,6 @@
 #include "CompressorControls.h"
 
 #include "Effect.h"
-#include "ValueBuffer.h"
-#include "RmsHelper.h"
 
 
 namespace lmms

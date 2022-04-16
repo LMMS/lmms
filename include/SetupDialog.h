@@ -27,11 +27,11 @@
 #define SETUP_DIALOG_H
 
 #include <QDialog>
-#include <QtCore/QMap>
+#include <QMap>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "lmmsconfig.h"
 #include "MidiClient.h"
 #include "MidiSetupWidget.h"

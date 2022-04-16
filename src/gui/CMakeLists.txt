@@ -1,22 +1,16 @@
 SET(LMMS_SRCS
 	${LMMS_SRCS}
-	gui/AboutDialog.cpp
 	gui/ActionGroup.cpp
 	gui/AudioAlsaSetupWidget.cpp
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
-	gui/AutomationPatternView.cpp
+	gui/AutomationClipView.cpp
 	gui/AutomationTrackView.cpp
-	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
-	gui/BBTCOView.cpp
-	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
-	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
-	gui/ExportProjectDialog.cpp
 	gui/FileBrowser.cpp
-	gui/FxMixerView.cpp
+	gui/MixerView.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
 	gui/InstrumentTrackView.cpp
@@ -28,32 +22,39 @@ SET(LMMS_SRCS
 	gui/MainApplication.cpp
 	gui/MainWindow.cpp
 	gui/MidiCCRackView.cpp
+	gui/MidiClipView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
-	gui/PatternView.cpp
+	gui/PatternClipView.cpp
+	gui/PatternTrackView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
-	gui/SampleTCOView.cpp
+	gui/SampleClipView.cpp
 	gui/SampleTrackView.cpp
 	gui/SampleTrackWindow.cpp
-	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
-	gui/TrackContentObjectView.cpp
+	gui/ClipView.cpp
 	gui/TrackView.cpp
 
-	gui/dialogs/FileDialog.cpp
-	gui/dialogs/VersionedSaveDialog.cpp
-	gui/dialogs/ColorChooser.cpp
+	gui/modals/AboutDialog.cpp
+	gui/modals/ColorChooser.cpp
+	gui/modals/ControllerConnectionDialog.cpp
+	gui/modals/EffectSelectDialog.cpp
+	gui/modals/ExportProjectDialog.cpp
+	gui/modals/FileDialog.cpp
+	gui/modals/RenameDialog.cpp
+	gui/modals/SetupDialog.cpp
+	gui/modals/VersionedSaveDialog.cpp
 
 	gui/editors/AutomationEditor.cpp
-	gui/editors/BBEditor.cpp
 	gui/editors/Editor.cpp
+	gui/editors/PatternEditor.cpp
 	gui/editors/PianoRoll.cpp
 	gui/editors/SongEditor.cpp
 
@@ -74,8 +75,8 @@ SET(LMMS_SRCS
 	gui/widgets/EnvelopeAndLfoView.cpp
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
-	gui/widgets/FxLine.cpp
-	gui/widgets/FxLineLcdSpinBox.cpp
+	gui/widgets/MixerLine.cpp
+	gui/widgets/MixerLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
@@ -88,7 +89,7 @@ SET(LMMS_SRCS
 	gui/widgets/LcdFloatSpinBox.cpp
 	gui/widgets/LcdSpinBox.cpp
 	gui/widgets/LcdWidget.cpp
-	gui/widgets/LedCheckbox.cpp
+	gui/widgets/LedCheckBox.cpp
 	gui/widgets/ControlLayout.cpp
 	gui/widgets/LinkedModelGroupViews.cpp
 	gui/widgets/MeterDialog.cpp
@@ -99,7 +100,6 @@ SET(LMMS_SRCS
 	gui/widgets/PixmapButton.cpp
 	gui/widgets/PositionLine.cpp
 	gui/widgets/ProjectNotes.cpp
-	gui/widgets/RenameDialog.cpp
 	gui/widgets/Rubberband.cpp
 	gui/widgets/SendButtonIndicator.cpp
 	gui/widgets/SideBar.cpp
@@ -110,7 +110,6 @@ SET(LMMS_SRCS
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
 	gui/widgets/ToolButton.cpp
-	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
 	gui/widgets/TrackContentWidget.cpp
 	gui/widgets/TrackOperationsWidget.cpp
@@ -122,10 +121,9 @@ SET(LMMS_SRCS
 
 set(LMMS_UIS
 	${LMMS_UIS}
-	gui/dialogs/about_dialog.ui
-	gui/dialogs/export_project.ui
-
-	gui/Forms/EffectSelectDialog.ui
+	gui/modals/about_dialog.ui
+	gui/modals/EffectSelectDialog.ui
+	gui/modals/export_project.ui
 
 	PARENT_SCOPE
 )

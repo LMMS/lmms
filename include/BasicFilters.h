@@ -36,7 +36,7 @@
 #define __USE_XOPEN
 #endif
 
-#include <math.h>
+#include <cmath>
 
 #include "lmms_basics.h"
 #include "lmms_constants.h"

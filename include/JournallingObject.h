@@ -25,7 +25,7 @@
 #ifndef JOURNALLING_OBJECT_H
 #define JOURNALLING_OBJECT_H
 
-#include <QtCore/QStack>
+#include <QStack>
 
 #include "lmms_basics.h"
 #include "SerializingObject.h"

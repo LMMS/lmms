@@ -25,7 +25,6 @@
 
 #include "NotePlayHandle.h"
 
-#include "lmms_constants.h"
 #include "AudioEngine.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"
@@ -38,7 +37,7 @@ namespace lmms
 {
 
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
-	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
+	m_value( detuning ? detuning->automationClip()->valueAt( 0 ) : 0 )
 {
 }
 
@@ -71,7 +70,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_parent( parent ),
 	m_hadChildren( false ),
 	m_muted( false ),
-	m_bbTrack( nullptr ),
+	m_patternTrack( nullptr ),
 	m_origTempo( Engine::getSong()->getTempo() ),
 	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
@@ -95,7 +94,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 		parent->m_subNotes.push_back( this );
 		parent->m_hadChildren = true;
 
-		m_bbTrack = parent->m_bbTrack;
+		m_patternTrack = parent->m_patternTrack;
 
 		parent->setUsesBuffer( false );
 	}
@@ -361,7 +360,7 @@ fpp_t NotePlayHandle::framesLeftForCurrentPeriod() const
 
 bool NotePlayHandle::isFromTrack( const Track * _track ) const
 {
-	return m_instrumentTrack == _track || m_bbTrack == _track;
+	return m_instrumentTrack == _track || m_patternTrack == _track;
 }
 
 
@@ -562,7 +561,7 @@ void NotePlayHandle::processTimePos( const TimePos& time )
 {
 	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{
-		const float v = detuning()->automationPattern()->valueAt( time - songGlobalParentOffset() - pos() );
+		const float v = detuning()->automationClip()->valueAt( time - songGlobalParentOffset() - pos() );
 		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{
 			m_baseDetuning->setValue( v );

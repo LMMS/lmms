@@ -26,7 +26,8 @@
 
 #include "BufferManager.h"
 
-#include "Engine.h"
+#include <cstring>
+
 #include "MemoryManager.h"
 
 namespace lmms

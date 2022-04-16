@@ -40,12 +40,11 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
-#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 #include "opl.h"
 #include "temuopl.h"
@@ -55,9 +54,7 @@
 #include "debug.h"
 
 #include "Knob.h"
-#include "LcdSpinBox.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 
 #include "plugin_export.h"
 
@@ -702,14 +699,14 @@ OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );
 
 #define WAVEBUTTON_GEN(buttname, tooltip, xpos, ypos, icon_on, icon_off, buttgroup) \
 	buttname = new PixmapButton( this, nullptr );\
         buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( icon_on ) ); \
         buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( icon_off ) ); \
-        ToolTip::add( buttname, tr( tooltip ) );\
+        buttname->setToolTip(tr(tooltip));\
         buttname->move( xpos, ypos );\
 	buttgroup->addButton(buttname);
 

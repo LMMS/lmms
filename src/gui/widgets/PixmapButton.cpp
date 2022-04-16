@@ -28,7 +28,6 @@
 #include <QPainter>
 
 #include "PixmapButton.h"
-#include "MainWindow.h"
 #include "embed.h"
 
 namespace lmms::gui

@@ -23,8 +23,6 @@
  *
  */
 
-#include <QPaintEvent>
-#include <QFontMetrics>
 #include <QPainter>
 
 #include "Graph.h"

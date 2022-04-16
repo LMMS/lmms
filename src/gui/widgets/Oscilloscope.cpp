@@ -32,7 +32,6 @@
 #include "MainWindow.h"
 #include "AudioEngine.h"
 #include "Engine.h"
-#include "ToolTip.h"
 #include "Song.h"
 #include "embed.h"
 #include "BufferManager.h"
@@ -59,7 +58,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	BufferManager::clear( m_buffer, frames );
 
 
-	ToolTip::add( this, tr( "Oscilloscope" ) );
+	setToolTip(tr("Oscilloscope"));
 }
 
 

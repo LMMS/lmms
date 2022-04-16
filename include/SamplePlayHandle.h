@@ -34,8 +34,8 @@ namespace lmms
 {
 
 
-class BBTrack;
-class SampleTCO;
+class PatternTrack;
+class SampleClip;
 class Track;
 class AudioPort;
 
@@ -45,7 +45,7 @@ class SamplePlayHandle : public PlayHandle
 public:
 	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
 	SamplePlayHandle( const QString& sampleFile );
-	SamplePlayHandle( SampleTCO* tco );
+	SamplePlayHandle( SampleClip* clip );
 	virtual ~SamplePlayHandle();
 
 	inline bool affinityMatters() const override
@@ -69,9 +69,9 @@ public:
 		m_doneMayReturnTrue = _enable;
 	}
 
-	void setBBTrack( BBTrack * _bb_track )
+	void setPatternTrack(PatternTrack* pt)
 	{
-		m_bbTrack = _bb_track;
+		m_patternTrack = pt;
 	}
 
 	void setVolumeModel( FloatModel * _model )
@@ -93,7 +93,7 @@ private:
 	FloatModel * m_volumeModel;
 	Track * m_track;
 
-	BBTrack * m_bbTrack;
+	PatternTrack* m_patternTrack;
 
 } ;
 

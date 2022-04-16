@@ -29,7 +29,7 @@
 #include <memory>
 #include <QPixmap>
 #include <QWidget>
-#include <QtCore/QPoint>
+#include <QPoint>
 #include <QTextDocument>
 
 #include "AutomatableModelView.h"

@@ -27,10 +27,9 @@
 #ifndef _SID_H
 #define _SID_H
 
-#include <QObject>
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
 
 namespace lmms
 {
@@ -40,12 +39,13 @@ class NotePlayHandle;
 
 namespace gui
 {
+class Knob;
 class automatableButtonGroup;
 class SidInstrumentView;
 class PixmapButton;
 }
 
-class voiceObject : public Model
+class VoiceObject : public Model
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -57,8 +57,8 @@ public:
 		NoiseWave,
 		NumWaveShapes
 	};
-	voiceObject( Model * _parent, int _idx );
-	virtual ~voiceObject();
+	VoiceObject( Model * _parent, int _idx );
+	virtual ~VoiceObject();
 
 
 private:
@@ -120,7 +120,7 @@ public:
 
 private:
 	// voices
-	voiceObject * m_voice[3];
+	VoiceObject * m_voice[3];
 
 	// filter	
 	FloatModel m_filterFCModel;

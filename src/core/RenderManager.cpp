@@ -22,13 +22,12 @@
  *
  */
 
-#include <QDebug>
 #include <QDir>
 
 #include "RenderManager.h"
+
+#include "PatternStore.h"
 #include "Song.h"
-#include "BBTrackContainer.h"
-#include "BBTrack.h"
 
 
 namespace lmms
@@ -114,7 +113,7 @@ void RenderManager::renderTracks()
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::getBBTrackContainer()->tracks();
+	const TrackContainer::TrackList t2 = Engine::patternStore()->tracks();
 	for( auto it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);

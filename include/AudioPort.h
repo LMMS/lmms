@@ -26,9 +26,8 @@
 #define AUDIO_PORT_H
 
 #include <memory>
-#include <QtCore/QString>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <QString>
+#include <QMutex>
 
 #include "MemoryManager.h"
 #include "PlayHandle.h"
@@ -74,11 +73,11 @@ public:
 	void setExtOutputEnabled( bool _enabled );
 
 
-	// next effect-channel after this audio-port
+	// next mixer-channel after this audio-port
 	// (-1 = none  0 = master)
-	inline fx_ch_t nextFxChannel() const
+	inline mix_ch_t nextMixerChannel() const
 	{
-		return m_nextFxChannel;
+		return m_nextMixerChannel;
 	}
 
 	inline EffectChain * effects()
@@ -86,9 +85,9 @@ public:
 		return m_effects.get();
 	}
 
-	void setNextFxChannel( const fx_ch_t _chnl )
+	void setNextMixerChannel( const mix_ch_t _chnl )
 	{
-		m_nextFxChannel = _chnl;
+		m_nextMixerChannel = _chnl;
 	}
 
 
@@ -119,7 +118,7 @@ private:
 	QMutex m_portBufferLock;
 
 	bool m_extOutputEnabled;
-	fx_ch_t m_nextFxChannel;
+	mix_ch_t m_nextMixerChannel;
 
 	QString m_name;
 

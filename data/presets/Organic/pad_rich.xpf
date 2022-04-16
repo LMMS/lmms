@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="59" name="pad_rich" tab="0">
+    <instrumenttrack mixch="0" vol="59" name="pad_rich" tab="0">
       <organic detune0="1" detune1="0" detune2="0" detune3="0" detune4="0" detune5="0" detune6="0" detune7="0" vol0="100" vol1="100" vol2="100" vol3="100" vol4="100" vol5="100" wavetype0="4" vol6="100" wavetype1="2" vol7="0" wavetype2="5" num_osc="8" wavetype3="1" harmonic0="0.5" wavetype4="2" wavetype5="5" harmonic1="0.75" wavetype6="0" harmonic2="1" wavetype7="0" pan0="0" harmonic3="2" harmonic4="3" pan1="0" harmonic5="4" pan2="0" foldback="0.26" harmonic6="5" pan3="0" harmonic7="6" pan4="0" pan5="0" pan6="0" pan7="0" vol="100"/>
       <eldata fres="1.19" ftype="0" fcut="320" fwet="1">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.708" latt="0" sus="0.039" lspd="0.1" att="0.363" pdel="0" lfosyncmode="0" lamt="0" dec="0.499" x100="0" lshp="0" hold="0.499"/>

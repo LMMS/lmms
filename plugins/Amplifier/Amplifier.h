@@ -29,7 +29,6 @@
 
 #include "Effect.h"
 #include "AmplifierControls.h"
-#include "ValueBuffer.h"
 
 namespace lmms
 {

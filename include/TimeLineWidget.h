@@ -239,7 +239,7 @@ private:
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
-		SelectSongTCO,
+		SelectSongClip,
 	} m_action;
 
 	int m_moveXOff;

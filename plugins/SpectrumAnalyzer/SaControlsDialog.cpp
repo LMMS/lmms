@@ -32,13 +32,13 @@
 
 #include "ComboBox.h"
 #include "ComboBoxModel.h"
-#include "embed.h"
-#include "Engine.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
 #include "SaControls.h"
 #include "SaProcessor.h"
+#include "SaSpectrumView.h"
+#include "SaWaterfallView.h"
 
 
 namespace lmms::gui

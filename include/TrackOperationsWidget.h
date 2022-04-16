@@ -56,7 +56,7 @@ private slots:
 	void selectTrackColor();
 	void randomizeTrackColor();
 	void resetTrackColor();
-	void resetTCOColors();
+	void resetClipColors();
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();

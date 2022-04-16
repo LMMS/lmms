@@ -28,7 +28,6 @@
 #include "CompressorControlDialog.h"
 
 #include "EffectControls.h"
-#include "Knob.h"
 
 namespace lmms
 {

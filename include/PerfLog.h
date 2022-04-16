@@ -26,7 +26,7 @@
 #define PERFLOG_H
 
 #include <ctime>
-#include <QtCore/QString>
+#include <QString>
 
 namespace lmms
 {

@@ -27,16 +27,15 @@
 #include <QAction>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLayout>
 #include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QPainter>
 #include <QScrollBar>
 #include <QTimeLine>
 
+#include "ActionGroup.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
 #include "AutomatableSlider.h"
+#include "ClipView.h"
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
@@ -48,11 +47,12 @@
 #include "MeterDialog.h"
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
+#include "PositionLine.h"
+#include "SubWindow.h"
 #include "TextFloat.h"
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
-#include "ToolTip.h"
-#include "Track.h"
+#include "TrackView.h"
 
 namespace lmms::gui
 {
@@ -115,7 +115,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
-	ToolTip::add( m_tempoSpinBox, tr( "Tempo in BPM" ) );
+	m_tempoSpinBox->setToolTip(tr("Tempo in BPM"));
 
 	int tempoSpinBoxCol = getGUI()->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
@@ -152,7 +152,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
-	ToolTip::add( m_masterVolumeSlider, tr( "Master volume" ) );
+	m_masterVolumeSlider->setToolTip(tr("Master volume"));
 
 	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( setMasterVolume( int ) ) );
@@ -185,7 +185,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
-	ToolTip::add( m_masterPitchSlider, tr( "Master pitch" ) );
+	m_masterPitchSlider->setToolTip(tr("Master pitch"));
 	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( setMasterPitch( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
@@ -356,7 +356,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 	{
 		m_selectRegion = true;
 
-		//deselect all tcos
+		//deselect all clips
 		for (auto &it : findChildren<selectableObject *>()) { it->setSelected(false); }
 
 		rubberBand()->setEnabled(true);
@@ -423,17 +423,17 @@ void SongEditor::updateRubberband()
 											  / pixelsPerBar() * TimePos::ticksPerBar())
 											  + m_currentPosition;
 
-		//are tcos in the rect of selection?
+		//are clips in the rect of selection?
 		for (auto &it : findChildren<selectableObject *>())
 		{
-			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(it);
-			if (tco)
+			ClipView * clip = dynamic_cast<ClipView*>(it);
+			if (clip)
 			{
-				auto indexOfTrackView = trackViews().indexOf(tco->getTrackView());
+				auto indexOfTrackView = trackViews().indexOf(clip->getTrackView());
 				bool isBeetweenRubberbandViews = indexOfTrackView >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
 											  && indexOfTrackView <= qMax(m_rubberBandStartTrackview, rubberBandTrackview);
-				bool isBeetweenRubberbandTimePos = tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos)
-											  && tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
+				bool isBeetweenRubberbandTimePos = clip->getClip()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos)
+											  && clip->getClip()->startPosition() <= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
 				it->setSelected(isBeetweenRubberbandViews && isBeetweenRubberbandTimePos);
 			}
 		}
@@ -510,18 +510,18 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		for( QVector<selectableObject *>::iterator it = so.begin();
 				it != so.end(); ++it )
 		{
-			TrackContentObjectView * tcov =
-				dynamic_cast<TrackContentObjectView *>( *it );
-			tcov->remove();
+			ClipView * clipv =
+				dynamic_cast<ClipView *>( *it );
+			clipv->remove();
 		}
 	}
 	else if( ke->key() == Qt::Key_A && ke->modifiers() & Qt::ControlModifier )
 	{
-		selectAllTcos( !isShiftPressed );
+		selectAllClips( !isShiftPressed );
 	}
 	else if( ke->key() == Qt::Key_Escape )
 	{
-		selectAllTcos( false );
+		selectAllClips( false );
 	}
 	else
 	{
@@ -563,7 +563,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// update timeline
 		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerBar( pixelsPerBar() );
-		// and make sure, all TCO's are resized and relocated
+		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
 
@@ -849,7 +849,7 @@ void SongEditor::zoomingChanged()
 }
 
 
-void SongEditor::selectAllTcos( bool select )
+void SongEditor::selectAllClips( bool select )
 {
 	QVector<selectableObject *> so = select ? rubberBand()->selectableObjects() : rubberBand()->selectedObjects();
 	for( int i = 0; i < so.count(); ++i )
@@ -931,15 +931,15 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// Set up buttons
 	m_playAction->setToolTip(tr("Play song (Space)"));
 	m_recordAction->setToolTip(tr("Record samples from Audio-device"));
-	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
+	m_recordAccompanyAction->setToolTip(tr("Record samples from Audio-device while playing song or pattern track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
 
-	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),
-									 tr("Add beat/bassline"), this);
+	m_addPatternTrackAction = new QAction(embed::getIconPixmap("add_pattern_track"),
+									 tr("Add pattern-track"), this);
 
 	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
 										 tr("Add sample-track"), this);
@@ -947,11 +947,11 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_addAutomationTrackAction = new QAction(embed::getIconPixmap("add_automation"),
 											 tr("Add automation-track"), this);
 
-	connect(m_addBBTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addBBTrack()));
+	connect(m_addPatternTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addPatternTrack()));
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
-	trackActionsToolBar->addAction( m_addBBTrackAction );
+	trackActionsToolBar->addAction( m_addPatternTrackAction );
 	trackActionsToolBar->addAction( m_addSampleTrackAction );
 	trackActionsToolBar->addAction( m_addAutomationTrackAction );
 

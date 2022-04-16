@@ -28,7 +28,7 @@
 #define RUBBERBAND_H
 
 #include <QRubberBand>
-#include <QtCore/QVector>
+#include <QVector>
 
 namespace lmms::gui
 {
@@ -48,9 +48,10 @@ public:
 	{
 	}
 
-	inline void setSelected( bool _selected )
+	inline void setSelected(bool selected)
 	{
-		m_selected = _selected;
+		if (m_selected == selected) { return; }
+		m_selected = selected;
 		update();
 	}
 

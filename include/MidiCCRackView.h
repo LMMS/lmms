@@ -3,8 +3,6 @@
 
 #include <QWidget>
 
-#include "GroupBox.h"
-#include "Knob.h"
 #include "Midi.h"
 #include "SerializingObject.h"
 
@@ -16,6 +14,8 @@ class InstrumentTrack;
 namespace gui
 {
 
+class Knob;
+class GroupBox;
 
 class MidiCCRackView : public QWidget, public SerializingObject
 {

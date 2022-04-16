@@ -26,16 +26,21 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <QPainter>
 #include <QWidget>
 
-#include "SaControls.h"
-#include "SaProcessor.h"
 
 class QMouseEvent;
 
+namespace lmms
+{
+class SaControls;
+class SaProcessor;
+}
+
 namespace lmms::gui
 {
+
+class EffectControlDialog;
 
 
 // Widget that displays a spectrum waterfall (spectrogram) and time labels.

@@ -28,8 +28,6 @@
 
 #include "AmplifierControls.h"
 #include "Amplifier.h"
-#include "Engine.h"
-#include "Song.h"
 
 namespace lmms
 {

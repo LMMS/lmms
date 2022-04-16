@@ -25,7 +25,7 @@
 #include "LocklessAllocator.h"
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 
 #include "lmmsconfig.h"
 

@@ -25,7 +25,6 @@
 #ifndef PEAK_CONTROLLER_H
 #define PEAK_CONTROLLER_H
 
-#include "Model.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
 

@@ -26,18 +26,15 @@
 #define _VST_EFFECT_CONTROLS_H
 
 #include "EffectControls.h"
-#include "VstEffectControlDialog.h"
 
-#include <QMenu>
-#include "embed.h"
-#include <QPushButton>
 
-#include <QMdiSubWindow>
-#include <QScrollArea>
-#include "CustomTextKnob.h"
-#include <QLayout>
-#include <QPainter>
 #include <QObject>
+
+class QGridLayout;
+class QPaintEvent;
+class QPushButton;
+class QMdiSubWindow;
+class QScrollArea;
 
 namespace lmms
 {
@@ -47,7 +44,9 @@ class VstEffect;
 
 namespace gui
 {
-class manageVSTEffectView;
+class CustomTextKnob;
+class ManageVSTEffectView;
+class VstEffectControlDialog;
 }
 
 
@@ -99,7 +98,7 @@ private:
 //	QLabel * m_presetLabel;
 
 	friend class gui::VstEffectControlDialog;
-	friend class gui::manageVSTEffectView;
+	friend class gui::ManageVSTEffectView;
 
 	bool m_vstGuiVisible;
 } ;
@@ -109,12 +108,12 @@ namespace gui
 {
 
 
-class manageVSTEffectView : public QObject
+class ManageVSTEffectView : public QObject
 {
 	Q_OBJECT
 public:
-	manageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi );
-	virtual ~manageVSTEffectView();
+	ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi );
+	virtual ~ManageVSTEffectView();
 
 
 protected slots:

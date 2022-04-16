@@ -50,7 +50,6 @@
 #include "Song.h"
 
 #include "PatchesDialog.h"
-#include "ToolTip.h"
 #include "LcdSpinBox.h"
 
 #include "embed.h"
@@ -946,7 +945,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open GIG file" ) );
+	m_fileDialogButton->setToolTip(tr("Open GIG file"));
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -958,7 +957,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
+	m_patchDialogButton->setToolTip(tr("Choose patch"));
 
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );

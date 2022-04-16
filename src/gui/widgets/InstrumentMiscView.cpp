@@ -25,14 +25,15 @@
 
 #include "InstrumentMiscView.h"
 
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QLayout>
+#include <QVBoxLayout>
 
 #include "ComboBox.h"
 #include "GroupBox.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 
 namespace lmms::gui

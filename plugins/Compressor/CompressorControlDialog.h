@@ -26,17 +26,12 @@
 #define COMPRESSOR_CONTROL_DIALOG_H
 
 #include <QBasicTimer>
-#include <QLabel>
-#include <QMouseEvent>
+#include <QElapsedTimer>
 #include <QPainter>
-#include <QTime>
 
-#include "../Eq/EqFader.h"
 #include "EffectControlDialog.h"
-#include "GuiApplication.h"
-#include "Knob.h"
-#include "MainWindow.h"
-#include "PixmapButton.h"
+
+class QLabel;
 
 namespace lmms
 {
@@ -65,6 +60,11 @@ class CompressorControls;
 
 namespace gui
 {
+
+class automatableButtonGroup;
+class Knob;
+class PixmapButton;
+class EqFader;
 
 
 class CompressorControlDialog : public EffectControlDialog

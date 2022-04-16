@@ -25,8 +25,6 @@
 
 #include <QDomElement>
 #include <QTimer>
-#include <QApplication>
-#include <QLayout>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolBar>
@@ -37,7 +35,6 @@
 #include "NStateButton.h"
 #include "GuiApplication.h"
 #include "TextFloat.h"
-#include "SongEditor.h"
 
 namespace lmms::gui
 {
@@ -241,7 +238,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.fillRect( 0, 0, width(), height(), p.background() );
 
 	// Clip so that we only draw everything starting from the offset
-	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
+	const int leftMargin = m_xOffset + s_posMarkerPixmap->width() / 2;
+	p.setClipRect(leftMargin, 0, width() - leftMargin, height() );
 
 	// Draw the loop rectangle
 	int const & loopRectMargin = getLoopRectangleVerticalPadding();
@@ -299,9 +297,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( innerRectangle );
 
-	// Draw the position marker
-	p.setOpacity( 0.6 );
-	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap );
+	// Only draw the position marker if the position line is in view
+	if (m_posMarkerX >= m_xOffset && m_posMarkerX < width() - s_posMarkerPixmap->width() / 2)
+	{
+		// Let the position marker extrude to the left
+		p.setClipping(false);
+		p.setOpacity(0.6);
+		p.drawPixmap(m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap);
+	}
 }
 
 
@@ -327,7 +330,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	}
 	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) )
 	{
-		m_action = SelectSongTCO;
+		m_action = SelectSongClip;
 		m_initalXSelect = event->x();
 	}
 	else if( event->button() == Qt::RightButton )
@@ -419,7 +422,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			update();
 			break;
 		}
-	case SelectSongTCO:
+	case SelectSongClip:
 			emit regionSelectedFromPixels( m_initalXSelect , event->x() );
 		break;
 
@@ -435,7 +438,7 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
 	m_hint = nullptr;
-	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
+	if ( m_action == SelectSongClip ) { emit selectionFinished(); }
 	m_action = NoAction;
 }
 

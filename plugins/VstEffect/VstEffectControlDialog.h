@@ -26,20 +26,18 @@
 #define _VST_EFFECT_CONTROL_DIALOG_H
 
 #include "EffectControlDialog.h"
-#include "VstPlugin.h"
 
-#include <QObject>
-#include <QPainter>
-#include <QLabel>
 #include <QSharedPointer>
 
 class QPixmap;
 class QPushButton;
+class QLabel;
 
 namespace lmms
 {
 
 class VstEffectControls;
+class VstPlugin;
 
 namespace gui
 {

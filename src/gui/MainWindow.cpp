@@ -32,28 +32,25 @@
 #include <QMdiArea>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QScrollBar>
 #include <QShortcut>
 #include <QLibrary>
 #include <QSplitter>
-#include <QUrl>
 
 #include "AboutDialog.h"
-#include "AudioDummy.h"
 #include "AutomationEditor.h"
-#include "BBEditor.h"
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
 #include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
-#include "FxMixerView.h"
+#include "MixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "InstrumentTrackView.h"
 #include "InstrumentTrackWindow.h"
 #include "MicrotunerConfig.h"
+#include "PatternEditor.h"
 #include "PianoRoll.h"
 #include "PianoView.h"
 #include "PluginBrowser.h"
@@ -67,6 +64,7 @@
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "SubWindow.h"
 #include "TemplatesMenu.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
@@ -263,6 +261,11 @@ MainWindow::MainWindow() :
 
 	maximized = isMaximized();
 	new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(toggleFullscreen()));
+
+	if (ConfigManager::inst()->value("tooltips", "disabled").toInt())
+	{
+		qApp->installEventFilter(this);
+	}
 }
 
 
@@ -503,13 +506,12 @@ void MainWindow::finalize()
 	song_editor_window->setShortcut( Qt::CTRL + Qt::Key_1 );
 
 
-	ToolButton * bb_editor_window = new ToolButton(
-					embed::getIconPixmap( "bb_track_btn" ),
-					tr( "Beat+Bassline Editor" ) +
-									" (Ctrl+2)",
-					this, SLOT( toggleBBEditorWin() ),
-								m_toolBar );
-	bb_editor_window->setShortcut( Qt::CTRL + Qt::Key_2 );
+	ToolButton* pattern_editor_window = new ToolButton(
+					embed::getIconPixmap("pattern_track_btn"),
+					tr("Pattern Editor") + " (Ctrl+2)",
+					this, SLOT(togglePatternEditorWin()),
+					m_toolBar);
+	pattern_editor_window->setShortcut(Qt::CTRL + Qt::Key_2);
 
 
 	ToolButton * piano_roll_window = new ToolButton(
@@ -529,12 +531,12 @@ void MainWindow::finalize()
 					m_toolBar );
 	automation_editor_window->setShortcut( Qt::CTRL + Qt::Key_4 );
 
-	ToolButton * fx_mixer_window = new ToolButton(
-					embed::getIconPixmap( "fx_mixer" ),
-					tr( "FX Mixer" ) + " (Ctrl+5)",
-					this, SLOT( toggleFxMixerWin() ),
+	ToolButton * mixer_window = new ToolButton(
+					embed::getIconPixmap( "mixer" ),
+					tr( "Mixer" ) + " (Ctrl+5)",
+					this, SLOT( toggleMixerWin() ),
 					m_toolBar );
-	fx_mixer_window->setShortcut( Qt::CTRL + Qt::Key_5 );
+	mixer_window->setShortcut( Qt::CTRL + Qt::Key_5 );
 
 	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
@@ -561,10 +563,10 @@ void MainWindow::finalize()
 	microtuner_window->setShortcut( Qt::CTRL + Qt::Key_8 );
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
-	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
+	m_toolBarLayout->addWidget( pattern_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
+	m_toolBarLayout->addWidget( mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
 	m_toolBarLayout->addWidget( microtuner_window, 1, 8 );
@@ -582,7 +584,7 @@ void MainWindow::finalize()
 	// user and is using AudioDummy as a fallback
 	// or the audio device is set to invalid one
 	else if( Engine::audioEngine()->audioDevStartFailed() || !AudioEngine::isAudioDevNameValid(
-		ConfigManager::inst()->value( "mixer", "audiodev" ) ) )
+		ConfigManager::inst()->value( "audioengine", "audiodev" ) ) )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
@@ -592,7 +594,7 @@ void MainWindow::finalize()
 	// Add editor subwindows
 	for (QWidget* widget :  std::list<QWidget*>{
 			getGUI()->automationEditor(),
-			getGUI()->getBBEditor(),
+			getGUI()->patternEditor(),
 			getGUI()->pianoRoll(),
 			getGUI()->songEditor()
 	})
@@ -604,8 +606,8 @@ void MainWindow::finalize()
 	}
 
 	getGUI()->automationEditor()->parentWidget()->hide();
-	getGUI()->getBBEditor()->parentWidget()->move( 610, 5 );
-	getGUI()->getBBEditor()->parentWidget()->hide();
+	getGUI()->patternEditor()->parentWidget()->move(610, 5);
+	getGUI()->patternEditor()->parentWidget()->hide();
 	getGUI()->pianoRoll()->parentWidget()->move(5, 5);
 	getGUI()->pianoRoll()->parentWidget()->hide();
 	getGUI()->songEditor()->parentWidget()->move(5, 5);
@@ -748,7 +750,7 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
-	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
+	// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != nullptr &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -785,7 +787,7 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
-		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
+		// If our widget is the main content of a window (e.g. piano roll, Mixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != nullptr &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -1059,7 +1061,7 @@ void MainWindow::refocus()
 	QList<QWidget*> editors;
 	editors
 		<< getGUI()->songEditor()->parentWidget()
-		<< getGUI()->getBBEditor()->parentWidget()
+		<< getGUI()->patternEditor()->parentWidget()
 		<< getGUI()->pianoRoll()->parentWidget()
 		<< getGUI()->automationEditor()->parentWidget();
 
@@ -1081,9 +1083,9 @@ void MainWindow::refocus()
 
 
 
-void MainWindow::toggleBBEditorWin( bool forceShow )
+void MainWindow::togglePatternEditorWin( bool forceShow )
 {
-	toggleWindow( getGUI()->getBBEditor(), forceShow );
+	toggleWindow( getGUI()->patternEditor(), forceShow );
 }
 
 
@@ -1121,9 +1123,9 @@ void MainWindow::toggleAutomationEditorWin()
 
 
 
-void MainWindow::toggleFxMixerWin()
+void MainWindow::toggleMixerWin()
 {
-	toggleWindow( getGUI()->fxMixerView() );
+	toggleWindow( getGUI()->mixerView() );
 }
 
 
@@ -1132,6 +1134,8 @@ void MainWindow::toggleMicrotunerWin()
 {
 	toggleWindow( getGUI()->getMicrotunerConfig() );
 }
+
+
 
 
 void MainWindow::updateViewMenu()
@@ -1144,9 +1148,9 @@ void MainWindow::updateViewMenu()
 			      tr( "Song Editor" ) + "\tCtrl+1",
 			      this, SLOT( toggleSongEditorWin() )
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "bb_track" ),
-					tr( "Beat+Bassline Editor" ) + "\tCtrl+2",
-					this, SLOT( toggleBBEditorWin() )
+	m_viewMenu->addAction(embed::getIconPixmap("pattern_track"),
+					tr("Pattern Editor") + "\tCtrl+2",
+					this, SLOT(togglePatternEditorWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),
 			      tr( "Piano Roll" ) + "\tCtrl+3",
@@ -1157,9 +1161,9 @@ void MainWindow::updateViewMenu()
 			      this,
 			      SLOT( toggleAutomationEditorWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
-			      tr( "FX Mixer" ) + "\tCtrl+5",
-			      this, SLOT( toggleFxMixerWin() )
+	m_viewMenu->addAction(embed::getIconPixmap( "mixer" ),
+			      tr( "Mixer" ) + "\tCtrl+5",
+			      this, SLOT( toggleMixerWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
 			      tr( "Controller Rack" ) + "\tCtrl+6",
@@ -1192,14 +1196,6 @@ void MainWindow::updateViewMenu()
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );
 	m_viewMenu->addAction(qa);
-
-	// Maybe this is impossible?
-	/* qa = new QAction(tr( "Tooltips" ), this);
-	qa->setData("tooltips");
-	qa->setCheckable( true );
-	qa->setChecked( !ConfigManager::inst()->value( "tooltips", "disabled" ).toInt() );
-	m_viewMenu->addAction(qa);
-	*/
 
 	qa = new QAction(tr( "Smooth scroll" ), this);
 	qa->setData("smoothscroll");
@@ -1240,6 +1236,10 @@ void MainWindow::updateConfig( QAction * _who )
 	{
 		ConfigManager::inst()->setValue( "tooltips", "disabled",
 						 QString::number(!checked) );
+
+		if (checked) { qApp->removeEventFilter(this); }
+		else { qApp->installEventFilter(this); }
+
 	}
 	else if ( tag == "smoothscroll" )
 	{
@@ -1280,7 +1280,7 @@ void MainWindow::updatePlayPauseIcons()
 {
 	getGUI()->songEditor()->setPauseIcon( false );
 	getGUI()->automationEditor()->setPauseIcon( false );
-	getGUI()->getBBEditor()->setPauseIcon( false );
+	getGUI()->patternEditor()->setPauseIcon( false );
 	getGUI()->pianoRoll()->setPauseIcon( false );
 
 	if( Engine::getSong()->isPlaying() )
@@ -1291,15 +1291,15 @@ void MainWindow::updatePlayPauseIcons()
 				getGUI()->songEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayAutomationPattern:
+			case Song::Mode_PlayAutomationClip:
 				getGUI()->automationEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayBB:
-				getGUI()->getBBEditor()->setPauseIcon( true );
+			case Song::Mode_PlayPattern:
+				getGUI()->patternEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayPattern:
+			case Song::Mode_PlayMidiClip:
 				getGUI()->pianoRoll()->setPauseIcon( true );
 				break;
 
@@ -1362,6 +1362,18 @@ void MainWindow::sessionCleanup()
 	// delete recover session files
 	QFile::remove( ConfigManager::inst()->recoveryFile() );
 	setSession( Normal );
+}
+
+
+
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+{
+	// For now this function is only used to globally block tooltips
+	// It must be installed to QApplication through installEventFilter
+	if (event->type() == QEvent::ToolTip) { return true; }
+
+	return QObject::eventFilter(watched, event);
 }
 
 

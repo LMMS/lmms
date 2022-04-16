@@ -27,13 +27,12 @@
 
 #include "Effect.h"
 #include "DelayControls.h"
-#include "Lfo.h"
-#include "StereoDelay.h"
-#include "ValueBuffer.h"
 
 namespace lmms
 {
 
+class Lfo;
+class StereoDelay;
 
 class DelayEffect : public Effect
 {

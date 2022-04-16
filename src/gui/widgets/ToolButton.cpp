@@ -24,7 +24,6 @@
  
 
 #include "ToolButton.h"
-#include "ToolTip.h"
 
 namespace lmms::gui
 {
@@ -41,7 +40,7 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	{
 		connect( this, SIGNAL( clicked() ), _receiver, _slot );
 	}
-	ToolTip::add( this, _tooltip );
+	setToolTip(_tooltip);
 	setIcon( _pixmap );
 }
 

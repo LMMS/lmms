@@ -29,18 +29,20 @@
 
 #include <QWidget>
 
-#include "EffectControls.h"
-#include "EqCurve.h"
-#include "TextFloat.h"
 
 namespace lmms
 {
 
+class BoolModel;
 class EqControls;
+class FloatModel;
 
 
 namespace gui
 {
+
+class EqCurve;
+class EqHandle;
 
 class EqBand
 {

@@ -1,5 +1,5 @@
 /*
- * Clipboard.cpp - the clipboard for patterns, notes etc.
+ * Clipboard.cpp - the clipboard for clips, notes etc.
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -27,7 +27,6 @@
 #include <QMimeData>
 
 #include "Clipboard.h"
-#include "JournallingObject.h"
 
 
 namespace lmms::Clipboard

@@ -24,8 +24,6 @@
 
 #include "Lv2Effect.h"
 
-#include <QDebug>
-#include <lv2.h>
 
 #include "Lv2SubPluginFeatures.h"
 

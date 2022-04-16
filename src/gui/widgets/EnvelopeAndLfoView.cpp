@@ -32,7 +32,7 @@
 #include "Engine.h"
 #include "gui_templates.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "AudioEngine.h"
 #include "DataFile.h"
 #include "Oscillator.h"
@@ -40,7 +40,6 @@
 #include "StringPairDrag.h"
 #include "TempoSyncKnob.h"
 #include "TextFloat.h"
-#include "ToolTip.h"
 #include "Track.h"
 
 namespace lmms
@@ -224,14 +223,14 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_x100Cb = new LedCheckBox( tr( "FREQ x 100" ), this );
 	m_x100Cb->setFont( pointSizeF( m_x100Cb->font(), 6.5 ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
-	ToolTip::add( m_x100Cb, tr( "Multiply LFO frequency by 100" ) );
+	m_x100Cb->setToolTip(tr("Multiply LFO frequency by 100"));
 
 
 	m_controlEnvAmountCb = new LedCheckBox( tr( "MODULATE ENV AMOUNT" ),
 			this );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSizeF( m_controlEnvAmountCb->font(), 6.5 ) );
-	ToolTip::add( m_controlEnvAmountCb,
+	m_controlEnvAmountCb->setToolTip(
 				tr( "Control envelope amount by this LFO" ) );
 
 
@@ -311,7 +310,7 @@ void EnvelopeAndLfoView::mousePressEvent( QMouseEvent * _me )
 void EnvelopeAndLfoView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee,
-					QString( "samplefile,tco_%1" ).arg(
+					QString( "samplefile,clip_%1" ).arg(
 							Track::SampleTrack ) );
 }
 
@@ -331,7 +330,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		_de->accept();
 		update();
 	}
-	else if( type == QString( "tco_%1" ).arg( Track::SampleTrack ) )
+	else if( type == QString( "clip_%1" ).arg( Track::SampleTrack ) )
 	{
 		DataFile dataFile( value.toUtf8() );
 		m_params->m_userWave.setAudioFile( dataFile.content().

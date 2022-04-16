@@ -31,7 +31,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrackView.h"
 #include "ColorChooser.h"
 #include "ConfigManager.h"
@@ -43,7 +43,6 @@
 #include "PixmapButton.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
 #include "Track.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
@@ -61,7 +60,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent )          /*!< The parent track view */
 {
-	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
+	setToolTip(tr("Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	QMenu * toMenu = new QMenu( this );
@@ -76,7 +75,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackOps->move( 12, 1 );
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
-	ToolTip::add( m_trackOps, tr( "Actions" ) );
+	m_trackOps->setToolTip(tr("Actions"));
 
 
 	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
@@ -102,10 +101,10 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	}
 
 	m_muteBtn->show();
-	ToolTip::add( m_muteBtn, tr( "Mute" ) );
+	m_muteBtn->setToolTip(tr("Mute"));
 
 	m_soloBtn->show();
-	ToolTip::add( m_soloBtn, tr( "Solo" ) );
+	m_soloBtn->setToolTip(tr("Solo"));
 
 	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
 			m_trackView->trackContainerView(),
@@ -134,7 +133,7 @@ TrackOperationsWidget::~TrackOperationsWidget()
 /*! \brief Respond to trackOperationsWidget mouse events
  *
  *  If it's the left mouse button, and Ctrl is held down, and we're
- *  not a Beat+Bassline Editor track, then start a new drag event to
+ *  not a Pattern Editor track, then start a new drag event to
  *  copy this track.
  *
  *  Otherwise, ignore all other events.
@@ -145,7 +144,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 {
 	if( me->button() == Qt::LeftButton &&
 		me->modifiers() & Qt::ControlModifier &&
-			m_trackView->getTrack()->type() != Track::BBTrack )
+			m_trackView->getTrack()->type() != Track::PatternTrack)
 	{
 		DataFile dataFile( DataFile::DragNDropData );
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
@@ -166,7 +165,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 
 /*! \brief Repaint the trackOperationsWidget
  *
- *  If we're not moving, and in the Beat+Bassline Editor, then turn
+ *  If we're not moving, and in the Pattern Editor, then turn
  *  automation on or off depending on its previous state and show
  *  ourselves.
  *
@@ -249,13 +248,13 @@ void TrackOperationsWidget::cloneTrack()
 }
 
 
-/*! \brief Clear this track - clears all TCOs from the track */
+/*! \brief Clear this track - clears all Clips from the track */
 void TrackOperationsWidget::clearTrack()
 {
 	Track * t = m_trackView->getTrack();
 	t->addJournalCheckPoint();
 	t->lock();
-	t->deleteTCOs();
+	t->deleteClips();
 	t->unlock();
 }
 
@@ -303,13 +302,13 @@ void TrackOperationsWidget::randomizeTrackColor()
 	Engine::getSong()->setModified();
 }
 
-void TrackOperationsWidget::resetTCOColors()
+void TrackOperationsWidget::resetClipColors()
 {
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
-	for (auto tco: track->getTCOs())
+	for (auto clip: track->getClips())
 	{
-		tco->useCustomClipColor(false);
+		clip->useCustomClipColor(false);
 	}
 	Engine::getSong()->setModified();
 }
@@ -322,7 +321,7 @@ void TrackOperationsWidget::resetTCOColors()
  *  For all track types, we have the Clone and Remove options.
  *  For instrument-tracks we also offer the MIDI-control-menu
  *  For automation tracks, extra options: turn on/off recording
- *  on all TCOs (same should be added for sample tracks when
+ *  on all Clips (same should be added for sample tracks when
  *  sampletrack recording is implemented)
  */
 void TrackOperationsWidget::updateMenu()
@@ -336,13 +335,13 @@ void TrackOperationsWidget::updateMenu()
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
 
-	if( ! m_trackView->trackContainerView()->fixedTCOs() )
+	if( ! m_trackView->trackContainerView()->fixedClips() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
 	}
-	if (QMenu *fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
+	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
-		toMenu->addMenu(fxMenu);
+		toMenu->addMenu(mixerMenu);
 	}
 
 	if (InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>(m_trackView))
@@ -364,7 +363,7 @@ void TrackOperationsWidget::updateMenu()
 	colorMenu->addAction(tr("Reset"), this, SLOT(resetTrackColor()));
 	colorMenu->addAction(tr("Pick random"), this, SLOT(randomizeTrackColor()));
 	colorMenu->addSeparator();
-	colorMenu->addAction(tr("Reset clip colors"), this, SLOT(resetTCOColors()));
+	colorMenu->addAction(tr("Reset clip colors"), this, SLOT(resetClipColors()));
 }
 
 
@@ -373,9 +372,9 @@ void TrackOperationsWidget::toggleRecording( bool on )
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		for( TrackContentObject * tco : atv->getTrack()->getTCOs() )
+		for( Clip * clip : atv->getTrack()->getClips() )
 		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( tco );
+			AutomationClip * ap = dynamic_cast<AutomationClip *>( clip );
 			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();

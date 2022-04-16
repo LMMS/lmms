@@ -28,8 +28,9 @@
 #include <QDropEvent>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QMdiSubWindow>
+#include <QLineEdit>
 #include <QMenu>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 #include "ComboBox.h"
@@ -40,8 +41,8 @@
 #include "Engine.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
-#include "FxLineLcdSpinBox.h"
-#include "FxMixer.h"
+#include "GroupBox.h"
+#include "MixerLineLcdSpinBox.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "Instrument.h"
@@ -52,8 +53,9 @@
 #include "InstrumentSoundShapingView.h"
 #include "InstrumentTrack.h"
 #include "InstrumentTrackView.h"
+#include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "LeftRightNav.h"
 #include "MainWindow.h"
 #include "PianoView.h"
@@ -61,8 +63,8 @@
 #include "PluginView.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "SubWindow.h"
 #include "TabWidget.h"
-#include "ToolTip.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
 
@@ -194,13 +196,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setColumnStretch(5, 1);
 
 
-	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox( 2, nullptr, tr( "FX channel" ), m_itv );
+	// setup spinbox for selecting Mixer-channel
+	m_mixerChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "Mixer channel" ), m_itv );
 
-	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );
-	basicControlsLayout->setAlignment( m_effectChannelNumber, widgetAlignment );
+	basicControlsLayout->addWidget( m_mixerChannelNumber, 0, 6 );
+	basicControlsLayout->setAlignment( m_mixerChannelNumber, widgetAlignment );
 
-	label = new QLabel( tr( "FX" ), this );
+	label = new QLabel( tr( "CHANNEL" ), this );
 	label->setStyleSheet( labelStyleSheet );
 	basicControlsLayout->addWidget( label, 1, 6);
 	basicControlsLayout->setAlignment( label, labelAlignment );
@@ -210,7 +212,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
-	ToolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
+	saveSettingsBtn->setToolTip(tr("Save current instrument track settings in a preset file"));
 
 	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
 
@@ -320,7 +322,7 @@ void InstrumentTrackWindow::setInstrumentTrackView( InstrumentTrackView* view )
 	}
 
 	m_itv = view;
-	m_effectChannelNumber->setTrackView(m_itv);
+	m_mixerChannelNumber->setTrackView(m_itv);
 }
 
 
@@ -342,7 +344,7 @@ void InstrumentTrackWindow::modelChanged()
 
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );
-	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
+	m_mixerChannelNumber->setModel( &m_track->m_mixerChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
 	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::IsNotBendable ) == false )
@@ -391,20 +393,20 @@ void InstrumentTrackWindow::modelChanged()
 
 void InstrumentTrackWindow::saveSettingsBtnClicked()
 {
-	FileDialog sfd( this, tr( "Save preset" ), "", tr( "XML preset file (*.xpf)" ) );
+	FileDialog sfd(this, tr("Save preset"), "", tr("XML preset file (*.xpf)"));
 
 	QString presetRoot = ConfigManager::inst()->userPresetsDir();
-	if( !QDir( presetRoot ).exists() )
+	if(!QDir(presetRoot).exists())
 	{
-		QDir().mkdir( presetRoot );
+		QDir().mkdir(presetRoot);
 	}
-	if( !QDir( presetRoot + m_track->instrumentName() ).exists() )
+	if(!QDir(presetRoot + m_track->instrumentName()).exists())
 	{
-		QDir( presetRoot ).mkdir( m_track->instrumentName() );
+		QDir(presetRoot).mkdir(m_track->instrumentName());
 	}
 
-	sfd.setAcceptMode( FileDialog::AcceptSave );
-	sfd.setDirectory( presetRoot + m_track->instrumentName() );
+	sfd.setAcceptMode(FileDialog::AcceptSave);
+	sfd.setDirectory(presetRoot + m_track->instrumentName());
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
 	sfd.selectFile(fname.remove(QRegExp(FILENAME_FILTER)));
@@ -414,11 +416,17 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 		!sfd.selectedFiles().isEmpty() &&
 		!sfd.selectedFiles().first().isEmpty() )
 	{
-		DataFile dataFile( DataFile::InstrumentTrackSettings );
+		DataFile dataFile(DataFile::InstrumentTrackSettings);
+		QDomElement& content(dataFile.content());
+
 		m_track->setSimpleSerializing();
-		m_track->saveSettings( dataFile, dataFile.content() );
+		m_track->saveSettings(dataFile, content);
+		//We don't want to save muted & solo settings when we're saving a preset
+		content.setAttribute("muted", 0);
+		content.setAttribute("solo", 0);
+		content.setAttribute("mutedBeforeSolo", 0);
 		QString f = sfd.selectedFiles()[0];
-		dataFile.writeFile( f );
+		dataFile.writeFile(f);
 	}
 }
 
@@ -648,7 +656,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		newView->m_tlb->setChecked(true);
 		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos);
 
-		// scroll the SongEditor/BB-editor to make sure the new trackview label is visible
+		// scroll the SongEditor/PatternEditor to make sure the new trackview label is visible
 		bringToFront->trackContainerView()->scrollToTrackView(bringToFront);
 
 		// get the instrument window to refresh

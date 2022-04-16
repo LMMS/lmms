@@ -22,11 +22,12 @@
  *
  */
 
-#include <QLayout>
 
 #include "ReverbSCControlDialog.h"
-#include "ReverbSCControls.h"
+
 #include "embed.h"
+#include "Knob.h"
+#include "ReverbSCControls.h"
 
 namespace lmms::gui
 {

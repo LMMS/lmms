@@ -41,6 +41,7 @@
 #include "Lv2Manager.h"
 #include "Lv2Ports.h"
 #include "Lv2Evbuf.h"
+#include "MidiEvent.h"
 #include "MidiEventToByteSeq.h"
 
 

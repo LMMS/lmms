@@ -25,13 +25,12 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
-#include <QtCore/QBasicTimer>
-#include <QtCore/QTimer>
-#include <QtCore/QList>
+#include <QBasicTimer>
+#include <QTimer>
+#include <QList>
 #include <QMainWindow>
 
 #include "ConfigManager.h"
-#include "SubWindow.h"
 
 class QAction;
 class QDomElement;
@@ -47,6 +46,7 @@ namespace gui
 {
 
 class PluginView;
+class SubWindow;
 class ToolButton;
 
 
@@ -142,6 +142,8 @@ public:
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
+	bool eventFilter(QObject* watched, QEvent* event) override;
+
 public slots:
 	void resetWindowTitle();
 
@@ -156,11 +158,11 @@ public slots:
 	void aboutLMMS();
 	void help();
 	void toggleAutomationEditorWin();
-	void toggleBBEditorWin( bool forceShow = false );
+	void togglePatternEditorWin(bool forceShow = false);
 	void toggleSongEditorWin();
 	void toggleProjectNotesWin();
 	void toggleMicrotunerWin();
-	void toggleFxMixerWin();
+	void toggleMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
 	void toggleFullscreen();

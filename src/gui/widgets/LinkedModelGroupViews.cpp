@@ -89,7 +89,6 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 	const std::string &display, bool removable)
 {
-	int wdgNum = static_cast<int>(m_widgets.size());
 	if (ctrl)
 	{
 		QWidget* box = new QWidget(this);
@@ -119,7 +118,6 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 
 		// take ownership of control and add it
 		m_widgets.emplace(id, std::unique_ptr<Control>(ctrl));
-		++wdgNum;
 	}
 
 	if (isHidden()) { setHidden(false); }

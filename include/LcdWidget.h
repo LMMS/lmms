@@ -26,7 +26,7 @@
 #ifndef LCD_WIDGET_H
 #define LCD_WIDGET_H
 
-#include <QtCore/QMap>
+#include <QMap>
 #include <QWidget>
 
 #include "lmms_export.h"

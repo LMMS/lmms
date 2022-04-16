@@ -24,8 +24,10 @@
  *
  */
 
+#include "AutomationTrack.h"
+
 #include "AutomationTrackView.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 
 namespace lmms
 {
@@ -38,7 +40,7 @@ AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 }
 
 bool AutomationTrack::play( const TimePos & time_start, const fpp_t _frames,
-							const f_cnt_t _frame_base, int _tco_num )
+							const f_cnt_t _frame_base, int _clip_num )
 {
 	return false;
 }
@@ -54,9 +56,9 @@ gui::TrackView* AutomationTrack::createView( gui::TrackContainerView* tcv )
 
 
 
-TrackContentObject* AutomationTrack::createTCO(const TimePos & pos)
+Clip* AutomationTrack::createClip(const TimePos & pos)
 {
-	AutomationPattern* p = new AutomationPattern(this);
+	AutomationClip* p = new AutomationClip(this);
 	p->movePosition(pos);
 	return p;
 }
@@ -80,5 +82,6 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		setMuted( false );
 	}
 }
+
 
 } // namespace lmms

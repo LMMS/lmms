@@ -26,15 +26,20 @@
 #define SACONTROLSDIALOG_H
 
 #include "EffectControlDialog.h"
-#include "SaControls.h"
-#include "SaSpectrumView.h"
-#include "SaProcessor.h"
-#include "SaWaterfallView.h"
+#include "fft_helpers.h"
+
+namespace lmms
+{
+class SaControls;
+class SaProcessor;
+}
 
 
 namespace lmms::gui
 {
 
+class SaSpectrumView;
+class SaWaterfallView;
 
 //! Top-level widget holding the configuration GUI and spectrum displays
 class SaControlsDialog : public EffectControlDialog

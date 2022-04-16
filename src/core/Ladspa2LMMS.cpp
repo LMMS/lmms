@@ -39,7 +39,7 @@ Ladspa2LMMS::Ladspa2LMMS()
 			it != plugins.end(); ++it )
 	{
 		ladspa_key_t key = (*it).second;
-		ladspaManagerDescription * desc = getDescription( key );
+		LadspaManagerDescription * desc = getDescription( key );
 		
 		if( desc->type == SOURCE )
 		{

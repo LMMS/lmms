@@ -26,27 +26,24 @@
 #define SONG_H
 
 #include <memory>
-#include <utility>
 
-#include <QtCore/QSharedMemory>
-#include <QtCore/QVector>
 #include <QHash>
 #include <QString>
 
 #include "TrackContainer.h"
 #include "AudioEngine.h"
 #include "Controller.h"
-#include "Keymap.h"
 #include "lmms_constants.h"
 #include "MeterModel.h"
-#include "Scale.h"
 #include "VstSyncController.h"
 
 namespace lmms
 {
 
 class AutomationTrack;
-class Pattern;
+class Keymap;
+class MidiClip;
+class Scale;
 
 namespace gui
 {
@@ -75,9 +72,9 @@ public:
 	{
 		Mode_None,
 		Mode_PlaySong,
-		Mode_PlayBB,
 		Mode_PlayPattern,
-		Mode_PlayAutomationPattern,
+		Mode_PlayMidiClip,
+		Mode_PlayAutomationClip,
 		Mode_Count
 	} ;
 
@@ -286,7 +283,7 @@ public:
 
 
 	bpm_t getTempo();
-	AutomationPattern * tempoAutomationPattern() override;
+	AutomationClip * tempoAutomationClip() override;
 
 	AutomationTrack * globalAutomationTrack()
 	{
@@ -294,7 +291,7 @@ public:
 	}
 
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
-	AutomatedValueMap automatedValuesAt(TimePos time, int tcoNum = -1) const override;
+	AutomatedValueMap automatedValuesAt(TimePos time, int clipNum = -1) const override;
 
 	// file management
 	void createNewProject();
@@ -335,7 +332,7 @@ public:
 		return "song";
 	}
 
-	virtual bool fixedTCOs() const
+	virtual bool fixedClips() const
 	{
 		return false;
 	}
@@ -373,8 +370,8 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playBB();
-	void playPattern( const Pattern * patternToPlay, bool loop = true );
+	void playPattern();
+	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -386,7 +383,7 @@ public slots:
 
 	void clearProject();
 
-	void addBBTrack();
+	void addPatternTrack();
 
 
 private slots:
@@ -483,8 +480,8 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	bar_t m_length;
 
-	const Pattern* m_patternToPlay;
-	bool m_loopPattern;
+	const MidiClip* m_midiClipToPlay;
+	bool m_loopMidiClip;
 
 	double m_elapsedMilliSeconds[Mode_Count];
 	tick_t m_elapsedTicks;

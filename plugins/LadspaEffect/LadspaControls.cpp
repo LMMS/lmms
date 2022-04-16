@@ -24,6 +24,8 @@
 
 #include <QDomElement>
 
+#include "LadspaBase.h"
+#include "LadspaControl.h"
 #include "LadspaEffect.h"
 
 namespace lmms

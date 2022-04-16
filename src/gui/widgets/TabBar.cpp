@@ -26,7 +26,6 @@
 #include "TabBar.h"
 #include "TabButton.h"
 #include "gui_templates.h"
-#include "ToolTip.h"
 
 
 namespace lmms::gui
@@ -62,7 +61,7 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	b->show();
 	if( _text_is_tooltip )
 	{
-		ToolTip::add( b, _text );
+		b->setToolTip(_text);
 	}
 
 	// small workaround, because QBoxLayout::addWidget(...) doesn't

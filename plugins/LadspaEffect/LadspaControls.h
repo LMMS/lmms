@@ -26,13 +26,13 @@
 #define LADSPA_CONTROLS_H
 
 #include "EffectControls.h"
-#include "LadspaControl.h"
 #include "LadspaControlDialog.h"
 
 namespace lmms
 {
 
 
+class LadspaControl;
 typedef QVector<LadspaControl *> control_list_t;
 
 class LadspaEffect;

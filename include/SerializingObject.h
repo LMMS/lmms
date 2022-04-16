@@ -25,7 +25,7 @@
 #ifndef SERIALIZING_OBJECT_H
 #define SERIALIZING_OBJECT_H
 
-#include <QtCore/QString>
+#include <QString>
 
 #include "lmms_export.h"
 

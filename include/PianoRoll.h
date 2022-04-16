@@ -29,7 +29,6 @@
 
 #include <QVector>
 #include <QWidget>
-#include <QInputDialog>
 
 #include "Editor.h"
 #include "ComboBoxModel.h"
@@ -37,13 +36,12 @@
 #include "Note.h"
 #include "lmms_basics.h"
 #include "Song.h"
-#include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
-#include "PositionLine.h"
 
 class QPainter;
 class QPixmap;
+class QPushButton;
 class QScrollBar;
 class QString;
 class QMenu;
@@ -54,13 +52,15 @@ namespace lmms
 
 
 class NotePlayHandle;
-class Pattern;
+class MidiClip;
 
 
 namespace gui
 {
 
 class ComboBox;
+class PositionLine;
+class TextFloat;
 class TimeLineWidget;
 
 
@@ -120,8 +120,8 @@ public:
 	void showVolTextFloat(volume_t vol, const QPoint &pos, int timeout=-1);
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
-	void setCurrentPattern( Pattern* newPattern );
-	void setGhostPattern( Pattern* newPattern );
+	void setCurrentMidiClip( MidiClip* newMidiClip );
+	void setGhostMidiClip( MidiClip* newMidiClip );
 	void loadGhostNotes( const QDomElement & de );
 	void loadMarkedSemiTones(const QDomElement & de);
 
@@ -140,14 +140,14 @@ public:
 		return m_stepRecorder.isRecording();
 	}
 
-	const Pattern* currentPattern() const
+	const MidiClip* currentMidiClip() const
 	{
-		return m_pattern;
+		return m_midiClip;
 	}
 
-	bool hasValidPattern() const
+	bool hasValidMidiClip() const
 	{
-		return m_pattern != nullptr;
+		return m_midiClip != nullptr;
 	}
 
 	Song::PlayModes desiredPlayModeForAccompany() const;
@@ -225,11 +225,11 @@ protected slots:
 	void changeNoteEditMode( int i );
 	void markSemiTone(int i, bool fromMenu = true);
 
-	void hidePattern( Pattern* pattern );
+	void hideMidiClip( MidiClip* clip );
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
-	void clearGhostPattern();
+	void clearGhostClip();
 	void glueNotes();
 	void fitNoteLengths(bool fill);
 	void constrainNoteLengths(bool constrainMax);
@@ -238,8 +238,8 @@ protected slots:
 
 
 signals:
-	void currentPatternChanged();
-	void ghostPatternSet(bool);
+	void currentMidiClipChanged();
+	void ghostClipSet(bool);
 	void semiToneMarkerMenuScaleSetEnabled(bool);
 	void semiToneMarkerMenuChordSetEnabled(bool);
 
@@ -359,7 +359,7 @@ private:
 	static const QVector<float> m_zoomLevels;
 	static const QVector<float> m_zoomYLevels;
 
-	Pattern* m_pattern;
+	MidiClip* m_midiClip;
 	NoteVector m_ghostNotes;
 
 	inline const NoteVector & ghostNotes() const
@@ -506,9 +506,9 @@ class PianoRollWindow : public Editor, SerializingObject
 public:
 	PianoRollWindow();
 
-	const Pattern* currentPattern() const;
-	void setCurrentPattern( Pattern* pattern );
-	void setGhostPattern( Pattern* pattern );
+	const MidiClip* currentMidiClip() const;
+	void setCurrentMidiClip( MidiClip* clip );
+	void setGhostMidiClip( MidiClip* clip );
 
 	int quantization() const;
 
@@ -538,17 +538,17 @@ public:
 	bool hasFocus() const;
 
 signals:
-	void currentPatternChanged();
+	void currentMidiClipChanged();
 
 
 private slots:
-	void updateAfterPatternChange();
-	void ghostPatternSet( bool state );
-	void exportPattern();
-	void importPattern();
+	void updateAfterMidiClipChange();
+	void ghostClipSet( bool state );
+	void exportMidiClip();
+	void importMidiClip();
 
 private:
-	void patternRenamed();
+	void clipRenamed();
 	void focusInEvent(QFocusEvent * event) override;
 	void stopStepRecording();
 	void updateStepRecordingIcon();

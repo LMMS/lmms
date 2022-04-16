@@ -25,7 +25,7 @@
 
 #include "MemoryManager.h"
 
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 #include "rpmalloc.h"
 
 namespace lmms

@@ -25,11 +25,10 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QSharedPointer>
+#include <QMutex>
+#include <QSharedPointer>
 
 #include "Effect.h"
-#include "VstEffectControlDialog.h"
 #include "VstEffectControls.h"
 
 namespace lmms
@@ -54,11 +53,6 @@ public:
 		return &m_vstControls;
 	}
 
-	virtual inline QString publicName() const
-	{
-		return m_plugin->name();
-	}
-
 
 private:
 	void openPlugin( const QString & _plugin );
@@ -73,7 +67,7 @@ private:
 
 	friend class VstEffectControls;
 	friend class gui::VstEffectControlDialog;
-	friend class gui::manageVSTEffectView;
+	friend class gui::ManageVSTEffectView;
 
 } ;
 

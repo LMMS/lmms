@@ -1,32 +1,34 @@
 #ifndef SENDBUTTONINDICATOR_H
 #define SENDBUTTONINDICATOR_H
 
-#include <QDebug>
 #include <QLabel>
-#include <QPixmap>
 
-#include "FxLine.h"
-#include "FxMixerView.h"
 
-namespace lmms::gui
+namespace lmms
 {
 
-class FxLine;
-class FxMixerView;
+class FloatModel;
+
+namespace gui
+{
+
+class MixerLine;
+class MixerView;
+
 
 class SendButtonIndicator : public QLabel 
 {
 public:
-	SendButtonIndicator( QWidget * _parent, FxLine * _owner,
-						 FxMixerView * _mv);
+	SendButtonIndicator( QWidget * _parent, MixerLine * _owner,
+						 MixerView * _mv);
 
 	void mousePressEvent( QMouseEvent * e ) override;
 	void updateLightStatus();
 
 private:
 
-	FxLine * m_parent;
-	FxMixerView * m_mv;
+	MixerLine * m_parent;
+	MixerView * m_mv;
 	static QPixmap * s_qpmOn;
 	static QPixmap * s_qpmOff;
 
@@ -34,6 +36,8 @@ private:
 };
 
 
-} // namespace lmms::gui
+} // namespace gui
+
+} // namespace lmms
 
 #endif // SENDBUTTONINDICATOR_H

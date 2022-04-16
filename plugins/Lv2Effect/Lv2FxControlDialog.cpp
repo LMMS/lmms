@@ -24,11 +24,8 @@
 
 #include "Lv2FxControlDialog.h"
 
-#include <QDebug>
 #include <QPushButton>
-#include <lv2.h>
 
-#include "Lv2Effect.h"
 #include "Lv2FxControls.h"
 
 namespace lmms::gui

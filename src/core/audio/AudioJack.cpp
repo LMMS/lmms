@@ -35,7 +35,6 @@
 #include "gui_templates.h"
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
-#include "AudioPort.h"
 #include "MainWindow.h"
 #include "AudioEngine.h"
 #include "MidiJack.h"

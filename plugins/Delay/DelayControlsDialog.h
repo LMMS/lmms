@@ -26,13 +26,13 @@
 #define DELAYCONTROLSDIALOG_H
 
 #include "EffectControlDialog.h"
-#include "AutomatableModel.h"
 
 namespace lmms
 {
 
 
 class DelayControls;
+class FloatModel;
 
 namespace gui
 {

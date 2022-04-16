@@ -264,7 +264,7 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 
 bool AudioDevice::hqAudio() const
 {
-	return ConfigManager::inst()->value( "mixer", "hqaudio" ).toInt();
+	return ConfigManager::inst()->value( "audioengine", "hqaudio" ).toInt();
 }
 
 

@@ -26,6 +26,8 @@
 
 #include <QDomElement>
 
+#include "Note.h"
+
 
 namespace lmms
 {

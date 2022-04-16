@@ -23,16 +23,15 @@
  *
  */
  
- #include "AutomationTrackView.h"
- 
- #include "AutomationPattern.h"
- #include "embed.h"
- #include "Engine.h"
- #include "ProjectJournal.h"
- #include "StringPairDrag.h"
- #include "TrackContainerView.h"
- #include "TrackLabelButton.h"
-
+#include "AutomationTrackView.h"
+#include "AutomationClip.h"
+#include "AutomationTrack.h"
+#include "embed.h"
+#include "Engine.h"
+#include "ProjectJournal.h"
+#include "StringPairDrag.h"
+#include "TrackContainerView.h"
+#include "TrackLabelButton.h"
 
 namespace lmms::gui
 {
@@ -81,9 +80,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 				pos.setTicks( 0 );
 			}
 
-			TrackContentObject * tco = getTrack()->createTCO( pos );
-			AutomationPattern * pat = dynamic_cast<AutomationPattern *>( tco );
-			pat->addObject( mod );
+			Clip * clip = getTrack()->createClip( pos );
+			AutomationClip * autoClip = dynamic_cast<AutomationClip *>( clip );
+			autoClip->addObject( mod );
 		}
 	}
 

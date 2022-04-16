@@ -25,11 +25,10 @@
 
 #include "SampleRecordHandle.h"
 #include "AudioEngine.h"
-#include "BBTrack.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
+#include "PatternTrack.h"
 #include "SampleBuffer.h"
-#include "SampleTrack.h"
+#include "SampleClip.h"
 #include "debug.h"
 
 
@@ -37,13 +36,13 @@ namespace lmms
 {
 
 
-SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
+SampleRecordHandle::SampleRecordHandle( SampleClip* clip ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
-	m_minLength( tco->length() ),
-	m_track( tco->getTrack() ),
-	m_bbTrack( nullptr ),
-	m_tco( tco )
+	m_minLength( clip->length() ),
+	m_track( clip->getTrack() ),
+	m_patternTrack( nullptr ),
+	m_clip( clip )
 {
 }
 
@@ -56,7 +55,7 @@ SampleRecordHandle::~SampleRecordHandle()
 	{
 		SampleBuffer* sb;
 		createSampleBuffer( &sb );
-		m_tco->setSampleBuffer( sb );
+		m_clip->setSampleBuffer( sb );
 	}
 	
 	while( !m_buffers.empty() )
@@ -64,7 +63,7 @@ SampleRecordHandle::~SampleRecordHandle()
 		delete[] m_buffers.front().first;
 		m_buffers.erase( m_buffers.begin() );
 	}
-	m_tco->setRecord( false );
+	m_clip->setRecord( false );
 }
 
 
@@ -80,7 +79,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	TimePos len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
 	{
-//		m_tco->changeLength( len );
+//		m_clip->changeLength( len );
 		m_minLength = len;
 	}
 }
@@ -98,7 +97,7 @@ bool SampleRecordHandle::isFinished() const
 
 bool SampleRecordHandle::isFromTrack( const Track * _track ) const
 {
-	return( m_track == _track || m_bbTrack == _track );
+	return (m_track == _track || m_patternTrack == _track);
 }
 
 

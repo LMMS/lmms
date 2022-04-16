@@ -27,17 +27,11 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QLabel>
-#include <QLineEdit>
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
-
+#include <cstdlib>
+#include <sndio.h>
 #include <poll.h>
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
 namespace lmms

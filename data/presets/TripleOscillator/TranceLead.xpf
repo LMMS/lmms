@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creatorversion="1.2.1" creator="LMMS" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings solo="0" type="0" muted="0" name="TranceLead">
-    <instrumenttrack pan="0" usemasterpitch="1" pitch="0" basenote="57" fxch="0" pitchrange="1" vol="50.1187">
+    <instrumenttrack pan="0" usemasterpitch="1" pitch="0" basenote="57" mixch="0" pitchrange="1" vol="50.1187">
       <instrument name="tripleoscillator">
         <tripleoscillator modalgo1="2" modalgo2="2" modalgo3="2" stphdetun0="130" stphdetun1="261" wavetype0="2" wavetype1="2" stphdetun2="94" wavetype2="2" vol0="33" phoffset0="0" vol1="33" phoffset1="244" vol2="33" pan0="0" phoffset2="87" pan1="33" pan2="-33" finel0="0" finer0="0" finel1="36" finer1="36" finel2="-36" finer2="-36" coarse0="0" coarse1="0" coarse2="0" userwavefile0="" userwavefile1="" userwavefile2="">
           <key/>

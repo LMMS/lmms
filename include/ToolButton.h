@@ -27,7 +27,6 @@
 #define TOOL_BUTTON_H
 
 #include <QToolButton>
-#include <QColor>
 
 namespace lmms::gui
 {

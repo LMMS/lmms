@@ -27,6 +27,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QCloseEvent>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QFontDatabase>

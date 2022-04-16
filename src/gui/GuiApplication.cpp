@@ -30,13 +30,12 @@
 #include "LmmsPalette.h"
 
 #include "AutomationEditor.h"
-#include "BBEditor.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
-#include "FxMixerView.h"
-#include "InstrumentTrack.h"
+#include "MixerView.h"
 #include "MainWindow.h"
 #include "MicrotunerConfig.h"
+#include "PatternEditor.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
@@ -44,6 +43,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QtGlobal>
+#include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
 
@@ -146,8 +146,8 @@ GuiApplication::GuiApplication()
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
-	m_fxMixerView = new FxMixerView;
-	connect(m_fxMixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	m_mixerView = new MixerView;
+	connect(m_mixerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
@@ -161,9 +161,9 @@ GuiApplication::GuiApplication()
 	m_microtunerConfig = new MicrotunerConfig;
 	connect(m_microtunerConfig, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing beat/bassline editor"));
-	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
-	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	displayInitProgress(tr("Preparing pattern editor"));
+	m_patternEditor = new PatternEditorWindow(Engine::patternStore());
+	connect(m_patternEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing piano roll"));
 	m_pianoRoll = new PianoRollWindow();
@@ -197,15 +197,15 @@ void GuiApplication::displayInitProgress(const QString &msg)
 
 void GuiApplication::childDestroyed(QObject *obj)
 {
-	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->fxMixerView(), etc
+	// when any object that can be reached via getGUI()->mainWindow(), getGUI()->mixerView(), etc
 	//   is destroyed, ensure that their accessor functions will return null instead of a garbage pointer.
 	if (obj == m_mainWindow)
 	{
 		m_mainWindow = nullptr;
 	}
-	else if (obj == m_fxMixerView)
+	else if (obj == m_mixerView)
 	{
-		m_fxMixerView = nullptr;
+		m_mixerView = nullptr;
 	}
 	else if (obj == m_songEditor)
 	{
@@ -215,9 +215,9 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_automationEditor = nullptr;
 	}
-	else if (obj == m_bbEditor)
+	else if (obj == m_patternEditor)
 	{
-		m_bbEditor = nullptr;
+		m_patternEditor = nullptr;
 	}
 	else if (obj == m_pianoRoll)
 	{

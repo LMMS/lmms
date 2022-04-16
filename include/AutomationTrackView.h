@@ -26,11 +26,16 @@
 #ifndef AUTOMATION_TRACK_VIEW_H
 #define AUTOMATION_TRACK_VIEW_H
 
-#include "AutomationTrack.h"
 #include "TrackView.h"
 
-namespace lmms::gui
+namespace lmms
 {
+
+class AutomationTrack;
+
+namespace gui
+{
+
 
 class AutomationTrackView : public TrackView
 {
@@ -43,6 +48,8 @@ public:
 } ;
 
 
-} // namespace lmms::gui
+} // namespace gui
+
+} // namespace lmms
 
 #endif

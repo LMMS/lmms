@@ -28,8 +28,6 @@
 
 #include <QDomElement>
 
-#include "Engine.h"
-#include "Song.h"
 
 namespace lmms
 {

@@ -23,14 +23,14 @@
  *
  */
 
-#include <QLayout>
+
+#include <QHBoxLayout>
 
 #include "LadspaControl.h"
 #include "LadspaControlView.h"
 #include "LadspaBase.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "TempoSyncKnob.h"
-#include "ToolTip.h"
 
 
 namespace lmms::gui
@@ -52,7 +52,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 	{
 		link = new LedCheckBox( "", this );
 		link->setModel( &m_ctl->m_linkEnabledModel );
-		ToolTip::add( link, tr( "Link channels" ) );
+		link->setToolTip(tr("Link channels"));
 		layout->addWidget( link );
 	}
 

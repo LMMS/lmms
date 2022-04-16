@@ -30,17 +30,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <lilv/lilv.h>
-#include <lv2.h>
+#include <lv2/lv2plug.in/ns/ext/buf-size/buf-size.h>
 #include <lv2/lv2plug.in/ns/ext/options/options.h>
 #include <QDebug>
-#include <QDir>
-#include <QLibrary>
 #include <QElapsedTimer>
 
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "Plugin.h"
-#include "PluginFactory.h"
 #include "Lv2ControlBase.h"
 #include "Lv2Options.h"
 #include "PluginIssue.h"
@@ -80,6 +76,10 @@ Lv2Manager::Lv2Manager() :
 	m_supportedFeatureURIs.insert(LV2_URID__map);
 	m_supportedFeatureURIs.insert(LV2_URID__unmap);
 	m_supportedFeatureURIs.insert(LV2_OPTIONS__options);
+	// min/max is always passed in the options
+	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__boundedBlockLength);
+	// block length is only changed initially in AudioEngine CTOR
+	m_supportedFeatureURIs.insert(LV2_BUF_SIZE__fixedBlockLength);
 
 	auto supportOpt = [this](Lv2UridCache::Id id)
 	{

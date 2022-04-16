@@ -29,7 +29,6 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <QtGlobal>
 #include <cstdint>
 
 

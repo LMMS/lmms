@@ -26,7 +26,7 @@
 
 #include "DataFile.h"
 
-#include <math.h>
+#include <cmath>
 #include <map>
 
 #include <QDebug>
@@ -45,6 +45,7 @@
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "Track.h"
 #include "PathUtil.h"
 
 #include "lmmsversion.h"
@@ -58,7 +59,7 @@ static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 // QMap with the DOM elements that access file resources
 const DataFile::ResourcesMap DataFile::ELEMENTS_WITH_RESOURCES = {
-{ "sampletco", {"src"} },
+{ "sampleclip", {"src"} },
 { "audiofileprocessor", {"src"} },
 };
 
@@ -74,7 +75,8 @@ const std::vector<DataFile::UpgradeMethod> DataFile::UPGRADE_METHODS = {
 	&DataFile::upgrade_1_1_91           ,   &DataFile::upgrade_1_2_0_rc3,
 	&DataFile::upgrade_1_3_0            ,   &DataFile::upgrade_noHiddenClipNames,
 	&DataFile::upgrade_automationNodes  ,   &DataFile::upgrade_extendedNoteRange,
-	&DataFile::upgrade_defaultTripleOscillatorHQ
+	&DataFile::upgrade_defaultTripleOscillatorHQ,
+	&DataFile::upgrade_mixerRename      ,   &DataFile::upgrade_bbTcoRename,
 };
 
 // Vector of all versions that have upgrade routines.
@@ -98,7 +100,7 @@ DataFile::typeDescStruct
 	{ DataFile::ClipboardData, "clipboard-data" },
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" },
-	{ DataFile::NotePattern, "pattern" }
+	{ DataFile::MidiClip, "midiclip" }
 } ;
 
 
@@ -203,7 +205,7 @@ bool DataFile::validate( QString extension )
 			return true;
 		}
 		break;
-	case Type::NotePattern:
+	case Type::MidiClip:
 		if (extension == "xpt" || extension == "xptz")
 		{
 			return true;
@@ -215,6 +217,9 @@ bool DataFile::validate( QString extension )
 				( extension == "xiz" && ! getPluginFactory()->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
+#ifdef LMMS_BUILD_LINUX
+				|| extension == "so"
+#endif
 #ifdef LMMS_HAVE_LV2
 				|| extension == "lv2"
 #endif
@@ -1765,10 +1770,75 @@ void DataFile::upgrade_defaultTripleOscillatorHQ()
 }
 
 
+// Remove FX prefix from mixer and related nodes
+void DataFile::upgrade_mixerRename()
+{
+	// Change nodename <fxmixer> to <mixer>
+	QDomNodeList fxmixer = elementsByTagName("fxmixer");
+	for (int i = 0; !fxmixer.item(i).isNull(); ++i)
+	{
+		fxmixer.item(i).toElement().setTagName("mixer");
+	}
+
+	// Change nodename <fxchannel> to <mixerchannel>
+	QDomNodeList fxchannel = elementsByTagName("fxchannel");
+	for (int i = 0; !fxchannel.item(i).isNull(); ++i)
+	{
+		fxchannel.item(i).toElement().setTagName("mixerchannel");
+	}
+
+	// Change the attribute fxch of element <instrumenttrack> to mixch
+	QDomNodeList fxch = elementsByTagName("instrumenttrack");
+	for(int i = 0; !fxch.item(i).isNull(); ++i)
+	{
+		if(fxch.item(i).toElement().hasAttribute("fxch"))
+		{
+			fxch.item(i).toElement().setAttribute("mixch", fxch.item(i).toElement().attribute("fxch"));
+			fxch.item(i).toElement().removeAttribute("fxch");
+		}
+	}
+}
+
+
+// Rename BB to pattern and TCO to clip
+void DataFile::upgrade_bbTcoRename()
+{
+	std::vector<std::pair<const char *, const char *>> names {
+		{"automationpattern", "automationclip"},
+		{"bbtco", "patternclip"},
+		{"pattern", "midiclip"},
+		{"sampletco", "sampleclip"},
+		{"bbtrack", "patterntrack"},
+		{"bbtrackcontainer", "patternstore"},
+	};
+	// Replace names of XML tags
+	for (auto name : names)
+	{
+		QDomNodeList elements = elementsByTagName(name.first);
+		for (int i = 0; !elements.item(i).isNull(); ++i)
+		{
+			elements.item(i).toElement().setTagName(name.second);
+		}
+	}
+	// Replace "Beat/Bassline" with "Pattern" in track names
+	QDomNodeList elements = elementsByTagName("track");
+	for (int i = 0; !elements.item(i).isNull(); ++i)
+	{
+		auto e = elements.item(i).toElement();
+		static_assert(Track::PatternTrack == 1, "Must be type=1 for backwards compatibility");
+		if (e.attribute("type").toInt() == Track::PatternTrack)
+		{
+			e.setAttribute("name", e.attribute("name").replace("Beat/Bassline", "Pattern"));
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_fileVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_fileVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();

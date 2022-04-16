@@ -1,10 +1,4 @@
 #include <QDomDocument>
-#include <QDir>
-#include <QApplication>
-#include <QMessageBox>
-#include <QProgressDialog>
-#include <QTextStream>
-#include <stdlib.h>
 
 #include "LocalFileMng.h"
 #include "HydrogenImport.h"
@@ -13,11 +7,9 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Note.h"
-#include "Pattern.h"
+#include "MidiClip.h"
+#include "PatternStore.h"
 #include "Track.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
-#include "Instrument.h"
 
 #include "plugin_export.h"
 
@@ -228,7 +220,9 @@ bool HydrogenImport::readSong()
 
 					if ( nLayer == 0 ) 
 					{
-						drum_track[sId] = ( InstrumentTrack * ) Track::create( Track::InstrumentTrack,Engine::getBBTrackContainer() );
+						drum_track[sId] = static_cast<InstrumentTrack*>(
+							Track::create(Track::InstrumentTrack, Engine::patternStore())
+						);
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
 						ins = drum_track[sId]->loadInstrument( "audiofileprocessor" );
@@ -252,7 +246,7 @@ bool HydrogenImport::readSong()
 	}
 	QDomNode patterns = songNode.firstChildElement( "patternList" );
 	int pattern_count = 0;
-	int nbb = Engine::getBBTrackContainer()->numOfBBs();
+	int existing_patterns = Engine::patternStore()->numOfPatterns();
 	QDomNode patternNode =  patterns.firstChildElement( "pattern" );
 	int pn = 1;
 	while (  !patternNode.isNull()  ) 
@@ -260,7 +254,7 @@ bool HydrogenImport::readSong()
 		if ( pn > 0 ) 
 		{
 			pattern_count++;
-			s->addBBTrack();
+			s->addPatternTrack();
 			pn = 0;
 		}
 		QString sName;	// name
@@ -283,9 +277,9 @@ bool HydrogenImport::readSong()
 				QString nNoteOff = LocalFileMng::readXmlString( noteNode, "note_off", "false", false, false );
 
 				QString instrId = LocalFileMng::readXmlString( noteNode, "instrument", 0,false, false );
-				int i = pattern_count - 1 + nbb;
+				int i = pattern_count - 1 + existing_patterns;
 				pattern_id[sName] = pattern_count - 1;
-				Pattern*p = dynamic_cast<Pattern*>( drum_track[instrId]->getTCO( i ) );
+				MidiClip*p = dynamic_cast<MidiClip*>( drum_track[instrId]->getClip( i ) );
 				Note n; 
 				n.setPos( nPosition );
 				if ( (nPosition + 48) <= nSize ) 
@@ -306,7 +300,7 @@ bool HydrogenImport::readSong()
 		}
 		patternNode = ( QDomNode ) patternNode.nextSiblingElement( "pattern" );
 	}
-	// Pattern sequence
+	// MidiClip sequence
 	QDomNode patternSequenceNode = songNode.firstChildElement( "patternSequence" );
 	QDomNode groupNode = patternSequenceNode.firstChildElement( "group" );
 	int pos = 0;
@@ -320,8 +314,8 @@ bool HydrogenImport::readSong()
 			patternId = ( QDomNode ) patternId.nextSiblingElement( "patternID" );
 
 			int i = pattern_id[patId]+song_num_tracks;
-			Track *t = ( BBTrack * ) s->tracks().at( i );
-			t->createTCO(pos);
+			Track* t = s->tracks().at(i);
+			t->createClip(pos);
 
 			if ( pattern_length[patId] > best_length ) 
 			{

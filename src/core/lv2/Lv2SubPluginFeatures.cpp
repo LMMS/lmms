@@ -28,7 +28,6 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
 

@@ -30,8 +30,8 @@
 #ifndef CONTROLLER_CONNECTION_H
 #define CONTROLLER_CONNECTION_H
 
-#include <QtCore/QObject>
-#include <QtCore/QVector>
+#include <QObject>
+#include <QVector>
 
 #include "Controller.h"
 #include "JournallingObject.h"

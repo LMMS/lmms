@@ -27,7 +27,7 @@
 #define TAB_WIDGET_H
 
 #include <QWidget>
-#include <QtCore/QMap>
+#include <QMap>
 
 namespace lmms::gui
 {

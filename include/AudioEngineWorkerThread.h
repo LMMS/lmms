@@ -25,7 +25,7 @@
 #ifndef AUDIO_ENGINE_WORKER_THREAD_H
 #define AUDIO_ENGINE_WORKER_THREAD_H
 
-#include <QtCore/QThread>
+#include <QThread>
 
 #include <atomic>
 

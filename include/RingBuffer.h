@@ -27,9 +27,9 @@
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 
+#include <cmath>
 #include <QObject>
 #include "lmms_basics.h"
-#include "lmms_math.h"
 #include "MemoryManager.h"
 
 

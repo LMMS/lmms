@@ -26,23 +26,22 @@
 #ifndef XPRESSIVE_H
 #define XPRESSIVE_H
 
-#include <QPlainTextEdit>
+
+#include <QTextEdit>
 
 #include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
-#include "LedCheckbox.h"
-#include "PixmapButton.h"
 
 #include "ExprSynth.h"
+
+class QPlainTextEdit;
 
 namespace lmms
 {
 
 
 class oscillator;
-class XpressiveView;
 
 const int	W1_EXPR = 0;
 const int	W2_EXPR = 1;
@@ -53,7 +52,12 @@ const int	NUM_EXPRS = 5;
 
 
 class ExprFront;
+
+namespace gui
+{
 class SubWindow;
+class XpressiveView;
+}
 
 
 

@@ -30,9 +30,10 @@
 #ifdef LMMS_HAVE_ALSA
 #include <alsa/asoundlib.h>
 
-#include <QtCore/QMutex>
-#include <QtCore/QThread>
-#include <QtCore/QTimer>
+#include <QMap>
+#include <QMutex>
+#include <QThread>
+#include <QTimer>
 
 
 #include "MidiClient.h"

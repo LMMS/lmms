@@ -25,16 +25,12 @@
 
 #include "EqControlsDialog.h"
 
-#include <QGraphicsView>
-#include <QLayout>
 #include <QWidget>
 
 #include "AutomatableButton.h"
 #include "embed.h"
-#include "Engine.h"
 #include "Knob.h"
-#include "Fader.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
 
 #include "EqControls.h"
@@ -204,13 +200,13 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	lpBtnGrp->addButton( lp12Button );
 	lpBtnGrp->addButton( lp24Button );
 	lpBtnGrp->addButton( lp48Button );
-	lpBtnGrp->setModel( &m_controls->m_lpTypeModel, false);
+	lpBtnGrp->setModel(&m_controls->m_lpTypeModel);
 
 	automatableButtonGroup *hpBtnGrp = new automatableButtonGroup( this, tr( "HP group" ) );
 	hpBtnGrp->addButton( hp12Button );
 	hpBtnGrp->addButton( hp24Button );
 	hpBtnGrp->addButton( hp48Button );
-	hpBtnGrp->setModel( &m_controls->m_hpTypeModel,false);
+	hpBtnGrp->setModel(&m_controls->m_hpTypeModel);
 }
 
 

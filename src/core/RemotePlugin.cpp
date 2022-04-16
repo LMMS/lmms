@@ -22,22 +22,23 @@
  *
  */
 
-#define COMPILE_REMOTE_PLUGIN_BASE
+#include "RemotePlugin.h"
+
 //#define DEBUG_REMOTE_PLUGIN
 #ifdef DEBUG_REMOTE_PLUGIN
 #include <QDebug>
 #endif
 
 #include "BufferManager.h"
-#include "RemotePlugin.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 
 #ifndef SYNC_WITH_SHM_FIFO
-#include <QtCore/QUuid>
+#include <QUuid>
 #include <sys/socket.h>
 #include <sys/un.h>
 #endif

@@ -25,7 +25,6 @@
 #ifndef SAMPLE_TRACK_VIEW_H
 #define SAMPLE_TRACK_VIEW_H
 
-#include "SampleTrack.h"
 
 #include "TrackView.h"
 
@@ -66,7 +65,7 @@ public:
 	}
 
 
-	QMenu * createFxMenu( QString title, QString newFxLabel ) override;
+	QMenu * createMixerMenu( QString title, QString newMixerLabel ) override;
 
 
 public slots:
@@ -85,8 +84,8 @@ protected:
 	void dropEvent(QDropEvent *de) override;
 
 private slots:
-	void assignFxLine( int channelIndex );
-	void createFxLine();
+	void assignMixerLine( int channelIndex );
+	void createMixerLine();
 
 
 private:

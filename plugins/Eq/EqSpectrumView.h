@@ -23,13 +23,11 @@
 #ifndef EQSPECTRUMVIEW_H
 #define EQSPECTRUMVIEW_H
 
-#include <QPainter>
 #include <QPainterPath>
 #include <QWidget>
 
 #include "fft_helpers.h"
 #include "lmms_basics.h"
-#include "lmms_math.h"
 
 namespace lmms
 {

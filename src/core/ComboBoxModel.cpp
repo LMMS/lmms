@@ -23,7 +23,8 @@
  */
 
 #include "ComboBoxModel.h"
-#include "embed.h"
+
+#include <cassert>
 
 namespace lmms
 {

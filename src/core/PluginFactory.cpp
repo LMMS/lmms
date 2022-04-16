@@ -24,16 +24,15 @@
 
 #include "PluginFactory.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+#include <QLibrary>
 #include <memory>
 #include "lmmsconfig.h"
 
 #include "ConfigManager.h"
 #include "Plugin.h"
-#include "embed.h"
 
 // QT qHash specialization, needs to be in global namespace
 qint64 qHash(const QFileInfo& fi)

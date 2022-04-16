@@ -30,7 +30,7 @@
 #include "InstrumentView.h"
 #include "Engine.h"
 
-#include <string.h>
+#include <cstring>
 
 #include "AudioEngine.h"
 

@@ -26,8 +26,8 @@
 #ifndef SAMPLE_RECORD_HANDLE_H
 #define SAMPLE_RECORD_HANDLE_H
 
-#include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QList>
+#include <QPair>
 
 #include "PlayHandle.h"
 #include "TimePos.h"
@@ -36,16 +36,16 @@ namespace lmms
 {
 
 
-class BBTrack;
+class PatternTrack;
 class SampleBuffer;
-class SampleTCO;
+class SampleClip;
 class Track;
 
 
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	SampleRecordHandle( SampleTCO* tco );
+	SampleRecordHandle( SampleClip* clip );
 	virtual ~SampleRecordHandle();
 
 	void play( sampleFrame * _working_buffer ) override;
@@ -67,8 +67,8 @@ private:
 	TimePos m_minLength;
 
 	Track * m_track;
-	BBTrack * m_bbTrack;
-	SampleTCO * m_tco;
+	PatternTrack* m_patternTrack;
+	SampleClip * m_clip;
 
 } ;
 

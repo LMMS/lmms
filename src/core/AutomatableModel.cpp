@@ -27,7 +27,7 @@
 #include "lmms_math.h"
 
 #include "AudioEngine.h"
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "ControllerConnection.h"
 #include "LocaleHelper.h"
 #include "ProjectJournal.h"
@@ -90,7 +90,7 @@ AutomatableModel::~AutomatableModel()
 
 bool AutomatableModel::isAutomated() const
 {
-	return AutomationPattern::isAutomated( this );
+	return AutomationClip::isAutomated( this );
 }
 
 
@@ -179,13 +179,13 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 void AutomatableModel::loadSettings( const QDomElement& element, const QString& name )
 {
 	// compat code
-	QDomNode node = element.namedItem( AutomationPattern::classNodeName() );
+	QDomNode node = element.namedItem( AutomationClip::classNodeName() );
 	if( node.isElement() )
 	{
 		node = node.namedItem( name );
 		if( node.isElement() )
 		{
-			AutomationPattern * p = AutomationPattern::globalAutomationPattern( this );
+			AutomationClip * p = AutomationClip::globalAutomationClip( this );
 			p->loadSettings( node.toElement() );
 			setValue( p->valueAt( 0 ) );
 			// in older projects we sometimes have odd automations
@@ -721,57 +721,57 @@ void AutomatableModel::reset()
 
 float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 {
-	// get patterns that connect to this model
-	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
-	if( patterns.isEmpty() )
+	// get clips that connect to this model
+	QVector<AutomationClip *> clips = AutomationClip::clipsForModel( this );
+	if( clips.isEmpty() )
 	{
-		// if no such patterns exist, return current value
+		// if no such clips exist, return current value
 		return m_value;
 	}
 	else
 	{
-		// of those patterns:
-		// find the patterns which overlap with the time position
-		QVector<AutomationPattern *> patternsInRange;
-		for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+		// of those clips:
+		// find the clips which overlap with the time position
+		QVector<AutomationClip *> clipsInRange;
+		for( QVector<AutomationClip *>::ConstIterator it = clips.begin(); it != clips.end(); it++ )
 		{
 			int s = ( *it )->startPosition();
 			int e = ( *it )->endPosition();
-			if( s <= time && e >= time ) { patternsInRange += ( *it ); }
+			if( s <= time && e >= time ) { clipsInRange += ( *it ); }
 		}
 
-		AutomationPattern * latestPattern = nullptr;
+		AutomationClip * latestClip = nullptr;
 
-		if( ! patternsInRange.isEmpty() )
+		if( ! clipsInRange.isEmpty() )
 		{
-			// if there are more than one overlapping patterns, just use the first one because
-			// multiple pattern behaviour is undefined anyway
-			latestPattern = patternsInRange[0];
+			// if there are more than one overlapping clips, just use the first one because
+			// multiple clip behaviour is undefined anyway
+			latestClip = clipsInRange[0];
 		}
 		else
-		// if we find no patterns at the exact time, we need to search for the last pattern before time and use that
+		// if we find no clips at the exact time, we need to search for the last clip before time and use that
 		{
 			int latestPosition = 0;
 
-			for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+			for( QVector<AutomationClip *>::ConstIterator it = clips.begin(); it != clips.end(); it++ )
 			{
 				int e = ( *it )->endPosition();
 				if( e <= time && e > latestPosition )
 				{
 					latestPosition = e;
-					latestPattern = ( *it );
+					latestClip = ( *it );
 				}
 			}
 		}
 
-		if( latestPattern )
+		if( latestClip )
 		{
 			// scale/fit the value appropriately and return it
-			const float value = latestPattern->valueAt( time - latestPattern->startPosition() );
+			const float value = latestClip->valueAt( time - latestClip->startPosition() );
 			const float scaled_value = scaledValue( value );
 			return fittedValue( scaled_value );
 		}
-		// if we still find no pattern, the value at that time is undefined so
+		// if we still find no clip, the value at that time is undefined so
 		// just return current value as the best we can do
 		else return m_value;
 	}
