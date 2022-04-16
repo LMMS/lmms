@@ -44,6 +44,11 @@ class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
 
+namespace gui
+{
+class GuiApplication;
+}
+
 
 class LMMS_EXPORT Engine : public QObject
 {
@@ -146,7 +151,7 @@ private:
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static Engine* s_instanceOfMe;
 
-	friend class GuiApplication;
+	friend class gui::GuiApplication;
 };
 
 

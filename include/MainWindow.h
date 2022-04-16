@@ -48,6 +48,7 @@ namespace gui
 class PluginView;
 class SubWindow;
 class ToolButton;
+class GuiApplication;
 
 
 class MainWindow : public QMainWindow
