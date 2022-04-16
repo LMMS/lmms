@@ -395,7 +395,8 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopEnd:
 		{
 			const int i = m_action - MoveLoopBegin; // i == 0 || i == 1
-			if( event->modifiers() & Qt::ControlModifier )
+			const bool control = event->modifiers() & Qt::ControlModifier;
+			if (control)
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;
@@ -407,18 +408,13 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 				m_loopPos[i] = t.quantize(m_snapSize);
 			}
 			// Catch begin == end
-			if( m_loopPos[0] == m_loopPos[1] )
+			if (m_loopPos[0] == m_loopPos[1])
 			{
+				const int offset = control ? 1 : m_snapSize * TimePos::ticksPerBar();
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
-				{
-					m_loopPos[0] -= m_snapSize * TimePos::ticksPerBar();
-				}
-				else
-				{
-					m_loopPos[1] += m_snapSize * TimePos::ticksPerBar();
-				}
+				if (m_action == MoveLoopBegin) { m_loopPos[0] -= offset; }
+				else { m_loopPos[1] += offset; }
 			}
 			update();
 			break;
