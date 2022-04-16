@@ -1,6 +1,7 @@
 #ifndef SPAPROC_H
 #define SPAPROC_H
 
+#include <memory>
 #include <QMap>
 #include <spa/spa_fwd.h>
 #include <spa/audio_fwd.h>

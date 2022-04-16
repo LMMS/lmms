@@ -41,7 +41,7 @@
 #include "SpaProc.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 {
