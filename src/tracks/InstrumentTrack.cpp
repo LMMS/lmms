@@ -26,17 +26,20 @@
 #include <QDebug>
 #include <QTextStream>
 #include "AudioEngine.h"
-#include "AutomationPattern.h"
-#include "BBTrack.h"
+#include "AutomationClip.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "DataFile.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
+#include "Keymap.h"
 #include "MidiClient.h"
+#include "MidiClip.h"
 #include "MixHelpers.h"
-#include "Pattern.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
+#include "Pitch.h"
 #include "Song.h"
 
 
@@ -58,7 +61,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_audioPort( tr( "unnamed_track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
-	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
+	m_mixerChannelModel( 0, 0, 0, this, tr( "Mixer channel" ) ),
 	m_useMasterPitchModel( true, this, tr( "Master pitch") ),
 	m_instrument( nullptr ),
 	m_soundShaping( this ),
@@ -73,7 +76,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_firstKeyModel.setInitValue(0);
 	m_lastKeyModel.setInitValue(NumKeys - 1);
 
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -102,7 +105,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect(&m_baseNoteModel, SIGNAL(dataChanged()), this, SLOT(updateBaseNote()), Qt::DirectConnection);
 	connect(&m_pitchModel, SIGNAL(dataChanged()), this, SLOT(updatePitch()), Qt::DirectConnection);
 	connect(&m_pitchRangeModel, SIGNAL(dataChanged()), this, SLOT(updatePitchRange()), Qt::DirectConnection);
-	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()), Qt::DirectConnection);
+	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()), Qt::DirectConnection);
 }
 
 
@@ -216,8 +219,8 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayPattern &&
-				n && n->isBbTrackMuted() ) || ! m_instrument )
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip &&
+				n && n->isPatternTrackMuted() ) || ! m_instrument )
 	{
 		return;
 	}
@@ -653,9 +656,9 @@ void InstrumentTrack::updatePitchRange()
 
 
 
-void InstrumentTrack::updateEffectChannel()
+void InstrumentTrack::updateMixerChannel()
 {
-	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
+	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
 }
 
 
@@ -681,7 +684,7 @@ void InstrumentTrack::removeMidiPortNode( DataFile & _dataFile )
 
 
 bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
-							const f_cnt_t _offset, int _tco_num )
+							const f_cnt_t _offset, int _clip_num )
 {
 	if( ! m_instrument || ! tryLock() )
 	{
@@ -689,20 +692,20 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 	const float frames_per_tick = Engine::framesPerTick();
 
-	tcoVector tcos;
-	::BBTrack * bb_track = nullptr;
-	if( _tco_num >= 0 )
+	clipVector clips;
+	::PatternTrack * pattern_track = nullptr;
+	if( _clip_num >= 0 )
 	{
-		TrackContentObject * tco = getTCO( _tco_num );
-		tcos.push_back( tco );
-		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		Clip * clip = getClip( _clip_num );
+		clips.push_back( clip );
+		if (trackContainer() == Engine::patternStore())
 		{
-			bb_track = BBTrack::findBBTrack( _tco_num );
+			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 		}
 	}
 	else
 	{
-		getTCOsInRange( tcos, _start, _start + static_cast<int>(
+		getClipsInRange( clips, _start, _start + static_cast<int>(
 					_frames / frames_per_tick ) );
 	}
 
@@ -713,7 +716,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		( *it )->processTimePos( _start );
 	}
 
-	if ( tcos.size() == 0 )
+	if ( clips.size() == 0 )
 	{
 		unlock();
 		return false;
@@ -721,25 +724,25 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	bool played_a_note = false;	// will be return variable
 
-	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
+	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
 	{
-		Pattern* p = dynamic_cast<Pattern*>( *it );
-		// everything which is not a pattern won't be played
-		// A pattern playing in the Piano Roll window will always play
-		if(p == nullptr ||
-			(Engine::getSong()->playMode() != Song::Mode_PlayPattern
+		MidiClip* c = dynamic_cast<MidiClip*>( *it );
+		// everything which is not a MIDI clip won't be played
+		// A MIDI clip playing in the Piano Roll window will always play
+		if(c == nullptr ||
+			(Engine::getSong()->playMode() != Song::Mode_PlayMidiClip
 			&& (*it)->isMuted()))
 		{
 			continue;
 		}
 		TimePos cur_start = _start;
-		if( _tco_num < 0 )
+		if( _clip_num < 0 )
 		{
-			cur_start -= p->startPosition();
+			cur_start -= c->startPosition();
 		}
 
-		// get all notes from the given pattern...
-		const NoteVector & notes = p->notes();
+		// get all notes from the given clip...
+		const NoteVector & notes = c->notes();
 		// ...and set our index to zero
 		NoteVector::ConstIterator nit = notes.begin();
 
@@ -764,13 +767,13 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 				cur_note->length().frames( frames_per_tick );
 
 			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
-			notePlayHandle->setBBTrack( bb_track );
+			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
-			if( _tco_num < 0 )
+			if( _clip_num < 0 )
 			{
-				// then set song-global offset of pattern in order to
+				// then set song-global offset of clip in order to
 				// properly perform the note detuning
-				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
+				notePlayHandle->setSongGlobalParentOffset( c->startPosition() );
 			}
 
 			Engine::audioEngine()->addPlayHandle( notePlayHandle );
@@ -785,9 +788,9 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackContentObject* InstrumentTrack::createTCO(const TimePos & pos)
+Clip* InstrumentTrack::createClip(const TimePos & pos)
 {
-	Pattern* p = new Pattern(this);
+	MidiClip* p = new MidiClip(this);
 	p->movePosition(pos);
 	return p;
 }
@@ -810,7 +813,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_pitchModel.saveSettings( doc, thisElement, "pitch" );
 	m_pitchRangeModel.saveSettings( doc, thisElement, "pitchrange" );
 
-	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
+	m_mixerChannelModel.saveSettings( doc, thisElement, "mixch" );
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
 	m_firstKeyModel.saveSettings(doc, thisElement, "firstkey");
 	m_lastKeyModel.saveSettings(doc, thisElement, "lastkey");
@@ -873,10 +876,10 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
+	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels()-1 );
 	if ( !m_previewMode )
 	{
-		m_effectChannelModel.loadSettings( thisElement, "fxch" );
+		m_mixerChannelModel.loadSettings( thisElement, "mixch" );
 	}
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_firstKeyModel.loadSettings(thisElement, "firstkey");
@@ -945,7 +948,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			// compat code - if node-name doesn't match any known
 			// one, we assume that it is an instrument-plugin
 			// which we'll try to load
-			else if(AutomationPattern::classNodeName() != node.nodeName() &&
+			else if(AutomationClip::classNodeName() != node.nodeName() &&
 					ControllerConnection::classNodeName() != node.nodeName() &&
 					!node.toElement().hasAttribute( "id" ))
 			{
@@ -983,14 +986,24 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 void InstrumentTrack::replaceInstrument(DataFile dataFile)
 {
-	// loadSettings clears the FX channel, so we save it here and set it back later
-	int effectChannel = effectChannelModel()->value();
+	// loadSettings clears the mixer channel, so we save it here and set it back later
+	int mixerChannel = mixerChannelModel()->value();
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
 	setSimpleSerializing();
+	
+	//Replacing an instrument shouldn't change the solo/mute state.
+	bool oldMute = isMuted();
+	bool oldSolo = isSolo();
+	bool oldMutedBeforeSolo = isMutedBeforeSolo();
+
 	loadSettings(dataFile.content().toElement());
 	
-	m_effectChannelModel.setValue(effectChannel);
+	setMuted(oldMute);
+	setSolo(oldSolo);
+	setMutedBeforeSolo(oldMutedBeforeSolo);
+	
+	m_mixerChannelModel.setValue(mixerChannel);
 	Engine::getSong()->setModified();
 }
 

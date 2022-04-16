@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <lilv/lilv.h>
+#include <memory>
 
 #include "DataFile.h"
 #include "LinkedModelGroups.h"

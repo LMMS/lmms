@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Lv2Instrument.h - implementation of LV2 instrument
  *
  * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>

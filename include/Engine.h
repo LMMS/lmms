@@ -26,8 +26,8 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <QtCore/QString>
-#include <QtCore/QObject>
+#include <QString>
+#include <QObject>
 
 
 #include "lmmsconfig.h"
@@ -35,8 +35,8 @@
 #include "lmms_basics.h"
 
 class AudioEngine;
-class BBTrackContainer;
-class FxMixer;
+class Mixer;
+class PatternStore;
 class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
@@ -67,9 +67,9 @@ public:
 		return s_audioEngine;
 	}
 
-	static FxMixer * fxMixer()
+	static Mixer * mixer()
 	{
-		return s_fxMixer;
+		return s_mixer;
 	}
 
 	static Song * getSong()
@@ -77,9 +77,9 @@ public:
 		return s_song;
 	}
 
-	static BBTrackContainer * getBBTrackContainer()
+	static PatternStore * patternStore()
 	{
-		return s_bbTrackContainer;
+		return s_patternStore;
 	}
 
 	static ProjectJournal * projectJournal()
@@ -155,9 +155,9 @@ private:
 
 	// core
 	static AudioEngine *s_audioEngine;
-	static FxMixer * s_fxMixer;
+	static Mixer * s_mixer;
 	static Song * s_song;
-	static BBTrackContainer * s_bbTrackContainer;
+	static PatternStore * s_patternStore;
 	static ProjectJournal * s_projectJournal;
 
 #ifdef LMMS_HAVE_LV2

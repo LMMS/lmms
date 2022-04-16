@@ -24,23 +24,21 @@
  */
 
 #include <QApplication>
-#include <QLayout>
-#include <QMdiSubWindow>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QMdiArea>
 #include <QMessageBox>
+#include <QVBoxLayout>
 
 #include "Song.h"
 #include "embed.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
-#include "GroupBox.h"
 #include "Clipboard.h"
 #include "ControllerConnection.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 #include "ControllerRackView.h"
 #include "ControllerView.h"
 #include "LfoController.h"
+#include "SubWindow.h"
 #include "StringPairDrag.h"
 
 

@@ -26,11 +26,10 @@
 
 #include <QLabel>
 #include <QPushButton>
+#include <QHBoxLayout>
 #include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QPainter>
 #include <QInputDialog>
-#include <QLayout>
+#include <QVBoxLayout>
 
 #include "ControllerView.h"
 
@@ -38,13 +37,11 @@
 #include "Clipboard.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
-#include "gui_templates.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
+#include "SubWindow.h"
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :

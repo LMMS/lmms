@@ -31,12 +31,8 @@
 
 // qt
 #include <QCloseEvent>
-#include <QCompleter>
-#include <QGridLayout>
-#include <QLineEdit>
-#include <QScrollArea>
-#include <QStringListModel>
-#include <QtCore/QMutex>
+#include <QDomElement>
+#include <QMutex>
 
 // carla/source/includes
 #include "carlabase_export.h"
@@ -54,16 +50,22 @@
 #endif
 
 // lmms/include/
-#include "EffectControls.h"
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
 #include "SubWindow.h"
 
 class QPushButton;
 class QComboBox;
+class QCompleter;
+class QGridLayout;
+class QHBoxLayout;
+class QLineEdit;
+class QStringListModel;
+class QScrollArea;
 
 class CarlaParamsView;
+class Knob;
 
 class CarlaParamFloatModel : public FloatModel
 {

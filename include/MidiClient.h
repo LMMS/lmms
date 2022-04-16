@@ -25,16 +25,16 @@
 #ifndef MIDI_CLIENT_H
 #define MIDI_CLIENT_H
 
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
+#include <QStringList>
+#include <QVector>
 
 
 #include "MidiEvent.h"
-#include "MidiEventProcessor.h"
-#include "TabWidget.h"
 
 
 class MidiPort;
+class QObject;
+class TimePos;
 
 
 // base-class for all MIDI-clients

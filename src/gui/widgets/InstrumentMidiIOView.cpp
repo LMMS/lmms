@@ -22,10 +22,10 @@
  *
  */
 
-#include <QMenu>
 #include <QToolButton>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QLayout>
+#include <QVBoxLayout>
 
 #include "InstrumentMidiIOView.h"
 #include "MidiPortMenu.h"
@@ -36,8 +36,6 @@
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
 #include "MidiClient.h"
-#include "InstrumentTrack.h"
-#include "LedCheckbox.h"
 
 
 InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
@@ -64,8 +62,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiInputLayout->addWidget( m_inputChannelSpinBox );
 
 	m_fixedInputVelocitySpinBox = new LcdSpinBox( 3, m_midiInputGroupBox );
-	m_fixedInputVelocitySpinBox->setDisplayOffset( 1 );
-	m_fixedInputVelocitySpinBox->addTextForValue( 0, "---" );
+	m_fixedInputVelocitySpinBox->addTextForValue( -1, "---" );
 	/*: This string must be be short, its width must be less than
 	 *  width of LCD spin-box of three digits */
 	m_fixedInputVelocitySpinBox->setLabel( tr( "VELOC" ) );
@@ -95,8 +92,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->addWidget( m_outputChannelSpinBox );
 
 	m_fixedOutputVelocitySpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
-	m_fixedOutputVelocitySpinBox->setDisplayOffset( 1 );
-	m_fixedOutputVelocitySpinBox->addTextForValue( 0, "---" );
+	m_fixedOutputVelocitySpinBox->addTextForValue( -1, "---" );
 	/*: This string must be be short, its width must be less than
 	 *  width of LCD spin-box of three digits */
 	m_fixedOutputVelocitySpinBox->setLabel( tr( "VELOC" ) );
@@ -111,8 +107,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->addWidget( m_outputProgramSpinBox );
 
 	m_fixedOutputNoteSpinBox = new LcdSpinBox( 3, m_midiOutputGroupBox );
-	m_fixedOutputNoteSpinBox->setDisplayOffset( 1 );
-	m_fixedOutputNoteSpinBox->addTextForValue( 0, "---" );
+	m_fixedOutputNoteSpinBox->addTextForValue( -1, "---" );
 	/*: This string must be be short, its width must be less than
 	 *  width of LCD spin-box of three digits */
 	m_fixedOutputNoteSpinBox->setLabel( tr( "NOTE" ) );

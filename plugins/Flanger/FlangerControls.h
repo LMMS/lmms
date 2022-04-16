@@ -26,7 +26,6 @@
 #define FLANGERCONTROLS_H
 
 #include "EffectControls.h"
-#include "Knob.h"
 #include "FlangerControlsDialog.h"
 
 

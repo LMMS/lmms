@@ -26,7 +26,6 @@
 
 #include <QDomElement>
 
-#include "PeakController.h"
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
 #include "Song.h"

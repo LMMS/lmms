@@ -24,9 +24,9 @@
  */
 
 
-#include <QLayout>
-#include <QPushButton>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 
 #include "MeterDialog.h"
 #include "MeterModel.h"

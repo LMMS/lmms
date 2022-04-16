@@ -27,7 +27,6 @@
 
 #include "EffectControls.h"
 #include "ReverbSCControlDialog.h"
-#include "Knob.h"
 
 
 class ReverbSCEffect;

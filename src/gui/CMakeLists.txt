@@ -5,18 +5,16 @@ SET(LMMS_SRCS
 	gui/AudioAlsaSetupWidget.cpp
 	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
-	gui/AutomationPatternView.cpp
+	gui/AutomationClipView.cpp
 	gui/AutomationTrackView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
-	gui/BBTCOView.cpp
-	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
 	gui/ExportProjectDialog.cpp
 	gui/FileBrowser.cpp
-	gui/FxMixerView.cpp
+	gui/MixerView.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
 	gui/InstrumentTrackView.cpp
@@ -28,14 +26,16 @@ SET(LMMS_SRCS
 	gui/MainApplication.cpp
 	gui/MainWindow.cpp
 	gui/MidiCCRackView.cpp
+	gui/MidiClipView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
-	gui/PatternView.cpp
+	gui/PatternClipView.cpp
+	gui/PatternTrackView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
-	gui/SampleTCOView.cpp
+	gui/SampleClipView.cpp
 	gui/SampleTrackView.cpp
 	gui/SampleTrackWindow.cpp
 	gui/SetupDialog.cpp
@@ -45,7 +45,7 @@ SET(LMMS_SRCS
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
-	gui/TrackContentObjectView.cpp
+	gui/ClipView.cpp
 	gui/TrackView.cpp
 
 	gui/dialogs/FileDialog.cpp
@@ -53,8 +53,8 @@ SET(LMMS_SRCS
 	gui/dialogs/ColorChooser.cpp
 
 	gui/editors/AutomationEditor.cpp
-	gui/editors/BBEditor.cpp
 	gui/editors/Editor.cpp
+	gui/editors/PatternEditor.cpp
 	gui/editors/PianoRoll.cpp
 	gui/editors/SongEditor.cpp
 
@@ -75,8 +75,8 @@ SET(LMMS_SRCS
 	gui/widgets/EnvelopeAndLfoView.cpp
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
-	gui/widgets/FxLine.cpp
-	gui/widgets/FxLineLcdSpinBox.cpp
+	gui/widgets/MixerLine.cpp
+	gui/widgets/MixerLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp

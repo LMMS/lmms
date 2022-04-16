@@ -27,20 +27,20 @@
 #define _VESTIGE_H
 
 
+#include <QMdiSubWindow>
 #include <QMutex>
-#include <QLayout>
-#include <QScrollArea>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "CustomTextKnob.h"
-#include "SubWindow.h"
-#include "AutomatableModel.h"
 
 
 class QPixmap;
 class QPushButton;
+class QScrollArea;
 
+class CustomTextKnob;
+class FloatModel;
+class QGridLayout;
 class PixmapButton;
 class VstPlugin;
 

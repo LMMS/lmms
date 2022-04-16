@@ -24,7 +24,6 @@
 
 #include <memory>
 #include <QApplication>
-#include <QBitmap>
 #include <QFontMetrics>
 #include <QInputDialog>
 #include <QMouseEvent>
@@ -46,7 +45,6 @@
 #include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
-#include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 

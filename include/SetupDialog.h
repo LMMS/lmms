@@ -27,7 +27,7 @@
 #define SETUP_DIALOG_H
 
 #include <QDialog>
-#include <QtCore/QMap>
+#include <QMap>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"

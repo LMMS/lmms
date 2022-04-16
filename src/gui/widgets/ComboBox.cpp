@@ -35,7 +35,6 @@
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "gui_templates.h"
-#include "MainWindow.h"
 
 
 QPixmap * ComboBox::s_background = nullptr;

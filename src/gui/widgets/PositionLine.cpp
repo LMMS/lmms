@@ -26,7 +26,6 @@
 
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "Song.h"
 
 
@@ -63,7 +62,7 @@ void PositionLine::paintEvent(QPaintEvent* pe)
 		if (m_hasTailGradient &&
 			Engine::getSong()->isPlaying() &&
 			(Engine::getSong()->playMode() == Song::Mode_PlaySong ||
-			 Engine::getSong()->playMode() == Song::Mode_PlayPattern))
+			 Engine::getSong()->playMode() == Song::Mode_PlayMidiClip))
 		{
 			c.setAlpha(60);
 			gradient.setColorAt(w, c);

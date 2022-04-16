@@ -24,25 +24,23 @@
 
 #include "TrackContainerView.h"
 
-#include <cmath>
 
-#include <QApplication>
 #include <QLayout>
-#include <QMdiArea>
 #include <QScrollBar>
 #include <QWheelEvent>
 
 #include "TrackContainer.h"
 #include "AudioEngine.h"
-#include "BBTrack.h"
 #include "DataFile.h"
 #include "MainWindow.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackView.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
@@ -165,7 +163,7 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	int indexFrom = m_trackViews.indexOf( trackView );
 	if ( indexFrom == indexTo ) { return; }
 
-	BBTrack::swapBBTracks( trackView->getTrack(),
+	PatternTrack::swapPatternTracks( trackView->getTrack(),
 			m_trackViews[indexTo]->getTrack() );
 
 	m_scrollLayout->removeWidget( trackView );
@@ -471,7 +469,7 @@ TrackContainerView::scrollArea::~scrollArea()
 void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 {
 	// always pass wheel-event to parent-widget (song-editor
-	// bb-editor etc.) because they might want to use it for zooming
+	// pattern-editor etc.) because they might want to use it for zooming
 	// or scrolling left/right if a modifier-key is pressed, otherwise
 	// they do not accept it and we pass it up to QScrollArea
 	m_trackContainerView->wheelEvent( _we );

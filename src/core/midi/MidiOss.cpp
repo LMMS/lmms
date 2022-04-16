@@ -28,7 +28,6 @@
 #ifdef LMMS_HAVE_OSS
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
 
@@ -39,8 +38,10 @@ MidiOss::MidiOss() :
 {
 	// only start thread, if opening of MIDI-device is successful,
 	// otherwise isRunning()==false indicates error
-	if( m_midiDev.open( QIODevice::ReadWrite ) ||
-					m_midiDev.open( QIODevice::ReadOnly ) )
+	if( m_midiDev.open( QIODevice::ReadWrite |
+		QIODevice::Unbuffered ) ||
+		m_midiDev.open( QIODevice::ReadOnly |
+			QIODevice::Unbuffered ) )
 	{
 		start( QThread::LowPriority );
 	}

@@ -28,7 +28,6 @@
 
 #include "Effect.h"
 #include "ReverbSCControls.h"
-#include "ValueBuffer.h"
 
 extern "C" {
     #include "base.h"

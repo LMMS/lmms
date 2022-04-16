@@ -27,11 +27,11 @@
 
 #include "Engine.h"
 #include "AudioEngine.h"
-#include "BBTrackContainer.h"
 #include "ConfigManager.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Ladspa2LMMS.h"
 #include "Lv2Manager.h"
+#include "PatternStore.h"
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
@@ -42,8 +42,8 @@
 
 float LmmsCore::s_framesPerTick;
 AudioEngine* LmmsCore::s_audioEngine = nullptr;
-FxMixer * LmmsCore::s_fxMixer = nullptr;
-BBTrackContainer * LmmsCore::s_bbTrackContainer = nullptr;
+Mixer * LmmsCore::s_mixer = nullptr;
+PatternStore * LmmsCore::s_patternStore = nullptr;
 Song * LmmsCore::s_song = nullptr;
 ProjectJournal * LmmsCore::s_projectJournal = nullptr;
 #ifdef LMMS_HAVE_LV2
@@ -73,8 +73,8 @@ void LmmsCore::init( bool renderOnly )
 	s_projectJournal = new ProjectJournal;
 	s_audioEngine = new AudioEngine( renderOnly );
 	s_song = new Song;
-	s_fxMixer = new FxMixer;
-	s_bbTrackContainer = new BBTrackContainer;
+	s_mixer = new Mixer;
+	s_patternStore = new PatternStore;
 
 #ifdef LMMS_HAVE_LV2
 	s_lv2Manager = new Lv2Manager;
@@ -107,9 +107,9 @@ void LmmsCore::destroy()
 
 	s_song->clearProject();
 
-	deleteHelper( &s_bbTrackContainer );
+	deleteHelper( &s_patternStore );
 
-	deleteHelper( &s_fxMixer );
+	deleteHelper( &s_mixer );
 	deleteHelper( &s_audioEngine );
 
 #ifdef LMMS_HAVE_LV2

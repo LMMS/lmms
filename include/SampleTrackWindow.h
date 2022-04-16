@@ -26,12 +26,19 @@
 #ifndef SAMPLE_TRACK_WINDOW_H
 #define SAMPLE_TRACK_WINDOW_H
 
-#include "FxLineLcdSpinBox.h"
 
-#include <QLineEdit>
 
-#include "EffectRackView.h"
+#include <QWidget>
+
+#include "ModelView.h"
 #include "SampleTrack.h"
+#include "SerializingObject.h"
+
+class EffectRackView;
+class Knob;
+class MixerLineLcdSpinBox;
+class QLineEdit;
+class SampleTrackView;
  
 
 class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook
@@ -82,7 +89,7 @@ private:
 	QLineEdit * m_nameLineEdit;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	FxLineLcdSpinBox * m_effectChannelNumber;
+	MixerLineLcdSpinBox * m_mixerChannelNumber;
 
 	EffectRackView * m_effectRack;
 } ;

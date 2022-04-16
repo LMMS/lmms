@@ -27,7 +27,9 @@
 #ifndef _VST_SUBPLUGIN_FEATURES_H
 #define _VST_SUBPLUGIN_FEATURES_H
 
+
 #include "Effect.h"
+#include "Plugin.h"
 
 
 class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures

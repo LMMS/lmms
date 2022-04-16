@@ -24,20 +24,18 @@
  */
 
 
-#include <QtCore/QVarLengthArray>
+#include <QVarLengthArray>
 #include <QMessageBox>
 
 #include "LadspaEffect.h"
 #include "DataFile.h"
 #include "AudioDevice.h"
 #include "AudioEngine.h"
-#include "ConfigManager.h"
 #include "Ladspa2LMMS.h"
+#include "LadspaBase.h"
 #include "LadspaControl.h"
 #include "LadspaSubPluginFeatures.h"
-#include "EffectChain.h"
-#include "AutomationPattern.h"
-#include "ControllerConnection.h"
+#include "AutomationClip.h"
 #include "MemoryManager.h"
 #include "ValueBuffer.h"
 #include "Song.h"
@@ -122,7 +120,7 @@ void LadspaEffect::changeSampleRate()
 
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 }
 
 

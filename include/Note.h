@@ -26,7 +26,7 @@
 #ifndef NOTE_H
 #define NOTE_H
 
-#include <QtCore/QVector>
+#include <QVector>
 
 #include "volume.h"
 #include "panning.h"

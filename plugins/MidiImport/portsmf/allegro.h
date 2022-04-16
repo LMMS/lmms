@@ -610,7 +610,7 @@ typedef class Serial_write_buffer: public Serial_buffer {
 #if defined(_WIN32)
 //#pragma warning(disable: 4311 4312)
 #endif
-        assert((char *)(((long) (ptr + 7)) & ~7) <= fence);
+        assert((char *)(((long long) (ptr + 7)) & ~7) <= fence);
 #if defined(_WIN32)
 //#pragma warning(default: 4311 4312)
 #endif

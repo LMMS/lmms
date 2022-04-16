@@ -27,11 +27,9 @@
 
 #include <string>
 #include <vector>
-#include <math.h>
-#include <cstdlib>
+#include <cmath>
 #include <random>
 
-#include "Xpressive.h"
 
 #include "interpolation.h"
 #include "lmms_math.h"
