@@ -8,7 +8,7 @@
 #include <immintrin.h>
 #ifdef __GNUC__
 #include <x86intrin.h>
-#endif
+#endif // __GNUC__
 
 namespace lmms
 {
@@ -22,12 +22,18 @@ int inline can_we_daz() {
   _fxsave(buffer);
 #elif defined(LMMS_HOST_X86_64)
   _fxsave64(buffer);
-#endif
+#endif // defined(LLMS_HOST_X86)
   // Bit 6 of the MXCSR_MASK, i.e. in the lowest byte,
   // tells if we can use the DAZ flag.
   return ((buffer[28] & (1 << 6)) != 0);
 }
-#endif
+
+} // namespace lmms
+#endif // __SSE__
+
+namespace lmms
+{
+
 
 // Set denormal protection for this thread. 
 void inline disable_denormals() {
@@ -44,5 +50,5 @@ void inline disable_denormals() {
 
 } // namespace lmms
 
-#endif
+#endif // DENORMALS_H
 
