@@ -52,7 +52,6 @@
 #include "TextFloat.h"
 #include "TimeDisplayWidget.h"
 #include "TimeLineWidget.h"
-#include "ToolTip.h"
 #include "TrackView.h"
 
 const QVector<float> SongEditor::m_zoomLevels =
@@ -112,7 +111,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
 	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
-	ToolTip::add( m_tempoSpinBox, tr( "Tempo in BPM" ) );
+	m_tempoSpinBox->setToolTip(tr("Tempo in BPM"));
 
 	int tempoSpinBoxCol = getGUI()->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
@@ -149,7 +148,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
-	ToolTip::add( m_masterVolumeSlider, tr( "Master volume" ) );
+	m_masterVolumeSlider->setToolTip(tr("Master volume"));
 
 	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( setMasterVolume( int ) ) );
@@ -182,7 +181,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
-	ToolTip::add( m_masterPitchSlider, tr( "Master pitch" ) );
+	m_masterPitchSlider->setToolTip(tr("Master pitch"));
 	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( setMasterPitch( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,

@@ -265,7 +265,7 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 		m_soundShaping.processAudioBuffer( buf + offset, frames - offset, n );
 		const float vol = ( (float) n->getVolume() * DefaultVolumeRatio );
 		const panning_t pan = qBound( PanningLeft, n->getPanning(), PanningRight );
-		stereoVolumeVector vv = panningToVolumeVector( pan, vol );
+		StereoVolumeVector vv = panningToVolumeVector( pan, vol );
 		for( f_cnt_t f = offset; f < frames; ++f )
 		{
 			for( int c = 0; c < 2; ++c )

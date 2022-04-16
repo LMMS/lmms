@@ -693,18 +693,6 @@ IF(LMMS_BUILD_LINUX)
 		DESTINATION "${CMAKE_INSTALL_PREFIX}/include/lmms/")
 ENDIF(LMMS_BUILD_LINUX)
 
-# package ZynAddSubFX into win32 build
-IF(LMMS_BUILD_WIN32)
-	IF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
-		ADD_SUBDIRECTORY("${CMAKE_SOURCE_DIR}/extras/data/presets")
-		FILE(GLOB ZASF_BINARIES
-			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/zynaddsubfx.dll"
-			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/remote_zynaddsubfx.exe")
-		LIST(SORT ZASF_BINARIES)
-		INSTALL(FILES "${ZASF_BINARIES}" DESTINATION "${PLUGIN_DIR}")
-	ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
-ENDIF(LMMS_BUILD_WIN32)
-
 #
 # add distclean-target
 #

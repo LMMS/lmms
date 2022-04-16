@@ -56,7 +56,7 @@
 #include "InstrumentTrackView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "LeftRightNav.h"
 #include "MainWindow.h"
 #include "PianoView.h"
@@ -66,7 +66,6 @@
 #include "StringPairDrag.h"
 #include "SubWindow.h"
 #include "TabWidget.h"
-#include "ToolTip.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
 
@@ -210,7 +209,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
-	ToolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
+	saveSettingsBtn->setToolTip(tr("Save current instrument track settings in a preset file"));
 
 	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
 

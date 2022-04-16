@@ -29,8 +29,7 @@
 #include "embed.h"
 #include "BitcrushControlDialog.h"
 #include "BitcrushControls.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 
 BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
@@ -82,12 +81,12 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	LedCheckBox * rateEnabled = new LedCheckBox( "", this, tr( "Rate enabled" ), LedCheckBox::Green );
 	rateEnabled->move( 64, 14 );
 	rateEnabled->setModel( & controls->m_rateEnabled );
-	ToolTip::add( rateEnabled, tr( "Enable sample-rate crushing" ) );
+	rateEnabled->setToolTip(tr("Enable sample-rate crushing"));
 	
 	LedCheckBox * depthEnabled = new LedCheckBox( "", this, tr( "Depth enabled" ), LedCheckBox::Green );
 	depthEnabled->move( 101, 14 );
 	depthEnabled->setModel( & controls->m_depthEnabled );
-	ToolTip::add( depthEnabled, tr( "Enable bit-depth crushing" ) );
+	depthEnabled->setToolTip(tr("Enable bit-depth crushing"));
 	
 	
 	// rate crushing knobs

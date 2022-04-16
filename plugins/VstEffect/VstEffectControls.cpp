@@ -168,7 +168,7 @@ EffectControlDialog *VstEffectControls::createView()
 void VstEffectControls::managePlugin( void )
 {
 	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
-		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
+		ManageVSTEffectView * tt = new ManageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
 		if (m_subWindow->widget()->isVisible() == false ) { 
@@ -309,7 +309,7 @@ void VstEffectControls::paintEvent( QPaintEvent * )
 
 
 
-manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
+ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
 	m_effect( _eff )
 {
 	m_vi2 = m_vi;
@@ -425,7 +425,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 
 
-void manageVSTEffectView::closeWindow()
+void ManageVSTEffectView::closeWindow()
 {
 	m_vi2->m_subWindow->hide();
 }
@@ -433,7 +433,7 @@ void manageVSTEffectView::closeWindow()
 
 
 
-void manageVSTEffectView::syncPlugin( void )
+void ManageVSTEffectView::syncPlugin( void )
 {
 	char paramStr[35];
 	QStringList s_dumpValues;
@@ -459,7 +459,7 @@ void manageVSTEffectView::syncPlugin( void )
 
 
 
-void manageVSTEffectView::displayAutomatedOnly( void )
+void ManageVSTEffectView::displayAutomatedOnly( void )
 {
 	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
 
@@ -484,7 +484,7 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 
 
 
-void manageVSTEffectView::setParameter( Model * action )
+void ManageVSTEffectView::setParameter( Model * action )
 {
 	int knobUNID = action->displayName().toInt();
 
@@ -494,7 +494,7 @@ void manageVSTEffectView::setParameter( Model * action )
 	}
 }
 
-void manageVSTEffectView::syncParameterText()
+void ManageVSTEffectView::syncParameterText()
 {
 	m_effect->m_plugin->loadParameterLabels();
 	m_effect->m_plugin->loadParameterDisplays();
@@ -527,7 +527,7 @@ void manageVSTEffectView::syncParameterText()
 
 
 
-manageVSTEffectView::~manageVSTEffectView()
+ManageVSTEffectView::~ManageVSTEffectView()
 {
 	if( m_vi2->knobFModel != nullptr )
 	{ 
