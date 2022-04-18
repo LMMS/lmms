@@ -1,10 +1,6 @@
-name: check strings
+name: check-strings
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push]
 
 jobs:
   build:
