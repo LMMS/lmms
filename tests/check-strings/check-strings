@@ -1,0 +1,152 @@
+#!/usr/bin/python3
+
+# This script checks for strings like paths or class names that are *not* in the source code, but e.g. in
+# translation files, stylesheets or git files.
+# Invalid strings *in the source code* are usually recognized when you compile them, but other strings may
+# be overseen, which is why this script checks strings *outside of the source code*.
+
+
+import os.path
+import re
+import subprocess
+import xml.etree.ElementTree as ElementTree
+from pathlib import Path
+import tinycss2
+
+
+# global variables
+
+errors = 0
+
+
+# functions
+
+def caption(my_str):
+    print('')
+    print('# ' + my_str)
+    print('')
+
+def error(where, my_str):
+    global errors
+    errors += 1
+    print('Error: ' + where + ': ' + my_str)
+
+
+# prepare some variables
+
+if not os.path.exists(".gitmodules"):
+    print('You need to call this script from the LMMS top directory')
+    exit(1)
+
+result = subprocess.run(['git', 'ls-files', 'src/', 'include/', 'plugins/'], capture_output=True, text=True, check=True)
+files = result.stdout.splitlines()
+classes = set()
+class_pat = re.compile(r'class(\s+LMMS_EXPORT)?\s+([a-zA-Z0-9_]+)')
+for cur_file in files:
+    if os.path.isfile(cur_file):
+        with open(cur_file, errors='replace') as fp:
+            lines = fp.readlines()
+            for line in lines:
+                if res := class_pat.search(line):
+                    classes.add(res.group(2))
+
+
+# the real checks
+
+caption('.gitmodules')
+
+with open(".gitmodules") as fp:
+    lines = fp.readlines()
+    for line in lines:
+        if res := re.match(r'\[submodule "([^"]+)"\]\s*$', line):
+            if not os.path.isdir(res.group(1)):
+                error('.gitmodules', 'Directory does not exist: ' + res.group(1))
+
+
+caption('locale')
+
+filenames = set()
+classes_found = set()
+for cur_file in Path('data/locale').glob('*.ts'):
+    tree = ElementTree.parse(str(cur_file))
+    root = tree.getroot()
+    for location in root.findall('./context/message/location'):
+        filenames.add(location.attrib['filename'])
+    for location in root.findall('./context/name'):
+        classes_found.add(location.text)
+for f in sorted(filenames):
+    if not os.path.isfile(f) and not os.path.isfile("data/locale/" + f):
+        error('data/locale', 'Source file does not exist: ' + f)
+for c in sorted(classes_found):
+    if c[0] != 'Q' and not '::' in c and not c in classes:
+        error('data/locale', 'Class does not exist in source code: ' + c)
+
+
+caption('themes')
+
+for cur_file in sorted(os.listdir(os.fsencode('data/themes'))):
+    if os.path.isdir('data/themes/' + cur_file.decode("latin-1")):
+        filename = 'data/themes/' + os.fsdecode(cur_file) + '/style.css'
+        classes_in_sheet = set()
+        with open(filename) as fp:
+            css = fp.read()
+            rules = tinycss2.parse_stylesheet(str(css))
+            for rule in rules:
+                if rule.type == 'qualified-rule':
+                    if rule.prelude[0].type == 'ident':
+                        classes_in_sheet.add(rule.prelude[0].value)
+        for class_in_sheet in sorted(classes_in_sheet):
+            if class_in_sheet[0] != 'Q' and class_in_sheet not in classes:
+                error(filename, 'Class does not exist in source code: ' + class_in_sheet)
+
+
+caption('patches (checks only plugins/)')
+
+pat = re.compile(r'/(plugins/\S*)')
+calf = re.compile(r'calf/.*/modules\.')  # these are a bit complicated to fix...
+for cur_file in sorted(Path('.').glob('*/patches/*.patch')):
+    if os.path.isfile(cur_file):
+        paths_in_patches = set()
+        with open(cur_file, errors='replace') as fp:
+            lines = fp.readlines()
+            for line in lines:
+                if not calf.search(line):
+                    if res := pat.search(line):
+                        paths_in_patches.add(res.group(1))
+        for p in sorted(paths_in_patches):
+            if not os.path.isfile(p):
+                error(str(cur_file), 'Source file does not exist: ' + p)
+
+
+caption('debian docs (only one string)')
+
+# Checks for caps.html. This gets relevant when #4027 will be merged
+with open('debian/lmms-common.docs', errors='replace') as fp:
+    lines = fp.readlines()
+    for line in lines:
+        line = line.rstrip()
+        if 'caps.html' in line:
+            if not os.path.isfile(line):
+                error('debian/lmms-common.docs', 'Path does not exist: ' + line)
+
+
+caption('debian/copyright')
+
+pat = re.compile(r'^Files:\s*(\S+).*$')
+with open('debian/copyright', errors='replace') as fp:
+    lines = fp.readlines()
+    for line in lines:
+        if res := pat.match(line):
+            # no idea why this must be so complicated. "if not Path('.').glob" did not work
+            glob_res = Path('.').glob(res.group(1))
+            glob = [x for x in glob_res]
+            if len(glob) == 0:
+                error('debian/copyright', 'Glob/Path does not exist: ' + res.group(1))
+
+
+# summary
+
+caption('summary')
+
+print(str(errors) + ' errors.')
+exit(1 if errors > 0 else 0)

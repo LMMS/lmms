@@ -1,0 +1,19 @@
+name: check strings
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Verify check-strings script
+      run: tests/check-strings/verify
+    - name: Run check-strings
+      run: tests/check-strings/check-strings

@@ -1,0 +1,50 @@
+#!/usr/bin/python3
+
+import subprocess
+from pathlib import Path
+import tempfile
+import os
+
+lmms_main_path = Path(__file__).resolve().parent.parent.parent
+
+# test with a stable LMMS ref to always get the same expectations
+ref = 'f56fc68b669b59f525ad133a0376feaba2a1a4ec'
+
+# find out a remote URL where we can fetch "ref" from
+res = subprocess.run(['git', 'rev-parse', '--verify', ref], capture_output=True, text=True)
+if res.returncode == 0:
+	remote = str(lmms_main_path)
+else:
+	res = subprocess.run(['git', 'remote', 'get-url', 'origin'], capture_output=True, text=True)
+	if res.returncode == 0:
+		remote = res.stdout
+	else:
+		res = subprocess.run(['git', 'remote', 'get-url', 'upstream'], capture_output=True, text=True)
+		if res.returncode == 0:
+			remote = res.stdout
+		else:
+			raise RuntimeError(
+				"Sorry, I can find ref " + ref + " neither in the repo nor in the remotes \"origin\" and \"upstream\"")
+
+with tempfile.TemporaryDirectory() as tmpdir:
+	os.chdir(tmpdir)
+	# get the repo and its submodules
+	subprocess.run(['git', 'init'], check=True)
+	subprocess.run(['git', 'fetch', '--depth=1', remote, ref], check=True)
+	subprocess.run(['git', 'checkout', ref], check=True)
+	subprocess.run(['git', 'submodule', 'update', '--depth=1', '--init'], check=True)
+	# run script
+	res = subprocess.run([str(lmms_main_path / 'tests' / 'check-strings' / 'check-strings')],
+						 capture_output=True, text=True)
+	print('--->8--- Script output BEGIN --->8---')
+	print(res.stdout)
+	print('--->8--- Script output END   --->8---')
+	# make sure script returned "error" (because we test for errors) and that the output is as expected
+	if res.returncode == 0:
+		raise RuntimeError("Script \"check-strings\" no errors, but errors were expected")
+	else:
+		if res.stdout != open(str(lmms_main_path / 'tests' / 'check-strings' / 'expectation.txt')).read():
+			raise RuntimeError("Script \"check-strings\" returned with different output than in expectation.txt")
+
+# if we made it until here without an exception, all tests were passed
+print("SUCCESS")

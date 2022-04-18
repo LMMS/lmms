@@ -1,0 +1,93 @@
+
+# .gitmodules
+
+Error: .gitmodules: Directory does not exist: plugins/sid/resid
+
+# locale
+
+Error: data/locale: Source file does not exist: ../../src/gui/BBClipView.cpp
+Error: data/locale: Source file does not exist: ../../src/gui/editors/BBEditor.cpp
+Error: data/locale: Source file does not exist: ../../src/tracks/BBTrack.cpp
+Error: data/locale: Source file does not exist: plugins/SpectrumAnalyzer/SpectrumAnalyzer.cpp
+Error: data/locale: Source file does not exist: plugins/SpectrumAnalyzer/SpectrumAnalyzerControlDialog.cpp
+Error: data/locale: Source file does not exist: plugins/SpectrumAnalyzer/SpectrumAnalyzerControls.cpp
+Error: data/locale: Source file does not exist: plugins/flp_import/FlpImport.cpp
+Error: data/locale: Source file does not exist: plugins/opl2/opl2instrument.cpp
+Error: data/locale: Source file does not exist: plugins/papu/papu_instrument.cpp
+Error: data/locale: Source file does not exist: plugins/sid/sid_instrument.cpp
+Error: data/locale: Source file does not exist: src/gui/editors/BBEditor.cpp
+Error: data/locale: Source file does not exist: src/gui/widgets/VisualizationWidget.cpp
+Error: data/locale: Source file does not exist: src/tracks/BBTrack.cpp
+Error: data/locale: Class does not exist in source code: BBClipView
+Error: data/locale: Class does not exist in source code: BBEditor
+Error: data/locale: Class does not exist in source code: BBTrack
+Error: data/locale: Class does not exist in source code: CarlaAboutW
+Error: data/locale: Class does not exist in source code: CarlaHostW
+Error: data/locale: Class does not exist in source code: CarlaHostWindow
+Error: data/locale: Class does not exist in source code: CarlaSettingsW
+Error: data/locale: Class does not exist in source code: Dialog
+Error: data/locale: Class does not exist in source code: DriverSettingsW
+Error: data/locale: Class does not exist in source code: JackApplicationW
+Error: data/locale: Class does not exist in source code: JuceAboutW
+Error: data/locale: Class does not exist in source code: MidiPatternW
+Error: data/locale: Class does not exist in source code: PluginDatabaseW
+Error: data/locale: Class does not exist in source code: PluginEdit
+Error: data/locale: Class does not exist in source code: PluginParameter
+Error: data/locale: Class does not exist in source code: PluginRefreshW
+Error: data/locale: Class does not exist in source code: PluginWidget
+Error: data/locale: Class does not exist in source code: SpectrumAnalyzerControlDialog
+Error: data/locale: Class does not exist in source code: SpectrumAnalyzerControls
+Error: data/locale: Class does not exist in source code: VisualizationWidget
+Error: data/locale: Class does not exist in source code: mixerLineLcdSpinBox
+Error: data/locale: Class does not exist in source code: opl2instrument
+Error: data/locale: Class does not exist in source code: opl2instrumentView
+Error: data/locale: Class does not exist in source code: papuInstrument
+Error: data/locale: Class does not exist in source code: papuInstrumentView
+Error: data/locale: Class does not exist in source code: pluginBrowser
+Error: data/locale: Class does not exist in source code: sidInstrument
+Error: data/locale: Class does not exist in source code: sidInstrumentView
+
+# themes
+
+Error: data/themes/classic/style.css: Class does not exist in source code: PluginDescList
+Error: data/themes/classic/style.css: Class does not exist in source code: nameLabel
+Error: data/themes/classic/style.css: Class does not exist in source code: opl2instrumentView
+Error: data/themes/classic/style.css: Class does not exist in source code: sidInstrumentView
+Error: data/themes/default/style.css: Class does not exist in source code: PluginDescList
+Error: data/themes/default/style.css: Class does not exist in source code: nameLabel
+Error: data/themes/default/style.css: Class does not exist in source code: opl2instrumentView
+Error: data/themes/default/style.css: Class does not exist in source code: sidInstrumentView
+
+# patches (checks only plugins/)
+
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/calf/metadata.h
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/calf/modules_comp.h
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/calf/modules_limit.h
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/calf/modules_mod.h
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/calf/organ.h
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/calf/preset.h
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/calf/primitives.h
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/calf/src/metadata.cpp
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/swh/flanger_1191.c
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/swh/gsm/short_term.c
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/swh/multivoice_chorus_1201.c
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/swh/retro_flange_1208.c
+Error: debian/patches/clang.patch: Source file does not exist: plugins/LadspaEffect/swh/vynil_1905.c
+Error: debian/patches/clang.patch: Source file does not exist: plugins/delay/stereodelay.cpp
+Error: debian/patches/clang.patch: Source file does not exist: plugins/opl2/fmopl.c
+
+# debian docs (only one string)
+
+
+# debian/copyright
+
+Error: debian/copyright: Glob/Path does not exist: data/projects/CoolSongs/Saber-*
+Error: debian/copyright: Glob/Path does not exist: plugins/LadspaEffect/calf/src/calf/vumeter.h
+Error: debian/copyright: Glob/Path does not exist: plugins/LadspaEffect/swh/gsm/*
+Error: debian/copyright: Glob/Path does not exist: plugins/LadspaEffect/swh/util/pitchscale.c
+Error: debian/copyright: Glob/Path does not exist: plugins/LadspaEffect/swh/vocoder_1337.c
+Error: debian/copyright: Glob/Path does not exist: plugins/opl2/fmopl.*
+
+# summary
+
+71 errors.
