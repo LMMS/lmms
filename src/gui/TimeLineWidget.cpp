@@ -335,7 +335,8 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		m_moveXOff = s_posMarkerPixmap->width() / 2;
 		const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
-		const TimePos loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
+		const TimePos end = TimePos(width() * TimePos::ticksPerBar() / m_ppb) - m_begin;
+		const TimePos loopMid = (std::clamp(m_loopPos[0], m_begin, end) + std::clamp(m_loopPos[1], m_begin, end)) / 2;
 
 		m_action = t < loopMid ? MoveLoopBegin : MoveLoopEnd;
 		std::sort(std::begin(m_loopPos), std::end(m_loopPos));
