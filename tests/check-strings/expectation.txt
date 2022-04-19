@@ -50,10 +50,12 @@ Error: data/locale: Class does not exist in source code: sidInstrumentView
 # themes
 
 Error: data/themes/classic/style.css: Class does not exist in source code: PluginDescList
+Error: data/themes/classic/style.css: Class does not exist in source code: effectLabel
 Error: data/themes/classic/style.css: Class does not exist in source code: nameLabel
 Error: data/themes/classic/style.css: Class does not exist in source code: opl2instrumentView
 Error: data/themes/classic/style.css: Class does not exist in source code: sidInstrumentView
 Error: data/themes/default/style.css: Class does not exist in source code: PluginDescList
+Error: data/themes/default/style.css: Class does not exist in source code: effectLabel
 Error: data/themes/default/style.css: Class does not exist in source code: nameLabel
 Error: data/themes/default/style.css: Class does not exist in source code: opl2instrumentView
 Error: data/themes/default/style.css: Class does not exist in source code: sidInstrumentView
@@ -90,4 +92,4 @@ Error: debian/copyright: Glob/Path does not exist: plugins/opl2/fmopl.*
 
 # summary
 
-71 errors.
+73 errors.

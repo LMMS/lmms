@@ -40,15 +40,31 @@ if not os.path.exists(".gitmodules"):
 
 result = subprocess.run(['git', 'ls-files', 'src/', 'include/', 'plugins/'], capture_output=True, text=True, check=True)
 files = result.stdout.splitlines()
+if os.path.isdir('plugins/carlabase/carla'):
+    carlabase = 'carlabase'
+else:
+    carlabase = 'CarlaBase'
+result = subprocess.run(['git',
+                         '--git-dir',   'plugins/'+carlabase+'/carla/.git',
+                         '--work-tree', 'plugins/'+carlabase+'/carla/',
+                         'ls-files', 'resources/ui', 'source/frontend'], capture_output=True, text=True, check=True)
+files_carla = ['plugins/CarlaBase/carla/' + i for i in result.stdout.splitlines()]
+files.extend(files_carla)
+
 classes = set()
 class_pat = re.compile(r'class(\s+LMMS_EXPORT)?\s+([a-zA-Z0-9_]+)')
+class_pat_ui = re.compile(r'^\s*<class>([a-zA-Z0-9_]+)</class>\s*$')
 for cur_file in files:
     if os.path.isfile(cur_file):
-        with open(cur_file, errors='replace') as fp:
-            lines = fp.readlines()
-            for line in lines:
-                if res := class_pat.search(line):
-                    classes.add(res.group(2))
+        if cur_file.endswith('.cpp') or cur_file.endswith('.h') or cur_file.endswith('.hpp') or cur_file.endswith('.ui'):
+            with open(cur_file, errors='replace') as fp:
+                lines = fp.readlines()
+                for line in lines:
+                    if cur_file.endswith('.ui'):
+                        if res := class_pat_ui.match(line):
+                            classes.add(res.group(1))
+                    elif res := class_pat.search(line):
+                        classes.add(res.group(2))
 
 
 # the real checks
@@ -95,6 +111,21 @@ for cur_file in sorted(os.listdir(os.fsencode('data/themes'))):
                 if rule.type == 'qualified-rule':
                     if rule.prelude[0].type == 'ident':
                         classes_in_sheet.add(rule.prelude[0].value)
+                        comma_set = 0
+                        # <ident>,<space>...
+                        for i in range(1, len(rule.prelude)):
+                            if rule.prelude[i].type == 'literal':
+                                if rule.prelude[i].value == ',':
+                                    comma_set = 1
+                                else:
+                                    break
+                            elif rule.prelude[i].type == 'whitespace':
+                                pass
+                            elif rule.prelude[i].type == 'ident' and comma_set:
+                                classes_in_sheet.add(rule.prelude[i].value)
+                                comma_set = 0
+                            else:
+                                break
         for class_in_sheet in sorted(classes_in_sheet):
             if class_in_sheet[0] != 'Q' and class_in_sheet not in classes:
                 error(filename, 'Class does not exist in source code: ' + class_in_sheet)
