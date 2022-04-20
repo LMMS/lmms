@@ -169,7 +169,7 @@ with open('debian/lmms-common.docs', errors='replace') as fp:
 caption('debian/copyright')
 
 pat = re.compile(r'^Files:\s*(\S+).*$')
-ladspa_swh = re.compile(r'(plugins/LadspaEffect/swh/ladspa/[^/.])\.c')
+ladspa_swh = re.compile(r'(plugins/LadspaEffect/swh/ladspa/[^/.]+)\.c')
 with open('debian/copyright', errors='replace') as fp:
     lines = fp.readlines()
     for line in lines:
