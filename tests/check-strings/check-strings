@@ -178,7 +178,7 @@ with open('debian/copyright', errors='replace') as fp:
             # (because the C files are not generated until a build is done)
             mpath = res.group(1)
             if res2 := ladspa_swh.match(mpath):
-                mpath = res.group(1) + '.xml'
+                mpath = res2.group(1) + '.xml'
             # no idea why this must be so complicated. "if not Path('.').glob" did not work
             glob_res = Path('.').glob(mpath)
             glob = [x for x in glob_res]
