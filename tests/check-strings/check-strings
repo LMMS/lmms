@@ -145,8 +145,13 @@ for cur_file in sorted(Path('.').glob('*/patches/*.patch')):
                     if res := pat.search(line):
                         paths_in_patches.add(res.group(1))
         for p in sorted(paths_in_patches):
-            if not os.path.isfile(p):
-                error(str(cur_file), 'Source file does not exist: ' + p)
+            # in case of LADSPA SWH effects, check that the XML exists, not the C file
+            # (because the C files are not generated until a build is done)
+            mpath = Path(p)
+            if mpath.parent == Path('plugins/LadspaEffect/swh/ladspa/'):
+                mpath = mpath.with_suffix('.xml')
+            if not mpath.is_file():
+                error(str(cur_file), 'Source file does not exist: ' + str(mpath))
 
 
 caption('debian docs (only one string)')
