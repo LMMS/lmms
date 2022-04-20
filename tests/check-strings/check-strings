@@ -169,12 +169,18 @@ with open('debian/lmms-common.docs', errors='replace') as fp:
 caption('debian/copyright')
 
 pat = re.compile(r'^Files:\s*(\S+).*$')
+ladspa_swh = re.compile(r'(plugins/LadspaEffect/swh/ladspa/[^/.])\.c')
 with open('debian/copyright', errors='replace') as fp:
     lines = fp.readlines()
     for line in lines:
         if res := pat.match(line):
+            # in case of LADSPA SWH effects, check that the XML exists, not the C file
+            # (because the C files are not generated until a build is done)
+            mpath = res.group(1)
+            if res2 := ladspa_swh.match(mpath):
+                mpath = res.group(1) + '.xml'
             # no idea why this must be so complicated. "if not Path('.').glob" did not work
-            glob_res = Path('.').glob(res.group(1))
+            glob_res = Path('.').glob(mpath)
             glob = [x for x in glob_res]
             if len(glob) == 0:
                 error('debian/copyright', 'Glob/Path does not exist: ' + res.group(1))
