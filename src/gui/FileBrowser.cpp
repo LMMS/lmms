@@ -235,7 +235,7 @@ void FileBrowser::reloadTree( void )
 
 	for (const QString& dir: m_toplevelDirectories)
 	{
-		m_tree->addTopLevelItem(new Directory(dir, dir, ""));
+		m_tree->addTopLevelItem(new Directory(dir));
 	}
 
 	for (TreeItem* item: Directory("", m_userDir, m_factoryDir).getDirectoryContent())
@@ -388,7 +388,7 @@ void FileBrowser::onItemExpand(QTreeWidgetItem * item)
 	if (!dir) { return; }
 
 	// Populate directory when it is expanded for the first time
-	if (dir->isExpanded() && dir->childCount() == 0)
+	if (dir->isExpanded() && !dir->initialized())
 	{
 		dir->addDirectoryContent();
 		// During search, only directories that match the search term are shown (as collapsed)
@@ -1050,17 +1050,14 @@ QPixmap * Directory::s_folderOpenedPixmap = nullptr;
 QPixmap * Directory::s_folderLockedPixmap = nullptr;
 
 
-Directory::Directory(const QString& name, const QString& userPath, const QString& factoryPath) :
+Directory::Directory(const QString& name, const QFileInfo& userPath, const QFileInfo& factoryPath) :
 	TreeItem(name),
 	m_userPath(userPath),
 	m_factoryPath(factoryPath)
 {
 	initPixmaps();
-
 	setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
-
 	updateIcon();
-	m_hidden = QFileInfo(path()).isHidden();
 }
 
 
@@ -1092,7 +1089,7 @@ void Directory::initPixmaps( void )
 
 void Directory::updateIcon(bool user, bool factory)
 {
-	if (QFileInfo(path(user, factory)).isReadable())
+	if ((user && m_userPath.isReadable()) || (factory && m_factoryPath.isReadable()))
 	{
 		setIcon(0, isExpanded() ? *s_folderOpenedPixmap : *s_folderPixmap);
 	}
@@ -1111,29 +1108,29 @@ std::vector<TreeItem*> Directory::getDirectoryContent()
 
 	// Map of directory names and their full user/factory path (if it exists)
 	// we use this to later create a single Directory object of the both paths
-	QMap<QString, std::pair<QString, QString>> dirs;
+	QMap<QString, std::pair<QFileInfo, QFileInfo>> dirs;
 
 	// Lambda used to read a directory and store the paths in the appropriate lists
-	auto parseDir = [&](const QString& path, bool isFactory)
+	auto parseDir = [&](const QFileInfo& path, bool isFactory)
 	{
-		if (path.isEmpty()) { return; }
+		if (path.filePath().isEmpty()) { return; }
 		static auto filter = QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden;
-		for (const QFileInfo& item: QDir(path).entryInfoList(filter))
+		for (const QFileInfo& item: path.dir().entryInfoList(filter))
 		{
 			if (item.isDir())
 			{
 				if (!isFactory)
 				{
-					dirs[item.fileName()].first = item.absoluteFilePath();
+					dirs[item.fileName()].first = item;
 				}
 				else
 				{
-					dirs[item.fileName()].second = item.absoluteFilePath();
+					dirs[item.fileName()].second = item;
 				}
 			}
 			else
 			{
-				items.push_back(new FileItem(item.fileName(), item.absoluteFilePath(), isFactory));
+				items.push_back(new FileItem(item.fileName(), item, isFactory));
 			}
 		}
 	};
@@ -1161,6 +1158,7 @@ void Directory::addDirectoryContent()
 	{
 		addChild(item);
 	}
+	m_initialized = true;
 }
 
 
@@ -1168,8 +1166,8 @@ void Directory::addDirectoryContent()
 
 QString Directory::path(bool user, bool factory) const
 {
-	if (user && !m_userPath.isEmpty()) { return m_userPath; }
-	if (factory && !m_factoryPath.isEmpty()) { return m_factoryPath; }
+	if (user && !m_userPath.filePath().isEmpty()) { return m_userPath.filePath(); }
+	if (factory && !m_factoryPath.filePath().isEmpty()) { return m_factoryPath.filePath(); }
 	return QString();
 }
 
@@ -1185,14 +1183,13 @@ QPixmap * FileItem::s_midiFilePixmap = nullptr;
 QPixmap * FileItem::s_unknownFilePixmap = nullptr;
 
 
-FileItem::FileItem(const QString& name, const QString& path, bool fromFactory) :
+FileItem::FileItem(const QString& name, const QFileInfo& path, bool fromFactory) :
 	TreeItem(name),
 	m_factory(fromFactory),
 	m_path( path )
 {
 	determineFileType();
 	initPixmaps();
-	m_hidden = QFileInfo(path).isHidden();
 }
 
 

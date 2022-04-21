@@ -168,13 +168,10 @@ public:
 
 	virtual bool isDirectory() const { return false; }
 	virtual bool isFactory() const { return false; }
-	virtual bool isHidden() const { return m_hidden; } //!< If hidden on the filesystem
+	virtual bool isHidden() const { return false; } //!< If hidden on the filesystem
 	virtual bool isUser() const { return false; }
 
 	static bool lessThan(const TreeItem* first, const TreeItem* second);
-
-protected:
-	bool m_hidden = false;
 };
 
 
@@ -183,7 +180,8 @@ protected:
 class Directory : public TreeItem
 {
 public:
-	Directory(const QString& name, const QString& userPath, const QString& factoryPath);
+	Directory(const QString& name, const QFileInfo& userPath, const QFileInfo& factoryPath);
+	Directory(const QString& path) : Directory(path, QFileInfo(path), {}) {}
 
 	//! Read directory and add its content as child items
 	void addDirectoryContent();
@@ -191,9 +189,17 @@ public:
 	//! Read directory and return a list of TreeItems
 	std::vector<TreeItem*> getDirectoryContent();
 
+	//! If the directory content has been read
+	bool initialized() const { return m_initialized; }
+
 	bool isDirectory() const override { return true; }
-	bool isFactory() const override { return !m_factoryPath.isEmpty(); }
-	bool isUser() const override { return !m_userPath.isEmpty(); }
+	bool isFactory() const override { return !m_factoryPath.filePath().isEmpty(); }
+	bool isUser() const override { return !m_userPath.filePath().isEmpty(); }
+	bool isHidden() const override
+	{
+		// Hidden if both user and factory is hidden (lazy logic)
+		return (m_userPath.isHidden() || !isUser()) && (m_factoryPath.isHidden() || !isFactory());
+	}
 
 	//! Return best path (user path takes precidence)
 	QString path(bool user = true, bool factory = true) const;
@@ -207,8 +213,9 @@ private:
 	static QPixmap * s_folderOpenedPixmap;
 	static QPixmap * s_folderLockedPixmap;
 
-	QString m_userPath;
-	QString m_factoryPath;
+	QFileInfo m_userPath;
+	QFileInfo m_factoryPath;
+	bool m_initialized = false;
 };
 
 
@@ -241,13 +248,13 @@ public:
 	} ;
 
 
-	FileItem(const QString& name, const QString& path, bool fromFactory = false);
-	FileItem(const QString& path) : FileItem(path, path) {}
+	FileItem(const QString& name, const QFileInfo& path, bool fromFactory = false);
+	FileItem(const QFileInfo& path) : FileItem(path.fileName(), path) {}
 
 	// TODO rename to path()
 	QString fullName() const
 	{
-		return m_path;
+		return m_path.filePath();
 	}
 
 	inline FileTypes type( void ) const
@@ -262,6 +269,7 @@ public:
 
 	bool isUser() const override { return !m_factory; }
 	bool isFactory() const override { return m_factory; }
+	bool isHidden() const override { return m_path.isHidden(); }
 
 	//! True if file may be loaded as a track
 	inline bool isTrack( void ) const
@@ -286,7 +294,7 @@ private:
 	static QPixmap * s_unknownFilePixmap;
 
 	bool m_factory;
-	QString m_path;
+	QFileInfo m_path;
 	FileTypes m_type;
 	FileHandling m_handling;
 
