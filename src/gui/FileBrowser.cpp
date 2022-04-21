@@ -62,8 +62,6 @@
 #include "TextFloat.h"
 
 
-
-
 FileBrowser::FileBrowser(const QString& title, const QPixmap& pm, QWidget* parent):
 	SideBarWidget(title, pm, parent)
 {
@@ -1115,7 +1113,7 @@ std::vector<TreeItem*> Directory::getDirectoryContent()
 	{
 		if (path.filePath().isEmpty()) { return; }
 		static auto filter = QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden;
-		for (const QFileInfo& item: path.dir().entryInfoList(filter))
+		for (const QFileInfo& item: QDir(path.absoluteFilePath()).entryInfoList(filter))
 		{
 			if (item.isDir())
 			{
@@ -1141,7 +1139,9 @@ std::vector<TreeItem*> Directory::getDirectoryContent()
 	// Create DirItems from the pair of paths we collected earlier
 	for (auto it = dirs.cbegin(); it != dirs.cend(); it++)
 	{
-		items.push_back(new Directory(it.key(), it.value().first, it.value().second));
+		items.push_back(new Directory(it.key(), // title
+									it.value().first, // user QFileInfo
+									it.value().second)); // factory QFileInfo
 	}
 
 	std::sort(items.begin(), items.end(), TreeItem::lessThan);
@@ -1186,7 +1186,7 @@ QPixmap * FileItem::s_unknownFilePixmap = nullptr;
 FileItem::FileItem(const QString& name, const QFileInfo& path, bool fromFactory) :
 	TreeItem(name),
 	m_factory(fromFactory),
-	m_path( path )
+	m_fileInfo( path )
 {
 	determineFileType();
 	initPixmaps();

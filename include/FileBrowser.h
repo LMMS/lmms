@@ -254,7 +254,7 @@ public:
 	// TODO rename to path()
 	QString fullName() const
 	{
-		return m_path.filePath();
+		return m_fileInfo.filePath();
 	}
 
 	inline FileTypes type( void ) const
@@ -269,7 +269,7 @@ public:
 
 	bool isUser() const override { return !m_factory; }
 	bool isFactory() const override { return m_factory; }
-	bool isHidden() const override { return m_path.isHidden(); }
+	bool isHidden() const override { return m_fileInfo.isHidden(); }
 
 	//! True if file may be loaded as a track
 	inline bool isTrack( void ) const
@@ -294,7 +294,7 @@ private:
 	static QPixmap * s_unknownFilePixmap;
 
 	bool m_factory;
-	QFileInfo m_path;
+	QFileInfo m_fileInfo;
 	FileTypes m_type;
 	FileHandling m_handling;
 
