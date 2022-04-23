@@ -26,6 +26,7 @@
 #define REMOTE_PLUGIN_H
 
 #include "RemotePluginBase.h"
+#include "SharedMemory.h"
 
 class RemotePlugin;
 
@@ -156,7 +157,7 @@ private:
 	QMutex m_commMutex;
 	bool m_splitChannels;
 #ifdef USE_QT_SHMEM
-	QSharedMemory m_shmObj;
+	SharedMemory<float[]> m_shmObj;
 #else
 	int m_shmID;
 #endif

@@ -42,20 +42,20 @@
 VstSyncController::VstSyncController() :
 	m_syncData( nullptr ),
 	m_shmID( -1 ),
-	m_shm( "/usr/bin/lmms" )
+	m_shm()
 {
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
 		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
 #ifdef USE_QT_SHMEM
-		if ( m_shm.create( sizeof( VstSyncData ) ) )
+		if (m_shm.create("/usr/bin/lmms"); m_shm)
 		{
-			m_syncData = (VstSyncData*) m_shm.data();
+			m_syncData = m_shm.get();
 		}
 		else
 		{
-			qWarning() << QString( "Failed to allocate shared memory for VST sync: %1" ).arg( m_shm.errorString() );
+			qWarning() << "Failed to allocate shared memory for VST sync";
 		}
 #else
 		key_t key; // make the key:
@@ -114,7 +114,7 @@ VstSyncController::~VstSyncController()
 	else
 	{
 #ifdef USE_QT_SHMEM
-		if( m_shm.data() )
+		if (m_shm)
 		{
 			// detach shared memory, delete it:
 			m_shm.detach();

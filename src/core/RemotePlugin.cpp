@@ -481,7 +481,7 @@ void RemotePlugin::hideUI()
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = ( m_inputCount+m_outputCount ) * Engine::audioEngine()->framesPerPeriod() * sizeof( float );
+	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
 	if( m_shm != nullptr )
 	{
 #ifdef USE_QT_SHMEM
@@ -496,13 +496,12 @@ void RemotePlugin::resizeSharedProcessingMemory()
 #ifdef USE_QT_SHMEM
 	do
 	{
-		m_shmObj.setKey( QString( "%1" ).arg( ++shm_key ) );
-		m_shmObj.create( s );
-	} while( m_shmObj.error() != QSharedMemory::NoError );
+		m_shmObj.create(QString("%1").arg(++shm_key).toStdString(), s);
+	} while (!m_shmObj);
 
-	m_shm = (float *) m_shmObj.data();
+	m_shm = m_shmObj.get();
 #else
-	while( ( m_shmID = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
+	while( ( m_shmID = shmget( ++shm_key, s * sizeof(float), IPC_CREAT | IPC_EXCL |
 								0600 ) ) == -1 )
 	{
 	}

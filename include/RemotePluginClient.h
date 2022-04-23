@@ -36,6 +36,8 @@
 #	include <unistd.h>
 #endif
 
+#include "SharedMemory.h"
+
 class RemotePluginClient : public RemotePluginBase
 {
 public:
@@ -46,7 +48,7 @@ public:
 #endif
 	virtual ~RemotePluginClient();
 #ifdef USE_QT_SHMEM
-	VstSyncData * getQtVSTshm();
+	const VstSyncData* getQtVSTshm();
 #endif
 	virtual bool processMessage( const message & _m );
 
@@ -122,10 +124,10 @@ private:
 	void doProcessing();
 
 #ifdef USE_QT_SHMEM
-	QSharedMemory m_shmObj;
-	QSharedMemory m_shmQtID;
+	SharedMemory<float[]> m_shmObj;
+	SharedMemory<const VstSyncData> m_shmQtID;
 #endif
-	VstSyncData * m_vstSyncData;
+	const VstSyncData* m_vstSyncData;
 	float * m_shm;
 
 	int m_inputCount;
@@ -185,7 +187,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 #endif
 #ifdef USE_QT_SHMEM
 	m_shmObj(),
-	m_shmQtID( "/usr/bin/lmms" ),
+	m_shmQtID(),
 #endif
 	m_vstSyncData( nullptr ),
 	m_shm( nullptr ),
@@ -219,9 +221,9 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 #endif
 
 #ifdef USE_QT_SHMEM
-	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
+	if (m_shmQtID.attach("/usr/bin/lmms"); m_shmQtID)
 	{
-		m_vstSyncData = (VstSyncData *) m_shmQtID.data();
+		m_vstSyncData = m_shmQtID.get();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
 		sendMessage( IdHostInfoGotten );
@@ -301,7 +303,7 @@ RemotePluginClient::~RemotePluginClient()
 
 
 #ifdef USE_QT_SHMEM
-VstSyncData * RemotePluginClient::getQtVSTshm()
+const VstSyncData* RemotePluginClient::getQtVSTshm()
 {
 	return m_vstSyncData;
 }
@@ -381,16 +383,13 @@ bool RemotePluginClient::processMessage( const message & _m )
 void RemotePluginClient::setShmKey( key_t _key, int _size )
 {
 #ifdef USE_QT_SHMEM
-	m_shmObj.setKey( QString::number( _key ) );
-	if( m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError )
+	if (m_shmObj.attach(QString::number(_key).toStdString()); m_shmObj)
 	{
-		m_shm = (float *) m_shmObj.data();
+		m_shm = m_shmObj.get();
 	}
 	else
 	{
-		char buf[64];
-		sprintf( buf, "failed getting shared memory: %d\n", m_shmObj.error() );
-		debugMessage( buf );
+		debugMessage("failed getting shared memory\n");
 	}
 #else
 	if( m_shm != nullptr )

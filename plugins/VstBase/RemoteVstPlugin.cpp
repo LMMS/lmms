@@ -498,7 +498,7 @@ private:
 	in * m_in;
 
 	int m_shmID;
-	VstSyncData* m_vstSyncData;
+	const VstSyncData* m_vstSyncData;
 
 } ;
 
@@ -564,15 +564,16 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 		fprintf(stderr, "RemoteVstPlugin.cpp: "
 			"Failed to initialize shared memory for VST synchronization.\n"
 			" (VST-host synchronization will be disabled)\n");
-		m_vstSyncData = (VstSyncData*) malloc( sizeof( VstSyncData ) );
-		m_vstSyncData->isPlaying = true;
-		m_vstSyncData->timeSigNumer = 4;
-		m_vstSyncData->timeSigDenom = 4;
-		m_vstSyncData->ppqPos = 0;
-		m_vstSyncData->isCycle = false;
-		m_vstSyncData->hasSHM = false;
-		m_vstSyncData->m_playbackJumped = false;
-		m_vstSyncData->m_sampleRate = sampleRate();
+		const auto vstSyncData = (VstSyncData*) malloc( sizeof( VstSyncData ) );
+		vstSyncData->isPlaying = true;
+		vstSyncData->timeSigNumer = 4;
+		vstSyncData->timeSigDenom = 4;
+		vstSyncData->ppqPos = 0;
+		vstSyncData->isCycle = false;
+		vstSyncData->hasSHM = false;
+		vstSyncData->m_playbackJumped = false;
+		vstSyncData->m_sampleRate = sampleRate();
+		m_vstSyncData = vstSyncData;
 	}
 
 	m_in = ( in* ) new char[ sizeof( in ) ];

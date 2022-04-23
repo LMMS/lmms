@@ -59,7 +59,6 @@
 #define USE_QT_SHMEM
 
 #include <QtGlobal>
-#include <QSharedMemory>
 
 #if !defined(LMMS_HAVE_SYS_TYPES_H) || defined(LMMS_BUILD_WIN32)
 typedef int32_t key_t;
@@ -100,6 +99,9 @@ typedef int32_t key_t;
 #endif
 
 #ifdef SYNC_WITH_SHM_FIFO
+
+#include "SharedMemory.h"
+
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
 const int SHM_FIFO_SIZE = 512*1024;
@@ -144,11 +146,10 @@ public:
 #ifdef USE_QT_SHMEM
 		do
 		{
-			m_shmObj.setKey( QString( "%1" ).arg( ++m_shmKey ) );
-			m_shmObj.create( sizeof( shmData ) );
-		} while( m_shmObj.error() != QSharedMemory::NoError );
+			m_shmObj.create(QString("%1").arg(++m_shmKey).toStdString());
+		} while (!m_shmObj);
 
-		m_data = (shmData *) m_shmObj.data();
+		m_data = m_shmObj.get();
 #else
 		while( ( m_shmID = shmget( ++m_shmKey, sizeof( shmData ),
 					IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
@@ -175,7 +176,7 @@ public:
 		m_master( false ),
 		m_shmKey( 0 ),
 #ifdef USE_QT_SHMEM
-		m_shmObj( QString::number( _shm_key ) ),
+		m_shmObj(),
 #else
 		m_shmID( shmget( _shm_key, 0, 0 ) ),
 #endif
@@ -185,9 +186,9 @@ public:
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
-		if( m_shmObj.attach() )
+		if (m_shmObj.attach(QString::number(_shm_key).toStdString()); m_shmObj)
 		{
-			m_data = (shmData *) m_shmObj.data();
+			m_data = m_shmObj.get();
 		}
 #else
 		if( m_shmID != -1 )
@@ -397,7 +398,7 @@ private:
 	bool m_master;
 	key_t m_shmKey;
 #ifdef USE_QT_SHMEM
-	QSharedMemory m_shmObj;
+	SharedMemory<shmData> m_shmObj;
 #else
 	int m_shmID;
 #endif
