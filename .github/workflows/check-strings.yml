@@ -9,8 +9,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install python-tinycss2
-      run: sudo apt-get install -y python3-tinycss2
+    - name: Install python modules
+      run: sudo apt-get install -y python3-tinycss2 python3-cssutils
     - name: Update submodules
       run: git submodule update --init --recursive
     - name: Verify check-strings script

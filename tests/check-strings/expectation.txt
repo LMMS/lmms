@@ -21,20 +21,6 @@ Error: data/locale: Source file does not exist: src/tracks/BBTrack.cpp
 Error: data/locale: Class does not exist in source code: BBClipView
 Error: data/locale: Class does not exist in source code: BBEditor
 Error: data/locale: Class does not exist in source code: BBTrack
-Error: data/locale: Class does not exist in source code: CarlaAboutW
-Error: data/locale: Class does not exist in source code: CarlaHostW
-Error: data/locale: Class does not exist in source code: CarlaHostWindow
-Error: data/locale: Class does not exist in source code: CarlaSettingsW
-Error: data/locale: Class does not exist in source code: Dialog
-Error: data/locale: Class does not exist in source code: DriverSettingsW
-Error: data/locale: Class does not exist in source code: JackApplicationW
-Error: data/locale: Class does not exist in source code: JuceAboutW
-Error: data/locale: Class does not exist in source code: MidiPatternW
-Error: data/locale: Class does not exist in source code: PluginDatabaseW
-Error: data/locale: Class does not exist in source code: PluginEdit
-Error: data/locale: Class does not exist in source code: PluginParameter
-Error: data/locale: Class does not exist in source code: PluginRefreshW
-Error: data/locale: Class does not exist in source code: PluginWidget
 Error: data/locale: Class does not exist in source code: SpectrumAnalyzerControlDialog
 Error: data/locale: Class does not exist in source code: SpectrumAnalyzerControls
 Error: data/locale: Class does not exist in source code: VisualizationWidget
@@ -92,4 +78,4 @@ Error: debian/copyright: Glob/Path does not exist: plugins/opl2/fmopl.*
 
 # summary
 
-73 errors.
+59 errors.
