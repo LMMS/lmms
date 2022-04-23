@@ -372,8 +372,10 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	QTreeWidget( parent ),
 	m_mousePressed( false ),
 	m_pressPos(),
-	m_previewPlayHandle( nullptr ),
-	m_pphMutex( QMutex::Recursive )
+	m_previewPlayHandle( nullptr )
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+	,m_pphMutex(QMutex::Recursive)
+#endif
 {
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );

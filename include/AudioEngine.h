@@ -26,6 +26,11 @@
 #define AUDIO_ENGINE_H
 
 #include <QMutex>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
+
 #include <QThread>
 #include <QVector>
 #include <QWaitCondition>
@@ -464,7 +469,11 @@ private:
 	bool m_changesSignal;
 	unsigned int m_changes;
 	QMutex m_changesMutex;
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_doChangesMutex;
+#else
 	QMutex m_doChangesMutex;
+#endif
 	QMutex m_waitChangesMutex;
 	QWaitCondition m_changesAudioEngineCondition;
 	QWaitCondition m_changesRequestCondition;
