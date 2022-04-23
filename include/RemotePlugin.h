@@ -28,6 +28,10 @@
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
+
 namespace lmms
 {
 
@@ -158,7 +162,11 @@ private:
 	QString m_exec;
 	QStringList m_args;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_commMutex;
+#else
 	QMutex m_commMutex;
+#endif
 	bool m_splitChannels;
 
 	SharedMemory<float[]> m_audioBuffer;

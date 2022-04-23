@@ -29,6 +29,9 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 #include <QTreeWidget>
 
 
@@ -140,7 +143,12 @@ private:
 
 	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
+	
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_pphMutex;
+#else
 	QMutex m_pphMutex;
+#endif
 
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 

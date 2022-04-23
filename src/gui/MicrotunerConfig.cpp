@@ -317,7 +317,11 @@ bool MicrotunerConfig::validateScaleForm()
 	if (name.contains('\n')) {fail(tr("Scale name cannot contain a new-line character")); return false;}
 
 	// check intervals
-	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+	#else
+		QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -361,7 +365,11 @@ bool MicrotunerConfig::validateKeymapForm()
 	if (name.contains('\n')) {fail(tr("Keymap name cannot contain a new-line character")); return false;}
 
 	// check key mappings
-	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+	#else
+		QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -391,7 +399,11 @@ bool MicrotunerConfig::applyScale()
 	std::vector<Interval> newIntervals;
 	newIntervals.push_back(Interval(1, 1));
 
-	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+#else
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -433,7 +445,11 @@ bool MicrotunerConfig::applyKeymap()
 
 	std::vector<int> newMap;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+#else
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
