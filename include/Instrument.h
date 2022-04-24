@@ -148,9 +148,9 @@ private:
 
 } ;
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
-
 
 } // namespace lmms
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(lmms::Instrument::Flags)
 
 #endif
