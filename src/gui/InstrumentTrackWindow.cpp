@@ -135,8 +135,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
 
 	QString labelStyleSheet = "font-size: 6pt;";
-	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
-	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
+	auto labelAlignment = static_cast<Qt::Alignment>(Qt::AlignHCenter | Qt::AlignTop);
+	auto widgetAlignment = static_cast<Qt::Alignment>(Qt::AlignHCenter | Qt::AlignCenter);
 
 	// set up volume knob
 	m_volumeKnob = new Knob( knobBright_26, nullptr, tr( "Volume" ) );
