@@ -2486,7 +2486,7 @@ int main( int _argc, char * * _argv )
 	}
 
 #ifndef LMMS_BUILD_WIN32
-	const auto pollParentThread = PollParentThread{};
+	const auto pollParentThread = lmms::PollParentThread{};
 #endif
 
 #ifndef NATIVE_LINUX_VST
