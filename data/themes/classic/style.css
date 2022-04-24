@@ -748,7 +748,7 @@ lmms--gui--SubWindow > QPushButton:hover{
 
 /* Plugins */
 
-lmms--gui--TripleOscillatorView Knob {
+lmms--gui--TripleOscillatorView lmms--gui--Knob {
 	color: rgb(255, 255, 255);
 	qproperty-outerColor: rgb(255, 255, 255);
 	qproperty-innerRadius: 2;
@@ -759,7 +759,7 @@ lmms--gui--TripleOscillatorView Knob {
 }
 
 
-lmms--gui--KickerInstrumentView Knob#smallKnob {
+lmms--gui--KickerInstrumentView lmms--gui--Knob#smallKnob {
 	color: #595959;
 	qproperty-outerColor: black;
 	qproperty-innerRadius: 3;
@@ -770,7 +770,7 @@ lmms--gui--KickerInstrumentView Knob#smallKnob {
 }
 
 
-lmms--gui--KickerInstrumentView Knob#largeKnob {
+lmms--gui--KickerInstrumentView lmms--gui--Knob#largeKnob {
 	color: #0c3b89;
 	qproperty-outerColor: #519fff;
 	qproperty-innerRadius: 12.0;
@@ -781,7 +781,7 @@ lmms--gui--KickerInstrumentView Knob#largeKnob {
 }
 
 
-lmms--gui--AudioFileProcessorView Knob {
+lmms--gui--AudioFileProcessorView lmms--gui--Knob {
 	color: rgb(240, 147, 14);
 	qproperty-outerColor: rgb(30, 35, 37);
 	qproperty-innerRadius: 4;
@@ -791,7 +791,7 @@ lmms--gui--AudioFileProcessorView Knob {
 	qproperty-lineWidth: 3;
 }
 
-lmms--gui--OrganicInstrumentView Knob {
+lmms--gui--OrganicInstrumentView lmms--gui--Knob {
 	color: rgb(124, 207, 98);
 	qproperty-outerColor: rgb(13, 42, 4);
 	qproperty-innerRadius: 2;
@@ -801,13 +801,13 @@ lmms--gui--OrganicInstrumentView Knob {
 	qproperty-lineWidth: 1.5;
 }
 
-lmms--gui--OrganicInstrumentView Knob#harmKnob {
+lmms--gui--OrganicInstrumentView lmms--gui--Knob#harmKnob {
 	color: rgb(205, 98, 216);
 	qproperty-outerColor: rgb(18, 4, 18);
 }
 
-lmms--gui--OrganicInstrumentView Knob#fx1Knob,
-lmms--gui--OrganicInstrumentView Knob#volKnob {
+lmms--gui--OrganicInstrumentView lmms--gui--Knob#fx1Knob,
+lmms--gui--OrganicInstrumentView lmms--gui--Knob#volKnob {
 	color: rgb(157, 157, 157);
 	qproperty-outerColor: rgb(37, 37, 37);
 	qproperty-innerRadius: 4;
@@ -817,7 +817,7 @@ lmms--gui--OrganicInstrumentView Knob#volKnob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--Sf2InstrumentView Knob {
+lmms--gui--Sf2InstrumentView lmms--gui--Knob {
 	color: #ff00ea;
 	qproperty-outerColor: rgb(20, 5, 18);
 	qproperty-innerRadius: 2;
@@ -827,7 +827,7 @@ lmms--gui--Sf2InstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--SfxrInstrumentView Knob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob {
 	color: #000;
 	qproperty-outerColor: rgb(194, 177, 145);
 	qproperty-innerRadius: 2;
@@ -835,42 +835,42 @@ lmms--gui--SfxrInstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--SfxrInstrumentView Knob#envKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#envKnob {
 	color:	#263352;
 	qproperty-outerColor: #4b66a4;
 }
 
-lmms--gui--SfxrInstrumentView Knob#freqKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#freqKnob {
 	color:	#1e4a22;
 	qproperty-outerColor: #3c9544;
 }
 
-lmms--gui--SfxrInstrumentView Knob#changeKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#changeKnob {
 	color:	#591c1c;
 	qproperty-outerColor: #b23737;
 }
 
-lmms--gui--SfxrInstrumentView Knob#sqrKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#sqrKnob {
 	color:	#3b2714;
 	qproperty-outerColor: #724c27;
 }
 
-lmms--gui--SfxrInstrumentView Knob#repeatKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#repeatKnob {
 	color:	#292929;
 	qproperty-outerColor: #515151;
 }
 
-lmms--gui--SfxrInstrumentView Knob#phaserKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#phaserKnob {
 	color:	#144c4d;
 	qproperty-outerColor: #299899;
 }
 
-lmms--gui--SfxrInstrumentView Knob#filterKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#filterKnob {
 	color:	#47224c;
 	qproperty-outerColor: #8e4397;
 }
 
-lmms--gui--OpulenzInstrumentView Knob {
+lmms--gui--OpulenzInstrumentView lmms--gui--Knob {
 	color: rgb(128,128,128);
 	qproperty-outerColor: rgb(255,255,255);
 	qproperty-innerRadius: 2;
@@ -878,7 +878,7 @@ lmms--gui--OpulenzInstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--SidInstrumentView Knob {
+lmms--gui--SidInstrumentView lmms--gui--Knob {
 	color: rgb(113,95,80);
 	qproperty-outerColor: rgb( 255,255,255 );
 	qproperty-innerRadius: 2;
@@ -886,7 +886,7 @@ lmms--gui--SidInstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--WatsynView Knob {
+lmms--gui--WatsynView lmms--gui--Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 9.5;
@@ -894,17 +894,17 @@ lmms--gui--WatsynView Knob {
 	qproperty-lineWidth: 2;
 }
 
-lmms--gui--WatsynView Knob#aKnob {
+lmms--gui--WatsynView lmms--gui--Knob#aKnob {
 	color: #43b2ff;
 	qproperty-outerColor: #43b2ff;
 }
 
-lmms--gui--WatsynView Knob#bKnob {
+lmms--gui--WatsynView lmms--gui--Knob#bKnob {
 	color: #fc5431;
 	qproperty-outerColor: #fc5431;
 }
 
-lmms--gui--WatsynView Knob#mixKnob {
+lmms--gui--WatsynView lmms--gui--Knob#mixKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 	qproperty-outerRadius: 13;
@@ -912,17 +912,17 @@ lmms--gui--WatsynView Knob#mixKnob {
 	qproperty-centerPointY: 15.5;
 }
 
-lmms--gui--WatsynView Knob#mixenvKnob {
+lmms--gui--WatsynView lmms--gui--Knob#mixenvKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 }
 
-lmms--gui--WatsynView Knob#xtalkKnob {
+lmms--gui--WatsynView lmms--gui--Knob#xtalkKnob {
 	color: #fb50fb;
 	qproperty-outerColor: #fb50fb;
 }
 
-lmms--gui--MonstroView Knob {
+lmms--gui--MonstroView lmms--gui--Knob {
 	color: #ffffff;
 	qproperty-outerColor: #aaaaaa;
 	qproperty-outerRadius: 9;
@@ -932,7 +932,7 @@ lmms--gui--MonstroView Knob {
 	qproperty-lineWidth: 2.5;
 }
 
-lmms--gui--NesInstrumentView Knob {
+lmms--gui--NesInstrumentView lmms--gui--Knob {
 	color: #e7231b;
 	qproperty-outerColor: #fff;
 	qproperty-outerRadius: 11.0;
@@ -956,7 +956,7 @@ lmms--gui--CompressorControlDialog {
 	qproperty-resetColor: rgba(200, 100, 15, 200);
 }
 
-lmms--gui--CompressorControlDialog Knob {
+lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
