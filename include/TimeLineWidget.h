@@ -184,6 +184,10 @@ public slots:
 	{
 		updatePosition( TimePos() );
 	}
+	void setSnapSize( const float snapSize )
+	{
+		m_snapSize = snapSize;
+	}
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
 	void toggleBehaviourAtStop( int _n );
@@ -221,6 +225,7 @@ private:
 	int m_xOffset;
 	int m_posMarkerX;
 	float m_ppb;
+	float m_snapSize;
 	Song::PlayPos & m_pos;
 	const TimePos & m_begin;
 	const Song::PlayModes m_mode;

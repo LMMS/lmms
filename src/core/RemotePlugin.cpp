@@ -29,6 +29,10 @@
 #include <QDebug>
 #endif
 
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
+
 #include "BufferManager.h"
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -42,6 +46,30 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #endif
+
+#ifdef LMMS_BUILD_WIN32
+
+namespace {
+
+HANDLE getRemotePluginJob()
+{
+	static const auto job = []
+	{
+		const auto job = CreateJobObject(nullptr, nullptr);
+
+		auto limitInfo = JOBOBJECT_EXTENDED_LIMIT_INFORMATION{};
+		limitInfo.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+		SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limitInfo, sizeof(limitInfo));
+
+		return job;
+	}();
+
+	return job;
+}
+
+} // namespace
+
+#endif // LMMS_BUILD_WIN32
 
 namespace lmms
 {
@@ -58,18 +86,41 @@ ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
 
 void ProcessWatcher::run()
 {
-	m_plugin->m_process.start( m_plugin->m_exec, m_plugin->m_args );
-	exec();
-	m_plugin->m_process.moveToThread( m_plugin->thread() );
-	while( !m_quit && m_plugin->messagesLeft() )
-	{
-		msleep( 200 );
-	}
-	if( !m_quit )
-	{
-		fprintf( stderr,
-				"remote plugin died! invalidating now.\n" );
+	auto& process = m_plugin->m_process;
+	process.start(m_plugin->m_exec, m_plugin->m_args);
 
+#ifdef LMMS_BUILD_WIN32
+	// Add the process to our job so it is killed if we crash
+	if (process.waitForStarted(-1))
+	{
+		if (const auto processHandle = OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE, false, process.processId()))
+		{
+			// Ensure the process is still running, otherwise the handle we
+			// obtained may be for a different process that happened to reuse
+			// the same process id.
+			// QProcess::state() alone is insufficient as it only returns a
+			// cached state variable that is updated asynchronously. To query
+			// the process itself, we can use QProcess::waitForFinished() with a
+			// zero timeout, but that too is insufficient as it fails if the
+			// process has already finished. Therefore, we check both.
+			if (!process.waitForFinished(0) && process.state() == QProcess::Running)
+			{
+				AssignProcessToJobObject(getRemotePluginJob(), processHandle);
+			}
+			CloseHandle(processHandle);
+		}
+	}
+#endif // LMMS_BUILD_WIN32
+
+	exec();
+	process.moveToThread(m_plugin->thread());
+	while (!m_quit && m_plugin->messagesLeft())
+	{
+		msleep(200);
+	}
+	if (!m_quit)
+	{
+		fprintf(stderr, "remote plugin died! invalidating now.\n");
 		m_plugin->invalidate();
 	}
 }

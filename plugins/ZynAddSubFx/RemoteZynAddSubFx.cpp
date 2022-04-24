@@ -268,6 +268,10 @@ int main( int _argc, char * * _argv )
 		return -1;
 	}
 
+#ifndef LMMS_BUILD_WIN32
+	const auto pollParentThread = PollParentThread{};
+#endif
+
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
 	// (non-portable) initialization of statically linked pthread library
