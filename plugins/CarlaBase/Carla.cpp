@@ -854,6 +854,17 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	splitter->addWidget(outputFrame);
 	verticalLayout->addWidget(splitter);
 
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+
 	// -- Sub window
 	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(), Qt::SubWindow |
 		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
@@ -1050,6 +1061,17 @@ void CarlaParamsView::windowResized()
 
 void CarlaParamsView::addKnob(uint32_t index)
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+
 	bool output = m_carlaInstrument->m_paramModels[index]->isOutput();
 	if (output)
 	{
