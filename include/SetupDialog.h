@@ -81,6 +81,7 @@ private slots:
 	void toggleMMPZ(bool enabled);
 	void toggleDisableBackup(bool enabled);
 	void toggleOpenLastProject(bool enabled);
+	void setLoopMarkerMode(int mode);
 	void setLanguage(int lang);
 
 	// Performance settings widget.
@@ -141,6 +142,8 @@ private:
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
+	QString m_loopMarkerMode;
+	QStringList m_loopMarkerModes;
 	QString m_lang;
 	QStringList m_languages;
 

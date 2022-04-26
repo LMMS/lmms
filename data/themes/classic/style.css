@@ -678,6 +678,8 @@ ClipView   {
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 3px 3px;
 	qproperty-mouseHotspotKnife: 0px 0px;
+	qproperty-mouseHotspotSelLeft: 0px 0px;
+	qproperty-mouseHotspotSelRight: 32px 0px;
 
 	font-size: 11px;
 }

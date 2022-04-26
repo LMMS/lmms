@@ -114,6 +114,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"app", "disablebackup").toInt()),
 	m_openLastProject(ConfigManager::inst()->value(
 			"app", "openlastproject").toInt()),
+	m_loopMarkerMode(ConfigManager::inst()->value(
+			"app", "loopmarkermode")),
 	m_lang(ConfigManager::inst()->value(
 			"app", "language")),
 	m_saveInterval(	ConfigManager::inst()->value(
@@ -158,7 +160,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// TODO: Equivalent to the new setWindowFlag(Qt::WindowContextHelpButtonHint, false)
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	setModal(true);
-	setFixedSize(454, 400);
+	setFixedSize(454, 440);
 
 	Engine::projectJournal()->setJournalling(false);
 
@@ -188,7 +190,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Settings widget.
 	QWidget * settings_w = new QWidget(main_w);
-	settings_w->setFixedSize(360, 360);
+	settings_w->setFixedSize(360, 400);
 
 	// General widget.
 	QWidget * general_w = new QWidget(settings_w);
@@ -246,7 +248,30 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	addLedCheckBox(tr("Show warning when deleting tracks"), gui_tw, counter,
 		m_trackDeletionWarning, SLOT(toggleTrackDeletionWarning(bool)), false);
 
-	gui_tw->setFixedHeight(YDelta + YDelta * counter);
+	QComboBox * changeLoop = new QComboBox(gui_tw);
+	changeLoop->move(XDelta, YDelta * counter + 20);
+
+	m_loopMarkerModes.append(QString("Grab closest"));
+	m_loopMarkerModes.append(QString("Handles"));
+
+	for (QString mode : m_loopMarkerModes)
+	{
+		changeLoop->addItem(mode);
+	}
+
+	for(int i = 0; i < changeLoop->count(); ++i)
+	{
+		if(m_loopMarkerMode == m_loopMarkerModes.at(i))
+		{
+			changeLoop->setCurrentIndex(i);
+			break;
+		}
+	}
+
+	connect(changeLoop, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(setLoopMarkerMode(int)));
+
+	gui_tw->setFixedHeight(2 * YDelta + 20 +  YDelta * counter);
 
 
 	counter = 0;
@@ -929,6 +954,7 @@ void SetupDialog::accept()
 					QString::number(!m_disableBackup));
 	ConfigManager::inst()->setValue("app", "openlastproject",
 					QString::number(m_openLastProject));
+	ConfigManager::inst()->setValue("app", "loopmarkermode", m_loopMarkerMode);
 	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
@@ -1062,6 +1088,12 @@ void SetupDialog::toggleDisableBackup(bool enabled)
 void SetupDialog::toggleOpenLastProject(bool enabled)
 {
 	m_openLastProject = enabled;
+}
+
+
+void SetupDialog::setLoopMarkerMode(int lang)
+{
+	m_loopMarkerMode = m_loopMarkerModes[lang];
 }
 
 

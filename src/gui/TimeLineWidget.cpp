@@ -31,6 +31,7 @@
 
 
 #include "TimeLineWidget.h"
+#include "ConfigManager.h"
 #include "embed.h"
 #include "NStateButton.h"
 #include "GuiApplication.h"
@@ -52,6 +53,10 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_loopRectangleVerticalPadding( 1 ),
 	m_barLineColor( 192, 192, 192 ),
 	m_barNumberColor( m_barLineColor.darker( 120 ) ),
+	m_mouseHotspotSelLeft( 0, 0 ),
+	m_mouseHotspotSelRight( 0, 0 ),
+	m_cursorSelectLeft(QCursor(embed::getIconPixmap("cursor_select_left"))),
+	m_cursorSelectRight(QCursor(embed::getIconPixmap("cursor_select_right"))),
 	m_autoScroll( AutoScrollEnabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
@@ -91,6 +96,11 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	updateTimer->start( 1000 / 60 );  // 60 fps
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( update() ) );
+
+	m_cursorSelectLeft = QCursor(embed::getIconPixmap("cursor_select_left"),
+		m_mouseHotspotSelLeft.width(), m_mouseHotspotSelLeft.height());
+	m_cursorSelectRight = QCursor(embed::getIconPixmap("cursor_select_right"),
+		m_mouseHotspotSelRight.width(), m_mouseHotspotSelRight.height());	
 }
 
 
@@ -111,6 +121,33 @@ void TimeLineWidget::setXOffset(const int x)
 {
 	m_xOffset = x;
 	if (s_posMarkerPixmap != nullptr) { m_xOffset -= s_posMarkerPixmap->width() / 2; }
+}
+
+
+
+
+TimePos TimeLineWidget::getClickedTime(const QMouseEvent *event)
+{
+	return getClickedTime(event->x());
+}
+
+
+TimePos TimeLineWidget::getClickedTime(const int xPosition)
+{
+	// How far into the timeline we clicked, measuring pixels from the leftmost part of the editor
+	const int pixelDelta = qMax(xPosition - m_xOffset - m_moveXOff, 0);
+	return m_begin + static_cast<int>(pixelDelta * TimePos::ticksPerBar() / m_ppb);
+}
+
+
+
+
+TimePos TimeLineWidget::getEnd()
+{
+	// widget width - track label area - margins - 1
+	auto contentWidth = width() - m_xOffset - 9;
+	auto ticksPerPixel = TimePos::ticksPerBar() / m_ppb;
+    return m_begin + (contentWidth * ticksPerPixel);
 }
 
 
@@ -252,6 +289,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	QRect outerRectangle( loopStart, loopRectMargin, loopRectWidth - 1, loopRectHeight - 1 );
 	p.fillRect( outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush());
 
+	QRect leftHandle(loopStart, loopRectMargin, 5, loopRectHeight - 1);
+	QRect rightHandle(loopEndR - 5, loopRectMargin, 5, loopRectHeight - 1);
+	if (ConfigManager::inst()->value( "app", "loopmarkermode" ) == "Handles")
+	{
+		p.fillRect(leftHandle, Qt::magenta);
+		p.fillRect(rightHandle, Qt::magenta);
+	}
+
 	// Draw the bar lines and numbers
 	// Activate hinting on the font
 	QFont font = p.font();
@@ -284,6 +329,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		}
 	}
 
+	// <Unneeded?>
 	// Draw the main rectangle (outer border)
 	p.setPen( loopPointsActive ? getActiveLoopColor() : getInactiveLoopColor() );
 	p.setBrush( Qt::NoBrush );
@@ -294,6 +340,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( innerRectangle );
+	// </Unneeded?>
 
 	// Only draw the position marker if the position line is in view
 	if (m_posMarkerX >= m_xOffset && m_posMarkerX < width() - s_posMarkerPixmap->width() / 2)
@@ -308,16 +355,77 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 
 
-void TimeLineWidget::mousePressEvent( QMouseEvent* event )
+TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 {
-	if( event->x() < m_xOffset )
+	if (!(event->modifiers() & Qt::ShiftModifier)){ return NoAction; }
+
+	const TimePos t = getClickedTime(event);
+	const QString loopMode = ConfigManager::inst()->value( "app", "loopmarkermode" );
+
+	if (loopMode == "Handles")
 	{
-		return;
+		const int leftMost = std::max(markerX(loopBegin()), m_xOffset) + 8;
+		const int deltaLeft = event->x() - leftMost;
+		const int rightMost = std::min(markerX(loopEnd()) + 9, width());
+		const int deltaRight = rightMost - event->x();
+
+		if (deltaLeft < 0 || deltaRight < 0) { return NoAction; }
+		else if (deltaLeft <= 5 && deltaLeft < deltaRight) { return MoveLoopBegin; }
+		else if (deltaRight <= 5) { return MoveLoopEnd; }
+		else { return NoAction; } // TODO: Loop slide
 	}
-	if( event->button() == Qt::LeftButton  && !(event->modifiers() & Qt::ShiftModifier) )
+	else /**if (loopMode == "Grab closest")**/
+	{
+		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1])/2;
+		return t < loopMid ? MoveLoopBegin : MoveLoopEnd;
+	}
+	// TODO: shortcut mode
+}
+
+
+
+void TimeLineWidget::updateCursor(actions action)
+{
+	if (action == NoAction){ setCursor(Qt::ArrowCursor); }
+	else if (action == MoveLoopBegin){ setCursor(m_cursorSelectLeft); }
+	else if (action == MoveLoopEnd){ setCursor(m_cursorSelectRight); }
+	// TODO: loop slide
+}
+
+
+
+
+void TimeLineWidget::mousePressEvent(QMouseEvent* event)
+{
+	// TODO: properly fix cursor hotspot, this doesn't seem to help
+	m_cursorSelectLeft = QCursor(embed::getIconPixmap("cursor_select_left"),
+		m_mouseHotspotSelLeft.width(), m_mouseHotspotSelLeft.height());
+	m_cursorSelectRight = QCursor(embed::getIconPixmap("cursor_select_right"),
+		m_mouseHotspotSelRight.width(), m_mouseHotspotSelRight.height());
+
+
+	if (event->x() < m_xOffset) { return; }
+
+	const bool shift = event->modifiers() & Qt::ShiftModifier;
+	const bool ctrl = event->modifiers() & Qt::ControlModifier;
+
+	if (shift) // loop marker manipulation
+	{
+		m_action = getLoopAction(event);
+		updateCursor(m_action);
+
+		m_loopPos[(m_action == MoveLoopBegin) ? 0 : 1] = getClickedTime(event);
+		std::sort(std::begin(m_loopPos), std::end(m_loopPos));
+	}
+	else if (event->button() == Qt::LeftButton && ctrl) // selection
+	{
+		m_action = SelectSongClip;
+		m_initalXSelect = event->x();
+	}
+	else if (event->button() == Qt::LeftButton && !ctrl) // move playhead
 	{
 		m_action = MovePositionMarker;
-		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
+		if (event->x() - m_xOffset < s_posMarkerPixmap->width())
 		{
 			m_moveXOff = event->x() - m_xOffset;
 		}
@@ -326,30 +434,16 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 			m_moveXOff = s_posMarkerPixmap->width() / 2;
 		}
 	}
-	else if( event->button() == Qt::LeftButton  && (event->modifiers() & Qt::ShiftModifier) )
-	{
-		m_action = SelectSongClip;
-		m_initalXSelect = event->x();
-	}
-	else if( event->button() == Qt::RightButton )
-	{
-		m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
-		const TimePos loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
+	else if (event->button() == Qt::RightButton){} // TODO: right click menu
 
-		m_action = t < loopMid ? MoveLoopBegin : MoveLoopEnd;
-		std::sort(std::begin(m_loopPos), std::end(m_loopPos));
-		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
-	}
-
-	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
+	if (m_action == MoveLoopBegin || m_action == MoveLoopEnd)
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
-					embed::getIconPixmap( "hint" ), 0 );
+			tr( "Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
+			embed::getIconPixmap( "hint" ), 0 );
 	}
-	mouseMoveEvent( event );
+	mouseMoveEvent(event);
 }
 
 
@@ -358,7 +452,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
-	const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
+	const TimePos t = getClickedTime(event);
 
 	switch( m_action )
 	{
@@ -375,11 +469,10 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			updatePosition();
 			positionMarkerMoved();
 			break;
-
 		case MoveLoopBegin:
 		case MoveLoopEnd:
 		{
-			const int i = m_action - MoveLoopBegin; // i == 0 || i == 1
+			const int i = m_action == MoveLoopBegin ? 0 : 1;
 			const bool control = event->modifiers() & Qt::ControlModifier;
 			if (control)
 			{
@@ -404,11 +497,12 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			update();
 			break;
 		}
-	case SelectSongClip:
+		case SelectSongClip:
 			emit regionSelectedFromPixels( m_initalXSelect , event->x() );
-		break;
+			break;
 
 		default:
+			updateCursor(getLoopAction(event));
 			break;
 	}
 }
@@ -422,4 +516,5 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	m_hint = nullptr;
 	if ( m_action == SelectSongClip ) { emit selectionFinished(); }
 	m_action = NoAction;
+	std::sort(std::begin(m_loopPos), std::end(m_loopPos));
 }

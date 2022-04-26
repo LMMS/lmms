@@ -51,6 +51,8 @@ public:
 	Q_PROPERTY( QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush )
 	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+	Q_PROPERTY( QSize mouseHotspotSelLeft WRITE setMouseHotspotSelLeft )
+	Q_PROPERTY( QSize mouseHotspotSelRight WRITE setMouseHotspotSelRight )
 
 	enum AutoScrollStates
 	{
@@ -103,6 +105,9 @@ public:
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
+	inline void setMouseHotspotSelLeft(const QSize & s) { m_mouseHotspotSelLeft = s; }
+	inline void setMouseHotspotSelRight(const QSize & s) { m_mouseHotspotSelRight = s; }
+
 	inline Song::PlayPos & pos()
 	{
 		return( m_pos );
@@ -151,6 +156,10 @@ public:
 	}
 
 	void setXOffset(const int x);
+	TimePos getClickedTime(const QMouseEvent *event);
+	TimePos getClickedTime(const int xPosition);
+	// Rightmost position visible on timeline (disregards parent editor scrollbar)
+	TimePos getEnd();
 
 	void addToolButtons(QToolBar* _tool_bar );
 
@@ -211,6 +220,11 @@ private:
 
 	QColor m_barLineColor;
 	QColor m_barNumberColor;
+	
+	QSize m_mouseHotspotSelLeft;
+	QSize m_mouseHotspotSelRight;
+	QCursor m_cursorSelectLeft;
+	QCursor m_cursorSelectRight;
 
 	AutoScrollStates m_autoScroll;
 	LoopPointStates m_loopPoints;
@@ -223,6 +237,7 @@ private:
 	float m_ppb;
 	float m_snapSize;
 	Song::PlayPos & m_pos;
+	// Leftmost position visible in parent editor
 	const TimePos & m_begin;
 	const Song::PlayModes m_mode;
 	TimePos m_loopPos[2];
@@ -242,6 +257,9 @@ private:
 		MoveLoopEnd,
 		SelectSongClip,
 	} m_action;
+	
+	TimeLineWidget::actions getLoopAction(QMouseEvent* event);
+	void updateCursor(actions action);
 
 	int m_moveXOff;
 
