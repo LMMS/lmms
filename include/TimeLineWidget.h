@@ -232,8 +232,8 @@ private:
 
 	bool m_changedPosition;
 
+	// Width of the unused region on the widget's left (above track labels or piano)
 	int m_xOffset;
-	int m_posMarkerX;
 	float m_ppb;
 	float m_snapSize;
 	Song::PlayPos & m_pos;
@@ -260,8 +260,6 @@ private:
 	
 	TimeLineWidget::actions getLoopAction(QMouseEvent* event);
 	void updateCursor(actions action);
-
-	int m_moveXOff;
 
 
 signals:

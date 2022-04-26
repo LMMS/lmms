@@ -62,7 +62,6 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_behaviourAtStop( BackToZero ),
 	m_changedPosition( true ),
 	m_xOffset( xoff ),
-	m_posMarkerX( 0 ),
 	m_ppb( ppb ),
 	m_snapSize( 1.0 ),
 	m_pos( pos ),
@@ -70,8 +69,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_mode( mode ),
 	m_savedPos( -1 ),
 	m_hint( nullptr ),
-	m_action( NoAction ),
-	m_moveXOff( 0 )
+	m_action( NoAction )
 {
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerBar;
@@ -84,8 +82,6 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
-
-	m_xOffset -= s_posMarkerPixmap->width() / 2;
 
 	setMouseTracking(true);
 	m_pos.m_timeLine = this;
@@ -120,7 +116,6 @@ TimeLineWidget::~TimeLineWidget()
 void TimeLineWidget::setXOffset(const int x)
 {
 	m_xOffset = x;
-	if (s_posMarkerPixmap != nullptr) { m_xOffset -= s_posMarkerPixmap->width() / 2; }
 }
 
 
@@ -135,7 +130,7 @@ TimePos TimeLineWidget::getClickedTime(const QMouseEvent *event)
 TimePos TimeLineWidget::getClickedTime(const int xPosition)
 {
 	// How far into the timeline we clicked, measuring pixels from the leftmost part of the editor
-	const int pixelDelta = qMax(xPosition - m_xOffset - m_moveXOff, 0);
+	const int pixelDelta = qMax(xPosition - m_xOffset, 0);
 	return m_begin + static_cast<int>(pixelDelta * TimePos::ticksPerBar() / m_ppb);
 }
 
@@ -144,8 +139,7 @@ TimePos TimeLineWidget::getClickedTime(const int xPosition)
 
 TimePos TimeLineWidget::getEnd()
 {
-	// widget width - track label area - margins - 1
-	auto contentWidth = width() - m_xOffset - 9;
+	auto contentWidth = width() - m_xOffset;
 	auto ticksPerPixel = TimePos::ticksPerBar() / m_ppb;
     return m_begin + (contentWidth * ticksPerPixel);
 }
@@ -224,17 +218,11 @@ void TimeLineWidget::loadSettings( const QDomElement & _this )
 
 
 
-void TimeLineWidget::updatePosition( const TimePos & )
+void TimeLineWidget::updatePosition( const TimePos & newPos )
 {
-	const int new_x = markerX( m_pos );
-
-	if( new_x != m_posMarkerX )
-	{
-		m_posMarkerX = new_x;
-		m_changedPosition = true;
-		emit positionChanged( m_pos );
-		update();
-	}
+	m_changedPosition = true;
+	emit positionChanged( m_pos );
+	update();
 }
 
 
@@ -273,29 +261,20 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.fillRect( 0, 0, width(), height(), p.background() );
 
 	// Clip so that we only draw everything starting from the offset
-	const int leftMargin = m_xOffset + s_posMarkerPixmap->width() / 2;
-	p.setClipRect(leftMargin, 0, width() - leftMargin, height() );
+	p.setClipRect(m_xOffset, 0, width() - m_xOffset, height() );
 
-	// Draw the loop rectangle
+	// Variables for the loop rectangle
 	int const & loopRectMargin = getLoopRectangleVerticalPadding();
 	int const loopRectHeight = this->height() - 2 * loopRectMargin;
-	int const loopStart = markerX( loopBegin() ) + 8;
-	int const loopEndR = markerX( loopEnd() ) + 9;
+	int const loopStart = markerX(loopBegin());
+	int const loopEndR = markerX(loopEnd());
 	int const loopRectWidth = loopEndR - loopStart;
 
 	bool const loopPointsActive = loopPointsEnabled();
 
-	// Draw the main rectangle (inner fill only)
+	// Draw the main loop rectangle (inner fill only)
 	QRect outerRectangle( loopStart, loopRectMargin, loopRectWidth - 1, loopRectHeight - 1 );
 	p.fillRect( outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush());
-
-	QRect leftHandle(loopStart, loopRectMargin, 5, loopRectHeight - 1);
-	QRect rightHandle(loopEndR - 5, loopRectMargin, 5, loopRectHeight - 1);
-	if (ConfigManager::inst()->value( "app", "loopmarkermode" ) == "Handles")
-	{
-		p.fillRect(leftHandle, Qt::magenta);
-		p.fillRect(rightHandle, Qt::magenta);
-	}
 
 	// Draw the bar lines and numbers
 	// Activate hinting on the font
@@ -309,7 +288,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	QColor const & barNumberColor = getBarNumberColor();
 
 	bar_t barNumber = m_begin.getBar();
-	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
+	int const x = m_xOffset - 
 			( ( static_cast<int>( m_begin * m_ppb ) / TimePos::ticksPerBar() ) % static_cast<int>( m_ppb ) );
 
 	for( int i = 0; x + i * m_ppb < width(); ++i )
@@ -329,26 +308,33 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 		}
 	}
 
-	// <Unneeded?>
-	// Draw the main rectangle (outer border)
+	// Draw the loop rectangle's outer outline
 	p.setPen( loopPointsActive ? getActiveLoopColor() : getInactiveLoopColor() );
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( outerRectangle );
 
-	// Draw the inner border outline (no fill)
+	// Draw the loop rectangle's inner outline
 	QRect innerRectangle = outerRectangle.adjusted( 1, 1, -1, -1 );
 	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( innerRectangle );
-	// </Unneeded?>
+	
+	// Draw loop handles if necessary
+	QRect leftHandle(loopStart, loopRectMargin, 5, loopRectHeight - 1);
+	QRect rightHandle(loopEndR - 5, loopRectMargin, 5, loopRectHeight - 1);
+	if (ConfigManager::inst()->value( "app", "loopmarkermode" ) == "Handles")
+	{
+		p.fillRect(leftHandle, Qt::magenta);
+		p.fillRect(rightHandle, Qt::magenta);
+	}
 
 	// Only draw the position marker if the position line is in view
-	if (m_posMarkerX >= m_xOffset && m_posMarkerX < width() - s_posMarkerPixmap->width() / 2)
+	if (markerX(m_pos) >= m_xOffset && markerX(m_pos) < width() - s_posMarkerPixmap->width() / 2)
 	{
 		// Let the position marker extrude to the left
 		p.setClipping(false);
 		p.setOpacity(0.6);
-		p.drawPixmap(m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap);
+		p.drawPixmap(markerX(m_pos) - (s_posMarkerPixmap->width() / 2), height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap);
 	}
 }
 
@@ -364,12 +350,12 @@ TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 
 	if (loopMode == "Handles")
 	{
-		const int leftMost = std::max(markerX(loopBegin()), m_xOffset) + 8;
+		const int leftMost = std::max(markerX(loopBegin()), m_xOffset);
 		const int deltaLeft = event->x() - leftMost;
-		const int rightMost = std::min(markerX(loopEnd()) + 9, width());
+		const int rightMost = std::min(markerX(loopEnd()), width());
 		const int deltaRight = rightMost - event->x();
 
-		if (deltaLeft < 0 || deltaRight < 0) { return NoAction; }
+		if (deltaLeft < 0 || deltaRight < 0) { return NoAction; } // Clicked outside loop
 		else if (deltaLeft <= 5 && deltaLeft < deltaRight) { return MoveLoopBegin; }
 		else if (deltaRight <= 5) { return MoveLoopEnd; }
 		else { return NoAction; } // TODO: Loop slide
@@ -425,14 +411,6 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 	else if (event->button() == Qt::LeftButton && !ctrl) // move playhead
 	{
 		m_action = MovePositionMarker;
-		if (event->x() - m_xOffset < s_posMarkerPixmap->width())
-		{
-			m_moveXOff = event->x() - m_xOffset;
-		}
-		else
-		{
-			m_moveXOff = s_posMarkerPixmap->width() / 2;
-		}
 	}
 	else if (event->button() == Qt::RightButton){} // TODO: right click menu
 
