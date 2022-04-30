@@ -46,18 +46,13 @@
 
 #include <QtGlobal>
 #include <QSystemSemaphore>
-#endif
-
-
-#ifdef LMMS_HAVE_SYS_SHM_H
-#include <sys/shm.h>
-
+#else
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#else
-#define USE_QT_SHMEM
+#endif
 
+#ifndef LMMS_HAVE_SYS_SHM_H
 #include <QtGlobal>
 
 #if !defined(LMMS_HAVE_SYS_TYPES_H) || defined(LMMS_BUILD_WIN32)
@@ -133,30 +128,18 @@ public:
 		m_invalid( false ),
 		m_master( true ),
 		m_shmKey( 0 ),
-#ifdef USE_QT_SHMEM
 		m_shmObj(),
-#else
-		m_shmID( -1 ),
-#endif
 		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
-#ifdef USE_QT_SHMEM
 		do
 		{
 			m_shmObj.create(QString("%1").arg(++m_shmKey).toStdString());
 		} while (!m_shmObj);
 
 		m_data = m_shmObj.get();
-#else
-		while( ( m_shmID = shmget( ++m_shmKey, sizeof( shmData ),
-					IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
-		{
-		}
-		m_data = (shmData *) shmat( m_shmID, 0, 0 );
-#endif
 		assert( m_data != nullptr );
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
@@ -175,45 +158,20 @@ public:
 		m_invalid( false ),
 		m_master( false ),
 		m_shmKey( 0 ),
-#ifdef USE_QT_SHMEM
 		m_shmObj(),
-#else
-		m_shmID( shmget( _shm_key, 0, 0 ) ),
-#endif
 		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
-#ifdef USE_QT_SHMEM
 		if (m_shmObj.attach(QString::number(_shm_key).toStdString()); m_shmObj)
 		{
 			m_data = m_shmObj.get();
 		}
-#else
-		if( m_shmID != -1 )
-		{
-			m_data = (shmData *) shmat( m_shmID, 0, 0 );
-		}
-#endif
 		assert( m_data != nullptr );
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ) );
-	}
-
-	~shmFifo()
-	{
-		// master?
-		if( m_master )
-		{
-#ifndef USE_QT_SHMEM
-			shmctl( m_shmID, IPC_RMID, nullptr );
-#endif
-		}
-#ifndef USE_QT_SHMEM
-		shmdt( m_data );
-#endif
 	}
 
 	inline bool isInvalid() const
@@ -397,11 +355,7 @@ private:
 	volatile bool m_invalid;
 	bool m_master;
 	key_t m_shmKey;
-#ifdef USE_QT_SHMEM
 	SharedMemory<shmData> m_shmObj;
-#else
-	int m_shmID;
-#endif
 	shmData * m_data;
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;

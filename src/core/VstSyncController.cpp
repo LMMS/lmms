@@ -32,24 +32,16 @@
 #include "Engine.h"
 #include "RemotePlugin.h"
 
-#ifndef USE_QT_SHMEM
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#endif
-
 
 VstSyncController::VstSyncController() :
 	m_syncData( nullptr ),
-	m_shmID( -1 ),
 	m_shm()
 {
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
 		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
-#ifdef USE_QT_SHMEM
-		if (m_shm.create("/usr/bin/lmms"); m_shm)
+		if (m_shm.create("usr_bin_lmms"); m_shm)
 		{
 			m_syncData = m_shm.get();
 		}
@@ -57,28 +49,6 @@ VstSyncController::VstSyncController() :
 		{
 			qWarning() << "Failed to allocate shared memory for VST sync";
 		}
-#else
-		key_t key; // make the key:
-		if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
-		{
-				qWarning( "VstSyncController: ftok() failed" );
-		}
-		else
-		{	// connect to shared memory segment
-			if( ( m_shmID = shmget( key, sizeof( VstSyncData ), 0644 | IPC_CREAT ) ) == -1 )
-			{
-				qWarning( "VstSyncController: shmget() failed" );
-			}
-			else
-			{		// attach segment
-				m_syncData = (VstSyncData *)shmat( m_shmID, 0, 0 );
-				if( m_syncData == (VstSyncData *)( -1 ) )
-				{
-					qWarning( "VstSyncController: shmat() failed" );
-				}
-			}
-		}
-#endif
 	}
 	else
 	{
@@ -113,22 +83,11 @@ VstSyncController::~VstSyncController()
 	}
 	else
 	{
-#ifdef USE_QT_SHMEM
 		if (m_shm)
 		{
 			// detach shared memory, delete it:
 			m_shm.detach();
 		}
-#else
-		if( shmdt( m_syncData ) != -1 )
-		{
-			shmctl( m_shmID, IPC_RMID, nullptr );
-		}
-		else
-		{
-			qWarning( "VstSyncController: shmdt() failed" );
-		}
-#endif
 	}
 }
 

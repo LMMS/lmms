@@ -156,11 +156,8 @@ private:
 
 	QMutex m_commMutex;
 	bool m_splitChannels;
-#ifdef USE_QT_SHMEM
+
 	SharedMemory<float[]> m_shmObj;
-#else
-	int m_shmID;
-#endif
 	size_t m_shmSize;
 	float * m_shm;
 

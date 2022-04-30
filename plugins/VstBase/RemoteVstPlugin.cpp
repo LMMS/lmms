@@ -125,18 +125,6 @@ struct ERect
 
 #include "VstSyncData.h"
 
-#ifdef LMMS_BUILD_WIN32
-#define USE_QT_SHMEM
-#endif
-
-#ifndef USE_QT_SHMEM
-#include <cstdio>
-#include <cstdlib>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#endif
-
 using namespace std;
 
 static VstHostLanguages hlang = LanguageEnglish;
@@ -497,7 +485,6 @@ private:
 
 	in * m_in;
 
-	int m_shmID;
 	const VstSyncData* m_vstSyncData;
 
 } ;
@@ -530,35 +517,11 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_currentSamplePos( 0 ),
 	m_currentProgram( -1 ),
 	m_in( nullptr ),
-	m_shmID( -1 ),
 	m_vstSyncData( nullptr )
 {
 	__plugin = this;
 
-#ifndef USE_QT_SHMEM
-	key_t key;
-	if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
-	{
-		perror( "RemoteVstPlugin.cpp::ftok" );
-	}
-	else
-	{	// connect to shared memory segment
-		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
-		{
-			perror( "RemoteVstPlugin.cpp::shmget" );
-		}
-		else
-		{	// attach segment
-			m_vstSyncData = (VstSyncData *)shmat(m_shmID, 0, 0);
-			if( m_vstSyncData == (VstSyncData *)( -1 ) )
-			{
-				perror( "RemoteVstPlugin.cpp::shmat" );
-			}
-		}
-	}
-#else
 	m_vstSyncData = RemotePluginClient::getQtVSTshm();
-#endif
 	if( m_vstSyncData == nullptr )
 	{
 		fprintf(stderr, "RemoteVstPlugin.cpp: "
@@ -601,21 +564,12 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	destroyEditor();
 	setResumed( false );
 	pluginDispatch( effClose );
-#ifndef USE_QT_SHMEM
-	// detach shared memory segment
-	if( shmdt( m_vstSyncData ) == -1)
+
+	if (!m_vstSyncData->hasSHM)
 	{
-		if( __plugin->m_vstSyncData->hasSHM )
-		{
-			perror( "~RemoteVstPlugin::shmdt" );
-		}
-		if( m_vstSyncData != nullptr )
-		{
-			delete m_vstSyncData;
-			m_vstSyncData = nullptr;
-		}
+		delete m_vstSyncData;
+		m_vstSyncData = nullptr;
 	}
-#endif
 
 	if( m_libInst != nullptr )
 	{

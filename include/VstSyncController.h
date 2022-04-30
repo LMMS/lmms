@@ -75,11 +75,7 @@ private slots:
 
 private:
 	VstSyncData* m_syncData;
-
-	int m_shmID;
-
 	SharedMemory<VstSyncData> m_shm;
-
 };
 
 #endif

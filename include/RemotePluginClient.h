@@ -47,9 +47,9 @@ public:
 	RemotePluginClient( const char * socketPath );
 #endif
 	virtual ~RemotePluginClient();
-#ifdef USE_QT_SHMEM
+
 	const VstSyncData* getQtVSTshm();
-#endif
+
 	virtual bool processMessage( const message & _m );
 
 	virtual void process( const sampleFrame * _in_buf,
@@ -120,13 +120,11 @@ public:
 
 
 private:
-	void setShmKey( key_t _key, int _size );
+	void setShmKey( const std::string& _key, int _size );
 	void doProcessing();
 
-#ifdef USE_QT_SHMEM
 	SharedMemory<float[]> m_shmObj;
 	SharedMemory<const VstSyncData> m_shmQtID;
-#endif
 	const VstSyncData* m_vstSyncData;
 	float * m_shm;
 
@@ -185,10 +183,8 @@ RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
 RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	RemotePluginBase(),
 #endif
-#ifdef USE_QT_SHMEM
 	m_shmObj(),
 	m_shmQtID(),
-#endif
 	m_vstSyncData( nullptr ),
 	m_shm( nullptr ),
 	m_inputCount( 0 ),
@@ -220,8 +216,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	}
 #endif
 
-#ifdef USE_QT_SHMEM
-	if (m_shmQtID.attach("/usr/bin/lmms"); m_shmQtID)
+	if (m_shmQtID.attach("usr_bin_lmms"); m_shmQtID)
 	{
 		m_vstSyncData = m_shmQtID.get();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
@@ -229,43 +224,6 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 		sendMessage( IdHostInfoGotten );
 		return;
 	}
-#else
-	key_t key;
-	int m_shmID;
-
-	if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
-	{
-		perror( "RemotePluginClient::ftok" );
-	}
-	else
-	{	// connect to shared memory segment
-		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
-		{
-			perror( "RemotePluginClient::shmget" );
-		}
-		else
-		{	// attach segment
-			m_vstSyncData = (VstSyncData *)shmat(m_shmID, 0, 0);
-			if( m_vstSyncData == (VstSyncData *)( -1 ) )
-			{
-				perror( "RemotePluginClient::shmat" );
-			}
-			else
-			{
-				m_bufferSize = m_vstSyncData->m_bufferSize;
-				m_sampleRate = m_vstSyncData->m_sampleRate;
-				sendMessage( IdHostInfoGotten );
-
-				// detach segment
-				if( shmdt(m_vstSyncData) == -1 )
-				{
-					perror("RemotePluginClient::shmdt");
-				}
-				return;
-			}
-		}
-	}
-#endif
 
 	// if attaching shared memory fails
 	sendMessage( IdSampleRateInformation );
@@ -283,14 +241,9 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 
 RemotePluginClient::~RemotePluginClient()
 {
-#ifdef USE_QT_SHMEM
 	m_shmQtID.detach();
-#endif
-	sendMessage( IdQuit );
 
-#ifndef USE_QT_SHMEM
-	shmdt( m_shm );
-#endif
+	sendMessage( IdQuit );
 
 #ifndef SYNC_WITH_SHM_FIFO
 	if ( close( m_socket ) == -1)
@@ -302,12 +255,12 @@ RemotePluginClient::~RemotePluginClient()
 
 
 
-#ifdef USE_QT_SHMEM
+
 const VstSyncData* RemotePluginClient::getQtVSTshm()
 {
 	return m_vstSyncData;
 }
-#endif
+
 
 
 
@@ -355,7 +308,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 			break;
 
 		case IdChangeSharedMemoryKey:
-			setShmKey( _m.getInt( 0 ), _m.getInt( 1 ) );
+			setShmKey( _m.getString( 0 ), _m.getInt( 1 ) );
 			break;
 
 		case IdInitDone:
@@ -380,10 +333,9 @@ bool RemotePluginClient::processMessage( const message & _m )
 
 
 
-void RemotePluginClient::setShmKey( key_t _key, int _size )
+void RemotePluginClient::setShmKey( const std::string& _key, int _size )
 {
-#ifdef USE_QT_SHMEM
-	if (m_shmObj.attach(QString::number(_key).toStdString()); m_shmObj)
+	if (m_shmObj.attach(_key); m_shmObj)
 	{
 		m_shm = m_shmObj.get();
 	}
@@ -391,29 +343,6 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 	{
 		debugMessage("failed getting shared memory\n");
 	}
-#else
-	if( m_shm != nullptr )
-	{
-		shmdt( m_shm );
-		m_shm = nullptr;
-	}
-
-	// only called for detaching SHM?
-	if( _key == 0 )
-	{
-		return;
-	}
-
-	int shm_id = shmget( _key, _size, 0 );
-	if( shm_id == -1 )
-	{
-		debugMessage( "failed getting shared memory\n" );
-	}
-	else
-	{
-		m_shm = (float *) shmat( shm_id, 0, 0 );
-	}
-#endif
 }
 
 
