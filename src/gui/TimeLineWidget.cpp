@@ -59,6 +59,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_xOffset( xoff ),
 	m_posMarkerX( 0 ),
 	m_ppb( ppb ),
+	m_snapSize( 1.0 ),
 	m_pos( pos ),
 	m_begin( begin ),
 	m_mode( mode ),
@@ -336,20 +337,8 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		const TimePos t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * TimePos::ticksPerBar() / m_ppb );
 		const TimePos loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
 
-		if( t < loopMid )
-		{
-			m_action = MoveLoopBegin;
-		}
-		else if( t > loopMid )
-		{
-			m_action = MoveLoopEnd;
-		}
-
-		if( m_loopPos[0] > m_loopPos[1]  )
-		{
-			qSwap( m_loopPos[0], m_loopPos[1] );
-		}
-
+		m_action = t < loopMid ? MoveLoopBegin : MoveLoopEnd;
+		std::sort(std::begin(m_loopPos), std::end(m_loopPos));
 		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
 
@@ -391,7 +380,8 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopEnd:
 		{
 			const int i = m_action - MoveLoopBegin; // i == 0 || i == 1
-			if( event->modifiers() & Qt::ControlModifier )
+			const bool control = event->modifiers() & Qt::ControlModifier;
+			if (control)
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;
@@ -400,21 +390,16 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			}
 			else
 			{
-				m_loopPos[i] = t.quantize(1.0);
+				m_loopPos[i] = t.quantize(m_snapSize);
 			}
 			// Catch begin == end
-			if( m_loopPos[0] == m_loopPos[1] )
+			if (m_loopPos[0] == m_loopPos[1])
 			{
+				const int offset = control ? 1 : m_snapSize * TimePos::ticksPerBar();
 				// Note, swap 1 and 0 below and the behavior "skips" the other
 				// marking instead of pushing it.
-				if( m_action == MoveLoopBegin ) 
-				{
-					m_loopPos[0] -= TimePos::ticksPerBar();
-				}
-				else
-				{
-					m_loopPos[1] += TimePos::ticksPerBar();
-				}
+				if (m_action == MoveLoopBegin) { m_loopPos[0] -= offset; }
+				else { m_loopPos[1] += offset; }
 			}
 			update();
 			break;

@@ -101,6 +101,11 @@ SongEditor::SongEditor( Song * song ) :
 			 m_positionLine, SLOT( update() ) );
 	connect( this, SIGNAL( zoomingValueChanged( float ) ),
 			 m_positionLine, SLOT( zoomChange( float ) ) );
+			 
+	// Ensure loop markers snap to same increments as clips. Zoom & proportional
+	// snap changes are handled in zoomingChanged() and toggleProportionalSnap()
+	connect(m_snappingModel, &ComboBoxModel::dataChanged,
+		[this]() { m_timeLine->setSnapSize(getSnapSize()); });
 
 
 	// add some essential widgets to global tool-bar
@@ -462,6 +467,7 @@ void SongEditor::setEditModeSelect()
 void SongEditor::toggleProportionalSnap()
 {
 	m_proportionalSnap = !m_proportionalSnap;
+	m_timeLine->setSnapSize(getSnapSize());
 }
 
 
@@ -840,6 +846,7 @@ void SongEditor::zoomingChanged()
 					setPixelsPerBar( pixelsPerBar() );
 	realignTracks();
 	updateRubberband();
+	m_timeLine->setSnapSize(getSnapSize());
 	
 	emit zoomingValueChanged( m_zoomLevels[m_zoomingModel->value()] );
 }
