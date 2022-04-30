@@ -38,6 +38,7 @@
 class QLineEdit;
 
 class TreeItem;
+class Directory;
 class FileItem;
 class InstrumentTrack;
 class FileBrowserTreeWidget;
@@ -72,7 +73,6 @@ public:
 
 private slots:
 	void reloadTree( void );
-	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
 	bool filterItems(TreeItem* parentDir = nullptr, bool search = true);
 	void giveFocusToFilter();
 	void onItemExpand(QTreeWidgetItem* item);
@@ -99,6 +99,7 @@ private:
 	QString m_factoryDir;
 
 	QList<QString> m_expandedDirsPriorToSearch;
+	bool m_loadedEverything = false;
 	bool m_isSearching = false;
 	bool m_recursiveSearch = false;
 } ;
@@ -115,8 +116,11 @@ public:
 
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
-	QList<QString> expandedDirs( QTreeWidgetItem * item = nullptr ) const;
+	QStringList getExpandedPaths(const QTreeWidgetItem* parent = nullptr) const;
+	void setExpandedPaths(const QStringList& expandedDirs, QTreeWidgetItem* parent = nullptr);
 
+	std::vector<TreeItem*> childItems(const QTreeWidgetItem* parent = nullptr) const;
+	void initRecursivly(TreeItem* parent = nullptr);
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * e ) override;

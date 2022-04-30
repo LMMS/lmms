@@ -132,17 +132,16 @@ FileBrowser::FileBrowser(const QString& title, const QPixmap& pm, QWidget* paren
 
 
 
-/*! \brief Filter the tree items
+/*! \brief Filter and search the tree items
  *
- *  \param parentDir - item to start filtering from
- *  \param search - if items should be filtered by the string in the search box
- *  \return bool - true if any items matched the search string (only if search is true)
+ *  \param parentDir - directory to start filtering inside (nullptr for top level)
+ *  \param enableSearch - true if items should be filtered by the search string
+ *  \returns true if any child items matched the search string (and enableSearch is true)
  */
-bool FileBrowser::filterItems(TreeItem* parentDir, bool search)
+bool FileBrowser::filterItems(TreeItem* parentDir, bool enableSearch)
 {
 	bool searchResultFound = false;
 
-	int numChildren = parentDir ? parentDir->childCount() : m_tree->topLevelItemCount();
 	bool showUser = m_userCheckBox->isChecked();
 	bool showFactory = m_factoryCheckBox->isChecked();
 	QStringList searchTerms = m_searchBox->text().split(" ", QString::KeepEmptyParts);
@@ -160,9 +159,8 @@ bool FileBrowser::filterItems(TreeItem* parentDir, bool search)
 		return true;
 	};
 
-	for( int i = 0; i < numChildren; ++i )
+	for(TreeItem* item: m_tree->childItems(parentDir))
 	{
-		auto item = static_cast<TreeItem*>(parentDir ? parentDir->child(i) : m_tree->topLevelItem(i));
 		item->setHidden(true);
 
 		// User/factory filter
@@ -184,23 +182,16 @@ bool FileBrowser::filterItems(TreeItem* parentDir, bool search)
 			if (!m_unknownCheckBox->isChecked() && file->type() == FileItem::UnknownFile) { continue; }
 		}
 
-		// Whether child items will be filtered through the search term
-		bool searchChildren = search;
-
 		// Search filter
-		if (search && !searchTerms.isEmpty())
+		bool searchChildren = enableSearch;
+		if (enableSearch && m_isSearching)
 		{
 			if (containsAll(item->text(0), searchTerms))
 			{
-				// If the name matches, show the item and all of it's children
+				// If a directory matches the search term, all its children are included
 				item->setHidden(false);
 				searchChildren = false;
 				searchResultFound = true;
-			}
-			// Do first-time loading of directory content if recursive search is enabled
-			if (m_recursiveSearch && item->isDirectory() && item->childCount() == 0)
-			{
-				dynamic_cast<Directory*>(item)->addDirectoryContent();
 			}
 		}
 		else
@@ -214,7 +205,7 @@ bool FileBrowser::filterItems(TreeItem* parentDir, bool search)
 		{
 			if (filterItems(item, searchChildren))
 			{
-				// If we are searching and one of the children matched, we show the parent
+				// If one of the children contains a search result, we show the parent
 				item->setHidden(false);
 				item->setExpanded(true);
 				searchResultFound = true;
@@ -226,10 +217,13 @@ bool FileBrowser::filterItems(TreeItem* parentDir, bool search)
 }
 
 
+
+//! Clear the tree and add the top level items
 void FileBrowser::reloadTree( void )
 {
-	QList<QString> expandedDirs = m_tree->expandedDirs();
+	QList<QString> expandedDirs = m_tree->getExpandedPaths();
 	m_tree->clear();
+	m_loadedEverything = false;
 
 	for (const QString& dir: m_toplevelDirectories)
 	{
@@ -240,33 +234,13 @@ void FileBrowser::reloadTree( void )
 	{
 		m_tree->addTopLevelItem(item);
 	}
-	expandItems(nullptr, expandedDirs);
+	m_tree->setExpandedPaths(expandedDirs);
 	filterItems();
 }
 
 
 
-void FileBrowser::expandItems( QTreeWidgetItem * item, QList<QString> expandedDirs )
-{
-	if (item == nullptr) { m_tree->collapseAll(); }
 
-	int numChildren = item ? item->childCount() : m_tree->topLevelItemCount();
-	for (int i = 0; i < numChildren; ++i)
-	{
-		Directory* child = dynamic_cast<Directory*>(item ? item->child(i) : m_tree->topLevelItem(i));
-		if (!child) { break; } // we can break because directories are always sorted before files
-		if (!expandedDirs.contains(child->path())) { continue; }
-
-		// (this will populate directories on the first run)
-		child->setExpanded(true);
-
-		// Continue expanding recursively
-		if (child->childCount() != 0)
-		{
-			expandItems(child, expandedDirs);
-		}
-	}
-}
 
 
 
@@ -280,87 +254,6 @@ void FileBrowser::giveFocusToFilter()
 	}
 }
 
-
-
-/* TODO remove
-void FileBrowser::addItems(const QString & path )
-{
-	if( m_dirsAsItems )
-	{
-		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
-		return;
-	}
-
-	// try to add all directories from file system alphabetically into the tree
-	QDir cdir( path );
-	QStringList files = cdir.entryList( QDir::Dirs, QDir::Name );
-	files.sort(Qt::CaseInsensitive);
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' )
-		{
-			bool orphan = true;
-			for( int i = 0; i < m_fileBrowserTreeWidget->topLevelItemCount(); ++i )
-			{
-				Directory * d = dynamic_cast<Directory *>(
-						m_fileBrowserTreeWidget->topLevelItem( i ) );
-				if( d == nullptr || cur_file < d->text( 0 ) )
-				{
-					// insert before item, we're done
-					Directory *dd = new Directory( cur_file, path,
-												   m_filter );
-					m_fileBrowserTreeWidget->insertTopLevelItem( i,dd );
-					dd->update(); // add files to the directory
-					orphan = false;
-					break;
-				}
-				else if( cur_file == d->text( 0 ) )
-				{
-					// imagine we have subdirs named "TripleOscillator/xyz" in
-					// two directories from m_directories
-					// then only add one tree widget for both
-					// so we don't add a new Directory - we just
-					// add the path to the current directory
-					d->addDirectory( path );
-					d->update();
-					orphan = false;
-					break;
-				}
-			}
-			if( orphan )
-			{
-				// it has not yet been added yet, so it's (lexically)
-				// larger than all other dirs => append it at the bottom
-				Directory *d = new Directory( cur_file,
-											  path, m_filter );
-				d->update();
-				m_fileBrowserTreeWidget->addTopLevelItem( d );
-			}
-		}
-	}
-
-	files = cdir.entryList( QDir::Files, QDir::Name );
-	for( QStringList::const_iterator it = files.constBegin();
-						it != files.constEnd(); ++it )
-	{
-		QString cur_file = *it;
-		if( cur_file[0] != '.' )
-		{
-			// TODO: don't insert instead of removing, order changed
-			// remove existing file-items
-			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(
-					cur_file, Qt::MatchFixedString );
-			if( !existing.empty() )
-			{
-				delete existing.front();
-			}
-			(void) new FileItem( m_fileBrowserTreeWidget, cur_file, path );
-		}
-	}
-}
-*/
 
 
 
@@ -378,20 +271,21 @@ void FileBrowser::keyPressEvent(QKeyEvent * ke )
 
 
 
-
+/*! \brief When an item is expanded or collapsed
+ *
+ *  Update directory icon and load directory content from the filesystem
+ */
 void FileBrowser::onItemExpand(QTreeWidgetItem * item)
 {
-	// Only works on directories
 	Directory* dir = dynamic_cast<Directory*>(item);
 	if (!dir) { return; }
 
-	// Populate directory when it is expanded for the first time
 	if (dir->isExpanded() && !dir->initialized())
 	{
 		dir->addDirectoryContent();
 		// During search, only directories that match the search term are shown (as collapsed)
-		// If one of those directories gets expanded we want to show all of its content
-		filterItems(dir, /*enableSearchFilter = */ false);
+		// If one of those directories gets expanded we want to show ALL of its content
+		filterItems(dir, /* enableSearch = */ false);
 	}
 
 	dir->updateIcon(m_userCheckBox->isChecked(), m_factoryCheckBox->isChecked());
@@ -399,17 +293,27 @@ void FileBrowser::onItemExpand(QTreeWidgetItem * item)
 
 
 
-
+/*! \brief When user types in the search box
+ *
+ *  Remember what directories were expanded in the tree before search started
+ *  and restore that state when search is done.
+ */
 void FileBrowser::onSearch(const QString &filter)
 {
+	// On the first run load the whole directory tree recursively (to speed up subsequent searches)
+	if (!m_loadedEverything)
+	{
+		m_tree->initRecursivly();
+		m_loadedEverything = true;
+	}
 	if (!m_isSearching && !filter.isEmpty())
 	{
-		m_expandedDirsPriorToSearch = m_tree->expandedDirs();
+		m_expandedDirsPriorToSearch = m_tree->getExpandedPaths();
 		m_tree->collapseAll();
 	}
 	else if (m_isSearching && filter.isEmpty())
 	{
-		expandItems(nullptr, m_expandedDirsPriorToSearch);
+		m_tree->setExpandedPaths(m_expandedDirsPriorToSearch);
 		m_expandedDirsPriorToSearch.clear();
 	}
 	m_isSearching = !m_searchBox->text().isEmpty();
@@ -428,7 +332,10 @@ void FileBrowser::enableBackupFilter()
 
 
 
-
+/*! \brief Set top level directory
+ *
+ *  The directory itself will not be displayed as an item.
+ */
 void FileBrowser::setDirectory(const QString& dir)
 {
 	m_userDir = dir;
@@ -438,7 +345,10 @@ void FileBrowser::setDirectory(const QString& dir)
 
 
 
-
+/*! \brief Set top level directories
+ *
+ *  Every directory will be displayed as a top level item.
+ */
 void FileBrowser::setDirectories(const QFileInfoList& dirList)
 {
 	m_userDir.clear();
@@ -452,7 +362,11 @@ void FileBrowser::setDirectories(const QFileInfoList& dirList)
 
 
 
-
+/*! \brief Set two top level paths that will be displayed as one virtual directory
+ *
+ *  If a file exists in both paths, the tree item will show the file from the user path.
+ *  If a directory exists in both paths, the tree item will include entries from both directories.
+ */
 void FileBrowser::setUserFactoryDir(const QString& userDir, const QString& factoryDir)
 {
 	m_userDir = userDir;
@@ -489,31 +403,91 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 }
 
 
-
-
-QList<QString> FileBrowserTreeWidget::expandedDirs( QTreeWidgetItem * item ) const
+/*! \brief Recursivly read directories from the filesystem and add them to the tree
+ *
+ *  \param parent - directory item to recurse (nullptr for top level)
+ */
+void FileBrowserTreeWidget::initRecursivly(TreeItem* parent)
 {
-	int numChildren = item ? item->childCount() : topLevelItemCount();
-	QList<QString> dirs;
-	for (int i = 0; i < numChildren; ++i)
+	for (TreeItem* child: childItems(parent))
 	{
-		QTreeWidgetItem * it  = item ? item->child(i) : topLevelItem(i);
-
-		if (it->isExpanded())
+		auto dir = dynamic_cast<Directory*>(child);
+		if (dir && !dir->initialized())
 		{
-			Directory *d = static_cast<Directory *> ( it );
-			dirs.append(d->path());
-		}
-
-		// Add expanded child directories (recurse).
-		if (it->childCount())
-		{
-			dirs.append( expandedDirs( it ) );
+			dir->addDirectoryContent();
+			initRecursivly(dir);
 		}
 	}
-	return dirs;
 }
 
+
+/*! \brief Return list of child items for given directory item
+ *
+ *  \param parent - directory item (nullptr for top level)
+ */
+std::vector<TreeItem*> FileBrowserTreeWidget::childItems(const QTreeWidgetItem* parent) const
+{
+	std::vector<TreeItem*> children;
+	int numChildren = parent ? parent->childCount() : topLevelItemCount();
+	for (int i = 0; i < numChildren; ++i)
+	{
+		children.push_back(static_cast<TreeItem*>(parent ? parent->child(i) : topLevelItem(i)));
+	}
+	return children;
+}
+
+/*! \brief Return a list of paths for expanded items in the tree
+ *
+ *  \param parent - directory to recurse (nullptr for top level)
+ */
+QStringList FileBrowserTreeWidget::getExpandedPaths(const QTreeWidgetItem* parent) const
+{
+	QStringList expanded;
+	for (const QTreeWidgetItem* child: childItems(parent))
+	{
+		if (child->isExpanded())
+		{
+			expanded.append(static_cast<const Directory*>(child)->path());
+		}
+		if (child->childCount())
+		{
+			// Recurse
+			expanded.append(getExpandedPaths(child));
+		}
+	}
+	return expanded;
+}
+
+/*! \brief Expand directory items that match the given paths
+ *
+ *  All other items are collapsed.
+ *
+ *  \param expandedDirs - list of paths that should be expanded
+ *  \param parent - directory to recurse (nullptr for top level)
+ */
+void FileBrowserTreeWidget::setExpandedPaths(const QStringList& pathsToExpand, QTreeWidgetItem* parent)
+{
+	if (parent == nullptr) { collapseAll(); }
+
+	for (auto child: childItems(parent))
+	{
+		// We can break when we hit a file, because that means there are no more directories
+		// (they are always sorted before files)
+		if (!child->isDirectory()) { break; }
+
+		Directory* dir = static_cast<Directory*>(child);
+
+		if (!pathsToExpand.contains(dir->path())) { continue; }
+
+		dir->setExpanded(true);
+
+		// Continue expanding recursively
+		if (dir->childCount() != 0)
+		{
+			setExpandedPaths(pathsToExpand, dir);
+		}
+	}
+}
 
 
 
