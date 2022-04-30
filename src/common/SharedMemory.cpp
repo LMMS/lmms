@@ -23,20 +23,141 @@
 
 #include "SharedMemory.h"
 
-#ifndef LMMS_HAVE_SYS_SHM_H
-#define USE_QT_SHMEM
+#include "lmmsconfig.h"
 
-#include <QtGlobal>
-#include <QSharedMemory>
+#ifdef LMMS_HAVE_UNISTD_H
+#	include <unistd.h>
+#endif
+
+#if _POSIX_SHARED_MEMORY_OBJECTS > 0
+#	include <sys/mman.h>
+#	include <sys/stat.h>
+#	include <assert.h>
+#	include <fcntl.h>
+#else
+#	include <QtGlobal>
+#	include <QSharedMemory>
 #endif
 
 namespace detail {
 
-#ifdef USE_QT_SHMEM
+#if _POSIX_SHARED_MEMORY_OBJECTS > 0
+
+namespace {
+
+template<typename F>
+int retryWhileInterrupted(F&& function)
+{
+	int result;
+	do
+	{
+		result = function();
+	}
+	while (result == -1 && errno == EINTR);
+	return result;
+}
+
+} // namespace
 
 class SharedMemoryImpl
 {
 public:
+	SharedMemoryImpl() = default;
+	SharedMemoryImpl(const SharedMemoryImpl&) = delete;
+	SharedMemoryImpl& operator=(const SharedMemoryImpl&) = delete;
+
+	~SharedMemoryImpl()
+	{
+		if (m_mapping) { munmap(m_mapping, m_size); }
+		if (m_isOwner && !m_key.empty()) { shm_unlink(m_key.c_str()); }
+	}
+
+	void* attach(const std::string& key, bool readOnly)
+	{
+		assert(m_mapping == nullptr);
+		m_key = "/" + key;
+		const auto openFlags = readOnly ? O_RDONLY : O_RDWR;
+		const auto fd = retryWhileInterrupted([&] { return shm_open(m_key.c_str(), openFlags, 0); });
+		if (fd == -1)
+		{
+			perror("SharedMemoryImpl::attach: shm_open() failed");
+		}
+		else
+		{
+			if (auto stat = (struct stat){}; fstat(fd, &stat) == -1)
+			{
+				perror("SharedMemoryImpl::attach: fstat() failed");
+			}
+			else
+			{
+				m_size = stat.st_size;
+				const auto mappingProtection = readOnly ? PROT_READ : PROT_READ | PROT_WRITE;
+				const auto mapping = mmap(nullptr, m_size, mappingProtection, MAP_SHARED, fd, 0);
+				if (mapping == MAP_FAILED)
+				{
+					perror("SharedMemoryImpl::attach: mmap() failed");
+				}
+				else
+				{
+					m_mapping = mapping;
+				}
+			}
+			retryWhileInterrupted([&] { return close(fd); });
+		}
+		return m_mapping;
+	}
+
+	void* create(const std::string& key, std::size_t size, bool readOnly)
+	{
+		assert(m_mapping == nullptr);
+		m_key = "/" + key;
+		m_size = size;
+		const auto fd = retryWhileInterrupted([&] { return shm_open(m_key.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600); });
+		if (fd == -1)
+		{
+			perror("SharedMemoryImpl::create: shm_open() failed");
+		}
+		else
+		{
+			m_isOwner = true;
+			if (retryWhileInterrupted([&] { return ftruncate(fd, m_size); }) == -1)
+			{
+				perror("SharedMemoryImpl::create: ftruncate() failed");
+			}
+			else
+			{
+				const auto mappingProtection = readOnly ? PROT_READ : PROT_READ | PROT_WRITE;
+				const auto mapping = mmap(nullptr, m_size, mappingProtection, MAP_SHARED, fd, 0);
+				if (mapping == MAP_FAILED)
+				{
+					perror("SharedMemoryImpl::create: mmap() failed");
+				}
+				else
+				{
+					m_mapping = mapping;
+				}
+			}
+			retryWhileInterrupted([&] { return close(fd); });
+		}
+		return m_mapping;
+	}
+
+private:
+	std::string m_key;
+	void* m_mapping = nullptr;
+	std::size_t m_size = 0;
+	bool m_isOwner = false;
+};
+
+#else
+
+class SharedMemoryImpl
+{
+public:
+	SharedMemoryImpl() = default;
+	SharedMemoryImpl(const SharedMemoryImpl&) = delete;
+	SharedMemoryImpl& operator=(const SharedMemoryImpl&) = delete;
+
 	void* attach(const std::string& key, bool readOnly)
 	{
 		const auto mode = readOnly ? QSharedMemory::ReadOnly : QSharedMemory::ReadWrite;
@@ -57,7 +178,7 @@ private:
 	QSharedMemory m_shm;
 };
 
-#endif // USE_QT_SHMEM
+#endif
 
 SharedMemoryData::SharedMemoryData()
 { }
