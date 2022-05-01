@@ -187,6 +187,7 @@ void SpaProc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 
 void SpaProc::copyModelsToPorts()
 {
+	// copy non-OSC models
 	for (LmmsPorts::TypedPorts &tp : m_ports.m_userPorts)
 	{
 		switch (tp.m_type)
@@ -204,6 +205,23 @@ void SpaProc::copyModelsToPorts()
 			assert(false);
 		}
 	}
+
+	// copy remainder models, which are OSC models, into the ringbuffer ports
+	auto F = [](const std::string& , const ModelInfo& info)
+	{
+		BoolOscModel* boolMod;
+		IntOscModel* intMod;
+		FloatOscModel* floatMod;
+
+		if((boolMod = qobject_cast<BoolOscModel *>( info.m_model )))
+		{ boolMod->sendOsc(); }
+		else if((intMod = qobject_cast<IntOscModel *>( info.m_model )))
+		{ intMod->sendOsc(); }
+		else if((floatMod = qobject_cast<FloatOscModel *>( info.m_model )))
+		{ floatMod->sendOsc(); }
+	};
+
+	foreach_model(F);
 
 	while(m_midiInputReader.read_space() > 0)
 	{

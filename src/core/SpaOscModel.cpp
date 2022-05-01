@@ -1,7 +1,7 @@
 /*
  * SpaOscModel.cpp - AutomatableModel which forwards OSC events
  *
- * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2022 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -30,11 +30,11 @@
 
 #include "SpaProc.h"
 
+// Send own value via OSC
+// This is only allowed if the plugin can not run currently!
+
 void BoolOscModel::sendOsc()
 {
-	// TODO: this should not write directly to the plugin (the plugin might
-	//       be running!!), but instead write to something similar to
-	//       m_plugReg->m_midiInputReader
 	m_plugRef->writeOsc(m_dest.data(), value() ? "T" : "F");
 }
 void IntOscModel::sendOsc()
@@ -51,7 +51,6 @@ BoolOscModel::BoolOscModel(SpaProc *plugRef, const QString dest, bool val) :
 {
 	qDebug() << "LMMS: receiving bool model: val = " << val;
 	init(plugRef, dest);
-	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
 
 IntOscModel::IntOscModel(SpaProc *plugRef, const QString dest, int min,
@@ -61,7 +60,6 @@ IntOscModel::IntOscModel(SpaProc *plugRef, const QString dest, int min,
 	qDebug() << "LMMS: receiving int model: (val, min, max) = (" << val
 		 << ", " << min << ", " << max << ")";
 	init(plugRef, dest);
-	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
 
 FloatOscModel::FloatOscModel(SpaProc *plugRef, const QString dest,
@@ -72,7 +70,6 @@ FloatOscModel::FloatOscModel(SpaProc *plugRef, const QString dest,
 	qDebug() << "LMMS: receiving float model: (val, min, max, step) = (" << val
 		 << ", " << min << ", " << max << ", " << step << ")";
 	init(plugRef, dest);
-	QObject::connect(this, SIGNAL(dataChanged()), this, SLOT(sendOsc()));
 }
 
 #endif // LMMS_HAVE_SPA

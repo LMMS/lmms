@@ -1,7 +1,7 @@
 /*
  * SpaOscModel.h - AutomatableModel which forwards OSC events
  *
- * Copyright (c) 2018-2019 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
+ * Copyright (c) 2018-2022 Johannes Lorenz <j.git$$$lorenz-ho.me, $$$=@>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -48,20 +48,16 @@ protected:
 class BoolOscModel : public SpaOscModel<BoolModel>
 {
 	Q_OBJECT
-private slots:
-	void sendOsc();
-
 public:
+	void sendOsc();
 	BoolOscModel(SpaProc *plugRef, const QString dest, bool val);
 };
 
 class IntOscModel : public SpaOscModel<IntModel>
 {
 	Q_OBJECT
-private slots:
-	void sendOsc();
-
 public:
+	void sendOsc();
 	IntOscModel(class SpaProc *plugRef, const QString dest, int min,
 		int max, int val);
 };
@@ -69,10 +65,8 @@ public:
 class FloatOscModel : public SpaOscModel<FloatModel>
 {
 	Q_OBJECT
-private slots:
-	void sendOsc();
-
 public:
+	void sendOsc();
 	FloatOscModel(class SpaProc *plugRef, const QString dest,
 		float min, float max, float step, float val);
 };
