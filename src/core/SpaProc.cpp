@@ -274,12 +274,8 @@ void SpaProc::shutdownPlugin()
 {
 	m_plugin->deactivate();
 
-	foreach_model([&](const std::string& name, LinkedModelGroup::ModelInfo& minf)
-	{
-		qDebug() << "deleting" << name.c_str() << minf.m_model->id();
-		delete minf.m_model;
-		minf.m_model = nullptr;
-	});
+	// no need to delete the LinkedModelGroups Models:
+	// they are handled in a callback connected to &AutomatableModel::destroyed
 
 	//m_spaDescriptor->delete_plugin(m_plugin);
 	delete m_plugin;
