@@ -22,9 +22,7 @@ errors = 0
 # functions
 
 def caption(my_str):
-    print('')
-    print(f'# {my_str}')
-    print('')
+    print(f'\n# {my_str}\n')
 
 def error(where, my_str):
     global errors
@@ -131,7 +129,7 @@ for cur_file in sorted(Path('.').glob('*/patches/*.patch')):
 caption('debian docs (only one string)')
 
 # Checks for caps.html. This gets relevant when #4027 will be merged
-for line in Path('debian/lmms-common.docs').read_text(errors='replace'):
+for line in Path('debian/lmms-common.docs').read_text(errors='replace').splitlines():
     line = line.rstrip()
     if 'caps.html' in line and not Path(line).is_file():
         error('debian/lmms-common.docs', f'Path does not exist: {line}')
