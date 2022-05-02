@@ -40,9 +40,9 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QUuid>
 
 #ifndef SYNC_WITH_SHM_FIFO
-#include <QUuid>
 #include <sys/socket.h>
 #include <sys/un.h>
 #endif
@@ -262,8 +262,8 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	QStringList args;
 #ifdef SYNC_WITH_SHM_FIFO
 	// swap in and out for bidirectional communication
-	args << QString::number( out()->shmKey() );
-	args << QString::number( in()->shmKey() );
+	args << QString::fromStdString(out()->shmKey());
+	args << QString::fromStdString(in()->shmKey());
 #else
 	args << m_socketFile;
 #endif
@@ -471,15 +471,9 @@ void RemotePlugin::hideUI()
 void RemotePlugin::resizeSharedProcessingMemory()
 {
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
-
-	static int shm_key = 0;
-	do
-	{
-		m_audioBuffer.create(QString("%1").arg(++shm_key).toStdString(), s);
-	} while (!m_audioBuffer);
-
+	m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
 	m_audioBufferSize = s * sizeof(float);
-	sendMessage(message(IdChangeSharedMemoryKey).addInt(shm_key));
+	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
 }
 
 

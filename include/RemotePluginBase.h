@@ -46,6 +46,7 @@
 
 #include <QtGlobal>
 #include <QSystemSemaphore>
+#include <QUuid>
 #else
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -118,16 +119,11 @@ public:
 	shmFifo() :
 		m_invalid( false ),
 		m_master( true ),
-		m_shmKey( 0 ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
-		do
-		{
-			m_data.create(QString("%1").arg(++m_shmKey).toStdString());
-		} while (!m_data);
-
+		m_data.create(QUuid::createUuid().toString().toStdString());
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
@@ -144,7 +140,6 @@ public:
 	shmFifo(const std::string& shmKey) :
 		m_invalid( false ),
 		m_master( false ),
-		m_shmKey( 0 ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
@@ -254,9 +249,9 @@ public:
 	}
 
 
-	inline int shmKey() const
+	const std::string& shmKey() const
 	{
-		return m_shmKey;
+		return m_data.key();
 	}
 
 
@@ -335,7 +330,6 @@ private:
 
 	volatile bool m_invalid;
 	bool m_master;
-	int m_shmKey;
 	SharedMemory<shmData> m_data;
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;
