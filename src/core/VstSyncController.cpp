@@ -34,8 +34,7 @@
 
 
 VstSyncController::VstSyncController() :
-	m_syncData( nullptr ),
-	m_shm()
+	m_syncData( nullptr )
 {
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
@@ -80,14 +79,6 @@ VstSyncController::~VstSyncController()
 	if( m_syncData->hasSHM == false )
 	{
 		delete m_syncData;
-	}
-	else
-	{
-		if (m_shm)
-		{
-			// detach shared memory, delete it:
-			m_shm.detach();
-		}
 	}
 }
 

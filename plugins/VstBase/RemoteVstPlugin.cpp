@@ -170,7 +170,7 @@ class RemoteVstPlugin : public RemotePluginClient
 {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
-	RemoteVstPlugin( key_t _shm_in, key_t _shm_out );
+	RemoteVstPlugin( const std::string& _shm_in, const std::string& _shm_out );
 #else
 	RemoteVstPlugin( const char * socketPath );
 #endif
@@ -493,7 +493,7 @@ private:
 
 
 #ifdef SYNC_WITH_SHM_FIFO
-RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
+RemoteVstPlugin::RemoteVstPlugin( const std::string& _shm_in, const std::string& _shm_out ) :
 	RemotePluginClient( _shm_in, _shm_out ),
 #else
 RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
@@ -521,7 +521,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 {
 	__plugin = this;
 
-	m_vstSyncData = RemotePluginClient::getQtVSTshm();
+	m_vstSyncData = RemotePluginClient::getVstSyncData();
 	if( m_vstSyncData == nullptr )
 	{
 		fprintf(stderr, "RemoteVstPlugin.cpp: "
@@ -2530,7 +2530,7 @@ int main( int _argc, char * * _argv )
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
 #ifdef SYNC_WITH_SHM_FIFO
-	__plugin = new RemoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
+	__plugin = new RemoteVstPlugin( _argv[1], _argv[2] );
 #else
 	__plugin = new RemoteVstPlugin( _argv[1] );
 #endif

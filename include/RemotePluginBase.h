@@ -52,15 +52,6 @@
 #endif
 #endif
 
-#ifndef LMMS_HAVE_SYS_SHM_H
-#include <QtGlobal>
-
-#if !defined(LMMS_HAVE_SYS_TYPES_H) || defined(LMMS_BUILD_WIN32)
-typedef int32_t key_t;
-#endif
-#endif
-
-
 #ifdef LMMS_HAVE_LOCALE_H
 #include <clocale>
 #endif
@@ -128,19 +119,15 @@ public:
 		m_invalid( false ),
 		m_master( true ),
 		m_shmKey( 0 ),
-		m_shmObj(),
-		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 		do
 		{
-			m_shmObj.create(QString("%1").arg(++m_shmKey).toStdString());
-		} while (!m_shmObj);
+			m_data.create(QString("%1").arg(++m_shmKey).toStdString());
+		} while (!m_data);
 
-		m_data = m_shmObj.get();
-		assert( m_data != nullptr );
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
@@ -154,21 +141,15 @@ public:
 
 	// constructor for remote-/client-side - use _shm_key for making up
 	// the connection to master
-	shmFifo( key_t _shm_key ) :
+	shmFifo(const std::string& shmKey) :
 		m_invalid( false ),
 		m_master( false ),
 		m_shmKey( 0 ),
-		m_shmObj(),
-		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
-		if (m_shmObj.attach(QString::number(_shm_key).toStdString()); m_shmObj)
-		{
-			m_data = m_shmObj.get();
-		}
-		assert( m_data != nullptr );
+		m_data.attach(shmKey);
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ) );
@@ -354,9 +335,8 @@ private:
 
 	volatile bool m_invalid;
 	bool m_master;
-	key_t m_shmKey;
-	SharedMemory<shmData> m_shmObj;
-	shmData * m_data;
+	int m_shmKey;
+	SharedMemory<shmData> m_data;
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;
 	std::atomic_int m_lockDepth;

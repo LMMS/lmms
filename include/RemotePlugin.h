@@ -157,9 +157,8 @@ private:
 	QMutex m_commMutex;
 	bool m_splitChannels;
 
-	SharedMemory<float[]> m_shmObj;
-	size_t m_shmSize;
-	float * m_shm;
+	SharedMemory<float[]> m_audioBuffer;
+	std::size_t m_audioBufferSize;
 
 	int m_inputCount;
 	int m_outputCount;

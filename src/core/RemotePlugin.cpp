@@ -137,9 +137,7 @@ RemotePlugin::RemotePlugin() :
 	m_watcher( this ),
 	m_commMutex( QMutex::Recursive ),
 	m_splitChannels( false ),
-	m_shmObj(),
-	m_shmSize( 0 ),
-	m_shm( nullptr ),
+	m_audioBufferSize( 0 ),
 	m_inputCount( DEFAULT_CHANNELS ),
 	m_outputCount( DEFAULT_CHANNELS )
 {
@@ -333,13 +331,13 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		return false;
 	}
 
-	if( m_shm == nullptr )
+	if (!m_audioBuffer)
 	{
-		// m_shm being zero means we didn't initialize everything so
+		// m_audioBuffer being zero means we didn't initialize everything so
 		// far so process one message each time (and hope we get
 		// information like SHM-key etc.) until we process messages
 		// in a later stage of this procedure
-		if( m_shmSize == 0 )
+		if( m_audioBufferSize == 0 )
 		{
 			lock();
 			fetchAndProcessAllMessages();
@@ -352,7 +350,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		return false;
 	}
 
-	memset( m_shm, 0, m_shmSize );
+	memset( m_audioBuffer.get(), 0, m_audioBufferSize );
 
 	ch_cnt_t inputs = qMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
 
@@ -364,18 +362,18 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
 				{
-					m_shm[ch * frames + frame] =
+					m_audioBuffer[ch * frames + frame] =
 							_in_buf[frame][ch];
 				}
 			}
 		}
 		else if( inputs == DEFAULT_CHANNELS )
 		{
-			memcpy( m_shm, _in_buf, frames * BYTES_PER_FRAME );
+			memcpy( m_audioBuffer.get(), _in_buf, frames * BYTES_PER_FRAME );
 		}
 		else
 		{
-			sampleFrame * o = (sampleFrame *) m_shm;
+			sampleFrame * o = (sampleFrame *) m_audioBuffer.get();
 			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
@@ -406,19 +404,19 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				_out_buf[frame][ch] = m_shm[( m_inputCount+ch )*
+				_out_buf[frame][ch] = m_audioBuffer[( m_inputCount+ch )*
 								frames + frame];
 			}
 		}
 	}
 	else if( outputs == DEFAULT_CHANNELS )
 	{
-		memcpy( _out_buf, m_shm + m_inputCount * frames,
+		memcpy( _out_buf, m_audioBuffer.get() + m_inputCount * frames,
 						frames * BYTES_PER_FRAME );
 	}
 	else
 	{
-		sampleFrame * o = (sampleFrame *) ( m_shm +
+		sampleFrame * o = (sampleFrame *) ( m_audioBuffer.get() +
 							m_inputCount*frames );
 		// clear buffer, if plugin didn't fill up both channels
 		BufferManager::clear( _out_buf, frames );
@@ -473,21 +471,15 @@ void RemotePlugin::hideUI()
 void RemotePlugin::resizeSharedProcessingMemory()
 {
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
-	if( m_shm != nullptr )
-	{
-		m_shmObj.detach();
-	}
 
 	static int shm_key = 0;
 	do
 	{
-		m_shmObj.create(QString("%1").arg(++shm_key).toStdString(), s);
-	} while (!m_shmObj);
+		m_audioBuffer.create(QString("%1").arg(++shm_key).toStdString(), s);
+	} while (!m_audioBuffer);
 
-	m_shm = m_shmObj.get();
-	m_shmSize = s * sizeof(float);
-	sendMessage( message( IdChangeSharedMemoryKey ).
-				addInt( shm_key ).addInt( m_shmSize ) );
+	m_audioBufferSize = s * sizeof(float);
+	sendMessage(message(IdChangeSharedMemoryKey).addInt(shm_key));
 }
 
 

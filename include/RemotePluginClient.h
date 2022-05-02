@@ -42,13 +42,13 @@ class RemotePluginClient : public RemotePluginBase
 {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
-	RemotePluginClient( key_t _shm_in, key_t _shm_out );
+	RemotePluginClient( const std::string& _shm_in, const std::string& _shm_out );
 #else
 	RemotePluginClient( const char * socketPath );
 #endif
 	virtual ~RemotePluginClient();
 
-	const VstSyncData* getQtVSTshm();
+	const VstSyncData* getVstSyncData();
 
 	virtual bool processMessage( const message & _m );
 
@@ -57,11 +57,6 @@ public:
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
-	}
-
-	inline float * sharedMemory()
-	{
-		return m_shm;
 	}
 
 	virtual void updateSampleRate()
@@ -120,13 +115,12 @@ public:
 
 
 private:
-	void setShmKey( const std::string& _key, int _size );
+	void setShmKey(const std::string& key);
 	void doProcessing();
 
-	SharedMemory<float[]> m_shmObj;
-	SharedMemory<const VstSyncData> m_shmQtID;
+	SharedMemory<float[]> m_audioBuffer;
+	SharedMemory<const VstSyncData> m_vstSyncShm;
 	const VstSyncData* m_vstSyncData;
-	float * m_shm;
 
 	int m_inputCount;
 	int m_outputCount;
@@ -177,16 +171,13 @@ private:
 #endif
 
 #ifdef SYNC_WITH_SHM_FIFO
-RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
+RemotePluginClient::RemotePluginClient( const std::string& _shm_in, const std::string& _shm_out ) :
 	RemotePluginBase( new shmFifo( _shm_in ), new shmFifo( _shm_out ) ),
 #else
 RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	RemotePluginBase(),
 #endif
-	m_shmObj(),
-	m_shmQtID(),
 	m_vstSyncData( nullptr ),
-	m_shm( nullptr ),
 	m_inputCount( 0 ),
 	m_outputCount( 0 ),
 	m_sampleRate( 44100 ),
@@ -216,9 +207,9 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	}
 #endif
 
-	if (m_shmQtID.attach("usr_bin_lmms"); m_shmQtID)
+	if (m_vstSyncShm.attach("usr_bin_lmms"); m_vstSyncShm)
 	{
-		m_vstSyncData = m_shmQtID.get();
+		m_vstSyncData = m_vstSyncShm.get();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
 		sendMessage( IdHostInfoGotten );
@@ -241,8 +232,6 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 
 RemotePluginClient::~RemotePluginClient()
 {
-	m_shmQtID.detach();
-
 	sendMessage( IdQuit );
 
 #ifndef SYNC_WITH_SHM_FIFO
@@ -256,7 +245,7 @@ RemotePluginClient::~RemotePluginClient()
 
 
 
-const VstSyncData* RemotePluginClient::getQtVSTshm()
+const VstSyncData* RemotePluginClient::getVstSyncData()
 {
 	return m_vstSyncData;
 }
@@ -308,7 +297,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 			break;
 
 		case IdChangeSharedMemoryKey:
-			setShmKey( _m.getString( 0 ), _m.getInt( 1 ) );
+			setShmKey(_m.getString(0));
 			break;
 
 		case IdInitDone:
@@ -333,13 +322,10 @@ bool RemotePluginClient::processMessage( const message & _m )
 
 
 
-void RemotePluginClient::setShmKey( const std::string& _key, int _size )
+void RemotePluginClient::setShmKey(const std::string& key)
 {
-	if (m_shmObj.attach(_key); m_shmObj)
-	{
-		m_shm = m_shmObj.get();
-	}
-	else
+	m_audioBuffer.attach(key);
+	if (!m_audioBuffer)
 	{
 		debugMessage("failed getting shared memory\n");
 	}
@@ -350,10 +336,10 @@ void RemotePluginClient::setShmKey( const std::string& _key, int _size )
 
 void RemotePluginClient::doProcessing()
 {
-	if( m_shm != nullptr )
+	if (m_audioBuffer)
 	{
-		process( (sampleFrame *)( m_inputCount > 0 ? m_shm : nullptr ),
-				(sampleFrame *)( m_shm +
+		process( (sampleFrame *)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
+				(sampleFrame *)( m_audioBuffer.get() +
 					( m_inputCount*m_bufferSize ) ) );
 	}
 	else
