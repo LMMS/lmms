@@ -144,7 +144,7 @@ for mpath in pat.findall(Path('debian/copyright').read_text(errors='replace')):
     # (because the C files are not generated until a build is done)
     if res2 := ladspa_swh.match(mpath):
         mpath = res2.group(1) + '.xml'
-    if len(list(Path('.').glob(mpath))) == 0:
+    if not any(Path('.').glob(mpath)):
         error('debian/copyright', f'Glob/Path does not exist: {mpath}')
 
 
