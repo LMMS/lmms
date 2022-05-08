@@ -53,8 +53,8 @@ result = subprocess.run(['git',
 files.extend([Path(f'{carlapath}/{f}') for f in result.stdout.splitlines()])
 
 classes = set()
-class_pat = re.compile(r'^\s*class(?:\s+LMMS_EXPORT)?\s+([a-zA-Z0-9_]+)', re.MULTILINE)
-class_pat_ui = re.compile(r'<class>([a-zA-Z0-9_]+)</class>')
+class_pat = re.compile(r'^\s*class(?:\s+LMMS_EXPORT)?\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.MULTILINE)
+class_pat_ui = re.compile(r'<class>([a-zA-Z_][a-zA-Z0-9_]*)</class>')
 for cur_file in files:
     if cur_file.is_file():
         text = cur_file.read_text(errors='replace')
