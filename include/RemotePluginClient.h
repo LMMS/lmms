@@ -27,6 +27,8 @@
 
 #include "RemotePluginBase.h"
 
+#include <stdexcept>
+
 #ifndef LMMS_BUILD_WIN32
 #	include <condition_variable>
 #	include <mutex>
@@ -207,22 +209,23 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	}
 #endif
 
-	if (m_vstSyncShm.attach("usr_bin_lmms"); m_vstSyncShm)
+	try
 	{
+		m_vstSyncShm.attach("usr_bin_lmms");
 		m_vstSyncData = m_vstSyncShm.get();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
-		sendMessage( IdHostInfoGotten );
-		return;
 	}
-
-	// if attaching shared memory fails
-	sendMessage( IdSampleRateInformation );
-	sendMessage( IdBufferSizeInformation );
-	if( waitForMessage( IdBufferSizeInformation ).id
-						!= IdBufferSizeInformation )
+	catch (const std::runtime_error&)
 	{
-		fprintf( stderr, "Could not get buffer size information\n" );
+		// if attaching shared memory fails
+		sendMessage( IdSampleRateInformation );
+		sendMessage( IdBufferSizeInformation );
+		if( waitForMessage( IdBufferSizeInformation ).id
+							!= IdBufferSizeInformation )
+		{
+			fprintf( stderr, "Could not get buffer size information\n" );
+		}
 	}
 	sendMessage( IdHostInfoGotten );
 }
@@ -324,10 +327,13 @@ bool RemotePluginClient::processMessage( const message & _m )
 
 void RemotePluginClient::setShmKey(const std::string& key)
 {
-	m_audioBuffer.attach(key);
-	if (!m_audioBuffer)
+	try
 	{
-		debugMessage("failed getting shared memory\n");
+		m_audioBuffer.attach(key);
+	}
+	catch (const std::runtime_error& error)
+	{
+		debugMessage(std::string{"failed getting shared memory: "} + error.what() + '\n');
 	}
 }
 

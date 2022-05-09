@@ -25,6 +25,8 @@
 
 #include "VstSyncController.h"
 
+#include <stdexcept>
+
 #include <QDebug>
 
 #include "AudioEngine.h"
@@ -40,13 +42,14 @@ VstSyncController::VstSyncController() :
 	{
 		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 
-		if (m_shm.create("usr_bin_lmms"); m_shm)
+		try
 		{
+			m_shm.create("usr_bin_lmms");
 			m_syncData = m_shm.get();
 		}
-		else
+		catch (const std::runtime_error& error)
 		{
-			qWarning() << "Failed to allocate shared memory for VST sync";
+			qWarning() << "Failed to allocate shared memory for VST sync:" << error.what();
 		}
 	}
 	else

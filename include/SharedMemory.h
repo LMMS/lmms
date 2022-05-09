@@ -35,7 +35,7 @@ class SharedMemoryImpl;
 class SharedMemoryData
 {
 public:
-	SharedMemoryData();
+	SharedMemoryData() noexcept;
 	SharedMemoryData(std::string&& key, bool readOnly);
 	SharedMemoryData(std::string&& key, std::size_t size, bool readOnly);
 	~SharedMemoryData();
@@ -88,7 +88,7 @@ public:
 		m_data = detail::SharedMemoryData{std::move(key), sizeof(T), std::is_const_v<T>};
 	}
 
-	void detach()
+	void detach() noexcept
 	{
 		m_data = detail::SharedMemoryData{};
 	}
@@ -125,7 +125,7 @@ public:
 		m_data = detail::SharedMemoryData{std::move(key), size * sizeof(T), std::is_const_v<T>};
 	}
 
-	void detach()
+	void detach() noexcept
 	{
 		m_data = detail::SharedMemoryData{};
 	}
