@@ -36,6 +36,7 @@
 
 // carla/source/includes
 #include "carlabase_export.h"
+#include "CarlaDefines.h"
 #if CARLA_VERSION_HEX >= 0x010911
     #include "CarlaNativePlugin.h"
 #else
