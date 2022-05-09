@@ -65,13 +65,17 @@ template<typename T, T Null>
 class NullableResource
 {
 public:
-	NullableResouce() = default;
+	NullableResource() = default;
 	NullableResource(std::nullptr_t) noexcept { }
 	NullableResource(T value) noexcept : m_value{value} { }
 	operator T() const noexcept { return m_value; }
 	explicit operator bool() const noexcept { return m_value != Null; }
 	friend bool operator==(NullableResource a, NullableResource b) noexcept { return a.m_value == b.m_value; }
+	friend bool operator==(NullableResource a, T b) noexcept { return a.m_value == b; }
+	friend bool operator==(T a, NullableResource b) noexcept { return a == b.m_value; }
 	friend bool operator!=(NullableResource a, NullableResource b) noexcept { return a.m_value != b.m_value; }
+	friend bool operator!=(NullableResource a, T b) noexcept { return a.m_value != b; }
+	friend bool operator!=(T a, NullableResource b) noexcept { return a != b.m_value; }
 
 private:
 	T m_value = Null;
@@ -87,7 +91,7 @@ struct NullableResourceDeleter
 template<typename T, T Null, auto Deleter>
 using UniqueNullableResource = std::unique_ptr<T, NullableResourceDeleter<T, Null, Deleter>>;
 
-void deleteFileDescriptor(int fd) const noexcept { retryWhileInterrupted([fd]() noexcept { return close(fd); }); }
+void deleteFileDescriptor(int fd) noexcept { retryWhileInterrupted([fd]() noexcept { return close(fd); }); }
 void deleteShmObject(const char* name) { shm_unlink(name); }
 
 using FileDescriptor = UniqueNullableResource<int, -1, deleteFileDescriptor>;
