@@ -428,9 +428,9 @@ void AudioFileProcessor::loopPointChanged( void )
 
 void AudioFileProcessor::pointChanged( void )
 {
-	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *	( m_sampleBuffer.frames() ) );
-	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() * ( m_sampleBuffer.frames() ) );
-	const f_cnt_t f_loop = static_cast<f_cnt_t>( m_loopPointModel.value() * ( m_sampleBuffer.frames() ) );
+	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *	m_sampleBuffer.frames() );
+	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() * m_sampleBuffer.frames() );
+	const f_cnt_t f_loop = static_cast<f_cnt_t>( m_loopPointModel.value() * m_sampleBuffer.frames() );
 
 	m_nextPlayStartPoint = f_start;
 	m_nextPlayBackwards = false;
