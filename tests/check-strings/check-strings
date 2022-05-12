@@ -10,10 +10,7 @@ import re
 import subprocess
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
-import cssutils
 import tinycss2
-
-cssutils.log.enabled = False
 
 
 # global variables
