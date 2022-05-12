@@ -40,7 +40,12 @@ else()
 	target_link_libraries(${EXE_NAME} dl X11)
 endif()
 if(NOT WIN32)
-	target_link_libraries(${EXE_NAME} pthread rt)
+	target_link_libraries(${EXE_NAME} pthread)
+endif()
+
+find_library(RT_LIBRARY rt)
+if(RT_LIBRARY)
+	target_link_libraries(${EXE_NAME} "${RT_LIBRARY}")
 endif()
 
 target_include_directories(${EXE_NAME}

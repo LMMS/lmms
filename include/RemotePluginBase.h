@@ -109,8 +109,8 @@ class shmFifo
 		sem32_t dataSem;	// semaphore for locking this
 					// FIFO management data
 		sem32_t messageSem;	// semaphore for incoming messages
-		volatile int32_t startPtr; // current start of FIFO in memory
-		volatile int32_t endPtr;   // current end of FIFO in memory
+		int32_t startPtr; // current start of FIFO in memory
+		int32_t endPtr;   // current end of FIFO in memory
 		char data[SHM_FIFO_SIZE];  // actual data
 	} ;
 
