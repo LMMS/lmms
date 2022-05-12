@@ -43,9 +43,8 @@ if(NOT WIN32)
 	target_link_libraries(${EXE_NAME} pthread)
 endif()
 
-find_library(RT_LIBRARY rt)
-if(RT_LIBRARY)
-	target_link_libraries(${EXE_NAME} "${RT_LIBRARY}")
+if(LMMS_HAVE_LIBRT)
+	target_link_libraries(${EXE_NAME} rt)
 endif()
 
 target_include_directories(${EXE_NAME}
