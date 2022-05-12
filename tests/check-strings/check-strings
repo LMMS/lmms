@@ -11,6 +11,8 @@ import subprocess
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 import cssutils
+import tinycss2
+
 cssutils.log.enabled = False
 
 
@@ -93,16 +95,21 @@ for c in sorted(classes_found):
 caption('themes')
 
 for theme in sorted([d for d in Path('data/themes').iterdir() if d.is_dir()]):
+    classes_in_sheet = set()
     stylesheet = theme / 'style.css'
-    idents = {
-        item.value[1]
-        for rule in cssutils.parseString(stylesheet.read_text(encoding='utf-8'))
-        if rule.type == rule.STYLE_RULE
-        for selector in rule.selectorList
-        for item in selector.seq
-        if item.type == 'type-selector' and not item.value[1].startswith('Q')
-    }
-    missing_classes = idents - classes
+    rules = tinycss2.parse_stylesheet(Path(stylesheet).read_text(errors='replace'))
+    for rule in rules:
+        if rule.type == 'qualified-rule':
+            class_found = False
+            for c in rule.prelude:
+                if c.type == 'ident' and not class_found:
+                    if is_our_class(c.value):
+                        classes_in_sheet.add(c.value)
+                    class_found = True
+                # After whitespace or comma comes a new class
+                elif c.type == 'whitespace' or (c.type == 'literal' and c.value == ','):
+                    class_found = False
+    missing_classes = classes_in_sheet - classes
     for class_in_sheet in sorted(missing_classes):
         error(str(stylesheet), f'Class does not exist in source code: {class_in_sheet}')
 
