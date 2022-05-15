@@ -26,6 +26,7 @@
 #define MIXER_H
 
 #include "Model.h"
+#include "Track.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "ThreadableJob.h"
@@ -66,6 +67,7 @@ class MixerChannel : public ThreadableJob
 		int m_channelIndex; // what channel index are we
 		bool m_queued; // are we queued up for rendering yet?
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
+		BoolModel m_autoTrackLinkModel;
 
 		// pointers to other channels that this one sends to
 		MixerRouteVector m_sends;
@@ -195,6 +197,16 @@ public:
 	// re-arrange channels
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
+	void swapChannels(int indexA, int indexB);
+
+	void toggleAutoTrackLink(int index);
+
+	// process tracks which have a fx send
+	void processFxTracks(std::function<void(Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)> process);
+	IntModel * getFxChannelModelByTrack(Track * track);
+	std::vector<int> getUsedChannelCounts();
+	bool isChannelUsed(int index);
+	bool isAutoTrackLinkToggleAllowed(int index);
 
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(mix_ch_t channelIndex);

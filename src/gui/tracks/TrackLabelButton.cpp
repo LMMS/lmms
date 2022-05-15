@@ -37,6 +37,8 @@
 #include "Song.h"
 #include "TrackRenameLineEdit.h"
 #include "TrackView.h"
+#include "GuiApplication.h"
+#include "MixerView.h"
 
 namespace lmms::gui
 {
@@ -84,7 +86,9 @@ void TrackLabelButton::rename()
 		renameDlg.exec();
 		if( txt != text() )
 		{
-			m_trackView->getTrack()->setName( txt );
+			Track * track = m_trackView->getTrack();
+			track->setName( txt );
+			getGUI()->fxMixerView()->processAfterTrackStyleModify(track);
 			Engine::getSong()->setModified();
 		}
 	}
@@ -111,7 +115,9 @@ void TrackLabelButton::renameFinished()
 			if( m_renameLineEdit->text() != m_trackView->getTrack()->name() )
 			{
 				setText( elideName( m_renameLineEdit->text() ) );
-				m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+				Track * track = m_trackView->getTrack();
+				track->setName( m_renameLineEdit->text() );
+				getGUI()->fxMixerView()->processAfterTrackStyleModify(track);
 				Engine::getSong()->setModified();
 			}
 		}

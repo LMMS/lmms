@@ -89,6 +89,7 @@ private:
 	MixerView * m_mv;
 	LcdWidget* m_lcd;
 	int m_channelIndex;
+	QPalette m_renameEditPalette;
 	QBrush m_backgroundActive;
 	QColor m_strokeOuterActive;
 	QColor m_strokeOuterInactive;
@@ -112,6 +113,8 @@ private slots:
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
+	void toogleAutoTrackLink();
+	void autoTrackLinkChanged();
 };
 
 

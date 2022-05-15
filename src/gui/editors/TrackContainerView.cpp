@@ -43,6 +43,7 @@
 #include "TrackView.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
+#include "FxMixerView.h"
 
 namespace lmms
 {
@@ -166,6 +167,8 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 	int index = m_trackViews.indexOf( _tv );
 	if( index != -1 )
 	{
+		Track * t = _tv->getTrack();
+		getGUI()->fxMixerView()->processAfterTrackDelete(t);
 		m_trackViews.removeAt( index );
 
 		disconnect( _tv );
@@ -203,6 +206,7 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	m_tc->m_tracks.insert( indexTo, track );
 	m_trackViews.move( indexFrom, indexTo );
 
+	getGUI()->fxMixerView()->processAfterTrackMove(track);
 	realignTracks();
 }
 
@@ -402,6 +406,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
+		getGUI()->fxMixerView()->processAfterTrackAdd(it);
 		InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
 					this, it, value );
 		ilt->start();
@@ -415,6 +420,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
+		getGUI()->fxMixerView()->processAfterTrackAdd(it);
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
@@ -428,6 +434,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
+		getGUI()->fxMixerView()->processAfterTrackAdd(it);
 		it->setSimpleSerializing();
 		it->loadSettings( dataFile.content().toElement() );
 		//it->toggledInstrumentTrackButton( true );

@@ -88,6 +88,7 @@ void PatternEditor::removeSteps()
 void PatternEditor::addSampleTrack()
 {
 	(void) Track::create( Track::SampleTrack, model() );
+	getGUI()->fxMixerView()->processAfterTrackAdd(track);
 }
 
 

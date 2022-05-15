@@ -241,9 +241,10 @@ void InstrumentTrackView::createMixerLine()
 /*! \brief Assign a specific mixer Channel for this track */
 void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
-	model()->mixerChannelModel()->setValue( channelIndex );
-
-	getGUI()->mixerView()->setCurrentMixerLine( channelIndex );
+	model()->effectChannelModel()->setValue( channelIndex );
+	FxMixerView*  fxMixerView = getGUI()->fxMixerView();
+	fxMixerView->processAfterTrackFxMixerModify(getTrack());
+	fxMixerView->setCurrentFxLine( channelIndex );
 }
 
 

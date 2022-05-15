@@ -36,6 +36,7 @@
 #include "PixmapButton.h"
 #include "embed.h"
 #include "EffectRackView.h"
+#include "Track.h"
 
 class QButtonGroup;
 
@@ -101,7 +102,6 @@ public:
 
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
-	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
 	void renameChannel(int index);
@@ -109,6 +109,15 @@ public:
 	// make sure the display syncs up with the mixer.
 	// useful for loading projects
 	void refreshDisplay();
+
+	// Auto track link support
+	void processAfterTrackAdd(Track * track);
+	void processAfterTrackStyleModify(Track * track);
+	void processAfterTrackFxMixerModify(Track * track);
+	void processAfterTrackMove(Track * track);
+	void processAfterTrackDelete(Track * track);
+	void toggleAutoTrackLink(int index);
+
 
 public slots:
 	int addNewChannel();
@@ -132,6 +141,8 @@ private:
 	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
+	void swapChannels(int indexA, int indexB);
+	void updateAutoTrackSortOrder();
 	
 	friend class MixerChannelView;
 } ;
