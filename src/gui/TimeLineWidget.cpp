@@ -47,10 +47,13 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_inactiveLoopColor( 52, 63, 53, 64 ),
 	m_inactiveLoopBrush( QColor( 255, 255, 255, 32 ) ),
 	m_inactiveLoopInnerColor( 255, 255, 255, 32 ),
+	m_inactiveLoopHandleColor( 255, 255, 255, 32 ),
 	m_activeLoopColor( 52, 63, 53, 255 ),
 	m_activeLoopBrush( QColor( 55, 141, 89 ) ),
 	m_activeLoopInnerColor( 74, 155, 100, 255 ),
+	m_activeLoopHandleColor( 74, 155, 100, 255 ),
 	m_loopRectangleVerticalPadding( 1 ),
+	m_loopHandleWidth( 5 ),
 	m_barLineColor( 192, 192, 192 ),
 	m_barNumberColor( m_barLineColor.darker( 120 ) ),
 	m_mouseHotspotSelLeft( 0, 0 ),
@@ -321,12 +324,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.drawRect( innerRectangle );
 	
 	// Draw loop handles if necessary
-	QRect leftHandle(loopStart, loopRectMargin, 5, loopRectHeight - 1);
-	QRect rightHandle(loopEndR - 5, loopRectMargin, 5, loopRectHeight - 1);
+	const int hw = std::min(m_loopHandleWidth, loopRectWidth/2);
+	QRect leftHandle(loopStart, 0.5, hw, loopRectHeight);
+	QRect rightHandle(loopEndR - hw, 0.5, hw, loopRectHeight);
 	if (ConfigManager::inst()->value( "app", "loopmarkermode" ) == "Handles")
 	{
-		p.fillRect(leftHandle, Qt::magenta);
-		p.fillRect(rightHandle, Qt::magenta);
+		auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
+		p.fillRect(leftHandle, color);
+		p.fillRect(rightHandle, color);
 	}
 
 	// Only draw the position marker if the position line is in view

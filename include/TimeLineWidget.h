@@ -47,10 +47,13 @@ public:
 	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
 	Q_PROPERTY( QBrush inactiveLoopBrush READ getInactiveLoopBrush WRITE setInactiveLoopBrush )
 	Q_PROPERTY( QColor inactiveLoopInnerColor READ getInactiveLoopInnerColor WRITE setInactiveLoopInnerColor )
+	Q_PROPERTY(QColor inactiveLoopHandleColor MEMBER m_inactiveLoopHandleColor)
 	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
 	Q_PROPERTY( QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush )
 	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
+	Q_PROPERTY(QColor activeLoopHandleColor MEMBER m_activeLoopHandleColor)
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+	Q_PROPERTY(int loopHandleWidth MEMBER m_loopHandleWidth)
 	Q_PROPERTY( QSize mouseHotspotSelLeft WRITE setMouseHotspotSelLeft )
 	Q_PROPERTY( QSize mouseHotspotSelRight WRITE setMouseHotspotSelRight )
 
@@ -211,12 +214,15 @@ private:
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;
 	QColor m_inactiveLoopInnerColor;
+	QColor m_inactiveLoopHandleColor;
 
 	QColor m_activeLoopColor;
 	QBrush m_activeLoopBrush;
 	QColor m_activeLoopInnerColor;
+	QColor m_activeLoopHandleColor;
 
 	int m_loopRectangleVerticalPadding;
+	int m_loopHandleWidth;
 
 	QColor m_barLineColor;
 	QColor m_barNumberColor;
