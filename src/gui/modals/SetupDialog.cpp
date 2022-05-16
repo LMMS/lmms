@@ -253,6 +253,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_loopMarkerModes.append(QString("Grab closest"));
 	m_loopMarkerModes.append(QString("Handles"));
+	m_loopMarkerModes.append(QString("Dual-button"));
 
 	for (QString mode : m_loopMarkerModes)
 	{

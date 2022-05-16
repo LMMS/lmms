@@ -348,7 +348,7 @@ TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 	const TimePos t = getClickedTime(event);
 	const QString loopMode = ConfigManager::inst()->value( "app", "loopmarkermode" );
 
-	if (loopMode == "Handles")
+	if (loopMode == "Handles" && event->button() == Qt::LeftButton)
 	{
 		const int leftMost = std::max(markerX(loopBegin()), m_xOffset);
 		const int deltaLeft = event->x() - leftMost;
@@ -360,12 +360,19 @@ TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 		else if (deltaRight <= 5) { return MoveLoopEnd; }
 		else { return NoAction; } // TODO: Loop slide
 	}
-	else /**if (loopMode == "Grab closest")**/
+	else if (loopMode == "Grab closest" && event->button() == Qt::LeftButton)
 	{
 		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1])/2;
 		return t < loopMid ? MoveLoopBegin : MoveLoopEnd;
 	}
-	// TODO: shortcut mode
+	else if (loopMode == "Dual-button")
+	{
+		if (event->button() == Qt::LeftButton){ return MoveLoopBegin; }
+		else if (event->button() == Qt::RightButton){ return MoveLoopEnd; }
+	}
+	
+	//Fallback
+	return NoAction;
 }
 
 
