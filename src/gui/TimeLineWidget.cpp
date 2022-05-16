@@ -377,12 +377,13 @@ TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 
 
 
-void TimeLineWidget::updateCursor(actions action)
+QCursor TimeLineWidget::actionCursor(actions action)
 {
-	if (action == NoAction){ setCursor(Qt::ArrowCursor); }
-	else if (action == MoveLoopBegin){ setCursor(m_cursorSelectLeft); }
-	else if (action == MoveLoopEnd){ setCursor(m_cursorSelectRight); }
+	if (action == MoveLoopBegin){ return m_cursorSelectLeft; }
+	else if (action == MoveLoopEnd){ return m_cursorSelectRight; }
 	// TODO: loop slide
+	// Fall back to normal cursor if no action or action cursor not specified
+	return Qt::ArrowCursor;
 }
 
 
@@ -405,7 +406,7 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 	if (shift) // loop marker manipulation
 	{
 		m_action = getLoopAction(event);
-		updateCursor(m_action);
+		setCursor(actionCursor(m_action));
 
 		m_loopPos[(m_action == MoveLoopBegin) ? 0 : 1] = getClickedTime(event);
 		std::sort(std::begin(m_loopPos), std::end(m_loopPos));
@@ -487,7 +488,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			break;
 
 		default:
-			updateCursor(getLoopAction(event));
+			setCursor(actionCursor(getLoopAction(event)));
 			break;
 	}
 }

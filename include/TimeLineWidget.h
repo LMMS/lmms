@@ -259,7 +259,7 @@ private:
 	} m_action;
 	
 	TimeLineWidget::actions getLoopAction(QMouseEvent* event);
-	void updateCursor(actions action);
+	QCursor actionCursor(actions action);
 
 
 signals:
