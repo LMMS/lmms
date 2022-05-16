@@ -241,6 +241,10 @@ private:
 	const TimePos & m_begin;
 	const Song::PlayModes m_mode;
 	TimePos m_loopPos[2];
+	// When in MoveLoop mode we need the initial positions. Storing only the latest
+	// position allows for unquantized drag but fails when toggling quantization.
+	TimePos m_oldLoopPos[2];
+	TimePos m_dragStartPos;
 
 	TimePos m_savedPos;
 
@@ -255,6 +259,7 @@ private:
 		MovePositionMarker,
 		MoveLoopBegin,
 		MoveLoopEnd,
+		MoveLoop,
 		SelectSongClip,
 	} m_action;
 	

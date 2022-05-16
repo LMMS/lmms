@@ -67,6 +67,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_pos( pos ),
 	m_begin( begin ),
 	m_mode( mode ),
+	m_dragStartPos(0),
 	m_savedPos( -1 ),
 	m_hint( nullptr ),
 	m_action( NoAction )
@@ -350,15 +351,17 @@ TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 
 	if (loopMode == "Handles" && event->button() == Qt::LeftButton)
 	{
+		// Loop start and end pos, or closest edge of screen if loop extends off it
 		const int leftMost = std::max(markerX(loopBegin()), m_xOffset);
-		const int deltaLeft = event->x() - leftMost;
 		const int rightMost = std::min(markerX(loopEnd()), width());
+		// Distance from click to handle, positive aimed towards center of loop
+		const int deltaLeft = event->x() - leftMost;
 		const int deltaRight = rightMost - event->x();
 
 		if (deltaLeft < 0 || deltaRight < 0) { return NoAction; } // Clicked outside loop
 		else if (deltaLeft <= 5 && deltaLeft < deltaRight) { return MoveLoopBegin; }
 		else if (deltaRight <= 5) { return MoveLoopEnd; }
-		else { return NoAction; } // TODO: Loop slide
+		else { return MoveLoop; }
 	}
 	else if (loopMode == "Grab closest" && event->button() == Qt::LeftButton)
 	{
@@ -379,9 +382,9 @@ TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 
 QCursor TimeLineWidget::actionCursor(actions action)
 {
-	if (action == MoveLoopBegin){ return m_cursorSelectLeft; }
+	if (action == MoveLoop){ return Qt::SizeHorCursor; }
+	else if (action == MoveLoopBegin){ return m_cursorSelectLeft; }
 	else if (action == MoveLoopEnd){ return m_cursorSelectRight; }
-	// TODO: loop slide
 	// Fall back to normal cursor if no action or action cursor not specified
 	return Qt::ArrowCursor;
 }
@@ -391,7 +394,7 @@ QCursor TimeLineWidget::actionCursor(actions action)
 
 void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 {
-	// TODO: properly fix cursor hotspot, this doesn't seem to help
+	// For whatever reason hotspots can't be set properly in the constructor
 	m_cursorSelectLeft = QCursor(embed::getIconPixmap("cursor_select_left"),
 		m_mouseHotspotSelLeft.width(), m_mouseHotspotSelLeft.height());
 	m_cursorSelectRight = QCursor(embed::getIconPixmap("cursor_select_right"),
@@ -408,8 +411,17 @@ void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 		m_action = getLoopAction(event);
 		setCursor(actionCursor(m_action));
 
-		m_loopPos[(m_action == MoveLoopBegin) ? 0 : 1] = getClickedTime(event);
-		std::sort(std::begin(m_loopPos), std::end(m_loopPos));
+		if (m_action == MoveLoopBegin || m_action == MoveLoopEnd)
+		{
+			m_loopPos[(m_action == MoveLoopBegin) ? 0 : 1] = getClickedTime(event);
+			std::sort(std::begin(m_loopPos), std::end(m_loopPos));
+		}
+		else if (m_action == MoveLoop)
+		{
+			m_dragStartPos = getClickedTime(event);
+			m_oldLoopPos[0] = m_loopPos[0];
+			m_oldLoopPos[1] = m_loopPos[1];
+		}
 	}
 	else if (event->button() == Qt::LeftButton && ctrl) // selection
 	{
@@ -439,6 +451,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
 	parentWidget()->update(); // essential for widgets that this timeline had taken their mouse move event from.
 	const TimePos t = getClickedTime(event);
+	const bool control = event->modifiers() & Qt::ControlModifier;
 
 	switch( m_action )
 	{
@@ -459,7 +472,6 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopEnd:
 		{
 			const int i = m_action == MoveLoopBegin ? 0 : 1;
-			const bool control = event->modifiers() & Qt::ControlModifier;
 			if (control)
 			{
 				// no ctrl-press-hint when having ctrl pressed
@@ -481,6 +493,17 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 				else { m_loopPos[1] += offset; }
 			}
 			update();
+			break;
+		}
+		case MoveLoop:
+		{
+			TimePos dragDelta = t - m_dragStartPos;
+			for (int i = 0; i <= 1; i++)
+			{
+				m_loopPos[i] = m_oldLoopPos[i] + dragDelta;
+				if (!control) { m_loopPos[i] = m_loopPos[i].quantize(m_snapSize); }
+			}
+
 			break;
 		}
 		case SelectSongClip:
