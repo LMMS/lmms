@@ -322,7 +322,7 @@ void MixerView::updateAutoTrackSortOrder()
 			{
 				// a (+1) because we didn't include master track in our list
 				swapChannels(list->value(i+1), list->value(i+2));
-				list->swapItemsAt(i,i+1);
+				list->swap(i,i+1);
 			}
 		}
 		n = n-1;
