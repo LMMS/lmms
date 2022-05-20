@@ -286,7 +286,7 @@ void Mixer::deleteChannel( int index )
 	Engine::audioEngine()->requestChangeInModel();
 
 
-	processFxTracks( [index](Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)
+	processFxTracks( [index](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
 	{
 		(void) track;
 		(void) fxChannel;
@@ -347,32 +347,32 @@ void Mixer::deleteChannel( int index )
 	Engine::audioEngine()->doneChangeInModel();
 }
 
-void FxMixer::toggleAutoTrackLink(int index)
+void Mixer::toggleAutoTrackLink(int index)
 {
-	m_fxChannels[index]->m_autoTrackLinkModel.setValue(! m_fxChannels[index]->m_autoTrackLinkModel.value());
+	m_mixerChannels[index]->m_autoTrackLinkModel.setValue(! m_mixerChannels[index]->m_autoTrackLinkModel.value());
 }
 
-IntModel * FxMixer::getFxChannelModelByTrack(Track * track)
+IntModel * Mixer::getFxChannelModelByTrack(Track * track)
 {
 	if( track->type() == Track::InstrumentTrack )
 	{
 		InstrumentTrack * inst = (InstrumentTrack *) track;
-		return inst->effectChannelModel();
+		return inst->mixerChannelModel();
 	}
 	else if( track->type() == Track::SampleTrack )
 	{
 		SampleTrack * strk = (SampleTrack *) track;
-		return strk->effectChannelModel();
+		return strk->mixerChannelModel();
 	}
 	return NULL;
 }
 
-bool FxMixer::isAutoTrackLinkToggleAllowed(int index)
+bool Mixer::isAutoTrackLinkToggleAllowed(int index)
 {
-	if (effectChannel( index )->m_autoTrackLinkModel.value()) return true;
+	if (mixerChannel( index )->m_autoTrackLinkModel.value()) return true;
 
-	std::vector<int> used(m_fxChannels.size(), 0);
-	processFxTracks([&used](Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)
+	std::vector<int> used(m_mixerChannels.size(), 0);
+	processFxTracks([&used](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
 	mutable {
 		(void) track;
 		(void) fxChannel;
@@ -383,32 +383,32 @@ bool FxMixer::isAutoTrackLinkToggleAllowed(int index)
 }
 
 
-void FxMixer::processFxTracks(std::function<void(Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)> process)
+void Mixer::processFxTracks(std::function<void(Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)> process)
 {
 	TrackContainer::TrackList trackList;
 	trackList += Engine::getSong()->tracks();
-	trackList += Engine::getBBTrackContainer()->tracks();
+	trackList += Engine::patternStore()->tracks();
 
 	for (Track* track: trackList)
 	{
 		IntModel * fxChannelModel = getFxChannelModelByTrack(track);
-		FxChannel * fxChannel = NULL;
+		MixerChannel * fxChannel = NULL;
 		if (fxChannelModel != NULL)
 		{
 			int channelIndex = fxChannelModel->value();
-			if (channelIndex > 0 && channelIndex < m_fxChannels.size() )
+			if (channelIndex > 0 && channelIndex < m_mixerChannels.size() )
 			{
-				fxChannel = effectChannel(channelIndex);
+				fxChannel = mixerChannel(channelIndex);
 			}
 			process(track,fxChannelModel, fxChannel);
 		}
 	}
 }
 
-std::vector<int> FxMixer::getUsedChannelCounts()
+std::vector<int> Mixer::getUsedChannelCounts()
 {
-	std::vector<int> used(m_fxChannels.size(), 0);
-	processFxTracks([&used](Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)
+	std::vector<int> used(m_mixerChannels.size(), 0);
+	processFxTracks([&used](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
 	mutable {
 		(void) track;
 		(void) fxChannel;
@@ -418,11 +418,11 @@ std::vector<int> FxMixer::getUsedChannelCounts()
 	return used;
 }
 
-bool FxMixer::isChannelUsed(int index)
+bool Mixer::isChannelUsed(int index)
 {
 	bool result = false;
 
-	processFxTracks([&result, index](Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)
+	processFxTracks([&result, index](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
 	mutable {
 		(void) track;
 		(void) fxChannel;
@@ -433,12 +433,12 @@ bool FxMixer::isChannelUsed(int index)
 
 
 
-void FxMixer::swapChannels(int indexA, int indexB)
+void Mixer::swapChannels(int indexA, int indexB)
 {
 	// range check - can't move master or first channel
 	if (( indexA == indexB ) ||
-		( indexA <= 1 || indexA >= m_fxChannels.size() ) ||
-		( indexB <= 1 || indexB >= m_fxChannels.size() ))
+		( indexA <= 1 || indexA >= m_mixerChannels.size() ) ||
+		( indexB <= 1 || indexB >= m_mixerChannels.size() ))
 	{
 		return;
 	}
@@ -451,7 +451,7 @@ void FxMixer::swapChannels(int indexA, int indexB)
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	processFxTracks( [a,b](Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)
+	processFxTracks( [a,b](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
 	{
 		(void) track;
 		(void) fxChannel;
@@ -467,15 +467,15 @@ void FxMixer::swapChannels(int indexA, int indexB)
 	});
 
 	// Swap positions in array
-	qSwap(m_fxChannels[a], m_fxChannels[b]);
+	qSwap(m_mixerChannels[a], m_mixerChannels[b]);
 
 	// Update m_channelIndex of both channels
-	m_fxChannels[a]->m_channelIndex = a;
-	m_fxChannels[b]->m_channelIndex = b;
+	m_mixerChannels[a]->m_channelIndex = a;
+	m_mixerChannels[b]->m_channelIndex = b;
 }
 
 
-void FxMixer::moveChannelLeft( int index )
+void Mixer::moveChannelLeft( int index )
 {
 	swapChannels(index - 1, index);
 }
@@ -784,14 +784,14 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		QDomElement mixch = _doc.createElement( QString( "mixerchannel" ) );
 		_this.appendChild( mixch );
 
-		ch->m_fxChain.saveState( _doc, fxch );
-		ch->m_volumeModel.saveSettings( _doc, fxch, "volume" );
-		ch->m_muteModel.saveSettings( _doc, fxch, "muted" );
-		ch->m_soloModel.saveSettings( _doc, fxch, "soloed" );
-		ch->m_autoTrackLinkModel.saveSettings( _doc, fxch, "autoTrackLink" );
-		fxch.setAttribute( "num", i );
-		fxch.setAttribute( "name", ch->m_name );
-		if( ch->m_hasColor ) fxch.setAttribute( "color", ch->m_color.name() );
+		ch->m_fxChain.saveState( _doc, mixch );
+		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
+		ch->m_muteModel.saveSettings( _doc, mixch, "muted" );
+		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
+		ch->m_autoTrackLinkModel.saveSettings( _doc, mixch, "autoTrackLink" );
+		mixch.setAttribute( "num", i );
+		mixch.setAttribute( "name", ch->m_name );
+		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
@@ -833,14 +833,14 @@ void Mixer::loadSettings( const QDomElement & _this )
 		// allocate enough channels
 		allocateChannelsTo( num );
 
-		m_fxChannels[num]->m_volumeModel.loadSettings( fxch, "volume" );
+		m_mixerChannels[num]->m_volumeModel.loadSettings( mixch, "volume" );
 
-		m_fxChannels[num]->m_muteModel.loadSettings( fxch, "muted" );
-		m_fxChannels[num]->m_soloModel.loadSettings( fxch, "soloed" );
-		m_fxChannels[num]->m_autoTrackLinkModel.loadSettings( fxch, "autoTrackLink" );
+		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
+		m_mixerChannels[num]->m_soloModel.loadSettings( mixch, "soloed" );
+		m_mixerChannels[num]->m_autoTrackLinkModel.loadSettings( mixch, "autoTrackLink" );
 
-		m_fxChannels[num]->m_name = fxch.attribute( "name" );
-		if( fxch.hasAttribute( "color" ) )
+		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
+		if( mixch.hasAttribute( "color" ) )
 		{
 			m_mixerChannels[num]->m_hasColor = true;
 			m_mixerChannels[num]->m_color.setNamedColor( mixch.attribute( "color" ) );

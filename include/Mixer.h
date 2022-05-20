@@ -202,7 +202,7 @@ public:
 	void toggleAutoTrackLink(int index);
 
 	// process tracks which have a fx send
-	void processFxTracks(std::function<void(Track * track, IntModel * fxChannelModel, FxChannel * fxChannel)> process);
+	void processFxTracks(std::function<void(Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)> process);
 	IntModel * getFxChannelModelByTrack(Track * track);
 	std::vector<int> getUsedChannelCounts();
 	bool isChannelUsed(int index);

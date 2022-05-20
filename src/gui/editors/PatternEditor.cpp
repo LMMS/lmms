@@ -36,9 +36,9 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TrackView.h"
-
 #include "MidiClip.h"
-
+#include "GuiApplication.h"
+#include "MixerView.h"
 
 namespace lmms::gui
 {
@@ -87,8 +87,8 @@ void PatternEditor::removeSteps()
 
 void PatternEditor::addSampleTrack()
 {
-	(void) Track::create( Track::SampleTrack, model() );
-	getGUI()->fxMixerView()->processAfterTrackAdd(track);
+	Track * track = Track::create( Track::SampleTrack, model() );
+	getGUI()->mixerView()->processAfterTrackAdd(track);
 }
 
 

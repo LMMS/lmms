@@ -232,10 +232,10 @@ void SampleTrackView::createMixerLine()
 /*! \brief Assign a specific mixer Channel for this track */
 void SampleTrackView::assignMixerLine(int channelIndex)
 {
-	model()->effectChannelModel()->setValue(channelIndex);
-	FxMixerView*  fxMixerView = getGUI()->fxMixerView();
-	fxMixerView->processAfterTrackFxMixerModify(getTrack());
-	fxMixerView->setCurrentFxLine( channelIndex );
+	model()->mixerChannelModel()->setValue(channelIndex);
+	MixerView*  mixerView = getGUI()->mixerView();
+	mixerView->processAfterTrackFxMixerModify(getTrack());
+	mixerView->setCurrentMixerLine( channelIndex );
 }
 
 } // namespace lmms::gui

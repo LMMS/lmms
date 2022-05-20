@@ -138,8 +138,8 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	autoTrackLinkChanged();
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
-	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
-	connect( &Engine::fxMixer()->effectChannel( m_channelIndex )->m_autoTrackLinkModel, SIGNAL(dataChanged()),this, SLOT(autoTrackLinkChanged()));
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_autoTrackLinkModel, SIGNAL(dataChanged()),this, SLOT(autoTrackLinkChanged()));
 }
 
 
@@ -174,8 +174,8 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	{
 		m_renameLineEdit->setText( elidedName );
 	}
-	int width = fxLine->rect().width();
-	int height = fxLine->rect().height();
+	int width = mixerLine->rect().width();
+	int height = mixerLine->rect().height();
 	
 	if( channel->m_hasColor && !muted )
 	{
@@ -252,15 +252,15 @@ void MixerLine::mouseDoubleClickEvent( QMouseEvent * )
 
 void MixerLine::contextMenuEvent( QContextMenuEvent * )
 {
-	FxMixer * mix =  Engine::fxMixer();
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
-	bool autoTrackLink = mix->effectChannel( m_channelIndex )->m_autoTrackLinkModel.value();
+	Mixer * mix =  Engine::mixer();
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->mixerChannel( m_channelIndex )->m_name, this );
+	bool autoTrackLink = mix->mixerChannel( m_channelIndex )->m_autoTrackLinkModel.value();
 	if( m_channelIndex != 0 ) // no move-options in master
 	{
 		if (!autoTrackLink)
 		{
 			contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
-			bool autoTrackLinkRight = (m_channelIndex +1 < mix->numChannels()) ? mix->effectChannel( m_channelIndex +1 )->m_autoTrackLinkModel.value() : false;
+			bool autoTrackLinkRight = (m_channelIndex +1 < mix->numChannels()) ? mix->mixerChannel( m_channelIndex +1 )->m_autoTrackLinkModel.value() : false;
 			if (!autoTrackLinkRight)
 			{
 				contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
@@ -300,15 +300,15 @@ void MixerLine::contextMenuEvent( QContextMenuEvent * )
 	delete contextMenu;
 }
 
-void FxLine::toogleAutoTrackLink()
+void MixerLine::toogleAutoTrackLink()
 {
-	FxMixerView * mix = getGUI()->fxMixerView();
+	MixerView * mix = getGUI()->mixerView();
 	mix->toggleAutoTrackLink(m_channelIndex);
 }
 
-void FxLine::autoTrackLinkChanged()
+void MixerLine::autoTrackLinkChanged()
 {
-	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
+	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
 	if (channel->m_autoTrackLinkModel.value())
 	{
 		m_renameEditPalette.setColor(QPalette::Text,Qt::green);
@@ -323,7 +323,7 @@ void FxLine::autoTrackLinkChanged()
 
 void MixerLine::renameChannel()
 {
-	if (Engine::fxMixer()->effectChannel( m_channelIndex )->m_autoTrackLinkModel.value()) return;
+	if (Engine::mixer()->mixerChannel( m_channelIndex )->m_autoTrackLinkModel.value()) return;
 
 	m_inRename = true;
 	setToolTip( "" );
