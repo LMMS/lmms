@@ -82,7 +82,6 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	m_strokeInnerInactive( 0, 0, 0 ),
 	m_inRename( false )
 {
-
 	if( !s_sendBgArrow )
 	{
 		s_sendBgArrow = new QPixmap( embed::getIconPixmap( "send_bg_arrow", 29, 56 ) );
