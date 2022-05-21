@@ -55,61 +55,77 @@ ProjectJournal::~ProjectJournal()
 
 void ProjectJournal::undo()
 {
-	while( !m_undoCheckPoints.isEmpty() )
-	{
-		CheckPoint c = m_undoCheckPoints.pop();
-		JournallingObject *jo = m_joIDs[c.joID];
-
-		if( jo )
-		{
-			DataFile curState( DataFile::JournalData );
-			jo->saveState( curState, curState.content() );
-			m_redoCheckPoints.push( CheckPoint( c.joID, curState ) );
-
-			bool prev = isJournalling();
-			setJournalling( false );
-			jo->restoreState( c.data.content().firstChildElement() );
-			setJournalling( prev );
-			Engine::getSong()->setModified();
-			break;
-		}
-	}
+	restoreCheckPoint(m_undoCheckPoints, m_redoCheckPoints);
 }
+
 
 
 
 void ProjectJournal::redo()
 {
-	while( !m_redoCheckPoints.isEmpty() )
+	restoreCheckPoint(m_redoCheckPoints, m_undoCheckPoints);
+}
+
+
+
+
+/*! \brief Take a backup of the current state before restoring the most recent checkpoint
+ *
+ *  \param restoreStack pop a checkpoint from this stack and restore it
+ *  \param backupStack append a checkpoint of the current state to this stack
+ */
+void ProjectJournal::restoreCheckPoint(ProjectJournal::CheckPointStack& restoreStack,
+										ProjectJournal::CheckPointStack& backupStack)
+{
+	while (!restoreStack.empty())
 	{
-		CheckPoint c = m_redoCheckPoints.pop();
-		JournallingObject *jo = m_joIDs[c.joID];
+		CheckPointGroup backup;
 
-		if( jo )
+		// For every checkpoint (journaled object) in the last group...
+		for (CheckPoint& restorePoint: restoreStack.back())
 		{
-			DataFile curState( DataFile::JournalData );
-			jo->saveState( curState, curState.content() );
-			m_undoCheckPoints.push( CheckPoint( c.joID, curState ) );
+			JournallingObject* jo = journallingObject(restorePoint.joID);
+			// TODO when can this be null?
+			if (!jo) { continue; }
 
+			// Create a backup of the object's current state
+			DataFile curState(DataFile::JournalData);
+			jo->saveState( curState, curState.content() );
+			backup.push_back(CheckPoint(restorePoint.joID, curState));
+
+			// Restore object to its previous state
 			bool prev = isJournalling();
 			setJournalling( false );
-			jo->restoreState( c.data.content().firstChildElement() );
+			jo->restoreState(restorePoint.data.content().firstChildElement());
 			setJournalling( prev );
 			Engine::getSong()->setModified();
-			break;
 		}
+		restoreStack.pop_back();
+
+		// Keep trying until something is restored
+		if (backup.empty()) { continue; }
+
+		backupStack.push_back(backup);
+		return;
 	}
 }
 
+
+
+
 bool ProjectJournal::canUndo() const
 {
-	return !m_undoCheckPoints.isEmpty();
+	return !m_undoCheckPoints.empty();
 }
+
+
+
 
 bool ProjectJournal::canRedo() const
 {
-	return !m_redoCheckPoints.isEmpty();
+	return !m_redoCheckPoints.empty();
 }
+
 
 
 
@@ -122,12 +138,41 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		DataFile dataFile( DataFile::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
 
-		m_undoCheckPoints.push( CheckPoint( jo->id(), dataFile ) );
+		// Create a new empty group if we're not grouping with previous checkpoints or there are none
+		if (m_groupCounter == 0 || m_undoCheckPoints.empty())
+		{
+			m_undoCheckPoints.emplace_back();
+		}
+
+		CheckPointGroup& group = m_undoCheckPoints.back();
+		group.push_back(CheckPoint(jo->id(), dataFile));
+
+		// Remove excessive checkpoints
 		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
 		{
-			m_undoCheckPoints.remove( 0, m_undoCheckPoints.size() - MAX_UNDO_STATES );
+			m_undoCheckPoints.erase(m_undoCheckPoints.begin(), m_undoCheckPoints.end() - MAX_UNDO_STATES);
 		}
 	}
+}
+
+
+
+
+void ProjectJournal::beginCheckPointGroup()
+{
+	if (!isJournalling()) { return; }
+	if (m_groupCounter == 0) { m_undoCheckPoints.emplace_back(); }
+	++m_groupCounter;
+}
+
+
+
+
+void ProjectJournal::endCheckPointGroup()
+{
+	if (!isJournalling()) { return; }
+	if (m_undoCheckPoints.back().empty()) { m_undoCheckPoints.pop_back(); }
+	--m_groupCounter;
 }
 
 

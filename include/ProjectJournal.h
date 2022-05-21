@@ -50,6 +50,8 @@ public:
 	bool canRedo() const;
 
 	void addJournalCheckPoint( JournallingObject *jo );
+	void beginCheckPointGroup();
+	void endCheckPointGroup();
 
 	bool isJournalling() const
 	{
@@ -107,13 +109,18 @@ private:
 		jo_id_t joID;
 		DataFile data;
 	} ;
-	typedef QStack<CheckPoint> CheckPointStack;
+	typedef std::vector<CheckPoint> CheckPointGroup;
+	typedef std::vector<CheckPointGroup> CheckPointStack;
+
+	void restoreCheckPoint(ProjectJournal::CheckPointStack& restore, ProjectJournal::CheckPointStack& backup);
 
 	JoIdMap m_joIDs;
 
 	CheckPointStack m_undoCheckPoints;
 	CheckPointStack m_redoCheckPoints;
 
+	//! Used to determine if checkpoints should be grouped
+	int m_groupCounter = 0;
 	bool m_journalling;
 
 } ;
