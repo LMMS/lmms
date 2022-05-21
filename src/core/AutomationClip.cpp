@@ -835,6 +835,10 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		useCustomClipColor( true );
 		setColor( _this.attribute( "color" ) );
 	}
+	else
+	{
+		useCustomClipColor(false);
+	}
 
 	int len = _this.attribute( "len" ).toInt();
 	if( len <= 0 )

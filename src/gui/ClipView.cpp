@@ -43,6 +43,7 @@
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
+#include "ProjectJournal.h"
 #include "SampleClip.h"
 #include "Song.h"
 #include "SongEditor.h"
@@ -372,25 +373,12 @@ void ClipView::setColor(const QColor* color)
 {
 	std::set<Track*> journaledTracks;
 
-	auto selectedClips = getClickedClips();
-	for (auto clipv: selectedClips)
+	Engine::projectJournal()->beginCheckPointGroup();
+
+	for (ClipView* clipv: getClickedClips())
 	{
 		auto clip = clipv->getClip();
-		auto track = clip->getTrack();
-
-		// TODO journal whole Song or group of clips instead of one journal entry for each track
-
-		// If only one clip changed, store that in the journal
-		if (selectedClips.length() == 1)
-		{
-			clip->addJournalCheckPoint();
-		}
-		// If multiple clips changed, store whole Track in the journal
-		// Check if track has been journaled already by trying to add it to the set
-		else if (journaledTracks.insert(track).second)
-		{
-			track->addJournalCheckPoint();
-		}
+		clip->addJournalCheckPoint();
 
 		if (color)
 		{
@@ -403,7 +391,7 @@ void ClipView::setColor(const QColor* color)
 		}
 		clipv->update();
 	}
-
+	Engine::projectJournal()->endCheckPointGroup();
 	Engine::getSong()->setModified();
 }
 
