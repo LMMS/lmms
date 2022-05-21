@@ -27,6 +27,7 @@
 
 #include <cmath>
 #include <QApplication>
+#include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
 
@@ -36,6 +37,7 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "TrackView.h"
 
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
@@ -140,8 +142,37 @@ void MidiClipView::changeName()
 
 
 
+void MidiClipView::transposeSelection()
+{
+	int semitones = QInputDialog::getInt(this, tr("Transpose"), tr("Semitones to transpose:"), 0, -NumKeys, NumKeys, 1);
+	if (semitones == 0) { return; }
+
+	// TODO make this not crash
+	// Engine::getSong()->addJournalCheckPoint();
+
+	QSet<Track*> m_changedTracks;
+
+	for (ClipView* clipview: getClickedClips())
+	{
+		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
+		{
+			m_changedTracks.insert(clipview->getTrackView()->getTrack());
+			mcv->getMidiClip()->transpose(semitones);
+		}
+	}
+	for (Track* track: m_changedTracks)
+	{
+		track->addJournalCheckPoint();
+	}
+}
+
+
+
+
 void MidiClipView::constructContextMenu( QMenu * _cm )
 {
+	bool isBeat = m_clip->type() == MidiClip::BeatClip;
+
 	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
 					tr( "Open in piano-roll" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
@@ -159,6 +190,10 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
 			tr( "Clear all notes" ), m_clip, SLOT( clear() ) );
+	if (!isBeat)
+	{
+		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, SLOT(transposeSelection()));
+	}
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
@@ -167,7 +202,7 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
 
-	if ( m_clip->type() == MidiClip::BeatClip )
+	if (isBeat)
 	{
 		_cm->addSeparator();
 

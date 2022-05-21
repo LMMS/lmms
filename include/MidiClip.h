@@ -72,6 +72,7 @@ public:
 
 	// Split the list of notes on the given position
 	void splitNotes(NoteVector notes, TimePos pos);
+	void transpose(int semitones);
 
 	// clip-type stuff
 	inline MidiClipTypes type() const
