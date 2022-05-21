@@ -151,18 +151,18 @@ void MidiClipView::transposeSelection()
 	// Engine::getSong()->addJournalCheckPoint();
 
 	QSet<Track*> m_changedTracks;
-
 	for (ClipView* clipview: getClickedClips())
 	{
 		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
 		{
-			m_changedTracks.insert(clipview->getTrackView()->getTrack());
+			auto track = clipview->getTrackView()->getTrack();
+			if (!m_changedTracks.contains(track))
+			{
+				track->addJournalCheckPoint();
+				m_changedTracks.insert(track);
+			}
 			mcv->getMidiClip()->transpose(semitones);
 		}
-	}
-	for (Track* track: m_changedTracks)
-	{
-		track->addJournalCheckPoint();
 	}
 }
 
