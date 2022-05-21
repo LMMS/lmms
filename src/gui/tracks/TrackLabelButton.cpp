@@ -88,7 +88,7 @@ void TrackLabelButton::rename()
 		{
 			Track * track = m_trackView->getTrack();
 			track->setName( txt );
-			getGUI()->mixerView()->processAfterTrackStyleModify(track);
+			getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 			Engine::getSong()->setModified();
 		}
 	}
@@ -117,7 +117,7 @@ void TrackLabelButton::renameFinished()
 				setText( elideName( m_renameLineEdit->text() ) );
 				Track * track = m_trackView->getTrack();
 				track->setName( m_renameLineEdit->text() );
-				getGUI()->mixerView()->processAfterTrackStyleModify(track);
+				getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 				Engine::getSong()->setModified();
 			}
 		}

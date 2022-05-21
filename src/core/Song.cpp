@@ -819,7 +819,7 @@ void Song::addPatternTrack()
 void Song::addSampleTrack()
 {
 	Track* track = Track::create( Track::SampleTrack, this );
-	getGUI()->mixerView()->processAfterTrackAdd(track);
+	getGUI()->mixerView()->updateAfterTrackAdd(track);
 }
 
 

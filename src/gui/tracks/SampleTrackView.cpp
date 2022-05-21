@@ -234,7 +234,7 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 {
 	model()->mixerChannelModel()->setValue(channelIndex);
 	MixerView*  mixerView = getGUI()->mixerView();
-	mixerView->processAfterTrackFxMixerModify(getTrack());
+	mixerView->updateAfterTrackMixerLineModify(getTrack());
 	mixerView->setCurrentMixerLine( channelIndex );
 }
 

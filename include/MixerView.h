@@ -111,11 +111,11 @@ public:
 	void refreshDisplay();
 
 	// Auto track link support
-	void processAfterTrackAdd(Track * track);
-	void processAfterTrackStyleModify(Track * track);
-	void processAfterTrackFxMixerModify(Track * track);
-	void processAfterTrackMove(Track * track);
-	void processAfterTrackDelete(Track * track);
+	void updateAfterTrackAdd(Track * track);
+	void updateAfterTrackStyleModify(Track * track);
+	void updateAfterTrackMixerLineModify(Track * track);
+	void updateAfterTrackMove(Track * track);
+	void updateAfterTrackDelete(Track * track);
 	void toggleAutoTrackLink(int index);
 
 
@@ -143,6 +143,7 @@ private:
 	void updateMaxChannelSelector();
 	void swapChannels(int indexA, int indexB);
 	void updateAutoTrackSortOrder();
+	void deleteChannelInternal(int index);
 	
 	friend class MixerChannelView;
 } ;

@@ -277,7 +277,7 @@ void TrackOperationsWidget::selectTrackColor()
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(new_color);
-	getGUI()->mixerView()->processAfterTrackStyleModify(track);
+	getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 	Engine::getSong()->setModified();
 }
 
@@ -286,7 +286,7 @@ void TrackOperationsWidget::resetTrackColor()
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->resetColor();
-	getGUI()->mixerView()->processAfterTrackStyleModify(track);
+	getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 	Engine::getSong()->setModified();
 }
 
@@ -296,7 +296,7 @@ void TrackOperationsWidget::randomizeTrackColor()
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(buffer);
-	getGUI()->mixerView()->processAfterTrackStyleModify(track);
+	getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 	Engine::getSong()->setModified();
 }
 

@@ -174,27 +174,27 @@ MixerView::~MixerView()
 	}
 }
 
-void MixerView::processAfterTrackAdd(Track * track)
+void MixerView::updateAfterTrackAdd(Track * track)
 {
 	// TODO: check if an autotrack mode is enabled (still missing)
 	Mixer * mix = Engine::mixer();
-	IntModel * model = mix->getFxChannelModelByTrack(track);
+	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != NULL)
 	{
 		int channelIndex = addNewChannel();
 		model->setValue( channelIndex );
 		mix->mixerChannel(channelIndex)->m_autoTrackLinkModel.setValue(true);
 
-		processAfterTrackStyleModify(track);
+		updateAfterTrackStyleModify(track);
 
 		setCurrentMixerLine( channelIndex );
 	}
 }
 
-void MixerView::processAfterTrackStyleModify(Track * track)
+void MixerView::updateAfterTrackStyleModify(Track * track)
 {
 	Mixer * mix = Engine::mixer();
-	IntModel * model = mix->getFxChannelModelByTrack(track);
+	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != NULL)
 	{
 		int index = model->value();
@@ -208,13 +208,13 @@ void MixerView::processAfterTrackStyleModify(Track * track)
 	}
 }
 
-void MixerView::processAfterTrackFxMixerModify(Track * track)
+void MixerView::updateAfterTrackMixerLineModify(Track * track)
 {
 	Mixer * mix = Engine::mixer();
-	IntModel * model = mix->getFxChannelModelByTrack(track);
+	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != NULL)
 	{
-		// check if there are more than one track is pointing to the same mixer channel
+		// check if there are more than one track pointing to the same mixer channel
 		// if yes disable the autotracklink
 		std::vector<bool> used(m_mixerChannelViews.size(), false);
 		bool needUpdate = false;
@@ -231,10 +231,10 @@ void MixerView::processAfterTrackFxMixerModify(Track * track)
 	}
 }
 
-void MixerView::processAfterTrackMove(Track * track)
+void MixerView::updateAfterTrackMove(Track * track)
 {
 	Mixer * mix = Engine::mixer();
-	IntModel * model = Engine::mixer()->getFxChannelModelByTrack(track);
+	IntModel * model = Engine::mixer()->getChannelModelByTrack(track);
 	if (model != NULL)
 	{
 		MixerChannel * channel = mix->mixerChannel(model->value());
@@ -245,13 +245,13 @@ void MixerView::processAfterTrackMove(Track * track)
 	}
 }
 
-void MixerView::processAfterTrackDelete(Track * track)
+void MixerView::updateAfterTrackDelete(Track * track)
 {
 	Mixer * mix = Engine::mixer();
-	IntModel * model = mix->getFxChannelModelByTrack(track);
+	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != NULL)
 	{
-		int channelIndex = mix->getFxChannelModelByTrack(track)->value();
+		int channelIndex = mix->getChannelModelByTrack(track)->value();
 		MixerChannel * channel = mix->mixerChannel(channelIndex);
 		if (channel->m_autoTrackLinkModel.value())
 		{
@@ -276,16 +276,14 @@ int MixerView::addNewChannel()
 
 	updateMixerLine(newChannelIndex);
 
-	updateMaxChannelSelector();
-
 	updateAutoTrackSortOrder();
+	updateMaxChannelSelector();
 
 	return newChannelIndex;
 }
 
 void MixerView::updateAutoTrackSortOrder()
 {
-	return;
 
 	Mixer * mix = Engine::mixer();
 	QList<int> *list = new QList<int>();
@@ -300,15 +298,16 @@ void MixerView::updateAutoTrackSortOrder()
 	}
 
 	// add auto tracks in the order of the song tracks
-	mix->processFxTracks([&, list](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
+	mix->processAssignedTracks([&, list](Track * track, IntModel * model, MixerChannel * channel)
 	mutable {
-		(void) track;
-		if (fxChannel == NULL) return;
-		if (fxChannel->m_autoTrackLinkModel.value())
+		(void) track;		
+		if (channel == NULL) return;		
+		if (channel->m_autoTrackLinkModel.value())
 		{
-			list->append(fxChannelModel->value());
+			list->append(model->value());
 		}
 	});
+	return;
 
 
 	// bubblesort here because the list is normally almost ordered
@@ -329,7 +328,7 @@ void MixerView::updateAutoTrackSortOrder()
 	} while (swapped);
 
 	// TODO: think about focus
-	// setCurrentFxLine( index - 1 );
+	// setCurrentMixerLine( index - 1 );
 }
 
 
@@ -375,13 +374,14 @@ void MixerView::refreshDisplay()
 void MixerView::updateMaxChannelSelector()
 {
 	Mixer * mix = Engine::mixer();
-	mix->processFxTracks([this](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
+	mix->processAssignedTracks([this](Track * track, IntModel * model, MixerChannel * channel)
 	{
 		(void) track;
-		(void) fxChannel;
-		fxChannelModel->setRange(0,m_mixerChannelViews.size()-1,1);
+		(void) channel;
+		model->setRange(0,m_mixerChannelViews.size()-1,1);
 	});
 }
+
 
 
 void MixerView::saveSettings( QDomDocument & _doc, QDomElement & _this )
@@ -503,8 +503,14 @@ void MixerView::updateMixerLine(int index)
 	thisLine->update();
 }
 
-
 void MixerView::deleteChannel(int index)
+{
+	deleteChannelInternal(index);
+	updateMaxChannelSelector();
+}
+
+
+void MixerView::deleteChannelInternal(int index)
 {
 	// can't delete master
 	if( index == 0 ) return;
@@ -545,8 +551,6 @@ void MixerView::deleteChannel(int index)
 		selLine = m_mixerChannelViews.size()-1;
 	}
 	setCurrentMixerLine(selLine);
-
-	updateMaxChannelSelector();
 }
 
 
@@ -556,14 +560,18 @@ void MixerView::deleteUnusedChannels()
 	Mixer * mix = Engine::mixer();
 	std::vector<int> inUse = mix->getUsedChannelCounts();
 
+	bool needUpdateMax = false;
+
 	//Check all channels except master, delete those with no incoming sends
 	for(int i = m_mixerChannelViews.size()-1; i > 0; --i)
 	{
 		if ((inUse[i]==0) && Engine::mixer()->mixerChannel(i)->m_receives.isEmpty())
 		{
-			deleteChannel(i);
+			deleteChannelInternal(i);
+			needUpdateMax = true;
 		}
 	}
+	if (needUpdateMax) updateMaxChannelSelector();
 }
 
 
@@ -575,10 +583,10 @@ void MixerView::toggleAutoTrackLink(int index)
 	if (!channel->m_autoTrackLinkModel.value()) return;
 
 	Track * trackFound = NULL;
-	mix->processFxTracks([&trackFound, index](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
+	mix->processAssignedTracks([&trackFound, index](Track * track, IntModel * model, MixerChannel * channel)
 	mutable {
-		(void) fxChannel;
-		if (fxChannelModel->value() == index)
+		(void) channel;
+		if (model->value() == index)
 		{
 			trackFound = track;
 		}
@@ -587,7 +595,7 @@ void MixerView::toggleAutoTrackLink(int index)
 	if (trackFound != NULL)
 	{
 		updateAutoTrackSortOrder();
-		processAfterTrackStyleModify(trackFound);
+		updateAfterTrackStyleModify(trackFound);
 	}
 }
 

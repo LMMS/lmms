@@ -168,7 +168,7 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 	if( index != -1 )
 	{
 		Track * t = _tv->getTrack();
-		getGUI()->mixerView()->processAfterTrackDelete(t);
+		getGUI()->mixerView()->updateAfterTrackDelete(t);
 		m_trackViews.removeAt( index );
 
 		disconnect( _tv );
@@ -206,7 +206,7 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	m_tc->m_tracks.insert( indexTo, track );
 	m_trackViews.move( indexFrom, indexTo );
 
-	getGUI()->mixerView()->processAfterTrackMove(track);
+	getGUI()->mixerView()->updateAfterTrackMove(track);
 	realignTracks();
 }
 
@@ -406,7 +406,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		getGUI()->mixerView()->processAfterTrackAdd(it);
+		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
 					this, it, value );
 		ilt->start();
@@ -420,7 +420,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		getGUI()->mixerView()->processAfterTrackAdd(it);
+		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
@@ -434,7 +434,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		getGUI()->mixerView()->processAfterTrackAdd(it);
+		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		it->setSimpleSerializing();
 		it->loadSettings( dataFile.content().toElement() );
 		//it->toggledInstrumentTrackButton( true );

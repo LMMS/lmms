@@ -286,21 +286,21 @@ void Mixer::deleteChannel( int index )
 	Engine::audioEngine()->requestChangeInModel();
 
 
-	processFxTracks( [index](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
+	processAssignedTracks( [index](Track * track, IntModel * model, MixerChannel * channel)
 	{
 		(void) track;
-		(void) fxChannel;
-		int curFxIndex = fxChannelModel->value(0);
-		if( curFxIndex == index )
+		(void) channel;
+		int curIndex = model->value(0);
+		if( curIndex == index )
 		{
-			// we are deleting this track's fx send
+			// we are deleting this track's mixer send
 			// send to master
-			fxChannelModel->setValue(0);
+			model->setValue(0);
 		}
-		else if ( curFxIndex > index )
+		else if ( curIndex > index )
 		{
 			// subtract 1 to make up for the missing channel
-			fxChannelModel->setValue(-1);
+			model->setValue(-1);
 		}
 	});
 
@@ -352,7 +352,7 @@ void Mixer::toggleAutoTrackLink(int index)
 	m_mixerChannels[index]->m_autoTrackLinkModel.setValue(! m_mixerChannels[index]->m_autoTrackLinkModel.value());
 }
 
-IntModel * Mixer::getFxChannelModelByTrack(Track * track)
+IntModel * Mixer::getChannelModelByTrack(Track * track)
 {
 	if( track->type() == Track::InstrumentTrack )
 	{
@@ -371,19 +371,12 @@ bool Mixer::isAutoTrackLinkToggleAllowed(int index)
 {
 	if (mixerChannel( index )->m_autoTrackLinkModel.value()) return true;
 
-	std::vector<int> used(m_mixerChannels.size(), 0);
-	processFxTracks([&used](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
-	mutable {
-		(void) track;
-		(void) fxChannel;
-		++used[fxChannelModel->value()];
-	});
-
-	return used[index] == 1;
+	std::vector<int> usedChannelCounts = getUsedChannelCounts();
+	return usedChannelCounts[index] == 1;
 }
 
 
-void Mixer::processFxTracks(std::function<void(Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)> process)
+void Mixer::processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process)
 {
 	TrackContainer::TrackList trackList;
 	trackList += Engine::getSong()->tracks();
@@ -391,16 +384,16 @@ void Mixer::processFxTracks(std::function<void(Track * track, IntModel * fxChann
 
 	for (Track* track: trackList)
 	{
-		IntModel * fxChannelModel = getFxChannelModelByTrack(track);
-		MixerChannel * fxChannel = NULL;
-		if (fxChannelModel != NULL)
+		IntModel * model = getChannelModelByTrack(track);
+		MixerChannel * channel = NULL;
+		if (model != NULL)
 		{
-			int channelIndex = fxChannelModel->value();
+			int channelIndex = model->value();
 			if (channelIndex > 0 && channelIndex < m_mixerChannels.size() )
 			{
-				fxChannel = mixerChannel(channelIndex);
+				channel = mixerChannel(channelIndex);
 			}
-			process(track,fxChannelModel, fxChannel);
+			process(track,model, channel);
 		}
 	}
 }
@@ -408,29 +401,15 @@ void Mixer::processFxTracks(std::function<void(Track * track, IntModel * fxChann
 std::vector<int> Mixer::getUsedChannelCounts()
 {
 	std::vector<int> used(m_mixerChannels.size(), 0);
-	processFxTracks([&used](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
+	processAssignedTracks([&used](Track * track, IntModel * model, MixerChannel * channel)
 	mutable {
 		(void) track;
-		(void) fxChannel;
-		++used[fxChannelModel->value()];
+		(void) channel;
+		++used[model->value()];
 	});
 
 	return used;
 }
-
-bool Mixer::isChannelUsed(int index)
-{
-	bool result = false;
-
-	processFxTracks([&result, index](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
-	mutable {
-		(void) track;
-		(void) fxChannel;
-		if (fxChannelModel->value() == index) result = true;
-	});
-	return result;
-}
-
 
 
 void Mixer::swapChannels(int indexA, int indexB)
@@ -451,18 +430,18 @@ void Mixer::swapChannels(int indexA, int indexB)
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	processFxTracks( [a,b](Track * track, IntModel * fxChannelModel, MixerChannel * fxChannel)
+	processAssignedTracks( [a,b](Track * track, IntModel * model, MixerChannel * channel)
 	{
 		(void) track;
-		(void) fxChannel;
-		int curFxIndex = fxChannelModel->value(0);
-		if( curFxIndex == a )
+		(void) channel;
+		int curIndex = model->value(0);
+		if( curIndex == a )
 		{
-			fxChannelModel->setValue(b);
+			model->setValue(b);
 		}
-		else if ( curFxIndex == b )
+		else if ( curIndex == b )
 		{
-			fxChannelModel->setValue(a);
+			model->setValue(a);
 		}
 	});
 
