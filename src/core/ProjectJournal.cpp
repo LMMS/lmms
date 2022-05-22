@@ -79,7 +79,7 @@ void ProjectJournal::restoreCheckPoint(ProjectJournal::CheckPointStack& restoreS
 {
 	while (!restoreStack.empty())
 	{
-		CheckPointGroup backup;
+		BatchCheckPoint backup;
 
 		// For every checkpoint (journaled object) in the last group...
 		for (CheckPoint& restorePoint: restoreStack.back())
@@ -135,25 +135,25 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 	{
 		m_redoCheckPoints.clear();
 
-		// Create a new empty group if we're not grouping with previous checkpoints or there are none
-		if (m_groupCounter == 0 || m_undoCheckPoints.empty())
+		// If we're not batching checkpoints, begin on a new one
+		if (m_batchingCount == 0 || m_undoCheckPoints.empty())
 		{
 			m_undoCheckPoints.emplace_back();
 		}
-		CheckPointGroup& group = m_undoCheckPoints.back();
+		BatchCheckPoint& batch = m_undoCheckPoints.back();
 
 		// If this object already has a checkpoint in the batch, skip it
-		for (const CheckPoint& checkpoint: group)
+		for (const CheckPoint& checkpoint: batch)
 		{
 			if (checkpoint.joID == jo->id()) { return; }
 		}
 
+		// Create a checkpoint and save it to the batch
 		DataFile dataFile( DataFile::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
+		batch.push_back(CheckPoint(jo->id(), dataFile));
 
-		group.push_back(CheckPoint(jo->id(), dataFile));
-
-		// Remove excessive checkpoints
+		// Remove excessive checkpoints from the stack
 		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
 		{
 			m_undoCheckPoints.erase(m_undoCheckPoints.begin(), m_undoCheckPoints.end() - MAX_UNDO_STATES);
@@ -164,21 +164,24 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 
 
-void ProjectJournal::beginCheckPointGroup()
+void ProjectJournal::beginBatchCheckPoint()
 {
 	if (!isJournalling()) { return; }
-	if (m_groupCounter == 0) { m_undoCheckPoints.emplace_back(); }
-	++m_groupCounter;
+	// Only begin on a new batch if we are not already batching
+	if (m_batchingCount == 0) { m_undoCheckPoints.emplace_back(); }
+	++m_batchingCount;
 }
 
 
 
 
-void ProjectJournal::endCheckPointGroup()
+void ProjectJournal::endBatchCheckPoint()
 {
 	if (!isJournalling()) { return; }
+	// If no checkpoints were added to the batch, remove it
 	if (m_undoCheckPoints.back().empty()) { m_undoCheckPoints.pop_back(); }
-	--m_groupCounter;
+	--m_batchingCount;
+	assert(m_batchStartCount >= 0);
 }
 
 

@@ -373,7 +373,7 @@ void ClipView::setColor(const QColor* color)
 {
 	std::set<Track*> journaledTracks;
 
-	Engine::projectJournal()->beginCheckPointGroup();
+	Engine::projectJournal()->beginBatchCheckPoint();
 
 	for (ClipView* clipv: getClickedClips())
 	{
@@ -391,7 +391,7 @@ void ClipView::setColor(const QColor* color)
 		}
 		clipv->update();
 	}
-	Engine::projectJournal()->endCheckPointGroup();
+	Engine::projectJournal()->endBatchCheckPoint();
 	Engine::getSong()->setModified();
 }
 
