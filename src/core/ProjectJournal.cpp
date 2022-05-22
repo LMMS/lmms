@@ -135,16 +135,22 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 	{
 		m_redoCheckPoints.clear();
 
-		DataFile dataFile( DataFile::JournalData );
-		jo->saveState( dataFile, dataFile.content() );
-
 		// Create a new empty group if we're not grouping with previous checkpoints or there are none
 		if (m_groupCounter == 0 || m_undoCheckPoints.empty())
 		{
 			m_undoCheckPoints.emplace_back();
 		}
-
 		CheckPointGroup& group = m_undoCheckPoints.back();
+
+		// If this object already has a checkpoint in the batch, skip it
+		for (const CheckPoint& checkpoint: group)
+		{
+			if (checkpoint.joID == jo->id()) { return; }
+		}
+
+		DataFile dataFile( DataFile::JournalData );
+		jo->saveState( dataFile, dataFile.content() );
+
 		group.push_back(CheckPoint(jo->id(), dataFile));
 
 		// Remove excessive checkpoints
