@@ -655,17 +655,17 @@ Radek Słowik</translation>
 <context>
     <name>PatternClipView</name>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="53"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>Otwórz w Edytorze Perkusji i Basu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>Zresetuj nazwę</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>Zmień nazwę</translation>
     </message>

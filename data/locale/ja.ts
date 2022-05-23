@@ -651,17 +651,17 @@ LMMSを他の言語に翻訳したり、翻訳を改善することに興味が�
 <context>
     <name>PatternClipView</name>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="53"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>ビート+ベースライン エディターで開く</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>名前をリセット</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>名前を変更</translation>
     </message>

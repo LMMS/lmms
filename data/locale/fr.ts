@@ -651,17 +651,17 @@ Si vous souhaitez traduire LMMS dans une autre langue ou améliorer les traducti
 <context>
     <name>PatternClipView</name>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="53"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>Ouvrir dans l&apos;éditeur de rythmes et de ligne de basse</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>Réinitialiser le nom</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>Modifier le nom</translation>
     </message>

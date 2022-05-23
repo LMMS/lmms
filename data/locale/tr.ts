@@ -651,17 +651,17 @@ LMMS&apos;yi başka bir dilde çevirmekle ilgileniyorsanız veya mevcut çeviril
 <context>
     <name>PatternClipView</name>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="53"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>Beat+Bassline Düzenleyici&apos;de aç</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>İsmini sıfırla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>İsmini değiştir</translation>
     </message>

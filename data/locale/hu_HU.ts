@@ -651,17 +651,17 @@ Ha szeretnél részt venni az LMMS más nyelvekre történő fordításában vag
 <context>
     <name>PatternClipView</name>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="53"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>Megnyitás a Beat+Bassline szerkesztőben</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>Név visszaállítása</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>Átnevezés</translation>
     </message>
