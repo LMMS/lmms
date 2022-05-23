@@ -420,7 +420,7 @@ TrackOperationsWidget > QPushButton::menu-indicator:checked {
 
 /* font sizes */
 
-nameLabel, effectLabel, Sf2InstrumentView > QLabel {
+Sf2InstrumentView > QLabel {
 	font-size:10px;
 }
 
@@ -619,10 +619,6 @@ SideBar QToolButton:checked {
 }
 
 /* Instrument plugin list */
-
-PluginDescList {
-	background-color: #131517;
-}
 
 PluginDescWidget {
 	border-top: 1px solid #3E474F;

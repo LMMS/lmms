@@ -563,7 +563,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBEditor</name>
+    <name>PatternEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
         <translation type="unfinished"/>
@@ -614,7 +614,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBClipView</name>
+    <name>PatternClipView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
         <translation type="unfinished"/>
@@ -637,7 +637,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBTrack</name>
+    <name>PatternTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
         <translation type="unfinished"/>
@@ -6980,7 +6980,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>VisualizationWidget</name>
+    <name>Oscilloscope</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
         <translation type="unfinished"/>
@@ -7752,7 +7752,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>mixerLineLcdSpinBox</name>
+    <name>MixerLineLcdSpinBox</name>
     <message>
         <source>Assign to:</source>
         <translation type="unfinished"/>
