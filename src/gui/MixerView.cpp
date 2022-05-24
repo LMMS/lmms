@@ -205,7 +205,8 @@ void MixerView::updateAfterTrackStyleModify(Track * track)
 			if (channel->m_autoTrackLinkModel.value())
 			{
 				channel->m_name = track->name();
-				if (track->useColor()) { channel->setColor (track->color()); }
+				channel->setColor (track->color());
+				channel->m_hasColor = track->useColor();
 				setCurrentMixerLine(channelIndex);
 			}
 		}
@@ -219,8 +220,7 @@ void MixerView::updateAfterTrackMixerLineModify(Track * track)
 	if (model != nullptr)
 	{
 		// check if there are more than one track pointing to the same mixer channel
-		// if yes disable the autotracklink
-		std::vector<bool> used(m_mixerChannelViews.size(), false);
+		// if yes disable the autotracklink		
 		bool needUpdate = false;
 		std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
 		for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
@@ -295,15 +295,16 @@ int MixerView::addNewChannel()
 
 void MixerView::updateAutoTrackSortOrder()
 {
-	Mixer * mix = Engine::mixer();
-	QList<int> *list = new QList<int>();
+	Mixer * mix = Engine::mixer();	
+	std::vector<int> list(m_mixerChannelViews.size(), 0);
 
+	int c = 0;
 	// add all non auto track first
 	for( int i = 1; i<m_mixerChannelViews.size(); ++i )
 	{
 		if (!mix->mixerChannel(i)->m_autoTrackLinkModel.value())
 		{
-			list->append(i);
+			list[c++] = i;
 		}
 	}
 
@@ -313,27 +314,30 @@ void MixerView::updateAutoTrackSortOrder()
 		if (channel == nullptr) return;
 		if (channel->m_autoTrackLinkModel.value())
 		{
-			list->append(model->value());
+			list[c++] = model->value();
 		}
 	});
 	return;
 
 
 	// bubblesort here because the list is normally almost ordered
-	int n = list->length();
 	bool swapped = false;
 	do
 	{
-		for (int i=0; i<n-1; ++i)
+		swapped = false;
+		for (int i=0; i<c-1; ++i)
 		{
-			if (list->value(i) > list->value(i+1))
+			if (list[i] > list[i+1])
 			{
 				// a (+1) because we didn't include master track in our list
-				swapChannels(list->value(i+1), list->value(i+2));
-				list->swap(i,i+1);
+				swapChannels(list[i+1], list[i+2]);
+				int t = list[i];
+				list[i] = list[i+1];
+				list[i+1] = t;
+				swapped = true;
 			}
 		}
-		n = n-1;
+		c = c-1;
 	} while (swapped);
 
 	// TODO: think about focus
