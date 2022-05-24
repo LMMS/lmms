@@ -144,7 +144,28 @@ void MidiClipView::changeName()
 
 void MidiClipView::transposeSelection()
 {
-	int semitones = QInputDialog::getInt(this, tr("Transpose"), tr("Semitones to transpose:"), 0, -NumKeys, NumKeys, 1);
+	const auto selection = getClickedClips();
+
+	// Calculate the key boundries for all clips
+	int highest = 0;
+	int lowest = NumKeys - 1;
+	for (ClipView* clipview: selection)
+	{
+		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
+		{
+			TimePos start, end;
+			int low, high;
+			if (mcv->getMidiClip()->notes().getBounds(start, end, low, high))
+			{
+				lowest = std::min(low, lowest);
+				highest = std::max(high, highest);
+			}
+		}
+	}
+
+	int minStep = 0 - lowest;
+	int maxStep = NumKeys - 1 - highest;
+	int semitones = QInputDialog::getInt(this, tr("Transpose"), tr("Semitones to transpose:"), 0, minStep, maxStep, 1);
 	if (semitones == 0) { return; }
 
 	// TODO make this not crash
@@ -161,9 +182,12 @@ void MidiClipView::transposeSelection()
 				track->addJournalCheckPoint();
 				m_changedTracks.insert(track);
 			}
-			mcv->getMidiClip()->transpose(semitones);
+			auto clip = mcv->getMidiClip();
+			clip->notes().transpose(semitones);
+			emit clip->dataChanged();
 		}
 	}
+	Engine::getSong()->setModified();
 }
 
 

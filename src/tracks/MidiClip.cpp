@@ -346,15 +346,8 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 
 
-void MidiClip::transpose(int semitones)
-{
-	if (notes().empty()) { return; }
 
-	for (Note* note: notes())
-	{
-		note->setKey(note->key() + semitones);
-	}
-}
+
 
 
 
