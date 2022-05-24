@@ -471,7 +471,16 @@ void RemotePlugin::hideUI()
 void RemotePlugin::resizeSharedProcessingMemory()
 {
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
-	m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
+	try
+	{
+		m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
+	}
+	catch (const std::runtime_error& error)
+	{
+		qCritical() << "Failed to allocate shared audio buffer:" << error.what();
+		m_audioBuffer.detach();
+		return;
+	}
 	m_audioBufferSize = s * sizeof(float);
 	sendMessage(message(IdChangeSharedMemoryKey).addString(m_audioBuffer.key()));
 }

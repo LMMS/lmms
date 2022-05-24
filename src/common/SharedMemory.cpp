@@ -34,8 +34,9 @@
 #
 #	include <sys/mman.h>
 #	include <sys/stat.h>
-#	include <assert.h>
 #	include <fcntl.h>
+#
+#	include "RaiiHelpers.h"
 #else
 #	include <stdexcept>
 #
@@ -61,38 +62,8 @@ int retryWhileInterrupted(F&& function) noexcept(std::is_nothrow_invocable_v<F>)
 	return result;
 }
 
-template<typename T, T Null>
-class NullableResource
-{
-public:
-	NullableResource() = default;
-	NullableResource(std::nullptr_t) noexcept { }
-	NullableResource(T value) noexcept : m_value{value} { }
-	operator T() const noexcept { return m_value; }
-	explicit operator bool() const noexcept { return m_value != Null; }
-	friend bool operator==(NullableResource a, NullableResource b) noexcept { return a.m_value == b.m_value; }
-	friend bool operator==(NullableResource a, T b) noexcept { return a.m_value == b; }
-	friend bool operator==(T a, NullableResource b) noexcept { return a == b.m_value; }
-	friend bool operator!=(NullableResource a, NullableResource b) noexcept { return a.m_value != b.m_value; }
-	friend bool operator!=(NullableResource a, T b) noexcept { return a.m_value != b; }
-	friend bool operator!=(T a, NullableResource b) noexcept { return a != b.m_value; }
-
-private:
-	T m_value = Null;
-};
-
-template<typename T, T Null, auto Deleter>
-struct NullableResourceDeleter
-{
-	using pointer = NullableResource<T, Null>;
-	void operator()(T value) const noexcept { Deleter(value); }
-};
-
-template<typename T, T Null, auto Deleter>
-using UniqueNullableResource = std::unique_ptr<T, NullableResourceDeleter<T, Null, Deleter>>;
-
 void deleteFileDescriptor(int fd) noexcept { retryWhileInterrupted([fd]() noexcept { return close(fd); }); }
-void deleteShmObject(const char* name) { shm_unlink(name); }
+void deleteShmObject(const char* name) noexcept { shm_unlink(name); }
 
 using FileDescriptor = UniqueNullableResource<int, -1, deleteFileDescriptor>;
 using ShmObject = UniqueNullableResource<const char*, nullptr, deleteShmObject>;
@@ -156,7 +127,7 @@ public:
 
 	~SharedMemoryImpl()
 	{
-		if (m_mapping) { munmap(m_mapping, m_size); }
+		munmap(m_mapping, m_size);
 	}
 
 	void* get() { return m_mapping; }
@@ -224,7 +195,7 @@ SharedMemoryData::~SharedMemoryData() { }
 SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
 	m_key{std::move(other.m_key)},
 	m_impl{std::move(other.m_impl)},
-	m_ptr{std::exchange(other.m_ptr, nullptr)}
+	m_ptr{other.m_ptr}
 { }
 
 } // namespace detail
