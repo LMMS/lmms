@@ -252,7 +252,7 @@ void MixerLine::mouseDoubleClickEvent( QMouseEvent * )
 void MixerLine::contextMenuEvent( QContextMenuEvent * )
 {
 	Mixer * mix =  Engine::mixer();
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->mixerChannel( m_channelIndex )->m_name, this );
+	CaptionMenu* contextMenu = new CaptionMenu( mix->mixerChannel( m_channelIndex )->m_name, this );
 	bool autoTrackLink = mix->mixerChannel( m_channelIndex )->m_autoTrackLinkModel.value();
 	if( m_channelIndex != 0 ) // no move-options in master
 	{

@@ -179,7 +179,7 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name)
 	// TODO: check if an autotrack mode is enabled (still missing)
 	Mixer * mix = Engine::mixer();
 	IntModel * model = mix->getChannelModelByTrack(track);
-	if ( model != NULL)
+	if ( model != nullptr)
 	{
 		int channelIndex = addNewChannel();
 		model->setValue( channelIndex );
@@ -196,7 +196,7 @@ void MixerView::updateAfterTrackStyleModify(Track * track)
 {
 	Mixer * mix = Engine::mixer();
 	IntModel * model = mix->getChannelModelByTrack(track);
-	if (model != NULL)
+	if (model != nullptr)
 	{
 		int channelIndex = model->value();
 		if (channelIndex>0)
@@ -216,14 +216,14 @@ void MixerView::updateAfterTrackMixerLineModify(Track * track)
 {
 	Mixer * mix = Engine::mixer();
 	IntModel * model = mix->getChannelModelByTrack(track);
-	if (model != NULL)
+	if (model != nullptr)
 	{
 		// check if there are more than one track pointing to the same mixer channel
 		// if yes disable the autotracklink
 		std::vector<bool> used(m_mixerChannelViews.size(), false);
 		bool needUpdate = false;
 		std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
-		for(unsigned long i = 0; i< usedChannelCounts.size();i++)
+		for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
 		{
 			if (usedChannelCounts[i] == 0 || usedChannelCounts[i] > 1)
 			{
@@ -238,8 +238,8 @@ void MixerView::updateAfterTrackMixerLineModify(Track * track)
 void MixerView::updateAfterTrackMove(Track * track)
 {
 	Mixer * mix = Engine::mixer();
-	IntModel * model = Engine::mixer()->getChannelModelByTrack(track);
-	if (model != NULL)
+	IntModel * model = mix->getChannelModelByTrack(track);
+	if (model != nullptr)
 	{
 		int channelIndex = model->value();
 		if (channelIndex>0)
@@ -257,7 +257,7 @@ void MixerView::updateAfterTrackDelete(Track * track)
 {
 	Mixer * mix = Engine::mixer();
 	IntModel * model = mix->getChannelModelByTrack(track);
-	if ( model != NULL)
+	if ( model != nullptr)
 	{
 		int channelIndex = model->value();
 		if (channelIndex>0)
@@ -308,10 +308,9 @@ void MixerView::updateAutoTrackSortOrder()
 	}
 
 	// add auto tracks in the order of the song tracks
-	mix->processAssignedTracks([&, list](Track * track, IntModel * model, MixerChannel * channel)
+	mix->processAssignedTracks([&, list](Track *, IntModel * model, MixerChannel * channel)
 	mutable {
-		(void) track;		
-		if (channel == NULL) return;		
+		if (channel == nullptr) return;
 		if (channel->m_autoTrackLinkModel.value())
 		{
 			list->append(model->value());
@@ -384,10 +383,8 @@ void MixerView::refreshDisplay()
 void MixerView::updateMaxChannelSelector()
 {
 	Mixer * mix = Engine::mixer();
-	mix->processAssignedTracks([this](Track * track, IntModel * model, MixerChannel * channel)
+	mix->processAssignedTracks([this](Track *, IntModel * model, MixerChannel *)
 	{
-		(void) track;
-		(void) channel;
 		model->setRange(0,m_mixerChannelViews.size()-1,1);
 	});
 }
@@ -492,7 +489,7 @@ void MixerView::updateMixerLine(int index)
 	// does current channel send to this channel?
 	int selIndex = m_currentMixerLine->channelIndex();
 	MixerLine * thisLine = m_mixerChannelViews[index]->m_mixerLine;
-	thisLine->setToolTip( Engine::mixer()->mixerChannel( index )->m_name );
+	thisLine->setToolTip( mix->mixerChannel( index )->m_name );
 
 	FloatModel * sendModel = mix->channelSendModel(selIndex, index);
 	if( sendModel == nullptr )
@@ -579,7 +576,7 @@ void MixerView::deleteUnusedChannels()
 	//Check all channels except master, delete those with no incoming sends
 	for(int i = m_mixerChannelViews.size()-1; i > 0; --i)
 	{
-		if ((inUse[i]==0) && Engine::mixer()->mixerChannel(i)->m_receives.isEmpty())
+		if ((inUse[i]==0) && mix->mixerChannel(i)->m_receives.isEmpty())
 		{
 			deleteChannelInternal(i);
 			needUpdateMax = true;
@@ -596,17 +593,16 @@ void MixerView::toggleAutoTrackLink(int index)
 	MixerChannel *  channel = mix->mixerChannel(index);
 	if (!channel->m_autoTrackLinkModel.value()) return;
 
-	Track * trackFound = NULL;
-	mix->processAssignedTracks([&trackFound, index](Track * track, IntModel * model, MixerChannel * channel)
+	Track * trackFound = nullptr;
+	mix->processAssignedTracks([&trackFound, index](Track * track, IntModel * model, MixerChannel *)
 	mutable {
-		(void) channel;
 		if (model->value() == index)
 		{
 			trackFound = track;
 		}
 	});
 
-	if (trackFound != NULL)
+	if (trackFound != nullptr)
 	{
 		updateAutoTrackSortOrder();
 		updateAfterTrackStyleModify(trackFound);

@@ -286,10 +286,8 @@ void Mixer::deleteChannel( int index )
 	Engine::audioEngine()->requestChangeInModel();
 
 
-	processAssignedTracks( [index](Track * track, IntModel * model, MixerChannel * channel)
+	processAssignedTracks( [index](Track *, IntModel * model, MixerChannel * )
 	{
-		(void) track;
-		(void) channel;
 		int curIndex = model->value(0);
 		if( curIndex == index )
 		{
@@ -364,7 +362,7 @@ IntModel * Mixer::getChannelModelByTrack(Track * track)
 		SampleTrack * strk = (SampleTrack *) track;
 		return strk->mixerChannelModel();
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool Mixer::isAutoTrackLinkToggleAllowed(int index)
@@ -385,8 +383,8 @@ void Mixer::processAssignedTracks(std::function<void(Track * track, IntModel * m
 	for (Track* track: trackList)
 	{
 		IntModel * model = getChannelModelByTrack(track);
-		MixerChannel * channel = NULL;
-		if (model != NULL)
+		MixerChannel * channel = nullptr;
+		if (model != nullptr)
 		{
 			int channelIndex = model->value();
 			if (channelIndex > 0 && channelIndex < m_mixerChannels.size() )
@@ -401,10 +399,8 @@ void Mixer::processAssignedTracks(std::function<void(Track * track, IntModel * m
 std::vector<int> Mixer::getUsedChannelCounts()
 {
 	std::vector<int> used(m_mixerChannels.size(), 0);
-	processAssignedTracks([&used](Track * track, IntModel * model, MixerChannel * channel)
+	processAssignedTracks([&used](Track *, IntModel * model, MixerChannel *)
 	mutable {
-		(void) track;
-		(void) channel;
 		++used[model->value()];
 	});
 
@@ -430,10 +426,8 @@ void Mixer::swapChannels(int indexA, int indexB)
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	processAssignedTracks( [a,b](Track * track, IntModel * model, MixerChannel * channel)
+	processAssignedTracks( [a,b](Track *, IntModel * model, MixerChannel *)
 	{
-		(void) track;
-		(void) channel;
 		int curIndex = model->value(0);
 		if( curIndex == a )
 		{
