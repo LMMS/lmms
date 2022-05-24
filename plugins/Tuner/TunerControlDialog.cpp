@@ -43,7 +43,7 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 
 	QLabel* playedNoteReadout = new QLabel(this);
 	playedNoteReadout->setFont(QFont("Arial", 32));
-	playedNoteReadout->setText("");
+	playedNoteReadout->setText("-");
 	playedNoteReadout->setFixedWidth(width());
 	playedNoteReadout->setAlignment(Qt::AlignCenter);
 	playedNoteReadout->move(0, height()/2 - playedNoteReadout->font().pointSize());
