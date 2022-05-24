@@ -110,8 +110,8 @@ public:
 	// useful for loading projects
 	void refreshDisplay();
 
-	// Auto track link support
-	void updateAfterTrackAdd(Track * track);
+	// Auto track link support	
+	void updateAfterTrackAdd(Track * track, QString name = "");
 	void updateAfterTrackStyleModify(Track * track);
 	void updateAfterTrackMixerLineModify(Track * track);
 	void updateAfterTrackMove(Track * track);

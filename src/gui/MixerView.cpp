@@ -174,7 +174,7 @@ MixerView::~MixerView()
 	}
 }
 
-void MixerView::updateAfterTrackAdd(Track * track)
+void MixerView::updateAfterTrackAdd(Track * track, QString name)
 {
 	// TODO: check if an autotrack mode is enabled (still missing)
 	Mixer * mix = Engine::mixer();
@@ -185,6 +185,7 @@ void MixerView::updateAfterTrackAdd(Track * track)
 		model->setValue( channelIndex );
 		mix->mixerChannel(channelIndex)->m_autoTrackLinkModel.setValue(true);
 
+		if (name != "") track->setName(name);
 		updateAfterTrackStyleModify(track);
 
 		setCurrentMixerLine( channelIndex );
@@ -197,13 +198,16 @@ void MixerView::updateAfterTrackStyleModify(Track * track)
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != NULL)
 	{
-		int index = model->value();
-		MixerChannel * channel = mix->mixerChannel(index);
-		if (channel->m_autoTrackLinkModel.value())
+		int channelIndex = model->value();
+		if (channelIndex>0)
 		{
-			channel->m_name = track->name();
-			if (track->useColor()) { channel->setColor (track->color()); }
-			setCurrentMixerLine(index);
+			MixerChannel * channel = mix->mixerChannel(channelIndex);
+			if (channel->m_autoTrackLinkModel.value())
+			{
+				channel->m_name = track->name();
+				if (track->useColor()) { channel->setColor (track->color()); }
+				setCurrentMixerLine(channelIndex);
+			}
 		}
 	}
 }
@@ -237,10 +241,14 @@ void MixerView::updateAfterTrackMove(Track * track)
 	IntModel * model = Engine::mixer()->getChannelModelByTrack(track);
 	if (model != NULL)
 	{
-		MixerChannel * channel = mix->mixerChannel(model->value());
-		if (channel->m_autoTrackLinkModel.value())
+		int channelIndex = model->value();
+		if (channelIndex>0)
 		{
-			updateAutoTrackSortOrder();
+			MixerChannel * channel = mix->mixerChannel(channelIndex);
+			if (channel->m_autoTrackLinkModel.value())
+			{
+				updateAutoTrackSortOrder();
+			}
 		}
 	}
 }
@@ -251,12 +259,15 @@ void MixerView::updateAfterTrackDelete(Track * track)
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != NULL)
 	{
-		int channelIndex = mix->getChannelModelByTrack(track)->value();
-		MixerChannel * channel = mix->mixerChannel(channelIndex);
-		if (channel->m_autoTrackLinkModel.value())
+		int channelIndex = model->value();
+		if (channelIndex>0)
 		{
-			deleteChannel(channelIndex);
-			updateAutoTrackSortOrder();
+			MixerChannel * channel = mix->mixerChannel(channelIndex);
+			if (channel->m_autoTrackLinkModel.value())
+			{
+				deleteChannel(channelIndex);
+				updateAutoTrackSortOrder();
+			}
 		}
 	}
 }
@@ -284,7 +295,6 @@ int MixerView::addNewChannel()
 
 void MixerView::updateAutoTrackSortOrder()
 {
-
 	Mixer * mix = Engine::mixer();
 	QList<int> *list = new QList<int>();
 
@@ -505,7 +515,20 @@ void MixerView::updateMixerLine(int index)
 
 void MixerView::deleteChannel(int index)
 {
+	if( index == 0 ) return;
+
+	// remember selected line
+	int selLine = m_currentMixerLine->channelIndex();
+
 	deleteChannelInternal(index);
+
+	// select the next channel
+	if( selLine >= m_mixerChannelViews.size() )
+	{
+		selLine = m_mixerChannelViews.size()-1;
+	}
+	setCurrentMixerLine(selLine);
+
 	updateMaxChannelSelector();
 }
 
@@ -514,9 +537,6 @@ void MixerView::deleteChannelInternal(int index)
 {
 	// can't delete master
 	if( index == 0 ) return;
-
-	// remember selected line
-	int selLine = m_currentMixerLine->channelIndex();
 
 	// in case the deleted channel is soloed or the remaining
 	// channels will be left in a muted state
@@ -545,12 +565,6 @@ void MixerView::deleteChannelInternal(int index)
 	}
 	m_mixerChannelViews.remove(index);
 
-	// select the next channel
-	if( selLine >= m_mixerChannelViews.size() )
-	{
-		selLine = m_mixerChannelViews.size()-1;
-	}
-	setCurrentMixerLine(selLine);
 }
 
 

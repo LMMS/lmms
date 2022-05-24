@@ -406,9 +406,9 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
 					this, it, value );
+		getGUI()->mixerView()->updateAfterTrackAdd(it, value);
 		ilt->start();
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
@@ -420,10 +420,10 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
+		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
@@ -434,9 +434,9 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
-		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		it->setSimpleSerializing();
 		it->loadSettings( dataFile.content().toElement() );
+		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}

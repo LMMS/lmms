@@ -300,7 +300,7 @@ void Mixer::deleteChannel( int index )
 		else if ( curIndex > index )
 		{
 			// subtract 1 to make up for the missing channel
-			model->setValue(-1);
+			model->setValue(curIndex-1);
 		}
 	});
 
