@@ -64,6 +64,7 @@ SET(LMMS_PLUGIN_LIST
 	StereoMatrix
 	Stk
 	TapTempo
+	Tuner
 	VstBase
 	Vestige
 	VstEffect
