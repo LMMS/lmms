@@ -184,6 +184,7 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name)
 		int channelIndex = addNewChannel();
 		model->setValue( channelIndex );
 		mix->mixerChannel(channelIndex)->m_autoTrackLinkModel.setValue(true);
+		m_mixerChannelViews[channelIndex]->m_mixerLine->autoTrackLinkChanged();
 
 		if (name != "") track->setName(name);
 		updateAfterTrackStyleModify(track);
@@ -228,6 +229,7 @@ void MixerView::updateAfterTrackMixerLineModify(Track * track)
 			if (usedChannelCounts[i] == 0 || usedChannelCounts[i] > 1)
 			{
 				mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
+				m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 				needUpdate = true;
 			}
 		}
@@ -563,9 +565,9 @@ void MixerView::deleteChannelInternal(int index)
 	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i-1);
+		m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 	}
 	m_mixerChannelViews.remove(index);
-
 }
 
 
@@ -594,6 +596,7 @@ void MixerView::toggleAutoTrackLink(int index)
 {
 	Mixer * mix = Engine::mixer();
 	mix->toggleAutoTrackLink(index);
+	m_mixerChannelViews[index]->m_mixerLine->autoTrackLinkChanged();
 	MixerChannel *  channel = mix->mixerChannel(index);
 	if (!channel->m_autoTrackLinkModel.value()) return;
 
@@ -617,8 +620,8 @@ void MixerView::toggleAutoTrackLink(int index)
 void MixerView::swapChannels(int indexA, int indexB)
 {
 	if (( indexA == indexB ) ||
-		( indexA <= 1 || indexA >= m_mixerChannelViews.size() ) ||
-		( indexB <= 1 || indexB >= m_mixerChannelViews.size() ))
+		( indexA < 1 || indexA >= m_mixerChannelViews.size() ) ||
+		( indexB < 1 || indexB >= m_mixerChannelViews.size() ))
 	{
 		return;
 	}
@@ -630,6 +633,9 @@ void MixerView::swapChannels(int indexA, int indexB)
 	// Update widgets models
 	m_mixerChannelViews[indexA]->setChannelIndex(indexA);
 	m_mixerChannelViews[indexB]->setChannelIndex(indexB );
+
+	m_mixerChannelViews[indexA]->m_mixerLine->autoTrackLinkChanged();
+	m_mixerChannelViews[indexB]->m_mixerLine->autoTrackLinkChanged();
 }
 
 

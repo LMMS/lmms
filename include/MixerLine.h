@@ -82,6 +82,8 @@ public:
 
 	bool eventFilter (QObject *dist, QEvent *event) override;
 
+	void autoTrackLinkChanged();
+
 private:
 	void drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
@@ -105,7 +107,7 @@ public slots:
 	void renameChannel();
 	void resetColor();
 	void selectColor();
-	void randomizeColor();
+	void randomizeColor();	
 
 private slots:
 	void renameFinished();
@@ -113,8 +115,7 @@ private slots:
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
-	void toogleAutoTrackLink();
-	void autoTrackLinkChanged();
+	void toogleAutoTrackLink();	
 };
 
 

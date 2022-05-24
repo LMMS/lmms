@@ -412,8 +412,8 @@ void Mixer::swapChannels(int indexA, int indexB)
 {
 	// range check - can't move master or first channel
 	if (( indexA == indexB ) ||
-		( indexA <= 1 || indexA >= m_mixerChannels.size() ) ||
-		( indexB <= 1 || indexB >= m_mixerChannels.size() ))
+		( indexA < 1 || indexA >= m_mixerChannels.size() ) ||
+		( indexB < 1 || indexB >= m_mixerChannels.size() ))
 	{
 		return;
 	}
