@@ -86,7 +86,6 @@ ClipView::ClipView( Clip * clip,
 	m_action( NoAction ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
-	m_initialOffsets( QVector<TimePos>() ),
 	m_hint( nullptr ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
@@ -627,7 +626,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	}
 
 	setInitialPos( me->pos() );
-	setInitialOffsets();
 	if( !fixedClips() && me->button() == Qt::LeftButton )
 	{
 		SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
@@ -642,14 +640,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			if( isSelected() )
 			{
 				m_action = MoveSelection;
+				setInitialOffsets();
 			}
 			else
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
-
-				setInitialPos( me->pos() );
-				setInitialOffsets();
 
 				if( m_clip->getAutoResize() )
 				{	// Always move clips that can't be manually resized
@@ -784,33 +780,21 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == MoveSelection )
 	{
-		// 1: Find the position we want to move the grabbed Clip to
-		TimePos newPos = draggedClipPos( me );
+		const auto selection = getClickedClips();
+		TimePos newPos = draggedClipPos(me);
 
-		// 2: Handle moving the other selected Clips the same distance
-		QVector<selectableObject *> so =
-			m_trackView->trackContainerView()->selectedObjects();
-		QVector<Clip *> clips; // List of selected clips
-		int leftmost = 0; // Leftmost clip's offset from grabbed clip
-		// Populate clips, find leftmost
-		for( QVector<selectableObject *>::iterator it = so.begin();
-							it != so.end(); ++it )
+		// Find leftmost clip's offset from grabbed clip
+		TimePos leftmost;
+		for (int i = 0; i < selection.size(); i++)
 		{
-			ClipView* clipv =
-				dynamic_cast<ClipView *>( *it );
-			if( clipv == nullptr ) { continue; }
-			clips.push_back( clipv->m_clip );
-			int index = std::distance( so.begin(), it );
-			leftmost = std::min(leftmost, m_initialOffsets[index].getTicks());
+			leftmost = std::min(leftmost, m_initialOffsets.at(i));
 		}
 		// Make sure the leftmost clip doesn't get moved to a negative position
 		if ( newPos.getTicks() + leftmost < 0 ) { newPos = -leftmost; }
 
-		for( QVector<Clip *>::iterator it = clips.begin();
-							it != clips.end(); ++it )
+		for (int i = 0; i < selection.size(); i++)
 		{
-			int index = std::distance( clips.begin(), it );
-			( *it )->movePosition( newPos + m_initialOffsets[index] );
+			selection.at(i)->getClip()->movePosition(newPos + m_initialOffsets.at(i));
 		}
 	}
 	else if( m_action == Resize || m_action == ResizeLeft )
@@ -1258,24 +1242,16 @@ float ClipView::pixelsPerBar()
 }
 
 
+
+
 /*! \brief Save the offsets between all selected tracks and a clicked track */
 void ClipView::setInitialOffsets()
 {
-	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
-	QVector<TimePos> offsets;
-	for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
+	m_initialOffsets.clear();
+	for (ClipView* clipv: getClickedClips())
 	{
-		ClipView * clipv =
-			dynamic_cast<ClipView *>( *it );
-		if( clipv == nullptr )
-		{
-			continue;
-		}
-		offsets.push_back( clipv->m_clip->startPosition() - m_initialClipPos );
+		m_initialOffsets.push_back(clipv->m_clip->startPosition() - m_initialClipPos);
 	}
-
-	m_initialOffsets = offsets;
 }
 
 
