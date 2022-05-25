@@ -609,6 +609,22 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
  */
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
+	// If a button is clicked *during* a split, cancel it
+	if (m_action == Split)
+	{
+		m_action = NoAction;
+		if (SampleClip* sClip = dynamic_cast<SampleClip*>(m_clip))
+		{
+			setMarkerEnabled(false);
+			update();
+		}
+		return;
+	}
+	// Ignore clicks when another button is being held
+	else if (m_action != NoAction)
+	{
+		return;
+	}
 	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
 	// to avoid the overhead of calling getClickedClips when it's not used
 	auto active = me->button() == Qt::LeftButton
@@ -728,16 +744,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedClips() )
 		{
 			remove( active );
-		}
-		if (m_action == Split)
-		{
-			m_action = NoAction;
-			SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
-			if (sClip)
-			{
-				setMarkerEnabled( false );
-				update();
-			}
 		}
 	}
 	else if( me->button() == Qt::MidButton )
