@@ -81,7 +81,7 @@ void ProjectJournal::restoreCheckPoint(ProjectJournal::CheckPointStack& restoreS
 	{
 		BatchCheckPoint backup;
 
-		// For every checkpoint (journaled object) in the last group...
+		// For every checkpoint (journaled object) in the last batch...
 		for (CheckPoint& restorePoint: restoreStack.back())
 		{
 			JournallingObject* jo = journallingObject(restorePoint.joID);
@@ -181,7 +181,7 @@ void ProjectJournal::endBatchCheckPoint()
 	// If no checkpoints were added to the batch, remove it
 	if (m_undoCheckPoints.back().empty()) { m_undoCheckPoints.pop_back(); }
 	--m_batchingCount;
-	assert(m_batchStartCount >= 0);
+	assert(m_batchingCount >= 0);
 }
 
 
