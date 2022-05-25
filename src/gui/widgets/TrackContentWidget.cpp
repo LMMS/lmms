@@ -441,36 +441,34 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	// value contains XML needed to reconstruct Clips and place them
 	DataFile dataFile( value.toUtf8() );
 
+	/* dataFile.content() looks something like:
+	 * <clips>
+	 *   <clip trackIndex=N>
+	 *     <midiclip pos=N/>
+	 *   </clip>
+	 * </clips>
+	 * <copyMetadata initialTrackIndex=N grabbedClipPos=N>
+	 */
+
 	// Extract the clip data
-	QDomElement clipParent = dataFile.content().firstChildElement("clips");
-	QDomNodeList clipNodes = clipParent.childNodes();
+	QDomNodeList clipNodes = dataFile.content().firstChildElement("clips").childNodes();
 
 	// Extract the track index that was originally clicked
 	QDomElement metadata = dataFile.content().firstChildElement( "copyMetadata" );
-	QDomAttr tiAttr = metadata.attributeNode( "initialTrackIndex" );
-	int initialTrackIndex = tiAttr.value().toInt();
-	QDomAttr clipPosAttr = metadata.attributeNode( "grabbedClipPos" );
-	TimePos grabbedClipPos = clipPosAttr.value().toInt();
-
-	// Snap the mouse position to the beginning of the dropped bar, in ticks
+	int initialTrackIndex = metadata.attribute("initialTrackIndex").toInt();
+	TimePos grabbedClipPos = metadata.attribute("grabbedClipPos").toInt();
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
 	const int currentTrackIndex = tracks.indexOf( getTrack() );
 
-	bool wasSelection = m_trackView->trackContainerView()->rubberBand()->selectedObjects().count();
-
 	// Unselect the old group
-		const QVector<selectableObject *> so =
-			m_trackView->trackContainerView()->selectedObjects();
-		for( QVector<selectableObject *>::const_iterator it = so.begin();
-		    	it != so.end(); ++it )
-		{
-			( *it )->setSelected( false );
-		}
-
+	const auto selectedObjects = m_trackView->trackContainerView()->selectedObjects();
+	bool wasSelection = selectedObjects.count();
+	for (auto obj: selectedObjects) { obj->setSelected(false); }
 
 	// TODO -- Need to draw the hovericon either way, or ghost the Clips
 	// onto their final position.
 
+	// Snap the mouse position to the beginning of the dropped bar, in ticks
 	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	// All clips should be offset the same amount as the grabbed clip
 	TimePos offset = TimePos(clipPos - grabbedClipPos);
@@ -483,27 +481,24 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	TimePos leftmostPos = grabbedClipPos;
 	for(int i = 0; i < clipNodes.length(); ++i)
 	{
-		QDomElement outerClipElement = clipNodes.item(i).toElement();
-		QDomElement clipElement = outerClipElement.firstChildElement();
-
-		TimePos pos = clipElement.attributeNode("pos").value().toInt();
-
+		TimePos pos = clipNodes.item(i).firstChildElement().attribute("pos").toInt();
 		if(pos < leftmostPos) { leftmostPos = pos; }
 	}
 	// Fix offset if it sets the left most Clip to a negative position
 	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
 
+	// Create clips on the relevant tracks
 	for( int i = 0; i<clipNodes.length(); i++ )
 	{
 		QDomElement outerClipElement = clipNodes.item( i ).toElement();
 		QDomElement clipElement = outerClipElement.firstChildElement();
 
-		int trackIndex = outerClipElement.attributeNode( "trackIndex" ).value().toInt();
+		int trackIndex = outerClipElement.attribute("trackIndex").toInt();
 		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
 		Track * t = tracks.at( finalTrackIndex );
 
 		// The new position is the old position plus the offset.
-		TimePos pos = clipElement.attributeNode( "pos" ).value().toInt() + offset;
+		TimePos pos = clipElement.attribute("pos").toInt() + offset;
 		// If we land on ourselves, offset by one snap
 		TimePos shift = TimePos::ticksPerBar() * getGUI()->songEditor()->m_editor->getSnapSize();
 		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
