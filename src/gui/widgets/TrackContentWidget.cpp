@@ -36,6 +36,7 @@
 #include "GuiApplication.h"
 #include "PatternEditor.h"
 #include "PatternStore.h"
+#include "ProjectJournal.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
@@ -436,8 +437,6 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	QString type = decodeKey( md );
 	QString value = decodeValue( md );
 
-	getTrack()->addJournalCheckPoint();
-
 	// value contains XML needed to reconstruct Clips and place them
 	DataFile dataFile( value.toUtf8() );
 
@@ -488,6 +487,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
 
 	// Create clips on the relevant tracks
+	Engine::projectJournal()->beginBatchCheckPoint();
 	for( int i = 0; i<clipNodes.length(); i++ )
 	{
 		QDomElement outerClipElement = clipNodes.item( i ).toElement();
@@ -496,6 +496,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 		int trackIndex = outerClipElement.attribute("trackIndex").toInt();
 		int finalTrackIndex = trackIndex + ( currentTrackIndex - initialTrackIndex );
 		Track * t = tracks.at( finalTrackIndex );
+		t->addJournalCheckPoint();
 
 		// The new position is the old position plus the offset.
 		TimePos pos = clipElement.attribute("pos").toInt() + offset;
@@ -511,6 +512,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 			clip->selectViewOnCreate( true );
 		}
 	}
+	Engine::projectJournal()->endBatchCheckPoint();
 
 	AutomationClip::resolveAllIDs();
 
