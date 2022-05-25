@@ -250,7 +250,7 @@ class NoteVector: public QVector<Note*>
 {
 public:
 	bool getBounds(TimePos& start, TimePos& end, int& lower, int& upper) const;
-	void transpose(int semitones) const;
+	bool transpose(int semitones) const;
 };
 
 

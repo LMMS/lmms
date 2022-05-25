@@ -172,7 +172,7 @@ void MidiClipView::transposeSelection()
 	// Engine::getSong()->addJournalCheckPoint();
 
 	QSet<Track*> m_changedTracks;
-	for (ClipView* clipview: getClickedClips())
+	for (ClipView* clipview: selection)
 	{
 		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
 		{
@@ -183,10 +183,13 @@ void MidiClipView::transposeSelection()
 				m_changedTracks.insert(track);
 			}
 			auto clip = mcv->getMidiClip();
-			clip->notes().transpose(semitones);
-			emit clip->dataChanged();
+			if (clip->notes().transpose(semitones))
+			{
+				emit clip->dataChanged();
+			}
 		}
 	}
+	// At least one clip must have notes to show the transpose dialog, so something *has* changed
 	Engine::getSong()->setModified();
 }
 

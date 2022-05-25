@@ -278,13 +278,15 @@ bool NoteVector::getBounds(TimePos& start, TimePos& end, int& lower, int& upper)
  *  Notes will be hard-clipped to the MIDI note range. To prevent this use getBounds() prior to transposing.
  *
  *  \param semitones Semitones to transpose
+ *  \return bool True if notes were transposed
  */
-void NoteVector::transpose(int semitones) const
+bool NoteVector::transpose(int semitones) const
 {
-	if (empty() || !semitones) { return; }
+	if (empty() || !semitones) { return false; }
 
 	for (Note* note: *this)
 	{
 		note->setKey(note->key() + semitones);
 	}
+	return true;
 }
