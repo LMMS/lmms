@@ -374,7 +374,8 @@ void ClipView::setColor(const QColor* color)
 
 	Engine::projectJournal()->beginBatchCheckPoint();
 
-	for (ClipView* clipv: getClickedClips())
+	const auto selection = getClickedClips();
+	for (ClipView* clipv: selection)
 	{
 		auto clip = clipv->getClip();
 		clip->addJournalCheckPoint();
@@ -612,7 +613,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	if (m_action == Split)
 	{
 		m_action = NoAction;
-		if (SampleClip* sClip = dynamic_cast<SampleClip*>(m_clip))
+		if (dynamic_cast<SampleClip*>(m_clip))
 		{
 			setMarkerEnabled(false);
 			update();
@@ -643,7 +644,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				setInitialOffsets();
 
 				Engine::projectJournal()->beginBatchCheckPoint();
-				for (ClipView* cv: getClickedClips())
+				const auto selection = getClickedClips();
+				for (ClipView* cv: selection)
 				{
 					cv->getClip()->addJournalCheckPoint();
 				}
@@ -699,8 +701,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
-
-
 	}
 	else if( me->button() == Qt::RightButton )
 	{
@@ -1259,7 +1259,8 @@ float ClipView::pixelsPerBar()
 void ClipView::setInitialOffsets()
 {
 	m_initialOffsets.clear();
-	for (ClipView* clipv: getClickedClips())
+	const auto selection = getClickedClips();
+	for (ClipView* clipv: selection)
 	{
 		m_initialOffsets.push_back(clipv->m_clip->startPosition() - m_initialClipPos);
 	}
