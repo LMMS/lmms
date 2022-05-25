@@ -641,6 +641,13 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			{
 				m_action = MoveSelection;
 				setInitialOffsets();
+
+				Engine::projectJournal()->beginBatchCheckPoint();
+				for (ClipView* cv: getClickedClips())
+				{
+					cv->getClip()->addJournalCheckPoint();
+				}
+				Engine::projectJournal()->endBatchCheckPoint();
 			}
 			else
 			{
@@ -1080,11 +1087,13 @@ QVector<ClipView *> ClipView::getClickedClips()
 
 void ClipView::remove( QVector<ClipView *> clipvs )
 {
+	Engine::projectJournal()->beginBatchCheckPoint();
 	for( auto clipv: clipvs )
 	{
 		// No need to check if it's nullptr because we check when building the QVector
 		clipv->remove();
 	}
+	Engine::projectJournal()->endBatchCheckPoint();
 }
 
 void ClipView::copy( QVector<ClipView *> clipvs )
@@ -1128,11 +1137,13 @@ void ClipView::paste()
 
 void ClipView::toggleMute( QVector<ClipView *> clipvs )
 {
+	Engine::projectJournal()->beginBatchCheckPoint();
 	for( auto clipv: clipvs )
 	{
 		// No need to check for nullptr because we check while building the clipvs QVector
 		clipv->getClip()->toggleMute();
 	}
+	Engine::projectJournal()->endBatchCheckPoint();
 }
 
 bool ClipView::canMergeSelection(QVector<ClipView*> clipvs)
