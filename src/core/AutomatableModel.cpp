@@ -293,13 +293,14 @@ void AutomatableModel::setValue( const float value )
 {
 	m_oldValue = m_value;
 	++m_setValueDepth;
-	const float old_val = m_value;
+	float newValue = fittedValue(value);
 
-	m_value = fittedValue( value );
-	if( old_val != m_value )
+	if (m_oldValue != newValue)
 	{
 		// add changes to history so user can undo it
 		addJournalCheckPoint();
+
+		m_value = newValue;
 
 		// notify linked models
 		for( AutoModelVector::Iterator it = m_linkedModels.begin(); it != m_linkedModels.end(); ++it )
