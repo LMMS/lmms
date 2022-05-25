@@ -192,8 +192,7 @@ private:
 		Resize,
 		ResizeLeft,
 		Split,
-		CopySelection,
-		ToggleSelected
+		CopyOrToggleSelect, // depends on drag vs click
 	} ;
 
 	static TextFloat * s_textFloat;

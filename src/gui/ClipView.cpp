@@ -635,14 +635,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
 		{
-			if( isSelected() )
-			{
-				m_action = CopySelection;
-			}
-			else
-			{
-				m_action = ToggleSelected;
-			}
+			m_action = CopyOrToggleSelect;
 		}
 		else
 		{
@@ -703,6 +696,8 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
+
+
 	}
 	else if( me->button() == Qt::RightButton )
 	{
@@ -746,31 +741,10 @@ void ClipView::mousePressEvent( QMouseEvent * me )
  */
 void ClipView::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_action == CopySelection || m_action == ToggleSelected )
+	if (m_action == CopyOrToggleSelect && mouseMovedDistance(me, 2))
 	{
-		if( mouseMovedDistance( me, 2 ) == true )
-		{
-			QVector<ClipView *> clipViews;
-			if( m_action == CopySelection )
-			{
-				// Collect all selected Clips
-				QVector<selectableObject *> so =
-					m_trackView->trackContainerView()->selectedObjects();
-				for( auto it = so.begin(); it != so.end(); ++it )
-				{
-					ClipView * clipv =
-						dynamic_cast<ClipView *>( *it );
-					if( clipv != nullptr )
-					{
-						clipViews.push_back( clipv );
-					}
-				}
-			}
-			else
-			{
-				getGUI()->songEditor()->m_editor->selectAllClips( false );
-				clipViews.push_back( this );
-			}
+			auto clipViews = getClickedClips();
+
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
 			m_action = NoAction;
@@ -786,7 +760,6 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			new StringPairDrag( QString( "clip_%1" ).arg(
 								m_clip->getTrack()->type() ),
 								dataFile.toString(), thumbnail, this );
-		}
 	}
 
 	if( me->modifiers() & Qt::ControlModifier )
@@ -958,12 +931,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
  */
 void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
-	// If the CopySelection was chosen as the action due to mouse movement,
-	// it will have been cleared.  At this point Toggle is the desired action.
-	// An active StringPairDrag will prevent this method from being called,
-	// so a real CopySelection would not have occurred.
-	if( m_action == CopySelection ||
-	    ( m_action == ToggleSelected && mouseMovedDistance( me, 2 ) == false ) )
+	// If mouse had been moved, m_action would be NoAction
+	if (m_action == CopyOrToggleSelect)
 	{
 		setSelected( !isSelected() );
 	}
