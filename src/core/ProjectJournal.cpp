@@ -24,6 +24,7 @@
 
 #include <cstdlib>
 
+#include "debug.h"
 #include "ProjectJournal.h"
 #include "Engine.h"
 #include "JournallingObject.h"
