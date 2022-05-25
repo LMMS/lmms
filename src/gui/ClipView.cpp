@@ -625,11 +625,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		return;
 	}
-	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
-	// to avoid the overhead of calling getClickedClips when it's not used
-	auto active = me->button() == Qt::LeftButton
-		? QVector<ClipView *>()
-		: getClickedClips();
 
 	setInitialPos( me->pos() );
 	setInitialOffsets();
@@ -659,13 +654,6 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
-
-				// Move, Resize and ResizeLeft
-				// Split action doesn't disable Clip journalling
-				if (m_action == Move || m_action == Resize || m_action == ResizeLeft)
-				{
-					m_clip->setJournalling(false);
-				}
 
 				setInitialPos( me->pos() );
 				setInitialOffsets();
@@ -699,32 +687,13 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					setCursor( Qt::SizeAllCursor );
 				}
 
-				if( m_action == Move )
+				if (m_action == Move || m_action == Resize || m_action == ResizeLeft)
 				{
-					s_textFloat->setTitle( tr( "Current position" ) );
-					s_textFloat->setText( QString( "%1:%2" ).
-						arg( m_clip->startPosition().getBar() + 1 ).
-						arg( m_clip->startPosition().getTicks() %
-								TimePos::ticksPerBar() ) );
+					s_textFloat->setTitle(m_action == Move ? tr("Current position") : tr("Current length"));
+					s_textFloat->show();
+					// Let mouseMoveEvent set the correct textFloat numbers
+					mouseMoveEvent(me);
 				}
-				else if( m_action == Resize || m_action == ResizeLeft )
-				{
-					s_textFloat->setTitle( tr( "Current length" ) );
-					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
-							arg( m_clip->length().getBar() ).
-							arg( m_clip->length().getTicks() %
-									TimePos::ticksPerBar() ).
-							arg( m_clip->startPosition().getBar() + 1 ).
-							arg( m_clip->startPosition().getTicks() %
-									TimePos::ticksPerBar() ).
-							arg( m_clip->endPosition().getBar() + 1 ).
-							arg( m_clip->endPosition().getTicks() %
-									TimePos::ticksPerBar() ) );
-				}
-				// s_textFloat->reparent( this );
-				// setup text-float as if Clip was already moved/resized
-				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
-				if ( m_action != Split) { s_textFloat->show(); }
 			}
 
 			delete m_hint;
@@ -739,22 +708,22 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMute( active );
+			toggleMute(getClickedClips());
 		}
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedClips() )
 		{
-			remove( active );
+			remove(getClickedClips());
 		}
 	}
 	else if( me->button() == Qt::MidButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMute( active );
+			toggleMute(getClickedClips());
 		}
 		else if( !fixedClips() )
 		{
-			remove( active );
+			remove(getClickedClips());
 		}
 	}
 }
@@ -997,11 +966,6 @@ void ClipView::mouseReleaseEvent( QMouseEvent * me )
 	    ( m_action == ToggleSelected && mouseMovedDistance( me, 2 ) == false ) )
 	{
 		setSelected( !isSelected() );
-	}
-	else if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
-	{
-		// TODO: Fix m_clip->setJournalling() consistency
-		m_clip->setJournalling( true );
 	}
 	else if( m_action == Split )
 	{
