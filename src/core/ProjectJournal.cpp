@@ -165,11 +165,15 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 
 
-void ProjectJournal::beginBatchCheckPoint()
+/*! \brief Start adding checkpoints together as a batch
+ *
+ *  \param append - Don't create a new batch, use the last checkpoint
+ */
+void ProjectJournal::beginBatchCheckPoint(bool append)
 {
 	if (!isJournalling()) { return; }
-	// Only begin on a new batch if we are not already batching
-	if (m_batchingCount == 0) { m_undoCheckPoints.emplace_back(); }
+	// Begin on a new batch if we are not already batching, or if there is nothing to append to
+	if (append ? m_undoCheckPoints.empty() : m_batchingCount == 0) { m_undoCheckPoints.emplace_back(); }
 	++m_batchingCount;
 }
 

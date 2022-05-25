@@ -39,6 +39,7 @@
 #include "InstrumentTrack.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
+#include "ProjectJournal.h"
 #include "SampleTrack.h"
 #include "Song.h"
 
@@ -581,6 +582,9 @@ bar_t Track::length() const
  */
 void Track::toggleSolo()
 {
+	// The solo led will have created its own checkpoint already, so we append to that batch
+	Engine::projectJournal()->beginBatchCheckPoint(/*append*/ true);
+
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
@@ -635,6 +639,7 @@ void Track::toggleSolo()
 			}
 		}
 	}
+	Engine::projectJournal()->endBatchCheckPoint();
 }
 
 void Track::setColor(const QColor& c)

@@ -50,7 +50,7 @@ public:
 	bool canRedo() const;
 
 	void addJournalCheckPoint( JournallingObject *jo );
-	void beginBatchCheckPoint();
+	void beginBatchCheckPoint(bool append = false);
 	void endBatchCheckPoint();
 
 	bool isJournalling() const
