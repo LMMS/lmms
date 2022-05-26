@@ -110,7 +110,8 @@ void SideBar::appendTab( SideBarWidget *widget )
 	SideBarButton *button = new SideBarButton( orientation(), this );
 	button->setText( " " + widget->title() );
 	button->setIcon( widget->icon() );
-	button->setLayoutDirection( Qt::RightToLeft );
+	button->setLayoutDirection( Qt::LeftToRight );
+	button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
 	button->setCheckable( true );
 	m_widgets[button] = widget;
 	m_btnGroup.addButton( button );
@@ -146,7 +147,6 @@ void SideBar::toggleButton( QAbstractButton * button )
 		else
 		{
 			curBtn->setChecked( false );
-			curBtn->setToolButtonStyle( Qt::ToolButtonIconOnly );
 		}
 
 		if( curWidget )
@@ -158,8 +158,6 @@ void SideBar::toggleButton( QAbstractButton * button )
 	if( toolButton && activeWidget )
 	{
 		activeWidget->setVisible( button->isChecked() );
-		toolButton->setToolButtonStyle( button->isChecked() ?
-				Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly );
 	}
 }
 
