@@ -126,61 +126,60 @@ MainWindow::MainWindow() :
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userProjectsDir() + "*" +
-				confMgr->factoryProjectsDir(),
-					"*.mmp *.mmpz *.xml *.mid",
-							tr( "My Projects" ),
-					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
-				confMgr->userProjectsDir(),
-				confMgr->factoryProjectsDir()));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userSamplesDir() + "*" +
-				confMgr->factorySamplesDir(),
-					"*", tr( "My Samples" ),
-					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true,
-					confMgr->userSamplesDir(),
-					confMgr->factorySamplesDir()));
-	sideBar->appendTab( new FileBrowser(
-				confMgr->userPresetsDir() + "*" +
-				confMgr->factoryPresetsDir(),
-					"*.xpf *.cs.xml *.xiz *.lv2",
-					tr( "My Presets" ),
-					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
-							splitter , false, true,
-				confMgr->userPresetsDir(),
-				confMgr->factoryPresetsDir()));
-	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
-							tr( "My Home" ),
-					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, false ) );
+
+	FileBrowser* projects = new FileBrowser(
+				tr("My Projects"),
+				embed::getIconPixmap("project_file").transformed(QTransform().rotate(90)),
+				splitter);
+	projects->enableBackupFilter();
+	projects->enableRecursiveSearch();
+	projects->setUserFactoryDir(confMgr->userProjectsDir(), confMgr->factoryProjectsDir());
+	sideBar->appendTab(projects);
+
+	FileBrowser* samples = new FileBrowser(
+				tr("My Samples"),
+				embed::getIconPixmap("sample_file").transformed(QTransform().rotate(90)),
+				splitter);
+	samples->enableRecursiveSearch();
+	samples->setUserFactoryDir(confMgr->userSamplesDir(), confMgr->factorySamplesDir());
+	sideBar->appendTab(samples);
 
 
-	QStringList root_paths;
-	QString title = tr( "Root directory" );
-	bool dirs_as_items = false;
+	FileBrowser* presets = new FileBrowser(
+				tr("My Presets"),
+				embed::getIconPixmap("preset_file").transformed(QTransform().rotate(90)),
+				splitter);
+	presets->enableRecursiveSearch();
+	presets->setUserFactoryDir(confMgr->userPresetsDir(), confMgr->factoryPresetsDir());
+	sideBar->appendTab(presets);
+
+	FileBrowser* homeBrowser = new FileBrowser(
+				tr("My Home"),
+				embed::getIconPixmap("home").transformed(QTransform().rotate(90)),
+				splitter);
+	homeBrowser->setDirectory(QDir::homePath());
+	homeBrowser->enableHiddenFiles();
+	homeBrowser->enableUnknownFiles();
+	sideBar->appendTab(homeBrowser);
+
+	FileBrowser* rootBrowser = new FileBrowser(tr("Root directory"),
+			embed::getIconPixmap("computer").transformed(QTransform().rotate(90)),
+			splitter);
+	rootBrowser->enableHiddenFiles();
+	rootBrowser->enableUnknownFiles();
 
 #ifdef LMMS_BUILD_APPLE
-	title = tr( "Volumes" );
-	root_paths += "/Volumes";
+	rootBrowser->setTitle(tr("Volumes"));
+	rootBrowser->setDirectory("/Volumes");
 #elif defined(LMMS_BUILD_WIN32)
-	title = tr( "My Computer" );
-	dirs_as_items = true;
+	rootBrowser->setTitle(tr("My Computer"));
+	rootBrowser->setDirectories(QDir::drives());
+#else
+	rootBrowser->setDirectory("/");
 #endif
 
-#if ! defined(LMMS_BUILD_APPLE)
-	QFileInfoList drives = QDir::drives();
-	for( const QFileInfo & drive : drives )
-	{
-		root_paths += drive.absolutePath();
-	}
-#endif
+	sideBar->appendTab(rootBrowser);
 
-	sideBar->appendTab( new FileBrowser( root_paths.join( "*" ), "*", title,
-					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, dirs_as_items) );
 
 	m_workspace = new QMdiArea(splitter);
 

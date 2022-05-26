@@ -48,6 +48,10 @@ public:
 	{
 		return m_title;
 	}
+	inline void setTitle(const QString& title)
+	{
+		m_title = title;
+	}
 
 signals:
 	void closeButtonClicked();
@@ -59,6 +63,7 @@ protected:
 	{
 	}
 
+	//! Inner widget of the sidebar, used to create a margin
 	QWidget * contentParent()
 	{
 		return m_contents;
