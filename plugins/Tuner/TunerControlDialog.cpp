@@ -37,9 +37,13 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 
 	LcdSpinBox* referenceFreqSpinBox = new LcdSpinBox(3, this, tr("Reference"));
 	referenceFreqSpinBox->setModel(&controls->m_referenceFreqModel);
-	referenceFreqSpinBox->setValue(controls->m_referenceFreqModel.value());
 	referenceFreqSpinBox->setLabel(tr("Reference"));
 	referenceFreqSpinBox->move(270, 280);
+
+	LcdWidget* centsLcd = new LcdWidget(2, this, tr("Cents"));
+	centsLcd->setValue(0);
+	centsLcd->setLabel(tr("Cents"));
+	centsLcd->move(10, 280);
 
 	QLabel* playedNoteReadout = new QLabel(this);
 	playedNoteReadout->setFont(QFont("Arial", 32));
@@ -47,11 +51,4 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	playedNoteReadout->setFixedWidth(width());
 	playedNoteReadout->setAlignment(Qt::AlignCenter);
 	playedNoteReadout->move(0, height()/2 - playedNoteReadout->font().pointSize());
-
-	LcdWidget* freqReadout = new LcdWidget(2, this, tr("Cents"));
-	freqReadout->setValue(0);
-	freqReadout->setLabel(tr("Cents"));
-	freqReadout->move(10, 280);
-
-	//TODO: Add cent LED lights and alternate displays
 }

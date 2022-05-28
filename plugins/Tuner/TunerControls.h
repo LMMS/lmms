@@ -46,7 +46,6 @@ public:
 
 private:
 	LcdSpinBoxModel m_referenceFreqModel;
-	FloatModel m_freqReadout;
 
 	friend class TunerControlDialog;
 	friend class Tuner;

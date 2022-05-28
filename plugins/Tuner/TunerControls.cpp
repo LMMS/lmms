@@ -23,21 +23,26 @@
  */
 
 #include "TunerControls.h"
+
+#include <QDomElement>
+
 #include "Tuner.h"
 
 TunerControls::TunerControls(Tuner* tuner)
-	: EffectControls(tuner),
-    m_referenceFreqModel(440, 0, 999),
-	m_freqReadout(440, 0, 999)
+	: EffectControls(tuner)
+	, m_referenceFreqModel(440, 0, 999)
 {
+	connect(&m_referenceFreqModel, &LcdSpinBoxModel::dataChanged, tuner, &Tuner::calculateNoteFrequencies);
 }
 
-void TunerControls::saveSettings(QDomDocument&, QDomElement&)
+void TunerControls::saveSettings(QDomDocument& domDocument, QDomElement& domElement)
 {
+	m_referenceFreqModel.saveSettings(domDocument, domElement, "reference");
 }
 
-void TunerControls::loadSettings(const QDomElement&)
+void TunerControls::loadSettings(const QDomElement& domElement)
 {
+	m_referenceFreqModel.loadSettings(domElement, "reference");
 }
 
 QString TunerControls::nodeName() const

@@ -24,6 +24,8 @@
 
 #include "Tuner.h"
 
+#include <cmath>
+
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -37,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT tuner_plugin_descriptor = {STRINGIFY(PLUGIN_NAM
 extern "C" {
 Plugin* PLUGIN_EXPORT lmms_plugin_main(Model* parent, void* _data)
 {
-	return new Tuner(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(_data));
+	return new Tuner(parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key*>(_data));
 }
 }
 
@@ -45,14 +47,40 @@ Tuner::Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&tuner_plugin_descriptor, parent, key)
 	, m_tunerControls(this)
 {
+	calculateNoteFrequencies();
 }
 
-bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames) 
+bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-
+	// TODO
+	return false;
 }
 
-EffectControls* Tuner::controls() 
+std::pair<Tuner::Note, float> Tuner::calculateClosestNote(float frequency, float reference)
+{
+	float cents = 1200 * std::log2(frequency / reference);
+	auto closestNote = std::min_element(m_noteFrequencies.begin(), m_noteFrequencies.end(),
+		[frequency](auto& a, auto& b) { return std::abs(frequency - a.second) < std::abs(frequency - b.second); });
+	return {closestNote->first, cents};
+}
+
+void Tuner::calculateNoteFrequencies()
+{
+	float referenceFrequency = m_tunerControls.m_referenceFreqModel.value();
+	for (int i = 0; i < static_cast<int>(Tuner::Note::Count); ++i)
+	{
+		auto note = static_cast<Tuner::Note>(i);
+		float noteFrequency = referenceFrequency * std::exp2(i / 12.0f);
+
+		if (m_noteFrequencies.find(note) != m_noteFrequencies.end()) { m_noteFrequencies[note] = noteFrequency; }
+		else
+		{
+			m_noteFrequencies.emplace(note, noteFrequency);
+		}
+	}
+}
+
+EffectControls* Tuner::controls()
 {
 	return new TunerControls(this);
 }

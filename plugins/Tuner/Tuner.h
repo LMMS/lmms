@@ -25,20 +25,46 @@
 #ifndef TUNER_H
 #define TUNER_H
 
+#include <array>
+#include <fftw3.h>
+
 #include "Effect.h"
 #include "TunerControls.h"
 
 class Tuner : public Effect
 {
 public:
+	enum class Note
+	{
+		A,
+		ASharp,
+		B,
+		C,
+		CSharp,
+		D,
+		DSharp,
+		E,
+		F,
+		FSharp,
+		G,
+		GSharp,
+		Count
+	};
+
 	Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
+	~Tuner();
 
 	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
-    EffectControls* controls() override;
+	std::pair<Note, float> calculateClosestNote(float frequency, float reference);
+	void calculateNoteFrequencies();
+
+	EffectControls* controls() override;
 
 private:
-    TunerControls m_tunerControls;
-    friend class TunerControls;
+	TunerControls m_tunerControls;
+	std::map<Note, float> m_noteFrequencies;
+
+	friend class TunerControls;
 };
 
 #endif
