@@ -125,18 +125,6 @@ struct ERect
 
 #include "VstSyncData.h"
 
-#ifdef LMMS_BUILD_WIN32
-#define USE_QT_SHMEM
-#endif
-
-#ifndef USE_QT_SHMEM
-#include <cstdio>
-#include <cstdlib>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#endif
-
 using namespace std;
 
 static VstHostLanguages hlang = LanguageEnglish;
@@ -182,7 +170,7 @@ class RemoteVstPlugin : public RemotePluginClient
 {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
-	RemoteVstPlugin( key_t _shm_in, key_t _shm_out );
+	RemoteVstPlugin( const std::string& _shm_in, const std::string& _shm_out );
 #else
 	RemoteVstPlugin( const char * socketPath );
 #endif
@@ -497,8 +485,7 @@ private:
 
 	in * m_in;
 
-	int m_shmID;
-	VstSyncData* m_vstSyncData;
+	const VstSyncData* m_vstSyncData;
 
 } ;
 
@@ -506,7 +493,7 @@ private:
 
 
 #ifdef SYNC_WITH_SHM_FIFO
-RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
+RemoteVstPlugin::RemoteVstPlugin( const std::string& _shm_in, const std::string& _shm_out ) :
 	RemotePluginClient( _shm_in, _shm_out ),
 #else
 RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
@@ -530,49 +517,26 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_currentSamplePos( 0 ),
 	m_currentProgram( -1 ),
 	m_in( nullptr ),
-	m_shmID( -1 ),
 	m_vstSyncData( nullptr )
 {
 	__plugin = this;
 
-#ifndef USE_QT_SHMEM
-	key_t key;
-	if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
-	{
-		perror( "RemoteVstPlugin.cpp::ftok" );
-	}
-	else
-	{	// connect to shared memory segment
-		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
-		{
-			perror( "RemoteVstPlugin.cpp::shmget" );
-		}
-		else
-		{	// attach segment
-			m_vstSyncData = (VstSyncData *)shmat(m_shmID, 0, 0);
-			if( m_vstSyncData == (VstSyncData *)( -1 ) )
-			{
-				perror( "RemoteVstPlugin.cpp::shmat" );
-			}
-		}
-	}
-#else
-	m_vstSyncData = RemotePluginClient::getQtVSTshm();
-#endif
+	m_vstSyncData = RemotePluginClient::getVstSyncData();
 	if( m_vstSyncData == nullptr )
 	{
 		fprintf(stderr, "RemoteVstPlugin.cpp: "
 			"Failed to initialize shared memory for VST synchronization.\n"
 			" (VST-host synchronization will be disabled)\n");
-		m_vstSyncData = (VstSyncData*) malloc( sizeof( VstSyncData ) );
-		m_vstSyncData->isPlaying = true;
-		m_vstSyncData->timeSigNumer = 4;
-		m_vstSyncData->timeSigDenom = 4;
-		m_vstSyncData->ppqPos = 0;
-		m_vstSyncData->isCycle = false;
-		m_vstSyncData->hasSHM = false;
-		m_vstSyncData->m_playbackJumped = false;
-		m_vstSyncData->m_sampleRate = sampleRate();
+		const auto vstSyncData = (VstSyncData*) malloc( sizeof( VstSyncData ) );
+		vstSyncData->isPlaying = true;
+		vstSyncData->timeSigNumer = 4;
+		vstSyncData->timeSigDenom = 4;
+		vstSyncData->ppqPos = 0;
+		vstSyncData->isCycle = false;
+		vstSyncData->hasSHM = false;
+		vstSyncData->m_playbackJumped = false;
+		vstSyncData->m_sampleRate = sampleRate();
+		m_vstSyncData = vstSyncData;
 	}
 
 	m_in = ( in* ) new char[ sizeof( in ) ];
@@ -600,21 +564,12 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	destroyEditor();
 	setResumed( false );
 	pluginDispatch( effClose );
-#ifndef USE_QT_SHMEM
-	// detach shared memory segment
-	if( shmdt( m_vstSyncData ) == -1)
+
+	if (!m_vstSyncData->hasSHM)
 	{
-		if( __plugin->m_vstSyncData->hasSHM )
-		{
-			perror( "~RemoteVstPlugin::shmdt" );
-		}
-		if( m_vstSyncData != nullptr )
-		{
-			delete m_vstSyncData;
-			m_vstSyncData = nullptr;
-		}
+		delete m_vstSyncData;
+		m_vstSyncData = nullptr;
 	}
-#endif
 
 	if( m_libInst != nullptr )
 	{
@@ -2575,7 +2530,7 @@ int main( int _argc, char * * _argv )
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
 #ifdef SYNC_WITH_SHM_FIFO
-	__plugin = new RemoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
+	__plugin = new RemoteVstPlugin( _argv[1], _argv[2] );
 #else
 	__plugin = new RemoteVstPlugin( _argv[1] );
 #endif

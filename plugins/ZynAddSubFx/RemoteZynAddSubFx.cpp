@@ -43,7 +43,7 @@ class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx
 {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
-	RemoteZynAddSubFx( int _shm_in, int _shm_out ) :
+	RemoteZynAddSubFx( const std::string& _shm_in, const std::string& _shm_out ) :
 		RemotePluginClient( _shm_in, _shm_out ),
 #else
 	RemoteZynAddSubFx( const char * socketPath ) :
@@ -282,7 +282,7 @@ int main( int _argc, char * * _argv )
 
 #ifdef SYNC_WITH_SHM_FIFO
 	RemoteZynAddSubFx * remoteZASF =
-		new RemoteZynAddSubFx( atoi( _argv[1] ), atoi( _argv[2] ) );
+		new RemoteZynAddSubFx( _argv[1], _argv[2] );
 #else
 	RemoteZynAddSubFx * remoteZASF = new RemoteZynAddSubFx( _argv[1] );
 #endif
