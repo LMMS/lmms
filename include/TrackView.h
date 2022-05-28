@@ -155,8 +155,6 @@ private:
 		return nullptr;
 	}
 
-	void setIndicatorMute(FadeButton* indicator, bool muted);
-
 	friend class TrackLabelButton;
 
 

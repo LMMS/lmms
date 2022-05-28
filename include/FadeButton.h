@@ -43,6 +43,11 @@ public:
 	virtual ~FadeButton();
 	void setActiveColor( const QColor & activated_color );
 
+	inline void setEnabled(bool enabled)
+	{
+		m_isEnabled = enabled;
+	}
+
 
 public slots:
 	void activate();
@@ -65,6 +70,7 @@ private:
 	// the color after the "play" fade is done but a note is still playing
 	QColor m_holdColor;
 	int activeNotes;
+	bool m_isEnabled;
 
 	QColor fadeToColor(QColor, QColor, QElapsedTimer, float);
 

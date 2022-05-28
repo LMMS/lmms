@@ -435,14 +435,5 @@ void TrackView::createClipView( Clip * clip )
 void TrackView::muteChanged()
 {
 	FadeButton * indicator = getActivityIndicator();
-	if (indicator) { setIndicatorMute(indicator, m_track->m_mutedModel.value()); }
-}
-
-
-
-
-void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
-{
-	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
-	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
+	if (indicator) indicator->setEnabled( !m_track->m_mutedModel.value());
 }
