@@ -26,7 +26,6 @@
 #define REMOTE_PLUGIN_BASE_H
 
 #include "MidiEvent.h"
-#include "VstSyncData.h"
 
 #include <atomic>
 #include <vector>
@@ -346,6 +345,7 @@ enum RemoteMessageIDs
 	IdHostInfoGotten,
 	IdInitDone,
 	IdQuit,
+	IdSyncKey,
 	IdSampleRateInformation,
 	IdBufferSizeInformation,
 	IdInformationUpdated,

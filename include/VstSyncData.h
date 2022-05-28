@@ -42,7 +42,6 @@ struct VstSyncData
 	int timeSigDenom;
 	bool isPlaying;
 	bool isCycle;
-	bool hasSHM;
 	float cycleStart;
 	float cycleEnd;
 	bool m_playbackJumped;

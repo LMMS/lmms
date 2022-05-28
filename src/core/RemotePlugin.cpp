@@ -36,6 +36,7 @@
 #include "BufferManager.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "Song.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -304,6 +305,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	}
 #endif
 
+	sendMessage(message(IdSyncKey).addString(Engine::getSong()->syncKey()));
 	resizeSharedProcessingMemory();
 
 	if( waitForInitDoneMsg )
