@@ -105,10 +105,13 @@ void AutomatableSlider::wheelEvent( QWheelEvent * _me )
 
 void AutomatableSlider::modelChanged()
 {
-	QSlider::setRange( model()->minValue(), model()->maxValue() );
+	updateSliderRange();
+	connect(model(), SIGNAL(propertiesChanged()),
+		this, SLOT(updateSliderRange()));
+
 	updateSlider();
-	connect( model(), SIGNAL( dataChanged() ),
-				this, SLOT( updateSlider() ) );
+	connect(model(), SIGNAL(dataChanged()),
+		this, SLOT(updateSlider()));
 }
 
 
@@ -140,5 +143,8 @@ void AutomatableSlider::updateSlider()
 
 
 
-
+void AutomatableSlider::updateSliderRange()
+{
+	QSlider::setRange(model()->minValue(), model()->maxValue());
+}
 

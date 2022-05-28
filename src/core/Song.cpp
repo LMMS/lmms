@@ -72,6 +72,7 @@ Song::Song() :
 	m_oldTicksPerBar( DefaultTicksPerBar ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
+	m_masterPitchRangeModel(12, 4, 64, this, tr("Master pitch range")),
 	m_nLoadingTrack( 0 ),
 	m_fileName(),
 	m_oldFileName(),
@@ -112,6 +113,8 @@ Song::Song() :
 			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
 /*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
 			this, SLOT( masterPitchChanged() ) );*/
+	connect(&m_masterPitchRangeModel, SIGNAL(dataChanged()),
+		this, SLOT(masterPitchRangeChanged()), Qt::DirectConnection);
 
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
@@ -135,6 +138,14 @@ Song::~Song()
 void Song::masterVolumeChanged()
 {
 	Engine::audioEngine()->setMasterGain( m_masterVolumeModel.value() / 100.0f );
+}
+
+
+
+void Song::masterPitchRangeChanged()
+{
+	auto pitchLimit = m_masterPitchRangeModel.value();
+	m_masterPitchModel.setRange(-pitchLimit, pitchLimit);
 }
 
 
@@ -897,6 +908,7 @@ void Song::clearProject()
 	m_tempoModel.reset();
 	m_masterVolumeModel.reset();
 	m_masterPitchModel.reset();
+	m_masterPitchRangeModel.reset();
 	m_timeSigModel.reset();
 
 	// Clear the m_oldAutomatedValues AutomatedValueMap
@@ -907,6 +919,7 @@ void Song::clearProject()
 									clear();
 	AutomationClip::globalAutomationClip( &m_masterPitchModel )->
 									clear();
+	AutomationPattern::globalAutomationPattern(&m_masterPitchRangeModel)->clear();
 
 	Engine::audioEngine()->doneChangeInModel();
 
@@ -973,6 +986,7 @@ void Song::createNewProject()
 	m_timeSigModel.reset();
 	m_masterVolumeModel.setInitValue( 100 );
 	m_masterPitchModel.setInitValue( 0 );
+	m_masterPitchRangeModel.setInitValue(12);
 
 	QCoreApplication::instance()->processEvents();
 
@@ -1071,6 +1085,7 @@ void Song::loadProject( const QString & fileName )
 	m_timeSigModel.loadSettings( dataFile.head(), "timesig" );
 	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
+	m_masterPitchRangeModel.loadSettings(dataFile.head(), "masterpitchrange");
 
 	if( m_playPos[Mode_PlaySong].m_timeLine )
 	{
@@ -1232,6 +1247,7 @@ bool Song::saveProjectFile(const QString & filename, bool withResources)
 	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
 	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
+	m_masterPitchRangeModel.saveSettings(dataFile, dataFile.head(), "masterpitchrange");
 
 	saveState( dataFile, dataFile.content() );
 

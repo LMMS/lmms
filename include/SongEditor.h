@@ -129,6 +129,7 @@ private:
 	MeterDialog * m_timeSigDisplay;
 	AutomatableSlider * m_masterVolumeSlider;
 	AutomatableSlider * m_masterPitchSlider;
+	LcdSpinBox* m_masterPitchRangeBox;
 
 	TextFloat * m_mvsStatus;
 	TextFloat * m_mpsStatus;
