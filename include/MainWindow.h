@@ -29,18 +29,30 @@
 #include <QTimer>
 #include <QList>
 #include <QMainWindow>
+#include <QMdiArea>
 
 #include "ConfigManager.h"
 
 class QAction;
 class QDomElement;
 class QGridLayout;
-class QMdiArea;
 
 class ConfigManager;
 class PluginView;
 class SubWindow;
 class ToolButton;
+
+
+class ScrollFixMdiArea : public QMdiArea
+{
+	Q_OBJECT
+protected:
+	virtual void wheelEvent(QWheelEvent * we);
+public:
+	ScrollFixMdiArea(QWidget* parent = nullptr) :
+		QMdiArea(parent)
+	{ /* only need to init QMdiArea */ }
+};
 
 
 class MainWindow : public QMainWindow
@@ -194,7 +206,7 @@ private:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 
-	QMdiArea * m_workspace;
+	ScrollFixMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
 	QGridLayout * m_toolBarLayout;

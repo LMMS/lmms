@@ -475,7 +475,28 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 	m_trackContainerView->wheelEvent( _we );
 	if( !_we->isAccepted() )
 	{
-		QScrollArea::wheelEvent( _we );
+		// Handle Shift+Wheel orientation of QWheelEvent
+		if (_we->modifiers() & Qt::ShiftModifier
+			&& _we->orientation() == Qt::Vertical)
+		{
+			// copy QWheelEvent but change orientation to Horizontal
+			QWheelEvent we(
+				_we->posF(), _we->globalPosF(), _we->pixelDelta(),
+				_we->angleDelta(), _we->delta(), Qt::Horizontal,
+				_we->buttons(), _we->modifiers(), _we->phase(),
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
+				_we->source(), _we->inverted()
+#else
+				_we->source()
+#endif
+			);
+			QScrollArea::wheelEvent(&we);
+		}
+		else
+		{
+			// Normal scroll event
+			QScrollArea::wheelEvent(_we);
+		}
 	}
 }
 

@@ -182,7 +182,7 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, dirs_as_items) );
 
-	m_workspace = new QMdiArea(splitter);
+	m_workspace = new ScrollFixMdiArea(splitter);
 
 	// Load background
 	emit initProgress(tr("Loading background picture"));
@@ -1734,4 +1734,25 @@ void MainWindow::onSongModified()
 void MainWindow::onProjectFileNameChanged()
 {
 	this->resetWindowTitle();
+}
+
+
+
+
+void ScrollFixMdiArea::wheelEvent(QWheelEvent * we)
+{
+	QPoint deg = we->angleDelta();
+	QScrollBar* bar = we->modifiers() & Qt::ShiftModifier
+		? horizontalScrollBar()
+		: verticalScrollBar();
+	int multiplier = we->modifiers() & Qt::ControlModifier
+		? 2
+		: 1;
+	if (!bar->isVisible())
+	{
+		we->ignore();
+		return;
+	}
+	bar->setValue(bar->value() - (deg.y() * multiplier));
+	we->accept();
 }
