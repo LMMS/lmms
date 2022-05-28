@@ -12,6 +12,8 @@
 #cmakedefine LMMS_HOST_ARM64
 #cmakedefine LMMS_HOST_RISCV32
 #cmakedefine LMMS_HOST_RISCV64
+#cmakedefine LMMS_HOST_PPC32
+#cmakedefine LMMS_HOST_PPC64
 
 #cmakedefine LMMS_HAVE_ALSA
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
