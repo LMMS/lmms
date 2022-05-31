@@ -199,14 +199,13 @@ public slots:
 	void toggleAutoScroll( int _n );
 	void toggleLoopPoints( int _n );
 	void toggleBehaviourAtStop( int _n );
-
+	void setShiftHeld(bool held);
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void mouseMoveEvent( QMouseEvent * _me ) override;
 	void mouseReleaseEvent( QMouseEvent * _me ) override;
-
 
 private:
 	static QPixmap * s_posMarkerPixmap;
@@ -257,7 +256,7 @@ private:
 
 	TextFloat * m_hint;
 	int m_initalXSelect;
-
+	bool m_shiftHeld;
 
 	enum actions
 	{
@@ -269,7 +268,8 @@ private:
 		SelectSongClip,
 	} m_action;
 	
-	TimeLineWidget::actions getLoopAction(QMouseEvent* event);
+	actions getLoopAction(QMouseEvent* event);
+	actions getLoopAction(QString mode, int xPos, Qt::MouseButton button);
 	QCursor actionCursor(actions action);
 
 

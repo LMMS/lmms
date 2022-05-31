@@ -109,6 +109,7 @@ private slots:
 
 private:
 	void keyPressEvent( QKeyEvent * ke ) override;
+	void keyReleaseEvent( QKeyEvent * ke ) override;
 	void wheelEvent( QWheelEvent * we ) override;
 
 	bool allowRubberband() const override;

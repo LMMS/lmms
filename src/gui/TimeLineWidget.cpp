@@ -73,6 +73,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_dragStartPos(0),
 	m_savedPos( -1 ),
 	m_hint( nullptr ),
+	m_shiftHeld(false),
 	m_action( NoAction )
 {
 	m_loopPos[0] = 0;
@@ -257,6 +258,23 @@ void TimeLineWidget::toggleBehaviourAtStop( int _n )
 
 
 
+void TimeLineWidget::setShiftHeld( bool held )
+{
+	m_shiftHeld = held;
+	if (m_shiftHeld)
+	{
+		setCursor(actionCursor(getLoopAction(
+			ConfigManager::inst()->value( "app", "loopmarkermode" ),
+			QWidget::mapFromGlobal(QCursor::pos()).x(),
+			Qt::NoButton
+		)));
+	}
+	else { setCursor(actionCursor(getLoopAction("", 0, Qt::NoButton))); }
+}
+
+
+
+
 void TimeLineWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
@@ -324,10 +342,11 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.drawRect( innerRectangle );
 	
 	// Draw loop handles if necessary
-	const int hw = std::min(m_loopHandleWidth, loopRectWidth/2);
+	bool handleMode = ConfigManager::inst()->value( "app", "loopmarkermode" ) == "Handles";
+	const int hw = std::min(m_loopHandleWidth, loopRectWidth/2 - 1);
 	QRect leftHandle(loopStart, 0.5, hw, loopRectHeight);
 	QRect rightHandle(loopEndR - hw, 0.5, hw, loopRectHeight);
-	if (ConfigManager::inst()->value( "app", "loopmarkermode" ) == "Handles")
+	if (handleMode && underMouse() && m_shiftHeld)
 	{
 		auto color = loopPointsActive ? m_activeLoopHandleColor : m_inactiveLoopHandleColor;
 		p.fillRect(leftHandle, color);
@@ -349,34 +368,38 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 {
-	if (!(event->modifiers() & Qt::ShiftModifier)){ return NoAction; }
+	const QString mode = ConfigManager::inst()->value("app", "loopmarkermode");
+	return getLoopAction(mode, event->x(), event->button());
+}
 
-	const TimePos t = getClickedTime(event);
-	const QString loopMode = ConfigManager::inst()->value( "app", "loopmarkermode" );
 
-	if (loopMode == "Handles" && event->button() == Qt::LeftButton)
+
+
+TimeLineWidget::actions TimeLineWidget::getLoopAction(QString mode, int xPos, Qt::MouseButton button)
+{
+	if (mode == "Handles")
 	{
 		// Loop start and end pos, or closest edge of screen if loop extends off it
 		const int leftMost = std::max(markerX(loopBegin()), m_xOffset);
 		const int rightMost = std::min(markerX(loopEnd()), width());
 		// Distance from click to handle, positive aimed towards center of loop
-		const int deltaLeft = event->x() - leftMost;
-		const int deltaRight = rightMost - event->x();
+		const int deltaLeft = xPos - leftMost;
+		const int deltaRight = rightMost - xPos;
 
 		if (deltaLeft < 0 || deltaRight < 0) { return NoAction; } // Clicked outside loop
 		else if (deltaLeft <= 5 && deltaLeft < deltaRight) { return MoveLoopBegin; }
 		else if (deltaRight <= 5) { return MoveLoopEnd; }
 		else { return MoveLoop; }
 	}
-	else if (loopMode == "Grab closest" && event->button() == Qt::LeftButton)
+	else if (mode == "Grab closest")
 	{
 		const TimePos loopMid = (m_loopPos[0] + m_loopPos[1])/2;
-		return t < loopMid ? MoveLoopBegin : MoveLoopEnd;
+		return getClickedTime(xPos) < loopMid ? MoveLoopBegin : MoveLoopEnd;
 	}
-	else if (loopMode == "Dual-button")
+	else if (mode == "Dual-button")
 	{
-		if (event->button() == Qt::LeftButton){ return MoveLoopBegin; }
-		else if (event->button() == Qt::RightButton){ return MoveLoopEnd; }
+		if (button == Qt::LeftButton){ return MoveLoopBegin; }
+		else if (button == Qt::RightButton){ return MoveLoopEnd; }
 	}
 	
 	//Fallback
@@ -387,6 +410,12 @@ TimeLineWidget::actions TimeLineWidget::getLoopAction(QMouseEvent* event)
 
 QCursor TimeLineWidget::actionCursor(actions action)
 {
+	// For whatever reason hotspots can't be set properly in the constructor
+	m_cursorSelectLeft = QCursor(embed::getIconPixmap("cursor_select_left"),
+		m_mouseHotspotSelLeft.width(), m_mouseHotspotSelLeft.height());
+	m_cursorSelectRight = QCursor(embed::getIconPixmap("cursor_select_right"),
+		m_mouseHotspotSelRight.width(), m_mouseHotspotSelRight.height());
+
 	if (action == MoveLoop){ return Qt::SizeHorCursor; }
 	else if (action == MoveLoopBegin){ return m_cursorSelectLeft; }
 	else if (action == MoveLoopEnd){ return m_cursorSelectRight; }
@@ -399,13 +428,6 @@ QCursor TimeLineWidget::actionCursor(actions action)
 
 void TimeLineWidget::mousePressEvent(QMouseEvent* event)
 {
-	// For whatever reason hotspots can't be set properly in the constructor
-	m_cursorSelectLeft = QCursor(embed::getIconPixmap("cursor_select_left"),
-		m_mouseHotspotSelLeft.width(), m_mouseHotspotSelLeft.height());
-	m_cursorSelectRight = QCursor(embed::getIconPixmap("cursor_select_right"),
-		m_mouseHotspotSelRight.width(), m_mouseHotspotSelRight.height());
-
-
 	if (event->x() < m_xOffset) { return; }
 
 	const bool shift = event->modifiers() & Qt::ShiftModifier;
@@ -516,8 +538,12 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			break;
 
 		default:
-			setCursor(actionCursor(getLoopAction(event)));
 			break;
+	}
+
+	if (m_shiftHeld && event->buttons() == Qt::NoButton)
+	{
+		setCursor(actionCursor(getLoopAction(event)));
 	}
 }
 

@@ -529,6 +529,16 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	{
 		QWidget::keyPressEvent( ke );
 	}
+
+	if (!ke->isAutoRepeat()){ m_timeLine->setShiftHeld(isShiftPressed); }
+}
+
+
+
+
+void SongEditor::keyReleaseEvent( QKeyEvent * ke )
+{
+	m_timeLine->setShiftHeld(ke->modifiers() & Qt::ShiftModifier);
 }
 
 
