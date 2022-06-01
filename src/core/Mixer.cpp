@@ -704,6 +704,7 @@ void Mixer::clearChannel(mix_ch_t index)
 	ch->m_volumeModel.setDisplayName( ch->m_name + ">" + tr( "Volume" ) );
 	ch->m_muteModel.setDisplayName( ch->m_name + ">" + tr( "Mute" ) );
 	ch->m_soloModel.setDisplayName( ch->m_name + ">" + tr( "Solo" ) );
+	ch->m_hasColor = false;
 
 	// send only to master
 	if( index > 0)
