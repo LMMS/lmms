@@ -25,9 +25,8 @@
 #include "TunerNote.h"
 
 #include <cmath>
-#include <string>
-
 #include <iostream>
+#include <string>
 
 TunerNote::TunerNote(NoteName name, int octave, float frequency)
 	: m_name(name)
@@ -73,7 +72,7 @@ int TunerNote::octave() const
 	return m_octave;
 }
 
-int TunerNote::cents() const 
+int TunerNote::cents() const
 {
 	return m_cents;
 }

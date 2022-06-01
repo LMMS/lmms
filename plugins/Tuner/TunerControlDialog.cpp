@@ -57,5 +57,4 @@ TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	referenceFreqSpinBox->setModel(&controls->m_referenceFreqModel);
 	referenceFreqSpinBox->setLabel(tr("Reference"));
 	referenceFreqSpinBox->move(193, 210);
-
 }

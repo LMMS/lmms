@@ -27,10 +27,10 @@
 #ifndef TUNER_NOTE_H
 #define TUNER_NOTE_H
 
-class TunerNote 
+class TunerNote
 {
 public:
-    enum class NoteName
+	enum class NoteName
 	{
 		A,
 		ASharp,
@@ -47,31 +47,32 @@ public:
 		Count
 	};
 
-    TunerNote(NoteName name, int octave, float frequency);
-    
-    TunerNote calculateNoteFromFrequency(float frequency);
+	TunerNote(NoteName name, int octave, float frequency);
 
-    void shiftByCents(int cents);
-    void shiftBySemitones(int semitones);
-    void shiftByOctaves(int octaves);
+	TunerNote calculateNoteFromFrequency(float frequency);
 
-    NoteName name() const;
-    int octave() const;
-    int cents() const;
-    float frequency() const;
+	void shiftByCents(int cents);
+	void shiftBySemitones(int semitones);
+	void shiftByOctaves(int octaves);
 
-    std::string nameToStr() const;
-    std::string fullNoteName() const;
+	NoteName name() const;
+	int octave() const;
+	int cents() const;
+	float frequency() const;
 
-    void setName(NoteName name);
-    void setOctave(int octave);
-    void setCents(int cents);
-    void setFrequency(float frequency);
+	std::string nameToStr() const;
+	std::string fullNoteName() const;
+
+	void setName(NoteName name);
+	void setOctave(int octave);
+	void setCents(int cents);
+	void setFrequency(float frequency);
+
 private:
-    NoteName m_name = NoteName::A;
-    int m_octave = 0;
-    int m_cents = 0;
-    float m_frequency = 0.0f;
+	NoteName m_name = NoteName::A;
+	int m_octave = 0;
+	int m_cents = 0;
+	float m_frequency = 0.0f;
 };
 
 #endif

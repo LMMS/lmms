@@ -62,9 +62,9 @@ EffectControlDialog* TunerControls::createView()
 	return m_tunerDialog;
 }
 
-void TunerControls::updateView(TunerNote note) 
+void TunerControls::updateView(TunerNote note)
 {
 	m_tunerDialog->m_noteLabel->setText(QString::fromStdString(note.fullNoteName()));
 	m_tunerDialog->m_freqWidget->setValue(note.frequency());
-	m_tunerDialog->m_centsWidget->setValue(note.cents());	
+	m_tunerDialog->m_centsWidget->setValue(note.cents());
 }

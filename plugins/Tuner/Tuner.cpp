@@ -74,7 +74,8 @@ bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 	}
 
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_intervalStart);
+	auto duration
+		= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_intervalStart);
 	if (outSum > 0.0f && duration.count() >= m_interval.count())
 	{
 		int numFramesToAdd = std::min(m_aubioHopSize - m_aubioFramesCounter, static_cast<int>(frames));
