@@ -25,15 +25,23 @@
 #ifndef TUNER_CONTROL_DIALOG_H
 #define TUNER_CONTROL_DIALOG_H
 
+#include <QLabel>
+
 #include "EffectControlDialog.h"
+#include "LcdWidget.h"
 
 class TunerControls;
 class TunerControlDialog : public EffectControlDialog
 {
-	Q_OBJECT
 public:
 	TunerControlDialog(TunerControls* controls);
-};
 
+private:
+	LcdWidget* m_centsWidget;
+	LcdWidget* m_freqWidget;
+	QLabel* m_noteLabel;
+
+	friend class TunerControls;
+};
 
 #endif

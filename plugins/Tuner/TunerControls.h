@@ -28,11 +28,11 @@
 #include "EffectControls.h"
 #include "LcdSpinBox.h"
 #include "TunerControlDialog.h"
+#include "TunerNote.h"
 
 class Tuner;
 class TunerControls : public EffectControls
 {
-	Q_OBJECT
 public:
 	TunerControls(Tuner* tuner);
 
@@ -43,8 +43,11 @@ public:
 	int controlCount() override;
 
 	EffectControlDialog* createView() override;
+	void updateView(TunerNote note);
 
 private:
+	Tuner* m_tuner = nullptr;
+	TunerControlDialog* m_tunerDialog = nullptr;
 	LcdSpinBoxModel m_referenceFreqModel;
 
 	friend class TunerControlDialog;

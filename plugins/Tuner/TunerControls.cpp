@@ -30,9 +30,10 @@
 
 TunerControls::TunerControls(Tuner* tuner)
 	: EffectControls(tuner)
+	, m_tuner(tuner)
 	, m_referenceFreqModel(440, 0, 999)
 {
-	connect(&m_referenceFreqModel, &LcdSpinBoxModel::dataChanged, tuner, &Tuner::calculateNoteFrequencies);
+	QObject::connect(&m_referenceFreqModel, &LcdSpinBoxModel::dataChanged, tuner, &Tuner::syncReferenceFrequency);
 }
 
 void TunerControls::saveSettings(QDomDocument& domDocument, QDomElement& domElement)
@@ -57,5 +58,13 @@ int TunerControls::controlCount()
 
 EffectControlDialog* TunerControls::createView()
 {
-	return new TunerControlDialog(this);
+	m_tunerDialog = new TunerControlDialog(this);
+	return m_tunerDialog;
+}
+
+void TunerControls::updateView(TunerNote note) 
+{
+	m_tunerDialog->m_noteLabel->setText(QString::fromStdString(note.fullNoteName()));
+	m_tunerDialog->m_freqWidget->setValue(note.frequency());
+	m_tunerDialog->m_centsWidget->setValue(note.cents());	
 }

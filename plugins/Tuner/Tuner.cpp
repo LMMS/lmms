@@ -1,5 +1,5 @@
 /*
- * Tuner.cpp - determine the fundamental frequency of audio signals
+ * Tuner.cpp - estimate the pitch of an audio signal
  *
  * Copyright (c) 2022 saker <sakertooth@gmail.com>
  *
@@ -25,15 +25,16 @@
 #include "Tuner.h"
 
 #include <cmath>
+#include <iostream>
 
 #include "embed.h"
 #include "plugin_export.h"
 
 extern "C" {
 
-Plugin::Descriptor PLUGIN_EXPORT tuner_plugin_descriptor = {STRINGIFY(PLUGIN_NAME), "Tuner",
-	QT_TRANSLATE_NOOP("pluginBrowser", "Determine the fundamental frequency of audio signals"),
-	"saker <sakertooth@gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
+Plugin::Descriptor PLUGIN_EXPORT tuner_plugin_descriptor
+	= {STRINGIFY(PLUGIN_NAME), "Tuner", QT_TRANSLATE_NOOP("pluginBrowser", "Estimate the pitch of audio signals"),
+		"saker <sakertooth@gmail.com>", 0x0100, Plugin::Effect, new PluginPixmapLoader("logo"), NULL, NULL};
 };
 
 extern "C" {
@@ -46,41 +47,70 @@ Plugin* PLUGIN_EXPORT lmms_plugin_main(Model* parent, void* _data)
 Tuner::Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key)
 	: Effect(&tuner_plugin_descriptor, parent, key)
 	, m_tunerControls(this)
+	, m_referenceNote(TunerNote::NoteName::A, 4, 440.0f)
+	, m_aubioPitch(
+		  new_aubio_pitch("default", m_aubioWindowSize, m_aubioHopSize, Engine::audioEngine()->processingSampleRate()))
+	, m_aubioInputBuffer(new_fvec(m_aubioHopSize))
+	, m_aubioOutputBuffer(new_fvec(1))
+	, m_intervalStart(std::chrono::system_clock::now())
+	, m_interval(100)
 {
-	calculateNoteFrequencies();
+}
+
+Tuner::~Tuner()
+{
+	del_fvec(m_aubioInputBuffer);
+	del_fvec(m_aubioOutputBuffer);
+	del_aubio_pitch(m_aubioPitch);
 }
 
 bool Tuner::processAudioBuffer(sampleFrame* buf, const fpp_t frames)
 {
-	// TODO
-	return false;
-}
+	if (!isEnabled() || !isRunning()) { return false; }
 
-std::pair<Tuner::Note, float> Tuner::calculateClosestNote(float frequency, float reference)
-{
-	float cents = 1200 * std::log2(frequency / reference);
-	auto closestNote = std::min_element(m_noteFrequencies.begin(), m_noteFrequencies.end(),
-		[frequency](auto& a, auto& b) { return std::abs(frequency - a.second) < std::abs(frequency - b.second); });
-	return {closestNote->first, cents};
-}
-
-void Tuner::calculateNoteFrequencies()
-{
-	float referenceFrequency = m_tunerControls.m_referenceFreqModel.value();
-	for (int i = 0; i < static_cast<int>(Tuner::Note::Count); ++i)
+	float outSum = 0.0f;
+	for (fpp_t f = 0; f < frames; ++f)
 	{
-		auto note = static_cast<Tuner::Note>(i);
-		float noteFrequency = referenceFrequency * std::exp2(i / 12.0f);
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
+	}
 
-		if (m_noteFrequencies.find(note) != m_noteFrequencies.end()) { m_noteFrequencies[note] = noteFrequency; }
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_intervalStart);
+	if (outSum > 0.0f && duration.count() >= m_interval.count())
+	{
+		int numFramesToAdd = std::min(m_aubioHopSize - m_aubioFramesCounter, static_cast<int>(frames));
+		if (numFramesToAdd > 0)
+		{
+			for (int i = 0; i < numFramesToAdd; ++i)
+			{
+				fvec_set_sample(m_aubioInputBuffer, (buf[i][0] + buf[i][1]) * 0.5f, m_aubioFramesCounter + i);
+			}
+
+			m_aubioFramesCounter += numFramesToAdd;
+		}
 		else
 		{
-			m_noteFrequencies.emplace(note, noteFrequency);
+			aubio_pitch_do(m_aubioPitch, m_aubioInputBuffer, m_aubioOutputBuffer);
+
+			float pitch = fvec_get_sample(m_aubioOutputBuffer, 0);
+			auto note = m_referenceNote.calculateNoteFromFrequency(pitch);
+			m_aubioFramesCounter = 0;
+
+			m_tunerControls.updateView(note);
+			m_intervalStart = std::chrono::system_clock::now();
 		}
 	}
+
+	checkGate(outSum / frames);
+	return isRunning();
+}
+
+void Tuner::syncReferenceFrequency()
+{
+	float reference_freq = m_tunerControls.m_referenceFreqModel.value();
+	m_referenceNote.setFrequency(reference_freq);
 }
 
 EffectControls* Tuner::controls()
 {
-	return new TunerControls(this);
+	return &m_tunerControls;
 }

@@ -1,5 +1,5 @@
 /*
- * Tuner.h - estimate the pitch of an audio signal
+ * TunerNote.h
  *
  * Copyright (c) 2022 sakertooth <sakertooth@gmail.com>
  *
@@ -22,44 +22,56 @@
  *
  */
 
-#ifndef TUNER_H
-#define TUNER_H
+#include <string>
 
-#include <array>
-#include <aubio/aubio.h>
-#include <chrono>
+#ifndef TUNER_NOTE_H
+#define TUNER_NOTE_H
 
-#include "Effect.h"
-#include "TunerControls.h"
-#include "TunerNote.h"
-
-class Tuner : public Effect
+class TunerNote 
 {
 public:
-	Tuner(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~Tuner() override;
+    enum class NoteName
+	{
+		A,
+		ASharp,
+		B,
+		C,
+		CSharp,
+		D,
+		DSharp,
+		E,
+		F,
+		FSharp,
+		G,
+		GSharp,
+		Count
+	};
 
-	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
-	EffectControls* controls() override;
+    TunerNote(NoteName name, int octave, float frequency);
+    
+    TunerNote calculateNoteFromFrequency(float frequency);
 
-	void syncReferenceFrequency();
+    void shiftByCents(int cents);
+    void shiftBySemitones(int semitones);
+    void shiftByOctaves(int octaves);
 
+    NoteName name() const;
+    int octave() const;
+    int cents() const;
+    float frequency() const;
+
+    std::string nameToStr() const;
+    std::string fullNoteName() const;
+
+    void setName(NoteName name);
+    void setOctave(int octave);
+    void setCents(int cents);
+    void setFrequency(float frequency);
 private:
-	TunerControls m_tunerControls;
-	TunerNote m_referenceNote;
-
-	int m_aubioFramesCounter = 0;
-	int m_aubioWindowSize = 8192;
-	int m_aubioHopSize = 4096;
-
-	aubio_pitch_t* m_aubioPitch;
-	fvec_t* m_aubioInputBuffer;
-	fvec_t* m_aubioOutputBuffer;
-
-	std::chrono::time_point<std::chrono::system_clock> m_intervalStart;
-	std::chrono::milliseconds m_interval;
-
-	friend class TunerControls;
+    NoteName m_name = NoteName::A;
+    int m_octave = 0;
+    int m_cents = 0;
+    float m_frequency = 0.0f;
 };
 
 #endif

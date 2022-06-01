@@ -28,27 +28,34 @@
 
 #include "LcdFloatSpinBox.h"
 #include "LcdSpinBox.h"
+#include "Tuner.h"
 #include "TunerControls.h"
 
 TunerControlDialog::TunerControlDialog(TunerControls* controls)
 	: EffectControlDialog(controls)
+	, m_centsWidget(new LcdWidget(3, this, tr("Cents")))
+	, m_freqWidget(new LcdWidget(4, this, tr("Frequency")))
+	, m_noteLabel(new QLabel(this))
 {
-	setFixedSize(320, 320);
+	setFixedSize(240, 240);
+
+	m_centsWidget->setValue(0);
+	m_centsWidget->setLabel(tr("Cents"));
+	m_centsWidget->move(7, 210);
+
+	m_freqWidget->setValue(0);
+	m_freqWidget->setLabel(tr("Frequency"));
+	m_freqWidget->move(100, 210);
+
+	m_noteLabel->setFont(QFont("Arial", 32));
+	m_noteLabel->setText("-");
+	m_noteLabel->setFixedWidth(width());
+	m_noteLabel->setAlignment(Qt::AlignCenter);
+	m_noteLabel->move(0, height() / 2 - m_noteLabel->font().pointSize());
 
 	LcdSpinBox* referenceFreqSpinBox = new LcdSpinBox(3, this, tr("Reference"));
 	referenceFreqSpinBox->setModel(&controls->m_referenceFreqModel);
 	referenceFreqSpinBox->setLabel(tr("Reference"));
-	referenceFreqSpinBox->move(270, 280);
+	referenceFreqSpinBox->move(193, 210);
 
-	LcdWidget* centsLcd = new LcdWidget(2, this, tr("Cents"));
-	centsLcd->setValue(0);
-	centsLcd->setLabel(tr("Cents"));
-	centsLcd->move(10, 280);
-
-	QLabel* playedNoteReadout = new QLabel(this);
-	playedNoteReadout->setFont(QFont("Arial", 32));
-	playedNoteReadout->setText("-");
-	playedNoteReadout->setFixedWidth(width());
-	playedNoteReadout->setAlignment(Qt::AlignCenter);
-	playedNoteReadout->move(0, height()/2 - playedNoteReadout->font().pointSize());
 }

@@ -1,3 +1,8 @@
 INCLUDE(BuildPlugin)
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-BUILD_PLUGIN(tuner Tuner.cpp TunerControls.cpp TunerControlDialog.cpp MOCFILES Tuner.h TunerControls.h TunerControlDialog.h Tuner.h)
+FIND_PACKAGE(Aubio REQUIRED)
+INCLUDE_DIRECTORIES(${AUBIO_INCLUDE_DIRS})
+LINK_LIBRARIES(${AUBIO_LIBRARY})
+
+BUILD_PLUGIN(tuner Tuner.cpp TunerControls.cpp TunerControlDialog.cpp TunerNote.cpp MOCFILES Tuner.h TunerControls.h TunerControlDialog.h TunerNote.h)
