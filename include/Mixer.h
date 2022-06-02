@@ -201,9 +201,10 @@ public:
 
 	void toggleAutoTrackLink(int index);
 
-	// process tracks which have a fx send
+	// process tracks which have a mixer channel assigned
 	void processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process);
-	IntModel * getChannelModelByTrack(Track * track);
+	void processChannelTracks(MixerChannel * channel, std::function<void(Track * track)> process);
+	IntModel * getChannelModelByTrack(Track * track);	
 	std::vector<int> getUsedChannelCounts();
 	bool isAutoTrackLinkToggleAllowed(int index);
 

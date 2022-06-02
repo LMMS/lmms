@@ -365,6 +365,18 @@ IntModel * Mixer::getChannelModelByTrack(Track * track)
 	return nullptr;
 }
 
+
+void Mixer::processChannelTracks(MixerChannel * channel, std::function<void(Track * track)> process)
+{
+	processAssignedTracks([channel, process](Track * track, IntModel *, MixerChannel * currentChannel)
+	{
+		if (currentChannel != nullptr && currentChannel->m_channelIndex == channel->m_channelIndex)
+		{
+			process(track);
+		}
+	});
+}
+
 bool Mixer::isAutoTrackLinkToggleAllowed(int index)
 {
 	if (mixerChannel( index )->m_autoTrackLinkModel.value()) return true;
