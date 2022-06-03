@@ -207,6 +207,8 @@ public:
 	IntModel * getChannelModelByTrack(Track * track);	
 	std::vector<int> getUsedChannelCounts();
 	bool isAutoTrackLinkToggleAllowed(int index);
+	bool autoLinkTrackConfigEnabled();
+	void autoLinkTrackConfigSet(bool value);
 
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(mix_ch_t channelIndex);

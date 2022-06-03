@@ -128,6 +128,7 @@ protected:
 private slots:
 	void updateFaders();
 	void toggledSolo();
+	void toogleAutoLinkTrackConfig();
 
 private:
 	QVector<MixerChannelView *> m_mixerChannelViews;
@@ -139,11 +140,13 @@ private:
 	QWidget * m_channelAreaWidget;
 	QStackedLayout * m_racksLayout;
 	QWidget * m_racksWidget;
+	QPushButton * m_toogleAutoLinkTrackConfigBtn;
 
 	void updateMaxChannelSelector();
 	void swapChannels(int indexA, int indexB);
 	void updateAutoTrackSortOrder();
 	void deleteChannelInternal(int index);
+	void setAutoLinkTrackConfig(bool value);
 	
 	friend class MixerChannelView;
 } ;

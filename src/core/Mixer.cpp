@@ -31,6 +31,7 @@
 #include "MixHelpers.h"
 #include "Song.h"
 
+#include "ConfigManager.h"
 #include "InstrumentTrack.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
@@ -350,6 +351,19 @@ void Mixer::toggleAutoTrackLink(int index)
 	m_mixerChannels[index]->m_autoTrackLinkModel.setValue(! m_mixerChannels[index]->m_autoTrackLinkModel.value());
 }
 
+
+bool Mixer::autoLinkTrackConfigEnabled()
+{
+	return ConfigManager::inst()->value("ui", "autoLinkTrackConfig").toInt() == 1;
+}
+
+void Mixer::autoLinkTrackConfigSet(bool value)
+{
+	ConfigManager::inst()->setValue("ui", "autoLinkTrackConfig", QString::number(value));
+	ConfigManager::inst()->saveConfigFile();
+}
+
+
 IntModel * Mixer::getChannelModelByTrack(Track * track)
 {
 	if( track->type() == Track::InstrumentTrack )
@@ -379,6 +393,7 @@ void Mixer::processChannelTracks(MixerChannel * channel, std::function<void(Trac
 
 bool Mixer::isAutoTrackLinkToggleAllowed(int index)
 {
+	if (!Engine::mixer()->autoLinkTrackConfigEnabled()) return false;
 	if (mixerChannel( index )->m_autoTrackLinkModel.value()) return true;
 
 	std::vector<int> usedChannelCounts = getUsedChannelCounts();

@@ -256,17 +256,15 @@ void MixerLine::contextMenuEvent( QContextMenuEvent * )
 	bool autoTrackLink = mix->mixerChannel( m_channelIndex )->m_autoTrackLinkModel.value();
 	if( m_channelIndex != 0 ) // no move-options in master
 	{
-		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
-		bool autoTrackLinkRight = (m_channelIndex +1 < mix->numChannels()) ? mix->mixerChannel( m_channelIndex +1 )->m_autoTrackLinkModel.value() : false;
-		if (!autoTrackLinkRight)
-		{
-			contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
-		}
-		if (mix->isAutoTrackLinkToggleAllowed(m_channelIndex))
-		{
-			QString marker = (autoTrackLink ? " *" : "");
-			contextMenu->addAction( tr("Auto track link") + marker, this, SLOT( toogleAutoTrackLink() ) );
-		}
+		QAction * actionMoveleft =contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
+		QAction * actionMoveRight =contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
+
+		QString marker = (autoTrackLink ? " *" : "");
+		QAction * actionToggleAutoTrackLink = contextMenu->addAction( tr("Auto track link") + marker, this, SLOT( toogleAutoTrackLink() ) );
+
+		actionMoveleft->setEnabled(m_channelIndex > 1);
+		actionMoveRight->setEnabled((m_channelIndex +1) < mix->numChannels());
+		actionToggleAutoTrackLink->setEnabled(mix->autoLinkTrackConfigEnabled() && mix->isAutoTrackLinkToggleAllowed(m_channelIndex));
 	}
 
 	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );

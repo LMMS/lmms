@@ -130,13 +130,24 @@ MixerView::MixerView() :
 			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
+	QWidget * buttonAreaWidget = new QWidget;
+	buttonAreaWidget->setFixedSize(mixerLineSize);
+	QVBoxLayout * bl = new QVBoxLayout( buttonAreaWidget );
+	bl->setSizeConstraint( QLayout::SetMinimumSize );
+	bl->setSpacing( 0 );
+	bl->setMargin( 0 );
+	ml->addWidget(buttonAreaWidget);
+
 	// show the add new mixer channel button
 	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
-	newChannelBtn->setFixedSize( mixerLineSize );
-	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
-	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
+	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
+	bl->addWidget(newChannelBtn, 0, Qt::AlignTop );
 
+	m_toogleAutoLinkTrackConfigBtn = new QPushButton( embed::getIconPixmap( "exp_wave_inactive" ), QString(), this );
+	connect( m_toogleAutoLinkTrackConfigBtn, SIGNAL( clicked() ), this, SLOT(toogleAutoLinkTrackConfig()));
+	setAutoLinkTrackConfig(Engine::mixer()->autoLinkTrackConfigEnabled());
+	bl->addWidget(m_toogleAutoLinkTrackConfigBtn, 0, Qt::AlignTop );
 
 	// add the stacked layout for the effect racks of mixer channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
@@ -175,9 +186,9 @@ MixerView::~MixerView()
 }
 
 void MixerView::updateAfterTrackAdd(Track * track, QString name)
-{
-	// TODO: check if an autotrack mode is enabled (still missing)
+{	
 	Mixer * mix = Engine::mixer();
+	if (!mix->autoLinkTrackConfigEnabled()) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != nullptr)
 	{
@@ -196,6 +207,7 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name)
 void MixerView::updateAfterTrackStyleModify(Track * track)
 {
 	Mixer * mix = Engine::mixer();
+	if (!mix->autoLinkTrackConfigEnabled()) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != nullptr)
 	{
@@ -217,6 +229,7 @@ void MixerView::updateAfterTrackStyleModify(Track * track)
 void MixerView::updateAfterTrackMixerLineModify(Track * track)
 {
 	Mixer * mix = Engine::mixer();
+	if (!mix->autoLinkTrackConfigEnabled()) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != nullptr)
 	{
@@ -240,6 +253,7 @@ void MixerView::updateAfterTrackMixerLineModify(Track * track)
 void MixerView::updateAfterTrackMove(Track * track)
 {
 	Mixer * mix = Engine::mixer();
+	if (!mix->autoLinkTrackConfigEnabled()) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != nullptr)
 	{
@@ -258,6 +272,7 @@ void MixerView::updateAfterTrackMove(Track * track)
 void MixerView::updateAfterTrackDelete(Track * track)
 {
 	Mixer * mix = Engine::mixer();
+	if (!mix->autoLinkTrackConfigEnabled()) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != nullptr)
 	{
@@ -273,6 +288,20 @@ void MixerView::updateAfterTrackDelete(Track * track)
 		}
 	}
 }
+
+
+void MixerView::setAutoLinkTrackConfig(bool value)
+{
+	Engine::mixer()->autoLinkTrackConfigSet(value);
+	m_toogleAutoLinkTrackConfigBtn->setIcon(value ? embed::getIconPixmap( "exp_wave_active" ) : embed::getIconPixmap( "exp_wave_inactive" ));
+}
+
+void MixerView::toogleAutoLinkTrackConfig()
+{
+	bool cur = Engine::mixer()->autoLinkTrackConfigEnabled();
+	setAutoLinkTrackConfig(!cur);
+}
+
 
 
 
@@ -595,6 +624,7 @@ void MixerView::deleteUnusedChannels()
 void MixerView::toggleAutoTrackLink(int index)
 {
 	Mixer * mix = Engine::mixer();
+	if (!mix->autoLinkTrackConfigEnabled()) return;
 	mix->toggleAutoTrackLink(index);
 	m_mixerChannelViews[index]->m_mixerLine->autoTrackLinkChanged();
 	MixerChannel *  channel = mix->mixerChannel(index);
