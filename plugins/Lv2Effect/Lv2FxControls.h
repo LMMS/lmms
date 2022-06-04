@@ -60,9 +60,6 @@ private slots:
 	void changeControl();
 
 private:
-	DataFile::Types settingsType() override;
-	void setNameFromFile(const QString &name) override;
-
 	friend class gui::Lv2FxControlDialog;
 	friend class Lv2Effect;
 };
