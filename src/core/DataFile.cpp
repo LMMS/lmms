@@ -1916,9 +1916,6 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( !success ) qWarning("File Version conversion failure.");
 	}
 
-	// Perform upgrade routines
-	if (m_fileVersion < UPGRADE_METHODS.size()) { upgrade(); }
-
 	if (root.hasAttribute("creatorversion"))
 	{
 		// compareType defaults to All, so it doesn't have to be set here
@@ -1941,6 +1938,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			);
 		}
 	}
+
+	// Perform upgrade routines
+	if (m_fileVersion < UPGRADE_METHODS.size()) { upgrade(); }
 
 	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }
