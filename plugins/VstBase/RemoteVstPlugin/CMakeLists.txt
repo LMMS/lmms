@@ -43,6 +43,10 @@ if(NOT WIN32)
 	target_link_libraries(${EXE_NAME} pthread)
 endif()
 
+if(LMMS_HAVE_LIBRT)
+	target_link_libraries(${EXE_NAME} rt)
+endif()
+
 target_include_directories(${EXE_NAME}
 	PRIVATE 
 		"${LMMS_SOURCE_DIR}/plugins/vst_base/common"

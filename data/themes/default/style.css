@@ -620,10 +620,6 @@ lmms--gui--SideBar QToolButton:checked {
 
 /* Instrument plugin list */
 
-lmms--gui--PluginDescList {
-	background-color: #131517;
-}
-
 lmms--gui--PluginDescWidget {
 	border-top: 1px solid #3E474F;
 	border-bottom: 1px solid #101314;
