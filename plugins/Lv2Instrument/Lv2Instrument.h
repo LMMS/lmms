@@ -50,6 +50,8 @@ class Lv2InsView;
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
 	Q_OBJECT
+signals:
+	void modelChanged();
 public:
 	/*
 		initialization
@@ -57,6 +59,8 @@ public:
 	Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 		 Descriptor::SubPluginFeatures::Key* key);
 	~Lv2Instrument() override;
+	void reload();
+	void onSampleRateChanged();
 	//! Must be checked after ctor or reload
 	bool isValid() const;
 
@@ -101,6 +105,7 @@ private:
 #ifdef LV2_INSTRUMENT_USE_MIDI
 	std::array<int, NumKeys> m_runningNotes = {};
 #endif
+	void clearRunningNotes();
 
 	friend class gui::Lv2InsView;
 };

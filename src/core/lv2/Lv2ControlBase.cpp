@@ -54,30 +54,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 {
 	if (m_plugin)
 	{
-		int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
-		while (channelsLeft > 0)
-		{
-			std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, that);
-			if (newOne->isValid())
-			{
-				channelsLeft -= std::max(
-					1 + static_cast<bool>(newOne->inPorts().m_right),
-					1 + static_cast<bool>(newOne->outPorts().m_right));
-				Q_ASSERT(channelsLeft >= 0);
-				m_procs.push_back(std::move(newOne));
-			}
-			else
-			{
-				qCritical() << "Failed instantiating LV2 processor";
-				m_valid = false;
-				channelsLeft = 0;
-			}
-		}
-		if (m_valid)
-		{
-			m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
-			linkAllModels();
-		}
+		init(that);
 	}
 	else
 	{
@@ -90,6 +67,53 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 
 
 Lv2ControlBase::~Lv2ControlBase() = default;
+
+
+
+
+void Lv2ControlBase::init(Model* meAsModel)
+{
+	int channelsLeft = DEFAULT_CHANNELS; // LMMS plugins are stereo
+	while (channelsLeft > 0)
+	{
+		std::unique_ptr<Lv2Proc> newOne = std::make_unique<Lv2Proc>(m_plugin, meAsModel);
+		if (newOne->isValid())
+		{
+			channelsLeft -= std::max(
+				1 + static_cast<bool>(newOne->inPorts().m_right),
+				1 + static_cast<bool>(newOne->outPorts().m_right));
+			Q_ASSERT(channelsLeft >= 0);
+			m_procs.push_back(std::move(newOne));
+		}
+		else
+		{
+			qCritical() << "Failed instantiating LV2 processor";
+			m_valid = false;
+			channelsLeft = 0;
+		}
+	}
+	if (m_valid)
+	{
+		m_channelsPerProc = DEFAULT_CHANNELS / m_procs.size();
+		linkAllModels();
+	}
+}
+
+
+
+
+void Lv2ControlBase::shutdown()
+{
+	// currently nothing to do here
+}
+
+
+
+
+void Lv2ControlBase::reload()
+{
+	for (const auto& c : m_procs) { c->reload(); }
+}
 
 
 
@@ -178,14 +202,6 @@ void Lv2ControlBase::loadSettings(const QDomElement &that)
 void Lv2ControlBase::loadFile(const QString &file)
 {
 	(void)file;
-}
-
-
-
-
-void Lv2ControlBase::reloadPlugin()
-{
-	// TODO
 }
 
 

@@ -45,7 +45,7 @@ public:
 
 private:
 	Lv2FxControls *lv2Controls();
-	void modelChanged() override;
+	void modelChanged() final;
 };
 
 

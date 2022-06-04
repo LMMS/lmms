@@ -105,6 +105,14 @@ void *&Lv2Features::operator[](const char *featName)
 }
 
 
+
+
+void Lv2Features::clear()
+{
+	m_featureByUri.clear();
+}
+
+
 } // namespace lmms
 
 #endif // LMMS_HAVE_LV2
