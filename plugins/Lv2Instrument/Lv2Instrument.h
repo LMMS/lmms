@@ -97,8 +97,6 @@ private slots:
 
 private:
 	QString nodeName() const override;
-	DataFile::Types settingsType() override;
-	void setNameFromFile(const QString &name) override;
 
 #ifdef LV2_INSTRUMENT_USE_MIDI
 	std::array<int, NumKeys> m_runningNotes = {};

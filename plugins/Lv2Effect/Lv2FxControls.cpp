@@ -86,20 +86,4 @@ void Lv2FxControls::changeControl() // TODO: what is that?
 }
 
 
-
-
-DataFile::Types Lv2FxControls::settingsType()
-{
-	return DataFile::EffectSettings;
-}
-
-
-
-
-void Lv2FxControls::setNameFromFile(const QString &name)
-{
-	effect()->setDisplayName(name);
-}
-
-
 } // namespace lmms

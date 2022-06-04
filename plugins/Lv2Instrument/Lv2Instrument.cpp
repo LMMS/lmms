@@ -196,24 +196,8 @@ QString Lv2Instrument::nodeName() const
 
 
 
-DataFile::Types Lv2Instrument::settingsType()
-{
-	return DataFile::InstrumentTrackSettings;
-}
-
-
-
-
-void Lv2Instrument::setNameFromFile(const QString &name)
-{
-	instrumentTrack()->setName(name);
-}
-
-
-
 namespace gui
 {
-
 
 /*
 	Lv2InsView
