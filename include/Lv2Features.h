@@ -69,6 +69,8 @@ public:
 	{
 		return m_featurePointers.data();
 	}
+	//! Clear everything
+	void clear();
 
 private:
 	//! feature storage

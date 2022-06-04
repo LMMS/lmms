@@ -38,7 +38,7 @@ Lv2FxControlDialog::Lv2FxControlDialog(Lv2FxControls *controls) :
 {
 	if (m_reloadPluginButton) {
 		connect(m_reloadPluginButton, &QPushButton::clicked,
-				this, [this](){ lv2Controls()->reloadPlugin(); });
+				this, [this](){ lv2Controls()->reload(); });
 	}
 	if (m_toggleUIButton) {
 		connect(m_toggleUIButton, &QPushButton::toggled,
@@ -67,6 +67,8 @@ Lv2FxControls *Lv2FxControlDialog::lv2Controls()
 void Lv2FxControlDialog::modelChanged()
 {
 	Lv2ViewBase::modelChanged(lv2Controls());
+	connect(lv2Controls(), &Lv2FxControls::modelChanged,
+		this, [this](){ this->modelChanged();} );
 }
 
 

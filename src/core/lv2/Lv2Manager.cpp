@@ -60,6 +60,12 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 	"http://calf.sourceforge.net/plugins/TransientDesigner",
 	"http://calf.sourceforge.net/plugins/Vinyl",
 
+	// https://gitlab.com/drobilla/blop-lv2/-/issues/3
+	"http://drobilla.net/plugins/blop/pulse",
+	"http://drobilla.net/plugins/blop/sawtooth",
+	"http://drobilla.net/plugins/blop/square",
+	"http://drobilla.net/plugins/blop/triangle",
+
 	// Visualization, meters, and scopes etc., won't work until we have gui support
 	"http://distrho.sf.net/plugins/ProM",
 	"http://distrho.sf.net/plugins/glBars",

@@ -77,6 +77,9 @@ public:
 	static Plugin::PluginTypes check(const LilvPlugin* m_plugin,
 		std::vector<PluginIssue> &issues);
 
+	void shutdown();
+	void init(Model* meAsModel);
+
 	const LilvPlugin* getPlugin() const { return m_plugin; }
 
 	Lv2Proc *control(std::size_t idx) { return m_procs[idx].get(); }
@@ -95,6 +98,7 @@ protected:
 	Lv2ControlBase(class Model *that, const QString& uri);
 	Lv2ControlBase(const Lv2ControlBase&) = delete;
 	~Lv2ControlBase() override;
+	void reload();
 
 	Lv2ControlBase& operator=(const Lv2ControlBase&) = delete;
 
@@ -129,8 +133,6 @@ protected:
 	void saveSettings(QDomDocument &doc, QDomElement &that);
 	void loadSettings(const QDomElement &that);
 	void loadFile(const QString &file);
-	//! TODO: not implemented
-	void reloadPlugin();
 
 	/*
 		more functions that must be called from virtuals
