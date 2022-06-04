@@ -1916,13 +1916,14 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( !success ) qWarning("File Version conversion failure.");
 	}
 
+	// Perform upgrade routines
+	if (m_fileVersion < UPGRADE_METHODS.size()) { upgrade(); }
+
 	if (root.hasAttribute("creatorversion"))
 	{
 		// compareType defaults to All, so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
-
-		if (createdWith < openedWith) { upgrade(); }
 
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
