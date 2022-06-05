@@ -1011,7 +1011,7 @@ int main( int argc, char * * argv )
 		// instances of LMMS.
 		if( autoSaveEnabled )
 		{
-			getGUI()->mainWindow()->autoSaveTimerReset();
+			gui::getGUI()->mainWindow()->autoSaveTimerReset();
 		}
 	}
 

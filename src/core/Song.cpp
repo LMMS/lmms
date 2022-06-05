@@ -856,6 +856,8 @@ AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 
 void Song::clearProject()
 {
+	using gui::getGUI;
+
 	Engine::projectJournal()->setJournalling( false );
 
 	if( m_playing )
@@ -1013,6 +1015,8 @@ void Song::createNewProjectFromTemplate( const QString & templ )
 // load given song
 void Song::loadProject( const QString & fileName )
 {
+	using gui::getGUI;
+
 	QDomNode node;
 
 	m_loadingProject = true;
@@ -1230,6 +1234,8 @@ void Song::loadProject( const QString & fileName )
 // only save current song as filename and do nothing else
 bool Song::saveProjectFile(const QString & filename, bool withResources)
 {
+	using gui::getGUI;
+
 	DataFile dataFile( DataFile::SongProject );
 	m_savingProject = true;
 
