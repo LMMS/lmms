@@ -36,8 +36,6 @@
 #define VST_CALL_CONV 
 #endif
 
-namespace lmms
-{
 
 template<typename T>
 constexpr int32_t CCONST(T a, T b, T c, T d)
@@ -301,7 +299,5 @@ public:
 
 
 typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
-
-} // namespace lmms
 
 #endif

@@ -35,7 +35,7 @@
 #endif
 
 
-namespace lmms
+namespace lmms::gui
 {
 
 
@@ -62,6 +62,6 @@ private:
 };
 
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // MAINAPPLICATION_H

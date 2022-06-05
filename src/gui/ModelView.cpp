@@ -26,7 +26,7 @@
 
 #include "ModelView.h"
 
-namespace lmms
+namespace lmms::gui
 {
 
 
@@ -96,4 +96,4 @@ void ModelView::doConnections()
 }
 
 
-} // namespace lmms
+} // namespace lmms::gui

@@ -63,6 +63,7 @@ inline QPoint position(QWheelEvent *wheelEvent)
 	return wheelEvent->pos();
 #endif
 }
-#endif // DEPRECATIONHELPER_H
 
 } // namespace lmms
+
+#endif // DEPRECATIONHELPER_H

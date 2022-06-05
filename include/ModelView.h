@@ -28,7 +28,7 @@
 #include <QPointer>
 #include "Model.h"
 
-namespace lmms
+namespace lmms::gui
 {
 
 class LMMS_EXPORT ModelView
@@ -83,7 +83,7 @@ private:
 
 } ;
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif
 

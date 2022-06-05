@@ -361,7 +361,7 @@ int main( int argc, char * * argv )
 #endif
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
-					new MainApplication( argc, argv );
+					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
