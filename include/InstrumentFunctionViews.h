@@ -37,9 +37,7 @@ namespace lmms
 class InstrumentFunctionArpeggio;
 class InstrumentFunctionNoteStacking;
 
-}
-
-namespace lmms::gui
+namespace gui
 {
 
 class ComboBox;
@@ -97,7 +95,8 @@ private:
 
 } ;
 
+} // namespace gui
 
-} // namespace lmms::gui
+} // namespace lmms
 
 #endif

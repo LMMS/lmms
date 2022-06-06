@@ -42,10 +42,10 @@ class QScrollBar;
 
 namespace lmms
 {
-class NotePlayHandle;
-}
 
-namespace lmms::gui
+class NotePlayHandle;
+
+namespace gui
 {
 
 class Knob;
@@ -300,7 +300,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+} // namespace gui
 
-} // namespace lmms::gui
+} // namespace lmms
 
 #endif
