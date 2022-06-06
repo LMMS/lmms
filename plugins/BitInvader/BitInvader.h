@@ -31,7 +31,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Graph.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 class oscillator;
 class BitInvaderView;

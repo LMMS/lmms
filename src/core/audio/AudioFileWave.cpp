@@ -26,7 +26,7 @@
 #include "AudioFileWave.h"
 #include "endian_handling.h"
 #include "AudioEngine.h"
-
+#include "core/common.h"
 
 
 AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
@@ -79,7 +79,7 @@ bool AudioFileWave::startEncoding()
 
 	if (!m_sf)
 	{
-		qWarning("Error: AudioFileWave::startEncoding: %s", sf_strerror(nullptr));
+		lmms::lmms_warning("Error: AudioFileWave::startEncoding: ", sf_strerror(nullptr));
 		return false;
 	}
 

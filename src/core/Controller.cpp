@@ -27,7 +27,7 @@
 #include <QDomElement>
 #include <QVector>
 
-
+#include "core/common.h"
 #include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
@@ -276,7 +276,7 @@ void Controller::loadSettings( const QDomElement & _this )
 {
 	if( _this.attribute( "type" ).toInt() != type() )
 	{
-		qWarning( "controller-type does not match controller-type of "
+		lmms::lmms_warning( "controller-type does not match controller-type of "
 							"settings-node!\n" );
 	}
 

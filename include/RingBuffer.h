@@ -30,7 +30,7 @@
 #include <cmath>
 #include <QObject>
 #include "lmms_basics.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 /** \brief A basic LMMS ring buffer for single-thread use. For thread and realtime safe alternative see LocklessRingBuffer.
 */

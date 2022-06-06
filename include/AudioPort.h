@@ -29,7 +29,7 @@
 #include <QString>
 #include <QMutex>
 
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 #include "PlayHandle.h"
 
 class EffectChain;

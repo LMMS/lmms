@@ -23,6 +23,7 @@
  */
 
 #include "RemotePlugin.h"
+#include "core/common.h"
 
 //#define DEBUG_REMOTE_PLUGIN
 #ifdef DEBUG_REMOTE_PLUGIN
@@ -117,7 +118,7 @@ void ProcessWatcher::run()
 	}
 	if (!m_quit)
 	{
-		fprintf(stderr, "remote plugin died! invalidating now.\n");
+		lmms::lmms_warning("remote plugin died! invalidating now.");
 		m_plugin->invalidate();
 	}
 }
@@ -152,7 +153,7 @@ RemotePlugin::RemotePlugin() :
 	if ( length >= sizeof sa.sun_path )
 	{
 		length = sizeof sa.sun_path - 1;
-		qWarning( "Socket path too long." );
+		lmms::lmms_warning("Socket path too long.");
 	}
 	memcpy(sa.sun_path, path.constData(), length );
 	sa.sun_path[length] = '\0';
@@ -160,13 +161,13 @@ RemotePlugin::RemotePlugin() :
 	m_server = socket( PF_LOCAL, SOCK_STREAM, 0 );
 	if ( m_server == -1 )
 	{
-		qWarning( "Unable to start the server." );
+		lmms::lmms_warning("Unable to start the server.");
 	}
 	remove(path.constData());
 	int ret = bind( m_server, (struct sockaddr *) &sa, sizeof sa );
 	if ( ret == -1 || listen( m_server, 1 ) == -1 )
 	{
-		qWarning( "Unable to start the server." );
+		lmms::lmms_warning("Unable to start the server.");
 	}
 #endif
 
@@ -208,7 +209,7 @@ RemotePlugin::~RemotePlugin()
 #ifndef SYNC_WITH_SHM_FIFO
 	if ( close( m_server ) == -1)
 	{
-		qWarning( "Error freeing resources." );
+		lmms::lmms_warning("Error freeing resources.");
 	}
 	remove( m_socketFile.toUtf8().constData() );
 #endif
@@ -246,8 +247,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 
 	if( ! QFile( exec ).exists() )
 	{
-		qWarning( "Remote plugin '%s' not found.",
-						exec.toUtf8().constData() );
+		lmms::lmms_warning("Remote plugin ", exec.toUtf8().constData(), " not found.");
 		m_failed = true;
 		invalidate();
 		unlock();
@@ -288,18 +288,18 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 	switch ( poll( &pollin, 1, 30000 ) )
 	{
 		case -1:
-			qWarning( "Unexpected poll error." );
+			lmms::lmms_warning("Unexpected poll error.");
 			break;
 
 		case 0:
-			qWarning( "Remote plugin did not connect." );
+			lmms::lmms_warning("Remote plugin did not connect.");
 			break;
 
 		default:
 			m_socket = accept( m_server, nullptr, nullptr );
 			if ( m_socket == -1 )
 			{
-				qWarning( "Unexpected socket error." );
+				lmms::lmms_warning("Unexpected socket error.");
 			}
 	}
 #endif
@@ -554,8 +554,7 @@ bool RemotePlugin::processMessage( const message & _m )
 			break;
 
 		case IdDebugMessage:
-			fprintf( stderr, "RemotePlugin::DebugMessage: %s",
-						_m.getString( 0 ).c_str() );
+			lmms::lmms_warning("RemotePlugin::DebugMessage: ", _m.getString( 0 ).c_str());
 			break;
 
 		case IdProcessingDone:

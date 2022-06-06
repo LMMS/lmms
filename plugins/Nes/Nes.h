@@ -31,7 +31,7 @@
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
 #include "PixmapButton.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\

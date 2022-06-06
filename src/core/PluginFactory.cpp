@@ -31,6 +31,7 @@
 #include <memory>
 #include "lmmsconfig.h"
 
+#include "core/common.h"
 #include "ConfigManager.h"
 #include "Plugin.h"
 
@@ -169,7 +170,7 @@ void PluginFactory::discoverPlugins()
 		auto library = std::make_shared<QLibrary>(file.absoluteFilePath());
 		if (! library->load()) {
 			m_errors[file.baseName()] = library->errorString();
-			qWarning("%s", library->errorString().toLocal8Bit().data());
+			lmms::lmms_warning(library->errorString().toLocal8Bit().data());
 			continue;
 		}
 
@@ -185,6 +186,7 @@ void PluginFactory::discoverPlugins()
 			pluginDescriptor = reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
 			if(pluginDescriptor == nullptr)
 			{
+				// TODO: change to lmms_warning function to help eliminate Qt dependency from core file
 				qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").
 							  arg(file.absoluteFilePath()).arg(descriptorName);
 				continue;

@@ -27,6 +27,7 @@
 
 #include <QDomElement>
 
+#include "core/common.h"
 #include "LadspaControl.h"
 #include "LadspaBase.h"
 
@@ -129,7 +130,7 @@ LADSPA_Data LadspaControl::value()
 		case TIME:
 			return static_cast<LADSPA_Data>( m_tempoSyncKnobModel.value() );
 		default:
-			qWarning( "LadspaControl::value(): BAD BAD BAD\n" );
+			lmms::lmms_warning("LadspaControl::value(): BAD BAD BAD");
 			break;
 	}
 
@@ -150,7 +151,7 @@ ValueBuffer * LadspaControl::valueBuffer()
 		case TIME:
 			return m_tempoSyncKnobModel.valueBuffer();
 		default:
-			qWarning( "LadspaControl::valueBuffer(): BAD BAD BAD\n" );
+			lmms::lmms_warning("LadspaControl::valueBuffer(): BAD BAD BAD");
 			break;
 	}
 
@@ -178,7 +179,7 @@ void LadspaControl::setValue( LADSPA_Data _value )
 								_value ) );
 			break;
 		default:
-			printf("LadspaControl::setValue BAD BAD BAD\n");
+			lmms::lmms_warning("LadspaControl::setValue BAD BAD BAD");
 			break;
 	}
 }
@@ -210,7 +211,7 @@ void LadspaControl::saveSettings( QDomDocument& doc,
 			m_tempoSyncKnobModel.saveSettings( doc, e, "data" );
 			break;
 		default:
-			printf("LadspaControl::saveSettings BAD BAD BAD\n");
+			lmms::lmms_warning("LadspaControl::saveSettings BAD BAD BAD");
 			break;
 	}
 
@@ -246,7 +247,7 @@ void LadspaControl::loadSettings( const QDomElement& parent, const QString& name
 				m_tempoSyncKnobModel.setValue(m_tempoSyncKnobModel.initValue());
 				break;
 			default:
-				printf("LadspaControl::loadSettings BAD BAD BAD\n");
+				lmms::lmms_warning("LadspaControl::loadSettings BAD BAD BAD");
 				break;
 		}
 	}
@@ -281,7 +282,7 @@ void LadspaControl::loadSettings( const QDomElement& parent, const QString& name
 				m_tempoSyncKnobModel.loadSettings( e, dataModelName );
 				break;
 			default:
-				printf("LadspaControl::loadSettings BAD BAD BAD\n");
+				lmms::lmms_warning("LadspaControl::loadSettings BAD BAD BAD");
 				break;
 		}
 	}

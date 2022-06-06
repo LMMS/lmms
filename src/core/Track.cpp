@@ -32,6 +32,7 @@
 #include <QDomElement>
 #include <QVariant>
 
+#include "core/common.h"
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "ConfigManager.h"
@@ -249,8 +250,7 @@ void Track::loadSettings( const QDomElement & element )
 {
 	if( element.attribute( "type" ).toInt() != type() )
 	{
-		qWarning( "Current track-type does not match track-type of "
-							"settings-node!\n" );
+		lmms::lmms_warning("Current track-type does not match track-type of settings-node!");
 	}
 
 	setName( element.hasAttribute( "name" ) ? element.attribute( "name" ) :
@@ -426,7 +426,7 @@ int Track::getClipNum( const Clip * clip )
 		}*/
 		return it - m_clips.begin();
 	}
-	qWarning( "Track::getClipNum(...) -> _clip not found!\n" );
+	lmms::lmms_warning("Track::getClipNum(...) -> _clip not found!");
 	return 0;
 }
 

@@ -30,7 +30,7 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 // brief usage 
 

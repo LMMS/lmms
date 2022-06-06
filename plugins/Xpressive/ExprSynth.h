@@ -30,7 +30,7 @@
 #include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 class automatableButtonGroup;
 class ExprFrontData;

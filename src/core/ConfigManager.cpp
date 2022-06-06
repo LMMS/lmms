@@ -30,6 +30,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
+#include "core/common.h"
 #include "ConfigManager.h"
 #include "MainWindow.h"
 #include "ProjectVersion.h"
@@ -441,7 +442,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			{
 				bool success;
 				m_configVersion = root.attribute("configversion").toUInt(&success);
-				if( !success ) qWarning("Config Version conversion failure.");
+				if( !success ) lmms::lmms_warning("Config Version conversion failure.");
 			}
 
 			// create the settings-map out of the DOM

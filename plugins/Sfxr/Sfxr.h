@@ -31,7 +31,7 @@
 #include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 
 enum SfxrWaves

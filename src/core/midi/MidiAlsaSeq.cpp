@@ -22,6 +22,7 @@
  *
  */
 
+#include "core/common.h"
 #include "MidiAlsaSeq.h"
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -218,7 +219,7 @@ void MidiAlsaSeq::processOutEvent( const MidiEvent& event, const TimePos& time, 
 			break;
 
 		default:
-			qWarning( "MidiAlsaSeq: unhandled output event %d\n", (int) event.type() );
+			lmms::lmms_warning("MidiAlsaSeq: unhandled output event ", static_cast<int>(event.type()));
 			return;
 	}
 

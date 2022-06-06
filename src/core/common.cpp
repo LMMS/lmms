@@ -1,8 +1,5 @@
 /*
- * ValueBuffer.h - a container class for passing buffers of model values around
- *
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * common.cpp
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,31 +20,17 @@
  *
  */
 
-#ifndef VALUE_BUFFER_H
-#define VALUE_BUFFER_H
+#include "core/common.h"
 
-#include <vector>
+#ifndef NDEBUG
 
-#include "core/MemoryManager.h"
-#include "lmms_export.h"
-
-class LMMS_EXPORT ValueBuffer : public std::vector<float>
+/* mimic the output of a raised QT_ASSERT_X */
+void assert_error(const char *where, const char *what, const char *file, int line) noexcept
 {
-	MM_OPERATORS
-public:
-	ValueBuffer();
-	ValueBuffer(int length);
+    std::cerr << "ASSERT failure in " << where << ": "
+		<< '"' << what << "\", "
+		<< "file " << file << ", "
+		<< "line " << line << std::endl;
+}
 
-	void fill(float value);
-
-	float value(int offset ) const;
-
-	const float * values() const;
-	float * values();
-	
-	int length() const;
-
-	void interpolate(float start, float end);
-};
-
-#endif
+#endif /* NDEBUG */

@@ -27,7 +27,7 @@
 #include <QDomElement>
 #include <QObject>
 
-
+#include "core/common.h"
 #include "Song.h"
 #include "ControllerConnection.h"
 
@@ -207,7 +207,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 		m_controllerId = _this.attribute( "id", "-1" ).toInt();
 		if( m_controllerId < 0 )
 		{
-			qWarning( "controller index invalid\n" );
+			lmms::lmms_warning("controller index invalid");
 			m_controllerId = -1;
 		}
 

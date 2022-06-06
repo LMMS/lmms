@@ -31,7 +31,7 @@
 #include <QDomDocument>
 
 #include "lmms_export.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 class ProjectVersion;
 class QTextStream;

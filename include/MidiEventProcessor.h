@@ -26,7 +26,7 @@
 #define MIDI_EVENT_PROCESSOR_H
 
 #include "MidiEvent.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 #include "TimePos.h"
 
 // all classes being able to process MIDI-events should inherit from this

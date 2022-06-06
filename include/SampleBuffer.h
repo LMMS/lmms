@@ -38,7 +38,7 @@
 #include "lmms_math.h"
 #include "shared_object.h"
 #include "OscillatorConstants.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 
 class QPainter;

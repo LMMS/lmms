@@ -35,6 +35,7 @@
 #include <QDir>
 #include <QMessageBox>
 
+#include "core/common.h"
 #include "base64.h"
 #include "ConfigManager.h"
 #include "Effect.h"
@@ -306,7 +307,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		}
 		else
 		{
-			qWarning() << body;
+			lmms::lmms_warning(body.toStdString());
 		}
 	};
 
@@ -485,7 +486,7 @@ bool DataFile::copyResources(const QString& resourcesDir)
 					// Copy resource file to the resources folder
 					if(!QFile::copy(resPath, finalPath))
 					{
-						qWarning("ERROR: Failed to copy resource");
+						lmms::lmms_warning("ERROR: Failed to copy resource");
 						return false;
 					}
 
@@ -1884,7 +1885,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		}
 		if( line >= 0 && col >= 0 )
 		{
-			qWarning() << "at line" << line << "column" << errorMsg;
+			lmms::lmms_warning("at line ", line, " column ", errorMsg.toStdString());
 			if( getGUI() != nullptr )
 			{
 				QMessageBox::critical( nullptr,
@@ -1913,7 +1914,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	{
 		bool success;
 		m_fileVersion = root.attribute( "version" ).toUInt( &success );
-		if( !success ) qWarning("File Version conversion failure.");
+		if( !success ) lmms::lmms_warning("File Version conversion failure.");
 	}
 
 	if (root.hasAttribute("creatorversion"))

@@ -23,6 +23,7 @@
  *
  */
 
+#include "core/common.h"
 #include "MidiClient.h"
 #include "MidiPort.h"
 
@@ -275,7 +276,7 @@ void MidiClientRaw::processOutEvent(const MidiEvent& event, const TimePos&, cons
 			break;
 
 		default:
-			qWarning("MidiClientRaw: unhandled MIDI-event %d\n", (int)event.type());
+			lmms::lmms_warning("MidiClientRaw: unhandled MIDI-event ", static_cast<int>(event.type()));
 			break;
 	}
 }

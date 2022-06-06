@@ -30,7 +30,7 @@
 #include "InstrumentView.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 class PixmapButton;
 
