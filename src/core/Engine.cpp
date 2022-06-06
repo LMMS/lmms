@@ -33,6 +33,7 @@
 #include "Plugin.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
+#include "SampleBufferCache.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
@@ -46,6 +47,7 @@ Mixer * Engine::s_mixer = nullptr;
 PatternStore * Engine::s_patternStore = nullptr;
 Song * Engine::s_song = nullptr;
 ProjectJournal * Engine::s_projectJournal = nullptr;
+std::unique_ptr<SampleBufferCache> Engine::s_sampleBufferCache = nullptr;
 #ifdef LMMS_HAVE_LV2
 Lv2Manager * Engine::s_lv2Manager = nullptr;
 #endif
@@ -68,6 +70,7 @@ void Engine::init( bool renderOnly )
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
 	s_audioEngine = new AudioEngine( renderOnly );
+	s_sampleBufferCache = std::make_unique<SampleBufferCache>();
 	s_song = new Song;
 	s_mixer = new Mixer;
 	s_patternStore = new PatternStore;

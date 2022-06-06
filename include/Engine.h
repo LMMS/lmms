@@ -26,9 +26,10 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <memory>
+
 #include <QString>
 #include <QObject>
-
 
 #include "lmmsconfig.h"
 #include "lmms_export.h"
@@ -43,6 +44,7 @@ class PatternStore;
 class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
+class SampleBufferCache;
 
 namespace gui
 {
@@ -81,6 +83,11 @@ public:
 	static ProjectJournal * projectJournal()
 	{
 		return s_projectJournal;
+	}
+
+	static SampleBufferCache* sampleBufferCache()
+	{
+		return s_sampleBufferCache.get();
 	}
 
 	static bool ignorePluginBlacklist();
@@ -139,6 +146,7 @@ private:
 	static AudioEngine *s_audioEngine;
 	static Mixer * s_mixer;
 	static Song * s_song;
+	static std::unique_ptr<SampleBufferCache> s_sampleBufferCache;
 	static PatternStore * s_patternStore;
 	static ProjectJournal * s_projectJournal;
 

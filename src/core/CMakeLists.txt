@@ -65,7 +65,10 @@ set(LMMS_SRCS
 	core/RemotePlugin.cpp
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
+	core/Sample.cpp
 	core/SampleBuffer.cpp
+	core/SampleBufferCache.cpp
+	core/SampleBufferV2.cpp
 	core/SampleClip.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp

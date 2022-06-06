@@ -1,0 +1,479 @@
+/*
+ * Sample.cpp - a SampleBuffer with its own characteristics
+ *
+ * Copyright (c) 2022 sakertooth <sakertooth@gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#include "Sample.h"
+
+#include <cmath>
+#include <cstring>
+#include <filesystem>
+#include <iostream>
+#include <variant>
+
+#include "ConfigManager.h"
+#include "FileDialog.h"
+#include "PathUtil.h"
+#include "SampleBufferV2.h"
+
+namespace lmms
+{
+	Sample::Sample(const std::string& strData, SampleBufferV2::StrDataType dataType)
+	{
+		setSampleData(strData, dataType);
+	}
+
+	Sample::Sample(const sampleFrame* data, const int numFrames)
+		: m_sampleBuffer(std::make_shared<const SampleBufferV2>(data, numFrames))
+		, m_endFrame(m_sampleBuffer->numFrames())
+	{
+	}
+
+	Sample::Sample(const SampleBufferV2* buffer)
+		: m_sampleBuffer(std::shared_ptr<const SampleBufferV2>(buffer))
+		, m_endFrame(m_sampleBuffer->numFrames())
+	{
+	}
+
+	Sample::Sample(const int numFrames)
+		: m_sampleBuffer(std::make_shared<const SampleBufferV2>(numFrames))
+		, m_endFrame(numFrames)
+	{
+	}
+
+	Sample::Sample(const Sample& other)
+		: m_sampleBuffer(other.m_sampleBuffer)
+		, m_amplification(other.m_amplification)
+		, m_frequency(other.m_frequency)
+		, m_reversed(other.m_reversed)
+		, m_varyingPitch(other.m_varyingPitch)
+		, m_interpolationMode(other.m_interpolationMode)
+		, m_startFrame(other.m_startFrame)
+		, m_endFrame(other.m_endFrame)
+		, m_frameIndex(other.m_frameIndex)
+	{
+	}
+
+	Sample::Sample(Sample&& other)
+		: m_sampleBuffer(std::exchange(other.m_sampleBuffer, nullptr))
+		, m_amplification(std::exchange(other.m_amplification, 1.0f))
+		, m_frequency(std::exchange(other.m_frequency, 0.0f))
+		, m_varyingPitch(std::exchange(other.m_varyingPitch, false))
+		, m_interpolationMode(std::exchange(other.m_interpolationMode, SRC_LINEAR))
+		, m_startFrame(std::exchange(other.m_startFrame, 0))
+		, m_endFrame(std::exchange(other.m_endFrame, 0))
+		, m_frameIndex(std::exchange(other.m_frameIndex, 0))
+	{
+	}
+
+	Sample& Sample::operator=(Sample other)
+	{
+		std::swap(*this, other);
+		return *this;
+	}
+
+	void swap(Sample& first, Sample& second)
+	{
+		first.m_sampleBuffer.swap(second.m_sampleBuffer);
+		std::swap(first.m_amplification, second.m_amplification);
+		std::swap(first.m_frequency, second.m_frequency);
+		std::swap(first.m_reversed, second.m_reversed);
+		std::swap(first.m_varyingPitch, second.m_varyingPitch);
+		std::swap(first.m_pingPongBackwards, second.m_pingPongBackwards);
+		std::swap(first.m_interpolationMode, second.m_interpolationMode);
+		std::swap(first.m_startFrame, second.m_startFrame);
+		std::swap(first.m_endFrame, second.m_endFrame);
+		std::swap(first.m_loopStartFrame, second.m_loopStartFrame);
+		std::swap(first.m_loopEndFrame, second.m_loopEndFrame);
+		std::swap(first.m_frameIndex, second.m_frameIndex);
+		std::swap(first.m_playback, second.m_playback);
+		std::swap(first.m_resampleState, second.m_resampleState);
+	}
+
+	bool Sample::play(sampleFrame* dst, const int framesToPlay, const float freq)
+	{
+		if (framesToPlay <= 0 || (m_frameIndex < 0 || m_frameIndex > m_endFrame)) { return false; }
+
+		if ((m_playback == PlaybackType::LoopPoints || m_playback == PlaybackType::PingPong)
+			&& (m_frameIndex < m_loopStartFrame || m_frameIndex > m_loopEndFrame))
+		{
+			m_frameIndex = m_loopStartFrame;
+		}
+
+		auto& sampleData = m_sampleBuffer->sampleData();
+		auto sampleDataIt = m_reversed ? sampleData.end() : sampleData.begin();
+
+		sampleDataIt += (m_reversed ? -m_frameIndex : m_frameIndex);
+		auto advanceBy = m_reversed ? -framesToPlay : framesToPlay;
+
+		double freqFactor = static_cast<double>(freq) / m_frequency;
+		const int totalFramesForCurrentPitch = static_cast<int>((m_endFrame - m_startFrame) / freqFactor);
+
+		if (totalFramesForCurrentPitch == 0) { return false; }
+		if (freqFactor != 1.0 || m_varyingPitch)
+		{
+			if (!m_resampleState)
+			{
+				int error = 0;
+				m_resampleState = src_new(m_interpolationMode, DEFAULT_CHANNELS, &error);
+
+				if (error) { return false; }
+			}
+
+			std::array<int, 5> sampleMargin = {64, 64, 64, 4, 4};
+			int fragmentSize = static_cast<int>(framesToPlay * freqFactor) + sampleMargin[m_interpolationMode];
+
+			SRC_DATA srcData;
+			srcData.data_in = (sampleDataIt + advanceBy)->data();
+			srcData.data_out = dst->data();
+			srcData.input_frames = fragmentSize;
+			srcData.output_frames = framesToPlay;
+			srcData.src_ratio = 1.0 / freqFactor;
+
+			int error = src_process(m_resampleState, &srcData);
+			if (error || srcData.output_frames_gen > framesToPlay) { return false; }
+
+			if (m_reversed) { std::reverse(dst, dst + framesToPlay); }
+		}
+		else
+		{
+			if (m_reversed) { std::reverse_copy(sampleDataIt - framesToPlay, sampleDataIt, dst); }
+			else
+			{
+				std::copy(sampleDataIt, sampleDataIt + advanceBy, dst);
+			}
+		}
+
+		for (int i = 0; i < framesToPlay; ++i)
+		{
+			dst[i][0] *= m_amplification;
+			dst[i][1] *= m_amplification;
+		}
+
+		switch (m_playback)
+		{
+		case PlaybackType::Regular:
+			m_frameIndex += framesToPlay;
+			break;
+		case PlaybackType::LoopPoints:
+			m_frameIndex += framesToPlay;
+			if (m_frameIndex >= m_loopEndFrame) { m_frameIndex = m_loopStartFrame; }
+			break;
+		case PlaybackType::PingPong:
+			if (!m_pingPongBackwards && m_frameIndex < m_loopEndFrame) { m_frameIndex += framesToPlay; }
+			else if (!m_pingPongBackwards && m_frameIndex >= m_loopEndFrame)
+			{
+				setReversed(!m_reversed);
+				m_pingPongBackwards = true;
+				m_frameIndex = m_loopEndFrame;
+			}
+			else if (m_pingPongBackwards && m_frameIndex > m_loopStartFrame)
+			{
+				m_frameIndex -= framesToPlay;
+			}
+			else if (m_pingPongBackwards && m_frameIndex <= m_loopStartFrame)
+			{
+				setReversed(!m_reversed);
+				m_pingPongBackwards = false;
+				m_frameIndex = m_loopStartFrame;
+			}
+			break;
+		}
+
+		return true;
+	}
+
+	/* @brief Draws a sample on the QRect given in the range [fromFrame, toFrame)
+	* @param QPainter p: Painter object for the painting operations
+	* @param QRect dr: QRect where the buffer will be drawn in
+	* @param QRect clip: QRect used for clipping
+	* @param int fromFrame: First frame of the range
+	* @param int toFrame: Last frame of the range non-inclusive
+	*/
+	void Sample::visualize(QPainter& painter, const QRect& drawingRect, int fromFrame, int toFrame)
+	{
+		/*TODO:
+			This function needs to be optimized.
+			- We do not have to recalculate peaks and rms every time we want to visualize the sample.
+			- You can store peaks and rms in 2 std::vector<QLines> instead of 4 std::vector<QPointF>'s
+			- Allocating large std::vectors on a hot path like Sample::visualize is not good.
+			- You can potentially reduce the number of frames you draw per pixel by choosing a certain frame per pixel
+		ratio beforehand.
+
+		This function also needs to be moved out of Sample in favor of no Qt in the core.
+		*/
+
+		if (m_sampleBuffer->numFrames() == 0) { return; }
+
+		const bool focusOnRange = toFrame <= m_sampleBuffer->numFrames() && 0 <= fromFrame && fromFrame < toFrame;
+		// TODO: If the clip QRect is not being used we should remove it
+		// p.setClipRect(clip);
+		const int w = drawingRect.width();
+		const int h = drawingRect.height();
+
+		const int yb = h / 2 + drawingRect.y();
+		const float ySpace = h * 0.5f;
+		const int nbFrames = focusOnRange ? toFrame - fromFrame : m_sampleBuffer->numFrames();
+
+		const double fpp = std::max(1., static_cast<double>(nbFrames) / w);
+		// There are 2 possibilities: Either nbFrames is bigger than
+		// the width, so we will have width points, or nbFrames is
+		// smaller than the width (fpp = 1) and we will have nbFrames
+		// points
+		const int totalPoints = nbFrames > w ? w : nbFrames;
+		std::vector<QPointF> fEdgeMax(totalPoints);
+		std::vector<QPointF> fEdgeMin(totalPoints);
+		std::vector<QPointF> fRmsMax(totalPoints);
+		std::vector<QPointF> fRmsMin(totalPoints);
+		int curPixel = 0;
+		const int xb = drawingRect.x();
+		const int first = focusOnRange ? fromFrame : 0;
+		const int last = focusOnRange ? toFrame - 1 : m_sampleBuffer->numFrames() - 1;
+		// When the number of frames isn't perfectly divisible by the
+		// width, the remaining frames don't fit the last pixel and are
+		// past the visible area. lastVisibleFrame is the index number of
+		// the last visible frame.
+		const int visibleFrames = (fpp * w);
+		const int lastVisibleFrame = focusOnRange ? fromFrame + visibleFrames - 1 : visibleFrames - 1;
+
+		for (double frame = first; frame <= last && frame <= lastVisibleFrame; frame += fpp)
+		{
+			float maxData = -1;
+			float minData = 1;
+
+			float rmsData[2] = {0, 0};
+
+			// Find maximum and minimum samples within range
+			for (int i = 0; i < fpp && frame + i <= last; ++i)
+			{
+				for (int j = 0; j < 2; ++j)
+				{
+					auto curData = m_sampleBuffer->sampleData()[static_cast<int>(frame) + i][j];
+
+					if (curData > maxData) { maxData = curData; }
+					if (curData < minData) { minData = curData; }
+
+					rmsData[j] += curData * curData;
+				}
+			}
+
+			const float trueRmsData = (rmsData[0] + rmsData[1]) / 2 / fpp;
+			const float sqrtRmsData = sqrt(trueRmsData);
+			const float maxRmsData = qBound(minData, sqrtRmsData, maxData);
+			const float minRmsData = qBound(minData, -sqrtRmsData, maxData);
+
+			// If nbFrames >= w, we can use curPixel to calculate X
+			// but if nbFrames < w, we need to calculate it proportionally
+			// to the total number of points
+			auto x = nbFrames >= w ? xb + curPixel : xb + ((static_cast<double>(curPixel) / nbFrames) * w);
+			// Partial Y calculation
+			auto py = ySpace * m_amplification;
+			fEdgeMax[curPixel] = QPointF(x, (yb - (maxData * py)));
+			fEdgeMin[curPixel] = QPointF(x, (yb - (minData * py)));
+			fRmsMax[curPixel] = QPointF(x, (yb - (maxRmsData * py)));
+			fRmsMin[curPixel] = QPointF(x, (yb - (minRmsData * py)));
+			++curPixel;
+		}
+
+		for (int i = 0; i < totalPoints; ++i)
+		{
+			painter.drawLine(fEdgeMax[i], fEdgeMin[i]);
+		}
+
+		painter.setPen(painter.pen().color().lighter(123));
+
+		for (int i = 0; i < totalPoints; ++i)
+		{
+			painter.drawLine(fRmsMax[i], fRmsMin[i]);
+		}
+	}
+
+	std::string Sample::sampleFile() const
+	{
+		auto& path = m_sampleBuffer->filePath();
+		return path.has_value() ? path->string() : "";
+	}
+
+	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const
+	{
+		return m_sampleBuffer;
+	}
+
+	float Sample::amplification() const
+	{
+		return m_amplification;
+	}
+
+	float Sample::frequency() const
+	{
+		return m_frequency;
+	}
+
+	bool Sample::reversed() const
+	{
+		return m_reversed;
+	}
+
+	bool Sample::varyingPitch() const
+	{
+		return m_varyingPitch;
+	}
+
+	int Sample::interpolationMode() const
+	{
+		return m_interpolationMode;
+	}
+
+	int Sample::startFrame() const
+	{
+		return m_startFrame;
+	}
+
+	int Sample::endFrame() const
+	{
+		return m_endFrame;
+	}
+
+	int Sample::loopStartFrame() const
+	{
+		return m_loopStartFrame;
+	}
+
+	int Sample::loopEndFrame() const
+	{
+		return m_loopEndFrame;
+	}
+
+	int Sample::frameIndex() const
+	{
+		return m_frameIndex;
+	}
+
+	int Sample::numFrames() const
+	{
+		return m_sampleBuffer ? m_sampleBuffer->numFrames() : 0;
+	}
+
+	Sample::PlaybackType Sample::playback() const
+	{
+		return m_playback;
+	}
+
+	void Sample::setSampleData(const std::string& strData, const SampleBufferV2::StrDataType dataType)
+	{
+		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(strData);
+
+		if (cachedSampleBuffer) { m_sampleBuffer = cachedSampleBuffer; }
+		else
+		{
+			m_sampleBuffer = Engine::sampleBufferCache()->add(strData, new SampleBufferV2(strData, dataType));
+		}
+
+		resetMarkers();
+	}
+
+	void Sample::setSampleBuffer(const SampleBufferV2* buffer)
+	{
+		m_sampleBuffer.reset(buffer);
+		resetMarkers();
+	}
+
+	void Sample::setAmplification(const float amplification)
+	{
+		m_amplification = amplification;
+	}
+
+	void Sample::setFrequency(const float frequency)
+	{
+		m_frequency = frequency;
+	}
+
+	void Sample::setReversed(const bool reversed)
+	{
+		m_reversed = reversed;
+	}
+
+	void Sample::setVaryingPitch(const bool varyingPitch)
+	{
+		m_varyingPitch = varyingPitch;
+	}
+
+	void Sample::setInterpolationMode(const int interpolationMode)
+	{
+		m_interpolationMode = interpolationMode;
+	}
+
+	void Sample::setStartFrame(const int start)
+	{
+		m_startFrame = start;
+	}
+
+	void Sample::setEndFrame(const int end)
+	{
+		m_endFrame = end;
+	}
+
+	void Sample::setLoopStartFrame(const int loopStart)
+	{
+		m_loopStartFrame = loopStart;
+	}
+
+	void Sample::setLoopEndFrame(const int loopEnd)
+	{
+		m_loopEndFrame = loopEnd;
+	}
+
+	void Sample::setFrameIndex(const int frameIndex)
+	{
+		m_frameIndex = frameIndex;
+	}
+
+	void Sample::setPlayback(const PlaybackType playback)
+	{
+		m_playback = playback;
+	}
+
+	void Sample::loadAudioFile(const std::string& audioFile)
+	{
+		setSampleData(audioFile, SampleBufferV2::StrDataType::AudioFile);
+	}
+
+	void Sample::loadBase64(const std::string& base64)
+	{
+		setSampleData(base64, SampleBufferV2::StrDataType::Base64);
+	}
+
+	void Sample::resetMarkers()
+	{
+		m_startFrame = 0;
+		m_endFrame = m_sampleBuffer->numFrames();
+		m_loopStartFrame = std::clamp(0, m_loopStartFrame, m_endFrame);
+		m_loopEndFrame = std::clamp(0, m_loopEndFrame, m_endFrame);
+		m_frameIndex = std::clamp(0, m_frameIndex, m_endFrame);
+	}
+
+	int Sample::calculateTickLength() const
+	{
+		return 1 / Engine::framesPerTick() * m_sampleBuffer->numFrames();
+	}
+}
+

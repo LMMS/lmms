@@ -1,0 +1,77 @@
+/*
+ * SampleBufferV2.h - container class for immutable sample data
+ *
+ * Copyright (c) 2022 sakertooth <sakertooth@gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#ifndef SAMPLE_BUFFER_V2_H
+#define SAMPLE_BUFFER_V2_H
+
+#include <filesystem>
+#include <memory>
+#include <optional>
+#include <vector>
+
+#include "AudioEngine.h"
+#include "Engine.h"
+#include "lmms_basics.h"
+
+namespace lmms 
+{
+	class SampleBufferV2
+	{
+	public:
+		enum class StrDataType
+		{
+			AudioFile,
+			Base64
+		};
+
+		SampleBufferV2(const std::string& strData, const StrDataType dataType);
+		SampleBufferV2(const sampleFrame* data, const int numFrames);
+		SampleBufferV2(const SampleBufferV2& other) = delete;
+		SampleBufferV2(SampleBufferV2&& other);
+		explicit SampleBufferV2(const int numFrames);
+
+		SampleBufferV2& operator=(SampleBufferV2& other) = delete;
+		SampleBufferV2& operator=(SampleBufferV2&& other);
+
+		const std::vector<sampleFrame>& sampleData() const;
+		const std::optional<std::filesystem::path>& filePath() const;
+		int originalSampleRate() const;
+
+		std::string toBase64() const;
+		int numFrames() const;
+
+	private:
+		void loadFromAudioFile(const std::filesystem::path& audioFilePath);
+		void loadFromDrumSynthFile(const std::filesystem::path& drumSynthFilePath);
+		void loadFromBase64(const std::string& base64);
+		void resample(const int oldSampleRate, const int newSampleRate);
+
+	private:
+		std::vector<sampleFrame> m_sampleData;
+		std::optional<std::filesystem::path> m_filePath;
+		int m_originalSampleRate = 0;
+	};
+}
+
+#endif
