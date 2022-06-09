@@ -12,6 +12,8 @@
 #cmakedefine LMMS_HOST_ARM64
 #cmakedefine LMMS_HOST_RISCV32
 #cmakedefine LMMS_HOST_RISCV64
+#cmakedefine LMMS_HOST_PPC32
+#cmakedefine LMMS_HOST_PPC64
 
 #cmakedefine LMMS_HAVE_ALSA
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
@@ -41,7 +43,6 @@
 #cmakedefine LMMS_HAVE_SYS_TYPES_H
 #cmakedefine LMMS_HAVE_SYS_IPC_H
 #cmakedefine LMMS_HAVE_SEMAPHORE_H
-#cmakedefine LMMS_HAVE_SYS_SHM_H
 #cmakedefine LMMS_HAVE_SYS_TIME_H
 #cmakedefine LMMS_HAVE_SYS_TIMES_H
 #cmakedefine LMMS_HAVE_SCHED_H

@@ -27,6 +27,8 @@
 
 #include "RemotePluginBase.h"
 
+#include <stdexcept>
+
 #ifndef LMMS_BUILD_WIN32
 #	include <condition_variable>
 #	include <mutex>
@@ -36,18 +38,20 @@
 #	include <unistd.h>
 #endif
 
+#include "SharedMemory.h"
+
 class RemotePluginClient : public RemotePluginBase
 {
 public:
 #ifdef SYNC_WITH_SHM_FIFO
-	RemotePluginClient( key_t _shm_in, key_t _shm_out );
+	RemotePluginClient( const std::string& _shm_in, const std::string& _shm_out );
 #else
 	RemotePluginClient( const char * socketPath );
 #endif
 	virtual ~RemotePluginClient();
-#ifdef USE_QT_SHMEM
-	VstSyncData * getQtVSTshm();
-#endif
+
+	const VstSyncData* getVstSyncData();
+
 	virtual bool processMessage( const message & _m );
 
 	virtual void process( const sampleFrame * _in_buf,
@@ -55,11 +59,6 @@ public:
 
 	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
 	{
-	}
-
-	inline float * sharedMemory()
-	{
-		return m_shm;
 	}
 
 	virtual void updateSampleRate()
@@ -118,15 +117,12 @@ public:
 
 
 private:
-	void setShmKey( key_t _key, int _size );
+	void setShmKey(const std::string& key);
 	void doProcessing();
 
-#ifdef USE_QT_SHMEM
-	QSharedMemory m_shmObj;
-	QSharedMemory m_shmQtID;
-#endif
-	VstSyncData * m_vstSyncData;
-	float * m_shm;
+	SharedMemory<float[]> m_audioBuffer;
+	SharedMemory<const VstSyncData> m_vstSyncShm;
+	const VstSyncData* m_vstSyncData;
 
 	int m_inputCount;
 	int m_outputCount;
@@ -177,18 +173,13 @@ private:
 #endif
 
 #ifdef SYNC_WITH_SHM_FIFO
-RemotePluginClient::RemotePluginClient( key_t _shm_in, key_t _shm_out ) :
+RemotePluginClient::RemotePluginClient( const std::string& _shm_in, const std::string& _shm_out ) :
 	RemotePluginBase( new shmFifo( _shm_in ), new shmFifo( _shm_out ) ),
 #else
 RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	RemotePluginBase(),
 #endif
-#ifdef USE_QT_SHMEM
-	m_shmObj(),
-	m_shmQtID( "/usr/bin/lmms" ),
-#endif
 	m_vstSyncData( nullptr ),
-	m_shm( nullptr ),
 	m_inputCount( 0 ),
 	m_outputCount( 0 ),
 	m_sampleRate( 44100 ),
@@ -218,60 +209,23 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	}
 #endif
 
-#ifdef USE_QT_SHMEM
-	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
+	try
 	{
-		m_vstSyncData = (VstSyncData *) m_shmQtID.data();
+		m_vstSyncShm.attach("usr_bin_lmms");
+		m_vstSyncData = m_vstSyncShm.get();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
-		sendMessage( IdHostInfoGotten );
-		return;
 	}
-#else
-	key_t key;
-	int m_shmID;
-
-	if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
+	catch (const std::runtime_error&)
 	{
-		perror( "RemotePluginClient::ftok" );
-	}
-	else
-	{	// connect to shared memory segment
-		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
+		// if attaching shared memory fails
+		sendMessage( IdSampleRateInformation );
+		sendMessage( IdBufferSizeInformation );
+		if( waitForMessage( IdBufferSizeInformation ).id
+							!= IdBufferSizeInformation )
 		{
-			perror( "RemotePluginClient::shmget" );
+			fprintf( stderr, "Could not get buffer size information\n" );
 		}
-		else
-		{	// attach segment
-			m_vstSyncData = (VstSyncData *)shmat(m_shmID, 0, 0);
-			if( m_vstSyncData == (VstSyncData *)( -1 ) )
-			{
-				perror( "RemotePluginClient::shmat" );
-			}
-			else
-			{
-				m_bufferSize = m_vstSyncData->m_bufferSize;
-				m_sampleRate = m_vstSyncData->m_sampleRate;
-				sendMessage( IdHostInfoGotten );
-
-				// detach segment
-				if( shmdt(m_vstSyncData) == -1 )
-				{
-					perror("RemotePluginClient::shmdt");
-				}
-				return;
-			}
-		}
-	}
-#endif
-
-	// if attaching shared memory fails
-	sendMessage( IdSampleRateInformation );
-	sendMessage( IdBufferSizeInformation );
-	if( waitForMessage( IdBufferSizeInformation ).id
-						!= IdBufferSizeInformation )
-	{
-		fprintf( stderr, "Could not get buffer size information\n" );
 	}
 	sendMessage( IdHostInfoGotten );
 }
@@ -281,14 +235,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 
 RemotePluginClient::~RemotePluginClient()
 {
-#ifdef USE_QT_SHMEM
-	m_shmQtID.detach();
-#endif
 	sendMessage( IdQuit );
-
-#ifndef USE_QT_SHMEM
-	shmdt( m_shm );
-#endif
 
 #ifndef SYNC_WITH_SHM_FIFO
 	if ( close( m_socket ) == -1)
@@ -300,12 +247,12 @@ RemotePluginClient::~RemotePluginClient()
 
 
 
-#ifdef USE_QT_SHMEM
-VstSyncData * RemotePluginClient::getQtVSTshm()
+
+const VstSyncData* RemotePluginClient::getVstSyncData()
 {
 	return m_vstSyncData;
 }
-#endif
+
 
 
 
@@ -353,7 +300,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 			break;
 
 		case IdChangeSharedMemoryKey:
-			setShmKey( _m.getInt( 0 ), _m.getInt( 1 ) );
+			setShmKey(_m.getString(0));
 			break;
 
 		case IdInitDone:
@@ -378,43 +325,16 @@ bool RemotePluginClient::processMessage( const message & _m )
 
 
 
-void RemotePluginClient::setShmKey( key_t _key, int _size )
+void RemotePluginClient::setShmKey(const std::string& key)
 {
-#ifdef USE_QT_SHMEM
-	m_shmObj.setKey( QString::number( _key ) );
-	if( m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError )
+	try
 	{
-		m_shm = (float *) m_shmObj.data();
+		m_audioBuffer.attach(key);
 	}
-	else
+	catch (const std::runtime_error& error)
 	{
-		char buf[64];
-		sprintf( buf, "failed getting shared memory: %d\n", m_shmObj.error() );
-		debugMessage( buf );
+		debugMessage(std::string{"failed getting shared memory: "} + error.what() + '\n');
 	}
-#else
-	if( m_shm != nullptr )
-	{
-		shmdt( m_shm );
-		m_shm = nullptr;
-	}
-
-	// only called for detaching SHM?
-	if( _key == 0 )
-	{
-		return;
-	}
-
-	int shm_id = shmget( _key, _size, 0 );
-	if( shm_id == -1 )
-	{
-		debugMessage( "failed getting shared memory\n" );
-	}
-	else
-	{
-		m_shm = (float *) shmat( shm_id, 0, 0 );
-	}
-#endif
 }
 
 
@@ -422,10 +342,10 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 
 void RemotePluginClient::doProcessing()
 {
-	if( m_shm != nullptr )
+	if (m_audioBuffer)
 	{
-		process( (sampleFrame *)( m_inputCount > 0 ? m_shm : nullptr ),
-				(sampleFrame *)( m_shm +
+		process( (sampleFrame *)( m_inputCount > 0 ? m_audioBuffer.get() : nullptr ),
+				(sampleFrame *)( m_audioBuffer.get() +
 					( m_inputCount*m_bufferSize ) ) );
 	}
 	else
