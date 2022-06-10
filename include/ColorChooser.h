@@ -21,6 +21,9 @@
  *
  */
 
+#ifndef COLOR_CHOOSER_H
+#define COLOR_CHOOSER_H
+
 #include <QApplication>
 #include <QColor>
 #include <QColorDialog>
@@ -64,3 +67,6 @@ private:
 
 
 } // namespace lmms::gui
+
+#endif
+

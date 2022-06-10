@@ -73,6 +73,6 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_MP3LAME
 
 #endif

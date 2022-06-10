@@ -64,6 +64,6 @@ private:
 
 } // namespace lmms::gui
 
-#endif
+#endif // LMMS_HAVE_ALSA
 
 #endif

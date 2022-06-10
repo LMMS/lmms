@@ -90,6 +90,6 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_OSS
 
 #endif

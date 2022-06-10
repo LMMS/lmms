@@ -66,8 +66,8 @@ inline QPixmap getIconPixmap( const QString&  _name,
 //QString getText( const char * _name );
 
 }
-#endif
 
+#endif // PLUGIN_NAME
 
 
 class PixmapLoader
@@ -136,7 +136,7 @@ public:
 	}
 
 } ;
-#endif
+#endif // PLUGIN_NAME
 
 
 } // namespace lmms
