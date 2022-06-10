@@ -352,15 +352,35 @@ void Mixer::toggleAutoTrackLink(int index)
 }
 
 
-bool Mixer::autoLinkTrackConfigEnabled()
+Mixer::autoTrackLinkSettings Mixer::getAutoLinkTrackSettings()
 {
-	return ConfigManager::inst()->value("ui", "autoLinkTrackConfig").toInt() == 1;
+	autoTrackLinkSettings settings;
+	auto cfg = ConfigManager::inst();
+	auto enabledAsString = cfg->value("ui", AUTOTRACK_CONFIGPREFIX);
+	if (enabledAsString != "")
+	{
+		settings.enabled = enabledAsString.toInt() == 1;
+		settings.linkName = (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_linkName").toInt() == 1);
+		settings.linkColor = (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_linkColor").toInt() == 1);
+		settings.autoAdd = (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_autoAdd").toInt() == 1);
+		settings.autoDelete = (cfg->value("ui",AUTOTRACK_CONFIGPREFIX+"_autoDelete").toInt() == 1);
+		settings.linkPatternEditor = (autoTrackLinkSettings::LinkPatternEditor) (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_linkPatternEditor").toInt());
+		settings.sort = (autoTrackLinkSettings::AutoSort) (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_sort").toInt());
+	}
+	return settings;
 }
 
-void Mixer::autoLinkTrackConfigSet(bool value)
+void Mixer::saveAutoLinkTrackSettings(autoTrackLinkSettings settings)
 {
-	ConfigManager::inst()->setValue("ui", "autoLinkTrackConfig", QString::number(value));
-	ConfigManager::inst()->saveConfigFile();
+	auto cfg = ConfigManager::inst();
+	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX, QString::number(settings.enabled));
+	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_linkName", QString::number(settings.linkName));
+	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_linkColor", QString::number(settings.linkColor));
+	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_autoAdd", QString::number(settings.autoAdd));
+	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_autoDelete", QString::number(settings.autoDelete));
+	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_linkPatternEditor", QString::number((int)settings.linkPatternEditor));
+	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_sort", QString::number((int)settings.sort));
+	cfg->saveConfigFile();
 }
 
 
@@ -391,14 +411,28 @@ void Mixer::processChannelTracks(MixerChannel * channel, std::function<void(Trac
 	});
 }
 
+
 bool Mixer::isAutoTrackLinkToggleAllowed(int index)
 {
-	if (!Engine::mixer()->autoLinkTrackConfigEnabled()) return false;
-	if (mixerChannel( index )->m_autoTrackLinkModel.value()) return true;
-
-	std::vector<int> usedChannelCounts = getUsedChannelCounts();
-	return usedChannelCounts[index] == 1;
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled) return false;
+	if (mixerChannel( index )->m_autoTrackLinkModel.value()) return true;	
+	if (settings.linkName)
+	{
+		std::vector<int> usedChannelCounts = getUsedChannelCounts();
+		return usedChannelCounts[index] == 1;
+	}
+	return true;
 }
+
+/*
+bool Mixer::autoLinkTrackConfigEnabled()
+{
+	auto settings =mix->getAutoLinkTrackSettings();
+}
+*/
+
 
 
 void Mixer::processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process)

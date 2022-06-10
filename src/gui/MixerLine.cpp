@@ -264,7 +264,7 @@ void MixerLine::contextMenuEvent( QContextMenuEvent * )
 
 		actionMoveleft->setEnabled(m_channelIndex > 1);
 		actionMoveRight->setEnabled((m_channelIndex +1) < mix->numChannels());
-		actionToggleAutoTrackLink->setEnabled(mix->autoLinkTrackConfigEnabled() && mix->isAutoTrackLinkToggleAllowed(m_channelIndex));
+		actionToggleAutoTrackLink->setEnabled(mix->isAutoTrackLinkToggleAllowed(m_channelIndex));
 	}
 
 	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );

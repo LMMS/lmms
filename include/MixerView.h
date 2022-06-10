@@ -146,7 +146,8 @@ private:
 	void swapChannels(int indexA, int indexB);
 	void updateAutoTrackSortOrder();
 	void deleteChannelInternal(int index);
-	void setAutoLinkTrackConfig(bool value);
+	void setAutoLinkTrackConfig(bool enabled);
+	void setAutoTrackConstraints();
 	
 	friend class MixerChannelView;
 } ;

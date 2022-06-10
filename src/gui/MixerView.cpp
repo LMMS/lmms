@@ -144,9 +144,9 @@ MixerView::MixerView() :
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
 	bl->addWidget(newChannelBtn, 0, Qt::AlignTop );
 
-	m_toogleAutoLinkTrackConfigBtn = new QPushButton( embed::getIconPixmap( "exp_wave_inactive" ), QString(), this );
+	m_toogleAutoLinkTrackConfigBtn = new QPushButton(QString(), this );
 	connect( m_toogleAutoLinkTrackConfigBtn, SIGNAL( clicked() ), this, SLOT(toogleAutoLinkTrackConfig()));
-	setAutoLinkTrackConfig(Engine::mixer()->autoLinkTrackConfigEnabled());
+	setAutoLinkTrackConfig(Engine::mixer()->getAutoLinkTrackSettings().enabled);
 	bl->addWidget(m_toogleAutoLinkTrackConfigBtn, 0, Qt::AlignTop );
 
 	// add the stacked layout for the effect racks of mixer channels
@@ -186,9 +186,10 @@ MixerView::~MixerView()
 }
 
 void MixerView::updateAfterTrackAdd(Track * track, QString name)
-{	
-	Mixer * mix = Engine::mixer();
-	if (!mix->autoLinkTrackConfigEnabled()) return;
+{
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled || !settings.autoAdd) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != nullptr)
 	{
@@ -197,6 +198,7 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name)
 		mix->mixerChannel(channelIndex)->m_autoTrackLinkModel.setValue(true);
 		m_mixerChannelViews[channelIndex]->m_mixerLine->autoTrackLinkChanged();
 
+		// it may be that the track name is not available yet because of async loading
 		if (name != "") track->setName(name);
 		updateAfterTrackStyleModify(track);
 
@@ -206,8 +208,9 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name)
 
 void MixerView::updateAfterTrackStyleModify(Track * track)
 {
-	Mixer * mix = Engine::mixer();
-	if (!mix->autoLinkTrackConfigEnabled()) return;
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();	
+	if (!settings.enabled || !settings.linkStyles()) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != nullptr)
 	{
@@ -217,9 +220,15 @@ void MixerView::updateAfterTrackStyleModify(Track * track)
 			MixerChannel * channel = mix->mixerChannel(channelIndex);
 			if (channel->m_autoTrackLinkModel.value())
 			{
-				channel->m_name = track->name();
-				channel->setColor (track->color());
-				channel->m_hasColor = track->useColor();
+				if (settings.linkName)
+				{
+					channel->m_name = track->name();
+				}
+				if (settings.linkColor)
+				{
+					channel->setColor (track->color());
+					channel->m_hasColor = track->useColor();
+				}
 				setCurrentMixerLine(channelIndex);
 			}
 		}
@@ -228,32 +237,41 @@ void MixerView::updateAfterTrackStyleModify(Track * track)
 
 void MixerView::updateAfterTrackMixerLineModify(Track * track)
 {
-	Mixer * mix = Engine::mixer();
-	if (!mix->autoLinkTrackConfigEnabled()) return;
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != nullptr)
 	{
-		// check if there are more than one track pointing to the same mixer channel
-		// if yes disable the autotracklink		
-		bool needUpdate = false;
-		std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
-		for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
-		{
-			if (usedChannelCounts[i] == 0 || usedChannelCounts[i] > 1)
-			{
-				mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
-				m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
-				needUpdate = true;
-			}
-		}
-		if (needUpdate) updateAutoTrackSortOrder();
+		setAutoTrackConstraints();
 	}
+}
+
+void MixerView::setAutoTrackConstraints()
+{
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled) return;
+	std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
+	bool wasModified = false;
+	for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
+	{
+		// no more linked tracks or too many linked tracks (if name linking is enabled)
+		if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 && settings.linkName))
+		{
+			mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
+			m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
+			wasModified = true;
+		}
+	}
+	if (wasModified) updateAutoTrackSortOrder();
 }
 
 void MixerView::updateAfterTrackMove(Track * track)
 {
-	Mixer * mix = Engine::mixer();
-	if (!mix->autoLinkTrackConfigEnabled()) return;
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled || settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if (model != nullptr)
 	{
@@ -271,8 +289,9 @@ void MixerView::updateAfterTrackMove(Track * track)
 
 void MixerView::updateAfterTrackDelete(Track * track)
 {
-	Mixer * mix = Engine::mixer();
-	if (!mix->autoLinkTrackConfigEnabled()) return;
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != nullptr)
 	{
@@ -282,28 +301,39 @@ void MixerView::updateAfterTrackDelete(Track * track)
 			MixerChannel * channel = mix->mixerChannel(channelIndex);
 			if (channel->m_autoTrackLinkModel.value())
 			{
-				deleteChannel(channelIndex);
-				updateAutoTrackSortOrder();
+				bool shouldDelete = true;
+				if (!settings.linkName)
+				{
+					// if we don't have a 1.1 name link we make sure that no track is left.
+					std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
+					shouldDelete = usedChannelCounts[channelIndex] == 0;
+				}
+				if (shouldDelete)
+				{
+					deleteChannel(channelIndex);
+					updateAutoTrackSortOrder();
+				}
 			}
 		}
 	}
 }
 
-
-void MixerView::setAutoLinkTrackConfig(bool value)
+void MixerView::setAutoLinkTrackConfig(bool enabled)
 {
-	Engine::mixer()->autoLinkTrackConfigSet(value);
-	m_toogleAutoLinkTrackConfigBtn->setIcon(value ? embed::getIconPixmap( "exp_wave_active" ) : embed::getIconPixmap( "exp_wave_inactive" ));
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	settings.enabled = enabled;
+	mix->saveAutoLinkTrackSettings(settings);
+	m_toogleAutoLinkTrackConfigBtn->setIcon(enabled ? embed::getIconPixmap( "exp_wave_active" ) : embed::getIconPixmap( "exp_wave_inactive" ));
+	setAutoTrackConstraints();
 }
 
 void MixerView::toogleAutoLinkTrackConfig()
 {
-	bool cur = Engine::mixer()->autoLinkTrackConfigEnabled();
-	setAutoLinkTrackConfig(!cur);
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	setAutoLinkTrackConfig(!settings.enabled);
 }
-
-
-
 
 int MixerView::addNewChannel()
 {
@@ -326,7 +356,10 @@ int MixerView::addNewChannel()
 
 void MixerView::updateAutoTrackSortOrder()
 {
-	Mixer * mix = Engine::mixer();	
+	Mixer * mix = Engine::mixer();		
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled || settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled) return;
+
 	std::vector<int> list(m_mixerChannelViews.size(), 0);
 
 	int c = 0;
@@ -348,7 +381,7 @@ void MixerView::updateAutoTrackSortOrder()
 			list[c++] = model->value();
 		}
 	});
-	return;
+	return;  // ignore for now
 
 
 	// bubblesort here because the list is normally almost ordered
@@ -623,8 +656,9 @@ void MixerView::deleteUnusedChannels()
 
 void MixerView::toggleAutoTrackLink(int index)
 {
-	Mixer * mix = Engine::mixer();
-	if (!mix->autoLinkTrackConfigEnabled()) return;
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled) return;
 	mix->toggleAutoTrackLink(index);
 	m_mixerChannelViews[index]->m_mixerLine->autoTrackLinkChanged();
 	MixerChannel *  channel = mix->mixerChannel(index);
