@@ -30,9 +30,24 @@
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
 
+#ifdef LMMS_HAVE_PORTAUDIO
+
+#   include <portaudio.h>
+
+#   include "AudioDevice.h"
+#   include "AudioDeviceSetupWidget.h"
+
+#   if defined paNeverDropInput || defined paNonInterleaved
+#	    define PORTAUDIO_V19
+#   else
+#	    define PORTAUDIO_V18
+#   endif
+
+#endif
+
+
 namespace lmms
 {
-
 
 class AudioPortAudioSetupUtil : public QObject
 {
@@ -48,31 +63,14 @@ public:
 };
 
 
-}
-
 #ifdef LMMS_HAVE_PORTAUDIO
-
-#include <portaudio.h>
-
-
-#include "AudioDevice.h"
-#include "AudioDeviceSetupWidget.h"
-
-#if defined paNeverDropInput || defined paNonInterleaved
-#	define PORTAUDIO_V19
-#else
-#	define PORTAUDIO_V18
-#endif
-
-namespace lmms
-{
 
 
 namespace gui
 {
 class ComboBox;
 class LcdSpinBox;
-} // namespace gui
+}
 
 
 class AudioPortAudio : public AudioDevice
@@ -161,9 +159,8 @@ private:
 
 } ;
 
+#endif // LMMS_HAVE_PORTAUDIO
 
 } // namespace lmms
-
-#endif // LMMS_HAVE_PORTAUDIO
 
 #endif

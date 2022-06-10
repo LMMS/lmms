@@ -35,9 +35,8 @@ namespace lmms
 
 class EffectControls;
 
-} // namespace lmms
 
-namespace lmms::gui
+namespace gui
 {
 
 class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
@@ -61,6 +60,8 @@ protected:
 
 } ;
 
-} // namespace lmms::gui
+} // namespace gui
+
+} // namespace lmms
 
 #endif

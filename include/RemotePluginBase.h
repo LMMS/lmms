@@ -83,7 +83,12 @@
 #include <unistd.h>
 #endif
 
-#endif
+#endif // BUILD_REMOTE_PLUGIN_CLIENT
+
+
+namespace lmms
+{
+
 
 #ifdef SYNC_WITH_SHM_FIFO
 
@@ -668,5 +673,7 @@ private:
 #endif
 
 } ;
+
+} // namespace lmms
 
 #endif // REMOTE_PLUGIN_BASE_H
