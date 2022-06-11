@@ -153,19 +153,17 @@ void MidiClipView::transposeSelection()
 	{
 		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
 		{
-			TimePos start, end;
-			int low, high;
-			if (mcv->getMidiClip()->notes().getBounds(start, end, low, high))
+			if (auto bounds = getNoteBounds(mcv->getMidiClip()->notes()))
 			{
-				lowest = std::min(low, lowest);
-				highest = std::max(high, highest);
+				lowest = std::min(bounds->lowest, lowest);
+				highest = std::max(bounds->highest, highest);
 			}
 		}
 	}
 
-	int minStep = 0 - lowest;
-	int maxStep = NumKeys - 1 - highest;
-	int semitones = QInputDialog::getInt(this, tr("Transpose"), tr("Semitones to transpose:"), 0, minStep, maxStep, 1);
+	int semitones = QInputDialog::getInt(this, tr("Transpose"), tr("Semitones to transpose by:"),
+		/*start*/ 0, /*min*/ -lowest, /*max*/ (NumKeys - 1 - highest));
+
 	if (semitones == 0) { return; }
 
 	// TODO make this not crash
@@ -174,20 +172,24 @@ void MidiClipView::transposeSelection()
 	QSet<Track*> m_changedTracks;
 	for (ClipView* clipview: selection)
 	{
-		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
+		auto mcv = dynamic_cast<MidiClipView*>(clipview);
+		if (!mcv) { continue; }
+
+		auto clip = mcv->getMidiClip();
+		if (clip->notes().empty()) { continue; }
+
+		auto track = clipview->getTrackView()->getTrack();
+		if (!m_changedTracks.contains(track))
 		{
-			auto track = clipview->getTrackView()->getTrack();
-			if (!m_changedTracks.contains(track))
-			{
-				track->addJournalCheckPoint();
-				m_changedTracks.insert(track);
-			}
-			auto clip = mcv->getMidiClip();
-			if (clip->notes().transpose(semitones))
-			{
-				emit clip->dataChanged();
-			}
+			track->addJournalCheckPoint();
+			m_changedTracks.insert(track);
 		}
+
+		for (Note* note: clip->notes())
+		{
+			note->setKey(note->key() + semitones);
+		}
+		emit clip->dataChanged();
 	}
 	// At least one clip must have notes to show the transpose dialog, so something *has* changed
 	Engine::getSong()->setModified();
@@ -219,7 +221,7 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 			tr( "Clear all notes" ), m_clip, SLOT( clear() ) );
 	if (!isBeat)
 	{
-		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, SLOT(transposeSelection()));
+		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
 	}
 	_cm->addSeparator();
 

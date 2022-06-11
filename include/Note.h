@@ -26,6 +26,7 @@
 #ifndef NOTE_H
 #define NOTE_H
 
+#include <optional>
 #include <QVector>
 
 #include "volume.h"
@@ -244,14 +245,18 @@ private:
 };
 
 
+typedef QVector<Note *> NoteVector;
 
 
-class NoteVector: public QVector<Note*>
+struct NoteBounds
 {
-public:
-	bool getBounds(TimePos& start, TimePos& end, int& lower, int& upper) const;
-	bool transpose(int semitones) const;
+	TimePos start;
+	TimePos end;
+	int lowest;
+	int highest;
 };
 
+
+std::optional<NoteBounds> getNoteBounds(const NoteVector& notes);
 
 #endif

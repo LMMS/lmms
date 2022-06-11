@@ -236,28 +236,20 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 
 
 
-
-
-
-
-/*! \brief Get the outer bounds of the notes
+/*! \brief Get the start/end/bottom/top positions of notes in a vector
  *
- *  \param start - Will be set to the first time position
- *  \param end - Will be set to the last end position
- *  \param lower - Will be set to the lowest key
- *  \param upper - Will be set to the highest key
- *  \return false if there are no notes
+ *  Returns no value if there are no notes
  */
-bool NoteVector::getBounds(TimePos& start, TimePos& end, int& lower, int& upper) const
+std::optional<NoteBounds> getNoteBounds(const NoteVector& notes)
 {
-	if (empty()) { return false; }
+	if (notes.empty()) { return {}; }
 
-	start = first()->pos();
-	end = start;
-	lower = first()->key();
-	upper = lower;
+	TimePos start = notes.front()->pos();
+	TimePos end = start;
+	int lower = notes.front()->key();
+	int upper = lower;
 
-	for (const Note* note: *this)
+	for (const Note* note: notes)
 	{
 		// TODO should we assume that NoteVector is always sorted correctly,
 		// so first() always has the lowest time position?
@@ -267,26 +259,5 @@ bool NoteVector::getBounds(TimePos& start, TimePos& end, int& lower, int& upper)
 		upper = std::max(upper, note->key());
 	}
 
-	return true;
-}
-
-
-
-
-/*! \brief Transpose all notes in the vector by X semitones
- *
- *  Notes will be hard-clipped to the MIDI note range. To prevent this use getBounds() prior to transposing.
- *
- *  \param semitones Semitones to transpose
- *  \return bool True if notes were transposed
- */
-bool NoteVector::transpose(int semitones) const
-{
-	if (empty() || !semitones) { return false; }
-
-	for (Note* note: *this)
-	{
-		note->setKey(note->key() + semitones);
-	}
-	return true;
+	return NoteBounds{start, end, lower, upper};
 }

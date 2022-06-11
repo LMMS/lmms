@@ -347,11 +347,6 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 
 
-
-
-
-
-
 void MidiClip::setType( MidiClipTypes _new_clip_type )
 {
 	if( _new_clip_type == BeatClip ||

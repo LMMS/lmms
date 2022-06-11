@@ -58,7 +58,6 @@ void JournallingObject::addJournalCheckPoint()
 	if( isJournalling() )
 	{
 		Engine::projectJournal()->addJournalCheckPoint( this );
-		// TODO Engine::getSong()->setModified() ?
 	}
 }
 
