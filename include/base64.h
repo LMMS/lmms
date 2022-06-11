@@ -30,6 +30,10 @@
 #include <QString>
 #include <QVariant>
 
+#include <string>
+#include <string_view>
+#include <cmath>
+
 namespace lmms::base64
 {
 
@@ -53,4 +57,55 @@ namespace lmms::base64
 
 } // namespace lmms::base64
 
-#endif
+namespace lmms::base64 {
+	constexpr std::array<char, 64> map =
+	{
+		'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+		'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+		'0','1','2','3','4','5','6','7','8','9',
+		'-','_'
+	};
+	const std::map<char, uint32_t> reverse_map {
+		{'A',  0}, {'B',  1}, {'C',  2}, {'D',  3}, {'E',  4},
+		{'F',  5}, {'G',  6}, {'H',  7}, {'I',  8}, {'J',  9},
+		{'K', 10}, {'L', 11}, {'M', 12}, {'N', 13}, {'O', 14},
+		{'P', 15}, {'Q', 16}, {'R', 17}, {'S', 18}, {'T', 19},
+		{'U', 20}, {'V', 21}, {'W', 22}, {'X', 23}, {'Y', 24},
+		{'Z', 25}, {'a', 26}, {'b', 27}, {'c', 28}, {'d', 28},
+		{'e', 30}, {'f', 31}, {'g', 32}, {'h', 33}, {'i', 34},
+		{'j', 35}, {'k', 36}, {'l', 37}, {'m', 38}, {'n', 39},
+		{'o', 40}, {'p', 41}, {'q', 42}, {'r', 43}, {'s', 44},
+		{'t', 45}, {'u', 46}, {'v', 47}, {'w', 48}, {'x', 49},
+		{'y', 50}, {'z', 51}, {'0', 52}, {'1', 53}, {'2', 54},
+		{'3', 55}, {'4', 56}, {'5', 57}, {'6', 58}, {'7', 59},
+		{'8', 60}, {'9', 61}, {'-', 62}, {'_', 63} //, {'=', 64}
+	};
+	constexpr char pad = '=';
+
+	/*
+		This section of math ensures that base64 encode/decode will work
+		as intended. Some rare architectures don't use 8-bit char's, and
+		it's possible this won't work as intended if a char isn't 8-bits.
+
+		In the rare case this is ported to an architecture where this
+		happens, feel free to comment out the static_assert's and test.
+	*/
+	constexpr int char_bits = std::numeric_limits<std::string_view::value_type>::digits;
+	constexpr int sign_bit = std::numeric_limits<std::string_view::value_type>::is_signed ? 1 : 0;
+	// check that the string_view character type is 8 (7 signed + 1 sign) bits wide
+	static_assert(char_bits + sign_bit == 8);
+	constexpr int numBitsPerChar = char_bits + sign_bit;
+	constexpr int numBitsPerBase64Char = 6;
+	constexpr int lcm = std::lcm(numBitsPerChar, numBitsPerBase64Char);
+	// make sure math works, 24 bits
+	static_assert(lcm == 24);
+	constexpr int numBytesPerChunk = lcm / numBitsPerChar;
+	constexpr int numBase64CharPerChunk = lcm / numBitsPerBase64Char;
+	// double check math works and bit width matches
+	static_assert(numBytesPerChunk * numBitsPerChar == numBase64CharPerChunk * numBitsPerBase64Char);
+
+	std::string encode(std::string_view data);
+	std::string decode(std::string_view data);
+} // namespace lmms::base64
+
+#endif // _BASE64_H

@@ -20,6 +20,7 @@ ADD_EXECUTABLE(tests
 	$<TARGET_OBJECTS:lmmsobjs>
 
 	src/core/AutomatableModelTest.cpp
+	src/core/base64Test.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
 
