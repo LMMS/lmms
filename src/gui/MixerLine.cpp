@@ -259,12 +259,17 @@ void MixerLine::contextMenuEvent( QContextMenuEvent * )
 		QAction * actionMoveleft =contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
 		QAction * actionMoveRight =contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
 
-		QString marker = (autoTrackLink ? " *" : "");
-		QAction * actionToggleAutoTrackLink = contextMenu->addAction( tr("Auto track link") + marker, this, SLOT( toogleAutoTrackLink() ) );
+		auto settings =mix->getAutoLinkTrackSettings();
+		if (settings.enabled)
+		{
+			// we don't show the menu entry if the auto link functionality is completely disabled
+			QString marker = (autoTrackLink ? " *" : "");
+			QAction * actionToggleAutoTrackLink = contextMenu->addAction( tr("Auto track link") + marker, this, [this](){ toogleAutoTrackLink(); } );
+			actionToggleAutoTrackLink->setEnabled(mix->isAutoTrackLinkToggleAllowed(m_channelIndex));
+		}
 
 		actionMoveleft->setEnabled(m_channelIndex > 1);
 		actionMoveRight->setEnabled((m_channelIndex +1) < mix->numChannels());
-		actionToggleAutoTrackLink->setEnabled(mix->isAutoTrackLinkToggleAllowed(m_channelIndex));
 	}
 
 	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );

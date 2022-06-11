@@ -142,10 +142,8 @@ class MixerRoute : public QObject
 
 class LMMS_EXPORT Mixer : public Model, public JournallingObject
 {
-
 	Q_OBJECT
 public:
-
 	struct autoTrackLinkSettings
 	{
 		enum class AutoSort
@@ -173,6 +171,16 @@ public:
 		bool linkStyles()
 		{
 			return linkColor || linkName;
+		}
+
+		bool linkNameAndColor()
+		{
+			return linkColor && linkName;
+		}
+
+		bool linkColorOnly()
+		{
+			return linkColor && !linkName;
 		}
 
 		autoTrackLinkSettings()

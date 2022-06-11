@@ -111,7 +111,7 @@ public:
 	void refreshDisplay();
 
 	// Auto track link support	
-	void updateAfterTrackAdd(Track * track, QString name = "");
+	void updateAfterTrackAdd(Track * track, QString name = "", bool isPatternEditor = false);
 	void updateAfterTrackStyleModify(Track * track);
 	void updateAfterTrackMixerLineModify(Track * track);
 	void updateAfterTrackMove(Track * track);
@@ -128,6 +128,7 @@ protected:
 private slots:
 	void updateFaders();
 	void toggledSolo();
+	void updateMenu();
 	void toogleAutoLinkTrackConfig();
 
 private:
@@ -141,14 +142,15 @@ private:
 	QStackedLayout * m_racksLayout;
 	QWidget * m_racksWidget;
 	QPushButton * m_toogleAutoLinkTrackConfigBtn;
+	QPushButton * m_autoLinkTrackSettingsBtn;
 
 	void updateMaxChannelSelector();
 	void swapChannels(int indexA, int indexB);
-	void updateAutoTrackSortOrder();
+	void updateAutoTrackSortOrder(bool autoSort = true);
 	void deleteChannelInternal(int index);
 	void setAutoLinkTrackConfig(bool enabled);
 	void setAutoTrackConstraints();
-	
+
 	friend class MixerChannelView;
 } ;
 

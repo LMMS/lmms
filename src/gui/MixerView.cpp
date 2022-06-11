@@ -22,7 +22,7 @@
  *
  */
 
-
+#include <QMenu>
 #include <QLayout>
 #include <QPushButton>
 #include <QScrollArea>
@@ -45,6 +45,7 @@
 #include "Song.h"
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
+#include "gui_templates.h"
 
 namespace lmms::gui
 {
@@ -141,13 +142,26 @@ MixerView::MixerView() :
 	// show the add new mixer channel button
 	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
-	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
+	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
+	//ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 	bl->addWidget(newChannelBtn, 0, Qt::AlignTop );
 
-	m_toogleAutoLinkTrackConfigBtn = new QPushButton(QString(), this );
-	connect( m_toogleAutoLinkTrackConfigBtn, SIGNAL( clicked() ), this, SLOT(toogleAutoLinkTrackConfig()));
+	QMenu * toMenu = new QMenu(this );
+	toMenu->setFont( pointSize<9>( toMenu->font() ) );
+	connect( toMenu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
+
+	m_autoLinkTrackSettingsBtn = new QPushButton(embed::getIconPixmap( "trackop" ),QString(), this);
+	m_autoLinkTrackSettingsBtn->move( 12, 1 );
+	m_autoLinkTrackSettingsBtn->setFocusPolicy( Qt::NoFocus );
+	m_autoLinkTrackSettingsBtn->setMenu( toMenu );
+	m_autoLinkTrackSettingsBtn->setToolTip(tr("Auto track link settings"));
+	bl->addWidget(m_autoLinkTrackSettingsBtn, 0, Qt::AlignTop );
+
+	m_toogleAutoLinkTrackConfigBtn = new QPushButton(this);
+	connect( m_toogleAutoLinkTrackConfigBtn, SIGNAL(clicked()), this, SLOT(toogleAutoLinkTrackConfig()));
 	setAutoLinkTrackConfig(Engine::mixer()->getAutoLinkTrackSettings().enabled);
 	bl->addWidget(m_toogleAutoLinkTrackConfigBtn, 0, Qt::AlignTop );
+
 
 	// add the stacked layout for the effect racks of mixer channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
@@ -185,7 +199,101 @@ MixerView::~MixerView()
 	}
 }
 
-void MixerView::updateAfterTrackAdd(Track * track, QString name)
+
+void MixerView::updateMenu()
+{
+	QMenu* toMenu = m_autoLinkTrackSettingsBtn->menu();
+	toMenu->clear();
+
+	// no widget but same approach as for CaptionMenu
+
+	QAction * captionMain = toMenu->addAction( "Auto track linking" );
+	captionMain->setEnabled( false );
+	QMenu* sortMenu = toMenu->addMenu(tr("Sort"));
+
+	QMenu* settingsMenu = toMenu->addMenu(tr("Settings"));
+	QMenu* linkTypeMenu = settingsMenu->addMenu(tr("Link type"));
+	QMenu* sortAutoMenu = settingsMenu->addMenu(tr("Automatic sorting"));
+	QMenu* patternEditorMenu = settingsMenu->addMenu(tr("Pattern Editor"));
+
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+
+	linkTypeMenu->addAction( tr("Name and color") +
+		(settings.linkNameAndColor() ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.linkName = true;
+		settings.linkColor = true;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+	linkTypeMenu->addAction( tr("Color only") +
+		(settings.linkColorOnly() ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.linkName = false;
+		settings.linkColor = true;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+
+	sortMenu->addAction( tr("Song Editor -> Pattern Editor"), this, [this]()
+	{
+		updateAutoTrackSortOrder(false);
+	});
+	sortMenu->addAction( tr("Pattern Editor -> Song Editor"), this, [this]()
+	{
+		updateAutoTrackSortOrder(false);
+	});
+
+	sortAutoMenu->addAction(
+		tr("Disabled") +(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.sort = Mixer::autoTrackLinkSettings::AutoSort::Disabled;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+	sortAutoMenu->addAction( tr("Song Editor -> Pattern Editor") +
+		(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::LinkedPattern ? " *" :""),
+		this, [this, &settings, &mix]()
+	{
+		settings.sort = Mixer::autoTrackLinkSettings::AutoSort::LinkedPattern;
+		mix->saveAutoLinkTrackSettings(settings);
+		updateAutoTrackSortOrder();
+	});
+	sortAutoMenu->addAction( tr("Pattern Editor - > Song Editor") +
+		(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::PatternLinked ? " *" :""),
+		this, [this, &settings, &mix]()
+	{
+		settings.sort = Mixer::autoTrackLinkSettings::AutoSort::PatternLinked;
+		mix->saveAutoLinkTrackSettings(settings);
+		updateAutoTrackSortOrder();
+	});
+
+	patternEditorMenu->addAction( tr("Disabled") +
+		(settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::Disabled ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.linkPatternEditor = Mixer::autoTrackLinkSettings::LinkPatternEditor::Disabled;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+	patternEditorMenu->addAction( tr("Each separate") +
+		(settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::Default ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.linkPatternEditor = Mixer::autoTrackLinkSettings::LinkPatternEditor::Default;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+	patternEditorMenu->addAction( tr("Use first track channel") +
+		(settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::UseFirstTrackOnly ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.linkPatternEditor = Mixer::autoTrackLinkSettings::LinkPatternEditor::UseFirstTrackOnly;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+
+}
+
+void MixerView::updateAfterTrackAdd(Track * track, QString name, bool isPatternEditor)
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
@@ -193,6 +301,26 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name)
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != nullptr)
 	{
+
+		if (isPatternEditor)
+		{
+			if (settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::Disabled) return;
+
+			if (settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::UseFirstTrackOnly)
+			{
+				auto trackList = Engine::patternStore()->tracks();
+				if (!trackList.empty())
+				{
+					IntModel * firstTrackModel = mix->getChannelModelByTrack(trackList.first());
+					if ( firstTrackModel != nullptr)
+					{
+						model->setValue(firstTrackModel->value());
+					}
+				}
+				return;
+			}
+		}
+
 		int channelIndex = addNewChannel();
 		model->setValue( channelIndex );
 		mix->mixerChannel(channelIndex)->m_autoTrackLinkModel.setValue(true);
@@ -263,6 +391,7 @@ void MixerView::setAutoTrackConstraints()
 			m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 			wasModified = true;
 		}
+		m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 	}
 	if (wasModified) updateAutoTrackSortOrder();
 }
@@ -324,7 +453,7 @@ void MixerView::setAutoLinkTrackConfig(bool enabled)
 	auto settings =mix->getAutoLinkTrackSettings();
 	settings.enabled = enabled;
 	mix->saveAutoLinkTrackSettings(settings);
-	m_toogleAutoLinkTrackConfigBtn->setIcon(enabled ? embed::getIconPixmap( "exp_wave_active" ) : embed::getIconPixmap( "exp_wave_inactive" ));
+	m_toogleAutoLinkTrackConfigBtn->setIcon(enabled ? embed::getIconPixmap( "auto_link_active" ) : embed::getIconPixmap( "auto_link_inactive" ));
 	setAutoTrackConstraints();
 }
 
@@ -354,11 +483,12 @@ int MixerView::addNewChannel()
 	return newChannelIndex;
 }
 
-void MixerView::updateAutoTrackSortOrder()
+void MixerView::updateAutoTrackSortOrder(bool autoSort)
 {
-	Mixer * mix = Engine::mixer();		
+	Mixer * mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
-	if (!settings.enabled || settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled) return;
+	if (!settings.enabled) return;
+	if (autoSort && settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled) return;
 
 	std::vector<int> list(m_mixerChannelViews.size(), 0);
 
@@ -381,8 +511,6 @@ void MixerView::updateAutoTrackSortOrder()
 			list[c++] = model->value();
 		}
 	});
-	return;  // ignore for now
-
 
 	// bubblesort here because the list is normally almost ordered
 	bool swapped = false;
