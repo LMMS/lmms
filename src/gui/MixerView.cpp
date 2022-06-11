@@ -158,6 +158,7 @@ MixerView::MixerView() :
 	bl->addWidget(m_autoLinkTrackSettingsBtn, 0, Qt::AlignTop );
 
 	m_toogleAutoLinkTrackConfigBtn = new QPushButton(this);
+	m_toogleAutoLinkTrackConfigBtn->setToolTip(tr("Enable/Disable auto track link"));
 	connect( m_toogleAutoLinkTrackConfigBtn, SIGNAL(clicked()), this, SLOT(toogleAutoLinkTrackConfig()));
 	setAutoLinkTrackConfig(Engine::mixer()->getAutoLinkTrackSettings().enabled);
 	bl->addWidget(m_toogleAutoLinkTrackConfigBtn, 0, Qt::AlignTop );
@@ -212,14 +213,17 @@ void MixerView::updateMenu()
 	QMenu* sortMenu = toMenu->addMenu(tr("Sort"));
 
 	QMenu* settingsMenu = toMenu->addMenu(tr("Settings"));
-	QMenu* linkTypeMenu = settingsMenu->addMenu(tr("Link type"));
+	QMenu* linkModeMenu = settingsMenu->addMenu(tr("Link mode"));
+	QMenu* linkStyleMenu = settingsMenu->addMenu(tr("Link style type"));
 	QMenu* sortAutoMenu = settingsMenu->addMenu(tr("Automatic sorting"));
-	QMenu* patternEditorMenu = settingsMenu->addMenu(tr("Pattern Editor"));
+	QMenu* addAutoMenu = settingsMenu->addMenu(tr("Automatic add"));
+	QMenu* deleteAutoMenu = settingsMenu->addMenu(tr("Automatic delete"));
+	//QMenu* patternEditorMenu = settingsMenu->addMenu(tr("Pattern Editor"));
 
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
 
-	linkTypeMenu->addAction( tr("Name and color") +
+	linkStyleMenu->addAction( tr("Name and color") +
 		(settings.linkNameAndColor() ? " *" :""),
 		this, [&settings, &mix]()
 	{
@@ -227,7 +231,7 @@ void MixerView::updateMenu()
 		settings.linkColor = true;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
-	linkTypeMenu->addAction( tr("Color only") +
+	linkStyleMenu->addAction( tr("Color only") +
 		(settings.linkColorOnly() ? " *" :""),
 		this, [&settings, &mix]()
 	{
@@ -235,6 +239,24 @@ void MixerView::updateMenu()
 		settings.linkColor = true;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
+
+	linkModeMenu->addAction( tr("One track to one channel") +
+		(settings.linkMode ==  Mixer::autoTrackLinkSettings::LinkMode::OneToOne ? " *" :""),
+		this, [this, &settings, &mix]()
+	{
+		settings.linkMode = Mixer::autoTrackLinkSettings::LinkMode::OneToOne;
+		mix->saveAutoLinkTrackSettings(settings);
+		setAutoTrackConstraints();
+	});
+	linkModeMenu->addAction( tr("Multiple tracks to one channel") +
+		(settings.linkMode ==  Mixer::autoTrackLinkSettings::LinkMode::OneToMany ? " *" :""),
+		this, [this,&settings, &mix]()
+	{
+		settings.linkMode = Mixer::autoTrackLinkSettings::LinkMode::OneToMany;
+		mix->saveAutoLinkTrackSettings(settings);
+		setAutoTrackConstraints();
+	});
+
 
 	sortMenu->addAction( tr("Song Editor -> Pattern Editor"), this, [this]()
 	{
@@ -245,8 +267,8 @@ void MixerView::updateMenu()
 		updateAutoTrackSortOrder(false);
 	});
 
-	sortAutoMenu->addAction(
-		tr("Disabled") +(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled ? " *" :""),
+	sortAutoMenu->addAction(tr("Disabled") +
+		(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled ? " *" :""),
 		this, [&settings, &mix]()
 	{
 		settings.sort = Mixer::autoTrackLinkSettings::AutoSort::Disabled;
@@ -269,25 +291,61 @@ void MixerView::updateMenu()
 		updateAutoTrackSortOrder();
 	});
 
-	patternEditorMenu->addAction( tr("Disabled") +
-		(settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::Disabled ? " *" :""),
+	QAction * captionPatternEditor = addAutoMenu->addAction( "Pattern Editor" );
+	captionPatternEditor->setEnabled( false );
+
+	addAutoMenu->addAction( tr("Disabled") +
+		(settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::Disabled ? " *" :""),
 		this, [&settings, &mix]()
 	{
-		settings.linkPatternEditor = Mixer::autoTrackLinkSettings::LinkPatternEditor::Disabled;
+		settings.autoAddPatternEditor = Mixer::autoTrackLinkSettings::AutoAdd::Disabled;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
-	patternEditorMenu->addAction( tr("Each separate") +
-		(settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::Default ? " *" :""),
+	addAutoMenu->addAction( tr("Each separate") +
+		(settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::Separate ? " *" :""),
 		this, [&settings, &mix]()
 	{
-		settings.linkPatternEditor = Mixer::autoTrackLinkSettings::LinkPatternEditor::Default;
+		settings.autoAddPatternEditor = Mixer::autoTrackLinkSettings::AutoAdd::Separate;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
-	patternEditorMenu->addAction( tr("Use first track channel") +
-		(settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::UseFirstTrackOnly ? " *" :""),
+	addAutoMenu->addAction( tr("Use first track's channel") +
+		(settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::UseFirstTrackOnly ? " *" :""),
 		this, [&settings, &mix]()
 	{
-		settings.linkPatternEditor = Mixer::autoTrackLinkSettings::LinkPatternEditor::UseFirstTrackOnly;
+		settings.autoAddPatternEditor = Mixer::autoTrackLinkSettings::AutoAdd::UseFirstTrackOnly;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+
+	QAction * captionSongEditor = addAutoMenu->addAction( "Song Editor" );
+	captionSongEditor->setEnabled( false );
+
+	addAutoMenu->addAction( tr("Disabled") +
+		(settings.autoAddSongEditor == Mixer::autoTrackLinkSettings::AutoAdd::Disabled ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.autoAddSongEditor = Mixer::autoTrackLinkSettings::AutoAdd::Disabled;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+	addAutoMenu->addAction( tr("Each separate") +
+		(settings.autoAddSongEditor == Mixer::autoTrackLinkSettings::AutoAdd::Separate ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.autoAddSongEditor = Mixer::autoTrackLinkSettings::AutoAdd::Separate;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+
+	deleteAutoMenu->addAction( tr("Disabled") +
+		(!settings.autoDelete ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.autoDelete = false;
+		mix->saveAutoLinkTrackSettings(settings);
+	});
+	deleteAutoMenu->addAction( tr("Enabled") +
+		(settings.autoDelete ? " *" :""),
+		this, [&settings, &mix]()
+	{
+		settings.autoDelete = true;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 
@@ -297,24 +355,24 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name, bool isPatternE
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
-	if (!settings.enabled || !settings.autoAdd) return;
+	if (!settings.enabled || !settings.autoAdd()) return;
 	IntModel * model = mix->getChannelModelByTrack(track);
 	if ( model != nullptr)
 	{
 
 		if (isPatternEditor)
 		{
-			if (settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::Disabled) return;
+			if (settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::Disabled) return;
 
-			if (settings.linkPatternEditor == Mixer::autoTrackLinkSettings::LinkPatternEditor::UseFirstTrackOnly)
+			if (settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::UseFirstTrackOnly)
 			{
 				auto trackList = Engine::patternStore()->tracks();
 				if (!trackList.empty())
 				{
-					IntModel * firstTrackModel = mix->getChannelModelByTrack(trackList.first());
-					if ( firstTrackModel != nullptr)
+					auto channel = mix->getCustomChannelByTrack(trackList.first());
+					if (channel != nullptr)
 					{
-						model->setValue(firstTrackModel->value());
+						model->setValue(channel->m_channelIndex);
 					}
 				}
 				return;
@@ -334,32 +392,53 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name, bool isPatternE
 	}
 }
 
+void MixerView::trackStyleToChannel(Track * track, MixerChannel * channel)
+{
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (settings.linkName)
+	{
+		channel->m_name = track->name();
+	}
+	if (settings.linkColor)
+	{
+		channel->setColor (track->color());
+		channel->m_hasColor = track->useColor();
+	}
+}
+
+void MixerView::channelStyleToTrack(MixerChannel * channel, Track * track)
+{
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (settings.linkName)
+	{
+		track->setName(channel->m_name);
+	}
+	if (settings.linkColor)
+	{
+		track->setColor(channel->m_color);
+		if (!channel->m_hasColor) track->resetColor();
+	}
+}
+
 void MixerView::updateAfterTrackStyleModify(Track * track)
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();	
 	if (!settings.enabled || !settings.linkStyles()) return;
-	IntModel * model = mix->getChannelModelByTrack(track);
-	if (model != nullptr)
+	auto channel = mix->getCustomChannelByTrack(track);
+	if (channel != nullptr && channel->m_autoTrackLinkModel.value())
 	{
-		int channelIndex = model->value();
-		if (channelIndex>0)
-		{
-			MixerChannel * channel = mix->mixerChannel(channelIndex);
-			if (channel->m_autoTrackLinkModel.value())
+		trackStyleToChannel(track, channel);
+		mix->processAssignedTracks([this, channel](Track * otherTrack, IntModel * model, MixerChannel *)
+		mutable {
+			if (model->value() == channel->m_channelIndex)
 			{
-				if (settings.linkName)
-				{
-					channel->m_name = track->name();
-				}
-				if (settings.linkColor)
-				{
-					channel->setColor (track->color());
-					channel->m_hasColor = track->useColor();
-				}
-				setCurrentMixerLine(channelIndex);
+				channelStyleToTrack(channel, otherTrack);
 			}
-		}
+		});
+		setCurrentMixerLine(channel->m_channelIndex);
 	}
 }
 
@@ -384,8 +463,9 @@ void MixerView::setAutoTrackConstraints()
 	bool wasModified = false;
 	for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
 	{
-		// no more linked tracks or too many linked tracks (if name linking is enabled)
-		if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 && settings.linkName))
+		// no more linked tracks or too many linked tracks
+		if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 &&
+			settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToOne))
 		{
 			mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
 			m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
@@ -393,6 +473,16 @@ void MixerView::setAutoTrackConstraints()
 		}
 		m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 	}
+	mix->processAssignedTracks([this](Track * track, IntModel *, MixerChannel * channel)
+	mutable {
+		if (channel != nullptr)
+		{
+			if (channel->m_autoTrackLinkModel.value())
+			{
+				channelStyleToTrack(channel, track);
+			}
+		}
+	});
 	if (wasModified) updateAutoTrackSortOrder();
 }
 
@@ -401,18 +491,10 @@ void MixerView::updateAfterTrackMove(Track * track)
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
 	if (!settings.enabled || settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled) return;
-	IntModel * model = mix->getChannelModelByTrack(track);
-	if (model != nullptr)
+	auto channel = mix->getCustomChannelByTrack(track);
+	if (channel != nullptr && channel->m_autoTrackLinkModel.value())
 	{
-		int channelIndex = model->value();
-		if (channelIndex>0)
-		{
-			MixerChannel * channel = mix->mixerChannel(channelIndex);
-			if (channel->m_autoTrackLinkModel.value())
-			{
-				updateAutoTrackSortOrder();
-			}
-		}
+		updateAutoTrackSortOrder();
 	}
 }
 
@@ -421,28 +503,24 @@ void MixerView::updateAfterTrackDelete(Track * track)
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
 	if (!settings.enabled) return;
-	IntModel * model = mix->getChannelModelByTrack(track);
-	if ( model != nullptr)
+	if (!settings.autoDelete)
 	{
-		int channelIndex = model->value();
-		if (channelIndex>0)
+		setAutoTrackConstraints();
+		return;
+	}
+	auto channel = mix->getCustomChannelByTrack(track);
+	if (channel != nullptr && channel->m_autoTrackLinkModel.value())
+	{
+		bool shouldDelete = true;
+		if (settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToMany)
 		{
-			MixerChannel * channel = mix->mixerChannel(channelIndex);
-			if (channel->m_autoTrackLinkModel.value())
-			{
-				bool shouldDelete = true;
-				if (!settings.linkName)
-				{
-					// if we don't have a 1.1 name link we make sure that no track is left.
-					std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
-					shouldDelete = usedChannelCounts[channelIndex] == 0;
-				}
-				if (shouldDelete)
-				{
-					deleteChannel(channelIndex);
-					updateAutoTrackSortOrder();
-				}
-			}
+			std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
+			shouldDelete = usedChannelCounts[channel->m_channelIndex] == 0;
+		}
+		if (shouldDelete)
+		{
+			deleteChannel(channel->m_channelIndex);
+			updateAutoTrackSortOrder();
 		}
 	}
 }

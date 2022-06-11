@@ -31,6 +31,7 @@
 #include <QScrollArea>
 
 #include "ModelView.h"
+#include "Mixer.h"
 #include "Engine.h"
 #include "Fader.h"
 #include "PixmapButton.h"
@@ -150,6 +151,8 @@ private:
 	void deleteChannelInternal(int index);
 	void setAutoLinkTrackConfig(bool enabled);
 	void setAutoTrackConstraints();
+	void trackStyleToChannel(Track * track, MixerChannel * channel);
+	void channelStyleToTrack(MixerChannel * channel, Track * track);
 
 	friend class MixerChannelView;
 } ;

@@ -302,8 +302,10 @@ void MixerLine::toogleAutoTrackLink()
 
 void MixerLine::autoTrackLinkChanged()
 {
-	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	if (channel->m_autoTrackLinkModel.value())
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	auto channel = mix->mixerChannel( m_channelIndex );
+	if (settings.enabled && channel->m_autoTrackLinkModel.value())
 	{
 		m_renameEditPalette.setColor(QPalette::Text,Qt::green);
 	}

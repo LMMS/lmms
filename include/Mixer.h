@@ -153,20 +153,33 @@ public:
 			PatternLinked 		/* pattern editor first, linked tracks afterwards */
 		};
 
-		enum class LinkPatternEditor
+		enum class AutoAdd
 		{
-			Disabled,			/* do not link pattern editor tracks */
-			Default,			/* one channel for each pattern editor track  */
-			UseFirstTrackOnly,	/* use always the first channel in the pattern editor for new tracks*/
+			Disabled,			/* do not link tracks after add */
+			Separate,			/* one channel for each track after add*/
+			UseFirstTrackOnly,	/* use always the first channel in the editor for new tracks*/
 		};
+
+		enum class LinkMode
+		{
+			OneToOne,			/* do not link song editor tracks */
+			OneToMany,			/* one channel for each song editor track  */
+		};
+
 
 		bool enabled;
 		bool linkColor;
 		bool linkName;
-		bool autoAdd;
 		bool autoDelete;
+		LinkMode linkMode;
 		AutoSort sort;
-		LinkPatternEditor linkPatternEditor;
+		AutoAdd autoAddPatternEditor;
+		AutoAdd autoAddSongEditor;
+
+		bool autoAdd()
+		{
+			return autoAddSongEditor != AutoAdd::Disabled || autoAddPatternEditor != AutoAdd::Disabled;
+		}
 
 		bool linkStyles()
 		{
@@ -188,9 +201,10 @@ public:
 			enabled = false;
 			linkColor = true;
 			linkName = true;
-			autoAdd = true;
 			autoDelete = true;
-			linkPatternEditor = LinkPatternEditor::Default;
+			linkMode = LinkMode::OneToOne;
+			autoAddPatternEditor = AutoAdd::Separate;
+			autoAddSongEditor = AutoAdd::Separate;
 			sort = AutoSort::Disabled;
 		}
 	};
@@ -259,6 +273,7 @@ public:
 	// process tracks assigned to a specific channel
 	void processChannelTracks(MixerChannel * channel, std::function<void(Track * track)> process);
 	IntModel * getChannelModelByTrack(Track * track);	
+	MixerChannel * getCustomChannelByTrack(Track * track);
 	std::vector<int> getUsedChannelCounts();
 	bool isAutoTrackLinkToggleAllowed(int index);
 	//bool autoLinkTrackConfigEnabled();
@@ -284,7 +299,8 @@ public:
 	MixerRouteVector m_mixerRoutes;
 
 private:
-	static inline QString const AUTOTRACK_CONFIGPREFIX = "autoTrackLinkSettings";
+	static inline QString const AUTOTRACK_CONFIGPREFIX = "settings";
+	static inline QString const AUTOTRACK_CONFIGID = "AutoTrackLink";
 	// the mixer channels in the mixer. index 0 is always master.
 	QVector<MixerChannel *> m_mixerChannels;
 

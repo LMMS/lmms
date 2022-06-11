@@ -352,20 +352,33 @@ void Mixer::toggleAutoTrackLink(int index)
 }
 
 
+//enabled = false;
+//linkColor = true;
+//linkName = true;
+//autoDelete = true;
+//linkMode = LinkMode::OneToOne;
+//autoAddPatternEditor = AutoAddPatternEditor::Separate;
+//autoAddSongEditor = AutoAddPatternEditor::Separate;
+//sort = AutoSort::Disabled;
+
 Mixer::autoTrackLinkSettings Mixer::getAutoLinkTrackSettings()
 {
 	autoTrackLinkSettings settings;
 	auto cfg = ConfigManager::inst();
-	auto enabledAsString = cfg->value("ui", AUTOTRACK_CONFIGPREFIX);
-	if (enabledAsString != "")
+	auto enabledAsString = cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX);
+	if (!enabledAsString.isEmpty())
 	{
-		settings.enabled = enabledAsString.toInt() == 1;
-		settings.linkName = (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_linkName").toInt() == 1);
-		settings.linkColor = (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_linkColor").toInt() == 1);
-		settings.autoAdd = (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_autoAdd").toInt() == 1);
-		settings.autoDelete = (cfg->value("ui",AUTOTRACK_CONFIGPREFIX+"_autoDelete").toInt() == 1);
-		settings.linkPatternEditor = (autoTrackLinkSettings::LinkPatternEditor) (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_linkPatternEditor").toInt());
-		settings.sort = (autoTrackLinkSettings::AutoSort) (cfg->value("ui", AUTOTRACK_CONFIGPREFIX+"_sort").toInt());
+		settings.enabled = enabledAsString.toInt();
+		settings.linkColor = cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkColor").toInt();
+		settings.linkName = cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkName").toInt();
+		settings.autoDelete = cfg->value(AUTOTRACK_CONFIGID,AUTOTRACK_CONFIGPREFIX+"_autoDelete").toInt();
+		settings.linkMode = (autoTrackLinkSettings::LinkMode)
+				(cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkMode").toInt());
+		settings.autoAddPatternEditor = (autoTrackLinkSettings::AutoAdd)
+				(cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddPatternEditor").toInt());
+		settings.autoAddSongEditor = (autoTrackLinkSettings::AutoAdd)
+				(cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddSongEditor").toInt());
+		settings.sort = (autoTrackLinkSettings::AutoSort) (cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_sort").toInt());
 	}
 	return settings;
 }
@@ -373,13 +386,14 @@ Mixer::autoTrackLinkSettings Mixer::getAutoLinkTrackSettings()
 void Mixer::saveAutoLinkTrackSettings(autoTrackLinkSettings settings)
 {
 	auto cfg = ConfigManager::inst();
-	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX, QString::number(settings.enabled));
-	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_linkName", QString::number(settings.linkName));
-	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_linkColor", QString::number(settings.linkColor));
-	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_autoAdd", QString::number(settings.autoAdd));
-	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_autoDelete", QString::number(settings.autoDelete));
-	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_linkPatternEditor", QString::number((int)settings.linkPatternEditor));
-	cfg->setValue("ui", AUTOTRACK_CONFIGPREFIX+"_sort", QString::number((int)settings.sort));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX, QString::number(settings.enabled));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkColor", QString::number(settings.linkColor));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkName", QString::number(settings.linkName));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoDelete", QString::number(settings.autoDelete));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkMode", QString::number((int)settings.linkMode));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddPatternEditor", QString::number((int)settings.autoAddPatternEditor));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddSongEditor", QString::number((int)settings.autoAddSongEditor));
+	cfg->setValue(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_sort", QString::number((int)settings.sort));
 	cfg->saveConfigFile();
 }
 
@@ -399,6 +413,19 @@ IntModel * Mixer::getChannelModelByTrack(Track * track)
 	return nullptr;
 }
 
+MixerChannel * Mixer::getCustomChannelByTrack(Track * track)
+{
+	IntModel * model = getChannelModelByTrack(track);
+	if (model != nullptr)
+	{
+		int channelIndex = model->value();
+		if (channelIndex>0)
+		{
+			return mixerChannel(channelIndex);
+		}
+	}
+	return nullptr;
+}
 
 void Mixer::processChannelTracks(MixerChannel * channel, std::function<void(Track * track)> process)
 {
