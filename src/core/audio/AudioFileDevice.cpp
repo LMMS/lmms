@@ -56,7 +56,7 @@ AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 						"file and try again!"
 								).arg( _file );
 
-		if( getGUI() != nullptr )
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::critical( nullptr, title, message,
 						QMessageBox::Ok,

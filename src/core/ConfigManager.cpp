@@ -517,7 +517,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
-		else if(getGUI() != nullptr)
+		else if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::warning(nullptr, gui::MainWindow::tr("Configuration file"),
 									gui::MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
@@ -648,7 +648,7 @@ void ConfigManager::saveConfigFile()
 					"the directory containing the "
 					"file and try again!"
 						).arg(m_lmmsRcFile);
-		if(getGUI() != nullptr)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,

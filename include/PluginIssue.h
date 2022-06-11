@@ -81,7 +81,7 @@ public:
 	friend QDebug (operator<<)(QDebug stream, const PluginIssue& iss);
 };
 
-QDebug operator<<(QDebug stream, const lmms::PluginIssue& iss);
+QDebug operator<<(QDebug stream, const PluginIssue& iss);
 
 } // namespace lmms
 

@@ -143,6 +143,6 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LMMS_HAVE_SOUNDIO
 
 #endif

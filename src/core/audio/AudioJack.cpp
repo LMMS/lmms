@@ -104,7 +104,7 @@ void AudioJack::restartAfterZombified()
 	{
 		m_active = false;
 		startProcessing();
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "JACK client restarted" ),
 			tr( "LMMS was kicked by JACK for some reason. "
 				"Therefore the JACK backend of LMMS has been "
@@ -113,7 +113,7 @@ void AudioJack::restartAfterZombified()
 	}
 	else
 	{
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "JACK server down" ),
 			tr( "The JACK server seems to have been shutdown "
 				"and starting a new instance failed. "

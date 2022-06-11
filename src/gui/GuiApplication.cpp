@@ -54,13 +54,15 @@
 namespace lmms
 {
 
-gui::GuiApplication* getGUI()
-{
-	return gui::GuiApplication::instance();
-}
 
 namespace gui
 {
+
+GuiApplication* getGUI()
+{
+	return GuiApplication::instance();
+}
+
 
 GuiApplication* GuiApplication::s_instance = nullptr;
 

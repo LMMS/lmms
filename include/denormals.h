@@ -9,14 +9,19 @@
 #ifdef __GNUC__
 #include <x86intrin.h>
 #endif // __GNUC__
+#endif // __SSE__
+
 
 namespace lmms
 {
 
+#ifdef __SSE__
+
 // Intel® 64 and IA-32 Architectures Software Developer’s Manual,
 // Volume 1: Basic Architecture,
 // 11.6.3 Checking for the DAZ Flag in the MXCSR Register
-int inline can_we_daz() {
+int inline can_we_daz()
+{
   alignas(16) unsigned char buffer[512] = {0};
 #if defined(LMMS_HOST_X86)
   _fxsave(buffer);
@@ -28,15 +33,11 @@ int inline can_we_daz() {
   return ((buffer[28] & (1 << 6)) != 0);
 }
 
-} // namespace lmms
 #endif // __SSE__
 
-namespace lmms
-{
-
-
 // Set denormal protection for this thread. 
-void inline disable_denormals() {
+void inline disable_denormals()
+{
 #ifdef __SSE__
   /* Setting DAZ might freeze systems not supporting it */
   if (can_we_daz()) {
@@ -44,9 +45,8 @@ void inline disable_denormals() {
   }
   /* FTZ flag */
   _MM_SET_FLUSH_ZERO_MODE( _MM_FLUSH_ZERO_ON );
-#endif
+#endif // __SSE__
 }
-
 
 } // namespace lmms
 

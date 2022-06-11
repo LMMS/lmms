@@ -148,7 +148,7 @@ void Clip::copyStateTo( Clip *src, Clip *dst )
 		dst->movePosition( pos );
 
 		AutomationClip::resolveAllIDs();
-		getGUI()->automationEditor()->m_editor->updateAfterClipChange();
+		gui::getGUI()->automationEditor()->m_editor->updateAfterClipChange();
 	}
 }
 

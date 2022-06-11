@@ -27,8 +27,8 @@
 #define VST_SYNC_CONTROLLER_H
 
 #include <QObject>
-#include <QSharedMemory>
 
+#include "SharedMemory.h"
 #include "VstSyncData.h"
 
 namespace lmms
@@ -78,11 +78,7 @@ private slots:
 
 private:
 	VstSyncData* m_syncData;
-
-	int m_shmID;
-
-	QSharedMemory m_shm;
-
+	SharedMemory<VstSyncData> m_shm;
 };
 
 

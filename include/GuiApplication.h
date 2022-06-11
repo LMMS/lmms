@@ -32,10 +32,7 @@
 
 class QLabel;
 
-namespace lmms
-{
-
-namespace gui
+namespace lmms::gui
 {
 
 class AutomationEditorWindow;
@@ -91,12 +88,9 @@ private:
 	QLabel* m_loadingProgressLabel;
 };
 
-
-} // namespace gui
-
 // Short-hand function
-LMMS_EXPORT gui::GuiApplication* getGUI();
+LMMS_EXPORT GuiApplication* getGUI();
 
-} // namespace lmms
+} // namespace lmms::gui
 
 #endif // GUIAPPLICATION_H

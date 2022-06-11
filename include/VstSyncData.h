@@ -37,10 +37,6 @@ namespace lmms
 // When defined, latency should be subtracted from song PPQ position
 //#define VST_SNC_LATENCY
 
-// define file for ftok as shared memory shmget key
-constexpr const char* VST_SNC_SHM_KEY_FILE = "/dev/null";
-//constexpr int64_t VST_SNC_SHM_RND_KEY = 3561653564469;
-
 
 
 struct VstSyncData

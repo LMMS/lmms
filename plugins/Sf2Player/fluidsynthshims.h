@@ -28,9 +28,6 @@
 
 #include <fluidsynth.h>
 
-namespace lmms
-{
-
 
 #if FLUIDSYNTH_VERSION_MAJOR < 2
 
@@ -88,8 +85,5 @@ inline fluid_preset_t* fluid_sfont_iteration_next_wrapper(fluid_sfont_t* sfont, 
 }
 
 #endif // FLUIDSYNTH_VERSION_MAJOR < 2
-
-
-} // namespace lmms
 
 #endif // FLUIDSYNTHSHIMS_H

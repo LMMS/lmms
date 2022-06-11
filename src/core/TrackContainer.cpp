@@ -91,14 +91,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	static QProgressDialog * pd = nullptr;
 	bool was_null = ( pd == nullptr );
-	if( !journalRestore && getGUI() != nullptr )
+	if (!journalRestore && gui::getGUI() != nullptr)
 	{
 		if( pd == nullptr )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						Engine::getSong()->getLoadingTrackCount(),
-						getGUI()->mainWindow() );
+						gui::getGUI()->mainWindow());
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -115,7 +115,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 						QEventLoop::AllEvents, 100 );
 			if( pd->wasCanceled() )
 			{
-				if ( getGUI() != nullptr )
+				if (gui::getGUI() != nullptr)
 				{
 					gui::TextFloat::displayMessage( tr( "Loading cancelled" ),
 					tr( "Project loading was cancelled." ),

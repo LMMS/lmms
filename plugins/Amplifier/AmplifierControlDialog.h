@@ -51,6 +51,6 @@ public:
 
 } // namespace gui
 
-} // namespace plugin
+} // namespace lmms
 
 #endif

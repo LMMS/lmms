@@ -31,7 +31,7 @@
 #include "MainWindow.h"
 #include "Song.h"
 
-namespace lmms
+namespace lmms::gui
 {
 
 
@@ -108,4 +108,4 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 #endif
 
 
-} // namespace lmms
+} // namespace lmms::gui
