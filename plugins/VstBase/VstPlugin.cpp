@@ -124,7 +124,7 @@ enum class ExecutableType
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( (getGUI() != nullptr)
+	m_embedMethod( (gui::getGUI() != nullptr)
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
@@ -422,7 +422,7 @@ bool VstPlugin::processMessage( const message & _m )
 #ifdef LMMS_BUILD_LINUX
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
-					getGUI()->mainWindow()->winId() );
+					gui::getGUI()->mainWindow()->winId() );
 #endif
 		}
 		break;
