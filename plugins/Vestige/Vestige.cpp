@@ -132,7 +132,7 @@ public:
 			return;
 		}
 		if ( embedMethod() != "none" ) {
-			m_pluginSubWindow.reset(new gui::vstSubWin( getGUI()->mainWindow()->workspace() ));
+			m_pluginSubWindow.reset(new gui::vstSubWin( gui::getGUI()->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
 			m_pluginSubWindow->setWidget(pluginWidget());
 		} else {
@@ -356,7 +356,7 @@ void VestigeInstrument::loadFile( const QString & _file )
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
 	gui::TextFloat * tf = nullptr;
-	if( getGUI() != nullptr )
+	if( gui::getGUI() != nullptr )
 	{
 		tf = gui::TextFloat::displayMessage(
 				tr( "Loading plugin" ),

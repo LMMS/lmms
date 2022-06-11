@@ -131,7 +131,7 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 void VstEffect::openPlugin( const QString & _plugin )
 {
 	gui::TextFloat* tf = nullptr;
-	if( getGUI() != nullptr )
+	if( gui::getGUI() != nullptr )
 	{
 		tf = gui::TextFloat::displayMessage(
 			VstPlugin::tr( "Loading plugin" ),
