@@ -36,6 +36,9 @@ jobs:
             ccache-${{ github.job }}-${{ github.ref }}-
             ccache-${{ github.job }}-
           path: ~/.ccache
+      - name: Install FFmpeg
+        run: |
+          apt-get --yes install libavcodec-dev libavformat-dev libavutil-dev libavdevice-dev libswresample-dev
       - name: Configure
         run: |
           source /opt/qt5*/bin/qt5*-env.sh || true
@@ -92,7 +95,7 @@ jobs:
         run: |
           brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
                        libsamplerate jack sdl libgig libsoundio lilv lv2 stk \
-                       fluid-synth portaudio fltk qt@5 carla
+                       fluid-synth portaudio fltk qt@5 carla ffmpeg
           npm install --location=global appdmg
       - name: Configure
         run: |
@@ -160,6 +163,28 @@ jobs:
             ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
             ccache-${{ github.job }}-${{ matrix.arch }}-
           path: ~/.ccache
+      - name: Cross Compile FFmpeg
+        run: |
+          apt-get --yes install yasm
+          git clone -c http.sslVerify=false https://git.ffmpeg.org/ffmpeg.git ffmpeg
+
+          if [ ${{ matrix.arch }} == 32 ]; then
+            FFMPEG_CROSS_PREFIX=i686-w64-mingw32
+          elif [ ${{ matrix.arch }} == 64 ]; then
+            FFMPEG_CROSS_PREFIX=x86_64-w64-mingw32
+          fi
+
+          cd ffmpeg
+          ./configure \
+            --arch=x86 \
+            --target-os=mingw32 \
+            --enable-cross-compile \
+            --prefix=/usr/$FFMPEG_CROSS_PREFIX \
+            --cross-prefix=$FFMPEG_CROSS_PREFIX- \
+            --x86asmexe=yasm \
+            --disable-programs \
+            --disable-doc
+          make && make install
       - name: Configure
         run: |
           mkdir build && cd build
@@ -223,7 +248,7 @@ jobs:
       - name: Install dependencies
         run: |
           vcpkg install --triplet ${{ matrix.arch }}-windows --recurse `
-            fftw3 libsamplerate libsndfile lilv lv2 sdl2
+            fftw3 libsamplerate libsndfile lilv lv2 sdl2 ffmpeg[core,avcodec,avformat,avdevice,swresample]
       - name: Set up build environment
         uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
         with:

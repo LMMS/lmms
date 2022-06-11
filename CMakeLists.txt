@@ -194,6 +194,10 @@ FIND_PACKAGE(SndFile REQUIRED)
 IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
+
+# check for FFmpeg
+FIND_PACKAGE(FFMPEG REQUIRED COMPONENTS avcodec avformat avutil avdevice swresample)
+
 # check if we can use SFC_SET_COMPRESSION_LEVEL
 INCLUDE(CheckCXXSourceCompiles)
 CHECK_CXX_SOURCE_COMPILES(
