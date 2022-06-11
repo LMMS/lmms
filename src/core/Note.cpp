@@ -240,7 +240,7 @@ bool Note::withinRange(int tickStart, int tickEnd) const
  *
  *  Returns no value if there are no notes
  */
-std::optional<NoteBounds> getNoteBounds(const NoteVector& notes)
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
 {
 	if (notes.empty()) { return {}; }
 

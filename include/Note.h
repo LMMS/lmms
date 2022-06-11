@@ -257,6 +257,6 @@ struct NoteBounds
 };
 
 
-std::optional<NoteBounds> getNoteBounds(const NoteVector& notes);
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
 
 #endif

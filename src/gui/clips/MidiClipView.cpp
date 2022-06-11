@@ -153,7 +153,7 @@ void MidiClipView::transposeSelection()
 	{
 		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
 		{
-			if (auto bounds = getNoteBounds(mcv->getMidiClip()->notes()))
+			if (auto bounds = boundsForNotes(mcv->getMidiClip()->notes()))
 			{
 				lowest = std::min(bounds->lowest, lowest);
 				highest = std::max(bounds->highest, highest);
