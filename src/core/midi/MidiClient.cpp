@@ -221,10 +221,12 @@ void MidiClientRaw::parseData( const unsigned char c )
 		case MidiNoteOff:
 		case MidiNoteOn:
 		case MidiKeyPressure:
+			// set velocity of key
+			m_midiParseData.m_midiEvent.setVelocity(m_midiParseData.m_buffer[1]);
 		case MidiChannelPressure:
 		case MidiProgramChange:
+			// set key (or for ChannelPressure/ProgramChange: set param 1)
 			m_midiParseData.m_midiEvent.setKey(m_midiParseData.m_buffer[0]);
-			m_midiParseData.m_midiEvent.setVelocity(m_midiParseData.m_buffer[1]);
 			break;
 
 		case MidiControlChange:
