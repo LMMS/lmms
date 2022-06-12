@@ -196,6 +196,31 @@ public:
 			return linkColor && !linkName;
 		}
 
+		bool getAsBoolOrDefault(const QString & text, bool defaultValue)
+		{
+			return (bool)getIntInRangeOrDefault(text, 0,1,defaultValue);
+		}
+
+		LinkMode getAsLinkModeOrCurrent(const QString & text)
+		{
+			return (LinkMode) getIntInRangeOrDefault(text,(int)LinkMode::OneToOne, (int)LinkMode::OneToMany,(int)linkMode);
+		}
+
+		AutoSort getAsAutoSortOrCurrent(const QString & text)
+		{
+			return (AutoSort) getIntInRangeOrDefault(text,(int)AutoSort::Disabled, (int)AutoSort::PatternLinked,(int)sort);
+		}
+
+		AutoAdd getAsAutoAddPatternEditorOrCurrent(const QString & text)
+		{
+			return (AutoAdd) getIntInRangeOrDefault(text,(int)AutoAdd::Disabled, (int)AutoAdd::UseFirstTrackOnly,(int)autoAddPatternEditor);
+		}
+
+		AutoAdd getAsAutoAddSongEditorOrCurrent(const QString & text)
+		{
+			return (AutoAdd) getIntInRangeOrDefault(text,(int)AutoAdd::Disabled, (int)AutoAdd::Separate,(int)autoAddSongEditor);
+		}
+
 		autoTrackLinkSettings()
 		{
 			enabled = false;
@@ -207,6 +232,16 @@ public:
 			autoAddSongEditor = AutoAdd::Separate;
 			sort = AutoSort::Disabled;
 		}
+
+	private:
+		int getIntInRangeOrDefault(const QString & text, int lower, int upper, int defaultValue)
+		{
+			if (text == nullptr || text.isEmpty()) return defaultValue;
+			auto asInt = text.toInt();
+			if (asInt < lower || asInt >upper) return defaultValue;
+			return asInt;
+		}
+
 	};
 
 

@@ -150,6 +150,7 @@ private:
 	void updateAutoTrackSortOrder(bool autoSort = true);
 	void deleteChannelInternal(int index);
 	void setAutoLinkTrackConfig(bool enabled);
+	void updateAutoLinkTrackConfigBtn(bool enabled);
 	void setAutoTrackConstraints();
 	void trackStyleToChannel(Track * track, MixerChannel * channel);
 	void channelStyleToTrack(MixerChannel * channel, Track * track);

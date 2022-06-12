@@ -363,22 +363,27 @@ void Mixer::toggleAutoTrackLink(int index)
 
 Mixer::autoTrackLinkSettings Mixer::getAutoLinkTrackSettings()
 {
-	autoTrackLinkSettings settings;
+	autoTrackLinkSettings settings = autoTrackLinkSettings();
 	auto cfg = ConfigManager::inst();
 	auto enabledAsString = cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX);
 	if (!enabledAsString.isEmpty())
 	{
-		settings.enabled = enabledAsString.toInt();
-		settings.linkColor = cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkColor").toInt();
-		settings.linkName = cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkName").toInt();
-		settings.autoDelete = cfg->value(AUTOTRACK_CONFIGID,AUTOTRACK_CONFIGPREFIX+"_autoDelete").toInt();
-		settings.linkMode = (autoTrackLinkSettings::LinkMode)
-				(cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkMode").toInt());
-		settings.autoAddPatternEditor = (autoTrackLinkSettings::AutoAdd)
-				(cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddPatternEditor").toInt());
-		settings.autoAddSongEditor = (autoTrackLinkSettings::AutoAdd)
-				(cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddSongEditor").toInt());
-		settings.sort = (autoTrackLinkSettings::AutoSort) (cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_sort").toInt());
+		settings.enabled = settings.getAsBoolOrDefault(
+				enabledAsString, settings.enabled);
+		settings.linkColor =settings.getAsBoolOrDefault(
+				cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkColor"),settings.linkColor);
+		settings.linkName = settings.getAsBoolOrDefault(
+				cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkName"),settings.linkName);
+		settings.autoDelete = settings.getAsBoolOrDefault(
+				cfg->value(AUTOTRACK_CONFIGID,AUTOTRACK_CONFIGPREFIX+"_autoDelete"),settings.autoDelete);
+		settings.linkMode = settings.getAsLinkModeOrCurrent(
+				cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_linkMode"));
+		settings.autoAddPatternEditor = settings.getAsAutoAddPatternEditorOrCurrent(
+				cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddPatternEditor"));
+		settings.autoAddSongEditor = settings.getAsAutoAddSongEditorOrCurrent(
+				cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_autoAddSongEditor"));
+		settings.sort = settings.getAsAutoSortOrCurrent(
+				cfg->value(AUTOTRACK_CONFIGID, AUTOTRACK_CONFIGPREFIX+"_sort"));
 	}
 	return settings;
 }

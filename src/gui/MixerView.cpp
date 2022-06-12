@@ -160,7 +160,7 @@ MixerView::MixerView() :
 	m_toogleAutoLinkTrackConfigBtn = new QPushButton(this);
 	m_toogleAutoLinkTrackConfigBtn->setToolTip(tr("Enable/Disable auto track link"));
 	connect( m_toogleAutoLinkTrackConfigBtn, SIGNAL(clicked()), this, SLOT(toogleAutoLinkTrackConfig()));
-	setAutoLinkTrackConfig(Engine::mixer()->getAutoLinkTrackSettings().enabled);
+	updateAutoLinkTrackConfigBtn(Engine::mixer()->getAutoLinkTrackSettings().enabled);
 	bl->addWidget(m_toogleAutoLinkTrackConfigBtn, 0, Qt::AlignTop );
 
 
@@ -190,6 +190,8 @@ MixerView::MixerView() :
 
 	// we want to receive dataChanged-signals in order to update
 	setModel( m );
+
+	setAutoTrackConstraints();
 }
 
 MixerView::~MixerView()
@@ -221,20 +223,23 @@ void MixerView::updateMenu()
 	//QMenu* patternEditorMenu = settingsMenu->addMenu(tr("Pattern Editor"));
 
 	auto mix = Engine::mixer();
-	auto settings =mix->getAutoLinkTrackSettings();
+	// remark: capturing "settings" (also as pointer) does not work as expected
+	auto settings = mix->getAutoLinkTrackSettings();
 
 	linkStyleMenu->addAction( tr("Name and color") +
 		(settings.linkNameAndColor() ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.linkName = true;
 		settings.linkColor = true;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 	linkStyleMenu->addAction( tr("Color only") +
 		(settings.linkColorOnly() ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.linkName = false;
 		settings.linkColor = true;
 		mix->saveAutoLinkTrackSettings(settings);
@@ -242,16 +247,18 @@ void MixerView::updateMenu()
 
 	linkModeMenu->addAction( tr("One track to one channel") +
 		(settings.linkMode ==  Mixer::autoTrackLinkSettings::LinkMode::OneToOne ? " *" :""),
-		this, [this, &settings, &mix]()
+		this, [this, mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.linkMode = Mixer::autoTrackLinkSettings::LinkMode::OneToOne;
 		mix->saveAutoLinkTrackSettings(settings);
 		setAutoTrackConstraints();
 	});
 	linkModeMenu->addAction( tr("Multiple tracks to one channel") +
 		(settings.linkMode ==  Mixer::autoTrackLinkSettings::LinkMode::OneToMany ? " *" :""),
-		this, [this,&settings, &mix]()
+		this, [this, mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.linkMode = Mixer::autoTrackLinkSettings::LinkMode::OneToMany;
 		mix->saveAutoLinkTrackSettings(settings);
 		setAutoTrackConstraints();
@@ -269,23 +276,26 @@ void MixerView::updateMenu()
 
 	sortAutoMenu->addAction(tr("Disabled") +
 		(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::Disabled ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.sort = Mixer::autoTrackLinkSettings::AutoSort::Disabled;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 	sortAutoMenu->addAction( tr("Song Editor -> Pattern Editor") +
 		(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::LinkedPattern ? " *" :""),
-		this, [this, &settings, &mix]()
+		this, [this, mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.sort = Mixer::autoTrackLinkSettings::AutoSort::LinkedPattern;
 		mix->saveAutoLinkTrackSettings(settings);
 		updateAutoTrackSortOrder();
 	});
 	sortAutoMenu->addAction( tr("Pattern Editor - > Song Editor") +
 		(settings.sort == Mixer::autoTrackLinkSettings::AutoSort::PatternLinked ? " *" :""),
-		this, [this, &settings, &mix]()
+		this, [this, mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.sort = Mixer::autoTrackLinkSettings::AutoSort::PatternLinked;
 		mix->saveAutoLinkTrackSettings(settings);
 		updateAutoTrackSortOrder();
@@ -296,22 +306,25 @@ void MixerView::updateMenu()
 
 	addAutoMenu->addAction( tr("Disabled") +
 		(settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::Disabled ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.autoAddPatternEditor = Mixer::autoTrackLinkSettings::AutoAdd::Disabled;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 	addAutoMenu->addAction( tr("Each separate") +
 		(settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::Separate ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.autoAddPatternEditor = Mixer::autoTrackLinkSettings::AutoAdd::Separate;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 	addAutoMenu->addAction( tr("Use first track's channel") +
 		(settings.autoAddPatternEditor == Mixer::autoTrackLinkSettings::AutoAdd::UseFirstTrackOnly ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.autoAddPatternEditor = Mixer::autoTrackLinkSettings::AutoAdd::UseFirstTrackOnly;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
@@ -321,30 +334,34 @@ void MixerView::updateMenu()
 
 	addAutoMenu->addAction( tr("Disabled") +
 		(settings.autoAddSongEditor == Mixer::autoTrackLinkSettings::AutoAdd::Disabled ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.autoAddSongEditor = Mixer::autoTrackLinkSettings::AutoAdd::Disabled;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 	addAutoMenu->addAction( tr("Each separate") +
 		(settings.autoAddSongEditor == Mixer::autoTrackLinkSettings::AutoAdd::Separate ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.autoAddSongEditor = Mixer::autoTrackLinkSettings::AutoAdd::Separate;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 
 	deleteAutoMenu->addAction( tr("Disabled") +
 		(!settings.autoDelete ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.autoDelete = false;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
 	deleteAutoMenu->addAction( tr("Enabled") +
 		(settings.autoDelete ? " *" :""),
-		this, [&settings, &mix]()
+		this, [mix]()
 	{
+		auto settings = mix->getAutoLinkTrackSettings();
 		settings.autoDelete = true;
 		mix->saveAutoLinkTrackSettings(settings);
 	});
@@ -458,21 +475,27 @@ void MixerView::setAutoTrackConstraints()
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
-	if (!settings.enabled) return;
 	std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
 	bool wasModified = false;
 	for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
 	{
-		// no more linked tracks or too many linked tracks
-		if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 &&
-			settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToOne))
+		if (settings.enabled)
 		{
-			mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
-			m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
-			wasModified = true;
+			// no more linked tracks or too many linked tracks
+			if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 &&
+				settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToOne))
+			{
+				mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
+				m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
+				wasModified = true;
+			}
 		}
+		// update mixer lines in both cases (enabling/disabling)
 		m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 	}
+	if (!settings.enabled) return;
+
+	// make sure that the tracks are updated according to the auto link settings
 	mix->processAssignedTracks([this](Track * track, IntModel *, MixerChannel * channel)
 	mutable {
 		if (channel != nullptr)
@@ -529,10 +552,15 @@ void MixerView::setAutoLinkTrackConfig(bool enabled)
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
+	updateAutoLinkTrackConfigBtn(enabled);
 	settings.enabled = enabled;
 	mix->saveAutoLinkTrackSettings(settings);
-	m_toogleAutoLinkTrackConfigBtn->setIcon(enabled ? embed::getIconPixmap( "auto_link_active" ) : embed::getIconPixmap( "auto_link_inactive" ));
 	setAutoTrackConstraints();
+}
+
+void MixerView::updateAutoLinkTrackConfigBtn(bool enabled)
+{
+	m_toogleAutoLinkTrackConfigBtn->setIcon(enabled ? embed::getIconPixmap( "auto_link_active" ) : embed::getIconPixmap( "auto_link_inactive" ));
 }
 
 void MixerView::toogleAutoLinkTrackConfig()
