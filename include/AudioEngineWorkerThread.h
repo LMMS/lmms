@@ -96,7 +96,7 @@ public:
 							JobQueue::OperationMode _opMode = JobQueue::Static )
 	{
 		resetJobQueue( _opMode );
-		for( typename T::ConstIterator it = _vec.begin(); it != _vec.end(); ++it )
+		for (typename T::const_iterator it = _vec.begin(); it != _vec.end(); ++it)
 		{
 			addJob( *it );
 		}

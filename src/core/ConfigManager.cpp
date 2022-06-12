@@ -332,23 +332,20 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-const QString & ConfigManager::value(const QString & cls,
+const QString ConfigManager::value(const QString & cls,
 					const QString & attribute) const
 {
-	if(m_settings.contains(cls))
+	if (m_settings.contains(cls))
 	{
-		for(stringPairVector::const_iterator it =
-						m_settings[cls].begin();
-					it != m_settings[cls].end(); ++it)
+		for (const auto& setting : m_settings[cls]) 
 		{
-			if((*it).first == attribute)
+			if (setting.first == attribute)
 			{
-				return (*it).second ;
+				return setting.second;
 			}
 		}
 	}
-	static QString empty;
-	return empty;
+	return "";
 }
 
 

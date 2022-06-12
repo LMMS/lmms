@@ -428,8 +428,8 @@ void MixerView::deleteChannel(int index)
 void MixerView::deleteUnusedChannels()
 {
 	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
+	tracks.insert(tracks.begin(), Engine::getSong()->tracks().begin(), Engine::getSong()->tracks().end());
+	tracks.insert(tracks.begin(), Engine::patternStore()->tracks().begin(), Engine::patternStore()->tracks().end());
 
 	std::vector<bool> inUse(m_mixerChannelViews.size(), false);
 
@@ -455,8 +455,7 @@ void MixerView::deleteUnusedChannels()
 	//Check all channels except master, delete those with no incoming sends
 	for(int i = m_mixerChannelViews.size()-1; i > 0; --i)
 	{
-		if (!inUse[i] && Engine::mixer()->mixerChannel(i)->m_receives.isEmpty())
-		{ deleteChannel(i); }
+		if (!inUse[i] && Engine::mixer()->mixerChannel(i)->m_receives.empty()) { deleteChannel(i); }
 	}
 }
 

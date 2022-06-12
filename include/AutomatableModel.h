@@ -25,6 +25,8 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
+#include <vector>
+
 #include <QMap>
 #include <QMutex>
 
@@ -75,7 +77,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	MM_OPERATORS
 public:
 
-	typedef QVector<AutomatableModel *> AutoModelVector;
+	using AutoModelVector = std::vector<AutomatableModel*>;
 
 	enum ScaleType
 	{

@@ -50,7 +50,8 @@ ControllerConnection::ControllerConnection(Controller * _controller) :
 		m_controller = Controller::create( Controller::DummyController,
 									nullptr );
 	}
-	s_connections.append( this );
+
+	s_connections.push_back(this);
 }
 
 
@@ -61,7 +62,7 @@ ControllerConnection::ControllerConnection( int _controllerId ) :
 	m_controllerId( _controllerId ),
 	m_ownsController( false )
 {
-	s_connections.append( this );
+	s_connections.push_back(this);
 }
 
 
@@ -73,7 +74,13 @@ ControllerConnection::~ControllerConnection()
 	{
 		m_controller->removeConnection( this );
 	}
-	s_connections.remove( s_connections.indexOf( this ) );
+
+	auto posIt = std::find(s_connections.begin(), s_connections.end(), this);
+	if (posIt != s_connections.end()) 
+	{
+		s_connections.erase(posIt);
+	}
+	
 	if( m_ownsController )
 	{
 		delete m_controller;
@@ -183,10 +190,12 @@ void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 		}
 		else
 		{
-			int id = Engine::getSong()->controllers().indexOf( m_controller );
-			if( id >= 0 )
+			auto controllers = Engine::getSong()->controllers();
+			auto it = std::find(controllers.begin(), controllers.end(), m_controller);
+			if (it != controllers.end())
 			{
-				_this.setAttribute( "id", id );
+				int id = std::distance(controllers.begin(), it);
+				_this.setAttribute("id", id);
 			}
 		}
 	}

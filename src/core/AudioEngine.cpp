@@ -415,7 +415,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 	}
 
 	// STAGE 2: process effects of all instrument- and sampletracks
-	AudioEngineWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
+	AudioEngineWorkerThread::fillJobQueue<std::vector<AudioPort *> >(m_audioPorts);
 	AudioEngineWorkerThread::startAndWaitForJobs();
 
 
@@ -659,7 +659,7 @@ void AudioEngine::removeAudioPort(AudioPort * port)
 {
 	requestChangeInModel();
 
-	QVector<AudioPort *>::Iterator it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
+	auto it = std::find(m_audioPorts.begin(), m_audioPorts.end(), port);
 	if (it != m_audioPorts.end())
 	{
 		m_audioPorts.erase(it);

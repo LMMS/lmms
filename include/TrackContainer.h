@@ -41,7 +41,7 @@ class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<Track *> TrackList;
+	using TrackList = std::vector<Track *>;
 	enum TrackContainerTypes
 	{
 		PatternContainer,

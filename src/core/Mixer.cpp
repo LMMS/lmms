@@ -202,9 +202,9 @@ Mixer::Mixer() :
 
 Mixer::~Mixer()
 {
-	while( ! m_mixerRoutes.isEmpty() )
+	while (!m_mixerRoutes.empty())
 	{
-		deleteChannelSend( m_mixerRoutes.first() );
+		deleteChannelSend(m_mixerRoutes.front());
 	}
 	while( m_mixerChannels.size() )
 	{
@@ -287,8 +287,12 @@ void Mixer::deleteChannel( int index )
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
+
+	auto& songTracks = Engine::getSong()->tracks();
+	tracks.insert(tracks.end(), songTracks.begin(), songTracks.end());
+
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	tracks.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 
 	for( Track* t : tracks )
 	{
@@ -329,13 +333,13 @@ void Mixer::deleteChannel( int index )
 	MixerChannel * ch = m_mixerChannels[index];
 
 	// delete all of this channel's sends and receives
-	while( ! ch->m_sends.isEmpty() )
+	while (!ch->m_sends.empty())
 	{
-		deleteChannelSend( ch->m_sends.first() );
+		deleteChannelSend(ch->m_sends.front());
 	}
-	while( ! ch->m_receives.isEmpty() )
+	while (!ch->m_receives.empty())
 	{
-		deleteChannelSend( ch->m_receives.first() );
+		deleteChannelSend( ch->m_receives.front() );
 	}
 
 	// if m_lastSoloed was our index, reset it
@@ -344,7 +348,7 @@ void Mixer::deleteChannel( int index )
 	else if (m_lastSoloed > index) { --m_lastSoloed; }
 
 	// actually delete the channel
-	m_mixerChannels.remove(index);
+	m_mixerChannels.erase(m_mixerChannels.begin() + index);
 	delete ch;
 
 	for( int i = index; i < m_mixerChannels.size(); ++i )
@@ -473,13 +477,13 @@ MixerRoute * Mixer::createRoute( MixerChannel * from, MixerChannel * to, float a
 	MixerRoute * route = new MixerRoute( from, to, amount );
 
 	// add us to from's sends
-	from->m_sends.append( route );
+	from->m_sends.push_back(route);
 
 	// add us to to's receives
-	to->m_receives.append( route );
+	to->m_receives.push_back(route);
 
 	// add us to mixer's list
-	Engine::mixer()->m_mixerRoutes.append( route );
+	Engine::mixer()->m_mixerRoutes.push_back(route);
 	Engine::audioEngine()->doneChangeInModel();
 
 	return route;
@@ -508,13 +512,24 @@ void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 void Mixer::deleteChannelSend( MixerRoute * route )
 {
 	Engine::audioEngine()->requestChangeInModel();
-	// remove us from from's sends
-	route->sender()->m_sends.remove( route->sender()->m_sends.indexOf( route ) );
-	// remove us from to's receives
-	route->receiver()->m_receives.remove( route->receiver()->m_receives.indexOf( route ) );
-	// remove us from mixer's list
-	Engine::mixer()->m_mixerRoutes.remove( Engine::mixer()->m_mixerRoutes.indexOf( route ) );
-	delete route;
+	// remove us from from's sends, remove us from to's recevies, and remove us from mixer's list
+	auto& sender = route->sender()->m_sends;
+	auto senderIt = std::find(sender.begin(), sender.end(), route);
+	
+	auto& receiver = route->receiver()->m_receives;
+	auto receiverIt = std::find(receiver.begin(), receiver.end(), route);
+	
+	auto& mixerRoutes = Engine::mixer()->m_mixerRoutes;
+	auto mixerRouteIt = std::find(mixerRoutes.begin(), mixerRoutes.end(), route);
+
+	if (senderIt != sender.end() && receiverIt != receiver.end() && mixerRouteIt != mixerRoutes.end()) 
+	{ 
+		sender.erase(senderIt);
+		receiver.erase(receiverIt);
+		mixerRoutes.erase(mixerRouteIt);
+		delete route;
+	}
+
 	Engine::audioEngine()->doneChangeInModel();
 }
 
@@ -710,9 +725,9 @@ void Mixer::clearChannel(mix_ch_t index)
 	if( index > 0)
 	{
 		// delete existing sends
-		while( ! ch->m_sends.isEmpty() )
+		while (!ch->m_sends.empty())
 		{
-			deleteChannelSend( ch->m_sends.first() );
+			deleteChannelSend(ch->m_sends.front());
 		}
 
 		// add send to master
@@ -720,9 +735,9 @@ void Mixer::clearChannel(mix_ch_t index)
 	}
 
 	// delete receives
-	while( ! ch->m_receives.isEmpty() )
+	while (!ch->m_receives.empty())
 	{
-		deleteChannelSend( ch->m_receives.first() );
+		deleteChannelSend(ch->m_receives.front());
 	}
 }
 

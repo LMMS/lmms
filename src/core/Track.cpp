@@ -82,9 +82,9 @@ Track::~Track()
 	lock();
 	emit destroyedTrack();
 
-	while( !m_clips.isEmpty() )
+	while( !m_clips.empty() )
 	{
-		delete m_clips.last();
+		delete m_clips.back();
 	}
 
 	m_trackContainer->removeTrack( this );
@@ -363,9 +363,9 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
-	while( ! m_clips.isEmpty() )
+	while (!m_clips.empty())
 	{
-		delete m_clips.first();
+		delete m_clips.front();
 	}
 }
 

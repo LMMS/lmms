@@ -59,7 +59,7 @@ public:
 
 
 private:
-	typedef QVector<Effect *> EffectList;
+	using EffectList = std::vector<Effect*>;
 	EffectList m_effects;
 
 	BoolModel m_enabledModel;

@@ -722,7 +722,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	bool played_a_note = false;	// will be return variable
 
-	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
+	for (auto it = clips.begin(); it != clips.end(); ++it)
 	{
 		MidiClip* c = dynamic_cast<MidiClip*>( *it );
 		// everything which is not a MIDI clip won't be played
@@ -742,7 +742,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// get all notes from the given clip...
 		const NoteVector & notes = c->notes();
 		// ...and set our index to zero
-		NoteVector::ConstIterator nit = notes.begin();
+		auto nit = notes.begin();
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
