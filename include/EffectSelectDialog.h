@@ -68,7 +68,7 @@ private:
 } ;
 
 
-} // namespace lmms
+} // namespace lmms::gui
 
 
 #endif
