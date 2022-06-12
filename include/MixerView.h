@@ -25,6 +25,7 @@
 #ifndef MIXER_VIEW_H
 #define MIXER_VIEW_H
 
+#include <QMenu>
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QStackedLayout>
@@ -112,7 +113,7 @@ public:
 	void refreshDisplay();
 
 	// Auto track link support	
-	void updateAfterTrackAdd(Track * track, QString name = "", bool isPatternEditor = false);
+	void updateAfterTrackAdd(Track * track, QString name = "");
 	void updateAfterTrackStyleModify(Track * track);
 	void updateAfterTrackMixerLineModify(Track * track);
 	void updateAfterTrackMove(Track * track);
@@ -129,10 +130,26 @@ protected:
 private slots:
 	void updateFaders();
 	void toggledSolo();
-	void updateMenu();
+	void updateAutoTrackLinkMenu();
 	void toogleAutoLinkTrackConfig();
 
 private:
+
+
+
+//	inline const QString autoTrackMenuText(const QString text, bool enabled)
+//	{
+//		return text + (enabled ? " *" :"");
+//	}
+
+//	inline  void setAutoTrackLinkValue(Mixer * mix, std::function<void(Mixer::autoTrackLinkSettings settings)> setValue)
+//	{
+//		auto settings = mix->getAutoLinkTrackSettings();
+//		setValue(settings);
+//		mix->saveAutoLinkTrackSettings(settings);
+//	}
+
+
 	QVector<MixerChannelView *> m_mixerChannelViews;
 
 	MixerLine * m_currentMixerLine;
@@ -154,6 +171,9 @@ private:
 	void setAutoTrackConstraints();
 	void trackStyleToChannel(Track * track, MixerChannel * channel);
 	void channelStyleToTrack(MixerChannel * channel, Track * track);
+	void addAutoLinkTrackMenuEntry(QMenu* menu, const QString &text, bool state,
+		std::function<void(Mixer::autoTrackLinkSettings* settings)> setValue,
+		std::function<void()> after = nullptr);
 
 	friend class MixerChannelView;
 } ;

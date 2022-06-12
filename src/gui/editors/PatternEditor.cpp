@@ -88,7 +88,7 @@ void PatternEditor::removeSteps()
 void PatternEditor::addSampleTrack()
 {
 	Track * track = Track::create( Track::SampleTrack, model() );
-	getGUI()->mixerView()->updateAfterTrackAdd(track, "", true);
+	getGUI()->mixerView()->updateAfterTrackAdd(track);
 }
 
 
