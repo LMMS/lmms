@@ -113,19 +113,19 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if( _search_dup && m_objects.contains(_obj) )
+	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())
 	{
 		return false;
 	}
 
 	// the automation track is unconnected and there is nothing in the track
-	if( m_objects.isEmpty() && hasAutomation() == false )
+	if (m_objects.empty() && hasAutomation() == false)
 	{
 		// then initialize first value
 		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
-	m_objects += _obj;
+	m_objects.push_back(_obj);
 
 	connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
 			this, SLOT( objectDestroyed( jo_id_t ) ),
@@ -177,7 +177,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 	QMutexLocker m(&m_clipMutex);
 
 	AutomatableModel* model;
-	if (!m_objects.isEmpty() && (model = m_objects.first()) != nullptr)
+	if (!m_objects.empty() && (model = *(m_objects.begin())) != nullptr)
 	{
 		return model;
 	}
@@ -373,11 +373,11 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 	// Make a list of TimePos with nodes to be removed
 	// because we can't simply remove the nodes from
 	// the timeMap while we are iterating it.
-	QVector<TimePos> nodesToRemove;
+	std::vector<TimePos> nodesToRemove;
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
 	{
-		nodesToRemove.append(POS(it));
+		nodesToRemove.push_back(POS(it));
 	}
 
 	for (auto node: nodesToRemove)
@@ -826,7 +826,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		}
 		else if( element.tagName() == "object" )
 		{
-			m_idsToResolve << element.attribute( "id" ).toInt();
+			m_idsToResolve.push_back(element.attribute( "id" ).toInt());
 		}
 	}
 	
@@ -860,9 +860,9 @@ const QString AutomationClip::name() const
 	{
 		return Clip::name();
 	}
-	if( !m_objects.isEmpty() && m_objects.first() != nullptr )
+	if (!m_objects.empty() && m_objects.begin() != m_objects.end())
 	{
-		return m_objects.first()->fullDisplayName();
+		return m_objects.begin()->data()->fullDisplayName();
 	}
 	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
@@ -918,9 +918,9 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
  * @brief returns a list of all the automation clips that are connected to a specific model
  * @param _m the model we want to look for
  */
-QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel * _m )
+std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel * _m)
 {
-	QVector<AutomationClip *> clips;
+	std::vector<AutomationClip *> clips;
 	TrackContainer::TrackList l;
 	l += Engine::getSong()->tracks();
 	l += Engine::patternStore()->tracks();
@@ -953,7 +953,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 						}
 					}
 					// if the clips is connected to the model, add it to the list
-					if( has_object ) { clips += a; }
+					if (has_object) { clips.push_back(a); }
 				}
 			}
 		}
@@ -1010,7 +1010,7 @@ void AutomationClip::resolveAllIDs()
 				AutomationClip * a = dynamic_cast<AutomationClip *>( *j );
 				if( a )
 				{
-					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
+					for (std::vector<jo_id_t>::iterator k = a->m_idsToResolve.begin();
 									k != a->m_idsToResolve.end(); ++k )
 					{
 						JournallingObject * o = Engine::projectJournal()->
@@ -1071,9 +1071,9 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 	// when switching samplerate) and real deletions because in the latter
 	// case we had to remove ourselves if we're the global automation
 	// clip of the destroyed object
-	m_idsToResolve += _id;
+	m_idsToResolve.push_back(_id);
 
-	for( objectVector::Iterator objIt = m_objects.begin();
+	for (objectVector::iterator objIt = m_objects.begin();
 		objIt != m_objects.end(); objIt++ )
 	{
 		Q_ASSERT( !(*objIt).isNull() );

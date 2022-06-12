@@ -25,7 +25,6 @@
  */
 
 #include <QDomElement>
-#include <QVector>
 
 
 #include "AudioEngine.h"
@@ -37,7 +36,7 @@
 
 
 long Controller::s_periods = 0;
-QVector<Controller *> Controller::s_controllers;
+ControllerVector Controller::s_controllers;
 
 
 
@@ -52,7 +51,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 {
 	if( _type != DummyController && _type != MidiController )
 	{
-		s_controllers.append( this );
+		s_controllers.push_back(this);
 		// Determine which name to use
 		for ( uint i=s_controllers.size(); ; i++ )
 		{
@@ -83,10 +82,10 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 
 Controller::~Controller()
 {
-	int idx = s_controllers.indexOf( this );
-	if( idx >= 0 )
+	auto it = std::find(s_controllers.begin(), s_controllers.end(), this);
+	if (it != s_controllers.end())
 	{
-		s_controllers.remove( idx );
+		s_controllers.erase(it);
 	}
 
 	m_valueBuffer.clear();
