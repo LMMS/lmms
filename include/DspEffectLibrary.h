@@ -329,7 +329,7 @@ namespace lmms::DspEffectLibrary
 
 	} ;
 
-} // namespace lmms::DspEffectLibaray
+} // namespace lmms::DspEffectLibrary
 
 
 #endif
