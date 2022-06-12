@@ -116,4 +116,4 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 }
 
 
-} // namespace lmms
+} // namespace lmms::gui
