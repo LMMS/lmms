@@ -517,7 +517,10 @@ void MixerView::updateAfterTrackDelete(Track * track)
 		}
 		if (shouldDelete)
 		{
-			deleteChannel(channel->m_channelIndex);
+			// we disable autolink if it gets not deleted because of a channel send.
+			channel->m_autoTrackLinkModel.setValue(false);
+			m_mixerChannelViews[channel->m_channelIndex]->m_mixerLine->autoTrackLinkChanged();
+			if (channel->m_receives.isEmpty()) deleteChannel(channel->m_channelIndex);
 			updateAutoTrackSortOrder();
 		}
 	}

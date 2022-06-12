@@ -158,7 +158,7 @@ public:
 		enum class AutoAdd
 		{
 			Disabled,			/* do not link tracks after add */
-			Separate,			/* one channel for each track after add*/
+			CreateNew,			/* one channel for each track after add*/
 			UseFirstTrackOnly,	/* use always the first channel in the editor for new tracks*/
 		};
 
@@ -175,7 +175,6 @@ public:
 			PatternLinked 		/* pattern editor first, linked tracks afterwards */
 		};
 
-
 		struct editorSettings
 		{
 			LinkStyle linkStyle;
@@ -184,10 +183,9 @@ public:
 			editorSettings()
 			{
 				linkStyle = LinkStyle::LinkNameAndColor;
-				autoAdd = AutoAdd::Separate;
+				autoAdd = AutoAdd::CreateNew;
 			}
 		};
-
 
 		bool enabled;
 		bool autoDelete;
@@ -264,9 +262,7 @@ public:
 			if (asInt < lower || asInt >upper) return defaultValue;
 			return asInt;
 		}
-
 	};
-
 
 
 	Mixer();
@@ -357,7 +353,6 @@ public:
 	MixerRouteVector m_mixerRoutes;
 
 private:
-
 	inline const QString & getAutoTrackCfg(ConfigManager * cfg, const QString & postFix)
 	{
 		return cfg->value("AutoTrackLink", "settings_"+postFix);

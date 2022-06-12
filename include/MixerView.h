@@ -134,22 +134,6 @@ private slots:
 	void toogleAutoLinkTrackConfig();
 
 private:
-
-
-
-//	inline const QString autoTrackMenuText(const QString text, bool enabled)
-//	{
-//		return text + (enabled ? " *" :"");
-//	}
-
-//	inline  void setAutoTrackLinkValue(Mixer * mix, std::function<void(Mixer::autoTrackLinkSettings settings)> setValue)
-//	{
-//		auto settings = mix->getAutoLinkTrackSettings();
-//		setValue(settings);
-//		mix->saveAutoLinkTrackSettings(settings);
-//	}
-
-
 	QVector<MixerChannelView *> m_mixerChannelViews;
 
 	MixerLine * m_currentMixerLine;
