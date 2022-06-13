@@ -117,7 +117,7 @@ public:
 	void updateAfterTrackStyleModify(Track * track);
 	void updateAfterTrackMixerLineModify(Track * track);
 	void updateAfterTrackMove(Track * track);
-	void updateAfterTrackDelete(Track * track);
+	void updateBeforeTrackDelete(Track * track);
 	void toggleAutoTrackLink(int index);
 
 

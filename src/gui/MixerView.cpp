@@ -223,8 +223,6 @@ void MixerView::updateAutoTrackLinkMenu()
 	QMenu* toMenu = m_autoLinkTrackSettingsBtn->menu();
 	toMenu->clear();
 
-	// no widget but same approach as for CaptionMenu
-
 	QAction * captionMain = toMenu->addAction( "Auto track linking" );
 	captionMain->setEnabled( false );
 	QMenu* sortMenu = toMenu->addMenu(tr("Sort linked channels"));
@@ -289,7 +287,6 @@ void MixerView::updateAutoTrackLinkMenu()
 		[](Mixer::autoTrackLinkSettings* s) { s->patternEditor.linkStyle = Mixer::autoTrackLinkSettings::LinkStyle::Disabled;});
 
 	// settings - automatic sort menu
-
 	addAutoLinkTrackMenuEntry(sortAutoMenu, tr("Song Editor -> Pattern Editor"),
 		settings.autoSort == Mixer::autoTrackLinkSettings::AutoSort::LinkedPattern,
 		[](Mixer::autoTrackLinkSettings* s) { s->autoSort = Mixer::autoTrackLinkSettings::AutoSort::LinkedPattern;},
@@ -372,7 +369,6 @@ void MixerView::updateAfterTrackAdd(Track * track, QString name)
 		int channelIndex = addNewChannel();
 		model->setValue( channelIndex );
 		mix->mixerChannel(channelIndex)->m_autoTrackLinkModel.setValue(true);
-		m_mixerChannelViews[channelIndex]->m_mixerLine->autoTrackLinkChanged();
 
 		// it may be that the track name is not available yet because of async loading
 		if (name != "") track->setName(name);
@@ -454,19 +450,16 @@ void MixerView::setAutoTrackConstraints()
 	bool wasModified = false;
 	for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
 	{
-		if (settings.enabled)
+		if (settings.enabled && mix->mixerChannel(i)->m_autoTrackLinkModel.value())
 		{
 			// no more linked tracks or too many linked tracks
 			if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 &&
 				settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToOne))
 			{
 				mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
-				m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 				wasModified = true;
 			}
 		}
-		// update mixer lines in both cases (enabling/disabling)
-		m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 	}
 	if (!settings.enabled) return;
 
@@ -496,16 +489,11 @@ void MixerView::updateAfterTrackMove(Track * track)
 	}
 }
 
-void MixerView::updateAfterTrackDelete(Track * track)
+void MixerView::updateBeforeTrackDelete(Track * track)
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
 	if (!settings.enabled) return;
-	if (!settings.autoDelete)
-	{
-		setAutoTrackConstraints();
-		return;
-	}
 	auto channel = mix->getCustomChannelByTrack(track);
 	if (channel != nullptr && channel->m_autoTrackLinkModel.value())
 	{
@@ -513,14 +501,17 @@ void MixerView::updateAfterTrackDelete(Track * track)
 		if (settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToMany)
 		{
 			std::vector<int> usedChannelCounts = mix->getUsedChannelCounts();
-			shouldDelete = usedChannelCounts[channel->m_channelIndex] == 0;
+			// why "1" - because the track is not yet deleted
+			shouldDelete = usedChannelCounts[channel->m_channelIndex] == 1;
 		}
 		if (shouldDelete)
 		{
-			// we disable autolink if it gets not deleted because of a channel send.
 			channel->m_autoTrackLinkModel.setValue(false);
-			m_mixerChannelViews[channel->m_channelIndex]->m_mixerLine->autoTrackLinkChanged();
-			if (channel->m_receives.isEmpty()) deleteChannel(channel->m_channelIndex);
+			if (settings.autoDelete && channel->m_receives.isEmpty())
+			{
+				// we only delete if the setting allows and the channel does not receive another channel
+				deleteChannel(channel->m_channelIndex);
+			}
 			updateAutoTrackSortOrder();
 		}
 	}
@@ -839,7 +830,6 @@ void MixerView::deleteChannelInternal(int index)
 	for(int i=index + 1; i<m_mixerChannelViews.size(); ++i)
 	{
 		m_mixerChannelViews[i]->m_mixerLine->setChannelIndex(i-1);
-		m_mixerChannelViews[i]->m_mixerLine->autoTrackLinkChanged();
 	}
 	m_mixerChannelViews.remove(index);
 }
@@ -872,7 +862,6 @@ void MixerView::toggleAutoTrackLink(int index)
 	auto settings =mix->getAutoLinkTrackSettings();
 	if (!settings.enabled) return;
 	mix->toggleAutoTrackLink(index);
-	m_mixerChannelViews[index]->m_mixerLine->autoTrackLinkChanged();
 	MixerChannel *  channel = mix->mixerChannel(index);
 	if (!channel->m_autoTrackLinkModel.value()) return;
 
@@ -887,8 +876,8 @@ void MixerView::toggleAutoTrackLink(int index)
 
 	if (trackFound != nullptr)
 	{
-		updateAutoTrackSortOrder();
 		updateAfterTrackStyleModify(trackFound);
+		updateAutoTrackSortOrder();
 	}
 }
 
@@ -910,8 +899,8 @@ void MixerView::swapChannels(int indexA, int indexB)
 	m_mixerChannelViews[indexA]->setChannelIndex(indexA);
 	m_mixerChannelViews[indexB]->setChannelIndex(indexB );
 
-	m_mixerChannelViews[indexA]->m_mixerLine->autoTrackLinkChanged();
-	m_mixerChannelViews[indexB]->m_mixerLine->autoTrackLinkChanged();
+	m_mixerChannelViews[indexA]->m_mixerLine->setChannelIndex(indexA);
+	m_mixerChannelViews[indexB]->m_mixerLine->setChannelIndex(indexB);
 }
 
 

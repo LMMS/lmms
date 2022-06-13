@@ -134,14 +134,10 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	proxyWidget->setRotation( -90 );
 	proxyWidget->setPos( 8, 145 );
 
-	autoTrackLinkChanged();
-
-	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );	
 	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
-	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_autoTrackLinkModel, SIGNAL(dataChanged()),this, SLOT(autoTrackLinkChanged()));
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_autoTrackLinkModel, SIGNAL( dataChanged() ), this, SLOT( autoTrackLinkChanged() ) );
 }
-
-
 
 
 MixerLine::~MixerLine()
@@ -159,6 +155,7 @@ void MixerLine::setChannelIndex( int index )
 	m_channelIndex = index;
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->update();
+	autoTrackLinkChanged();
 }
 
 
@@ -296,8 +293,8 @@ void MixerLine::contextMenuEvent( QContextMenuEvent * )
 
 void MixerLine::toogleAutoTrackLink()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->toggleAutoTrackLink(m_channelIndex);
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->toggleAutoTrackLink(m_channelIndex);
 }
 
 void MixerLine::autoTrackLinkChanged()
@@ -367,8 +364,8 @@ void MixerLine::renameFinished()
 
 void MixerLine::removeChannel()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->deleteChannel( m_channelIndex );
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->deleteChannel( m_channelIndex );
 }
 
 
@@ -376,8 +373,8 @@ void MixerLine::removeChannel()
 
 void MixerLine::removeUnusedChannels()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->deleteUnusedChannels();
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->deleteUnusedChannels();
 }
 
 
@@ -385,8 +382,8 @@ void MixerLine::removeUnusedChannels()
 
 void MixerLine::moveChannelLeft()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->moveChannelLeft( m_channelIndex );
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->moveChannelLeft( m_channelIndex );
 }
 
 
@@ -394,8 +391,8 @@ void MixerLine::moveChannelLeft()
 
 void MixerLine::moveChannelRight()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->moveChannelRight( m_channelIndex );
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->moveChannelRight( m_channelIndex );
 }
 
 

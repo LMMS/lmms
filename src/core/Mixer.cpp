@@ -352,8 +352,6 @@ void Mixer::toggleAutoTrackLink(int index)
 }
 
 
-
-
 IntModel * Mixer::getChannelModelByTrack(Track * track)
 {
 	if( track->type() == Track::InstrumentTrack )

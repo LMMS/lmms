@@ -168,7 +168,7 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 	if( index != -1 )
 	{
 		Track * t = _tv->getTrack();
-		getGUI()->mixerView()->updateAfterTrackDelete(t);
+		getGUI()->mixerView()->updateBeforeTrackDelete(t);
 		m_trackViews.removeAt( index );
 
 		disconnect( _tv );
