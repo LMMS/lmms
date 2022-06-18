@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef MIXER_LINE_H
-#define MIXER_LINE_H
+#ifndef MIXERLINE_H
+#define MIXERLINE_H
 
 #include <QWidget>
 
