@@ -78,7 +78,7 @@ public:
 	PluginIssueType type() const { return m_issueType; }
 	bool operator==(const PluginIssue& other) const;
 	bool operator<(const PluginIssue& other) const;
-	friend QDebug (operator<<)(QDebug stream, const PluginIssue& iss);
+	friend QDebug operator<<(QDebug stream, const PluginIssue& iss);
 };
 
 QDebug operator<<(QDebug stream, const PluginIssue& iss);
