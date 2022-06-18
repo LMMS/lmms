@@ -66,18 +66,17 @@ class Xpressive : public Instrument
 	Q_OBJECT
 public:
 	Xpressive(InstrumentTrack* instrument_track );
-	virtual ~Xpressive();
 
-	virtual void playNote(NotePlayHandle* nph,
-						sampleFrame* working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle* nph );
+	void playNote(NotePlayHandle* nph,
+						sampleFrame* working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle* nph ) override;
 
 
-	virtual void saveSettings( QDomDocument& _doc,
-							QDomElement& _this );
-	virtual void loadSettings( const QDomElement& _this );
+	void saveSettings( QDomDocument& _doc,
+							QDomElement& _this ) override;
+	void loadSettings( const QDomElement& _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
 	gui::PluginView* instantiateView( QWidget * parent ) override;
 
@@ -157,7 +156,6 @@ public:
 	XpressiveView( Instrument* _instrument,
 					QWidget* _parent );
 
-	virtual ~XpressiveView();
 protected:
 
 
@@ -178,7 +176,7 @@ protected slots:
 	void graphDrawn( );
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob *m_generalPurposeKnob[3];
 	Knob *m_panningKnob[2];

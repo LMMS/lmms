@@ -111,9 +111,6 @@ Xpressive::Xpressive(InstrumentTrack* instrument_track) :
 	m_outputExpression[1]="expw(integrate(f*atan(500t)*2/pi))*0.5+0.12";
 }
 
-Xpressive::~Xpressive() {
-}
-
 void Xpressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 
 	// Save plugin version
@@ -535,11 +532,6 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	connect(m_o2Btn, SIGNAL(clicked()), this, SLOT(updateLayout()));
 
 	updateLayout();
-}
-
-
-XpressiveView::~XpressiveView()
-{
 }
 
 
