@@ -68,4 +68,4 @@ void MemoryHelper::alignedFree( void* _buffer )
 }
 
 
-} // namespac elmms
+} // namespace lmms
