@@ -1,0 +1,199 @@
+#!/usr/bin/python3
+
+# This script checks the code for namespace related issues
+# Note: This script is not perfect. It can not parse all LMMS files,
+#       and does not contain a complete C++ parser. If you encounter
+#       difficulties with this tests, it could be a fault of your
+#       changes, but it could also be a fault of this script.
+
+import re
+import subprocess
+from pathlib import Path
+
+# global variables
+
+errors = 0
+
+
+# functions
+
+def caption(my_str):
+    print(f'\n# {my_str}\n')
+
+
+def error(where, my_str):
+    global errors
+    errors += 1
+    print(f'Error: {where}: {my_str}')
+
+
+# if a string makes a classname, we need to check if that class is in the source
+# however, some of these strings name classes that are not from LMMS, so these can be ignored for such checks:
+def is_our_class(classname: str) -> int:
+    return classname[0] != 'Q'  # Qt classes
+
+
+# prepare some variables
+
+if not Path('.gitmodules').is_file():
+    print('You need to call this script from the LMMS top directory')
+    exit(1)
+
+result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
+                        capture_output=True, text=True, check=True)
+exclude_files = {
+    # too complex
+    'include/AudioPortAudio.h',
+    'src/core/audio/AudioPortAudio.cpp',
+    'include/RemotePluginBase.h',
+    'plugins/VstBase/RemoteVstPlugin.cpp',
+    'plugins/ReverbSC/ReverbSC.h',
+    # not ours:
+    'include/ladspa.h'
+    # f.startswith('plugins/LadspaEffect')
+    # f.__contains__('portsmf')
+}
+known_no_namespace_lmms = {
+    # main.cpp
+    'src/core/main.cpp',
+    # nothing to set under a namespace
+    'include/debug.h',
+    'include/versioninfo.h',
+    'plugins/CarlaBase/CarlaConfig/config.h',
+    'plugins/CarlaBase/DummyCarla.cpp',
+    # unclear why it has no namespace
+    'plugins/ZynAddSubFx/RemoteZynAddSubFx.cpp',
+    # not our code
+    'include/aeffectx.h',
+    'include/fenv.h',
+    'plugins/Sf2Player/fluidsynthshims.h',
+    'plugins/MidiExport/MidiFile.hpp',
+    'plugins/ReverbSC/base.c',
+    'plugins/ReverbSC/base.h',
+    'plugins/ReverbSC/dcblock.c',
+    'plugins/ReverbSC/dcblock.h',
+    'plugins/ReverbSC/revsc.c',
+    'plugins/ReverbSC/revsc.h'
+}
+
+files = [Path(f) for f in result.stdout.splitlines() if
+            f not in exclude_files
+            and not f.startswith('plugins/LadspaEffect/calf')
+            and not f.startswith('plugins/LadspaEffect/caps')
+            and not f.startswith('plugins/LadspaEffect/cmt')
+            and not f.startswith('plugins/LadspaEffect/swh')
+            and not f.startswith('plugins/LadspaEffect/tap')
+            and not f.__contains__('portsmf')
+        ]
+
+namespaces = re.compile(r'^\s*namespace\s*\S*', re.MULTILINE)
+no_include_after_namespace = re.compile(
+    r'^(\s*#\s*(?:include|if|el|endif)[^\n]*)*(namespace [\w:]+ [{]|#(?:ifn?def(?: [\w_]+)|if|endif|el)[a-z]*(?: // ?[\w_]+)?|[}](?: // namespace [\w:]+)?|\n)*$')
+has_namespace_lmms = re.compile(r'namespace\s+lmms', re.MULTILINE)
+all_braces_and_macros = re.compile(
+    r'[ \t]*#[ \t]*include|(?:(?:^|\n)namespace [\w:]+[ \n])?[{]|[}](?: // namespace [\w:]+)?|[ \t]*#[ \t]*(?:ifn?def(?: [\w_]+)?|if|el|endif(?: // [\w_]+)?)')
+extract_namespace = re.compile(r'(?:namespace|#ifn?def) ([\w:]+)')
+extract_namespace_from_end_comment = re.compile(r'(?:// namespace |#endif // )([\w_:]+)')
+
+#
+# the real code
+#
+
+caption('namespace checks')
+
+
+# remove all pairs of parentheses and #ifs (and, depending on the 2nd param, also of namespace parentheses)
+# if there is no further opening parentheses/#if/namespace in between
+def eliminate_parentheses(arr, also_incs_and_namespace: bool):
+    removed = 1
+    cur_size = len(arr)
+    # print(f'{cur_file}: {results}')
+    while removed:
+        removed = 0
+        for i in range(0, cur_size):
+            if results[i] == '#include' and also_incs_and_namespace:
+                results[i] = ''
+            elif results[i] == '{' or results[i].startswith('#if') or (
+                    also_incs_and_namespace and results[i].startswith('namespace')):
+                for j in range(i + 1, cur_size):
+                    if (len(results[j]) > 0 and results[j][0] == '}' and (results[i] == '{' or results[i].startswith('namespace')))\
+                            or (len(results[j]) > 0 and results[j].startswith('#endif') and results[i].startswith('#if')):
+                        # if this is a namespace pair, make sure the end comment matches
+                        match = extract_namespace_from_end_comment.search(results[j])
+                        if match:
+                            match2 = extract_namespace.search(results[i])
+                            if match2 and match.group(1) != match2.group(1):
+                                error(cur_file, f'namespace/macro ("{match2.group(1)}") does not match end ("{match.group(1)}")')
+                        # blank out the range between opening and closing symbols
+                        for k in range(i, j + 1):
+                            results[k] = ''
+                            removed = removed + 1
+                        break
+                    elif not (results[j] == '' or results[j] == '#el' or (
+                                also_incs_and_namespace and results[j].startswith(
+                                    '#include'))):  # can only be '{', #if... etc. so we can't eliminate starting at 'i'
+                        break
+        # print(f'{last_size} -> {cur_size}')
+        # print(f'{cur_file}: {results}')
+
+
+for cur_file in files:
+    if cur_file.is_file():
+        results = namespaces.findall(cur_file.read_text(errors='replace'))
+        results_as_str = '\n'.join(results)
+        # print(f'{cur_file}: {results_as_str}')
+
+        if str(cur_file) not in known_no_namespace_lmms:
+            has_namespace_lmms.search(results_as_str) or error(cur_file, f'File has no namespace lmms')
+
+        debugfile = ''  # 'include/RemotePluginBase.h' # debugging
+
+        # remove comments
+        cur_text = cur_file.read_text(errors='replace')
+        cur_text = re.sub(r'(^|[^/])/\*(.|\n)*?\*/', r'\1', cur_text)
+        cur_text = re.sub(r'// namespace', r'//%namespace', cur_text, 0, re.MULTILINE)
+        cur_text = re.sub(r'#endif // ?([A-Z_]+)$', r'#endif //%\1', cur_text, 0, re.MULTILINE)
+        if str(cur_file) == debugfile:
+            print(cur_text)
+        cur_text = re.sub(r'//[^%].*$', r'', cur_text, 0, re.MULTILINE)
+        cur_text = re.sub(r'#endif //%([A-Z_]+)$', r'#endif // \1', cur_text, 0, re.MULTILINE)
+        cur_text = re.sub(r'//%namespace', r'// namespace', cur_text, 0, re.MULTILINE)
+
+        # get list of all #include, #if../#el../#endif and {, }, namespace ... {
+        results = all_braces_and_macros.findall(cur_text)
+
+        if str(cur_file) == debugfile:
+            print(cur_text)
+            print(f'{cur_file}: {results}')
+
+        # remove all ' ' and '\t' from results
+        results = [mystr.strip() for mystr in results]
+        results = [re.sub(r'#\s+', '#', mystr) for mystr in results]
+        results = [re.sub(r'\s+{', ' {', mystr) for mystr in results]
+
+        # eliminate non namespace parentheses and #if../#el../#endif
+        eliminate_parentheses(results, False)
+
+        # the remainder should be solely includes + >=0 namespaces
+        results_as_str = '\n'.join(results)
+        no_include_after_namespace.match(results_as_str) or error(cur_file,
+                                                                  f'File \'{cur_file}\' has includes inside/after a namespace: {results_as_str}')
+
+        if str(cur_file) == debugfile:
+            print(f'{cur_file}: {results}')
+
+        # now also remove #include and the namespaces - the resulting string must be empty
+        eliminate_parentheses(results, True)
+        results_as_str = ''.join(results).replace(' ', '')
+        results_as_str == '' or error(cur_file, f'File \'{cur_file}\' is misformatted: {results_as_str}')
+
+        if str(cur_file) == debugfile:
+            print("FINAL:")
+            print(f'{cur_file}: {results}')
+
+        # print(f'{cur_file}: {results}')
+
+caption('summary')
+
+print(f'{str(errors)} errors.')
+exit(1 if errors > 0 else 0)

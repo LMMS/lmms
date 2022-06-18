@@ -37,10 +37,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
     subprocess.run(['git', 'fetch', '--depth=1', 'origin', ref, head], check=True)
     subprocess.run(['git', 'checkout', ref], check=True)
     subprocess.run(['git', 'submodule', 'update', '--depth=1', '--init'], check=True)
-    # checkout the CURRENT check-strings, because it is subject-under-test
-    subprocess.run(['git', 'checkout', head, 'tests/check-strings/check-strings'], check=True)
-    # run script
-    res = subprocess.run([str(lmms_main_path / 'tests' / 'check-strings' / 'check-strings')],
+    # checkout the CURRENT test scripts, because it is subject-under-test
+    subprocess.run(['git', 'checkout', head, 'tests/scripted/'], check=True)
+    # run check-strings
+    res = subprocess.run([str(lmms_main_path / 'tests' / 'scripted' / 'check-strings')],
                          capture_output=True, text=True)
     print('--->8--- Script output BEGIN --->8---')
     print(res.stdout)
@@ -53,8 +53,22 @@ with tempfile.TemporaryDirectory() as tmpdir:
     if res.returncode == 0:
         raise RuntimeError("Script \"check-strings\" no errors, but errors were expected")
     else:
-        if res.stdout != open(str(lmms_main_path / 'tests' / 'check-strings' / 'expectation.txt')).read():
+        if res.stdout != open(str(lmms_main_path / 'tests' / 'scripted' / 'expectation.txt')).read():
             raise RuntimeError("Script \"check-strings\" returned with different output than in expectation.txt")
+    # run check-namespace
+    res = subprocess.run([str(lmms_main_path / 'tests' / 'scripted' / 'check-namespace')],
+                         capture_output=True, text=True)
+    print('--->8--- Script output BEGIN --->8---')
+    print(res.stdout)
+    print('--->8--- Script output END   --->8---')
+    if res.returncode == 0:
+        raise RuntimeError("Script \"check-strings\" no errors, but errors were expected")
+    else:
+        if not 'Error: src/tracks/SampleTrack.cpp: File has no namespace lmms' in res.stdout:
+            raise RuntimeError("Script \"check-namespace\" did not find missing namespace \"lmms\"")
+        if not 'Error: include/MixerLine.h: namespace/macro ("MIXER_LINE_H") does not match end ("MIXERLINE_H")' in res.stdout:
+            raise RuntimeError("Script \"check-namespace\" did not find missing namespace \"lmms\"")
+
 
 # if we made it until here without an exception, all tests have been passed
 print("SUCCESS")
