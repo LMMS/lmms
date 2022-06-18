@@ -81,6 +81,8 @@
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
 #include <unistd.h>
+#else
+#include "SharedMemory.h"
 #endif
 
 #endif // BUILD_REMOTE_PLUGIN_CLIENT
@@ -92,7 +94,6 @@ namespace lmms
 
 #ifdef SYNC_WITH_SHM_FIFO
 
-#include "SharedMemory.h"
 
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
