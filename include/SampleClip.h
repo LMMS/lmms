@@ -26,8 +26,6 @@
 #define SAMPLE_CLIP_H
 
 #include "Clip.h"
-#include "SampleBuffer.h"
-#include "SampleTrack.h"
 
 namespace lmms
 {
