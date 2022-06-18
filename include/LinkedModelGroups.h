@@ -28,11 +28,12 @@
 
 #include <cstddef>
 
-#include <QDomDocument>
 #include <QDomElement>
 
 #include "Model.h"
 
+
+class QDomDocument;
 
 namespace lmms
 {
