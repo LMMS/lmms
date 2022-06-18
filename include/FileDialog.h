@@ -57,4 +57,4 @@ public:
 
 } // namespace lmms::gui
 
-#endif // FILEDIALOG_HPP
+#endif // FILEDIALOG_H
