@@ -40,30 +40,12 @@
 namespace lmms
 {
 
-class Lv2Instrument;
-
 namespace gui
 {
 
+class Lv2InsView;
 
-class Lv2InsView : public InstrumentView, public Lv2ViewBase
-{
-Q_OBJECT
-public:
-	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
-
-protected:
-	void dragEnterEvent(QDragEnterEvent *_dee) override;
-	void dropEvent(QDropEvent *_de) override;
-
-private:
-	void modelChanged() override;
-};
-
-
-} // namespace gui
-
-
+}
 
 class Lv2Instrument : public Instrument, public Lv2ControlBase
 {
@@ -124,6 +106,28 @@ private:
 
 	friend class gui::Lv2InsView;
 };
+
+
+namespace gui
+{
+
+
+class Lv2InsView : public InstrumentView, public Lv2ViewBase
+{
+Q_OBJECT
+public:
+	Lv2InsView(Lv2Instrument *_instrument, QWidget *_parent);
+
+protected:
+	void dragEnterEvent(QDragEnterEvent *_dee) override;
+	void dropEvent(QDropEvent *_de) override;
+
+private:
+	void modelChanged() override;
+};
+
+
+} // namespace gui
 
 
 } // namespace lmms
