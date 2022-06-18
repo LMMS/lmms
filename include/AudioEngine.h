@@ -316,7 +316,7 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const surroundSampleFrame * buffer );
+	void nextAudioBuffer( const lmms::surroundSampleFrame * buffer );
 
 
 private:

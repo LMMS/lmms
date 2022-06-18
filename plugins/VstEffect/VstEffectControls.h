@@ -77,7 +77,7 @@ protected slots:
 	void rollPreset( void );
 	void rolrPreset( void );
 	void selPreset( void );
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -119,7 +119,7 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
 

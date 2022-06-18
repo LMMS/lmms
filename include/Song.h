@@ -371,7 +371,7 @@ public slots:
 	void record();
 	void playAndRecord();
 	void playPattern();
-	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
+	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -511,10 +511,10 @@ signals:
 	void playbackStateChanged();
 	void playbackPositionChanged();
 	void lengthChanged( int bars );
-	void tempoChanged( bpm_t newBPM );
+	void tempoChanged( lmms::bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );
-	void controllerAdded( Controller * );
-	void controllerRemoved( Controller * );
+	void controllerAdded( lmms::Controller * );
+	void controllerRemoved( lmms::Controller * );
 	void updateSampleTracks();
 	void stopped();
 	void modified();

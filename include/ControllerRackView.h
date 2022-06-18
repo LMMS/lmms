@@ -65,9 +65,9 @@ public:
 
 
 public slots:
-	void deleteController( ControllerView * _view );
-	void onControllerAdded( Controller * );
-	void onControllerRemoved( Controller * );
+	void deleteController( lmms::gui::ControllerView * _view );
+	void onControllerAdded( lmms::Controller * );
+	void onControllerRemoved( lmms::Controller * );
 
 protected:
 	void closeEvent( QCloseEvent * _ce ) override;

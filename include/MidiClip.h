@@ -149,7 +149,7 @@ private:
 
 
 signals:
-	void destroyedMidiClip( MidiClip* );
+	void destroyedMidiClip( lmms::MidiClip* );
 } ;
 
 

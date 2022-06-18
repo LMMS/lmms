@@ -83,7 +83,7 @@ private:
 
 
 signals:
-	void effectModelChanged( LadspaControls * );
+	void effectModelChanged( lmms::LadspaControls * );
 
 } ;
 

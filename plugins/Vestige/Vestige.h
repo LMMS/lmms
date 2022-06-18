@@ -80,7 +80,7 @@ public:
 	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 protected slots:
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 	void handleConfigChange( QString cls, QString attr, QString value );
 	void reloadPlugin();
 
@@ -119,7 +119,7 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
 

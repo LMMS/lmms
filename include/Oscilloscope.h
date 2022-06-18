@@ -60,7 +60,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer( const surroundSampleFrame * buffer );
+	void updateAudioBuffer( const lmms::surroundSampleFrame * buffer );
 
 private:
 	QColor const & determineLineColor(float level) const;

@@ -92,7 +92,7 @@ public:
 
 public slots:
 	void update();
-	void changePosition( const TimePos & newPos = TimePos( -1 ) );
+	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
 
 protected:
 	enum ContextMenuAction

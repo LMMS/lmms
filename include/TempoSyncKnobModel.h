@@ -83,7 +83,7 @@ public:
 	void setScale( float _new_scale );
 
 signals:
-	void syncModeChanged( TempoSyncMode _new_mode );
+	void syncModeChanged( lmms::TempoSyncKnobModel::TempoSyncMode _new_mode );
 	void scaleChanged( float _new_scale );
 
 
@@ -97,7 +97,7 @@ public slots:
 
 
 protected slots:
-	void calculateTempoSyncTime( bpm_t _bpm );
+	void calculateTempoSyncTime( lmms::bpm_t _bpm );
 	void updateCustom();
 
 

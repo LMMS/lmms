@@ -420,7 +420,7 @@ private:
 
 signals:
 	void initValueChanged( float val );
-	void destroyed( jo_id_t id );
+	void destroyed( lmms::jo_id_t id );
 
 } ;
 

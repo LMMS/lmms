@@ -196,8 +196,8 @@ protected slots:
 	bool toggleStepRecording();
 	void stop();
 
-	void startRecordNote( const Note & n );
-	void finishRecordNote( const Note & n );
+	void startRecordNote( const lmms::Note & n );
+	void finishRecordNote( const lmms::Note & n );
 
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
@@ -209,23 +209,23 @@ protected slots:
 	void pasteNotes();
 	bool deleteSelectedNotes();
 
-	void updatePosition(const TimePos & t );
-	void updatePositionAccompany(const TimePos & t );
-	void updatePositionStepRecording(const TimePos & t );
+	void updatePosition(const lmms::TimePos & t );
+	void updatePositionAccompany(const lmms::TimePos & t );
+	void updatePositionStepRecording(const lmms::TimePos & t );
 
 	void zoomingChanged();
 	void zoomingYChanged();
 	void quantizeChanged();
 	void noteLengthChanged();
 	void keyChanged();
-	void quantizeNotes(QuantizeActions mode = QuantizeBoth);
+	void quantizeNotes(lmms::gui::PianoRoll::QuantizeActions mode = QuantizeBoth);
 
 	void updateSemiToneMarkerMenu();
 
 	void changeNoteEditMode( int i );
 	void markSemiTone(int i, bool fromMenu = true);
 
-	void hideMidiClip( MidiClip* clip );
+	void hideMidiClip( lmms::MidiClip* clip );
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
@@ -494,7 +494,7 @@ private:
 	QBrush m_blackKeyDisabledBackground;
 
 signals:
-	void positionChanged( const TimePos & );
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 

@@ -73,7 +73,7 @@ private:
 	friend class TrackView;
 
 signals:
-	void trackRemovalScheduled( TrackView * t );
+	void trackRemovalScheduled( lmms::gui::TrackView * t );
 
 } ;
 

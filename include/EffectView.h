@@ -71,9 +71,9 @@ public slots:
 
 
 signals:
-	void moveUp( EffectView * _plugin );
-	void moveDown( EffectView * _plugin );
-	void deletePlugin( EffectView * _plugin );
+	void moveUp( lmms::gui::EffectView * _plugin );
+	void moveDown( lmms::gui::EffectView * _plugin );
+	void deletePlugin( lmms::gui::EffectView * _plugin );
 
 
 protected:

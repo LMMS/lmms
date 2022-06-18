@@ -54,7 +54,7 @@ public:
 
 
 private slots:
-	void updateEffectView( LadspaControls * _ctl );
+	void updateEffectView( lmms::LadspaControls * _ctl );
 
 
 private:

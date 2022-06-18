@@ -68,7 +68,7 @@ public slots:
 	void renameController();
 
 signals:
-	void deleteController( ControllerView * _view );
+	void deleteController( lmms::gui::ControllerView * _view );
 
 
 protected:

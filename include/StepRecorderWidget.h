@@ -90,7 +90,7 @@ private:
 	const int m_marginRight;
 
 signals:
-	void positionChanged(const TimePos & t);
+	void positionChanged(const lmms::TimePos & t);
 } ;
 
 } // namespace lmms::gui

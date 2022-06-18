@@ -169,7 +169,7 @@ private:
 
 
 private slots:
-	void createClipView( Clip * clip );
+	void createClipView( lmms::Clip * clip );
 	void muteChanged();
 
 } ;

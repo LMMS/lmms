@@ -250,7 +250,7 @@ private:
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void clipAdded( Clip * );
+	void clipAdded( lmms::Clip * );
 	void colorChanged();
 } ;
 

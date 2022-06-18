@@ -153,8 +153,8 @@ public:
 
 public slots:
 	void realignTracks();
-	TrackView * createTrackView( Track * _t );
-	void deleteTrackView( TrackView * _tv );
+	lmms::gui::TrackView * createTrackView( lmms::Track * _t );
+	void deleteTrackView( lmms::gui::TrackView * _tv );
 
 	void dropEvent( QDropEvent * _de ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
@@ -209,7 +209,7 @@ private:
 
 
 signals:
-	void positionChanged( const TimePos & _pos );
+	void positionChanged( const lmms::TimePos & _pos );
 
 
 } ;

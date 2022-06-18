@@ -117,7 +117,7 @@ public:
 
 
 private slots:
-	void changeQueueTempo( bpm_t _bpm );
+	void changeQueueTempo( lmms::bpm_t _bpm );
 	void updatePortList();
 
 

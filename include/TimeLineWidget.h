@@ -179,7 +179,7 @@ signals:
 
 
 public slots:
-	void updatePosition( const TimePos & );
+	void updatePosition( const lmms::TimePos & );
 	void updatePosition()
 	{
 		updatePosition( TimePos() );
@@ -251,7 +251,7 @@ private:
 
 
 signals:
-	void positionChanged( const TimePos & _t );
+	void positionChanged( const lmms::TimePos & _t );
 	void loopPointStateLoaded( int _n );
 	void positionMarkerMoved();
 	void loadBehaviourAtStop( int _n );

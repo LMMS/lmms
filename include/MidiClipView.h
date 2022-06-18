@@ -63,7 +63,7 @@ public:
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
-	MidiClip* getMidiClip();
+	lmms::MidiClip* getMidiClip();
 	void update() override;
 
 
