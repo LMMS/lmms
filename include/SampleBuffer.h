@@ -284,8 +284,8 @@ public:
 public slots:
 	void setAudioFile(const QString & audioFile);
 	void loadFromBase64(const QString & data);
-	void setStartFrame(const f_cnt_t s);
-	void setEndFrame(const f_cnt_t e);
+	void setStartFrame(const lmms::f_cnt_t s);
+	void setEndFrame(const lmms::f_cnt_t e);
 	void setAmplification(float a);
 	void setReversed(bool on);
 	void sampleRateChanged();
