@@ -108,38 +108,43 @@ public:
 		}
 	};
 
-
-	struct ChordTable : public QVector<Chord>
+	class ChordTable 
 	{
-	private:
-		ChordTable();
-
-		struct Init
-		{
-			const char * m_name;
-			ChordSemiTones m_semiTones;
-		};
-
-		static Init s_initTable[];
-
 	public:
-		static const ChordTable & getInstance()
+		static const ChordTable& getInstance() 
 		{
 			static ChordTable inst;
 			return inst;
 		}
 
-		const Chord & getByName( const QString & name, bool is_scale = false ) const;
+		const Chord& getByName(const QString& name, bool is_scale = false) const;
 
-		const Chord & getScaleByName( const QString & name ) const
+		const Chord& getScaleByName(const QString& name) const
 		{
-			return getByName( name, true );
+			return getByName(name, true);
 		}
 
-		const Chord & getChordByName( const QString & name ) const
+		const Chord& getChordByName(const QString& name) const
 		{
-			return getByName( name, false );
+			return getByName(name, false);
 		}
+
+		const std::vector<Chord>& chords() const 
+		{
+			return m_chords;
+		}
+	private:
+		ChordTable();
+
+		struct Init 
+		{
+			const char* m_name;
+			ChordSemiTones m_semiTones;
+		};
+
+		static Init s_initTable[];
+
+		std::vector<Chord> m_chords;
 	};
 
 

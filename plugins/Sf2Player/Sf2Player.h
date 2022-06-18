@@ -34,7 +34,7 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "LcdSpinBox.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 class Sf2InstrumentView;
 class Sf2Font;

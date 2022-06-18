@@ -29,7 +29,7 @@
 #include <QString>
 #include "lmms_export.h"
 #include "lmms_basics.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 #include "Plugin.h"
 #include "TimePos.h"
 

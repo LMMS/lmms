@@ -843,7 +843,9 @@ AutomationClip * Song::tempoAutomationClip()
 
 AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 {
-	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, clipNum);
+	TrackList trackList {m_globalAutomationTrack};
+	trackList.insert(trackList.end(), tracks().begin(), tracks().end());
+	return TrackContainer::automatedValuesFromTracks(trackList, time, clipNum);
 }
 
 
@@ -1318,7 +1320,7 @@ void Song::restoreControllerStates( const QDomElement & element )
 		else
 		{
 			// Fix indices to ensure correct connections
-			m_controllers.append(Controller::create(
+			m_controllers.push_back(Controller::create(
 				Controller::DummyController, this));
 		}
 
@@ -1437,9 +1439,10 @@ void Song::setProjectFileName(QString const & projectFileName)
 
 void Song::addController( Controller * controller )
 {
-	if( controller && !m_controllers.contains( controller ) )
+	const auto cont = std::find(m_controllers.begin(), m_controllers.end(), controller);
+	if (controller && cont == m_controllers.end())
 	{
-		m_controllers.append( controller );
+		m_controllers.push_back(controller);
 		emit controllerAdded( controller );
 
 		this->setModified();
@@ -1451,10 +1454,10 @@ void Song::addController( Controller * controller )
 
 void Song::removeController( Controller * controller )
 {
-	int index = m_controllers.indexOf( controller );
-	if( index != -1 )
+	auto it = std::find(m_controllers.begin(), m_controllers.end(), controller);
+	if (it != m_controllers.end())
 	{
-		m_controllers.remove( index );
+		m_controllers.erase(it);
 
 		emit controllerRemoved( controller );
 		delete controller;

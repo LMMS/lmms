@@ -28,7 +28,7 @@
 
 #include <cstring>
 
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 static fpp_t framesPerPeriod;
 

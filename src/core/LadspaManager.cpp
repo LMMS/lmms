@@ -31,6 +31,7 @@
 
 #include <cmath>
 
+#include "core/common.h"
 #include "ConfigManager.h"
 #include "LadspaManager.h"
 #include "PluginFactory.h"
@@ -94,7 +95,7 @@ LadspaManager::LadspaManager()
 			}
 			else
 			{
-				qWarning() << plugin_lib.errorString();
+				lmms::lmms_warning(plugin_lib.errorString().toStdString());
 			}
 		}
 	}

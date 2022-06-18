@@ -25,6 +25,7 @@
 #include "PerfLog.h"
 
 #include "lmmsconfig.h"
+#include "core/common.h"
 
 #if defined(LMMS_HAVE_SYS_TIMES_H) && defined(LMMS_HAVE_UNISTD_H)
 #	define USE_POSIX_TIME
@@ -68,7 +69,7 @@ PerfTime PerfTime::now()
 	time.m_real = times(&t);
 	time.m_user = t.tms_utime;
 	time.m_system = t.tms_stime;
-	if (time.m_real == -1) { qWarning("PerfTime: now failed"); }
+	if (time.m_real == -1) { lmms::lmms_warning("PerfTime: now failed"); }
 #endif
 	return time;
 }
@@ -79,7 +80,7 @@ clock_t PerfTime::ticksPerSecond()
 #ifdef USE_POSIX_TIME
 	if (!clktck) {
 		if ((clktck = sysconf(_SC_CLK_TCK)) < 0) {
-			qWarning("PerfLog::end sysconf()");
+			lmms::lmms_warning("PerfLog::end sysconf()");
 		}
 	}
 #endif
@@ -120,6 +121,7 @@ void PerfLogTimer::end()
 	long clktck = PerfTime::ticksPerSecond();
 
 	PerfTime d = PerfTime::now() - begin_time;
+	// TODO: change to lmms_warning function to help eliminate Qt dependency from core file
 	qWarning("PERFLOG | %20s | %.2fuser, %.2fsystem %.2felapsed",
 			 qPrintable(name),
 			 d.user() / (double)clktck,

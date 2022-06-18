@@ -25,9 +25,8 @@
 #ifndef MIDI_CLIENT_H
 #define MIDI_CLIENT_H
 
+#include <vector>
 #include <QStringList>
-#include <QVector>
-
 
 #include "MidiEvent.h"
 
@@ -107,7 +106,7 @@ public:
 	static MidiClient * openMidiClient();
 
 protected:
-	QVector<MidiPort *> m_midiPorts;
+	std::vector<MidiPort*> m_midiPorts;
 
 } ;
 

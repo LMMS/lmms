@@ -26,12 +26,13 @@
 #ifndef CONFIG_MGR_H
 #define CONFIG_MGR_H
 
+#include <vector>
+
 #include "lmmsconfig.h"
 
 #include <QMap>
 #include <QPair>
 #include <QStringList>
-#include <QVector>
 #include <QObject>
 
 #include "lmms_export.h"
@@ -236,8 +237,8 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	const QString & value(const QString & cls,
-					const QString & attribute) const;
+	const QString value(const QString& cls, const QString& attribute) const;
+
 	const QString & value(const QString & cls,
 					const QString & attribute,
 					const QString & defaultVal) const;
@@ -299,7 +300,7 @@ private:
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
-	typedef QVector<QPair<QString, QString> > stringPairVector;
+	using stringPairVector = std::vector<QPair<QString, QString>>;
 	typedef QMap<QString, stringPairVector> settingsMap;
 	settingsMap m_settings;
 

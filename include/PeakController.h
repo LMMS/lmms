@@ -32,7 +32,7 @@ class QWidget;
 
 class PeakControllerEffect;
 
-typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
+using PeakControllerEffectVector = std::vector<PeakControllerEffect*>;
 
 
 class LMMS_EXPORT PeakController : public Controller

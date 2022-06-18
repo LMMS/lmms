@@ -196,11 +196,11 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
 						this, SLOT( flipX() ) );
-	if( !m_clip->m_objects.isEmpty() )
+	if (!m_clip->m_objects.empty())
 	{
 		_cm->addSeparator();
 		QMenu * m = new QMenu( tr( "%1 Connections" ).
-				arg( m_clip->m_objects.count() ), _cm );
+				arg(m_clip->m_objects.size()), _cm);
 		for( AutomationClip::objectVector::iterator it =
 						m_clip->m_objects.begin();
 					it != m_clip->m_objects.end(); ++it )

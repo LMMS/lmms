@@ -157,8 +157,7 @@ void PeakController::loadSettings( const QDomElement & _this )
 		effectId = m_loadCount++;
 	}
 
-	PeakControllerEffectVector::Iterator i;
-	for( i = s_effects.begin(); i != s_effects.end(); ++i )
+	for (auto i = s_effects.begin(); i != s_effects.end(); ++i)
 	{
 		if( (*i)->m_effectId == effectId )
 		{
@@ -186,14 +185,14 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 {
 	int effectId = _this.attribute( "effectId" ).toInt();
 
-	PeakControllerEffectVector::Iterator i;
+	PeakControllerEffectVector::iterator i;
 
 	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
 	//foundCount should always be 1 because m_effectId is initialized with rand()
 	int foundCount = 0;
 	if( m_buggedFile == false )
 	{
-		for( i = s_effects.begin(); i != s_effects.end(); ++i )
+		for (auto i = s_effects.begin(); i != s_effects.end(); ++i)
 		{
 			if( (*i)->m_effectId == effectId )
 			{

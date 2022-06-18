@@ -22,10 +22,9 @@
  *
  */
 
+#include "core/MemoryManager.h"
 
-#include "MemoryManager.h"
-
-#include <QtGlobal>
+#include "core/common.h"
 #include "rpmalloc.h"
 
 /// Global static object handling rpmalloc intializing and finalizing
@@ -63,15 +62,15 @@ void* MemoryManager::alloc(size_t size)
 {
 	// Reference local thread guard to ensure it is initialized.
 	// Compilers may optimize the instance away otherwise.
-	Q_UNUSED(&local_mm_thread_guard);
-	Q_ASSERT_X(rpmalloc_is_thread_initialized(), "MemoryManager::alloc", "Thread not initialized");
+	UNUSED_ARG(&local_mm_thread_guard);
+	LMMS_ASSERT(rpmalloc_is_thread_initialized(), "MemoryManager::alloc", "Thread not initialized");
 	return rpmalloc(size);
 }
 
 
 void MemoryManager::free(void * ptr)
 {
-	Q_UNUSED(&local_mm_thread_guard);
-	Q_ASSERT_X(rpmalloc_is_thread_initialized(), "MemoryManager::free", "Thread not initialized");
+	UNUSED_ARG(&local_mm_thread_guard);
+	LMMS_ASSERT(rpmalloc_is_thread_initialized(), "MemoryManager::free", "Thread not initialized");
 	return rpfree(ptr);
 }

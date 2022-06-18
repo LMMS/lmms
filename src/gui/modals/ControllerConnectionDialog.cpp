@@ -259,7 +259,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			}
 			else
 			{
-				int idx = Engine::getSong()->controllers().indexOf( cc->getController() );
+				auto controllers = Engine::getSong()->controllers();
+				int idx = std::distance(controllers.begin(), std::find(controllers.begin(), controllers.end(), cc->getController()));
 
 				if( idx >= 0 )
 				{

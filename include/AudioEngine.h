@@ -27,10 +27,10 @@
 
 #include <QMutex>
 #include <QThread>
-#include <QVector>
 #include <QWaitCondition>
 #include <samplerate.h>
 
+#include <vector>
 
 #include "lmms_basics.h"
 #include "LocklessList.h"
@@ -411,7 +411,7 @@ private:
 
 	bool m_renderOnly;
 
-	QVector<AudioPort *> m_audioPorts;
+	std::vector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
 
@@ -425,7 +425,7 @@ private:
 	surroundSampleFrame * m_outputBufferWrite;
 
 	// worker thread stuff
-	QVector<AudioEngineWorkerThread *> m_workers;
+	std::vector<AudioEngineWorkerThread *> m_workers;
 	int m_numWorkers;
 
 	// playhandle stuff

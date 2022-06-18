@@ -23,14 +23,14 @@
  */
 
 #include "AudioEngineWorkerThread.h"
+#include "core/common.h"
 
-#include <QDebug>
 #include <QMutex>
 #include <QWaitCondition>
 
 #include "denormals.h"
 #include "AudioEngine.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 #include "ThreadableJob.h"
 
 #if __SSE__
@@ -63,7 +63,7 @@ void AudioEngineWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 		if (index < JOB_QUEUE_SIZE) {
 			m_items[index] = _job;
 		} else {
-			qWarning() << "Job queue is full!";
+			lmms::lmms_warning("Job queue is full!");
 			++m_itemsDone;
 		}
 	}
@@ -164,7 +164,7 @@ void AudioEngineWorkerThread::startAndWaitForJobs()
 
 void AudioEngineWorkerThread::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
+	MemoryManager::ThreadGuard mmThreadGuard; UNUSED_ARG(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;

@@ -25,6 +25,7 @@
 
 #include <QFile>
 
+#include "core/common.h"
 #include "ProjectRenderer.h"
 #include "Song.h"
 #include "PerfLog.h"
@@ -161,7 +162,7 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
-	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
+	MemoryManager::ThreadGuard mmThreadGuard; UNUSED_ARG(mmThreadGuard);
 #if 0
 #if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_FREEBSD)
 #ifdef LMMS_HAVE_SCHED_H
@@ -241,7 +242,7 @@ void ProjectRenderer::updateConsoleProgress()
 							activity[rot] );
 	rot = ( rot+1 ) % 4;
 
-	fprintf( stderr, "%s", buf );
+	lmms::lmms_warning(buf);
 	fflush( stderr );
 }
 

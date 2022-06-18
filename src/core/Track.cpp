@@ -32,6 +32,7 @@
 #include <QDomElement>
 #include <QVariant>
 
+#include "core/common.h"
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
 #include "ConfigManager.h"
@@ -81,9 +82,9 @@ Track::~Track()
 	lock();
 	emit destroyedTrack();
 
-	while( !m_clips.isEmpty() )
+	while( !m_clips.empty() )
 	{
-		delete m_clips.last();
+		delete m_clips.back();
 	}
 
 	m_trackContainer->removeTrack( this );
@@ -249,8 +250,7 @@ void Track::loadSettings( const QDomElement & element )
 {
 	if( element.attribute( "type" ).toInt() != type() )
 	{
-		qWarning( "Current track-type does not match track-type of "
-							"settings-node!\n" );
+		lmms::lmms_warning("Current track-type does not match track-type of settings-node!");
 	}
 
 	setName( element.hasAttribute( "name" ) ? element.attribute( "name" ) :
@@ -363,9 +363,9 @@ void Track::removeClip( Clip * clip )
 /*! \brief Remove all Clips from this track */
 void Track::deleteClips()
 {
-	while( ! m_clips.isEmpty() )
+	while (!m_clips.empty())
 	{
-		delete m_clips.first();
+		delete m_clips.front();
 	}
 }
 
@@ -426,7 +426,7 @@ int Track::getClipNum( const Clip * clip )
 		}*/
 		return it - m_clips.begin();
 	}
-	qWarning( "Track::getClipNum(...) -> _clip not found!\n" );
+	lmms::lmms_warning("Track::getClipNum(...) -> _clip not found!");
 	return 0;
 }
 

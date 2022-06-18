@@ -35,7 +35,7 @@
 #include <QColor>
 
 class MixerRoute;
-typedef QVector<MixerRoute *> MixerRouteVector;
+using MixerRouteVector = std::vector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
 {
@@ -211,7 +211,7 @@ public:
 
 private:
 	// the mixer channels in the mixer. index 0 is always master.
-	QVector<MixerChannel *> m_mixerChannels;
+	std::vector<MixerChannel*> m_mixerChannels;
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);

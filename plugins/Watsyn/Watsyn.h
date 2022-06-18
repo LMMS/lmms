@@ -32,7 +32,7 @@
 #include "AutomatableModel.h"
 #include "TempoSyncKnob.h"
 #include <samplerate.h>
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\

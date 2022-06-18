@@ -26,6 +26,8 @@
 #ifndef PANNING_H
 #define PANNING_H
 
+#include <cmath>
+
 #include "lmms_basics.h"
 #include "panning_constants.h"
 #include "Midi.h"
@@ -36,7 +38,7 @@ inline StereoVolumeVector panningToVolumeVector( panning_t _p,
 {
 	StereoVolumeVector v = { { _scale, _scale } };
 	const float pf = _p / 100.0f;
-	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - qAbs<float>( pf );
+	v.vol[_p >= PanningCenter ? 0 : 1] *= 1.0f - std::abs(pf);
 	return v;
 }
 

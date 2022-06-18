@@ -25,6 +25,8 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
+#include <vector>
+
 #include <QMap>
 #include <QMutex>
 
@@ -32,7 +34,7 @@
 #include "Model.h"
 #include "TimePos.h"
 #include "ValueBuffer.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 #include "ModelVisitor.h"
 
 // simple way to map a property of a view to a model
@@ -75,7 +77,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	MM_OPERATORS
 public:
 
-	typedef QVector<AutomatableModel *> AutoModelVector;
+	using AutoModelVector = std::vector<AutomatableModel*>;
 
 	enum ScaleType
 	{

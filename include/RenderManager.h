@@ -27,6 +27,7 @@
 #define RENDER_MANAGER_H
 
 #include <memory>
+#include <vector>
 
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
@@ -74,8 +75,8 @@ private:
 
 	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 
-	QVector<Track*> m_tracksToRender;
-	QVector<Track*> m_unmuted;
+	std::vector<Track*> m_tracksToRender;
+	std::vector<Track*> m_unmuted;
 } ;
 
 #endif

@@ -24,7 +24,7 @@
 #include <cstdlib>
 
 #include "lmms_basics.h"
-#include "MemoryHelper.h"
+#include "core/MemoryHelper.h"
 
 /**
  * Allocate a number of bytes and return them.

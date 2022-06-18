@@ -26,7 +26,7 @@
 #ifndef NOTE_H
 #define NOTE_H
 
-#include <QVector>
+#include <vector>
 
 #include "volume.h"
 #include "panning.h"
@@ -244,7 +244,7 @@ private:
 };
 
 
-typedef QVector<Note *> NoteVector;
+using NoteVector = std::vector<Note*>;
 
 
 #endif

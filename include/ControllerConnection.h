@@ -30,8 +30,9 @@
 #ifndef CONTROLLER_CONNECTION_H
 #define CONTROLLER_CONNECTION_H
 
+#include <vector>
+
 #include <QObject>
-#include <QVector>
 
 #include "Controller.h"
 #include "JournallingObject.h"
@@ -39,7 +40,7 @@
 
 class ControllerConnection;
 
-typedef QVector<ControllerConnection *> ControllerConnectionVector;
+using ControllerConnectionVector = std::vector<ControllerConnection*>;
 
 
 class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObject

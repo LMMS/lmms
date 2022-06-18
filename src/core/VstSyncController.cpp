@@ -27,8 +27,7 @@
 
 #include <stdexcept>
 
-#include <QDebug>
-
+#include "core/common.h"
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
@@ -49,12 +48,12 @@ VstSyncController::VstSyncController() :
 		}
 		catch (const std::runtime_error& error)
 		{
-			qWarning() << "Failed to allocate shared memory for VST sync:" << error.what();
+			lmms::lmms_warning("Failed to allocate shared memory for VST sync: ", error.what());
 		}
 	}
 	else
 	{
-		qWarning( "VST sync support disabled in your configuration" );
+		lmms::lmms_warning("VST sync support disabled in your configuration");
 	}
 
 	if( m_syncData == nullptr )

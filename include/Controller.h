@@ -27,6 +27,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include <vector>
+
 #include "lmms_export.h"
 #include "Engine.h"
 #include "Model.h"
@@ -37,7 +39,7 @@ class ControllerDialog;
 class Controller;
 class ControllerConnection;
 
-typedef QVector<Controller *> ControllerVector;
+using ControllerVector = std::vector<Controller*>;
 
 
 class LMMS_EXPORT Controller : public Model, public JournallingObject

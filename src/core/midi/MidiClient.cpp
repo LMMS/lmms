@@ -23,6 +23,7 @@
  *
  */
 
+#include "core/common.h"
 #include "MidiClient.h"
 #include "MidiPort.h"
 
@@ -75,8 +76,7 @@ void MidiClient::removePort( MidiPort* port )
 		return;
 	}
 
-	QVector<MidiPort *>::Iterator it =
-		std::find( m_midiPorts.begin(), m_midiPorts.end(), port );
+	auto it = std::find(m_midiPorts.begin(), m_midiPorts.end(), port);
 	if( it != m_midiPorts.end() )
 	{
 		m_midiPorts.erase( it );
@@ -275,7 +275,7 @@ void MidiClientRaw::processOutEvent(const MidiEvent& event, const TimePos&, cons
 			break;
 
 		default:
-			qWarning("MidiClientRaw: unhandled MIDI-event %d\n", (int)event.type());
+			lmms::lmms_warning("MidiClientRaw: unhandled MIDI-event ", static_cast<int>(event.type()));
 			break;
 	}
 }

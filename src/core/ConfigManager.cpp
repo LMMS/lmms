@@ -30,6 +30,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
+#include "core/common.h"
 #include "ConfigManager.h"
 #include "MainWindow.h"
 #include "ProjectVersion.h"
@@ -331,23 +332,20 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-const QString & ConfigManager::value(const QString & cls,
+const QString ConfigManager::value(const QString & cls,
 					const QString & attribute) const
 {
-	if(m_settings.contains(cls))
+	if (m_settings.contains(cls))
 	{
-		for(stringPairVector::const_iterator it =
-						m_settings[cls].begin();
-					it != m_settings[cls].end(); ++it)
+		for (const auto& setting : m_settings[cls]) 
 		{
-			if((*it).first == attribute)
+			if (setting.first == attribute)
 			{
-				return (*it).second ;
+				return setting.second;
 			}
 		}
 	}
-	static QString empty;
-	return empty;
+	return "";
 }
 
 
@@ -441,7 +439,7 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			{
 				bool success;
 				m_configVersion = root.attribute("configversion").toUInt(&success);
-				if( !success ) qWarning("Config Version conversion failure.");
+				if( !success ) lmms::lmms_warning("Config Version conversion failure.");
 			}
 
 			// create the settings-map out of the DOM

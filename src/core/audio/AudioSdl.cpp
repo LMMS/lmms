@@ -33,6 +33,7 @@
 #include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
+#include "core/common.h"
 
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
@@ -114,7 +115,7 @@ AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 		m_supportsCapture = true;
 	} else {
 		m_supportsCapture = false;
-		qWarning ( "Couldn't open SDL capture device: %s\n", SDL_GetError ());
+		lmms::lmms_warning("Couldn't open SDL capture device: ", SDL_GetError());
 	}
 
 #endif

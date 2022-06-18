@@ -31,7 +31,7 @@
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-#include "MemoryManager.h"
+#include "core/MemoryManager.h"
 
 class EffectChain;
 class EffectControls;
