@@ -98,7 +98,7 @@ private:
 };
 
 
-} // namesapce lmms
+} // namespace lmms
 
 #endif // LMMS_HAVE_JACK
 
