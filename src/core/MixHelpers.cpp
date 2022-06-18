@@ -24,6 +24,9 @@
 
 #include "MixHelpers.h"
 
+#ifdef LMMS_DEBUG
+#include <cstdio>
+#endif
 
 #include <cmath>
 #include <QtGlobal>
@@ -102,6 +105,7 @@ bool sanitize( sampleFrame * src, int frames )
 			if( std::isinf( src[f][c] ) || std::isnan( src[f][c] ) )
 			{
 				#ifdef LMMS_DEBUG
+					// TODO don't use printf here
 					printf("Bad data, clearing buffer. frame: ");
 					printf("%d: value %f\n", f, src[f][c]);
 				#endif

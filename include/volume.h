@@ -35,6 +35,6 @@ constexpr volume_t DefaultVolume = 100;
 typedef struct
 {
 	float vol[2];
-} stereoVolumeVector;
+} StereoVolumeVector;
 
 #endif

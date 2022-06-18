@@ -26,7 +26,7 @@
 
 #include "embed.h"
 #include "FlangerControls.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "TempoSyncKnob.h"
 
 
