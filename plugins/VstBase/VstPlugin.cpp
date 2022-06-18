@@ -416,7 +416,7 @@ bool VstPlugin::processMessage( const message & _m )
 			// so this is legal despite MSDN's warning
 			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
 					GWLP_HWNDPARENT,
-					(LONG_PTR) getGUI()->mainWindow()->winId() );
+					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
 #endif
 
 #ifdef LMMS_BUILD_LINUX
