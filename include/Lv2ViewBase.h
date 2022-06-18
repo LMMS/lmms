@@ -101,7 +101,6 @@ private:
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	const int m_colNum = 6;
 	QMdiSubWindow* m_helpWindow = nullptr;
-	LedCheckBox* m_multiChannelLink;
 };
 
 
