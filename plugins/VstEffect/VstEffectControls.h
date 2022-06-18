@@ -88,7 +88,7 @@ private:
 //	QLabel * m_presetLabel;
 
 	friend class VstEffectControlDialog;
-	friend class manageVSTEffectView;
+	friend class ManageVSTEffectView;
 
 	bool m_vstGuiVisible;
 } ;
@@ -96,12 +96,12 @@ private:
 
 
 
-class manageVSTEffectView : public QObject
+class ManageVSTEffectView : public QObject
 {
 	Q_OBJECT
 public:
-	manageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi );
-	virtual ~manageVSTEffectView();
+	ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi );
+	virtual ~ManageVSTEffectView();
 
 
 protected slots:

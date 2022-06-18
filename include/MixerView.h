@@ -34,7 +34,6 @@
 #include "Engine.h"
 #include "Fader.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "embed.h"
 #include "EffectRackView.h"
 
