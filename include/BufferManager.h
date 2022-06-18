@@ -48,7 +48,7 @@ public:
 	static void release( sampleFrame * buf );
 
 private:
-	static fpp_t framesPerPeriod;
+	static fpp_t s_framesPerPeriod;
 };
 
 

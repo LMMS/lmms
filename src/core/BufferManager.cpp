@@ -33,17 +33,17 @@
 namespace lmms
 {
 
-fpp_t BufferManager::framesPerPeriod;
+fpp_t BufferManager::s_framesPerPeriod;
 
 void BufferManager::init( fpp_t fpp )
 {
-	BufferManager::framesPerPeriod = fpp;
+	s_framesPerPeriod = fpp;
 }
 
 
 sampleFrame * BufferManager::acquire()
 {
-	return MM_ALLOC<sampleFrame>( BufferManager::framesPerPeriod );
+	return MM_ALLOC<sampleFrame>( s_framesPerPeriod );
 }
 
 void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
