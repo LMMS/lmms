@@ -69,7 +69,6 @@
 #ifndef SYNC_WITH_SHM_FIFO
 #include <sys/socket.h>
 #include <sys/un.h>
-#include "SharedMemory.h"
 #endif // SYNC_WITH_SHM_FIFO
 
 #else // BUILD_REMOTE_PLUGIN_CLIENT
@@ -86,6 +85,9 @@
 
 #endif // BUILD_REMOTE_PLUGIN_CLIENT
 
+#ifdef SYNC_WITH_SHM_FIFO
+#include "SharedMemory.h"
+#endif
 
 namespace lmms
 {
