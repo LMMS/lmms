@@ -115,13 +115,6 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 
 
 
-AudioFileProcessor::~AudioFileProcessor()
-{
-}
-
-
-
-
 void AudioFileProcessor::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {

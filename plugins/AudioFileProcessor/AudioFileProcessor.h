@@ -56,23 +56,22 @@ class AudioFileProcessor : public Instrument
 	Q_OBJECT
 public:
 	AudioFileProcessor( InstrumentTrack * _instrument_track );
-	virtual ~AudioFileProcessor();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	virtual void saveSettings( QDomDocument & _doc,
-						QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+						QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile( const QString & _file ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
 	virtual int getBeatLen( NotePlayHandle * _n ) const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return 128;
 	}
