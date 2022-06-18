@@ -47,11 +47,11 @@
 #include <QtGlobal>
 #include <QSystemSemaphore>
 #include <QUuid>
-#else
+#else // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#endif
+#endif // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 
 #ifdef LMMS_HAVE_LOCALE_H
 #include <clocale>
@@ -69,9 +69,10 @@
 #ifndef SYNC_WITH_SHM_FIFO
 #include <sys/socket.h>
 #include <sys/un.h>
-#endif
+#include "SharedMemory.h"
+#endif // SYNC_WITH_SHM_FIFO
 
-#else
+#else // BUILD_REMOTE_PLUGIN_CLIENT
 #include "lmms_export.h"
 #include <QMutex>
 #include <QProcess>
@@ -81,9 +82,7 @@
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
 #include <unistd.h>
-#else
-#include "SharedMemory.h"
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
 #endif // BUILD_REMOTE_PLUGIN_CLIENT
 
