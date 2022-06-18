@@ -84,13 +84,6 @@ ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin() :
 
 
 
-
-ZynAddSubFxRemotePlugin::~ZynAddSubFxRemotePlugin()
-{
-}
-
-
-
 bool ZynAddSubFxRemotePlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
@@ -568,14 +561,6 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	l->setColumnStretch( 4, 10 );
 
 	setAcceptDrops( true );
-}
-
-
-
-
-
-ZynAddSubFxView::~ZynAddSubFxView()
-{
 }
 
 

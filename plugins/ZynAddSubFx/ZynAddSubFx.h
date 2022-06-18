@@ -56,9 +56,8 @@ class ZynAddSubFxRemotePlugin : public RemotePlugin
 	Q_OBJECT
 public:
 	ZynAddSubFxRemotePlugin();
-	virtual ~ZynAddSubFxRemotePlugin();
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 
 signals:
@@ -73,21 +72,21 @@ class ZynAddSubFxInstrument : public Instrument
 	Q_OBJECT
 public:
 	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
-	virtual ~ZynAddSubFxInstrument();
+	~ZynAddSubFxInstrument() override;
 
-	virtual void play( sampleFrame * _working_buffer );
+	void play( sampleFrame * _working_buffer ) override;
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 );
+	bool handleMidiEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile( const QString & _file ) override;
 
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
 		return IsSingleStreamed | IsMidiBased;
 	}
@@ -147,16 +146,15 @@ class ZynAddSubFxView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	ZynAddSubFxView( Instrument * _instrument, QWidget * _parent );
-	virtual ~ZynAddSubFxView();
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
 
 
 private:
-	void modelChanged();
+	void modelChanged() override;
 
 	QPushButton * m_toggleUIButton;
 	Knob * m_portamento;
