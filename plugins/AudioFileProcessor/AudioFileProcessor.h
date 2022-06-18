@@ -94,7 +94,7 @@ private slots:
 
 
 signals:
-	void isPlaying( f_cnt_t _current_frame );
+	void isPlaying( lmms::f_cnt_t _current_frame );
 
 
 private:
