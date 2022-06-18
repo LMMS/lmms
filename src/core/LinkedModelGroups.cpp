@@ -22,6 +22,9 @@
  *
  */
 
+#include <QDomDocument>
+#include <QDomElement>
+
 #include "LinkedModelGroups.h"
 
 
