@@ -47,19 +47,18 @@ class Vibed : public Instrument
 	Q_OBJECT
 public:
 	Vibed( InstrumentTrack * _instrument_track );
-	virtual ~Vibed();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
 		return IsNotBendable;
 	}

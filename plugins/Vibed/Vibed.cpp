@@ -132,13 +132,6 @@ Vibed::Vibed( InstrumentTrack * _instrumentTrack ) :
 
 
 
-Vibed::~Vibed()
-{
-}
-
-
-
-
 void Vibed::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 
