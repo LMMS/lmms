@@ -151,9 +151,15 @@ TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
+<<<<<<< HEAD
 	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 				_tv->getTrackContentWidget(),
 				SLOT( changePosition( const lmms::TimePos& ) ) );
+=======
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+				_tv->getTrackContentWidget(),
+				SLOT( changePosition( const lmms::TimePos & ) ) );
+>>>>>>> 0b8b8dc25 (Namespace `lmms` (#6174))
 	realignTracks();
 	return( _tv );
 }

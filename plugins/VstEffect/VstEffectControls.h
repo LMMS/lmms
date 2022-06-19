@@ -117,8 +117,13 @@ public:
 
 
 protected slots:
+<<<<<<< HEAD
 	void syncPlugin();
 	void displayAutomatedOnly();
+=======
+	void syncPlugin( void );
+	void displayAutomatedOnly( void );
+>>>>>>> 0b8b8dc25 (Namespace `lmms` (#6174))
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
