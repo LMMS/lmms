@@ -48,7 +48,7 @@ public:
 
 
 signals:
-	void doubleClicked( const lmms::ladspa_key_t & );
+	void doubleClicked( const ::lmms::ladspa_key_t & );
 
 
 private:

@@ -50,7 +50,7 @@ public:
 
 
 public slots:
-	void showPorts( const lmms::ladspa_key_t & _key );
+	void showPorts( const ::lmms::ladspa_key_t & _key );
 
 
 private:

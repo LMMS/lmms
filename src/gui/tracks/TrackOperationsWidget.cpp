@@ -106,9 +106,9 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_soloBtn->show();
 	m_soloBtn->setToolTip(tr("Solo"));
 
-	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
+	connect( this, SIGNAL( trackRemovalScheduled( lmms::gui::TrackView * ) ),
 			m_trackView->trackContainerView(),
-				SLOT( deleteTrackView( TrackView * ) ),
+				SLOT( deleteTrackView( lmms::gui::TrackView * ) ),
 							Qt::QueuedConnection );
 
 	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),

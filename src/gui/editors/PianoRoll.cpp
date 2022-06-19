@@ -301,28 +301,28 @@ PianoRoll::PianoRoll() :
 						Song::Mode_PlayMidiClip ),
 						m_currentPosition,
 						Song::Mode_PlayMidiClip, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
-		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+		m_timeLine, SLOT( updatePosition( const lmms::TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+			this, SLOT( updatePosition( const lmms::TimePos & ) ) );
 
 	// white position line follows timeline marker
 	m_positionLine = new PositionLine(this);
 
 	//update timeline when in step-recording mode
-	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePositionStepRecording( const TimePos & ) ) );
+	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+			this, SLOT( updatePositionStepRecording( const lmms::TimePos & ) ) );
 
 	// update timeline when in record-accompany mode
 	connect( Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).m_timeLine,
-				SIGNAL( positionChanged( const TimePos & ) ),
+				SIGNAL( positionChanged( const lmms::TimePos & ) ),
 			this,
-			SLOT( updatePositionAccompany( const TimePos & ) ) );
+			SLOT( updatePositionAccompany( const lmms::TimePos & ) ) );
 	// TODO
 /*	connect( engine::getSong()->getPlayPos( Song::Mode_PlayPattern ).m_timeLine,
-				SIGNAL( positionChanged( const TimePos & ) ),
+				SIGNAL( positionChanged( const lmms::TimePos & ) ),
 			this,
-			SLOT( updatePositionAccompany( const TimePos & ) ) );*/
+			SLOT( updatePositionAccompany( const lmms::TimePos & ) ) );*/
 
 	removeSelection();
 
@@ -913,10 +913,10 @@ void PianoRoll::setCurrentMidiClip( MidiClip* newMidiClip )
 	resizeEvent( nullptr );
 
 	// make sure to always get informed about the MIDI clip being destroyed
-	connect( m_midiClip, SIGNAL( destroyedMidiClip( MidiClip* ) ), this, SLOT( hideMidiClip( MidiClip* ) ) );
+	connect( m_midiClip, SIGNAL( destroyedMidiClip( lmms::MidiClip* ) ), this, SLOT( hideMidiClip( lmms::MidiClip* ) ) );
 
-	connect( m_midiClip->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
-	connect( m_midiClip->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
+	connect( m_midiClip->instrumentTrack(), SIGNAL( midiNoteOn( const lmms::Note& ) ), this, SLOT( startRecordNote( const lmms::Note& ) ) );
+	connect( m_midiClip->instrumentTrack(), SIGNAL( midiNoteOff( const lmms::Note& ) ), this, SLOT( finishRecordNote( const lmms::Note& ) ) );
 	connect( m_midiClip, SIGNAL(dataChanged()), this, SLOT(update()));
 	connect( m_midiClip->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
 

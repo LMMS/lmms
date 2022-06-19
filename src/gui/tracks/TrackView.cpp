@@ -90,8 +90,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	connect( m_track,
-		SIGNAL( clipAdded( Clip * ) ),
-			this, SLOT( createClipView( Clip * ) ),
+		SIGNAL( clipAdded( lmms::Clip * ) ),
+			this, SLOT( createClipView( lmms::Clip * ) ),
 			Qt::QueuedConnection );
 
 	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),

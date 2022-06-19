@@ -71,8 +71,8 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	setAcceptDrops( true );
 
 	connect( parent->trackContainerView(),
-			SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( changePosition( const TimePos & ) ) );
+			SIGNAL( positionChanged( const lmms::TimePos & ) ),
+			this, SLOT( changePosition( const lmms::TimePos & ) ) );
 
 	setStyle( QApplication::style() );
 

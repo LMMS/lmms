@@ -548,8 +548,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_waveView = 0;
 	newWaveView();
 
-	connect( castModel<AudioFileProcessor>(), SIGNAL( isPlaying( f_cnt_t ) ),
-			m_waveView, SLOT( isPlaying( f_cnt_t ) ) );
+	connect( castModel<AudioFileProcessor>(), SIGNAL( isPlaying( lmms::f_cnt_t ) ),
+			m_waveView, SLOT( isPlaying( lmms::f_cnt_t ) ) );
 
 	qRegisterMetaType<f_cnt_t>( "f_cnt_t" );
 

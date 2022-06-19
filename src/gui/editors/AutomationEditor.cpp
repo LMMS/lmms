@@ -150,10 +150,10 @@ AutomationEditor::AutomationEditor() :
 					Song::Mode_PlayAutomationClip ),
 					m_currentPosition,
 					Song::Mode_PlayAutomationClip, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
-		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+		m_timeLine, SLOT( updatePosition( const lmms::TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+			this, SLOT( updatePosition( const lmms::TimePos & ) ) );
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );

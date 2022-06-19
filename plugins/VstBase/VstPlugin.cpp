@@ -182,8 +182,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 	setTempo( Engine::getSong()->getTempo() );
 
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL( tempoChanged( lmms::bpm_t ) ),
+			this, SLOT( setTempo( lmms::bpm_t ) ), Qt::DirectConnection );
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 

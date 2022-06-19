@@ -47,7 +47,7 @@ SampleClip::SampleClip( Track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( Engine::getSong(), SIGNAL( tempoChanged( lmms::bpm_t ) ),
 					this, SLOT( updateLength() ), Qt::DirectConnection );
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( updateLength() ) );

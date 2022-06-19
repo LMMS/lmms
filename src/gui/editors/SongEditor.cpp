@@ -88,11 +88,11 @@ SongEditor::SongEditor( Song * song ) :
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
 				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
-			SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+			SLOT( updatePosition( const lmms::TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+			this, SLOT( updatePosition( const lmms::TimePos & ) ) );
 	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
