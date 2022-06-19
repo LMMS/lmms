@@ -54,7 +54,7 @@ public:
 				const QString & _name = QString(),
 						LedColors _color = Yellow );
 
-	virtual ~LedCheckBox();
+	~LedCheckBox() override;
 
 
 	inline const QString & text()

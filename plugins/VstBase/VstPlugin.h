@@ -45,7 +45,7 @@ class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 	Q_OBJECT
 public:
 	VstPlugin( const QString & _plugin );
-	virtual ~VstPlugin();
+	~VstPlugin() override;
 
 	void tryLoad( const QString &remoteVstPluginExecutable );
 
@@ -112,7 +112,7 @@ public:
 	void loadSettings( const QDomElement & _this ) override;
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 
-	virtual QString nodeName() const override
+	QString nodeName() const override
 	{
 		return "vstplugin";
 	}

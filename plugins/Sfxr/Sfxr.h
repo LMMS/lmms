@@ -140,7 +140,7 @@ public:
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */
-	virtual void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) )
+	void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) ) override
 	{
 		float oldInitValue = initValue();
 		FloatModel::loadSettings(element, name);
@@ -161,7 +161,7 @@ public:
 	{
 	}
 	/* purpose: prevent the initial value of the model from being changed */
-	virtual void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) )
+	void loadSettings( const QDomElement& element, const QString& name = QString( "value" ) ) override
 	{
 		float oldInitValue = initValue();
 		FloatModel::loadSettings(element, name);
@@ -176,18 +176,18 @@ class SfxrInstrument : public Instrument
 	Q_OBJECT
 public:
 	SfxrInstrument(InstrumentTrack * _instrument_track );
-	virtual ~SfxrInstrument();
+	~SfxrInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+							QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 	void resetModels();
 
@@ -240,7 +240,7 @@ public:
 	SfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent );
 
-	virtual ~SfxrInstrumentView() {};
+	~SfxrInstrumentView() override {};
 
 protected slots:
 	void genPickup();
@@ -256,7 +256,7 @@ protected slots:
 	void previewSound();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob * m_attKnob; //Attack Time
 	Knob * m_holdKnob; //Sustain Time

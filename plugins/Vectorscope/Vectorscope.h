@@ -37,7 +37,7 @@ class Vectorscope : public Effect
 {
 public:
 	Vectorscope(Model *parent, const Descriptor::SubPluginFeatures::Key *key);
-	virtual ~Vectorscope() {};
+	~Vectorscope() override {};
 
 	bool processAudioBuffer(sampleFrame *buffer, const fpp_t frame_count) override;
 	EffectControls *controls() override {return &m_controls;}

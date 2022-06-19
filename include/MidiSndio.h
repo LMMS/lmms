@@ -46,7 +46,7 @@ class MidiSndio : public QThread, public MidiClientRaw
 	Q_OBJECT
 public:
 	MidiSndio( void );
-	virtual ~MidiSndio();
+	~MidiSndio() override;
 
 	static QString probeDevice(void);
 

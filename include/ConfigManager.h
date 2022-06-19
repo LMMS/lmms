@@ -274,7 +274,7 @@ private:
 
 	ConfigManager();
 	ConfigManager(const ConfigManager & _c);
-	~ConfigManager();
+	~ConfigManager() override;
 
 	void upgrade_1_1_90();
 	void upgrade_1_1_91();

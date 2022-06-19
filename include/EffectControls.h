@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	virtual ~EffectControls()
+	~EffectControls() override
 	{
 	}
 

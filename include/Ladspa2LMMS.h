@@ -68,7 +68,7 @@ public:
 
 private:
 	Ladspa2LMMS();
-	virtual ~Ladspa2LMMS();
+	~Ladspa2LMMS() override;
 
 	l_sortable_plugin_t m_instruments;
 	l_sortable_plugin_t m_validEffects;

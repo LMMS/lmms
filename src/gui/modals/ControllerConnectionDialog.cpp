@@ -60,7 +60,7 @@ public:
 	}
 
 
-	virtual ~AutoDetectMidiController()
+	~AutoDetectMidiController() override
 	{
 	}
 

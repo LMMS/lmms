@@ -39,7 +39,7 @@ class ProcessWatcher : public QThread
 	Q_OBJECT
 public:
 	ProcessWatcher( RemotePlugin * );
-	virtual ~ProcessWatcher() = default;
+	~ProcessWatcher() override = default;
 
 	void stop()
 	{
@@ -66,7 +66,7 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 	Q_OBJECT
 public:
 	RemotePlugin();
-	virtual ~RemotePlugin();
+	~RemotePlugin() override;
 
 	inline bool isRunning()
 	{

@@ -46,7 +46,7 @@ class SampleRecordHandle : public PlayHandle
 {
 public:
 	SampleRecordHandle( SampleClip* clip );
-	virtual ~SampleRecordHandle();
+	~SampleRecordHandle() override;
 
 	void play( sampleFrame * _working_buffer ) override;
 	bool isFinished() const override;

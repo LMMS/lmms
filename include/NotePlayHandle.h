@@ -74,7 +74,7 @@ public:
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
 					Origin origin = OriginMidiClip );
-	virtual ~NotePlayHandle();
+	~NotePlayHandle() override;
 
 	void * operator new ( size_t size, void * p )
 	{

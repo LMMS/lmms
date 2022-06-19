@@ -42,7 +42,7 @@ public:
 		: QTreeWidgetItem( pListView, pItemAfter ) {}
 
 	// Sort/compare overriden method.
-	bool operator< ( const QTreeWidgetItem& other ) const
+	bool operator< ( const QTreeWidgetItem& other ) const override
 	{
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
 		const QString& s1 = text( iColumn );

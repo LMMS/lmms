@@ -41,7 +41,7 @@ class AutomationTrackView : public TrackView
 {
 public:
 	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
-	virtual ~AutomationTrackView() = default;
+	~AutomationTrackView() override = default;
 
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
 	void dropEvent( QDropEvent * _de ) override;

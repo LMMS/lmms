@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-	virtual ~InlineAutomation()
+	~InlineAutomation() override
 	{
 		if( m_autoClip )
 		{

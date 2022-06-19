@@ -43,7 +43,7 @@ public:
 	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
 
 	Oscilloscope( QWidget * _parent );
-	virtual ~Oscilloscope();
+	~Oscilloscope() override;
 
 	void setActive( bool _active );
 

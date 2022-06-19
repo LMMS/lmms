@@ -40,21 +40,21 @@ class BitcrushControls : public EffectControls
 	Q_OBJECT
 public:
 	BitcrushControls( BitcrushEffect * eff );
-	virtual ~BitcrushControls();
+	~BitcrushControls() override;
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & elem );
-	virtual void loadSettings( const QDomElement & elem );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & doc, QDomElement & elem ) override;
+	void loadSettings( const QDomElement & elem ) override;
+	inline QString nodeName() const override
 	{
 		return( "bitcrushcontrols" );
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 9 );
 	}
 
-	virtual gui::EffectControlDialog * createView()
+	gui::EffectControlDialog * createView() override
 	{
 		return( new gui::BitcrushControlDialog( this ) );
 	}

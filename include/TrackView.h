@@ -64,7 +64,7 @@ class TrackView : public QWidget, public ModelView, public JournallingObject
 	Q_OBJECT
 public:
 	TrackView( Track * _track, TrackContainerView* tcv );
-	virtual ~TrackView();
+	~TrackView() override;
 
 	inline const Track * getTrack() const
 	{

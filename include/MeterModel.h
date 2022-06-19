@@ -38,7 +38,7 @@ class MeterModel : public Model
 	mapPropertyFromModel(int,getDenominator,setDenominator,m_denominatorModel);
 public:
 	MeterModel( Model * _parent );
-	~MeterModel();
+	~MeterModel() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this,
 						const QString & _name );

@@ -43,7 +43,7 @@ public:
 	//!   If false, all child widget will be cut down to the TabWidget's size
 	TabWidget( const QString & _caption, QWidget * _parent,
 				bool usePixmap = false, bool resizable = false );
-	virtual ~TabWidget() = default;
+	~TabWidget() override = default;
 
 	void addTab( QWidget * w, const QString & name, const char *pixmap = nullptr, int idx = -1 );
 

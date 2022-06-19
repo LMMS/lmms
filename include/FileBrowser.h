@@ -68,7 +68,7 @@ public:
 			const QString& userDir = "",
 			const QString& factoryDir = "");
 
-	virtual ~FileBrowser() = default;
+	~FileBrowser() override = default;
 
 private slots:
 	void reloadTree( void );
@@ -107,7 +107,7 @@ class FileBrowserTreeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget( QWidget * parent );
-	virtual ~FileBrowserTreeWidget() = default;
+	~FileBrowserTreeWidget() override = default;
 
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.

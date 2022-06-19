@@ -44,7 +44,7 @@ class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
 	Q_OBJECT
 public:
 	ProjectNotes();
-	virtual ~ProjectNotes();
+	~ProjectNotes() override;
 
 	void clear();
 	void setText( const QString & _text );

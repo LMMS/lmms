@@ -44,7 +44,7 @@ class LMMS_EXPORT StringPairDrag : public QDrag
 public:
 	StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w );
-	~StringPairDrag();
+	~StringPairDrag() override;
 
 	static bool processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys );

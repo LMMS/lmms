@@ -41,7 +41,7 @@ public:
 	{
 	}
 
-	virtual ~DummyPlugin()
+	~DummyPlugin() override
 	{
 	}
 

@@ -41,7 +41,7 @@ class TrackLabelButton : public QToolButton
 	Q_OBJECT
 public:
 	TrackLabelButton( TrackView * _tv, QWidget * _parent );
-	virtual ~TrackLabelButton();
+	~TrackLabelButton() override;
 
 
 public slots:

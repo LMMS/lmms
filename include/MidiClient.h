@@ -125,7 +125,7 @@ class MidiClientRaw : public MidiClient
 {
 public:
 	MidiClientRaw();
-	virtual ~MidiClientRaw();
+	~MidiClientRaw() override;
 
 	// we are raw-clients for sure!
 	bool isRaw() const override

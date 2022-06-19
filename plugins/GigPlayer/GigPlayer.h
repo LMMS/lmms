@@ -243,35 +243,35 @@ class GigInstrument : public Instrument
 
 public:
 	GigInstrument( InstrumentTrack * _instrument_track );
-	virtual ~GigInstrument();
+	~GigInstrument() override;
 
-	virtual void play( sampleFrame * _working_buffer );
+	void play( sampleFrame * _working_buffer ) override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile( const QString & _file ) override;
 
-	virtual AutomatableModel * childModel( const QString & _modelName );
+	AutomatableModel * childModel( const QString & _modelName ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return 0;
 	}
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
 		return IsSingleStreamed|IsNotBendable;
 	}
 
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 	QString getCurrentPatchName();
 
@@ -352,10 +352,10 @@ class GigInstrumentView : public InstrumentViewFixedSize
 public:
 	GigInstrumentView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~GigInstrumentView();
+	~GigInstrumentView() override;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	PixmapButton * m_fileDialogButton;
 	PixmapButton * m_patchDialogButton;

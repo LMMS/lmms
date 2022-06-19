@@ -40,7 +40,7 @@ public:
 	AudioFileDevice(OutputSettings const & outputSettings,
 			const ch_cnt_t _channels, const QString & _file,
 			AudioEngine* audioEngine );
-	virtual ~AudioFileDevice();
+	~AudioFileDevice() override;
 
 	QString outputFile() const
 	{

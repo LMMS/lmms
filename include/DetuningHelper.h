@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-	virtual ~DetuningHelper()
+	~DetuningHelper() override
 	{
 	}
 

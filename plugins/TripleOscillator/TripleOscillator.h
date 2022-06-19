@@ -57,7 +57,7 @@ class OscillatorObject : public Model
 	Q_OBJECT
 public:
 	OscillatorObject( Model * _parent, int _idx );
-	virtual ~OscillatorObject();
+	~OscillatorObject() override;
 
 
 private:
@@ -108,24 +108,24 @@ class TripleOscillator : public Instrument
 	Q_OBJECT
 public:
 	TripleOscillator( InstrumentTrack * _track );
-	virtual ~TripleOscillator();
+	~TripleOscillator() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 128 );
 	}
 
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 protected slots:
@@ -157,11 +157,11 @@ class TripleOscillatorView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	TripleOscillatorView( Instrument * _instrument, QWidget * _parent );
-	virtual ~TripleOscillatorView();
+	~TripleOscillatorView() override;
 
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	automatableButtonGroup * m_mod1BtnGrp;
 	automatableButtonGroup * m_mod2BtnGrp;

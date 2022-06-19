@@ -72,7 +72,7 @@ public:
 
 
 
-	~EqFader()
+	~EqFader() override
 	{
 	}
 

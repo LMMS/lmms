@@ -387,7 +387,7 @@ private:
 
 
 	AudioEngine( bool renderOnly );
-	virtual ~AudioEngine();
+	~AudioEngine() override;
 
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();

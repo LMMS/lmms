@@ -63,16 +63,16 @@ class MidiExport: public ExportFilter
 // 	Q_OBJECT
 public:
 	MidiExport();
-	~MidiExport();
+	~MidiExport() override;
 
-	virtual gui::PluginView* instantiateView(QWidget *)
+	gui::PluginView* instantiateView(QWidget *) override
 	{
 		return nullptr;
 	}
 
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
+	bool tryExport(const TrackContainer::TrackList &tracks,
 				const TrackContainer::TrackList &patternTracks,
-				int tempo, int masterPitch, const QString &filename);
+				int tempo, int masterPitch, const QString &filename) override;
 	
 private:
 	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,

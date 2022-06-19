@@ -67,7 +67,7 @@ public:
 	{
 	}
 
-	virtual ~LocklessAllocatorT()
+	~LocklessAllocatorT() override
 	{
 	}
 

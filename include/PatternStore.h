@@ -68,7 +68,7 @@ class LMMS_EXPORT PatternStore : public TrackContainer
 	mapPropertyFromModel(int, currentPattern, setCurrentPattern, m_patternComboBoxModel);
 public:
 	PatternStore();
-	virtual ~PatternStore();
+	~PatternStore() override;
 
 	virtual bool play(TimePos start, const fpp_t frames, const f_cnt_t frameBase, int clipNum = -1);
 

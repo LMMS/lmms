@@ -65,7 +65,7 @@ class InstrumentTrackWindow : public QWidget, public ModelView,
 	Q_OBJECT
 public:
 	InstrumentTrackWindow( InstrumentTrackView * _tv );
-	virtual ~InstrumentTrackWindow();
+	~InstrumentTrackWindow() override;
 
 	// parent for all internal tab-widgets
 	TabWidget * tabWidgetParent()

@@ -50,7 +50,7 @@ class VstEffectControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	VstEffectControlDialog( VstEffectControls * _controls );
-	virtual ~VstEffectControlDialog();
+	~VstEffectControlDialog() override;
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;

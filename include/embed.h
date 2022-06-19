@@ -120,7 +120,7 @@ public:
 	{
 	}
 
-	virtual QPixmap pixmap() const
+	QPixmap pixmap() const override
 	{
 		if( !m_name.isEmpty() )
 		{
@@ -130,7 +130,7 @@ public:
 		return( QPixmap() );
 	}
 
-	virtual QString pixmapName() const
+	QString pixmapName() const override
 	{
 		return QString( STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
 	}

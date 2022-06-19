@@ -48,7 +48,7 @@ public:
 	LcdWidget(int numDigits, const QString& style, QWidget* parent, const QString& name = QString(),
 		bool leadingZero = false);
 
-	virtual ~LcdWidget();
+	~LcdWidget() override;
 
 	void setValue( int value );
 	void setLabel( const QString& label );

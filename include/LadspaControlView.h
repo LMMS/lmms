@@ -43,7 +43,7 @@ class LMMS_EXPORT LadspaControlView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	LadspaControlView( QWidget * _parent, LadspaControl * _ctl );
-	virtual ~LadspaControlView();
+	~LadspaControlView() override;
 
 private:
 	LadspaControl * m_ctl;

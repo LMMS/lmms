@@ -57,7 +57,7 @@ public:
 	} ;
 
 	TrackContainer();
-	virtual ~TrackContainer();
+	~TrackContainer() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 

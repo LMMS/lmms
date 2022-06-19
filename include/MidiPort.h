@@ -83,7 +83,7 @@ public:
 			MidiEventProcessor* eventProcessor,
 			Model* parent = nullptr,
 			Mode mode = Disabled );
-	virtual ~MidiPort();
+	~MidiPort() override;
 
 	void setName( const QString& name );
 

@@ -57,7 +57,7 @@ class LfoController : public Controller
 public:
 	LfoController( Model * _parent );
 
-	virtual ~LfoController();
+	~LfoController() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -105,7 +105,7 @@ class LfoControllerDialog : public ControllerDialog
 	Q_OBJECT
 public:
 	LfoControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~LfoControllerDialog();
+	~LfoControllerDialog() override;
 
 
 protected:

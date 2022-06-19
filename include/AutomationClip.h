@@ -65,7 +65,7 @@ public:
 
 	AutomationClip( AutomationTrack * _auto_track );
 	AutomationClip( const AutomationClip & _clip_to_copy );
-	virtual ~AutomationClip() = default;
+	~AutomationClip() override = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 

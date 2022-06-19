@@ -66,7 +66,7 @@ public:
 
 
 	MixerView();
-	virtual ~MixerView();
+	~MixerView() override;
 
 	void keyPressEvent(QKeyEvent * e) override;
 

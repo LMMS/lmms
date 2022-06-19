@@ -190,7 +190,7 @@ protected:
 private:
 	MainWindow();
 	MainWindow( const MainWindow & );
-	virtual ~MainWindow();
+	~MainWindow() override;
 
 	void finalize();
 

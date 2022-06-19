@@ -103,11 +103,11 @@ public:
 		setWindowFlags( Qt::WindowCloseButtonHint );
 	}
 
-	virtual ~vstSubWin()
+	~vstSubWin() override
 	{
 	}
 
-	virtual void closeEvent( QCloseEvent * e )
+	void closeEvent( QCloseEvent * e ) override
 	{
 		// ignore close-events - for some reason otherwise the VST GUI
 		// remains hidden when re-opening
