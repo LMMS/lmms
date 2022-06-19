@@ -1924,8 +1924,6 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
-		if (createdWith < openedWith) { upgrade(); }
-
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
 		 && getGUI() != nullptr && root.attribute("type") == "song"
@@ -1942,6 +1940,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			);
 		}
 	}
+
+	// Perform upgrade routines
+	if (m_fileVersion < UPGRADE_METHODS.size()) { upgrade(); }
 
 	m_content = root.elementsByTagName(typeName(m_type)).item(0).toElement();
 }
