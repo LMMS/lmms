@@ -33,6 +33,8 @@
 class QLineEdit;
 class QTreeWidget;
 
+namespace lmms::gui
+{
 
 class PluginBrowser : public SideBarWidget
 {
@@ -80,5 +82,7 @@ private:
 	bool m_mouseOver;
 };
 
+
+} // namespace lmms::gui
 
 #endif

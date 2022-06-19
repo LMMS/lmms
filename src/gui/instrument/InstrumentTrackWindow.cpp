@@ -69,6 +69,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
@@ -129,6 +133,17 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setHorizontalSpacing(3);
 	basicControlsLayout->setVerticalSpacing(0);
 	basicControlsLayout->setContentsMargins(0, 0, 0, 0);
+
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
 
 	QString labelStyleSheet = "font-size: 6pt;";
 	Qt::Alignment labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
@@ -679,3 +694,5 @@ void InstrumentTrackWindow::adjustTabSize(QWidget *w)
 	w->setMinimumSize(INSTRUMENT_WIDTH - 4, INSTRUMENT_HEIGHT - 4 - 1);
 }
 
+
+} // namespace lmms::gui

@@ -45,6 +45,9 @@
 #include "ClipView.h"
 
 
+namespace lmms::gui
+{
+
 /*! \brief Create a new track View.
  *
  *  The track View is handles the actual display of the track, including
@@ -87,8 +90,8 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	connect( m_track,
-		SIGNAL( clipAdded( Clip * ) ),
-			this, SLOT( createClipView( Clip * ) ),
+		SIGNAL( clipAdded( lmms::Clip * ) ),
+			this, SLOT( createClipView( lmms::Clip * ) ),
 			Qt::QueuedConnection );
 
 	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
@@ -446,3 +449,6 @@ void TrackView::setIndicatorMute(FadeButton* indicator, bool muted)
 	QPalette::ColorRole role = muted ? QPalette::Highlight : QPalette::BrightText;
 	indicator->setActiveColor(QApplication::palette().color(QPalette::Active, role));
 }
+
+
+} // namespace lmms::gui

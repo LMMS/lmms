@@ -30,6 +30,10 @@
 #include "DspEffectLibrary.h"
 #include "StereoEnhancerControls.h"
 
+namespace lmms
+{
+
+
 class StereoEnhancerEffect : public Effect
 {
 public:
@@ -59,5 +63,6 @@ private:
 } ;
 
 
+} // namespace lmms
 
 #endif

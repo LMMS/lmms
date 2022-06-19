@@ -28,6 +28,9 @@
 
 #include <QActionGroup>
 
+namespace lmms::gui
+{
+
 /// \brief Convenience subclass of QActionGroup
 ///
 /// This class provides the same functionality as QActionGroup, but in addition
@@ -53,5 +56,7 @@ private slots:
 private:
 	QList<QAction*> m_actions;
 };
+
+} // namespace lmms::gui
 
 #endif

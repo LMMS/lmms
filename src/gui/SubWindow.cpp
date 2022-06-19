@@ -37,6 +37,8 @@
 
 #include "embed.h"
 
+namespace lmms::gui
+{
 
 
 SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
@@ -378,3 +380,6 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 		m_trackedNormalGeom.setSize( event->size() );
 	}
 }
+
+
+} // namespace lmms::gui

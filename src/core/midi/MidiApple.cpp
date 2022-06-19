@@ -36,6 +36,11 @@
 
 #include <CoreMIDI/CoreMIDI.h>
 
+
+namespace lmms
+{
+
+
 const unsigned int SYSEX_LENGTH=1024;
 
 MidiApple::MidiApple() :
@@ -625,6 +630,6 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 }
 
 
-#endif
+} // namespace lmms
 
-
+#endif // LMMS_BUILD_APPLE

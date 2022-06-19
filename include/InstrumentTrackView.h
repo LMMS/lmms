@@ -30,6 +30,10 @@
 #include "InstrumentTrack.h"
 
 
+namespace lmms::gui
+{
+
+
 class InstrumentTrackWindow;
 class Knob;
 class MidiCCRackView;
@@ -114,5 +118,7 @@ private:
 	friend class InstrumentTrackWindow;
 } ;
 
-#endif
 
+} // namespace lmms::gui
+
+#endif

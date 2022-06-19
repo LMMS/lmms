@@ -27,6 +27,10 @@
 
 #include "LcdSpinBox.h"
 
+namespace lmms::gui
+{
+
+
 class TrackView;
 
 
@@ -48,5 +52,8 @@ protected:
 private:
 	TrackView * m_tv;
 };
+
+
+} // namespace lmms::gui
 
 #endif

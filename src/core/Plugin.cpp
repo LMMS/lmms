@@ -35,6 +35,10 @@
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"
+#include "PluginFactory.h"
+
+namespace lmms
+{
 
 
 static PixmapLoader dummyLoader;
@@ -183,7 +187,6 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 
-#include "PluginFactory.h"
 Plugin * Plugin::instantiateWithKey(const QString& pluginName, Model * parent,
 				const Descriptor::SubPluginFeatures::Key *key,
 				bool keyFromDnd)
@@ -218,7 +221,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 	Plugin* inst;
 	if( pi.isNull() )
 	{
-		if( getGUI() != nullptr )
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::information( nullptr,
 				tr( "Plugin not found" ),
@@ -240,7 +243,7 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 		}
 		else
 		{
-			if( getGUI() != nullptr )
+			if (gui::getGUI() != nullptr)
 			{
 				QMessageBox::information( nullptr,
 					tr( "Error while loading plugin" ),
@@ -265,9 +268,9 @@ void Plugin::collectErrorForUI( QString errMsg )
 
 
 
-PluginView * Plugin::createView( QWidget * parent )
+gui::PluginView * Plugin::createView( QWidget * parent )
 {
-	PluginView * pv = instantiateView( parent );
+	gui::PluginView * pv = instantiateView( parent );
 	if( pv != nullptr )
 	{
 		pv->setModel( this );
@@ -312,3 +315,4 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 
 
 
+} // namespace lmms

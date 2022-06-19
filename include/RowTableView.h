@@ -27,6 +27,9 @@
 
 #include <QTableView>
 
+namespace lmms::gui
+{
+
 
 class RowDelegate;
 
@@ -51,5 +54,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 #endif

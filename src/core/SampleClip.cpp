@@ -31,6 +31,11 @@
 #include "SampleTrack.h"
 #include "TimeLineWidget.h"
 
+
+namespace lmms
+{
+
+
 SampleClip::SampleClip( Track * _track ) :
 	Clip( _track ),
 	m_sampleBuffer( new SampleBuffer ),
@@ -42,13 +47,13 @@ SampleClip::SampleClip( Track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( Engine::getSong(), SIGNAL( tempoChanged( lmms::bpm_t ) ),
 					this, SLOT( updateLength() ), Qt::DirectConnection );
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( updateLength() ) );
 
 	//care about positionmarker
-	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
+	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
 	if( timeLine )
 	{
 		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
@@ -316,7 +321,10 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 
 
-ClipView * SampleClip::createView( TrackView * _tv )
+gui::ClipView * SampleClip::createView( gui::TrackView * _tv )
 {
-	return new SampleClipView( this, _tv );
+	return new gui::SampleClipView( this, _tv );
 }
+
+
+} // namespace lmms

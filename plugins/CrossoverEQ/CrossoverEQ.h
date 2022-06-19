@@ -31,6 +31,10 @@
 #include "CrossoverEQControls.h"
 #include "BasicFilters.h"
 
+namespace lmms
+{
+
+
 class CrossoverEQEffect : public Effect
 {
 public:
@@ -73,5 +77,8 @@ private:
 	
 	friend class CrossoverEQControls;
 };
+
+
+} // namespace lmms
 
 #endif

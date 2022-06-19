@@ -30,6 +30,8 @@
 #include "PatternTrack.h"
 #include "Song.h"
 
+namespace lmms
+{
 
 
 PatternStore::PatternStore() :
@@ -257,3 +259,5 @@ AutomatedValueMap PatternStore::automatedValuesAt(TimePos time, int clipNum) con
 	return TrackContainer::automatedValuesAt(time + (TimePos::ticksPerBar() * clipNum), clipNum);
 }
 
+
+} // namespace lmms

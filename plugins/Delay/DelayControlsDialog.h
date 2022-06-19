@@ -27,8 +27,15 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class DelayControls;
 class FloatModel;
+
+namespace gui
+{
 
 class DelayControlsDialog : public EffectControlDialog
 {
@@ -58,5 +65,10 @@ private:
 	FloatModel *m_yModel;
 	bool m_acceptInput;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // DELAYCONTROLSDIALOG_H

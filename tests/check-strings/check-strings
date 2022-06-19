@@ -91,6 +91,21 @@ for c in sorted(classes_found):
 
 caption('themes')
 
+
+GUI_NAMESPACE_PREFIX = "lmms--gui"
+
+
+def unscope_classname(stylesheet, cname):
+    # Strip the namespace part from the given class name,
+    # while expecting it to have one in the first place.
+    SCOPE_TOKEN = "--"
+    i = cname.rfind(SCOPE_TOKEN) + len(SCOPE_TOKEN)
+
+    assert i>=0
+
+    return cname[i:]
+
+
 for theme in sorted([d for d in Path('data/themes').iterdir() if d.is_dir()]):
     classes_in_sheet = set()
     stylesheet = theme / 'style.css'
@@ -101,7 +116,10 @@ for theme in sorted([d for d in Path('data/themes').iterdir() if d.is_dir()]):
             for c in rule.prelude:
                 if c.type == 'ident' and not class_found:
                     if is_our_class(c.value):
-                        classes_in_sheet.add(c.value)
+                        if str(c.value).startswith(GUI_NAMESPACE_PREFIX):
+                            classes_in_sheet.add(unscope_classname(stylesheet, c.value))
+                        else:
+                            error(str(stylesheet), f"Namespace prefix missing from class {c.value}")
                     class_found = True
                 # After whitespace or comma comes a new class
                 elif c.type == 'whitespace' or (c.type == 'literal' and c.value == ','):

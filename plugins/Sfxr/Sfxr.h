@@ -33,6 +33,9 @@
 #include "InstrumentView.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 
 enum SfxrWaves
 {
@@ -60,11 +63,15 @@ const int KNOB_BLOCK_SIZE_Y = 40;
 
 
 
+class SfxrInstrument;
 
+namespace gui
+{
 class automatableButtonGroup;
 class Knob;
 class PixmapButton;
-class SfxrInstrument;
+class SfxrInstrumentView;
+}
 
 
 
@@ -180,7 +187,7 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 	void resetModels();
 
@@ -217,10 +224,13 @@ private:
 
 	IntModel m_waveFormModel;
 
-	friend class SfxrInstrumentView;
+	friend class gui::SfxrInstrumentView;
 	friend class SfxrSynth;
 };
 
+
+namespace gui
+{
 
 
 class SfxrInstrumentView : public InstrumentViewFixedSize
@@ -300,5 +310,8 @@ private:
 };
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

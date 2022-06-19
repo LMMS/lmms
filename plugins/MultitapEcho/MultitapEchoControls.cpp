@@ -31,6 +31,9 @@
 #include "lmms_math.h"
 #include "base64.h"
 
+namespace lmms
+{
+
 
 MultitapEchoControls::MultitapEchoControls( MultitapEchoEffect * eff ) :
 	EffectControls( eff ),
@@ -178,3 +181,6 @@ void MultitapEchoControls::sampleRateChanged()
 	m_effect->m_sampleRatio = 1.0f / m_effect->m_sampleRate;
 	m_effect->updateFilters( 0, 19 );
 }
+
+
+} // namespace lmms

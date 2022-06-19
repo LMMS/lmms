@@ -29,6 +29,13 @@
 #include "TrackContainer.h"
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+	class PatternEditorWindow;
+}
 
 /*
  * PatternStore is the backend of Pattern Editor:
@@ -100,9 +107,11 @@ private:
 
 
 	// Where the pattern selection combo box is
-	friend class PatternEditorWindow;
+	friend class gui::PatternEditorWindow;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

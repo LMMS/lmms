@@ -35,6 +35,8 @@
 #include "Lv2Proc.h"
 
 
+namespace lmms
+{
 
 
 Plugin::PluginTypes Lv2ControlBase::check(const LilvPlugin *plugin,
@@ -213,6 +215,7 @@ void Lv2ControlBase::handleMidiInputEvent(const MidiEvent &event,
 }
 
 
+} // namespace lmms
 
 
 #endif // LMMS_HAVE_LV2

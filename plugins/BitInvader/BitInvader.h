@@ -33,11 +33,18 @@
 #include "Graph.h"
 #include "MemoryManager.h"
 
-class oscillator;
+namespace lmms
+{
+
+
+namespace gui
+{
 class BitInvaderView;
 class Knob;
 class LedCheckBox;
 class PixmapButton;
+}
+
 
 class BSynth
 {
@@ -85,7 +92,7 @@ public:
 		return( 64 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView * instantiateView( QWidget * _parent );
 
 protected slots:
 	void lengthChanged();
@@ -103,10 +110,12 @@ private:
 	
 	float m_normalizeFactor;
 	
-	friend class BitInvaderView;
+	friend class gui::BitInvaderView;
 } ;
 
 
+namespace gui
+{
 
 class BitInvaderView : public InstrumentViewFixedSize
 {
@@ -153,5 +162,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

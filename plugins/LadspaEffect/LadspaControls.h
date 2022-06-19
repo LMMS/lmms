@@ -28,6 +28,9 @@
 #include "EffectControls.h"
 #include "LadspaControlDialog.h"
 
+namespace lmms
+{
+
 
 class LadspaControl;
 typedef QVector<LadspaControl *> control_list_t;
@@ -54,9 +57,9 @@ public:
 		return "ladspacontrols";
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new LadspaControlDialog( this );
+		return new gui::LadspaControlDialog( this );
 	}
 
 
@@ -75,13 +78,16 @@ private:
 	QVector<control_list_t> m_controls;
 
 
-	friend class LadspaControlDialog;
+	friend class gui::LadspaControlDialog;
 	friend class LadspaEffect;
 
 
 signals:
-	void effectModelChanged( LadspaControls * );
+	void effectModelChanged( lmms::LadspaControls * );
 
 } ;
+
+
+} // namespace lmms
 
 #endif

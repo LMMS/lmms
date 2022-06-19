@@ -28,8 +28,16 @@
 #include "EffectControls.h"
 #include "EqSpectrumView.h"
 
+namespace lmms
+{
+
 
 class EqEffect;
+
+namespace gui
+{
+class EqControlsDialog;
+}
 
 class EqControls : public EffectControls
 {
@@ -54,7 +62,7 @@ public:
 		return 42;
 	}
 
-	virtual EffectControlDialog* createView();
+	virtual gui::EffectControlDialog* createView();
 
 	float m_inPeakL;
 	float m_inPeakR;
@@ -126,7 +134,11 @@ private:
 	BoolModel m_analyseInModel;
 	BoolModel m_analyseOutModel;
 
-	friend class EqControlsDialog;
+	friend class gui::EqControlsDialog;
 	friend class EqEffect;
 };
+
+
+} // namespace lmms
+
 #endif // EQCONTROLS_H

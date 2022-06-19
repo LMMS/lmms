@@ -26,12 +26,17 @@
 #define MIDI_CLIP_VIEW_H
  
 #include <QStaticText>
-
 #include "ClipView.h"
 
+namespace lmms
+{
+
 class MidiClip;
- 
- 
+
+namespace gui
+{
+
+
 class MidiClipView : public ClipView
 {
 	Q_OBJECT
@@ -58,7 +63,7 @@ public:
 	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
-	MidiClip* getMidiClip();
+	lmms::MidiClip* getMidiClip();
 	void update() override;
 
 
@@ -96,7 +101,10 @@ private:
 	
 	bool m_legacySEPattern;
 } ;
- 
- 
+
+
+} // namespace gui
+
+} // namespace lmms
  
  #endif

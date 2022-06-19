@@ -31,7 +31,16 @@
 #include "Note.h"
 
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
+
+namespace gui
+{
+class MidiClipView;
+}
 
 
 class LMMS_EXPORT MidiClip : public Clip
@@ -100,7 +109,7 @@ public:
 	bool empty();
 
 
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	using Model::dataChanged;
@@ -136,13 +145,14 @@ private:
 
 	MidiClip * adjacentMidiClipByOffset(int offset) const;
 
-	friend class MidiClipView;
+	friend class gui::MidiClipView;
 
 
 signals:
-	void destroyedMidiClip( MidiClip* );
+	void destroyedMidiClip( lmms::MidiClip* );
 } ;
 
 
+} // namespace lmms
 
 #endif

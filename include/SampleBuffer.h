@@ -44,6 +44,9 @@
 class QPainter;
 class QRect;
 
+namespace lmms
+{
+
 // values for buffer margins, used for various libsamplerate interpolation modes
 // the array positions correspond to the converter_type parameter values in libsamplerate
 // if there appears problems with playback on some interpolation mode, then the value for that mode
@@ -281,8 +284,8 @@ public:
 public slots:
 	void setAudioFile(const QString & audioFile);
 	void loadFromBase64(const QString & data);
-	void setStartFrame(const f_cnt_t s);
-	void setEndFrame(const f_cnt_t e);
+	void setStartFrame(const lmms::f_cnt_t s);
+	void setEndFrame(const lmms::f_cnt_t e);
 	void setAmplification(float a);
 	void setReversed(bool on);
 	void sampleRateChanged();
@@ -351,5 +354,6 @@ signals:
 
 } ;
 
+} // namespace lmms
 
 #endif

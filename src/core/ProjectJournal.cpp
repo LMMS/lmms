@@ -29,6 +29,9 @@
 #include "JournallingObject.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 //! Avoid clashes between loaded IDs (have the bit cleared)
 //! and newly created IDs (have the bit set)
 static const int EO_ID_MSB = 1 << 23;
@@ -206,3 +209,4 @@ void ProjectJournal::stopAllJournalling()
 
 
 
+} // namespace lmms

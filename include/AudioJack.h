@@ -41,8 +41,16 @@
 #include "AudioDeviceSetupWidget.h"
 
 class QLineEdit;
-class LcdSpinBox;
+
+namespace lmms
+{
+
 class MidiJack;
+
+namespace gui
+{
+class LcdSpinBox;
+}
 
 
 class AudioJack : public QObject, public AudioDevice
@@ -66,7 +74,7 @@ public:
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -76,7 +84,7 @@ public:
 
 	private:
 		QLineEdit * m_clientName;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 
 	} ;
 
@@ -132,6 +140,8 @@ signals:
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_JACK
 
 #endif

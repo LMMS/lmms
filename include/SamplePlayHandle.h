@@ -30,6 +30,10 @@
 #include "AutomatableModel.h"
 #include "PlayHandle.h"
 
+namespace lmms
+{
+
+
 class PatternTrack;
 class SampleClip;
 class Track;
@@ -93,5 +97,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

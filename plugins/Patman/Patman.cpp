@@ -46,6 +46,9 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C"
 {
@@ -427,9 +430,9 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 
 
 
-PluginView * PatmanInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * PatmanInstrument::instantiateView( QWidget * _parent )
 {
-	return( new PatmanView( this, _parent ) );
+	return( new gui::PatmanView( this, _parent ) );
 }
 
 
@@ -437,8 +440,8 @@ PluginView * PatmanInstrument::instantiateView( QWidget * _parent )
 
 
 
-
-
+namespace gui
+{
 
 
 PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
@@ -643,3 +646,8 @@ void PatmanView::modelChanged( void )
 	connect( m_pi, SIGNAL( fileChanged() ),
 			this, SLOT( updateFilename() ) );
 }
+
+
+} // namespace gui
+
+} // namespace lmms

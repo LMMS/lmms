@@ -31,6 +31,11 @@
 #include "BitcrushControls.h"
 #include "BasicFilters.h"
 
+
+namespace lmms
+{
+
+
 class BitcrushEffect : public Effect
 {
 public:
@@ -77,5 +82,8 @@ private:
 
 	friend class BitcrushControls;
 };
+
+
+} // namespace lmms
 
 #endif

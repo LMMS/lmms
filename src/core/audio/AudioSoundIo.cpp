@@ -36,6 +36,9 @@
 #include "ComboBox.h"
 #include "AudioEngine.h"
 
+namespace lmms
+{
+
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, AudioEngine * _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
 		DEFAULT_CHANNELS,
@@ -518,5 +521,8 @@ void AudioSoundIo::setupWidget::saveSettings()
 	ConfigManager::inst()->setValue( "audiosoundio", "out_device_id", deviceId->id);
 	ConfigManager::inst()->setValue( "audiosoundio", "out_device_raw", configDeviceRaw);
 }
+
+
+} // namespace lmms
 
 #endif

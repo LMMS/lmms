@@ -31,6 +31,10 @@
 #include <QElapsedTimer>
 
 
+namespace lmms::gui
+{
+
+
 class FadeButton : public QAbstractButton
 {
 	Q_OBJECT
@@ -70,5 +74,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

@@ -22,6 +22,10 @@
  */
 #include "Gb_Apu_Buffer.h"
 
+namespace lmms
+{
+
+
 Gb_Apu_Buffer::Gb_Apu_Buffer() {}
 Gb_Apu_Buffer::~Gb_Apu_Buffer() {}
 
@@ -51,3 +55,5 @@ void Gb_Apu_Buffer::bass_freq(int freq) {
 	m_buf.bass_freq(freq);
 }
 
+
+} // namespace lmms

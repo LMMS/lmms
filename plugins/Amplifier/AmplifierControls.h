@@ -29,8 +29,15 @@
 #include "EffectControls.h"
 #include "AmplifierControlDialog.h"
 
+namespace lmms
+{
 
 class AmplifierEffect;
+
+namespace gui
+{
+class AmplifierControlDialog;
+}
 
 
 class AmplifierControls : public EffectControls
@@ -54,9 +61,9 @@ public:
 		return 4;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new AmplifierControlDialog( this );
+		return new gui::AmplifierControlDialog( this );
 	}
 
 
@@ -70,9 +77,12 @@ private:
 	FloatModel m_leftModel;
 	FloatModel m_rightModel;
 
-	friend class AmplifierControlDialog;
+	friend class gui::AmplifierControlDialog;
 	friend class AmplifierEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

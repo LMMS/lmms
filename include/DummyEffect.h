@@ -31,6 +31,12 @@
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
 class Knob;
 
 
@@ -44,6 +50,7 @@ public:
 
 } ;
 
+}
 
 class DummyEffectControls : public EffectControls
 {
@@ -75,9 +82,9 @@ public:
 		return "DummyControls";
 	}
 
-	EffectControlDialog * createView() override
+	gui::EffectControlDialog * createView() override
 	{
-		return new DummyEffectControlDialog( this );
+		return new gui::DummyEffectControlDialog( this );
 	}
 } ;
 
@@ -143,5 +150,7 @@ private:
 	}
 } ;
 
+
+} // namespace lmms
 
 #endif

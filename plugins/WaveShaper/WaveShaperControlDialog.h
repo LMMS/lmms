@@ -28,8 +28,13 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
 
 class WaveShaperControls;
+
+namespace gui
+{
 
 
 class WaveShaperControlDialog : public EffectControlDialog
@@ -45,5 +50,10 @@ public:
 private:
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

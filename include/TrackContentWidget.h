@@ -33,10 +33,16 @@
 
 class QMimeData;
 
-class Track;
-class ClipView;
-class TrackView;
+namespace lmms
+{
 
+class Track;
+
+namespace gui
+{
+
+class TrackView;
+class ClipView;
 
 class TrackContentWidget : public QWidget, public JournallingObject
 {
@@ -86,7 +92,7 @@ public:
 
 public slots:
 	void update();
-	void changePosition( const TimePos & newPos = TimePos( -1 ) );
+	void changePosition( const lmms::TimePos & newPos = TimePos( -1 ) );
 
 protected:
 	enum ContextMenuAction
@@ -139,5 +145,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

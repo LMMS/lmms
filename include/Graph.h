@@ -35,7 +35,14 @@
 #include "ModelView.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+
 class graphModel;
+
+namespace gui
+{
 
 
 class LMMS_EXPORT Graph : public QWidget, public ModelView
@@ -116,6 +123,9 @@ private:
 } ;
 
 
+} // namespace gui
+
+
 /**
 	@brief 2 dimensional function plot
 
@@ -137,7 +147,7 @@ public:
 	graphModel( float _min,
 			float _max,
 			int _size,
-			:: Model * _parent,
+			Model * _parent,
 			bool _default_constructed = false,
 			float _step = 0.0 );
 
@@ -211,8 +221,11 @@ private:
 	float m_maxValue;
 	float m_step;
 
-	friend class Graph;
+	friend class gui::Graph;
 
 };
+
+
+} // namespace lmms
 
 #endif

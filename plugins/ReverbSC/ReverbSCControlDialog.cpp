@@ -29,6 +29,10 @@
 #include "Knob.h"
 #include "ReverbSCControls.h"
 
+namespace lmms::gui
+{
+
+
 ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	EffectControlDialog( controls )
 {
@@ -62,3 +66,6 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	outputGainKnob->setLabel( tr( "Output" ) );
 	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
 }
+
+
+} // namespace lmms::gui

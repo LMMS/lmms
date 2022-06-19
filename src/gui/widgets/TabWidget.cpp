@@ -35,6 +35,9 @@
 #include "embed.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
+
 TabWidget::TabWidget(const QString & caption, QWidget * parent, bool usePixmap,
 					 bool resizable) :
 	QWidget( parent ),
@@ -415,3 +418,6 @@ void TabWidget::setTabBorder( const QColor & c )
 {
 	m_tabBorder = c;
 }
+
+
+} // namespace lmms::gui

@@ -27,7 +27,10 @@
 #include "AutomationClip.h"
 
 
-MeterModel::MeterModel( ::Model * _parent ) :
+namespace lmms
+{
+
+MeterModel::MeterModel( Model * _parent ) :
 	Model( _parent ),
 	m_numeratorModel( 4, 1, 32, this, tr( "Numerator" ) ),
 	m_denominatorModel( 4, 1, 32, this, tr( "Denominator" ) )
@@ -78,6 +81,4 @@ void MeterModel::loadSettings( const QDomElement & _this,
 }
 
 
-
-
-
+} // namespace lmms

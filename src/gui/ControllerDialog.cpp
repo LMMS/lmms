@@ -28,6 +28,9 @@
 #include "ControllerDialog.h"
 #include "Controller.h"
 
+namespace lmms::gui
+{
+
 
 ControllerDialog::ControllerDialog( Controller * _controller,
 							QWidget * _parent ) :
@@ -52,4 +55,4 @@ void ControllerDialog::closeEvent( QCloseEvent * _ce )
 
 
 
-
+} // namespace lmms::gui

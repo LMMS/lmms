@@ -32,16 +32,21 @@
 #include "InstrumentView.h"
 #include "TempoSyncKnobModel.h"
 
-class Knob;
-class LedCheckBox;
 
-
+namespace lmms
+{
 
 #define KICKER_PRESET_VERSION 1
 
 
-class KickerInstrumentView;
 class NotePlayHandle;
+
+namespace gui
+{
+class Knob;
+class LedCheckBox;
+class KickerInstrumentView;
+}
 
 
 class KickerInstrument : public Instrument
@@ -70,7 +75,7 @@ public:
 		return( 512 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 
 private:
@@ -90,10 +95,13 @@ private:
 
 	IntModel m_versionModel;
 
-	friend class KickerInstrumentView;
+	friend class gui::KickerInstrumentView;
 
 } ;
 
+
+namespace gui
+{
 
 
 class KickerInstrumentView : public InstrumentViewFixedSize
@@ -123,5 +131,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

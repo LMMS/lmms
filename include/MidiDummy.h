@@ -28,6 +28,10 @@
 #include "MidiClient.h"
 
 
+namespace lmms
+{
+
+
 class MidiDummy : public MidiClientRaw
 {
 public:
@@ -62,5 +66,7 @@ protected:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

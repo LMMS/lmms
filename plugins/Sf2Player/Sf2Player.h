@@ -36,16 +36,24 @@
 #include "LcdSpinBox.h"
 #include "MemoryManager.h"
 
-class Sf2InstrumentView;
-class Sf2Font;
-class Knob;
-class NotePlayHandle;
-class PixmapButton;
-
-class PatchesDialog;
 class QLabel;
 
+namespace lmms
+{
+
+
+class Sf2Font;
 struct Sf2PluginData;
+class NotePlayHandle;
+
+namespace gui
+{
+class Knob;
+class PixmapButton;
+class Sf2InstrumentView;
+class PatchesDialog;
+} // namespace gui
+
 
 class Sf2Instrument : public Instrument
 {
@@ -83,7 +91,7 @@ public:
 		return IsSingleStreamed;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 	
 	QString getCurrentPatchName();
 
@@ -133,8 +141,8 @@ private:
 	int m_lastMidiPitchRange;
 	int m_channel;
 
-	LcdSpinBoxModel m_bankNum;
-	LcdSpinBoxModel m_patchNum;
+	gui::LcdSpinBoxModel m_bankNum;
+	gui::LcdSpinBoxModel m_patchNum;
 
 	FloatModel m_gain;
 
@@ -159,7 +167,7 @@ private:
 	void noteOff( Sf2PluginData * n );
 	void renderFrames( f_cnt_t frames, sampleFrame * buf );
 
-	friend class Sf2InstrumentView;
+	friend class gui::Sf2InstrumentView;
 
 signals:
 	void fileLoading();
@@ -184,6 +192,9 @@ public:
 	int refCount;
 };
 
+
+namespace gui
+{
 
 
 class Sf2InstrumentView : public InstrumentViewFixedSize
@@ -231,5 +242,8 @@ protected slots:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

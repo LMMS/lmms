@@ -36,9 +36,15 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-
-class LcdSpinBox;
 class QLineEdit;
+
+namespace lmms
+{
+
+namespace gui
+{
+class LcdSpinBox;
+}
 
 
 class AudioPulseAudio : public QThread, public AudioDevice
@@ -56,7 +62,7 @@ public:
 	static QString probeDevice();
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -66,7 +72,7 @@ public:
 
 	private:
 		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 
 	} ;
 
@@ -93,6 +99,8 @@ private:
 	QSemaphore m_connectedSemaphore;
 
 } ;
+
+} // namespace lmms
 
 #endif
 

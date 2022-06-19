@@ -32,6 +32,9 @@
 
 class QLabel;
 
+namespace lmms::gui
+{
+
 class EnvelopeAndLfoView;
 class ComboBox;
 class GroupBox;
@@ -66,5 +69,8 @@ private:
 	QLabel* m_singleStreamInfoLabel;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

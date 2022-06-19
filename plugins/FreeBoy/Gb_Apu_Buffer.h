@@ -27,6 +27,10 @@
 #include "Multi_Buffer.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
+
 class Gb_Apu_Buffer : public Gb_Apu {
 	MM_OPERATORS
 public:
@@ -43,6 +47,9 @@ public:
 private:
 	Stereo_Buffer m_buf;
 };
+
+
+} // namespace lmms
 
 #endif
 

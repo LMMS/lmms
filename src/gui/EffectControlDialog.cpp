@@ -28,6 +28,9 @@
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
 
+namespace lmms::gui
+{
+
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 	QWidget( nullptr ),
@@ -55,6 +58,4 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-
-
-
+} // namespace lmms::gui

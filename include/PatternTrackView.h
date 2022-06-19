@@ -29,7 +29,14 @@
 
 #include "TrackView.h"
 
+namespace lmms
+{
+
 class PatternTrack;
+
+namespace gui
+{
+
 class TrackLabelButton;
 
 
@@ -58,5 +65,9 @@ private:
 } ;
 
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

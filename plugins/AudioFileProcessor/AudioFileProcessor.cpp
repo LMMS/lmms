@@ -47,6 +47,11 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -105,13 +110,6 @@ AudioFileProcessor::AudioFileProcessor( InstrumentTrack * _instrument_track ) :
 	m_interpolationModel.setValue( 1 );
 
 	pointChanged();
-}
-
-
-
-
-AudioFileProcessor::~AudioFileProcessor()
-{
 }
 
 
@@ -312,9 +310,9 @@ int AudioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 
 
 
-PluginView * AudioFileProcessor::instantiateView( QWidget * _parent )
+gui::PluginView* AudioFileProcessor::instantiateView( QWidget * _parent )
 {
-	return new AudioFileProcessorView( this, _parent );
+	return new gui::AudioFileProcessorView( this, _parent );
 }
 
 
@@ -442,6 +440,8 @@ void AudioFileProcessor::pointChanged( void )
 
 
 
+namespace gui
+{
 
 
 QPixmap * AudioFileProcessorView::s_artwork = nullptr;
@@ -548,8 +548,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_waveView = 0;
 	newWaveView();
 
-	connect( castModel<AudioFileProcessor>(), SIGNAL( isPlaying( f_cnt_t ) ),
-			m_waveView, SLOT( isPlaying( f_cnt_t ) ) );
+	connect( castModel<AudioFileProcessor>(), SIGNAL( isPlaying( lmms::f_cnt_t ) ),
+			m_waveView, SLOT( isPlaying( lmms::f_cnt_t ) ) );
 
 	qRegisterMetaType<f_cnt_t>( "f_cnt_t" );
 
@@ -1242,7 +1242,7 @@ float AudioFileProcessorWaveView::knob::getValue( const QPoint & _p )
 	const double dec_fact = ! m_waveView ? 1 :
 		double( m_waveView->m_to - m_waveView->m_from )
 			/ m_waveView->m_sampleBuffer.frames();
-	const float inc = ::Knob::getValue( _p ) * dec_fact;
+	const float inc = Knob::getValue( _p ) * dec_fact;
 
 	return inc;
 }
@@ -1273,6 +1273,7 @@ bool AudioFileProcessorWaveView::knob::checkBound( double _v ) const
 }
 
 
+} // namespace gui
 
 
 
@@ -1288,3 +1289,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * model, void *)
 
 
 }
+
+
+} // namespace lmms

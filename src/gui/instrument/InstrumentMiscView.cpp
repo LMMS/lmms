@@ -36,6 +36,10 @@
 #include "LedCheckBox.h"
 
 
+namespace lmms::gui
+{
+
+
 InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	QWidget(parent)
 {
@@ -85,3 +89,6 @@ InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	// Fill remaining space
 	layout->addStretch();
 }
+
+
+} // namespace lmms::gui

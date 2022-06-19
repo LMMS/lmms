@@ -36,6 +36,9 @@
 
 class QThread;
 
+namespace lmms
+{
+
 class Track;
 class AudioPort;
 
@@ -162,5 +165,6 @@ private:
 typedef QList<PlayHandle *> PlayHandleList;
 typedef QList<const PlayHandle *> ConstPlayHandleList;
 
+} // namespace lmms
 
 #endif

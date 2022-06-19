@@ -30,14 +30,24 @@
 
 #include <QObject>
 
-
-class CustomTextKnob;
 class QGridLayout;
 class QPaintEvent;
 class QPushButton;
 class QMdiSubWindow;
 class QScrollArea;
+
+namespace lmms
+{
+
+
 class VstEffect;
+
+namespace gui
+{
+class CustomTextKnob;
+class ManageVSTEffectView;
+class VstEffectControlDialog;
+}
 
 
 class VstEffectControls : public EffectControls
@@ -56,7 +66,7 @@ public:
 
 	virtual int controlCount();
 
-	virtual EffectControlDialog * createView();
+	virtual gui::EffectControlDialog* createView();
 
 
 protected slots:
@@ -67,7 +77,7 @@ protected slots:
 	void rollPreset( void );
 	void rolrPreset( void );
 	void selPreset( void );
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -87,13 +97,15 @@ private:
 	int lastPosInMenu;
 //	QLabel * m_presetLabel;
 
-	friend class VstEffectControlDialog;
-	friend class ManageVSTEffectView;
+	friend class gui::VstEffectControlDialog;
+	friend class gui::ManageVSTEffectView;
 
 	bool m_vstGuiVisible;
 } ;
 
 
+namespace gui
+{
 
 
 class ManageVSTEffectView : public QObject
@@ -107,7 +119,7 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
 
@@ -131,5 +143,9 @@ private:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

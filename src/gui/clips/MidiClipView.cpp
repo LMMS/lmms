@@ -37,6 +37,10 @@
 #include "PianoRoll.h"
 #include "RenameDialog.h"
 
+namespace lmms::gui
+{
+
+
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
 	m_clip( clip ),
@@ -616,3 +620,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
+
+
+} // namespace lmms::gui

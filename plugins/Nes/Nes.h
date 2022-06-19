@@ -56,6 +56,11 @@
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "nesdc_off" ) ); \
 	name->setToolTip(ttip);
 
+
+namespace lmms
+{
+
+
 const float NES_SIMPLE_FILTER = 1.0 / 20.0; // simulate nes analog audio output
 const float NFB = 895000.0f;
 const float NOISE_FREQS[16] = 
@@ -76,8 +81,14 @@ const float NES_MIXING_ALL = 1.0 / ( NES_MIXING_12 + NES_MIXING_34 ); // constan
 const int MIN_WLEN = 4;
 
 
-class Knob;
 class NesInstrument;
+
+namespace gui
+{
+class Knob;
+class NesInstrumentView;
+} // namespace gui
+
 
 class NesObject
 {
@@ -218,7 +229,7 @@ public:
 		return( 8 );
 	}
 	
-	virtual PluginView * instantiateView( QWidget * parent );
+	virtual gui::PluginView* instantiateView( QWidget * parent );
 	
 public slots:
 	void updateFreq1();
@@ -288,8 +299,12 @@ private:
 	
 	
 	friend class NesObject;
-	friend class NesInstrumentView;
+	friend class gui::NesInstrumentView;
 };
+
+
+namespace gui
+{
 
 
 class NesInstrumentView : public InstrumentViewFixedSize
@@ -359,5 +374,10 @@ private:
 	
 	static QPixmap *	s_artwork;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

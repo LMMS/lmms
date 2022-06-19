@@ -41,6 +41,9 @@
 #include "Engine.h"
 
 
+namespace lmms::gui
+{
+
 QPixmap * AutomationClipView::s_clip_rec = nullptr;
 
 AutomationClipView::AutomationClipView( AutomationClip * _clip,
@@ -508,3 +511,6 @@ void AutomationClipView::scaleTimemapToFit( float oldMin, float oldMax )
 
 	m_clip->generateTangents();
 }
+
+
+} // namespace lmms::gui

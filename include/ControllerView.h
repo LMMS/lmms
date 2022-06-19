@@ -36,6 +36,10 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
+namespace lmms::gui
+{
+
+
 class LedCheckBox;
 
 
@@ -64,7 +68,7 @@ public slots:
 	void renameController();
 
 signals:
-	void deleteController( ControllerView * _view );
+	void deleteController( lmms::gui::ControllerView * _view );
 
 
 protected:
@@ -80,5 +84,8 @@ private:
 	bool m_show;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

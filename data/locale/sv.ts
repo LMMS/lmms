@@ -7447,7 +7447,7 @@ Dubbelklicka för att välja en fil.</translation>
     </message>
 </context>
 <context>
-    <name>LmmsCore</name>
+    <name>Engine</name>
     <message>
         <location filename="../../src/core/Engine.cpp" line="58"/>
         <source>Generating wavetables</source>

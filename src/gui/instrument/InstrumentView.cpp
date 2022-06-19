@@ -29,6 +29,8 @@
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
 
+namespace lmms::gui
+{
 
 InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :
 	PluginView( _Instrument, _parent )
@@ -77,3 +79,5 @@ InstrumentViewFixedSize::~InstrumentViewFixedSize()
 {
 }
 
+
+} // namespace lmms::gui

@@ -28,6 +28,10 @@
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
 
+namespace lmms
+{
+
+
 class RemotePlugin;
 
 class ProcessWatcher : public QThread
@@ -70,7 +74,7 @@ public:
 		return true;
 #else
 		return m_process.state() != QProcess::NotRunning;
-#endif
+#endif // DEBUG_REMOTE_PLUGIN
 	}
 
 	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
@@ -166,7 +170,7 @@ private:
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;
 	QString m_socketFile;
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
 	friend class ProcessWatcher;
 
@@ -176,9 +180,13 @@ private slots:
 	void processErrored(QProcess::ProcessError err );
 } ;
 
+
 LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
 {
 	return qstr.toStdString();
 }
+
+
+} // namespace lmms
 
 #endif // REMOTE_PLUGIN_H

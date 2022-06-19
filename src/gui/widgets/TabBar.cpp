@@ -28,6 +28,9 @@
 #include "gui_templates.h"
 
 
+namespace lmms::gui
+{
+
 
 TabBar::TabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	QWidget( _parent ),
@@ -229,9 +232,4 @@ bool TabBar::allHidden()
 }
 
 
-
-
-
-
-
-
+} // namespace lmms::gui

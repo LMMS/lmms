@@ -31,6 +31,10 @@
 #include "MemoryManager.h"
 #include "lmms_export.h"
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT ValueBuffer : public std::vector<float>
 {
 	MM_OPERATORS
@@ -49,5 +53,8 @@ public:
 
 	void interpolate(float start, float end);
 };
+
+
+} // namespace lmms
 
 #endif

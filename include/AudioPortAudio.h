@@ -30,9 +30,28 @@
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
 
+#ifdef LMMS_HAVE_PORTAUDIO
+
+#   include <portaudio.h>
+
+#   include "AudioDevice.h"
+#   include "AudioDeviceSetupWidget.h"
+
+#   if defined paNeverDropInput || defined paNonInterleaved
+#	    define PORTAUDIO_V19
+#   else
+#	    define PORTAUDIO_V18
+#   endif
+
+#endif
+
+
+namespace lmms
+{
+
 class AudioPortAudioSetupUtil : public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public slots:
 	void updateBackends();
 	void updateDevices();
@@ -41,26 +60,17 @@ public slots:
 public:
 	ComboBoxModel m_backendModel;
 	ComboBoxModel m_deviceModel;
-} ;
+};
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <portaudio.h>
 
-
-#include "AudioDevice.h"
-#include "AudioDeviceSetupWidget.h"
-
-#if defined paNeverDropInput || defined paNonInterleaved
-#	define PORTAUDIO_V19
-#else
-#	define PORTAUDIO_V18
-#endif
-
-
+namespace gui
+{
 class ComboBox;
 class LcdSpinBox;
+}
 
 
 class AudioPortAudio : public AudioDevice
@@ -80,7 +90,7 @@ public:
 		unsigned long _framesPerBuffer );
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -90,8 +100,8 @@ public:
 		virtual void show();
 
 	private:
-		ComboBox * m_backend;
-		ComboBox * m_device;
+		gui::ComboBox * m_backend;
+		gui::ComboBox * m_device;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;
@@ -149,6 +159,8 @@ private:
 
 } ;
 
-#endif
+#endif // LMMS_HAVE_PORTAUDIO
+
+} // namespace lmms
 
 #endif

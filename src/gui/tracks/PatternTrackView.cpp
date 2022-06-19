@@ -31,6 +31,9 @@
 #include "PatternTrack.h"
 #include "TrackLabelButton.h"
 
+namespace lmms::gui
+{
+
 PatternTrackView::PatternTrackView(PatternTrack* pt, TrackContainerView* tcv) :
 	TrackView(pt, tcv),
 	m_patternTrack(pt)
@@ -74,3 +77,6 @@ void PatternTrackView::clickedTrackLabel()
 	getGUI()->patternEditor()->parentWidget()->show();
 	getGUI()->patternEditor()->setFocus(Qt::ActiveWindowFocusReason);
 }
+
+
+} // namespace lmms::gui

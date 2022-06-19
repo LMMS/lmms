@@ -62,6 +62,8 @@
 
 #include "embed.h"
 
+namespace lmms
+{
 
 
 extern "C"
@@ -86,6 +88,9 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 } ;
 
 }
+
+namespace gui
+{
 
 
 class vstSubWin : public SubWindow
@@ -112,6 +117,9 @@ public:
 };
 
 
+} // namespace gui
+
+
 class VstInstrumentPlugin : public VstPlugin
 {
 public:
@@ -124,7 +132,7 @@ public:
 			return;
 		}
 		if ( embedMethod() != "none" ) {
-			m_pluginSubWindow.reset(new vstSubWin( getGUI()->mainWindow()->workspace() ));
+			m_pluginSubWindow.reset(new gui::vstSubWin( gui::getGUI()->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
 			m_pluginSubWindow->setWidget(pluginWidget());
 		} else {
@@ -143,9 +151,6 @@ private:
 	std::unique_ptr<QMdiSubWindow> m_pluginSubWindow;
 };
 
-
-QPixmap * VestigeInstrumentView::s_artwork = nullptr;
-QPixmap * ManageVestigeInstrumentView::s_artwork = nullptr;
 
 
 VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
@@ -350,10 +355,10 @@ void VestigeInstrument::loadFile( const QString & _file )
 		closePlugin();
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
-	TextFloat * tf = nullptr;
-	if( getGUI() != nullptr )
+	gui::TextFloat * tf = nullptr;
+	if( gui::getGUI() != nullptr )
 	{
-		tf = TextFloat::displayMessage(
+		tf = gui::TextFloat::displayMessage(
 				tr( "Loading plugin" ),
 				tr( "Please wait while loading the VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -477,13 +482,17 @@ void VestigeInstrument::closePlugin( void )
 
 
 
-PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 {
-	return new VestigeInstrumentView( this, _parent );
+	return new gui::VestigeInstrumentView( this, _parent );
 }
 
 
+namespace gui
+{
 
+QPixmap * VestigeInstrumentView::s_artwork = nullptr;
+QPixmap * ManageVestigeInstrumentView::s_artwork = nullptr;
 
 
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
@@ -928,6 +937,17 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 							QWidget * _parent, VestigeInstrument * m_vi2 ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+	
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
@@ -1233,6 +1253,7 @@ void ManageVestigeInstrumentView::paintEvent( QPaintEvent * )
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -1246,3 +1267,6 @@ Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
+
+
+} // namespace lmms

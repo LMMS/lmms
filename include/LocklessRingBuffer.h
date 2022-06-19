@@ -32,6 +32,9 @@
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
 
+namespace lmms
+{
+
 //! A convenience layer for a realtime-safe and thread-safe multi-reader ringbuffer
 template <class T>
 class LocklessRingBuffer
@@ -82,5 +85,8 @@ public:
 private:
 	QWaitCondition *m_notifier;
 };
+
+
+} // namespace lmms
 
 #endif //LOCKLESSRINGBUFFER_H
