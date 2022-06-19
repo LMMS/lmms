@@ -31,7 +31,7 @@
 #include "ThreadableJob.h"
 
 #include <atomic>
-
+#include <optional>
 #include <QColor>
 
 namespace lmms
@@ -84,7 +84,7 @@ class MixerChannel : public ThreadableJob
 		}
 
 		// TODO C++17 and above: use std::optional instead
-		QColor m_color;
+        std::optional<QColor> m_color;
 		bool m_hasColor;
 
 	

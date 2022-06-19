@@ -742,7 +742,7 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
 		mixch.setAttribute( "num", i );
 		mixch.setAttribute( "name", ch->m_name );
-		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
+        if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color->name() );
 
 		// add the channel sends
 		for( int si = 0; si < ch->m_sends.size(); ++si )
@@ -791,7 +791,7 @@ void Mixer::loadSettings( const QDomElement & _this )
 		if( mixch.hasAttribute( "color" ) )
 		{
 			m_mixerChannels[num]->m_hasColor = true;
-			m_mixerChannels[num]->m_color.setNamedColor( mixch.attribute( "color" ) );
+            m_mixerChannels[num]->m_color->setNamedColor( mixch.attribute( "color" ) );
 		}
 
 		m_mixerChannels[num]->m_fxChain.restoreState( mixch.firstChildElement(
