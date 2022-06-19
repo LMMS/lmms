@@ -62,12 +62,12 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 		setFixedSize( 160, 29 );
 		m_renameLineEdit->move( 30, ( height() / 2 ) - ( m_renameLineEdit->sizeHint().height() / 2 ) );
 		m_renameLineEdit->setFixedWidth( width() - 33 );
-		connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+		connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 	}
 	
 	setIconSize( QSize( 24, 24 ) );
-	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
-	connect( m_trackView->getTrack(), SIGNAL( nameChanged() ), this, SLOT( nameChanged() ) );
+	connect( m_trackView->getTrack(), SIGNAL(dataChanged()), this, SLOT(update()));
+	connect( m_trackView->getTrack(), SIGNAL(nameChanged()), this, SLOT(nameChanged()));
 }
 
 

@@ -108,10 +108,10 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	setAcceptDrops( true );
 
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-						this, SLOT( realignTracks() ) );
-	connect( m_tc, SIGNAL( trackAdded( lmms::Track * ) ),
-			this, SLOT( createTrackView( lmms::Track * ) ),
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+						this, SLOT(realignTracks()));
+	connect( m_tc, SIGNAL(trackAdded(lmms::Track*)),
+			this, SLOT(createTrackView(lmms::Track*)),
 			Qt::QueuedConnection );
 }
 
@@ -151,9 +151,9 @@ TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 				_tv->getTrackContentWidget(),
-				SLOT( changePosition( const lmms::TimePos & ) ) );
+				SLOT( changePosition( const lmms::TimePos& ) ) );
 	realignTracks();
 	return( _tv );
 }

@@ -480,8 +480,8 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 
 		if( !model->hasLinkedModels() )
 		{
-			QObject::connect( this, SIGNAL( dataChanged() ),
-					model, SIGNAL( dataChanged() ), Qt::DirectConnection );
+			QObject::connect( this, SIGNAL(dataChanged()),
+					model, SIGNAL(dataChanged()), Qt::DirectConnection );
 		}
 	}
 }
@@ -552,9 +552,9 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	m_controllerConnection = c;
 	if( c )
 	{
-		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ),
-				this, SIGNAL( dataChanged() ), Qt::DirectConnection );
-		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
+		QObject::connect( m_controllerConnection, SIGNAL(valueChanged()),
+				this, SIGNAL(dataChanged()), Qt::DirectConnection );
+		QObject::connect( m_controllerConnection, SIGNAL(destroyed()), this, SLOT(unlinkControllerConnection()));
 		m_valueChanged = true;
 		emit dataChanged();
 	}

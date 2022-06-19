@@ -44,7 +44,7 @@ VstSyncController::VstSyncController() :
 {
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
-		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+		connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSampleRate()));
 
 		try
 		{

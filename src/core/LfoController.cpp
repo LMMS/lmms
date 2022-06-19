@@ -51,20 +51,20 @@ LfoController::LfoController( Model * _parent ) :
 	m_userDefSampleBuffer( new SampleBuffer )
 {
 	setSampleExact( true );
-	connect( &m_waveModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleFunction() ), Qt::DirectConnection );
+	connect( &m_waveModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleFunction()), Qt::DirectConnection );
 
-	connect( &m_speedModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ), Qt::DirectConnection );
-	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ), Qt::DirectConnection );
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
-			this, SLOT( updateDuration() ) );
+	connect( &m_speedModel, SIGNAL(dataChanged()),
+			this, SLOT(updateDuration()), Qt::DirectConnection );
+	connect( &m_multiplierModel, SIGNAL(dataChanged()),
+			this, SLOT(updateDuration()), Qt::DirectConnection );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()),
+			this, SLOT(updateDuration()));
 
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
-			this, SLOT( updatePhase() ) );
-	connect( Engine::getSong(), SIGNAL( playbackPositionChanged() ),
-			this, SLOT( updatePhase() ) );
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+			this, SLOT(updatePhase()));
+	connect( Engine::getSong(), SIGNAL(playbackPositionChanged()),
+			this, SLOT(updatePhase()));
 
 	updateDuration();
 }

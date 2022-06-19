@@ -81,7 +81,7 @@ void TextFloat::setPixmap( const QPixmap & _pixmap )
 
 void TextFloat::setVisibilityTimeOut( int _msecs )
 {
-	QTimer::singleShot( _msecs, this, SLOT( hide() ) );
+	QTimer::singleShot( _msecs, this, SLOT(hide()));
 	show();
 }
 
@@ -106,7 +106,7 @@ TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
 	if( _timeout > 0 )
 	{
 		tf->setAttribute( Qt::WA_DeleteOnClose, true );
-		QTimer::singleShot( _timeout, tf, SLOT( close() ) );
+		QTimer::singleShot( _timeout, tf, SLOT(close()));
 	}
 	return( tf );
 }

@@ -444,11 +444,11 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 308, 20 );*/
 
-	connect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateDevices() ) );
+	connect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateDevices()));
 			
-	connect( &m_setupUtil.m_deviceModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateChannels() ) );
+	connect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateChannels()));
 			
 	m_backend->setModel( &m_setupUtil.m_backendModel );
 	m_device->setModel( &m_setupUtil.m_deviceModel );
@@ -459,11 +459,11 @@ AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 
 AudioPortAudio::setupWidget::~setupWidget()
 {
-	disconnect( &m_setupUtil.m_backendModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateDevices() ) );
+	disconnect( &m_setupUtil.m_backendModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateDevices()));
 			
-	disconnect( &m_setupUtil.m_deviceModel, SIGNAL( dataChanged() ),
-			&m_setupUtil, SLOT( updateChannels() ) );
+	disconnect( &m_setupUtil.m_deviceModel, SIGNAL(dataChanged()),
+			&m_setupUtil, SLOT(updateChannels()));
 }
 
 

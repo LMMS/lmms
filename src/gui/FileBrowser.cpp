@@ -125,14 +125,14 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit = new QLineEdit( searchWidget );
 	m_filterEdit->setPlaceholderText( tr("Search") );
 	m_filterEdit->setClearButtonEnabled( true );
-	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
-			this, SLOT( filterItems( const QString & ) ) );
+	connect( m_filterEdit, SIGNAL( textEdited( const QString& ) ),
+			this, SLOT( filterItems( const QString& ) ) );
 
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
 						QString(), searchWidget );
 	reload_btn->setToolTip( tr( "Refresh list" ) );
-	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
+	connect( reload_btn, SIGNAL(clicked()), this, SLOT(reloadTree()));
 
 	searchWidgetLayout->addWidget( m_filterEdit );
 	searchWidgetLayout->addSpacing( 5 );
@@ -144,7 +144,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	addContentWidget( m_fileBrowserTreeWidget );
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
-	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()) );
+	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()));
 	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	reloadTree();
@@ -379,12 +379,12 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
 
-	connect( this, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
-			SLOT( activateListItem( QTreeWidgetItem *, int ) ) );
-	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem * ) ),
-				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
-	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
-				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
+	connect( this, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),
+			SLOT(activateListItem(QTreeWidgetItem*,int)));
+	connect( this, SIGNAL(itemCollapsed(QTreeWidgetItem*)),
+				SLOT(updateDirectory(QTreeWidgetItem*)));
+	connect( this, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+				SLOT(updateDirectory(QTreeWidgetItem*)));
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
 	// Set the font for the QTreeWidget to the Windows System font to make sure that

@@ -90,8 +90,8 @@ void ModelView::doConnections()
 {
 	if( m_model != nullptr )
 	{
-		QObject::connect( m_model, SIGNAL( dataChanged() ), widget(), SLOT( update() ) );
-		QObject::connect( m_model, SIGNAL( propertiesChanged() ), widget(), SLOT( update() ) );
+		QObject::connect( m_model, SIGNAL(dataChanged()), widget(), SLOT(update()));
+		QObject::connect( m_model, SIGNAL(propertiesChanged()), widget(), SLOT(update()));
 	}
 }
 

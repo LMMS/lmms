@@ -47,30 +47,30 @@ SampleClip::SampleClip( Track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this Clip
-	connect( Engine::getSong(), SIGNAL( tempoChanged( lmms::bpm_t ) ),
-					this, SLOT( updateLength() ), Qt::DirectConnection );
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
-					this, SLOT( updateLength() ) );
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+					this, SLOT(updateLength()), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+					this, SLOT(updateLength()));
 
 	//care about positionmarker
 	gui::TimeLineWidget* timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
 	if( timeLine )
 	{
-		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
+		connect( timeLine, SIGNAL(positionMarkerMoved()), this, SLOT(playbackPositionChanged()));
 	}
 	//playbutton clicked or space key / on Export Song set isPlaying to false
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
-			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about loops
-	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ),
-			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(updateSampleTracks()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about mute Clips
-	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
+	connect( this, SIGNAL(dataChanged()), this, SLOT(playbackPositionChanged()));
 	//care about mute track
-	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
-			this, SLOT( playbackPositionChanged() ), Qt::DirectConnection );
+	connect( getTrack()->getMutedModel(), SIGNAL(dataChanged()),
+			this, SLOT(playbackPositionChanged()), Qt::DirectConnection );
 	//care about Clip position
-	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackClips() ) );
+	connect( this, SIGNAL(positionChanged()), this, SLOT(updateTrackClips()));
 
 	switch( getTrack()->trackContainer()->type() )
 	{

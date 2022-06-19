@@ -91,11 +91,11 @@ void RingBuffer::setSamplerateAware( bool b )
 {
 	if( b )
 	{
-		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ), Qt::UniqueConnection );
+		connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()), Qt::UniqueConnection );
 	}
 	else
 	{
-		disconnect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+		disconnect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()));
 	}
 }
 

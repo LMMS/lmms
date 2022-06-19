@@ -134,8 +134,8 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	proxyWidget->setRotation( -90 );
 	proxyWidget->setPos( 8, 145 );
 
-	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
-	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
 }
 
 
@@ -251,18 +251,18 @@ void MixerLine::contextMenuEvent( QContextMenuEvent * )
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::mixer()->mixerChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master
 	{
-		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
-		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
+		contextMenu->addAction( tr( "Move &left" ),	this, SLOT(moveChannelLeft()));
+		contextMenu->addAction( tr( "Move &right" ), this, SLOT(moveChannelRight()));
 	}
-	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );
+	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT(renameChannel()));
 	contextMenu->addSeparator();
 
 	if( m_channelIndex != 0 ) // no remove-option in master
 	{
-		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ), this, SLOT( removeChannel() ) );
+		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ), this, SLOT(removeChannel()));
 		contextMenu->addSeparator();
 	}
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT(removeUnusedChannels()));
 	contextMenu->addSeparator();
 
 	QMenu colorMenu(tr("Color"), this);

@@ -46,8 +46,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 {
 	if( m_link )
 	{
-		connect( &m_linkEnabledModel, SIGNAL( dataChanged() ),
-					 this, SLOT( linkStateChanged() ),
+		connect( &m_linkEnabledModel, SIGNAL(dataChanged()),
+					 this, SLOT(linkStateChanged()),
 					 Qt::DirectConnection );
 	}
 
@@ -56,8 +56,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 		case TOGGLED:
 			m_toggledModel.setInitValue(
 				static_cast<bool>( m_port->def ) );
-			connect( &m_toggledModel, SIGNAL( dataChanged() ),
-					 this, SLOT( ledChanged() ) );
+			connect( &m_toggledModel, SIGNAL(dataChanged()),
+					 this, SLOT(ledChanged()));
 			if( m_port->def == 1.0f )
 			{
 				m_toggledModel.setValue( true );
@@ -74,8 +74,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 							  m_port->min ) / 400 );
 			m_knobModel.setInitValue(
 					static_cast<int>( m_port->def ) );
-			connect( &m_knobModel, SIGNAL( dataChanged() ),
-						 this, SLOT( knobChanged() ) );
+			connect( &m_knobModel, SIGNAL(dataChanged()),
+						 this, SLOT(knobChanged()));
 			// TODO: careful: we must prevent saved scales
 			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
@@ -87,8 +87,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 					&& m_port->max == 10.0f ? 4000.0f :
 								( m_port->suggests_logscale ? 8000000.0f : 800000.0f ) ) );
 			m_knobModel.setInitValue( m_port->def );
-			connect( &m_knobModel, SIGNAL( dataChanged() ),
-						 this, SLOT( knobChanged() ) );
+			connect( &m_knobModel, SIGNAL(dataChanged()),
+						 this, SLOT(knobChanged()));
 			// TODO: careful: we must prevent saved scales
 			m_knobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
@@ -98,8 +98,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 					  ( m_port->max -
 						m_port->min ) / 800.0f );
 			m_tempoSyncKnobModel.setInitValue( m_port->def );
-			connect( &m_tempoSyncKnobModel, SIGNAL( dataChanged() ),
-					 this, SLOT( tempoKnobChanged() ) );
+			connect( &m_tempoSyncKnobModel, SIGNAL(dataChanged()),
+					 this, SLOT(tempoKnobChanged()));
 			// TODO: careful: we must prevent saved scales
 			m_tempoSyncKnobModel.setScaleLogarithmic( m_port->suggests_logscale );
 			break;
