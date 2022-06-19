@@ -46,14 +46,14 @@ class LadspaEffect : public Effect
 public:
 	LadspaEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~LadspaEffect();
+	~LadspaEffect() override;
 
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	bool processAudioBuffer( sampleFrame * _buf,
+							const fpp_t _frames ) override;
 	
 	void setControl( int _control, LADSPA_Data _data );
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return m_controls;
 	}

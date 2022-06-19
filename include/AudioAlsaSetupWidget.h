@@ -47,7 +47,7 @@ class AudioAlsaSetupWidget : public AudioDeviceSetupWidget
 
 public:
 	AudioAlsaSetupWidget( QWidget * _parent );
-	virtual ~AudioAlsaSetupWidget();
+	~AudioAlsaSetupWidget() override;
 
 	void saveSettings() override;
 

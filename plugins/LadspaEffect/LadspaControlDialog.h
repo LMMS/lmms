@@ -50,7 +50,7 @@ class LadspaControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	LadspaControlDialog( LadspaControls * _ctl );
-	~LadspaControlDialog();
+	~LadspaControlDialog() override;
 
 
 private slots:

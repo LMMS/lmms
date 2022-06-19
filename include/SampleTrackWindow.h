@@ -50,7 +50,7 @@ class SampleTrackWindow : public QWidget, public ModelView, public SerializingOb
 	Q_OBJECT
 public:
 	SampleTrackWindow(SampleTrackView * tv);
-	virtual ~SampleTrackWindow();
+	~SampleTrackWindow() override;
 
 	SampleTrack * model()
 	{

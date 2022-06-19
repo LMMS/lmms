@@ -98,7 +98,7 @@ public:
 		panning_t panning = DefaultPanning,
 		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
-	virtual ~Note();
+	~Note() override;
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }

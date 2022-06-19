@@ -38,7 +38,7 @@ public:
 	MidiDummy()
 	{
 	}
-	virtual ~MidiDummy()
+	~MidiDummy() override
 	{
 	}
 

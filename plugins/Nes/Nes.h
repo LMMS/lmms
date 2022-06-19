@@ -211,25 +211,25 @@ class NesInstrument : public Instrument
 	Q_OBJECT
 public:
 	NesInstrument( InstrumentTrack * instrumentTrack );
-	virtual ~NesInstrument();
+	~NesInstrument() override;
 	
-	virtual void playNote( NotePlayHandle * n,
-						sampleFrame * workingBuffer );
-	virtual void deleteNotePluginData( NotePlayHandle * n );
+	void playNote( NotePlayHandle * n,
+						sampleFrame * workingBuffer ) override;
+	void deleteNotePluginData( NotePlayHandle * n ) override;
 
 
-	virtual void saveSettings( QDomDocument & doc,
-							QDomElement & element );
-	virtual void loadSettings( const QDomElement & element );
+	void saveSettings( QDomDocument & doc,
+							QDomElement & element ) override;
+	void loadSettings( const QDomElement & element ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 8 );
 	}
 	
-	virtual gui::PluginView* instantiateView( QWidget * parent );
+	gui::PluginView* instantiateView( QWidget * parent ) override;
 	
 public slots:
 	void updateFreq1();
@@ -313,10 +313,10 @@ class NesInstrumentView : public InstrumentViewFixedSize
 public:
 	NesInstrumentView( Instrument * instrument,
 					QWidget * parent );
-	virtual ~NesInstrumentView();	
+	~NesInstrumentView() override;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 	
 	// channel 1
 	PixmapButton * 	m_ch1EnabledBtn;

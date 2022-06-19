@@ -406,7 +406,7 @@ private slots:
 private:
 	Song();
 	Song( const Song & );
-	virtual ~Song();
+	~Song() override;
 
 
 	inline bar_t currentBar() const

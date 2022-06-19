@@ -113,7 +113,7 @@ MixerView::MixerView() :
 		public:
 			ChannelArea( QWidget * parent, MixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
-			~ChannelArea() {}
+			~ChannelArea() override {}
 			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );

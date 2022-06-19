@@ -52,7 +52,7 @@ class AudioSndio : public QThread, public AudioDevice
 	Q_OBJECT
 public:
 	AudioSndio( bool & _success_ful, AudioEngine * _audioEngine );
-	virtual ~AudioSndio();
+	~AudioSndio() override;
 
 	inline static QString name( void )
 	{
@@ -63,7 +63,7 @@ public:
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
 		void saveSettings( void ) override;
 

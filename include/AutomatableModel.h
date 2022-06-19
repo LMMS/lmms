@@ -89,7 +89,7 @@ public:
 	};
 
 
-	virtual ~AutomatableModel();
+	~AutomatableModel() override;
 
 	// Implement those by using the MODEL_IS_VISITABLE macro
 	virtual void accept(ModelVisitor& v) = 0;

@@ -53,7 +53,7 @@ public:
  * 	\param size The size of the buffer in milliseconds. The actual size will be size + period size
  */
 	RingBuffer( float size );
-	virtual ~RingBuffer();
+	~RingBuffer() override;
 
 
 

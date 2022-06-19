@@ -38,7 +38,7 @@ class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
 
-	virtual ~InstrumentPlayHandle()
+	~InstrumentPlayHandle() override
 	{
 	}
 

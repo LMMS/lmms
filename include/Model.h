@@ -45,7 +45,7 @@ public:
 	{
 	}
 
-	virtual ~Model()
+	~Model() override
 	{
 	}
 

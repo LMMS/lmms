@@ -64,7 +64,7 @@ class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
 public:
 	InstrumentTrack( TrackContainer* tc );
-	virtual ~InstrumentTrack();
+	~InstrumentTrack() override;
 
 	// used by instrument
 	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
@@ -122,7 +122,7 @@ public:
 	}
 
 	// play everything in given frame-range - creates note-play-handles
-	virtual bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 	// create new view for me
 	gui::TrackView* createView( gui::TrackContainerView* tcv ) override;
@@ -132,7 +132,7 @@ public:
 
 
 	// called by track
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
+	void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 

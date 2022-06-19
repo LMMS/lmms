@@ -41,11 +41,11 @@ class MultitapEchoControls : public EffectControls
 	Q_OBJECT
 public:
 	MultitapEchoControls( MultitapEchoEffect * eff );
-	virtual ~MultitapEchoControls();
+	~MultitapEchoControls() override;
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & parent );
-	virtual void loadSettings( const QDomElement & elem );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & doc, QDomElement & parent ) override;
+	void loadSettings( const QDomElement & elem ) override;
+	inline QString nodeName() const override
 	{
 		return( "multitapechocontrols" );
 	}
@@ -53,12 +53,12 @@ public:
 	void setDefaultAmpShape();
 	void setDefaultLpShape();
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 5 );
 	}
 
-	virtual gui::EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
 		return( new gui::MultitapEchoControlDialog( this ) );
 	}

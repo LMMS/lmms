@@ -48,7 +48,7 @@ class AudioSdl : public AudioDevice
 {
 public:
 	AudioSdl( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioSdl();
+	~AudioSdl() override;
 
 	inline static QString name()
 	{

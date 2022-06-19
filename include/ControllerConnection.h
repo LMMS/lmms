@@ -58,7 +58,7 @@ public:
 	ControllerConnection(Controller * _controller);
 	ControllerConnection( int _controllerId );
 
-	virtual ~ControllerConnection();
+	~ControllerConnection() override;
 
 	inline Controller * getController()
 	{

@@ -58,7 +58,7 @@ public:
 		NumWaveShapes
 	};
 	VoiceObject( Model * _parent, int _idx );
-	virtual ~VoiceObject();
+	~VoiceObject() override;
 
 
 private:
@@ -97,21 +97,21 @@ public:
 
 
 	SidInstrument( InstrumentTrack * _instrument_track );
-	virtual ~SidInstrument();
+	~SidInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
+	f_cnt_t desiredReleaseFrames() const override;
 
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 /*public slots:
@@ -147,10 +147,10 @@ class SidInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	SidInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~SidInstrumentView();
+	~SidInstrumentView() override;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 	
 	automatableButtonGroup * m_passBtnGrp;
 	automatableButtonGroup * m_sidTypeBtnGrp;

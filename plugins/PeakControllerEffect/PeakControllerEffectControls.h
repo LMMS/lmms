@@ -41,7 +41,7 @@ class PeakControllerEffectControls : public EffectControls
 	Q_OBJECT
 public:
 	PeakControllerEffectControls( PeakControllerEffect * _eff );
-	virtual ~PeakControllerEffectControls()
+	~PeakControllerEffectControls() override
 	{
 	}
 

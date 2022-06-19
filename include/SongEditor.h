@@ -66,7 +66,7 @@ public:
 	};
 
 	SongEditor( Song * song );
-	~SongEditor();
+	~SongEditor() override;
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;

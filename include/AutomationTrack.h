@@ -37,9 +37,9 @@ class AutomationTrack : public Track
 	Q_OBJECT
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
-	virtual ~AutomationTrack() = default;
+	~AutomationTrack() override = default;
 
-	virtual bool play( const TimePos & _start, const fpp_t _frames,
+	bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
 
 	QString nodeName() const override
@@ -50,7 +50,7 @@ public:
 	gui::TrackView * createView( gui::TrackContainerView* ) override;
 	Clip* createClip(const TimePos & pos) override;
 
-	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
+	void saveTrackSpecificSettings( QDomDocument & _doc,
 							QDomElement & _parent ) override;
 	void loadTrackSpecificSettings( const QDomElement & _this ) override;
 

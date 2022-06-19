@@ -54,28 +54,28 @@ class KickerInstrument : public Instrument
 	Q_OBJECT
 public:
 	KickerInstrument( InstrumentTrack * _instrument_track );
-	virtual ~KickerInstrument();
+	~KickerInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
 		return IsNotBendable;
 	}
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 512 );
 	}
 
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private:
@@ -109,10 +109,10 @@ class KickerInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	KickerInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~KickerInstrumentView();
+	~KickerInstrumentView() override;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob * m_startFreqKnob;
 	Knob * m_endFreqKnob;

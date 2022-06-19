@@ -64,7 +64,7 @@ public:
 	};
 
 	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
-	virtual ~SetupDialog();
+	~SetupDialog() override;
 
 
 protected slots:

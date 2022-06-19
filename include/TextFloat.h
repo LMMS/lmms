@@ -39,7 +39,7 @@ class LMMS_EXPORT TextFloat : public QWidget
 	Q_OBJECT
 public:
 	TextFloat();
-	virtual ~TextFloat()
+	~TextFloat() override
 	{
 	}
 

@@ -41,7 +41,7 @@ public:
 	MixerLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = nullptr) :
 		LcdSpinBox(numDigits, parent, name), m_tv(tv)
 	{}
-	virtual ~MixerLineLcdSpinBox() {}
+	~MixerLineLcdSpinBox() override {}
 
 	void setTrackView(TrackView * tv);
 

@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-	virtual ~selectableObject()
+	~selectableObject() override
 	{
 	}
 
@@ -80,7 +80,7 @@ class RubberBand : public QRubberBand
 {
 public:
 	RubberBand( QWidget * _parent );
-	virtual ~RubberBand();
+	~RubberBand() override;
 
 	QVector<selectableObject *> selectedObjects() const;
 	QVector<selectableObject *> selectableObjects() const;

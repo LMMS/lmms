@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-	virtual ~SideBarButton() = default;
+	~SideBarButton() override = default;
 
 	Qt::Orientation orientation() const
 	{

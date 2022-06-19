@@ -60,7 +60,7 @@ public:
 	Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
 			const Descriptor::SubPluginFeatures::Key * key = nullptr);
-	virtual ~Instrument() = default;
+	~Instrument() override = default;
 
 	// --------------------------------------------------------------------
 	// functions that can/should be re-implemented:

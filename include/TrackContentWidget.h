@@ -56,7 +56,7 @@ class TrackContentWidget : public QWidget, public JournallingObject
 
 public:
 	TrackContentWidget( TrackView * parent );
-	virtual ~TrackContentWidget();
+	~TrackContentWidget() override;
 
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();

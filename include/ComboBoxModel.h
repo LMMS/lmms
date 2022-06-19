@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	virtual ~ComboBoxModel()
+	~ComboBoxModel() override
 	{
 		clear();
 	}

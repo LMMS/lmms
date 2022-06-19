@@ -39,10 +39,10 @@ class DualFilterEffect : public Effect
 {
 public:
 	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~DualFilterEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~DualFilterEffect() override;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_dfControls;
 	}

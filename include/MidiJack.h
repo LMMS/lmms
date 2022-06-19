@@ -53,7 +53,7 @@ class MidiJack : public QThread, public MidiClientRaw
         Q_OBJECT
 public:
 	MidiJack();
-	virtual ~MidiJack();
+	~MidiJack() override;
 
 	jack_client_t* jackClient();
 
@@ -76,8 +76,8 @@ public:
 
 
 protected:
-	virtual void sendByte( const unsigned char c );
-	virtual void run();
+	void sendByte( const unsigned char c ) override;
+	void run() override;
 
 
 private:

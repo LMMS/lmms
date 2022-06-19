@@ -40,7 +40,7 @@ class VstSyncController : public QObject
 	Q_OBJECT
 public:
 	VstSyncController();
-	~VstSyncController();
+	~VstSyncController() override;
 
 	void setAbsolutePosition( double ticks );
 

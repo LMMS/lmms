@@ -43,7 +43,7 @@ class MidiClipView : public ClipView
 
 public:
 	MidiClipView( MidiClip* clip, TrackView* parent );
- 	virtual ~MidiClipView() = default;
+ 	~MidiClipView() override = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)

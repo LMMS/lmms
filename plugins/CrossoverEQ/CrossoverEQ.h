@@ -39,10 +39,10 @@ class CrossoverEQEffect : public Effect
 {
 public:
 	CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~CrossoverEQEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~CrossoverEQEffect() override;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_controls;
 	}

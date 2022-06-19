@@ -61,7 +61,7 @@ class ControllerConnectionDialog : public QDialog
 public:
 	ControllerConnectionDialog( QWidget * _parent,
 			const AutomatableModel * _target_model );
-	virtual ~ControllerConnectionDialog();
+	~ControllerConnectionDialog() override;
 
 	Controller * chosenController()
 	{

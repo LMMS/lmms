@@ -40,7 +40,7 @@ public:
 
 	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
 
-	virtual ~LcdSpinBox() = default;
+	~LcdSpinBox() override = default;
 
 	void modelChanged() override
 	{

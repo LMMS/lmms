@@ -42,7 +42,7 @@ class StereoEnhancerControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	StereoEnhancerControlDialog( StereoEnhancerControls * _controls );
-	virtual ~StereoEnhancerControlDialog()
+	~StereoEnhancerControlDialog() override
 	{
 	}
 
