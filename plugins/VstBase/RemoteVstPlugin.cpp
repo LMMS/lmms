@@ -2165,7 +2165,7 @@ void RemoteVstPlugin::idle()
 		return;
 	}
 	setProcessing( true );
-	if (!HEADLESS)
+	if (!HEADLESS && m_window)
 	{
 		pluginDispatch( effEditIdle );
 	}
