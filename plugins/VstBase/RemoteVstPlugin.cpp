@@ -2216,7 +2216,10 @@ void RemoteVstPlugin::processUIThreadMessages()
 #endif
 		if( shouldGiveIdle() )
 		{
-			pluginDispatch( effEditIdle );
+			if (!HEADLESS && m_window)
+			{
+				pluginDispatch( effEditIdle );
+			}
 			setShouldGiveIdle( false );
 		}
 #ifdef NATIVE_LINUX_VST
