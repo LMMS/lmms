@@ -24,8 +24,8 @@
  */
 
 
-#ifndef _DRUMSYNTH_H__
-#define _DRUMSYNTH_H__
+#ifndef DRUMSYNTH_H
+#define DRUMSYNTH_H
 
 #include <stdint.h>
 #include "lmms_basics.h"
@@ -57,4 +57,4 @@ class DrumSynth {
 
 } // namespace lmms
 
-#endif
+#endif // DRUMSYNTH_H
