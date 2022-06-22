@@ -38,7 +38,6 @@
 
 #if !(defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H))
 #define SYNC_WITH_SHM_FIFO
-#define USE_QT_SEMAPHORES
 
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
