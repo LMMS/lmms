@@ -41,7 +41,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Dynamics Processor",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for processing dynamics in a flexible way" ),

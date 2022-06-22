@@ -61,7 +61,7 @@ namespace PLUGIN_NAME
 inline QPixmap getIconPixmap( const QString&  _name,
 	int _w = -1, int _h = -1, const char** xpm = nullptr )
 {
-	return embed::getIconPixmap(QString("%1/%2").arg(STRINGIFY(PLUGIN_NAME), _name), _w, _h, xpm);
+	return embed::getIconPixmap(QString("%1/%2").arg(LMMS_STRINGIFY(PLUGIN_NAME), _name), _w, _h, xpm);
 }
 //QString getText( const char * _name );
 
@@ -132,7 +132,7 @@ public:
 
 	QString pixmapName() const override
 	{
-		return QString( STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
+		return QString( LMMS_STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
 	}
 
 } ;

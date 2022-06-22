@@ -47,7 +47,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Monstro",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Monstrous 3-oscillator synth with modulation matrix" ),

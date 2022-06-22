@@ -36,7 +36,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Amplifier",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native amplifier plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
