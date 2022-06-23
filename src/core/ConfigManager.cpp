@@ -37,6 +37,9 @@
 
 #include "lmmsversion.h"
 
+namespace lmms
+{
+
 
 // Vector with all the upgrade methods
 const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
@@ -522,10 +525,10 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
-		else if(getGUI() != nullptr)
+		else if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::warning(nullptr, MainWindow::tr("Configuration file"),
-									MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
+			QMessageBox::warning(nullptr, gui::MainWindow::tr("Configuration file"),
+									gui::MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
 													arg(errorLine).
 													arg(errorCol).
 													arg(errorString));
@@ -642,6 +645,8 @@ void ConfigManager::saveConfigFile()
 	QFile outfile(m_lmmsRcFile);
 	if(!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
+		using gui::MainWindow;
+
 		QString title, message;
 		title = MainWindow::tr("Could not open file");
 		message = MainWindow::tr("Could not open file %1 "
@@ -651,7 +656,7 @@ void ConfigManager::saveConfigFile()
 					"the directory containing the "
 					"file and try again!"
 						).arg(m_lmmsRcFile);
-		if(getGUI() != nullptr)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,
@@ -742,3 +747,6 @@ unsigned int ConfigManager::legacyConfigVersion()
 		return 2;
 	}
 }
+
+
+} // namespace lmms

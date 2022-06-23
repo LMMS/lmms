@@ -44,7 +44,35 @@
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
+namespace lmms
+{
+
 using namespace std;
+
+
+InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack *it, QString name ) :
+	QThread( parent ),
+	m_it( it ),
+	m_name( name )
+{
+	m_containerThread = thread();
+}
+
+
+
+
+void InstrumentLoaderThread::run()
+{
+	Instrument *i = m_it->loadInstrument(m_name, nullptr,
+										 true /*always DnD*/);
+	QObject *parent = i->parent();
+	i->setParent( 0 );
+	i->moveToThread( m_containerThread );
+	i->setParent( parent );
+}
+
+namespace gui
+{
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
@@ -82,8 +110,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( realignTracks() ) );
-	connect( m_tc, SIGNAL( trackAdded( Track * ) ),
-			this, SLOT( createTrackView( Track * ) ),
+	connect( m_tc, SIGNAL( trackAdded( lmms::Track * ) ),
+			this, SLOT( createTrackView( lmms::Track * ) ),
 			Qt::QueuedConnection );
 }
 
@@ -123,9 +151,9 @@ TrackView * TrackContainerView::addTrackView( TrackView * _tv )
 {
 	m_trackViews.push_back( _tv );
 	m_scrollLayout->addWidget( _tv );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
 				_tv->getTrackContentWidget(),
-				SLOT( changePosition( const TimePos & ) ) );
+				SLOT( changePosition( const lmms::TimePos & ) ) );
 	realignTracks();
 	return( _tv );
 }
@@ -480,25 +508,7 @@ void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 }
 
 
+} // namespace gui
 
 
-InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack *it, QString name ) :
-	QThread( parent ),
-	m_it( it ),
-	m_name( name )
-{
-	m_containerThread = thread();
-}
-
-
-
-
-void InstrumentLoaderThread::run()
-{
-	Instrument *i = m_it->loadInstrument(m_name, nullptr,
-				true /*always DnD*/);
-	QObject *parent = i->parent();
-	i->setParent( 0 );
-	i->moveToThread( m_containerThread );
-	i->setParent( parent );
-}
+} // namespace lmms

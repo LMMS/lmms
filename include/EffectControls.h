@@ -29,8 +29,16 @@
 #include "JournallingObject.h"
 #include "Effect.h"
 
+namespace lmms
+{
+
+
+namespace gui
+{
+
 class EffectControlDialog;
 
+} // namespace gui
 
 class EffectControls : public JournallingObject, public Model
 {
@@ -48,7 +56,7 @@ public:
 	}
 
 	virtual int controlCount() = 0;
-	virtual EffectControlDialog * createView() = 0;
+	virtual gui::EffectControlDialog * createView() = 0;
 
 
 	void setViewVisible( bool _visible )
@@ -72,5 +80,8 @@ private:
 	bool m_viewVisible;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

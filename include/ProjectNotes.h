@@ -35,6 +35,9 @@ class QComboBox;
 class QTextCharFormat;
 class QTextEdit;
 
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
 {
@@ -88,5 +91,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

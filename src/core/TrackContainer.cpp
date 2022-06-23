@@ -41,6 +41,10 @@
 #include "MainWindow.h"
 #include "TextFloat.h"
 
+namespace lmms
+{
+
+
 TrackContainer::TrackContainer() :
 	Model( nullptr ),
 	JournallingObject(),
@@ -87,14 +91,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	static QProgressDialog * pd = nullptr;
 	bool was_null = ( pd == nullptr );
-	if( !journalRestore && getGUI() != nullptr )
+	if (!journalRestore && gui::getGUI() != nullptr)
 	{
 		if( pd == nullptr )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
 						Engine::getSong()->getLoadingTrackCount(),
-						getGUI()->mainWindow() );
+						gui::getGUI()->mainWindow());
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
@@ -111,9 +115,9 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 						QEventLoop::AllEvents, 100 );
 			if( pd->wasCanceled() )
 			{
-				if ( getGUI() != nullptr )
+				if (gui::getGUI() != nullptr)
 				{
-					TextFloat::displayMessage( tr( "Loading cancelled" ),
+					gui::TextFloat::displayMessage( tr( "Loading cancelled" ),
 					tr( "Project loading was cancelled." ),
 					embed::getIconPixmap( "project_file", 24, 24 ),
 					2000 );
@@ -330,3 +334,5 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 	return valueMap;
 };
 
+
+} // namespace lmms

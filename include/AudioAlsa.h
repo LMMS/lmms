@@ -37,6 +37,8 @@
 
 #include "AudioDevice.h"
 
+namespace lmms
+{
 
 class AudioAlsa : public QThread, public AudioDevice
 {
@@ -102,6 +104,8 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA
 
 #endif

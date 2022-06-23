@@ -40,9 +40,16 @@ class QPainter;
 class QPixmap;
 class QScrollBar;
 
-class ComboBox;
-class Knob;
+namespace lmms
+{
+
 class NotePlayHandle;
+
+namespace gui
+{
+
+class Knob;
+class ComboBox;
 class TimeLineWidget;
 
 
@@ -128,7 +135,7 @@ protected slots:
 	void setProgressionType(int type);
 	void setTension();
 
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 
 	void zoomingXChanged();
 	void zoomingYChanged();
@@ -234,7 +241,7 @@ private:
 
 signals:
 	void currentClipChanged();
-	void positionChanged( const TimePos & );
+	void positionChanged( const lmms::TimePos & );
 } ;
 
 
@@ -293,5 +300,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 };
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

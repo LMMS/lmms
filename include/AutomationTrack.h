@@ -29,6 +29,8 @@
 
 #include "Track.h"
 
+namespace lmms
+{
 
 class AutomationTrack : public Track
 {
@@ -45,7 +47,7 @@ public:
 		return "automationtrack";
 	}
 
-	TrackView * createView( TrackContainerView* ) override;
+	gui::TrackView * createView( gui::TrackContainerView* ) override;
 	Clip* createClip(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -57,5 +59,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

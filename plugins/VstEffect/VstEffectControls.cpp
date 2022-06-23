@@ -42,6 +42,8 @@
 #include "SubWindow.h"
 #include <QApplication>
 
+namespace lmms
+{
 
 
 VstEffectControls::VstEffectControls( VstEffect * _eff ) :
@@ -155,9 +157,9 @@ int VstEffectControls::controlCount()
 
 
 
-EffectControlDialog *VstEffectControls::createView()
+gui::EffectControlDialog* VstEffectControls::createView()
 {
-	auto dialog = new VstEffectControlDialog( this );
+	auto dialog = new gui::VstEffectControlDialog( this );
 	dialog->togglePluginUI( m_vstGuiVisible );
 	return dialog;
 }
@@ -168,7 +170,7 @@ EffectControlDialog *VstEffectControls::createView()
 void VstEffectControls::managePlugin( void )
 {
 	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
-		ManageVSTEffectView * tt = new ManageVSTEffectView( m_effect, this);
+		gui::ManageVSTEffectView * tt = new gui::ManageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
 		if (m_subWindow->widget()->isVisible() == false ) { 
@@ -307,6 +309,9 @@ void VstEffectControls::paintEvent( QPaintEvent * )
 }
 
 
+
+namespace gui
+{
 
 
 ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
@@ -572,7 +577,6 @@ ManageVSTEffectView::~ManageVSTEffectView()
 }
 
 
+} // namespace gui
 
-
-
-
+} // namespace lmms

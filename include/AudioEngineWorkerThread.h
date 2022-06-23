@@ -29,8 +29,12 @@
 
 #include <atomic>
 
-class AudioEngine;
 class QWaitCondition;
+
+namespace lmms
+{
+
+class AudioEngine;
 class ThreadableJob;
 
 class AudioEngineWorkerThread : public QThread
@@ -115,5 +119,6 @@ private:
 	volatile bool m_quit;
 } ;
 
+} // namespace lmms
 
 #endif

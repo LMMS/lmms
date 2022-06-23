@@ -42,6 +42,11 @@ class QLabel;
 class QLineEdit;
 class QSlider;
 
+
+namespace lmms::gui
+{
+
+
 class TabBar;
 
 class SetupDialog : public QDialog
@@ -212,4 +217,8 @@ private:
 
 	QLabel * restartWarningLbl;
 };
+
+
+} // namespace lmms::gui
+
 #endif

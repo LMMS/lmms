@@ -34,6 +34,11 @@
 #include <QAbstractNativeEventFilter>
 #endif
 
+
+namespace lmms::gui
+{
+
+
 #if defined(LMMS_BUILD_WIN32)
 class MainApplication : public QApplication, public QAbstractNativeEventFilter
 #else
@@ -55,5 +60,8 @@ public:
 private:
 	QString m_queuedFile;
 };
+
+
+} // namespace lmms::gui
 
 #endif // MAINAPPLICATION_H

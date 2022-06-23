@@ -27,7 +27,15 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class FlangerControls;
+
+namespace gui
+{
+
 
 class FlangerControlsDialog : public EffectControlDialog
 {
@@ -38,5 +46,10 @@ public:
 	{
 	}
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // FLANGERCONTROLSDIALOG_H

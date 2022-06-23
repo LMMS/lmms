@@ -30,13 +30,23 @@
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
 
+
+class NotePlayHandle;
+class SampleBuffer;
+class Oscillator;
+
+
+namespace gui
+{
 class automatableButtonGroup;
 class Knob;
-class NotePlayHandle;
-class Oscillator;
 class PixmapButton;
-class SampleBuffer;
+class TripleOscillatorView;
+} // namespace gui
+
 
 const int NUM_OF_OSCILLATORS = 3;
 
@@ -75,7 +85,7 @@ private:
 	bool m_useWaveTable;
 
 	friend class TripleOscillator;
-	friend class TripleOscillatorView;
+	friend class gui::TripleOscillatorView;
 
 
 private slots:
@@ -115,7 +125,7 @@ public:
 		return( 128 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 
 protected slots:
@@ -133,10 +143,13 @@ private:
 	} ;
 
 
-	friend class TripleOscillatorView;
+	friend class gui::TripleOscillatorView;
 
 } ;
 
+
+namespace gui
+{
 
 
 class TripleOscillatorView : public InstrumentViewFixedSize
@@ -198,5 +211,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

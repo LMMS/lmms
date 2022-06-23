@@ -27,6 +27,9 @@
 
 #include <QDataStream>
 
+namespace lmms
+{
+
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;
 QString BandLimitedWave::s_wavetableDir = "";
@@ -270,3 +273,5 @@ moogfile.close();
 */
 
 }
+
+} // namespace lmms

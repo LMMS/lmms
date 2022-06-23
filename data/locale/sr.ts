@@ -3550,7 +3550,7 @@ Double click to pick a file.</source>
     </message>
 </context>
 <context>
-    <name>LmmsCore</name>
+    <name>Engine</name>
     <message>
         <source>Generating wavetables</source>
         <translation type="unfinished"/>

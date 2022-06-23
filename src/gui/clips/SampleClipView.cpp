@@ -35,6 +35,10 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 
+namespace lmms::gui
+{
+
+
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
 	m_clip( _clip ),
@@ -351,3 +355,6 @@ bool SampleClipView::splitClip( const TimePos pos )
 	}
 	else { return false; }
 }
+
+
+} // namespace lmms::gui

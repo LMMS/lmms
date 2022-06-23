@@ -37,6 +37,9 @@
 
 #include <cmath>
 
+namespace lmms
+{
+
 int AutomationClip::s_quantization = 1;
 const float AutomationClip::DEFAULT_MIN_VALUE = 0;
 const float AutomationClip::DEFAULT_MAX_VALUE = 1;
@@ -127,8 +130,8 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 
 	m_objects += _obj;
 
-	connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
-			this, SLOT( objectDestroyed( jo_id_t ) ),
+	connect( _obj, SIGNAL( destroyed( lmms::jo_id_t ) ),
+			this, SLOT( objectDestroyed( lmms::jo_id_t ) ),
 						Qt::DirectConnection );
 
 	emit dataChanged();
@@ -870,11 +873,11 @@ const QString AutomationClip::name() const
 
 
 
-ClipView * AutomationClip::createView( TrackView * _tv )
+gui::ClipView * AutomationClip::createView( gui::TrackView * _tv )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	return new AutomationClipView( this, _tv );
+	return new gui::AutomationClipView( this, _tv );
 }
 
 
@@ -1183,3 +1186,5 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 		it++;
 	}
 }
+
+} // namespace lmms

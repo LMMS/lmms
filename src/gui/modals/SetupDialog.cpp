@@ -68,6 +68,10 @@
 #include "MidiWinMM.h"
 
 
+namespace lmms::gui
+{
+
+
 constexpr int BUFFERSIZE_RESOLUTION = 32;
 
 inline void labelWidget(QWidget * w, const QString & txt)
@@ -1428,3 +1432,6 @@ void SetupDialog::showRestartWarning()
 {
 	restartWarningLbl->show();
 }
+
+
+} // namespace lmms::gui

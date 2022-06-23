@@ -38,6 +38,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiApple : public QObject, public MidiClient
 {
 	Q_OBJECT
@@ -146,7 +150,10 @@ signals:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_BUILD_APPLE
 
 
 #endif

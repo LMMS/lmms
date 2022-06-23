@@ -81,9 +81,9 @@ SET(zynaddsubfx_core_SRCS
 	zynaddsubfx/src/Effects/Distorsion.cpp
 	zynaddsubfx/src/Effects/DynamicFilter.cpp
 	zynaddsubfx/src/Effects/Echo.cpp
-	zynaddsubfx/src/Effects/ZynEffect.cpp
-	zynaddsubfx/src/Effects/ZynEffectLFO.cpp
-	zynaddsubfx/src/Effects/ZynEffectMgr.cpp
+	zynaddsubfx/src/Effects/Effect.cpp
+	zynaddsubfx/src/Effects/EffectLFO.cpp
+	zynaddsubfx/src/Effects/EffectMgr.cpp
 	zynaddsubfx/src/Effects/EQ.cpp
 	zynaddsubfx/src/Effects/Phaser.cpp
 	zynaddsubfx/src/Effects/Reverb.cpp

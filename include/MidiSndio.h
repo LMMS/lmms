@@ -32,8 +32,13 @@
 
 #include <QThread>
 
-
 #include "MidiClient.h"
+
+
+struct mio_hdl;
+
+namespace lmms
+{
 
 
 class MidiSndio : public QThread, public MidiClientRaw
@@ -61,9 +66,12 @@ protected:
 	void run(void) override;
 
 private:
-	struct mio_hdl *m_hdl;
+	mio_hdl *m_hdl;
 	volatile bool m_quit;
 } ;
+
+
+} // namespace lmms
 
 #endif	/* LMMS_HAVE_SNDIO */
 

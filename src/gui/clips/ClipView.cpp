@@ -52,6 +52,9 @@
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
 
 /*! The width of the resize grip in pixels
  */
@@ -1502,3 +1505,6 @@ QColor ClipView::getColorForDisplay( QColor defaultColor )
 	// Return color to caller
 	return c;
 }
+
+
+} // namespace lmms::gui

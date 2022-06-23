@@ -31,6 +31,12 @@
 #include "Model.h"
 
 
+class QDomDocument;
+class QDomElement;
+
+namespace lmms
+{
+
 /**
 	@file LinkedModelGroups.h
 	See Lv2ControlBase.h and Lv2Proc.h for example usage
@@ -107,8 +113,8 @@ signals:
 	// (who would kno if the client is Qt, i.e. it may not have slots at all)
 	// In this case you'd e.g. send the UI something like
 	// "/added <model meta info>"
-	void modelAdded(AutomatableModel* added);
-	void modelRemoved(AutomatableModel* removed);
+	void modelAdded(lmms::AutomatableModel* added);
+	void modelRemoved(lmms::AutomatableModel* removed);
 
 public:
 	AutomatableModel* getModel(const std::string& s)
@@ -169,5 +175,7 @@ public:
 	virtual const LinkedModelGroup* getGroup(std::size_t idx) const = 0;
 };
 
+
+} // namespace lmms
 
 #endif // LINKEDMODELGROUPS_H

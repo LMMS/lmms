@@ -35,6 +35,9 @@
 class QListWidgetItem;
 class QScrollArea;
 
+namespace lmms::gui
+{
+
 
 class LadspaDescription : public QWidget
 {
@@ -45,7 +48,7 @@ public:
 
 
 signals:
-	void doubleClicked( const ladspa_key_t & );
+	void doubleClicked( const ::lmms::ladspa_key_t & );
 
 
 private:
@@ -64,6 +67,6 @@ private slots:
 } ;
 
 
-
+} // namespace lmms::gui
 
 #endif

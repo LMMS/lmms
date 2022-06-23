@@ -28,6 +28,9 @@
 #include "EffectControls.h"
 #include "FlangerControlsDialog.h"
 
+namespace lmms
+{
+
 
 class FlangerEffect;
 
@@ -49,9 +52,9 @@ public:
 	{
 		return 7;
 	}
-	virtual EffectControlDialog* createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new FlangerControlsDialog( this );
+		return new gui::FlangerControlsDialog( this );
 	}
 
 private slots:
@@ -68,9 +71,12 @@ private:
 	FloatModel m_whiteNoiseAmountModel;
 	BoolModel m_invertFeedbackModel;
 
-	friend class FlangerControlsDialog;
+	friend class gui::FlangerControlsDialog;
 	friend class FlangerEffect;
 
 };
+
+
+} // namespace lmms
 
 #endif // FLANGERCONTROLS_H

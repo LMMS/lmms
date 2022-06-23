@@ -36,8 +36,16 @@ class QPushButton;
 class QScrollArea;
 class QVBoxLayout;
 
-class ControllerView;
+
+namespace lmms
+{
+
 class Controller;
+
+namespace gui
+{
+
+class ControllerView;
 
 
 class ControllerRackView : public QWidget, public SerializingObject
@@ -57,9 +65,9 @@ public:
 
 
 public slots:
-	void deleteController( ControllerView * _view );
-	void onControllerAdded( Controller * );
-	void onControllerRemoved( Controller * );
+	void deleteController( lmms::gui::ControllerView * _view );
+	void onControllerAdded( lmms::Controller * );
+	void onControllerRemoved( lmms::Controller * );
 
 protected:
 	void closeEvent( QCloseEvent * _ce ) override;
@@ -81,5 +89,9 @@ private:
 	// Needed so that the StretchItem always stays at the last position.
 	int m_nextIndex;
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

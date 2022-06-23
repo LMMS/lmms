@@ -28,8 +28,14 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 
 class DualFilterControls;
+
+namespace gui
+{
 
 
 class DualFilterControlDialog : public EffectControlDialog
@@ -42,5 +48,10 @@ public:
 	}
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

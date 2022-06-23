@@ -36,6 +36,10 @@
 //----------------------------------------------------------------------------
 // qsynthPresetForm -- UI wrapper form.
 
+namespace lmms::gui
+{
+
+
 class PatchesDialog : public QDialog, private Ui::PatchesDialog
 {
 	Q_OBJECT
@@ -87,5 +91,8 @@ private:
 	LcdSpinBoxModel * m_progModel;
 	QLabel * m_patchLabel;
 };
+
+
+} // namespace lmms::gui
 
 #endif

@@ -30,6 +30,10 @@
 #include "DualFilterControlDialog.h"
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
+
+
 class DualFilterEffect;
 
 
@@ -54,9 +58,9 @@ public:
 		return 11;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new DualFilterControlDialog( this );
+		return new gui::DualFilterControlDialog( this );
 	}
 
 
@@ -80,9 +84,12 @@ private:
 	FloatModel m_res2Model;
 	FloatModel m_gain2Model;
 
-	friend class DualFilterControlDialog;
+	friend class gui::DualFilterControlDialog;
 	friend class DualFilterEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

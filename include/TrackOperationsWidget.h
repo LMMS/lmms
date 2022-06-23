@@ -29,6 +29,9 @@
 
 class QPushButton;
 
+namespace lmms::gui
+{
+
 class PixmapButton;
 class TrackView;
 
@@ -70,8 +73,11 @@ private:
 	friend class TrackView;
 
 signals:
-	void trackRemovalScheduled( TrackView * t );
+	void trackRemovalScheduled( lmms::gui::TrackView * t );
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

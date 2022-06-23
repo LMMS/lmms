@@ -31,10 +31,18 @@
 #include "Track.h"
 #include "JournallingObject.h"
 
+namespace lmms
+{
 
 class AutomationClip;
 class InstrumentTrack;
+
+namespace gui
+{
+
 class TrackContainerView;
+
+}
 
 
 class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
@@ -96,7 +104,7 @@ public:
 	virtual AutomatedValueMap automatedValuesAt(TimePos time, int clipNum = -1) const;
 
 signals:
-	void trackAdded( Track * _track );
+	void trackAdded( lmms::Track * _track );
 
 protected:
 	static AutomatedValueMap automatedValuesFromTracks(const TrackList &tracks, TimePos timeStart, int clipNum = -1);
@@ -109,10 +117,11 @@ private:
 	TrackContainerTypes m_TrackContainerType;
 
 
-	friend class TrackContainerView;
+	friend class gui::TrackContainerView;
 	friend class Track;
 
 } ;
 
+} // namespace lmms
 
 #endif

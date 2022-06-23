@@ -28,6 +28,9 @@
 #include "Engine.h"
 #include "MixHelpers.h"
 
+namespace lmms
+{
+
  
 RingBuffer::RingBuffer( f_cnt_t size ) : 
 	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
@@ -314,3 +317,4 @@ void RingBuffer::updateSamplerate()
 }
 
 
+} // namespace lmms

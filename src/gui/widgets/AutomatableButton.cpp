@@ -31,6 +31,8 @@
 #include "StringPairDrag.h"
 
 
+namespace lmms::gui
+{
 
 AutomatableButton::AutomatableButton( QWidget * _parent,
 						const QString & _name ) :
@@ -266,4 +268,4 @@ void automatableButtonGroup::updateButtons()
 
 
 
-
+} // namespace lmms::gui

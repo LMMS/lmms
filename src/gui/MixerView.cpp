@@ -46,6 +46,10 @@
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+namespace lmms::gui
+{
+
+
 MixerView::MixerView() :
 	QWidget(),
 	ModelView( nullptr, this ),
@@ -618,3 +622,6 @@ void MixerView::updateFaders()
 		}
 	}
 }
+
+
+} // namesapce lmms::gui

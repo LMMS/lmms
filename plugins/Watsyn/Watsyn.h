@@ -34,6 +34,9 @@
 #include <samplerate.h>
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new Knob( knobStyled, this ); 				\
@@ -74,9 +77,14 @@ const int	B1_OSC = 2;
 const int	B2_OSC = 3;
 const int	NUM_OSCS = 4;
 
+class WatsynInstrument;
+
+namespace gui
+{
 class automatableButtonGroup;
 class PixmapButton;
-class WatsynInstrument;
+class WatsynView;
+}
 
 class WatsynObject
 {
@@ -149,7 +157,7 @@ public:
 		return( 64 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 public slots:
 	void updateVolumes();
@@ -288,8 +296,12 @@ private:
 	float B2_wave [WAVELEN];
 
 	friend class WatsynObject;
-	friend class WatsynView;
+	friend class gui::WatsynView;
 };
+
+
+namespace gui
+{
 
 
 class WatsynView : public InstrumentViewFixedSize
@@ -375,5 +387,10 @@ private:
 	PixmapButton * m_loadButton;
 
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

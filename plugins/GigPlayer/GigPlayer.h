@@ -41,11 +41,21 @@
 #include "MemoryManager.h"
 #include "gig.h"
 
-class GigInstrumentView;
+
+class QLabel;
+
+
+namespace lmms
+{
+
+
 class NotePlayHandle;
 
+namespace gui
+{
 class PatchesDialog;
-class QLabel;
+class GigInstrumentView;
+}
 
 
 
@@ -261,7 +271,7 @@ public:
 		return IsSingleStreamed|IsNotBendable;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 	QString getCurrentPatchName();
 
@@ -283,8 +293,8 @@ private:
 	// Part of the UI
 	QString m_filename;
 
-	LcdSpinBoxModel m_bankNum;
-	LcdSpinBoxModel m_patchNum;
+	gui::LcdSpinBoxModel m_bankNum;
+	gui::LcdSpinBoxModel m_patchNum;
 
 	FloatModel m_gain;
 
@@ -322,7 +332,7 @@ private:
 	// samples
 	void addSamples( GigNote & gignote, bool wantReleaseSample );
 
-	friend class GigInstrumentView;
+	friend class gui::GigInstrumentView;
 
 signals:
 	void fileLoading();
@@ -332,6 +342,8 @@ signals:
 } ;
 
 
+namespace gui
+{
 
 
 class GigInstrumentView : public InstrumentViewFixedSize
@@ -366,5 +378,9 @@ protected slots:
 	void updatePatchName();
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

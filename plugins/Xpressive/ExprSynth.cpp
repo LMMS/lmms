@@ -39,6 +39,11 @@
 #include "exprtk.hpp"
 
 #define WARN_EXPRTK qWarning("ExprTk exception")
+
+namespace lmms
+{
+
+
 typedef exprtk::symbol_table<float> symbol_table_t;
 typedef exprtk::expression<float> expression_t;
 typedef exprtk::parser<float> parser_t;
@@ -820,3 +825,6 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 		WARN_EXPRTK;
 	}
 }
+
+
+} // namespace lmms

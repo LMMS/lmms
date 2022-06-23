@@ -6,9 +6,16 @@
 #include "Midi.h"
 #include "SerializingObject.h"
 
-class GroupBox;
+namespace lmms
+{
+
 class InstrumentTrack;
+
+namespace gui
+{
+
 class Knob;
+class GroupBox;
 
 class MidiCCRackView : public QWidget, public SerializingObject
 {
@@ -36,5 +43,10 @@ private:
 	Knob *m_controllerKnob[MidiControllerCount]; // Holds the knob widgets for each controller
 
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

@@ -27,6 +27,9 @@
 #include "MidiPort.h"
 
 
+namespace lmms
+{
+
 MidiClient::MidiClient()
 {
 }
@@ -324,3 +327,5 @@ int MidiClientRaw::eventLength( const unsigned char event )
 	}
 	return 1;
 }
+
+} // namespace lmms

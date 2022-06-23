@@ -37,6 +37,9 @@
 #include <xmmintrin.h>
 #endif
 
+namespace lmms
+{
+
 AudioEngineWorkerThread::JobQueue AudioEngineWorkerThread::globalJobQueue;
 QWaitCondition * AudioEngineWorkerThread::queueReadyWaitCond = nullptr;
 QList<AudioEngineWorkerThread *> AudioEngineWorkerThread::workerThreads;
@@ -177,4 +180,4 @@ void AudioEngineWorkerThread::run()
 	}
 }
 
-
+} // namespace lmms

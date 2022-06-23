@@ -39,6 +39,10 @@
 #include "MainWindow.h"
 #include "PixmapButton.h"
 
+namespace lmms::gui
+{
+
+
 CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :
 	EffectControlDialog(controls),
 	m_controls(controls),
@@ -762,3 +766,6 @@ void CompressorControlDialog::resetCompressorView()
 	m_autoReleaseKnob->move(m_controlsBoxX + 590, m_controlsBoxY + 38);
 	lookaheadButton->move(m_controlsBoxX + 202, m_controlsBoxY + 171);
 }
+
+
+} // namespace lmms::gui

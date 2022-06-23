@@ -44,6 +44,9 @@
 #include "Song.h"
 
 
+namespace lmms::gui
+{
+
 
 ProjectNotes::ProjectNotes() :
 	QMainWindow( getGUI()->mainWindow()->workspace() )
@@ -409,3 +412,5 @@ void ProjectNotes::closeEvent( QCloseEvent * _ce )
 	}
 	_ce->ignore();
  }
+
+} // namespace lmms::gui

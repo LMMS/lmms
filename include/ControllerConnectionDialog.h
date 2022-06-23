@@ -38,14 +38,21 @@
 class QLineEdit;
 class QListView;
 class QScrollArea;
+
+namespace lmms
+{
+
 class AutoDetectMidiController;
+
+namespace gui
+{
+
 class ComboBox;
 class GroupBox;
 class TabWidget;
 class LcdSpinBox;
 class LedCheckBox;
 class MidiPortMenu;
-
 
 
 class ControllerConnectionDialog : public QDialog
@@ -98,5 +105,10 @@ private:
 	// Temporary midiController
 	AutoDetectMidiController * m_midiController;
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

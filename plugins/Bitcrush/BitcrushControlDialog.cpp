@@ -32,6 +32,10 @@
 #include "LedCheckBox.h"
 #include "Knob.h"
 
+namespace lmms::gui
+{
+
+
 BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	EffectControlDialog( controls )
 {
@@ -110,3 +114,6 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	levels->setLabel( tr( "QUANT" ) );
 	levels->setHintText( tr( "Levels:" ) , "" );
 }
+
+
+} // namespace lmms::gui

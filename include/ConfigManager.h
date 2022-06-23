@@ -37,7 +37,11 @@
 #include "lmms_export.h"
 
 
-class LmmsCore;
+namespace lmms
+{
+
+
+class Engine;
 
 const QString PROJECTS_PATH = "projects/";
 const QString TEMPLATE_PATH = "templates/";
@@ -312,6 +316,10 @@ private:
 	settingsMap m_settings;
 
 
-	friend class LmmsCore;
+	friend class Engine;
 };
+
+
+} // namespace lmms
+
 #endif

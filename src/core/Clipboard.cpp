@@ -30,8 +30,9 @@
 #include "Clipboard.h"
 
 
-namespace Clipboard
+namespace lmms::Clipboard
 {
+
 	const QMimeData * getMimeData()
 	{
 		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
@@ -93,4 +94,6 @@ namespace Clipboard
 		bool hasMt = (mimeData->hasFormat(mimeType(MimeType::StringPair)));
 		return( QString::fromUtf8( mimeData->data( mimeType( hasMt ? MimeType::StringPair : MimeType::Osc ) ) ).section( ':', 1, -1 ) );
 	}
-}
+
+
+} // namespace lmms::Clipboard

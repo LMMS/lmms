@@ -39,11 +39,32 @@
 
 class QVBoxLayout;
 
+namespace lmms
+{
+
 class InstrumentTrack;
 class Track;
 class TrackContainer;
-class TrackView;
 
+class InstrumentLoaderThread : public QThread
+{
+Q_OBJECT
+public:
+	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
+		QString name = "" );
+
+	void run() override;
+
+private:
+	InstrumentTrack *m_it;
+	QString m_name;
+	QThread *m_containerThread;
+};
+
+namespace gui
+{
+
+class TrackView;
 
 class TrackContainerView : public QWidget, public ModelView,
 						public JournallingObject,
@@ -132,8 +153,8 @@ public:
 
 public slots:
 	void realignTracks();
-	TrackView * createTrackView( Track * _t );
-	void deleteTrackView( TrackView * _tv );
+	lmms::gui::TrackView * createTrackView( lmms::Track * _t );
+	void deleteTrackView( lmms::gui::TrackView * _tv );
 
 	void dropEvent( QDropEvent * _de ) override;
 	void dragEnterEvent( QDragEnterEvent * _dee ) override;
@@ -188,24 +209,14 @@ private:
 
 
 signals:
-	void positionChanged( const TimePos & _pos );
+	void positionChanged( const lmms::TimePos & _pos );
 
 
 } ;
 
-class InstrumentLoaderThread : public QThread
-{
-	Q_OBJECT
-public:
-	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
-							QString name = "" );
 
-	void run() override;
+} // namespace gui
 
-private:
-	InstrumentTrack *m_it;
-	QString m_name;
-	QThread *m_containerThread;
-};
+} // namespace lmms
 
 #endif

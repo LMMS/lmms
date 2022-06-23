@@ -32,6 +32,9 @@
 class QPixmap;
 
 
+namespace lmms::gui
+{
+
 class LMMS_EXPORT LedCheckBox : public AutomatableButton
 {
 	Q_OBJECT
@@ -77,5 +80,8 @@ private:
 	void onTextUpdated(); //!< to be called when you updated @a m_text
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

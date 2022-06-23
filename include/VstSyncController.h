@@ -31,6 +31,9 @@
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 
+namespace lmms
+{
+
 
 class VstSyncController : public QObject
 {
@@ -77,5 +80,8 @@ private:
 	VstSyncData* m_syncData;
 	SharedMemory<VstSyncData> m_shm;
 };
+
+
+} // namespace lmms
 
 #endif

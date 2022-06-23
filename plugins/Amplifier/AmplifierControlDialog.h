@@ -28,9 +28,14 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
 
 class AmplifierControls;
 
+
+namespace gui
+{
 
 class AmplifierControlDialog : public EffectControlDialog
 {
@@ -42,5 +47,10 @@ public:
 	}
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

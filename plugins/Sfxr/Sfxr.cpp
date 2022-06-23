@@ -52,6 +52,10 @@ float frnd(float range)
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -504,9 +508,9 @@ void SfxrInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * SfxrInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * SfxrInstrument::instantiateView( QWidget * _parent )
 {
-	return( new SfxrInstrumentView( this, _parent ) );
+	return( new gui::SfxrInstrumentView( this, _parent ) );
 }
 
 
@@ -548,6 +552,9 @@ void SfxrInstrument::resetModels()
 }
 
 
+
+namespace gui
+{
 
 
 class SfxrKnob : public Knob
@@ -1115,6 +1122,9 @@ void SfxrInstrumentView::previewSound()
 
 
 
+} // namespace gui
+
+
 extern "C"
 {
 
@@ -1128,5 +1138,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* m, void* )
 }
 
 
-
-
+} // namespace lmms

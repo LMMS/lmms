@@ -30,6 +30,10 @@
 #include "DynamicsProcessorControlDialog.h"
 #include "Graph.h"
 
+namespace lmms
+{
+
+
 class DynProcEffect;
 
 
@@ -63,9 +67,9 @@ public:
 		return( 6 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog * createView()
 	{
-		return( new DynProcControlDialog( this ) );
+		return( new gui::DynProcControlDialog( this ) );
 	}
 
 
@@ -89,9 +93,12 @@ private:
 	graphModel m_wavegraphModel;
 	IntModel m_stereomodeModel;
 
-	friend class DynProcControlDialog;
+	friend class gui::DynProcControlDialog;
 	friend class DynProcEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

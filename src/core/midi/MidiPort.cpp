@@ -32,6 +32,11 @@
 #include "Note.h"
 #include "Song.h"
 
+
+namespace lmms
+{
+
+
 static MidiDummy s_dummyClient;
 
 
@@ -422,3 +427,6 @@ void MidiPort::invalidateCilent()
 {
 	m_midiClient = &s_dummyClient;
 }
+
+
+} // namespace lmms

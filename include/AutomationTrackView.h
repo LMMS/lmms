@@ -28,7 +28,13 @@
 
 #include "TrackView.h"
 
+namespace lmms
+{
+
 class AutomationTrack;
+
+namespace gui
+{
 
 
 class AutomationTrackView : public TrackView
@@ -41,5 +47,9 @@ public:
 	void dropEvent( QDropEvent * _de ) override;
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

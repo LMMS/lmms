@@ -31,12 +31,19 @@
 #include "Instrument.h"
 #include "InstrumentView.h"
 
+namespace lmms
+{
 
-class Knob;
-class SidInstrumentView;
+
 class NotePlayHandle;
+
+namespace gui
+{
+class Knob;
 class automatableButtonGroup;
+class SidInstrumentView;
 class PixmapButton;
+}
 
 class VoiceObject : public Model
 {
@@ -68,7 +75,7 @@ private:
 	BoolModel m_testModel;
 
 	friend class SidInstrument;
-	friend class SidInstrumentView;
+	friend class gui::SidInstrumentView;
 } ;
 
 class SidInstrument : public Instrument
@@ -104,7 +111,7 @@ public:
 
 	virtual f_cnt_t desiredReleaseFrames() const;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 
 /*public slots:
@@ -126,10 +133,13 @@ private:
 
 	IntModel m_chipModel;
 
-	friend class SidInstrumentView;
+	friend class gui::SidInstrumentView;
 
 } ;
 
+
+namespace gui
+{
 
 
 class SidInstrumentView : public InstrumentViewFixedSize
@@ -199,5 +209,9 @@ protected slots:
 	void updateKnobToolTip();
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

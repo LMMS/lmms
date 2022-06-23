@@ -34,6 +34,8 @@
 
 class QPixmap;
 
+namespace lmms::gui
+{
 
 class GroupBox : public QWidget, public BoolModelView
 {
@@ -70,6 +72,7 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 
 #endif

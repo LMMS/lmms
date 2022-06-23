@@ -127,16 +127,19 @@ struct ERect
 
 using namespace std;
 
-static VstHostLanguages hlang = LanguageEnglish;
+static lmms::VstHostLanguages hlang = lmms::LanguageEnglish;
 
 static bool EMBED = false;
 static bool EMBED_X11 = false;
 static bool EMBED_WIN32 = false;
 static bool HEADLESS = false;
 
+namespace lmms
+{
 class RemoteVstPlugin;
+}
 
-RemoteVstPlugin * __plugin = nullptr;
+lmms::RemoteVstPlugin * __plugin = nullptr;
 
 #ifndef NATIVE_LINUX_VST
 HWND __MessageHwnd = nullptr;
@@ -144,6 +147,10 @@ DWORD __processingThreadId = 0;
 #else
 pthread_t __processingThreadId = 0;
 #endif
+
+namespace lmms
+{
+
 
 #ifdef _WIN32
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
@@ -2414,11 +2421,17 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 
 	return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
+
+
 #endif
+
+} // namespace lmms
 
 
 int main( int _argc, char * * _argv )
 {
+	using lmms::RemoteVstPlugin;
+
 #ifdef SYNC_WITH_SHM_FIFO
 	if( _argc < 4 )
 #else
@@ -2430,7 +2443,7 @@ int main( int _argc, char * * _argv )
 	}
 
 #ifndef LMMS_BUILD_WIN32
-	const auto pollParentThread = PollParentThread{};
+	const auto pollParentThread = lmms::PollParentThread{};
 #endif
 
 #ifndef NATIVE_LINUX_VST
@@ -2490,32 +2503,32 @@ int main( int _argc, char * * _argv )
 
 		if ( embedMethod == "none" )
 		{
-			cerr << "Starting detached." << endl;
+			std::cerr << "Starting detached." << std::endl;
 			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
 		else if ( embedMethod == "win32" )
 		{
-			cerr << "Starting using Win32-native embedding." << endl;
+			std::cerr << "Starting using Win32-native embedding." << std::endl;
 			EMBED = EMBED_WIN32 = true; EMBED_X11 = HEADLESS = false;
 		}
 		else if ( embedMethod == "qt" )
 		{
-			cerr << "Starting using Qt-native embedding." << endl;
+			std::cerr << "Starting using Qt-native embedding." << std::endl;
 			EMBED = true; EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
 		else if ( embedMethod == "xembed" )
 		{
-			cerr << "Starting using X11Embed protocol." << endl;
+			std::cerr << "Starting using X11Embed protocol." << std::endl;
 			EMBED = EMBED_X11 = true; EMBED_WIN32 = HEADLESS = false;
 		}
 		else if ( embedMethod == "headless" )
 		{
-			cerr << "Starting without UI." << endl;
+			std::cerr << "Starting without UI." << std::endl;
 			HEADLESS = true; EMBED = EMBED_X11 = EMBED_WIN32 = false;
 		}
 		else
 		{
-			cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << endl;
+			std::cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << std::endl;
 			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
 	}
@@ -2523,7 +2536,7 @@ int main( int _argc, char * * _argv )
 #ifdef NATIVE_LINUX_VST
 	if (EMBED)
 	{
-		cerr << "Native linux VST works only without embedding." << endl;
+		std::cerr << "Native linux VST works only without embedding." << std::endl;
 	}
 #endif
 	
@@ -2567,4 +2580,3 @@ int main( int _argc, char * * _argv )
 #endif
 	return 0;
 }
-

@@ -31,8 +31,9 @@ class QMimeData;
 
 class QMimeData;
 
-namespace Clipboard
+namespace lmms::Clipboard
 {
+
 	enum class MimeType
 	{
 		StringPair,
@@ -66,6 +67,7 @@ namespace Clipboard
 				return "application/x-lmms-clipboard";
 		}
 	}
-} ;
+
+} // namespace lmms::Clipboard
 
 #endif

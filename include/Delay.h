@@ -32,6 +32,9 @@
 #include "interpolation.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 // brief usage 
 
 // Classes:
@@ -359,5 +362,8 @@ typedef CombFeedback<2> StereoCombFeedback;
 typedef CombFeedfwd<2> StereoCombFeedfwd;
 typedef CombFeedbackDualtap<2> StereoCombFeedbackDualtap;
 typedef AllpassDelay<2> StereoAllpassDelay;
+
+
+} // namespace lmms
 
 #endif

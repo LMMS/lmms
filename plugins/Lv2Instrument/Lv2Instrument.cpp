@@ -40,6 +40,8 @@
 #include "plugin_export.h"
 
 
+namespace lmms
+{
 
 
 extern "C"
@@ -173,9 +175,9 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 
 
-PluginView *Lv2Instrument::instantiateView(QWidget *parent)
+gui::PluginView* Lv2Instrument::instantiateView(QWidget *parent)
 {
-	return new Lv2InsView(this, parent);
+	return new gui::Lv2InsView(this, parent);
 }
 
 
@@ -212,6 +214,9 @@ void Lv2Instrument::setNameFromFile(const QString &name)
 }
 
 
+
+namespace gui
+{
 
 
 /*
@@ -285,7 +290,7 @@ void Lv2InsView::modelChanged()
 }
 
 
-
+} // namespace gui
 
 extern "C"
 {
@@ -302,3 +307,6 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 }
 
 }
+
+
+} // namespace lmms
