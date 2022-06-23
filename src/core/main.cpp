@@ -831,12 +831,12 @@ int main( int argc, char * * argv )
 		// create renderer
 		RenderManager * r = new RenderManager( qs, os, eff, renderOut );
 		QCoreApplication::instance()->connect( r,
-				SIGNAL( finished() ), SLOT( quit() ) );
+				SIGNAL(finished()), SLOT(quit()));
 
 		// timer for progress-updates
 		QTimer * t = new QTimer( r );
-		r->connect( t, SIGNAL( timeout() ),
-				SLOT( updateConsoleProgress() ) );
+		r->connect( t, SIGNAL(timeout()),
+				SLOT(updateConsoleProgress()));
 		t->start( 200 );
 
 		if( profilerOutputFile.isEmpty() == false )

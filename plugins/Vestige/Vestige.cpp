@@ -71,7 +71,7 @@ extern "C"
 
 Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"VST-host for using VST(i)-plugins within LMMS" ),
@@ -103,11 +103,11 @@ public:
 		setWindowFlags( Qt::WindowCloseButtonHint );
 	}
 
-	virtual ~vstSubWin()
+	~vstSubWin() override
 	{
 	}
 
-	virtual void closeEvent( QCloseEvent * e )
+	void closeEvent( QCloseEvent * e ) override
 	{
 		// ignore close-events - for some reason otherwise the VST GUI
 		// remains hidden when re-opening
@@ -741,7 +741,7 @@ void VestigeInstrumentView::openPreset()
 {
 
 	if ( m_vi->m_plugin != nullptr ) {
-		m_vi->m_plugin->openPreset( );
+		m_vi->m_plugin->openPreset();
     		bool converted;
     		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -759,7 +759,7 @@ void VestigeInstrumentView::savePreset()
 
 	if ( m_vi->m_plugin != nullptr )
 	{
-		m_vi->m_plugin->savePreset( );
+		m_vi->m_plugin->savePreset();
 /*    		bool converted;
     		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
      		if (str != "")

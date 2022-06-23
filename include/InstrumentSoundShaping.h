@@ -46,7 +46,7 @@ class InstrumentSoundShaping : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
-	virtual ~InstrumentSoundShaping();
+	~InstrumentSoundShaping() override;
 
 	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
 							NotePlayHandle * _n );

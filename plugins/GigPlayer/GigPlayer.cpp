@@ -64,7 +64,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"GIG Player",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
 	"Garrett Wilson <g/at/floft/dot/net>",

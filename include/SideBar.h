@@ -42,7 +42,7 @@ class SideBar : public QToolBar
 	Q_OBJECT
 public:
 	SideBar( Qt::Orientation _orientation, QWidget * _parent );
-	virtual ~SideBar();
+	~SideBar() override;
 
 	void appendTab( SideBarWidget * _sbw );
 

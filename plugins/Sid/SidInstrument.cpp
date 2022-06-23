@@ -75,7 +75,7 @@ extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"SID",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of the MOS6581 and MOS8580 "
 					"SID.\nThis chip was used in the Commodore 64 computer." ),

@@ -85,7 +85,7 @@ public:
 	} ;
 
 	Track( TrackTypes type, TrackContainer * tc );
-	virtual ~Track();
+	~Track() override;
 
 	static Track * create( TrackTypes tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,

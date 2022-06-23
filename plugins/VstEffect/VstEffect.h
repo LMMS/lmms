@@ -43,12 +43,12 @@ class VstEffect : public Effect
 public:
 	VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~VstEffect();
+	~VstEffect() override;
 
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	bool processAudioBuffer( sampleFrame * _buf,
+							const fpp_t _frames ) override;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return &m_vstControls;
 	}

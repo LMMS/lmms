@@ -40,21 +40,21 @@ class CrossoverEQControls : public EffectControls
 	Q_OBJECT
 public:
 	CrossoverEQControls( CrossoverEQEffect * eff );
-	virtual ~CrossoverEQControls() {}
+	~CrossoverEQControls() override {}
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & elem );
-	virtual void loadSettings( const QDomElement & elem );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & doc, QDomElement & elem ) override;
+	void loadSettings( const QDomElement & elem ) override;
+	inline QString nodeName() const override
 	{
 		return( "crossoevereqcontrols" );
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 11 );
 	}
 
-	virtual gui::EffectControlDialog * createView()
+	gui::EffectControlDialog * createView() override
 	{
 		return( new gui::CrossoverEQControlDialog( this ) );
 	}

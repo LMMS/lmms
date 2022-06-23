@@ -49,12 +49,12 @@ class MidiController : public Controller, public MidiEventProcessor
 	Q_OBJECT
 public:
 	MidiController( Model * _parent );
-	virtual ~MidiController();
+	~MidiController() override;
 
-	virtual void processInEvent( const MidiEvent & _me,
+	void processInEvent( const MidiEvent & _me,
 					const TimePos & _time, f_cnt_t offset = 0 ) override;
 
-	virtual void processOutEvent( const MidiEvent& _me,
+	void processOutEvent( const MidiEvent& _me,
 					const TimePos & _time, f_cnt_t offset = 0 ) override
 	{
 		// No output yet

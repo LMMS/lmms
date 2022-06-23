@@ -41,7 +41,7 @@ class PluginBrowser : public SideBarWidget
 	Q_OBJECT
 public:
 	PluginBrowser( QWidget * _parent );
-	virtual ~PluginBrowser() = default;
+	~PluginBrowser() override = default;
 
 private slots:
 	void onFilterChanged( const QString & filter );

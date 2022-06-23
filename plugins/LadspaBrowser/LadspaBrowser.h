@@ -46,7 +46,7 @@ class LadspaBrowserView : public ToolPluginView
 	Q_OBJECT
 public:
 	LadspaBrowserView( ToolPlugin * _tool );
-	virtual ~LadspaBrowserView();
+	~LadspaBrowserView() override;
 
 
 public slots:
@@ -69,22 +69,22 @@ class LadspaBrowser : public ToolPlugin
 {
 public:
 	LadspaBrowser();
-	virtual ~LadspaBrowser();
+	~LadspaBrowser() override;
 
-	virtual gui::PluginView* instantiateView( QWidget * )
+	gui::PluginView* instantiateView( QWidget * ) override
 	{
 		return new gui::LadspaBrowserView( this );
 	}
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	void saveSettings( QDomDocument& doc, QDomElement& element ) override
 	{
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	void loadSettings( const QDomElement& element ) override
 	{
 		Q_UNUSED(element)
 	}

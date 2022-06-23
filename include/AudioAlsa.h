@@ -69,7 +69,7 @@ public:
 
 public:
 	AudioAlsa( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioAlsa();
+	~AudioAlsa() override;
 
 	inline static QString name()
 	{

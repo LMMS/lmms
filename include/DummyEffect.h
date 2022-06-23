@@ -60,7 +60,7 @@ public:
 	{
 	}
 
-	virtual ~DummyEffectControls()
+	~DummyEffectControls() override
 	{
 	}
 
@@ -102,7 +102,7 @@ public:
 		setName();
 	}
 
-	virtual ~DummyEffect()
+	~DummyEffect() override
 	{
 	}
 

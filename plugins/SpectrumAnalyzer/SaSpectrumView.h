@@ -54,7 +54,7 @@ class SaSpectrumView : public QWidget
 	Q_OBJECT
 public:
 	explicit SaSpectrumView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaSpectrumView() {}
+	~SaSpectrumView() override {}
 
 	QSize sizeHint() const override {return QSize(400, 200);}
 

@@ -70,7 +70,7 @@ public:
 	*/
 	LinkedModelGroupView(QWidget* parent, LinkedModelGroup* model,
 		std::size_t colNum);
-	~LinkedModelGroupView();
+	~LinkedModelGroupView() override;
 
 	//! Reconnect models if model changed
 	void modelChanged(LinkedModelGroup* linkedModelGroup);

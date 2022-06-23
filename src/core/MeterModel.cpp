@@ -35,10 +35,10 @@ MeterModel::MeterModel( Model * _parent ) :
 	m_numeratorModel( 4, 1, 32, this, tr( "Numerator" ) ),
 	m_denominatorModel( 4, 1, 32, this, tr( "Denominator" ) )
 {
-	connect( &m_numeratorModel, SIGNAL( dataChanged() ), 
-			this, SIGNAL( dataChanged() ), Qt::DirectConnection );
-	connect( &m_denominatorModel, SIGNAL( dataChanged() ), 
-			this, SIGNAL( dataChanged() ), Qt::DirectConnection );
+	connect( &m_numeratorModel, SIGNAL(dataChanged()), 
+			this, SIGNAL(dataChanged()), Qt::DirectConnection );
+	connect( &m_denominatorModel, SIGNAL(dataChanged()), 
+			this, SIGNAL(dataChanged()), Qt::DirectConnection );
 }
 
 

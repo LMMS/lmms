@@ -45,7 +45,7 @@ namespace lmms::gui
 {
 
 
-ControllerRackView::ControllerRackView( ) :
+ControllerRackView::ControllerRackView() :
 	QWidget(),
 	m_nextIndex(0)
 {
@@ -67,12 +67,12 @@ ControllerRackView::ControllerRackView( ) :
 	m_addButton = new QPushButton( this );
 	m_addButton->setText( tr( "Add" ) );
 
-	connect( m_addButton, SIGNAL( clicked() ),
-			this, SLOT( addController() ) );
+	connect( m_addButton, SIGNAL(clicked()),
+			this, SLOT(addController()));
 
 	Song * song = Engine::getSong();
-	connect( song, SIGNAL( controllerAdded( lmms::Controller* ) ), SLOT( onControllerAdded( lmms::Controller* ) ) );
-	connect( song, SIGNAL( controllerRemoved( lmms::Controller* ) ), SLOT( onControllerRemoved( lmms::Controller* ) ) );
+	connect( song, SIGNAL(controllerAdded(lmms::Controller*)), SLOT(onControllerAdded(lmms::Controller*)));
+	connect( song, SIGNAL(controllerRemoved(lmms::Controller*)), SLOT(onControllerRemoved(lmms::Controller*)));
 
 	QVBoxLayout * layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
@@ -153,8 +153,8 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 
 	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
 
-	connect( controllerView, SIGNAL( deleteController( lmms::gui::ControllerView * ) ),
-		 this, SLOT( deleteController( lmms::gui::ControllerView * ) ), Qt::QueuedConnection );
+	connect( controllerView, SIGNAL(deleteController(lmms::gui::ControllerView*)),
+		 this, SLOT(deleteController(lmms::gui::ControllerView*)), Qt::QueuedConnection );
 
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );

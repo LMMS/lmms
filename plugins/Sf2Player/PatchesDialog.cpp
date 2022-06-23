@@ -47,7 +47,7 @@ public:
 		: QTreeWidgetItem( pListView, pItemAfter ) {}
 
 	// Sort/compare overriden method.
-	bool operator< ( const QTreeWidgetItem& other ) const
+	bool operator< ( const QTreeWidgetItem& other ) const override
 	{
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
 		const QString& s1 = text( iColumn );
@@ -264,7 +264,7 @@ void PatchesDialog::accept()
 
 
 // Reject settings (Cancel button slot).
-void PatchesDialog::reject (void)
+void PatchesDialog::reject ()
 {
 	// Reset selection to initial selection, if applicable...
 	if (m_dirty > 0)
@@ -306,7 +306,7 @@ QTreeWidgetItem *PatchesDialog::findProgItem ( int iProg )
 
 
 // Bank change slot.
-void PatchesDialog::bankChanged (void)
+void PatchesDialog::bankChanged ()
 {
 	if (m_pSynth == nullptr)
 		return;

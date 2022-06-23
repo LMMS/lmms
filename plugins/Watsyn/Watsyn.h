@@ -139,25 +139,25 @@ class WatsynInstrument : public Instrument
 	Q_OBJECT
 public:
 	WatsynInstrument( InstrumentTrack * _instrument_track );
-	virtual ~WatsynInstrument();
+	~WatsynInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+							QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 64 );
 	}
 
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 public slots:
 	void updateVolumes();
@@ -310,7 +310,7 @@ class WatsynView : public InstrumentViewFixedSize
 public:
 	WatsynView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~WatsynView();
+	~WatsynView() override;
 
 protected slots:
 	void updateLayout();
@@ -328,7 +328,7 @@ protected slots:
 	void loadClicked();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 // knobs
 	Knob * a1_volKnob;

@@ -60,7 +60,7 @@ public:
 	}
 
 
-	virtual ~AutoDetectMidiController()
+	~AutoDetectMidiController() override
 	{
 	}
 
@@ -143,8 +143,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	// Midi stuff
 	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
 	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
-	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
-			this, SLOT( midiToggled() ) );
+	connect( m_midiGroupBox->model(), SIGNAL(dataChanged()),
+			this, SLOT(midiToggled()));
 	
 	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
 			tr( "Input channel" ) );
@@ -164,16 +164,16 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 				m_midiGroupBox, tr("Auto Detect") );
 	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
 	m_midiAutoDetectCheckBox->move( 8, 60 );
-	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
-			this, SLOT( autoDetectToggled() ) );
+	connect( &m_midiAutoDetect, SIGNAL(dataChanged()),
+			this, SLOT(autoDetectToggled()));
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
 	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
 		m_readablePorts = new MidiPortMenu( MidiPort::Input );
-		connect( m_readablePorts, SIGNAL( triggered( QAction * ) ),
-				this, SLOT( enableAutoDetect( QAction * ) ) );
+		connect( m_readablePorts, SIGNAL(triggered(QAction*)),
+				this, SLOT(enableAutoDetect(QAction*)));
 		ToolButton * rp_btn = new ToolButton( m_midiGroupBox );
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
@@ -187,8 +187,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	// User stuff
 	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
 	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
-	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
-			this, SLOT( userToggled() ) );
+	connect( m_userGroupBox->model(), SIGNAL(dataChanged()),
+			this, SLOT(userToggled()));
 
 	m_userController = new ComboBox( m_userGroupBox, "Controller" );
 	m_userController->setGeometry( 10, 24, 200, ComboBox::DEFAULT_HEIGHT );
@@ -196,10 +196,10 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	{
 		m_userController->model()->addItem( c->name() );
 	}
-	connect( m_userController->model(), SIGNAL( dataUnchanged() ),
-			this, SLOT( userSelected() ) );
-	connect( m_userController->model(), SIGNAL( dataChanged() ),
-			this, SLOT( userSelected() ) );
+	connect( m_userController->model(), SIGNAL(dataUnchanged()),
+			this, SLOT(userSelected()));
+	connect( m_userController->model(), SIGNAL(dataChanged()),
+			this, SLOT(userSelected()));
 
 
 	// Mapping functions
@@ -222,14 +222,14 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	QPushButton * select_btn = new QPushButton( 
 					embed::getIconPixmap( "add" ),
 					tr( "OK" ), buttons );
-	connect( select_btn, SIGNAL( clicked() ), 
-				this, SLOT( selectController() ) );
+	connect( select_btn, SIGNAL(clicked()), 
+				this, SLOT(selectController()));
 	
 	QPushButton * cancel_btn = new QPushButton( 
 					embed::getIconPixmap( "cancel" ),
 					tr( "Cancel" ), buttons );
-	connect( cancel_btn, SIGNAL( clicked() ),
-				this, SLOT( reject() ) );
+	connect( cancel_btn, SIGNAL(clicked()),
+				this, SLOT(reject()));
 
 	btn_layout->addStretch();
 	btn_layout->addSpacing( 10 );
@@ -376,7 +376,7 @@ void ControllerConnectionDialog::midiToggled()
 				m_readablePorts->setModel( &m_midiController->m_midiPort );
 			}
 
-			connect( m_midiController, SIGNAL( valueChanged() ), this, SLOT( midiValueChanged() ) );
+			connect( m_midiController, SIGNAL(valueChanged()), this, SLOT(midiValueChanged()));
 		}
 	}
 	m_midiAutoDetect.setValue( enabled );

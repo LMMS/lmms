@@ -43,21 +43,21 @@ class LadspaControls : public EffectControls
 	Q_OBJECT
 public:
 	LadspaControls( LadspaEffect * _eff );
-	virtual ~LadspaControls();
+	~LadspaControls() override;
 
-	inline int controlCount()
+	inline int controlCount() override
 	{
 		return m_controlCount;
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "ladspacontrols";
 	}
 
-	virtual gui::EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
 		return new gui::LadspaControlDialog( this );
 	}

@@ -52,9 +52,9 @@ class AudioSndio : public QThread, public AudioDevice
 	Q_OBJECT
 public:
 	AudioSndio( bool & _success_ful, AudioEngine * _audioEngine );
-	virtual ~AudioSndio();
+	~AudioSndio() override;
 
-	inline static QString name( void )
+	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
 	}
@@ -63,9 +63,9 @@ public:
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
-		void saveSettings( void ) override;
+		void saveSettings() override;
 
 	private:
 		QLineEdit * m_device;
@@ -73,10 +73,10 @@ public:
 	} ;
 
 private:
-	void startProcessing( void ) override;
-	void stopProcessing( void ) override;
-	void applyQualitySettings( void ) override;
-	void run( void ) override;
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
+	void run() override;
 
 	struct sio_hdl *m_hdl;
 	struct sio_par m_par;

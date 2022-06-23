@@ -47,7 +47,7 @@ public:
 	{
 	}
 
-	virtual ~DummyInstrument()
+	~DummyInstrument() override
 	{
 	}
 

@@ -74,7 +74,7 @@ class EqSpectrumView : public QWidget
 	Q_OBJECT
 public:
 	explicit EqSpectrumView( EqAnalyser *b, QWidget *_parent = 0 );
-	virtual ~EqSpectrumView()
+	~EqSpectrumView() override
 	{
 	}
 
@@ -82,7 +82,7 @@ public:
 	void setColor( const QColor &value );
 
 protected:
-	virtual void paintEvent( QPaintEvent *event );
+	void paintEvent( QPaintEvent *event ) override;
 
 private slots:
 	void periodicalUpdate();

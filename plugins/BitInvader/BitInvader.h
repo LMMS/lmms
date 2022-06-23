@@ -74,25 +74,25 @@ class BitInvader : public Instrument
 	Q_OBJECT
 public:
 	BitInvader(InstrumentTrack * _instrument_track );
-	virtual ~BitInvader();
+	~BitInvader() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+							QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 64 );
 	}
 
-	virtual gui::PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView * instantiateView( QWidget * _parent ) override;
 
 protected slots:
 	void lengthChanged();
@@ -124,7 +124,7 @@ public:
 	BitInvaderView( Instrument * _instrument,
 					QWidget * _parent );
 
-	virtual ~BitInvaderView() {};
+	~BitInvaderView() override {};
 
 protected slots:
 	//void sampleSizeChanged( float _new_sample_length );
@@ -139,10 +139,10 @@ protected slots:
 	void noiseWaveClicked();
 	void usrWaveClicked();
 	
-	void smoothClicked( void  );
+	void smoothClicked(  );
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob * m_sampleLengthKnob;
 	PixmapButton * m_sinWaveBtn;

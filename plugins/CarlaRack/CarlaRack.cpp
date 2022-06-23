@@ -37,7 +37,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
 {
-    STRINGIFY( PLUGIN_NAME ),
+    LMMS_STRINGIFY( PLUGIN_NAME ),
     "Carla Rack",
     QT_TRANSLATE_NOOP( "PluginBrowser",
                        "Carla Rack Instrument" ),

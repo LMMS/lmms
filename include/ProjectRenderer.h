@@ -64,7 +64,7 @@ public:
 				const OutputSettings & _os,
 				ExportFileFormats _file_format,
 				const QString & _out_file );
-	virtual ~ProjectRenderer();
+	~ProjectRenderer() override;
 
 	bool isReady() const
 	{

@@ -105,7 +105,7 @@ private:
 	float m_phaseOffsetRight;
 
 	OscillatorObject( Model * _parent, int _index );
-	virtual ~OscillatorObject();
+	~OscillatorObject() override;
 
 	friend class OrganicInstrument;
 	friend class gui::OrganicInstrumentView;
@@ -124,17 +124,17 @@ class OrganicInstrument : public Instrument
 	Q_OBJECT
 public:
 	OrganicInstrument( InstrumentTrack * _instrument_track );
-	virtual ~OrganicInstrument();
+	~OrganicInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
 	int intRand( int min, int max );
 
@@ -172,7 +172,7 @@ private:
 	FloatModel  m_fx1Model;
 	FloatModel  m_volModel;
 
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private slots:
@@ -190,10 +190,10 @@ class OrganicInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	OrganicInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~OrganicInstrumentView();
+	~OrganicInstrumentView() override;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	struct OscillatorKnobs
 	{

@@ -55,7 +55,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"PatMan",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"GUS-compatible patch instrument" ),
@@ -125,7 +125,7 @@ void PatmanInstrument::loadFile( const QString & _file )
 
 
 
-QString PatmanInstrument::nodeName( void ) const
+QString PatmanInstrument::nodeName() const
 {
 	return( patman_plugin_descriptor.name );
 }
@@ -380,7 +380,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 
 
 
-void PatmanInstrument::unloadCurrentPatch( void )
+void PatmanInstrument::unloadCurrentPatch()
 {
 	while( !m_patchSamples.empty() )
 	{
@@ -502,7 +502,7 @@ PatmanView::~PatmanView()
 
 
 
-void PatmanView::openFile( void )
+void PatmanView::openFile()
 {
 	FileDialog ofd( nullptr, tr( "Open patch file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
@@ -554,7 +554,7 @@ void PatmanView::openFile( void )
 
 
 
-void PatmanView::updateFilename( void )
+void PatmanView::updateFilename()
 {
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
@@ -638,7 +638,7 @@ void PatmanView::paintEvent( QPaintEvent * )
 
 
 
-void PatmanView::modelChanged( void )
+void PatmanView::modelChanged()
 {
 	m_pi = castModel<PatmanInstrument>();
 	m_loopButton->setModel( &m_pi->m_loopedModel );

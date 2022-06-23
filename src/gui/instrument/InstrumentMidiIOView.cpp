@@ -73,10 +73,10 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiInputLayout->addWidget( m_fixedInputVelocitySpinBox );
 	midiInputLayout->addStretch();
 
-	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
-	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-		m_fixedInputVelocitySpinBox, SLOT( setEnabled( bool ) ) );
+	connect( m_midiInputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+			m_inputChannelSpinBox, SLOT(setEnabled(bool)));
+	connect( m_midiInputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+		m_fixedInputVelocitySpinBox, SLOT(setEnabled(bool)));
 
 
 
@@ -118,12 +118,12 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	midiOutputLayout->addWidget( m_fixedOutputNoteSpinBox );
 	midiOutputLayout->addStretch();
 
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-		m_fixedOutputVelocitySpinBox, SLOT( setEnabled( bool ) ) );
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-			m_outputProgramSpinBox, SLOT( setEnabled( bool ) ) );
-	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-		m_fixedOutputNoteSpinBox, SLOT( setEnabled( bool ) ) );
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+		m_fixedOutputVelocitySpinBox, SLOT(setEnabled(bool)));
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+			m_outputProgramSpinBox, SLOT(setEnabled(bool)));
+	connect( m_midiOutputGroupBox->ledButton(), SIGNAL(toggled(bool)),
+		m_fixedOutputNoteSpinBox, SLOT(setEnabled(bool)));
 
 	if( !Engine::audioEngine()->midiClient()->isRaw() )
 	{
@@ -144,8 +144,6 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
-#define PROVIDE_CUSTOM_BASE_VELOCITY_UI
-#ifdef PROVIDE_CUSTOM_BASE_VELOCITY_UI
 	GroupBox* baseVelocityGroupBox = new GroupBox( tr( "CUSTOM BASE VELOCITY" ) );
 	layout->addWidget( baseVelocityGroupBox );
 
@@ -164,9 +162,8 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_baseVelocitySpinBox->setEnabled( false );
 	baseVelocityLayout->addWidget( m_baseVelocitySpinBox );
 
-	connect( baseVelocityGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-			m_baseVelocitySpinBox, SLOT( setEnabled( bool ) ) );
-#endif
+	connect( baseVelocityGroupBox->ledButton(), SIGNAL(toggled(bool)),
+			m_baseVelocitySpinBox, SLOT(setEnabled(bool)));
 
 	layout->addStretch();
 }
@@ -195,9 +192,7 @@ void InstrumentMidiIOView::modelChanged()
 	m_fixedOutputNoteSpinBox->setModel( &mp->m_fixedOutputNoteModel );
 	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
 
-#ifdef PROVIDE_CUSTOM_BASE_VELOCITY_UI
 	m_baseVelocitySpinBox->setModel( &mp->m_baseVelocityModel );
-#endif
 
 	if( m_rpBtn )
 	{

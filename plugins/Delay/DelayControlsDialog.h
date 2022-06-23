@@ -42,7 +42,7 @@ class DelayControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	DelayControlsDialog( DelayControls* controls );
-	virtual ~DelayControlsDialog()
+	~DelayControlsDialog() override
 	{
 	}
 };
@@ -52,13 +52,13 @@ class XyPad : public QWidget
 	Q_OBJECT
 public:
 	XyPad( QWidget *parent = 0, FloatModel *xModel = 0, FloatModel *yModel = 0 );
-	~XyPad() {}
+	~XyPad() override {}
 
 protected:
-	virtual void paintEvent ( QPaintEvent * event );
-	virtual void mousePressEvent(QMouseEvent * event );
-	virtual void mouseReleaseEvent(QMouseEvent * event);
-	virtual void mouseMoveEvent(QMouseEvent * event);
+	void paintEvent ( QPaintEvent * event ) override;
+	void mousePressEvent(QMouseEvent * event ) override;
+	void mouseReleaseEvent(QMouseEvent * event) override;
+	void mouseMoveEvent(QMouseEvent * event) override;
 
 private:
 	FloatModel *m_xModel;

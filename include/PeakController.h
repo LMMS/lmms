@@ -47,7 +47,7 @@ public:
 		PeakControllerEffect *_peak_effect = nullptr );
 
 
-	virtual ~PeakController();
+	~PeakController() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -61,7 +61,7 @@ public:
 
 public slots:
 	gui::ControllerDialog * createDialog( QWidget * _parent ) override;
-	void handleDestroyedEffect( );
+	void handleDestroyedEffect();
 	void updateCoeffs();
 
 protected:
@@ -92,7 +92,7 @@ class PeakControllerDialog : public ControllerDialog
 	Q_OBJECT
 public:
 	PeakControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~PeakControllerDialog();
+	~PeakControllerDialog() override;
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;

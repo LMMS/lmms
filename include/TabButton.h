@@ -45,7 +45,7 @@ public:
 						SLOT( slotClicked() ) );
 	}
 
-	~TabButton()
+	~TabButton() override
 	{
 	}
 

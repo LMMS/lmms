@@ -45,7 +45,7 @@ class CrossoverEQControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	CrossoverEQControlDialog( CrossoverEQControls * controls );
-	virtual ~CrossoverEQControlDialog()
+	~CrossoverEQControlDialog() override
 	{
 	}
 	

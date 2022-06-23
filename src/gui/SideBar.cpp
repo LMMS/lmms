@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-	virtual ~SideBarButton() = default;
+	~SideBarButton() override = default;
 
 	Qt::Orientation orientation() const
 	{
@@ -94,8 +94,8 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 	setIconSize( QSize( 16, 16 ) );
 
 	m_btnGroup.setExclusive( false );
-	connect( &m_btnGroup, SIGNAL( buttonClicked( QAbstractButton * ) ),
-				this, SLOT( toggleButton( QAbstractButton * ) ) );
+	connect( &m_btnGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+				this, SLOT(toggleButton(QAbstractButton*)));
 }
 
 

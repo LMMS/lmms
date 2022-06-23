@@ -45,7 +45,7 @@ class PatternTrackView : public TrackView
 	Q_OBJECT
 public:
 	PatternTrackView(PatternTrack* pt, TrackContainerView* tcv);
-	virtual ~PatternTrackView();
+	~PatternTrackView() override;
 
 	bool close() override;
 

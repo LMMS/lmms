@@ -44,7 +44,7 @@ class MidiOss : public QThread, public MidiClientRaw
 	Q_OBJECT
 public:
 	MidiOss();
-	virtual ~MidiOss();
+	~MidiOss() override;
 
 	static QString probeDevice();
 

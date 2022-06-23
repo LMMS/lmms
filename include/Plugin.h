@@ -244,7 +244,7 @@ public:
 	//!   See the key() function
 	Plugin(const Descriptor * descriptor, Model * parent,
 		const Descriptor::SubPluginFeatures::Key *key = nullptr);
-	virtual ~Plugin();
+	~Plugin() override;
 
 	//! Return display-name out of sub plugin or descriptor
 	QString displayName() const override;
@@ -253,7 +253,7 @@ public:
 	const PixmapLoader *logo() const;
 
 	//! Return plugin type
-	inline PluginTypes type( void ) const
+	inline PluginTypes type() const
 	{
 		return m_descriptor->type;
 	}

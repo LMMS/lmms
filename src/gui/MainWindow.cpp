@@ -251,8 +251,8 @@ MainWindow::MainWindow() :
 		// See autoSaveTimerReset() in MainWindow.h
 	}
 
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
-				this, SLOT( updatePlayPauseIcons() ) );
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+				this, SLOT(updatePlayPauseIcons()));
 
 	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
 
@@ -302,7 +302,7 @@ void MainWindow::finalize()
 	menuBar()->addMenu( project_menu )->setText( tr( "&File" ) );
 	project_menu->addAction( embed::getIconPixmap( "project_new" ),
 					tr( "&New" ),
-					this, SLOT( createNewProject() ),
+					this, SLOT(createNewProject()),
 					QKeySequence::New );
 
 	auto templates_menu = new TemplatesMenu( this );
@@ -310,48 +310,48 @@ void MainWindow::finalize()
 
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
-					this, SLOT( openProject() ),
+					this, SLOT(openProject()),
 					QKeySequence::Open );
 
 	project_menu->addMenu(new RecentProjectsMenu(this));
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "&Save" ),
-					this, SLOT( saveProject() ),
+					this, SLOT(saveProject()),
 					QKeySequence::Save );
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save &As..." ),
-					this, SLOT( saveProjectAs() ),
+					this, SLOT(saveProjectAs()),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save as New &Version" ),
-					this, SLOT( saveProjectAsNewVersion() ),
+					this, SLOT(saveProjectAsNewVersion()),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
 					tr( "Save as default template" ),
-					this, SLOT( saveProjectAsDefaultTemplate() ) );
+					this, SLOT(saveProjectAsDefaultTemplate()));
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
 					this,
-					SLOT( onImportProject() ) );
+					SLOT(onImportProject()));
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
 					this,
-					SLOT( onExportProject() ),
+					SLOT(onExportProject()),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
 					this,
-					SLOT( onExportProjectTracks() ),
+					SLOT(onExportProjectTracks()),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					this,
-					SLOT( onExportProjectMidi() ),
+					SLOT(onExportProjectMidi()),
 					Qt::CTRL + Qt::Key_M );
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
@@ -359,7 +359,7 @@ void MainWindow::finalize()
 	project_menu->addSeparator();
 #endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
-					qApp, SLOT( closeAllWindows() ),
+					qApp, SLOT(closeAllWindows()),
 					Qt::CTRL + Qt::Key_Q );
 
 
@@ -367,32 +367,32 @@ void MainWindow::finalize()
 	menuBar()->addMenu( edit_menu )->setText( tr( "&Edit" ) );
 	m_undoAction = edit_menu->addAction( embed::getIconPixmap( "edit_undo" ),
 					tr( "Undo" ),
-					this, SLOT( undo() ),
+					this, SLOT(undo()),
 					QKeySequence::Undo );
 	m_redoAction = edit_menu->addAction( embed::getIconPixmap( "edit_redo" ),
 					tr( "Redo" ),
-					this, SLOT( redo() ),
+					this, SLOT(redo()),
 					QKeySequence::Redo );
 	// Ensure that both (Ctrl+Y) and (Ctrl+Shift+Z) activate redo shortcut regardless of OS defaults
 	if (QKeySequence(QKeySequence::Redo) != QKeySequence(Qt::CTRL + Qt::Key_Y))
 	{
-		new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_Y ), this, SLOT(redo()) );
+		new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_Y ), this, SLOT(redo()));
 	}
 	if (QKeySequence(QKeySequence::Redo) != QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Z ))
 	{
-		new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Z ), this, SLOT(redo()) );
+		new QShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Z ), this, SLOT(redo()));
 	}
 
 	edit_menu->addSeparator();
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
-					this, SLOT( showSettingsDialog() ) );
-	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()) );
+					this, SLOT(showSettingsDialog()));
+	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()));
 
 	m_viewMenu = new QMenu( this );
 	menuBar()->addMenu( m_viewMenu )->setText( tr( "&View" ) );
-	connect( m_viewMenu, SIGNAL( aboutToShow() ),
-		 this, SLOT( updateViewMenu() ) );
+	connect( m_viewMenu, SIGNAL(aboutToShow()),
+		 this, SLOT(updateViewMenu()));
 	connect( m_viewMenu, SIGNAL(triggered(QAction*)), this,
 		SLOT(updateConfig(QAction*)));
 
@@ -407,8 +407,8 @@ void MainWindow::finalize()
 	if( !m_toolsMenu->isEmpty() )
 	{
 		menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
-		connect( m_toolsMenu, SIGNAL( triggered( QAction * ) ),
-					this, SLOT( showTool( QAction * ) ) );
+		connect( m_toolsMenu, SIGNAL(triggered(QAction*)),
+					this, SLOT(showTool(QAction*)));
 	}
 
 
@@ -420,13 +420,13 @@ void MainWindow::finalize()
 	{
 		help_menu->addAction( embed::getIconPixmap( "help" ),
 						tr( "Online Help" ),
-						this, SLOT( browseHelp() ) );
+						this, SLOT(browseHelp()));
 	}
 	else
 	{
 		help_menu->addAction( embed::getIconPixmap( "help" ),
 							tr( "Help" ),
-							this, SLOT( help() ) );
+							this, SLOT(help()));
 	}
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
@@ -434,19 +434,19 @@ void MainWindow::finalize()
 	help_menu->addSeparator();
 #endif
 	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
-				  this, SLOT( aboutLMMS() ) );
+				  this, SLOT(aboutLMMS()));
 
 	// create tool-buttons
 	ToolButton * project_new = new ToolButton(
 					embed::getIconPixmap( "project_new" ),
 					tr( "Create new project" ),
-					this, SLOT( createNewProject() ),
+					this, SLOT(createNewProject()),
 							m_toolBar );
 
 	ToolButton * project_new_from_template = new ToolButton(
 			embed::getIconPixmap( "project_new_from_template" ),
 				tr( "Create new project from template" ),
-					this, SLOT( emptySlot() ),
+					this, SLOT(emptySlot()),
 							m_toolBar );
 	project_new_from_template->setMenu( templates_menu );
 	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
@@ -454,21 +454,21 @@ void MainWindow::finalize()
 	ToolButton * project_open = new ToolButton(
 					embed::getIconPixmap( "project_open" ),
 					tr( "Open existing project" ),
-					this, SLOT( openProject() ),
+					this, SLOT(openProject()),
 								m_toolBar );
 
 
 	ToolButton * project_open_recent = new ToolButton(
 				embed::getIconPixmap( "project_open_recent" ),
 					tr( "Recently opened projects" ),
-					this, SLOT( emptySlot() ), m_toolBar );
+					this, SLOT(emptySlot()), m_toolBar );
 	project_open_recent->setMenu( new RecentProjectsMenu(this) );
 	project_open_recent->setPopupMode( ToolButton::InstantPopup );
 
 	ToolButton * project_save = new ToolButton(
 					embed::getIconPixmap( "project_save" ),
 					tr( "Save current project" ),
-					this, SLOT( saveProject() ),
+					this, SLOT(saveProject()),
 								m_toolBar );
 
 
@@ -476,13 +476,13 @@ void MainWindow::finalize()
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
 					this,
-							SLOT( onExportProject() ),
+							SLOT(onExportProject()),
 								m_toolBar );
 
 	m_metronomeToggle = new ToolButton(
 				embed::getIconPixmap( "metronome" ),
 				tr( "Metronome" ),
-				this, SLOT( onToggleMetronome() ),
+				this, SLOT(onToggleMetronome()),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
 	m_metronomeToggle->setChecked(Engine::audioEngine()->isMetronomeActive());
@@ -501,7 +501,7 @@ void MainWindow::finalize()
 	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
 					tr( "Song Editor" ) + " (Ctrl+1)",
-					this, SLOT( toggleSongEditorWin() ),
+					this, SLOT(toggleSongEditorWin()),
 								m_toolBar );
 	song_editor_window->setShortcut( Qt::CTRL + Qt::Key_1 );
 
@@ -518,7 +518,7 @@ void MainWindow::finalize()
 						embed::getIconPixmap( "piano" ),
 						tr( "Piano Roll" ) +
 									" (Ctrl+3)",
-					this, SLOT( togglePianoRollWin() ),
+					this, SLOT(togglePianoRollWin()),
 								m_toolBar );
 	piano_roll_window->setShortcut( Qt::CTRL + Qt::Key_3 );
 
@@ -527,14 +527,14 @@ void MainWindow::finalize()
 					tr( "Automation Editor" ) +
 									" (Ctrl+4)",
 					this,
-					SLOT( toggleAutomationEditorWin() ),
+					SLOT(toggleAutomationEditorWin()),
 					m_toolBar );
 	automation_editor_window->setShortcut( Qt::CTRL + Qt::Key_4 );
 
 	ToolButton * mixer_window = new ToolButton(
 					embed::getIconPixmap( "mixer" ),
 					tr( "Mixer" ) + " (Ctrl+5)",
-					this, SLOT( toggleMixerWin() ),
+					this, SLOT(toggleMixerWin()),
 					m_toolBar );
 	mixer_window->setShortcut( Qt::CTRL + Qt::Key_5 );
 
@@ -542,7 +542,7 @@ void MainWindow::finalize()
 					embed::getIconPixmap( "controller" ),
 					tr( "Show/hide controller rack" ) +
 								" (Ctrl+6)",
-					this, SLOT( toggleControllerRack() ),
+					this, SLOT(toggleControllerRack()),
 								m_toolBar );
 	controllers_window->setShortcut( Qt::CTRL + Qt::Key_6 );
 
@@ -550,7 +550,7 @@ void MainWindow::finalize()
 					embed::getIconPixmap( "project_notes" ),
 					tr( "Show/hide project notes" ) +
 								" (Ctrl+7)",
-					this, SLOT( toggleProjectNotesWin() ),
+					this, SLOT(toggleProjectNotesWin()),
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::CTRL + Qt::Key_7 );
 
@@ -558,7 +558,7 @@ void MainWindow::finalize()
 					embed::getIconPixmap( "microtuner" ),
 					tr( "Microtuner configuration" ) +
 								" (Ctrl+8)",
-					this, SLOT( toggleMicrotunerWin() ),
+					this, SLOT(toggleMicrotunerWin()),
 								m_toolBar );
 	microtuner_window->setShortcut( Qt::CTRL + Qt::Key_8 );
 
@@ -616,7 +616,7 @@ void MainWindow::finalize()
 	// reset window title every time we change the state of a subwindow to show the correct title
 	for( const QMdiSubWindow * subWindow : workspace()->subWindowList() )
 	{
-		connect( subWindow, SIGNAL( windowStateChanged(Qt::WindowStates,Qt::WindowStates) ), this, SLOT( resetWindowTitle() ) );
+		connect( subWindow, SIGNAL(windowStateChanged(Qt::WindowStates,Qt::WindowStates)), this, SLOT(resetWindowTitle()));
 	}
 }
 
@@ -1146,7 +1146,7 @@ void MainWindow::updateViewMenu()
 	// not on top -> top <-> invisible
 	m_viewMenu->addAction(embed::getIconPixmap( "songeditor" ),
 			      tr( "Song Editor" ) + "\tCtrl+1",
-			      this, SLOT( toggleSongEditorWin() )
+			      this, SLOT(toggleSongEditorWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap("pattern_track"),
 					tr("Pattern Editor") + "\tCtrl+2",
@@ -1154,35 +1154,35 @@ void MainWindow::updateViewMenu()
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),
 			      tr( "Piano Roll" ) + "\tCtrl+3",
-			      this, SLOT( togglePianoRollWin() )
+			      this, SLOT(togglePianoRollWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "automation" ),
 			      tr( "Automation Editor" ) + "\tCtrl+4",
 			      this,
-			      SLOT( toggleAutomationEditorWin())
+			      SLOT(toggleAutomationEditorWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "mixer" ),
 			      tr( "Mixer" ) + "\tCtrl+5",
-			      this, SLOT( toggleMixerWin() )
+			      this, SLOT(toggleMixerWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
 			      tr( "Controller Rack" ) + "\tCtrl+6",
-			      this, SLOT( toggleControllerRack() )
+			      this, SLOT(toggleControllerRack())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
 			      tr( "Project Notes" ) + "\tCtrl+7",
-			      this, SLOT( toggleProjectNotesWin() )
+			      this, SLOT(toggleProjectNotesWin())
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "microtuner" ),
 			      tr( "Microtuner" ) + "\tCtrl+8",
-			      this, SLOT( toggleMicrotunerWin() )
+			      this, SLOT(toggleMicrotunerWin())
 		);
 
 	m_viewMenu->addSeparator();
 	
 	m_viewMenu->addAction(embed::getIconPixmap( "fullscreen" ),
 				tr( "Fullscreen" ) + "\tF11",
-				this, SLOT( toggleFullscreen() ) 
+				this, SLOT(toggleFullscreen())
 		);
 
 	m_viewMenu->addSeparator();

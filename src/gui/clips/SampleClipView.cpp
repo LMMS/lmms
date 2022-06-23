@@ -74,7 +74,7 @@ void SampleClipView::constructContextMenu(QMenu* cm)
 
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
-						m_clip, SLOT( toggleRecord() ) );*/
+						m_clip, SLOT(toggleRecord()));*/
 
 	cm->addAction(
 		embed::getIconPixmap("flip_x"),

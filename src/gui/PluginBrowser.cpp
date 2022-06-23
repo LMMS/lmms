@@ -74,8 +74,8 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	m_descTree->setIndentation( 10 );
 	m_descTree->setSelectionMode( QAbstractItemView::NoSelection );
 
-	connect( searchBar, SIGNAL( textEdited( const QString & ) ),
-			this, SLOT( onFilterChanged( const QString & ) ) );
+	connect( searchBar, SIGNAL( textEdited( const QString& ) ),
+			this, SLOT( onFilterChanged( const QString& ) ) );
 
 	view_layout->addWidget( hint );
 	view_layout->addWidget( searchBar );

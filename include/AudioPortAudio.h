@@ -77,7 +77,7 @@ class AudioPortAudio : public AudioDevice
 {
 public:
 	AudioPortAudio( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioPortAudio();
+	~AudioPortAudio() override;
 
 	inline static QString name()
 	{
@@ -94,10 +94,10 @@ public:
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
-		virtual void saveSettings();
-		virtual void show();
+		void saveSettings() override;
+		void show() override;
 
 	private:
 		gui::ComboBox * m_backend;
@@ -107,9 +107,9 @@ public:
 	} ;
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
 
 #ifdef PORTAUDIO_V19
 	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,

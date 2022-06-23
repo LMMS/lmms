@@ -53,7 +53,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Tuneful things to bang on" ),

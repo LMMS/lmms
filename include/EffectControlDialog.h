@@ -44,7 +44,7 @@ class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	EffectControlDialog( EffectControls * _controls );
-	virtual ~EffectControlDialog();
+	~EffectControlDialog() override;
 
 	virtual bool isResizable() const {return false;}
 

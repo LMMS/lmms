@@ -53,7 +53,7 @@ public:
 		m_previewInstrumentTrack->setPreviewMode( true );
 	}
 
-	virtual ~PreviewTrackContainer()
+	~PreviewTrackContainer() override
 	{
 	}
 

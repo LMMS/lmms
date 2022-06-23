@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef MICRO_TIMER
-#define MICRO_TIMER
+#ifndef MICRO_TIMER_H
+#define MICRO_TIMER_H
 
 #include <chrono>
 
@@ -48,4 +48,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // MICRO_TIMER_H

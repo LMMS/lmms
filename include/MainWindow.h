@@ -190,7 +190,7 @@ protected:
 private:
 	MainWindow();
 	MainWindow( const MainWindow & );
-	virtual ~MainWindow();
+	~MainWindow() override;
 
 	void finalize();
 
@@ -242,7 +242,7 @@ private:
 private slots:
 	void browseHelp();
 	void showTool( QAction * _idx );
-	void updateViewMenu( void );
+	void updateViewMenu();
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 	void onExportProject();

@@ -39,23 +39,23 @@ class BassBoosterControls : public EffectControls
 	Q_OBJECT
 public:
 	BassBoosterControls( BassBoosterEffect* effect );
-	virtual ~BassBoosterControls()
+	~BassBoosterControls() override
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "bassboostercontrols";
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 3;
 	}
 
-	virtual gui::EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
 		return new gui::BassBoosterControlDialog( this );
 	}

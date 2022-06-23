@@ -181,7 +181,7 @@ protected:
 class EqHp12Filter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate
@@ -226,7 +226,7 @@ public :
 class EqLp12Filter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate
@@ -270,7 +270,7 @@ class EqPeakFilter : public EqFilter
 public:
 
 
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
@@ -300,7 +300,7 @@ public:
 		setCoeffs( a1, a2, b0, b1, b2 );
 	}
 
-	virtual inline void setParameters( float sampleRate, float freq, float bw, float gain )
+	inline void setParameters( float sampleRate, float freq, float bw, float gain ) override
 	{
 		bool hasChanged = false;
 		if( sampleRate != m_sampleRate )
@@ -334,7 +334,7 @@ public:
 class EqLowShelfFilter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate
@@ -373,7 +373,7 @@ public :
 class EqHighShelfFilter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate

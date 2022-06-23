@@ -44,7 +44,7 @@ public:
 	void fillDescriptionWidget( QWidget * _parent,
 												const Key * _key ) const override;
 
-	virtual void listSubPluginKeys( const Plugin::Descriptor * _desc,
+	void listSubPluginKeys( const Plugin::Descriptor * _desc,
 												KeyList & _kl ) const override;
 
 

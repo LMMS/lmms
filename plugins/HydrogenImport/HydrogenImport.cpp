@@ -24,7 +24,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT hydrogenimport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Hydrogen Import",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing Hydrogen files into LMMS" ),

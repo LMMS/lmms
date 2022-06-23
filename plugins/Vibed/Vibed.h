@@ -97,11 +97,11 @@ class VibedView : public InstrumentViewFixedSize
 public:
 	VibedView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~VibedView() {};
+	~VibedView() override {};
 
 public slots:
 	void showString( int _string );
-	void contextMenuEvent( QContextMenuEvent * );
+	void contextMenuEvent( QContextMenuEvent * ) override;
 
 protected slots:
 	void sinWaveClicked();
@@ -114,7 +114,7 @@ protected slots:
 	void normalizeClicked();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 	// String-related

@@ -56,7 +56,7 @@ struct freefunc0 : public exprtk::ifunction<T>
 	freefunc0() : exprtk::ifunction<T>(0) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
-	inline T operator()()
+	inline T operator()() override
 	{ return Functor::process(); }
 };
 template <typename T,typename Functor,bool optimize>
@@ -67,7 +67,7 @@ struct freefunc1 : public exprtk::ifunction<T>
 	freefunc1() : exprtk::ifunction<T>(1) {
 		if (optimize) { exprtk::disable_has_side_effects(*this); }
 	}
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{ return Functor::process(x); }
 };
 
@@ -76,7 +76,7 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 {
 
 	using exprtk::ifunction<T>::operator();
-	virtual ~IntegrateFunction()
+	~IntegrateFunction() override
 	{
 		delete [] m_counters;
 	}
@@ -94,7 +94,7 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 		clearArray(m_counters,max_counters);
 	}
 
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{
 		if (*m_frame == 0)
 		{
@@ -131,7 +131,7 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 {
 
 	using exprtk::ifunction<T>::operator();
-	virtual ~LastSampleFunction()
+	~LastSampleFunction() override
 	{
 		delete [] m_samples;
 	}
@@ -145,7 +145,7 @@ struct LastSampleFunction : public exprtk::ifunction<T>
 		clearArray(m_samples, history_size);
 	}
 
-	inline T operator()(const T& x)
+	inline T operator()(const T& x) override
 	{
 		if (!std::isnan(x) && !std::isinf(x))
 		{
@@ -187,7 +187,7 @@ struct WaveValueFunction : public exprtk::ifunction<T>
 	m_size(s)
 	{}
 
-	inline T operator()(const T& index)
+	inline T operator()(const T& index) override
 	{
 		return m_vec[(int) ( positiveFraction(index) * m_size )];
 	}
@@ -205,7 +205,7 @@ struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
 	m_size(s)
 	{}
 
-	inline T operator()(const T& index)
+	inline T operator()(const T& index) override
 	{
 		const T x = positiveFraction(index) * m_size;
 		const int ix = (int)x;
@@ -321,7 +321,7 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 		return static_cast<int>(res) / (float)(1 << 31);
 	}
 
-	inline float operator()(const float& index,const float& seed)
+	inline float operator()(const float& index,const float& seed) override
 	{
 		int irseed;
 		if (seed < 0 || std::isnan(seed) || std::isinf(seed))
@@ -346,7 +346,7 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 	m_rseed(seed)
 	{ exprtk::disable_has_side_effects(*this); }
 
-	inline float operator()(const float& index)
+	inline float operator()(const float& index) override
 	{
 		return RandomVectorSeedFunction::randv(index,m_rseed);
 	}

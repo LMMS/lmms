@@ -49,25 +49,25 @@ public:
 		NumStereoModes
 	};
 	DynProcControls( DynProcEffect * _eff );
-	virtual ~DynProcControls()
+	~DynProcControls() override
 	{
 	}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return( "dynamicsprocessor_controls" );
 	}
 
 	virtual void setDefaultShape();
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return( 6 );
 	}
 
-	virtual gui::EffectControlDialog * createView()
+	gui::EffectControlDialog * createView() override
 	{
 		return( new gui::DynProcControlDialog( this ) );
 	}

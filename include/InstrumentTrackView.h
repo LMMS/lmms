@@ -46,7 +46,7 @@ class InstrumentTrackView : public TrackView
 	Q_OBJECT
 public:
 	InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tc );
-	virtual ~InstrumentTrackView();
+	~InstrumentTrackView() override;
 
 	InstrumentTrackWindow * getInstrumentTrackWindow();
 

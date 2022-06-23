@@ -61,8 +61,8 @@ AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
-		connect( this, SIGNAL( zombified() ),
-				this, SLOT( restartAfterZombified() ),
+		connect( this, SIGNAL(zombified()),
+				this, SLOT(restartAfterZombified()),
 				Qt::QueuedConnection );
 	}
 

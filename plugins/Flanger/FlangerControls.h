@@ -39,20 +39,20 @@ class FlangerControls : public EffectControls
 	Q_OBJECT
 public:
 	FlangerControls( FlangerEffect* effect );
-	virtual ~FlangerControls()
+	~FlangerControls() override
 	{
 	}
-	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
-	virtual void loadSettings ( const QDomElement &_this );
-	inline virtual QString nodeName() const
+	void saveSettings ( QDomDocument& doc, QDomElement& parent ) override;
+	void loadSettings ( const QDomElement &_this ) override;
+	inline QString nodeName() const override
 	{
 		return "Flanger";
 	}
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 7;
 	}
-	virtual gui::EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
 		return new gui::FlangerControlsDialog( this );
 	}

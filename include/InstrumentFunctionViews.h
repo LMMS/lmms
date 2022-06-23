@@ -50,7 +50,7 @@ class InstrumentFunctionNoteStackingView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent = nullptr );
-	virtual ~InstrumentFunctionNoteStackingView();
+	~InstrumentFunctionNoteStackingView() override;
 
 
 private:
@@ -73,7 +73,7 @@ class InstrumentFunctionArpeggioView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent = nullptr );
-	virtual ~InstrumentFunctionArpeggioView();
+	~InstrumentFunctionArpeggioView() override;
 
 
 private:

@@ -29,6 +29,9 @@
 
 #include <QMap>
 #include <QPointer>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 
 #include "AutomationNode.h"
 #include "Clip.h"
@@ -65,7 +68,7 @@ public:
 
 	AutomationClip( AutomationTrack * _auto_track );
 	AutomationClip( const AutomationClip & _clip_to_copy );
-	virtual ~AutomationClip() = default;
+	~AutomationClip() override = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
@@ -189,7 +192,11 @@ private:
 
 	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	mutable QRecursiveMutex m_clipMutex;
+#else
 	mutable QMutex m_clipMutex;
+#endif
 
 	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;

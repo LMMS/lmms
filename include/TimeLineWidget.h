@@ -78,7 +78,7 @@ public:
 
 	TimeLineWidget(int xoff, int yoff, float ppb, Song::PlayPos & pos,
 				const TimePos & begin, Song::PlayModes mode, QWidget * parent);
-	virtual ~TimeLineWidget();
+	~TimeLineWidget() override;
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
 	inline void setBarLineColor(QColor const & barLineColor) { m_barLineColor = barLineColor; }
