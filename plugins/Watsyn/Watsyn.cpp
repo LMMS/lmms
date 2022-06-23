@@ -46,7 +46,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Watsyn",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"4-oscillator modulatable wavetable synth" ),

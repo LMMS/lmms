@@ -49,7 +49,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Versatile drum synthesizer" ),

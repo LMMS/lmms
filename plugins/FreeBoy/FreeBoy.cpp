@@ -52,7 +52,7 @@ extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of GameBoy (TM) APU" ),
 

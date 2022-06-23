@@ -144,8 +144,6 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 		midiOutputLayout->insertWidget( 0, m_wpBtn );
 	}
 
-#define PROVIDE_CUSTOM_BASE_VELOCITY_UI
-#ifdef PROVIDE_CUSTOM_BASE_VELOCITY_UI
 	GroupBox* baseVelocityGroupBox = new GroupBox( tr( "CUSTOM BASE VELOCITY" ) );
 	layout->addWidget( baseVelocityGroupBox );
 
@@ -166,7 +164,6 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 	connect( baseVelocityGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 			m_baseVelocitySpinBox, SLOT( setEnabled( bool ) ) );
-#endif
 
 	layout->addStretch();
 }
@@ -195,9 +192,7 @@ void InstrumentMidiIOView::modelChanged()
 	m_fixedOutputNoteSpinBox->setModel( &mp->m_fixedOutputNoteModel );
 	m_outputProgramSpinBox->setModel( &mp->m_outputProgramModel );
 
-#ifdef PROVIDE_CUSTOM_BASE_VELOCITY_UI
 	m_baseVelocitySpinBox->setModel( &mp->m_baseVelocityModel );
-#endif
 
 	if( m_rpBtn )
 	{

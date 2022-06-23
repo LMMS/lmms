@@ -136,8 +136,8 @@ using surroundSampleFrame = std::array<sample_t, SURROUND_CHANNELS>;
 constexpr std::size_t LMMS_ALIGN_SIZE = 16;
 
 
-#define STRINGIFY(s) STR(s)
-#define STR(PN)	#PN
+#define LMMS_STRINGIFY(s) LMMS_STR(s)
+#define LMMS_STR(PN)	#PN
 
 // Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
 constexpr const char* UI_CTRL_KEY =

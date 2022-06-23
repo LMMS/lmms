@@ -23,8 +23,8 @@
  */
 
 
-#ifndef PATMAN_H_
-#define PATMAN_H_
+#ifndef PATMAN_H
+#define PATMAN_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -162,4 +162,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // PATMAN_H

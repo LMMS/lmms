@@ -49,7 +49,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"LV2",
 	QT_TRANSLATE_NOOP("PluginBrowser",
 		"plugin for using arbitrary LV2 instruments inside LMMS."),
