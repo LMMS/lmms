@@ -248,7 +248,15 @@ bool RemotePluginClient::processMessage( const message & _m )
 			return false;
 
 		case IdSyncKey:
-			m_vstSyncData.attach(_m.getString(0));
+			try
+			{
+				m_vstSyncData.attach(_m.getString(0));
+			}
+			catch (const std::runtime_error& error)
+			{
+				debugMessage(std::string{"Failed to attach sync data: "} + error.what() + '\n');
+				std::exit(EXIT_FAILURE);
+			}
 			m_bufferSize = m_vstSyncData->m_bufferSize;
 			m_sampleRate = m_vstSyncData->m_sampleRate;
 			reply_message.id = IdHostInfoGotten;
