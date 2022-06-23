@@ -117,8 +117,8 @@ public:
 
 
 protected slots:
-	void syncPlugin( );
-	void displayAutomatedOnly( );
+	void syncPlugin();
+	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
@@ -154,16 +154,16 @@ public:
 
 
 protected slots:
-	void updateMenu( );
-	void openPlugin( );
-	void managePlugin( );
-	void openPreset( );
-	void savePreset( );
+	void updateMenu();
+	void openPlugin();
+	void managePlugin();
+	void openPreset();
+	void savePreset();
 	void nextProgram();
 	void previousProgram();
-	void selPreset( );
-	void toggleGUI( );
-	void noteOffAll( );
+	void selPreset();
+	void toggleGUI();
+	void noteOffAll();
 
 
 protected:
@@ -173,7 +173,7 @@ protected:
 
 
 private:
-	virtual void modelChanged( );
+	virtual void modelChanged();
 
 	static QPixmap * s_artwork;
 
