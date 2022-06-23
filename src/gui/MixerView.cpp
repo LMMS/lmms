@@ -46,6 +46,10 @@
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+namespace lmms::gui
+{
+
+
 MixerView::MixerView() :
 	QWidget(),
 	ModelView( nullptr, this ),
@@ -109,7 +113,7 @@ MixerView::MixerView() :
 		public:
 			ChannelArea( QWidget * parent, MixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
-			~ChannelArea() {}
+			~ChannelArea() override {}
 			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );
@@ -618,3 +622,6 @@ void MixerView::updateFaders()
 		}
 	}
 }
+
+
+} // namesapce lmms::gui

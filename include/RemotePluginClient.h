@@ -41,6 +41,9 @@
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 
+namespace lmms
+{
+
 class RemotePluginClient : public RemotePluginBase
 {
 public:
@@ -49,11 +52,11 @@ public:
 #else
 	RemotePluginClient( const char * socketPath );
 #endif
-	virtual ~RemotePluginClient();
+	~RemotePluginClient() override;
 
 	const VstSyncData* getVstSyncData();
 
-	virtual bool processMessage( const message & _m );
+	bool processMessage( const message & _m ) override;
 
 	virtual void process( const sampleFrame * _in_buf,
 					sampleFrame * _out_buf ) = 0;
@@ -341,5 +344,7 @@ void RemotePluginClient::doProcessing()
 	}
 }
 
+
+} // namespace lmms
 
 #endif // REMOTE_PLUGIN_CLIENT_H

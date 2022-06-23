@@ -27,6 +27,9 @@
 
 #include "AutomatableModel.h"
 
+namespace lmms
+{
+
 
 class MeterModel : public Model
 {
@@ -35,7 +38,7 @@ class MeterModel : public Model
 	mapPropertyFromModel(int,getDenominator,setDenominator,m_denominatorModel);
 public:
 	MeterModel( Model * _parent );
-	~MeterModel();
+	~MeterModel() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this,
 						const QString & _name );
@@ -61,5 +64,8 @@ private:
 	IntModel m_denominatorModel;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

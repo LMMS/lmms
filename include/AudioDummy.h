@@ -30,6 +30,8 @@
 #include "AudioEngine.h"
 #include "MicroTimer.h"
 
+namespace lmms
+{
 
 class AudioDummy : public QThread, public AudioDevice
 {
@@ -41,7 +43,7 @@ public:
 		_success_ful = true;
 	}
 
-	virtual ~AudioDummy()
+	~AudioDummy() override
 	{
 		stopProcessing();
 	}
@@ -52,15 +54,15 @@ public:
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			AudioDeviceSetupWidget( AudioDummy::name(), _parent )
+			gui::AudioDeviceSetupWidget( AudioDummy::name(), _parent )
 		{
 		}
 
-		virtual ~setupWidget()
+		~setupWidget() override
 		{
 		}
 
@@ -114,5 +116,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif

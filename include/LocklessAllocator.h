@@ -28,6 +28,11 @@
 #include <atomic>
 #include <cstddef>
 
+
+namespace lmms
+{
+
+
 class LocklessAllocator
 {
 public:
@@ -62,7 +67,7 @@ public:
 	{
 	}
 
-	virtual ~LocklessAllocatorT()
+	~LocklessAllocatorT() override
 	{
 	}
 
@@ -78,5 +83,7 @@ public:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

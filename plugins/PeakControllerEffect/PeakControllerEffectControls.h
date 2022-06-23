@@ -29,14 +29,19 @@
 #include "EffectControls.h"
 #include "PeakControllerEffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class PeakControllerEffect;
+
 
 class PeakControllerEffectControls : public EffectControls
 {
 	Q_OBJECT
 public:
 	PeakControllerEffectControls( PeakControllerEffect * _eff );
-	virtual ~PeakControllerEffectControls()
+	~PeakControllerEffectControls() override
 	{
 	}
 
@@ -51,9 +56,9 @@ public:
 	{
 		return 1;
 	}
-	EffectControlDialog * createView() override
+	gui::EffectControlDialog * createView() override
 	{
-		return new PeakControllerEffectControlDialog( this );
+		return new gui::PeakControllerEffectControlDialog( this );
 	}
 
 
@@ -69,10 +74,12 @@ private:
 	BoolModel m_absModel;
 	FloatModel m_amountMultModel;
 
-	friend class PeakControllerEffectControlDialog;
+	friend class gui::PeakControllerEffectControlDialog;
 	friend class PeakControllerEffect;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

@@ -36,6 +36,10 @@
 #include "RemotePlugin.h"
 
 
+namespace lmms
+{
+
+
 VstSyncController::VstSyncController()
 {
 	try
@@ -159,6 +163,4 @@ void VstSyncController::updateSampleRate()
 }
 
 
-
-
-
+} // namespace lmms

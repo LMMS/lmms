@@ -37,6 +37,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -580,9 +584,9 @@ QString WatsynInstrument::nodeName() const
 }
 
 
-PluginView * WatsynInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* WatsynInstrument::instantiateView( QWidget * _parent )
 {
-	return( new WatsynView( this, _parent ) );
+	return( new gui::WatsynView( this, _parent ) );
 }
 
 
@@ -662,6 +666,8 @@ void WatsynInstrument::updateWaveB2()
 }
 
 
+namespace gui
+{
 
 
 WatsynView::WatsynView( Instrument * _instrument,
@@ -1271,6 +1277,7 @@ void WatsynView::modelChanged()
 }
 
 
+} // namespace gui
 
 
 
@@ -1287,4 +1294,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
+} // namespace lmms

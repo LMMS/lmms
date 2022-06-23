@@ -30,6 +30,10 @@
 #define LMMSPALETTE_H
 
 
+namespace lmms::gui
+{
+
+
 class LMMS_EXPORT LmmsPalette : public QWidget
 {
 	Q_OBJECT
@@ -46,7 +50,7 @@ class LMMS_EXPORT LmmsPalette : public QWidget
 
 public:
 	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
-	virtual ~LmmsPalette();
+	~LmmsPalette() override;
 
 #define ACCESSMET( read, write ) \
 	QColor read () const; \
@@ -83,5 +87,6 @@ private:
 
 
 
+} // namespace lmms::gui
 
 #endif

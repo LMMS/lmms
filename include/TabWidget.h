@@ -29,6 +29,9 @@
 #include <QWidget>
 #include <QMap>
 
+namespace lmms::gui
+{
+
 const int TEXT_TAB_HEIGHT = 14;
 const int GRAPHIC_TAB_HEIGHT = 17;
 
@@ -40,7 +43,7 @@ public:
 	//!   If false, all child widget will be cut down to the TabWidget's size
 	TabWidget( const QString & _caption, QWidget * _parent,
 				bool usePixmap = false, bool resizable = false );
-	virtual ~TabWidget() = default;
+	~TabWidget() override = default;
 
 	void addTab( QWidget * w, const QString & name, const char *pixmap = nullptr, int idx = -1 );
 
@@ -105,5 +108,8 @@ private:
 	QColor m_tabBackground; // The TabWidget's background color.
 	QColor m_tabBorder;     // The TabWidget's borders color.
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

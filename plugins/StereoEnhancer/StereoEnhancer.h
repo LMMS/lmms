@@ -30,16 +30,20 @@
 #include "DspEffectLibrary.h"
 #include "StereoEnhancerControls.h"
 
+namespace lmms
+{
+
+
 class StereoEnhancerEffect : public Effect
 {
 public:
 	StereoEnhancerEffect( Model * parent,
 	                      const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~StereoEnhancerEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-		                                          const fpp_t _frames );
+	~StereoEnhancerEffect() override;
+	bool processAudioBuffer( sampleFrame * _buf,
+		                                          const fpp_t _frames ) override;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return( &m_bbControls );
 	}
@@ -59,5 +63,6 @@ private:
 } ;
 
 
+} // namespace lmms
 
 #endif

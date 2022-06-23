@@ -33,11 +33,18 @@
 #include "Graph.h"
 #include "MemoryManager.h"
 
-class oscillator;
+namespace lmms
+{
+
+
+namespace gui
+{
 class BitInvaderView;
 class Knob;
 class LedCheckBox;
 class PixmapButton;
+}
+
 
 class BSynth
 {
@@ -67,25 +74,25 @@ class BitInvader : public Instrument
 	Q_OBJECT
 public:
 	BitInvader(InstrumentTrack * _instrument_track );
-	virtual ~BitInvader();
+	~BitInvader() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+							QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 64 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView * instantiateView( QWidget * _parent ) override;
 
 protected slots:
 	void lengthChanged();
@@ -103,10 +110,12 @@ private:
 	
 	float m_normalizeFactor;
 	
-	friend class BitInvaderView;
+	friend class gui::BitInvaderView;
 } ;
 
 
+namespace gui
+{
 
 class BitInvaderView : public InstrumentViewFixedSize
 {
@@ -115,7 +124,7 @@ public:
 	BitInvaderView( Instrument * _instrument,
 					QWidget * _parent );
 
-	virtual ~BitInvaderView() {};
+	~BitInvaderView() override {};
 
 protected slots:
 	//void sampleSizeChanged( float _new_sample_length );
@@ -133,7 +142,7 @@ protected slots:
 	void smoothClicked( void  );
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob * m_sampleLengthKnob;
 	PixmapButton * m_sinWaveBtn;
@@ -153,5 +162,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

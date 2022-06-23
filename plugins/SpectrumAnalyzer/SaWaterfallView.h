@@ -29,10 +29,19 @@
 #include <QWidget>
 
 
-class EffectControlDialog;
 class QMouseEvent;
+
+namespace lmms
+{
 class SaControls;
 class SaProcessor;
+}
+
+namespace lmms::gui
+{
+
+class EffectControlDialog;
+
 
 // Widget that displays a spectrum waterfall (spectrogram) and time labels.
 class SaWaterfallView : public QWidget
@@ -40,7 +49,7 @@ class SaWaterfallView : public QWidget
 	Q_OBJECT
 public:
 	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	virtual ~SaWaterfallView() {}
+	~SaWaterfallView() override {}
 
 	QSize sizeHint() const override {return QSize(400, 350);}
 
@@ -87,4 +96,8 @@ private:
 		float m_execution_avg;
 	#endif
 };
+
+
+} // namespace lmms::gui
+
 #endif // SAWATERFALLVIEW_H

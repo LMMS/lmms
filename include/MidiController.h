@@ -33,7 +33,15 @@
 #include "MidiPort.h"
 
 
+namespace lmms
+{
+
 class MidiPort;
+
+namespace gui
+{
+class ControllerConnectionDialog;
+}
 
 
 class MidiController : public Controller, public MidiEventProcessor
@@ -41,12 +49,12 @@ class MidiController : public Controller, public MidiEventProcessor
 	Q_OBJECT
 public:
 	MidiController( Model * _parent );
-	virtual ~MidiController();
+	~MidiController() override;
 
-	virtual void processInEvent( const MidiEvent & _me,
+	void processInEvent( const MidiEvent & _me,
 					const TimePos & _time, f_cnt_t offset = 0 ) override;
 
-	virtual void processOutEvent( const MidiEvent& _me,
+	void processOutEvent( const MidiEvent& _me,
 					const TimePos & _time, f_cnt_t offset = 0 ) override
 	{
 		// No output yet
@@ -61,7 +69,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	gui::ControllerDialog* createDialog( QWidget * _parent ) override;
 	void updateName();
 
 
@@ -76,10 +84,12 @@ protected:
 	float m_lastValue;
 	float m_previousValue;
 
-	friend class ControllerConnectionDialog;
+	friend class gui::ControllerConnectionDialog;
 	friend class AutoDetectMidiController;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

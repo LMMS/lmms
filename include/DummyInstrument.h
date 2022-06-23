@@ -35,6 +35,10 @@
 #include "AudioEngine.h"
 
 
+namespace lmms
+{
+
+
 class DummyInstrument : public Instrument
 {
 public:
@@ -43,7 +47,7 @@ public:
 	{
 	}
 
-	virtual ~DummyInstrument()
+	~DummyInstrument() override
 	{
 	}
 
@@ -66,11 +70,13 @@ public:
 		return "dummyinstrument";
 	}
 
-	PluginView * instantiateView( QWidget * _parent ) override
+	gui::PluginView * instantiateView( QWidget * _parent ) override
 	{
-		return new InstrumentViewFixedSize( this, _parent );
+		return new gui::InstrumentViewFixedSize( this, _parent );
 	}
 } ;
 
+
+} // namespace lmms
 
 #endif

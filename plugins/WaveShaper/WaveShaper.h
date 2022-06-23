@@ -30,6 +30,8 @@
 #include "Effect.h"
 #include "WaveShaperControls.h"
 
+namespace lmms
+{
 
 
 class WaveShaperEffect : public Effect
@@ -37,11 +39,11 @@ class WaveShaperEffect : public Effect
 public:
 	WaveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~WaveShaperEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	~WaveShaperEffect() override;
+	bool processAudioBuffer( sampleFrame * _buf,
+							const fpp_t _frames ) override;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return( &m_wsControls );
 	}
@@ -56,7 +58,7 @@ private:
 } ;
 
 
-
+} // namespace lmms
 
 
 #endif

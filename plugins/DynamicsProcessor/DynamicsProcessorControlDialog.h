@@ -28,16 +28,22 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 
 class DynProcControls;
 
+
+namespace gui
+{
 
 class DynProcControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	DynProcControlDialog( DynProcControls * _controls );
-	virtual ~DynProcControlDialog()
+	~DynProcControlDialog() override
 	{
 	}
 
@@ -45,5 +51,10 @@ public:
 private:
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

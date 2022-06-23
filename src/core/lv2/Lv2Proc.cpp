@@ -45,6 +45,8 @@
 #include "MidiEventToByteSeq.h"
 
 
+namespace lmms
+{
 
 
 // container for everything required to store MIDI events going to the plugin
@@ -838,5 +840,7 @@ AutoLilvNode Lv2Proc::uri(const char *uriStr)
 	return Engine::getLv2Manager()->uri(uriStr);
 }
 
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

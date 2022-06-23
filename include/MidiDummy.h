@@ -28,13 +28,17 @@
 #include "MidiClient.h"
 
 
+namespace lmms
+{
+
+
 class MidiDummy : public MidiClientRaw
 {
 public:
 	MidiDummy()
 	{
 	}
-	virtual ~MidiDummy()
+	~MidiDummy() override
 	{
 	}
 
@@ -62,5 +66,7 @@ protected:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

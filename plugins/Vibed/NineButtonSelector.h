@@ -25,14 +25,20 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-
 #include <QWidget>
-
 #include "AutomatableModelView.h"
+
+namespace lmms
+{
+class graphModel;
+}
+
+namespace lmms::gui
+{
+
 
 class Knob;	
 class PixmapButton;
-class graphModel;
 
 
 class NineButtonSelector: public QWidget , public IntModelView
@@ -61,7 +67,7 @@ public:
 				int _default,
 				int _x, int _y,
 				QWidget * _parent);
-	virtual ~NineButtonSelector();
+	~NineButtonSelector() override;
 	
 //	inline int getSelected() { 
 //		return( castModel<NineButtonSelectorModel>()->value() );
@@ -80,13 +86,13 @@ public slots:
 	void button6Clicked();
 	void button7Clicked();
 	void button8Clicked();
-	void contextMenuEvent( QContextMenuEvent * );
+	void contextMenuEvent( QContextMenuEvent * ) override;
 	
 signals:
 	void NineButtonSelection( int );
 	
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 	void updateButton( int );
 
 	QList<PixmapButton *> m_buttons;
@@ -96,5 +102,8 @@ private:
 } ;
 
 typedef IntModel NineButtonSelectorModel;
+
+
+} // namespace lmms::gui
 
 #endif

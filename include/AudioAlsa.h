@@ -37,6 +37,8 @@
 
 #include "AudioDevice.h"
 
+namespace lmms
+{
 
 class AudioAlsa : public QThread, public AudioDevice
 {
@@ -67,7 +69,7 @@ public:
 
 public:
 	AudioAlsa( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioAlsa();
+	~AudioAlsa() override;
 
 	inline static QString name()
 	{
@@ -102,6 +104,8 @@ private:
 
 } ;
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA
 
 #endif

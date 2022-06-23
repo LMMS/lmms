@@ -30,6 +30,10 @@
 
 class QWidget;
 
+namespace lmms
+{
+
+
 class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
@@ -43,7 +47,7 @@ public:
 		PeakControllerEffect *_peak_effect = nullptr );
 
 
-	virtual ~PeakController();
+	~PeakController() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -56,7 +60,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	gui::ControllerDialog * createDialog( QWidget * _parent ) override;
 	void handleDestroyedEffect( );
 	void updateCoeffs();
 
@@ -80,14 +84,15 @@ private:
 	bool m_coeffNeedsUpdate;
 } ;
 
-
+namespace gui
+{
 
 class PeakControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
 	PeakControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~PeakControllerDialog();
+	~PeakControllerDialog() override;
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
@@ -96,6 +101,11 @@ protected:
 
 	PeakController * m_peakController;
 
-} ;
+};
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

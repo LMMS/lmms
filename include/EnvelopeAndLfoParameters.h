@@ -33,6 +33,15 @@
 #include "TempoSyncKnobModel.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
+class EnvelopeAndLfoView;
+
+}
 
 class LMMS_EXPORT EnvelopeAndLfoParameters : public Model, public JournallingObject
 {
@@ -69,7 +78,7 @@ public:
 
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
 							Model * _parent );
-	virtual ~EnvelopeAndLfoParameters();
+	~EnvelopeAndLfoParameters() override;
 
 	static inline float expKnobVal( float _val )
 	{
@@ -179,8 +188,10 @@ private:
 	void updateLfoShapeData();
 
 
-	friend class EnvelopeAndLfoView;
+	friend class gui::EnvelopeAndLfoView;
 
 } ;
+
+} // namespace lmms
 
 #endif

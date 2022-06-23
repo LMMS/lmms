@@ -35,17 +35,20 @@
 class QListWidgetItem;
 class QScrollArea;
 
+namespace lmms::gui
+{
+
 
 class LadspaDescription : public QWidget
 {
 	Q_OBJECT
 public:
 	LadspaDescription( QWidget * _parent, LadspaPluginType _type );
-	virtual ~LadspaDescription();
+	~LadspaDescription() override;
 
 
 signals:
-	void doubleClicked( const ladspa_key_t & );
+	void doubleClicked( const ::lmms::ladspa_key_t & );
 
 
 private:
@@ -64,6 +67,6 @@ private slots:
 } ;
 
 
-
+} // namespace lmms::gui
 
 #endif

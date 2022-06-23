@@ -32,12 +32,20 @@
 #include "Graph.h"
 #include "MemoryManager.h"
 
-class automatableButtonGroup;
+namespace lmms
+{
+
+
 class ExprFrontData;
+class NotePlayHandle;
+
+namespace gui
+{
+class automatableButtonGroup;
 class Knob;
 class LedCheckBox;
-class NotePlayHandle;
 class PixmapButton;
+}
 
 
 class ExprFront
@@ -145,5 +153,6 @@ inline void clearArray(T* arr,unsigned int size)
 }
 
 
+} // namespace lmms
 
 #endif

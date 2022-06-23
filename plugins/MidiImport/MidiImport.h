@@ -32,22 +32,25 @@
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 
+namespace lmms
+{
+
 
 class MidiImport : public ImportFilter
 {
 	Q_OBJECT
 public:
 	MidiImport( const QString & _file );
-	virtual ~MidiImport();
+	~MidiImport() override;
 
-	virtual PluginView * instantiateView( QWidget * )
+	gui::PluginView* instantiateView( QWidget * ) override
 	{
 		return( nullptr );
 	}
 
 
 private:
-	virtual bool tryImport( TrackContainer* tc );
+	bool tryImport( TrackContainer* tc ) override;
 
 	bool readSMF( TrackContainer* tc );
 	bool readRIFF( TrackContainer* tc );
@@ -124,5 +127,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

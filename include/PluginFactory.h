@@ -38,6 +38,9 @@
 
 class QLibrary;
 
+namespace lmms
+{
+
 class LMMS_EXPORT PluginFactory
 {
 public:
@@ -104,5 +107,8 @@ private:
 
 //Short-hand function
 LMMS_EXPORT PluginFactory* getPluginFactory();
+
+
+} // namespace lmms
 
 #endif // PLUGINFACTORY_H

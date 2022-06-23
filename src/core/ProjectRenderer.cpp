@@ -34,6 +34,11 @@
 #include "AudioFileMP3.h"
 #include "AudioFileFlac.h"
 
+
+namespace lmms
+{
+
+
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
@@ -246,3 +251,4 @@ void ProjectRenderer::updateConsoleProgress()
 }
 
 
+} // namespace lmms

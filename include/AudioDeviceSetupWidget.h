@@ -27,6 +27,8 @@
 
 #include "TabWidget.h"
 
+namespace lmms::gui
+{
 
 class AudioDeviceSetupWidget : public TabWidget
 {
@@ -34,12 +36,13 @@ class AudioDeviceSetupWidget : public TabWidget
 public:
 	AudioDeviceSetupWidget( const QString & _caption, QWidget * _parent );
 
-	virtual ~AudioDeviceSetupWidget();
+	~AudioDeviceSetupWidget() override;
 
 	virtual void saveSettings() = 0;
 
 	virtual void show();
 };
 
+} // namespace lmms::gui
 
 #endif

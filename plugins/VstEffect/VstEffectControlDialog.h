@@ -29,13 +29,19 @@
 
 #include <QSharedPointer>
 
+class QPixmap;
+class QPushButton;
+class QLabel;
+
+namespace lmms
+{
 
 class VstEffectControls;
 class VstPlugin;
-class PixmapButton;
-class QLabel;
-class QPixmap;
-class QPushButton;
+
+namespace gui
+{
+
 class PixmapButton;
 
 
@@ -44,7 +50,7 @@ class VstEffectControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	VstEffectControlDialog( VstEffectControls * _controls );
-	virtual ~VstEffectControlDialog();
+	~VstEffectControlDialog() override;
 
 protected:
 	void paintEvent( QPaintEvent * _pe ) override;
@@ -67,5 +73,10 @@ private:
 public slots:
 	void togglePluginUI( bool checked );
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

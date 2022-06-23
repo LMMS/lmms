@@ -28,6 +28,9 @@
 
 #include <QWidget>
 
+namespace lmms::gui
+{
+
 class PositionLine : public QWidget
 {
 	Q_OBJECT
@@ -45,5 +48,7 @@ private:
 	bool m_hasTailGradient;
 	QColor m_lineColor;
 };
+
+} // namespace lmms::gui
 
 #endif

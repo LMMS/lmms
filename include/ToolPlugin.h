@@ -29,11 +29,16 @@
 
 #include "Plugin.h"
 
+
+namespace lmms
+{
+
+
 class LMMS_EXPORT ToolPlugin : public Plugin
 {
 public:
 	ToolPlugin( const Descriptor * _descriptor, Model * _parent );
-	virtual ~ToolPlugin();
+	~ToolPlugin() override;
 
 	// instantiate tool-plugin with given name or return NULL
 	// on failure
@@ -41,5 +46,8 @@ public:
 										Model * _parent );
 
 } ;
+
+
+} // namespace lmms
 
 #endif

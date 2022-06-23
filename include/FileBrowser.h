@@ -37,13 +37,18 @@
 
 class QLineEdit;
 
-class FileItem;
+namespace lmms
+{
+
 class InstrumentTrack;
-class FileBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
 
+namespace gui
+{
 
+class FileItem;
+class FileBrowserTreeWidget;
 
 class FileBrowser : public SideBarWidget
 {
@@ -63,7 +68,7 @@ public:
 			const QString& userDir = "",
 			const QString& factoryDir = "");
 
-	virtual ~FileBrowser() = default;
+	~FileBrowser() override = default;
 
 private slots:
 	void reloadTree( void );
@@ -102,7 +107,7 @@ class FileBrowserTreeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget( QWidget * parent );
-	virtual ~FileBrowserTreeWidget() = default;
+	~FileBrowserTreeWidget() override = default;
 
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
@@ -142,11 +147,11 @@ private:
 
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrack( FileItem* item, bool songEditor );
-	bool openInNewSampleTrack( FileItem* item );
-	void sendToActiveInstrumentTrack( FileItem* item );
+	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
+	bool openInNewSampleTrack( lmms::gui::FileItem* item );
+	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
-	void openContainingFolder( FileItem* item );
+	void openContainingFolder( lmms::gui::FileItem* item );
 
 } ;
 
@@ -280,5 +285,9 @@ private:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

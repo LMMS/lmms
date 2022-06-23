@@ -28,18 +28,29 @@
 #include "EffectControlDialog.h"
 
 
+namespace lmms
+{
+
 class ReverbSCControls;
 
+
+namespace gui
+{
 
 class ReverbSCControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	ReverbSCControlDialog( ReverbSCControls* controls );
-	virtual ~ReverbSCControlDialog()
+	~ReverbSCControlDialog() override
 	{
 	}
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

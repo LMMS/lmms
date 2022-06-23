@@ -31,19 +31,24 @@
 #include "Effect.h"
 #include "VstEffectControls.h"
 
+namespace lmms
+{
+
+
 class VstPlugin;
+
 
 class VstEffect : public Effect
 {
 public:
 	VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~VstEffect();
+	~VstEffect() override;
 
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-							const fpp_t _frames );
+	bool processAudioBuffer( sampleFrame * _buf,
+							const fpp_t _frames ) override;
 
-	virtual EffectControls * controls()
+	EffectControls * controls() override
 	{
 		return &m_vstControls;
 	}
@@ -61,11 +66,12 @@ private:
 
 
 	friend class VstEffectControls;
-	friend class VstEffectControlDialog;
-	friend class ManageVSTEffectView;
+	friend class gui::VstEffectControlDialog;
+	friend class gui::ManageVSTEffectView;
 
 } ;
 
 
+} // namespace lmms
 
 #endif

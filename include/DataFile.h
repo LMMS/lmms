@@ -33,8 +33,13 @@
 #include "lmms_export.h"
 #include "MemoryManager.h"
 
-class ProjectVersion;
 class QTextStream;
+
+namespace lmms
+{
+
+class ProjectVersion;
+
 
 class LMMS_EXPORT DataFile : public QDomDocument
 {
@@ -154,5 +159,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

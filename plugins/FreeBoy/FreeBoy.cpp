@@ -41,6 +41,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 const blip_time_t FRAME_LENGTH = 70224;
 const long CLOCK_RATE = 4194304;
 
@@ -427,10 +431,14 @@ void FreeBoyInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
 {
-	return( new FreeBoyInstrumentView( this, _parent ) );
+	return( new gui::FreeBoyInstrumentView( this, _parent ) );
 }
+
+
+namespace gui
+{
 
 
 class FreeBoyKnob : public Knob
@@ -721,6 +729,9 @@ void FreeBoyInstrumentView::modelChanged()
 	m_graph->setModel( &p->m_graphModel );
 }
 
+
+} // namespace gui
+
 extern "C"
 {
 
@@ -735,3 +746,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
+} // namespace lmms

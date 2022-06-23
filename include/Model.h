@@ -30,6 +30,8 @@
 
 #include "lmms_export.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT Model : public QObject
 {
@@ -43,7 +45,7 @@ public:
 	{
 	}
 
-	virtual ~Model()
+	~Model() override
 	{
 	}
 
@@ -87,6 +89,8 @@ signals:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

@@ -24,7 +24,7 @@
     <widget class="QLineEdit" name="filterEdit"/>
    </item>
    <item>
-    <widget class="RowTableView" name="pluginList">
+    <widget class="lmms::gui::RowTableView" name="pluginList">
      <property name="minimumSize">
       <size>
        <width>500</width>

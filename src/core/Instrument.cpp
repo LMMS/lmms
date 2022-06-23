@@ -31,6 +31,10 @@
 #include "lmms_constants.h"
 
 
+namespace lmms
+{
+
+
 Instrument::Instrument(InstrumentTrack * _instrument_track,
 			const Descriptor * _descriptor,
 			const Descriptor::SubPluginFeatures::Key *key) :
@@ -201,3 +205,6 @@ QString Instrument::fullDisplayName() const
 {
 	return instrumentTrack()->displayName();
 }
+
+
+} // namespace lmms

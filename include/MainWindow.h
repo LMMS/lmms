@@ -37,10 +37,18 @@ class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
+namespace lmms
+{
+
 class ConfigManager;
+
+namespace gui
+{
+
 class PluginView;
 class SubWindow;
 class ToolButton;
+class GuiApplication;
 
 
 class MainWindow : public QMainWindow
@@ -182,7 +190,7 @@ protected:
 private:
 	MainWindow();
 	MainWindow( const MainWindow & );
-	virtual ~MainWindow();
+	~MainWindow() override;
 
 	void finalize();
 
@@ -249,5 +257,10 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

@@ -527,52 +527,52 @@ LMMS&apos;yi başka bir dilde çevirmekle ilgileniyorsanız veya mevcut çeviril
 <context>
     <name>AutomationClipView</name>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>Ayarkayıt Düzenleyici&apos;de aç</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="181"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>Temizle</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="184"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>İsmini sıfırla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="187"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>İsmini değiştir</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="190"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>Kayıdı başlat/durdur</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="193"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>Dikey Yönde Çevir (Görünür)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="196"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>Yatay Yönde Çevir (Görünür)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="201"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1 Bağlantı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="209"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>Şunun bağlantısını kes: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="448"/>
         <source>Model is already connected to this clip.</source>
         <translation>Model zaten bu desene bağlanmış.</translation>
     </message>
@@ -651,17 +651,17 @@ LMMS&apos;yi başka bir dilde çevirmekle ilgileniyorsanız veya mevcut çeviril
 <context>
     <name>PatternClipView</name>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="53"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>Beat+Bassline Düzenleyici&apos;de aç</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>İsmini sıfırla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>İsmini değiştir</translation>
     </message>
@@ -3435,22 +3435,22 @@ Bu mod, VST eklentileri için kullanılamaz.</translation>
 <context>
     <name>ControllerRackView</name>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="49"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="49"/>
         <source>Controller Rack</source>
         <translation>Denetleyici Rafı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="64"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="64"/>
         <source>Add</source>
         <translation>Ekle</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="127"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="127"/>
         <source>Confirm Delete</source>
         <translation>Silmeyi Onayla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="128"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="128"/>
         <source>Confirm delete? There are existing connection(s) associated with this controller. There is no way to undo.</source>
         <translation>Silmeyi onaylıyor musunuz? Bu denetleyiciyle ilişkili mevcut bağlantılar var. Geri almanın bir yolu yok.</translation>
     </message>
@@ -3458,32 +3458,32 @@ Bu mod, VST eklentileri için kullanılamaz.</translation>
 <context>
     <name>ControllerView</name>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="69"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="69"/>
         <source>Controls</source>
         <translation>Kontroller</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="146"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="146"/>
         <source>Rename controller</source>
         <translation>Denetleyiciyi yeniden adlandır</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="147"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="147"/>
         <source>Enter the new name for this controller</source>
         <translation>Bu denetleyicinin yeni adını girin</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="154"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="154"/>
         <source>LFO</source>
         <translation>LFO</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="178"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="178"/>
         <source>&amp;Remove this controller</source>
         <translation>Bu denetleyiciyi &amp;kaldırın</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="180"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="180"/>
         <source>Re&amp;name this controller</source>
         <translation>Bu denetleyiciyi yeniden ad&amp;landırın</translation>
     </message>
@@ -4211,12 +4211,12 @@ Emin değilseniz, &quot;Otomatik&quot; olarak bırakın.</translation>
 <context>
     <name>EffectRackView</name>
     <message>
-        <location filename="../../src/gui/widgets/EffectRackView.cpp" line="44"/>
+        <location filename="../../src/gui/EffectRackView.cpp" line="44"/>
         <source>EFFECTS CHAIN</source>
         <translation>ETKİ ZİNCİRİ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectRackView.cpp" line="61"/>
+        <location filename="../../src/gui/EffectRackView.cpp" line="61"/>
         <source>Add effect</source>
         <translation>Efekt ekleyin</translation>
     </message>
@@ -4253,57 +4253,57 @@ Emin değilseniz, &quot;Otomatik&quot; olarak bırakın.</translation>
 <context>
     <name>EffectView</name>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="60"/>
+        <location filename="../../src/gui/EffectView.cpp" line="60"/>
         <source>On/Off</source>
         <translation>Aç/Kapat</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="64"/>
+        <location filename="../../src/gui/EffectView.cpp" line="64"/>
         <source>W/D</source>
         <translation>I/K</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="67"/>
+        <location filename="../../src/gui/EffectView.cpp" line="67"/>
         <source>Wet Level:</source>
         <translation>Islak düzey:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="71"/>
+        <location filename="../../src/gui/EffectView.cpp" line="71"/>
         <source>DECAY</source>
         <translation>BOZULMA</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="74"/>
+        <location filename="../../src/gui/EffectView.cpp" line="74"/>
         <source>Time:</source>
         <translation>Zaman:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="78"/>
+        <location filename="../../src/gui/EffectView.cpp" line="78"/>
         <source>GATE</source>
         <translation>PORTAL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="81"/>
+        <location filename="../../src/gui/EffectView.cpp" line="81"/>
         <source>Gate:</source>
         <translation>Portal:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="88"/>
+        <location filename="../../src/gui/EffectView.cpp" line="88"/>
         <source>Controls</source>
         <translation>Kontroller</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="196"/>
+        <location filename="../../src/gui/EffectView.cpp" line="196"/>
         <source>Move &amp;up</source>
         <translation>Y&amp;ukarı taşı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="199"/>
+        <location filename="../../src/gui/EffectView.cpp" line="199"/>
         <source>Move &amp;down</source>
         <translation>&amp;Aşağı taşı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="203"/>
+        <location filename="../../src/gui/EffectView.cpp" line="203"/>
         <source>&amp;Remove this plugin</source>
         <translation>Bu eklentiyi &amp;kaldır</translation>
     </message>
@@ -4384,123 +4384,123 @@ Emin değilseniz, &quot;Otomatik&quot; olarak bırakın.</translation>
 <context>
     <name>EnvelopeAndLfoView</name>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="98"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="98"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="142"/>
         <source>DEL</source>
         <translation>SİL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="100"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="144"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="100"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="144"/>
         <source>Pre-delay:</source>
         <translation>Ön gecikme:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="104"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="148"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="104"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="148"/>
         <source>ATT</source>
         <translation>ATT</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="106"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="150"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="106"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="150"/>
         <source>Attack:</source>
         <translation>Saldırı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="110"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="110"/>
         <source>HOLD</source>
         <translation>TUT</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="112"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="112"/>
         <source>Hold:</source>
         <translation>Ambar:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="116"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="116"/>
         <source>DEC</source>
         <translation>DEC</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="118"/>
         <source>Decay:</source>
         <translation>Bozunma:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="122"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="122"/>
         <source>SUST</source>
         <translation>SUST</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="124"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="124"/>
         <source>Sustain:</source>
         <translation>Sürdürmek:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="128"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="128"/>
         <source>REL</source>
         <translation>REL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="130"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="130"/>
         <source>Release:</source>
         <translation>Yayınla:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="134"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="160"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="160"/>
         <source>AMT</source>
         <translation>AMT</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="136"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="162"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="136"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="162"/>
         <source>Modulation amount:</source>
         <translation>Modülasyon miktarı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="154"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="154"/>
         <source>SPD</source>
         <translation>SPD</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="156"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="156"/>
         <source>Frequency:</source>
         <translation>Frekans:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="218"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="218"/>
         <source>FREQ x 100</source>
         <translation>FREQ x 100</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="221"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="221"/>
         <source>Multiply LFO frequency by 100</source>
         <translation>LFO frekansını 100 ile çarpın</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="224"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="224"/>
         <source>MODULATE ENV AMOUNT</source>
         <translation>ENV MİKTARINI MODÜLE EDİN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="229"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="229"/>
         <source>Control envelope amount by this LFO</source>
         <translation>Bu LFO ile kontrol zarfı miktarı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="504"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="504"/>
         <source>ms/LFO:</source>
         <translation>ms/LFO:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="520"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="520"/>
         <source>Hint</source>
         <translation>İpucu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="521"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="521"/>
         <source>Drag and drop a sample into this window.</source>
         <translation>Bu pencereye bir numune sürükleyip bırakın.</translation>
     </message>
@@ -5621,47 +5621,47 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
 <context>
     <name>MixerLine</name>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="86"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="86"/>
         <source>Channel send amount</source>
         <translation>Kanal gönderme miktarı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="242"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="242"/>
         <source>Move &amp;left</source>
         <translation>Sol&amp;a taşı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="243"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="243"/>
         <source>Move &amp;right</source>
         <translation>&amp;Sağa taşı</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="245"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="245"/>
         <source>Rename &amp;channel</source>
         <translation>&amp;Kanalı yeniden adlandır</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="250"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="250"/>
         <source>R&amp;emove channel</source>
         <translation>Kanalı k&amp;aldır</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="253"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="253"/>
         <source>Remove &amp;unused channels</source>
         <translation>&amp;Kullanılmayan kanalları kaldırın</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="255"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="255"/>
         <source>Set channel color</source>
         <translation>Kanal rengini ayarla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="256"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="256"/>
         <source>Remove channel color</source>
         <translation>Kanal rengini kaldır</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="257"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="257"/>
         <source>Pick random channel color</source>
         <translation>Rastgele kanal rengi seçin</translation>
     </message>
@@ -5947,119 +5947,119 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
 <context>
     <name>InstrumentFunctionArpeggioView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="95"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="95"/>
         <source>ARPEGGIO</source>
         <translation>ARPEJ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="117"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="117"/>
         <source>RANGE</source>
         <translation>ARALIK</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="118"/>
         <source>Arpeggio range:</source>
         <translation>Arpej aralığı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="118"/>
         <source>octave(s)</source>
         <translation>octave(s)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="121"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="121"/>
         <source>REP</source>
         <translation>REP</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="122"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="122"/>
         <source>Note repeats:</source>
         <translation>Nota tekrarları:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="122"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="122"/>
         <source>time(s)</source>
         <translation>zamanlar)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="125"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="125"/>
         <source>CYCLE</source>
         <translation>DÖNGÜ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="126"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="126"/>
         <source>Cycle notes:</source>
         <translation>Döngü notaları:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="126"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="126"/>
         <source>note(s)</source>
         <translation>nota(lar)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="129"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="129"/>
         <source>SKIP</source>
         <translation>ATLA</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="130"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="130"/>
         <source>Skip rate:</source>
         <translation>Atlama oranı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="130"/>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="134"/>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="130"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="142"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="133"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="133"/>
         <source>MISS</source>
         <translation>KAÇIRMA</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="134"/>
         <source>Miss rate:</source>
         <translation>Kaçırma oranı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="137"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="137"/>
         <source>TIME</source>
         <translation>ZAMAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="138"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="138"/>
         <source>Arpeggio time:</source>
         <translation>Arpej zamanı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="138"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="138"/>
         <source>ms</source>
         <translation>ms</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="141"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="141"/>
         <source>GATE</source>
         <translation>PORTAL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="142"/>
         <source>Arpeggio gate:</source>
         <translation>Arpej kapısı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="145"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="145"/>
         <source>Chord:</source>
         <translation>Akord:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="148"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="148"/>
         <source>Direction:</source>
         <translation>Yön:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="151"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="151"/>
         <source>Mode:</source>
         <translation>Kip:</translation>
     </message>
@@ -6556,27 +6556,27 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
 <context>
     <name>InstrumentFunctionNoteStackingView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="41"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="41"/>
         <source>STACKING</source>
         <translation>İSTİFLEME</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="55"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="55"/>
         <source>Chord:</source>
         <translation>Akord:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="58"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="58"/>
         <source>RANGE</source>
         <translation>ARALIK</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="59"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="59"/>
         <source>Chord range:</source>
         <translation>Akord aralığı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="59"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="59"/>
         <source>octave(s)</source>
         <translation>octave(s)</translation>
     </message>
@@ -6584,63 +6584,63 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
 <context>
     <name>InstrumentMidiIOView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="51"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="51"/>
         <source>ENABLE MIDI INPUT</source>
         <translation>MIDI GİRİŞİNİ ETKİNLEŞTİR</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="83"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="83"/>
         <source>ENABLE MIDI OUTPUT</source>
         <translation>MIDI ÇIKIŞINI ETKİNLEŞTİR</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="62"/>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="94"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="62"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="94"/>
         <source>CHAN</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of two digits</extracomment>
         <translation>KANAL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="71"/>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="102"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="71"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="102"/>
         <source>VELOC</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of three digits</extracomment>
         <translation>VELOC</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="109"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="109"/>
         <source>PROG</source>
         <extracomment>This string must be be short, its width must be less than the * width of LCD spin-box of three digits</extracomment>
         <translation>PROG</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="118"/>
         <source>NOTE</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of three digits</extracomment>
         <translation>NOTA</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="134"/>
         <source>MIDI devices to receive MIDI events from</source>
         <translation>MIDI olaylarının alınacağı MIDI cihazları</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="142"/>
         <source>MIDI devices to send MIDI events to</source>
         <translation>MIDI olaylarının gönderileceği MIDI cihazları</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="151"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="151"/>
         <source>CUSTOM BASE VELOCITY</source>
         <translation>ÖZEL BAZ HIZI</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="158"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="158"/>
         <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity.</source>
         <translation>% 100 nota hızında MIDI tabanlı enstrümanlar için hız normalleştirme tabanını belirtin.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="165"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="165"/>
         <source>BASE VELOCITY</source>
         <translation>TABAN HIZI</translation>
     </message>
@@ -6648,12 +6648,12 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
 <context>
     <name>InstrumentMiscView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="221"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>
         <translation>ANA PERDE</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="225"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="225"/>
         <source>Enables the use of master pitch</source>
         <translation>Ana adımın kullanılmasını sağlar</translation>
     </message>
@@ -6820,42 +6820,42 @@ Lütfen dosyaya ve dosyayı içeren dizine yazma izniniz olduğundan emin olun v
 <context>
     <name>InstrumentSoundShapingView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="55"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="55"/>
         <source>TARGET</source>
         <translation>HEDEF</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="70"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="70"/>
         <source>FILTER</source>
         <translation>FİLTRE</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="82"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="82"/>
         <source>FREQ</source>
         <translation>FREK</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="84"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="84"/>
         <source>Cutoff frequency:</source>
         <translation>Kesim frekansı:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="84"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="84"/>
         <source>Hz</source>
         <translation>Hz</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="88"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="88"/>
         <source>Q/RESO</source>
         <translation>Q/RESO</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="90"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="90"/>
         <source>Q/Resonance:</source>
         <translation>Q/Rezonans:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="93"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="93"/>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
         <translation>Zarflar, LFO&apos;lar ve filtreler mevcut cihaz tarafından desteklenmemektedir.</translation>
     </message>
@@ -7229,12 +7229,12 @@ Telif Hakkı (C) 2017 ROLI Ltd.</translation>
 <context>
     <name>LadspaControlView</name>
     <message>
-        <location filename="../../src/gui/widgets/LadspaControlView.cpp" line="52"/>
+        <location filename="../../src/gui/LadspaControlView.cpp" line="52"/>
         <source>Link channels</source>
         <translation>Kanalları bağla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/LadspaControlView.cpp" line="104"/>
+        <location filename="../../src/gui/LadspaControlView.cpp" line="104"/>
         <source>Value:</source>
         <translation>Değer:</translation>
     </message>
@@ -7449,7 +7449,7 @@ Bir dosya seçmek için çift tıklayın.</translation>
     </message>
 </context>
 <context>
-    <name>LmmsCore</name>
+    <name>Engine</name>
     <message>
         <location filename="../../src/core/Engine.cpp" line="58"/>
         <source>Generating wavetables</source>
@@ -9864,42 +9864,42 @@ LMMS ile ilgili belgeler için lütfen http://lmms.sf.net/wiki adresini ziyaret 
 <context>
     <name>MidiClipView</name>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="143"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="143"/>
         <source>Open in piano-roll</source>
         <translation>Piyano rulosunda aç</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="149"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="149"/>
         <source>Set as ghost in piano-roll</source>
         <translation>Piyano rulosunda hayalet olarak ayarla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="158"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="158"/>
         <source>Clear all notes</source>
         <translation>Tüm notaları temizle</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="161"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="161"/>
         <source>Reset name</source>
         <translation>İsmini sıfırla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="164"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="164"/>
         <source>Change name</source>
         <translation>İsmini değiştir</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="172"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="172"/>
         <source>Add steps</source>
         <translation>Uzat</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="174"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="174"/>
         <source>Remove steps</source>
         <translation>Kısalt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="176"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="176"/>
         <source>Clone Steps</source>
         <translation>Klon Adımları</translation>
     </message>
@@ -10415,17 +10415,17 @@ LMMS ile ilgili belgeler için lütfen http://lmms.sf.net/wiki adresini ziyaret 
 <context>
     <name>PianoView</name>
     <message>
-        <location filename="../../src/gui/PianoView.cpp" line="813"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="813"/>
         <source>Base note</source>
         <translation>Temel nota</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PianoView.cpp" line="818"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="818"/>
         <source>First note</source>
         <translation>İlk nota</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PianoView.cpp" line="823"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="823"/>
         <source>Last note</source>
         <translation>Son nota</translation>
     </message>
@@ -11460,147 +11460,147 @@ Daha hızlı bir tarama süresi elde etmek için bu kontrolleri devre dışı b�
 <context>
     <name>ProjectNotes</name>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="70"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="70"/>
         <source>Project Notes</source>
         <translation>Proje Notları</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="92"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="92"/>
         <source>Enter project notes here</source>
         <translation>Buraya proje notlarını girin</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="113"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="113"/>
         <source>Edit Actions</source>
         <translation>İşlemleri Düzenle</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="116"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="116"/>
         <source>&amp;Undo</source>
         <translation>Geri &amp;Al</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="118"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="118"/>
         <source>%1+Z</source>
         <translation>%1+Z</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="122"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="122"/>
         <source>&amp;Redo</source>
         <translation>&amp;Yinele</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="124"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="124"/>
         <source>%1+Y</source>
         <translation>%1+Y</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="128"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="128"/>
         <source>&amp;Copy</source>
         <translation>&amp;Kopyala</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="130"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="130"/>
         <source>%1+C</source>
         <translation>%1+C</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="134"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="134"/>
         <source>Cu&amp;t</source>
         <translation>Ke&amp;s</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="136"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="136"/>
         <source>%1+X</source>
         <translation>%1+X</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="140"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="140"/>
         <source>&amp;Paste</source>
         <translation>&amp;Yapıştır</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="142"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="142"/>
         <source>%1+V</source>
         <translation>%1+V</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="147"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="147"/>
         <source>Format Actions</source>
         <translation>Eylemleri Biçimlendir</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="171"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="171"/>
         <source>&amp;Bold</source>
         <translation>&amp;Kalın</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="172"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="172"/>
         <source>%1+B</source>
         <translation>%1+B</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="178"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="178"/>
         <source>&amp;Italic</source>
         <translation>&amp;İtalik</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="179"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="179"/>
         <source>%1+I</source>
         <translation>%1+I</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="186"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="186"/>
         <source>&amp;Underline</source>
         <translation>&amp;Altı Çizili</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="187"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="187"/>
         <source>%1+U</source>
         <translation>%1+U</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="198"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="198"/>
         <source>&amp;Left</source>
         <translation>&amp;Sol</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="199"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="199"/>
         <source>%1+L</source>
         <translation>%1+L</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="205"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="205"/>
         <source>C&amp;enter</source>
         <translation>M&amp;erkez</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="207"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="207"/>
         <source>%1+E</source>
         <translation>%1+E</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="212"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="212"/>
         <source>&amp;Right</source>
         <translation>&amp;Sağ</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="214"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="214"/>
         <source>%1+R</source>
         <translation>%1+R</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="220"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="220"/>
         <source>&amp;Justify</source>
         <translation>&amp;Yasla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="221"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="221"/>
         <source>%1+J</source>
         <translation>%1+J</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="228"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="228"/>
         <source>&amp;Color...</source>
         <translation>&amp;Renk...</translation>
     </message>
@@ -12324,67 +12324,67 @@ Daha hızlı bir tarama süresi elde etmek için bu kontrolleri devre dışı b�
 <context>
     <name>SampleClipView</name>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="60"/>
         <source>Double-click to open sample</source>
         <translation>Örneği açmak için çift tıklayın</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="84"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="84"/>
         <source>Delete (middle mousebutton)</source>
         <translation>Sil (orta klik)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="85"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="85"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation>Seçimi sil (orta fare düğmesi)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="93"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="93"/>
         <source>Cut</source>
         <translation>Kes</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="94"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="94"/>
         <source>Cut selection</source>
         <translation>Seçimi Kes</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="101"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="101"/>
         <source>Copy</source>
         <translation>Kopyala</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="102"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="102"/>
         <source>Copy selection</source>
         <translation>Seçimi Kopyala</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="107"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="107"/>
         <source>Paste</source>
         <translation>Yapıştır</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="115"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="115"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>Sesi kapat/sesi aç (&lt;%1&gt; + orta tıklama)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="116"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="116"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation>Seçimin sesini kapat/aç (&lt;%1&gt; + orta tıklama)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="125"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="125"/>
         <source>Reverse sample</source>
         <translation>Örneği ters çevir</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="133"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="133"/>
         <source>Set clip color</source>
         <translation>Klip rengini ayarla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="135"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="135"/>
         <source>Use track color</source>
         <translation>Parça rengini kullan</translation>
     </message>
@@ -12416,37 +12416,37 @@ Daha hızlı bir tarama süresi elde etmek için bu kontrolleri devre dışı b�
 <context>
     <name>SampleTrackView</name>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="56"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="56"/>
         <source>Track volume</source>
         <translation>Parça ses düzeyi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="59"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="59"/>
         <source>Channel volume:</source>
         <translation>Kanal ses düzeyi:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="66"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="66"/>
         <source>VOL</source>
         <translation>SES</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="70"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="70"/>
         <source>Panning</source>
         <translation>Panning</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="72"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="72"/>
         <source>Panning:</source>
         <translation>Panning:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="74"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="74"/>
         <source>PAN</source>
         <translation>PAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="142"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="142"/>
         <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
@@ -13025,7 +13025,7 @@ Gecikme: %2 ms</translation>
 <context>
     <name>SideBarWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/SideBarWidget.cpp" line="47"/>
+        <location filename="../../src/gui/SideBarWidget.cpp" line="47"/>
         <source>Close</source>
         <translation>Kapat</translation>
     </message>
@@ -13331,12 +13331,12 @@ Gecikme: %2 ms</translation>
 <context>
     <name>StepRecorderWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/StepRecorderWidget.cpp" line="92"/>
+        <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="92"/>
         <source>Hint</source>
         <translation>İpucu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/StepRecorderWidget.cpp" line="92"/>
+        <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="92"/>
         <source>Move recording curser using &lt;Left/Right&gt; arrows</source>
         <translation>&lt;Sol/Sağ&gt; oklarını kullanarak kayıt imlecini hareket ettirin</translation>
     </message>
@@ -13511,37 +13511,37 @@ Gecikme: %2 ms</translation>
 <context>
     <name>TimeLineWidget</name>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="124"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="124"/>
         <source>Auto scrolling</source>
         <translation>Otomatik kaydırma</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="131"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="131"/>
         <source>Loop points</source>
         <translation>Döngü noktaları</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="141"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="141"/>
         <source>After stopping go back to beginning</source>
         <translation>Durduktan sonra başa dön</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="144"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="144"/>
         <source>After stopping go back to position at which playing was started</source>
         <translation>Durduktan sonra oyunun başladığı konuma geri dönün</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="148"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="148"/>
         <source>After stopping keep position</source>
         <translation>Durduktan sonra pozisyonunuzu koruyun</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="356"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="356"/>
         <source>Hint</source>
         <translation>İpucu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="357"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="357"/>
         <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation>Manyetik döngü noktalarını devre dışı bırakmak için &lt;%1&gt; tuşuna basın.</translation>
     </message>
@@ -13634,93 +13634,93 @@ Lütfen dosyayı ve dosyayı içeren dizini okuma iznine sahip olduğunuzdan emi
 <context>
     <name>ClipView</name>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="647"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="647"/>
         <source>Current position</source>
         <translation>Şu anki pozisyon</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="655"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="655"/>
         <source>Current length</source>
         <translation>Mevcut uzunluk</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="656"/>
-        <location filename="../../src/gui/ClipView.cpp" line="908"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="656"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="908"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 to %5:%6)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="675"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="675"/>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation>Bir kopya oluşturmak için &lt;%1&gt; tuşuna basın ve sürükleyin.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="676"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="676"/>
         <source>Press &lt;%1&gt; for free resizing.</source>
         <translation>Serbest yeniden boyutlandırma için &lt;%1&gt; seçeneğine basın.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="677"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="677"/>
         <source>Hint</source>
         <translation>İpucu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1007"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1007"/>
         <source>Delete (middle mousebutton)</source>
         <translation>Sil (orta klik)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1008"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1008"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation>Seçimi sil (orta fare düğmesi)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1016"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1016"/>
         <source>Cut</source>
         <translation>Kes</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1017"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1017"/>
         <source>Cut selection</source>
         <translation>Seçimi Kes</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1024"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1024"/>
         <source>Merge Selection</source>
         <translation>Seçimi Birleştir</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1033"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1033"/>
         <source>Copy</source>
         <translation>Kopyala</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1034"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1034"/>
         <source>Copy selection</source>
         <translation>Seçimi Kopyala</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1039"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1039"/>
         <source>Paste</source>
         <translation>Yapıştır</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1047"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1047"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>Sesi kapat/sesi aç (&lt;%1&gt; + orta tıklama)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1048"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1048"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation>Seçimin sesini kapat/aç (&lt;%1&gt; + orta tıklama)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1054"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1054"/>
         <source>Set clip color</source>
         <translation>Klip rengini ayarla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1056"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1056"/>
         <source>Use track color</source>
         <translation>Parça rengini kullan</translation>
     </message>
@@ -13728,7 +13728,7 @@ Lütfen dosyayı ve dosyayı içeren dizini okuma iznine sahip olduğunuzdan emi
 <context>
     <name>TrackContentWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/TrackContentWidget.cpp" line="670"/>
+        <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="670"/>
         <source>Paste</source>
         <translation>Yapıştır</translation>
     </message>
@@ -13736,94 +13736,94 @@ Lütfen dosyayı ve dosyayı içeren dizini okuma iznine sahip olduğunuzdan emi
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="61"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="61"/>
         <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop action.</source>
         <translation>Yeni bir sürükle ve bırak eylemine başlamak için tutamağa tıklarken &lt;%1&gt; tuşuna basın.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="76"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="76"/>
         <source>Actions</source>
         <translation>Eylemler</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="79"/>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="102"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="79"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="102"/>
         <source>Mute</source>
         <translation>Ses kapatma</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="84"/>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="105"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="84"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="105"/>
         <source>Solo</source>
         <translation>Tek</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="204"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="204"/>
         <source>After removing a track, it can not be recovered. Are you sure you want to remove track &quot;%1&quot;?</source>
         <translation>Bir parça kaldırıldıktan sonra kurtarılamaz. &quot;%1&quot; parçasını kaldırmak istediğinizden emin misiniz?</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="207"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="207"/>
         <source>Confirm removal</source>
         <translation>Kaldırma işlemini onayla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="208"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="208"/>
         <source>Don&apos;t ask again</source>
         <translation>Bir daha sorma</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="328"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="328"/>
         <source>Clone this track</source>
         <translation>Bu parçayı çoğalt</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="331"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="331"/>
         <source>Remove this track</source>
         <translation>Bu parçayı sil</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="336"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="336"/>
         <source>Clear this track</source>
         <translation>Bu parçayı temizle</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="338"/>
         <source>Channel %1: %2</source>
         <translation>FX %1: %2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="338"/>
         <source>Assign to new mixer Channel</source>
         <translation>Yeni FX Kanalına atayın</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="350"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="350"/>
         <source>Turn all recording on</source>
         <translation>Tüm kaydı aç</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="351"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="351"/>
         <source>Turn all recording off</source>
         <translation>Tüm kayıtları kapat</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="356"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="356"/>
         <source>Change color</source>
         <translation>Rengini değiştir</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="358"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="358"/>
         <source>Reset color to default</source>
         <translation>Rengini varsayılana sıfırla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="360"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="360"/>
         <source>Set random color</source>
         <translation>Rastgele renk ayarla</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="363"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="363"/>
         <source>Clear clip colors</source>
         <translation>Klip renklerini temizle</translation>
     </message>

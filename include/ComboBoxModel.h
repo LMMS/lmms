@@ -32,6 +32,8 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT ComboBoxModel : public IntModel
 {
@@ -45,7 +47,7 @@ public:
 	{
 	}
 
-	virtual ~ComboBoxModel()
+	~ComboBoxModel() override
 	{
 		clear();
 	}
@@ -91,5 +93,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif

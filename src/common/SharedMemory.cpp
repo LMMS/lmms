@@ -44,9 +44,11 @@
 #	include <QSharedMemory>
 #endif
 
-namespace detail {
+
+namespace lmms::detail {
 
 #if _POSIX_SHARED_MEMORY_OBJECTS > 0
+
 
 namespace {
 
@@ -198,4 +200,4 @@ SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
 	m_ptr{other.m_ptr}
 { }
 
-} // namespace detail
+} // namespace lmms::detail

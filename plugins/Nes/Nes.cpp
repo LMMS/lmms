@@ -36,6 +36,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -699,9 +703,9 @@ QString NesInstrument::nodeName() const
 }
 
 
-PluginView * NesInstrument::instantiateView( QWidget * parent )
+gui::PluginView* NesInstrument::instantiateView( QWidget * parent )
 {
-	return( new NesInstrumentView( this, parent ) );
+	return( new gui::NesInstrumentView( this, parent ) );
 }
 
 
@@ -724,6 +728,8 @@ void NesInstrument::updateFreq3()
 }
 
 
+namespace gui
+{
 
 
 QPixmap * NesInstrumentView::s_artwork = nullptr;
@@ -912,6 +918,9 @@ void NesInstrumentView::modelChanged()
 }
 
 
+} // namespace gui
+
+
 extern "C"
 {
 
@@ -925,4 +934,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * _data )
 }
 
 
-
+} // namespace lmms

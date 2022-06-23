@@ -29,7 +29,13 @@
 
 #include "ClipView.h"
 
+namespace lmms
+{
+
 class AutomationClip;
+
+namespace gui
+{
 
 
 class AutomationClipView : public ClipView
@@ -39,7 +45,7 @@ class AutomationClipView : public ClipView
 
 public:
 	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
-	virtual ~AutomationClipView();
+	~AutomationClipView() override;
 
 public slots:
 	/// Opens this view's clip in the global automation editor
@@ -74,5 +80,9 @@ private:
 	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

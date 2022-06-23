@@ -28,13 +28,16 @@
 #include <QMainWindow>
 #include <QToolBar>
 
+class QAction;
+
+namespace lmms::gui
+{
+
 static const int Quantizations[] = {
 	1, 2, 4, 8, 16, 32, 64,
 	3, 6, 12, 24, 48, 96, 192
 };
 
-
-class QAction;
 
 class DropToolBar;
 
@@ -78,7 +81,7 @@ protected:
 	/// \param	record	If set true, the editor's toolbar will contain record
 	///					buttons in addition to the play and stop buttons.
 	Editor(bool record = false, bool record_step = false);
-	virtual ~Editor();
+	~Editor() override;
 
 
 	DropToolBar* m_toolBar;
@@ -107,5 +110,7 @@ protected:
 	void dropEvent(QDropEvent* event) override;
 };
 
+
+} // namespace lmms::gui
 
 #endif

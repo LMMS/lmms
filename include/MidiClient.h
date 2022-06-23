@@ -31,9 +31,13 @@
 
 #include "MidiEvent.h"
 
+class QObject;
+
+
+namespace lmms
+{
 
 class MidiPort;
-class QObject;
 class TimePos;
 
 
@@ -121,7 +125,7 @@ class MidiClientRaw : public MidiClient
 {
 public:
 	MidiClientRaw();
-	virtual ~MidiClientRaw();
+	~MidiClientRaw() override;
 
 	// we are raw-clients for sure!
 	bool isRaw() const override
@@ -167,6 +171,7 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif
 

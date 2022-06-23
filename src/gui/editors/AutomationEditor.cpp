@@ -62,6 +62,9 @@
 #include "TimeLineWidget.h"
 
 
+namespace lmms::gui
+{
+
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
 QPixmap * AutomationEditor::s_toolDrawOut = nullptr;
@@ -147,10 +150,10 @@ AutomationEditor::AutomationEditor() :
 					Song::Mode_PlayAutomationClip ),
 					m_currentPosition,
 					Song::Mode_PlayAutomationClip, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
-		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+		m_timeLine, SLOT( updatePosition( const lmms::TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+			this, SLOT( updatePosition( const lmms::TimePos & ) ) );
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
@@ -2107,3 +2110,6 @@ void AutomationEditorWindow::updateWindowTitle()
 
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 }
+
+
+} // namespace lmms::gui

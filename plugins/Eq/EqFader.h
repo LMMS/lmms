@@ -32,6 +32,9 @@
 #include "MainWindow.h"
 #include "TextFloat.h"
 
+namespace lmms::gui
+{
+
 
 class EqFader : public Fader
 {
@@ -69,7 +72,7 @@ public:
 
 
 
-	~EqFader()
+	~EqFader() override
 	{
 	}
 
@@ -112,4 +115,8 @@ private:
 	FloatModel* m_model;
 
 };
+
+
+} // namespace lmms::gui
+
 #endif // EQFADER_H

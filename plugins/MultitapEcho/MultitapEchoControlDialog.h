@@ -29,16 +29,29 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class MultitapEchoControls;
+
+namespace gui
+{
+
 
 class MultitapEchoControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	MultitapEchoControlDialog( MultitapEchoControls * controls );
-	virtual ~MultitapEchoControlDialog()
+	~MultitapEchoControlDialog() override
 	{
 	}
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

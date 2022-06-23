@@ -37,12 +37,21 @@
 class QPixmap;
 class QPushButton;
 class QScrollArea;
-
-class CustomTextKnob;
-class FloatModel;
 class QGridLayout;
-class PixmapButton;
+
+namespace lmms
+{
+
+class FloatModel;
 class VstPlugin;
+
+namespace gui
+{
+class PixmapButton;
+class CustomTextKnob;
+class VestigeInstrumentView;
+class ManageVestigeInstrumentView;
+} // namespace gui
 
 
 class VestigeInstrument : public Instrument
@@ -68,10 +77,10 @@ public:
 
 	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 protected slots:
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 	void handleConfigChange( QString cls, QString attr, QString value );
 	void reloadPlugin();
 
@@ -90,11 +99,14 @@ private:
 	int paramCount;
 
 
-	friend class VestigeInstrumentView;
-	friend class ManageVestigeInstrumentView;
+	friend class gui::VestigeInstrumentView;
+	friend class gui::ManageVestigeInstrumentView;
 
 } ;
 
+
+namespace gui
+{
 
 class ManageVestigeInstrumentView : public InstrumentViewFixedSize
 {
@@ -107,7 +119,7 @@ public:
 protected slots:
 	void syncPlugin( void );
 	void displayAutomatedOnly( void );
-	void setParameter( Model * action );
+	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
 
@@ -184,5 +196,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

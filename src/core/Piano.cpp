@@ -41,6 +41,10 @@
 #include "InstrumentTrack.h"
 
 
+namespace lmms
+{
+
+
 /*! The black / white order of keys as they appear on the keyboard.
  */
 static const Piano::KeyTypes KEY_ORDER[] =
@@ -137,3 +141,5 @@ bool Piano::isWhiteKey( int key )
 	return !isBlackKey( key );
 }
 
+
+} // namespace lmms

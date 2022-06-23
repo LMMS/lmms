@@ -34,6 +34,9 @@
 #include <samplerate.h>
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\
 	name = new Knob( knobStyled, this ); 				\
@@ -74,9 +77,14 @@ const int	B1_OSC = 2;
 const int	B2_OSC = 3;
 const int	NUM_OSCS = 4;
 
+class WatsynInstrument;
+
+namespace gui
+{
 class automatableButtonGroup;
 class PixmapButton;
-class WatsynInstrument;
+class WatsynView;
+}
 
 class WatsynObject
 {
@@ -131,25 +139,25 @@ class WatsynInstrument : public Instrument
 	Q_OBJECT
 public:
 	WatsynInstrument( InstrumentTrack * _instrument_track );
-	virtual ~WatsynInstrument();
+	~WatsynInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+							QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 64 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 public slots:
 	void updateVolumes();
@@ -288,8 +296,12 @@ private:
 	float B2_wave [WAVELEN];
 
 	friend class WatsynObject;
-	friend class WatsynView;
+	friend class gui::WatsynView;
 };
+
+
+namespace gui
+{
 
 
 class WatsynView : public InstrumentViewFixedSize
@@ -298,7 +310,7 @@ class WatsynView : public InstrumentViewFixedSize
 public:
 	WatsynView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~WatsynView();
+	~WatsynView() override;
 
 protected slots:
 	void updateLayout();
@@ -316,7 +328,7 @@ protected slots:
 	void loadClicked();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 // knobs
 	Knob * a1_volKnob;
@@ -375,5 +387,10 @@ private:
 	PixmapButton * m_loadButton;
 
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

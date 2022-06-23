@@ -38,13 +38,23 @@
 #include "NotePlayHandle.h"
 #include <QMutex>
 
+namespace lmms
+{
+
+
 static const int NUM_FILTERS = 2;
 
+class NotePlayHandle;
+
+
+namespace gui
+{
 class automatableButtonGroup;
 class Knob;
 class Lb302SynthView;
 class LedCheckBox;
-class NotePlayHandle;
+}
+
 
 class Lb302FilterKnobState
 {
@@ -82,11 +92,11 @@ class Lb302FilterIIR2 : public Lb302Filter
 {
 	public:
 	Lb302FilterIIR2(Lb302FilterKnobState* p_fs);
-	virtual ~Lb302FilterIIR2();
+	~Lb302FilterIIR2() override;
 
-	virtual void recalc();
-	virtual void envRecalc();
-	virtual float process(const float& samp);
+	void recalc() override;
+	void envRecalc() override;
+	float process(const float& samp) override;
 
 	protected:
 	float vcf_d1,           //   d1 and d2 are added back into the sample with
@@ -108,9 +118,9 @@ class Lb302Filter3Pole : public Lb302Filter
 	Lb302Filter3Pole(Lb302FilterKnobState* p_fs);
 
 	//virtual void recalc();
-	virtual void envRecalc();
-	virtual void recalc();
-	virtual float process(const float& samp);
+	void envRecalc() override;
+	void recalc() override;
+	float process(const float& samp) override;
 
 	protected:
 	float kfcn,
@@ -140,30 +150,30 @@ class Lb302Synth : public Instrument
 	Q_OBJECT
 public:
 	Lb302Synth( InstrumentTrack * _instrument_track );
-	virtual ~Lb302Synth();
+	~Lb302Synth() override;
 
-	virtual void play( sampleFrame * _working_buffer );
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void play( sampleFrame * _working_buffer ) override;
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
 		return IsSingleStreamed;
 	}
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return 0; //4048;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 private:
 	void processNote( NotePlayHandle * n );
@@ -249,12 +259,16 @@ private:
 
 	int process(sampleFrame *outbuf, const int size);
 
-	friend class Lb302SynthView;
+	friend class gui::Lb302SynthView;
 
 	NotePlayHandle * m_playingNote;
 	NotePlayHandleList m_notes;
 	QMutex m_notesMutex;
 } ;
+
+
+namespace gui
+{
 
 
 class Lb302SynthView : public InstrumentViewFixedSize
@@ -263,10 +277,10 @@ class Lb302SynthView : public InstrumentViewFixedSize
 public:
 	Lb302SynthView( Instrument * _instrument,
 	                QWidget * _parent );
-	virtual ~Lb302SynthView();
+	~Lb302SynthView() override;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob * m_vcfCutKnob;
 	Knob * m_vcfResKnob;
@@ -283,5 +297,10 @@ private:
 	LedCheckBox * m_db24Toggle;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

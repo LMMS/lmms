@@ -33,6 +33,11 @@
 #include "SerializingObject.h"
 #include "TimePos.h"
 
+
+namespace lmms
+{
+
+
 class DetuningHelper;
 
 
@@ -93,7 +98,7 @@ public:
 		panning_t panning = DefaultPanning,
 		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
-	virtual ~Note();
+	~Note() override;
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
@@ -246,5 +251,7 @@ private:
 
 typedef QVector<Note *> NoteVector;
 
+
+} // namespace lmms
 
 #endif

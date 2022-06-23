@@ -31,6 +31,8 @@
 #include "MainWindow.h"
 #include "OutputSettings.h"
 
+namespace lmms::gui
+{
 
 ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 							QWidget * _parent, bool multi_export=false ) :
@@ -294,3 +296,5 @@ void ExportProjectDialog::updateTitleBar( int _prog )
 	getGUI()->mainWindow()->setWindowTitle(
 					tr( "Rendering: %1%" ).arg( _prog ) );
 }
+
+} // namespace lmms::gui

@@ -38,8 +38,6 @@
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
 
-class ComboBox;
-
 //
 //	UI Macros
 //
@@ -65,6 +63,14 @@ class ComboBox;
 	name -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_on" ) ); \
 	name -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "tinyled_off" ) ); \
 	name->setToolTip(ttip);
+
+namespace lmms
+{
+
+
+namespace gui
+{
+
 
 // UI constants
 const int O1ROW = 22;
@@ -107,6 +113,9 @@ const int MATROW6 = 22 + 39*5;
 
 const int OPVIEW = 0;
 const int MATVIEW = 1;
+
+
+} // namespace gui
 
 // waveform enumerators
 const int WAVE_SINE = 0;
@@ -154,7 +163,12 @@ const float PW_MIN = 0.25f;
 const float PW_MAX = 100.0f - PW_MIN;
 
 class MonstroInstrument;
+
+namespace gui
+{
 class MonstroView;
+class ComboBox;
+}
 
 
 class MonstroSynth
@@ -341,21 +355,21 @@ class MonstroInstrument : public Instrument
 
 public:
 	MonstroInstrument( InstrumentTrack * _instrument_track );
-	virtual ~MonstroInstrument();
+	~MonstroInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _this );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+							QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
+	f_cnt_t desiredReleaseFrames() const override;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 public slots:
 	void updateVolume1();
@@ -564,9 +578,14 @@ private:
 	FloatModel	m_sub3lfo2;
 
 	friend class MonstroSynth;
-	friend class MonstroView;
+	friend class gui::MonstroView;
 
 };
+
+
+namespace gui
+{
+
 
 class MonstroView : public InstrumentViewFixedSize
 {
@@ -574,13 +593,13 @@ class MonstroView : public InstrumentViewFixedSize
 public:
 	MonstroView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~MonstroView();
+	~MonstroView() override;
 
 protected slots:
 	void updateLayout();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupOperatorsView( QWidget * _parent );
@@ -718,5 +737,9 @@ private:
 
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

@@ -32,6 +32,9 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 namespace embed
 {
 
@@ -63,8 +66,8 @@ inline QPixmap getIconPixmap( const QString&  _name,
 //QString getText( const char * _name );
 
 }
-#endif
 
+#endif // PLUGIN_NAME
 
 
 class PixmapLoader
@@ -117,7 +120,7 @@ public:
 	{
 	}
 
-	virtual QPixmap pixmap() const
+	QPixmap pixmap() const override
 	{
 		if( !m_name.isEmpty() )
 		{
@@ -127,14 +130,15 @@ public:
 		return( QPixmap() );
 	}
 
-	virtual QString pixmapName() const
+	QString pixmapName() const override
 	{
 		return QString( STRINGIFY(PLUGIN_NAME) ) + "::" + m_name;
 	}
 
 } ;
-#endif
+#endif // PLUGIN_NAME
 
 
+} // namespace lmms
 
 #endif

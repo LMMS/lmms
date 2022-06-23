@@ -30,6 +30,9 @@
 
 #include "Plugin.h"
 
+namespace lmms
+{
+
 
 class TrackContainer;
 
@@ -39,7 +42,7 @@ class LMMS_EXPORT ImportFilter : public Plugin
 public:
 	ImportFilter( const QString & _file_name,
 					const Descriptor * _descriptor );
-	virtual ~ImportFilter();
+	~ImportFilter() override;
 
 
 	// tries to import given file to given track-container by having all
@@ -108,5 +111,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

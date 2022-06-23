@@ -31,13 +31,15 @@
 
 #include "lmms_export.h"
 
+namespace lmms::gui
+{
 
 class LMMS_EXPORT TextFloat : public QWidget
 {
 	Q_OBJECT
 public:
 	TextFloat();
-	virtual ~TextFloat()
+	~TextFloat() override
 	{
 	}
 
@@ -78,5 +80,8 @@ private:
 	QPixmap m_pixmap;
 
 };
+
+
+} // namespace lmms::gui
 
 #endif

@@ -31,6 +31,11 @@
 #include "lmms_basics.h"
 #include "DataFile.h"
 
+
+namespace lmms
+{
+
+
 class JournallingObject;
 
 
@@ -118,6 +123,8 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

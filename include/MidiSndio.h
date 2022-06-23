@@ -32,8 +32,13 @@
 
 #include <QThread>
 
-
 #include "MidiClient.h"
+
+
+struct mio_hdl;
+
+namespace lmms
+{
 
 
 class MidiSndio : public QThread, public MidiClientRaw
@@ -41,7 +46,7 @@ class MidiSndio : public QThread, public MidiClientRaw
 	Q_OBJECT
 public:
 	MidiSndio( void );
-	virtual ~MidiSndio();
+	~MidiSndio() override;
 
 	static QString probeDevice(void);
 
@@ -61,9 +66,12 @@ protected:
 	void run(void) override;
 
 private:
-	struct mio_hdl *m_hdl;
+	mio_hdl *m_hdl;
 	volatile bool m_quit;
 } ;
+
+
+} // namespace lmms
 
 #endif	/* LMMS_HAVE_SNDIO */
 

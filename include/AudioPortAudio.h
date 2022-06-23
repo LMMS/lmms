@@ -30,9 +30,28 @@
 #include "lmmsconfig.h"
 #include "ComboBoxModel.h"
 
+#ifdef LMMS_HAVE_PORTAUDIO
+
+#   include <portaudio.h>
+
+#   include "AudioDevice.h"
+#   include "AudioDeviceSetupWidget.h"
+
+#   if defined paNeverDropInput || defined paNonInterleaved
+#	    define PORTAUDIO_V19
+#   else
+#	    define PORTAUDIO_V18
+#   endif
+
+#endif
+
+
+namespace lmms
+{
+
 class AudioPortAudioSetupUtil : public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public slots:
 	void updateBackends();
 	void updateDevices();
@@ -41,33 +60,24 @@ public slots:
 public:
 	ComboBoxModel m_backendModel;
 	ComboBoxModel m_deviceModel;
-} ;
+};
 
 
 #ifdef LMMS_HAVE_PORTAUDIO
 
-#include <portaudio.h>
 
-
-#include "AudioDevice.h"
-#include "AudioDeviceSetupWidget.h"
-
-#if defined paNeverDropInput || defined paNonInterleaved
-#	define PORTAUDIO_V19
-#else
-#	define PORTAUDIO_V18
-#endif
-
-
+namespace gui
+{
 class ComboBox;
 class LcdSpinBox;
+}
 
 
 class AudioPortAudio : public AudioDevice
 {
 public:
 	AudioPortAudio( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioPortAudio();
+	~AudioPortAudio() override;
 
 	inline static QString name()
 	{
@@ -80,26 +90,26 @@ public:
 		unsigned long _framesPerBuffer );
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
-		virtual void saveSettings();
-		virtual void show();
+		void saveSettings() override;
+		void show() override;
 
 	private:
-		ComboBox * m_backend;
-		ComboBox * m_device;
+		gui::ComboBox * m_backend;
+		gui::ComboBox * m_device;
 		AudioPortAudioSetupUtil m_setupUtil;
 
 	} ;
 
 private:
-	virtual void startProcessing();
-	virtual void stopProcessing();
-	virtual void applyQualitySettings();
+	void startProcessing() override;
+	void stopProcessing() override;
+	void applyQualitySettings() override;
 
 #ifdef PORTAUDIO_V19
 	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
@@ -149,6 +159,8 @@ private:
 
 } ;
 
-#endif
+#endif // LMMS_HAVE_PORTAUDIO
+
+} // namespace lmms
 
 #endif

@@ -59,6 +59,10 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
+namespace lmms::gui
+{
+
+
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -1243,7 +1247,7 @@ void FileItem::determineFileType( void )
 	{
 		m_type = PatchFile;
 	}
-	else if( ext == "mid" )
+	else if( ext == "mid" || ext == "midi" || ext == "rmi" )
 	{
 		m_type = MidiFile;
 		m_handling = ImportAsProject;
@@ -1295,3 +1299,6 @@ QString FileItem::extension(const QString & file )
 {
 	return QFileInfo( file ).suffix().toLower();
 }
+
+
+} // namespace lmms::gui

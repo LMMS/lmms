@@ -31,6 +31,9 @@
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 
+namespace lmms
+{
+
 
 class VstSyncController : public QObject
 {
@@ -55,5 +58,8 @@ private slots:
 private:
 	SharedMemory<VstSyncData> m_syncData;
 };
+
+
+} // namespace lmms
 
 #endif

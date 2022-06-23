@@ -29,6 +29,9 @@
 #include "MemoryManager.h"
 #include "TimePos.h"
 
+namespace lmms
+{
+
 // all classes being able to process MIDI-events should inherit from this
 class MidiEventProcessor
 {
@@ -47,5 +50,7 @@ public:
 	virtual void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) = 0;
 
 } ;
+
+} // namespace lmms
 
 #endif

@@ -28,35 +28,43 @@
 #include "InstrumentView.h"
 #include "NineButtonSelector.h"
 
+namespace lmms
+{
+
+
+class NotePlayHandle;
+class graphModel;
+
+namespace gui
+{
 class Graph;
 class LedCheckBox;
-class NotePlayHandle;
 class VibedView;
+}
 
 class Vibed : public Instrument
 {
 	Q_OBJECT
 public:
 	Vibed( InstrumentTrack * _instrument_track );
-	virtual ~Vibed();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
 		return IsNotBendable;
 	}
 
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private:
@@ -71,13 +79,16 @@ private:
 	QList<BoolModel*> m_powerButtons;
 	QList<graphModel*> m_graphs;
 	QList<BoolModel*> m_impulses;
-	QList<NineButtonSelectorModel*> m_harmonics;
+	QList<gui::NineButtonSelectorModel*> m_harmonics;
 
 	static const int __sampleLength = 128;
 
-	friend class VibedView;
+	friend class gui::VibedView;
 } ;
 
+
+namespace gui
+{
 
 
 class VibedView : public InstrumentViewFixedSize
@@ -86,11 +97,11 @@ class VibedView : public InstrumentViewFixedSize
 public:
 	VibedView( Instrument * _instrument,
 					QWidget * _parent );
-	virtual ~VibedView() {};
+	~VibedView() override {};
 
 public slots:
 	void showString( int _string );
-	void contextMenuEvent( QContextMenuEvent * );
+	void contextMenuEvent( QContextMenuEvent * ) override;
 
 protected slots:
 	void sinWaveClicked();
@@ -103,7 +114,7 @@ protected slots:
 	void normalizeClicked();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 
 	// String-related
@@ -135,5 +146,10 @@ private:
 
 
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

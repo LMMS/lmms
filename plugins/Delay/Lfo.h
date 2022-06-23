@@ -28,6 +28,10 @@
 #include "lmms_constants.h"
 
 
+namespace lmms
+{
+
+
 class Lfo
 {
 public:
@@ -76,5 +80,8 @@ private:
 	double m_twoPiOverSr;
 	int m_samplerate;
 };
+
+
+} // namespace lmms
 
 #endif // LFO_H

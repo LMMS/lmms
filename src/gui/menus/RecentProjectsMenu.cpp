@@ -10,6 +10,10 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
+
 RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 	QMenu(tr( "&Recently Opened Projects" ), parent)
 {
@@ -76,3 +80,6 @@ void RecentProjectsMenu::openProject(QAction * _action )
 		mainWindow->setCursor( Qt::ArrowCursor );
 	}
 }
+
+
+} // namespace lmms::gui

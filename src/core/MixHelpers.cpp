@@ -38,7 +38,7 @@
 static bool s_NaNHandler;
 
 
-namespace MixHelpers
+namespace lmms::MixHelpers
 {
 
 /*! \brief Function for applying MIXOP on all sample frames */
@@ -328,5 +328,5 @@ void multiplyAndAddMultipliedJoined( sampleFrame* dst,
 	run<>( dst, srcLeft, srcRight, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc) );
 }
 
-}
+} // namespace lmms::MixHelpers
 

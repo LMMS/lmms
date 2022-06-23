@@ -27,16 +27,29 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class FlangerControls;
+
+namespace gui
+{
+
 
 class FlangerControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	FlangerControlsDialog( FlangerControls* controls );
-	virtual ~FlangerControlsDialog()
+	~FlangerControlsDialog() override
 	{
 	}
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // FLANGERCONTROLSDIALOG_H

@@ -26,12 +26,12 @@
 
 
 #include "StereoEnhancerControlDialog.h"
-
 #include <QHBoxLayout>
-
 #include "Knob.h"
 #include "StereoEnhancerControls.h"
 
+namespace lmms::gui
+{
 
 
 StereoEnhancerControlDialog::StereoEnhancerControlDialog(
@@ -50,3 +50,5 @@ StereoEnhancerControlDialog::StereoEnhancerControlDialog(
 	this->setLayout(l);
 }
 
+
+} // namespace lmms::gui

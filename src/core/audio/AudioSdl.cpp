@@ -34,6 +34,9 @@
 #include "ConfigManager.h"
 #include "gui_templates.h"
 
+namespace lmms
+{
+
 AudioSdl::AudioSdl( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( DEFAULT_CHANNELS, _audioEngine ),
 	m_outBuf( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
@@ -350,6 +353,8 @@ void AudioSdl::setupWidget::saveSettings()
 							m_device->text() );
 }
 
+
+} // namespace lmms
 
 #endif
 

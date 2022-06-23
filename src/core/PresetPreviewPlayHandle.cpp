@@ -35,6 +35,9 @@
 
 #include <atomic>
 
+namespace lmms
+{
+
 // invisible track-container which is needed as parent for preview-channels
 class PreviewTrackContainer : public TrackContainer
 {
@@ -50,7 +53,7 @@ public:
 		m_previewInstrumentTrack->setPreviewMode( true );
 	}
 
-	virtual ~PreviewTrackContainer()
+	~PreviewTrackContainer() override
 	{
 	}
 
@@ -274,4 +277,4 @@ bool PresetPreviewPlayHandle::isPreviewing()
 }
 
 
-
+} // namespace lmms

@@ -29,16 +29,20 @@
 #include "Effect.h"
 #include "StereoMatrixControls.h"
 
+namespace lmms
+{
+
+
 class StereoMatrixEffect : public Effect
 {
 public:
 	StereoMatrixEffect( Model * parent, 
 	                      const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~StereoMatrixEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
-		                                          const fpp_t _frames );
+	~StereoMatrixEffect() override;
+	bool processAudioBuffer( sampleFrame * _buf,
+		                                          const fpp_t _frames ) override;
 
-	virtual EffectControls * controls()
+	EffectControls* controls() override
 	{
 		return( &m_smControls );
 	}
@@ -51,5 +55,6 @@ private:
 } ;
 
 
+} // namespace lmms
 
 #endif

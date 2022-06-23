@@ -526,52 +526,52 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationClipView</name>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>在自動編輯器（Automation editor）中打開</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="181"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>清除</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="184"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>重置名稱</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="187"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>修改名稱</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="190"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>設置/清除錄製</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="193"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>垂直翻轉 (可見)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="196"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>水平翻轉 (可見)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="201"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1個連接</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="209"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>斷開“%1”的連接</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
+        <location filename="../../src/gui/clips/AutomationClipView.cpp" line="448"/>
         <source>Model is already connected to this clip.</source>
         <translation>模型已連接到此片段。</translation>
     </message>
@@ -650,17 +650,17 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>PatternClipView</name>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="53"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>在節拍+Bassline編輯器中打開</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>重置名稱</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternClipView.cpp" line="63"/>
+        <location filename="../../src/gui/clips/PatternClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>修改名稱</translation>
     </message>
@@ -3151,22 +3151,22 @@ This mode is not available for VST plugins.</source>
 <context>
     <name>ControllerRackView</name>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="49"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="49"/>
         <source>Controller Rack</source>
         <translation>控制器機架</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="64"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="64"/>
         <source>Add</source>
         <translation>增加</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="127"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="127"/>
         <source>Confirm Delete</source>
         <translation>刪除前確認</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerRackView.cpp" line="128"/>
+        <location filename="../../src/gui/ControllerRackView.cpp" line="128"/>
         <source>Confirm delete? There are existing connection(s) associated with this controller. There is no way to undo.</source>
         <translation>確定要刪除嗎？此控制器仍處於被連接狀態。此操作不可撤銷。</translation>
     </message>
@@ -3174,32 +3174,32 @@ This mode is not available for VST plugins.</source>
 <context>
     <name>ControllerView</name>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="69"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="69"/>
         <source>Controls</source>
         <translation>控制器</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="146"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="146"/>
         <source>Rename controller</source>
         <translation>重命名控制器</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="147"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="147"/>
         <source>Enter the new name for this controller</source>
         <translation>輸入這個控制器的新名稱</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="154"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="154"/>
         <source>LFO</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="178"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="178"/>
         <source>&amp;Remove this controller</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ControllerView.cpp" line="180"/>
+        <location filename="../../src/gui/ControllerView.cpp" line="180"/>
         <source>Re&amp;name this controller</source>
         <translation type="unfinished"/>
     </message>
@@ -3926,12 +3926,12 @@ If you are unsure, leave it as &apos;Automatic&apos;.</source>
 <context>
     <name>EffectRackView</name>
     <message>
-        <location filename="../../src/gui/widgets/EffectRackView.cpp" line="44"/>
+        <location filename="../../src/gui/EffectRackView.cpp" line="44"/>
         <source>EFFECTS CHAIN</source>
         <translation>效果器鏈</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectRackView.cpp" line="61"/>
+        <location filename="../../src/gui/EffectRackView.cpp" line="61"/>
         <source>Add effect</source>
         <translation>增加效果器</translation>
     </message>
@@ -3968,57 +3968,57 @@ If you are unsure, leave it as &apos;Automatic&apos;.</source>
 <context>
     <name>EffectView</name>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="60"/>
+        <location filename="../../src/gui/EffectView.cpp" line="60"/>
         <source>On/Off</source>
         <translation>開/關</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="64"/>
+        <location filename="../../src/gui/EffectView.cpp" line="64"/>
         <source>W/D</source>
         <translation>W/D</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="67"/>
+        <location filename="../../src/gui/EffectView.cpp" line="67"/>
         <source>Wet Level:</source>
         <translation>效果度：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="71"/>
+        <location filename="../../src/gui/EffectView.cpp" line="71"/>
         <source>DECAY</source>
         <translation>衰減</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="74"/>
+        <location filename="../../src/gui/EffectView.cpp" line="74"/>
         <source>Time:</source>
         <translation>時間：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="78"/>
+        <location filename="../../src/gui/EffectView.cpp" line="78"/>
         <source>GATE</source>
         <translation>門限</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="81"/>
+        <location filename="../../src/gui/EffectView.cpp" line="81"/>
         <source>Gate:</source>
         <translation>門限：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="88"/>
+        <location filename="../../src/gui/EffectView.cpp" line="88"/>
         <source>Controls</source>
         <translation>控制</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="196"/>
+        <location filename="../../src/gui/EffectView.cpp" line="196"/>
         <source>Move &amp;up</source>
         <translation>向上移(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="199"/>
+        <location filename="../../src/gui/EffectView.cpp" line="199"/>
         <source>Move &amp;down</source>
         <translation>向下移(&amp;D)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EffectView.cpp" line="203"/>
+        <location filename="../../src/gui/EffectView.cpp" line="203"/>
         <source>&amp;Remove this plugin</source>
         <translation>移除此插件(&amp;R)</translation>
     </message>
@@ -4099,123 +4099,123 @@ If you are unsure, leave it as &apos;Automatic&apos;.</source>
 <context>
     <name>EnvelopeAndLfoView</name>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="98"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="98"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="142"/>
         <source>DEL</source>
         <translation>DEL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="100"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="144"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="100"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="144"/>
         <source>Pre-delay:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="104"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="148"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="104"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="148"/>
         <source>ATT</source>
         <translation>ATT</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="106"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="150"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="106"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="150"/>
         <source>Attack:</source>
         <translation>打進聲:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="110"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="110"/>
         <source>HOLD</source>
         <translation>持續</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="112"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="112"/>
         <source>Hold:</source>
         <translation>持續：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="116"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="116"/>
         <source>DEC</source>
         <translation>衰減</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="118"/>
         <source>Decay:</source>
         <translation>衰減：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="122"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="122"/>
         <source>SUST</source>
         <translation>持續</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="124"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="124"/>
         <source>Sustain:</source>
         <translation>持續：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="128"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="128"/>
         <source>REL</source>
         <translation>釋音</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="130"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="130"/>
         <source>Release:</source>
         <translation>釋音：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="134"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="160"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="160"/>
         <source>AMT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="136"/>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="162"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="136"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="162"/>
         <source>Modulation amount:</source>
         <translation>調製量:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="154"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="154"/>
         <source>SPD</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="156"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="156"/>
         <source>Frequency:</source>
         <translation>頻率：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="218"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="218"/>
         <source>FREQ x 100</source>
         <translation>頻率 x 100</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="221"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="221"/>
         <source>Multiply LFO frequency by 100</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="224"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="224"/>
         <source>MODULATE ENV AMOUNT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="229"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="229"/>
         <source>Control envelope amount by this LFO</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="504"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="504"/>
         <source>ms/LFO:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="520"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="520"/>
         <source>Hint</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/EnvelopeAndLfoView.cpp" line="521"/>
+        <location filename="../../src/gui/instrument/EnvelopeAndLfoView.cpp" line="521"/>
         <source>Drag and drop a sample into this window.</source>
         <translation type="unfinished"/>
     </message>
@@ -5336,47 +5336,47 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>MixerLine</name>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="86"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="86"/>
         <source>Channel send amount</source>
         <translation>通道發送的數量</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="242"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="242"/>
         <source>Move &amp;left</source>
         <translation>向左移(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="243"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="243"/>
         <source>Move &amp;right</source>
         <translation>向右移(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="245"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="245"/>
         <source>Rename &amp;channel</source>
         <translation>重命名通道(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="250"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="250"/>
         <source>R&amp;emove channel</source>
         <translation>刪除通道(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="253"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="253"/>
         <source>Remove &amp;unused channels</source>
         <translation>移除所有未用通道(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="255"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="255"/>
         <source>Set channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="256"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="256"/>
         <source>Remove channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/MixerLine.cpp" line="257"/>
+        <location filename="../../src/gui/MixerLine.cpp" line="257"/>
         <source>Pick random channel color</source>
         <translation type="unfinished"/>
     </message>
@@ -5662,119 +5662,119 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>InstrumentFunctionArpeggioView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="95"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="95"/>
         <source>ARPEGGIO</source>
         <translation>琶音</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="117"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="117"/>
         <source>RANGE</source>
         <translation>範圍</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="118"/>
         <source>Arpeggio range:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="118"/>
         <source>octave(s)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="121"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="121"/>
         <source>REP</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="122"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="122"/>
         <source>Note repeats:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="122"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="122"/>
         <source>time(s)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="125"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="125"/>
         <source>CYCLE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="126"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="126"/>
         <source>Cycle notes:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="126"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="126"/>
         <source>note(s)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="129"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="129"/>
         <source>SKIP</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="130"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="130"/>
         <source>Skip rate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="130"/>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="134"/>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="130"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="142"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="133"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="133"/>
         <source>MISS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="134"/>
         <source>Miss rate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="137"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="137"/>
         <source>TIME</source>
         <translation>時長</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="138"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="138"/>
         <source>Arpeggio time:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="138"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="138"/>
         <source>ms</source>
         <translation>毫秒</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="141"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="141"/>
         <source>GATE</source>
         <translation>門限</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="142"/>
         <source>Arpeggio gate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="145"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="145"/>
         <source>Chord:</source>
         <translation>和絃：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="148"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="148"/>
         <source>Direction:</source>
         <translation>方向：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="151"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="151"/>
         <source>Mode:</source>
         <translation>模式：</translation>
     </message>
@@ -6271,27 +6271,27 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>InstrumentFunctionNoteStackingView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="41"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="41"/>
         <source>STACKING</source>
         <translation>堆疊</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="55"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="55"/>
         <source>Chord:</source>
         <translation>和絃：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="58"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="58"/>
         <source>RANGE</source>
         <translation>範圍</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="59"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="59"/>
         <source>Chord range:</source>
         <translation>和絃範圍：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentFunctionViews.cpp" line="59"/>
+        <location filename="../../src/gui/instrument/InstrumentFunctionViews.cpp" line="59"/>
         <source>octave(s)</source>
         <translation type="unfinished"/>
     </message>
@@ -6299,63 +6299,63 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>InstrumentMidiIOView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="51"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="51"/>
         <source>ENABLE MIDI INPUT</source>
         <translation>啓用MIDI輸入</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="83"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="83"/>
         <source>ENABLE MIDI OUTPUT</source>
         <translation>啓用MIDI輸出</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="62"/>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="94"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="62"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="94"/>
         <source>CHAN</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of two digits</extracomment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="71"/>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="102"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="71"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="102"/>
         <source>VELOC</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of three digits</extracomment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="109"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="109"/>
         <source>PROG</source>
         <extracomment>This string must be be short, its width must be less than the * width of LCD spin-box of three digits</extracomment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="118"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="118"/>
         <source>NOTE</source>
         <extracomment>This string must be be short, its width must be less than * width of LCD spin-box of three digits</extracomment>
         <translation>音符</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="134"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="134"/>
         <source>MIDI devices to receive MIDI events from</source>
         <translation>用於接收 MIDI 事件的 MIDI 設備</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="142"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="142"/>
         <source>MIDI devices to send MIDI events to</source>
         <translation>用於發送 MIDI 事件的 MIDI 設備</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="151"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="151"/>
         <source>CUSTOM BASE VELOCITY</source>
         <translation>自定義基準力度</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="158"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="158"/>
         <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="165"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="165"/>
         <source>BASE VELOCITY</source>
         <translation>基準力度</translation>
     </message>
@@ -6363,12 +6363,12 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>InstrumentMiscView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="221"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="221"/>
         <source>MASTER PITCH</source>
         <translation>主音高</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentMidiIOView.cpp" line="225"/>
+        <location filename="../../src/gui/instrument/InstrumentMidiIOView.cpp" line="225"/>
         <source>Enables the use of master pitch</source>
         <translation type="unfinished"/>
     </message>
@@ -6535,42 +6535,42 @@ Please make sure you have write permission to the file and the directory contain
 <context>
     <name>InstrumentSoundShapingView</name>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="55"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="55"/>
         <source>TARGET</source>
         <translation>目標</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="70"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="70"/>
         <source>FILTER</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="82"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="82"/>
         <source>FREQ</source>
         <translation>頻率</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="84"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="84"/>
         <source>Cutoff frequency:</source>
         <translation>頻譜刀頻率：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="84"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="84"/>
         <source>Hz</source>
         <translation>Hz</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="88"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="88"/>
         <source>Q/RESO</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="90"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="90"/>
         <source>Q/Resonance:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/InstrumentSoundShapingView.cpp" line="93"/>
+        <location filename="../../src/gui/instrument/InstrumentSoundShapingView.cpp" line="93"/>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
         <translation>包絡和低頻振盪 (LFO) 不被當前樂器支持。</translation>
     </message>
@@ -6937,12 +6937,12 @@ Copyright (C) 2017 ROLI Ltd.</source>
 <context>
     <name>LadspaControlView</name>
     <message>
-        <location filename="../../src/gui/widgets/LadspaControlView.cpp" line="52"/>
+        <location filename="../../src/gui/LadspaControlView.cpp" line="52"/>
         <source>Link channels</source>
         <translation>連接通道</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/LadspaControlView.cpp" line="104"/>
+        <location filename="../../src/gui/LadspaControlView.cpp" line="104"/>
         <source>Value:</source>
         <translation>值：</translation>
     </message>
@@ -7156,7 +7156,7 @@ Double click to pick a file.</source>
     </message>
 </context>
 <context>
-    <name>LmmsCore</name>
+    <name>Engine</name>
     <message>
         <location filename="../../src/core/Engine.cpp" line="58"/>
         <source>Generating wavetables</source>
@@ -9571,42 +9571,42 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 <context>
     <name>MidiClipView</name>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="143"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="143"/>
         <source>Open in piano-roll</source>
         <translation>在鋼琴窗中打開</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="149"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="149"/>
         <source>Set as ghost in piano-roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="158"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="158"/>
         <source>Clear all notes</source>
         <translation>清除所有音符</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="161"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="161"/>
         <source>Reset name</source>
         <translation>重置名稱</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="164"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="164"/>
         <source>Change name</source>
         <translation>修改名稱</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="172"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="172"/>
         <source>Add steps</source>
         <translation>添加音階</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="174"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="174"/>
         <source>Remove steps</source>
         <translation>移除音階</translation>
     </message>
     <message>
-        <location filename="../../src/gui/MidiClipView.cpp" line="176"/>
+        <location filename="../../src/gui/clips/MidiClipView.cpp" line="176"/>
         <source>Clone Steps</source>
         <translation type="unfinished"/>
     </message>
@@ -10122,17 +10122,17 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 <context>
     <name>PianoView</name>
     <message>
-        <location filename="../../src/gui/PianoView.cpp" line="813"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="813"/>
         <source>Base note</source>
         <translation>基本音</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PianoView.cpp" line="818"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="818"/>
         <source>First note</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/PianoView.cpp" line="823"/>
+        <location filename="../../src/gui/instrument/PianoView.cpp" line="823"/>
         <source>Last note</source>
         <translation>上一個音符</translation>
     </message>
@@ -11164,147 +11164,147 @@ You can disable these checks to get a faster scanning time (at your own risk).</
 <context>
     <name>ProjectNotes</name>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="70"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="70"/>
         <source>Project Notes</source>
         <translation>顯示/隱藏工程註釋</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="92"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="92"/>
         <source>Enter project notes here</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="113"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="113"/>
         <source>Edit Actions</source>
         <translation>編輯功能</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="116"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="116"/>
         <source>&amp;Undo</source>
         <translation>撤銷（&amp;U)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="118"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="118"/>
         <source>%1+Z</source>
         <translation>%1+Z</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="122"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="122"/>
         <source>&amp;Redo</source>
         <translation>重做(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="124"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="124"/>
         <source>%1+Y</source>
         <translation>%1+Y</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="128"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="128"/>
         <source>&amp;Copy</source>
         <translation>複製(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="130"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="130"/>
         <source>%1+C</source>
         <translation>%1+C</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="134"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="134"/>
         <source>Cu&amp;t</source>
         <translation>剪切(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="136"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="136"/>
         <source>%1+X</source>
         <translation>%1+X</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="140"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="140"/>
         <source>&amp;Paste</source>
         <translation>粘貼(&amp;P)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="142"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="142"/>
         <source>%1+V</source>
         <translation>%1+V</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="147"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="147"/>
         <source>Format Actions</source>
         <translation>格式功能</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="171"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="171"/>
         <source>&amp;Bold</source>
         <translation>加粗(&amp;B)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="172"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="172"/>
         <source>%1+B</source>
         <translation>%1+B</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="178"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="178"/>
         <source>&amp;Italic</source>
         <translation>斜體(&amp;I)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="179"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="179"/>
         <source>%1+I</source>
         <translation>%1+I</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="186"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="186"/>
         <source>&amp;Underline</source>
         <translation>下劃線(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="187"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="187"/>
         <source>%1+U</source>
         <translation>%1+U</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="198"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="198"/>
         <source>&amp;Left</source>
         <translation>左對齊(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="199"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="199"/>
         <source>%1+L</source>
         <translation>%1+L</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="205"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="205"/>
         <source>C&amp;enter</source>
         <translation>居中(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="207"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="207"/>
         <source>%1+E</source>
         <translation>%1+E</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="212"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="212"/>
         <source>&amp;Right</source>
         <translation>右對齊(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="214"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="214"/>
         <source>%1+R</source>
         <translation>%1+R</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="220"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="220"/>
         <source>&amp;Justify</source>
         <translation>勻齊(&amp;J)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="221"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="221"/>
         <source>%1+J</source>
         <translation>%1+J</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/ProjectNotes.cpp" line="228"/>
+        <location filename="../../src/gui/ProjectNotes.cpp" line="228"/>
         <source>&amp;Color...</source>
         <translation>顏色(&amp;C)...</translation>
     </message>
@@ -12028,67 +12028,67 @@ You can disable these checks to get a faster scanning time (at your own risk).</
 <context>
     <name>SampleClipView</name>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="60"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="60"/>
         <source>Double-click to open sample</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="84"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="84"/>
         <source>Delete (middle mousebutton)</source>
         <translation>刪除 (鼠標中鍵)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="85"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="85"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="93"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="93"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="94"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="94"/>
         <source>Cut selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="101"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="101"/>
         <source>Copy</source>
         <translation>複製</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="102"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="102"/>
         <source>Copy selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="107"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="107"/>
         <source>Paste</source>
         <translation>粘貼</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="115"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="115"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>靜音/取消靜音 (&lt;%1&gt; + 鼠標中鍵)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="116"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="116"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="125"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="125"/>
         <source>Reverse sample</source>
         <translation>反轉取樣</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="133"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="133"/>
         <source>Set clip color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleClipView.cpp" line="135"/>
+        <location filename="../../src/gui/clips/SampleClipView.cpp" line="135"/>
         <source>Use track color</source>
         <translation type="unfinished"/>
     </message>
@@ -12120,37 +12120,37 @@ You can disable these checks to get a faster scanning time (at your own risk).</
 <context>
     <name>SampleTrackView</name>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="56"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="56"/>
         <source>Track volume</source>
         <translation>軌道音量</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="59"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="59"/>
         <source>Channel volume:</source>
         <translation>通道音量：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="66"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="66"/>
         <source>VOL</source>
         <translation>VOL</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="70"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="70"/>
         <source>Panning</source>
         <translation>聲相</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="72"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="72"/>
         <source>Panning:</source>
         <translation>聲相：</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="74"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="74"/>
         <source>PAN</source>
         <translation>PAN</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTrackView.cpp" line="142"/>
+        <location filename="../../src/gui/tracks/SampleTrackView.cpp" line="142"/>
         <source>Channel %1: %2</source>
         <translation>效果 %1: %2</translation>
     </message>
@@ -12729,7 +12729,7 @@ Latency: %2 ms</source>
 <context>
     <name>SideBarWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/SideBarWidget.cpp" line="47"/>
+        <location filename="../../src/gui/SideBarWidget.cpp" line="47"/>
         <source>Close</source>
         <translation type="unfinished"/>
     </message>
@@ -13035,12 +13035,12 @@ Latency: %2 ms</source>
 <context>
     <name>StepRecorderWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/StepRecorderWidget.cpp" line="92"/>
+        <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="92"/>
         <source>Hint</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/StepRecorderWidget.cpp" line="92"/>
+        <location filename="../../src/gui/editors/StepRecorderWidget.cpp" line="92"/>
         <source>Move recording curser using &lt;Left/Right&gt; arrows</source>
         <translation type="unfinished"/>
     </message>
@@ -13215,37 +13215,37 @@ Latency: %2 ms</source>
 <context>
     <name>TimeLineWidget</name>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="124"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="124"/>
         <source>Auto scrolling</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="131"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="131"/>
         <source>Loop points</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="141"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="141"/>
         <source>After stopping go back to beginning</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="144"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="144"/>
         <source>After stopping go back to position at which playing was started</source>
         <translation>停止後前往播放開始的地方</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="148"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="148"/>
         <source>After stopping keep position</source>
         <translation>停止後保持位置不變</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="356"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="356"/>
         <source>Hint</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TimeLineWidget.cpp" line="357"/>
+        <location filename="../../src/gui/editors/TimeLineWidget.cpp" line="357"/>
         <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation>按住 &lt;%1&gt; 禁用磁性吸附。</translation>
     </message>
@@ -13338,93 +13338,93 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>ClipView</name>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="647"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="647"/>
         <source>Current position</source>
         <translation>當前位置</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="655"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="655"/>
         <source>Current length</source>
         <translation>當前長度</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="656"/>
-        <location filename="../../src/gui/ClipView.cpp" line="908"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="656"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="908"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 到 %5:%6)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="675"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="675"/>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation>按住 &lt;%1&gt; 並拖動以創建副本。</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="676"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="676"/>
         <source>Press &lt;%1&gt; for free resizing.</source>
         <translation>按住 &lt;%1&gt; 自由調整大小。</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="677"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="677"/>
         <source>Hint</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1007"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1007"/>
         <source>Delete (middle mousebutton)</source>
         <translation>刪除 (鼠標中鍵)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1008"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1008"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1016"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1016"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1017"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1017"/>
         <source>Cut selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1024"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1024"/>
         <source>Merge Selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1033"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1033"/>
         <source>Copy</source>
         <translation>複製</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1034"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1034"/>
         <source>Copy selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1039"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1039"/>
         <source>Paste</source>
         <translation>粘貼</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1047"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1047"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>靜音/取消靜音 (&lt;%1&gt; + 鼠標中鍵)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1048"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1048"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1054"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1054"/>
         <source>Set clip color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/ClipView.cpp" line="1056"/>
+        <location filename="../../src/gui/clips/ClipView.cpp" line="1056"/>
         <source>Use track color</source>
         <translation type="unfinished"/>
     </message>
@@ -13432,7 +13432,7 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>TrackContentWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/TrackContentWidget.cpp" line="670"/>
+        <location filename="../../src/gui/tracks/TrackContentWidget.cpp" line="670"/>
         <source>Paste</source>
         <translation>粘貼</translation>
     </message>
@@ -13440,94 +13440,94 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="61"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="61"/>
         <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop action.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="76"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="76"/>
         <source>Actions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="79"/>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="102"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="79"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="102"/>
         <source>Mute</source>
         <translation>靜音</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="84"/>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="105"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="84"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="105"/>
         <source>Solo</source>
         <translation>獨奏</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="204"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="204"/>
         <source>After removing a track, it can not be recovered. Are you sure you want to remove track &quot;%1&quot;?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="207"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="207"/>
         <source>Confirm removal</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="208"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="208"/>
         <source>Don&apos;t ask again</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="328"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="328"/>
         <source>Clone this track</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="331"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="331"/>
         <source>Remove this track</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="336"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="336"/>
         <source>Clear this track</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="338"/>
         <source>Channel %1: %2</source>
         <translation>效果 %1: %2</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="338"/>
         <source>Assign to new mixer Channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="350"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="350"/>
         <source>Turn all recording on</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="351"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="351"/>
         <source>Turn all recording off</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="356"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="356"/>
         <source>Change color</source>
         <translation>改變顏色</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="358"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="358"/>
         <source>Reset color to default</source>
         <translation>重置顏色</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="360"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="360"/>
         <source>Set random color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="363"/>
+        <location filename="../../src/gui/tracks/TrackOperationsWidget.cpp" line="363"/>
         <source>Clear clip colors</source>
         <translation type="unfinished"/>
     </message>

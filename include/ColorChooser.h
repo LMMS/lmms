@@ -21,11 +21,18 @@
  *
  */
 
+#ifndef COLOR_CHOOSER_H
+#define COLOR_CHOOSER_H
+
 #include <QApplication>
 #include <QColor>
 #include <QColorDialog>
 #include <QKeyEvent>
 #include <QVector>
+
+namespace lmms::gui
+{
+
 
 class ColorChooser: public QColorDialog
 {
@@ -57,3 +64,9 @@ private:
 	//! Generate a nice palette, with adjustable value
 	static QVector<QColor> nicePalette (int);
 };
+
+
+} // namespace lmms::gui
+
+#endif
+

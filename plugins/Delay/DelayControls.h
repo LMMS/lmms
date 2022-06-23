@@ -28,30 +28,33 @@
 #include "EffectControls.h"
 #include "DelayControlsDialog.h"
 
+namespace lmms
+{
 
 
 class DelayEffect;
+
 
 class DelayControls : public EffectControls
 {
 	Q_OBJECT
 public:
 	DelayControls( DelayEffect* effect );
-	virtual ~DelayControls()
+	~DelayControls() override
 	{
 	}
-	virtual void saveSettings( QDomDocument& doc, QDomElement& parent );
-	virtual void loadSettings( const QDomElement& _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument& doc, QDomElement& parent ) override;
+	void loadSettings( const QDomElement& _this ) override;
+	inline QString nodeName() const override
 	{
 		return "Delay";
 	}
-	virtual int controlCount(){
+	int controlCount() override{
 		return 5;
 	}
-	virtual EffectControlDialog* createView()
+	gui::EffectControlDialog* createView() override
 	{
-		return new DelayControlsDialog( this );
+		return new gui::DelayControlsDialog( this );
 	}
 
 	float m_outPeakL;
@@ -69,8 +72,11 @@ private:
 	TempoSyncKnobModel m_lfoAmountModel;
 	FloatModel m_outGainModel;
 
-	friend class DelayControlsDialog;
+	friend class gui::DelayControlsDialog;
 	friend class DelayEffect;
 };
+
+
+} // namespace lmms
 
 #endif // DELAYCONTROLS_H

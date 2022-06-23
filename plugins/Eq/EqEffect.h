@@ -28,15 +28,17 @@
 #include "EqControls.h"
 #include "EqFilter.h"
 
+namespace lmms
+{
 
 
 class EqEffect : public Effect
 {
 public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
-	virtual ~EqEffect();
-	virtual bool processAudioBuffer( sampleFrame * buf, const fpp_t frames );
-	virtual EffectControls * controls()
+	~EqEffect() override;
+	bool processAudioBuffer( sampleFrame * buf, const fpp_t frames ) override;
+	EffectControls * controls() override
 	{
 		return &m_eqControls;
 	}
@@ -94,5 +96,8 @@ private:
 
 	void setBandPeaks( EqAnalyser * fft , int );
 };
+
+
+} // namespace lmms
 
 #endif // EQEFFECT_H
