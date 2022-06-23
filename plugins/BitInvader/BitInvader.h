@@ -139,7 +139,7 @@ protected slots:
 	void noiseWaveClicked();
 	void usrWaveClicked();
 	
-	void smoothClicked( void  );
+	void smoothClicked(  );
 
 private:
 	void modelChanged() override;

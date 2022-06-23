@@ -38,7 +38,7 @@ namespace lmms
 {
 
 
-MidiSndio::MidiSndio( void ) :
+MidiSndio::MidiSndio( ) :
 	MidiClientRaw(),
 	m_quit( false )
 {
@@ -74,7 +74,7 @@ MidiSndio::~MidiSndio()
 }
 
 
-QString MidiSndio::probeDevice( void )
+QString MidiSndio::probeDevice( )
 {
 	QString dev = ConfigManager::inst()->value( "MidiSndio", "device" );
 
@@ -88,7 +88,7 @@ void MidiSndio::sendByte( const unsigned char c )
 }
 
 
-void MidiSndio::run( void )
+void MidiSndio::run( )
 {
 	struct pollfd pfd;
 	nfds_t nfds;

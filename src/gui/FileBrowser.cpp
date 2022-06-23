@@ -201,7 +201,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 }
 
 
-void FileBrowser::reloadTree( void )
+void FileBrowser::reloadTree( )
 {
 	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
@@ -957,7 +957,7 @@ Directory::Directory(const QString & filename, const QString & path,
 
 
 
-void Directory::initPixmaps( void )
+void Directory::initPixmaps( )
 {
 	if( s_folderPixmap == nullptr )
 	{
@@ -981,7 +981,7 @@ void Directory::initPixmaps( void )
 
 
 
-void Directory::update( void )
+void Directory::update( )
 {
 	if( !isExpanded() )
 	{
@@ -1144,7 +1144,7 @@ FileItem::FileItem(const QString & name, const QString & path ) :
 
 
 
-void FileItem::initPixmaps( void )
+void FileItem::initPixmaps( )
 {
 	if( s_projectFilePixmap == nullptr )
 	{
@@ -1219,7 +1219,7 @@ void FileItem::initPixmaps( void )
 
 
 
-void FileItem::determineFileType( void )
+void FileItem::determineFileType( )
 {
 	m_handling = NotSupported;
 
@@ -1287,7 +1287,7 @@ void FileItem::determineFileType( void )
 
 
 
-QString FileItem::extension( void )
+QString FileItem::extension( )
 {
 	return extension( fullName() );
 }

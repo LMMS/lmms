@@ -70,7 +70,7 @@ public:
 	{
 	}
 
-	QPalette standardPalette( void ) const override;
+	QPalette standardPalette( ) const override;
 
 	void drawComplexControl(
 				ComplexControl control,

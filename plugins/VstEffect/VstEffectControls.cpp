@@ -167,7 +167,7 @@ gui::EffectControlDialog* VstEffectControls::createView()
 
 
 
-void VstEffectControls::managePlugin( void )
+void VstEffectControls::managePlugin( )
 {
 	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
 		gui::ManageVSTEffectView * tt = new gui::ManageVSTEffectView( m_effect, this);
@@ -187,7 +187,7 @@ void VstEffectControls::managePlugin( void )
 
 
 
-void VstEffectControls::savePreset( void )
+void VstEffectControls::savePreset( )
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -204,7 +204,7 @@ void VstEffectControls::savePreset( void )
 
 
 
-void VstEffectControls::updateMenu( void )
+void VstEffectControls::updateMenu( )
 {
 
 	// get all presets -
@@ -239,7 +239,7 @@ void VstEffectControls::updateMenu( void )
 
 
 
-void VstEffectControls::openPreset( void )
+void VstEffectControls::openPreset( )
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -256,7 +256,7 @@ void VstEffectControls::openPreset( void )
 
 
 
-void VstEffectControls::rollPreset( void )
+void VstEffectControls::rollPreset( )
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -272,7 +272,7 @@ void VstEffectControls::rollPreset( void )
 
 
 
-void VstEffectControls::rolrPreset( void )
+void VstEffectControls::rolrPreset( )
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -288,7 +288,7 @@ void VstEffectControls::rolrPreset( void )
 
 
 
-void VstEffectControls::selPreset( void )
+void VstEffectControls::selPreset( )
 {
 
      QAction *action = qobject_cast<QAction *>(sender());
@@ -438,7 +438,7 @@ void ManageVSTEffectView::closeWindow()
 
 
 
-void ManageVSTEffectView::syncPlugin( void )
+void ManageVSTEffectView::syncPlugin( )
 {
 	char paramStr[35];
 	QStringList s_dumpValues;
@@ -464,7 +464,7 @@ void ManageVSTEffectView::syncPlugin( void )
 
 
 
-void ManageVSTEffectView::displayAutomatedOnly( void )
+void ManageVSTEffectView::displayAutomatedOnly( )
 {
 	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
 
