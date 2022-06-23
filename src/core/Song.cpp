@@ -819,7 +819,7 @@ void Song::addPatternTrack()
 void Song::addSampleTrack()
 {
 	Track* track = Track::create( Track::SampleTrack, this );
-	getGUI()->mixerView()->updateAfterTrackAdd(track);
+    gui::getGUI()->mixerView()->updateAfterTrackAdd(track);
 }
 
 
@@ -873,17 +873,17 @@ void Song::clearProject()
 
 	Engine::audioEngine()->requestChangeInModel();
 
-	if( getGUI() != nullptr && getGUI()->patternEditor() )
+    if( getGUI() != nullptr && getGUI()->patternEditor() )
 	{
 		getGUI()->patternEditor()->m_editor->clearAllTracks();
 	}
-	if( getGUI() != nullptr && getGUI()->songEditor() )
+    if( getGUI() != nullptr && getGUI()->songEditor() )
 	{
-		getGUI()->songEditor()->m_editor->clearAllTracks();
+        getGUI()->songEditor()->m_editor->clearAllTracks();
 	}
-	if( getGUI() != nullptr && getGUI()->mixerView() )
+    if( getGUI() != nullptr && getGUI()->mixerView() )
 	{
-		getGUI()->mixerView()->clear();
+        getGUI()->mixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
 	Engine::patternStore()->clearAllTracks();
