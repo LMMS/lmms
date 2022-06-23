@@ -70,13 +70,13 @@ public:
 
 
 protected slots:
-	void updateMenu( void );
-	void managePlugin( void );
-	void openPreset( void );
-	void savePreset( void );
-	void rollPreset( void );
-	void rolrPreset( void );
-	void selPreset( void );
+	void updateMenu();
+	void managePlugin();
+	void openPreset();
+	void savePreset();
+	void rollPreset();
+	void rolrPreset();
+	void selPreset();
 	void setParameter( lmms::Model * action );
 
 protected:
@@ -117,8 +117,8 @@ public:
 
 
 protected slots:
-	void syncPlugin( void );
-	void displayAutomatedOnly( void );
+	void syncPlugin();
+	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();

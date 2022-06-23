@@ -127,7 +127,7 @@ void PeakController::updateCoeffs()
 }
 
 
-void PeakController::handleDestroyedEffect( )
+void PeakController::handleDestroyedEffect()
 {
 	// possible race condition...
 	//printf("disconnecting effect\n");

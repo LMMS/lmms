@@ -66,7 +66,7 @@ void InstrumentView::setModel( Model * _model, bool )
 
 
 
-InstrumentTrackWindow * InstrumentView::instrumentTrackWindow( void )
+InstrumentTrackWindow * InstrumentView::instrumentTrackWindow()
 {
 	return( dynamic_cast<InstrumentTrackWindow *>(
 					parentWidget()->parentWidget() ) );

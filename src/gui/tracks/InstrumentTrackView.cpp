@@ -145,7 +145,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 		this, SLOT(toggleMidiCCRack()));
 
 	m_activityIndicator = new FadeButton( QApplication::palette().color( QPalette::Active,
-							QPalette::Background),
+							QPalette::Window),
 						QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ),
 						QApplication::palette().color( QPalette::Active,

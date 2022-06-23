@@ -178,7 +178,7 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 
-	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	p.fillRect(rect(), palette().brush(QPalette::Window));
 
 	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{

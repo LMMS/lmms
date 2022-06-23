@@ -755,7 +755,7 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( me->button() == Qt::MidButton )
+	else if( me->button() == Qt::MiddleButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
