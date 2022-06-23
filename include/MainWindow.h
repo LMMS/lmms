@@ -242,7 +242,7 @@ private:
 private slots:
 	void browseHelp();
 	void showTool( QAction * _idx );
-	void updateViewMenu( );
+	void updateViewMenu();
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 	void onExportProject();

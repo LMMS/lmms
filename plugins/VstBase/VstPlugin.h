@@ -126,13 +126,13 @@ public:
 public slots:
 	void setTempo( lmms::bpm_t _bpm );
 	void updateSampleRate();
-	void openPreset( );
+	void openPreset();
 	void setProgram( int index );
 	void rotateProgram( int offset );
 	void loadProgramNames();
 	void loadParameterLabels();
 	void loadParameterDisplays();
-	void savePreset( );
+	void savePreset();
 	void setParam( int i, float f );
 	void idleUpdate();
 

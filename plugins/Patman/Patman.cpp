@@ -125,7 +125,7 @@ void PatmanInstrument::loadFile( const QString & _file )
 
 
 
-QString PatmanInstrument::nodeName( ) const
+QString PatmanInstrument::nodeName() const
 {
 	return( patman_plugin_descriptor.name );
 }
@@ -380,7 +380,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 
 
 
-void PatmanInstrument::unloadCurrentPatch( )
+void PatmanInstrument::unloadCurrentPatch()
 {
 	while( !m_patchSamples.empty() )
 	{
@@ -502,7 +502,7 @@ PatmanView::~PatmanView()
 
 
 
-void PatmanView::openFile( )
+void PatmanView::openFile()
 {
 	FileDialog ofd( nullptr, tr( "Open patch file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
@@ -554,7 +554,7 @@ void PatmanView::openFile( )
 
 
 
-void PatmanView::updateFilename( )
+void PatmanView::updateFilename()
 {
  	m_displayFilename = "";
 	int idx = m_pi->m_patchFile.length();
@@ -638,7 +638,7 @@ void PatmanView::paintEvent( QPaintEvent * )
 
 
 
-void PatmanView::modelChanged( )
+void PatmanView::modelChanged()
 {
 	m_pi = castModel<PatmanInstrument>();
 	m_loopButton->setModel( &m_pi->m_loopedModel );

@@ -167,7 +167,7 @@ gui::EffectControlDialog* VstEffectControls::createView()
 
 
 
-void VstEffectControls::managePlugin( )
+void VstEffectControls::managePlugin()
 {
 	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
 		gui::ManageVSTEffectView * tt = new gui::ManageVSTEffectView( m_effect, this);
@@ -187,11 +187,11 @@ void VstEffectControls::managePlugin( )
 
 
 
-void VstEffectControls::savePreset( )
+void VstEffectControls::savePreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
-		m_effect->m_plugin->savePreset( );
+		m_effect->m_plugin->savePreset();
 /*    		bool converted;
     		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -204,7 +204,7 @@ void VstEffectControls::savePreset( )
 
 
 
-void VstEffectControls::updateMenu( )
+void VstEffectControls::updateMenu()
 {
 
 	// get all presets -
@@ -239,11 +239,11 @@ void VstEffectControls::updateMenu( )
 
 
 
-void VstEffectControls::openPreset( )
+void VstEffectControls::openPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
-		m_effect->m_plugin->openPreset( );
+		m_effect->m_plugin->openPreset();
     		bool converted;
     		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -256,7 +256,7 @@ void VstEffectControls::openPreset( )
 
 
 
-void VstEffectControls::rollPreset( )
+void VstEffectControls::rollPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -272,7 +272,7 @@ void VstEffectControls::rollPreset( )
 
 
 
-void VstEffectControls::rolrPreset( )
+void VstEffectControls::rolrPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -288,7 +288,7 @@ void VstEffectControls::rolrPreset( )
 
 
 
-void VstEffectControls::selPreset( )
+void VstEffectControls::selPreset()
 {
 
      QAction *action = qobject_cast<QAction *>(sender());
@@ -438,7 +438,7 @@ void ManageVSTEffectView::closeWindow()
 
 
 
-void ManageVSTEffectView::syncPlugin( )
+void ManageVSTEffectView::syncPlugin()
 {
 	char paramStr[35];
 	QStringList s_dumpValues;
@@ -464,7 +464,7 @@ void ManageVSTEffectView::syncPlugin( )
 
 
 
-void ManageVSTEffectView::displayAutomatedOnly( )
+void ManageVSTEffectView::displayAutomatedOnly()
 {
 	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
 

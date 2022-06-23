@@ -289,7 +289,7 @@ void AudioFileProcessor::loadFile( const QString & _file )
 
 
 
-QString AudioFileProcessor::nodeName( ) const
+QString AudioFileProcessor::nodeName() const
 {
 	return audiofileprocessor_plugin_descriptor.name;
 }
@@ -339,7 +339,7 @@ void AudioFileProcessor::setAudioFile( const QString & _audio_file,
 
 
 
-void AudioFileProcessor::reverseModelChanged( )
+void AudioFileProcessor::reverseModelChanged()
 {
 	m_sampleBuffer.setReversed( m_reverseModel.value() );
 	m_nextPlayStartPoint = m_sampleBuffer.startFrame();
@@ -349,7 +349,7 @@ void AudioFileProcessor::reverseModelChanged( )
 
 
 
-void AudioFileProcessor::ampModelChanged( )
+void AudioFileProcessor::ampModelChanged()
 {
 	m_sampleBuffer.setAmplification( m_ampModel.value() / 100.0f );
 }
@@ -362,7 +362,7 @@ void AudioFileProcessor::stutterModelChanged()
 }
 
 
-void AudioFileProcessor::startPointChanged( )
+void AudioFileProcessor::startPointChanged()
 {
 	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
@@ -394,14 +394,14 @@ void AudioFileProcessor::startPointChanged( )
 
 }
 
-void AudioFileProcessor::endPointChanged( )
+void AudioFileProcessor::endPointChanged()
 {
 	// same as start, for now
 	startPointChanged();
 
 }
 
-void AudioFileProcessor::loopPointChanged( )
+void AudioFileProcessor::loopPointChanged()
 {
 
 	// check that loop point is between start-end points and not overlapping with endpoint
@@ -424,7 +424,7 @@ void AudioFileProcessor::loopPointChanged( )
 	pointChanged();
 }
 
-void AudioFileProcessor::pointChanged( )
+void AudioFileProcessor::pointChanged()
 {
 	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *	( m_sampleBuffer.frames()-1 ) );
 	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() * ( m_sampleBuffer.frames()-1 ) );
@@ -677,7 +677,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 
 
-void AudioFileProcessorView::sampleUpdated( )
+void AudioFileProcessorView::sampleUpdated()
 {
 	m_waveView->updateSampleRange();
 	m_waveView->update();
@@ -688,7 +688,7 @@ void AudioFileProcessorView::sampleUpdated( )
 
 
 
-void AudioFileProcessorView::openAudioFile( )
+void AudioFileProcessorView::openAudioFile()
 {
 	QString af = castModel<AudioFileProcessor>()->m_sampleBuffer.
 							openAudioFile();
@@ -703,7 +703,7 @@ void AudioFileProcessorView::openAudioFile( )
 
 
 
-void AudioFileProcessorView::modelChanged( )
+void AudioFileProcessorView::modelChanged()
 {
 	AudioFileProcessor * a = castModel<AudioFileProcessor>();
 	connect( &a->m_sampleBuffer, SIGNAL( sampleUpdated() ),

@@ -741,7 +741,7 @@ void VestigeInstrumentView::openPreset()
 {
 
 	if ( m_vi->m_plugin != nullptr ) {
-		m_vi->m_plugin->openPreset( );
+		m_vi->m_plugin->openPreset();
     		bool converted;
     		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")

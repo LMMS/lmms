@@ -66,7 +66,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( ) const;
+	virtual QString nodeName() const;
 
 	virtual void loadFile( const QString & _file );
 
@@ -85,7 +85,7 @@ protected slots:
 	void reloadPlugin();
 
 private:
-	void closePlugin( );
+	void closePlugin();
 
 
 	VstPlugin * m_plugin;

@@ -69,9 +69,9 @@ public:
 
 	void loadFile( const QString & _file ) override;
 
-	QString nodeName( ) const override;
+	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames( ) const override
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 128 );
 	}
@@ -109,7 +109,7 @@ private:
 	} ;
 
 	LoadErrors loadPatch( const QString & _filename );
-	void unloadCurrentPatch( );
+	void unloadCurrentPatch();
 
 	void selectSample( NotePlayHandle * _n );
 
@@ -117,7 +117,7 @@ private:
 	friend class gui::PatmanView;
 
 signals:
-	void fileChanged( );
+	void fileChanged();
 
 } ;
 
@@ -135,8 +135,8 @@ public:
 
 
 public slots:
-	void openFile( );
-	void updateFilename( );
+	void openFile();
+	void updateFilename();
 
 
 protected:
@@ -146,7 +146,7 @@ protected:
 
 
 private:
-	void modelChanged( ) override;
+	void modelChanged() override;
 
 	PatmanInstrument * m_pi;
 	QString m_displayFilename;

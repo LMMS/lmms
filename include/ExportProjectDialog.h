@@ -45,12 +45,12 @@ public:
 	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
 
 protected:
-	void reject( ) override;
+	void reject() override;
 	void closeEvent( QCloseEvent * _ce ) override;
 
 
 private slots:
-	void startBtnClicked( );
+	void startBtnClicked();
 	void updateTitleBar( int );
 	void accept() override;
 	void startExport();
