@@ -121,12 +121,12 @@ ClipView::ClipView( Clip * clip,
 	setAcceptDrops( true );
 	setMouseTracking( true );
 
-	connect( m_clip, SIGNAL( lengthChanged() ),
-			this, SLOT( updateLength() ) );
-	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
-	connect( m_clip, SIGNAL( positionChanged() ),
-			this, SLOT( updatePosition() ) );
-	connect( m_clip, SIGNAL( destroyedClip() ), this, SLOT( close() ) );
+	connect( m_clip, SIGNAL(lengthChanged()),
+			this, SLOT(updateLength()));
+	connect( getGUI()->songEditor()->m_editor->zoomingModel(), SIGNAL(dataChanged()), this, SLOT(updateLength()));
+	connect( m_clip, SIGNAL(positionChanged()),
+			this, SLOT(updatePosition()));
+	connect( m_clip, SIGNAL(destroyedClip()), this, SLOT(close()));
 	setModel( m_clip );
 	connect(m_clip, SIGNAL(colorChanged()), this, SLOT(update()));
 

@@ -175,14 +175,14 @@ RemotePlugin::RemotePlugin() :
 	}
 #endif
 
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		this, SLOT( processFinished( int, QProcess::ExitStatus ) ),
+	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+		this, SLOT(processFinished(int,QProcess::ExitStatus)),
 		Qt::DirectConnection );
-	connect( &m_process, SIGNAL( errorOccurred( QProcess::ProcessError ) ),
-			 this, SLOT( processErrored( QProcess::ProcessError ) ),
+	connect( &m_process, SIGNAL(errorOccurred(QProcess::ProcessError)),
+			 this, SLOT(processErrored(QProcess::ProcessError)),
 		Qt::DirectConnection );
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		&m_watcher, SLOT( quit() ), Qt::DirectConnection );
+	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+		&m_watcher, SLOT(quit()), Qt::DirectConnection );
 }
 
 

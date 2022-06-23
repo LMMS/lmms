@@ -88,20 +88,20 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	setAttribute( Qt::WA_DeleteOnClose, true );
 
 
-	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
+	connect( m_track, SIGNAL(destroyedTrack()), this, SLOT(close()));
 	connect( m_track,
-		SIGNAL( clipAdded( lmms::Clip * ) ),
-			this, SLOT( createClipView( lmms::Clip * ) ),
+		SIGNAL(clipAdded(lmms::Clip*)),
+			this, SLOT(createClipView(lmms::Clip*)),
 			Qt::QueuedConnection );
 
-	connect( &m_track->m_mutedModel, SIGNAL( dataChanged() ),
-			&m_trackContentWidget, SLOT( update() ) );
+	connect( &m_track->m_mutedModel, SIGNAL(dataChanged()),
+			&m_trackContentWidget, SLOT(update()));
 
 	connect(&m_track->m_mutedModel, SIGNAL(dataChanged()),
 			this, SLOT(muteChanged()));
 
-	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
-			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
+	connect( &m_track->m_soloModel, SIGNAL(dataChanged()),
+			m_track, SLOT(toggleSolo()), Qt::DirectConnection );
 
 	// create views for already existing clips
 	for( Track::clipVector::iterator it = m_track->m_clips.begin(); it != m_track->m_clips.end(); ++it )
@@ -196,7 +196,7 @@ void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
 	Q_ASSERT( m_track != nullptr );
-	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
+	connect( m_track, SIGNAL(destroyedTrack()), this, SLOT(close()));
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
 	ModelView::modelChanged();

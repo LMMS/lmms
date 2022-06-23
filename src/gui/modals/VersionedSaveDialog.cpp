@@ -80,8 +80,8 @@ VersionedSaveDialog::VersionedSaveDialog( QWidget *parent,
 	}
 
 	// Connect + and - buttons
-	connect( plusButton, SIGNAL( clicked() ), this, SLOT( incrementVersion() ));
-	connect( minusButton, SIGNAL( clicked() ), this, SLOT( decrementVersion() ));
+	connect( plusButton, SIGNAL(clicked()), this, SLOT(incrementVersion()));
+	connect( minusButton, SIGNAL(clicked()), this, SLOT(decrementVersion()));
 }
 
 

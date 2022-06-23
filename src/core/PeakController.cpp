@@ -53,14 +53,14 @@ PeakController::PeakController( Model * _parent,
 	setSampleExact( true );
 	if( m_peakEffect )
 	{
-		connect( m_peakEffect, SIGNAL( destroyed() ),
-			this, SLOT( handleDestroyedEffect() ) );
+		connect( m_peakEffect, SIGNAL(destroyed()),
+			this, SLOT(handleDestroyedEffect()));
 	}
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ),
-			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
-	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ),
-			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateCoeffs()));
+	connect( m_peakEffect->attackModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
+	connect( m_peakEffect->decayModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
 	m_coeffNeedsUpdate = true;
 }
 

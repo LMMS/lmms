@@ -44,8 +44,8 @@ PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
 	m_paintPixmap()
 {
-	connect( _clip->getTrack(), SIGNAL( dataChanged() ), 
-			this, SLOT( update() ) );
+	connect( _clip->getTrack(), SIGNAL(dataChanged()), 
+			this, SLOT(update()));
 
 	setStyle( QApplication::style() );
 }
@@ -56,15 +56,15 @@ void PatternClipView::constructContextMenu(QMenu* _cm)
 					tr("Open in Pattern Editor"),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ),
-			this, SLOT( openInPatternEditor() ) );
+	connect( a, SIGNAL(triggered(bool)),
+			this, SLOT(openInPatternEditor()));
 	_cm->insertSeparator( _cm->actions()[1] );
 	_cm->addSeparator();
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
-						this, SLOT( resetName() ) );
+						this, SLOT(resetName()));
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
-						this, SLOT( changeName() ) );
+						this, SLOT(changeName()));
 }
 
 

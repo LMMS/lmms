@@ -88,23 +88,23 @@ SongEditor::SongEditor( Song * song ) :
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
-	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
 				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
-			SLOT( updatePosition( const lmms::TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos & ) ),
-			this, SLOT( updatePosition( const lmms::TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
-			this, SLOT( selectRegionFromPixels( int, int ) ) );
-	connect( m_timeLine, SIGNAL( selectionFinished() ),
-			 this, SLOT( stopRubberBand() ) );
+			SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect( m_timeLine, SIGNAL(regionSelectedFromPixels(int,int)),
+			this, SLOT(selectRegionFromPixels(int,int)));
+	connect( m_timeLine, SIGNAL(selectionFinished()),
+			 this, SLOT(stopRubberBand()));
 
 	m_positionLine = new PositionLine(this);
 	static_cast<QVBoxLayout *>( layout() )->insertWidget( 1, m_timeLine );
 	
-	connect( m_song, SIGNAL( playbackStateChanged() ),
-			 m_positionLine, SLOT( update() ) );
-	connect( this, SIGNAL( zoomingValueChanged( float ) ),
-			 m_positionLine, SLOT( zoomChange( float ) ) );
+	connect( m_song, SIGNAL(playbackStateChanged()),
+			 m_positionLine, SLOT(update()));
+	connect( this, SIGNAL(zoomingValueChanged(float)),
+			 m_positionLine, SLOT(zoomChange(float)));
 			 
 	// Ensure loop markers snap to same increments as clips. Zoom & proportional
 	// snap changes are handled in zoomingChanged() and toggleProportionalSnap()
@@ -129,8 +129,8 @@ SongEditor::SongEditor( Song * song ) :
 						tr( "High quality mode" ),
 						nullptr, nullptr, tb );
 	hq_btn->setCheckable( true );
-	connect( hq_btn, SIGNAL( toggled( bool ) ),
-			this, SLOT( setHighQuality( bool ) ) );
+	connect( hq_btn, SIGNAL(toggled(bool)),
+			this, SLOT(setHighQuality(bool)));
 	hq_btn->setFixedWidth( 42 );
 	getGUI()->mainWindow()->addWidgetToToolBar( hq_btn, 1, col );
 #endif
@@ -159,14 +159,14 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterVolumeSlider->setTickInterval( 50 );
 	m_masterVolumeSlider->setToolTip(tr("Master volume"));
 
-	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( setMasterVolume( int ) ) );
-	connect( m_masterVolumeSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( showMasterVolumeFloat()) );
-	connect( m_masterVolumeSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( updateMasterVolumeFloat( int ) ) );
-	connect( m_masterVolumeSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( hideMasterVolumeFloat() ) );
+	connect( m_masterVolumeSlider, SIGNAL(logicValueChanged(int)), this,
+			SLOT(setMasterVolume(int)));
+	connect( m_masterVolumeSlider, SIGNAL(sliderPressed()), this,
+			SLOT(showMasterVolumeFloat()));
+	connect( m_masterVolumeSlider, SIGNAL(logicSliderMoved(int)), this,
+			SLOT(updateMasterVolumeFloat(int)));
+	connect( m_masterVolumeSlider, SIGNAL(sliderReleased()), this,
+			SLOT(hideMasterVolumeFloat()));
 
 	m_mvsStatus = new TextFloat;
 	m_mvsStatus->setTitle( tr( "Master volume" ) );
@@ -191,14 +191,14 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
 	m_masterPitchSlider->setToolTip(tr("Master pitch"));
-	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
-			SLOT( setMasterPitch( int ) ) );
-	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
-			SLOT( showMasterPitchFloat() ) );
-	connect( m_masterPitchSlider, SIGNAL( logicSliderMoved( int ) ), this,
-			SLOT( updateMasterPitchFloat( int ) ) );
-	connect( m_masterPitchSlider, SIGNAL( sliderReleased() ), this,
-			SLOT( hideMasterPitchFloat() ) );
+	connect( m_masterPitchSlider, SIGNAL(logicValueChanged(int)), this,
+			SLOT(setMasterPitch(int)));
+	connect( m_masterPitchSlider, SIGNAL(sliderPressed()), this,
+			SLOT(showMasterPitchFloat()));
+	connect( m_masterPitchSlider, SIGNAL(logicSliderMoved(int)), this,
+			SLOT(updateMasterPitchFloat(int)));
+	connect( m_masterPitchSlider, SIGNAL(sliderReleased()), this,
+			SLOT(hideMasterPitchFloat()));
 
 	m_mpsStatus = new TextFloat;
 	m_mpsStatus->setTitle( tr( "Master pitch" ) );
@@ -231,10 +231,10 @@ SongEditor::SongEditor( Song * song ) :
 	m_leftRightScroll->setSingleStep( 1 );
 	m_leftRightScroll->setPageStep( 20 );
 	static_cast<QVBoxLayout *>( layout() )->addWidget( m_leftRightScroll );
-	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ),
-					this, SLOT( scrolled( int ) ) );
-	connect( m_song, SIGNAL( lengthChanged( int ) ),
-			this, SLOT( updateScrollBar( int ) ) );
+	connect( m_leftRightScroll, SIGNAL(valueChanged(int)),
+					this, SLOT(scrolled(int)));
+	connect( m_song, SIGNAL(lengthChanged(int)),
+			this, SLOT(updateScrollBar(int)));
 	connect(m_leftRightScroll, SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(contentWidget()->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateRubberband()));
 	connect(m_timeLine, SIGNAL(selectionFinished()), this, SLOT(stopSelectRegion()));
@@ -247,10 +247,10 @@ SongEditor::SongEditor( Song * song ) :
 	}
 	m_zoomingModel->setInitValue(
 			m_zoomingModel->findText( "100%" ) );
-	connect( m_zoomingModel, SIGNAL( dataChanged() ),
-					this, SLOT( zoomingChanged() ) );
-	connect( m_zoomingModel, SIGNAL( dataChanged() ),
-					m_positionLine, SLOT( update() ) );
+	connect( m_zoomingModel, SIGNAL(dataChanged()),
+					this, SLOT(zoomingChanged()));
+	connect( m_zoomingModel, SIGNAL(dataChanged()),
+					m_positionLine, SLOT(update()));
 
 	//Set up snapping model, 2^i
 	for ( int i = 3; i >= -4; i-- )
@@ -765,9 +765,9 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 		{
 			t = new QTimeLine( 600, scrollBar );
 			t->setFrameRange( scrollBar->value(), newVal );
-			t->connect( t, SIGNAL( finished() ), SLOT( deleteLater() ) );
+			t->connect( t, SIGNAL(finished()), SLOT(deleteLater()));
 
-			scrollBar->connect( t, SIGNAL( frameChanged( int ) ), SLOT( setValue( int ) ) );
+			scrollBar->connect( t, SIGNAL(frameChanged(int)), SLOT(setValue(int)));
 
 			t->start();
 		}
@@ -1023,7 +1023,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_setProportionalSnapAction->setCheckable(true);
 	m_setProportionalSnapAction->setChecked(false);
 	connect(m_setProportionalSnapAction, SIGNAL(triggered()), m_editor, SLOT(toggleProportionalSnap()));
-	connect(m_setProportionalSnapAction, SIGNAL(triggered()), this, SLOT(updateSnapLabel()) );
+	connect(m_setProportionalSnapAction, SIGNAL(triggered()), this, SLOT(updateSnapLabel()));
 
 	snapToolBar->addWidget( snap_lbl );
 	snapToolBar->addWidget( m_snappingComboBox );
@@ -1139,7 +1139,7 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	// it, it's very annyoing to manually bring up the song editor each time
 	getGUI()->mainWindow()->workspace()->setActiveSubWindow(
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
-	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
+	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL(focusLost()), this, SLOT(lostFocus()));
 	m_editor->scrolled(0);
 }
 

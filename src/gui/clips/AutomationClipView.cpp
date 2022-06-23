@@ -52,10 +52,10 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 	m_clip( _clip ),
 	m_paintPixmap()
 {
-	connect( m_clip, SIGNAL( dataChanged() ),
-			this, SLOT( update() ) );
-	connect( getGUI()->automationEditor(), SIGNAL( currentClipChanged() ),
-			this, SLOT( update() ) );
+	connect( m_clip, SIGNAL(dataChanged()),
+			this, SLOT(update()));
+	connect( getGUI()->automationEditor(), SIGNAL(currentClipChanged()),
+			this, SLOT(update()));
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -182,23 +182,23 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
-			tr( "Clear" ), m_clip, SLOT( clear() ) );
+			tr( "Clear" ), m_clip, SLOT(clear()));
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
-						this, SLOT( resetName() ) );
+						this, SLOT(resetName()));
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
-						this, SLOT( changeName() ) );
+						this, SLOT(changeName()));
 	_cm->addAction( embed::getIconPixmap( "record" ),
 						tr( "Set/clear record" ),
-						this, SLOT( toggleRecording() ) );
+						this, SLOT(toggleRecording()));
 	_cm->addAction( embed::getIconPixmap( "flip_y" ),
 						tr( "Flip Vertically (Visible)" ),
-						this, SLOT( flipY() ) );
+						this, SLOT(flipY()));
 	_cm->addAction( embed::getIconPixmap( "flip_x" ),
 						tr( "Flip Horizontally (Visible)" ),
-						this, SLOT( flipX() ) );
+						this, SLOT(flipX()));
 	if( !m_clip->m_objects.isEmpty() )
 	{
 		_cm->addSeparator();
@@ -216,8 +216,8 @@ void AutomationClipView::constructContextMenu( QMenu * _cm )
 				m->addAction( a );
 			}
 		}
-		connect( m, SIGNAL( triggered( QAction * ) ),
-				this, SLOT( disconnectObject( QAction * ) ) );
+		connect( m, SIGNAL(triggered(QAction*)),
+				this, SLOT(disconnectObject(QAction*)));
 		_cm->addMenu( m );
 	}
 }

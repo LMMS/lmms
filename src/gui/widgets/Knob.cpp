@@ -515,7 +515,7 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 	addDefaultActions( &contextMenu );
 	contextMenu.addAction( QPixmap(),
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
-		this, SLOT( toggleScale() ) );
+		this, SLOT(toggleScale()));
 	contextMenu.addSeparator();
 	contextMenu.exec( QCursor::pos() );
 }
@@ -829,11 +829,11 @@ void Knob::doConnections()
 {
 	if( model() != nullptr )
 	{
-		QObject::connect( model(), SIGNAL( dataChanged() ),
-					this, SLOT( friendlyUpdate() ) );
+		QObject::connect( model(), SIGNAL(dataChanged()),
+					this, SLOT(friendlyUpdate()));
 
-		QObject::connect( model(), SIGNAL( propertiesChanged() ),
-						this, SLOT( update() ) );
+		QObject::connect( model(), SIGNAL(propertiesChanged()),
+						this, SLOT(update()));
 	}
 }
 

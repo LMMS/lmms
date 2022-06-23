@@ -61,14 +61,14 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 						AutomatableModel::tr( "&Reset (%1%2)" ).
 							arg( model->initValue<float>() * m_conversionFactor ).
 							arg( m_unit ),
-						model, SLOT( reset() ) );
+						model, SLOT(reset()));
 
 	menu->addSeparator();
 	menu->addAction( embed::getIconPixmap( "edit_copy" ),
 						AutomatableModel::tr( "&Copy value (%1%2)" ).
 							arg( model->value<float>() * m_conversionFactor ).
 							arg( m_unit ),
-						amvSlots, SLOT( copyToClipboard() ) );
+						amvSlots, SLOT(copyToClipboard()));
 
 	bool canPaste = true;
 	const float valueToPaste = floatFromClipboard(&canPaste);
@@ -78,7 +78,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 						arg( m_unit )
 					: AutomatableModel::tr( "&Paste value");
 	QAction* pasteAction = menu->addAction( embed::getIconPixmap( "edit_paste" ),
-						pasteDesc, amvSlots, SLOT( pasteFromClipboard() ) );
+						pasteDesc, amvSlots, SLOT(pasteFromClipboard()));
 	pasteAction->setEnabled(canPaste);
 
 	menu->addSeparator();
@@ -86,12 +86,12 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 	menu->addAction( embed::getIconPixmap( "automation" ),
 						AutomatableModel::tr( "Edit song-global automation" ),
 							amvSlots,
-							SLOT( editSongGlobalAutomation() ) );
+							SLOT(editSongGlobalAutomation()));
 
 	menu->addAction( QPixmap(),
 						AutomatableModel::tr( "Remove song-global automation" ),
 						amvSlots,
-						SLOT( removeSongGlobalAutomation() ) );
+						SLOT(removeSongGlobalAutomation()));
 
 	menu->addSeparator();
 
@@ -99,7 +99,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 	{
 		menu->addAction( embed::getIconPixmap( "edit-delete" ),
 							AutomatableModel::tr( "Remove all linked controls" ),
-							amvSlots, SLOT( unlinkAllModels() ) );
+							amvSlots, SLOT(unlinkAllModels()));
 		menu->addSeparator();
 	}
 
@@ -120,16 +120,16 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 		contMenu->addAction( embed::getIconPixmap( "controller" ),
 								AutomatableModel::tr("Edit connection..."),
-								amvSlots, SLOT( execConnectionDialog() ) );
+								amvSlots, SLOT(execConnectionDialog()));
 		contMenu->addAction( embed::getIconPixmap( "cancel" ),
 								AutomatableModel::tr("Remove connection"),
-								amvSlots, SLOT( removeConnection() ) );
+								amvSlots, SLOT(removeConnection()));
 	}
 	else
 	{
 		menu->addAction( embed::getIconPixmap( "controller" ),
 							AutomatableModel::tr("Connect to controller..."),
-							amvSlots, SLOT( execConnectionDialog() ) );
+							amvSlots, SLOT(execConnectionDialog()));
 	}
 }
 
@@ -202,7 +202,7 @@ AutomatableModelViewSlots::AutomatableModelViewSlots( AutomatableModelView* amv,
 	QObject(),
 	m_amv( amv )
 {
-	connect( parent, SIGNAL( destroyed() ), this, SLOT( deleteLater() ), Qt::QueuedConnection );
+	connect( parent, SIGNAL(destroyed()), this, SLOT(deleteLater()), Qt::QueuedConnection );
 }
 
 
