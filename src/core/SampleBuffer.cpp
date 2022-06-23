@@ -291,7 +291,7 @@ void SampleBuffer::update(bool keepSettings)
 		{
 			// Use QFile to handle unicode file names on Windows
 			QFile f(file);
-			SNDFILE * sndFile = NULL;
+			SNDFILE * sndFile = nullptr;
 			SF_INFO sfInfo;
 			sfInfo.format = 0;
 
