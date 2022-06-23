@@ -251,7 +251,7 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
+	void (QDragEnterEvent::*reaction)() = &QDragEnterEvent::ignore;
 
 	if (_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair )))
 	{

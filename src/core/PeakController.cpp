@@ -53,8 +53,8 @@ PeakController::PeakController( Model * _parent,
 	setSampleExact( true );
 	if( m_peakEffect )
 	{
-		connect( m_peakEffect, SIGNAL( destroyed( ) ),
-			this, SLOT( handleDestroyedEffect( ) ) );
+		connect( m_peakEffect, SIGNAL( destroyed() ),
+			this, SLOT( handleDestroyedEffect() ) );
 	}
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
 	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ),
@@ -127,7 +127,7 @@ void PeakController::updateCoeffs()
 }
 
 
-void PeakController::handleDestroyedEffect( )
+void PeakController::handleDestroyedEffect()
 {
 	// possible race condition...
 	//printf("disconnecting effect\n");

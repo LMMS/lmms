@@ -61,7 +61,7 @@ public:
 
 public slots:
 	gui::ControllerDialog * createDialog( QWidget * _parent ) override;
-	void handleDestroyedEffect( );
+	void handleDestroyedEffect();
 	void updateCoeffs();
 
 protected:

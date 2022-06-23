@@ -42,7 +42,7 @@ namespace lmms::gui
 {
 
 
-ControllerRackView::ControllerRackView( ) :
+ControllerRackView::ControllerRackView() :
 	QWidget(),
 	m_nextIndex(0)
 {

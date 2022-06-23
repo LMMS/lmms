@@ -55,8 +55,8 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( updateGraph( int, int ) ) );
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL( lengthChanged() ),
+			this, SLOT( updateGraph() ) );
 }
 
 void Graph::setForeground( const QPixmap &_pixmap )
@@ -438,8 +438,8 @@ void Graph::modelChanged()
 	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( updateGraph( int, int ) ) );
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL( lengthChanged() ),
+			this, SLOT( updateGraph() ) );
 }
 
 

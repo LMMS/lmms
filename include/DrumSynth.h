@@ -41,8 +41,8 @@ class DrumSynth {
         int GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sample_rate_t Fs);
 
     private:
-        float LoudestEnv(void);
-        int   LongestEnv(void);
+        float LoudestEnv();
+        int   LongestEnv();
         void  UpdateEnv(int e, long t);
         void  GetEnv(int env, const char *sec, const char *key, QString ini);
 

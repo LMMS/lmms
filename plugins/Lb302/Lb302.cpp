@@ -293,26 +293,26 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_mode(never_played)
 {
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_cut_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_cut_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_res_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_res_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_mod_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_mod_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_dec_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_dec_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &db24Toggle, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( db24Toggled( ) ) );
+	connect( &db24Toggle, SIGNAL( dataChanged() ),
+	         this, SLOT ( db24Toggled() ) );
 
-	connect( &dist_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( )));
+	connect( &dist_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged()));
 
 
 	// SYNTH
