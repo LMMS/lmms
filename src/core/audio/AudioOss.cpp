@@ -219,7 +219,7 @@ QString AudioOss::probeDevice()
 	if( QFileInfo( dev ).isWritable() == false )
 	{
 		int instance = -1;
-		while( 1 )
+		while( true )
 		{
 			dev = PATH_DEV_DSP + QString::number( ++instance );
 			if( !QFileInfo( dev ).exists() )

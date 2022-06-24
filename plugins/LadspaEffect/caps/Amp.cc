@@ -388,9 +388,7 @@ AmpV::one_cycle (int frames)
 		v = v * v * .06 + .46;
 
 		a = filter[0].process (a + normal);
-		if (0)
-			a = filter[2].process (a);
-		
+
 		a = g * (a + supply * .001); 
 
 		a = v * tube.transfer_clip (up.upsample (a));
@@ -399,8 +397,7 @@ AmpV::one_cycle (int frames)
 		a = down.process (a);
 
 		a = filter[1].process (a - normal);
-		if (1)
-			a = filter[2].process (a + normal);
+		a = filter[2].process (a + normal);
 
 		{
 			for (int o = 1; o < OVERSAMPLE; ++o)
