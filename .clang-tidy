@@ -2,7 +2,13 @@
 Checks: >
   bugprone-macro-parentheses,
   bugprone-macro-repeated-side-effects,
+  modernize-redundant-void-arg,
+  modernize-use-bool-literals,
+  modernize-use-emplace,
+  modernize-use-equals-default,
+  modernize-use-equals-delete,
   modernize-use-override,
+  performance-trivially-destructible,
   readability-identifier-naming,
   readability-misleading-indentation,
   readability-simplify-boolean-expr,
