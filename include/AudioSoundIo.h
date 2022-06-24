@@ -70,7 +70,7 @@ public:
 		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "soundio" );
 	}
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -84,8 +84,8 @@ public:
 	private:
 
 		AudioSoundIoSetupUtil m_setupUtil;
-		ComboBox * m_backend;
-		ComboBox * m_device;
+		gui::ComboBox * m_backend;
+		gui::ComboBox * m_device;
 
 		ComboBoxModel m_backendModel;
 		ComboBoxModel m_deviceModel;
