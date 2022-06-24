@@ -98,27 +98,27 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	m_model.setSourceModel( &m_sourceModel );
 	m_model.setFilterCaseSensitivity( Qt::CaseInsensitive );
 
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-				&m_model, SLOT( setFilterFixedString( const QString & ) ) );
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-					this, SLOT( updateSelection() ) );
-	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-							SLOT( sortAgain() ) );
+	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
+				&m_model, SLOT( setFilterFixedString( const QString& ) ) );
+	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
+					this, SLOT(updateSelection()));
+	connect( ui->filterEdit, SIGNAL( textChanged( const QString& ) ),
+							SLOT(sortAgain()));
 
 	ui->pluginList->setModel( &m_model );
 
 	// setup selection model
 	QItemSelectionModel * selectionModel = new QItemSelectionModel( &m_model );
 	ui->pluginList->setSelectionModel( selectionModel );
-	connect( selectionModel, SIGNAL( currentRowChanged( const QModelIndex &,
+	connect( selectionModel, SIGNAL( currentRowChanged( const QModelIndex&,
 														const QModelIndex & ) ),
-			SLOT( rowChanged( const QModelIndex &, const QModelIndex & ) ) );
-	connect( ui->pluginList, SIGNAL( doubleClicked( const QModelIndex & ) ),
-				SLOT( acceptSelection() ) );
+			SLOT( rowChanged( const QModelIndex &, const QModelIndex& ) ) );
+	connect( ui->pluginList, SIGNAL( doubleClicked( const QModelIndex& ) ),
+				SLOT(acceptSelection()));
 
 	// try to accept current selection when pressing "OK"
-	connect( ui->buttonBox, SIGNAL( accepted() ),
-				this, SLOT( acceptSelection() ) );
+	connect( ui->buttonBox, SIGNAL(accepted()),
+				this, SLOT(acceptSelection()));
 
 	ui->filterEdit->setClearButtonEnabled( true );
 	ui->pluginList->verticalHeader()->setSectionResizeMode(

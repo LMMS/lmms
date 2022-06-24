@@ -52,7 +52,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Vibed",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 					"Vibrating string modeler" ),
@@ -492,7 +492,7 @@ VibedView::VibedView( Instrument * _instrument,
 	m_triangleWaveBtn->setToolTip(
 			tr( "Triangle wave" ) );
 	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
-			this, SLOT ( triangleWaveClicked( ) ) );
+			this, SLOT ( triangleWaveClicked() ) );
 
 	
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );

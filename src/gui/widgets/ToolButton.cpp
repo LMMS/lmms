@@ -38,7 +38,7 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 
 	if( _receiver != nullptr && _slot != nullptr )
 	{
-		connect( this, SIGNAL( clicked() ), _receiver, _slot );
+		connect( this, SIGNAL(clicked()), _receiver, _slot );
 	}
 	setToolTip(_tooltip);
 	setIcon( _pixmap );

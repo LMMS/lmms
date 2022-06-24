@@ -91,17 +91,17 @@ void Oscilloscope::setActive( bool _active )
 	if( m_active )
 	{
 		connect( getGUI()->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
+					SIGNAL(periodicUpdate()),
+					this, SLOT(update()));
 		connect( Engine::audioEngine(),
-			SIGNAL( nextAudioBuffer( const lmms::surroundSampleFrame* ) ),
-			this, SLOT( updateAudioBuffer( const lmms::surroundSampleFrame* ) ) );
+			SIGNAL(nextAudioBuffer(const lmms::surroundSampleFrame*)),
+			this, SLOT(updateAudioBuffer(const lmms::surroundSampleFrame*)) );
 	}
 	else
 	{
 		disconnect( getGUI()->mainWindow(),
-					SIGNAL( periodicUpdate() ),
-					this, SLOT( update() ) );
+					SIGNAL(periodicUpdate()),
+					this, SLOT(update()));
 		disconnect( Engine::audioEngine(),
 			SIGNAL( nextAudioBuffer( const lmms::surroundSampleFrame* ) ),
 			this, SLOT( updateAudioBuffer( const lmms::surroundSampleFrame* ) ) );

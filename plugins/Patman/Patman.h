@@ -23,8 +23,8 @@
  */
 
 
-#ifndef PATMAN_H_
-#define PATMAN_H_
+#ifndef PATMAN_H
+#define PATMAN_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -69,9 +69,9 @@ public:
 
 	void loadFile( const QString & _file ) override;
 
-	QString nodeName( void ) const override;
+	QString nodeName() const override;
 
-	f_cnt_t desiredReleaseFrames( void ) const override
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 128 );
 	}
@@ -109,7 +109,7 @@ private:
 	} ;
 
 	LoadErrors loadPatch( const QString & _filename );
-	void unloadCurrentPatch( void );
+	void unloadCurrentPatch();
 
 	void selectSample( NotePlayHandle * _n );
 
@@ -117,7 +117,7 @@ private:
 	friend class gui::PatmanView;
 
 signals:
-	void fileChanged( void );
+	void fileChanged();
 
 } ;
 
@@ -135,8 +135,8 @@ public:
 
 
 public slots:
-	void openFile( void );
-	void updateFilename( void );
+	void openFile();
+	void updateFilename();
 
 
 protected:
@@ -146,7 +146,7 @@ protected:
 
 
 private:
-	void modelChanged( void ) override;
+	void modelChanged() override;
 
 	PatmanInstrument * m_pi;
 	QString m_displayFilename;
@@ -162,4 +162,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // PATMAN_H

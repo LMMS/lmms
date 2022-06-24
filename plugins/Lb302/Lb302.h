@@ -29,8 +29,8 @@
  */
 
 
-#ifndef LB302_H_
-#define LB302_H_
+#ifndef LB302_H
+#define LB302_H
 
 #include "DspEffectLibrary.h"
 #include "Instrument.h"
@@ -303,4 +303,4 @@ private:
 
 } // namespace lmms
 
-#endif
+#endif // LB302_H

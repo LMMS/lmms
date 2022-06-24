@@ -264,7 +264,7 @@ void PatchesDialog::accept()
 
 
 // Reject settings (Cancel button slot).
-void PatchesDialog::reject (void)
+void PatchesDialog::reject ()
 {
 	// Reset selection to initial selection, if applicable...
 	if (m_dirty > 0)
@@ -306,7 +306,7 @@ QTreeWidgetItem *PatchesDialog::findProgItem ( int iProg )
 
 
 // Bank change slot.
-void PatchesDialog::bankChanged (void)
+void PatchesDialog::bankChanged ()
 {
 	if (m_pSynth == nullptr)
 		return;

@@ -56,7 +56,7 @@ private:
 	bool readRIFF( TrackContainer* tc );
 	bool readTrack( int _track_end, QString & _track_name );
 
-	void error( void );
+	void error();
 
 
 	inline int readInt( int _bytes )

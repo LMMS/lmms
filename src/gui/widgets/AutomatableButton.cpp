@@ -246,8 +246,8 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 
 void automatableButtonGroup::modelChanged()
 {
-	connect( model(), SIGNAL( dataChanged() ),
-			this, SLOT( updateButtons() ) );
+	connect( model(), SIGNAL(dataChanged()),
+			this, SLOT(updateButtons()));
 	IntModelView::modelChanged();
 	updateButtons();
 }

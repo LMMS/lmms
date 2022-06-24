@@ -98,8 +98,8 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	compressionWidget->setVisible(false);
 #endif
 
-	connect( startButton, SIGNAL( clicked() ),
-			this, SLOT( startBtnClicked() ) );
+	connect( startButton, SIGNAL(clicked()),
+			this, SLOT(startBtnClicked()));
 }
 
 
@@ -190,14 +190,14 @@ void ExportProjectDialog::startExport()
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
 	Engine::getSong()->setLoopRenderCount(loopCountSB->value());
 
-	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
-			progressBar, SLOT( setValue( int ) ) );
-	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
-			this, SLOT( updateTitleBar( int ) ));
-	connect( m_renderManager.get(), SIGNAL( finished() ),
-			this, SLOT( accept() ) ) ;
-	connect( m_renderManager.get(), SIGNAL( finished() ),
-			getGUI()->mainWindow(), SLOT( resetWindowTitle() ) );
+	connect( m_renderManager.get(), SIGNAL(progressChanged(int)),
+			progressBar, SLOT(setValue(int)));
+	connect( m_renderManager.get(), SIGNAL(progressChanged(int)),
+			this, SLOT(updateTitleBar(int)));
+	connect( m_renderManager.get(), SIGNAL(finished()),
+			this, SLOT(accept())) ;
+	connect( m_renderManager.get(), SIGNAL(finished()),
+			getGUI()->mainWindow(), SLOT(resetWindowTitle()));
 
 	if ( m_multiExport )
 	{

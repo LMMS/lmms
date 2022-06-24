@@ -46,8 +46,8 @@ PatternTrackView::PatternTrackView(PatternTrack* pt, TrackContainerView* tcv) :
 	m_trackLabel->setIcon( embed::getIconPixmap("pattern_track"));
 	m_trackLabel->move( 3, 1 );
 	m_trackLabel->show();
-	connect( m_trackLabel, SIGNAL( clicked( bool ) ),
-			this, SLOT( clickedTrackLabel() ) );
+	connect( m_trackLabel, SIGNAL(clicked(bool)),
+			this, SLOT(clickedTrackLabel()));
 	setModel(pt);
 }
 

@@ -29,6 +29,9 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 #include <QTreeWidget>
 
 
@@ -71,7 +74,7 @@ public:
 	~FileBrowser() override = default;
 
 private slots:
-	void reloadTree( void );
+	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
 	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
@@ -140,7 +143,12 @@ private:
 
 	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
+	
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_pphMutex;
+#else
 	QMutex m_pphMutex;
+#endif
 
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
@@ -164,7 +172,7 @@ public:
 	Directory( const QString & filename, const QString & path,
 						const QString & filter );
 
-	void update( void );
+	void update();
 
 	inline QString fullName( QString path = QString() )
 	{
@@ -187,7 +195,7 @@ public:
 
 
 private:
-	void initPixmaps( void );
+	void initPixmaps();
 
 	bool addItems( const QString & path );
 
@@ -248,28 +256,28 @@ public:
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
-	inline FileTypes type( void ) const
+	inline FileTypes type() const
 	{
 		return( m_type );
 	}
 
-	inline FileHandling handling( void ) const
+	inline FileHandling handling() const
 	{
 		return( m_handling );
 	}
 
-	inline bool isTrack( void ) const
+	inline bool isTrack() const
 	{
 		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
 	}
 
-	QString extension( void );
+	QString extension();
 	static QString extension( const QString & file );
 
 
 private:
-	void initPixmaps( void );
-	void determineFileType( void );
+	void initPixmaps();
+	void determineFileType();
 
 	static QPixmap * s_projectFilePixmap;
 	static QPixmap * s_presetFilePixmap;

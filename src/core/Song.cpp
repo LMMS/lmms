@@ -100,21 +100,21 @@ Song::Song() :
 	m_oldAutomatedValues()
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
-	connect( &m_tempoModel, SIGNAL( dataChanged() ),
-			this, SLOT( setTempo() ), Qt::DirectConnection );
-	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
-			this, SLOT( setTempo() ), Qt::DirectConnection );
-	connect( &m_timeSigModel, SIGNAL( dataChanged() ),
-			this, SLOT( setTimeSignature() ), Qt::DirectConnection );
+	connect( &m_tempoModel, SIGNAL(dataChanged()),
+			this, SLOT(setTempo()), Qt::DirectConnection );
+	connect( &m_tempoModel, SIGNAL(dataUnchanged()),
+			this, SLOT(setTempo()), Qt::DirectConnection );
+	connect( &m_timeSigModel, SIGNAL(dataChanged()),
+			this, SLOT(setTimeSignature()), Qt::DirectConnection );
 
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this,
-						SLOT( updateFramesPerTick() ) );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this,
+						SLOT(updateFramesPerTick()));
 
-	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterVolumeChanged() ), Qt::DirectConnection );
-/*	connect( &m_masterPitchModel, SIGNAL( dataChanged() ),
-			this, SLOT( masterPitchChanged() ) );*/
+	connect( &m_masterVolumeModel, SIGNAL(dataChanged()),
+			this, SLOT(masterVolumeChanged()), Qt::DirectConnection );
+/*	connect( &m_masterPitchModel, SIGNAL(dataChanged()),
+			this, SLOT(masterPitchChanged()));*/
 
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );

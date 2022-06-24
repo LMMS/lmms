@@ -65,7 +65,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	QMenu * toMenu = new QMenu( this );
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
-	connect( toMenu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
+	connect( toMenu, SIGNAL(aboutToShow()), this, SLOT(updateMenu()));
 
 
 	setObjectName( "automationEnabled" );
@@ -106,13 +106,13 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_soloBtn->show();
 	m_soloBtn->setToolTip(tr("Solo"));
 
-	connect( this, SIGNAL( trackRemovalScheduled( lmms::gui::TrackView * ) ),
+	connect( this, SIGNAL(trackRemovalScheduled(lmms::gui::TrackView*)),
 			m_trackView->trackContainerView(),
-				SLOT( deleteTrackView( lmms::gui::TrackView * ) ),
+				SLOT(deleteTrackView(lmms::gui::TrackView*)),
 							Qt::QueuedConnection );
 
-	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
-			this, SLOT( update() ) );
+	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL(dataChanged()),
+			this, SLOT(update()));
 
 	connect(m_trackView->getTrack(), SIGNAL(colorChanged()), this, SLOT(update()));
 }
@@ -178,7 +178,7 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 
-	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	p.fillRect(rect(), palette().brush(QPalette::Window));
 
 	if( m_trackView->getTrack()->useColor() && ! m_trackView->getTrack()->getMutedModel()->value() ) 
 	{
@@ -330,14 +330,14 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->clear();
 	toMenu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
 						tr( "Clone this track" ),
-						this, SLOT( cloneTrack() ) );
+						this, SLOT(cloneTrack()));
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
-						this, SLOT( removeTrack() ) );
+						this, SLOT(removeTrack()));
 
 	if( ! m_trackView->trackContainerView()->fixedClips() )
 	{
-		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
+		toMenu->addAction( tr( "Clear this track" ), this, SLOT(clearTrack()));
 	}
 	if (QMenu *mixerMenu = m_trackView->createMixerMenu(tr("Channel %1: %2"), tr("Assign to new Mixer Channel")))
 	{
@@ -351,8 +351,8 @@ void TrackOperationsWidget::updateMenu()
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
-		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
-		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
+		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT(recordingOn()));
+		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT(recordingOff()));
 	}
 
 	toMenu->addSeparator();

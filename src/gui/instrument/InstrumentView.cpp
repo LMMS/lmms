@@ -59,14 +59,14 @@ void InstrumentView::setModel( Model * _model, bool )
 	{
 		ModelView::setModel( _model );
 		instrumentTrackWindow()->setWindowIcon( model()->logo()->pixmap() );
-		connect( model(), SIGNAL( destroyed( QObject * ) ), this, SLOT( close() ) );
+		connect( model(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
 	}
 }
 
 
 
 
-InstrumentTrackWindow * InstrumentView::instrumentTrackWindow( void )
+InstrumentTrackWindow * InstrumentView::instrumentTrackWindow()
 {
 	return( dynamic_cast<InstrumentTrackWindow *>(
 					parentWidget()->parentWidget() ) );

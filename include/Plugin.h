@@ -253,7 +253,7 @@ public:
 	const PixmapLoader *logo() const;
 
 	//! Return plugin type
-	inline PluginTypes type( void ) const
+	inline PluginTypes type() const
 	{
 		return m_descriptor->type;
 	}

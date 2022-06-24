@@ -153,8 +153,8 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_userWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
 	connect( m_userWaveBtn,
-					SIGNAL( doubleClicked() ),
-			this, SLOT( askUserDefWave() ) );
+					SIGNAL(doubleClicked()),
+			this, SLOT(askUserDefWave()));
 	m_userWaveBtn->setToolTip(
 				tr( "User-defined shape.\nDouble click to pick a file." ) );
 	
@@ -244,14 +244,14 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 		//   should be replaced by Model::displayName
 	contextMenu->addAction( embed::getIconPixmap( "arp_up_on" ),
 						tr( "Move &up" ),
-						this, SLOT( moveUp() ) );
+						this, SLOT(moveUp()));
 	contextMenu->addAction( embed::getIconPixmap( "arp_down_on" ),
 						tr( "Move &down" ),
-						this, SLOT( moveDown() ) );
+						this, SLOT(moveDown()));
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
-						this, SLOT( deletePlugin() ) );
+						this, SLOT(deletePlugin()));
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 	*/
