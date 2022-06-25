@@ -41,18 +41,7 @@ if not Path('.gitmodules').is_file():
 
 result = subprocess.run(['git', 'ls-files', '*.[ch]', '*.[ch]pp', ':!tests/*'],
                         capture_output=True, text=True, check=True)
-exclude_files = {
-    # too complex
-    'include/AudioPortAudio.h',
-    'src/core/audio/AudioPortAudio.cpp',
-    'include/RemotePluginBase.h',
-    'plugins/VstBase/RemoteVstPlugin.cpp',
-    'plugins/ReverbSC/ReverbSC.h',
-    # not ours:
-    'include/ladspa.h'
-    # f.startswith('plugins/LadspaEffect')
-    # f.__contains__('portsmf')
-}
+
 known_no_namespace_lmms = {
     # main.cpp
     'src/core/main.cpp',
@@ -76,15 +65,29 @@ known_no_namespace_lmms = {
     'plugins/ReverbSC/revsc.h'
 }
 
-files = [Path(f) for f in result.stdout.splitlines() if
-            f not in exclude_files
-            and not f.startswith('plugins/LadspaEffect/calf')
-            and not f.startswith('plugins/LadspaEffect/caps')
-            and not f.startswith('plugins/LadspaEffect/cmt')
-            and not f.startswith('plugins/LadspaEffect/swh')
-            and not f.startswith('plugins/LadspaEffect/tap')
-            and not f.__contains__('portsmf')
-        ]
+exclude_files_tmp = {
+    # too complex
+    'include/AudioPortAudio.h',
+    'src/core/audio/AudioPortAudio.cpp',
+    'include/RemotePluginBase.h',
+    'plugins/VstBase/RemoteVstPlugin.cpp',
+    'plugins/ReverbSC/ReverbSC.h',
+    # not ours:
+    'include/ladspa.h'
+    # f.startswith('plugins/LadspaEffect')
+    # f.__contains__('portsmf')
+}
+exclude_files = [
+    f for f in result.stdout.splitlines()
+		if f in exclude_files_tmp
+        or f.startswith('plugins/LadspaEffect/calf')
+        or f.startswith('plugins/LadspaEffect/caps')
+        or f.startswith('plugins/LadspaEffect/cmt')
+        or f.startswith('plugins/LadspaEffect/swh')
+        or f.startswith('plugins/LadspaEffect/tap')
+        or f.__contains__('portsmf')
+]
+files = [Path(f) for f in result.stdout.splitlines() if f not in exclude_files]
 
 namespaces = re.compile(r'^\s*namespace\s*\S*', re.MULTILINE)
 no_include_after_namespace = re.compile(
