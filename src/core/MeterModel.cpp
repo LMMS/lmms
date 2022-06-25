@@ -41,6 +41,7 @@ MeterModel::MeterModel( Model * _parent ) :
 			this, SIGNAL(dataChanged()), Qt::DirectConnection );
 }
 
+MeterModel::~MeterModel() = default;
 
 
 
