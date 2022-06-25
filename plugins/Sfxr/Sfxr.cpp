@@ -88,8 +88,7 @@ SfxrSynth::SfxrSynth( const SfxrInstrument * s ):
 
 
 
-SfxrSynth::~SfxrSynth()
-= default;
+SfxrSynth::~SfxrSynth() = default;
 
 
 
@@ -360,8 +359,7 @@ SfxrInstrument::SfxrInstrument( InstrumentTrack * _instrument_track ) :
 
 
 
-SfxrInstrument::~SfxrInstrument()
-= default;
+SfxrInstrument::~SfxrInstrument() = default;
 
 
 

@@ -118,8 +118,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 /*! \brief Destroy this track View.
  *
  */
-TrackView::~TrackView()
-= default;
+TrackView::~TrackView() = default;
 
 
 

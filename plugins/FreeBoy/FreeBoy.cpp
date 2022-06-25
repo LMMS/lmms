@@ -125,8 +125,7 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-FreeBoyInstrument::~FreeBoyInstrument()
-= default;
+FreeBoyInstrument::~FreeBoyInstrument() = default;
 
 
 void FreeBoyInstrument::saveSettings( QDomDocument & _doc,
@@ -683,8 +682,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 }
 
 
-FreeBoyInstrumentView::~FreeBoyInstrumentView()
-= default;
+FreeBoyInstrumentView::~FreeBoyInstrumentView() = default;
 
 
 void FreeBoyInstrumentView::modelChanged()

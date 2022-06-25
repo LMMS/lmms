@@ -103,8 +103,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 
 
 
-MeterDialog::~MeterDialog()
-= default;
+MeterDialog::~MeterDialog() = default;
 
 
 

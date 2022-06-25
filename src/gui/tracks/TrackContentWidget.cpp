@@ -86,8 +86,7 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
  *
  *  Destroys the trackContentWidget.
  */
-TrackContentWidget::~TrackContentWidget()
-= default;
+TrackContentWidget::~TrackContentWidget() = default;
 
 
 

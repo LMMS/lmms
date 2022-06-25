@@ -36,8 +36,7 @@ AudioEngineProfiler::AudioEngineProfiler() :
 
 
 
-AudioEngineProfiler::~AudioEngineProfiler()
-= default;
+AudioEngineProfiler::~AudioEngineProfiler() = default;
 
 
 void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )

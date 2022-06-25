@@ -103,8 +103,7 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 }
 
 
-NesObject::~NesObject()
-= default;
+NesObject::~NesObject() = default;
 
 
 void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
@@ -550,8 +549,7 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 
 
-NesInstrument::~NesInstrument()
-= default;
+NesInstrument::~NesInstrument() = default;
 
 
 void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
@@ -852,8 +850,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 
 
-NesInstrumentView::~NesInstrumentView()
-= default;
+NesInstrumentView::~NesInstrumentView() = default;
 
 
 void NesInstrumentView::modelChanged()

@@ -101,8 +101,7 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 
 
 
-SideBar::~SideBar()
-= default;
+SideBar::~SideBar() = default;
 
 
 

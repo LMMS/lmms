@@ -326,8 +326,7 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-WatsynInstrument::~WatsynInstrument()
-= default;
+WatsynInstrument::~WatsynInstrument() = default;
 
 
 void WatsynInstrument::playNote( NotePlayHandle * _n,
@@ -946,8 +945,7 @@ WatsynView::WatsynView( Instrument * _instrument,
 }
 
 
-WatsynView::~WatsynView()
-= default;
+WatsynView::~WatsynView() = default;
 
 
 

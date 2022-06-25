@@ -583,8 +583,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 
 
 
-OscillatorObject::~OscillatorObject()
-= default;
+OscillatorObject::~OscillatorObject() = default;
 
 
 

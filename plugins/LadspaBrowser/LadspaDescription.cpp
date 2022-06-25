@@ -116,8 +116,7 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 
 
 
-LadspaDescription::~LadspaDescription()
-= default;
+LadspaDescription::~LadspaDescription() = default;
 
 
 

@@ -107,8 +107,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 
 
 
-InstrumentSoundShaping::~InstrumentSoundShaping()
-= default;
+InstrumentSoundShaping::~InstrumentSoundShaping() = default;
 
 
 

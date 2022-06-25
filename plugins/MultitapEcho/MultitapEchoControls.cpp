@@ -58,8 +58,7 @@ MultitapEchoControls::MultitapEchoControls( MultitapEchoEffect * eff ) :
 }
 
 
-MultitapEchoControls::~MultitapEchoControls()
-= default;
+MultitapEchoControls::~MultitapEchoControls() = default;
 
 
 void MultitapEchoControls::saveSettings( QDomDocument & doc, QDomElement & parent )

@@ -41,8 +41,7 @@ ControllerDialog::ControllerDialog( Controller * _controller,
 
 
 
-ControllerDialog::~ControllerDialog()
-= default;
+ControllerDialog::~ControllerDialog() = default;
 
 
 

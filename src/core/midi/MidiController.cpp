@@ -47,8 +47,7 @@ MidiController::MidiController( Model * _parent ) :
 
 
 
-MidiController::~MidiController()
-= default;
+MidiController::~MidiController() = default;
 
 
 

@@ -84,8 +84,7 @@ ProjectNotes::ProjectNotes() :
 
 
 
-ProjectNotes::~ProjectNotes()
-= default;
+ProjectNotes::~ProjectNotes() = default;
 
 
 

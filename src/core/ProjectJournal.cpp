@@ -49,8 +49,7 @@ ProjectJournal::ProjectJournal() :
 
 
 
-ProjectJournal::~ProjectJournal()
-= default;
+ProjectJournal::~ProjectJournal() = default;
 
 
 

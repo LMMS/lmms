@@ -58,8 +58,7 @@ PluginFactory::PluginFactory()
 	discoverPlugins();
 }
 
-PluginFactory::~PluginFactory()
-= default;
+PluginFactory::~PluginFactory() = default;
 
 void PluginFactory::setupSearchPaths()
 {

@@ -42,8 +42,7 @@ MidiPortMenu::MidiPortMenu( MidiPort::Modes _mode ) :
 
 
 
-MidiPortMenu::~MidiPortMenu()
-= default;
+MidiPortMenu::~MidiPortMenu() = default;
 
 
 

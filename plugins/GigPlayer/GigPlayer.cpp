@@ -988,8 +988,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 
-GigInstrumentView::~GigInstrumentView()
-= default;
+GigInstrumentView::~GigInstrumentView() = default;
 
 
 

@@ -44,8 +44,7 @@ MeterModel::MeterModel( Model * _parent ) :
 
 
 
-MeterModel::~MeterModel()
-= default;
+MeterModel::~MeterModel() = default;
 
 
 

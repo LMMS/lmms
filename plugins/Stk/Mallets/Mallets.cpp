@@ -130,8 +130,7 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 
 
 
-MalletsInstrument::~MalletsInstrument()
-= default;
+MalletsInstrument::~MalletsInstrument() = default;
 
 
 
@@ -434,8 +433,7 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 
 
 
-MalletsInstrumentView::~MalletsInstrumentView()
-= default;
+MalletsInstrumentView::~MalletsInstrumentView() = default;
 
 
 

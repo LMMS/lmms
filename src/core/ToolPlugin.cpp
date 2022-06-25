@@ -38,8 +38,7 @@ ToolPlugin::ToolPlugin( const Descriptor * _descriptor, Model * _parent ) :
 
 
 
-ToolPlugin::~ToolPlugin()
-= default;
+ToolPlugin::~ToolPlugin() = default;
 
 
 

@@ -67,8 +67,7 @@ MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor)
 
 
 
-MidiExport::~MidiExport()
-= default;
+MidiExport::~MidiExport() = default;
 
 
 

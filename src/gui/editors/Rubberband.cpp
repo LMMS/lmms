@@ -38,8 +38,7 @@ RubberBand::RubberBand( QWidget * _parent ) :
 
 
 
-RubberBand::~RubberBand()
-= default;
+RubberBand::~RubberBand() = default;
 
 
 

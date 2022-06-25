@@ -171,8 +171,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 
 
-InstrumentMidiIOView::~InstrumentMidiIOView()
-= default;
+InstrumentMidiIOView::~InstrumentMidiIOView() = default;
 
 
 

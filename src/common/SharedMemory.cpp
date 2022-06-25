@@ -177,8 +177,7 @@ private:
 
 #endif
 
-SharedMemoryData::SharedMemoryData() noexcept
-= default;
+SharedMemoryData::SharedMemoryData() noexcept = default;
 
 SharedMemoryData::SharedMemoryData(std::string&& key, bool readOnly) :
 	m_key{std::move(key)},

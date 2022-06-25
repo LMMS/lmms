@@ -111,8 +111,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 }
 
 
-MonstroSynth::~MonstroSynth()
-= default;
+MonstroSynth::~MonstroSynth() = default;
 
 
 void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
@@ -1028,8 +1027,7 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-MonstroInstrument::~MonstroInstrument()
-= default;
+MonstroInstrument::~MonstroInstrument() = default;
 
 
 void MonstroInstrument::playNote( NotePlayHandle * _n,
@@ -1488,8 +1486,7 @@ MonstroView::MonstroView( Instrument * _instrument,
 }
 
 
-MonstroView::~MonstroView()
-= default;
+MonstroView::~MonstroView() = default;
 
 
 void MonstroView::updateLayout()

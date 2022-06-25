@@ -93,8 +93,7 @@ ControllerRackView::ControllerRackView() :
 
 
 
-ControllerRackView::~ControllerRackView()
-= default;
+ControllerRackView::~ControllerRackView() = default;
 
 
 

@@ -44,8 +44,7 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 
 
 
-EffectControlDialog::~EffectControlDialog()
-= default;
+EffectControlDialog::~EffectControlDialog() = default;
 
 
 

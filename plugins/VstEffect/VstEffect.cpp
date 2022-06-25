@@ -76,8 +76,7 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-VstEffect::~VstEffect()
-= default;
+VstEffect::~VstEffect() = default;
 
 
 

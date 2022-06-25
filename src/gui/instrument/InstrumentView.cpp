@@ -75,8 +75,7 @@ InstrumentTrackWindow * InstrumentView::instrumentTrackWindow()
 
 
 
-InstrumentViewFixedSize::~InstrumentViewFixedSize()
-= default;
+InstrumentViewFixedSize::~InstrumentViewFixedSize() = default;
 
 
 } // namespace lmms::gui

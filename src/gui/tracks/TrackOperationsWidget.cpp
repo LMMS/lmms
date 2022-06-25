@@ -123,8 +123,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 /*! \brief Destroy an existing trackOperationsWidget
  *
  */
-TrackOperationsWidget::~TrackOperationsWidget()
-= default;
+TrackOperationsWidget::~TrackOperationsWidget() = default;
 
 
 

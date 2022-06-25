@@ -171,8 +171,7 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 
 
 
-BitInvader::~BitInvader()
-= default;
+BitInvader::~BitInvader() = default;
 
 
 

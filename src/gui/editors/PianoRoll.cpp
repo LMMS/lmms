@@ -625,8 +625,7 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 }
 
 
-PianoRoll::~PianoRoll()
-= default;
+PianoRoll::~PianoRoll() = default;
 
 
 void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )

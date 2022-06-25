@@ -14,8 +14,7 @@ MicroTimer::MicroTimer()
 	reset();
 }
 
-MicroTimer::~MicroTimer()
-= default;
+MicroTimer::~MicroTimer() = default;
 
 void MicroTimer::reset()
 {

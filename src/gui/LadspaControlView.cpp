@@ -121,8 +121,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 
 
 
-LadspaControlView::~LadspaControlView()
-= default;
+LadspaControlView::~LadspaControlView() = default;
 
 
 

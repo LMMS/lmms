@@ -277,8 +277,7 @@ SongEditor::SongEditor( Song * song ) :
 
 
 
-SongEditor::~SongEditor()
-= default;
+SongEditor::~SongEditor() = default;
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {

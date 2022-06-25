@@ -48,8 +48,7 @@ ImportFilter::ImportFilter( const QString & _file_name,
 
 
 
-ImportFilter::~ImportFilter()
-= default;
+ImportFilter::~ImportFilter() = default;
 
 
 

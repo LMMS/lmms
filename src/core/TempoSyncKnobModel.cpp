@@ -53,8 +53,7 @@ TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 
 
 
-TempoSyncKnobModel::~TempoSyncKnobModel()
-= default;
+TempoSyncKnobModel::~TempoSyncKnobModel() = default;
 
 
 

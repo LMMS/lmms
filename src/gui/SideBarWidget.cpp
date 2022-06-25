@@ -55,8 +55,7 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 
 
 
-SideBarWidget::~SideBarWidget()
-= default;
+SideBarWidget::~SideBarWidget() = default;
 
 
 

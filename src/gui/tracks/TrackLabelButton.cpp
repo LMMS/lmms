@@ -73,8 +73,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 
 
 
-TrackLabelButton::~TrackLabelButton()
-= default;
+TrackLabelButton::~TrackLabelButton() = default;
 
 
 

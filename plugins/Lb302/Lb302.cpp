@@ -1010,8 +1010,7 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 }
 
 
-Lb302SynthView::~Lb302SynthView()
-= default;
+Lb302SynthView::~Lb302SynthView() = default;
 
 
 void Lb302SynthView::modelChanged()

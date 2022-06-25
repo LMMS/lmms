@@ -176,8 +176,7 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 
 
-DataFile::~DataFile()
-= default;
+DataFile::~DataFile() = default;
 
 
 

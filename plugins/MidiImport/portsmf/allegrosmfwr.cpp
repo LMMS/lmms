@@ -98,8 +98,7 @@ Alg_smf_write::Alg_smf_write(Alg_seq_ptr a_seq)
 }
 
 
-Alg_smf_write::~Alg_smf_write()
-= default;
+Alg_smf_write::~Alg_smf_write() = default;
 
 
 // sorting is quite subtle due to rounding

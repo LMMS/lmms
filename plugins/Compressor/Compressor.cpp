@@ -97,8 +97,7 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 
 
 
-CompressorEffect::~CompressorEffect()
-= default;
+CompressorEffect::~CompressorEffect() = default;
 
 
 float CompressorEffect::msToCoeff(float ms)

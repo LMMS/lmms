@@ -82,8 +82,7 @@ Ladspa2LMMS::Ladspa2LMMS()
  
  
  
-Ladspa2LMMS::~Ladspa2LMMS()
-= default;
+Ladspa2LMMS::~Ladspa2LMMS() = default;
 
 
 

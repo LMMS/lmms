@@ -670,8 +670,7 @@ void VestigeInstrumentView::updateMenu( void )
 }
 
 
-VestigeInstrumentView::~VestigeInstrumentView()
-= default;
+VestigeInstrumentView::~VestigeInstrumentView() = default;
 
 
 

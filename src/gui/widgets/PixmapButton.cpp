@@ -47,8 +47,7 @@ PixmapButton::PixmapButton( QWidget * _parent, const QString & _name ) :
 
 
 
-PixmapButton::~PixmapButton()
-= default;
+PixmapButton::~PixmapButton() = default;
 
 
 
