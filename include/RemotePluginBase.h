@@ -412,7 +412,7 @@ public:
 		{
 			char buf[32];
 			sprintf( buf, "%d", _i );
-			data.push_back( std::string( buf ) );
+			data.emplace_back( buf );
 			return *this;
 		}
 
@@ -420,7 +420,7 @@ public:
 		{
 			char buf[32];
 			sprintf( buf, "%f", _f );
-			data.push_back( std::string( buf ) );
+			data.emplace_back( buf );
 			return *this;
 		}
 
