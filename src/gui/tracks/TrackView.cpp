@@ -119,8 +119,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
  *
  */
 TrackView::~TrackView()
-{
-}
+= default;
 
 
 

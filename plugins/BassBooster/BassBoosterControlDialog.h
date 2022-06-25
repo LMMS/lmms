@@ -41,8 +41,7 @@ class BassBoosterControlDialog : public EffectControlDialog
 public:
 	BassBoosterControlDialog( BassBoosterControls* controls );
 	~BassBoosterControlDialog() override
-	{
-	}
+	= default;
 
 } ;
 

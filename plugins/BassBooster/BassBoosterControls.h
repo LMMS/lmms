@@ -40,8 +40,7 @@ class BassBoosterControls : public EffectControls
 public:
 	BassBoosterControls( BassBoosterEffect* effect );
 	~BassBoosterControls() override
-	{
-	}
+	= default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

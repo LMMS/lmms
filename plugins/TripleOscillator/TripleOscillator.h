@@ -192,8 +192,7 @@ private:
 		{
 		}
 		OscillatorKnobs()
-		{
-		}
+		= default;
 		Knob * m_volKnob;
 		Knob * m_panKnob;
 		Knob * m_coarseKnob;

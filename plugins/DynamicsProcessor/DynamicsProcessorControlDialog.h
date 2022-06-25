@@ -44,8 +44,7 @@ class DynProcControlDialog : public EffectControlDialog
 public:
 	DynProcControlDialog( DynProcControls * _controls );
 	~DynProcControlDialog() override
-	{
-	}
+	= default;
 
 
 private:

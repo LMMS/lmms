@@ -75,8 +75,7 @@ Plugin::Plugin(const Descriptor * descriptor, Model * parent, const
 
 
 Plugin::~Plugin()
-{
-}
+= default;
 
 
 

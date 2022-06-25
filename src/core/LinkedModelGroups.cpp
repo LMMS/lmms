@@ -140,7 +140,7 @@ bool LinkedModelGroup::containsModel(const QString &name) const
 
 
 
-LinkedModelGroups::~LinkedModelGroups() {}
+LinkedModelGroups::~LinkedModelGroups() = default;
 
 
 

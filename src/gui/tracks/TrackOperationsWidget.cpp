@@ -124,8 +124,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
  *
  */
 TrackOperationsWidget::~TrackOperationsWidget()
-{
-}
+= default;
 
 
 

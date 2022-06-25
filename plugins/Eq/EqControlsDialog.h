@@ -48,8 +48,7 @@ class EqControlsDialog : public EffectControlDialog
 public:
 	EqControlsDialog( EqControls * controls );
 	~EqControlsDialog() override
-	{
-	}
+	= default;
 
 	EqBand * setBand( EqControls * controls );
 

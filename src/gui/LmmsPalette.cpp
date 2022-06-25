@@ -53,8 +53,7 @@ LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) :
 }
 
 LmmsPalette::~LmmsPalette()
-{
-}
+= default;
 
 #define ACCESSMET( read, write ) \
 	QColor LmmsPalette:: read () const \

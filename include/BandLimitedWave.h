@@ -97,8 +97,8 @@ public:
 		NumBLWaveforms
 	};
 
-	BandLimitedWave() {};
-	virtual ~BandLimitedWave() {};
+	BandLimitedWave() = default;
+	virtual ~BandLimitedWave() = default;
 
 	/*! \brief This method converts frequency to wavelength. The oscillate function takes wavelength as argument so
 	 * use this to convert your note frequency to wavelength before using it.

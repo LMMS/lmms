@@ -341,8 +341,7 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 
 
 AudioSdl::setupWidget::~setupWidget()
-{
-}
+= default;
 
 
 

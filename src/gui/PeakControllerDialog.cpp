@@ -56,8 +56,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 
 
 PeakControllerDialog::~PeakControllerDialog()
-{
-}
+= default;
 
 
 

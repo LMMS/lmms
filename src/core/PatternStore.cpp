@@ -51,8 +51,7 @@ PatternStore::PatternStore() :
 
 
 PatternStore::~PatternStore()
-{
-}
+= default;
 
 
 

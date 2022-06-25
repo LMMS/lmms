@@ -54,8 +54,7 @@ BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 }
 
 BitcrushControls::~BitcrushControls()
-{
-}
+= default;
 
 void BitcrushControls::saveSettings( QDomDocument & doc, QDomElement & elem )
 {

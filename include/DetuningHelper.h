@@ -43,8 +43,7 @@ public:
 	}
 
 	~DetuningHelper() override
-	{
-	}
+	= default;
 
 	float defaultValue() const override
 	{

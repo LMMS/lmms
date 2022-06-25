@@ -31,8 +31,7 @@ namespace lmms
 {
 
 MidiClient::MidiClient()
-{
-}
+= default;
 
 
 
@@ -107,15 +106,13 @@ void MidiClient::subscribeWritablePort( MidiPort* , const QString& , bool )
 
 
 MidiClientRaw::MidiClientRaw()
-{
-}
+= default;
 
 
 
 
 MidiClientRaw::~MidiClientRaw()
-{
-}
+= default;
 
 
 

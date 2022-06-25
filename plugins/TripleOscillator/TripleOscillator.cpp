@@ -239,8 +239,7 @@ TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 
 
 TripleOscillator::~TripleOscillator()
-{
-}
+= default;
 
 
 
@@ -715,8 +714,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 
 
 TripleOscillatorView::~TripleOscillatorView()
-{
-}
+= default;
 
 
 

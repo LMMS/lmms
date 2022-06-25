@@ -43,8 +43,7 @@ class FlangerControlsDialog : public EffectControlDialog
 public:
 	FlangerControlsDialog( FlangerControls* controls );
 	~FlangerControlsDialog() override
-	{
-	}
+	= default;
 };
 
 

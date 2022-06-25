@@ -390,11 +390,7 @@ public:
 		{
 		}
 
-		message( const message & _m ) :
-			id( _m.id ),
-			data( _m.data )
-		{
-		}
+		message( const message & _m ) = default;
 
 		message( int _id ) :
 			id( _id ),

@@ -65,8 +65,7 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 EqEffect::~EqEffect()
-{
-}
+= default;
 
 
 

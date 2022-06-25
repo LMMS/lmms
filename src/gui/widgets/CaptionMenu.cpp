@@ -41,8 +41,7 @@ CaptionMenu::CaptionMenu( const QString & _title, QWidget * _parent ) :
 
 
 CaptionMenu::~CaptionMenu()
-{
-}
+= default;
 
 
 } // namespace lmms::gui

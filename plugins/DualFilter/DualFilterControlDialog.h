@@ -44,8 +44,7 @@ class DualFilterControlDialog : public EffectControlDialog
 public:
 	DualFilterControlDialog( DualFilterControls* controls );
 	~DualFilterControlDialog() override
-	{
-	}
+	= default;
 
 } ;
 

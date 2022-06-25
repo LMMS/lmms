@@ -75,8 +75,7 @@ class EqSpectrumView : public QWidget
 public:
 	explicit EqSpectrumView( EqAnalyser *b, QWidget *_parent = 0 );
 	~EqSpectrumView() override
-	{
-	}
+	= default;
 
 	QColor getColor() const;
 	void setColor( const QColor &value );

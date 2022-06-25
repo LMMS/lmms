@@ -43,8 +43,7 @@ class StereoEnhancerControlDialog : public EffectControlDialog
 public:
 	StereoEnhancerControlDialog( StereoEnhancerControls * _controls );
 	~StereoEnhancerControlDialog() override
-	{
-	}
+	= default;
 
 };
 

@@ -40,7 +40,7 @@ class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
 	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, nullptr ) {}
-	~ExportFilter() override {}
+	~ExportFilter() override = default;
 
 
 	virtual bool tryExport(const TrackContainer::TrackList &tracks,

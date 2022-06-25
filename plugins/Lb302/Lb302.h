@@ -71,7 +71,7 @@ class Lb302Filter
 {
 	public:
 	Lb302Filter(Lb302FilterKnobState* p_fs);
-	virtual ~Lb302Filter() {};
+	virtual ~Lb302Filter() = default;
 
 	virtual void recalc();
 	virtual void envRecalc();

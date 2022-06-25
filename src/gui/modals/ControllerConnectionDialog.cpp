@@ -61,8 +61,7 @@ public:
 
 
 	~AutoDetectMidiController() override
-	{
-	}
+	= default;
 
 
 	void processInEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override

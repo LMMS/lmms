@@ -124,7 +124,7 @@ public:
 	BitInvaderView( Instrument * _instrument,
 					QWidget * _parent );
 
-	~BitInvaderView() override {};
+	~BitInvaderView() override = default;
 
 protected slots:
 	//void sampleSizeChanged( float _new_sample_length );

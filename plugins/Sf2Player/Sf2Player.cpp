@@ -1056,8 +1056,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 Sf2InstrumentView::~Sf2InstrumentView()
-{
-}
+= default;
 
 
 

@@ -44,8 +44,7 @@ class BitcrushControlDialog : public EffectControlDialog
 public:
 	BitcrushControlDialog( BitcrushControls * controls );
 	~BitcrushControlDialog() override
-	{
-	}
+	= default;
 };
 
 

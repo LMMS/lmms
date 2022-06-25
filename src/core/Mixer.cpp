@@ -52,8 +52,7 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 
 
 MixerRoute::~MixerRoute()
-{
-}
+= default;
 
 
 void MixerRoute::updateName()

@@ -61,8 +61,7 @@ AmplifierEffect::AmplifierEffect( Model* parent, const Descriptor::SubPluginFeat
 
 
 AmplifierEffect::~AmplifierEffect()
-{
-}
+= default;
 
 
 

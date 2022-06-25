@@ -53,8 +53,7 @@ RenameDialog::RenameDialog( QString & _string ) :
 
 
 RenameDialog::~RenameDialog()
-{
-}
+= default;
 
 
 

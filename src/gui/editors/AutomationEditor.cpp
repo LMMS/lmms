@@ -1968,8 +1968,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 
 AutomationEditorWindow::~AutomationEditorWindow()
-{
-}
+= default;
 
 
 void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)

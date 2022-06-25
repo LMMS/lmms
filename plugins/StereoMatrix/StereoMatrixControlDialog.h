@@ -42,8 +42,7 @@ class StereoMatrixControlDialog : public EffectControlDialog
 public:
 	StereoMatrixControlDialog( StereoMatrixControls * _controls );
 	~StereoMatrixControlDialog() override
-	{
-	}
+	= default;
 
 };
 

@@ -33,8 +33,7 @@ AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget 
 }
 
 AudioDeviceSetupWidget::~AudioDeviceSetupWidget()
-{
-}
+= default;
 
 void AudioDeviceSetupWidget::show()
 {

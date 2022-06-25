@@ -57,8 +57,7 @@ FadeButton::FadeButton(const QColor & _normal_color,
 
 
 FadeButton::~FadeButton()
-{
-}
+= default;
 
 void FadeButton::setActiveColor(const QColor & activated_color)
 {

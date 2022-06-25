@@ -45,8 +45,7 @@ class MultitapEchoControlDialog : public EffectControlDialog
 public:
 	MultitapEchoControlDialog( MultitapEchoControls * controls );
 	~MultitapEchoControlDialog() override
-	{
-	}
+	= default;
 };
 
 

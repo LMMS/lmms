@@ -759,7 +759,7 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 	~ConnectPortVisitor() override;
 };
 
-ConnectPortVisitor::~ConnectPortVisitor() {}
+ConnectPortVisitor::~ConnectPortVisitor() = default;
 
 // !This function must be realtime safe!
 // use createPort to create any port before connecting

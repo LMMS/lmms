@@ -61,8 +61,7 @@ public:
 	}
 
 	~DummyEffectControls() override
-	{
-	}
+	= default;
 
 	int controlCount() override
 	{
@@ -103,8 +102,7 @@ public:
 	}
 
 	~DummyEffect() override
-	{
-	}
+	= default;
 
 	EffectControls * controls() override
 	{

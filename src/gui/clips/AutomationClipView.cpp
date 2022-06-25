@@ -72,8 +72,7 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 
 AutomationClipView::~AutomationClipView()
-{
-}
+= default;
 
 
 

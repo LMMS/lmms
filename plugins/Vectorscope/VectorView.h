@@ -44,7 +44,7 @@ class VectorView : public QWidget
 	Q_OBJECT
 public:
 	explicit VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
-	~VectorView() override {}
+	~VectorView() override = default;
 
 	QSize sizeHint() const override {return QSize(300, 300);}
 

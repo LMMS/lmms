@@ -113,8 +113,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 
 
 LadspaControl::~LadspaControl()
-{
-}
+= default;
 
 
 

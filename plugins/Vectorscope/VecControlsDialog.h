@@ -43,7 +43,7 @@ class VecControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	explicit VecControlsDialog(VecControls *controls);
-	~VecControlsDialog() override {}
+	~VecControlsDialog() override = default;
 
 	bool isResizable() const override {return true;}
 	QSize sizeHint() const override;

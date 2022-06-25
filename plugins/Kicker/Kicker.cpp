@@ -86,8 +86,7 @@ KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
 
 
 KickerInstrument::~KickerInstrument()
-{
-}
+= default;
 
 
 
@@ -343,8 +342,7 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 
 
 KickerInstrumentView::~KickerInstrumentView()
-{
-}
+= default;
 
 
 

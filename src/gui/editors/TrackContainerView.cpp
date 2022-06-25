@@ -488,8 +488,7 @@ TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
 
 
 TrackContainerView::scrollArea::~scrollArea()
-{
-}
+= default;
 
 
 

@@ -42,8 +42,7 @@ public:
 	}
 
 	virtual ~SweepOscillator()
-	{
-	}
+	= default;
 
 	void update( sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
 	{

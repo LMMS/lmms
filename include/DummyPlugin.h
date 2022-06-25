@@ -42,8 +42,7 @@ public:
 	}
 
 	~DummyPlugin() override
-	{
-	}
+	= default;
 
 	void saveSettings( QDomDocument &, QDomElement & ) override
 	{

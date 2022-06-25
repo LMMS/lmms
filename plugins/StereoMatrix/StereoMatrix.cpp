@@ -65,8 +65,7 @@ StereoMatrixEffect::StereoMatrixEffect(
 
 
 StereoMatrixEffect::~StereoMatrixEffect()
-{
-}
+= default;
 
 
 

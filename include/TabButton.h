@@ -46,8 +46,7 @@ public:
 	}
 
 	~TabButton() override
-	{
-	}
+	= default;
 
 
 signals:

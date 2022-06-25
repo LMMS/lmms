@@ -83,8 +83,7 @@ Ladspa2LMMS::Ladspa2LMMS()
  
  
 Ladspa2LMMS::~Ladspa2LMMS()
-{
-}
+= default;
 
 
 

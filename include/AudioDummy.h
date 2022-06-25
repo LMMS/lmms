@@ -63,8 +63,7 @@ public:
 		}
 
 		~setupWidget() override
-		{
-		}
+		= default;
 
 		void saveSettings() override
 		{

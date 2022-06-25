@@ -91,8 +91,7 @@ MidiImport::MidiImport( const QString & _file ) :
 
 
 MidiImport::~MidiImport()
-{
-}
+= default;
 
 
 

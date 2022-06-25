@@ -67,8 +67,7 @@ public:
 
 	LmmsStyle();
 	~LmmsStyle() override
-	{
-	}
+	= default;
 
 	QPalette standardPalette() const override;
 

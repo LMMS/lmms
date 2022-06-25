@@ -67,8 +67,7 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 WaveShaperEffect::~WaveShaperEffect()
-{
-}
+= default;
 
 
 

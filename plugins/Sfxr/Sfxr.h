@@ -240,7 +240,7 @@ public:
 	SfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent );
 
-	~SfxrInstrumentView() override {};
+	~SfxrInstrumentView() override = default;
 
 protected slots:
 	void genPickup();

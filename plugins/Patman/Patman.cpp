@@ -496,8 +496,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 
 PatmanView::~PatmanView()
-{
-}
+= default;
 
 
 

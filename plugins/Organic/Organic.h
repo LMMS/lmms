@@ -212,8 +212,7 @@ private:
 		{
 		}
 		OscillatorKnobs()
-		{
-		}
+		= default;
 
 		Knob * m_harmKnob;
 		Knob * m_volKnob;

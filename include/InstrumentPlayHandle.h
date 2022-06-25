@@ -39,8 +39,7 @@ public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
 
 	~InstrumentPlayHandle() override
-	{
-	}
+	= default;
 
 
 	void play( sampleFrame * _working_buffer ) override

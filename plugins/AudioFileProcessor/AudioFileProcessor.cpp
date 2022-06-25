@@ -560,8 +560,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 
 AudioFileProcessorView::~AudioFileProcessorView()
-{
-}
+= default;
 
 
 

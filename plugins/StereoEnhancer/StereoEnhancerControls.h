@@ -40,8 +40,7 @@ class StereoEnhancerControls : public EffectControls
 public:
 	StereoEnhancerControls( StereoEnhancerEffect( * _eff ) ); 
 	~StereoEnhancerControls() override
-	{
-	}
+	= default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

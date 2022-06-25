@@ -43,8 +43,7 @@ class ReverbSCControlDialog : public EffectControlDialog
 public:
 	ReverbSCControlDialog( ReverbSCControls* controls );
 	~ReverbSCControlDialog() override
-	{
-	}
+	= default;
 
 } ;
 

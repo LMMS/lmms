@@ -109,8 +109,7 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 
 
 ProjectRenderer::~ProjectRenderer()
-{
-}
+= default;
 
 
 

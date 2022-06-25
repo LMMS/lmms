@@ -134,9 +134,7 @@ Editor::Editor(bool record, bool stepRecord) :
 }
 
 Editor::~Editor()
-{
-
-}
+= default;
 
 QAction *Editor::playAction() const
 {

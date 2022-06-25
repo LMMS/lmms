@@ -104,8 +104,7 @@ public:
 	}
 
 	~vstSubWin() override
-	{
-	}
+	= default;
 
 	void closeEvent( QCloseEvent * e ) override
 	{
@@ -672,8 +671,7 @@ void VestigeInstrumentView::updateMenu( void )
 
 
 VestigeInstrumentView::~VestigeInstrumentView()
-{
-}
+= default;
 
 
 

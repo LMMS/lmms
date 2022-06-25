@@ -54,8 +54,7 @@ public:
 	}
 
 	~PreviewTrackContainer() override
-	{
-	}
+	= default;
 
 	QString nodeName() const override
 	{

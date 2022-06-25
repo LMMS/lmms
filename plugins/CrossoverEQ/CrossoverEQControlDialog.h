@@ -46,8 +46,7 @@ class CrossoverEQControlDialog : public EffectControlDialog
 public:
 	CrossoverEQControlDialog( CrossoverEQControls * controls );
 	~CrossoverEQControlDialog() override
-	{
-	}
+	= default;
 	
 private:
 	QPixmap m_fader_bg;

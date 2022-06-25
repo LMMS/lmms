@@ -164,8 +164,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 }
 
 SampleTrackWindow::~SampleTrackWindow()
-{
-}
+= default;
 
 
 

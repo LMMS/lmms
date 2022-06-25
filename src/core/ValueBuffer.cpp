@@ -7,7 +7,7 @@ namespace lmms
 
 
 ValueBuffer::ValueBuffer()
-{}
+= default;
 
 ValueBuffer::ValueBuffer(int length)
 	: std::vector<float>(length)

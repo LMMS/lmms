@@ -68,8 +68,7 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 
 
 LadspaControlDialog::~LadspaControlDialog()
-{
-}
+= default;
 
 
 

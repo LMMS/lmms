@@ -50,8 +50,7 @@ ProjectJournal::ProjectJournal() :
 
 
 ProjectJournal::~ProjectJournal()
-{
-}
+= default;
 
 
 

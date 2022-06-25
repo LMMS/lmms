@@ -113,8 +113,7 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 
 // Destructor.
 PatchesDialog::~PatchesDialog()
-{
-}
+= default;
 
 
 // Dialog setup loader.

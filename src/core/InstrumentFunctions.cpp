@@ -222,8 +222,7 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 
 
 InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
-{
-}
+= default;
 
 
 
@@ -335,8 +334,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 
 
 InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
-{
-}
+= default;
 
 
 

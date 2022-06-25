@@ -126,7 +126,7 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 
 
 
-Lv2ViewProc::~Lv2ViewProc() {}
+Lv2ViewProc::~Lv2ViewProc() = default;
 
 
 

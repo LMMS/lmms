@@ -66,16 +66,7 @@ public:
 		m_data.m_sysExDataLen = dataLen;
 	}
 
-	MidiEvent( const MidiEvent& other ) :
-		m_type( other.m_type ),
-		m_metaEvent( other.m_metaEvent ),
-		m_channel( other.m_channel ),
-		m_data( other.m_data ),
-		m_sysExData( other.m_sysExData ),
-		m_sourcePort(other.m_sourcePort),
-		m_source(other.m_source)
-	{
-	}
+	MidiEvent( const MidiEvent& other ) = default;
 
 	MidiEventTypes type() const
 	{

@@ -83,8 +83,7 @@ LadspaBrowser::LadspaBrowser() :
 
 
 LadspaBrowser::~LadspaBrowser()
-{
-}
+= default;
 
 
 
@@ -167,8 +166,7 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 
 
 LadspaBrowserView::~LadspaBrowserView()
-{
-}
+= default;
 
 
 

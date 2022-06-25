@@ -37,7 +37,7 @@ namespace lmms
 
 class DrumSynth {
     public:
-        DrumSynth() {};
+        DrumSynth() = default;
         int GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sample_rate_t Fs);
 
     private:

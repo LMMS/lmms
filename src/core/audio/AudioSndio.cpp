@@ -205,9 +205,7 @@ AudioSndio::setupWidget::setupWidget( QWidget * _parent ) :
 
 
 AudioSndio::setupWidget::~setupWidget()
-{
-
-}
+= default;
 
 
 void AudioSndio::setupWidget::saveSettings()

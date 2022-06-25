@@ -49,7 +49,7 @@ class SaControls : public EffectControls
 	Q_OBJECT
 public:
 	explicit SaControls(Analyzer* effect);
-	~SaControls() override {}
+	~SaControls() override = default;
 
 	gui::EffectControlDialog* createView() override;
 

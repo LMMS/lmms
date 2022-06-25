@@ -45,8 +45,7 @@ public:
 	}
 
 	~selectableObject() override
-	{
-	}
+	= default;
 
 	inline void setSelected(bool selected)
 	{

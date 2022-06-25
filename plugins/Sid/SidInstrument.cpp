@@ -117,8 +117,7 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 
 
 VoiceObject::~VoiceObject()
-{
-}
+= default;
 
 
 SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
@@ -141,8 +140,7 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 
 
 SidInstrument::~SidInstrument()
-{
-}
+= default;
 
 
 void SidInstrument::saveSettings( QDomDocument & _doc,
@@ -663,8 +661,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 
 
 SidInstrumentView::~SidInstrumentView()
-{
-}
+= default;
 
 void SidInstrumentView::updateKnobHint()
 {

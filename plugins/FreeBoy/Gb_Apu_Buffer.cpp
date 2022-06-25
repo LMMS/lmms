@@ -26,8 +26,8 @@ namespace lmms
 {
 
 
-Gb_Apu_Buffer::Gb_Apu_Buffer() {}
-Gb_Apu_Buffer::~Gb_Apu_Buffer() {}
+Gb_Apu_Buffer::Gb_Apu_Buffer() = default;
+Gb_Apu_Buffer::~Gb_Apu_Buffer() = default;
 
 void Gb_Apu_Buffer::end_frame(blip_time_t end_time) {
 	Gb_Apu::end_frame(end_time);

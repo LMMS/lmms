@@ -46,8 +46,7 @@ public:
 	PeakControllerEffectControlDialog(
 				PeakControllerEffectControls * _controls );
 	~PeakControllerEffectControlDialog() override
-	{
-	}
+	= default;
 
 
 protected:

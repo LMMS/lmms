@@ -55,7 +55,7 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 
 
 
-LinkedModelGroupView::~LinkedModelGroupView() {}
+LinkedModelGroupView::~LinkedModelGroupView() = default;
 
 
 

@@ -43,8 +43,7 @@ class AmplifierControlDialog : public EffectControlDialog
 public:
 	AmplifierControlDialog( AmplifierControls* controls );
 	~AmplifierControlDialog() override
-	{
-	}
+	= default;
 
 } ;
 

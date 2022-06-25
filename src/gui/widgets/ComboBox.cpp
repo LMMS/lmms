@@ -83,8 +83,7 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 
 
 ComboBox::~ComboBox()
-{
-}
+= default;
 
 
 

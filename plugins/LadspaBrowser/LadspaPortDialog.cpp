@@ -169,8 +169,7 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 
 
 LadspaPortDialog::~LadspaPortDialog()
-{
-}
+= default;
 
 
 } // namespace lmms::gui
