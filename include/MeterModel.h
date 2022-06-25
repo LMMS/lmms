@@ -31,14 +31,14 @@ namespace lmms
 {
 
 
-class MeterModel : public Model
+class LMMS_EXPORT MeterModel : public Model
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,getNumerator,setNumerator,m_numeratorModel);
 	mapPropertyFromModel(int,getDenominator,setDenominator,m_denominatorModel);
 public:
 	MeterModel( Model * _parent );
-	~MeterModel() override;
+	~MeterModel() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this,
 						const QString & _name );
