@@ -277,8 +277,6 @@ SongEditor::SongEditor( Song * song ) :
 
 
 
-SongEditor::~SongEditor() = default;
-
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
 	MainWindow::saveWidgetState( parentWidget(), element );

@@ -116,9 +116,6 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 }
 
 
-VoiceObject::~VoiceObject() = default;
-
-
 SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
 	// filter	
@@ -136,9 +133,6 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 		m_voice[i] = new VoiceObject( this, i );
 	}
 }
-
-
-SidInstrument::~SidInstrument() = default;
 
 
 void SidInstrument::saveSettings( QDomDocument & _doc,
@@ -657,8 +651,6 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	}
 }
 
-
-SidInstrumentView::~SidInstrumentView() = default;
 
 void SidInstrumentView::updateKnobHint()
 {

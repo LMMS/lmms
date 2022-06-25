@@ -93,11 +93,6 @@ ControllerRackView::ControllerRackView() :
 
 
 
-ControllerRackView::~ControllerRackView() = default;
-
-
-
-
 void ControllerRackView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {

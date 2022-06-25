@@ -121,8 +121,4 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 
 
 
-LadspaControlView::~LadspaControlView() = default;
-
-
-
 } // namespace lmms::gui

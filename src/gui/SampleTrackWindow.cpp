@@ -163,9 +163,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	subWin->hide();
 }
 
-SampleTrackWindow::~SampleTrackWindow() = default;
-
-
 
 void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
 {

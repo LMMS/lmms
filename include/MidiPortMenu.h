@@ -41,7 +41,7 @@ class MidiPortMenu : public QMenu, public ModelView
 	Q_OBJECT
 public:
 	MidiPortMenu( MidiPort::Modes _mode );
-	~MidiPortMenu() override;
+	~MidiPortMenu() override = default;
 
 
 public slots:

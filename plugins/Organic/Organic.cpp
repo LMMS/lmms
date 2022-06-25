@@ -583,11 +583,6 @@ OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 
 
 
-OscillatorObject::~OscillatorObject() = default;
-
-
-
-
 void OscillatorObject::oscButtonChanged()
 {
 

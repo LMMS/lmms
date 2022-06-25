@@ -176,7 +176,7 @@ class MonstroSynth
 	MM_OPERATORS
 public:
 	MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph );
-	virtual ~MonstroSynth();
+	virtual ~MonstroSynth() = default;
 
 	void renderOutput( fpp_t _frames, sampleFrame * _buf );
 
@@ -355,7 +355,7 @@ class MonstroInstrument : public Instrument
 
 public:
 	MonstroInstrument( InstrumentTrack * _instrument_track );
-	~MonstroInstrument() override;
+	~MonstroInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -593,7 +593,7 @@ class MonstroView : public InstrumentViewFixedSize
 public:
 	MonstroView( Instrument * _instrument,
 					QWidget * _parent );
-	~MonstroView() override;
+	~MonstroView() override = default;
 
 protected slots:
 	void updateLayout();

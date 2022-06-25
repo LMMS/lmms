@@ -40,7 +40,7 @@ class TrackOperationsWidget : public QWidget
 	Q_OBJECT
 public:
 	TrackOperationsWidget( TrackView * parent );
-	~TrackOperationsWidget() override;
+	~TrackOperationsWidget() override = default;
 
 
 protected:

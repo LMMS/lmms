@@ -30,11 +30,6 @@
 namespace lmms
 {
 
-MidiClient::MidiClient() = default;
-
-
-
-
 MidiClient::~MidiClient()
 {
 	//TODO: noteOffAll(); / clear all ports
@@ -100,16 +95,6 @@ void MidiClient::subscribeWritablePort( MidiPort* , const QString& , bool )
 
 
 
-
-
-
-
-MidiClientRaw::MidiClientRaw() = default;
-
-
-
-
-MidiClientRaw::~MidiClientRaw() = default;
 
 
 

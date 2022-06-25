@@ -64,7 +64,7 @@ public:
 				const OutputSettings & _os,
 				ExportFileFormats _file_format,
 				const QString & _out_file );
-	~ProjectRenderer() override;
+	~ProjectRenderer() override = default;
 
 	bool isReady() const
 	{

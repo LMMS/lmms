@@ -150,7 +150,7 @@ class VestigeInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	VestigeInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~VestigeInstrumentView();
+	virtual ~VestigeInstrumentView() = default;
 
 
 protected slots:

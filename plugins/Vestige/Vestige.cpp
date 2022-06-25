@@ -669,11 +669,6 @@ void VestigeInstrumentView::updateMenu( void )
 }
 
 
-VestigeInstrumentView::~VestigeInstrumentView() = default;
-
-
-
-
 void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<VestigeInstrument>();

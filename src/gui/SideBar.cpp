@@ -101,11 +101,6 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 
 
 
-SideBar::~SideBar() = default;
-
-
-
-
 void SideBar::appendTab( SideBarWidget *widget )
 {
 	SideBarButton *button = new SideBarButton( orientation(), this );

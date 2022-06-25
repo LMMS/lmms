@@ -74,11 +74,6 @@ Plugin::Plugin(const Descriptor * descriptor, Model * parent, const
 
 
 
-Plugin::~Plugin() = default;
-
-
-
-
 template<class T>
 T use_this_or(T this_param, T or_param)
 {

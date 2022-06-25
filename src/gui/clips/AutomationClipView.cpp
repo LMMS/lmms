@@ -71,11 +71,6 @@ AutomationClipView::AutomationClipView( AutomationClip * _clip,
 
 
 
-AutomationClipView::~AutomationClipView() = default;
-
-
-
-
 void AutomationClipView::openInAutomationEditor()
 {
 	if(getGUI() != nullptr)

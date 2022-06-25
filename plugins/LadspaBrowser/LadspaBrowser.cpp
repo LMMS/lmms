@@ -82,11 +82,6 @@ LadspaBrowser::LadspaBrowser() :
 
 
 
-LadspaBrowser::~LadspaBrowser() = default;
-
-
-
-
 QString LadspaBrowser::nodeName() const
 {
 	return ladspabrowser_plugin_descriptor.name;
@@ -160,11 +155,6 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 		parentWidget()->setWindowFlags( flags );
 	}
 }
-
-
-
-
-LadspaBrowserView::~LadspaBrowserView() = default;
 
 
 

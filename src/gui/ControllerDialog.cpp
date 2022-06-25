@@ -41,10 +41,6 @@ ControllerDialog::ControllerDialog( Controller * _controller,
 
 
 
-ControllerDialog::~ControllerDialog() = default;
-
-
-
 void ControllerDialog::closeEvent( QCloseEvent * _ce )
 {
 	_ce->ignore();

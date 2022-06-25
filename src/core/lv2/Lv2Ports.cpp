@@ -352,15 +352,6 @@ void AtomSeq::Lv2EvbufDeleter::operator()(LV2_Evbuf *n) { lv2_evbuf_free(n); }
 
 
 
-// make the compiler happy, give each class with virtuals
-// a function (the destructor here) which is in a cpp file
-PortBase::~PortBase() = default;
-ConstVisitor::~ConstVisitor() = default;
-Visitor::~Visitor() = default;
-
-
-
-
 } // namespace lmms::Lv2Ports
 
 #endif // LMMS_HAVE_LV2

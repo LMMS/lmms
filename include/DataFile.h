@@ -67,7 +67,7 @@ public:
 	DataFile( const QByteArray& data );
 	DataFile( Type type );
 
-	virtual ~DataFile();
+	virtual ~DataFile() = default;
 
 	///
 	/// \brief validate

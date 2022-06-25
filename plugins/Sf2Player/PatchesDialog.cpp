@@ -111,10 +111,6 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 }
 
 
-// Destructor.
-PatchesDialog::~PatchesDialog() = default;
-
-
 // Dialog setup loader.
 void PatchesDialog::setup ( fluid_synth_t * pSynth, int iChan,
 						const QString & _chanName,

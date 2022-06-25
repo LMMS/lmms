@@ -111,9 +111,6 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 }
 
 
-MonstroSynth::~MonstroSynth() = default;
-
-
 void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 {
 	float modtmp; // temp variable for freq modulation
@@ -1027,9 +1024,6 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-MonstroInstrument::~MonstroInstrument() = default;
-
-
 void MonstroInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
@@ -1484,9 +1478,6 @@ MonstroView::MonstroView( Instrument * _instrument,
 	connect( m_opViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
 	connect( m_matViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
 }
-
-
-MonstroView::~MonstroView() = default;
 
 
 void MonstroView::updateLayout()

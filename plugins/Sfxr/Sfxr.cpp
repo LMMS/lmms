@@ -88,11 +88,6 @@ SfxrSynth::SfxrSynth( const SfxrInstrument * s ):
 
 
 
-SfxrSynth::~SfxrSynth() = default;
-
-
-
-
 void SfxrSynth::resetSample( bool restart )
 {
 	if(!restart)
@@ -355,11 +350,6 @@ SfxrInstrument::SfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave" ) )
 {
 }
-
-
-
-
-SfxrInstrument::~SfxrInstrument() = default;
 
 
 

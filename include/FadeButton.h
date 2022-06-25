@@ -44,7 +44,7 @@ public:
 		const QColor & _hold_color,
 		QWidget * _parent );
 
-	~FadeButton() override;
+	~FadeButton() override = default;
 	void setActiveColor( const QColor & activated_color );
 
 

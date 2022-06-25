@@ -36,7 +36,7 @@ class MicroTimer
 
 public:
 	MicroTimer();
-	~MicroTimer();
+	~MicroTimer() = default;
 
 	void reset();
 	int elapsed() const;

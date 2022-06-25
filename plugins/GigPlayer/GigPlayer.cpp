@@ -988,11 +988,6 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 
-GigInstrumentView::~GigInstrumentView() = default;
-
-
-
-
 void GigInstrumentView::modelChanged()
 {
 	GigInstrument * k = castModel<GigInstrument>();

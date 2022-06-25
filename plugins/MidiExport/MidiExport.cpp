@@ -67,10 +67,6 @@ MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor)
 
 
 
-MidiExport::~MidiExport() = default;
-
-
-
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &patternStoreTracks,
 			int tempo, int masterPitch, const QString &filename)

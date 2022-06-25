@@ -44,8 +44,4 @@ void ConstModelVisitor::visit(const FloatModel &m) { up(m); }
 void ConstModelVisitor::visit(const ComboBoxModel &m) { up<IntModel>(m); }
 void ConstModelVisitor::visit(const TempoSyncKnobModel &m) { up<FloatModel>(m); }
 
-ModelVisitor::~ModelVisitor() = default;
-ConstModelVisitor::~ConstModelVisitor() = default;
-
-
 } // namespace lmms

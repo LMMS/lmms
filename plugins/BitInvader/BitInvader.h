@@ -74,7 +74,7 @@ class BitInvader : public Instrument
 	Q_OBJECT
 public:
 	BitInvader(InstrumentTrack * _instrument_track );
-	~BitInvader() override;
+	~BitInvader() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;

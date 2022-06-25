@@ -44,11 +44,6 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 
 
 
-EffectControlDialog::~EffectControlDialog() = default;
-
-
-
-
 void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 {
 	_ce->ignore();

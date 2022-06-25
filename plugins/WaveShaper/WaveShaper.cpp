@@ -66,11 +66,6 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 
 
 
-WaveShaperEffect::~WaveShaperEffect() = default;
-
-
-
-
 bool WaveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames )
 {

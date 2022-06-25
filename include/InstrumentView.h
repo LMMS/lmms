@@ -70,7 +70,7 @@ class LMMS_EXPORT InstrumentViewFixedSize : public InstrumentView
 
 public:
 	using InstrumentView::InstrumentView;
-	~InstrumentViewFixedSize() override;
+	~InstrumentViewFixedSize() override = default;
 } ;
 
 

@@ -37,7 +37,7 @@ class AudioEngineProfiler
 {
 public:
 	AudioEngineProfiler();
-	~AudioEngineProfiler();
+	~AudioEngineProfiler() = default;
 
 	void startPeriod()
 	{

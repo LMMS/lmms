@@ -345,8 +345,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	}
 }
 
-AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil() = default;
-
 void AudioSoundIoSetupUtil::reconnectSoundIo()
 {
 	((AudioSoundIo::setupWidget *)m_setupWidget)->reconnectSoundIo();

@@ -46,7 +46,7 @@ class LadspaBrowserView : public ToolPluginView
 	Q_OBJECT
 public:
 	LadspaBrowserView( ToolPlugin * _tool );
-	~LadspaBrowserView() override;
+	~LadspaBrowserView() override = default;
 
 
 public slots:
@@ -69,7 +69,7 @@ class LadspaBrowser : public ToolPlugin
 {
 public:
 	LadspaBrowser();
-	~LadspaBrowser() override;
+	~LadspaBrowser() override = default;
 
 	gui::PluginView* instantiateView( QWidget * ) override
 	{

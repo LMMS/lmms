@@ -84,11 +84,6 @@ ProjectNotes::ProjectNotes() :
 
 
 
-ProjectNotes::~ProjectNotes() = default;
-
-
-
-
 void ProjectNotes::clear()
 {
 	m_edit->setHtml( tr( "Enter project notes here" ) );

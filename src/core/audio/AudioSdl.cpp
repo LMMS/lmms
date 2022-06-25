@@ -340,11 +340,6 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 
 
 
-AudioSdl::setupWidget::~setupWidget() = default;
-
-
-
-
 void AudioSdl::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue( "audiosdl", "device",

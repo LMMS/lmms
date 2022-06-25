@@ -495,11 +495,6 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 
 
 
-PatmanView::~PatmanView() = default;
-
-
-
-
 void PatmanView::openFile()
 {
 	FileDialog ofd( nullptr, tr( "Open patch file" ) );

@@ -53,11 +53,6 @@ TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 
 
 
-TempoSyncKnobModel::~TempoSyncKnobModel() = default;
-
-
-
-
 void TempoSyncKnobModel::setTempoSync( QAction * _item )
 {
 	setTempoSync( _item->data().toInt() );

@@ -352,7 +352,7 @@ class GigInstrumentView : public InstrumentViewFixedSize
 public:
 	GigInstrumentView( Instrument * _instrument,
 					QWidget * _parent );
-	~GigInstrumentView() override;
+	~GigInstrumentView() override = default;
 
 private:
 	void modelChanged() override;

@@ -52,10 +52,6 @@ RenameDialog::RenameDialog( QString & _string ) :
 
 
 
-RenameDialog::~RenameDialog() = default;
-
-
-
 
 void RenameDialog::resizeEvent (QResizeEvent * event) {
 	m_stringLE->setGeometry ( 10, 5, width() - 20, 20 );	

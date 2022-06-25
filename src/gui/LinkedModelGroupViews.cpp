@@ -55,11 +55,6 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 
 
 
-LinkedModelGroupView::~LinkedModelGroupView() = default;
-
-
-
-
 void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 {
 	// reconnect models

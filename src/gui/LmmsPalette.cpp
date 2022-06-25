@@ -52,8 +52,6 @@ LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) :
 	ensurePolished();
 }
 
-LmmsPalette::~LmmsPalette() = default;
-
 #define ACCESSMET( read, write ) \
 	QColor LmmsPalette:: read () const \
 	{	return m_##read ; } \

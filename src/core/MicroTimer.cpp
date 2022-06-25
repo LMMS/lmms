@@ -14,8 +14,6 @@ MicroTimer::MicroTimer()
 	reset();
 }
 
-MicroTimer::~MicroTimer() = default;
-
 void MicroTimer::reset()
 {
 	begin = steady_clock::now();

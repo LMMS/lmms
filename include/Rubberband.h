@@ -78,7 +78,7 @@ class RubberBand : public QRubberBand
 {
 public:
 	RubberBand( QWidget * _parent );
-	~RubberBand() override;
+	~RubberBand() override = default;
 
 	QVector<selectableObject *> selectedObjects() const;
 	QVector<selectableObject *> selectableObjects() const;

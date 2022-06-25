@@ -38,11 +38,6 @@ RubberBand::RubberBand( QWidget * _parent ) :
 
 
 
-RubberBand::~RubberBand() = default;
-
-
-
-
 QVector<selectableObject *> RubberBand::selectedObjects() const
 {
 	QVector<selectableObject *> so = selectableObjects();

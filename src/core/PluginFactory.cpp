@@ -58,8 +58,6 @@ PluginFactory::PluginFactory()
 	discoverPlugins();
 }
 
-PluginFactory::~PluginFactory() = default;
-
 void PluginFactory::setupSearchPaths()
 {
 	// Adds a search path relative to the main executable if the path exists.

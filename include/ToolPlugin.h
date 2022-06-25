@@ -38,7 +38,7 @@ class LMMS_EXPORT ToolPlugin : public Plugin
 {
 public:
 	ToolPlugin( const Descriptor * _descriptor, Model * _parent );
-	~ToolPlugin() override;
+	~ToolPlugin() override = default;
 
 	// instantiate tool-plugin with given name or return NULL
 	// on failure

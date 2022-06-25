@@ -65,7 +65,6 @@ BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPlugin
 
 
 
-BassBoosterEffect::~BassBoosterEffect() = default;
 
 
 

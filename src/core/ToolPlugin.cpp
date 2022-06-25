@@ -38,11 +38,6 @@ ToolPlugin::ToolPlugin( const Descriptor * _descriptor, Model * _parent ) :
 
 
 
-ToolPlugin::~ToolPlugin() = default;
-
-
-
-
 ToolPlugin * ToolPlugin::instantiate( const QString & _plugin_name, Model * _parent )
 {
 	Plugin * p = Plugin::instantiate( _plugin_name, _parent, nullptr );

@@ -44,11 +44,6 @@ MeterModel::MeterModel( Model * _parent ) :
 
 
 
-MeterModel::~MeterModel() = default;
-
-
-
-
 void MeterModel::reset()
 {
 	m_numeratorModel.setValue( 4 );

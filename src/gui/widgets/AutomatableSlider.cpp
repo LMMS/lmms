@@ -51,8 +51,6 @@ AutomatableSlider::AutomatableSlider( QWidget * _parent,
 
 
 
-AutomatableSlider::~AutomatableSlider() = default;
-
 
 
 

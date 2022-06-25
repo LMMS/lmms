@@ -116,11 +116,6 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 
 
 
-LadspaDescription::~LadspaDescription() = default;
-
-
-
-
 void LadspaDescription::update( const ladspa_key_t & _key )
 {
 	QWidget * description = new QWidget;

@@ -126,11 +126,6 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 
 
 
-Lv2ViewProc::~Lv2ViewProc() = default;
-
-
-
-
 AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 {
 	return Engine::getLv2Manager()->uri(uriStr);

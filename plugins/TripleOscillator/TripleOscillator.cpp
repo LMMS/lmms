@@ -238,11 +238,6 @@ TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 
 
 
-TripleOscillator::~TripleOscillator() = default;
-
-
-
-
 void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
@@ -708,11 +703,6 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 							spdk, uwb, wsbg, uwt );
 	}
 }
-
-
-
-
-TripleOscillatorView::~TripleOscillatorView() = default;
 
 
 

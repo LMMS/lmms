@@ -52,7 +52,7 @@ class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
 public:
 	LadspaControl( Model * _parent, port_desc_t * _port,
 							bool _link = false );
-	~LadspaControl() override;
+	~LadspaControl() override = default;
 
 	LADSPA_Data value();
 	ValueBuffer * valueBuffer();

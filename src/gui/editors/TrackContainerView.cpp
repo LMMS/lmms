@@ -487,11 +487,6 @@ TrackContainerView::scrollArea::scrollArea( TrackContainerView * _parent ) :
 
 
 
-TrackContainerView::scrollArea::~scrollArea() = default;
-
-
-
-
 void TrackContainerView::scrollArea::wheelEvent( QWheelEvent * _we )
 {
 	// always pass wheel-event to parent-widget (song-editor

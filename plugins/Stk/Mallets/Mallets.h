@@ -160,7 +160,7 @@ class MalletsInstrument : public Instrument
 	Q_OBJECT
 public:
 	MalletsInstrument( InstrumentTrack * _instrument_track );
-	~MalletsInstrument() override;
+	~MalletsInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -219,7 +219,7 @@ class MalletsInstrumentView: public InstrumentViewFixedSize
 public:
 	MalletsInstrumentView( MalletsInstrument * _instrument,
 				QWidget * _parent );
-	~MalletsInstrumentView() override;
+	~MalletsInstrumentView() override = default;
 
 public slots:
 	void changePreset();

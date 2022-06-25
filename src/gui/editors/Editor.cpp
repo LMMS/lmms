@@ -133,8 +133,6 @@ Editor::Editor(bool record, bool stepRecord) :
 	addButton(m_stopAction, "stopButton");
 }
 
-Editor::~Editor() = default;
-
 QAction *Editor::playAction() const
 {
 	return m_playAction;

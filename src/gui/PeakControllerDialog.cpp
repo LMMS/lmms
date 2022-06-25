@@ -55,10 +55,6 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 
 
 
-PeakControllerDialog::~PeakControllerDialog() = default;
-
-
-
 /*
 void effectView::closeEffects()
 {

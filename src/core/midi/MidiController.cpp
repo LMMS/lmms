@@ -47,11 +47,6 @@ MidiController::MidiController( Model * _parent ) :
 
 
 
-MidiController::~MidiController() = default;
-
-
-
-
 void MidiController::updateValueBuffer()
 {
 	if( m_previousValue != m_lastValue )

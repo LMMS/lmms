@@ -85,11 +85,6 @@ KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
 
 
 
-KickerInstrument::~KickerInstrument() = default;
-
-
-
-
 void KickerInstrument::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
@@ -336,11 +331,6 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 }
-
-
-
-
-KickerInstrumentView::~KickerInstrumentView() = default;
 
 
 

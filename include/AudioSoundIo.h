@@ -51,7 +51,7 @@ class AudioSoundIoSetupUtil : public QObject
 {
 	Q_OBJECT
 public:
-	virtual ~AudioSoundIoSetupUtil();
+	virtual ~AudioSoundIoSetupUtil() = default;
 
 	void *m_setupWidget;
 public slots:

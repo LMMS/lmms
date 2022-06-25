@@ -176,10 +176,6 @@ DataFile::DataFile( const QByteArray & _data ) :
 
 
 
-DataFile::~DataFile() = default;
-
-
-
 
 bool DataFile::validate( QString extension )
 {

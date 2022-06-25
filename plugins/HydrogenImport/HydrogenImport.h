@@ -15,7 +15,7 @@ public:
 	HydrogenImport( const QString & _file );
         bool readSong();
 
-	~HydrogenImport() override;
+	~HydrogenImport() override = default;
 
 	gui::PluginView* instantiateView( QWidget * ) override
 	{

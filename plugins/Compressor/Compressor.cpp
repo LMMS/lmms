@@ -97,9 +97,6 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 
 
 
-CompressorEffect::~CompressorEffect() = default;
-
-
 float CompressorEffect::msToCoeff(float ms)
 {
 	// Convert time in milliseconds to applicable lowpass coefficient

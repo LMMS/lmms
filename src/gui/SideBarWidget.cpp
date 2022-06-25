@@ -55,11 +55,6 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 
 
 
-SideBarWidget::~SideBarWidget() = default;
-
-
-
-
 void SideBarWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );

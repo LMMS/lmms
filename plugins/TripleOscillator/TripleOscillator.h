@@ -108,7 +108,7 @@ class TripleOscillator : public Instrument
 	Q_OBJECT
 public:
 	TripleOscillator( InstrumentTrack * _track );
-	~TripleOscillator() override;
+	~TripleOscillator() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -157,7 +157,7 @@ class TripleOscillatorView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	TripleOscillatorView( Instrument * _instrument, QWidget * _parent );
-	~TripleOscillatorView() override;
+	~TripleOscillatorView() override = default;
 
 
 private:

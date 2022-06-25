@@ -277,7 +277,7 @@ class Lb302SynthView : public InstrumentViewFixedSize
 public:
 	Lb302SynthView( Instrument * _instrument,
 	                QWidget * _parent );
-	~Lb302SynthView() override;
+	~Lb302SynthView() override = default;
 
 private:
 	void modelChanged() override;
