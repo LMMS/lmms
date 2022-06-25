@@ -187,8 +187,7 @@ public:
 			{
 			}
 
-			virtual ~SubPluginFeatures()
-			= default;
+			virtual ~SubPluginFeatures() = default;
 
 			virtual void fillDescriptionWidget( QWidget *, const Key * ) const
 			{

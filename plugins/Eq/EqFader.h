@@ -72,8 +72,7 @@ public:
 
 
 
-	~EqFader() override
-	= default;
+	~EqFader() override = default;
 
 
 private slots:

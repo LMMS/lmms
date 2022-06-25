@@ -67,8 +67,7 @@ public:
 	{
 	}
 
-	~LocklessAllocatorT() override
-	= default;
+	~LocklessAllocatorT() override = default;
 
 	T * alloc()
 	{

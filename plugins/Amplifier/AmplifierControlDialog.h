@@ -42,8 +42,7 @@ class AmplifierControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	AmplifierControlDialog( AmplifierControls* controls );
-	~AmplifierControlDialog() override
-	= default;
+	~AmplifierControlDialog() override = default;
 
 } ;
 

@@ -96,8 +96,7 @@ public:
 		return( QPixmap() );
 	}
 
-	virtual ~PixmapLoader()
-	= default;
+	virtual ~PixmapLoader() = default;
 
 	virtual QString pixmapName() const
 	{

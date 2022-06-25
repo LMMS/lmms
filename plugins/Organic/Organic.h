@@ -211,8 +211,7 @@ private:
 			m_detuneKnob( dt )
 		{
 		}
-		OscillatorKnobs()
-		= default;
+		OscillatorKnobs() = default;
 
 		Knob * m_harmKnob;
 		Knob * m_volKnob;

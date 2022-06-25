@@ -39,8 +39,7 @@ class StereoMatrixControls : public EffectControls
 	Q_OBJECT
 public:
 	StereoMatrixControls( StereoMatrixEffect( * _eff ) ); 
-	~StereoMatrixControls() override
-	= default;
+	~StereoMatrixControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

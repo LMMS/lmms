@@ -49,8 +49,7 @@ public:
 		NumStereoModes
 	};
 	DynProcControls( DynProcEffect * _eff );
-	~DynProcControls() override
-	= default;
+	~DynProcControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

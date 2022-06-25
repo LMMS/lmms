@@ -42,8 +42,7 @@ class WaveShaperControls : public EffectControls
 	Q_OBJECT
 public:
 	WaveShaperControls( WaveShaperEffect * _eff );
-	~WaveShaperControls() override
-	= default;
+	~WaveShaperControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

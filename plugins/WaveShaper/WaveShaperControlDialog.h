@@ -42,8 +42,7 @@ class WaveShaperControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	WaveShaperControlDialog( WaveShaperControls * _controls );
-	~WaveShaperControlDialog() override
-	= default;
+	~WaveShaperControlDialog() override = default;
 
 
 private:

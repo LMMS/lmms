@@ -35,10 +35,8 @@ namespace lmms
 class MidiDummy : public MidiClientRaw
 {
 public:
-	MidiDummy()
-	= default;
-	~MidiDummy() override
-	= default;
+	MidiDummy() = default;
+	~MidiDummy() override = default;
 
 	inline static QString name()
 	{

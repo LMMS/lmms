@@ -39,8 +39,7 @@ class LMMS_EXPORT TextFloat : public QWidget
 	Q_OBJECT
 public:
 	TextFloat();
-	~TextFloat() override
-	= default;
+	~TextFloat() override = default;
 
 	void setTitle( const QString & _title );
 	void setText( const QString & _text );

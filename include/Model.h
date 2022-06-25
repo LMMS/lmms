@@ -45,8 +45,7 @@ public:
 	{
 	}
 
-	~Model() override
-	= default;
+	~Model() override = default;
 
 	bool isDefaultConstructed()
 	{

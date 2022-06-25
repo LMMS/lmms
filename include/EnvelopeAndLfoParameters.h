@@ -50,11 +50,9 @@ public:
 	class LfoInstances
 	{
 	public:
-		LfoInstances()
-		= default;
+		LfoInstances() = default;
 
-		~LfoInstances()
-		= default;
+		~LfoInstances() = default;
 
 		inline bool isEmpty() const
 		{

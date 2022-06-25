@@ -42,8 +42,7 @@ class StereoEnhancerControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	StereoEnhancerControlDialog( StereoEnhancerControls * _controls );
-	~StereoEnhancerControlDialog() override
-	= default;
+	~StereoEnhancerControlDialog() override = default;
 
 };
 

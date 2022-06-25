@@ -103,8 +103,7 @@ public:
 		setWindowFlags( Qt::WindowCloseButtonHint );
 	}
 
-	~vstSubWin() override
-	= default;
+	~vstSubWin() override = default;
 
 	void closeEvent( QCloseEvent * e ) override
 	{

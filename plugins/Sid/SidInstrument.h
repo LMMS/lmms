@@ -181,8 +181,7 @@ private:
 			m_testButton( testb )
 		{
 		}
-		voiceKnobs()
-		= default;
+		voiceKnobs() = default;
 		Knob * m_attKnob;
 		Knob * m_decKnob;
 		Knob * m_sustKnob;

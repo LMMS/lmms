@@ -47,8 +47,7 @@ public:
 	{
 	}
 
-	~DummyInstrument() override
-	= default;
+	~DummyInstrument() override = default;
 
 	void playNote( NotePlayHandle *, sampleFrame * buffer ) override
 	{

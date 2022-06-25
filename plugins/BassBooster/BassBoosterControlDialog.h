@@ -40,8 +40,7 @@ class BassBoosterControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	BassBoosterControlDialog( BassBoosterControls* controls );
-	~BassBoosterControlDialog() override
-	= default;
+	~BassBoosterControlDialog() override = default;
 
 } ;
 

@@ -43,8 +43,7 @@ class DualFilterControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	DualFilterControlDialog( DualFilterControls* controls );
-	~DualFilterControlDialog() override
-	= default;
+	~DualFilterControlDialog() override = default;
 
 } ;
 

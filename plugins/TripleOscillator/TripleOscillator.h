@@ -191,8 +191,7 @@ private:
 			m_multiBandWaveTableButton( wt )
 		{
 		}
-		OscillatorKnobs()
-		= default;
+		OscillatorKnobs() = default;
 		Knob * m_volKnob;
 		Knob * m_panKnob;
 		Knob * m_coarseKnob;

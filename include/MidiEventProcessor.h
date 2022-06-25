@@ -37,11 +37,9 @@ class MidiEventProcessor
 {
 	MM_OPERATORS
 public:
-	MidiEventProcessor()
-	= default;
+	MidiEventProcessor() = default;
 
-	virtual ~MidiEventProcessor()
-	= default;
+	virtual ~MidiEventProcessor() = default;
 
 	// to be implemented by inheriting classes
 	virtual void processInEvent( const MidiEvent& event, const TimePos& time = TimePos(), f_cnt_t offset = 0 ) = 0;

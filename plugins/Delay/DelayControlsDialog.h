@@ -42,8 +42,7 @@ class DelayControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	DelayControlsDialog( DelayControls* controls );
-	~DelayControlsDialog() override
-	= default;
+	~DelayControlsDialog() override = default;
 };
 
 class XyPad : public QWidget

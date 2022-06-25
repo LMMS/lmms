@@ -42,8 +42,7 @@ class DualFilterControls : public EffectControls
 	Q_OBJECT
 public:
 	DualFilterControls( DualFilterEffect* effect );
-	~DualFilterControls() override
-	= default;
+	~DualFilterControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

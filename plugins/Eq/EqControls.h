@@ -44,8 +44,7 @@ class EqControls : public EffectControls
 	Q_OBJECT
 public:
 	explicit EqControls( EqEffect* effect );
-	~EqControls() override
-	= default;
+	~EqControls() override = default;
 
 	void saveSettings ( QDomDocument& doc, QDomElement& parent ) override;
 

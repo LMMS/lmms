@@ -45,8 +45,7 @@ public:
 						SLOT( slotClicked() ) );
 	}
 
-	~TabButton() override
-	= default;
+	~TabButton() override = default;
 
 
 signals:
