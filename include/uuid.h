@@ -1,7 +1,9 @@
 #ifndef LMMS_UUID_H
 #define LMMS_UUID_H
 
-#include <QUuid>
+#include <string>
+
+class QUuid;
 
 namespace lmms
 {

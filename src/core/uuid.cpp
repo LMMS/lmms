@@ -1,4 +1,5 @@
 #include "uuid.h"
+#include <QUuid>
 
 namespace lmms
 {

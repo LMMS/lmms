@@ -26,6 +26,7 @@
 #define JOURNALLING_OBJECT_H
 
 #include <QStack>
+#include <QUuid>
 
 #include "lmms_basics.h"
 #include "SerializingObject.h"
