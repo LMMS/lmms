@@ -38,6 +38,15 @@ public:
 
 
 	/**
+	 * @brief Create a UUID from a string. If the string is malformed, this might throw an
+	 * exception or return the null UUID.
+	 * @return A UUID that's equivalent to the given string representation,
+	 * or possibly the null UUID.
+	 */
+	static uuid_t FromString(std::string_view const& string);
+
+
+	/**
 	 * @brief Returns whether the given UUID is non-null.
 	 * @return true if the given UUID is valid.
 	 */
