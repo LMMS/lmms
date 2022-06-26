@@ -362,7 +362,7 @@ bool TrackContentWidget::canPasteSelection( TimePos clipPos, const QMimeData* md
 	const int currentTrackIndex = tracks.indexOf( t );
 
 	// Don't paste if we're on the same bar and allowSameBar is false
-	auto sourceTrackContainerId = metadata.attributeNode( "trackContainerId" ).value().toUInt();
+	auto sourceTrackContainerId = UUID::FromString(metadata.attributeNode( "trackContainerId" ).value().toStdString());
 	if( !allowSameBar && sourceTrackContainerId == t->trackContainer()->id() &&
 			clipPos == grabbedClipBar && currentTrackIndex == initialTrackIndex )
 	{

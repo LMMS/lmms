@@ -128,7 +128,7 @@ void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 			// A group, we must get process it instead
 			AutomatableModelView* groupView = (AutomatableModelView*)m_group;
 			new StringPairDrag( "automatable_model",
-					QString::number( groupView->modelUntyped()->id() ),
+					QString::fromStdString( UUID::AsString( groupView->modelUntyped()->id()) ),
 					QPixmap(), widget() );
 			// TODO: ^^ Maybe use a predefined icon instead of the button they happened to select
 			_me->accept();
