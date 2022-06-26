@@ -92,7 +92,7 @@ class PeakControllerDialog : public ControllerDialog
 	Q_OBJECT
 public:
 	PeakControllerDialog( Controller * _controller, QWidget * _parent );
-	~PeakControllerDialog() override;
+	~PeakControllerDialog() override = default;
 
 protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;

@@ -47,7 +47,7 @@ class SaControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	explicit SaControlsDialog(SaControls *controls, SaProcessor *processor);
-	~SaControlsDialog() override {}
+	~SaControlsDialog() override = default;
 
 	bool isResizable() const override {return true;}
 	QSize sizeHint() const override;

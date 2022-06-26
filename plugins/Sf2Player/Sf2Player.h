@@ -203,7 +203,7 @@ class Sf2InstrumentView : public InstrumentViewFixedSize
 public:
 	Sf2InstrumentView( Instrument * _instrument,
 					QWidget * _parent );
-	~Sf2InstrumentView() override;
+	~Sf2InstrumentView() override = default;
 
 private:
 	void modelChanged() override;

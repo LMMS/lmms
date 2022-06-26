@@ -50,7 +50,7 @@ class LMMS_EXPORT LmmsPalette : public QWidget
 
 public:
 	LmmsPalette( QWidget * parent, QStyle * stylearg  ); 
-	~LmmsPalette() override;
+	~LmmsPalette() override = default;
 
 #define ACCESSMET( read, write ) \
 	QColor read () const; \

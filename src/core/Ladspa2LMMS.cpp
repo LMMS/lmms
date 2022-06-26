@@ -82,12 +82,6 @@ Ladspa2LMMS::Ladspa2LMMS()
  
  
  
-Ladspa2LMMS::~Ladspa2LMMS()
-{
-}
-
-
-
 QString Ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 {
 	QString name = getName( _key );

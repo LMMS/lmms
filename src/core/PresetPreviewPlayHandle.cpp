@@ -53,9 +53,7 @@ public:
 		m_previewInstrumentTrack->setPreviewMode( true );
 	}
 
-	~PreviewTrackContainer() override
-	{
-	}
+	~PreviewTrackContainer() override = default;
 
 	QString nodeName() const override
 	{

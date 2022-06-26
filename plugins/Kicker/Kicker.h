@@ -54,7 +54,7 @@ class KickerInstrument : public Instrument
 	Q_OBJECT
 public:
 	KickerInstrument( InstrumentTrack * _instrument_track );
-	~KickerInstrument() override;
+	~KickerInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -109,7 +109,7 @@ class KickerInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	KickerInstrumentView( Instrument * _instrument, QWidget * _parent );
-	~KickerInstrumentView() override;
+	~KickerInstrumentView() override = default;
 
 private:
 	void modelChanged() override;

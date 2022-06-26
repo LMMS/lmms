@@ -44,7 +44,7 @@ class LadspaDescription : public QWidget
 	Q_OBJECT
 public:
 	LadspaDescription( QWidget * _parent, LadspaPluginType _type );
-	~LadspaDescription() override;
+	~LadspaDescription() override = default;
 
 
 signals:

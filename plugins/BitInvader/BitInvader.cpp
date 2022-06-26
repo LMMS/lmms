@@ -171,10 +171,6 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 
 
 
-BitInvader::~BitInvader()
-{
-}
-
 
 
 

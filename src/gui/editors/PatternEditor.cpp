@@ -301,11 +301,6 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 }
 
 
-PatternEditorWindow::~PatternEditorWindow()
-{
-}
-
-
 QSize PatternEditorWindow::sizeHint() const
 {
 	return {minimumWidth() + 10, 300};

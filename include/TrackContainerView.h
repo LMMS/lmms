@@ -184,7 +184,7 @@ private:
 	{
 	public:
 		scrollArea( TrackContainerView* parent );
-		~scrollArea() override;
+		~scrollArea() override = default;
 
 	protected:
 		void wheelEvent( QWheelEvent * _we ) override;

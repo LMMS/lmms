@@ -168,9 +168,4 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 
 
 
-LadspaPortDialog::~LadspaPortDialog()
-{
-}
-
-
 } // namespace lmms::gui

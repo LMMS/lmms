@@ -238,13 +238,6 @@ TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 
 
 
-TripleOscillator::~TripleOscillator()
-{
-}
-
-
-
-
 void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
@@ -709,13 +702,6 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		m_oscKnobs[i] = OscillatorKnobs( vk, pk, ck, flk, frk, pok,
 							spdk, uwb, wsbg, uwt );
 	}
-}
-
-
-
-
-TripleOscillatorView::~TripleOscillatorView()
-{
 }
 
 

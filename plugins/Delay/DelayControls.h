@@ -40,9 +40,7 @@ class DelayControls : public EffectControls
 	Q_OBJECT
 public:
 	DelayControls( DelayEffect* effect );
-	~DelayControls() override
-	{
-	}
+	~DelayControls() override = default;
 	void saveSettings( QDomDocument& doc, QDomElement& parent ) override;
 	void loadSettings( const QDomElement& _this ) override;
 	inline QString nodeName() const override

@@ -95,7 +95,7 @@ class NesObject
 	MM_OPERATORS
 public:
 	NesObject( NesInstrument * nes, const sample_rate_t samplerate, NotePlayHandle * nph );
-	virtual ~NesObject();
+	virtual ~NesObject() = default;
 	
 	void renderOutput( sampleFrame * buf, fpp_t frames );
 	void updateVibrato( float * freq );
@@ -211,7 +211,7 @@ class NesInstrument : public Instrument
 	Q_OBJECT
 public:
 	NesInstrument( InstrumentTrack * instrumentTrack );
-	~NesInstrument() override;
+	~NesInstrument() override = default;
 	
 	void playNote( NotePlayHandle * n,
 						sampleFrame * workingBuffer ) override;
@@ -313,7 +313,7 @@ class NesInstrumentView : public InstrumentViewFixedSize
 public:
 	NesInstrumentView( Instrument * instrument,
 					QWidget * parent );
-	~NesInstrumentView() override;
+	~NesInstrumentView() override = default;
 
 private:
 	void modelChanged() override;

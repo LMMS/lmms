@@ -103,11 +103,6 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 }
 
 
-NesObject::~NesObject()
-{
-}
-
-
 void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 {
 	////////////////////////////////
@@ -551,11 +546,6 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 
 
-NesInstrument::~NesInstrument()
-{
-}
-
-
 void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 {
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
@@ -852,11 +842,6 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 }
 
-
-
-NesInstrumentView::~NesInstrumentView()
-{
-}
 
 
 void NesInstrumentView::modelChanged()

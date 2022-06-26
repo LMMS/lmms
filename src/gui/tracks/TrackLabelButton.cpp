@@ -73,11 +73,6 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 
 
 
-TrackLabelButton::~TrackLabelButton()
-{
-}
-
-
 
 
 void TrackLabelButton::rename()

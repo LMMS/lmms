@@ -82,14 +82,6 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 
 
-/*! \brief Destroy this trackContentWidget
- *
- *  Destroys the trackContentWidget.
- */
-TrackContentWidget::~TrackContentWidget()
-{
-}
-
 
 
 

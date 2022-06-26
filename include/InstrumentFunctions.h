@@ -58,7 +58,7 @@ private:
 
 public:
 	InstrumentFunctionNoteStacking( Model * _parent );
-	~InstrumentFunctionNoteStacking() override;
+	~InstrumentFunctionNoteStacking() override = default;
 
 	void processNote( NotePlayHandle* n );
 
@@ -180,7 +180,7 @@ public:
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
-	~InstrumentFunctionArpeggio() override;
+	~InstrumentFunctionArpeggio() override = default;
 
 	void processNote( NotePlayHandle* n );
 

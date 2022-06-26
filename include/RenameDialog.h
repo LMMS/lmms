@@ -40,7 +40,7 @@ class RenameDialog : public QDialog
 	Q_OBJECT
 public:
 	RenameDialog( QString & _string );
-	~RenameDialog() override;
+	~RenameDialog() override = default;
 
 
 protected:

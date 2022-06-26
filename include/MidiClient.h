@@ -45,7 +45,7 @@ class TimePos;
 class MidiClient
 {
 public:
-	MidiClient();
+	MidiClient() = default;
 	virtual ~MidiClient();
 
 	// to be implemented by sub-classes
@@ -124,8 +124,8 @@ const uint32_t RAW_MIDI_PARSE_BUF_SIZE = 16;
 class MidiClientRaw : public MidiClient
 {
 public:
-	MidiClientRaw();
-	~MidiClientRaw() override;
+	MidiClientRaw() = default;
+	~MidiClientRaw() override = default;
 
 	// we are raw-clients for sure!
 	bool isRaw() const override

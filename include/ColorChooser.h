@@ -40,7 +40,7 @@ public:
 	ColorChooser(const QColor &initial, QWidget *parent): QColorDialog(initial, parent) {};
 	ColorChooser(QWidget *parent): QColorDialog(parent) {};
 	//! For getting a color without having to initialise a color dialog
-	ColorChooser() {};
+	ColorChooser() = default;
 	enum class Palette {Default, Track, Mixer};
 	//! Set global palette via array, checking bounds
 	void setPalette (QVector<QColor>);

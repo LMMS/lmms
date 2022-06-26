@@ -326,11 +326,6 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-WatsynInstrument::~WatsynInstrument()
-{
-}
-
-
 void WatsynInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
@@ -945,12 +940,6 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 	updateLayout();
 }
-
-
-WatsynView::~WatsynView()
-{
-}
-
 
 
 void WatsynView::updateLayout()

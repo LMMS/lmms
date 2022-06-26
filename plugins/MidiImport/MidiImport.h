@@ -41,7 +41,7 @@ class MidiImport : public ImportFilter
 	Q_OBJECT
 public:
 	MidiImport( const QString & _file );
-	~MidiImport() override;
+	~MidiImport() override = default;
 
 	gui::PluginView* instantiateView( QWidget * ) override
 	{

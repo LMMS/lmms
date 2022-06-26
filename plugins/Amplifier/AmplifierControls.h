@@ -45,9 +45,7 @@ class AmplifierControls : public EffectControls
 	Q_OBJECT
 public:
 	AmplifierControls( AmplifierEffect* effect );
-	~AmplifierControls() override
-	{
-	}
+	~AmplifierControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

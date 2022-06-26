@@ -105,7 +105,7 @@ private:
 	float m_phaseOffsetRight;
 
 	OscillatorObject( Model * _parent, int _index );
-	~OscillatorObject() override;
+	~OscillatorObject() override = default;
 
 	friend class OrganicInstrument;
 	friend class gui::OrganicInstrumentView;
@@ -211,9 +211,7 @@ private:
 			m_detuneKnob( dt )
 		{
 		}
-		OscillatorKnobs()
-		{
-		}
+		OscillatorKnobs() = default;
 
 		Knob * m_harmKnob;
 		Knob * m_volKnob;

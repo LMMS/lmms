@@ -108,13 +108,6 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 
 
 
-ProjectRenderer::~ProjectRenderer()
-{
-}
-
-
-
-
 // Little help function for getting file format from a file extension
 // (only for registered file-encoders).
 ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(

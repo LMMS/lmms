@@ -50,7 +50,7 @@ public:
 	PatchesDialog(QWidget *pParent = 0, Qt::WindowFlags wflags = QFlag(0));
 
 	// Destructor.
-	~PatchesDialog() override;
+	~PatchesDialog() override = default;
 
 
 	void setup(fluid_synth_t *pSynth, int iChan, const QString & _chanName,

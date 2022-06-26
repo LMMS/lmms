@@ -42,9 +42,7 @@ class FlangerControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	FlangerControlsDialog( FlangerControls* controls );
-	~FlangerControlsDialog() override
-	{
-	}
+	~FlangerControlsDialog() override = default;
 };
 
 

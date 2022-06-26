@@ -40,7 +40,7 @@ class CrossoverEQControls : public EffectControls
 	Q_OBJECT
 public:
 	CrossoverEQControls( CrossoverEQEffect * eff );
-	~CrossoverEQControls() override {}
+	~CrossoverEQControls() override = default;
 
 	void saveSettings( QDomDocument & doc, QDomElement & elem ) override;
 	void loadSettings( const QDomElement & elem ) override;

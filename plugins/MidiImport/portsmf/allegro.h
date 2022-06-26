@@ -287,7 +287,7 @@ public:
     const char *GetDescription(); // computes a text description of this event
     // the result is in a static buffer, not thread-safe, just for debugging.
     Alg_event() { selected = false; }
-    virtual ~Alg_event() {}
+    virtual ~Alg_event() = default;
 } *Alg_event_ptr;
 
 
@@ -306,7 +306,7 @@ public:
 
 typedef class Alg_update : public Alg_event {
 public:
-    ~Alg_update() override {};
+    ~Alg_update() override = default;
     Alg_update(Alg_update *); // copy constructor
     Alg_parameter parameter; // an update contains one attr/value pair
 
@@ -437,7 +437,7 @@ typedef class Alg_beat {
 public:
     Alg_beat(double t, double b) {
         time = t; beat = b; }
-    Alg_beat() {};
+    Alg_beat() = default;
     double time;
     double beat;
 } *Alg_beat_ptr;
@@ -535,7 +535,7 @@ class Serial_buffer {
         ptr = nullptr;
         len = 0;
     }
-    virtual ~Serial_buffer() { }
+    virtual ~Serial_buffer() = default;
 
     long get_posn() { return (long) (ptr - buffer); }
     long get_len() { return len; }
@@ -548,7 +548,7 @@ public:
     // setting buffer, but it is not the Serial_read_buffer's responsibility
     // to delete the buffer (owner might want to reuse it), so the destructor
     // does nothing.
-    ~Serial_read_buffer() override {  }
+    ~Serial_read_buffer() override = default;
 #if defined(_WIN32)
 //#pragma warning(disable: 546) // cast to int is OK, we only want low 7 bits
 //#pragma warning(disable: 4311) // type cast pointer to long warning

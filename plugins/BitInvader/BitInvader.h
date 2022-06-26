@@ -74,7 +74,7 @@ class BitInvader : public Instrument
 	Q_OBJECT
 public:
 	BitInvader(InstrumentTrack * _instrument_track );
-	~BitInvader() override;
+	~BitInvader() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -124,7 +124,7 @@ public:
 	BitInvaderView( Instrument * _instrument,
 					QWidget * _parent );
 
-	~BitInvaderView() override {};
+	~BitInvaderView() override = default;
 
 protected slots:
 	//void sampleSizeChanged( float _new_sample_length );

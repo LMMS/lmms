@@ -92,7 +92,7 @@ struct ConstVisitor
 	virtual void visit(const Lv2Ports::AtomSeq& ) {}
 	virtual void visit(const Lv2Ports::Unknown& ) {}
 
-	virtual ~ConstVisitor();
+	virtual ~ConstVisitor() = default;
 };
 
 struct Visitor
@@ -104,7 +104,7 @@ struct Visitor
 	virtual void visit(Lv2Ports::AtomSeq& ) {}
 	virtual void visit(Lv2Ports::Unknown& ) {}
 
-	virtual ~Visitor();
+	virtual ~Visitor() = default;
 };
 
 struct Meta
@@ -139,7 +139,7 @@ struct PortBase : public Meta
 	QString name() const;
 	QString uri() const;
 
-	virtual ~PortBase();
+	virtual ~PortBase() = default;
 };
 
 template<typename Derived, typename Base>

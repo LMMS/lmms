@@ -41,7 +41,7 @@ class SideBarWidget : public QWidget
 public:
 	SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent );
-	~SideBarWidget() override;
+	~SideBarWidget() override = default;
 
 	inline const QPixmap & icon() const
 	{

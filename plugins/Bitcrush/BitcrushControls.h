@@ -40,7 +40,7 @@ class BitcrushControls : public EffectControls
 	Q_OBJECT
 public:
 	BitcrushControls( BitcrushEffect * eff );
-	~BitcrushControls() override;
+	~BitcrushControls() override = default;
 
 	void saveSettings( QDomDocument & doc, QDomElement & elem ) override;
 	void loadSettings( const QDomElement & elem ) override;

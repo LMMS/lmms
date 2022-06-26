@@ -103,9 +103,7 @@ public:
 		setWindowFlags( Qt::WindowCloseButtonHint );
 	}
 
-	~vstSubWin() override
-	{
-	}
+	~vstSubWin() override = default;
 
 	void closeEvent( QCloseEvent * e ) override
 	{
@@ -669,13 +667,6 @@ void VestigeInstrumentView::updateMenu( void )
 
 	}
 }
-
-
-VestigeInstrumentView::~VestigeInstrumentView()
-{
-}
-
-
 
 
 void VestigeInstrumentView::modelChanged()

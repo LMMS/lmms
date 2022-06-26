@@ -40,9 +40,7 @@ class ReverbSCControls : public EffectControls
 	Q_OBJECT
 public:
 	ReverbSCControls( ReverbSCEffect* effect );
-	~ReverbSCControls() override
-	{
-	}
+	~ReverbSCControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

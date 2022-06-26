@@ -43,7 +43,7 @@ class VstEffect : public Effect
 public:
 	VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	~VstEffect() override;
+	~VstEffect() override = default;
 
 	bool processAudioBuffer( sampleFrame * _buf,
 							const fpp_t _frames ) override;

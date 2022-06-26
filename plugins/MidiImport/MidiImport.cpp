@@ -90,13 +90,6 @@ MidiImport::MidiImport( const QString & _file ) :
 
 
 
-MidiImport::~MidiImport()
-{
-}
-
-
-
-
 bool MidiImport::tryImport( TrackContainer* tc )
 {
 	if( openFile() == false )

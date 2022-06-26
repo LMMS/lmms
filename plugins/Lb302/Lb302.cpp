@@ -1010,11 +1010,6 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 }
 
 
-Lb302SynthView::~Lb302SynthView()
-{
-}
-
-
 void Lb302SynthView::modelChanged()
 {
 	Lb302Synth * syn = castModel<Lb302Synth>();

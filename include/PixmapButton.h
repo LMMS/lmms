@@ -40,7 +40,7 @@ class LMMS_EXPORT PixmapButton : public AutomatableButton
 public:
 	PixmapButton( QWidget * _parent,
 					const QString & _name = QString() );
-	~PixmapButton() override;
+	~PixmapButton() override = default;
 
 	void setActiveGraphic( const QPixmap & _pm );
 	void setInactiveGraphic( const QPixmap & _pm, bool _update = true );

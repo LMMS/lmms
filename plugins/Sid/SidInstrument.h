@@ -58,7 +58,7 @@ public:
 		NumWaveShapes
 	};
 	VoiceObject( Model * _parent, int _idx );
-	~VoiceObject() override;
+	~VoiceObject() override = default;
 
 
 private:
@@ -97,7 +97,7 @@ public:
 
 
 	SidInstrument( InstrumentTrack * _instrument_track );
-	~SidInstrument() override;
+	~SidInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -147,7 +147,7 @@ class SidInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	SidInstrumentView( Instrument * _instrument, QWidget * _parent );
-	~SidInstrumentView() override;
+	~SidInstrumentView() override = default;
 
 private:
 	void modelChanged() override;
@@ -181,9 +181,7 @@ private:
 			m_testButton( testb )
 		{
 		}
-		voiceKnobs()
-		{
-		}
+		voiceKnobs() = default;
 		Knob * m_attKnob;
 		Knob * m_decKnob;
 		Knob * m_sustKnob;
