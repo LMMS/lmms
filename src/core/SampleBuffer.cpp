@@ -247,7 +247,7 @@ void SampleBuffer::update(bool keepSettings)
 	const int fileSizeMax = 300; // MB
 	const int sampleLengthMax = 90; // Minutes
 
-	enum FileLoadError
+	enum class FileLoadError
 	{
 		None,
 		ReadPermissionDenied,
