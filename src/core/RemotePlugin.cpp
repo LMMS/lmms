@@ -37,6 +37,7 @@
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "Song.h"
+#include "uuid.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -151,8 +152,9 @@ RemotePlugin::RemotePlugin() :
 	struct sockaddr_un sa;
 	sa.sun_family = AF_LOCAL;
 
-	m_socketFile = QDir::tempPath() + QDir::separator() +
-						QUuid::createUuid().toString();
+	// TODO Currently converting a QString to std::string and back here; when we switch from Quuid to something else,
+	//  that problem solves itself; but look at this line anyway because we'll probably also remove the other QT types.
+	m_socketFile = QDir::tempPath() + QDir::separator() + QString::fromStdString(UUID::AsString(UUID::RandomUuid()));
 	auto path = m_socketFile.toUtf8();
 	size_t length = path.length();
 	if ( length >= sizeof sa.sun_path )
@@ -480,7 +482,7 @@ void RemotePlugin::resizeSharedProcessingMemory()
 	const size_t s = (m_inputCount + m_outputCount) * Engine::audioEngine()->framesPerPeriod();
 	try
 	{
-		m_audioBuffer.create(QUuid::createUuid().toString().toStdString(), s);
+		m_audioBuffer.create(UUID::AsString(UUID::RandomUuid()), s);
 	}
 	catch (const std::runtime_error& error)
 	{

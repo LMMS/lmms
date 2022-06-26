@@ -77,6 +77,7 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/uuid.cpp
 	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
