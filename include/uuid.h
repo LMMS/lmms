@@ -16,7 +16,6 @@ namespace lmms
 class Uuid
 {
 public:
-
 	using uuid_t = QUuid;
 
 	/**
@@ -53,7 +52,6 @@ public:
 	 * @return true if the given UUID is valid.
 	 */
 	static bool IsValid(uuid_t const& uuid);
-
 };
 
 
