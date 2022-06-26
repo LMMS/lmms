@@ -112,7 +112,7 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		// => it must be appended as a node
 
 		QDomElement me = doc.createElement( mustQuote ? QString("automatablemodel") : name );
-		me.setAttribute( "id", QString::fromStdString(UUID::AsString( id() )) );
+		me.setAttribute( "id", QString::fromStdString(Uuid::AsString(id() )) );
 		me.setAttribute( "value", m_value );
 		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
 		if(mustQuote) {
@@ -258,7 +258,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( node.isElement() )
 	{
 		QDomElement nodeElement = node.toElement();
-		changeID( UUID::FromString(nodeElement.attribute( "id" ).toStdString()) );
+		changeID(Uuid::FromString(nodeElement.attribute("id" ).toStdString()) );
 		setValue( LocaleHelper::toFloat( nodeElement.attribute( "value" ) ) );
 		if( nodeElement.hasAttribute( "scale_type" ) )
 		{

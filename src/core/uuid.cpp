@@ -5,29 +5,29 @@ namespace lmms
 {
 
 
-auto UUID::NullUuid() -> uuid_t
+auto Uuid::NullUuid() -> uuid_t
 {
 	return QUuid{};
 }
 
 
-auto UUID::RandomUuid() -> uuid_t
+auto Uuid::RandomUuid() -> uuid_t
 {
 	return QUuid::createUuid();
 }
 
-auto UUID::AsString(uuid_t const& uuid) -> std::string
+auto Uuid::AsString(uuid_t const& uuid) -> std::string
 {
 	return uuid.toString().toStdString();
 }
 
-auto UUID::FromString(std::string_view const& string) -> uuid_t
+auto Uuid::FromString(std::string_view const& string) -> uuid_t
 {
 	return QUuid{QString::fromStdString(
 			std::string{string})};
 }
 
-bool UUID::IsValid(uuid_t const& uuid)
+bool Uuid::IsValid(uuid_t const& uuid)
 {
 	return !uuid.isNull();
 }

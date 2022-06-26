@@ -2031,7 +2031,7 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		auto journalID = UUID::FromString( val.toStdString() );
+		auto journalID = Uuid::FromString(val.toStdString() );
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
 					journallingObject( journalID ) );

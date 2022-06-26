@@ -74,7 +74,7 @@ QDomElement JournallingObject::saveState( QDomDocument & _doc,
 		QDomElement _this = SerializingObject::saveState( _doc, _parent );
 
 		QDomElement journalNode = _doc.createElement( "journallingObject" );
-		journalNode.setAttribute( "id", QString::fromStdString(UUID::AsString(id())) );
+		journalNode.setAttribute( "id", QString::fromStdString(Uuid::AsString(id())) );
 		journalNode.setAttribute( "metadata", true );
 		_this.appendChild( journalNode );
 
@@ -99,8 +99,8 @@ void JournallingObject::restoreState( const QDomElement & _this )
 	{
 		if( node.isElement() && node.nodeName() == "journal" )
 		{
-			const jo_id_t new_id = UUID::FromString(node.toElement().attribute( "id" ).toStdString());
-			if( UUID::IsValid(new_id) )
+			const jo_id_t new_id = Uuid::FromString(node.toElement().attribute("id" ).toStdString());
+			if( Uuid::IsValid(new_id) )
 			{
 				changeID( new_id );
 			}
@@ -131,8 +131,8 @@ void JournallingObject::changeID( jo_id_t _id )
 								displayName();
 			}
 			// This message should never ever be seen anymore.
-			fprintf( stderr, "JO-ID %s already in use by %s!\n",
-				UUID::AsString(_id).c_str(), used_by.toUtf8().constData() );
+			fprintf(stderr, "JO-ID %s already in use by %s!\n",
+					Uuid::AsString(_id).c_str(), used_by.toUtf8().constData() );
 			return;
 		}
 

@@ -565,7 +565,7 @@ DataFile ClipView::createClipDataFiles(
 	QDomElement metadata = dataFile.createElement( "copyMetadata" );
 	// initialTrackIndex is the index of the track that was touched
 	metadata.setAttribute( "initialTrackIndex", initialTrackIndex );
-	metadata.setAttribute( "trackContainerId", QString::fromStdString(UUID::AsString(tc->id())) );
+	metadata.setAttribute( "trackContainerId", QString::fromStdString(Uuid::AsString(tc->id())) );
 	// grabbedClipPos is the pos of the bar containing the Clip we grabbed
 	metadata.setAttribute( "grabbedClipPos", m_clip->startPosition() );
 

@@ -110,7 +110,7 @@ void AutomationClipView::changeName()
 void AutomationClipView::disconnectObject( QAction * _a )
 {
 	JournallingObject * j = Engine::projectJournal()->
-				journallingObject( _a->data().value<UUID::uuid_t>() );
+				journallingObject( _a->data().value<Uuid::uuid_t>() );
 	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
 		float oldMin = m_clip->getMin();
@@ -434,7 +434,7 @@ void AutomationClipView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		auto journalID = UUID::FromString( val.toStdString() );
+		auto journalID = Uuid::FromString(val.toStdString() );
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
 					journallingObject( journalID ) );

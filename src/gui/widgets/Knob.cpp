@@ -549,7 +549,7 @@ void Knob::dropEvent( QDropEvent * _de )
 	}
 	else if( type == "automatable_model" )
 	{
-		auto journalID = UUID::FromString( val.toStdString() );
+		auto journalID = Uuid::FromString(val.toStdString() );
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
 					journallingObject( journalID ) );

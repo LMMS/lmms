@@ -127,7 +127,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 {
-	jo_id_t id = UUID::RandomUuid();
+	jo_id_t id = Uuid::RandomUuid();
 	m_joIDs[id] = _obj;
 	return id;
 }

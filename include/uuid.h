@@ -13,7 +13,7 @@ namespace lmms
  * @brief Utility class for creating UUIDs.
  * TODO When we move QT out of core, the uuid_t type must be changed from QUuid to the new one.
  */
-class UUID
+class Uuid
 {
 public:
 

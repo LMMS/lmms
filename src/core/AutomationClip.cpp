@@ -793,7 +793,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		{
 			QDomElement element = _doc.createElement( "object" );
 			element.setAttribute( "id", QString::fromStdString(
-				UUID::AsString( (*it)->id() ) ));
+				Uuid::AsString((*it)->id() ) ));
 			_this.appendChild( element );
 		}
 	}
@@ -833,7 +833,7 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		}
 		else if( element.tagName() == "object" )
 		{
-			m_idsToResolve << UUID::FromString(element.attribute( "id" ).toStdString());
+			m_idsToResolve << Uuid::FromString(element.attribute("id" ).toStdString());
 		}
 	}
 	
