@@ -32,10 +32,6 @@
 namespace lmms
 {
 
-//! Avoid clashes between loaded IDs (have the bit cleared)
-//! and newly created IDs (have the bit set)
-static const int EO_ID_MSB = 1 << 23;
-
 const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 
 ProjectJournal::ProjectJournal() :
@@ -153,12 +149,12 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 
 jo_id_t ProjectJournal::idToSave( jo_id_t id )
 {
-	return id & ~EO_ID_MSB;
+	return id;
 }
 
 jo_id_t ProjectJournal::idFromSave( jo_id_t id )
 {
-	return id | EO_ID_MSB;
+	return id;
 }
 
 
