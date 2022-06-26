@@ -36,6 +36,13 @@ public:
 	 */
 	static std::string AsString(uuid_t const& uuid);
 
+
+	/**
+	 * @brief Returns whether the given UUID is non-null.
+	 * @return true if the given UUID is valid.
+	 */
+	static bool IsValid(uuid_t const& uuid);
+
 };
 
 

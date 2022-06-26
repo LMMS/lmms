@@ -20,5 +20,10 @@ auto UUID::AsString(uuid_t const& uuid) -> std::string
 	return uuid.toString().toStdString();
 }
 
+bool UUID::IsValid(uuid_t const& uuid)
+{
+	return !uuid.isNull();
+}
+
 
 } // namespace lmms
