@@ -53,8 +53,9 @@
 namespace lmms
 {
 
+using old_jo_id_t = uint32_t;
 
-static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
+static void findIds(const QDomElement& elem, QList<old_jo_id_t>& idList);
 
 
 // QMap with the DOM elements that access file resources
@@ -1047,9 +1048,9 @@ void DataFile::upgrade_0_4_0_rc2()
 
 void DataFile::upgrade_1_0_99()
 {
-	jo_id_t last_assigned_id = 0;
+	old_jo_id_t last_assigned_id = 0;
 
-	QList<jo_id_t> idList;
+	QList<old_jo_id_t> idList;
 	findIds(documentElement(), idList);
 
 	QDomNodeList list = elementsByTagName("ladspacontrols");
@@ -1068,7 +1069,7 @@ void DataFile::upgrade_1_0_99()
 					me.setAttribute("value", el.attribute("data"));
 					me.setAttribute("scale_type", "log");
 
-					jo_id_t id;
+					old_jo_id_t id;
 					for(id = last_assigned_id + 1;
 						idList.contains(id); id++)
 					{
@@ -1950,7 +1951,7 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 }
 
 
-void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
+void findIds(const QDomElement& elem, QList<old_jo_id_t>& idList)
 {
 	if(elem.hasAttribute("id"))
 	{
