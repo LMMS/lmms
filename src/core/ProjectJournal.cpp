@@ -145,21 +145,6 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 }
 
 
-
-
-jo_id_t ProjectJournal::idToSave( jo_id_t id )
-{
-	return id;
-}
-
-jo_id_t ProjectJournal::idFromSave( jo_id_t id )
-{
-	return id;
-}
-
-
-
-
 void ProjectJournal::clearJournal()
 {
 	m_undoCheckPoints.clear();

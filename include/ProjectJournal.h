@@ -82,11 +82,6 @@ public:
 		reallocID( _id, nullptr );
 	}
 
-	//! hack, not used when saving a file
-	static jo_id_t idToSave( jo_id_t id );
-	//! hack, not used when loading a savefile
-	static jo_id_t idFromSave( jo_id_t id );
-
 	void clearJournal();
 	void stopAllJournalling();
 	JournallingObject * journallingObject( const jo_id_t _id )
