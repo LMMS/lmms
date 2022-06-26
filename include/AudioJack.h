@@ -131,7 +131,7 @@ private:
 		jack_port_t * ports[2];
 	} ;
 
-	typedef QMap<AudioPort *, StereoPort> JackPortMap;
+	using JackPortMap = QMap<AudioPort *, StereoPort>;
 	JackPortMap m_portMap;
 #endif
 

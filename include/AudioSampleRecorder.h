@@ -52,7 +52,7 @@ private:
 						const fpp_t _frames,
 						const float _master_gain ) override;
 
-	typedef QList<QPair<sampleFrame *, fpp_t> > BufferList;
+	using BufferList = QList<QPair<sampleFrame*, fpp_t>>;
 	BufferList m_buffers;
 
 } ;

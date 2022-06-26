@@ -66,7 +66,7 @@ template<ch_cnt_t CHANNELS>
 class CombFeedback
 {
 public:
-	typedef double frame[CHANNELS];
+	using frame[CHANNELS] = double;
 
 	CombFeedback( int maxDelay ) :
 		m_size( maxDelay ),
@@ -137,7 +137,7 @@ private:
 template<ch_cnt_t CHANNELS>
 class CombFeedfwd
 {
-	typedef double frame[CHANNELS];
+	using frame[CHANNELS] = double;
 
 	CombFeedfwd( int maxDelay ) :
 		m_size( maxDelay ),
@@ -208,7 +208,7 @@ private:
 template<ch_cnt_t CHANNELS>
 class CombFeedbackDualtap
 {
-	typedef double frame[CHANNELS];
+	using frame[CHANNELS] = double;
 
 	CombFeedbackDualtap( int maxDelay ) :
 		m_size( maxDelay ),
@@ -289,7 +289,7 @@ template<ch_cnt_t CHANNELS>
 class AllpassDelay
 {
 public:
-	typedef double frame[CHANNELS];
+	using frame[CHANNELS] = double;
 
 	AllpassDelay( int maxDelay ) :
 		m_size( maxDelay ),
@@ -358,11 +358,10 @@ private:
 };
 
 // convenience typedefs for stereo effects
-typedef CombFeedback<2> StereoCombFeedback;
-typedef CombFeedfwd<2> StereoCombFeedfwd;
-typedef CombFeedbackDualtap<2> StereoCombFeedbackDualtap;
-typedef AllpassDelay<2> StereoAllpassDelay;
-
+using StereoCombFeedback = CombFeedback<2>;
+using StereoCombFeedfwd = CombFeedfwd<2>;
+using StereoCombFeedbackDualtap = CombFeedbackDualtap<2>;
+using StereoAllpassDelay = AllpassDelay<2>;
 
 } // namespace lmms
 

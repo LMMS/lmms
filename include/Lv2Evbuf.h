@@ -47,15 +47,16 @@ namespace lmms
 /**
    An abstract/opaque LV2 event buffer.
 */
-typedef struct LV2_Evbuf_Impl LV2_Evbuf;
+using LV2_Evbuf = struct LV2_Evbuf_Impl;
 
 /**
    An iterator over an LV2_Evbuf.
 */
-typedef struct {
+using LV2_Evbuf_Iterator = struct
+{
 	LV2_Evbuf* evbuf;
 	uint32_t offset;
-} LV2_Evbuf_Iterator;
+};
 
 /**
    Allocate a new, empty event buffer.

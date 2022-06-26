@@ -134,7 +134,7 @@ private:
 	QMap<HMIDIOUT, QString> m_outputDevices;
 
 	// subscriptions
-	typedef QMap<QString, MidiPortList> SubMap;
+	using SubMap = QMap<QString, MidiPortList>;
 	SubMap m_inputSubs;
 	SubMap m_outputSubs;
 
