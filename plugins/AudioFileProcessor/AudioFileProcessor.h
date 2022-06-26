@@ -98,7 +98,7 @@ signals:
 
 
 private:
-	typedef SampleBuffer::handleState handleState;
+	using handleState = SampleBuffer::handleState;
 
 	SampleBuffer m_sampleBuffer;
 

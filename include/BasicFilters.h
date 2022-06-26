@@ -141,7 +141,7 @@ private:
 	typedef double frame[CHANNELS];
 	frame m_z1, m_z2, m_z3, m_z4;
 };
-typedef LinkwitzRiley<2> StereoLinkwitzRiley;
+using StereoLinkwitzRiley = LinkwitzRiley<2>;
 
 template<ch_cnt_t CHANNELS>
 class BiQuad
@@ -184,7 +184,7 @@ private:
 	
 	friend class BasicFilters<CHANNELS>; // needed for subfilter stuff in BasicFilters
 };
-typedef BiQuad<2> StereoBiQuad;
+using StereoBiQuad = BiQuad<2>;
 
 template<ch_cnt_t CHANNELS>
 class OnePole
@@ -218,7 +218,7 @@ private:
 	float m_a0, m_b1; 
 	float m_z1 [CHANNELS];
 };
-typedef OnePole<2> StereoOnePole;
+using StereoOnePole = OnePole<2>;
 
 template<ch_cnt_t CHANNELS>
 class BasicFilters

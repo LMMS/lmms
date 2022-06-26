@@ -167,10 +167,9 @@ private:
 	bool m_syncVSTPlugins;
 	bool m_disableAutoQuit;
 
-
-	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
-	typedef QMap<QString, MidiSetupWidget *> MswMap;
-	typedef QMap<QString, QString> trMap;
+	using AswMap = QMap<QString, AudioDeviceSetupWidget*>;
+	using MswMap = QMap<QString, MidiSetupWidget*>;
+	using trMap = QMap<QString, QString>;
 
 	// Audio settings widgets.
 	QComboBox * m_audioInterfaces;

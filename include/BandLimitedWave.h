@@ -54,29 +54,30 @@ const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
 					2 << 8, 3 << 8, 2 << 9, 3 << 9,
 					2 << 10, 3 << 10, 2 << 11, 3 << 11 };
 
-typedef struct
+using WaveMipMap = struct
 {
 public:
-	inline sample_t sampleAt( int table, int ph )
+	inline sample_t sampleAt(int table, int ph)
 	{
-		if( table % 2 == 0 )
-		{	return m_data[ TLENS[ table ] + ph ]; }
+		if (table % 2 == 0) { return m_data[TLENS[table] + ph]; }
 		else
-		{	return m_data3[ TLENS[ table ] + ph ]; }
+		{
+			return m_data3[TLENS[table] + ph];
+		}
 	}
-	inline void setSampleAt( int table, int ph, sample_t sample )
+	inline void setSampleAt(int table, int ph, sample_t sample)
 	{
-		if( table % 2 == 0 )
-		{	m_data[ TLENS[ table ] + ph ] = sample; }
+		if (table % 2 == 0) { m_data[TLENS[table] + ph] = sample; }
 		else
-		{ 	m_data3[ TLENS[ table ] + ph ] = sample; }
+		{
+			m_data3[TLENS[table] + ph] = sample;
+		}
 	}
+
 private:
-	sample_t m_data [ MIPMAPSIZE ];
-	sample_t m_data3 [ MIPMAPSIZE3 ];
-
-} WaveMipMap;
-
+	sample_t m_data[MIPMAPSIZE];
+	sample_t m_data3[MIPMAPSIZE3];
+};
 
 QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap );
 

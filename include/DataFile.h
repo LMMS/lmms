@@ -61,7 +61,7 @@ public:
 		MidiClip,
 		TypeCount
 	} ;
-	typedef Types Type;
+	using Type = Types;
 
 	DataFile( const QString& fileName );
 	DataFile( const QByteArray& data );
@@ -136,7 +136,7 @@ private:
 	static const std::vector<ProjectVersion> UPGRADE_VERSIONS;
 
 	// Map with DOM elements that access resources (for making bundles)
-	typedef std::map<QString, std::vector<QString>> ResourcesMap;
+	using ResourcesMap = std::map<QString, std::vector<QString>>;
 	static const ResourcesMap ELEMENTS_WITH_RESOURCES;
 
 	void upgrade();

@@ -248,9 +248,7 @@ private:
 	DetuningHelper * m_detuning;
 };
 
-
-typedef QVector<Note *> NoteVector;
-
+using NoteVector = QVector<Note*>;
 
 } // namespace lmms
 

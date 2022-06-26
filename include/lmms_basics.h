@@ -38,27 +38,23 @@
 namespace lmms
 {
 
+using bar_t = int32_t;
+using tick_t = int32_t;
+using volume_t = uint8_t;
+using panning_t = int8_t;
 
-typedef int32_t bar_t;
-typedef int32_t tick_t;
-typedef uint8_t volume_t;
-typedef int8_t panning_t;
+using sample_t = float;		  // standard sample-type
+using int_sample_t = int16_t; // 16-bit-int-sample
 
+using sample_rate_t = uint32_t; // sample-rate
+using fpp_t = int16_t;			// frames per period (0-16384)
+using f_cnt_t = int32_t;		// standard frame-count
+using ch_cnt_t = uint8_t;		// channel-count (0-SURROUND_CHANNELS)
+using bpm_t = uint16_t;			// tempo (MIN_BPM to MAX_BPM)
+using bitrate_t = uint16_t;		// bitrate in kbps
+using mix_ch_t = uint16_t;		// Mixer-channel (0 to MAX_CHANNEL)
 
-typedef float sample_t;			// standard sample-type
-typedef int16_t int_sample_t;		// 16-bit-int-sample
-
-
-typedef uint32_t sample_rate_t;		// sample-rate
-typedef int16_t fpp_t;			// frames per period (0-16384)
-typedef int32_t f_cnt_t;			// standard frame-count
-typedef uint8_t ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
-typedef uint16_t bpm_t;			// tempo (MIN_BPM to MAX_BPM)
-typedef uint16_t bitrate_t;		// bitrate in kbps
-typedef uint16_t mix_ch_t;			// Mixer-channel (0 to MAX_CHANNEL)
-
-typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
-
+using jo_id_t = uint32_t; // (unique) ID of a journalling object
 
 // windows headers define "min" and "max" macros, breaking the methods bwloe
 #undef min

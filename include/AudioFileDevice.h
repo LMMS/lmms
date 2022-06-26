@@ -68,13 +68,8 @@ private:
 	OutputSettings m_outputSettings;
 } ;
 
-
-typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
-					( const QString & outputFilename,
-					  OutputSettings const & outputSettings,
-					  const ch_cnt_t channels,
-					  AudioEngine* audioEngine,
-					  bool & successful );
+using AudioFileDeviceInstantiaton
+	= AudioFileDevice* (*)(const QString&, const OutputSettings&, const ch_cnt_t, AudioEngine*, bool&);
 
 } // namespace lmms
 

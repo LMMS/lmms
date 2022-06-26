@@ -206,7 +206,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	{
 		fprintf( stderr, "Could not connect to local server.\n" );
 	}
-	if ( ::connect( m_socket, (struct sockaddr *) &sa, sizeof sa ) == -1 )
+	if (QIODevice::connect(m_socket, (struct sockaddr*)&sa, sizeof sa) == -1)
 	{
 		fprintf( stderr, "Could not connect to local server.\n" );
 	}

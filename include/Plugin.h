@@ -136,7 +136,7 @@ public:
 			*/
 			struct Key
 			{
-				typedef QMap<QString, QString> AttributeMap;
+				using AttributeMap = QMap<QString, QString>;
 
 				inline Key( const Plugin::Descriptor * desc = nullptr,
 						const QString & name = QString(),
@@ -179,8 +179,7 @@ public:
 				const PixmapLoader* logo() const;
 			} ;
 
-			typedef QList<Key> KeyList;
-
+			using KeyList = QList<Key>;
 
 			SubPluginFeatures( Plugin::PluginTypes type ) :
 				m_type( type )
@@ -235,7 +234,7 @@ public:
 
 	} ;
 	// typedef a list so we can easily work with list of plugin descriptors
-	typedef QList<Descriptor*> DescriptorList;
+	using DescriptorList = QList<Descriptor*>;
 
 	//! Constructor of a plugin
 	//! @param key Sub plugins must pass a key here, optional otherwise.
@@ -307,8 +306,7 @@ private:
 	Descriptor::SubPluginFeatures::Key m_key;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * InstantiationHook )( Model * , void * );
-
+	using InstantiationHook = Plugin* (*)(Model*, void*);
 } ;
 
 

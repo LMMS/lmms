@@ -91,7 +91,7 @@ private:
 		QString name;        // name for widget
 		int nwidth;          // width of name when painting (only valid for text tab)
 	} ;
-	typedef QMap<int, widgetDesc> widgetStack;
+	using widgetStack = QMap<int, widgetDesc>;
 
 	widgetStack m_widgets;
 

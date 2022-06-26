@@ -69,7 +69,7 @@ public:
 
 
 private:
-	typedef QVector<Effect *> EffectList;
+	using EffectList = QVector<Effect*>;
 	EffectList m_effects;
 
 	BoolModel m_enabledModel;

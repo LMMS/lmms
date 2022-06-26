@@ -38,7 +38,7 @@ namespace lmms
 
 
 const int BUFFER_SIZE = 50*1024;
-typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+using MTrack = MidiFile::MIDITrack<BUFFER_SIZE>;
 
 struct MidiNote
 {
@@ -53,10 +53,8 @@ struct MidiNote
 	}
 } ;
 
-typedef std::vector<MidiNote> MidiNoteVector;
-typedef std::vector<MidiNote>::iterator MidiNoteIterator;
-
-
+using MidiNoteVector = std::vector<MidiNote>;
+using MidiNoteIterator = std::vector<MidiNote>::iterator;
 
 class MidiExport: public ExportFilter
 {
