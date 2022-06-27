@@ -475,7 +475,7 @@ private:
 	std::mutex m_shmLock;
 	bool m_shmValid;
 
-	typedef std::vector<VstMidiEvent> VstMidiEventList;
+	using VstMidiEventList = std::vector<VstMidiEvent>;
 	VstMidiEventList m_midiEvents;
 
 	bpm_t m_bpm;
