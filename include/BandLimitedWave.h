@@ -54,7 +54,7 @@ const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
 					2 << 8, 3 << 8, 2 << 9, 3 << 9,
 					2 << 10, 3 << 10, 2 << 11, 3 << 11 };
 
-using WaveMipMap = struct
+using WaveMipMap = struct WaveMipMap
 {
 public:
 	inline sample_t sampleAt(int table, int ph)
