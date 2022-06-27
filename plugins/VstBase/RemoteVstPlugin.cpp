@@ -475,7 +475,7 @@ private:
 	std::mutex m_shmLock;
 	bool m_shmValid;
 
-	using VstMidiEventList = int;
+	typedef std::vector<VstMidiEvent> VstMidiEventList;
 	VstMidiEventList m_midiEvents;
 
 	bpm_t m_bpm;
@@ -997,7 +997,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	}
 #endif
 
-	using mainEntryPointer = AEffect* (*)(audioMasterCallback);
+	using mainEntryPointer = AEffect* (VST_CALL_CONV*) (audioMasterCallback);
 #ifndef NATIVE_LINUX_VST
 	mainEntryPointer mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "VSTPluginMain" );
