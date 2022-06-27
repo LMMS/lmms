@@ -16,30 +16,27 @@
 
 #define SP_RANDMAX 2147483648
 
-using sp_frame = unsigned long;
+typedef unsigned long sp_frame;
 
-using sp_auxdata = struct sp_auxdata
-{
-	size_t size;
-	void* ptr;
-};
+typedef struct sp_auxdata {
+    size_t size;
+    void *ptr;
+} sp_auxdata;
 
-using sp_data = struct sp_data
-{
-	SPFLOAT* out;
-	uint32_t sr;
-	int nchan;
-	unsigned long len;
-	unsigned long pos;
-	char filename[200];
-	uint32_t rand;
-};
+typedef struct sp_data { 
+    SPFLOAT *out;
+    uint32_t sr;
+    int nchan;
+    unsigned long len;
+    unsigned long pos;
+    char filename[200];
+    uint32_t rand;
+} sp_data; 
 
-using sp_param = struct
-{
-	char state;
-	SPFLOAT val;
-};
+typedef struct {
+    char state;
+    SPFLOAT val;
+} sp_param;
 
 int sp_auxdata_alloc(sp_auxdata *aux, size_t size);
 int sp_auxdata_free(sp_auxdata *aux);
@@ -62,12 +59,12 @@ int sp_out(sp_data *sp, uint32_t chan, SPFLOAT val);
 uint32_t sp_rand(sp_data *sp);
 void sp_srand(sp_data *sp, uint32_t val);
 
-using sp_fft = struct
-{
-	SPFLOAT* utbl;
-	int16_t* BRLow;
-	int16_t* BRLowCpx;
-};
+
+typedef struct {
+    SPFLOAT *utbl;
+    int16_t *BRLow;
+    int16_t *BRLowCpx;
+} sp_fft;
 
 void sp_fft_create(sp_fft **fft);
 void sp_fft_init(sp_fft *fft, int M);
@@ -78,11 +75,10 @@ void sp_fft_destroy(sp_fft *fft);
 #ifndef kiss_fft_scalar
 #define kiss_fft_scalar SPFLOAT
 #endif
-using kiss_fft_cpx = struct
-{
-	kiss_fft_scalar r;
-	kiss_fft_scalar i;
-};
+typedef struct {
+    kiss_fft_scalar r;
+    kiss_fft_scalar i;
+}kiss_fft_cpx;
 
-using kiss_fft_cfg = struct kiss_fft_state;
-using kiss_fftr_cfg = struct kiss_fftr_state;
+typedef struct kiss_fft_state* kiss_fft_cfg;
+typedef struct kiss_fftr_state* kiss_fftr_cfg;
