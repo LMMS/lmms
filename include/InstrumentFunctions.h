@@ -54,7 +54,7 @@ public:
 	static const int MAX_CHORD_POLYPHONY = 13;
 
 private:
-	using ChordSemiTones = int8_t[MAX_CHORD_POLYPHONY];
+	using ChordSemiTones = std::array<int8_t, MAX_CHORD_POLYPHONY>;
 
 public:
 	InstrumentFunctionNoteStacking( Model * _parent );

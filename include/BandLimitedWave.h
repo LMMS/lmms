@@ -167,7 +167,7 @@ public:
 
 	static bool s_wavesGenerated;
 
-	static WaveMipMap s_waveforms [NumBLWaveforms];
+	static std::array<WaveMipMap, NumBLWaveforms> s_waveforms;
 
 	static QString s_wavetableDir;
 };
