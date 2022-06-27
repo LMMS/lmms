@@ -433,7 +433,7 @@ private:
 	QVector<AudioEngineWorkerThread *> m_workers;
 	int m_numWorkers;
 
-	// playhandle stuff
+	// playhandle
 	PlayHandleList m_playHandles;
 	// place where new playhandles are added temporarily
 	LocklessList<PlayHandle *> m_newPlayHandles;
@@ -445,24 +445,26 @@ private:
 
 	bool m_isProcessing;
 
-	// audio device stuff
+	// audio device
 	void doSetAudioDevice( AudioDevice *_dev );
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
 	bool m_audioDevStartFailed;
 
-	// MIDI device stuff
+	// Metronome
+	bool m_metronomeActive;
+	std::pair<tick_t, tick_t> m_prevMetronomeStates; // .first: number of ticks from last play sound, .second: number of ticks from last call
+
+	// MIDI device
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
 
-	// FIFO stuff
+	// FIFO
 	Fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
 	AudioEngineProfiler m_profiler;
-
-	bool m_metronomeActive;
 
 	bool m_clearSignal;
 

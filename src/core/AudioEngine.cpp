@@ -67,7 +67,6 @@ namespace lmms
 
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
-
 static thread_local bool s_renderingThread;
 
 
@@ -89,8 +88,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_audioDev( nullptr ),
 	m_oldAudioDev( nullptr ),
 	m_audioDevStartFailed( false ),
-	m_profiler(),
 	m_metronomeActive(false),
+	m_prevMetronomeStates(std::pair<tick_t, tick_t>(100, 0)),
+	m_profiler(),
 	m_clearSignal( false ),
 	m_changesSignal( false ),
 	m_changes( 0 ),
@@ -463,8 +463,6 @@ void AudioEngine::swapBuffers()
 
 void AudioEngine::handleMetronome()
 {
-	static tick_t lastMetroTicks = -1;
-
 	Song * song = Engine::getSong();
 	Song::PlayModes currentPlayMode = song->playMode();
 
@@ -485,24 +483,41 @@ void AudioEngine::handleMetronome()
 	}
 
 	tick_t ticks = song->getPlayPos(currentPlayMode).getTicks();
-	tick_t ticksPerBar = TimePos::ticksPerBar();
-	int numerator = song->getTimeSigModel().getNumerator();
-
-	if (ticks == lastMetroTicks)
+	if (ticks == m_prevMetronomeStates.second)
 	{
 		return;
 	}
 
-	if (ticks % (ticksPerBar / 1) == 0)
+	/* Metronome sound generation - explanation:
+	 * The modulo operation below figures out the exact point in time when a sound should be played. As this operation
+	 * relies on ".getTicks()" we have to add a certain tick tolerance, since it is not guaranted that between each call
+	 * the tick gets a +1-increment and thus the exact point in time can be missed.*/	
+
+	// increase this parameter if with complex projects or poor HW resources the metronome rings out of rythm
+	int nToleranceTicks = 5;
+	// LMMS allows abrupt jumps in song positions (e.g. song-loops, when marker was put of that loop), this iscached below
+	bool noDoubleTick = m_prevMetronomeStates.first > nToleranceTicks;
+	// identify which sound should be played below
+	bool highTickEvent = ticks % int(TimePos::ticksPerBar() / 1) <= nToleranceTicks;
+	bool lowTickEvent = ticks % int(TimePos::ticksPerBar() / song->getTimeSigModel().getNumerator()) <= nToleranceTicks;
+
+	// handle sound-'state'-machine
+	if (highTickEvent && noDoubleTick)
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome02.ogg"));
+		m_prevMetronomeStates.first = 0;
 	}
-	else if (ticks % (ticksPerBar / numerator) == 0)
+	else if (lowTickEvent && noDoubleTick)
 	{
 		addPlayHandle(new SamplePlayHandle("misc/metronome01.ogg"));
+		m_prevMetronomeStates.first = 0;
+	}
+	else
+	{
+		m_prevMetronomeStates.first += 1;
 	}
 
-	lastMetroTicks = ticks;
+	m_prevMetronomeStates.second = ticks;
 }
 
 
