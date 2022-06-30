@@ -30,13 +30,13 @@
 
 #include "Effect.h"
 #include "ladspa.h"
-#include "LadspaBase.h"
 #include "LadspaControls.h"
 #include "LadspaManager.h"
 
 namespace lmms
 {
 
+using port_desc_t = struct PortDescription;
 using multi_proc_t = QVector<port_desc_t*>;
 
 class LadspaEffect : public Effect
