@@ -35,7 +35,7 @@
 namespace lmms
 {
 
-using port_desc_t = struct PortDescription;
+struct port_desc_t;
 
 namespace gui
 {

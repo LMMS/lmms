@@ -48,7 +48,7 @@ enum buffer_data_t { TOGGLED, ENUM, INTEGER, FLOATING, TIME, NONE };
 
 //! This struct is used to hold port descriptions internally
 //! which where received from the ladspa plugin
-using port_desc_t = struct PortDescription
+struct port_desc_t
 {
 	QString name;
 	ch_cnt_t proc;
