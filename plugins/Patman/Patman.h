@@ -84,7 +84,7 @@ public slots:
 
 
 private:
-	using handle_data = struct
+	struct handle_data
 	{
 		MM_OPERATORS
 		SampleBuffer::handleState* state;

@@ -73,7 +73,7 @@ enum LadspaPluginType
 	OTHER
 };
 
-using LadspaManagerDescription = struct LadspaManagerStorage
+struct LadspaManagerDescription
 {
 	LADSPA_Descriptor_Function descriptorFunction;
 	uint32_t index;

@@ -52,7 +52,7 @@ using LV2_Evbuf = struct LV2_Evbuf_Impl;
 /**
    An iterator over an LV2_Evbuf.
 */
-using LV2_Evbuf_Iterator = struct LV2_Evbuf_Iterator
+struct LV2_Evbuf_Iterator
 {
 	LV2_Evbuf* evbuf;
 	uint32_t offset;

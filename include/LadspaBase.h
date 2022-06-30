@@ -35,7 +35,7 @@ namespace lmms
 
 class LadspaControl;
 
-using buffer_rate_t = enum BufferRates {
+enum buffer_rate_t {
 	CHANNEL_IN,
 	CHANNEL_OUT,
 	AUDIO_RATE_INPUT,
@@ -44,7 +44,7 @@ using buffer_rate_t = enum BufferRates {
 	CONTROL_RATE_OUTPUT
 };
 
-using buffer_data_t = enum BufferData { TOGGLED, ENUM, INTEGER, FLOATING, TIME, NONE };
+enum buffer_data_t { TOGGLED, ENUM, INTEGER, FLOATING, TIME, NONE };
 
 //! This struct is used to hold port descriptions internally
 //! which where received from the ladspa plugin

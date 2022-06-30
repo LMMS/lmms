@@ -29,13 +29,13 @@
 #include <ladspa.h>
 
 #include "AutomatableModel.h"
+#include "LadspaBase.h"
 #include "TempoSyncKnobModel.h"
 #include "ValueBuffer.h"
 
 namespace lmms
 {
 
-using port_desc_t = struct PortDescription;
 
 namespace gui
 {

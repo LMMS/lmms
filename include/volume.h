@@ -36,7 +36,7 @@ constexpr volume_t MinVolume = 0;
 constexpr volume_t MaxVolume = 200;
 constexpr volume_t DefaultVolume = 100;
 
-using StereoVolumeVector = struct
+struct StereoVolumeVector
 {
 	float vol[2];
 };
