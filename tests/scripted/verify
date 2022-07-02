@@ -60,9 +60,6 @@ class ScriptTest():
 		if expectation not in self.result.stdout:
 			raise RuntimeError(f'Expected "{expectation}" in script output')
 
-	# Exception handling here
-	# close(self.fd)
-
 	def run(self, expected_returncode: int = 1):  # default: something goes wrong ("to the safe side")
 		"""Run the script, check the exit code and store the result"""
 		self.result = subprocess.run([str(self.scriptpath)], capture_output=True, text=True)
