@@ -6,6 +6,12 @@ import tempfile
 import os
 
 
+def set_git_identity():
+	"""Set local git identity, but only in local repo (to not overwrite user settings)"""
+	subprocess.run(['git', 'config', 'user.name', 'James Bond'])
+	subprocess.run(['git', 'config', 'user.email', '007@sis.gov.uk'])
+
+
 def create_file(filename: str, file_content: str):
 	"""Create a file in the current directory and adds it to git"""
 	Path(filename).parent.mkdir(parents=True, exist_ok=True)
@@ -25,6 +31,7 @@ class ScriptTest():
 		# prerequirements
 		Path('data/themes').mkdir(parents=True)
 		subprocess.run(['git', 'init', '-b', 'main'], check=True)
+		set_git_identity()
 		subprocess.run(['git', 'submodule', 'add', '../../carla', 'plugins/CarlaBase/carla'], check=True)
 		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
 		create_file('debian/lmms-common.docs', '')
@@ -40,7 +47,7 @@ class ScriptTest():
 					'    </message>\n'
 					'</context>\n'
 					'</TS>\n')
-		subprocess.run(['git', 'commit', '-m', 'Initial commit', '--author', 'James Bond <007@sis.gov.uk>'], check=True)
+		subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
 		return self
 
 	def __exit__(self, type, value, traceback):
@@ -82,9 +89,10 @@ with tempfile.TemporaryDirectory() as tmpdir:
 	# create dummy carla repo
 	Path('carla').mkdir()
 	os.chdir('carla')
-	subprocess.run(['git', 'init'], check=True)
+	subprocess.run(['git', 'init', '-b', 'main'], check=True)
+	set_git_identity()
 	create_file('README.md', 'hello world')
-	subprocess.run(['git', 'commit', '-m', 'Initial commit', '--author', 'James Bond <007@sis.gov.uk>'], check=True)
+	subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
 	os.chdir('..')
 
 	Path('lmms').mkdir()
