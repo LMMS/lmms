@@ -24,7 +24,7 @@ class ScriptTest():
 		os.chdir(self.lmms_tmpdir.name)
 		# prerequirements
 		Path('data/themes').mkdir(parents=True)
-		subprocess.run(['git', 'init'], check=True)
+		subprocess.run(['git', 'init', '-b', 'main'], check=True)
 		subprocess.run(['git', 'submodule', 'add', '../../carla', 'plugins/CarlaBase/carla'], check=True)
 		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
 		create_file('debian/lmms-common.docs', '')
@@ -40,7 +40,7 @@ class ScriptTest():
 					'    </message>\n'
 					'</context>\n'
 					'</TS>\n')
-		subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
+		subprocess.run(['git', 'commit', '-m', 'Initial commit', '--author', 'James Bond <007@sis.gov.uk>'], check=True)
 		return self
 
 	def __exit__(self, type, value, traceback):
@@ -84,7 +84,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 	os.chdir('carla')
 	subprocess.run(['git', 'init'], check=True)
 	create_file('README.md', 'hello world')
-	subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
+	subprocess.run(['git', 'commit', '-m', 'Initial commit', '--author', 'James Bond <007@sis.gov.uk>'], check=True)
 	os.chdir('..')
 
 	Path('lmms').mkdir()
