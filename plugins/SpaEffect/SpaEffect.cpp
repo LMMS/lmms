@@ -29,9 +29,15 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+extern "C"
+{
+
 Plugin::Descriptor PLUGIN_EXPORT spaeffect_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"SPA",
 	QT_TRANSLATE_NOOP("SpaEffect",
 		"plugin for using arbitrary SPA-effects inside LMMS."),
@@ -42,6 +48,8 @@ Plugin::Descriptor PLUGIN_EXPORT spaeffect_plugin_descriptor =
 	nullptr,
 	new SpaSubPluginFeatures(Plugin::Effect)
 };
+
+}
 
 SpaEffect::SpaEffect(Model* parent, const Descriptor::SubPluginFeatures::Key *key) :
 	Effect(&spaeffect_plugin_descriptor, parent, key),
@@ -100,3 +108,5 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 }
 
 }
+
+} // namespace lmms

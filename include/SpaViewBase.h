@@ -32,8 +32,21 @@
 
 #include "LinkedModelGroupViews.h"
 
+class AutomatableModel;
+class QDropEvent;
+class QGridLayout;
+class QPushButton;
+class QWidget;
+
+namespace lmms
+{
+class AutomatableModel;
 class SpaProc;
 class SpaControlBase;
+}
+
+namespace lmms::gui
+{
 
 class SpaViewProc : public LinkedModelGroupView
 {
@@ -42,18 +55,18 @@ public:
 	SpaViewProc(QWidget *parent, SpaProc *proc,
 				std::size_t colNum);
 	// TODO: make those two private?
-	void dropEvent(class QDropEvent *de) override;
+	void dropEvent(QDropEvent *de) override;
 	void dragEnterEvent(QDragEnterEvent *dev) override;
 private slots:
-	void modelAdded(class AutomatableModel* mdl);
-	void modelRemoved(AutomatableModel *mdl);
+	void modelAdded(lmms::AutomatableModel* mdl);
+	void modelRemoved(lmms::AutomatableModel *mdl);
 private:
 	SpaProc* m_proc;
 };
 
 class SpaViewBase : LinkedModelGroupsView
 {
-	class QGridLayout *m_grid;
+	QGridLayout *m_grid;
 	const int m_firstModelRow = 1; // row 0 is for buttons
 	const int m_rowNum = 6; // just some guess for what might look good
 
@@ -64,13 +77,13 @@ class SpaViewBase : LinkedModelGroupsView
 	LinkedModelGroupView *getGroupView() override;
 
 protected:
-	class QPushButton *m_toggleUIButton = nullptr;
-	class QPushButton *m_reloadPluginButton;
+	QPushButton *m_toggleUIButton = nullptr;
+	QPushButton *m_reloadPluginButton;
 
 	// to be called by virtuals
 	void modelChanged(SpaControlBase* ctrlBase);
 	void connectSlots(const char* toggleUiSlot);
-	SpaViewBase(class QWidget *meAsWidget, SpaControlBase* ctrlBase);
+	SpaViewBase(QWidget *meAsWidget, SpaControlBase* ctrlBase);
 	virtual ~SpaViewBase();
 	void dropEvent(QDropEvent *de);
 
@@ -124,6 +137,8 @@ private slots:
 };
 
 #endif
+
+} // namespace lmms::gui
 
 #endif // LMMS_HAVE_SPA
 

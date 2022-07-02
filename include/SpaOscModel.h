@@ -31,6 +31,9 @@
 
 #include "AutomatableModel.h"
 
+namespace lmms
+{
+
 template <class Base> class SpaOscModel : public Base
 {
 protected:
@@ -70,6 +73,8 @@ public:
 	FloatOscModel(class SpaProc *plugRef, const QString dest,
 		float min, float max, float step, float val);
 };
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA
 

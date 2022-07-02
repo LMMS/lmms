@@ -28,6 +28,9 @@
 
 #include "SpaFxControls.h"
 
+namespace lmms::gui
+{
+
 SpaFxControls *SpaFxControlDialog::spaControls()
 {
 	return static_cast<SpaFxControls *>(m_effectControls);
@@ -82,3 +85,5 @@ void SpaFxControlDialog::toggleUI()
 }
 
 void SpaFxControlDialog::reloadPlugin() { spaControls()->reloadPlugin(); }
+
+} // namespace lmms::gui

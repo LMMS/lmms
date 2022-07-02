@@ -29,6 +29,9 @@
 #include "SpaFxControlDialog.h"
 #include "SpaProc.h"
 
+namespace lmms
+{
+
 SpaFxControls::SpaFxControls(class SpaEffect *effect, const QString& uniqueName) :
 	EffectControls(effect),
 	SpaControlBase(static_cast<EffectControls*>(this), uniqueName,
@@ -69,7 +72,9 @@ int SpaFxControls::controlCount()
 	return static_cast<int>(res);
 }
 
-EffectControlDialog *SpaFxControls::createView()
+gui::EffectControlDialog *SpaFxControls::createView()
 {
-	return new SpaFxControlDialog(this);
+	return new gui::SpaFxControlDialog(this);
 }
+
+} // namespace lmms

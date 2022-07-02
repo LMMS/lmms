@@ -34,11 +34,19 @@
 #include "SpaControlBase.h"
 #include "SpaViewBase.h"
 
+class QPushButton;
+
+namespace lmms
+{
+
+namespace gui
+{
+	class SpaInsView;
+}
+
 // whether to use MIDI vs playHandle
 // currently only MIDI works
 #define SPA_INSTRUMENT_USE_MIDI
-
-class QPushButton;
 
 class SpaInstrument : public Instrument, public SpaControlBase
 {
@@ -73,7 +81,7 @@ public:
 #endif
 	}
 
-	PluginView *instantiateView(QWidget *parent) override;
+	gui::PluginView *instantiateView(QWidget *parent) override;
 
 	unsigned netPort(std::size_t) const override;
 	class AutomatableModel* modelAtPort(const QString& dest) override;
@@ -83,9 +91,11 @@ private slots:
 	void reloadPlugin() { SpaControlBase::reloadPlugin(); }
 
 private:
-	friend class SpaInsView;
+	friend class gui::SpaInsView;
 	QString nodeName() const override;
 };
+
+namespace gui {
 
 class SpaInsView : public InstrumentView, public SpaViewBase
 {
@@ -101,5 +111,8 @@ private slots:
 	void toggleUI();
 	void reloadPlugin();
 };
+
+} // namespace gui
+} // namespace lmms
 
 #endif // SPA_INSTRUMENT_H

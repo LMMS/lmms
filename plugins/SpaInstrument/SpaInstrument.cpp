@@ -44,9 +44,15 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+extern "C"
+{
+
 Plugin::Descriptor PLUGIN_EXPORT spainstrument_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"SPA",
 	QT_TRANSLATE_NOOP("SpaInstrument",
 		"plugin for using arbitrary SPA instruments inside LMMS."),
@@ -57,6 +63,8 @@ Plugin::Descriptor PLUGIN_EXPORT spainstrument_plugin_descriptor =
 	nullptr,
 	new SpaSubPluginFeatures(Plugin::Instrument)
 };
+
+}
 
 /*DataFile::Types SpaInstrument::settingsType()
 {
@@ -184,9 +192,9 @@ bool SpaInstrument::handleMidiEvent(
 }
 #endif
 
-PluginView *SpaInstrument::instantiateView(QWidget *parent)
+gui::PluginView *SpaInstrument::instantiateView(QWidget *parent)
 {
-	return new SpaInsView(this, parent);
+	return new gui::SpaInsView(this, parent);
 }
 
 unsigned SpaInstrument::netPort(std::size_t chan) const
@@ -198,6 +206,8 @@ AutomatableModel *SpaInstrument::modelAtPort(const QString &dest)
 {
 	return SpaControlBase::modelAtPort(dest);
 }
+
+namespace gui {
 
 SpaInsView::SpaInsView(SpaInstrument *_instrument, QWidget *_parent) :
 	InstrumentView(_instrument, _parent),
@@ -258,3 +268,6 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 }
 
 }
+
+} // namespace gui
+} // namespace lmms

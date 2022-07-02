@@ -42,11 +42,19 @@
 // includes from the spa library
 #include <spa/spa_fwd.h>
 
+namespace lmms
+{
+
+namespace gui
+{
+	class SpaViewBase;
+}
+
 class SpaProc;
 
 class SpaControlBase : public LinkedModelGroups
 {
-	friend class SpaViewBase;
+	friend class gui::SpaViewBase;
 public:
 	SpaControlBase(Model *that, const QString &uniqueName,
 				DataFile::Types settingsType);
@@ -105,6 +113,8 @@ protected:
 private:
 	unsigned m_channelsPerProc;
 };
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA
 

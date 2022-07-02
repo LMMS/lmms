@@ -30,6 +30,8 @@
 
 #include "SpaProc.h"
 
+namespace lmms {
+
 // Send own value via OSC
 // This is only allowed if the plugin can not run currently!
 
@@ -71,5 +73,7 @@ FloatOscModel::FloatOscModel(SpaProc *plugRef, const QString dest,
 		 << ", " << min << ", " << max << ", " << step << ")";
 	init(plugRef, dest);
 }
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA

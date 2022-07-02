@@ -34,6 +34,11 @@
 
 #include "Plugin.h"
 
+class QLibrary;
+
+namespace lmms
+{
+
 //! Class to keep track of all SPA plugins
 class SpaManager
 {
@@ -44,7 +49,7 @@ public:
 	{
 		// only required when plugins shall not be loaded at startup
 		/*const*/ QString m_path;
-		class QLibrary *m_lib = nullptr;
+		QLibrary *m_lib = nullptr;
 		spa::descriptor *m_descriptor;
 		Plugin::PluginTypes m_type;
 		SpaInfo(const SpaInfo &) = delete;
@@ -84,6 +89,8 @@ public:
 private:
 	std::map<std::string, SpaInfo> m_spaInfoMap;
 };
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA
 

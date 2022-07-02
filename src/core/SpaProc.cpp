@@ -17,6 +17,8 @@
 #include "SpaOscModel.h"
 #include "TimePos.h"
 
+namespace lmms {
+
 SpaProc::SpaProc(Model *parent, const spa::descriptor* desc, DataFile::Types settingsType) :
 	LinkedModelGroup(parent),
 	m_spaDescriptor(desc),
@@ -733,3 +735,4 @@ SpaProc::LmmsPorts::LmmsPorts(int bufferSize) :
 }
 
 
+} // namespace lmms

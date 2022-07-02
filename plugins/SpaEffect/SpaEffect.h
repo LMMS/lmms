@@ -28,8 +28,12 @@
 #include "Effect.h"
 #include "SpaFxControls.h"
 
-class AutomatableModel;
 class QString;
+
+namespace lmms
+{
+
+class AutomatableModel;
 
 class SpaEffect : public Effect
 {
@@ -54,5 +58,7 @@ private:
 
 	friend class SpaFxControls;
 };
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA

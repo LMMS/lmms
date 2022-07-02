@@ -35,6 +35,9 @@
 
 #include "Plugin.h"
 
+namespace lmms
+{
+
 class SpaSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 private:
@@ -54,6 +57,8 @@ public:
 	void listSubPluginKeys(
 		const Plugin::Descriptor *_desc, KeyList &_kl) const override;
 };
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA
 

@@ -30,6 +30,14 @@
 
 class QDomElement;
 
+namespace lmms
+{
+
+namespace gui
+{
+	class SpaFxControlDialog;
+}
+
 class SpaFxControls : public EffectControls, public SpaControlBase
 {
 	Q_OBJECT
@@ -50,7 +58,7 @@ public:
 
 	int controlCount() override;
 
-	EffectControlDialog *createView() override;
+	gui::EffectControlDialog *createView() override;
 
 private slots:
 	void changeControl();
@@ -59,8 +67,10 @@ private slots:
 
 private:
 	class SpaEffect *m_effect;
-	friend class SpaFxControlDialog;
+	friend class gui::SpaFxControlDialog;
 	friend class SpaEffect;
 };
+
+} // namespace lmms
 
 #endif

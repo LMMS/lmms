@@ -42,6 +42,9 @@
 #include "SpaManager.h"
 #include "embed.h"
 
+namespace lmms
+{
+
 spa::descriptor *SpaSubPluginFeatures::spaDescriptor(
 	const Plugin::Descriptor::SubPluginFeatures::Key &k)
 {
@@ -184,3 +187,5 @@ void SpaSubPluginFeatures::listSubPluginKeys(
 		}
 	}
 }
+
+} // namespace lmms

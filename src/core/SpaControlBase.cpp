@@ -38,6 +38,9 @@
 #include "SpaManager.h"
 #include "SpaProc.h"
 
+namespace lmms
+{
+
 SpaControlBase::SpaControlBase(Model* that, const QString& uniqueName,
 								DataFile::Types settingsType) :
 	m_spaDescriptor(Engine::getSPAManager()->getDescriptor(uniqueName)),
@@ -254,5 +257,7 @@ void SpaControlBase::handleMidiInputEvent(const MidiEvent &event,
 	for (auto& c : m_procs) { c->handleMidiInputEvent(event, time, offset); }
 }
 
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA

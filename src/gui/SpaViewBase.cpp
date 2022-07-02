@@ -43,6 +43,8 @@
 #include "Clipboard.h"
 #include "LedCheckBox.h"
 
+namespace lmms::gui {
+
 SpaViewBase::SpaViewBase(QWidget* meAsWidget, SpaControlBase *ctrlBase)
 {
 	m_grid = new QGridLayout(meAsWidget);
@@ -317,6 +319,8 @@ void SpaViewProc::dropEvent(QDropEvent *dev)
 	else
 		dev->ignore();
 }
+
+} // namespace lmms::gui
 
 
 #endif // LMMS_HAVE_SPA

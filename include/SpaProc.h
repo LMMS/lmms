@@ -12,6 +12,8 @@
 #include "Note.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 
+namespace lmms {
+
 class AutomatableModel;
 
 class SpaProc : public LinkedModelGroup
@@ -133,5 +135,7 @@ protected:
 	void initPlugin();
 	void shutdownPlugin();
 };
+
+} // namespace lmms
 
 #endif // SPAPROC_H

@@ -28,11 +28,19 @@
 #include "EffectControlDialog.h"
 #include "SpaViewBase.h"
 
+namespace lmms
+{
+	class SpaFxControls;
+}
+
+namespace lmms::gui
+{
+
 class SpaFxControlDialog : public EffectControlDialog, public SpaViewBase
 {
 	Q_OBJECT
 
-	class SpaFxControls *spaControls();
+	SpaFxControls *spaControls();
 	void modelChanged() override;
 
 public:
@@ -43,5 +51,7 @@ private slots:
 	void toggleUI();
 	void reloadPlugin();
 };
+
+} // namespace lmms::gui
 
 #endif

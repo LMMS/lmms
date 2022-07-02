@@ -36,6 +36,9 @@
 #include "Plugin.h"
 #include "PluginFactory.h"
 
+namespace lmms
+{
+
 SpaManager::SpaManager()
 {
 	// TODO: make common func? (LADSPA, SPA, LV2, ...)
@@ -217,5 +220,7 @@ void SpaManager::SpaInfo::cleanup()
 	delete m_descriptor;
 	delete m_lib;
 }
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_SPA
