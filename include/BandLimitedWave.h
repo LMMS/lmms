@@ -36,6 +36,9 @@ class QString;
 #include "Engine.h"
 #include "AudioEngine.h"
 
+namespace lmms
+{
+
 constexpr int MAXLEN = 11;
 constexpr int MIPMAPSIZE = 2 << ( MAXLEN + 1 );
 constexpr int MIPMAPSIZE3 = 3 << ( MAXLEN + 1 );
@@ -94,8 +97,8 @@ public:
 		NumBLWaveforms
 	};
 
-	BandLimitedWave() {};
-	virtual ~BandLimitedWave() {};
+	BandLimitedWave() = default;
+	virtual ~BandLimitedWave() = default;
 
 	/*! \brief This method converts frequency to wavelength. The oscillate function takes wavelength as argument so
 	 * use this to convert your note frequency to wavelength before using it.
@@ -168,5 +171,6 @@ public:
 	static QString s_wavetableDir;
 };
 
+} // namespace lmms
 
 #endif

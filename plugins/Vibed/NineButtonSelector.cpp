@@ -29,6 +29,9 @@
 #include "CaptionMenu.h"
 #include "PixmapButton.h"
 
+namespace lmms::gui
+{
+
 
 NineButtonSelector::NineButtonSelector(	QPixmap _button0_on,
 					QPixmap _button0_off,
@@ -252,3 +255,6 @@ void NineButtonSelector::contextMenuEvent( QContextMenuEvent * )
 	CaptionMenu contextMenu( windowTitle(), this );
 	contextMenu.exec( QCursor::pos() );
 }
+
+
+} // namespace lmms::gui

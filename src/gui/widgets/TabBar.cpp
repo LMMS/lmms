@@ -28,6 +28,9 @@
 #include "gui_templates.h"
 
 
+namespace lmms::gui
+{
+
 
 TabBar::TabBar( QWidget * _parent, QBoxLayout::Direction _dir ) :
 	QWidget( _parent ),
@@ -52,7 +55,7 @@ TabButton * TabBar::addTab( QWidget * _w, const QString & _text, int _id,
 	QString caption = ( _text_is_tooltip ) ? QString( "" ) : _text;
 	// create tab-button
 	TabButton * b = new TabButton( caption, _id, this );
-	connect( b, SIGNAL( clicked( int ) ), this, SLOT( tabClicked( int ) ) );
+	connect( b, SIGNAL(clicked(int)), this, SLOT(tabClicked(int)));
 	b->setIconSize( QSize( 48, 48 ) );
 	b->setFixedSize( 64, 64 );
 	b->show();
@@ -229,9 +232,4 @@ bool TabBar::allHidden()
 }
 
 
-
-
-
-
-
-
+} // namespace lmms::gui

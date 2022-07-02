@@ -36,9 +36,16 @@
 class QMenu;
 class QContextMenuEvent;
 
+namespace lmms
+{
+
 class DataFile;
-class TextFloat;
 class Clip;
+
+namespace gui
+{
+
+class TextFloat;
 class TrackView;
 
 
@@ -64,7 +71,7 @@ public:
 	const static int BORDER_WIDTH = 2;
 
 	ClipView( Clip * clip, TrackView * tv );
-	virtual ~ClipView();
+	~ClipView() override;
 
 	bool fixedClips();
 
@@ -239,5 +246,9 @@ private:
 	void updateCursor(QMouseEvent * me);
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

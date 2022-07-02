@@ -28,12 +28,15 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Amplifier",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native amplifier plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
@@ -57,9 +60,6 @@ AmplifierEffect::AmplifierEffect( Model* parent, const Descriptor::SubPluginFeat
 
 
 
-AmplifierEffect::~AmplifierEffect()
-{
-}
 
 
 
@@ -145,3 +145,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 
 }
 
+} // namespace lmms

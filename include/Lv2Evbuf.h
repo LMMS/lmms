@@ -39,6 +39,11 @@
 
 #include <cstdint>
 
+
+namespace lmms
+{
+
+
 /**
    An abstract/opaque LV2 event buffer.
 */
@@ -143,6 +148,9 @@ lv2_evbuf_write(	LV2_Evbuf_Iterator* iter,
 					uint32_t type,
 					uint32_t size,
 					const uint8_t* data);
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

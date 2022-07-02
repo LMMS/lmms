@@ -29,13 +29,24 @@
 
 #include <QMap>
 #include <QPointer>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 
 #include "AutomationNode.h"
 #include "Clip.h"
 
 
+namespace lmms
+{
+
 class AutomationTrack;
 class TimePos;
+
+namespace gui
+{
+class AutomationClipView;
+} // namespace gui
 
 
 
@@ -57,7 +68,7 @@ public:
 
 	AutomationClip( AutomationTrack * _auto_track );
 	AutomationClip( const AutomationClip & _clip_to_copy );
-	virtual ~AutomationClip() = default;
+	~AutomationClip() override = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
@@ -152,7 +163,7 @@ public:
 	static const QString classNodeName() { return "automationclip"; }
 	QString nodeName() const override { return classNodeName(); }
 
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	static bool isAutomated( const AutomatableModel * _m );
@@ -168,7 +179,7 @@ public:
 
 public slots:
 	void clear();
-	void objectDestroyed( jo_id_t );
+	void objectDestroyed( lmms::jo_id_t );
 	void flipY( int min, int max );
 	void flipY();
 	void flipX( int length = -1 );
@@ -181,7 +192,11 @@ private:
 
 	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	mutable QRecursiveMutex m_clipMutex;
+#else
 	mutable QMutex m_clipMutex;
+#endif
 
 	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
@@ -204,7 +219,7 @@ private:
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
 
-	friend class AutomationClipView;
+	friend class gui::AutomationClipView;
 	friend class AutomationNode;
 
 } ;
@@ -241,5 +256,8 @@ inline int POS(AutomationClip::TimemapIterator it)
 {
 	return it.key();
 }
+
+
+} // namespace lmms
 
 #endif

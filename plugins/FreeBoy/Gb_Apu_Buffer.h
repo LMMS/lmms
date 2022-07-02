@@ -27,11 +27,15 @@
 #include "Multi_Buffer.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
+
 class Gb_Apu_Buffer : public Gb_Apu {
 	MM_OPERATORS
 public:
-	Gb_Apu_Buffer();
-	~Gb_Apu_Buffer();
+	Gb_Apu_Buffer() = default;
+	~Gb_Apu_Buffer() = default;
 
 	void end_frame(blip_time_t);
 
@@ -43,6 +47,9 @@ public:
 private:
 	Stereo_Buffer m_buf;
 };
+
+
+} // namespace lmms
 
 #endif
 

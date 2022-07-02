@@ -27,6 +27,9 @@
 
 #include <QTableView>
 
+namespace lmms::gui
+{
+
 
 class RowDelegate;
 
@@ -36,7 +39,7 @@ class RowTableView : public QTableView
 	Q_OBJECT
 public:
 	RowTableView( QWidget * parent = 0 );
-	virtual ~RowTableView();
+	~RowTableView() override;
 
 	void setModel( QAbstractItemModel * model ) override;
 
@@ -51,5 +54,6 @@ private:
 } ;
 
 
+} // namespace lmms::gui
 
 #endif

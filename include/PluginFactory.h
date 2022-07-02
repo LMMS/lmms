@@ -38,6 +38,9 @@
 
 class QLibrary;
 
+namespace lmms
+{
+
 class LMMS_EXPORT PluginFactory
 {
 public:
@@ -54,7 +57,7 @@ public:
 	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
 
 	PluginFactory();
-	~PluginFactory();
+	~PluginFactory() = default;
 
 	static void setupSearchPaths();
 
@@ -104,5 +107,8 @@ private:
 
 //Short-hand function
 LMMS_EXPORT PluginFactory* getPluginFactory();
+
+
+} // namespace lmms
 
 #endif // PLUGINFACTORY_H

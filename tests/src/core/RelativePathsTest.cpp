@@ -36,6 +36,8 @@ class RelativePathsTest : QTestSuite
 private slots:
 	void PathUtilComparisonTests()
 	{
+		using namespace lmms;
+
 		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
 		QVERIFY(fi.exists());
 

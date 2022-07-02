@@ -30,6 +30,9 @@
 #include "Note.h"
 #include "DetuningHelper.h"
 
+namespace lmms
+{
+
 
 Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
@@ -232,3 +235,6 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
 		&& length().getTicks() != 0;
 }
+
+
+} // namespace lmms

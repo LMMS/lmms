@@ -68,6 +68,10 @@
 #include "MidiWinMM.h"
 
 
+namespace lmms::gui
+{
+
+
 constexpr int BUFFERSIZE_RESOLUTION = 32;
 
 inline void labelWidget(QWidget * w, const QString & txt)
@@ -541,8 +545,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		setCurrentIndex(m_audioInterfaces->findText(audioDevName));
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
-	connect(m_audioInterfaces, SIGNAL(activated(const QString &)),
-			this, SLOT(audioInterfaceChanged(const QString &)));
+	connect(m_audioInterfaces, SIGNAL(activated(const QString&)),
+			this, SLOT(audioInterfaceChanged(const QString&)));
 
 	// Advanced setting, hidden for now
 	if(false)
@@ -685,8 +689,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
 
-	connect(m_midiInterfaces, SIGNAL(activated(const QString &)),
-			this, SLOT(midiInterfaceChanged(const QString &)));
+	connect(m_midiInterfaces, SIGNAL(activated(const QString&)),
+			this, SLOT(midiInterfaceChanged(const QString&)));
 
 
 	// MIDI autoassign tab.
@@ -757,7 +761,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 		lineEdit = new QLineEdit(content, newTw);
 		lineEdit->setGeometry(10, 20, txtLength, 16);
-		connect(lineEdit, SIGNAL(textChanged(const QString &)),
+		connect(lineEdit, SIGNAL(textChanged(const QString&)),
 			this, setSlot);
 
 		QPushButton * selectBtn = new QPushButton(
@@ -772,37 +776,37 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	};
 
 	addPathEntry(tr("LMMS working directory"), m_workingDir,
-		SLOT(setWorkingDir(const QString &)),
+		SLOT(setWorkingDir(const QString&)),
 		SLOT(openWorkingDir()),
 		m_workingDirLineEdit);
 	addPathEntry(tr("VST plugins directory"), m_vstDir,
-		SLOT(setVSTDir(const QString &)),
+		SLOT(setVSTDir(const QString&)),
 		SLOT(openVSTDir()),
 		m_vstDirLineEdit);
 	addPathEntry(tr("LADSPA plugins directories"), m_ladspaDir,
-		SLOT(setLADSPADir(const QString &)),
+		SLOT(setLADSPADir(const QString&)),
 		SLOT(openLADSPADir()),
 		m_ladspaDirLineEdit, "add_folder");
 	addPathEntry(tr("SF2 directory"), m_sf2Dir,
-		SLOT(setSF2Dir(const QString &)),
+		SLOT(setSF2Dir(const QString&)),
 		SLOT(openSF2Dir()),
 		m_sf2DirLineEdit);
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	addPathEntry(tr("Default SF2"), m_sf2File,
-		SLOT(setSF2File(const QString &)),
+		SLOT(setSF2File(const QString&)),
 		SLOT(openSF2File()),
 		m_sf2FileLineEdit);
 #endif
 	addPathEntry(tr("GIG directory"), m_gigDir,
-		SLOT(setGIGDir(const QString &)),
+		SLOT(setGIGDir(const QString&)),
 		SLOT(openGIGDir()),
 		m_gigDirLineEdit);
 	addPathEntry(tr("Theme directory"), m_themeDir,
-		SLOT(setThemeDir(const QString &)),
+		SLOT(setThemeDir(const QString&)),
 		SLOT(openThemeDir()),
 		m_themeDirLineEdit);
 	addPathEntry(tr("Background artwork"), m_backgroundPicFile,
-		SLOT(setBackgroundPicFile(const QString &)),
+		SLOT(setBackgroundPicFile(const QString&)),
 		SLOT(openBackgroundPicFile()),
 		m_backgroundPicFileLineEdit);
 
@@ -1396,3 +1400,6 @@ void SetupDialog::showRestartWarning()
 {
 	restartWarningLbl->show();
 }
+
+
+} // namespace lmms::gui

@@ -27,6 +27,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;
 const float CUTOFF_RATIO = 0.353553391f;
@@ -39,7 +43,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Bitcrush",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "An oversampling bitcrusher" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
@@ -251,3 +255,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }
+
+
+} // namespace lmms

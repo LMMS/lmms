@@ -32,6 +32,9 @@
 #include "Knob.h"
 #include "PixmapButton.h"
 
+namespace lmms::gui
+{
+
 
 DynProcControlDialog::DynProcControlDialog(
 					DynProcControls * _controls ) :
@@ -151,3 +154,5 @@ DynProcControlDialog::DynProcControlDialog(
 			_controls, SLOT( subOneClicked() ) );
 }
 
+
+} // namespace lmms::gui

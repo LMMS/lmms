@@ -28,6 +28,9 @@
 #include <QGraphicsObject>
 
 
+namespace lmms::gui
+{
+
 
 enum{
 	highpass=1,
@@ -52,7 +55,7 @@ public:
 	static float gainToYPixel( float gain, int h, float pixelPerUnitHeight );
 	static float yPixelToGain( float y, int h, float pixelPerUnitHeight );
 
-	QRectF boundingRect() const;
+	QRectF boundingRect() const override;
 	QPainterPath getCurvePath();
 	float getPeakCurve( float x );
 	float getHighShelfCurve( float x );
@@ -80,13 +83,13 @@ signals:
 	void positionChanged();
 
 protected:
-	void mousePressEvent( QGraphicsSceneMouseEvent *event );
-	void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
-	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
-	void wheelEvent( QGraphicsSceneWheelEvent *wevent );
-	void hoverEnterEvent( QGraphicsSceneHoverEvent *hevent );
-	void hoverLeaveEvent( QGraphicsSceneHoverEvent *hevent );
-	QVariant itemChange( GraphicsItemChange change, const QVariant &value );
+	void mousePressEvent( QGraphicsSceneMouseEvent *event ) override;
+	void mouseReleaseEvent( QGraphicsSceneMouseEvent *event ) override;
+	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget ) override;
+	void wheelEvent( QGraphicsSceneWheelEvent *wevent ) override;
+	void hoverEnterEvent( QGraphicsSceneHoverEvent *hevent ) override;
+	void hoverLeaveEvent( QGraphicsSceneHoverEvent *hevent ) override;
+	QVariant itemChange( GraphicsItemChange change, const QVariant &value ) override;
 
 private:
 	double calculateGain( const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 );
@@ -117,11 +120,11 @@ class EqCurve : public QGraphicsObject
 	Q_OBJECT
 public:
 	EqCurve( QList<EqHandle*> *handle, int x, int y );
-	QRectF boundingRect() const;
+	QRectF boundingRect() const override;
 	void setModelChanged(bool mc);
 
 protected:
-	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
+	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget ) override;
 
 private:
 	QList<EqHandle*> *m_handle;
@@ -133,5 +136,8 @@ private:
 	float m_pixelsPerUnitHeight;
 	float m_scale;
 };
+
+
+} // namespace lmms::gui
 
 #endif // EQCURVE_H

@@ -36,12 +36,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Nescaline",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"A NES-like synthesizer" ),
@@ -96,11 +100,6 @@ NesObject::NesObject( NesInstrument * nes, const sample_rate_t samplerate, NoteP
 	m_vibratoPhase = 0;
 	
 	updatePitch();
-}
-
-
-NesObject::~NesObject()
-{
 }
 
 
@@ -547,11 +546,6 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 
 
 
-NesInstrument::~NesInstrument()
-{
-}
-
-
 void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 {
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
@@ -699,9 +693,9 @@ QString NesInstrument::nodeName() const
 }
 
 
-PluginView * NesInstrument::instantiateView( QWidget * parent )
+gui::PluginView* NesInstrument::instantiateView( QWidget * parent )
 {
-	return( new NesInstrumentView( this, parent ) );
+	return( new gui::NesInstrumentView( this, parent ) );
 }
 
 
@@ -724,6 +718,8 @@ void NesInstrument::updateFreq3()
 }
 
 
+namespace gui
+{
 
 
 QPixmap * NesInstrumentView::s_artwork = nullptr;
@@ -848,11 +844,6 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 
 
-NesInstrumentView::~NesInstrumentView()
-{
-}
-
-
 void NesInstrumentView::modelChanged()
 {
 	NesInstrument * nes = castModel<NesInstrument>();	
@@ -912,6 +903,9 @@ void NesInstrumentView::modelChanged()
 }
 
 
+} // namespace gui
+
+
 extern "C"
 {
 
@@ -925,4 +919,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * _data )
 }
 
 
-
+} // namespace lmms

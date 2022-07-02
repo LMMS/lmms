@@ -49,12 +49,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
@@ -874,15 +878,16 @@ void Sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * Sf2Instrument::instantiateView( QWidget * _parent )
+gui::PluginView * Sf2Instrument::instantiateView( QWidget * _parent )
 {
-	return new Sf2InstrumentView( this, _parent );
+	return new gui::Sf2InstrumentView( this, _parent );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 class Sf2Knob : public Knob
@@ -1050,13 +1055,6 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 
-Sf2InstrumentView::~Sf2InstrumentView()
-{
-}
-
-
-
-
 void Sf2InstrumentView::modelChanged()
 {
 	Sf2Instrument * k = castModel<Sf2Instrument>();
@@ -1182,6 +1180,7 @@ void Sf2InstrumentView::showPatchDialog()
 }
 
 
+} // namespace gui
 
 extern "C"
 {
@@ -1193,3 +1192,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 }
+
+
+} // namespace lmms

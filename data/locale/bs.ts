@@ -2,69 +2,69 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="14"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="14"/>
         <source>About LMMS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="55"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="55"/>
         <source>LMMS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="62"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="62"/>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="90"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="90"/>
         <source>About</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="112"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="112"/>
         <source>LMMS - easy music production for everyone</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="138"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="138"/>
         <source>Copyright © %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="164"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="164"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="188"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="188"/>
         <source>Authors</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="202"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="202"/>
         <source>Involved</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="208"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="208"/>
         <source>Contributors ordered by number of commits:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="223"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="223"/>
         <source>Translation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="232"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="232"/>
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/about_dialog.ui" line="242"/>
+        <location filename="src/gui/modals/about_dialog.ui" line="242"/>
         <source>License</source>
         <translation type="unfinished"/>
     </message>
@@ -613,57 +613,57 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationClipView</name>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="57"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="57"/>
         <source>double-click to open this pattern in automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="179"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="179"/>
         <source>Open in Automation editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="187"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="187"/>
         <source>Clear</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="190"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="190"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="193"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="193"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="196"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="196"/>
         <source>Set/clear record</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="199"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="199"/>
         <source>Flip Vertically (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="202"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="202"/>
         <source>Flip Horizontally (Visible)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="207"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="207"/>
         <source>%1 Connections</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="215"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="215"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/AutomationClipView.cpp" line="449"/>
+        <location filename="src/gui/clips/AutomationClipView.cpp" line="449"/>
         <source>Model is already connected to this clip.</source>
         <translation type="unfinished"/>
     </message>
@@ -677,105 +677,105 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>BBEditor</name>
+    <name>PatternEditor</name>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="52"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="52"/>
         <source>Beat+Bassline Editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="74"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="74"/>
         <source>Play/pause current beat/bassline (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="75"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="75"/>
         <source>Stop playback of current beat/bassline (Space)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="78"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="78"/>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="82"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="82"/>
         <source>Click here to stop playing of current beat/bassline.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="87"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="87"/>
         <source>Beat selector</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="97"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="97"/>
         <source>Track and step actions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="100"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="100"/>
         <source>Add beat/bassline</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="102"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="102"/>
         <source>Add automation-track</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="111"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="111"/>
         <source>Remove steps</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="113"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="113"/>
         <source>Add steps</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/editors/BBEditor.cpp" line="115"/>
+        <location filename="src/gui/editors/PatternEditor.cpp" line="115"/>
         <source>Clone Steps</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>BBClipView</name>
+    <name>PatternClipView</name>
     <message>
-        <location filename="src/tracks/BBTrack.cpp" line="185"/>
+        <location filename="src/tracks/PatternTrack.cpp" line="185"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/BBTrack.cpp" line="192"/>
+        <location filename="src/tracks/PatternTrack.cpp" line="192"/>
         <source>Reset name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/BBTrack.cpp" line="195"/>
+        <location filename="src/tracks/PatternTrack.cpp" line="195"/>
         <source>Change name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/BBTrack.cpp" line="198"/>
+        <location filename="src/tracks/PatternTrack.cpp" line="198"/>
         <source>Change color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/BBTrack.cpp" line="200"/>
+        <location filename="src/tracks/PatternTrack.cpp" line="200"/>
         <source>Reset color to default</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>BBTrack</name>
+    <name>PatternTrack</name>
     <message>
-        <location filename="src/tracks/BBTrack.cpp" line="414"/>
+        <location filename="src/tracks/PatternTrack.cpp" line="414"/>
         <source>Beat/Bassline %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/tracks/BBTrack.cpp" line="562"/>
+        <location filename="src/tracks/PatternTrack.cpp" line="562"/>
         <source>Clone of %1</source>
         <translation type="unfinished"/>
     </message>
@@ -973,73 +973,73 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>ControllerConnectionDialog</name>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="136"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="136"/>
         <source>Connection Settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="140"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="140"/>
         <source>MIDI CONTROLLER</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="146"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="146"/>
         <source>Input channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="148"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="148"/>
         <source>CHANNEL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="152"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="152"/>
         <source>Input controller</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="154"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="154"/>
         <source>CONTROLLER</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="159"/>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="160"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="159"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="160"/>
         <source>Auto Detect</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="174"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="174"/>
         <source>MIDI-devices to receive MIDI-events from</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="184"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="184"/>
         <source>USER CONTROLLER</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="200"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="200"/>
         <source>MAPPING FUNCTION</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="218"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="218"/>
         <source>OK</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="224"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="224"/>
         <source>Cancel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="332"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="332"/>
         <source>LMMS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ControllerConnectionDialog.cpp" line="332"/>
+        <location filename="src/gui/modals/ControllerConnectionDialog.cpp" line="332"/>
         <source>Cycle Detected.</source>
         <translation type="unfinished"/>
     </message>
@@ -1047,22 +1047,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>ControllerRackView</name>
     <message>
-        <location filename="src/gui/widgets/ControllerRackView.cpp" line="52"/>
+        <location filename="src/gui/ControllerRackView.cpp" line="52"/>
         <source>Controller Rack</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ControllerRackView.cpp" line="67"/>
+        <location filename="src/gui/ControllerRackView.cpp" line="67"/>
         <source>Add</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ControllerRackView.cpp" line="128"/>
+        <location filename="src/gui/ControllerRackView.cpp" line="128"/>
         <source>Confirm Delete</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ControllerRackView.cpp" line="129"/>
+        <location filename="src/gui/ControllerRackView.cpp" line="129"/>
         <source>Confirm delete? There are existing connection(s) associated with this controller. There is no way to undo.</source>
         <translation type="unfinished"/>
     </message>
@@ -1070,27 +1070,27 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>ControllerView</name>
     <message>
-        <location filename="src/gui/widgets/ControllerView.cpp" line="71"/>
+        <location filename="src/gui/ControllerView.cpp" line="71"/>
         <source>Controls</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ControllerView.cpp" line="96"/>
+        <location filename="src/gui/ControllerView.cpp" line="96"/>
         <source>Controllers are able to automate the value of a knob, slider, and other controls.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ControllerView.cpp" line="154"/>
+        <location filename="src/gui/ControllerView.cpp" line="154"/>
         <source>Rename controller</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ControllerView.cpp" line="155"/>
+        <location filename="src/gui/ControllerView.cpp" line="155"/>
         <source>Enter the new name for this controller</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ControllerView.cpp" line="176"/>
+        <location filename="src/gui/ControllerView.cpp" line="176"/>
         <source>&amp;Remove this plugin</source>
         <translation type="unfinished"/>
     </message>
@@ -1571,12 +1571,12 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>EffectRackView</name>
     <message>
-        <location filename="src/gui/widgets/EffectRackView.cpp" line="45"/>
+        <location filename="src/gui/EffectRackView.cpp" line="45"/>
         <source>EFFECTS CHAIN</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectRackView.cpp" line="62"/>
+        <location filename="src/gui/EffectRackView.cpp" line="62"/>
         <source>Add effect</source>
         <translation type="unfinished"/>
     </message>
@@ -1584,22 +1584,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>EffectSelectDialog</name>
     <message>
-        <location filename="src/gui/Forms/EffectSelectDialog.ui" line="14"/>
+        <location filename="src/gui/modals/EffectSelectDialog.ui" line="14"/>
         <source>Add effect</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/EffectSelectDialog.cpp" line="203"/>
+        <location filename="src/gui/modals/EffectSelectDialog.cpp" line="203"/>
         <source>Name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/EffectSelectDialog.cpp" line="204"/>
+        <location filename="src/gui/modals/EffectSelectDialog.cpp" line="204"/>
         <source>Description</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/EffectSelectDialog.cpp" line="205"/>
+        <location filename="src/gui/modals/EffectSelectDialog.cpp" line="205"/>
         <source>Author</source>
         <translation type="unfinished"/>
     </message>
@@ -1607,67 +1607,67 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>EffectView</name>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="62"/>
+        <location filename="src/gui/EffectView.cpp" line="62"/>
         <source>Toggles the effect on or off.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="64"/>
+        <location filename="src/gui/EffectView.cpp" line="64"/>
         <source>On/Off</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="68"/>
+        <location filename="src/gui/EffectView.cpp" line="68"/>
         <source>W/D</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="71"/>
+        <location filename="src/gui/EffectView.cpp" line="71"/>
         <source>Wet Level:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="72"/>
+        <location filename="src/gui/EffectView.cpp" line="72"/>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="78"/>
+        <location filename="src/gui/EffectView.cpp" line="78"/>
         <source>DECAY</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="81"/>
+        <location filename="src/gui/EffectView.cpp" line="81"/>
         <source>Time:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="82"/>
+        <location filename="src/gui/EffectView.cpp" line="82"/>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="89"/>
+        <location filename="src/gui/EffectView.cpp" line="89"/>
         <source>GATE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="92"/>
+        <location filename="src/gui/EffectView.cpp" line="92"/>
         <source>Gate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="93"/>
+        <location filename="src/gui/EffectView.cpp" line="93"/>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="102"/>
+        <location filename="src/gui/EffectView.cpp" line="102"/>
         <source>Controls</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="128"/>
+        <location filename="src/gui/EffectView.cpp" line="128"/>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
 
 The On/Off switch allows you to bypass a given plugin at any point in time.
@@ -1684,17 +1684,17 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="251"/>
+        <location filename="src/gui/EffectView.cpp" line="251"/>
         <source>Move &amp;up</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="254"/>
+        <location filename="src/gui/EffectView.cpp" line="254"/>
         <source>Move &amp;down</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EffectView.cpp" line="258"/>
+        <location filename="src/gui/EffectView.cpp" line="258"/>
         <source>&amp;Remove this plugin</source>
         <translation type="unfinished"/>
     </message>
@@ -1775,226 +1775,226 @@ Right clicking will bring up a context menu where you can change the order in wh
 <context>
     <name>EnvelopeAndLfoView</name>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="98"/>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="177"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="98"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="177"/>
         <source>DEL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="100"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="100"/>
         <source>Predelay:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="102"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="102"/>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="108"/>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="187"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="108"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="187"/>
         <source>ATT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="110"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="110"/>
         <source>Attack:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="112"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="112"/>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="119"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="119"/>
         <source>HOLD</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="121"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="121"/>
         <source>Hold:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="123"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="123"/>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="129"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="129"/>
         <source>DEC</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="131"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="131"/>
         <source>Decay:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="133"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="133"/>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="141"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="141"/>
         <source>SUST</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="143"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="143"/>
         <source>Sustain:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="145"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="145"/>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="152"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="152"/>
         <source>REL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="154"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="154"/>
         <source>Release:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="156"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="156"/>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="164"/>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="207"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="164"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="207"/>
         <source>AMT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="166"/>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="209"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="166"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="209"/>
         <source>Modulation amount:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="168"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="168"/>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="179"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="179"/>
         <source>LFO predelay:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="181"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="181"/>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="189"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="189"/>
         <source>LFO- attack:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="191"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="191"/>
         <source>Use this knob for setting attack-time of the current LFO. The bigger this value the longer the LFO needs to increase its amplitude to maximum.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="197"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="197"/>
         <source>SPD</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="199"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="199"/>
         <source>LFO speed:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="201"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="201"/>
         <source>Use this knob for setting speed of the current LFO. The bigger this value the faster the LFO oscillates and the faster will be your effect.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="211"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="211"/>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="224"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="224"/>
         <source>Click here for a sine-wave.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="233"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="233"/>
         <source>Click here for a triangle-wave.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="242"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="242"/>
         <source>Click here for a saw-wave for current.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="251"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="251"/>
         <source>Click here for a square-wave.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="260"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="260"/>
         <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="274"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="274"/>
         <source>Click here for random wave.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="284"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="284"/>
         <source>FREQ x 100</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="288"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="288"/>
         <source>Click here if the frequency of this LFO should be multiplied by 100.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="290"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="290"/>
         <source>multiply LFO-frequency by 100</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="293"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="293"/>
         <source>MODULATE ENV-AMOUNT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="298"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="298"/>
         <source>Click here to make the envelope-amount controlled by this LFO.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="301"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="301"/>
         <source>control envelope-amount by this LFO</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="567"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="567"/>
         <source>ms/LFO:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="583"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="583"/>
         <source>Hint</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/EnvelopeAndLfoView.cpp" line="584"/>
+        <location filename="src/gui/instrument/EnvelopeAndLfoView.cpp" line="584"/>
         <source>Drag a sample from somewhere and drop it in this window.</source>
         <translation type="unfinished"/>
     </message>
@@ -2340,177 +2340,177 @@ Right clicking will bring up a context menu where you can change the order in wh
 <context>
     <name>ExportProjectDialog</name>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="14"/>
+        <location filename="src/gui/modals/export_project.ui" line="14"/>
         <source>Export project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="22"/>
+        <location filename="src/gui/modals/export_project.ui" line="22"/>
         <source>Output</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="34"/>
+        <location filename="src/gui/modals/export_project.ui" line="34"/>
         <source>File format:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="44"/>
+        <location filename="src/gui/modals/export_project.ui" line="44"/>
         <source>Samplerate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="52"/>
+        <location filename="src/gui/modals/export_project.ui" line="52"/>
         <source>44100 Hz</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="57"/>
+        <location filename="src/gui/modals/export_project.ui" line="57"/>
         <source>48000 Hz</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="62"/>
+        <location filename="src/gui/modals/export_project.ui" line="62"/>
         <source>88200 Hz</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="67"/>
+        <location filename="src/gui/modals/export_project.ui" line="67"/>
         <source>96000 Hz</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="72"/>
+        <location filename="src/gui/modals/export_project.ui" line="72"/>
         <source>192000 Hz</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="98"/>
+        <location filename="src/gui/modals/export_project.ui" line="98"/>
         <source>Bitrate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="109"/>
+        <location filename="src/gui/modals/export_project.ui" line="109"/>
         <source>64 KBit/s</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="114"/>
+        <location filename="src/gui/modals/export_project.ui" line="114"/>
         <source>128 KBit/s</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="119"/>
+        <location filename="src/gui/modals/export_project.ui" line="119"/>
         <source>160 KBit/s</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="124"/>
+        <location filename="src/gui/modals/export_project.ui" line="124"/>
         <source>192 KBit/s</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="129"/>
+        <location filename="src/gui/modals/export_project.ui" line="129"/>
         <source>256 KBit/s</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="134"/>
+        <location filename="src/gui/modals/export_project.ui" line="134"/>
         <source>320 KBit/s</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="160"/>
+        <location filename="src/gui/modals/export_project.ui" line="160"/>
         <source>Depth:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="168"/>
+        <location filename="src/gui/modals/export_project.ui" line="168"/>
         <source>16 Bit Integer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="173"/>
+        <location filename="src/gui/modals/export_project.ui" line="173"/>
         <source>32 Bit Float</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="200"/>
+        <location filename="src/gui/modals/export_project.ui" line="200"/>
         <source>Please note that not all of the parameters above apply for all file formats.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="226"/>
+        <location filename="src/gui/modals/export_project.ui" line="226"/>
         <source>Quality settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="232"/>
+        <location filename="src/gui/modals/export_project.ui" line="232"/>
         <source>Interpolation:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="243"/>
+        <location filename="src/gui/modals/export_project.ui" line="243"/>
         <source>Zero Order Hold</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="248"/>
+        <location filename="src/gui/modals/export_project.ui" line="248"/>
         <source>Sinc Fastest</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="253"/>
+        <location filename="src/gui/modals/export_project.ui" line="253"/>
         <source>Sinc Medium (recommended)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="258"/>
+        <location filename="src/gui/modals/export_project.ui" line="258"/>
         <source>Sinc Best (very slow!)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="266"/>
+        <location filename="src/gui/modals/export_project.ui" line="266"/>
         <source>Oversampling (use with care!):</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="274"/>
+        <location filename="src/gui/modals/export_project.ui" line="274"/>
         <source>1x (None)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="279"/>
+        <location filename="src/gui/modals/export_project.ui" line="279"/>
         <source>2x</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="284"/>
+        <location filename="src/gui/modals/export_project.ui" line="284"/>
         <source>4x</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="289"/>
+        <location filename="src/gui/modals/export_project.ui" line="289"/>
         <source>8x</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="297"/>
+        <location filename="src/gui/modals/export_project.ui" line="297"/>
         <source>Export as loop (remove end silence)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="304"/>
+        <location filename="src/gui/modals/export_project.ui" line="304"/>
         <source>Export between loop markers</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="344"/>
+        <location filename="src/gui/modals/export_project.ui" line="344"/>
         <source>Start</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/export_project.ui" line="351"/>
+        <location filename="src/gui/modals/export_project.ui" line="351"/>
         <source>Cancel</source>
         <translation type="unfinished"/>
     </message>
@@ -2526,22 +2526,22 @@ Please make sure you have write-permission to the file and the directory contain
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ExportProjectDialog.cpp" line="48"/>
+        <location filename="src/gui/modals/ExportProjectDialog.cpp" line="48"/>
         <source>Export project to %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ExportProjectDialog.cpp" line="195"/>
+        <location filename="src/gui/modals/ExportProjectDialog.cpp" line="195"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ExportProjectDialog.cpp" line="196"/>
+        <location filename="src/gui/modals/ExportProjectDialog.cpp" line="196"/>
         <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/ExportProjectDialog.cpp" line="217"/>
+        <location filename="src/gui/modals/ExportProjectDialog.cpp" line="217"/>
         <source>Rendering: %1%</source>
         <translation type="unfinished"/>
     </message>
@@ -2700,12 +2700,12 @@ Please make sure you have write-permission to the file and the directory contain
 <context>
     <name>MixerLine</name>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="71"/>
+        <location filename="src/gui/MixerLine.cpp" line="71"/>
         <source>Channel send amount</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="85"/>
+        <location filename="src/gui/MixerLine.cpp" line="85"/>
         <source>The Mixer channel receives input from one or more instrument tracks.
  It in turn can be routed to multiple other mixer channels. LMMS automatically takes care of preventing infinite loops for you and doesn't allow making a connection that would result in an infinite loop.
 
@@ -2716,27 +2716,27 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="213"/>
+        <location filename="src/gui/MixerLine.cpp" line="213"/>
         <source>Move &amp;left</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="214"/>
+        <location filename="src/gui/MixerLine.cpp" line="214"/>
         <source>Move &amp;right</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="216"/>
+        <location filename="src/gui/MixerLine.cpp" line="216"/>
         <source>Rename &amp;channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="221"/>
+        <location filename="src/gui/MixerLine.cpp" line="221"/>
         <source>R&amp;emove channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="226"/>
+        <location filename="src/gui/MixerLine.cpp" line="226"/>
         <source>Remove &amp;unused channels</source>
         <translation type="unfinished"/>
     </message>
@@ -2789,12 +2789,12 @@ You can remove and move mixer channels in the context menu, which is accessed by
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="241"/>
+        <location filename="src/gui/MixerLine.cpp" line="241"/>
         <source>Rename mixer channel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/MixerLine.cpp" line="242"/>
+        <location filename="src/gui/MixerLine.cpp" line="242"/>
         <source>Enter the new name for this mixer channel</source>
         <translation type="unfinished"/>
     </message>
@@ -3019,87 +3019,87 @@ You can remove and move mixer channels in the context menu, which is accessed by
 <context>
     <name>InstrumentFunctionArpeggioView</name>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="103"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="103"/>
         <source>ARPEGGIO</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="122"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="122"/>
         <source>An arpeggio is a method playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords. The only difference is that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads, but there are a lot of other possible chords, you can select.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="132"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="132"/>
         <source>RANGE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="133"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="133"/>
         <source>Arpeggio range:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="133"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="133"/>
         <source>octave(s)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="135"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="135"/>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified number of octaves.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="140"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="140"/>
         <source>TIME</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="141"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="141"/>
         <source>Arpeggio time:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="141"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="141"/>
         <source>ms</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="143"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="143"/>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="148"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="148"/>
         <source>GATE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="149"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="149"/>
         <source>Arpeggio gate:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="149"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="149"/>
         <source>%</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="151"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="151"/>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato arpeggios.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="156"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="156"/>
         <source>Chord:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="159"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="159"/>
         <source>Direction:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="162"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="162"/>
         <source>Mode:</source>
         <translation type="unfinished"/>
     </message>
@@ -3586,32 +3586,32 @@ You can remove and move mixer channels in the context menu, which is accessed by
 <context>
     <name>InstrumentFunctionNoteStackingView</name>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="45"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="45"/>
         <source>STACKING</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="59"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="59"/>
         <source>Chord:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="62"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="62"/>
         <source>RANGE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="63"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="63"/>
         <source>Chord range:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="63"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="63"/>
         <source>octave(s)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentFunctionViews.cpp" line="65"/>
+        <location filename="src/gui/instrument/InstrumentFunctionViews.cpp" line="65"/>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified number of octaves.</source>
         <translation type="unfinished"/>
     </message>
@@ -3619,59 +3619,59 @@ You can remove and move mixer channels in the context menu, which is accessed by
 <context>
     <name>InstrumentMidiIOView</name>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="53"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="53"/>
         <source>ENABLE MIDI INPUT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="62"/>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="89"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="62"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="89"/>
         <source>CHANNEL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="69"/>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="96"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="69"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="96"/>
         <source>VELOCITY</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="81"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="81"/>
         <source>ENABLE MIDI OUTPUT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="101"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="101"/>
         <source>PROGRAM</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="108"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="108"/>
         <source>NOTE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="126"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="126"/>
         <source>MIDI devices to receive MIDI events from</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="134"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="134"/>
         <source>MIDI devices to send MIDI events to</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="143"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="143"/>
         <source>CUSTOM BASE VELOCITY</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="150"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="150"/>
         <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="157"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="157"/>
         <source>BASE VELOCITY</source>
         <translation type="unfinished"/>
     </message>
@@ -3679,12 +3679,12 @@ You can remove and move mixer channels in the context menu, which is accessed by
 <context>
     <name>InstrumentMiscView</name>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="213"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="213"/>
         <source>MASTER PITCH</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentMidiIOView.cpp" line="217"/>
+        <location filename="src/gui/instrument/InstrumentMidiIOView.cpp" line="217"/>
         <source>Enables the use of Master Pitch</source>
         <translation type="unfinished"/>
     </message>
@@ -3851,62 +3851,62 @@ You can remove and move mixer channels in the context menu, which is accessed by
 <context>
     <name>InstrumentSoundShapingView</name>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="55"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="55"/>
         <source>TARGET</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="61"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="61"/>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="83"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="83"/>
         <source>FILTER</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="94"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="94"/>
         <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="100"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="100"/>
         <source>FREQ</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="102"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="102"/>
         <source>cutoff frequency:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="102"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="102"/>
         <source>Hz</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="104"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="104"/>
         <source>Use this knob for setting the cutoff frequency for the selected filter. The cutoff frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff frequency. A highpass-filter cuts all frequencies below cutoff frequency, and so on...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="113"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="113"/>
         <source>RESO</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="115"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="115"/>
         <source>Resonance:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="117"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="117"/>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter how much it should amplify frequencies near Cutoff-frequency.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/InstrumentSoundShapingView.cpp" line="122"/>
+        <location filename="src/gui/instrument/InstrumentSoundShapingView.cpp" line="122"/>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
         <translation type="unfinished"/>
     </message>
@@ -4200,17 +4200,17 @@ You can remove and move mixer channels in the context menu, which is accessed by
 <context>
     <name>LadspaControlView</name>
     <message>
-        <location filename="src/gui/widgets/LadspaControlView.cpp" line="52"/>
+        <location filename="src/gui/LadspaControlView.cpp" line="52"/>
         <source>Link channels</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/LadspaControlView.cpp" line="103"/>
+        <location filename="src/gui/LadspaControlView.cpp" line="103"/>
         <source>Value:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/LadspaControlView.cpp" line="104"/>
+        <location filename="src/gui/LadspaControlView.cpp" line="104"/>
         <source>Sorry, no help available.</source>
         <translation type="unfinished"/>
     </message>
@@ -4416,7 +4416,7 @@ Double click to pick a file.</source>
     </message>
 </context>
 <context>
-    <name>LmmsCore</name>
+    <name>Engine</name>
     <message>
         <location filename="src/core/Engine.cpp" line="57"/>
         <source>Generating wavetables</source>
@@ -7015,7 +7015,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 <context>
     <name>PianoView</name>
     <message>
-        <location filename="src/gui/PianoView.cpp" line="408"/>
+        <location filename="src/gui/instrument/PianoView.cpp" line="408"/>
         <source>Base note</source>
         <translation type="unfinished"/>
     </message>
@@ -7078,147 +7078,147 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>ProjectNotes</name>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="71"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="71"/>
         <source>Project notes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="93"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="93"/>
         <source>Put down your project notes here.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="114"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="114"/>
         <source>Edit Actions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="117"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="117"/>
         <source>&amp;Undo</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="119"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="119"/>
         <source>%1+Z</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="128"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="128"/>
         <source>&amp;Redo</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="130"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="130"/>
         <source>%1+Y</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="139"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="139"/>
         <source>&amp;Copy</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="141"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="141"/>
         <source>%1+C</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="150"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="150"/>
         <source>Cu&amp;t</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="152"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="152"/>
         <source>%1+X</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="161"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="161"/>
         <source>&amp;Paste</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="163"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="163"/>
         <source>%1+V</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="173"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="173"/>
         <source>Format Actions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="197"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="197"/>
         <source>&amp;Bold</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="198"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="198"/>
         <source>%1+B</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="209"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="209"/>
         <source>&amp;Italic</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="210"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="210"/>
         <source>%1+I</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="222"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="222"/>
         <source>&amp;Underline</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="223"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="223"/>
         <source>%1+U</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="239"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="239"/>
         <source>&amp;Left</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="240"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="240"/>
         <source>%1+L</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="251"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="251"/>
         <source>C&amp;enter</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="253"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="253"/>
         <source>%1+E</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="263"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="263"/>
         <source>&amp;Right</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="265"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="265"/>
         <source>%1+R</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="276"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="276"/>
         <source>&amp;Justify</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="277"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="277"/>
         <source>%1+J</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/ProjectNotes.cpp" line="289"/>
+        <location filename="src/gui/ProjectNotes.cpp" line="289"/>
         <source>&amp;Color...</source>
         <translation type="unfinished"/>
     </message>
@@ -7321,7 +7321,7 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>RenameDialog</name>
     <message>
-        <location filename="src/gui/widgets/RenameDialog.cpp" line="38"/>
+        <location filename="src/gui/modals/RenameDialog.cpp" line="38"/>
         <source>Rename...</source>
         <translation type="unfinished"/>
     </message>
@@ -7472,325 +7472,325 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>SetupDialog</name>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="145"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="145"/>
         <source>Setup LMMS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="177"/>
-        <location filename="src/gui/SetupDialog.cpp" line="938"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="177"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="938"/>
         <source>General settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="179"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="179"/>
         <source>BUFFER SIZE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="202"/>
-        <location filename="src/gui/SetupDialog.cpp" line="700"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="202"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="700"/>
         <source>Reset to default-value</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="211"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="211"/>
         <source>MISC</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="219"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="219"/>
         <source>Enable tooltips</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="229"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="229"/>
         <source>Show restart warning after changing settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="238"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="238"/>
         <source>Display volume as dBV </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="248"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="248"/>
         <source>Compress project files per default</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="257"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="257"/>
         <source>One instrument track window mode</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="266"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="266"/>
         <source>HQ-mode for output audio-device</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="275"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="275"/>
         <source>Compact track buttons</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="285"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="285"/>
         <source>Sync VST plugins to host playback</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="294"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="294"/>
         <source>Enable note labels in piano roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="303"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="303"/>
         <source>Enable waveform display by default</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="312"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="312"/>
         <source>Keep effects running even without input</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="321"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="321"/>
         <source>Create backup file when saving a project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="330"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="330"/>
         <source>Reopen last project on start</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="340"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="340"/>
         <source>LANGUAGE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="402"/>
-        <location filename="src/gui/SetupDialog.cpp" line="940"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="402"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="940"/>
         <source>Paths</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="403"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="403"/>
         <source>Directories</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="424"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="424"/>
         <source>LMMS working directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="444"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="444"/>
         <source>Themes directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="465"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="465"/>
         <source>Background artwork</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="488"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="488"/>
         <source>FL Studio installation directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="507"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="507"/>
         <source>VST-plugin directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="526"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="526"/>
         <source>GIG directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="545"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="545"/>
         <source>SF2 directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="566"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="566"/>
         <source>LADSPA plugin directories</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="587"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="587"/>
         <source>STK rawwave directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="608"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="608"/>
         <source>Default Soundfont File</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="665"/>
-        <location filename="src/gui/SetupDialog.cpp" line="943"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="665"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="943"/>
         <source>Performance settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="669"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="669"/>
         <source>Auto save</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="688"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="688"/>
         <source>Enable auto save feature</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="712"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="712"/>
         <source>UI effects vs. performance</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="718"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="718"/>
         <source>Smooth scroll in Song Editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="725"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="725"/>
         <source>Show playback cursor in AudioFileProcessor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="744"/>
-        <location filename="src/gui/SetupDialog.cpp" line="946"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="744"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="946"/>
         <source>Audio settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="746"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="746"/>
         <source>AUDIO INTERFACE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="850"/>
-        <location filename="src/gui/SetupDialog.cpp" line="948"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="850"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="948"/>
         <source>MIDI settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="852"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="852"/>
         <source>MIDI INTERFACE</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="965"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="965"/>
         <source>OK</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="970"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="970"/>
         <source>Cancel</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1081"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1081"/>
         <source>Restart LMMS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1082"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1082"/>
         <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1115"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1115"/>
         <source>Frames: %1
 Latency: %2 ms</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1136"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1136"/>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1277"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1277"/>
         <source>Choose LMMS working directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1287"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1287"/>
         <source>Choose your GIG directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1298"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1298"/>
         <source>Choose your SF2 directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1320"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1320"/>
         <source>Choose your VST-plugin directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1352"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1352"/>
         <source>Choose artwork-theme directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1374"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1374"/>
         <source>Choose FL Studio installation directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1388"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1388"/>
         <source>Choose LADSPA plugin directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1410"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1410"/>
         <source>Choose STK rawwave directory</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1426"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1426"/>
         <source>Choose default SoundFont</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1459"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1459"/>
         <source>Choose background artwork</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1521"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1521"/>
         <source>minutes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1521"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1521"/>
         <source>minute</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1522"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1522"/>
         <source>Auto save interval: %1 %2</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1544"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1544"/>
         <source>Set the time between automatic backup to %1.
 Remember to also save your project manually.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1569"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1569"/>
         <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/SetupDialog.cpp" line="1599"/>
+        <location filename="src/gui/modals/SetupDialog.cpp" line="1599"/>
         <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
         <translation type="unfinished"/>
     </message>
@@ -8226,43 +8226,43 @@ Remember to also save your project manually.</source>
 <context>
     <name>TimeLineWidget</name>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="123"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="123"/>
         <source>Enable/disable auto-scrolling</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="130"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="130"/>
         <source>Enable/disable loop-points</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="140"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="140"/>
         <source>After stopping go back to begin</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="143"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="143"/>
         <source>After stopping go back to position at which playing was started</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="147"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="147"/>
         <source>After stopping keep position</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="326"/>
-        <location filename="src/gui/TimeLineWidget.cpp" line="338"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="326"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="338"/>
         <source>Hint</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="327"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="327"/>
         <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/TimeLineWidget.cpp" line="339"/>
+        <location filename="src/gui/editors/TimeLineWidget.cpp" line="339"/>
         <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"/>
     </message>
@@ -8641,12 +8641,12 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>VersionedSaveDialog</name>
     <message>
-        <location filename="src/gui/dialogs/VersionedSaveDialog.cpp" line="47"/>
+        <location filename="src/gui/modals/VersionedSaveDialog.cpp" line="47"/>
         <source>Increment version number</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/dialogs/VersionedSaveDialog.cpp" line="49"/>
+        <location filename="src/gui/modals/VersionedSaveDialog.cpp" line="49"/>
         <source>Decrement version number</source>
         <translation type="unfinished"/>
     </message>
@@ -8766,14 +8766,14 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
 </context>
 <context>
-    <name>VisualizationWidget</name>
+    <name>Oscilloscope</name>
     <message>
-        <location filename="src/gui/widgets/VisualizationWidget.cpp" line="60"/>
+        <location filename="src/gui/widgets/Oscilloscope.cpp" line="60"/>
         <source>click to enable/disable visualization of master-output</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/gui/widgets/VisualizationWidget.cpp" line="179"/>
+        <location filename="src/gui/widgets/Oscilloscope.cpp" line="179"/>
         <source>Click to enable</source>
         <translation type="unfinished"/>
     </message>

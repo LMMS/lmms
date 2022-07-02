@@ -35,9 +35,20 @@
 #include "SampleBuffer.h"
 #include "Knob.h"
 
+
+namespace lmms
+{
+
+namespace gui
+{
 class automatableButtonGroup;
-class ComboBox;
+class PluginView;
+class InstrumentViewFixedSize;
+class Knob;
 class PixmapButton;
+class ComboBox;
+class AudioFileProcessorView;
+}
 
 
 class AudioFileProcessor : public Instrument
@@ -45,28 +56,27 @@ class AudioFileProcessor : public Instrument
 	Q_OBJECT
 public:
 	AudioFileProcessor( InstrumentTrack * _instrument_track );
-	virtual ~AudioFileProcessor();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
-	virtual void saveSettings( QDomDocument & _doc,
-						QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc,
+						QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile( const QString & _file ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
 	virtual int getBeatLen( NotePlayHandle * _n ) const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return 128;
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 public slots:
@@ -84,7 +94,7 @@ private slots:
 
 
 signals:
-	void isPlaying( f_cnt_t _current_frame );
+	void isPlaying( lmms::f_cnt_t _current_frame );
 
 
 private:
@@ -104,21 +114,23 @@ private:
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
 
-	friend class AudioFileProcessorView;
+	friend class gui::AudioFileProcessorView;
 
 } ;
 
 
+namespace gui
+{
 
 class AudioFileProcessorWaveView;
 
 
-class AudioFileProcessorView : public InstrumentViewFixedSize
+class AudioFileProcessorView : public gui::InstrumentViewFixedSize
 {
 	Q_OBJECT
 public:
 	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
-	virtual ~AudioFileProcessorView();
+	virtual ~AudioFileProcessorView() = default;
 
 	void newWaveView();
 protected slots:
@@ -143,7 +155,7 @@ private:
 	Knob * m_endKnob;
 	Knob * m_loopKnob;
 
-	PixmapButton * m_openAudioFileButton;
+	gui::PixmapButton * m_openAudioFileButton;
 	PixmapButton * m_reverseButton;
 	automatableButtonGroup * m_loopGroup;
 	PixmapButton * m_stutterButton;
@@ -174,7 +186,7 @@ public:
 		loop
 	} ;
 
-	class knob : public ::Knob
+	class knob : public Knob
 	{
 		const AudioFileProcessorWaveView * m_waveView;
 		const Knob * m_relatedKnob;
@@ -182,7 +194,7 @@ public:
 
 	public:
 		knob( QWidget * _parent ) :
-			::Knob( knobBright_26, _parent ),
+			Knob( knobBright_26, _parent ),
 			m_waveView( 0 ),
 			m_relatedKnob( 0 )
 		{
@@ -223,7 +235,7 @@ public slots:
 		QWidget::update();
 	}
 
-	void isPlaying( f_cnt_t _current_frame );
+	void isPlaying( lmms::f_cnt_t _current_frame );
 
 
 private:
@@ -287,6 +299,8 @@ private:
 } ;
 
 
+} // namespace gui
 
+} // namespace lmms
 
 #endif

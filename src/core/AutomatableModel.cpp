@@ -33,6 +33,9 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 long AutomatableModel::s_periodCounter = 0;
 
 
@@ -327,7 +330,7 @@ void AutomatableModel::setValue( const float value )
 
 template<class T> T AutomatableModel::logToLinearScale( T value ) const
 {
-	return castValue<T>( ::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
+	return castValue<T>( lmms::logToLinearScale( minValue<float>(), maxValue<float>(), static_cast<float>( value ) ) );
 }
 
 
@@ -343,7 +346,7 @@ float AutomatableModel::inverseScaledValue( float value ) const
 {
 	return m_scaleType == Linear
 		? value
-		: ::linearToLogScale( minValue<float>(), maxValue<float>(), value );
+		: lmms::linearToLogScale( minValue<float>(), maxValue<float>(), value );
 }
 
 
@@ -365,7 +368,7 @@ void roundAt( T& value, const T& where, const T& step_size )
 template<class T>
 void AutomatableModel::roundAt( T& value, const T& where ) const
 {
-	::roundAt(value, where, m_step);
+	lmms::roundAt(value, where, m_step);
 }
 
 
@@ -478,8 +481,8 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 
 		if( !model->hasLinkedModels() )
 		{
-			QObject::connect( this, SIGNAL( dataChanged() ),
-					model, SIGNAL( dataChanged() ), Qt::DirectConnection );
+			QObject::connect( this, SIGNAL(dataChanged()),
+					model, SIGNAL(dataChanged()), Qt::DirectConnection );
 		}
 	}
 }
@@ -550,9 +553,9 @@ void AutomatableModel::setControllerConnection( ControllerConnection* c )
 	m_controllerConnection = c;
 	if( c )
 	{
-		QObject::connect( m_controllerConnection, SIGNAL( valueChanged() ),
-				this, SIGNAL( dataChanged() ), Qt::DirectConnection );
-		QObject::connect( m_controllerConnection, SIGNAL( destroyed() ), this, SLOT( unlinkControllerConnection() ) );
+		QObject::connect( m_controllerConnection, SIGNAL(valueChanged()),
+				this, SIGNAL(dataChanged()), Qt::DirectConnection );
+		QObject::connect( m_controllerConnection, SIGNAL(destroyed()), this, SLOT(unlinkControllerConnection()));
 		m_valueChanged = true;
 		emit dataChanged();
 	}
@@ -825,3 +828,6 @@ QString BoolModel::displayValue( const float val ) const
 {
 	return QString::number( castValue<bool>( scaledValue( val ) ) );
 }
+
+
+} // namespace lmms

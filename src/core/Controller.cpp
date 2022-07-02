@@ -35,6 +35,9 @@
 #include "MidiController.h"
 #include "PeakController.h"
 
+namespace lmms
+{
+
 
 long Controller::s_periods = 0;
 QVector<Controller *> Controller::s_controllers;
@@ -194,7 +197,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			break;
 
 		case Controller::LfoController:
-			c = new ::LfoController( _parent );
+			c = new class LfoController( _parent );
 			break;
 
 		case Controller::PeakController:
@@ -203,7 +206,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			break;
 
 		case Controller::MidiController:
-			c = new ::MidiController( _parent );
+			c = new class MidiController( _parent );
 			break;
 
 		default: 
@@ -291,9 +294,9 @@ QString Controller::nodeName() const
 
 
 
-ControllerDialog * Controller::createDialog( QWidget * _parent )
+gui::ControllerDialog * Controller::createDialog( QWidget * _parent )
 {
-	ControllerDialog * d = new ControllerDialog( this, _parent );
+	gui::ControllerDialog * d = new gui::ControllerDialog( this, _parent );
 
 	return d;
 }
@@ -323,7 +326,7 @@ int Controller::connectionCount() const{
 }
 
 
-
+} // namespace lmms
 
 
 

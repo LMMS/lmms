@@ -30,10 +30,13 @@
 
 #include "lmms_basics.h"
 
+class QThread;
+
+namespace lmms
+{
 
 class AudioEngine;
 class AudioPort;
-class QThread;
 
 
 class AudioDevice
@@ -153,7 +156,8 @@ private:
 
 	surroundSampleFrame * m_buffer;
 
-} ;
+};
 
+} // namespace lmms
 
 #endif

@@ -39,6 +39,9 @@
 #include "Plugin.h"
 
 
+namespace lmms
+{
+
 /*
 	all Lv2 classes in relation (use our "4 spaces per tab rule" to view):
 
@@ -157,6 +160,9 @@ private:
 	// functions
 	bool isSubclassOf(const LilvPluginClass *clvss, const char *uriStr);
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

@@ -32,6 +32,10 @@
 #include "PlayHandle.h"
 #include "TimePos.h"
 
+namespace lmms
+{
+
+
 class PatternTrack;
 class SampleBuffer;
 class SampleClip;
@@ -42,7 +46,7 @@ class SampleRecordHandle : public PlayHandle
 {
 public:
 	SampleRecordHandle( SampleClip* clip );
-	virtual ~SampleRecordHandle();
+	~SampleRecordHandle() override;
 
 	void play( sampleFrame * _working_buffer ) override;
 	bool isFinished() const override;
@@ -68,5 +72,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

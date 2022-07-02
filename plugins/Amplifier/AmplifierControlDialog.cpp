@@ -30,6 +30,9 @@
 #include "Knob.h"
 
 
+namespace lmms::gui
+{
+
 
 AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	EffectControlDialog( controls )
@@ -67,3 +70,6 @@ AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
 	rightKnob->setLabel( tr( "RIGHT" ) );
 	rightKnob->setHintText( tr( "Right gain:" ) , "%" );
 }
+
+
+} // namespace lmms::gui

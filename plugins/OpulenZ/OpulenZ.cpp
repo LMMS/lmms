@@ -58,12 +58,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
-        STRINGIFY( PLUGIN_NAME ),
+        LMMS_STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
         QT_TRANSLATE_NOOP( "PluginBrowser",
 			   "2-operator FM Synth" ),
@@ -388,9 +392,9 @@ QString OpulenzInstrument::nodeName() const
         return( opulenz_plugin_descriptor.name );
 }
 
-PluginView * OpulenzInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* OpulenzInstrument::instantiateView( QWidget * _parent )
 {
-        return( new OpulenzInstrumentView( this, _parent ) );
+        return( new gui::OpulenzInstrumentView( this, _parent ) );
 }
 
 
@@ -673,7 +677,8 @@ void OpulenzInstrument::loadFile( const QString& file ) {
 
 
 
-
+namespace gui
+{
 
 OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
@@ -870,4 +875,6 @@ void OpulenzInstrumentView::modelChanged()
 }
 
 
+} // namespace gui
 
+} // namespace lmms

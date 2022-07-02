@@ -23,8 +23,8 @@
  */
 
 
-#ifndef PATMAN_H_
-#define PATMAN_H_
+#ifndef PATMAN_H
+#define PATMAN_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -32,7 +32,14 @@
 #include "AutomatableModel.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
+namespace gui
+{
 class PixmapButton;
+class PatmanView;
+} // namespace gui
 
 
 #define MODES_16BIT	( 1 << 0 )
@@ -50,26 +57,26 @@ class PatmanInstrument : public Instrument
 	Q_OBJECT
 public:
 	PatmanInstrument( InstrumentTrack * _track );
-	virtual ~PatmanInstrument();
+	~PatmanInstrument() override;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual void loadFile( const QString & _file );
+	void loadFile( const QString & _file ) override;
 
-	virtual QString nodeName( void ) const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames( void ) const
+	f_cnt_t desiredReleaseFrames() const override
 	{
 		return( 128 );
 	}
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 public slots:
@@ -102,18 +109,21 @@ private:
 	} ;
 
 	LoadErrors loadPatch( const QString & _filename );
-	void unloadCurrentPatch( void );
+	void unloadCurrentPatch();
 
 	void selectSample( NotePlayHandle * _n );
 
 
-	friend class PatmanView;
+	friend class gui::PatmanView;
 
 signals:
-	void fileChanged( void );
+	void fileChanged();
 
 } ;
 
+
+namespace gui
+{
 
 
 class PatmanView : public InstrumentViewFixedSize
@@ -121,22 +131,22 @@ class PatmanView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	PatmanView( Instrument * _instrument, QWidget * _parent );
-	virtual ~PatmanView();
+	~PatmanView() override = default;
 
 
 public slots:
-	void openFile( void );
-	void updateFilename( void );
+	void openFile();
+	void updateFilename();
 
 
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void paintEvent( QPaintEvent * );
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void paintEvent( QPaintEvent * ) override;
 
 
 private:
-	virtual void modelChanged( void );
+	void modelChanged() override;
 
 	PatmanInstrument * m_pi;
 	QString m_displayFilename;
@@ -148,5 +158,8 @@ private:
 } ;
 
 
+} // namespace gui
 
-#endif
+} // namespace lmms
+
+#endif // PATMAN_H

@@ -37,6 +37,9 @@
 
 #include <cmath>
 
+namespace lmms
+{
+
 int AutomationClip::s_quantization = 1;
 const float AutomationClip::DEFAULT_MIN_VALUE = 0;
 const float AutomationClip::DEFAULT_MAX_VALUE = 1;
@@ -44,7 +47,9 @@ const float AutomationClip::DEFAULT_MAX_VALUE = 1;
 
 AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 	Clip( _auto_track ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
+#endif
 	m_autoTrack( _auto_track ),
 	m_objects(),
 	m_tension( 1.0 ),
@@ -76,7 +81,9 @@ AutomationClip::AutomationClip( AutomationTrack * _auto_track ) :
 
 AutomationClip::AutomationClip( const AutomationClip & _clip_to_copy ) :
 	Clip( _clip_to_copy.m_autoTrack ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_clipMutex(QMutex::Recursive),
+#endif
 	m_autoTrack( _clip_to_copy.m_autoTrack ),
 	m_objects( _clip_to_copy.m_objects ),
 	m_tension( _clip_to_copy.m_tension ),
@@ -127,8 +134,8 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 
 	m_objects += _obj;
 
-	connect( _obj, SIGNAL( destroyed( jo_id_t ) ),
-			this, SLOT( objectDestroyed( jo_id_t ) ),
+	connect( _obj, SIGNAL(destroyed(lmms::jo_id_t)),
+			this, SLOT(objectDestroyed(lmms::jo_id_t)),
 						Qt::DirectConnection );
 
 	emit dataChanged();
@@ -874,11 +881,11 @@ const QString AutomationClip::name() const
 
 
 
-ClipView * AutomationClip::createView( TrackView * _tv )
+gui::ClipView * AutomationClip::createView( gui::TrackView * _tv )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	return new AutomationClipView( this, _tv );
+	return new gui::AutomationClipView( this, _tv );
 }
 
 
@@ -1187,3 +1194,5 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 		it++;
 	}
 }
+
+} // namespace lmms

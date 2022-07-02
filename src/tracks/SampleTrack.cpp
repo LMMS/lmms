@@ -40,6 +40,9 @@
 #include "volume.h"
 
 
+namespace lmms
+{
+
 
 SampleTrack::SampleTrack(TrackContainer* tc) :
 	Track(Track::SampleTrack, tc),
@@ -73,8 +76,9 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false; // will be return variable
 
+
 	clipVector clips;
-	::PatternTrack * pattern_track = nullptr;
+	class PatternTrack * pattern_track = nullptr;
 	if( _clip_num >= 0 )
 	{
 		if (_start > getClip(_clip_num)->length())
@@ -166,9 +170,9 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackView * SampleTrack::createView( TrackContainerView* tcv )
+gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 {
-	return new SampleTrackView( this, tcv );
+	return new gui::SampleTrackView( this, tcv );
 }
 
 
@@ -249,3 +253,6 @@ void SampleTrack::updateMixerChannel()
 {
 	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
 }
+
+
+} // namespace lmms

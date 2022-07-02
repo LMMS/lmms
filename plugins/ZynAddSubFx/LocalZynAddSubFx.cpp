@@ -36,8 +36,13 @@
 #include "zynaddsubfx/src/Misc/Master.h"
 #include "zynaddsubfx/src/Misc/Part.h"
 
-
+// Global variable in zynaddsubfx/src/globals.h
 SYNTH_T* synth = nullptr;
+
+
+namespace lmms
+{
+
 
 int LocalZynAddSubFx::s_instanceCount = 0;
 
@@ -81,7 +86,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_ioEngine = new NulEngine;
 
 	m_master = new Master();
-	m_master->swaplr = 0;
+	m_master->swaplr = false;
 }
 
 
@@ -276,3 +281,4 @@ void LocalZynAddSubFx::processAudio( sampleFrame * _out )
 }
 
 
+} // namespace lmms

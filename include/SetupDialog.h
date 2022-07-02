@@ -42,6 +42,11 @@ class QLabel;
 class QLineEdit;
 class QSlider;
 
+
+namespace lmms::gui
+{
+
+
 class TabBar;
 
 class SetupDialog : public QDialog
@@ -59,7 +64,7 @@ public:
 	};
 
 	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
-	virtual ~SetupDialog();
+	~SetupDialog() override;
 
 
 protected slots:
@@ -208,4 +213,8 @@ private:
 
 	QLabel * restartWarningLbl;
 };
+
+
+} // namespace lmms::gui
+
 #endif

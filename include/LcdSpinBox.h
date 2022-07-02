@@ -29,6 +29,8 @@
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
 
 class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
@@ -38,7 +40,7 @@ public:
 
 	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
 
-	virtual ~LcdSpinBox() = default;
+	~LcdSpinBox() override = default;
 
 	void modelChanged() override
 	{
@@ -85,5 +87,7 @@ signals:
 } ;
 
 typedef IntModel LcdSpinBoxModel;
+
+} // namespace lmms::gui
 
 #endif

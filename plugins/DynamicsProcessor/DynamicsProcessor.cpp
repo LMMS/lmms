@@ -32,12 +32,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Dynamics Processor",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for processing dynamics in a flexible way" ),
@@ -244,3 +248,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms
