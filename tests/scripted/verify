@@ -5,70 +5,199 @@ from pathlib import Path
 import tempfile
 import os
 
+
+def create_file(filename: str, file_content: str):
+	"""Create a file in the current directory and adds it to git"""
+	Path(filename).parent.mkdir(parents=True, exist_ok=True)
+	with open(filename, "w") as textfile:
+		print(file_content, file=textfile)
+	subprocess.run(['git', 'add', filename], check=True)
+
+
+class ScriptTest():
+	def __init__(self, scriptpath: Path):
+		self.scriptpath = Path(scriptpath)
+
+	def __enter__(self):
+		"""Create temporary, minimal test environment, and change to it"""
+		self.lmms_tmpdir = tempfile.TemporaryDirectory(dir='.')
+		os.chdir(self.lmms_tmpdir.name)
+		# prerequirements
+		Path('data/themes').mkdir(parents=True)
+		subprocess.run(['git', 'init'], check=True)
+		subprocess.run(['git', 'submodule', 'add', '../../carla', 'plugins/CarlaBase/carla'], check=True)
+		create_file('src/core/classes.cpp', 'namespace lmms {\nclass TestClass\n}')
+		create_file('debian/lmms-common.docs', '')
+		create_file('debian/copyright', '')
+		create_file('data/locale/de.ts',
+					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
+					'    <context>\n'
+					'    <name>TestClass</name>\n'
+					'     <message>\n'
+					'        <location filename="../../src/core/classes.cpp" line="20"/>\n'
+					'        <source>About LMMS</source>\n'
+					'        <translation>Über LMMS</translation>\n'
+					'    </message>\n'
+					'</context>\n'
+					'</TS>\n')
+		subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
+		return self
+
+	def __exit__(self, type, value, traceback):
+		"""Leave and destroy temporary test environment"""
+		os.chdir('..')
+		self.lmms_tmpdir.cleanup()
+
+	def expect(self, expectation: str):
+		"""Check if "expectation" is in the output"""
+		if expectation not in self.result.stdout:
+			raise RuntimeError(f'Expected "{expectation}" in script output')
+
+	# Exception handling here
+	# close(self.fd)
+
+	def run(self, expected_returncode: int = 1):  # default: something goes wrong ("to the safe side")
+		"""Run the script, check the exit code and store the result"""
+		self.result = subprocess.run([str(self.scriptpath)], capture_output=True, text=True)
+		print('--->8--- Script output BEGIN --->8---')
+		print(self.result.stdout)
+		print('--->8--- Script output END   --->8---')
+		if self.result.stderr:
+			print('--->8--- Script error output BEGIN --->8---')
+			print(self.result.stderr)
+			print('--->8--- Script error output END   --->8---')
+		# make sure script returned "error" (because we test for errors) and that the output is as expected
+		if self.result.returncode != expected_returncode:
+			raise RuntimeError(f"Script \"check-strings\" returned {self.result.returncode}, "
+							   f"but {expected_returncode} expected")
+
+
 lmms_main_path = Path(__file__).resolve().parent.parent.parent
 
-res = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True)
-head = res.stdout.rstrip()
-
-# test with a stable LMMS ref to always get the same expectations
-ref = 'f56fc68b669b59f525ad133a0376feaba2a1a4ec'
-
-# find out a remote URL where we can fetch "ref" from
-res = subprocess.run(['git', 'rev-parse', '-q', '--verify', ref+'^{commit}'], capture_output=True, text=True)
-if res.returncode == 0:
-    remote = str(lmms_main_path)
-else:
-    res = subprocess.run(['git', 'remote', 'get-url', 'origin'], capture_output=True, text=True)
-    if res.returncode == 0:
-        remote = res.stdout.rstrip()
-    else:
-        res = subprocess.run(['git', 'remote', 'get-url', 'upstream'], capture_output=True, text=True)
-        if res.returncode == 0:
-            remote = res.stdout.rstrip()
-        else:
-            raise RuntimeError(
-                "Sorry, I can find ref " + ref + " neither in the repo nor in the remotes \"origin\" and \"upstream\"")
-
 with tempfile.TemporaryDirectory() as tmpdir:
-    os.chdir(tmpdir)
-    # get the repo and its submodules
-    subprocess.run(['git', 'init'], check=True)
-    subprocess.run(['git', 'remote', 'add', 'origin', remote], check=True)
-    subprocess.run(['git', 'fetch', '--depth=1', 'origin', ref, head], check=True)
-    subprocess.run(['git', 'checkout', ref], check=True)
-    subprocess.run(['git', 'submodule', 'update', '--depth=1', '--init'], check=True)
-    # checkout the CURRENT test scripts, because it is subject-under-test
-    subprocess.run(['git', 'checkout', head, 'tests/scripted/'], check=True)
-    # run check-strings
-    res = subprocess.run([str(lmms_main_path / 'tests' / 'scripted' / 'check-strings')],
-                         capture_output=True, text=True)
-    print('--->8--- Script output BEGIN --->8---')
-    print(res.stdout)
-    print('--->8--- Script output END   --->8---')
-    if res.stderr:
-        print('--->8--- Script error output BEGIN --->8---')
-        print(res.stderr)
-        print('--->8--- Script error output END   --->8---')
-    # make sure script returned "error" (because we test for errors) and that the output is as expected
-    if res.returncode == 0:
-        raise RuntimeError("Script \"check-strings\" no errors, but errors were expected")
-    else:
-        if res.stdout != open(str(lmms_main_path / 'tests' / 'scripted' / 'expectation.txt')).read():
-            raise RuntimeError("Script \"check-strings\" returned with different output than in expectation.txt")
-    # run check-namespace
-    res = subprocess.run([str(lmms_main_path / 'tests' / 'scripted' / 'check-namespace')],
-                         capture_output=True, text=True)
-    print('--->8--- Script output BEGIN --->8---')
-    print(res.stdout)
-    print('--->8--- Script output END   --->8---')
-    if res.returncode == 0:
-        raise RuntimeError("Script \"check-strings\" no errors, but errors were expected")
-    else:
-        if not 'Error: src/tracks/SampleTrack.cpp: File has no namespace lmms' in res.stdout:
-            raise RuntimeError("Script \"check-namespace\" did not find missing namespace \"lmms\"")
-        if not 'Error: include/MixerLine.h: namespace/macro ("MIXER_LINE_H") does not match end ("MIXERLINE_H")' in res.stdout:
-            raise RuntimeError("Script \"check-namespace\" did not find missing namespace \"lmms\"")
+	os.chdir(tmpdir)
+	check_strings = lmms_main_path / 'tests' / 'scripted' / 'check-strings'
+	check_namespace = lmms_main_path / 'tests' / 'scripted' / 'check-namespace'
 
+	# create dummy carla repo
+	Path('carla').mkdir()
+	os.chdir('carla')
+	subprocess.run(['git', 'init'], check=True)
+	create_file('README.md', 'hello world')
+	subprocess.run(['git', 'commit', '-m', 'Initial commit'], check=True)
+	os.chdir('..')
+
+	Path('lmms').mkdir()
+	os.chdir('lmms')
+
+	# minimal working example
+	with ScriptTest(check_strings) as test:
+		test.run(0)  # exitcode 0 - no errors expected
+		test.expect('0 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('data/locale/fr.ts',
+					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
+					'    <context>\n'
+					'    <name>TestClass</name>\n'
+					'     <message>\n'
+					'        <location filename="../../src/core/non-existent.cpp" line="20"/>\n'
+					'        <source>About LMMS</source>\n'
+					'        <translation>À propos de LMMS</translation>\n'
+					'    </message>\n'
+					'</context>\n'
+					'</TS>\n')
+		test.run()
+		test.expect('Error: data/locale: Source file does not exist: ../../src/core/non-existent.cpp')
+		test.expect('1 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('data/locale/fr.ts',
+					'<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">\n'
+					'    <context>\n'
+					'    <name>NonExistentClass</name>\n'
+					'     <message>\n'
+					'        <location filename="../../src/core/classes.cpp" line="20"/>\n'
+					'        <source>About LMMS</source>\n'
+					'        <translation>À propos de LMMS</translation>\n'
+					'    </message>\n'
+					'</context>\n'
+					'</TS>\n')
+		test.run()
+		test.expect('Error: data/locale: Class does not exist in source code: NonExistentClass')
+		test.expect('1 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('data/themes/classic/style.css',
+					'NonExistentClass {'
+					'\tcolor: #d1d8e4;\n'
+					'}')
+		test.run()
+		test.expect('Error: data/themes/classic/style.css: Class does not exist in source code: NonExistentClass')
+		test.expect('1 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('debian/patches/clang.patch', '/plugins/non-existent-file')
+		test.run()
+		test.expect('Error: debian/patches/clang.patch: Source file does not exist: plugins/non-existent-file')
+		test.expect('1 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('debian/lmms-common.docs', '/plugins/caps.html')
+		test.run()
+		test.expect('Error: debian/lmms-common.docs: Path does not exist: /plugins/caps.html')
+		test.expect('1 errors')
+
+	with ScriptTest(check_strings) as test:
+		create_file('debian/copyright', 'Files: NonExistent')
+		test.run()
+		test.expect('Error: debian/copyright: Glob/Path does not exist: NonExistent')
+		test.expect('1 errors')
+
+	# minimal working example
+	with ScriptTest(check_namespace) as test:
+		test.run(0)  # exitcode 0 - no errors expected
+		test.expect('0 errors')
+
+	with ScriptTest(check_namespace) as test:
+		create_file('src/core/NoNamespace.cpp', '')
+		test.run()
+		test.expect('Error: src/core/NoNamespace.cpp: File has no namespace lmms')
+		test.expect('1 errors')
+
+	with ScriptTest(check_namespace) as test:
+		create_file('src/core/Model.cpp', 'namespace lmms {\n\n} // namespace lmm')
+		test.run()
+		test.expect('Error: src/core/Model.cpp: namespace/macro ("lmms") does not match end ("lmm")')
+		test.expect('1 errors')
+
+	with ScriptTest(check_namespace) as test:
+		create_file('src/core/Model.cpp', '#ifdef LMMS_HAVE_LV2\nnamespace lmms {}\n#endif // LMMS_HAVE_LV')
+		test.run()
+		test.expect('Error: src/core/Model.cpp: namespace/macro ("LMMS_HAVE_LV2") does not match end ("LMMS_HAVE_LV")')
+		test.expect('1 errors')
+
+	with ScriptTest(check_namespace) as test:
+		create_file('include/Model.h', '#ifndef MODEL_H\n#define MODEL_H\nnamespace lmms {}\n#endif // MODEL_')
+		test.run()
+		test.expect('Error: include/Model.h: namespace/macro ("MODEL_H") does not match end ("MODEL_")')
+		test.expect('1 errors')
+
+	with ScriptTest(check_namespace) as test:
+		create_file('include/Model.h', 'namespace lmms {\n#include "lmms_export.h"\n}')
+		# "include" inside namespace => user includes file into lmms namespace...
+		test.run()
+		test.expect('Error: include/Model.h: File "include/Model.h" has includes inside/after a namespace')
+		test.expect('1 errors')
+
+	with ScriptTest(check_namespace) as test:
+		create_file('include/Model.h', '#ifndef MODEL_H\n#include "lmms_export.h"\nnamespace lmms {}')
+		# This might still compile if "lmms_export.h" has one "#endif" too much.
+		# However, this would confuse our script - it has sanity checks that require equal number of opening/closing
+		# "#if..."/namespaces
+		test.run()
+		test.expect('Error: include/Model.h: File "include/Model.h" is misformatted')
+		test.expect('1 errors')
 
 # if we made it until here without an exception, all tests have been passed
 print("SUCCESS")

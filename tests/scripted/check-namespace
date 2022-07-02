@@ -180,7 +180,7 @@ for cur_file in files:
         # the remainder should be solely includes + >=0 namespaces
         results_as_str = '\n'.join(results)
         no_include_after_namespace.match(results_as_str) or error(cur_file,
-                                                                  f'File \'{cur_file}\' has includes inside/after a namespace: {results_as_str}')
+                                                                  f'File "{cur_file}" has includes inside/after a namespace: {results_as_str}')
 
         if str(cur_file) == debugfile:
             print(f'{cur_file}: {results}')
@@ -188,7 +188,7 @@ for cur_file in files:
         # now also remove #include and the namespaces - the resulting string must be empty
         eliminate_parentheses(results, True)
         results_as_str = ''.join(results).replace(' ', '')
-        results_as_str == '' or error(cur_file, f'File \'{cur_file}\' is misformatted: {results_as_str}')
+        results_as_str == '' or error(cur_file, f'File "{cur_file}" is misformatted: {results_as_str}')
 
         if str(cur_file) == debugfile:
             print("FINAL:")
