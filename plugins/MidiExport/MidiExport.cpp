@@ -35,12 +35,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"MIDI Export",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for exporting MIDI-files from LMMS" ),
@@ -60,12 +64,6 @@ MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor)
 {
 }
 
-
-
-
-MidiExport::~MidiExport()
-{
-}
 
 
 
@@ -159,7 +157,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
 					int len = it.attribute("len", "0").toInt();
-					plist.push_back(std::pair<int,int>(pos, pos+len));
+					plist.emplace_back(pos, pos+len);
 				}
 			}
 			std::sort(plist.begin(), plist.end());
@@ -359,3 +357,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms

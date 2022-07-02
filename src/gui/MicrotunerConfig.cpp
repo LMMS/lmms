@@ -50,6 +50,9 @@
 #include "Song.h"
 #include "SubWindow.h"
 
+namespace lmms::gui
+{
+
 
 MicrotunerConfig::MicrotunerConfig() :
 	QWidget(),
@@ -314,7 +317,11 @@ bool MicrotunerConfig::validateScaleForm()
 	if (name.contains('\n')) {fail(tr("Scale name cannot contain a new-line character")); return false;}
 
 	// check intervals
-	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+	#else
+		QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -358,7 +365,11 @@ bool MicrotunerConfig::validateKeymapForm()
 	if (name.contains('\n')) {fail(tr("Keymap name cannot contain a new-line character")); return false;}
 
 	// check key mappings
-	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+		QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+	#else
+		QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -386,9 +397,13 @@ bool MicrotunerConfig::applyScale()
 	if (!validateScaleForm()) {return false;};
 
 	std::vector<Interval> newIntervals;
-	newIntervals.push_back(Interval(1, 1));
+	newIntervals.emplace_back(1, 1);
 
-	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+#else
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -396,7 +411,7 @@ bool MicrotunerConfig::applyScale()
 		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
 		{
-			newIntervals.push_back(Interval(firstSection.toFloat()));
+			newIntervals.emplace_back(firstSection.toFloat());
 		}
 		else								// ratio mode
 		{
@@ -406,7 +421,7 @@ bool MicrotunerConfig::applyScale()
 			{
 				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
 			}
-			newIntervals.push_back(Interval(num, den));
+			newIntervals.emplace_back(num, den);
 		}
 	}
 
@@ -430,7 +445,11 @@ bool MicrotunerConfig::applyKeymap()
 
 	std::vector<int> newMap;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+#else
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+#endif
 	for (auto &line: input)
 	{
 		if (line.isEmpty()) {continue;}
@@ -651,3 +670,6 @@ void MicrotunerConfig::closeEvent(QCloseEvent *ce)
 	else {hide();}
 	ce->ignore();
 }
+
+
+} // namespace lmms::gui

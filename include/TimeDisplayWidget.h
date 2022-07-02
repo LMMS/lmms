@@ -31,13 +31,15 @@
 
 #include "LcdWidget.h"
 
+namespace lmms::gui
+{
 
 class TimeDisplayWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	TimeDisplayWidget();
-	virtual ~TimeDisplayWidget() = default;
+	~TimeDisplayWidget() override = default;
 
 
 protected:
@@ -66,5 +68,7 @@ private:
 	LcdWidget m_milliSecondsLCD;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif // TIME_DISPLAY_WIDGET_H

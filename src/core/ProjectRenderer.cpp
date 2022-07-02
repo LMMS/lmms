@@ -34,6 +34,11 @@
 #include "AudioFileMP3.h"
 #include "AudioFileFlac.h"
 
+
+namespace lmms
+{
+
+
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
@@ -98,13 +103,6 @@ ProjectRenderer::ProjectRenderer( const AudioEngine::qualitySettings & qualitySe
 			m_fileDev = nullptr;
 		}
 	}
-}
-
-
-
-
-ProjectRenderer::~ProjectRenderer()
-{
 }
 
 
@@ -246,3 +244,4 @@ void ProjectRenderer::updateConsoleProgress()
 }
 
 
+} // namespace lmms

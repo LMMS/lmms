@@ -52,12 +52,16 @@ float frnd(float range)
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"sfxr",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"LMMS port of sfxr" ),
@@ -79,14 +83,6 @@ SfxrSynth::SfxrSynth( const SfxrInstrument * s ):
 	playing_sample( true )
 {
     resetSample( false );
-}
-
-
-
-
-SfxrSynth::~SfxrSynth()
-{
-
 }
 
 
@@ -358,13 +354,6 @@ SfxrInstrument::SfxrInstrument( InstrumentTrack * _instrument_track ) :
 
 
 
-SfxrInstrument::~SfxrInstrument()
-{
-}
-
-
-
-
 void SfxrInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "version", "1" );
@@ -504,9 +493,9 @@ void SfxrInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * SfxrInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * SfxrInstrument::instantiateView( QWidget * _parent )
 {
-	return( new SfxrInstrumentView( this, _parent ) );
+	return( new gui::SfxrInstrumentView( this, _parent ) );
 }
 
 
@@ -548,6 +537,9 @@ void SfxrInstrument::resetModels()
 }
 
 
+
+namespace gui
+{
 
 
 class SfxrKnob : public Knob
@@ -1115,6 +1107,9 @@ void SfxrInstrumentView::previewSound()
 
 
 
+} // namespace gui
+
+
 extern "C"
 {
 
@@ -1128,5 +1123,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* m, void* )
 }
 
 
-
-
+} // namespace lmms

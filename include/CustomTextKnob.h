@@ -4,6 +4,10 @@
 
 #include "Knob.h"
 
+namespace lmms::gui
+{
+
+
 class LMMS_EXPORT CustomTextKnob : public Knob
 {
 protected:
@@ -21,10 +25,13 @@ public:
 	}
 
 private:
-	virtual QString displayValue() const;
+	QString displayValue() const override;
 
 protected:
 	QString m_value_text;
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

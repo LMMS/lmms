@@ -36,6 +36,9 @@
 #include "Ladspa2LMMS.h"
 
 
+namespace lmms::gui
+{
+
 
 LadspaDescription::LadspaDescription( QWidget * _parent,
 						LadspaPluginType _type ) :
@@ -108,13 +111,6 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 		m_currentSelection = m_pluginKeys[0];
 		update( m_currentSelection );
 	}
-}
-
-
-
-
-LadspaDescription::~LadspaDescription()
-{
 }
 
 
@@ -215,6 +211,4 @@ void LadspaDescription::onDoubleClicked( QListWidgetItem * _item )
 }
 
 
-
-
-
+} // namespace lmms::gui

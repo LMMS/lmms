@@ -34,14 +34,22 @@
 class QLabel;
 class QScrollBar;
 
+namespace lmms
+{
+
+class Song;
+class ComboBoxModel;
+
+namespace gui
+{
+
+
 class ActionGroup;
 class AutomatableSlider;
 class ComboBox;
-class ComboBoxModel;
 class LcdSpinBox;
 class MeterDialog;
 class PositionLine;
-class Song;
 class TextFloat;
 class TimeLineWidget;
 
@@ -58,7 +66,7 @@ public:
 	};
 
 	SongEditor( Song * song );
-	~SongEditor();
+	~SongEditor() override = default;
 
 	void saveSettings( QDomDocument& doc, QDomElement& element ) override;
 	void loadSettings( const QDomElement& element ) override;
@@ -74,13 +82,13 @@ public slots:
 	void stopSelectRegion();
 	void updateRubberband();
 
-	void setEditMode( EditMode mode );
+	void setEditMode( lmms::gui::SongEditor::EditMode mode );
 	void setEditModeDraw();
 	void setEditModeKnife();
 	void setEditModeSelect();
 	void toggleProportionalSnap();
 
-	void updatePosition( const TimePos & t );
+	void updatePosition( const lmms::TimePos & t );
 	void updatePositionLine();
 	void selectAllClips( bool select );
 
@@ -214,5 +222,10 @@ private:
 	QAction* m_insertBarAction;
 	QAction* m_removeBarAction;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

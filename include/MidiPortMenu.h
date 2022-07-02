@@ -33,13 +33,15 @@
 
 class QAction;
 
+namespace lmms::gui
+{
 
 class MidiPortMenu : public QMenu, public ModelView
 {
 	Q_OBJECT
 public:
 	MidiPortMenu( MidiPort::Modes _mode );
-	virtual ~MidiPortMenu();
+	~MidiPortMenu() override = default;
 
 
 public slots:
@@ -57,5 +59,6 @@ private:
 
 } ;
 
+} // namespace lmms::gui
 
 #endif

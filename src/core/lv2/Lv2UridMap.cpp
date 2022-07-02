@@ -27,6 +27,10 @@
 
 #ifdef LMMS_HAVE_LV2
 
+namespace lmms
+{
+
+
 static LV2_URID staticMap(LV2_URID_Map_Handle handle, const char* uri)
 {
 	UridMap* map = static_cast<UridMap*>(handle);
@@ -94,6 +98,9 @@ const char *UridMap::unmap(LV2_URID urid)
 	std::lock_guard<std::mutex> guard (m_MapMutex);
 	return (idx < m_unMap.size()) ? m_unMap[idx] : nullptr;
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

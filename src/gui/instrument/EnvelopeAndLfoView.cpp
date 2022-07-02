@@ -42,9 +42,15 @@
 #include "TextFloat.h"
 #include "Track.h"
 
+namespace lmms
+{
 
 extern const float SECS_PER_ENV_SEGMENT;
 extern const float SECS_PER_LFO_OSCILLATION;
+
+
+namespace gui
+{
 
 
 const int ENV_GRAPH_X = 6;
@@ -196,8 +202,8 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_userLfoBtn->setInactiveGraphic( embed::getIconPixmap(
 							"usr_wave_inactive" ) );
 
-	connect( m_userLfoBtn, SIGNAL( toggled( bool ) ),
-				this, SLOT( lfoUserWaveChanged() ) );
+	connect( m_userLfoBtn, SIGNAL(toggled(bool)),
+				this, SLOT(lfoUserWaveChanged()));
 
 	PixmapButton * random_lfo_btn = new PixmapButton( this, nullptr );
 	random_lfo_btn->move( LFO_SHAPES_X+60, LFO_SHAPES_Y );
@@ -528,4 +534,6 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 
 
 
+} // namespace gui
 
+} // namespace lmms

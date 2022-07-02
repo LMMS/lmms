@@ -35,6 +35,10 @@
 #include "MemoryManager.h"
 #include "ModelVisitor.h"
 
+
+namespace lmms
+{
+
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
 		public:													\
@@ -85,7 +89,7 @@ public:
 	};
 
 
-	virtual ~AutomatableModel();
+	~AutomatableModel() override;
 
 	// Implement those by using the MODEL_IS_VISITABLE macro
 	virtual void accept(ModelVisitor& v) = 0;
@@ -416,7 +420,7 @@ private:
 
 signals:
 	void initValueChanged( float val );
-	void destroyed( jo_id_t id );
+	void destroyed( lmms::jo_id_t id );
 
 } ;
 
@@ -501,6 +505,9 @@ public:
 } ;
 
 typedef QMap<AutomatableModel*, float> AutomatedValueMap;
+
+
+} // namespace lmms
 
 #endif
 

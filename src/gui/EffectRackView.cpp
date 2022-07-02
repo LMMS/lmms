@@ -34,6 +34,9 @@
 #include "GroupBox.h"
 
 
+namespace lmms::gui
+{
+
 EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this )
@@ -62,7 +65,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	effectsLayout->addWidget( addButton );
 
-	connect( addButton, SIGNAL( clicked() ), this, SLOT( addEffect() ) );
+	connect( addButton, SIGNAL(clicked()), this, SLOT(addEffect()));
 
 
 	m_lastY = 0;
@@ -168,12 +171,12 @@ void EffectRackView::update()
 		if( i >= m_effectViews.size() )
 		{
 			EffectView * view = new EffectView( *it, w );
-			connect( view, SIGNAL( moveUp( EffectView * ) ), 
-					this, SLOT( moveUp( EffectView * ) ) );
-			connect( view, SIGNAL( moveDown( EffectView * ) ),
-				this, SLOT( moveDown( EffectView * ) ) );
-			connect( view, SIGNAL( deletePlugin( EffectView * ) ),
-				this, SLOT( deletePlugin( EffectView * ) ),
+			connect( view, SIGNAL(moveUp(lmms::gui::EffectView*)),
+					this, SLOT(moveUp(lmms::gui::EffectView*)));
+			connect( view, SIGNAL(moveDown(lmms::gui::EffectView*)),
+				this, SLOT(moveDown(lmms::gui::EffectView*)));
+			connect( view, SIGNAL(deletePlugin(lmms::gui::EffectView*)),
+				this, SLOT(deletePlugin(lmms::gui::EffectView*)),
 							Qt::QueuedConnection );
 			view->show();
 			m_effectViews.append( view );
@@ -256,11 +259,11 @@ void EffectRackView::modelChanged()
 {
 	//clearViews();
 	m_effectsGroupBox->setModel( &fxChain()->m_enabledModel );
-	connect( fxChain(), SIGNAL( aboutToClear() ), this, SLOT( clearViews() ) );
+	connect( fxChain(), SIGNAL(aboutToClear()), this, SLOT(clearViews()));
 	update();
 }
 
 
 
 
-
+} // namespace lmms::gui

@@ -37,12 +37,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Watsyn",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"4-oscillator modulatable wavetable synth" ),
@@ -322,11 +326,6 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-WatsynInstrument::~WatsynInstrument()
-{
-}
-
-
 void WatsynInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
@@ -580,9 +579,9 @@ QString WatsynInstrument::nodeName() const
 }
 
 
-PluginView * WatsynInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* WatsynInstrument::instantiateView( QWidget * _parent )
 {
-	return( new WatsynView( this, _parent ) );
+	return( new gui::WatsynView( this, _parent ) );
 }
 
 
@@ -662,6 +661,8 @@ void WatsynInstrument::updateWaveB2()
 }
 
 
+namespace gui
+{
 
 
 WatsynView::WatsynView( Instrument * _instrument,
@@ -939,12 +940,6 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 	updateLayout();
 }
-
-
-WatsynView::~WatsynView()
-{
-}
-
 
 
 void WatsynView::updateLayout()
@@ -1271,6 +1266,7 @@ void WatsynView::modelChanged()
 }
 
 
+} // namespace gui
 
 
 
@@ -1287,4 +1283,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
+} // namespace lmms

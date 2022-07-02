@@ -31,13 +31,16 @@
 #include "SharedMemory.h"
 #include "VstSyncData.h"
 
+namespace lmms
+{
+
 
 class VstSyncController : public QObject
 {
 	Q_OBJECT
 public:
 	VstSyncController();
-	~VstSyncController();
+	~VstSyncController() override;
 
 	void setAbsolutePosition( double ticks );
 
@@ -77,5 +80,8 @@ private:
 	VstSyncData* m_syncData;
 	SharedMemory<VstSyncData> m_shm;
 };
+
+
+} // namespace lmms
 
 #endif

@@ -47,6 +47,8 @@
 #include "SubWindow.h"
 
 
+namespace lmms::gui
+{
 
 
 Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
@@ -120,11 +122,6 @@ Lv2ViewProc::Lv2ViewProc(QWidget* parent, Lv2Proc* ctrlBase, int colNum) :
 			}
 		});
 }
-
-
-
-
-Lv2ViewProc::~Lv2ViewProc() {}
 
 
 
@@ -247,5 +244,7 @@ AutoLilvNode Lv2ViewBase::uri(const char *uriStr)
 	return Engine::getLv2Manager()->uri(uriStr);
 }
 
+
+} // namespace lmms::gui
 
 #endif // LMMS_HAVE_LV2

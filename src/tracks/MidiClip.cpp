@@ -35,10 +35,13 @@
 
 
 
-QPixmap * MidiClipView::s_stepBtnOn0 = nullptr;
-QPixmap * MidiClipView::s_stepBtnOn200 = nullptr;
-QPixmap * MidiClipView::s_stepBtnOff = nullptr;
-QPixmap * MidiClipView::s_stepBtnOffLight = nullptr;
+namespace lmms
+{
+
+QPixmap * gui::MidiClipView::s_stepBtnOn0 = nullptr;
+QPixmap * gui::MidiClipView::s_stepBtnOn200 = nullptr;
+QPixmap * gui::MidiClipView::s_stepBtnOff = nullptr;
+QPixmap * gui::MidiClipView::s_stepBtnOffLight = nullptr;
 
 
 
@@ -129,8 +132,8 @@ void MidiClip::resizeToFirstTrack()
 
 void MidiClip::init()
 {
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-				this, SLOT( changeTimeSignature() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+				this, SLOT(changeTimeSignature()));
 	saveJournallingState( false );
 
 	updateLength();
@@ -197,9 +200,9 @@ TimePos MidiClip::beatClipLength() const
 Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 {
 	Note * new_note = new Note( _new_note );
-	if( _quant_pos && getGUI()->pianoRoll() )
+	if (_quant_pos && gui::getGUI()->pianoRoll())
 	{
-		new_note->quantizePos( getGUI()->pianoRoll()->quantization() );
+		new_note->quantizePos(gui::getGUI()->pianoRoll()->quantization());
 	}
 
 	instrumentTrack()->lock();
@@ -551,9 +554,9 @@ void MidiClip::removeSteps()
 
 
 
-ClipView * MidiClip::createView( TrackView * _tv )
+gui::ClipView * MidiClip::createView( gui::TrackView * _tv )
 {
-	return new MidiClipView( this, _tv );
+	return new gui::MidiClipView( this, _tv );
 }
 
 
@@ -566,11 +569,11 @@ void MidiClip::updatePatternTrack()
 		Engine::patternStore()->updatePatternTrack(this);
 	}
 
-	if( getGUI() != nullptr
-		&& getGUI()->pianoRoll()
-		&& getGUI()->pianoRoll()->currentMidiClip() == this )
+	if (gui::getGUI() != nullptr
+		&& gui::getGUI()->pianoRoll()
+		&& gui::getGUI()->pianoRoll()->currentMidiClip() == this)
 	{
-		getGUI()->pianoRoll()->update();
+		gui::getGUI()->pianoRoll()->update();
 	}
 }
 
@@ -610,3 +613,6 @@ void MidiClip::changeTimeSignature()
 				last_pos.getBar() * TimePos::stepsPerBar() );
 	updateLength();
 }
+
+
+} // namespace lmms

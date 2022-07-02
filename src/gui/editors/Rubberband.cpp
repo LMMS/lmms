@@ -26,16 +26,12 @@
 
 #include "Rubberband.h"
 
+namespace lmms::gui
+{
+
 
 RubberBand::RubberBand( QWidget * _parent ) :
 	QRubberBand( Rectangle, _parent )
-{
-}
-
-
-
-
-RubberBand::~RubberBand()
 {
 }
 
@@ -90,8 +86,4 @@ QVector<selectableObject *> RubberBand::selectableObjects() const
 }
 
 
-
-
-
-
-
+} // namespace lmms::gui

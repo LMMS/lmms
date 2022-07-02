@@ -31,6 +31,8 @@
 #include "StringPairDrag.h"
 
 
+namespace lmms::gui
+{
 
 AutomatableButton::AutomatableButton( QWidget * _parent,
 						const QString & _name ) :
@@ -244,8 +246,8 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 
 void automatableButtonGroup::modelChanged()
 {
-	connect( model(), SIGNAL( dataChanged() ),
-			this, SLOT( updateButtons() ) );
+	connect( model(), SIGNAL(dataChanged()),
+			this, SLOT(updateButtons()));
 	IntModelView::modelChanged();
 	updateButtons();
 }
@@ -266,4 +268,4 @@ void automatableButtonGroup::updateButtons()
 
 
 
-
+} // namespace lmms::gui

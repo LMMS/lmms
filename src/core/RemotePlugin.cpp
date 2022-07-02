@@ -71,6 +71,9 @@ HANDLE getRemotePluginJob()
 
 #endif // LMMS_BUILD_WIN32
 
+namespace lmms
+{
+
 // simple helper thread monitoring our RemotePlugin - if process terminates
 // unexpectedly invalidate plugin so LMMS doesn't lock up
 ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
@@ -135,7 +138,9 @@ RemotePlugin::RemotePlugin() :
 #endif
 	m_failed( true ),
 	m_watcher( this ),
-	m_commMutex( QMutex::Recursive ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+	m_commMutex(QMutex::Recursive),
+#endif
 	m_splitChannels( false ),
 	m_audioBufferSize( 0 ),
 	m_inputCount( DEFAULT_CHANNELS ),
@@ -170,14 +175,14 @@ RemotePlugin::RemotePlugin() :
 	}
 #endif
 
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		this, SLOT( processFinished( int, QProcess::ExitStatus ) ),
+	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+		this, SLOT(processFinished(int,QProcess::ExitStatus)),
 		Qt::DirectConnection );
-	connect( &m_process, SIGNAL( errorOccurred( QProcess::ProcessError ) ),
-			 this, SLOT( processErrored( QProcess::ProcessError ) ),
+	connect( &m_process, SIGNAL(errorOccurred(QProcess::ProcessError)),
+			 this, SLOT(processErrored(QProcess::ProcessError)),
 		Qt::DirectConnection );
-	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		&m_watcher, SLOT( quit() ), Qt::DirectConnection );
+	connect( &m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+		&m_watcher, SLOT(quit()), Qt::DirectConnection );
 }
 
 
@@ -571,3 +576,6 @@ bool RemotePlugin::processMessage( const message & _m )
 
 	return true;
 }
+
+
+} // namespace lmms

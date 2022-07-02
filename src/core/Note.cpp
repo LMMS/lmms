@@ -30,6 +30,9 @@
 #include "Note.h"
 #include "DetuningHelper.h"
 
+namespace lmms
+{
+
 
 Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
@@ -261,3 +264,6 @@ std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
 
 	return NoteBounds{start, end, lower, upper};
 }
+
+
+} // namespace lmms

@@ -34,11 +34,21 @@
 #include "TimePos.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
 
 class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
+
+namespace gui
+{
+
 class MidiPortMenu;
+class ControllerConnectionDialog;
+class InstrumentMidiIOView;
+
+}
 
 
 // class for abstraction of MIDI-port
@@ -73,7 +83,7 @@ public:
 			MidiEventProcessor* eventProcessor,
 			Model* parent = nullptr,
 			Mode mode = Disabled );
-	virtual ~MidiPort();
+	~MidiPort() override;
 
 	void setName( const QString& name );
 
@@ -129,8 +139,8 @@ public:
 
 	void invalidateCilent();
 
-	MidiPortMenu* m_readablePortsMenu;
-	MidiPortMenu* m_writablePortsMenu;
+	gui::MidiPortMenu* m_readablePortsMenu;
+	gui::MidiPortMenu* m_writablePortsMenu;
 
 
 public slots:
@@ -165,8 +175,8 @@ private:
 	Map m_writablePorts;
 
 
-	friend class ControllerConnectionDialog;
-	friend class InstrumentMidiIOView;
+	friend class gui::ControllerConnectionDialog;
+	friend class gui::InstrumentMidiIOView;
 
 
 signals:
@@ -179,5 +189,6 @@ signals:
 
 typedef QList<MidiPort *> MidiPortList;
 
+} // namespace lmms
 
 #endif

@@ -30,6 +30,10 @@
 #include <QToolBar>
 
 class QToolButton;
+
+namespace lmms::gui
+{
+
 class SideBarWidget;
 
 
@@ -38,7 +42,7 @@ class SideBar : public QToolBar
 	Q_OBJECT
 public:
 	SideBar( Qt::Orientation _orientation, QWidget * _parent );
-	virtual ~SideBar();
+	~SideBar() override = default;
 
 	void appendTab( SideBarWidget * _sbw );
 
@@ -53,5 +57,7 @@ private:
 	ButtonMap m_widgets;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif

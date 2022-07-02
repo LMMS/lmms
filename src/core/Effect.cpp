@@ -32,6 +32,9 @@
 
 #include "ConfigManager.h"
 
+namespace lmms
+{
+
 
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
@@ -162,9 +165,9 @@ void Effect::checkGate( double _out_sum )
 
 
 
-PluginView * Effect::instantiateView( QWidget * _parent )
+gui::PluginView * Effect::instantiateView( QWidget * _parent )
 {
-	return new EffectView( this, _parent );
+	return new gui::EffectView( this, _parent );
 }
 
 	
@@ -215,3 +218,4 @@ void Effect::resample( int _i, const sampleFrame * _src_buf,
 	}
 }
 
+} // namespace lmms

@@ -30,6 +30,9 @@
 #include "FadeButton.h"
 
 
+namespace lmms::gui
+{
+
 const float FadeDuration = 300;
 
 
@@ -51,11 +54,6 @@ FadeButton::FadeButton(const QColor & _normal_color,
 }
 
 
-
-
-FadeButton::~FadeButton()
-{
-}
 
 void FadeButton::setActiveColor(const QColor & activated_color)
 {
@@ -164,3 +162,6 @@ QColor FadeButton::fadeToColor(QColor startCol, QColor endCol, QElapsedTimer tim
 
 	return col;
 }
+
+
+} // namespace lmms::gui

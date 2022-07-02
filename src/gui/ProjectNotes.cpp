@@ -44,6 +44,9 @@
 #include "Song.h"
 
 
+namespace lmms::gui
+{
+
 
 ProjectNotes::ProjectNotes() :
 	QMainWindow( getGUI()->mainWindow()->workspace() )
@@ -58,12 +61,12 @@ ProjectNotes::ProjectNotes() :
 	clear();
 
 	connect( m_edit,
-		SIGNAL( currentCharFormatChanged( const QTextCharFormat & ) ),
-		this, SLOT( formatChanged( const QTextCharFormat & ) ) );
-//	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
-//			this, SLOT( alignmentChanged( int ) ) );
-	connect( m_edit, SIGNAL( textChanged() ),
-			Engine::getSong(), SLOT( setModified() ) );
+		SIGNAL( currentCharFormatChanged( const QTextCharFormat& ) ),
+		this, SLOT( formatChanged( const QTextCharFormat& ) ) );
+//	connect( m_edit, SIGNAL(currentAlignmentChanged(int)),
+//			this, SLOT(alignmentChanged(int)));
+	connect( m_edit, SIGNAL(textChanged()),
+			Engine::getSong(), SLOT(setModified()));
 
 	setupActions();
 
@@ -76,13 +79,6 @@ ProjectNotes::ProjectNotes() :
 	parentWidget()->move( 700, 10 );
 	parentWidget()->resize( 400, 300 );
 	parentWidget()->hide();
-}
-
-
-
-
-ProjectNotes::~ProjectNotes()
-{
 }
 
 
@@ -117,31 +113,31 @@ void ProjectNotes::setupActions()
 	a = new QAction( embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
 									this );
 	a->setShortcut( tr( "%1+Z" ).arg(UI_CTRL_KEY) );
-	connect( a, SIGNAL( triggered() ), m_edit, SLOT( undo() ) );
+	connect( a, SIGNAL(triggered()), m_edit, SLOT(undo()));
 	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_redo" ), tr( "&Redo" ),
 									this );
 	a->setShortcut( tr( "%1+Y" ).arg(UI_CTRL_KEY) );
-	connect( a, SIGNAL( triggered() ), m_edit, SLOT( redo() ) );
+	connect( a, SIGNAL(triggered()), m_edit, SLOT(redo()));
 	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_copy" ), tr( "&Copy" ),
 									this );
 	a->setShortcut( tr( "%1+C" ).arg(UI_CTRL_KEY) );
-	connect( a, SIGNAL( triggered() ), m_edit, SLOT( copy() ) );
+	connect( a, SIGNAL(triggered()), m_edit, SLOT(copy()));
 	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_cut" ), tr( "Cu&t" ),
 									this );
 	a->setShortcut( tr( "%1+X" ).arg(UI_CTRL_KEY) );
-	connect( a, SIGNAL( triggered() ), m_edit, SLOT( cut() ) );
+	connect( a, SIGNAL(triggered()), m_edit, SLOT(cut()));
 	tb->addAction( a );
 
 	a = new QAction( embed::getIconPixmap( "edit_paste" ), tr( "&Paste" ),
 									this );
 	a->setShortcut( tr( "%1+V" ).arg(UI_CTRL_KEY) );
-	connect( a, SIGNAL( triggered() ), m_edit, SLOT( paste() ) );
+	connect( a, SIGNAL(triggered()), m_edit, SLOT(paste()));
 	tb->addAction( a );
 
 
@@ -151,8 +147,8 @@ void ProjectNotes::setupActions()
 	m_comboFont->setEditable( true );
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
-	connect( m_comboFont, SIGNAL( activated( const QString & ) ),
-			m_edit, SLOT( setFontFamily( const QString & ) ) );
+	connect( m_comboFont, SIGNAL( activated( const QString& ) ),
+			m_edit, SLOT( setFontFamily( const QString& ) ) );
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
 
 	m_comboSize = new QComboBox( tb );
@@ -163,8 +159,8 @@ void ProjectNotes::setupActions()
 	{
 		m_comboSize->addItem( QString::number( *it ) );
 	}
-	connect( m_comboSize, SIGNAL( activated( const QString & ) ),
-		     this, SLOT( textSize( const QString & ) ) );
+	connect( m_comboSize, SIGNAL( activated( const QString& ) ),
+		     this, SLOT( textSize( const QString& ) ) );
 	m_comboSize->lineEdit()->setText( QString::number(
 					QApplication::font().pointSize() ) );
 
@@ -172,28 +168,28 @@ void ProjectNotes::setupActions()
 							tr( "&Bold" ), this );
 	m_actionTextBold->setShortcut( tr( "%1+B" ).arg(UI_CTRL_KEY) );
 	m_actionTextBold->setCheckable( true );
-	connect( m_actionTextBold, SIGNAL( triggered() ), this,
-							SLOT( textBold() ) );
+	connect( m_actionTextBold, SIGNAL(triggered()), this,
+							SLOT(textBold()));
 
 	m_actionTextItalic = new QAction( embed::getIconPixmap( "text_italic" ),
 							tr( "&Italic" ), this );
 	m_actionTextItalic->setShortcut( tr( "%1+I" ).arg(UI_CTRL_KEY) );
 	m_actionTextItalic->setCheckable( true );
-	connect( m_actionTextItalic, SIGNAL( triggered() ), this,
-							SLOT( textItalic() ) );
+	connect( m_actionTextItalic, SIGNAL(triggered()), this,
+							SLOT(textItalic()));
 
 	m_actionTextUnderline = new QAction( embed::getIconPixmap(
 								"text_under" ),
 						tr( "&Underline" ), this );
 	m_actionTextUnderline->setShortcut( tr( "%1+U" ).arg(UI_CTRL_KEY) );
 	m_actionTextUnderline->setCheckable( true );
-	connect( m_actionTextUnderline, SIGNAL( triggered() ), this,
-						SLOT( textUnderline() ) );
+	connect( m_actionTextUnderline, SIGNAL(triggered()), this,
+						SLOT(textUnderline()));
 
 
 	QActionGroup * grp = new QActionGroup( tb );
-	connect( grp, SIGNAL( triggered( QAction * ) ), this,
-					SLOT( textAlign( QAction * ) ) );
+	connect( grp, SIGNAL(triggered(QAction*)), this,
+					SLOT(textAlign(QAction*)));
 
 	m_actionAlignLeft = new QAction( embed::getIconPixmap( "text_left" ),
 						tr( "&Left" ), m_edit );
@@ -227,8 +223,8 @@ void ProjectNotes::setupActions()
 	QPixmap pix( 16, 16 );
 	pix.fill( Qt::black );
 	m_actionTextColor = new QAction( pix, tr( "&Color..." ), this );
-	connect( m_actionTextColor, SIGNAL( triggered() ), this,
-							SLOT( textColor() ) );
+	connect( m_actionTextColor, SIGNAL(triggered()), this,
+							SLOT(textColor()));
 
 	tb->addWidget( m_comboFont );
 	tb->addWidget( m_comboSize );
@@ -409,3 +405,5 @@ void ProjectNotes::closeEvent( QCloseEvent * _ce )
 	}
 	_ce->ignore();
  }
+
+} // namespace lmms::gui

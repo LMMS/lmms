@@ -31,6 +31,8 @@
 #include "AudioDevice.h"
 #include "OutputSettings.h"
 
+namespace lmms
+{
 
 class AudioFileDevice : public AudioDevice
 {
@@ -38,7 +40,7 @@ public:
 	AudioFileDevice(OutputSettings const & outputSettings,
 			const ch_cnt_t _channels, const QString & _file,
 			AudioEngine* audioEngine );
-	virtual ~AudioFileDevice();
+	~AudioFileDevice() override;
 
 	QString outputFile() const
 	{
@@ -74,5 +76,6 @@ typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
 					  AudioEngine* audioEngine,
 					  bool & successful );
 
+} // namespace lmms
 
 #endif

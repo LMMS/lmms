@@ -35,9 +35,22 @@
 #include "lmms_export.h"
 #include "Lv2Basics.h"
 
+
+class QPushButton;
+class QMdiSubWindow;
+
+namespace lmms
+{
+
+
 class Lv2Proc;
 class Lv2ControlBase;
 
+
+namespace gui
+{
+
+class LedCheckBox;
 
 //! View for one processor, Lv2ViewBase contains 2 of those for mono plugins
 class Lv2ViewProc : public LinkedModelGroupView
@@ -45,7 +58,7 @@ class Lv2ViewProc : public LinkedModelGroupView
 public:
 	//! @param colNum numbers of columns for the controls
 	Lv2ViewProc(QWidget *parent, Lv2Proc *ctrlBase, int colNum);
-	~Lv2ViewProc();
+	~Lv2ViewProc() override = default;
 
 private:
 	static AutoLilvNode uri(const char *uriStr);
@@ -61,9 +74,9 @@ protected:
 	~Lv2ViewBase();
 
 	// these widgets must be connected by child widgets
-	class QPushButton *m_reloadPluginButton = nullptr;
-	class QPushButton *m_toggleUIButton = nullptr;
-	class QPushButton *m_helpButton = nullptr;
+	QPushButton* m_reloadPluginButton = nullptr;
+	QPushButton* m_toggleUIButton = nullptr;
+	QPushButton* m_helpButton = nullptr;
 
 	void toggleUI();
 	void toggleHelp(bool visible);
@@ -87,10 +100,13 @@ private:
 
 	//! Numbers of controls per row; must be multiple of 2 for mono effects
 	const int m_colNum = 6;
-	class QMdiSubWindow* m_helpWindow = nullptr;
-	class LedCheckBox *m_multiChannelLink;
+	QMdiSubWindow* m_helpWindow = nullptr;
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2VIEWBASE_H

@@ -32,6 +32,9 @@
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT LcdFloatSpinBox : public QWidget, public FloatModelView
 {
@@ -79,5 +82,7 @@ signals:
 };
 
 using LcdFloatSpinBoxModel = FloatModel;
+
+} // namespace lmms::gui
 
 #endif

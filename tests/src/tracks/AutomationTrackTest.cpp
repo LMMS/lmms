@@ -49,6 +49,8 @@ private slots:
 
 	void testClipLinear()
 	{
+		using namespace lmms;
+
 		AutomationClip c(nullptr);
 		c.setProgressionType(AutomationClip::LinearProgression);
 		c.putValue(0, 0.0, false);
@@ -64,6 +66,8 @@ private slots:
 
 	void testClipDiscrete()
 	{
+		using namespace lmms;
+
 		AutomationClip c(nullptr);
 		c.setProgressionType(AutomationClip::DiscreteProgression);
 		c.putValue(0, 0.0, false);
@@ -77,6 +81,8 @@ private slots:
 
 	void testClips()
 	{
+		using namespace lmms;
+
 		FloatModel model;
 
 		auto song = Engine::getSong();
@@ -111,6 +117,8 @@ private slots:
 
 	void testLengthRespected()
 	{
+		using namespace lmms;
+
 		FloatModel model;
 
 		auto song = Engine::getSong();
@@ -136,6 +144,8 @@ private slots:
 
 	void testInlineAutomation()
 	{
+		using namespace lmms;
+
 		auto song = Engine::getSong();
 
 		InstrumentTrack* instrumentTrack =
@@ -160,6 +170,8 @@ private slots:
 
 	void testPatternTrack()
 	{
+		using namespace lmms;
+
 		auto song = Engine::getSong();
 		auto patternStore = Engine::patternStore();
 		PatternTrack patternTrack(song);
@@ -197,6 +209,8 @@ private slots:
 
 	void testGlobalAutomation()
 	{
+		using namespace lmms;
+
 		// Global automation should not have priority, see https://github.com/LMMS/lmms/issues/4268
 		// Tests regression caused by 75077f6200a5aee3a5821aae48a3b8466ed8714a
 		auto song = Engine::getSong();

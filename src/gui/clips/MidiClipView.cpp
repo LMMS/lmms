@@ -39,6 +39,10 @@
 #include "RenameDialog.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
+
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
 	m_clip( clip ),
@@ -50,8 +54,8 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	// TODO if this option is ever added to the GUI, rename it to legacysepattern
 	m_legacySEPattern(ConfigManager::inst()->value("ui", "legacysebb", "0").toInt())
 {
-	connect( getGUI()->pianoRoll(), SIGNAL( currentMidiClipChanged() ),
-			this, SLOT( update() ) );
+	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
+			this, SLOT(update()));
 
 	if( s_stepBtnOn0 == nullptr )
 	{
@@ -205,20 +209,20 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
 					tr( "Open in piano-roll" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ),
-					this, SLOT( openInPianoRoll() ) );
+	connect( a, SIGNAL(triggered(bool)),
+					this, SLOT(openInPianoRoll()));
 
 	QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
 						tr( "Set as ghost in piano-roll" ), _cm );
 	if( m_clip->empty() ) { b->setEnabled( false ); }
 	_cm->insertAction( _cm->actions()[1], b );
-	connect( b, SIGNAL( triggered( bool ) ),
-					this, SLOT( setGhostInPianoRoll() ) );
+	connect( b, SIGNAL(triggered(bool)),
+					this, SLOT(setGhostInPianoRoll()));
 	_cm->insertSeparator( _cm->actions()[2] );
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
-			tr( "Clear all notes" ), m_clip, SLOT( clear() ) );
+			tr( "Clear all notes" ), m_clip, SLOT(clear()));
 	if (!isBeat)
 	{
 		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
@@ -226,21 +230,21 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
-						this, SLOT( resetName() ) );
+						this, SLOT(resetName()));
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
-						this, SLOT( changeName() ) );
+						this, SLOT(changeName()));
 
 	if (isBeat)
 	{
 		_cm->addSeparator();
 
 		_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
-			tr( "Add steps" ), m_clip, SLOT( addSteps() ) );
+			tr( "Add steps" ), m_clip, SLOT(addSteps()));
 		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
-			tr( "Remove steps" ), m_clip, SLOT( removeSteps() ) );
+			tr( "Remove steps" ), m_clip, SLOT(removeSteps()));
 		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
-			tr( "Clone Steps" ), m_clip, SLOT( cloneSteps() ) );
+			tr( "Clone Steps" ), m_clip, SLOT(cloneSteps()));
 	}
 }
 
@@ -680,3 +684,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
+
+
+} // namespace lmms::gui

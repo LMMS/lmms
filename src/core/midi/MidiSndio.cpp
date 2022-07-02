@@ -34,7 +34,11 @@
 #include "ConfigManager.h"
 
 
-MidiSndio::MidiSndio( void ) :
+namespace lmms
+{
+
+
+MidiSndio::MidiSndio() :
 	MidiClientRaw(),
 	m_quit( false )
 {
@@ -70,7 +74,7 @@ MidiSndio::~MidiSndio()
 }
 
 
-QString MidiSndio::probeDevice( void )
+QString MidiSndio::probeDevice()
 {
 	QString dev = ConfigManager::inst()->value( "MidiSndio", "device" );
 
@@ -84,7 +88,7 @@ void MidiSndio::sendByte( const unsigned char c )
 }
 
 
-void MidiSndio::run( void )
+void MidiSndio::run()
 {
 	struct pollfd pfd;
 	nfds_t nfds;
@@ -110,5 +114,8 @@ void MidiSndio::run( void )
 		}
 	}
 }
+
+
+} // namespace lmms
 
 #endif	/* LMMS_HAVE_SNDIO */

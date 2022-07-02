@@ -62,6 +62,8 @@
 
 #include "embed.h"
 
+namespace lmms
+{
 
 
 extern "C"
@@ -69,7 +71,7 @@ extern "C"
 
 Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"VST-host for using VST(i)-plugins within LMMS" ),
@@ -87,6 +89,9 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 
 }
 
+namespace gui
+{
+
 
 class vstSubWin : public SubWindow
 {
@@ -98,11 +103,9 @@ public:
 		setWindowFlags( Qt::WindowCloseButtonHint );
 	}
 
-	virtual ~vstSubWin()
-	{
-	}
+	~vstSubWin() override = default;
 
-	virtual void closeEvent( QCloseEvent * e )
+	void closeEvent( QCloseEvent * e ) override
 	{
 		// ignore close-events - for some reason otherwise the VST GUI
 		// remains hidden when re-opening
@@ -110,6 +113,9 @@ public:
 		e->ignore();
 	}
 };
+
+
+} // namespace gui
 
 
 class VstInstrumentPlugin : public VstPlugin
@@ -124,7 +130,7 @@ public:
 			return;
 		}
 		if ( embedMethod() != "none" ) {
-			m_pluginSubWindow.reset(new vstSubWin( getGUI()->mainWindow()->workspace() ));
+			m_pluginSubWindow.reset(new gui::vstSubWin( gui::getGUI()->mainWindow()->workspace() ));
 			VstPlugin::createUI( m_pluginSubWindow.get() );
 			m_pluginSubWindow->setWidget(pluginWidget());
 		} else {
@@ -143,9 +149,6 @@ private:
 	std::unique_ptr<QMdiSubWindow> m_pluginSubWindow;
 };
 
-
-QPixmap * VestigeInstrumentView::s_artwork = nullptr;
-QPixmap * ManageVestigeInstrumentView::s_artwork = nullptr;
 
 
 VestigeInstrument::VestigeInstrument( InstrumentTrack * _instrument_track ) :
@@ -350,10 +353,10 @@ void VestigeInstrument::loadFile( const QString & _file )
 		closePlugin();
 	}
 	m_pluginDLL = PathUtil::toShortestRelative( _file );
-	TextFloat * tf = nullptr;
-	if( getGUI() != nullptr )
+	gui::TextFloat * tf = nullptr;
+	if( gui::getGUI() != nullptr )
 	{
-		tf = TextFloat::displayMessage(
+		tf = gui::TextFloat::displayMessage(
 				tr( "Loading plugin" ),
 				tr( "Please wait while loading the VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -477,13 +480,17 @@ void VestigeInstrument::closePlugin( void )
 
 
 
-PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * VestigeInstrument::instantiateView( QWidget * _parent )
 {
-	return new VestigeInstrumentView( this, _parent );
+	return new gui::VestigeInstrumentView( this, _parent );
 }
 
 
+namespace gui
+{
 
+QPixmap * VestigeInstrumentView::s_artwork = nullptr;
+QPixmap * ManageVestigeInstrumentView::s_artwork = nullptr;
 
 
 VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
@@ -662,13 +669,6 @@ void VestigeInstrumentView::updateMenu( void )
 }
 
 
-VestigeInstrumentView::~VestigeInstrumentView()
-{
-}
-
-
-
-
 void VestigeInstrumentView::modelChanged()
 {
 	m_vi = castModel<VestigeInstrument>();
@@ -732,7 +732,7 @@ void VestigeInstrumentView::openPreset()
 {
 
 	if ( m_vi->m_plugin != nullptr ) {
-		m_vi->m_plugin->openPreset( );
+		m_vi->m_plugin->openPreset();
     		bool converted;
     		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -750,7 +750,7 @@ void VestigeInstrumentView::savePreset()
 
 	if ( m_vi->m_plugin != nullptr )
 	{
-		m_vi->m_plugin->savePreset( );
+		m_vi->m_plugin->savePreset();
 /*    		bool converted;
     		QString str = m_vi->m_plugin->presetString().section("/", 0, 0);
      		if (str != "")
@@ -928,6 +928,17 @@ ManageVestigeInstrumentView::ManageVestigeInstrumentView( Instrument * _instrume
 							QWidget * _parent, VestigeInstrument * m_vi2 ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+	
 	m_vi = m_vi2;
 	m_vi->m_scrollArea = new QScrollArea( this );
 	widget = new QWidget(this);
@@ -1233,6 +1244,7 @@ void ManageVestigeInstrumentView::paintEvent( QPaintEvent * )
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -1246,3 +1258,6 @@ Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
+
+
+} // namespace lmms

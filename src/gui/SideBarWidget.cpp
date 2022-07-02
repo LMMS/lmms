@@ -30,6 +30,9 @@
 
 #include "embed.h"
 
+namespace lmms::gui
+{
+
 
 SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent ) :
@@ -47,13 +50,6 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 	m_closeBtn->setToolTip(tr("Close"));
 	connect(m_closeBtn, &QPushButton::clicked,
 		[=]() { this->closeButtonClicked(); });
-}
-
-
-
-
-SideBarWidget::~SideBarWidget()
-{
 }
 
 
@@ -92,6 +88,4 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 }
 
 
-
-
-
+} // namespace lmms::gui

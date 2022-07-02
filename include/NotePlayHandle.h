@@ -35,6 +35,10 @@
 #include "MemoryManager.h"
 
 class QReadWriteLock;
+
+namespace lmms
+{
+
 class InstrumentTrack;
 class NotePlayHandle;
 
@@ -70,7 +74,7 @@ public:
 					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
 					Origin origin = OriginMidiClip );
-	virtual ~NotePlayHandle();
+	~NotePlayHandle() override;
 
 	void * operator new ( size_t size, void * p )
 	{
@@ -358,5 +362,7 @@ private:
 	static int s_size;
 };
 
+
+} // namespace lmms
 
 #endif

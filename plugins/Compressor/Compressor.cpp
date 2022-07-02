@@ -29,12 +29,16 @@
 #include "lmms_math.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT compressor_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"Compressor",
 	QT_TRANSLATE_NOOP("PluginBrowser", "A dynamic range compressor."),
 	"Lost Robot <r94231@gmail.com>",
@@ -91,11 +95,6 @@ CompressorEffect::CompressorEffect(Model* parent, const Descriptor::SubPluginFea
 }
 
 
-
-
-CompressorEffect::~CompressorEffect()
-{
-}
 
 
 float CompressorEffect::msToCoeff(float ms)
@@ -662,3 +661,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model* parent, void* data)
 
 }
 
+
+} // namespace lmms

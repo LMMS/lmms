@@ -65,8 +65,16 @@ class QLineEdit;
 class QStringListModel;
 class QScrollArea;
 
+
+namespace lmms
+{
+
+namespace gui
+{
 class CarlaParamsView;
+class CarlaInstrumentView;
 class Knob;
+}
 
 class CarlaParamFloatModel : public FloatModel
 {
@@ -85,7 +93,7 @@ public:
 		return !reg.exactMatch(name);
 	}
 
-	inline virtual void loadSettings(const QDomElement& element, const QString& name = QString("value")) override
+	inline void loadSettings(const QDomElement& element, const QString& name = QString("value")) override
 	{
 		AutomatableModel::loadSettings(element, name);
 		bool mustQuote = mustQuoteName(name);
@@ -96,7 +104,7 @@ public:
 		}
 	}
 
-	inline virtual void saveSettings(QDomDocument& doc, QDomElement& element,
+	inline void saveSettings(QDomDocument& doc, QDomElement& element,
 		const QString& name = QString( "value" )) override
 	{
 		if (m_isEnabled)
@@ -161,59 +169,6 @@ private:
 
 // -------------------------------------------------------------------
 
-class CarlaParamsSubWindow : public SubWindow
-{
-	Q_OBJECT
-
-signals:
-	void uiClosed();
-	void resized();
-
-public:
-	CarlaParamsSubWindow(QWidget * _parent, Qt::WindowFlags windowFlags) :
-		SubWindow(_parent)
-	{
-		setAttribute(Qt::WA_DeleteOnClose, false);
-		setWindowFlags(windowFlags);
-	}
-
-	virtual void resizeEvent(QResizeEvent * event) override
-	{
-		if (mousePress) {
-			resizing = true;
-		}
-		SubWindow::resizeEvent(event);
-	}
-
-	virtual void mousePressEvent(QMouseEvent * event) override
-	{
-		mousePress = true;
-		SubWindow::mousePressEvent(event);
-	}
-
-	virtual void mouseReleaseEvent(QMouseEvent * event) override
-	{
-		if (resizing) {
-			resizing = false;
-			mousePress = false;
-			emit resized();
-		}
-		SubWindow::mouseReleaseEvent(event);
-	}
-
-	virtual void closeEvent(QCloseEvent * event) override
-	{
-		emit uiClosed();
-		event->accept();
-	}
-
-private:
-	bool resizing = false;
-	bool mousePress = false;
-};
-
-// -------------------------------------------------------------------
-
 class CARLABASE_EXPORT CarlaInstrument : public Instrument
 {
     Q_OBJECT
@@ -222,7 +177,7 @@ public:
     static const uint32_t kMaxMidiEvents = 512;
 
     CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay);
-    virtual ~CarlaInstrument();
+    ~CarlaInstrument() override;
 
     // Carla NativeHostDescriptor functions
     uint32_t handleGetBufferSize() const;
@@ -234,13 +189,13 @@ public:
     intptr_t handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt);
 
     // LMMS functions
-    virtual Flags flags() const;
-    virtual QString nodeName() const;
-    virtual void saveSettings(QDomDocument& doc, QDomElement& parent);
-    virtual void loadSettings(const QDomElement& elem);
-    virtual void play(sampleFrame* workingBuffer);
-    virtual bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset);
-    virtual PluginView* instantiateView(QWidget* parent);
+    Flags flags() const override;
+    QString nodeName() const override;
+    void saveSettings(QDomDocument& doc, QDomElement& parent) override;
+    void loadSettings(const QDomElement& elem) override;
+    void play(sampleFrame* workingBuffer) override;
+    bool handleMidiEvent(const MidiEvent& event, const TimePos& time, f_cnt_t offset) override;
+    gui::PluginView* instantiateView(QWidget* parent) override;
 
 signals:
     void uiClosed();
@@ -274,10 +229,66 @@ private:
     QCompleter* m_paramsCompleter;
     QStringListModel* m_completerModel;
 
-    friend class CarlaInstrumentView;
-    friend class CarlaParamsView;
+    friend class gui::CarlaInstrumentView;
+    friend class gui::CarlaParamsView;
 };
 
+
+// -------------------------------------------------------------------
+
+namespace gui
+{
+
+class CarlaParamsSubWindow : public SubWindow
+{
+Q_OBJECT
+
+signals:
+	void uiClosed();
+	void resized();
+
+public:
+	CarlaParamsSubWindow(QWidget * _parent, Qt::WindowFlags windowFlags) :
+		SubWindow(_parent)
+	{
+		setAttribute(Qt::WA_DeleteOnClose, false);
+		setWindowFlags(windowFlags);
+	}
+
+	void resizeEvent(QResizeEvent * event) override
+	{
+		if (mousePress) {
+			resizing = true;
+		}
+		SubWindow::resizeEvent(event);
+	}
+
+	void mousePressEvent(QMouseEvent * event) override
+	{
+		mousePress = true;
+		SubWindow::mousePressEvent(event);
+	}
+
+	void mouseReleaseEvent(QMouseEvent * event) override
+	{
+		if (resizing) {
+			resizing = false;
+			mousePress = false;
+			emit resized();
+		}
+		SubWindow::mouseReleaseEvent(event);
+	}
+
+	void closeEvent(QCloseEvent * event) override
+	{
+		emit uiClosed();
+		event->accept();
+	}
+
+private:
+	bool resizing = false;
+	bool mousePress = false;
+};
 
 // -------------------------------------------------------------------
 
@@ -287,7 +298,7 @@ class CarlaInstrumentView : public InstrumentViewFixedSize
 
 public:
     CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent);
-    virtual ~CarlaInstrumentView();
+    ~CarlaInstrumentView() override;
 
 private slots:
     void toggleUI(bool);
@@ -296,8 +307,8 @@ private slots:
     void paramsUiClosed();
 
 private:
-    virtual void modelChanged();
-    virtual void timerEvent(QTimerEvent*);
+    void modelChanged() override;
+    void timerEvent(QTimerEvent*) override;
 
     NativePluginHandle fHandle;
     const NativePluginDescriptor* fDescriptor;
@@ -322,7 +333,7 @@ class CarlaParamsView : public InstrumentView
 	Q_OBJECT
 public:
 	CarlaParamsView(CarlaInstrumentView* const instrumentView, QWidget* const parent);
-	virtual ~CarlaParamsView();
+	~CarlaParamsView() override;
 
 signals:
 	void uiClosed();
@@ -364,5 +375,10 @@ private:
 	QComboBox* m_groupFilterCombo;
 	QStringListModel* m_groupFilterModel;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

@@ -26,6 +26,11 @@
 #define AUDIO_ENGINE_H
 
 #include <QMutex>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
+
 #include <QThread>
 #include <QVector>
 #include <QWaitCondition>
@@ -39,9 +44,13 @@
 #include "PlayHandle.h"
 
 
+namespace lmms
+{
+
 class AudioDevice;
 class MidiClient;
 class AudioPort;
+class AudioEngineWorkerThread;
 
 
 const fpp_t MINIMUM_BUFFER_SIZE = 32;
@@ -54,14 +63,50 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-
-class AudioEngineWorkerThread;
-
-
 class LMMS_EXPORT AudioEngine : public QObject
 {
 	Q_OBJECT
 public:
+	/**
+	 * @brief RAII helper for requestChangesInModel.
+	 * Used by AudioEngine::requestChangesGuard.
+	 */
+	class RequestChangesGuard {
+		friend class AudioEngine;
+
+	private:
+		RequestChangesGuard(AudioEngine* audioEngine)
+			: m_audioEngine{audioEngine}
+		{
+			m_audioEngine->requestChangeInModel();
+		}
+	public:
+
+		RequestChangesGuard()
+			: m_audioEngine{nullptr}
+		{
+		}
+
+		RequestChangesGuard(RequestChangesGuard&& other)
+			: RequestChangesGuard()
+		{
+			std::swap(other.m_audioEngine, m_audioEngine);
+		}
+
+		// Disallow copy.
+		RequestChangesGuard(const RequestChangesGuard&) = delete;
+		RequestChangesGuard& operator=(const RequestChangesGuard&) = delete;
+
+		~RequestChangesGuard() {
+			if (m_audioEngine) {
+				m_audioEngine->doneChangeInModel();
+			}
+		}
+
+	private:
+		AudioEngine* m_audioEngine;
+	};
+
 	struct qualitySettings
 	{
 		enum Mode
@@ -309,6 +354,11 @@ public:
 	void requestChangeInModel();
 	void doneChangeInModel();
 
+	RequestChangesGuard requestChangesGuard()
+	{
+		return RequestChangesGuard{this};
+	}
+
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
 
@@ -316,7 +366,7 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const surroundSampleFrame * buffer );
+	void nextAudioBuffer( const lmms::surroundSampleFrame * buffer );
 
 
 private:
@@ -342,7 +392,7 @@ private:
 
 
 	AudioEngine( bool renderOnly );
-	virtual ~AudioEngine();
+	~AudioEngine() override;
 
 	void startProcessing(bool needsFifo = true);
 	void stopProcessing();
@@ -419,16 +469,22 @@ private:
 	bool m_changesSignal;
 	unsigned int m_changes;
 	QMutex m_changesMutex;
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_doChangesMutex;
+#else
 	QMutex m_doChangesMutex;
+#endif
 	QMutex m_waitChangesMutex;
 	QWaitCondition m_changesAudioEngineCondition;
 	QWaitCondition m_changesRequestCondition;
 
 	bool m_waitingForWrite;
 
-	friend class LmmsCore;
+	friend class Engine;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
 } ;
+
+} // namespace lmms
 
 #endif

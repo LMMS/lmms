@@ -35,12 +35,16 @@
 #include "RemotePlugin.h"
 
 
+namespace lmms
+{
+
+
 VstSyncController::VstSyncController() :
 	m_syncData( nullptr )
 {
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
-		connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+		connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSampleRate()));
 
 		try
 		{
@@ -140,6 +144,4 @@ void VstSyncController::updateSampleRate()
 }
 
 
-
-
-
+} // namespace lmms

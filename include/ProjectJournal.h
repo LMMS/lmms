@@ -31,6 +31,11 @@
 #include "lmms_basics.h"
 #include "DataFile.h"
 
+
+namespace lmms
+{
+
+
 class JournallingObject;
 
 
@@ -41,7 +46,7 @@ public:
 	static const int MAX_UNDO_STATES;
 
 	ProjectJournal();
-	virtual ~ProjectJournal();
+	virtual ~ProjectJournal() = default;
 
 	void undo();
 	void redo();
@@ -118,6 +123,8 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

@@ -34,12 +34,16 @@
 #include "lmms_basics.h"
 
 
+namespace lmms::gui
+{
+
+
 class CPULoadWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	CPULoadWidget( QWidget * _parent );
-	virtual ~CPULoadWidget();
+	~CPULoadWidget() override = default;
 
 
 protected:
@@ -63,5 +67,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

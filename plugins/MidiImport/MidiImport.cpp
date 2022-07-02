@@ -50,6 +50,10 @@
 
 #include "portsmf/allegro.h"
 
+namespace lmms
+{
+
+
 #define makeID(_c0, _c1, _c2, _c3) \
 		( 0 | \
 		( ( _c0 ) | ( ( _c1 ) << 8 ) | ( ( _c2 ) << 16 ) | ( ( _c3 ) << 24 ) ) )
@@ -61,7 +65,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"MIDI Import",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing MIDI-files into LMMS" ),
@@ -86,13 +90,6 @@ MidiImport::MidiImport( const QString & _file ) :
 
 
 
-MidiImport::~MidiImport()
-{
-}
-
-
-
-
 bool MidiImport::tryImport( TrackContainer* tc )
 {
 	if( openFile() == false )
@@ -101,10 +98,10 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	if( getGUI() != nullptr &&
+	if (gui::getGUI() != nullptr &&
 		ConfigManager::inst()->sf2File().isEmpty() )
 	{
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You have not set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
@@ -114,9 +111,9 @@ bool MidiImport::tryImport( TrackContainer* tc )
 				"settings dialog and try again." ) );
 	}
 #else
-	if( getGUI() != nullptr )
+	if (gui::getGUI() != nullptr)
 	{
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "Setup incomplete" ),
 			tr( "You did not compile LMMS with support for "
 				"SoundFont2 player, which is used to add default "
@@ -305,7 +302,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	const int MIDI_CC_COUNT = 128 + 1; // 0-127 (128) + pitch bend
 	const int preTrackSteps = 2;
 	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
-	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, getGUI()->mainWindow() );
+	TrackContainer::tr("Cancel"), 0, preTrackSteps, gui::getGUI()->mainWindow());
 	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	pd.setWindowModality(Qt::WindowModal);
 	pd.setMinimumDuration( 0 );
@@ -601,7 +598,7 @@ invalid_format:
 	}
 
 	// search for "data" chunk
-	while( 1 )
+	while( true )
 	{
 		const int id = readID();
 		const int len = read32LE();
@@ -654,3 +651,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 
 }
 
+
+} // namespace lmms

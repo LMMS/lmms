@@ -34,11 +34,21 @@
 #include "TempoSyncKnobModel.h"
 #include "Oscillator.h"
 
+namespace lmms
+{
+
+namespace gui
+{
+
 class automatableButtonGroup;
-class Knob;
 class LedCheckBox;
-class TempoSyncKnob;
 class PixmapButton;
+class Knob;
+class TempoSyncKnob;
+
+class LfoControllerDialog;
+
+}
 
 
 class LfoController : public Controller 
@@ -47,7 +57,7 @@ class LfoController : public Controller
 public:
 	LfoController( Model * _parent );
 
-	virtual ~LfoController();
+	~LfoController() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -55,7 +65,7 @@ public:
 
 
 public slots:
-	ControllerDialog * createDialog( QWidget * _parent ) override;
+	gui::ControllerDialog * createDialog( QWidget * _parent ) override;
 
 
 protected:
@@ -83,18 +93,19 @@ protected slots:
 	void updateSampleFunction();
 	void updateDuration();
 
-	friend class LfoControllerDialog;
+	friend class gui::LfoControllerDialog;
 
 } ;
 
-
+namespace gui
+{
 
 class LfoControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
 	LfoControllerDialog( Controller * _controller, QWidget * _parent );
-	virtual ~LfoControllerDialog();
+	~LfoControllerDialog() override;
 
 
 protected:
@@ -119,5 +130,10 @@ private slots:
 	void askUserDefWave();
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

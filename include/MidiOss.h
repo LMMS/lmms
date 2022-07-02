@@ -35,13 +35,16 @@
 #include "MidiClient.h"
 
 
+namespace lmms
+{
+
 
 class MidiOss : public QThread, public MidiClientRaw
 {
 	Q_OBJECT
 public:
 	MidiOss();
-	virtual ~MidiOss();
+	~MidiOss() override;
 
 	static QString probeDevice();
 
@@ -69,7 +72,11 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+
+#endif // LMMS_HAVE_OSS
 
 
 #endif

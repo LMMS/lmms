@@ -40,6 +40,10 @@
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
 
+
+namespace lmms
+{
+
 class PluginIssue;
 
 // forward declare port structs/enums
@@ -211,6 +215,9 @@ private:
 	static bool portIsOptional(const LilvPlugin* plugin, const LilvPort *port);
 	static AutoLilvNode uri(const char* uriStr);
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2PROC_H
