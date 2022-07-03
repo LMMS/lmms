@@ -245,7 +245,7 @@ bool Note::withinRange(int tickStart, int tickEnd) const
  */
 std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
 {
-	if (notes.empty()) { return {}; }
+	if (notes.empty()) { return std::nullopt; }
 
 	TimePos start = notes.front()->pos();
 	TimePos end = start;

@@ -155,7 +155,7 @@ void MidiClipView::transposeSelection()
 	int lowest = NumKeys - 1;
 	for (ClipView* clipview: selection)
 	{
-		if (auto mcv = dynamic_cast<MidiClipView*>(clipview))
+		if (auto mcv = qobject_cast<MidiClipView*>(clipview))
 		{
 			if (auto bounds = boundsForNotes(mcv->getMidiClip()->notes()))
 			{
@@ -176,7 +176,7 @@ void MidiClipView::transposeSelection()
 	QSet<Track*> m_changedTracks;
 	for (ClipView* clipview: selection)
 	{
-		auto mcv = dynamic_cast<MidiClipView*>(clipview);
+		auto mcv = qobject_cast<MidiClipView*>(clipview);
 		if (!mcv) { continue; }
 
 		auto clip = mcv->getMidiClip();
