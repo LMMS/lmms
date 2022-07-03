@@ -25,6 +25,9 @@
 #include "LinkedModelGroupViews.h"
 
 #include <QPushButton>
+#include <QVariant>
+#include <QVBoxLayout>
+
 #include "Controls.h"
 #include "ControlLayout.h"
 #include "LinkedModelGroups.h"
@@ -43,13 +46,22 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	QWidget(parent),
 	m_model(model),
 	m_colNum(colNum),
-	m_layout(new ControlLayout(this))
+	m_filter{new ControlFilterWidget{this}}
 {
 	// This is required to remove the focus of the line edit
 	// when e.g. another spin box is being clicked.
 	// Removing the focus is wanted because in many cases, the user wants to
 	// quickly play notes on the virtual keyboard.
-	setFocusPolicy( Qt::StrongFocus );
+	setFocusPolicy(Qt::StrongFocus);
+
+	const auto controlContainer = new QWidget{this};
+	m_layout = new ControlLayout{controlContainer};
+
+	const auto thisLayout = new QVBoxLayout{this};
+	thisLayout->addWidget(m_filter);
+	thisLayout->addWidget(controlContainer);
+
+	connect(m_filter, &ControlFilterWidget::filterChanged, m_layout, &ControlLayout::setFilterString);
 }
 
 
@@ -81,7 +93,7 @@ void LinkedModelGroupView::modelChanged(LinkedModelGroup *group)
 
 
 
-void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
+void LinkedModelGroupView::addControl(std::unique_ptr<Control> ctrl, const std::string& id,
 	const std::string &display, bool removable)
 {
 	if (ctrl)
@@ -95,7 +107,7 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 			QPushButton* removeBtn = new QPushButton;
 			removeBtn->setIcon( embed::getIconPixmap( "discard" ) );
 			QObject::connect(removeBtn, &QPushButton::clicked,
-				this, [this,ctrl](bool){
+				this, [this, ctrl = ctrl.get()](bool){
 					AutomatableModel* controlModel = ctrl->model();
 					// remove control out of model group
 					// (will also remove it from the UI)
@@ -108,46 +120,14 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 		}
 
 		// required, so the Layout knows how to sort/filter widgets by string
-		box->setObjectName(QString::fromStdString(display));
+		box->setProperty(ControlLayout::KeyProperty, QString::fromStdString(display));
 		m_layout->addWidget(box);
 
-		// take ownership of control and add it
-		m_widgets.emplace(id, std::unique_ptr<Control>(ctrl));
+		// add control to map
+		m_widgets.emplace(id, std::move(ctrl));
 	}
 
 	if (isHidden()) { setHidden(false); }
-}
-
-
-
-
-void LinkedModelGroupView::removeControl(const QString& key)
-{
-	auto itr = m_widgets.find(key.toStdString());
-	if (itr != m_widgets.end())
-	{
-		QLayoutItem* item = m_layout->itemByString(key);
-		Q_ASSERT(!!item);
-		QWidget* wdg = item->widget();
-		Q_ASSERT(!!wdg);
-
-		// remove item from layout
-		m_layout->removeItem(item);
-		// the widget still exists and is visible - remove it now
-		delete wdg;
-		// erase widget pointer from dictionary
-		m_widgets.erase(itr);
-		// repaint immediately, so we don't have dangling model views
-		m_layout->update();
-	}
-}
-
-
-
-
-void LinkedModelGroupView::removeFocusFromSearchBar()
-{
-	m_layout->removeFocusFromSearchBar();
 }
 
 

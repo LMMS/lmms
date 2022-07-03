@@ -43,6 +43,7 @@ namespace gui
 {
 
 class Control;
+class ControlFilterWidget;
 
 /**
 	@file LinkedModelGroupViews.h
@@ -77,21 +78,17 @@ public:
 
 protected:
 	//! Add a control to this widget
-	//! @warning This widget will own this control, do not free it
-	void addControl(Control* ctrl, const std::string &id,
+	void addControl(std::unique_ptr<Control> ctrl, const std::string &id,
 					const std::string& display, bool removable);
-
-	void removeControl(const QString &key);
-
-	void removeFocusFromSearchBar();
 
 private:
 	class LinkedModelGroup* m_model;
 
 	//! column number in surrounding grid in LinkedModelGroupsView
 	std::size_t m_colNum;
+	ControlFilterWidget* m_filter;
 	class ControlLayout* m_layout;
-	std::map<std::string, std::unique_ptr<class Control>> m_widgets;
+	std::map<std::string, std::unique_ptr<Control>> m_widgets;
 };
 
 

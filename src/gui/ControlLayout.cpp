@@ -73,11 +73,13 @@
 
 #include "ControlLayout.h"
 
-#include <QWidget>
+#include <QHBoxLayout>
 #include <QLayoutItem>
 #include <QLineEdit>
 #include <QRect>
 #include <QString>
+
+#include <algorithm>
 #include <utility>
 
 
@@ -87,26 +89,14 @@ namespace lmms::gui
 constexpr const int ControlLayout::m_minWidth;
 
 ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
-	: QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing),
-	  m_searchBar(new QLineEdit(parent))
+	: QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing)
 {
 	setContentsMargins(margin, margin, margin, margin);
-	m_searchBar->setPlaceholderText("filter");
-	m_searchBar->setObjectName(s_searchBarName);
-	connect(m_searchBar, SIGNAL(textChanged(const QString&)),
-		this, SLOT(onTextChanged(const QString& )));
-	addWidget(m_searchBar);
-	m_searchBar->setHidden(true); // nothing to filter yet
 }
 
-ControlLayout::~ControlLayout()
+void ControlLayout::setFilterString(const QString& filter)
 {
-	QLayoutItem *item;
-	while ((item = takeAt(0))) { delete item; }
-}
-
-void ControlLayout::onTextChanged(const QString&)
-{
+	m_filterString = filter;
 	invalidate();
 	update();
 }
@@ -114,8 +104,7 @@ void ControlLayout::onTextChanged(const QString&)
 void ControlLayout::addItem(QLayoutItem *item)
 {
 	QWidget* widget = item->widget();
-	const QString str = widget ? widget->objectName() : QString("unnamed");
-	m_itemMap.insert(str, item);
+	m_items.emplace_back(item);
 	invalidate();
 }
 
@@ -139,50 +128,21 @@ int ControlLayout::verticalSpacing() const
 
 int ControlLayout::count() const
 {
-	return m_itemMap.size() - 1;
+	return m_items.size();
 }
 
-QMap<QString, QLayoutItem*>::const_iterator
-ControlLayout::pairAt(int index) const
-{
-	if (index < 0) { return m_itemMap.cend(); }
-
-	auto skip = [&](QLayoutItem* item) -> bool
-	{
-		return item->widget()->objectName() == s_searchBarName;
-	};
-
-	QMap<QString, QLayoutItem*>::const_iterator itr = m_itemMap.cbegin();
-	for (; itr != m_itemMap.cend() && (index > 0 || skip(itr.value())); ++itr)
-	{
-		if(!skip(itr.value())) { index--; }
-	}
-	return itr;
-}
-
-// linear time :-(
 QLayoutItem *ControlLayout::itemAt(int index) const
 {
-	auto itr = pairAt(index);
-	return (itr == m_itemMap.end()) ? nullptr : itr.value();
+	if (index < 0 || index >= m_items.size()) { return nullptr; }
+	return m_items[index].get();
 }
 
-QLayoutItem *ControlLayout::itemByString(const QString &key) const
-{
-	auto itr = m_itemMap.find(key);
-	return (itr == m_itemMap.end()) ? nullptr : *itr;
-}
-
-// linear time :-(
 QLayoutItem *ControlLayout::takeAt(int index)
 {
-	auto itr = pairAt(index);
-	return (itr == m_itemMap.end()) ? nullptr : m_itemMap.take(itr.key());
-}
-
-void ControlLayout::removeFocusFromSearchBar()
-{
-	m_searchBar->clearFocus();
+	if (index < 0 || index >= m_items.size()) { return nullptr; }
+	const auto item = m_items[index].release();
+	m_items.erase(m_items.begin() + index);
+	return item;
 }
 
 Qt::Orientations ControlLayout::expandingDirections() const
@@ -218,7 +178,7 @@ QSize ControlLayout::minimumSize() const
 	// get maximum height and width for all children.
 	// as Qt will later call heightForWidth, only the width here really matters
 	QSize size;
-	for (const QLayoutItem *item : std::as_const(m_itemMap))
+	for (const auto& item : m_items)
 	{
 		size = size.expandedTo(item->minimumSize());
 	}
@@ -240,29 +200,15 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 	int y = effectiveRect.y();
 	int lineHeight = 0;
 
-	const QString filterText = m_searchBar->text();
-	bool first = true;
-
-	QMapIterator<QString, QLayoutItem*> itr(m_itemMap);
-	while (itr.hasNext())
+	for (const auto& item : m_items)
 	{
-		itr.next();
-		QLayoutItem* item = itr.value();
 		QWidget *wid = item->widget();
 		if (wid)
 		{
-			if (	first || // do not filter search bar
-				filterText.isEmpty() || // no filter - pass all
-				itr.key().contains(filterText, Qt::CaseInsensitive))
+			if (m_filterString.isEmpty() // no filter - pass all
+				|| wid->property(KeyProperty).toString().contains(m_filterString, Qt::CaseInsensitive))
 			{
-				if (first)
-				{
-					// for the search bar, only show it if there are at least
-					// two control widgets (i.e. at least 3 widgets)
-					if (m_itemMap.size() > 2) { wid->show(); }
-					else { wid->hide(); }
-				}
-				else { wid->show(); }
+				wid->show();
 
 				int spaceX = horizontalSpacing();
 				if (spaceX == -1)
@@ -292,7 +238,6 @@ int ControlLayout::doLayout(const QRect &rect, bool testOnly) const
 
 				x = nextX;
 				lineHeight = qMax(lineHeight, item->sizeHint().height());
-				first = false;
 			}
 			else
 			{
@@ -313,6 +258,19 @@ int ControlLayout::smartSpacing(QStyle::PixelMetric pm) const
 		return pw->style()->pixelMetric(pm, nullptr, pw);
 	}
 	else { return static_cast<QLayout *>(parent)->spacing(); }
+}
+
+ControlFilterWidget::ControlFilterWidget(QWidget* parent) :
+	QWidget{parent}
+{
+	const auto searchBar = new QLineEdit{this};
+	searchBar->setPlaceholderText(tr("Filter"));
+	searchBar->setClearButtonEnabled(true);
+	connect(searchBar, &QLineEdit::textChanged, this, &ControlFilterWidget::filterChanged);
+
+	const auto layout = new QHBoxLayout{this};
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->addWidget(searchBar);
 }
 
 
