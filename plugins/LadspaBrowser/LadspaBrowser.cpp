@@ -82,13 +82,6 @@ LadspaBrowser::LadspaBrowser() :
 
 
 
-LadspaBrowser::~LadspaBrowser()
-{
-}
-
-
-
-
 QString LadspaBrowser::nodeName() const
 {
 	return ladspabrowser_plugin_descriptor.name;
@@ -161,13 +154,6 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		parentWidget()->setWindowFlags( flags );
 	}
-}
-
-
-
-
-LadspaBrowserView::~LadspaBrowserView()
-{
 }
 
 

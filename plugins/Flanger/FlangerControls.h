@@ -39,9 +39,7 @@ class FlangerControls : public EffectControls
 	Q_OBJECT
 public:
 	FlangerControls( FlangerEffect* effect );
-	~FlangerControls() override
-	{
-	}
+	~FlangerControls() override = default;
 	void saveSettings ( QDomDocument& doc, QDomElement& parent ) override;
 	void loadSettings ( const QDomElement &_this ) override;
 	inline QString nodeName() const override

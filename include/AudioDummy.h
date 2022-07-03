@@ -62,9 +62,7 @@ public:
 		{
 		}
 
-		~setupWidget() override
-		{
-		}
+		~setupWidget() override = default;
 
 		void saveSettings() override
 		{

@@ -130,13 +130,6 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 
 
 
-MalletsInstrument::~MalletsInstrument()
-{
-}
-
-
-
-
 void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	// ModalBar
@@ -432,12 +425,6 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	}
 }
 
-
-
-
-MalletsInstrumentView::~MalletsInstrumentView()
-{
-}
 
 
 

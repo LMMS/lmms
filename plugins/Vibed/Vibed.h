@@ -97,7 +97,7 @@ class VibedView : public InstrumentViewFixedSize
 public:
 	VibedView( Instrument * _instrument,
 					QWidget * _parent );
-	~VibedView() override {};
+	~VibedView() override = default;
 
 public slots:
 	void showString( int _string );

@@ -131,7 +131,7 @@ class PatmanView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	PatmanView( Instrument * _instrument, QWidget * _parent );
-	~PatmanView() override;
+	~PatmanView() override = default;
 
 
 public slots:

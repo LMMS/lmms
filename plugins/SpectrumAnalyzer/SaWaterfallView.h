@@ -49,7 +49,7 @@ class SaWaterfallView : public QWidget
 	Q_OBJECT
 public:
 	explicit SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent = 0);
-	~SaWaterfallView() override {}
+	~SaWaterfallView() override = default;
 
 	QSize sizeHint() const override {return QSize(400, 350);}
 

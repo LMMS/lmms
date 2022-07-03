@@ -107,11 +107,6 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 
 
 
-InstrumentSoundShaping::~InstrumentSoundShaping()
-{
-}
-
-
 
 
 float InstrumentSoundShaping::volumeLevel( NotePlayHandle* n, const f_cnt_t frame )

@@ -61,7 +61,7 @@ public:
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		~setupWidget() override;
+		~setupWidget() override = default;
 
 		void saveSettings() override;
 

@@ -41,9 +41,7 @@ class PeakControllerEffectControls : public EffectControls
 	Q_OBJECT
 public:
 	PeakControllerEffectControls( PeakControllerEffect * _eff );
-	~PeakControllerEffectControls() override
-	{
-	}
+	~PeakControllerEffectControls() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

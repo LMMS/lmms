@@ -58,11 +58,6 @@ MultitapEchoControls::MultitapEchoControls( MultitapEchoEffect * eff ) :
 }
 
 
-MultitapEchoControls::~MultitapEchoControls()
-{
-}
-
-
 void MultitapEchoControls::saveSettings( QDomDocument & doc, QDomElement & parent )
 {
 	m_steps.saveSettings( doc, parent, "steps" );

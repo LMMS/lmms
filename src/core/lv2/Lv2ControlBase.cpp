@@ -89,7 +89,7 @@ Lv2ControlBase::Lv2ControlBase(Model* that, const QString &uri) :
 
 
 
-Lv2ControlBase::~Lv2ControlBase() {}
+Lv2ControlBase::~Lv2ControlBase() = default;
 
 
 

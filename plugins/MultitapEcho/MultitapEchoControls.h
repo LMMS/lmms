@@ -41,7 +41,7 @@ class MultitapEchoControls : public EffectControls
 	Q_OBJECT
 public:
 	MultitapEchoControls( MultitapEchoEffect * eff );
-	~MultitapEchoControls() override;
+	~MultitapEchoControls() override = default;
 
 	void saveSettings( QDomDocument & doc, QDomElement & parent ) override;
 	void loadSettings( const QDomElement & elem ) override;

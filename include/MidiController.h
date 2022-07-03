@@ -49,7 +49,7 @@ class MidiController : public Controller, public MidiEventProcessor
 	Q_OBJECT
 public:
 	MidiController( Model * _parent );
-	~MidiController() override;
+	~MidiController() override = default;
 
 	void processInEvent( const MidiEvent & _me,
 					const TimePos & _time, f_cnt_t offset = 0 ) override;

@@ -64,13 +64,6 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 
 
 
-EqEffect::~EqEffect()
-{
-}
-
-
-
-
 bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 {
 	const int sampleRate = Engine::audioEngine()->processingSampleRate();

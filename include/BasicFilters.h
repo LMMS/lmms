@@ -58,7 +58,7 @@ public:
 		m_sampleRate = sampleRate;
 		clearHistory();
 	}
-	virtual ~LinkwitzRiley() {}
+	virtual ~LinkwitzRiley() = default;
 
 	inline void clearHistory()
 	{
@@ -152,7 +152,7 @@ public:
 	{
 		clearHistory();
 	}
-	virtual ~BiQuad() {}
+	virtual ~BiQuad() = default;
 	
 	inline void setCoeffs( float a1, float a2, float b0, float b1, float b2 )
 	{
@@ -200,7 +200,7 @@ public:
 			m_z1[i] = 0.0;
 		}
 	}
-	virtual ~OnePole() {}
+	virtual ~OnePole() = default;
 	
 	inline void setCoeffs( float a0, float b1 )
 	{

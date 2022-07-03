@@ -45,7 +45,7 @@ class AutomationClipView : public ClipView
 
 public:
 	AutomationClipView( AutomationClip * _clip, TrackView * _parent );
-	~AutomationClipView() override;
+	~AutomationClipView() override = default;
 
 public slots:
 	/// Opens this view's clip in the global automation editor

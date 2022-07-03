@@ -40,7 +40,7 @@ class LadspaPortDialog : public QDialog
 	Q_OBJECT
 public:
 	LadspaPortDialog( const ladspa_key_t & _key );
-	~LadspaPortDialog() override;
+	~LadspaPortDialog() override = default;
 
 };
 

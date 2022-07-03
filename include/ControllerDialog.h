@@ -44,7 +44,7 @@ class ControllerDialog : public QWidget, public ModelView
 public:
 	ControllerDialog( Controller * _controller, QWidget * _parent );
 
-	~ControllerDialog() override;
+	~ControllerDialog() override = default;
 
 
 signals:

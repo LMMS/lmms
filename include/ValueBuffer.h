@@ -39,7 +39,7 @@ class LMMS_EXPORT ValueBuffer : public std::vector<float>
 {
 	MM_OPERATORS
 public:
-	ValueBuffer();
+	ValueBuffer() = default;
 	ValueBuffer(int length);
 
 	void fill(float value);

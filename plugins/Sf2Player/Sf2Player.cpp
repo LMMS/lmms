@@ -1055,13 +1055,6 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 
-Sf2InstrumentView::~Sf2InstrumentView()
-{
-}
-
-
-
-
 void Sf2InstrumentView::modelChanged()
 {
 	Sf2Instrument * k = castModel<Sf2Instrument>();

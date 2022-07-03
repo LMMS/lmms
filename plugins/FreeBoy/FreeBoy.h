@@ -52,7 +52,7 @@ class FreeBoyInstrument : public Instrument
 public:
 
 	FreeBoyInstrument( InstrumentTrack * _instrument_track );
-	~FreeBoyInstrument() override;
+	~FreeBoyInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -129,7 +129,7 @@ class FreeBoyInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	FreeBoyInstrumentView( Instrument * _instrument, QWidget * _parent );
-	~FreeBoyInstrumentView() override;
+	~FreeBoyInstrumentView() override = default;
 
 private:
 	void modelChanged() override;

@@ -59,10 +59,6 @@ CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 
 
 
-CPULoadWidget::~CPULoadWidget()
-{
-}
-
 
 
 

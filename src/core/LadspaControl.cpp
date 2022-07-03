@@ -112,13 +112,6 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 
 
 
-LadspaControl::~LadspaControl()
-{
-}
-
-
-
-
 LADSPA_Data LadspaControl::value()
 {
 	switch( m_port->data_type )

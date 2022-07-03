@@ -139,7 +139,7 @@ class WatsynInstrument : public Instrument
 	Q_OBJECT
 public:
 	WatsynInstrument( InstrumentTrack * _instrument_track );
-	~WatsynInstrument() override;
+	~WatsynInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer ) override;
@@ -310,7 +310,7 @@ class WatsynView : public InstrumentViewFixedSize
 public:
 	WatsynView( Instrument * _instrument,
 					QWidget * _parent );
-	~WatsynView() override;
+	~WatsynView() override = default;
 
 protected slots:
 	void updateLayout();

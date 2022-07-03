@@ -90,13 +90,6 @@ MidiImport::MidiImport( const QString & _file ) :
 
 
 
-MidiImport::~MidiImport()
-{
-}
-
-
-
-
 bool MidiImport::tryImport( TrackContainer* tc )
 {
 	if( openFile() == false )
@@ -605,7 +598,7 @@ invalid_format:
 	}
 
 	// search for "data" chunk
-	while( 1 )
+	while( true )
 	{
 		const int id = readID();
 		const int len = read32LE();

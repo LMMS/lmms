@@ -38,11 +38,6 @@ namespace lmms::gui
 {
 
 
-Control::~Control() {}
-
-
-
-
 void KnobControl::setText(const QString &text) { m_knob->setLabel(text); }
 
 QWidget *KnobControl::topWidget() { return m_knob; }
@@ -58,10 +53,6 @@ AutomatableModelView* KnobControl::modelView() { return m_knob; }
 
 KnobControl::KnobControl(QWidget *parent) :
 	m_knob(new Knob(parent)) {}
-
-KnobControl::~KnobControl() {}
-
-
 
 
 void ComboControl::setText(const QString &text) { m_label->setText(text); }
@@ -86,9 +77,6 @@ ComboControl::ComboControl(QWidget *parent) :
 	vbox->addWidget(m_label);
 	m_combo->repaint();
 }
-
-ComboControl::~ComboControl() {}
-
 
 
 
@@ -115,8 +103,6 @@ CheckControl::CheckControl(QWidget *parent) :
 	vbox->addWidget(m_label);
 }
 
-CheckControl::~CheckControl() {}
-
 
 
 
@@ -137,8 +123,6 @@ LcdControl::LcdControl(int numDigits, QWidget *parent) :
 	m_lcd(new LcdSpinBox(numDigits, parent))
 {
 }
-
-LcdControl::~LcdControl() {}
 
 
 } // namespace lmms::gui

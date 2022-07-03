@@ -1967,11 +1967,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 }
 
 
-AutomationEditorWindow::~AutomationEditorWindow()
-{
-}
-
-
 void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 {
 	// Disconnect our old clip

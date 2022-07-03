@@ -50,7 +50,7 @@ class InstrumentMidiIOView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentMidiIOView( QWidget* parent );
-	~InstrumentMidiIOView() override;
+	~InstrumentMidiIOView() override = default;
 
 
 private:

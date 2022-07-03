@@ -221,10 +221,6 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 
 
 
-InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
-{
-}
-
 
 
 
@@ -332,11 +328,6 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 }
 
 
-
-
-InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
-{
-}
 
 
 

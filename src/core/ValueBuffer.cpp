@@ -6,9 +6,6 @@ namespace lmms
 {
 
 
-ValueBuffer::ValueBuffer()
-{}
-
 ValueBuffer::ValueBuffer(int length)
 	: std::vector<float>(length)
 {}

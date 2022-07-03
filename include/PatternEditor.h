@@ -80,7 +80,7 @@ class PatternEditorWindow : public Editor
 Q_OBJECT
 public:
 	PatternEditorWindow(PatternStore* ps);
-	~PatternEditorWindow();
+	~PatternEditorWindow() = default;
 
 	QSize sizeHint() const override;
 

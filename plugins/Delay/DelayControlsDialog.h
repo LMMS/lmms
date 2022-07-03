@@ -42,9 +42,7 @@ class DelayControlsDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	DelayControlsDialog( DelayControls* controls );
-	~DelayControlsDialog() override
-	{
-	}
+	~DelayControlsDialog() override = default;
 };
 
 class XyPad : public QWidget
@@ -52,7 +50,7 @@ class XyPad : public QWidget
 	Q_OBJECT
 public:
 	XyPad( QWidget *parent = 0, FloatModel *xModel = 0, FloatModel *yModel = 0 );
-	~XyPad() override {}
+	~XyPad() override = default;
 
 protected:
 	void paintEvent ( QPaintEvent * event ) override;

@@ -76,13 +76,6 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-VstEffect::~VstEffect()
-{
-}
-
-
-
-
 bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )

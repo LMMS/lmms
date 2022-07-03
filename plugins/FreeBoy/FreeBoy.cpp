@@ -125,11 +125,6 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-FreeBoyInstrument::~FreeBoyInstrument()
-{
-}
-
-
 void FreeBoyInstrument::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
@@ -681,11 +676,6 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_graph->move( 37, 199 );
 	m_graph->resize(208, 47);
 	m_graph->setToolTip(tr("Wave pattern graph"));
-}
-
-
-FreeBoyInstrumentView::~FreeBoyInstrumentView()
-{
 }
 
 

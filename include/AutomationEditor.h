@@ -255,7 +255,7 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_HEIGHT = 480;
 public:
 	AutomationEditorWindow();
-	~AutomationEditorWindow() override;
+	~AutomationEditorWindow() override = default;
 
 	void setCurrentClip(AutomationClip* clip);
 	const AutomationClip* currentClip();

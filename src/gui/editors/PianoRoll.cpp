@@ -625,11 +625,6 @@ void PianoRoll::markSemiTone(int i, bool fromMenu)
 }
 
 
-PianoRoll::~PianoRoll()
-{
-}
-
-
 void PianoRoll::setGhostMidiClip( MidiClip* newMidiClip )
 {
 	// Expects a pointer to a MIDI clip or nullptr.

@@ -63,7 +63,7 @@ class MidiExport: public ExportFilter
 // 	Q_OBJECT
 public:
 	MidiExport();
-	~MidiExport() override;
+	~MidiExport() override = default;
 
 	gui::PluginView* instantiateView(QWidget *) override
 	{

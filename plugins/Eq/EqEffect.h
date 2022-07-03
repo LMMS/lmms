@@ -36,7 +36,7 @@ class EqEffect : public Effect
 {
 public:
 	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
-	~EqEffect() override;
+	~EqEffect() override = default;
 	bool processAudioBuffer( sampleFrame * buf, const fpp_t frames ) override;
 	EffectControls * controls() override
 	{

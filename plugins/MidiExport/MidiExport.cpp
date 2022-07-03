@@ -67,12 +67,6 @@ MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor)
 
 
 
-MidiExport::~MidiExport()
-{
-}
-
-
-
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			const TrackContainer::TrackList &patternStoreTracks,
 			int tempo, int masterPitch, const QString &filename)
@@ -163,7 +157,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					QDomElement it = n.toElement();
 					int pos = it.attribute("pos", "0").toInt();
 					int len = it.attribute("len", "0").toInt();
-					plist.push_back(std::pair<int,int>(pos, pos+len));
+					plist.emplace_back(pos, pos+len);
 				}
 			}
 			std::sort(plist.begin(), plist.end());

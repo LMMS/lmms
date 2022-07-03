@@ -345,10 +345,6 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	}
 }
 
-AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil()
-{
-}
-
 void AudioSoundIoSetupUtil::reconnectSoundIo()
 {
 	((AudioSoundIo::setupWidget *)m_setupWidget)->reconnectSoundIo();
@@ -455,14 +451,14 @@ AudioSoundIo::setupWidget::setupWidget( QWidget * _parent ) :
 {
 	m_setupUtil.m_setupWidget = this;
 
-	m_backend = new ComboBox( this, "BACKEND" );
+	m_backend = new gui::ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );
 
 	QLabel * backend_lbl = new QLabel( tr( "Backend" ), this );
 	backend_lbl->setFont( pointSize<7>( backend_lbl->font() ) );
 	backend_lbl->move( 8, 18 );
 
-	m_device = new ComboBox( this, "DEVICE" );
+	m_device = new gui::ComboBox( this, "DEVICE" );
 	m_device->setGeometry( 64, 35, 260, 20 );
 
 	QLabel * dev_lbl = new QLabel( tr( "Device" ), this );

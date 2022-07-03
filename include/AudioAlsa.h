@@ -54,7 +54,7 @@ public:
 			m_deviceName(deviceName),
 			m_deviceDescription(deviceDescription)
 		{}
-		~DeviceInfo() {}
+		~DeviceInfo() = default;
 
 		QString const & getDeviceName() const { return m_deviceName; }
 		QString const & getDeviceDescription() const { return m_deviceDescription; }

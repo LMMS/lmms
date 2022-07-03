@@ -134,9 +134,6 @@ HydrogenImport::HydrogenImport( const QString & _file ) :
 
 
 
-HydrogenImport::~HydrogenImport()
-{
-}
 Instrument * ins;
 bool HydrogenImport::readSong() 
 {

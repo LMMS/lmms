@@ -71,7 +71,7 @@ class Lb302Filter
 {
 	public:
 	Lb302Filter(Lb302FilterKnobState* p_fs);
-	virtual ~Lb302Filter() {};
+	virtual ~Lb302Filter() = default;
 
 	virtual void recalc();
 	virtual void envRecalc();
@@ -277,7 +277,7 @@ class Lb302SynthView : public InstrumentViewFixedSize
 public:
 	Lb302SynthView( Instrument * _instrument,
 	                QWidget * _parent );
-	~Lb302SynthView() override;
+	~Lb302SynthView() override = default;
 
 private:
 	void modelChanged() override;

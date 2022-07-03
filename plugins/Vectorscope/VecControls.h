@@ -47,7 +47,7 @@ class VecControls : public EffectControls
 	Q_OBJECT
 public:
 	explicit VecControls(Vectorscope *effect);
-	~VecControls() override {}
+	~VecControls() override = default;
 
 	gui::EffectControlDialog* createView() override;
 

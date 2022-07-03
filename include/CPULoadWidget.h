@@ -43,7 +43,7 @@ class CPULoadWidget : public QWidget
 	Q_OBJECT
 public:
 	CPULoadWidget( QWidget * _parent );
-	~CPULoadWidget() override;
+	~CPULoadWidget() override = default;
 
 
 protected:

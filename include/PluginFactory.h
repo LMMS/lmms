@@ -57,7 +57,7 @@ public:
 	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
 
 	PluginFactory();
-	~PluginFactory();
+	~PluginFactory() = default;
 
 	static void setupSearchPaths();
 

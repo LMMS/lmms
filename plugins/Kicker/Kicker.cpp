@@ -85,13 +85,6 @@ KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
 
 
 
-KickerInstrument::~KickerInstrument()
-{
-}
-
-
-
-
 void KickerInstrument::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
@@ -337,13 +330,6 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-}
-
-
-
-
-KickerInstrumentView::~KickerInstrumentView()
-{
 }
 
 

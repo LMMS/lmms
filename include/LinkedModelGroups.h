@@ -155,7 +155,7 @@ private:
 class LinkedModelGroups
 {
 public:
-	virtual ~LinkedModelGroups();
+	virtual ~LinkedModelGroups() = default;
 
 	void linkAllModels();
 

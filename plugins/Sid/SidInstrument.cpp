@@ -116,11 +116,6 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 }
 
 
-VoiceObject::~VoiceObject()
-{
-}
-
-
 SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
 	// filter	
@@ -137,11 +132,6 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	{
 		m_voice[i] = new VoiceObject( this, i );
 	}
-}
-
-
-SidInstrument::~SidInstrument()
-{
 }
 
 
@@ -661,10 +651,6 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	}
 }
 
-
-SidInstrumentView::~SidInstrumentView()
-{
-}
 
 void SidInstrumentView::updateKnobHint()
 {

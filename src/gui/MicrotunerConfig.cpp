@@ -397,7 +397,7 @@ bool MicrotunerConfig::applyScale()
 	if (!validateScaleForm()) {return false;};
 
 	std::vector<Interval> newIntervals;
-	newIntervals.push_back(Interval(1, 1));
+	newIntervals.emplace_back(1, 1);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
 	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
@@ -411,7 +411,7 @@ bool MicrotunerConfig::applyScale()
 		QString firstSection = line.section(QRegExp("\\s+|/"), 0, 0, QString::SectionSkipEmpty);
 		if (firstSection.contains('.'))		// cent mode
 		{
-			newIntervals.push_back(Interval(firstSection.toFloat()));
+			newIntervals.emplace_back(firstSection.toFloat());
 		}
 		else								// ratio mode
 		{
@@ -421,7 +421,7 @@ bool MicrotunerConfig::applyScale()
 			{
 				den = line.split('/').at(1).section(QRegExp("\\s+"), 0, 0, QString::SectionSkipEmpty).toInt();
 			}
-			newIntervals.push_back(Interval(num, den));
+			newIntervals.emplace_back(num, den);
 		}
 	}
 

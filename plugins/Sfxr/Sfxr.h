@@ -80,7 +80,7 @@ class SfxrSynth
 	MM_OPERATORS
 public:
 	SfxrSynth( const SfxrInstrument * s );
-	virtual ~SfxrSynth();
+	virtual ~SfxrSynth() = default;
 
 	void resetSample( bool restart );
 	void update( sampleFrame * buffer, const int32_t frameNum );
@@ -176,7 +176,7 @@ class SfxrInstrument : public Instrument
 	Q_OBJECT
 public:
 	SfxrInstrument(InstrumentTrack * _instrument_track );
-	~SfxrInstrument() override;
+	~SfxrInstrument() override = default;
 
 	void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer ) override;
 	void deleteNotePluginData( NotePlayHandle * _n ) override;
@@ -240,7 +240,7 @@ public:
 	SfxrInstrumentView( Instrument * _instrument,
 					QWidget * _parent );
 
-	~SfxrInstrumentView() override {};
+	~SfxrInstrumentView() override = default;
 
 protected slots:
 	void genPickup();

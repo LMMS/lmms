@@ -40,7 +40,7 @@ class LMMS_EXPORT ComboBox : public QWidget, public IntModelView
 	Q_OBJECT
 public:
 	ComboBox( QWidget* parent = nullptr, const QString& name = QString() );
-	~ComboBox() override;
+	~ComboBox() override = default;
 
 	ComboBoxModel* model()
 	{

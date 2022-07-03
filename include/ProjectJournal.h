@@ -46,7 +46,7 @@ public:
 	static const int MAX_UNDO_STATES;
 
 	ProjectJournal();
-	virtual ~ProjectJournal();
+	virtual ~ProjectJournal() = default;
 
 	void undo();
 	void redo();
