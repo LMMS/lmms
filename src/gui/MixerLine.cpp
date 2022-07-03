@@ -436,7 +436,7 @@ void MixerLine::setStrokeInnerInactive( const QColor & c )
 void MixerLine::selectColor()
 {
 	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-    auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(*channel->m_color);
+	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(*channel->m_color);
 	if(!new_color.isValid()) { return; }
 	channel->setColor (new_color);
 	Engine::getSong()->setModified();
