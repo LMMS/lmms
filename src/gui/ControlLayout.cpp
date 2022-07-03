@@ -103,7 +103,6 @@ void ControlLayout::setFilterString(const QString& filter)
 
 void ControlLayout::addItem(QLayoutItem *item)
 {
-	QWidget* widget = item->widget();
 	m_items.emplace_back(item);
 	invalidate();
 }
