@@ -240,12 +240,10 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 
 
 /*! \brief Get the start/end/bottom/top positions of notes in a vector
- *
- *  Returns no value if there are no notes
  */
-std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
+NoteBounds boundsForNotes(const NoteVector& notes)
 {
-	if (notes.empty()) { return {}; }
+	if (notes.empty()) { return NoteBounds(); }
 
 	TimePos start = notes.front()->pos();
 	TimePos end = start;

@@ -253,16 +253,22 @@ private:
 typedef QVector<Note *> NoteVector;
 
 
+/*! \brief Bounding box of notes
+ *
+ *  Defaults to all zero, and will in that case evaluate to false if converted to bool.
+ */
 struct NoteBounds
 {
 	TimePos start;
 	TimePos end;
 	int lowest;
 	int highest;
+
+	operator bool() { return start.getTicks() || end.getTicks() || lowest || highest; }
 };
 
 
-std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
+NoteBounds boundsForNotes(const NoteVector& notes);
 
 
 } // namespace lmms
