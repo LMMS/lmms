@@ -98,6 +98,7 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	// mixer sends knob
 	m_sendKnob = new Knob( knobBright_26, this, tr( "Channel send amount" ) );
 	m_sendKnob->move( 3, 22 );
+
 	m_sendKnob->setVisible( false );
 
 	// send button indicator
@@ -174,9 +175,9 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	int width = mixerLine->rect().width();
 	int height = mixerLine->rect().height();
 	
-	if( channel->m_hasColor && !muted )
+	if( channel->m_color.has_value() && !muted )
 	{
-        p->fillRect( mixerLine->rect(), channel->m_color->darker( isActive ? 120 : 150 ) );
+		p->fillRect( mixerLine->rect(), channel->m_color->darker( isActive ? 120 : 150 ) );
 	}
 	else
 	{
@@ -446,7 +447,7 @@ void MixerLine::selectColor()
 // Disable the usage of color on this mixer line
 void MixerLine::resetColor()
 {
-	Engine::mixer()->mixerChannel( m_channelIndex )->m_hasColor = false;
+	Engine::mixer()->mixerChannel( m_channelIndex )->m_color = { };
 	Engine::getSong()->setModified();
 	update();
 }

@@ -80,12 +80,10 @@ class MixerChannel : public ThreadableJob
 		void setColor (QColor newColor)
 		{
 			m_color = newColor;
-			m_hasColor = true;
 		}
 
 		// TODO C++17 and above: use std::optional instead
-        std::optional<QColor> m_color;
-		bool m_hasColor;
+		std::optional<QColor> m_color;
 
 	
 		std::atomic_int m_dependenciesMet;
