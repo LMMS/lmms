@@ -64,10 +64,9 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_clips(),        /*!< The clips (segments) */
-	m_color( 0, 0, 0 ),
-	m_hasColor( false )
+	m_clips()        /*!< The clips (segments) */
 {
+	m_color = QColor(0,0,0);
 	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
@@ -209,9 +208,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		element.setAttribute( "trackheight", m_height );
 	}
 	
-	if( m_hasColor )
+	if( m_color.has_value())
 	{
-		element.setAttribute( "color", m_color.name() );
+		element.setAttribute( "color", m_color->name() );
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -642,14 +641,13 @@ void Track::toggleSolo()
 
 void Track::setColor(const QColor& c)
 {
-	m_hasColor = true;
 	m_color = c;
 	emit colorChanged();
 }
 
 void Track::resetColor()
 {
-	m_hasColor = false;
+	m_color = { };
 	emit colorChanged();
 }
 
