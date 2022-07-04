@@ -26,6 +26,7 @@
 #ifndef NOTE_H
 #define NOTE_H
 
+#include <optional>
 #include <QVector>
 
 #include "volume.h"
@@ -250,6 +251,18 @@ private:
 
 
 typedef QVector<Note *> NoteVector;
+
+
+struct NoteBounds
+{
+	TimePos start;
+	TimePos end;
+	int lowest;
+	int highest;
+};
+
+
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
 
 
 } // namespace lmms
