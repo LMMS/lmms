@@ -40,45 +40,23 @@ class VstSyncController : public QObject
 	Q_OBJECT
 public:
 	VstSyncController();
-	~VstSyncController() override;
 
-	void setAbsolutePosition( double ticks );
-
-	void setPlaybackState( bool enabled )
-	{
-		m_syncData->isPlaying = enabled;
-	}
-
-	void setTempo( int newTempo );
-
-	void setTimeSignature( int num, int denom )
-	{
-		m_syncData->timeSigNumer = num;
-		m_syncData->timeSigDenom = denom;
-	}
-
-	void startCycle( int startTick, int endTick );
-
-	void stopCycle()
-	{
-		m_syncData->isCycle = false;
-	}
-
-	void setPlaybackJumped( bool jumped )
-	{
-		m_syncData->m_playbackJumped = jumped;
-	}
-
+	void setAbsolutePosition(double ticks);
+	void setPlaybackState(bool enabled);
+	void setTempo(int newTempo);
+	void setTimeSignature(int num, int denom);
+	void startCycle(int startTick, int endTick);
+	void stopCycle();
+	void setPlaybackJumped(bool jumped);
 	void update();
 
+	const std::string& sharedMemoryKey() const noexcept { return m_syncData.key(); }
 
 private slots:
 	void updateSampleRate();
 
-
 private:
-	VstSyncData* m_syncData;
-	SharedMemory<VstSyncData> m_shm;
+	SharedMemory<VstSyncData> m_syncData;
 };
 
 
