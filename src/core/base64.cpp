@@ -85,34 +85,37 @@ std::string encode(std::string_view data)
 	*/
 	// Get the first base64 character offset from the char chunk
 	auto b64char1 = [](std::string_view chunk) {
-		return static_cast<size_t>(chunk[0]) >> 2;
+		return static_cast<std::string::value_type>(chunk[0] >> 2);
 	};
 	// Get the second base64 character offset from the char chunk
 	auto b64char2 = [](std::string_view chunk) {
-		return (
-			((static_cast<size_t>(chunk[0]) & 0x03) << 4)
+		return static_cast<std::string::value_type>(
+			((chunk[0] & 0x03) << 4)
 			|
-			((static_cast<size_t>(chunk.size() > 0 ? chunk[1] : '\0') & 0xF0) >> 4)
+			(chunk.size() > 0 ? ((chunk[1] & 0xF0) >> 4) : 0)
 		);
 	};
 	// Get the third base64 character offset from the char chunk
 	auto b64char3 = [](std::string_view chunk) {
-		return (
-			((static_cast<size_t>(chunk.size() > 0 ? chunk[1] : '\0') & 0x0F) << 2)
+		return static_cast<std::string::value_type>(
+			(chunk.size() > 0 ? ((chunk[1] & 0x0F) << 2) : 0)
 			|
-			((static_cast<size_t>(chunk.size() > 1 ? chunk[2] : '\0') & 0xC0) >> 6)
+			(chunk.size() > 1 ? ((chunk[2] & 0xC0) >> 6) : 0)
 		);
 	};
 	// Get the fourth base64 character offset from the char chunk
 	auto b64char4 = [](std::string_view chunk) {
-		return static_cast<size_t>(chunk.size() > 1 ? chunk[2] : '\0') & 0x3F;
+		return static_cast<std::string::value_type>(chunk.size() > 1 ? (chunk[2] & 0x3F) : 0);
 	};
 	for (int currentChunk = 0; currentChunk < numChunks; ++currentChunk)
 	{
 		std::string_view chunk = data.substr(currentChunk * numBytesPerChunk, numBytesPerChunk);
-		std::string output{pad, pad, pad, pad};
-		output[0] = map[b64char1(chunk)];
-		output[1] = map[b64char2(chunk)];
+		std::string output{
+			map[b64char1(chunk)],
+			map[b64char2(chunk)],
+			pad,
+			pad
+		};
 		switch (chunk.length()) {
 			case 3:
 				output[3] = map[b64char4(chunk)];
@@ -152,35 +155,31 @@ std::string decode(std::string_view data)
 	*/
 	// Get the first character from the base64 chunk
 	auto char1 = [](std::string_view chunk) {
-		return static_cast<char>(
-			(static_cast<size_t>(reverse_map.at(chunk[0])) << 2)
-			|
-			(static_cast<size_t>(reverse_map.at(chunk[1])) >> 4)
+		return static_cast<std::string::value_type>(
+			(rmap.at(chunk[0]) << 2) | (rmap.at(chunk[1]) >> 4)
 		);
 	};
 	// Get the second character from the base64 chunk
 	auto char2 = [](std::string_view chunk) {
-		return chunk[2] == pad ? '\0' : static_cast<char>(
-			(static_cast<size_t>(reverse_map.at(chunk[1]) & 0x0F) << 4)
-			|
-			(static_cast<size_t>(reverse_map.at(chunk[2])) >> 2)
+		return static_cast<std::string::value_type>(
+			chunk[2] == pad
+			? 0
+			: ((rmap.at(chunk[1]) & 0x0F) << 4) | (rmap.at(chunk[2]) >> 2)
 		);
 	};
 	// Get the third character from the base64 chunk
 	auto char3 = [](std::string_view chunk) {
-		return chunk[3] == pad ? '\0' : static_cast<char>(
-			(static_cast<size_t>(reverse_map.at(chunk[2]) & 0x03) << 6)
-			|
-			static_cast<size_t>(reverse_map.at(chunk[3]))
+		return static_cast<std::string::value_type>(
+			chunk[3] == pad
+			? 0
+			: ((rmap.at(chunk[2]) & 0x03) << 6) | rmap.at(chunk[3])
 		);
 	};
 	for (int currentChunk = 0; currentChunk < numChunks.quot; ++currentChunk) {
 		std::string_view chunk = data.substr(currentChunk * numBase64CharPerChunk, numBase64CharPerChunk);
-		std::string output{0, 0, 0};
-		output[0] = char1(chunk);
-		output[1] = char2(chunk);
-		output[2] = char3(chunk);
-		result += output;
+		result.push_back(char1(chunk));
+		result.push_back(char2(chunk));
+		result.push_back(char3(chunk));
 	}
 	return result;
 }
