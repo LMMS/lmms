@@ -101,8 +101,7 @@ private:
 
 } ;
 
-typedef IntModel NineButtonSelectorModel;
-
+using NineButtonSelectorModel = IntModel;
 
 } // namespace lmms::gui
 

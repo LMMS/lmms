@@ -46,9 +46,7 @@ class ControllerDialog;
 
 } // namespace gui
 
-
-typedef QVector<Controller *> ControllerVector;
-
+using ControllerVector = QVector<Controller*>;
 
 class LMMS_EXPORT Controller : public Model, public JournallingObject
 {

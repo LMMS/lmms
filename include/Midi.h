@@ -81,8 +81,7 @@ enum MidiMetaEventTypes
 	MidiMetaCustom = 0x80,
 	MidiNotePanning
 } ;
-typedef MidiMetaEventTypes MidiMetaEventType;
-
+using MidiMetaEventType = MidiMetaEventTypes;
 
 enum MidiStandardControllers
 {

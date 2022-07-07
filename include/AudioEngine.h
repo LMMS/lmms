@@ -370,7 +370,7 @@ signals:
 
 
 private:
-	typedef FifoBuffer<surroundSampleFrame *> Fifo;
+	using Fifo = FifoBuffer<surroundSampleFrame*>;
 
 	class fifoWriter : public QThread
 	{

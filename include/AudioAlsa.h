@@ -65,7 +65,7 @@ public:
 
 	};
 
-	typedef std::vector<DeviceInfo> DeviceInfoCollection;
+	using DeviceInfoCollection = std::vector<DeviceInfo>;
 
 public:
 	AudioAlsa( bool & _success_ful, AudioEngine* audioEngine );

@@ -70,7 +70,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<Clip *> clipVector;
+	using clipVector = QVector<Clip*>;
 
 	enum TrackTypes
 	{

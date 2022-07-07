@@ -30,8 +30,7 @@
 namespace lmms
 {
 
-
-typedef int16_t pitch_t;
+using pitch_t = int16_t;
 
 constexpr pitch_t CentsPerSemitone = 100;
 constexpr pitch_t MinPitchDefault = -CentsPerSemitone;

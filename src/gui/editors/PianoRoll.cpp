@@ -77,7 +77,7 @@ namespace lmms
 {
 
 
-typedef AutomationClip::timeMap timeMap;
+using timeMap = AutomationClip::timeMap;
 
 
 namespace gui

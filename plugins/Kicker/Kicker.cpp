@@ -154,11 +154,8 @@ QString KickerInstrument::nodeName() const
 	return kicker_plugin_descriptor.name;
 }
 
-
-
-typedef DspEffectLibrary::Distortion DistFX;
-typedef KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
-
+using DistFX = DspEffectLibrary::Distortion;
+using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 
 void KickerInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )

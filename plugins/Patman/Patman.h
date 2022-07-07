@@ -84,13 +84,13 @@ public slots:
 
 
 private:
-	typedef struct
+	struct handle_data
 	{
 		MM_OPERATORS
 		SampleBuffer::handleState* state;
 		bool tuned;
 		SampleBuffer* sample;
-	} handle_data;
+	};
 
 	QString m_patchFile;
 	QVector<SampleBuffer *> m_patchSamples;

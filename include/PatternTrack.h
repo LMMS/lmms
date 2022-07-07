@@ -94,7 +94,7 @@ protected:
 private:
 	QList<Track *> m_disabledTracks;
 
-	typedef QMap<PatternTrack*, int> infoMap;
+	using infoMap = QMap<PatternTrack*, int>;
 	static infoMap s_infoMap;
 
 	friend class gui::PatternTrackView;

@@ -87,7 +87,7 @@ public:
 
 
 private:
-	typedef std::pair<QString, std::unique_ptr<PixmapLoader> > Item;
+	using Item = std::pair<QString, std::unique_ptr<PixmapLoader>>;
 
 	std::vector<Item> m_items;
 

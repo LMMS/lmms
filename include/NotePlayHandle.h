@@ -42,9 +42,8 @@ namespace lmms
 class InstrumentTrack;
 class NotePlayHandle;
 
-typedef QList<NotePlayHandle *> NotePlayHandleList;
-typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
-
+using NotePlayHandleList = QList<NotePlayHandle*>;
+using ConstNotePlayHandleList = QList<const NotePlayHandle*>;
 
 class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
@@ -65,7 +64,7 @@ public:
 		OriginArpeggio,		/*! created by arpeggio instrument function */
 		OriginCount
 	};
-	typedef Origins Origin;
+	using Origin = Origins;
 
 	NotePlayHandle( InstrumentTrack* instrumentTrack,
 					const f_cnt_t offset,

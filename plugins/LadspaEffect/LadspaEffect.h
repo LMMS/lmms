@@ -36,9 +36,8 @@
 namespace lmms
 {
 
-
-typedef struct PortDescription port_desc_t;
-typedef QVector<port_desc_t *> multi_proc_t;
+struct port_desc_t;
+using multi_proc_t = QVector<port_desc_t*>;
 
 class LadspaEffect : public Effect
 {

@@ -131,10 +131,10 @@ private:
 		unsigned long _framesPerBuffer, PaTimestamp _outTime, void * _arg );
 
 
-	typedef double PaTime;
-	typedef PaDeviceID PaDeviceIndex;
+	using PaTime = double;
+	using PaDeviceIndex = PaDeviceID;
 
-	typedef struct PaStreamParameters
+	using PaStreamParameters = struct
 	{
 		PaDeviceIndex device;
 		int channelCount;

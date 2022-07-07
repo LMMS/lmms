@@ -922,7 +922,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 			}
 			else if(node.nodeName() == "instrument")
 			{
-				typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+				using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 				PluginKey key(node.toElement().elementsByTagName("key").item(0).toElement());
 
 				if (reuseInstrument)

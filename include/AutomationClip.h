@@ -61,8 +61,8 @@ public:
 		CubicHermiteProgression
 	} ;
 
-	typedef QMap<int, AutomationNode> timeMap;
-	typedef QVector<QPointer<AutomatableModel>> objectVector;
+	using timeMap = QMap<int, AutomationNode>;
+	using objectVector = QVector<QPointer<AutomatableModel>>;
 
 	using TimemapIterator = timeMap::const_iterator;
 

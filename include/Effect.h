@@ -236,10 +236,8 @@ private:
 
 } ;
 
-
-typedef Effect::Descriptor::SubPluginFeatures::Key EffectKey;
-typedef Effect::Descriptor::SubPluginFeatures::KeyList EffectKeyList;
-
+using EffectKey = Effect::Descriptor::SubPluginFeatures::Key;
+using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
 } // namespace lmms
 

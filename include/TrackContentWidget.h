@@ -132,7 +132,7 @@ private:
 
 	TrackView * m_trackView;
 
-	typedef QVector<ClipView *> clipViewVector;
+	using clipViewVector = QVector<ClipView*>;
 	clipViewVector m_clipViews;
 
 	QPixmap m_background;

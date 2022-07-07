@@ -120,8 +120,7 @@ private:
 		}
 	}
 
-
-	typedef QVector<QPair<int, MidiEvent> > EventVector;
+	using EventVector = QVector<QPair<int, MidiEvent>>;
 	EventVector m_events;
 	int m_timingDivision;
 

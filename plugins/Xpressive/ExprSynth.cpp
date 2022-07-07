@@ -43,10 +43,9 @@
 namespace lmms
 {
 
-
-typedef exprtk::symbol_table<float> symbol_table_t;
-typedef exprtk::expression<float> expression_t;
-typedef exprtk::parser<float> parser_t;
+using symbol_table_t = exprtk::symbol_table<float>;
+using expression_t = exprtk::expression<float>;
+using parser_t = exprtk::parser<float>;
 
 template <typename T,typename Functor,bool optimize>
 struct freefunc0 : public exprtk::ifunction<T>

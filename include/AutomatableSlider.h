@@ -73,7 +73,7 @@ private slots:
 } ;
 
 
-typedef IntModel sliderModel;
+using sliderModel = IntModel;
 
 } // namespace lmms::gui
 

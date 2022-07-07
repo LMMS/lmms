@@ -41,7 +41,7 @@ public:
 
 	blargg_err_t set_sample_rate(long sample_rate, long clock_rate);
 	long samples_avail() const;
-	typedef blip_sample_t sample_t;
+	using sample_t = blip_sample_t;
 	long read_samples(sample_t* out, long count);
 	void bass_freq(int freq);
 private:

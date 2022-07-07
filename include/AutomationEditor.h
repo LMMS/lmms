@@ -99,7 +99,7 @@ public slots:
 
 
 protected:
-	typedef AutomationClip::timeMap timeMap;
+	using timeMap = AutomationClip::timeMap;
 
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
