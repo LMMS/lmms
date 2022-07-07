@@ -400,9 +400,9 @@ bool MicrotunerConfig::applyScale()
 	newIntervals.emplace_back(1, 1);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-	QStringList input = m_keymapTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
+	QStringList input = m_scaleTextEdit->toPlainText().split('\n', Qt::SkipEmptyParts);
 #else
-	QStringList input = m_keymapTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
+	QStringList input = m_scaleTextEdit->toPlainText().split('\n', QString::SkipEmptyParts);
 #endif
 	for (auto &line: input)
 	{
