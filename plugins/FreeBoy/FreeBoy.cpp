@@ -365,18 +365,19 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 	if( tfp == 0 )
 	{
 		// Initialize noise channel...
-		//PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
+		// PRNG Frequency = (1048576 Hz / (ratio + 1)) / 2 ^ (shiftclockfreq + 1)
+		// When div_ratio = 0 the ratio should be 0.5. Since s = 0 is the only case where r = 0 gives
+		// a unique frequency, we can start by guessing s = r = 0 here and then skip r = 0 in the loop.
 		char clock_freq = 0;
-		char div_ratio = 1;
-		float closest_freq = 524288.0 / ( div_ratio * pow( 2.0, clock_freq + 1.0 ) );
+		char div_ratio = 0;
+		float closest_freq = 524288.0 / ( 0.5 * pow( 2.0, clock_freq + 1.0 ) );
 		// This nested for loop iterates over all possible combinations of clock frequency and dividing
 		// ratio and chooses the combination whose resulting frequency is closest to the note frequency
 		for ( char s = 0; s < 16; s++ )
 		{
-			for ( char r = 0 ; r < 8; r++ )
+			for ( char r = 1 ; r < 8; r++ )
 			{
-				float r_val = (r == 0 ? 0.5 : r);
-				float f = 524288.0 / ( r_val * pow( 2.0, s + 1.0 ) );
+				float f = 524288.0 / ( r * pow( 2.0, s + 1.0 ) );
 				if( fabs( freq - closest_freq ) > fabs( freq - f ) )
 				{
 					closest_freq = f;
