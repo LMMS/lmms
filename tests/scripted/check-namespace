@@ -21,19 +21,14 @@ def caption(my_str):
     print(f'\n# {my_str}\n')
 
 
-def error(where, my_str):
+def error(where, match, my_str):
     global errors
     errors += 1
-    print(f'Error: {where}: {my_str}')
+    if match:
+        line = match.string[:match.start()].count('\n') + 1  # first line is 1
+        where = f'{where}:{line}'
+    print(f'{where}: {my_str}')
 
-
-# if a string makes a classname, we need to check if that class is in the source
-# however, some of these strings name classes that are not from LMMS, so these can be ignored for such checks:
-def is_our_class(classname: str) -> int:
-    return classname[0] != 'Q'  # Qt classes
-
-
-# prepare some variables
 
 if not Path('.gitmodules').is_file():
     print('You need to call this script from the LMMS top directory')
@@ -52,51 +47,50 @@ known_no_namespace_lmms = {
     'plugins/CarlaBase/DummyCarla.cpp',
     # unclear why it has no namespace
     'plugins/ZynAddSubFx/RemoteZynAddSubFx.cpp',
-    # not our code
-    'include/aeffectx.h',
-    'include/fenv.h',
-    'plugins/Sf2Player/fluidsynthshims.h',
-    'plugins/MidiExport/MidiFile.hpp',
-    'plugins/ReverbSC/base.c',
-    'plugins/ReverbSC/base.h',
-    'plugins/ReverbSC/dcblock.c',
-    'plugins/ReverbSC/dcblock.h',
-    'plugins/ReverbSC/revsc.c',
-    'plugins/ReverbSC/revsc.h'
 }
 
-exclude_files_tmp = {
-    # too complex
-    'include/AudioPortAudio.h',
-    'src/core/audio/AudioPortAudio.cpp',
-    'include/RemotePluginBase.h',
-    'plugins/VstBase/RemoteVstPlugin.cpp',
-    'plugins/ReverbSC/ReverbSC.h',
+exclude_files = re.compile(
     # not ours:
-    'include/ladspa.h'
-    # f.startswith('plugins/LadspaEffect')
-    # f.__contains__('portsmf')
-}
-exclude_files = [
-    f for f in result.stdout.splitlines()
-		if f in exclude_files_tmp
-        or f.startswith('plugins/LadspaEffect/calf')
-        or f.startswith('plugins/LadspaEffect/caps')
-        or f.startswith('plugins/LadspaEffect/cmt')
-        or f.startswith('plugins/LadspaEffect/swh')
-        or f.startswith('plugins/LadspaEffect/tap')
-        or f.__contains__('portsmf')
-]
-files = [Path(f) for f in result.stdout.splitlines() if f not in exclude_files]
+    'include/(aeffectx|fenv|ladspa).h|'
+    'plugins/LadspaEffect/(calf|caps|cmt|swh|tap)/|'
+    'plugins/MidiExport/MidiFile.hpp|'
+    'plugins/ReverbSC/[a-z]|'
+    'plugins/Sf2Player/fluidsynthshims.h|'
+    '/portsmf/'
+)
 
-namespaces = re.compile(r'^\s*namespace\s*\S*', re.MULTILINE)
-no_include_after_namespace = re.compile(
-    r'^(\s*#\s*(?:include|if|el|endif)[^\n]*)*(namespace [\w:]+ [{]|#(?:ifn?def(?: [\w_]+)|if|endif|el)[a-z]*(?: // ?[\w_]+)?|[}](?: // namespace [\w:]+)?|\n)*$')
-has_namespace_lmms = re.compile(r'namespace\s+lmms', re.MULTILINE)
-all_braces_and_macros = re.compile(
-    r'[ \t]*#[ \t]*include|(?:(?:^|\n)namespace [\w:]+[ \n])?[{]|[}](?: // namespace [\w:]+)?|[ \t]*#[ \t]*(?:ifn?def(?: [\w_]+)?|if|el|endif(?: // [\w_]+)?)')
-extract_namespace = re.compile(r'(?:namespace|#ifn?def) ([\w:]+)')
-extract_namespace_from_end_comment = re.compile(r'(?:// namespace |#endif // )([\w_:]+)')
+files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
+
+statement_pattern = re.compile(
+    # IRRELEVANT STRINGS - by capturing these we prevent them from matching later
+    # Block comment or regular comment (including escaped newlines)
+    r'/[*](.|\n)*?[*]/|//(.*\\\n)*.*|'
+    # Small namespace that doesn't require an end comment
+    r'namespace *[\w:]*\s*{[^{}]*}|'
+    # ifdef of max 30 lines and with no other #if inside
+    r'^ *# *ifn?def(([^#\n]|#(?!if|endif))*\n){,30} *# *endif|'
+
+    # INTERESTING STRINGS - with (?P<name>...) you can do a backreference to \name later
+    # Macro followed by name or comment
+    r'^ *# *(?P<named_macro>ifn?def|endif)(( *// *| +)(?P<macro_name>\w+))?|'
+    # Other macros
+    r'^ *# *(?P<macro>include|if|el)|'
+    # Start of named namespace, or just a opening brace
+    r'(^ *namespace *(?P<namespace_start>[\w:]+)\s*)?(?P<opening_brace>{)|'
+    # End of namespace including comment, or just a closing brace
+    r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?|'
+
+    # MODIFIERS
+    # In all the regexes above match both tab and space when a space is used
+    r''.replace(' ', r'[\t ]'),
+    # Make ^ match on every line, not just beginning of file
+    re.MULTILINE)
+
+# Comments and whitespace followed by header guard
+header_guard_pattern = re.compile(r'^(/[*](.|\n)*?[*]/|//.*|\s)*#\s*(ifndef|pragma\s+once)')
+
+# Namespace lmms
+namespace_pattern = re.compile(r'^\s*namespace\s+lmms', re.MULTILINE)
 
 #
 # the real code
@@ -104,97 +98,50 @@ extract_namespace_from_end_comment = re.compile(r'(?:// namespace |#endif // )([
 
 caption('namespace checks')
 
-
-# remove all pairs of parentheses and #ifs (and, depending on the 2nd param, also of namespace parentheses)
-# if there is no further opening parentheses/#if/namespace in between
-def eliminate_parentheses(arr, also_incs_and_namespace: bool):
-    removed = 1
-    cur_size = len(arr)
-    # print(f'{cur_file}: {results}')
-    while removed:
-        removed = 0
-        for i in range(0, cur_size):
-            if results[i] == '#include' and also_incs_and_namespace:
-                results[i] = ''
-            elif results[i] == '{' or results[i].startswith('#if') or (
-                    also_incs_and_namespace and results[i].startswith('namespace')):
-                for j in range(i + 1, cur_size):
-                    if (len(results[j]) > 0 and results[j][0] == '}' and (results[i] == '{' or results[i].startswith('namespace')))\
-                            or (len(results[j]) > 0 and results[j].startswith('#endif') and results[i].startswith('#if')):
-                        # if this is a namespace pair, make sure the end comment matches
-                        match = extract_namespace_from_end_comment.search(results[j])
-                        if match:
-                            match2 = extract_namespace.search(results[i])
-                            if match2 and match.group(1) != match2.group(1):
-                                error(cur_file, f'namespace/macro ("{match2.group(1)}") does not match end ("{match.group(1)}")')
-                        # blank out the range between opening and closing symbols
-                        for k in range(i, j + 1):
-                            results[k] = ''
-                            removed = removed + 1
-                        break
-                    elif not (results[j] == '' or results[j] == '#el' or (
-                                also_incs_and_namespace and results[j].startswith(
-                                    '#include'))):  # can only be '{', #if... etc. so we can't eliminate starting at 'i'
-                        break
-        # print(f'{last_size} -> {cur_size}')
-        # print(f'{cur_file}: {results}')
-
-
 for cur_file in files:
     if cur_file.is_file():
-        results = namespaces.findall(cur_file.read_text(errors='replace'))
-        results_as_str = '\n'.join(results)
-        # print(f'{cur_file}: {results_as_str}')
+        cur_text = cur_file.read_text(errors='replace')
 
         if str(cur_file) not in known_no_namespace_lmms:
-            has_namespace_lmms.search(results_as_str) or error(cur_file, f'File has no namespace lmms')
+            namespace_pattern.search(cur_text) or error(cur_file, None, f'File has no namespace lmms')
 
-        debugfile = ''  # 'include/RemotePluginBase.h' # debugging
+        header_guard = str(cur_file).endswith('.h')
+        found_start_of_code = False
+        expected_statements = []  # [(statement, argument)]
 
-        # remove comments
-        cur_text = cur_file.read_text(errors='replace')
-        cur_text = re.sub(r'(^|[^/])/\*(.|\n)*?\*/', r'\1', cur_text)
-        cur_text = re.sub(r'// namespace', r'//%namespace', cur_text, 0, re.MULTILINE)
-        cur_text = re.sub(r'#endif // ?([A-Z_]+)$', r'#endif //%\1', cur_text, 0, re.MULTILINE)
-        if str(cur_file) == debugfile:
-            print(cur_text)
-        cur_text = re.sub(r'//[^%].*$', r'', cur_text, 0, re.MULTILINE)
-        cur_text = re.sub(r'#endif //%([A-Z_]+)$', r'#endif // \1', cur_text, 0, re.MULTILINE)
-        cur_text = re.sub(r'//%namespace', r'// namespace', cur_text, 0, re.MULTILINE)
+        if header_guard:
+            if not header_guard_pattern.match(cur_text):
+                error(cur_file, None, 'First statement should be header guard')
+                header_guard = False
 
-        # get list of all #include, #if../#el../#endif and {, }, namespace ... {
-        results = all_braces_and_macros.findall(cur_text)
+        for m in statement_pattern.finditer(cur_text):
+            macro = m.group('macro') or m.group('named_macro') or ''
+            name = m.group('macro_name') or m.group('namespace_start') or m.group('namespace_end') or ''
+            brace = m.group('opening_brace') or m.group('closing_brace') or ''
 
-        if str(cur_file) == debugfile:
-            print(cur_text)
-            print(f'{cur_file}: {results}')
+            if not macro and not brace:
+                continue
+            elif brace:
+                found_start_of_code = True
 
-        # remove all ' ' and '\t' from results
-        results = [mystr.strip() for mystr in results]
-        results = [re.sub(r'#\s+', '#', mystr) for mystr in results]
-        results = [re.sub(r'\s+{', ' {', mystr) for mystr in results]
-
-        # eliminate non namespace parentheses and #if../#el../#endif
-        eliminate_parentheses(results, False)
-
-        # the remainder should be solely includes + >=0 namespaces
-        results_as_str = '\n'.join(results)
-        no_include_after_namespace.match(results_as_str) or error(cur_file,
-                                                                  f'File "{cur_file}" has includes inside/after a namespace: {results_as_str}')
-
-        if str(cur_file) == debugfile:
-            print(f'{cur_file}: {results}')
-
-        # now also remove #include and the namespaces - the resulting string must be empty
-        eliminate_parentheses(results, True)
-        results_as_str = ''.join(results).replace(' ', '')
-        results_as_str == '' or error(cur_file, f'File "{cur_file}" is misformatted: {results_as_str}')
-
-        if str(cur_file) == debugfile:
-            print("FINAL:")
-            print(f'{cur_file}: {results}')
-
-        # print(f'{cur_file}: {results}')
+            if macro == 'include' and found_start_of_code:
+                error(cur_file, m, '#include after beginning of C++ code')
+            elif macro.startswith('if'):
+                # Require no end comment for the header guard
+                expected_statements.append(('endif', name if not header_guard else None))
+                header_guard = False
+            elif macro == 'el':
+                exp = expected_statements[-1][0]
+                if exp != 'endif':
+                    error(cur_file, m, f'Expected {exp} before #el')
+            elif macro == 'endif' or brace == '}':
+                exp, expected_name = expected_statements.pop()
+                if (macro or brace) != exp:
+                    error(cur_file, m, f'Expected {exp} before {macro or brace}')
+                elif expected_name and name != expected_name:
+                    error(cur_file, m, f'Missing comment // {"namespace " if brace else ""}{expected_name}')
+            elif brace == '{':
+                expected_statements.append(('}', name))
 
 caption('summary')
 
