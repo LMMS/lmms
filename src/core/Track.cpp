@@ -64,9 +64,9 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
+	m_color(std::in_place, 0, 0, 0),
 	m_clips()        /*!< The clips (segments) */
-{
-	m_color = QColor(0,0,0);
+{	
 	m_trackContainer->addTrack( this );
 	m_height = -1;
 }
@@ -647,7 +647,7 @@ void Track::setColor(const QColor& c)
 
 void Track::resetColor()
 {
-	m_color = { };
+	m_color = std::nullopt;
 	emit colorChanged();
 }
 

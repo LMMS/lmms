@@ -789,8 +789,7 @@ void Mixer::loadSettings( const QDomElement & _this )
 		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
 		if( mixch.hasAttribute( "color" ) )
 		{
-			auto col = QColor(mixch.attribute( "color" ));
-			m_mixerChannels[num]->m_color = col;
+			m_mixerChannels[num]->m_color = QColor(mixch.attribute( "color" ));
 		}
 
 		m_mixerChannels[num]->m_fxChain.restoreState( mixch.firstChildElement(

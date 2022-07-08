@@ -447,7 +447,7 @@ void MixerLine::selectColor()
 // Disable the usage of color on this mixer line
 void MixerLine::resetColor()
 {
-	Engine::mixer()->mixerChannel( m_channelIndex )->m_color = { };
+	Engine::mixer()->mixerChannel( m_channelIndex )->m_color = std::nullopt;
 	Engine::getSong()->setModified();
 	update();
 }
