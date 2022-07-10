@@ -479,14 +479,21 @@ void MixerView::setAutoTrackConstraints()
 	bool wasModified = false;
 	for(unsigned long i = 0; i < usedChannelCounts.size(); i++)
 	{
-		if (settings.enabled && mix->mixerChannel(i)->m_autoTrackLinkModel.value())
+		if (mix->mixerChannel(i)->m_autoTrackLinkModel.value())
 		{
-			// no more linked tracks or too many linked tracks
-			if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 &&
-				settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToOne))
+			if (settings.enabled)
 			{
-				mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
-				wasModified = true;
+				// no more linked tracks or too many linked tracks
+				if (usedChannelCounts[i] == 0 || (usedChannelCounts[i] > 1 &&
+					settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToOne))
+				{
+					mix->mixerChannel(i)->m_autoTrackLinkModel.setValue(false);
+					wasModified = true;
+				}
+			}
+			else
+			{
+				m_mixerChannelViews[newChannelIndex]->m_mixerLine->refreshAutoTrackLinkStyle();
 			}
 		}
 	}

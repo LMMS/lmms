@@ -136,7 +136,7 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );	
 	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
-	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_autoTrackLinkModel, SIGNAL( dataChanged() ), this, SLOT( autoTrackLinkChanged() ) );
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_autoTrackLinkModel, SIGNAL( dataChanged() ), this, SLOT( refreshAutoTrackLinkStyle() ) );
 }
 
 
@@ -155,7 +155,7 @@ void MixerLine::setChannelIndex( int index )
 	m_channelIndex = index;
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->update();
-	autoTrackLinkChanged();
+	refreshAutoTrackLinkStyle();
 }
 
 
@@ -297,7 +297,7 @@ void MixerLine::toogleAutoTrackLink()
 	mixView->toggleAutoTrackLink(m_channelIndex);
 }
 
-void MixerLine::autoTrackLinkChanged()
+void MixerLine::refreshAutoTrackLinkStyle()
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();

@@ -106,7 +106,8 @@ public slots:
 	void renameChannel();
 	void resetColor();
 	void selectColor();
-	void randomizeColor();	
+	void randomizeColor();
+	void refreshAutoTrackLinkStyle();
 
 private slots:
 	void renameFinished();
@@ -115,7 +116,6 @@ private slots:
 	void moveChannelLeft();
 	void moveChannelRight();
 	void toogleAutoTrackLink();
-	void autoTrackLinkChanged();
 };
 
 
