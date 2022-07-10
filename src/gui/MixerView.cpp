@@ -144,7 +144,6 @@ MixerView::MixerView() :
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	//ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
-	bl->addWidget(newChannelBtn, 0, Qt::AlignTop );
 
 	QMenu * toMenu = new QMenu(this );
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
@@ -155,12 +154,18 @@ MixerView::MixerView() :
 	m_autoLinkTrackSettingsBtn->setFocusPolicy( Qt::NoFocus );
 	m_autoLinkTrackSettingsBtn->setMenu( toMenu );
 	m_autoLinkTrackSettingsBtn->setToolTip(tr("Auto track link settings"));
-	bl->addWidget(m_autoLinkTrackSettingsBtn, 0, Qt::AlignTop );
 
 	m_toogleAutoLinkTrackConfigBtn = new QPushButton(this);
 	m_toogleAutoLinkTrackConfigBtn->setToolTip(tr("Enable/Disable auto track linking"));
 	connect( m_toogleAutoLinkTrackConfigBtn, SIGNAL(clicked()), this, SLOT(toogleAutoLinkTrackConfig()));
 	updateAutoLinkTrackConfigBtn(Engine::mixer()->getAutoLinkTrackSettings().enabled);
+
+	m_autoLinkTrackSettingsBtn->setFixedSize(mixerLineSize.width(), 34);
+	m_toogleAutoLinkTrackConfigBtn->setFixedSize(mixerLineSize.width(), 34);
+	newChannelBtn->setFixedSize(mixerLineSize.width(), mixerLineSize.height()-34*2);
+
+	bl->addWidget(newChannelBtn, 0, Qt::AlignTop );
+	bl->addWidget(m_autoLinkTrackSettingsBtn, 0, Qt::AlignTop );
 	bl->addWidget(m_toogleAutoLinkTrackConfigBtn, 0, Qt::AlignTop );
 
 
@@ -430,17 +435,41 @@ void MixerView::updateAfterTrackStyleModify(Track * track)
 	}
 }
 
-void MixerView::updateAfterTrackMixerLineModify(Track * track)
+void MixerView::trackMixerLineAssign(Track * track, int channelIndex)
 {
 	auto mix = Engine::mixer();
 	auto settings =mix->getAutoLinkTrackSettings();
-	if (!settings.enabled) return;
+
 	IntModel * model = mix->getChannelModelByTrack(track);
-	if (model != nullptr)
+	model->setValue( channelIndex );
+
+	if (settings.enabled)
 	{
-		setAutoTrackConstraints();
+		IntModel * model = mix->getChannelModelByTrack(track);
+		if (model != nullptr)
+		{
+			setAutoTrackConstraints();
+		}
 	}
+	setCurrentMixerLine(channelIndex);
 }
+
+void MixerView::trackMixerLineCreate(Track * track)
+{
+	int channelIndex = addNewChannel();
+	auto channel = Engine::mixer()->mixerChannel(channelIndex);
+
+	channel->m_name = track->name();
+	if (track->useColor()) { channel->setColor (track->color()); }
+
+	IntModel * model = Engine::mixer()->getChannelModelByTrack(track);
+	model->setValue( channelIndex );
+
+	toggleAutoTrackLink(channelIndex);
+
+	setCurrentMixerLine(channelIndex);
+}
+
 
 void MixerView::setAutoTrackConstraints()
 {

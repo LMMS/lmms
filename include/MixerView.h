@@ -115,7 +115,8 @@ public:
 	// Auto track link support	
 	void updateAfterTrackAdd(Track * track, QString name = "");
 	void updateAfterTrackStyleModify(Track * track);
-	void updateAfterTrackMixerLineModify(Track * track);
+	void trackMixerLineCreate(Track * track);
+	void trackMixerLineAssign(Track * track, int channelIndex);
 	void updateAfterTrackMove(Track * track);
 	void updateBeforeTrackDelete(Track * track);
 	void toggleAutoTrackLink(int index);
