@@ -42,7 +42,7 @@ namespace lmms
 
 
 struct ConnectPortVisitor;
-typedef struct LV2_Evbuf_Impl LV2_Evbuf;
+using LV2_Evbuf = struct LV2_Evbuf_Impl;
 
 namespace Lv2Ports {
 

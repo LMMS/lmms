@@ -62,7 +62,7 @@ class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+	using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
 	QString name() const;
 

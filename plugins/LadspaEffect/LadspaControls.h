@@ -33,7 +33,7 @@ namespace lmms
 
 
 class LadspaControl;
-typedef QVector<LadspaControl *> control_list_t;
+using control_list_t = QVector<LadspaControl*>;
 
 class LadspaEffect;
 

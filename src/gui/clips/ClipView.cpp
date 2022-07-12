@@ -523,7 +523,7 @@ DataFile ClipView::createClipDataFiles(
 	DataFile dataFile( DataFile::DragNDropData );
 	QDomElement clipParent = dataFile.createElement("clips");
 
-	typedef QVector<ClipView *> clipViewVector;
+	using clipViewVector = QVector<ClipView*>;
 	for( clipViewVector::const_iterator it = clipViews.begin();
 			it != clipViews.end(); ++it )
 	{

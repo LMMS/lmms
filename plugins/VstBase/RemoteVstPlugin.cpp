@@ -475,7 +475,7 @@ private:
 	std::mutex m_shmLock;
 	bool m_shmValid;
 
-	typedef std::vector<VstMidiEvent> VstMidiEventList;
+	using VstMidiEventList = std::vector<VstMidiEvent>;
 	VstMidiEventList m_midiEvents;
 
 	bpm_t m_bpm;
@@ -491,10 +491,7 @@ private:
 	} ;
 
 	in * m_in;
-
-	const VstSyncData* m_vstSyncData;
-
-} ;
+};
 
 
 
@@ -523,28 +520,9 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 ),
 	m_currentProgram( -1 ),
-	m_in( nullptr ),
-	m_vstSyncData( nullptr )
+	m_in( nullptr )
 {
 	__plugin = this;
-
-	m_vstSyncData = RemotePluginClient::getVstSyncData();
-	if( m_vstSyncData == nullptr )
-	{
-		fprintf(stderr, "RemoteVstPlugin.cpp: "
-			"Failed to initialize shared memory for VST synchronization.\n"
-			" (VST-host synchronization will be disabled)\n");
-		const auto vstSyncData = (VstSyncData*) malloc( sizeof( VstSyncData ) );
-		vstSyncData->isPlaying = true;
-		vstSyncData->timeSigNumer = 4;
-		vstSyncData->timeSigDenom = 4;
-		vstSyncData->ppqPos = 0;
-		vstSyncData->isCycle = false;
-		vstSyncData->hasSHM = false;
-		vstSyncData->m_playbackJumped = false;
-		vstSyncData->m_sampleRate = sampleRate();
-		m_vstSyncData = vstSyncData;
-	}
 
 	m_in = ( in* ) new char[ sizeof( in ) ];
 	m_in->lastppqPos = 0;
@@ -571,12 +549,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	destroyEditor();
 	setResumed( false );
 	pluginDispatch( effClose );
-
-	if (!m_vstSyncData->hasSHM)
-	{
-		delete m_vstSyncData;
-		m_vstSyncData = nullptr;
-	}
 
 	if( m_libInst != nullptr )
 	{
@@ -997,8 +969,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	}
 #endif
 
-	typedef AEffect * ( VST_CALL_CONV * mainEntryPointer )
-						( audioMasterCallback );
+	using mainEntryPointer = AEffect* (VST_CALL_CONV*) (audioMasterCallback);
 #ifndef NATIVE_LINUX_VST
 	mainEntryPointer mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "VSTPluginMain" );
@@ -1808,86 +1779,71 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			return 0;
 
 		case audioMasterGetTime:
+		{
 			SHOW_CALLBACK( "amc: audioMasterGetTime\n" );
 			// returns const VstTimeInfo* (or 0 if not supported)
 			// <value> should contain a mask indicating which
 			// fields are required (see valid masks above), as some
 			// items may require extensive conversions
 
-			// Shared memory was initialised? - see song.cpp
-			//assert( __plugin->m_vstSyncData != nullptr );
+			const auto syncData = __plugin->getVstSyncData();
+			assert(syncData != nullptr);
 
 			memset( &_timeInfo, 0, sizeof( _timeInfo ) );
 			_timeInfo.samplePos = __plugin->m_currentSamplePos;
-			_timeInfo.sampleRate = __plugin->m_vstSyncData->hasSHM ?
-							__plugin->m_vstSyncData->m_sampleRate :
-							__plugin->sampleRate();
+			_timeInfo.sampleRate = syncData->m_sampleRate;
 			_timeInfo.flags = 0;
-			_timeInfo.tempo = __plugin->m_vstSyncData->hasSHM ?
-							__plugin->m_vstSyncData->m_bpm :
-							__plugin->m_bpm;
-			_timeInfo.timeSigNumerator = __plugin->m_vstSyncData->timeSigNumer;
-			_timeInfo.timeSigDenominator = __plugin->m_vstSyncData->timeSigDenom;
+			_timeInfo.tempo = syncData->m_bpm;
+			_timeInfo.timeSigNumerator = syncData->timeSigNumer;
+			_timeInfo.timeSigDenominator = syncData->timeSigDenom;
 			_timeInfo.flags |= kVstTempoValid;
 			_timeInfo.flags |= kVstTimeSigValid;
 
-			if( __plugin->m_vstSyncData->isCycle )
+			if (syncData->isCycle)
 			{
-				_timeInfo.cycleStartPos = __plugin->m_vstSyncData->cycleStart;
-				_timeInfo.cycleEndPos = __plugin->m_vstSyncData->cycleEnd;
+				_timeInfo.cycleStartPos = syncData->cycleStart;
+				_timeInfo.cycleEndPos = syncData->cycleEnd;
 				_timeInfo.flags |= kVstCyclePosValid;
 				_timeInfo.flags |= kVstTransportCycleActive;
 			}
 
-			if( __plugin->m_vstSyncData->ppqPos != 
-							__plugin->m_in->m_Timestamp )
+			if (syncData->ppqPos != __plugin->m_in->m_Timestamp)
 			{
-				_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;
-				__plugin->m_in->lastppqPos = __plugin->m_vstSyncData->ppqPos;
-				__plugin->m_in->m_Timestamp = __plugin->m_vstSyncData->ppqPos;
+				_timeInfo.ppqPos = syncData->ppqPos;
+				__plugin->m_in->lastppqPos = syncData->ppqPos;
+				__plugin->m_in->m_Timestamp = syncData->ppqPos;
 			}
-			else if( __plugin->m_vstSyncData->isPlaying )
+			else if (syncData->isPlaying)
 			{
-				if( __plugin->m_vstSyncData->hasSHM )
-				{
-					__plugin->m_in->lastppqPos +=
-						__plugin->m_vstSyncData->m_bpm / 60.0
-						* __plugin->m_vstSyncData->m_bufferSize
-						/ __plugin->m_vstSyncData->m_sampleRate;
-				}
-				else
-				{
-					__plugin->m_in->lastppqPos +=
-						__plugin->m_bpm / 60.0
-						* __plugin->bufferSize()
-						/ __plugin->sampleRate();
-				}
+				__plugin->m_in->lastppqPos +=
+					syncData->m_bpm / 60.0
+					* syncData->m_bufferSize
+					/ syncData->m_sampleRate;
 				_timeInfo.ppqPos = __plugin->m_in->lastppqPos;
 			}
-//			_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;
+//			_timeInfo.ppqPos = syncData->ppqPos;
 			_timeInfo.flags |= kVstPpqPosValid;
 
-			if( __plugin->m_vstSyncData->isPlaying )
+			if (syncData->isPlaying)
 			{
 				_timeInfo.flags |= kVstTransportPlaying;
 			}
-			_timeInfo.barStartPos = ( (int) ( _timeInfo.ppqPos / 
-				( 4 *__plugin->m_vstSyncData->timeSigNumer
-				/ (float) __plugin->m_vstSyncData->timeSigDenom ) ) ) *
-				( 4 * __plugin->m_vstSyncData->timeSigNumer
-				/ (float) __plugin->m_vstSyncData->timeSigDenom );
+			_timeInfo.barStartPos = ((int) (_timeInfo.ppqPos
+				/ (4 * syncData->timeSigNumer / (float) syncData->timeSigDenom)))
+				* (4 * syncData->timeSigNumer / (float) syncData->timeSigDenom);
 
 			_timeInfo.flags |= kVstBarsValid;
 
-			if( ( _timeInfo.flags & ( kVstTransportPlaying | kVstTransportCycleActive ) ) !=
-				( __plugin->m_in->m_lastFlags & ( kVstTransportPlaying | kVstTransportCycleActive ) )
-				|| __plugin->m_vstSyncData->m_playbackJumped )
+			if ((_timeInfo.flags & (kVstTransportPlaying | kVstTransportCycleActive))
+				!= (__plugin->m_in->m_lastFlags & (kVstTransportPlaying | kVstTransportCycleActive))
+				|| syncData->m_playbackJumped)
 			{
 				_timeInfo.flags |= kVstTransportChanged;
 			}
 			__plugin->m_in->m_lastFlags = _timeInfo.flags;
 
 			return (intptr_t) &_timeInfo;
+		}
 
 		case audioMasterProcessEvents:
 			SHOW_CALLBACK( "amc: audioMasterProcessEvents\n" );

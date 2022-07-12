@@ -52,7 +52,7 @@ public:
 		TypeSamplePlayHandle = 0x04,
 		TypePresetPreviewHandle = 0x08
 	} ;
-	typedef Types Type;
+	using Type = Types;
 
 	enum
 	{
@@ -161,9 +161,8 @@ private:
 	AudioPort * m_audioPort;
 } ;
 
-
-typedef QList<PlayHandle *> PlayHandleList;
-typedef QList<const PlayHandle *> ConstPlayHandleList;
+using PlayHandleList = QList<PlayHandle*>;
+using ConstPlayHandleList = QList<const PlayHandle*>;
 
 } // namespace lmms
 

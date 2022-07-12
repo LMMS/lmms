@@ -112,7 +112,7 @@ public:
 
 
 private:
-	typedef QHash<jo_id_t, JournallingObject *> JoIdMap;
+	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
 
 	struct CheckPoint
 	{
@@ -124,8 +124,8 @@ private:
 		jo_id_t joID;
 		DataFile data;
 	} ;
-	typedef std::vector<CheckPoint> CheckPointBatch;
-	typedef std::vector<CheckPointBatch> CheckPointStack;
+	using CheckPointBatch = std::vector<CheckPoint>;
+	using CheckPointStack = std::vector<CheckPointBatch>;
 
 	bool isBatching() { return m_batchGuardCount > 0; }
 	void batchGuardDestroyed();

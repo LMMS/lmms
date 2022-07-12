@@ -73,6 +73,7 @@ protected slots:
 
 	void resetName();
 	void changeName();
+	void transposeSelection();
 
 
 protected:

@@ -57,7 +57,7 @@ private:
 		BarsTicks,
 		DisplayModeCount
 	};
-	typedef DisplayModes DisplayMode;
+	using DisplayMode = DisplayModes;
 
 	void setDisplayMode( DisplayMode displayMode );
 

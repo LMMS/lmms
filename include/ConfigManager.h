@@ -303,8 +303,8 @@ private:
 	unsigned int m_configVersion;
 	QStringList m_recentlyOpenedProjects;
 
-	typedef QVector<QPair<QString, QString> > stringPairVector;
-	typedef QMap<QString, stringPairVector> settingsMap;
+	using stringPairVector = QVector<QPair<QString, QString>>;
+	using settingsMap = QMap<QString, stringPairVector>;
 	settingsMap m_settings;
 
 

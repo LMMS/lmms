@@ -36,8 +36,7 @@ namespace lmms
 
 class PeakControllerEffect;
 
-typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;
-
+using PeakControllerEffectVector = QVector<PeakControllerEffect*>;
 
 class LMMS_EXPORT PeakController : public Controller
 {

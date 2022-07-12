@@ -61,7 +61,7 @@ private:
 	virtual void writeBuffer( const sampleFrame * _ab,
 						const f_cnt_t _frames );
 
-	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
+	using bufferList = QList<QPair<sampleFrame*, f_cnt_t>>;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
 	TimePos m_minLength;

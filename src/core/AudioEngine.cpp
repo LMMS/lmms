@@ -64,9 +64,7 @@
 namespace lmms
 {
 
-
-typedef LocklessList<PlayHandle *>::Element LocklessListElement;
-
+using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread;
 

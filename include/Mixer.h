@@ -39,7 +39,7 @@ namespace lmms
 
 
 class MixerRoute;
-typedef QVector<MixerRoute *> MixerRouteVector;
+using MixerRouteVector = QVector<MixerRoute*>;
 
 class MixerChannel : public ThreadableJob
 {

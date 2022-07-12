@@ -67,7 +67,7 @@ public:
 
 	private:
 		QMutex m_lfoListMutex;
-		typedef QList<EnvelopeAndLfoParameters *> LfoList;
+		using LfoList = QList<EnvelopeAndLfoParameters*>;
 		LfoList m_lfos;
 
 	} ;

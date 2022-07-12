@@ -86,7 +86,7 @@ signals:
 
 } ;
 
-typedef IntModel LcdSpinBoxModel;
+using LcdSpinBoxModel = IntModel;
 
 } // namespace lmms::gui
 

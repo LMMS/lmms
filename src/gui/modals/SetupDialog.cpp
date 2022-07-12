@@ -136,8 +136,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
 	m_vstAlwaysOnTop(ConfigManager::inst()->value(
 			"ui", "vstalwaysontop").toInt()),
-	m_syncVSTPlugins(ConfigManager::inst()->value(
-			"ui", "syncvstplugins", "1").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
 			"ui", "disableautoquit", "1").toInt()),
 	m_NaNHandler(ConfigManager::inst()->value(
@@ -432,9 +430,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstAlwaysOnTopCheckBox->setVisible(m_vstEmbedMethod == "none");
 	connect(m_vstAlwaysOnTopCheckBox, SIGNAL(toggled(bool)),
 			this, SLOT(toggleVSTAlwaysOnTop(bool)));
-
-	addLedCheckBox(tr("Sync VST plugins to host playback"), plugins_tw, counter,
-		m_syncVSTPlugins, SLOT(toggleSyncVSTPlugins(bool)), false);
 
 	addLedCheckBox(tr("Keep effects running even without input"), plugins_tw, counter,
 		m_disableAutoQuit, SLOT(toggleDisableAutoQuit(bool)), false);
@@ -948,8 +943,6 @@ void SetupDialog::accept()
 					m_vstEmbedComboBox->currentData().toString());
 	ConfigManager::inst()->setValue("ui", "vstalwaysontop",
 					QString::number(m_vstAlwaysOnTop));
-	ConfigManager::inst()->setValue("ui", "syncvstplugins",
-					QString::number(m_syncVSTPlugins));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",
 					QString::number(m_disableAutoQuit));
 	ConfigManager::inst()->setValue("audioengine", "audiodev",
@@ -1127,12 +1120,6 @@ void SetupDialog::toggleSmoothScroll(bool enabled)
 void SetupDialog::toggleAnimateAFP(bool enabled)
 {
 	m_animateAFP = enabled;
-}
-
-
-void SetupDialog::toggleSyncVSTPlugins(bool enabled)
-{
-	m_syncVSTPlugins = enabled;
 }
 
 

@@ -53,7 +53,7 @@ private slots:
 
 private:
 	QButtonGroup m_btnGroup;
-	typedef QMap<QToolButton *, QWidget *> ButtonMap;
+	using ButtonMap = QMap<QToolButton*, QWidget*>;
 	ButtonMap m_widgets;
 
 } ;
