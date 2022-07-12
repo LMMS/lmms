@@ -55,7 +55,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_loopRectangleVerticalPadding( 1 ),
 	m_barLineColor( 192, 192, 192 ),
 	m_barNumberColor( m_barLineColor.darker( 120 ) ),
-	m_autoScroll( AutoScrollEnabled ),
+	m_autoScroll( AutoScrollDisabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
 	m_changedPosition( true ),
@@ -127,6 +127,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
 	connect( autoScroll, SIGNAL(changedState(int)), this,
 					SLOT(toggleAutoScroll(int)));
+	autoScroll->changeState(AutoScrollDisabled);
 
 	NStateButton * loopPoints = new NStateButton( _tool_bar );
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
