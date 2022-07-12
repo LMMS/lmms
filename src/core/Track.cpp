@@ -585,24 +585,25 @@ bar_t Track::length() const
  */
 void Track::toggleSolo()
 {
-	// The solo led will have created its own checkpoint already, so we append to that batch
-	Engine::projectJournal()->beginBatchCheckPoint(/*append*/ true);
-
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
-	for( TrackContainer::TrackList::const_iterator it = tl.begin();
-							it != tl.end(); ++it )
+	for (Track* track: tl)
 	{
-		if( *it != this )
+		if (track != this && track->m_soloModel.value())
 		{
-			if( ( *it )->m_soloModel.value() )
-			{
-				soloBefore = true;
-				break;
-			}
+			// The toggled solo led will have created a journal checkpoint already (see AutomatableModel::setValue)
+			// Now we are implicitly changing another solo led, so we must save that to the same checkpoint.
+			auto batchAction = Engine::projectJournal()->beginBatchAction(/*append*/ true);
+			track->addJournalCheckPoint();
+			soloBefore = true;
+			break;
 		}
 	}
+
+	// No other changes needs to be journaled since they will happen automatically once solo is toggled
+	bool journalingBefore = Engine::projectJournal()->isJournalling();
+	Engine::projectJournal()->setJournalling(false);
 
 	const bool solo = m_soloModel.value();
 	// Should we use the new behavior of solo or the older/legacy one?
@@ -642,7 +643,7 @@ void Track::toggleSolo()
 			}
 		}
 	}
-	Engine::projectJournal()->endBatchCheckPoint();
+	Engine::projectJournal()->setJournalling(journalingBefore);
 }
 
 void Track::setColor(const QColor& c)

@@ -482,7 +482,7 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 	offset = std::max(offset.getTicks(), -leftmostPos.getTicks());
 
 	// Create clips on the relevant tracks
-	Engine::projectJournal()->beginBatchCheckPoint();
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	for( int i = 0; i<clipNodes.length(); i++ )
 	{
 		QDomElement outerClipElement = clipNodes.item( i ).toElement();
@@ -507,7 +507,6 @@ bool TrackContentWidget::pasteSelection( TimePos clipPos, const QMimeData * md, 
 			clip->selectViewOnCreate( true );
 		}
 	}
-	Engine::projectJournal()->endBatchCheckPoint();
 
 	AutomationClip::resolveAllIDs();
 

@@ -76,19 +76,23 @@ void ProjectJournal::restoreCheckPoint(ProjectJournal::CheckPointStack& restoreS
 {
 	while (!restoreStack.empty())
 	{
-		BatchCheckPoint backup;
+		CheckPointBatch backup;
 
 		// For every checkpoint (journaled object) in the last batch...
 		for (CheckPoint& restorePoint: restoreStack.back())
 		{
 			JournallingObject* jo = journallingObject(restorePoint.joID);
-			// TODO when can this be null?
-			if (!jo) { continue; }
+			// If the object with this ID has been destroyed there's an implementation problem somewhere else
+			if (!jo)
+			{
+				fprintf(stderr, "Cannot undo/redo changes on a deleted object\n");
+				continue;
+			}
 
 			// Create a backup of the object's current state
 			DataFile curState(DataFile::JournalData);
 			jo->saveState( curState, curState.content() );
-			backup.push_back(CheckPoint(restorePoint.joID, curState));
+			backup.emplace_back(restorePoint.joID, curState);
 
 			// Restore object to its previous state
 			bool prev = isJournalling();
@@ -98,11 +102,7 @@ void ProjectJournal::restoreCheckPoint(ProjectJournal::CheckPointStack& restoreS
 			Engine::getSong()->setModified();
 		}
 		restoreStack.pop_back();
-
-		// Keep trying until something is restored
-		if (backup.empty()) { continue; }
-
-		backupStack.push_back(backup);
+		backupStack.push_back(std::move(backup));
 		return;
 	}
 }
@@ -133,11 +133,11 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		m_redoCheckPoints.clear();
 
 		// If we're not batching checkpoints, begin on a new one
-		if (m_batchingCount == 0 || m_undoCheckPoints.empty())
+		if (!isBatching() || m_undoCheckPoints.empty())
 		{
 			m_undoCheckPoints.emplace_back();
 		}
-		BatchCheckPoint& batch = m_undoCheckPoints.back();
+		CheckPointBatch& batch = m_undoCheckPoints.back();
 
 		// If this object already has a checkpoint in the batch, skip it
 		for (const CheckPoint& checkpoint: batch)
@@ -148,7 +148,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 		// Create a checkpoint and save it to the batch
 		DataFile dataFile( DataFile::JournalData );
 		jo->saveState( dataFile, dataFile.content() );
-		batch.push_back(CheckPoint(jo->id(), dataFile));
+		batch.emplace_back(jo->id(), dataFile);
 
 		// Remove excessive checkpoints from the stack
 		if( m_undoCheckPoints.size() > MAX_UNDO_STATES )
@@ -161,30 +161,39 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 
 
-/*! \brief Start adding checkpoints together as a batch
+/*! \brief Start grouping new checkpoints together in a batch
  *
- *  \param append - Don't create a new batch, use the last checkpoint
+ *  Returns a BatchActionGuard that must be kept for the whole scope of the batch action.
+ *  If batching is already ongoing, checkpoints will be appended to the existing batch.
+ *  Batching ends when all BatchActionGuards goes out of scope or are destroyed.
+ *
+ *  \param append - Don't begin on a new batch, append to the last one instead.
+ *                  This is used as a workaround when we want add more checkpoints to a
+ *                  checkpoint/batch that has already been created.
  */
-void ProjectJournal::beginBatchCheckPoint(bool append)
+ProjectJournal::BatchActionGuard ProjectJournal::beginBatchAction(bool append)
 {
-	if (!isJournalling()) { return; }
-	// Begin on a new batch if we are not already batching, or if there is nothing to append to
-	if (append ? m_undoCheckPoints.empty() : m_batchingCount == 0) { m_undoCheckPoints.emplace_back(); }
-	++m_batchingCount;
+	if (!append && !isBatching()) { m_undoCheckPoints.emplace_back(); }
+
+	++m_batchGuardCount;
+
+	return BatchActionGuard(this);
 }
 
 
 
 
-void ProjectJournal::endBatchCheckPoint()
+/*! \brief Called by BatchActionGuard's destructor */
+void ProjectJournal::batchGuardDestroyed()
 {
-	if (!isJournalling()) { return; }
-	// If no checkpoints were added to the batch, remove it
-	if (m_undoCheckPoints.back().empty()) { m_undoCheckPoints.pop_back(); }
-	--m_batchingCount;
-	assert(m_batchingCount >= 0);
-}
+	--m_batchGuardCount;
 
+	// If the batch ends and no checkpoints were added, remove it from the undo vector
+	if (m_batchGuardCount == 0 && m_undoCheckPoints.back().empty())
+	{
+		m_undoCheckPoints.pop_back();
+	}
+}
 
 
 

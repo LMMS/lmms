@@ -55,8 +55,18 @@ public:
 	bool canRedo() const;
 
 	void addJournalCheckPoint( JournallingObject *jo );
-	void beginBatchCheckPoint(bool append = false);
-	void endBatchCheckPoint();
+
+	//! Used similarly to std::lock_guard, see beginBatchAction()
+	class BatchActionGuard
+	{
+	public:
+		BatchActionGuard(ProjectJournal* j) : m_journal(j) {}
+		~BatchActionGuard() { m_journal->batchGuardDestroyed(); }
+	private:
+		ProjectJournal* m_journal;
+	};
+
+	BatchActionGuard beginBatchAction(bool append = false);
 
 	bool isJournalling() const
 	{
@@ -114,9 +124,11 @@ private:
 		jo_id_t joID;
 		DataFile data;
 	} ;
-	typedef std::vector<CheckPoint> BatchCheckPoint;
-	typedef std::vector<BatchCheckPoint> CheckPointStack;
+	typedef std::vector<CheckPoint> CheckPointBatch;
+	typedef std::vector<CheckPointBatch> CheckPointStack;
 
+	bool isBatching() { return m_batchGuardCount > 0; }
+	void batchGuardDestroyed();
 	void restoreCheckPoint(ProjectJournal::CheckPointStack& restore, ProjectJournal::CheckPointStack& backup);
 
 	JoIdMap m_joIDs;
@@ -124,8 +136,7 @@ private:
 	CheckPointStack m_undoCheckPoints;
 	CheckPointStack m_redoCheckPoints;
 
-	//! Used to determine if checkpoints should be batched or not
-	int m_batchingCount = 0;
+	int m_batchGuardCount = 0;
 	bool m_journalling;
 
 } ;

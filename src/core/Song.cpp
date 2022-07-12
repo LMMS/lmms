@@ -779,7 +779,7 @@ void Song::stopExport()
 
 void Song::insertBar()
 {
-	Engine::projectJournal()->beginBatchCheckPoint();
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
@@ -787,7 +787,6 @@ void Song::insertBar()
 		track->insertBar(m_playPos[Mode_PlaySong]);
 	}
 	m_tracksMutex.unlock();
-	Engine::projectJournal()->endBatchCheckPoint();
 }
 
 
@@ -795,7 +794,7 @@ void Song::insertBar()
 
 void Song::removeBar()
 {
-	Engine::projectJournal()->beginBatchCheckPoint();
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
@@ -803,7 +802,6 @@ void Song::removeBar()
 		track->removeBar(m_playPos[Mode_PlaySong]);
 	}
 	m_tracksMutex.unlock();
-	Engine::projectJournal()->endBatchCheckPoint();
 }
 
 

@@ -373,9 +373,7 @@ void ClipView::resetColor()
  */
 void ClipView::setColor(const QColor* color)
 {
-	std::set<Track*> journaledTracks;
-
-	Engine::projectJournal()->beginBatchCheckPoint();
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 
 	const auto selection = getClickedClips();
 	for (ClipView* clipv: selection)
@@ -394,7 +392,6 @@ void ClipView::setColor(const QColor* color)
 		}
 		clipv->update();
 	}
-	Engine::projectJournal()->endBatchCheckPoint();
 	Engine::getSong()->setModified();
 }
 
@@ -646,13 +643,12 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 				m_action = MoveSelection;
 				setInitialOffsets();
 
-				Engine::projectJournal()->beginBatchCheckPoint();
+				auto batchAction = Engine::projectJournal()->beginBatchAction();
 				const auto selection = getClickedClips();
 				for (ClipView* cv: selection)
 				{
 					cv->getClip()->addJournalCheckPoint();
 				}
-				Engine::projectJournal()->endBatchCheckPoint();
 			}
 			else
 			{
@@ -793,7 +789,8 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 		const auto selection = getClickedClips();
 		TimePos newPos = draggedClipPos(me);
 
-		// Find leftmost clip's offset from grabbed clip
+		// Find position of the leftmost selected clip
+		// (The values are stored as offsets relative to the clicked clip)
 		TimePos leftmost;
 		for (int i = 0; i < selection.size(); i++)
 		{
@@ -918,16 +915,14 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 
 /*! \brief Handle a mouse release on this ClipView.
  *
- *  If we're in move or resize mode, journal the change as appropriate.
- *  Then tidy up.
- *
  * \param me The QMouseEvent to handle.
  */
 void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
-	// If mouse had been moved, m_action would be NoAction
 	if (m_action == CopyOrToggleSelect)
 	{
+		// If we get here it means the user simply clicked without dragging, because that would have
+		// been caught in mouseMoveEvent and m_action would be NoAction as a result
 		setSelected( !isSelected() );
 	}
 	else if( m_action == Split )
@@ -1090,13 +1085,12 @@ QVector<ClipView *> ClipView::getClickedClips()
 
 void ClipView::remove( QVector<ClipView *> clipvs )
 {
-	Engine::projectJournal()->beginBatchCheckPoint();
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	for( auto clipv: clipvs )
 	{
 		// No need to check if it's nullptr because we check when building the QVector
 		clipv->remove();
 	}
-	Engine::projectJournal()->endBatchCheckPoint();
 }
 
 void ClipView::copy( QVector<ClipView *> clipvs )
@@ -1140,13 +1134,12 @@ void ClipView::paste()
 
 void ClipView::toggleMute( QVector<ClipView *> clipvs )
 {
-	Engine::projectJournal()->beginBatchCheckPoint();
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	for( auto clipv: clipvs )
 	{
 		// No need to check for nullptr because we check while building the clipvs QVector
 		clipv->getClip()->toggleMute();
 	}
-	Engine::projectJournal()->endBatchCheckPoint();
 }
 
 bool ClipView::canMergeSelection(QVector<ClipView*> clipvs)
@@ -1258,7 +1251,7 @@ float ClipView::pixelsPerBar()
 
 
 
-/*! \brief Save the offsets between all selected tracks and a clicked track */
+/*! \brief Save the offsets between all selected clips on all tracks and the clicked clip */
 void ClipView::setInitialOffsets()
 {
 	m_initialOffsets.clear();
