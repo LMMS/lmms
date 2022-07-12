@@ -29,6 +29,10 @@
 #include <QStyledItemDelegate>
 
 
+namespace lmms::gui
+{
+
+
 class RowDelegate : public QStyledItemDelegate
 {
 public:
@@ -37,13 +41,13 @@ public:
 		m_table( table )
 		{
 		}
-	virtual void paint( QPainter * painter,
+	void paint( QPainter * painter,
 					const QStyleOptionViewItem & option,
 					const QModelIndex & index ) const override;
 
 
 protected:
-	virtual void initStyleOption( QStyleOptionViewItem * option,
+	void initStyleOption( QStyleOptionViewItem * option,
 					const QModelIndex & index ) const override;
 
 
@@ -135,5 +139,4 @@ void RowTableView::keyPressEvent( QKeyEvent * event )
 }
 
 
-
-
+} // namespace lmms::gui

@@ -24,20 +24,22 @@
  */
 
 
-#include <QLayout>
-#include <QPushButton>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 
 #include "MeterDialog.h"
 #include "MeterModel.h"
 #include "gui_templates.h"
 #include "LcdSpinBox.h"
-#include "ToolTip.h"
+
+namespace lmms::gui
+{
 
 
 MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	QWidget( _parent ),
-	ModelView( NULL, this )
+	ModelView( nullptr, this )
 {
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
@@ -50,7 +52,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 
 
 	m_numerator = new LcdSpinBox( 2, num, tr( "Meter Numerator" ) );
-	ToolTip::add( m_numerator, tr( "Meter numerator" ) );
+	m_numerator->setToolTip(tr("Meter numerator"));
 
 	num_layout->addWidget( m_numerator );
 
@@ -71,7 +73,7 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	den_layout->setMargin( 0 );
 
 	m_denominator = new LcdSpinBox( 2, den, tr( "Meter Denominator" ) );
-	ToolTip::add( m_denominator, tr( "Meter denominator" ) );
+	m_denominator->setToolTip(tr("Meter denominator"));
 	if( _simple )
 	{
 		m_denominator->setLabel( tr( "TIME SIG" ) );
@@ -101,10 +103,6 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 
 
 
-MeterDialog::~MeterDialog()
-{
-}
-
 
 
 
@@ -115,3 +113,5 @@ void MeterDialog::modelChanged()
 	m_denominator->setModel( &mm->denominatorModel() );
 }
 
+
+} // namespace lmms::gui

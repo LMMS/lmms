@@ -28,6 +28,11 @@
 
 #include "lmms_basics.h"
 
+
+namespace lmms
+{
+
+
 class OutputSettings
 {
 public:
@@ -74,7 +79,7 @@ public:
 		m_bitRateSettings(bitRateSettings),
 		m_bitDepth(bitDepth),
 		m_stereoMode(stereoMode),
-		m_compressionLevel(0.5)
+		m_compressionLevel(0.625) // 5/8
 	{
 	}
 
@@ -111,5 +116,8 @@ private:
 	StereoMode m_stereoMode;
 	double m_compressionLevel;
 };
+
+
+} // namespace lmms
 
 #endif

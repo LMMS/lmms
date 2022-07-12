@@ -29,8 +29,10 @@
 #include "CompressorControls.h"
 
 #include "Effect.h"
-#include "ValueBuffer.h"
-#include "RmsHelper.h"
+
+
+namespace lmms
+{
 
 
 constexpr float COMP_LOG = -2.2;
@@ -40,7 +42,7 @@ class CompressorEffect : public Effect
 	Q_OBJECT
 public:
 	CompressorEffect(Model* parent, const Descriptor::SubPluginFeatures::Key* key);
-	~CompressorEffect() override;
+	~CompressorEffect() override = default;
 	bool processAudioBuffer(sampleFrame* buf, const fpp_t frames) override;
 
 	EffectControls* controls() override
@@ -147,7 +149,10 @@ private:
 	bool m_redrawThreshold = true;
 
 	friend class CompressorControls;
-	friend class CompressorControlDialog;
+	friend class gui::CompressorControlDialog;
 } ;
+
+
+} // namespace lmms
 
 #endif

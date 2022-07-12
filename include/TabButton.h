@@ -28,6 +28,9 @@
 
 #include <QPushButton>
 
+namespace lmms::gui
+{
+
 
 class TabButton : public QPushButton
 {
@@ -42,9 +45,7 @@ public:
 						SLOT( slotClicked() ) );
 	}
 
-	~TabButton()
-	{
-	}
+	~TabButton() override = default;
 
 
 signals:
@@ -62,5 +63,8 @@ private:
 	int m_id;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

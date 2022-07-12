@@ -22,8 +22,9 @@
  */
 #include "Gb_Apu_Buffer.h"
 
-Gb_Apu_Buffer::Gb_Apu_Buffer() {}
-Gb_Apu_Buffer::~Gb_Apu_Buffer() {}
+namespace lmms
+{
+
 
 void Gb_Apu_Buffer::end_frame(blip_time_t end_time) {
 	Gb_Apu::end_frame(end_time);
@@ -51,3 +52,5 @@ void Gb_Apu_Buffer::bass_freq(int freq) {
 	m_buf.bass_freq(freq);
 }
 
+
+} // namespace lmms

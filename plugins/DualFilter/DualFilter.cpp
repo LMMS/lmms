@@ -29,20 +29,24 @@
 #include "BasicFilters.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Dual Filter",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A Dual filter plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -53,8 +57,8 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 	Effect( &dualfilter_plugin_descriptor, parent, key ),
 	m_dfControls( this )
 {
-	m_filter1 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
-	m_filter2 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
+	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
+	m_filter2 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
 
 	// ensure filters get updated
 	m_filter1changed = true;
@@ -229,3 +233,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 
 }
 
+
+} // namespace lmms

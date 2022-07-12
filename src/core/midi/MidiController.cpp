@@ -24,32 +24,24 @@
  */
 
 #include <QDomElement>
-#include <QObject>
 
-#include "Song.h"
-#include "Mixer.h"
-#include "MidiClient.h"
+#include "AudioEngine.h"
 #include "MidiController.h"
+
+namespace lmms
+{
 
 
 MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_midi_controller" ),
-			Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
+	m_midiPort( tr( "unnamed_midi_controller" ), Engine::audioEngine()->midiClient(), this, this, MidiPort::Input ),
 	m_lastValue( 0.0f ),
 	m_previousValue( 0.0f )
 {
 	setSampleExact( true );
-	connect( &m_midiPort, SIGNAL( modeChanged() ),
-			this, SLOT( updateName() ) );
-}
-
-
-
-
-MidiController::~MidiController()
-{
+	connect( &m_midiPort, SIGNAL(modeChanged()),
+			this, SLOT(updateName()));
 }
 
 
@@ -150,11 +142,11 @@ QString MidiController::nodeName() const
 
 
 
-ControllerDialog * MidiController::createDialog( QWidget * _parent )
+gui::ControllerDialog* MidiController::createDialog( QWidget * _parent )
 {
-	return NULL;
+	return nullptr;
 }
 
 
 
-
+} // namespace lmms

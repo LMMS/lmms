@@ -25,7 +25,11 @@
 #ifndef FIFO_BUFFER_H
 #define FIFO_BUFFER_H
 
-#include <QtCore/QSemaphore>
+#include <QSemaphore>
+
+
+namespace lmms
+{
 
 
 template<typename T>
@@ -87,5 +91,7 @@ private:
 	T * m_buffer;
 } ;
 
+
+} // namespace lmms
 
 #endif

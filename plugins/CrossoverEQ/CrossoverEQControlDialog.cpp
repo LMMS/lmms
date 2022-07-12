@@ -24,16 +24,17 @@
  *
  */
  
-#include <QLayout>
-#include <QLabel>
 
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"
 #include "embed.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 #include "Fader.h"
+
+namespace lmms::gui
+{
+
 
 CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * controls ) :
 	EffectControlDialog( controls )
@@ -96,20 +97,23 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 	LedCheckBox * mute1 = new LedCheckBox( "", this, tr( "Band 1 mute" ), LedCheckBox::Green );
 	mute1->move( 15, 154 );
 	mute1->setModel( & controls->m_mute1 );
-	ToolTip::add( mute1, tr( "Mute band 1" ) );
+	mute1->setToolTip(tr("Mute band 1"));
 	
 	LedCheckBox * mute2 = new LedCheckBox( "", this, tr( "Band 2 mute" ), LedCheckBox::Green );
 	mute2->move( 55, 154 );
 	mute2->setModel( & controls->m_mute2 );
-	ToolTip::add( mute2, tr( "Mute band 2" ) );
+	mute2->setToolTip(tr("Mute band 2"));
 	
 	LedCheckBox * mute3 = new LedCheckBox( "", this, tr( "Band 3 mute" ), LedCheckBox::Green );
 	mute3->move( 95, 154 );
 	mute3->setModel( & controls->m_mute3 );
-	ToolTip::add( mute3, tr( "Mute band 3" ) );
+	mute3->setToolTip(tr("Mute band 3"));
 	
 	LedCheckBox * mute4 = new LedCheckBox( "", this, tr( "Band 4 mute" ), LedCheckBox::Green );
 	mute4->move( 135, 154 );
 	mute4->setModel( & controls->m_mute4 );
-	ToolTip::add( mute4, tr( "Mute band 4" ) );
+	mute4->setToolTip(tr("Mute band 4"));
 }
+
+
+} // namespace lmms::gui

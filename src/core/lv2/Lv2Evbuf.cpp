@@ -36,6 +36,10 @@
 
 #include <lv2/lv2plug.in/ns/ext/atom/atom.h>
 
+namespace lmms
+{
+
+
 struct LV2_Evbuf_Impl {
 	uint32_t capacity;
 	uint32_t atom_Chunk;
@@ -144,7 +148,7 @@ lv2_evbuf_get(LV2_Evbuf_Iterator iter,
 	uint8_t** data)
 {
 	*frames = *type = *size = 0;
-	*data = NULL;
+	*data = nullptr;
 
 	if (!lv2_evbuf_is_valid(iter)) {
 		return false;
@@ -189,5 +193,8 @@ lv2_evbuf_write(LV2_Evbuf_Iterator* iter,
 
 	return true;
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

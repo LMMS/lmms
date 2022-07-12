@@ -28,33 +28,39 @@
 #include "EffectControls.h"
 #include "EqSpectrumView.h"
 
+namespace lmms
+{
+
 
 class EqEffect;
+
+namespace gui
+{
+class EqControlsDialog;
+}
 
 class EqControls : public EffectControls
 {
 	Q_OBJECT
 public:
 	explicit EqControls( EqEffect* effect );
-	virtual ~EqControls()
-	{
-	}
+	~EqControls() override = default;
 
-	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
+	void saveSettings ( QDomDocument& doc, QDomElement& parent ) override;
 
-	virtual void loadSettings ( const QDomElement &_this );
+	void loadSettings ( const QDomElement &_this ) override;
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "Eq";
 	}
 
-	virtual int controlCount()
+	int controlCount() override
 	{
 		return 42;
 	}
 
-	virtual EffectControlDialog* createView();
+	gui::EffectControlDialog* createView() override;
 
 	float m_inPeakL;
 	float m_inPeakR;
@@ -126,7 +132,11 @@ private:
 	BoolModel m_analyseInModel;
 	BoolModel m_analyseOutModel;
 
-	friend class EqControlsDialog;
+	friend class gui::EqControlsDialog;
 	friend class EqEffect;
 };
+
+
+} // namespace lmms
+
 #endif // EQCONTROLS_H

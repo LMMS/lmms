@@ -26,7 +26,11 @@
 #define PERFLOG_H
 
 #include <ctime>
-#include <QtCore/QString>
+#include <QString>
+
+namespace lmms
+{
+
 
 /// \brief CPU time point
 ///
@@ -69,5 +73,8 @@ class PerfLogTimer
 	QString name;
 	PerfTime begin_time;
 };
+
+
+} // namespace lmms
 
 #endif

@@ -29,25 +29,29 @@
 
 #include "Track.h"
 
+#include <QDomElement>
 #include <QVariant>
 
-#include "AutomationPattern.h"
+#include "AutomationClip.h"
 #include "AutomationTrack.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
 #include "SampleTrack.h"
 #include "Song.h"
 
+
+namespace lmms
+{
 
 /*! \brief Create a new (empty) track object
  *
  *  The track object is the whole track, linking its contents, its
  *  automation, name, type, and so forth.
  *
- * \param type The type of track (Song Editor or Beat+Bassline Editor)
+ * \param type The type of track (Song Editor or Pattern Editor)
  * \param tc The track Container object to encapsulate in this track.
  *
  * \todo check the definitions of all the properties - are they OK?
@@ -60,7 +64,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_mutedModel( false, this, tr( "Mute" ) ), /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ), /*!< For controlling track soloing */
 	m_simpleSerializingMode( false ),
-	m_trackContentObjects(),        /*!< The track content objects (segments) */
+	m_clips(),        /*!< The clips (segments) */
 	m_color( 0, 0, 0 ),
 	m_hasColor( false )
 {
@@ -73,22 +77,16 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 
 /*! \brief Destroy this track
  *
- *  If the track container is a Beat+Bassline container, step through
- *  its list of tracks and remove us.
- *
- *  Then delete the TrackContentObject's contents, remove this track from
- *  the track container.
- *
- *  Finally step through this track's automation and forget all of them.
+ *  Delete the clips and remove this track from the track container.
  */
 Track::~Track()
 {
 	lock();
 	emit destroyedTrack();
 
-	while( !m_trackContentObjects.isEmpty() )
+	while( !m_clips.isEmpty() )
 	{
-		delete m_trackContentObjects.last();
+		delete m_clips.last();
 	}
 
 	m_trackContainer->removeTrack( this );
@@ -105,32 +103,31 @@ Track::~Track()
  */
 Track * Track::create( TrackTypes tt, TrackContainer * tc )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
-	Track * t = NULL;
+	Track * t = nullptr;
 
 	switch( tt )
 	{
-		case InstrumentTrack: t = new ::InstrumentTrack( tc ); break;
-		case BBTrack: t = new ::BBTrack( tc ); break;
-		case SampleTrack: t = new ::SampleTrack( tc ); break;
+		case InstrumentTrack: t = new class InstrumentTrack( tc ); break;
+		case PatternTrack: t = new class PatternTrack( tc ); break;
+		case SampleTrack: t = new class SampleTrack( tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
-		case AutomationTrack: t = new ::AutomationTrack( tc ); break;
+		case AutomationTrack: t = new class AutomationTrack( tc ); break;
 		case HiddenAutomationTrack:
-						t = new ::AutomationTrack( tc, true ); break;
+						t = new class AutomationTrack( tc, true ); break;
 		default: break;
 	}
 
-	if( tc == Engine::getBBTrackContainer() && t )
+	if (tc == Engine::patternStore() && t)
 	{
-		t->createTCOsForBB( Engine::getBBTrackContainer()->numOfBBs()
-									- 1 );
+		t->createClipsForPattern(Engine::patternStore()->numOfPatterns() - 1);
 	}
 
 	tc->updateAfterTrackAdd();
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	return t;
 }
@@ -145,17 +142,17 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
  */
 Track * Track::create( const QDomElement & element, TrackContainer * tc )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	Track * t = create(
 		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
 									tc );
-	if( t != NULL )
+	if( t != nullptr )
 	{
 		t->restoreState( element );
 	}
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	return t;
 }
@@ -168,12 +165,13 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
  */
 Track* Track::clone()
 {
+	// Save track to temporary XML and load it to create a new identical track
 	QDomDocument doc;
-	QDomElement parent = doc.createElement("clone");
+	QDomElement parent = doc.createElement("clonedtrack");
 	saveState(doc, parent);
 	Track* t = create(parent.firstChild().toElement(), m_trackContainer);
 
-	AutomationPattern::resolveAllIDs();
+	AutomationClip::resolveAllIDs();
 	return t;
 }
 
@@ -185,7 +183,7 @@ Track* Track::clone()
 /*! \brief Save this track's settings to file
  *
  *  We save the track type and its muted state and solo state, then append the track-
- *  specific settings.  Then we iterate through the trackContentObjects
+ *  specific settings.  Then we iterate through the clips
  *  and save all their states in turn.
  *
  *  \param doc The QDomDocument to use to save
@@ -217,8 +215,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 	
 	QDomElement tsDe = doc.createElement( nodeName() );
-	// let actual track (InstrumentTrack, bbTrack, sampleTrack etc.) save
-	// its settings
+	// let actual track (InstrumentTrack, PatternTrack, SampleTrack etc.) save its settings
 	element.appendChild( tsDe );
 	saveTrackSpecificSettings( doc, tsDe );
 
@@ -228,9 +225,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 		return;
 	}
 
-	// now save settings of all TCO's
-	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	// now save settings of all Clip's
+	for( clipVector::const_iterator it = m_clips.begin();
+				it != m_clips.end(); ++it )
 	{
 		( *it )->saveState( doc, element );
 	}
@@ -242,10 +239,10 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 /*! \brief Load the settings from a file
  *
  *  We load the track's type and muted state and solo state, then clear out our
- *  current TrackContentObject.
+ *  current Clip.
  *
  *  Then we step through the QDomElement's children and load the
- *  track-specific settings and trackContentObjects states from it
+ *  track-specific settings and clip states from it
  *  one at a time.
  *
  *  \param element the QDomElement to load track settings from
@@ -270,8 +267,12 @@ void Track::loadSettings( const QDomElement & element )
 
 	if( element.hasAttribute( "color" ) )
 	{
-		m_color.setNamedColor( element.attribute( "color" ) );
-		m_hasColor = true;
+		QColor newColor = QColor(element.attribute("color"));
+		setColor(newColor);
+	}
+	else
+	{
+		resetColor();
 	}
 
 	if( m_simpleSerializingMode )
@@ -290,10 +291,10 @@ void Track::loadSettings( const QDomElement & element )
 		return;
 	}
 
-	while( !m_trackContentObjects.empty() )
+	while( !m_clips.empty() )
 	{
-		delete m_trackContentObjects.front();
-//		m_trackContentObjects.erase( m_trackContentObjects.begin() );
+		delete m_clips.front();
+//		m_clips.erase( m_clips.begin() );
 	}
 
 	QDomNode node = element.firstChild();
@@ -309,9 +310,9 @@ void Track::loadSettings( const QDomElement & element )
 			&& node.nodeName() != "solo"
 			&& !node.toElement().attribute( "metadata" ).toInt() )
 			{
-				TrackContentObject * tco = createTCO(
+				Clip * clip = createClip(
 								TimePos( 0 ) );
-				tco->restoreState( node.toElement() );
+				clip->restoreState( node.toElement() );
 			}
 		}
 		node = node.nextSibling();
@@ -327,34 +328,32 @@ void Track::loadSettings( const QDomElement & element )
 
 
 
-/*! \brief Add another TrackContentObject into this track
+/*! \brief Add another Clip into this track
  *
- *  \param tco The TrackContentObject to attach to this track.
+ *  \param clip The Clip to attach to this track.
  */
-TrackContentObject * Track::addTCO( TrackContentObject * tco )
+Clip * Track::addClip( Clip * clip )
 {
-	m_trackContentObjects.push_back( tco );
+	m_clips.push_back( clip );
 
-	emit trackContentObjectAdded( tco );
+	emit clipAdded( clip );
 
-	return tco;		// just for convenience
+	return clip; // just for convenience
 }
 
 
 
 
-/*! \brief Remove a given TrackContentObject from this track
+/*! \brief Remove a given Clip from this track
  *
- *  \param tco The TrackContentObject to remove from this track.
+ *  \param clip The Clip to remove from this track.
  */
-void Track::removeTCO( TrackContentObject * tco )
+void Track::removeClip( Clip * clip )
 {
-	tcoVector::iterator it = std::find( m_trackContentObjects.begin(),
-					m_trackContentObjects.end(),
-					tco );
-	if( it != m_trackContentObjects.end() )
+	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
+	if( it != m_clips.end() )
 	{
-		m_trackContentObjects.erase( it );
+		m_clips.erase( it );
 		if( Engine::getSong() )
 		{
 			Engine::getSong()->updateLength();
@@ -364,105 +363,103 @@ void Track::removeTCO( TrackContentObject * tco )
 }
 
 
-/*! \brief Remove all TCOs from this track */
-void Track::deleteTCOs()
+/*! \brief Remove all Clips from this track */
+void Track::deleteClips()
 {
-	while( ! m_trackContentObjects.isEmpty() )
+	while( ! m_clips.isEmpty() )
 	{
-		delete m_trackContentObjects.first();
+		delete m_clips.first();
 	}
 }
 
 
-/*! \brief Return the number of trackContentObjects we contain
+/*! \brief Return the number of clips we contain
  *
- *  \return the number of trackContentObjects we currently contain.
+ *  \return the number of clips we currently contain.
  */
-int Track::numOfTCOs()
+int Track::numOfClips()
 {
-	return m_trackContentObjects.size();
+	return m_clips.size();
 }
 
 
 
 
-/*! \brief Get a TrackContentObject by number
+/*! \brief Get a Clip by number
  *
- *  If the TCO number is less than our TCO array size then fetch that
+ *  If the Clip number is less than our Clip array size then fetch that
  *  numbered object from the array.  Otherwise we warn the user that
- *  we've somehow requested a TCO that is too large, and create a new
- *  TCO for them.
- *  \param tcoNum The number of the TrackContentObject to fetch.
- *  \return the given TrackContentObject or a new one if out of range.
- *  \todo reject TCO numbers less than zero.
- *  \todo if we create a TCO here, should we somehow attach it to the
+ *  we've somehow requested a Clip that is too large, and create a new
+ *  Clip for them.
+ *  \param clipNum The number of the Clip to fetch.
+ *  \return the given Clip or a new one if out of range.
+ *  \todo reject Clip numbers less than zero.
+ *  \todo if we create a Clip here, should we somehow attach it to the
  *     track?
  */
-TrackContentObject * Track::getTCO( int tcoNum )
+Clip * Track::getClip( int clipNum )
 {
-	if( tcoNum < m_trackContentObjects.size() )
+	if( clipNum < m_clips.size() )
 	{
-		return m_trackContentObjects[tcoNum];
+		return m_clips[clipNum];
 	}
-	printf( "called Track::getTCO( %d ), "
-			"but TCO %d doesn't exist\n", tcoNum, tcoNum );
-	return createTCO( tcoNum * TimePos::ticksPerBar() );
+	printf( "called Track::getClip( %d ), "
+			"but Clip %d doesn't exist\n", clipNum, clipNum );
+	return createClip( clipNum * TimePos::ticksPerBar() );
 
 }
 
 
 
 
-/*! \brief Determine the given TrackContentObject's number in our array.
+/*! \brief Determine the given Clip's number in our array.
  *
- *  \param tco The TrackContentObject to search for.
+ *  \param clip The Clip to search for.
  *  \return its number in our array.
  */
-int Track::getTCONum( const TrackContentObject * tco )
+int Track::getClipNum( const Clip * clip )
 {
-//	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
-	tcoVector::iterator it = std::find( m_trackContentObjects.begin(),
-					m_trackContentObjects.end(),
-					tco );
-	if( it != m_trackContentObjects.end() )
+//	for( int i = 0; i < getTrackContentWidget()->numOfClips(); ++i )
+	clipVector::iterator it = std::find( m_clips.begin(), m_clips.end(), clip );
+	if( it != m_clips.end() )
 	{
-/*		if( getTCO( i ) == _tco )
+/*		if( getClip( i ) == _clip )
 		{
 			return i;
 		}*/
-		return it - m_trackContentObjects.begin();
+		return it - m_clips.begin();
 	}
-	qWarning( "Track::getTCONum(...) -> _tco not found!\n" );
+	qWarning( "Track::getClipNum(...) -> _clip not found!\n" );
 	return 0;
 }
 
 
 
 
-/*! \brief Retrieve a list of trackContentObjects that fall within a period.
+/*! \brief Retrieve a list of clips that fall within a period.
  *
- *  Here we're interested in a range of trackContentObjects that intersect
+ *  Here we're interested in a range of clips that intersect
  *  the given time period.
  *
- *  We return the TCOs we find in order by time, earliest TCOs first.
+ *  We return the Clips we find in order by time, earliest Clips first.
  *
- *  \param tcoV The list to contain the found trackContentObjects.
+ *  \param clipV The list to contain the found clips.
  *  \param start The MIDI start time of the range.
  *  \param end   The MIDI endi time of the range.
  */
-void Track::getTCOsInRange( tcoVector & tcoV, const TimePos & start,
+void Track::getClipsInRange( clipVector & clipV, const TimePos & start,
 							const TimePos & end )
 {
-	for( TrackContentObject* tco : m_trackContentObjects )
+	for( Clip* clip : m_clips )
 	{
-		int s = tco->startPosition();
-		int e = tco->endPosition();
+		int s = clip->startPosition();
+		int e = clip->endPosition();
 		if( ( s <= end ) && ( e >= start ) )
 		{
-			// TCO is within given range
-			// Insert sorted by TCO's position
-			tcoV.insert(std::upper_bound(tcoV.begin(), tcoV.end(), tco, TrackContentObject::comparePosition),
-						tco);
+			// Clip is within given range
+			// Insert sorted by Clip's position
+			clipV.insert(std::upper_bound(clipV.begin(), clipV.end(), clip, Clip::comparePosition),
+						clip);
 		}
 	}
 }
@@ -470,55 +467,53 @@ void Track::getTCOsInRange( tcoVector & tcoV, const TimePos & start,
 
 
 
-/*! \brief Swap the position of two trackContentObjects.
+/*! \brief Swap the position of two clips.
  *
- *  First, we arrange to swap the positions of the two TCOs in the
- *  trackContentObjects list.  Then we swap their start times as well.
+ *  First, we arrange to swap the positions of the two Clips in the
+ *  clips list.  Then we swap their start times as well.
  *
- *  \param tcoNum1 The first TrackContentObject to swap.
- *  \param tcoNum2 The second TrackContentObject to swap.
+ *  \param clipNum1 The first Clip to swap.
+ *  \param clipNum2 The second Clip to swap.
  */
-void Track::swapPositionOfTCOs( int tcoNum1, int tcoNum2 )
+void Track::swapPositionOfClips( int clipNum1, int clipNum2 )
 {
-	qSwap( m_trackContentObjects[tcoNum1],
-					m_trackContentObjects[tcoNum2] );
+	qSwap( m_clips[clipNum1], m_clips[clipNum2] );
 
-	const TimePos pos = m_trackContentObjects[tcoNum1]->startPosition();
+	const TimePos pos = m_clips[clipNum1]->startPosition();
 
-	m_trackContentObjects[tcoNum1]->movePosition(
-			m_trackContentObjects[tcoNum2]->startPosition() );
-	m_trackContentObjects[tcoNum2]->movePosition( pos );
+	m_clips[clipNum1]->movePosition( m_clips[clipNum2]->startPosition() );
+	m_clips[clipNum2]->movePosition( pos );
 }
 
 
 
 
-void Track::createTCOsForBB( int bb )
+void Track::createClipsForPattern(int pattern)
 {
-	while( numOfTCOs() < bb + 1 )
+	while( numOfClips() < pattern + 1 )
 	{
-		TimePos position = TimePos( numOfTCOs(), 0 );
-		TrackContentObject * tco = createTCO( position );
-		tco->changeLength( TimePos( 1, 0 ) );
+		TimePos position = TimePos( numOfClips(), 0 );
+		Clip * clip = createClip( position );
+		clip->changeLength( TimePos( 1, 0 ) );
 	}
 }
 
 
 
 
-/*! \brief Move all the trackContentObjects after a certain time later by one bar.
+/*! \brief Move all the clips after a certain time later by one bar.
  *
  *  \param pos The time at which we want to insert the bar.
  *  \todo if we stepped through this list last to first, and the list was
- *    in ascending order by TCO time, once we hit a TCO that was earlier
+ *    in ascending order by Clip time, once we hit a Clip that was earlier
  *    than the insert time, we could fall out of the loop early.
  */
 void Track::insertBar( const TimePos & pos )
 {
-	// we'll increase the position of every TCO, positioned behind pos, by
+	// we'll increase the position of every Clip, positioned behind pos, by
 	// one bar
-	for( tcoVector::iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	for( clipVector::iterator it = m_clips.begin();
+				it != m_clips.end(); ++it )
 	{
 		if( ( *it )->startPosition() >= pos )
 		{
@@ -531,16 +526,15 @@ void Track::insertBar( const TimePos & pos )
 
 
 
-/*! \brief Move all the trackContentObjects after a certain time earlier by one bar.
+/*! \brief Move all the clips after a certain time earlier by one bar.
  *
  *  \param pos The time at which we want to remove the bar.
  */
 void Track::removeBar( const TimePos & pos )
 {
-	// we'll decrease the position of every TCO, positioned behind pos, by
+	// we'll decrease the position of every Clip, positioned behind pos, by
 	// one bar
-	for( tcoVector::iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	for( clipVector::iterator it = m_clips.begin(); it != m_clips.end(); ++it )
 	{
 		if( ( *it )->startPosition() >= pos )
 		{
@@ -554,7 +548,7 @@ void Track::removeBar( const TimePos & pos )
 
 /*! \brief Return the length of the entire track in bars
  *
- *  We step through our list of TCOs and determine their end position,
+ *  We step through our list of Clips and determine their end position,
  *  keeping track of the latest time found in ticks.  Then we return
  *  that in bars by dividing by the number of ticks per bar.
  */
@@ -562,8 +556,7 @@ bar_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
-	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
-				it != m_trackContentObjects.end(); ++it )
+	for( clipVector::const_iterator it = m_clips.begin(); it != m_clips.end(); ++it )
 	{
 		if( Engine::getSong()->isExporting() &&
 				( *it )->isMuted() )
@@ -647,23 +640,17 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::trackColorChanged( QColor & c )
+void Track::setColor(const QColor& c)
 {
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
-		m_trackContentObjects[i]->updateColor();
-	}
 	m_hasColor = true;
 	m_color = c;
+	emit colorChanged();
 }
 
-void Track::trackColorReset()
+void Track::resetColor()
 {
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
-		m_trackContentObjects[i]->updateColor();
-	}
 	m_hasColor = false;
+	emit colorChanged();
 }
 
 
@@ -672,3 +659,4 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
+} // namespace lmms

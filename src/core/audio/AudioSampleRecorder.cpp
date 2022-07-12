@@ -29,11 +29,14 @@
 #include "debug.h"
 
 
+namespace lmms
+{
+
 
 AudioSampleRecorder::AudioSampleRecorder( const ch_cnt_t _channels,
 							bool & _success_ful,
-							Mixer * _mixer ) :
-	AudioDevice( _channels, _mixer ),
+							AudioEngine * _audioEngine ) :
+	AudioDevice( _channels, _audioEngine ),
 	m_buffers()
 {
 	_success_ful = true;
@@ -77,7 +80,7 @@ void AudioSampleRecorder::createSampleBuffer( SampleBuffer** sampleBuf )
 	sampleFrame * data_ptr = data;
 
 
-	assert( data != NULL );
+	assert( data != nullptr );
 
 	// now copy all buffers into big buffer
 	for( BufferList::ConstIterator it = m_buffers.begin();
@@ -111,4 +114,4 @@ void AudioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
 }
 
 
-
+} // namespace lmms

@@ -30,13 +30,15 @@
 #include "Effect.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
-#include "Song.h"
+
+namespace lmms
+{
 
 
 EffectChain::EffectChain( Model * _parent ) :
 	Model( _parent ),
 	SerializingObject(),
-	m_enabledModel( false, NULL, tr( "Effects enabled" ) )
+	m_enabledModel( false, nullptr, tr( "Effects enabled" ) )
 {
 }
 
@@ -78,7 +80,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 {
 	clear();
 
-	// TODO This method should probably also lock the mixer
+	// TODO This method should probably also lock the audio engine
 
 	m_enabledModel.loadSettings( _this, "enabled" );
 
@@ -97,7 +99,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 			Effect* e = Effect::instantiate( name.toUtf8(), this, &key );
 
-			if( e != NULL && e->isOkay() && e->nodeName() == node.nodeName() )
+			if( e != nullptr && e->isOkay() && e->nodeName() == node.nodeName() )
 			{
 				e->restoreState( effectData );
 			}
@@ -121,9 +123,9 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 void EffectChain::appendEffect( Effect * _effect )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	m_effects.append( _effect );
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	m_enabledModel.setValue( true );
 
@@ -135,17 +137,17 @@ void EffectChain::appendEffect( Effect * _effect )
 
 void EffectChain::removeEffect( Effect * _effect )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	Effect ** found = std::find( m_effects.begin(), m_effects.end(), _effect );
 	if( found == m_effects.end() )
 	{
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 		return;
 	}
 	m_effects.erase( found );
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	if( m_effects.isEmpty() )
 	{
@@ -228,7 +230,7 @@ void EffectChain::clear()
 {
 	emit aboutToClear();
 
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	while( m_effects.count() )
 	{
@@ -237,7 +239,10 @@ void EffectChain::clear()
 		delete e;
 	}
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	m_enabledModel.setValue( false );
 }
+
+
+} // namespace lmms

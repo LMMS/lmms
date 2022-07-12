@@ -28,8 +28,14 @@
 #include "MidiPort.h"
 #include "MidiClient.h"
 #include "MidiDummy.h"
+#include "MidiEventProcessor.h"
 #include "Note.h"
 #include "Song.h"
+
+
+namespace lmms
+{
+
 
 static MidiDummy s_dummyClient;
 
@@ -41,8 +47,8 @@ MidiPort::MidiPort( const QString& name,
 					Model* parent,
 					Mode mode ) :
 	Model( parent ),
-	m_readablePortsMenu( NULL ),
-	m_writablePortsMenu( NULL ),
+	m_readablePortsMenu( nullptr ),
+	m_writablePortsMenu( nullptr ),
 	m_midiClient( client ),
 	m_midiEventProcessor( eventProcessor ),
 	m_mode( mode ),
@@ -63,12 +69,12 @@ MidiPort::MidiPort( const QString& name,
 	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
 	m_writableModel.setValue( m_mode == Output || m_mode == Duplex );
 
-	connect( &m_readableModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
-	connect( &m_writableModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateMidiPortMode() ), Qt::DirectConnection );
-	connect( &m_outputProgramModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateOutputProgram() ), Qt::DirectConnection );
+	connect( &m_readableModel, SIGNAL(dataChanged()),
+			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
+	connect( &m_writableModel, SIGNAL(dataChanged()),
+			this, SLOT(updateMidiPortMode()), Qt::DirectConnection );
+	connect( &m_outputProgramModel, SIGNAL(dataChanged()),
+			this, SLOT(updateOutputProgram()), Qt::DirectConnection );
 
 
 	// when using with non-raw-clients we can provide buttons showing
@@ -79,8 +85,8 @@ MidiPort::MidiPort( const QString& name,
 		updateWritablePorts();
 
 		// we want to get informed about port-changes!
-		m_midiClient->connectRPChanged( this, SLOT( updateReadablePorts() ) );
-		m_midiClient->connectWPChanged( this, SLOT( updateWritablePorts() ) );
+		m_midiClient->connectRPChanged( this, SLOT(updateReadablePorts()));
+		m_midiClient->connectWPChanged( this, SLOT(updateWritablePorts()));
 	}
 
 	updateMidiPortMode();
@@ -421,3 +427,6 @@ void MidiPort::invalidateCilent()
 {
 	m_midiClient = &s_dummyClient;
 }
+
+
+} // namespace lmms

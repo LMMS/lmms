@@ -71,7 +71,7 @@ SET(CPACK_NSIS_MUI_ICON                 "${CPACK_NSIS_MUI_ICON}" PARENT_SCOPE)
 
 # Windows resource compilers
 CONFIGURE_FILE("lmms.rc.in"             "${CMAKE_BINARY_DIR}/lmms.rc")
-CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc")
+CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/ZynAddSubFx/zynaddsubfx.rc")
 
 IF(LMMS_HAVE_STK)
 	FILE(GLOB RAWWAVES "${MINGW_PREFIX}/share/stk/rawwaves/*.raw")

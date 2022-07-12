@@ -28,7 +28,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QStandardPaths>
-#include <QtCore/QTextStream>
+#include <QTextStream>
 
 #include "ConfigManager.h"
 #include "MainWindow.h"
@@ -37,10 +37,14 @@
 
 #include "lmmsversion.h"
 
+namespace lmms
+{
+
 
 // Vector with all the upgrade methods
 const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
-	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91
+	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91,
+	&ConfigManager::upgrade_1_2_2
 };
 
 static inline QString ensureTrailingSlash(const QString & s )
@@ -53,7 +57,7 @@ static inline QString ensureTrailingSlash(const QString & s )
 }
 
 
-ConfigManager * ConfigManager::s_instanceOfMe = NULL;
+ConfigManager * ConfigManager::s_instanceOfMe = nullptr;
 
 
 ConfigManager::ConfigManager() :
@@ -119,16 +123,35 @@ void ConfigManager::upgrade_1_1_90()
 	}
 }
 
-	
 void ConfigManager::upgrade_1_1_91()
 {
 	// rename displaydbv to displaydbfs
-	if (!value("app", "displaydbv").isNull()) {
+	if (!value("app", "displaydbv").isNull())
+	{
 		setValue("app", "displaydbfs", value("app", "displaydbv"));
 		deleteValue("app", "displaydbv");
 	}
 }
 
+void ConfigManager::upgrade_1_2_2()
+{
+	// Since mixer has been renamed to audioengine, we need to transfer the
+	// attributes from the old element to the new one
+	std::vector<QString> attrs = {
+		"audiodev", "mididev", "framesperaudiobuffer", "hqaudio", "samplerate"
+	};
+
+	for (auto attr : attrs)
+	{
+		if (!value("mixer", attr).isNull())
+		{
+			setValue("audioengine", attr, value("mixer", attr));
+			deleteValue("mixer", attr);
+		}
+	}
+
+	m_settings.remove("mixer");
+}
 
 void ConfigManager::upgrade()
 {
@@ -139,7 +162,8 @@ void ConfigManager::upgrade()
 	}
 
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_configVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_configVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
@@ -493,10 +517,10 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
-		else if(gui)
+		else if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::warning(NULL, MainWindow::tr("Configuration file"),
-									MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
+			QMessageBox::warning(nullptr, gui::MainWindow::tr("Configuration file"),
+									gui::MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
 													arg(errorLine).
 													arg(errorCol).
 													arg(errorString));
@@ -613,6 +637,8 @@ void ConfigManager::saveConfigFile()
 	QFile outfile(m_lmmsRcFile);
 	if(!outfile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
+		using gui::MainWindow;
+
 		QString title, message;
 		title = MainWindow::tr("Could not open file");
 		message = MainWindow::tr("Could not open file %1 "
@@ -622,9 +648,9 @@ void ConfigManager::saveConfigFile()
 					"the directory containing the "
 					"file and try again!"
 						).arg(m_lmmsRcFile);
-		if(gui)
+		if (gui::getGUI() != nullptr)
 		{
-			QMessageBox::critical(NULL, title, message,
+			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,
 						QMessageBox::NoButton);
 		}
@@ -713,3 +739,6 @@ unsigned int ConfigManager::legacyConfigVersion()
 		return 2;
 	}
 }
+
+
+} // namespace lmms
