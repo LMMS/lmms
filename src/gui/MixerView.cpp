@@ -491,10 +491,8 @@ void MixerView::setAutoTrackConstraints()
 					wasModified = true;
 				}
 			}
-			else
-			{
-				m_mixerChannelViews[i]->m_mixerLine->refreshAutoTrackLinkStyle();
-			}
+			// needed when global enabled is switched
+			m_mixerChannelViews[i]->m_mixerLine->refreshAutoTrackLinkStyle();
 		}
 	}
 	if (!settings.enabled) return;
