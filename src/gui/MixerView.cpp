@@ -493,7 +493,7 @@ void MixerView::setAutoTrackConstraints()
 			}
 			else
 			{
-				m_mixerChannelViews[newChannelIndex]->m_mixerLine->refreshAutoTrackLinkStyle();
+				m_mixerChannelViews[i]->m_mixerLine->refreshAutoTrackLinkStyle();
 			}
 		}
 	}
