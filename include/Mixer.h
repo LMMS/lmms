@@ -264,6 +264,11 @@ public:
 		}
 	};
 
+	enum class ProcessSortOrder
+	{
+		SongPattern,
+		PatternSong
+	};
 
 	Mixer();
 	~Mixer() override;
@@ -323,7 +328,7 @@ public:
 	void toggleAutoTrackLink(int index);
 
 	// process tracks which have a mixer channel assigned
-	void processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process);
+	void processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process, ProcessSortOrder sortOrder = ProcessSortOrder::SongPattern);
 	// process tracks assigned to a specific channel
 	void processChannelTracks(MixerChannel * channel, std::function<void(Track * track)> process);
 	IntModel * getChannelModelByTrack(Track * track);	

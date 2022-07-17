@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Mixer.cpp - effect mixer for LMMS
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -415,11 +415,20 @@ bool Mixer::autoLinkTrackConfigEnabled()
 
 
 
-void Mixer::processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process)
+void Mixer::processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process,
+								  ProcessSortOrder sortOrder)
 {
 	TrackContainer::TrackList trackList;
-	trackList += Engine::getSong()->tracks();
-	trackList += Engine::patternStore()->tracks();
+	if (sortOrder == ProcessSortOrder::SongPattern)
+	{
+	  trackList += Engine::getSong()->tracks();
+	  trackList += Engine::patternStore()->tracks();
+	}
+	else
+	{
+		trackList += Engine::patternStore()->tracks();
+		trackList += Engine::getSong()->tracks();
+	}
 
 	for (Track* track: trackList)
 	{

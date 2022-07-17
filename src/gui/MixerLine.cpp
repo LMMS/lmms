@@ -311,6 +311,7 @@ void MixerLine::refreshAutoTrackLinkStyle()
 		m_renameEditPalette.setColor(QPalette::Text,Qt::white);
 	}
 	m_renameLineEdit->setPalette(m_renameEditPalette);
+	update();
 }
 
 

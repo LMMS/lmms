@@ -601,8 +601,8 @@ void MixerView::updateAutoTrackSortOrder(bool autoSort)
 
 	std::vector<int> list(m_mixerChannelViews.size(), 0);
 
-	int c = 0;
-	// add all non auto track first
+	int c = 1;
+	// add all non auto tracks first
 	for( int i = 1; i<m_mixerChannelViews.size(); ++i )
 	{
 		if (!mix->mixerChannel(i)->m_autoTrackLinkModel.value())
@@ -611,17 +611,23 @@ void MixerView::updateAutoTrackSortOrder(bool autoSort)
 		}
 	}
 
-	// add auto tracks in the order of the song tracks
-	mix->processAssignedTracks([&, list](Track *, IntModel * model, MixerChannel * channel)
+	// add auto linked and assigned tracks in song/patter order
+	auto sortOrder = settings.autoSort == Mixer::autoTrackLinkSettings::AutoSort::LinkedPattern
+			? Mixer::ProcessSortOrder::SongPattern
+			: Mixer::ProcessSortOrder::PatternSong;
+	mix->processAssignedTracks([&list,&c](Track *, IntModel * model, MixerChannel * channel)
 	mutable {
 		if (channel == nullptr) return;
 		if (channel->m_autoTrackLinkModel.value())
 		{
 			list[c++] = model->value();
 		}
-	});
+	}, sortOrder);
 
-	// bubblesort here because the list is normally almost ordered
+	// bubblesort here because:
+	// - list is normally almost ordered
+	// - stable sort and
+	// - "distance" between swapped items is normally small
 	bool swapped = false;
 	do
 	{
@@ -630,12 +636,12 @@ void MixerView::updateAutoTrackSortOrder(bool autoSort)
 		{
 			if (list[i] > list[i+1])
 			{
-				// a (+1) because we didn't include master track in our list
-				swapChannels(list[i+1], list[i+2]);
+				swapChannels(list[i], list[i+1]);
 				int t = list[i];
 				list[i] = list[i+1];
 				list[i+1] = t;
 				swapped = true;
+
 			}
 		}
 		c = c-1;
@@ -812,6 +818,7 @@ void MixerView::updateMixerLine(int index)
 	// disable the send button if it would cause an infinite loop
 	thisLine->m_sendBtn->setVisible(! mix->isInfiniteLoop(selIndex, index));
 	thisLine->m_sendBtn->updateLightStatus();
+	thisLine->refreshAutoTrackLinkStyle();
 	thisLine->update();
 }
 
