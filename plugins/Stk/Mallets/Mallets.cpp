@@ -87,7 +87,7 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_strikeModel( true, this, tr( "Bowed" ) ),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
-	m_randomModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Randomness" )),
+	m_randomModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Randomness")),
 	m_versionModel( MALLETS_PRESET_VERSION, 0, MALLETS_PRESET_VERSION, this, "" ),
 	m_isOldVersionModel( false, this, "" ),
 	m_filesMissing( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
@@ -156,7 +156,7 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	m_presetsModel.saveSettings( _doc, _this, "preset" );
 	m_spreadModel.saveSettings( _doc, _this, "spread" );
-	m_randomModel.saveSettings( _doc, _this, "randomness" );
+	m_randomModel.saveSettings(_doc, _this, "randomness");
 	m_versionModel.saveSettings( _doc, _this, "version" );
 	m_isOldVersionModel.saveSettings( _doc, _this, "oldversion" );
 }
@@ -191,7 +191,7 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 
 	m_presetsModel.loadSettings( _this, "preset" );
 	m_spreadModel.loadSettings( _this, "spread" );
-	m_randomModel.loadSettings( _this, "randomness" );
+	m_randomModel.loadSettings(_this, "randomness");
 	m_isOldVersionModel.loadSettings( _this, "oldversion" );
 
 	// To maintain backward compatibility
@@ -302,7 +302,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		float modulator = m_modulatorModel.value();
 		float crossfade = m_crossfadeModel.value();
 
-		if(p < 9 )
+		if(p < 9)
 		{
 			hardness += random * static_cast<float>(rand() % 128) - 64.0;
 			hardness = std::clamp(0.0f, hardness, 128.0f);
@@ -310,7 +310,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 			position += random * static_cast<float>(rand() % 64) - 32.0;
 			position = std::clamp(0.0f, position, 64.0f);
 		}
-		else if( p == 9 )
+		else if(p == 9)
 		{
 			modulator += random * static_cast<float>(rand() % 128) - 64.0;
 			modulator = std::clamp(0.0f, modulator, 128.0f);
@@ -440,10 +440,10 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
-	m_randomKnob = new Knob( knobVintage_32, this );
-	m_randomKnob->setLabel( tr( "Random" ) );
-	m_randomKnob->move( 190, 190 );
-	m_randomKnob->setHintText( tr( "Random:" ), "" );
+	m_randomKnob = new Knob(knobVintage_32, this);
+	m_randomKnob->setLabel(tr("Random"));
+	m_randomKnob->move(190, 190);
+	m_randomKnob->setHintText(tr("Random:"),"");
 
 	// try to inform user about missing Stk-installation
 	if( _instrument->m_filesMissing && getGUI() != nullptr )
@@ -598,7 +598,7 @@ void MalletsInstrumentView::modelChanged()
 //	m_strikeLED->setModel( &inst->m_strikeModel );
 	m_presetsCombo->setModel( &inst->m_presetsModel );
 	m_spreadKnob->setModel( &inst->m_spreadModel );
-	m_randomKnob->setModel( &inst->m_randomModel );
+	m_randomKnob->setModel(&inst->m_randomModel);
 }
 
 
