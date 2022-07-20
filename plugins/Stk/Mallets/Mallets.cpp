@@ -87,6 +87,7 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_strikeModel( true, this, tr( "Bowed" ) ),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
+	m_randomModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Randomness" )),
 	m_versionModel( MALLETS_PRESET_VERSION, 0, MALLETS_PRESET_VERSION, this, "" ),
 	m_isOldVersionModel( false, this, "" ),
 	m_filesMissing( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
@@ -155,6 +156,7 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	m_presetsModel.saveSettings( _doc, _this, "preset" );
 	m_spreadModel.saveSettings( _doc, _this, "spread" );
+	m_randomModel.saveSettings( _doc, _this, "randomness" );
 	m_versionModel.saveSettings( _doc, _this, "version" );
 	m_isOldVersionModel.saveSettings( _doc, _this, "oldversion" );
 }
@@ -189,6 +191,7 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 
 	m_presetsModel.loadSettings( _this, "preset" );
 	m_spreadModel.loadSettings( _this, "spread" );
+	m_randomModel.loadSettings( _this, "randomness" );
 	m_isOldVersionModel.loadSettings( _this, "oldversion" );
 
 	// To maintain backward compatibility
@@ -284,7 +287,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	int p = m_presetsModel.value();
-	
+
 	const float freq = _n->frequency();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
@@ -292,6 +295,29 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		float velocityAdjust =
 			m_isOldVersionModel.value() ? 100.0 : 200.0;
 		const float vel = _n->getVolume() / velocityAdjust;
+
+		const float random = m_randomModel.value();
+		float hardness = m_hardnessModel.value();
+		float position = m_positionModel.value();
+		float modulator = m_modulatorModel.value();
+		float crossfade = m_crossfadeModel.value();
+
+		if(p < 9 )
+		{
+			hardness += random * static_cast<float>(rand() % 128) - 64.0;
+			hardness = std::clamp(0.0f, hardness, 128.0f);
+
+			position += random * static_cast<float>(rand() % 64) - 32.0;
+			position = std::clamp(0.0f, position, 64.0f);
+		}
+		else if( p == 9 )
+		{
+			modulator += random * static_cast<float>(rand() % 128) - 64.0;
+			modulator = std::clamp(0.0f, modulator, 128.0f);
+
+			crossfade += random * static_cast<float>(rand() % 128) - 64.0;
+			crossfade = std::clamp(0.0f, crossfade, 128.0f);
+		}
 
 		// critical section as STK is not thread-safe
 		static QMutex m;
@@ -301,8 +327,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 			_n->m_pluginData = new MalletsSynth( freq,
 						vel,
 						m_stickModel.value(),
-						m_hardnessModel.value(),
-						m_positionModel.value(),
+						hardness,
+						position,
 						m_vibratoGainModel.value(),
 						m_vibratoFreqModel.value(),
 						p,
@@ -315,8 +341,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 						vel,
 						p,
 						m_lfoDepthModel.value(),
-						m_modulatorModel.value(),
-						m_crossfadeModel.value(),
+						modulator,
+						crossfade,
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
 						(uint8_t) m_spreadModel.value(),
@@ -414,6 +440,11 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	m_spreadKnob->move( 190, 140 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
+	m_randomKnob = new Knob( knobVintage_32, this );
+	m_randomKnob->setLabel( tr( "Random" ) );
+	m_randomKnob->move( 190, 190 );
+	m_randomKnob->setHintText( tr( "Random:" ), "" );
+
 	// try to inform user about missing Stk-installation
 	if( _instrument->m_filesMissing && getGUI() != nullptr )
 	{
@@ -469,7 +500,7 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	m_stickKnob->setLabel( tr( "Stick mix" ) );
 	m_stickKnob->move( 190, 90 );
 	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
-	
+
 	return( widget );
 }
 
@@ -567,6 +598,7 @@ void MalletsInstrumentView::modelChanged()
 //	m_strikeLED->setModel( &inst->m_strikeModel );
 	m_presetsCombo->setModel( &inst->m_presetsModel );
 	m_spreadKnob->setModel( &inst->m_spreadModel );
+	m_randomKnob->setModel( &inst->m_randomModel );
 }
 
 
