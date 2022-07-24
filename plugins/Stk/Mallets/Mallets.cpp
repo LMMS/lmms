@@ -222,17 +222,10 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	p = ps->presetIndex();
 	ps->setFrequency( freq );
 
-/*   {{1.0, 2.01, 3.9, 14.37}, 		// Vibraphone
-     {0.99995, 0.99991, 0.99992, 0.9999},	
-     {0.025, 0.015, 0.015, 0.015 },
-     {0.390625,0.570312,0.078125}},*/
-
 	ps->setFixed( 0, m_freq0Model.value(), m_res0Model.value(), m_vol0Model.value());
 	ps->setFixed( 1, m_freq1Model.value(), m_res1Model.value(), m_vol1Model.value());
 	ps->setFixed( 2, m_freq2Model.value(), m_res2Model.value(), m_vol2Model.value());
 	ps->setFixed( 3, m_freq3Model.value(), m_res3Model.value(), m_vol3Model.value());
-	//ps->setFixed( 4, 14.37f, 0.9999f, 0.0f);
-	//ps->setRest(0.390625,0.570312,0.078125);
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
@@ -269,7 +262,7 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
         InstrumentViewFixedSize( _instrument, _parent )
 {
 	m_modalBarWidget = setupModalBarControls( this );
-	setWidgetBackground( m_modalBarWidget, "artwork2" );
+	setWidgetBackground( m_modalBarWidget, "artwork" );
 	m_modalBarWidget->move( 0,0 );
 
 	changePreset(); // Show widget

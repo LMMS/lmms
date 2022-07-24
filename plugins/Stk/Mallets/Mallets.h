@@ -106,21 +106,13 @@ public:
 		}
 	}
 
-	inline void setFixed(const int modal, const StkFloat ration, const StkFloat radius,
-												const StkFloat gain)
+	inline void setFixed(const int modal, const StkFloat ratio, const StkFloat radius, const StkFloat gain)
 	{
 		if( m_voice )
 		{
-			m_voice->setRatioAndRadius(modal, ration, radius);
+			m_voice->setRatioAndRadius(modal, ratio, radius);
 			m_voice->setModeGain(modal, gain);
 		}
-	}
-
-	inline void setRest(const StkFloat stickh, const StkFloat stickp, const StkFloat dgain)
-	{
-		m_voice->setStickHardness(stickh);
-		m_voice->setStrikePosition(stickp);
-		m_voice->setDirectGain(dgain);
 	}
 
 	inline int presetIndex()
