@@ -6,10 +6,15 @@ jobs:
     runs-on: ubuntu-18.04
     container: lmmsci/linux.mingw64:18.04
     steps:
+    - name: Update git
+      run: |
+        sudo add-apt-repository ppa:git-core/ppa
+        sudo apt-get update
+        sudo apt-get install git
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Initialise submodules
-      run: git submodule update --init --recursive
+      with:
+        submodules: recursive
     - name: Build
       run: |
         mkdir build && cd build
