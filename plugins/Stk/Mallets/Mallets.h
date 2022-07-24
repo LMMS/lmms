@@ -169,7 +169,7 @@ public:
 private:
 	FloatModel m_freq0Model, m_freq1Model, m_freq2Model, m_freq3Model;
 	FloatModel m_res0Model, m_res1Model, m_res2Model, m_res3Model;
-//	FloatModel m_vol0, m_vol1, m_vol2, m_vol3;
+	FloatModel m_vol0Model, m_vol1Model, m_vol2Model, m_vol3Model;
 	FloatModel m_hardnessModel;
 	FloatModel m_positionModel;
 	FloatModel m_vibratoGainModel;
@@ -212,6 +212,7 @@ private:
 	QWidget * m_modalBarWidget;
 	Knob * m_freq0Knob; Knob * m_freq1Knob; Knob * m_freq2Knob; Knob * m_freq3Knob;
 	Knob * m_res0Knob; Knob * m_res1Knob; Knob * m_res2Knob; Knob * m_res3Knob;
+	Knob * m_vol0Knob; Knob * m_vol1Knob; Knob * m_vol2Knob; Knob * m_vol3Knob;
 	Knob * m_hardnessKnob;
 	Knob * m_positionKnob;
 	Knob * m_vibratoGainKnob;

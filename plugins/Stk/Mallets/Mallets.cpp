@@ -74,6 +74,10 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_res1Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 1" )),
 	m_res2Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 2" )),
 	m_res3Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 3" )),
+	m_vol0Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 0" )),
+	m_vol1Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 1" )),
+	m_vol2Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 2" )),
+	m_vol3Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 3" )),
 	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
 	m_positionModel(64.0f, 0.0f, 64.0f, 0.1f, this, tr( "Position" )),
 	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato gain" )),
@@ -111,6 +115,10 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_res1Model.saveSettings( _doc, _this, "res1" );
 	m_res2Model.saveSettings( _doc, _this, "res2" );
 	m_res3Model.saveSettings( _doc, _this, "res3" );
+	m_vol0Model.saveSettings( _doc, _this, "vol0" );
+	m_vol1Model.saveSettings( _doc, _this, "vol1" );
+	m_vol2Model.saveSettings( _doc, _this, "vol2" );
+	m_vol3Model.saveSettings( _doc, _this, "vol3" );
 	m_hardnessModel.saveSettings( _doc, _this, "hardness" );
 	m_positionModel.saveSettings( _doc, _this, "position" );
 	m_vibratoGainModel.saveSettings( _doc, _this, "vib_gain" );
@@ -139,6 +147,10 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 	m_res1Model.loadSettings( _this, "res1" );
 	m_res2Model.loadSettings( _this, "res2" );
 	m_res3Model.loadSettings( _this, "res3" );
+	m_vol0Model.loadSettings( _this, "vol0" );
+	m_vol1Model.loadSettings( _this, "vol1" );
+	m_vol2Model.loadSettings( _this, "vol2" );
+	m_vol3Model.loadSettings( _this, "vol3" );
 	m_hardnessModel.loadSettings( _this, "hardness" );
 	m_positionModel.loadSettings( _this, "position" );
 	m_vibratoGainModel.loadSettings( _this, "vib_gain" );
@@ -215,10 +227,10 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
      {0.025, 0.015, 0.015, 0.015 },
      {0.390625,0.570312,0.078125}},*/
 
-   	ps->setFixed( 0, m_freq0Model.value(), m_res0Model.value(), 0.0f);
-   	ps->setFixed( 1, m_freq1Model.value(), m_res1Model.value(), 0.025f);
-   	ps->setFixed( 2, m_freq2Model.value(), m_res2Model.value(), 0.025f);
-	ps->setFixed( 3, m_freq3Model.value(), m_res3Model.value(), 0.025f);
+	ps->setFixed( 0, m_freq0Model.value(), m_res0Model.value(), m_vol0Model.value());
+	ps->setFixed( 1, m_freq1Model.value(), m_res1Model.value(), m_vol1Model.value());
+	ps->setFixed( 2, m_freq2Model.value(), m_res2Model.value(), m_vol2Model.value());
+	ps->setFixed( 3, m_freq3Model.value(), m_res3Model.value(), m_vol3Model.value());
 	//ps->setFixed( 4, 14.37f, 0.9999f, 0.0f);
 	//ps->setRest(0.390625,0.570312,0.078125);
 
@@ -271,12 +283,12 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	
 	m_spreadKnob = new Knob( knobBright_26, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
-	m_spreadKnob->move( 190, 140 );
+	m_spreadKnob->move( 180, 145 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
 	m_randomKnob = new Knob(knobBright_26, this);
 	m_randomKnob->setLabel(tr("Random"));
-	m_randomKnob->move(190, 190);
+	m_randomKnob->move(180, 185);
 	m_randomKnob->setHintText(tr("Random:"),"");
 
 	// try to inform user about missing Stk-installation
@@ -332,48 +344,68 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 
 	m_res0Knob	= new Knob( knobBright_26, widget );
 	m_res0Knob->setLabel( tr( "Res 0" ) );
-	m_res0Knob->move( 30, 60 );
+	m_res0Knob->move( 30, 65 );
 	m_res0Knob->setHintText( tr( "Res 0:" ), "" );
 
 	m_res1Knob	= new Knob( knobBright_26, widget );
 	m_res1Knob->setLabel( tr( "Res 1" ) );
-	m_res1Knob->move( 80, 60 );
+	m_res1Knob->move( 80, 65 );
 	m_res1Knob->setHintText( tr( "Res 1:" ), "" );
 
 	m_res2Knob	= new Knob( knobBright_26, widget );
 	m_res2Knob->setLabel( tr( "Res 2" ) );
-	m_res2Knob->move( 130, 60 );
+	m_res2Knob->move( 130, 65 );
 	m_res2Knob->setHintText( tr( "Res 2:" ), "" );
 
 	m_res3Knob	= new Knob( knobBright_26, widget );
 	m_res3Knob->setLabel( tr( "Res 3" ) );
-	m_res3Knob->move( 180, 60 );
+	m_res3Knob->move( 180, 65 );
 	m_res3Knob->setHintText( tr( "Res 3:" ), "" );
 		
+	m_vol0Knob	= new Knob( knobBright_26, widget );
+	m_vol0Knob->setLabel( tr( "Vol 0" ) );
+	m_vol0Knob->move( 30, 105 );
+	m_vol0Knob->setHintText( tr( "Vol 0:" ), "" );
+
+	m_vol1Knob	= new Knob( knobBright_26, widget );
+	m_vol1Knob->setLabel( tr( "Vol 1" ) );
+	m_vol1Knob->move( 80, 105 );
+	m_vol1Knob->setHintText( tr( "Vol 1:" ), "" );
+
+	m_vol2Knob	= new Knob( knobBright_26, widget );
+	m_vol2Knob->setLabel( tr( "Vol 2" ) );
+	m_vol2Knob->move( 130, 105 );
+	m_vol2Knob->setHintText( tr( "Vol 2:" ), "" );
+
+	m_vol3Knob	= new Knob( knobBright_26, widget );
+	m_vol3Knob->setLabel( tr( "Vol 3" ) );
+	m_vol3Knob->move( 180, 105 );
+	m_vol3Knob->setHintText( tr( "Vol 3:" ), "" );
+
 	m_hardnessKnob = new Knob( knobBright_26, widget );
-	m_hardnessKnob->setLabel( tr( "Hardness" ) );
-	m_hardnessKnob->move( 30, 90 );
+	m_hardnessKnob->setLabel( tr( "Hard" ) );
+	m_hardnessKnob->move( 30, 145 );
 	m_hardnessKnob->setHintText( tr( "Hardness:" ), "" );
 
 	m_positionKnob = new Knob( knobBright_26, widget );
-	m_positionKnob->setLabel( tr( "Position" ) );
-	m_positionKnob->move( 110, 90 );
+	m_positionKnob->setLabel( tr( "Pos" ) );
+	m_positionKnob->move( 80, 145 );
 	m_positionKnob->setHintText( tr( "Position:" ), "" );
+
+	m_stickKnob = new Knob( knobBright_26, widget );
+	m_stickKnob->setLabel( tr( "Stick" ) );
+	m_stickKnob->move( 130, 145 );
+	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
 
 	m_vibratoGainKnob = new Knob( knobBright_26, widget );
 	m_vibratoGainKnob->setLabel( tr( "Vibrato gain" ) );
-	m_vibratoGainKnob->move( 30, 140 );
+	m_vibratoGainKnob->move( 30, 185 );
 	m_vibratoGainKnob->setHintText( tr( "Vibrato gain:" ), "" );
 
 	m_vibratoFreqKnob = new Knob( knobBright_26, widget );
 	m_vibratoFreqKnob->setLabel( tr( "Vibrato frequency" ) );
-	m_vibratoFreqKnob->move( 110, 140 );
+	m_vibratoFreqKnob->move( 110, 185 );
 	m_vibratoFreqKnob->setHintText( tr( "Vibrato frequency:" ), "" );
-
-	m_stickKnob = new Knob( knobBright_26, widget );
-	m_stickKnob->setLabel( tr( "Stick mix" ) );
-	m_stickKnob->move( 190, 90 );
-	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
 
 	return( widget );
 }
@@ -392,6 +424,10 @@ void MalletsInstrumentView::modelChanged()
 	m_res1Knob->setModel( &inst->m_res1Model );
 	m_res2Knob->setModel( &inst->m_res2Model );
 	m_res3Knob->setModel( &inst->m_res3Model );
+	m_vol0Knob->setModel( &inst->m_vol0Model );
+	m_vol1Knob->setModel( &inst->m_vol1Model );
+	m_vol2Knob->setModel( &inst->m_vol2Model );
+	m_vol3Knob->setModel( &inst->m_vol3Model );
 	m_hardnessKnob->setModel( &inst->m_hardnessModel );
 	m_positionKnob->setModel( &inst->m_positionModel );
 	m_vibratoGainKnob->setModel( &inst->m_vibratoGainModel );
