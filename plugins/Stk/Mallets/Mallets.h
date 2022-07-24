@@ -27,7 +27,7 @@
 #ifndef _MALLET_H
 #define _MALLET_H
 
-#include "Instrmnt.h"
+#include "ModalBar.h"
 
 #include "ComboBox.h"
 #include "Instrument.h"
@@ -46,8 +46,6 @@ namespace lmms
 
 
 using namespace stk;
-
-static const int MALLETS_PRESET_VERSION = 1;
 
 
 namespace gui
@@ -68,30 +66,6 @@ public:
 			const StkFloat _control8,
 			const StkFloat _control11,
 			const int _control16,
-			const uint8_t _delay,
-			const sample_rate_t _sample_rate );
-
-	// TubeBell
-	MalletsSynth( const StkFloat _pitch,
-			const StkFloat _velocity,
-			const int _preset,
-			const StkFloat _control1,
-			const StkFloat _control2,
-			const StkFloat _control4,
-			const StkFloat _control11,
-			const StkFloat _control128,
-			const uint8_t _delay,
-			const sample_rate_t _sample_rate );
-
-	// BandedWG
-	MalletsSynth( const StkFloat _pitch,
-			const StkFloat _velocity,
-			const StkFloat _control2,
-			const StkFloat _control4,
-			const StkFloat _control11,
-			const int _control16,
-			const StkFloat _control64,
-			const StkFloat _control128,
 			const uint8_t _delay,
 			const sample_rate_t _sample_rate );
 
@@ -182,24 +156,10 @@ private:
 	FloatModel m_vibratoFreqModel;
 	FloatModel m_stickModel;
 
-	FloatModel m_modulatorModel;
-	FloatModel m_crossfadeModel;
-	FloatModel m_lfoSpeedModel;
-	FloatModel m_lfoDepthModel;
-	FloatModel m_adsrModel;
-
-	FloatModel m_pressureModel;
-	FloatModel m_motionModel;
-	FloatModel m_vibratoModel;
-	FloatModel m_velocityModel;
-
-	BoolModel m_strikeModel;
-
 	ComboBoxModel m_presetsModel;
 	FloatModel m_spreadModel;
 	FloatModel m_randomModel;
 	IntModel m_versionModel;
-	BoolModel m_isOldVersionModel;
 
 	QVector<sample_t> m_scalers;
 
@@ -230,8 +190,6 @@ private:
 
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupModalBarControls( QWidget * _parent );
-	QWidget * setupTubeBellControls( QWidget * _parent );
-	QWidget * setupBandedWGControls( QWidget * _parent );
 
 	QWidget * m_modalBarWidget;
 	Knob * m_hardnessKnob;
@@ -239,20 +197,6 @@ private:
 	Knob * m_vibratoGainKnob;
 	Knob * m_vibratoFreqKnob;
 	Knob * m_stickKnob;
-
-	QWidget * m_tubeBellWidget;
-	Knob * m_modulatorKnob;
-	Knob * m_crossfadeKnob;
-	Knob * m_lfoSpeedKnob;
-	Knob * m_lfoDepthKnob;
-	Knob * m_adsrKnob;
-
-	QWidget * m_bandedWGWidget;
-	Knob * m_pressureKnob;
-//	Knob * m_motionKnob;
-//	Knob * m_vibratoKnob;
-	Knob * m_velocityKnob;
-//	LedCheckBox * m_strikeLED;
 
 	ComboBox * m_presetsCombo;
 	Knob * m_spreadKnob;
