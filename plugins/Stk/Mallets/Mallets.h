@@ -106,6 +106,23 @@ public:
 		}
 	}
 
+	inline void setFixed(const int modal, const StkFloat ration, const StkFloat radius,
+												const StkFloat gain)
+	{
+		if( m_voice )
+		{
+			m_voice->setRatioAndRadius(modal, ration, radius);
+			m_voice->setModeGain(modal, gain);
+		}
+	}
+
+	inline void setRest(const StkFloat stickh, const StkFloat stickp, const StkFloat dgain)
+	{
+		m_voice->setStickHardness(stickh);
+		m_voice->setStrikePosition(stickp);
+		m_voice->setDirectGain(dgain);
+	}
+
 	inline int presetIndex()
 	{
 		return m_presetIndex;
@@ -119,7 +136,7 @@ public:
 
 protected:
 	int m_presetIndex;
-	Instrmnt * m_voice;
+	ModalBar * m_voice;
 
 	StkFloat * m_delay;
 	uint8_t m_delayRead;
@@ -150,6 +167,9 @@ public:
 
 
 private:
+	FloatModel m_freq0Model, m_freq1Model, m_freq2Model, m_freq3Model;
+	FloatModel m_res0Model, m_res1Model, m_res2Model, m_res3Model;
+//	FloatModel m_vol0, m_vol1, m_vol2, m_vol3;
 	FloatModel m_hardnessModel;
 	FloatModel m_positionModel;
 	FloatModel m_vibratoGainModel;
@@ -160,8 +180,6 @@ private:
 	FloatModel m_spreadModel;
 	FloatModel m_randomModel;
 	IntModel m_versionModel;
-
-	QVector<sample_t> m_scalers;
 
 	bool m_filesMissing;
 
@@ -192,6 +210,8 @@ private:
 	QWidget * setupModalBarControls( QWidget * _parent );
 
 	QWidget * m_modalBarWidget;
+	Knob * m_freq0Knob; Knob * m_freq1Knob; Knob * m_freq2Knob; Knob * m_freq3Knob;
+	Knob * m_res0Knob; Knob * m_res1Knob; Knob * m_res2Knob; Knob * m_res3Knob;
 	Knob * m_hardnessKnob;
 	Knob * m_positionKnob;
 	Knob * m_vibratoGainKnob;
