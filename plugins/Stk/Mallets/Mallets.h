@@ -157,11 +157,16 @@ public:
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
-	//void changePreset(int preset);
+
+public slots:
+	void changeFreqModel();
+	void changePreset();
+
 
 private:
 	BoolModel m_f0fixedModel, m_f1fixedModel, m_f2fixedModel, m_f3fixedModel;
 	FloatModel m_freq0Model, m_freq1Model, m_freq2Model, m_freq3Model;
+	FloatModel m_fixedFreq0Model, m_fixedFreq1Model, m_fixedFreq2Model, m_fixedFreq3Model;
 	FloatModel m_res0Model, m_res1Model, m_res2Model, m_res3Model;
 	FloatModel m_vol0Model, m_vol1Model, m_vol2Model, m_vol3Model;
 	FloatModel m_hardnessModel;
