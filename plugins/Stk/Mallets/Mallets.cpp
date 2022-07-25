@@ -28,6 +28,7 @@
 
 #include <QDir>
 #include <QDomElement>
+#include <QLabel>
 #include <QMessageBox>
 
 #include "AudioEngine.h"
@@ -91,14 +92,50 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 {
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
+//	m_presets[0] = {{1.0, 3.99, 10.65, -2443},
+//					{0.9996, 0.9994, 0.9994, 0.999},
+//					{0.04, 0.01, 0.01, 0.008},
+//					{0.429688, 0.445312, 0.093750}};
 	m_presetsModel.addItem( tr( "Vibraphone" ) );
+//	m_presets[1] = {{1.0, 2.01, 3.9, 14.37},
+//					{0.99995, 0.99991, 0.99992, 0.9999},
+//					{0.025, 0.015, 0.015, 0.015 },
+//					{0.390625,0.570312,0.078125}}
 	m_presetsModel.addItem( tr( "Agogo" ) );
+//	m_presets[2] = {{1.0, 4.08, 6.669, -3725.0},
+//					{0.999, 0.999, 0.999, 0.999},
+//					{0.06, 0.05, 0.03, 0.02},
+//					{0.609375,0.359375,0.140625}}
 	m_presetsModel.addItem( tr( "Wood 1" ) );
+//	m_presets[3] = {{1.0, 2.777, 7.378, 15.377},
+//					{0.996, 0.994, 0.994, 0.99},
+//					{0.04, 0.01, 0.01, 0.008},
+//					{0.460938,0.375000,0.046875}}
 	m_presetsModel.addItem( tr( "Reso" ) );
+//	m_presets[4] = {{1.0, 2.777, 7.378, 15.377},
+//					{0.99996, 0.99994, 0.99994, 0.9999},
+//					{0.02, 0.005, 0.005, 0.004},
+//					{0.453125,0.250000,0.101562}}
 	m_presetsModel.addItem( tr( "Wood 2" ) );
+//	m_presets[5] = {{1.0, 1.777, 2.378, 3.377},
+//					{0.996, 0.994, 0.994, 0.99},
+//					{0.04, 0.01, 0.01, 0.008},
+//					{0.312500,0.445312,0.109375}}
 	m_presetsModel.addItem( tr( "Beats" ) );
+//	m_presets[6] = {{1.0, 1.004, 1.013, 2.377},
+//					{0.9999, 0.9999, 0.9999, 0.999},
+//					{0.02, 0.005, 0.005, 0.004},
+//					{0.398438,0.296875,0.070312}}
 	m_presetsModel.addItem( tr( "Two fixed" ) );
+//	m_presets[7] = {{1.0, 4.0, -1320.0, -3960.0},
+//					{0.9996, 0.999, 0.9994, 0.999},
+//					{0.04, 0.01, 0.01, 0.008},
+//					{0.453125,0.453125,0.070312}}
 	m_presetsModel.addItem( tr( "Clump" ) );
+//	m_presets[8] = {{1.0, 1.217, 1.475, 1.729},
+//					{0.999, 0.999, 0.999, 0.999},
+//					{0.03, 0.03, 0.03, 0.03 },
+//					{0.390625,0.570312,0.078125}}
 }
 
 
@@ -160,6 +197,28 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 	m_presetsModel.loadSettings( _this, "preset" );
 	m_spreadModel.loadSettings( _this, "spread" );
 	m_randomModel.loadSettings(_this, "randomness");
+}
+
+
+void MalletsInstrument::changePreset(int preset)
+{
+	MalletsSynth * ps = static_cast<MalletsSynth *>( _n->m_pluginData );
+	int p = ps->presetIndex();;
+	m_freq0Model.setValue(m_presets[p][0][0]);
+	m_freq1Model.setValue(m_presets[p][0][1]);
+	m_freq2Model.setValue(m_presets[p][0][2]);
+	m_freq3Model.setValue(m_presets[p][0][3]);
+	m_res0Model.setValue(m_presets[p][1][0]);
+	m_res1Model.setValue(m_presets[p][1][1]);
+	m_res2Model.setValue(m_presets[p][1][2]);
+	m_res3Model.setValue(m_presets[p][1][3]);
+	m_vol0Model.setValue(m_presets[p][2][0]);
+	m_vol1Model.setValue(m_presets[p][2][1]);
+	m_vol2Model.setValue(m_presets[p][2][2]);
+	m_vol3Model.setValue(m_presets[p][2][3]);
+	m_hardnessModel.setValue(m_presets[p][3][0]);
+	m_positionModel.setValue(m_presets[p][3][1]);
+	m_stickModel.setValue(m_presets[p][3][2]);
 }
 
 
@@ -276,12 +335,12 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	
 	m_spreadKnob = new Knob( knobBright_26, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
-	m_spreadKnob->move( 180, 145 );
+	m_spreadKnob->move( 180, 155 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
 	m_randomKnob = new Knob(knobBright_26, this);
-	m_randomKnob->setLabel(tr("Random"));
-	m_randomKnob->move(180, 185);
+	m_randomKnob->setLabel(tr("Rand"));
+	m_randomKnob->move(180, 195);
 	m_randomKnob->setHintText(tr("Random:"),"");
 
 	// try to inform user about missing Stk-installation
@@ -317,88 +376,92 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 
 	m_freq0Knob	= new Knob( knobBright_26, widget );
 	m_freq0Knob->setLabel( tr( "Freq 0" ) );
-	m_freq0Knob->move( 30, 25 );
+	m_freq0Knob->move( 30, 35 );
 	m_freq0Knob->setHintText( tr( "Freq 0:" ), "" );
 
 	m_freq1Knob	= new Knob( knobBright_26, widget );
 	m_freq1Knob->setLabel( tr( "Freq 1" ) );
-	m_freq1Knob->move( 80, 25 );
+	m_freq1Knob->move( 80, 35 );
 	m_freq1Knob->setHintText( tr( "Freq 1:" ), "" );
 
 	m_freq2Knob	= new Knob( knobBright_26, widget );
 	m_freq2Knob->setLabel( tr( "Freq 2" ) );
-	m_freq2Knob->move( 130, 25 );
+	m_freq2Knob->move( 130, 35 );
 	m_freq2Knob->setHintText( tr( "Freq 2:" ), "" );
 
 	m_freq3Knob	= new Knob( knobBright_26, widget );
 	m_freq3Knob->setLabel( tr( "Freq 3" ) );
-	m_freq3Knob->move( 180, 25 );
+	m_freq3Knob->move( 180, 35 );
 	m_freq3Knob->setHintText( tr( "Freq3:" ), "" );
 
 	m_res0Knob	= new Knob( knobBright_26, widget );
 	m_res0Knob->setLabel( tr( "Res 0" ) );
-	m_res0Knob->move( 30, 65 );
+	m_res0Knob->move( 30, 75 );
 	m_res0Knob->setHintText( tr( "Res 0:" ), "" );
 
 	m_res1Knob	= new Knob( knobBright_26, widget );
 	m_res1Knob->setLabel( tr( "Res 1" ) );
-	m_res1Knob->move( 80, 65 );
+	m_res1Knob->move( 80, 75 );
 	m_res1Knob->setHintText( tr( "Res 1:" ), "" );
 
 	m_res2Knob	= new Knob( knobBright_26, widget );
 	m_res2Knob->setLabel( tr( "Res 2" ) );
-	m_res2Knob->move( 130, 65 );
+	m_res2Knob->move( 130, 75 );
 	m_res2Knob->setHintText( tr( "Res 2:" ), "" );
 
 	m_res3Knob	= new Knob( knobBright_26, widget );
 	m_res3Knob->setLabel( tr( "Res 3" ) );
-	m_res3Knob->move( 180, 65 );
+	m_res3Knob->move( 180, 75 );
 	m_res3Knob->setHintText( tr( "Res 3:" ), "" );
 		
 	m_vol0Knob	= new Knob( knobBright_26, widget );
 	m_vol0Knob->setLabel( tr( "Vol 0" ) );
-	m_vol0Knob->move( 30, 105 );
+	m_vol0Knob->move( 30, 115 );
 	m_vol0Knob->setHintText( tr( "Vol 0:" ), "" );
 
 	m_vol1Knob	= new Knob( knobBright_26, widget );
 	m_vol1Knob->setLabel( tr( "Vol 1" ) );
-	m_vol1Knob->move( 80, 105 );
+	m_vol1Knob->move( 80, 115 );
 	m_vol1Knob->setHintText( tr( "Vol 1:" ), "" );
 
 	m_vol2Knob	= new Knob( knobBright_26, widget );
 	m_vol2Knob->setLabel( tr( "Vol 2" ) );
-	m_vol2Knob->move( 130, 105 );
+	m_vol2Knob->move( 130, 115 );
 	m_vol2Knob->setHintText( tr( "Vol 2:" ), "" );
 
 	m_vol3Knob	= new Knob( knobBright_26, widget );
 	m_vol3Knob->setLabel( tr( "Vol 3" ) );
-	m_vol3Knob->move( 180, 105 );
+	m_vol3Knob->move( 180, 115 );
 	m_vol3Knob->setHintText( tr( "Vol 3:" ), "" );
 
 	m_hardnessKnob = new Knob( knobBright_26, widget );
 	m_hardnessKnob->setLabel( tr( "Hard" ) );
-	m_hardnessKnob->move( 30, 145 );
+	m_hardnessKnob->move( 30, 155 );
 	m_hardnessKnob->setHintText( tr( "Hardness:" ), "" );
 
 	m_positionKnob = new Knob( knobBright_26, widget );
 	m_positionKnob->setLabel( tr( "Pos" ) );
-	m_positionKnob->move( 80, 145 );
+	m_positionKnob->move( 80, 155 );
 	m_positionKnob->setHintText( tr( "Position:" ), "" );
 
 	m_stickKnob = new Knob( knobBright_26, widget );
 	m_stickKnob->setLabel( tr( "Stick" ) );
-	m_stickKnob->move( 130, 145 );
+	m_stickKnob->move( 130, 155 );
 	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
 
 	m_vibratoGainKnob = new Knob( knobBright_26, widget );
-	m_vibratoGainKnob->setLabel( tr( "Vibrato gain" ) );
-	m_vibratoGainKnob->move( 30, 185 );
+	m_vibratoGainKnob->setLabel( tr( "Gain" ) );
+	m_vibratoGainKnob->move( 30, 195 );
 	m_vibratoGainKnob->setHintText( tr( "Vibrato gain:" ), "" );
 
 	m_vibratoFreqKnob = new Knob( knobBright_26, widget );
-	m_vibratoFreqKnob->setLabel( tr( "Vibrato frequency" ) );
-	m_vibratoFreqKnob->move( 110, 185 );
+	m_vibratoFreqKnob->setLabel( tr( "Freq" ) );
+	m_vibratoFreqKnob->move( 80, 195 );
 	m_vibratoFreqKnob->setHintText( tr( "Vibrato frequency:" ), "" );
+
+	QLabel* vibratoLabel = new QLabel( tr( "Vibrato" ), widget );
+	vibratoLabel->setFont( pointSize<8>( vibratoLabel->font() ) );
+	vibratoLabel->move(50, 230);
 
 	return( widget );
 }
@@ -436,6 +499,23 @@ void MalletsInstrumentView::modelChanged()
 
 void MalletsInstrumentView::changePreset()
 {
+	MalletsInstrument * inst = static_cast castModel<MalletsInstrument>();
+	MalletsInstrument::changePreset(inst->m_presetsModel.value());
+/*	MalletsInstrument::m_freq0Model.set(m_presets[p][0][0]);
+	MalletsInstrument::m_freq1Model.set(m_presets[p][0][1]);
+	MalletsInstrument::m_freq2Model.set(m_presets[p][0][2]);
+	MalletsInstrument::m_freq3Model.set(m_presets[p][0][3]);
+	MalletsInstrument::m_res0Model.set(m_presets[p][1][0]);
+	MalletsInstrument::m_res1Model.set(m_presets[p][1][1]);
+	MalletsInstrument::m_res2Model.set(m_presets[p][1][2]);
+	MalletsInstrument::m_res3Model.set(m_presets[p][1][3]);
+	MalletsInstrument::m_vol0Model.set(m_presets[p][2][0]);
+	MalletsInstrument::m_vol1Model.set(m_presets[p][2][1]);
+	MalletsInstrument::m_vol2Model.set(m_presets[p][2][2]);
+	MalletsInstrument::m_vol3Model.set(m_presets[p][2][3]);
+	MalletsInstrument::m_hardnessModel.set(m_presets[p][3][0]);
+	MalletsInstrument::m_positionModel.set(m_presets[p][3][1]);
+	MalletsInstrument::m_stickModel.set(m_presets[p][3][2]);*/
 	m_modalBarWidget->show();
 }
 
@@ -474,7 +554,7 @@ MalletsSynth::MalletsSynth( const StkFloat _pitch,
 		m_voice->controlChange( 8, _control8 );
 		m_voice->controlChange( 11, _control11 );
 		//m_voice->controlChange( 128, 128.0f );
-		
+
 		m_voice->noteOn( _pitch, _velocity );
 	}
 	catch( ... )
