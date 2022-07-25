@@ -20,11 +20,11 @@ jobs:
       run: |
         mkdir build && cd build
         ../cmake/build_win64.sh
-        make
+        make -j2
     - name: Build tests
-      run: cd build && make tests
+      run: cd build && make -j2 tests
     - name: Package
-      run: cd build && make package
+      run: cd build && make -j2 package
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
