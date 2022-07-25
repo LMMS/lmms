@@ -200,7 +200,7 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 }
 
 
-void MalletsInstrument::changePreset(int preset)
+/*void MalletsInstrument::changePreset(int preset)
 {
 	MalletsSynth * ps = static_cast<MalletsSynth *>( _n->m_pluginData );
 	int p = ps->presetIndex();;
@@ -219,7 +219,7 @@ void MalletsInstrument::changePreset(int preset)
 	m_hardnessModel.setValue(m_presets[p][3][0]);
 	m_positionModel.setValue(m_presets[p][3][1]);
 	m_stickModel.setValue(m_presets[p][3][2]);
-}
+}*/
 
 
 
@@ -499,9 +499,9 @@ void MalletsInstrumentView::modelChanged()
 
 void MalletsInstrumentView::changePreset()
 {
-	MalletsInstrument * inst = static_cast castModel<MalletsInstrument>();
+/*	MalletsInstrument * inst = static_cast castModel<MalletsInstrument>();
 	MalletsInstrument::changePreset(inst->m_presetsModel.value());
-/*	MalletsInstrument::m_freq0Model.set(m_presets[p][0][0]);
+	MalletsInstrument::m_freq0Model.set(m_presets[p][0][0]);
 	MalletsInstrument::m_freq1Model.set(m_presets[p][0][1]);
 	MalletsInstrument::m_freq2Model.set(m_presets[p][0][2]);
 	MalletsInstrument::m_freq3Model.set(m_presets[p][0][3]);

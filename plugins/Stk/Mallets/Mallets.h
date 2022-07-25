@@ -152,12 +152,12 @@ public:
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
-//	void changePreset(int preset);
+
 	QString nodeName() const override;
 
 	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
-	void changePreset(int preset);
+	//void changePreset(int preset);
 
 private:
 	FloatModel m_freq0Model, m_freq1Model, m_freq2Model, m_freq3Model;
