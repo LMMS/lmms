@@ -67,6 +67,10 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 
 MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	Instrument( _instrument_track, &malletsstk_plugin_descriptor ),
+	m_f0fixedModel(false, this, tr( "Fixed 0" )),
+	m_f1fixedModel(false, this, tr( "Fixed 1" )),
+	m_f2fixedModel(false, this, tr( "Fixed 2" )),
+	m_f3fixedModel(false, this, tr( "Fixed 3" )),
 	m_freq0Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 0" )),
 	m_freq1Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 1" )),
 	m_freq2Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 2" )),
@@ -144,6 +148,10 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	// ModalBar
+	m_f0fixedModel.saveSettings( _doc, _this, "fixed0");
+	m_f1fixedModel.saveSettings( _doc, _this, "fixed1");
+	m_f2fixedModel.saveSettings( _doc, _this, "fixed2");
+	m_f3fixedModel.saveSettings( _doc, _this, "fixed3");
 	m_freq0Model.saveSettings( _doc, _this, "freq0" );
 	m_freq1Model.saveSettings( _doc, _this, "freq1" );
 	m_freq2Model.saveSettings( _doc, _this, "freq2" );
@@ -176,6 +184,10 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 	m_versionModel.loadSettings( _this, "version" );
 
 	// ModalBar
+	m_f0fixedModel.loadSettings( _this, "fixed0");
+	m_f1fixedModel.loadSettings( _this, "fixed1");
+	m_f2fixedModel.loadSettings( _this, "fixed2");
+	m_f3fixedModel.loadSettings( _this, "fixed3");
 	m_freq0Model.loadSettings( _this, "freq0" );
 	m_freq1Model.loadSettings( _this, "freq1" );
 	m_freq2Model.loadSettings( _this, "freq2" );
@@ -326,9 +338,9 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 
 	changePreset(); // Show widget
 
-	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 140, 10, 99, ComboBox::DEFAULT_HEIGHT );
-	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
+//	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
+//	m_presetsCombo->setGeometry( 140, 10, 99, ComboBox::DEFAULT_HEIGHT );
+//	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
@@ -374,6 +386,14 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 
+	m_f0fixedLED = new LedCheckBox( tr( "F0" ), widget );
+	m_f0fixedLED->move( 10, 15 );
+	m_f1fixedLED = new LedCheckBox( tr( "F1" ), widget );
+	m_f1fixedLED->move( 60, 15 );
+	m_f2fixedLED = new LedCheckBox( tr( "F2" ), widget );
+	m_f2fixedLED->move( 110, 15 );
+	m_f3fixedLED = new LedCheckBox( tr( "F3" ), widget );
+	m_f3fixedLED->move( 160, 15 );
 	m_freq0Knob	= new Knob( knobBright_26, widget );
 	m_freq0Knob->setLabel( tr( "Freq 0" ) );
 	m_freq0Knob->move( 30, 35 );
@@ -472,6 +492,10 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 void MalletsInstrumentView::modelChanged()
 {
 	MalletsInstrument * inst = castModel<MalletsInstrument>();
+	m_f0fixedLED->setModel( &inst->m_f0fixedModel );
+	m_f1fixedLED->setModel( &inst->m_f1fixedModel );
+	m_f2fixedLED->setModel( &inst->m_f2fixedModel );
+	m_f3fixedLED->setModel( &inst->m_f3fixedModel );
 	m_freq0Knob->setModel( &inst->m_freq0Model );
 	m_freq1Knob->setModel( &inst->m_freq1Model );
 	m_freq2Knob->setModel( &inst->m_freq2Model );
@@ -489,7 +513,7 @@ void MalletsInstrumentView::modelChanged()
 	m_vibratoGainKnob->setModel( &inst->m_vibratoGainModel );
 	m_vibratoFreqKnob->setModel( &inst->m_vibratoFreqModel );
 	m_stickKnob->setModel( &inst->m_stickModel );
-	m_presetsCombo->setModel( &inst->m_presetsModel );
+//	m_presetsCombo->setModel( &inst->m_presetsModel );
 	m_spreadKnob->setModel( &inst->m_spreadModel );
 	m_randomKnob->setModel(&inst->m_randomModel);
 }

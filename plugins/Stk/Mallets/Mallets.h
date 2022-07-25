@@ -160,6 +160,7 @@ public:
 	//void changePreset(int preset);
 
 private:
+	BoolModel m_f0fixedModel, m_f1fixedModel, m_f2fixedModel, m_f3fixedModel;
 	FloatModel m_freq0Model, m_freq1Model, m_freq2Model, m_freq3Model;
 	FloatModel m_res0Model, m_res1Model, m_res2Model, m_res3Model;
 	FloatModel m_vol0Model, m_vol1Model, m_vol2Model, m_vol3Model;
@@ -242,6 +243,7 @@ private:
 	QWidget * setupModalBarControls( QWidget * _parent );
 
 	QWidget * m_modalBarWidget;
+	LedCheckBox * m_f0fixedLED; LedCheckBox * m_f1fixedLED; LedCheckBox * m_f2fixedLED; LedCheckBox * m_f3fixedLED;
 	Knob * m_freq0Knob; Knob * m_freq1Knob; Knob * m_freq2Knob; Knob * m_freq3Knob;
 	Knob * m_res0Knob; Knob * m_res1Knob; Knob * m_res2Knob; Knob * m_res3Knob;
 	Knob * m_vol0Knob; Knob * m_vol1Knob; Knob * m_vol2Knob; Knob * m_vol3Knob;
