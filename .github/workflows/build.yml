@@ -6,11 +6,12 @@ jobs:
     runs-on: ubuntu-18.04
     container: lmmsci/linux.mingw64:18.04
     steps:
-    - name: Update git
+    - name: Update and configure Git
       run: |
         add-apt-repository ppa:git-core/ppa
         apt-get update
         apt-get --yes install git
+        git config --global --add safe.directory /__w/lmms/lmms
     - name: Checkout
       uses: actions/checkout@v3
       with:
