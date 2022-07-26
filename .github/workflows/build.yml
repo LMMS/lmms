@@ -1,31 +1,130 @@
 name: build
 on: [push, pull_request]
+shared:
+  environment: &environment
+    CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    MAKEFLAGS: -j2
+  configure-git: &configure-git
+    name: Update and configure Git
+    run: |
+      add-apt-repository ppa:git-core/ppa
+      apt-get update
+      apt-get --yes install git
+      git config --global --add safe.directory /__w/lmms/lmms
+  check-out: &check-out
+    name: Check out
+    uses: actions/checkout@v3
+    with:
+      fetch-depth: 0
+      submodules: recursive
+  build-make: &build-make
+    name: Build
+    run: cd build && make
+  build-tests-make: &build-tests-make
+    name: Build tests
+    run: cd build && make tests
+  run-tests: &run-tests
+    name: Run tests
+    run: build/tests/tests
 jobs:
+  linux:
+    name: linux
+    runs-on: ubuntu-18.04
+    container: lmmsci/linux.gcc:18.04
+    env: *environment
+    steps:
+    - *configure-git
+    - *check-out
+    - name: Configure
+      run: |
+        source /opt/qt5*/bin/qt5*-env.sh || true
+        mkdir build && cd build
+        cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
+    - *build-make
+    - *build-tests-make
+    - *run-tests
+    - name: Package
+      run: |
+        cd build
+        make install
+        make appimage || (cat appimage.log && false)
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux
+        path: build/lmms-*.AppImage
+  macos:
+    name: macos
+    runs-on: macos-11
+    env:
+      <<: *environment
+      MAKEFLAGS: -j3
+      DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
+    steps:
+    - *check-out
+    - name: Install dependencies
+      run: |
+        brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
+                     libsamplerate jack sdl libgig libsoundio lilv lv2 stk \
+                     fluid-synth portaudio fltk qt5 carla
+        npm install -g appdmg
+    - name: Configure
+      run: |
+        mkdir build && cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX="../target" \
+                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
+                 $CMAKE_OPTS \
+                 -DUSE_WERROR=OFF
+    - *build-make
+    - *build-tests-make
+    - *run-tests
+    - name: Package
+      run: |
+        cd build
+        make install
+        make dmg
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux
+        path: build/lmms-*.dmg
+  mingw32:
+    name: mingw32
+    runs-on: ubuntu-18.04
+    container: lmmsci/linux.mingw32:18.04
+    env: *environment
+    steps:
+    - *configure-git
+    - *check-out
+    - name: Configure
+      run: |
+        mkdir build && cd build
+        ../cmake/build_win32.sh
+    - *build-make
+    - *build-tests-make
+    - name: Package
+      run: cd build && make package
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: mingw32
+        path: build/lmms-*.exe
   mingw64:
     name: mingw64
     runs-on: ubuntu-18.04
     container: lmmsci/linux.mingw64:18.04
+    env: *environment
     steps:
-    - name: Update and configure Git
-      run: |
-        add-apt-repository ppa:git-core/ppa
-        apt-get update
-        apt-get --yes install git
-        git config --global --add safe.directory /__w/lmms/lmms
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: recursive
-    - name: Build
+    - *configure-git
+    - *check-out
+    - name: Configure
       run: |
         mkdir build && cd build
         ../cmake/build_win64.sh
-        make -j2
-    - name: Build tests
-      run: cd build && make -j2 tests
+    - *build-make
+    - *build-tests-make
     - name: Package
-      run: cd build && make -j2 package
+      run: cd build && make package
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
