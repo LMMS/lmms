@@ -178,7 +178,6 @@ private:
 	ComboBoxModel m_presetsModel;
 	FloatModel m_spreadModel;
 	FloatModel m_randomModel;
-	IntModel m_versionModel;
 
 	static constexpr StkFloat m_presets[9][4][4] = {
 		{{1.0, 3.99, 10.65, -2443},		// Marimba

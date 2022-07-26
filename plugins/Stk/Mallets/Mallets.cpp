@@ -174,7 +174,6 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_presetsModel.saveSettings( _doc, _this, "preset" );
 	m_spreadModel.saveSettings( _doc, _this, "spread" );
 	m_randomModel.saveSettings(_doc, _this, "randomness");
-	m_versionModel.saveSettings( _doc, _this, "version" );
 }
 
 
@@ -182,8 +181,6 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void MalletsInstrument::loadSettings( const QDomElement & _this )
 {
-	m_versionModel.loadSettings( _this, "version" );
-
 	// ModalBar
 	m_f0fixedModel.loadSettings( _this, "fixed0");
 	m_f1fixedModel.loadSettings( _this, "fixed1");
