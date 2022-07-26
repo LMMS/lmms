@@ -532,9 +532,9 @@ void MalletsInstrumentView::changePreset()
 	inst->m_vol1Model.setValue(MalletsInstrument::m_presets[p][2][1]);
 	inst->m_vol2Model.setValue(MalletsInstrument::m_presets[p][2][2]);
 	inst->m_vol3Model.setValue(MalletsInstrument::m_presets[p][2][3]);
-	inst->m_hardnessModel.setValue(MalletsInstrument::m_presets[p][3][0]);
-	inst->m_positionModel.setValue(MalletsInstrument::m_presets[p][3][1]);
-	inst->m_stickModel.setValue(MalletsInstrument::m_presets[p][3][2]);
+	inst->m_hardnessModel.setValue(MalletsInstrument::m_presets[p][3][0] * 128);// *128, temporary solution to
+	inst->m_positionModel.setValue(MalletsInstrument::m_presets[p][3][1] * 128);// convert to the 0.0 - 128.0
+	inst->m_stickModel.setValue(MalletsInstrument::m_presets[p][3][2] * 128);  	// range.
 	m_modalBarWidget->show();
 }
 
