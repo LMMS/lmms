@@ -446,16 +446,10 @@ void MalletsInstrumentView::modelChanged()
 	m_f1fixedLED->setModel( &inst->m_f1fixedModel );
 	m_f2fixedLED->setModel( &inst->m_f2fixedModel );
 	m_f3fixedLED->setModel( &inst->m_f3fixedModel );
-/*	m_freq0Knob->setModel( &inst->m_freq0Model );
-	m_freq1Knob->setModel( &inst->m_freq1Model );
-	m_freq2Knob->setModel( &inst->m_freq2Model );
-	m_freq3Knob->setModel( &inst->m_freq3Model );*/
-
 	m_freq0Knob->setModel( &inst->m_freq0Model );
 	m_freq1Knob->setModel( &inst->m_freq1Model );
 	m_freq2Knob->setModel( &inst->m_freq2Model );
 	m_freq3Knob->setModel( &inst->m_freq3Model );
-
 	m_res0Knob->setModel( &inst->m_res0Model );
 	m_res1Knob->setModel( &inst->m_res1Model );
 	m_res2Knob->setModel( &inst->m_res2Model );
