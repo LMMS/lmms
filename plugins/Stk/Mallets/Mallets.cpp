@@ -75,10 +75,6 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_freq1Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 1" )),
 	m_freq2Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 2" )),
 	m_freq3Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 3" )),
-	m_fixedFreq0Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 0" )),
-	m_fixedFreq1Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 1" )),
-	m_fixedFreq2Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 2" )),
-	m_fixedFreq3Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 3" )),
 	m_res0Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 0" )),
 	m_res1Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 1" )),
 	m_res2Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 2" )),
@@ -161,10 +157,6 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_freq1Model.saveSettings( _doc, _this, "freq1" );
 	m_freq2Model.saveSettings( _doc, _this, "freq2" );
 	m_freq3Model.saveSettings( _doc, _this, "freq3" );
-	m_fixedFreq0Model.saveSettings( _doc, _this, "fixedfreq0" );
-	m_fixedFreq1Model.saveSettings( _doc, _this, "fixedfreq1" );
-	m_fixedFreq2Model.saveSettings( _doc, _this, "fixedfreq2" );
-	m_fixedFreq3Model.saveSettings( _doc, _this, "fixedfreq3" );
 	m_res0Model.saveSettings( _doc, _this, "res0" );
 	m_res1Model.saveSettings( _doc, _this, "res1" );
 	m_res2Model.saveSettings( _doc, _this, "res2" );
@@ -201,10 +193,6 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 	m_freq1Model.loadSettings( _this, "freq1" );
 	m_freq2Model.loadSettings( _this, "freq2" );
 	m_freq3Model.loadSettings( _this, "freq3" );
-	m_fixedFreq0Model.loadSettings( _this, "fixedfreq0" );
-	m_fixedFreq1Model.loadSettings( _this, "fixedfreq1" );
-	m_fixedFreq2Model.loadSettings( _this, "fixedfreq2" );
-	m_fixedFreq3Model.loadSettings( _this, "fixedfreq3" );
 	m_res0Model.loadSettings( _this, "res0" );
 	m_res1Model.loadSettings( _this, "res1" );
 	m_res2Model.loadSettings( _this, "res2" );
@@ -283,14 +271,10 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	MalletsSynth * ps = static_cast<MalletsSynth *>( _n->m_pluginData );
 	p = ps->presetIndex();
 	ps->setFrequency( freq );
-	StkFloat fTemp = m_f0fixedModel.value() ? -m_fixedFreq0Model.value() : m_freq0Model.value();
-	ps->setFixed( 0, fTemp, m_res0Model.value(), m_vol0Model.value());
-	fTemp = m_f1fixedModel.value() ? -m_fixedFreq1Model.value() : m_freq1Model.value();
-	ps->setFixed( 1, fTemp, m_res1Model.value(), m_vol1Model.value());
-	fTemp = m_f2fixedModel.value() ? -m_fixedFreq2Model.value() : m_freq2Model.value();
-	ps->setFixed( 2, fTemp, m_res2Model.value(), m_vol2Model.value());
-	fTemp = m_f3fixedModel.value() ? -m_fixedFreq3Model.value() : m_freq3Model.value();
-	ps->setFixed( 3, fTemp, m_res3Model.value(), m_vol3Model.value());
+	ps->setFixed( 0, m_freq0Model.value(), m_res0Model.value(), m_vol0Model.value());
+	ps->setFixed( 1, m_freq1Model.value(), m_res1Model.value(), m_vol1Model.value());
+	ps->setFixed( 2, m_freq2Model.value(), m_res2Model.value(), m_vol2Model.value());
+	ps->setFixed( 3, m_freq3Model.value(), m_res3Model.value(), m_vol3Model.value());
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
@@ -506,15 +490,11 @@ void MalletsInstrumentView::modelChanged()
 	m_freq1Knob->setModel( &inst->m_freq1Model );
 	m_freq2Knob->setModel( &inst->m_freq2Model );
 	m_freq3Knob->setModel( &inst->m_freq3Model );*/
-//qDebug()<< "inst->m_f0fixedModel.value() " << inst->m_f0fixedModel.value();
-	if (inst->m_f0fixedModel.value()){m_freq0Knob->setModel( &inst->m_fixedFreq0Model );}
-	else {m_freq0Knob->setModel( &inst->m_freq0Model );}
-	if (inst->m_f1fixedModel.value()){m_freq1Knob->setModel( &inst->m_fixedFreq1Model );}
-	else {m_freq1Knob->setModel( &inst->m_freq1Model );}
-	if (inst->m_f2fixedModel.value()){m_freq2Knob->setModel( &inst->m_fixedFreq2Model );}
-	else {m_freq2Knob->setModel( &inst->m_freq2Model );}
-	if (inst->m_f3fixedModel.value()){m_freq3Knob->setModel( &inst->m_fixedFreq3Model );}
-	else {m_freq3Knob->setModel( &inst->m_freq3Model );}
+
+	m_freq0Knob->setModel( &inst->m_freq0Model );
+	m_freq1Knob->setModel( &inst->m_freq1Model );
+	m_freq2Knob->setModel( &inst->m_freq2Model );
+	m_freq3Knob->setModel( &inst->m_freq3Model );
 
 	m_res0Knob->setModel( &inst->m_res0Model );
 	m_res1Knob->setModel( &inst->m_res1Model );
@@ -605,9 +585,7 @@ void MalletsInstrumentView::changePreset()
 }
 
 
-/*if (m_f0fixedModel.value())
 
-unsetModel*/
 
 void MalletsInstrumentView::changeFreqModel()
 {
