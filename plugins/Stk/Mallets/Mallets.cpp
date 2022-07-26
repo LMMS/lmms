@@ -75,10 +75,10 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_freq1Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 1" )),
 	m_freq2Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 2" )),
 	m_freq3Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 3" )),
-	m_fixedFreq0Model(1000.0f, 0.0f, 1000.0f, 0.1f, this, tr( "Freq 0" )),
-	m_fixedFreq1Model(1000.0f, 0.0f, 1000.0f, 0.1f, this, tr( "Freq 1" )),
-	m_fixedFreq2Model(1000.0f, 0.0f, 1000.0f, 0.1f, this, tr( "Freq 2" )),
-	m_fixedFreq3Model(1000.0f, 0.0f, 1000.0f, 0.1f, this, tr( "Freq 3" )),
+	m_fixedFreq0Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 0" )),
+	m_fixedFreq1Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 1" )),
+	m_fixedFreq2Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 2" )),
+	m_fixedFreq3Model(1000.0f, 0.0f, 10000.0f, 0.1f, this, tr( "Freq 3" )),
 	m_res0Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 0" )),
 	m_res1Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 1" )),
 	m_res2Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 2" )),
@@ -545,7 +545,7 @@ void MalletsInstrumentView::changePreset()
 	if(MalletsInstrument::m_presets[p][0][0] < 0.0f)
 	{
 		inst->m_f0fixedModel.setValue(true);
-		inst->m_freq0Model.setRange(0.0f, 1000.0f, 0.1f);
+		inst->m_freq0Model.setRange(0.0f, 10000.0f, 0.1f);
 	}
 	else
 	{
@@ -556,7 +556,7 @@ void MalletsInstrumentView::changePreset()
 	if(MalletsInstrument::m_presets[p][0][1] < 0.0f)
 	{
 		inst->m_f1fixedModel.setValue(true);
-		inst->m_freq1Model.setRange(0.0f, 1000.0f, 0.1f);
+		inst->m_freq1Model.setRange(0.0f, 10000.0f, 0.1f);
 	}
 	else
 	{
@@ -567,7 +567,7 @@ void MalletsInstrumentView::changePreset()
 	if(MalletsInstrument::m_presets[p][0][2] < 0.0f)
 	{
 		inst->m_f2fixedModel.setValue(true);
-		inst->m_freq2Model.setRange(0.0f, 1000.0f, 0.1f);
+		inst->m_freq2Model.setRange(0.0f, 10000.0f, 0.1f);
 	}
 	else
 	{
@@ -578,7 +578,7 @@ void MalletsInstrumentView::changePreset()
 	if(MalletsInstrument::m_presets[p][0][3] < 0.0f)
 	{
 		inst->m_f3fixedModel.setValue(true);
-		inst->m_freq3Model.setRange(0.0f, 1000.0f, 0.1f);
+		inst->m_freq3Model.setRange(0.0f, 10000.0f, 0.1f);
 	}
 	else
 	{
@@ -612,10 +612,10 @@ unsetModel*/
 void MalletsInstrumentView::changeFreqModel()
 {
 	MalletsInstrument * inst = castModel<MalletsInstrument>();
-	inst->m_f0fixedModel.value() ? inst->m_freq0Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq0Model.setRange(0.0f, 20.0f, 0.01f);
-	inst->m_f1fixedModel.value() ? inst->m_freq1Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq1Model.setRange(0.0f, 20.0f, 0.01f);
-	inst->m_f2fixedModel.value() ? inst->m_freq2Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq2Model.setRange(0.0f, 20.0f, 0.01f);
-	inst->m_f3fixedModel.value() ? inst->m_freq3Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq3Model.setRange(0.0f, 20.0f, 0.01f);
+	inst->m_f0fixedModel.value() ? inst->m_freq0Model.setRange(0.0f, 10000.0f, 0.1f) : inst->m_freq0Model.setRange(0.0f, 20.0f, 0.01f);
+	inst->m_f1fixedModel.value() ? inst->m_freq1Model.setRange(0.0f, 10000.0f, 0.1f) : inst->m_freq1Model.setRange(0.0f, 20.0f, 0.01f);
+	inst->m_f2fixedModel.value() ? inst->m_freq2Model.setRange(0.0f, 10000.0f, 0.1f) : inst->m_freq2Model.setRange(0.0f, 20.0f, 0.01f);
+	inst->m_f3fixedModel.value() ? inst->m_freq3Model.setRange(0.0f, 10000.0f, 0.1f) : inst->m_freq3Model.setRange(0.0f, 20.0f, 0.01f);
 }
 
 
