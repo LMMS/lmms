@@ -3,49 +3,37 @@ on: [push, pull_request]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-shared:
-  environment: &environment
-    CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
-    MAKEFLAGS: -j2
-  configure-git: &configure-git
-    name: Update and configure Git
-    run: |
-      add-apt-repository ppa:git-core/ppa
-      apt-get update
-      apt-get --yes install git
-      git config --global --add safe.directory /__w/lmms/lmms
-  check-out: &check-out
-    name: Check out
-    uses: actions/checkout@v3
-    with:
-      fetch-depth: 0
-      submodules: recursive
-  build-make: &build-make
-    name: Build
-    run: cd build && make
-  build-tests-make: &build-tests-make
-    name: Build tests
-    run: cd build && make tests
-  run-tests: &run-tests
-    name: Run tests
-    run: build/tests/tests
 jobs:
   linux:
     name: linux
     runs-on: ubuntu-18.04
     container: lmmsci/linux.gcc:18.04
-    env: *environment
+    env:
+      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      MAKEFLAGS: -j2
     steps:
-    - *configure-git
-    - *check-out
+    - name: Update and configure Git
+      run: |
+        add-apt-repository ppa:git-core/ppa
+        apt-get update
+        apt-get --yes install git
+        git config --global --add safe.directory /__w/lmms/lmms
+    - name: Check out
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: recursive
     - name: Configure
       run: |
         source /opt/qt5*/bin/qt5*-env.sh || true
         mkdir build && cd build
         cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
-    - *build-make
-    - *build-tests-make
-    - *run-tests
+    - name: Build
+      run: cd build && make
+    - name: Build tests
+      run: cd build && make tests
+    - name: Run tests
+      run: build/tests/tests
     - name: Package
       run: |
         cd build
@@ -60,11 +48,15 @@ jobs:
     name: macos
     runs-on: macos-11
     env:
-      <<: *environment
+      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
       MAKEFLAGS: -j3
       DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
     steps:
-    - *check-out
+    - name: Check out
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: recursive
     - name: Install dependencies
       run: |
         brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
@@ -78,9 +70,12 @@ jobs:
                  -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
                  $CMAKE_OPTS \
                  -DUSE_WERROR=OFF
-    - *build-make
-    - *build-tests-make
-    - *run-tests
+    - name: Build
+      run: cd build && make
+    - name: Build tests
+      run: cd build && make tests
+    - name: Run tests
+      run: build/tests/tests
     - name: Package
       run: |
         cd build
@@ -95,16 +90,29 @@ jobs:
     name: mingw32
     runs-on: ubuntu-18.04
     container: lmmsci/linux.mingw32:18.04
-    env: *environment
+    env:
+      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      MAKEFLAGS: -j2
     steps:
-    - *configure-git
-    - *check-out
+    - name: Update and configure Git
+      run: |
+        add-apt-repository ppa:git-core/ppa
+        apt-get update
+        apt-get --yes install git
+        git config --global --add safe.directory /__w/lmms/lmms
+    - name: Check out
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: recursive
     - name: Configure
       run: |
         mkdir build && cd build
         ../cmake/build_win32.sh
-    - *build-make
-    - *build-tests-make
+    - name: Build
+      run: cd build && make
+    - name: Build tests
+      run: cd build && make tests
     - name: Package
       run: cd build && make package
     - name: Upload artifacts
@@ -116,16 +124,29 @@ jobs:
     name: mingw64
     runs-on: ubuntu-18.04
     container: lmmsci/linux.mingw64:18.04
-    env: *environment
+    env:
+      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      MAKEFLAGS: -j2
     steps:
-    - *configure-git
-    - *check-out
+    - name: Update and configure Git
+      run: |
+        add-apt-repository ppa:git-core/ppa
+        apt-get update
+        apt-get --yes install git
+        git config --global --add safe.directory /__w/lmms/lmms
+    - name: Check out
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: recursive
     - name: Configure
       run: |
         mkdir build && cd build
         ../cmake/build_win64.sh
-    - *build-make
-    - *build-tests-make
+    - name: Build
+      run: cd build && make
+    - name: Build tests
+      run: cd build && make tests
     - name: Package
       run: cd build && make package
     - name: Upload artifacts
