@@ -84,7 +84,7 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: linux
+        name: macos
         path: build/lmms-*.dmg
   mingw32:
     name: mingw32
