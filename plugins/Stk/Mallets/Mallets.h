@@ -159,8 +159,8 @@ public:
 
 
 public slots:
-	void changeFreqModel();
-	void changePreset();
+	//void changeFreqModel();
+	//void changePreset();
 
 
 private:
@@ -240,6 +240,7 @@ public:
 
 public slots:
 	void changePreset();
+	void changeFreqModel();
 
 private:
 	void modelChanged() override;

@@ -145,32 +145,9 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 //					{0.03, 0.03, 0.03, 0.03 },
 //					{0.390625,0.570312,0.078125}}
 
-	connect( &m_f0fixedModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeFreqModel() ), Qt::DirectConnection );
-	connect( &m_f1fixedModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeFreqModel() ), Qt::DirectConnection );
-	connect( &m_f2fixedModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeFreqModel() ), Qt::DirectConnection );
-	connect( &m_f3fixedModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeFreqModel() ), Qt::DirectConnection );
-	connect( &m_presetsModel, SIGNAL( dataChanged() ),
-			this, SLOT( changeFreqModel() ), Qt::DirectConnection );
 }
 
 
-/*if (m_f0fixedModel.value())
-
-unsetModel*/
-
-void MalletsInstrument::changeFreqModel()
-{
-	m_freq0Model.setRange(0.0f, 1000.0f, 0.1f);
-/*	MalletsInstrument * inst = castModel<MalletsInstrument>();
-	inst->m_f0fixedModel.value() ? m_freq0Model.setRange(0.0f, 1000.0f, 0.1f) : m_freq0Model.setRange(0.0f, 20.0f, 0.01f);
-	inst->m_f1fixedModel.value() ? m_freq1Model.setRange(0.0f, 1000.0f, 0.1f) : m_freq1Model.setRange(0.0f, 20.0f, 0.01f);
-	inst->m_f2fixedModel.value() ? m_freq2Model.setRange(0.0f, 1000.0f, 0.1f) : m_freq2Model.setRange(0.0f, 20.0f, 0.01f);
-	inst->m_f3fixedModel.value() ? m_freq3Model.setRange(0.0f, 1000.0f, 0.1f) : m_freq3Model.setRange(0.0f, 20.0f, 0.01f);
-*/}
 
 
 void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
@@ -361,6 +338,16 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
+	connect( &_instrument->m_f0fixedModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeFreqModel() ));
+	connect( &_instrument->m_f1fixedModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeFreqModel() ));
+	connect( &_instrument->m_f2fixedModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeFreqModel() ));
+	connect( &_instrument->m_f3fixedModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeFreqModel() ));
+	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
+			this, SLOT( changeFreqModel() ));
 	
 	m_spreadKnob = new Knob( knobBright_26, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
@@ -616,6 +603,22 @@ void MalletsInstrumentView::changePreset()
 	inst->m_stickModel.setValue(MalletsInstrument::m_presets[p][3][2]);
 	m_modalBarWidget->show();
 }
+
+
+/*if (m_f0fixedModel.value())
+
+unsetModel*/
+
+void MalletsInstrumentView::changeFreqModel()
+{
+	MalletsInstrument * inst = castModel<MalletsInstrument>();
+	inst->m_f0fixedModel.value() ? inst->m_freq0Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq0Model.setRange(0.0f, 20.0f, 0.01f);
+	inst->m_f1fixedModel.value() ? inst->m_freq1Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq1Model.setRange(0.0f, 20.0f, 0.01f);
+	inst->m_f2fixedModel.value() ? inst->m_freq2Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq2Model.setRange(0.0f, 20.0f, 0.01f);
+	inst->m_f3fixedModel.value() ? inst->m_freq3Model.setRange(0.0f, 1000.0f, 0.1f) : inst->m_freq3Model.setRange(0.0f, 20.0f, 0.01f);
+}
+
+
 
 
 } // namespace gui
