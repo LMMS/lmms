@@ -69,23 +69,23 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_f1fixedModel(false, this, tr( "Fixed 1" )),
 	m_f2fixedModel(false, this, tr( "Fixed 2" )),
 	m_f3fixedModel(false, this, tr( "Fixed 3" )),
-	m_freq0Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 0" )),
-	m_freq1Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 1" )),
-	m_freq2Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 2" )),
-	m_freq3Model(0.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 3" )),
-	m_res0Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 0" )),
-	m_res1Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 1" )),
-	m_res2Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 2" )),
+	m_freq0Model(1.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 0" )),
+	m_freq1Model(2.01f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 1" )),
+	m_freq2Model(3.9f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 2" )),
+	m_freq3Model(14.37f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 3" )),
+	m_res0Model(0.99995f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 0" )),
+	m_res1Model(0.99991f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 1" )),
+	m_res2Model(0.99992f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 2" )),
 	m_res3Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 3" )),
-	m_vol0Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 0" )),
-	m_vol1Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 1" )),
-	m_vol2Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 2" )),
-	m_vol3Model(0.0f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 3" )),
-	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
-	m_positionModel(64.0f, 0.0f, 64.0f, 0.1f, this, tr( "Position" )),
+	m_vol0Model(0.025f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 0" )),
+	m_vol1Model(0.015f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 1" )),
+	m_vol2Model(0.015f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 2" )),
+	m_vol3Model(0.015f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 3" )),
+	m_hardnessModel(50.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
+	m_positionModel(73.0f, 0.0f, 64.0f, 0.1f, this, tr( "Position" )),
 	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato gain" )),
 	m_vibratoFreqModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato frequency" )),
-	m_stickModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick mix" )),
+	m_stickModel(10.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick mix" )),
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_randomModel(0.0f, 0.0f, 1.0f, 0.01f, this, tr("Randomness")),
@@ -229,10 +229,10 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	MalletsSynth * ps = static_cast<MalletsSynth *>( _n->m_pluginData );
 	p = ps->presetIndex();
 	ps->setFrequency( freq );
-	ps->setFixed( 0, m_freq0Model.value(), m_res0Model.value(), m_vol0Model.value());
-	ps->setFixed( 1, m_freq1Model.value(), m_res1Model.value(), m_vol1Model.value());
-	ps->setFixed( 2, m_freq2Model.value(), m_res2Model.value(), m_vol2Model.value());
-	ps->setFixed( 3, m_freq3Model.value(), m_res3Model.value(), m_vol3Model.value());
+	ps->setFixed( 0, m_f0fixedModel.value() ? -m_freq0Model.value() : m_freq0Model.value(), m_res0Model.value(), m_vol0Model.value());
+	ps->setFixed( 1, m_f1fixedModel.value() ? -m_freq1Model.value() : m_freq1Model.value(), m_res1Model.value(), m_vol1Model.value());
+	ps->setFixed( 2, m_f2fixedModel.value() ? -m_freq2Model.value() : m_freq2Model.value(), m_res2Model.value(), m_vol2Model.value());
+	ps->setFixed( 3, m_f3fixedModel.value() ? -m_freq3Model.value() : m_freq3Model.value(), m_res3Model.value(), m_vol3Model.value());
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
