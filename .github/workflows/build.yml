@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-18.04
     container: lmmsci/linux.gcc:18.04
     env:
-      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 500M
       MAKEFLAGS: -j2
     steps:
     - name: Update and configure Git
@@ -23,6 +24,14 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
+    - name: Cache ccache data
+      uses: actions/cache@v3
+      with:
+        key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+        restore-keys: |
+          ccache-${{ github.job }}-${{ github.ref }}-
+          ccache-${{ github.job }}-
+        path: ~/.ccache
     - name: Configure
       run: |
         source /opt/qt5*/bin/qt5*-env.sh || true
@@ -44,11 +53,18 @@ jobs:
       with:
         name: linux
         path: build/lmms-*.AppImage
+    - name: Print ccache statistics
+      run: |
+        echo "[ccache config]"
+        ccache -p
+        echo "[ccache stats]"
+        ccache -s
   macos:
     name: macos
     runs-on: macos-11
     env:
-      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 500M
       MAKEFLAGS: -j3
       DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
     steps:
@@ -57,6 +73,14 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
+    - name: Cache ccache data
+      uses: actions/cache@v3
+      with:
+        key: ccache-${{ github.job }}-${{ github.ref }}-${{ github.run_id }}
+        restore-keys: |
+          ccache-${{ github.job }}-${{ github.ref }}-
+          ccache-${{ github.job }}-
+        path: ~/.ccache
     - name: Cache brew dependencies
       uses: actions/cache@v3
       with:
@@ -96,6 +120,12 @@ jobs:
       with:
         name: macos
         path: build/lmms-*.dmg
+    - name: Print ccache statistics
+      run: |
+        echo "[ccache config]"
+        ccache -p
+        echo "[ccache stats]"
+        ccache -s
   mingw:
     strategy:
       fail-fast: false
@@ -105,7 +135,8 @@ jobs:
     runs-on: ubuntu-18.04
     container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
     env:
-      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_COMPILE_CACHE=ON
+      CCACHE_MAXSIZE: 500M
       MAKEFLAGS: -j2
     steps:
     - name: Update and configure Git
@@ -119,6 +150,14 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
+    - name: Cache ccache data
+      uses: actions/cache@v3
+      with:
+        key: ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-${{ github.run_id }}
+        restore-keys: |
+          ccache-${{ github.job }}-${{ matrix.arch }}-${{ github.ref }}-
+          ccache-${{ github.job }}-${{ matrix.arch }}-
+        path: ~/.ccache
     - name: Configure
       run: |
         mkdir build && cd build
@@ -134,3 +173,9 @@ jobs:
       with:
         name: mingw${{ matrix.arch }}
         path: build/lmms-*.exe
+    - name: Print ccache statistics
+      run: |
+        echo "[ccache config]"
+        ccache -p
+        echo "[ccache stats]"
+        ccache -s
