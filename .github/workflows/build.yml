@@ -179,3 +179,72 @@ jobs:
         ccache -p
         echo "[ccache stats]"
         ccache -s
+  msvc:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ['x86', 'x64']
+    name: msvc-${{ matrix.arch }}
+    runs-on: windows-2019
+    steps:
+    - name: Check out
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: recursive
+    - name: Cache clcache data
+      uses: actions/cache@v3
+      with:
+        key: clcache-${{ matrix.arch }}-${{ github.ref }}-${{ github.run_id }}
+        restore-keys: |
+          clcache-${{ matrix.arch }}-${{ github.ref }}-
+          clcache-${{ matrix.arch }}-
+        path: '%HOME%\clcache'
+    - name: Cache vcpkg dependencies
+      uses: actions/cache@v3
+      with:
+        key: vcpkg-${{ matrix.arch }}-${{ github.ref }}-${{ github.run_id }}
+        restore-keys: |
+          vcpkg-${{ matrix.arch }}-${{ github.ref }}-
+          vcpkg-${{ matrix.arch }}-
+        path: C:\vcpkg\installed
+    - name: Install 32-bit Qt
+      uses: jurplel/install-qt-action@93b1fb3370eaf039e126fa73214fd3aad3b0509a
+      with:
+        version: '5.15.2'
+        arch: win32_msvc2019
+        archives: qtbase qtsvg qttools
+        cache: true
+    - name: Install 64-bit Qt
+      if: ${{ matrix.arch == 'x64' }}
+      uses: jurplel/install-qt-action@93b1fb3370eaf039e126fa73214fd3aad3b0509a
+      with:
+        version: '5.15.2'
+        arch: win64_msvc2019_64
+        archives: qtbase qtsvg qttools
+        cache: true
+    - name: Install dependencies
+      run: |
+        vcpkg install --triplet ${{ matrix.arch }}-windows --recurse fftw3 libsamplerate libsndfile lilv lv2 sdl2
+        nuget install clcache -Version 4.1.0
+    - name: Set up build environment
+      uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
+      with:
+        arch: ${{ matrix.arch }}
+    - name: Configure
+      run: |
+        mkdir build
+        cmake -S . -B build -G Ninja --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_COMPILE_CACHE=ON
+    - name: Build
+      run: cmake --build build --parallel 2
+    - name: Build tests
+      run: cmake --build build --target tests --parallel 2
+    - name: Package
+      run: cmake --build build --target package --parallel 2
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: msvc-${{ matrix.arch }}
+        path: build\lmms-*.exe
+    - name: Print clcache statistics
+      run: clcache -s
