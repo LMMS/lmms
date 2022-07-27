@@ -80,7 +80,7 @@ jobs:
         restore-keys: |
           ccache-${{ github.job }}-${{ github.ref }}-
           ccache-${{ github.job }}-
-        path: ~/.ccache
+        path: ~/Library/Caches/ccache
     - name: Cache brew dependencies
       uses: actions/cache@v3
       with:
