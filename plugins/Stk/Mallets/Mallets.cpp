@@ -73,16 +73,16 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_freq1Model(2.01f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 1" )),
 	m_freq2Model(3.9f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 2" )),
 	m_freq3Model(14.37f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 3" )),
-	m_res0Model(0.99995f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 0" )),
-	m_res1Model(0.99991f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 1" )),
-	m_res2Model(0.99992f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 2" )),
-	m_res3Model(0.9999f, 0.999f, 1.0f, 0.00001f, this, tr( "Res 3" )),
+	m_res0Model(0.99995f, 0.99f, 1.0f, 0.00001f, this, tr( "Res 0" )),
+	m_res1Model(0.99991f, 0.99f, 1.0f, 0.00001f, this, tr( "Res 1" )),
+	m_res2Model(0.99992f, 0.99f, 1.0f, 0.00001f, this, tr( "Res 2" )),
+	m_res3Model(0.9999f, 0.99f, 1.0f, 0.00001f, this, tr( "Res 3" )),
 	m_vol0Model(0.025f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 0" )),
 	m_vol1Model(0.015f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 1" )),
 	m_vol2Model(0.015f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 2" )),
 	m_vol3Model(0.015f, 0.0f, 0.1f, 0.00001, this, tr( "Vol 3" )),
 	m_hardnessModel(50.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
-	m_positionModel(73.0f, 0.0f, 64.0f, 0.1f, this, tr( "Position" )),
+	m_positionModel(73.0f, 0.0f, 128.0f, 0.1f, this, tr( "Position" )),
 	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato gain" )),
 	m_vibratoFreqModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato frequency" )),
 	m_stickModel(10.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick mix" )),
@@ -94,14 +94,23 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 {
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
+	m_scalers.append( 4.0 );
 	m_presetsModel.addItem( tr( "Vibraphone" ) );
+	m_scalers.append( 4.0 );
 	m_presetsModel.addItem( tr( "Agogo" ) );
+	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Wood 1" ) );
+	m_scalers.append( 4.0 );
 	m_presetsModel.addItem( tr( "Reso" ) );
+	m_scalers.append( 2.5 );
 	m_presetsModel.addItem( tr( "Wood 2" ) );
+	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Beats" ) );
+	m_scalers.append( 20.0 );
 	m_presetsModel.addItem( tr( "Two fixed" ) );
+	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Clump" ) );
+	m_scalers.append( 4.0 );
 }
 
 
@@ -203,8 +212,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		hardness += random * static_cast<float>(rand() % 128) - 64.0;
 		hardness = std::clamp(0.0f, hardness, 128.0f);
 
-		position += random * static_cast<float>(rand() % 64) - 32.0;
-		position = std::clamp(0.0f, position, 64.0f);
+		position += random * static_cast<float>(rand() % 128) - 64.0;
+		position = std::clamp(0.0f, position, 128.0f);
 
 		// critical section as STK is not thread-safe
 		static QMutex m;
@@ -236,8 +245,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		_working_buffer[frame][0] = ps->nextSampleLeft() * 20.0f;
-		_working_buffer[frame][1] = ps->nextSampleRight() * 20.0f;
+		_working_buffer[frame][0] = ps->nextSampleLeft() * m_scalers[p];
+		_working_buffer[frame][1] = ps->nextSampleRight() * m_scalers[p];
 	}
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );

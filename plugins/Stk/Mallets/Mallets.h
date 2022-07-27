@@ -177,6 +177,7 @@ private:
 
 	ComboBoxModel m_presetsModel;
 	FloatModel m_spreadModel;
+	QVector<sample_t> m_scalers;
 	FloatModel m_randomModel;
 
 	static constexpr StkFloat m_presets[9][4][4] = {
