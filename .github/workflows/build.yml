@@ -81,16 +81,6 @@ jobs:
           ccache-${{ github.job }}-${{ github.ref }}-
           ccache-${{ github.job }}-
         path: ~/Library/Caches/ccache
-    - name: Cache brew dependencies
-      uses: actions/cache@v3
-      with:
-        key: homebrew-${{ github.ref }}-${{ github.run_id }}
-        restore-keys: |
-          homebrew-${{ github.ref }}-
-          homebrew-
-        path: |
-          ~/Library/Caches/Homebrew
-          /usr/local/Homebrew
     - name: Install dependencies
       run: |
         brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
