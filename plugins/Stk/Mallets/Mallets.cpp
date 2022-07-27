@@ -25,7 +25,6 @@
  */
 
 #include "Mallets.h"
-#include <QDebug>
 #include <QDir>
 #include <QDomElement>
 #include <QLabel>
@@ -37,7 +36,6 @@
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
-#include "lmms_math.h"
 #include "embed.h"
 #include "plugin_export.h"
 
@@ -302,8 +300,6 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	m_randomKnob->setLabel(tr("Rand"));
 	m_randomKnob->move(180, 195);
 	m_randomKnob->setHintText(tr("Random:"),"");
-
-	modelChanged();
 
 	// try to inform user about missing Stk-installation
 	if( _instrument->m_filesMissing && getGUI() != nullptr )
