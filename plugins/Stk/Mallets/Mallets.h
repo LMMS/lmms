@@ -106,6 +106,22 @@ public:
 		}
 	}
 
+	inline void setStickHardness( const StkFloat _control2 ) // Stick Hardness
+	{
+		if( m_voice )
+		{
+			m_voice->controlChange( 2, _control2 );
+		}
+	}
+
+	inline void setStrikePosition( const StkFloat _control4 ) // Strike Position
+	{
+		if( m_voice )
+		{
+			m_voice->controlChange( 4, _control4 );
+		}
+	}
+
 	inline void setFixed(const int modal, const StkFloat ratio, const StkFloat radius, const StkFloat gain)
 	{
 		if( m_voice )

@@ -69,10 +69,10 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_f1fixedModel(false, this, tr( "Fixed 1" )),
 	m_f2fixedModel(false, this, tr( "Fixed 2" )),
 	m_f3fixedModel(false, this, tr( "Fixed 3" )),
-	m_freq0Model(1.0f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 0" )),
-	m_freq1Model(2.01f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 1" )),
-	m_freq2Model(3.9f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 2" )),
-	m_freq3Model(14.37f, 0.0f, 20.0f, 0.01f, this, tr( "Freq 3" )),
+	m_freq0Model(1.0f, 0.0f, 20.0f, 0.001f, this, tr( "Freq 0" )),
+	m_freq1Model(2.01f, 0.0f, 20.0f, 0.001f, this, tr( "Freq 1" )),
+	m_freq2Model(3.9f, 0.0f, 20.0f, 0.001f, this, tr( "Freq 2" )),
+	m_freq3Model(14.37f, 0.0f, 20.0f, 0.001f, this, tr( "Freq 3" )),
 	m_res0Model(0.99995f, 0.99f, 1.0f, 0.00001f, this, tr( "Res 0" )),
 	m_res1Model(0.99991f, 0.99f, 1.0f, 0.00001f, this, tr( "Res 1" )),
 	m_res2Model(0.99992f, 0.99f, 1.0f, 0.00001f, this, tr( "Res 2" )),
@@ -199,6 +199,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	int p = m_presetsModel.value();
+	float hardness = m_hardnessModel.value();
+	float position = m_positionModel.value();
 
 	const float freq = _n->frequency();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
@@ -206,8 +208,6 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 		const float vel = _n->getVolume() / 200.0;
 
 		const float random = m_randomModel.value();
-		float hardness = m_hardnessModel.value();
-		float position = m_positionModel.value();
 
 		hardness += random * static_cast<float>(rand() % 128) - 64.0;
 		hardness = std::clamp(0.0f, hardness, 128.0f);
@@ -242,6 +242,8 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	ps->setFixed( 1, m_f1fixedModel.value() ? -m_freq1Model.value() : m_freq1Model.value(), m_res1Model.value(), m_vol1Model.value());
 	ps->setFixed( 2, m_f2fixedModel.value() ? -m_freq2Model.value() : m_freq2Model.value(), m_res2Model.value(), m_vol2Model.value());
 	ps->setFixed( 3, m_f3fixedModel.value() ? -m_freq3Model.value() : m_freq3Model.value(), m_res3Model.value(), m_vol3Model.value());
+	ps->setStickHardness(hardness);
+	ps->setStrikePosition(position);
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
