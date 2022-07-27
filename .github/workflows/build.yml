@@ -96,10 +96,14 @@ jobs:
       with:
         name: macos
         path: build/lmms-*.dmg
-  mingw32:
-    name: mingw32
+  mingw:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ['32', '64']
+    name: mingw${{ matrix.arch }}
     runs-on: ubuntu-18.04
-    container: lmmsci/linux.mingw32:18.04
+    container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
     env:
       CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
       MAKEFLAGS: -j2
@@ -118,7 +122,7 @@ jobs:
     - name: Configure
       run: |
         mkdir build && cd build
-        ../cmake/build_win32.sh
+        ../cmake/build_win${{ matrix.arch }}.sh
     - name: Build
       run: cd build && make
     - name: Build tests
@@ -128,39 +132,5 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: mingw32
-        path: build/lmms-*.exe
-  mingw64:
-    name: mingw64
-    runs-on: ubuntu-18.04
-    container: lmmsci/linux.mingw64:18.04
-    env:
-      CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
-      MAKEFLAGS: -j2
-    steps:
-    - name: Update and configure Git
-      run: |
-        add-apt-repository ppa:git-core/ppa
-        apt-get update
-        apt-get --yes install git
-        git config --global --add safe.directory /__w/lmms/lmms
-    - name: Check out
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        submodules: recursive
-    - name: Configure
-      run: |
-        mkdir build && cd build
-        ../cmake/build_win64.sh
-    - name: Build
-      run: cd build && make
-    - name: Build tests
-      run: cd build && make tests
-    - name: Package
-      run: cd build && make package
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: mingw64
+        name: mingw${{ matrix.arch }}
         path: build/lmms-*.exe
