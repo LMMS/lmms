@@ -62,7 +62,7 @@ jobs:
         brew install ccache fftw pkg-config libogg libvorbis lame libsndfile \
                      libsamplerate jack sdl libgig libsoundio lilv lv2 stk \
                      fluid-synth portaudio fltk qt5 carla
-        npm install -g appdmg
+        npm install --location=global appdmg
     - name: Configure
       run: |
         mkdir build && cd build
