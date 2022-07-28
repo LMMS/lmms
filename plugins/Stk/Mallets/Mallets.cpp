@@ -283,8 +283,6 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	setWidgetBackground( m_modalBarWidget, "artwork" );
 	m_modalBarWidget->move( 0,0 );
 
-	changePreset(); // Show widget
-
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
 	m_presetsCombo->setGeometry( 140, 0, 99, ComboBox::DEFAULT_HEIGHT );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
