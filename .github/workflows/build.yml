@@ -176,8 +176,6 @@ jobs:
         arch: ['x86', 'x64']
     name: msvc-${{ matrix.arch }}
     runs-on: windows-2019
-    env:
-      qt-version: '5.15.2'
     steps:
     - name: Check out
       uses: actions/checkout@v3
@@ -200,25 +198,22 @@ jobs:
           vcpkg-${{ matrix.arch }}-${{ github.ref }}-
           vcpkg-${{ matrix.arch }}-
         path: C:\vcpkg\installed
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v3
-      with:
-        key: qt-${{ env.qt-version }}-msvc-${{ matrix.arch }}
-        path: '%RUNNER_WORKSPACE%\Qt'
-    - name: Install 32-bit Qt
-      uses: jurplel/install-qt-action@c04feedfdfd6dbe64db62deda57fb0971a1bf440
-      with:
-        version: ${{ env.qt-version }}
-        arch: win32_msvc2019
-        cached: ${{ steps.cache-qt.outputs.cache-hit }}
-    - name: Install 64-bit Qt
-      if: ${{ matrix.arch == 'x64' }}
-      uses: jurplel/install-qt-action@c04feedfdfd6dbe64db62deda57fb0971a1bf440
-      with:
-        version: ${{ env.qt-version }}
-        arch: win64_msvc2019_64
-        cached: ${{ steps.cache-qt.outputs.cache-hit }}
+    - name: Install Qt
+      run: |
+        pip install aqtinstall
+        $qt_version = '5.15.2'
+        $target_dir = Join-Path (Get-Location) 'Qt'
+        if ('${{ matrix.arch }}' -eq 'x64') {
+          aqt install-qt windows desktop $qt_version win64_msvc2019_64 --archives qtbase qtsvg qttools -O $target_dir
+          aqt install-qt windows desktop $qt_version win32_msvc2019 --archives qtbase -O $target_dir
+          $qt_dir = Join-Path $target_dir $qt_version 'msvc2019_64'
+        } else {
+          aqt install-qt windows desktop $qt_version win32_msvc2019 --archives qtbase qtsvg qttools -O $target_dir
+          $qt_dir = Join-Path $target_dir $qt_version 'msvc2019'
+        }
+        $qt_bin_dir = Join-Path $qt_dir 'bin'
+        echo "Qt5_DIR=$qt_dir" >> $env:GITHUB_ENV
+        echo $qt_bin_dir >> $env:GITHUB_PATH
     - name: Install dependencies
       run: |
         vcpkg install --triplet ${{ matrix.arch }}-windows --recurse fftw3 libsamplerate libsndfile lilv lv2 sdl2
