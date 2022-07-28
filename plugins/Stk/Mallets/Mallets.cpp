@@ -111,6 +111,8 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Clump" ) );
 	m_scalers.append( 4.0 );
+	m_presetsModel.addItem( tr( "Init" ) );
+	m_scalers.append( 4.0 );
 }
 
 
@@ -140,7 +142,6 @@ void MalletsInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	m_vibratoGainModel.saveSettings( _doc, _this, "vib_gain" );
 	m_vibratoFreqModel.saveSettings( _doc, _this, "vib_freq" );
 	m_stickModel.saveSettings( _doc, _this, "stick_mix" );
-
 	m_presetsModel.saveSettings( _doc, _this, "preset" );
 	m_spreadModel.saveSettings( _doc, _this, "spread" );
 	m_randomModel.saveSettings(_doc, _this, "randomness");
@@ -173,7 +174,6 @@ void MalletsInstrument::loadSettings( const QDomElement & _this )
 	m_vibratoGainModel.loadSettings( _this, "vib_gain" );
 	m_vibratoFreqModel.loadSettings( _this, "vib_freq" );
 	m_stickModel.loadSettings( _this, "stick_mix" );
-
 	m_presetsModel.loadSettings( _this, "preset" );
 	m_spreadModel.loadSettings( _this, "spread" );
 	m_randomModel.loadSettings(_this, "randomness");
