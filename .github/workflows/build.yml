@@ -182,14 +182,6 @@ jobs:
       with:
         fetch-depth: 0
         submodules: recursive
-    - name: Cache clcache data
-      uses: actions/cache@v3
-      with:
-        key: clcache-${{ matrix.arch }}-${{ github.ref }}-${{ github.run_id }}
-        restore-keys: |
-          clcache-${{ matrix.arch }}-${{ github.ref }}-
-          clcache-${{ matrix.arch }}-
-        path: '%HOME%\clcache'
     - name: Cache vcpkg dependencies
       uses: actions/cache@v3
       with:
@@ -217,8 +209,6 @@ jobs:
     - name: Install dependencies
       run: |
         vcpkg install --triplet ${{ matrix.arch }}-windows --recurse fftw3 libsamplerate libsndfile lilv lv2 sdl2
-        nuget install clcache -Version 4.1.0
-        echo (Join-Path (Get-Location) 'clcache.4.1.0' 'clcache-4.1.0') >> $env:GITHUB_PATH
     - name: Set up build environment
       uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
       with:
@@ -226,7 +216,7 @@ jobs:
     - name: Configure
       run: |
         mkdir build
-        cmake -S . -B build -G Ninja --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_COMPILE_CACHE=ON
+        cmake -S . -B build -G Ninja --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: Build
       run: cmake --build build --parallel 2
     - name: Build tests
@@ -238,5 +228,3 @@ jobs:
       with:
         name: msvc-${{ matrix.arch }}
         path: build\lmms-*.exe
-    - name: Print clcache statistics
-      run: clcache -s
