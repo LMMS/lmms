@@ -218,6 +218,7 @@ jobs:
       run: |
         vcpkg install --triplet ${{ matrix.arch }}-windows --recurse fftw3 libsamplerate libsndfile lilv lv2 sdl2
         nuget install clcache -Version 4.1.0
+        echo (Join-Path (Get-Location) 'clcache.4.1.0' 'clcache-4.1.0') >> $env:GITHUB_PATH
     - name: Set up build environment
       uses: ilammy/msvc-dev-cmd@d8610e2b41c6d0f0c3b4c46dad8df0fd826c68e1
       with:
