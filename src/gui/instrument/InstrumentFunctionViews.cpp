@@ -101,11 +101,13 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpRangeKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpRepeatsKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpCycleKnob( new Knob( KnobType::Bright26 ) ),
+	m_arpRandShapeKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpSkipKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpMissKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( KnobType::Bright26 ) ),
 	m_arpGateKnob( new Knob( KnobType::Bright26 ) ),
 	m_arpDirectionComboBox( new ComboBox() ),
+	m_arpRandomComboBox( new ComboBox() ),
 	m_arpModeComboBox( new ComboBox() )
 {
 	auto topLayout = new QHBoxLayout(this);
@@ -128,6 +130,10 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 	m_arpCycleKnob->setLabel( tr( "CYCLE" ) );
 	m_arpCycleKnob->setHintText( tr( "Cycle notes:" ) + " ", " " + tr( "note(s)" ) );
+
+
+	m_arpRandShapeKnob->setLabel(tr("RAND"));
+	m_arpRandShapeKnob->setHintText(tr("Rand shape:"), "");
 
 
 	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
@@ -154,16 +160,22 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	auto arpModeLabel = new QLabel(tr("Mode:"));
 	arpModeLabel->setFont( pointSize<8>( arpModeLabel->font() ) );
 
+	QLabel* arpRandomLabel = new QLabel(tr("Distribution:"));
+	arpRandomLabel->setFont(pointSize<8>(arpRandomLabel->font()));
+
 	mainLayout->addWidget( arpChordLabel, 0, 0 );
 	mainLayout->addWidget( m_arpComboBox, 1, 0 );
-	mainLayout->addWidget( arpDirectionLabel, 3, 0 );
-	mainLayout->addWidget( m_arpDirectionComboBox, 4, 0 );
+	mainLayout->addWidget( arpDirectionLabel, 2, 0 );
+	mainLayout->addWidget( m_arpDirectionComboBox, 3, 0 );
+	mainLayout->addWidget( arpRandomLabel, 4, 0 );
+	mainLayout->addWidget( m_arpRandomComboBox, 5, 0 );
 	mainLayout->addWidget( arpModeLabel, 6, 0 );
 	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
 	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpRepeatsKnob, 0, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpCycleKnob, 0, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpRandShapeKnob, 3, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpSkipKnob, 3, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpMissKnob, 3, 3, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpGateKnob, 6, 2, 2, 1, Qt::AlignHCenter );
@@ -192,11 +204,13 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
 	m_arpRepeatsKnob->setModel( &m_a->m_arpRepeatsModel );
 	m_arpCycleKnob->setModel( &m_a->m_arpCycleModel );
+	m_arpRandShapeKnob->setModel( &m_a->m_arpRandShapeModel );
 	m_arpSkipKnob->setModel( &m_a->m_arpSkipModel );
 	m_arpMissKnob->setModel( &m_a->m_arpMissModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );
 	m_arpGateKnob->setModel( &m_a->m_arpGateModel );
 	m_arpDirectionComboBox->setModel( &m_a->m_arpDirectionModel );
+	m_arpRandomComboBox->setModel( &m_a->m_arpRandomModel );
 	m_arpModeComboBox->setModel( &m_a->m_arpModeModel );
 }
 

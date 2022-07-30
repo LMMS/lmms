@@ -185,6 +185,14 @@ public:
 		Random
 	} ;
 
+enum ArpRandomDistributions
+	{
+		ArpRandomExp,
+		ArpRandomNormal,
+		ArpRandomChase,
+		NumArpRandomDistributions
+	} ;
+
 	InstrumentFunctionArpeggio( Model * _parent );
 	~InstrumentFunctionArpeggio() override = default;
 
@@ -213,13 +221,15 @@ private:
 	FloatModel m_arpRangeModel;
 	FloatModel m_arpRepeatsModel;
 	FloatModel m_arpCycleModel;
+	FloatModel m_arpRandShapeModel;
 	FloatModel m_arpSkipModel;
 	FloatModel m_arpMissModel;
 	TempoSyncKnobModel m_arpTimeModel;
 	FloatModel m_arpGateModel;
 	ComboBoxModel m_arpDirectionModel;
+	ComboBoxModel m_arpRandomModel;
 	ComboBoxModel m_arpModeModel;
-
+	int m_lastRandomNote;
 
 	friend class InstrumentTrack;
 	friend class gui::InstrumentFunctionArpeggioView;
