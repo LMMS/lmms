@@ -30,6 +30,9 @@
 #include <QFontMetrics>
 #include <QWheelEvent>
 
+namespace lmms
+{
+
 /**
  * @brief horizontalAdvance is a backwards-compatible adapter for
  * QFontMetrics::horizontalAdvance and width functions.
@@ -60,4 +63,7 @@ inline QPoint position(QWheelEvent *wheelEvent)
 	return wheelEvent->pos();
 #endif
 }
+
+} // namespace lmms
+
 #endif // DEPRECATIONHELPER_H

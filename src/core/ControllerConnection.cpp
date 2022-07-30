@@ -31,6 +31,9 @@
 #include "Song.h"
 #include "ControllerConnection.h"
 
+namespace lmms
+{
+
 
 ControllerConnectionVector ControllerConnection::s_connections;
 
@@ -233,4 +236,4 @@ void ControllerConnection::deleteConnection()
 
 
 
-
+} // namespace lmms

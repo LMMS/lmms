@@ -34,6 +34,10 @@
 #include <QLabel>
 
 
+namespace lmms::gui
+{
+
+
 EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	QDialog( _parent ),
 	ui( new Ui::EffectSelectDialog ),
@@ -271,6 +275,4 @@ void EffectSelectDialog::updateSelection()
 }
 
 
-
-
-
+} // namespace lmms::gui

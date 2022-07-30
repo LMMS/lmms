@@ -28,6 +28,9 @@
 
 #include "Clip.h"
 
+namespace lmms
+{
+
 /*! \brief Dummy clip for PatternTracks
  *
  *  Only used in the Song (Editor). See PatternStore.h for more info.
@@ -47,12 +50,13 @@ public:
 
 	int patternIndex();
 
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 private:
 	friend class PatternClipView;
 } ;
 
 
+} // namespace lmms
 
 #endif

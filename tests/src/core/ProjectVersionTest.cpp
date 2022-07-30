@@ -32,6 +32,8 @@ class ProjectVersionTest : QTestSuite
 private slots:
 	void ProjectVersionComparisonTests()
 	{
+		using namespace lmms;
+
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Minor) > "1.0.3");
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Major) < "2.1.0");
 		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Release) > "0.2.1");

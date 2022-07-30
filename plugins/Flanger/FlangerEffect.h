@@ -36,6 +36,9 @@ class MonoDelay;
 class Noise;
 class QuadratureLfo;
 
+namespace lmms
+{
+
 
 class FlangerEffect : public Effect
 {
@@ -58,5 +61,8 @@ private:
 	Noise* m_noise;
 
 };
+
+
+} // namespace lmms
 
 #endif // FLANGEREFFECT_H

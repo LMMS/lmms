@@ -35,6 +35,10 @@
 #include "Clipboard.h"
 
 
+namespace lmms::gui
+{
+
+
 StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 					const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
@@ -111,3 +115,6 @@ QString StringPairDrag::decodeValue( QDropEvent * _de )
 {
 	return Clipboard::decodeValue( _de->mimeData() );
 }
+
+
+} // namespace lmms::gui

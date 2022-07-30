@@ -34,6 +34,8 @@
 #include "Knob.h"
 
 
+namespace lmms::gui
+{
 
 
 Control::~Control() {}
@@ -138,3 +140,5 @@ LcdControl::LcdControl(int numDigits, QWidget *parent) :
 
 LcdControl::~LcdControl() {}
 
+
+} // namespace lmms::gui

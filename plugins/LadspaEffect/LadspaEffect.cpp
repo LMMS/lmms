@@ -44,6 +44,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -604,5 +608,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 }
 
 
-
-
+} // namespace lmms

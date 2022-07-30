@@ -1,5 +1,8 @@
 #include "MicroTimer.h"
 
+namespace lmms
+{
+
 using namespace std;
 using namespace std::chrono;
 
@@ -25,3 +28,5 @@ int MicroTimer::elapsed() const
 	auto now = steady_clock::now();
 	return std::chrono::duration_cast<std::chrono::duration<int, std::micro>>(now - begin).count();
 }
+
+} // namespace lmms

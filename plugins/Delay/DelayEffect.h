@@ -28,6 +28,9 @@
 #include "Effect.h"
 #include "DelayControls.h"
 
+namespace lmms
+{
+
 class Lfo;
 class StereoDelay;
 
@@ -50,5 +53,8 @@ private:
 	float m_outGain;
 	float m_currentLength;
 };
+
+
+} // namespace lmms
 
 #endif // DELAYEFFECT_H

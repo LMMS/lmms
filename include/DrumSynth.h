@@ -32,6 +32,9 @@
 
 class QString;
 
+namespace lmms
+{
+
 class DrumSynth {
     public:
         DrumSynth() {};
@@ -50,5 +53,8 @@ class DrumSynth {
         float GetPrivateProfileFloat(const char *sec, const char *key, float def, QString file);
 
 };
+
+
+} // namespace lmms
 
 #endif

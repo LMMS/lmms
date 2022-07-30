@@ -31,6 +31,8 @@
 #include "AudioDevice.h"
 #include "OutputSettings.h"
 
+namespace lmms
+{
 
 class AudioFileDevice : public AudioDevice
 {
@@ -74,5 +76,6 @@ typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
 					  AudioEngine* audioEngine,
 					  bool & successful );
 
+} // namespace lmms
 
 #endif

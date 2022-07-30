@@ -30,8 +30,14 @@
 
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class EffectControls;
 
+
+namespace gui
+{
 
 class LMMS_EXPORT EffectControlDialog : public QWidget, public ModelView
 {
@@ -53,5 +59,9 @@ protected:
 	EffectControls * m_effectControls;
 
 } ;
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

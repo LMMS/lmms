@@ -28,6 +28,11 @@
 
 #include "lmms_math.h"
 
+
+namespace lmms
+{
+
+
 class RmsHelper
 {
 public:
@@ -90,5 +95,7 @@ private:
 	float m_sizef;
 };
 
+
+} // namespace lmms
 
 #endif

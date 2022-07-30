@@ -34,6 +34,10 @@
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
 
+namespace lmms::gui
+{
+
+
 class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
 	Q_OBJECT
@@ -62,5 +66,9 @@ private:
 	ProjectRenderer::ExportFileFormats m_ft;
 	std::unique_ptr<RenderManager> m_renderManager;
 } ;
+
+
+} // namespace lmms::gui
+
 
 #endif

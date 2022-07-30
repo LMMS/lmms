@@ -55,6 +55,9 @@
 
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
+
 class TextFloat;
 
 
@@ -167,6 +170,9 @@ private:
 	QColor m_peakRed;
 	QColor m_peakYellow;
 } ;
+
+
+} // namespace lmms::gui
 
 
 #endif

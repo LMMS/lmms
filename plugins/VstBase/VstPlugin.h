@@ -36,7 +36,8 @@
 
 #include "vstbase_export.h"
 
-class vstSubWin;
+namespace lmms
+{
 
 
 class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
@@ -123,7 +124,7 @@ public:
 	QString embedMethod() const;
 
 public slots:
-	void setTempo( bpm_t _bpm );
+	void setTempo( lmms::bpm_t _bpm );
 	void updateSampleRate();
 	void openPreset( void );
 	void setProgram( int index );
@@ -172,5 +173,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

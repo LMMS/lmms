@@ -40,6 +40,9 @@
 
 #include "SharedMemory.h"
 
+namespace lmms
+{
+
 class RemotePluginClient : public RemotePluginBase
 {
 public:
@@ -354,5 +357,7 @@ void RemotePluginClient::doProcessing()
 	}
 }
 
+
+} // namespace lmms
 
 #endif // REMOTE_PLUGIN_CLIENT_H

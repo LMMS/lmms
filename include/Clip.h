@@ -30,10 +30,19 @@
 #include "AutomatableModel.h"
 
 
+namespace lmms
+{
+
 class Track;
-class ClipView;
 class TrackContainer;
+
+namespace gui
+{
+
+class ClipView;
 class TrackView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT Clip : public Model, public JournallingObject
@@ -116,7 +125,7 @@ public:
 	virtual void movePosition( const TimePos & pos );
 	virtual void changeLength( const TimePos & length );
 
-	virtual ClipView * createView( TrackView * tv ) = 0;
+	virtual gui::ClipView * createView( gui::TrackView * tv ) = 0;
 
 	inline void selectViewOnCreate( bool select )
 	{
@@ -176,5 +185,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

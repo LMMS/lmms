@@ -32,6 +32,10 @@
 #include "Song.h"
 
 class QLineEdit;
+
+namespace lmms::gui
+{
+
 class LedCheckBox;
 
 class SaveOptionsWidget : public QWidget {
@@ -61,5 +65,8 @@ public slots:
 	void incrementVersion();
 	void decrementVersion();
 };
+
+
+} // namespace lmms::gui
 
 #endif // VERSIONEDSAVEDIALOG_H

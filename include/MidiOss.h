@@ -35,6 +35,9 @@
 #include "MidiClient.h"
 
 
+namespace lmms
+{
+
 
 class MidiOss : public QThread, public MidiClientRaw
 {
@@ -69,7 +72,11 @@ private:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+
+#endif // LMMS_HAVE_OSS
 
 
 #endif

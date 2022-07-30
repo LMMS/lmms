@@ -28,7 +28,13 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
 class PeakControllerEffectControls;
+
+namespace gui
+{
 class Knob;
 class LedCheckBox;
 
@@ -57,5 +63,8 @@ protected:
 
 } ;
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

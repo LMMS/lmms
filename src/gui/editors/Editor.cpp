@@ -33,6 +33,10 @@
 #include <QCloseEvent>
 
 
+namespace lmms::gui
+{
+
+
 void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
@@ -169,3 +173,4 @@ void DropToolBar::dropEvent(QDropEvent* event)
 
 
 
+} // namespace lmms::gui

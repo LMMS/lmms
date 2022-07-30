@@ -30,7 +30,15 @@
 #include <QPixmap>
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class CrossoverEQControls;
+
+
+namespace gui
+{
 
 class CrossoverEQControlDialog : public EffectControlDialog
 {
@@ -46,5 +54,10 @@ private:
 	QPixmap m_fader_empty;
 	QPixmap m_fader_knob;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

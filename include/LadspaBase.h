@@ -29,6 +29,10 @@
 #include "LadspaManager.h"
 #include "Plugin.h"
 
+namespace lmms
+{
+
+
 class LadspaControl;
 
 
@@ -87,5 +91,7 @@ inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
 	return Plugin::Descriptor::SubPluginFeatures::Key( _desc, _name, m );
 }
 
+
+} // namespace lmms
 
 #endif

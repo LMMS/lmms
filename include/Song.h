@@ -37,12 +37,22 @@
 #include "MeterModel.h"
 #include "VstSyncController.h"
 
+namespace lmms
+{
 
 class AutomationTrack;
 class Keymap;
 class MidiClip;
 class Scale;
+
+namespace gui
+{
+
 class TimeLineWidget;
+class SongEditor;
+class ControllerRackView;
+
+}
 
 
 const bpm_t MinTempo = 10;
@@ -114,7 +124,7 @@ public:
 		{
 			return m_jumped;
 		}
-		TimeLineWidget * m_timeLine;
+		gui::TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
@@ -361,7 +371,7 @@ public slots:
 	void record();
 	void playAndRecord();
 	void playPattern();
-	void playMidiClip( const MidiClip * midiClipToPlay, bool loop = true );
+	void playMidiClip( const lmms::MidiClip * midiClipToPlay, bool loop = true );
 	void togglePause();
 	void stop();
 
@@ -492,20 +502,19 @@ private:
 
 	AutomatedValueMap m_oldAutomatedValues;
 
-	friend class LmmsCore;
-	friend class SongEditor;
-	friend class mainWindow;
-	friend class ControllerRackView;
+	friend class Engine;
+	friend class gui::SongEditor;
+	friend class gui::ControllerRackView;
 
 signals:
 	void projectLoaded();
 	void playbackStateChanged();
 	void playbackPositionChanged();
 	void lengthChanged( int bars );
-	void tempoChanged( bpm_t newBPM );
+	void tempoChanged( lmms::bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerBar, int ticksPerBar );
-	void controllerAdded( Controller * );
-	void controllerRemoved( Controller * );
+	void controllerAdded( lmms::Controller * );
+	void controllerRemoved( lmms::Controller * );
 	void updateSampleTracks();
 	void stopped();
 	void modified();
@@ -514,5 +523,7 @@ signals:
 	void keymapListChanged(int index);
 } ;
 
+
+} // namespace lmms
 
 #endif

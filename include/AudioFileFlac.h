@@ -30,6 +30,9 @@
 #include "AudioFileDevice.h"
 #include <sndfile.h>
 
+namespace lmms
+{
+
 class AudioFileFlac: public AudioFileDevice
 {
 public:
@@ -70,5 +73,8 @@ private:
 	void finishEncoding();
 
 };
+
+
+} // namespace lmms
 
 #endif //AUDIO_FILE_FLAC_H

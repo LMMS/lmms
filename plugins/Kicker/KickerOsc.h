@@ -33,6 +33,9 @@
 #include "interpolation.h"
 #include "Memory.h"
 
+namespace lmms
+{
+
 
 template<class FX = DspEffectLibrary::StereoBypass>
 class KickerOsc
@@ -106,5 +109,7 @@ private:
 
 };
 
+
+} // namespace lmms
 
 #endif

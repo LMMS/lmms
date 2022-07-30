@@ -31,6 +31,8 @@
 #include "Song.h"
 
 
+namespace lmms::gui
+{
 
 TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
@@ -127,3 +129,5 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 	}
 }
+
+} // namespace lmms::gui

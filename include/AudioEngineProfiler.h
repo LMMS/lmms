@@ -31,6 +31,9 @@
 #include "lmms_basics.h"
 #include "MicroTimer.h"
 
+namespace lmms
+{
+
 class LMMS_EXPORT AudioEngineProfiler
 {
 public:
@@ -57,5 +60,7 @@ private:
 	int m_cpuLoad;
 	QFile m_outputFile;
 };
+
+} // namespace lmms
 
 #endif

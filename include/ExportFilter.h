@@ -32,6 +32,10 @@
 #include "Plugin.h"
 
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
@@ -62,5 +66,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

@@ -31,9 +31,13 @@
 
 #include "MidiEvent.h"
 
+class QObject;
+
+
+namespace lmms
+{
 
 class MidiPort;
-class QObject;
 class TimePos;
 
 
@@ -167,6 +171,7 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif
 

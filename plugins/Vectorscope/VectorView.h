@@ -27,9 +27,15 @@
 
 #include "LocklessRingBuffer.h"
 
+namespace lmms
+{
 class VecControls;
+}
 
 //#define VEC_DEBUG
+
+namespace lmms::gui
+{
 
 
 // Widget that displays a vectorscope visualization of stereo signal.
@@ -74,4 +80,8 @@ private:
 	float m_executionAvg = 0;
 #endif
 };
+
+
+} // namespace lmms::gui
+
 #endif // VECTORVIEW_H

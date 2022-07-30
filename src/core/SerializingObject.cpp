@@ -26,7 +26,8 @@
 
 #include "SerializingObject.h"
 
-
+namespace lmms
+{
 
 SerializingObject::SerializingObject() :
 	m_hook( nullptr )
@@ -110,4 +111,4 @@ void SerializingObject::loadSettings( const QDomElement& element )
 	Q_UNUSED(element)
 }
 
-
+} // namespace lmms

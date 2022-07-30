@@ -29,6 +29,8 @@
 #include "Engine.h"
 #include "Song.h"
 
+namespace lmms
+{
 
 
 FlangerControls::FlangerControls( FlangerEffect *effect ) :
@@ -91,3 +93,6 @@ void FlangerControls::changedPlaybackState()
 {
 	m_effect->restartLFO();
 }
+
+
+} // namespace lmms

@@ -40,6 +40,8 @@
 #include "MidiClip.h"
 
 
+namespace lmms::gui
+{
 
 
 PatternEditor::PatternEditor(PatternStore* ps) :
@@ -327,3 +329,6 @@ void PatternEditorWindow::stop()
 {
 	Engine::getSong()->stop();
 }
+
+
+} // namespace lmms::gui

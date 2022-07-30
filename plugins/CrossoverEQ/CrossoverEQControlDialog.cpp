@@ -32,6 +32,10 @@
 #include "Knob.h"
 #include "Fader.h"
 
+namespace lmms::gui
+{
+
+
 CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * controls ) :
 	EffectControlDialog( controls )
 {
@@ -110,3 +114,6 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 	mute4->setModel( & controls->m_mute4 );
 	mute4->setToolTip(tr("Mute band 4"));
 }
+
+
+} // namespace lmms::gui

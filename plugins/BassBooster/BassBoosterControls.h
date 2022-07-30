@@ -28,6 +28,8 @@
 #include "EffectControls.h"
 #include "BassBoosterControlDialog.h"
 
+namespace lmms
+{
 
 class BassBoosterEffect;
 
@@ -53,9 +55,9 @@ public:
 		return 3;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new BassBoosterControlDialog( this );
+		return new gui::BassBoosterControlDialog( this );
 	}
 
 
@@ -68,8 +70,11 @@ private:
 	FloatModel m_gainModel;
 	FloatModel m_ratioModel;
 
-	friend class BassBoosterControlDialog;
+	friend class gui::BassBoosterControlDialog;
 	friend class BassBoosterEffect;
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -29,6 +29,10 @@
 #endif
 
 
+namespace lmms
+{
+
+
 #ifdef SYNC_WITH_SHM_FIFO
 RemotePluginBase::RemotePluginBase( shmFifo * _in, shmFifo * _out ) :
 	m_in( _in ),
@@ -186,3 +190,5 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 
 	return message();
 }
+
+} // namespace lmms

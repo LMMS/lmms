@@ -30,6 +30,17 @@
 
 class QAction;
 
+namespace lmms
+{
+
+namespace gui
+{
+
+class TempoSyncKnob;
+
+} // namespace gui
+
+
 class LMMS_EXPORT TempoSyncKnobModel : public FloatModel
 {
 	Q_OBJECT
@@ -72,7 +83,7 @@ public:
 	void setScale( float _new_scale );
 
 signals:
-	void syncModeChanged( TempoSyncMode _new_mode );
+	void syncModeChanged( lmms::TempoSyncKnobModel::TempoSyncMode _new_mode );
 	void scaleChanged( float _new_scale );
 
 
@@ -86,7 +97,7 @@ public slots:
 
 
 protected slots:
-	void calculateTempoSyncTime( bpm_t _bpm );
+	void calculateTempoSyncTime( lmms::bpm_t _bpm );
 	void updateCustom();
 
 
@@ -98,8 +109,10 @@ private:
 	MeterModel m_custom;
 
 
-	friend class TempoSyncKnob;
+	friend class gui::TempoSyncKnob;
 
 } ;
+
+} // namespace lmms
 
 #endif

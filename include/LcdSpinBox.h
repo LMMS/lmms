@@ -29,6 +29,8 @@
 #include "LcdWidget.h"
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
 
 class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
@@ -85,5 +87,7 @@ signals:
 } ;
 
 typedef IntModel LcdSpinBoxModel;
+
+} // namespace lmms::gui
 
 #endif

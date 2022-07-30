@@ -68,6 +68,9 @@
 // Old config
 //
 
+namespace lmms
+{
+
 
 //#define engine::audioEngine()->processingSampleRate() 44100.0f
 const float sampleRateCutoff = 44100.0f;
@@ -802,10 +805,13 @@ void Lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
 }
 
 
-PluginView * Lb302Synth::instantiateView( QWidget * _parent )
+gui::PluginView * Lb302Synth::instantiateView( QWidget * _parent )
 {
-	return( new Lb302SynthView( this, _parent ) );
+	return( new gui::Lb302SynthView( this, _parent ) );
 }
+
+namespace gui
+{
 
 
 Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
@@ -1029,6 +1035,8 @@ void Lb302SynthView::modelChanged()
 }
 
 
+} // namespace gui
+
 
 extern "C"
 {
@@ -1045,3 +1053,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
+} // namespace lmms

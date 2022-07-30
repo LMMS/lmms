@@ -31,8 +31,15 @@
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
-class TabBar;
+namespace lmms
+{
 
+
+namespace gui
+{
+
+
+class TabBar;
 
 class LadspaBrowserView : public ToolPluginView
 {
@@ -43,7 +50,7 @@ public:
 
 
 public slots:
-	void showPorts( const ladspa_key_t & _key );
+	void showPorts( const ::lmms::ladspa_key_t & _key );
 
 
 private:
@@ -52,7 +59,10 @@ private:
 	QWidget * createTab( QWidget * _parent, const QString & _txt,
 						LadspaPluginType _type );
 
-} ;
+};
+
+
+} // namespace gui
 
 
 class LadspaBrowser : public ToolPlugin
@@ -61,9 +71,9 @@ public:
 	LadspaBrowser();
 	virtual ~LadspaBrowser();
 
-	virtual PluginView * instantiateView( QWidget * )
+	virtual gui::PluginView* instantiateView( QWidget * )
 	{
-		return new LadspaBrowserView( this );
+		return new gui::LadspaBrowserView( this );
 	}
 
 	virtual QString nodeName() const;
@@ -82,5 +92,7 @@ public:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

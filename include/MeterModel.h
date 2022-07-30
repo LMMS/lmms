@@ -27,6 +27,9 @@
 
 #include "AutomatableModel.h"
 
+namespace lmms
+{
+
 
 class MeterModel : public Model
 {
@@ -61,5 +64,8 @@ private:
 	IntModel m_denominatorModel;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

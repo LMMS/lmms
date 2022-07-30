@@ -30,6 +30,9 @@
 
 #include "AutomatableButton.h"
 
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT PixmapButton : public AutomatableButton
 {
@@ -61,5 +64,8 @@ private:
 	bool	m_pressed;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

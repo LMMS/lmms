@@ -30,6 +30,10 @@
 #include <QtGlobal>
 #include "rpmalloc.h"
 
+namespace lmms
+{
+
+
 static thread_local MemoryManager::ThreadGuard local_mm_thread_guard{};
 
 void* MemoryManager::alloc(size_t size)
@@ -78,3 +82,5 @@ void _AlignedAllocator_Base::dealloc_impl(void* p)
 {
 	rpfree(p);
 }
+
+} // namespace lmms

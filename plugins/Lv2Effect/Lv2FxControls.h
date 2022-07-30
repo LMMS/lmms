@@ -28,7 +28,16 @@
 #include "EffectControls.h"
 #include "Lv2ControlBase.h"
 
+namespace lmms
+{
+
+
 class Lv2Effect;
+
+namespace gui
+{
+class Lv2FxControlDialog;
+}
 
 
 class Lv2FxControls : public EffectControls, public Lv2ControlBase
@@ -45,7 +54,7 @@ public:
 	}
 
 	int controlCount() override;
-	EffectControlDialog *createView() override;
+	gui::EffectControlDialog* createView() override;
 
 private slots:
 	void changeControl();
@@ -54,8 +63,11 @@ private:
 	DataFile::Types settingsType() override;
 	void setNameFromFile(const QString &name) override;
 
-	friend class Lv2FxControlDialog;
+	friend class gui::Lv2FxControlDialog;
 	friend class Lv2Effect;
 };
+
+
+} // namespace lmms
 
 #endif

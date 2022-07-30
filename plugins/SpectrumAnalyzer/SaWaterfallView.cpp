@@ -40,6 +40,10 @@
 #include "SaProcessor.h"
 
 
+namespace lmms::gui
+{
+
+
 SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, QWidget *_parent) :
 	QWidget(_parent),
 	m_controls(controls),
@@ -341,3 +345,6 @@ void SaWaterfallView::resizeEvent(QResizeEvent *event)
 {
 	m_timeTics = makeTimeTics();
 }
+
+
+} // namespace lmms::gui

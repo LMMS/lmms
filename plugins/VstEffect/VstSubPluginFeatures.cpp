@@ -30,6 +30,8 @@
 #include "VstSubPluginFeatures.h"
 #include "ConfigManager.h"
 
+namespace lmms
+{
 
 
 VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
@@ -90,3 +92,5 @@ void VstSubPluginFeatures::addPluginsFromDir( QStringList* filenames, QString pa
 	}
 }
 
+
+} // namespace lmms

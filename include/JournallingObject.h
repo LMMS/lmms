@@ -30,6 +30,8 @@
 #include "lmms_basics.h"
 #include "SerializingObject.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT JournallingObject : public SerializingObject
 {
@@ -98,6 +100,8 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

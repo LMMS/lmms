@@ -49,6 +49,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -874,15 +878,16 @@ void Sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * Sf2Instrument::instantiateView( QWidget * _parent )
+gui::PluginView * Sf2Instrument::instantiateView( QWidget * _parent )
 {
-	return new Sf2InstrumentView( this, _parent );
+	return new gui::Sf2InstrumentView( this, _parent );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 class Sf2Knob : public Knob
@@ -1182,6 +1187,7 @@ void Sf2InstrumentView::showPatchDialog()
 }
 
 
+} // namespace gui
 
 extern "C"
 {
@@ -1193,3 +1199,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 }
+
+
+} // namespace lmms

@@ -35,6 +35,11 @@
 #include <unordered_map>
 #include <vector>
 
+
+namespace lmms
+{
+
+
 /**
  * Complete implementation of the Lv2 Urid Map extension
  */
@@ -65,6 +70,9 @@ public:
 	LV2_URID_Map* mapFeature() { return &m_mapFeature; }
 	LV2_URID_Unmap* unmapFeature() { return &m_unmapFeature; }
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2URIDMAP_H

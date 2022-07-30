@@ -50,6 +50,10 @@
 
 #include "lmmsversion.h"
 
+namespace lmms
+{
+
+
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
@@ -139,11 +143,11 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( getGUI() != nullptr )
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox::critical( nullptr,
-				SongEditor::tr( "Could not open file" ),
-				SongEditor::tr( "Could not open file %1. You probably "
+				gui::SongEditor::tr( "Could not open file" ),
+				gui::SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
 						"file.\n Please make sure to have at "
 						"least read permissions to the file "
@@ -295,7 +299,7 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 {
 	// Small lambda function for displaying errors
 	auto showError = [this](QString title, QString body){
-		if (getGUI() != nullptr)
+		if (gui::getGUI() != nullptr)
 		{
 			QMessageBox mb;
 			mb.setWindowTitle(title);
@@ -324,6 +328,8 @@ bool DataFile::writeFile(const QString& filename, bool withResources)
 		: nameWithExtension(filename);
 	const QString fullNameTemp = fullName + ".new";
 	const QString fullNameBak = fullName + ".bak";
+
+	using gui::SongEditor;
 
 	// If we are saving with resources, setup the bundle folder first
 	if (withResources)
@@ -1884,8 +1890,10 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		}
 		if( line >= 0 && col >= 0 )
 		{
+			using gui::SongEditor;
+
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( getGUI() != nullptr )
+			if (gui::getGUI() != nullptr)
 			{
 				QMessageBox::critical( nullptr,
 					SongEditor::tr( "Error in file" ),
@@ -1918,18 +1926,20 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 	if (root.hasAttribute("creatorversion"))
 	{
+		using gui::SongEditor;
+
 		// compareType defaults to All, so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute("creatorversion");
 		ProjectVersion openedWith = LMMS_VERSION;
 
 		if (createdWith.setCompareType(ProjectVersion::Minor)
 		 !=  openedWith.setCompareType(ProjectVersion::Minor)
-		 && getGUI() != nullptr && root.attribute("type") == "song"
+		 && gui::getGUI() != nullptr && root.attribute("type") == "song"
 		){
 			auto projectType = _sourceFile.endsWith(".mpt") ?
 				SongEditor::tr("template") : SongEditor::tr("project");
 
-			TextFloat::displayMessage(
+			gui::TextFloat::displayMessage(
 				SongEditor::tr("Version difference"),
 				SongEditor::tr("This %1 was created with LMMS %2")
 				.arg(projectType).arg(createdWith.getVersion()),
@@ -1973,3 +1983,6 @@ unsigned int DataFile::legacyFileVersion()
 	// Convert the iterator to an index, which is our file version (starting at 0)
 	return std::distance( UPGRADE_VERSIONS.begin(), firstRequiredUpgrade );
 }
+
+
+} // namespace lmms

@@ -30,6 +30,9 @@
 #include "Effect.h"
 #include "DynamicsProcessorControls.h"
 
+namespace lmms
+{
+
 class RmsHelper;
 
 
@@ -68,7 +71,6 @@ private:
 } ;
 
 
-
-
+} // namespace lmms
 
 #endif

@@ -35,6 +35,11 @@ extern "C" {
     #include "dcblock.h"
 }
 
+
+namespace lmms
+{
+
+
 class ReverbSCEffect : public Effect
 {
 public:
@@ -57,5 +62,8 @@ private:
 	QMutex mutex;
 	friend class ReverbSCControls;
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -32,6 +32,9 @@
 #include "ComboBoxModel.h"
 #include "AutomatableModelView.h"
 
+namespace lmms::gui
+{
+
 class LMMS_EXPORT ComboBox : public QWidget, public IntModelView
 {
 	Q_OBJECT
@@ -77,5 +80,7 @@ private slots:
 	void setItem( QAction* item );
 
 } ;
+
+} // namespace lmms::gui
 
 #endif

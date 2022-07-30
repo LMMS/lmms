@@ -37,24 +37,27 @@
 #include "BandLimitedWave.h"
 #include "Oscillator.h"
 
-float LmmsCore::s_framesPerTick;
-AudioEngine* LmmsCore::s_audioEngine = nullptr;
-Mixer * LmmsCore::s_mixer = nullptr;
-PatternStore * LmmsCore::s_patternStore = nullptr;
-Song * LmmsCore::s_song = nullptr;
-ProjectJournal * LmmsCore::s_projectJournal = nullptr;
-#ifdef LMMS_HAVE_LV2
-Lv2Manager * LmmsCore::s_lv2Manager = nullptr;
-#endif
-Ladspa2LMMS * LmmsCore::s_ladspaManager = nullptr;
-void* LmmsCore::s_dndPluginKey = nullptr;
-
-
-
-
-void LmmsCore::init( bool renderOnly )
+namespace lmms
 {
-	LmmsCore *engine = inst();
+
+float Engine::s_framesPerTick;
+AudioEngine* Engine::s_audioEngine = nullptr;
+Mixer * Engine::s_mixer = nullptr;
+PatternStore * Engine::s_patternStore = nullptr;
+Song * Engine::s_song = nullptr;
+ProjectJournal * Engine::s_projectJournal = nullptr;
+#ifdef LMMS_HAVE_LV2
+Lv2Manager * Engine::s_lv2Manager = nullptr;
+#endif
+Ladspa2LMMS * Engine::s_ladspaManager = nullptr;
+void* Engine::s_dndPluginKey = nullptr;
+
+
+
+
+void Engine::init( bool renderOnly )
+{
+	Engine *engine = inst();
 
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
@@ -89,7 +92,7 @@ void LmmsCore::init( bool renderOnly )
 
 
 
-void LmmsCore::destroy()
+void Engine::destroy()
 {
 	s_projectJournal->stopAllJournalling();
 	s_audioEngine->stopProcessing();
@@ -123,7 +126,7 @@ void LmmsCore::destroy()
 
 
 
-bool LmmsCore::ignorePluginBlacklist()
+bool Engine::ignorePluginBlacklist()
 {
 	const char* envVar = getenv("LMMS_IGNORE_BLACKLIST");
 	return (envVar && *envVar);
@@ -132,7 +135,7 @@ bool LmmsCore::ignorePluginBlacklist()
 
 
 
-float LmmsCore::framesPerTick(sample_rate_t sampleRate)
+float Engine::framesPerTick(sample_rate_t sampleRate)
 {
 	return sampleRate * 60.0f * 4 /
 			DefaultTicksPerBar / s_song->getTempo();
@@ -141,7 +144,7 @@ float LmmsCore::framesPerTick(sample_rate_t sampleRate)
 
 
 
-void LmmsCore::updateFramesPerTick()
+void Engine::updateFramesPerTick()
 {
 	s_framesPerTick = s_audioEngine->processingSampleRate() * 60.0f * 4 / DefaultTicksPerBar / s_song->getTempo();
 }
@@ -149,7 +152,7 @@ void LmmsCore::updateFramesPerTick()
 
 
 
-void LmmsCore::setDndPluginKey(void *newKey)
+void Engine::setDndPluginKey(void *newKey)
 {
 	Q_ASSERT(static_cast<Plugin::Descriptor::SubPluginFeatures::Key*>(newKey));
 	s_dndPluginKey = newKey;
@@ -158,7 +161,7 @@ void LmmsCore::setDndPluginKey(void *newKey)
 
 
 
-void *LmmsCore::pickDndPluginKey()
+void *Engine::pickDndPluginKey()
 {
 	return s_dndPluginKey;
 }
@@ -166,4 +169,6 @@ void *LmmsCore::pickDndPluginKey()
 
 
 
-LmmsCore * LmmsCore::s_instanceOfMe = nullptr;
+Engine * Engine::s_instanceOfMe = nullptr;
+
+} // namespace lmms

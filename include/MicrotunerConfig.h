@@ -35,6 +35,10 @@
 class QLineEdit;
 class QPlainTextEdit;
 
+namespace lmms::gui
+{
+
+
 class LMMS_EXPORT MicrotunerConfig : public QWidget, public SerializingObject
 {
 	Q_OBJECT
@@ -88,5 +92,8 @@ private:
 	IntModel m_baseKeyModel;                //!< model for spinbox of currently edited base key
 	FloatModel m_baseFreqModel;             //!< model for spinbox of currently edited base note frequency
 };
+
+
+} // namespace lmms::gui
 
 #endif

@@ -29,6 +29,11 @@
 
 #include "Plugin.h"
 
+
+namespace lmms
+{
+
+
 class LMMS_EXPORT ToolPlugin : public Plugin
 {
 public:
@@ -41,5 +46,8 @@ public:
 										Model * _parent );
 
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -27,7 +27,16 @@
 
 #include "ClipView.h"
 
+
+
+namespace lmms
+{
+
 class SampleClip;
+
+namespace gui
+{
+
 
 class SampleClipView : public ClipView
 {
@@ -60,5 +69,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

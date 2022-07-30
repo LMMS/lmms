@@ -28,11 +28,21 @@
 #include "lmms_export.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
+
 /// Legacy interface for buffer re-use. Uses MemoryPool internally now.
 class LMMS_EXPORT BufferPool
 {
 public:
-	static void init( fpp_t framesPerPeriod );
+	static void init( fpp_t fpp );
 	static sampleFrame * acquire();
 	static void release( sampleFrame * buf );
+
+private:
+	static fpp_t s_framesPerPeriod;
 };
+
+
+} // namespace lmms

@@ -39,9 +39,13 @@
 #include "PlayHandle.h"
 
 
+namespace lmms
+{
+
 class AudioDevice;
 class MidiClient;
 class AudioPort;
+class AudioEngineWorkerThread;
 
 
 const fpp_t MINIMUM_BUFFER_SIZE = 32;
@@ -53,10 +57,6 @@ const int BYTES_PER_FRAME = sizeof( sampleFrame );
 const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
-
-
-class AudioEngineWorkerThread;
-
 
 class LMMS_EXPORT AudioEngine : public QObject
 {
@@ -361,7 +361,7 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer( const surroundSampleFrame * buffer );
+	void nextAudioBuffer( const lmms::surroundSampleFrame * buffer );
 
 
 private:
@@ -471,9 +471,11 @@ private:
 
 	bool m_waitingForWrite;
 
-	friend class LmmsCore;
+	friend class Engine;
 	friend class AudioEngineWorkerThread;
 	friend class ProjectRenderer;
 } ;
+
+} // namespace lmms
 
 #endif

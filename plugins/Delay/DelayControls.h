@@ -28,9 +28,12 @@
 #include "EffectControls.h"
 #include "DelayControlsDialog.h"
 
+namespace lmms
+{
 
 
 class DelayEffect;
+
 
 class DelayControls : public EffectControls
 {
@@ -49,9 +52,9 @@ public:
 	virtual int controlCount(){
 		return 5;
 	}
-	virtual EffectControlDialog* createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new DelayControlsDialog( this );
+		return new gui::DelayControlsDialog( this );
 	}
 
 	float m_outPeakL;
@@ -69,8 +72,11 @@ private:
 	TempoSyncKnobModel m_lfoAmountModel;
 	FloatModel m_outGainModel;
 
-	friend class DelayControlsDialog;
+	friend class gui::DelayControlsDialog;
 	friend class DelayEffect;
 };
+
+
+} // namespace lmms
 
 #endif // DELAYCONTROLS_H

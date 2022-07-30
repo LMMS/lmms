@@ -28,6 +28,10 @@
 #include "EffectControls.h"
 #include "StereoEnhancerControlDialog.h"
 
+namespace lmms
+{
+
+
 class StereoEnhancerEffect;
 
 class StereoEnhancerControls : public EffectControls
@@ -51,9 +55,9 @@ public:
 		return( 1 );
 	}
 	
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new StereoEnhancerControlDialog( this );
+		return new gui::StereoEnhancerControlDialog( this );
 	}
 
 
@@ -65,9 +69,11 @@ private:
 	StereoEnhancerEffect * m_effect;
 	FloatModel m_widthModel;
 	
-	friend class StereoEnhancerControlDialog;
+	friend class gui::StereoEnhancerControlDialog;
 
 } ;
 
+
+} // namespace lmms
 
 #endif /*_STEREO_ENHANCER_CONTROLS_H*/

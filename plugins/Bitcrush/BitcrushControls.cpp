@@ -29,6 +29,10 @@
 #include "BitcrushControls.h"
 #include "Bitcrush.h"
 
+namespace lmms
+{
+
+
 
 BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	EffectControls( eff ),
@@ -86,3 +90,6 @@ void BitcrushControls::sampleRateChanged()
 {
 	m_effect->sampleRateChanged();
 }
+
+
+} // namespace lmms

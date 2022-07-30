@@ -31,6 +31,9 @@
 #include "Effect.h"
 #include "Plugin.h"
 
+namespace lmms
+{
+
 
 class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
@@ -47,8 +50,7 @@ private:
 } ;
 
 
-
-
+} // namespace lmms
 
 #endif
 

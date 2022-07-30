@@ -24,6 +24,8 @@
 
 #include "Model.h"
 
+namespace lmms
+{
 
 QString Model::fullDisplayName() const
 {
@@ -46,5 +48,5 @@ QString Model::fullDisplayName() const
 
 
 
-
+} // namespace lmms
 

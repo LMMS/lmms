@@ -27,6 +27,10 @@
 #include "AudioPortAudio.h"
 
 #ifndef LMMS_HAVE_PORTAUDIO
+namespace lmms
+{
+
+
 void AudioPortAudioSetupUtil::updateBackends()
 {
 }
@@ -38,6 +42,9 @@ void AudioPortAudioSetupUtil::updateDevices()
 void AudioPortAudioSetupUtil::updateChannels()
 {
 }
+
+
+} // namespace lmms
 #endif
 
 #ifdef LMMS_HAVE_PORTAUDIO
@@ -49,6 +56,9 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "gui_templates.h"
 #include "ComboBox.h"
 #include "AudioEngine.h"
+
+namespace lmms
+{
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, AudioEngine * _audioEngine ) :
@@ -407,6 +417,8 @@ void AudioPortAudioSetupUtil::updateChannels()
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
+	using gui::ComboBox;
+
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, ComboBox::DEFAULT_HEIGHT );
 
@@ -495,6 +507,8 @@ void AudioPortAudio::setupWidget::show()
 
 	AudioDeviceSetupWidget::show();
 }
+
+} // namespace lmms
 
 
 #endif

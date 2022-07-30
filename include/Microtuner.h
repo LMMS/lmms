@@ -29,6 +29,9 @@
 #include "ComboBoxModel.h"
 #include "JournallingObject.h"
 
+namespace lmms
+{
+
 class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 {
 	Q_OBJECT
@@ -67,5 +70,7 @@ private:
 	BoolModel m_keyRangeImportModel;
 
 };
+
+} // namespace lmms
 
 #endif

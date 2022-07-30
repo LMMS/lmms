@@ -39,6 +39,9 @@
 #define strcasecmp _stricmp
 #endif
 
+namespace lmms
+{
+
 
 using namespace std;
 
@@ -741,3 +744,5 @@ int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sa
   return Length;
 }
 
+
+} // namespace lmms

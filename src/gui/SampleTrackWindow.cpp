@@ -43,7 +43,10 @@
 #include "SubWindow.h"
 #include "TabWidget.h"
 #include "TrackLabelButton.h"
- 
+
+namespace lmms::gui
+{
+
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
@@ -271,3 +274,6 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
+
+
+} // namespace lmms::gui

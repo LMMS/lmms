@@ -29,6 +29,10 @@
 #include <QStyledItemDelegate>
 
 
+namespace lmms::gui
+{
+
+
 class RowDelegate : public QStyledItemDelegate
 {
 public:
@@ -135,5 +139,4 @@ void RowTableView::keyPressEvent( QKeyEvent * event )
 }
 
 
-
-
+} // namespace lmms::gui

@@ -34,6 +34,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -126,10 +130,10 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	TextFloat * tf = nullptr;
-	if( getGUI() != nullptr )
+	gui::TextFloat* tf = nullptr;
+	if( gui::getGUI() != nullptr )
 	{
-		tf = TextFloat::displayMessage(
+		tf = gui::TextFloat::displayMessage(
 			VstPlugin::tr( "Loading plugin" ),
 			VstPlugin::tr( "Please wait while loading VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
@@ -166,3 +170,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms

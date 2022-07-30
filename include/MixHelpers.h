@@ -28,6 +28,9 @@
 #include "lmms_basics.h"
 #include "lmms_export.h"
 
+namespace lmms
+{
+
 class ValueBuffer;
 namespace MixHelpers
 {
@@ -79,7 +82,10 @@ void multiplyAndAddMultiplied( sampleFrame* dst, const sampleFrame* src, float c
 /*! \brief Multiply dst by coeffDst and add samples from srcLeft/srcRight multiplied by coeffSrc */
 void multiplyAndAddMultipliedJoined( sampleFrame* dst, const sample_t* srcLeft, const sample_t* srcRight, float coeffDst, float coeffSrc, int frames );
 
-}
+} // namespace MixHelpers
+
+
+} // namespace lmms
 
 #endif
 

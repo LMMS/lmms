@@ -27,7 +27,15 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class VecControls;
+
+namespace gui
+{
+
 
 //! Top-level widget holding the configuration GUI and vector display
 class VecControlsDialog : public EffectControlDialog
@@ -43,5 +51,10 @@ public:
 private:
 	VecControls *m_controls;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif // VECCONTROLSDIALOG_H

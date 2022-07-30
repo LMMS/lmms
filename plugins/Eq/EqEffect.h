@@ -28,6 +28,8 @@
 #include "EqControls.h"
 #include "EqFilter.h"
 
+namespace lmms
+{
 
 
 class EqEffect : public Effect
@@ -94,5 +96,8 @@ private:
 
 	void setBandPeaks( EqAnalyser * fft , int );
 };
+
+
+} // namespace lmms
 
 #endif // EQEFFECT_H

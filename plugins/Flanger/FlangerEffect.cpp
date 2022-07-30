@@ -28,6 +28,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -161,3 +165,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }}
+
+
+} // namespace lmms

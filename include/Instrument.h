@@ -33,6 +33,8 @@
 #include "Plugin.h"
 #include "TimePos.h"
 
+namespace lmms
+{
 
 // forward-declarations
 class InstrumentTrack;
@@ -146,6 +148,10 @@ private:
 
 } ;
 
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
+
+
+} // namespace lmms
 
 #endif

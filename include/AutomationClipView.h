@@ -29,7 +29,13 @@
 
 #include "ClipView.h"
 
+namespace lmms
+{
+
 class AutomationClip;
+
+namespace gui
+{
 
 
 class AutomationClipView : public ClipView
@@ -74,5 +80,9 @@ private:
 	void scaleTimemapToFit( float oldMin, float oldMax );
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

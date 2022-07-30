@@ -28,6 +28,10 @@
 #include "Note.h"
 #include "Model.h"
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class MidiEventProcessor;
 
@@ -81,6 +85,9 @@ private:
 	bool m_pressedKeys[NumKeys];
 
 } ;
+
+
+} // namespace lmms
 
 #endif
 

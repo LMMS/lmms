@@ -32,6 +32,9 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
 
 ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 	PluginView( _toolPlugin, nullptr )
@@ -44,3 +47,4 @@ ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 }
 
 
+} // namespace lmms::gui

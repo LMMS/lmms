@@ -35,6 +35,8 @@ class MemoryPoolTest : QTestSuite
 private slots:
 	void MemoryPoolTests()
 	{
+		using namespace lmms;
+
 		using T = std::array<char, 16>;
 		int n = 256;
 		MemoryPool<T> pool(n);

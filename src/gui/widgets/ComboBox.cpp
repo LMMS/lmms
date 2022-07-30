@@ -36,6 +36,8 @@
 #include "embed.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
 
 QPixmap * ComboBox::s_background = nullptr;
 QPixmap * ComboBox::s_arrow = nullptr;
@@ -249,6 +251,6 @@ void ComboBox::setItem( QAction* item )
 }
 
 
-
+} // namespace lmms::gui
 
 

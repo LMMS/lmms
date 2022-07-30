@@ -34,8 +34,16 @@
 #include "Clip.h"
 
 
+namespace lmms
+{
+
 class AutomationTrack;
 class TimePos;
+
+namespace gui
+{
+class AutomationClipView;
+} // namespace gui
 
 
 
@@ -152,7 +160,7 @@ public:
 	static const QString classNodeName() { return "automationclip"; }
 	QString nodeName() const override { return classNodeName(); }
 
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	static bool isAutomated( const AutomatableModel * _m );
@@ -168,7 +176,7 @@ public:
 
 public slots:
 	void clear();
-	void objectDestroyed( jo_id_t );
+	void objectDestroyed( lmms::jo_id_t );
 	void flipY( int min, int max );
 	void flipY();
 	void flipX( int length = -1 );
@@ -204,7 +212,7 @@ private:
 	static const float DEFAULT_MIN_VALUE;
 	static const float DEFAULT_MAX_VALUE;
 
-	friend class AutomationClipView;
+	friend class gui::AutomationClipView;
 	friend class AutomationNode;
 
 } ;
@@ -241,5 +249,8 @@ inline int POS(AutomationClip::TimemapIterator it)
 {
 	return it.key();
 }
+
+
+} // namespace lmms
 
 #endif

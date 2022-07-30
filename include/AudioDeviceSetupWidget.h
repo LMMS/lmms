@@ -27,6 +27,8 @@
 
 #include "TabWidget.h"
 
+namespace lmms::gui
+{
 
 class AudioDeviceSetupWidget : public TabWidget
 {
@@ -41,5 +43,6 @@ public:
 	virtual void show();
 };
 
+} // namespace lmms::gui
 
 #endif

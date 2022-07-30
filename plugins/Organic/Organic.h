@@ -34,10 +34,19 @@
 
 class QPixmap;
 
-class Knob;
+namespace lmms
+{
+
+
 class NotePlayHandle;
 class Oscillator;
+
+namespace gui
+{
+class Knob;
 class PixmapButton;
+class OrganicInstrumentView;
+} // namespace gui
 
 const int NUM_OSCILLATORS = 8;
 const int NUM_HARMONICS = 18;
@@ -99,7 +108,7 @@ private:
 	virtual ~OscillatorObject();
 
 	friend class OrganicInstrument;
-	friend class OrganicInstrumentView;
+	friend class gui::OrganicInstrumentView;
 
 
 private slots:
@@ -163,14 +172,17 @@ private:
 	FloatModel  m_fx1Model;
 	FloatModel  m_volModel;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual gui::PluginView* instantiateView( QWidget * _parent );
 
 
 private slots:
 	void updateAllDetuning();
 
-	friend class OrganicInstrumentView;
+	friend class gui::OrganicInstrumentView;
 } ;
+
+namespace gui
+{
 
 
 class OrganicInstrumentView : public InstrumentViewFixedSize
@@ -224,5 +236,9 @@ protected slots:
 	void updateKnobHint();
 };
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

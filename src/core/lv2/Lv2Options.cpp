@@ -29,6 +29,10 @@
 #include <QtGlobal>
 
 
+namespace lmms
+{
+
+
 std::set<LV2_URID> Lv2Options::s_supportedOptions;
 
 
@@ -89,5 +93,7 @@ void Lv2Options::initOption(LV2_URID key, uint32_t size, LV2_URID type,
 	Q_ASSERT(valResult.second);
 }
 
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

@@ -22,15 +22,18 @@
  *
  */
 
-#include "LinkedModelGroups.h"
-
 #include <QDomDocument>
 #include <QDomElement>
+
+#include "LinkedModelGroups.h"
+
 
 #include "AutomatableModel.h"
 
 
 
+namespace lmms
+{
 
 /*
 	LinkedModelGroup
@@ -182,3 +185,5 @@ void LinkedModelGroups::loadSettings(const QDomElement& that)
 	}
 }
 
+
+} // namespace lmms

@@ -30,6 +30,9 @@
 
 #include "lmms_export.h"
 
+namespace lmms::gui
+{
+
 ///
 /// \brief A context menu with a caption
 ///
@@ -42,6 +45,6 @@ public:
 } ;
 
 
-
+} // namespace lmms::gui
 
 #endif

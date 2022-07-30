@@ -33,6 +33,9 @@
 #include "MainWindow.h"
 #include "VecControls.h"
 
+namespace lmms::gui
+{
+
 
 VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent) :
 	QWidget(parent),
@@ -327,3 +330,6 @@ void VectorView::wheelEvent(QWheelEvent *event)
 	).count();
 
 }
+
+
+} // namespace lmms::gui

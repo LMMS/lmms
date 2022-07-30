@@ -37,6 +37,8 @@
 #include "LadspaControlView.h"
 #include "LedCheckBox.h"
 
+namespace lmms::gui
+{
 
 
 LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
@@ -141,11 +143,10 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		m_stereoLink->setModel( &_ctl->m_stereoLinkModel );
 	}
 
-	connect( _ctl, SIGNAL( effectModelChanged( LadspaControls * ) ),
-				this, SLOT( updateEffectView( LadspaControls * ) ),
+	connect( _ctl, SIGNAL( effectModelChanged( lmms::LadspaControls * ) ),
+				this, SLOT( updateEffectView( lmms::LadspaControls * ) ),
 							Qt::DirectConnection );
 }
 
 
-
-
+} // namespace lmms::gui

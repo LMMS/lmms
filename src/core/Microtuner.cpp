@@ -33,6 +33,9 @@
 #include "Scale.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 Microtuner::Microtuner() :
 	Model(nullptr, tr("Microtuner")),
@@ -165,3 +168,6 @@ void Microtuner::loadSettings(const QDomElement &element)
 	m_keymapModel.loadSettings(element, "keymap");
 	m_keyRangeImportModel.loadSettings(element, "range_import");
 }
+
+
+} // namespace lmms

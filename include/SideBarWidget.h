@@ -31,6 +31,9 @@
 
 class QPushButton;
 
+namespace lmms::gui
+{
+
 
 class SideBarWidget : public QWidget
 {
@@ -83,5 +86,8 @@ private:
 	const QSize m_buttonSize;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

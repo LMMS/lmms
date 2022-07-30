@@ -29,7 +29,8 @@
 #include "LedCheckBox.h"
 #include "TempoSyncKnob.h"
 
-
+namespace lmms::gui
+{
 
 
 FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
@@ -89,3 +90,6 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 
 
 }
+
+
+} // namespace lmms::gui

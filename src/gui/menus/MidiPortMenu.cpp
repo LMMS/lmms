@@ -26,6 +26,8 @@
 #include "MidiPortMenu.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
 
 
 MidiPortMenu::MidiPortMenu( MidiPort::Modes _mode ) :
@@ -99,6 +101,6 @@ void MidiPortMenu::updateMenu()
 }
 
 
-
+} // namespace lmms::gui
 
 

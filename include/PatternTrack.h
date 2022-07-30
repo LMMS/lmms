@@ -31,8 +31,18 @@
 
 #include "Track.h"
 
-class TrackLabelButton;
+namespace lmms
+{
+
 class TrackContainer;
+
+namespace gui
+{
+
+class TrackLabelButton;
+class PatternTrackView;
+
+} // namespace gui
 
 
 /*! Track type used in the Song (Editor) to reference a pattern in the PatternStore */
@@ -44,8 +54,9 @@ public:
 	virtual ~PatternTrack();
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
+
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
-	TrackView * createView( TrackContainerView* tcv ) override;
+	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
 	Clip* createClip(const TimePos & pos) override;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
@@ -86,9 +97,11 @@ private:
 	typedef QMap<PatternTrack*, int> infoMap;
 	static infoMap s_infoMap;
 
-	friend class PatternTrackView;
+	friend class gui::PatternTrackView;
 } ;
 
 
+
+} // namespace lmms
 
 #endif

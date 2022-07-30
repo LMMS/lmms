@@ -31,6 +31,8 @@
 #include "AutomatableModelView.h"
 
 
+namespace lmms::gui
+{
 
 class AutomatableSlider : public QSlider, public IntModelView
 {
@@ -73,5 +75,6 @@ private slots:
 
 typedef IntModel sliderModel;
 
+} // namespace lmms::gui
 
 #endif

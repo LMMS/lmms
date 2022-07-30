@@ -33,6 +33,9 @@
 #include "LadspaControls.h"
 #include "LadspaManager.h"
 
+namespace lmms
+{
+
 
 typedef struct PortDescription port_desc_t;
 typedef QVector<port_desc_t *> multi_proc_t;
@@ -87,5 +90,8 @@ private:
 	multi_proc_t m_portControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

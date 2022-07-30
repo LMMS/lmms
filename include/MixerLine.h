@@ -23,16 +23,18 @@
  *
  */
 
-#ifndef MIXER_LINE_H
-#define MIXER_LINE_H
+#ifndef MIXERLINE_H
+#define MIXERLINE_H
 
 #include <QWidget>
 
-
-
-
 class QGraphicsView;
 class QLineEdit;
+
+namespace lmms::gui
+{
+
+
 class Knob;
 class LcdWidget;
 class MixerView;
@@ -112,5 +114,7 @@ private slots:
 	void moveChannelRight();
 };
 
+
+} // namespace lmms::gui
 
 #endif // MIXERLINE_H

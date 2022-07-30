@@ -30,6 +30,10 @@
 #define LMMSPALETTE_H
 
 
+namespace lmms::gui
+{
+
+
 class LMMS_EXPORT LmmsPalette : public QWidget
 {
 	Q_OBJECT
@@ -83,5 +87,6 @@ private:
 
 
 
+} // namespace lmms::gui
 
 #endif

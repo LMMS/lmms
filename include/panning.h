@@ -31,6 +31,10 @@
 #include "Midi.h"
 #include "volume.h"
 
+namespace lmms
+{
+
+
 inline StereoVolumeVector panningToVolumeVector( panning_t _p,
 							float _scale = 1.0f )
 {
@@ -48,5 +52,8 @@ inline int panningToMidi( panning_t _p )
 			  ( (float)( PanningRight - PanningLeft ) ) *
 			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
 }
+
+
+} // namespace lmms
 
 #endif

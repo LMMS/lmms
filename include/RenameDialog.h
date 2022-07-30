@@ -32,6 +32,8 @@
 
 class QLineEdit;
 
+namespace lmms::gui
+{
 
 class RenameDialog : public QDialog
 {
@@ -57,5 +59,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

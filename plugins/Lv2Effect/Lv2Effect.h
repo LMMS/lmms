@@ -28,6 +28,10 @@
 #include "Effect.h"
 #include "Lv2FxControls.h"
 
+namespace lmms
+{
+
+
 class Lv2Effect : public Effect
 {
 	Q_OBJECT
@@ -50,5 +54,8 @@ private:
 	Lv2FxControls m_controls;
 	std::vector<sampleFrame> m_tmpOutputSmps;
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

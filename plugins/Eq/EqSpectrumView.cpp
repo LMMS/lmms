@@ -33,6 +33,10 @@
 #include "MainWindow.h"
 #include "lmms_constants.h"
 
+namespace lmms
+{
+
+
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),
 	m_energy ( 0 ),
@@ -176,6 +180,8 @@ void EqAnalyser::clear()
 
 
 
+namespace gui
+{
 
 EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
@@ -298,3 +304,8 @@ void EqSpectrumView::periodicalUpdate()
 	m_analyser->setActive( isVisible() );
 	update();
 }
+
+
+} // namespace gui
+
+} // namespace lmms

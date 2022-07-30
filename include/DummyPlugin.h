@@ -30,6 +30,9 @@
 #include "PluginView.h"
 
 
+namespace lmms
+{
+
 class DummyPlugin : public Plugin
 {
 public:
@@ -57,12 +60,14 @@ public:
 
 
 protected:
-	PluginView * instantiateView( QWidget * _parent ) override
+	gui::PluginView * instantiateView( QWidget * _parent ) override
 	{
-		return new PluginView( this, _parent );
+		return new gui::PluginView( this, _parent );
 	}
 
 } ;
 
+
+} // namesplace lmms
 
 #endif

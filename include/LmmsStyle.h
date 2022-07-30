@@ -30,6 +30,9 @@
 #include <QProxyStyle>
 
 
+namespace lmms::gui
+{
+
 
 class LmmsStyle : public QProxyStyle
 {
@@ -91,5 +94,8 @@ private:
 	QColor m_colors[ LmmsStyle::NumColorRoles ];
 
 };
+
+
+} // namespace lmms::gui
 
 #endif

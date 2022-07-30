@@ -27,6 +27,9 @@
 
 #include <chrono>
 
+namespace lmms
+{
+
 class MicroTimer
 {
 	using time_point = std::chrono::steady_clock::time_point;
@@ -42,5 +45,7 @@ private:
 	time_point begin;
 } ;
 
+
+} // namespace lmms
 
 #endif

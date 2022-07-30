@@ -36,8 +36,15 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
-class LcdSpinBox;
 class QLineEdit;
+
+namespace lmms
+{
+
+namespace gui
+{
+class LcdSpinBox;
+}
 
 
 class AudioSndio : public QThread, public AudioDevice
@@ -52,7 +59,7 @@ public:
 		return QT_TRANSLATE_NOOP( "AudioDeviceSetupWidget", "sndio" );
 	}
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -62,7 +69,7 @@ public:
 
 	private:
 		QLineEdit * m_device;
-		LcdSpinBox * m_channels;
+		gui::LcdSpinBox * m_channels;
 	} ;
 
 private:
@@ -77,6 +84,8 @@ private:
 	bool m_convertEndian;
 } ;
 
+
+} // namespace lmms
 
 #endif	/* LMMS_HAVE_SNDIO */
 

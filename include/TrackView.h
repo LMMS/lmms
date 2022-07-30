@@ -37,10 +37,18 @@
 
 class QMenu;
 
-class FadeButton;
+namespace lmms
+{
+
 class Track;
-class TrackContainerView;
 class Clip;
+
+
+namespace gui
+{
+
+class FadeButton;
+class TrackContainerView;
 
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
@@ -161,11 +169,14 @@ private:
 
 
 private slots:
-	void createClipView( Clip * clip );
+	void createClipView( lmms::Clip * clip );
 	void muteChanged();
 
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

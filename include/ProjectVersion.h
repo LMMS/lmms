@@ -33,6 +33,10 @@
 #include <limits>
 #include "lmms_export.h"
 
+namespace lmms
+{
+
+
 /*! \brief Version number parsing and comparison
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
@@ -75,5 +79,8 @@ inline bool operator<=(const ProjectVersion & v1, const ProjectVersion & v2) { r
 inline bool operator>=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) >= 0; }
 inline bool operator==(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) == 0; }
 inline bool operator!=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) != 0; }
+
+
+} // namespace lmms
 
 #endif

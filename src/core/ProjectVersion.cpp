@@ -28,6 +28,8 @@
 #include "ProjectVersion.h"
 
 
+namespace lmms
+{
 
 
 ProjectVersion::ProjectVersion(QString version, CompareType c) :
@@ -135,3 +137,6 @@ int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
 {
 	return compare(v1, v2, std::min(v1.getCompareType(), v2.getCompareType()));
 }
+
+
+} // namespace lmms

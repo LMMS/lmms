@@ -35,7 +35,9 @@
 #include "Lv2Manager.h"
 #include "Lv2Evbuf.h"
 
-namespace Lv2Ports {
+
+namespace lmms::Lv2Ports
+{
 
 
 
@@ -359,7 +361,7 @@ Visitor::~Visitor() {}
 
 
 
-} // namespace Lv2Ports
+} // namespace lmms::Lv2Ports
 
 #endif // LMMS_HAVE_LV2
 

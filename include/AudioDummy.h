@@ -30,6 +30,8 @@
 #include "AudioEngine.h"
 #include "MicroTimer.h"
 
+namespace lmms
+{
 
 class AudioDummy : public QThread, public AudioDevice
 {
@@ -52,11 +54,11 @@ public:
 	}
 
 
-	class setupWidget : public AudioDeviceSetupWidget
+	class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			AudioDeviceSetupWidget( AudioDummy::name(), _parent )
+			gui::AudioDeviceSetupWidget( AudioDummy::name(), _parent )
 		{
 		}
 
@@ -114,5 +116,6 @@ private:
 
 } ;
 
+} // namespace lmms
 
 #endif

@@ -31,6 +31,9 @@
 #include "PatternStore.h"
 #include "PatternTrack.h"
 
+namespace lmms
+{
+
 
 PatternClip::PatternClip(Track* track) :
 	Clip(track)
@@ -109,7 +112,10 @@ int PatternClip::patternIndex()
 
 
 
-ClipView* PatternClip::createView(TrackView* tv)
+gui::ClipView* PatternClip::createView(gui::TrackView* tv)
 {
-	return new PatternClipView(this, tv);
+	return new gui::PatternClipView(this, tv);
 }
+
+
+} // namespace lmms

@@ -31,7 +31,8 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-
+namespace lmms::gui
+{
 
 
 DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
@@ -152,3 +153,6 @@ void XyPad::mouseMoveEvent(QMouseEvent *event)
 		m_yModel->setValue( m_yModel->minValue() + ( event->y() * yInc ) );
 	}
 }
+
+
+} // namespace lmms::gui

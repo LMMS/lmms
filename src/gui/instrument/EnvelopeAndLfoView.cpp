@@ -42,9 +42,15 @@
 #include "TextFloat.h"
 #include "Track.h"
 
+namespace lmms
+{
 
 extern const float SECS_PER_ENV_SEGMENT;
 extern const float SECS_PER_LFO_OSCILLATION;
+
+
+namespace gui
+{
 
 
 const int ENV_GRAPH_X = 6;
@@ -528,4 +534,6 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 
 
 
+} // namespace gui
 
+} // namespace lmms

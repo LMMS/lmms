@@ -36,6 +36,9 @@
 #include "PluginFactory.h"
 
 
+namespace lmms
+{
+
 
 LadspaManager::LadspaManager()
 {
@@ -715,3 +718,6 @@ bool LadspaManager::cleanup( const ladspa_key_t & _plugin,
 	}
 	return( false );
 }
+
+
+} // namespace lmms

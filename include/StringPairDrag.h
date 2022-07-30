@@ -35,6 +35,9 @@
 
 class QPixmap;
 
+namespace lmms::gui
+{
+
 
 class LMMS_EXPORT StringPairDrag : public QDrag
 {
@@ -49,5 +52,7 @@ public:
 	static QString decodeValue( QDropEvent * _de );
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

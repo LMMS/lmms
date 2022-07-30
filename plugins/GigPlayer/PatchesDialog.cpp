@@ -27,6 +27,9 @@
 
 #include <QHeaderView>
 
+namespace lmms::gui
+{
+
 
 // Custom list-view item (as for numerical sort purposes...)
 class PatchItem : public QTreeWidgetItem
@@ -408,3 +411,6 @@ void PatchesDialog::progChanged( QTreeWidgetItem * curr, QTreeWidgetItem * prev 
 	// Stabilize the form.
 	stabilizeForm();
 }
+
+
+} // namespace lmms::gui

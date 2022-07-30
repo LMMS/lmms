@@ -31,8 +31,13 @@
 #include "AutomatableModel.h"
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class Piano;
 
+namespace gui
+{
 
 class PianoView : public QWidget, public ModelView
 {
@@ -93,5 +98,9 @@ signals:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

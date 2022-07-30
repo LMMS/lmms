@@ -48,6 +48,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tcv ) :
 	TrackView( _it, tcv ),
 	m_window( nullptr ),
@@ -384,3 +388,5 @@ QMenu * InstrumentTrackView::createMixerMenu(QString title, QString newMixerLabe
 	return mixerMenu;
 }
 
+
+} // namespace lmms::gui

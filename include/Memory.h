@@ -34,6 +34,10 @@
 #include "lmms_export.h"
 #include "NiftyCounter.h"
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT MemoryManager
 {
 public:
@@ -140,5 +144,8 @@ void MM_FREE(T* ptr)
 {
 	MemoryManager::free(ptr);
 }
+
+
+} // namespace lmms
 
 #endif

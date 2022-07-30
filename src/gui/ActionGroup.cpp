@@ -24,6 +24,9 @@
 
 #include "ActionGroup.h"
 
+namespace lmms::gui
+{
+
 ActionGroup::ActionGroup(QObject* parent) : QActionGroup(parent)
 {
 	connect(this, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered_(QAction*)));
@@ -53,3 +56,5 @@ void ActionGroup::actionTriggered_(QAction* action)
 
 	emit triggered(actions().indexOf(action));
 }
+
+} // namespace lmms::gui

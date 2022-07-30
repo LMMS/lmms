@@ -34,6 +34,10 @@
 #include "EffectChain.h"
 #include "plugins/PeakControllerEffect/PeakControllerEffect.h"
 
+namespace lmms
+{
+
+
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
 int PeakController::m_loadCount;
@@ -247,11 +251,10 @@ QString PeakController::nodeName() const
 
 
 
-ControllerDialog * PeakController::createDialog( QWidget * _parent )
+gui::ControllerDialog * PeakController::createDialog( QWidget * _parent )
 {
-	return new PeakControllerDialog( this, _parent );
+	return new gui::PeakControllerDialog( this, _parent );
 }
 
 
-
-
+} // namespace lmms

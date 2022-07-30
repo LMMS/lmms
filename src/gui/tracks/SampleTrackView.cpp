@@ -42,6 +42,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	TrackView( _t, tcv )
 {
@@ -232,3 +236,6 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 
 	getGUI()->mixerView()->setCurrentMixerLine(channelIndex);
 }
+
+
+} // namespace lmms::gui

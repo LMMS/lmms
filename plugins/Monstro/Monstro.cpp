@@ -38,6 +38,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
@@ -1304,9 +1308,9 @@ f_cnt_t MonstroInstrument::desiredReleaseFrames() const
 }
 
 
-PluginView * MonstroInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* MonstroInstrument::instantiateView( QWidget * _parent )
 {
-	return( new MonstroView( this, _parent ) );
+	return( new gui::MonstroView( this, _parent ) );
 }
 
 
@@ -1443,6 +1447,10 @@ void MonstroInstrument::updateSlope2()
 	const float slope = m_env2Slope.value();
 	m_slope[1] = std::pow(10.f, slope * -1.0f );
 }
+
+
+namespace gui
+{
 
 
 MonstroView::MonstroView( Instrument * _instrument,
@@ -1823,6 +1831,10 @@ QWidget * MonstroView::setupMatrixView( QWidget * _parent )
 	return( view );
 }
 
+
+} // namespace gui
+
+
 extern "C"
 {
 
@@ -1836,5 +1848,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
-
+} // namespace lmms

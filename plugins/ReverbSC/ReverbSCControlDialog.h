@@ -28,8 +28,14 @@
 #include "EffectControlDialog.h"
 
 
+namespace lmms
+{
+
 class ReverbSCControls;
 
+
+namespace gui
+{
 
 class ReverbSCControlDialog : public EffectControlDialog
 {
@@ -41,5 +47,10 @@ public:
 	}
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

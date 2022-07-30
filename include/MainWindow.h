@@ -39,10 +39,18 @@ class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
+namespace lmms
+{
+
 class ConfigManager;
+
+namespace gui
+{
+
 class PluginView;
 class SubWindow;
 class ToolButton;
+class GuiApplication;
 
 
 class LMMS_EXPORT MainWindow : public QMainWindow
@@ -251,5 +259,10 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

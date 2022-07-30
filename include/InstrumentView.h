@@ -29,6 +29,10 @@
 #include "Instrument.h"
 #include "PluginView.h"
 
+
+namespace lmms::gui
+{
+
 class InstrumentTrackWindow;
 
 
@@ -69,5 +73,7 @@ public:
 	~InstrumentViewFixedSize() override;
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

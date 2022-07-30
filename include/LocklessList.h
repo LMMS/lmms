@@ -29,6 +29,9 @@
 
 #include <atomic>
 
+namespace lmms
+{
+
 template<typename T>
 class LocklessList
 {
@@ -90,5 +93,7 @@ private:
 	MemoryPool<Element> * m_allocator;
 } ;
 
+
+} // namespace lmms
 
 #endif

@@ -27,6 +27,10 @@
 
 #include "lmms_export.h"
 
+namespace lmms
+{
+
+
 class AutomatableModel;
 class BoolModel;
 class IntModel;
@@ -62,5 +66,8 @@ public:
 	virtual void visit(const TempoSyncKnobModel& m);
 	virtual ~ConstModelVisitor();
 };
+
+
+} // namespace lmms
 
 #endif // MODELVISITOR_H

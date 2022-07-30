@@ -31,8 +31,13 @@
 
 #include "ClipView.h"
 
+namespace lmms
+{
+
 class PatternClip;
 
+namespace gui
+{
 
 class PatternClipView : public ClipView
 {
@@ -65,5 +70,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

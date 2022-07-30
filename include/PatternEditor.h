@@ -30,8 +30,14 @@
 #include "Editor.h"
 #include "TrackContainerView.h"
 
+namespace lmms
+{
 
 class PatternStore;
+
+namespace gui
+{
+
 class ComboBox;
 
 
@@ -69,11 +75,9 @@ private:
 };
 
 
-
-
 class PatternEditorWindow : public Editor
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	PatternEditorWindow(PatternStore* ps);
 	~PatternEditorWindow();
@@ -89,5 +93,10 @@ public slots:
 private:
 	ComboBox* m_patternComboBox;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

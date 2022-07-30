@@ -31,6 +31,8 @@
 
 #include "LcdWidget.h"
 
+namespace lmms::gui
+{
 
 class TimeDisplayWidget : public QWidget
 {
@@ -66,5 +68,7 @@ private:
 	LcdWidget m_milliSecondsLCD;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif // TIME_DISPLAY_WIDGET_H

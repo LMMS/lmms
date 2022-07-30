@@ -32,6 +32,9 @@
 
 #include "fluidsynthshims.h"
 
+namespace lmms::gui
+{
+
 
 // Custom list-view item (as for numerical sort purposes...)
 class PatchItem : public QTreeWidgetItem
@@ -381,4 +384,4 @@ void PatchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 }
 
 
-
+} // namespace lmms::gui

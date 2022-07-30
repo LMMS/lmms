@@ -28,6 +28,9 @@
 
 #include "NotePlayHandle.h"
 
+namespace lmms
+{
+
 
 class DataFile;
 class InstrumentTrack;
@@ -63,5 +66,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

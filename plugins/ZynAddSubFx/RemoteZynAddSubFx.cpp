@@ -38,6 +38,7 @@
 #include "zynaddsubfx/src/Nio/Nio.h"
 #include "zynaddsubfx/src/UI/MasterUI.h"
 
+using namespace lmms;
 
 class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx
 {

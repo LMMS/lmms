@@ -39,6 +39,10 @@
 #define LV2_BUF_SIZE__nominalBlockLength LV2_BUF_SIZE_PREFIX "nominalBlockLength"
 #endif
 
+namespace lmms
+{
+
+
 uint32_t Lv2UridCache::operator[](Lv2UridCache::Id id) const
 {
 	Q_ASSERT(id != Id::size);
@@ -66,6 +70,9 @@ Lv2UridCache::Lv2UridCache(UridMap &mapper)
 
 	for(uint32_t urid : m_cache) { Q_ASSERT(urid != noIdYet); }
 }
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

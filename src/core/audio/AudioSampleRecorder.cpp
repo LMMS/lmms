@@ -29,6 +29,9 @@
 #include "debug.h"
 
 
+namespace lmms
+{
+
 
 AudioSampleRecorder::AudioSampleRecorder( const ch_cnt_t _channels,
 							bool & _success_ful,
@@ -111,4 +114,4 @@ void AudioSampleRecorder::writeBuffer( const surroundSampleFrame * _ab,
 }
 
 
-
+} // namespace lmms

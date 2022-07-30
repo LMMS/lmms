@@ -25,6 +25,10 @@
 #ifndef NOISE_H
 #define NOISE_H
 
+namespace lmms
+{
+
+
 class Noise
 {
 public:
@@ -33,5 +37,8 @@ public:
 private:
 	double inv_randmax;
 };
+
+
+} // namespace lmms
 
 #endif // NOISE_H

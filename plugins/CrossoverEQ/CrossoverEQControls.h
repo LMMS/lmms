@@ -30,6 +30,9 @@
 #include "EffectControls.h"
 #include "CrossoverEQControlDialog.h"
 
+namespace lmms
+{
+
 class CrossoverEQEffect;
 
 class CrossoverEQControls : public EffectControls
@@ -51,9 +54,9 @@ public:
 		return( 11 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog * createView()
 	{
-		return( new CrossoverEQControlDialog( this ) );
+		return( new gui::CrossoverEQControlDialog( this ) );
 	}
 
 private slots:
@@ -79,8 +82,11 @@ private:
 	BoolModel m_mute3;
 	BoolModel m_mute4;
 	
-	friend class CrossoverEQControlDialog;
+	friend class gui::CrossoverEQControlDialog;
 	friend class CrossoverEQEffect;
 };
+
+
+} // namespace lmms
 
 #endif

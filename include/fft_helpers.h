@@ -32,6 +32,9 @@
 #include <vector>
 #include <fftw3.h>
 
+namespace lmms
+{
+
 // NOTE: FFT_BUFFER_SIZE should be considered deprecated!
 // It is used by Eq plugin and some older code here, but this should be a user
 // switchable parameter, not a constant. Use a value from FFT_BLOCK_SIZES
@@ -102,5 +105,8 @@ int LMMS_EXPORT absspec(const fftwf_complex *complex_buffer, float *absspec_buff
  */
 int LMMS_EXPORT compressbands(const float * _absspec_buffer, float * _compressedband,
 			int _num_old, int _num_new, int _bottom, int _top);
+
+
+} // namespace lmms
 
 #endif

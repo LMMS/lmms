@@ -54,6 +54,10 @@
 #include "TimeLineWidget.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
+
 const QVector<float> SongEditor::m_zoomLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
@@ -84,11 +88,11 @@ SongEditor::SongEditor( Song * song ) :
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
 					Song::Mode_PlaySong, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos & ) ),
 				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
-			SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+			SLOT( updatePosition( const lmms::TimePos & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos & ) ),
+			this, SLOT( updatePosition( const lmms::TimePos & ) ) );
 	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 	connect( m_timeLine, SIGNAL( selectionFinished() ),
@@ -1138,3 +1142,6 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
 	m_editor->scrolled(0);
 }
+
+
+} // namespace lmms::gui

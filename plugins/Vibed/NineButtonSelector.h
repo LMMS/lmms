@@ -25,14 +25,20 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-
 #include <QWidget>
-
 #include "AutomatableModelView.h"
+
+namespace lmms
+{
+class graphModel;
+}
+
+namespace lmms::gui
+{
+
 
 class Knob;	
 class PixmapButton;
-class graphModel;
 
 
 class NineButtonSelector: public QWidget , public IntModelView
@@ -96,5 +102,8 @@ private:
 } ;
 
 typedef IntModel NineButtonSelectorModel;
+
+
+} // namespace lmms::gui
 
 #endif

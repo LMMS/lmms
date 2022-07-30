@@ -31,12 +31,16 @@
 #include "ComboBox.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
+
+
 #define makeknob( name, x, y, model, label, hint, unit ) 	\
 	Knob * name = new Knob( knobBright_26, this); 			\
-	name -> move( x, y );									\
-	name ->setModel( &controls-> model );					\
-	name ->setLabel( label );							\
-	name ->setHintText( hint, unit );
+	(name) -> move( x, y );									\
+	(name) ->setModel( &controls-> model );					\
+	(name) ->setLabel( label );							\
+	(name) ->setHintText( hint, unit );
 
 
 
@@ -83,3 +87,5 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
 
+
+} // namespace lmms::gui

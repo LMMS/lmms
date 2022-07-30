@@ -30,6 +30,9 @@
 #include "panning_constants.h"
 #include "volume.h"
 
+namespace lmms
+{
+
 class MidiEvent
 {
 public:
@@ -224,5 +227,7 @@ private:
 	// Stores the source of the MidiEvent: Internal or External (hardware controllers).
 	Source m_source;
 } ;
+
+} // namespace lmms
 
 #endif

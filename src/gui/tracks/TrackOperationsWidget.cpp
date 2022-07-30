@@ -47,6 +47,9 @@
 #include "TrackContainerView.h"
 #include "TrackView.h"
 
+namespace lmms::gui
+{
+
 /*! \brief Create a new trackOperationsWidget
  *
  * The trackOperationsWidget is the grip and the mute button of a track.
@@ -103,9 +106,9 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_soloBtn->show();
 	m_soloBtn->setToolTip(tr("Solo"));
 
-	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
+	connect( this, SIGNAL( trackRemovalScheduled( lmms::gui::TrackView * ) ),
 			m_trackView->trackContainerView(),
-				SLOT( deleteTrackView( TrackView * ) ),
+				SLOT( deleteTrackView( lmms::gui::TrackView * ) ),
 							Qt::QueuedConnection );
 
 	connect( m_trackView->getTrack()->getMutedModel(), SIGNAL( dataChanged() ),
@@ -391,3 +394,5 @@ void TrackOperationsWidget::recordingOff()
 	toggleRecording( false );
 }
 
+
+} // namespace lmms::gui

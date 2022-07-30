@@ -33,6 +33,9 @@
 #include "Instrument.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationClip()->valueAt( 0 ) : 0 )
 {
@@ -594,3 +597,6 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 
 const size_t INITIAL_NPH_CACHE = 256;
 MemoryPool<NotePlayHandle> NotePlayHandlePool{INITIAL_NPH_CACHE};
+
+
+} // namespace lmms

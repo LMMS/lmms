@@ -33,6 +33,8 @@
 
 class QAction;
 
+namespace lmms::gui
+{
 
 class MidiPortMenu : public QMenu, public ModelView
 {
@@ -57,5 +59,6 @@ private:
 
 } ;
 
+} // namespace lmms::gui
 
 #endif

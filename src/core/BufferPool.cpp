@@ -30,6 +30,9 @@
 
 #include "MemoryPool.h"
 
+namespace lmms
+{
+
 static std::unique_ptr<_MemoryPool_Base> pool;
 const int BM_INITIAL_BUFFERS = 256;
 
@@ -47,3 +50,5 @@ void BufferPool::release( sampleFrame * buf )
 {
 	pool->deallocate(buf);
 }
+
+} // namespace lmms

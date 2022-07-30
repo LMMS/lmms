@@ -30,6 +30,8 @@
 
 #include <QKeyEvent>
 
+namespace lmms::gui
+{
 
 
 TrackRenameLineEdit::TrackRenameLineEdit( QWidget * parent ) :
@@ -59,3 +61,6 @@ void TrackRenameLineEdit::keyPressEvent( QKeyEvent * ke )
 	
 	QLineEdit::keyPressEvent( ke );
 }
+
+
+} // namespace lmms::gui

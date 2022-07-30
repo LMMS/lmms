@@ -32,6 +32,9 @@
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 
+namespace lmms
+{
+
 
 class MidiImport : public ImportFilter
 {
@@ -40,7 +43,7 @@ public:
 	MidiImport( const QString & _file );
 	virtual ~MidiImport();
 
-	virtual PluginView * instantiateView( QWidget * )
+	virtual gui::PluginView* instantiateView( QWidget * )
 	{
 		return( nullptr );
 	}
@@ -124,5 +127,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

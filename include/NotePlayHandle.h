@@ -35,6 +35,10 @@
 #include "MemoryPool.h"
 
 class QReadWriteLock;
+
+namespace lmms
+{
+
 class InstrumentTrack;
 class NotePlayHandle;
 
@@ -331,5 +335,7 @@ private:
 } ;
 
 extern MemoryPool<NotePlayHandle> NotePlayHandlePool;
+
+} // namespace lmms
 
 #endif

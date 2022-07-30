@@ -27,10 +27,18 @@
 
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
+
 
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
+
+namespace gui
+{
+class InstrumentSoundShapingView;
+}
 
 
 class InstrumentSoundShaping : public Model, public JournallingObject
@@ -77,9 +85,11 @@ private:
 	static const char *const targetNames[InstrumentSoundShaping::NumTargets][3];
 
 
-	friend class InstrumentSoundShapingView;
+	friend class gui::InstrumentSoundShapingView;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

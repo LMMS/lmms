@@ -28,6 +28,9 @@
 #include "AudioEngine.h"
 #include "MidiController.h"
 
+namespace lmms
+{
+
 
 MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
@@ -146,11 +149,11 @@ QString MidiController::nodeName() const
 
 
 
-ControllerDialog * MidiController::createDialog( QWidget * _parent )
+gui::ControllerDialog* MidiController::createDialog( QWidget * _parent )
 {
 	return nullptr;
 }
 
 
 
-
+} // namespace lmms

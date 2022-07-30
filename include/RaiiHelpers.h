@@ -27,6 +27,10 @@
 #include <cstddef>
 #include <memory>
 
+
+namespace lmms
+{
+
 template<typename T, T Null>
 class NullableResource
 {
@@ -56,5 +60,7 @@ struct NullableResourceDeleter
 
 template<typename T, T Null, auto Deleter>
 using UniqueNullableResource = std::unique_ptr<T, NullableResourceDeleter<T, Null, Deleter>>;
+
+} // namespace lmms
 
 #endif // RAII_HELPERS_H

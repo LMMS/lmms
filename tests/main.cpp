@@ -28,7 +28,7 @@ int runSuit(const QString& name, const QStringList& args)
 int main(int argc, char* argv[])
 {
 	auto app = new QCoreApplication(argc, argv);
-	Engine::init(true);
+	lmms::Engine::init(true);
 
 	int rc = 0;
 

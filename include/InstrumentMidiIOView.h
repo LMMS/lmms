@@ -30,12 +30,19 @@
 
 #include "ModelView.h"
 
+class QToolButton;
+
+namespace lmms
+{
+
+class InstrumentTrack;
+
+namespace gui
+{
 
 class GroupBox;
 class LcdSpinBox;
-class QToolButton;
 class LedCheckBox;
-class InstrumentTrack;
 
 
 class InstrumentMidiIOView : public QWidget, public ModelView
@@ -64,5 +71,10 @@ private:
 	LcdSpinBox* m_baseVelocitySpinBox;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

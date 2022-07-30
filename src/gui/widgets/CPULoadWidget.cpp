@@ -32,6 +32,10 @@
 #include "Engine.h"
 
 
+namespace lmms::gui
+{
+
+
 CPULoadWidget::CPULoadWidget( QWidget * _parent ) :
 	QWidget( _parent ),
 	m_currentLoad( 0 ),
@@ -102,7 +106,4 @@ void CPULoadWidget::updateCpuLoad()
 }
 
 
-
-
-
-
+} // namespace lmms::gui

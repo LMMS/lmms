@@ -29,7 +29,15 @@
 
 #include "EffectControlDialog.h"
 
+namespace lmms
+{
+
+
 class MultitapEchoControls;
+
+namespace gui
+{
+
 
 class MultitapEchoControlDialog : public EffectControlDialog
 {
@@ -40,5 +48,10 @@ public:
 	{
 	}
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

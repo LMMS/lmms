@@ -56,6 +56,9 @@
 #include "ConfigManager.h"
 #include "TextFloat.h"
 
+namespace lmms::gui
+{
+
 
 TextFloat * Fader::s_textFloat = nullptr;
 QPixmap * Fader::s_back = nullptr;
@@ -478,3 +481,6 @@ void Fader::setPeakYellow( const QColor & c )
 {
 	m_peakYellow = c;
 }
+
+
+} // namespace lmms::gui

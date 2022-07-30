@@ -33,6 +33,9 @@
 
 #include <cmath>
 
+namespace lmms
+{
+
 #ifdef __INTEL_COMPILER
 
 static inline float absFraction( const float _x )
@@ -322,5 +325,8 @@ static inline T absMin( T a, T b )
 {
 	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
 }
+
+
+} // namespace lmms
 
 #endif

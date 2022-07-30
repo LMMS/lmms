@@ -28,6 +28,8 @@
 
 #include "RenameDialog.h"
 
+namespace lmms::gui
+{
 
 
 RenameDialog::RenameDialog( QString & _string ) :
@@ -80,3 +82,6 @@ void RenameDialog::textChanged( const QString & _new_string )
 {
 	m_stringToEdit = _new_string;
 }
+
+
+} // namespace lmms::gui

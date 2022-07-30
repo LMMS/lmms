@@ -34,6 +34,8 @@
 
 #include "lame/lame.h"
 
+namespace lmms
+{
 
 class AudioFileMP3 : public AudioFileDevice
 {
@@ -69,6 +71,8 @@ private:
 	lame_t m_lame;
 };
 
-#endif
+} // namespace lmms
+
+#endif // LMMS_HAVE_MP3LAME
 
 #endif

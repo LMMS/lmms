@@ -30,11 +30,19 @@
 #include <QWidget>
 
 
+namespace lmms
+{
+
 class BoolModel;
 class EqControls;
+class FloatModel;
+
+
+namespace gui
+{
+
 class EqCurve;
 class EqHandle;
-class FloatModel;
 
 class EqBand
 {
@@ -93,4 +101,10 @@ private slots:
 	void updateModels();
 	void updateHandle();
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // EQPARAMETERWIDGET_H

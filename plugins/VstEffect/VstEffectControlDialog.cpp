@@ -37,6 +37,10 @@
 #include <QToolBar>
 #include <QLabel>
 
+namespace lmms::gui
+{
+
+
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
 	m_pluginWidget( nullptr ),
@@ -294,3 +298,5 @@ void VstEffectControlDialog::togglePluginUI( bool checked )
 	}
 }
 
+
+} // namespace lmms::gui

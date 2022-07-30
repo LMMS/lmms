@@ -41,6 +41,10 @@
 #include "SaWaterfallView.h"
 
 
+namespace lmms::gui
+{
+
+
 // The entire GUI layout is built here.
 SaControlsDialog::SaControlsDialog(SaControls *controls, SaProcessor *processor) :
 	EffectControlDialog(controls),
@@ -350,3 +354,5 @@ QSize SaControlsDialog::sizeHint() const
 	}
 }
 
+
+} // namespace lmms::gui

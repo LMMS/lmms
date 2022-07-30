@@ -35,6 +35,9 @@
 class QScrollArea;
 class QVBoxLayout;
 
+namespace lmms::gui
+{
+
 class EffectView;
 class GroupBox;
 
@@ -50,9 +53,9 @@ public:
 
 public slots:
 	void clearViews();
-	void moveUp( EffectView* view );
-	void moveDown( EffectView* view );
-	void deletePlugin( EffectView* view );
+	void moveUp( lmms::gui::EffectView* view );
+	void moveDown( lmms::gui::EffectView* view );
+	void deletePlugin( lmms::gui::EffectView* view );
 
 
 private slots:
@@ -82,5 +85,7 @@ private:
 	int m_lastY;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif

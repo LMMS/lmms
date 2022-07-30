@@ -30,6 +30,10 @@
 #include "WaveShaperControlDialog.h"
 #include "Graph.h"
 
+namespace lmms
+{
+
+
 class WaveShaperEffect;
 
 
@@ -56,9 +60,9 @@ public:
 		return( 4 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return( new WaveShaperControlDialog( this ) );
+		return( new gui::WaveShaperControlDialog( this ) );
 	}
 
 
@@ -78,9 +82,12 @@ private:
 	graphModel m_wavegraphModel;
 	BoolModel  m_clipModel;
 
-	friend class WaveShaperControlDialog;
+	friend class gui::WaveShaperControlDialog;
 	friend class WaveShaperEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

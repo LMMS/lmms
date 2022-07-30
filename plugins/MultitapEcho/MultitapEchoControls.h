@@ -30,6 +30,9 @@
 #include "MultitapEchoControlDialog.h"
 #include "Graph.h"
 
+namespace lmms
+{
+
 
 class MultitapEchoEffect;
 
@@ -55,9 +58,9 @@ public:
 		return( 5 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return( new MultitapEchoControlDialog( this ) );
+		return( new gui::MultitapEchoControlDialog( this ) );
 	}
 
 private slots:
@@ -83,8 +86,10 @@ private:
 	graphModel m_lpGraph;
 
 	friend class MultitapEchoEffect;
-	friend class MultitapEchoControlDialog;
+	friend class gui::MultitapEchoControlDialog;
 };
 
+
+} // namespace lmms
 
 #endif

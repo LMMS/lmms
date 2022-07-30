@@ -34,6 +34,10 @@
 
 #include <QColor>
 
+namespace lmms
+{
+
+
 class MixerRoute;
 typedef QVector<MixerRoute *> MixerRouteVector;
 
@@ -219,5 +223,7 @@ private:
 	int m_lastSoloed;
 } ;
 
+
+} // namespace lmms
 
 #endif

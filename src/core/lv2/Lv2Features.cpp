@@ -32,6 +32,10 @@
 #include "Lv2Manager.h"
 
 
+namespace lmms
+{
+
+
 bool Lv2Features::isFeatureSupported(const char* featName)
 {
 	return Engine::getLv2Manager()->isFeatureSupported(featName);
@@ -100,6 +104,8 @@ void *&Lv2Features::operator[](const char *featName)
 	return itr->second;
 }
 
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

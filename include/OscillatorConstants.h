@@ -30,8 +30,9 @@
 
 #include "lmms_basics.h"
 
-namespace OscillatorConstants
+namespace lmms::OscillatorConstants
 {
+
 	// Limit wavetables to the audible audio spectrum
 	const int MAX_FREQ = 20000;
 	// Minimum size of table to have all audible bands for midi note 1 (i.e. 20 000 Hz / 8.176 Hz)
@@ -51,7 +52,8 @@ namespace OscillatorConstants
 	//  - wavetable: a table containing one period of a wave, with frequency content optimized for a specific pitch.
 	typedef std::array<sample_t, WAVETABLE_LENGTH> wavetable_t;
 	typedef std::array<wavetable_t,	WAVE_TABLES_PER_WAVEFORM_COUNT> waveform_t;
-};
 
+
+} // namespace lmms::OscillatorConstants
 
 #endif // OSCILLATORCONSTANTS_H

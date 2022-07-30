@@ -58,6 +58,9 @@
 
 #include "embed.h"
 
+namespace lmms
+{
+
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
 
@@ -144,6 +147,7 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 }
 
 // -----------------------------------------------------------------------
+
 
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
     : Instrument(instrumentTrack, descriptor),
@@ -575,7 +579,7 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const TimePos&, f_
     return true;
 }
 
-PluginView* CarlaInstrument::instantiateView(QWidget* parent)
+gui::PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 {
 // Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
 #ifndef CARLA_OS_MAC
@@ -592,7 +596,7 @@ PluginView* CarlaInstrument::instantiateView(QWidget* parent)
     //fHost.uiName = strdup(parent->windowTitle().toUtf8().constData());
     fHost.uiName = strdup(kIsPatchbay ? "CarlaPatchbay-LMMS" : "CarlaRack-LMMS");
 
-    return new CarlaInstrumentView(this, parent);
+    return new gui::CarlaInstrumentView(this, parent);
 }
 
 void CarlaInstrument::sampleRateChanged()
@@ -601,6 +605,9 @@ void CarlaInstrument::sampleRateChanged()
 }
 
 // -------------------------------------------------------------------
+
+namespace gui
+{
 
 CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWidget* const parent)
     : InstrumentViewFixedSize(instrument, parent),
@@ -847,6 +854,17 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	splitter->addWidget(outputFrame);
 	verticalLayout->addWidget(splitter);
 
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+
 	// -- Sub window
 	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(), Qt::SubWindow |
 		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
@@ -1043,6 +1061,17 @@ void CarlaParamsView::windowResized()
 
 void CarlaParamsView::addKnob(uint32_t index)
 {
+#if QT_VERSION < 0x50C00
+	// Workaround for a bug in Qt versions below 5.12,
+	// where argument-dependent-lookup fails for QFlags operators
+	// declared inside a namepsace.
+	// This affects the Q_DECLARE_OPERATORS_FOR_FLAGS macro in Instrument.h
+	// See also: https://codereview.qt-project.org/c/qt/qtbase/+/225348
+
+	using ::operator|;
+
+#endif
+
 	bool output = m_carlaInstrument->m_paramModels[index]->isOutput();
 	if (output)
 	{
@@ -1111,3 +1140,8 @@ void CarlaParamsView::clearKnobs()
 	m_curOutColumn = 0;
 	m_curOutRow = 0;
 }
+
+
+} // namespace gui
+
+} // namespace lmms

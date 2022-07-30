@@ -30,6 +30,9 @@
 
 #include "embed.h"
 
+namespace lmms::gui
+{
+
 
 SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 							QWidget * _parent ) :
@@ -92,6 +95,4 @@ void SideBarWidget::resizeEvent( QResizeEvent * )
 }
 
 
-
-
-
+} // namespace lmms::gui

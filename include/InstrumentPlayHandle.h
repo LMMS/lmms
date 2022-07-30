@@ -30,6 +30,9 @@
 #include "NotePlayHandle.h"
 #include "lmms_export.h"
 
+namespace lmms
+{
+
 class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
@@ -80,5 +83,8 @@ private:
 	Instrument* m_instrument;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -28,6 +28,10 @@
 #include "EffectControls.h"
 #include "StereoMatrixControlDialog.h"
 
+namespace lmms
+{
+
+
 class StereoMatrixEffect;
 
 class StereoMatrixControls : public EffectControls
@@ -51,9 +55,9 @@ public:
 		return( 1 );
 	}
 	
-	virtual EffectControlDialog * createView()
+	virtual gui::EffectControlDialog* createView()
 	{
-		return new StereoMatrixControlDialog( this );
+		return new gui::StereoMatrixControlDialog( this );
 	}
 
 
@@ -69,10 +73,12 @@ private:
 	FloatModel m_rlModel;
 	FloatModel m_rrModel;
 	
-	friend class StereoMatrixControlDialog;
+	friend class gui::StereoMatrixControlDialog;
 	friend class StereoMatrixEffect;
 
 } ;
 
+
+} // namespace lmms
 
 #endif 

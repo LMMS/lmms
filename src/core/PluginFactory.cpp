@@ -34,16 +34,21 @@
 #include "ConfigManager.h"
 #include "Plugin.h"
 
+// QT qHash specialization, needs to be in global namespace
+qint64 qHash(const QFileInfo& fi)
+{
+	return qHash(fi.absoluteFilePath());
+}
+
+namespace lmms
+{
+
+
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
 #else
 	QStringList nameFilters("lib*.so");
 #endif
-
-qint64 qHash(const QFileInfo& fi)
-{
-	return qHash(fi.absoluteFilePath());
-}
 
 std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 
@@ -251,3 +256,6 @@ const QString PluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }
+
+
+} // namespace lmms

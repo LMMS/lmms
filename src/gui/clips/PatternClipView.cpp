@@ -35,6 +35,10 @@
 #include "PatternStore.h"
 #include "RenameDialog.h"
 
+namespace lmms::gui
+{
+
+
 PatternClipView::PatternClipView(Clip* _clip, TrackView* _tv) :
 	ClipView( _clip, _tv ),
 	m_patternClip(dynamic_cast<PatternClip*>(_clip)),
@@ -188,3 +192,6 @@ void PatternClipView::update()
 
 	ClipView::update();
 }
+
+
+} // namespace lmms::gui

@@ -35,6 +35,9 @@
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
 
+namespace lmms
+{
+
 
 LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
 	SubPluginFeatures( _type )
@@ -178,3 +181,5 @@ ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
 					, _key->attributes["plugin"] ) );
 }
 
+
+} // namespace lmms

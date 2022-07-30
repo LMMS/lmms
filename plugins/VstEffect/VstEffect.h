@@ -31,7 +31,12 @@
 #include "Effect.h"
 #include "VstEffectControls.h"
 
+namespace lmms
+{
+
+
 class VstPlugin;
+
 
 class VstEffect : public Effect
 {
@@ -61,11 +66,12 @@ private:
 
 
 	friend class VstEffectControls;
-	friend class VstEffectControlDialog;
-	friend class ManageVSTEffectView;
+	friend class gui::VstEffectControlDialog;
+	friend class gui::ManageVSTEffectView;
 
 } ;
 
 
+} // namespace lmms
 
 #endif

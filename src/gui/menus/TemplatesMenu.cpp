@@ -8,6 +8,11 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+
+namespace lmms::gui
+{
+
+
 TemplatesMenu::TemplatesMenu(QWidget *parent) :
 	QMenu(tr("New from template"), parent)
 {
@@ -67,3 +72,6 @@ void TemplatesMenu::addTemplatesFromDir( const QDir& dir ) {
 #endif
 	}
 }
+
+
+} // namespace lmms::gui

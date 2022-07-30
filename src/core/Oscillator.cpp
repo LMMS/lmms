@@ -38,6 +38,9 @@
 #include "fft_helpers.h"
 
 
+namespace lmms
+{
+
 
 void Oscillator::waveTableInit()
 {
@@ -814,4 +817,4 @@ inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 }
 
 
-
+} // namespace lmms

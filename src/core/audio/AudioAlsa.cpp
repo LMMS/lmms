@@ -32,6 +32,8 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 
+namespace lmms
+{
 
 AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<ch_cnt_t>(
@@ -537,5 +539,7 @@ int AudioAlsa::setSWParams()
 
 	return 0;	// all ok
 }
+
+} // namespace lmms
 
 #endif

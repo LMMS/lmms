@@ -33,8 +33,9 @@
 #include <limits>
 #include <cmath>
 
-namespace LocaleHelper
+namespace lmms::LocaleHelper
 {
+
 inline double toDouble(QString str, bool* ok = nullptr)
 {
 	bool isOkay;
@@ -62,6 +63,8 @@ inline float toFloat(QString str, bool* ok = nullptr)
 	}
 	return static_cast<float>(d);
 }
-}
+
+
+} // namespace lmms::LocaleHelper
 
 #endif // LOCALEHELPER_H

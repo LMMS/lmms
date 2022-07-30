@@ -27,6 +27,9 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C" {
 	Plugin::Descriptor PLUGIN_EXPORT vectorscope_plugin_descriptor =
@@ -78,3 +81,5 @@ extern "C" {
 	}
 }
 
+
+} // namespace lmms

@@ -30,6 +30,18 @@
 #include "Track.h"
 
 
+namespace lmms
+{
+
+namespace gui
+{
+
+class SampleTrackView;
+class SampleTrackWindow;
+
+} // namespace gui
+
+
 class SampleTrack : public Track
 {
 	Q_OBJECT
@@ -39,7 +51,7 @@ public:
 
 	virtual bool play( const TimePos & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _clip_num = -1 ) override;
-	TrackView * createView( TrackContainerView* tcv ) override;
+	gui::TrackView * createView( gui::TrackContainerView* tcv ) override;
 	Clip* createClip(const TimePos & pos) override;
 
 
@@ -90,11 +102,12 @@ private:
 
 
 
-	friend class SampleTrackView;
-	friend class SampleTrackWindow;
+	friend class gui::SampleTrackView;
+	friend class gui::SampleTrackWindow;
 
 } ;
 
 
+} // namespace lmms
 
 #endif

@@ -59,6 +59,10 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
+namespace lmms::gui
+{
+
+
 enum TreeWidgetItemTypes
 {
 	TypeFileItem = QTreeWidgetItem::UserType,
@@ -1295,3 +1299,6 @@ QString FileItem::extension(const QString & file )
 {
 	return QFileInfo( file ).suffix().toLower();
 }
+
+
+} // namespace lmms::gui

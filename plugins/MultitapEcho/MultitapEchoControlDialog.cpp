@@ -33,6 +33,9 @@
 #include "TempoSyncKnob.h"
 #include "LcdSpinBox.h"
 
+namespace lmms::gui
+{
+
 
 MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * controls ) :
 	EffectControlDialog( controls )
@@ -99,3 +102,6 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	swapInputs->setModel( & controls->m_swapInputs );
 	swapInputs->setToolTip(tr("Swap left and right input channels for reflections"));
 }
+
+
+} // namespace lmms::gui

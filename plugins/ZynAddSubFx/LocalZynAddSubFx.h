@@ -28,8 +28,13 @@
 #include "Note.h"
 
 class Master;
-class MidiEvent;
 class NulEngine;
+
+namespace lmms
+{
+
+class MidiEvent;
+
 
 class LocalZynAddSubFx
 {
@@ -72,5 +77,8 @@ protected:
 	NulEngine* m_ioEngine;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

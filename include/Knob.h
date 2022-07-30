@@ -36,6 +36,11 @@
 
 
 class QPixmap;
+
+namespace lmms::gui
+{
+
+
 class TextFloat;
 
 enum knobTypes
@@ -205,5 +210,8 @@ private:
 	knobTypes m_knobNum;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

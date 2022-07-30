@@ -24,6 +24,8 @@
 #include <ColorChooser.h>
 
 
+namespace lmms::gui
+{
 
 
 //! Set global palette via array, checking bounds
@@ -91,3 +93,6 @@ QVector<QColor> ColorChooser::nicePalette (int base)
 	}
 	return result;
 }
+
+
+} // namespace lmms::gui

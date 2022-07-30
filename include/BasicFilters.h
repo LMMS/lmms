@@ -43,6 +43,9 @@
 #include "interpolation.h"
 #include "Memory.h"
 
+namespace lmms
+{
+
 template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS> class BasicFilters;
 
 template<ch_cnt_t CHANNELS>
@@ -912,5 +915,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

@@ -37,6 +37,10 @@
 #include "SubWindow.h"
 
 
+namespace lmms::gui
+{
+
+
 
 TempoSyncKnob::TempoSyncKnob( knobTypes _knob_num, QWidget * _parent,
 						const QString & _name ) :
@@ -71,7 +75,7 @@ void TempoSyncKnob::modelChanged()
 	{
 		m_custom->setModel( &model()->m_custom );
 	}
-	connect( model(), SIGNAL( syncModeChanged( TempoSyncMode ) ),
+	connect( model(), SIGNAL( syncModeChanged( lmms::TempoSyncKnobModel::TempoSyncMode ) ),
 			this, SLOT( updateDescAndIcon() ) );
 	connect( this, SIGNAL( sliderMoved( float ) ),
 			model(), SLOT( disableSync() ) );
@@ -308,4 +312,4 @@ void TempoSyncKnob::showCustom()
 
 
 
-
+} // namespace lmms::gui

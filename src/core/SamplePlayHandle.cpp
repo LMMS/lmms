@@ -31,6 +31,8 @@
 #include "SampleClip.h"
 #include "SampleTrack.h"
 
+namespace lmms
+{
 
 
 SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
@@ -148,5 +150,4 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 }
 
 
-
-
+} // namespace lmms
