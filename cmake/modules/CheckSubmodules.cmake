@@ -7,7 +7,7 @@
 #       INCLUDE(CheckSubmodules)
 #
 # Options:
-#       SET(PLUGIN_LIST "zynaddsubfx;...") # skips submodules for plugins not explicitely listed
+#       SET(PLUGIN_LIST "ZynAddSubFx;...") # skips submodules for plugins not explicitely listed
 #
 # Or via command line:       
 #       cmake -PLUGIN_LIST=foo;bar

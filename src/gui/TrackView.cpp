@@ -40,7 +40,6 @@
 #include "FadeButton.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
 #include "Track.h"
 #include "TrackContainerView.h"
 #include "ClipView.h"
@@ -375,7 +374,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 
 	if( height() < DEFAULT_TRACK_HEIGHT )
 	{
-		ToolTip::add( this, m_track->m_name );
+		setToolTip(m_track->m_name);
 	}
 }
 

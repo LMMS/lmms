@@ -38,7 +38,6 @@
 #include "MainWindow.h"
 #include "SubWindow.h"
 #include "TempoSyncKnob.h"
-#include "ToolTip.h"
 
 
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
@@ -55,7 +54,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
 
-	ToolTip::add( m_bypass, tr( "On/Off" ) );
+	m_bypass->setToolTip(tr("On/Off"));
 
 
 	m_wetDry = new Knob( knobBright_26, this );

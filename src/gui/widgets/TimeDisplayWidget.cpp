@@ -28,7 +28,6 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
-#include "ToolTip.h"
 #include "Song.h"
 
 
@@ -49,7 +48,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	ToolTip::add( this, tr( "Time units" ) );
+	setToolTip(tr("Time units"));
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );

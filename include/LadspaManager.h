@@ -1,5 +1,5 @@
 /*
- * LadspaManager.h - declaration of class ladspaManager
+ * LadspaManager.h - declaration of class LadspaManager
  *                    a class to manage loading and instantiation
  *                    of ladspa plugins
  *
@@ -47,7 +47,7 @@ typedef QPair<QString, ladspa_key_t> sortable_plugin_t;
 typedef QList<sortable_plugin_t> l_sortable_plugin_t;
 typedef QList<ladspa_key_t> l_ladspa_key_t;
 
-/* ladspaManager provides a database of LADSPA plug-ins.  Upon instantiation,
+/* LadspaManager provides a database of LADSPA plug-ins.  Upon instantiation,
 it loads all of the plug-ins found in the LADSPA_PATH environmental variable
 and stores their access descriptors according in a dictionary keyed on
 the filename the plug-in was loaded from and the label of the plug-in.
@@ -60,7 +60,7 @@ calls using:
 
 as the plug-in key. */
 
-enum ladspaPluginType
+enum LadspaPluginType
 {
 	SOURCE,
 	TRANSFER,
@@ -70,14 +70,14 @@ enum ladspaPluginType
 	OTHER
 };
 
-typedef struct ladspaManagerStorage
+typedef struct LadspaManagerStorage
 {
 	LADSPA_Descriptor_Function descriptorFunction;
 	uint32_t index;
-	ladspaPluginType type;
+	LadspaPluginType type;
 	uint16_t inputChannels;
 	uint16_t outputChannels;
-} ladspaManagerDescription;
+} LadspaManagerDescription;
 
 
 class LMMS_EXPORT LadspaManager
@@ -88,7 +88,7 @@ public:
 	virtual ~LadspaManager();
 
 	l_sortable_plugin_t getSortedPlugins();
-	ladspaManagerDescription * getDescription( const ladspa_key_t &
+	LadspaManagerDescription * getDescription( const ladspa_key_t &
 								_plugin );
 
 	/* This identifier can be used as a unique, case-sensitive
@@ -339,9 +339,9 @@ private:
 	const LADSPA_PortRangeHint* getPortRangeHint( const ladspa_key_t& _plugin,
 													uint32_t _port );
 
-	typedef QMap<ladspa_key_t, ladspaManagerDescription *>
-						ladspaManagerMapType;
-	ladspaManagerMapType m_ladspaManagerMap;
+	typedef QMap<ladspa_key_t, LadspaManagerDescription *>
+						LadspaManagerMapType;
+	LadspaManagerMapType m_ladspaManagerMap;
 	l_sortable_plugin_t m_sortedPlugins;
 
 } ;

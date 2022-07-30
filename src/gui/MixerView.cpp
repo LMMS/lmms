@@ -297,7 +297,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 				embed::getIconPixmap( "led_green" ) );
 	m_muteBtn->setCheckable( true );
 	m_muteBtn->move( 9,  m_fader->y()-11);
-	ToolTip::add( m_muteBtn, tr( "Mute this channel" ) );
+	m_muteBtn->setToolTip(tr("Mute this channel"));
 
 	m_soloBtn = new PixmapButton( m_mixerLine, tr( "Solo" ) );
 	m_soloBtn->setModel( &mixerChannel->m_soloModel );
@@ -309,7 +309,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 	m_soloBtn->move( 9,  m_fader->y()-21);
 	connect(&mixerChannel->m_soloModel, SIGNAL( dataChanged() ),
 			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
-	ToolTip::add( m_soloBtn, tr( "Solo this channel" ) );
+	m_soloBtn->setToolTip(tr("Solo this channel"));
 
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &mixerChannel->m_fxChain, _mv->m_racksWidget );

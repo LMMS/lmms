@@ -1,5 +1,5 @@
 /*
- * PluginBrowser.h - include file for pluginBrowser
+ * PluginBrowser.h - include file for PluginBrowser
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

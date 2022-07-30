@@ -46,26 +46,12 @@
 
 #include <QtGlobal>
 #include <QSystemSemaphore>
-#endif
-
-
-#ifdef LMMS_HAVE_SYS_SHM_H
-#include <sys/shm.h>
-
+#include <QUuid>
+#else
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#else
-#define USE_QT_SHMEM
-
-#include <QtGlobal>
-#include <QSharedMemory>
-
-#if !defined(LMMS_HAVE_SYS_TYPES_H) || defined(LMMS_BUILD_WIN32)
-typedef int32_t key_t;
 #endif
-#endif
-
 
 #ifdef LMMS_HAVE_LOCALE_H
 #include <clocale>
@@ -100,6 +86,9 @@ typedef int32_t key_t;
 #endif
 
 #ifdef SYNC_WITH_SHM_FIFO
+
+#include "SharedMemory.h"
+
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
 const int SHM_FIFO_SIZE = 512*1024;
@@ -120,8 +109,8 @@ class shmFifo
 		sem32_t dataSem;	// semaphore for locking this
 					// FIFO management data
 		sem32_t messageSem;	// semaphore for incoming messages
-		volatile int32_t startPtr; // current start of FIFO in memory
-		volatile int32_t endPtr;   // current end of FIFO in memory
+		int32_t startPtr; // current start of FIFO in memory
+		int32_t endPtr;   // current end of FIFO in memory
 		char data[SHM_FIFO_SIZE];  // actual data
 	} ;
 
@@ -130,33 +119,11 @@ public:
 	shmFifo() :
 		m_invalid( false ),
 		m_master( true ),
-		m_shmKey( 0 ),
-#ifdef USE_QT_SHMEM
-		m_shmObj(),
-#else
-		m_shmID( -1 ),
-#endif
-		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
-#ifdef USE_QT_SHMEM
-		do
-		{
-			m_shmObj.setKey( QString( "%1" ).arg( ++m_shmKey ) );
-			m_shmObj.create( sizeof( shmData ) );
-		} while( m_shmObj.error() != QSharedMemory::NoError );
-
-		m_data = (shmData *) m_shmObj.data();
-#else
-		while( ( m_shmID = shmget( ++m_shmKey, sizeof( shmData ),
-					IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
-		{
-		}
-		m_data = (shmData *) shmat( m_shmID, 0, 0 );
-#endif
-		assert( m_data != nullptr );
+		m_data.create(QUuid::createUuid().toString().toStdString());
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
@@ -170,49 +137,17 @@ public:
 
 	// constructor for remote-/client-side - use _shm_key for making up
 	// the connection to master
-	shmFifo( key_t _shm_key ) :
+	shmFifo(const std::string& shmKey) :
 		m_invalid( false ),
 		m_master( false ),
-		m_shmKey( 0 ),
-#ifdef USE_QT_SHMEM
-		m_shmObj( QString::number( _shm_key ) ),
-#else
-		m_shmID( shmget( _shm_key, 0, 0 ) ),
-#endif
-		m_data( nullptr ),
 		m_dataSem( QString() ),
 		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
-#ifdef USE_QT_SHMEM
-		if( m_shmObj.attach() )
-		{
-			m_data = (shmData *) m_shmObj.data();
-		}
-#else
-		if( m_shmID != -1 )
-		{
-			m_data = (shmData *) shmat( m_shmID, 0, 0 );
-		}
-#endif
-		assert( m_data != nullptr );
+		m_data.attach(shmKey);
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ) );
-	}
-
-	~shmFifo()
-	{
-		// master?
-		if( m_master )
-		{
-#ifndef USE_QT_SHMEM
-			shmctl( m_shmID, IPC_RMID, nullptr );
-#endif
-		}
-#ifndef USE_QT_SHMEM
-		shmdt( m_data );
-#endif
 	}
 
 	inline bool isInvalid() const
@@ -314,9 +249,9 @@ public:
 	}
 
 
-	inline int shmKey() const
+	const std::string& shmKey() const
 	{
-		return m_shmKey;
+		return m_data.key();
 	}
 
 
@@ -395,13 +330,7 @@ private:
 
 	volatile bool m_invalid;
 	bool m_master;
-	key_t m_shmKey;
-#ifdef USE_QT_SHMEM
-	QSharedMemory m_shmObj;
-#else
-	int m_shmID;
-#endif
-	shmData * m_data;
+	SharedMemory<shmData> m_data;
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;
 	std::atomic_int m_lockDepth;

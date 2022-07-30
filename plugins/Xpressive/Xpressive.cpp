@@ -38,7 +38,6 @@
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "ToolTip.h"
 
 #include "base64.h"
 #include "lmms_constants.h"
@@ -300,7 +299,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_graph->setGraphColor(QColor(255, 255, 255));
 	m_graph->setEnabled(false);
 
-	ToolTip::add(m_graph, tr("Draw your own waveform here "
+	m_graph->setToolTip(tr("Draw your own waveform here "
 			"by dragging your mouse on this graph."));
 
 	pal = QPalette();
@@ -318,37 +317,37 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_w1Btn->move(3, ROW_BTN);
 	m_w1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w1_active"));
 	m_w1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w1_inactive"));
-	ToolTip::add(m_w1Btn, tr("Select oscillator W1"));
+	m_w1Btn->setToolTip(tr("Select oscillator W1"));
 
 	m_w2Btn = new PixmapButton(this, nullptr);
 	m_w2Btn->move(26, ROW_BTN);
 	m_w2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w2_active"));
 	m_w2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w2_inactive"));
-	ToolTip::add(m_w2Btn, tr("Select oscillator W2"));
+	m_w2Btn->setToolTip(tr("Select oscillator W2"));
 
 	m_w3Btn = new PixmapButton(this, nullptr);
 	m_w3Btn->move(49, ROW_BTN);
 	m_w3Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w3_active"));
 	m_w3Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("w3_inactive"));
-	ToolTip::add(m_w3Btn, tr("Select oscillator W3"));
+	m_w3Btn->setToolTip(tr("Select oscillator W3"));
 
 	m_o1Btn = new PixmapButton(this, nullptr);
 	m_o1Btn->move(79, ROW_BTN);
 	m_o1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o1_active"));
 	m_o1Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o1_inactive"));
-	ToolTip::add(m_o1Btn, tr("Select output O1"));
+	m_o1Btn->setToolTip(tr("Select output O1"));
 
 	m_o2Btn = new PixmapButton(this, nullptr);
 	m_o2Btn->move(101, ROW_BTN);
 	m_o2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o2_active"));
 	m_o2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o2_inactive"));
-	ToolTip::add(m_o2Btn, tr("Select output O2"));
+	m_o2Btn->setToolTip(tr("Select output O2"));
 
 	m_helpBtn = new PixmapButton(this, nullptr);
 	m_helpBtn->move(133, ROW_BTN);
 	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
 	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
-	ToolTip::add(m_helpBtn, tr("Open help window"));
+	m_helpBtn->setToolTip(tr("Open help window"));
 
 	m_selectedGraphGroup = new automatableButtonGroup(this);
 	m_selectedGraphGroup->addButton(m_w1Btn);
@@ -364,32 +363,32 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_sinWaveBtn->move(4, ROW_WAVEBTN);
 	m_sinWaveBtn->setActiveGraphic(embed::getIconPixmap("sin_wave_active"));
 	m_sinWaveBtn->setInactiveGraphic(embed::getIconPixmap("sin_wave_inactive"));
-	ToolTip::add(m_sinWaveBtn, tr("Sine wave"));
+	m_sinWaveBtn->setToolTip(tr("Sine wave"));
 
 	m_moogWaveBtn = new PixmapButton(this, tr("Moog-saw wave"));
 	m_moogWaveBtn->move(4, ROW_WAVEBTN-14);
 	m_moogWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	m_moogWaveBtn->setInactiveGraphic(embed::getIconPixmap("moog_saw_wave_inactive"));
-	ToolTip::add(m_moogWaveBtn, tr("Moog-saw wave"));
+	m_moogWaveBtn->setToolTip(tr("Moog-saw wave"));
 
 	m_expWaveBtn = new PixmapButton(this, tr("Exponential wave"));
 	m_expWaveBtn->move(4 +14, ROW_WAVEBTN-14);
 	m_expWaveBtn->setActiveGraphic(embed::getIconPixmap( "exp_wave_active" ) );
 	m_expWaveBtn->setInactiveGraphic(embed::getIconPixmap( "exp_wave_inactive" ) );
-	ToolTip::add(m_expWaveBtn, tr("Exponential wave"));
+	m_expWaveBtn->setToolTip(tr("Exponential wave"));
 
 	m_sawWaveBtn = new PixmapButton(this, tr("Saw wave"));
 	m_sawWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN-14);
 	m_sawWaveBtn->setActiveGraphic(embed::getIconPixmap("saw_wave_active"));
 	m_sawWaveBtn->setInactiveGraphic(embed::getIconPixmap("saw_wave_inactive"));
-	ToolTip::add(m_sawWaveBtn, tr("Saw wave"));
+	m_sawWaveBtn->setToolTip(tr("Saw wave"));
 
 	m_usrWaveBtn = new PixmapButton(this, tr("User-defined wave"));
 	m_usrWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN-14);
 	m_usrWaveBtn->setActiveGraphic(embed::getIconPixmap("usr_wave_active"));
 	m_usrWaveBtn->setInactiveGraphic(embed::getIconPixmap("usr_wave_inactive"));
-	ToolTip::add(m_usrWaveBtn, tr("User-defined wave"));
+	m_usrWaveBtn->setToolTip(tr("User-defined wave"));
 
 	m_triangleWaveBtn = new PixmapButton(this, tr("Triangle wave"));
 	m_triangleWaveBtn->move(4 + 14, ROW_WAVEBTN);
@@ -397,14 +396,14 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 			embed::getIconPixmap("triangle_wave_active"));
 	m_triangleWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("triangle_wave_inactive"));
-	ToolTip::add(m_triangleWaveBtn, tr("Triangle wave"));
+	m_triangleWaveBtn->setToolTip(tr("Triangle wave"));
 
 	m_sqrWaveBtn = new PixmapButton(this, tr("Square wave"));
 	m_sqrWaveBtn->move(4 + 14 * 2, ROW_WAVEBTN);
 	m_sqrWaveBtn->setActiveGraphic(embed::getIconPixmap("square_wave_active"));
 	m_sqrWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("square_wave_inactive"));
-	ToolTip::add(m_sqrWaveBtn, tr("Square wave"));
+	m_sqrWaveBtn->setToolTip(tr("Square wave"));
 
 	m_whiteNoiseWaveBtn = new PixmapButton(this, tr("White noise"));
 	m_whiteNoiseWaveBtn->move(4 + 14 * 3, ROW_WAVEBTN);
@@ -412,7 +411,7 @@ XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 			embed::getIconPixmap("white_noise_wave_active"));
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap("white_noise_wave_inactive"));
-	ToolTip::add(m_whiteNoiseWaveBtn, tr("White noise"));
+	m_whiteNoiseWaveBtn->setToolTip(tr("White noise"));
 
 
 	m_waveInterpolate  = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),

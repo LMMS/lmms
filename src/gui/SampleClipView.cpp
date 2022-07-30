@@ -34,7 +34,6 @@
 #include "SampleClip.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "ToolTip.h"
 
 SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	ClipView( _clip, _tv ),
@@ -57,7 +56,7 @@ void SampleClipView::updateSample()
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
-	ToolTip::add( this, ( m_clip->m_sampleBuffer->audioFile() != "" ) ?
+	setToolTip(m_clip->m_sampleBuffer->audioFile() != "" ?
 					PathUtil::toAbsolute(m_clip->m_sampleBuffer->audioFile()) :
 					tr( "Double-click to open sample" ) );
 }

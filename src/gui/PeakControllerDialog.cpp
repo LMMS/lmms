@@ -29,7 +29,6 @@
 #include <QIcon>
 
 #include "embed.h"
-#include "ToolTip.h"
 
 #include "PeakController.h"
 
@@ -41,7 +40,7 @@ PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _pare
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 256, 64 );
 	
-	ToolTip::add( this, tr( "LFO Controller" ) );
+	setToolTip(tr("LFO Controller"));
 
 	QLabel * l = new QLabel( this );
 	l->setText( "Use FX's controls" );

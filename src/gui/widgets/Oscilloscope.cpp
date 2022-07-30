@@ -33,7 +33,6 @@
 #include "Engine.h"
 #include "MainWindow.h"
 #include "MixHelpers.h"
-#include "ToolTip.h"
 #include "Song.h"
 #include "embed.h"
 
@@ -56,7 +55,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	MixHelpers::clear( m_buffer, frames );
 
 
-	ToolTip::add( this, tr( "Oscilloscope" ) );
+	setToolTip(tr("Oscilloscope"));
 }
 
 

@@ -36,7 +36,6 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
-#include "ToolTip.h"
 
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
@@ -94,7 +93,7 @@ MidiClip* MidiClipView::getMidiClip()
 
 void MidiClipView::update()
 {
-	ToolTip::add(this, m_clip->name());
+	setToolTip(m_clip->name());
 
 	ClipView::update();
 }
