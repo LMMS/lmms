@@ -28,11 +28,11 @@
 
 #include "AutomationClip.h"
 #include "AutomationTrack.h"
-#include "BBTrack.h"
-#include "BBTrackContainer.h"
 #include "DetuningHelper.h"
 #include "InstrumentTrack.h"
 #include "MidiClip.h"
+#include "PatternTrack.h"
+#include "PatternStore.h"
 #include "TrackContainer.h"
 
 #include "Engine.h"
@@ -157,12 +157,12 @@ private slots:
 		QCOMPARE(clip->valueAt(TimePos(4, 0)), 1.0f);
 	}
 
-	void testBBTrack()
+	void testPatternTrack()
 	{
 		auto song = Engine::getSong();
-		auto bbContainer = Engine::getBBTrackContainer();
-		BBTrack bbTrack(song);
-		Track* automationTrack = Track::create(Track::AutomationTrack, bbContainer);
+		auto patternStore = Engine::patternStore();
+		PatternTrack patternTrack(song);
+		Track* automationTrack = Track::create(Track::AutomationTrack, patternStore);
 
 		QVERIFY(automationTrack->numOfClips());
 		AutomationClip* c1 = dynamic_cast<AutomationClip*>(automationTrack->getClip(0));
@@ -175,17 +175,17 @@ private slots:
 		c1->putValue(10, 1.0, false);
 		c1->addObject(&model);
 
-		QCOMPARE(bbContainer->automatedValuesAt( 0, bbTrack.index())[&model], 0.0f);
-		QCOMPARE(bbContainer->automatedValuesAt( 5, bbTrack.index())[&model], 0.5f);
-		QCOMPARE(bbContainer->automatedValuesAt(10, bbTrack.index())[&model], 1.0f);
-		QCOMPARE(bbContainer->automatedValuesAt(50, bbTrack.index())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 0, patternTrack.patternIndex())[&model], 0.0f);
+		QCOMPARE(patternStore->automatedValuesAt( 5, patternTrack.patternIndex())[&model], 0.5f);
+		QCOMPARE(patternStore->automatedValuesAt(10, patternTrack.patternIndex())[&model], 1.0f);
+		QCOMPARE(patternStore->automatedValuesAt(50, patternTrack.patternIndex())[&model], 1.0f);
 
-		BBTrack bbTrack2(song);
+		PatternTrack patternTrack2(song);
 
-		QCOMPARE(bbContainer->automatedValuesAt(5, bbTrack.index())[&model], 0.5f);
-		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
+		QCOMPARE(patternStore->automatedValuesAt(5, patternTrack.patternIndex())[&model], 0.5f);
+		QVERIFY(! patternStore->automatedValuesAt(5, patternTrack2.patternIndex()).size());
 
-		BBClip clip(&bbTrack);
+		PatternClip clip(&patternTrack);
 		clip.changeLength(TimePos::ticksPerBar() * 2);
 		clip.movePosition(0);
 

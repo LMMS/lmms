@@ -198,7 +198,7 @@ signals:
 	void resized();
 
 private:
-	QAction* m_addBBTrackAction;
+	QAction* m_addPatternTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 	QAction* m_setProportionalSnapAction;

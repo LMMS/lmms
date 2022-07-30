@@ -67,7 +67,7 @@ SampleClip::SampleClip( Track * _track ) :
 
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::BBContainer:
+		case TrackContainer::PatternContainer:
 			setAutoResize( true );
 			break;
 

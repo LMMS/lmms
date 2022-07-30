@@ -30,13 +30,13 @@
 #include "LmmsPalette.h"
 
 #include "AutomationEditor.h"
-#include "BBEditor.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "MixerView.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MicrotunerConfig.h"
+#include "PatternEditor.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
@@ -153,9 +153,9 @@ GuiApplication::GuiApplication()
 	m_microtunerConfig = new MicrotunerConfig;
 	connect(m_microtunerConfig, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing beat/bassline editor"));
-	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
-	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
+	displayInitProgress(tr("Preparing pattern editor"));
+	m_patternEditor = new PatternEditorWindow(Engine::patternStore());
+	connect(m_patternEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing piano roll"));
 	m_pianoRoll = new PianoRollWindow();
@@ -207,9 +207,9 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_automationEditor = nullptr;
 	}
-	else if (obj == m_bbEditor)
+	else if (obj == m_patternEditor)
 	{
-		m_bbEditor = nullptr;
+		m_patternEditor = nullptr;
 	}
 	else if (obj == m_pianoRoll)
 	{

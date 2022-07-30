@@ -25,10 +25,10 @@
 #include "SamplePlayHandle.h"
 #include "AudioEngine.h"
 #include "AudioPort.h"
-#include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "lmms_constants.h"
+#include "PatternTrack.h"
 #include "SampleClip.h"
 
 
@@ -42,7 +42,7 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPo
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( nullptr ),
-	m_bbTrack( nullptr )
+	m_patternTrack( nullptr )
 {
 	if (ownAudioPort)
 	{
@@ -106,7 +106,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	}
 
 	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
 /*		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
@@ -135,7 +135,7 @@ bool SamplePlayHandle::isFinished() const
 
 bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 {
-	return m_track == _track || m_bbTrack == _track;
+	return m_track == _track || m_patternTrack == _track;
 }
 
 

@@ -32,7 +32,7 @@
 #include "PlayHandle.h"
 #include "TimePos.h"
 
-class BBTrack;
+class PatternTrack;
 class SampleBuffer;
 class SampleClip;
 class Track;
@@ -63,7 +63,7 @@ private:
 	TimePos m_minLength;
 
 	Track * m_track;
-	BBTrack * m_bbTrack;
+	PatternTrack* m_patternTrack;
 	SampleClip * m_clip;
 
 } ;

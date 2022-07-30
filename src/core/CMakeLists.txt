@@ -9,8 +9,6 @@ set(LMMS_SRCS
 	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
-	core/BBClip.cpp
-	core/BBTrackContainer.cpp
 	core/BufferPool.cpp
 	core/Clipboard.cpp
 	core/ComboBoxModel.cpp
@@ -50,6 +48,8 @@ set(LMMS_SRCS
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
 	core/PathUtil.cpp
+	core/PatternClip.cpp
+	core/PatternStore.cpp
 	core/PeakController.cpp
 	core/PerfLog.cpp
 	core/Piano.cpp

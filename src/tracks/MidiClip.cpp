@@ -25,9 +25,9 @@
 
 #include "MidiClip.h"
 
-#include "BBTrackContainer.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 
 #include <limits>
@@ -46,8 +46,7 @@ MidiClip::MidiClip( InstrumentTrack * _instrument_track ) :
 	m_clipType( BeatClip ),
 	m_steps( TimePos::stepsPerBar() )
 {
-	if( _instrument_track->trackContainer()
-					== Engine::getBBTrackContainer() )
+	if (_instrument_track->trackContainer()	== Engine::patternStore())
 	{
 		resizeToFirstTrack();
 	}
@@ -72,7 +71,7 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	init();
 	switch( getTrack()->trackContainer()->type() )
 	{
-		case TrackContainer::BBContainer:
+		case TrackContainer::PatternContainer:
 			setAutoResize( true );
 			break;
 
@@ -103,7 +102,7 @@ MidiClip::~MidiClip()
 
 void MidiClip::resizeToFirstTrack()
 {
-	// Resize this track to be the same as existing tracks in the BB
+	// Resize this track to be the same as existing tracks in the pattern
 	const TrackContainer::TrackList & tracks =
 		m_instrumentTrack->trackContainer()->tracks();
 	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
@@ -144,7 +143,7 @@ void MidiClip::updateLength()
 	if( m_clipType == BeatClip )
 	{
 		changeLength( beatClipLength() );
-		updateBBTrack();
+		updatePatternTrack();
 		return;
 	}
 
@@ -161,7 +160,7 @@ void MidiClip::updateLength()
 	}
 	changeLength( TimePos( max_length ).nextFullBar() *
 						TimePos::ticksPerBar() );
-	updateBBTrack();
+	updatePatternTrack();
 }
 
 
@@ -558,11 +557,11 @@ ClipView * MidiClip::createView( TrackView * _tv )
 
 
 
-void MidiClip::updateBBTrack()
+void MidiClip::updatePatternTrack()
 {
-	if( getTrack()->trackContainer() == Engine::getBBTrackContainer() )
+	if (getTrack()->trackContainer() == Engine::patternStore())
 	{
-		Engine::getBBTrackContainer()->updateBBTrack( this );
+		Engine::patternStore()->updatePatternTrack(this);
 	}
 
 	if( getGUI() != nullptr

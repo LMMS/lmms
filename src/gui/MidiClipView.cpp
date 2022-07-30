@@ -43,7 +43,8 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	m_noteBorderColor(255, 255, 255, 220),
 	m_mutedNoteFillColor(100, 100, 100, 220),
 	m_mutedNoteBorderColor(100, 100, 100, 220),
-	m_legacySEBB(ConfigManager::inst()->value("ui","legacysebb","0").toInt())
+	// TODO if this option is ever added to the GUI, rename it to legacysepattern
+	m_legacySEPattern(ConfigManager::inst()->value("ui", "legacysebb", "0").toInt())
 {
 	connect( getGUI()->pianoRoll(), SIGNAL( currentMidiClipChanged() ),
 			this, SLOT( update() ) );
@@ -182,12 +183,12 @@ void MidiClipView::constructContextMenu( QMenu * _cm )
 
 void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
-	bool displayBB = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEBB);
+	bool displayPattern = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEPattern);
 	if( _me->button() == Qt::LeftButton &&
 		m_clip->m_clipType == MidiClip::BeatClip &&
-		displayBB && _me->y() > height() - s_stepBtnOff->height() )
+		displayPattern && _me->y() > height() - s_stepBtnOff->height() )
 
-	// when mouse button is pressed in beat/bassline -mode
+	// when mouse button is pressed in pattern mode
 
 	{
 //	get the step number that was clicked on and
@@ -228,7 +229,7 @@ void MidiClipView::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 
-	// if not in beat/bassline -mode, let parent class handle the event
+	// if not in pattern mode, let parent class handle the event
 
 	{
 		ClipView::mousePressEvent( _me );
@@ -335,8 +336,8 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	if( beatClip )
 	{
-		// Do not paint BBClips how we paint MidiClips
-		c = BBClipBackground();
+		// Do not paint PatternClips how we paint MidiClips
+		c = patternClipBackground();
 	}
 	else
 	{
@@ -388,7 +389,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	const int x_base = CLIP_BORDER_WIDTH;
 
-	bool displayBB = fixedClips() || (pixelsPerBar >= 96 && m_legacySEBB);
+	bool displayPattern = fixedClips() || (pixelsPerBar >= 96 && m_legacySEPattern);
 	// melody clip paint event
 	NoteVector const & noteCollection = m_clip->m_notes;
 	if( m_clip->m_clipType == MidiClip::MelodyClip && !noteCollection.empty() )
@@ -505,7 +506,7 @@ void MidiClipView::paintEvent( QPaintEvent * )
 		p.restore();
 	}
 	// beat clip paint event
-	else if( beatClip &&	displayBB )
+	else if (beatClip && displayPattern)
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;

@@ -9,8 +9,6 @@ SET(LMMS_SRCS
 	gui/AutomationTrackView.cpp
 	gui/ControllerConnectionDialog.cpp
 	gui/ControllerDialog.cpp
-	gui/BBClipView.cpp
-	gui/BBTrackView.cpp
 	gui/EffectControlDialog.cpp
 	gui/EffectSelectDialog.cpp
 	gui/embed.cpp
@@ -31,6 +29,8 @@ SET(LMMS_SRCS
 	gui/MidiClipView.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
+	gui/PatternClipView.cpp
+	gui/PatternTrackView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
@@ -52,8 +52,8 @@ SET(LMMS_SRCS
 	gui/dialogs/ColorChooser.cpp
 
 	gui/editors/AutomationEditor.cpp
-	gui/editors/BBEditor.cpp
 	gui/editors/Editor.cpp
+	gui/editors/PatternEditor.cpp
 	gui/editors/PianoRoll.cpp
 	gui/editors/SongEditor.cpp
 

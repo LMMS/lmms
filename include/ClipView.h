@@ -53,7 +53,7 @@ class ClipView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
-	Q_PROPERTY( QColor BBClipBackground READ BBClipBackground WRITE setBBClipBackground )
+	Q_PROPERTY( QColor patternClipBackground READ patternClipBackground WRITE setPatternClipBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 	// We have to use a QSize here because using QPoint isn't supported.
 	// width -> x, height -> y
@@ -83,7 +83,7 @@ public:
 	QColor textColor() const;
 	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
-	QColor BBClipBackground() const;
+	QColor patternClipBackground() const;
 	bool gradient() const;
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
@@ -91,7 +91,7 @@ public:
 	void setTextColor( const QColor & c );
 	void setTextBackgroundColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
-	void setBBClipBackground( const QColor & c );
+	void setPatternClipBackground(const QColor& c);
 	void setGradient( const bool & b );
 
 	// access needsUpdate member variable
@@ -211,7 +211,7 @@ private:
 	QColor m_textColor;
 	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;
-	QColor m_BBClipBackground;
+	QColor m_patternClipBackground;
 	bool m_gradient;
 	QSize m_mouseHotspotHand; // QSize must be used because QPoint
 	QSize m_mouseHotspotKnife; // isn't supported by property system

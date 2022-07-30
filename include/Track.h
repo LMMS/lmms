@@ -65,7 +65,7 @@ public:
 	enum TrackTypes
 	{
 		InstrumentTrack,
-		BBTrack,
+		PatternTrack,
 		SampleTrack,
 		EventTrack,
 		VideoTrack,
@@ -127,7 +127,7 @@ public:
 							const TimePos & end );
 	void swapPositionOfClips( int clipNum1, int clipNum2 );
 
-	void createClipsForBB( int bb );
+	void createClipsForPattern(int pattern);
 
 
 	void insertBar( const TimePos & pos );

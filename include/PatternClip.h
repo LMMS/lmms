@@ -1,5 +1,5 @@
 /*
- * BBClip.h
+ * PatternClip.h
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,31 +23,35 @@
  */
  
 
-#ifndef BB_CLIP_H
-#define BB_CLIP_H
+#ifndef PATTERN_CLIP_H
+#define PATTERN_CLIP_H
 
 #include "ClipView.h"
 
 
-class LMMS_EXPORT BBClip : public Clip
+/*! \brief Dummy clip for PatternTracks
+ *
+ *  Only used in the Song (Editor). See PatternStore.h for more info.
+*/
+class LMMS_EXPORT PatternClip : public Clip
 {
 public:
-	BBClip( Track * _track );
-	virtual ~BBClip() = default;
+	PatternClip(Track* track);
+	virtual ~PatternClip() = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
 	inline QString nodeName() const override
 	{
-		return( "bbtco" );
+		return "patternclip";
 	}
 
-	int bbTrackIndex();
+	int patternIndex();
 
 	ClipView * createView( TrackView * _tv ) override;
 
 private:
-	friend class BBClipView;
+	friend class PatternClipView;
 } ;
 
 

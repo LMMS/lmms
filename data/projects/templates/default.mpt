@@ -25,7 +25,7 @@
           <fxchain numofeffects="0" enabled="0"/>
         </sampletrack>
       </track>
-      <track muted="0" type="1" name="Beat/Bassline 0" solo="0">
+      <track muted="0" type="1" name="Pattern 0" solo="0">
         <bbtrack>
           <trackcontainer width="640" x="610" y="5" maximized="0" height="400" visible="0" type="bbtrackcontainer" minimized="0">
             <track muted="0" type="0" name="Kicker" solo="0">
