@@ -1243,7 +1243,7 @@ void FileItem::determineFileType( void )
 	{
 		m_type = PatchFile;
 	}
-	else if( ext == "mid" )
+	else if( ext == "mid" || ext == "midi" || ext == "rmi" )
 	{
 		m_type = MidiFile;
 		m_handling = ImportAsProject;

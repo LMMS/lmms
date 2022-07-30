@@ -62,6 +62,46 @@ class LMMS_EXPORT AudioEngine : public QObject
 {
 	Q_OBJECT
 public:
+	/**
+	 * @brief RAII helper for requestChangesInModel.
+	 * Used by AudioEngine::requestChangesGuard.
+	 */
+	class RequestChangesGuard {
+		friend class AudioEngine;
+
+	private:
+		RequestChangesGuard(AudioEngine* audioEngine)
+			: m_audioEngine{audioEngine}
+		{
+			m_audioEngine->requestChangeInModel();
+		}
+	public:
+
+		RequestChangesGuard()
+			: m_audioEngine{nullptr}
+		{
+		}
+
+		RequestChangesGuard(RequestChangesGuard&& other)
+			: RequestChangesGuard()
+		{
+			std::swap(other.m_audioEngine, m_audioEngine);
+		}
+
+		// Disallow copy.
+		RequestChangesGuard(const RequestChangesGuard&) = delete;
+		RequestChangesGuard& operator=(const RequestChangesGuard&) = delete;
+
+		~RequestChangesGuard() {
+			if (m_audioEngine) {
+				m_audioEngine->doneChangeInModel();
+			}
+		}
+
+	private:
+		AudioEngine* m_audioEngine;
+	};
+
 	struct qualitySettings
 	{
 		enum Mode
@@ -308,6 +348,11 @@ public:
 	//! Block until a change in model can be done (i.e. wait for audio thread)
 	void requestChangeInModel();
 	void doneChangeInModel();
+
+	RequestChangesGuard requestChangesGuard()
+	{
+		return RequestChangesGuard{this};
+	}
 
 	static bool isAudioDevNameValid(QString name);
 	static bool isMidiDevNameValid(QString name);
