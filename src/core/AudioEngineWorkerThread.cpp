@@ -30,7 +30,7 @@
 
 #include "denormals.h"
 #include "AudioEngine.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 #include "ThreadableJob.h"
 
 #if __SSE__

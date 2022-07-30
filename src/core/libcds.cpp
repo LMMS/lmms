@@ -3,7 +3,6 @@
 #include <cds/init.h>
 
 #include <memory>
-#include "stdshims.h"
 
 namespace _cdslib
 {

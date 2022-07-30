@@ -66,7 +66,7 @@ void MemoryManager::thread_initialize()
 
 void MemoryManager::thread_deinitialize()
 {
-	rpmalloc_thread_finalize();
+	rpmalloc_thread_finalize(true);
 }
 
 void* _AlignedAllocator_Base::alloc_impl(size_t alignment, size_t size )
