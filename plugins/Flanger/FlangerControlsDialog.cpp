@@ -38,7 +38,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 195, 75 );
+	setFixedSize( 233, 75 );
 
 	Knob* delayKnob = new Knob( knobBright_26, this );
 	delayKnob->move( 10,10 );
@@ -61,15 +61,22 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr( "Amount:" ) , "" );
 
+	Knob * lfoPhaseKnob = new Knob( knobBright_26, this );
+	lfoPhaseKnob->move( 123,10 );
+	lfoPhaseKnob->setVolumeKnob( false );
+	lfoPhaseKnob->setModel( &controls->m_lfoPhaseModel );
+	lfoPhaseKnob->setLabel( tr( "PHASE" ) );
+	lfoPhaseKnob->setHintText( tr( "Phase:" ) , " degrees" );
+
 	Knob * feedbackKnob = new Knob( knobBright_26, this );
-	feedbackKnob->move( 122,10 );
+	feedbackKnob->move( 160,10 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel );
 	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr( "Feedback amount:" ) , "" );
 
 	Knob * whiteNoiseKnob = new Knob( knobBright_26, this );
-	whiteNoiseKnob->move( 156,10 );
+	whiteNoiseKnob->move( 196,10 );
 	whiteNoiseKnob->setVolumeKnob( true) ;
 	whiteNoiseKnob->setModel( &controls->m_whiteNoiseAmountModel );
 	whiteNoiseKnob->setLabel( tr( "NOISE" ) );

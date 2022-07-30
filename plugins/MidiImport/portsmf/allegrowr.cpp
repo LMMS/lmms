@@ -56,7 +56,7 @@ Alg_event_ptr Alg_seq::write_track_name(ostream &file, int n,
 // find a name and write it, return a pointer to it so the track
 // writer knows what update (if any) to skip
 {
-    Alg_event_ptr e = NULL; // e is the result, default is NULL
+    Alg_event_ptr e = nullptr; // e is the result, default is NULL
     file << "#track " << n;
     const char *attr = symbol_table.insert_string(
                                n == 0 ? "seqnames" : "tracknames");

@@ -26,12 +26,13 @@
 
 #include <QDebug>
 #include <QDragEnterEvent>
+#include <QPushButton>
 
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Lv2SubPluginFeatures.h"
-#include "Mixer.h"
 #include "StringPairDrag.h"
 #include "Clipboard.h"
 
@@ -80,13 +81,13 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 #endif
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);
-		connect(Engine::mixer(), &Mixer::sampleRateChanged,
+		connect(Engine::audioEngine(), &AudioEngine::sampleRateChanged,
 			this, [this](){Lv2ControlBase::reloadPlugin();});
 
 		// now we need a play-handle which cares for calling play()
 		InstrumentPlayHandle *iph =
 			new InstrumentPlayHandle(this, instrumentTrackArg);
-		Engine::mixer()->addPlayHandle(iph);
+		Engine::audioEngine()->addPlayHandle(iph);
 	}
 }
 
@@ -95,9 +96,8 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 
 Lv2Instrument::~Lv2Instrument()
 {
-	Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(),
-		PlayHandle::TypeNotePlayHandle |
-						  PlayHandle::TypeInstrumentPlayHandle);
+	Engine::audioEngine()->removePlayHandlesOfTypes(instrumentTrack(),
+		PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 }
 
 
@@ -160,7 +160,7 @@ void Lv2Instrument::play(sampleFrame *buf)
 {
 	copyModelsFromLmms();
 
-	fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	fpp_t fpp = Engine::audioEngine()->framesPerPeriod();
 
 	run(fpp);
 

@@ -41,8 +41,8 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -53,8 +53,8 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 	Effect( &dualfilter_plugin_descriptor, parent, key ),
 	m_dfControls( this )
 {
-	m_filter1 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
-	m_filter2 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
+	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
+	m_filter2 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
 
 	// ensure filters get updated
 	m_filter1changed = true;

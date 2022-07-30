@@ -181,7 +181,7 @@ void ProjectJournal::clearJournal()
 
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); )
 	{
-		if( it.value() == NULL )
+		if( it.value() == nullptr )
 		{
 			it = m_joIDs.erase( it );
 		}
@@ -196,7 +196,7 @@ void ProjectJournal::stopAllJournalling()
 {
 	for( JoIdMap::Iterator it = m_joIDs.begin(); it != m_joIDs.end(); ++it)
 	{
-		if( it.value() != NULL ) 
+		if( it.value() != nullptr )
 		{
 			it.value()->setJournalling(false);
 		}

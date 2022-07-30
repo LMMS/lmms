@@ -51,8 +51,8 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -1006,9 +1006,9 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateSampleRate
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
 
-	m_fpp = Engine::mixer()->framesPerPeriod();
+	m_fpp = Engine::audioEngine()->framesPerPeriod();
 
 	updateSamplerate();
 	updateVolume1();
@@ -1036,7 +1036,7 @@ void MonstroInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
+	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == nullptr )
 	{
 		_n->m_pluginData = new MonstroSynth( this, _n );
 	}
@@ -1419,7 +1419,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = Engine::mixer()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->processingSampleRate();
 	
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
@@ -1434,14 +1434,14 @@ void MonstroInstrument::updateSamplerate()
 void MonstroInstrument::updateSlope1()
 {
 	const float slope = m_env1Slope.value();
-	m_slope[0] = exp10( slope * -1.0f );
+	m_slope[0] = std::pow(10.f, slope * -1.0f );
 }
 
 
 void MonstroInstrument::updateSlope2()
 {
 	const float slope = m_env2Slope.value();
-	m_slope[1] = exp10( slope * -1.0f );
+	m_slope[1] = std::pow(10.f, slope * -1.0f );
 }
 
 
@@ -1461,13 +1461,13 @@ MonstroView::MonstroView( Instrument * _instrument,
 
 // "tab buttons"
 
-	PixmapButton * m_opViewButton = new PixmapButton( this, NULL );
+	PixmapButton * m_opViewButton = new PixmapButton( this, nullptr );
 	m_opViewButton -> move( 0,0 );
 	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
 	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
 	ToolTip::add( m_opViewButton, tr( "Operators view" ) );
 
-	PixmapButton * m_matViewButton = new PixmapButton( this, NULL );
+	PixmapButton * m_matViewButton = new PixmapButton( this, nullptr );
 	m_matViewButton -> move( 125,0 );
 	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
@@ -1722,25 +1722,25 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_env2SlopeKnob, KNOBCOL7, E2ROW, tr( "Slope" ), "", "envKnob" )
 
 	// mod selector
-	PixmapButton * m_mixButton = new PixmapButton( view, NULL );
+	PixmapButton * m_mixButton = new PixmapButton( view, nullptr );
 	m_mixButton -> move( 225, 185 );
 	m_mixButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_active" ) );
 	m_mixButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "mix_inactive" ) );
 	ToolTip::add( m_mixButton, tr( "Mix osc 2 with osc 3" ) );
 
-	PixmapButton * m_amButton = new PixmapButton( view, NULL );
+	PixmapButton * m_amButton = new PixmapButton( view, nullptr );
 	m_amButton -> move( 225, 185 + 15 );
 	m_amButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "am_active" ) );
 	m_amButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "am_inactive" ) );
 	ToolTip::add( m_amButton, tr( "Modulate amplitude of osc 3 by osc 2" ) );
 
-	PixmapButton * m_fmButton = new PixmapButton( view, NULL );
+	PixmapButton * m_fmButton = new PixmapButton( view, nullptr );
 	m_fmButton -> move( 225, 185 + 15*2 );
 	m_fmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_active" ) );
 	m_fmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fm_inactive" ) );
 	ToolTip::add( m_fmButton, tr( "Modulate frequency of osc 3 by osc 2" ) );
 
-	PixmapButton * m_pmButton = new PixmapButton( view, NULL );
+	PixmapButton * m_pmButton = new PixmapButton( view, nullptr );
 	m_pmButton -> move( 225, 185 + 15*3 );
 	m_pmButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_active" ) );
 	m_pmButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "pm_inactive" ) );

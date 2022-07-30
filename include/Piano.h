@@ -65,6 +65,10 @@ public:
 	static bool isWhiteKey(int key);
 	static bool isBlackKey(int key);
 
+	static const unsigned int WhiteKeysPerOctave = 7;
+	static const unsigned int BlackKeysPerOctave = 5;
+	static const unsigned int NumWhiteKeys = 75;
+	static const unsigned int NumBlackKeys = 53;
 
 private:
 	static bool isValidKey( int key )

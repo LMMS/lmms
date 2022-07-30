@@ -35,7 +35,7 @@
  */
 float maximum(const float *abs_spectrum, unsigned int spec_size)
 {
-	if (abs_spectrum == NULL) {return -1;}
+	if (abs_spectrum == nullptr) {return -1;}
 	if (spec_size == 0) {return -1;}
 
 	float maxi = 0;
@@ -60,7 +60,7 @@ float maximum(const std::vector<float> &abs_spectrum)
  */
 int normalize(const float *abs_spectrum, float *norm_spectrum, unsigned int bin_count, unsigned int block_size)
 {
-	if (abs_spectrum == NULL || norm_spectrum == NULL) {return -1;}
+	if (abs_spectrum == nullptr || norm_spectrum == nullptr) {return -1;}
 	if (bin_count == 0 || block_size == 0) {return -1;}
 
 	block_size /= 2;
@@ -100,7 +100,7 @@ int notEmpty(const std::vector<float> &spectrum)
  */
 int precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool normalized)
 {
-	if (window == NULL) {return -1;}
+	if (window == nullptr) {return -1;}
 
 	float gain = 0;
 	float a0;
@@ -162,7 +162,7 @@ int precomputeWindow(float *window, unsigned int length, FFT_WINDOWS type, bool 
  */
 int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, unsigned int compl_length)
 {
-	if (complex_buffer == NULL || absspec_buffer == NULL) {return -1;}
+	if (complex_buffer == nullptr || absspec_buffer == nullptr) {return -1;}
 	if (compl_length == 0) {return -1;}
 
 	for (unsigned int i = 0; i < compl_length; i++)
@@ -183,7 +183,7 @@ int absspec(const fftwf_complex *complex_buffer, float *absspec_buffer, unsigned
  */
 int compressbands(const float *absspec_buffer, float *compressedband, int num_old, int num_new, int bottom, int top)
 {
-	if (absspec_buffer == NULL || compressedband == NULL) {return -1;}
+	if (absspec_buffer == nullptr || compressedband == nullptr) {return -1;}
 	if (num_old < num_new) {return -1;}
 	if (num_old <= 0 || num_new <= 0) {return -1;}
 	if (bottom < 0) {bottom = 0;}

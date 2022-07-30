@@ -39,8 +39,8 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -117,7 +117,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 
 inline void BassBoosterEffect::changeFrequency()
 {
-	const sample_t fac = Engine::mixer()->processingSampleRate() / 44100.0f;
+	const sample_t fac = Engine::audioEngine()->processingSampleRate() / 44100.0f;
 
 	m_bbFX.leftFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
 	m_bbFX.rightFX().setFrequency( m_bbControls.m_freqModel.value() * fac );

@@ -43,10 +43,10 @@
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
-	m_pluginWidget( NULL ),
+	m_pluginWidget( nullptr ),
 
-	m_plugin( NULL ),
-	tbLabel( NULL )
+	m_plugin( nullptr ),
+	tbLabel( nullptr )
 {
 	QGridLayout * l = new QGridLayout( this );
 	l->setContentsMargins( 10, 10, 10, 10 );
@@ -55,8 +55,8 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 	bool embed_vst = false;
 
-	if( _ctl != NULL && _ctl->m_effect != NULL &&
-					_ctl->m_effect->m_plugin != NULL )
+	if( _ctl != nullptr && _ctl->m_effect != nullptr &&
+					_ctl->m_effect->m_plugin != nullptr )
 	{
 		m_plugin = _ctl->m_effect->m_plugin;
 		embed_vst = m_plugin->embedMethod() != "none";
@@ -248,7 +248,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 void VstEffectControlDialog::paintEvent( QPaintEvent * )
 {
-	if( m_plugin != NULL && tbLabel != NULL )
+	if( m_plugin != nullptr && tbLabel != nullptr )
 	{
 		tbLabel->setText( tr( "Effect by: " ) + m_plugin->vendorString() +
 			tr( "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />" ) +

@@ -26,6 +26,7 @@
 #ifndef OUTPUT_SETTINGS_H
 #define OUTPUT_SETTINGS_H
 
+#include "lmms_basics.h"
 
 class OutputSettings
 {
@@ -73,7 +74,7 @@ public:
 		m_bitRateSettings(bitRateSettings),
 		m_bitDepth(bitDepth),
 		m_stereoMode(stereoMode),
-		m_compressionLevel(0.5)
+		m_compressionLevel(0.625) // 5/8
 	{
 	}
 

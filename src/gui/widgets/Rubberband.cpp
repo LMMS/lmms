@@ -74,7 +74,7 @@ void RubberBand::resizeEvent( QResizeEvent * _re )
 QVector<selectableObject *> RubberBand::selectableObjects() const
 {
 	QVector<selectableObject *> so;
-	if( parentWidget() == NULL )
+	if( parentWidget() == nullptr )
 	{
 		return( so );
 	}

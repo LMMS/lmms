@@ -38,32 +38,32 @@
 #include "MainWindow.h"
 
 
-QPixmap * ComboBox::s_background = NULL;
-QPixmap * ComboBox::s_arrow = NULL;
-QPixmap * ComboBox::s_arrowSelected = NULL;
+QPixmap * ComboBox::s_background = nullptr;
+QPixmap * ComboBox::s_arrow = nullptr;
+QPixmap * ComboBox::s_arrowSelected = nullptr;
 
 const int CB_ARROW_BTN_WIDTH = 18;
 
 
 ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	QWidget( _parent ),
-	IntModelView( new ComboBoxModel( NULL, QString(), true ), this ),
+	IntModelView( new ComboBoxModel( nullptr, QString(), true ), this ),
 	m_menu( this ),
 	m_pressed( false )
 {
 	setFixedHeight( ComboBox::DEFAULT_HEIGHT );
 
-	if( s_background == NULL )
+	if( s_background == nullptr )
 	{
 		s_background = new QPixmap( embed::getIconPixmap( "combobox_bg" ) );
 	}
 
-	if( s_arrow == NULL )
+	if( s_arrow == nullptr )
 	{
 		s_arrow = new QPixmap( embed::getIconPixmap( "combobox_arrow" ) );
 	}
 
-	if( s_arrowSelected == NULL )
+	if( s_arrowSelected == nullptr )
 	{
 		s_arrowSelected = new QPixmap( embed::getIconPixmap( "combobox_arrow_selected" ) );
 	}
@@ -104,7 +104,7 @@ void ComboBox::selectPrevious()
 
 void ComboBox::contextMenuEvent( QContextMenuEvent * event )
 {
-	if( model() == NULL || event->x() <= width() - CB_ARROW_BTN_WIDTH )
+	if( model() == nullptr || event->x() <= width() - CB_ARROW_BTN_WIDTH )
 	{
 		QWidget::contextMenuEvent( event );
 		return;
@@ -120,7 +120,7 @@ void ComboBox::contextMenuEvent( QContextMenuEvent * event )
 
 void ComboBox::mousePressEvent( QMouseEvent* event )
 {
-	if( model() == NULL )
+	if( model() == nullptr )
 	{
 		return;
 	}

@@ -213,7 +213,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 	AutomatableModel* m = m_amv->modelUntyped();
 
 	m->displayName();
-	ControllerConnectionDialog d( gui->mainWindow(), m );
+	ControllerConnectionDialog d( getGUI()->mainWindow(), m );
 
 	if( d.exec() == 1 )
 	{
@@ -228,7 +228,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// New
 			else
 			{
-				ControllerConnection* cc = new ControllerConnection( d.chosenController() );
+				ControllerConnection* cc = new ControllerConnection(d.chosenController());
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}
@@ -251,7 +251,7 @@ void AutomatableModelViewSlots::removeConnection()
 	if( m->controllerConnection() )
 	{
 		delete m->controllerConnection();
-		m->setControllerConnection( NULL );
+		m->setControllerConnection( nullptr );
 	}
 }
 
@@ -260,7 +260,7 @@ void AutomatableModelViewSlots::removeConnection()
 
 void AutomatableModelViewSlots::editSongGlobalAutomation()
 {
-	gui->automationEditor()->open(
+	getGUI()->automationEditor()->open(
 				AutomationPattern::globalAutomationPattern(m_amv->modelUntyped())
 	);
 }
@@ -294,7 +294,6 @@ void AutomatableModelViewSlots::pasteFromClipboard()
 		m_amv->modelUntyped()->setValue(number / m_amv->getConversionFactor());
 	}
 }
-
 
 /// Attempt to parse a float from the clipboard
 static float floatFromClipboard(bool* ok)

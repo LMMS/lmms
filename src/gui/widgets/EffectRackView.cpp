@@ -36,7 +36,7 @@
 
 EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	QWidget( parent ),
-	ModelView( NULL, this )
+	ModelView( nullptr, this )
 {
 	QVBoxLayout* mainLayout = new QVBoxLayout( this );
 	mainLayout->setMargin( 5 );

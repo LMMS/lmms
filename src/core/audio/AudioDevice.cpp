@@ -1,5 +1,5 @@
 /*
- * AudioDevice.cpp - base-class for audio-devices used by LMMS-mixer
+ * AudioDevice.cpp - base-class for audio-devices used by LMMS audio engine
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,23 +25,23 @@
 #include <cstring>
 
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "debug.h"
-#include "Mixer.h"
 
 
 
-AudioDevice::AudioDevice( const ch_cnt_t _channels, Mixer*  _mixer ) :
+AudioDevice::AudioDevice( const ch_cnt_t _channels, AudioEngine*  _audioEngine ) :
 	m_supportsCapture( false ),
-	m_sampleRate( _mixer->processingSampleRate() ),
+	m_sampleRate( _audioEngine->processingSampleRate() ),
 	m_channels( _channels ),
-	m_mixer( _mixer ),
-	m_buffer( new surroundSampleFrame[mixer()->framesPerPeriod()] )
+	m_audioEngine( _audioEngine ),
+	m_buffer( new surroundSampleFrame[audioEngine()->framesPerPeriod()] )
 {
 	int error;
 	if( ( m_srcState = src_new(
-		mixer()->currentQualitySettings().libsrcInterpolation(),
-				SURROUND_CHANNELS, &error ) ) == NULL )
+		audioEngine()->currentQualitySettings().libsrcInterpolation(),
+				SURROUND_CHANNELS, &error ) ) == nullptr )
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
 	}
@@ -67,7 +67,7 @@ void AudioDevice::processNextBuffer()
 	const fpp_t frames = getNextBuffer( m_buffer );
 	if( frames )
 	{
-		writeBuffer( m_buffer, frames, mixer()->masterGain() );
+		writeBuffer( m_buffer, frames, audioEngine()->masterGain() );
 	}
 	else
 	{
@@ -80,8 +80,8 @@ void AudioDevice::processNextBuffer()
 
 fpp_t AudioDevice::getNextBuffer( surroundSampleFrame * _ab )
 {
-	fpp_t frames = mixer()->framesPerPeriod();
-	const surroundSampleFrame * b = mixer()->nextBuffer();
+	fpp_t frames = audioEngine()->framesPerPeriod();
+	const surroundSampleFrame * b = audioEngine()->nextBuffer();
 	if( !b )
 	{
 		return 0;
@@ -91,10 +91,9 @@ fpp_t AudioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	lock();
 
 	// resample if necessary
-	if( mixer()->processingSampleRate() != m_sampleRate )
+	if( audioEngine()->processingSampleRate() != m_sampleRate )
 	{
-		frames = resample( b, frames, _ab, mixer()->processingSampleRate(),
-				    	   m_sampleRate );
+		frames = resample( b, frames, _ab, audioEngine()->processingSampleRate(), m_sampleRate );
 	}
 	else
 	{
@@ -104,7 +103,7 @@ fpp_t AudioDevice::getNextBuffer( surroundSampleFrame * _ab )
 	// release lock
 	unlock();
 
-	if( mixer()->hasFifoWriter() )
+	if( audioEngine()->hasFifoWriter() )
 	{
 		delete[] b;
 	}
@@ -117,7 +116,7 @@ fpp_t AudioDevice::getNextBuffer( surroundSampleFrame * _ab )
 
 void AudioDevice::stopProcessing()
 {
-	if( mixer()->hasFifoWriter() )
+	if( audioEngine()->hasFifoWriter() )
 	{
 		while( m_inProcess )
 		{
@@ -151,8 +150,8 @@ void AudioDevice::applyQualitySettings()
 
 	int error;
 	if( ( m_srcState = src_new(
-		mixer()->currentQualitySettings().libsrcInterpolation(),
-				SURROUND_CHANNELS, &error ) ) == NULL )
+		audioEngine()->currentQualitySettings().libsrcInterpolation(),
+				SURROUND_CHANNELS, &error ) ) == nullptr )
 	{
 		printf( "Error: src_new() failed in audio_device.cpp!\n" );
 	}
@@ -188,7 +187,7 @@ fpp_t AudioDevice::resample( const surroundSampleFrame * _src,
 						const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 {
-	if( m_srcState == NULL )
+	if( m_srcState == nullptr )
 	{
 		return _frames;
 	}
@@ -222,7 +221,7 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				temp = static_cast<int_sample_t>( Mixer::clip( _ab[frame][chnl] * _master_gain ) * OUTPUT_SAMPLE_MULTIPLIER );
+				temp = static_cast<int_sample_t>( AudioEngine::clip( _ab[frame][chnl] * _master_gain ) * OUTPUT_SAMPLE_MULTIPLIER );
 				
 				( _output_buffer + frame * channels() )[chnl] =
 						( temp & 0x00ff ) << 8 |
@@ -238,7 +237,7 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 			{
 				( _output_buffer + frame * channels() )[chnl] =
 						static_cast<int_sample_t>(
-						Mixer::clip( _ab[frame][chnl] *
+						AudioEngine::clip( _ab[frame][chnl] *
 						_master_gain ) *
 						OUTPUT_SAMPLE_MULTIPLIER );
 			}
@@ -254,7 +253,7 @@ int AudioDevice::convertToS16( const surroundSampleFrame * _ab,
 void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 {
 
-	assert( _outbuf != NULL );
+	assert( _outbuf != nullptr );
 
 	memset( _outbuf, 0,  _frames * channels() * BYTES_PER_INT_SAMPLE );
 }
@@ -264,7 +263,7 @@ void AudioDevice::clearS16Buffer( int_sample_t * _outbuf, const fpp_t _frames )
 
 bool AudioDevice::hqAudio() const
 {
-	return ConfigManager::inst()->value( "mixer", "hqaudio" ).toInt();
+	return ConfigManager::inst()->value( "audioengine", "hqaudio" ).toInt();
 }
 
 

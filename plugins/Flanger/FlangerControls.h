@@ -48,7 +48,7 @@ public:
 	}
 	virtual int controlCount()
 	{
-		return 5;
+		return 7;
 	}
 	virtual EffectControlDialog* createView()
 	{
@@ -64,6 +64,7 @@ private:
 	FloatModel m_delayTimeModel;
 	TempoSyncKnobModel m_lfoFrequencyModel;
 	FloatModel m_lfoAmountModel;
+	FloatModel m_lfoPhaseModel;
 	FloatModel m_feedbackModel;
 	FloatModel m_whiteNoiseAmountModel;
 	BoolModel m_invertFeedbackModel;

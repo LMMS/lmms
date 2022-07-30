@@ -45,7 +45,7 @@
 
 
 ProjectNotes::ProjectNotes() :
-	QMainWindow( gui->mainWindow()->workspace() )
+	QMainWindow( getGUI()->mainWindow()->workspace() )
 {
 	m_edit = new QTextEdit( this );
 	m_edit->setAutoFillBackground( true );
@@ -70,7 +70,7 @@ ProjectNotes::ProjectNotes() :
 	setWindowTitle( tr( "Project Notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
-	gui->mainWindow()->addWindowedWidget( this );
+	getGUI()->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 700, 10 );
 	parentWidget()->resize( 400, 300 );

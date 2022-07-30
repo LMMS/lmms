@@ -273,7 +273,7 @@ public:
 		m_type = _idx == DoubleLowPass 
 			? LowPass
 			: Moog;
-		if( m_subFilter == NULL )
+		if( m_subFilter == nullptr )
 		{
 			m_subFilter = new BasicFilters<CHANNELS>(
 						static_cast<sample_rate_t>(
@@ -286,7 +286,7 @@ public:
 		m_doubleFilter( false ),
 		m_sampleRate( (float) _sample_rate ),
 		m_sampleRatio( 1.0f / m_sampleRate ),
-		m_subFilter( NULL )
+		m_subFilter( nullptr )
 	{
 		clearHistory();
 	}

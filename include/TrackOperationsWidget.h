@@ -43,16 +43,17 @@ public:
 protected:
 	void mousePressEvent( QMouseEvent * me ) override;
 	void paintEvent( QPaintEvent * pe ) override;
+	bool confirmRemoval();
 
 
 private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
-	void changeTrackColor();
-	void randomTrackColor();
+	void selectTrackColor();
+	void randomizeTrackColor();
 	void resetTrackColor();
-	void useTrackColor();
+	void resetTCOColors();
 	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
@@ -70,9 +71,6 @@ private:
 
 signals:
 	void trackRemovalScheduled( TrackView * t );
-	void colorChanged( QColor & c );
-	void colorParented();
-	void colorReset();
 
 } ;
 

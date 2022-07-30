@@ -11,7 +11,7 @@ function(CreateTempFilePath)
 
     set(file_name "${CMAKE_BINARY_DIR}/${TEMP_TAG}_${hashed_content}")
     set(${TEMP_OUTPUT_VAR} "${file_name}" PARENT_SCOPE)
-    if(CONFIG_SUFFIX)
+    if(TEMP_CONFIG_SUFFIX)
         set(file_name "${file_name}_$<CONFIG>")
     endif()
 

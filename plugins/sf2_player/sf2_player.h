@@ -95,7 +95,7 @@ public:
 public slots:
 	void openFile( const QString & _sf2File, bool updateTrackName = true );
 	void updatePatch();
-	void updateSampleRate();
+	void reloadSynth();
 	
 	// We can't really support sample-exact with the way IPH and FS work.
 	// So, sig/slots work just fine for the synth settings right now.

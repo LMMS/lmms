@@ -62,7 +62,7 @@ PreampIII::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register sample_t a = s[i] + normal;
+		sample_t a = s[i] + normal;
 
 		a = g * tube.transfer (a * temp);
 		a = filter.process (a);
@@ -166,7 +166,7 @@ PreampIV::one_cycle (int frames)
 
 	for (int i = 0; i < frames; ++i)
 	{
-		register sample_t a = tone.process (s[i] + normal);
+		sample_t a = tone.process (s[i] + normal);
 
 		a = g * tube.transfer (a * temp);
 

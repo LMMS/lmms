@@ -58,7 +58,7 @@ public:
 
 	virtual AutomationPattern * tempoAutomationPattern()
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;

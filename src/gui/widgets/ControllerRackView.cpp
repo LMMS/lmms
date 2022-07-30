@@ -75,7 +75,7 @@ ControllerRackView::ControllerRackView( ) :
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget( this );
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();

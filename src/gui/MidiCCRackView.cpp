@@ -47,7 +47,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget(this);
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 
 	// Remove maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();

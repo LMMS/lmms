@@ -18,7 +18,7 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * )
 	{
-		return( NULL );
+		return( nullptr );
 	}
 private:
 	virtual bool tryImport( TrackContainer* tc );

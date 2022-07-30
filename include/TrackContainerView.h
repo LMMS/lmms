@@ -80,6 +80,7 @@ public:
 	const TrackView * trackViewAt( const int _y ) const;
 
 	virtual bool allowRubberband() const;
+	virtual bool knifeMode() const;
 
 	inline bool rubberBandActive() const
 	{

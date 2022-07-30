@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Lv2Instrument.h - implementation of LV2 instrument
  *
  * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>
@@ -36,8 +36,6 @@
 // whether to use MIDI vs playHandle
 // currently only MIDI works
 #define LV2_INSTRUMENT_USE_MIDI
-
-class QPushButton;
 
 
 class Lv2Instrument : public Instrument, public Lv2ControlBase

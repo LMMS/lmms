@@ -34,11 +34,11 @@
 #include <QtGlobal>
 
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "Mixer.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
 #include "ToolTip.h"
@@ -58,7 +58,7 @@
  */
 TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	QWidget( tcv->contentWidget() ),   /*!< The Track Container View's content widget. */
-	ModelView( NULL, this ),            /*!< The model view of this track */
+	ModelView( nullptr, this ),            /*!< The model view of this track */
 	m_track( track ),                  /*!< The track we're displaying */
 	m_trackContainerView( tcv ),       /*!< The track Container View we're displayed in */
 	m_trackOperationsWidget( this ),    /*!< Our trackOperationsWidget */
@@ -81,7 +81,7 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 	layout->addWidget( &m_trackContentWidget, 1 );
 	setFixedHeight( m_track->getHeight() );
 
-	resizeEvent( NULL );
+	resizeEvent( nullptr );
 
 	setAcceptDrops( true );
 	setAttribute( Qt::WA_DeleteOnClose, true );
@@ -101,12 +101,6 @@ TrackView::TrackView( Track * track, TrackContainerView * tcv ) :
 
 	connect( &m_track->m_soloModel, SIGNAL( dataChanged() ),
 			m_track, SLOT( toggleSolo() ), Qt::DirectConnection );
-
-	connect( &m_trackOperationsWidget, SIGNAL( colorChanged( QColor & ) ),
-			m_track, SLOT( trackColorChanged( QColor & ) ) );
-
-	connect( &m_trackOperationsWidget, SIGNAL( colorReset() ),
-			m_track, SLOT( trackColorReset() ) );
 
 	// create views for already existing TCOs
 	for( Track::tcoVector::iterator it =
@@ -178,7 +172,7 @@ QMenu * TrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	Q_UNUSED(title)
 	Q_UNUSED(newFxLabel)
-	return NULL;
+	return nullptr;
 }
 
 
@@ -202,7 +196,7 @@ bool TrackView::close()
 void TrackView::modelChanged()
 {
 	m_track = castModel<Track>();
-	Q_ASSERT( m_track != NULL );
+	Q_ASSERT( m_track != nullptr );
 	connect( m_track, SIGNAL( destroyedTrack() ), this, SLOT( close() ) );
 	m_trackOperationsWidget.m_muteBtn->setModel( &m_track->m_mutedModel );
 	m_trackOperationsWidget.m_soloBtn->setModel( &m_track->m_soloModel );
@@ -243,9 +237,9 @@ void TrackView::dropEvent( QDropEvent * de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		Engine::mixer()->requestChangeInModel();
+		Engine::audioEngine()->requestChangeInModel();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		Engine::mixer()->doneChangeInModel();
+		Engine::audioEngine()->doneChangeInModel();
 		de->accept();
 	}
 }
@@ -362,7 +356,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 		//	qDebug( "y position %d", yPos );
 
 		// a track-widget not equal to ourself?
-		if( trackAtY != NULL && trackAtY != this )
+		if( trackAtY != nullptr && trackAtY != this )
 		{
 			// then move us up/down there!
 			if( me->y() < 0 )
@@ -397,7 +391,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 void TrackView::mouseReleaseEvent( QMouseEvent * me )
 {
 	m_action = NoAction;
-	while( QApplication::overrideCursor() != NULL )
+	while( QApplication::overrideCursor() != nullptr )
 	{
 		QApplication::restoreOverrideCursor();
 	}

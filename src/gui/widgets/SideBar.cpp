@@ -131,8 +131,8 @@ void SideBar::appendTab( SideBarWidget *widget )
 
 void SideBar::toggleButton( QAbstractButton * button )
 {
-	QToolButton *toolButton = NULL;
-	QWidget *activeWidget = NULL;
+	QToolButton *toolButton = nullptr;
+	QWidget *activeWidget = nullptr;
 
 	for( auto it = m_widgets.begin(); it != m_widgets.end(); ++it )
 	{

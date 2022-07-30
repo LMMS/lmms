@@ -37,7 +37,7 @@ public:
 	PositionLine(QWidget* parent);
 
 public slots:
-	void zoomChange(double zoom);
+	void zoomChange(float zoom);
 
 private:
 	void paintEvent(QPaintEvent* pe) override;

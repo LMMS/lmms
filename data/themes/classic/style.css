@@ -20,7 +20,8 @@ AutomationEditor {
 	background-color: rgb(0, 0, 0);
 	color: #e0e0e0;
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
-	qproperty-vertexColor: #ff77af;
+	qproperty-nodeInValueColor: rgba(255, 119, 175, 150);
+	qproperty-nodeOutValueColor: rgba(129, 231, 181, 150);
 	qproperty-crossColor: rgb( 255, 51, 51 );
 	/* Grid colors */
 	qproperty-lineColor: rgba(128, 128, 128, 80);
@@ -149,23 +150,27 @@ PianoRoll {
 	qproperty-noteOpacity: 128;
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
-	qproperty-ghostNoteColor: #000000;
+	qproperty-ghostNoteColor: #1e1e1e;
 	qproperty-ghostNoteTextColor: #ffffff;
-	qproperty-ghostNoteOpacity: 50;
+	qproperty-ghostNoteOpacity: 60;
 	qproperty-ghostNoteBorders: true;
-	qproperty-barColor: #4afd85;
+	qproperty-barColor: rgb( 119, 199, 216 );
 	qproperty-markedSemitoneColor: rgba( 0, 255, 200, 60 );
+	qproperty-knifeCutLine: rgba(255, 0, 0, 255);
 	/* Piano keys */
 	qproperty-whiteKeyWidth: 64;
 	qproperty-whiteKeyActiveTextColor: #000;
 	qproperty-whiteKeyActiveTextShadow: rgb( 240, 240, 240 );
-	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
+	qproperty-whiteKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #50b8c3, stop:1 #54c4d2);
 	qproperty-whiteKeyInactiveTextColor: rgb( 128, 128, 128);
 	qproperty-whiteKeyInactiveTextShadow: rgb( 240, 240, 240 );
-	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #eeeeee, stop:1 #ffffff);
+	qproperty-whiteKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #c5c5c5, stop:1 #f9f9f9);
+	qproperty-whiteKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #a0a0a0, stop:1 #b0b0b0);
 	qproperty-blackKeyWidth: 48;
-	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #43e97b, stop:1 #3bcd6c);
-	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #333, stop:1 #000);
+	qproperty-blackKeyActiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #50b8c3, stop:1 #54c4d2);
+	qproperty-blackKeyInactiveBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #101010, stop:1 #3a3a3a);
+	qproperty-blackKeyDisabledBackground: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #606060, stop:1 #505050);
+
 	/* Grid colors */
 	qproperty-lineColor: rgba( 128, 128, 128, 80 );
 	qproperty-beatLineColor: rgba( 128, 128, 128, 160 );
@@ -482,7 +487,7 @@ QToolButton#stopButton {
 
 /* all tool buttons */
 
-QToolButton {
+QToolButton, QToolButton::menu-button {
 	padding: 1px 1px 1px 1px;
 	border-radius: 5px;
 	border: 1px solid rgba(63, 63, 63, 128);
@@ -506,6 +511,22 @@ QToolButton:checked  {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.8 #c9c9c9, stop:1 #c0c0c0 );
 	padding: 2px 1px 0px 1px;
 	color: black;
+}
+
+/* buttons with combined menu */
+
+QToolButton[popupMode="1"] {
+	margin-right: 11px;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+QToolButton::menu-button {
+	subcontrol-origin: margin;
+	width: 11px;
+	padding: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 /* track label buttons - the part that contains the icon and track title */
@@ -596,10 +617,10 @@ FxLine {
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
-	qproperty-strokeOuterActive: rgb( 0, 0, 0 );	
-	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );	
-	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );	
-	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );					
+	qproperty-strokeOuterActive: rgb( 0, 0, 0 );
+	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );
+	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );
+	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );
 }
 
 /* persistent peak markers for fx peak meters */
@@ -656,7 +677,8 @@ TrackContentObjectView   {
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
 	/* finger tip offset of cursor */
 	qproperty-mouseHotspotHand: 3px 3px;
-	
+	qproperty-mouseHotspotKnife: 0px 0px;
+
 	font-size: 11px;
 }
 
@@ -673,8 +695,8 @@ PatternView {
 
 /* sample track pattern */
 SampleTCOView {
-	background-color: rgb( 74, 253, 133 );
-	color: rgb( 187, 227, 236 );
+	background-color: rgba(42,51,59,255);
+	color: #FF8F05;
 }
 
 /* automation pattern */
@@ -915,6 +937,26 @@ NesInstrumentView Knob {
 	qproperty-innerRadius: 8.0;
 	qproperty-centerPointX: 14.5;
 	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+CompressorControlDialog {
+	qproperty-inVolAreaColor: rgba(209, 216, 228, 17);
+	qproperty-inVolColor: rgba(209, 216, 228, 100);
+	qproperty-outVolAreaColor: rgba(209, 216, 228, 30);
+	qproperty-outVolColor: rgba(209, 216, 228, 240);
+	qproperty-gainReductionColor: rgba(180, 100, 100, 210);
+	qproperty-kneeColor: rgba(39, 171, 95, 255);
+	qproperty-kneeColor2: rgba(9, 171, 160, 255);
+	qproperty-threshColor: rgba(39, 171, 95, 100);
+	qproperty-textColor: rgba(209, 216, 228, 50);
+	qproperty-graphColor: rgba(209, 216, 228, 50);
+	qproperty-resetColor: rgba(200, 100, 15, 200);
+}
+
+CompressorControlDialog Knob {
+	color: #2fcc71;
+	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
 }
 

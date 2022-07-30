@@ -44,7 +44,7 @@ Note::Note( const TimePos & length, const TimePos & pos,
 	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning( NULL )
+	m_detuning( nullptr )
 {
 	if( detuning )
 	{
@@ -71,7 +71,7 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning( NULL )
+	m_detuning( nullptr )
 {
 	if( note.m_detuning )
 	{
@@ -208,7 +208,7 @@ void Note::loadSettings( const QDomElement & _this )
 
 void Note::createDetuning()
 {
-	if( m_detuning == NULL )
+	if( m_detuning == nullptr )
 	{
 		m_detuning = new DetuningHelper;
 		(void) m_detuning->automationPattern();

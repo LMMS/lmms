@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _TIME_DISPLAY_WIDGET
-#define _TIME_DISPLAY_WIDGET
+#ifndef TIME_DISPLAY_WIDGET_H
+#define TIME_DISPLAY_WIDGET_H
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -67,4 +67,4 @@ private:
 
 } ;
 
-#endif
+#endif // TIME_DISPLAY_WIDGET_H

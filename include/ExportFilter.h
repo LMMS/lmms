@@ -35,7 +35,7 @@
 class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
-	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, NULL ) {}
+	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, nullptr ) {}
 	virtual ~ExportFilter() {}
 
 

@@ -66,7 +66,7 @@ public:
 					const f_cnt_t offset,
 					const f_cnt_t frames,
 					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
+					NotePlayHandle* parent = nullptr,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
 	virtual ~NotePlayHandle();
@@ -124,7 +124,7 @@ public:
 	/*! Returns whether the play handle plays on a certain track */
 	bool isFromTrack( const Track* _track ) const override;
 
-	/*! Releases the note (and plays release frames */
+	/*! Releases the note (and plays release frames) */
 	void noteOff( const f_cnt_t offset = 0 );
 
 	/*! Returns number of frames to be played until the note is going to be released */

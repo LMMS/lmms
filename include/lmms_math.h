@@ -32,11 +32,6 @@
 #include <QtCore/QtGlobal>
 
 #include <cmath>
-using namespace std;
-
-#ifndef exp10
-#define exp10(x) std::pow( 10.0, x )
-#endif
 
 #ifdef __INTEL_COMPILER
 
@@ -124,7 +119,7 @@ static inline float absFraction( float _x )
 
 
 
-#define FAST_RAND_MAX 32767
+constexpr int FAST_RAND_MAX = 32767;
 static inline int fast_rand()
 {
 	static unsigned long next = 1;
@@ -220,10 +215,10 @@ static inline float logToLinearScale( float min, float max, float value )
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
 		const float val = value * ( max - min ) + min;
 		float result = signedPowf( val / mmax, F_E ) * mmax;
-		return isnan( result ) ? 0 : result;
+		return std::isnan( result ) ? 0 : result;
 	}
 	float result = powf( value, F_E ) * ( max - min ) + min;
-	return isnan( result ) ? 0 : result;
+	return std::isnan( result ) ? 0 : result;
 }
 
 
@@ -237,10 +232,10 @@ static inline float linearToLogScale( float min, float max, float value )
 	{
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
 		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
-		return isnan( result ) ? 0 : result;
+		return std::isnan( result ) ? 0 : result;
 	}
 	float result = powf( val, EXP ) * ( max - min ) + min;
-	return isnan( result ) ? 0 : result;
+	return std::isnan( result ) ? 0 : result;
 }
 
 
@@ -262,9 +257,9 @@ static inline float safeAmpToDbfs( float amp )
 //! @return Linear amplitude
 static inline float safeDbfsToAmp( float dbfs )
 {
-	return isinf( dbfs )
+	return std::isinf( dbfs )
 		? 0.0f
-		: exp10( dbfs * 0.05f );
+		: std::pow(10.f, dbfs * 0.05f );
 }
 
 
@@ -282,7 +277,7 @@ static inline float ampToDbfs( float amp )
 //! @return Linear amplitude
 static inline float dbfsToAmp( float dbfs )
 {
-	return exp10( dbfs * 0.05f );
+	return std::pow(10.f, dbfs * 0.05f );
 }
 
 

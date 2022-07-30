@@ -49,8 +49,8 @@ const int FILTER_GROUPBOX_HEIGHT = 245-FILTER_GROUPBOX_Y;
 
 InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 	QWidget( _parent ),
-	ModelView( NULL, this ),
-	m_ss( NULL )
+	ModelView( nullptr, this ),
+	m_ss( nullptr )
 {
 	m_targetsTabWidget = new TabWidget( tr( "TARGET" ), this );
 	m_targetsTabWidget->setGeometry( TARGETS_TABWIDGET_X,
@@ -63,7 +63,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 		m_envLfoViews[i] = new EnvelopeAndLfoView( m_targetsTabWidget );
 		m_targetsTabWidget->addTab( m_envLfoViews[i],
 						tr( InstrumentSoundShaping::targetNames[i][0] ), 
-                                                NULL );
+                                                nullptr );
 	}
 
 

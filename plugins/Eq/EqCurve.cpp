@@ -190,7 +190,7 @@ bool EqHandle::mousePressed() const
 float EqHandle::getPeakCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::mixer()->processingSampleRate();
+	const int SR = Engine::audioEngine()->processingSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
@@ -228,7 +228,7 @@ float EqHandle::getPeakCurve( float x )
 float EqHandle::getHighShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::mixer()->processingSampleRate();
+	const int SR = Engine::audioEngine()->processingSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
@@ -264,7 +264,7 @@ float EqHandle::getHighShelfCurve( float x )
 float EqHandle::getLowShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::mixer()->processingSampleRate();
+	const int SR = Engine::audioEngine()->processingSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
@@ -301,7 +301,7 @@ float EqHandle::getLowShelfCurve( float x )
 float EqHandle::getLowCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::mixer()->processingSampleRate();
+	const int SR = Engine::audioEngine()->processingSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
@@ -345,7 +345,7 @@ float EqHandle::getLowCutCurve( float x )
 float EqHandle::getHighCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x(), m_width );
-	const int SR = Engine::mixer()->processingSampleRate();
+	const int SR = Engine::audioEngine()->processingSampleRate();
 	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
@@ -520,7 +520,7 @@ void EqHandle::setlp48()
 
 double EqHandle::calculateGain(const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 )
 {
-	const int SR = Engine::mixer()->processingSampleRate();
+	const int SR = Engine::audioEngine()->processingSampleRate();
 
 	const double w = 2 * LD_PI * freq / SR ;
 	const double PHI = pow( sin( w / 2 ), 2 ) * 4;

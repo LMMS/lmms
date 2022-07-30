@@ -446,7 +446,7 @@ Midifile_reader::Midifile_reader()
 void Midifile_reader::finalize()
 {
     if (Msgbuff) Mf_free(Msgbuff, Msgsize);
-    Msgbuff = NULL;
+    Msgbuff = nullptr;
 }
 
 

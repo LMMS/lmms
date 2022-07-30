@@ -49,7 +49,7 @@ SaWaterfallView::SaWaterfallView(SaControls *controls, SaProcessor *processor, Q
 	setMinimumSize(300, 150);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayTop = 1;
 	m_displayBottom = height() -2;

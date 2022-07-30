@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Lv2Effect.h - implementation of LV2 effect
  *
  * Copyright (c) 2018-2020 Johannes Lorenz <jlsf2013$users.sourceforge.net, $=@>

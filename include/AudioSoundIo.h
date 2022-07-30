@@ -56,7 +56,7 @@ public slots:
 class AudioSoundIo : public AudioDevice
 {
 public:
-	AudioSoundIo( bool & _success_ful, Mixer* mixer );
+	AudioSoundIo( bool & _success_ful, AudioEngine* audioEngine );
 	virtual ~AudioSoundIo();
 
 	inline static QString name()

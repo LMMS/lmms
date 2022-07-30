@@ -41,7 +41,7 @@ class LMMS_EXPORT PeakController : public Controller
 	Q_OBJECT
 public:
 	PeakController( Model * _parent,
-		PeakControllerEffect *_peak_effect = NULL );
+		PeakControllerEffect *_peak_effect = nullptr );
 
 
 	virtual ~PeakController();

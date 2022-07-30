@@ -105,9 +105,9 @@ Track::~Track()
  */
 Track * Track::create( TrackTypes tt, TrackContainer * tc )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
-	Track * t = NULL;
+	Track * t = nullptr;
 
 	switch( tt )
 	{
@@ -130,7 +130,7 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 
 	tc->updateAfterTrackAdd();
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	return t;
 }
@@ -145,17 +145,17 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
  */
 Track * Track::create( const QDomElement & element, TrackContainer * tc )
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 
 	Track * t = create(
 		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
 									tc );
-	if( t != NULL )
+	if( t != nullptr )
 	{
 		t->restoreState( element );
 	}
 
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 
 	return t;
 }
@@ -270,8 +270,12 @@ void Track::loadSettings( const QDomElement & element )
 
 	if( element.hasAttribute( "color" ) )
 	{
-		m_color.setNamedColor( element.attribute( "color" ) );
-		m_hasColor = true;
+		QColor newColor = QColor(element.attribute("color"));
+		setColor(newColor);
+	}
+	else
+	{
+		resetColor();
 	}
 
 	if( m_simpleSerializingMode )
@@ -647,23 +651,17 @@ void Track::toggleSolo()
 	}
 }
 
-void Track::trackColorChanged( QColor & c )
+void Track::setColor(const QColor& c)
 {
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
-		m_trackContentObjects[i]->updateColor();
-	}
 	m_hasColor = true;
 	m_color = c;
+	emit colorChanged();
 }
 
-void Track::trackColorReset()
+void Track::resetColor()
 {
-	for (int i = 0; i < numOfTCOs(); i++)
-	{
-		m_trackContentObjects[i]->updateColor();
-	}
 	m_hasColor = false;
+	emit colorChanged();
 }
 
 

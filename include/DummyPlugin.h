@@ -34,7 +34,7 @@ class DummyPlugin : public Plugin
 {
 public:
 	DummyPlugin() :
-		Plugin( NULL, NULL )
+		Plugin( nullptr, nullptr )
 	{
 	}
 

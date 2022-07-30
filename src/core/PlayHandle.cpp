@@ -24,8 +24,8 @@
  
 #include "BufferPool.h"
 #include "PlayHandle.h"
+#include "AudioEngine.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MixHelpers.h"
 
 #include <QtCore/QThread>
@@ -55,12 +55,12 @@ void PlayHandle::doProcessing()
 	if( m_usesBuffer )
 	{
 		m_bufferReleased = false;
-		MixHelpers::clear(m_playHandleBuffer, Engine::mixer()->framesPerPeriod());
+		MixHelpers::clear(m_playHandleBuffer, Engine::audioEngine()->framesPerPeriod());
 		play( buffer() );
 	}
 	else
 	{
-		play( NULL );
+		play( nullptr );
 	}
 }
 

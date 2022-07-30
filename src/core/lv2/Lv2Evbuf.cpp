@@ -144,7 +144,7 @@ lv2_evbuf_get(LV2_Evbuf_Iterator iter,
 	uint8_t** data)
 {
 	*frames = *type = *size = 0;
-	*data = NULL;
+	*data = nullptr;
 
 	if (!lv2_evbuf_is_valid(iter)) {
 		return false;

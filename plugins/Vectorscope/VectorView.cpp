@@ -49,7 +49,7 @@ VectorView::VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *i
 	setMinimumSize(200, 200);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-	connect(gui->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
+	connect(getGUI()->mainWindow(), SIGNAL(periodicUpdate()), this, SLOT(periodicUpdate()));
 
 	m_displayBuffer.resize(sizeof qRgb(0,0,0) * m_displaySize * m_displaySize, 0);
 

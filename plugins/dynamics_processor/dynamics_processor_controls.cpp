@@ -48,7 +48,7 @@ dynProcControls::dynProcControls( dynProcEffect * _eff ) :
 {
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 
 	setDefaultShape();
 

@@ -73,7 +73,7 @@
 //
 
 
-//#define engine::mixer()->processingSampleRate() 44100.0f
+//#define engine::audioEngine()->processingSampleRate() 44100.0f
 const float sampleRateCutoff = 44100.0f;
 
 extern "C"
@@ -89,8 +89,8 @@ Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 };
 
 }
@@ -112,8 +112,8 @@ void lb302Filter::recalc()
 {
 	vcf_e1 = exp(6.109 + 1.5876*(fs->envmod) + 2.1553*(fs->cutoff) - 1.2*(1.0-(fs->reso)));
 	vcf_e0 = exp(5.613 - 0.8*(fs->envmod) + 2.1553*(fs->cutoff) - 0.7696*(1.0-(fs->reso)));
-	vcf_e0*=M_PI/Engine::mixer()->processingSampleRate();
-	vcf_e1*=M_PI/Engine::mixer()->processingSampleRate();
+	vcf_e0*=M_PI/Engine::audioEngine()->processingSampleRate();
+	vcf_e1*=M_PI/Engine::audioEngine()->processingSampleRate();
 	vcf_e1 -= vcf_e0;
 
 	vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
@@ -229,7 +229,7 @@ void lb302Filter3Pole::envRecalc()
 	w = vcf_e0 + vcf_c0;
 	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
     // sampleRateCutoff should not be changed to anything dynamic that is outside the
-    // scope of lb302 (like e.g. the mixers sample rate) as this changes the filters cutoff
+    // scope of lb302 (like e.g. the audio engine's sample rate) as this changes the filter's cutoff
     // behavior without any modification to its controls.
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
 	                   (700.f+1500.f*(k)+(1500.f+(k)*(sampleRateCutoff/2.f-6000.f)) *
@@ -239,7 +239,7 @@ void lb302Filter3Pole::envRecalc()
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// kfcn = fs->cutoff;
-	kfcn = 2.0 * kfco / Engine::mixer()->processingSampleRate();
+	kfcn = 2.0 * kfco / Engine::audioEngine()->processingSampleRate();
 #else
 	kfcn = w;
 #endif
@@ -294,7 +294,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_mode(never_played)
 {
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged( ) ),
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged( ) ),
 	         this, SLOT ( filterChanged( ) ) );
 
 	connect( &vcf_cut_knob, SIGNAL( dataChanged( ) ),
@@ -351,7 +351,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	filterChanged();
 
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
-	Engine::mixer()->addPlayHandle( iph );
+	Engine::audioEngine()->addPlayHandle( iph );
 }
 
 
@@ -410,7 +410,7 @@ void lb302Synth::filterChanged()
 
 	float d = 0.2 + (2.3*vcf_dec_knob.value());
 
-	d *= Engine::mixer()->processingSampleRate();                                // d *= smpl rate
+	d *= Engine::audioEngine()->processingSampleRate(); // d *= smpl rate
 	fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
 	                                           // vcf_envdecay is now adjusted for both
 	                                           // sampling rate and ENVINC
@@ -444,7 +444,7 @@ void lb302Synth::recalcFilter()
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
 	// right now.   Should be toggled by LB_24_RES_TRICK at the moment.
 
-	/*kfcn = 2.0 * (((vcf_cutoff*3000))) / engine::mixer()->processingSampleRate();
+	/*kfcn = 2.0 * (((vcf_cutoff*3000))) / engine::audioEngine()->processingSampleRate();
 	kp   = ((-2.7528*kfcn + 3.0429)*kfcn + 1.718)*kfcn - 0.9984;
 	kp1  = kp+1.0;
 	kp1h = 0.5*kp1;
@@ -455,12 +455,12 @@ void lb302Synth::recalcFilter()
 }
 
 inline float GET_INC(float freq) {
-	return freq/Engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
+	return freq/Engine::audioEngine()->processingSampleRate();  // TODO: Use actual sampling rate.
 }
 
 int lb302Synth::process(sampleFrame *outbuf, const int size)
 {
-	const float sampleRatio = 44100.f / Engine::mixer()->processingSampleRate();
+	const float sampleRatio = 44100.f / Engine::audioEngine()->processingSampleRate();
 	float w;
 	float samp;
 
@@ -635,7 +635,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 		// Handle Envelope
 		if(vca_mode==attack) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
-			if(sample_cnt>=0.5*Engine::mixer()->processingSampleRate())
+			if(sample_cnt>=0.5*Engine::audioEngine()->processingSampleRate())
 				vca_mode = idle;
 		}
 		else if(vca_mode == decay) {
@@ -787,10 +787,10 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 	};
 	m_notesMutex.unlock();
 	
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 
 	process( _working_buffer, frames );
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 //	release_frame = 0; //removed for issue # 1432
 }
 
@@ -801,7 +801,7 @@ void lb302Synth::deleteNotePluginData( NotePlayHandle * _n )
 	//printf("GONE\n");
 	if( m_playingNote == _n )
 	{
-		m_playingNote = NULL;
+		m_playingNote = nullptr;
 	}
 }
 

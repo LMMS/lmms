@@ -39,17 +39,17 @@ public:
 			const ch_cnt_t channels,
 			bool & successful,
 			const QString & file,
-			Mixer* mixer );
+			AudioEngine* audioEngine );
 	virtual ~AudioFileWave();
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
 					  const ch_cnt_t channels,
-					  Mixer* mixer,
+					  AudioEngine* audioEngine,
 					  bool & successful )
 	{
 		return new AudioFileWave( outputSettings, channels, successful,
-					  outputFilename, mixer );
+					  outputFilename, audioEngine );
 	}
 
 

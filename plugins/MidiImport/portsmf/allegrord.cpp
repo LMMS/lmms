@@ -167,7 +167,7 @@ bool Alg_reader::parse()
         double new_pitch = 0.0;
         bool new_key_flag = false;   // "K" syntax
         int new_key = 0;
-        Alg_parameters_ptr attributes = NULL;
+        Alg_parameters_ptr attributes = nullptr;
         if (line_parser.peek() == '#') {
             // look for #track
             line_parser.get_nonspace_quoted(field);
@@ -299,7 +299,7 @@ bool Alg_reader::parse()
                     if (parse_attribute(field, &parm)) { // enter attribute-value pair
                         attributes = new Alg_parameters(attributes);
                         attributes->parm = parm;
-                        parm.s = NULL; // protect string from deletion by destructor
+                        parm.s = nullptr; // protect string from deletion by destructor
                     }
                 } else {
                     parse_error(field, 0, "Unknown field");
@@ -397,7 +397,7 @@ bool Alg_reader::parse()
                             seq->add_event(new_upd, track_num);
                             Alg_parameters_ptr p = attributes;
                             attributes = attributes->next;
-                            p->parm.s = NULL; // so we don't delete the string
+                            p->parm.s = nullptr; // so we don't delete the string
                             delete p;
                         }
                     }
@@ -588,7 +588,7 @@ struct loud_lookup_struct {
     int val;
 } loud_lookup[] = { {"FFF", 127}, {"FF", 120}, {"F", 110}, {"MF", 100}, 
                     {"MP", 90}, {"P", 80}, {"PP", 70}, {"PPP", 60}, 
-                    {NULL, 0} };
+                    {nullptr, 0} };
 
 
 double Alg_reader::parse_loud(string &field)

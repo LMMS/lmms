@@ -104,8 +104,8 @@ private:
 public slots:
 	void renameChannel();
 	void resetColor();
-	void changeColor();
-	void randomColor();
+	void selectColor();
+	void randomizeColor();
 
 private slots:
 	void renameFinished();

@@ -36,14 +36,14 @@
 #include "zynaddsubfx/src/Misc/Dump.h"
 
 
-SYNTH_T* synth = NULL;
+SYNTH_T* synth = nullptr;
 
 int LocalZynAddSubFx::s_instanceCount = 0;
 
 
 LocalZynAddSubFx::LocalZynAddSubFx() :
-	m_master( NULL ),
-	m_ioEngine( NULL )
+	m_master( nullptr ),
+	m_ioEngine( nullptr )
 {
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -66,7 +66,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 		synth->oscilsize = config.cfg.OscilSize;
 		synth->alias();
 
-		srand( time( NULL ) );
+		srand( time( nullptr ) );
 
 		denormalkillbuf = new float[synth->buffersize];
 		for( int i = 0; i < synth->buffersize; ++i )
@@ -195,7 +195,7 @@ void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 
 void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 {
-	if( config.workingDir != NULL )
+	if( config.workingDir != nullptr )
 	{
 		free( config.workingDir );
 	}

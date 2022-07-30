@@ -72,7 +72,7 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC( frame, maxDelay );
+		m_buffer = MM_ALLOC<frame>(maxDelay );
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedback()
@@ -85,7 +85,7 @@ public:
 		if( maxDelay > m_size )
 		{
 			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC( frame, maxDelay );
+			m_buffer = MM_ALLOC<frame>( maxDelay );
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -143,7 +143,7 @@ class CombFeedfwd
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC( frame, maxDelay );
+		m_buffer = MM_ALLOC<frame>( maxDelay );
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedfwd()
@@ -156,7 +156,7 @@ class CombFeedfwd
 		if( maxDelay > m_size )
 		{
 			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC( frame, maxDelay );
+			m_buffer = MM_ALLOC<frame>( maxDelay );
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -214,7 +214,7 @@ class CombFeedbackDualtap
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC( frame, maxDelay );
+		m_buffer = MM_ALLOC<frame>( maxDelay );
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~CombFeedbackDualtap()
@@ -227,7 +227,7 @@ class CombFeedbackDualtap
 		if( maxDelay > m_size )
 		{
 			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC( frame, maxDelay );
+			m_buffer = MM_ALLOC<frame>( maxDelay );
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;
@@ -295,7 +295,7 @@ public:
 		m_delay( 0 ),
 		m_fraction( 0.0 )
 	{
-		m_buffer = MM_ALLOC( frame, maxDelay );
+		m_buffer = MM_ALLOC<frame>( maxDelay );
 		memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 	}
 	virtual ~AllpassDelay()
@@ -308,7 +308,7 @@ public:
 		if( maxDelay > m_size )
 		{
 			MM_FREE( m_buffer );
-			m_buffer = MM_ALLOC( frame, maxDelay );
+			m_buffer = MM_ALLOC<frame>( maxDelay );
 			memset( m_buffer, 0, sizeof( frame ) * maxDelay );
 		}
 		m_size = maxDelay;

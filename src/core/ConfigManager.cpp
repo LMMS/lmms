@@ -40,7 +40,8 @@
 
 // Vector with all the upgrade methods
 const std::vector<ConfigManager::UpgradeMethod> ConfigManager::UPGRADE_METHODS = {
-	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91
+	&ConfigManager::upgrade_1_1_90    ,    &ConfigManager::upgrade_1_1_91,
+	&ConfigManager::upgrade_1_2_2
 };
 
 static inline QString ensureTrailingSlash(const QString & s )
@@ -53,7 +54,7 @@ static inline QString ensureTrailingSlash(const QString & s )
 }
 
 
-ConfigManager * ConfigManager::s_instanceOfMe = NULL;
+ConfigManager * ConfigManager::s_instanceOfMe = nullptr;
 
 
 ConfigManager::ConfigManager() :
@@ -119,16 +120,35 @@ void ConfigManager::upgrade_1_1_90()
 	}
 }
 
-	
 void ConfigManager::upgrade_1_1_91()
 {
 	// rename displaydbv to displaydbfs
-	if (!value("app", "displaydbv").isNull()) {
+	if (!value("app", "displaydbv").isNull())
+	{
 		setValue("app", "displaydbfs", value("app", "displaydbv"));
 		deleteValue("app", "displaydbv");
 	}
 }
 
+void ConfigManager::upgrade_1_2_2()
+{
+	// Since mixer has been renamed to audioengine, we need to transfer the
+	// attributes from the old element to the new one
+	std::vector<QString> attrs = {
+		"audiodev", "mididev", "framesperaudiobuffer", "hqaudio", "samplerate"
+	};
+
+	for (auto attr : attrs)
+	{
+		if (!value("mixer", attr).isNull())
+		{
+			setValue("audioengine", attr, value("mixer", attr));
+			deleteValue("mixer", attr);
+		}
+	}
+
+	m_settings.remove("mixer");
+}
 
 void ConfigManager::upgrade()
 {
@@ -139,7 +159,8 @@ void ConfigManager::upgrade()
 	}
 
 	// Runs all necessary upgrade methods
-	std::for_each( UPGRADE_METHODS.begin() + m_configVersion, UPGRADE_METHODS.end(),
+	std::size_t max = std::min(static_cast<std::size_t>(m_configVersion), UPGRADE_METHODS.size());
+	std::for_each( UPGRADE_METHODS.begin() + max, UPGRADE_METHODS.end(),
 		[this](UpgradeMethod um)
 		{
 			(this->*um)();
@@ -493,9 +514,9 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
-		else if(gui)
+		else if(getGUI() != nullptr)
 		{
-			QMessageBox::warning(NULL, MainWindow::tr("Configuration file"),
+			QMessageBox::warning(nullptr, MainWindow::tr("Configuration file"),
 									MainWindow::tr("Error while parsing configuration file at line %1:%2: %3").
 													arg(errorLine).
 													arg(errorCol).
@@ -622,9 +643,9 @@ void ConfigManager::saveConfigFile()
 					"the directory containing the "
 					"file and try again!"
 						).arg(m_lmmsRcFile);
-		if(gui)
+		if(getGUI() != nullptr)
 		{
-			QMessageBox::critical(NULL, title, message,
+			QMessageBox::critical(nullptr, title, message,
 						QMessageBox::Ok,
 						QMessageBox::NoButton);
 		}

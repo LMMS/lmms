@@ -40,7 +40,7 @@
 #include "SongEditor.h"
 
 
-QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
+QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 			Song::PlayPos & pos, const TimePos & begin, Song::PlayModes mode,
@@ -66,14 +66,14 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_begin( begin ),
 	m_mode( mode ),
 	m_savedPos( -1 ),
-	m_hint( NULL ),
+	m_hint( nullptr ),
 	m_action( NoAction ),
 	m_moveXOff( 0 )
 {
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerBar;
 
-	if( s_posMarkerPixmap == NULL )
+	if( s_posMarkerPixmap == nullptr )
 	{
 		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
 							"playpos_marker" ) );
@@ -100,9 +100,9 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 
 TimeLineWidget::~TimeLineWidget()
 {
-	if( gui->songEditor() )
+	if( getGUI()->songEditor() )
 	{
-		m_pos.m_timeLine = NULL;
+		m_pos.m_timeLine = nullptr;
 	}
 	delete m_hint;
 }
@@ -238,7 +238,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.fillRect( 0, 0, width(), height(), p.background() );
 
 	// Clip so that we only draw everything starting from the offset
-	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
+	const int leftMargin = m_xOffset + s_posMarkerPixmap->width() / 2;
+	p.setClipRect(leftMargin, 0, width() - leftMargin, height() );
 
 	// Draw the loop rectangle
 	int const & loopRectMargin = getLoopRectangleVerticalPadding();
@@ -296,9 +297,14 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( innerRectangle );
 
-	// Draw the position marker
-	p.setOpacity( 0.6 );
-	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap );
+	// Only draw the position marker if the position line is in view
+	if (m_posMarkerX >= m_xOffset && m_posMarkerX < width() - s_posMarkerPixmap->width() / 2)
+	{
+		// Let the position marker extrude to the left
+		p.setClipping(false);
+		p.setOpacity(0.6);
+		p.drawPixmap(m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap);
+	}
 }
 
 
@@ -392,7 +398,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;
-				m_hint = NULL;
+				m_hint = nullptr;
 				m_loopPos[i] = t;
 			}
 			else
@@ -431,7 +437,7 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 {
 	delete m_hint;
-	m_hint = NULL;
+	m_hint = nullptr;
 	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
 	m_action = NoAction;
 }

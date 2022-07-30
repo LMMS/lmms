@@ -186,6 +186,11 @@ public:
 	{
 		return m_hasColor;
 	}
+
+	bool isMutedBeforeSolo() const
+	{
+		return m_mutedBeforeSolo;
+	}
 	
 	BoolModel* getMutedModel();
 
@@ -196,10 +201,15 @@ public slots:
 		emit nameChanged();
 	}
 
+	void setMutedBeforeSolo(const bool muted)
+	{
+		m_mutedBeforeSolo = muted;
+	}
+
 	void toggleSolo();
 
-	void trackColorChanged( QColor & c );
-	void trackColorReset();
+	void setColor(const QColor& c);
+	void resetColor();
 
 private:
 	TrackContainer* m_trackContainer;
@@ -209,6 +219,7 @@ private:
 
 protected:
 	BoolModel m_mutedModel;
+
 private:
 	BoolModel m_soloModel;
 	bool m_mutedBeforeSolo;
@@ -229,7 +240,7 @@ signals:
 	void destroyedTrack();
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
-
+	void colorChanged();
 } ;
 
 

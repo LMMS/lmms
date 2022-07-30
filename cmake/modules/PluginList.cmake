@@ -30,6 +30,7 @@ SET(LMMS_PLUGIN_LIST
 	carlabase
 	carlapatchbay
 	carlarack
+	Compressor
 	CrossoverEQ
 	Delay
 	DualFilter

@@ -199,7 +199,7 @@ void TrackContentWidget::update()
  */
 void TrackContentWidget::changePosition( const TimePos & newPos )
 {
-	if( m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView() )
+	if( m_trackView->trackContainerView() == getGUI()->getBBEditor()->trackContainerView() )
 	{
 		const int curBB = Engine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled( false );
@@ -473,11 +473,11 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
 	// onto their final position.
 
-	float snapSize = gui->songEditor()->m_editor->getSnapSize();
+	float snapSize = getGUI()->songEditor()->m_editor->getSnapSize();
 	// All patterns should be offset the same amount as the grabbed pattern
 	TimePos offset = TimePos(tcoPos - grabbedTCOPos);
 	// Users expect clips to "fall" backwards, so bias the offset
-	offset = offset - TimePos::ticksPerBar() * snapSize / 2;
+	offset -= TimePos::ticksPerBar() * snapSize / 2;
 	// The offset is quantized (rather than the positions) to preserve fine adjustments
 	offset = offset.quantize(snapSize);
 
@@ -507,8 +507,8 @@ bool TrackContentWidget::pasteSelection( TimePos tcoPos, const QMimeData * md, b
 		// The new position is the old position plus the offset.
 		TimePos pos = tcoElement.attributeNode( "pos" ).value().toInt() + offset;
 		// If we land on ourselves, offset by one snap
-		TimePos shift = TimePos::ticksPerBar() * gui->songEditor()->m_editor->getSnapSize();
-		if (offset == 0) { pos += shift; }
+		TimePos shift = TimePos::ticksPerBar() * getGUI()->songEditor()->m_editor->getSnapSize();
+		if (offset == 0 && initialTrackIndex == currentTrackIndex) { pos += shift; }
 
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
@@ -547,14 +547,22 @@ void TrackContentWidget::dropEvent( QDropEvent * de )
  */
 void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 {
+	// Enable box select if control is held when clicking an empty space
+	// (If we had clicked a TCO it would have intercepted the mouse event)
+	if( me->modifiers() & Qt::ControlModifier ){
+		getGUI()->songEditor()->m_editor->setEditMode(SongEditor::EditMode::SelectMode);
+	}
+	// Forward event to allow box select if the editor supports it and is in that mode
 	if( m_trackView->trackContainerView()->allowRubberband() == true )
 	{
 		QWidget::mousePressEvent( me );
 	}
+	// Forward shift clicks so tracks can be resized
 	else if( me->modifiers() & Qt::ShiftModifier )
 	{
 		QWidget::mousePressEvent( me );
 	}
+	// For an unmodified click, create a new TCO
 	else if( me->button() == Qt::LeftButton &&
 			!m_trackView->trackContainerView()->fixedTCOs() )
 	{
@@ -573,6 +581,15 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 
 
 
+void TrackContentWidget::mouseReleaseEvent( QMouseEvent * me )
+{
+	getGUI()->songEditor()->syncEditMode();
+	QWidget::mouseReleaseEvent(me);
+}
+
+
+
+
 /*! \brief Repaint the trackContentWidget on command
  *
  * \param pe the Paint Event to respond to
@@ -584,7 +601,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 	int ppb = static_cast<int>( tcv->pixelsPerBar() );
 	QPainter p( this );
 	// Don't draw background on BB-Editor
-	if( m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView() )
+	if( m_trackView->trackContainerView() != getGUI()->getBBEditor()->trackContainerView() )
 	{
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getBar() * ppb, 0 ) );
@@ -707,4 +724,3 @@ void TrackContentWidget::setGridColor( const QBrush & c )
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
-

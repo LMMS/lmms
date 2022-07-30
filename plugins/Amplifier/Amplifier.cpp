@@ -40,8 +40,8 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }

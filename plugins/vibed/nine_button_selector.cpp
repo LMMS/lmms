@@ -52,13 +52,13 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 					int _x, int _y,
 					QWidget * _parent ):
 	QWidget( _parent ),
-	IntModelView( new nineButtonSelectorModel(0, 8, _default, NULL,
+	IntModelView( new nineButtonSelectorModel(0, 8, _default, nullptr,
 				QString(), true ), this )
 {
 	setFixedSize( 50, 50 );
 	move( _x, _y );
 
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 1, 1 );
 	m_button->setActiveGraphic( _button0_on );
 	m_button->setInactiveGraphic( _button0_off );
@@ -67,7 +67,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button0Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 18, 1 );
 	m_button->setActiveGraphic( _button1_on );
 	m_button->setInactiveGraphic( _button1_off );
@@ -76,7 +76,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button1Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 35, 1 );
 	m_button->setActiveGraphic( _button2_on );
 	m_button->setInactiveGraphic( _button2_off );
@@ -85,7 +85,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button2Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 1, 18 );
 	m_button->setActiveGraphic( _button3_on );
 	m_button->setInactiveGraphic( _button3_off );
@@ -94,7 +94,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button3Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 18, 18 );
 	m_button->setActiveGraphic( _button4_on );
 	m_button->setInactiveGraphic( _button4_off );
@@ -103,7 +103,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button4Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 35, 18 );
 	m_button->setActiveGraphic( _button5_on );
 	m_button->setInactiveGraphic( _button5_off );
@@ -112,7 +112,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button5Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 1, 35 );
 	m_button->setActiveGraphic( _button6_on );
 	m_button->setInactiveGraphic( _button6_off );
@@ -121,7 +121,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button6Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 18, 35 );
 	m_button->setActiveGraphic( _button7_on );
 	m_button->setInactiveGraphic( _button7_off );
@@ -130,7 +130,7 @@ nineButtonSelector::nineButtonSelector(	QPixmap _button0_on,
 		 this, SLOT ( button7Clicked() ) );
 	m_buttons.append( m_button );
 	
-	m_button = new PixmapButton( this, NULL );
+	m_button = new PixmapButton( this, nullptr );
 	m_button->move( 35, 35 );
 	m_button->setActiveGraphic( _button8_on );
 	m_button->setInactiveGraphic( _button8_off );

@@ -37,7 +37,7 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 		int _height ) :
 	QWidget( _parent ),
 	/* TODO: size, background? */
-	ModelView( new graphModel( -1.0, 1.0, 128, NULL, true ), this ),
+	ModelView( new graphModel( -1.0, 1.0, 128, nullptr, true ), this ),
 	m_graphStyle( _style )
 {
 	m_mouseDown = false;

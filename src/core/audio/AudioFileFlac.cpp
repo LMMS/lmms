@@ -29,10 +29,10 @@
 
 #include "AudioFileFlac.h"
 #include "endian_handling.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 
-AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, Mixer* mixer):
-	AudioFileDevice(outputSettings,channels,file,mixer),
+AudioFileFlac::AudioFileFlac(OutputSettings const& outputSettings, ch_cnt_t const channels, bool& successful, QString const& file, AudioEngine* audioEngine):
+	AudioFileDevice(outputSettings,channels,file,audioEngine),
 	m_sf(nullptr)
 {
 	successful = outputFileOpened() && startEncoding();
@@ -47,7 +47,7 @@ bool AudioFileFlac::startEncoding()
 {
 	m_sfinfo.samplerate=sampleRate();
 	m_sfinfo.channels=channels();
-	m_sfinfo.frames = mixer()->framesPerPeriod();
+	m_sfinfo.frames = audioEngine()->framesPerPeriod();
 	m_sfinfo.sections=1;
 	m_sfinfo.seekable=0;
 

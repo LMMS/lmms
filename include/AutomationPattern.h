@@ -30,6 +30,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
 
+#include "AutomationNode.h"
 #include "TrackContentObject.h"
 
 
@@ -49,8 +50,10 @@ public:
 		CubicHermiteProgression
 	} ;
 
-	typedef QMap<int, float> timeMap;
-	typedef QVector<QPointer<AutomatableModel> > objectVector;
+	typedef QMap<int, AutomationNode> timeMap;
+	typedef QVector<QPointer<AutomatableModel>> objectVector;
+
+	using TimemapIterator = timeMap::const_iterator;
 
 	AutomationPattern( AutomationTrack * _auto_track );
 	AutomationPattern( const AutomationPattern & _pat_to_copy );
@@ -77,12 +80,25 @@ public:
 	TimePos timeMapLength() const;
 	void updateLength();
 
-	TimePos putValue( const TimePos & time,
-				const float value,
-				const bool quantPos = true,
-				const bool ignoreSurroundingPoints = true );
+	TimePos putValue(
+		const TimePos & time,
+		const float value,
+		const bool quantPos = true,
+		const bool ignoreSurroundingPoints = true
+	);
 
-	void removeValue( const TimePos & time );
+	TimePos putValues(
+		const TimePos & time,
+		const float inValue,
+		const float outValue,
+		const bool quantPos = true,
+		const bool ignoreSurroundingPoints = true
+	);
+
+	void removeNode(const TimePos & time);
+	void removeNodes(const int tick0, const int tick1);
+
+	void resetNodes(const int tick0, const int tick1);
 
 	void recordValue(TimePos time, float value);
 
@@ -107,16 +123,6 @@ public:
 	inline timeMap & getTimeMap()
 	{
 		return m_timeMap;
-	}
-
-	inline const timeMap & getTangents() const
-	{
-		return m_tangents;
-	}
-
-	inline timeMap & getTangents()
-	{
-		return m_tangents;
 	}
 
 	inline float getMin() const
@@ -170,21 +176,26 @@ public slots:
 private:
 	void cleanObjects();
 	void generateTangents();
-	void generateTangents( timeMap::const_iterator it, int numToGenerate );
+	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
+
+	// Mutex to make methods involving automation patterns thread safe
+	// Mutable so we can lock it from const objects
+	mutable QMutex m_patternMutex;
 
 	AutomationTrack * m_autoTrack;
 	QVector<jo_id_t> m_idsToResolve;
 	objectVector m_objects;
 	timeMap m_timeMap;	// actual values
 	timeMap m_oldTimeMap;	// old values for storing the values before setDragValue() is called.
-	timeMap m_tangents;	// slope at each point for calculating spline
 	float m_tension;
 	bool m_hasAutomation;
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
-	
+	bool m_dragKeepOutValue; // Should we keep the current dragged node's outValue?
+	float m_dragOutValue; // The outValue of the dragged node's
+
 	bool m_isRecording;
 	float m_lastRecordedValue;
 
@@ -194,8 +205,41 @@ private:
 	static const float DEFAULT_MAX_VALUE;
 
 	friend class AutomationPatternView;
+	friend class AutomationNode;
 
 } ;
 
+//Short-hand functions to access node values in an automation pattern;
+// replacement for CPP macros with the same purpose; could be refactored
+// further in the future.
+inline float INVAL(AutomationPattern::TimemapIterator it)
+{
+	return it->getInValue();
+}
+
+inline float OUTVAL(AutomationPattern::TimemapIterator it)
+{
+	return it->getOutValue();
+}
+
+inline float OFFSET(AutomationPattern::TimemapIterator it)
+{
+	return it->getValueOffset();
+}
+
+inline float INTAN(AutomationPattern::TimemapIterator it)
+{
+	return it->getInTangent();
+}
+
+inline float OUTTAN(AutomationPattern::TimemapIterator it)
+{
+	return it->getOutTangent();
+}
+
+inline int POS(AutomationPattern::TimemapIterator it)
+{
+	return it.key();
+}
 
 #endif

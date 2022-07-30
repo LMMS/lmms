@@ -55,8 +55,8 @@ bool FxLine::eventFilter( QObject *dist, QEvent *event )
 }
 
 const int FxLine::FxLineHeight = 287;
-QPixmap * FxLine::s_sendBgArrow = NULL;
-QPixmap * FxLine::s_receiveBgArrow = NULL;
+QPixmap * FxLine::s_sendBgArrow = nullptr;
+QPixmap * FxLine::s_receiveBgArrow = nullptr;
 
 FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	QWidget( _parent ),
@@ -207,8 +207,8 @@ QString FxLine::elideName( const QString & name )
 
 void FxLine::paintEvent( QPaintEvent * )
 {
-	bool sendToThis = Engine::fxMixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
-	bool receiveFromThis = Engine::fxMixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
+	bool sendToThis = Engine::fxMixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != nullptr;
+	bool receiveFromThis = Engine::fxMixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != nullptr;
 	QPainter painter;
 	painter.begin( this );
 	drawFxLine( &painter, this, m_mv->currentFxLine() == this, sendToThis, receiveFromThis );
@@ -252,9 +252,14 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 	}
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Set channel color" ), this, SLOT( changeColor() ) );
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Remove channel color" ), this, SLOT( resetColor() ) );
-	contextMenu->addAction( embed::getIconPixmap( "colorize" ), tr( "Pick random channel color" ), this, SLOT( randomColor() ) );
+
+	QMenu colorMenu(tr("Color"), this);
+	colorMenu.setIcon(embed::getIconPixmap("colorize"));
+	colorMenu.addAction(tr("Change"), this, SLOT(selectColor()));
+	colorMenu.addAction(tr("Reset"), this, SLOT(resetColor()));
+	colorMenu.addAction(tr("Pick random"), this, SLOT(randomizeColor()));
+	contextMenu->addMenu(&colorMenu);
+
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
@@ -302,7 +307,7 @@ void FxLine::renameFinished()
 
 void FxLine::removeChannel()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->deleteChannel( m_channelIndex );
 }
 
@@ -311,7 +316,7 @@ void FxLine::removeChannel()
 
 void FxLine::removeUnusedChannels()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->deleteUnusedChannels();
 }
 
@@ -320,7 +325,7 @@ void FxLine::removeUnusedChannels()
 
 void FxLine::moveChannelLeft()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->moveChannelLeft( m_channelIndex );
 }
 
@@ -329,7 +334,7 @@ void FxLine::moveChannelLeft()
 
 void FxLine::moveChannelRight()
 {
-	FxMixerView * mix = gui->fxMixerView();
+	FxMixerView * mix = getGUI()->fxMixerView();
 	mix->moveChannelRight( m_channelIndex );
 }
 
@@ -415,12 +420,13 @@ void FxLine::setStrokeInnerInactive( const QColor & c )
 
 
 // Ask user for a color, and set it as the mixer line color
-void FxLine::changeColor()
+void FxLine::selectColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
 	if(!new_color.isValid()) { return; }
 	channel->setColor (new_color);
+	Engine::getSong()->setModified();
 	update();
 }
 
@@ -429,14 +435,16 @@ void FxLine::changeColor()
 void FxLine::resetColor()
 {
 	Engine::fxMixer()->effectChannel( m_channelIndex )->m_hasColor = false;
+	Engine::getSong()->setModified();
 	update();
 }
 
 
 // Pick a random color from the mixer palette and set it as our color
-void FxLine::randomColor()
+void FxLine::randomizeColor()
 {
 	auto channel = Engine::fxMixer()->effectChannel( m_channelIndex );
 	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	Engine::getSong()->setModified();
 	update();
 }

@@ -29,11 +29,11 @@
 #include <QCompleter>
 #include <QMessageBox>
 
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MainWindow.h"
 
 /* callback functions for jack */
@@ -56,14 +56,14 @@ static void JackMidiShutdown(void *arg)
 	QString msg_short = MidiJack::tr("JACK server down");
         //: When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)
 	QString msg_long = MidiJack::tr("The JACK server seems to be shuted down.");
-	QMessageBox::information( gui->mainWindow(), msg_short, msg_long );
+	QMessageBox::information( getGUI()->mainWindow(), msg_short, msg_long );
 }
 
 MidiJack::MidiJack() :
 	MidiClientRaw(),
 	m_jackClient( nullptr ),
-	m_input_port( NULL ),
-	m_output_port( NULL ),
+	m_input_port( nullptr ),
+	m_output_port( nullptr ),
 	m_quit( false )
 {
 	// if jack is currently used for audio then we share the connection
@@ -71,15 +71,15 @@ MidiJack::MidiJack() :
 	// and also handles the callback, we pass it our address
 	// so that we can also process during the callback
 
-	m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev());
+	m_jackAudio = dynamic_cast<AudioJack*>(Engine::audioEngine()->audioDev());
 	if( m_jackAudio )
 	{
 		// if a jack connection has been created for audio we use that
 		m_jackAudio->addMidiClient(this);
 	}else{
-		m_jackAudio = NULL;
+		m_jackAudio = nullptr;
 		m_jackClient = jack_client_open(probeDevice().toLatin1().data(),
-										JackNoStartServer, NULL);
+										JackNoStartServer, nullptr);
 
 		if(m_jackClient)
 		{
@@ -118,8 +118,10 @@ MidiJack::~MidiJack()
 {
 	if(jackClient())
 	{
-		// remove ourselves first (atomically), so we will not get called again
-		m_jackAudio->removeMidiClient();
+		if (m_jackAudio) {
+			// remove ourselves first (atomically), so we will not get called again
+			m_jackAudio->removeMidiClient();
+		}
 
 		if( jack_port_unregister( jackClient(), m_input_port) != 0){
 			printf("Failed to unregister jack midi input\n");
@@ -153,10 +155,10 @@ MidiJack::~MidiJack()
 
 jack_client_t* MidiJack::jackClient()
 {
-	if( m_jackAudio == NULL && m_jackClient == NULL)
-		return NULL;
+	if( m_jackAudio == nullptr && m_jackClient == nullptr)
+		return nullptr;
 
-	if( m_jackAudio == NULL && m_jackClient )
+	if( m_jackAudio == nullptr && m_jackClient )
 		return m_jackClient;
 
 	return m_jackAudio->jackClient();
@@ -186,7 +188,7 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 	{
 		for(i=0; i<nframes; i++)
 		{
-			if((in_event.time == i) && (event_index < event_count))
+			while((in_event.time == i) && (event_index < event_count))
 			{
 				// lmms is setup to parse bytes coming from a device
 				// parse it byte by byte as it expects

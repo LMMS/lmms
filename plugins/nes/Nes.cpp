@@ -25,13 +25,13 @@
 #include <QDomElement>
 
 #include "Nes.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
-#include "Mixer.h"
 #include "Oscillator.h"
 
 #include "embed.h"
@@ -50,8 +50,8 @@ Plugin::Descriptor PLUGIN_EXPORT nes_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -558,9 +558,9 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	const fpp_t frames = n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = n->noteOffset();
 	
-	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
+	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr )
 	{	
-		NesObject * nes = new NesObject( this, Engine::mixer()->processingSampleRate(), n );
+		NesObject * nes = new NesObject( this, Engine::audioEngine()->processingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
 	
@@ -727,7 +727,7 @@ void NesInstrument::updateFreq3()
 
 
 
-QPixmap * NesInstrumentView::s_artwork = NULL;
+QPixmap * NesInstrumentView::s_artwork = nullptr;
 
 
 NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent ) :
@@ -736,7 +736,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 	setAutoFillBackground( true );
 	QPalette pal;
 
-	if( s_artwork == NULL )
+	if( s_artwork == nullptr )
 	{
 		s_artwork = new QPixmap( PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	}

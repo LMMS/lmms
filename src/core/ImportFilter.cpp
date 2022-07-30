@@ -37,7 +37,7 @@ using std::unique_ptr;
 
 ImportFilter::ImportFilter( const QString & _file_name,
 							const Descriptor * _descriptor ) :
-	Plugin( _descriptor, NULL ),
+	Plugin( _descriptor, nullptr ),
 	m_file( _file_name )
 {
 }
@@ -64,10 +64,10 @@ void ImportFilter::import( const QString & _file_to_import,
 	const bool j = Engine::projectJournal()->isJournalling();
 	Engine::projectJournal()->setJournalling( false );
 
-	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::ImportFilter))
+	for (const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::ImportFilter))
 	{
-		unique_ptr<Plugin> p(Plugin::instantiate( desc->name, NULL, s.data() ));
-		if( dynamic_cast<ImportFilter *>( p.get() ) != NULL &&
+		unique_ptr<Plugin> p(Plugin::instantiate( desc->name, nullptr, s.data() ));
+		if( dynamic_cast<ImportFilter *>( p.get() ) != nullptr &&
 			dynamic_cast<ImportFilter *>( p.get() )->tryImport( tc ) )
 		{
 			successful = true;
@@ -79,7 +79,7 @@ void ImportFilter::import( const QString & _file_to_import,
 
 	if( successful == false )
 	{
-		QMessageBox::information( NULL,
+		QMessageBox::information( nullptr,
 			TrackContainer::tr( "Couldn't import file" ),
 			TrackContainer::tr( "Couldn't find a filter for "
 						"importing file %1.\n"
@@ -99,7 +99,7 @@ bool ImportFilter::openFile()
 {
 	if( m_file.open( QFile::ReadOnly ) == false )
 	{
-		QMessageBox::critical( NULL,
+		QMessageBox::critical( nullptr,
 			TrackContainer::tr( "Couldn't open file" ),
 			TrackContainer::tr( "Couldn't open file %1 "
 						"for reading.\nPlease make "

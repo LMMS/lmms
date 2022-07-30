@@ -34,7 +34,7 @@ namespace base64
 
 QVariant decode( const QString & _b64, QVariant::Type _force_type )
 {
-	char * dst = NULL;
+	char * dst = nullptr;
 	int dsize = 0;
 	base64::decode( _b64, &dst, &dsize );
 	QByteArray ba( dst, dsize );

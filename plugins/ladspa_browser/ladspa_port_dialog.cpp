@@ -28,10 +28,10 @@
 #include <QLayout>
 #include <QTableWidget>
 
+#include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
-#include "Mixer.h"
 
 
 ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
@@ -87,11 +87,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= Engine::mixer()->processingSampleRate();
+				min *= Engine::audioEngine()->processingSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= Engine::mixer()->processingSampleRate();
+				max *= Engine::audioEngine()->processingSampleRate();
 			}
 		}
 

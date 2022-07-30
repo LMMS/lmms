@@ -59,7 +59,7 @@ static const Piano::KeyTypes KEY_ORDER[] =
  *  \param _it the InstrumentTrack window to attach to
  */
 Piano::Piano( InstrumentTrack* track ) :
-	Model( NULL ),              /*!< base class ctor */
+	Model( nullptr ),              /*!< base class ctor */
 	m_instrumentTrack( track ),
 	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
 {

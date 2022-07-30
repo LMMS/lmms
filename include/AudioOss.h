@@ -43,7 +43,7 @@ class AudioOss : public QThread, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioOss( bool & _success_ful, Mixer* mixer );
+	AudioOss( bool & _success_ful, AudioEngine* audioEngine );
 	virtual ~AudioOss();
 
 	inline static QString name()

@@ -44,7 +44,7 @@ public:
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( channel ),
-		m_sysExData( NULL ),
+		m_sysExData( nullptr ),
 		m_sourcePort(sourcePort),
 		m_source(source)
 	{

@@ -67,9 +67,9 @@ StringPairDrag::~StringPairDrag()
 {
 	// during a drag, we might have lost key-press-events, so reset
 	// modifiers of main-win
-	if( gui->mainWindow() )
+	if( getGUI()->mainWindow() )
 	{
-		gui->mainWindow()->clearKeyModifiers();
+		getGUI()->mainWindow()->clearKeyModifiers();
 	}
 }
 
