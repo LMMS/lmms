@@ -49,6 +49,6 @@ int main(int argc, char* argv[])
 		qDebug() << "<<" << rc << "out of"<<numsuites<<"test suites failed.";
 	}
 
-	Engine::destroy();
+	lmms::Engine::destroy();
 	return rc;
 }
