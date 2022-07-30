@@ -28,28 +28,22 @@
 #include "PlayHandle.h"
 #include "Instrument.h"
 #include "NotePlayHandle.h"
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT InstrumentPlayHandle : public PlayHandle
+namespace lmms
+{
+
+class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
 
-	virtual ~InstrumentPlayHandle()
-	{
-	}
+	~InstrumentPlayHandle() override = default;
 
 
-	virtual void play( sampleFrame * _working_buffer )
+	void play( sampleFrame * _working_buffer ) override
 	{
-		// if the instrument is midi-based, we can safely render right away
-		if( m_instrument->flags() & Instrument::IsMidiBased )
-		{
-			m_instrument->play( _working_buffer );
-			return;
-		}
-		
-		// if not, we need to ensure that all our nph's have been processed first
+		// ensure that all our nph's have been processed first
 		ConstNotePlayHandleList nphv = NotePlayHandle::nphsOfInstrumentTrack( m_instrument->instrumentTrack(), true );
 		
 		bool nphsLeft;
@@ -59,7 +53,8 @@ public:
 			for( const NotePlayHandle * constNotePlayHandle : nphv )
 			{
 				NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>( constNotePlayHandle );
-				if( notePlayHandle->state() != ThreadableJob::Done && ! notePlayHandle->isFinished() )
+				if( notePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
+					!notePlayHandle->isFinished())
 				{
 					nphsLeft = true;
 					notePlayHandle->process();
@@ -71,12 +66,12 @@ public:
 		m_instrument->play( _working_buffer );
 	}
 
-	virtual bool isFinished() const
+	bool isFinished() const override
 	{
 		return false;
 	}
 
-	virtual bool isFromTrack( const Track* _track ) const
+	bool isFromTrack( const Track* _track ) const override
 	{
 		return m_instrument->isFromTrack( _track );
 	}
@@ -86,5 +81,8 @@ private:
 	Instrument* m_instrument;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

@@ -28,11 +28,16 @@
 
 #include "lmms_math.h"
 
+
+namespace lmms
+{
+
+
 class RmsHelper
 {
 public:
 	RmsHelper( int size ) :
-		m_buffer( NULL )
+		m_buffer( nullptr )
 	{
 		setSize( size );
 	}
@@ -90,5 +95,7 @@ private:
 	float m_sizef;
 };
 
+
+} // namespace lmms
 
 #endif

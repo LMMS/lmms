@@ -36,13 +36,15 @@
 #define __USE_XOPEN
 #endif
 
-#include <math.h>
+#include <cmath>
 
 #include "lmms_basics.h"
-#include "templates.h"
 #include "lmms_constants.h"
 #include "interpolation.h"
 #include "MemoryManager.h"
+
+namespace lmms
+{
 
 template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS> class BasicFilters;
 
@@ -56,7 +58,7 @@ public:
 		m_sampleRate = sampleRate;
 		clearHistory();
 	}
-	virtual ~LinkwitzRiley() {}
+	virtual ~LinkwitzRiley() = default;
 
 	inline void clearHistory()
 	{
@@ -136,10 +138,10 @@ private:
 	double m_a, m_a0, m_a1, m_a2;
 	double m_b1, m_b2, m_b3, m_b4;
 	
-	typedef double frame[CHANNELS];
+	using frame = std::array<double, CHANNELS>;
 	frame m_z1, m_z2, m_z3, m_z4;
 };
-typedef LinkwitzRiley<2> StereoLinkwitzRiley;
+using StereoLinkwitzRiley = LinkwitzRiley<2>;
 
 template<ch_cnt_t CHANNELS>
 class BiQuad
@@ -150,7 +152,7 @@ public:
 	{
 		clearHistory();
 	}
-	virtual ~BiQuad() {}
+	virtual ~BiQuad() = default;
 	
 	inline void setCoeffs( float a1, float a2, float b0, float b1, float b2 )
 	{
@@ -182,7 +184,7 @@ private:
 	
 	friend class BasicFilters<CHANNELS>; // needed for subfilter stuff in BasicFilters
 };
-typedef BiQuad<2> StereoBiQuad;
+using StereoBiQuad = BiQuad<2>;
 
 template<ch_cnt_t CHANNELS>
 class OnePole
@@ -198,7 +200,7 @@ public:
 			m_z1[i] = 0.0;
 		}
 	}
-	virtual ~OnePole() {}
+	virtual ~OnePole() = default;
 	
 	inline void setCoeffs( float a0, float b1 )
 	{
@@ -216,7 +218,7 @@ private:
 	float m_a0, m_b1; 
 	float m_z1 [CHANNELS];
 };
-typedef OnePole<2> StereoOnePole;
+using StereoOnePole = OnePole<2>;
 
 template<ch_cnt_t CHANNELS>
 class BasicFilters
@@ -274,7 +276,7 @@ public:
 		m_type = _idx == DoubleLowPass 
 			? LowPass
 			: Moog;
-		if( m_subFilter == NULL )
+		if( m_subFilter == nullptr )
 		{
 			m_subFilter = new BasicFilters<CHANNELS>(
 						static_cast<sample_rate_t>(
@@ -287,7 +289,7 @@ public:
 		m_doubleFilter( false ),
 		m_sampleRate( (float) _sample_rate ),
 		m_sampleRatio( 1.0f / m_sampleRate ),
-		m_subFilter( NULL )
+		m_subFilter( nullptr )
 	{
 		clearHistory();
 	}
@@ -887,7 +889,7 @@ private:
 	// coeffs for Lowpass_SV (state-variant lowpass)
 	float m_svf1, m_svf2, m_svq;
 
-	typedef sample_t frame[CHANNELS];
+	using frame = std::array<sample_t, CHANNELS>;
 
 	// in/out history for moog-filter
 	frame m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
@@ -913,5 +915,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

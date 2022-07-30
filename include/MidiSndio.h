@@ -30,25 +30,27 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QtCore/QThread>
-#include <QtCore/QFile>
-
-#include <sndio.h>
+#include <QThread>
 
 #include "MidiClient.h"
 
-class QLineEdit;
 
+struct mio_hdl;
 
-class MidiSndio : public MidiClientRaw, public QThread
+namespace lmms
 {
+
+
+class MidiSndio : public QThread, public MidiClientRaw
+{
+	Q_OBJECT
 public:
-	MidiSndio( void );
-	virtual ~MidiSndio();
+	MidiSndio();
+	~MidiSndio() override;
 
-	static QString probeDevice(void);
+	static QString probeDevice();
 
-	inline static QString name(void)
+	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP("MidiSetupWidget", "sndio MIDI");
 	}
@@ -60,13 +62,16 @@ public:
 
 
 protected:
-	virtual void sendByte(const unsigned char c);
-	virtual void run(void);
+	void sendByte(const unsigned char c) override;
+	void run() override;
 
 private:
-	struct mio_hdl *m_hdl;
+	mio_hdl *m_hdl;
 	volatile bool m_quit;
 } ;
+
+
+} // namespace lmms
 
 #endif	/* LMMS_HAVE_SNDIO */
 

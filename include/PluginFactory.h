@@ -26,35 +26,40 @@
 #define PLUGINFACTORY_H
 
 #include <memory>
+#include <string>
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QHash>
-#include <QtCore/QList>
+#include <QFileInfo>
+#include <QList>
+#include <QString>
+#include <QVector>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "Plugin.h"
 
 class QLibrary;
 
-class EXPORT PluginFactory
+namespace lmms
+{
+
+class LMMS_EXPORT PluginFactory
 {
 public:
 	struct PluginInfo
 	{
-		PluginInfo() : library(nullptr), descriptor(nullptr) {}
-
 		const QString name() const;
 		QFileInfo file;
-		std::shared_ptr<QLibrary> library;
-		Plugin::Descriptor* descriptor;
+		std::shared_ptr<QLibrary> library = nullptr;
+		Plugin::Descriptor* descriptor = nullptr;
 
 		bool isNull() const {return ! library;}
 	};
-	typedef QList<PluginInfo> PluginInfoList;
-	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
+	using PluginInfoList = QList<PluginInfo>;
+	using DescriptorMap = QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*>;
 
 	PluginFactory();
-	~PluginFactory();
+	~PluginFactory() = default;
+
+	static void setupSearchPaths();
 
 	/// Returns the singleton instance of PluginFactory. You won't need to call
 	/// this directly, use pluginFactory instead.
@@ -64,10 +69,17 @@ public:
 	const Plugin::DescriptorList descriptors() const;
 	const Plugin::DescriptorList descriptors(Plugin::PluginTypes type) const;
 
+	struct PluginInfoAndKey
+	{
+		PluginInfo info;
+		Plugin::Descriptor::SubPluginFeatures::Key key;
+		bool isNull() const { return info.isNull(); }
+	};
+
 	/// Returns a list of all found plugins' PluginFactory::PluginInfo objects.
 	const PluginInfoList& pluginInfos() const;
 	/// Returns a plugin that support the given file extension
-	const PluginInfo pluginSupportingExtension(const QString& ext);
+	const PluginInfoAndKey pluginSupportingExtension(const QString& ext);
 
 	/// Returns the PluginInfo object of the plugin with the given name.
 	/// If the plugin is not found, an empty PluginInfo is returned (use
@@ -84,13 +96,19 @@ public slots:
 private:
 	DescriptorMap m_descriptors;
 	PluginInfoList m_pluginInfos;
-	QMap<QString, PluginInfo> m_pluginByExt;
+
+	QMap<QString, PluginInfoAndKey> m_pluginByExt;
+	QVector<std::string> m_garbage; //!< cleaned up at destruction
 
 	QHash<QString, QString> m_errors;
 
 	static std::unique_ptr<PluginFactory> s_instance;
 };
 
-#define pluginFactory PluginFactory::instance()
+//Short-hand function
+LMMS_EXPORT PluginFactory* getPluginFactory();
+
+
+} // namespace lmms
 
 #endif // PLUGINFACTORY_H

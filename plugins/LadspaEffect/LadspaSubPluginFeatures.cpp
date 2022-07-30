@@ -30,15 +30,28 @@
 
 #include "LadspaSubPluginFeatures.h"
 #include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "Engine.h"
 #include "Ladspa2LMMS.h"
 #include "LadspaBase.h"
-#include "Mixer.h"
+
+namespace lmms
+{
 
 
 LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
 	SubPluginFeatures( _type )
 {
+}
+
+
+
+
+QString LadspaSubPluginFeatures::displayName(const Plugin::Descriptor::SubPluginFeatures::Key &k) const
+{
+	const ladspa_key_t & lkey = subPluginKeyToLadspaKey(&k);
+	Ladspa2LMMS * lm = Engine::getLADSPAManager();
+	return lm->getName(lkey);
 }
 
 
@@ -144,8 +157,7 @@ void LadspaSubPluginFeatures::listSubPluginKeys(
 	for( l_sortable_plugin_t::const_iterator it = plugins.begin();
 						it != plugins.end(); ++it )
 	{
-		if( lm->getDescription( ( *it ).second )->inputChannels <= 
-				  Engine::mixer()->audioDev()->channels() )
+		if( lm->getDescription( ( *it ).second )->inputChannels <= Engine::audioEngine()->audioDev()->channels() )
 		{
 			_kl.push_back( ladspaKeyToSubPluginKey( _desc, ( *it ).first, ( *it ).second ) );
 		}
@@ -169,3 +181,5 @@ ladspa_key_t LadspaSubPluginFeatures::subPluginKeyToLadspaKey(
 					, _key->attributes["plugin"] ) );
 }
 
+
+} // namespace lmms

@@ -26,19 +26,29 @@
 #ifndef MIDI_PORT_H
 #define MIDI_PORT_H
 
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QMap>
+#include <QString>
+#include <QList>
+#include <QMap>
 
 #include "Midi.h"
-#include "MidiTime.h"
+#include "TimePos.h"
 #include "AutomatableModel.h"
 
+namespace lmms
+{
 
 class MidiClient;
 class MidiEvent;
 class MidiEventProcessor;
+
+namespace gui
+{
+
 class MidiPortMenu;
+class ControllerConnectionDialog;
+class InstrumentMidiIOView;
+
+}
 
 
 // class for abstraction of MIDI-port
@@ -57,7 +67,7 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
 public:
-	typedef QMap<QString, bool> Map;
+	using Map = QMap<QString, bool>;
 
 	enum Modes
 	{
@@ -66,14 +76,14 @@ public:
 		Output,		// from MIDI-event-processor to MIDI-client
 		Duplex		// both directions
 	} ;
-	typedef Modes Mode;
+	using Mode = Modes;
 
 	MidiPort( const QString& name,
 			MidiClient* client,
 			MidiEventProcessor* eventProcessor,
-			Model* parent = NULL,
+			Model* parent = nullptr,
 			Mode mode = Disabled );
-	virtual ~MidiPort();
+	~MidiPort() override;
 
 	void setName( const QString& name );
 
@@ -96,17 +106,20 @@ public:
 
 	int realOutputChannel() const
 	{
-		return outputChannel() - 1;
+		// There's a possibility of outputChannel being 0 ("--"), which is used to keep all
+		// midi channels when forwarding. In that case, realOutputChannel will return the
+		// default channel 1 (whose value is 0).
+		return outputChannel() ? outputChannel() - 1 : 0;
 	}
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
-	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	void processInEvent( const MidiEvent& event, const TimePos& time = TimePos() );
+	void processOutEvent( const MidiEvent& event, const TimePos& time = TimePos() );
 
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& thisElement );
-	virtual void loadSettings( const QDomElement& thisElement );
+	void saveSettings( QDomDocument& doc, QDomElement& thisElement ) override;
+	void loadSettings( const QDomElement& thisElement ) override;
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "midiport";
 	}
@@ -124,8 +137,10 @@ public:
 		return m_writablePorts;
 	}
 
-	MidiPortMenu* m_readablePortsMenu;
-	MidiPortMenu* m_writablePortsMenu;
+	void invalidateCilent();
+
+	gui::MidiPortMenu* m_readablePortsMenu;
+	gui::MidiPortMenu* m_writablePortsMenu;
 
 
 public slots:
@@ -160,8 +175,8 @@ private:
 	Map m_writablePorts;
 
 
-	friend class ControllerConnectionDialog;
-	friend class InstrumentMidiIOView;
+	friend class gui::ControllerConnectionDialog;
+	friend class gui::InstrumentMidiIOView;
 
 
 signals:
@@ -171,8 +186,8 @@ signals:
 
 } ;
 
+using MidiPortList = QList<MidiPort*>;
 
-typedef QList<MidiPort *> MidiPortList;
-
+} // namespace lmms
 
 #endif

@@ -27,12 +27,14 @@
 #define INSTRUMENT_H
 
 #include <QString>
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 #include "MemoryManager.h"
-#include "MidiTime.h"
 #include "Plugin.h"
+#include "TimePos.h"
 
+namespace lmms
+{
 
 // forward-declarations
 class InstrumentTrack;
@@ -41,7 +43,7 @@ class NotePlayHandle;
 class Track;
 
 
-class EXPORT Instrument : public Plugin
+class LMMS_EXPORT Instrument : public Plugin
 {
 	MM_OPERATORS
 public:
@@ -55,17 +57,20 @@ public:
 
 	Q_DECLARE_FLAGS(Flags, Flag);
 
-	Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor );
-	virtual ~Instrument();
+	Instrument(InstrumentTrack * _instrument_track,
+			const Descriptor * _descriptor,
+			const Descriptor::SubPluginFeatures::Key * key = nullptr);
+	~Instrument() override = default;
 
 	// --------------------------------------------------------------------
 	// functions that can/should be re-implemented:
 	// --------------------------------------------------------------------
 
+	virtual bool hasNoteInput() const { return true; }
+
 	// if the plugin doesn't play each note, it can create an instrument-
 	// play-handle and re-implement this method, so that it mixes its
-	// output buffer only once per mixer-period
+	// output buffer only once per audio engine period
 	virtual void play( sampleFrame * _working_buffer );
 
 	// to be implemented by actual plugin
@@ -102,21 +107,23 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
+	inline virtual bool handleMidiEvent( const MidiEvent&, const TimePos& = TimePos(), f_cnt_t offset = 0 )
 	{
 		return true;
 	}
 
-	virtual QString fullDisplayName() const;
+	QString fullDisplayName() const override;
 
 	// --------------------------------------------------------------------
 	// provided functions:
 	// --------------------------------------------------------------------
 
-	// instantiate instrument-plugin with given name or return NULL
-	// on failure
-	static Instrument * instantiate( const QString & _plugin_name,
-									InstrumentTrack * _instrument_track );
+	//! instantiate instrument-plugin with given name or return NULL
+	//! on failure
+	static Instrument * instantiate(const QString & _plugin_name,
+		InstrumentTrack * _instrument_track,
+		const Plugin::Descriptor::SubPluginFeatures::Key* key,
+		bool keyFromDnd = false);
 
 	virtual bool isFromTrack( const Track * _track ) const;
 
@@ -127,6 +134,9 @@ public:
 
 
 protected:
+	// fade in to prevent clicks
+	void applyFadeIn(sampleFrame * buf, NotePlayHandle * n);
+
 	// instruments may use this to apply a soft fade out at the end of
 	// notes - method does this only if really less or equal
 	// desiredReleaseFrames() frames are left
@@ -138,6 +148,10 @@ private:
 
 } ;
 
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
+
+
+} // namespace lmms
 
 #endif

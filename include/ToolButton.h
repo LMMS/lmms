@@ -27,8 +27,9 @@
 #define TOOL_BUTTON_H
 
 #include <QToolButton>
-#include <QColor>
 
+namespace lmms::gui
+{
 
 class ToolButton : public QToolButton
 {
@@ -42,9 +43,11 @@ public:
 		QToolButton(_parent)
 	{ }
 
-	virtual ~ToolButton();
+	~ToolButton() override = default;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif
 

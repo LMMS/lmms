@@ -26,38 +26,52 @@
 #ifndef SHARED_OBJECT_H
 #define SHARED_OBJECT_H
 
-#include <QtCore/QMutex>
+#include <atomic>
 
+namespace lmms
+{
 
 class sharedObject
 {
 public:
 	sharedObject() :
-		m_referenceCount( 1 ),
-		m_lock()
+		m_referenceCount(1)
 	{
 	}
 
-	virtual ~sharedObject()
-	{
-	}
+	virtual ~sharedObject() = default;
 
 	template<class T>
 	static T* ref( T* object )
 	{
-		object->m_lock.lock();
-		// TODO: Use QShared
-		++object->m_referenceCount;
-		object->m_lock.unlock();
+		// Incrementing an atomic reference count can be relaxed since no action
+		// is ever taken as a result of increasing the count.
+		// Other loads and stores can be reordered around this without consequence.
+		object->m_referenceCount.fetch_add(1, std::memory_order_relaxed);
 		return object;
 	}
 
 	template<class T>
 	static void unref( T* object )
 	{
-		object->m_lock.lock();
-		bool deleteObject = --object->m_referenceCount <= 0;
-		object->m_lock.unlock();
+		// When decrementing an atomic reference count, we need to provide
+		// two ordering guarantees:
+		// 1. All reads and writes to the referenced object occur before
+		//    the count reaches zero.
+		// 2. Deletion occurs after the count reaches zero.
+		//
+		// To accomplish this, each decrement must be store-released,
+		// and the final thread (which is deleting the referenced data)
+		// must load-acquire those stores.
+		// The simplest way to do this to give the decrement acquire-release
+		// semantics.
+		//
+		// See https://www.boost.org/doc/libs/1_67_0/doc/html/atomic/usage_examples.html
+		// for further discussion, along with a slightly more complicated
+		// (but possibly more performant on weakly-ordered hardware like ARM)
+		// approach.
+		const bool deleteObject =
+			object->m_referenceCount.fetch_sub(1, std::memory_order_acq_rel) == 1;
 
 		if ( deleteObject )
 		{
@@ -65,20 +79,11 @@ public:
 		}
 	}
 
-	// keep clang happy which complaines about unused member variable
-	void dummy()
-	{
-		m_referenceCount = 0;
-	}
-
 private:
-	int m_referenceCount;
-	QMutex m_lock;
-
+	std::atomic_int m_referenceCount;
 } ;
 
 
-
+} // namespace lmms
 
 #endif
-

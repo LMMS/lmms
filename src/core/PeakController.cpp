@@ -30,10 +30,13 @@
 #include <QDomElement>
 #include <QMessageBox>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "EffectChain.h"
-#include "plugins/peak_controller_effect/peak_controller_effect.h"
-#include "PresetPreviewPlayHandle.h"
+#include "plugins/PeakControllerEffect/PeakControllerEffect.h"
+
+namespace lmms
+{
+
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
@@ -50,12 +53,14 @@ PeakController::PeakController( Model * _parent,
 	setSampleExact( true );
 	if( m_peakEffect )
 	{
-		connect( m_peakEffect, SIGNAL( destroyed( ) ),
-			this, SLOT( handleDestroyedEffect( ) ) );
+		connect( m_peakEffect, SIGNAL(destroyed()),
+			this, SLOT(handleDestroyedEffect()));
 	}
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateCoeffs()));
+	connect( m_peakEffect->attackModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
+	connect( m_peakEffect->decayModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
 	m_coeffNeedsUpdate = true;
 }
 
@@ -64,11 +69,7 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	//EffectChain::loadSettings() appends effect to EffectChain::m_effects
-	//When it's previewing, EffectChain::loadSettings(<Controller Fx XML>) is not called
-	//Therefore, we shouldn't call removeEffect() as it is not even appended.
-	//NB: Most XML setting are loaded on preview, except controller fx.
-	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL && PresetPreviewPlayHandle::isPreviewing() == false )
+	if( m_peakEffect != nullptr && m_peakEffect->effectChain() != nullptr )
 	{
 		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}
@@ -79,7 +80,7 @@ void PeakController::updateValueBuffer()
 {
 	if( m_coeffNeedsUpdate )
 	{
-		const float ratio = 44100.0f / Engine::mixer()->processingSampleRate();
+		const float ratio = 44100.0f / Engine::audioEngine()->processingSampleRate();
 		m_attackCoeff = 1.0f - powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->attackModel()->value() ) * ratio );
 		m_decayCoeff = 1.0f -  powf( 2.0f, -0.3f * ( 1.0f - m_peakEffect->decayModel()->value()  ) * ratio );
 		m_coeffNeedsUpdate = false;
@@ -90,7 +91,7 @@ void PeakController::updateValueBuffer()
 		float targetSample = m_peakEffect->lastSample();
 		if( m_currentSample != targetSample )
 		{
-			const f_cnt_t frames = Engine::mixer()->framesPerPeriod();
+			const f_cnt_t frames = Engine::audioEngine()->framesPerPeriod();
 			float * values = m_valueBuffer.values();
 
 			for( f_cnt_t f = 0; f < frames; ++f )
@@ -126,12 +127,12 @@ void PeakController::updateCoeffs()
 }
 
 
-void PeakController::handleDestroyedEffect( )
+void PeakController::handleDestroyedEffect()
 {
 	// possible race condition...
 	//printf("disconnecting effect\n");
 	disconnect( m_peakEffect );
-	m_peakEffect = NULL;
+	m_peakEffect = nullptr;
 	//deleteLater();
 	delete this;
 }
@@ -238,7 +239,7 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -250,11 +251,10 @@ QString PeakController::nodeName() const
 
 
 
-ControllerDialog * PeakController::createDialog( QWidget * _parent )
+gui::ControllerDialog * PeakController::createDialog( QWidget * _parent )
 {
-	return new PeakControllerDialog( this, _parent );
+	return new gui::PeakControllerDialog( this, _parent );
 }
 
 
-
-
+} // namespace lmms

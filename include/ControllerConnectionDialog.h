@@ -38,7 +38,15 @@
 class QLineEdit;
 class QListView;
 class QScrollArea;
+
+namespace lmms
+{
+
 class AutoDetectMidiController;
+
+namespace gui
+{
+
 class ComboBox;
 class GroupBox;
 class TabWidget;
@@ -47,14 +55,13 @@ class LedCheckBox;
 class MidiPortMenu;
 
 
-
 class ControllerConnectionDialog : public QDialog
 {
 	Q_OBJECT
 public:
 	ControllerConnectionDialog( QWidget * _parent,
 			const AutomatableModel * _target_model );
-	virtual ~ControllerConnectionDialog();
+	~ControllerConnectionDialog() override;
 
 	Controller * chosenController()
 	{
@@ -66,6 +73,7 @@ public slots:
 	void selectController();
 	void midiToggled();
 	void userToggled();
+	void userSelected();
 	void autoDetectToggled();
 	void enableAutoDetect( QAction * _a );
 
@@ -97,5 +105,10 @@ private:
 	// Temporary midiController
 	AutoDetectMidiController * m_midiController;
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

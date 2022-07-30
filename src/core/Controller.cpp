@@ -25,17 +25,18 @@
  */
 
 #include <QDomElement>
-#include <QObject>
 #include <QVector>
 
 
-#include "Song.h"
-#include "Mixer.h"
+#include "AudioEngine.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "LfoController.h"
 #include "MidiController.h"
 #include "PeakController.h"
+
+namespace lmms
+{
 
 
 long Controller::s_periods = 0;
@@ -47,7 +48,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 					const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
-	m_valueBuffer( Engine::mixer()->framesPerPeriod() ),
+	m_valueBuffer( Engine::audioEngine()->framesPerPeriod() ),
 	m_bufferLastUpdated( -1 ),
 	m_connectionCount( 0 ),
 	m_type( _type )
@@ -63,11 +64,9 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 
 			// Check if name is already in use
 			bool name_used = false;
-			QVector<Controller *>::const_iterator it;
-			for ( it = s_controllers.constBegin();
-				  it != s_controllers.constEnd(); ++it )
+			for (Controller * controller : s_controllers)
 			{
-				if ( (*it)->name() == new_name )
+				if ( controller->name() == new_name )
 				{
 					name_used = true;
 					break;
@@ -142,7 +141,7 @@ void Controller::updateValueBuffer()
 // Get position in frames
 unsigned int Controller::runningFrames()
 {
-	return s_periods * Engine::mixer()->framesPerPeriod();
+	return s_periods * Engine::audioEngine()->framesPerPeriod();
 }
 
 
@@ -150,20 +149,20 @@ unsigned int Controller::runningFrames()
 // Get position in seconds
 float Controller::runningTime()
 {
-	return runningFrames() / Engine::mixer()->processingSampleRate();
+	return runningFrames() / Engine::audioEngine()->processingSampleRate();
 }
 
 
 
 void Controller::triggerFrameCounter()
 {
-	for( int i = 0; i < s_controllers.size(); ++i ) 
+	for (Controller * controller : s_controllers)
 	{
 		// This signal is for updating values for both stubborn knobs and for
 		// painting.  If we ever get all the widgets to use or at least check
 		// currentValue() then we can throttle the signal and only use it for
 		// GUI.
-		emit s_controllers.at(i)->valueChanged();
+		emit controller->valueChanged();
 	}
 
 	s_periods ++;
@@ -174,10 +173,10 @@ void Controller::triggerFrameCounter()
 
 void Controller::resetFrameCounter()
 {
-	for( int i = 0; i < s_controllers.size(); ++i ) 
+	for (Controller * controller : s_controllers)
 	{
-		s_controllers.at( i )->m_bufferLastUpdated = 0;
-	} 
+		controller->m_bufferLastUpdated = 0;
+	}
 	s_periods = 0;
 }
 
@@ -185,24 +184,20 @@ void Controller::resetFrameCounter()
 
 Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 {
-	static Controller * dummy = NULL;
-	Controller * c = NULL;
+	static Controller * dummy = nullptr;
+	Controller * c = nullptr;
 
 	switch( _ct )
 	{
-		case Controller::DummyController: 
-			if( dummy )
-				c = dummy;
-			else
-			{
-				c = new Controller( DummyController, NULL,
+		case Controller::DummyController:
+			if (!dummy)
+				dummy = new Controller( DummyController, nullptr,
 								QString() );
-				dummy = c;
-			}
+			c = dummy;
 			break;
 
 		case Controller::LfoController:
-			c = new ::LfoController( _parent );
+			c = new class LfoController( _parent );
 			break;
 
 		case Controller::PeakController:
@@ -211,7 +206,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			break;
 
 		case Controller::MidiController:
-			c = new ::MidiController( _parent );
+			c = new class MidiController( _parent );
 			break;
 
 		default: 
@@ -237,7 +232,7 @@ Controller * Controller::create( const QDomElement & _this, Model * _parent )
 										_parent );
 	}
 
-	if( c != NULL )
+	if( c != nullptr )
 	{
 		c->restoreState( _this );
 	}
@@ -247,14 +242,12 @@ Controller * Controller::create( const QDomElement & _this, Model * _parent )
 
 
 
-bool Controller::hasModel( const Model * m )
+bool Controller::hasModel( const Model * m ) const
 {
-	QObjectList chldren = children();
-	for( int i = 0; i < chldren.size(); ++i )
+	for (QObject * c : children())
 	{
-		QObject * c = chldren.at(i);
 		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
-		if( am != NULL )
+		if( am != nullptr )
 		{
 			if( am == m )
 			{
@@ -262,16 +255,13 @@ bool Controller::hasModel( const Model * m )
 			}
 
 			ControllerConnection * cc = am->controllerConnection();
-			if( cc != NULL )
+			if( cc != nullptr && cc->getController()->hasModel( m ) )
 			{
-				if( cc->getController()->hasModel( m ) )
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -304,9 +294,9 @@ QString Controller::nodeName() const
 
 
 
-ControllerDialog * Controller::createDialog( QWidget * _parent )
+gui::ControllerDialog * Controller::createDialog( QWidget * _parent )
 {
-	ControllerDialog * d = new ControllerDialog( this, _parent );
+	gui::ControllerDialog * d = new gui::ControllerDialog( this, _parent );
 
 	return d;
 }
@@ -336,7 +326,7 @@ int Controller::connectionCount() const{
 }
 
 
-
+} // namespace lmms
 
 
 

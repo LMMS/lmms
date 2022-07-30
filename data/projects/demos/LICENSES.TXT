@@ -2,22 +2,6 @@
   - CC (by-sa)
   - https://lmms.io/lsp/index.php?action=show&file=819
 
-* CapDan-ReggaeTry.mmpz
-  - Artistic 2.0
-  - https://lmms.io/lsp/index.php?action=show&file=1369
-
-* CapDan-ReggaetonTry.mmpz
-  - Artistic 2.0
-  - https://lmms.io/lsp/index.php?action=show&file=1370
-
-* CapDan-TwilightArea-OriginalByAlf42red.mmpz
-  - CC (by-sa)
-  - https://lmms.io/lsp/index.php?action=show&file=1439
-
-* CapDan-ZeroSumGame-OriginalByZakarra.mmpz
-  - Artistic 2.0
-  - https://lmms.io/lsp/index.php?action=show&file=1565
-
 * EsoXLB-CPU.mmpz
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=723
@@ -33,6 +17,10 @@
 * Impulslogik-Zen.mmpz
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=581
+
+* Jousboxx-BuzzerBeater.mmpz
+  - CC BY-SA 4.0
+  - https://github.com/LMMS/lmms/pull/3482#issuecomment-293609866
 
 * Momo64-esp.mmpz
   - Artistic 2.0
@@ -50,6 +38,10 @@
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=1156
 
+* Popsip-Electric Dancer.mmpz
+  - Creative Commons (by-nc)
+  - https://lmms.io/lsp/?action=show&file=5414
+
 * Root84-Initialize.mmpz
   - Yellow openmusic
   - https://lmms.io/lsp/index.php?action=show&file=628
@@ -62,14 +54,6 @@
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=515
 
-* Skiessi-C64.mmpz
-  - CC (by sa)
-  - https://lmms.io/lsp/index.php?action=show&file=472
-
-* Skiessi-Onion.mmpz
-  - CC (by-sa)
-  - https://lmms.io/lsp/index.php?action=show&file=405
-
 * Socceroos-Progress.mmpz
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=1516
@@ -78,6 +62,10 @@
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=1060
 
+* Thaledric-Armageddon.mmpz
+  - Creative Commons (by-nc-sa)
+  - https://lmms.io/lsp/?action=show&file=1947
+
 * Thomasso-AxeFromThe80s.mmpz
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=474
@@ -85,7 +73,3 @@
 * unfa-Spoken.mmpz
   - CC (by-nc)
   - https://lmms.io/lsp/index.php?action=show&file=4929
-  
-* Jousboxx-BuzzerBeater.mmpz
-  - CC (by-sa)
-  - https://lmms.io/lsp/?action=show&file=10488

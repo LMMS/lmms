@@ -29,15 +29,30 @@
 #define VERSIONEDSAVEDIALOG_H
 
 #include "FileDialog.h"
+#include "Song.h"
 
 class QLineEdit;
 
+namespace lmms::gui
+{
+
+class LedCheckBox;
+
+class SaveOptionsWidget : public QWidget {
+public:
+	SaveOptionsWidget(Song::SaveOptions &saveOptions);
+
+private:
+	LedCheckBox *m_discardMIDIConnectionsCheckbox;
+	LedCheckBox *m_saveAsProjectBundleCheckbox;
+};
 
 class VersionedSaveDialog : public FileDialog
 {
 	Q_OBJECT
 public:
 	explicit VersionedSaveDialog( QWidget *parent = 0,
+								  QWidget *saveOptionsWidget = nullptr,
 								  const QString &caption = QString(),
 								  const QString &directory = QString(),
 								  const QString &filter = QString() );
@@ -50,5 +65,8 @@ public slots:
 	void incrementVersion();
 	void decrementVersion();
 };
+
+
+} // namespace lmms::gui
 
 #endif // VERSIONEDSAVEDIALOG_H

@@ -26,10 +26,14 @@
 #ifndef RENDER_MANAGER_H
 #define RENDER_MANAGER_H
 
-#include <vector>
+#include <memory>
 
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
+
+
+namespace lmms
+{
 
 
 class RenderManager : public QObject
@@ -37,12 +41,12 @@ class RenderManager : public QObject
 	Q_OBJECT
 public:
 	RenderManager(
-		const Mixer::qualitySettings & qualitySettings,
+		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath);
 
-	virtual ~RenderManager();
+	~RenderManager() override;
 
 	/// Export all unmuted tracks into a single file
 	void renderProject();
@@ -64,15 +68,21 @@ private:
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
 
-	const Mixer::qualitySettings m_qualitySettings;
+	void render( QString outputPath );
+
+	const AudioEngine::qualitySettings m_qualitySettings;
+	const AudioEngine::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormats m_format;
 	QString m_outputPath;
 
-	ProjectRenderer* m_activeRenderer;
+	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 
 	QVector<Track*> m_tracksToRender;
 	QVector<Track*> m_unmuted;
 } ;
+
+
+} // namespace lmms
 
 #endif

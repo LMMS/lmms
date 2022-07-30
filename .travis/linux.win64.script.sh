@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-
 set -e
 
+mkdir build
+cd build
+
 export CMAKE_OPTS="$CMAKE_FLAGS -DUSE_WERROR=ON"
-../cmake/build_mingw64.sh
+../cmake/build_win64.sh
+
+make -j4
+make tests

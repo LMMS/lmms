@@ -29,6 +29,9 @@
 #include "InlineAutomation.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 class DetuningHelper : public InlineAutomation
 {
 	Q_OBJECT
@@ -39,26 +42,26 @@ public:
 	{
 	}
 
-	virtual ~DetuningHelper()
-	{
-	}
+	~DetuningHelper() override = default;
 
-	virtual float defaultValue() const
+	float defaultValue() const override
 	{
 		return 0;
 	}
 
-	virtual QString displayName() const
+	QString displayName() const override
 	{
 		return tr( "Note detuning" );
 	}
 
-	inline virtual QString nodeName() const
+	inline QString nodeName() const override
 	{
 		return "detuning";
 	}
 
 } ;
 
+
+} // namespace lmms
 
 #endif

@@ -1,5 +1,4 @@
-INSTALL(FILES lmms.svg                  DESTINATION "${DATA_DIR}/icons/hicolor/scalable/apps")
-INSTALL(FILES project.svg               DESTINATION "${DATA_DIR}/icons/hicolor/scalable/mimetypes/" RENAME "application-x-lmms-project.svg")
+INSTALL(DIRECTORY icons/                DESTINATION "${DATA_DIR}/icons/hicolor")
 INSTALL(FILES lmms.desktop              DESTINATION "${DATA_DIR}/applications")
 INSTALL(FILES lmms.xml                  DESTINATION "${DATA_DIR}/mime/packages")
 
@@ -15,5 +14,6 @@ ADD_CUSTOM_TARGET(removeappimage
 ADD_CUSTOM_TARGET(appimage 
 	COMMAND chmod +x "${CMAKE_BINARY_DIR}/package_linux.sh"
 	COMMAND "${CMAKE_BINARY_DIR}/package_linux.sh"
-	COMMENT "Generating AppImage")
+	COMMENT "Generating AppImage"
+	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
 ADD_DEPENDENCIES(appimage removeappimage)

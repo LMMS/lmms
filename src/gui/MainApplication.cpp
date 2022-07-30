@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017-2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,11 +31,15 @@
 #include "MainWindow.h"
 #include "Song.h"
 
+namespace lmms::gui
+{
+
+
 MainApplication::MainApplication(int& argc, char** argv) :
 	QApplication(argc, argv),
 	m_queuedFile()
 {
-#if defined(LMMS_BUILD_WIN32) && QT_VERSION >= 0x050000
+#if defined(LMMS_BUILD_WIN32)
 	installNativeEventFilter(this);
 #endif
 }
@@ -51,7 +55,7 @@ bool MainApplication::event(QEvent* event)
 			m_queuedFile = fileEvent->file();
 			if(Engine::getSong())
 			{
-				if(gui->mainWindow()->mayChangeProject(true))
+				if(getGUI()->mainWindow()->mayChangeProject(true))
 				{
 					qDebug() << "Loading file " << m_queuedFile;
 					Engine::getSong()->loadProject(m_queuedFile);
@@ -92,7 +96,6 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 	}
 }
 
-#if QT_VERSION >= 0x050000
 bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 					void* message, long* result)
 {
@@ -103,4 +106,6 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 	return false;
 }
 #endif
-#endif
+
+
+} // namespace lmms::gui

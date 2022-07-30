@@ -27,19 +27,18 @@
 #define DSP_EFFECT_LIBRARY_H
 
 #include "lmms_math.h"
-#include "templates.h"
 #include "lmms_constants.h"
 #include "lmms_basics.h"
 
 
-namespace DspEffectLibrary
+namespace lmms::DspEffectLibrary
 {
 
 	template<typename T>
 	class MonoBase
 	{
 	public:
-		typedef class MonoBypass bypassType;
+		using bypassType = class MonoBypass;
 
 		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
@@ -54,7 +53,7 @@ namespace DspEffectLibrary
 	class StereoBase
 	{
 	public:
-		typedef class StereoBypass bypassType;
+		using bypassType = class StereoBypass;
 
 		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
@@ -165,7 +164,7 @@ namespace DspEffectLibrary
 	class Chain : public FX0::bypassType
 	{
 	public:
-		typedef typename FX0::sample_t sample_t;
+		using sample_t = typename FX0::sample_t;
 		Chain( const FX0& fx0, const FX1& fx1 = FX1() ) :
 			m_FX0( fx0 ),
 			m_FX1( fx1 )
@@ -245,14 +244,36 @@ namespace DspEffectLibrary
 	} ;
 
 
-	class FoldbackDistortion : public MonoBase<FoldbackDistortion>
+	template<class T>
+	class DistortionBase : public MonoBase<T>
 	{
 	public:
-		FoldbackDistortion( float threshold, float gain ) :
+		DistortionBase( float threshold, float gain ) :
 			m_threshold( threshold ),
 			m_gain( gain )
 		{
 		}
+
+		void setThreshold( float threshold )
+		{
+			m_threshold = threshold;
+		}
+
+		void setGain( float gain )
+		{
+			m_gain = gain;
+		}
+
+	protected:
+		float m_threshold;
+		float m_gain;
+	};
+
+
+	class FoldbackDistortion : public DistortionBase<FoldbackDistortion>
+	{
+	public:
+		using DistortionBase<FoldbackDistortion>::DistortionBase;
 
 		sample_t nextSample( sample_t in )
 		{
@@ -262,54 +283,18 @@ namespace DspEffectLibrary
 			}
 			return in * m_gain;
 		}
-
-		void setThreshold( float threshold )
-		{
-			m_threshold = threshold;
-		}
-
-		void setGain( float gain )
-		{
-			m_gain = gain;
-		}
-
-
-	private:
-		float m_threshold;
-		float m_gain;
-
 	} ;
 
 
-	class Distortion : public MonoBase<Distortion>
+	class Distortion : public DistortionBase<Distortion>
 	{
 	public:
-		Distortion( float threshold, float gain ) :
-			m_threshold( threshold ),
-			m_gain( gain )
-		{
-		}
+		using DistortionBase<Distortion>::DistortionBase;
 
 		sample_t nextSample( sample_t in )
 		{
 			return m_gain * ( in * ( fabsf( in )+m_threshold ) / ( in*in +( m_threshold-1 )* fabsf( in ) + 1 ) );
 		}
-
-		void setThreshold( float threshold )
-		{
-			m_threshold = threshold;
-		}
-
-		void setGain( float gain )
-		{
-			m_gain = gain;
-		}
-
-
-	private:
-		float m_threshold;
-		float m_gain;
-
 	} ;
 
 
@@ -344,7 +329,7 @@ namespace DspEffectLibrary
 
 	} ;
 
-} ;
+} // namespace lmms::DspEffectLibrary
 
 
 #endif

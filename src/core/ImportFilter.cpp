@@ -23,6 +23,7 @@
  */
 
 
+#include <memory>
 #include <QMessageBox>
 
 #include "ImportFilter.h"
@@ -32,19 +33,18 @@
 #include "ProjectJournal.h"
 
 
+namespace lmms
+{
+
+using std::unique_ptr;
+
 ImportFilter::ImportFilter( const QString & _file_name,
 							const Descriptor * _descriptor ) :
-	Plugin( _descriptor, NULL ),
+	Plugin( _descriptor, nullptr ),
 	m_file( _file_name )
 {
 }
 
-
-
-
-ImportFilter::~ImportFilter()
-{
-}
 
 
 
@@ -54,32 +54,29 @@ void ImportFilter::import( const QString & _file_to_import,
 {
 	bool successful = false;
 
-	char * s = qstrdup( _file_to_import.toUtf8().constData() );
+	QByteArray s = _file_to_import.toUtf8();
+	s.detach();
 
 	// do not record changes while importing files
 	const bool j = Engine::projectJournal()->isJournalling();
 	Engine::projectJournal()->setJournalling( false );
 
-	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::ImportFilter))
+	for (const Plugin::Descriptor* desc : getPluginFactory()->descriptors(Plugin::ImportFilter))
 	{
-		Plugin * p = Plugin::instantiate( desc->name, NULL, s );
-		if( dynamic_cast<ImportFilter *>( p ) != NULL &&
-			dynamic_cast<ImportFilter *>( p )->tryImport( tc ) == true )
+		unique_ptr<Plugin> p(Plugin::instantiate( desc->name, nullptr, s.data() ));
+		if( dynamic_cast<ImportFilter *>( p.get() ) != nullptr &&
+			dynamic_cast<ImportFilter *>( p.get() )->tryImport( tc ) )
 		{
-			delete p;
 			successful = true;
 			break;
 		}
-		delete p;
 	}
 
 	Engine::projectJournal()->setJournalling( j );
 
-	delete[] s;
-
 	if( successful == false )
 	{
-		QMessageBox::information( NULL,
+		QMessageBox::information( nullptr,
 			TrackContainer::tr( "Couldn't import file" ),
 			TrackContainer::tr( "Couldn't find a filter for "
 						"importing file %1.\n"
@@ -99,7 +96,7 @@ bool ImportFilter::openFile()
 {
 	if( m_file.open( QFile::ReadOnly ) == false )
 	{
-		QMessageBox::critical( NULL,
+		QMessageBox::critical( nullptr,
 			TrackContainer::tr( "Couldn't open file" ),
 			TrackContainer::tr( "Couldn't open file %1 "
 						"for reading.\nPlease make "
@@ -117,3 +114,4 @@ bool ImportFilter::openFile()
 
 
 
+} // namespace lmms

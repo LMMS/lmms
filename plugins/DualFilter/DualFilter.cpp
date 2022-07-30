@@ -27,6 +27,10 @@
 
 #include "embed.h"
 #include "BasicFilters.h"
+#include "plugin_export.h"
+
+namespace lmms
+{
 
 
 extern "C"
@@ -34,15 +38,15 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Dual Filter",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A Dual filter plugin" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "A Dual filter plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
 	new PluginPixmapLoader( "logo" ),
-	NULL,
-	NULL
+	nullptr,
+	nullptr,
 } ;
 
 }
@@ -53,8 +57,8 @@ DualFilterEffect::DualFilterEffect( Model* parent, const Descriptor::SubPluginFe
 	Effect( &dualfilter_plugin_descriptor, parent, key ),
 	m_dfControls( this )
 {
-	m_filter1 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
-	m_filter2 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
+	m_filter1 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
+	m_filter2 = new BasicFilters<2>( Engine::audioEngine()->processingSampleRate() );
 
 	// ensure filters get updated
 	m_filter1changed = true;
@@ -193,11 +197,11 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 			s[0] += ( s2[0] * mix2 );
 			s[1] += ( s2[1] * mix2 );
 		}
-		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 
 		// do another mix with dry signal
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
+		outSum += buf[f][0] * buf[f][0] + buf[f][1] * buf[f][1];
 
 		//increment pointers
 		cut1Ptr += cut1Inc;
@@ -229,3 +233,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 
 }
 
+
+} // namespace lmms

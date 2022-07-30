@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Paul Batchelor
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 
 #include "Effect.h"
 #include "ReverbSCControls.h"
-#include "ValueBuffer.h"
 
 extern "C" {
     #include "base.h"
@@ -36,14 +35,19 @@ extern "C" {
     #include "dcblock.h"
 }
 
+
+namespace lmms
+{
+
+
 class ReverbSCEffect : public Effect
 {
 public:
 	ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~ReverbSCEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~ReverbSCEffect() override;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_reverbSCControls;
 	}
@@ -58,5 +62,8 @@ private:
 	QMutex mutex;
 	friend class ReverbSCControls;
 } ;
+
+
+} // namespace lmms
 
 #endif

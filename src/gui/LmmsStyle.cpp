@@ -26,14 +26,19 @@
 
 #include <QFile>
 #include <QApplication>
-#include <QFrame>
 #include <QPainter>
+#include <QPainterPath>
 #include <QStyleFactory>
 #include <QStyleOption>
 
 #include "LmmsStyle.h"
 
-QPalette * LmmsStyle::s_palette = NULL;
+
+namespace lmms::gui
+{
+
+
+QPalette * LmmsStyle::s_palette = nullptr;
 
 QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 {
@@ -44,11 +49,11 @@ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 	qreal saturation = _col.saturationF();
 
 	QColor c = _col;
-	c.setHsvF( hue, 0.42 * saturation, 0.98 * value ); // TODO: pattern: 1.08
+	c.setHsvF( hue, 0.42 * saturation, 0.98 * value ); // TODO: MIDI clip: 1.08
 	g.setColorAt( 0, c );
-	c.setHsvF( hue, 0.58 * saturation, 0.95 * value ); // TODO: pattern: 1.05
+	c.setHsvF( hue, 0.58 * saturation, 0.95 * value ); // TODO: MIDI clip: 1.05
 	g.setColorAt( 0.25, c );
-	c.setHsvF( hue, 0.70 * saturation, 0.93 * value ); // TODO: pattern: 1.03
+	c.setHsvF( hue, 0.70 * saturation, 0.93 * value ); // TODO: MIDI clip: 1.03
 	g.setColorAt( 0.5, c );
 
 	c.setHsvF( hue, 0.95 * saturation, 0.9 * value );
@@ -114,7 +119,7 @@ void drawPath( QPainter *p, const QPainterPath &path,
 
 	p->setOpacity(0.5);
 
-	// highlight (bb)
+	// highlight (pattern)
 	if (dark)
 		p->strokePath(path, QPen(borderCol.lighter(133), 2));
 	else
@@ -130,21 +135,17 @@ LmmsStyle::LmmsStyle() :
 	file.open( QIODevice::ReadOnly );
 	qApp->setStyleSheet( file.readAll() );
 
-	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
+	if( s_palette != nullptr ) { qApp->setPalette( *s_palette ); }
 
-#if QT_VERSION >= 0x050000
 	setBaseStyle( QStyleFactory::create( "Fusion" ) );
-#else
-	setBaseStyle( QStyleFactory::create( "Plastique" ) );
-#endif
 }
 
 
 
 
-QPalette LmmsStyle::standardPalette( void ) const
+QPalette LmmsStyle::standardPalette() const
 {
-	if( s_palette != NULL) { return * s_palette; }
+	if( s_palette != nullptr) { return * s_palette; }
 
 	QPalette pal = QProxyStyle::standardPalette();
 
@@ -176,6 +177,13 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 							painter, widget );
 			return;
 		}
+	}
+	else if (control == CC_MdiControls)
+	{
+		QStyleOptionComplex so(*option);
+		so.palette.setColor(QPalette::Button, QColor(223, 228, 236));
+		QProxyStyle::drawComplexControl(control, &so, painter, widget);
+		return;
 	}
 /*	else if( control == CC_ScrollBar )
 	{
@@ -366,3 +374,5 @@ void LmmsStyle::hoverColors( bool sunken, bool hover, bool active, QColor& color
 	}
 }
 
+
+} // namespace lmms::gui

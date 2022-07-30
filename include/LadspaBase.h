@@ -29,31 +29,26 @@
 #include "LadspaManager.h"
 #include "Plugin.h"
 
+namespace lmms
+{
+
+
 class LadspaControl;
 
-
-typedef enum BufferRates
-{
+enum buffer_rate_t {
 	CHANNEL_IN,
 	CHANNEL_OUT,
 	AUDIO_RATE_INPUT,
 	AUDIO_RATE_OUTPUT,
 	CONTROL_RATE_INPUT,
 	CONTROL_RATE_OUTPUT
-} buffer_rate_t;
+};
 
-typedef enum BufferData
-{
-	TOGGLED,
-	INTEGER,
-	FLOATING,
-	TIME,
-	NONE
-} buffer_data_t;
+enum buffer_data_t { TOGGLED, ENUM, INTEGER, FLOATING, TIME, NONE };
 
 //! This struct is used to hold port descriptions internally
 //! which where received from the ladspa plugin
-typedef struct PortDescription
+struct port_desc_t
 {
 	QString name;
 	ch_cnt_t proc;
@@ -69,10 +64,9 @@ typedef struct PortDescription
 	//! This is true iff ladspa suggests logscale
 	//! Note however that the model can still decide to use a linear scale
 	bool suggests_logscale;
-	LADSPA_Data * buffer;
-	LadspaControl * control;
-} port_desc_t;
-
+	LADSPA_Data* buffer;
+	LadspaControl* control;
+};
 
 inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
 						const Plugin::Descriptor * _desc,
@@ -86,5 +80,7 @@ inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
 	return Plugin::Descriptor::SubPluginFeatures::Key( _desc, _name, m );
 }
 
+
+} // namespace lmms
 
 #endif

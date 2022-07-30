@@ -32,11 +32,14 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
 
 ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
-	PluginView( _toolPlugin, NULL )
+	PluginView( _toolPlugin, nullptr )
 {
-	gui->mainWindow()->addWindowedWidget( this );
+	getGUI()->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 
 	setWindowTitle( _toolPlugin->displayName() );
@@ -44,3 +47,4 @@ ToolPluginView::ToolPluginView( ToolPlugin * _toolPlugin ) :
 }
 
 
+} // namespace lmms::gui

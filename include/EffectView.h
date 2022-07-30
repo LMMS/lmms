@@ -35,6 +35,9 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
+namespace lmms::gui
+{
+
 class EffectControlDialog;
 class Knob;
 class LedCheckBox;
@@ -46,7 +49,7 @@ class EffectView : public PluginView
 	Q_OBJECT
 public:
 	EffectView( Effect * _model, QWidget * _parent );
-	virtual ~EffectView();
+	~EffectView() override;
 
 	inline Effect * effect()
 	{
@@ -57,26 +60,26 @@ public:
 		return castModel<Effect>();
 	}
 
+	static constexpr int DEFAULT_WIDTH = 215;
 
 public slots:
 	void editControls();
 	void moveUp();
 	void moveDown();
 	void deletePlugin();
-	void displayHelp();
 	void closeEffects();
 
 
 signals:
-	void moveUp( EffectView * _plugin );
-	void moveDown( EffectView * _plugin );
-	void deletePlugin( EffectView * _plugin );
+	void moveUp( lmms::gui::EffectView * _plugin );
+	void moveDown( lmms::gui::EffectView * _plugin );
+	void deletePlugin( lmms::gui::EffectView * _plugin );
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void modelChanged();
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
+	void modelChanged() override;
 
 
 private:
@@ -89,5 +92,8 @@ private:
 	EffectControlDialog * m_controlView;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

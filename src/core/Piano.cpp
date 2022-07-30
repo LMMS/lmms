@@ -41,6 +41,10 @@
 #include "InstrumentTrack.h"
 
 
+namespace lmms
+{
+
+
 /*! The black / white order of keys as they appear on the keyboard.
  */
 static const Piano::KeyTypes KEY_ORDER[] =
@@ -59,7 +63,7 @@ static const Piano::KeyTypes KEY_ORDER[] =
  *  \param _it the InstrumentTrack window to attach to
  */
 Piano::Piano( InstrumentTrack* track ) :
-	Model( NULL ),              /*!< base class ctor */
+	Model( nullptr ),              /*!< base class ctor */
 	m_instrumentTrack( track ),
 	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
 {
@@ -69,19 +73,6 @@ Piano::Piano( InstrumentTrack* track ) :
 	}
 
 }
-
-
-
-
-/*! \brief Destroy this new keyboard display
- *
- */
-Piano::~Piano()
-{
-}
-
-
-
 
 /*! \brief Turn a key on or off
  *
@@ -150,3 +141,5 @@ bool Piano::isWhiteKey( int key )
 	return !isBlackKey( key );
 }
 
+
+} // namespace lmms

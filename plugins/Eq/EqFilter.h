@@ -28,14 +28,18 @@
 #include "BasicFilters.h"
 #include "lmms_math.h"
 
+namespace lmms
+{
+
+
 ///
 /// \brief The EqFilter class.
 /// A wrapper for the StereoBiQuad class, giving it freq, res, and gain controls.
-/// It is designed to process periods in one pass, with recalculation of coefficents
+/// Used on a per channel per frame basis with recalculation of coefficents
 /// upon parameter changes. The intention is to use this as a bass class, children override
 /// the calcCoefficents() function, providing the coefficents a1, a2, b0, b1, b2.
 ///
-class EqFilter : public StereoBiQuad
+class EqFilter
 {
 public:
 	EqFilter() :
@@ -114,7 +118,28 @@ public:
 	}
 
 
+	///
+	/// \brief update
+	/// filters using two BiQuads, then crossfades,
+	///  depending on on percentage of period processes
+	/// \param in
+	/// \param ch
+	/// \param frameProgress percentage of frame processed
+	/// \return
+	///
+	inline float update( float in, ch_cnt_t ch, float frameProgress)
+	{
+		float initailF =  m_biQuadFrameInitial.update( in, ch );
+		float targetF = m_biQuadFrameTarget.update( in, ch );
 
+		if(frameProgress > 0.99999 )
+		{
+			m_biQuadFrameInitial= m_biQuadFrameTarget;
+		}
+
+		return (1.0f-frameProgress) * initailF + frameProgress * targetF;
+
+	}
 
 
 protected:
@@ -127,11 +152,23 @@ protected:
 
 	}
 
+	inline void setCoeffs( float a1, float a2, float b0, float b1, float b2 )
+	{
+		m_biQuadFrameTarget.setCoeffs( a1, a2, b0, b1, b2 );
+	}
+
+
+
+
+
+
 	float m_sampleRate;
 	float m_freq;
 	float m_res;
 	float m_gain;
 	float m_bw;
+	StereoBiQuad m_biQuadFrameInitial;
+	StereoBiQuad m_biQuadFrameTarget;
 };
 
 
@@ -144,7 +181,7 @@ protected:
 class EqHp12Filter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate
@@ -189,7 +226,7 @@ public :
 class EqLp12Filter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate
@@ -233,7 +270,7 @@ class EqPeakFilter : public EqFilter
 public:
 
 
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 		// calc intermediate
 		float w0 = F_2PI * m_freq / m_sampleRate;
@@ -263,7 +300,7 @@ public:
 		setCoeffs( a1, a2, b0, b1, b2 );
 	}
 
-	virtual inline void setParameters( float sampleRate, float freq, float bw, float gain )
+	inline void setParameters( float sampleRate, float freq, float bw, float gain ) override
 	{
 		bool hasChanged = false;
 		if( sampleRate != m_sampleRate )
@@ -297,7 +334,7 @@ public:
 class EqLowShelfFilter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate
@@ -336,7 +373,7 @@ public :
 class EqHighShelfFilter : public EqFilter
 {
 public :
-	virtual void calcCoefficents()
+	void calcCoefficents() override
 	{
 
 		// calc intermediate
@@ -421,6 +458,7 @@ protected:
 };
 
 
+} // namespace lmms
 
 
 #endif // EQFILTER_H

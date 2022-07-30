@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Paul Batchelor
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,17 +28,20 @@
 #include "ReverbSCControls.h"
 #include "ReverbSC.h"
 #include "Engine.h"
-#include "Song.h"
+
+namespace lmms
+{
+
 
 ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
 	EffectControls( effect ),
 	m_effect( effect ),
-	m_inputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Input Gain" ) ),
+	m_inputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Input gain" ) ),
 	m_sizeModel( 0.89f, 0.0f, 1.0f, 0.01f, this, tr( "Size" ) ),
 	m_colorModel( 10000.0f, 100.0f, 15000.0f, 0.1f, this, tr( "Color" ) ),
-	m_outputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Output Gain" ) )
+	m_outputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Output gain" ) )
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ));
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ));
 }
 
 void ReverbSCControls::changeControl()
@@ -65,3 +68,6 @@ void ReverbSCControls::changeSampleRate()
 {
 	m_effect->changeSampleRate();
 }
+
+
+} // namespace lmms

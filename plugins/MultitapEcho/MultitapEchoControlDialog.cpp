@@ -23,18 +23,18 @@
  *
  */
 
-#include <QLayout>
 
 #include "MultitapEchoControlDialog.h"
 #include "MultitapEchoControls.h"
 #include "embed.h"
 #include "Graph.h"
-#include "PixmapButton.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 #include "LcdSpinBox.h"
+
+namespace lmms::gui
+{
 
 
 MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * controls ) :
@@ -88,17 +88,20 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
 	dryGain->setLabel( tr( "Dry" ) );
-	dryGain->setHintText( tr( "Dry Gain:" ) , " dBFS" );
+	dryGain->setHintText( tr( "Dry gain:" ) , " dBFS" );
 
 	Knob * stages = new Knob( knobBright_26, this );
 	stages->move( 200, 245 );
 	stages->setModel( & controls->m_stages );
 	stages->setLabel( tr( "Stages" ) );
-	stages->setHintText( tr( "Lowpass stages:" ) , "x" );
+	stages->setHintText( tr( "Low-pass stages:" ) , "x" );
 	// switch led
 	
 	LedCheckBox * swapInputs = new LedCheckBox( "Swap inputs", this, tr( "Swap inputs" ), LedCheckBox::Green );
 	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );
-	ToolTip::add( swapInputs, tr( "Swap left and right input channel for reflections" ) );
+	swapInputs->setToolTip(tr("Swap left and right input channels for reflections"));
 }
+
+
+} // namespace lmms::gui

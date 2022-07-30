@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Paul Batchelor
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,11 +22,16 @@
  *
  */
 
-#include <QLayout>
 
 #include "ReverbSCControlDialog.h"
-#include "ReverbSCControls.h"
+
 #include "embed.h"
+#include "Knob.h"
+#include "ReverbSCControls.h"
+
+namespace lmms::gui
+{
+
 
 ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	EffectControlDialog( controls )
@@ -41,7 +46,7 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	inputGainKnob -> move( 16, 10 );
 	inputGainKnob->setModel( &controls->m_inputGainModel );
 	inputGainKnob->setLabel( tr( "Input" ) );
-	inputGainKnob->setHintText( tr( "Input Gain:" ) , "dB" );
+	inputGainKnob->setHintText( tr( "Input gain:" ) , "dB" );
 
 	Knob * sizeKnob = new Knob( knobBright_26, this);
 	sizeKnob -> move( 57, 10 );
@@ -59,5 +64,8 @@ ReverbSCControlDialog::ReverbSCControlDialog( ReverbSCControls* controls ) :
 	outputGainKnob -> move( 139, 10 );
 	outputGainKnob->setModel( &controls->m_outputGainModel );
 	outputGainKnob->setLabel( tr( "Output" ) );
-	outputGainKnob->setHintText( tr( "Output Gain:" ) , "dB" );
+	outputGainKnob->setHintText( tr( "Output gain:" ) , "dB" );
 }
+
+
+} // namespace lmms::gui

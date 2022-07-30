@@ -28,6 +28,9 @@
 #include "LmmsPalette.h"
 
 
+namespace lmms::gui
+{
+
 LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) : 
 	QWidget( parent ),
 	
@@ -42,17 +45,11 @@ LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) :
 	m_buttonText( 0,0,0 ),
 	m_brightText( 74, 253, 133 ),
 	m_highlight( 100, 100, 100 ),
-	m_highlightedText( 255, 255, 255  ),
-	m_toolTipText( 0, 0, 0 ),
-	m_toolTipBase( 128, 128, 128 )
+	m_highlightedText( 255, 255, 255  )
 {
 	setStyle( stylearg );
 	stylearg->polish( this );
 	ensurePolished();
-}
-
-LmmsPalette::~LmmsPalette()
-{
 }
 
 #define ACCESSMET( read, write ) \
@@ -72,8 +69,6 @@ LmmsPalette::~LmmsPalette()
 	ACCESSMET( brightText, setBrightText )
 	ACCESSMET( highlight, setHighlight )
 	ACCESSMET( highlightedText, setHighlightedText )
-	ACCESSMET( toolTipText, setToolTipText )
-	ACCESSMET( toolTipBase, setToolTipBase )
 
 
 QPalette LmmsPalette::palette() const
@@ -90,10 +85,8 @@ QPalette LmmsPalette::palette() const
 	pal.setColor( QPalette::Shadow, 			shadow() );	
 	pal.setColor( QPalette::Highlight, 			highlight() );	
 	pal.setColor( QPalette::HighlightedText, 	highlightedText() );
-	pal.setBrush( QPalette::ToolTipText,		QBrush( toolTipText() ) );
-	pal.setBrush( QPalette::ToolTipBase,		QBrush( toolTipBase() ) );  
 	return pal;
 }
 
 
-
+} // namespace lmms::gui

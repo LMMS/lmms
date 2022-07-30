@@ -28,10 +28,14 @@
 #include "Note.h"
 #include "Model.h"
 
+namespace lmms
+{
+
+
 class InstrumentTrack;
 class MidiEventProcessor;
 
-class Piano : public Model
+class Piano final : public Model
 {
 public:
 	enum KeyTypes
@@ -41,7 +45,6 @@ public:
 	} ;
 
 	Piano( InstrumentTrack* track );
-	virtual ~Piano();
 
 	void setKeyState( int key, bool state );
 
@@ -66,6 +69,10 @@ public:
 	static bool isWhiteKey(int key);
 	static bool isBlackKey(int key);
 
+	static const unsigned int WhiteKeysPerOctave = 7;
+	static const unsigned int BlackKeysPerOctave = 5;
+	static const unsigned int NumWhiteKeys = 75;
+	static const unsigned int NumBlackKeys = 53;
 
 private:
 	static bool isValidKey( int key )
@@ -78,6 +85,9 @@ private:
 	bool m_pressedKeys[NumKeys];
 
 } ;
+
+
+} // namespace lmms
 
 #endif
 

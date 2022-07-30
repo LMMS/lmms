@@ -24,14 +24,17 @@
  */
 
 #include "RingBuffer.h"
+#include "AudioEngine.h"
 #include "Engine.h"
-#include "Mixer.h"
 #include "MixHelpers.h"
+
+namespace lmms
+{
 
  
 RingBuffer::RingBuffer( f_cnt_t size ) : 
-	m_fpp( Engine::mixer()->framesPerPeriod() ),
-	m_samplerate( Engine::mixer()->processingSampleRate() ),
+	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
+	m_samplerate( Engine::audioEngine()->processingSampleRate() ),
 	m_size( size + m_fpp )
 {
 	m_buffer = new sampleFrame[ m_size ];
@@ -41,8 +44,8 @@ RingBuffer::RingBuffer( f_cnt_t size ) :
 
 
 RingBuffer::RingBuffer( float size ) : 
-	m_fpp( Engine::mixer()->framesPerPeriod() ),
-	m_samplerate( Engine::mixer()->processingSampleRate() )
+	m_fpp( Engine::audioEngine()->framesPerPeriod() ),
+	m_samplerate( Engine::audioEngine()->processingSampleRate() )
 {
 	m_size = msToFrames( size ) + m_fpp;
 	m_buffer = new sampleFrame[ m_size ];
@@ -88,11 +91,11 @@ void RingBuffer::setSamplerateAware( bool b )
 {
 	if( b )
 	{
-		connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ), Qt::UniqueConnection );
+		connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()), Qt::UniqueConnection );
 	}
 	else
 	{
-		disconnect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+		disconnect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateSamplerate()));
 	}
 }
 
@@ -304,9 +307,9 @@ void RingBuffer::writeSwappedAddingMultiplied( sampleFrame * src, float offset, 
 
 void RingBuffer::updateSamplerate()
 {
-	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::mixer()->processingSampleRate() ) / m_samplerate;
+	float newsize = static_cast<float>( ( m_size - m_fpp ) * Engine::audioEngine()->processingSampleRate() ) / m_samplerate;
 	m_size = static_cast<f_cnt_t>( ceilf( newsize ) ) + m_fpp;
-	m_samplerate = Engine::mixer()->processingSampleRate();
+	m_samplerate = Engine::audioEngine()->processingSampleRate();
 	delete[] m_buffer;
 	m_buffer = new sampleFrame[ m_size ];
 	memset( m_buffer, 0, m_size * sizeof( sampleFrame ) );
@@ -314,3 +317,4 @@ void RingBuffer::updateSamplerate()
 }
 
 
+} // namespace lmms

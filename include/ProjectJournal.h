@@ -25,22 +25,28 @@
 #ifndef PROJECT_JOURNAL_H
 #define PROJECT_JOURNAL_H
 
-#include <QtCore/QHash>
-#include <QtCore/QStack>
+#include <QHash>
+#include <QStack>
 
 #include "lmms_basics.h"
 #include "DataFile.h"
 
+
+namespace lmms
+{
+
+
 class JournallingObject;
 
 
+//! @warning many parts of this class may be rewritten soon
 class ProjectJournal
 {
 public:
 	static const int MAX_UNDO_STATES;
 
 	ProjectJournal();
-	virtual ~ProjectJournal();
+	virtual ~ProjectJournal() = default;
 
 	void undo();
 	void redo();
@@ -73,10 +79,13 @@ public:
 	// restoring a journalling object later
 	void freeID( const jo_id_t _id )
 	{
-		reallocID( _id, NULL );
+		reallocID( _id, nullptr );
 	}
 
+	//! hack, not used when saving a file
 	static jo_id_t idToSave( jo_id_t id );
+	//! hack, not used when loading a savefile
+	static jo_id_t idFromSave( jo_id_t id );
 
 	void clearJournal();
 	void stopAllJournalling();
@@ -86,12 +95,12 @@ public:
 		{
 			return m_joIDs[_id];
 		}
-		return NULL;
+		return nullptr;
 	}
 
 
 private:
-	typedef QHash<jo_id_t, JournallingObject *> JoIdMap;
+	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
 
 	struct CheckPoint
 	{
@@ -103,7 +112,7 @@ private:
 		jo_id_t joID;
 		DataFile data;
 	} ;
-	typedef QStack<CheckPoint> CheckPointStack;
+	using CheckPointStack = QStack<CheckPoint>;
 
 	JoIdMap m_joIDs;
 
@@ -114,6 +123,8 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

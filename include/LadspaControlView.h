@@ -30,19 +30,29 @@
 
 #include "ModelView.h"
 
+namespace lmms
+{
+
 class LadspaControl;
 
+namespace gui
+{
 
-class EXPORT LadspaControlView : public QWidget, public ModelView
+class LMMS_EXPORT LadspaControlView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	LadspaControlView( QWidget * _parent, LadspaControl * _ctl );
-	virtual ~LadspaControlView();
+	~LadspaControlView() override = default;
 
 private:
 	LadspaControl * m_ctl;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

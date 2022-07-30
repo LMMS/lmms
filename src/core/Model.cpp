@@ -24,6 +24,8 @@
 
 #include "Model.h"
 
+namespace lmms
+{
 
 QString Model::fullDisplayName() const
 {
@@ -33,7 +35,7 @@ QString Model::fullDisplayName() const
 		const QString p = parentModel()->fullDisplayName();
 		if( n.isEmpty() && p.isEmpty() )
 		{
-			return QString::null;
+			return QString();
 		}
 		else if( p.isEmpty() )
 		{
@@ -46,5 +48,5 @@ QString Model::fullDisplayName() const
 
 
 
-
+} // namespace lmms
 

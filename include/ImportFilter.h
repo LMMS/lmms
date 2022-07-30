@@ -26,20 +26,23 @@
 #ifndef IMPORT_FILTER_H
 #define IMPORT_FILTER_H
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "Plugin.h"
+
+namespace lmms
+{
 
 
 class TrackContainer;
 
 
-class EXPORT ImportFilter : public Plugin
+class LMMS_EXPORT ImportFilter : public Plugin
 {
 public:
 	ImportFilter( const QString & _file_name,
 					const Descriptor * _descriptor );
-	virtual ~ImportFilter();
+	~ImportFilter() override = default;
 
 
 	// tries to import given file to given track-container by having all
@@ -78,20 +81,26 @@ protected:
 		return m_file.read( _data, _len );
 	}
 
+	inline QByteArray readAllData()
+	{
+		m_file.seek(0);
+		return m_file.readAll();
+	}
+
 	inline void ungetChar( char _ch )
 	{
 		m_file.ungetChar( _ch );
 	}
 
-	virtual void saveSettings( QDomDocument &, QDomElement & )
+	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
 	}
 
-	virtual void loadSettings( const QDomElement & )
+	void loadSettings( const QDomElement & ) override
 	{
 	}
 
-	virtual QString nodeName() const
+	QString nodeName() const override
 	{
 		return "import_filter";
 	}
@@ -102,5 +111,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

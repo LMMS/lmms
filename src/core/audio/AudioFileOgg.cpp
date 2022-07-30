@@ -30,18 +30,23 @@
 
 #ifdef LMMS_HAVE_OGGVORBIS
 
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
+#include <QRandomGenerator>
+#endif
+#include <string>
 #include <vorbis/vorbisenc.h>
 
-#include "Mixer.h"
+#include "AudioEngine.h"
 
+namespace lmms
+{
 
 AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,
 				const ch_cnt_t channels,
 				bool & successful,
 				const QString & file,
-				Mixer* mixer ) :
-	AudioFileDevice( outputSettings, channels, file, mixer )
+				AudioEngine* audioEngine ) :
+	AudioFileDevice( outputSettings, channels, file, audioEngine )
 {
 	m_ok = successful = outputFileOpened() && startEncoding();
 }
@@ -71,14 +76,14 @@ bool AudioFileOgg::startEncoding()
 {
 	vorbis_comment vc;
 	const char * comments = "Cool=This song has been made using LMMS";
-	int comment_length = strlen( comments );
-	char * user_comments = new char[comment_length + 1];
-	strcpy( user_comments, comments );
+	std::string user_comments_str(comments);
+	int comment_length = user_comments_str.size();
+	char * user_comments = &user_comments_str[0];
 
 	vc.user_comments = &user_comments;
 	vc.comment_lengths = &comment_length;
 	vc.comments = 1;
-	vc.vendor = NULL;
+	vc.vendor = nullptr;
 
 	m_channels = channels();
 
@@ -113,18 +118,17 @@ bool AudioFileOgg::startEncoding()
 		printf( "Mode initialization failed: invalid parameters for "
 								"bitrate\n" );
 		vorbis_info_clear( &m_vi );
-		delete[] user_comments;
 		return false;
 	}
 
 	if( useVariableBitRate )
 	{
 		// Turn off management entirely (if it was turned on).
-		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, NULL );
+		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, nullptr );
 	}
 	else
 	{
-		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, NULL );
+		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, nullptr );
 	}
 
 	vorbis_encode_setup_init( &m_vi );
@@ -136,8 +140,13 @@ bool AudioFileOgg::startEncoding()
 
 	// We give our ogg file a random serial number and avoid
 	// 0 and UINT32_MAX which can get you into trouble.
-	qsrand( time( 0 ) );
+#if (QT_VERSION >= QT_VERSION_CHECK(5,10,0))
+	// QRandomGenerator::global() is already initialized, and we can't seed() it.
+	m_serialNo = 0xD0000000 + QRandomGenerator::global()->generate() % 0x0FFFFFFF;
+#else
+	qsrand(time(0));
 	m_serialNo = 0xD0000000 + qrand() % 0x0FFFFFFF;
+#endif
 	ogg_stream_init( &m_os, m_serialNo );
 
 	// Now, build the three header packets and send through to the stream
@@ -169,12 +178,10 @@ bool AudioFileOgg::startEncoding()
 		{
 			// clean up
 			finishEncoding();
-			delete[] user_comments;
 			return false;
 		}
 	}
 
-	delete[] user_comments;
 	return true;
 }
 
@@ -205,7 +212,7 @@ void AudioFileOgg::writeBuffer( const surroundSampleFrame * _ab,
 	while( vorbis_analysis_blockout( &m_vd, &m_vb ) == 1 )
 	{
 		// Do the main analysis, creating a packet
-		vorbis_analysis( &m_vb, NULL );
+		vorbis_analysis( &m_vb, nullptr );
 		vorbis_bitrate_addblock( &m_vb );
 
 		while( vorbis_bitrate_flushpacket( &m_vd, &m_op ) )
@@ -251,7 +258,7 @@ void AudioFileOgg::finishEncoding()
 	if( m_ok )
 	{
 		// just for flushing buffers...
-		writeBuffer( NULL, 0, 0.0f );
+		writeBuffer( nullptr, 0, 0.0f );
 
 		// clean up
 		ogg_stream_clear( &m_os );
@@ -262,6 +269,8 @@ void AudioFileOgg::finishEncoding()
 	}
 }
 
+
+} // namespace lmms
 
 #endif
 

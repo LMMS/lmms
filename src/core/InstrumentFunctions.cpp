@@ -25,12 +25,14 @@
 #include <QDomElement>
 
 #include "InstrumentFunctions.h"
+#include "AudioEngine.h"
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 
+namespace lmms
+{
 
 
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
@@ -45,7 +47,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "aug" ), { 0, 4, 8, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "augsus4" ), { 0, 5, 8, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "tri" ), { 0, 3, 6, 9, -1 } },
-	
+
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6" ), { 0, 4, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6sus4" ), { 0, 5, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6add9" ), { 0, 4, 7, 9, 14, -1 } },
@@ -125,7 +127,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Neopolitan minor" ), { 0, 1, 3, 5, 7, 8, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Hungarian minor" ), { 0, 2, 3, 6, 7, 8, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
@@ -133,7 +135,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Chromatic" ), { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Half-Whole Diminished" ), { 0, 1, 3, 4, 6, 7, 9, 10, -1 } },
-	
+
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian dominant" ), { 0, 1, 4, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Persian" ), { 0, 1, 4, 5, 6, 8, 11, -1 } }
@@ -219,10 +221,6 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 
 
 
-InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
-{
-}
-
 
 
 
@@ -262,7 +260,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				Engine::mixer()->addPlayHandle( 
+				Engine::audioEngine()->addPlayHandle(
 						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::OriginNoteStacking )
 						);
@@ -302,6 +300,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
+	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
 	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
 	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
@@ -316,24 +315,19 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 		m_arpModel.addItem( chord_table[i].getName() );
 	}
 
-	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
-	m_arpDirectionModel.addItem( tr( "Down" ), new PixmapLoader( "arp_down" ) );
-	m_arpDirectionModel.addItem( tr( "Up and down" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Down and up" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
+	m_arpDirectionModel.addItem( tr( "Up" ), std::make_unique<PixmapLoader>( "arp_up" ) );
+	m_arpDirectionModel.addItem( tr( "Down" ), std::make_unique<PixmapLoader>( "arp_down" ) );
+	m_arpDirectionModel.addItem( tr( "Up and down" ), std::make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Down and up" ), std::make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Random" ), std::make_unique<PixmapLoader>( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
-	m_arpModeModel.addItem( tr( "Free" ), new PixmapLoader( "arp_free" ) );
-	m_arpModeModel.addItem( tr( "Sort" ), new PixmapLoader( "arp_sort" ) );
-	m_arpModeModel.addItem( tr( "Sync" ), new PixmapLoader( "arp_sync" ) );
+	m_arpModeModel.addItem( tr( "Free" ), std::make_unique<PixmapLoader>( "arp_free" ) );
+	m_arpModeModel.addItem( tr( "Sort" ), std::make_unique<PixmapLoader>( "arp_sort" ) );
+	m_arpModeModel.addItem( tr( "Sync" ), std::make_unique<PixmapLoader>( "arp_sync" ) );
 }
 
 
-
-
-InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
-{
-}
 
 
 
@@ -344,11 +338,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	if( _n->origin() == NotePlayHandle::OriginArpeggio ||
 		_n->origin() == NotePlayHandle::OriginNoteStacking ||
 		!m_arpEnabledModel.value() ||
-		( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
+		_n->isReleased() )
 	{
 		return;
 	}
 
+	// Set master note if not playing arp note or it will play as an ordinary note
+	_n->setMasterNote();
 
 	const int selected_arp = m_arpModel.value();
 
@@ -368,11 +364,11 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table[selected_arp].size();
-	const int range = (int)( cur_chord_size * m_arpRangeModel.value() );
+	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * m_arpRepeatsModel.value());
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
-	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate() );
+	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * Engine::audioEngine()->processingSampleRate() );
 	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() * arp_frames / 100.0f );
 
 	// used for calculating remaining frames for arp-note, we have to add
@@ -384,11 +380,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	// used for loop
 	f_cnt_t frames_processed = ( m_arpModeModel.value() != FreeMode ) ? cnphv.first()->noteOffset() : _n->noteOffset();
 
-	while( frames_processed < Engine::mixer()->framesPerPeriod() )
+	while( frames_processed < Engine::audioEngine()->framesPerPeriod() )
 	{
 		const f_cnt_t remaining_frames_for_cur_arp = arp_frames - ( cur_frame % arp_frames );
-		// does current arp-note fill whole audio-buffer?
-		if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() )
+		// does current arp-note fill whole audio-buffer or is the remaining time just
+		// a short bit that we can discard?
+		if( remaining_frames_for_cur_arp > Engine::audioEngine()->framesPerPeriod() ||
+			_n->frames() - _n->totalFramesPlayed() < arp_frames / 5 )
 		{
 			// then we don't have to do something!
 			break;
@@ -401,8 +399,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		if( m_arpModeModel.value() == SortMode &&
 				( ( cur_frame / arp_frames ) % total_range ) / range != (f_cnt_t) _n->index() )
 		{
-			// Set master note if not playing arp note or it will play as an ordinary note
-			_n->setMasterNote();
 			// update counters
 			frames_processed += arp_frames;
 			cur_frame += arp_frames;
@@ -412,12 +408,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-
 			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
 			{
-				// Set master note to prevent the note to extend over skipped notes
-				// This may only be needed for lb302
-				_n->setMasterNote();
 				// update counters
 				frames_processed += arp_frames;
 				cur_frame += arp_frames;
@@ -482,11 +474,14 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
 		}
 
+		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
+		cur_arp_idx = static_cast<int>(cur_arp_idx / m_arpRepeatsModel.value());
+
 		// Cycle notes
 		if( m_arpCycleModel.value() && dir != ArpDirRandom )
 		{
 			cur_arp_idx *= m_arpCycleModel.value() + 1;
-			cur_arp_idx %= range;
+			cur_arp_idx %= static_cast<int>( range / m_arpRepeatsModel.value() );
 		}
 
 		// now calculate final key for our arp-note
@@ -496,26 +491,20 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// range-checking
 		if( sub_note_key >= NumKeys ||
 			sub_note_key < 0 ||
-			Engine::mixer()->criticalXRuns() )
+			Engine::audioEngine()->criticalXRuns() )
 		{
 			continue;
-		}
-
-		float vol_level = 1.0f;
-		if( _n->isReleased() )
-		{
-			vol_level = _n->volumeLevel( cur_frame + gated_frames );
 		}
 
 		// create new arp-note
 
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
-		Engine::mixer()->addPlayHandle(
+		Engine::audioEngine()->addPlayHandle(
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
-							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, (volume_t) qRound( _n->getVolume() * vol_level ),
+							Note( TimePos( 0 ), TimePos( 0 ), sub_note_key, _n->getVolume(),
 									_n->getPanning(), _n->detuning() ),
 							_n, -1, NotePlayHandle::OriginArpeggio )
 				);
@@ -523,13 +512,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// update counters
 		frames_processed += arp_frames;
 		cur_frame += arp_frames;
-	}
-
-	// make sure note is handled as arp-base-note, even
-	// if we didn't add a sub-note so far
-	if( m_arpModeModel.value() != FreeMode )
-	{
-		_n->setMasterNote();
 	}
 }
 
@@ -541,13 +523,13 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpEnabledModel.saveSettings( _doc, _this, "arp-enabled" );
 	m_arpModel.saveSettings( _doc, _this, "arp" );
 	m_arpRangeModel.saveSettings( _doc, _this, "arprange" );
+	m_arpRepeatsModel.saveSettings( _doc, _this, "arprepeats" );
 	m_arpCycleModel.saveSettings( _doc, _this, "arpcycle" );
 	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
 	m_arpMissModel.saveSettings( _doc, _this, "arpmiss" );
 	m_arpTimeModel.saveSettings( _doc, _this, "arptime" );
 	m_arpGateModel.saveSettings( _doc, _this, "arpgate" );
 	m_arpDirectionModel.saveSettings( _doc, _this, "arpdir" );
-
 	m_arpModeModel.saveSettings( _doc, _this, "arpmode" );
 }
 
@@ -559,23 +541,15 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpEnabledModel.loadSettings( _this, "arp-enabled" );
 	m_arpModel.loadSettings( _this, "arp" );
 	m_arpRangeModel.loadSettings( _this, "arprange" );
+	m_arpRepeatsModel.loadSettings( _this, "arprepeats" );
 	m_arpCycleModel.loadSettings( _this, "arpcycle" );
 	m_arpSkipModel.loadSettings( _this, "arpskip" );
 	m_arpMissModel.loadSettings( _this, "arpmiss" );
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
-/*
-	// Keep compatibility with version 0.2.1 file format
-	if( _this.hasAttribute( "arpsyncmode" ) )
-	{
-	 	m_arpTimeKnob->setSyncMode( 
- 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
- 						 "arpsyncmode" ).toInt() );
-	}*/
-
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }
 
 
-
+} // namespace lmms

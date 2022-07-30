@@ -23,26 +23,33 @@
  */
 
 #include "ComboBoxModel.h"
-#include "embed.h"
 
+#include <cassert>
 
-
-void ComboBoxModel::addItem( const QString& item, PixmapLoader* loader )
+namespace lmms
 {
-	m_items.push_back( qMakePair( item, loader ) );
+
+using std::unique_ptr;
+using std::move;
+
+void ComboBoxModel::addItem( QString item, unique_ptr<PixmapLoader> loader )
+{
+	m_items.emplace_back( move(item), move(loader) );
 	setRange( 0, m_items.size() - 1 );
 }
 
 
+void ComboBoxModel::replaceItem(std::size_t index, QString item, unique_ptr<PixmapLoader> loader)
+{
+	assert(index < m_items.size());
+	m_items[index] = Item(move(item), move(loader));
+	emit propertiesChanged();
+}
 
 
 void ComboBoxModel::clear()
 {
 	setRange( 0, 0 );
-	for( const Item& i : m_items )
-	{
-		delete i.second;
-	}
 
 	m_items.clear();
 
@@ -54,7 +61,7 @@ void ComboBoxModel::clear()
 
 int ComboBoxModel::findText( const QString& txt ) const
 {
-	for( QVector<Item>::ConstIterator it = m_items.begin(); it != m_items.end(); ++it )
+	for( auto it = m_items.begin(); it != m_items.end(); ++it )
 	{
 		if( ( *it ).first == txt )
 		{
@@ -65,6 +72,6 @@ int ComboBoxModel::findText( const QString& txt ) const
 }
 
 
-
+} // namespace lmms
 
 

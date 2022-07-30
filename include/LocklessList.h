@@ -25,9 +25,12 @@
 #ifndef LOCKLESS_LIST_H
 #define LOCKLESS_LIST_H
 
-#include <QAtomicPointer>
-
 #include "LocklessAllocator.h"
+
+#include <atomic>
+
+namespace lmms
+{
 
 template<typename T>
 class LocklessList
@@ -39,9 +42,10 @@ public:
 		Element * next;
 	} ;
 
-	LocklessList( size_t size )
+	LocklessList( size_t size ) :
+		m_first(nullptr),
+		m_allocator(new LocklessAllocatorT<Element>(size))
 	{
-		m_allocator = new LocklessAllocatorT<Element>( size );
 	}
 
 	~LocklessList()
@@ -53,39 +57,29 @@ public:
 	{
 		Element * e = m_allocator->alloc();
 		e->value = value;
+		e->next = m_first.load(std::memory_order_relaxed);
 
-		do
+		while (!m_first.compare_exchange_weak(e->next, e,
+				std::memory_order_release,
+				std::memory_order_relaxed))
 		{
-#if QT_VERSION >= 0x050000
-			e->next = m_first.loadAcquire();
-#else
-			e->next = m_first;
-#endif
+			// Empty loop (compare_exchange_weak updates e->next)
 		}
-		while( !m_first.testAndSetOrdered( e->next, e ) );
 	}
 
 	Element * popList()
 	{
-		return m_first.fetchAndStoreOrdered( NULL );
+		return m_first.exchange(nullptr);
 	}
 
 	Element * first()
 	{
-#if QT_VERSION >= 0x050000
-		return m_first.loadAcquire();
-#else
-		return m_first;
-#endif
+		return m_first.load(std::memory_order_acquire);
 	}
 
 	void setFirst( Element * e )
 	{
-#if QT_VERSION >= 0x050000
-		m_first.storeRelease( e );
-#else
-		m_first = e;
-#endif
+		m_first.store(e, std::memory_order_release);
 	}
 
 	void free( Element * e )
@@ -95,10 +89,12 @@ public:
 
 
 private:
-	QAtomicPointer<Element> m_first;
+	std::atomic<Element*> m_first;
 	LocklessAllocatorT<Element> * m_allocator;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

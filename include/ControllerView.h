@@ -36,6 +36,10 @@ class QLabel;
 class QPushButton;
 class QMdiSubWindow;
 
+namespace lmms::gui
+{
+
+
 class LedCheckBox;
 
 
@@ -44,7 +48,7 @@ class ControllerView : public QFrame, public ModelView
 	Q_OBJECT
 public:
 	ControllerView( Controller * _controller, QWidget * _parent );
-	virtual ~ControllerView();
+	~ControllerView() override;
 
 	inline Controller * getController()
 	{
@@ -60,18 +64,17 @@ public:
 public slots:
 	void editControls();
 	void deleteController();
-	void displayHelp();
 	void closeControls();
 	void renameController();
 
 signals:
-	void deleteController( ControllerView * _view );
+	void deleteController( lmms::gui::ControllerView * _view );
 
 
 protected:
-	virtual void contextMenuEvent( QContextMenuEvent * _me );
-	virtual void modelChanged();
-	virtual void mouseDoubleClickEvent( QMouseEvent * event );
+	void contextMenuEvent( QContextMenuEvent * _me ) override;
+	void modelChanged() override;
+	void mouseDoubleClickEvent( QMouseEvent * event ) override;
 
 
 private:
@@ -81,5 +84,8 @@ private:
 	bool m_show;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

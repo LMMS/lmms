@@ -3,7 +3,7 @@
 <multimedia-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Harp" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
       <instrument name="OPL2">
         <OPL2 op2_waveform="0" op2_trem="0" fm="1" op2_ksr="0" op1_trem="0" op1_lvl="34" op1_waveform="1" op1_scale="0" op2_perc="1" op2_a="0" op1_perc="1" op1_mul="2" op2_lvl="54" op2_d="12" op1_a="0" op2_scale="2" op1_d="10" op2_mul="1" op1_vib="0" feedback="0" op2_r="11" trem_depth="0" op2_s="0" op1_ksr="0" op1_r="10" op1_s="8" op2_vib="0" vib_depth="1"/>
       </instrument>

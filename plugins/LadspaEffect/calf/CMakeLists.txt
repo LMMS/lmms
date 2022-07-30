@@ -12,10 +12,11 @@ FILE(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/veal/src/*.cpp")
 LIST(SORT SOURCES)
 
 # Skip files matching pattern
-SET(FILE_PATTERNS "ctl;gui;gtk;session;connector;jack;rdf;draw;fluid;preset;lv2;benchmark;win")
+SET(FILE_PATTERNS "ctl;gui;gtk;session;connector;jack;rdf;draw;fluid;preset;lv2;benchmark;win;plugin.cpp")
 FOREACH(_item ${SOURCES})
+	GET_FILENAME_COMPONENT(m_basename ${_item} NAME)
 	FOREACH(_pattern ${FILE_PATTERNS})
-		IF(${_item} MATCHES ${_pattern})
+		IF(${m_basename} MATCHES ${_pattern})
 			LIST(REMOVE_ITEM SOURCES ${_item})
 		ENDIF()
 	ENDFOREACH()
@@ -29,6 +30,10 @@ INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include"
 		
 INSTALL(TARGETS veal LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 SET_TARGET_PROPERTIES(veal PROPERTIES PREFIX "")
+
+# Disable OSC messaging, it's not mingw compatible
+TARGET_COMPILE_DEFINITIONS(veal PRIVATE DISABLE_OSC=1)
+
 SET(INLINE_FLAGS "")
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	SET(INLINE_FLAGS "-finline-functions-called-once -finline-limit=80")
@@ -42,4 +47,3 @@ ENDIF()
 IF(NOT LMMS_BUILD_APPLE AND NOT LMMS_BUILD_OPENBSD)
 	SET_TARGET_PROPERTIES(veal PROPERTIES LINK_FLAGS "${LINK_FLAGS} -shared -Wl,-no-undefined")
 ENDIF()
-

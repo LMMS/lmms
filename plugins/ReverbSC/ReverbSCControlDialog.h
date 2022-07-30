@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Paul Batchelor
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,18 +28,27 @@
 #include "EffectControlDialog.h"
 
 
+namespace lmms
+{
+
 class ReverbSCControls;
 
+
+namespace gui
+{
 
 class ReverbSCControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
 	ReverbSCControlDialog( ReverbSCControls* controls );
-	virtual ~ReverbSCControlDialog()
-	{
-	}
+	~ReverbSCControlDialog() override = default;
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

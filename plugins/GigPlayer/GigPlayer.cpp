@@ -28,6 +28,7 @@
  *
  */
 
+#include "GigPlayer.h"
 
 #include <cstring>
 #include <QDebug>
@@ -35,24 +36,27 @@
 #include <QLabel>
 #include <QDomDocument>
 
-#include "FileDialog.h"
-#include "GigPlayer.h"
-#include "Engine.h"
-#include "InstrumentTrack.h"
-#include "InstrumentPlayHandle.h"
-#include "Mixer.h"
-#include "NotePlayHandle.h"
-#include "Knob.h"
-#include "SampleBuffer.h"
-#include "Song.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
+#include "Engine.h"
+#include "FileDialog.h"
+#include "InstrumentTrack.h"
+#include "InstrumentPlayHandle.h"
+#include "Knob.h"
+#include "NotePlayHandle.h"
+#include "PathUtil.h"
+#include "SampleBuffer.h"
+#include "Song.h"
 
 #include "PatchesDialog.h"
-#include "ToolTip.h"
 #include "LcdSpinBox.h"
 
 #include "embed.h"
+#include "plugin_export.h"
+
+namespace lmms
+{
 
 
 extern "C"
@@ -60,15 +64,15 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"GIG Player",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "Player for GIG files" ),
+	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
 	"Garrett Wilson <g/at/floft/dot/net>",
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
 	"gig",
-	NULL
+	nullptr,
 } ;
 
 }
@@ -78,8 +82,8 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
-	m_instance( NULL ),
-	m_instrument( NULL ),
+	m_instance( nullptr ),
+	m_instrument( nullptr ),
 	m_filename( "" ),
 	m_bankNum( 0, 0, 999, this, tr( "Bank" ) ),
 	m_patchNum( 0, 0, 127, this, tr( "Patch" ) ),
@@ -89,13 +93,13 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_currentKeyDimension( 0 )
 {
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	Engine::audioEngine()->addPlayHandle( iph );
 
 	updateSampleRate();
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 }
 
 
@@ -103,7 +107,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 
 GigInstrument::~GigInstrument()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+	Engine::audioEngine()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::TypeNotePlayHandle
 				| PlayHandle::TypeInstrumentPlayHandle );
 	freeInstance();
@@ -164,7 +168,7 @@ AutomatableModel * GigInstrument::childModel( const QString & _modelName )
 
 	qCritical() << "requested unknown model " << _modelName;
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -183,15 +187,15 @@ void GigInstrument::freeInstance()
 	QMutexLocker synthLock( &m_synthMutex );
 	QMutexLocker notesLock( &m_notesMutex );
 
-	if( m_instance != NULL )
+	if( m_instance != nullptr )
 	{
 		delete m_instance;
-		m_instance = NULL;
+		m_instance = nullptr;
 
 		// If we're changing instruments, we got to make sure that we
 		// remove all pointers to the old samples and don't try accessing
 		// that instrument again
-		m_instrument = NULL;
+		m_instrument = nullptr;
 		m_notes.clear();
 	}
 }
@@ -211,12 +215,12 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 		try
 		{
-			m_instance = new GigInstance( SampleBuffer::tryToMakeAbsolute( _gigFile ) );
-			m_filename = SampleBuffer::tryToMakeRelative( _gigFile );
+			m_instance = new GigInstance( PathUtil::toAbsolute( _gigFile ) );
+			m_filename = PathUtil::toShortestRelative( _gigFile );
 		}
 		catch( ... )
 		{
-			m_instance = NULL;
+			m_instance = nullptr;
 			m_filename = "";
 		}
 	}
@@ -225,7 +229,7 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 	if( updateTrackName == true )
 	{
-		instrumentTrack()->setName( QFileInfo( _gigFile ).baseName() );
+		instrumentTrack()->setName(PathUtil::cleanName( _gigFile ) );
 		updatePatch();
 	}
 }
@@ -248,7 +252,7 @@ QString GigInstrument::getCurrentPatchName()
 {
 	QMutexLocker locker( &m_synthMutex );
 
-	if( m_instance == NULL )
+	if( m_instance == nullptr )
 	{
 		return "";
 	}
@@ -258,7 +262,7 @@ QString GigInstrument::getCurrentPatchName()
 
 	gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
 
-	while( pInstrument != NULL )
+	while( pInstrument != nullptr )
 	{
 		int iBank = pInstrument->MIDIBank;
 		int iProg = pInstrument->MIDIProgram;
@@ -320,8 +324,8 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 // the preferences)
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
-	const int rate = Engine::mixer()->processingSampleRate();
+	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
+	const int rate = Engine::audioEngine()->processingSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -329,7 +333,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	m_synthMutex.lock();
 	m_notesMutex.lock();
 
-	if( m_instance == NULL || m_instrument == NULL )
+	if( m_instance == nullptr || m_instrument == nullptr )
 	{
 		m_synthMutex.unlock();
 		m_notesMutex.unlock();
@@ -378,7 +382,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Delete if the ADSR for a sample is complete for normal
 			// notes, or if a release sample, then if we've reached
 			// the end of the sample
-			if( sample->sample == NULL || sample->adsr.done() ||
+			if( sample->sample == nullptr || sample->adsr.done() ||
 				( it->isRelease == true &&
 				  sample->pos >= sample->sample->SamplesTotal - 1 ) )
 			{
@@ -416,7 +420,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		for( QList<GigSample>::iterator sample = it->samples.begin();
 				sample != it->samples.end(); ++sample )
 		{
-			if( sample->sample == NULL || sample->region == NULL )
+			if( sample->sample == nullptr || sample->region == nullptr )
 			{
 				continue;
 			}
@@ -503,7 +507,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 		_working_buffer[i][1] *= m_gain.value();
 	}
 
-	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
+	instrumentTrack()->processAudioBuffer( _working_buffer, frames, nullptr );
 }
 
 
@@ -511,7 +515,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cnt_t samples )
 {
-	if( sampleData == NULL || samples < 1 )
+	if( sampleData == nullptr || samples < 1 )
 	{
 		return;
 	}
@@ -522,7 +526,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 	f_cnt_t loopStart = 0;
 	f_cnt_t loopLength = 0;
 
-	if( sample.region->pSampleLoops != NULL )
+	if( sample.region->pSampleLoops != nullptr )
 	{
 		for( uint32_t i = 0; i < sample.region->SampleLoops; ++i )
 		{
@@ -567,7 +571,7 @@ void GigInstrument::loadSample( GigSample& sample, sampleFrame* sampleData, f_cn
 		{
 			samplestoloopend = loopEnd - sample.sample->GetPos();
 			readsamples = sample.sample->Read( &buffer[totalreadsamples * sample.sample->FrameSize],
-					min( samplestoread, samplestoloopend ) );
+					std::min( samplestoread, samplestoloopend ) );
 			samplestoread -= readsamples;
 			totalreadsamples += readsamples;
 
@@ -703,9 +707,9 @@ void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * GigInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* GigInstrument::instantiateView( QWidget * _parent )
 {
-	return new GigInstrumentView( this, _parent );
+	return new gui::GigInstrumentView( this, _parent );
 }
 
 
@@ -732,7 +736,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 
 	gig::Region* pRegion = m_instrument->GetFirstRegion();
 
-	while( pRegion != NULL )
+	while( pRegion != nullptr )
 	{
 		Dimension dim = getDimensions( pRegion, gignote.velocity, wantReleaseSample );
 		gig::DimensionRegion * pDimRegion = pRegion->GetDimensionRegionByValue( dim.DimValues );
@@ -749,7 +753,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			gignote.release = dim.release;
 		}
 
-		if( pSample != NULL && pSample->SamplesTotal != 0 )
+		if( pSample != nullptr && pSample->SamplesTotal != 0 )
 		{
 			int keyLow = pRegion->KeyRange.low;
 			int keyHigh = pRegion->KeyRange.high;
@@ -757,7 +761,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
-				float length = (float) pSample->SamplesTotal / Engine::mixer()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / Engine::audioEngine()->processingSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 
@@ -790,7 +794,7 @@ Dimension GigInstrument::getDimensions( gig::Region * pRegion, int velocity, boo
 {
 	Dimension dim;
 
-	if( pRegion == NULL )
+	if( pRegion == nullptr )
 	{
 		return dim;
 	}
@@ -872,11 +876,11 @@ void GigInstrument::getInstrument()
 
 	QMutexLocker locker( &m_synthMutex );
 
-	if( m_instance != NULL )
+	if( m_instance != nullptr )
 	{
 		gig::Instrument * pInstrument = m_instance->gig.GetFirstInstrument();
 
-		while( pInstrument != NULL )
+		while( pInstrument != nullptr )
 		{
 			int iBank = pInstrument->MIDIBank;
 			int iProg = pInstrument->MIDIProgram;
@@ -907,6 +911,9 @@ void GigInstrument::updateSampleRate()
 
 
 
+namespace gui
+{
+
 
 class gigKnob : public Knob
 {
@@ -922,7 +929,7 @@ public:
 
 
 GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _parent ) :
-	InstrumentView( _instrument, _parent )
+        InstrumentViewFixedSize( _instrument, _parent )
 {
 	GigInstrument * k = castModel<GigInstrument>();
 
@@ -938,9 +945,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open other GIG file" ) );
-
-	m_fileDialogButton->setWhatsThis( tr( "Click here to open another GIG file" ) );
+	m_fileDialogButton->setToolTip(tr("Open GIG file"));
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -952,9 +957,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
-
-	m_patchDialogButton->setWhatsThis( tr( "Click here to change which patch of the GIG file to use" ) );
+	m_patchDialogButton->setToolTip(tr("Choose patch"));
 
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
@@ -963,23 +966,16 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	m_patchNumLcd = new LcdSpinBox( 3, "21pink", this );
 	m_patchNumLcd->move( 161, 150 );
 
-	m_bankNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
-	m_patchNumLcd->setWhatsThis( tr( "Change which instrument of the GIG file is being played" ) );
-
 	// Next row
 	m_filenameLabel = new QLabel( this );
 	m_filenameLabel->setGeometry( 61, 70, 156, 14 );
 	m_patchLabel = new QLabel( this );
 	m_patchLabel->setGeometry( 61, 94, 156, 14 );
 
-	m_filenameLabel->setWhatsThis( tr( "Which GIG file is currently being used" ) );
-	m_patchLabel->setWhatsThis( tr( "Which patch of the GIG file is currently being used" ) );
-
 	// Gain
 	m_gainKnob = new gigKnob( this );
-	m_gainKnob->setHintText( tr( "Gain" ) + " ", "" );
+	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move( 32, 140 );
-	m_gainKnob->setWhatsThis( tr( "Factor to multiply samples by" ) );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -987,13 +983,6 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
-}
-
-
-
-
-GigInstrumentView::~GigInstrumentView()
-{
 }
 
 
@@ -1059,7 +1048,7 @@ void GigInstrumentView::showFileDialog()
 {
 	GigInstrument * k = castModel<GigInstrument>();
 
-	FileDialog ofd( NULL, tr( "Open GIG file" ) );
+	FileDialog ofd( nullptr, tr( "Open GIG file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
@@ -1068,7 +1057,7 @@ void GigInstrumentView::showFileDialog()
 
 	if( k->m_filename != "" )
 	{
-		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
+		QString f = PathUtil::toAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
@@ -1105,16 +1094,17 @@ void GigInstrumentView::showPatchDialog()
 }
 
 
+} // namespace gui
 
 
 // Store information related to playing a sample from the GIG file
 GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 		float attenuation, int interpolation, float desiredFreq )
 	: sample( pSample ), region( pDimRegion ), attenuation( attenuation ),
-	  pos( 0 ), interpolation( interpolation ), srcState( NULL ),
+	  pos( 0 ), interpolation( interpolation ), srcState( nullptr ),
 	  sampleFreq( 0 ), freqFactor( 1 )
 {
-	if( sample != NULL && region != NULL )
+	if( sample != nullptr && region != nullptr )
 	{
 		// Note: we don't create the libsamplerate object here since we always
 		// also call the copy constructor when appending to the end of the
@@ -1144,7 +1134,7 @@ GigSample::GigSample( gig::Sample * pSample, gig::DimensionRegion * pDimRegion,
 
 GigSample::~GigSample()
 {
-	if( srcState != NULL )
+	if( srcState != nullptr )
 	{
 		src_delete( srcState );
 	}
@@ -1156,7 +1146,7 @@ GigSample::~GigSample()
 GigSample::GigSample( const GigSample& g )
 	: sample( g.sample ), region( g.region ), attenuation( g.attenuation ),
 	  adsr( g.adsr ), pos( g.pos ), interpolation( g.interpolation ),
-	  srcState( NULL ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
+	  srcState( nullptr ), sampleFreq( g.sampleFreq ), freqFactor( g.freqFactor )
 {
 	// On the copy, we want to create the object
 	updateSampleRate();
@@ -1173,11 +1163,11 @@ GigSample& GigSample::operator=( const GigSample& g )
 	adsr = g.adsr;
 	pos = g.pos;
 	interpolation = g.interpolation;
-	srcState = NULL;
+	srcState = nullptr;
 	sampleFreq = g.sampleFreq;
 	freqFactor = g.freqFactor;
 
-	if( g.srcState != NULL )
+	if( g.srcState != nullptr )
 	{
 		updateSampleRate();
 	}
@@ -1190,7 +1180,7 @@ GigSample& GigSample::operator=( const GigSample& g )
 
 void GigSample::updateSampleRate()
 {
-	if( srcState != NULL )
+	if( srcState != nullptr )
 	{
 		src_delete( srcState );
 	}
@@ -1198,7 +1188,7 @@ void GigSample::updateSampleRate()
 	int error = 0;
 	srcState = src_new( interpolation, DEFAULT_CHANNELS, &error );
 
-	if( srcState == NULL || error != 0 )
+	if( srcState == nullptr || error != 0 )
 	{
 		qCritical( "error while creating libsamplerate data structure in GigSample" );
 	}
@@ -1210,7 +1200,7 @@ void GigSample::updateSampleRate()
 bool GigSample::convertSampleRate( sampleFrame & oldBuf, sampleFrame & newBuf,
 		f_cnt_t oldSize, f_cnt_t newSize, float freq_factor, f_cnt_t& used )
 {
-	if( srcState == NULL )
+	if( srcState == nullptr )
 	{
 		return false;
 	}
@@ -1274,7 +1264,7 @@ ADSR::ADSR( gig::DimensionRegion * region, int sampleRate )
 	  attackPosition( 0 ), attackLength( 0 ), decayLength( 0 ),
 	  releasePosition( 0 ), releaseLength( 0 )
 {
-	if( region != NULL )
+	if( region != nullptr )
 	{
 		// Parameters from GIG file
 		preattack = 1.0 * region->EG1PreAttack / 1000; // EG1PreAttack is 0-1000 permille
@@ -1401,9 +1391,12 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 {
-	return new GigInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new GigInstrument( static_cast<InstrumentTrack *>( m ) );
 }
 
 }
+
+
+} // namespace lmms

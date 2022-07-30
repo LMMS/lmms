@@ -22,28 +22,27 @@
  *
  */
 
-#include <QComboBox>
-#include <QLineEdit>
 
 #include "AudioAlsa.h"
 
 #ifdef LMMS_HAVE_ALSA
 
 #include "endian_handling.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "Mixer.h"
-#include "gui_templates.h"
 
+namespace lmms
+{
 
-AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
-	AudioDevice( tLimit<ch_cnt_t>(
+AudioAlsa::AudioAlsa( bool & _success_ful, AudioEngine*  _audioEngine ) :
+	AudioDevice( qBound<ch_cnt_t>(
+		DEFAULT_CHANNELS,
 		ConfigManager::inst()->value( "audioalsa", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
-	m_handle( NULL ),
-	m_hwParams( NULL ),
-	m_swParams( NULL ),
+		SURROUND_CHANNELS ), _audioEngine ),
+	m_handle( nullptr ),
+	m_hwParams( nullptr ),
+	m_swParams( nullptr ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
@@ -107,17 +106,17 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 AudioAlsa::~AudioAlsa()
 {
 	stopProcessing();
-	if( m_handle != NULL )
+	if( m_handle != nullptr )
 	{
 		snd_pcm_close( m_handle );
 	}
 
-	if( m_hwParams != NULL )
+	if( m_hwParams != nullptr )
 	{
 		snd_pcm_hw_params_free( m_hwParams );
 	}
 
-	if( m_swParams != NULL )
+	if( m_swParams != nullptr )
 	{
 		snd_pcm_sw_params_free( m_swParams );
 	}
@@ -131,7 +130,7 @@ QString AudioAlsa::probeDevice()
 	QString dev = ConfigManager::inst()->value( "audioalsa", "device" );
 	if( dev == "" )
 	{
-		if( getenv( "AUDIODEV" ) != NULL )
+		if( getenv( "AUDIODEV" ) != nullptr )
 		{
 			return getenv( "AUDIODEV" );
 		}
@@ -171,7 +170,7 @@ AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
 	}
 
 	char** n = hints;
-	while (*n != NULL)
+	while (*n != nullptr)
 	{
 		char *name = snd_device_name_get_hint(*n, "NAME");
 		char *description = snd_device_name_get_hint(*n, "DESC");
@@ -255,9 +254,9 @@ void AudioAlsa::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( Engine::audioEngine()->processingSampleRate() );
 
-		if( m_handle != NULL )
+		if( m_handle != nullptr )
 		{
 			snd_pcm_close( m_handle );
 		}
@@ -296,14 +295,11 @@ void AudioAlsa::applyQualitySettings()
 
 void AudioAlsa::run()
 {
-	surroundSampleFrame * temp =
-		new surroundSampleFrame[mixer()->framesPerPeriod()];
-	int_sample_t * outbuf =
-			new int_sample_t[mixer()->framesPerPeriod() *
-								channels()];
+	surroundSampleFrame * temp = new surroundSampleFrame[audioEngine()->framesPerPeriod()];
+	int_sample_t * outbuf = new int_sample_t[audioEngine()->framesPerPeriod() * channels()];
 	int_sample_t * pcmbuf = new int_sample_t[m_periodSize * channels()];
 
-	int outbuf_size = mixer()->framesPerPeriod() * channels();
+	int outbuf_size = audioEngine()->framesPerPeriod() * channels();
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
@@ -328,7 +324,7 @@ void AudioAlsa::run()
 				outbuf_size = frames * channels();
 
 				convertToS16( temp, frames,
-						mixer()->masterGain(),
+						audioEngine()->masterGain(),
 						outbuf,
 						m_convertEndian );
 			}
@@ -429,7 +425,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 						sampleRate(), 0 ) ) < 0 )
 	{
 		if( ( err = snd_pcm_hw_params_set_rate( m_handle, m_hwParams,
-				mixer()->baseSampleRate(), 0 ) ) < 0 )
+				audioEngine()->baseSampleRate(), 0 ) ) < 0 )
 		{
 			printf( "Could not set sample rate: %s\n",
 							snd_strerror( err ) );
@@ -437,7 +433,7 @@ int AudioAlsa::setHWParams( const ch_cnt_t _channels, snd_pcm_access_t _access )
 		}
 	}
 
-	m_periodSize = mixer()->framesPerPeriod();
+	m_periodSize = audioEngine()->framesPerPeriod();
 	m_bufferSize = m_periodSize * 8;
 	dir = 0;
 	err = snd_pcm_hw_params_set_period_size_near( m_handle, m_hwParams,
@@ -543,5 +539,7 @@ int AudioAlsa::setSWParams()
 
 	return 0;	// all ok
 }
+
+} // namespace lmms
 
 #endif

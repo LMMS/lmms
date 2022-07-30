@@ -55,13 +55,15 @@
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "TextFloat.h"
-#include "MainWindow.h"
+
+namespace lmms::gui
+{
 
 
-TextFloat * Fader::s_textFloat = NULL;
-QPixmap * Fader::s_back = NULL;
-QPixmap * Fader::s_leds = NULL;
-QPixmap * Fader::s_knob = NULL;
+TextFloat * Fader::s_textFloat = nullptr;
+QPixmap * Fader::s_back = nullptr;
+QPixmap * Fader::s_leds = nullptr;
+QPixmap * Fader::s_knob = nullptr;
 
 Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	QWidget( _parent ),
@@ -72,7 +74,6 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_persistentPeak_R( 0.0 ),
 	m_fMinPeak( 0.01f ),
 	m_fMaxPeak( 1.1 ),
-	m_displayConversion( true ),
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
@@ -80,7 +81,7 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_peakRed( 0, 0, 0 ),
 	m_peakYellow( 0, 0, 0 )
 {
-	if( s_textFloat == NULL )
+	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new TextFloat;
 	}
@@ -102,6 +103,8 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_knob = s_knob;
 
 	init(_model, _name);
+
+	m_conversionFactor = 100.0;
 }
 
 
@@ -114,14 +117,13 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	m_persistentPeak_R( 0.0 ),
 	m_fMinPeak( 0.01f ),
 	m_fMaxPeak( 1.1 ),
-	m_displayConversion( false ),
 	m_levelsDisplayedInDBFS(false),
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
 	m_peakGreen( 0, 0, 0 ),
 	m_peakRed( 0, 0, 0 )
 {
-	if( s_textFloat == NULL )
+	if( s_textFloat == nullptr )
 	{
 		s_textFloat = new TextFloat;
 	}
@@ -132,12 +134,6 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 
 	init(model, name);
 }
-
-
-Fader::~Fader()
-{
-}
-
 
 void Fader::init(FloatModel * model, QString const & name)
 {
@@ -188,6 +184,13 @@ void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 	if( mouseEvent->button() == Qt::LeftButton &&
 			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
 	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
+
 		if( mouseEvent->y() >= knobPosY() - ( *m_knob ).height() && mouseEvent->y() < knobPosY() )
 		{
 			updateTextFloat();
@@ -216,26 +219,13 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 	bool ok;
 	float newValue;
 	// TODO: dbV handling
-	if( m_displayConversion )
-	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( model()->minValue() * 100 ).
-							arg( model()->maxValue() * 100 ),
-						model()->getRoundedValue() * 100,
-						model()->minValue() * 100,
-						model()->maxValue() * 100, model()->getDigitCount(), &ok ) * 0.01f;
-	}
-	else
-	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( model()->minValue() ).
-							arg( model()->maxValue() ),
-						model()->getRoundedValue(),
-						model()->minValue(),
-						model()->maxValue(), model()->getDigitCount(), &ok );
-	}
+	newValue = QInputDialog::getDouble( this, tr( "Set value" ),
+				tr( "Please enter a new value between %1 and %2:" ).
+						arg( model()->minValue() * m_conversionFactor ).
+						arg( model()->maxValue() * m_conversionFactor ),
+					model()->getRoundedValue() * m_conversionFactor,
+					model()->minValue() * m_conversionFactor,
+					model()->maxValue() * m_conversionFactor, model()->getDigitCount(), &ok ) / m_conversionFactor;
 
 	if( ok )
 	{
@@ -245,8 +235,17 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 
 
 
-void Fader::mouseReleaseEvent( QMouseEvent * _me )
+void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 {
+	if( mouseEvent && mouseEvent->button() == Qt::LeftButton )
+	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->restoreJournallingState();
+		}
+	}
+
 	s_textFloat->hide();
 }
 
@@ -255,7 +254,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 {
 	ev->accept();
 
-	if ( ev->delta() > 0 )
+	if (ev->angleDelta().y() > 0)
 	{
 		model()->incValue( 1 );
 	}
@@ -272,7 +271,7 @@ void Fader::wheelEvent ( QWheelEvent *ev )
 ///
 /// Set peak value (0.0 .. 1.0)
 ///
-void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime )
+void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QElapsedTimer &lastPeakTimer )
 {
 	if( fPeak <  m_fMinPeak )
 	{
@@ -289,12 +288,12 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTim
 		if( targetPeak >= persistentPeak )
 		{
 			persistentPeak = targetPeak;
-			lastPeakTime.restart();
+			lastPeakTimer.restart();
 		}
 		update();
 	}
 
-	if( persistentPeak > 0 && lastPeakTime.elapsed() > 1500 )
+	if( persistentPeak > 0 && lastPeakTimer.elapsed() > 1500 )
 	{
 		persistentPeak = qMax<float>( 0, persistentPeak-0.05 );
 		update();
@@ -305,14 +304,14 @@ void Fader::setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTim
 
 void Fader::setPeak_L( float fPeak )
 {
-	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTime_L );
+	setPeak( fPeak, m_fPeakValue_L, m_persistentPeak_L, m_lastPeakTimer_L );
 }
 
 
 
 void Fader::setPeak_R( float fPeak )
 {
-	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTime_R );
+	setPeak( fPeak, m_fPeakValue_R, m_persistentPeak_R, m_lastPeakTimer_R );
 }
 
 
@@ -320,14 +319,14 @@ void Fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_displayConversion )
+	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_conversionFactor == 100.0 )
 	{
 		s_textFloat->setText( QString("Volume: %1 dBFS").
-				arg( 20.0 * log10( model()->value() ), 3, 'f', 2 ) );
+				arg( ampToDbfs( model()->value() ), 3, 'f', 2 ) );
 	}
 	else
 	{
-		s_textFloat->setText( m_description + " " + QString("%1 ").arg( m_displayConversion ? model()->value() * 100 : model()->value() ) + " " + m_unit );
+		s_textFloat->setText( m_description + " " + QString("%1 ").arg( model()->value() * m_conversionFactor ) + " " + m_unit );
 	}
 	s_textFloat->moveGlobal( this, QPoint( width() - ( *m_knob ).width() - 5, knobPosY() - 46 ) );
 }
@@ -482,3 +481,6 @@ void Fader::setPeakYellow( const QColor & c )
 {
 	m_peakYellow = c;
 }
+
+
+} // namespace lmms::gui

@@ -22,14 +22,20 @@
  *
  */
 
-#include <QMessageBox>
 
 #include "VstEffect.h"
+
+#include "GuiApplication.h"
 #include "Song.h"
 #include "TextFloat.h"
+#include "VstPlugin.h"
 #include "VstSubPluginFeatures.h"
 
 #include "embed.h"
+#include "plugin_export.h"
+
+namespace lmms
+{
 
 
 extern "C"
@@ -37,15 +43,15 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"VST",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
+	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for using arbitrary VST effects inside LMMS." ),
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
 	Plugin::Effect,
 	new PluginPixmapLoader("logo"),
-	NULL,
+	nullptr,
 	new VstSubPluginFeatures( Plugin::Effect )
 } ;
 
@@ -70,13 +76,6 @@ VstEffect::VstEffect( Model * _parent,
 
 
 
-VstEffect::~VstEffect()
-{
-}
-
-
-
-
 bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 {
 	if( !isEnabled() || !isRunning () )
@@ -93,9 +92,11 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 		sampleFrame * buf = new sampleFrame[_frames];
 #endif
 		memcpy( buf, _buf, sizeof( sampleFrame ) * _frames );
-		m_pluginMutex.lock();
-		m_plugin->process( buf, buf );
-		m_pluginMutex.unlock();
+		if (m_pluginMutex.tryLock(Engine::getSong()->isExporting() ? -1 : 0))
+		{
+			m_plugin->process( buf, buf );
+			m_pluginMutex.unlock();
+		}
 
 		double out_sum = 0.0;
 		const float w = wetLevel();
@@ -122,10 +123,14 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	TextFloat * tf = TextFloat::displayMessage(
-		VstPlugin::tr( "Loading plugin" ),
-		VstPlugin::tr( "Please wait while loading VST plugin..." ),
-			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	gui::TextFloat* tf = nullptr;
+	if( gui::getGUI() != nullptr )
+	{
+		tf = gui::TextFloat::displayMessage(
+			VstPlugin::tr( "Loading plugin" ),
+			VstPlugin::tr( "Please wait while loading VST plugin..." ),
+				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
 	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin( _plugin ));
@@ -136,9 +141,6 @@ void VstEffect::openPlugin( const QString & _plugin )
 		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
 		return;
 	}
-
-	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin.data(), SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( Engine::getSong()->getTempo() );
 
 	delete tf;
 
@@ -161,3 +163,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms

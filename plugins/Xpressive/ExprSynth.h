@@ -27,19 +27,32 @@
 
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
-#include "Instrument.h"
 #include "MemoryManager.h"
+
+namespace lmms
+{
 
 
 class ExprFrontData;
+class NotePlayHandle;
+
+namespace gui
+{
+class automatableButtonGroup;
+class Knob;
+class LedCheckBox;
+class PixmapButton;
+}
+
 
 class ExprFront
 {
 public:
-	typedef float (*ff1data_functor)(void*, float);
-	ExprFront(const char* expr);
+	using ff1data_functor = float (*)(void*, float);
+	ExprFront(const char* expr, int last_func_samples);
 	~ExprFront();
 	bool compile();
 	inline bool isValid() { return m_valid; }
@@ -52,6 +65,9 @@ public:
 private:
 	ExprFrontData *m_data;
 	bool m_valid;
+	
+	static const int max_float_integer_mask=(1<<(std::numeric_limits<float>::digits))-1;
+
 };
 
 class WaveSample
@@ -137,5 +153,6 @@ inline void clearArray(T* arr,unsigned int size)
 }
 
 
+} // namespace lmms
 
 #endif
