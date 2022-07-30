@@ -29,7 +29,7 @@
 #include <QString>
 #include <QMutex>
 
-#include "MemoryManager.h"
+#include "Memory.h"
 #include "PlayHandle.h"
 
 namespace lmms

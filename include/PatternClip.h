@@ -35,7 +35,7 @@ namespace lmms
  *
  *  Only used in the Song (Editor). See PatternStore.h for more info.
 */
-class PatternClip : public Clip
+class LMMS_EXPORT PatternClip : public Clip
 {
 public:
 	PatternClip(Track* track);

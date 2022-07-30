@@ -27,13 +27,14 @@
 
 #include <QFile>
 
+#include "lmms_export.h"
 #include "lmms_basics.h"
 #include "MicroTimer.h"
 
 namespace lmms
 {
 
-class AudioEngineProfiler
+class LMMS_EXPORT AudioEngineProfiler
 {
 public:
 	AudioEngineProfiler();

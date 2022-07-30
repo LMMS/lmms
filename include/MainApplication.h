@@ -25,6 +25,7 @@
 #ifndef MAINAPPLICATION_H
 #define MAINAPPLICATION_H
 
+#include "lmms_export.h"
 #include "lmmsconfig.h"
 
 #include <QApplication>
@@ -40,7 +41,7 @@ namespace lmms::gui
 
 
 #if defined(LMMS_BUILD_WIN32)
-class MainApplication : public QApplication, public QAbstractNativeEventFilter
+class LMMS_EXPORT MainApplication : public QApplication, public QAbstractNativeEventFilter
 #else
 class MainApplication : public QApplication
 #endif

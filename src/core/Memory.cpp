@@ -1,7 +1,9 @@
 /*
- * MemoryManager.cpp
+ * Memory.cpp
  *
- * Copyright (c) 2017 Lukas W <lukaswhl/at/gmail.com>
+ * Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
+ * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,7 +25,7 @@
  */
 
 
-#include "MemoryManager.h"
+#include "Memory.h"
 
 #include <QtGlobal>
 #include "rpmalloc.h"
@@ -31,35 +33,6 @@
 namespace lmms
 {
 
-
-/// Global static object handling rpmalloc intializing and finalizing
-struct MemoryManagerGlobalGuard {
-	MemoryManagerGlobalGuard() {
-		rpmalloc_initialize();
-	}
-	~MemoryManagerGlobalGuard() {
-		rpmalloc_finalize();
-	}
-} static mm_global_guard;
-
-
-namespace {
-static thread_local size_t thread_guard_depth;
-}
-
-MemoryManager::ThreadGuard::ThreadGuard()
-{
-	if (thread_guard_depth++ == 0) {
-		rpmalloc_thread_initialize();
-	}
-}
-
-MemoryManager::ThreadGuard::~ThreadGuard()
-{
-	if (--thread_guard_depth == 0) {
-		rpmalloc_thread_finalize(true);
-	}
-}
 
 static thread_local MemoryManager::ThreadGuard local_mm_thread_guard{};
 
@@ -80,5 +53,34 @@ void MemoryManager::free(void * ptr)
 	return rpfree(ptr);
 }
 
+void MemoryManager::initialize()
+{
+	rpmalloc_initialize();
+}
+
+void MemoryManager::deinitialize()
+{
+	rpmalloc_finalize();
+}
+
+void MemoryManager::thread_initialize()
+{
+	rpmalloc_thread_initialize();
+}
+
+void MemoryManager::thread_deinitialize()
+{
+	rpmalloc_thread_finalize(true);
+}
+
+void* _AlignedAllocator_Base::alloc_impl(size_t alignment, size_t size )
+{
+	return rpaligned_alloc(alignment, size);
+}
+
+void _AlignedAllocator_Base::dealloc_impl(void* p)
+{
+	rpfree(p);
+}
 
 } // namespace lmms

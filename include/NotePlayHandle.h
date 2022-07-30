@@ -32,7 +32,7 @@
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
-#include "MemoryManager.h"
+#include "MemoryPool.h"
 
 class QReadWriteLock;
 
@@ -47,7 +47,6 @@ using ConstNotePlayHandleList = QList<const NotePlayHandle*>;
 
 class LMMS_EXPORT NotePlayHandle : public PlayHandle, public Note
 {
-	MM_OPERATORS
 public:
 	void * m_pluginData;
 	std::unique_ptr<BasicFilters<>> m_filter;
@@ -334,33 +333,7 @@ private:
 	bool m_frequencyNeedsUpdate;				// used to update pitch
 } ;
 
-
-const int INITIAL_NPH_CACHE = 256;
-const int NPH_CACHE_INCREMENT = 16;
-
-class NotePlayHandleManager
-{
-	MM_OPERATORS
-public:
-	static void init();
-	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
-					const f_cnt_t offset,
-					const f_cnt_t frames,
-					const Note& noteToPlay,
-					NotePlayHandle* parent = nullptr,
-					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginMidiClip );
-	static void release( NotePlayHandle * nph );
-	static void extend( int i );
-	static void free();
-
-private:
-	static NotePlayHandle ** s_available;
-	static QReadWriteLock s_mutex;
-	static std::atomic_int s_availableIndex;
-	static int s_size;
-};
-
+extern MemoryPool<NotePlayHandle> NotePlayHandlePool;
 
 } // namespace lmms
 

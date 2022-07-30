@@ -6,6 +6,8 @@ INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/src")
 
 SET(CMAKE_CXX_STANDARD 17)
 
+FIND_PACKAGE(Qt5Test)
+
 SET(CMAKE_AUTOMOC ON)
 
 # FIXME: remove this once we export include directories for LMMS
@@ -17,16 +19,12 @@ ADD_EXECUTABLE(tests
 	EXCLUDE_FROM_ALL
 	main.cpp
 	QTestSuite.cpp
-	$<TARGET_OBJECTS:lmmsobjs>
 
 	src/core/AutomatableModelTest.cpp
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
+	src/core/MemoryPoolTest.cpp
 
 	src/tracks/AutomationTrackTest.cpp
 )
-TARGET_COMPILE_DEFINITIONS(tests
-	PRIVATE $<TARGET_PROPERTY:lmmsobjs,INTERFACE_COMPILE_DEFINITIONS>
-)
-TARGET_LINK_LIBRARIES(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
-TARGET_LINK_LIBRARIES(tests ${LMMS_REQUIRED_LIBS})
+TARGET_LINK_LIBRARIES(tests lmmslib Qt5::Test)

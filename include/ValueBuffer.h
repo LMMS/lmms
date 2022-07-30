@@ -28,7 +28,7 @@
 
 #include <vector>
 
-#include "MemoryManager.h"
+#include "Memory.h"
 #include "lmms_export.h"
 
 namespace lmms

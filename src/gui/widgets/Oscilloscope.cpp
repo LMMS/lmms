@@ -29,12 +29,12 @@
 #include "Oscilloscope.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
-#include "MainWindow.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "MainWindow.h"
+#include "MixHelpers.h"
 #include "Song.h"
 #include "embed.h"
-#include "BufferManager.h"
 
 namespace lmms::gui
 {
@@ -55,7 +55,7 @@ Oscilloscope::Oscilloscope( QWidget * _p ) :
 	const fpp_t frames = Engine::audioEngine()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
-	BufferManager::clear( m_buffer, frames );
+	MixHelpers::clear( m_buffer, frames );
 
 
 	setToolTip(tr("Oscilloscope"));

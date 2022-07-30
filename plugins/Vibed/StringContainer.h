@@ -27,7 +27,7 @@
 #include <QVector>
 
 #include "VibratingString.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 namespace lmms
 {

@@ -30,7 +30,7 @@
 #include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 namespace lmms
 {

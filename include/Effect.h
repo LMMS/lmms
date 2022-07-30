@@ -31,7 +31,7 @@
 #include "AudioEngine.h"
 #include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 namespace lmms
 {

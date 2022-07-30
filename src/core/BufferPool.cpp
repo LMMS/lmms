@@ -1,6 +1,9 @@
 /*
- * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * BufferPool.cpp
+ *
+ * Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
+ * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
+ * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,31 +24,31 @@
  *
  */
 
+#include "BufferPool.h"
 
-#ifndef MEMORY_HELPER_H
-#define MEMORY_HELPER_H
+#include <cstring>
 
-#include <cstddef>
+#include "MemoryPool.h"
 
 namespace lmms
 {
 
+static std::unique_ptr<_MemoryPool_Base> pool;
+const int BM_INITIAL_BUFFERS = 256;
 
-/**
- * Helper class to alocate aligned memory and free it.
- */
-class MemoryHelper {
-public:
+void BufferPool::init( fpp_t framesPerPeriod )
+{
+	pool.reset(new _MemoryPool_Base(framesPerPeriod * sizeof(sampleFrame), BM_INITIAL_BUFFERS));
+}
 
-	static void* alignedMalloc( size_t );
+sampleFrame * BufferPool::acquire()
+{
+	return reinterpret_cast<sampleFrame*>(pool->allocate());
+}
 
-	static void alignedFree( void* );
-
-private:
-};
-
+void BufferPool::release( sampleFrame * buf )
+{
+	pool->deallocate(buf);
+}
 
 } // namespace lmms
-
-#endif
-

@@ -30,7 +30,7 @@
 #include <cmath>
 #include <QObject>
 #include "lmms_basics.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 
 namespace lmms

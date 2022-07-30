@@ -36,7 +36,7 @@ namespace lmms
 {
 
 
-class RenderManager : public QObject
+class LMMS_EXPORT RenderManager : public QObject
 {
 	Q_OBJECT
 public:

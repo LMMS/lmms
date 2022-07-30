@@ -1,7 +1,8 @@
 /*
- * Gb_Apu_Buffer.cpp - Gb_Apu subclass which allows direct buffer access
- * Copyright (c) 2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
- * 
+ * MemoryPoolTest.cpp
+ *
+ * Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -20,36 +21,41 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef GB_APU_BUFFER_H
-#define GB_APU_BUFFER_H
 
-#include "Gb_Apu.h"
-#include "Multi_Buffer.h"
-#include "Memory.h"
+#include "QTestSuite.h"
 
-namespace lmms
+#include "MemoryPool.h"
+
+#include <array>
+#include <stack>
+
+class MemoryPoolTest : QTestSuite
 {
+	Q_OBJECT
+private slots:
+	void MemoryPoolTests()
+	{
+		using namespace lmms;
 
+		using T = std::array<char, 16>;
+		int n = 256;
+		MemoryPool<T> pool(n);
 
-class Gb_Apu_Buffer : public Gb_Apu {
-	MM_OPERATORS
-public:
-	Gb_Apu_Buffer() = default;
-	~Gb_Apu_Buffer() = default;
+		std::stack<T*> ptrs;
 
-	void end_frame(blip_time_t);
+		for (int i=0; i < n; i++) {
+			ptrs.push(pool.allocate_bounded());
+			QVERIFY(ptrs.top());
+		}
+		QCOMPARE(pool.allocate_bounded(), static_cast<T*>(nullptr));
+		ptrs.push(pool.allocate());
+		QVERIFY(ptrs.top());
 
-	blargg_err_t set_sample_rate(long sample_rate, long clock_rate);
-	long samples_avail() const;
-	using sample_t = blip_sample_t;
-	long read_samples(sample_t* out, long count);
-	void bass_freq(int freq);
-private:
-	Stereo_Buffer m_buf;
-};
+		while (!ptrs.empty()) {
+			pool.deallocate(ptrs.top());
+			ptrs.pop();
+		}
+	}
+} MemoryPoolTests;
 
-
-} // namespace lmms
-
-#endif
-
+#include "MemoryPoolTest.moc"

@@ -30,9 +30,9 @@
 	#include <thread>
 #endif
 
-#include "BufferManager.h"
-#include "Engine.h"
 #include "AudioEngine.h"
+#include "Engine.h"
+#include "MixHelpers.h"
 #include "AutomatableModel.h"
 #include "fftw3.h"
 #include "fft_helpers.h"
@@ -81,7 +81,7 @@ void Oscillator::update(sampleFrame* ab, const fpp_t frames, const ch_cnt_t chnl
 {
 	if (m_freq >= Engine::audioEngine()->processingSampleRate() / 2)
 	{
-		BufferManager::clear(ab, frames);
+		MixHelpers::clear(ab, frames);
 		return;
 	}
 	// If this oscillator is used to PM or PF modulate another oscillator, take a note.

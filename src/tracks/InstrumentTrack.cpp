@@ -338,7 +338,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const TimePos& tim
 				if (m_notes[event.key()] == nullptr && event.key() >= firstKey() && event.key() <= lastKey())
 				{
 					NotePlayHandle* nph =
-						NotePlayHandleManager::acquire(
+						NotePlayHandlePool.construct(
 								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								Note( TimePos(), TimePos(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
@@ -767,7 +767,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			const f_cnt_t note_frames =
 				cur_note->length().frames( frames_per_tick );
 
-			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			NotePlayHandle* notePlayHandle = NotePlayHandlePool.construct( this, _offset, note_frames, *cur_note );
 			notePlayHandle->setPatternTrack(pattern_track);
 			// are we playing global song?
 			if( _clip_num < 0 )

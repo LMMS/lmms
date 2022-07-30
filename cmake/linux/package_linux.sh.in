@@ -108,7 +108,7 @@ chmod +x "${APPDIR}usr/bin/lmms"
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
-export LD_LIBRARY_PATH="${APPDIR}"usr/lib/lmms/:"${APPDIR}"usr/lib/lmms/optional:"$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="${APPDIR}"usr/lib/:"${APPDIR}"usr/lib/lmms/:"${APPDIR}"usr/lib/lmms/optional:"$LD_LIBRARY_PATH"
 
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"

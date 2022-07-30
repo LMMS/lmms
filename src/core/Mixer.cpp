@@ -26,7 +26,7 @@
 
 #include "AudioEngine.h"
 #include "AudioEngineWorkerThread.h"
-#include "BufferManager.h"
+#include "BufferPool.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -75,7 +75,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_hasColor( false ),
 	m_dependenciesMet(0)
 {
-	BufferManager::clear( m_buffer, Engine::audioEngine()->framesPerPeriod() );
+	MixHelpers::clear( m_buffer, Engine::audioEngine()->framesPerPeriod() );
 }
 
 
@@ -595,7 +595,7 @@ void Mixer::mixToChannel( const sampleFrame * _buf, mix_ch_t _ch )
 
 void Mixer::prepareMasterMix()
 {
-	BufferManager::clear( m_mixerChannels[0]->m_buffer,
+	MixHelpers::clear( m_mixerChannels[0]->m_buffer,
 					Engine::audioEngine()->framesPerPeriod() );
 }
 
@@ -668,7 +668,7 @@ void Mixer::masterMix( sampleFrame * _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear( m_mixerChannels[i]->m_buffer,
+		MixHelpers::clear( m_mixerChannels[i]->m_buffer,
 				Engine::audioEngine()->framesPerPeriod() );
 		m_mixerChannels[i]->reset();
 		m_mixerChannels[i]->m_queued = false;

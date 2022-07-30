@@ -33,9 +33,9 @@
 #include <windows.h>
 #endif
 
-#include "BufferManager.h"
 #include "AudioEngine.h"
 #include "Engine.h"
+#include "MixHelpers.h"
 #include "Song.h"
 
 #include <QCoreApplication>
@@ -333,7 +333,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 	{
 		if( _out_buf != nullptr )
 		{
-			BufferManager::clear( _out_buf, frames );
+			MixHelpers::clear( _out_buf, frames );
 		}
 		return false;
 	}
@@ -352,7 +352,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		}
 		if( _out_buf != nullptr )
 		{
-			BufferManager::clear( _out_buf, frames );
+			MixHelpers::clear( _out_buf, frames );
 		}
 		return false;
 	}
@@ -426,7 +426,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf, sampleFrame * _out_buf 
 		sampleFrame * o = (sampleFrame *) ( m_audioBuffer.get() +
 							m_inputCount*frames );
 		// clear buffer, if plugin didn't fill up both channels
-		BufferManager::clear( _out_buf, frames );
+		MixHelpers::clear( _out_buf, frames );
 
 		for( ch_cnt_t ch = 0; ch <
 				qMin<int>( DEFAULT_CHANNELS, outputs ); ++ch )
