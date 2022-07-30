@@ -608,11 +608,11 @@ PianoView {
 
 /* font sizes for text buttons */
 
-FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
+MixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
-FxLine {
+MixerLine {
 	background: #5b6571;
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,

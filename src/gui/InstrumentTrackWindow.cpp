@@ -40,8 +40,8 @@
 #include "Engine.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
-#include "FxLineLcdSpinBox.h"
-#include "FxMixer.h"
+#include "MixerLineLcdSpinBox.h"
+#include "Mixer.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "Instrument.h"
@@ -190,13 +190,13 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	basicControlsLayout->setColumnStretch(5, 1);
 
 
-	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox( 2, nullptr, tr( "FX channel" ), m_itv );
+	// setup spinbox for selecting Mixer-channel
+	m_mixerChannelNumber = new MixerLineLcdSpinBox( 2, nullptr, tr( "Mixer channel" ), m_itv );
 
-	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );
-	basicControlsLayout->setAlignment( m_effectChannelNumber, widgetAlignment );
+	basicControlsLayout->addWidget( m_mixerChannelNumber, 0, 6 );
+	basicControlsLayout->setAlignment( m_mixerChannelNumber, widgetAlignment );
 
-	label = new QLabel( tr( "FX" ), this );
+	label = new QLabel( tr( "CHANNEL" ), this );
 	label->setStyleSheet( labelStyleSheet );
 	basicControlsLayout->addWidget( label, 1, 6);
 	basicControlsLayout->setAlignment( label, labelAlignment );
@@ -316,7 +316,7 @@ void InstrumentTrackWindow::setInstrumentTrackView( InstrumentTrackView* view )
 	}
 
 	m_itv = view;
-	m_effectChannelNumber->setTrackView(m_itv);
+	m_mixerChannelNumber->setTrackView(m_itv);
 }
 
 
@@ -338,7 +338,7 @@ void InstrumentTrackWindow::modelChanged()
 
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );
-	m_effectChannelNumber->setModel( &m_track->m_effectChannelModel );
+	m_mixerChannelNumber->setModel( &m_track->m_mixerChannelModel );
 	m_pianoView->setModel( &m_track->m_piano );
 
 	if( m_track->instrument() && m_track->instrument()->flags().testFlag( Instrument::IsNotBendable ) == false )

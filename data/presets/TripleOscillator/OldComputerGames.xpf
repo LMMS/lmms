@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Old Computer Games" solo="0">
-    <instrumenttrack pan="-7" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="50">
+    <instrumenttrack pan="-7" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="50">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="" finer0="-4" userwavefile1="" finer1="2" userwavefile2="" finer2="-2" coarse0="0" coarse1="0" coarse2="0" finel0="4" finel1="-2" modalgo1="2" modalgo2="0" finel2="2" pan0="0" modalgo3="0" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="3" stphdetun2="0" wavetype1="3" wavetype2="2" vol0="33" vol1="30" phoffset0="0" phoffset1="0" vol2="33"/>
       </instrument>

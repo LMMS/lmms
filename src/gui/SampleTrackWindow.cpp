@@ -113,13 +113,13 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	basicControlsLayout->setColumnStretch(2, 1);
 
 
-	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox(2, nullptr, tr("FX channel"), m_stv);
+	// setup spinbox for selecting Mixer-channel
+	m_mixerChannelNumber = new MixerLineLcdSpinBox(2, nullptr, tr("Mixer channel"), m_stv);
 
-	basicControlsLayout->addWidget(m_effectChannelNumber, 0, 3);
-	basicControlsLayout->setAlignment(m_effectChannelNumber, widgetAlignment);
+	basicControlsLayout->addWidget(m_mixerChannelNumber, 0, 3);
+	basicControlsLayout->setAlignment(m_mixerChannelNumber, widgetAlignment);
 
-	label = new QLabel(tr("FX"), this);
+	label = new QLabel(tr("CHANNEL"), this);
 	label->setStyleSheet(labelStyleSheet);
 	basicControlsLayout->addWidget(label, 1, 3);
 	basicControlsLayout->setAlignment(label, labelAlignment);
@@ -183,7 +183,7 @@ void SampleTrackWindow::modelChanged()
 
 	m_volumeKnob->setModel(&m_track->m_volumeModel);
 	m_panningKnob->setModel(&m_track->m_panningModel);
-	m_effectChannelNumber->setModel(&m_track->m_effectChannelModel);
+	m_mixerChannelNumber->setModel(&m_track->m_mixerChannelModel);
 
 	updateName();
 }

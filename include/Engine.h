@@ -36,7 +36,7 @@
 
 class AudioEngine;
 class BBTrackContainer;
-class FxMixer;
+class Mixer;
 class ProjectJournal;
 class Song;
 class Ladspa2LMMS;
@@ -67,9 +67,9 @@ public:
 		return s_audioEngine;
 	}
 
-	static FxMixer * fxMixer()
+	static Mixer * mixer()
 	{
-		return s_fxMixer;
+		return s_mixer;
 	}
 
 	static Song * getSong()
@@ -141,7 +141,7 @@ private:
 
 	// core
 	static AudioEngine *s_audioEngine;
-	static FxMixer * s_fxMixer;
+	static Mixer * s_mixer;
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;
 	static ProjectJournal * s_projectJournal;

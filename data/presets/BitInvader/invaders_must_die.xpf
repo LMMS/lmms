@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Invaders must die" solo="0">
-    <instrumenttrack pan="0" fxch="11" pitchrange="1" pitch="0" basenote="45" vol="30.2">
+    <instrumenttrack pan="0" mixch="11" pitchrange="1" pitch="0" basenote="45" vol="30.2">
       <instrument name="bitinvader">
         <bitinvader version="0.1" sampleLength="56" normalize="1" sampleShape="AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AACAPwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" interpolation="0"/>
       </instrument>

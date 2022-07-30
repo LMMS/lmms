@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="59" name="Fat Reversed Kick" tab="0">
+    <instrumenttrack mixch="0" vol="59" name="Fat Reversed Kick" tab="0">
       <audiofileprocessor reversed="1" looped="1" eframe="0.999949" sframe="0" amp="100" src="drums/bassdrum01.ogg"/>
       <eldata fres="3" ftype="0" fcut="193" fwet="1">
         <elvol userwavefile="" lpdel="0" ctlenvamt="0" amt="1" rel="0.05" latt="0" sus="0" lspd="0.1" att="0.05" pdel="0" lfosyncmode="0" lamt="0" dec="0" x100="0" lshp="0" hold="0"/>

@@ -3,7 +3,7 @@
 <multimedia-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" surpos-x="0" surpos-y="0" basenote="75" name="Oh Synth" vol="102" tab="0">
+    <instrumenttrack mixch="0" surpos-x="0" surpos-y="0" basenote="75" name="Oh Synth" vol="102" tab="0">
       <lb302 db24="1" vcf_res="1.045" vcf_dec="0.42" vco_detune="-16" dead="0" vcf_cut="0.15" vcf_mod="0.61" dist="0" slide_dec="0.57" slide="0" shape="2"/>
       <eldata fres="0.5" ftype="0" fcut="14000" fwet="0">
         <elvol lspd_denominator="4" userwavefile="" pdel="0" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" sus="0.5" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>

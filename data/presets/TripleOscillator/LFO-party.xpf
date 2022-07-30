@@ -3,7 +3,7 @@
 <multimedia-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="LFO-party">
-    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="69" vol="59">
+    <instrumenttrack pan="0" mixch="0" pitch="0" basenote="69" vol="59">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="89" userwavefile0="samples/empty.wav" userwavefile1="samples/empty.wav" finer0="0" userwavefile2="samples/empty.wav" finer1="10" finer2="0" coarse0="0" coarse1="12" coarse2="-12" finel0="0" finel1="-10" modalgo1="2" finel2="0" modalgo2="2" pan0="0" modalgo3="0" pan1="12" stphdetun0="0" pan2="-37" stphdetun1="0" wavetype0="2" stphdetun2="296" wavetype1="2" wavetype2="2" vol0="85" vol1="51" phoffset0="0" phoffset1="0" vol2="48"/>
       </instrument>

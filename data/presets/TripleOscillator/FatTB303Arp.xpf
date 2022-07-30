@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Fat TB303 Arp" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="28.7">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="28.7">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="-12" coarse1="-24" coarse2="-24" finel0="0" finel1="0" modalgo1="0" modalgo2="1" finel2="0" pan0="10" modalgo3="2" pan1="0" stphdetun0="84" pan2="6" stphdetun1="263" wavetype0="5" stphdetun2="0" wavetype1="0" wavetype2="2" vol0="72" vol1="64" phoffset0="183" phoffset1="106" vol2="52"/>
       </instrument>

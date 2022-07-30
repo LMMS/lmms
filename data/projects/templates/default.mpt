@@ -5,7 +5,7 @@
   <song>
     <trackcontainer width="600" x="5" y="5" maximized="0" height="300" visible="1" type="song" minimized="0">
       <track muted="0" type="0" name="TripleOscillator" solo="0">
-        <instrumenttrack pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
+        <instrumenttrack pan="0" mixch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
           <instrument name="tripleoscillator">
             <tripleoscillator phoffset2="0" userwavefile0="" finer0="0" userwavefile1="" finer1="0" userwavefile2="" finer2="0" coarse0="0" coarse1="-12" coarse2="-24" finel0="0" finel1="0" modalgo1="2" modalgo2="2" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="0" pan2="0" stphdetun1="0" wavetype0="0" stphdetun2="0" wavetype1="0" wavetype2="0" vol0="33" vol1="33" phoffset0="0" phoffset1="0" vol2="33" useWaveTable1="1" useWaveTable2="1" useWaveTable3="1"/>
           </instrument>
@@ -29,7 +29,7 @@
         <bbtrack>
           <trackcontainer width="640" x="610" y="5" maximized="0" height="400" visible="0" type="bbtrackcontainer" minimized="0">
             <track muted="0" type="0" name="Kicker" solo="0">
-              <instrumenttrack pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
+              <instrumenttrack pan="0" mixch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
                 <instrument name="kicker">
                   <kicker decay_numerator="4" decay_denominator="4" distend="0.8" click="0.4" endnote="0" version="1" decay_syncmode="0" decay="440" noise="0" slope="0.06" dist="0.8" env="0.163" startnote="1" startfreq="150" endfreq="40" gain="1"/>
                 </instrument>
@@ -70,11 +70,11 @@
         <object id="5865711"/>
       </automationpattern>
     </track>
-    <fxmixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
-      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+    <mixer width="543" x="5" y="310" maximized="0" height="335" visible="1" minimized="0">
+      <mixerchannel num="0" muted="0" volume="1" name="Master" soloed="0">
         <fxchain numofeffects="0" enabled="0"/>
-      </fxchannel>
-    </fxmixer>
+      </mixerchannel>
+    </mixer>
     <ControllerRackView width="350" x="680" y="310" maximized="0" height="200" visible="1" minimized="0"/>
     <pianoroll width="640" x="5" y="5" maximized="0" height="480" visible="0" minimized="0"/>
     <automationeditor width="640" x="-36" y="0" maximized="0" height="400" visible="0" minimized="0"/>

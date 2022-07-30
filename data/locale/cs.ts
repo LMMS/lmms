@@ -5334,134 +5334,134 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
 </context>
 <context>
-    <name>FxLine</name>
+    <name>MixerLine</name>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="86"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="86"/>
         <source>Channel send amount</source>
         <translation>Množství odeslaného kanálu</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="242"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="242"/>
         <source>Move &amp;left</source>
         <translation>Přesunout do&amp;leva</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="243"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="243"/>
         <source>Move &amp;right</source>
         <translation>Přesun dop&amp;rava</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="245"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="245"/>
         <source>Rename &amp;channel</source>
         <translation>Přejmenovat &amp;kanál</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="250"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="250"/>
         <source>R&amp;emove channel</source>
         <translation>Př&amp;esunout kanál</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="253"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="253"/>
         <source>Remove &amp;unused channels</source>
         <translation>Odstranit nepo&amp;užívané kanály</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="255"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="255"/>
         <source>Set channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="256"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="256"/>
         <source>Remove channel color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLine.cpp" line="257"/>
+        <location filename="../../src/gui/widgets/MixerLine.cpp" line="257"/>
         <source>Pick random channel color</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
-    <name>FxLineLcdSpinBox</name>
+    <name>MixerLineLcdSpinBox</name>
     <message>
-        <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
+        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
         <source>Assign to:</source>
         <translation>Přiřadit k:</translation>
     </message>
     <message>
-        <location filename="../../src/gui/widgets/FxLineLcdSpinBox.cpp" line="58"/>
-        <source>New FX Channel</source>
+        <location filename="../../src/gui/widgets/MixerLineLcdSpinBox.cpp" line="58"/>
+        <source>New mixer Channel</source>
         <translation>Nový efektový kanál</translation>
     </message>
 </context>
 <context>
-    <name>FxMixer</name>
+    <name>Mixer</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="704"/>
+        <location filename="../../src/core/Mixer.cpp" line="704"/>
         <source>Master</source>
         <translation>Hlavní</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="704"/>
-        <location filename="../../src/core/FxMixer.cpp" line="825"/>
-        <location filename="../../src/core/FxMixer.cpp" line="827"/>
-        <source>FX %1</source>
+        <location filename="../../src/core/Mixer.cpp" line="704"/>
+        <location filename="../../src/core/Mixer.cpp" line="825"/>
+        <location filename="../../src/core/Mixer.cpp" line="827"/>
+        <source>Channel %1</source>
         <translation>Efekt %1</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="705"/>
+        <location filename="../../src/core/Mixer.cpp" line="705"/>
         <source>Volume</source>
         <translation>Hlasitost</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="706"/>
+        <location filename="../../src/core/Mixer.cpp" line="706"/>
         <source>Mute</source>
         <translation>Ztlumit</translation>
     </message>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="707"/>
+        <location filename="../../src/core/Mixer.cpp" line="707"/>
         <source>Solo</source>
         <translation>Sólo</translation>
     </message>
 </context>
 <context>
-    <name>FxMixerView</name>
+    <name>MixerView</name>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="70"/>
-        <source>FX-Mixer</source>
+        <location filename="../../src/gui/MixerView.cpp" line="70"/>
+        <source>Mixer</source>
         <translation>Efektový mixážní panel</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="289"/>
-        <source>FX Fader %1</source>
+        <location filename="../../src/gui/MixerView.cpp" line="289"/>
+        <source>Fader %1</source>
         <translation>Efektový fader %1</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="298"/>
+        <location filename="../../src/gui/MixerView.cpp" line="298"/>
         <source>Mute</source>
         <translation>Ztlumit</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="306"/>
-        <source>Mute this FX channel</source>
+        <location filename="../../src/gui/MixerView.cpp" line="306"/>
+        <source>Mute this mixer channel</source>
         <translation>Ztlumit tento efektový kanál</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="308"/>
+        <location filename="../../src/gui/MixerView.cpp" line="308"/>
         <source>Solo</source>
         <translation>Sólo</translation>
     </message>
     <message>
-        <location filename="../../src/gui/FxMixerView.cpp" line="318"/>
-        <source>Solo FX channel</source>
+        <location filename="../../src/gui/MixerView.cpp" line="318"/>
+        <source>Solo mixer channel</source>
         <translation>Sólovat efektový kanál</translation>
     </message>
 </context>
 <context>
-    <name>FxRoute</name>
+    <name>MixerRoute</name>
     <message>
-        <location filename="../../src/core/FxMixer.cpp" line="43"/>
-        <location filename="../../src/core/FxMixer.cpp" line="58"/>
+        <location filename="../../src/core/Mixer.cpp" line="43"/>
+        <location filename="../../src/core/Mixer.cpp" line="58"/>
         <source>Amount to send from channel %1 to channel %2</source>
         <translation>Množství k odeslání z kanálu %1 do kanálu %2</translation>
     </message>
@@ -6620,7 +6620,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="106"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Efektový kanál</translation>
     </message>
     <message>
@@ -6699,7 +6699,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1355"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>Efekt %1: %2</translation>
     </message>
 </context>
@@ -6772,12 +6772,12 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1488"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Efektový kanál</translation>
     </message>
     <message>
         <location filename="../../src/tracks/InstrumentTrack.cpp" line="1493"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>EFEKT</translation>
     </message>
     <message>
@@ -7462,7 +7462,7 @@ Ujistěte se prosím, zda máte povolen zápis do souboru a do složky obsahují
     <message>
         <location filename="../../src/gui/MainWindow.cpp" line="528"/>
         <location filename="../../src/gui/MainWindow.cpp" line="1139"/>
-        <source>FX Mixer</source>
+        <source>Mixer</source>
         <translation>Efektový mixážní panel</translation>
     </message>
     <message>
@@ -12108,7 +12108,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/tracks/SampleTrack.cpp" line="41"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Efektový kanál</translation>
     </message>
     <message>
@@ -12152,7 +12152,7 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackView.cpp" line="142"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>Efekt %1: %2</translation>
     </message>
 </context>
@@ -12195,12 +12195,12 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="117"/>
-        <source>FX channel</source>
+        <source>Mixer channel</source>
         <translation>Efektový kanál</translation>
     </message>
     <message>
         <location filename="../../src/gui/SampleTrackWindow.cpp" line="122"/>
-        <source>FX</source>
+        <source>CHANNEL</source>
         <translation>EFEKT</translation>
     </message>
 </context>
@@ -13494,12 +13494,12 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>FX %1: %2</source>
+        <source>Channel %1: %2</source>
         <translation>Efekt %1: %2</translation>
     </message>
     <message>
         <location filename="../../src/gui/widgets/TrackOperationsWidget.cpp" line="338"/>
-        <source>Assign to new FX Channel</source>
+        <source>Assign to new mixer Channel</source>
         <translation>Přiřadit k novému efektovému kanálu</translation>
     </message>
     <message>

@@ -53,7 +53,7 @@ typedef int32_t f_cnt_t;			// standard frame-count
 typedef uint8_t ch_cnt_t;			// channel-count (0-SURROUND_CHANNELS)
 typedef uint16_t bpm_t;			// tempo (MIN_BPM to MAX_BPM)
 typedef uint16_t bitrate_t;		// bitrate in kbps
-typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
+typedef uint16_t mix_ch_t;			// Mixer-channel (0 to MAX_CHANNEL)
 
 typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 

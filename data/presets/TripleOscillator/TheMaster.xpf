@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="The Master" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="235" userwavefile0="shapes/micro.wav" finer0="12" userwavefile1="samples/empty.wav" finer1="0" userwavefile2="samples/empty.wav" finer2="0" coarse0="0" coarse1="0" coarse2="0" finel0="-12" finel1="0" modalgo1="0" modalgo2="1" finel2="0" pan0="0" modalgo3="2" pan1="0" stphdetun0="235" pan2="0" stphdetun1="185" wavetype0="7" stphdetun2="209" wavetype1="2" wavetype2="0" vol0="25" vol1="132" phoffset0="98" phoffset1="58" vol2="68"/>
       </instrument>

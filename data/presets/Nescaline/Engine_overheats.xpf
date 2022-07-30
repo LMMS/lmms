@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Engine overheats" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
       <instrument name="nes">
         <nes vol3="15" nfrqmode4="0" envlen4="0" vol4="15" dc1="0" dc2="2" sweep1="1" sweep2="0" nfreq4="0" swamt1="6" swamt2="0" vol="1" crs1="0" crs2="0" crs3="0" swrate1="0" swrate2="0" nmode4="0" envon1="0" envon2="0" envon4="0" envloop1="0" envloop2="0" envloop4="0" vibr="1" on1="1" on2="0" envlen1="0" vol1="15" on3="0" envlen2="0" vol2="15" on4="0"/>
       </instrument>

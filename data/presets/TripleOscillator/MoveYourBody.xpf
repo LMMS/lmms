@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.2" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Move your body" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="94">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="94">
       <instrument name="tripleoscillator">
         <tripleoscillator phoffset2="87" userwavefile0="" finer0="0" userwavefile1="" finer1="32" userwavefile2="" finer2="-16" coarse0="0" coarse1="0" coarse2="-12" finel0="0" finel1="-28" modalgo1="2" modalgo2="2" finel2="12" pan0="0" modalgo3="2" pan1="33" stphdetun0="130" pan2="-33" stphdetun1="261" wavetype0="2" stphdetun2="94" wavetype1="2" wavetype2="2" vol0="33" vol1="33" phoffset0="0" phoffset1="244" vol2="33"/>
       </instrument>

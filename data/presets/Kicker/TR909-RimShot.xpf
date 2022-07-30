@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.98" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="TR909-RimShot" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="57" vol="100">
       <instrument name="kicker">
         <kicker decay_numerator="4" decay_denominator="4" distend="0.8" click="0.15" endnote="0" version="1" decay="40" syncmode="0" noise="0.13" slope="0.265" dist="100" env="0.044" startnote="0" startfreq="330" endfreq="5" gain="0.75"/>
       </instrument>

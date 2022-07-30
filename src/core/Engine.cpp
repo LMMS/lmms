@@ -27,7 +27,7 @@
 #include "AudioEngine.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
-#include "FxMixer.h"
+#include "Mixer.h"
 #include "Ladspa2LMMS.h"
 #include "Lv2Manager.h"
 #include "Plugin.h"
@@ -39,7 +39,7 @@
 
 float LmmsCore::s_framesPerTick;
 AudioEngine* LmmsCore::s_audioEngine = nullptr;
-FxMixer * LmmsCore::s_fxMixer = nullptr;
+Mixer * LmmsCore::s_mixer = nullptr;
 BBTrackContainer * LmmsCore::s_bbTrackContainer = nullptr;
 Song * LmmsCore::s_song = nullptr;
 ProjectJournal * LmmsCore::s_projectJournal = nullptr;
@@ -66,7 +66,7 @@ void LmmsCore::init( bool renderOnly )
 	s_projectJournal = new ProjectJournal;
 	s_audioEngine = new AudioEngine( renderOnly );
 	s_song = new Song;
-	s_fxMixer = new FxMixer;
+	s_mixer = new Mixer;
 	s_bbTrackContainer = new BBTrackContainer;
 
 #ifdef LMMS_HAVE_LV2
@@ -100,7 +100,7 @@ void LmmsCore::destroy()
 
 	deleteHelper( &s_bbTrackContainer );
 
-	deleteHelper( &s_fxMixer );
+	deleteHelper( &s_mixer );
 	deleteHelper( &s_audioEngine );
 
 #ifdef LMMS_HAVE_LV2

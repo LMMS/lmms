@@ -16,7 +16,7 @@ SET(LMMS_SRCS
 	gui/embed.cpp
 	gui/ExportProjectDialog.cpp
 	gui/FileBrowser.cpp
-	gui/FxMixerView.cpp
+	gui/MixerView.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
 	gui/InstrumentTrackView.cpp
@@ -74,8 +74,8 @@ SET(LMMS_SRCS
 	gui/widgets/EnvelopeAndLfoView.cpp
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
-	gui/widgets/FxLine.cpp
-	gui/widgets/FxLineLcdSpinBox.cpp
+	gui/widgets/MixerLine.cpp
+	gui/widgets/MixerLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp

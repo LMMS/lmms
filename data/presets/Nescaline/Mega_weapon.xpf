@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="Mega weapon" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="23" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="23" vol="100">
       <instrument name="nes">
         <nes vol3="15" nfrqmode4="0" envlen4="3" vol4="15" dc1="0" dc2="2" sweep1="0" sweep2="0" nfreq4="10" swamt1="0" swamt2="0" vol="1" nq4="1" crs1="0" crs2="0" crs3="0" swrate1="0" swrate2="0" nmode4="1" envon1="0" envon2="0" envon4="1" nswp4="-5" envloop1="0" envloop2="0" envloop4="0" vibr="0" on1="0" on2="0" envlen1="0" vol1="15" on3="0" envlen2="0" vol2="15" on4="1"/>
       </instrument>

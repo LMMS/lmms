@@ -3,7 +3,7 @@
 <multimediaproject version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings>
-    <instrumenttrack fxch="0" vol="100" name="soft_pad" tab="0">
+    <instrumenttrack mixch="0" vol="100" name="soft_pad" tab="0">
       <bitinvader sampleLength="128" version="0.1" normalize="1" sampleShape="4lVxvqJBUb6xfVi+j0VHvkFRIL7UGeq9Z2GzvV4hr72iwdC98Kn3vQjdA77+2f697NH1vQuFBb5JhSS+nEVOvuDRb77vXXe+v0lfvmqlNL4eCQ++Ar0Avh6tDr5cKS6+lWVKvqjZU76RVUi+X2kvvighFL71Qfq9pMHRvURhor2CAUG9OAGcu2xxNj2O2cY9NbEaPqjNUz4O+4Y+Q1+hPmgLtD52B7s+bbG2PlzJrT5Vf6o+aDu0Ppdbyz7SO+k+BPsBPxTCCT8WCws/ECUIPwgcBD8AOQA/7Af2PsWJ4j6Ff8I+NVWaPtaBaj5+ST8+gMk/Pst5ZT4ax4w+QEGgPkpBpT47cZ0+Ia2QPg7Thj4EC4I+9k17PsphZT50BTo+75n3PbRxWj24Ady7jFFGvRrZjL0gSZC9x1FjvZzBzbwc4Y08DWmGPcGx4D0YUQw+IKEPPvzJ/T2fkc89YGmwPV5Brz2KKcU9sKHXPZqhzD06EZ09YuEwPZpBTTz7gf27bAG2vGPBMb1Syai9HkUPvp15Tr72vXq+BN+Bvtida76KFUW+UjkpvlOFKb6JVUS+0JlnvvzVfb70JXq+v6VfvnwpPr5MaSa+QGUgvk5hJ75dsS6+WDUsvjxVHr4XeQu+8XH4vdOR6b3S0ei95qnyvQotBb48nR2+jr1Gvvr9fL4=" interpolation="1"/>
       <eldata fres="0.5" ftype="0" fcut="9120" fwet="1">
         <elvol userwavefile="" lpdel="0" ctlenvamt="1" amt="1" rel="0.727" latt="0" sus="0" lspd="0.1" att="0.657" pdel="0" lfosyncmode="0" lamt="0" dec="0" x100="0" lshp="0" hold="0"/>

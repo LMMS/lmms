@@ -3,7 +3,7 @@
 <multimedia-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="STrash">
-    <instrumenttrack pan="0" fxch="0" pitch="0" basenote="81" vol="25">
+    <instrumenttrack pan="0" mixch="0" pitch="0" basenote="81" vol="25">
       <instrument name="lb302">
         <lb302 db24="0" vcf_res="1.01" vcf_dec="0.1" dead="0" vcf_cut="0.18" vcf_mod="1" dist="1" slide_dec="0.5" slide="1" shape="0"/>
       </instrument>
