@@ -25,7 +25,7 @@
 #ifndef FIFO_BUFFER_H
 #define FIFO_BUFFER_H
 
-#include <QtCore/QSemaphore>
+#include <QSemaphore>
 
 
 template<typename T>

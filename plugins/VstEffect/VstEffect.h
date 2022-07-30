@@ -25,11 +25,10 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include <QtCore/QMutex>
-#include <QtCore/QSharedPointer>
+#include <QMutex>
+#include <QSharedPointer>
 
 #include "Effect.h"
-#include "VstEffectControlDialog.h"
 #include "VstEffectControls.h"
 
 class VstPlugin;
@@ -47,11 +46,6 @@ public:
 	virtual EffectControls * controls()
 	{
 		return &m_vstControls;
-	}
-
-	virtual inline QString publicName() const
-	{
-		return m_plugin->name();
 	}
 
 

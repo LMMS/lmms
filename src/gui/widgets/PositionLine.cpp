@@ -26,7 +26,6 @@
 
 #include <QPainter>
 
-#include "GuiApplication.h"
 #include "Song.h"
 
 

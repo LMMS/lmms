@@ -20,6 +20,8 @@
  *
  */
 
+#include <QPainter>
+
 #include "StepRecorderWidget.h"
 #include "TextFloat.h"
 #include "embed.h"

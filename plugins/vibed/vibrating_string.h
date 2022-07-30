@@ -24,7 +24,6 @@
 #ifndef _VIBRATING_STRING_H
 #define _VIBRATING_STRING_H
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "lmms_basics.h"

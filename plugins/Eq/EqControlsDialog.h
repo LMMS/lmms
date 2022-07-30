@@ -25,8 +25,6 @@
 #ifndef EQCONTROLSDIALOG_H
 #define EQCONTROLSDIALOG_H
 
-#include <QLabel>
-#include <QPushButton>
 
 #include "EffectControlDialog.h"
 

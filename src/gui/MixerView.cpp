@@ -22,15 +22,8 @@
  *
  */
 
-#include <QtGlobal>
-#include <QDebug>
 
-#include <QButtonGroup>
-#include <QInputDialog>
 #include <QLayout>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QStyle>
@@ -45,11 +38,12 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "AudioEngine.h"
-#include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
+#include "SendButtonIndicator.h"
 #include "Song.h"
+#include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
 MixerView::MixerView() :

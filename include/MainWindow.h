@@ -27,13 +27,12 @@
 
 #include "lmms_export.h"
 
-#include <QtCore/QBasicTimer>
-#include <QtCore/QTimer>
-#include <QtCore/QList>
+#include <QBasicTimer>
+#include <QTimer>
+#include <QList>
 #include <QMainWindow>
 
 #include "ConfigManager.h"
-#include "SubWindow.h"
 
 class QAction;
 class QDomElement;
@@ -42,6 +41,7 @@ class QMdiArea;
 
 class ConfigManager;
 class PluginView;
+class SubWindow;
 class ToolButton;
 
 

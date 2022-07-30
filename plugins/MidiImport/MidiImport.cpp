@@ -23,7 +23,6 @@
  */
 
 
-#include <QDomDocument>
 #include <QDir>
 #include <QApplication>
 #include <QFile>
@@ -47,7 +46,6 @@
 #include "debug.h"
 #include "Song.h"
 
-#include "embed.h"
 #include "plugin_export.h"
 
 #include "portsmf/allegro.h"

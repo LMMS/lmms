@@ -25,7 +25,7 @@
 #ifndef ENDIAN_HANDLING_H
 #define ENDIAN_HANDLING_H
 
-#include <QtCore/QSysInfo>
+#include <QSysInfo>
 
 #include "lmms_basics.h"
 

@@ -27,6 +27,7 @@
 #include "BufferPool.h"
 
 #include <cstring>
+
 #include "MemoryPool.h"
 
 static std::unique_ptr<_MemoryPool_Base> pool;

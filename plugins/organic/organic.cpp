@@ -27,7 +27,6 @@
 
 
 #include <QDomElement>
-#include <QPainter>
 
 
 #include "Engine.h"
@@ -37,7 +36,6 @@
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 
 #include "embed.h"
 

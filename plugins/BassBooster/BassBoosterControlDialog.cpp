@@ -22,11 +22,14 @@
  *
  */
 
-#include <QLayout>
+
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #include "BassBoosterControlDialog.h"
 #include "BassBoosterControls.h"
 #include "embed.h"
+#include "Knob.h"
 
 
 

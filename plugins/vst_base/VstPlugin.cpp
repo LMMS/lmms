@@ -26,15 +26,13 @@
 
 #include "communication.h"
 
-#include <QtCore/QtEndian>
-#include <QtCore/QDebug>
+#include <QtEndian>
+#include <QDebug>
 #include <QDir>
+#include <QDomElement>
 #include <QFileInfo>
 #include <QLocale>
 #include <QTemporaryFile>
-#include <QCloseEvent>
-#include <QMdiArea>
-#include <QMdiSubWindow>
 
 #ifdef LMMS_BUILD_LINUX
 #	include <QX11Info>
@@ -43,7 +41,6 @@
 
 #include <QWindow>
 
-#include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
 #	include <windows.h>

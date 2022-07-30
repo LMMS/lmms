@@ -26,7 +26,7 @@
 #ifndef TRACK_CONTAINER_H
 #define TRACK_CONTAINER_H
 
-#include <QtCore/QReadWriteLock>
+#include <QReadWriteLock>
 
 #include "Track.h"
 #include "JournallingObject.h"

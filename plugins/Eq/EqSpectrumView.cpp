@@ -22,11 +22,16 @@
 
 #include "EqSpectrumView.h"
 
+#include <cmath>
+#include <QPainter>
+#include <QPen>
+
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "lmms_constants.h"
 
 EqAnalyser::EqAnalyser() :
 	m_framesFilledUp ( 0 ),

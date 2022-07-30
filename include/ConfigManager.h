@@ -28,11 +28,11 @@
 
 #include "lmmsconfig.h"
 
-#include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
-#include <QtCore/QObject>
+#include <QMap>
+#include <QPair>
+#include <QStringList>
+#include <QVector>
+#include <QObject>
 
 #include "lmms_export.h"
 

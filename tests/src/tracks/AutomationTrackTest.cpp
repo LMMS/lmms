@@ -31,6 +31,7 @@
 #include "DetuningHelper.h"
 #include "InstrumentTrack.h"
 #include "MidiClip.h"
+#include "PatternClip.h"
 #include "PatternTrack.h"
 #include "PatternStore.h"
 #include "TrackContainer.h"

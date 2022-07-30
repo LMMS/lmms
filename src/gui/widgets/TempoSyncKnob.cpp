@@ -34,6 +34,7 @@
 #include "MainWindow.h"
 #include "MeterDialog.h"
 #include "Song.h"
+#include "SubWindow.h"
 
 
 

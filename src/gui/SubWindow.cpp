@@ -28,10 +28,12 @@
 
 #include "SubWindow.h"
 
+#include <QGraphicsDropShadowEffect>
+#include <QLabel>
 #include <QMdiArea>
 #include <QMoveEvent>
 #include <QPainter>
-#include <QScrollBar>
+#include <QPushButton>
 
 #include "embed.h"
 

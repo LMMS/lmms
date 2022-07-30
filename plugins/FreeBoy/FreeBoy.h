@@ -26,14 +26,14 @@
 #ifndef FREEBOY_H
 #define FREEBOY_H
 
-#include <QObject>
+#include "AutomatableModel.h"
+#include "Blip_Buffer.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
 #include "Graph.h"
-#include "Gb_Apu.h"
 
 class FreeBoyInstrumentView;
+class Knob;
 class NotePlayHandle;
 class PixmapButton;
 

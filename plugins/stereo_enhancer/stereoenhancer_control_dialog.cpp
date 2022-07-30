@@ -24,9 +24,12 @@
 
 
 
-#include <QLayout>
 
 #include "stereoenhancer_control_dialog.h"
+
+#include <QHBoxLayout>
+
+#include "Knob.h"
 #include "stereoenhancer_controls.h"
 
 

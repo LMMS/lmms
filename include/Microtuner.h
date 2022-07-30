@@ -28,8 +28,6 @@
 #include "AutomatableModel.h"
 #include "ComboBoxModel.h"
 #include "JournallingObject.h"
-#include "lmms_constants.h"
-#include "Note.h"
 
 class LMMS_EXPORT Microtuner : public Model, public JournallingObject
 {

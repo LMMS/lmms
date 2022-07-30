@@ -24,15 +24,9 @@
  */
 
 
-#include <QDomDocument>
-#include <QDir>
-#include <QApplication>
-#include <QMessageBox>
-#include <QProgressDialog>
 
 #include "MidiExport.h"
 
-#include "lmms_math.h"
 #include "TrackContainer.h"
 #include "DataFile.h"
 #include "InstrumentTrack.h"
@@ -271,7 +265,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 
 
-void MidiExport::writeMidiClip(MidiNoteVector &midiClip, QDomNode n,
+void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 				int base_pitch, double base_volume, int base_time)
 {
 	// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"

@@ -24,13 +24,11 @@
 
 #include "VecControlsDialog.h"
 
-#include <QGridLayout>
-#include <QLabel>
-#include <QResizeEvent>
-#include <QSizePolicy>
-#include <QWidget>
 
-#include "embed.h"
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
+#include "Knob.h"
 #include "LedCheckbox.h"
 #include "VecControls.h"
 #include "Vectorscope.h"

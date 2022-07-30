@@ -26,8 +26,8 @@
 
 #include "ui_EffectSelectDialog.h"
 
-#include "gui_templates.h"
 #include "DummyEffect.h"
+#include "EffectChain.h"
 #include "embed.h"
 #include "PluginFactory.h"
 

@@ -24,11 +24,8 @@
 
 #include "TrackContainerView.h"
 
-#include <cmath>
 
-#include <QApplication>
 #include <QLayout>
-#include <QMdiArea>
 #include <QScrollBar>
 #include <QWheelEvent>
 
@@ -43,6 +40,7 @@
 #include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackView.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 

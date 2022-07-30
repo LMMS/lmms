@@ -27,7 +27,7 @@
 #define TAB_WIDGET_H
 
 #include <QWidget>
-#include <QtCore/QMap>
+#include <QMap>
 
 const int TEXT_TAB_HEIGHT = 14;
 const int GRAPHIC_TAB_HEIGHT = 17;

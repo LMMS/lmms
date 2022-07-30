@@ -25,6 +25,7 @@
 
 #include "PatternStore.h"
 
+#include "Clip.h"
 #include "Engine.h"
 #include "PatternTrack.h"
 #include "Song.h"

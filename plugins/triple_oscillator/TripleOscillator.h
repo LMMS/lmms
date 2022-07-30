@@ -28,13 +28,13 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Oscillator.h"
 #include "AutomatableModel.h"
 
 
 class automatableButtonGroup;
 class Knob;
 class NotePlayHandle;
+class Oscillator;
 class PixmapButton;
 class SampleBuffer;
 

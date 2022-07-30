@@ -28,10 +28,8 @@
 #include "Engine.h"
 #include "MixHelpers.h"
 
-#include <QtCore/QThread>
-#include <QDebug>
+#include <QThread>
 
-#include <iterator>
 
 PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_type(type),

@@ -28,17 +28,17 @@
 
 #include <vector>
 
+#include "ComboBoxModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
-#include "AutomatableButton.h"
 #include "TempoSyncKnob.h"
-#include "NotePlayHandle.h"
 #include "PixmapButton.h"
-#include "ComboBox.h"
 #include "Oscillator.h"
 #include "lmms_math.h"
 #include "BandLimitedWave.h"
+
+class ComboBox;
 
 //
 //	UI Macros

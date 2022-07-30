@@ -26,12 +26,19 @@
 #ifndef SAMPLE_TRACK_WINDOW_H
 #define SAMPLE_TRACK_WINDOW_H
 
-#include "MixerLineLcdSpinBox.h"
 
-#include <QLineEdit>
 
-#include "EffectRackView.h"
+#include <QWidget>
+
+#include "ModelView.h"
 #include "SampleTrack.h"
+#include "SerializingObject.h"
+
+class EffectRackView;
+class Knob;
+class MixerLineLcdSpinBox;
+class QLineEdit;
+class SampleTrackView;
  
 
 class SampleTrackWindow : public QWidget, public ModelView, public SerializingObjectHook

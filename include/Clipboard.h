@@ -25,7 +25,7 @@
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
-#include <QtCore/QMap>
+#include <QMap>
 #include <QDomElement>
 
 class QMimeData;

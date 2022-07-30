@@ -27,7 +27,7 @@
 
 #include "Memory.h"
 
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 #include "rpmalloc.h"
 
 static thread_local MemoryManager::ThreadGuard local_mm_thread_guard{};

@@ -26,7 +26,7 @@
 #ifndef AUDIO_FILE_DEVICE_H
 #define AUDIO_FILE_DEVICE_H
 
-#include <QtCore/QFile>
+#include <QFile>
 
 #include "AudioDevice.h"
 #include "OutputSettings.h"

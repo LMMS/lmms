@@ -28,7 +28,6 @@
 
 #include "EffectControls.h"
 #include "waveshaper_control_dialog.h"
-#include "Knob.h"
 #include "Graph.h"
 
 class waveShaperEffect;

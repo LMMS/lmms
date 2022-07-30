@@ -27,7 +27,6 @@
 #ifndef SASPECTRUMVIEW_H
 #define SASPECTRUMVIEW_H
 
-#include "SaControls.h"
 
 #include <string>
 #include <utility>
@@ -37,6 +36,7 @@
 
 class QMouseEvent;
 class QPainter;
+class SaControls;
 class SaProcessor;
 
 //! Widget that displays a spectrum curve and frequency / amplitude grid

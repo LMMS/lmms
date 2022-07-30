@@ -30,7 +30,7 @@
 
 // Need to include this first to ensure we get M_PI in MinGW with C++11
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include "lb302.h"
 #include "AutomatableButton.h"
@@ -38,6 +38,7 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "LedCheckbox.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -63,10 +64,6 @@
 //#define LB_DECAY_NOTES
 
 #define LB_DEBUG
-
-#ifdef LB_DEBUG
-#include <assert.h>
-#endif
 
 //
 // Old config

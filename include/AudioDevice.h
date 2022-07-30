@@ -25,7 +25,7 @@
 #ifndef AUDIO_DEVICE_H
 #define AUDIO_DEVICE_H
 
-#include <QtCore/QMutex>
+#include <QMutex>
 #include <samplerate.h>
 
 #include "lmms_basics.h"

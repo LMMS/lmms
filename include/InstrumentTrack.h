@@ -35,10 +35,8 @@
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
 #include "Piano.h"
-#include "Pitch.h"
 #include "Plugin.h"
 #include "Track.h"
-#include "TrackView.h"
 
 
 class Instrument;

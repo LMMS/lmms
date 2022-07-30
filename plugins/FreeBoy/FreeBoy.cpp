@@ -25,11 +25,9 @@
 
 #include <cmath>
 
-#include <QPainter>
 #include <QDomElement>
 #include "FreeBoy.h"
 #include "Gb_Apu_Buffer.h"
-#include "Multi_Buffer.h"
 #include "base64.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"

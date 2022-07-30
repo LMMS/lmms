@@ -24,12 +24,13 @@
 #include "PatternTrack.h"
 
 #include <QDomElement>
-#include <QMenu>
-#include <QPainter>
 
+#include "AudioEngine.h"
+#include "Engine.h"
+#include "PatternClip.h"
 #include "PatternStore.h"
 #include "PatternTrackView.h"
-#include "Song.h"
+#include "PlayHandle.h"
 
 
 

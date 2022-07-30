@@ -25,6 +25,7 @@
 #include "Xpressive.h"
 
 #include <QDomElement>
+#include <QPlainTextEdit>
 
 #include "AudioEngine.h"
 #include "Engine.h"
@@ -35,10 +36,8 @@
 #include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "NotePlayHandle.h"
-#include "Oscillator.h"
 #include "PixmapButton.h"
 #include "Song.h"
-#include "SubWindow.h"
 #include "ToolTip.h"
 
 #include "base64.h"

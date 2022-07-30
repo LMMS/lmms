@@ -31,12 +31,12 @@
 #include <QMouseEvent>
 #include <QMutexLocker>
 #include <QPainter>
-#include <QSplitter>
 #include <QString>
 
 #include "EffectControlDialog.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "SaControls.h"
 #include "SaProcessor.h"
 
 

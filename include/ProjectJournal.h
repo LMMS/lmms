@@ -25,8 +25,8 @@
 #ifndef PROJECT_JOURNAL_H
 #define PROJECT_JOURNAL_H
 
-#include <QtCore/QHash>
-#include <QtCore/QStack>
+#include <QHash>
+#include <QStack>
 
 #include "lmms_basics.h"
 #include "DataFile.h"

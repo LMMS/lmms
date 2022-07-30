@@ -29,7 +29,6 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <QtGlobal>
 #include <cstdint>
 
 //! Cached URIDs for fast access (for use in real-time code)

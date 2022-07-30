@@ -29,7 +29,7 @@
 #include <QDir>
 #include <QLibrary>
 
-#include <math.h>
+#include <cmath>
 
 #include "ConfigManager.h"
 #include "LadspaManager.h"

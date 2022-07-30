@@ -24,16 +24,15 @@
 
 #include "PluginFactory.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
-#include <QtCore/QDir>
-#include <QtCore/QLibrary>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+#include <QLibrary>
 #include <memory>
 #include "lmmsconfig.h"
 
 #include "ConfigManager.h"
 #include "Plugin.h"
-#include "embed.h"
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");

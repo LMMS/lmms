@@ -27,7 +27,6 @@
 
 #include <algorithm>
 
-#include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -57,7 +56,7 @@
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "lmms_constants.h"
+#include "Note.h"
 #include "PathUtil.h"
 
 #include "FileDialog.h"

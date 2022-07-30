@@ -28,7 +28,6 @@
 #ifdef LMMS_HAVE_OSS
 
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
 

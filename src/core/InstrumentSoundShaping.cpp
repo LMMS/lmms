@@ -22,7 +22,7 @@
  *
  */
 
-#include <QtCore/QVarLengthArray>
+#include <QVarLengthArray>
 #include <QDomElement>
 
 #include "InstrumentSoundShaping.h"

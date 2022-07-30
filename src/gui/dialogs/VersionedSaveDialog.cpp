@@ -23,13 +23,11 @@
  */
 
 
-#include <QFontMetrics>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QGroupBox>
-#include <QLabel>
 
 #include "DeprecationHelper.h"
 #include "VersionedSaveDialog.h"

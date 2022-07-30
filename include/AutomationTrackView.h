@@ -26,8 +26,9 @@
 #ifndef AUTOMATION_TRACK_VIEW_H
 #define AUTOMATION_TRACK_VIEW_H
 
-#include "AutomationTrack.h"
 #include "TrackView.h"
+
+class AutomationTrack;
 
 
 class AutomationTrackView : public TrackView

@@ -33,10 +33,10 @@
 
 #include "AudioEngine.h"
 #include "ConfigManager.h"
-#include "ControllerConnectionDialog.h"
 #include "Engine.h"
 #include "FadeButton.h"
-#include "MixerLineLcdSpinBox.h"
+#include "Knob.h"
+#include "MidiCCRackView.h"
 #include "Mixer.h"
 #include "MixerView.h"
 #include "GuiApplication.h"

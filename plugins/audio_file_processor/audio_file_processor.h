@@ -29,13 +29,15 @@
 
 #include <QPixmap>
 
+#include "ComboBoxModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "SampleBuffer.h"
 #include "Knob.h"
-#include "PixmapButton.h"
-#include "AutomatableButton.h"
-#include "ComboBox.h"
+
+class automatableButtonGroup;
+class ComboBox;
+class PixmapButton;
 
 
 class audioFileProcessor : public Instrument

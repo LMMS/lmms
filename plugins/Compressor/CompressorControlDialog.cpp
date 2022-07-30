@@ -27,14 +27,17 @@
 #include "CompressorControls.h"
 
 #include <QLabel>
-#include <QLayout>
 #include <QPainter>
+#include <QWheelEvent>
 
+#include "AutomatableButton.h"
 #include "embed.h"
+#include "../Eq/EqFader.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "interpolation.h"
+#include "Knob.h"
 #include "MainWindow.h"
+#include "PixmapButton.h"
 #include "ToolTip.h"
 
 CompressorControlDialog::CompressorControlDialog(CompressorControls* controls) :

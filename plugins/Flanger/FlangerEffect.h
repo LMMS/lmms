@@ -28,9 +28,13 @@
 
 #include "Effect.h"
 #include "FlangerControls.h"
-#include "QuadratureLfo.h"
 #include "MonoDelay.h"
 #include "Noise.h"
+#include "QuadratureLfo.h"
+
+class MonoDelay;
+class Noise;
+class QuadratureLfo;
 
 
 class FlangerEffect : public Effect

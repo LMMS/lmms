@@ -26,8 +26,8 @@
 #ifndef VST_SYNC_CONTROLLER_H
 #define VST_SYNC_CONTROLLER_H
 
-#include <QtCore/QObject>
-#include <QtCore/QSharedMemory>
+#include <QObject>
+#include <QSharedMemory>
 
 #include "VstSyncData.h"
 

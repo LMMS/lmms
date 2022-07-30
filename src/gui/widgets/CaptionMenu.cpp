@@ -24,7 +24,6 @@
 
 
 #include "CaptionMenu.h"
-#include "embed.h"
 
 
 

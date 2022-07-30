@@ -33,7 +33,6 @@
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "MixerView.h"
-#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "MicrotunerConfig.h"
 #include "PatternEditor.h"
@@ -44,6 +43,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QtGlobal>
+#include <QLabel>
 #include <QMessageBox>
 #include <QSplashScreen>
 

@@ -24,7 +24,6 @@
  */
 
 
-#include <QPainter>
 #include <QDomElement>
 
 #include <cmath>

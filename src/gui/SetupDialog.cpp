@@ -28,7 +28,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QMessageBox>
 #include <QScrollArea>
 
 #include "AudioDeviceSetupWidget.h"

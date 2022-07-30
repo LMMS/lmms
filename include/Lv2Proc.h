@@ -31,17 +31,16 @@
 
 #include <lilv/lilv.h>
 #include <memory>
-#include <QObject>
 
 #include "Lv2Basics.h"
 #include "Lv2Features.h"
 #include "Lv2Options.h"
 #include "LinkedModelGroups.h"
-#include "MidiEvent.h"
 #include "Plugin.h"
-#include "PluginIssue.h"
 #include "../src/3rdparty/ringbuffer/include/ringbuffer/ringbuffer.h"
 #include "TimePos.h"
+
+class PluginIssue;
 
 // forward declare port structs/enums
 namespace Lv2Ports

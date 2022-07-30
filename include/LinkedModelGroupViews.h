@@ -28,7 +28,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <vector>
 #include <QWidget>
 
 

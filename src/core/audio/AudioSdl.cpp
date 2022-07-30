@@ -28,9 +28,9 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <SDL.h>
 
 #include "AudioEngine.h"
-#include "Engine.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 

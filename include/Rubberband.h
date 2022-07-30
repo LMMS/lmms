@@ -28,7 +28,7 @@
 #define RUBBERBAND_H
 
 #include <QRubberBand>
-#include <QtCore/QVector>
+#include <QVector>
 
 
 class selectableObject : public QWidget

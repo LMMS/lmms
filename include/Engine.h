@@ -26,8 +26,8 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <QtCore/QString>
-#include <QtCore/QObject>
+#include <QString>
+#include <QObject>
 
 
 #include "lmmsconfig.h"

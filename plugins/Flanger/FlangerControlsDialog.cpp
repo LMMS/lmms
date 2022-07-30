@@ -23,8 +23,9 @@
  */
 
 #include "FlangerControlsDialog.h"
-#include "FlangerControls.h"
+
 #include "embed.h"
+#include "FlangerControls.h"
 #include "LedCheckbox.h"
 #include "TempoSyncKnob.h"
 

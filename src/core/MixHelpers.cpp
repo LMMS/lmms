@@ -24,12 +24,12 @@
 
 #include "MixHelpers.h"
 
-#include <cstdio>
 
-#include "lmms_math.h"
+#include <cmath>
+#include <QtGlobal>
+
 #include "ValueBuffer.h"
 
-#include <cstdio>
 
 
 static bool s_NaNHandler;

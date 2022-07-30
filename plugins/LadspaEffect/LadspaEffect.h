@@ -29,10 +29,12 @@
 #include <QMutex>
 
 #include "Effect.h"
-#include "LadspaBase.h"
+#include "ladspa.h"
 #include "LadspaControls.h"
+#include "LadspaManager.h"
 
 
+typedef struct PortDescription port_desc_t;
 typedef QVector<port_desc_t *> multi_proc_t;
 
 class LadspaEffect : public Effect

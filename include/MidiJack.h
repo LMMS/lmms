@@ -35,15 +35,13 @@
 #include "weak_libjack.h"
 #endif
 
-#include <QtCore/QThread>
-#include <QMutex>
-#include <QtCore/QFile>
+#include <QThread>
 
 #include "MidiClient.h"
-#include "AudioJack.h"
 
 constexpr size_t JACK_MIDI_BUFFER_MAX = 64; /* events */
 
+class AudioJack;
 class QLineEdit;
 
 class MidiJack : public QThread, public MidiClientRaw

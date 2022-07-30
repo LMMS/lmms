@@ -31,10 +31,8 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_STDINT_H
 #include <cstdint>
 #include <array>
-#endif
 
 
 typedef int32_t bar_t;

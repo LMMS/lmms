@@ -25,7 +25,6 @@
 #ifndef SAMPLE_TRACK_VIEW_H
 #define SAMPLE_TRACK_VIEW_H
 
-#include "SampleTrack.h"
 
 #include "TrackView.h"
 

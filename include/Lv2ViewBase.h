@@ -30,8 +30,6 @@
 #ifdef LMMS_HAVE_LV2
 
 
-#include <QString>
-#include <QVector>
 
 #include "LinkedModelGroupViews.h"
 #include "lmms_export.h"

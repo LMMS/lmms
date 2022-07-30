@@ -30,10 +30,9 @@
 #include <cmath>
 
 #include <QApplication>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLayout>
-#include <QMdiArea>
 #include <QPainter>
 #include <QPainterPath>
 #include <QScrollBar>
@@ -53,11 +52,11 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
+#include "Knob.h"
 #include "MainWindow.h"
 #include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"

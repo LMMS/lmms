@@ -23,9 +23,8 @@
  */
  
 
-#include <QDomDocument>
-#include <QBitmap>
-#include <QPainter>
+
+#include <QDomElement>
 
 #include "TripleOscillator.h"
 #include "AudioEngine.h"
@@ -35,6 +34,7 @@
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "NotePlayHandle.h"
+#include "Oscillator.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
 #include "ToolTip.h"

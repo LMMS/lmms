@@ -27,6 +27,7 @@
 #ifdef LMMS_HAVE_LV2
 
 #include <algorithm>
+#include <QDebug>
 #include <QtGlobal>
 
 #include "Engine.h"

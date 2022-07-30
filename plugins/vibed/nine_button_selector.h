@@ -25,7 +25,14 @@
 #ifndef _NINE_BUTTON_SELECTOR_H
 #define _NINE_BUTTON_SELECTOR_H
 
-#include "PixmapButton.h"
+
+#include <QWidget>
+
+#include "AutomatableModelView.h"
+
+class Knob;	
+class PixmapButton;
+class graphModel;
 
 
 class nineButtonSelector: public QWidget , public IntModelView

@@ -24,9 +24,9 @@
 
 #include "SideBarWidget.h"
 
-#include <QApplication>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QPushButton>
 
 #include "embed.h"
 

@@ -1,6 +1,6 @@
 #include "QTestSuite.h"
 
-#include <QtTest/QTest>
+#include <QTest>
 
 #include <QDebug>
 

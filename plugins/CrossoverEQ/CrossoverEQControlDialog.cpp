@@ -24,8 +24,6 @@
  *
  */
  
-#include <QLayout>
-#include <QLabel>
 
 #include "CrossoverEQControlDialog.h"
 #include "CrossoverEQControls.h"

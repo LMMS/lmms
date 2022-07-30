@@ -25,7 +25,6 @@
 #ifndef SCALE_H
 #define SCALE_H
 
-#include <cmath>
 #include <cstdint>
 #include <vector>
 #include <QObject>

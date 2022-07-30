@@ -27,7 +27,6 @@
 #ifndef TIME_POS_H
 #define TIME_POS_H
 
-#include <QtGlobal>
 
 #include "lmms_export.h"
 #include "lmms_basics.h"

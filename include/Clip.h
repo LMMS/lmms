@@ -28,7 +28,6 @@
 #include <QColor>
 
 #include "AutomatableModel.h"
-#include "lmms_basics.h"
 
 
 class Track;

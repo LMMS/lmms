@@ -24,6 +24,7 @@
  */
 
 
+#include <QApplication>
 #include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -43,7 +44,6 @@
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
@@ -52,6 +52,7 @@
 #include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
+#include "SampleClip.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"

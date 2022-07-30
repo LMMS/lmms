@@ -30,13 +30,13 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Oscillator.h"
 #include "AutomatableModel.h"
 
 class QPixmap;
 
 class Knob;
 class NotePlayHandle;
+class Oscillator;
 class PixmapButton;
 
 const int NUM_OSCILLATORS = 8;

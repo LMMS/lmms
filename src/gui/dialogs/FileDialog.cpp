@@ -24,8 +24,8 @@
 
 #include <QList>
 #include <QUrl>
-#include <QDesktopServices>
 #include <QListView>
+#include <QStandardPaths>
 
 #include "ConfigManager.h"
 #include "FileDialog.h"

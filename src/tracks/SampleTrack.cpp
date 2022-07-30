@@ -27,11 +27,17 @@
 
 #include <QDomElement>
 
+#include "EffectChain.h"
+#include "Mixer.h"
+#include "panning_constants.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
+#include "SampleClip.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
+#include "SampleTrackView.h"
 #include "Song.h"
+#include "volume.h"
 
 
 

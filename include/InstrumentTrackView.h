@@ -28,11 +28,11 @@
 #include "TrackView.h"
 
 #include "InstrumentTrack.h"
-#include "MidiCCRackView.h"
 
 
 class InstrumentTrackWindow;
 class Knob;
+class MidiCCRackView;
 class TrackContainerView;
 class TrackLabelButton;
 

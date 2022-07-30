@@ -27,7 +27,6 @@
 #define TOOL_BUTTON_H
 
 #include <QToolButton>
-#include <QColor>
 
 
 class ToolButton : public QToolButton

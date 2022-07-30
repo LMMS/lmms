@@ -29,8 +29,6 @@
 #include "CompressorControls.h"
 
 #include "Effect.h"
-#include "ValueBuffer.h"
-#include "RmsHelper.h"
 
 
 constexpr float COMP_LOG = -2.2;

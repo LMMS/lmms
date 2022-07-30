@@ -21,16 +21,17 @@
 #ifndef STEP_RECORDER_H
 #define STEP_RECORDER_H
 
+#include <QColor>
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QObject>
-#include <QKeyEvent>
 
 #include "Note.h"
-#include "lmms_basics.h"
-#include "MidiClip.h"
 
+class MidiClip;
 class PianoRoll;
+class QKeyEvent;
+class QMouseEvent;
 class StepRecorderWidget;
 
 class StepRecorder : public QObject

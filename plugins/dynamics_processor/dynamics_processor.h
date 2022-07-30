@@ -29,7 +29,8 @@
 
 #include "Effect.h"
 #include "dynamics_processor_controls.h"
-#include "RmsHelper.h"
+
+class RmsHelper;
 
 
 class dynProcEffect : public Effect

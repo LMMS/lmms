@@ -25,9 +25,8 @@
 #include "PatternEditor.h"
 
 #include <QAction>
-#include <QKeyEvent>
-#include <QLayout>
 
+#include "ClipView.h"
 #include "ComboBox.h"
 #include "DataFile.h"
 #include "embed.h"
@@ -36,6 +35,7 @@
 #include "PatternTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "TrackView.h"
 
 #include "MidiClip.h"
 
@@ -236,11 +236,11 @@ PatternEditorWindow::PatternEditorWindow(PatternStore* ps) :
 	// TODO: Use style sheet
 	if (ConfigManager::inst()->value("ui", "compacttrackbuttons").toInt())
 	{
-		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * CLIP_BORDER_WIDTH + 384);
+		setMinimumWidth(TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + 2 * ClipView::BORDER_WIDTH + 384);
 	}
 	else
 	{
-		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * CLIP_BORDER_WIDTH + 384);
+		setMinimumWidth(TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH + 2 * ClipView::BORDER_WIDTH + 384);
 	}
 
 	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));

@@ -28,11 +28,20 @@
 #include <cstdlib>
 
 #include <QGraphicsProxyWidget>
+#include <QGraphicsView>
+#include <QLineEdit>
+#include <QPainter>
 
 #include "CaptionMenu.h"
+#include "ColorChooser.h"
+#include "embed.h"
+#include "Knob.h"
+#include "LcdWidget.h"
 #include "Mixer.h"
+#include "MixerView.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
+#include "SendButtonIndicator.h"
 #include "Song.h"
 
 bool MixerLine::eventFilter( QObject *dist, QEvent *event )

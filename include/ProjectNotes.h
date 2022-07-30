@@ -27,7 +27,6 @@
 #define PROJECT_NOTES_H
 
 #include <QMainWindow>
-#include <QCloseEvent>
 
 #include "SerializingObject.h"
 

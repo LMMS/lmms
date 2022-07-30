@@ -29,7 +29,6 @@
 
 #include <QVector>
 #include <QWidget>
-#include <QInputDialog>
 
 #include "Editor.h"
 #include "ComboBoxModel.h"
@@ -37,13 +36,12 @@
 #include "Note.h"
 #include "lmms_basics.h"
 #include "Song.h"
-#include "ToolTip.h"
 #include "StepRecorder.h"
 #include "StepRecorderWidget.h"
-#include "PositionLine.h"
 
 class QPainter;
 class QPixmap;
+class QPushButton;
 class QScrollBar;
 class QString;
 class QMenu;
@@ -52,6 +50,8 @@ class QToolButton;
 class ComboBox;
 class NotePlayHandle;
 class MidiClip;
+class PositionLine;
+class TextFloat;
 class TimeLineWidget;
 
 class PianoRoll : public QWidget

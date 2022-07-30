@@ -46,7 +46,6 @@
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
 #include "AudioEngine.h"
-#include "ControllerConnection.h"
 #include "Clipboard.h"
 
 #include "embed.h"

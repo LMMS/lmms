@@ -27,10 +27,9 @@
 
 #include <QStaticText>
 
-#include "AutomationClip.h"
-#include "Song.h"
-#include "SongEditor.h"
 #include "ClipView.h"
+
+class AutomationClip;
 
 
 class AutomationClipView : public ClipView

@@ -27,12 +27,12 @@
 #ifndef _SID_H
 #define _SID_H
 
-#include <QObject>
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Knob.h"
 
 
+class Knob;
 class SidInstrumentView;
 class NotePlayHandle;
 class automatableButtonGroup;

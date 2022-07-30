@@ -25,10 +25,10 @@
 #ifndef SAMPLE_CLIP_H
 #define SAMPLE_CLIP_H
 
-#include "SampleBuffer.h"
-#include "SampleTrack.h"
 #include "Clip.h"
- 
+
+class SampleBuffer;
+
 
 class SampleClip : public Clip
 {

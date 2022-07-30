@@ -27,8 +27,8 @@
 #ifndef AUTOMATION_CLIP_H
 #define AUTOMATION_CLIP_H
 
-#include <QtCore/QMap>
-#include <QtCore/QPointer>
+#include <QMap>
+#include <QPointer>
 
 #include "AutomationNode.h"
 #include "Clip.h"

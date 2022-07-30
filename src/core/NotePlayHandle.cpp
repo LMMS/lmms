@@ -25,7 +25,6 @@
 
 #include "NotePlayHandle.h"
 
-#include "lmms_constants.h"
 #include "AudioEngine.h"
 #include "BasicFilters.h"
 #include "DetuningHelper.h"

@@ -24,7 +24,6 @@
 
 #include "MidiAlsaRaw.h"
 #include "ConfigManager.h"
-#include "gui_templates.h"
 
 
 #ifdef LMMS_HAVE_ALSA

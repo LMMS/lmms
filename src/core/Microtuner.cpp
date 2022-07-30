@@ -27,9 +27,9 @@
 #include <vector>
 #include <cmath>
 
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "Keymap.h"
+#include "Note.h"
 #include "Scale.h"
 #include "Song.h"
 

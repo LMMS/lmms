@@ -27,8 +27,8 @@
 #define SAMPLE_BUFFER_H
 
 #include <memory>
-#include <QtCore/QReadWriteLock>
-#include <QtCore/QObject>
+#include <QReadWriteLock>
+#include <QObject>
 
 #include <samplerate.h>
 

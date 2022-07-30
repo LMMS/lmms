@@ -24,7 +24,7 @@
 
 #include "SaControls.h"
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "Analyzer.h"
 #include "SaControlsDialog.h"

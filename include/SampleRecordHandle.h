@@ -26,8 +26,8 @@
 #ifndef SAMPLE_RECORD_HANDLE_H
 #define SAMPLE_RECORD_HANDLE_H
 
-#include <QtCore/QList>
-#include <QtCore/QPair>
+#include <QList>
+#include <QPair>
 
 #include "PlayHandle.h"
 #include "TimePos.h"

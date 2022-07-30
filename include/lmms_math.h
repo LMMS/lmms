@@ -29,7 +29,7 @@
 #include <cstdint>
 #include "lmms_constants.h"
 #include "lmmsconfig.h"
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #include <cmath>
 

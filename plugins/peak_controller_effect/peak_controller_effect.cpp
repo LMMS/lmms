@@ -24,7 +24,6 @@
  */
 
 
-#include "Controller.h"
 #include "Song.h"
 #include "PresetPreviewPlayHandle.h"
 #include "PeakController.h"

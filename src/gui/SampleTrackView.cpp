@@ -24,15 +24,18 @@
  
 #include "SampleTrackView.h"
 
+#include <QApplication>
 #include <QMenu>
 
+#include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FadeButton.h"
+#include "Mixer.h"
 #include "MixerView.h"
-#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "Knob.h"
-#include "MainWindow.h"
+#include "SampleClip.h"
 #include "SampleTrackWindow.h"
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"

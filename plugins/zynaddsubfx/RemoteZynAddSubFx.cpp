@@ -29,7 +29,6 @@
 
 #include <queue>
 
-#include <FL/x.H>
 #undef CursorShape // is, by mistake, not undefed in FL
 
 #define BUILD_REMOTE_PLUGIN_CLIENT

@@ -31,11 +31,13 @@
 #include "Mixer.h"
 #include "InstrumentTrackView.h"
 #include "Instrument.h"
+#include "Keymap.h"
 #include "MidiClient.h"
 #include "MidiClip.h"
 #include "MixHelpers.h"
 #include "PatternStore.h"
 #include "PatternTrack.h"
+#include "Pitch.h"
 #include "Song.h"
 
 

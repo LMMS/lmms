@@ -24,12 +24,12 @@
 
 
 
-#include <QLayout>
-#include <QLabel>
 
 #include "stereomatrix_control_dialog.h"
-#include "stereomatrix_controls.h"
+
 #include "embed.h"
+#include "Knob.h"
+#include "stereomatrix_controls.h"
 
 
 

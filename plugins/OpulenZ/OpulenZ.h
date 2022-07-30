@@ -25,13 +25,18 @@
 #ifndef OPULENZ_H
 #define OPULENZ_H
 
+#include <QMutex>
+
+#include "AutomatableModel.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "opl.h"
 
-#include "LcdSpinBox.h"
-#include "Knob.h"
-#include "PixmapButton.h"
+class automatableButtonGroup;
+class Copl;
+class Knob;
+class LcdSpinBox;
+class PixmapButton;
+
 
 // This one is a flag, MIDI notes take 7 low bits
 #define OPL2_VOICE_FREE 128

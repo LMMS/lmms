@@ -25,7 +25,7 @@
 #ifndef SIDE_BAR_H
 #define SIDE_BAR_H
 
-#include <QtCore/QMap>
+#include <QMap>
 #include <QButtonGroup>
 #include <QToolBar>
 

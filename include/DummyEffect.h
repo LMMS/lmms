@@ -25,9 +25,13 @@
 #ifndef DUMMY_EFFECT_H
 #define DUMMY_EFFECT_H
 
+#include <QDomElement>
+
 #include "Effect.h"
 #include "EffectControls.h"
 #include "EffectControlDialog.h"
+
+class Knob;
 
 
 class DummyEffectControlDialog : public EffectControlDialog

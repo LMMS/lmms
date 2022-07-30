@@ -29,7 +29,6 @@
 
 #ifdef LMMS_HAVE_LV2
 
-#include <lv2.h>
 #include <map>
 #include <vector>
 #include "Lv2Manager.h"

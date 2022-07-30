@@ -26,10 +26,10 @@
 #include "AudioEngine.h"
 #include "AudioPort.h"
 #include "Engine.h"
-#include "InstrumentTrack.h"
-#include "lmms_constants.h"
+#include "Note.h"
 #include "PatternTrack.h"
 #include "SampleClip.h"
+#include "SampleTrack.h"
 
 
 

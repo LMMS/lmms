@@ -29,7 +29,6 @@
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
-#include "EffectChain.h"
 #include "Effect.h"
 
 
