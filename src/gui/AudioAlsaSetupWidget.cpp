@@ -33,6 +33,8 @@
 #include "LcdSpinBox.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
 
 AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioAlsa::name(), _parent ),
@@ -115,5 +117,7 @@ void AudioAlsaSetupWidget::onCurrentIndexChanged(int index)
 	m_selectedDevice = index;
 }
 
+
+} // namespace lmms::gui
 
 #endif

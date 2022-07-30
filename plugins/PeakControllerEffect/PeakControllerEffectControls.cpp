@@ -30,6 +30,9 @@
 #include "PeakControllerEffect.h"
 #include "Song.h"
 
+namespace lmms
+{
+
 
 PeakControllerEffectControls::
 PeakControllerEffectControls( PeakControllerEffect * _eff ) :
@@ -104,6 +107,4 @@ void PeakControllerEffectControls::saveSettings( QDomDocument & _doc,
 }
 
 
-
-
-
+} // namespace lmms

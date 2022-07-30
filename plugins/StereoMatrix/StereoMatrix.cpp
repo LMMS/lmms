@@ -28,12 +28,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Stereo Matrix",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Plugin for freely manipulating stereo output" ),
@@ -57,12 +61,6 @@ StereoMatrixEffect::StereoMatrixEffect(
 {
 }
 
-
-
-
-StereoMatrixEffect::~StereoMatrixEffect()
-{
-}
 
 
 
@@ -121,3 +119,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 }
 
 }
+
+
+} // namespace lmms

@@ -29,6 +29,8 @@
 #include "InstrumentTrack.h"
 #include "InstrumentTrackWindow.h"
 
+namespace lmms::gui
+{
 
 InstrumentView::InstrumentView( Instrument * _Instrument, QWidget * _parent ) :
 	PluginView( _Instrument, _parent )
@@ -57,14 +59,14 @@ void InstrumentView::setModel( Model * _model, bool )
 	{
 		ModelView::setModel( _model );
 		instrumentTrackWindow()->setWindowIcon( model()->logo()->pixmap() );
-		connect( model(), SIGNAL( destroyed( QObject * ) ), this, SLOT( close() ) );
+		connect( model(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
 	}
 }
 
 
 
 
-InstrumentTrackWindow * InstrumentView::instrumentTrackWindow( void )
+InstrumentTrackWindow * InstrumentView::instrumentTrackWindow()
 {
 	return( dynamic_cast<InstrumentTrackWindow *>(
 					parentWidget()->parentWidget() ) );
@@ -73,7 +75,5 @@ InstrumentTrackWindow * InstrumentView::instrumentTrackWindow( void )
 
 
 
-InstrumentViewFixedSize::~InstrumentViewFixedSize()
-{
-}
 
+} // namespace lmms::gui

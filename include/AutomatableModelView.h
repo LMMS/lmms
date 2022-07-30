@@ -32,11 +32,14 @@
 class QMenu;
 class QMouseEvent;
 
+namespace lmms::gui
+{
+
 class LMMS_EXPORT AutomatableModelView : public ModelView
 {
 public:
 	AutomatableModelView( Model* model, QWidget* _this );
-	virtual ~AutomatableModelView() = default;
+	~AutomatableModelView() override = default;
 
 	// some basic functions for convenience
 	AutomatableModel* modelUntyped()
@@ -131,6 +134,8 @@ public:
 using FloatModelView = TypedModelView<FloatModel>;
 using IntModelView = TypedModelView<IntModel>;
 using BoolModelView = TypedModelView<BoolModel>;
+
+} // namespace lmms::gui
 
 #endif
 

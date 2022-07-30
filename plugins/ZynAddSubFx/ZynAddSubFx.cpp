@@ -51,12 +51,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Embedded ZynAddSubFX" ),
@@ -76,13 +80,6 @@ ZynAddSubFxRemotePlugin::ZynAddSubFxRemotePlugin() :
 	RemotePlugin()
 {
 	init( "RemoteZynAddSubFx", false );
-}
-
-
-
-
-ZynAddSubFxRemotePlugin::~ZynAddSubFxRemotePlugin()
-{
 }
 
 
@@ -485,15 +482,16 @@ void ZynAddSubFxInstrument::sendControlChange( MidiControllers midiCtl, float va
 
 
 
-PluginView * ZynAddSubFxInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* ZynAddSubFxInstrument::instantiateView( QWidget * _parent )
 {
-	return new ZynAddSubFxView( this, _parent );
+	return new gui::ZynAddSubFxView( this, _parent );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) :
@@ -563,14 +561,6 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	l->setColumnStretch( 4, 10 );
 
 	setAcceptDrops( true );
-}
-
-
-
-
-
-ZynAddSubFxView::~ZynAddSubFxView()
-{
 }
 
 
@@ -657,6 +647,7 @@ void ZynAddSubFxView::toggleUI()
 }
 
 
+} // namespace gui
 
 
 
@@ -673,3 +664,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main(Model * m, void *)
 }
 
 
+} // namespace lmms

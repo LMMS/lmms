@@ -36,6 +36,8 @@
 #include "embed.h"
 #include "gui_templates.h"
 
+namespace lmms::gui
+{
 
 QPixmap * ComboBox::s_background = nullptr;
 QPixmap * ComboBox::s_arrow = nullptr;
@@ -70,8 +72,8 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 	setFont( pointSize<9>( font() ) );
 	m_menu.setFont( pointSize<8>( m_menu.font() ) );
 
-	connect( &m_menu, SIGNAL( triggered( QAction * ) ),
-				this, SLOT( setItem( QAction * ) ) );
+	connect( &m_menu, SIGNAL(triggered(QAction*)),
+				this, SLOT(setItem(QAction*)));
 
 	setWindowTitle( _name );
 	doConnections();
@@ -79,10 +81,6 @@ ComboBox::ComboBox( QWidget * _parent, const QString & _name ) :
 
 
 
-
-ComboBox::~ComboBox()
-{
-}
 
 
 
@@ -249,6 +247,6 @@ void ComboBox::setItem( QAction* item )
 }
 
 
-
+} // namespace lmms::gui
 
 

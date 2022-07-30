@@ -57,6 +57,8 @@
 
 #include "ConfigManager.h"
 
+namespace lmms
+{
 
 static const QString PATH_DEV_DSP =
 #if defined(__NetBSD__) || defined(__OpenBSD__)
@@ -217,7 +219,7 @@ QString AudioOss::probeDevice()
 	if( QFileInfo( dev ).isWritable() == false )
 	{
 		int instance = -1;
-		while( 1 )
+		while( true )
 		{
 			dev = PATH_DEV_DSP + QString::number( ++instance );
 			if( !QFileInfo( dev ).exists() )
@@ -325,13 +327,13 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
+	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiooss",
 							"channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
@@ -357,6 +359,8 @@ void AudioOss::setupWidget::saveSettings()
 				QString::number( m_channels->value<int>() ) );
 }
 
+
+} // namespace lmms
 
 #endif
 

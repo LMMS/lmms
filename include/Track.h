@@ -34,11 +34,21 @@
 #include "lmms_basics.h"
 
 
+namespace lmms
+{
+
 class TimePos;
 class TrackContainer;
-class TrackContainerView;
 class Clip;
+
+
+namespace gui
+{
+
 class TrackView;
+class TrackContainerView;
+
+}
 
 
 /*! The minimum track height in pixels
@@ -60,7 +70,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	typedef QVector<Clip *> clipVector;
+	using clipVector = QVector<Clip*>;
 
 	enum TrackTypes
 	{
@@ -75,7 +85,7 @@ public:
 	} ;
 
 	Track( TrackTypes type, TrackContainer * tc );
-	virtual ~Track();
+	~Track() override;
 
 	static Track * create( TrackTypes tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
@@ -93,7 +103,8 @@ public:
 						const f_cnt_t frameBase, int clipNum = -1 ) = 0;
 
 
-	virtual TrackView * createView( TrackContainerView * view ) = 0;
+
+	virtual gui::TrackView * createView( gui::TrackContainerView * view ) = 0;
 	virtual Clip * createClip( const TimePos & pos ) = 0;
 
 	virtual void saveTrackSpecificSettings( QDomDocument & doc,
@@ -233,16 +244,17 @@ private:
 	QColor m_color;
 	bool m_hasColor;
 
-	friend class TrackView;
+	friend class gui::TrackView;
 
 
 signals:
 	void destroyedTrack();
 	void nameChanged();
-	void clipAdded( Clip * );
+	void clipAdded( lmms::Clip * );
 	void colorChanged();
 } ;
 
 
+} // namespace lmms
 
 #endif

@@ -42,6 +42,8 @@
 #include "SubWindow.h"
 #include <QApplication>
 
+namespace lmms
+{
 
 
 VstEffectControls::VstEffectControls( VstEffect * _eff ) :
@@ -155,9 +157,9 @@ int VstEffectControls::controlCount()
 
 
 
-EffectControlDialog *VstEffectControls::createView()
+gui::EffectControlDialog* VstEffectControls::createView()
 {
-	auto dialog = new VstEffectControlDialog( this );
+	auto dialog = new gui::VstEffectControlDialog( this );
 	dialog->togglePluginUI( m_vstGuiVisible );
 	return dialog;
 }
@@ -165,10 +167,10 @@ EffectControlDialog *VstEffectControls::createView()
 
 
 
-void VstEffectControls::managePlugin( void )
+void VstEffectControls::managePlugin()
 {
 	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
-		ManageVSTEffectView * tt = new ManageVSTEffectView( m_effect, this);
+		gui::ManageVSTEffectView * tt = new gui::ManageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
 		if (m_subWindow->widget()->isVisible() == false ) { 
@@ -185,11 +187,11 @@ void VstEffectControls::managePlugin( void )
 
 
 
-void VstEffectControls::savePreset( void )
+void VstEffectControls::savePreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
-		m_effect->m_plugin->savePreset( );
+		m_effect->m_plugin->savePreset();
 /*    		bool converted;
     		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -202,7 +204,7 @@ void VstEffectControls::savePreset( void )
 
 
 
-void VstEffectControls::updateMenu( void )
+void VstEffectControls::updateMenu()
 {
 
 	// get all presets -
@@ -237,11 +239,11 @@ void VstEffectControls::updateMenu( void )
 
 
 
-void VstEffectControls::openPreset( void )
+void VstEffectControls::openPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
-		m_effect->m_plugin->openPreset( );
+		m_effect->m_plugin->openPreset();
     		bool converted;
     		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -254,7 +256,7 @@ void VstEffectControls::openPreset( void )
 
 
 
-void VstEffectControls::rollPreset( void )
+void VstEffectControls::rollPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -270,7 +272,7 @@ void VstEffectControls::rollPreset( void )
 
 
 
-void VstEffectControls::rolrPreset( void )
+void VstEffectControls::rolrPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -286,7 +288,7 @@ void VstEffectControls::rolrPreset( void )
 
 
 
-void VstEffectControls::selPreset( void )
+void VstEffectControls::selPreset()
 {
 
      QAction *action = qobject_cast<QAction *>(sender());
@@ -307,6 +309,9 @@ void VstEffectControls::paintEvent( QPaintEvent * )
 }
 
 
+
+namespace gui
+{
 
 
 ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
@@ -433,7 +438,7 @@ void ManageVSTEffectView::closeWindow()
 
 
 
-void ManageVSTEffectView::syncPlugin( void )
+void ManageVSTEffectView::syncPlugin()
 {
 	char paramStr[35];
 	QStringList s_dumpValues;
@@ -459,7 +464,7 @@ void ManageVSTEffectView::syncPlugin( void )
 
 
 
-void ManageVSTEffectView::displayAutomatedOnly( void )
+void ManageVSTEffectView::displayAutomatedOnly()
 {
 	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
 
@@ -572,7 +577,6 @@ ManageVSTEffectView::~ManageVSTEffectView()
 }
 
 
+} // namespace gui
 
-
-
-
+} // namespace lmms

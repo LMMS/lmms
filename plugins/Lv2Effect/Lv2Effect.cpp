@@ -31,6 +31,8 @@
 #include "plugin_export.h"
 
 
+namespace lmms
+{
 
 
 extern "C"
@@ -38,7 +40,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lv2effect_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"LV2",
 	QT_TRANSLATE_NOOP("PluginBrowser",
 		"plugin for using arbitrary LV2-effects inside LMMS."),
@@ -113,3 +115,6 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 }
 
 }
+
+
+} // namespace lmms

@@ -44,12 +44,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Mallets",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Tuneful things to bang on" ),
@@ -121,13 +125,6 @@ MalletsInstrument::MalletsInstrument( InstrumentTrack * _instrument_track ):
 	m_scalers.append( 16.0 );
 	m_presetsModel.addItem( tr( "Tibetan bowl" ) );
 	m_scalers.append( 7.0 );
-}
-
-
-
-
-MalletsInstrument::~MalletsInstrument()
-{
 }
 
 
@@ -377,12 +374,14 @@ void MalletsInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * MalletsInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * MalletsInstrument::instantiateView( QWidget * _parent )
 {
-	return( new MalletsInstrumentView( this, _parent ) );
+	return( new gui::MalletsInstrumentView( this, _parent ) );
 }
 
 
+namespace gui
+{
 
 
 MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
@@ -426,12 +425,6 @@ MalletsInstrumentView::MalletsInstrumentView( MalletsInstrument * _instrument,
 	}
 }
 
-
-
-
-MalletsInstrumentView::~MalletsInstrumentView()
-{
-}
 
 
 
@@ -605,6 +598,8 @@ void MalletsInstrumentView::changePreset()
 }
 
 
+} // namespace gui
+
 
 // ModalBar
 MalletsSynth::MalletsSynth( const StkFloat _pitch,
@@ -770,6 +765,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
-
-
-
+} // namespace lmms

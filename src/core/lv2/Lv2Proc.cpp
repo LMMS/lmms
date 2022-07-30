@@ -45,6 +45,8 @@
 #include "MidiEventToByteSeq.h"
 
 
+namespace lmms
+{
 
 
 // container for everything required to store MIDI events going to the plugin
@@ -754,10 +756,8 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 		connectPort((audio.mustBeUsed()) ? audio.m_buffer.data() : nullptr);
 	}
 	void visit(Lv2Ports::Unknown&) override { connectPort(nullptr); }
-	~ConnectPortVisitor() override;
+	~ConnectPortVisitor() override = default;
 };
-
-ConnectPortVisitor::~ConnectPortVisitor() {}
 
 // !This function must be realtime safe!
 // use createPort to create any port before connecting
@@ -838,5 +838,7 @@ AutoLilvNode Lv2Proc::uri(const char *uriStr)
 	return Engine::getLv2Manager()->uri(uriStr);
 }
 
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2

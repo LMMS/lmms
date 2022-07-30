@@ -40,9 +40,21 @@
 // However in older versions this namespace does not exist, therefore declare it
 // so this plugin builds with all versions of Stk.
 namespace stk { } ;
+
+namespace lmms
+{
+
+
 using namespace stk;
 
 static const int MALLETS_PRESET_VERSION = 1;
+
+
+namespace gui
+{
+class MalletsInstrumentView;
+} // namespace gui
+
 
 class MalletsSynth
 {
@@ -148,19 +160,19 @@ class MalletsInstrument : public Instrument
 	Q_OBJECT
 public:
 	MalletsInstrument( InstrumentTrack * _instrument_track );
-	virtual ~MalletsInstrument();
+	~MalletsInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 private:
@@ -193,9 +205,12 @@ private:
 	bool m_filesMissing;
 
 
-	friend class MalletsInstrumentView;
+	friend class gui::MalletsInstrumentView;
 
 } ;
+
+namespace gui
+{
 
 
 class MalletsInstrumentView: public InstrumentViewFixedSize
@@ -204,13 +219,13 @@ class MalletsInstrumentView: public InstrumentViewFixedSize
 public:
 	MalletsInstrumentView( MalletsInstrument * _instrument,
 				QWidget * _parent );
-	virtual ~MalletsInstrumentView();
+	~MalletsInstrumentView() override = default;
 
 public slots:
 	void changePreset();
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	void setWidgetBackground( QWidget * _widget, const QString & _pic );
 	QWidget * setupModalBarControls( QWidget * _parent );
@@ -241,5 +256,10 @@ private:
 	ComboBox * m_presetsCombo;
 	Knob * m_spreadKnob;
 };
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

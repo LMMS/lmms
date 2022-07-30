@@ -37,6 +37,9 @@
 #include "StringPairDrag.h"
 #include "PluginFactory.h"
 
+namespace lmms::gui
+{
+
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	SideBarWidget( tr( "Instrument Plugins" ),
@@ -71,8 +74,8 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	m_descTree->setIndentation( 10 );
 	m_descTree->setSelectionMode( QAbstractItemView::NoSelection );
 
-	connect( searchBar, SIGNAL( textEdited( const QString & ) ),
-			this, SLOT( onFilterChanged( const QString & ) ) );
+	connect( searchBar, SIGNAL( textEdited( const QString& ) ),
+			this, SLOT( onFilterChanged( const QString& ) ) );
 
 	view_layout->addWidget( hint );
 	view_layout->addWidget( searchBar );
@@ -285,9 +288,4 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
-
-
-
-
-
-
+} // namespace lmms::gui

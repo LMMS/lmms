@@ -26,7 +26,6 @@
 #define REMOTE_PLUGIN_BASE_H
 
 #include "MidiEvent.h"
-#include "VstSyncData.h"
 
 #include <atomic>
 #include <vector>
@@ -38,7 +37,6 @@
 
 #if !(defined(LMMS_HAVE_SYS_IPC_H) && defined(LMMS_HAVE_SEMAPHORE_H))
 #define SYNC_WITH_SHM_FIFO
-#define USE_QT_SEMAPHORES
 
 #ifdef LMMS_HAVE_PROCESS_H
 #include <process.h>
@@ -47,11 +45,11 @@
 #include <QtGlobal>
 #include <QSystemSemaphore>
 #include <QUuid>
-#else
+#else // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#endif
+#endif // !(LMMS_HAVE_SYS_IPC_H && LMMS_HAVE_SEMAPHORE_H)
 
 #ifdef LMMS_HAVE_LOCALE_H
 #include <clocale>
@@ -69,9 +67,9 @@
 #ifndef SYNC_WITH_SHM_FIFO
 #include <sys/socket.h>
 #include <sys/un.h>
-#endif
+#endif // SYNC_WITH_SHM_FIFO
 
-#else
+#else // BUILD_REMOTE_PLUGIN_CLIENT
 #include "lmms_export.h"
 #include <QMutex>
 #include <QProcess>
@@ -81,13 +79,20 @@
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
 #include <unistd.h>
+#endif // SYNC_WITH_SHM_FIFO
+
+#endif // BUILD_REMOTE_PLUGIN_CLIENT
+
+#ifdef SYNC_WITH_SHM_FIFO
+#include "SharedMemory.h"
 #endif
 
-#endif
+namespace lmms
+{
+
 
 #ifdef SYNC_WITH_SHM_FIFO
 
-#include "SharedMemory.h"
 
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
@@ -346,6 +351,7 @@ enum RemoteMessageIDs
 	IdHostInfoGotten,
 	IdInitDone,
 	IdQuit,
+	IdSyncKey,
 	IdSampleRateInformation,
 	IdBufferSizeInformation,
 	IdInformationUpdated,
@@ -384,11 +390,7 @@ public:
 		{
 		}
 
-		message( const message & _m ) :
-			id( _m.id ),
-			data( _m.data )
-		{
-		}
+		message( const message & _m ) = default;
 
 		message( int _id ) :
 			id( _id ),
@@ -406,7 +408,7 @@ public:
 		{
 			char buf[32];
 			sprintf( buf, "%d", _i );
-			data.push_back( std::string( buf ) );
+			data.emplace_back( buf );
 			return *this;
 		}
 
@@ -414,7 +416,7 @@ public:
 		{
 			char buf[32];
 			sprintf( buf, "%f", _f );
-			data.push_back( std::string( buf ) );
+			data.emplace_back( buf );
 			return *this;
 		}
 
@@ -668,5 +670,7 @@ private:
 #endif
 
 } ;
+
+} // namespace lmms
 
 #endif // REMOTE_PLUGIN_BASE_H

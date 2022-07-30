@@ -31,6 +31,10 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
+
 LfoController::LfoController( Model * _parent ) :
 	Controller( Controller::LfoController, _parent, tr( "LFO Controller" ) ),
 	m_baseModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Base value" ) ),
@@ -47,20 +51,20 @@ LfoController::LfoController( Model * _parent ) :
 	m_userDefSampleBuffer( new SampleBuffer )
 {
 	setSampleExact( true );
-	connect( &m_waveModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleFunction() ), Qt::DirectConnection );
+	connect( &m_waveModel, SIGNAL(dataChanged()),
+			this, SLOT(updateSampleFunction()), Qt::DirectConnection );
 
-	connect( &m_speedModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ), Qt::DirectConnection );
-	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ), Qt::DirectConnection );
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
-			this, SLOT( updateDuration() ) );
+	connect( &m_speedModel, SIGNAL(dataChanged()),
+			this, SLOT(updateDuration()), Qt::DirectConnection );
+	connect( &m_multiplierModel, SIGNAL(dataChanged()),
+			this, SLOT(updateDuration()), Qt::DirectConnection );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()),
+			this, SLOT(updateDuration()));
 
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
-			this, SLOT( updatePhase() ) );
-	connect( Engine::getSong(), SIGNAL( playbackPositionChanged() ),
-			this, SLOT( updatePhase() ) );
+	connect( Engine::getSong(), SIGNAL(playbackStateChanged()),
+			this, SLOT(updatePhase()));
+	connect( Engine::getSong(), SIGNAL(playbackPositionChanged()),
+			this, SLOT(updatePhase()));
 
 	updateDuration();
 }
@@ -220,12 +224,10 @@ QString LfoController::nodeName() const
 
 
 
-ControllerDialog * LfoController::createDialog( QWidget * _parent )
+gui::ControllerDialog * LfoController::createDialog( QWidget * _parent )
 {
-	return new LfoControllerDialog( this, _parent );
+	return new gui::LfoControllerDialog( this, _parent );
 }
 
 
-
-
-
+} // namespace lmms

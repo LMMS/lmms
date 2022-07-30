@@ -31,6 +31,8 @@
 #include "Knob.h"
 #include "StereoMatrixControls.h"
 
+namespace lmms::gui
+{
 
 
 StereoMatrixControlDialog::StereoMatrixControlDialog(
@@ -67,3 +69,6 @@ StereoMatrixControlDialog::StereoMatrixControlDialog(
 	rrKnob->setHintText( tr( "Right to Right Vol:" ) , "" );
 	rrKnob->move( 123, 79 );
 }
+
+
+} // namespace lmms::gui

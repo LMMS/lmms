@@ -30,6 +30,10 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
+
 RenderManager::RenderManager(
 		const AudioEngine::qualitySettings & qualitySettings,
 		const OutputSettings & outputSettings,
@@ -53,8 +57,8 @@ RenderManager::~RenderManager()
 void RenderManager::abortProcessing()
 {
 	if ( m_activeRenderer ) {
-		disconnect( m_activeRenderer.get(), SIGNAL( finished() ),
-				this, SLOT( renderNextTrack() ) );
+		disconnect( m_activeRenderer.get(), SIGNAL(finished()),
+				this, SLOT(renderNextTrack()));
 		m_activeRenderer->abortProcessing();
 	}
 	restoreMutedState();
@@ -147,13 +151,13 @@ void RenderManager::render(QString outputPath)
 	if( m_activeRenderer->isReady() )
 	{
 		// pass progress signals through
-		connect( m_activeRenderer.get(), SIGNAL( progressChanged( int ) ),
-				this, SIGNAL( progressChanged( int ) ) );
+		connect( m_activeRenderer.get(), SIGNAL(progressChanged(int)),
+				this, SIGNAL(progressChanged(int)));
 
 		// when it is finished, render the next track.
 		// if we have not queued any tracks, renderNextTrack will just clean up
-		connect( m_activeRenderer.get(), SIGNAL( finished() ),
-				this, SLOT( renderNextTrack() ) );
+		connect( m_activeRenderer.get(), SIGNAL(finished()),
+				this, SLOT(renderNextTrack()));
 
 		m_activeRenderer->startProcessing();
 	}
@@ -200,3 +204,6 @@ void RenderManager::updateConsoleProgress()
 		}
 	}
 }
+
+
+} // namespace lmms

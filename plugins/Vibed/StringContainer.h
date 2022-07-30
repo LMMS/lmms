@@ -29,6 +29,9 @@
 #include "VibratingString.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 
 class StringContainer
 {
@@ -76,5 +79,8 @@ private:
 	const int m_bufferLength;
 	QVector<bool> m_exists;
 } ;
+
+
+} // namespace lmms
 
 #endif

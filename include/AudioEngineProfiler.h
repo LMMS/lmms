@@ -30,11 +30,14 @@
 #include "lmms_basics.h"
 #include "MicroTimer.h"
 
+namespace lmms
+{
+
 class AudioEngineProfiler
 {
 public:
 	AudioEngineProfiler();
-	~AudioEngineProfiler();
+	~AudioEngineProfiler() = default;
 
 	void startPeriod()
 	{
@@ -56,5 +59,7 @@ private:
 	int m_cpuLoad;
 	QFile m_outputFile;
 };
+
+} // namespace lmms
 
 #endif

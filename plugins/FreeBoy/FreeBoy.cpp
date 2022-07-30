@@ -41,6 +41,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 const blip_time_t FRAME_LENGTH = 70224;
 const long CLOCK_RATE = 4194304;
 
@@ -48,7 +52,7 @@ extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of GameBoy (TM) APU" ),
 
@@ -117,11 +121,6 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 	m_graphModel( 0, 15, 32, this, false, 1 ),
 
 	m_time(0)
-{
-}
-
-
-FreeBoyInstrument::~FreeBoyInstrument()
 {
 }
 
@@ -427,10 +426,14 @@ void FreeBoyInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
 {
-	return( new FreeBoyInstrumentView( this, _parent ) );
+	return( new gui::FreeBoyInstrumentView( this, _parent ) );
 }
+
+
+namespace gui
+{
 
 
 class FreeBoyKnob : public Knob
@@ -676,11 +679,6 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 }
 
 
-FreeBoyInstrumentView::~FreeBoyInstrumentView()
-{
-}
-
-
 void FreeBoyInstrumentView::modelChanged()
 {
 	FreeBoyInstrument * p = castModel<FreeBoyInstrument>();
@@ -721,6 +719,9 @@ void FreeBoyInstrumentView::modelChanged()
 	m_graph->setModel( &p->m_graphModel );
 }
 
+
+} // namespace gui
+
 extern "C"
 {
 
@@ -735,3 +736,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
+} // namespace lmms

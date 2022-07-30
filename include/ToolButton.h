@@ -28,6 +28,8 @@
 
 #include <QToolButton>
 
+namespace lmms::gui
+{
 
 class ToolButton : public QToolButton
 {
@@ -41,9 +43,11 @@ public:
 		QToolButton(_parent)
 	{ }
 
-	virtual ~ToolButton() = default;
+	~ToolButton() override = default;
 
 } ;
+
+} // namespace lmms::gui
 
 #endif
 

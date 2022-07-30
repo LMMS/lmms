@@ -44,6 +44,9 @@
 #include "TrackView.h"
 
 
+namespace lmms::gui
+{
+
 /*! Alternate between a darker and a lighter background color every 4 bars
  */
 const int BARS_PER_GROUP = 4;
@@ -68,8 +71,8 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	setAcceptDrops( true );
 
 	connect( parent->trackContainerView(),
-			SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( changePosition( const TimePos & ) ) );
+			SIGNAL( positionChanged( const lmms::TimePos& ) ),
+			this, SLOT( changePosition( const lmms::TimePos& ) ) );
 
 	setStyle( QApplication::style() );
 
@@ -78,14 +81,6 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 
 
 
-
-/*! \brief Destroy this trackContentWidget
- *
- *  Destroys the trackContentWidget.
- */
-TrackContentWidget::~TrackContentWidget()
-{
-}
 
 
 
@@ -722,3 +717,6 @@ void TrackContentWidget::setGridColor( const QBrush & c )
 //! \brief CSS theming qproperty access method
 void TrackContentWidget::setEmbossColor( const QBrush & c )
 { m_embossColor = c; }
+
+
+} // namespace lmms::gui

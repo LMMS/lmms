@@ -43,7 +43,10 @@
 #include "SubWindow.h"
 #include "TabWidget.h"
 #include "TrackLabelButton.h"
- 
+
+namespace lmms::gui
+{
+
 
 SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
@@ -72,8 +75,8 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	// setup line edit for changing sample track name
 	m_nameLineEdit = new QLineEdit;
 	m_nameLineEdit->setFont(pointSize<9>(m_nameLineEdit->font()));
-	connect(m_nameLineEdit, SIGNAL(textChanged(const QString &)),
-				this, SLOT(textChanged(const QString &)));
+	connect(m_nameLineEdit, SIGNAL(textChanged(const QString&)),
+				this, SLOT(textChanged(const QString&)));
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 	nameLayout->addWidget(m_nameLineEdit);
@@ -159,11 +162,6 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	subWin->setFixedSize(subWin->size());
 	subWin->hide();
 }
-
-SampleTrackWindow::~SampleTrackWindow()
-{
-}
-
 
 
 void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
@@ -275,3 +273,6 @@ void SampleTrackWindow::loadSettings(const QDomElement& element)
 		m_stv->m_tlb->setChecked(true);
 	}
 }
+
+
+} // namespace lmms::gui

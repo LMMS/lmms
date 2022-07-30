@@ -40,12 +40,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Kicker",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Versatile drum synthesizer" ),
@@ -75,13 +79,6 @@ KickerInstrument::KickerInstrument( InstrumentTrack * _instrument_track ) :
 	m_startNoteModel( true, this, tr( "Start from note" ) ),
 	m_endNoteModel( false, this, tr( "End to note" ) ),
 	m_versionModel( KICKER_PRESET_VERSION, 0, KICKER_PRESET_VERSION, this, "" )
-{
-}
-
-
-
-
-KickerInstrument::~KickerInstrument()
 {
 }
 
@@ -157,11 +154,8 @@ QString KickerInstrument::nodeName() const
 	return kicker_plugin_descriptor.name;
 }
 
-
-
-typedef DspEffectLibrary::Distortion DistFX;
-typedef KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX> > SweepOsc;
-
+using DistFX = DspEffectLibrary::Distortion;
+using SweepOsc = KickerOsc<DspEffectLibrary::MonoToStereoAdaptor<DistFX>>;
 
 void KickerInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
@@ -220,12 +214,14 @@ void KickerInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * KickerInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * KickerInstrument::instantiateView( QWidget * _parent )
 {
-	return new KickerInstrumentView( this, _parent );
+	return new gui::KickerInstrumentView( this, _parent );
 }
 
 
+namespace gui
+{
 
 
 class KickerKnob : public Knob
@@ -336,13 +332,6 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 
 
 
-KickerInstrumentView::~KickerInstrumentView()
-{
-}
-
-
-
-
 void KickerInstrumentView::modelChanged()
 {
 	KickerInstrument * k = castModel<KickerInstrument>();
@@ -361,7 +350,7 @@ void KickerInstrumentView::modelChanged()
 }
 
 
-
+} // namespace gui
 
 
 extern "C"
@@ -377,5 +366,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * m, void * )
 }
 
 
-
-
+} // namespace lmms

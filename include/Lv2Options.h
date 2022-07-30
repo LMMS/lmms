@@ -41,6 +41,9 @@
 #include "Lv2Manager.h"
 #include "Lv2UridCache.h"
 
+namespace lmms
+{
+
 /**
 	Option container
 
@@ -98,6 +101,9 @@ private:
 	//! option value storage
 	std::map<LV2_URID, std::shared_ptr<void>> m_optionValues;
 };
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 

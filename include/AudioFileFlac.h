@@ -30,6 +30,9 @@
 #include "AudioFileDevice.h"
 #include <sndfile.h>
 
+namespace lmms
+{
+
 class AudioFileFlac: public AudioFileDevice
 {
 public:
@@ -40,7 +43,7 @@ public:
 			AudioEngine* audioEngine
 	);
 
-	virtual ~AudioFileFlac();
+	~AudioFileFlac() override;
 
 	static AudioFileDevice* getInst(QString const& outputFilename,
 			OutputSettings const& outputSettings,
@@ -62,7 +65,7 @@ private:
 	SF_INFO  m_sfinfo;
 	SNDFILE* m_sf;
 
-	virtual void writeBuffer(surroundSampleFrame const* _ab,
+	void writeBuffer(surroundSampleFrame const* _ab,
 						fpp_t const frames,
 						float master_gain) override;
 
@@ -70,5 +73,8 @@ private:
 	void finishEncoding();
 
 };
+
+
+} // namespace lmms
 
 #endif //AUDIO_FILE_FLAC_H

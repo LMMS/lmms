@@ -46,6 +46,10 @@
 #include "SubWindow.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+namespace lmms::gui
+{
+
+
 MixerView::MixerView() :
 	QWidget(),
 	ModelView( nullptr, this ),
@@ -109,7 +113,7 @@ MixerView::MixerView() :
 		public:
 			ChannelArea( QWidget * parent, MixerView * mv ) :
 				QScrollArea( parent ), m_mv( mv ) {}
-			~ChannelArea() {}
+			~ChannelArea() override = default;
 			void keyPressEvent( QKeyEvent * e ) override
 			{
 				m_mv->keyPressEvent( e );
@@ -130,7 +134,7 @@ MixerView::MixerView() :
 	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( mixerLineSize );
-	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
+	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
@@ -143,8 +147,8 @@ MixerView::MixerView() :
 	updateGeometry();
 
 	// timer for updating faders
-	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateFaders() ) );
+	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
+					this, SLOT(updateFaders()));
 
 
 	// add ourself to workspace
@@ -307,7 +311,7 @@ MixerView::MixerChannelView::MixerChannelView(QWidget * _parent, MixerView * _mv
 				embed::getIconPixmap( "led_off" ) );
 	m_soloBtn->setCheckable( true );
 	m_soloBtn->move( 9,  m_fader->y()-21);
-	connect(&mixerChannel->m_soloModel, SIGNAL( dataChanged() ),
+	connect(&mixerChannel->m_soloModel, SIGNAL(dataChanged()),
 			_mv, SLOT ( toggledSolo() ), Qt::DirectConnection );
 	m_soloBtn->setToolTip(tr("Solo this channel"));
 
@@ -623,3 +627,6 @@ void MixerView::updateFaders()
 		}
 	}
 }
+
+
+} // namesapce lmms::gui

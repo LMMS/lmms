@@ -30,6 +30,9 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 	QWidget( nullptr ),
@@ -38,13 +41,6 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 {
 	setWindowTitle( m_effectControls->effect()->displayName() );
 	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-}
-
-
-
-
-EffectControlDialog::~EffectControlDialog()
-{
 }
 
 
@@ -70,6 +66,4 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-
-
-
+} // namespace lmms::gui

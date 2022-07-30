@@ -33,13 +33,15 @@
 class QLineEdit;
 class QTreeWidget;
 
+namespace lmms::gui
+{
 
 class PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
 	PluginBrowser( QWidget * _parent );
-	virtual ~PluginBrowser() = default;
+	~PluginBrowser() override = default;
 
 private slots:
 	void onFilterChanged( const QString & filter );
@@ -60,7 +62,7 @@ class PluginDescWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	typedef Plugin::Descriptor::SubPluginFeatures::Key PluginKey;
+	using PluginKey = Plugin::Descriptor::SubPluginFeatures::Key;
 	PluginDescWidget( const PluginKey & _pk, QWidget * _parent );
 	QString name() const;
 
@@ -80,5 +82,7 @@ private:
 	bool m_mouseOver;
 };
 
+
+} // namespace lmms::gui
 
 #endif

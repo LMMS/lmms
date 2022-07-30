@@ -31,6 +31,10 @@
 
 #ifdef LMMS_HAVE_ALSA
 
+
+namespace lmms
+{
+
 const int EventPollTimeOut = 250;
 
 
@@ -97,14 +101,14 @@ MidiAlsaSeq::MidiAlsaSeq() :
 
 	snd_seq_start_queue( m_seqHandle, m_queueID, nullptr );
 	changeQueueTempo( Engine::getSong()->getTempo() );
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( changeQueueTempo( bpm_t ) ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL(tempoChanged(lmms::bpm_t)),
+			this, SLOT(changeQueueTempo(lmms::bpm_t)), Qt::DirectConnection );
 
 	// initial list-update
 	updatePortList();
 
-	connect( &m_portListUpdateTimer, SIGNAL( timeout() ),
-					this, SLOT( updatePortList() ) );
+	connect( &m_portListUpdateTimer, SIGNAL(timeout()),
+					this, SLOT(updatePortList()));
 	// we check for port-changes every second
 	m_portListUpdateTimer.start( 1000 );
 
@@ -693,5 +697,7 @@ void MidiAlsaSeq::updatePortList()
 }
 
 
-#endif
 
+} // namespace lmms
+
+#endif // LMMS_HAVE_ALSA

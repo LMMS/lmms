@@ -31,12 +31,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Waveshaper Effect",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"plugin for waveshaping" ),
@@ -56,13 +60,6 @@ WaveShaperEffect::WaveShaperEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &waveshaper_plugin_descriptor, _parent, _key ),
 	m_wsControls( this )
-{
-}
-
-
-
-
-WaveShaperEffect::~WaveShaperEffect()
 {
 }
 
@@ -171,3 +168,5 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 }
 
+
+} // namespace lmms

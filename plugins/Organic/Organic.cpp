@@ -41,13 +41,16 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Organic",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Additive Synthesizer for organ-like sounds" ),
@@ -61,7 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 
 }
 
-QPixmap * OrganicInstrumentView::s_artwork = nullptr;
+QPixmap * gui::OrganicInstrumentView::s_artwork = nullptr;
 float * OrganicInstrument::s_harmonics = nullptr;
 
 /***********************************************************************
@@ -392,12 +395,14 @@ int OrganicInstrument::intRand( int min, int max )
 }
 
 
-PluginView * OrganicInstrument::instantiateView( QWidget * _parent )
+gui::PluginView * OrganicInstrument::instantiateView( QWidget * _parent )
 {
-	return( new OrganicInstrumentView( this, _parent ) );
+	return( new gui::OrganicInstrumentView( this, _parent ) );
 }
 
 
+namespace gui
+{
 
 
 class OrganicKnob : public Knob
@@ -409,7 +414,6 @@ public:
 		setFixedSize( 21, 21 );
 	}
 };
-
 
 
 
@@ -557,6 +561,7 @@ void OrganicInstrumentView::updateKnobHint()
 }
 
 
+} // namespace gui
 
 
 OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
@@ -572,13 +577,6 @@ OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
 			this, tr( "Osc %1 panning" ).arg( _index + 1 ) ),
 	m_detuneModel( 0.0f, -1200.0f, 1200.0f, 1.0f, 
 			this, tr( "Osc %1 fine detuning left" ).arg( _index + 1 ) )
-{
-}
-
-
-
-
-OscillatorObject::~OscillatorObject()
 {
 }
 
@@ -627,8 +625,6 @@ void OscillatorObject::updateDetuning()
 }
 
 
-
-
 extern "C"
 {
 
@@ -652,5 +648,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
  */
 
 
-
-
+} // namespace lmms

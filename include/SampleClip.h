@@ -27,7 +27,17 @@
 
 #include "Clip.h"
 
+namespace lmms
+{
+
 class SampleBuffer;
+
+namespace gui
+{
+
+class SampleClipView;
+
+} // namespace gui
 
 
 class SampleClip : public Clip
@@ -37,7 +47,7 @@ class SampleClip : public Clip
 public:
 	SampleClip( Track * _track );
 	SampleClip( const SampleClip& orig );
-	virtual ~SampleClip();
+	~SampleClip() override;
 
 	SampleClip& operator=( const SampleClip& that ) = delete;
 
@@ -59,14 +69,14 @@ public:
 	TimePos sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
-	ClipView * createView( TrackView * _tv ) override;
+	gui::ClipView * createView( gui::TrackView * _tv ) override;
 
 
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
 public slots:
-	void setSampleBuffer( SampleBuffer* sb );
+	void setSampleBuffer( lmms::SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength();
 	void toggleRecord();
@@ -79,7 +89,7 @@ private:
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
-	friend class SampleClipView;
+	friend class gui::SampleClipView;
 
 
 signals:
@@ -88,5 +98,6 @@ signals:
 } ;
 
 
+} // namespace lmms
 
 #endif

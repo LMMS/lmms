@@ -113,6 +113,9 @@ private:
 
 }
 
+namespace lmms
+{
+
 enum class ExecutableType
 {
 	Unknown, Win32, Win64, Linux64,
@@ -121,7 +124,7 @@ enum class ExecutableType
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( (getGUI() != nullptr)
+	m_embedMethod( (gui::getGUI() != nullptr)
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
 	m_version( 0 ),
@@ -179,8 +182,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 	setTempo( Engine::getSong()->getTempo() );
 
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-			this, SLOT( setTempo( bpm_t ) ), Qt::DirectConnection );
+	connect( Engine::getSong(), SIGNAL( tempoChanged( lmms::bpm_t ) ),
+			this, SLOT( setTempo( lmms::bpm_t ) ), Qt::DirectConnection );
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
@@ -413,13 +416,13 @@ bool VstPlugin::processMessage( const message & _m )
 			// so this is legal despite MSDN's warning
 			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
 					GWLP_HWNDPARENT,
-					(LONG_PTR) getGUI()->mainWindow()->winId() );
+					(LONG_PTR) gui::getGUI()->mainWindow()->winId() );
 #endif
 
 #ifdef LMMS_BUILD_LINUX
 			XSetTransientForHint( QX11Info::display(),
 					m_pluginWindowID,
-					getGUI()->mainWindow()->winId() );
+					gui::getGUI()->mainWindow()->winId() );
 #endif
 		}
 		break;
@@ -502,12 +505,12 @@ QWidget *VstPlugin::editor()
 }
 
 
-void VstPlugin::openPreset( )
+void VstPlugin::openPreset()
 {
 
-	FileDialog ofd( nullptr, tr( "Open Preset" ), "",
+	gui::FileDialog ofd( nullptr, tr( "Open Preset" ), "",
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
-	ofd.setFileMode( FileDialog::ExistingFiles );
+	ofd.setFileMode( gui::FileDialog::ExistingFiles );
 	if( ofd.exec () == QDialog::Accepted &&
 					!ofd.selectedFiles().isEmpty() )
 	{
@@ -580,12 +583,12 @@ void VstPlugin::loadParameterDisplays()
 
 
 
-void VstPlugin::savePreset( )
+void VstPlugin::savePreset()
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly
 
-	FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
+	gui::FileDialog sfd( nullptr, tr( "Save Preset" ), presName.section(": ", 1, 1) + tr(".fxp"),
 		tr( "Vst Plugin Preset (*.fxp *.fxb)" ) );
 
 	if( p_name != "" ) // remember last directory
@@ -593,8 +596,8 @@ void VstPlugin::savePreset( )
 		sfd.setDirectory( QFileInfo( p_name ).absolutePath() );
 	}
 
-	sfd.setAcceptMode( FileDialog::AcceptSave );
-	sfd.setFileMode( FileDialog::AnyFile );
+	sfd.setAcceptMode( gui::FileDialog::AcceptSave );
+	sfd.setFileMode( gui::FileDialog::AnyFile );
 	if( sfd.exec () == QDialog::Accepted &&
 				!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
@@ -823,3 +826,6 @@ QString VstPlugin::embedMethod() const
 {
 	return m_embedMethod;
 }
+
+
+} // namespace lmms

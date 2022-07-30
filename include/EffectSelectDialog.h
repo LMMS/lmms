@@ -34,13 +34,16 @@
 
 namespace Ui { class EffectSelectDialog; }
 
+namespace lmms::gui
+{
+
 
 class EffectSelectDialog : public QDialog
 {
 	Q_OBJECT
 public:
 	EffectSelectDialog( QWidget * _parent );
-	virtual ~EffectSelectDialog();
+	~EffectSelectDialog() override;
 
 	Effect * instantiateSelectedPlugin( EffectChain * _parent );
 
@@ -64,6 +67,8 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 
 #endif

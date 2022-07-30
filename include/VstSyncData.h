@@ -26,6 +26,10 @@
 #ifndef VST_SYNC_DATA_H
 #define VST_SYNC_DATA_H
 
+namespace lmms
+{
+
+
 // VST sync frequency (in ms), how often will be VST plugin synced
 // keep it power of two if possible (not used by now)
 //#define VST_SNC_TIMER 1
@@ -42,7 +46,6 @@ struct VstSyncData
 	int timeSigDenom;
 	bool isPlaying;
 	bool isCycle;
-	bool hasSHM;
 	float cycleStart;
 	float cycleEnd;
 	bool m_playbackJumped;
@@ -54,5 +57,8 @@ struct VstSyncData
 	float m_latency;
 #endif
 } ;
+
+
+} // namespace lmms
 
 #endif

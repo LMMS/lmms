@@ -29,6 +29,10 @@
 #include "BitcrushControls.h"
 #include "Bitcrush.h"
 
+namespace lmms
+{
+
+
 
 BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	EffectControls( eff ),
@@ -49,9 +53,6 @@ BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }
 
-BitcrushControls::~BitcrushControls()
-{
-}
 
 void BitcrushControls::saveSettings( QDomDocument & doc, QDomElement & elem )
 {
@@ -86,3 +87,6 @@ void BitcrushControls::sampleRateChanged()
 {
 	m_effect->sampleRateChanged();
 }
+
+
+} // namespace lmms

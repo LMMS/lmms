@@ -29,6 +29,9 @@
 #include "ControlLayout.h"
 #include "LinkedModelGroups.h"
 
+namespace lmms::gui
+{
+
 
 /*
 	LinkedModelGroupViewBase
@@ -48,11 +51,6 @@ LinkedModelGroupView::LinkedModelGroupView(QWidget* parent,
 	// quickly play notes on the virtual keyboard.
 	setFocusPolicy( Qt::StrongFocus );
 }
-
-
-
-
-LinkedModelGroupView::~LinkedModelGroupView() {}
 
 
 
@@ -169,3 +167,4 @@ void LinkedModelGroupsView::modelChanged(LinkedModelGroups *groups)
 }
 
 
+} // namespace lmms::gui

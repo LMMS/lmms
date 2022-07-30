@@ -42,6 +42,10 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 #define C64_PAL_CYCLES_PER_SEC  985248
 
 #define NUMSIDREGS 0x19
@@ -71,7 +75,7 @@ extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT sid_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"SID",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of the MOS6581 and MOS8580 "
 					"SID.\nThis chip was used in the Commodore 64 computer." ),
@@ -112,11 +116,6 @@ VoiceObject::VoiceObject( Model * _parent, int _idx ) :
 }
 
 
-VoiceObject::~VoiceObject()
-{
-}
-
-
 SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &sid_plugin_descriptor ),
 	// filter	
@@ -133,11 +132,6 @@ SidInstrument::SidInstrument( InstrumentTrack * _instrument_track ) :
 	{
 		m_voice[i] = new VoiceObject( this, i );
 	}
-}
-
-
-SidInstrument::~SidInstrument()
-{
 }
 
 
@@ -452,12 +446,15 @@ void SidInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * SidInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* SidInstrument::instantiateView( QWidget * _parent )
 {
-	return( new SidInstrumentView( this, _parent ) );
+	return( new gui::SidInstrumentView( this, _parent ) );
 }
 
 
+
+namespace gui
+{
 
 
 class sidKnob : public Knob
@@ -655,10 +652,6 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 }
 
 
-SidInstrumentView::~SidInstrumentView()
-{
-}
-
 void SidInstrumentView::updateKnobHint()
 {
 	SidInstrument * k = castModel<SidInstrument>();
@@ -785,7 +778,7 @@ void SidInstrumentView::modelChanged()
 }
 
 
-
+} // namespace gui
 
 
 extern "C"
@@ -801,5 +794,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 
-
-
+} // namespace lmms

@@ -28,8 +28,16 @@
 
 #include "TrackView.h"
 
-class Knob;
+namespace lmms
+{
+
 class SampleTrack;
+
+
+namespace gui
+{
+
+class Knob;
 class SampleTrackWindow;
 class TrackLabelButton;
 
@@ -39,7 +47,7 @@ class SampleTrackView : public TrackView
 	Q_OBJECT
 public:
 	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
-	virtual ~SampleTrackView();
+	~SampleTrackView() override;
 
 	SampleTrackWindow * getSampleTrackWindow()
 	{
@@ -97,5 +105,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

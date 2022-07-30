@@ -56,6 +56,10 @@
 #include "StringPairDrag.h"
 
 
+namespace lmms::gui
+{
+
+
 /*! The scale of C Major - white keys only.
  */
 Keys WhiteKeys[] =
@@ -137,8 +141,8 @@ PianoView::PianoView(QWidget *parent) :
 	m_pianoScroll->setValue(Octave_3 * Piano::WhiteKeysPerOctave);
 
 	// and connect it to this widget
-	connect( m_pianoScroll, SIGNAL( valueChanged( int ) ),
-			this, SLOT( pianoScrolled( int ) ) );
+	connect( m_pianoScroll, SIGNAL(valueChanged(int)),
+			this, SLOT(pianoScrolled(int)));
 
 	// create a layout for ourselves
 	QVBoxLayout * layout = new QVBoxLayout( this );
@@ -982,5 +986,5 @@ void PianoView::paintEvent( QPaintEvent * )
 }
 
 
-
+} // namespace lmms::gui
 
