@@ -46,7 +46,7 @@ public:
 	{
 		m_buffer.touch();	// reserve storage space before realtime operation starts
 	}
-	~LocklessRingBuffer() {};
+	~LocklessRingBuffer() = default;
 
 	std::size_t capacity() const {return m_buffer.maximum_eventual_write_space();}
 	std::size_t free() const {return m_buffer.write_space();}

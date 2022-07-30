@@ -36,11 +36,6 @@ AudioEngineProfiler::AudioEngineProfiler() :
 
 
 
-AudioEngineProfiler::~AudioEngineProfiler()
-{
-}
-
-
 void AudioEngineProfiler::finishPeriod( sample_rate_t sampleRate, fpp_t framesPerPeriod )
 {
 	int periodElapsed = m_periodTimer.elapsed();

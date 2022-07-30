@@ -42,7 +42,7 @@ class LMMS_EXPORT ImportFilter : public Plugin
 public:
 	ImportFilter( const QString & _file_name,
 					const Descriptor * _descriptor );
-	virtual ~ImportFilter();
+	~ImportFilter() override = default;
 
 
 	// tries to import given file to given track-container by having all

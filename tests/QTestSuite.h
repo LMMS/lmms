@@ -10,7 +10,7 @@ class QTestSuite : public QObject
 	Q_OBJECT
 public:
 	explicit QTestSuite(QObject *parent = 0);
-	~QTestSuite();
+	~QTestSuite() override;
 
 	static QList<QTestSuite*> suites();
 

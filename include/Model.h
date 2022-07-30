@@ -45,9 +45,7 @@ public:
 	{
 	}
 
-	virtual ~Model()
-	{
-	}
+	~Model() override = default;
 
 	bool isDefaultConstructed()
 	{

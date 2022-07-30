@@ -47,7 +47,7 @@ class InstrumentSoundShapingView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentSoundShapingView( QWidget * _parent );
-	virtual ~InstrumentSoundShapingView();
+	~InstrumentSoundShapingView() override;
 
 	void setFunctionsHidden( bool hidden );
 

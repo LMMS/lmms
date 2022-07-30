@@ -298,7 +298,7 @@ private:
 
 	PianoRoll();
 	PianoRoll( const PianoRoll & );
-	virtual ~PianoRoll();
+	~PianoRoll() override = default;
 
 	void autoScroll(const TimePos & t );
 

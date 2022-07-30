@@ -40,8 +40,8 @@ class PeakControllerEffect : public Effect
 public:
 	PeakControllerEffect( Model * parent, 
 						const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~PeakControllerEffect();
-	virtual bool processAudioBuffer( sampleFrame * _buf,
+	~PeakControllerEffect() override;
+	bool processAudioBuffer( sampleFrame * _buf,
 									const fpp_t _frames ) override;
 
 	EffectControls * controls() override

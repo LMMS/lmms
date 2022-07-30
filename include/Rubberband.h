@@ -44,9 +44,7 @@ public:
 	{
 	}
 
-	virtual ~selectableObject()
-	{
-	}
+	~selectableObject() override = default;
 
 	inline void setSelected(bool selected)
 	{
@@ -80,7 +78,7 @@ class RubberBand : public QRubberBand
 {
 public:
 	RubberBand( QWidget * _parent );
-	virtual ~RubberBand();
+	~RubberBand() override = default;
 
 	QVector<selectableObject *> selectedObjects() const;
 	QVector<selectableObject *> selectableObjects() const;

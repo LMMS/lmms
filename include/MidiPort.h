@@ -67,7 +67,7 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
 public:
-	typedef QMap<QString, bool> Map;
+	using Map = QMap<QString, bool>;
 
 	enum Modes
 	{
@@ -76,14 +76,14 @@ public:
 		Output,		// from MIDI-event-processor to MIDI-client
 		Duplex		// both directions
 	} ;
-	typedef Modes Mode;
+	using Mode = Modes;
 
 	MidiPort( const QString& name,
 			MidiClient* client,
 			MidiEventProcessor* eventProcessor,
 			Model* parent = nullptr,
 			Mode mode = Disabled );
-	virtual ~MidiPort();
+	~MidiPort() override;
 
 	void setName( const QString& name );
 
@@ -186,8 +186,7 @@ signals:
 
 } ;
 
-
-typedef QList<MidiPort *> MidiPortList;
+using MidiPortList = QList<MidiPort*>;
 
 } // namespace lmms
 

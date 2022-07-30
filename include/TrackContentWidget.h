@@ -56,7 +56,7 @@ class TrackContentWidget : public QWidget, public JournallingObject
 
 public:
 	TrackContentWidget( TrackView * parent );
-	virtual ~TrackContentWidget();
+	~TrackContentWidget() override = default;
 
 	/*! \brief Updates the background tile pixmap. */
 	void updateBackground();
@@ -132,7 +132,7 @@ private:
 
 	TrackView * m_trackView;
 
-	typedef QVector<ClipView *> clipViewVector;
+	using clipViewVector = QVector<ClipView*>;
 	clipViewVector m_clipViews;
 
 	QPixmap m_background;

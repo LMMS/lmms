@@ -58,7 +58,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Sf2 Player",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for SoundFont files" ),
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
@@ -1050,13 +1050,6 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
-}
-
-
-
-
-Sf2InstrumentView::~Sf2InstrumentView()
-{
 }
 
 

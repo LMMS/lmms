@@ -39,7 +39,7 @@ class RowTableView : public QTableView
 	Q_OBJECT
 public:
 	RowTableView( QWidget * parent = 0 );
-	virtual ~RowTableView();
+	~RowTableView() override;
 
 	void setModel( QAbstractItemModel * model ) override;
 

@@ -47,8 +47,7 @@ namespace gui
 class ControllerConnectionDialog;
 }
 
-typedef QVector<ControllerConnection *> ControllerConnectionVector;
-
+using ControllerConnectionVector = QVector<ControllerConnection*>;
 
 class LMMS_EXPORT ControllerConnection : public QObject, public JournallingObject
 {
@@ -58,7 +57,7 @@ public:
 	ControllerConnection(Controller * _controller);
 	ControllerConnection( int _controllerId );
 
-	virtual ~ControllerConnection();
+	~ControllerConnection() override;
 
 	inline Controller * getController()
 	{

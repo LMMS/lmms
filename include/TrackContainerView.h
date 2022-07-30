@@ -73,7 +73,7 @@ class TrackContainerView : public QWidget, public ModelView,
 	Q_OBJECT
 public:
 	TrackContainerView( TrackContainer* tc );
-	virtual ~TrackContainerView();
+	~TrackContainerView() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -184,7 +184,7 @@ private:
 	{
 	public:
 		scrollArea( TrackContainerView* parent );
-		virtual ~scrollArea();
+		~scrollArea() override = default;
 
 	protected:
 		void wheelEvent( QWheelEvent * _we ) override;
@@ -196,7 +196,7 @@ private:
 	friend class TrackContainerView::scrollArea;
 
 	TrackContainer* m_tc;
-	typedef QList<TrackView *> trackViewList;
+	using trackViewList = QList<TrackView*>;
 	trackViewList m_trackViews;
 
 	scrollArea * m_scrollArea;

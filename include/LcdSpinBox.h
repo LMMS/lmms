@@ -40,7 +40,7 @@ public:
 
 	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString() );
 
-	virtual ~LcdSpinBox() = default;
+	~LcdSpinBox() override = default;
 
 	void modelChanged() override
 	{
@@ -86,7 +86,7 @@ signals:
 
 } ;
 
-typedef IntModel LcdSpinBoxModel;
+using LcdSpinBoxModel = IntModel;
 
 } // namespace lmms::gui
 

@@ -65,7 +65,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"MIDI Import",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Filter for importing MIDI-files into LMMS" ),
@@ -84,13 +84,6 @@ MidiImport::MidiImport( const QString & _file ) :
 	ImportFilter( _file, &midiimport_plugin_descriptor ),
 	m_events(),
 	m_timingDivision( 0 )
-{
-}
-
-
-
-
-MidiImport::~MidiImport()
 {
 }
 
@@ -326,6 +319,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// 128 CC + Pitch Bend
 	smfMidiCC ccs[MIDI_CC_COUNT];
 
+	// channel to CC object for program changes
+	std::unordered_map<long, smfMidiCC> pcs;
+
 	// channels can be set out of 256 range
 	// using unordered_map should fix most invalid loads and crashes while loading
 	std::unordered_map<long, smfMidiChannel> chs;
@@ -474,8 +470,12 @@ bool MidiImport::readSMF( TrackContainer* tc )
 					long prog = evt->get_integer_value();
 					if( ch->isSF2 )
 					{
-						ch->it_inst->childModel( "bank" )->setValue( 0 );
-						ch->it_inst->childModel( "patch" )->setValue( prog );
+						auto& pc = pcs[evt->chan];
+						AutomatableModel* objModel = ch->it_inst->childModel("patch");
+						if (pc.at == nullptr) {
+							pc.create(tc, trackName + " > " + objModel->displayName());
+						}
+						pc.putValue(time, objModel, prog);
 					}
 					else {
 						const QString num = QString::number( prog );
@@ -605,7 +605,7 @@ invalid_format:
 	}
 
 	// search for "data" chunk
-	while( 1 )
+	while( true )
 	{
 		const int id = readID();
 		const int len = read32LE();

@@ -64,17 +64,17 @@ public:
 		pthread_create( &m_messageThreadHandle, nullptr, messageLoop, this );
 	}
 
-	virtual ~RemoteZynAddSubFx()
+	~RemoteZynAddSubFx() override
 	{
 		Nio::stop();
 	}
 
-	virtual void updateSampleRate()
+	void updateSampleRate() override
 	{
 		LocalZynAddSubFx::setSampleRate( sampleRate() );
 	}
 
-	virtual void updateBufferSize()
+	void updateBufferSize() override
 	{
 		LocalZynAddSubFx::setBufferSize( bufferSize() );
 	}
@@ -91,7 +91,7 @@ public:
 		m_guiExit = true;
 	}
 
-	virtual bool processMessage( const message & _m )
+	bool processMessage( const message & _m ) override
 	{
 		switch( _m.id )
 		{
@@ -133,13 +133,13 @@ public:
 	}
 
 	// all functions are called while m_master->mutex is held
-	virtual void processMidiEvent( const MidiEvent& event, const f_cnt_t /* _offset */ )
+	void processMidiEvent( const MidiEvent& event, const f_cnt_t /* _offset */ ) override
 	{
 		LocalZynAddSubFx::processMidiEvent( event );
 	}
 
 
-	virtual void process( const sampleFrame * _in, sampleFrame * _out )
+	void process( const sampleFrame * _in, sampleFrame * _out ) override
 	{
 		LocalZynAddSubFx::processAudio( _out );
 	}

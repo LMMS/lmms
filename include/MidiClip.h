@@ -55,7 +55,7 @@ public:
 
 	MidiClip( InstrumentTrack* instrumentTrack );
 	MidiClip( const MidiClip& other );
-	virtual ~MidiClip();
+	~MidiClip() override;
 
 	void init();
 

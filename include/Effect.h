@@ -55,7 +55,7 @@ public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~Effect();
+	~Effect() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -236,10 +236,8 @@ private:
 
 } ;
 
-
-typedef Effect::Descriptor::SubPluginFeatures::Key EffectKey;
-typedef Effect::Descriptor::SubPluginFeatures::KeyList EffectKeyList;
-
+using EffectKey = Effect::Descriptor::SubPluginFeatures::Key;
+using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
 } // namespace lmms
 

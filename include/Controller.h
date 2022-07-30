@@ -46,9 +46,7 @@ class ControllerDialog;
 
 } // namespace gui
 
-
-typedef QVector<Controller *> ControllerVector;
-
+using ControllerVector = QVector<Controller*>;
 
 class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
@@ -70,7 +68,7 @@ public:
 	Controller( ControllerTypes _type, Model * _parent,
 						const QString & _display_name );
 
-	virtual ~Controller();
+	~Controller() override;
 
 	virtual float currentValue( int _offset );
 	// The per-controller get-value-in-buffers function

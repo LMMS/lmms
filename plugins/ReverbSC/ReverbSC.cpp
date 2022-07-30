@@ -37,7 +37,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT reverbsc_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ReverbSC",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Reverb algorithm by Sean Costello" ),
 	"Paul Batchelor",

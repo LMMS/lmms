@@ -39,7 +39,7 @@ class TimeDisplayWidget : public QWidget
 	Q_OBJECT
 public:
 	TimeDisplayWidget();
-	virtual ~TimeDisplayWidget() = default;
+	~TimeDisplayWidget() override = default;
 
 
 protected:
@@ -57,7 +57,7 @@ private:
 		BarsTicks,
 		DisplayModeCount
 	};
-	typedef DisplayModes DisplayMode;
+	using DisplayMode = DisplayModes;
 
 	void setDisplayMode( DisplayMode displayMode );
 

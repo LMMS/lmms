@@ -80,7 +80,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lb302_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"LB302",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Incomplete monophonic imitation TB-303" ),
@@ -293,26 +293,26 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	vca_mode(never_played)
 {
 
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_cut_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_cut_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_res_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_res_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_mod_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_mod_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &vcf_dec_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( ) ) );
+	connect( &vcf_dec_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged() ) );
 
-	connect( &db24Toggle, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( db24Toggled( ) ) );
+	connect( &db24Toggle, SIGNAL( dataChanged() ),
+	         this, SLOT ( db24Toggled() ) );
 
-	connect( &dist_knob, SIGNAL( dataChanged( ) ),
-	         this, SLOT ( filterChanged( )));
+	connect( &dist_knob, SIGNAL( dataChanged() ),
+	         this, SLOT ( filterChanged()));
 
 
 	// SYNTH
@@ -1007,11 +1007,6 @@ Lb302SynthView::Lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 			"artwork" ) );
 	setPalette( pal );
-}
-
-
-Lb302SynthView::~Lb302SynthView()
-{
 }
 
 

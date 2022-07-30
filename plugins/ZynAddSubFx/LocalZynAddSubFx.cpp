@@ -86,7 +86,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_ioEngine = new NulEngine;
 
 	m_master = new Master();
-	m_master->swaplr = 0;
+	m_master->swaplr = false;
 }
 
 

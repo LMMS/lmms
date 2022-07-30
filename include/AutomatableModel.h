@@ -78,8 +78,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
-
-	typedef QVector<AutomatableModel *> AutoModelVector;
+	using AutoModelVector = QVector<AutomatableModel*>;
 
 	enum ScaleType
 	{
@@ -89,7 +88,7 @@ public:
 	};
 
 
-	virtual ~AutomatableModel();
+	~AutomatableModel() override;
 
 	// Implement those by using the MODEL_IS_VISITABLE macro
 	virtual void accept(ModelVisitor& v) = 0;
@@ -504,8 +503,7 @@ public:
 	QString displayValue( const float val ) const override;
 } ;
 
-typedef QMap<AutomatableModel*, float> AutomatedValueMap;
-
+using AutomatedValueMap = QMap<AutomatableModel*, float>;
 
 } // namespace lmms
 

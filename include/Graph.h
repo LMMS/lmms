@@ -67,7 +67,7 @@ public:
 		int _width = 132,
 		int _height = 104
 	);
-	virtual ~Graph() = default;
+	~Graph() override = default;
 
 	void setForeground( const QPixmap & _pixmap );
 
@@ -151,7 +151,7 @@ public:
 			bool _default_constructed = false,
 			float _step = 0.0 );
 
-	virtual ~graphModel() = default;
+	~graphModel() override = default;
 
 	// TODO: saveSettings, loadSettings?
 
@@ -197,7 +197,7 @@ public slots:
 	void setWaveToSaw();
 	void setWaveToSquare();
 	void setWaveToNoise();
-	QString setWaveToUser( );
+	QString setWaveToUser();
 
 	void smooth();
 	void smoothNonCyclic();

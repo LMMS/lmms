@@ -39,7 +39,7 @@ class LMMS_EXPORT AutomatableModelView : public ModelView
 {
 public:
 	AutomatableModelView( Model* model, QWidget* _this );
-	virtual ~AutomatableModelView() = default;
+	~AutomatableModelView() override = default;
 
 	// some basic functions for convenience
 	AutomatableModel* modelUntyped()

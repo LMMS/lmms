@@ -49,7 +49,7 @@ class LMMS_EXPORT TrackContainer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
-	typedef QVector<Track *> TrackList;
+	using TrackList = QVector<Track*>;
 	enum TrackContainerTypes
 	{
 		PatternContainer,
@@ -57,7 +57,7 @@ public:
 	} ;
 
 	TrackContainer();
-	virtual ~TrackContainer();
+	~TrackContainer() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 

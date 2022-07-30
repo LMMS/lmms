@@ -43,9 +43,7 @@ class DynProcControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	DynProcControlDialog( DynProcControls * _controls );
-	virtual ~DynProcControlDialog()
-	{
-	}
+	~DynProcControlDialog() override = default;
 
 
 private:

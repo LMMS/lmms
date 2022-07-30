@@ -52,7 +52,7 @@ extern "C"
 {
 Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Emulation of GameBoy (TM) APU" ),
 
@@ -121,11 +121,6 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 	m_graphModel( 0, 15, 32, this, false, 1 ),
 
 	m_time(0)
-{
-}
-
-
-FreeBoyInstrument::~FreeBoyInstrument()
 {
 }
 
@@ -681,11 +676,6 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_graph->move( 37, 199 );
 	m_graph->resize(208, 47);
 	m_graph->setToolTip(tr("Wave pattern graph"));
-}
-
-
-FreeBoyInstrumentView::~FreeBoyInstrumentView()
-{
 }
 
 

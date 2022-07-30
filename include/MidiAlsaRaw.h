@@ -48,7 +48,7 @@ class MidiAlsaRaw : public QThread, public MidiClientRaw
 	Q_OBJECT
 public:
 	MidiAlsaRaw();
-	virtual ~MidiAlsaRaw();
+	~MidiAlsaRaw() override;
 
 	static QString probeDevice();
 

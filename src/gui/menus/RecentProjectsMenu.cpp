@@ -19,10 +19,10 @@ RecentProjectsMenu::RecentProjectsMenu(QWidget *parent) :
 {
 	setIcon(embed::getIconPixmap( "project_open_recent" ));
 
-	connect( this, SIGNAL( aboutToShow() ),
-			 this, SLOT(fillMenu() ) );
-	connect( this, SIGNAL( triggered( QAction * ) ),
-			 this, SLOT(openProject(QAction * ) ) );
+	connect( this, SIGNAL(aboutToShow()),
+			 this, SLOT(fillMenu()));
+	connect( this, SIGNAL(triggered(QAction*)),
+			 this, SLOT(openProject(QAction*)));
 }
 
 

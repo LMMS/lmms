@@ -38,13 +38,6 @@ RubberBand::RubberBand( QWidget * _parent ) :
 
 
 
-RubberBand::~RubberBand()
-{
-}
-
-
-
-
 QVector<selectableObject *> RubberBand::selectedObjects() const
 {
 	QVector<selectableObject *> so = selectableObjects();

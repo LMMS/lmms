@@ -49,13 +49,6 @@ ProjectJournal::ProjectJournal() :
 
 
 
-ProjectJournal::~ProjectJournal()
-{
-}
-
-
-
-
 void ProjectJournal::undo()
 {
 	while( !m_undoCheckPoints.isEmpty() )

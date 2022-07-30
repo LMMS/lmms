@@ -65,9 +65,7 @@
 namespace lmms
 {
 
-
-typedef LocklessList<PlayHandle *>::Element LocklessListElement;
-
+using LocklessListElement = LocklessList<PlayHandle*>::Element;
 
 static thread_local bool s_renderingThread;
 
@@ -95,7 +93,9 @@ AudioEngine::AudioEngine( bool renderOnly ) :
 	m_clearSignal( false ),
 	m_changesSignal( false ),
 	m_changes( 0 ),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
 	m_doChangesMutex( QMutex::Recursive ),
+#endif
 	m_waitingForWrite( false )
 {
 	for( int i = 0; i < 2; ++i )

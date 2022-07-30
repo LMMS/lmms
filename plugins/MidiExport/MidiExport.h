@@ -38,7 +38,7 @@ namespace lmms
 
 
 const int BUFFER_SIZE = 50*1024;
-typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+using MTrack = MidiFile::MIDITrack<BUFFER_SIZE>;
 
 struct MidiNote
 {
@@ -53,26 +53,24 @@ struct MidiNote
 	}
 } ;
 
-typedef std::vector<MidiNote> MidiNoteVector;
-typedef std::vector<MidiNote>::iterator MidiNoteIterator;
-
-
+using MidiNoteVector = std::vector<MidiNote>;
+using MidiNoteIterator = std::vector<MidiNote>::iterator;
 
 class MidiExport: public ExportFilter
 {
 // 	Q_OBJECT
 public:
 	MidiExport();
-	~MidiExport();
+	~MidiExport() override = default;
 
-	virtual gui::PluginView* instantiateView(QWidget *)
+	gui::PluginView* instantiateView(QWidget *) override
 	{
 		return nullptr;
 	}
 
-	virtual bool tryExport(const TrackContainer::TrackList &tracks,
+	bool tryExport(const TrackContainer::TrackList &tracks,
 				const TrackContainer::TrackList &patternTracks,
-				int tempo, int masterPitch, const QString &filename);
+				int tempo, int masterPitch, const QString &filename) override;
 	
 private:
 	void writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,

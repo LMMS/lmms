@@ -37,7 +37,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"StereoEnhancer Effect",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Plugin for enhancing stereo separation of a stereo input file" ),

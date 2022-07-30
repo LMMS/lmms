@@ -46,7 +46,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Watsyn",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"4-oscillator modulatable wavetable synth" ),
@@ -323,11 +323,6 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 	updateWaveA2();
 	updateWaveB1();
 	updateWaveB2();
-}
-
-
-WatsynInstrument::~WatsynInstrument()
-{
 }
 
 
@@ -945,12 +940,6 @@ WatsynView::WatsynView( Instrument * _instrument,
 
 	updateLayout();
 }
-
-
-WatsynView::~WatsynView()
-{
-}
-
 
 
 void WatsynView::updateLayout()

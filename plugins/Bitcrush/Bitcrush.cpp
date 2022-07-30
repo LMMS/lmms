@@ -43,7 +43,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Bitcrush",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "An oversampling bitcrusher" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",

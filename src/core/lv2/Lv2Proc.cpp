@@ -756,10 +756,8 @@ struct ConnectPortVisitor : public Lv2Ports::Visitor
 		connectPort((audio.mustBeUsed()) ? audio.m_buffer.data() : nullptr);
 	}
 	void visit(Lv2Ports::Unknown&) override { connectPort(nullptr); }
-	~ConnectPortVisitor() override;
+	~ConnectPortVisitor() override = default;
 };
-
-ConnectPortVisitor::~ConnectPortVisitor() {}
 
 // !This function must be realtime safe!
 // use createPort to create any port before connecting

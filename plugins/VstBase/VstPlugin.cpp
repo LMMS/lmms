@@ -505,7 +505,7 @@ QWidget *VstPlugin::editor()
 }
 
 
-void VstPlugin::openPreset( )
+void VstPlugin::openPreset()
 {
 
 	gui::FileDialog ofd( nullptr, tr( "Open Preset" ), "",
@@ -583,7 +583,7 @@ void VstPlugin::loadParameterDisplays()
 
 
 
-void VstPlugin::savePreset( )
+void VstPlugin::savePreset()
 {
 	QString presName = currentProgramName().isEmpty() ? tr(": default") : currentProgramName();
 	presName.replace("\"", "'"); // QFileDialog unable to handle double quotes properly

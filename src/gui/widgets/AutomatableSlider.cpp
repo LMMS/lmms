@@ -42,18 +42,14 @@ AutomatableSlider::AutomatableSlider( QWidget * _parent,
 {
 	setWindowTitle( _name );
 
-	connect( this, SIGNAL( valueChanged( int ) ),
-					this, SLOT( changeValue( int ) ) );
-	connect( this, SIGNAL( sliderMoved( int ) ),
-					this, SLOT( moveSlider( int ) ) );
+	connect( this, SIGNAL(valueChanged(int)),
+					this, SLOT(changeValue(int)));
+	connect( this, SIGNAL(sliderMoved(int)),
+					this, SLOT(moveSlider(int)));
 }
 
 
 
-
-AutomatableSlider::~AutomatableSlider()
-{
-}
 
 
 
@@ -109,8 +105,8 @@ void AutomatableSlider::modelChanged()
 {
 	QSlider::setRange( model()->minValue(), model()->maxValue() );
 	updateSlider();
-	connect( model(), SIGNAL( dataChanged() ),
-				this, SLOT( updateSlider() ) );
+	connect( model(), SIGNAL(dataChanged()),
+				this, SLOT(updateSlider()));
 }
 
 

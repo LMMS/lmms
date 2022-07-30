@@ -25,7 +25,7 @@ public:
 	}
 
 private:
-	virtual QString displayValue() const;
+	QString displayValue() const override;
 
 protected:
 	QString m_value_text;

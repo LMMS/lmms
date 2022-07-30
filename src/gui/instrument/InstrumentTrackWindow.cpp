@@ -108,8 +108,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	// setup line edit for changing instrument track name
 	m_nameLineEdit = new QLineEdit;
 	m_nameLineEdit->setFont( pointSize<9>( m_nameLineEdit->font() ) );
-	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
-				this, SLOT( textChanged( const QString & ) ) );
+	connect( m_nameLineEdit, SIGNAL( textChanged( const QString& ) ),
+				this, SLOT( textChanged( const QString& ) ) );
 
 	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
 	nameAndChangeTrackLayout->addWidget(m_nameLineEdit, 1);
@@ -117,10 +117,10 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 	// set up left/right arrows for changing instrument
 	m_leftRightNav = new LeftRightNav(this);
-	connect( m_leftRightNav, SIGNAL( onNavLeft() ), this,
-						SLOT( viewPrevInstrument() ) );
-	connect( m_leftRightNav, SIGNAL( onNavRight() ), this,
-						SLOT( viewNextInstrument() ) );
+	connect( m_leftRightNav, SIGNAL(onNavLeft()), this,
+						SLOT(viewPrevInstrument()));
+	connect( m_leftRightNav, SIGNAL(onNavRight()), this,
+						SLOT(viewNextInstrument()));
 	// m_leftRightNav->setShortcuts();
 	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
 
@@ -221,7 +221,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	QPushButton* saveSettingsBtn = new QPushButton( embed::getIconPixmap( "project_save" ), QString() );
 	saveSettingsBtn->setMinimumSize( 32, 32 );
 
-	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
+	connect( saveSettingsBtn, SIGNAL(clicked()), this, SLOT(saveSettingsBtnClicked()));
 
 	saveSettingsBtn->setToolTip(tr("Save current instrument track settings in a preset file"));
 
@@ -345,13 +345,13 @@ void InstrumentTrackWindow::modelChanged()
 
 	m_nameLineEdit->setText( m_track->name() );
 
-	m_track->disconnect( SIGNAL( nameChanged() ), this );
-	m_track->disconnect( SIGNAL( instrumentChanged() ), this );
+	m_track->disconnect( SIGNAL(nameChanged()), this );
+	m_track->disconnect( SIGNAL(instrumentChanged()), this );
 
-	connect( m_track, SIGNAL( nameChanged() ),
-			this, SLOT( updateName() ) );
-	connect( m_track, SIGNAL( instrumentChanged() ),
-			this, SLOT( updateInstrumentView() ) );
+	connect( m_track, SIGNAL(nameChanged()),
+			this, SLOT(updateName()));
+	connect( m_track, SIGNAL(instrumentChanged()),
+			this, SLOT(updateInstrumentView()));
 
 	m_volumeKnob->setModel( &m_track->m_volumeModel );
 	m_panningKnob->setModel( &m_track->m_panningModel );

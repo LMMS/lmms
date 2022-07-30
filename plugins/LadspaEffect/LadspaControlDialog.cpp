@@ -67,13 +67,6 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 
 
 
-LadspaControlDialog::~LadspaControlDialog()
-{
-}
-
-
-
-
 void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 {
 	QList<QGroupBox *> list = findChildren<QGroupBox *>();

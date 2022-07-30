@@ -61,7 +61,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"sfxr",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"LMMS port of sfxr" ),
@@ -83,14 +83,6 @@ SfxrSynth::SfxrSynth( const SfxrInstrument * s ):
 	playing_sample( true )
 {
     resetSample( false );
-}
-
-
-
-
-SfxrSynth::~SfxrSynth()
-{
-
 }
 
 
@@ -356,13 +348,6 @@ SfxrInstrument::SfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_hpFilCutModel(0.0f, this, "HP Filter Cutoff"),
 	m_hpFilCutSweepModel(0.0f, this, "HP Filter Cutoff Sweep"),
 	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave" ) )
-{
-}
-
-
-
-
-SfxrInstrument::~SfxrInstrument()
 {
 }
 

@@ -40,15 +40,8 @@ MidiController::MidiController( Model * _parent ) :
 	m_previousValue( 0.0f )
 {
 	setSampleExact( true );
-	connect( &m_midiPort, SIGNAL( modeChanged() ),
-			this, SLOT( updateName() ) );
-}
-
-
-
-
-MidiController::~MidiController()
-{
+	connect( &m_midiPort, SIGNAL(modeChanged()),
+			this, SLOT(updateName()));
 }
 
 

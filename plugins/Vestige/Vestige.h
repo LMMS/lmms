@@ -66,7 +66,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
-	virtual QString nodeName( void ) const;
+	virtual QString nodeName() const;
 
 	virtual void loadFile( const QString & _file );
 
@@ -85,7 +85,7 @@ protected slots:
 	void reloadPlugin();
 
 private:
-	void closePlugin( void );
+	void closePlugin();
 
 
 	VstPlugin * m_plugin;
@@ -117,8 +117,8 @@ public:
 
 
 protected slots:
-	void syncPlugin( void );
-	void displayAutomatedOnly( void );
+	void syncPlugin();
+	void displayAutomatedOnly();
 	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
@@ -150,20 +150,20 @@ class VestigeInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	VestigeInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~VestigeInstrumentView();
+	virtual ~VestigeInstrumentView() = default;
 
 
 protected slots:
-	void updateMenu( void );
-	void openPlugin( void );
-	void managePlugin( void );
-	void openPreset( void );
-	void savePreset( void );
+	void updateMenu();
+	void openPlugin();
+	void managePlugin();
+	void openPreset();
+	void savePreset();
 	void nextProgram();
 	void previousProgram();
-	void selPreset( void );
-	void toggleGUI( void );
-	void noteOffAll( void );
+	void selPreset();
+	void toggleGUI();
+	void noteOffAll();
 
 
 protected:
@@ -173,7 +173,7 @@ protected:
 
 
 private:
-	virtual void modelChanged( void );
+	virtual void modelChanged();
 
 	static QPixmap * s_artwork;
 

@@ -43,7 +43,7 @@ public:
 		_success_ful = true;
 	}
 
-	virtual ~AudioDummy()
+	~AudioDummy() override
 	{
 		stopProcessing();
 	}
@@ -62,9 +62,7 @@ public:
 		{
 		}
 
-		virtual ~setupWidget()
-		{
-		}
+		~setupWidget() override = default;
 
 		void saveSettings() override
 		{

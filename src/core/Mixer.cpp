@@ -51,11 +51,6 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 }
 
 
-MixerRoute::~MixerRoute()
-{
-}
-
-
 void MixerRoute::updateName()
 {
 	m_amount.setDisplayName(

@@ -39,7 +39,7 @@ class LMMS_EXPORT PatternClip : public Clip
 {
 public:
 	PatternClip(Track* track);
-	virtual ~PatternClip() = default;
+	~PatternClip() override = default;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;

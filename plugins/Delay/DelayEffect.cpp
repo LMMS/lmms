@@ -39,7 +39,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Delay",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native delay plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",

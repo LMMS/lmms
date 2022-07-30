@@ -99,7 +99,7 @@ public slots:
 
 
 protected:
-	typedef AutomationClip::timeMap timeMap;
+	using timeMap = AutomationClip::timeMap;
 
 	void keyPressEvent(QKeyEvent * ke) override;
 	void leaveEvent(QEvent * e) override;
@@ -167,7 +167,7 @@ private:
 
 	AutomationEditor();
 	AutomationEditor( const AutomationEditor & );
-	virtual ~AutomationEditor();
+	~AutomationEditor() override;
 
 	static QPixmap * s_toolDraw;
 	static QPixmap * s_toolErase;
@@ -255,7 +255,7 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_HEIGHT = 480;
 public:
 	AutomationEditorWindow();
-	~AutomationEditorWindow();
+	~AutomationEditorWindow() override = default;
 
 	void setCurrentClip(AutomationClip* clip);
 	const AutomationClip* currentClip();

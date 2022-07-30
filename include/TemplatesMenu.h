@@ -37,7 +37,7 @@ class TemplatesMenu : public QMenu
 	Q_OBJECT
 public:
 	TemplatesMenu(QWidget *parent = nullptr);
-	virtual ~TemplatesMenu() = default;
+	~TemplatesMenu() override = default;
 
 private slots:
 	static void createNewProjectFromTemplate(QAction * _action);

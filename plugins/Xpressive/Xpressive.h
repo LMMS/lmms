@@ -171,9 +171,9 @@ protected slots:
 	void expWaveClicked();
 	void usrWaveClicked();
 	void helpClicked();
-	void expressionChanged( );
-	void smoothChanged( );
-	void graphDrawn( );
+	void expressionChanged();
+	void smoothChanged();
+	void graphDrawn();
 
 private:
 	void modelChanged() override;

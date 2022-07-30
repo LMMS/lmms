@@ -50,13 +50,9 @@ public:
 	class LfoInstances
 	{
 	public:
-		LfoInstances()
-		{
-		}
+		LfoInstances() = default;
 
-		~LfoInstances()
-		{
-		}
+		~LfoInstances() = default;
 
 		inline bool isEmpty() const
 		{
@@ -71,14 +67,14 @@ public:
 
 	private:
 		QMutex m_lfoListMutex;
-		typedef QList<EnvelopeAndLfoParameters *> LfoList;
+		using LfoList = QList<EnvelopeAndLfoParameters*>;
 		LfoList m_lfos;
 
 	} ;
 
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
 							Model * _parent );
-	virtual ~EnvelopeAndLfoParameters();
+	~EnvelopeAndLfoParameters() override;
 
 	static inline float expKnobVal( float _val )
 	{

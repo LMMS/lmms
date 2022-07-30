@@ -67,7 +67,7 @@ long  wavewords, wavemode=0;
 float mem_t=1.0f, mem_o=1.0f, mem_n=1.0f, mem_b=1.0f, mem_tune=1.0f, mem_time=1.0f;
 
 
-int DrumSynth::LongestEnv(void)
+int DrumSynth::LongestEnv()
 {
   long e, eon, p;
   float l=0.f;
@@ -86,7 +86,7 @@ int DrumSynth::LongestEnv(void)
 }
 
 
-float DrumSynth::LoudestEnv(void)
+float DrumSynth::LoudestEnv()
 {
   float loudest=0.f;
   int i=0;

@@ -36,9 +36,7 @@ class Lfo
 {
 public:
 	Lfo( int samplerate );
-	~Lfo()
-	{
-	}
+	~Lfo() = default;
 
 
 

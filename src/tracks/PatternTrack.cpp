@@ -51,7 +51,7 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 	Engine::patternStore()->setCurrentPattern(patternNum);
 	Engine::patternStore()->updateComboBox();
 
-	connect( this, SIGNAL( nameChanged() ),
+	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
 }
 

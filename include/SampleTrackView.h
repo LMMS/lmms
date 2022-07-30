@@ -47,7 +47,7 @@ class SampleTrackView : public TrackView
 	Q_OBJECT
 public:
 	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
-	virtual ~SampleTrackView();
+	~SampleTrackView() override;
 
 	SampleTrackWindow * getSampleTrackWindow()
 	{

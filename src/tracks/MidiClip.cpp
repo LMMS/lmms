@@ -132,8 +132,8 @@ void MidiClip::resizeToFirstTrack()
 
 void MidiClip::init()
 {
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-				this, SLOT( changeTimeSignature() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+				this, SLOT(changeTimeSignature()));
 	saveJournallingState( false );
 
 	updateLength();

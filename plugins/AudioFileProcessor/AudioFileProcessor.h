@@ -98,7 +98,7 @@ signals:
 
 
 private:
-	typedef SampleBuffer::handleState handleState;
+	using handleState = SampleBuffer::handleState;
 
 	SampleBuffer m_sampleBuffer;
 
@@ -130,7 +130,7 @@ class AudioFileProcessorView : public gui::InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	AudioFileProcessorView( Instrument * _instrument, QWidget * _parent );
-	virtual ~AudioFileProcessorView();
+	virtual ~AudioFileProcessorView() = default;
 
 	void newWaveView();
 protected slots:

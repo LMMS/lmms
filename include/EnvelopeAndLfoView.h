@@ -54,7 +54,7 @@ class EnvelopeAndLfoView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	EnvelopeAndLfoView( QWidget * _parent );
-	virtual ~EnvelopeAndLfoView();
+	~EnvelopeAndLfoView() override;
 
 
 protected:

@@ -136,7 +136,7 @@ public:
 			*/
 			struct Key
 			{
-				typedef QMap<QString, QString> AttributeMap;
+				using AttributeMap = QMap<QString, QString>;
 
 				inline Key( const Plugin::Descriptor * desc = nullptr,
 						const QString & name = QString(),
@@ -179,17 +179,14 @@ public:
 				const PixmapLoader* logo() const;
 			} ;
 
-			typedef QList<Key> KeyList;
-
+			using KeyList = QList<Key>;
 
 			SubPluginFeatures( Plugin::PluginTypes type ) :
 				m_type( type )
 			{
 			}
 
-			virtual ~SubPluginFeatures()
-			{
-			}
+			virtual ~SubPluginFeatures() = default;
 
 			virtual void fillDescriptionWidget( QWidget *, const Key * ) const
 			{
@@ -237,14 +234,14 @@ public:
 
 	} ;
 	// typedef a list so we can easily work with list of plugin descriptors
-	typedef QList<Descriptor*> DescriptorList;
+	using DescriptorList = QList<Descriptor*>;
 
 	//! Constructor of a plugin
 	//! @param key Sub plugins must pass a key here, optional otherwise.
 	//!   See the key() function
 	Plugin(const Descriptor * descriptor, Model * parent,
 		const Descriptor::SubPluginFeatures::Key *key = nullptr);
-	virtual ~Plugin();
+	~Plugin() override = default;
 
 	//! Return display-name out of sub plugin or descriptor
 	QString displayName() const override;
@@ -253,7 +250,7 @@ public:
 	const PixmapLoader *logo() const;
 
 	//! Return plugin type
-	inline PluginTypes type( void ) const
+	inline PluginTypes type() const
 	{
 		return m_descriptor->type;
 	}
@@ -309,8 +306,7 @@ private:
 	Descriptor::SubPluginFeatures::Key m_key;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * InstantiationHook )( Model * , void * );
-
+	using InstantiationHook = Plugin* (*)(Model*, void*);
 } ;
 
 

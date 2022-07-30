@@ -366,6 +366,8 @@ public:
 	void setScale(unsigned int index, std::shared_ptr<Scale> newScale);
 	void setKeymap(unsigned int index, std::shared_ptr<Keymap> newMap);
 
+	const std::string& syncKey() const noexcept { return m_vstSyncController.sharedMemoryKey(); }
+
 public slots:
 	void playSong();
 	void record();
@@ -406,7 +408,7 @@ private slots:
 private:
 	Song();
 	Song( const Song & );
-	virtual ~Song();
+	~Song() override;
 
 
 	inline bar_t currentBar() const

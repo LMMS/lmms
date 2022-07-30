@@ -48,7 +48,7 @@ class AudioSdl : public AudioDevice
 {
 public:
 	AudioSdl( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioSdl();
+	~AudioSdl() override;
 
 	inline static QString name()
 	{
@@ -61,7 +61,7 @@ public:
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		~setupWidget() override;
+		~setupWidget() override = default;
 
 		void saveSettings() override;
 

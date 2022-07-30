@@ -48,12 +48,6 @@ ImportFilter::ImportFilter( const QString & _file_name,
 
 
 
-ImportFilter::~ImportFilter()
-{
-}
-
-
-
 
 void ImportFilter::import( const QString & _file_to_import,
 							TrackContainer* tc )

@@ -44,7 +44,7 @@ class PatternClipView : public ClipView
 	Q_OBJECT
 public:
 	PatternClipView(Clip* clip, TrackView* tv);
-	virtual ~PatternClipView() = default;
+	~PatternClipView() override = default;
 
 
 public slots:

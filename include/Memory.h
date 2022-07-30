@@ -63,8 +63,10 @@ class LMMS_EXPORT MmAllocator
 public:
 	MmAllocator() = default;
 	template< class U > MmAllocator( const MmAllocator<U>& other ) {}
-	typedef T value_type;
-	template<class U> struct rebind { typedef MmAllocator<U> other; };
+	using value_type = T;
+	template<class U>  struct rebind {
+		using other = MmAllocator<U>;
+	};
 
 
 	T* allocate( std::size_t n )
@@ -77,7 +79,7 @@ public:
 		MemoryManager::free( p );
 	}
 
-	typedef std::vector<T, MmAllocator<T> > vector;
+	using vector = std::vector<T, MmAllocator<T>>;
 };
 
 class _AlignedAllocator_Base

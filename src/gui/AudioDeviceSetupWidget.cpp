@@ -32,10 +32,6 @@ AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget 
 {
 }
 
-AudioDeviceSetupWidget::~AudioDeviceSetupWidget()
-{
-}
-
 void AudioDeviceSetupWidget::show()
 {
 	parentWidget()->show();

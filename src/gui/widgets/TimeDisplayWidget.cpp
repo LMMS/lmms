@@ -55,8 +55,8 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
-	connect( getGUI()->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateTime() ) );
+	connect( getGUI()->mainWindow(), SIGNAL(periodicUpdate()),
+					this, SLOT(updateTime()));
 }
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )

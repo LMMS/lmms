@@ -78,7 +78,7 @@ public:
 
 
 	AudioEngineWorkerThread( AudioEngine* audioEngine );
-	virtual ~AudioEngineWorkerThread();
+	~AudioEngineWorkerThread() override;
 
 	virtual void quit();
 

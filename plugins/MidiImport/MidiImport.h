@@ -41,22 +41,22 @@ class MidiImport : public ImportFilter
 	Q_OBJECT
 public:
 	MidiImport( const QString & _file );
-	virtual ~MidiImport();
+	~MidiImport() override = default;
 
-	virtual gui::PluginView* instantiateView( QWidget * )
+	gui::PluginView* instantiateView( QWidget * ) override
 	{
 		return( nullptr );
 	}
 
 
 private:
-	virtual bool tryImport( TrackContainer* tc );
+	bool tryImport( TrackContainer* tc ) override;
 
 	bool readSMF( TrackContainer* tc );
 	bool readRIFF( TrackContainer* tc );
 	bool readTrack( int _track_end, QString & _track_name );
 
-	void error( void );
+	void error();
 
 
 	inline int readInt( int _bytes )
@@ -120,8 +120,7 @@ private:
 		}
 	}
 
-
-	typedef QVector<QPair<int, MidiEvent> > EventVector;
+	using EventVector = QVector<QPair<int, MidiEvent>>;
 	EventVector m_events;
 	int m_timingDivision;
 

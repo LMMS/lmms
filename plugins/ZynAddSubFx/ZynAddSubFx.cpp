@@ -60,7 +60,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT zynaddsubfx_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"ZynAddSubFX",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 			"Embedded ZynAddSubFX" ),

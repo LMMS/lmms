@@ -46,7 +46,7 @@ public:
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath);
 
-	virtual ~RenderManager();
+	~RenderManager() override;
 
 	/// Export all unmuted tracks into a single file
 	void renderProject();

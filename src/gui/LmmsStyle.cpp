@@ -143,7 +143,7 @@ LmmsStyle::LmmsStyle() :
 
 
 
-QPalette LmmsStyle::standardPalette( void ) const
+QPalette LmmsStyle::standardPalette() const
 {
 	if( s_palette != nullptr) { return * s_palette; }
 

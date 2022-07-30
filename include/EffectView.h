@@ -49,7 +49,7 @@ class EffectView : public PluginView
 	Q_OBJECT
 public:
 	EffectView( Effect * _model, QWidget * _parent );
-	virtual ~EffectView();
+	~EffectView() override;
 
 	inline Effect * effect()
 	{

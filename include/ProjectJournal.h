@@ -46,7 +46,7 @@ public:
 	static const int MAX_UNDO_STATES;
 
 	ProjectJournal();
-	virtual ~ProjectJournal();
+	virtual ~ProjectJournal() = default;
 
 	void undo();
 	void redo();
@@ -100,7 +100,7 @@ public:
 
 
 private:
-	typedef QHash<jo_id_t, JournallingObject *> JoIdMap;
+	using JoIdMap = QHash<jo_id_t, JournallingObject*>;
 
 	struct CheckPoint
 	{
@@ -112,7 +112,7 @@ private:
 		jo_id_t joID;
 		DataFile data;
 	} ;
-	typedef QStack<CheckPoint> CheckPointStack;
+	using CheckPointStack = QStack<CheckPoint>;
 
 	JoIdMap m_joIDs;
 

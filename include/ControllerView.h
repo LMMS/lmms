@@ -48,7 +48,7 @@ class ControllerView : public QFrame, public ModelView
 	Q_OBJECT
 public:
 	ControllerView( Controller * _controller, QWidget * _parent );
-	virtual ~ControllerView();
+	~ControllerView() override;
 
 	inline Controller * getController()
 	{

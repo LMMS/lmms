@@ -44,9 +44,7 @@ class MultitapEchoControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	MultitapEchoControlDialog( MultitapEchoControls * controls );
-	virtual ~MultitapEchoControlDialog()
-	{
-	}
+	~MultitapEchoControlDialog() override = default;
 };
 
 

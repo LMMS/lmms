@@ -52,7 +52,7 @@ class AudioPulseAudio : public QThread, public AudioDevice
 	Q_OBJECT
 public:
 	AudioPulseAudio( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioPulseAudio();
+	~AudioPulseAudio() override;
 
 	inline static QString name()
 	{
@@ -66,7 +66,7 @@ public:
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
 		void saveSettings() override;
 

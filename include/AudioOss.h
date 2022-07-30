@@ -51,7 +51,7 @@ class AudioOss : public QThread, public AudioDevice
 	Q_OBJECT
 public:
 	AudioOss( bool & _success_ful, AudioEngine* audioEngine );
-	virtual ~AudioOss();
+	~AudioOss() override;
 
 	inline static QString name()
 	{
@@ -65,7 +65,7 @@ class setupWidget : public gui::AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
+		~setupWidget() override;
 
 		void saveSettings() override;
 

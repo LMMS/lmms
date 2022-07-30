@@ -53,9 +53,6 @@ BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }
 
-BitcrushControls::~BitcrushControls()
-{
-}
 
 void BitcrushControls::saveSettings( QDomDocument & doc, QDomElement & elem )
 {

@@ -43,7 +43,7 @@ class EffectSelectDialog : public QDialog
 	Q_OBJECT
 public:
 	EffectSelectDialog( QWidget * _parent );
-	virtual ~EffectSelectDialog();
+	~EffectSelectDialog() override;
 
 	Effect * instantiateSelectedPlugin( EffectChain * _parent );
 

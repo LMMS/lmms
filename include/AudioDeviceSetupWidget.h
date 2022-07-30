@@ -36,7 +36,7 @@ class AudioDeviceSetupWidget : public TabWidget
 public:
 	AudioDeviceSetupWidget( const QString & _caption, QWidget * _parent );
 
-	virtual ~AudioDeviceSetupWidget();
+	~AudioDeviceSetupWidget() override = default;
 
 	virtual void saveSettings() = 0;
 

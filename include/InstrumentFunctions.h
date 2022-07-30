@@ -54,11 +54,11 @@ public:
 	static const int MAX_CHORD_POLYPHONY = 13;
 
 private:
-	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
+	using ChordSemiTones = std::array<int8_t, MAX_CHORD_POLYPHONY>;
 
 public:
 	InstrumentFunctionNoteStacking( Model * _parent );
-	virtual ~InstrumentFunctionNoteStacking();
+	~InstrumentFunctionNoteStacking() override = default;
 
 	void processNote( NotePlayHandle* n );
 
@@ -180,7 +180,7 @@ public:
 	} ;
 
 	InstrumentFunctionArpeggio( Model * _parent );
-	virtual ~InstrumentFunctionArpeggio();
+	~InstrumentFunctionArpeggio() override = default;
 
 	void processNote( NotePlayHandle* n );
 

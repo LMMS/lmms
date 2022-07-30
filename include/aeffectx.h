@@ -296,8 +296,6 @@ public:
 
 } ;
 
-
-
-typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
+using audioMasterCallback = intptr_t (VST_CALL_CONV*)(AEffect*, int32_t, int32_t, intptr_t, void*, float);
 
 #endif

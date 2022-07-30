@@ -140,11 +140,6 @@ bool LinkedModelGroup::containsModel(const QString &name) const
 
 
 
-LinkedModelGroups::~LinkedModelGroups() {}
-
-
-
-
 void LinkedModelGroups::linkAllModels()
 {
 	LinkedModelGroup* first = getGroup(0);

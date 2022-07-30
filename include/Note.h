@@ -26,6 +26,7 @@
 #ifndef NOTE_H
 #define NOTE_H
 
+#include <optional>
 #include <QVector>
 
 #include "volume.h"
@@ -98,7 +99,7 @@ public:
 		panning_t panning = DefaultPanning,
 		DetuningHelper * detuning = nullptr );
 	Note( const Note & note );
-	virtual ~Note();
+	~Note() override;
 
 	// used by GUI
 	inline void setSelected( const bool selected ) { m_selected = selected; }
@@ -248,8 +249,18 @@ private:
 	DetuningHelper * m_detuning;
 };
 
+using NoteVector = QVector<Note*>;
 
-typedef QVector<Note *> NoteVector;
+struct NoteBounds
+{
+	TimePos start;
+	TimePos end;
+	int lowest;
+	int highest;
+};
+
+
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes);
 
 
 } // namespace lmms

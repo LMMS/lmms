@@ -47,7 +47,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Monstro",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Monstrous 3-oscillator synth with modulation matrix" ),
@@ -108,11 +108,6 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 	m_lfo[1].resize( m_parent->m_fpp );
 	m_env[0].resize( m_parent->m_fpp );
 	m_env[1].resize( m_parent->m_fpp );
-}
-
-
-MonstroSynth::~MonstroSynth()
-{
 }
 
 
@@ -1029,11 +1024,6 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 }
 
 
-MonstroInstrument::~MonstroInstrument()
-{
-}
-
-
 void MonstroInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
@@ -1487,11 +1477,6 @@ MonstroView::MonstroView( Instrument * _instrument,
 
 	connect( m_opViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
 	connect( m_matViewButton, SIGNAL( clicked() ), this, SLOT( updateLayout() ) );
-}
-
-
-MonstroView::~MonstroView()
-{
 }
 
 

@@ -51,9 +51,7 @@ public:
 	{
 	}
 
-	virtual ~EffectControls()
-	{
-	}
+	~EffectControls() override = default;
 
 	virtual int controlCount() = 0;
 	virtual gui::EffectControlDialog * createView() = 0;

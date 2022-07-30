@@ -38,7 +38,7 @@ namespace lmms::DspEffectLibrary
 	class MonoBase
 	{
 	public:
-		typedef class MonoBypass bypassType;
+		using bypassType = class MonoBypass;
 
 		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
@@ -53,7 +53,7 @@ namespace lmms::DspEffectLibrary
 	class StereoBase
 	{
 	public:
-		typedef class StereoBypass bypassType;
+		using bypassType = class StereoBypass;
 
 		static void process( sample_t * * _buf, const f_cnt_t _frames )
 		{
@@ -164,7 +164,7 @@ namespace lmms::DspEffectLibrary
 	class Chain : public FX0::bypassType
 	{
 	public:
-		typedef typename FX0::sample_t sample_t;
+		using sample_t = typename FX0::sample_t;
 		Chain( const FX0& fx0, const FX1& fx1 = FX1() ) :
 			m_FX0( fx0 ),
 			m_FX1( fx1 )

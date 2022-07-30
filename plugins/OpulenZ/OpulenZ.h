@@ -59,24 +59,24 @@ class OpulenzInstrument : public Instrument
 	Q_OBJECT
 public:
 	OpulenzInstrument( InstrumentTrack * _instrument_track );
-	virtual ~OpulenzInstrument();
+	~OpulenzInstrument() override;
 
-	virtual QString nodeName() const;
-	virtual gui::PluginView* instantiateView( QWidget * _parent );
+	QString nodeName() const override;
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
-	virtual Flags flags() const
+	Flags flags() const override
 	{
 		return IsSingleStreamed | IsMidiBased;
 	}
 
-	virtual bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 );
-	virtual void play( sampleFrame * _working_buffer );
+	bool handleMidiEvent( const MidiEvent& event, const TimePos& time, f_cnt_t offset = 0 ) override;
+	void play( sampleFrame * _working_buffer ) override;
 
-	void saveSettings( QDomDocument & _doc, QDomElement & _this );
-	void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _this ) override;
+	void loadSettings( const QDomElement & _this ) override;
 	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
-	virtual void loadFile( const QString& file );
+	void loadFile( const QString& file ) override;
 
 	IntModel m_patchModel;
 
@@ -163,9 +163,9 @@ class OpulenzInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	OpulenzInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~OpulenzInstrumentView();
+	~OpulenzInstrumentView() override;
 	LcdSpinBox *m_patch;
-	void modelChanged();
+	void modelChanged() override;
 
 	Knob *op1_a_kn;
 	Knob *op1_d_kn;

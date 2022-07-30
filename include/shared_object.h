@@ -39,9 +39,7 @@ public:
 	{
 	}
 
-	virtual ~sharedObject()
-	{
-	}
+	virtual ~sharedObject() = default;
 
 	template<class T>
 	static T* ref( T* object )

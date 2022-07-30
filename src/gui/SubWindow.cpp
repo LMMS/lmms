@@ -63,7 +63,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_closeBtn->setCursor( Qt::ArrowCursor );
 	m_closeBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_closeBtn->setToolTip( tr( "Close" ) );
-	connect( m_closeBtn, SIGNAL( clicked( bool ) ), this, SLOT( close() ) );
+	connect( m_closeBtn, SIGNAL(clicked(bool)), this, SLOT(close()));
 
 	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
 	m_maximizeBtn->resize( m_buttonSize );
@@ -71,7 +71,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_maximizeBtn->setCursor( Qt::ArrowCursor );
 	m_maximizeBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
-	connect( m_maximizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMaximized() ) );
+	connect( m_maximizeBtn, SIGNAL(clicked(bool)), this, SLOT(showMaximized()));
 
 	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
 	m_restoreBtn->resize( m_buttonSize );
@@ -79,7 +79,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_restoreBtn->setCursor( Qt::ArrowCursor );
 	m_restoreBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_restoreBtn->setToolTip( tr( "Restore" ) );
-	connect( m_restoreBtn, SIGNAL( clicked( bool ) ), this, SLOT( showNormal() ) );
+	connect( m_restoreBtn, SIGNAL(clicked(bool)), this, SLOT(showNormal()));
 
 	// QLabel for the window title and the shadow effect
 	m_shadow = new QGraphicsDropShadowEffect();
@@ -96,7 +96,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
 		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
 		Qt::CustomizeWindowHint );
-	connect( mdiArea(), SIGNAL( subWindowActivated( QMdiSubWindow* ) ), this, SLOT( focusChanged( QMdiSubWindow* ) ) );
+	connect( mdiArea(), SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(focusChanged(QMdiSubWindow*)));
 }
 
 

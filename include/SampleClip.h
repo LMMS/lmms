@@ -47,7 +47,7 @@ class SampleClip : public Clip
 public:
 	SampleClip( Track * _track );
 	SampleClip( const SampleClip& orig );
-	virtual ~SampleClip();
+	~SampleClip() override;
 
 	SampleClip& operator=( const SampleClip& that ) = delete;
 

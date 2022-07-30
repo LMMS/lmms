@@ -50,7 +50,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"LADSPA Plugin Browser",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"List installed LADSPA plugins" ),
@@ -76,13 +76,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 
 LadspaBrowser::LadspaBrowser() :
 	ToolPlugin( &ladspabrowser_plugin_descriptor, nullptr )
-{
-}
-
-
-
-
-LadspaBrowser::~LadspaBrowser()
 {
 }
 
@@ -161,13 +154,6 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		parentWidget()->setWindowFlags( flags );
 	}
-}
-
-
-
-
-LadspaBrowserView::~LadspaBrowserView()
-{
 }
 
 

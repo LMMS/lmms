@@ -53,11 +53,11 @@ public:
 
 		bool isNull() const {return ! library;}
 	};
-	typedef QList<PluginInfo> PluginInfoList;
-	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
+	using PluginInfoList = QList<PluginInfo>;
+	using DescriptorMap = QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*>;
 
 	PluginFactory();
-	~PluginFactory();
+	~PluginFactory() = default;
 
 	static void setupSearchPaths();
 

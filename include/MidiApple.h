@@ -140,7 +140,7 @@ private:
 	QMap<MIDIEndpointRef, MIDIPortRef> m_sourcePortRef;
 
 	// subscriptions
-	typedef QMap<QString, MidiPortList> SubMap;
+	using SubMap = QMap<QString, MidiPortList>;
 	SubMap m_inputSubs;
 	SubMap m_outputSubs;
 

@@ -38,7 +38,7 @@ class LMMS_EXPORT AudioEngineProfiler
 {
 public:
 	AudioEngineProfiler();
-	~AudioEngineProfiler();
+	~AudioEngineProfiler() = default;
 
 	void startPeriod()
 	{

@@ -43,18 +43,12 @@ RenameDialog::RenameDialog( QString & _string ) :
 	m_stringLE->setText( _string );
 	m_stringLE->setGeometry ( 10, 5, 220, 20 );
 	m_stringLE->selectAll();
-	connect( m_stringLE, SIGNAL( textChanged( const QString & ) ), this,
-				SLOT( textChanged( const QString & ) ) );
-	connect( m_stringLE, SIGNAL( returnPressed() ), this,
-							SLOT( accept() ) );
+	connect( m_stringLE, SIGNAL( textChanged( const QString& ) ), this,
+				SLOT( textChanged( const QString& ) ) );
+	connect( m_stringLE, SIGNAL(returnPressed()), this,
+							SLOT(accept()));
 }
 
-
-
-
-RenameDialog::~RenameDialog()
-{
-}
 
 
 

@@ -45,7 +45,7 @@ public:
 			bool & _success_ful,
 			const QString & _file,
 			AudioEngine* audioEngine );
-	virtual ~AudioFileOgg();
+	~AudioFileOgg() override;
 
 	static AudioFileDevice * getInst( const QString & outputFilename,
 					  OutputSettings const & outputSettings,
@@ -58,7 +58,7 @@ public:
 
 
 private:
-	virtual void writeBuffer( const surroundSampleFrame * _ab,
+	void writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain ) override;
 

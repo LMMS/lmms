@@ -40,10 +40,10 @@ class BitcrushEffect : public Effect
 {
 public:
 	BitcrushEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~BitcrushEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~BitcrushEffect() override;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_controls;
 	}

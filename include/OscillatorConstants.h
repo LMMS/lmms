@@ -50,9 +50,8 @@ namespace lmms::OscillatorConstants
 	//  - wave shape: abstract and precise definition of the graph associated with a given type of wave;
 	//  - waveform: digital representations the wave shape, a set of waves optimized for use at varying pitches;
 	//  - wavetable: a table containing one period of a wave, with frequency content optimized for a specific pitch.
-	typedef std::array<sample_t, WAVETABLE_LENGTH> wavetable_t;
-	typedef std::array<wavetable_t,	WAVE_TABLES_PER_WAVEFORM_COUNT> waveform_t;
-
+	using wavetable_t = std::array<sample_t, WAVETABLE_LENGTH>;
+	using waveform_t = std::array<wavetable_t, WAVE_TABLES_PER_WAVEFORM_COUNT>;
 
 } // namespace lmms::OscillatorConstants
 

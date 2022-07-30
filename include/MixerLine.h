@@ -50,7 +50,7 @@ public:
 	Q_PROPERTY( QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive )
 	Q_PROPERTY( QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive )
 	MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex);
-	~MixerLine();
+	~MixerLine() override;
 
 	void paintEvent( QPaintEvent * ) override;
 	void mousePressEvent( QMouseEvent * ) override;

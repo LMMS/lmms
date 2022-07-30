@@ -46,7 +46,7 @@ class LMMS_EXPORT TabBar : public QWidget
 public:
 	TabBar( QWidget * _parent,
 			QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
-	virtual ~TabBar() = default;
+	~TabBar() override = default;
 
 	TabButton * addTab( QWidget * _w, const QString & _text,
 					int _id, bool _add_stretch = false,

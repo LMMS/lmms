@@ -45,9 +45,7 @@ class CrossoverEQControlDialog : public EffectControlDialog
 	Q_OBJECT
 public:
 	CrossoverEQControlDialog( CrossoverEQControls * controls );
-	virtual ~CrossoverEQControlDialog()
-	{
-	}
+	~CrossoverEQControlDialog() override = default;
 	
 private:
 	QPixmap m_fader_bg;
