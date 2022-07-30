@@ -19,6 +19,9 @@
 
 #include "Memory.h"
 
+namespace lmms
+{
+
 class _MemoryPool_Private : MmAllocator<char>
 {
 	using Alloc = MmAllocator<char>;
@@ -121,3 +124,4 @@ void _MemoryPool_Base::deallocate(void * ptr)
 	return _imp->deallocate(ptr);
 }
 
+} // namespace lmms
