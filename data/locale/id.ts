@@ -397,7 +397,7 @@ Jika Anda tertarik untuk menerjemahkan LMMS dalam bahasa lain atau ingin meningk
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1228"/>
-        <source>Please open an automation pattern with the context menu of a control!</source>
+        <source>Please open an automation clip with the context menu of a control!</source>
         <translation>Silakan buka pola otomasi dengan menu konteks kontrol!</translation>
     </message>
 </context>
@@ -405,12 +405,12 @@ Jika Anda tertarik untuk menerjemahkan LMMS dalam bahasa lain atau ingin meningk
     <name>AutomationEditorWindow</name>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1835"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation>Putar/jeda pola saat ini (Spasi)</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1837"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation>Berhenti memutar pola saat ini (Spasi)</translation>
     </message>
     <message>
@@ -501,7 +501,7 @@ Jika Anda tertarik untuk menerjemahkan LMMS dalam bahasa lain atau ingin meningk
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="1990"/>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2107"/>
-        <source>Automation Editor - no pattern</source>
+        <source>Automation Editor - no clip</source>
         <translation>Editor Otomasi - tiada pola</translation>
     </message>
     <message>
@@ -512,68 +512,68 @@ Jika Anda tertarik untuk menerjemahkan LMMS dalam bahasa lain atau ingin meningk
     </message>
     <message>
         <location filename="../../src/gui/editors/AutomationEditor.cpp" line="2048"/>
-        <source>Model is already connected to this pattern.</source>
+        <source>Model is already connected to this clip.</source>
         <translation>Model sudah terhubung ke pola ini.</translation>
     </message>
 </context>
 <context>
-    <name>AutomationPattern</name>
+    <name>AutomationClip</name>
     <message>
-        <location filename="../../src/core/AutomationPattern.cpp" line="866"/>
+        <location filename="../../src/core/AutomationClip.cpp" line="866"/>
         <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation>Tarik kontrol sambil menekan &lt;%1&gt;</translation>
     </message>
 </context>
 <context>
-    <name>AutomationPatternView</name>
+    <name>AutomationClipView</name>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="173"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="173"/>
         <source>Open in Automation editor</source>
         <translation>Buka di editor Otomasi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="181"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="181"/>
         <source>Clear</source>
         <translation>Bersih</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="184"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="184"/>
         <source>Reset name</source>
         <translation>Reset nama</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="187"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="187"/>
         <source>Change name</source>
         <translation>Ganti nama</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="190"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="190"/>
         <source>Set/clear record</source>
         <translation>Setel/bersihkan catatan</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="193"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="193"/>
         <source>Flip Vertically (Visible)</source>
         <translation>Balik secara Vertikal (Terlihat)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="196"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="196"/>
         <source>Flip Horizontally (Visible)</source>
         <translation>Balik secara Horizontal (Terlihat)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="201"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="201"/>
         <source>%1 Connections</source>
         <translation>%1 Koneksi</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="209"/>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="209"/>
         <source>Disconnect &quot;%1&quot;</source>
         <translation>Putuskan &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../src/gui/AutomationPatternView.cpp" line="448"/>
-        <source>Model is already connected to this pattern.</source>
+        <location filename="../../src/gui/AutomationClipView.cpp" line="448"/>
+        <source>Model is already connected to this clip.</source>
         <translation>Model sudah terhubung ke pola ini.</translation>
     </message>
 </context>
@@ -619,7 +619,7 @@ Jika Anda tertarik untuk menerjemahkan LMMS dalam bahasa lain atau ingin meningk
     </message>
     <message>
         <location filename="../../src/gui/editors/BBEditor.cpp" line="91"/>
-        <source>Clone beat/bassline pattern</source>
+        <source>Clone beat/bassline clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -649,19 +649,19 @@ Jika Anda tertarik untuk menerjemahkan LMMS dalam bahasa lain atau ingin meningk
     </message>
 </context>
 <context>
-    <name>BBTCOView</name>
+    <name>BBClipView</name>
     <message>
-        <location filename="../../src/gui/BBTCOView.cpp" line="53"/>
+        <location filename="../../src/gui/BBClipView.cpp" line="53"/>
         <source>Open in Beat+Bassline-Editor</source>
         <translation>Buka di Ketukan/Bassline-Editor</translation>
     </message>
     <message>
-        <location filename="../../src/gui/BBTCOView.cpp" line="60"/>
+        <location filename="../../src/gui/BBClipView.cpp" line="60"/>
         <source>Reset name</source>
         <translation>Reset nama</translation>
     </message>
     <message>
-        <location filename="../../src/gui/BBTCOView.cpp" line="63"/>
+        <location filename="../../src/gui/BBClipView.cpp" line="63"/>
         <source>Change name</source>
         <translation>Ganti nama</translation>
     </message>
@@ -9574,44 +9574,44 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
     </message>
 </context>
 <context>
-    <name>PatternView</name>
+    <name>MidiClipView</name>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="143"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="143"/>
         <source>Open in piano-roll</source>
         <translation>Buka di rol-piano</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="149"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="149"/>
         <source>Set as ghost in piano-roll</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="158"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="158"/>
         <source>Clear all notes</source>
         <translation>Bersihkan semua not</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="161"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="161"/>
         <source>Reset name</source>
         <translation>Reset nama</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="164"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="164"/>
         <source>Change name</source>
         <translation>Ganti nama</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="172"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="172"/>
         <source>Add steps</source>
         <translation>Tambah langkah</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="174"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="174"/>
         <source>Remove steps</source>
         <translation>Hapus langkah</translation>
     </message>
     <message>
-        <location filename="../../src/gui/PatternView.cpp" line="176"/>
+        <location filename="../../src/gui/MidiClipView.cpp" line="176"/>
         <source>Clone Steps</source>
         <translation>Klon langkah</translation>
     </message>
@@ -9872,7 +9872,7 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="3603"/>
-        <source>Please open a pattern by double-clicking on it!</source>
+        <source>Please open a clip by double-clicking on it!</source>
         <translation>Buka pola dengan mengklik dua kali di atasnya!</translation>
     </message>
     <message>
@@ -9886,7 +9886,7 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
     <name>PianoRollWindow</name>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4714"/>
-        <source>Play/pause current pattern (Space)</source>
+        <source>Play/pause current clip (Space)</source>
         <translation>Putar/jeda pola saat ini (Spasi)</translation>
     </message>
     <message>
@@ -9906,7 +9906,7 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4718"/>
-        <source>Stop playing of current pattern (Space)</source>
+        <source>Stop playing of current clip (Space)</source>
         <translation>Berhenti memutar pola sekarang (Spasi)</translation>
     </message>
     <message>
@@ -9956,13 +9956,13 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4773"/>
-        <source>Import pattern</source>
+        <source>Import clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="4776"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5232"/>
-        <source>Export pattern</source>
+        <source>Export clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -10079,48 +10079,48 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5043"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5214"/>
-        <source>Piano-Roll - no pattern</source>
+        <source>Piano-Roll - no clip</source>
         <translation>Rol-Piano - tiada pola</translation>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5233"/>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5280"/>
-        <source>XML pattern file (*.xpt *.xptz)</source>
+        <source>XML clip file (*.xpt *.xptz)</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5253"/>
-        <source>Export pattern success</source>
+        <source>Export clip success</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5254"/>
-        <source>Pattern saved to %1</source>
+        <source>Clip saved to %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5269"/>
-        <source>Import pattern.</source>
+        <source>Import clip.</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5270"/>
-        <source>You are about to import a pattern, this will overwrite your current pattern. Do you want to continue?</source>
+        <source>You are about to import a clip, this will overwrite your current clip. Do you want to continue?</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5279"/>
-        <source>Open pattern</source>
+        <source>Open clip</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5299"/>
-        <source>Import pattern success</source>
+        <source>Import clip success</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../../src/gui/editors/PianoRoll.cpp" line="5300"/>
-        <source>Imported pattern %1!</source>
+        <source>Imported clip %1!</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -12031,69 +12031,69 @@ You can disable these checks to get a faster scanning time (at your own risk).</
     </message>
 </context>
 <context>
-    <name>SampleTCOView</name>
+    <name>SampleClipView</name>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="60"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="60"/>
         <source>Double-click to open sample</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="84"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="84"/>
         <source>Delete (middle mousebutton)</source>
         <translation>Hapus (tombol tengah mouse)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="85"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="85"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="93"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="93"/>
         <source>Cut</source>
         <translation>Potong</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="94"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="94"/>
         <source>Cut selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="101"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="101"/>
         <source>Copy</source>
         <translation>Salin</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="102"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="102"/>
         <source>Copy selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="107"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="107"/>
         <source>Paste</source>
         <translation>Tempel</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="115"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="115"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>Bisukan/suarakan (&lt;%1&gt; + middle click)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="116"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="116"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="125"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="125"/>
         <source>Reverse sample</source>
         <translation>Balikan sampel</translation>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="133"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="133"/>
         <source>Set clip color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/SampleTCOView.cpp" line="135"/>
+        <location filename="../../src/gui/SampleClipView.cpp" line="135"/>
         <source>Use track color</source>
         <translation type="unfinished"/>
     </message>
@@ -13334,103 +13334,103 @@ Pastikan anda memiliki izin baca untuk berkas ini dan direktori yang mengandung 
     </message>
 </context>
 <context>
-    <name>TrackContentObject</name>
+    <name>Clip</name>
     <message>
-        <location filename="../../src/core/TrackContentObject.cpp" line="47"/>
+        <location filename="../../src/core/Clip.cpp" line="47"/>
         <source>Mute</source>
         <translation>Bisu</translation>
     </message>
 </context>
 <context>
-    <name>TrackContentObjectView</name>
+    <name>ClipView</name>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="647"/>
+        <location filename="../../src/gui/ClipView.cpp" line="647"/>
         <source>Current position</source>
         <translation>Posisi saat ini</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="655"/>
+        <location filename="../../src/gui/ClipView.cpp" line="655"/>
         <source>Current length</source>
         <translation>Panjang saat ini</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="656"/>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="908"/>
+        <location filename="../../src/gui/ClipView.cpp" line="656"/>
+        <location filename="../../src/gui/ClipView.cpp" line="908"/>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
         <translation>%1:%2 (%3:%4 to %5:%6)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="675"/>
+        <location filename="../../src/gui/ClipView.cpp" line="675"/>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation>Tekan &lt;%1&gt; dan seret untuk membuat salinan.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="676"/>
+        <location filename="../../src/gui/ClipView.cpp" line="676"/>
         <source>Press &lt;%1&gt; for free resizing.</source>
         <translation>Tekan &lt;%1&gt; untuk merubah ukuran secara bebas.</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="677"/>
+        <location filename="../../src/gui/ClipView.cpp" line="677"/>
         <source>Hint</source>
         <translation>Petunjuk</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1007"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1007"/>
         <source>Delete (middle mousebutton)</source>
         <translation>Hapus (tombol tengah mouse)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1008"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1008"/>
         <source>Delete selection (middle mousebutton)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1016"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1016"/>
         <source>Cut</source>
         <translation>Potong</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1017"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1017"/>
         <source>Cut selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1024"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1024"/>
         <source>Merge Selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1033"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1033"/>
         <source>Copy</source>
         <translation>Salin</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1034"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1034"/>
         <source>Copy selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1039"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1039"/>
         <source>Paste</source>
         <translation>Tempel</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1047"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1047"/>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation>Bisukan/suarakan (&lt;%1&gt; + middle click)</translation>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1048"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1048"/>
         <source>Mute/unmute selection (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1054"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1054"/>
         <source>Set clip color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../../src/gui/TrackContentObjectView.cpp" line="1056"/>
+        <location filename="../../src/gui/ClipView.cpp" line="1056"/>
         <source>Use track color</source>
         <translation type="unfinished"/>
     </message>

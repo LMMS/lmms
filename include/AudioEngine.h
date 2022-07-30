@@ -56,9 +56,6 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
 
-#include "PlayHandle.h"
-
-
 class AudioEngineWorkerThread;
 
 

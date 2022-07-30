@@ -5,11 +5,11 @@ set(LMMS_SRCS
 	core/AudioEngineProfiler.cpp
 	core/AudioEngineWorkerThread.cpp
 	core/AutomatableModel.cpp
-	core/AutomationPattern.cpp
+	core/AutomationClip.cpp
 	core/AutomationNode.cpp
 	core/BandLimitedWave.cpp
 	core/base64.cpp
-	core/BBTCO.cpp
+	core/BBClip.cpp
 	core/BBTrackContainer.cpp
 	core/BufferPool.cpp
 	core/Clipboard.cpp
@@ -65,9 +65,9 @@ set(LMMS_SRCS
 	core/RenderManager.cpp
 	core/RingBuffer.cpp
 	core/SampleBuffer.cpp
+	core/SampleClip.cpp
 	core/SamplePlayHandle.cpp
 	core/SampleRecordHandle.cpp
-	core/SampleTCO.cpp
 	core/Scale.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
@@ -76,7 +76,7 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
-	core/TrackContentObject.cpp
+	core/Clip.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 	core/StepRecorder.cpp

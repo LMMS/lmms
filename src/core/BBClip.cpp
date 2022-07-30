@@ -1,5 +1,5 @@
 /*
- * BBTCO.cpp - implementation of class bbTCO
+ * BBClip.cpp - implementation of class bbClip
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,7 +22,7 @@
  *
  */
  
- #include "BBTCO.h"
+ #include "BBClip.h"
  
  #include <QDomElement>
  
@@ -31,8 +31,8 @@
  #include "Engine.h"
  
 
-BBTCO::BBTCO( Track * _track ) :
-	TrackContentObject( _track )
+BBClip::BBClip( Track * _track ) :
+	Clip( _track )
 {
 	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( bbTrackIndex() );
 	if( t > 0 )
@@ -44,7 +44,7 @@ BBTCO::BBTCO( Track * _track ) :
 	setAutoResize( false );
 }
 
-void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
+void BBClip::saveSettings( QDomDocument & doc, QDomElement & element )
 {
 	element.setAttribute( "name", name() );
 	if( element.parentNode().nodeName() == "clipboard" )
@@ -66,7 +66,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 
 
 
-void BBTCO::loadSettings( const QDomElement & element )
+void BBClip::loadSettings( const QDomElement & element )
 {
 	setName( element.attribute( "name" ) );
 	if( element.attribute( "pos" ).toInt() >= 0 )
@@ -101,14 +101,14 @@ void BBTCO::loadSettings( const QDomElement & element )
 
 
 
-int BBTCO::bbTrackIndex()
+int BBClip::bbTrackIndex()
 {
 	return dynamic_cast<BBTrack *>( getTrack() )->index();
 }
 
 
 
-TrackContentObjectView * BBTCO::createView( TrackView * _tv )
+ClipView * BBClip::createView( TrackView * _tv )
 {
-	return new BBTCOView( this, _tv );
+	return new BBClipView( this, _tv );
 }

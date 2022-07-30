@@ -352,7 +352,7 @@ void SongEditor::selectRegionFromPixels(int xStart, int xEnd)
 	{
 		m_selectRegion = true;
 
-		//deselect all tcos
+		//deselect all clips
 		for (auto &it : findChildren<selectableObject *>()) { it->setSelected(false); }
 
 		rubberBand()->setEnabled(true);
@@ -419,17 +419,17 @@ void SongEditor::updateRubberband()
 											  / pixelsPerBar() * TimePos::ticksPerBar())
 											  + m_currentPosition;
 
-		//are tcos in the rect of selection?
+		//are clips in the rect of selection?
 		for (auto &it : findChildren<selectableObject *>())
 		{
-			TrackContentObjectView * tco = dynamic_cast<TrackContentObjectView*>(it);
-			if (tco)
+			ClipView * clip = dynamic_cast<ClipView*>(it);
+			if (clip)
 			{
-				auto indexOfTrackView = trackViews().indexOf(tco->getTrackView());
+				auto indexOfTrackView = trackViews().indexOf(clip->getTrackView());
 				bool isBeetweenRubberbandViews = indexOfTrackView >= qMin(m_rubberBandStartTrackview, rubberBandTrackview)
 											  && indexOfTrackView <= qMax(m_rubberBandStartTrackview, rubberBandTrackview);
-				bool isBeetweenRubberbandTimePos = tco->getTrackContentObject()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos)
-											  && tco->getTrackContentObject()->startPosition() <= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
+				bool isBeetweenRubberbandTimePos = clip->getClip()->endPosition() >= qMin(m_rubberbandStartTimePos, rubberbandTimePos)
+											  && clip->getClip()->startPosition() <= qMax(m_rubberbandStartTimePos, rubberbandTimePos);
 				it->setSelected(isBeetweenRubberbandViews && isBeetweenRubberbandTimePos);
 			}
 		}
@@ -506,18 +506,18 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 		for( QVector<selectableObject *>::iterator it = so.begin();
 				it != so.end(); ++it )
 		{
-			TrackContentObjectView * tcov =
-				dynamic_cast<TrackContentObjectView *>( *it );
-			tcov->remove();
+			ClipView * clipv =
+				dynamic_cast<ClipView *>( *it );
+			clipv->remove();
 		}
 	}
 	else if( ke->key() == Qt::Key_A && ke->modifiers() & Qt::ControlModifier )
 	{
-		selectAllTcos( !isShiftPressed );
+		selectAllClips( !isShiftPressed );
 	}
 	else if( ke->key() == Qt::Key_Escape )
 	{
-		selectAllTcos( false );
+		selectAllClips( false );
 	}
 	else
 	{
@@ -559,7 +559,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// update timeline
 		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerBar( pixelsPerBar() );
-		// and make sure, all TCO's are resized and relocated
+		// and make sure, all Clip's are resized and relocated
 		realignTracks();
 	}
 
@@ -845,7 +845,7 @@ void SongEditor::zoomingChanged()
 }
 
 
-void SongEditor::selectAllTcos( bool select )
+void SongEditor::selectAllClips( bool select )
 {
 	QVector<selectableObject *> so = select ? rubberBand()->selectableObjects() : rubberBand()->selectedObjects();
 	for( int i = 0; i < so.count(); ++i )

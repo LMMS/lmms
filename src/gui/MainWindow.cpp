@@ -1131,6 +1131,8 @@ void MainWindow::toggleMicrotunerWin()
 }
 
 
+
+
 void MainWindow::updateViewMenu()
 {
 	m_viewMenu->clear();
@@ -1288,7 +1290,7 @@ void MainWindow::updatePlayPauseIcons()
 				getGUI()->songEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayAutomationPattern:
+			case Song::Mode_PlayAutomationClip:
 				getGUI()->automationEditor()->setPauseIcon( true );
 				break;
 
@@ -1296,7 +1298,7 @@ void MainWindow::updatePlayPauseIcons()
 				getGUI()->getBBEditor()->setPauseIcon( true );
 				break;
 
-			case Song::Mode_PlayPattern:
+			case Song::Mode_PlayMidiClip:
 				getGUI()->pianoRoll()->setPauseIcon( true );
 				break;
 

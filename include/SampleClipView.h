@@ -1,7 +1,7 @@
 /*
- * BBTCOView.h
+ * SampleClipView.h
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,44 +21,43 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
 
-#ifndef BB_TCO_VIEW_H
-#define BB_TCO_VIEW_H
+#ifndef SAMPLE_CLIP_VIEW_H
+#define SAMPLE_CLIP_VIEW_H
 
-#include "BBTCO.h"
+#include "SampleClipView.h"
 
-#include <QStaticText>
+#include "SampleClip.h"
+#include "ClipView.h"
 
-
-class BBTCOView : public TrackContentObjectView
+class SampleClipView : public ClipView
 {
 	Q_OBJECT
-public:
-	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
-	virtual ~BBTCOView() = default;
 
+public:
+	SampleClipView( SampleClip * _clip, TrackView * _tv );
+	virtual ~SampleClipView() = default;
 
 public slots:
-	void update() override;
+	void updateSample();
+	void reverseSample();
 
-protected slots:
-	void openInBBEditor();
-	void resetName();
-	void changeName();
 
 
 protected:
-	void paintEvent( QPaintEvent * pe ) override;
-	void mouseDoubleClickEvent( QMouseEvent * _me ) override;
-	void constructContextMenu( QMenu * ) override;
+	void constructContextMenu(QMenu* cm) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void mouseReleaseEvent( QMouseEvent * _me ) override;
+	void dragEnterEvent( QDragEnterEvent * _dee ) override;
+	void dropEvent( QDropEvent * _de ) override;
+	void mouseDoubleClickEvent( QMouseEvent * ) override;
+	void paintEvent( QPaintEvent * ) override;
 
 
 private:
-	BBTCO * m_bbTCO;
+	SampleClip * m_clip;
 	QPixmap m_paintPixmap;
-	
-	QStaticText m_staticTextName;
+	bool splitClip( const TimePos pos ) override;
 } ;
 
 

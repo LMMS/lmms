@@ -53,7 +53,7 @@ public:
 		ClipboardData,
 		JournalData,
 		EffectSettings,
-		NotePattern,
+		MidiClip,
 		TypeCount
 	} ;
 	typedef Types Type;

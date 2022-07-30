@@ -1,5 +1,5 @@
 /*
- * Pattern.cpp - implementation of class pattern which holds notes
+ * MidiClipView.cpp - implementation of class MidiClipView which displays notes
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
@@ -23,7 +23,7 @@
  *
  */
 
-#include "PatternView.h"
+#include "MidiClipView.h"
 
 #include <QApplication>
 #include <QMenu>
@@ -35,9 +35,9 @@
 #include "PianoRoll.h"
 #include "RenameDialog.h"
 
-PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
-	TrackContentObjectView( pattern, parent ),
-	m_pat( pattern ),
+MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
+	ClipView( clip, parent ),
+	m_clip( clip ),
 	m_paintPixmap(),
 	m_noteFillColor(255, 255, 255, 220),
 	m_noteBorderColor(255, 255, 255, 220),
@@ -45,7 +45,7 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	m_mutedNoteBorderColor(100, 100, 100, 220),
 	m_legacySEBB(ConfigManager::inst()->value("ui","legacysebb","0").toInt())
 {
-	connect( getGUI()->pianoRoll(), SIGNAL( currentPatternChanged() ),
+	connect( getGUI()->pianoRoll(), SIGNAL( currentMidiClipChanged() ),
 			this, SLOT( update() ) );
 
 	if( s_stepBtnOn0 == nullptr )
@@ -80,27 +80,27 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 
 
 
-Pattern* PatternView::getPattern()
+MidiClip* MidiClipView::getMidiClip()
 {
-	return m_pat;
+	return m_clip;
 }
 
 
 
 
-void PatternView::update()
+void MidiClipView::update()
 {
-	ToolTip::add(this, m_pat->name());
+	ToolTip::add(this, m_clip->name());
 
-	TrackContentObjectView::update();
+	ClipView::update();
 }
 
 
 
 
-void PatternView::openInPianoRoll()
+void MidiClipView::openInPianoRoll()
 {
-	getGUI()->pianoRoll()->setCurrentPattern( m_pat );
+	getGUI()->pianoRoll()->setCurrentMidiClip( m_clip );
 	getGUI()->pianoRoll()->parentWidget()->show();
 	getGUI()->pianoRoll()->show();
 	getGUI()->pianoRoll()->setFocus();
@@ -110,9 +110,9 @@ void PatternView::openInPianoRoll()
 
 
 
-void PatternView::setGhostInPianoRoll()
+void MidiClipView::setGhostInPianoRoll()
 {
-	getGUI()->pianoRoll()->setGhostPattern( m_pat );
+	getGUI()->pianoRoll()->setGhostMidiClip( m_clip );
 	getGUI()->pianoRoll()->parentWidget()->show();
 	getGUI()->pianoRoll()->show();
 	getGUI()->pianoRoll()->setFocus();
@@ -121,23 +121,23 @@ void PatternView::setGhostInPianoRoll()
 
 
 
-void PatternView::resetName() { m_pat->setName(""); }
+void MidiClipView::resetName() { m_clip->setName(""); }
 
 
 
 
-void PatternView::changeName()
+void MidiClipView::changeName()
 {
-	QString s = m_pat->name();
+	QString s = m_clip->name();
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
-	m_pat->setName( s );
+	m_clip->setName( s );
 }
 
 
 
 
-void PatternView::constructContextMenu( QMenu * _cm )
+void MidiClipView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
 					tr( "Open in piano-roll" ), _cm );
@@ -147,7 +147,7 @@ void PatternView::constructContextMenu( QMenu * _cm )
 
 	QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
 						tr( "Set as ghost in piano-roll" ), _cm );
-	if( m_pat->empty() ) { b->setEnabled( false ); }
+	if( m_clip->empty() ) { b->setEnabled( false ); }
 	_cm->insertAction( _cm->actions()[1], b );
 	connect( b, SIGNAL( triggered( bool ) ),
 					this, SLOT( setGhostInPianoRoll() ) );
@@ -155,7 +155,7 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
-			tr( "Clear all notes" ), m_pat, SLOT( clear() ) );
+			tr( "Clear all notes" ), m_clip, SLOT( clear() ) );
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
@@ -164,27 +164,27 @@ void PatternView::constructContextMenu( QMenu * _cm )
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
 
-	if ( m_pat->type() == Pattern::BeatPattern )
+	if ( m_clip->type() == MidiClip::BeatClip )
 	{
 		_cm->addSeparator();
 
 		_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
-			tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
+			tr( "Add steps" ), m_clip, SLOT( addSteps() ) );
 		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
-			tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
+			tr( "Remove steps" ), m_clip, SLOT( removeSteps() ) );
 		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
-			tr( "Clone Steps" ), m_pat, SLOT( cloneSteps() ) );
+			tr( "Clone Steps" ), m_clip, SLOT( cloneSteps() ) );
 	}
 }
 
 
 
 
-void PatternView::mousePressEvent( QMouseEvent * _me )
+void MidiClipView::mousePressEvent( QMouseEvent * _me )
 {
-	bool displayBB = fixedTCOs() || (pixelsPerBar() >= 96 && m_legacySEBB);
+	bool displayBB = fixedClips() || (pixelsPerBar() >= 96 && m_legacySEBB);
 	if( _me->button() == Qt::LeftButton &&
-		m_pat->m_patternType == Pattern::BeatPattern &&
+		m_clip->m_clipType == MidiClip::BeatClip &&
 		displayBB && _me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in beat/bassline -mode
@@ -192,36 +192,36 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	{
 //	get the step number that was clicked on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ( ( float(_me->x()) - TCO_BORDER_WIDTH ) *
-				float( m_pat -> m_steps ) ) / float(width() - TCO_BORDER_WIDTH*2);
+		float tmp = ( ( float(_me->x()) - CLIP_BORDER_WIDTH ) *
+				float( m_clip -> m_steps ) ) / float(width() - CLIP_BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
 //	debugging to ensure we get the correct step...
 //		qDebug( "Step (%f) %d", tmp, step );
 
-		if( step >= m_pat->m_steps )
+		if( step >= m_clip->m_steps )
 		{
-			qDebug( "Something went wrong in pattern.cpp: step %d doesn't exist in pattern!", step );
+			qDebug( "Something went wrong in clip.cpp: step %d doesn't exist in clip!", step );
 			return;
 		}
 
-		Note * n = m_pat->noteAtStep( step );
+		Note * n = m_clip->noteAtStep( step );
 
 		if( n == nullptr )
 		{
-			m_pat->addStepNote( step );
+			m_clip->addStepNote( step );
 		}
 		else // note at step found
 		{
-			m_pat->addJournalCheckPoint();
-			m_pat->setStep( step, false );
+			m_clip->addJournalCheckPoint();
+			m_clip->setStep( step, false );
 		}
 
 		Engine::getSong()->setModified();
 		update();
 
-		if( getGUI()->pianoRoll()->currentPattern() == m_pat )
+		if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
 		{
 			getGUI()->pianoRoll()->update();
 		}
@@ -231,18 +231,18 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 	// if not in beat/bassline -mode, let parent class handle the event
 
 	{
-		TrackContentObjectView::mousePressEvent( _me );
+		ClipView::mousePressEvent( _me );
 	}
 }
 
-void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
+void MidiClipView::mouseDoubleClickEvent(QMouseEvent *_me)
 {
 	if( _me->button() != Qt::LeftButton )
 	{
 		_me->ignore();
 		return;
 	}
-	if( m_pat->m_patternType == Pattern::MelodyPattern || !fixedTCOs() )
+	if( m_clip->m_clipType == MidiClip::MelodyClip || !fixedClips() )
 	{
 		openInPianoRoll();
 	}
@@ -251,28 +251,28 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 
 
 
-void PatternView::wheelEvent(QWheelEvent * we)
+void MidiClipView::wheelEvent(QWheelEvent * we)
 {
-	if(m_pat->m_patternType == Pattern::BeatPattern &&
-				(fixedTCOs() || pixelsPerBar() >= 96) &&
+	if(m_clip->m_clipType == MidiClip::BeatClip &&
+				(fixedClips() || pixelsPerBar() >= 96) &&
 				position(we).y() > height() - s_stepBtnOff->height())
 	{
 //	get the step number that was wheeled on and
 //	do calculations in floats to prevent rounding errors...
-		float tmp = ((float(position(we).x()) - TCO_BORDER_WIDTH) *
-				float(m_pat -> m_steps)) / float(width() - TCO_BORDER_WIDTH*2);
+		float tmp = ((float(position(we).x()) - CLIP_BORDER_WIDTH) *
+				float(m_clip -> m_steps)) / float(width() - CLIP_BORDER_WIDTH*2);
 
 		int step = int( tmp );
 
-		if( step >= m_pat->m_steps )
+		if( step >= m_clip->m_steps )
 		{
 			return;
 		}
 
-		Note * n = m_pat->noteAtStep( step );
+		Note * n = m_clip->noteAtStep( step );
 		if(!n && we->angleDelta().y() > 0)
 		{
-			n = m_pat->addStepNote( step );
+			n = m_clip->addStepNote( step );
 			n->setVolume( 0 );
 		}
 		if( n != nullptr )
@@ -290,7 +290,7 @@ void PatternView::wheelEvent(QWheelEvent * we)
 
 			Engine::getSong()->setModified();
 			update();
-			if( getGUI()->pianoRoll()->currentPattern() == m_pat )
+			if( getGUI()->pianoRoll()->currentMidiClip() == m_clip )
 			{
 				getGUI()->pianoRoll()->update();
 			}
@@ -299,7 +299,7 @@ void PatternView::wheelEvent(QWheelEvent * we)
 	}
 	else
 	{
-		TrackContentObjectView::wheelEvent(we);
+		ClipView::wheelEvent(we);
 	}
 }
 
@@ -309,7 +309,7 @@ static int computeNoteRange(int minKey, int maxKey)
 	return (maxKey - minKey) + 1;
 }
 
-void PatternView::paintEvent( QPaintEvent * )
+void MidiClipView::paintEvent( QPaintEvent * )
 {
 	QPainter painter( this );
 
@@ -329,14 +329,14 @@ void PatternView::paintEvent( QPaintEvent * )
 	QPainter p( &m_paintPixmap );
 
 	QColor c;
-	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
-	bool current = getGUI()->pianoRoll()->currentPattern() == m_pat;
-	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
+	bool const muted = m_clip->getTrack()->isMuted() || m_clip->isMuted();
+	bool current = getGUI()->pianoRoll()->currentMidiClip() == m_clip;
+	bool beatClip = m_clip->m_clipType == MidiClip::BeatClip;
 
-	if( beatPattern )
+	if( beatClip )
 	{
-		// Do not paint BBTCOs how we paint pattern TCOs
-		c = BBPatternBackground();
+		// Do not paint BBClips how we paint MidiClips
+		c = BBClipBackground();
 	}
 	else
 	{
@@ -345,10 +345,10 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	// invert the gradient for the background in the B&B editor
 	QLinearGradient lingrad( 0, 0, 0, height() );
-	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
-	lingrad.setColorAt( beatPattern ? 1 : 0, c );
+	lingrad.setColorAt( beatClip ? 0 : 1, c.darker( 300 ) );
+	lingrad.setColorAt( beatClip ? 1 : 0, c );
 
-	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
@@ -362,12 +362,12 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	// Check whether we will paint a text box and compute its potential height
 	// This is needed so we can paint the notes underneath it.
-	bool const drawName = !m_pat->name().isEmpty();
-	bool const drawTextBox = !beatPattern && drawName;
+	bool const drawName = !m_clip->name().isEmpty();
+	bool const drawTextBox = !beatClip && drawName;
 
-	// TODO Warning! This might cause problems if TrackContentObjectView::paintTextLabel changes
+	// TODO Warning! This might cause problems if ClipView::paintTextLabel changes
 	int textBoxHeight = 0;
-	const int textTop = TCO_BORDER_WIDTH + 1;
+	const int textTop = CLIP_BORDER_WIDTH + 1;
 	if (drawTextBox)
 	{
 		QFont labelFont = this->font();
@@ -378,22 +378,22 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// Compute pixels per bar
-	const int baseWidth = fixedTCOs() ? parentWidget()->width() - 2 * TCO_BORDER_WIDTH
-						: width() - TCO_BORDER_WIDTH;
-	const float pixelsPerBar = baseWidth / (float) m_pat->length().getBar();
+	const int baseWidth = fixedClips() ? parentWidget()->width() - 2 * CLIP_BORDER_WIDTH
+						: width() - CLIP_BORDER_WIDTH;
+	const float pixelsPerBar = baseWidth / (float) m_clip->length().getBar();
 
 	// Length of one bar/beat in the [0,1] x [0,1] coordinate system
-	const float barLength = 1. / m_pat->length().getBar();
+	const float barLength = 1. / m_clip->length().getBar();
 	const float tickLength = barLength / TimePos::ticksPerBar();
 
-	const int x_base = TCO_BORDER_WIDTH;
+	const int x_base = CLIP_BORDER_WIDTH;
 
-	bool displayBB = fixedTCOs() || (pixelsPerBar >= 96 && m_legacySEBB);
-	// melody pattern paint event
-	NoteVector const & noteCollection = m_pat->m_notes;
-	if( m_pat->m_patternType == Pattern::MelodyPattern && !noteCollection.empty() )
+	bool displayBB = fixedClips() || (pixelsPerBar >= 96 && m_legacySEBB);
+	// melody clip paint event
+	NoteVector const & noteCollection = m_clip->m_notes;
+	if( m_clip->m_clipType == MidiClip::MelodyClip && !noteCollection.empty() )
 	{
-		// Compute the minimum and maximum key in the pattern
+		// Compute the minimum and maximum key in the clip
 		// so that we know how much there is to draw.
 		int maxKey = std::numeric_limits<int>::min();
 		int minKey = std::numeric_limits<int>::max();
@@ -456,7 +456,7 @@ void PatternView::paintEvent( QPaintEvent * )
 		// set colour based on mute status
 		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
 		QColor noteBorderColor = muted ? getMutedNoteBorderColor()
-									   : ( m_pat->hasColor() ? c.lighter( 200 ) : getNoteBorderColor() );
+									   : ( m_clip->hasColor() ? c.lighter( 200 ) : getNoteBorderColor() );
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)
@@ -477,7 +477,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		float const noteHeight = 1. / adjustedNoteRange;
 
-		// scan through all the notes and draw them on the pattern
+		// scan through all the notes and draw them on the clip
 		for (Note const * currentNote : noteCollection)
 		{
 			// Map to 0, 1, 2, ...
@@ -504,18 +504,18 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		p.restore();
 	}
-	// beat pattern paint event
-	else if( beatPattern &&	displayBB )
+	// beat clip paint event
+	else if( beatClip &&	displayBB )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
-					m_pat->m_steps );
-		const int w = width() - 2 * TCO_BORDER_WIDTH;
+					m_clip->m_steps );
+		const int w = width() - 2 * CLIP_BORDER_WIDTH;
 
-		// scale step graphics to fit the beat pattern length
+		// scale step graphics to fit the beat clip length
 		stepon0 = s_stepBtnOn0->scaled( w / steps,
 					      s_stepBtnOn0->height(),
 					      Qt::IgnoreAspectRatio,
@@ -533,12 +533,12 @@ void PatternView::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
+		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat clip
 		{
-			Note * n = m_pat->noteAtStep( it );
+			Note * n = m_clip->noteAtStep( it );
 
 			// figure out x and y coordinates for step graphic
-			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
+			const int x = CLIP_BORDER_WIDTH + static_cast<int>( it * w / steps );
 			const int y = height() - s_stepBtnOff->height() - 1;
 
 			if( n )
@@ -560,7 +560,7 @@ void PatternView::paintEvent( QPaintEvent * )
 			}
 		} // end for loop
 
-		// draw a transparent rectangle over muted patterns
+		// draw a transparent rectangle over muted clips
 		if ( muted )
 		{
 			p.setBrush( mutedBackgroundColor() );
@@ -573,39 +573,39 @@ void PatternView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	for( bar_t t = 1; t < m_pat->length().getBar(); ++t )
+	for( bar_t t = 1; t < m_clip->length().getBar(); ++t )
 	{
 		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				TCO_BORDER_WIDTH, x_base + static_cast<int>(
-						pixelsPerBar * t ) - 1, TCO_BORDER_WIDTH + lineSize );
+				CLIP_BORDER_WIDTH, x_base + static_cast<int>(
+						pixelsPerBar * t ) - 1, CLIP_BORDER_WIDTH + lineSize );
 		p.drawLine( x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
+				rect().bottom() - ( lineSize + CLIP_BORDER_WIDTH ),
 				x_base + static_cast<int>( pixelsPerBar * t ) - 1,
-				rect().bottom() - TCO_BORDER_WIDTH );
+				rect().bottom() - CLIP_BORDER_WIDTH );
 	}
 
-	// pattern name
+	// clip name
 	if (drawTextBox)
 	{
-		paintTextLabel(m_pat->name(), p);
+		paintTextLabel(m_clip->name(), p);
 	}
 
-	if( !( fixedTCOs() && beatPattern ) )
+	if( !( fixedClips() && beatClip ) )
 	{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );
-		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-			rect().bottom() - TCO_BORDER_WIDTH );
+		p.drawRect( 1, 1, rect().right() - CLIP_BORDER_WIDTH,
+			rect().bottom() - CLIP_BORDER_WIDTH );
 
 		// outer border
 		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
 		p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	}
 
-	// draw the 'muted' pixmap only if the pattern was manually muted
-	if( m_pat->isMuted() )
+	// draw the 'muted' pixmap only if the clip was manually muted
+	if( m_clip->isMuted() )
 	{
-		const int spacing = TCO_BORDER_WIDTH;
+		const int spacing = CLIP_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );

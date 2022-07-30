@@ -69,7 +69,15 @@ void Lv2Features::createFeatureVectors()
 	// create vector of features
 	for(std::pair<const char* const, void*>& pr : m_featureByUri)
 	{
-		Q_ASSERT(pr.second != nullptr);
+		/*
+			If pr.second is nullptr here, this means that the LV2_feature
+			has no "data". If this happens here, this means
+			* either that this feature is static
+			  (e.g. LV2_BUF_SIZE__boundedBlockLength)
+			* or that the programmer forgot to use operator[] before feature
+			  vector creation (This can be done in
+			  Lv2Proc::initPluginSpecificFeatures or in Lv2Features::initCommon)
+		*/
 		m_features.push_back(LV2_Feature { pr.first, pr.second });
 	}
 

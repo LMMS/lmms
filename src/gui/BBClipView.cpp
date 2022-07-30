@@ -1,5 +1,5 @@
 /*
- * BBTCOView.cpp
+ * BBClipView.cpp
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "BBTCOView.h"
+#include "BBClipView.h"
 
 #include <QMenu>
 #include <QPainter>
@@ -36,18 +36,18 @@
 #include "Song.h"
 #include "ToolTip.h"
 
-BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
-	TrackContentObjectView( _tco, _tv ),
-	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) ),
+BBClipView::BBClipView( Clip * _clip, TrackView * _tv ) :
+	ClipView( _clip, _tv ),
+	m_bbClip( dynamic_cast<BBClip *>( _clip ) ),
 	m_paintPixmap()
 {
-	connect( _tco->getTrack(), SIGNAL( dataChanged() ), 
+	connect( _clip->getTrack(), SIGNAL( dataChanged() ), 
 			this, SLOT( update() ) );
 
 	setStyle( QApplication::style() );
 }
 
-void BBTCOView::constructContextMenu( QMenu * _cm )
+void BBClipView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
 					tr( "Open in Beat+Bassline-Editor" ),
@@ -67,7 +67,7 @@ void BBTCOView::constructContextMenu( QMenu * _cm )
 
 
 
-void BBTCOView::mouseDoubleClickEvent( QMouseEvent * )
+void BBClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	openInBBEditor();
 }
@@ -75,7 +75,7 @@ void BBTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void BBTCOView::paintEvent( QPaintEvent * )
+void BBClipView::paintEvent( QPaintEvent * )
 {
 	QPainter painter( this );
 
@@ -100,7 +100,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( 0, c.lighter( 130 ) );
 	lingrad.setColorAt( 1, c.lighter( 70 ) );
 
-	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	// paint a black rectangle under the clip to prevent glitches with transparent backgrounds
 	p.fillRect( rect(), QColor( 0, 0, 0 ) );
 
 	if( gradient() )
@@ -116,35 +116,35 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 200 ) );
 
-	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
-	if( m_bbTCO->length() > TimePos::ticksPerBar() && t > 0 )
+	bar_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbClip->bbTrackIndex() );
+	if( m_bbClip->length() > TimePos::ticksPerBar() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerBar() );
 								x < width() - 2;
 			x += static_cast<int>( t * pixelsPerBar() ) )
 		{
-			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
-			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
-			 	x, rect().bottom() - TCO_BORDER_WIDTH );
+			p.drawLine( x, CLIP_BORDER_WIDTH, x, CLIP_BORDER_WIDTH + lineSize );
+			p.drawLine( x, rect().bottom() - ( CLIP_BORDER_WIDTH + lineSize ),
+			 	x, rect().bottom() - CLIP_BORDER_WIDTH );
 		}
 	}
 
-	// pattern name
-	paintTextLabel(m_bbTCO->name(), p);
+	// clip name
+	paintTextLabel(m_bbClip->name(), p);
 
 	// inner border
 	p.setPen( c.lighter( 130 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-		rect().bottom() - TCO_BORDER_WIDTH );	
+	p.drawRect( 1, 1, rect().right() - CLIP_BORDER_WIDTH,
+		rect().bottom() - CLIP_BORDER_WIDTH );	
 
 	// outer border
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
-	// draw the 'muted' pixmap only if the pattern was manualy muted
-	if( m_bbTCO->isMuted() )
+	// draw the 'muted' pixmap only if the clip was manualy muted
+	if( m_bbClip->isMuted() )
 	{
-		const int spacing = TCO_BORDER_WIDTH;
+		const int spacing = CLIP_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
@@ -158,9 +158,9 @@ void BBTCOView::paintEvent( QPaintEvent * )
 
 
 
-void BBTCOView::openInBBEditor()
+void BBClipView::openInBBEditor()
 {
-	Engine::getBBTrackContainer()->setCurrentBB( m_bbTCO->bbTrackIndex() );
+	Engine::getBBTrackContainer()->setCurrentBB( m_bbClip->bbTrackIndex() );
 
 	getGUI()->mainWindow()->toggleBBEditorWin( true );
 }
@@ -168,24 +168,24 @@ void BBTCOView::openInBBEditor()
 
 
 
-void BBTCOView::resetName() { m_bbTCO->setName(""); }
+void BBClipView::resetName() { m_bbClip->setName(""); }
 
 
 
 
-void BBTCOView::changeName()
+void BBClipView::changeName()
 {
-	QString s = m_bbTCO->name();
+	QString s = m_bbClip->name();
 	RenameDialog rename_dlg( s );
 	rename_dlg.exec();
-	m_bbTCO->setName( s );
+	m_bbClip->setName( s );
 }
 
 
 
-void BBTCOView::update()
+void BBClipView::update()
 {
-	ToolTip::add(this, m_bbTCO->name());
+	ToolTip::add(this, m_bbClip->name());
 
-	TrackContentObjectView::update();
+	ClipView::update();
 }

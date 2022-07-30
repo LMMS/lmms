@@ -26,18 +26,18 @@
 #ifndef AUTOMATION_NODE_H
 #define AUTOMATION_NODE_H
 
-class AutomationPattern;
+class AutomationClip;
 
 
-// Note: We use the default copy-assignment on the AutomationPattern constructor. It's
+// Note: We use the default copy-assignment on the AutomationClip constructor. It's
 // fine for now as we don't have dynamic allocated members, but if any are added we should
 // have an user-defined one to perform a deep-copy.
 class AutomationNode
 {
 public:
 	AutomationNode(); // Dummy constructor for the QMap
-	AutomationNode(AutomationPattern* pat, float value, int pos);
-	AutomationNode(AutomationPattern* pat, float inValue, float outValue, int pos);
+	AutomationNode(AutomationClip* clip, float value, int pos);
+	AutomationNode(AutomationClip* clip, float inValue, float outValue, int pos);
 
 	AutomationNode& operator+=(float f)
 	{
@@ -123,18 +123,18 @@ public:
 	}
 
 	/**
-	 * @brief Sets the pattern this node belongs to
-	 * @param AutomationPattern* pattern that m_pattern will be
+	 * @brief Sets the clip this node belongs to
+	 * @param AutomationClip* clip that m_clip will be
 	 * set to
 	 */
-	inline void setPattern(AutomationPattern* pat)
+	inline void setClip(AutomationClip* clip)
 	{
-		m_pattern = pat;
+		m_clip = clip;
 	}
 
 private:
-	// Pattern that this node belongs to
-	AutomationPattern* m_pattern;
+	// Clip that this node belongs to
+	AutomationClip* m_clip;
 
 	// Time position of this node (matches the timeMap key)
 	int m_pos;
