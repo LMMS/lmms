@@ -32,7 +32,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "NotePlayHandle.h"
 #include "KickerOsc.h"
 #include "TempoSyncKnob.h"

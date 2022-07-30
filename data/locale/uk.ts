@@ -10286,8 +10286,8 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="86"/>
-        <source>Incomplete monophonic imitation tb303</source>
-        <translation>Незавершена монофонічна імітація tb303</translation>
+        <source>Incomplete monophonic imitation TB-303</source>
+        <translation>Незавершена монофонічна імітація TB-303</translation>
     </message>
     <message>
         <location filename="../../plugins/Lv2Effect/Lv2Effect.cpp" line="45"/>

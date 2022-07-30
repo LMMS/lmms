@@ -1,6 +1,6 @@
 /*
  * lb302.h - declaration of class lb302 which is a bass synth attempting to
- *           emulate the Roland TB303 bass synth
+ *           emulate the Roland TB-303 bass synth
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  *
@@ -8,7 +8,7 @@
  *
  * lb302FilterIIR2 is based on the gsyn filter code by Andy Sloane.
  *
- * lb302Filter3Pole is based on the TB303 instrument written by
+ * lb302Filter3Pole is based on the TB-303 instrument written by
  *   Josep M Comajuncosas for the CSounds library
  *
  * This program is free software; you can redistribute it and/or

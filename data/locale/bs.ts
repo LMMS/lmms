@@ -11406,7 +11406,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <location filename="plugins/lb302/lb302.cpp" line="87"/>
-        <source>Incomplete monophonic imitation tb303</source>
+        <source>Incomplete monophonic imitation TB-303</source>
         <translation type="unfinished"/>
     </message>
     <message>

@@ -35,7 +35,7 @@
 #include "LadspaControls.h"
 #include "LadspaControlDialog.h"
 #include "LadspaControlView.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 
 

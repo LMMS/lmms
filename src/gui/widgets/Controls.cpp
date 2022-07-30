@@ -30,7 +30,7 @@
 
 #include "ComboBox.h"
 #include "LcdSpinBox.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 
 

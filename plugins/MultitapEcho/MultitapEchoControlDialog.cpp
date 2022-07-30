@@ -29,7 +29,7 @@
 #include "embed.h"
 #include "Graph.h"
 #include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 #include "LcdSpinBox.h"

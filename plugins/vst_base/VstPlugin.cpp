@@ -113,6 +113,10 @@ private:
 
 }
 
+enum class ExecutableType
+{
+	Unknown, Win32, Win64, Linux64,
+};
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( PathUtil::toAbsolute(_plugin) ),
@@ -125,23 +129,49 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 {
 	setSplittedChannels( true );
 
-	PE::MachineType machineType;
-	try {
-		PE::FileInfo peInfo(m_plugin);
-		machineType = peInfo.machineType();
-	} catch (std::runtime_error& e) {
-		qCritical() << "Error while determining PE file's machine type: " << e.what();
-		machineType = PE::MachineType::unknown;
+	auto pluginType = ExecutableType::Unknown;
+#ifdef LMMS_BUILD_LINUX
+	QFileInfo fi(m_plugin);
+	if (fi.suffix() == "so")
+	{
+		pluginType = ExecutableType::Linux64;
+	}
+	else
+#endif
+	{
+		try {
+			PE::FileInfo peInfo(m_plugin);
+			switch (peInfo.machineType())
+			{
+			case PE::MachineType::amd64:
+				pluginType = ExecutableType::Win64;
+				break;
+			case PE::MachineType::i386:
+				pluginType = ExecutableType::Win32;
+				break;
+			default:
+				qWarning() << "Unknown PE machine type"
+					<< QString::number(static_cast<uint16_t>(peInfo.machineType()), 16);
+				break;
+			}
+		} catch (std::runtime_error& e) {
+			qCritical() << "Error while determining PE file's machine type: " << e.what();
+		}
 	}
 
-	switch(machineType)
+	switch(pluginType)
 	{
-	case PE::MachineType::amd64:
+	case ExecutableType::Win64:
 		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: RemoteVstPlugin64
 		break;
-	case PE::MachineType::i386:
+	case ExecutableType::Win32:
 		tryLoad( REMOTE_VST_PLUGIN_FILEPATH_32 ); // Default: 32/RemoteVstPlugin32
 		break;
+#ifdef LMMS_BUILD_LINUX
+	case ExecutableType::Linux64:
+		tryLoad( NATIVE_LINUX_REMOTE_VST_PLUGIN_FILEPATH_64 ); // Default: NativeLinuxRemoteVstPlugin32
+		break;
+#endif
 	default:
 		m_failed = true;
 		return;

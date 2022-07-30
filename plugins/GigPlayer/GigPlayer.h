@@ -37,7 +37,7 @@
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "LcdSpinBox.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Memory.h"
 #include "gig.h"
 

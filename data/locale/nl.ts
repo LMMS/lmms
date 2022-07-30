@@ -10288,8 +10288,8 @@ Reden: &quot;%2&quot;</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="86"/>
-        <source>Incomplete monophonic imitation tb303</source>
-        <translation>Onvoltooide monofonische limitering tb303</translation>
+        <source>Incomplete monophonic imitation TB-303</source>
+        <translation>Onvoltooide monofonische limitering TB-303</translation>
     </message>
     <message>
         <location filename="../../plugins/Lv2Effect/Lv2Effect.cpp" line="45"/>

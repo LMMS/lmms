@@ -78,7 +78,11 @@ Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
+#ifdef LMMS_BUILD_LINUX
+	"dll,so",
+#else
 	"dll",
+#endif
 	nullptr,
 } ;
 
@@ -682,6 +686,9 @@ void VestigeInstrumentView::openPlugin()
 	QStringList types;
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
+#ifdef LMMS_BUILD_LINUX
+		<< tr( "SO-files (*.so)" )
+#endif
 		;
 	ofd.setNameFilters( types );
 

@@ -10292,8 +10292,8 @@ Ok: &quot;%2&quot;</translation>
     </message>
     <message>
         <location filename="../../plugins/lb302/lb302.cpp" line="86"/>
-        <source>Incomplete monophonic imitation tb303</source>
-        <translation>Félkész monofonikus tb303 imitáció</translation>
+        <source>Incomplete monophonic imitation TB-303</source>
+        <translation>Félkész monofonikus TB-303 imitáció</translation>
     </message>
     <message>
         <location filename="../../plugins/Lv2Effect/Lv2Effect.cpp" line="45"/>

@@ -34,7 +34,7 @@
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "NotePlayHandle.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 // As of Stk 4.4 all classes and types have been moved to the namespace "stk".
 // However in older versions this namespace does not exist, therefore declare it

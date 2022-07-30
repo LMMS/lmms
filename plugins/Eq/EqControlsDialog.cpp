@@ -30,7 +30,7 @@
 #include "AutomatableButton.h"
 #include "embed.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
 
 #include "EqControls.h"

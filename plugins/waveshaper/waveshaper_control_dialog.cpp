@@ -32,7 +32,7 @@
 #include "Knob.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 
 waveShaperControlDialog::waveShaperControlDialog(

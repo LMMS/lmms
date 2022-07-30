@@ -30,7 +30,11 @@
 #include <type_traits>
 
 // Calling convention
+#ifdef _WIN32
 #define VST_CALL_CONV __cdecl
+#else
+#define VST_CALL_CONV 
+#endif
 
 template<typename T>
 constexpr int32_t CCONST(T a, T b, T c, T d)

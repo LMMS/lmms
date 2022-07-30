@@ -1,5 +1,5 @@
 /*
- * LedCheckbox.h - class LedCheckBox, an improved QCheckBox
+ * LedCheckBox.h - class LedCheckBox, an improved QCheckBox
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *

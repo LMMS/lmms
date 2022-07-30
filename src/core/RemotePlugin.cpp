@@ -22,17 +22,18 @@
  *
  */
 
-#define COMPILE_REMOTE_PLUGIN_BASE
+#include "RemotePlugin.h"
+
 //#define DEBUG_REMOTE_PLUGIN
 #ifdef DEBUG_REMOTE_PLUGIN
 #include <QDebug>
 #endif
 
-#include "RemotePlugin.h"
 #include "AudioEngine.h"
 #include "Engine.h"
 #include "MixHelpers.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 

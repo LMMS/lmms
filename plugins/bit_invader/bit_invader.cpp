@@ -32,7 +32,7 @@
 #include "Graph.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"

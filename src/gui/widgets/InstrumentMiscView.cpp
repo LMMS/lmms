@@ -33,7 +33,7 @@
 #include "GroupBox.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 
 
 InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
