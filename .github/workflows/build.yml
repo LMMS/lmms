@@ -42,16 +42,16 @@ jobs:
           mkdir build && cd build
           cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
       - name: Build
-        run: cd build && make
+        run: cmake --build build
       - name: Build tests
-        run: cd build && make tests
+        run: cmake --build build --target tests
       - name: Run tests
         run: build/tests/tests
       - name: Package
         run: |
-          cd build
-          make install
-          make appimage || (cat appimage.log && false)
+          cmake --build build --target install
+          cmake --build build --target appimage \
+            || (cat build/appimage.log && false)
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -96,22 +96,23 @@ jobs:
           npm install --location=global appdmg
       - name: Configure
         run: |
-          mkdir build && cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX="../target" \
-                   -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
-                   $CMAKE_OPTS \
-                   -DUSE_WERROR=OFF
+          mkdir build
+          cmake -S . \
+                -B build \
+                -DCMAKE_INSTALL_PREFIX="../target" \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" \
+                $CMAKE_OPTS \
+                -DUSE_WERROR=OFF
       - name: Build
-        run: cd build && make
+        run: cmake --build build
       - name: Build tests
-        run: cd build && make tests
+        run: cmake --build build --target tests
       - name: Run tests
         run: build/tests/tests
       - name: Package
         run: |
-          cd build
-          make install
-          make dmg
+          cmake --build build --target install
+          cmake --build build --target dmg
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -164,11 +165,11 @@ jobs:
           mkdir build && cd build
           ../cmake/build_win${{ matrix.arch }}.sh
       - name: Build
-        run: cd build && make
+        run: cmake --build build
       - name: Build tests
-        run: cd build && make tests
+        run: cmake --build build --target tests
       - name: Package
-        run: cd build && make package
+        run: cmake --build build --target package
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
