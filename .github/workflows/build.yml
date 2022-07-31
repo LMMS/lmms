@@ -254,11 +254,11 @@ jobs:
             --toolchain C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
             -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - name: Build
-        run: cmake --build build --parallel 2
+        run: cmake --build build
       - name: Build tests
-        run: cmake --build build --target tests --parallel 2
+        run: cmake --build build --target tests
       - name: Package
-        run: cmake --build build --target package --parallel 2
+        run: cmake --build build --target package
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
