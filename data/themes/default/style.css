@@ -858,7 +858,7 @@ lmms--gui--OrganicInstrumentView lmms--gui--Knob#volKnob {
 }
 
 lmms--gui--Sf2InstrumentView lmms--gui--Knob {
-	color: #ff00ea;
+	color: #00ff00;
 	qproperty-outerColor: rgb(20, 5, 18);
 	qproperty-innerRadius: 2;
 	qproperty-outerRadius: 9.2;
