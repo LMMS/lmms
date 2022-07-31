@@ -7,7 +7,7 @@ concurrency:
 jobs:
   linux:
     name: linux
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     container: lmmsci/linux.gcc:18.04
     env:
       CMAKE_OPTS: >-
@@ -129,7 +129,7 @@ jobs:
       matrix:
         arch: ['32', '64']
     name: mingw${{ matrix.arch }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     container: lmmsci/linux.mingw${{ matrix.arch }}:18.04
     env:
       CMAKE_OPTS: >-
