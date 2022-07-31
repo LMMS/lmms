@@ -25,4 +25,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Run shellcheck
         run: |
-          shellcheck $(find "./cmake/" -type f -name '*.sh' -o -name "*.sh.in")
+          shellcheck \
+            $(find "./cmake/" -type f -name '*.sh' -o -name "*.sh.in") \
+            doc/bash-completion/lmms \
+            buildtools/update_locales
