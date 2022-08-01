@@ -27,8 +27,9 @@
 #ifndef LMMS_GUI_PIANO_ROLL_H
 #define LMMS_GUI_PIANO_ROLL_H
 
-#include <QVector>
 #include <QWidget>
+
+#include <vector>
 
 #include "Editor.h"
 #include "ComboBoxModel.h"
@@ -291,7 +292,7 @@ private:
 
 	PositionLine * m_positionLine;
 
-	QVector<QString> m_nemStr; // gui names of each edit mode
+	std::vector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
 
 	QList<int> m_markedSemiTones;
@@ -358,8 +359,8 @@ private:
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
 
-	static const QVector<float> m_zoomLevels;
-	static const QVector<float> m_zoomYLevels;
+	static const std::vector<float> m_zoomLevels;
+	static const std::vector<float> m_zoomYLevels;
 
 	MidiClip* m_midiClip;
 	NoteVector m_ghostNotes;
