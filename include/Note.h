@@ -27,7 +27,7 @@
 #define LMMS_NOTE_H
 
 #include <optional>
-#include <QVector>
+#include <vector>
 
 #include "volume.h"
 #include "panning.h"
@@ -249,7 +249,7 @@ private:
 	DetuningHelper * m_detuning;
 };
 
-using NoteVector = QVector<Note*>;
+using NoteVector = std::vector<Note*>;
 
 struct NoteBounds
 {
