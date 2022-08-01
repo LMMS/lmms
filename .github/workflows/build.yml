@@ -196,12 +196,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v3
-        with:
-          key: qt-${{ env.qt-version }}-msvc-${{ matrix.arch }}-0
-          path: Qt
       - name: Cache vcpkg dependencies
         uses: actions/cache@v3
         with:
@@ -210,33 +204,22 @@ jobs:
             vcpkg-${{ matrix.arch }}-${{ github.ref }}-
             vcpkg-${{ matrix.arch }}-
           path: C:\vcpkg\installed
-      - name: Install Qt
-        run: |
-          $qt_version = ${env:qt-version}
-          $target_dir = Join-Path (Get-Location) 'Qt'
-          if ('${{ steps.cache-qt.outputs.cache-hit }}' -ne 'true') {
-            pip install aqtinstall
-            switch ('${{ matrix.arch }}') {
-              'x86' {
-                aqt install-qt windows desktop $qt_version win32_msvc2019 `
-                  --archives qtbase qtsvg qttools -O $target_dir
-              }
-              'x64' {
-                aqt install-qt windows desktop $qt_version win64_msvc2019_64 `
-                  --archives qtbase qtsvg qttools -O $target_dir
-                aqt install-qt windows desktop $qt_version win32_msvc2019 `
-                  --archives qtbase -O $target_dir
-              }
-            }
-          }
-          $qt_arch = switch ('${{ matrix.arch }}') {
-            'x86' { 'msvc2019' }
-            'x64' { 'msvc2019_64' }
-          }
-          $qt_dir = Join-Path $target_dir $qt_version $qt_arch
-          $qt_bin_dir = Join-Path $qt_dir 'bin'
-          echo "Qt5_DIR=$qt_dir" >> $env:GITHUB_ENV
-          echo $qt_bin_dir >> $env:GITHUB_PATH
+      - name: Install 64-bit Qt
+        if: matrix.arch == 'x64'
+        uses: PhysSong/install-qt-action@v3
+        with:
+          version: ${{ env.qt-version }}
+          arch: win64_msvc2019_64
+          archives: qtbase qtsvg qttools
+          cache: true
+      - name: Install 32-bit Qt
+        uses: PhysSong/install-qt-action@v3
+        with:
+          version: ${{ env.qt-version }}
+          arch: win32_msvc2019
+          archives: qtbase qtsvg qttools
+          cache: true
+          set-env: ${{ matrix.arch == 'x86' }}
       - name: Install dependencies
         run: |
           vcpkg install --triplet ${{ matrix.arch }}-windows --recurse `
