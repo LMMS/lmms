@@ -258,10 +258,12 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 			}
 			else
 			{
-				int idx = Engine::getSong()->controllers().indexOf( cc->getController() );
-
-				if( idx >= 0 )
+				auto& controllers = Engine::getSong()->controllers();
+				auto it = std::find(controllers.begin(), controllers.end(), cc->getController());
+				
+				if (it != controllers.end())
 				{
+					int idx = std::distance(it, controllers.begin());
 					m_userGroupBox->model()->setValue( true );
 					m_userController->model()->setValue( idx );
 				}
