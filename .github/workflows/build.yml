@@ -22,7 +22,7 @@ jobs:
           add-apt-repository ppa:git-core/ppa
           apt-get update
           apt-get --yes install git
-          git config --global --add safe.directory /__w/lmms/lmms
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
@@ -153,7 +153,7 @@ jobs:
           add-apt-repository ppa:git-core/ppa
           apt-get update
           apt-get --yes install git
-          git config --global --add safe.directory /__w/lmms/lmms
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Check out
         uses: actions/checkout@v3
         with:
