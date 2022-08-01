@@ -22,10 +22,11 @@
  *
  */
 
-#ifndef LMMS_TRACK_H
-#define LMMS_TRACK_H
+#ifndef TRACK_H
+#define TRACK_H
 
-#include <QVector>
+#include <vector>
+
 #include <QColor>
 
 #include "AutomatableModel.h"
@@ -69,7 +70,7 @@ class LMMS_EXPORT Track : public Model, public JournallingObject
 	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
 	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
 public:
-	using clipVector = QVector<Clip*>;
+	using clipVector = std::vector<Clip*>;
 
 	enum TrackTypes
 	{
