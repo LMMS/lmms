@@ -175,15 +175,15 @@ void StepRecorder::setStepsLength(const TimePos& newLength)
 	updateWidget();
 }
 
-QVector<Note*> StepRecorder::getCurStepNotes()
+std::vector<Note*> StepRecorder::getCurStepNotes()
 {
-	QVector<Note*> notes;
+	std::vector<Note*> notes;
 
 	if(m_isStepInProgress)
 	{
-		for(StepNote* stepNote: m_curStepNotes)
+		for (StepNote* stepNote: m_curStepNotes)
 		{
-			notes.append(&stepNote->m_note);
+			notes.push_back(&stepNote->m_note);
 		}
 	}
 
