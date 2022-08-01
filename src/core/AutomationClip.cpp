@@ -380,11 +380,11 @@ void AutomationClip::removeNodes(const int tick0, const int tick1)
 	// Make a list of TimePos with nodes to be removed
 	// because we can't simply remove the nodes from
 	// the timeMap while we are iterating it.
-	QVector<TimePos> nodesToRemove;
+	std::vector<TimePos> nodesToRemove;
 
 	for (auto it = m_timeMap.lowerBound(start), endIt = m_timeMap.upperBound(end); it != endIt; ++it)
 	{
-		nodesToRemove.append(POS(it));
+		nodesToRemove.push_back(POS(it));
 	}
 
 	for (auto node: nodesToRemove)
@@ -770,7 +770,7 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
 	_this.setAttribute( "mute", QString::number( isMuted() ) );
-	
+
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
@@ -831,10 +831,10 @@ void AutomationClip::loadSettings( const QDomElement & _this )
 		}
 		else if( element.tagName() == "object" )
 		{
-			m_idsToResolve << element.attribute( "id" ).toInt();
+			m_idsToResolve.push_back(element.attribute( "id" ).toInt());
 		}
 	}
-	
+
 	if( _this.hasAttribute( "color" ) )
 	{
 		useCustomClipColor( true );
@@ -921,9 +921,9 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
  * @brief returns a list of all the automation clips that are connected to a specific model
  * @param _m the model we want to look for
  */
-QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel * _m )
+std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel* _m)
 {
-	QVector<AutomationClip*> clips;
+	std::vector<AutomationClip *> clips;
 	TrackContainer::TrackList tracks;
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::patternStore()->tracks();
@@ -953,7 +953,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 						}
 					}
 					// if the clips is connected to the model, add it to the list
-					if( has_object ) { clips += a; }
+					if( has_object ) { clips.push_back(a); }
 				}
 			}
 		}
@@ -1060,7 +1060,7 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 	// when switching samplerate) and real deletions because in the latter
 	// case we had to remove ourselves if we're the global automation
 	// clip of the destroyed object
-	m_idsToResolve += _id;
+	m_idsToResolve.push_back(_id);
 
 	for( objectVector::Iterator objIt = m_objects.begin();
 		objIt != m_objects.end(); objIt++ )
