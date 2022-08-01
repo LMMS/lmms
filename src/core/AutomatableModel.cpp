@@ -721,8 +721,8 @@ void AutomatableModel::reset()
 float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 {
 	// get clips that connect to this model
-	QVector<AutomationClip *> clips = AutomationClip::clipsForModel( this );
-	if( clips.isEmpty() )
+	auto clips = AutomationClip::clipsForModel( this );
+	if (clips.empty())
 	{
 		// if no such clips exist, return current value
 		return m_value;
@@ -731,17 +731,18 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 	{
 		// of those clips:
 		// find the clips which overlap with the time position
-		QVector<AutomationClip *> clipsInRange;
-		for (const auto& clip : clips)
+		std::vector<AutomationClip*> clipsInRange;
+
+		for (const auto clip : clipsInRange)
 		{
-			int s = clip->startPosition();
-			int e = clip->endPosition();
-			if (s <= time && e >= time) { clipsInRange += clip; }
+			int start = clip->startPosition();
+			int end = clip->endPosition();
+			if (start <= time && end >= time) { clipsInRange.push_back(clip); }
 		}
 
 		AutomationClip * latestClip = nullptr;
 
-		if( ! clipsInRange.isEmpty() )
+		if (!clipsInRange.empty())
 		{
 			// if there are more than one overlapping clips, just use the first one because
 			// multiple clip behaviour is undefined anyway
@@ -751,19 +752,18 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// if we find no clips at the exact time, we need to search for the last clip before time and use that
 		{
 			int latestPosition = 0;
-
-			for (const auto& clip : clips)
+			for (const auto clip : clips)
 			{
-				int e = clip->endPosition();
-				if (e <= time && e > latestPosition)
+				int end = clip->endPosition();
+				if (end <= time && end > latestPosition)
 				{
-					latestPosition = e;
+					latestPosition = end;
 					latestClip = clip;
 				}
 			}
 		}
 
-		if( latestClip )
+		if (latestClip)
 		{
 			// scale/fit the value appropriately and return it
 			const float value = latestClip->valueAt( time - latestClip->startPosition() );

@@ -78,7 +78,7 @@ class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	using AutoModelVector = QVector<AutomatableModel*>;
+	using AutoModelVector = std::vector<AutomatableModel*>;
 
 	enum ScaleType
 	{
