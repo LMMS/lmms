@@ -91,7 +91,7 @@ void StepRecorder::notePressed(const Note & n)
 	StepNote* stepNote = findCurStepNote(n.key());
 	if(stepNote == nullptr)
 	{
-		m_curStepNotes.append(new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
+		m_curStepNotes.push_back(new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
 		m_pianoRoll.update();
 	}
 	else if (stepNote->isReleased())
@@ -288,26 +288,26 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	int nextTimout = std::numeric_limits<int>::max();
 	bool notesRemoved = false;
 
-	QMutableVectorIterator<StepNote*> itr(m_curStepNotes);
-	while (itr.hasNext())
+	m_curStepNotes.erase(std::remove_if(m_curStepNotes.begin(), m_curStepNotes.end(), [&](StepNote* stepNote) 
 	{
-		StepNote* stepNote = itr.next();
-
-		if(stepNote->isReleased())
+		bool shouldRemove = false;
+		if (stepNote->isReleased()) 
 		{
-			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
-			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
+			const int timeSinceReleased = stepNote->timeSinceReleased();
+			shouldRemove = timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS;
+
+			if (shouldRemove) 
 			{
 				delete stepNote;
-				itr.remove();
 				notesRemoved = true;
 			}
-			else
+			else 
 			{
 				nextTimout = min(nextTimout, REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS - timeSinceReleased);
 			}
 		}
-	}
+		return stepNote->isReleased() && shouldRemove;
+	}), m_curStepNotes.end());
 
 	if(notesRemoved)
 	{
