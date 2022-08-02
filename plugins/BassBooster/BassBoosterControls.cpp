@@ -28,6 +28,8 @@
 #include "BassBoosterControls.h"
 #include "BassBooster.h"
 
+namespace lmms
+{
 
 
 BassBoosterControls::BassBoosterControls( BassBoosterEffect* effect ) :
@@ -37,7 +39,7 @@ BassBoosterControls::BassBoosterControls( BassBoosterEffect* effect ) :
 	m_gainModel( 1.0f, 0.1f, 5.0f, 0.05f, this, tr( "Gain" ) ),
 	m_ratioModel( 2.0f, 0.1f, 10.0f, 0.1f, this, tr( "Ratio" ) )
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeFrequency() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( changeFrequency() ) );
 }
 
 
@@ -66,6 +68,4 @@ void BassBoosterControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 }
 
 
-
-
-
+} // namespace lmms

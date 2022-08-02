@@ -31,9 +31,12 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 
+namespace lmms::gui
+{
+
 
 TextFloat::TextFloat() :
-	QWidget( gui->mainWindow(), Qt::ToolTip ),
+	QWidget( getGUI()->mainWindow(), Qt::ToolTip ),
 	m_title(),
 	m_text(),
 	m_pixmap()
@@ -78,7 +81,7 @@ void TextFloat::setPixmap( const QPixmap & _pixmap )
 
 void TextFloat::setVisibilityTimeOut( int _msecs )
 {
-	QTimer::singleShot( _msecs, this, SLOT( hide() ) );
+	QTimer::singleShot( _msecs, this, SLOT(hide()));
 	show();
 }
 
@@ -88,9 +91,9 @@ void TextFloat::setVisibilityTimeOut( int _msecs )
 TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
 					QWidget * _parent, int _add_y_margin )
 {
-	QWidget * mw = gui->mainWindow();
+	QWidget * mw = getGUI()->mainWindow();
 	TextFloat * tf = new TextFloat;
-	if( _parent != NULL )
+	if( _parent != nullptr )
 	{
 		tf->moveGlobal( _parent, QPoint( _parent->width() + 2, 0 ) );
 	}
@@ -103,7 +106,7 @@ TextFloat * TextFloat::displayMessage( const QString & _msg, int _timeout,
 	if( _timeout > 0 )
 	{
 		tf->setAttribute( Qt::WA_DeleteOnClose, true );
-		QTimer::singleShot( _timeout, tf, SLOT( close() ) );
+		QTimer::singleShot( _timeout, tf, SLOT(close()));
 	}
 	return( tf );
 }
@@ -199,4 +202,4 @@ void TextFloat::updateSize()
 
 
 
-
+} // namespace lmms::gui

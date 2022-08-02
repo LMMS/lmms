@@ -28,8 +28,9 @@
 #include "CompressorControlDialog.h"
 
 #include "EffectControls.h"
-#include "Knob.h"
 
+namespace lmms
+{
 
 class CompressorEffect;
 
@@ -52,9 +53,9 @@ public:
 		return 28;
 	}
 
-	EffectControlDialog* createView() override
+	gui::EffectControlDialog* createView() override
 	{
-		return new CompressorControlDialog(this);
+		return new gui::CompressorControlDialog(this);
 	}
 
 private:
@@ -94,9 +95,12 @@ private:
 	float m_outPeakL;
 	float m_outPeakR;
 
-	friend class CompressorControlDialog;
+	friend class gui::CompressorControlDialog;
 	friend class CompressorEffect;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

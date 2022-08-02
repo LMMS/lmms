@@ -27,6 +27,10 @@
 
 #include "lmms_math.h"
 
+namespace lmms
+{
+
+
 class QuadratureLfo
 {
 public:
@@ -92,5 +96,8 @@ private:
 	int m_samplerate;
 
 };
+
+
+} // namespace lmms
 
 #endif // QUADRATURELFO_H

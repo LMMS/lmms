@@ -3,7 +3,7 @@
 <lmms-project version="1.0" creator="LMMS" creatorversion="1.0.93" type="instrumenttracksettings">
   <head/>
   <instrumenttracksettings muted="0" type="0" name="orion_string01.ogg" solo="0">
-    <instrumenttrack pan="0" fxch="0" pitchrange="1" pitch="0" basenote="60" vol="100">
+    <instrumenttrack pan="0" mixch="0" pitchrange="1" pitch="0" basenote="60" vol="100">
       <instrument name="audiofileprocessor">
         <audiofileprocessor reversed="0" looped="1" eframe="1" stutter="0" sframe="0" src="stringsnpads/orion_string01.ogg" amp="100"/>
       </instrument>

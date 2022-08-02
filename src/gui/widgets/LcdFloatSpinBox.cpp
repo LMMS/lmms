@@ -28,14 +28,13 @@
 
 #include <cmath>
 
-#include <QApplication>
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
-#include <QStyleOptionFrameV2>
+#include <QStyleOptionFrame>
 #include <QVBoxLayout>
 
 #include "CaptionMenu.h"
@@ -43,6 +42,9 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+
+namespace lmms::gui
+{
 
 
 LcdFloatSpinBox::LcdFloatSpinBox(int numWhole, int numFrac, const QString& name, QWidget* parent) :
@@ -153,7 +155,7 @@ void LcdFloatSpinBox::mouseMoveEvent(QMouseEvent* event)
 	if (m_mouseMoving)
 	{
 		int dy = event->globalY() - m_origMousePos.y();
-		if (gui->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
+		if (getGUI()->mainWindow()->isShiftPressed()) { dy = qBound(-4, dy/4, 4); }
 		if (dy > 1 || dy < -1)
 		{
 			model()->setValue(model()->value() - dy / 2 * getStep());
@@ -242,3 +244,6 @@ void LcdFloatSpinBox::paintEvent(QPaintEvent*)
 		p.drawText(width() / 2 - p.fontMetrics().width(m_label) / 2, height() - 1, m_label);
 	}
 }
+
+
+} // namespace lmms::gui

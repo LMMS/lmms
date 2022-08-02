@@ -27,26 +27,36 @@
 
 #include <QDomElement>
 
-#include "BBTrack.h"
+#include "EffectChain.h"
+#include "Mixer.h"
+#include "panning_constants.h"
+#include "PatternStore.h"
+#include "PatternTrack.h"
+#include "SampleClip.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
+#include "SampleTrackView.h"
 #include "Song.h"
+#include "volume.h"
 
+
+namespace lmms
+{
 
 
 SampleTrack::SampleTrack(TrackContainer* tc) :
 	Track(Track::SampleTrack, tc),
 	m_volumeModel(DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr("Volume")),
 	m_panningModel(DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr("Panning")),
-	m_effectChannelModel(0, 0, 0, this, tr("FX channel")),
+	m_mixerChannelModel(0, 0, 0, this, tr("Mixer channel")),
 	m_audioPort(tr("Sample track"), true, &m_volumeModel, &m_panningModel, &m_mutedModel),
 	m_isPlaying(false)
 {
 	setName(tr("Sample track"));
 	m_panningModel.setCenterValue(DefaultPanning);
-	m_effectChannelModel.setRange(0, Engine::fxMixer()->numChannels()-1, 1);
+	m_mixerChannelModel.setRange(0, Engine::mixer()->numChannels()-1, 1);
 
-	connect(&m_effectChannelModel, SIGNAL(dataChanged()), this, SLOT(updateEffectChannel()));
+	connect(&m_mixerChannelModel, SIGNAL(dataChanged()), this, SLOT(updateMixerChannel()));
 }
 
 
@@ -54,23 +64,24 @@ SampleTrack::SampleTrack(TrackContainer* tc) :
 
 SampleTrack::~SampleTrack()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
 }
 
 
 
 
 bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
-					const f_cnt_t _offset, int _tco_num )
+					const f_cnt_t _offset, int _clip_num )
 {
 	m_audioPort.effects()->startRunning();
-	bool played_a_note = false;	// will be return variable
+	bool played_a_note = false; // will be return variable
 
-	tcoVector tcos;
-	::BBTrack * bb_track = NULL;
-	if( _tco_num >= 0 )
+
+	clipVector clips;
+	class PatternTrack * pattern_track = nullptr;
+	if( _clip_num >= 0 )
 	{
-		if (_start > getTCO(_tco_num)->length())
+		if (_start > getClip(_clip_num)->length())
 		{
 			setPlaying(false);
 		}
@@ -78,55 +89,55 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		{
 			return false;
 		}
-		tcos.push_back( getTCO( _tco_num ) );
-		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		clips.push_back( getClip( _clip_num ) );
+		if (trackContainer() == Engine::patternStore())
 		{
-			bb_track = BBTrack::findBBTrack( _tco_num );
+			pattern_track = PatternTrack::findPatternTrack(_clip_num);
 			setPlaying(true);
 		}
 	}
 	else
 	{
 		bool nowPlaying = false;
-		for( int i = 0; i < numOfTCOs(); ++i )
+		for( int i = 0; i < numOfClips(); ++i )
 		{
-			TrackContentObject * tco = getTCO( i );
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
+			Clip * clip = getClip( i );
+			SampleClip * sClip = dynamic_cast<SampleClip*>( clip );
 
-			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
+			if( _start >= sClip->startPosition() && _start < sClip->endPosition() )
 			{
-				if( sTco->isPlaying() == false && _start >= (sTco->startPosition() + sTco->startTimeOffset()) )
+				if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset()) )
 				{
-					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
-					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
-					f_cnt_t tcoFrameLength = bufferFramesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
-					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
-					//if the Tco smaller than the sample length we play only until Tco end
+					auto bufferFramesPerTick = Engine::framesPerTick (sClip->sampleBuffer ()->sampleRate ());
+					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
+					f_cnt_t clipFrameLength = bufferFramesPerTick * ( sClip->endPosition() - sClip->startPosition() - sClip->startTimeOffset() );
+					f_cnt_t sampleBufferLength = sClip->sampleBuffer()->frames();
+					//if the Clip smaller than the sample length we play only until Clip end
 					//else we play the sample to the end but nothing more
-					f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
+					f_cnt_t samplePlayLength = clipFrameLength > sampleBufferLength ? sampleBufferLength : clipFrameLength;
 					//we only play within the sampleBuffer limits
 					if( sampleStart < sampleBufferLength )
 					{
-						sTco->setSampleStartFrame( sampleStart );
-						sTco->setSamplePlayLength( samplePlayLength );
-						tcos.push_back( sTco );
-						sTco->setIsPlaying( true );
+						sClip->setSampleStartFrame( sampleStart );
+						sClip->setSamplePlayLength( samplePlayLength );
+						clips.push_back( sClip );
+						sClip->setIsPlaying( true );
 						nowPlaying = true;
 					}
 				}
 			}
 			else
 			{
-				sTco->setIsPlaying( false );
+				sClip->setIsPlaying( false );
 			}
-			nowPlaying = nowPlaying || sTco->isPlaying();
+			nowPlaying = nowPlaying || sClip->isPlaying();
 		}
 		setPlaying(nowPlaying);
 	}
 
-	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
+	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
 	{
-		SampleTCO * st = dynamic_cast<SampleTCO *>( *it );
+		SampleClip * st = dynamic_cast<SampleClip *>( *it );
 		if( !st->isMuted() )
 		{
 			PlayHandle* handle;
@@ -143,12 +154,12 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
-				smpHandle->setBBTrack( bb_track );
+				smpHandle->setPatternTrack(pattern_track);
 				handle = smpHandle;
 			}
 			handle->setOffset( _offset );
-			// send it to the mixer
-			Engine::mixer()->addPlayHandle( handle );
+			// send it to the audio engine
+			Engine::audioEngine()->addPlayHandle( handle );
 			played_a_note = true;
 		}
 	}
@@ -159,19 +170,19 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackView * SampleTrack::createView( TrackContainerView* tcv )
+gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 {
-	return new SampleTrackView( this, tcv );
+	return new gui::SampleTrackView( this, tcv );
 }
 
 
 
 
-TrackContentObject * SampleTrack::createTCO(const TimePos & pos)
+Clip * SampleTrack::createClip(const TimePos & pos)
 {
-	SampleTCO * sTco = new SampleTCO(this);
-	sTco->movePosition(pos);
-	return sTco;
+	SampleClip * sClip = new SampleClip(this);
+	sClip->movePosition(pos);
+	return sClip;
 }
 
 
@@ -186,7 +197,7 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
-	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
+	m_mixerChannelModel.saveSettings( _doc, _this, "mixch" );
 }
 
 
@@ -209,36 +220,39 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels() - 1 );
-	m_effectChannelModel.loadSettings( _this, "fxch" );
+	m_mixerChannelModel.setRange( 0, Engine::mixer()->numChannels() - 1 );
+	m_mixerChannelModel.loadSettings( _this, "mixch" );
 }
 
 
 
 
-void SampleTrack::updateTcos()
+void SampleTrack::updateClips()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
-	setPlayingTcos( false );
+	Engine::audioEngine()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	setPlayingClips( false );
 }
 
 
 
 
-void SampleTrack::setPlayingTcos( bool isPlaying )
+void SampleTrack::setPlayingClips( bool isPlaying )
 {
-	for( int i = 0; i < numOfTCOs(); ++i )
+	for( int i = 0; i < numOfClips(); ++i )
 	{
-		TrackContentObject * tco = getTCO( i );
-		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-		sTco->setIsPlaying( isPlaying );
+		Clip * clip = getClip( i );
+		SampleClip * sClip = dynamic_cast<SampleClip*>( clip );
+		sClip->setIsPlaying( isPlaying );
 	}
 }
 
 
 
 
-void SampleTrack::updateEffectChannel()
+void SampleTrack::updateMixerChannel()
 {
-	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
+	m_audioPort.setNextMixerChannel( m_mixerChannelModel.value() );
 }
+
+
+} // namespace lmms

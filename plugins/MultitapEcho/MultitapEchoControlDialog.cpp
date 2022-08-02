@@ -23,18 +23,18 @@
  *
  */
 
-#include <QLayout>
 
 #include "MultitapEchoControlDialog.h"
 #include "MultitapEchoControls.h"
 #include "embed.h"
 #include "Graph.h"
-#include "PixmapButton.h"
-#include "ToolTip.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 #include "LcdSpinBox.h"
+
+namespace lmms::gui
+{
 
 
 MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * controls ) :
@@ -100,5 +100,8 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	LedCheckBox * swapInputs = new LedCheckBox( "Swap inputs", this, tr( "Swap inputs" ), LedCheckBox::Green );
 	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );
-	ToolTip::add( swapInputs, tr( "Swap left and right input channels for reflections" ) );
+	swapInputs->setToolTip(tr("Swap left and right input channels for reflections"));
 }
+
+
+} // namespace lmms::gui

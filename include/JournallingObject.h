@@ -25,17 +25,19 @@
 #ifndef JOURNALLING_OBJECT_H
 #define JOURNALLING_OBJECT_H
 
-#include <QtCore/QStack>
+#include <QStack>
 
 #include "lmms_basics.h"
 #include "SerializingObject.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT JournallingObject : public SerializingObject
 {
 public:
 	JournallingObject();
-	virtual ~JournallingObject();
+	~JournallingObject() override;
 
 	inline jo_id_t id() const
 	{
@@ -58,7 +60,7 @@ public:
 
 	void addJournalCheckPoint();
 
-	virtual QDomElement saveState( QDomDocument & _doc,
+	QDomElement saveState( QDomDocument & _doc,
 									QDomElement & _parent ) override;
 
 	void restoreState( const QDomElement & _this ) override;
@@ -98,6 +100,8 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif
 

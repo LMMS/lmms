@@ -27,6 +27,10 @@
 #include "Ladspa2LMMS.h"
 
 
+namespace lmms
+{
+
+
 Ladspa2LMMS::Ladspa2LMMS()
 {
 	l_sortable_plugin_t plugins = getSortedPlugins();
@@ -35,7 +39,7 @@ Ladspa2LMMS::Ladspa2LMMS()
 			it != plugins.end(); ++it )
 	{
 		ladspa_key_t key = (*it).second;
-		ladspaManagerDescription * desc = getDescription( key );
+		LadspaManagerDescription * desc = getDescription( key );
 		
 		if( desc->type == SOURCE )
 		{
@@ -78,12 +82,6 @@ Ladspa2LMMS::Ladspa2LMMS()
  
  
  
-Ladspa2LMMS::~Ladspa2LMMS()
-{
-}
-
-
-
 QString Ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 {
 	QString name = getName( _key );
@@ -126,3 +124,6 @@ QString Ladspa2LMMS::getShortName( const ladspa_key_t & _key )
 	return name;
 }
 
+
+
+} // namespace lmms

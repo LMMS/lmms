@@ -22,12 +22,18 @@
  *
  */
 
-#include <QLayout>
+
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #include "BassBoosterControlDialog.h"
 #include "BassBoosterControls.h"
 #include "embed.h"
+#include "Knob.h"
 
+
+namespace lmms::gui
+{
 
 
 BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* controls ) :
@@ -66,3 +72,6 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	tl->addLayout( l );
 	setLayout( tl );
 }
+
+
+} // namespace lmms::gui

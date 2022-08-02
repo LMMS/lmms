@@ -24,18 +24,21 @@
 
 #include "MixHelpers.h"
 
+#ifdef LMMS_DEBUG
 #include <cstdio>
+#endif
 
-#include "lmms_math.h"
+#include <cmath>
+#include <QtGlobal>
+
 #include "ValueBuffer.h"
 
-#include <cstdio>
 
 
 static bool s_NaNHandler;
 
 
-namespace MixHelpers
+namespace lmms::MixHelpers
 {
 
 /*! \brief Function for applying MIXOP on all sample frames */
@@ -99,9 +102,10 @@ bool sanitize( sampleFrame * src, int frames )
 	{
 		for( int c = 0; c < 2; ++c )
 		{
-			if( isinf( src[f][c] ) || isnan( src[f][c] ) )
+			if( std::isinf( src[f][c] ) || std::isnan( src[f][c] ) )
 			{
 				#ifdef LMMS_DEBUG
+					// TODO don't use printf here
 					printf("Bad data, clearing buffer. frame: ");
 					printf("%d: value %f\n", f, src[f][c]);
 				#endif
@@ -210,8 +214,8 @@ void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, f
 
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += ( isinf( src[f][0] ) || isnan( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
-		dst[f][1] += ( isinf( src[f][1] ) || isnan( src[f][1] ) ) ? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
+		dst[f][0] += ( std::isinf( src[f][0] ) || std::isnan( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
+		dst[f][1] += ( std::isinf( src[f][1] ) || std::isnan( src[f][1] ) ) ? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
 	}
 }
 
@@ -226,10 +230,10 @@ void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, 
 
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += ( isinf( src[f][0] ) || isnan( src[f][0] ) )
+		dst[f][0] += ( std::isinf( src[f][0] ) || std::isnan( src[f][0] ) )
 			? 0.0f
 			: src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
-		dst[f][1] += ( isinf( src[f][1] ) || isnan( src[f][1] ) )
+		dst[f][1] += ( std::isinf( src[f][1] ) || std::isnan( src[f][1] ) )
 			? 0.0f
 			: src[f][1] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
 	}
@@ -243,8 +247,8 @@ struct AddSanitizedMultipliedOp
 
 	void operator()( sampleFrame& dst, const sampleFrame& src ) const
 	{
-		dst[0] += ( isinf( src[0] ) || isnan( src[0] ) ) ? 0.0f : src[0] * m_coeff;
-		dst[1] += ( isinf( src[1] ) || isnan( src[1] ) ) ? 0.0f : src[1] * m_coeff;
+		dst[0] += ( std::isinf( src[0] ) || std::isnan( src[0] ) ) ? 0.0f : src[0] * m_coeff;
+		dst[1] += ( std::isinf( src[1] ) || std::isnan( src[1] ) ) ? 0.0f : src[1] * m_coeff;
 	}
 
 	const float m_coeff;
@@ -324,5 +328,5 @@ void multiplyAndAddMultipliedJoined( sampleFrame* dst,
 	run<>( dst, srcLeft, srcRight, frames, MultiplyAndAddMultipliedOp(coeffDst, coeffSrc) );
 }
 
-}
+} // namespace lmms::MixHelpers
 

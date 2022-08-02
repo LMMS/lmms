@@ -27,22 +27,29 @@
 #include "Multi_Buffer.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
+
 class Gb_Apu_Buffer : public Gb_Apu {
 	MM_OPERATORS
 public:
-	Gb_Apu_Buffer();
-	~Gb_Apu_Buffer();
+	Gb_Apu_Buffer() = default;
+	~Gb_Apu_Buffer() = default;
 
 	void end_frame(blip_time_t);
 
 	blargg_err_t set_sample_rate(long sample_rate, long clock_rate);
 	long samples_avail() const;
-	typedef blip_sample_t sample_t;
+	using sample_t = blip_sample_t;
 	long read_samples(sample_t* out, long count);
 	void bass_freq(int freq);
 private:
 	Stereo_Buffer m_buf;
 };
+
+
+} // namespace lmms
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * Clipboard.cpp - the clipboard for patterns, notes etc.
+ * Clipboard.cpp - the clipboard for clips, notes etc.
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -27,11 +27,11 @@
 #include <QMimeData>
 
 #include "Clipboard.h"
-#include "JournallingObject.h"
 
 
-namespace Clipboard
+namespace lmms::Clipboard
 {
+
 	const QMimeData * getMimeData()
 	{
 		return QApplication::clipboard()->mimeData( QClipboard::Clipboard );
@@ -91,4 +91,6 @@ namespace Clipboard
 	{
 		return( QString::fromUtf8( mimeData->data( mimeType( MimeType::StringPair ) ) ).section( ':', 1, -1 ) );
 	}
-}
+
+
+} // namespace lmms::Clipboard

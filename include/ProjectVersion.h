@@ -27,10 +27,14 @@
 #ifndef PROJECT_VERSION_H
 #define PROJECT_VERSION_H
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
+#include <QString>
+#include <QStringList>
 
 #include <limits>
+
+namespace lmms
+{
+
 
 /*! \brief Version number parsing and comparison
  *
@@ -74,5 +78,8 @@ inline bool operator<=(const ProjectVersion & v1, const ProjectVersion & v2) { r
 inline bool operator>=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) >= 0; }
 inline bool operator==(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) == 0; }
 inline bool operator!=(const ProjectVersion & v1, const ProjectVersion & v2) { return ProjectVersion::compare(v1, v2) != 0; }
+
+
+} // namespace lmms
 
 #endif

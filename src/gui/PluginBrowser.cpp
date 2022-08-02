@@ -34,9 +34,11 @@
 
 #include "embed.h"
 #include "Engine.h"
-#include "gui_templates.h"
 #include "StringPairDrag.h"
 #include "PluginFactory.h"
+
+namespace lmms::gui
+{
 
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
@@ -55,8 +57,8 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 
 	auto hint = new QLabel( tr( "Drag an instrument "
-					"into either the Song-Editor, the "
-					"Beat+Bassline Editor or into an "
+					"into either the Song Editor, the "
+					"Pattern Editor or into an "
 					"existing instrument track." ),
 								m_view );
 	hint->setWordWrap( true );
@@ -72,8 +74,8 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	m_descTree->setIndentation( 10 );
 	m_descTree->setSelectionMode( QAbstractItemView::NoSelection );
 
-	connect( searchBar, SIGNAL( textEdited( const QString & ) ),
-			this, SLOT( onFilterChanged( const QString & ) ) );
+	connect( searchBar, SIGNAL( textEdited( const QString& ) ),
+			this, SLOT( onFilterChanged( const QString& ) ) );
 
 	view_layout->addWidget( hint );
 	view_layout->addWidget( searchBar );
@@ -156,7 +158,7 @@ void PluginBrowser::addPlugins()
 	m_descTree->clear();
 
 	// Fetch and sort all instrument plugin descriptors
-	auto descs = pluginFactory->descriptors(Plugin::Instrument);
+	auto descs = getPluginFactory()->descriptors(Plugin::Instrument);
 	std::sort(descs.begin(), descs.end(),
 		[](auto d1, auto d2)
 		{
@@ -286,9 +288,4 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 }
 
 
-
-
-
-
-
-
+} // namespace lmms::gui

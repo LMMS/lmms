@@ -27,10 +27,18 @@
 
 #include "ComboBoxModel.h"
 
+namespace lmms
+{
+
 
 class InstrumentTrack;
 class EnvelopeAndLfoParameters;
 class NotePlayHandle;
+
+namespace gui
+{
+class InstrumentSoundShapingView;
+}
 
 
 class InstrumentSoundShaping : public Model, public JournallingObject
@@ -38,7 +46,7 @@ class InstrumentSoundShaping : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	InstrumentSoundShaping( InstrumentTrack * _instrument_track );
-	virtual ~InstrumentSoundShaping();
+	~InstrumentSoundShaping() override = default;
 
 	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
 							NotePlayHandle * _n );
@@ -77,9 +85,11 @@ private:
 	static const char *const targetNames[InstrumentSoundShaping::NumTargets][3];
 
 
-	friend class InstrumentSoundShapingView;
+	friend class gui::InstrumentSoundShapingView;
 
 } ;
 
+
+} // namespace lmms
 
 #endif

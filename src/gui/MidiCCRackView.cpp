@@ -26,7 +26,6 @@
 #include "MidiCCRackView.h"
 
 #include <QGridLayout>
-#include <QMdiSubWindow>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -37,7 +36,10 @@
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "MainWindow.h"
-#include "Track.h"
+#include "SubWindow.h"
+
+namespace lmms::gui
+{
 
 
 MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
@@ -47,7 +49,7 @@ MidiCCRackView::MidiCCRackView(InstrumentTrack * track) :
 	setWindowIcon(embed::getIconPixmap("midi_cc_rack"));
 	setWindowTitle(tr("MIDI CC Rack - %1").arg(m_track->name()));
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget(this);
+	QMdiSubWindow * subWin = getGUI()->mainWindow()->addWindowedWidget(this);
 
 	// Remove maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -131,3 +133,6 @@ void MidiCCRackView::saveSettings(QDomDocument & doc, QDomElement & parent)
 void MidiCCRackView::loadSettings(const QDomElement &)
 {
 }
+
+
+} // namespace lmms::gui

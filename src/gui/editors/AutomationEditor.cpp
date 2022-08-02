@@ -30,10 +30,9 @@
 #include <cmath>
 
 #include <QApplication>
+#include <QInputDialog>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLayout>
-#include <QMdiArea>
 #include <QPainter>
 #include <QPainterPath>
 #include <QScrollBar>
@@ -46,7 +45,6 @@
 
 #include "ActionGroup.h"
 #include "AutomationNode.h"
-#include "BBTrackContainer.h"
 #include "ComboBox.h"
 #include "debug.h"
 #include "DeprecationHelper.h"
@@ -54,15 +52,18 @@
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
+#include "Knob.h"
 #include "MainWindow.h"
+#include "PatternStore.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
-#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "ToolTip.h"
 
+
+namespace lmms::gui
+{
 
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
@@ -72,7 +73,7 @@ QPixmap * AutomationEditor::s_toolMove = nullptr;
 QPixmap * AutomationEditor::s_toolYFlip = nullptr;
 QPixmap * AutomationEditor::s_toolXFlip = nullptr;
 
-const QVector<double> AutomationEditor::m_zoomXLevels =
+const QVector<float> AutomationEditor::m_zoomXLevels =
 		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 
@@ -82,7 +83,7 @@ AutomationEditor::AutomationEditor() :
 	m_zoomingXModel(),
 	m_zoomingYModel(),
 	m_quantizeModel(),
-	m_pattern(nullptr),
+	m_clip(nullptr),
 	m_minLevel( 0 ),
 	m_maxLevel( 0 ),
 	m_step( 1 ),
@@ -111,11 +112,11 @@ AutomationEditor::AutomationEditor() :
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0)
 {
-	connect( this, SIGNAL( currentPatternChanged() ),
-				this, SLOT( updateAfterPatternChange() ),
+	connect( this, SIGNAL(currentClipChanged()),
+				this, SLOT(updateAfterClipChange()),
 				Qt::QueuedConnection );
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-						this, SLOT( update() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+						this, SLOT(update()));
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -123,15 +124,15 @@ AutomationEditor::AutomationEditor() :
 	setLayoutDirection( Qt::LeftToRight );
 
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
-	connect( m_tensionModel, SIGNAL( dataChanged() ),
-				this, SLOT( setTension() ) );
+	connect( m_tensionModel, SIGNAL(dataChanged()),
+				this, SLOT(setTension()));
 
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
 
-	connect( &m_quantizeModel, SIGNAL(dataChanged() ),
-					this, SLOT( setQuantization() ) );
+	connect( &m_quantizeModel, SIGNAL(dataChanged()),
+					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
 	if (s_toolYFlip == nullptr)
@@ -148,25 +149,25 @@ AutomationEditor::AutomationEditor() :
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppb,
 				Engine::getSong()->getPlayPos(
-					Song::Mode_PlayAutomationPattern ),
+					Song::Mode_PlayAutomationClip ),
 					m_currentPosition,
-					Song::Mode_PlayAutomationPattern, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
-		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+					Song::Mode_PlayAutomationClip, this );
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
-	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( horScrolled( int ) ) );
+	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(horScrolled(int)));
 
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
 	m_topBottomScroll->setPageStep( 20 );
-	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( verScrolled( int ) ) );
+	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(verScrolled(int)));
 
 	// init pixmaps
 	if (s_toolDraw == nullptr)
@@ -190,7 +191,7 @@ AutomationEditor::AutomationEditor() :
 		s_toolMove = new QPixmap(embed::getIconPixmap("edit_move"));
 	}
 
-	setCurrentPattern(nullptr);
+	setCurrentClip(nullptr);
 
 	setMouseTracking( true );
 	setFocusPolicy( Qt::StrongFocus );
@@ -213,21 +214,21 @@ AutomationEditor::~AutomationEditor()
 
 
 
-void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
+void AutomationEditor::setCurrentClip(AutomationClip * new_clip )
 {
-	if (m_pattern)
+	if (m_clip)
 	{
-		m_pattern->disconnect(this);
+		m_clip->disconnect(this);
 	}
 
-	m_pattern = new_pattern;
+	m_clip = new_clip;
 
-	if (m_pattern != nullptr)
+	if (m_clip != nullptr)
 	{
-		connect(m_pattern, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(m_clip, SIGNAL(dataChanged()), this, SLOT(update()));
 	}
 
-	emit currentPatternChanged();
+	emit currentClipChanged();
 }
 
 
@@ -249,11 +250,11 @@ void AutomationEditor::loadSettings( const QDomElement & dom_parent)
 
 
 
-void AutomationEditor::updateAfterPatternChange()
+void AutomationEditor::updateAfterClipChange()
 {
 	m_currentPosition = 0;
 
-	if( !validPattern() )
+	if( !validClip() )
 	{
 		m_minLevel = m_maxLevel = m_scrollLevel = 0;
 		m_step = 1;
@@ -261,12 +262,12 @@ void AutomationEditor::updateAfterPatternChange()
 		return;
 	}
 
-	m_minLevel = m_pattern->firstObject()->minValue<float>();
-	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
-	m_step = m_pattern->firstObject()->step<float>();
+	m_minLevel = m_clip->firstObject()->minValue<float>();
+	m_maxLevel = m_clip->firstObject()->maxValue<float>();
+	m_step = m_clip->firstObject()->step<float>();
 	centerTopBottomScroll();
 
-	m_tensionModel->setValue( m_pattern->getTension() );
+	m_tensionModel->setValue( m_clip->getTension() );
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of levels and so on...)
@@ -283,9 +284,9 @@ void AutomationEditor::update()
 	QWidget::update();
 
 	// Note detuning?
-	if( m_pattern && !m_pattern->getTrack() )
+	if( m_clip && !m_clip->getTrack() )
 	{
-		gui->pianoRoll()->update();
+		getGUI()->pianoRoll()->update();
 	}
 }
 
@@ -350,8 +351,8 @@ void AutomationEditor::leaveEvent(QEvent * e )
 
 void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 {
-	int x0 = Note::quantized( x0In, AutomationPattern::quantization() );
-	int x1 = Note::quantized( x1In, AutomationPattern::quantization() );
+	int x0 = Note::quantized( x0In, AutomationClip::quantization() );
+	int x1 = Note::quantized( x1In, AutomationClip::quantization() );
 	int deltax = qAbs( x1 - x0 );
 	float deltay = qAbs<float>( y1 - y0 );
 	int x = x0;
@@ -359,22 +360,22 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 	int xstep;
 	int ystep;
 
-	if( deltax < AutomationPattern::quantization() )
+	if( deltax < AutomationClip::quantization() )
 	{
 		return;
 	}
 
-	deltax /= AutomationPattern::quantization();
+	deltax /= AutomationClip::quantization();
 
 	float yscale = deltay / ( deltax );
 
 	if( x0 < x1 )
 	{
-		xstep = AutomationPattern::quantization();
+		xstep = AutomationClip::quantization();
 	}
 	else
 	{
-		xstep = -( AutomationPattern::quantization() );
+		xstep = -( AutomationClip::quantization() );
 	}
 
 	float lineAdjust;
@@ -396,8 +397,8 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 		x += xstep;
 		i += 1;
-		m_pattern->removeNode(TimePos(x));
-		m_pattern->putValue( TimePos( x ), y );
+		m_clip->removeNode(TimePos(x));
+		m_clip->putValue( TimePos( x ), y );
 	}
 }
 
@@ -406,7 +407,7 @@ void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 
 bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValue)
 {
-	if (node == m_pattern->getTimeMap().end()) { return false; }
+	if (node == m_clip->getTimeMap().end()) { return false; }
 
 	// Display dialog to edit the value
 	bool ok;
@@ -419,8 +420,8 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 		editingOutValue
 			? OUTVAL(node)
 			: INVAL(node),
-		m_pattern->firstObject()->minValue<float>(),
-		m_pattern->firstObject()->maxValue<float>(),
+		m_clip->firstObject()->minValue<float>(),
+		m_clip->firstObject()->maxValue<float>(),
 		3,
 		&ok
 	);
@@ -453,7 +454,7 @@ bool AutomationEditor::fineTuneValue(timeMap::iterator node, bool editingOutValu
 
 void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 {
-	if( !validPattern() )
+	if( !validClip() )
 	{
 		return;
 	}
@@ -461,15 +462,15 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 	// Some helper lambda functions to avoid repetition of code
 	auto eraseNode = [this](timeMap::iterator node)
 	{
-		if (node != m_pattern->getTimeMap().end())
+		if (node != m_clip->getTimeMap().end())
 		{
-			m_pattern->removeNode(POS(node));
+			m_clip->removeNode(POS(node));
 			Engine::getSong()->setModified();
 		}
 	};
 	auto resetNode = [this](timeMap::iterator node)
 	{
-		if (node != m_pattern->getTimeMap().end())
+		if (node != m_clip->getTimeMap().end())
 		{
 			node.value().resetOutValue();
 			Engine::getSong()->setModified();
@@ -477,12 +478,12 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 	};
 	auto resetTangent = [this](timeMap::iterator node)
 	{
-		if (node != m_pattern->getTimeMap().end())
+		if (node != m_clip->getTimeMap().end())
 		{
 			// Unlock the tangents from that node
 			node.value().setLockedTangents(false);
 			// Recalculate the tangents
-			m_pattern->generateTangents(node, 1);
+			m_clip->generateTangents(node, 1);
 			Engine::getSong()->setModified();
 		}
 	};
@@ -498,8 +499,8 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		// Get tick in which the user clicked
 		int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
-		// Get the time map of current pattern
-		timeMap & tm = m_pattern->getTimeMap();
+		// Get the time map of current clip
+		timeMap & tm = m_clip->getTimeMap();
 
 		m_mouseDownLeft = (mouseEvent->button() == Qt::LeftButton);
 		m_mouseDownRight = (mouseEvent->button() == Qt::RightButton);
@@ -518,7 +519,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 		{
 			case DRAW:
 			{
-				m_pattern->addJournalCheckPoint();
+				m_clip->addJournalCheckPoint();
 
 				if (m_mouseDownLeft)
 				{
@@ -539,7 +540,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					else // No shift, we are just creating/moving nodes
 					{
 						// Starts actually moving/draging the node
-						TimePos newTime = m_pattern->setDragValue(
+						TimePos newTime = m_clip->setDragValue(
 							// The TimePos of either the clicked node or a new one
 							TimePos(
 								clickedNode == tm.end()
@@ -590,7 +591,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			}
 			case ERASE:
 			{
-				m_pattern->addJournalCheckPoint();
+				m_clip->addJournalCheckPoint();
 
 				// On erase mode, left click removes nodes
 				if (m_mouseDownLeft)
@@ -619,7 +620,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			}
 			case DRAW_OUTVALUES:
 			{
-				m_pattern->addJournalCheckPoint();
+				m_clip->addJournalCheckPoint();
 
 				// On this mode, left click sets the outValue
 				if (m_mouseDownLeft)
@@ -641,7 +642,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 						// node and set its outValue
 						TimePos quantizedPos = Note::quantized(
 							TimePos(posTicks),
-							m_pattern->quantization()
+							m_clip->quantization()
 						);
 
 						clickedNode = tm.find(quantizedPos);
@@ -672,9 +673,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			}
 			case EDIT_TANGENTS:
 			{
-				if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression)
+				if (m_clip->progressionType() == AutomationClip::CubicHermiteProgression)
 				{
-					m_pattern->addJournalCheckPoint();
+					m_clip->addJournalCheckPoint();
 
 					// Gets the closest node to the mouse click
 					timeMap::iterator node = getClosestNode(mouseEvent->x());
@@ -727,7 +728,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 void AutomationEditor::mouseDoubleClickEvent(QMouseEvent * mouseEvent)
 {
-	if (!validPattern()) { return; }
+	if (!validClip()) { return; }
 
 	// If we double clicked outside the AutomationEditor viewport return
 	if (mouseEvent->y() <= TOP_MARGIN || mouseEvent->x() < VALUES_WIDTH) { return; }
@@ -770,7 +771,7 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 		if (m_action == MOVE_VALUE)
 		{
 			// Actually apply the value of the node being dragged
-			m_pattern->applyDragValue();
+			m_clip->applyDragValue();
 		}
 
 		QApplication::restoreOverrideCursor();
@@ -786,7 +787,7 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 {
-	if( !validPattern() )
+	if( !validClip() )
 	{
 		update();
 		return;
@@ -823,7 +824,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						m_drawLastLevel = level;
 
 						// Updates the drag value of the moved node
-						m_pattern->setDragValue(
+						m_clip->setDragValue(
 							TimePos(posTicks),
 							level,
 							true,
@@ -849,7 +850,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Removing automation nodes
 
 						// Removes all values from the last clicked tick up to the current position tick
-						m_pattern->removeNodes(m_drawLastTick, posTicks);
+						m_clip->removeNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -869,7 +870,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Removing automation nodes
 
 						// Removes all values from the last clicked tick up to the current position tick
-						m_pattern->removeNodes(m_drawLastTick, posTicks);
+						m_clip->removeNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -881,7 +882,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Reseting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
-						m_pattern->resetNodes(m_drawLastTick, posTicks);
+						m_clip->resetNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -899,7 +900,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 					if (m_action == MOVE_OUTVALUE)
 					{
 						// We are moving the outValue of the node
-						timeMap & tm = m_pattern->getTimeMap();
+						timeMap & tm = m_clip->getTimeMap();
 
 						timeMap::iterator it = tm.find(m_draggedOutValueKey);
 						// Safety check
@@ -917,7 +918,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Reseting outValues
 
 						// Resets all values from the last clicked tick up to the current position tick
-						m_pattern->resetNodes(m_drawLastTick, posTicks);
+						m_clip->resetNodes(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -933,7 +934,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				{
 					if (m_action == MOVE_TANGENT)
 					{
-						timeMap & tm = m_pattern->getTimeMap();
+						timeMap & tm = m_clip->getTimeMap();
 						timeMap::iterator it = tm.find(m_draggedTangentTick);
 
 						// Safety check
@@ -967,7 +968,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 						// Reseting tangents
 
 						// Resets all tangents from the last clicked tick up to the current position tick
-						m_pattern->resetTangents(m_drawLastTick, posTicks);
+						m_clip->resetTangents(m_drawLastTick, posTicks);
 
 						Engine::getSong()->setModified();
 					}
@@ -1007,7 +1008,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 	tt_pos.ry() -= 51;
 	tt_pos.rx() += 26;
 
-	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
+	float scaledLevel = m_clip->firstObject()->scaledValue( level );
 
 	// Limit the scaled-level tooltip to the grid
 	if( mouse_pos.x() >= 0 &&
@@ -1026,12 +1027,12 @@ inline void AutomationEditor::drawAutomationPoint(QPainter & p, timeMap::iterato
 {
 	int x = xCoordOfTick(POS(it));
 	int y;
-	// Below (m_ppb * AutomationPattern::quantization() / 576) is used because:
+	// Below (m_ppb * AutomationClip::quantization() / 576) is used because:
 	// 1 bar equals to 192/quantization() notes. Hence, to calculate the number of pixels
 	// per note we would have (m_ppb * 1 bar / (192/quantization()) notes per bar), or
 	// (m_ppb * quantization / 192). If we want 1/3 of the number of pixels per note we
 	// get (m_ppb * quantization() / 192*3) or (m_ppb * quantization() / 576)
-	const int outerRadius = qBound(3, (m_ppb * AutomationPattern::quantization()) / 576, 5);
+	const int outerRadius = qBound(3, (m_ppb * AutomationClip::quantization()) / 576, 5);
 
 	// Draw a circle for the outValue
 	y = yCoordOfLevel(OUTVAL(it));
@@ -1114,7 +1115,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	Qt::Alignment text_flags =
 		(Qt::Alignment)( Qt::AlignRight | Qt::AlignVCenter );
 
-	if( validPattern() )
+	if( validClip() )
 	{
 		if( m_y_auto )
 		{
@@ -1122,7 +1123,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			float level[] = { m_minLevel, m_maxLevel };
 			for( int i = 0; i < 2; ++i )
 			{
-				const QString & label = m_pattern->firstObject()
+				const QString & label = m_clip->firstObject()
 						->displayValue( level[i] );
 				p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::Shadow ) );
@@ -1150,7 +1151,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 			for( ; level <= m_topLevel; level += printable )
 			{
-				const QString & label = m_pattern->firstObject()
+				const QString & label = m_clip->firstObject()
 							->displayValue( level );
 				y = yCoordOfLevel( level );
 				p.setPen( QApplication::palette().color( QPalette::Active,
@@ -1173,7 +1174,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	// draw vertical raster
 
-	if( m_pattern )
+	if( m_clip )
 	{
 		int tick, x, q;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
@@ -1183,17 +1184,17 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		if( m_zoomingXModel.value() > 3 )
 		{
 			// If we're over 100% zoom, we allow all quantization level grids
-			q = AutomationPattern::quantization();
+			q = AutomationClip::quantization();
 		}
-		else if( AutomationPattern::quantization() % 3 != 0 )
+		else if( AutomationClip::quantization() % 3 != 0 )
 		{
 			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
 			// to ensure a dense doesn't fill out the background
-			q = AutomationPattern::quantization() < 8 ? 8 : AutomationPattern::quantization();
+			q = AutomationClip::quantization() < 8 ? 8 : AutomationClip::quantization();
 		}
 		else {
 			// If we're under 100% zoom, we allow quantization grid up to 1/32 for normal notes
-			q = AutomationPattern::quantization() < 6 ? 6 : AutomationPattern::quantization();
+			q = AutomationClip::quantization() < 6 ? 6 : AutomationClip::quantization();
 		}
 
 		// 3 independent loops, because quantization might not divide evenly into
@@ -1286,11 +1287,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	// following code draws all visible values
 
-	if( validPattern() )
+	if( validClip() )
 	{
 		//NEEDS Change in CSS
 		//int len_ticks = 4;
-		timeMap & time_map = m_pattern->getTimeMap();
+		timeMap & time_map = m_clip->getTimeMap();
 
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
@@ -1313,7 +1314,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 					break;
 				}
 
-				float *values = m_pattern->valuesAfter(POS(it));
+				float *values = m_clip->valuesAfter(POS(it));
 
 				// We are creating a path to draw a polygon representing the values between two
 				// nodes. When we have two nodes with discrete progression, we will basically have
@@ -1322,7 +1323,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// the value of the end of the shape between the two nodes will be the inValue of
 				// the next node.
 				float nextValue;
-				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
+				if( m_clip->progressionType() == AutomationClip::DiscreteProgression )
 				{
 					nextValue = OUTVAL(it);
 				}
@@ -1348,7 +1349,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// Draw circle
 				drawAutomationPoint(p, it);
 				// Draw tangents if necessary (only for manually edited tangents)
-				if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression
+				if (m_clip->progressionType() == AutomationClip::CubicHermiteProgression
 					&& LOCKEDTAN(it))
 				{
 					drawAutomationTangents(p, it);
@@ -1370,7 +1371,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
 			// Draw tangents if necessary (only for manually edited tangents)
-			if (m_pattern->progressionType() == AutomationPattern::CubicHermiteProgression
+			if (m_clip->progressionType() == AutomationClip::CubicHermiteProgression
 				&& LOCKEDTAN(it))
 			{
 				drawAutomationTangents(p, it);
@@ -1387,12 +1388,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		p.drawText( VALUES_WIDTH + 20, TOP_MARGIN + 40,
 				width() - VALUES_WIDTH - 20 - SCROLLBAR_SIZE,
 				grid_height - 40, Qt::TextWordWrap,
-				tr( "Please open an automation pattern with "
+				tr( "Please open an automation clip with "
 					"the context menu of a control!" ) );
 	}
 
 	// TODO: Get this out of paint event
-	int l = validPattern() ? (int) m_pattern->length() : 0;
+	int l = validClip() ? (int) m_clip->length() : 0;
 
 	// reset scroll-range
 	if( m_leftRightScroll->maximum() != l )
@@ -1401,7 +1402,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	if(validPattern() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
+	if(validClip() && GuiApplication::instance()->automationEditor()->m_editor->hasFocus())
 	{
 		drawCross( p );
 	}
@@ -1519,17 +1520,17 @@ void AutomationEditor::centerTopBottomScroll()
 {
 	// default to the m_scrollLevel position
 	int pos = static_cast<int>(m_scrollLevel);
-	// If a pattern exists...
-	if (m_pattern)
+	// If a clip exists...
+	if (m_clip)
 	{
-		// get time map of current pattern
-		timeMap & time_map = m_pattern->getTimeMap();
+		// get time map of current clip
+		timeMap & time_map = m_clip->getTimeMap();
 		// If time_map is not empty...
 		if (!time_map.empty())
 		{
 			// set the position to the inverted value ((max + min) - value)
-			// If we set just (max - value), we're off by m_pattern's minimum
-			pos = m_pattern->getMax() + m_pattern->getMin() - static_cast<int>(INVAL(time_map.begin()));
+			// If we set just (max - value), we're off by m_clip's minimum
+			pos = m_clip->getMax() + m_clip->getMin() - static_cast<int>(INVAL(time_map.begin()));
 		}
 	}
 	m_topBottomScroll->setValue(pos);
@@ -1568,7 +1569,7 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 
 	if( Engine::getSong() )
 	{
-		Engine::getSong()->getPlayPos( Song::Mode_PlayAutomationPattern
+		Engine::getSong()->getPlayPos( Song::Mode_PlayAutomationClip
 					).m_timeLine->setFixedWidth( width() );
 	}
 
@@ -1676,10 +1677,9 @@ float AutomationEditor::getLevel(int y )
 
 
 
-inline bool AutomationEditor::inBBEditor()
+inline bool AutomationEditor::inPatternEditor()
 {
-	return( validPattern() &&
-				m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
+	return (validClip() && m_clip->getTrack()->trackContainer() == Engine::patternStore());
 }
 
 
@@ -1687,17 +1687,17 @@ inline bool AutomationEditor::inBBEditor()
 
 void AutomationEditor::play()
 {
-	if( !validPattern() )
+	if( !validClip() )
 	{
 		return;
 	}
 
-	if( !m_pattern->getTrack() )
+	if( !m_clip->getTrack() )
 	{
-		if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
+		if( Engine::getSong()->playMode() != Song::Mode_PlayMidiClip )
 		{
 			Engine::getSong()->stop();
-			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
+			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 		else if( Engine::getSong()->isStopped() == false )
 		{
@@ -1705,12 +1705,12 @@ void AutomationEditor::play()
 		}
 		else
 		{
-			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
+			Engine::getSong()->playMidiClip( getGUI()->pianoRoll()->currentMidiClip() );
 		}
 	}
-	else if( inBBEditor() )
+	else if (inPatternEditor())
 	{
-		Engine::getBBTrackContainer()->play();
+		Engine::patternStore()->play();
 	}
 	else
 	{
@@ -1730,13 +1730,13 @@ void AutomationEditor::play()
 
 void AutomationEditor::stop()
 {
-	if( !validPattern() )
+	if( !validClip() )
 	{
 		return;
 	}
-	if( m_pattern->getTrack() && inBBEditor() )
+	if (m_clip->getTrack() && inPatternEditor())
 	{
-		Engine::getBBTrackContainer()->stop();
+		Engine::patternStore()->stop();
 	}
 	else
 	{
@@ -1789,12 +1789,12 @@ void AutomationEditor::setEditMode(int mode)
 
 
 
-void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes type)
+void AutomationEditor::setProgressionType(AutomationClip::ProgressionTypes type)
 {
-	if (validPattern())
+	if (validClip())
 	{
-		m_pattern->addJournalCheckPoint();
-		m_pattern->setProgressionType(type);
+		m_clip->addJournalCheckPoint();
+		m_clip->setProgressionType(type);
 		Engine::getSong()->setModified();
 		update();
 	}
@@ -1802,7 +1802,7 @@ void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes ty
 
 void AutomationEditor::setProgressionType(int type)
 {
-	setProgressionType((AutomationPattern::ProgressionTypes) type);
+	setProgressionType((AutomationClip::ProgressionTypes) type);
 }
 
 
@@ -1810,9 +1810,9 @@ void AutomationEditor::setProgressionType(int type)
 
 void AutomationEditor::setTension()
 {
-	if ( m_pattern )
+	if ( m_clip )
 	{
-		m_pattern->setTension( QString::number( m_tensionModel->value() ) );
+		m_clip->setTension( QString::number( m_tensionModel->value() ) );
 		update();
 	}
 }
@@ -1824,7 +1824,7 @@ void AutomationEditor::updatePosition(const TimePos & t )
 {
 	if( ( Engine::getSong()->isPlaying() &&
 			Engine::getSong()->playMode() ==
-					Song::Mode_PlayAutomationPattern ) ||
+					Song::Mode_PlayAutomationClip ) ||
 							m_scrollBack == true )
 	{
 		const int w = width() - VALUES_WIDTH;
@@ -1880,7 +1880,7 @@ void AutomationEditor::zoomingYChanged()
 
 void AutomationEditor::setQuantization()
 {
-	AutomationPattern::setQuantization(DefaultTicksPerBar / Quantizations[m_quantizeModel.value()]);
+	AutomationClip::setQuantization(DefaultTicksPerBar / Quantizations[m_quantizeModel.value()]);
 
 	update();
 }
@@ -1954,8 +1954,8 @@ AutomationEditor::timeMap::iterator AutomationEditor::getNodeAt(int x, int y, bo
 	// Convert the x position to the position in ticks
 	int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
-	// Get our pattern timeMap and create a iterator so we can check the nodes
-	timeMap & tm = m_pattern->getTimeMap();
+	// Get our clip timeMap and create a iterator so we can check the nodes
+	timeMap & tm = m_clip->getTimeMap();
 	timeMap::iterator it = tm.begin();
 
 	// ticksOffset is the number of ticks that match "r" pixels
@@ -2005,7 +2005,7 @@ AutomationEditor::timeMap::iterator AutomationEditor::getClosestNode(int x)
 	int posTicks = (x * TimePos::ticksPerBar() / m_ppb) + m_currentPosition;
 
 	// Get our pattern timeMap and create a iterator so we can check the nodes
-	timeMap & tm = m_pattern->getTimeMap();
+	timeMap & tm = m_clip->getTimeMap();
 
 	if (tm.isEmpty()) { return tm.end(); }
 
@@ -2057,9 +2057,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 
 	// Play/stop buttons
-	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ));
+	m_playAction->setToolTip(tr( "Play/pause current clip (Space)" ));
 
-	m_stopAction->setToolTip(tr("Stop playing of current pattern (Space)"));
+	m_stopAction->setToolTip(tr("Stop playing of current clip (Space)"));
 
 	// Edit mode buttons
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
@@ -2110,7 +2110,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 	m_tensionKnob->setModel(m_editor->m_tensionModel);
-	ToolTip::add(m_tensionKnob, tr("Tension value for spline"));
+	m_tensionKnob->setToolTip(tr("Tension value for spline"));
 
 	connect(m_cubicHermiteAction, SIGNAL(toggled(bool)), m_tensionKnob, SLOT(setEnabled(bool)));
 
@@ -2144,8 +2144,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingXComboBox->setModel( &m_editor->m_zoomingXModel );
 
-	connect( &m_editor->m_zoomingXModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingXChanged() ) );
+	connect( &m_editor->m_zoomingXModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingXChanged()));
 
 
 	QLabel * zoom_y_label = new QLabel( zoomToolBar );
@@ -2164,8 +2164,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingYComboBox->setModel( &m_editor->m_zoomingYModel );
 
-	connect( &m_editor->m_zoomingYModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingYChanged() ) );
+	connect( &m_editor->m_zoomingYModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingYChanged()));
 
 	zoomToolBar->addWidget( zoom_x_label );
 	zoomToolBar->addWidget( m_zoomingXComboBox );
@@ -2197,67 +2197,62 @@ AutomationEditorWindow::AutomationEditorWindow() :
 }
 
 
-AutomationEditorWindow::~AutomationEditorWindow()
+void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 {
-}
-
-
-void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
-{
-	// Disconnect our old pattern
-	if (currentPattern() != nullptr)
+	// Disconnect our old clip
+	if (currentClip() != nullptr)
 	{
-		m_editor->m_pattern->disconnect(this);
+		m_editor->m_clip->disconnect(this);
 		m_flipXAction->disconnect();
 		m_flipYAction->disconnect();
 	}
 
-	m_editor->setCurrentPattern(pattern);
+	m_editor->setCurrentClip(clip);
 
 	// Set our window's title
-	if (pattern == nullptr)
+	if (clip == nullptr)
 	{
-		setWindowTitle( tr( "Automation Editor - no pattern" ) );
+		setWindowTitle( tr( "Automation Editor - no clip" ) );
 		return;
 	}
 
-	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_pattern->name() ) );
+	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 
 
-	switch(m_editor->m_pattern->progressionType())
+	switch(m_editor->m_clip->progressionType())
 	{
-	case AutomationPattern::DiscreteProgression:
+	case AutomationClip::DiscreteProgression:
 		m_discreteAction->setChecked(true);
 		m_tensionKnob->setEnabled(false);
 		break;
-	case AutomationPattern::LinearProgression:
+	case AutomationClip::LinearProgression:
 		m_linearAction->setChecked(true);
 		m_tensionKnob->setEnabled(false);
 		break;
-	case AutomationPattern::CubicHermiteProgression:
+	case AutomationClip::CubicHermiteProgression:
 		m_cubicHermiteAction->setChecked(true);
 		m_tensionKnob->setEnabled(true);
 		break;
 	}
 
-	// Connect new pattern
-	if (pattern)
+	// Connect new clip
+	if (clip)
 	{
-		connect(pattern, SIGNAL(dataChanged()), this, SLOT(update()));
-		connect( pattern, SIGNAL( dataChanged() ), this, SLOT( updateWindowTitle() ) );
-		connect(pattern, SIGNAL(destroyed()), this, SLOT(clearCurrentPattern()));
+		connect(clip, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect( clip, SIGNAL(dataChanged()), this, SLOT(updateWindowTitle()));
+		connect(clip, SIGNAL(destroyed()), this, SLOT(clearCurrentClip()));
 
-		connect(m_flipXAction, SIGNAL(triggered()), pattern, SLOT(flipX()));
-		connect(m_flipYAction, SIGNAL(triggered()), pattern, SLOT(flipY()));
+		connect(m_flipXAction, SIGNAL(triggered()), clip, SLOT(flipX()));
+		connect(m_flipYAction, SIGNAL(triggered()), clip, SLOT(flipY()));
 	}
 
-	emit currentPatternChanged();
+	emit currentClipChanged();
 }
 
 
-const AutomationPattern* AutomationEditorWindow::currentPattern()
+const AutomationClip* AutomationEditorWindow::currentClip()
 {
-	return m_editor->currentPattern();
+	return m_editor->currentClip();
 }
 
 void AutomationEditorWindow::dropEvent( QDropEvent *_de )
@@ -2271,16 +2266,16 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 					journallingObject( val.toInt() ) );
 		if (mod != nullptr)
 		{
-			bool added = m_editor->m_pattern->addObject( mod );
+			bool added = m_editor->m_clip->addObject( mod );
 			if ( !added )
 			{
 				TextFloat::displayMessage( mod->displayName(),
 							   tr( "Model is already connected "
-							   "to this pattern." ),
+							   "to this clip." ),
 							   embed::getIconPixmap( "automation" ),
 							   2000 );
 			}
-			setCurrentPattern( m_editor->m_pattern );
+			setCurrentClip( m_editor->m_clip );
 		}
 	}
 
@@ -2289,15 +2284,15 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 
 void AutomationEditorWindow::dragEnterEvent( QDragEnterEvent *_dee )
 {
-	if (! m_editor->validPattern() ) {
+	if (! m_editor->validClip() ) {
 		return;
 	}
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 
-void AutomationEditorWindow::open(AutomationPattern* pattern)
+void AutomationEditorWindow::open(AutomationClip* clip)
 {
-	setCurrentPattern(pattern);
+	setCurrentClip(clip);
 	parentWidget()->show();
 	show();
 	setFocus();
@@ -2308,10 +2303,10 @@ QSize AutomationEditorWindow::sizeHint() const
 	return {INITIAL_WIDTH, INITIAL_HEIGHT};
 }
 
-void AutomationEditorWindow::clearCurrentPattern()
+void AutomationEditorWindow::clearCurrentClip()
 {
-	m_editor->m_pattern = nullptr;
-	setCurrentPattern(nullptr);
+	m_editor->m_clip = nullptr;
+	setCurrentClip(nullptr);
 }
 
 void AutomationEditorWindow::focusInEvent(QFocusEvent * event)
@@ -2332,13 +2327,13 @@ void AutomationEditorWindow::stop()
 
 void AutomationEditorWindow::updateWindowTitle()
 {
-	if (m_editor->m_pattern == nullptr)
+	if (m_editor->m_clip == nullptr)
 	{
-		setWindowTitle( tr( "Automation Editor - no pattern" ) );
+		setWindowTitle( tr( "Automation Editor - no clip" ) );
 		return;
 	}
 
-	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_pattern->name() ) );
+	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 }
 
 /**
@@ -2352,7 +2347,7 @@ void AutomationEditorWindow::updateWindowTitle()
  */
 void AutomationEditorWindow::setProgressionType(int progType)
 {
-	if (progType != AutomationPattern::CubicHermiteProgression)
+	if (progType != AutomationClip::CubicHermiteProgression)
 	{
 		if (m_editTanAction->isChecked()) { m_drawAction->trigger(); }
 		if (m_editTanAction->isEnabled()) { m_editTanAction->setEnabled(false); }
@@ -2363,3 +2358,5 @@ void AutomationEditorWindow::setProgressionType(int progType)
 	}
 	m_editor->setProgressionType(progType);
 }
+
+} // namespace lmms::gui

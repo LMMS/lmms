@@ -30,17 +30,18 @@
 #include "PluginView.h"
 
 
+namespace lmms
+{
+
 class DummyPlugin : public Plugin
 {
 public:
 	DummyPlugin() :
-		Plugin( NULL, NULL )
+		Plugin( nullptr, nullptr )
 	{
 	}
 
-	virtual ~DummyPlugin()
-	{
-	}
+	~DummyPlugin() override = default;
 
 	void saveSettings( QDomDocument &, QDomElement & ) override
 	{
@@ -57,12 +58,14 @@ public:
 
 
 protected:
-	PluginView * instantiateView( QWidget * _parent ) override
+	gui::PluginView * instantiateView( QWidget * _parent ) override
 	{
-		return new PluginView( this, _parent );
+		return new gui::PluginView( this, _parent );
 	}
 
 } ;
 
+
+} // namesplace lmms
 
 #endif

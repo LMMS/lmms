@@ -24,6 +24,7 @@
  */
 
 
+#include <QApplication>
 #include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -37,25 +38,30 @@
 #include <QStringList>
 
 #include "FileBrowser.h"
-#include "BBTrackContainer.h"
+#include "AudioEngine.h"
 #include "ConfigManager.h"
 #include "DataFile.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "InstrumentTrackWindow.h"
 #include "MainWindow.h"
-#include "Mixer.h"
+#include "PatternStore.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
+#include "SampleClip.h"
 #include "SamplePlayHandle.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
+
+namespace lmms::gui
+{
+
 
 enum TreeWidgetItemTypes
 {
@@ -119,14 +125,14 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_filterEdit = new QLineEdit( searchWidget );
 	m_filterEdit->setPlaceholderText( tr("Search") );
 	m_filterEdit->setClearButtonEnabled( true );
-	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
-			this, SLOT( filterItems( const QString & ) ) );
+	connect( m_filterEdit, SIGNAL( textEdited( const QString& ) ),
+			this, SLOT( filterItems( const QString& ) ) );
 
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
 						QString(), searchWidget );
 	reload_btn->setToolTip( tr( "Refresh list" ) );
-	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
+	connect( reload_btn, SIGNAL(clicked()), this, SLOT(reloadTree()));
 
 	searchWidgetLayout->addWidget( m_filterEdit );
 	searchWidgetLayout->addSpacing( 5 );
@@ -138,7 +144,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	addContentWidget( m_fileBrowserTreeWidget );
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
-	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()) );
+	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()));
 	filterFocusShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
 	reloadTree();
@@ -195,7 +201,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 }
 
 
-void FileBrowser::reloadTree( void )
+void FileBrowser::reloadTree()
 {
 	QList<QString> expandedDirs = m_fileBrowserTreeWidget->expandedDirs();
 	const QString text = m_filterEdit->text();
@@ -366,19 +372,21 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	QTreeWidget( parent ),
 	m_mousePressed( false ),
 	m_pressPos(),
-	m_previewPlayHandle( nullptr ),
-	m_pphMutex( QMutex::Recursive )
+	m_previewPlayHandle( nullptr )
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+	,m_pphMutex(QMutex::Recursive)
+#endif
 {
 	setColumnCount( 1 );
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
 
-	connect( this, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
-			SLOT( activateListItem( QTreeWidgetItem *, int ) ) );
-	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem * ) ),
-				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
-	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
-				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
+	connect( this, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),
+			SLOT(activateListItem(QTreeWidgetItem*,int)));
+	connect( this, SIGNAL(itemCollapsed(QTreeWidgetItem*)),
+				SLOT(updateDirectory(QTreeWidgetItem*)));
+	connect( this, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+				SLOT(updateDirectory(QTreeWidgetItem*)));
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 12, 2) && defined LMMS_BUILD_WIN32
 	// Set the font for the QTreeWidget to the Windows System font to make sure that
@@ -449,7 +457,7 @@ void FileBrowserTreeWidget::keyPressEvent(QKeyEvent * ke )
 	// When enter is pressed, add the selected item...
 	if (insert)
 	{
-		// ...to the song editor by default, or to the BB editor if ctrl is held
+		// ...to the song editor by default, or to the pattern editor if ctrl is held
 		bool songEditor = !(ke->modifiers() & Qt::ControlModifier);
 		// If shift is held, we send the item to a new sample track...
 		bool sampleTrack = ke->modifiers() & Qt::ShiftModifier;
@@ -520,9 +528,9 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 		contextMenu.addAction( songEditorHeader );
 		contextMenu.addActions( getContextActions(file, true) );
 
-		QAction* bbEditorHeader = new QAction( tr("BB Editor"), nullptr );
-		bbEditorHeader->setDisabled(true);
-		contextMenu.addAction( bbEditorHeader );
+		QAction* patternEditorHeader = new QAction(tr("Pattern Editor"), nullptr);
+		patternEditorHeader->setDisabled(true);
+		contextMenu.addAction(patternEditorHeader);
 		contextMenu.addActions( getContextActions(file, false) );
 
 		// We should only show the menu if it contains items
@@ -571,11 +579,11 @@ QList<QAction*> FileBrowserTreeWidget::getContextActions(FileItem* file, bool so
 void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
 	// Forward the event
+	QTreeWidgetItem * i = itemAt(me->pos());
 	QTreeWidget::mousePressEvent(me);
 	// QTreeWidget handles right clicks for us, so we only care about left clicks
 	if(me->button() != Qt::LeftButton) { return; }
 
-	QTreeWidgetItem * i = itemAt(me->pos());
 	if (i)
 	{
 		// TODO: Restrict to visible selection
@@ -626,7 +634,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 	else if (
 		(ext == "xiz" || ext == "sf2" || ext == "sf3" ||
 		 ext == "gig" || ext == "pat")
-		&& !pluginFactory->pluginSupportingExtension(ext).isNull())
+		&& !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
 		const bool isPlugin = file->handling() == FileItem::LoadByPlugin;
 		newPPH = new PresetPreviewPlayHandle(fileName, isPlugin);
@@ -650,7 +658,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 
 	if (newPPH != nullptr)
 	{
-		if (Engine::mixer()->addPlayHandle(newPPH))
+		if (Engine::audioEngine()->addPlayHandle(newPPH))
 		{
 			m_previewPlayHandle = newPPH;
 		}
@@ -666,7 +674,7 @@ void FileBrowserTreeWidget::stopPreview()
 	QMutexLocker previewLocker(&m_pphMutex);
 	if (m_previewPlayHandle != nullptr)
 	{
-		Engine::mixer()->removePlayHandle(m_previewPlayHandle);
+		Engine::audioEngine()->removePlayHandle(m_previewPlayHandle);
 		m_previewPlayHandle = nullptr;
 	}
 }
@@ -751,11 +759,11 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 {
-	Engine::mixer()->requestChangeInModel();
+	Engine::audioEngine()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
-			if( gui->mainWindow()->mayChangeProject(true) )
+			if( getGUI()->mainWindow()->mayChangeProject(true) )
 			{
 				Engine::getSong()->loadProject( f->fullName() );
 			}
@@ -769,22 +777,18 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 				!i->descriptor()->supportsFileType( e ) )
 			{
 				PluginFactory::PluginInfoAndKey piakn =
-					pluginFactory->pluginSupportingExtension(e);
+					getPluginFactory()->pluginSupportingExtension(e);
 				i = it->loadInstrument(piakn.info.name(), &piakn.key);
 			}
 			i->loadFile( f->fullName() );
 			break;
 		}
 
-		case FileItem::LoadAsPreset:
-		{
-			DataFile dataFile( f->fullName() );
-			InstrumentTrack::removeMidiPortNode( dataFile );
-			it->setSimpleSerializing();
-			it->loadSettings( dataFile.content().toElement() );
+		case FileItem::LoadAsPreset: {
+			DataFile dataFile(f->fullName());
+			it->replaceInstrument(dataFile);
 			break;
 		}
-
 		case FileItem::ImportAsProject:
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
@@ -795,7 +799,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it)
 			break;
 
 	}
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -818,8 +822,8 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	else if( f->handling() != FileItem::NotSupported )
 	{
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-					Engine::getBBTrackContainer() ) );
+			Track::create(Track::InstrumentTrack, Engine::patternStore())
+		);
 		handleFile( f, it );
 	}
 }
@@ -844,7 +848,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack(FileItem* item, bool songEd
 {
 	// Get the correct TrackContainer. Ternary doesn't compile here
 	TrackContainer* tc = Engine::getSong();
-	if (!songEditor) { tc = Engine::getBBTrackContainer(); }
+	if (!songEditor) { tc = Engine::patternStore(); }
 	openInNewInstrumentTrack(tc, item);
 }
 
@@ -861,10 +865,10 @@ bool FileBrowserTreeWidget::openInNewSampleTrack(FileItem* item)
 		Track::create(Track::SampleTrack, Engine::getSong()));
 
 	// Add the sample clip to the track
-	Engine::mixer()->requestChangeInModel();
-	SampleTCO* clip = static_cast<SampleTCO*>(sampleTrack->createTCO(0));
+	Engine::audioEngine()->requestChangeInModel();
+	SampleClip* clip = static_cast<SampleClip*>(sampleTrack->createClip(0));
 	clip->setSampleFile(item->fullName());
-	Engine::mixer()->doneChangeInModel();
+	Engine::audioEngine()->doneChangeInModel();
 	return true;
 }
 
@@ -890,7 +894,7 @@ void FileBrowserTreeWidget::sendToActiveInstrumentTrack( FileItem* item )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
-			gui->mainWindow()->workspace()->
+			getGUI()->mainWindow()->workspace()->
 				subWindowList( QMdiArea::StackingOrder );
 	QListIterator<QMdiSubWindow *> w( pl );
 	w.toBack();
@@ -955,7 +959,7 @@ Directory::Directory(const QString & filename, const QString & path,
 
 
 
-void Directory::initPixmaps( void )
+void Directory::initPixmaps()
 {
 	if( s_folderPixmap == nullptr )
 	{
@@ -979,7 +983,7 @@ void Directory::initPixmaps( void )
 
 
 
-void Directory::update( void )
+void Directory::update()
 {
 	if( !isExpanded() )
 	{
@@ -1142,7 +1146,7 @@ FileItem::FileItem(const QString & name, const QString & path ) :
 
 
 
-void FileItem::initPixmaps( void )
+void FileItem::initPixmaps()
 {
 	if( s_projectFilePixmap == nullptr )
 	{
@@ -1217,7 +1221,7 @@ void FileItem::initPixmaps( void )
 
 
 
-void FileItem::determineFileType( void )
+void FileItem::determineFileType()
 {
 	m_handling = NotSupported;
 
@@ -1232,7 +1236,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
 	}
-	else if( ext == "xiz" && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
@@ -1245,12 +1249,16 @@ void FileItem::determineFileType( void )
 	{
 		m_type = PatchFile;
 	}
-	else if( ext == "mid" )
+	else if( ext == "mid" || ext == "midi" || ext == "rmi" )
 	{
 		m_type = MidiFile;
 		m_handling = ImportAsProject;
 	}
-	else if( ext == "dll" )
+	else if( ext == "dll"
+#ifdef LMMS_BUILD_LINUX
+		|| ext == "so" 
+#endif
+	)
 	{
 		m_type = VstPluginFile;
 		m_handling = LoadByPlugin;
@@ -1266,7 +1274,7 @@ void FileItem::determineFileType( void )
 	}
 
 	if( m_handling == NotSupported &&
-		!ext.isEmpty() && ! pluginFactory->pluginSupportingExtension(ext).isNull() )
+		!ext.isEmpty() && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_handling = LoadByPlugin;
 		// classify as sample if not classified by anything yet but can
@@ -1281,7 +1289,7 @@ void FileItem::determineFileType( void )
 
 
 
-QString FileItem::extension( void )
+QString FileItem::extension()
 {
 	return extension( fullName() );
 }
@@ -1293,3 +1301,6 @@ QString FileItem::extension(const QString & file )
 {
 	return QFileInfo( file ).suffix().toLower();
 }
+
+
+} // namespace lmms::gui

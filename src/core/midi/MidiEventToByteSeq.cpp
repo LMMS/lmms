@@ -29,6 +29,10 @@
 #include "MidiEvent.h"
 
 
+namespace lmms
+{
+
+
 std::size_t writeToByteSeq(
 	const MidiEvent& ev, uint8_t *data, std::size_t bufsize)
 {
@@ -105,3 +109,5 @@ std::size_t writeToByteSeq(
 	return size;
 }
 
+
+} // namespace lmms

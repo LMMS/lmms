@@ -28,7 +28,10 @@
 
 #include "BitcrushControls.h"
 #include "Bitcrush.h"
-#include "lmms_math.h"
+
+namespace lmms
+{
+
 
 
 BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
@@ -47,12 +50,9 @@ BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	m_rate.setStrictStepSize( true );
 	m_levels.setStrictStepSize( true );
 	
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }
 
-BitcrushControls::~BitcrushControls()
-{
-}
 
 void BitcrushControls::saveSettings( QDomDocument & doc, QDomElement & elem )
 {
@@ -87,3 +87,6 @@ void BitcrushControls::sampleRateChanged()
 {
 	m_effect->sampleRateChanged();
 }
+
+
+} // namespace lmms
