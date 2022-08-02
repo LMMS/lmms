@@ -115,8 +115,8 @@ void MidiClip::resizeToFirstTrack()
 		{
 			if (track != m_instrumentTrack)
 			{
-				unsigned int currentClip = m_instrumentTrack->
-					getClips().indexOf(this);
+				unsigned int currentClip = std::distance(m_instrumentTrack->getClips().begin(),
+					std::find(m_instrumentTrack->getClips().begin(), m_instrumentTrack->getClips().end(), this));
 				m_steps = static_cast<MidiClip *>
 					(track->getClip(currentClip))
 					->m_steps;
@@ -218,17 +218,14 @@ Note * MidiClip::addNote( const Note & _new_note, const bool _quant_pos )
 void MidiClip::removeNote( Note * _note_to_del )
 {
 	instrumentTrack()->lock();
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+
+	m_notes.erase(std::remove_if(m_notes.begin(), m_notes.end(), [&](Note* note)
 	{
-		if( *it == _note_to_del )
-		{
-			delete *it;
-			m_notes.erase( it );
-			break;
-		}
-		++it;
-	}
+		bool shouldRemove = note == _note_to_del;
+		if (shouldRemove) { delete note; }
+		return shouldRemove;
+	}), m_notes.end());
+
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -269,6 +266,7 @@ void MidiClip::clearNotes()
 	{
 		delete note;
 	}
+
 	m_notes.clear();
 	instrumentTrack()->unlock();
 
@@ -354,16 +352,15 @@ void MidiClip::setType( MidiClipTypes _new_clip_type )
 
 void MidiClip::checkType()
 {
-	NoteVector::Iterator it = m_notes.begin();
-	while( it != m_notes.end() )
+	for (auto& note : m_notes)
 	{
-		if( ( *it )->length() > 0 )
+		if (note->length() > 0)
 		{
-			setType( MelodyClip );
+			setType(MelodyClip);
 			return;
 		}
-		++it;
 	}
+
 	setType( BeatClip );
 }
 
@@ -374,7 +371,7 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "type", m_clipType );
 	_this.setAttribute( "name", name() );
-	
+
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
@@ -395,9 +392,9 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "steps", m_steps );
 
 	// now save settings of all notes
-	for (const auto& note : m_notes)
+	for (auto& note : m_notes)
 	{
-		note->saveState( _doc, _this );
+		note->saveState(_doc, _this);
 	}
 }
 
@@ -409,7 +406,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	m_clipType = static_cast<MidiClipTypes>( _this.attribute( "type"
 								).toInt() );
 	setName( _this.attribute( "name" ) );
-	
+
 	if( _this.hasAttribute( "color" ) )
 	{
 		useCustomClipColor( true );
@@ -419,7 +416,7 @@ void MidiClip::loadSettings( const QDomElement & _this )
 	{
 		useCustomClipColor(false);
 	}
-	
+
 	if( _this.attribute( "pos" ).toInt() >= 0 )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
@@ -477,9 +474,9 @@ MidiClip *  MidiClip::nextMidiClip() const
 
 MidiClip * MidiClip::adjacentMidiClipByOffset(int offset) const
 {
-	QVector<Clip *> clips = m_instrumentTrack->getClips();
+	std::vector<Clip *> clips = m_instrumentTrack->getClips();
 	int clipNum = m_instrumentTrack->getClipNum(this);
-	return dynamic_cast<MidiClip*>(clips.value(clipNum + offset, nullptr));
+	return (clipNum < 0 || clipNum > clips.size() - 1) ? nullptr : dynamic_cast<MidiClip*>(clips[clipNum + offset]);
 }
 
 
@@ -578,6 +575,7 @@ bool MidiClip::empty()
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -587,6 +585,7 @@ bool MidiClip::empty()
 void MidiClip::changeTimeSignature()
 {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
+
 	for (const auto& note : m_notes)
 	{
 		if (note->length() < 0 && note->pos() > last_pos)
@@ -594,6 +593,7 @@ void MidiClip::changeTimeSignature()
 			last_pos = note->pos() + TimePos::ticksPerBar() / TimePos::stepsPerBar();
 		}
 	}
+
 	last_pos = last_pos.nextFullBar() * TimePos::ticksPerBar();
 	m_steps = qMax<tick_t>( TimePos::stepsPerBar(),
 				last_pos.getBar() * TimePos::stepsPerBar() );
