@@ -206,6 +206,7 @@ jobs:
           path: C:\vcpkg\installed
       - name: Install 64-bit Qt
         if: matrix.arch == 'x64'
+        # Temporary workaround until upstream install-qt-action is fixed
         uses: PhysSong/install-qt-action@v3
         with:
           version: ${{ env.qt-version }}
