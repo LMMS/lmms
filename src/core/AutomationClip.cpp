@@ -997,8 +997,10 @@ void AutomationClip::resolveAllIDs()
 	TrackContainer::TrackList l;
 
 	auto& tracks = Engine::getSong()->tracks();
+	l.insert(l.end(), tracks.begin(), tracks.end());
+
 	auto& patternStoreTracks = Engine::patternStore()->tracks();
-	l.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
+	l.insert(l.end(), patternStoreTracks.begin(), patternStoreTracks.end());
 
 	l.push_back(Engine::getSong()->globalAutomationTrack());
 	for (const auto& track : l)
