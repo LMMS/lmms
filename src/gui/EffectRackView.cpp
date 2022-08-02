@@ -103,7 +103,7 @@ void EffectRackView::moveUp( EffectView* view )
 	if( view != m_effectViews.first() )
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
+		for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
 					it != m_effectViews.end(); it++, i++ )
 		{
 			if( *it == view )
@@ -196,7 +196,7 @@ void EffectRackView::update()
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
 
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
+	for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
 					it != m_effectViews.end(); i++ )
 	{
 		if( i < view_map.size() && view_map[i] == false )
