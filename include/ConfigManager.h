@@ -239,8 +239,8 @@ public:
 
 	void addRecentlyOpenedProject(const QString & _file);
 
-	const QString & value(const QString & cls,
-					const QString & attribute) const;
+	const QString value(const QString & cls, const QString & attribute) const;
+	
 	const QString & value(const QString & cls,
 					const QString & attribute,
 					const QString & defaultVal) const;

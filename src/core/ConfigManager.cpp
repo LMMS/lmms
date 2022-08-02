@@ -169,9 +169,9 @@ void ConfigManager::upgrade()
 			(this->*um)();
 		}
 	);
-	
+
 	ProjectVersion createdWith = m_version;
-	
+
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
 	if (createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION)
 	{
@@ -334,10 +334,10 @@ void ConfigManager::addRecentlyOpenedProject(const QString & file)
 
 
 
-const QString & ConfigManager::value(const QString & cls,
+const QString ConfigManager::value(const QString & cls,
 					const QString & attribute) const
 {
-	if(m_settings.contains(cls))
+	if (m_settings.contains(cls))
 	{
 		for (const auto& setting : m_settings[cls])
 		{
@@ -347,10 +347,8 @@ const QString & ConfigManager::value(const QString & cls,
 			}
 		}
 	}
-	static QString empty;
-	return empty;
+	return "";
 }
-
 
 
 const QString & ConfigManager::value(const QString & cls,
