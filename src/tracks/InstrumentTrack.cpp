@@ -739,7 +739,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		// get all notes from the given clip...
 		const NoteVector & notes = c->notes();
 		// ...and set our index to zero
-		NoteVector::ConstIterator nit = notes.begin();
+		auto nit = notes.begin();
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
@@ -748,7 +748,7 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		if( cur_start > 0 )
 		{
 			// skip notes which are posated before start-bar
-			while( nit != notes.end() && ( *nit )->pos() < cur_start )
+			while (nit != notes.end() && (*nit)->pos() < cur_start)
 			{
 				++nit;
 			}
@@ -986,18 +986,18 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
 	setSimpleSerializing();
-	
+
 	//Replacing an instrument shouldn't change the solo/mute state.
 	bool oldMute = isMuted();
 	bool oldSolo = isSolo();
 	bool oldMutedBeforeSolo = isMutedBeforeSolo();
 
 	loadSettings(dataFile.content().toElement());
-	
+
 	setMuted(oldMute);
 	setSolo(oldSolo);
 	setMutedBeforeSolo(oldMutedBeforeSolo);
-	
+
 	m_mixerChannelModel.setValue(mixerChannel);
 	Engine::getSong()->setModified();
 }
