@@ -120,19 +120,19 @@ bool AutomationClip::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	QMutexLocker m(&m_clipMutex);
 
-	if( _search_dup && m_objects.contains(_obj) )
+	if (_search_dup && std::find(m_objects.begin(), m_objects.end(), _obj) != m_objects.end())
 	{
 		return false;
 	}
 
 	// the automation track is unconnected and there is nothing in the track
-	if( m_objects.isEmpty() && hasAutomation() == false )
+	if (m_objects.empty() && hasAutomation() == false)
 	{
 		// then initialize first value
 		putValue( TimePos(0), _obj->inverseScaledValue( _obj->value<float>() ), false );
 	}
 
-	m_objects += _obj;
+	m_objects.push_back(_obj);
 
 	connect( _obj, SIGNAL(destroyed(lmms::jo_id_t)),
 			this, SLOT(objectDestroyed(lmms::jo_id_t)),
@@ -184,7 +184,7 @@ const AutomatableModel * AutomationClip::firstObject() const
 	QMutexLocker m(&m_clipMutex);
 
 	AutomatableModel* model;
-	if (!m_objects.isEmpty() && (model = m_objects.first()) != nullptr)
+	if (!m_objects.empty() && (model = m_objects.front()) != nullptr)
 	{
 		return model;
 	}
@@ -865,9 +865,9 @@ QString AutomationClip::name() const
 	{
 		return Clip::name();
 	}
-	if( !m_objects.isEmpty() && m_objects.first() != nullptr )
+	if (!m_objects.empty() && m_objects.front() != nullptr)
 	{
-		return m_objects.first()->fullDisplayName();
+		return m_objects.front()->fullDisplayName();
 	}
 	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
@@ -889,9 +889,9 @@ gui::ClipView * AutomationClip::createView( gui::TrackView * _tv )
 bool AutomationClip::isAutomated( const AutomatableModel * _m )
 {
 	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::patternStore()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+
+	auto& songTracks = Engine::getSong()->tracks();
+	l.insert(l.end(), songTracks.begin(), songTracks.end());
 
 	for (const auto& track : l)
 	{
@@ -924,13 +924,18 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel* _m)
 {
 	std::vector<AutomationClip *> clips;
-	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
-	tracks += Engine::getSong()->globalAutomationTrack();
+	TrackContainer::TrackList l;
+
+	auto& songTracks = Engine::getSong()->tracks();
+	l.insert(l.end(), songTracks.begin(), songTracks.end());
+
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	l.insert(l.end(), patternStoreTracks.begin(), patternStoreTracks.end());
+
+	l.push_back(Engine::getSong()->globalAutomationTrack());
 
 	// go through all tracks...
-	for (const auto& track : tracks)
+	for (const auto track : l)
 	{
 		// we want only automation tracks...
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack )
@@ -953,7 +958,7 @@ std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableMod
 						}
 					}
 					// if the clips is connected to the model, add it to the list
-					if( has_object ) { clips.push_back(a); }
+					if (has_object) { clips.push_back(a); }
 				}
 			}
 		}
@@ -989,9 +994,13 @@ AutomationClip * AutomationClip::globalAutomationClip(
 
 void AutomationClip::resolveAllIDs()
 {
-	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-				Engine::patternStore()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	TrackContainer::TrackList l;
+
+	auto& tracks = Engine::getSong()->tracks();
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+	l.insert(tracks.end(), patternStoreTracks.begin(), patternStoreTracks.end());
+
+	l.push_back(Engine::getSong()->globalAutomationTrack());
 	for (const auto& track : l)
 	{
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
@@ -1062,14 +1071,13 @@ void AutomationClip::objectDestroyed( jo_id_t _id )
 	// clip of the destroyed object
 	m_idsToResolve.push_back(_id);
 
-	for( objectVector::Iterator objIt = m_objects.begin();
-		objIt != m_objects.end(); objIt++ )
+	for (auto objIt = m_objects.begin(); objIt != m_objects.end(); objIt++)
 	{
-		Q_ASSERT( !(*objIt).isNull() );
-		if( (*objIt)->id() == _id )
+		Q_ASSERT(!(*objIt).isNull());
+		if((*objIt)->id() == _id)
 		{
 			//Assign to objIt so that this loop work even break; is removed.
-			objIt = m_objects.erase( objIt );
+			objIt = m_objects.erase(objIt);
 			break;
 		}
 	}
