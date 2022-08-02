@@ -53,7 +53,7 @@ ControllerConnection::ControllerConnection(Controller * _controller) :
 		m_controller = Controller::create( Controller::DummyController,
 									nullptr );
 	}
-	s_connections.append( this );
+	s_connections.push_back(this);
 }
 
 
@@ -64,7 +64,7 @@ ControllerConnection::ControllerConnection( int _controllerId ) :
 	m_controllerId( _controllerId ),
 	m_ownsController( false )
 {
-	s_connections.append( this );
+	s_connections.push_back(this);
 }
 
 
@@ -76,7 +76,10 @@ ControllerConnection::~ControllerConnection()
 	{
 		m_controller->removeConnection( this );
 	}
-	s_connections.remove( s_connections.indexOf( this ) );
+
+	auto it = std::find(s_connections.begin(), s_connections.end(), this);
+	if (it != s_connections.end()) { s_connections.erase(it); };
+
 	if( m_ownsController )
 	{
 		delete m_controller;
