@@ -60,8 +60,10 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "ToolTip.h"
 
+
+namespace lmms::gui
+{
 
 QPixmap * AutomationEditor::s_toolDraw = nullptr;
 QPixmap * AutomationEditor::s_toolErase = nullptr;
@@ -108,11 +110,11 @@ AutomationEditor::AutomationEditor() :
 	m_crossColor(0, 0, 0),
 	m_backgroundShade(0, 0, 0)
 {
-	connect( this, SIGNAL( currentClipChanged() ),
-				this, SLOT( updateAfterClipChange() ),
+	connect( this, SIGNAL(currentClipChanged()),
+				this, SLOT(updateAfterClipChange()),
 				Qt::QueuedConnection );
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-						this, SLOT( update() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+						this, SLOT(update()));
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
@@ -120,15 +122,15 @@ AutomationEditor::AutomationEditor() :
 	setLayoutDirection( Qt::LeftToRight );
 
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
-	connect( m_tensionModel, SIGNAL( dataChanged() ),
-				this, SLOT( setTension() ) );
+	connect( m_tensionModel, SIGNAL(dataChanged()),
+				this, SLOT(setTension()));
 
 	for (auto q : Quantizations) {
 		m_quantizeModel.addItem(QString("1/%1").arg(q));
 	}
 
-	connect( &m_quantizeModel, SIGNAL(dataChanged() ),
-					this, SLOT( setQuantization() ) );
+	connect( &m_quantizeModel, SIGNAL(dataChanged()),
+					this, SLOT(setQuantization()));
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
 	if (s_toolYFlip == nullptr)
@@ -148,22 +150,22 @@ AutomationEditor::AutomationEditor() :
 					Song::Mode_PlayAutomationClip ),
 					m_currentPosition,
 					Song::Mode_PlayAutomationClip, this );
-	connect( this, SIGNAL( positionChanged( const TimePos & ) ),
-		m_timeLine, SLOT( updatePosition( const TimePos & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const TimePos & ) ),
-			this, SLOT( updatePosition( const TimePos & ) ) );
+	connect( this, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+		m_timeLine, SLOT( updatePosition( const lmms::TimePos& ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const lmms::TimePos& ) ),
+			this, SLOT( updatePosition( const lmms::TimePos& ) ) );
 
 	// init scrollbars
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
-	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( horScrolled( int ) ) );
+	connect( m_leftRightScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(horScrolled(int)));
 
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
 	m_topBottomScroll->setPageStep( 20 );
-	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( verScrolled( int ) ) );
+	connect( m_topBottomScroll, SIGNAL(valueChanged(int)), this,
+						SLOT(verScrolled(int)));
 
 	// init pixmaps
 	if (s_toolDraw == nullptr)
@@ -1878,7 +1880,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 	m_tensionKnob->setModel(m_editor->m_tensionModel);
-	ToolTip::add(m_tensionKnob, tr("Tension value for spline"));
+	m_tensionKnob->setToolTip(tr("Tension value for spline"));
 
 	connect(m_cubicHermiteAction, SIGNAL(toggled(bool)), m_tensionKnob, SLOT(setEnabled(bool)));
 
@@ -1912,8 +1914,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingXComboBox->setModel( &m_editor->m_zoomingXModel );
 
-	connect( &m_editor->m_zoomingXModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingXChanged() ) );
+	connect( &m_editor->m_zoomingXModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingXChanged()));
 
 
 	QLabel * zoom_y_label = new QLabel( zoomToolBar );
@@ -1932,8 +1934,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingYComboBox->setModel( &m_editor->m_zoomingYModel );
 
-	connect( &m_editor->m_zoomingYModel, SIGNAL( dataChanged() ),
-			m_editor, SLOT( zoomingYChanged() ) );
+	connect( &m_editor->m_zoomingYModel, SIGNAL(dataChanged()),
+			m_editor, SLOT(zoomingYChanged()));
 
 	zoomToolBar->addWidget( zoom_x_label );
 	zoomToolBar->addWidget( m_zoomingXComboBox );
@@ -1962,11 +1964,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	setWindowIcon( embed::getIconPixmap( "automation" ) );
 	setAcceptDrops( true );
 	m_toolBar->setAcceptDrops( true );
-}
-
-
-AutomationEditorWindow::~AutomationEditorWindow()
-{
 }
 
 
@@ -2012,7 +2009,7 @@ void AutomationEditorWindow::setCurrentClip(AutomationClip* clip)
 	if (clip)
 	{
 		connect(clip, SIGNAL(dataChanged()), this, SLOT(update()));
-		connect( clip, SIGNAL( dataChanged() ), this, SLOT( updateWindowTitle() ) );
+		connect( clip, SIGNAL(dataChanged()), this, SLOT(updateWindowTitle()));
 		connect(clip, SIGNAL(destroyed()), this, SLOT(clearCurrentClip()));
 
 		connect(m_flipXAction, SIGNAL(triggered()), clip, SLOT(flipX()));
@@ -2108,3 +2105,6 @@ void AutomationEditorWindow::updateWindowTitle()
 
 	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_clip->name() ) );
 }
+
+
+} // namespace lmms::gui

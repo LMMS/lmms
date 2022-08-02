@@ -37,10 +37,18 @@ class QDomElement;
 class QGridLayout;
 class QMdiArea;
 
+namespace lmms
+{
+
 class ConfigManager;
+
+namespace gui
+{
+
 class PluginView;
 class SubWindow;
 class ToolButton;
+class GuiApplication;
 
 
 class MainWindow : public QMainWindow
@@ -135,6 +143,8 @@ public:
 	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
+	bool eventFilter(QObject* watched, QEvent* event) override;
+
 public slots:
 	void resetWindowTitle();
 
@@ -180,7 +190,7 @@ protected:
 private:
 	MainWindow();
 	MainWindow( const MainWindow & );
-	virtual ~MainWindow();
+	~MainWindow() override;
 
 	void finalize();
 
@@ -232,7 +242,7 @@ private:
 private slots:
 	void browseHelp();
 	void showTool( QAction * _idx );
-	void updateViewMenu( void );
+	void updateViewMenu();
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 	void onExportProject();
@@ -247,5 +257,10 @@ signals:
 	void initProgress(const QString &msg);
 
 } ;
+
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

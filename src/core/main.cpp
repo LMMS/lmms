@@ -124,7 +124,7 @@ void consoleMessageHandler(QtMsgType type,
 
 
 inline void loadTranslation( const QString & tname,
-	const QString & dir = ConfigManager::inst()->localeDir() )
+	const QString & dir = lmms::ConfigManager::inst()->localeDir() )
 {
 	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
@@ -252,6 +252,8 @@ int noInputFileError()
 
 int main( int argc, char * * argv )
 {
+	using namespace lmms;
+
 #ifdef LMMS_DEBUG_FPE
 	// Enable exceptions for certain floating point results
 	// FE_UNDERFLOW is disabled for the time being
@@ -359,7 +361,7 @@ int main( int argc, char * * argv )
 #endif
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
-					new MainApplication( argc, argv );
+					new gui::MainApplication(argc, argv);
 
 	AudioEngine::qualitySettings qs( AudioEngine::qualitySettings::Mode_HighQuality );
 	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
@@ -829,12 +831,12 @@ int main( int argc, char * * argv )
 		// create renderer
 		RenderManager * r = new RenderManager( qs, os, eff, renderOut );
 		QCoreApplication::instance()->connect( r,
-				SIGNAL( finished() ), SLOT( quit() ) );
+				SIGNAL(finished()), SLOT(quit()));
 
 		// timer for progress-updates
 		QTimer * t = new QTimer( r );
-		r->connect( t, SIGNAL( timeout() ),
-				SLOT( updateConsoleProgress() ) );
+		r->connect( t, SIGNAL(timeout()),
+				SLOT(updateConsoleProgress()));
 		t->start( 200 );
 
 		if( profilerOutputFile.isEmpty() == false )
@@ -854,6 +856,8 @@ int main( int argc, char * * argv )
 	}
 	else // otherwise, start the GUI
 	{
+		using namespace lmms::gui;
+
 		new GuiApplication();
 
 		// re-intialize RNG - shared libraries might have srand() or
@@ -1007,7 +1011,7 @@ int main( int argc, char * * argv )
 		// instances of LMMS.
 		if( autoSaveEnabled )
 		{
-			getGUI()->mainWindow()->autoSaveTimerReset();
+			gui::getGUI()->mainWindow()->autoSaveTimerReset();
 		}
 	}
 

@@ -11,12 +11,12 @@ QMdiArea {
 	background-image: url(resources:background_artwork.png);
 }
 
-Knob {
+lmms--gui--Knob {
 	qproperty-lineInactiveColor: rgb(120, 120, 120);
 	qproperty-arcInactiveColor: rgba(120, 120, 120, 70);
 }
 
-AutomationEditor {
+lmms--gui--AutomationEditor {
 	background-color: rgb(0, 0, 0);
 	color: #e0e0e0;
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
@@ -70,7 +70,7 @@ QToolTip {
 	color: #4afd85;
 }
 
-TextFloat {
+lmms--gui--TextFloat {
 	border-radius: 4px;
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0.5, x2:0.5, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(50, 50, 50, 220));
 	opacity: 175;
@@ -130,18 +130,18 @@ QMenu::indicator:selected {
 	background-color: #747474;
 }
 
-FileBrowser QCheckBox
+lmms--gui--FileBrowser QCheckBox
 {
 	font-size: 10px;
 	color: white;
 }
 
-PositionLine {
+lmms--gui--PositionLine {
 	qproperty-tailGradient: false;
 	qproperty-lineColor: rgb(255, 255, 255);
 }
 
-PianoRoll {
+lmms--gui--PianoRoll {
 	background-color: rgb(0, 0, 0);
 	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
@@ -182,7 +182,7 @@ PianoRoll {
 	qproperty-textShadow: rgb( 240, 240, 240 );
 }
 
-TabWidget {
+lmms--gui--TabWidget {
 	background-color: #5b6571;
 	qproperty-tabText: rgba(255, 255, 255, 180);
 	qproperty-tabTitleText: #fff;
@@ -191,13 +191,13 @@ TabWidget {
 	qproperty-tabBorder: #3c434b;
 }
 
-GroupBox {
+lmms--gui--GroupBox {
 	background-color: #5b6571;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
 
-Oscilloscope {
+lmms--gui--Oscilloscope {
 	background: none;
 	border: none;
 	qproperty-normalColor: rgb(71, 253, 133);
@@ -206,7 +206,7 @@ Oscilloscope {
 
 /* main toolbar cpu load widget - this can have transparent bg now */
 
-CPULoadWidget {
+lmms--gui--CPULoadWidget {
 	border: none;
 	background: url(resources:cpuload_bg.png);
 }
@@ -335,19 +335,19 @@ QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarr
 
 /* background for song editor and pattern editor */
 
-TrackContainerView QFrame{
+lmms--gui--TrackContainerView QFrame{
 	background-color: #49515b;
 }
 
 /* background for track controls */
-TrackView > QWidget {
+lmms--gui--TrackView > QWidget {
 	background-color: #5b6571;
 }
 
 /* autoscroll, loop, stop behaviour toggle buttons */
 
 /* track background colors */
-TrackContentWidget {
+lmms--gui--TrackContentWidget {
 	qproperty-darkerColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
 							stop:0 rgb( 50, 50, 50 ), stop:0.33 rgb( 20, 20, 20 ), stop:1 rgb( 15, 15, 15 ) );
 	qproperty-lighterColor: qlineargradient(x1:0, y1:0, x2:0, y2:1,
@@ -359,7 +359,7 @@ TrackContentWidget {
 
 /* gear button in tracks */
 
-TrackOperationsWidget > QPushButton {
+lmms--gui--TrackOperationsWidget > QPushButton {
 	max-height: 26px;
 	max-width: 26px;
 	min-height: 26px;
@@ -368,7 +368,7 @@ TrackOperationsWidget > QPushButton {
 	border: none;
 }
 
-TrackOperationsWidget > QPushButton::menu-indicator {
+lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator {
 	image: url(resources:trackop.png);
 	subcontrol-origin: padding;
 	subcontrol-position: center;
@@ -376,12 +376,12 @@ TrackOperationsWidget > QPushButton::menu-indicator {
 	top: 1px;
 }
 
-TrackOperationsWidget > QPushButton::menu-indicator:hover {
+lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:hover {
 	image: url(resources:trackop_h.png);
 }
 
-TrackOperationsWidget > QPushButton::menu-indicator:pressed,
-TrackOperationsWidget > QPushButton::menu-indicator:checked {
+lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:pressed,
+lmms--gui--TrackOperationsWidget > QPushButton::menu-indicator:checked {
 	image: url(resources:trackop_c.png);
 	position: relative;
 	top: 2px;
@@ -395,13 +395,13 @@ TrackOperationsWidget > QPushButton::menu-indicator:checked {
 
 /* font sizes */
 
-nameLabel, effectLabel, sf2InstrumentView > QLabel {
+lmms--gui--Sf2InstrumentView > QLabel {
 	font-size:10px;
 }
 
 /* main toolbar sliders (master vol, master pitch) */
 
-AutomatableSlider::groove:vertical {
+lmms--gui--AutomatableSlider::groove:vertical {
 	background: rgba(0,0,0, 128);
 	border: 1px inset rgba(100,100,100, 64);
 	border-radius: 2px;
@@ -409,7 +409,7 @@ AutomatableSlider::groove:vertical {
 	margin: 2px 2px;
 }
 
-AutomatableSlider::handle:vertical {
+lmms--gui--AutomatableSlider::handle:vertical {
 	background: none;
 	border-image: url(resources:main_slider.png);
 	width: 26px;
@@ -425,13 +425,13 @@ QTabWidget, QTabWidget QWidget {
 
 /* window that shows up when you add effects */
 
-EffectSelectDialog QScrollArea {
+lmms--gui--EffectSelectDialog QScrollArea {
 	background: #5b6571;
 }
 
 /* the inner boxes in LADSPA effect windows */
 
-EffectControlDialog QGroupBox {
+lmms--gui--EffectControlDialog QGroupBox {
 	background: #49515b;
 	margin-top: 1ex;
 	padding: 10px 2px 1px;
@@ -441,7 +441,7 @@ EffectControlDialog QGroupBox {
 
 /* the inner box titles when present (channel 1, channel 2...) */
 
-EffectControlDialog QGroupBox::title {
+lmms--gui--EffectControlDialog QGroupBox::title {
 	subcontrol-origin: margin;
 	subcontrol-position: top left;
 	background: #7b838d;
@@ -531,7 +531,7 @@ QToolButton::menu-button {
 
 /* track label buttons - the part that contains the icon and track title */
 
-TrackLabelButton {
+lmms--gui--TrackLabelButton {
 	background-color: #5b6571;
 	color: #c9c9c9;
 	font-size: 11px;
@@ -541,7 +541,7 @@ TrackLabelButton {
 	padding: 2px 1px;
 }
 
-TrackLabelButton:hover {
+lmms--gui--TrackLabelButton:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
@@ -549,7 +549,7 @@ TrackLabelButton:hover {
 	margin: 0px;
 }
 
-TrackLabelButton:pressed {
+lmms--gui--TrackLabelButton:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,64);
@@ -557,7 +557,7 @@ TrackLabelButton:pressed {
 	font-weight: bold;
 }
 
-TrackLabelButton:checked {
+lmms--gui--TrackLabelButton:checked {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 	color: white;
 	border: 1px solid rgba(0,0,0,128);
@@ -565,54 +565,52 @@ TrackLabelButton:checked {
 	font-weight: bold;
 }
 
-TrackLabelButton:checked:hover {
+lmms--gui--TrackLabelButton:checked:hover {
 	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #5b6571, stop:0.75 #7b838d, stop:1 #7b838d );
 }
 
-TrackLabelButton:checked:pressed {
+lmms--gui--TrackLabelButton:checked:pressed {
 	background: qlineargradient(spread:reflect, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 #49515b, stop:0.3 #5b6571, stop:1 #6b7581 );
 }
 
 /* sidebar, sidebar buttons */
 
-SideBar {
+lmms--gui--SideBar {
 	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop: 0 #98a2a7, stop: 1.0 #5b646f);
 }
 
-SideBar QToolButton {
+lmms--gui--SideBar QToolButton {
 	font-size: 12px;
 }
 
 /* Instrument plugin list */
 
-PluginDescList {
-	background-color: #5b6571;
-}
-
-PluginDescWidget {
+lmms--gui--PluginDescWidget {
 	background-color: #e0e0e0;
 	color: #404040;
 	border: 1px solid rgb(64, 64, 64);
 	margin: 0px;
 }
 
-PluginDescWidget:hover {
+lmms--gui--PluginDescWidget:hover {
 	background-color: #e0e0e0;
 }
 
 /* piano widget */
 
-PianoView {
+lmms--gui--PianoView {
 	background-color: #14171a;
 }
 
 /* font sizes for text buttons */
 
-MixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
+lmms--gui--MixerView QPushButton,
+lmms--gui--EffectRackView QPushButton,
+lmms--gui--ControllerRackView QPushButton {
 	font-size: 10px;
 }
 
-MixerLine {
+lmms--gui--MixerLine {
 	background: #5b6571;
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
@@ -624,13 +622,13 @@ MixerLine {
 }
 
 /* persistent peak markers for fx peak meters */
-Fader {
+lmms--gui--Fader {
 	qproperty-peakGreen: rgb( 74, 253, 133);
 	qproperty-peakYellow: rgb(224, 222, 18);
 	qproperty-peakRed: rgb( 255, 100, 100);
 }
 
-TimeLineWidget {
+lmms--gui--TimeLineWidget {
         /* font-size only supports px and pt. */
 	font-size: 7pt;
 	/* lengths also support em. This will make sure that the height
@@ -658,7 +656,7 @@ QTreeView {
 	alternate-background-color: #747474;
 }
 
-TrackContainerView QLabel
+lmms--gui--TrackContainerView QLabel
 {
 	background: none;
 }
@@ -666,7 +664,7 @@ TrackContainerView QLabel
 /* Clips */
 
 /* common clip colors */
-ClipView   {
+lmms--gui--ClipView   {
 	qproperty-mutedColor: rgb( 128, 128, 128 );
 	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
 	qproperty-selectedColor: rgb( 0, 125, 255 );
@@ -683,7 +681,7 @@ ClipView   {
 }
 
 /* MIDI (instrument) clip */
-MidiClipView {
+lmms--gui--MidiClipView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
 
@@ -694,24 +692,24 @@ MidiClipView {
 }
 
 /* sample track clip */
-SampleClipView {
+lmms--gui--SampleClipView {
 	background-color: rgba(42,51,59,255);
 	color: #FF8F05;
 }
 
 /* automation clip */
-AutomationClipView {
+lmms--gui--AutomationClipView {
 	background-color: #99afff;
 	color: rgb( 204, 215, 255 );
 }
 
 /* pattern clip */
-PatternClipView {
+lmms--gui--PatternClipView {
 	background-color: rgb( 128, 182, 175 ); /* default colour for pattern tracks */
 }
 
 /* Subwindows in MDI-Area */
-SubWindow {
+lmms--gui--SubWindow {
 	color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 						stop: 0 #4b525c, stop: 1.0 #31363d);
 	qproperty-activeColor: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -721,21 +719,21 @@ SubWindow {
 }
 
 /* Subwindow title text */
-SubWindow > QLabel {
+lmms--gui--SubWindow > QLabel {
 	color: rgb( 255, 255, 255 );
 	font-size: 12px;
 	font-style: normal;
 }
 
 /* SubWindow titlebar button */
-SubWindow > QPushButton {
+lmms--gui--SubWindow > QPushButton {
 	background-color: rgba( 255, 255, 255, 0% );
 	border-width: 0px;
 	border-color: none;
 	border-style: none;
 }
 
-SubWindow > QPushButton:hover{
+lmms--gui--SubWindow > QPushButton:hover{
 	background-color: rgba( 255, 255, 255, 15% );
 	border-width: 1px;
 	border-color: rgba( 0, 0, 0, 20% );
@@ -746,7 +744,7 @@ SubWindow > QPushButton:hover{
 
 /* Plugins */
 
-TripleOscillatorView Knob {
+lmms--gui--TripleOscillatorView lmms--gui--Knob {
 	color: rgb(255, 255, 255);
 	qproperty-outerColor: rgb(255, 255, 255);
 	qproperty-innerRadius: 2;
@@ -757,7 +755,7 @@ TripleOscillatorView Knob {
 }
 
 
-kickerInstrumentView Knob#smallKnob {
+lmms--gui--KickerInstrumentView lmms--gui--Knob#smallKnob {
 	color: #595959;
 	qproperty-outerColor: black;
 	qproperty-innerRadius: 3;
@@ -768,7 +766,7 @@ kickerInstrumentView Knob#smallKnob {
 }
 
 
-kickerInstrumentView Knob#largeKnob {
+lmms--gui--KickerInstrumentView lmms--gui--Knob#largeKnob {
 	color: #0c3b89;
 	qproperty-outerColor: #519fff;
 	qproperty-innerRadius: 12.0;
@@ -779,7 +777,7 @@ kickerInstrumentView Knob#largeKnob {
 }
 
 
-AudioFileProcessorView Knob {
+lmms--gui--AudioFileProcessorView lmms--gui--Knob {
 	color: rgb(240, 147, 14);
 	qproperty-outerColor: rgb(30, 35, 37);
 	qproperty-innerRadius: 4;
@@ -789,7 +787,7 @@ AudioFileProcessorView Knob {
 	qproperty-lineWidth: 3;
 }
 
-organicInstrumentView Knob {
+lmms--gui--OrganicInstrumentView lmms--gui--Knob {
 	color: rgb(124, 207, 98);
 	qproperty-outerColor: rgb(13, 42, 4);
 	qproperty-innerRadius: 2;
@@ -799,13 +797,13 @@ organicInstrumentView Knob {
 	qproperty-lineWidth: 1.5;
 }
 
-organicInstrumentView Knob#harmKnob {
+lmms--gui--OrganicInstrumentView lmms--gui--Knob#harmKnob {
 	color: rgb(205, 98, 216);
 	qproperty-outerColor: rgb(18, 4, 18);
 }
 
-organicInstrumentView Knob#fx1Knob,
-organicInstrumentView Knob#volKnob {
+lmms--gui--OrganicInstrumentView lmms--gui--Knob#fx1Knob,
+lmms--gui--OrganicInstrumentView lmms--gui--Knob#volKnob {
 	color: rgb(157, 157, 157);
 	qproperty-outerColor: rgb(37, 37, 37);
 	qproperty-innerRadius: 4;
@@ -815,7 +813,7 @@ organicInstrumentView Knob#volKnob {
 	qproperty-lineWidth: 2;
 }
 
-sf2InstrumentView Knob {
+lmms--gui--Sf2InstrumentView lmms--gui--Knob {
 	color: #ff00ea;
 	qproperty-outerColor: rgb(20, 5, 18);
 	qproperty-innerRadius: 2;
@@ -825,7 +823,7 @@ sf2InstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-sfxrInstrumentView Knob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob {
 	color: #000;
 	qproperty-outerColor: rgb(194, 177, 145);
 	qproperty-innerRadius: 2;
@@ -833,42 +831,42 @@ sfxrInstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-sfxrInstrumentView Knob#envKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#envKnob {
 	color:	#263352;
 	qproperty-outerColor: #4b66a4;
 }
 
-sfxrInstrumentView Knob#freqKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#freqKnob {
 	color:	#1e4a22;
 	qproperty-outerColor: #3c9544;
 }
 
-sfxrInstrumentView Knob#changeKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#changeKnob {
 	color:	#591c1c;
 	qproperty-outerColor: #b23737;
 }
 
-sfxrInstrumentView Knob#sqrKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#sqrKnob {
 	color:	#3b2714;
 	qproperty-outerColor: #724c27;
 }
 
-sfxrInstrumentView Knob#repeatKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#repeatKnob {
 	color:	#292929;
 	qproperty-outerColor: #515151;
 }
 
-sfxrInstrumentView Knob#phaserKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#phaserKnob {
 	color:	#144c4d;
 	qproperty-outerColor: #299899;
 }
 
-sfxrInstrumentView Knob#filterKnob {
+lmms--gui--SfxrInstrumentView lmms--gui--Knob#filterKnob {
 	color:	#47224c;
 	qproperty-outerColor: #8e4397;
 }
 
-opl2instrumentView Knob {
+lmms--gui--OpulenzInstrumentView lmms--gui--Knob {
 	color: rgb(128,128,128);
 	qproperty-outerColor: rgb(255,255,255);
 	qproperty-innerRadius: 2;
@@ -876,7 +874,7 @@ opl2instrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-sidInstrumentView Knob {
+lmms--gui--SidInstrumentView lmms--gui--Knob {
 	color: rgb(113,95,80);
 	qproperty-outerColor: rgb( 255,255,255 );
 	qproperty-innerRadius: 2;
@@ -884,7 +882,7 @@ sidInstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-WatsynView Knob {
+lmms--gui--WatsynView lmms--gui--Knob {
 	qproperty-innerRadius: 1;
 	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 9.5;
@@ -892,17 +890,17 @@ WatsynView Knob {
 	qproperty-lineWidth: 2;
 }
 
-WatsynView Knob#aKnob {
+lmms--gui--WatsynView lmms--gui--Knob#aKnob {
 	color: #43b2ff;
 	qproperty-outerColor: #43b2ff;
 }
 
-WatsynView Knob#bKnob {
+lmms--gui--WatsynView lmms--gui--Knob#bKnob {
 	color: #fc5431;
 	qproperty-outerColor: #fc5431;
 }
 
-WatsynView Knob#mixKnob {
+lmms--gui--WatsynView lmms--gui--Knob#mixKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 	qproperty-outerRadius: 13;
@@ -910,17 +908,17 @@ WatsynView Knob#mixKnob {
 	qproperty-centerPointY: 15.5;
 }
 
-WatsynView Knob#mixenvKnob {
+lmms--gui--WatsynView lmms--gui--Knob#mixenvKnob {
 	color: #43ff82;
 	qproperty-outerColor: #43ff82;
 }
 
-WatsynView Knob#xtalkKnob {
+lmms--gui--WatsynView lmms--gui--Knob#xtalkKnob {
 	color: #fb50fb;
 	qproperty-outerColor: #fb50fb;
 }
 
-MonstroView Knob {
+lmms--gui--MonstroView lmms--gui--Knob {
 	color: #ffffff;
 	qproperty-outerColor: #aaaaaa;
 	qproperty-outerRadius: 9;
@@ -930,7 +928,7 @@ MonstroView Knob {
 	qproperty-lineWidth: 2.5;
 }
 
-NesInstrumentView Knob {
+lmms--gui--NesInstrumentView lmms--gui--Knob {
 	color: #e7231b;
 	qproperty-outerColor: #fff;
 	qproperty-outerRadius: 11.0;
@@ -940,7 +938,7 @@ NesInstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
-CompressorControlDialog {
+lmms--gui--CompressorControlDialog {
 	qproperty-inVolAreaColor: rgba(209, 216, 228, 17);
 	qproperty-inVolColor: rgba(209, 216, 228, 100);
 	qproperty-outVolAreaColor: rgba(209, 216, 228, 30);
@@ -954,7 +952,7 @@ CompressorControlDialog {
 	qproperty-resetColor: rgba(200, 100, 15, 200);
 }
 
-CompressorControlDialog Knob {
+lmms--gui--CompressorControlDialog lmms--gui--Knob {
 	color: #2fcc71;
 	qproperty-outerColor: #2fcc71;
 	qproperty-lineWidth: 2;
@@ -962,7 +960,7 @@ CompressorControlDialog Knob {
 
 /* palette information  */
 
-LmmsPalette {
+lmms--gui--LmmsPalette {
 	qproperty-background: #5b6571;
 	qproperty-windowText: #f0f0f0;
 	qproperty-base: #808080;

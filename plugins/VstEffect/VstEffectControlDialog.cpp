@@ -32,11 +32,14 @@
 
 #include "PixmapButton.h"
 #include "embed.h"
-#include "ToolTip.h"
 
 #include "gui_templates.h"
 #include <QToolBar>
 #include <QLabel>
+
+namespace lmms::gui
+{
+
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
@@ -97,7 +100,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"controls" ) );
 		connect( m_managePluginButton, SIGNAL( clicked() ),  _ctl,
 						SLOT( managePlugin() ) );
-		ToolTip::add( m_managePluginButton, tr( "Control VST plugin from LMMS host" ) );
+		m_managePluginButton->setToolTip(tr("Control VST plugin from LMMS host"));
 
 		m_managePluginButton->setMinimumWidth( 26 );
 		m_managePluginButton->setMaximumWidth( 26 );
@@ -113,7 +116,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"project_open" ) );
 		connect( m_openPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( openPreset() ) );
-		ToolTip::add( m_openPresetButton, tr( "Open VST plugin preset" ) );
+		m_openPresetButton->setToolTip(tr("Open VST plugin preset"));
 
 		m_openPresetButton->setMinimumWidth( 16 );
 		m_openPresetButton->setMaximumWidth( 16 );
@@ -133,7 +136,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( update() ) );
 
-		ToolTip::add( m_rolLPresetButton, tr( "Previous (-)" ) );
+		m_rolLPresetButton->setToolTip(tr("Previous (-)"));
 
 		m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
@@ -155,7 +158,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( update() ) );
 
-		ToolTip::add( m_rolRPresetButton, tr( "Next (+)" ) );
+		m_rolRPresetButton->setToolTip(tr("Next (+)"));
 
 		m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
@@ -189,7 +192,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"project_save", 21, 21  ) );
 		connect( m_savePresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( savePreset() ) );
-		ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
+		m_savePresetButton->setToolTip(tr("Save preset"));
 
 		m_savePresetButton->setMinimumWidth( 21 );
 		m_savePresetButton->setMaximumWidth( 21 );
@@ -295,3 +298,5 @@ void VstEffectControlDialog::togglePluginUI( bool checked )
 	}
 }
 
+
+} // namespace lmms::gui

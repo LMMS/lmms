@@ -38,6 +38,10 @@
 class QLineEdit;
 
 
+namespace lmms
+{
+
+
 class MidiApple : public QObject, public MidiClient
 {
 	Q_OBJECT
@@ -136,7 +140,7 @@ private:
 	QMap<MIDIEndpointRef, MIDIPortRef> m_sourcePortRef;
 
 	// subscriptions
-	typedef QMap<QString, MidiPortList> SubMap;
+	using SubMap = QMap<QString, MidiPortList>;
 	SubMap m_inputSubs;
 	SubMap m_outputSubs;
 
@@ -146,7 +150,10 @@ signals:
 
 } ;
 
-#endif
+
+} // namespace lmms
+
+#endif // LMMS_BUILD_APPLE
 
 
 #endif

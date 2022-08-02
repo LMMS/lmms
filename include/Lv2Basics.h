@@ -36,6 +36,9 @@
 #include <QString>
 #include <string>
 
+namespace lmms
+{
+
 struct LilvNodeDeleter
 {
 	void operator()(LilvNode* n) { lilv_node_free(n); }
@@ -62,6 +65,8 @@ QString qStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
 
 //! Return port name as std::string, everything will be freed automatically
 std::string stdStringFromPortName(const LilvPlugin* plug, const LilvPort* port);
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 #endif // LV2BASICS_H

@@ -30,6 +30,9 @@
 #include "Note.h"
 #include "DetuningHelper.h"
 
+namespace lmms
+{
+
 
 Note::Note( const TimePos & length, const TimePos & pos,
 		int key, volume_t volume, panning_t panning,
@@ -232,3 +235,35 @@ bool Note::withinRange(int tickStart, int tickEnd) const
 	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
 		&& length().getTicks() != 0;
 }
+
+
+
+
+/*! \brief Get the start/end/bottom/top positions of notes in a vector
+ *
+ *  Returns no value if there are no notes
+ */
+std::optional<NoteBounds> boundsForNotes(const NoteVector& notes)
+{
+	if (notes.empty()) { return std::nullopt; }
+
+	TimePos start = notes.front()->pos();
+	TimePos end = start;
+	int lower = notes.front()->key();
+	int upper = lower;
+
+	for (const Note* note: notes)
+	{
+		// TODO should we assume that NoteVector is always sorted correctly,
+		// so first() always has the lowest time position?
+		start = std::min(start, note->pos());
+		end = std::max(end, note->endPos());
+		lower = std::min(lower, note->key());
+		upper = std::max(upper, note->key());
+	}
+
+	return NoteBounds{start, end, lower, upper};
+}
+
+
+} // namespace lmms

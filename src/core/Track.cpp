@@ -43,6 +43,9 @@
 #include "Song.h"
 
 
+namespace lmms
+{
+
 /*! \brief Create a new (empty) track object
  *
  *  The track object is the whole track, linking its contents, its
@@ -106,14 +109,14 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 
 	switch( tt )
 	{
-		case InstrumentTrack: t = new ::InstrumentTrack( tc ); break;
-		case PatternTrack: t = new ::PatternTrack( tc ); break;
-		case SampleTrack: t = new ::SampleTrack( tc ); break;
+		case InstrumentTrack: t = new class InstrumentTrack( tc ); break;
+		case PatternTrack: t = new class PatternTrack( tc ); break;
+		case SampleTrack: t = new class SampleTrack( tc ); break;
 //		case EVENT_TRACK:
 //		case VIDEO_TRACK:
-		case AutomationTrack: t = new ::AutomationTrack( tc ); break;
+		case AutomationTrack: t = new class AutomationTrack( tc ); break;
 		case HiddenAutomationTrack:
-						t = new ::AutomationTrack( tc, true ); break;
+						t = new class AutomationTrack( tc, true ); break;
 		default: break;
 	}
 
@@ -656,3 +659,4 @@ BoolModel *Track::getMutedModel()
 	return &m_mutedModel;
 }
 
+} // namespace lmms

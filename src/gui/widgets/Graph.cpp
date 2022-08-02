@@ -30,6 +30,11 @@
 #include "SampleBuffer.h"
 #include "Oscillator.h"
 
+namespace lmms
+{
+
+namespace gui
+{
 
 Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 		int _height ) :
@@ -47,11 +52,11 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 
 	graphModel * gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( updateGraph( int, int ) ) );
+	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
+			this, SLOT(updateGraph(int,int)));
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL(lengthChanged()),
+			this, SLOT(updateGraph()));
 }
 
 void Graph::setForeground( const QPixmap &_pixmap )
@@ -430,11 +435,11 @@ void Graph::modelChanged()
 {
 	graphModel * gModel = castModel<graphModel>();
 
-	QObject::connect( gModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( updateGraph( int, int ) ) );
+	QObject::connect( gModel, SIGNAL(samplesChanged(int,int)),
+			this, SLOT(updateGraph(int,int)));
 
-	QObject::connect( gModel, SIGNAL( lengthChanged( ) ),
-			this, SLOT( updateGraph( ) ) );
+	QObject::connect( gModel, SIGNAL(lengthChanged()),
+			this, SLOT(updateGraph()));
 }
 
 
@@ -451,8 +456,10 @@ void Graph::updateGraph()
 }
 
 
+} // namespace gui
+
 graphModel::graphModel( float _min, float _max, int _length,
-			::Model * _parent, bool _default_constructed,  float _step ) :
+			Model* _parent, bool _default_constructed,  float _step ) :
 	Model( _parent, tr( "Graph" ), _default_constructed ),
 	m_samples( _length ),
 	m_length( _length ),
@@ -744,6 +751,4 @@ void graphModel::drawSampleAt( int x, float val )
 }
 
 
-
-
-
+} // namespace lmms

@@ -30,12 +30,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"Equalizer",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "A native eq plugin" ),
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
@@ -54,13 +58,6 @@ EqEffect::EqEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::
 	m_eqControls( this ),
 	m_inGain( 1.0 ),
 	m_outGain( 1.0 )
-{
-}
-
-
-
-
-EqEffect::~EqEffect()
 {
 }
 
@@ -363,3 +360,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 }
 
 }
+
+
+} // namespace lmms

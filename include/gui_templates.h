@@ -32,6 +32,8 @@
 #include <QFont>
 #include <QDesktopWidget>
 
+namespace lmms
+{
 
 
 // return DPI-independent font-size - font with returned font-size has always
@@ -64,5 +66,7 @@ inline QFont pointSizeF( QFont _f, float SIZE )
 	return( _f );
 }
 
+
+} // namespace lmms
 
 #endif

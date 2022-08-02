@@ -29,6 +29,9 @@
 
 #include <QLineEdit>
 
+namespace lmms::gui
+{
+
 class TrackRenameLineEdit : public QLineEdit
 {
 	Q_OBJECT
@@ -42,5 +45,7 @@ protected:
 private:
 	QString m_oldName;
 } ;
+
+} // namespace lmms::gui
 
 #endif

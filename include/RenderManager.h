@@ -32,6 +32,10 @@
 #include "OutputSettings.h"
 
 
+namespace lmms
+{
+
+
 class RenderManager : public QObject
 {
 	Q_OBJECT
@@ -42,7 +46,7 @@ public:
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath);
 
-	virtual ~RenderManager();
+	~RenderManager() override;
 
 	/// Export all unmuted tracks into a single file
 	void renderProject();
@@ -77,5 +81,8 @@ private:
 	QVector<Track*> m_tracksToRender;
 	QVector<Track*> m_unmuted;
 } ;
+
+
+} // namespace lmms
 
 #endif

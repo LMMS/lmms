@@ -30,6 +30,10 @@
 #include "AutomatableModel.h"
 #include "PlayHandle.h"
 
+namespace lmms
+{
+
+
 class PatternTrack;
 class SampleClip;
 class Track;
@@ -42,7 +46,7 @@ public:
 	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleClip* clip );
-	virtual ~SamplePlayHandle();
+	~SamplePlayHandle() override;
 
 	inline bool affinityMatters() const override
 	{
@@ -93,5 +97,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

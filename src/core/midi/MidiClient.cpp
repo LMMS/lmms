@@ -27,12 +27,8 @@
 #include "MidiPort.h"
 
 
-MidiClient::MidiClient()
+namespace lmms
 {
-}
-
-
-
 
 MidiClient::~MidiClient()
 {
@@ -99,20 +95,6 @@ void MidiClient::subscribeWritablePort( MidiPort* , const QString& , bool )
 
 
 
-
-
-
-
-MidiClientRaw::MidiClientRaw()
-{
-}
-
-
-
-
-MidiClientRaw::~MidiClientRaw()
-{
-}
 
 
 
@@ -221,10 +203,13 @@ void MidiClientRaw::parseData( const unsigned char c )
 		case MidiNoteOff:
 		case MidiNoteOn:
 		case MidiKeyPressure:
-		case MidiChannelPressure:
-		case MidiProgramChange:
 			m_midiParseData.m_midiEvent.setKey(m_midiParseData.m_buffer[0]);
 			m_midiParseData.m_midiEvent.setVelocity(m_midiParseData.m_buffer[1]);
+			break;
+
+		case MidiChannelPressure:
+		case MidiProgramChange:
+			m_midiParseData.m_midiEvent.setParam(0, m_midiParseData.m_buffer[0]);
 			break;
 
 		case MidiControlChange:
@@ -324,3 +309,5 @@ int MidiClientRaw::eventLength( const unsigned char event )
 	}
 	return 1;
 }
+
+} // namespace lmms

@@ -29,6 +29,9 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QMutex>
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
 #include <QTreeWidget>
 
 
@@ -37,13 +40,18 @@
 
 class QLineEdit;
 
-class FileItem;
+namespace lmms
+{
+
 class InstrumentTrack;
-class FileBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
 
+namespace gui
+{
 
+class FileItem;
+class FileBrowserTreeWidget;
 
 class FileBrowser : public SideBarWidget
 {
@@ -63,10 +71,10 @@ public:
 			const QString& userDir = "",
 			const QString& factoryDir = "");
 
-	virtual ~FileBrowser() = default;
+	~FileBrowser() override = default;
 
 private slots:
-	void reloadTree( void );
+	void reloadTree();
 	void expandItems( QTreeWidgetItem * item=nullptr, QList<QString> expandedDirs = QList<QString>() );
 	// call with item=NULL to filter the entire tree
 	bool filterItems( const QString & filter, QTreeWidgetItem * item=nullptr );
@@ -102,7 +110,7 @@ class FileBrowserTreeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget( QWidget * parent );
-	virtual ~FileBrowserTreeWidget() = default;
+	~FileBrowserTreeWidget() override = default;
 
 	//! This method returns a QList with paths (QString's) of all directories
 	//! that are expanded in the tree.
@@ -135,18 +143,23 @@ private:
 
 	//! This should only be accessed or modified when m_pphMutex is held
 	PlayHandle* m_previewPlayHandle;
+	
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_pphMutex;
+#else
 	QMutex m_pphMutex;
+#endif
 
 	QList<QAction*> getContextActions(FileItem* item, bool songEditor);
 
 
 private slots:
 	void activateListItem( QTreeWidgetItem * item, int column );
-	void openInNewInstrumentTrack( FileItem* item, bool songEditor );
-	bool openInNewSampleTrack( FileItem* item );
-	void sendToActiveInstrumentTrack( FileItem* item );
+	void openInNewInstrumentTrack( lmms::gui::FileItem* item, bool songEditor );
+	bool openInNewSampleTrack( lmms::gui::FileItem* item );
+	void sendToActiveInstrumentTrack( lmms::gui::FileItem* item );
 	void updateDirectory( QTreeWidgetItem * item );
-	void openContainingFolder( FileItem* item );
+	void openContainingFolder( lmms::gui::FileItem* item );
 
 } ;
 
@@ -159,7 +172,7 @@ public:
 	Directory( const QString & filename, const QString & path,
 						const QString & filter );
 
-	void update( void );
+	void update();
 
 	inline QString fullName( QString path = QString() )
 	{
@@ -182,7 +195,7 @@ public:
 
 
 private:
-	void initPixmaps( void );
+	void initPixmaps();
 
 	bool addItems( const QString & path );
 
@@ -243,28 +256,28 @@ public:
 		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
-	inline FileTypes type( void ) const
+	inline FileTypes type() const
 	{
 		return( m_type );
 	}
 
-	inline FileHandling handling( void ) const
+	inline FileHandling handling() const
 	{
 		return( m_handling );
 	}
 
-	inline bool isTrack( void ) const
+	inline bool isTrack() const
 	{
 		return m_handling == LoadAsPreset || m_handling == LoadByPlugin;
 	}
 
-	QString extension( void );
+	QString extension();
 	static QString extension( const QString & file );
 
 
 private:
-	void initPixmaps( void );
-	void determineFileType( void );
+	void initPixmaps();
+	void determineFileType();
 
 	static QPixmap * s_projectFilePixmap;
 	static QPixmap * s_presetFilePixmap;
@@ -280,5 +293,9 @@ private:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

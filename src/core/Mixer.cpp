@@ -36,6 +36,10 @@
 #include "SampleTrack.h"
 #include "TrackContainer.h" // For TrackContainer::TrackList typedef
 
+namespace lmms
+{
+
+
 MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 	m_from( from ),
 	m_to( to ),
@@ -44,11 +48,6 @@ MixerRoute::MixerRoute( MixerChannel * from, MixerChannel * to, float amount ) :
 {
 	//qDebug( "created: %d to %d", m_from->m_channelIndex, m_to->m_channelIndex );
 	// create send amount model
-}
-
-
-MixerRoute::~MixerRoute()
-{
 }
 
 
@@ -827,3 +826,6 @@ void Mixer::validateChannelName( int index, int oldIndex )
 		m_mixerChannels[index]->m_name = tr( "Channel %1" ).arg( index );
 	}
 }
+
+
+} // namespace lmms

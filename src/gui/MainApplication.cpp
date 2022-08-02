@@ -31,6 +31,10 @@
 #include "MainWindow.h"
 #include "Song.h"
 
+namespace lmms::gui
+{
+
+
 MainApplication::MainApplication(int& argc, char** argv) :
 	QApplication(argc, argv),
 	m_queuedFile()
@@ -102,3 +106,6 @@ bool MainApplication::nativeEventFilter(const QByteArray& eventType,
 	return false;
 }
 #endif
+
+
+} // namespace lmms::gui

@@ -32,6 +32,10 @@
 #include "PlayHandle.h"
 #include "TimePos.h"
 
+namespace lmms
+{
+
+
 class PatternTrack;
 class SampleBuffer;
 class SampleClip;
@@ -42,7 +46,7 @@ class SampleRecordHandle : public PlayHandle
 {
 public:
 	explicit SampleRecordHandle(SampleClip* clip, TimePos startRecordTimeOffset);
-	virtual ~SampleRecordHandle();
+	~SampleRecordHandle() override;
 
 	void play( sampleFrame * _working_buffer ) override;
 	bool isFinished() const override;
@@ -57,7 +61,7 @@ private:
 	virtual void writeBuffer( const sampleFrame * _ab,
 						const f_cnt_t _frames );
 
-	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
+	using bufferList = QList<QPair<sampleFrame*, f_cnt_t>>;
 	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
 	TimePos m_minLength;
@@ -71,5 +75,7 @@ private:
 	TimePos m_startRecordTimeOffset;
 } ;
 
+
+} // namespace lmms
 
 #endif

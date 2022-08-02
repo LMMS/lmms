@@ -40,6 +40,8 @@
 #include "MidiJack.h"
 
 
+namespace lmms
+{
 
 AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	AudioDevice( qBound<int>(
@@ -59,8 +61,8 @@ AudioJack::AudioJack( bool & _success_ful, AudioEngine*  _audioEngine ) :
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
-		connect( this, SIGNAL( zombified() ),
-				this, SLOT( restartAfterZombified() ),
+		connect( this, SIGNAL(zombified()),
+				this, SLOT(restartAfterZombified()),
 				Qt::QueuedConnection );
 	}
 
@@ -102,7 +104,7 @@ void AudioJack::restartAfterZombified()
 	{
 		m_active = false;
 		startProcessing();
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "JACK client restarted" ),
 			tr( "LMMS was kicked by JACK for some reason. "
 				"Therefore the JACK backend of LMMS has been "
@@ -111,7 +113,7 @@ void AudioJack::restartAfterZombified()
 	}
 	else
 	{
-		QMessageBox::information( getGUI()->mainWindow(),
+		QMessageBox::information(gui::getGUI()->mainWindow(),
 			tr( "JACK server down" ),
 			tr( "The JACK server seems to have been shutdown "
 				"and starting a new instance failed. "
@@ -464,13 +466,13 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
 	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
+	gui::LcdSpinBoxModel * m = new gui::LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiojack",
 							"channels" ).toInt() );
 
-	m_channels = new LcdSpinBox( 1, this );
+	m_channels = new gui::LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "Channels" ) );
 	m_channels->move( 180, 20 );
@@ -498,6 +500,6 @@ void AudioJack::setupWidget::saveSettings()
 
 
 
-
+} // namespace lmms
 
 #endif

@@ -50,18 +50,21 @@
 #include "Song.h"
 
 #include "PatchesDialog.h"
-#include "ToolTip.h"
 #include "LcdSpinBox.h"
 
 #include "embed.h"
 #include "plugin_export.h"
+
+namespace lmms
+{
+
 
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"GIG Player",
 	QT_TRANSLATE_NOOP( "PluginBrowser", "Player for GIG files" ),
 	"Garrett Wilson <g/at/floft/dot/net>",
@@ -704,9 +707,9 @@ void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * GigInstrument::instantiateView( QWidget * _parent )
+gui::PluginView* GigInstrument::instantiateView( QWidget * _parent )
 {
-	return new GigInstrumentView( this, _parent );
+	return new gui::GigInstrumentView( this, _parent );
 }
 
 
@@ -908,6 +911,9 @@ void GigInstrument::updateSampleRate()
 
 
 
+namespace gui
+{
+
 
 class gigKnob : public Knob
 {
@@ -939,7 +945,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open GIG file" ) );
+	m_fileDialogButton->setToolTip(tr("Open GIG file"));
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -951,7 +957,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
+	m_patchDialogButton->setToolTip(tr("Choose patch"));
 
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
@@ -977,13 +983,6 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 	setPalette( pal );
 
 	updateFilename();
-}
-
-
-
-
-GigInstrumentView::~GigInstrumentView()
-{
 }
 
 
@@ -1095,6 +1094,7 @@ void GigInstrumentView::showPatchDialog()
 }
 
 
+} // namespace gui
 
 
 // Store information related to playing a sample from the GIG file
@@ -1397,3 +1397,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 }
 
 }
+
+
+} // namespace lmms

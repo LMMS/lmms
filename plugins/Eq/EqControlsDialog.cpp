@@ -30,13 +30,16 @@
 #include "AutomatableButton.h"
 #include "embed.h"
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "PixmapButton.h"
 
 #include "EqControls.h"
 #include "EqFader.h"
 #include "EqParameterWidget.h"
 #include "EqSpectrumView.h"
+
+namespace lmms::gui
+{
 
 
 EqControlsDialog::EqControlsDialog( EqControls *controls ) :
@@ -234,3 +237,6 @@ EqBand* EqControlsDialog::setBand(int index, BoolModel* active, FloatModel* freq
 	filterModels->lp48 = lp48;
 	return filterModels;
 }
+
+
+} // namespace lmms::gui

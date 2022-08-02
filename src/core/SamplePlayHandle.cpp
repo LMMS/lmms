@@ -31,6 +31,8 @@
 #include "SampleClip.h"
 #include "SampleTrack.h"
 
+namespace lmms
+{
 
 
 SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
@@ -108,7 +110,7 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	if( !( m_track && m_track->isMuted() )
 				&& !(m_patternTrack && m_patternTrack->isMuted()))
 	{
-/*		stereoVolumeVector v =
+/*		StereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
 				m_volumeModel->value() / DefaultVolume } };*/
 		// SamplePlayHandle always plays the sample at its original pitch;
@@ -148,5 +150,4 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 }
 
 
-
-
+} // namespace lmms

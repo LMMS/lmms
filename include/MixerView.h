@@ -34,11 +34,15 @@
 #include "Engine.h"
 #include "Fader.h"
 #include "PixmapButton.h"
-#include "ToolTip.h"
 #include "embed.h"
 #include "EffectRackView.h"
 
 class QButtonGroup;
+
+
+namespace lmms::gui
+{
+
 class MixerLine;
 
 class LMMS_EXPORT MixerView : public QWidget, public ModelView,
@@ -62,7 +66,7 @@ public:
 
 
 	MixerView();
-	virtual ~MixerView();
+	~MixerView() override;
 
 	void keyPressEvent(QKeyEvent * e) override;
 
@@ -131,5 +135,8 @@ private:
 	
 	friend class MixerChannelView;
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

@@ -31,6 +31,9 @@
 #include "DummyEffect.h"
 #include "MixHelpers.h"
 
+namespace lmms
+{
+
 
 EffectChain::EffectChain( Model * _parent ) :
 	Model( _parent ),
@@ -240,3 +243,6 @@ void EffectChain::clear()
 
 	m_enabledModel.setValue( false );
 }
+
+
+} // namespace lmms

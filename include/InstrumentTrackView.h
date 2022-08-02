@@ -30,6 +30,10 @@
 #include "InstrumentTrack.h"
 
 
+namespace lmms::gui
+{
+
+
 class InstrumentTrackWindow;
 class Knob;
 class MidiCCRackView;
@@ -42,7 +46,7 @@ class InstrumentTrackView : public TrackView
 	Q_OBJECT
 public:
 	InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tc );
-	virtual ~InstrumentTrackView();
+	~InstrumentTrackView() override;
 
 	InstrumentTrackWindow * getInstrumentTrackWindow();
 
@@ -114,5 +118,7 @@ private:
 	friend class InstrumentTrackWindow;
 } ;
 
-#endif
 
+} // namespace lmms::gui
+
+#endif

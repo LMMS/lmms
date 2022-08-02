@@ -29,10 +29,13 @@
 #include <QVBoxLayout>
 
 #include "Knob.h"
-#include "LedCheckbox.h"
+#include "LedCheckBox.h"
 #include "VecControls.h"
 #include "Vectorscope.h"
 #include "VectorView.h"
+
+namespace lmms::gui
+{
 
 
 // The entire GUI layout is built here.
@@ -90,3 +93,6 @@ QSize VecControlsDialog::sizeHint() const
 {
 	return QSize(275, 300);
 }
+
+
+} // namespace lmms::gui

@@ -32,10 +32,19 @@
 #include "InstrumentView.h"
 #include "Graph.h"
 
+namespace lmms
+{
+
+class NotePlayHandle;
+
+
+namespace gui
+{
+class PixmapButton;
 class FreeBoyInstrumentView;
 class Knob;
-class NotePlayHandle;
-class PixmapButton;
+}
+
 
 class FreeBoyInstrument : public Instrument
 {
@@ -43,21 +52,21 @@ class FreeBoyInstrument : public Instrument
 public:
 
 	FreeBoyInstrument( InstrumentTrack * _instrument_track );
-	virtual ~FreeBoyInstrument();
+	~FreeBoyInstrument() override = default;
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	void playNote( NotePlayHandle * _n,
+						sampleFrame * _working_buffer ) override;
+	void deleteNotePluginData( NotePlayHandle * _n ) override;
 
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
 
-	virtual QString nodeName() const;
+	QString nodeName() const override;
 
-	virtual f_cnt_t desiredReleaseFrames() const;
+	f_cnt_t desiredReleaseFrames() const override;
 
-	virtual PluginView * instantiateView( QWidget * _parent );
+	gui::PluginView* instantiateView( QWidget * _parent ) override;
 
 
 /*public slots:
@@ -107,8 +116,12 @@ private:
 	blip_time_t m_time;
 	blip_time_t fakeClock() { return m_time += 4; }
 
-	friend class FreeBoyInstrumentView;
+	friend class gui::FreeBoyInstrumentView;
 } ;
+
+
+namespace gui
+{
 
 
 class FreeBoyInstrumentView : public InstrumentViewFixedSize
@@ -116,10 +129,10 @@ class FreeBoyInstrumentView : public InstrumentViewFixedSize
 	Q_OBJECT
 public:
 	FreeBoyInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~FreeBoyInstrumentView();
+	~FreeBoyInstrumentView() override = default;
 
 private:
-	virtual void modelChanged();
+	void modelChanged() override;
 
 	Knob * m_ch1SweepTimeKnob;
 	PixmapButton * m_ch1SweepDirButton;
@@ -161,5 +174,9 @@ private:
 	void updateKnobToolTip();*/
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

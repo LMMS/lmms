@@ -27,7 +27,16 @@
 
 #include "ClipView.h"
 
+
+
+namespace lmms
+{
+
 class SampleClip;
+
+namespace gui
+{
+
 
 class SampleClipView : public ClipView
 {
@@ -35,7 +44,7 @@ class SampleClipView : public ClipView
 
 public:
 	SampleClipView( SampleClip * _clip, TrackView * _tv );
-	virtual ~SampleClipView() = default;
+	~SampleClipView() override = default;
 
 public slots:
 	void updateSample();
@@ -60,5 +69,8 @@ private:
 } ;
 
 
+} // namespace gui
+
+} // namespace lmms
 
 #endif

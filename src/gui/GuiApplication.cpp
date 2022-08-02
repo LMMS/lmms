@@ -51,6 +51,19 @@
 #include <windows.h>
 #endif
 
+namespace lmms
+{
+
+
+namespace gui
+{
+
+GuiApplication* getGUI()
+{
+	return GuiApplication::instance();
+}
+
+
 GuiApplication* GuiApplication::s_instance = nullptr;
 
 GuiApplication* GuiApplication::instance()
@@ -58,10 +71,7 @@ GuiApplication* GuiApplication::instance()
 	return s_instance;
 }
 
-GuiApplication* getGUI()
-{
-	return GuiApplication::instance();
-}
+
 
 GuiApplication::GuiApplication()
 {
@@ -249,3 +259,8 @@ QFont GuiApplication::getWin32SystemFont()
 	return QFont( QString::fromUtf8( metrics.lfMessageFont.lfFaceName ), pointSize );
 }
 #endif
+
+
+} // namespace gui
+
+} // namespace lmms

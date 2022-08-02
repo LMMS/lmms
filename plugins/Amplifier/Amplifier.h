@@ -30,14 +30,17 @@
 #include "Effect.h"
 #include "AmplifierControls.h"
 
+namespace lmms
+{
+
 class AmplifierEffect : public Effect
 {
 public:
 	AmplifierEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
-	virtual ~AmplifierEffect();
-	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
+	~AmplifierEffect() override = default;
+	bool processAudioBuffer( sampleFrame* buf, const fpp_t frames ) override;
 
-	virtual EffectControls* controls()
+	EffectControls* controls() override
 	{
 		return &m_ampControls;
 	}
@@ -49,5 +52,8 @@ private:
 	friend class AmplifierControls;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

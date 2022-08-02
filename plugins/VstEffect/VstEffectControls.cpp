@@ -42,6 +42,8 @@
 #include "SubWindow.h"
 #include <QApplication>
 
+namespace lmms
+{
 
 
 VstEffectControls::VstEffectControls( VstEffect * _eff ) :
@@ -155,9 +157,9 @@ int VstEffectControls::controlCount()
 
 
 
-EffectControlDialog *VstEffectControls::createView()
+gui::EffectControlDialog* VstEffectControls::createView()
 {
-	auto dialog = new VstEffectControlDialog( this );
+	auto dialog = new gui::VstEffectControlDialog( this );
 	dialog->togglePluginUI( m_vstGuiVisible );
 	return dialog;
 }
@@ -165,10 +167,10 @@ EffectControlDialog *VstEffectControls::createView()
 
 
 
-void VstEffectControls::managePlugin( void )
+void VstEffectControls::managePlugin()
 {
 	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
-		manageVSTEffectView * tt = new manageVSTEffectView( m_effect, this);
+		gui::ManageVSTEffectView * tt = new gui::ManageVSTEffectView( m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
 		if (m_subWindow->widget()->isVisible() == false ) { 
@@ -185,11 +187,11 @@ void VstEffectControls::managePlugin( void )
 
 
 
-void VstEffectControls::savePreset( void )
+void VstEffectControls::savePreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
-		m_effect->m_plugin->savePreset( );
+		m_effect->m_plugin->savePreset();
 /*    		bool converted;
     		QString str = m_vi->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -202,7 +204,7 @@ void VstEffectControls::savePreset( void )
 
 
 
-void VstEffectControls::updateMenu( void )
+void VstEffectControls::updateMenu()
 {
 
 	// get all presets -
@@ -237,11 +239,11 @@ void VstEffectControls::updateMenu( void )
 
 
 
-void VstEffectControls::openPreset( void )
+void VstEffectControls::openPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
-		m_effect->m_plugin->openPreset( );
+		m_effect->m_plugin->openPreset();
     		bool converted;
     		QString str = m_effect->m_plugin->currentProgramName().section("/", 0, 0);
      		if (str != "")
@@ -254,7 +256,7 @@ void VstEffectControls::openPreset( void )
 
 
 
-void VstEffectControls::rollPreset( void )
+void VstEffectControls::rollPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -270,7 +272,7 @@ void VstEffectControls::rollPreset( void )
 
 
 
-void VstEffectControls::rolrPreset( void )
+void VstEffectControls::rolrPreset()
 {
 
 	if ( m_effect->m_plugin != nullptr ) {
@@ -286,7 +288,7 @@ void VstEffectControls::rolrPreset( void )
 
 
 
-void VstEffectControls::selPreset( void )
+void VstEffectControls::selPreset()
 {
 
      QAction *action = qobject_cast<QAction *>(sender());
@@ -308,8 +310,11 @@ void VstEffectControls::paintEvent( QPaintEvent * )
 
 
 
+namespace gui
+{
 
-manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
+
+ManageVSTEffectView::ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi ) :
 	m_effect( _eff )
 {
 	m_vi2 = m_vi;
@@ -425,7 +430,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 
 
 
-void manageVSTEffectView::closeWindow()
+void ManageVSTEffectView::closeWindow()
 {
 	m_vi2->m_subWindow->hide();
 }
@@ -433,7 +438,7 @@ void manageVSTEffectView::closeWindow()
 
 
 
-void manageVSTEffectView::syncPlugin( void )
+void ManageVSTEffectView::syncPlugin()
 {
 	char paramStr[35];
 	QStringList s_dumpValues;
@@ -459,7 +464,7 @@ void manageVSTEffectView::syncPlugin( void )
 
 
 
-void manageVSTEffectView::displayAutomatedOnly( void )
+void ManageVSTEffectView::displayAutomatedOnly()
 {
 	bool isAuto = QString::compare( m_displayAutomatedOnly->text(), tr( "Automated" ) ) == 0;
 
@@ -484,7 +489,7 @@ void manageVSTEffectView::displayAutomatedOnly( void )
 
 
 
-void manageVSTEffectView::setParameter( Model * action )
+void ManageVSTEffectView::setParameter( Model * action )
 {
 	int knobUNID = action->displayName().toInt();
 
@@ -494,7 +499,7 @@ void manageVSTEffectView::setParameter( Model * action )
 	}
 }
 
-void manageVSTEffectView::syncParameterText()
+void ManageVSTEffectView::syncParameterText()
 {
 	m_effect->m_plugin->loadParameterLabels();
 	m_effect->m_plugin->loadParameterDisplays();
@@ -527,7 +532,7 @@ void manageVSTEffectView::syncParameterText()
 
 
 
-manageVSTEffectView::~manageVSTEffectView()
+ManageVSTEffectView::~ManageVSTEffectView()
 {
 	if( m_vi2->knobFModel != nullptr )
 	{ 
@@ -572,7 +577,6 @@ manageVSTEffectView::~manageVSTEffectView()
 }
 
 
+} // namespace gui
 
-
-
-
+} // namespace lmms
