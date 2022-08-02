@@ -840,7 +840,9 @@ bpm_t Song::getTempo()
 
 AutomatedValueMap Song::automatedValuesAt(TimePos time, int clipNum) const
 {
-	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, clipNum);
+	auto globalAutomationTracks = TrackList{m_globalAutomationTrack};
+	globalAutomationTracks.insert(globalAutomationTracks.end(), tracks().begin(), tracks().end());
+	return TrackContainer::automatedValuesFromTracks(globalAutomationTracks, time, clipNum);
 }
 
 
