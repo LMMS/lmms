@@ -888,12 +888,8 @@ gui::ClipView * AutomationClip::createView( gui::TrackView * _tv )
 
 bool AutomationClip::isAutomated( const AutomatableModel * _m )
 {
-	TrackContainer::TrackList l;
-
-	auto& songTracks = Engine::getSong()->tracks();
-	l.insert(l.end(), songTracks.begin(), songTracks.end());
-
-	for (const auto& track : l)
+	auto l = combineAllTracks();
+	for (const auto track : l)
 	{
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
@@ -924,15 +920,7 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 std::vector<AutomationClip *> AutomationClip::clipsForModel(const AutomatableModel* _m)
 {
 	std::vector<AutomationClip *> clips;
-	TrackContainer::TrackList l;
-
-	auto& songTracks = Engine::getSong()->tracks();
-	l.insert(l.end(), songTracks.begin(), songTracks.end());
-
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
-	l.insert(l.end(), patternStoreTracks.begin(), patternStoreTracks.end());
-
-	l.push_back(Engine::getSong()->globalAutomationTrack());
+	auto l = combineAllTracks();
 
 	// go through all tracks...
 	for (const auto track : l)
@@ -994,15 +982,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 
 void AutomationClip::resolveAllIDs()
 {
-	TrackContainer::TrackList l;
-
-	auto& tracks = Engine::getSong()->tracks();
-	l.insert(l.end(), tracks.begin(), tracks.end());
-
-	auto& patternStoreTracks = Engine::patternStore()->tracks();
-	l.insert(l.end(), patternStoreTracks.begin(), patternStoreTracks.end());
-
-	l.push_back(Engine::getSong()->globalAutomationTrack());
+	auto l = combineAllTracks();
 	for (const auto& track : l)
 	{
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
@@ -1181,6 +1161,20 @@ void AutomationClip::generateTangents(timeMap::iterator it, int numToGenerate)
 		}
 		it++;
 	}
+}
+
+std::vector<Track*> AutomationClip::combineAllTracks()
+{
+	std::vector<Track*> combinedTrackList;
+
+	auto& songTracks = Engine::getSong()->tracks();
+	auto& patternStoreTracks = Engine::patternStore()->tracks();
+
+	combinedTrackList.insert(combinedTrackList.end(), songTracks.begin(), songTracks.end());
+	combinedTrackList.insert(combinedTrackList.end(), patternStoreTracks.begin(), patternStoreTracks.end());
+	combinedTrackList.push_back(Engine::getSong()->globalAutomationTrack());
+
+	return combinedTrackList;
 }
 
 } // namespace lmms

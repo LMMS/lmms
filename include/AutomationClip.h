@@ -189,6 +189,15 @@ private:
 	void generateTangents();
 	void generateTangents(timeMap::iterator it, int numToGenerate);
 	float valueAt( timeMap::const_iterator v, int offset ) const;
+	
+	/**
+	 * @brief 
+	 * This function combines the song tracks, pattern store tracks,
+	 * and the global automation track all in one vector.
+	 * 
+	 * @return std::vector<Track*>
+	 */
+	static std::vector<Track*> combineAllTracks();
 
 	// Mutex to make methods involving automation clips thread safe
 	// Mutable so we can lock it from const objects
