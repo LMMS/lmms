@@ -1,0 +1,31 @@
+---
+name: checks
+'on': [push, pull_request]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check-strings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install python-tinycss2
+        run: sudo apt-get install -y python3-tinycss2
+      - name: Update submodules
+        run: git submodule update --init --recursive
+      - name: Verify check-strings script
+        run: tests/check-strings/verify
+      - name: Run check-strings
+        run: tests/check-strings/check-strings
+  shellcheck:
+    runs-on: ubuntu-latest
+    container: koalaman/shellcheck-alpine:v0.4.6
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+      - name: Run shellcheck
+        run: |
+          shellcheck \
+            $(find "./cmake/" -type f -name '*.sh' -o -name "*.sh.in") \
+            doc/bash-completion/lmms \
+            buildtools/update_locales
