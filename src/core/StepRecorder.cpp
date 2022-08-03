@@ -301,7 +301,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 				delete stepNote;
 				notesRemoved = true;
 			}
-			else 
+			else
 			{
 				nextTimout = min(nextTimout, REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS - timeSinceReleased);
 			}
