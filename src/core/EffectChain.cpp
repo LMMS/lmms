@@ -162,7 +162,7 @@ void EffectChain::moveDown( Effect * _effect )
 	if (_effect != m_effects.back())
 	{
 		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
-		std::swap(*(it++), *it);
+		std::swap(*std::next(it), *it);
 	}
 }
 
@@ -174,7 +174,7 @@ void EffectChain::moveUp( Effect * _effect )
 	if (_effect != m_effects.front())
 	{
 		auto it = std::find(m_effects.begin(), m_effects.end(), _effect);
-		std::swap(*(it--), *it);
+		std::swap(*std::prev(it), *it);
 	}
 }
 
