@@ -288,28 +288,30 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	int nextTimout = std::numeric_limits<int>::max();
 	bool notesRemoved = false;
 
-	for (const auto& stepNote : m_curStepNotes) 
+	auto it = m_curStepNotes.begin();
+	while (it != m_curStepNotes.end()) 
 	{
+		StepNote* stepNote = *it;
+
 		if (stepNote->isReleased()) 
 		{
 			const int timeSinceReleased = stepNote->timeSinceReleased();
-			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS) 
+			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
 			{
 				delete stepNote;
+				it = m_curStepNotes.erase(it);
 				notesRemoved = true;
+				continue;
 			}
 			else 
 			{
 				nextTimout = min(nextTimout, REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS - timeSinceReleased);
 			}
 		}
+
+		++it;
 	}
-
-	m_curStepNotes.erase(std::remove_if(m_curStepNotes.begin(), m_curStepNotes.end(), [](auto stepNote) 
-	{ 
-		return stepNote->timeSinceReleased() >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS; 
-	}));
-
+	
 	if(notesRemoved)
 	{
 		m_pianoRoll.update();
