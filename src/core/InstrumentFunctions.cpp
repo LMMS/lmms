@@ -190,7 +190,7 @@ InstrumentFunctionNoteStacking::ChordTable::ChordTable()
 
 const InstrumentFunctionNoteStacking::Chord & InstrumentFunctionNoteStacking::ChordTable::getByName( const QString & name, bool is_scale ) const
 {
-	for (const auto chord : m_chords)
+	for (const auto& chord : m_chords)
 	{
 		if (chord.getName() == name && is_scale == chord.isScale())
 		{
