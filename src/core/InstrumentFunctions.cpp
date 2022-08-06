@@ -512,7 +512,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				randNumber = fastRandf(1.0f);
 				float shape2 = fabs(m_arpRandShapeModel.value());
 				int change = static_cast<int>(shape2 - std::round(2 * shape2 * randNumber));
-
+				change *= m_arpRepeatsModel.value();
 				cur_arp_idx = m_lastRandomNote + change;
 				if (!isNeg)
 				{
