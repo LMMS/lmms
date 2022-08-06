@@ -207,6 +207,9 @@ enum ArpRandomDistributions
 		return "arpeggiator";
 	}
 
+protected slots:
+
+	void updateNoteRange();
 
 private:
 	enum class ArpMode

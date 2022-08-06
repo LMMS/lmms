@@ -301,7 +301,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	Model( _parent, tr( "Arpeggio" ) ),
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
-	m_arpRangeModel( 0.0f, 0.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
+	m_arpRangeModel( 1.0f, 0.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
 	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
 	m_arpRandShapeModel( 0.0f, -10.0f, 10.0f, 1.0f, this, tr( "Rand shape" ) ),
@@ -334,9 +334,36 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel.addItem( tr( "Free" ), std::make_unique<PixmapLoader>( "arp_free" ) );
 	m_arpModeModel.addItem( tr( "Sort" ), std::make_unique<PixmapLoader>( "arp_sort" ) );
 	m_arpModeModel.addItem( tr( "Sync" ), std::make_unique<PixmapLoader>( "arp_sync" ) );
+
+	connect( &m_arpModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
+	connect( &m_arpRangeModel, SIGNAL( dataChanged() ),
+			this, SLOT( updateNoteRange() ), Qt::DirectConnection );
 }
 
 
+
+
+void InstrumentFunctionArpeggio::updateNoteRange()
+{
+	bool sticky = false;
+	if( m_arpCycleModel.value() && m_arpCycleModel.value() ==  m_arpCycleModel.maxValue() )
+	{
+		sticky = true;
+	}
+
+	const InstrumentFunctionNoteStacking::ChordTable & chord_table =
+				InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	const int cur_chord_size = chord_table.chords()[m_arpModel.value()].size();
+	float noteRange = m_arpRangeModel.value() * cur_chord_size;
+
+	m_arpCycleModel.setRange( 0.0f, noteRange );
+
+	if( sticky )
+	{
+		m_arpCycleModel.setValue( m_arpCycleModel.maxValue() );
+	}
+}
 
 
 
