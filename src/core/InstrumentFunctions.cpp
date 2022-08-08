@@ -301,7 +301,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	Model( _parent, tr( "Arpeggio" ) ),
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
-	m_arpRangeModel( 1.0f, 0.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
+	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
 	m_arpRepeatsModel( 1.0f, 1.0f, 8.0f, 1.0f, this, tr( "Note repeats" ) ),
 	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
 	m_arpRandShapeModel( 0.0f, -10.0f, 10.0f, 1.0f, this, tr( "Rand shape" ) ),
@@ -400,10 +400,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table.chords()[selected_arp].size();
-	int rangecompute = m_arpRangeModel.value();
-	int rangeModifier = rangecompute > 0 ? 1 : 0;
-	rangecompute = rangecompute > 0 ? rangecompute : 1;
-	const int range = static_cast<int>(cur_chord_size * rangecompute * m_arpRepeatsModel.value()) + rangeModifier;
+	const int repeats = m_arpRepeatsModel.value();
+	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * repeats) + 1;
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
@@ -539,7 +537,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				randNumber = fastRandf(1.0f);
 				float shape2 = fabs(m_arpRandShapeModel.value());
 				int change = static_cast<int>(shape2 - std::round(2 * shape2 * randNumber));
-				change *= m_arpRepeatsModel.value();
+				change *= repeats;
 				cur_arp_idx = m_lastRandomNote + change;
 				if (!isNeg)
 				{
@@ -557,13 +555,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 
 		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
-		cur_arp_idx = static_cast<int>(cur_arp_idx / m_arpRepeatsModel.value());
+		cur_arp_idx = static_cast<int>(cur_arp_idx / repeats);
 
 		// Cycle notes
 		if( m_arpCycleModel.value() && dir != ArpDirection::Random )
 		{
 			cur_arp_idx *= m_arpCycleModel.value() + 1;
-			cur_arp_idx %= static_cast<int>( range / m_arpRepeatsModel.value() );
+			cur_arp_idx %= static_cast<int>( range / repeats );
 		}
 
 		// now calculate final key for our arp-note
