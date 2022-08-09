@@ -607,13 +607,12 @@ void ConfigManager::saveConfigFile()
 	lmms_config.setAttribute("configversion", m_configVersion);
 	doc.appendChild(lmms_config);
 
-	for(settingsMap::iterator it = m_settings.begin();
-						it != m_settings.end(); ++it)
+	for(auto it = m_settings.begin(); it != m_settings.end(); ++it)
 	{
 		QDomElement n = doc.createElement(it.key());
-		for(auto & it2 : it)
+		for(auto it2 = (*it).begin(); it2 != (*it).end(); ++it2)
 		{
-			n.setAttribute(it2.first, it2.second);
+			n.setAttribute((*it2).first, (*it2).second);
 		}
 		lmms_config.appendChild(n);
 	}
