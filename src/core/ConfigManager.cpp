@@ -610,9 +610,9 @@ void ConfigManager::saveConfigFile()
 	for (auto it = m_settings.begin(); it != m_settings.end(); ++it)
 	{
 		QDomElement n = doc.createElement(it.key());
-		for (auto it2 = (*it).begin(); it2 != (*it).end(); ++it2)
+		for (auto&& [first, second] : *it)
 		{
-			n.setAttribute((*it2).first, (*it2).second);
+			n.setAttribute(first, second);
 		}
 		lmms_config.appendChild(n);
 	}

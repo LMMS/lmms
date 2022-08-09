@@ -415,12 +415,9 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			continue;
 		}
 
-		for (QList<GigSample>::iterator sample = note.samples.begin(); sample != note.samples.end(); ++sample)
+		for (auto& sample : note.samples)
 		{
-			if( sample->sample == nullptr || sample->region == nullptr )
-			{
-				continue;
-			}
+			if (sample.sample == nullptr || sample.region == nullptr) { continue; }
 
 			// Will change if resampling
 			bool resample = false;
@@ -431,18 +428,15 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			// Resample to be the correct pitch when the sample provided isn't
 			// solely for this one note (e.g. one or two samples per octave) or
 			// we are processing at a different sample rate
-			if( sample->region->PitchTrack == true || rate != sample->sample->SamplesPerSecond )
+			if (sample.region->PitchTrack == true || rate != sample.sample->SamplesPerSecond)
 			{
 				resample = true;
 
 				// Factor just for resampling
-				freq_factor = 1.0 * rate / sample->sample->SamplesPerSecond;
+				freq_factor = 1.0 * rate / sample.sample->SamplesPerSecond;
 
 				// Factor for pitch shifting as well as resampling
-				if( sample->region->PitchTrack == true )
-				{
-					freq_factor *= sample->freqFactor;
-				}
+				if (sample.region->PitchTrack == true) { freq_factor *= sample.freqFactor; }
 
 				// We need a bit of margin so we don't get glitching
 				samples = frames / freq_factor + MARGIN[m_interpolation];
@@ -450,11 +444,11 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 
 			// Load this note's data
 			sampleFrame sampleData[samples];
-			loadSample( *sample, sampleData, samples );
+			loadSample(sample, sampleData, samples);
 
 			// Apply ADSR using a copy so if we don't use these samples when
 			// resampling, the ADSR doesn't get messed up
-			ADSR copy = sample->adsr;
+			ADSR copy = sample.adsr;
 
 			for( f_cnt_t i = 0; i < samples; ++i )
 			{
@@ -469,8 +463,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				sampleFrame convertBuf[frames];
 
 				// Only output if resampling is successful (note that "used" is output)
-				if( sample->convertSampleRate( *sampleData, *convertBuf, samples, frames,
-							freq_factor, used ) )
+				if (sample.convertSampleRate(*sampleData, *convertBuf, samples, frames, freq_factor, used))
 				{
 					for( f_cnt_t i = 0; i < frames; ++i )
 					{
@@ -489,8 +482,8 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 			}
 
 			// Update note position with how many samples we actually used
-			sample->pos += used;
-			sample->adsr.inc( used );
+			sample.pos += used;
+			sample.adsr.inc(used);
 		}
 	}
 
