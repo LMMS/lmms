@@ -385,9 +385,9 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		//	                          //
 		//  final stage - mixing      //
 		//                            //
-		////////////////////////////////			
-		
-		float pin1 = static_cast<float>( ch1 + ch2 ); 
+		////////////////////////////////
+
+		auto pin1 = static_cast<float>(ch1 + ch2);
 		// add dithering noise
 		pin1 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin1 = pin1 / 30.0f;
@@ -405,8 +405,7 @@ void NesObject::renderOutput( sampleFrame * buf, fpp_t frames )
 		
 		pin1 *= NES_MIXING_12;
 
-		
-		float pin2 = static_cast<float>( ch3 + ch4 ); 
+		auto pin2 = static_cast<float>(ch3 + ch4);
 		// add dithering noise
 		pin2 *= 1.0 + ( Oscillator::noiseSample( 0.0f ) * DITHER_AMP );		
 		pin2 = pin2 / 30.0f;
@@ -552,13 +551,13 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	const f_cnt_t offset = n->noteOffset();
 	
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == nullptr )
-	{	
-		NesObject * nes = new NesObject( this, Engine::audioEngine()->processingSampleRate(), n );
+	{
+		auto* nes = new NesObject(this, Engine::audioEngine()->processingSampleRate(), n);
 		n->m_pluginData = nes;
 	}
-	
-	NesObject * nes = static_cast<NesObject *>( n->m_pluginData );
-	
+
+	auto* nes = static_cast<NesObject*>(n->m_pluginData);
+
 	nes->renderOutput( workingBuffer + offset, frames );
 	
 	applyRelease( workingBuffer, n );
@@ -846,7 +845,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 void NesInstrumentView::modelChanged()
 {
-	NesInstrument * nes = castModel<NesInstrument>();	
+	auto* nes = castModel<NesInstrument>();
 
 	m_ch1EnabledBtn->setModel( &nes->m_ch1Enabled );
 	m_ch1CrsKnob->setModel( &nes->m_ch1Crs );

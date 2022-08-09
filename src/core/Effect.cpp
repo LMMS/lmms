@@ -124,7 +124,7 @@ Effect * Effect::instantiate( const QString& pluginName,
 	if( dynamic_cast<Effect *>( p ) != nullptr )
 	{
 		// everything ok, so return pointer
-		Effect * effect = dynamic_cast<Effect *>( p );
+		auto* effect = dynamic_cast<Effect*>(p);
 		effect->m_parent = dynamic_cast<EffectChain *>(_parent);
 		return effect;
 	}

@@ -103,10 +103,8 @@ BSynth::~BSynth()
 
 sample_t BSynth::nextStringSample( float sample_length )
 {
-	float sample_step = 
-		static_cast<float>( sample_length / ( sample_rate / nph->frequency() ) );
+	auto sample_step = static_cast<float>(sample_length / (sample_rate / nph->frequency()));
 
-	
 	// check overflow
 	while (sample_realindex >= sample_length) {
 		sample_realindex -= sample_length;
@@ -299,7 +297,7 @@ void BitInvader::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	BSynth * ps = static_cast<BSynth *>( _n->m_pluginData );
+	auto* ps = static_cast<BSynth*>(_n->m_pluginData);
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
 		const sample_t cur = ps->nextStringSample( m_graph.length() );
@@ -472,7 +470,7 @@ BitInvaderView::BitInvaderView( Instrument * _instrument,
 
 void BitInvaderView::modelChanged()
 {
-	BitInvader * b = castModel<BitInvader>();
+	auto* b = castModel<BitInvader>();
 
 	m_graph->setModel( &b->m_graph );
 	m_sampleLengthKnob->setModel( &b->m_sampleLength );

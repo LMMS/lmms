@@ -46,10 +46,10 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	setFixedSize( 181, 128 );
 	
 	// labels
-	QLabel * inLabel = new QLabel( tr( "IN" ), this );
+	auto* inLabel = new QLabel(tr("IN"), this);
 	inLabel->move( 24, 15 );
-	
-	QLabel * outLabel = new QLabel( tr( "OUT" ), this );
+
+	auto* outLabel = new QLabel(tr("OUT"), this);
 	outLabel->move( 139, 15 );
 	
 	// input knobs
@@ -82,12 +82,12 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	
 	
 	// leds
-	LedCheckBox * rateEnabled = new LedCheckBox( "", this, tr( "Rate enabled" ), LedCheckBox::Green );
+	auto* rateEnabled = new LedCheckBox("", this, tr("Rate enabled"), LedCheckBox::Green);
 	rateEnabled->move( 64, 14 );
 	rateEnabled->setModel( & controls->m_rateEnabled );
 	rateEnabled->setToolTip(tr("Enable sample-rate crushing"));
-	
-	LedCheckBox * depthEnabled = new LedCheckBox( "", this, tr( "Depth enabled" ), LedCheckBox::Green );
+
+	auto* depthEnabled = new LedCheckBox("", this, tr("Depth enabled"), LedCheckBox::Green);
 	depthEnabled->move( 101, 14 );
 	depthEnabled->setModel( & controls->m_depthEnabled );
 	depthEnabled->setToolTip(tr("Enable bit-depth crushing"));

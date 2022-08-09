@@ -246,7 +246,7 @@ bool Controller::hasModel( const Model * m ) const
 {
 	for (QObject * c : children())
 	{
-		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
+		auto* am = qobject_cast<AutomatableModel*>(c);
 		if( am != nullptr )
 		{
 			if( am == m )
@@ -296,7 +296,7 @@ QString Controller::nodeName() const
 
 gui::ControllerDialog * Controller::createDialog( QWidget * _parent )
 {
-	gui::ControllerDialog * d = new gui::ControllerDialog( this, _parent );
+	auto* d = new gui::ControllerDialog(this, _parent);
 
 	return d;
 }

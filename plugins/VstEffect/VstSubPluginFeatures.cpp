@@ -55,7 +55,7 @@ void VstSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 void VstSubPluginFeatures::listSubPluginKeys( const Plugin::Descriptor * _desc,
 														KeyList & _kl ) const
 {
-	QStringList *dlls = new QStringList();
+	auto* dlls = new QStringList();
 	const QString path = QString("");
 	addPluginsFromDir(dlls, path );
 	// TODO: eval m_type

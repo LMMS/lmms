@@ -53,7 +53,7 @@ bool MixerLine::eventFilter( QObject *dist, QEvent *event )
 	// If we are in a rename, capture the enter/return events and handle them
 	if ( event->type() == QEvent::KeyPress )
 	{
-		QKeyEvent * keyEvent = static_cast<QKeyEvent*>(event);
+		auto* keyEvent = static_cast<QKeyEvent*>(event);
 		if( keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return )
 		{
 			if( m_inRename )
@@ -120,7 +120,7 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	m_renameLineEdit->setReadOnly( true );
 	m_renameLineEdit->installEventFilter( this );
 
-	QGraphicsScene * scene = new QGraphicsScene();
+	auto* scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, 33, MixerLineHeight );
 
 	m_view = new QGraphicsView( this );

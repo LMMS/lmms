@@ -38,7 +38,7 @@ StereoEnhancerControlDialog::StereoEnhancerControlDialog(
 	StereoEnhancerControls * _controls ) :
 	EffectControlDialog( _controls )
 {
-	QHBoxLayout * l = new QHBoxLayout( this );
+	auto* l = new QHBoxLayout(this);
 
 	Knob * widthKnob = new Knob( knobBright_26, this );
 	widthKnob->setModel( &_controls->m_widthModel );

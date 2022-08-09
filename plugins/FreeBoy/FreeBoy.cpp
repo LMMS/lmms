@@ -251,7 +251,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 
 	if ( tfp == 0 )
 	{
-		Gb_Apu_Buffer *papu = new Gb_Apu_Buffer();
+		auto* papu = new Gb_Apu_Buffer();
 		papu->set_sample_rate( samplerate, CLOCK_RATE );
 
 		// Master sound circuitry power control
@@ -282,7 +282,7 @@ void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = papu;
 	}
 
-	Gb_Apu_Buffer *papu = static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
+	auto* papu = static_cast<Gb_Apu_Buffer*>(_n->m_pluginData);
 
 	papu->treble_eq( m_trebleModel.value() );
 	papu->bass_freq( m_bassModel.value() );
@@ -681,7 +681,7 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 
 void FreeBoyInstrumentView::modelChanged()
 {
-	FreeBoyInstrument * p = castModel<FreeBoyInstrument>();
+	auto* p = castModel<FreeBoyInstrument>();
 
 	m_ch1SweepTimeKnob->setModel( &p->m_ch1SweepTimeModel );
 	m_ch1SweepDirButton->setModel( &p->m_ch1SweepDirModel );

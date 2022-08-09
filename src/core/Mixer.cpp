@@ -293,7 +293,7 @@ void Mixer::deleteChannel( int index )
 	{
 		if( t->type() == Track::InstrumentTrack )
 		{
-			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
+			auto* inst = dynamic_cast<InstrumentTrack*>(t);
 			int val = inst->mixerChannelModel()->value(0);
 			if( val == index )
 			{
@@ -309,7 +309,7 @@ void Mixer::deleteChannel( int index )
 		}
 		else if( t->type() == Track::SampleTrack )
 		{
-			SampleTrack* strk = dynamic_cast<SampleTrack *>( t );
+			auto* strk = dynamic_cast<SampleTrack*>(t);
 			int val = strk->mixerChannelModel()->value(0);
 			if( val == index )
 			{
@@ -395,7 +395,7 @@ void Mixer::moveChannelLeft( int index )
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
-				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
+				auto* inst = (InstrumentTrack*)trackList[i];
 				int val = inst->mixerChannelModel()->value(0);
 				if( val == a )
 				{
@@ -408,7 +408,7 @@ void Mixer::moveChannelLeft( int index )
 			}
 			else if( trackList[i]->type() == Track::SampleTrack )
 			{
-				SampleTrack * strk = (SampleTrack *) trackList[i];
+				auto* strk = (SampleTrack*)trackList[i];
 				int val = strk->mixerChannelModel()->value(0);
 				if( val == a )
 				{
@@ -469,7 +469,7 @@ MixerRoute * Mixer::createRoute( MixerChannel * from, MixerChannel * to, float a
 		return nullptr;
 	}
 	Engine::audioEngine()->requestChangeInModel();
-	MixerRoute * route = new MixerRoute( from, to, amount );
+	auto* route = new MixerRoute(from, to, amount);
 
 	// add us to from's sends
 	from->m_sends.append( route );

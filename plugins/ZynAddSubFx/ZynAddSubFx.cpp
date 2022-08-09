@@ -135,7 +135,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 			this, SLOT( updateResBandwidth() ), Qt::DirectConnection );
 
 	// now we need a play-handle which cares for calling play()
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
+	auto* iph = new InstrumentPlayHandle(this, _instrumentTrack);
 	Engine::audioEngine()->addPlayHandle( iph );
 
 	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ),
@@ -503,7 +503,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 								"artwork" ) );
 	setPalette( pal );
 
-	QGridLayout * l = new QGridLayout( this );
+	auto* l = new QGridLayout(this);
 	l->setContentsMargins( 20, 80, 10, 10 );
 	l->setVerticalSpacing( 16 );
 	l->setHorizontalSpacing( 10 );
@@ -611,7 +611,7 @@ void ZynAddSubFxView::dropEvent( QDropEvent * _de )
 
 void ZynAddSubFxView::modelChanged()
 {
-	ZynAddSubFxInstrument * m = castModel<ZynAddSubFxInstrument>();
+	auto* m = castModel<ZynAddSubFxInstrument>();
 
 	// set models for controller knobs
 	m_portamento->setModel( &m->m_portamentoModel );
@@ -632,7 +632,7 @@ void ZynAddSubFxView::modelChanged()
 
 void ZynAddSubFxView::toggleUI()
 {
-	ZynAddSubFxInstrument * model = castModel<ZynAddSubFxInstrument>();
+	auto* model = castModel<ZynAddSubFxInstrument>();
 	if( model->m_hasGUI != m_toggleUIButton->isChecked() )
 	{
 		model->m_hasGUI = m_toggleUIButton->isChecked();

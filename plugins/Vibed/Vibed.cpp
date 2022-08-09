@@ -301,8 +301,7 @@ void Vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
-	StringContainer * ps = static_cast<StringContainer *>(
-							_n->m_pluginData );
+	auto* ps = static_cast<StringContainer*>(_n->m_pluginData);
 
 	for( fpp_t i = offset; i < frames + offset; ++i )
 	{
@@ -583,8 +582,8 @@ void VibedView::modelChanged()
 
 void VibedView::showString( int _string )
 {
-	Vibed * v = castModel<Vibed>();
-	
+	auto* v = castModel<Vibed>();
+
 	m_pickKnob->setModel( v->m_pickKnobs[_string] );
 	m_pickupKnob->setModel( v->m_pickupKnobs[_string] );
 	m_stiffnessKnob->setModel( v->m_stiffnessKnobs[_string] );

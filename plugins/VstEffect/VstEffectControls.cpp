@@ -170,7 +170,7 @@ gui::EffectControlDialog* VstEffectControls::createView()
 void VstEffectControls::managePlugin()
 {
 	if ( m_effect->m_plugin != nullptr && m_subWindow == nullptr ) {
-		gui::ManageVSTEffectView * tt = new gui::ManageVSTEffectView( m_effect, this);
+		auto* tt = new gui::ManageVSTEffectView(m_effect, this);
 		ctrHandle = (QObject *)tt;
 	} else if (m_subWindow != nullptr) {
 		if (m_subWindow->widget()->isVisible() == false ) { 
@@ -221,8 +221,8 @@ void VstEffectControls::updateMenu()
     		to_menu->clear();
 
      		for (int i = 0; i < list1.size(); i++) {
-			QAction* presetAction = new QAction(this);
-			connect(presetAction, SIGNAL(triggered()), this, SLOT(selPreset()));
+				auto* presetAction = new QAction(this);
+				connect(presetAction, SIGNAL(triggered()), this, SLOT(selPreset()));
 
         		presetAction->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
         		presetAction->setData(i);
@@ -291,13 +291,14 @@ void VstEffectControls::rolrPreset()
 void VstEffectControls::selPreset()
 {
 
-     QAction *action = qobject_cast<QAction *>(sender());
-     if (action)
-         if ( m_effect->m_plugin != nullptr ) {
-		lastPosInMenu = action->data().toInt();
-		m_effect->m_plugin->setProgram( lastPosInMenu );
-		//QWidget::update();
-	 }
+	auto* action = qobject_cast<QAction*>(sender());
+	if (action)
+		if (m_effect->m_plugin != nullptr)
+		{
+			lastPosInMenu = action->data().toInt();
+			m_effect->m_plugin->setProgram(lastPosInMenu);
+			// QWidget::update();
+		}
 }
 
 

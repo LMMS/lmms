@@ -310,7 +310,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setValue( 0 );
 
 	std::istringstream stream(readAllData().toStdString());
-	Alg_seq_ptr seq = new Alg_seq(stream, true);
+	auto seq = new Alg_seq(stream, true);
 	seq->convert_to_beats();
 
 	pd.setMaximum( seq->tracks()  + preTrackSteps );
@@ -328,18 +328,14 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	// NOTE: unordered_map::operator[] creates a new element if none exists
 
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
-	AutomationTrack * nt = dynamic_cast<AutomationTrack*>(
-		Track::create(Track::AutomationTrack, Engine::getSong()));
+	auto* nt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
 	nt->setName(tr("MIDI Time Signature Numerator"));
-	AutomationTrack * dt = dynamic_cast<AutomationTrack*>(
-		Track::create(Track::AutomationTrack, Engine::getSong()));
+	auto* dt = dynamic_cast<AutomationTrack*>(Track::create(Track::AutomationTrack, Engine::getSong()));
 	dt->setName(tr("MIDI Time Signature Denominator"));
-	AutomationClip * timeSigNumeratorPat =
-		new AutomationClip(nt);
+	auto* timeSigNumeratorPat = new AutomationClip(nt);
 	timeSigNumeratorPat->setDisplayName(tr("Numerator"));
 	timeSigNumeratorPat->addObject(&timeSigMM.numeratorModel());
-	AutomationClip * timeSigDenominatorPat =
-		new AutomationClip(dt);
+	auto* timeSigDenominatorPat = new AutomationClip(dt);
 	timeSigDenominatorPat->setDisplayName(tr("Denominator"));
 	timeSigDenominatorPat->addObject(&timeSigMM.denominatorModel());
 	
@@ -448,7 +444,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			else if (evt->is_note())
 			{
 				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
-				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
+				auto noteEvt = dynamic_cast<Alg_note_ptr>(evt);
 				int ticks = noteEvt->get_duration() * ticksPerBeat;
 				Note n( (ticks < 1 ? 1 : ticks ),
 						noteEvt->get_start_time() * ticksPerBeat,

@@ -115,7 +115,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 {
 	const f_cnt_t frames = framesRecorded();
 	// create buffer to store all recorded buffers in
-	sampleFrame * data = new sampleFrame[frames];
+	auto* data = new sampleFrame[frames];
 	// make sure buffer is cleaned up properly at the end...
 	sampleFrame * data_ptr = data;
 
@@ -140,7 +140,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 
 void SampleRecordHandle::writeBuffer( const sampleFrame * _ab, const f_cnt_t _frames )
 {
-	sampleFrame * buf = new sampleFrame[_frames];
+	auto* buf = new sampleFrame[_frames];
 	for( f_cnt_t frame = 0; frame < _frames; ++frame )
 	{
 		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )

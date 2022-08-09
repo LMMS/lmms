@@ -136,9 +136,9 @@ AutoLilvNode Lv2ViewProc::uri(const char *uriStr)
 
 Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 {
-	QGridLayout* grid = new QGridLayout(meAsWidget);
+	auto* grid = new QGridLayout(meAsWidget);
 
-	QHBoxLayout* btnBox = new QHBoxLayout();
+	auto* btnBox = new QHBoxLayout();
 	if (/* DISABLES CODE */ (false))
 	{
 		m_reloadPluginButton = new QPushButton(QObject::tr("Reload Plugin"),
@@ -169,7 +169,7 @@ Lv2ViewBase::Lv2ViewBase(QWidget* meAsWidget, Lv2ControlBase *ctrlBase)
 	LILV_FOREACH(nodes, itr, props.get())
 	{
 		const LilvNode* node = lilv_nodes_get(props.get(), itr);
-		QLabel* infoLabel = new QLabel(lilv_node_as_string(node));
+		auto* infoLabel = new QLabel(lilv_node_as_string(node));
 		infoLabel->setWordWrap(true);
 		infoLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
