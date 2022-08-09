@@ -401,7 +401,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
 	const int cur_chord_size = chord_table.chords()[selected_arp].size();
 	const int repeats = m_arpRepeatsModel.value();
-	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * repeats) + 1;
+	const int range = static_cast<int>(cur_chord_size * m_arpRangeModel.value() * repeats) + repeats;
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
@@ -484,23 +484,23 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 * repeats );
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
 			if( cur_arp_idx >= range )
 			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - repeats;
 			}
 		}
 		else if( dir == ArpDirection::DownAndUp && range > 1 )
 		{
 			// copied from ArpDirection::UpAndDown above
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 * repeats);
 			// if greater than range, we have to play down...
 			// looks like the code for arp_dir==DOWN... :)
 			if( cur_arp_idx >= range )
 			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - repeats;
 			}
 			// inverts direction
 			cur_arp_idx = range - cur_arp_idx - 1;
