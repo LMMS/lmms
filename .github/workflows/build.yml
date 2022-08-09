@@ -206,14 +206,14 @@ jobs:
           path: C:\vcpkg\installed
       - name: Install 64-bit Qt
         if: matrix.arch == 'x64'
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
         with:
           version: ${{ env.qt-version }}
           arch: win64_msvc2019_64
           archives: qtbase qtsvg qttools
           cache: true
       - name: Install 32-bit Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@64bdb64f2c14311d23733a8463e5fcbc65e8775e
         with:
           version: ${{ env.qt-version }}
           arch: win32_msvc2019
