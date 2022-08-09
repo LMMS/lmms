@@ -90,10 +90,10 @@ int RemotePluginBase::sendMessage( const message & _m )
 	writeInt( _m.id );
 	writeInt( _m.data.size() );
 	int j = 8;
-	for( unsigned int i = 0; i < _m.data.size(); ++i )
+	for(const auto & i : _m.data)
 	{
-		writeString( _m.data[i] );
-		j += 4 + _m.data[i].size();
+		writeString( i );
+		j += 4 + i.size();
 	}
 	pthread_mutex_unlock( &m_sendMutex );
 #endif

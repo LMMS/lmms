@@ -66,11 +66,11 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 
 Effect::~Effect()
 {
-	for( int i = 0; i < 2; ++i )
+	for(auto & i : m_srcState)
 	{
-		if( m_srcState[i] != nullptr )
+		if( i != nullptr )
 		{
-			src_delete( m_srcState[i] );
+			src_delete( i );
 		}
 	}
 }
@@ -175,14 +175,14 @@ gui::PluginView * Effect::instantiateView( QWidget * _parent )
 
 void Effect::reinitSRC()
 {
-	for( int i = 0; i < 2; ++i )
+	for(auto & i : m_srcState)
 	{
-		if( m_srcState[i] != nullptr )
+		if( i != nullptr )
 		{
-			src_delete( m_srcState[i] );
+			src_delete( i );
 		}
 		int error;
-		if( ( m_srcState[i] = src_new(
+		if( ( i = src_new(
 			Engine::audioEngine()->currentQualitySettings().
 							libsrcInterpolation(),
 					DEFAULT_CHANNELS, &error ) ) == nullptr )

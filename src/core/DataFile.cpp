@@ -534,13 +534,9 @@ bool DataFile::hasLocalPlugins(QDomElement parent /* = QDomElement()*/, bool fir
 		// Skip the nodes allowed to have "local:" attributes, but
 		// still check its children
 		for
-		(
-			ResourcesMap::const_iterator it = ELEMENTS_WITH_RESOURCES.begin();
-			it != ELEMENTS_WITH_RESOURCES.end();
-			++it
-		)
+		(const auto & it : ELEMENTS_WITH_RESOURCES)
 		{
-			if (childElement.tagName() == it->first)
+			if (childElement.tagName() == it.first)
 			{
 				skipNode = true;
 				break;

@@ -109,13 +109,13 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	TimePos lastPosition;
 	TimePos lastLen;
-	for( clipVector::iterator it = clips.begin(); it != clips.end(); ++it )
+	for(auto & clip : clips)
 	{
-		if( !( *it )->isMuted() &&
-				( *it )->startPosition() >= lastPosition )
+		if( !clip->isMuted() &&
+				clip->startPosition() >= lastPosition )
 		{
-			lastPosition = ( *it )->startPosition();
-			lastLen = ( *it )->length();
+			lastPosition = clip->startPosition();
+			lastLen = clip->length();
 		}
 	}
 
@@ -185,11 +185,10 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 					Engine::patternStore()->tracks();
 		// copy clips of all tracks from source pattern (at bar "src") to destination
 		// clips (which are created if they do not exist yet)
-		for( TrackContainer::TrackList::iterator it = tl.begin();
-							it != tl.end(); ++it )
+		for(auto & it : tl)
 		{
-			Clip::copyStateTo( ( *it )->getClip( src ),
-				( *it )->getClip( dst ) );
+			Clip::copyStateTo( it->getClip( src ),
+				it->getClip( dst ) );
 		}
 		setName( tr( "Clone of %1" ).arg(
 					_this.parentNode().toElement().attribute( "name" ) ) );

@@ -339,13 +339,11 @@ const QString & ConfigManager::value(const QString & cls,
 {
 	if(m_settings.contains(cls))
 	{
-		for(stringPairVector::const_iterator it =
-						m_settings[cls].begin();
-					it != m_settings[cls].end(); ++it)
+		for(const auto & it : m_settings[cls])
 		{
-			if((*it).first == attribute)
+			if(it.first == attribute)
 			{
-				return (*it).second ;
+				return it.second ;
 			}
 		}
 	}
@@ -613,21 +611,19 @@ void ConfigManager::saveConfigFile()
 						it != m_settings.end(); ++it)
 	{
 		QDomElement n = doc.createElement(it.key());
-		for(stringPairVector::iterator it2 = (*it).begin();
-						it2 != (*it).end(); ++it2)
+		for(auto & it2 : it)
 		{
-			n.setAttribute((*it2).first, (*it2).second);
+			n.setAttribute(it2.first, it2.second);
 		}
 		lmms_config.appendChild(n);
 	}
 
 	QDomElement recent_files = doc.createElement("recentfiles");
 
-	for(QStringList::iterator it = m_recentlyOpenedProjects.begin();
-				it != m_recentlyOpenedProjects.end(); ++it)
+	for(auto & m_recentlyOpenedProject : m_recentlyOpenedProjects)
 	{
 		QDomElement n = doc.createElement("file");
-		n.setAttribute("path", *it);
+		n.setAttribute("path", m_recentlyOpenedProject);
 		recent_files.appendChild(n);
 	}
 	lmms_config.appendChild(recent_files);

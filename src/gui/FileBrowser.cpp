@@ -219,9 +219,9 @@ void FileBrowser::reloadTree()
 
 	if (!paths.isEmpty())
 	{
-		for (QStringList::iterator it = paths.begin(); it != paths.end(); ++it)
+		for (auto & path : paths)
 		{
-			addItems(*it);
+			addItems(path);
 		}
 	}
 	expandItems(nullptr, expandedDirs);
@@ -996,12 +996,11 @@ void Directory::update()
 	{
 		m_dirCount = 0;
 		// for all paths leading here, add their items
-		for( QStringList::iterator it = m_directories.begin();
-					it != m_directories.end(); ++it )
+		for(auto & m_directorie : m_directories)
 		{
 			int filesBeforeAdd = childCount() - m_dirCount;
-			if( addItems( fullName( *it ) ) &&
-				( *it ).contains(
+			if( addItems( fullName( m_directorie ) ) &&
+				m_directorie.contains(
 					ConfigManager::inst()->dataDir() ) )
 			{
 				// factory file directory is added

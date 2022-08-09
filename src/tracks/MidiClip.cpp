@@ -68,9 +68,9 @@ MidiClip::MidiClip( const MidiClip& other ) :
 	m_clipType( other.m_clipType ),
 	m_steps( other.m_steps )
 {
-	for( NoteVector::ConstIterator it = other.m_notes.begin(); it != other.m_notes.end(); ++it )
+	for(auto m_note : other.m_notes)
 	{
-		m_notes.push_back( new Note( **it ) );
+		m_notes.push_back( new Note( *m_note ) );
 	}
 
 	init();
@@ -93,10 +93,9 @@ MidiClip::~MidiClip()
 {
 	emit destroyedMidiClip( this );
 
-	for( NoteVector::Iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for(auto & m_note : m_notes)
 	{
-		delete *it;
+		delete m_note;
 	}
 
 	m_notes.clear();
@@ -110,16 +109,16 @@ void MidiClip::resizeToFirstTrack()
 	// Resize this track to be the same as existing tracks in the pattern
 	const TrackContainer::TrackList & tracks =
 		m_instrumentTrack->trackContainer()->tracks();
-	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
+	for(auto track : tracks)
 	{
-		if(tracks.at(trackID)->type() == Track::InstrumentTrack)
+		if(track->type() == Track::InstrumentTrack)
 		{
-			if(tracks.at(trackID) != m_instrumentTrack)
+			if(track != m_instrumentTrack)
 			{
 				unsigned int currentClip = m_instrumentTrack->
 					getClips().indexOf(this);
 				m_steps = static_cast<MidiClip *>
-					(tracks.at(trackID)->getClip(currentClip))
+					(track->getClip(currentClip))
 					->m_steps;
 			}
 			break;
@@ -154,13 +153,12 @@ void MidiClip::updateLength()
 
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for(auto m_note : m_notes)
 	{
-		if( ( *it )->length() > 0 )
+		if( m_note->length() > 0 )
 		{
 			max_length = qMax<tick_t>( max_length,
-							( *it )->endPos() );
+							m_note->endPos() );
 		}
 	}
 	changeLength( TimePos( max_length ).nextFullBar() *
@@ -175,13 +173,12 @@ TimePos MidiClip::beatClipLength() const
 {
 	tick_t max_length = TimePos::ticksPerBar();
 
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for(auto m_note : m_notes)
 	{
-		if( ( *it )->length() < 0 )
+		if( m_note->length() < 0 )
 		{
 			max_length = qMax<tick_t>( max_length,
-				( *it )->pos() + 1 );
+				m_note->pos() + 1 );
 		}
 	}
 
@@ -247,13 +244,12 @@ void MidiClip::removeNote( Note * _note_to_del )
 
 Note * MidiClip::noteAtStep( int _step )
 {
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
+	for(auto & m_note : m_notes)
 	{
-		if( ( *it )->pos() == TimePos::stepPosition( _step )
-						&& ( *it )->length() < 0 )
+		if( m_note->pos() == TimePos::stepPosition( _step )
+						&& m_note->length() < 0 )
 		{
-			return *it;
+			return m_note;
 		}
 	}
 	return nullptr;
@@ -272,10 +268,9 @@ void MidiClip::rearrangeAllNotes()
 void MidiClip::clearNotes()
 {
 	instrumentTrack()->lock();
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
+	for(auto & m_note : m_notes)
 	{
-		delete *it;
+		delete m_note;
 	}
 	m_notes.clear();
 	instrumentTrack()->unlock();
@@ -322,11 +317,9 @@ void MidiClip::splitNotes(NoteVector notes, TimePos pos)
 
 	addJournalCheckPoint();
 
-	for (int i = 0; i < notes.size(); ++i)
+	for (auto note : notes)
 	{
-		Note* note = notes.at(i);
-
-		int leftLength = pos.getTicks() - note->pos();
+			int leftLength = pos.getTicks() - note->pos();
 		int rightLength = note->length() - leftLength;
 
 		// Split out of bounds
@@ -405,10 +398,9 @@ void MidiClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "steps", m_steps );
 
 	// now save settings of all notes
-	for( NoteVector::Iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for(auto & m_note : m_notes)
 	{
-		( *it )->saveState( _doc, _this );
+		m_note->saveState( _doc, _this );
 	}
 }
 
@@ -582,10 +574,9 @@ void MidiClip::updatePatternTrack()
 
 bool MidiClip::empty()
 {
-	for( NoteVector::ConstIterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
+	for(auto m_note : m_notes)
 	{
-		if( ( *it )->length() != 0 )
+		if( m_note->length() != 0 )
 		{
 			return false;
 		}
@@ -599,12 +590,11 @@ bool MidiClip::empty()
 void MidiClip::changeTimeSignature()
 {
 	TimePos last_pos = TimePos::ticksPerBar() - 1;
-	for( NoteVector::ConstIterator cit = m_notes.begin();
-						cit != m_notes.end(); ++cit )
+	for(auto m_note : m_notes)
 	{
-		if( ( *cit )->length() < 0 && ( *cit )->pos() > last_pos )
+		if( m_note->length() < 0 && m_note->pos() > last_pos )
 		{
-			last_pos = ( *cit )->pos()+TimePos::ticksPerBar() /
+			last_pos = m_note->pos()+TimePos::ticksPerBar() /
 						TimePos::stepsPerBar();
 		}
 	}

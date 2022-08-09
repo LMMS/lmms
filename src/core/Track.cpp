@@ -226,10 +226,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 
 	// now save settings of all Clip's
-	for( clipVector::const_iterator it = m_clips.begin();
-				it != m_clips.end(); ++it )
+	for(auto m_clip : m_clips)
 	{
-		( *it )->saveState( doc, element );
+		m_clip->saveState( doc, element );
 	}
 }
 
@@ -512,12 +511,11 @@ void Track::insertBar( const TimePos & pos )
 {
 	// we'll increase the position of every Clip, positioned behind pos, by
 	// one bar
-	for( clipVector::iterator it = m_clips.begin();
-				it != m_clips.end(); ++it )
+	for(auto & m_clip : m_clips)
 	{
-		if( ( *it )->startPosition() >= pos )
+		if( m_clip->startPosition() >= pos )
 		{
-			( *it )->movePosition( (*it)->startPosition() +
+			m_clip->movePosition( m_clip->startPosition() +
 						TimePos::ticksPerBar() );
 		}
 	}
@@ -534,11 +532,11 @@ void Track::removeBar( const TimePos & pos )
 {
 	// we'll decrease the position of every Clip, positioned behind pos, by
 	// one bar
-	for( clipVector::iterator it = m_clips.begin(); it != m_clips.end(); ++it )
+	for(auto & m_clip : m_clips)
 	{
-		if( ( *it )->startPosition() >= pos )
+		if( m_clip->startPosition() >= pos )
 		{
-			(*it)->movePosition((*it)->startPosition() - TimePos::ticksPerBar());
+			m_clip->movePosition(m_clip->startPosition() - TimePos::ticksPerBar());
 		}
 	}
 }
@@ -556,15 +554,15 @@ bar_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
-	for( clipVector::const_iterator it = m_clips.begin(); it != m_clips.end(); ++it )
+	for(auto m_clip : m_clips)
 	{
 		if( Engine::getSong()->isExporting() &&
-				( *it )->isMuted() )
+				m_clip->isMuted() )
 		{
 			continue;
 		}
 
-		const tick_t cur = ( *it )->endPosition();
+		const tick_t cur = m_clip->endPosition();
 		if( cur > last )
 		{
 			last = cur;
@@ -587,12 +585,11 @@ void Track::toggleSolo()
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
-	for( TrackContainer::TrackList::const_iterator it = tl.begin();
-							it != tl.end(); ++it )
+	for(auto it : tl)
 	{
-		if( *it != this )
+		if( it != this )
 		{
-			if( ( *it )->m_soloModel.value() )
+			if( it->m_soloModel.value() )
 			{
 				soloBefore = true;
 				break;
@@ -604,37 +601,36 @@ void Track::toggleSolo()
 	// Should we use the new behavior of solo or the older/legacy one?
 	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
 
-	for( TrackContainer::TrackList::const_iterator it = tl.begin();
-							it != tl.end(); ++it )
+	for(auto it : tl)
 	{
 		if( solo )
 		{
 			// save mute-state in case no track was solo before
 			if( !soloBefore )
 			{
-				( *it )->m_mutedBeforeSolo = ( *it )->isMuted();
+				it->m_mutedBeforeSolo = it->isMuted();
 			}
 			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
-			if( *it == this )
+			if( it == this )
 			{
-				( *it )->setMuted( false );
+				it->setMuted( false );
 			}
-			else if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			else if( soloLegacyBehavior || it->type() != AutomationTrack )
 			{
-				( *it )->setMuted( true );
+				it->setMuted( true );
 			}
-			if( *it != this )
+			if( it != this )
 			{
-				( *it )->m_soloModel.setValue( false );
+				it->m_soloModel.setValue( false );
 			}
 		}
 		else if( !soloBefore )
 		{
 			// Unless we are on the sololegacybehavior mode, only restores the
 			// mute state if the track isn't an Automation Track
-			if( soloLegacyBehavior || ( *it )->type() != AutomationTrack )
+			if( soloLegacyBehavior || it->type() != AutomationTrack )
 			{
-				( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
+				it->setMuted( it->m_mutedBeforeSolo );
 			}
 		}
 	}

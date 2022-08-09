@@ -216,27 +216,27 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
 
 				// for each pattern clip of the current pattern track (in song editor)
-				for (auto it = plist.begin(); it != plist.end(); ++it)
+				for (auto & it : plist)
 				{
-					while (!st.empty() && st.back().second <= it->first)
+					while (!st.empty() && st.back().second <= it.first)
 					{
 						writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 						pos = st.back().second;
 						st.pop_back();
 					}
 
-					if (!st.empty() && st.back().second <= it->second)
+					if (!st.empty() && st.back().second <= it.second)
 					{
-						writePatternClip(midiClip, nv, len, st.back().first, pos, it->first);
-						pos = it->first;
-						while (!st.empty() && st.back().second <= it->second)
+						writePatternClip(midiClip, nv, len, st.back().first, pos, it.first);
+						pos = it.first;
+						while (!st.empty() && st.back().second <= it.second)
 						{
 							st.pop_back();
 						}
 					}
 
-					st.push_back(*it);
-					pos = it->first;
+					st.push_back(it);
+					pos = it.first;
 				}
 
 				while (!st.empty())
@@ -286,9 +286,9 @@ void MidiExport::writeMidiClip(MidiNoteVector &midiClip, const QDomNode& n,
 
 void MidiExport::writeMidiClipToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
-	for (auto it = nv.begin(); it != nv.end(); ++it)
+	for (auto & it : nv)
 	{
-		mtrack.addNote(it->pitch, it->volume, it->time / 48.0, it->duration / 48.0);
+		mtrack.addNote(it.pitch, it.volume, it.time / 48.0, it.duration / 48.0);
 	}
 }
 
@@ -301,16 +301,16 @@ void MidiExport::writePatternClip(MidiNoteVector& src, MidiNoteVector& dst,
 	start -= base;
 	end -= base;
 	std::sort(src.begin(), src.end());
-	for (auto it = src.begin(); it != src.end(); ++it)
+	for (auto & it : src)
 	{
-		for (int time = it->time  + ceil((start - it->time) / len)
+		for (int time = it.time  + ceil((start - it.time) / len)
 				* len; time < end; time += len)
 		{
 			MidiNote note;
-			note.duration = it->duration;
-			note.pitch = it->pitch;
+			note.duration = it.duration;
+			note.pitch = it.pitch;
 			note.time = base + time;
-			note.volume = it->volume;
+			note.volume = it.volume;
 			dst.push_back(note);
 		}
 	}

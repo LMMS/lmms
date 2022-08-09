@@ -135,9 +135,9 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		setPlaying(nowPlaying);
 	}
 
-	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
+	for(auto & clip : clips)
 	{
-		SampleClip * st = dynamic_cast<SampleClip *>( *it );
+		SampleClip * st = dynamic_cast<SampleClip *>( clip );
 		if( !st->isMuted() )
 		{
 			PlayHandle* handle;

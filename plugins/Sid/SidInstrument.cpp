@@ -227,10 +227,10 @@ f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
-	for( int i = 0 ; i < 3 ; ++i )
+	for(auto i : m_voice)
 	{
-		if( maxrel < m_voice[i]->m_releaseModel.value() )
-			maxrel = (int)m_voice[i]->m_releaseModel.value();
+		if( maxrel < i->m_releaseModel.value() )
+			maxrel = (int)i->m_releaseModel.value();
 	}
 
 	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
@@ -320,9 +320,9 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
 	unsigned char sidreg[NUMSIDREGS];
 
-	for (int c = 0; c < NUMSIDREGS; c++)
+	for (unsigned char & c : sidreg)
 	{
-		sidreg[c] = 0x00;
+		c = 0x00;
 	}
 
 	if( (ChipModel)m_chipModel.value() == sidMOS6581 )
@@ -750,19 +750,19 @@ void SidInstrumentView::modelChanged()
 					&k->m_voice[i]->m_testModel );
 	}
 
-	for( int i = 0; i < 3; ++i )
+	for(auto & i : k->m_voice)
 	{
-		connect( &k->m_voice[i]->m_attackModel, SIGNAL( dataChanged() ),
+		connect( &i->m_attackModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_decayModel, SIGNAL( dataChanged() ),
+		connect( &i->m_decayModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_releaseModel, SIGNAL( dataChanged() ),
+		connect( &i->m_releaseModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_pulseWidthModel, SIGNAL( dataChanged() ),
+		connect( &i->m_pulseWidthModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobHint() ) );
-		connect( &k->m_voice[i]->m_sustainModel, SIGNAL( dataChanged() ),
+		connect( &i->m_sustainModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobToolTip() ) );
-		connect( &k->m_voice[i]->m_coarseModel, SIGNAL( dataChanged() ),
+		connect( &i->m_coarseModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateKnobToolTip() ) );
 	}
 	

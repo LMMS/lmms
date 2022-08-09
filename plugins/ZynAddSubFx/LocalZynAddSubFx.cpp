@@ -51,9 +51,9 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master( nullptr ),
 	m_ioEngine( nullptr )
 {
-	for( int i = 0; i < NumKeys; ++i )
+	for(int & m_runningNote : m_runningNotes)
 	{
-		m_runningNotes[i] = 0;
+		m_runningNote = 0;
 	}
 
 	if( s_instanceCount == 0 )
@@ -182,14 +182,14 @@ void LocalZynAddSubFx::loadPreset( const std::string & _filename, int _part )
 void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 {
 	m_presetsDir = _dir;
-	for( int i = 0; i < MAX_BANK_ROOT_DIRS; ++i )
+	for(auto & i : config.cfg.bankRootDirList)
 	{
-		if( config.cfg.bankRootDirList[i].empty() )
+		if( i.empty() )
 		{
-			config.cfg.bankRootDirList[i] = m_presetsDir;
+			i = m_presetsDir;
 			break;
 		}
-		else if( config.cfg.bankRootDirList[i] == m_presetsDir )
+		else if( i == m_presetsDir )
 		{
 			break;
 		}
@@ -214,9 +214,9 @@ void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 
 void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
 {
-	for( int i = 0; i < NUM_MIDI_PARTS; ++i )
+	for(auto & i : m_master->part)
 	{
-		m_master->part[i]->ctl.setpitchwheelbendrange( semitones * 100 );
+		i->ctl.setpitchwheelbendrange( semitones * 100 );
 	}
 }
 

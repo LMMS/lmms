@@ -59,18 +59,15 @@ LadspaManager::LadspaManager()
 	ladspaDirectories.push_back( "/Library/Audio/Plug-Ins/LADSPA" );
 #endif
 
-	for( QStringList::iterator it = ladspaDirectories.begin(); 
-			 		   it != ladspaDirectories.end(); ++it )
+	for(auto & ladspaDirectorie : ladspaDirectories)
 	{
 		// Skip empty entries as QDir will interpret it as the working directory
-		if ((*it).isEmpty()) { continue; }
-		QDir directory( ( *it ) );
+		if (ladspaDirectorie.isEmpty()) { continue; }
+		QDir directory( ladspaDirectorie );
 		QFileInfoList list = directory.entryInfoList();
-		for( QFileInfoList::iterator file = list.begin();
-						file != list.end(); ++file )
+		for(auto & f : list)
 		{
-			const QFileInfo & f = *file;
-			if( !f.isFile() ||
+				if( !f.isFile() ||
 				 f.fileName().right( 3 ).toLower() !=
 #ifdef LMMS_BUILD_WIN32
 													"dll"
@@ -103,10 +100,9 @@ LadspaManager::LadspaManager()
 	}
 	
 	l_ladspa_key_t keys = m_ladspaManagerMap.keys();
-	for( l_ladspa_key_t::iterator it = keys.begin();
-			it != keys.end(); ++it )
+	for(auto & key : keys)
 	{
-		m_sortedPlugins.append( qMakePair( getName( *it ), *it ) );
+		m_sortedPlugins.append( qMakePair( getName( key ), key ) );
 	}
 	std::sort( m_sortedPlugins.begin(), m_sortedPlugins.end() );
 }

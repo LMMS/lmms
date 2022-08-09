@@ -100,10 +100,9 @@ void RenderManager::renderTracks()
 	const TrackContainer::TrackList & tl = Engine::getSong()->tracks();
 
 	// find all currently unnmuted tracks -- we want to render these.
-	for( auto it = tl.begin(); it != tl.end(); ++it )
+	for(auto tk : tl)
 	{
-		Track* tk = (*it);
-		Track::TrackTypes type = tk->type();
+			Track::TrackTypes type = tk->type();
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&
@@ -114,10 +113,9 @@ void RenderManager::renderTracks()
 	}
 
 	const TrackContainer::TrackList t2 = Engine::patternStore()->tracks();
-	for( auto it = t2.begin(); it != t2.end(); ++it )
+	for(auto tk : t2)
 	{
-		Track* tk = (*it);
-		Track::TrackTypes type = tk->type();
+			Track::TrackTypes type = tk->type();
 
 		// Don't render automation tracks
 		if ( tk->isMuted() == false &&

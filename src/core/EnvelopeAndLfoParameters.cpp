@@ -47,11 +47,10 @@ EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstance
 void EnvelopeAndLfoParameters::LfoInstances::trigger()
 {
 	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	for(auto & m_lfo : m_lfos)
 	{
-		( *it )->m_lfoFrame += Engine::audioEngine()->framesPerPeriod();
-		( *it )->m_bad_lfoShapeData = true;
+		m_lfo->m_lfoFrame += Engine::audioEngine()->framesPerPeriod();
+		m_lfo->m_bad_lfoShapeData = true;
 	}
 }
 
@@ -61,11 +60,10 @@ void EnvelopeAndLfoParameters::LfoInstances::trigger()
 void EnvelopeAndLfoParameters::LfoInstances::reset()
 {
 	QMutexLocker m( &m_lfoListMutex );
-	for( LfoList::Iterator it = m_lfos.begin();
-							it != m_lfos.end(); ++it )
+	for(auto & m_lfo : m_lfos)
 	{
-		( *it )->m_lfoFrame = 0;
-		( *it )->m_bad_lfoShapeData = true;
+		m_lfo->m_lfoFrame = 0;
+		m_lfo->m_bad_lfoShapeData = true;
 	}
 }
 

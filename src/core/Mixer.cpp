@@ -388,14 +388,13 @@ void Mixer::moveChannelLeft( int index )
 	TrackContainer::TrackList patternTrackList = Engine::patternStore()->tracks();
 
 	TrackContainer::TrackList trackLists[] = {songTrackList, patternTrackList};
-	for(int tl=0; tl<2; ++tl)
+	for(auto trackList : trackLists)
 	{
-		TrackContainer::TrackList trackList = trackLists[tl];
-		for(int i=0; i<trackList.size(); ++i)
+			for(auto & i : trackList)
 		{
-			if( trackList[i]->type() == Track::InstrumentTrack )
+			if( i->type() == Track::InstrumentTrack )
 			{
-				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
+				InstrumentTrack * inst = (InstrumentTrack *) i;
 				int val = inst->mixerChannelModel()->value(0);
 				if( val == a )
 				{
@@ -406,9 +405,9 @@ void Mixer::moveChannelLeft( int index )
 					inst->mixerChannelModel()->setValue(a);
 				}
 			}
-			else if( trackList[i]->type() == Track::SampleTrack )
+			else if( i->type() == Track::SampleTrack )
 			{
-				SampleTrack * strk = (SampleTrack *) trackList[i];
+				SampleTrack * strk = (SampleTrack *) i;
 				int val = strk->mixerChannelModel()->value(0);
 				if( val == a )
 				{
@@ -447,13 +446,13 @@ MixerRoute * Mixer::createChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel,
 	MixerChannel * from = m_mixerChannels[fromChannel];
 	MixerChannel * to = m_mixerChannels[toChannel];
 
-	for( int i=0; i<from->m_sends.size(); ++i )
+	for(auto & m_send : from->m_sends)
 	{
-		if( from->m_sends[i]->receiver() == to )
+		if( m_send->receiver() == to )
 		{
 			// simply adjust the amount
-			from->m_sends[i]->amount()->setValue( amount );
-			return from->m_sends[i];
+			m_send->amount()->setValue( amount );
+			return m_send;
 		}
 	}
 
@@ -493,11 +492,11 @@ void Mixer::deleteChannelSend( mix_ch_t fromChannel, mix_ch_t toChannel )
 	MixerChannel * to	 = m_mixerChannels[toChannel];
 
 	// find and delete the send entry
-	for( int i = 0; i < from->m_sends.size(); ++i )
+	for(auto & m_send : from->m_sends)
 	{
-		if( from->m_sends[i]->receiver() == to )
+		if( m_send->receiver() == to )
 		{
-			deleteChannelSend( from->m_sends[i] );
+			deleteChannelSend( m_send );
 			break;
 		}
 	}
@@ -544,9 +543,9 @@ bool Mixer::checkInfiniteLoop( MixerChannel * from, MixerChannel * to )
 
 	// follow sendTo's outputs recursively looking for something that sends
 	// to sendFrom
-	for( int i=0; i < to->m_sends.size(); ++i )
+	for(auto & m_send : to->m_sends)
 	{
-		if( checkInfiniteLoop( from, to->m_sends[i]->receiver() ) )
+		if( checkInfiniteLoop( from, m_send->receiver() ) )
 		{
 			return true;
 		}
@@ -744,13 +743,13 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
 
 		// add the channel sends
-		for( int si = 0; si < ch->m_sends.size(); ++si )
+		for(auto & m_send : ch->m_sends)
 		{
 			QDomElement sendsDom = _doc.createElement( QString( "send" ) );
 			mixch.appendChild( sendsDom );
 
-			sendsDom.setAttribute( "channel", ch->m_sends[si]->receiverIndex() );
-			ch->m_sends[si]->amount()->saveSettings( _doc, sendsDom, "amount" );
+			sendsDom.setAttribute( "channel", m_send->receiverIndex() );
+			m_send->amount()->saveSettings( _doc, sendsDom, "amount" );
 		}
 	}
 }

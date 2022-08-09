@@ -356,8 +356,8 @@ Lb302Synth::Lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 Lb302Synth::~Lb302Synth()
 {
-	for (int i=0; i<NUM_FILTERS; ++i) {
-		delete vcfs[i];
+	for (auto & vcf : vcfs) {
+		delete vcf;
 	}
 }
 

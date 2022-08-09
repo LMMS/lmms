@@ -72,15 +72,14 @@ LadspaDescription::LadspaDescription( QWidget * _parent,
 	}
 
 	QList<QString> pluginNames;
-	for( l_sortable_plugin_t::iterator it = plugins.begin();
-			it != plugins.end(); ++it )
+	for(auto & plugin : plugins)
 	{
 		if( _type != VALID || 
-			manager->getDescription( ( *it ).second )->inputChannels
+			manager->getDescription( plugin.second )->inputChannels
 				<= Engine::audioEngine()->audioDev()->channels() )
 		{ 
-			pluginNames.push_back( ( *it ).first );
-			m_pluginKeys.push_back( ( *it ).second );
+			pluginNames.push_back( plugin.first );
+			m_pluginKeys.push_back( plugin.second );
 		}
 	}
 
