@@ -531,11 +531,11 @@ void Track::removeBar( const TimePos & pos )
 {
 	// we'll decrease the position of every Clip, positioned behind pos, by
 	// one bar
-	for(auto & m_clip : m_clips)
+	for (auto& clip : m_clips)
 	{
-		if( m_clip->startPosition() >= pos )
+		if (clip->startPosition() >= pos)
 		{
-			m_clip->movePosition(m_clip->startPosition() - TimePos::ticksPerBar());
+			clip->movePosition(clip->startPosition() - TimePos::ticksPerBar());
 		}
 	}
 }
@@ -599,7 +599,7 @@ void Track::toggleSolo()
 	// Should we use the new behavior of solo or the older/legacy one?
 	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
 
-	for(auto track : tl)
+	for (auto track : tl)
 	{
 		if (solo)
 		{
