@@ -405,7 +405,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 		Alg_track_ptr trk = seq->track( t );
 		pd.setValue( t + preTrackSteps );
 
-		for(auto & cc : ccs)
+		for (auto& cc : ccs)
 		{
 			cc.clear();
 		}

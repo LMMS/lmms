@@ -786,14 +786,13 @@ void AutomationClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		_this.appendChild( element );
 	}
 
-	for(const auto & m_object : m_objects)
+	for (const auto& object : m_objects)
 	{
-		if( m_object )
+		if (object)
 		{
 			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute( "id",
-				ProjectJournal::idToSave( m_object->id() ) );
-			_this.appendChild( element );
+			element.setAttribute("id", ProjectJournal::idToSave(object->id()));
+			_this.appendChild(element);
 		}
 	}
 }
@@ -894,20 +893,19 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
-	for(auto it : l)
+	for (auto track : l)
 	{
-		if( it->type() == Track::AutomationTrack ||
-			it->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
-			const Track::clipVector & v = it->getClips();
-			for(auto j : v)
+			const Track::clipVector& v = track->getClips();
+			for (auto clip : v)
 			{
-				const AutomationClip * a = dynamic_cast<const AutomationClip *>( j );
+				const AutomationClip* a = dynamic_cast<const AutomationClip*>(clip);
 				if( a && a->hasAutomation() )
 				{
-					for(const auto & m_object : a->m_objects)
+					for (const auto& object : a->m_objects)
 					{
-						if( m_object == _m )
+						if (object == _m)
 						{
 							return true;
 						}
@@ -926,34 +924,33 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
  */
 QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel * _m )
 {
-	QVector<AutomationClip *> clips;
-	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::patternStore()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	QVector<AutomationClip*> clips;
+	TrackContainer::TrackList tracks;
+	tracks += Engine::getSong()->tracks();
+	tracks += Engine::patternStore()->tracks();
+	tracks += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
-	for(auto it : l)
+	for (auto track : tracks)
 	{
 		// we want only automation tracks...
-		if( it->type() == Track::AutomationTrack ||
-			it->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack )
 		{
 			// get clips in those tracks....
-			const Track::clipVector & v = it->getClips();
+			const Track::clipVector& trackClips = track->getClips();
 			// go through all the clips...
-			for(auto j : v)
+			for (auto trackClip : trackClips)
 			{
-				AutomationClip * a = dynamic_cast<AutomationClip *>( j );
+				AutomationClip* a = dynamic_cast<AutomationClip*>(trackClip);
 				// check that the clip has automation
 				if( a && a->hasAutomation() )
 				{
 					// now check is the clip is connected to the model we want by going through all the connections
 					// of the clip
 					bool has_object = false;
-					for(const auto & m_object : a->m_objects)
+					for (const auto& object : a->m_objects)
 					{
-						if( m_object == _m )
+						if (object == _m)
 						{
 							has_object = true;
 						}
@@ -974,9 +971,9 @@ AutomationClip * AutomationClip::globalAutomationClip(
 {
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
 	Track::clipVector v = t->getClips();
-	for(auto j : v)
+	for (auto clip : v)
 	{
-		AutomationClip * a = dynamic_cast<AutomationClip *>( j );
+		AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
 		{
 			for( objectVector::const_iterator k = a->m_objects.begin();
@@ -1003,15 +1000,14 @@ void AutomationClip::resolveAllIDs()
 	TrackContainer::TrackList l = Engine::getSong()->tracks() +
 				Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
-	for(auto & it : l)
+	for (auto& track : l)
 	{
-		if( it->type() == Track::AutomationTrack ||
-			 it->type() == Track::HiddenAutomationTrack )
+		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
-			Track::clipVector v = it->getClips();
-			for(auto & j : v)
+			Track::clipVector v = track->getClips();
+			for (auto& clip : v)
 			{
-				AutomationClip * a = dynamic_cast<AutomationClip *>( j );
+				AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
 				if( a )
 				{
 					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();

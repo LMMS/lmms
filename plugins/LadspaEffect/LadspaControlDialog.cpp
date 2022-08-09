@@ -69,10 +69,10 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 
 void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 {
-	QList<QGroupBox *> list = findChildren<QGroupBox *>();
-	for(auto & it : list)
+	QList<QGroupBox *> groupBoxes = findChildren<QGroupBox *>();
+	for (auto& groupBox : groupBoxes)
 	{
-		delete it;
+		delete groupBox;
 	}
 
 	m_effectControls = _ctl;
@@ -104,9 +104,9 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 		grouper->setLayout( gl );
 		grouper->setAlignment( Qt::Vertical );
 
-		for(auto & control : controls)
+		for (auto& control : controls)
 		{
-			if( control->port()->proc == proc )
+			if (control->port()->proc == proc)
 			{
 				buffer_data_t this_port = control->port()->data_type;
 				if( last_port != NONE &&
@@ -116,7 +116,7 @@ void LadspaControlDialog::updateEffectView( LadspaControls * _ctl )
 					++row;
 					col = 0;
 				}
-				gl->addWidget( new LadspaControlView( grouper, control ), row, col );
+				gl->addWidget(new LadspaControlView(grouper, control), row, col);
 				if( ++col == cols )
 				{
 					++row;

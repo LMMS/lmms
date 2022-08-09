@@ -226,9 +226,9 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	}
 
 	// now save settings of all Clip's
-	for(auto m_clip : m_clips)
+	for (auto clip : m_clips)
 	{
-		m_clip->saveState( doc, element );
+		clip->saveState(doc, element);
 	}
 }
 
@@ -511,12 +511,11 @@ void Track::insertBar( const TimePos & pos )
 {
 	// we'll increase the position of every Clip, positioned behind pos, by
 	// one bar
-	for(auto & m_clip : m_clips)
+	for (auto& clip : m_clips)
 	{
-		if( m_clip->startPosition() >= pos )
+		if (clip->startPosition() >= pos)
 		{
-			m_clip->movePosition( m_clip->startPosition() +
-						TimePos::ticksPerBar() );
+			clip->movePosition(clip->startPosition() + TimePos::ticksPerBar());
 		}
 	}
 }
@@ -554,15 +553,14 @@ bar_t Track::length() const
 {
 	// find last end-position
 	tick_t last = 0;
-	for(auto m_clip : m_clips)
+	for (auto clip : m_clips)
 	{
-		if( Engine::getSong()->isExporting() &&
-				m_clip->isMuted() )
+		if (Engine::getSong()->isExporting() && clip->isMuted())
 		{
 			continue;
 		}
 
-		const tick_t cur = m_clip->endPosition();
+		const tick_t cur = clip->endPosition();
 		if( cur > last )
 		{
 			last = cur;
@@ -585,11 +583,11 @@ void Track::toggleSolo()
 	const TrackContainer::TrackList & tl = m_trackContainer->tracks();
 
 	bool soloBefore = false;
-	for(auto it : tl)
+	for (auto track : tl)
 	{
-		if( it != this )
+		if (track != this)
 		{
-			if( it->m_soloModel.value() )
+			if (track->m_soloModel.value())
 			{
 				soloBefore = true;
 				break;
@@ -601,36 +599,36 @@ void Track::toggleSolo()
 	// Should we use the new behavior of solo or the older/legacy one?
 	const bool soloLegacyBehavior = ConfigManager::inst()->value("app", "sololegacybehavior", "0").toInt();
 
-	for(auto it : tl)
+	for(auto track : tl)
 	{
-		if( solo )
+		if (solo)
 		{
 			// save mute-state in case no track was solo before
-			if( !soloBefore )
+			if (!soloBefore)
 			{
-				it->m_mutedBeforeSolo = it->isMuted();
+				track->m_mutedBeforeSolo = track->isMuted();
 			}
 			// Don't mute AutomationTracks (keep their original state) unless we are on the sololegacybehavior mode
-			if( it == this )
+			if (track == this)
 			{
-				it->setMuted( false );
+				track->setMuted(false);
 			}
-			else if( soloLegacyBehavior || it->type() != AutomationTrack )
+			else if (soloLegacyBehavior || track->type() != AutomationTrack)
 			{
-				it->setMuted( true );
+				track->setMuted(true);
 			}
-			if( it != this )
+			if (track != this)
 			{
-				it->m_soloModel.setValue( false );
+				track->m_soloModel.setValue(false);
 			}
 		}
-		else if( !soloBefore )
+		else if (!soloBefore)
 		{
 			// Unless we are on the sololegacybehavior mode, only restores the
 			// mute state if the track isn't an Automation Track
-			if( soloLegacyBehavior || it->type() != AutomationTrack )
+			if (soloLegacyBehavior || track->type() != AutomationTrack)
 			{
-				it->setMuted( it->m_mutedBeforeSolo );
+				track->setMuted(track->m_mutedBeforeSolo);
 			}
 		}
 	}

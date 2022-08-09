@@ -71,7 +71,8 @@ QLinearGradient getGradient( const QColor & _col, const QRectF & _rect )
 QLinearGradient darken( const QLinearGradient & _gradient )
 {
 	QGradientStops stops = _gradient.stops();
-	for (auto & stop : stops) {
+	for (auto& stop : stops) 
+	{
 		QColor color = stop.second;
 		stop.second = color.lighter(133);
 	}

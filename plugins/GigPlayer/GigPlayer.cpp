@@ -355,7 +355,7 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 				it->state = PlayingKeyUp;
 
 				// Notify each sample that the key has been released
-				for(auto & sample : it->samples)
+				for (auto& sample : it->samples)
 				{
 					sample.adsr.keyup();
 				}
@@ -407,17 +407,15 @@ void GigInstrument::play( sampleFrame * _working_buffer )
 	}
 
 	// Fill buffer with portions of the note samples
-	for(auto & m_note : m_notes)
+	for (auto& note : m_notes)
 	{
 		// Only process the notes if we're in a playing state
-		if( !( m_note.state == PlayingKeyDown ||
-				m_note.state == PlayingKeyUp ) )
+		if (!(note.state == PlayingKeyDown || note.state == PlayingKeyUp ))
 		{
 			continue;
 		}
 
-		for( QList<GigSample>::iterator sample = m_note.samples.begin();
-				sample != m_note.samples.end(); ++sample )
+		for (QList<GigSample>::iterator sample = note.samples.begin(); sample != note.samples.end(); ++sample)
 		{
 			if( sample->sample == nullptr || sample->region == nullptr )
 			{
@@ -688,13 +686,12 @@ void GigInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 	// Mark the note as being released, but only if it was playing or was just
 	// pressed (i.e., not if the key was already released)
-	for(auto & m_note : m_notes)
+	for (auto& note : m_notes)
 	{
 		// Find the note by matching pointers to the plugin data
-		if( m_note.handle == pluginData &&
-				( m_note.state == KeyDown || m_note.state == PlayingKeyDown ) )
+		if (note.handle == pluginData && (note.state == KeyDown || note.state == PlayingKeyDown))
 		{
-			m_note.state = KeyUp;
+			note.state = KeyUp;
 		}
 	}
 

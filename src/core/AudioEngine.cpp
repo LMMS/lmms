@@ -188,9 +188,9 @@ AudioEngine::~AudioEngine()
 	MemoryHelper::alignedFree(m_outputBufferRead);
 	MemoryHelper::alignedFree(m_outputBufferWrite);
 
-	for(auto & i : m_inputBuffer)
+	for (auto& input : m_inputBuffer)
 	{
-		delete[] i;
+		delete[] input;
 	}
 }
 

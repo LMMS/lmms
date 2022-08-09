@@ -67,9 +67,9 @@ Piano::Piano( InstrumentTrack* track ) :
 	m_instrumentTrack( track ),
 	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
 {
-	for(bool & m_pressedKey : m_pressedKeys)
+	for (bool& pressedKey : m_pressedKeys)
 	{
-		m_pressedKey = false;
+		pressedKey = false;
 	}
 
 }

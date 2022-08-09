@@ -219,7 +219,7 @@ void FileBrowser::reloadTree()
 
 	if (!paths.isEmpty())
 	{
-		for (auto & path : paths)
+		for (auto& path : paths)
 		{
 			addItems(path);
 		}
@@ -996,12 +996,10 @@ void Directory::update()
 	{
 		m_dirCount = 0;
 		// for all paths leading here, add their items
-		for(auto & m_directorie : m_directories)
+		for (auto& directory : m_directories)
 		{
 			int filesBeforeAdd = childCount() - m_dirCount;
-			if( addItems( fullName( m_directorie ) ) &&
-				m_directorie.contains(
-					ConfigManager::inst()->dataDir() ) )
+			if(addItems(fullName(directory)) && directory.contains(ConfigManager::inst()->dataDir()))
 			{
 				// factory file directory is added
 				// note: those are always added last

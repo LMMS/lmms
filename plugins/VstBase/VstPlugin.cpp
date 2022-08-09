@@ -375,14 +375,12 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 {
 	message m( IdVstSetParameterDump );
 	m.addInt( _pdump.size() );
-	for(const auto & it : _pdump)
+	for (const auto& str : _pdump)
 	{
 		const VstParameterDumpItem item =
 		{
-			it.section( ':', 0, 0 ).toInt(),
-			"",
-			LocaleHelper::toFloat(it.section(':', 2, -1))
-		} ;
+			str.section(':', 0, 0).toInt(), "", LocaleHelper::toFloat(str.section(':', 2, -1))
+		};
 		m.addInt( item.index );
 		m.addString( item.shortLabel );
 		m.addFloat( item.value );

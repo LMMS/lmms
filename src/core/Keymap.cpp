@@ -125,11 +125,11 @@ void Keymap::saveSettings(QDomDocument &document, QDomElement &element)
 	element.setAttribute("base_key", m_baseKey);
 	element.setAttribute("base_freq", m_baseFreq);
 
-	for (int i : m_map)
+	for (int value : m_map)
 	{
 		QDomElement degree = document.createElement("degree");
 		element.appendChild(degree);
-		degree.setAttribute("value", i);
+		degree.setAttribute("value", value);
 	}
 }
 

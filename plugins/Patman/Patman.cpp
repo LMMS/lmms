@@ -399,16 +399,16 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 	float min_dist = HUGE_VALF;
 	SampleBuffer* sample = nullptr;
 
-	for(auto & m_patchSample : m_patchSamples)
+	for (auto& patchSample : m_patchSamples)
 	{
-		float patch_freq = m_patchSample->frequency();
+		float patch_freq = patchSample->frequency();
 		float dist = freq >= patch_freq ? freq / patch_freq :
 							patch_freq / freq;
 
 		if( dist < min_dist )
 		{
 			min_dist = dist;
-			sample = m_patchSample;
+			sample = patchSample;
 		}
 	}
 

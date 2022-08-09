@@ -286,9 +286,9 @@ void MicrotunerConfig::updateKeymapForm()
 
 	m_keymapTextEdit->setPlainText("");
 	const std::vector<int> &map = newMap->getMap();
-	for (int i : map)
+	for (int value : map)
 	{
-		if (i >= 0) {m_keymapTextEdit->appendPlainText(QString::number(i));}
+		if (value >= 0) {m_keymapTextEdit->appendPlainText(QString::number(value));}
 		else {m_keymapTextEdit->appendPlainText("x");}
 	}
 	QTextCursor tmp = m_keymapTextEdit->textCursor();

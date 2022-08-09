@@ -140,11 +140,11 @@ void SfxrSynth::resetSample( bool restart )
 		if(s->m_phaserSweepModel.value()<0.0f) fdphase=-fdphase;
 		iphase=abs((int)fphase);
 		ipp=0;
-		for(float & i : phaser_buffer)
-			i=0.0f;
+		for (float& i : phaser_buffer)
+			i = 0.0f;
 
-		for(float & i : noise_buffer)
-			i=frnd(2.0f)-1.0f;
+		for (float& i : noise_buffer)
+			i = frnd(2.0f)-1.0f;
 
 		rep_time=0;
 		rep_limit=(int)(pow(1.0f-s->m_repeatSpeedModel.value(), 2.0f)*20000+32);
@@ -239,8 +239,8 @@ void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 //				phase=0;
 				phase%=period;
 				if(s->m_waveFormModel.value()==3)
-					for(float & i : noise_buffer)
-						i=frnd(2.0f)-1.0f;
+					for (float& i : noise_buffer)
+						i = frnd(2.0f) - 1.0f;
 			}
 			// base waveform
 			float fp=(float)phase/period;

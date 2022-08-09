@@ -179,9 +179,9 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) cons
 InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
 	QVector<Chord>()
 {
-	for(auto & i : s_initTable)
+	for (auto& chord : s_initTable)
 	{
-		push_back( Chord( i.m_name, i.m_semiTones ) );
+		push_back(Chord(chord.m_name, chord.m_semiTones));
 	}
 }
 

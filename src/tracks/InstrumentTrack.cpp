@@ -621,9 +621,9 @@ void InstrumentTrack::setName( const QString & _new_name )
 void InstrumentTrack::updateBaseNote()
 {
 	Engine::audioEngine()->requestChangeInModel();
-	for(auto & m_processHandle : m_processHandles)
+	for (auto& processHandle : m_processHandles)
 	{
-		m_processHandle->setFrequencyUpdate();
+		processHandle->setFrequencyUpdate();
 	}
 	Engine::audioEngine()->doneChangeInModel();
 }
@@ -710,9 +710,9 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 	}
 
 	// Handle automation: detuning
-	for(auto & m_processHandle : m_processHandles)
+	for (auto& processHandle : m_processHandles)
 	{
-		m_processHandle->processTimePos( _start );
+		processHandle->processTimePos(_start);
 	}
 
 	if ( clips.size() == 0 )
@@ -723,14 +723,12 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	bool played_a_note = false;	// will be return variable
 
-	for(auto & clip : clips)
+	for (auto& clip : clips)
 	{
-		MidiClip* c = dynamic_cast<MidiClip*>( clip );
+		MidiClip* c = dynamic_cast<MidiClip*>(clip);
 		// everything which is not a MIDI clip won't be played
 		// A MIDI clip playing in the Piano Roll window will always play
-		if(c == nullptr ||
-			(Engine::getSong()->playMode() != Song::Mode_PlayMidiClip
-			&& clip->isMuted()))
+		if (c == nullptr || (Engine::getSong()->playMode() != Song::Mode_PlayMidiClip && clip->isMuted()))
 		{
 			continue;
 		}

@@ -305,13 +305,13 @@ void AutomatableModel::setValue( const float value )
 		addJournalCheckPoint();
 
 		// notify linked models
-		for(auto & m_linkedModel : m_linkedModels)
+		for (auto& linkedModel : m_linkedModels)
 		{
-			if( m_linkedModel->m_setValueDepth < 1 && m_linkedModel->fittedValue( value ) != m_linkedModel->m_value )
+			if (linkedModel->m_setValueDepth < 1 && linkedModel->fittedValue(value) != linkedModel->m_value)
 			{
-				bool journalling = m_linkedModel->testAndSetJournalling( isJournalling() );
-				m_linkedModel->setValue( value );
-				m_linkedModel->setJournalling( journalling );
+				bool journalling = linkedModel->testAndSetJournalling(isJournalling());
+				linkedModel->setValue(value);
+				linkedModel->setJournalling(journalling);
 			}
 		}
 		m_valueChanged = true;
@@ -388,12 +388,12 @@ void AutomatableModel::setAutomatedValue( const float value )
 	if( oldValue != m_value )
 	{
 		// notify linked models
-		for (auto & m_linkedModel : m_linkedModels)
+		for (auto& linkedModel : m_linkedModels)
 		{
-			if (!(m_linkedModel->controllerConnection()) && m_linkedModel->m_setValueDepth < 1 &&
-					m_linkedModel->fittedValue(m_value) != m_linkedModel->m_value)
+			if (!(linkedModel->controllerConnection()) && linkedModel->m_setValueDepth < 1 &&
+					linkedModel->fittedValue(m_value) != linkedModel->m_value)
 			{
-				m_linkedModel->setAutomatedValue(value);
+				linkedModel->setAutomatedValue(value);
 			}
 		}
 		m_valueChanged = true;
@@ -732,11 +732,11 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// of those clips:
 		// find the clips which overlap with the time position
 		QVector<AutomationClip *> clipsInRange;
-		for(auto clip : clips)
+		for (auto clip : clips)
 		{
 			int s = clip->startPosition();
 			int e = clip->endPosition();
-			if( s <= time && e >= time ) { clipsInRange += clip; }
+			if (s <= time && e >= time) { clipsInRange += clip; }
 		}
 
 		AutomationClip * latestClip = nullptr;
@@ -752,10 +752,10 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		{
 			int latestPosition = 0;
 
-			for(auto clip : clips)
+			for (auto clip : clips)
 			{
 				int e = clip->endPosition();
-				if( e <= time && e > latestPosition )
+				if (e <= time && e > latestPosition)
 				{
 					latestPosition = e;
 					latestClip = clip;

@@ -227,10 +227,10 @@ f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
-	for(auto i : m_voice)
+	for (auto voice : m_voice)
 	{
-		if( maxrel < i->m_releaseModel.value() )
-			maxrel = (int)i->m_releaseModel.value();
+		if( maxrel < voice->m_releaseModel.value() )
+			maxrel = (int)voice->m_releaseModel.value();
 	}
 
 	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
@@ -320,7 +320,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
 	unsigned char sidreg[NUMSIDREGS];
 
-	for (unsigned char & c : sidreg)
+	for (unsigned char& c : sidreg)
 	{
 		c = 0x00;
 	}
@@ -750,20 +750,14 @@ void SidInstrumentView::modelChanged()
 					&k->m_voice[i]->m_testModel );
 	}
 
-	for(auto & i : k->m_voice)
+	for (auto& voice : k->m_voice)
 	{
-		connect( &i->m_attackModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &i->m_decayModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &i->m_releaseModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &i->m_pulseWidthModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobHint() ) );
-		connect( &i->m_sustainModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobToolTip() ) );
-		connect( &i->m_coarseModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateKnobToolTip() ) );
+		connect(&voice->m_attackModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_decayModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_releaseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_pulseWidthModel, SIGNAL(dataChanged()), this, SLOT(updateKnobHint()));
+		connect(&voice->m_sustainModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
+		connect(&voice->m_coarseModel, SIGNAL(dataChanged()), this, SLOT(updateKnobToolTip()));
 	}
 	
 	connect( &k->m_volumeModel, SIGNAL( dataChanged() ),

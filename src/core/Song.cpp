@@ -99,7 +99,7 @@ Song::Song() :
 	m_loopRenderRemaining(1),
 	m_oldAutomatedValues()
 {
-	for(double & m_elapsedMilliSecond : m_elapsedMilliSeconds) m_elapsedMilliSecond = 0;
+	for (double& elapsedMilliSecond : m_elapsedMilliSeconds) elapsedMilliSecond = 0;
 	connect( &m_tempoModel, SIGNAL(dataChanged()),
 			this, SLOT(setTempo()), Qt::DirectConnection );
 	connect( &m_tempoModel, SIGNAL(dataUnchanged()),
@@ -119,8 +119,8 @@ Song::Song() :
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
 
-	for (auto & m_scale : m_scales) {m_scale = std::make_shared<Scale>();}
-	for (auto & m_keymap : m_keymaps) {m_keymap = std::make_shared<Keymap>();}
+	for (auto& m_scale : m_scales) {m_scale = std::make_shared<Scale>();}
+	for (auto& m_keymap : m_keymaps) {m_keymap = std::make_shared<Keymap>();}
 }
 
 
@@ -148,9 +148,9 @@ void Song::setTempo()
 	Engine::audioEngine()->requestChangeInModel();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
-	for(auto & playHandle : playHandles)
+	for (auto& playHandle : playHandles)
 	{
-		NotePlayHandle * nph = dynamic_cast<NotePlayHandle *>( playHandle );
+		NotePlayHandle* nph = dynamic_cast<NotePlayHandle*>(playHandle);
 		if( nph && !nph->isReleased() )
 		{
 			nph->lock();
@@ -1309,9 +1309,9 @@ void Song::saveControllerStates( QDomDocument & doc, QDomElement & element )
 	// save settings of controllers
 	QDomElement controllersNode = doc.createElement( "controllers" );
 	element.appendChild( controllersNode );
-	for(auto & m_controller : m_controllers)
+	for (auto& controller : m_controllers)
 	{
-		m_controller->saveState( doc, controllersNode );
+		controller->saveState(doc, controllersNode);
 	}
 }
 
@@ -1355,9 +1355,9 @@ void Song::saveScaleStates(QDomDocument &doc, QDomElement &element)
 	QDomElement scalesNode = doc.createElement("scales");
 	element.appendChild(scalesNode);
 
-	for (auto & m_scale : m_scales)
+	for (auto& scale : m_scales)
 	{
-		m_scale->saveState(doc, scalesNode);
+		scale->saveState(doc, scalesNode);
 	}
 }
 
@@ -1380,9 +1380,9 @@ void Song::saveKeymapStates(QDomDocument &doc, QDomElement &element)
 	QDomElement keymapsNode = doc.createElement("keymaps");
 	element.appendChild(keymapsNode);
 
-	for (auto & m_keymap : m_keymaps)
+	for (auto& keymap : m_keymaps)
 	{
-		m_keymap->saveState(doc, keymapsNode);
+		keymap->saveState(doc, keymapsNode);
 	}
 }
 

@@ -377,13 +377,13 @@ public:
 	{}
 	~ExprFrontData()
 	{
-		for (auto & m_cyclic : m_cyclics)
+		for (auto& cyclic : m_cyclics)
 		{
-			delete m_cyclic;
+			delete cyclic;
 		}
-		for (auto & i : m_cyclics_interp)
+		for (auto& cyclic : m_cyclics_interp)
 		{
-			delete i;
+			delete cyclic;
 		}
 		if (m_integ_func)
 		{

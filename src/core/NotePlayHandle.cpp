@@ -443,9 +443,9 @@ float NotePlayHandle::volumeLevel( const f_cnt_t _frame )
 void NotePlayHandle::mute()
 {
 	// mute all sub-notes
-	for(auto & m_subNote : m_subNotes)
+	for (auto& subNote : m_subNotes)
 	{
-		m_subNote->mute();
+		subNote->mute();
 	}
 	m_muted = true;
 }
@@ -457,9 +457,9 @@ int NotePlayHandle::index() const
 {
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	int idx = 0;
-	for(auto playHandle : playHandles)
+	for (auto playHandle : playHandles)
 	{
-		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( playHandle );
+		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph == nullptr || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
 		{
 			continue;
@@ -481,9 +481,9 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
-	for(auto playHandle : playHandles)
+	for (auto playHandle : playHandles)
 	{
-		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( playHandle );
+		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle *>(playHandle);
 		if( nph != nullptr && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
@@ -589,9 +589,9 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 	m_frames = (f_cnt_t)new_frames;
 	m_totalFramesPlayed = (f_cnt_t)( completed * new_frames );
 
-	for(auto & m_subNote : m_subNotes)
+	for (auto& subNote : m_subNotes)
 	{
-		m_subNote->resize( _new_tempo );
+		subNote->resize(_new_tempo);
 	}
 }
 
