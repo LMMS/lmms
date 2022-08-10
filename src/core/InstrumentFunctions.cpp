@@ -469,41 +469,39 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		int cur_arp_idx = 0;
 		// process according to arpeggio-direction...
-		if( dir == ArpDirection::Up )
+		if(dir == ArpDirection::Up || dir == ArpDirection::Down)
 		{
 			cur_arp_idx = ( cur_frame / arp_frames ) % range;
+			cur_arp_idx /= repeats;
+			if( m_arpCycleModel.value() )
+			{
+				cur_arp_idx *= m_arpCycleModel.value() + 1;
+				cur_arp_idx %= ( range / repeats );
+			}
+			// If direction is ArpDirection::Down the result is inverted
+			if( dir == ArpDirection::Down ){ cur_arp_idx = (range/repeats) - cur_arp_idx - 1; }
 		}
-		else if( dir == ArpDirection::Down )
-		{
-			cur_arp_idx = range - ( cur_frame / arp_frames ) %
-								range - 1;
-		}
-		else if( dir == ArpDirection::UpAndDown && range > 1 )
+		else if( (dir == ArpDirection::UpAndDown || dir == ArpDirection::DownAndUp) && range > 1 )
 		{
 			// imagine, we had to play the arp once up and then
 			// once down -> makes 2 * range possible notes...
 			// because we don't play the lower and upper notes
 			// twice, we have to subtract 2
 			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 * repeats );
+			cur_arp_idx /= repeats;
+			if( m_arpCycleModel.value() )
+			{
+				cur_arp_idx *= m_arpCycleModel.value() + 1;
+				cur_arp_idx %= ( range / repeats );
+			}
+
 			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
-			if( cur_arp_idx >= range )
+			if( cur_arp_idx >= range / repeats )
 			{
 				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - repeats;
 			}
-		}
-		else if( dir == ArpDirection::DownAndUp && range > 1 )
-		{
-			// copied from ArpDirection::UpAndDown above
-			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 * repeats);
-			// if greater than range, we have to play down...
-			// looks like the code for arp_dir==DOWN... :)
-			if( cur_arp_idx >= range )
-			{
-				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - repeats;
-			}
-			// inverts direction
-			cur_arp_idx = range - cur_arp_idx - 1;
+			// If direction is ArpDirDownUp the result is inverted
+			if( dir == ArpDirection::DownAndUp ){ cur_arp_idx = (range/repeats) - cur_arp_idx - 1; }
 		}
 		else if( dir == ArpDirection::Random )
 		{
@@ -552,16 +550,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				}
 				m_lastRandomNote = cur_arp_idx;
 			}
-		}
-
-		// Divide cur_arp_idx with wanted repeats. The repeat feature will not affect random notes.
-		cur_arp_idx = static_cast<int>(cur_arp_idx / repeats);
-
-		// Cycle notes
-		if( m_arpCycleModel.value() && dir != ArpDirection::Random )
-		{
-			cur_arp_idx *= m_arpCycleModel.value() + 1;
-			cur_arp_idx %= static_cast<int>( range / repeats );
 		}
 
 		// now calculate final key for our arp-note
