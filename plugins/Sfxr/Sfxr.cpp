@@ -140,8 +140,8 @@ void SfxrSynth::resetSample( bool restart )
 		if(s->m_phaserSweepModel.value()<0.0f) fdphase=-fdphase;
 		iphase=abs((int)fphase);
 		ipp=0;
-		for (float& i : phaser_buffer)
-			i = 0.0f;
+		for (auto& phaserSample : phaser_buffer)
+			phaserSample = 0.0f;
 
 		for (float& i : noise_buffer)
 			i = frnd(2.0f)-1.0f;
