@@ -143,8 +143,8 @@ void SfxrSynth::resetSample( bool restart )
 		for (auto& phaserSample : phaser_buffer)
 			phaserSample = 0.0f;
 
-		for (float& i : noise_buffer)
-			i = frnd(2.0f)-1.0f;
+		for (auto& noiseSample : noise_buffer)
+			noiseSample = frnd(2.0f)-1.0f;
 
 		rep_time=0;
 		rep_limit=(int)(pow(1.0f-s->m_repeatSpeedModel.value(), 2.0f)*20000+32);
