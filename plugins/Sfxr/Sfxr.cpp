@@ -239,8 +239,8 @@ void SfxrSynth::update( sampleFrame * buffer, const int32_t frameNum )
 //				phase=0;
 				phase%=period;
 				if(s->m_waveFormModel.value()==3)
-					for (float& i : noise_buffer)
-						i = frnd(2.0f) - 1.0f;
+					for (auto& noiseSample : noise_buffer)
+						noiseSample = frnd(2.0f) - 1.0f;
 			}
 			// base waveform
 			float fp=(float)phase/period;
