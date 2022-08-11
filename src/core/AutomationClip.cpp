@@ -1010,11 +1010,9 @@ void AutomationClip::resolveAllIDs()
 				AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
 				if( a )
 				{
-					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
-									k != a->m_idsToResolve.end(); ++k )
+					for (auto& id : a->m_idsToResolve)
 					{
-						JournallingObject * o = Engine::projectJournal()->
-														journallingObject( *k );
+						JournallingObject* o = Engine::projectJournal()->journallingObject(id);
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{
 							a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
@@ -1023,7 +1021,7 @@ void AutomationClip::resolveAllIDs()
 						{
 							// FIXME: Remove this block once the automation system gets fixed
 							// This is a temporary fix for https://github.com/LMMS/lmms/issues/3781
-							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(*k));
+							o = Engine::projectJournal()->journallingObject(ProjectJournal::idFromSave(id));
 							if( o && dynamic_cast<AutomatableModel *>( o ) )
 							{
 								a->addObject( dynamic_cast<AutomatableModel *>( o ), false );
@@ -1032,7 +1030,7 @@ void AutomationClip::resolveAllIDs()
 							{
 								// FIXME: Remove this block once the automation system gets fixed
 								// This is a temporary fix for https://github.com/LMMS/lmms/issues/4781
-								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(*k));
+								o = Engine::projectJournal()->journallingObject(ProjectJournal::idToSave(id));
 								if( o && dynamic_cast<AutomatableModel *>( o ) )
 								{
 									a->addObject( dynamic_cast<AutomatableModel *>( o ), false );

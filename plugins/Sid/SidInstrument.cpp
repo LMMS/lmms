@@ -320,9 +320,9 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
 	unsigned char sidreg[NUMSIDREGS];
 
-	for (unsigned char& c : sidreg)
+	for (auto& reg : sidreg)
 	{
-		c = 0x00;
+		reg = 0x00;
 	}
 
 	if( (ChipModel)m_chipModel.value() == sidMOS6581 )

@@ -115,9 +115,9 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus speed" ) ),
 	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus depth" ) )
 {
-	for (int& i : m_notesRunning)
+	for (int& noteRunning : m_notesRunning)
 	{
-		i = 0;
+		noteRunning = 0;
 	}
 
 
