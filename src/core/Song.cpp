@@ -119,8 +119,8 @@ Song::Song() :
 	qRegisterMetaType<Note>( "Note" );
 	setType( SongContainer );
 
-	for (auto& m_scale : m_scales) {m_scale = std::make_shared<Scale>();}
-	for (auto& m_keymap : m_keymaps) {m_keymap = std::make_shared<Keymap>();}
+	for (auto& scale : m_scales) {scale = std::make_shared<Scale>();}
+	for (auto& keymap : m_keymaps) {keymap = std::make_shared<Keymap>();}
 }
 
 
