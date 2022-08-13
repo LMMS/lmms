@@ -134,7 +134,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
 	with ScriptTest(check_strings) as test:
 		create_file('data/themes/classic/style.css',
-					'NonExistentClass {'
+					'lmms--gui--NonExistentClass {'
 					'\tcolor: #d1d8e4;\n'
 					'}')
 		test.run()
