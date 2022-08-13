@@ -13,10 +13,10 @@ jobs:
         run: sudo apt-get install -y python3-tinycss2
       - name: Update submodules
         run: git submodule update --init --recursive
-      - name: Verify check-strings script
-        run: tests/check-strings/verify
+      - name: Verify scripted tests
+        run: tests/scripted/verify
       - name: Run check-strings
-        run: tests/check-strings/check-strings
+        run: tests/scripted/check-strings
   shellcheck:
     runs-on: ubuntu-latest
     container: koalaman/shellcheck-alpine:v0.4.6
