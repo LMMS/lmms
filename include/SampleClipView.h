@@ -25,8 +25,10 @@
 #ifndef SAMPLE_CLIP_VIEW_H
 #define SAMPLE_CLIP_VIEW_H
 
-#include "ClipView.h"
+#include <optional>
 
+#include "ClipView.h"
+#include "Sample.h"
 
 
 namespace lmms
@@ -45,6 +47,7 @@ class SampleClipView : public ClipView
 public:
 	SampleClipView( SampleClip * _clip, TrackView * _tv );
 	~SampleClipView() override = default;
+	static std::string openSampleFile(const Sample& sample);
 
 public slots:
 	void updateSample();

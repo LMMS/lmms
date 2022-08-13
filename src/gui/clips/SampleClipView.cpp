@@ -34,6 +34,8 @@
 #include "SampleClip.h"
 #include "Song.h"
 #include "StringPairDrag.h"
+#include "FileDialog.h"
+#include "ConfigManager.h"
 
 namespace lmms::gui
 {
@@ -55,14 +57,78 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	setStyle( QApplication::style() );
 }
 
+std::string SampleClipView::openSampleFile(const Sample& sample) 
+{
+	gui::FileDialog ofd(nullptr, QObject::tr("Open audio file"));
+	
+	auto sampleFile = sample.sampleFile();
+	std::string dir;
+
+	if (!sampleFile.empty())
+	{
+		if (std::filesystem::path{sampleFile}.is_relative()) 
+		{
+			sampleFile = ConfigManager::inst()->userSamplesDir().toStdString() + sampleFile;
+			if (!std::filesystem::exists(sampleFile)) 
+			{
+				sampleFile = ConfigManager::inst()->factorySamplesDir().toStdString() + sampleFile;
+			}
+		}
+
+		dir = std::filesystem::absolute(sampleFile).string();
+	}
+	else 
+	{
+		dir = ConfigManager::inst()->userSamplesDir().toStdString();
+	}
+
+	// change dir to position of previously opened file
+	ofd.setDirectory(QString::fromStdString(dir));
+	ofd.setFileMode(gui::FileDialog::ExistingFiles);
+
+	std::array<QString, 11> types = 
+	{
+		QObject::tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)"),
+		QObject::tr("Wave-Files (*.wav)"),
+		QObject::tr("OGG-Files (*.ogg)"),
+		QObject::tr("DrumSynth-Files (*.ds)"),
+		QObject::tr("FLAC-Files (*.flac)"),
+		QObject::tr("SPEEX-Files (*.spx)"),
+		QObject::tr("VOC-Files (*.voc)"),
+		QObject::tr("AIFF-Files (*.aif *.aiff)"),
+		QObject::tr("AU-Files (*.au)"),
+		QObject::tr("RAW-Files (*.raw)")	
+	};
+
+	ofd.setNameFilters(QStringList{types.begin(), types.end()});
+
+	if (!sampleFile.empty())
+	{
+		// select previously opened file
+		ofd.selectFile(QFileInfo(QString::fromStdString(sampleFile)).fileName());
+	}
+
+	if (ofd.exec () == QDialog::Accepted)
+	{
+		if (ofd.selectedFiles().isEmpty())
+		{
+			return "";
+		}
+
+		return PathUtil::toShortestRelative(ofd.selectedFiles()[0]).toStdString();
+	}
+
+	return "";
+}
+
 void SampleClipView::updateSample()
 {
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
-	setToolTip(m_clip->m_sampleBuffer->audioFile() != "" ?
-					PathUtil::toAbsolute(m_clip->m_sampleBuffer->audioFile()) :
-					tr( "Double-click to open sample" ) );
+	setToolTip(m_clip->m_sample.sampleFile() != "" ?
+					PathUtil::toAbsolute(QString::fromStdString(m_clip->sample().sampleFile())) :
+					tr("Double-click to open sample"));
 }
 
 
@@ -112,8 +178,7 @@ void SampleClipView::dropEvent( QDropEvent * _de )
 	}
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
-		m_clip->m_sampleBuffer->loadFromBase64(
-					StringPairDrag::decodeValue( _de ) );
+		m_clip->m_sample.loadBase64(StringPairDrag::decodeValue(_de).toStdString());
 		m_clip->updateLength();
 		update();
 		_de->accept();
@@ -171,17 +236,17 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	QString af = m_clip->m_sampleBuffer->openAudioFile();
-
-	if ( af.isEmpty() ) {} //Don't do anything if no file is loaded
-	else if ( af == m_clip->m_sampleBuffer->audioFile() )
-	{	//Instead of reloading the existing file, just reset the size
-		int length = (int) ( m_clip->m_sampleBuffer->frames() / Engine::framesPerTick() );
+	auto openedSample = openSampleFile(m_clip->sample());
+	if (openedSample == m_clip->sampleFile().toStdString()) 
+	{
+		//Instead of reloading the existing file, just reset the size
+		int length = static_cast<int>(m_clip->sample().numFrames() / Engine::framesPerTick());
 		m_clip->changeLength(length);
 	}
-	else
-	{	//Otherwise load the new file as ususal
-		m_clip->setSampleFile( af );
+	else 
+	{
+		//Otherwise load the new file as ususal
+		m_clip->setSampleFile(QString::fromStdString(openedSample));
 		Engine::getSong()->setModified();
 	}
 }
@@ -263,9 +328,9 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 	float offset =  m_clip->startTimeOffset() / ticksPerBar * pixelsPerBar();
 	QRect r = QRect( offset, spacing,
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
-	m_clip->m_sampleBuffer->visualize( p, r, pe->rect() );
+	m_clip->m_sample.visualize(p, r);
 
-	QString name = PathUtil::cleanName(m_clip->m_sampleBuffer->audioFile());
+	QString name = PathUtil::cleanName(QString::fromStdString(m_clip->m_sample.sampleFile()));
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed
@@ -318,7 +383,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 
 void SampleClipView::reverseSample()
 {
-	m_clip->sampleBuffer()->setReversed(!m_clip->sampleBuffer()->reversed());
+	m_clip->m_sample.setReversed(!m_clip->m_sample.reversed());
 	Engine::getSong()->setModified();
 	update();
 }

@@ -26,11 +26,10 @@
 #define SAMPLE_CLIP_H
 
 #include "Clip.h"
+#include "Sample.h"
 
 namespace lmms
 {
-
-class SampleBuffer;
 
 namespace gui
 {
@@ -52,7 +51,7 @@ public:
 	SampleClip& operator=( const SampleClip& that ) = delete;
 
 	void changeLength( const TimePos & _length ) override;
-	const QString & sampleFile() const;
+	QString sampleFile() const;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -61,9 +60,9 @@ public:
 		return "sampleclip";
 	}
 
-	SampleBuffer* sampleBuffer()
+	const Sample& sample()
 	{
-		return m_sampleBuffer;
+		return m_sample;
 	}
 
 	TimePos sampleLength() const;
@@ -76,7 +75,7 @@ public:
 	void setIsPlaying(bool isPlaying);
 
 public slots:
-	void setSampleBuffer( lmms::SampleBuffer* sb );
+	void setSample(const Sample& sample);
 	void setSampleFile( const QString & _sf );
 	void updateLength();
 	void toggleRecord();
@@ -85,7 +84,7 @@ public slots:
 
 
 private:
-	SampleBuffer* m_sampleBuffer;
+	Sample m_sample;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 

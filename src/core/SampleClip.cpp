@@ -38,11 +38,10 @@ namespace lmms
 
 SampleClip::SampleClip( Track * _track ) :
 	Clip( _track ),
-	m_sampleBuffer( new SampleBuffer ),
 	m_isPlaying( false )
 {
 	saveJournallingState( false );
-	setSampleFile( "" );
+	setSampleFile("");
 	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
@@ -87,13 +86,8 @@ SampleClip::SampleClip( Track * _track ) :
 	updateTrackClips();
 }
 
-SampleClip::SampleClip(const SampleClip& orig) :
-	SampleClip(orig.getTrack())
+SampleClip::SampleClip(const SampleClip& orig) : SampleClip(orig.getTrack())
 {
-	// TODO: This creates a new SampleBuffer for the new Clip, eating up memory
-	// & eventually causing performance issues. Letting tracks share buffers
-	// when they're identical would fix this, but isn't possible right now.
-	*m_sampleBuffer = *orig.m_sampleBuffer;
 	m_isPlaying = orig.m_isPlaying;
 }
 
@@ -107,9 +101,6 @@ SampleClip::~SampleClip()
 	{
 		sampletrack->updateClips();
 	}
-	Engine::audioEngine()->requestChangeInModel();
-	sharedObject::unref( m_sampleBuffer );
-	Engine::audioEngine()->doneChangeInModel();
 }
 
 
@@ -123,19 +114,16 @@ void SampleClip::changeLength( const TimePos & _length )
 
 
 
-const QString & SampleClip::sampleFile() const
+QString SampleClip::sampleFile() const
 {
-	return m_sampleBuffer->audioFile();
+	return QString::fromStdString(m_sample.sampleFile());
 }
 
 
 
-void SampleClip::setSampleBuffer( SampleBuffer* sb )
+void SampleClip::setSample(const Sample& sample)
 {
-	Engine::audioEngine()->requestChangeInModel();
-	sharedObject::unref( m_sampleBuffer );
-	Engine::audioEngine()->doneChangeInModel();
-	m_sampleBuffer = sb;
+	m_sample = sample;
 	updateLength();
 
 	emit sampleChanged();
@@ -154,7 +142,7 @@ void SampleClip::setSampleFile( const QString & _sf )
 	}
 	else
 	{	//Otherwise set it to the sample's length
-		m_sampleBuffer->setAudioFile( _sf );
+		m_sample.loadAudioFile(_sf.toStdString());
 		length = sampleLength();
 	}
 	changeLength(length);
@@ -225,7 +213,7 @@ void SampleClip::updateLength()
 
 TimePos SampleClip::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
+	return (int)(m_sample.numFrames() / Engine::framesPerTick());
 }
 
 
@@ -233,7 +221,7 @@ TimePos SampleClip::sampleLength() const
 
 void SampleClip::setSampleStartFrame(f_cnt_t startFrame)
 {
-	m_sampleBuffer->setStartFrame( startFrame );
+	m_sample.setStartFrame(startFrame);
 }
 
 
@@ -241,7 +229,7 @@ void SampleClip::setSampleStartFrame(f_cnt_t startFrame)
 
 void SampleClip::setSamplePlayLength(f_cnt_t length)
 {
-	m_sampleBuffer->setEndFrame( length );
+	m_sample.setEndFrame(length);
 }
 
 
@@ -261,18 +249,21 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
-	if( sampleFile() == "" )
+	
+	if (m_sample.sampleBuffer()) 
 	{
-		QString s;
-		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
+		if (sampleFile() == "")
+		{
+			_this.setAttribute("data", QString::fromStdString(m_sample.sampleBuffer()->toBase64()));
+		}
+		_this.setAttribute("sample_rate", m_sample.sampleBuffer()->sampleRate());
 	}
-
-	_this.setAttribute( "sample_rate", m_sampleBuffer->sampleRate());
+	
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
 	}
-	if (m_sampleBuffer->reversed())
+	if (m_sample.reversed())
 	{
 		_this.setAttribute("reversed", "true");
 	}
@@ -291,15 +282,11 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	setSampleFile( _this.attribute( "src" ) );
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
-		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
+		m_sample.loadBase64(_this.attribute("data").toStdString());
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
-
-	if ( _this.hasAttribute( "sample_rate" ) ) {
-		m_sampleBuffer->setSampleRate( _this.attribute( "sample_rate" ).toInt() );
-	}
 
 	if( _this.hasAttribute( "color" ) )
 	{
@@ -313,7 +300,7 @@ void SampleClip::loadSettings( const QDomElement & _this )
 
 	if(_this.hasAttribute("reversed"))
 	{
-		m_sampleBuffer->setReversed(true);
+		m_sample.setReversed(true);
 		emit wasReversed(); // tell SampleClipView to update the view
 	}
 }
