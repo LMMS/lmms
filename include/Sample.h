@@ -95,7 +95,12 @@ namespace lmms
 		void loadAudioFile(const std::string& audioFile);
 		void loadBase64(const std::string& base64);
 		void resetMarkers();
+		
+		void advanceFrameIndex(f_cnt_t amount, PlaybackType playback);
+		std::optional<f_cnt_t> calculatePlaybackIndex(f_cnt_t index, f_cnt_t start, f_cnt_t end, PlaybackType playback);
 		int calculateTickLength() const;
+
+		void sampleUpdated();
 
 	private:
 		std::shared_ptr<const SampleBufferV2> m_sampleBuffer;
@@ -112,6 +117,7 @@ namespace lmms
 		int m_loopEndFrame = 0;
 		int m_frameIndex = 0;
 		SRC_STATE* m_resampleState = nullptr;
+		static std::array<int, 5> s_sampleMargin;
 	};
 }
 

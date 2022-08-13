@@ -37,6 +37,8 @@
 
 namespace lmms
 {
+	std::array<int, 5> Sample::s_sampleMargin = {64, 64, 64, 4, 4};
+
 	Sample::Sample(const std::string& strData, SampleBufferV2::StrDataType dataType)
 	{
 		setSampleData(strData, dataType);
@@ -62,6 +64,7 @@ namespace lmms
 
 	Sample::Sample(const Sample& other)
 		: m_sampleBuffer(other.m_sampleBuffer)
+		, m_sampleRate(other.m_sampleRate)
 		, m_amplification(other.m_amplification)
 		, m_frequency(other.m_frequency)
 		, m_reversed(other.m_reversed)
@@ -75,6 +78,7 @@ namespace lmms
 
 	Sample::Sample(Sample&& other)
 		: m_sampleBuffer(std::exchange(other.m_sampleBuffer, nullptr))
+		, m_sampleRate(std::exchange(other.m_sampleRate, 0))
 		, m_amplification(std::exchange(other.m_amplification, 1.0f))
 		, m_frequency(std::exchange(other.m_frequency, 0.0f))
 		, m_varyingPitch(std::exchange(other.m_varyingPitch, false))
@@ -94,6 +98,7 @@ namespace lmms
 	void swap(Sample& first, Sample& second)
 	{
 		first.m_sampleBuffer.swap(second.m_sampleBuffer);
+		std::swap(first.m_sampleRate, second.m_sampleRate);
 		std::swap(first.m_amplification, second.m_amplification);
 		std::swap(first.m_frequency, second.m_frequency);
 		std::swap(first.m_reversed, second.m_reversed);
@@ -110,25 +115,27 @@ namespace lmms
 
 	bool Sample::play(sampleFrame* dst, const int framesToPlay, const float freq, PlaybackType playback)
 	{
-		if (!m_sampleBuffer || framesToPlay <= 0 || (m_frameIndex < 0 || m_frameIndex > m_endFrame)) { return false; }
+		if (!m_sampleBuffer || framesToPlay <= 0) { return false; }
 
-		if ((playback == PlaybackType::LoopPoints || playback == PlaybackType::PingPong)
-			&& (m_frameIndex < m_loopStartFrame || m_frameIndex > m_loopEndFrame))
+		const auto freqFactor = static_cast<double>(freq) / static_cast<double>(m_frequency) 
+			* m_sampleRate / Engine::audioEngine()->processingSampleRate();
+
+		const f_cnt_t totalFramesForCurrentPitch = static_cast<f_cnt_t>((m_endFrame - m_startFrame) / freqFactor);
+		if (totalFramesForCurrentPitch == 0) { return false; }
+
+		if (playback == PlaybackType::Regular && (m_frameIndex >= m_endFrame || (m_endFrame - m_frameIndex) / freqFactor == 0)) 
 		{
-			m_frameIndex = m_loopStartFrame;
+			return false;
 		}
 
+		m_frameIndex = playback == PlaybackType::Regular ? std::max(m_frameIndex, m_startFrame) 
+			: calculatePlaybackIndex(m_frameIndex, m_loopStartFrame, m_loopEndFrame, playback).value();
+
+		f_cnt_t fragmentSize = static_cast<f_cnt_t>(framesToPlay * freqFactor) + s_sampleMargin[m_interpolationMode];
+		f_cnt_t framesUsed = framesToPlay;
+
 		auto& sampleData = m_sampleBuffer->sampleData();
-		auto sampleDataIt = m_reversed ? sampleData.end() : sampleData.begin();
-
-		sampleDataIt += (m_reversed ? -m_frameIndex : m_frameIndex);
-		auto advanceBy = m_reversed ? -framesToPlay : framesToPlay;
-
-		double freqFactor = static_cast<double>(freq) / m_frequency;
-		const int totalFramesForCurrentPitch = static_cast<int>((m_endFrame - m_startFrame) / freqFactor);
-
-		if (totalFramesForCurrentPitch == 0) { return false; }
-		if (freqFactor != 1.0 || m_varyingPitch)
+		if (freqFactor != 1.0 || m_varyingPitch) 
 		{
 			if (!m_resampleState)
 			{
@@ -138,64 +145,39 @@ namespace lmms
 				if (error) { return false; }
 			}
 
-			std::array<int, 5> sampleMargin = {64, 64, 64, 4, 4};
-			int fragmentSize = static_cast<int>(framesToPlay * freqFactor) + sampleMargin[m_interpolationMode];
-
 			SRC_DATA srcData;
-			srcData.data_in = (sampleDataIt + advanceBy)->data();
+			srcData.data_in = (sampleData.data() + m_frameIndex)->data();
 			srcData.data_out = dst->data();
 			srcData.input_frames = fragmentSize;
 			srcData.output_frames = framesToPlay;
 			srcData.src_ratio = 1.0 / freqFactor;
+			srcData.end_of_input = 0;
 
 			int error = src_process(m_resampleState, &srcData);
-			if (error || srcData.output_frames_gen > framesToPlay) { return false; }
-
-			if (m_reversed) { std::reverse(dst, dst + framesToPlay); }
-		}
-		else
-		{
-			if (m_reversed) { std::reverse_copy(sampleDataIt - framesToPlay, sampleDataIt, dst); }
-			else
+			if (error) 
 			{
-				std::copy(sampleDataIt, sampleDataIt + advanceBy, dst);
+				std::cout << "SampleBuffer: error while resampling: " <<
+					src_strerror(error) << '\n';
 			}
+
+			if (srcData.output_frames_gen > framesToPlay)
+			{
+				std::cout << "SampleBuffer: not enough frames: " <<
+					srcData.output_frames_gen << "/" << framesToPlay << '\n';
+			}
+
+			framesUsed = srcData.input_frames_used;
 		}
 
-		for (int i = 0; i < framesToPlay; ++i)
+		m_reversed ? 
+			std::reverse_copy(sampleData.end() - m_frameIndex - framesUsed - 1, sampleData.end() - m_frameIndex - 1, dst) :
+			std::copy(sampleData.begin() + m_frameIndex, sampleData.begin() + m_frameIndex + framesUsed, dst);
+
+		advanceFrameIndex(framesUsed, playback);
+		for (int i = 0; i < framesToPlay; ++i) 
 		{
 			dst[i][0] *= m_amplification;
 			dst[i][1] *= m_amplification;
-		}
-
-		switch (playback)
-		{
-		case PlaybackType::Regular:
-			m_frameIndex += framesToPlay;
-			break;
-		case PlaybackType::LoopPoints:
-			m_frameIndex += framesToPlay;
-			if (m_frameIndex >= m_loopEndFrame) { m_frameIndex = m_loopStartFrame; }
-			break;
-		case PlaybackType::PingPong:
-			if (!m_pingPongBackwards && m_frameIndex < m_loopEndFrame) { m_frameIndex += framesToPlay; }
-			else if (!m_pingPongBackwards && m_frameIndex >= m_loopEndFrame)
-			{
-				setReversed(!m_reversed);
-				m_pingPongBackwards = true;
-				m_frameIndex = m_loopEndFrame;
-			}
-			else if (m_pingPongBackwards && m_frameIndex > m_loopStartFrame)
-			{
-				m_frameIndex -= framesToPlay;
-			}
-			else if (m_pingPongBackwards && m_frameIndex <= m_loopStartFrame)
-			{
-				setReversed(!m_reversed);
-				m_pingPongBackwards = false;
-				m_frameIndex = m_loopStartFrame;
-			}
-			break;
 		}
 
 		return true;
@@ -416,6 +398,7 @@ namespace lmms
 	void Sample::setReversed(const bool reversed)
 	{
 		m_reversed = reversed;
+		emit sampleUpdated();
 	}
 
 	void Sample::setVaryingPitch(const bool varyingPitch)
@@ -461,7 +444,6 @@ namespace lmms
 		m_frameIndex = frameIndex;
 	}
 
-
 	void Sample::loadAudioFile(const std::string& audioFile)
 	{
 		setSampleData(audioFile, SampleBufferV2::StrDataType::AudioFile);
@@ -484,6 +466,64 @@ namespace lmms
 	int Sample::calculateTickLength() const
 	{
 		return 1 / Engine::framesPerTick() * m_sampleBuffer->numFrames();
+	}
+
+	void Sample::advanceFrameIndex(f_cnt_t amount, PlaybackType playback) 
+	{
+		switch (playback) 
+		{
+			case PlaybackType::Regular:
+				m_frameIndex += amount;
+				break;
+			case PlaybackType::LoopPoints:
+				m_frameIndex += amount;
+				m_frameIndex = calculatePlaybackIndex(m_frameIndex, m_loopStartFrame, m_loopEndFrame, playback).value();
+				break;
+			case PlaybackType::PingPong:
+				f_cnt_t left = amount;
+				
+				if (m_reversed)
+				{
+					m_frameIndex -= amount;
+					if (m_frameIndex < m_loopStartFrame)
+					{
+						left -= (m_loopStartFrame - m_frameIndex);
+						m_frameIndex = m_loopStartFrame;
+					}
+					else left = 0;
+				}
+				
+				m_frameIndex += left;
+				m_frameIndex = calculatePlaybackIndex(m_frameIndex, m_loopStartFrame, m_loopEndFrame, playback).value();
+				break;
+		}
+	}
+
+	std::optional<f_cnt_t> Sample::calculatePlaybackIndex(f_cnt_t index, f_cnt_t start, f_cnt_t end, PlaybackType playback)
+	{
+		switch (playback) 
+		{
+		case PlaybackType::Regular:
+			if (index < start || index > end) { return std::nullopt; }
+			return index;
+			break;
+		case PlaybackType::LoopPoints:
+			if (index < end) { return index; }
+			return start + (index - start) % (end - start);
+			break;
+		case PlaybackType::PingPong:
+			if (index < end) { return index; }
+			
+			const f_cnt_t loopLen = end - start;
+			const f_cnt_t loopPos = (index - end) % (loopLen * 2);
+
+			return (loopPos < loopLen)
+				? end - loopPos
+				: start + (loopPos - loopLen);
+			break;
+		}
+
+		return std::nullopt;
 	}
 }
 
