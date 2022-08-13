@@ -81,7 +81,6 @@ lmms_main_path = Path(__file__).resolve().parent.parent.parent
 with tempfile.TemporaryDirectory() as tmpdir:
 	os.chdir(tmpdir)
 	check_strings = lmms_main_path / 'tests' / 'scripted' / 'check-strings'
-	check_namespace = lmms_main_path / 'tests' / 'scripted' / 'check-namespace'
 
 	# create dummy carla repo
 	Path('carla').mkdir()
@@ -157,48 +156,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
 		create_file('debian/copyright', 'Files: NonExistent')
 		test.run()
 		test.expect('Error: debian/copyright: Glob/Path does not exist: NonExistent')
-		test.expect('1 errors')
-
-	# minimal working example
-	with ScriptTest(check_namespace) as test:
-		test.run(0)  # exitcode 0 - no errors expected
-		test.expect('0 errors')
-
-	with ScriptTest(check_namespace) as test:
-		create_file('src/core/NoNamespace.cpp', '')
-		test.run()
-		test.expect('Error: src/core/NoNamespace.cpp: File has no namespace lmms')
-		test.expect('1 errors')
-	if False:
-		with ScriptTest(check_namespace) as test:
-			create_file('src/core/Model.cpp', 'namespace lmms {\n\n} // namespace lmm')
-			test.run()
-			test.expect('Error: src/core/Model.cpp: namespace/macro ("lmms") does not match end ("lmm")')
-			test.expect('1 errors')
-
-		with ScriptTest(check_namespace) as test:
-			create_file('src/core/Model.cpp', '#ifdef LMMS_HAVE_LV2\nnamespace lmms {}\n#endif // LMMS_HAVE_LV')
-			test.run()
-			test.expect('Error: src/core/Model.cpp: namespace/macro ("LMMS_HAVE_LV2") does not match end ("LMMS_HAVE_LV")')
-			test.expect('1 errors')
-
-		with ScriptTest(check_namespace) as test:
-			create_file('include/Model.h', '#ifndef MODEL_H\n#define MODEL_H\nnamespace lmms {}\n#endif // MODEL_')
-			test.run()
-			test.expect('Error: include/Model.h: namespace/macro ("MODEL_H") does not match end ("MODEL_")')
-			test.expect('1 errors')
-
-		with ScriptTest(check_namespace) as test:
-			create_file('include/Model.h', '#ifndef MODEL_H\n#define MODEL_H\nnamespace lmms {\n#include "lmms_export.h"\n}#endif // MODEL_H')
-			# "include" inside namespace => user includes file into lmms namespace...
-			test.run()
-			test.expect('Error: include/Model.h: First statement should be header guard')
-			test.expect('1 errors')
-
-	with ScriptTest(check_namespace) as test:
-		create_file('include/Model.h', 'namespace lmms {\n}')
-		test.run()
-		test.expect('Error: include/Model.h: First statement should be header guard')
 		test.expect('1 errors')
 
 # if we made it until here without an exception, all tests have been passed
