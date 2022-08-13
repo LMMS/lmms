@@ -27,7 +27,7 @@ def error(where, match, my_str):
     if match:
         line = match.string[:match.start()].count('\n') + 1  # first line is 1
         where = f'{where}:{line}'
-    print(f'{where}: {my_str}')
+    print(f'Error: {where}: {my_str}')
 
 
 if not Path('.gitmodules').is_file():
