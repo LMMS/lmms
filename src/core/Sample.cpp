@@ -105,15 +105,14 @@ namespace lmms
 		std::swap(first.m_loopStartFrame, second.m_loopStartFrame);
 		std::swap(first.m_loopEndFrame, second.m_loopEndFrame);
 		std::swap(first.m_frameIndex, second.m_frameIndex);
-		std::swap(first.m_playback, second.m_playback);
 		std::swap(first.m_resampleState, second.m_resampleState);
 	}
 
-	bool Sample::play(sampleFrame* dst, const int framesToPlay, const float freq)
+	bool Sample::play(sampleFrame* dst, const int framesToPlay, const float freq, PlaybackType playback)
 	{
 		if (framesToPlay <= 0 || (m_frameIndex < 0 || m_frameIndex > m_endFrame)) { return false; }
 
-		if ((m_playback == PlaybackType::LoopPoints || m_playback == PlaybackType::PingPong)
+		if ((playback == PlaybackType::LoopPoints || playback == PlaybackType::PingPong)
 			&& (m_frameIndex < m_loopStartFrame || m_frameIndex > m_loopEndFrame))
 		{
 			m_frameIndex = m_loopStartFrame;
@@ -169,7 +168,7 @@ namespace lmms
 			dst[i][1] *= m_amplification;
 		}
 
-		switch (m_playback)
+		switch (playback)
 		{
 		case PlaybackType::Regular:
 			m_frameIndex += framesToPlay;
@@ -373,10 +372,6 @@ namespace lmms
 		return m_sampleBuffer ? m_sampleBuffer->numFrames() : 0;
 	}
 
-	Sample::PlaybackType Sample::playback() const
-	{
-		return m_playback;
-	}
 
 	void Sample::setSampleData(const std::string& strData, const SampleBufferV2::StrDataType dataType)
 	{
@@ -447,10 +442,6 @@ namespace lmms
 		m_frameIndex = frameIndex;
 	}
 
-	void Sample::setPlayback(const PlaybackType playback)
-	{
-		m_playback = playback;
-	}
 
 	void Sample::loadAudioFile(const std::string& audioFile)
 	{

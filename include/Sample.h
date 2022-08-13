@@ -59,7 +59,7 @@ namespace lmms
 		Sample& operator=(Sample other);
 		friend void swap(Sample& first, Sample& second);
 
-		bool play(sampleFrame* dst, const int numFrames, const float freq);
+		bool play(sampleFrame* dst, const int numFrames, const float freq, PlaybackType playback = PlaybackType::Regular);
 		void visualize(QPainter& painter, const QRect& drawingRect, const int fromFrame = 0, const int toFrame = 0);
 
 		std::string sampleFile() const;
@@ -76,7 +76,6 @@ namespace lmms
 		int loopEndFrame() const;
 		int frameIndex() const;
 		int numFrames() const;
-		PlaybackType playback() const;
 
 		void setSampleData(const std::string& str, const SampleBufferV2::StrDataType dataType);
 		void setSampleBuffer(const SampleBufferV2* buffer);
@@ -90,7 +89,6 @@ namespace lmms
 		void setLoopStartFrame(const int loopStart);
 		void setLoopEndFrame(const int loopEnd);
 		void setFrameIndex(const int frameIndex);
-		void setPlayback(const PlaybackType playback);
 
 		void loadAudioFile(const std::string& audioFile);
 		void loadBase64(const std::string& base64);
@@ -110,7 +108,6 @@ namespace lmms
 		int m_loopStartFrame = 0;
 		int m_loopEndFrame = 0;
 		int m_frameIndex = 0;
-		PlaybackType m_playback = PlaybackType::Regular;
 		SRC_STATE* m_resampleState = nullptr;
 	};
 }
