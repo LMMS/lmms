@@ -57,21 +57,19 @@ namespace lmms
 	SampleBufferV2::SampleBufferV2(const sampleFrame* data, const int numFrames)
 		: m_sampleData(data, data + numFrames)
 		, m_filePath("")
-		, m_originalSampleRate(Engine::audioEngine()->processingSampleRate())
 	{
 	}
 
 	SampleBufferV2::SampleBufferV2(const int numFrames)
 		: m_sampleData(numFrames)
 		, m_filePath("")
-		, m_originalSampleRate(Engine::audioEngine()->processingSampleRate())
 	{
 	}
 
 	SampleBufferV2::SampleBufferV2(SampleBufferV2&& other)
 		: m_sampleData(std::move(other.m_sampleData))
 		, m_filePath(std::exchange(other.m_filePath, std::nullopt))
-		, m_originalSampleRate(std::exchange(other.m_originalSampleRate, 0))
+		, m_sampleRate(std::exchange(other.m_sampleRate, 0))
 	{
 		other.m_sampleData.clear();
 	}
@@ -82,7 +80,7 @@ namespace lmms
 
 		m_sampleData = std::move(other.m_sampleData);
 		m_filePath = std::exchange(other.m_filePath, std::nullopt);
-		m_originalSampleRate = std::exchange(other.m_originalSampleRate, 0);
+		m_sampleRate = std::exchange(other.m_sampleRate, 0);
 		other.m_sampleData.clear();
 
 		return *this;
@@ -98,9 +96,9 @@ namespace lmms
 		return m_filePath;
 	}
 
-	int SampleBufferV2::originalSampleRate() const
+	sample_rate_t SampleBufferV2::sampleRate() const
 	{
-		return m_originalSampleRate;
+		return m_sampleRate;
 	}
 
 	std::string SampleBufferV2::toBase64() const
@@ -113,35 +111,6 @@ namespace lmms
 	int SampleBufferV2::numFrames() const
 	{
 		return m_sampleData.size();
-	}
-
-	void SampleBufferV2::resample(const int oldSampleRate, const int newSampleRate)
-	{
-		int dstFrames = static_cast<int>(static_cast<float>(numFrames()) / oldSampleRate * newSampleRate);
-		auto resampleBuf = std::vector<sampleFrame>(dstFrames);
-
-		int error;
-		SRC_STATE* state;
-		if ((state = src_new(SRC_LINEAR, DEFAULT_CHANNELS, &error)) != nullptr)
-		{
-			SRC_DATA srcData;
-			srcData.data_in = m_sampleData.data()->data();
-			srcData.input_frames = numFrames();
-			srcData.data_out = resampleBuf.data()->data();
-			srcData.output_frames = dstFrames;
-			srcData.src_ratio = static_cast<double>(newSampleRate) / oldSampleRate;
-			srcData.end_of_input = 1;
-
-			error = src_process(state, &srcData);
-			src_delete(state);
-		}
-
-		if (error != 0)
-		{
-			throw std::runtime_error(std::string("An error occurred when resampling: ") + src_strerror(error) + '\n');
-		}
-
-		m_sampleData = std::move(resampleBuf);
 	}
 
 	void SampleBufferV2::loadFromAudioFile(const std::filesystem::path& audioFilePath)
@@ -170,19 +139,13 @@ namespace lmms
 		}
 
 		m_sampleData = std::vector<sampleFrame>(sfInfo.frames);
-		m_originalSampleRate = sfInfo.samplerate;
+		m_sampleRate = sfInfo.samplerate;
 		m_filePath = audioFilePath;
 
 		for (sf_count_t frameIndex = 0; frameIndex < sfInfo.frames; ++frameIndex)
 		{
 			m_sampleData[frameIndex][0] = samples[frameIndex * sfInfo.channels];
 			m_sampleData[frameIndex][1] = samples[frameIndex * sfInfo.channels + (sfInfo.channels > 1 ? 1 : 0)];
-		}
-
-		auto audioEngineSampleRate = Engine::audioEngine()->processingSampleRate();
-		if (sfInfo.samplerate != static_cast<int>(audioEngineSampleRate))
-		{
-			resample(sfInfo.samplerate, audioEngineSampleRate);
 		}
 	}
 

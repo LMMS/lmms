@@ -56,21 +56,20 @@ namespace lmms
 
 		const std::vector<sampleFrame>& sampleData() const;
 		const std::optional<std::filesystem::path>& filePath() const;
-		int originalSampleRate() const;
+		sample_rate_t sampleRate() const;
+		int numFrames() const;
 
 		std::string toBase64() const;
-		int numFrames() const;
 
 	private:
 		void loadFromAudioFile(const std::filesystem::path& audioFilePath);
 		void loadFromDrumSynthFile(const std::filesystem::path& drumSynthFilePath);
 		void loadFromBase64(const std::string& base64);
-		void resample(const int oldSampleRate, const int newSampleRate);
 
 	private:
 		std::vector<sampleFrame> m_sampleData;
 		std::optional<std::filesystem::path> m_filePath;
-		int m_originalSampleRate = 0;
+		sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
 	};
 }
 
