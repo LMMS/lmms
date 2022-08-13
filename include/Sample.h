@@ -64,7 +64,6 @@ namespace lmms
 
 		std::string sampleFile() const;
 		std::shared_ptr<const SampleBufferV2> sampleBuffer() const;
-		int sampleRate() const;
 		float amplification() const;
 		float frequency() const;
 		bool reversed() const;
