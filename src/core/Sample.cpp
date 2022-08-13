@@ -437,6 +437,14 @@ namespace lmms
 		m_loopEndFrame = loopEnd;
 	}
 
+	void Sample::setAllPointFrames(const int start, const int end, const int loopStart, const int loopEnd) 
+	{
+		m_startFrame = start;
+		m_endFrame = end;
+		m_loopStartFrame = loopStart;
+		m_loopEndFrame = loopEnd;
+	}
+
 	void Sample::setFrameIndex(const int frameIndex)
 	{
 		m_frameIndex = frameIndex;

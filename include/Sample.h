@@ -88,6 +88,7 @@ namespace lmms
 		void setEndFrame(const int end);
 		void setLoopStartFrame(const int loopStart);
 		void setLoopEndFrame(const int loopEnd);
+		void setAllPointFrames(const int start, const int end, const int loopStart, const int loopEnd);
 		void setFrameIndex(const int frameIndex);
 
 		void loadAudioFile(const std::string& audioFile);
