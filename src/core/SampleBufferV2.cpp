@@ -42,11 +42,7 @@ namespace lmms
 				throw std::runtime_error("SampleBufferV2.cpp: non existing file " + strData);
 			}
 
-			if (audioFilePath.extension() == ".ds") { loadFromDrumSynthFile(audioFilePath); }
-			else
-			{
-				loadFromAudioFile(audioFilePath);
-			}
+			audioFilePath.extension() == ".ds" ? loadFromDrumSynthFile(audioFilePath) : loadFromAudioFile(audioFilePath);
 		}
 		else if (dataType == StrDataType::Base64)
 		{
@@ -101,6 +97,11 @@ namespace lmms
 		return m_sampleRate;
 	}
 
+	int SampleBufferV2::numFrames() const
+	{
+		return m_sampleData.size();
+	}
+
 	std::string SampleBufferV2::toBase64() const
 	{
 		const char* rawData = reinterpret_cast<const char*>(m_sampleData.data());
@@ -108,10 +109,6 @@ namespace lmms
 		return data.toBase64().constData();
 	}
 
-	int SampleBufferV2::numFrames() const
-	{
-		return m_sampleData.size();
-	}
 
 	void SampleBufferV2::loadFromAudioFile(const std::filesystem::path& audioFilePath)
 	{
