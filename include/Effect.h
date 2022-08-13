@@ -33,8 +33,18 @@
 #include "TempoSyncKnobModel.h"
 #include "MemoryManager.h"
 
+namespace lmms
+{
+
 class EffectChain;
 class EffectControls;
+
+namespace gui
+{
+
+class EffectView;
+
+} // namespace gui
 
 
 class LMMS_EXPORT Effect : public Plugin
@@ -45,7 +55,7 @@ public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key );
-	virtual ~Effect();
+	~Effect() override;
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
 	void loadSettings( const QDomElement & _this ) override;
@@ -170,7 +180,7 @@ protected:
 	*/
 	void checkGate( double _out_sum );
 
-	PluginView * instantiateView( QWidget * ) override;
+	gui::PluginView* instantiateView( QWidget * ) override;
 
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
@@ -221,14 +231,14 @@ private:
 	SRC_STATE * m_srcState[2];
 
 
-	friend class EffectView;
+	friend class gui::EffectView;
 	friend class EffectChain;
 
 } ;
 
+using EffectKey = Effect::Descriptor::SubPluginFeatures::Key;
+using EffectKeyList = Effect::Descriptor::SubPluginFeatures::KeyList;
 
-typedef Effect::Descriptor::SubPluginFeatures::Key EffectKey;
-typedef Effect::Descriptor::SubPluginFeatures::KeyList EffectKeyList;
-
+} // namespace lmms
 
 #endif

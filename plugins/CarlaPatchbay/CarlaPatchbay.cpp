@@ -28,12 +28,16 @@
 #include "plugin_export.h"
 #include "InstrumentTrack.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
 {
-    STRINGIFY( PLUGIN_NAME ),
+    LMMS_STRINGIFY( PLUGIN_NAME ),
     "Carla Patchbay",
     QT_TRANSLATE_NOOP( "PluginBrowser",
                        "Carla Patchbay Instrument" ),
@@ -51,3 +55,6 @@ PLUGIN_EXPORT Plugin* lmms_plugin_main(Model* m, void*)
 }
 
 }
+
+
+} // namespace lmms

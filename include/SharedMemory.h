@@ -28,7 +28,12 @@
 #include <string>
 #include <type_traits>
 
-namespace detail {
+
+namespace lmms
+{
+
+namespace detail
+{
 
 class SharedMemoryImpl;
 
@@ -66,6 +71,7 @@ private:
 };
 
 } // namespace detail
+
 
 template<typename T>
 class SharedMemory
@@ -139,5 +145,7 @@ public:
 private:
 	detail::SharedMemoryData m_data;
 };
+
+} // namespace lmms
 
 #endif // SHARED_MEMORY_H

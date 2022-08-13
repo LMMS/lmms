@@ -28,6 +28,9 @@
 #include "LadspaControl.h"
 #include "LadspaEffect.h"
 
+namespace lmms
+{
+
 
 LadspaControls::LadspaControls( LadspaEffect * _eff ) :
 	EffectControls( _eff ),
@@ -190,5 +193,4 @@ void LadspaControls::updateLinkStatesFromGlobal()
 }
 
 
-
-
+} // namespace lmms

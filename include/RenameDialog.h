@@ -32,13 +32,15 @@
 
 class QLineEdit;
 
+namespace lmms::gui
+{
 
 class RenameDialog : public QDialog
 {
 	Q_OBJECT
 public:
 	RenameDialog( QString & _string );
-	~RenameDialog();
+	~RenameDialog() override = default;
 
 
 protected:
@@ -57,5 +59,7 @@ private:
 
 } ;
 
+
+} // namespace lmms::gui
 
 #endif

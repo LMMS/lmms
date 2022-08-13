@@ -32,6 +32,9 @@
 
 #include "fluidsynthshims.h"
 
+namespace lmms::gui
+{
+
 
 // Custom list-view item (as for numerical sort purposes...)
 class PatchItem : public QTreeWidgetItem
@@ -44,7 +47,7 @@ public:
 		: QTreeWidgetItem( pListView, pItemAfter ) {}
 
 	// Sort/compare overriden method.
-	bool operator< ( const QTreeWidgetItem& other ) const
+	bool operator< ( const QTreeWidgetItem& other ) const override
 	{
 		int iColumn = QTreeWidgetItem::treeWidget()->sortColumn();
 		const QString& s1 = text( iColumn );
@@ -105,12 +108,6 @@ PatchesDialog::PatchesDialog( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_cancelButton,
 		SIGNAL(clicked()),
 		SLOT(reject()));
-}
-
-
-// Destructor.
-PatchesDialog::~PatchesDialog()
-{
 }
 
 
@@ -261,7 +258,7 @@ void PatchesDialog::accept()
 
 
 // Reject settings (Cancel button slot).
-void PatchesDialog::reject (void)
+void PatchesDialog::reject ()
 {
 	// Reset selection to initial selection, if applicable...
 	if (m_dirty > 0)
@@ -303,7 +300,7 @@ QTreeWidgetItem *PatchesDialog::findProgItem ( int iProg )
 
 
 // Bank change slot.
-void PatchesDialog::bankChanged (void)
+void PatchesDialog::bankChanged ()
 {
 	if (m_pSynth == nullptr)
 		return;
@@ -381,4 +378,4 @@ void PatchesDialog::progChanged (QTreeWidgetItem * _curr, QTreeWidgetItem * _pre
 }
 
 
-
+} // namespace lmms::gui

@@ -34,7 +34,8 @@
 #include "gui_templates.h"
 
 
-
+namespace lmms::gui
+{
 
 LcdWidget::LcdWidget(QWidget* parent, const QString& name, bool leadingZero) :
 	LcdWidget(1, parent, name, leadingZero)
@@ -290,3 +291,4 @@ void LcdWidget::initUi(const QString& name , const QString& style)
 	updateSize();
 }
 
+} // namespace lmms::gui

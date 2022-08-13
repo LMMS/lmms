@@ -80,6 +80,10 @@
 #include <QString>
 #include <utility>
 
+
+namespace lmms::gui
+{
+
 constexpr const int ControlLayout::m_minWidth;
 
 ControlLayout::ControlLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
@@ -312,3 +316,4 @@ int ControlLayout::smartSpacing(QStyle::PixelMetric pm) const
 }
 
 
+} // namespace lmms::gui

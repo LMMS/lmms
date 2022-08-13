@@ -28,6 +28,14 @@
 #include "RemotePluginBase.h"
 #include "SharedMemory.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	#include <QRecursiveMutex>
+#endif
+
+namespace lmms
+{
+
+
 class RemotePlugin;
 
 class ProcessWatcher : public QThread
@@ -35,7 +43,7 @@ class ProcessWatcher : public QThread
 	Q_OBJECT
 public:
 	ProcessWatcher( RemotePlugin * );
-	virtual ~ProcessWatcher() = default;
+	~ProcessWatcher() override = default;
 
 	void stop()
 	{
@@ -62,7 +70,7 @@ class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 	Q_OBJECT
 public:
 	RemotePlugin();
-	virtual ~RemotePlugin();
+	~RemotePlugin() override;
 
 	inline bool isRunning()
 	{
@@ -70,7 +78,7 @@ public:
 		return true;
 #else
 		return m_process.state() != QProcess::NotRunning;
-#endif
+#endif // DEBUG_REMOTE_PLUGIN
 	}
 
 	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
@@ -154,7 +162,11 @@ private:
 	QString m_exec;
 	QStringList m_args;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+	QRecursiveMutex m_commMutex;
+#else
 	QMutex m_commMutex;
+#endif
 	bool m_splitChannels;
 
 	SharedMemory<float[]> m_audioBuffer;
@@ -166,7 +178,7 @@ private:
 #ifndef SYNC_WITH_SHM_FIFO
 	int m_server;
 	QString m_socketFile;
-#endif
+#endif // not SYNC_WITH_SHM_FIFO
 
 	friend class ProcessWatcher;
 
@@ -176,9 +188,13 @@ private slots:
 	void processErrored(QProcess::ProcessError err );
 } ;
 
+
 LMMS_EXPORT inline std::string QSTR_TO_STDSTR(QString const& qstr)
 {
 	return qstr.toStdString();
 }
+
+
+} // namespace lmms
 
 #endif // REMOTE_PLUGIN_H

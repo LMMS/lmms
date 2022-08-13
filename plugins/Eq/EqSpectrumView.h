@@ -29,6 +29,9 @@
 #include "fft_helpers.h"
 #include "lmms_basics.h"
 
+namespace lmms
+{
+
 
 const int MAX_BANDS = 2048;
 class EqAnalyser
@@ -63,22 +66,21 @@ private:
 };
 
 
-
+namespace gui
+{
 
 class EqSpectrumView : public QWidget
 {
 	Q_OBJECT
 public:
 	explicit EqSpectrumView( EqAnalyser *b, QWidget *_parent = 0 );
-	virtual ~EqSpectrumView()
-	{
-	}
+	~EqSpectrumView() override = default;
 
 	QColor getColor() const;
 	void setColor( const QColor &value );
 
 protected:
-	virtual void paintEvent( QPaintEvent *event );
+	void paintEvent( QPaintEvent *event ) override;
 
 private slots:
 	void periodicalUpdate();
@@ -96,4 +98,10 @@ private:
 
 	float bandToFreq ( int index );
 };
+
+
+} // namespace gui
+
+} // namespace lmms
+
 #endif // EQSPECTRUMVIEW_H

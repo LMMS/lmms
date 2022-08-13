@@ -32,6 +32,9 @@
 
 class QLabel;
 
+namespace lmms::gui
+{
+
 class AutomationEditorWindow;
 class ControllerRackView;
 class MixerView;
@@ -47,7 +50,7 @@ class LMMS_EXPORT GuiApplication : public QObject
 	Q_OBJECT;
 public:
 	explicit GuiApplication();
-	~GuiApplication();
+	~GuiApplication() override;
 
 	static GuiApplication* instance();
 #ifdef LMMS_BUILD_WIN32
@@ -87,5 +90,7 @@ private:
 
 // Short-hand function
 LMMS_EXPORT GuiApplication* getGUI();
+
+} // namespace lmms::gui
 
 #endif // GUIAPPLICATION_H

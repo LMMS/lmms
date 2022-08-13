@@ -30,14 +30,24 @@
 
 #include <QObject>
 
-
-class CustomTextKnob;
 class QGridLayout;
 class QPaintEvent;
 class QPushButton;
 class QMdiSubWindow;
 class QScrollArea;
+
+namespace lmms
+{
+
+
 class VstEffect;
+
+namespace gui
+{
+class CustomTextKnob;
+class ManageVSTEffectView;
+class VstEffectControlDialog;
+}
 
 
 class VstEffectControls : public EffectControls
@@ -45,29 +55,29 @@ class VstEffectControls : public EffectControls
 	Q_OBJECT
 public:
 	VstEffectControls( VstEffect * _eff );
-	virtual ~VstEffectControls();
+	~VstEffectControls() override;
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-	inline virtual QString nodeName() const
+	void saveSettings( QDomDocument & _doc, QDomElement & _parent ) override;
+	void loadSettings( const QDomElement & _this ) override;
+	inline QString nodeName() const override
 	{
 		return "vsteffectcontrols";
 	}
 
-	virtual int controlCount();
+	int controlCount() override;
 
-	virtual EffectControlDialog * createView();
+	gui::EffectControlDialog* createView() override;
 
 
 protected slots:
-	void updateMenu( void );
-	void managePlugin( void );
-	void openPreset( void );
-	void savePreset( void );
-	void rollPreset( void );
-	void rolrPreset( void );
-	void selPreset( void );
-	void setParameter( Model * action );
+	void updateMenu();
+	void managePlugin();
+	void openPreset();
+	void savePreset();
+	void rollPreset();
+	void rolrPreset();
+	void selPreset();
+	void setParameter( lmms::Model * action );
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -87,13 +97,15 @@ private:
 	int lastPosInMenu;
 //	QLabel * m_presetLabel;
 
-	friend class VstEffectControlDialog;
-	friend class ManageVSTEffectView;
+	friend class gui::VstEffectControlDialog;
+	friend class gui::ManageVSTEffectView;
 
 	bool m_vstGuiVisible;
 } ;
 
 
+namespace gui
+{
 
 
 class ManageVSTEffectView : public QObject
@@ -101,13 +113,13 @@ class ManageVSTEffectView : public QObject
 	Q_OBJECT
 public:
 	ManageVSTEffectView( VstEffect * _eff, VstEffectControls * m_vi );
-	virtual ~ManageVSTEffectView();
+	~ManageVSTEffectView() override;
 
 
 protected slots:
-	void syncPlugin( void );
-	void displayAutomatedOnly( void );
-	void setParameter( Model * action );
+	void syncPlugin();
+	void displayAutomatedOnly();
+	void setParameter( lmms::Model * action );
 	void syncParameterText();
 	void closeWindow();
 
@@ -131,5 +143,9 @@ private:
 
 } ;
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

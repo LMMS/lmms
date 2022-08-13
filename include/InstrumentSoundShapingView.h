@@ -32,6 +32,9 @@
 
 class QLabel;
 
+namespace lmms::gui
+{
+
 class EnvelopeAndLfoView;
 class ComboBox;
 class GroupBox;
@@ -44,7 +47,7 @@ class InstrumentSoundShapingView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	InstrumentSoundShapingView( QWidget * _parent );
-	virtual ~InstrumentSoundShapingView();
+	~InstrumentSoundShapingView() override;
 
 	void setFunctionsHidden( bool hidden );
 
@@ -66,5 +69,8 @@ private:
 	QLabel* m_singleStreamInfoLabel;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

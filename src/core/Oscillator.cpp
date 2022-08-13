@@ -38,6 +38,9 @@
 #include "fft_helpers.h"
 
 
+namespace lmms
+{
+
 
 void Oscillator::waveTableInit()
 {
@@ -231,7 +234,7 @@ void Oscillator::generateWaveTables()
 	// Generate tables for simple shaped (constructed by summing sine waves).
 	// Start from the table that contains the least number of bands, and re-use each table in the following
 	// iteration, adding more bands in each step and avoiding repeated computation of earlier bands.
-	typedef void (*generator_t)(int, sample_t*, int);
+	using generator_t = void (*)(int, sample_t*, int);
 	auto simpleGen = [](WaveShapes shape, generator_t generator)
 	{
 		const int shapeID = shape - FirstWaveShapeTable;
@@ -814,4 +817,4 @@ inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 }
 
 
-
+} // namespace lmms

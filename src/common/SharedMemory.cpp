@@ -44,9 +44,11 @@
 #	include <QSharedMemory>
 #endif
 
-namespace detail {
+
+namespace lmms::detail {
 
 #if _POSIX_SHARED_MEMORY_OBJECTS > 0
+
 
 namespace {
 
@@ -175,8 +177,7 @@ private:
 
 #endif
 
-SharedMemoryData::SharedMemoryData() noexcept
-{ }
+SharedMemoryData::SharedMemoryData() noexcept = default;
 
 SharedMemoryData::SharedMemoryData(std::string&& key, bool readOnly) :
 	m_key{std::move(key)},
@@ -190,7 +191,7 @@ SharedMemoryData::SharedMemoryData(std::string&& key, std::size_t size, bool rea
 	m_ptr{m_impl->get()}
 { }
 
-SharedMemoryData::~SharedMemoryData() { }
+SharedMemoryData::~SharedMemoryData() = default;
 
 SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
 	m_key{std::move(other.m_key)},
@@ -198,4 +199,4 @@ SharedMemoryData::SharedMemoryData(SharedMemoryData&& other) noexcept :
 	m_ptr{other.m_ptr}
 { }
 
-} // namespace detail
+} // namespace lmms::detail

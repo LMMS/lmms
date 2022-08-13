@@ -42,6 +42,10 @@
 
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 static const int wavetableSize = 200;
 static const float defaultNormalizationFactor = 1.0f;
 
@@ -50,7 +54,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT bitinvader_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"BitInvader",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Customizable wavetable synthesizer" ),
@@ -157,8 +161,8 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 	m_graph.setWaveToSine();
 	lengthChanged();
 
-	connect( &m_sampleLength, SIGNAL( dataChanged( ) ),
-			this, SLOT( lengthChanged( ) ), Qt::DirectConnection );
+	connect( &m_sampleLength, SIGNAL( dataChanged() ),
+			this, SLOT( lengthChanged() ), Qt::DirectConnection );
 
 	connect( &m_graph, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
@@ -166,10 +170,6 @@ BitInvader::BitInvader( InstrumentTrack * _instrument_track ) :
 
 
 
-
-BitInvader::~BitInvader()
-{
-}
 
 
 
@@ -325,15 +325,16 @@ void BitInvader::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * BitInvader::instantiateView( QWidget * _parent )
+gui::PluginView * BitInvader::instantiateView( QWidget * _parent )
 {
-	return( new BitInvaderView( this, _parent ) );
+	return( new gui::BitInvaderView( this, _parent ) );
 }
 
 
 
 
-
+namespace gui
+{
 
 
 BitInvaderView::BitInvaderView( Instrument * _instrument,
@@ -571,6 +572,7 @@ void BitInvaderView::normalizeToggled( bool value )
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -584,3 +586,6 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *m, void * )
 
 
 }
+
+
+} // namespace lmms

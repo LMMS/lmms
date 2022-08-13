@@ -29,6 +29,9 @@
 #include "SideBar.h"
 #include "SideBarWidget.h"
 
+namespace lmms::gui
+{
+
 
 // internal helper class allowing to create QToolButtons with
 // vertical orientation
@@ -41,7 +44,7 @@ public:
 	{
 	}
 
-	virtual ~SideBarButton() = default;
+	~SideBarButton() override = default;
 
 	Qt::Orientation orientation() const
 	{
@@ -91,15 +94,8 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 	setIconSize( QSize( 16, 16 ) );
 
 	m_btnGroup.setExclusive( false );
-	connect( &m_btnGroup, SIGNAL( buttonClicked( QAbstractButton * ) ),
-				this, SLOT( toggleButton( QAbstractButton * ) ) );
-}
-
-
-
-
-SideBar::~SideBar()
-{
+	connect( &m_btnGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+				this, SLOT(toggleButton(QAbstractButton*)));
 }
 
 
@@ -164,5 +160,4 @@ void SideBar::toggleButton( QAbstractButton * button )
 }
 
 
-
-
+} // namespace lmms::gui

@@ -33,6 +33,9 @@
 #include "PixmapButton.h"
 #include "LedCheckBox.h"
 
+namespace lmms::gui
+{
+
 
 WaveShaperControlDialog::WaveShaperControlDialog(
 					WaveShaperControls * _controls ) :
@@ -116,3 +119,5 @@ WaveShaperControlDialog::WaveShaperControlDialog(
 			_controls, SLOT( subOneClicked() ) );
 }
 
+
+} // namespace lmms::gui

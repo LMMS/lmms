@@ -36,6 +36,9 @@
 #include "lmms_basics.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
 
 extern "C" {
 	Plugin::Descriptor PLUGIN_EXPORT analyzer_plugin_descriptor =
@@ -116,3 +119,5 @@ extern "C" {
 	}
 }
 
+
+} // namespace lmms

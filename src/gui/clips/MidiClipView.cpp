@@ -27,6 +27,7 @@
 
 #include <cmath>
 #include <QApplication>
+#include <QInputDialog>
 #include <QMenu>
 #include <QPainter>
 
@@ -36,6 +37,11 @@
 #include "MidiClip.h"
 #include "PianoRoll.h"
 #include "RenameDialog.h"
+#include "TrackView.h"
+
+namespace lmms::gui
+{
+
 
 MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	ClipView( clip, parent ),
@@ -48,8 +54,8 @@ MidiClipView::MidiClipView( MidiClip* clip, TrackView* parent ) :
 	// TODO if this option is ever added to the GUI, rename it to legacysepattern
 	m_legacySEPattern(ConfigManager::inst()->value("ui", "legacysebb", "0").toInt())
 {
-	connect( getGUI()->pianoRoll(), SIGNAL( currentMidiClipChanged() ),
-			this, SLOT( update() ) );
+	connect( getGUI()->pianoRoll(), SIGNAL(currentMidiClipChanged()),
+			this, SLOT(update()));
 
 	if( s_stepBtnOn0 == nullptr )
 	{
@@ -140,43 +146,105 @@ void MidiClipView::changeName()
 
 
 
+void MidiClipView::transposeSelection()
+{
+	const auto selection = getClickedClips();
+
+	// Calculate the key boundries for all clips
+	int highest = 0;
+	int lowest = NumKeys - 1;
+	for (ClipView* clipview: selection)
+	{
+		if (auto mcv = qobject_cast<MidiClipView*>(clipview))
+		{
+			if (auto bounds = boundsForNotes(mcv->getMidiClip()->notes()))
+			{
+				lowest = std::min(bounds->lowest, lowest);
+				highest = std::max(bounds->highest, highest);
+			}
+		}
+	}
+
+	int semitones = QInputDialog::getInt(this, tr("Transpose"), tr("Semitones to transpose by:"),
+		/*start*/ 0, /*min*/ -lowest, /*max*/ (NumKeys - 1 - highest));
+
+	if (semitones == 0) { return; }
+
+	// TODO make this not crash
+	// Engine::getSong()->addJournalCheckPoint();
+
+	QSet<Track*> m_changedTracks;
+	for (ClipView* clipview: selection)
+	{
+		auto mcv = qobject_cast<MidiClipView*>(clipview);
+		if (!mcv) { continue; }
+
+		auto clip = mcv->getMidiClip();
+		if (clip->notes().empty()) { continue; }
+
+		auto track = clipview->getTrackView()->getTrack();
+		if (!m_changedTracks.contains(track))
+		{
+			track->addJournalCheckPoint();
+			m_changedTracks.insert(track);
+		}
+
+		for (Note* note: clip->notes())
+		{
+			note->setKey(note->key() + semitones);
+		}
+		emit clip->dataChanged();
+	}
+	// At least one clip must have notes to show the transpose dialog, so something *has* changed
+	Engine::getSong()->setModified();
+}
+
+
+
+
 void MidiClipView::constructContextMenu( QMenu * _cm )
 {
+	bool isBeat = m_clip->type() == MidiClip::BeatClip;
+
 	QAction * a = new QAction( embed::getIconPixmap( "piano" ),
 					tr( "Open in piano-roll" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
-	connect( a, SIGNAL( triggered( bool ) ),
-					this, SLOT( openInPianoRoll() ) );
+	connect( a, SIGNAL(triggered(bool)),
+					this, SLOT(openInPianoRoll()));
 
 	QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
 						tr( "Set as ghost in piano-roll" ), _cm );
 	if( m_clip->empty() ) { b->setEnabled( false ); }
 	_cm->insertAction( _cm->actions()[1], b );
-	connect( b, SIGNAL( triggered( bool ) ),
-					this, SLOT( setGhostInPianoRoll() ) );
+	connect( b, SIGNAL(triggered(bool)),
+					this, SLOT(setGhostInPianoRoll()));
 	_cm->insertSeparator( _cm->actions()[2] );
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "edit_erase" ),
-			tr( "Clear all notes" ), m_clip, SLOT( clear() ) );
+			tr( "Clear all notes" ), m_clip, SLOT(clear()));
+	if (!isBeat)
+	{
+		_cm->addAction(embed::getIconPixmap("scale"), tr("Transpose"), this, &MidiClipView::transposeSelection);
+	}
 	_cm->addSeparator();
 
 	_cm->addAction( embed::getIconPixmap( "reload" ), tr( "Reset name" ),
-						this, SLOT( resetName() ) );
+						this, SLOT(resetName()));
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
-						this, SLOT( changeName() ) );
+						this, SLOT(changeName()));
 
-	if ( m_clip->type() == MidiClip::BeatClip )
+	if (isBeat)
 	{
 		_cm->addSeparator();
 
 		_cm->addAction( embed::getIconPixmap( "step_btn_add" ),
-			tr( "Add steps" ), m_clip, SLOT( addSteps() ) );
+			tr( "Add steps" ), m_clip, SLOT(addSteps()));
 		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
-			tr( "Remove steps" ), m_clip, SLOT( removeSteps() ) );
+			tr( "Remove steps" ), m_clip, SLOT(removeSteps()));
 		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
-			tr( "Clone Steps" ), m_clip, SLOT( cloneSteps() ) );
+			tr( "Clone Steps" ), m_clip, SLOT(cloneSteps()));
 	}
 }
 
@@ -616,3 +684,6 @@ void MidiClipView::paintEvent( QPaintEvent * )
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
+
+
+} // namespace lmms::gui

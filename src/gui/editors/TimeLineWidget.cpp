@@ -36,6 +36,9 @@
 #include "GuiApplication.h"
 #include "TextFloat.h"
 
+namespace lmms::gui
+{
+
 
 QPixmap * TimeLineWidget::s_posMarkerPixmap = nullptr;
 
@@ -86,11 +89,11 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppb,
 	m_pos.m_timeLine = this;
 
 	QTimer * updateTimer = new QTimer( this );
-	connect( updateTimer, SIGNAL( timeout() ),
-					this, SLOT( updatePosition() ) );
+	connect( updateTimer, SIGNAL(timeout()),
+					this, SLOT(updatePosition()));
 	updateTimer->start( 1000 / 60 );  // 60 fps
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
-					this, SLOT( update() ) );
+	connect( Engine::getSong(), SIGNAL(timeSignatureChanged(int,int)),
+					this, SLOT(update()));
 }
 
 
@@ -122,17 +125,17 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 	autoScroll->setGeneralToolTip( tr( "Auto scrolling" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
-	connect( autoScroll, SIGNAL( changedState( int ) ), this,
-					SLOT( toggleAutoScroll( int ) ) );
+	connect( autoScroll, SIGNAL(changedState(int)), this,
+					SLOT(toggleAutoScroll(int)));
 
 	NStateButton * loopPoints = new NStateButton( _tool_bar );
 	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
-	connect( loopPoints, SIGNAL( changedState( int ) ), this,
-					SLOT( toggleLoopPoints( int ) ) );
-	connect( this, SIGNAL( loopPointStateLoaded( int ) ), loopPoints,
-					SLOT( changeState( int ) ) );
+	connect( loopPoints, SIGNAL(changedState(int)), this,
+					SLOT(toggleLoopPoints(int)));
+	connect( this, SIGNAL(loopPointStateLoaded(int)), loopPoints,
+					SLOT(changeState(int)));
 
 	NStateButton * behaviourAtStop = new NStateButton( _tool_bar );
 	behaviourAtStop->addState( embed::getIconPixmap( "back_to_zero" ),
@@ -144,10 +147,10 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 						"started" ) );
 	behaviourAtStop->addState( embed::getIconPixmap( "keep_stop_position" ),
 					tr( "After stopping keep position" ) );
-	connect( behaviourAtStop, SIGNAL( changedState( int ) ), this,
-					SLOT( toggleBehaviourAtStop( int ) ) );
-	connect( this, SIGNAL( loadBehaviourAtStop( int ) ), behaviourAtStop,
-					SLOT( changeState( int ) ) );
+	connect( behaviourAtStop, SIGNAL(changedState(int)), this,
+					SLOT(toggleBehaviourAtStop(int)));
+	connect( this, SIGNAL(loadBehaviourAtStop(int)), behaviourAtStop,
+					SLOT(changeState(int)));
 	behaviourAtStop->changeState( BackToStart );
 
 	_tool_bar->addWidget( autoScroll );
@@ -423,3 +426,6 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	if ( m_action == SelectSongClip ) { emit selectionFinished(); }
 	m_action = NoAction;
 }
+
+
+} // namespace lmms::gui

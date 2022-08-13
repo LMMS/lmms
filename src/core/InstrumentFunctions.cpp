@@ -31,6 +31,9 @@
 #include "InstrumentTrack.h"
 #include "PresetPreviewPlayHandle.h"
 
+namespace lmms
+{
+
 
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
 {
@@ -218,10 +221,6 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 
 
 
-InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
-{
-}
-
 
 
 
@@ -329,11 +328,6 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 }
 
 
-
-
-InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
-{
-}
 
 
 
@@ -556,3 +550,6 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }
+
+
+} // namespace lmms

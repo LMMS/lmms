@@ -32,13 +32,16 @@
 
 #include "ToolButton.h"
 
+namespace lmms::gui
+{
+
 
 class NStateButton : public ToolButton
 {
 	Q_OBJECT
 public:
 	NStateButton( QWidget * _parent );
-	virtual ~NStateButton();
+	~NStateButton() override;
 	void addState( const QPixmap & _pixmap, const QString & _tooltip = "" );
 
 	inline void setGeneralToolTip( const QString & _tooltip )
@@ -71,5 +74,8 @@ private:
 	int m_curState;
 
 } ;
+
+
+} // namespace lmms::gui
 
 #endif

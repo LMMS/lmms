@@ -32,6 +32,10 @@
 
 #include "lmms_export.h"
 
+namespace lmms
+{
+
+
 class LMMS_EXPORT ProjectRenderer : public QThread
 {
 	Q_OBJECT
@@ -60,7 +64,7 @@ public:
 				const OutputSettings & _os,
 				ExportFileFormats _file_format,
 				const QString & _out_file );
-	virtual ~ProjectRenderer();
+	~ProjectRenderer() override = default;
 
 	bool isReady() const
 	{
@@ -95,5 +99,8 @@ private:
 	volatile bool m_abort;
 
 } ;
+
+
+} // namespace lmms
 
 #endif

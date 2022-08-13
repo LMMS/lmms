@@ -42,6 +42,10 @@
 #include "TrackLabelButton.h"
 
 
+namespace lmms::gui
+{
+
+
 SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	TrackView( _t, tcv )
 {
@@ -49,7 +53,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 
 	m_tlb = new TrackLabelButton(this, getTrackSettingsWidget());
 	m_tlb->setCheckable(true);
-	connect(m_tlb, SIGNAL(clicked( bool )),
+	connect(m_tlb, SIGNAL(clicked(bool)),
 			this, SLOT(showEffects()));
 	m_tlb->setIcon(embed::getIconPixmap("sample_track"));
 	m_tlb->move(3, 1);
@@ -232,3 +236,6 @@ void SampleTrackView::assignMixerLine(int channelIndex)
 
 	getGUI()->mixerView()->setCurrentMixerLine(channelIndex);
 }
+
+
+} // namespace lmms::gui

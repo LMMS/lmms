@@ -40,6 +40,8 @@
 #include "plugin_export.h"
 
 
+namespace lmms
+{
 
 
 extern "C"
@@ -47,7 +49,7 @@ extern "C"
 
 Plugin::Descriptor PLUGIN_EXPORT lv2instrument_plugin_descriptor =
 {
-	STRINGIFY(PLUGIN_NAME),
+	LMMS_STRINGIFY(PLUGIN_NAME),
 	"LV2",
 	QT_TRANSLATE_NOOP("PluginBrowser",
 		"plugin for using arbitrary LV2 instruments inside LMMS."),
@@ -173,9 +175,9 @@ void Lv2Instrument::play(sampleFrame *buf)
 
 
 
-PluginView *Lv2Instrument::instantiateView(QWidget *parent)
+gui::PluginView* Lv2Instrument::instantiateView(QWidget *parent)
 {
-	return new Lv2InsView(this, parent);
+	return new gui::Lv2InsView(this, parent);
 }
 
 
@@ -213,6 +215,9 @@ void Lv2Instrument::setNameFromFile(const QString &name)
 
 
 
+namespace gui
+{
+
 
 /*
 	Lv2InsView
@@ -246,7 +251,7 @@ void Lv2InsView::dragEnterEvent(QDragEnterEvent *_dee)
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	void (QDragEnterEvent::*reaction)(void) = &QDragEnterEvent::ignore;
+	void (QDragEnterEvent::*reaction)() = &QDragEnterEvent::ignore;
 
 	if (_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair )))
 	{
@@ -285,7 +290,7 @@ void Lv2InsView::modelChanged()
 }
 
 
-
+} // namespace gui
 
 extern "C"
 {
@@ -302,3 +307,6 @@ PLUGIN_EXPORT Plugin *lmms_plugin_main(Model *_parent, void *_data)
 }
 
 }
+
+
+} // namespace lmms

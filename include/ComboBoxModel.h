@@ -32,6 +32,8 @@
 #include "AutomatableModel.h"
 #include "embed.h"
 
+namespace lmms
+{
 
 class LMMS_EXPORT ComboBoxModel : public IntModel
 {
@@ -45,7 +47,7 @@ public:
 	{
 	}
 
-	virtual ~ComboBoxModel()
+	~ComboBoxModel() override
 	{
 		clear();
 	}
@@ -85,11 +87,12 @@ public:
 
 
 private:
-	typedef std::pair<QString, std::unique_ptr<PixmapLoader> > Item;
+	using Item = std::pair<QString, std::unique_ptr<PixmapLoader>>;
 
 	std::vector<Item> m_items;
 
 } ;
 
+} // namespace lmms
 
 #endif

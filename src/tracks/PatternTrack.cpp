@@ -33,6 +33,9 @@
 #include "PlayHandle.h"
 
 
+namespace lmms
+{
+
 
 PatternTrack::infoMap PatternTrack::s_infoMap;
 
@@ -48,7 +51,7 @@ PatternTrack::PatternTrack(TrackContainer* tc) :
 	Engine::patternStore()->setCurrentPattern(patternNum);
 	Engine::patternStore()->updateComboBox();
 
-	connect( this, SIGNAL( nameChanged() ),
+	connect( this, SIGNAL(nameChanged()),
 		Engine::patternStore(), SLOT(updateComboBox()));
 }
 
@@ -126,9 +129,9 @@ bool PatternTrack::play( const TimePos & _start, const fpp_t _frames,
 
 
 
-TrackView* PatternTrack::createView(TrackContainerView* tcv)
+gui::TrackView* PatternTrack::createView(gui::TrackContainerView* tcv)
 {
-	return new PatternTrackView(this, tcv);
+	return new gui::PatternTrackView(this, tcv);
 }
 
 
@@ -240,3 +243,6 @@ void PatternTrack::swapPatternTracks(Track* track1, Track* track2)
 		Engine::patternStore()->setCurrentPattern(s_infoMap[t1]);
 	}
 }
+
+
+} // namespace lmms

@@ -36,6 +36,9 @@
 
 class QThread;
 
+namespace lmms
+{
+
 class Track;
 class AudioPort;
 
@@ -49,7 +52,7 @@ public:
 		TypeSamplePlayHandle = 0x04,
 		TypePresetPreviewHandle = 0x08
 	} ;
-	typedef Types Type;
+	using Type = Types;
 
 	enum
 	{
@@ -158,9 +161,9 @@ private:
 	AudioPort * m_audioPort;
 } ;
 
+using PlayHandleList = QList<PlayHandle*>;
+using ConstPlayHandleList = QList<const PlayHandle*>;
 
-typedef QList<PlayHandle *> PlayHandleList;
-typedef QList<const PlayHandle *> ConstPlayHandleList;
-
+} // namespace lmms
 
 #endif

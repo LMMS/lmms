@@ -40,6 +40,9 @@
 #include "TempoSyncKnob.h"
 
 
+namespace lmms::gui
+{
+
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	PluginView( _model, _parent ),
 	m_bg( embed::getIconPixmap( "effect_plugin" ) ),
@@ -87,8 +90,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<8>( f ) );
 		ctls_btn->setGeometry( 150, 14, 50, 20 );
-		connect( ctls_btn, SIGNAL( clicked() ),
-					this, SLOT( editControls() ) );
+		connect( ctls_btn, SIGNAL(clicked()),
+					this, SLOT(editControls()));
 
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
@@ -108,8 +111,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 			flags &= ~Qt::WindowMaximizeButtonHint;
 			m_subWindow->setWindowFlags( flags );
 
-			connect( m_controlView, SIGNAL( closed() ),
-					this, SLOT( closeEffects() ) );
+			connect( m_controlView, SIGNAL(closed()),
+					this, SLOT(closeEffects()));
 
 			m_subWindow->hide();
 		}
@@ -191,14 +194,14 @@ void EffectView::contextMenuEvent( QContextMenuEvent * )
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "arp_up" ),
 						tr( "Move &up" ),
-						this, SLOT( moveUp() ) );
+						this, SLOT(moveUp()));
 	contextMenu->addAction( embed::getIconPixmap( "arp_down" ),
 						tr( "Move &down" ),
-						this, SLOT( moveDown() ) );
+						this, SLOT(moveDown()));
 	contextMenu->addSeparator();
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
-						this, SLOT( deletePlugin() ) );
+						this, SLOT(deletePlugin()));
 	contextMenu->addSeparator();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
@@ -234,3 +237,5 @@ void EffectView::modelChanged()
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
 	m_gate->setModel( &effect()->m_gateModel );
 }
+
+} // namespace lmms::gui

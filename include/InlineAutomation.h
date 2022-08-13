@@ -29,6 +29,8 @@
 #include "AutomationClip.h"
 #include "shared_object.h"
 
+namespace lmms
+{
 
 class InlineAutomation : public FloatModel, public sharedObject
 {
@@ -40,7 +42,7 @@ public:
 	{
 	}
 
-	virtual ~InlineAutomation()
+	~InlineAutomation() override
 	{
 		if( m_autoClip )
 		{
@@ -94,5 +96,7 @@ private:
 
 } ;
 
+
+} // namespace lmms
 
 #endif

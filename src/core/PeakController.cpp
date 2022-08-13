@@ -34,6 +34,10 @@
 #include "EffectChain.h"
 #include "plugins/PeakControllerEffect/PeakControllerEffect.h"
 
+namespace lmms
+{
+
+
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
 int PeakController::m_loadCount;
@@ -49,14 +53,14 @@ PeakController::PeakController( Model * _parent,
 	setSampleExact( true );
 	if( m_peakEffect )
 	{
-		connect( m_peakEffect, SIGNAL( destroyed( ) ),
-			this, SLOT( handleDestroyedEffect( ) ) );
+		connect( m_peakEffect, SIGNAL(destroyed()),
+			this, SLOT(handleDestroyedEffect()));
 	}
-	connect( Engine::audioEngine(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
-	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ),
-			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
-	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ),
-			this, SLOT( updateCoeffs() ), Qt::DirectConnection );
+	connect( Engine::audioEngine(), SIGNAL(sampleRateChanged()), this, SLOT(updateCoeffs()));
+	connect( m_peakEffect->attackModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
+	connect( m_peakEffect->decayModel(), SIGNAL(dataChanged()),
+			this, SLOT(updateCoeffs()), Qt::DirectConnection );
 	m_coeffNeedsUpdate = true;
 }
 
@@ -123,7 +127,7 @@ void PeakController::updateCoeffs()
 }
 
 
-void PeakController::handleDestroyedEffect( )
+void PeakController::handleDestroyedEffect()
 {
 	// possible race condition...
 	//printf("disconnecting effect\n");
@@ -247,11 +251,10 @@ QString PeakController::nodeName() const
 
 
 
-ControllerDialog * PeakController::createDialog( QWidget * _parent )
+gui::ControllerDialog * PeakController::createDialog( QWidget * _parent )
 {
-	return new PeakControllerDialog( this, _parent );
+	return new gui::PeakControllerDialog( this, _parent );
 }
 
 
-
-
+} // namespace lmms

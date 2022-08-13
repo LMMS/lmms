@@ -29,7 +29,14 @@
 
 #include "TrackView.h"
 
+namespace lmms
+{
+
 class PatternTrack;
+
+namespace gui
+{
+
 class TrackLabelButton;
 
 
@@ -38,7 +45,7 @@ class PatternTrackView : public TrackView
 	Q_OBJECT
 public:
 	PatternTrackView(PatternTrack* pt, TrackContainerView* tcv);
-	virtual ~PatternTrackView();
+	~PatternTrackView() override;
 
 	bool close() override;
 
@@ -58,5 +65,9 @@ private:
 } ;
 
 
+
+} // namespace gui
+
+} // namespace lmms
 
 #endif

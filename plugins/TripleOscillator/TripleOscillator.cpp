@@ -41,12 +41,16 @@
 #include "embed.h"
 #include "plugin_export.h"
 
+namespace lmms
+{
+
+
 extern "C"
 {
 
 Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 {
-	STRINGIFY( PLUGIN_NAME ),
+	LMMS_STRINGIFY( PLUGIN_NAME ),
 	"TripleOscillator",
 	QT_TRANSLATE_NOOP( "PluginBrowser",
 				"Three powerful oscillators you can modulate "
@@ -234,13 +238,6 @@ TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 
 
 
-TripleOscillator::~TripleOscillator()
-{
-}
-
-
-
-
 void TripleOscillator::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
@@ -402,9 +399,9 @@ void TripleOscillator::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * TripleOscillator::instantiateView( QWidget * _parent )
+gui::PluginView* TripleOscillator::instantiateView( QWidget * _parent )
 {
-	return new TripleOscillatorView( this, _parent );
+	return new gui::TripleOscillatorView( this, _parent );
 }
 
 
@@ -420,6 +417,9 @@ void TripleOscillator::updateAllDetuning()
 }
 
 
+
+namespace gui
+{
 
 
 class TripleOscKnob : public Knob
@@ -707,13 +707,6 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 
 
 
-TripleOscillatorView::~TripleOscillatorView()
-{
-}
-
-
-
-
 void TripleOscillatorView::modelChanged()
 {
 	TripleOscillator * t = castModel<TripleOscillator>();
@@ -748,6 +741,7 @@ void TripleOscillatorView::modelChanged()
 }
 
 
+} // namespace gui
 
 
 extern "C"
@@ -763,4 +757,4 @@ PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* model, void * )
 
 
 
-
+} // namespace lmms

@@ -27,9 +27,15 @@
 
 #include "LocklessRingBuffer.h"
 
+namespace lmms
+{
 class VecControls;
+}
 
 //#define VEC_DEBUG
+
+namespace lmms::gui
+{
 
 
 // Widget that displays a vectorscope visualization of stereo signal.
@@ -38,7 +44,7 @@ class VectorView : public QWidget
 	Q_OBJECT
 public:
 	explicit VectorView(VecControls *controls, LocklessRingBuffer<sampleFrame> *inputBuffer, unsigned short displaySize, QWidget *parent = 0);
-	virtual ~VectorView() {}
+	~VectorView() override = default;
 
 	QSize sizeHint() const override {return QSize(300, 300);}
 
@@ -74,4 +80,8 @@ private:
 	float m_executionAvg = 0;
 #endif
 };
+
+
+} // namespace lmms::gui
+
 #endif // VECTORVIEW_H

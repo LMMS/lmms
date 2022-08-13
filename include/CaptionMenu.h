@@ -30,6 +30,9 @@
 
 #include "lmms_export.h"
 
+namespace lmms::gui
+{
+
 ///
 /// \brief A context menu with a caption
 ///
@@ -38,10 +41,10 @@ class LMMS_EXPORT CaptionMenu : public QMenu
 	Q_OBJECT
 public:
 	CaptionMenu( const QString & _title, QWidget * _parent = 0 );
-	virtual ~CaptionMenu();
+	~CaptionMenu() override = default;
 } ;
 
 
-
+} // namespace lmms::gui
 
 #endif

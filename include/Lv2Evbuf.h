@@ -39,18 +39,24 @@
 
 #include <cstdint>
 
+
+namespace lmms
+{
+
+
 /**
    An abstract/opaque LV2 event buffer.
 */
-typedef struct LV2_Evbuf_Impl LV2_Evbuf;
+using LV2_Evbuf = struct LV2_Evbuf_Impl;
 
 /**
    An iterator over an LV2_Evbuf.
 */
-typedef struct {
+struct LV2_Evbuf_Iterator
+{
 	LV2_Evbuf* evbuf;
 	uint32_t offset;
-} LV2_Evbuf_Iterator;
+};
 
 /**
    Allocate a new, empty event buffer.
@@ -143,6 +149,9 @@ lv2_evbuf_write(	LV2_Evbuf_Iterator* iter,
 					uint32_t type,
 					uint32_t size,
 					const uint8_t* data);
+
+
+} // namespace lmms
 
 #endif // LMMS_HAVE_LV2
 
