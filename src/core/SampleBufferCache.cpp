@@ -30,7 +30,7 @@ namespace lmms
 {
 	std::shared_ptr<const SampleBufferV2> SampleBufferCache::get(const std::string& id)
 	{
-		if (contains(id)) { return nullptr; }
+		if (!contains(id)) { return nullptr; }
 		return m_map.at(id).lock();
 	}
 
