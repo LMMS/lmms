@@ -250,15 +250,12 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
 	
-	if (m_sample.sampleBuffer()) 
+	if (m_sample.sampleBuffer() && sampleFile() == "")
 	{
-		if (sampleFile() == "")
-		{
-			_this.setAttribute("data", QString::fromStdString(m_sample.sampleBuffer()->toBase64()));
-		}
-		_this.setAttribute("sample_rate", m_sample.sampleBuffer()->sampleRate());
+		_this.setAttribute("data", QString::fromStdString(m_sample.sampleBuffer()->toBase64()));
 	}
-	
+
+	_this.setAttribute("sample_rate", m_sample.sampleRate());
 	if( usesCustomClipColor() )
 	{
 		_this.setAttribute( "color", color().name() );
@@ -287,6 +284,11 @@ void SampleClip::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
+
+	if (_this.hasAttribute("sample_rate"))
+	{
+		m_sample.setSampleRate(_this.attribute("sample_rate").toInt());
+	}
 
 	if( _this.hasAttribute( "color" ) )
 	{

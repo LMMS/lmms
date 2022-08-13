@@ -64,6 +64,7 @@ namespace lmms
 
 		std::string sampleFile() const;
 		std::shared_ptr<const SampleBufferV2> sampleBuffer() const;
+		sample_rate_t sampleRate() const;
 		float amplification() const;
 		float frequency() const;
 		bool reversed() const;
@@ -78,6 +79,7 @@ namespace lmms
 
 		void setSampleData(const std::string& str, const SampleBufferV2::StrDataType dataType);
 		void setSampleBuffer(const SampleBufferV2* buffer);
+		void setSampleRate(const sample_rate_t sampleRate);
 		void setAmplification(const float amplification);
 		void setFrequency(const float frequency);
 		void setReversed(const bool reversed);
@@ -97,6 +99,7 @@ namespace lmms
 
 	private:
 		std::shared_ptr<const SampleBufferV2> m_sampleBuffer;
+		sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
 		float m_amplification = 1.0f;
 		float m_frequency = DefaultBaseFreq;
 		bool m_reversed = false;

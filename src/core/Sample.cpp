@@ -318,6 +318,11 @@ namespace lmms
 		return m_sampleBuffer;
 	}
 
+	sample_rate_t Sample::sampleRate() const 
+	{
+		return m_sampleRate;
+	}
+
 	float Sample::amplification() const
 	{
 		return m_amplification;
@@ -391,6 +396,11 @@ namespace lmms
 	{
 		m_sampleBuffer.reset(buffer);
 		resetMarkers();
+	}
+
+	void Sample::setSampleRate(const sample_rate_t sampleRate) 
+	{
+		m_sampleRate = sampleRate;
 	}
 
 	void Sample::setAmplification(const float amplification)

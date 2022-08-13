@@ -108,7 +108,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 			{
 				if( sClip->isPlaying() == false && _start >= (sClip->startPosition() + sClip->startTimeOffset()) )
 				{
-					auto bufferFramesPerTick = Engine::framesPerTick(Engine::audioEngine()->processingSampleRate());
+					auto bufferFramesPerTick = Engine::framesPerTick(sClip->sample().sampleRate());
 					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sClip->startPosition() - sClip->startTimeOffset() );
 					f_cnt_t clipFrameLength = bufferFramesPerTick * ( sClip->endPosition() - sClip->startPosition() - sClip->startTimeOffset() );
 					f_cnt_t sampleBufferLength = sClip->sample().numFrames();
