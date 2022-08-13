@@ -31,13 +31,13 @@
 
 #include "PlayHandle.h"
 #include "TimePos.h"
+#include "Sample.h"
 
 namespace lmms
 {
 
 
 class PatternTrack;
-class SampleBuffer;
 class SampleClip;
 class Track;
 
@@ -54,7 +54,7 @@ public:
 	bool isFromTrack( const Track * _track ) const override;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer * * _sample_buf );
+	Sample createSample();
 
 
 private:
