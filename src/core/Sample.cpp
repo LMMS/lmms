@@ -110,7 +110,7 @@ namespace lmms
 
 	bool Sample::play(sampleFrame* dst, const int framesToPlay, const float freq, PlaybackType playback)
 	{
-		if (framesToPlay <= 0 || (m_frameIndex < 0 || m_frameIndex > m_endFrame)) { return false; }
+		if (!m_sampleBuffer || framesToPlay <= 0 || (m_frameIndex < 0 || m_frameIndex > m_endFrame)) { return false; }
 
 		if ((playback == PlaybackType::LoopPoints || playback == PlaybackType::PingPong)
 			&& (m_frameIndex < m_loopStartFrame || m_frameIndex > m_loopEndFrame))
@@ -221,7 +221,7 @@ namespace lmms
 		This function also needs to be moved out of Sample in favor of no Qt in the core.
 		*/
 
-		if (m_sampleBuffer->numFrames() == 0) { return; }
+		if (!m_sampleBuffer || m_sampleBuffer->numFrames() == 0) { return; }
 
 		const bool focusOnRange = toFrame <= m_sampleBuffer->numFrames() && 0 <= fromFrame && fromFrame < toFrame;
 		// TODO: If the clip QRect is not being used we should remove it
@@ -308,8 +308,9 @@ namespace lmms
 
 	std::string Sample::sampleFile() const
 	{
+		if (!m_sampleBuffer) { return ""; }
 		auto& path = m_sampleBuffer->filePath();
-		return path.has_value() ? path->string() : "";
+		return path ? path->string() : "";
 	}
 
 	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const
