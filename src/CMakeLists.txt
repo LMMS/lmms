@@ -189,6 +189,7 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	${FFTW3F_LIBRARIES}
 	${EXTRA_LIBRARIES}
 	rpmalloc
+	stdc++fs
 )
 
 # Expose required libs for tests binary

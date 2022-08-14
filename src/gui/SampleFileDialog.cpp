@@ -42,16 +42,16 @@ namespace lmms::gui
 
 		if (!sampleFile.empty())
 		{
-			if (std::filesystem::path{sampleFile}.is_relative()) 
+			if (std::experimental::filesystem::path{sampleFile}.is_relative()) 
 			{
 				sampleFile = ConfigManager::inst()->userSamplesDir().toStdString() + sampleFile;
-				if (!std::filesystem::exists(sampleFile)) 
+				if (!std::experimental::filesystem::exists(sampleFile)) 
 				{
 					sampleFile = ConfigManager::inst()->factorySamplesDir().toStdString() + sampleFile;
 				}
 			}
 
-			dir = std::filesystem::absolute(sampleFile).string();
+			dir = std::experimental::filesystem::absolute(sampleFile).string();
 		}
 		else 
 		{

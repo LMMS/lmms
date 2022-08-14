@@ -25,13 +25,8 @@
 #ifndef SAMPLE_BUFFER_V2_H
 #define SAMPLE_BUFFER_V2_H
 
-// TODO: Simplify when CI fully supports filesystem
-#include <version>
-#ifdef __cpp_lib_filesystem
-	#include <filesystem>
-#elif __cpp_lib_experimental_filesystem
-	#include <experimental/filesystem>
-#endif
+// TODO: Replace with #include <filesystem> when GHA fully supports it
+#include <experimental/filesystem>
 
 #include <memory>
 #include <optional>
@@ -62,18 +57,18 @@ namespace lmms
 		SampleBufferV2& operator=(SampleBufferV2&& other);
 
 		const std::vector<sampleFrame>& sampleData() const;
-		const std::optional<std::filesystem::path>& filePath() const;
+		const std::optional<std::experimental::filesystem::path>& filePath() const;
 		sample_rate_t sampleRate() const;
 		int numFrames() const;
 
 	private:
-		void loadFromSampleFile(const std::filesystem::path& sampleFilePath);
-		void loadFromDrumSynthFile(const std::filesystem::path& drumSynthFilePath);
+		void loadFromSampleFile(const std::experimental::filesystem::path& sampleFilePath);
+		void loadFromDrumSynthFile(const std::experimental::filesystem::path& drumSynthFilePath);
 		void loadFromBase64(const std::string& base64);
 
 	private:
 		std::vector<sampleFrame> m_sampleData;
-		std::optional<std::filesystem::path> m_filePath;
+		std::optional<std::experimental::filesystem::path> m_filePath;
 		sample_rate_t m_sampleRate = Engine::audioEngine()->processingSampleRate();
 	};
 }

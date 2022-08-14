@@ -36,8 +36,8 @@ namespace lmms
 
 		if (dataType == SampleType::SampleFile)
 		{
-			auto audioFilePath = std::filesystem::path(str);
-			if (!std::filesystem::exists(audioFilePath))
+			auto audioFilePath = std::experimental::filesystem::path(str);
+			if (!std::experimental::filesystem::exists(audioFilePath))
 			{
 				throw std::runtime_error("SampleBufferV2.cpp: non existing file " + str);
 			}
@@ -87,7 +87,7 @@ namespace lmms
 		return m_sampleData;
 	}
 
-	const std::optional<std::filesystem::path>& SampleBufferV2::filePath() const
+	const std::optional<std::experimental::filesystem::path>& SampleBufferV2::filePath() const
 	{
 		return m_filePath;
 	}
@@ -102,7 +102,7 @@ namespace lmms
 		return m_sampleData.size();
 	}
 
-	void SampleBufferV2::loadFromSampleFile(const std::filesystem::path& audioFilePath)
+	void SampleBufferV2::loadFromSampleFile(const std::experimental::filesystem::path& audioFilePath)
 	{
 		SF_INFO sfInfo;
 		sfInfo.format = 0;
@@ -138,7 +138,7 @@ namespace lmms
 		}
 	}
 
-	void SampleBufferV2::loadFromDrumSynthFile(const std::filesystem::path& drumSynthFilePath)
+	void SampleBufferV2::loadFromDrumSynthFile(const std::experimental::filesystem::path& drumSynthFilePath)
 	{
 		auto dsFilePathStr = drumSynthFilePath.native();
 		auto ds = DrumSynth();
