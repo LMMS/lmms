@@ -365,7 +365,7 @@ void Lv2Proc::handleMidiInputEvent(const MidiEvent &event, const TimePos &time, 
 	else
 	{
 		qWarning() << "Warning: Caught MIDI event for an Lv2 instrument"
-					<< "that can not hande MIDI... Ignoring";
+					<< "that can not handle MIDI... Ignoring";
 	}
 }
 
