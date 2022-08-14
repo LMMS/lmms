@@ -118,6 +118,17 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 
 	// unstable
 	"urn:juced:DrumSynth"
+
+	// need capacity to load files
+	"http://gareus.org/oss/lv2/convoLV2#Mono",
+	"http://gareus.org/oss/lv2/convoLV2#MonoToStereo",
+	"http://gareus.org/oss/lv2/convoLV2#Stereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMono",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Mono",
+	"http://gareus.org/oss/lv2/zeroconvolv#MonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Stereo",
 };
 
 
