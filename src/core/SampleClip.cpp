@@ -142,7 +142,7 @@ void SampleClip::setSampleFile( const QString & _sf )
 	}
 	else
 	{	//Otherwise set it to the sample's length
-		m_sample.loadAudioFile(_sf.toStdString());
+		m_sample.loadSampleFile(_sf.toStdString());
 		length = sampleLength();
 	}
 	changeLength(length);
@@ -252,7 +252,7 @@ void SampleClip::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	
 	if (m_sample.sampleBuffer() && sampleFile() == "")
 	{
-		_this.setAttribute("data", QString::fromStdString(m_sample.sampleBuffer()->toBase64()));
+		_this.setAttribute("data", QString::fromStdString(m_sample.toBase64()));
 	}
 
 	_this.setAttribute("sample_rate", m_sample.sampleRate());

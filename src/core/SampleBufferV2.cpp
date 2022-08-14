@@ -30,23 +30,23 @@
 
 namespace lmms
 {
-	SampleBufferV2::SampleBufferV2(const std::string& strData, const StrDataType dataType)
+	SampleBufferV2::SampleBufferV2(const std::string& str, const SampleType dataType)
 	{
-		if (strData.empty()) { throw std::runtime_error("SampleBufferV2.cpp: strData is empty."); }
+		if (str.empty()) { throw std::runtime_error("SampleBufferV2.cpp: str is empty."); }
 
-		if (dataType == StrDataType::AudioFile)
+		if (dataType == SampleType::SampleFile)
 		{
-			auto audioFilePath = std::filesystem::path(strData);
+			auto audioFilePath = std::filesystem::path(str);
 			if (!std::filesystem::exists(audioFilePath))
 			{
-				throw std::runtime_error("SampleBufferV2.cpp: non existing file " + strData);
+				throw std::runtime_error("SampleBufferV2.cpp: non existing file " + str);
 			}
 
-			audioFilePath.extension() == ".ds" ? loadFromDrumSynthFile(audioFilePath) : loadFromAudioFile(audioFilePath);
+			audioFilePath.extension() == ".ds" ? loadFromDrumSynthFile(audioFilePath) : loadFromSampleFile(audioFilePath);
 		}
-		else if (dataType == StrDataType::Base64)
+		else if (dataType == SampleType::Base64)
 		{
-			loadFromBase64(strData);
+			loadFromBase64(str);
 		}
 	}
 
@@ -102,15 +102,7 @@ namespace lmms
 		return m_sampleData.size();
 	}
 
-	std::string SampleBufferV2::toBase64() const
-	{
-		const char* rawData = reinterpret_cast<const char*>(m_sampleData.data());
-		QByteArray data = QByteArray(rawData, m_sampleData.size() * sizeof(sampleFrame));
-		return data.toBase64().constData();
-	}
-
-
-	void SampleBufferV2::loadFromAudioFile(const std::filesystem::path& audioFilePath)
+	void SampleBufferV2::loadFromSampleFile(const std::filesystem::path& audioFilePath)
 	{
 		SF_INFO sfInfo;
 		sfInfo.format = 0;

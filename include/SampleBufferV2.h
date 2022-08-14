@@ -25,7 +25,14 @@
 #ifndef SAMPLE_BUFFER_V2_H
 #define SAMPLE_BUFFER_V2_H
 
-#include <filesystem>
+// TODO: Simplify when CI fully supports filesystem
+#include <version>
+#ifdef __cpp_lib_filesystem
+	#include <filesystem>
+#elif __cpp_lib_experimental_filesystem
+	#include <experimental/filesystem>
+#endif
+
 #include <memory>
 #include <optional>
 #include <vector>
@@ -39,17 +46,17 @@ namespace lmms
 	class SampleBufferV2
 	{
 	public:
-		enum class StrDataType
+		enum class SampleType
 		{
-			AudioFile,
+			SampleFile,
 			Base64
 		};
 
-		SampleBufferV2(const std::string& strData, const StrDataType dataType);
+		SampleBufferV2(const std::string& str, const SampleType sampleType);
 		SampleBufferV2(const sampleFrame* data, const int numFrames);
+		explicit SampleBufferV2(const int numFrames);
 		SampleBufferV2(const SampleBufferV2& other) = delete;
 		SampleBufferV2(SampleBufferV2&& other);
-		explicit SampleBufferV2(const int numFrames);
 
 		SampleBufferV2& operator=(SampleBufferV2& other) = delete;
 		SampleBufferV2& operator=(SampleBufferV2&& other);
@@ -59,10 +66,8 @@ namespace lmms
 		sample_rate_t sampleRate() const;
 		int numFrames() const;
 
-		std::string toBase64() const;
-
 	private:
-		void loadFromAudioFile(const std::filesystem::path& audioFilePath);
+		void loadFromSampleFile(const std::filesystem::path& sampleFilePath);
 		void loadFromDrumSynthFile(const std::filesystem::path& drumSynthFilePath);
 		void loadFromBase64(const std::string& base64);
 

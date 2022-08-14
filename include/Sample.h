@@ -49,7 +49,7 @@ namespace lmms
 		};
 
 		Sample() = default;
-		Sample(const std::string& strData, const SampleBufferV2::StrDataType dataType);
+		Sample(const std::string& str, const SampleBufferV2::SampleType sampleType);
 		Sample(const sampleFrame* data, const int numFrames);
 		explicit Sample(const SampleBufferV2* buffer);
 		explicit Sample(const int numFrames);
@@ -77,7 +77,7 @@ namespace lmms
 		int frameIndex() const;
 		int numFrames() const;
 
-		void setSampleData(const std::string& str, const SampleBufferV2::StrDataType dataType);
+		void setSampleData(const std::string& str, const SampleBufferV2::SampleType sampleType);
 		void setSampleBuffer(const SampleBufferV2* buffer);
 		void setSampleRate(const sample_rate_t sampleRate);
 		void setAmplification(const float amplification);
@@ -92,15 +92,20 @@ namespace lmms
 		void setAllPointFrames(const int start, const int end, const int loopStart, const int loopEnd);
 		void setFrameIndex(const int frameIndex);
 
-		void loadAudioFile(const std::string& audioFile);
+		std::string toBase64() const;
+
+		void loadSampleFile(const std::string& sampleFile);
 		void loadBase64(const std::string& base64);
 		void resetMarkers();
 		
-		void advanceFrameIndex(f_cnt_t amount, PlaybackType playback);
-		std::optional<f_cnt_t> calculatePlaybackIndex(f_cnt_t index, f_cnt_t start, f_cnt_t end, PlaybackType playback);
+		int calculateLength() const;
 		int calculateTickLength() const;
 
-		void sampleUpdated();
+		void advanceFrameIndex(f_cnt_t amount, PlaybackType playback);
+		f_cnt_t calculatePlaybackIndex(PlaybackType playback);
+
+	private:
+		SRC_STATE* createResampleState();
 
 	private:
 		std::shared_ptr<const SampleBufferV2> m_sampleBuffer;
@@ -116,7 +121,7 @@ namespace lmms
 		int m_loopStartFrame = 0;
 		int m_loopEndFrame = 0;
 		int m_frameIndex = 0;
-		SRC_STATE* m_resampleState = nullptr;
+		SRC_STATE* m_resampleState = createResampleState();
 		static std::array<int, 5> s_sampleMargin;
 	};
 }

@@ -31,6 +31,7 @@
 #include "embed.h"
 #include "PathUtil.h"
 #include "SampleBuffer.h"
+#include "SampleFileDialog.h"
 #include "SampleClip.h"
 #include "Song.h"
 #include "StringPairDrag.h"
@@ -55,70 +56,6 @@ SampleClipView::SampleClipView( SampleClip * _clip, TrackView * _tv ) :
 	connect(m_clip, SIGNAL(wasReversed()), this, SLOT(update()));
 
 	setStyle( QApplication::style() );
-}
-
-std::string SampleClipView::openSampleFile(const Sample& sample) 
-{
-	gui::FileDialog ofd(nullptr, QObject::tr("Open audio file"));
-	
-	auto sampleFile = sample.sampleFile();
-	std::string dir;
-
-	if (!sampleFile.empty())
-	{
-		if (std::filesystem::path{sampleFile}.is_relative()) 
-		{
-			sampleFile = ConfigManager::inst()->userSamplesDir().toStdString() + sampleFile;
-			if (!std::filesystem::exists(sampleFile)) 
-			{
-				sampleFile = ConfigManager::inst()->factorySamplesDir().toStdString() + sampleFile;
-			}
-		}
-
-		dir = std::filesystem::absolute(sampleFile).string();
-	}
-	else 
-	{
-		dir = ConfigManager::inst()->userSamplesDir().toStdString();
-	}
-
-	// change dir to position of previously opened file
-	ofd.setDirectory(QString::fromStdString(dir));
-	ofd.setFileMode(gui::FileDialog::ExistingFiles);
-
-	std::array<QString, 11> types = 
-	{
-		QObject::tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)"),
-		QObject::tr("Wave-Files (*.wav)"),
-		QObject::tr("OGG-Files (*.ogg)"),
-		QObject::tr("DrumSynth-Files (*.ds)"),
-		QObject::tr("FLAC-Files (*.flac)"),
-		QObject::tr("SPEEX-Files (*.spx)"),
-		QObject::tr("VOC-Files (*.voc)"),
-		QObject::tr("AIFF-Files (*.aif *.aiff)"),
-		QObject::tr("AU-Files (*.au)"),
-		QObject::tr("RAW-Files (*.raw)")	
-	};
-
-	ofd.setNameFilters(QStringList{types.begin(), types.end()});
-
-	if (!sampleFile.empty())
-	{
-		// select previously opened file
-		ofd.selectFile(QFileInfo(QString::fromStdString(sampleFile)).fileName());
-	}
-
-	if (ofd.exec () == QDialog::Accepted)
-	{
-		if (ofd.selectedFiles().isEmpty())
-		{
-			return "";
-		}
-
-		return PathUtil::toShortestRelative(ofd.selectedFiles()[0]).toStdString();
-	}
-
-	return "";
 }
 
 void SampleClipView::updateSample()
@@ -236,7 +173,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
-	auto openedSample = openSampleFile(m_clip->sample());
+	auto openedSample = SampleFileDialog::openSampleFile(m_clip->sample());
 	if (openedSample == m_clip->sampleFile().toStdString()) 
 	{
 		//Instead of reloading the existing file, just reset the size
