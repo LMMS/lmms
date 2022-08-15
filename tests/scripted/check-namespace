@@ -8,6 +8,7 @@
 
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 # global variables
@@ -61,26 +62,34 @@ exclude_files = re.compile(
 
 files = [Path(f) for f in result.stdout.splitlines() if not exclude_files.search(f)]
 
-statement_pattern = re.compile(
-    # IRRELEVANT STRINGS - by capturing these we prevent them from matching later
-    # Block comment or regular comment (including escaped newlines)
-    r'/[*](.|\n)*?[*]/|//(.*\\\n)*.*|'
-    # Small namespace that doesn't require an end comment
-    r'namespace *[\w:]*\s*{[^{}]*}|'
-    # ifdef of max 30 lines and with no other #if inside
-    r'^ *# *ifn?def(([^#\n]|#(?!if|endif))*\n){,30} *# *endif|'
+# Debug argument
+if len(sys.argv) > 1:
+    files = [Path(arg) for arg in sys.argv[1:]]
 
-    # INTERESTING STRINGS - with (?P<name>...) you can do a backreference to \name later
+statement_pattern = re.compile(
+    # Capture comments first to prevent them from matching any other regex
+    #  Include next line if line ends with backslash
+    r'/[*](.|\n)*?[*]/|//(.*\\\n)*.*|'
+
+    # Macro with <30 lines and no other #if inside needs no end comment
+    #  Match here to prevent from matching next regex
+    #  With a (?!negative lookahead) we can allow all # except the ones followed by "if"
+    r'^ *# *(?P<short_macro>ifn?def)(?=(([^#\n]|#(?!if|endif))*\n){,30} *# *endif)|'
     # Macro followed by name or comment
+    #  With (?P<name>...) you can do a backreference to \name later
     r'^ *# *(?P<named_macro>ifn?def|endif)(( *// *| +)(?P<macro_name>\w+))?|'
     # Other macros
     r'^ *# *(?P<macro>include|if|el)|'
+
+    # Namespace that contains no other braces needs no end comment
+    #  With a (?=lookahead) we can let the "namespace" part be eaten by the parser
+    #  but save the braces and their content for later so they can be matched again
+    r'namespace *[\w:]*\s*(?={[^{}]*})|'
     # Start of named namespace, or just a opening brace
     r'(^ *namespace *(?P<namespace_start>[\w:]+)\s*)?(?P<opening_brace>{)|'
     # End of namespace including comment, or just a closing brace
     r'(?P<closing_brace>})( *// *namespace +(?P<namespace_end>[\w:]+))?|'
 
-    # MODIFIERS
     # In all the regexes above match both tab and space when a space is used
     r''.replace(' ', r'[\t ]'),
     # Make ^ match on every line, not just beginning of file
@@ -115,7 +124,7 @@ for cur_file in files:
                 header_guard = False
 
         for m in statement_pattern.finditer(cur_text):
-            macro = m.group('macro') or m.group('named_macro') or ''
+            macro = m.group('macro') or m.group('named_macro') or m.group('short_macro') or ''
             name = m.group('macro_name') or m.group('namespace_start') or m.group('namespace_end') or ''
             brace = m.group('opening_brace') or m.group('closing_brace') or ''
 
@@ -135,6 +144,9 @@ for cur_file in files:
                 if exp != 'endif':
                     error(cur_file, m, f'Expected {exp} before #el')
             elif macro == 'endif' or brace == '}':
+                if not expected_statements:
+                    error(cur_file, m, f'Unexpected {macro or brace}')
+                    continue
                 exp, expected_name = expected_statements.pop()
                 if (macro or brace) != exp:
                     error(cur_file, m, f'Expected {exp} before {macro or brace}')
@@ -142,6 +154,9 @@ for cur_file in files:
                     error(cur_file, m, f'Missing comment // {"namespace " if brace else ""}{expected_name}')
             elif brace == '{':
                 expected_statements.append(('}', name))
+
+        for exp, name in reversed(expected_statements):
+            error(cur_file, None, f'Expected {exp} before end of file')
 
 caption('summary')
 
