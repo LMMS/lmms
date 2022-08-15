@@ -187,6 +187,7 @@ public:
 
 enum ArpRandomDistributions
 	{
+		ArpRandomBase,
 		ArpRandomExp,
 		ArpRandomNormal,
 		ArpRandomChase,

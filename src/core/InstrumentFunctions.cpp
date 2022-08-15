@@ -327,6 +327,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpDirectionModel.addItem( tr( "Random" ), std::make_unique<PixmapLoader>( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( static_cast<float>(ArpDirection::Up) );
 
+	m_arpRandomModel.addItem(tr("Base"), std::make_unique<PixmapLoader>("arp_random"));
 	m_arpRandomModel.addItem(tr("Exponential"), std::make_unique<PixmapLoader>("arp_random"));
 	m_arpRandomModel.addItem(tr("Normal"), std::make_unique<PixmapLoader>("arp_random"));
 	m_arpRandomModel.addItem(tr("Chase"), std::make_unique<PixmapLoader>("arp_random"));
@@ -503,20 +504,25 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// If direction is ArpDirDownUp the result is inverted
 			if( dir == ArpDirection::DownAndUp ){ cur_arp_idx = (range/repeats) - cur_arp_idx - 1; }
 		}
-		else if( dir == ArpDirection::Random )
+		else if(dir == ArpDirection::Random)
 		{
 			int randomness = m_arpRandomModel.value();
+			int randRange = range / repeats;
 
 			float shape = m_arpRandShapeModel.value();
 			bool isNeg = shape < 0.0f;
 			shape = std::fabs(shape);
 			shape = shape < 1.0f ? 1.0f : shape;
 			float randNumber = 0.0f;
-			if (randomness == ArpRandomExp) // Exponential response (default)
+			if (randomness == ArpRandomBase) // Exponential response (default)
+			{
+				cur_arp_idx = fast_rand() % randRange;
+			}
+			else if (randomness == ArpRandomExp) // Exponential response (default)
 			{
 				randNumber = fastRandf(1.0f);
-				cur_arp_idx = static_cast<int>(range * std::pow(randNumber, shape));
-				if (!isNeg){ cur_arp_idx = range - cur_arp_idx - 1; }
+				cur_arp_idx = static_cast<int>(randRange * std::pow(randNumber, shape));
+				if (!isNeg){ cur_arp_idx = randRange - cur_arp_idx - 1; }
 			}
 			else if (randomness == ArpRandomNormal) // Normal distribution/inverted normal distribution
 			{
@@ -528,25 +534,24 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 				if (isNeg){ randNumber += randNumber > 0.5f ? -0.5f : 0.5f; }
 
-				cur_arp_idx = static_cast<int>(randNumber * range);
+				cur_arp_idx = static_cast<int>(randNumber * randRange);
 			}
 			else if (randomness == ArpRandomChase) // Chase - Brownian motion
 			{
 				randNumber = fastRandf(1.0f);
 				float shape2 = fabs(m_arpRandShapeModel.value());
 				int change = static_cast<int>(shape2 - std::round(2 * shape2 * randNumber));
-				change *= repeats;
 				cur_arp_idx = m_lastRandomNote + change;
 				if (!isNeg)
 				{
 					// cur_arp_idx = std::clamp(cur_arp_idx, 0, range - 1); // gnu++17
-					cur_arp_idx = std::min(cur_arp_idx, range - 1);
+					cur_arp_idx = std::min(cur_arp_idx, randRange - 1);
 					cur_arp_idx = std::max(cur_arp_idx, 0);
 				}
 				else
 				{
-					cur_arp_idx += cur_arp_idx < 0 ? range : 0;
-					cur_arp_idx -= cur_arp_idx > range - 1 ? range : 0;
+					cur_arp_idx += cur_arp_idx < 0 ? randRange : 0;
+					cur_arp_idx -= cur_arp_idx > randRange - 1 ? randRange : 0;
 				}
 				m_lastRandomNote = cur_arp_idx;
 			}
