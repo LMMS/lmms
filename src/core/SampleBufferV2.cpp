@@ -22,11 +22,6 @@
  *
  */
 
-#ifdef LMMS_BUILD_WIN32
-	#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
-	#include <windows.h>
-#endif
-
 #include "SampleBufferV2.h"
 
 #include <DrumSynth.h>
@@ -117,19 +112,14 @@ namespace lmms
 		#endif
 	}
 
-	void SampleBufferV2::loadFromSampleFile(const std::experimental::filesystem::path& audioFilePath)
+	void SampleBufferV2::loadFromSampleFile(const std::experimental::filesystem::path& sampleFilePath)
 	{
 		SF_INFO sfInfo;
 		sfInfo.format = 0;
 
 		auto sndFileDeleter = [](SNDFILE* ptr) { sf_close(ptr); };
-		#ifdef LMMS_BUILD_WIN32
-			auto sndFile = std::unique_ptr<SNDFILE, decltype(sndFileDeleter)>(
-				sf_wchar_open(audioFilePath.c_str(), SFM_READ, &sfInfo), sndFileDeleter);
-		#else
-			auto sndFile = std::unique_ptr<SNDFILE, decltype(sndFileDeleter)>(
-				sf_open(audioFilePath.c_str(), SFM_READ, &sfInfo), sndFileDeleter);
-		#endif
+		auto sndFile = std::unique_ptr<SNDFILE, decltype(sndFileDeleter)>(
+				sf_open(sampleFilePath.generic_string().c_str(), SFM_READ, &sfInfo), sndFileDeleter);
 
 		if (!sndFile) { throw std::runtime_error{"SampleBufferV2.cpp: Failed to open sample file"}; };
 
@@ -144,7 +134,7 @@ namespace lmms
 
 		m_sampleData = std::vector<sampleFrame>(sfInfo.frames);
 		m_sampleRate = sfInfo.samplerate;
-		m_filePath = audioFilePath;
+		m_filePath = sampleFilePath;
 
 		for (sf_count_t frameIndex = 0; frameIndex < sfInfo.frames; ++frameIndex)
 		{
