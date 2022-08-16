@@ -22,6 +22,8 @@
  *
  */
 
+#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
+
 #include "SampleBufferV2.h"
 
 #include <DrumSynth.h>
