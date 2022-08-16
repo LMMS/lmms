@@ -280,10 +280,10 @@ namespace lmms
 		}
 	}
 
-	std::experimental::filesystem::path Sample::sampleFile() const
+	std::string Sample::sampleFile() const
 	{
-		if (!m_sampleBuffer || !m_sampleBuffer->filePath()) { return std::experimental::filesystem::path{}; }
-		return m_sampleBuffer->filePath().value_or(std::experimental::filesystem::path{}); 
+		if (!m_sampleBuffer || !m_sampleBuffer->filePath()) { return ""; }
+		return m_sampleBuffer->filePath()->generic_string(); 
 	}
 
 	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const
@@ -432,9 +432,9 @@ namespace lmms
 
 	void Sample::loadSampleFile(const std::experimental::filesystem::path& sampleFile)
 	{
-		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleFile);
+		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleFile.generic_string());
 		m_sampleBuffer = cachedSampleBuffer ? cachedSampleBuffer :
-			Engine::sampleBufferCache()->add(sampleFile);
+			Engine::sampleBufferCache()->add(sampleFile.generic_string());
 		resetMarkers();
 	}
 

@@ -33,14 +33,14 @@
 
 namespace lmms::gui 
 {
-	std::experimental::filesystem::path::string_type SampleFileDialog::openSampleFile(const Sample& sample) 
+	std::string SampleFileDialog::openSampleFile(const Sample& sample) 
 	{
 		gui::FileDialog ofd(nullptr, QObject::tr("Open audio file"));
 		
 		const auto sampleFile = sample.sampleFile();
 		QString dir;
 
-		if (!sampleFile.native().empty())
+		if (!sampleFile.empty())
 		{
 			QString f = SampleBufferV2::qStringFromFilePath(sampleFile);
 			if (QFileInfo(f).isRelative())
@@ -91,7 +91,7 @@ namespace lmms::gui
 				return "";
 			}
 
-			return SampleBufferV2::qStringToFilePath(PathUtil::toShortestRelative(ofd.selectedFiles()[0])).native();
+			return SampleBufferV2::qStringToFilePath(PathUtil::toShortestRelative(ofd.selectedFiles()[0])).generic_string();
 		}
 
 		return "";

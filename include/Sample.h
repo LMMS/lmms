@@ -62,7 +62,7 @@ namespace lmms
 		bool play(sampleFrame* dst, const int numFrames, const float freq, PlaybackType playback = PlaybackType::Regular);
 		void visualize(QPainter& painter, const QRect& drawingRect, const int fromFrame = 0, const int toFrame = 0);
 
-		std::experimental::filesystem::path sampleFile() const;
+		std::string sampleFile() const;
 		std::shared_ptr<const SampleBufferV2> sampleBuffer() const;
 		sample_rate_t sampleRate() const;
 		float amplification() const;
