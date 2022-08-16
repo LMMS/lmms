@@ -25,10 +25,11 @@
 #ifndef SAMPLE_BUFFER_CACHE_H
 #define SAMPLE_BUFFER_CACHE_H
 
+#include "SampleBufferV2.h"
+
 #include <memory>
 #include <string>
-
-#include "SampleBufferV2.h"
+#include <unordered_map>
 
 namespace lmms 
 {
