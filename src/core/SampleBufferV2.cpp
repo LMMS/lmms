@@ -126,7 +126,7 @@ namespace lmms
 				sf_open(audioFilePath.c_str(), SFM_READ, &sfInfo), sndFileDeleter);
 		#endif
 
-		if (!sndFile) { throw std::runtime_error{"SampleBufferV2.cpp: Failed to open sample file"};
+		if (!sndFile) { throw std::runtime_error{"SampleBufferV2.cpp: Failed to open sample file"}; };
 
 		auto numSamples = sfInfo.frames * sfInfo.channels;
 		auto samples = std::vector<float>(numSamples);
