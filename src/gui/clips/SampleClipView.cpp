@@ -64,7 +64,7 @@ void SampleClipView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-clip contains
 	setToolTip(m_clip->m_sample.sampleFile() != "" ?
-					PathUtil::toAbsolute(QString::fromStdString(m_clip->sample().sampleFile())) :
+					PathUtil::toAbsolute(SampleBufferV2::qStringFromFilePath(m_clip->sample().sampleFile())) :
 					tr("Double-click to open sample"));
 }
 
@@ -174,7 +174,7 @@ void SampleClipView::mouseReleaseEvent(QMouseEvent *_me)
 void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	auto openedSample = SampleFileDialog::openSampleFile(m_clip->sample());
-	if (openedSample == m_clip->sampleFile().toStdString()) 
+	if (SampleBufferV2::qStringFromFilePath(openedSample) == m_clip->sampleFile()) 
 	{
 		//Instead of reloading the existing file, just reset the size
 		int length = static_cast<int>(m_clip->sample().numFrames() / Engine::framesPerTick());
@@ -183,7 +183,7 @@ void SampleClipView::mouseDoubleClickEvent( QMouseEvent * )
 	else 
 	{
 		//Otherwise load the new file as ususal
-		m_clip->setSampleFile(QString::fromStdString(openedSample));
+		m_clip->setSampleFile(SampleBufferV2::qStringFromFilePath(openedSample));
 		Engine::getSong()->setModified();
 	}
 }
@@ -267,7 +267,7 @@ void SampleClipView::paintEvent( QPaintEvent * pe )
 			qMax( static_cast<int>( m_clip->sampleLength() * ppb / ticksPerBar ), 1 ), rect().bottom() - 2 * spacing );
 	m_clip->m_sample.visualize(p, r);
 
-	QString name = PathUtil::cleanName(QString::fromStdString(m_clip->m_sample.sampleFile()));
+	QString name = PathUtil::cleanName(SampleBufferV2::qStringFromFilePath(m_clip->m_sample.sampleFile()));
 	paintTextLabel(name, p);
 
 	// disable antialiasing for borders, since its not needed

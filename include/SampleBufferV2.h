@@ -58,7 +58,7 @@ namespace lmms
 		static std::shared_ptr<const SampleBufferV2> loadFromBase64(const std::string& base64);
 
 		/**
-		 * @brief Convert a QString to a STL file path portably.
+		 * @brief Convert a STL file path to a QString portably.
 		 * 
 		 * @param filePath 
 		 * @return QString 
@@ -66,7 +66,7 @@ namespace lmms
 		static QString qStringFromFilePath(const std::experimental::filesystem::path& filePath);
 		
 		/**
-		 * @brief Convert a STL file path to a QString portably.
+		 * @brief Convert a QString to a STL file path portably.
 		 * 
 		 * @param str 
 		 * @return std::experimental::filesystem::path 
