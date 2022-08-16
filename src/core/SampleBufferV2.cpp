@@ -34,7 +34,7 @@ namespace lmms
 	{
 		if (!std::experimental::filesystem::exists(sampleFile))
 		{
-			throw std::runtime_error("SampleBufferV2.cpp: non existing file " + sampleFile.native());
+			throw std::runtime_error{"SampleBufferV2.cpp: Sample file does not exist"};
 		}
 
 		sampleFile.extension() == ".ds" ? 
@@ -126,7 +126,7 @@ namespace lmms
 				sf_open(audioFilePath.c_str(), SFM_READ, &sfInfo), sndFileDeleter);
 		#endif
 
-		if (!sndFile) { throw std::runtime_error("Failed to open audio file: " + std::string{sf_strerror(sndFile.get())}); }
+		if (!sndFile) { throw std::runtime_error{"SampleBufferV2.cpp: Failed to open sample file"};
 
 		auto numSamples = sfInfo.frames * sfInfo.channels;
 		auto samples = std::vector<float>(numSamples);
@@ -134,7 +134,7 @@ namespace lmms
 
 		if (samplesRead != numSamples)
 		{
-			throw std::runtime_error("Failed to read audio samples: samplesRead != numSamples");
+			throw std::runtime_error{"SampleBufferV2.cpp: samplesRead != numSamples"};
 		}
 
 		m_sampleData = std::vector<sampleFrame>(sfInfo.frames);
@@ -159,7 +159,7 @@ namespace lmms
 
 		if (numSamples == 0 || !samples)
 		{
-			throw std::runtime_error("Could not read DrumSynth file " + drumSynthFilePath.native());
+			throw std::runtime_error{"SampleBufferV2.cpp: Could not read DrumSynth file."};
 		}
 
 		m_sampleData.resize(numSamples / DEFAULT_CHANNELS);
