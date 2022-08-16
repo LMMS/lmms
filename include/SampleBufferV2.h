@@ -41,13 +41,7 @@ namespace lmms
 	class SampleBufferV2
 	{
 	public:
-		enum class SampleType
-		{
-			SampleFile,
-			Base64
-		};
-
-		SampleBufferV2(const std::string& str, const SampleType sampleType);
+		SampleBufferV2(const std::experimental::filesystem::path& sampleFile);
 		SampleBufferV2(const sampleFrame* data, const int numFrames);
 		explicit SampleBufferV2(const int numFrames);
 		SampleBufferV2(const SampleBufferV2& other) = delete;
@@ -61,11 +55,28 @@ namespace lmms
 		sample_rate_t sampleRate() const;
 		int numFrames() const;
 
+		static std::shared_ptr<const SampleBufferV2> loadFromBase64(const std::string& base64);
+
+		/**
+		 * @brief Convert a QString to a STL file path portably.
+		 * 
+		 * @param filePath 
+		 * @return QString 
+		 */
+		static QString qStringFromFilePath(const std::experimental::filesystem::path& filePath);
+		
+		/**
+		 * @brief Convert a STL file path to a QString portably.
+		 * 
+		 * @param str 
+		 * @return std::experimental::filesystem::path 
+		 */
+		static std::experimental::filesystem::path qStringToFilePath(const QString& str);
+
 	private:
 		void loadFromSampleFile(const std::experimental::filesystem::path& sampleFilePath);
 		void loadFromDrumSynthFile(const std::experimental::filesystem::path& drumSynthFilePath);
-		void loadFromBase64(const std::string& base64);
-
+		
 	private:
 		std::vector<sampleFrame> m_sampleData;
 		std::optional<std::experimental::filesystem::path> m_filePath;

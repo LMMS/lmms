@@ -26,7 +26,6 @@
 
 #include <cmath>
 #include <cstring>
-#include <filesystem>
 #include <iostream>
 #include <variant>
 
@@ -39,9 +38,9 @@ namespace lmms
 {
 	std::array<int, 5> Sample::s_sampleMargin = {64, 64, 64, 4, 4};
 
-	Sample::Sample(const std::string& str, SampleBufferV2::SampleType sampleType)
+	Sample::Sample(const std::experimental::filesystem::path& sampleFile)
 	{
-		setSampleData(str, sampleType);
+		loadSampleFile(sampleFile);
 	}
 
 	Sample::Sample(const sampleFrame* data, const int numFrames)
@@ -281,11 +280,10 @@ namespace lmms
 		}
 	}
 
-	std::string Sample::sampleFile() const
+	std::experimental::filesystem::path Sample::sampleFile() const
 	{
-		if (!m_sampleBuffer) { return ""; }
-		auto& path = m_sampleBuffer->filePath();
-		return path ? path->string() : "";
+		if (!m_sampleBuffer || !m_sampleBuffer->filePath()) { return std::experimental::filesystem::path{}; }
+		return m_sampleBuffer->filePath().value_or(std::experimental::filesystem::path{}); 
 	}
 
 	std::shared_ptr<const SampleBufferV2> Sample::sampleBuffer() const
@@ -351,15 +349,6 @@ namespace lmms
 	int Sample::numFrames() const
 	{
 		return m_sampleBuffer ? m_sampleBuffer->numFrames() : 0;
-	}
-
-
-	void Sample::setSampleData(const std::string& str, const SampleBufferV2::SampleType sampleType)
-	{
-		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(str);
-		m_sampleBuffer = cachedSampleBuffer ? cachedSampleBuffer : 
-			Engine::sampleBufferCache()->add(str, new SampleBufferV2{str, sampleType});
-		resetMarkers();
 	}
 
 	void Sample::setSampleBuffer(const SampleBufferV2* buffer)
@@ -441,14 +430,18 @@ namespace lmms
 		return data.toBase64().constData();
 	}
 
-	void Sample::loadSampleFile(const std::string& sampleFile)
+	void Sample::loadSampleFile(const std::experimental::filesystem::path& sampleFile)
 	{
-		setSampleData(sampleFile, SampleBufferV2::SampleType::SampleFile);
+		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleFile);
+		m_sampleBuffer = cachedSampleBuffer ? cachedSampleBuffer :
+			Engine::sampleBufferCache()->add(sampleFile);
+		resetMarkers();
 	}
 
 	void Sample::loadBase64(const std::string& base64)
 	{
-		setSampleData(base64, SampleBufferV2::SampleType::Base64);
+		m_sampleBuffer = SampleBufferV2::loadFromBase64(base64);
+		resetMarkers();
 	}
 
 	void Sample::resetMarkers()

@@ -23,32 +23,27 @@
  */
 
 #include "SampleBufferCache.h"
-
 #include "SampleBufferV2.h"
 
 namespace lmms
 {
-	std::shared_ptr<const SampleBufferV2> SampleBufferCache::get(const std::string& id)
+	std::shared_ptr<const SampleBufferV2> SampleBufferCache::get(const CacheID& id)
 	{
-		if (!contains(id)) { return nullptr; }
+		if (m_map.find(id) == m_map.end()) { return nullptr; }
 		return m_map.at(id).lock();
 	}
 
-	std::shared_ptr<const SampleBufferV2> SampleBufferCache::add(const std::string& id, const SampleBufferV2* buffer)
+	std::shared_ptr<const SampleBufferV2> SampleBufferCache::add(const CacheID& id)
 	{
-		if (contains(id)) { return nullptr; }
+		if (m_map.find(id) != m_map.end()) { return m_map.at(id).lock(); }
 
-		auto sharedBuffer = std::shared_ptr<const SampleBufferV2>(buffer, [=](const SampleBufferV2* ptr) {
+		auto sharedBuffer = std::shared_ptr<const SampleBufferV2>(new SampleBufferV2{id}, [this, id](const SampleBufferV2* ptr)
+		{
 			delete ptr;
 			m_map.erase(id);
 		});
 
 		m_map.emplace(id, std::weak_ptr<const SampleBufferV2>(sharedBuffer));
 		return sharedBuffer;
-	}
-
-	bool SampleBufferCache::contains(const std::string& id) 
-	{
-		return m_map.find(id) != m_map.end();
 	}
 }

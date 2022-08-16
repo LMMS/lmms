@@ -33,33 +33,33 @@
 
 namespace lmms::gui 
 {
-	std::string SampleFileDialog::openSampleFile(const Sample& sample) 
+	std::experimental::filesystem::path::string_type SampleFileDialog::openSampleFile(const Sample& sample) 
 	{
 		gui::FileDialog ofd(nullptr, QObject::tr("Open audio file"));
 		
-		auto sampleFile = sample.sampleFile();
-		std::string dir;
+		const auto sampleFile = sample.sampleFile();
+		QString dir;
 
-		if (!sampleFile.empty())
+		if (!sampleFile.native().empty())
 		{
-			if (std::experimental::filesystem::path{sampleFile}.is_relative()) 
+			QString f = SampleBufferV2::qStringFromFilePath(sampleFile);
+			if (QFileInfo(f).isRelative())
 			{
-				sampleFile = ConfigManager::inst()->userSamplesDir().toStdString() + sampleFile;
-				if (!std::experimental::filesystem::exists(sampleFile)) 
+				f = ConfigManager::inst()->userSamplesDir() + f;
+				if (!QFileInfo(f).exists())
 				{
-					sampleFile = ConfigManager::inst()->factorySamplesDir().toStdString() + sampleFile;
+					f = ConfigManager::inst()->factorySamplesDir() + SampleBufferV2::qStringFromFilePath(sampleFile);
 				}
 			}
-
-			dir = std::experimental::filesystem::absolute(sampleFile).string();
+			dir = QFileInfo(f).absolutePath();
 		}
-		else 
+		else
 		{
-			dir = ConfigManager::inst()->userSamplesDir().toStdString();
+			dir = ConfigManager::inst()->userSamplesDir();
 		}
 
 		// change dir to position of previously opened file
-		ofd.setDirectory(QString::fromStdString(dir));
+		ofd.setDirectory(dir);
 		ofd.setFileMode(gui::FileDialog::ExistingFiles);
 
 		std::array<QString, 11> types = 
@@ -81,7 +81,7 @@ namespace lmms::gui
 		if (!sampleFile.empty())
 		{
 			// select previously opened file
-			ofd.selectFile(QFileInfo(QString::fromStdString(sampleFile)).fileName());
+			ofd.selectFile(QFileInfo(SampleBufferV2::qStringFromFilePath(sampleFile)).fileName());
 		}
 
 		if (ofd.exec () == QDialog::Accepted)
@@ -91,7 +91,7 @@ namespace lmms::gui
 				return "";
 			}
 
-			return PathUtil::toShortestRelative(ofd.selectedFiles()[0]).toStdString();
+			return SampleBufferV2::qStringToFilePath(PathUtil::toShortestRelative(ofd.selectedFiles()[0])).native();
 		}
 
 		return "";

@@ -30,24 +30,16 @@
 
 namespace lmms
 {
-	SampleBufferV2::SampleBufferV2(const std::string& str, const SampleType dataType)
+	SampleBufferV2::SampleBufferV2(const std::experimental::filesystem::path& sampleFile) 
 	{
-		if (str.empty()) { throw std::runtime_error("SampleBufferV2.cpp: str is empty."); }
-
-		if (dataType == SampleType::SampleFile)
+		if (!std::experimental::filesystem::exists(sampleFile))
 		{
-			auto audioFilePath = std::experimental::filesystem::path(str);
-			if (!std::experimental::filesystem::exists(audioFilePath))
-			{
-				throw std::runtime_error("SampleBufferV2.cpp: non existing file " + str);
-			}
+			throw std::runtime_error("SampleBufferV2.cpp: non existing file " + sampleFile.native());
+		}
 
-			audioFilePath.extension() == ".ds" ? loadFromDrumSynthFile(audioFilePath) : loadFromSampleFile(audioFilePath);
-		}
-		else if (dataType == SampleType::Base64)
-		{
-			loadFromBase64(str);
-		}
+		sampleFile.extension() == ".ds" ? 
+			loadFromDrumSynthFile(sampleFile) : 
+			loadFromSampleFile(sampleFile);
 	}
 
 	SampleBufferV2::SampleBufferV2(const sampleFrame* data, const int numFrames)
@@ -102,6 +94,24 @@ namespace lmms
 		return m_sampleData.size();
 	}
 
+	QString SampleBufferV2::qStringFromFilePath(const std::experimental::filesystem::path& filePath) 
+	{
+		#ifdef LMMS_BUILD_WIN32
+			return QString::fromStdWString(filePath);
+		#else
+			return QString::fromStdString(filePath);
+		#endif
+	}
+	
+	std::experimental::filesystem::path SampleBufferV2::qStringToFilePath(const QString& str) 
+	{
+		#ifdef LMMS_BUILD_WIN32
+			return std::experimental::filesystem::path{str.toStdWString()};
+		#else
+			return std::experimental::filesystem::path{str.toStdString()};
+		#endif
+	}
+
 	void SampleBufferV2::loadFromSampleFile(const std::experimental::filesystem::path& audioFilePath)
 	{
 		SF_INFO sfInfo;
@@ -140,18 +150,16 @@ namespace lmms
 
 	void SampleBufferV2::loadFromDrumSynthFile(const std::experimental::filesystem::path& drumSynthFilePath)
 	{
-		auto dsFilePathStr = drumSynthFilePath.native();
 		auto ds = DrumSynth();
 		auto samples = std::make_unique<int16_t>();
 		auto samplesRawPtr = samples.get();
 
-		// TODO: Remove QString::fromStdString when Qt is removed from DrumSynth
-		int numSamples = ds.GetDSFileSamples(QString::fromStdString(dsFilePathStr), samplesRawPtr,
+		int numSamples = ds.GetDSFileSamples(qStringFromFilePath(drumSynthFilePath), samplesRawPtr,
 			DEFAULT_CHANNELS, Engine::audioEngine()->processingSampleRate());
 
 		if (numSamples == 0 || !samples)
 		{
-			throw std::runtime_error("Could not read DrumSynth file " + dsFilePathStr);
+			throw std::runtime_error("Could not read DrumSynth file " + drumSynthFilePath.native());
 		}
 
 		m_sampleData.resize(numSamples / DEFAULT_CHANNELS);
@@ -165,11 +173,11 @@ namespace lmms
 		}
 	}
 
-	void SampleBufferV2::loadFromBase64(const std::string& base64)
+	std::shared_ptr<const SampleBufferV2> SampleBufferV2::loadFromBase64(const std::string& base64)
 	{
 		// TODO: Base64 decoding without the use of Qt
 		QByteArray base64Data = QByteArray::fromBase64(QString::fromStdString(base64).toUtf8());
 		sampleFrame* dataAsSampleFrame = reinterpret_cast<sampleFrame*>(base64Data.data());
-		m_sampleData.assign(dataAsSampleFrame, dataAsSampleFrame + base64Data.size());
+		return std::make_shared<const SampleBufferV2>(dataAsSampleFrame, dataAsSampleFrame->size());
 	}
 }

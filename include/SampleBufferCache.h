@@ -35,11 +35,12 @@ namespace lmms
 	class SampleBufferCache
 	{
 	public:
-		std::shared_ptr<const SampleBufferV2> get(const std::string& id);
-		std::shared_ptr<const SampleBufferV2> add(const std::string& id, const SampleBufferV2* buffer);
-		bool contains(const std::string& id);
+		using CacheID = std::experimental::filesystem::path::string_type;
+		
+		std::shared_ptr<const SampleBufferV2> get(const CacheID& id);
+		std::shared_ptr<const SampleBufferV2> add(const CacheID& id);
 	private:
-		std::unordered_map<std::string, std::weak_ptr<const SampleBufferV2>> m_map;
+		std::unordered_map<CacheID, std::weak_ptr<const SampleBufferV2>> m_map;
 	};
 }
 
