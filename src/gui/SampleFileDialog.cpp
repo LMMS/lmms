@@ -76,7 +76,7 @@ namespace lmms::gui
 			QObject::tr("RAW-Files (*.raw)")	
 		};
 
-		ofd.setNameFilters(QStringList{types.begin(), types.end()});
+		ofd.setNameFilters(QStringList(types.begin(), types.end()));
 
 		if (!sampleFile.empty())
 		{
