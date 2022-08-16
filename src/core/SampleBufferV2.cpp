@@ -22,7 +22,10 @@
  *
  */
 
-#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
+#ifdef LMMS_BUILD_WIN32
+	#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
+	#include <windows.h>
+#endif
 
 #include "SampleBufferV2.h"
 
