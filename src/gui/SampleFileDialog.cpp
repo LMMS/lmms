@@ -62,7 +62,7 @@ namespace lmms::gui
 		ofd.setDirectory(dir);
 		ofd.setFileMode(gui::FileDialog::ExistingFiles);
 
-		std::array<QString, 11> types = 
+		QStringList filters
 		{
 			QObject::tr("All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)"),
 			QObject::tr("Wave-Files (*.wav)"),
@@ -76,7 +76,7 @@ namespace lmms::gui
 			QObject::tr("RAW-Files (*.raw)")	
 		};
 
-		ofd.setNameFilters(QStringList(types.begin(), types.end()));
+		ofd.setNameFilters(filters);
 
 		if (!sampleFile.empty())
 		{
