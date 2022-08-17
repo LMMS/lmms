@@ -51,10 +51,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	m_master( nullptr ),
 	m_ioEngine( nullptr )
 {
-	for (int& runningNote : m_runningNotes)
-	{
-		runningNote = 0;
-	}
+	m_runningNotes.fill(0);
 
 	if( s_instanceCount == 0 )
 	{

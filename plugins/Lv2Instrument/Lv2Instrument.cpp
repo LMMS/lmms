@@ -79,7 +79,7 @@ Lv2Instrument::Lv2Instrument(InstrumentTrack *instrumentTrackArg,
 	if (Lv2ControlBase::isValid())
 	{
 #ifdef LV2_INSTRUMENT_USE_MIDI
-		for (int& runningNote : m_runningNotes) { runningNote = 0; }
+		m_runningNotes.fill(0);
 #endif
 		connect(instrumentTrack()->pitchRangeModel(), SIGNAL(dataChanged()),
 			this, SLOT(updatePitchRange()), Qt::DirectConnection);

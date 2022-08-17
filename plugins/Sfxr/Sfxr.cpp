@@ -141,14 +141,10 @@ void SfxrSynth::resetSample( bool restart )
 		iphase=abs((int)fphase);
 		ipp=0;
 		
-		for (auto& phaserSample : phaser_buffer) 
-		{ 
-			phaserSample = 0.0f; 
-		}
-
+		phaser_buffer.fill(0.0f);
 		for (auto& noiseSample : noise_buffer) 
 		{
-			noiseSample = frnd(2.0f)-1.0f; 
+			noiseSample = frnd(2.0f) - 1.0f; 
 		}
 
 		rep_time=0;

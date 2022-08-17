@@ -101,7 +101,7 @@ private:
 	void setNameFromFile(const QString &name) override;
 
 #ifdef LV2_INSTRUMENT_USE_MIDI
-	int m_runningNotes[NumKeys];
+	std::array<int, NumKeys> m_runningNotes;
 #endif
 
 	friend class gui::Lv2InsView;

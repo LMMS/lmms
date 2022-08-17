@@ -135,7 +135,7 @@ private:
 	QMutex m_synthMutex;
 	QMutex m_loadMutex;
 
-	int m_notesRunning[128];
+	std::array<int, 128> m_notesRunning;
 	sample_rate_t m_internalSampleRate;
 	int m_lastMidiPitch;
 	int m_lastMidiPitchRange;
