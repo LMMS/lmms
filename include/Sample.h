@@ -49,7 +49,7 @@ namespace lmms
 		};
 
 		Sample() = default;
-		Sample(const std::experimental::filesystem::path& sampleFile);
+		Sample(const fs::path& sampleFile);
 		Sample(const sampleFrame* data, const int numFrames);
 		explicit Sample(const SampleBufferV2* buffer);
 		explicit Sample(const int numFrames);
@@ -93,7 +93,7 @@ namespace lmms
 
 		std::string toBase64() const;
 
-		void loadSampleFile(const std::experimental::filesystem::path& sampleFile);
+		void loadSampleFile(const fs::path& sampleFile);
 		void loadBase64(const std::string& base64);
 		void resetMarkers();
 		

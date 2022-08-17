@@ -38,7 +38,7 @@ namespace lmms
 {
 	std::array<int, 5> Sample::s_sampleMargin = {64, 64, 64, 4, 4};
 
-	Sample::Sample(const std::experimental::filesystem::path& sampleFile)
+	Sample::Sample(const fs::path& sampleFile)
 	{
 		loadSampleFile(sampleFile);
 	}
@@ -430,7 +430,7 @@ namespace lmms
 		return data.toBase64().constData();
 	}
 
-	void Sample::loadSampleFile(const std::experimental::filesystem::path& sampleFile)
+	void Sample::loadSampleFile(const fs::path& sampleFile)
 	{
 		auto cachedSampleBuffer = Engine::sampleBufferCache()->get(sampleFile.generic_string());
 		m_sampleBuffer = cachedSampleBuffer ? cachedSampleBuffer :

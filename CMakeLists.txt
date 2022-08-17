@@ -34,6 +34,7 @@ INCLUDE(PluginList)
 INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckIncludeFileCXX)
 INCLUDE(FindPkgConfig)
 INCLUDE(GenerateExportHeader)
 
@@ -153,6 +154,10 @@ CHECK_INCLUDE_FILES(ctype.h LMMS_HAVE_CTYPE_H)
 CHECK_INCLUDE_FILES(string.h LMMS_HAVE_STRING_H)
 CHECK_INCLUDE_FILES(process.h LMMS_HAVE_PROCESS_H)
 CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
+
+# Check for filesystem support
+CHECK_INCLUDE_FILE_CXX(filesystem LMMS_HAVE_FILESYSTEM)
+CHECK_INCLUDE_FILE_CXX(experimental/filesystem LMMS_HAVE_EXPERIMENTAL_FILESYSTEM)
 
 include(CheckLibraryExists)
 check_library_exists(rt shm_open "" LMMS_HAVE_LIBRT)

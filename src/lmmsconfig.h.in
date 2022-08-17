@@ -53,3 +53,6 @@
 #cmakedefine LMMS_HAVE_STRING_H
 #cmakedefine LMMS_HAVE_PROCESS_H
 #cmakedefine LMMS_HAVE_LOCALE_H
+
+#cmakedefine LMMS_HAVE_FILESYSTEM
+#cmakedefine LMMS_HAVE_EXPERIMENTAL_FILESYSTEM

@@ -30,9 +30,9 @@
 
 namespace lmms
 {
-	SampleBufferV2::SampleBufferV2(const std::experimental::filesystem::path& sampleFile) 
+	SampleBufferV2::SampleBufferV2(const fs::path& sampleFile) 
 	{
-		if (!std::experimental::filesystem::exists(sampleFile))
+		if (!fs::exists(sampleFile))
 		{
 			throw std::runtime_error{"SampleBufferV2.cpp: Sample file does not exist"};
 		}
@@ -79,7 +79,7 @@ namespace lmms
 		return m_sampleData;
 	}
 
-	const std::optional<std::experimental::filesystem::path>& SampleBufferV2::filePath() const
+	const std::optional<fs::path>& SampleBufferV2::filePath() const
 	{
 		return m_filePath;
 	}
@@ -94,7 +94,7 @@ namespace lmms
 		return m_sampleData.size();
 	}
 
-	QString SampleBufferV2::qStringFromFilePath(const std::experimental::filesystem::path& filePath) 
+	QString SampleBufferV2::qStringFromFilePath(const fs::path& filePath) 
 	{
 		#ifdef LMMS_BUILD_WIN32
 			return QString::fromStdWString(filePath);
@@ -103,16 +103,16 @@ namespace lmms
 		#endif
 	}
 	
-	std::experimental::filesystem::path SampleBufferV2::qStringToFilePath(const QString& str) 
+	fs::path SampleBufferV2::qStringToFilePath(const QString& str) 
 	{
 		#ifdef LMMS_BUILD_WIN32
-			return std::experimental::filesystem::path{str.toStdWString()};
+			return fs::path{str.toStdWString()};
 		#else
-			return std::experimental::filesystem::path{str.toStdString()};
+			return fs::path{str.toStdString()};
 		#endif
 	}
 
-	void SampleBufferV2::loadFromSampleFile(const std::experimental::filesystem::path& sampleFilePath)
+	void SampleBufferV2::loadFromSampleFile(const fs::path& sampleFilePath)
 	{
 		SF_INFO sfInfo;
 		sfInfo.format = 0;
@@ -143,7 +143,7 @@ namespace lmms
 		}
 	}
 
-	void SampleBufferV2::loadFromDrumSynthFile(const std::experimental::filesystem::path& drumSynthFilePath)
+	void SampleBufferV2::loadFromDrumSynthFile(const fs::path& drumSynthFilePath)
 	{
 		auto ds = DrumSynth();
 		auto samples = std::make_unique<int16_t>();
