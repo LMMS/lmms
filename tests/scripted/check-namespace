@@ -84,7 +84,7 @@ statement_pattern = re.compile(
     # Namespace that contains no other braces needs no end comment
     #  With a (?=lookahead) we can let the "namespace" part be eaten by the parser
     #  but save the braces and their content for later so they can be matched again
-    r'namespace *[\w:]*\s*(?={[^{}]*})|'
+    r'^ *namespace *[\w:]*\s*(?={[^{}]*})|'
     # Start of named namespace, or just a opening brace
     r'(^ *namespace *(?P<namespace_start>[\w:]+)\s*)?(?P<opening_brace>{)|'
     # End of namespace including comment, or just a closing brace
