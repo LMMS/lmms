@@ -100,6 +100,15 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 	"http://gareus.org/oss/lv2/sisco#Mono",
 	"http://gareus.org/oss/lv2/sisco#Stereo",
 	"http://gareus.org/oss/lv2/spectra#Mono",
+	"http://gareus.org/oss/lv2/convoLV2#Mono",
+	"http://gareus.org/oss/lv2/convoLV2#MonoToStereo",
+	"http://gareus.org/oss/lv2/convoLV2#Stereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMono",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgMonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#CfgStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Mono",
+	"http://gareus.org/oss/lv2/zeroconvolv#MonoToStereo",
+	"http://gareus.org/oss/lv2/zeroconvolv#Stereo",
 	"http://lsp-plug.in/plugins/lv2/latency_meter",
 	"http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x1",
 	"http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x2",
@@ -115,20 +124,10 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 	"https://github.com/laixinyuan/StereoSourceSepartion",
 	"urn:juce:TalFilter2",
 	"urn:juce:Vex",
+	"http://zynaddsubfx.sourceforge.net",
 
 	// unstable
-	"urn:juced:DrumSynth"
-
-	// need capacity to load files
-	"http://gareus.org/oss/lv2/convoLV2#Mono",
-	"http://gareus.org/oss/lv2/convoLV2#MonoToStereo",
-	"http://gareus.org/oss/lv2/convoLV2#Stereo",
-	"http://gareus.org/oss/lv2/zeroconvolv#CfgMono",
-	"http://gareus.org/oss/lv2/zeroconvolv#CfgMonoToStereo",
-	"http://gareus.org/oss/lv2/zeroconvolv#CfgStereo",
-	"http://gareus.org/oss/lv2/zeroconvolv#Mono",
-	"http://gareus.org/oss/lv2/zeroconvolv#MonoToStereo",
-	"http://gareus.org/oss/lv2/zeroconvolv#Stereo",
+	"urn:juced:DrumSynth",
 };
 
 
