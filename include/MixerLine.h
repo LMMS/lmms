@@ -82,6 +82,7 @@ public:
 
 	bool eventFilter (QObject *dist, QEvent *event) override;
 
+
 private:
 	void drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
@@ -89,6 +90,7 @@ private:
 	MixerView * m_mv;
 	LcdWidget* m_lcd;
 	int m_channelIndex;
+	QPalette m_renameEditPalette;
 	QBrush m_backgroundActive;
 	QColor m_strokeOuterActive;
 	QColor m_strokeOuterInactive;
@@ -105,6 +107,7 @@ public slots:
 	void resetColor();
 	void selectColor();
 	void randomizeColor();
+	void refreshAutoTrackLinkStyle();
 
 private slots:
 	void renameFinished();
@@ -112,6 +115,7 @@ private slots:
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
+	void toogleAutoTrackLink();
 };
 
 

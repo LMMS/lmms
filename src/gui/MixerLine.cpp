@@ -134,11 +134,10 @@ MixerLine::MixerLine( QWidget * _parent, MixerView * _mv, int _channelIndex ) :
 	proxyWidget->setRotation( -90 );
 	proxyWidget->setPos( 8, 145 );
 
-	connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
-	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL(dataChanged()), this, SLOT(update()));
+	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );	
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_muteModel, SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( &Engine::mixer()->mixerChannel( m_channelIndex )->m_autoTrackLinkModel, SIGNAL( dataChanged() ), this, SLOT( refreshAutoTrackLinkStyle() ) );
 }
-
-
 
 
 MixerLine::~MixerLine()
@@ -156,6 +155,7 @@ void MixerLine::setChannelIndex( int index )
 	m_channelIndex = index;
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->update();
+	refreshAutoTrackLinkStyle();
 }
 
 
@@ -170,7 +170,6 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 	{
 		m_renameLineEdit->setText( elidedName );
 	}
-
 	int width = mixerLine->rect().width();
 	int height = mixerLine->rect().height();
 	
@@ -183,6 +182,7 @@ void MixerLine::drawMixerLine( QPainter* p, const MixerLine *mixerLine, bool isA
 		p->fillRect( mixerLine->rect(),
 					 isActive ? mixerLine->backgroundActive().color() : p->background().color() );
 	}
+
 	
 	// inner border
 	p->setPen( isActive ? mixerLine->strokeInnerActive() : mixerLine->strokeInnerInactive() );
@@ -248,13 +248,28 @@ void MixerLine::mouseDoubleClickEvent( QMouseEvent * )
 
 void MixerLine::contextMenuEvent( QContextMenuEvent * )
 {
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::mixer()->mixerChannel( m_channelIndex )->m_name, this );
+	Mixer * mix =  Engine::mixer();
+	CaptionMenu* contextMenu = new CaptionMenu( mix->mixerChannel( m_channelIndex )->m_name, this );
+	bool autoTrackLink = mix->mixerChannel( m_channelIndex )->m_autoTrackLinkModel.value();
 	if( m_channelIndex != 0 ) // no move-options in master
 	{
-		contextMenu->addAction( tr( "Move &left" ),	this, SLOT(moveChannelLeft()));
-		contextMenu->addAction( tr( "Move &right" ), this, SLOT(moveChannelRight()));
+		QAction * actionMoveleft =contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
+		QAction * actionMoveRight =contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
+
+		auto settings =mix->getAutoLinkTrackSettings();
+		if (settings.enabled)
+		{
+			// we don't show the menu entry if the auto link functionality is completely disabled
+			QString marker = (autoTrackLink ? " *" : "");
+			QAction * actionToggleAutoTrackLink = contextMenu->addAction( tr("Auto track link") + marker, this, [this](){ toogleAutoTrackLink(); } );
+			actionToggleAutoTrackLink->setEnabled(mix->isAutoTrackLinkToggleAllowed(m_channelIndex));
+		}
+
+		actionMoveleft->setEnabled(m_channelIndex > 1);
+		actionMoveRight->setEnabled((m_channelIndex +1) < mix->numChannels());
 	}
-	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT(renameChannel()));
+
+	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );
 	contextMenu->addSeparator();
 
 	if( m_channelIndex != 0 ) // no remove-option in master
@@ -276,7 +291,28 @@ void MixerLine::contextMenuEvent( QContextMenuEvent * )
 	delete contextMenu;
 }
 
+void MixerLine::toogleAutoTrackLink()
+{
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->toggleAutoTrackLink(m_channelIndex);
+}
 
+void MixerLine::refreshAutoTrackLinkStyle()
+{
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	auto channel = mix->mixerChannel( m_channelIndex );
+	if (settings.enabled && channel->m_autoTrackLinkModel.value())
+	{
+		m_renameEditPalette.setColor(QPalette::Text,Qt::green);
+	}
+	else
+	{
+		m_renameEditPalette.setColor(QPalette::Text,Qt::white);
+	}
+	m_renameLineEdit->setPalette(m_renameEditPalette);
+	update();
+}
 
 
 void MixerLine::renameChannel()
@@ -306,8 +342,18 @@ void MixerLine::renameFinished()
 	setFocus();
 	if( !newName.isEmpty() && Engine::mixer()->mixerChannel( m_channelIndex )->m_name != newName )
 	{
-		Engine::mixer()->mixerChannel( m_channelIndex )->m_name = newName;
+		auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
+		channel->m_name = newName;
 		m_renameLineEdit->setText( elideName( newName ) );
+
+		if (channel->m_autoTrackLinkModel.value())
+		{
+			Engine::mixer()->processChannelTracks(channel, [newName](Track * track)
+			{
+				track->setName(newName);
+			});
+		}
+
 		Engine::getSong()->setModified();
 	}
 	QString name = Engine::mixer()->mixerChannel( m_channelIndex )->m_name;
@@ -319,8 +365,8 @@ void MixerLine::renameFinished()
 
 void MixerLine::removeChannel()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->deleteChannel( m_channelIndex );
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->deleteChannel( m_channelIndex );
 }
 
 
@@ -328,8 +374,8 @@ void MixerLine::removeChannel()
 
 void MixerLine::removeUnusedChannels()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->deleteUnusedChannels();
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->deleteUnusedChannels();
 }
 
 
@@ -337,8 +383,8 @@ void MixerLine::removeUnusedChannels()
 
 void MixerLine::moveChannelLeft()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->moveChannelLeft( m_channelIndex );
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->moveChannelLeft( m_channelIndex );
 }
 
 
@@ -346,8 +392,8 @@ void MixerLine::moveChannelLeft()
 
 void MixerLine::moveChannelRight()
 {
-	MixerView * mix = getGUI()->mixerView();
-	mix->moveChannelRight( m_channelIndex );
+	MixerView * mixView = getGUI()->mixerView();
+	mixView->moveChannelRight( m_channelIndex );
 }
 
 
@@ -435,9 +481,18 @@ void MixerLine::setStrokeInnerInactive( const QColor & c )
 void MixerLine::selectColor()
 {
 	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	auto new_color = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
-	if(!new_color.isValid()) { return; }
-	channel->setColor (new_color);
+	auto newColor = ColorChooser(this).withPalette(ColorChooser::Palette::Mixer)->getColor(channel->m_color);
+	if(!newColor.isValid()) { return; }
+	channel->setColor (newColor);
+
+	if (channel->m_autoTrackLinkModel.value())
+	{
+		Engine::mixer()->processChannelTracks(channel, [newColor](Track * track)
+		{
+			track->setColor(newColor);
+		});
+	}
+
 	Engine::getSong()->setModified();
 	update();
 }
@@ -446,7 +501,17 @@ void MixerLine::selectColor()
 // Disable the usage of color on this mixer line
 void MixerLine::resetColor()
 {
-	Engine::mixer()->mixerChannel( m_channelIndex )->m_hasColor = false;
+	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
+	channel->m_hasColor = false;
+
+	if (channel->m_autoTrackLinkModel.value())
+	{
+		Engine::mixer()->processChannelTracks(channel, [](Track * track)
+		{
+			track->resetColor();
+		});
+	}
+
 	Engine::getSong()->setModified();
 	update();
 }
@@ -456,7 +521,17 @@ void MixerLine::resetColor()
 void MixerLine::randomizeColor()
 {
 	auto channel = Engine::mixer()->mixerChannel( m_channelIndex );
-	channel->setColor (ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48]);
+	auto newColor = ColorChooser::getPalette(ColorChooser::Palette::Mixer)[rand() % 48];
+	channel->setColor (newColor);
+
+	if (channel->m_autoTrackLinkModel.value())
+	{
+		Engine::mixer()->processChannelTracks(channel, [newColor](Track * track)
+		{
+			track->setColor(newColor);
+		});
+	}
+
 	Engine::getSong()->setModified();
 	update();
 }

@@ -25,7 +25,9 @@
 #ifndef MIXER_H
 #define MIXER_H
 
+#include "ConfigManager.h"
 #include "Model.h"
+#include "Track.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "ThreadableJob.h"
@@ -66,6 +68,7 @@ class MixerChannel : public ThreadableJob
 		int m_channelIndex; // what channel index are we
 		bool m_queued; // are we queued up for rendering yet?
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
+		BoolModel m_autoTrackLinkModel;
 
 		// pointers to other channels that this one sends to
 		MixerRouteVector m_sends;
@@ -142,6 +145,131 @@ class LMMS_EXPORT Mixer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:
+	struct autoTrackLinkSettings
+	{
+		// Remark: take care of the enum order as it is used for range checking during reading the values from config
+		enum class LinkStyle
+		{
+			Disabled,		/* don't link any styles */
+			LinkNameAndColor,		/* link namd and color */
+			LinkColorOnly,		/* link only color */
+		};
+
+		enum class AutoAdd
+		{
+			Disabled,			/* do not link tracks after add */
+			CreateNew,			/* one channel for each track after add*/
+			UseFirstTrackOnly,	/* use always the first channel in the editor for new tracks*/
+		};
+
+		enum class LinkMode
+		{
+			OneToOne,			/* do not link song editor tracks */
+			OneToMany,			/* one channel for each song editor track  */
+		};
+
+		enum class AutoSort
+		{
+			Disabled,			/* automatic sorting is disabled */
+			LinkedPattern,		/* linked tracks first, pattern editor afterwards */
+			PatternLinked 		/* pattern editor first, linked tracks afterwards */
+		};
+
+		struct editorSettings
+		{
+			LinkStyle linkStyle;
+			AutoAdd autoAdd;
+
+			editorSettings()
+			{
+				linkStyle = LinkStyle::LinkNameAndColor;
+				autoAdd = AutoAdd::CreateNew;
+			}
+		};
+
+		bool enabled;
+		bool autoDelete;
+		LinkMode linkMode;
+		AutoSort autoSort;
+		editorSettings songEditor;
+		editorSettings patternEditor;
+
+		bool getAsBoolOrDefault(const QString & text, bool defaultValue)
+		{
+			return (bool)getIntInRangeOrDefault(text, 0,1,defaultValue);
+		}
+
+
+		AutoAdd getAsAutoAddOrDefault(const QString & text, AutoAdd defaultValue)
+		{
+			return (AutoAdd) getIntInRangeOrDefault(text,(int)AutoAdd::Disabled, (int)AutoAdd::UseFirstTrackOnly,(int)defaultValue);
+		}
+
+		LinkStyle getAsLinkStyleOrDefault(const QString & text, LinkStyle defaultValue)
+		{
+			return (LinkStyle) getIntInRangeOrDefault(text,(int)LinkStyle::Disabled, (int)LinkStyle::LinkColorOnly,(int)defaultValue);
+		}
+
+		AutoSort getAsAutoSortOrDefault(const QString & text, AutoSort defaultValue)
+		{
+			return (AutoSort) getIntInRangeOrDefault(text,(int)AutoSort::Disabled, (int)AutoSort::PatternLinked,(int)defaultValue);
+		}
+
+
+		LinkMode getAsLinkModeOrDefault(const QString & text, LinkMode defaultValue)
+		{
+			return (LinkMode) getIntInRangeOrDefault(text,(int)LinkMode::OneToOne, (int)LinkMode::OneToMany,(int)defaultValue);
+		}
+
+		bool autoAdd()
+		{
+			return songEditor.autoAdd != AutoAdd::Disabled || patternEditor.autoAdd != AutoAdd::Disabled;
+		}
+
+
+		bool linkName(bool isPatternEditor)
+		{
+			return isPatternEditor ?
+				patternEditor.linkStyle == LinkStyle::LinkNameAndColor :
+				songEditor.linkStyle == LinkStyle::LinkNameAndColor;
+		}
+
+		bool linkColor(bool isPatternEditor)
+		{
+			return isPatternEditor ?
+				(patternEditor.linkStyle == LinkStyle::LinkNameAndColor) || (patternEditor.linkStyle == LinkStyle::LinkColorOnly) :
+				(songEditor.linkStyle == LinkStyle::LinkNameAndColor) || (songEditor.linkStyle == LinkStyle::LinkColorOnly);
+		}
+
+		bool linkAnyStyles()
+		{
+			return patternEditor.linkStyle != LinkStyle::Disabled ||  songEditor.linkStyle != LinkStyle::Disabled;
+		}
+
+		autoTrackLinkSettings()
+		{
+			enabled = false;
+			autoDelete = true;
+			linkMode = LinkMode::OneToOne;
+			autoSort = AutoSort::Disabled;
+		}
+
+	private:
+		int getIntInRangeOrDefault(const QString & text, int lower, int upper, int defaultValue)
+		{
+			if (text == nullptr || text.isEmpty()) return defaultValue;
+			auto asInt = text.toInt();
+			if (asInt < lower || asInt >upper) return defaultValue;
+			return asInt;
+		}
+	};
+
+	enum class ProcessSortOrder
+	{
+		SongPattern,
+		PatternSong
+	};
+
 	Mixer();
 	~Mixer() override;
 
@@ -195,6 +323,22 @@ public:
 	// re-arrange channels
 	void moveChannelLeft(int index);
 	void moveChannelRight(int index);
+	void swapChannels(int indexA, int indexB);
+
+	void toggleAutoTrackLink(int index);
+
+	// process tracks which have a mixer channel assigned
+	void processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process, ProcessSortOrder sortOrder = ProcessSortOrder::SongPattern);
+	// process tracks assigned to a specific channel
+	void processChannelTracks(MixerChannel * channel, std::function<void(Track * track)> process);
+	IntModel * getChannelModelByTrack(Track * track);	
+	MixerChannel * getCustomChannelByTrack(Track * track);
+	std::vector<int> getUsedChannelCounts();
+	bool isAutoTrackLinkToggleAllowed(int index);
+	//bool autoLinkTrackConfigEnabled();
+
+	autoTrackLinkSettings getAutoLinkTrackSettings();
+	void saveAutoLinkTrackSettings(autoTrackLinkSettings settings);
 
 	// reset a channel's name, fx, sends, etc
 	void clearChannel(mix_ch_t channelIndex);
@@ -214,6 +358,16 @@ public:
 	MixerRouteVector m_mixerRoutes;
 
 private:
+	inline const QString & getAutoTrackCfg(ConfigManager * cfg, const QString & postFix)
+	{
+		return cfg->value("AutoTrackLink", "settings_"+postFix);
+	}
+
+	inline void setAutoTrackCfg(ConfigManager * cfg, const QString & postFix, int value)
+	{
+		cfg->setValue("AutoTrackLink", "settings_"+postFix,  QString::number(value));
+	}
+
 	// the mixer channels in the mixer. index 0 is always master.
 	QVector<MixerChannel *> m_mixerChannels;
 

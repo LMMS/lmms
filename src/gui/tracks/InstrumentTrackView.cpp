@@ -221,31 +221,18 @@ InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 }
 
 
-
-
 /*! \brief Create and assign a new mixer Channel for this track */
 void InstrumentTrackView::createMixerLine()
 {
-	int channelIndex = getGUI()->mixerView()->addNewChannel();
-	auto channel = Engine::mixer()->mixerChannel(channelIndex);
-
-	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
-
-	assignMixerLine(channelIndex);
+	getGUI()->mixerView()->trackMixerLineCreate(getTrack());
 }
-
-
 
 
 /*! \brief Assign a specific mixer Channel for this track */
 void InstrumentTrackView::assignMixerLine(int channelIndex)
 {
-	model()->mixerChannelModel()->setValue( channelIndex );
-
-	getGUI()->mixerView()->setCurrentMixerLine( channelIndex );
+	getGUI()->mixerView()->trackMixerLineAssign(getTrack(), channelIndex);
 }
-
 
 
 InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()

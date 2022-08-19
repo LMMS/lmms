@@ -46,6 +46,8 @@
 #include "Track.h"
 #include "TrackContainerView.h"
 #include "TrackView.h"
+#include "GuiApplication.h"
+#include "MixerView.h"
 
 namespace lmms::gui
 {
@@ -275,6 +277,7 @@ void TrackOperationsWidget::selectTrackColor()
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(new_color);
+	getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 	Engine::getSong()->setModified();
 }
 
@@ -283,6 +286,7 @@ void TrackOperationsWidget::resetTrackColor()
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->resetColor();
+	getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 	Engine::getSong()->setModified();
 }
 
@@ -292,6 +296,7 @@ void TrackOperationsWidget::randomizeTrackColor()
 	auto track = m_trackView->getTrack();
 	track->addJournalCheckPoint();
 	track->setColor(buffer);
+	getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 	Engine::getSong()->setModified();
 }
 

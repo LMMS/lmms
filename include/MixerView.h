@@ -25,17 +25,20 @@
 #ifndef MIXER_VIEW_H
 #define MIXER_VIEW_H
 
+#include <QMenu>
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QStackedLayout>
 #include <QScrollArea>
 
 #include "ModelView.h"
+#include "Mixer.h"
 #include "Engine.h"
 #include "Fader.h"
 #include "PixmapButton.h"
 #include "embed.h"
 #include "EffectRackView.h"
+#include "Track.h"
 
 class QButtonGroup;
 
@@ -101,7 +104,6 @@ public:
 
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
-	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
 	void renameChannel(int index);
@@ -109,6 +111,16 @@ public:
 	// make sure the display syncs up with the mixer.
 	// useful for loading projects
 	void refreshDisplay();
+
+	// Auto track link support	
+	void updateAfterTrackAdd(Track * track, QString name = "");
+	void updateAfterTrackStyleModify(Track * track);
+	void trackMixerLineCreate(Track * track);
+	void trackMixerLineAssign(Track * track, int channelIndex);
+	void updateAfterTrackMove(Track * track);
+	void updateBeforeTrackDelete(Track * track);
+	void toggleAutoTrackLink(int index);
+
 
 public slots:
 	int addNewChannel();
@@ -119,6 +131,8 @@ protected:
 private slots:
 	void updateFaders();
 	void toggledSolo();
+	void updateAutoTrackLinkMenu();
+	void toogleAutoLinkTrackConfig();
 
 private:
 	QVector<MixerChannelView *> m_mixerChannelViews;
@@ -130,9 +144,22 @@ private:
 	QWidget * m_channelAreaWidget;
 	QStackedLayout * m_racksLayout;
 	QWidget * m_racksWidget;
+	QPushButton * m_toogleAutoLinkTrackConfigBtn;
+	QPushButton * m_autoLinkTrackSettingsBtn;
 
 	void updateMaxChannelSelector();
-	
+	void swapChannels(int indexA, int indexB);
+	void updateAutoTrackSortOrder(bool autoSort = true);
+	void deleteChannelInternal(int index);
+	void setAutoLinkTrackConfig(bool enabled);
+	void updateAutoLinkTrackConfigBtn(bool enabled);
+	void setAutoTrackConstraints();
+	void trackStyleToChannel(Track * track, MixerChannel * channel);
+	void channelStyleToTrack(MixerChannel * channel, Track * track);
+	void addAutoLinkTrackMenuEntry(QMenu* menu, const QString &text, bool state,
+		std::function<void(Mixer::autoTrackLinkSettings* settings)> setValue,
+		std::function<void()> after = nullptr);
+
 	friend class MixerChannelView;
 } ;
 

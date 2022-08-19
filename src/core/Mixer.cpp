@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Mixer.cpp - effect mixer for LMMS
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -31,6 +31,7 @@
 #include "MixHelpers.h"
 #include "Song.h"
 
+#include "ConfigManager.h"
 #include "InstrumentTrack.h"
 #include "PatternStore.h"
 #include "SampleTrack.h"
@@ -72,6 +73,7 @@ MixerChannel::MixerChannel( int idx, Model * _parent ) :
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
+	m_autoTrackLinkModel (false, _parent),
 	m_hasColor( false ),
 	m_dependenciesMet(0)
 {
@@ -284,46 +286,23 @@ void Mixer::deleteChannel( int index )
 	// channel deletion is performed between mixer rounds
 	Engine::audioEngine()->requestChangeInModel();
 
-	// go through every instrument and adjust for the channel index change
-	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::patternStore()->tracks();
 
-	for( Track* t : tracks )
+	processAssignedTracks( [index](Track *, IntModel * model, MixerChannel * )
 	{
-		if( t->type() == Track::InstrumentTrack )
+		int curIndex = model->value(0);
+		if( curIndex == index )
 		{
-			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
-			int val = inst->mixerChannelModel()->value(0);
-			if( val == index )
-			{
-				// we are deleting this track's channel send
-				// send to master
-				inst->mixerChannelModel()->setValue(0);
-			}
-			else if( val > index )
-			{
-				// subtract 1 to make up for the missing channel
-				inst->mixerChannelModel()->setValue(val-1);
-			}
+			// we are deleting this track's mixer send
+			// send to master
+			model->setValue(0);
 		}
-		else if( t->type() == Track::SampleTrack )
+		else if ( curIndex > index )
 		{
-			SampleTrack* strk = dynamic_cast<SampleTrack *>( t );
-			int val = strk->mixerChannelModel()->value(0);
-			if( val == index )
-			{
-				// we are deleting this track's channel send
-				// send to master
-				strk->mixerChannelModel()->setValue(0);
-			}
-			else if( val > index )
-			{
-				// subtract 1 to make up for the missing channel
-				strk->mixerChannelModel()->setValue(val-1);
-			}
+			// subtract 1 to make up for the missing channel
+			model->setValue(curIndex-1);
 		}
-	}
+	});
+
 
 	MixerChannel * ch = m_mixerChannels[index];
 
@@ -367,74 +346,167 @@ void Mixer::deleteChannel( int index )
 	Engine::audioEngine()->doneChangeInModel();
 }
 
-
-
-void Mixer::moveChannelLeft( int index )
+void Mixer::toggleAutoTrackLink(int index)
 {
-	// can't move master or first channel
-	if( index <= 1 || index >= m_mixerChannels.size() )
+	m_mixerChannels[index]->m_autoTrackLinkModel.setValue(! m_mixerChannels[index]->m_autoTrackLinkModel.value());
+}
+
+
+IntModel * Mixer::getChannelModelByTrack(Track * track)
+{
+	if( track->type() == Track::InstrumentTrack )
+	{
+		InstrumentTrack * inst = (InstrumentTrack *) track;
+		return inst->mixerChannelModel();
+	}
+	else if( track->type() == Track::SampleTrack )
+	{
+		SampleTrack * strk = (SampleTrack *) track;
+		return strk->mixerChannelModel();
+	}
+	return nullptr;
+}
+
+MixerChannel * Mixer::getCustomChannelByTrack(Track * track)
+{
+	IntModel * model = getChannelModelByTrack(track);
+	if (model != nullptr)
+	{
+		int channelIndex = model->value();
+		if (channelIndex>0)
+		{
+			return mixerChannel(channelIndex);
+		}
+	}
+	return nullptr;
+}
+
+void Mixer::processChannelTracks(MixerChannel * channel, std::function<void(Track * track)> process)
+{
+	processAssignedTracks([channel, process](Track * track, IntModel *, MixerChannel * currentChannel)
+	{
+		if (currentChannel != nullptr && currentChannel->m_channelIndex == channel->m_channelIndex)
+		{
+			process(track);
+		}
+	});
+}
+
+
+bool Mixer::isAutoTrackLinkToggleAllowed(int index)
+{
+	auto mix = Engine::mixer();
+	auto settings =mix->getAutoLinkTrackSettings();
+	if (!settings.enabled) return false;
+	if (mixerChannel( index )->m_autoTrackLinkModel.value()) return true;	
+	std::vector<int> usedChannelCounts = getUsedChannelCounts();
+	return settings.linkMode == Mixer::autoTrackLinkSettings::LinkMode::OneToOne ?
+				usedChannelCounts[index] == 1 :
+				usedChannelCounts[index] >= 1;
+	return true;
+}
+
+/*
+bool Mixer::autoLinkTrackConfigEnabled()
+{
+	auto settings =mix->getAutoLinkTrackSettings();
+}
+*/
+
+
+
+void Mixer::processAssignedTracks(std::function<void(Track * track, IntModel * model, MixerChannel * channel)> process,
+								  ProcessSortOrder sortOrder)
+{
+	TrackContainer::TrackList trackList;
+	if (sortOrder == ProcessSortOrder::SongPattern)
+	{
+	  trackList += Engine::getSong()->tracks();
+	  trackList += Engine::patternStore()->tracks();
+	}
+	else
+	{
+		trackList += Engine::patternStore()->tracks();
+		trackList += Engine::getSong()->tracks();
+	}
+
+	for (Track* track: trackList)
+	{
+		IntModel * model = getChannelModelByTrack(track);
+		MixerChannel * channel = nullptr;
+		if (model != nullptr)
+		{
+			int channelIndex = model->value();
+			if (channelIndex > 0 && channelIndex < m_mixerChannels.size() )
+			{
+				channel = mixerChannel(channelIndex);
+			}
+			process(track,model, channel);
+		}
+	}
+}
+
+std::vector<int> Mixer::getUsedChannelCounts()
+{
+	std::vector<int> used(m_mixerChannels.size(), 0);
+	processAssignedTracks([&used](Track *, IntModel * model, MixerChannel *)
+	mutable {
+		++used[model->value()];
+	});
+
+	return used;
+}
+
+
+void Mixer::swapChannels(int indexA, int indexB)
+{
+	// range check - can't move master or first channel
+	if (( indexA == indexB ) ||
+		( indexA < 1 || indexA >= m_mixerChannels.size() ) ||
+		( indexB < 1 || indexB >= m_mixerChannels.size() ))
 	{
 		return;
 	}
+
 	// channels to swap
-	int a = index - 1, b = index;
+	int a = indexA, b = indexB;
 
 	// check if m_lastSoloed is one of our swaps
 	if (m_lastSoloed == a) { m_lastSoloed = b; }
 	else if (m_lastSoloed == b) { m_lastSoloed = a; }
 
 	// go through every instrument and adjust for the channel index change
-	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
-	TrackContainer::TrackList patternTrackList = Engine::patternStore()->tracks();
-
-	TrackContainer::TrackList trackLists[] = {songTrackList, patternTrackList};
-	for(int tl=0; tl<2; ++tl)
+	processAssignedTracks( [a,b](Track *, IntModel * model, MixerChannel *)
 	{
-		TrackContainer::TrackList trackList = trackLists[tl];
-		for(int i=0; i<trackList.size(); ++i)
+		int curIndex = model->value(0);
+		if( curIndex == a )
 		{
-			if( trackList[i]->type() == Track::InstrumentTrack )
-			{
-				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
-				int val = inst->mixerChannelModel()->value(0);
-				if( val == a )
-				{
-					inst->mixerChannelModel()->setValue(b);
-				}
-				else if( val == b )
-				{
-					inst->mixerChannelModel()->setValue(a);
-				}
-			}
-			else if( trackList[i]->type() == Track::SampleTrack )
-			{
-				SampleTrack * strk = (SampleTrack *) trackList[i];
-				int val = strk->mixerChannelModel()->value(0);
-				if( val == a )
-				{
-					strk->mixerChannelModel()->setValue(b);
-				}
-				else if( val == b )
-				{
-					strk->mixerChannelModel()->setValue(a);
-				}
-			}
+			model->setValue(b);
 		}
-	}
+		else if ( curIndex == b )
+		{
+			model->setValue(a);
+		}
+	});
 
 	// Swap positions in array
-	qSwap(m_mixerChannels[index], m_mixerChannels[index - 1]);
+	qSwap(m_mixerChannels[a], m_mixerChannels[b]);
 
 	// Update m_channelIndex of both channels
-	m_mixerChannels[index]->m_channelIndex = index;
-	m_mixerChannels[index - 1]->m_channelIndex = index -1;
+	m_mixerChannels[a]->m_channelIndex = a;
+	m_mixerChannels[b]->m_channelIndex = b;
 }
 
+
+void Mixer::moveChannelLeft( int index )
+{
+	swapChannels(index - 1, index);
+}
 
 
 void Mixer::moveChannelRight( int index )
 {
-	moveChannelLeft( index + 1 );
+	swapChannels(index, index + 1 );
 }
 
 
@@ -725,6 +797,36 @@ void Mixer::clearChannel(mix_ch_t index)
 	}
 }
 
+Mixer::autoTrackLinkSettings Mixer::getAutoLinkTrackSettings()
+{
+	autoTrackLinkSettings settings = autoTrackLinkSettings();
+	auto cfg = ConfigManager::inst();
+	settings.enabled = settings.getAsBoolOrDefault(Mixer::getAutoTrackCfg(cfg,""), settings.enabled);
+	settings.autoDelete = settings.getAsBoolOrDefault(Mixer::getAutoTrackCfg(cfg,"autoDelete"), settings.autoDelete);
+	settings.autoSort = settings.getAsAutoSortOrDefault(Mixer::getAutoTrackCfg(cfg,"autoSort"), settings.autoSort);
+	settings.linkMode = settings.getAsLinkModeOrDefault(Mixer::getAutoTrackCfg(cfg,"linkMode"), settings.linkMode);
+	settings.patternEditor.autoAdd = settings.getAsAutoAddOrDefault(Mixer::getAutoTrackCfg(cfg,"pe_autoAdd"), settings.patternEditor.autoAdd);
+	settings.patternEditor.linkStyle = settings.getAsLinkStyleOrDefault(Mixer::getAutoTrackCfg(cfg,"pe_linkStyle"), settings.patternEditor.linkStyle);
+	settings.songEditor.autoAdd = settings.getAsAutoAddOrDefault(Mixer::getAutoTrackCfg(cfg,"se_autoAdd"), settings.songEditor.autoAdd);
+	settings.songEditor.linkStyle = settings.getAsLinkStyleOrDefault(Mixer::getAutoTrackCfg(cfg,"se_linkStyle"), settings.songEditor.linkStyle);
+	return settings;
+}
+
+void Mixer::saveAutoLinkTrackSettings(autoTrackLinkSettings settings)
+{
+	auto cfg = ConfigManager::inst();
+	Mixer::setAutoTrackCfg(cfg,"", settings.enabled);
+	Mixer::setAutoTrackCfg(cfg,"autoDelete", settings.autoDelete);
+	Mixer::setAutoTrackCfg(cfg,"autoSort", (int)settings.autoSort);
+	Mixer::setAutoTrackCfg(cfg,"linkMode", (int)settings.linkMode);
+	Mixer::setAutoTrackCfg(cfg,"pe_autoAdd", (int)settings.patternEditor.autoAdd);
+	Mixer::setAutoTrackCfg(cfg,"pe_linkStyle", (int)settings.patternEditor.linkStyle);
+	Mixer::setAutoTrackCfg(cfg,"se_autoAdd", (int)settings.songEditor.autoAdd);
+	Mixer::setAutoTrackCfg(cfg,"se_linkStyle", (int)settings.songEditor.linkStyle);
+	cfg->saveConfigFile();
+}
+
+
 void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	// save channels
@@ -739,6 +841,7 @@ void Mixer::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		ch->m_volumeModel.saveSettings( _doc, mixch, "volume" );
 		ch->m_muteModel.saveSettings( _doc, mixch, "muted" );
 		ch->m_soloModel.saveSettings( _doc, mixch, "soloed" );
+		ch->m_autoTrackLinkModel.saveSettings( _doc, mixch, "autoTrackLink" );
 		mixch.setAttribute( "num", i );
 		mixch.setAttribute( "name", ch->m_name );
 		if( ch->m_hasColor ) mixch.setAttribute( "color", ch->m_color.name() );
@@ -784,8 +887,11 @@ void Mixer::loadSettings( const QDomElement & _this )
 		allocateChannelsTo( num );
 
 		m_mixerChannels[num]->m_volumeModel.loadSettings( mixch, "volume" );
+
 		m_mixerChannels[num]->m_muteModel.loadSettings( mixch, "muted" );
 		m_mixerChannels[num]->m_soloModel.loadSettings( mixch, "soloed" );
+		m_mixerChannels[num]->m_autoTrackLinkModel.loadSettings( mixch, "autoTrackLink" );
+
 		m_mixerChannels[num]->m_name = mixch.attribute( "name" );
 		if( mixch.hasAttribute( "color" ) )
 		{

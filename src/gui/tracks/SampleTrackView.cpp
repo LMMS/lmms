@@ -212,29 +212,17 @@ void SampleTrackView::dropEvent(QDropEvent *de)
 }
 
 
-
-
 /*! \brief Create and assign a new mixer Channel for this track */
 void SampleTrackView::createMixerLine()
 {
-	int channelIndex = getGUI()->mixerView()->addNewChannel();
-	auto channel = Engine::mixer()->mixerChannel(channelIndex);
-
-	channel->m_name = getTrack()->name();
-	if (getTrack()->useColor()) { channel->setColor (getTrack()->color()); }
-
-	assignMixerLine(channelIndex);
+	getGUI()->mixerView()->trackMixerLineCreate(getTrack());
 }
-
-
 
 
 /*! \brief Assign a specific mixer Channel for this track */
 void SampleTrackView::assignMixerLine(int channelIndex)
 {
-	model()->mixerChannelModel()->setValue(channelIndex);
-
-	getGUI()->mixerView()->setCurrentMixerLine(channelIndex);
+	getGUI()->mixerView()->trackMixerLineAssign(getTrack(), channelIndex);
 }
 
 

@@ -37,6 +37,9 @@
 #include "Song.h"
 #include "TrackRenameLineEdit.h"
 #include "TrackView.h"
+#include "GuiApplication.h"
+#include "MixerView.h"
+#include "TrackView.h"
 
 namespace lmms::gui
 {
@@ -64,7 +67,6 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 		m_renameLineEdit->setFixedWidth( width() - 33 );
 		connect( m_renameLineEdit, SIGNAL(editingFinished()), this, SLOT(renameFinished()));
 	}
-	
 	setIconSize( QSize( 24, 24 ) );
 	connect( m_trackView->getTrack(), SIGNAL(dataChanged()), this, SLOT(update()));
 	connect( m_trackView->getTrack(), SIGNAL(nameChanged()), this, SLOT(nameChanged()));
@@ -84,7 +86,9 @@ void TrackLabelButton::rename()
 		renameDlg.exec();
 		if( txt != text() )
 		{
-			m_trackView->getTrack()->setName( txt );
+			Track * track = m_trackView->getTrack();
+			track->setName( txt );
+			getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 			Engine::getSong()->setModified();
 		}
 	}
@@ -111,7 +115,9 @@ void TrackLabelButton::renameFinished()
 			if( m_renameLineEdit->text() != m_trackView->getTrack()->name() )
 			{
 				setText( elideName( m_renameLineEdit->text() ) );
-				m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+				Track * track = m_trackView->getTrack();
+				track->setName( m_renameLineEdit->text() );
+				getGUI()->mixerView()->updateAfterTrackStyleModify(track);
 				Engine::getSong()->setModified();
 			}
 		}

@@ -43,6 +43,7 @@
 #include "TrackView.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
+#include "MixerView.h"
 
 namespace lmms
 {
@@ -166,6 +167,8 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 	int index = m_trackViews.indexOf( _tv );
 	if( index != -1 )
 	{
+		Track * t = _tv->getTrack();
+		getGUI()->mixerView()->updateBeforeTrackDelete(t);
 		m_trackViews.removeAt( index );
 
 		disconnect( _tv );
@@ -203,6 +206,7 @@ void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 	m_tc->m_tracks.insert( indexTo, track );
 	m_trackViews.move( indexFrom, indexTo );
 
+	getGUI()->mixerView()->updateAfterTrackMove(track);
 	realignTracks();
 }
 
@@ -404,6 +408,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 								m_tc ) );
 		InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
 					this, it, value );
+		getGUI()->mixerView()->updateAfterTrackAdd(it, value);
 		ilt->start();
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
@@ -418,6 +423,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		PluginFactory::PluginInfoAndKey piakn =
 			getPluginFactory()->pluginSupportingExtension(FileItem::extension(value));
 		Instrument * i = it->loadInstrument(piakn.info.name(), &piakn.key);
+		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
@@ -430,6 +436,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 								m_tc ) );
 		it->setSimpleSerializing();
 		it->loadSettings( dataFile.content().toElement() );
+		getGUI()->mixerView()->updateAfterTrackAdd(it);
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
