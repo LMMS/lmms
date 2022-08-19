@@ -125,9 +125,10 @@ const std::set<const char*, Lv2Manager::CmpStr> Lv2Manager::pluginBlacklist =
 	"urn:juce:TalFilter2",
 	"urn:juce:Vex",
 	"http://zynaddsubfx.sourceforge.net",
+	"http://geontime.com/geonkick/single",
 
 	// unstable
-	"urn:juced:DrumSynth",
+	"urn:juced:DrumSynth"
 };
 
 
