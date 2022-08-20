@@ -109,7 +109,8 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
-		ModeEditKnife
+		ModeEditKnife,
+		ModeBulldozer
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -175,7 +176,11 @@ protected:
 	void focusOutEvent( QFocusEvent * ) override;
 	void focusInEvent( QFocusEvent * ) override;
 
+	TimePos getTicks(int x) const;
 	int getKey( int y ) const;
+	int xCoordOfTick(const TimePos& tick) const;
+	int yCoordOfKey(int key) const;
+
 	void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
 					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
@@ -247,13 +252,17 @@ signals:
 private:
 	enum Actions
 	{
-		ActionNone,
-		ActionMoveNote,
-		ActionResizeNote,
-		ActionSelectNotes,
-		ActionChangeNoteProperty,
-		ActionResizeNoteEditArea,
-		ActionKnife
+		ActionNone                          = 0,
+		ActionMoveNote                      = 1 << 0,
+		ActionBulldozerMove                 = 1 << 1,
+		ActionResizeNote                    = 1 << 2,
+		ActionBulldozerResize               = 1 << 3,
+		ActionSelectNotes                   = 1 << 4,
+		ActionChangeNoteProperty            = 1 << 5,
+		ActionResizeNoteEditArea            = 1 << 6,
+		ActionMoveAny = ActionMoveNote | ActionBulldozerMove,
+		ActionResizeAny = ActionResizeNote | ActionBulldozerResize,
+		ActionMoveOrResize = ActionMoveAny | ActionResizeAny
 	};
 
 	enum NoteEditMode
@@ -316,9 +325,6 @@ private:
 	void playChordNotes(int key, int velocity=-1);
 	void pauseChordNotes(int key);
 
-	void setKnifeAction();
-	void cancelKnifeAction();
-
 	void updateScrollbars();
 	void updatePositionLineHeight();
 
@@ -335,13 +341,6 @@ private:
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
-
-	static QPixmap * s_toolDraw;
-	static QPixmap * s_toolErase;
-	static QPixmap * s_toolSelect;
-	static QPixmap * s_toolMove;
-	static QPixmap * s_toolOpen;
-	static QPixmap* s_toolKnife;
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -385,10 +384,7 @@ private:
 	int m_selectedKeys;
 
 	// boundary box around all selected notes when dragging
-	int m_moveBoundaryLeft;
-	int m_moveBoundaryTop;
-	int m_moveBoundaryRight;
-	int m_moveBoundaryBottom;
+	NoteBounds m_moveBoundary;
 
 	// remember where the scrolling started when dragging so that
 	// we can handle dragging while scrolling with arrow keys
@@ -440,6 +436,7 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
+	bool isHoveringResize(Note* note);
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
@@ -494,6 +491,7 @@ private:
 	QBrush m_blackKeyDisabledBackground;
 
 signals:
+	void editModeChanged(int);
 	void positionChanged( const lmms::TimePos & );
 } ;
 

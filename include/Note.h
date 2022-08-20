@@ -159,6 +159,11 @@ public:
 		return m_oldLength;
 	}
 
+	inline TimePos oldEndPos() const
+	{
+		return m_oldPos + m_oldLength;
+	}
+
 	inline bool isPlaying() const
 	{
 		return m_isPlaying;
