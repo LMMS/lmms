@@ -48,6 +48,7 @@
 #include "Oscilloscope.h"
 #include "PianoRoll.h"
 #include "PositionLine.h"
+#include "ProjectJournal.h"
 #include "SubWindow.h"
 #include "TextFloat.h"
 #include "TimeDisplayWidget.h"
@@ -508,6 +509,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace )
 	{
+		auto batchAction = Engine::projectJournal()->beginBatchAction();
 		QVector<selectableObject *> so = selectedObjects();
 		for( QVector<selectableObject *>::iterator it = so.begin();
 				it != so.end(); ++it )

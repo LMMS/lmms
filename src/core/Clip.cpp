@@ -60,6 +60,8 @@ Clip::Clip( Track * track ) :
 	movePosition( 0 );
 	changeLength( 0 );
 	setJournalling( true );
+
+	connect(&m_mutedModel, &Model::dataChanged, this, &Model::dataChanged);
 }
 
 

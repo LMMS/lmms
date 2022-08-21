@@ -43,6 +43,7 @@
 #include "MidiClip.h"
 #include "MidiClipView.h"
 #include "Note.h"
+#include "ProjectJournal.h"
 #include "SampleClip.h"
 #include "Song.h"
 #include "SongEditor.h"
@@ -88,7 +89,6 @@ ClipView::ClipView( Clip * clip,
 	m_action( NoAction ),
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
-	m_initialOffsets( QVector<TimePos>() ),
 	m_hint( nullptr ),
 	m_mutedColor( 0, 0, 0 ),
 	m_mutedBackgroundColor( 0, 0, 0 ),
@@ -373,27 +373,13 @@ void ClipView::resetColor()
  */
 void ClipView::setColor(const QColor* color)
 {
-	std::set<Track*> journaledTracks;
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 
-	auto selectedClips = getClickedClips();
-	for (auto clipv: selectedClips)
+	const auto selection = getClickedClips();
+	for (ClipView* clipv: selection)
 	{
 		auto clip = clipv->getClip();
-		auto track = clip->getTrack();
-
-		// TODO journal whole Song or group of clips instead of one journal entry for each track
-
-		// If only one clip changed, store that in the journal
-		if (selectedClips.length() == 1)
-		{
-			clip->addJournalCheckPoint();
-		}
-		// If multiple clips changed, store whole Track in the journal
-		// Check if track has been journaled already by trying to add it to the set
-		else if (journaledTracks.insert(track).second)
-		{
-			track->addJournalCheckPoint();
-		}
+		clip->addJournalCheckPoint();
 
 		if (color)
 		{
@@ -406,7 +392,6 @@ void ClipView::setColor(const QColor* color)
 		}
 		clipv->update();
 	}
-
 	Engine::getSong()->setModified();
 }
 
@@ -624,14 +609,24 @@ void ClipView::paintTextLabel(QString const & text, QPainter & painter)
  */
 void ClipView::mousePressEvent( QMouseEvent * me )
 {
-	// Right now, active is only used on right/mid clicks actions, so we use a ternary operator
-	// to avoid the overhead of calling getClickedClips when it's not used
-	auto active = me->button() == Qt::LeftButton
-		? QVector<ClipView *>()
-		: getClickedClips();
+	// If a button is clicked *during* a split, cancel it
+	if (m_action == Split)
+	{
+		m_action = NoAction;
+		if (dynamic_cast<SampleClip*>(m_clip))
+		{
+			setMarkerEnabled(false);
+			update();
+		}
+		return;
+	}
+	// Ignore clicks when another button is being held
+	else if (m_action != NoAction)
+	{
+		return;
+	}
 
 	setInitialPos( me->pos() );
-	setInitialOffsets();
 	if( !fixedClips() && me->button() == Qt::LeftButton )
 	{
 		SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
@@ -639,35 +634,26 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 
 		if ( me->modifiers() & Qt::ControlModifier && !(sClip && knifeMode) )
 		{
-			if( isSelected() )
-			{
-				m_action = CopySelection;
-			}
-			else
-			{
-				m_action = ToggleSelected;
-			}
+			m_action = CopyOrToggleSelect;
 		}
 		else
 		{
 			if( isSelected() )
 			{
 				m_action = MoveSelection;
+				setInitialOffsets();
+
+				auto batchAction = Engine::projectJournal()->beginBatchAction();
+				const auto selection = getClickedClips();
+				for (ClipView* cv: selection)
+				{
+					cv->getClip()->addJournalCheckPoint();
+				}
 			}
 			else
 			{
 				getGUI()->songEditor()->m_editor->selectAllClips( false );
 				m_clip->addJournalCheckPoint();
-
-				// Move, Resize and ResizeLeft
-				// Split action doesn't disable Clip journalling
-				if (m_action == Move || m_action == Resize || m_action == ResizeLeft)
-				{
-					m_clip->setJournalling(false);
-				}
-
-				setInitialPos( me->pos() );
-				setInitialOffsets();
 
 				if( m_clip->getAutoResize() )
 				{	// Always move clips that can't be manually resized
@@ -698,32 +684,13 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 					setCursor( Qt::SizeAllCursor );
 				}
 
-				if( m_action == Move )
+				if (m_action == Move || m_action == Resize || m_action == ResizeLeft)
 				{
-					s_textFloat->setTitle( tr( "Current position" ) );
-					s_textFloat->setText( QString( "%1:%2" ).
-						arg( m_clip->startPosition().getBar() + 1 ).
-						arg( m_clip->startPosition().getTicks() %
-								TimePos::ticksPerBar() ) );
+					s_textFloat->setTitle(m_action == Move ? tr("Current position") : tr("Current length"));
+					s_textFloat->show();
+					// Let mouseMoveEvent set the correct textFloat numbers
+					mouseMoveEvent(me);
 				}
-				else if( m_action == Resize || m_action == ResizeLeft )
-				{
-					s_textFloat->setTitle( tr( "Current length" ) );
-					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
-							arg( m_clip->length().getBar() ).
-							arg( m_clip->length().getTicks() %
-									TimePos::ticksPerBar() ).
-							arg( m_clip->startPosition().getBar() + 1 ).
-							arg( m_clip->startPosition().getTicks() %
-									TimePos::ticksPerBar() ).
-							arg( m_clip->endPosition().getBar() + 1 ).
-							arg( m_clip->endPosition().getTicks() %
-									TimePos::ticksPerBar() ) );
-				}
-				// s_textFloat->reparent( this );
-				// setup text-float as if Clip was already moved/resized
-				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
-				if ( m_action != Split) { s_textFloat->show(); }
 			}
 
 			delete m_hint;
@@ -738,32 +705,22 @@ void ClipView::mousePressEvent( QMouseEvent * me )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMute( active );
+			toggleMute(getClickedClips());
 		}
 		else if( me->modifiers() & Qt::ShiftModifier && !fixedClips() )
 		{
-			remove( active );
-		}
-		if (m_action == Split)
-		{
-			m_action = NoAction;
-			SampleClip * sClip = dynamic_cast<SampleClip*>( m_clip );
-			if (sClip)
-			{
-				setMarkerEnabled( false );
-				update();
-			}
+			remove(getClickedClips());
 		}
 	}
 	else if( me->button() == Qt::MiddleButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
-			toggleMute( active );
+			toggleMute(getClickedClips());
 		}
 		else if( !fixedClips() )
 		{
-			remove( active );
+			remove(getClickedClips());
 		}
 	}
 }
@@ -786,31 +743,10 @@ void ClipView::mousePressEvent( QMouseEvent * me )
  */
 void ClipView::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_action == CopySelection || m_action == ToggleSelected )
+	if (m_action == CopyOrToggleSelect && mouseMovedDistance(me, 2))
 	{
-		if( mouseMovedDistance( me, 2 ) == true )
-		{
-			QVector<ClipView *> clipViews;
-			if( m_action == CopySelection )
-			{
-				// Collect all selected Clips
-				QVector<selectableObject *> so =
-					m_trackView->trackContainerView()->selectedObjects();
-				for( auto it = so.begin(); it != so.end(); ++it )
-				{
-					ClipView * clipv =
-						dynamic_cast<ClipView *>( *it );
-					if( clipv != nullptr )
-					{
-						clipViews.push_back( clipv );
-					}
-				}
-			}
-			else
-			{
-				getGUI()->songEditor()->m_editor->selectAllClips( false );
-				clipViews.push_back( this );
-			}
+			auto clipViews = getClickedClips();
+
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
 			m_action = NoAction;
@@ -826,7 +762,6 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 			new StringPairDrag( QString( "clip_%1" ).arg(
 								m_clip->getTrack()->type() ),
 								dataFile.toString(), thumbnail, this );
-		}
 	}
 
 	if( me->modifiers() & Qt::ControlModifier )
@@ -851,33 +786,22 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == MoveSelection )
 	{
-		// 1: Find the position we want to move the grabbed Clip to
-		TimePos newPos = draggedClipPos( me );
+		const auto selection = getClickedClips();
+		TimePos newPos = draggedClipPos(me);
 
-		// 2: Handle moving the other selected Clips the same distance
-		QVector<selectableObject *> so =
-			m_trackView->trackContainerView()->selectedObjects();
-		QVector<Clip *> clips; // List of selected clips
-		int leftmost = 0; // Leftmost clip's offset from grabbed clip
-		// Populate clips, find leftmost
-		for( QVector<selectableObject *>::iterator it = so.begin();
-							it != so.end(); ++it )
+		// Find position of the leftmost selected clip
+		// (The values are stored as offsets relative to the clicked clip)
+		TimePos leftmost;
+		for (int i = 0; i < selection.size(); i++)
 		{
-			ClipView* clipv =
-				dynamic_cast<ClipView *>( *it );
-			if( clipv == nullptr ) { continue; }
-			clips.push_back( clipv->m_clip );
-			int index = std::distance( so.begin(), it );
-			leftmost = std::min(leftmost, m_initialOffsets[index].getTicks());
+			leftmost = std::min(leftmost, m_initialOffsets.at(i));
 		}
 		// Make sure the leftmost clip doesn't get moved to a negative position
 		if ( newPos.getTicks() + leftmost < 0 ) { newPos = -leftmost; }
 
-		for( QVector<Clip *>::iterator it = clips.begin();
-							it != clips.end(); ++it )
+		for (int i = 0; i < selection.size(); i++)
 		{
-			int index = std::distance( clips.begin(), it );
-			( *it )->movePosition( newPos + m_initialOffsets[index] );
+			selection.at(i)->getClip()->movePosition(newPos + m_initialOffsets.at(i));
 		}
 	}
 	else if( m_action == Resize || m_action == ResizeLeft )
@@ -991,26 +915,15 @@ void ClipView::mouseMoveEvent( QMouseEvent * me )
 
 /*! \brief Handle a mouse release on this ClipView.
  *
- *  If we're in move or resize mode, journal the change as appropriate.
- *  Then tidy up.
- *
  * \param me The QMouseEvent to handle.
  */
 void ClipView::mouseReleaseEvent( QMouseEvent * me )
 {
-	// If the CopySelection was chosen as the action due to mouse movement,
-	// it will have been cleared.  At this point Toggle is the desired action.
-	// An active StringPairDrag will prevent this method from being called,
-	// so a real CopySelection would not have occurred.
-	if( m_action == CopySelection ||
-	    ( m_action == ToggleSelected && mouseMovedDistance( me, 2 ) == false ) )
+	if (m_action == CopyOrToggleSelect)
 	{
+		// If we get here it means the user simply clicked without dragging, because that would have
+		// been caught in mouseMoveEvent and m_action would be NoAction as a result
 		setSelected( !isSelected() );
-	}
-	else if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
-	{
-		// TODO: Fix m_clip->setJournalling() consistency
-		m_clip->setJournalling( true );
 	}
 	else if( m_action == Split )
 	{
@@ -1172,6 +1085,7 @@ QVector<ClipView *> ClipView::getClickedClips()
 
 void ClipView::remove( QVector<ClipView *> clipvs )
 {
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	for( auto clipv: clipvs )
 	{
 		// No need to check if it's nullptr because we check when building the QVector
@@ -1220,6 +1134,7 @@ void ClipView::paste()
 
 void ClipView::toggleMute( QVector<ClipView *> clipvs )
 {
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	for( auto clipv: clipvs )
 	{
 		// No need to check for nullptr because we check while building the clipvs QVector
@@ -1334,24 +1249,17 @@ float ClipView::pixelsPerBar()
 }
 
 
-/*! \brief Save the offsets between all selected tracks and a clicked track */
+
+
+/*! \brief Save the offsets between all selected clips on all tracks and the clicked clip */
 void ClipView::setInitialOffsets()
 {
-	QVector<selectableObject *> so = m_trackView->trackContainerView()->selectedObjects();
-	QVector<TimePos> offsets;
-	for( QVector<selectableObject *>::iterator it = so.begin();
-						it != so.end(); ++it )
+	m_initialOffsets.clear();
+	const auto selection = getClickedClips();
+	for (ClipView* clipv: selection)
 	{
-		ClipView * clipv =
-			dynamic_cast<ClipView *>( *it );
-		if( clipv == nullptr )
-		{
-			continue;
-		}
-		offsets.push_back( clipv->m_clip->startPosition() - m_initialClipPos );
+		m_initialOffsets.push_back(clipv->m_clip->startPosition() - m_initialClipPos);
 	}
-
-	m_initialOffsets = offsets;
 }
 
 

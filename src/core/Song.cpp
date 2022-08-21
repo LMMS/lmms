@@ -779,10 +779,10 @@ void Song::stopExport()
 
 void Song::insertBar()
 {
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
-		// FIXME journal batch of tracks instead of each track individually
 		if (track->numOfClips() > 0) { track->addJournalCheckPoint(); }
 		track->insertBar(m_playPos[Mode_PlaySong]);
 	}
@@ -794,10 +794,10 @@ void Song::insertBar()
 
 void Song::removeBar()
 {
+	auto batchAction = Engine::projectJournal()->beginBatchAction();
 	m_tracksMutex.lockForRead();
 	for (Track* track: tracks())
 	{
-		// FIXME journal batch of tracks instead of each track individually
 		if (track->numOfClips() > 0) { track->addJournalCheckPoint(); }
 		track->removeBar(m_playPos[Mode_PlaySong]);
 	}

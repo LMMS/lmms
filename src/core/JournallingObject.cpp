@@ -73,7 +73,7 @@ QDomElement JournallingObject::saveState( QDomDocument & _doc,
 	{
 		QDomElement _this = SerializingObject::saveState( _doc, _parent );
 
-		QDomElement journalNode = _doc.createElement( "journallingObject" );
+		QDomElement journalNode = _doc.createElement("journal");
 		journalNode.setAttribute( "id", id() );
 		journalNode.setAttribute( "metadata", true );
 		_this.appendChild( journalNode );
