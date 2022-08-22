@@ -889,7 +889,7 @@ gui::PluginView * Sf2Instrument::instantiateView( QWidget * _parent )
 namespace gui
 {
 
-
+/*
 class Sf2Knob : public Knob
 {
 public:
@@ -900,7 +900,7 @@ public:
 	}
 };
 
-
+*/
 
 Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
@@ -968,7 +968,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 //	vl->addLayout( hl );
 
 	// Gain
-	m_gainKnob = new Sf2Knob( this );
+	m_gainKnob = new Knob( knobDark_28, this );
 	m_gainKnob->setHintText( tr("Gain:"), "" );
 	m_gainKnob->move( 86, 55 );
 //	vl->addWidget( m_gainKnob );
@@ -985,19 +985,19 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbButton->setToolTip(tr("Apply reverb (if supported)"));
 
 
-	m_reverbRoomSizeKnob = new Sf2Knob( this );
+	m_reverbRoomSizeKnob = new Knob( knobDark_28, this );
 	m_reverbRoomSizeKnob->setHintText( tr("Room size:"), "" );
 	m_reverbRoomSizeKnob->move( 93, 160 );
 
-	m_reverbDampingKnob = new Sf2Knob( this );
+	m_reverbDampingKnob = new Knob( knobDark_28, this );
 	m_reverbDampingKnob->setHintText( tr("Damping:"), "" );
 	m_reverbDampingKnob->move( 130, 160 );
 
-	m_reverbWidthKnob = new Sf2Knob( this );
+	m_reverbWidthKnob = new Knob( knobDark_28, this );
 	m_reverbWidthKnob->setHintText( tr("Width:"), "" );
 	m_reverbWidthKnob->move( 167, 160 );
 
-	m_reverbLevelKnob = new Sf2Knob( this );
+	m_reverbLevelKnob = new Knob( knobDark_28, this );
 	m_reverbLevelKnob->setHintText( tr("Level:"), "" );
 	m_reverbLevelKnob->move( 204, 160 );
 
@@ -1020,19 +1020,19 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
 	m_chorusButton->setToolTip(tr("Apply chorus (if supported)"));
 
-	m_chorusNumKnob = new Sf2Knob( this );
+	m_chorusNumKnob = new Knob( knobDark_28, this );
 	m_chorusNumKnob->setHintText( tr("Voices:"), "" );
 	m_chorusNumKnob->move( 93, 206 );
 
-	m_chorusLevelKnob = new Sf2Knob( this );
+	m_chorusLevelKnob = new Knob( knobDark_28, this );
 	m_chorusLevelKnob->setHintText( tr("Level:"), "" );
 	m_chorusLevelKnob->move( 130 , 206 );
 
-	m_chorusSpeedKnob = new Sf2Knob( this );
+	m_chorusSpeedKnob = new Knob( knobDark_28, this );
 	m_chorusSpeedKnob->setHintText( tr("Speed:"), "" );
 	m_chorusSpeedKnob->move( 167 , 206 );
 
-	m_chorusDepthKnob = new Sf2Knob( this );
+	m_chorusDepthKnob = new Knob( knobDark_28, this );
 	m_chorusDepthKnob->setHintText( tr("Depth:"), "" );
 	m_chorusDepthKnob->move( 204 , 206 );
 /*
