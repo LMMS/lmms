@@ -889,24 +889,9 @@ gui::PluginView * Sf2Instrument::instantiateView( QWidget * _parent )
 namespace gui
 {
 
-/*
-class Sf2Knob : public Knob
-{
-public:
-	Sf2Knob( QWidget * _parent ) :
-			Knob( knobStyled, _parent )
-	{
-		setFixedSize( 31, 38 );
-	}
-};
-
-*/
-
 Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _parent ) :
 	InstrumentViewFixedSize( _instrument, _parent )
 {
-//	QVBoxLayout * vl = new QVBoxLayout( this );
-//	QHBoxLayout * hl = new QHBoxLayout();
 
 	Sf2Instrument* k = castModel<Sf2Instrument>();
 
