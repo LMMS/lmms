@@ -3462,11 +3462,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		if (m_action == ActionBulldozerMove || m_action == ActionBulldozerResize)
 		{
 			p.setPen(QPen(m_knifeCutLineColor, 1));
-			int x = xCoordOfTick(m_moveBoundary.start);
+			int x = xCoordOfTick(m_action == ActionBulldozerMove ? m_currentNote->pos() : m_moveBoundary.start);
 			p.drawLine(x, keyAreaTop(), x, keyAreaBottom() - keyAreaTop());
 			if (m_action == ActionBulldozerResize)
 			{
-				x = xCoordOfTick(m_moveBoundary.end);
+				// Find new end position of last note
+				x = xCoordOfTick(boundsForNotes(getSelectedNotes()).value().end);
 				p.drawLine(x, keyAreaTop(), x, keyAreaBottom() - keyAreaTop());
 			}
 		}
