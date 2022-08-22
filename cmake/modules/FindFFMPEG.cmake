@@ -44,7 +44,7 @@ The following cache variables may also be set:
 
 #]=======================================================================]
 
-find_package(PkgConfig)
+find_package(PkgConfig QUIET)
 set(_possibleComponents avcodec avformat avutil avfilter avdevice swresample swscale)
 
 foreach(component ${FFMPEG_FIND_COMPONENTS})
