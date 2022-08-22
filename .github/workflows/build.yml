@@ -185,6 +185,7 @@ jobs:
             --disable-programs \
             --disable-doc
           make && make install
+        shell: bash
       - name: Configure
         run: |
           mkdir build && cd build
