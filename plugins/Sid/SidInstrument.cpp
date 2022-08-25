@@ -227,7 +227,7 @@ f_cnt_t SidInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = Engine::audioEngine()->processingSampleRate();
 	int maxrel = 0;
-	for (auto voice : m_voice)
+	for (auto& voice : m_voice)
 	{
 		if( maxrel < voice->m_releaseModel.value() )
 			maxrel = (int)voice->m_releaseModel.value();

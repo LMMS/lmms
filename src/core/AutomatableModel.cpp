@@ -732,7 +732,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		// of those clips:
 		// find the clips which overlap with the time position
 		QVector<AutomationClip *> clipsInRange;
-		for (auto clip : clips)
+		for (auto& clip : clips)
 		{
 			int s = clip->startPosition();
 			int e = clip->endPosition();
@@ -752,7 +752,7 @@ float AutomatableModel::globalAutomationValueAt( const TimePos& time )
 		{
 			int latestPosition = 0;
 
-			for (auto clip : clips)
+			for (auto& clip : clips)
 			{
 				int e = clip->endPosition();
 				if (e <= time && e > latestPosition)

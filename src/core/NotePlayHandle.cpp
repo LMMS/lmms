@@ -457,7 +457,7 @@ int NotePlayHandle::index() const
 {
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	int idx = 0;
-	for (auto playHandle : playHandles)
+	for (auto& playHandle : playHandles)
 	{
 		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle*>(playHandle);
 		if( nph == nullptr || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
@@ -481,7 +481,7 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 	const PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	ConstNotePlayHandleList cnphv;
 
-	for (auto playHandle : playHandles)
+	for (auto& playHandle : playHandles)
 	{
 		const NotePlayHandle* nph = dynamic_cast<const NotePlayHandle *>(playHandle);
 		if( nph != nullptr && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )

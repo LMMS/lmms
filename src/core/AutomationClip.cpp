@@ -893,12 +893,12 @@ bool AutomationClip::isAutomated( const AutomatableModel * _m )
 	l += Engine::patternStore()->tracks();
 	l += Engine::getSong()->globalAutomationTrack();
 
-	for (auto track : l)
+	for (auto& track : l)
 	{
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
 		{
 			const Track::clipVector& v = track->getClips();
-			for (auto clip : v)
+			for (auto& clip : v)
 			{
 				const AutomationClip* a = dynamic_cast<const AutomationClip*>(clip);
 				if( a && a->hasAutomation() )
@@ -931,7 +931,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 	tracks += Engine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
-	for (auto track : tracks)
+	for (auto& track : tracks)
 	{
 		// we want only automation tracks...
 		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack )
@@ -939,7 +939,7 @@ QVector<AutomationClip *> AutomationClip::clipsForModel( const AutomatableModel 
 			// get clips in those tracks....
 			const Track::clipVector& trackClips = track->getClips();
 			// go through all the clips...
-			for (auto trackClip : trackClips)
+			for (auto& trackClip : trackClips)
 			{
 				AutomationClip* a = dynamic_cast<AutomationClip*>(trackClip);
 				// check that the clip has automation
@@ -971,7 +971,7 @@ AutomationClip * AutomationClip::globalAutomationClip(
 {
 	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
 	Track::clipVector v = t->getClips();
-	for (auto clip : v)
+	for (auto& clip : v)
 	{
 		AutomationClip* a = dynamic_cast<AutomationClip*>(clip);
 		if( a )
