@@ -422,7 +422,7 @@ OrganicInstrumentView::OrganicInstrumentView( Instrument * _instrument,
 	InstrumentViewFixedSize( _instrument, _parent ),
 	m_oscKnobs( nullptr )
 {
-	auto* oi = castModel<OrganicInstrument>();
+	OrganicInstrument * oi = castModel<OrganicInstrument>();
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -474,8 +474,8 @@ OrganicInstrumentView::~OrganicInstrumentView()
 
 void OrganicInstrumentView::modelChanged()
 {
-	auto* oi = castModel<OrganicInstrument>();
-
+	OrganicInstrument * oi = castModel<OrganicInstrument>();
+	
 	const float y=91.0f;
 	const float rowHeight = 26.0f;
 	const float x=53.0f;
@@ -547,7 +547,7 @@ void OrganicInstrumentView::modelChanged()
 
 void OrganicInstrumentView::updateKnobHint()
 {
-	auto* oi = castModel<OrganicInstrument>();
+	OrganicInstrument * oi = castModel<OrganicInstrument>();
 	for( int i = 0; i < m_numOscillators; ++i )
 	{
 		const float harm = oi->m_osc[i]->m_harmModel.value();

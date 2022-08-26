@@ -126,7 +126,7 @@ void consoleMessageHandler(QtMsgType type,
 inline void loadTranslation( const QString & tname,
 	const QString & dir = lmms::ConfigManager::inst()->localeDir() )
 {
-	auto* t = new QTranslator(QCoreApplication::instance());
+	QTranslator * t = new QTranslator( QCoreApplication::instance() );
 	QString name = tname + ".qm";
 
 	if (t->load(name, dir))
@@ -829,12 +829,12 @@ int main( int argc, char * * argv )
 		}
 
 		// create renderer
-		auto* r = new RenderManager(qs, os, eff, renderOut);
+		RenderManager * r = new RenderManager( qs, os, eff, renderOut );
 		QCoreApplication::instance()->connect( r,
 				SIGNAL(finished()), SLOT(quit()));
 
 		// timer for progress-updates
-		auto* t = new QTimer(r);
+		QTimer * t = new QTimer( r );
 		r->connect( t, SIGNAL(timeout()),
 				SLOT(updateConsoleProgress()));
 		t->start( 200 );

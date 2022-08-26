@@ -311,7 +311,7 @@ void LadspaEffect::pluginInstantiation()
 		multi_proc_t ports;
 		for( int port = 0; port < m_portCount; port++ )
 		{
-			auto* p = new port_desc_t;
+			port_desc_t * p = new port_desc_t;
 
 			p->name = manager->getPortName( m_key, port );
 			p->proc = proc;

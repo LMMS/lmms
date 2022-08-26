@@ -148,7 +148,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 	{
 		selectSample( _n );
 	}
-	auto* hdata = (handle_data*)_n->m_pluginData;
+	handle_data * hdata = (handle_data *)_n->m_pluginData;
 
 	float play_freq = hdata->tuned ? _n->frequency() :
 						hdata->sample->frequency();
@@ -171,7 +171,7 @@ void PatmanInstrument::playNote( NotePlayHandle * _n,
 
 void PatmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	auto* hdata = (handle_data*)_n->m_pluginData;
+	handle_data * hdata = (handle_data *)_n->m_pluginData;
 	sharedObject::unref( hdata->sample );
 	delete hdata->state;
 	delete hdata;
@@ -347,7 +347,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto* data = new sampleFrame[frames];
+		sampleFrame * data = new sampleFrame[frames];
 
 		for( f_cnt_t frame = 0; frame < frames; ++frame )
 		{
@@ -358,7 +358,7 @@ PatmanInstrument::LoadErrors PatmanInstrument::loadPatch(
 			}
 		}
 
-		auto* psample = new SampleBuffer(data, frames);
+		SampleBuffer* psample = new SampleBuffer( data, frames );
 		psample->setFrequency( root_freq / 1000.0f );
 		psample->setSampleRate( sample_rate );
 
@@ -412,7 +412,7 @@ void PatmanInstrument::selectSample( NotePlayHandle * _n )
 		}
 	}
 
-	auto* hdata = new handle_data;
+	handle_data * hdata = new handle_data;
 	hdata->tuned = m_tunedModel.value();
 	if( sample )
 	{

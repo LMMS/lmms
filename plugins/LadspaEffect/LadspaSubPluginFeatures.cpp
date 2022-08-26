@@ -63,65 +63,65 @@ void LadspaSubPluginFeatures::fillDescriptionWidget( QWidget * _parent,
 	const ladspa_key_t & lkey = subPluginKeyToLadspaKey( _key );
 	Ladspa2LMMS * lm = Engine::getLADSPAManager();
 
-	auto* label = new QLabel(_parent);
+	QLabel * label = new QLabel( _parent );
 	label->setText( QWidget::tr( "Name: " ) + lm->getName( lkey ) );
 
-	auto* fileInfo = new QLabel(_parent);
+	QLabel* fileInfo = new QLabel( _parent );
 	fileInfo->setText( QWidget::tr( "File: %1" ).arg( lkey.first ) );
 
-	auto* maker = new QWidget(_parent);
-	auto* l = new QHBoxLayout(maker);
+	QWidget * maker = new QWidget( _parent );
+	QHBoxLayout * l = new QHBoxLayout( maker );
 	l->setMargin( 0 );
 	l->setSpacing( 0 );
 
-	auto* maker_label = new QLabel(maker);
+	QLabel * maker_label = new QLabel( maker );
 	maker_label->setText( QWidget::tr( "Maker: " ) );
 	maker_label->setAlignment( Qt::AlignTop );
-	auto* maker_content = new QLabel(maker);
+	QLabel * maker_content = new QLabel( maker );
 	maker_content->setText( lm->getMaker( lkey ) );
 	maker_content->setWordWrap( true );
 	l->addWidget( maker_label );
 	l->addWidget( maker_content, 1 );
 
-	auto* copyright = new QWidget(_parent);
+	QWidget * copyright = new QWidget( _parent );
 	l = new QHBoxLayout( copyright );
 	l->setMargin( 0 );
 	l->setSpacing( 0 );
 
 	copyright->setMinimumWidth( _parent->minimumWidth() );
-	auto* copyright_label = new QLabel(copyright);
+	QLabel * copyright_label = new QLabel( copyright );
 	copyright_label->setText( QWidget::tr( "Copyright: " ) );
 	copyright_label->setAlignment( Qt::AlignTop );
 
-	auto* copyright_content = new QLabel(copyright);
+	QLabel * copyright_content = new QLabel( copyright );
 	copyright_content->setText( lm->getCopyright( lkey ) );
 	copyright_content->setWordWrap( true );
 	l->addWidget( copyright_label );
 	l->addWidget( copyright_content, 1 );
 
-	auto* requiresRealTime = new QLabel(_parent);
+	QLabel * requiresRealTime = new QLabel( _parent );
 	requiresRealTime->setText( QWidget::tr( "Requires Real Time: " ) +
 					( lm->hasRealTimeDependency( lkey ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
 
-	auto* realTimeCapable = new QLabel(_parent);
+	QLabel * realTimeCapable = new QLabel( _parent );
 	realTimeCapable->setText( QWidget::tr( "Real Time Capable: " ) +
 					( lm->isRealTimeCapable( lkey ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
 
-	auto* inplaceBroken = new QLabel(_parent);
+	QLabel * inplaceBroken = new QLabel( _parent );
 	inplaceBroken->setText( QWidget::tr( "In Place Broken: " ) +
 					( lm->isInplaceBroken( lkey ) ?
 							QWidget::tr( "Yes" ) :
 							QWidget::tr( "No" ) ) );
-
-	auto* channelsIn = new QLabel(_parent);
+	
+	QLabel * channelsIn = new QLabel( _parent );
 	channelsIn->setText( QWidget::tr( "Channels In: " ) +
 		QString::number( lm->getDescription( lkey )->inputChannels ) );
 
-	auto* channelsOut = new QLabel(_parent);
+	QLabel * channelsOut = new QLabel( _parent );
 	channelsOut->setText( QWidget::tr( "Channels Out: " ) +
 		QString::number( lm->getDescription( lkey )->outputChannels ) );	
 }

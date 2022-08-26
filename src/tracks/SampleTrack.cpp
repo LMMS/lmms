@@ -102,7 +102,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 		for( int i = 0; i < numOfClips(); ++i )
 		{
 			Clip * clip = getClip( i );
-			auto* sClip = dynamic_cast<SampleClip*>(clip);
+			SampleClip * sClip = dynamic_cast<SampleClip*>( clip );
 
 			if( _start >= sClip->startPosition() && _start < sClip->endPosition() )
 			{
@@ -137,7 +137,7 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 
 	for( clipVector::Iterator it = clips.begin(); it != clips.end(); ++it )
 	{
-		auto* st = dynamic_cast<SampleClip*>(*it);
+		SampleClip * st = dynamic_cast<SampleClip *>( *it );
 		if( !st->isMuted() )
 		{
 			PlayHandle* handle;
@@ -147,12 +147,12 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 				{
 					return played_a_note;
 				}
-				auto* smpHandle = new SampleRecordHandle(st);
+				SampleRecordHandle* smpHandle = new SampleRecordHandle( st );
 				handle = smpHandle;
 			}
 			else
 			{
-				auto* smpHandle = new SamplePlayHandle(st);
+				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
 				smpHandle->setPatternTrack(pattern_track);
 				handle = smpHandle;
@@ -180,7 +180,7 @@ gui::TrackView * SampleTrack::createView( gui::TrackContainerView* tcv )
 
 Clip * SampleTrack::createClip(const TimePos & pos)
 {
-	auto* sClip = new SampleClip(this);
+	SampleClip * sClip = new SampleClip(this);
 	sClip->movePosition(pos);
 	return sClip;
 }
@@ -241,7 +241,7 @@ void SampleTrack::setPlayingClips( bool isPlaying )
 	for( int i = 0; i < numOfClips(); ++i )
 	{
 		Clip * clip = getClip( i );
-		auto* sClip = dynamic_cast<SampleClip*>(clip);
+		SampleClip * sClip = dynamic_cast<SampleClip*>( clip );
 		sClip->setIsPlaying( isPlaying );
 	}
 }

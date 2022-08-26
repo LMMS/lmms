@@ -146,7 +146,8 @@ public:
 
 	static void * messageLoop( void * _arg )
 	{
-		auto* _this = static_cast<RemoteZynAddSubFx*>(_arg);
+		RemoteZynAddSubFx * _this =
+					static_cast<RemoteZynAddSubFx *>( _arg );
 
 		_this->messageLoop();
 
@@ -284,7 +285,7 @@ int main( int _argc, char * * _argv )
 	RemoteZynAddSubFx * remoteZASF =
 		new RemoteZynAddSubFx( _argv[1], _argv[2] );
 #else
-	auto* remoteZASF = new RemoteZynAddSubFx(_argv[1]);
+	RemoteZynAddSubFx * remoteZASF = new RemoteZynAddSubFx( _argv[1] );
 #endif
 
 	remoteZASF->guiLoop();

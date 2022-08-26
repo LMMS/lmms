@@ -45,10 +45,10 @@ BassBoosterControlDialog::BassBoosterControlDialog( BassBoosterControls* control
 	setPalette( pal );
 	setFixedSize( 120, 60 );
 
-	auto* tl = new QVBoxLayout(this);
+	QVBoxLayout * tl = new QVBoxLayout( this );
 	tl->addSpacing( 4 );
 
-	auto* l = new QHBoxLayout;
+	QHBoxLayout * l = new QHBoxLayout;
 
 	Knob * freqKnob = new Knob( knobBright_26, this);
 	freqKnob->setModel( &controls->m_freqModel );

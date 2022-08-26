@@ -85,7 +85,8 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
-		auto* ctls_btn = new QPushButton(tr("Controls"), this);
+		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
+									this );
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<8>( f ) );
 		ctls_btn->setGeometry( 150, 14, 50, 20 );

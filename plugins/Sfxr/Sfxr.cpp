@@ -464,7 +464,7 @@ void SfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 // debug code
 //	qDebug( "pFN %d", pitchedFrameNum );
 
-	auto* pitchedBuffer = new sampleFrame[pitchedFrameNum];
+	sampleFrame * pitchedBuffer = new sampleFrame[pitchedFrameNum];
 	static_cast<SfxrSynth*>(_n->m_pluginData)->update( pitchedBuffer, pitchedFrameNum );
 	for( fpp_t i=0; i<frameNum; i++ )
 	{
@@ -709,7 +709,7 @@ SfxrInstrumentView::SfxrInstrumentView( Instrument * _instrument,
 
 void SfxrInstrumentView::modelChanged()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 
 	m_attKnob->setModel( &s->m_attModel );
 	m_holdKnob->setModel( &s->m_holdModel );
@@ -748,7 +748,7 @@ void SfxrInstrumentView::modelChanged()
 
 void SfxrInstrumentView::genPickup()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 	s->resetModels();
 	s->m_startFreqModel.setValue( 0.4f+frnd(0.5f) );
 	s->m_attModel.setValue( 0.0f );
@@ -768,7 +768,7 @@ void SfxrInstrumentView::genPickup()
 
 void SfxrInstrumentView::genLaser()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 	s->resetModels();
 
 	s->m_waveFormModel.setValue( rnd(2) );
@@ -827,7 +827,7 @@ void SfxrInstrumentView::genLaser()
 
 void SfxrInstrumentView::genExplosion()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 	s->resetModels();
 
 	s->m_waveFormModel.setValue( 3 );
@@ -882,7 +882,7 @@ void SfxrInstrumentView::genExplosion()
 
 void SfxrInstrumentView::genPowerup()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 	s->resetModels();
 
 	if(rnd(1))
@@ -916,7 +916,7 @@ void SfxrInstrumentView::genPowerup()
 
 void SfxrInstrumentView::genHit()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 	s->resetModels();
 
 	s->m_waveFormModel.setValue( rnd(2) );
@@ -946,7 +946,7 @@ void SfxrInstrumentView::genHit()
 
 void SfxrInstrumentView::genJump()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 	s->resetModels();
 
 	s->m_waveFormModel.setValue( 0 );
@@ -976,7 +976,7 @@ void SfxrInstrumentView::genJump()
 
 void SfxrInstrumentView::genBlip()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 	s->resetModels();
 
 	s->m_waveFormModel.setValue( rnd(1) );
@@ -998,7 +998,7 @@ void SfxrInstrumentView::genBlip()
 
 void SfxrInstrumentView::randomize()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 
 	s->m_startFreqModel.setValue( pow(frnd(2.0f)-1.0f, 2.0f) );
 	if(rnd(1))
@@ -1059,7 +1059,7 @@ void SfxrInstrumentView::randomize()
 
 void SfxrInstrumentView::mutate()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument * s = castModel<SfxrInstrument>();
 
 	if(rnd(1)) s->m_startFreqModel.setValue( s->m_startFreqModel.value()+frnd(0.1f)-0.05f );
 	//		if(rnd(1)) s->m_minFreqModel.setValue( s->m_minFreqModel.value()+frnd(0.1f)-0.05f );
@@ -1099,7 +1099,7 @@ void SfxrInstrumentView::mutate()
 
 void SfxrInstrumentView::previewSound()
 {
-	auto* s = castModel<SfxrInstrument>();
+	SfxrInstrument* s = castModel<SfxrInstrument>();
 	InstrumentTrack* it = s->instrumentTrack();
 	it->silenceAllNotes();
 	it->processInEvent( MidiEvent( MidiNoteOn, 0, it->baseNoteModel()->value(), MidiDefaultVelocity ) );

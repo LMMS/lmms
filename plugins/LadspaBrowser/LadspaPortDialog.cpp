@@ -45,13 +45,13 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 	setWindowTitle( tr( "Ports" ) );
 	setModal( true );
 
-	auto* vlayout = new QVBoxLayout(this);
+	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
 	vlayout->setMargin( 0 );
 
 	int pc = manager->getPortCount( _key );
 
-	auto* settings = new QTableWidget(pc, 7, this);
+	QTableWidget * settings = new QTableWidget( pc, 7, this );
 
 	QStringList ports;
 	ports.append( tr( "Name" ) );
@@ -67,7 +67,7 @@ LadspaPortDialog::LadspaPortDialog( const ladspa_key_t & _key )
 	{
 		for( int col = 0; col < 7; ++col )
 		{
-			auto* item = new QTableWidgetItem;
+			QTableWidgetItem * item = new QTableWidgetItem;
 			item->setFlags(QFlag(0));
 			settings->setItem( row, col, item );
 		}

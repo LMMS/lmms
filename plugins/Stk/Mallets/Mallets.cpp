@@ -342,7 +342,7 @@ void MalletsInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
-	auto* ps = static_cast<MalletsSynth*>(_n->m_pluginData);
+	MalletsSynth * ps = static_cast<MalletsSynth *>( _n->m_pluginData );
 	ps->setFrequency( freq );
 	p = ps->presetIndex();
 
@@ -442,7 +442,7 @@ void MalletsInstrumentView::setWidgetBackground( QWidget * _widget, const QStrin
 
 QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 {
-	auto* widget = new QWidget(_parent);
+	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 		
 	m_hardnessKnob = new Knob( knobVintage_32, widget );
@@ -478,7 +478,7 @@ QWidget * MalletsInstrumentView::setupModalBarControls( QWidget * _parent )
 
 QWidget * MalletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 {
-	auto* widget = new QWidget(_parent);
+	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 	
 	m_modulatorKnob = new Knob( knobVintage_32, widget );
@@ -515,7 +515,7 @@ QWidget * MalletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 QWidget * MalletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 {
 	// BandedWG
-	auto* widget = new QWidget(_parent);
+	QWidget * widget = new QWidget( _parent );
 	widget->setFixedSize( 250, 250 );
 	
 /*	m_strikeLED = new LedCheckBox( tr( "Bowed" ), widget );
@@ -549,7 +549,7 @@ QWidget * MalletsInstrumentView::setupBandedWGControls( QWidget * _parent )
 
 void MalletsInstrumentView::modelChanged()
 {
-	auto* inst = castModel<MalletsInstrument>();
+	MalletsInstrument * inst = castModel<MalletsInstrument>();
 	m_hardnessKnob->setModel( &inst->m_hardnessModel );
 	m_positionKnob->setModel( &inst->m_positionModel );
 	m_vibratoGainKnob->setModel( &inst->m_vibratoGainModel );
@@ -574,7 +574,7 @@ void MalletsInstrumentView::modelChanged()
 
 void MalletsInstrumentView::changePreset()
 {
-	auto* inst = castModel<MalletsInstrument>();
+	MalletsInstrument * inst = castModel<MalletsInstrument>();
 	int _preset = inst->m_presetsModel.value();
 
 	if( _preset < 9 )

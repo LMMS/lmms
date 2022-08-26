@@ -801,7 +801,7 @@ float FloatModel::getRoundedValue() const
 
 int FloatModel::getDigitCount() const
 {
-	auto steptemp = step<float>();
+	float steptemp = step<float>();
 	int digits = 0;
 	while ( steptemp < 1 )
 	{

@@ -49,7 +49,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	delayKnob->setLabel( tr( "DELAY" ) );
 	delayKnob->setHintText( tr( "Delay time:" ) + " ", "s" );
 
-	auto* lfoFreqKnob = new TempoSyncKnob(knobBright_26, this);
+	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
 	lfoFreqKnob->move( 48,10 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
@@ -84,7 +84,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	whiteNoiseKnob->setLabel( tr( "NOISE" ) );
 	whiteNoiseKnob->setHintText( tr( "White noise amount:" ) , "" );
 
-	auto* invertCb = new LedCheckBox(tr("Invert"), this);
+	LedCheckBox * invertCb = new LedCheckBox( tr( "Invert" ), this );
 	invertCb->move( 10,53 );
 
 

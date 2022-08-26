@@ -56,9 +56,9 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_pixelsPerOctave = EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
-	auto* scene = new QGraphicsScene();
+	QGraphicsScene *scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
-	auto* view = new QGraphicsView(this);
+	QGraphicsView *view = new QGraphicsView( this );
 	view->setStyleSheet( "border-style: none; background: transparent;" );
 	view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );

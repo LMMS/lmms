@@ -426,9 +426,9 @@ void AudioFileProcessor::loopPointChanged()
 
 void AudioFileProcessor::pointChanged()
 {
-	const auto f_start = static_cast<f_cnt_t>(m_startPointModel.value() * m_sampleBuffer.frames());
-	const auto f_end = static_cast<f_cnt_t>(m_endPointModel.value() * m_sampleBuffer.frames());
-	const auto f_loop = static_cast<f_cnt_t>(m_loopPointModel.value() * m_sampleBuffer.frames());
+	const f_cnt_t f_start = static_cast<f_cnt_t>( m_startPointModel.value() *	m_sampleBuffer.frames() );
+	const f_cnt_t f_end = static_cast<f_cnt_t>( m_endPointModel.value() * m_sampleBuffer.frames() );
+	const f_cnt_t f_loop = static_cast<f_cnt_t>( m_loopPointModel.value() * m_sampleBuffer.frames() );
 
 	m_nextPlayStartPoint = f_start;
 	m_nextPlayBackwards = false;
@@ -479,7 +479,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 // loop button group
 
-	auto* m_loopOffButton = new PixmapButton(this);
+	PixmapButton * m_loopOffButton = new PixmapButton( this );
 	m_loopOffButton->setCheckable( true );
 	m_loopOffButton->move( 190, 105 );
 	m_loopOffButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -488,7 +488,8 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"loop_off_off" ) );
 	m_loopOffButton->setToolTip(tr("Disable loop"));
 
-	auto* m_loopOnButton = new PixmapButton(this);
+
+	PixmapButton * m_loopOnButton = new PixmapButton( this );
 	m_loopOnButton->setCheckable( true );
 	m_loopOnButton->move( 190, 124 );
 	m_loopOnButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -497,7 +498,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"loop_on_off" ) );
 	m_loopOnButton->setToolTip(tr("Enable loop"));
 
-	auto* m_loopPingPongButton = new PixmapButton(this);
+	PixmapButton * m_loopPingPongButton = new PixmapButton( this );
 	m_loopPingPongButton->setCheckable( true );
 	m_loopPingPongButton->move( 216, 124 );
 	m_loopPingPongButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -644,9 +645,9 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, *s_artwork );
 
-	auto* a = castModel<AudioFileProcessor>();
+	AudioFileProcessor * a = castModel<AudioFileProcessor>();
 
-	QString file_name = "";
+ 	QString file_name = "";
 	int idx = a->m_sampleBuffer.audioFile().length();
 
 	p.setFont( pointSize<8>( font() ) );
@@ -701,7 +702,7 @@ void AudioFileProcessorView::openAudioFile()
 
 void AudioFileProcessorView::modelChanged()
 {
-	auto* a = castModel<AudioFileProcessor>();
+	AudioFileProcessor * a = castModel<AudioFileProcessor>();
 	connect( &a->m_sampleBuffer, SIGNAL( sampleUpdated() ),
 					this, SLOT( sampleUpdated() ) );
 	m_ampKnob->setModel( &a->m_ampModel );

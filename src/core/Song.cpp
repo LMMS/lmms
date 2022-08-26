@@ -146,12 +146,12 @@ void Song::masterVolumeChanged()
 void Song::setTempo()
 {
 	Engine::audioEngine()->requestChangeInModel();
-	const auto tempo = (bpm_t)m_tempoModel.value();
+	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::audioEngine()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
-		auto* nph = dynamic_cast<NotePlayHandle*>(*it);
+		NotePlayHandle * nph = dynamic_cast<NotePlayHandle *>( *it );
 		if( nph && !nph->isReleased() )
 		{
 			nph->lock();
@@ -321,7 +321,7 @@ void Song::processNextBuffer()
 		}
 
 		const f_cnt_t framesUntilNextPeriod = framesPerPeriod - frameOffsetInPeriod;
-		const auto framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
+		const f_cnt_t framesUntilNextTick = static_cast<f_cnt_t>(std::ceil(framesPerTick - frameOffsetInTick));
 
 		// We want to proceed to the next buffer or tick, whichever is closer
 		const auto framesToPlay = std::min(framesUntilNextPeriod, framesUntilNextTick);

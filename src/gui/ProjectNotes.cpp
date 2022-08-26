@@ -186,7 +186,8 @@ void ProjectNotes::setupActions()
 	connect( m_actionTextUnderline, SIGNAL(triggered()), this,
 						SLOT(textUnderline()));
 
-	auto* grp = new QActionGroup(tb);
+
+	QActionGroup * grp = new QActionGroup( tb );
 	connect( grp, SIGNAL(triggered(QAction*)), this,
 					SLOT(textAlign(QAction*)));
 

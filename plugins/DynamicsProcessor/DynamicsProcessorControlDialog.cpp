@@ -47,7 +47,7 @@ DynProcControlDialog::DynProcControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 319 );
 
-	auto* waveGraph = new Graph(this, Graph::LinearNonCyclicStyle, 204, 205);
+	Graph * waveGraph = new Graph( this, Graph::LinearNonCyclicStyle, 204, 205 );
 	waveGraph -> move( 10, 6 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );
@@ -88,28 +88,28 @@ DynProcControlDialog::DynProcControlDialog(
 
 //wavegraph control buttons
 
-	auto* resetButton = new PixmapButton(this, tr("Reset wavegraph"));
+	PixmapButton * resetButton = new PixmapButton( this, tr("Reset wavegraph") );
 	resetButton -> move( 162, 223 );
 	resetButton -> resize( 13, 48 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
 	resetButton->setToolTip(tr("Reset wavegraph"));
 
-	auto* smoothButton = new PixmapButton(this, tr("Smooth wavegraph"));
+	PixmapButton * smoothButton = new PixmapButton( this, tr("Smooth wavegraph") );
 	smoothButton -> move( 162, 239 );
 	smoothButton -> resize( 13, 48 );
 	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
 	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
 	smoothButton->setToolTip(tr("Smooth wavegraph"));
 
-	auto* addOneButton = new PixmapButton(this, tr("Increase wavegraph amplitude by 1 dB"));
+	PixmapButton * addOneButton = new PixmapButton( this, tr("Increase wavegraph amplitude by 1 dB") );
 	addOneButton -> move( 131, 223 );
 	addOneButton -> resize( 13, 29 );
 	addOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_active" ) );
 	addOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_inactive" ) );
 	addOneButton->setToolTip(tr("Increase wavegraph amplitude by 1 dB"));
 
-	auto* subOneButton = new PixmapButton(this, tr("Decrease wavegraph amplitude by 1 dB"));
+	PixmapButton * subOneButton = new PixmapButton( this, tr("Decrease wavegraph amplitude by 1 dB") );
 	subOneButton -> move( 131, 239 );
 	subOneButton -> resize( 13, 29 );
 	subOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_active" ) );
@@ -117,28 +117,28 @@ DynProcControlDialog::DynProcControlDialog(
 	subOneButton->setToolTip(tr("Decrease wavegraph amplitude by 1 dB"));
 
 //stereomode switches
-	auto* smMaxButton = new PixmapButton(this, tr("Stereo mode: maximum"));
+	PixmapButton * smMaxButton = new PixmapButton( this, tr( "Stereo mode: maximum" ) );
 	smMaxButton -> move( 131, 257 );
 	smMaxButton -> resize( 78, 17 );
 	smMaxButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "max_active" ) );
 	smMaxButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "max_inactive" ) );
 	smMaxButton->setToolTip(tr("Process based on the maximum of both stereo channels"));
-
-	auto* smAvgButton = new PixmapButton(this, tr("Stereo mode: average"));
+	
+	PixmapButton * smAvgButton = new PixmapButton( this, tr( "Stereo mode: average" ) );
 	smAvgButton -> move( 131, 274 );
 	smAvgButton -> resize( 78, 16 );
 	smAvgButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "avg_active" ) );
 	smAvgButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "avg_inactive" ) );
 	smAvgButton->setToolTip(tr("Process based on the average of both stereo channels"));
 
-	auto* smUnlButton = new PixmapButton(this, tr("Stereo mode: unlinked"));
+	PixmapButton * smUnlButton = new PixmapButton( this, tr( "Stereo mode: unlinked" ) );
 	smUnlButton -> move( 131, 290 );
 	smUnlButton -> resize( 78, 17 );
 	smUnlButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "unl_active" ) );
 	smUnlButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "unl_inactive" ) );
 	smUnlButton->setToolTip(tr("Process each stereo channel independently"));
-
-	auto* smGroup = new automatableButtonGroup(this);
+	
+	automatableButtonGroup * smGroup = new automatableButtonGroup( this );
 	smGroup -> addButton( smMaxButton );
 	smGroup -> addButton( smAvgButton );
 	smGroup -> addButton( smUnlButton );

@@ -95,7 +95,7 @@ VibratingString::VibratingString(	float _pitch,
 VibratingString::delayLine * VibratingString::initDelayLine( int _len,
 								int _pick )
 {
-	auto* dl = new VibratingString::delayLine[_len];
+	delayLine * dl = new VibratingString::delayLine[_len];
 	dl->length = _len;
 	if( _len > 0 )
 	{

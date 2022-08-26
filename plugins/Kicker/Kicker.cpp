@@ -185,7 +185,7 @@ void KickerInstrument::playNote( NotePlayHandle * _n,
 		_n->noteOff();
 	}
 
-	auto* so = static_cast<SweepOsc*>(_n->m_pluginData);
+	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
 	so->update( _working_buffer + offset, frames, Engine::audioEngine()->processingSampleRate() );
 
 	if( _n->isReleased() )
@@ -334,7 +334,7 @@ KickerInstrumentView::KickerInstrumentView( Instrument * _instrument,
 
 void KickerInstrumentView::modelChanged()
 {
-	auto* k = castModel<KickerInstrument>();
+	KickerInstrument * k = castModel<KickerInstrument>();
 	m_startFreqKnob->setModel( &k->m_startFreqModel );
 	m_endFreqKnob->setModel( &k->m_endFreqModel );
 	m_decayKnob->setModel( &k->m_decayModel );

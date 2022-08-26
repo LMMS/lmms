@@ -215,7 +215,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( trem_depth_mdl );
 
 	// Connect the plugin to the audio engine...
-	auto* iph = new InstrumentPlayHandle(this, _instrument_track);
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
@@ -798,7 +798,8 @@ void OpulenzInstrumentView::updateKnobHints()
 		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
 	};
 
-	auto* m = castModel<OpulenzInstrument>();
+	OpulenzInstrument * m = castModel<OpulenzInstrument>();
+	
 
 	op1_a_kn->setHintText( tr( "Attack" ),
 						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
@@ -820,7 +821,7 @@ void OpulenzInstrumentView::updateKnobHints()
 
 void OpulenzInstrumentView::modelChanged()
 {
-	auto* m = castModel<OpulenzInstrument>();
+	OpulenzInstrument * m = castModel<OpulenzInstrument>();
 	// m_patch->setModel( &m->m_patchModel );
 
 	op1_a_kn->setModel( &m->op1_a_mdl );

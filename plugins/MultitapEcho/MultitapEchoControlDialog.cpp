@@ -47,10 +47,10 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	setFixedSize( 245, 300 );
 	
 	// graph widgets
-
-	auto* ampGraph = new Graph(this, Graph::BarStyle, 204, 105);
-	auto* lpGraph = new Graph(this, Graph::BarStyle, 204, 105);
-
+	
+	Graph * ampGraph = new Graph( this, Graph::BarStyle, 204, 105 );
+	Graph * lpGraph = new Graph( this, Graph::BarStyle, 204, 105 );
+	
 	ampGraph->move( 30, 10 );
 	lpGraph->move( 30, 125 );
 	
@@ -71,14 +71,14 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	lpGraph -> setMaximumSize( 204, 105 );
 	
 	// steps spinbox
-
-	auto* steps = new LcdSpinBox(2, this, "Steps");
+	
+	LcdSpinBox * steps = new LcdSpinBox( 2, this, "Steps" );
 	steps->move( 20, 245 );
 	steps->setModel( & controls->m_steps );
 	
 	// knobs
 
-	auto* stepLength = new TempoSyncKnob(knobBright_26, this);
+	TempoSyncKnob * stepLength = new TempoSyncKnob( knobBright_26, this );
 	stepLength->move( 100, 245 );
 	stepLength->setModel( & controls->m_stepLength );
 	stepLength->setLabel( tr( "Length" ) );
@@ -96,8 +96,8 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	stages->setLabel( tr( "Stages" ) );
 	stages->setHintText( tr( "Low-pass stages:" ) , "x" );
 	// switch led
-
-	auto* swapInputs = new LedCheckBox("Swap inputs", this, tr("Swap inputs"), LedCheckBox::Green);
+	
+	LedCheckBox * swapInputs = new LedCheckBox( "Swap inputs", this, tr( "Swap inputs" ), LedCheckBox::Green );
 	swapInputs->move( 20, 275 );
 	swapInputs->setModel( & controls->m_swapInputs );
 	swapInputs->setToolTip(tr("Swap left and right input channels for reflections"));

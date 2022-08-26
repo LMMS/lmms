@@ -86,13 +86,13 @@ void LinkedModelGroupView::addControl(Control* ctrl, const std::string& id,
 {
 	if (ctrl)
 	{
-		auto* box = new QWidget(this);
-		auto* boxLayout = new QHBoxLayout(box);
+		QWidget* box = new QWidget(this);
+		QHBoxLayout* boxLayout = new QHBoxLayout(box);
 		boxLayout->addWidget(ctrl->topWidget());
 
 		if (removable)
 		{
-			auto* removeBtn = new QPushButton;
+			QPushButton* removeBtn = new QPushButton;
 			removeBtn->setIcon( embed::getIconPixmap( "discard" ) );
 			QObject::connect(removeBtn, &QPushButton::clicked,
 				this, [this,ctrl](bool){

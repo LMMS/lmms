@@ -41,13 +41,13 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	QWidget( parent ),
 	ModelView( nullptr, this )
 {
-	auto* mainLayout = new QVBoxLayout(this);
+	QVBoxLayout* mainLayout = new QVBoxLayout( this );
 	mainLayout->setMargin( 5 );
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );
 
-	auto* effectsLayout = new QVBoxLayout(m_effectsGroupBox);
+	QVBoxLayout* effectsLayout = new QVBoxLayout( m_effectsGroupBox );
 	effectsLayout->setSpacing( 0 );
 	effectsLayout->setContentsMargins( 2, m_effectsGroupBox->titleBarHeight() + 2, 2, 2 );
 
@@ -60,7 +60,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 
 	effectsLayout->addWidget( m_scrollArea );
 
-	auto* addButton = new QPushButton;
+	QPushButton* addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
 
 	effectsLayout->addWidget( addButton );
@@ -170,7 +170,7 @@ void EffectRackView::update()
 		}
 		if( i >= m_effectViews.size() )
 		{
-			auto* view = new EffectView(*it, w);
+			EffectView * view = new EffectView( *it, w );
 			connect( view, SIGNAL(moveUp(lmms::gui::EffectView*)),
 					this, SLOT(moveUp(lmms::gui::EffectView*)));
 			connect( view, SIGNAL(moveDown(lmms::gui::EffectView*)),

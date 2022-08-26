@@ -55,7 +55,7 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 {
 	AutomatableModel* model = modelUntyped();
 
-	auto* amvSlots = new AutomatableModelViewSlots(this, menu);
+	AutomatableModelViewSlots* amvSlots = new AutomatableModelViewSlots( this, menu );
 
 	menu->addAction( embed::getIconPixmap( "reload" ),
 						AutomatableModel::tr( "&Reset (%1%2)" ).
@@ -230,7 +230,7 @@ void AutomatableModelViewSlots::execConnectionDialog()
 			// New
 			else
 			{
-				auto* cc = new ControllerConnection(d.chosenController());
+				ControllerConnection* cc = new ControllerConnection(d.chosenController());
 				m->setControllerConnection( cc );
 				//cc->setTargetName( m->displayName() );
 			}

@@ -43,25 +43,25 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	EffectControlDialog(controls),
 	m_controls(controls)
 {
-	auto* master_layout = new QVBoxLayout;
+	QVBoxLayout *master_layout = new QVBoxLayout;
 	master_layout->setContentsMargins(0, 2, 0, 0);
 	setLayout(master_layout);
 
 	// Visualizer widget
 	// The size of 768 pixels seems to offer a good balance of speed, accuracy and trace thickness.
-	auto* display = new VectorView(controls, m_controls->m_effect->getBuffer(), 768, this);
+	VectorView *display = new VectorView(controls, m_controls->m_effect->getBuffer(), 768, this);
 	master_layout->addWidget(display);
 
 	// Config area located inside visualizer
-	auto* internal_layout = new QVBoxLayout(display);
-	auto* config_layout = new QHBoxLayout();
-	auto* switch_layout = new QVBoxLayout();
+	QVBoxLayout *internal_layout = new QVBoxLayout(display);
+	QHBoxLayout *config_layout = new QHBoxLayout();
+	QVBoxLayout *switch_layout = new QVBoxLayout();
 	internal_layout->addStretch();
 	internal_layout->addLayout(config_layout);
 	config_layout->addLayout(switch_layout);
 
 	// High-quality switch
-	auto* highQualityButton = new LedCheckBox(tr("HQ"), this);
+	LedCheckBox *highQualityButton = new LedCheckBox(tr("HQ"), this);
 	highQualityButton->setToolTip(tr("Double the resolution and simulate continuous analog-like trace."));
 	highQualityButton->setCheckable(true);
 	highQualityButton->setMinimumSize(70, 12);
@@ -69,7 +69,7 @@ VecControlsDialog::VecControlsDialog(VecControls *controls) :
 	switch_layout->addWidget(highQualityButton);
 
 	// Log. scale switch
-	auto* logarithmicButton = new LedCheckBox(tr("Log. scale"), this);
+	LedCheckBox *logarithmicButton = new LedCheckBox(tr("Log. scale"), this);
 	logarithmicButton->setToolTip(tr("Display amplitude on logarithmic scale to better see small values."));
 	logarithmicButton->setCheckable(true);
 	logarithmicButton->setMinimumSize(70, 12);

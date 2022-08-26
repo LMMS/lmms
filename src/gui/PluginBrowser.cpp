@@ -51,7 +51,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 	addContentWidget( m_view );
 
-	auto* view_layout = new QVBoxLayout(m_view);
+	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
 	view_layout->setMargin( 5 );
 	view_layout->setSpacing( 5 );
 
@@ -63,7 +63,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 								m_view );
 	hint->setWordWrap( true );
 
-	auto* searchBar = new QLineEdit(m_view);
+	QLineEdit * searchBar = new QLineEdit( m_view );
 	searchBar->setPlaceholderText( "Search" );
 	searchBar->setMaxLength( 64 );
 	searchBar->setClearButtonEnabled( true );
@@ -120,7 +120,8 @@ void PluginBrowser::onFilterChanged( const QString & filter )
 		for (int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
 		{
 			QTreeWidgetItem * item = root->child( itemIndex );
-			auto* descWidget = static_cast<PluginDescWidget*>(m_descTree->itemWidget(item, 0));
+			PluginDescWidget * descWidget = static_cast<PluginDescWidget *>
+							(m_descTree->itemWidget( item, 0));
 			if (descWidget->name().contains(filter, Qt::CaseInsensitive))
 			{
 				item->setHidden( false );

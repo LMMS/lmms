@@ -91,11 +91,11 @@ GuiApplication::GuiApplication()
 	QDir::addSearchPath("artwork", ConfigManager::inst()->defaultThemeDir());
 	QDir::addSearchPath("artwork", ":/artwork");
 
-	auto* lmmsstyle = new LmmsStyle();
+	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 
-	auto* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
-	auto* lpal = new QPalette(lmmspal->palette());
+	LmmsPalette* lmmspal = new LmmsPalette(nullptr, lmmsstyle);
+	QPalette* lpal = new QPalette(lmmspal->palette());
 
 	QApplication::setPalette( *lpal );
 	LmmsStyle::s_palette = lpal;

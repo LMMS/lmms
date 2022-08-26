@@ -317,7 +317,7 @@ void SidInstrument::playNote( NotePlayHandle * _n,
 	SID *sid = static_cast<SID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
 	// avoid variable length array for msvc compat
-	auto* buf = reinterpret_cast<short*>(_working_buffer + offset);
+	short* buf = reinterpret_cast<short*>(_working_buffer + offset);
 	unsigned char sidreg[NUMSIDREGS];
 
 	for (int c = 0; c < NUMSIDREGS; c++)
@@ -498,19 +498,19 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	m_cutKnob->setHintText( tr( "Cutoff frequency:" ), " Hz" );
 	m_cutKnob->move( 7 + 2*28, 64 );
 
-	auto* hp_btn = new PixmapButton(this, nullptr);
+	PixmapButton * hp_btn = new PixmapButton( this, nullptr );
 	hp_btn->move( 140, 77 );
 	hp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "hpred" ) );
 	hp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "hp" ) );
 	hp_btn->setToolTip(tr("High-pass filter "));
 
-	auto* bp_btn = new PixmapButton(this, nullptr);
+	PixmapButton * bp_btn = new PixmapButton( this, nullptr );
 	bp_btn->move( 164, 77 );
 	bp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "bpred" ) );
 	bp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "bp" ) );
 	bp_btn->setToolTip(tr("Band-pass filter "));
 
-	auto* lp_btn = new PixmapButton(this, nullptr);
+	PixmapButton * lp_btn = new PixmapButton( this, nullptr );
 	lp_btn->move( 185, 77 );
 	lp_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "lpred" ) );
 	lp_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "lp" ) );
@@ -528,13 +528,13 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 	m_offButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "3off" ) );
 	m_offButton->setToolTip(tr("Voice 3 off "));
 
-	auto* mos6581_btn = new PixmapButton(this, nullptr);
+	PixmapButton * mos6581_btn = new PixmapButton( this, nullptr );
 	mos6581_btn->move( 170, 59 );
 	mos6581_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "6581red" ) );
 	mos6581_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "6581" ) );
 	mos6581_btn->setToolTip(tr("MOS6581 SID "));
 
-	auto* mos8580_btn = new PixmapButton(this, nullptr);
+	PixmapButton * mos8580_btn = new PixmapButton( this, nullptr );
 	mos8580_btn->move( 207, 59 );
 	mos8580_btn->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "8580red" ) );
 	mos8580_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "8580" ) );
@@ -570,7 +570,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 		crsk->setHintText( tr("Coarse:"), " semitones" );
 		crsk->move( 147, 114 + i*50 );
 
-		auto* pulse_btn = new PixmapButton(this, nullptr);
+		PixmapButton * pulse_btn = new PixmapButton( this, nullptr );
 		pulse_btn->move( 187, 101 + i*50 );
 		pulse_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "pulsered" ) );
@@ -578,7 +578,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "pulse" ) );
 		pulse_btn->setToolTip(tr("Pulse wave"));
 
-		auto* triangle_btn = new PixmapButton(this, nullptr);
+		PixmapButton * triangle_btn = new PixmapButton( this, nullptr );
 		triangle_btn->move( 168, 101 + i*50 );
 		triangle_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "trianglered" ) );
@@ -586,7 +586,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "triangle" ) );
 		triangle_btn->setToolTip(tr("Triangle wave"));
 
-		auto* saw_btn = new PixmapButton(this, nullptr);
+		PixmapButton * saw_btn = new PixmapButton( this, nullptr );
 		saw_btn->move( 207, 101 + i*50 );
 		saw_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "sawred" ) );
@@ -594,7 +594,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "saw" ) );
 		saw_btn->setToolTip(tr("Saw wave"));
 
-		auto* noise_btn = new PixmapButton(this, nullptr);
+		PixmapButton * noise_btn = new PixmapButton( this, nullptr );
 		noise_btn->move( 226, 101 + i*50 );
 		noise_btn->setActiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "noisered" ) );
@@ -602,14 +602,15 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "noise" ) );
 		noise_btn->setToolTip(tr("Noise"));
 
-		auto* wfbg = new automatableButtonGroup(this);
+		automatableButtonGroup * wfbg =
+			new automatableButtonGroup( this );
 
 		wfbg->addButton( pulse_btn );
 		wfbg->addButton( triangle_btn );
 		wfbg->addButton( saw_btn );
 		wfbg->addButton( noise_btn );
 
-		auto* sync_btn = new PixmapButton(this, nullptr);
+		PixmapButton * sync_btn = new PixmapButton( this, nullptr );
 		sync_btn->setCheckable( true );
 		sync_btn->move( 207, 134 + i*50 );
 		sync_btn->setActiveGraphic(
@@ -618,7 +619,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "sync" ) );
 		sync_btn->setToolTip(tr("Sync"));
 
-		auto* ringMod_btn = new PixmapButton(this, nullptr);
+		PixmapButton * ringMod_btn = new PixmapButton( this, nullptr );
 		ringMod_btn->setCheckable( true );
 		ringMod_btn->move( 170, 116 + i*50 );
 		ringMod_btn->setActiveGraphic(
@@ -627,7 +628,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "ring" ) );
 		ringMod_btn->setToolTip(tr("Ring modulation"));
 
-		auto* filter_btn = new PixmapButton(this, nullptr);
+		PixmapButton * filter_btn = new PixmapButton( this, nullptr );
 		filter_btn->setCheckable( true );
 		filter_btn->move( 207, 116 + i*50 );
 		filter_btn->setActiveGraphic(
@@ -636,7 +637,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 			PLUGIN_NAME::getIconPixmap( "filter" ) );
 		filter_btn->setToolTip(tr("Filtered"));
 
-		auto* test_btn = new PixmapButton(this, nullptr);
+		PixmapButton * test_btn = new PixmapButton( this, nullptr );
 		test_btn->setCheckable( true );
 		test_btn->move( 170, 134 + i*50 );
 		test_btn->setActiveGraphic(
@@ -653,7 +654,7 @@ SidInstrumentView::SidInstrumentView( Instrument * _instrument,
 
 void SidInstrumentView::updateKnobHint()
 {
-	auto* k = castModel<SidInstrument>();
+	SidInstrument * k = castModel<SidInstrument>();
 
 	for( int i = 0; i < 3; ++i )
 	{
@@ -694,7 +695,7 @@ void SidInstrumentView::updateKnobHint()
 
 void SidInstrumentView::updateKnobToolTip()
 {
-	auto* k = castModel<SidInstrument>();
+	SidInstrument * k = castModel<SidInstrument>();
 	for( int i = 0; i < 3; ++i )
 	{
 		m_voiceKnobs[i].m_sustKnob->setToolTip(
@@ -714,7 +715,7 @@ void SidInstrumentView::updateKnobToolTip()
 
 void SidInstrumentView::modelChanged()
 {
-	auto* k = castModel<SidInstrument>();
+	SidInstrument * k = castModel<SidInstrument>();
 
 	m_volKnob->setModel( &k->m_volumeModel );
 	m_resKnob->setModel( &k->m_filterResonanceModel );

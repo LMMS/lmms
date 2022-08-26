@@ -44,7 +44,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	setPalette( pal );
 	setFixedSize( 300, 208 );
 
-	auto* sampleDelayKnob = new TempoSyncKnob(knobBright_26, this);
+	TempoSyncKnob* sampleDelayKnob = new TempoSyncKnob( knobBright_26, this );
 	sampleDelayKnob->move( 10,14 );
 	sampleDelayKnob->setVolumeKnob( false );
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
@@ -58,28 +58,28 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr ( "Feedback amount" ) + " " , "" );
 
-	auto* lfoFreqKnob = new TempoSyncKnob(knobBright_26, this);
+	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
 	lfoFreqKnob->move( 11, 119 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
 	lfoFreqKnob->setLabel( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr ( "LFO frequency") + " ", " s" );
 
-	auto* lfoAmtKnob = new TempoSyncKnob(knobBright_26, this);
+	TempoSyncKnob * lfoAmtKnob = new TempoSyncKnob( knobBright_26, this );
 	lfoAmtKnob->move( 11, 159 );
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
 	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr ( "LFO amount" ) + " " , " s" );
 
-	auto* outFader
-		= new EqFader(&controls->m_outGainModel, tr("Out gain"), this, &controls->m_outPeakL, &controls->m_outPeakR);
+	EqFader * outFader = new EqFader( &controls->m_outGainModel,tr( "Out gain" ),
+									  this, &controls->m_outPeakL, &controls->m_outPeakR );
 	outFader->setMaximumHeight( 196 );
 	outFader->move( 263, 45 );
 	outFader->setDisplayConversion( false );
 	outFader->setHintText( tr( "Gain" ), "dBFS" );
 
-	auto* pad = new XyPad(this, &controls->m_feedbackModel, &controls->m_delayTimeModel);
+	XyPad * pad = new XyPad( this, &controls->m_feedbackModel, &controls->m_delayTimeModel );
 	pad->resize( 200, 200 );
 	pad->move( 50, 5 );
 }

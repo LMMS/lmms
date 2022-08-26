@@ -54,19 +54,19 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	this->setFrameStyle( QFrame::StyledPanel );
 	this->setFrameShadow( QFrame::Raised );
 
-	auto* vBoxLayout = new QVBoxLayout(this);
+	QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
 
-	auto* hBox = new QHBoxLayout();
+	QHBoxLayout *hBox = new QHBoxLayout();
 	vBoxLayout->addLayout(hBox);
 
-	auto* label = new QLabel("<b>" + _model->displayName() + "</b>", this);
+	QLabel *label = new QLabel( "<b>" + _model->displayName() + "</b>", this);
 	QSizePolicy sizePolicy = label->sizePolicy();
 	sizePolicy.setHorizontalStretch(1);
 	label->setSizePolicy(sizePolicy);
 
 	hBox->addWidget(label);
 
-	auto* controlsButton = new QPushButton(tr("Controls"), this);
+	QPushButton * controlsButton = new QPushButton( tr( "Controls" ), this );
 	connect( controlsButton, SIGNAL(clicked()), SLOT(editControls()));
 
 	hBox->addWidget(controlsButton);
@@ -141,7 +141,7 @@ void ControllerView::deleteController()
 void ControllerView::renameController()
 {
 	bool ok;
-	auto* c = castModel<Controller>();
+	Controller * c = castModel<Controller>();
 	QString new_name = QInputDialog::getText( this,
 			tr( "Rename controller" ),
 			tr( "Enter the new name for this controller" ),

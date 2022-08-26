@@ -50,7 +50,7 @@ bool MainApplication::event(QEvent* event)
 	{
 		case QEvent::FileOpen:
 		{
-			auto* fileEvent = static_cast<QFileOpenEvent*>(event);
+			QFileOpenEvent * fileEvent = static_cast<QFileOpenEvent *>(event);
 			// Handle the project file
 			m_queuedFile = fileEvent->file();
 			if(Engine::getSong())

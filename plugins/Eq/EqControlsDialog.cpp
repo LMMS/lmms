@@ -52,11 +52,11 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	setPalette( pal );
 	setFixedSize( 500, 500 );
 
-	auto* inSpec = new EqSpectrumView(&controls->m_inFftBands, this);
+	EqSpectrumView * inSpec = new EqSpectrumView( &controls->m_inFftBands, this );
 	inSpec->move( 26, 17 );
 	inSpec->setColor( QColor( 77, 101, 242, 150 ) );
 
-	auto* outSpec = new EqSpectrumView(&controls->m_outFftBands, this);
+	EqSpectrumView * outSpec = new EqSpectrumView( &controls->m_outFftBands, this );
 	outSpec->setColor( QColor( 0, 255, 239, 150 ) );
 	outSpec->move( 26, 17 );
 
@@ -72,18 +72,16 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	setBand( 6, &controls->m_highShelfActiveModel, &controls->m_highShelfFreqModel, &controls->m_highShelfResModel, &controls->m_highShelfGainModel, QColor(255 ,255, 255), tr( "High-shelf" ), &controls->m_highShelfPeakL, &controls->m_highShelfPeakR,0,0,0,0,0,0 );
 	setBand( 7, &controls->m_lpActiveModel, &controls->m_lpFreqModel, &controls->m_lpResModel, 0, QColor(255 ,255, 255), tr( "LP" ) ,0,0,0,0,0, &controls->m_lp12Model, &controls->m_lp24Model, &controls->m_lp48Model);
 
-	auto* faderBg = new QPixmap(PLUGIN_NAME::getIconPixmap("faderback"));
-	auto* faderLeds = new QPixmap(PLUGIN_NAME::getIconPixmap("faderleds"));
-	auto* faderKnob = new QPixmap(PLUGIN_NAME::getIconPixmap("faderknob"));
+	QPixmap * faderBg = new QPixmap( PLUGIN_NAME::getIconPixmap( "faderback" ) );
+	QPixmap * faderLeds = new QPixmap( PLUGIN_NAME::getIconPixmap( "faderleds" ) );
+	QPixmap * faderKnob = new QPixmap( PLUGIN_NAME::getIconPixmap( "faderknob" ) );
 
-	auto* GainFaderIn = new EqFader(&controls->m_inGainModel, tr("Input gain"), this, faderBg, faderLeds, faderKnob,
-		&controls->m_inPeakL, &controls->m_inPeakR);
+	EqFader * GainFaderIn = new EqFader( &controls->m_inGainModel, tr( "Input gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_inPeakL, &controls->m_inPeakR );
 	GainFaderIn->move( 23, 295 );
 	GainFaderIn->setDisplayConversion( false );
 	GainFaderIn->setHintText( tr( "Gain" ), "dBv");
 
-	auto* GainFaderOut = new EqFader(&controls->m_outGainModel, tr("Output gain"), this, faderBg, faderLeds, faderKnob,
-		&controls->m_outPeakL, &controls->m_outPeakR);
+	EqFader * GainFaderOut = new EqFader( &controls->m_outGainModel, tr( "Output gain" ), this, faderBg, faderLeds, faderKnob, &controls->m_outPeakL, &controls->m_outPeakR );
 	GainFaderOut->move( 453, 295);
 	GainFaderOut->setDisplayConversion( false );
 	GainFaderOut->setHintText( tr( "Gain" ), "dBv" );
@@ -92,8 +90,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	int distance = 126;
 	for( int i = 1; i < m_parameterWidget->bandCount() - 1; i++ )
 	{
-		auto* gainFader = new EqFader(m_parameterWidget->getBandModels(i)->gain, tr(""), this, faderBg, faderLeds,
-			faderKnob, m_parameterWidget->getBandModels(i)->peakL, m_parameterWidget->getBandModels(i)->peakR);
+		EqFader * gainFader = new EqFader( m_parameterWidget->getBandModels( i )->gain, tr( "" ), this, faderBg, faderLeds, faderKnob, m_parameterWidget->getBandModels( i )->peakL, m_parameterWidget->getBandModels( i )->peakR );
 		gainFader->move( distance, 295 );
 		distance += 44;
 		gainFader->setMinimumHeight(80);
@@ -120,7 +117,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		freqKnob->setHintText( tr( "Frequency:" ), "Hz" );
 
 		// adds the Number Active buttons
-		auto* activeButton = new PixmapButton(this, nullptr);
+		PixmapButton * activeButton = new PixmapButton( this, nullptr );
 		activeButton->setCheckable(true);
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 
@@ -143,48 +140,48 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 
 
 	// adds the buttons for Spectrum analyser on/off
-	auto* inSpecButton = new LedCheckBox(this);
+	LedCheckBox * inSpecButton = new LedCheckBox( this );
 	inSpecButton->setCheckable(true);
 	inSpecButton->setModel( &controls->m_analyseInModel );
 	inSpecButton->move( 172, 240 );
-	auto* outSpecButton = new LedCheckBox(this);
+	LedCheckBox * outSpecButton = new LedCheckBox( this );
 	outSpecButton->setCheckable(true);
 	outSpecButton->setModel( &controls->m_analyseOutModel );
 	outSpecButton->move( 302, 240 );
 
 	//hp filter type
-	auto* hp12Button = new PixmapButton(this, nullptr);
+	PixmapButton * hp12Button = new PixmapButton( this , nullptr );
 	hp12Button->setModel( m_parameterWidget->getBandModels( 0 )->hp12 );
 	hp12Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "12dB" ) );
 	hp12Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "12dBoff" ) );
 	hp12Button->move( 79, 298 );
-	auto* hp24Button = new PixmapButton(this, nullptr);
+	PixmapButton * hp24Button = new PixmapButton( this , nullptr );
 	hp24Button->setModel(m_parameterWidget->getBandModels( 0 )->hp24 );
 	hp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	hp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
 
 	hp24Button->move( 79 , 328 );
-	auto* hp48Button = new PixmapButton(this, nullptr);
+	PixmapButton * hp48Button = new PixmapButton( this , nullptr );
 	hp48Button->setModel( m_parameterWidget->getBandModels(0)->hp48 );
 	hp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	hp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );
 
 	hp48Button->move( 79, 358 );
 	//LP filter type
-	auto* lp12Button = new PixmapButton(this, nullptr);
+	PixmapButton * lp12Button = new PixmapButton( this , nullptr );
 	lp12Button->setModel( m_parameterWidget->getBandModels( 7 )->lp12 );
 	lp12Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "12dB" ) );
 	lp12Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "12dBoff" ) );
 
 	lp12Button->move( 387, 298 );
-	auto* lp24Button = new PixmapButton(this, nullptr);
+	PixmapButton * lp24Button = new PixmapButton( this , nullptr );
 	lp24Button->setModel( m_parameterWidget->getBandModels( 7 )->lp24 );
 	lp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	lp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
 
 	lp24Button->move( 387, 328 );
 
-	auto* lp48Button = new PixmapButton(this, nullptr);
+	PixmapButton * lp48Button = new PixmapButton( this , nullptr );
 	lp48Button->setModel( m_parameterWidget->getBandModels( 7 )->lp48 );
 	lp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	lp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );
@@ -199,13 +196,13 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp24 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp48 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 
-	auto* lpBtnGrp = new automatableButtonGroup(this, tr("LP group"));
+	automatableButtonGroup *lpBtnGrp = new automatableButtonGroup( this, tr( "LP group" ) );
 	lpBtnGrp->addButton( lp12Button );
 	lpBtnGrp->addButton( lp24Button );
 	lpBtnGrp->addButton( lp48Button );
 	lpBtnGrp->setModel(&m_controls->m_lpTypeModel);
 
-	auto* hpBtnGrp = new automatableButtonGroup(this, tr("HP group"));
+	automatableButtonGroup *hpBtnGrp = new automatableButtonGroup( this, tr( "HP group" ) );
 	hpBtnGrp->addButton( hp12Button );
 	hpBtnGrp->addButton( hp24Button );
 	hpBtnGrp->addButton( hp48Button );

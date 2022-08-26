@@ -96,7 +96,7 @@ namespace gui
 LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 	ToolPluginView( _tool  )
 {
-	auto* hlayout = new QHBoxLayout(this);
+	QHBoxLayout * hlayout = new QHBoxLayout( this );
 	hlayout->setSpacing( 0 );
 	hlayout->setMargin( 0 );
 
@@ -104,7 +104,7 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 	m_tabBar->setExclusive( true );
 	m_tabBar->setFixedWidth( 72 );
 
-	auto* ws = new QWidget(this);
+	QWidget * ws = new QWidget( this );
 	ws->setFixedSize( 500, 480 );
 
 	QWidget * available = createTab( ws, tr( "Available Effects" ), VALID );
@@ -162,14 +162,14 @@ LadspaBrowserView::LadspaBrowserView( ToolPlugin * _tool ) :
 QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 							LadspaPluginType _type )
 {
-	auto* tab = new QWidget(_parent);
+	QWidget * tab = new QWidget( _parent );
 	tab->setFixedSize( 500, 400 );
-	auto* layout = new QVBoxLayout(tab);
+	QVBoxLayout * layout = new QVBoxLayout( tab );
 	layout->setSpacing( 0 );
 	layout->setMargin( 0 );
 
 	const QString type = "<b>" + tr( "Type:" ) + "</b> ";
-	auto* title = new QLabel(type + _txt, tab);
+	QLabel * title = new QLabel( type + _txt, tab );
 	QFont f = title->font();
 	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
@@ -178,7 +178,7 @@ QWidget * LadspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	layout->addWidget( title );
 	layout->addSpacing( 10 );
 
-	auto* description = new LadspaDescription(tab, _type);
+	LadspaDescription * description = new LadspaDescription( tab, _type );
 	connect( description, SIGNAL( doubleClicked( const ::lmms::ladspa_key_t & ) ),
 				SLOT( showPorts( const ::lmms::ladspa_key_t & ) ) );
 	layout->addWidget( description, 1 );

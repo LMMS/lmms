@@ -60,7 +60,10 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 	for( Effect* effect : m_effects)
 	{
-		if (auto* dummy = dynamic_cast<DummyEffect*>(effect)) { _this.appendChild(dummy->originalPluginData()); }
+		if( DummyEffect* dummy = dynamic_cast<DummyEffect*>(effect) )
+		{
+			_this.appendChild( dummy->originalPluginData() );
+		}
 		else
 		{
 			QDomElement ef = effect->saveState( _doc, _this );

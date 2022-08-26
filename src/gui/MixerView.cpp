@@ -69,7 +69,7 @@ MixerView::MixerView() :
 	setWindowIcon( embed::getIconPixmap( "mixer" ) );
 
 	// main-layout
-	auto* ml = new QHBoxLayout;
+	QHBoxLayout * ml = new QHBoxLayout;
 
 	// Set margins
 	ml->setContentsMargins( 0, 4, 0, 0 );
@@ -131,7 +131,7 @@ MixerView::MixerView() :
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
 
 	// show the add new mixer channel button
-	auto* newChannelBtn = new QPushButton(embed::getIconPixmap("new_channel"), QString(), this);
+	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString(), this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
 	newChannelBtn->setFixedSize( mixerLineSize );
 	connect( newChannelBtn, SIGNAL(clicked()), this, SLOT(addNewChannel()));
@@ -247,13 +247,13 @@ void MixerView::updateMaxChannelSelector()
 		{
 			if( trackList[i]->type() == Track::InstrumentTrack )
 			{
-				auto* inst = (InstrumentTrack*)trackList[i];
+				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				inst->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
 			else if( trackList[i]->type() == Track::SampleTrack )
 			{
-				auto* strk = (SampleTrack*)trackList[i];
+				SampleTrack * strk = (SampleTrack *) trackList[i];
 				strk->mixerChannelModel()->setRange(0,
 					m_mixerChannelViews.size()-1,1);
 			}
@@ -445,12 +445,12 @@ void MixerView::deleteUnusedChannels()
 		int channel = 0;
 		if (t->type() == Track::InstrumentTrack)
 		{
-			auto* inst = dynamic_cast<InstrumentTrack*>(t);
+			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>(t);
 			channel = inst->mixerChannelModel()->value();
 		}
 		else if (t->type() == Track::SampleTrack)
 		{
-			auto* strack = dynamic_cast<SampleTrack*>(t);
+			SampleTrack *strack = dynamic_cast<SampleTrack *>(t);
 			channel = strack->mixerChannelModel()->value();
 		}
 		inUse[channel] = true;

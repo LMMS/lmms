@@ -103,7 +103,7 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 
 void SideBar::appendTab( SideBarWidget *widget )
 {
-	auto* button = new SideBarButton(orientation(), this);
+	SideBarButton *button = new SideBarButton( orientation(), this );
 	button->setText( " " + widget->title() );
 	button->setIcon( widget->icon() );
 	button->setLayoutDirection( Qt::RightToLeft );

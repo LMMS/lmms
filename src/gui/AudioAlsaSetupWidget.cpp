@@ -67,11 +67,11 @@ AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 			SIGNAL(currentIndexChanged(int)),
 			SLOT(onCurrentIndexChanged(int)));
 
-	auto* dev_lbl = new QLabel(tr("DEVICE"), this);
+	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
 
-	auto* m = new LcdSpinBoxModel(/* this */);
+	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audioalsa",
