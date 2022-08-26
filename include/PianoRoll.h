@@ -34,6 +34,7 @@
 #include "ComboBoxModel.h"
 #include "SerializingObject.h"
 #include "Note.h"
+#include "LcdSpinBox.h"
 #include "lmms_basics.h"
 #include "Song.h"
 #include "StepRecorder.h"
@@ -109,6 +110,7 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
+		ModeEditDetuningShift,
 		ModeEditKnife
 	};
 
@@ -356,6 +358,8 @@ private:
 	ComboBoxModel m_chordModel;
 	ComboBoxModel m_snapModel;
 
+	IntModel m_detuningShiftModel;
+
 	static const QVector<float> m_zoomLevels;
 	static const QVector<float> m_zoomYLevels;
 
@@ -555,6 +559,7 @@ private:
 
 	PianoRoll* m_editor;
 
+	LcdSpinBox *m_shiftSpinBox;
 	QToolButton* m_fileToolsButton;
 	ComboBox * m_zoomingComboBox;
 	ComboBox * m_zoomingYComboBox;

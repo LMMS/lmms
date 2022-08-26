@@ -1058,6 +1058,21 @@ void AutomationClip::resolveAllIDs()
 
 
 
+/**
+ * @brief Adds the specified value to all inValues and outValues.
+ */
+void AutomationClip::shift(float amt) {
+	QMutexLocker clipMutexLocker(&m_clipMutex);
+	QList<tick_t> positions = m_timeMap.keys();
+	for (tick_t position : positions) {
+		m_timeMap[position] += amt;
+	}
+	emit dataChanged();
+}
+
+
+
+
 void AutomationClip::clear()
 {
 	QMutexLocker m(&m_clipMutex);

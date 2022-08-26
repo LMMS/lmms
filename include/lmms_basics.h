@@ -40,6 +40,8 @@ namespace lmms
 
 using bar_t = int32_t;
 using tick_t = int32_t;
+const auto TICK_MAX = INT32_MAX;
+const auto TICK_MIN = INT32_MIN;
 using volume_t = uint8_t;
 using panning_t = int8_t;
 

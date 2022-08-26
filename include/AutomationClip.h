@@ -177,6 +177,8 @@ public:
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
 
+	void shift(float amt);
+
 public slots:
 	void clear();
 	void objectDestroyed( lmms::jo_id_t );
