@@ -4,7 +4,11 @@
 
 CARLA_EXPORT const char* carla_get_library_filename() { return nullptr; }
 CARLA_EXPORT const char* carla_get_library_folder() { return nullptr; }
-CARLA_EXPORT const NativePluginDescriptor* carla_get_native_rack_plugin() { return nullptr; }
+CARLA_EXPORT const NativePluginDescriptor;
+*carla_get_native_rack_plugin()
+{
+	return nullptr;
+}
 CARLA_EXPORT const NativePluginDescriptor* carla_get_native_patchbay_plugin() { return nullptr; }
 CARLA_EXPORT const NativePluginDescriptor* carla_get_native_patchbay16_plugin() { return nullptr; }
 CARLA_EXPORT const NativePluginDescriptor* carla_get_native_patchbay32_plugin() { return nullptr; }

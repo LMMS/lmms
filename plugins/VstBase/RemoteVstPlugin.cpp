@@ -1048,7 +1048,7 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 					return a.deltaFrames < b.deltaFrames;
 				} );
 
-		VstEvents* events = (VstEvents *) eventsBuffer;
+		auto events = (VstEvents*)eventsBuffer;
 		events->reserved = 0;
 		events->numEvents = m_midiEvents.size();
 
@@ -1425,7 +1425,7 @@ struct sBank
 void RemoteVstPlugin::savePreset( const std::string & _file )
 {
 	unsigned int chunk_size = 0;
-	sBank * pBank = ( sBank* ) new char[ sizeof( sBank ) ];
+	auto pBank = (sBank*)new char[sizeof(sBank)];
 	char progName[ 128 ] = { 0 };
 	char* data = nullptr;
 	const bool chunky = ( m_plugin->flags & ( 1 << 5 ) ) != 0;
@@ -1444,11 +1444,11 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 		if (isPreset) {
 			chunk_size = m_plugin->numParams * sizeof( float );
 			data = new char[ chunk_size ];
-			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( data );
+			auto toUIntArray = reinterpret_cast<unsigned int*>(data);
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				float value = m_plugin->getParameter( m_plugin, i );
-				unsigned int * pValue = ( unsigned int * ) &value;
+				auto pValue = (unsigned int*)&value;
 				toUIntArray[ i ] = endian_swap( *pValue );
 			}
 		} else chunk_size = (((m_plugin->numParams * sizeof( float )) + 56)*m_plugin->numPrograms);
@@ -1463,7 +1463,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) pBank->fxMagic = 0x6B427846;
 
 	pBank->version = 0x01000000;
-	unsigned int uIntToFile = (unsigned int) m_plugin->uniqueID;
+	auto uIntToFile = (unsigned int)m_plugin->uniqueID;
 	pBank->fxID = endian_swap( uIntToFile );
 	uIntToFile = (unsigned int) pluginVersion();
 	pBank->fxVersion = endian_swap( uIntToFile );
@@ -1526,9 +1526,9 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 {
 	void * chunk = nullptr;
-	unsigned int * pLen = new unsigned int[ 1 ];
+	auto pLen = new unsigned int[1];
 	unsigned int len = 0;
-	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
+	auto pBank = (sBank*)new char[sizeof(sBank)];
 	FILE * stream = F_OPEN_UTF8( _file, "rb" );
 	if (!stream)
 	{
@@ -1580,7 +1580,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			pluginDispatch( 24, 1, len, chunk );
 		else
 		{
-			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( chunk );
+			auto toUIntArray = reinterpret_cast<unsigned int*>(chunk);
 			for (int i = 0; i < pBank->numPrograms; i++ )
 			{
 				toUInt = endian_swap( toUIntArray[ i ] );
@@ -1634,7 +1634,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 {
-	char * chunk = new char[_len];
+	auto chunk = new char[_len];
 
 	FILE* fp = F_OPEN_UTF8( _file, "rb" );
 	if (!fp)

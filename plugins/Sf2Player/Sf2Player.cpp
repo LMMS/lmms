@@ -186,7 +186,7 @@ Sf2Instrument::Sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusSpeed, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	auto iph = new InstrumentPlayHandle(this, _instrument_track);
 	Engine::audioEngine()->addPlayHandle( iph );
 }
 
@@ -640,7 +640,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		}
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
 
-		Sf2PluginData * pluginData = new Sf2PluginData;
+		auto pluginData = new Sf2PluginData;
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
 		pluginData->lastVelocity = _n->midiVelocity( baseVelocity );
@@ -658,7 +658,7 @@ void Sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	}
 	else if( _n->isReleased() && ! _n->instrumentTrack()->isSustainPedalPressed() ) // note is released during this period
 	{
-		Sf2PluginData * pluginData = static_cast<Sf2PluginData *>( _n->m_pluginData );
+		auto pluginData = static_cast<Sf2PluginData*>(_n->m_pluginData);
 		pluginData->offset = _n->framesBeforeRelease();
 		pluginData->isNew = false;
 
@@ -766,8 +766,8 @@ void Sf2Instrument::play( sampleFrame * _working_buffer )
 		NotePlayHandle * currentNote = m_playingNotes[0];
 		for( int i = 1; i < m_playingNotes.size(); ++i )
 		{
-			Sf2PluginData * currentData = static_cast<Sf2PluginData *>( currentNote->m_pluginData );
-			Sf2PluginData * iData = static_cast<Sf2PluginData *>( m_playingNotes[i]->m_pluginData );
+			auto currentData = static_cast<Sf2PluginData*>(currentNote->m_pluginData);
+			auto iData = static_cast<Sf2PluginData*>(m_playingNotes[i]->m_pluginData);
 			if( currentData->offset > iData->offset )
 			{
 				currentNote = m_playingNotes[i];
@@ -776,7 +776,7 @@ void Sf2Instrument::play( sampleFrame * _working_buffer )
 
 		// process the current note:
 		// first see if we're synced in frame count
-		Sf2PluginData * currentData = static_cast<Sf2PluginData *>( currentNote->m_pluginData );
+		auto currentData = static_cast<Sf2PluginData*>(currentNote->m_pluginData);
 		if( currentData->offset > currentFrame )
 		{
 			renderFrames( currentData->offset - currentFrame, _working_buffer + currentFrame );
@@ -860,7 +860,7 @@ void Sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 
 void Sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	Sf2PluginData * pluginData = static_cast<Sf2PluginData *>( _n->m_pluginData );
+	auto pluginData = static_cast<Sf2PluginData*>(_n->m_pluginData);
 	if( ! pluginData->noteOffSent ) // if we for some reason haven't noteoffed the note before it gets deleted,
 									// do it here
 	{
@@ -908,37 +908,36 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 //	QVBoxLayout * vl = new QVBoxLayout( this );
 //	QHBoxLayout * hl = new QHBoxLayout();
 
-	Sf2Instrument* k = castModel<Sf2Instrument>();
+	auto k = castModel<Sf2Instrument>();
 
-	connect( &k->m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
-	connect( &k->m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatchName() ) );
+	connect(&k->m_bankNum, SIGNAL(dataChanged()), this, SLOT(updatePatchName()));
+	connect(&k->m_patchNum, SIGNAL(dataChanged()), this, SLOT(updatePatchName()));
 
 	// File Button
-	m_fileDialogButton = new PixmapButton( this );
-	m_fileDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_fileDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_on" ) );
-	m_fileDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "fileselect_off" ) );
-	m_fileDialogButton->move( 217, 107 );
+	m_fileDialogButton = new PixmapButton(this);
+	m_fileDialogButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_fileDialogButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("fileselect_on"));
+	m_fileDialogButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("fileselect_off"));
+	m_fileDialogButton->move(217, 107);
 
-	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
+	connect(m_fileDialogButton, SIGNAL(clicked()), this, SLOT(showFileDialog()));
 
 	m_fileDialogButton->setToolTip(tr("Open SoundFont file"));
 
 	// Patch Button
-	m_patchDialogButton = new PixmapButton( this );
-	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
-	m_patchDialogButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_on" ) );
-	m_patchDialogButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "patches_off" ) );
-	m_patchDialogButton->setEnabled( false );
-	m_patchDialogButton->move( 217, 125 );
+	m_patchDialogButton = new PixmapButton(this);
+	m_patchDialogButton->setCursor(QCursor(Qt::PointingHandCursor));
+	m_patchDialogButton->setActiveGraphic(PLUGIN_NAME::getIconPixmap("patches_on"));
+	m_patchDialogButton->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("patches_off"));
+	m_patchDialogButton->setEnabled(false);
+	m_patchDialogButton->move(217, 125);
 
-	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
+	connect(m_patchDialogButton, SIGNAL(clicked()), this, SLOT(showPatchDialog()));
 
 	m_patchDialogButton->setToolTip(tr("Choose patch"));
 
-
 	// LCDs
-	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
+	m_bankNumLcd = new LcdSpinBox(3, "21pink", this);
 	m_bankNumLcd->move(131, 62);
 //	m_bankNumLcd->addTextForValue( -1, "---" );
 //	m_bankNumLcd->setEnabled( false );
@@ -1057,7 +1056,7 @@ Sf2InstrumentView::Sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 void Sf2InstrumentView::modelChanged()
 {
-	Sf2Instrument * k = castModel<Sf2Instrument>();
+	auto k = castModel<Sf2Instrument>();
 	m_bankNumLcd->setModel( &k->m_bankNum );
 	m_patchNumLcd->setModel( &k->m_patchNum );
 
@@ -1088,7 +1087,7 @@ void Sf2InstrumentView::modelChanged()
 
 void Sf2InstrumentView::updateFilename()
 {
-	Sf2Instrument * i = castModel<Sf2Instrument>();
+	auto i = castModel<Sf2Instrument>();
 	QFontMetrics fm( m_filenameLabel->font() );
 	QString file = i->m_filename.endsWith( ".sf2", Qt::CaseInsensitive ) ?
 			i->m_filename.left( i->m_filename.length() - 4 ) :
@@ -1108,7 +1107,7 @@ void Sf2InstrumentView::updateFilename()
 
 void Sf2InstrumentView::updatePatchName()
 {
-	Sf2Instrument * i = castModel<Sf2Instrument>();
+	auto i = castModel<Sf2Instrument>();
 	QFontMetrics fm( font() );
 	QString patch = i->getCurrentPatchName();
 	m_patchLabel->setText( fm.elidedText( patch, Qt::ElideLeft, m_patchLabel->width() ) );
@@ -1130,7 +1129,7 @@ void Sf2InstrumentView::invalidateFile()
 
 void Sf2InstrumentView::showFileDialog()
 {
-	Sf2Instrument * k = castModel<Sf2Instrument>();
+	auto k = castModel<Sf2Instrument>();
 
 	FileDialog ofd( nullptr, tr( "Open SoundFont file" ) );
 	ofd.setFileMode( FileDialog::ExistingFiles );
@@ -1170,7 +1169,7 @@ void Sf2InstrumentView::showFileDialog()
 
 void Sf2InstrumentView::showPatchDialog()
 {
-	Sf2Instrument * k = castModel<Sf2Instrument>();
+	auto k = castModel<Sf2Instrument>();
 
 	PatchesDialog pd( this );
 

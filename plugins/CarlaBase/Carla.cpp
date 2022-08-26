@@ -194,8 +194,8 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
         fDescriptor->activate(fHandle);
 
     // we need a play-handle which cares for calling play()
-    InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
-    Engine::audioEngine()->addPlayHandle( iph );
+	auto iph = new InstrumentPlayHandle(this, instrumentTrack);
+	Engine::audioEngine()->addPlayHandle( iph );
 
 #if CARLA_VERSION_HEX >= CARLA_MIN_PARAM_VERSION
     // text filter completion
@@ -625,8 +625,8 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     pal.setBrush(backgroundRole(), instrument->kIsPatchbay ? PLUGIN_NAME::getIconPixmap("artwork-patchbay") : PLUGIN_NAME::getIconPixmap("artwork-rack"));
     setPalette(pal);
 
-    QHBoxLayout* l = new QHBoxLayout(this);
-    l->setContentsMargins( 20, 180, 10, 10 );
+	auto l = new QHBoxLayout(this);
+	l->setContentsMargins( 20, 180, 10, 10 );
     l->setSpacing(3);
     l->setAlignment(Qt::AlignTop);
 
@@ -750,8 +750,8 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_curOutColumn(0),
 	m_curOutRow(0)
 {
-	QWidget* centralWidget = new QWidget(this);
-	QVBoxLayout* verticalLayout = new QVBoxLayout(centralWidget);
+	auto centralWidget = new QWidget(this);
+	auto verticalLayout = new QVBoxLayout(centralWidget);
 
 	// -- Toolbar
 	m_toolBarLayout = new QHBoxLayout();
@@ -794,9 +794,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	m_toolBarLayout->addWidget(m_groupFilterCombo);
 
 	// -- Input params
-	QFrame* inputFrame = new QFrame(this);
-	QVBoxLayout* inputLayout = new QVBoxLayout(inputFrame);
-	QLabel* inputLabel = new QLabel("Input parameters", inputFrame);
+	auto inputFrame = new QFrame(this);
+	auto inputLayout = new QVBoxLayout(inputFrame);
+	auto inputLabel = new QLabel("Input parameters", inputFrame);
 
 	m_inputScrollArea = new QScrollArea(inputFrame);
 	m_inputScrollAreaWidgetContent = new QWidget();
@@ -820,9 +820,9 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	inputLayout->addWidget(m_inputScrollArea);
 
 	// -- Output params
-	QFrame* outputFrame = new QFrame(this);
-	QVBoxLayout* outputLayout = new QVBoxLayout(outputFrame);
-	QLabel* outputLabel = new QLabel("Output parameters", outputFrame);
+	auto outputFrame = new QFrame(this);
+	auto outputLayout = new QVBoxLayout(outputFrame);
+	auto outputLabel = new QLabel("Output parameters", outputFrame);
 
 	m_outputScrollArea = new QScrollArea(outputFrame);
 	m_outputScrollAreaWidgetContent = new QWidget();
@@ -846,7 +846,7 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 	outputLayout->addWidget(m_outputScrollArea);
 
 	// -- QSplitter
-	QSplitter* splitter = new QSplitter(Qt::Vertical, this);
+	auto splitter = new QSplitter(Qt::Vertical, this);
 
 	// -- Add layout and widgets.
 	verticalLayout->addLayout(m_toolBarLayout);
@@ -866,8 +866,8 @@ CarlaParamsView::CarlaParamsView(CarlaInstrumentView* const instrumentView, QWid
 #endif
 
 	// -- Sub window
-	CarlaParamsSubWindow* win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(), Qt::SubWindow |
-		Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+	auto win = new CarlaParamsSubWindow(getGUI()->mainWindow()->workspace()->viewport(),
+		Qt::SubWindow | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_carlaInstrumentView->m_paramsSubWindow = getGUI()->mainWindow()->workspace()->addSubWindow(win);
 	m_carlaInstrumentView->m_paramsSubWindow->setSizePolicy(
 		QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -976,7 +976,7 @@ void CarlaParamsView::filterKnobs()
 	}
 
 	// Add spacer so all knobs go to top
-	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	auto verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	m_inputScrollAreaLayout->addItem(verticalSpacer, m_curRow+1, 0, 1, 1);
 }
 

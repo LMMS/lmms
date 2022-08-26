@@ -58,7 +58,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 		setPixmap( _icon );
 	}
 	QString txt = _key + ":" + _value;
-	QMimeData * m = new QMimeData();
+	auto m = new QMimeData();
 	m->setData( mimeType( MimeType::StringPair ), txt.toUtf8() );
 	setMimeData( m );
 	exec( Qt::LinkAction, Qt::LinkAction );

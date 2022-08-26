@@ -86,9 +86,7 @@ LadspaManager::LadspaManager()
 
 			if( plugin_lib.load() == true )
 			{
-				LADSPA_Descriptor_Function descriptorFunction =
-			( LADSPA_Descriptor_Function ) plugin_lib.resolve(
-							"ladspa_descriptor" );
+				auto descriptorFunction = (LADSPA_Descriptor_Function)plugin_lib.resolve("ladspa_descriptor");
 				if( descriptorFunction != nullptr )
 				{
 					addPlugins( descriptorFunction,
@@ -158,8 +156,7 @@ void LadspaManager::addPlugins(
 			continue;
 		}
 
-		LadspaManagerDescription * plugIn = 
-				new LadspaManagerDescription;
+		auto plugIn = new LadspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
 		plugIn->index = pluginIndex;
 		plugIn->inputChannels = getPluginInputs( descriptor );

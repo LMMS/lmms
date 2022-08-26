@@ -312,7 +312,7 @@ struct RandomVectorSeedFunction : public exprtk::ifunction<float>
 		{
 			return 0;
 		}
-		const unsigned int xi = (unsigned int)index;
+		const auto xi = (unsigned int)index;
 		const unsigned int si = irseed % data_size;
 		const unsigned int sa = irseed / data_size;
 		unsigned int res=rotateLeft(random_data[(xi + 23 * si + 1) % data_size] ^ random_data[(xi / data_size + sa) % data_size],sa % 31 + 1);
@@ -634,13 +634,13 @@ bool ExprFront::add_cyclic_vector(const char* name, const float* data, size_t le
 	{
 		if (interp)
 		{
-			WaveValueFunctionInterpolate<float> *wvf = new WaveValueFunctionInterpolate<float>(data, length);
+			auto wvf = new WaveValueFunctionInterpolate<float>(data, length);
 			m_data->m_cyclics_interp.push_back(wvf);
 			return m_data->m_symbol_table.add_function(name, *wvf);
 		}
 		else
 		{
-			WaveValueFunction<float> *wvf = new WaveValueFunction<float>(data, length);
+			auto wvf = new WaveValueFunction<float>(data, length);
 			m_data->m_cyclics.push_back(wvf);
 			return m_data->m_symbol_table.add_function(name, *wvf);
 		}
