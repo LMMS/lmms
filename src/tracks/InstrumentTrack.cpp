@@ -756,6 +756,8 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 			// skip notes which are posated before start-bar
 			while( nit != notes.end() && ( *nit )->pos() < cur_start )
 			{
+				// older notes must not keep the shouldSkip flag
+				((Note*) *nit)->skipNextPlay(false);
 				++nit;
 			}
 		}
@@ -764,6 +766,14 @@ bool InstrumentTrack::play( const TimePos & _start, const fpp_t _frames,
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{
+			// if the note is flaged to be skipped on next play, do just that
+			if (cur_note->shouldSkip())
+			{
+				cur_note->skipNextPlay(false);
+				++nit;
+				continue;
+			}
+
 			const f_cnt_t note_frames =
 				cur_note->length().frames( frames_per_tick );
 
@@ -992,18 +1002,18 @@ void InstrumentTrack::replaceInstrument(DataFile dataFile)
 
 	InstrumentTrack::removeMidiPortNode(dataFile);
 	setSimpleSerializing();
-	
+
 	//Replacing an instrument shouldn't change the solo/mute state.
 	bool oldMute = isMuted();
 	bool oldSolo = isSolo();
 	bool oldMutedBeforeSolo = isMutedBeforeSolo();
 
 	loadSettings(dataFile.content().toElement());
-	
+
 	setMuted(oldMute);
 	setSolo(oldSolo);
 	setMutedBeforeSolo(oldMutedBeforeSolo);
-	
+
 	m_mixerChannelModel.setValue(mixerChannel);
 	Engine::getSong()->setModified();
 }
