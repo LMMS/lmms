@@ -632,7 +632,7 @@ void FileBrowserTreeWidget::previewFileItem(FileItem* file)
 		delete tf;
 	}
 	else if (
-		(ext == "xiz" || ext == "sf2" || ext == "sf3" ||
+		(ext == "xiz" || ext == "xmz" || ext == "sf2" || ext == "sf3" ||
 		 ext == "gig" || ext == "pat")
 		&& !getPluginFactory()->pluginSupportingExtension(ext).isNull())
 	{
@@ -1236,7 +1236,7 @@ void FileItem::determineFileType()
 		m_type = PresetFile;
 		m_handling = LoadAsPreset;
 	}
-	else if( ext == "xiz" && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
+	else if( (ext == "xiz" || ext == "xmz" ) && ! getPluginFactory()->pluginSupportingExtension(ext).isNull() )
 	{
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;

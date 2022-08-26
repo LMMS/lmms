@@ -205,6 +205,12 @@ public:
 		return m_dataDir + TRACK_ICON_PATH;
 	}
 
+	const QString & spaDir() const
+	{
+		return m_spaDir;
+	}
+
+
 	const QString recoveryFile() const
 	{
 		return m_workingDir + "recover.mmp";
@@ -258,6 +264,7 @@ public:
 	void setLADSPADir(const QString & ladspaDir);
 	void setSF2Dir(const QString & sf2Dir);
 	void setSF2File(const QString & sf2File);
+	void setSPADir(const QString & sd);
 	void setSTKDir(const QString & stkDir);
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
@@ -288,6 +295,7 @@ private:
 	QString m_dataDir;
 	QString m_vstDir;
 	QString m_ladspaDir;
+	QString m_spaDir;
 	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_sf2File;

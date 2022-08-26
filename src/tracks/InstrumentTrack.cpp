@@ -23,6 +23,8 @@
  */
 #include "InstrumentTrack.h"
 
+#include <QDebug>
+#include <QTextStream>
 #include "AudioEngine.h"
 #include "AutomationClip.h"
 #include "ConfigManager.h"

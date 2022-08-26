@@ -37,6 +37,7 @@ SET(LMMS_SRCS
 	gui/SendButtonIndicator.cpp
 	gui/SideBar.cpp
 	gui/SideBarWidget.cpp
+	gui/SpaViewBase.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/ToolPluginView.cpp

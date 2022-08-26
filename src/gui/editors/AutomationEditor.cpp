@@ -2031,9 +2031,9 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		AutomatableModel * mod = Engine::getAutomatableModel( val,
+			_de->mimeData()->hasFormat( "application/x-osc-stringpair") );
+
 		if (mod != nullptr)
 		{
 			bool added = m_editor->m_clip->addObject( mod );
@@ -2047,6 +2047,8 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 			}
 			setCurrentClip( m_editor->m_clip );
 		}
+
+		_de->acceptProposedAction();
 	}
 
 	update();

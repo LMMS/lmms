@@ -58,6 +58,8 @@ SET(LMMS_PLUGIN_LIST
 	Sf2Player
 	Sfxr
 	Sid
+	SpaEffect
+	SpaInstrument
 	SpectrumAnalyzer
 	StereoEnhancer
 	StereoMatrix

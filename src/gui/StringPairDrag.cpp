@@ -25,6 +25,7 @@
  */
 
 
+#include <QDebug>
 #include <QMimeData>
 #include <QDragEnterEvent>
 
@@ -86,18 +87,35 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 	// For mimeType() and MimeType enum class
 	using namespace Clipboard;
 
-	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) )
+	if( !_dee->mimeData()->hasFormat( mimeType( MimeType::StringPair ) ) &&
+		!_dee->mimeData()->hasFormat( mimeType( MimeType::Osc ) ) )
 	{
-		return( false );
+		qDebug()	<< "will reject: bad mimetype:"
+					<< (_dee->mimeData()->formats().empty()
+						? "none"
+						: _dee->mimeData()->formats().front().toUtf8().data());
+		return false;
 	}
 	QString txt = _dee->mimeData()->data( mimeType( MimeType::StringPair ) );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
-		return( true );
+		return true;
+	}
+	else {
+		QString txtOsc = _dee->mimeData()->data( mimeType( MimeType::Osc ) );
+		if( _allowed_keys.split( ',' ).contains( txtOsc.section( ':', 0, 0 ) ) )
+		{
+			_dee->acceptProposedAction();
+			qDebug() << "will accept OSC DnD";
+			return true;
+		}
+		else
+			qDebug() << "will reject DnD: cannot drop"
+					<< txt << "or" << txtOsc <<  "here";
 	}
 	_dee->ignore();
-	return( false );
+	return false;
 }
 
 

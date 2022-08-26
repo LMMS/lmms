@@ -75,7 +75,8 @@ protected:
 	void contextMenuEvent( QContextMenuEvent * _me ) override;
 	void modelChanged() override;
 	void mouseDoubleClickEvent( QMouseEvent * event ) override;
-
+	virtual void dragEnterEvent( QDragEnterEvent *dee );
+	virtual void dropEvent( QDropEvent * de );
 
 private:
 	QMdiSubWindow * m_subWindow;

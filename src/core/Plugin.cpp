@@ -230,9 +230,16 @@ Plugin * Plugin::instantiate(const QString& pluginName, Model * parent,
 		if ((instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )))
 		{
 			inst = instantiationHook(parent, data);
-			if(!inst) {
-				inst = new DummyPlugin();
+			if(inst)
+			{
+				unsigned port;
+				for (std::size_t chan = 0;
+					(port = inst->netPort(chan)); ++chan)
+				{
+					Engine::addPluginByPort(port, inst);
+				}
 			}
+	 		else { inst = new DummyPlugin();}
 		}
 		else
 		{

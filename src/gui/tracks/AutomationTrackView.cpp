@@ -62,9 +62,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+		AutomatableModel * mod = Engine::getAutomatableModel(val,
+			_de->mimeData()->hasFormat( "application/x-osc-stringpair"));
+
 		if( mod != nullptr )
 		{
 			TimePos pos = TimePos( trackContainerView()->
@@ -84,6 +84,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			AutomationClip * autoClip = dynamic_cast<AutomationClip *>( clip );
 			autoClip->addObject( mod );
 		}
+
+		// tell the source app that the drop did succeed
+		_de->acceptProposedAction();
 	}
 
 	update();
