@@ -135,7 +135,7 @@ for cur_file in files:
             namespace_pattern.search(cur_text) or error(cur_file, None, f'File has no namespace lmms')
 
         header_guard = str(cur_file).endswith('.h')
-        expectations: list[Expectation] = []
+        expectations = []  # type: list[Expectation]
 
         if header_guard:
             if not header_guard_pattern.match(cur_text):
