@@ -329,8 +329,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 
 	m_arpRandomModel.addItem(tr("Base"), std::make_unique<PixmapLoader>("arp_random"));
 	m_arpRandomModel.addItem(tr("Exponential"), std::make_unique<PixmapLoader>("arp_random"));
-	m_arpRandomModel.addItem(tr("Normal"), std::make_unique<PixmapLoader>("arp_random"));
-	m_arpRandomModel.addItem(tr("Chase"), std::make_unique<PixmapLoader>("arp_random"));
+	m_arpRandomModel.addItem(tr("Normal"), std::make_unique<PixmapLoader>("filter_bp"));
+	m_arpRandomModel.addItem(tr("Chase"), std::make_unique<PixmapLoader>("white_noise_wave_active"));
 
 	m_arpModeModel.addItem( tr( "Free" ), std::make_unique<PixmapLoader>( "arp_free" ) );
 	m_arpModeModel.addItem( tr( "Sort" ), std::make_unique<PixmapLoader>( "arp_sort" ) );
