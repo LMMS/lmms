@@ -180,11 +180,9 @@ void PatternTrack::loadTrackSpecificSettings(const QDomElement& _this)
 	{
 		const int src = _this.attribute("sourcepattern").toInt();
 		const int dst = s_infoMap[this];
-		TrackContainer::TrackList tl =
-					Engine::patternStore()->tracks();
 		// copy clips of all tracks from source pattern (at bar "src") to destination
 		// clips (which are created if they do not exist yet)
-		for (auto& track : tl)
+		for (auto& track : Engine::patternStore()->tracks())
 		{
 			Clip::copyStateTo(track->getClip(src), track->getClip(dst));
 		}

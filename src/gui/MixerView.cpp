@@ -239,8 +239,7 @@ void MixerView::updateMaxChannelSelector()
 	TrackContainer::TrackList songTracks = Engine::getSong()->tracks();
 	TrackContainer::TrackList patternStoreTracks = Engine::patternStore()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTracks, patternStoreTracks};
-	for (auto& trackList : trackLists)
+	for (auto& trackList : {songTracks, patternStoreTracks})
 	{
 		for (auto& track : trackList)
 		{

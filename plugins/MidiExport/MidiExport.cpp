@@ -216,27 +216,28 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
 
 				// for each pattern clip of the current pattern track (in song editor)
-				for (auto& pair : plist)
+				for (const auto& position : plist)
 				{
-					while (!st.empty() && st.back().second <= pair.first)
+					const auto& [start, end] = position;
+					while (!st.empty() && st.back().second <= start)
 					{
 						writePatternClip(midiClip, nv, len, st.back().first, pos, st.back().second);
 						pos = st.back().second;
 						st.pop_back();
 					}
 
-					if (!st.empty() && st.back().second <= pair.second)
+					if (!st.empty() && st.back().second <= end)
 					{
-						writePatternClip(midiClip, nv, len, st.back().first, pos, pair.first);
-						pos = pair.first;
-						while (!st.empty() && st.back().second <= pair.second)
+						writePatternClip(midiClip, nv, len, st.back().first, pos, start);
+						pos = start;
+						while (!st.empty() && st.back().second <= end)
 						{
 							st.pop_back();
 						}
 					}
 
-					st.push_back(pair);
-					pos = pair.first;
+					st.push_back(position);
+					pos = start;
 				}
 
 				while (!st.empty())

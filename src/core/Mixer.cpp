@@ -387,8 +387,7 @@ void Mixer::moveChannelLeft( int index )
 	TrackContainer::TrackList songTrackList = Engine::getSong()->tracks();
 	TrackContainer::TrackList patternTrackList = Engine::patternStore()->tracks();
 
-	TrackContainer::TrackList trackLists[] = {songTrackList, patternTrackList};
-	for (auto& trackList : trackLists)
+	for (auto& trackList : {songTrackList, patternTrackList})
 	{
 		for (auto& track : trackList)
 		{
